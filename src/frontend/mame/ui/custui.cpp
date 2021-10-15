@@ -618,7 +618,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	// bottom text
 	// get the text for 'UI Select'
-	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change the color value"), ui().get_general_input_setting(IPT_UI_SELECT)) };
+	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change color"), ui().get_general_input_setting(IPT_UI_SELECT)) };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,

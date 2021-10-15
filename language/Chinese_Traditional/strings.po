@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-11 14:20+1100\n"
+"POT-Creation-Date: 2021-10-16 04:41+1100\n"
 "PO-Revision-Date: 2021-10-14 21:20+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
@@ -16,6 +16,3196 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: src/frontend/mame/ui/ui.cpp:477 src/frontend/mame/ui/ui.cpp:550
+msgid ""
+"\n"
+"\n"
+"Press any key to continue"
+msgstr ""
+"\n"
+"\n"
+"按任意鍵繼續"
+
+#: src/frontend/mame/ui/ui.cpp:562
+msgid "This driver requires images to be loaded in the following device(s): "
+msgstr "此驅動需要額外載入下列裝置的映像檔： "
+
+#: src/frontend/mame/ui/ui.cpp:1268
+#, c-format
+msgid ""
+"UI controls enabled\n"
+"Use %1$s to toggle"
+msgstr ""
+"啟用 UI 控制\n"
+"以 %1$s 切換"
+
+#: src/frontend/mame/ui/ui.cpp:1270
+#, c-format
+msgid ""
+"UI controls disabled\n"
+"Use %1$s to toggle"
+msgstr ""
+"停用 UI 控制\n"
+"以 %1$s 切換"
+
+#: src/frontend/mame/ui/ui.cpp:1464
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press ''%1$s'' to quit,\n"
+"Press ''%2$s'' to return to emulation."
+msgstr ""
+"確定要退出嗎？\n"
+"\n"
+"按『%1$s』退出，\n"
+"按『%2$s』繼續模擬。"
+
+#: src/frontend/mame/ui/ui.cpp:1514
+msgid "Master Volume"
+msgstr "主音量"
+
+#: src/frontend/mame/ui/ui.cpp:1523
+#, c-format
+msgid "%1$s Volume"
+msgstr "%1$s 音量"
+
+#: src/frontend/mame/ui/ui.cpp:1545
+#, c-format
+msgid "Overclock CPU %1$s"
+msgstr "超頻 CPU %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1553
+#, c-format
+msgid "Overclock %1$s sound"
+msgstr "超頻 %1$s 聲音"
+
+#: src/frontend/mame/ui/ui.cpp:1572
+#, c-format
+msgid "%1$s Refresh Rate"
+msgstr "%1$s 更新率"
+
+#: src/frontend/mame/ui/ui.cpp:1577
+#, c-format
+msgid "%1$s Brightness"
+msgstr "%1$s 亮度"
+
+#: src/frontend/mame/ui/ui.cpp:1579
+#, c-format
+msgid "%1$s Contrast"
+msgstr "%1$s 對比"
+
+#: src/frontend/mame/ui/ui.cpp:1581
+#, c-format
+msgid "%1$s Gamma"
+msgstr "%1$s Gamma 值"
+
+#: src/frontend/mame/ui/ui.cpp:1585
+#, c-format
+msgid "%1$s Horiz Stretch"
+msgstr "%1$s 水平延展"
+
+#: src/frontend/mame/ui/ui.cpp:1587
+#, c-format
+msgid "%1$s Horiz Position"
+msgstr "%1$s 水平位置"
+
+#: src/frontend/mame/ui/ui.cpp:1589
+#, c-format
+msgid "%1$s Vert Stretch"
+msgstr "%1$s 垂直延展"
+
+#: src/frontend/mame/ui/ui.cpp:1591
+#, c-format
+msgid "%1$s Vert Position"
+msgstr "%1$s 垂直位置"
+
+#: src/frontend/mame/ui/ui.cpp:1607
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Stretch"
+msgstr "雷射影碟 %1$s 水平延展"
+
+#: src/frontend/mame/ui/ui.cpp:1610
+#, c-format
+msgid "Laserdisc '%1$s' Horiz Position"
+msgstr "雷射影碟 %1$s 水平位置"
+
+#: src/frontend/mame/ui/ui.cpp:1612
+#, c-format
+msgid "Laserdisc '%1$s' Vert Stretch"
+msgstr "雷射影碟 %1$s 垂直延展"
+
+#: src/frontend/mame/ui/ui.cpp:1615
+#, c-format
+msgid "Laserdisc '%1$s' Vert Position"
+msgstr "雷射影碟 %1$s 垂直位置"
+
+#: src/frontend/mame/ui/ui.cpp:1625
+msgid "Vector Flicker"
+msgstr "向量閃爍度"
+
+#: src/frontend/mame/ui/ui.cpp:1626
+msgid "Beam Width Minimum"
+msgstr "最小光束寬度"
+
+#: src/frontend/mame/ui/ui.cpp:1627
+msgid "Beam Width Maximum"
+msgstr "最大光束寬度"
+
+#: src/frontend/mame/ui/ui.cpp:1628
+msgid "Beam Dot Size"
+msgstr "光束點大小"
+
+#: src/frontend/mame/ui/ui.cpp:1629
+msgid "Beam Intensity Weight"
+msgstr "光束強度"
+
+#: src/frontend/mame/ui/ui.cpp:1642
+#, c-format
+msgid "Crosshair Scale %1$s"
+msgstr "十字準星尺度 %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1642 src/frontend/mame/ui/ui.cpp:1644
+msgid "X"
+msgstr "X"
+
+#: src/frontend/mame/ui/ui.cpp:1642 src/frontend/mame/ui/ui.cpp:1644
+msgid "Y"
+msgstr "Y"
+
+#: src/frontend/mame/ui/ui.cpp:1644
+#, c-format
+msgid "Crosshair Offset %1$s"
+msgstr "十字準星偏移 %1$s"
+
+#: src/frontend/mame/ui/ui.cpp:1676
+#, c-format
+msgid "%1$3ddB"
+msgstr "%1$3ddB"
+
+#: src/frontend/mame/ui/ui.cpp:1719
+#, c-format
+msgid "%1$d%%"
+msgstr "%1$d%%"
+
+#: src/frontend/mame/ui/ui.cpp:1734
+#, c-format
+msgid "%1$3.0f%%"
+msgstr "%1$3.0f%%"
+
+#: src/frontend/mame/ui/ui.cpp:1757 src/frontend/mame/ui/ui.cpp:1777
+#: src/frontend/mame/ui/ui.cpp:1796 src/frontend/mame/ui/ui.cpp:1814
+#: src/frontend/mame/ui/ui.cpp:1833 src/frontend/mame/ui/ui.cpp:1852
+#: src/frontend/mame/ui/ui.cpp:1871 src/frontend/mame/ui/ui.cpp:1890
+#: src/frontend/mame/ui/ui.cpp:1911 src/frontend/mame/ui/ui.cpp:1932
+#: src/frontend/mame/ui/ui.cpp:1953 src/frontend/mame/ui/ui.cpp:1974
+#, c-format
+msgid "%1$.3f"
+msgstr "%1$.3f"
+
+#: src/frontend/mame/ui/ui.cpp:1989 src/frontend/mame/ui/ui.cpp:2004
+#: src/frontend/mame/ui/ui.cpp:2019 src/frontend/mame/ui/ui.cpp:2034
+#: src/frontend/mame/ui/ui.cpp:2049
+#, c-format
+msgid "%1$1.2f"
+msgstr "%1$1.2f"
+
+#: src/frontend/mame/ui/ui.cpp:2065
+#, c-format
+msgid "Crosshair Scale X %1$1.3f"
+msgstr "十字準星尺度 X %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2065
+#, c-format
+msgid "Crosshair Scale Y %1$1.3f"
+msgstr "十字準星尺度 Y %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2082
+#, c-format
+msgid "Crosshair Offset X %1$1.3f"
+msgstr "十字準星偏移 X %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2082
+#, c-format
+msgid "Crosshair Offset Y %1$1.3f"
+msgstr "十字準星偏移 Y %1$1.3f"
+
+#: src/frontend/mame/ui/ui.cpp:2189
+msgid "**Error saving ui.ini**"
+msgstr "**儲存 ui.ini 時發生錯誤**"
+
+#: src/frontend/mame/ui/ui.cpp:2248
+#, c-format
+msgid "**Error saving %s.ini**"
+msgstr "**儲存 %s.ini 時發生錯誤**"
+
+#: src/frontend/mame/ui/ui.cpp:2252 src/frontend/mame/ui/miscmenu.cpp:763
+msgid ""
+"\n"
+"    Configuration saved    \n"
+"\n"
+msgstr ""
+"\n"
+"        設定已儲存        \n"
+"\n"
+
+#: src/frontend/mame/ui/selsoft.cpp:486 src/frontend/mame/ui/selgame.cpp:302
+#, c-format
+msgid ""
+"%s\n"
+" added to favorites list."
+msgstr ""
+"%s\n"
+" 已新增至最愛清單。"
+
+#: src/frontend/mame/ui/selsoft.cpp:491 src/frontend/mame/ui/selgame.cpp:307
+#: src/frontend/mame/ui/selgame.cpp:313
+#, c-format
+msgid ""
+"%s\n"
+" removed from favorites list."
+msgstr ""
+"%s\n"
+" 已從最愛清單移除。"
+
+#: src/frontend/mame/ui/selsoft.cpp:525
+msgid "[Start empty]"
+msgstr "[ 無卡啟動 ]"
+
+#: src/frontend/mame/ui/selsoft.cpp:525
+msgid "[Use file manager]"
+msgstr "[ 使用檔案管理員 ]"
+
+#: src/frontend/mame/ui/selsoft.cpp:708
+#, c-format
+msgid "%1$s %2$s ( %3$d / %4$d software packages )"
+msgstr "%1$s %2$s ( %3$d / %4$d 軟體套件 )"
+
+#: src/frontend/mame/ui/selsoft.cpp:709
+#, c-format
+msgid "Driver: \"%1$s\" software list "
+msgstr "驅動程式： \"%1$s\" 軟體清單 "
+
+#: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1072
+#, c-format
+msgid "%1$s: %2$s - Search: %3$s_"
+msgstr "%1$s： %2$s - 搜尋： %3$s_"
+
+#: src/frontend/mame/ui/selsoft.cpp:716 src/frontend/mame/ui/selgame.cpp:1074
+#, c-format
+msgid "Search: %1$s_"
+msgstr "搜尋： %1$s_"
+
+#: src/frontend/mame/ui/selsoft.cpp:723
+#, c-format
+msgid "Software list/item: %1$s:%2$s"
+msgstr ""
+
+#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:163
+msgid "Sound Options"
+msgstr "聲音選項"
+
+#: src/frontend/mame/ui/optsmenu.cpp:76
+msgid "General Inputs"
+msgstr "一般輸入"
+
+#: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:962
+msgid "Plugins"
+msgstr "外掛"
+
+#: src/frontend/mame/ui/optsmenu.cpp:81
+msgid "Save Configuration"
+msgstr "儲存設定"
+
+#: src/frontend/mame/ui/optsmenu.cpp:148
+msgid "Settings"
+msgstr "設定"
+
+#: src/frontend/mame/ui/optsmenu.cpp:206
+msgid "Filter"
+msgstr "篩選"
+
+#: src/frontend/mame/ui/optsmenu.cpp:218
+msgid "Customize UI"
+msgstr "自訂 UI"
+
+#: src/frontend/mame/ui/optsmenu.cpp:219
+msgid "Configure Directories"
+msgstr "設定目錄"
+
+#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:89
+#: src/frontend/mame/ui/slotopt.cpp:220
+msgid "[empty slot]"
+msgstr "[空插槽]"
+
+#: src/frontend/mame/ui/filesel.cpp:263
+msgid "[create]"
+msgstr "[建立]"
+
+#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:100
+msgid "[software list]"
+msgstr "[軟體清單]"
+
+#: src/frontend/mame/ui/filesel.cpp:323
+#, c-format
+msgid "Error accessing %s"
+msgstr "錯誤存取 %s"
+
+#: src/frontend/mame/ui/filesel.cpp:546
+msgid "Select access mode"
+msgstr "選擇存取模式"
+
+#: src/frontend/mame/ui/filesel.cpp:547
+msgid "Read-only"
+msgstr "唯讀"
+
+#: src/frontend/mame/ui/filesel.cpp:549
+msgid "Read-write"
+msgstr "讀寫"
+
+#: src/frontend/mame/ui/filesel.cpp:550
+msgid "Read this image, write to another image"
+msgstr "讀取此映像檔，寫入至其他映像檔"
+
+#: src/frontend/mame/ui/filesel.cpp:551
+msgid "Read this image, write to diff"
+msgstr "讀取此映像檔，寫入差異檔"
+
+#: src/frontend/mame/ui/submenu.cpp:31
+msgid "Miscellaneous Options"
+msgstr "其他選項"
+
+#: src/frontend/mame/ui/submenu.cpp:32
+msgid "Skip imperfect emulation warnings"
+msgstr "略過未完整模擬的警示訊息"
+
+#: src/frontend/mame/ui/submenu.cpp:33
+msgid "Re-select last machine launched"
+msgstr "重新選擇上次執行的機台"
+
+#: src/frontend/mame/ui/submenu.cpp:34
+msgid "Enlarge images in the right panel"
+msgstr "放大右側面版的圖片"
+
+#: src/frontend/mame/ui/submenu.cpp:35
+msgid "Cheats"
+msgstr "作弊引擎"
+
+#: src/frontend/mame/ui/submenu.cpp:36
+msgid "Show mouse pointer"
+msgstr "顯示滑鼠指標"
+
+#: src/frontend/mame/ui/submenu.cpp:37
+msgid "Confirm quit from machines"
+msgstr "確認離開機台"
+
+#: src/frontend/mame/ui/submenu.cpp:38
+msgid "Skip information screen at startup"
+msgstr "略過起始的資訊畫面"
+
+#: src/frontend/mame/ui/submenu.cpp:39
+msgid "Force 4:3 aspect for snapshot display"
+msgstr "強制擷圖顯示比例為 4:3"
+
+#: src/frontend/mame/ui/submenu.cpp:40
+msgid "Use image as background"
+msgstr "使用圖片作為背景"
+
+#: src/frontend/mame/ui/submenu.cpp:41
+msgid "Skip BIOS selection menu"
+msgstr "略過 BIOS 選擇選單"
+
+#: src/frontend/mame/ui/submenu.cpp:42
+msgid "Skip software parts selection menu"
+msgstr "略過軟體部分選擇選單"
+
+#: src/frontend/mame/ui/submenu.cpp:43
+msgid "Info auto audit"
+msgstr "資訊自動驗證"
+
+#: src/frontend/mame/ui/submenu.cpp:44
+msgid "Hide romless machine from available list"
+msgstr "在可用清單中隱藏無 ROM 機台"
+
+#: src/frontend/mame/ui/submenu.cpp:50
+msgid "Advanced Options"
+msgstr "進階選項"
+
+#: src/frontend/mame/ui/submenu.cpp:51
+msgid "Performance Options"
+msgstr "效能選項"
+
+#: src/frontend/mame/ui/submenu.cpp:52
+msgid "Auto frame skip"
+msgstr "自動省略畫格"
+
+#: src/frontend/mame/ui/submenu.cpp:53
+msgid "Frame skip"
+msgstr "省略畫格"
+
+#: src/frontend/mame/ui/submenu.cpp:54
+msgid "Throttle"
+msgstr "限制速度"
+
+#: src/frontend/mame/ui/submenu.cpp:55
+msgid "Mute when unthrottled"
+msgstr "當未限制速度時靜音"
+
+#: src/frontend/mame/ui/submenu.cpp:56
+msgid "Sleep"
+msgstr "休眠"
+
+#: src/frontend/mame/ui/submenu.cpp:57
+msgid "Speed"
+msgstr "速度"
+
+#: src/frontend/mame/ui/submenu.cpp:58
+msgid "Adjust speed to match refresh rate"
+msgstr "調整速度以符合更新率"
+
+#: src/frontend/mame/ui/submenu.cpp:59
+msgid "Low latency"
+msgstr "低延遲"
+
+#: src/frontend/mame/ui/submenu.cpp:61
+msgid "Rotation Options"
+msgstr "選轉選項"
+
+#: src/frontend/mame/ui/submenu.cpp:62 src/frontend/mame/ui/videoopt.cpp:180
+msgid "Rotate"
+msgstr "旋轉"
+
+#: src/frontend/mame/ui/submenu.cpp:63
+msgid "Rotate right"
+msgstr "右旋轉"
+
+#: src/frontend/mame/ui/submenu.cpp:64
+msgid "Rotate left"
+msgstr "左旋轉"
+
+#: src/frontend/mame/ui/submenu.cpp:65
+msgid "Auto rotate right"
+msgstr "自動右旋轉"
+
+#: src/frontend/mame/ui/submenu.cpp:66
+msgid "Auto rotate left"
+msgstr "自動左旋轉"
+
+#: src/frontend/mame/ui/submenu.cpp:67
+msgid "Flip X"
+msgstr "翻轉 X"
+
+#: src/frontend/mame/ui/submenu.cpp:68
+msgid "Flip Y"
+msgstr "翻轉 Y"
+
+#: src/frontend/mame/ui/submenu.cpp:70
+msgid "Artwork Options"
+msgstr "裝飾圖選項"
+
+#: src/frontend/mame/ui/submenu.cpp:71
+msgid "Zoom to screen area"
+msgstr "縮放至畫面區域"
+
+#: src/frontend/mame/ui/submenu.cpp:73
+msgid "State/Playback Options"
+msgstr "狀態/播放選項"
+
+#: src/frontend/mame/ui/submenu.cpp:74
+msgid "Automatic save/restore"
+msgstr "自動儲存/還原"
+
+#: src/frontend/mame/ui/submenu.cpp:75
+msgid "Allow rewind"
+msgstr "允許倒帶"
+
+#: src/frontend/mame/ui/submenu.cpp:76
+msgid "Rewind capacity"
+msgstr "倒帶容量"
+
+#: src/frontend/mame/ui/submenu.cpp:77
+msgid "Bilinear filtering for snapshots"
+msgstr "供截圖使用的雙線過濾"
+
+#: src/frontend/mame/ui/submenu.cpp:78
+msgid "Burn-in"
+msgstr "烙印擷圖"
+
+#: src/frontend/mame/ui/submenu.cpp:80
+msgid "Input Options"
+msgstr "輸入選項"
+
+#: src/frontend/mame/ui/submenu.cpp:81
+msgid "Coin lockout"
+msgstr "投幣鎖定"
+
+#: src/frontend/mame/ui/submenu.cpp:82
+msgid "Mouse"
+msgstr "滑鼠"
+
+#: src/frontend/mame/ui/submenu.cpp:83
+msgid "Joystick"
+msgstr "搖桿"
+
+#: src/frontend/mame/ui/submenu.cpp:84
+msgid "Lightgun"
+msgstr "光線槍"
+
+#: src/frontend/mame/ui/submenu.cpp:85
+msgid "Multi-keyboard"
+msgstr "多重鍵盤"
+
+#: src/frontend/mame/ui/submenu.cpp:86
+msgid "Multi-mouse"
+msgstr "多重滑鼠"
+
+#: src/frontend/mame/ui/submenu.cpp:87
+msgid "Steadykey"
+msgstr "穩定鍵"
+
+#: src/frontend/mame/ui/submenu.cpp:88
+msgid "UI active"
+msgstr "UI 啟動"
+
+#: src/frontend/mame/ui/submenu.cpp:89
+msgid "Offscreen reload"
+msgstr "畫面外重新裝填"
+
+#: src/frontend/mame/ui/submenu.cpp:90
+msgid "Joystick deadzone"
+msgstr "搖桿無反應區"
+
+#: src/frontend/mame/ui/submenu.cpp:91
+msgid "Joystick saturation"
+msgstr "搖桿飽和值"
+
+#: src/frontend/mame/ui/submenu.cpp:92
+msgid "Natural keyboard"
+msgstr "自然鍵盤"
+
+#: src/frontend/mame/ui/submenu.cpp:93
+msgid "Simultaneous contradictory"
+msgstr "同時發生的對立狀況"
+
+#: src/frontend/mame/ui/submenu.cpp:94
+msgid "Coin impulse"
+msgstr "投幣脈衝"
+
+#: src/frontend/mame/ui/submenu.cpp:100
+msgid "Device Mapping"
+msgstr "裝置映對"
+
+#: src/frontend/mame/ui/submenu.cpp:101
+msgid "Lightgun Device Assignment"
+msgstr "分配光線槍裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:102
+msgid "Trackball Device Assignment"
+msgstr "分配軌跡球裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:103
+msgid "Pedal Device Assignment"
+msgstr "分配踏板裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:104
+msgid "Adstick Device Assignment"
+msgstr "分配 Adstick 裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:105
+msgid "Paddle Device Assignment"
+msgstr "分配划槳裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:106
+msgid "Dial Device Assignment"
+msgstr "分配轉盤裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:107
+msgid "Positional Device Assignment"
+msgstr "分配指向裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:108
+msgid "Mouse Device Assignment"
+msgstr "分配滑鼠裝置"
+
+#: src/frontend/mame/ui/submenu.cpp:114 src/frontend/mame/ui/mainmenu.cpp:151
+msgid "Video Options"
+msgstr "視訊選項"
+
+#: src/frontend/mame/ui/submenu.cpp:115
+msgid "Video Mode"
+msgstr "視訊模式"
+
+#: src/frontend/mame/ui/submenu.cpp:116
+msgid "Number Of Screens"
+msgstr "畫面數"
+
+#: src/frontend/mame/ui/submenu.cpp:118
+msgid "Triple Buffering"
+msgstr "三重緩衝"
+
+#: src/frontend/mame/ui/submenu.cpp:119
+msgid "HLSL"
+msgstr "HLSL"
+
+#: src/frontend/mame/ui/submenu.cpp:121
+msgid "GLSL"
+msgstr "GLSL"
+
+#: src/frontend/mame/ui/submenu.cpp:122
+msgid "Bilinear Filtering"
+msgstr "雙線過濾"
+
+#: src/frontend/mame/ui/submenu.cpp:123
+msgid "Bitmap Prescaling"
+msgstr "點陣圖預縮放"
+
+#: src/frontend/mame/ui/submenu.cpp:124
+msgid "Window Mode"
+msgstr "視窗模式"
+
+#: src/frontend/mame/ui/submenu.cpp:125
+msgid "Enforce Aspect Ratio"
+msgstr "強制比例"
+
+#: src/frontend/mame/ui/submenu.cpp:126
+msgid "Start Out Maximized"
+msgstr "最大化開始"
+
+#: src/frontend/mame/ui/submenu.cpp:127
+msgid "Synchronized Refresh"
+msgstr "同步更新"
+
+#: src/frontend/mame/ui/submenu.cpp:128
+msgid "Wait Vertical Sync"
+msgstr "等待垂直同步"
+
+#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:672
+#: src/frontend/mame/ui/videoopt.cpp:192 plugins/cheatfind/init.lua:766
+#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
+msgid "On"
+msgstr "開"
+
+#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:675
+#: src/frontend/mame/ui/videoopt.cpp:208 plugins/cheatfind/init.lua:763
+#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
+#: plugins/cheat/init.lua:680
+msgid "Off"
+msgstr "關"
+
+#: src/frontend/mame/ui/menu.cpp:678
+msgid "Auto"
+msgstr "自動"
+
+#: src/frontend/mame/ui/menu.cpp:1190
+#: src/frontend/mame/ui/simpleselgame.cpp:289
+msgid "Return to Previous Menu"
+msgstr "回上一層選單"
+
+#: src/frontend/mame/ui/videoopt.cpp:57
+#, c-format
+msgid "Screen #%d"
+msgstr "畫面 #%d"
+
+#: src/frontend/mame/ui/videoopt.cpp:184
+msgid "Zoom to Screen Area"
+msgstr "縮放至畫面區域"
+
+#: src/frontend/mame/ui/videoopt.cpp:196
+msgid "X Only"
+msgstr "僅 X 軸"
+
+#: src/frontend/mame/ui/videoopt.cpp:200
+msgid "Y Only"
+msgstr "僅 Y 軸"
+
+#: src/frontend/mame/ui/videoopt.cpp:204
+msgid "X or Y (Auto)"
+msgstr "X 軸或 Y 週（自動）"
+
+#: src/frontend/mame/ui/videoopt.cpp:211
+msgid "Non-Integer Scaling"
+msgstr "非整數縮放"
+
+#: src/frontend/mame/ui/videoopt.cpp:214
+msgid "Maintain Aspect Ratio"
+msgstr "維持長寬比例"
+
+#: src/frontend/mame/ui/videoopt.cpp:228
+msgid "Cannot change options while recording!"
+msgstr "正在錄製時無法變更選項！"
+
+#: src/frontend/mame/ui/info.cpp:32
+msgctxt "emulation-feature"
+msgid "protection"
+msgstr "保護"
+
+#: src/frontend/mame/ui/info.cpp:33
+msgctxt "emulation-feature"
+msgid "timing"
+msgstr "計時"
+
+#: src/frontend/mame/ui/info.cpp:34
+msgctxt "emulation-feature"
+msgid "graphics"
+msgstr "圖形"
+
+#: src/frontend/mame/ui/info.cpp:35
+msgctxt "emulation-feature"
+msgid "color palette"
+msgstr "色盤"
+
+#: src/frontend/mame/ui/info.cpp:36
+msgctxt "emulation-feature"
+msgid "sound"
+msgstr "聲音"
+
+#: src/frontend/mame/ui/info.cpp:37
+msgctxt "emulation-feature"
+msgid "capture hardware"
+msgstr "擷取硬體"
+
+#: src/frontend/mame/ui/info.cpp:38
+msgctxt "emulation-feature"
+msgid "camera"
+msgstr "相機"
+
+#: src/frontend/mame/ui/info.cpp:39
+msgctxt "emulation-feature"
+msgid "microphone"
+msgstr "麥克風"
+
+#: src/frontend/mame/ui/info.cpp:40
+msgctxt "emulation-feature"
+msgid "controls"
+msgstr "控制"
+
+#: src/frontend/mame/ui/info.cpp:41
+msgctxt "emulation-feature"
+msgid "keyboard"
+msgstr "鍵盤"
+
+#: src/frontend/mame/ui/info.cpp:42
+msgctxt "emulation-feature"
+msgid "mouse"
+msgstr "滑鼠"
+
+#: src/frontend/mame/ui/info.cpp:43
+msgctxt "emulation-feature"
+msgid "media"
+msgstr "媒體"
+
+#: src/frontend/mame/ui/info.cpp:44
+msgctxt "emulation-feature"
+msgid "disk"
+msgstr "磁碟"
+
+#: src/frontend/mame/ui/info.cpp:45
+msgctxt "emulation-feature"
+msgid "printer"
+msgstr "印表機"
+
+#: src/frontend/mame/ui/info.cpp:46
+msgctxt "emulation-feature"
+msgid "magnetic tape"
+msgstr "磁帶"
+
+#: src/frontend/mame/ui/info.cpp:47
+msgctxt "emulation-feature"
+msgid "punch tape"
+msgstr "打孔帶"
+
+#: src/frontend/mame/ui/info.cpp:48
+msgctxt "emulation-feature"
+msgid "magnetic drum"
+msgstr "磁鼓"
+
+#: src/frontend/mame/ui/info.cpp:49
+msgctxt "emulation-feature"
+msgid "solid state storage"
+msgstr "固態儲存"
+
+#: src/frontend/mame/ui/info.cpp:50
+msgctxt "emulation-feature"
+msgid "communications"
+msgstr "通訊"
+
+#: src/frontend/mame/ui/info.cpp:51
+msgctxt "emulation-feature"
+msgid "LAN"
+msgstr "區域網路"
+
+#: src/frontend/mame/ui/info.cpp:52
+msgctxt "emulation-feature"
+msgid "WAN"
+msgstr "外部網路"
+
+#: src/frontend/mame/ui/info.cpp:231
+msgid ""
+"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
+"run correctly.\n"
+msgstr "本機台有一個或更多的 ROM/CHD 是不正確的。此機台可能無法正確執行。\n"
+
+#: src/frontend/mame/ui/info.cpp:241
+msgid ""
+"There are known problems with this machine\n"
+"\n"
+msgstr ""
+"本機台已知具有下列的問題\n"
+"\n"
+
+#: src/frontend/mame/ui/info.cpp:246
+msgid ""
+"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
+msgstr "本機台有一個或更多的 ROM/CHD 尚未正確地被 DUMP。\n"
+
+#: src/frontend/mame/ui/info.cpp:251
+msgid "Completely unemulated features: "
+msgstr "未完整模擬功能: "
+
+#: src/frontend/mame/ui/info.cpp:257 src/frontend/mame/ui/info.cpp:273
+#, c-format
+msgid "%s"
+msgstr "%s"
+
+#: src/frontend/mame/ui/info.cpp:257 src/frontend/mame/ui/info.cpp:273
+#: src/frontend/mame/ui/info.cpp:318
+#, c-format
+msgid ", %s"
+msgstr ", %s"
+
+#: src/frontend/mame/ui/info.cpp:267
+msgid "Imperfectly emulated features: "
+msgstr "未完美模擬功能: "
+
+#: src/frontend/mame/ui/info.cpp:282
+msgid "Screen flipping in cocktail mode is not supported.\n"
+msgstr "尚未支援檯面型筐體模式的畫面翻轉。"
+
+#: src/frontend/mame/ui/info.cpp:284
+msgid "This machine requires external artwork files.\n"
+msgstr "此機台需要額外的裝飾圖檔"
+
+#: src/frontend/mame/ui/info.cpp:286
+msgid ""
+"This machine was never completed. It may exhibit strange behavior or missing "
+"elements that are not bugs in the emulation.\n"
+msgstr "本機台無法完成，並非模擬時的錯誤而可能呈現怪異的行為或缺少元件。\n"
+
+#: src/frontend/mame/ui/info.cpp:288
+msgid ""
+"This machine has no sound hardware, MAME will produce no sounds, this is "
+"expected behaviour.\n"
+msgstr "本機台無聲音硬體，故 MAME 將不會產生聲音，這是可預期的行為。\n"
+
+#: src/frontend/mame/ui/info.cpp:292
+msgid ""
+"\n"
+"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
+"complete. There is nothing you can do to fix this problem except wait for "
+"the developers to improve the emulation.\n"
+msgstr ""
+"\n"
+"此機台無法執行，機台的模擬還不完全。除了等待開發人員改良模擬之外，沒有方法可"
+"以解決這個問題。\n"
+
+#: src/frontend/mame/ui/info.cpp:294
+msgid ""
+"\n"
+"Elements of this machine cannot be emulated as they require physical "
+"interaction or consist of mechanical devices. It is not possible to fully "
+"experience this machine.\n"
+msgstr ""
+"\n"
+"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。 故無法達成"
+"此機台的完整體驗。\n"
+
+#: src/frontend/mame/ui/info.cpp:316
+#, c-format
+msgid ""
+"\n"
+"\n"
+"There are working clones of this machine: %s"
+msgstr ""
+"\n"
+"\n"
+"本機台尚有可執行的仿製版： %s"
+
+#: src/frontend/mame/ui/info.cpp:340
+#, c-format
+msgid ""
+"%1$s\n"
+"%2$s %3$s\n"
+"Driver: %4$s\n"
+"\n"
+"CPU:\n"
+msgstr ""
+"%1$s\n"
+"%2$s %3$s\n"
+"驅動程式： %4$s\n"
+"\n"
+"CPU：\n"
+
+#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
+#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+msgid "GHz"
+msgstr "GHz"
+
+#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
+#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+msgid "MHz"
+msgstr "MHz"
+
+#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
+#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+msgid "kHz"
+msgstr "kHz"
+
+#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
+#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+msgid "Hz"
+msgstr "Hz"
+
+#: src/frontend/mame/ui/info.cpp:396
+msgid ""
+"\n"
+"Sound:\n"
+msgstr ""
+"\n"
+"聲音：\n"
+
+#: src/frontend/mame/ui/info.cpp:429
+msgid ""
+"\n"
+"Video:\n"
+msgstr ""
+"\n"
+"視訊：\n"
+
+#: src/frontend/mame/ui/info.cpp:433
+msgid "None\n"
+msgstr "無\n"
+
+#: src/frontend/mame/ui/info.cpp:440
+msgid "Vector"
+msgstr "向量"
+
+#: src/frontend/mame/ui/info.cpp:456
+#, c-format
+msgid "%1$s: %2$s\n"
+msgstr "%1$s: %2$s\n"
+
+#: src/frontend/mame/ui/info.cpp:456
+msgid "%2$s\n"
+msgstr "%2$s\n"
+
+#: src/frontend/mame/ui/info.cpp:473
+#, c-format
+msgid "Screen '%1$s'"
+msgstr "畫面 '%1$s'"
+
+#: src/frontend/mame/ui/info.cpp:475
+msgid "Screen"
+msgstr "畫面"
+
+#: src/frontend/mame/ui/info.cpp:582
+msgid "Not supported"
+msgstr "不支援"
+
+#: src/frontend/mame/ui/info.cpp:585
+msgid "Partially supported"
+msgstr "部分支援"
+
+#: src/frontend/mame/ui/info.cpp:594
+msgid "[empty]"
+msgstr "[ 空 ]"
+
+#: src/frontend/mame/ui/swlist.cpp:94
+msgid "[file manager]"
+msgstr "[ 檔案管理員 ]"
+
+#: src/frontend/mame/ui/swlist.cpp:228
+msgid "Switch Item Ordering"
+msgstr "切換項目順序"
+
+#: src/frontend/mame/ui/swlist.cpp:262
+msgid "Switched Order: entries now ordered by shortname"
+msgstr "切換順序：目前項目依照短檔名排序"
+
+#: src/frontend/mame/ui/swlist.cpp:263
+msgid "Switched Order: entries now ordered by description"
+msgstr "切換順序：目前項目依照描述排序"
+
+#: src/frontend/mame/ui/swlist.cpp:399
+msgid "[compatible lists]"
+msgstr "[ 完整清單 ]"
+
+#: src/frontend/mame/ui/filecreate.cpp:79
+msgid "File Already Exists - Override?"
+msgstr "檔案已存在 — 是否覆蓋？"
+
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
+msgid "No"
+msgstr "否"
+
+#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
+msgid "Yes"
+msgstr "是"
+
+#: src/frontend/mame/ui/filecreate.cpp:171
+msgid "New Image Name:"
+msgstr "新映像檔名稱："
+
+#: src/frontend/mame/ui/filecreate.cpp:177
+msgid "Image Format:"
+msgstr "映像檔格式"
+
+#: src/frontend/mame/ui/filecreate.cpp:183
+#: plugins/autofire/autofire_menu.lua:213
+msgid "Create"
+msgstr "建立"
+
+#: src/frontend/mame/ui/filecreate.cpp:214
+msgid "Please enter a file extension too"
+msgstr "請一併輸入副檔名"
+
+#: src/frontend/mame/ui/filecreate.cpp:265
+msgid "Select image format"
+msgstr "選擇映像檔格式"
+
+#: src/frontend/mame/ui/filecreate.cpp:325
+msgid "Select initial contents"
+msgstr "選擇初始化內容"
+
+#: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:147
+msgid "Keyboard Mode"
+msgstr "鍵盤模式"
+
+#: src/frontend/mame/ui/keyboard.cpp:40
+msgid "Natural"
+msgstr "自然"
+
+#: src/frontend/mame/ui/keyboard.cpp:40
+msgid "Emulated"
+msgstr "模擬"
+
+#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:484
+#, c-format
+msgid "%1$s [root%2$s]"
+msgstr "%1$s [root%2$s]"
+
+#: src/frontend/mame/ui/keyboard.cpp:53
+msgid "[root%2$s]"
+msgstr "[root%2$s]"
+
+#: src/frontend/mame/ui/keyboard.cpp:56
+msgid "Enabled"
+msgstr "已啟用"
+
+#: src/frontend/mame/ui/keyboard.cpp:56
+msgid "Disabled"
+msgstr "已停用"
+
+#: src/frontend/mame/ui/utils.cpp:63
+msgctxt "swlist-info"
+msgid "Alternate Title"
+msgstr "別題名"
+
+#: src/frontend/mame/ui/utils.cpp:64
+msgctxt "swlist-info"
+msgid "Author"
+msgstr "作者"
+
+#: src/frontend/mame/ui/utils.cpp:65
+msgctxt "swlist-info"
+msgid "Barcode Number"
+msgstr "條碼編號"
+
+#: src/frontend/mame/ui/utils.cpp:66
+msgctxt "swlist-info"
+msgid "Developer"
+msgstr "開發商"
+
+#: src/frontend/mame/ui/utils.cpp:67
+msgctxt "swlist-info"
+msgid "Distributor"
+msgstr "經銷商"
+
+#: src/frontend/mame/ui/utils.cpp:68
+msgctxt "swlist-info"
+msgid "Installation Instructions"
+msgstr "安裝說明"
+
+#: src/frontend/mame/ui/utils.cpp:69
+msgctxt "swlist-info"
+msgid "ISBN"
+msgstr "ISBN"
+
+#: src/frontend/mame/ui/utils.cpp:70
+msgctxt "swlist-info"
+msgid "OEM"
+msgstr "OEM"
+
+#: src/frontend/mame/ui/utils.cpp:71
+msgctxt "swlist-info"
+msgid "Original Publisher"
+msgstr "原出版商"
+
+#: src/frontend/mame/ui/utils.cpp:72
+msgctxt "swlist-info"
+msgid "Part Number"
+msgstr "配件編號"
+
+#: src/frontend/mame/ui/utils.cpp:73
+msgctxt "swlist-info"
+msgid "PCB"
+msgstr "PCB"
+
+#: src/frontend/mame/ui/utils.cpp:74
+msgctxt "swlist-info"
+msgid "Programmer"
+msgstr "程式設計"
+
+#: src/frontend/mame/ui/utils.cpp:75
+msgctxt "swlist-info"
+msgid "Release Date"
+msgstr "發行日"
+
+#: src/frontend/mame/ui/utils.cpp:76
+msgctxt "swlist-info"
+msgid "Serial Number"
+msgstr "序號"
+
+#: src/frontend/mame/ui/utils.cpp:77
+msgctxt "swlist-info"
+msgid "Usage Instructions"
+msgstr "使用說明"
+
+#: src/frontend/mame/ui/utils.cpp:78
+msgctxt "swlist-info"
+msgid "Version"
+msgstr "版本"
+
+#: src/frontend/mame/ui/utils.cpp:84
+msgctxt "machine-filter"
+msgid "Unfiltered"
+msgstr "未篩選"
+
+#: src/frontend/mame/ui/utils.cpp:85
+msgctxt "machine-filter"
+msgid "Available"
+msgstr "可用"
+
+#: src/frontend/mame/ui/utils.cpp:86
+msgctxt "machine-filter"
+msgid "Unavailable"
+msgstr "不可用"
+
+#: src/frontend/mame/ui/utils.cpp:87
+msgctxt "machine-filter"
+msgid "Working"
+msgstr "可以執行"
+
+#: src/frontend/mame/ui/utils.cpp:88
+msgctxt "machine-filter"
+msgid "Not Working"
+msgstr "不可執行"
+
+#: src/frontend/mame/ui/utils.cpp:89
+msgctxt "machine-filter"
+msgid "Mechanical"
+msgstr "機械式"
+
+#: src/frontend/mame/ui/utils.cpp:90
+msgctxt "machine-filter"
+msgid "Not Mechanical"
+msgstr "非機械式"
+
+#: src/frontend/mame/ui/utils.cpp:91
+msgctxt "machine-filter"
+msgid "Category"
+msgstr "類別"
+
+#: src/frontend/mame/ui/utils.cpp:92
+msgctxt "machine-filter"
+msgid "Favorites"
+msgstr "最愛"
+
+#: src/frontend/mame/ui/utils.cpp:93
+msgctxt "machine-filter"
+msgid "BIOS"
+msgstr "BIOS"
+
+#: src/frontend/mame/ui/utils.cpp:94
+msgctxt "machine-filter"
+msgid "Not BIOS"
+msgstr "非 BIOS"
+
+#: src/frontend/mame/ui/utils.cpp:95
+msgctxt "machine-filter"
+msgid "Parents"
+msgstr "母檔"
+
+#: src/frontend/mame/ui/utils.cpp:96
+msgctxt "machine-filter"
+msgid "Clones"
+msgstr "仿製版"
+
+#: src/frontend/mame/ui/utils.cpp:97
+msgctxt "machine-filter"
+msgid "Manufacturer"
+msgstr "製造商"
+
+#: src/frontend/mame/ui/utils.cpp:98
+msgctxt "machine-filter"
+msgid "Year"
+msgstr "年代"
+
+#: src/frontend/mame/ui/utils.cpp:99
+msgctxt "machine-filter"
+msgid "Save Supported"
+msgstr "已支援即時存檔"
+
+#: src/frontend/mame/ui/utils.cpp:100
+msgctxt "machine-filter"
+msgid "Save Unsupported"
+msgstr "未支援即時存檔"
+
+#: src/frontend/mame/ui/utils.cpp:101
+msgctxt "machine-filter"
+msgid "CHD Required"
+msgstr "需要 CHD"
+
+#: src/frontend/mame/ui/utils.cpp:102
+msgctxt "machine-filter"
+msgid "No CHD Required"
+msgstr "不需要 CHD"
+
+#: src/frontend/mame/ui/utils.cpp:103
+msgctxt "machine-filter"
+msgid "Vertical Screen"
+msgstr "垂直螢幕"
+
+#: src/frontend/mame/ui/utils.cpp:104
+msgctxt "machine-filter"
+msgid "Horizontal Screen"
+msgstr "水平螢幕"
+
+#: src/frontend/mame/ui/utils.cpp:105
+msgctxt "machine-filter"
+msgid "Custom Filter"
+msgstr "自訂篩選"
+
+#: src/frontend/mame/ui/utils.cpp:109
+msgctxt "software-filter"
+msgid "Unfiltered"
+msgstr "未篩選"
+
+#: src/frontend/mame/ui/utils.cpp:110
+msgctxt "software-filter"
+msgid "Available"
+msgstr "可用"
+
+#: src/frontend/mame/ui/utils.cpp:111
+msgctxt "software-filter"
+msgid "Unavailable"
+msgstr "不可用"
+
+#: src/frontend/mame/ui/utils.cpp:112
+msgctxt "software-filter"
+msgid "Favorites"
+msgstr "最愛"
+
+#: src/frontend/mame/ui/utils.cpp:113
+msgctxt "software-filter"
+msgid "Parents"
+msgstr "母檔"
+
+#: src/frontend/mame/ui/utils.cpp:114
+msgctxt "software-filter"
+msgid "Clones"
+msgstr "仿製版"
+
+#: src/frontend/mame/ui/utils.cpp:115
+msgctxt "software-filter"
+msgid "Year"
+msgstr "年代"
+
+#: src/frontend/mame/ui/utils.cpp:116
+msgctxt "software-filter"
+msgid "Publisher"
+msgstr "出版商"
+
+#: src/frontend/mame/ui/utils.cpp:117
+msgctxt "software-filter"
+msgid "Developer"
+msgstr "開發商"
+
+#: src/frontend/mame/ui/utils.cpp:118
+msgctxt "software-filter"
+msgid "Distributor"
+msgstr "經銷商"
+
+#: src/frontend/mame/ui/utils.cpp:119
+msgctxt "software-filter"
+msgid "Author"
+msgstr "作者"
+
+#: src/frontend/mame/ui/utils.cpp:120
+msgctxt "software-filter"
+msgid "Programmer"
+msgstr "程式設計"
+
+#: src/frontend/mame/ui/utils.cpp:121
+msgctxt "software-filter"
+msgid "Supported"
+msgstr "已支援"
+
+#: src/frontend/mame/ui/utils.cpp:122
+msgctxt "software-filter"
+msgid "Partially Supported"
+msgstr "部分支援"
+
+#: src/frontend/mame/ui/utils.cpp:123
+msgctxt "software-filter"
+msgid "Unsupported"
+msgstr "不支援"
+
+#: src/frontend/mame/ui/utils.cpp:124
+msgctxt "software-filter"
+msgid "Release Region"
+msgstr "釋出區域"
+
+#: src/frontend/mame/ui/utils.cpp:125
+msgctxt "software-filter"
+msgid "Device Type"
+msgstr "裝置類別"
+
+#: src/frontend/mame/ui/utils.cpp:126
+msgctxt "software-filter"
+msgid "Software List"
+msgstr "軟體清單"
+
+#: src/frontend/mame/ui/utils.cpp:127
+msgctxt "software-filter"
+msgid "Custom Filter"
+msgstr "自訂篩選"
+
+#: src/frontend/mame/ui/utils.cpp:291
+msgid "<set up filters>"
+msgstr "<設定篩選>"
+
+#: src/frontend/mame/ui/utils.cpp:395
+msgid "Select custom filters:"
+msgstr "選擇自訂篩選："
+
+#: src/frontend/mame/ui/utils.cpp:546
+#, c-format
+msgid "Filter %1$u"
+msgstr "篩選 %1$u"
+
+#: src/frontend/mame/ui/utils.cpp:560
+msgid "Remove last filter"
+msgstr "移除最後篩選"
+
+#: src/frontend/mame/ui/utils.cpp:562
+msgid "Add filter"
+msgstr "新增篩選"
+
+#: src/frontend/mame/ui/utils.cpp:1001
+msgid "Select category:"
+msgstr "選擇類別："
+
+#: src/frontend/mame/ui/utils.cpp:1032
+msgid "[no category INI files]"
+msgstr "[沒有類別 INI 檔案]"
+
+#: src/frontend/mame/ui/utils.cpp:1040
+msgid "[no groups in INI file]"
+msgstr "[INI 檔案中無群組]"
+
+#: src/frontend/mame/ui/utils.cpp:1074
+msgid "No category INI files found"
+msgstr "沒有找到類別 INI 檔案"
+
+#: src/frontend/mame/ui/utils.cpp:1079
+msgid "File"
+msgstr "檔案"
+
+#: src/frontend/mame/ui/utils.cpp:1083
+msgid "No groups found in category file"
+msgstr "類別檔案中沒有找到群組"
+
+#: src/frontend/mame/ui/utils.cpp:1088
+msgid "Group"
+msgstr "群組"
+
+#: src/frontend/mame/ui/utils.cpp:1089
+msgid "Include clones"
+msgstr "包含仿製版"
+
+#: src/frontend/mame/ui/utils.cpp:2048 src/frontend/mame/ui/inifile.cpp:272
+msgctxt "swlist-info"
+msgid "Software list/item"
+msgstr "軟體列表/項目"
+
+#: src/frontend/mame/ui/datmenu.cpp:85 src/frontend/mame/ui/selmenu.cpp:2696
+msgid "Software List Info"
+msgstr "軟體列表資訊"
+
+#: src/frontend/mame/ui/datmenu.cpp:398
+msgid "Revision: "
+msgstr "版本： "
+
+#: src/frontend/mame/ui/miscmenu.cpp:78 src/frontend/mame/ui/confswitch.cpp:165
+#: src/frontend/mame/ui/slotopt.cpp:203
+msgid "Reset"
+msgstr "重設"
+
+#: src/frontend/mame/ui/miscmenu.cpp:236
+#, c-format
+msgid ""
+"Uptime: %1$d:%2$02d:%3$02d\n"
+"\n"
+msgstr ""
+"執行時間： %1$d:%2$02d:%3$02d\n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:238
+#, c-format
+msgid ""
+"Uptime: %1$d:%2$02d\n"
+"\n"
+msgstr ""
+"執行時間： %1$d:%2$02d\n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:242
+#, c-format
+msgid ""
+"Tickets dispensed: %1$d\n"
+"\n"
+msgstr ""
+"彩票分配數： %1$d\n"
+"\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:253
+msgid "Coin %1$c: NA%3$s\n"
+msgstr "投幣數 %1$c： NA%3$s\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:253
+#, c-format
+msgid "Coin %1$c: %2$d%3$s\n"
+msgstr "投幣數 %1$c： %2$d%3$s\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:256
+msgid " (locked)"
+msgstr " （已鎖定）"
+
+#: src/frontend/mame/ui/miscmenu.cpp:456
+#, c-format
+msgid "P%d Visibility"
+msgstr "P$d 可見度"
+
+#: src/frontend/mame/ui/miscmenu.cpp:510
+#, c-format
+msgid "P%d Crosshair"
+msgstr "P%d 十字準星"
+
+#: src/frontend/mame/ui/miscmenu.cpp:527
+msgid "Visible Delay"
+msgstr "可見度延遲"
+
+#: src/frontend/mame/ui/miscmenu.cpp:639
+#, c-format
+msgid "%s.xml saved in UI settings folder."
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:665
+msgid "Name:             Description:\n"
+msgstr "名稱：            描述：\n"
+
+#: src/frontend/mame/ui/miscmenu.cpp:676
+#, c-format
+msgid "%s.txt saved in UI settings folder."
+msgstr ""
+
+#: src/frontend/mame/ui/miscmenu.cpp:693
+msgid "Export list in XML format (like -listxml)"
+msgstr "匯出 XML 格式清單 （同 -listxml）"
+
+#: src/frontend/mame/ui/miscmenu.cpp:694
+msgid "Export list in XML format (like -listxml, but exclude devices)"
+msgstr "匯出 TXT 格式清單 （同 -listxml，但不包含裝置）"
+
+#: src/frontend/mame/ui/miscmenu.cpp:695
+msgid "Export list in TXT format (like -listfull)"
+msgstr "匯出 TXT 格式清單 （同 -listfull）"
+
+#: src/frontend/mame/ui/miscmenu.cpp:807
+msgid "BIOS"
+msgstr "BIOS"
+
+#: src/frontend/mame/ui/miscmenu.cpp:811
+msgid "Driver"
+msgstr "驅動程式"
+
+#: src/frontend/mame/ui/miscmenu.cpp:814
+msgid "This machine has no BIOS."
+msgstr "此機台沒有 BIOS。"
+
+#: src/frontend/mame/ui/miscmenu.cpp:823 src/frontend/mame/ui/mainmenu.cpp:168
+msgid "Add To Favorites"
+msgstr "新增至最愛"
+
+#: src/frontend/mame/ui/miscmenu.cpp:825 src/frontend/mame/ui/mainmenu.cpp:170
+msgid "Remove From Favorites"
+msgstr "從最愛移除"
+
+#: src/frontend/mame/ui/miscmenu.cpp:828
+msgid "Save Machine Configuration"
+msgstr "儲存機台設定"
+
+#: src/frontend/mame/ui/miscmenu.cpp:839
+msgid "Configure Machine:"
+msgstr "設定機台："
+
+#: src/frontend/mame/ui/miscmenu.cpp:873 src/frontend/mame/ui/selmenu.cpp:2634
+msgid " (default)"
+msgstr " （預設）"
+
+#: src/frontend/mame/ui/miscmenu.cpp:951
+msgid "No plugins found"
+msgstr "未找到外掛"
+
+#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:132
+msgid "Pseudo terminals"
+msgstr "偽終端"
+
+#: src/frontend/mame/ui/info_pty.cpp:39
+msgid "[failed]"
+msgstr "[ 錯誤 ]"
+
+#: src/frontend/mame/ui/state.cpp:215
+msgid "No save states found"
+msgstr "未找到已儲存的狀態"
+
+#: src/frontend/mame/ui/state.cpp:265
+#, c-format
+msgid ""
+"Delete saved state %1$s?\n"
+"Press %2$s to delete\n"
+"Press %3$s to cancel"
+msgstr ""
+"刪除已儲存的狀態檔 %1$s?\n"
+"按下 %2$s 刪除\n"
+"按下 %3$s 取消"
+
+#: src/frontend/mame/ui/state.cpp:378
+#, c-format
+msgid "Error removing saved state file %1$s"
+msgstr "移除已儲存的狀態檔 %1$s 時發生錯誤"
+
+#: src/frontend/mame/ui/state.cpp:424
+#, c-format
+msgid "Press %1$s to delete"
+msgstr "按下  %1$s 刪除"
+
+#: src/frontend/mame/ui/state.cpp:497
+msgid "Load State"
+msgstr "載入狀態"
+
+#: src/frontend/mame/ui/state.cpp:497
+msgid "Select state to load"
+msgstr "選擇要載入的狀態"
+
+#: src/frontend/mame/ui/state.cpp:521
+msgid "Save State"
+msgstr "儲存狀態"
+
+#: src/frontend/mame/ui/state.cpp:521
+msgid "Press a key or joystick button, or select state to overwrite"
+msgstr "按下鍵盤按鍵、搖桿按鈕或選擇狀態以覆寫"
+
+#: src/frontend/mame/ui/slotopt.cpp:192
+#, c-format
+msgid "%s [internal]"
+msgstr "%s [內部]"
+
+#: src/frontend/mame/ui/inputmap.cpp:38
+msgid "User Interface"
+msgstr "使用者介面"
+
+#: src/frontend/mame/ui/inputmap.cpp:41
+#, c-format
+msgid "Player %1$d Controls"
+msgstr "玩家 %1$d 控制"
+
+#: src/frontend/mame/ui/inputmap.cpp:44
+msgid "Other Controls"
+msgstr "其他控制"
+
+#: src/frontend/mame/ui/inputmap.cpp:227
+msgid "This machine has no configurable inputs."
+msgstr "此機台沒有可設定的輸入"
+
+#: src/frontend/mame/ui/inputmap.cpp:310
+msgid "Pressed"
+msgstr "按住"
+
+#: src/frontend/mame/ui/inputmap.cpp:379 plugins/autofire/autofire_menu.lua:123
+#: plugins/cheat/init.lua:626
+msgid "Invalid sequence entered"
+msgstr "輸入了無效序列"
+
+#: src/frontend/mame/ui/inputmap.cpp:486
+#, c-format
+msgid "[root%1$s]"
+msgstr "[root%1$s]"
+
+#: src/frontend/mame/ui/inputmap.cpp:513
+#, c-format
+msgid "Press %1$s to set\n"
+msgstr "按下 %1$s 設定\n"
+
+#: src/frontend/mame/ui/inputmap.cpp:514
+#, c-format
+msgid "Press %1$s to append\n"
+msgstr "按下 %1$s 加入\n"
+
+#: src/frontend/mame/ui/inputmap.cpp:515
+#, c-format
+msgid "Press %1$s to clear\n"
+msgstr "按下 %1$s 清除\n"
+
+#: src/frontend/mame/ui/inputmap.cpp:516
+#, c-format
+msgid "Press %1$s to restore default\n"
+msgstr "按下 %1$s 還原預設值\n"
+
+#: src/frontend/mame/ui/tapectrl.cpp:85
+msgid "stopped"
+msgstr "已停止"
+
+#: src/frontend/mame/ui/tapectrl.cpp:87
+msgid "playing"
+msgstr "正在執行"
+
+#: src/frontend/mame/ui/tapectrl.cpp:87
+msgid "(playing)"
+msgstr "（正在執行）"
+
+#: src/frontend/mame/ui/tapectrl.cpp:88
+msgid "recording"
+msgstr "正在錄製"
+
+#: src/frontend/mame/ui/tapectrl.cpp:88
+msgid "(recording)"
+msgstr "（正在錄製）"
+
+#: src/frontend/mame/ui/tapectrl.cpp:95
+msgid "Pause/Stop"
+msgstr "暫停／停止"
+
+#: src/frontend/mame/ui/tapectrl.cpp:98
+msgid "Play"
+msgstr "執行"
+
+#: src/frontend/mame/ui/tapectrl.cpp:101
+msgid "Record"
+msgstr "記錄"
+
+#: src/frontend/mame/ui/tapectrl.cpp:104
+msgid "Rewind"
+msgstr "倒帶"
+
+#: src/frontend/mame/ui/tapectrl.cpp:107
+msgid "Fast Forward"
+msgstr "快進"
+
+#: src/frontend/mame/ui/imgcntrl.cpp:132
+msgid "Cannot save over directory"
+msgstr "無法跨目錄儲存"
+
+#: src/frontend/mame/ui/imgcntrl.cpp:165
+msgid ""
+"The software selected is missing one or more required ROM or CHD images.\n"
+"Please acquire the correct files or select a different one."
+msgstr ""
+"選定的軟體缺少一個或多個必要的 ROM 或 CHD 映像檔\n"
+"請取得正確的檔案或選擇不同的檔案。"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:150
+msgid ""
+"The selected game is missing one or more required ROM or CHD images. Please "
+"select a different game.\n"
+"\n"
+"Press any key to continue."
+msgstr ""
+"選定的遊戲缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他遊戲。\n"
+"按任意鍵繼續。"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:249
+#, c-format
+msgid ""
+"No machines found. Please check the rompath specified in the %1$s.ini file.\n"
+"\n"
+"If this is your first time using %2$s, please see the config.txt file in the "
+"docs directory for information on configuring %2$s."
+msgstr ""
+"找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
+"\n"
+"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
+"訊。"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:283
+#: src/frontend/mame/ui/selgame.cpp:439
+msgid "Configure Options"
+msgstr "設定選項"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:284
+#: src/frontend/mame/ui/selmenu.cpp:1287
+msgid "Exit"
+msgstr "結束"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:309
+#, c-format
+msgid "Type name or select: %1$s_"
+msgstr "輸入名稱或選擇： %1$s_"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:311
+msgid "Type name or select: (random)"
+msgstr "輸入名稱或選擇： (隨機)"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:325
+#, c-format
+msgid "%1$-.100s"
+msgstr "%1$-.100s"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:328
+#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
+#, c-format
+msgid "%1$s, %2$-.100s"
+msgstr "%1$s, %2$-.100s"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:331
+#, c-format
+msgid "Driver: %1$-.100s"
+msgstr "驅動程式： %-.100s\n"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:347
+#: src/frontend/mame/ui/selmenu.cpp:723
+msgid "Overall: NOT WORKING"
+msgstr "整體： 不可執行"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:349
+#: src/frontend/mame/ui/selmenu.cpp:725
+msgid "Overall: Unemulated Protection"
+msgstr "整體： 未模擬保護"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:351
+#: src/frontend/mame/ui/selmenu.cpp:727
+msgid "Overall: Working"
+msgstr "整體： 可以執行"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:355
+#: src/frontend/mame/ui/selmenu.cpp:731
+msgid "Graphics: Unimplemented, "
+msgstr "圖形： 不完整，"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:357
+#: src/frontend/mame/ui/selmenu.cpp:733
+msgid "Graphics: Imperfect, "
+msgstr "圖形： 不完美， "
+
+#: src/frontend/mame/ui/simpleselgame.cpp:359
+#: src/frontend/mame/ui/selmenu.cpp:735
+msgid "Graphics: OK, "
+msgstr "圖形： OK， "
+
+#: src/frontend/mame/ui/simpleselgame.cpp:362
+#: src/frontend/mame/ui/selmenu.cpp:738
+msgid "Sound: None"
+msgstr "聲音： 無"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:364
+#: src/frontend/mame/ui/selmenu.cpp:740
+msgid "Sound: Unimplemented"
+msgstr "聲音： 無法執行"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:366
+#: src/frontend/mame/ui/selmenu.cpp:742
+msgid "Sound: Imperfect"
+msgstr "聲音： 不完美"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:368
+#: src/frontend/mame/ui/selmenu.cpp:744
+msgid "Sound: OK"
+msgstr "聲音： OK"
+
+#: src/frontend/mame/ui/cheatopt.cpp:87 plugins/cheat/init.lua:751
+#, c-format, lua-format
+msgid ""
+"Cheat Comment:\n"
+"%s"
+msgstr ""
+"作弊碼註解：\n"
+"%s"
+
+#: src/frontend/mame/ui/cheatopt.cpp:100
+msgid "All cheats reloaded"
+msgstr "全部作弊碼已重新載入"
+
+#: src/frontend/mame/ui/cheatopt.cpp:140 plugins/cheat/init.lua:698
+msgid "Reset All"
+msgstr "全部重設"
+
+#: src/frontend/mame/ui/cheatopt.cpp:143 plugins/cheat/init.lua:699
+msgid "Reload All"
+msgstr "全部重新載入"
+
+#: src/frontend/mame/ui/dirmenu.cpp:38
+msgctxt "path-option"
+msgid "ROMs"
+msgstr "ROM"
+
+#: src/frontend/mame/ui/dirmenu.cpp:39
+msgctxt "path-option"
+msgid "Software Media"
+msgstr "軟體媒體"
+
+#: src/frontend/mame/ui/dirmenu.cpp:40
+msgctxt "path-option"
+msgid "Sound Samples"
+msgstr "聲音樣本檔"
+
+#: src/frontend/mame/ui/dirmenu.cpp:41
+msgctxt "path-option"
+msgid "Artwork"
+msgstr "裝飾圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:42
+msgctxt "path-option"
+msgid "Crosshairs"
+msgstr "十字準星"
+
+#: src/frontend/mame/ui/dirmenu.cpp:43
+msgctxt "path-option"
+msgid "Cheat Files"
+msgstr "作弊檔"
+
+#: src/frontend/mame/ui/dirmenu.cpp:44
+msgctxt "path-option"
+msgid "Plugins"
+msgstr "外掛"
+
+#: src/frontend/mame/ui/dirmenu.cpp:45
+msgctxt "path-option"
+msgid "UI Translations"
+msgstr "UI 翻譯"
+
+#: src/frontend/mame/ui/dirmenu.cpp:46
+msgctxt "path-option"
+msgid "INIs"
+msgstr "INI"
+
+#: src/frontend/mame/ui/dirmenu.cpp:47
+msgctxt "path-option"
+msgid "UI Settings"
+msgstr "UI 設定"
+
+#: src/frontend/mame/ui/dirmenu.cpp:48
+msgctxt "path-option"
+msgid "Plugin Data"
+msgstr "外掛資料"
+
+#: src/frontend/mame/ui/dirmenu.cpp:49
+msgctxt "path-option"
+msgid "DATs"
+msgstr "文件"
+
+#: src/frontend/mame/ui/dirmenu.cpp:50
+msgctxt "path-option"
+msgid "Category INIs"
+msgstr "類別 INI"
+
+#: src/frontend/mame/ui/dirmenu.cpp:51
+msgctxt "path-option"
+msgid "Snapshots"
+msgstr "擷圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:52
+msgctxt "path-option"
+msgid "Icons"
+msgstr "圖示"
+
+#: src/frontend/mame/ui/dirmenu.cpp:53
+msgctxt "path-option"
+msgid "Control Panels"
+msgstr "操作檯"
+
+#: src/frontend/mame/ui/dirmenu.cpp:54
+msgctxt "path-option"
+msgid "Cabinets"
+msgstr "筐體圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:55
+msgctxt "path-option"
+msgid "Marquees"
+msgstr "標籤圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:56
+msgctxt "path-option"
+msgid "PCBs"
+msgstr "PCB 圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:57
+msgctxt "path-option"
+msgid "Flyers"
+msgstr "廣告圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:58
+msgctxt "path-option"
+msgid "Title Screens"
+msgstr "標題畫面"
+
+#: src/frontend/mame/ui/dirmenu.cpp:59
+msgctxt "path-option"
+msgid "Game Endings"
+msgstr "遊戲結局"
+
+#: src/frontend/mame/ui/dirmenu.cpp:60
+msgctxt "path-option"
+msgid "Bosses"
+msgstr "首領"
+
+#: src/frontend/mame/ui/dirmenu.cpp:61
+msgctxt "path-option"
+msgid "Artwork Previews"
+msgstr "裝飾圖預覽"
+
+#: src/frontend/mame/ui/dirmenu.cpp:62
+msgctxt "path-option"
+msgid "Select"
+msgstr "精選"
+
+#: src/frontend/mame/ui/dirmenu.cpp:63
+msgctxt "path-option"
+msgid "Game Over Screens"
+msgstr "遊戲結束畫面"
+
+#: src/frontend/mame/ui/dirmenu.cpp:64
+msgctxt "path-option"
+msgid "HowTo"
+msgstr "說明圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:65
+msgctxt "path-option"
+msgid "Logos"
+msgstr "標題圖"
+
+#: src/frontend/mame/ui/dirmenu.cpp:66
+msgctxt "path-option"
+msgid "Scores"
+msgstr "得分"
+
+#: src/frontend/mame/ui/dirmenu.cpp:67
+msgctxt "path-option"
+msgid "Versus"
+msgstr "對戰"
+
+#: src/frontend/mame/ui/dirmenu.cpp:68
+msgctxt "path-option"
+msgid "Covers"
+msgstr "封面"
+
+#: src/frontend/mame/ui/dirmenu.cpp:121
+msgid "Folders Setup"
+msgstr "資料夾設定"
+
+#: src/frontend/mame/ui/dirmenu.cpp:172
+#, c-format
+msgid "Current %1$s Folders"
+msgstr "目前 %1$s 資料夾"
+
+#: src/frontend/mame/ui/dirmenu.cpp:184
+msgid "Change Folder"
+msgstr "變更資料夾"
+
+#: src/frontend/mame/ui/dirmenu.cpp:184
+msgid "Add Folder"
+msgstr "新增資料夾"
+
+#: src/frontend/mame/ui/dirmenu.cpp:187
+msgid "Remove Folder"
+msgstr "移除資料夾"
+
+#: src/frontend/mame/ui/dirmenu.cpp:422
+#, c-format
+msgid "Change %1$s Folder - Search: %2$s_"
+msgstr "變更 %1$s 資料夾 - 搜尋： %2$s_"
+
+#: src/frontend/mame/ui/dirmenu.cpp:422
+#, c-format
+msgid "Add %1$s Folder - Search: %2$s_"
+msgstr "新增 %1$s 資料夾 - 搜尋： %2$s_"
+
+#: src/frontend/mame/ui/dirmenu.cpp:433
+msgid "Press TAB to set"
+msgstr "按下 TAB 鍵設定"
+
+#: src/frontend/mame/ui/dirmenu.cpp:517
+#, c-format
+msgid "Remove %1$s Folder"
+msgstr "移除 %1$s 資料夾"
+
+#: src/frontend/mame/ui/viewgfx.cpp:436
+msgid " COLORS"
+msgstr " 色彩"
+
+#: src/frontend/mame/ui/viewgfx.cpp:436
+msgid " PENS"
+msgstr " PENS"
+
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = 1/%1$d"
+msgstr "縮放 = 1/%1$d"
+
+#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
+#, c-format
+msgid "Zoom = %1$d"
+msgstr "縮放 = %1$d"
+
+#: src/frontend/mame/ui/viewgfx.cpp:1262
+msgid "Expand to fit"
+msgstr "展開以符合"
+
+#: src/frontend/mame/ui/selgame.cpp:440
+msgid "Configure Machine"
+msgstr "設定機台"
+
+#: src/frontend/mame/ui/selgame.cpp:1056
+#, c-format
+msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
+msgstr "%1$s %2$s （ %3$d / %4$d 機台 (%5$d BIOS) ）"
+
+#: src/frontend/mame/ui/selgame.cpp:1084
+#, c-format
+msgid "System: %1$-.100s"
+msgstr "系統： %1$-.100s"
+
+#: src/frontend/mame/ui/selector.cpp:118
+msgid "Selection List - Search: "
+msgstr "選項清單 - 搜尋： "
+
+#: src/frontend/mame/ui/selector.cpp:126
+#, c-format
+msgid "Double-click or press %1$s to select"
+msgstr "雙擊或按下 %1$s 以選擇"
+
+#: src/frontend/mame/ui/auditmenu.cpp:59
+#, c-format
+msgid "Results will be saved to %1$s"
+msgstr "結果將儲存至 %1$s"
+
+#: src/frontend/mame/ui/auditmenu.cpp:97
+#, c-format
+msgid ""
+"Auditing ROMs for machine %2$u of %3$u...\n"
+"%1$s"
+msgstr ""
+"正在驗證供機台 %2$u 的 %3$u ROM 檔...\n"
+"%1$s"
+
+#: src/frontend/mame/ui/auditmenu.cpp:115
+#, c-format
+msgid ""
+"Cancel audit?\n"
+"\n"
+"Press %1$s to cancel\n"
+"Press %2$s to continue"
+msgstr ""
+
+#: src/frontend/mame/ui/auditmenu.cpp:135
+#, c-format
+msgid "Audit ROMs for %1$u machines marked unavailable"
+msgstr "驗證標記為不可用的 %1$u 機台 ROM 檔"
+
+#: src/frontend/mame/ui/auditmenu.cpp:136
+#, c-format
+msgid "Audit ROMs for all %1$u machines"
+msgstr "驗證所有 %1$u 機台的 ROM 檔"
+
+#: src/frontend/mame/ui/auditmenu.cpp:154
+#, c-format
+msgid "Press %1$s to cancel\n"
+msgstr "按下 %1$s 取消\n"
+
+#: src/frontend/mame/ui/custui.cpp:33
+msgid "Show All"
+msgstr "顯示全部"
+
+#: src/frontend/mame/ui/custui.cpp:34
+msgid "Hide Filters"
+msgstr "隱藏篩選"
+
+#: src/frontend/mame/ui/custui.cpp:35
+msgid "Hide Info/Image"
+msgstr "隱藏資訊/圖片"
+
+#: src/frontend/mame/ui/custui.cpp:36
+msgid "Hide Both"
+msgstr "隱藏兩者"
+
+#: src/frontend/mame/ui/custui.cpp:176
+msgid "Fonts"
+msgstr "字體"
+
+#: src/frontend/mame/ui/custui.cpp:177
+msgid "Colors"
+msgstr "顏色"
+
+#: src/frontend/mame/ui/custui.cpp:180
+msgid "Language"
+msgstr "語言"
+
+#: src/frontend/mame/ui/custui.cpp:183
+msgid "System Names"
+msgstr "系統名稱"
+
+#: src/frontend/mame/ui/custui.cpp:186
+msgid "Show side panels"
+msgstr "顯示側面版"
+
+#: src/frontend/mame/ui/custui.cpp:198
+msgid "UI Customization Settings"
+msgstr "UI 自訂設置"
+
+#: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
+msgid "[built-in]"
+msgstr "[內建]"
+
+#: src/frontend/mame/ui/custui.cpp:338
+msgid "default"
+msgstr "預設"
+
+#: src/frontend/mame/ui/custui.cpp:459
+msgid "UI Font"
+msgstr "UI 字體"
+
+#: src/frontend/mame/ui/custui.cpp:464
+msgid "Bold"
+msgstr "粗體"
+
+#: src/frontend/mame/ui/custui.cpp:465
+msgid "Italic"
+msgstr "斜體"
+
+#: src/frontend/mame/ui/custui.cpp:470
+msgid "Lines"
+msgstr "行"
+
+#: src/frontend/mame/ui/custui.cpp:476
+msgid "Infos text size"
+msgstr "資訊字體大小"
+
+#: src/frontend/mame/ui/custui.cpp:490
+msgid "UI Fonts Settings"
+msgstr "UI 字體設定"
+
+#: src/frontend/mame/ui/custui.cpp:499
+msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+msgstr "文字樣本～永東國酬愛鬱靈鷹袋、南去經三國，東來過五湖。"
+
+#: src/frontend/mame/ui/custui.cpp:582
+msgctxt "color-option"
+msgid "Normal text"
+msgstr "一般文字"
+
+#: src/frontend/mame/ui/custui.cpp:583
+msgctxt "color-option"
+msgid "Selected color"
+msgstr "選擇色彩"
+
+#: src/frontend/mame/ui/custui.cpp:584
+msgctxt "color-option"
+msgid "Normal text background"
+msgstr "一般文字背景"
+
+#: src/frontend/mame/ui/custui.cpp:585
+msgctxt "color-option"
+msgid "Selected background color"
+msgstr "已選擇背景顏色"
+
+#: src/frontend/mame/ui/custui.cpp:586
+msgctxt "color-option"
+msgid "Subitem color"
+msgstr "子項目顏色"
+
+#: src/frontend/mame/ui/custui.cpp:587
+msgctxt "color-option"
+msgid "Clone"
+msgstr "相容版本"
+
+#: src/frontend/mame/ui/custui.cpp:588
+msgctxt "color-option"
+msgid "Border"
+msgstr "邊框"
+
+#: src/frontend/mame/ui/custui.cpp:589
+msgctxt "color-option"
+msgid "Background"
+msgstr "背景"
+
+#: src/frontend/mame/ui/custui.cpp:590
+msgctxt "color-option"
+msgid "DIP switch"
+msgstr "機台設定開關"
+
+#: src/frontend/mame/ui/custui.cpp:591
+msgctxt "color-option"
+msgid "Unavailable color"
+msgstr "未擁有遊戲顏色"
+
+#: src/frontend/mame/ui/custui.cpp:592
+msgctxt "color-option"
+msgid "Slider color"
+msgstr "參數調整"
+
+#: src/frontend/mame/ui/custui.cpp:593
+msgctxt "color-option"
+msgid "Graphics viewer background"
+msgstr "圖形檢視器背景"
+
+#: src/frontend/mame/ui/custui.cpp:594
+msgctxt "color-option"
+msgid "Mouse over color"
+msgstr "滑鼠經過顏色"
+
+#: src/frontend/mame/ui/custui.cpp:595
+msgctxt "color-option"
+msgid "Mouse over background color"
+msgstr "滑鼠經過背景顏色"
+
+#: src/frontend/mame/ui/custui.cpp:596
+msgctxt "color-option"
+msgid "Mouse down color"
+msgstr "滑鼠按下顏色"
+
+#: src/frontend/mame/ui/custui.cpp:597
+msgctxt "color-option"
+msgid "Mouse down background color"
+msgstr "滑鼠按下背景顏色"
+
+#: src/frontend/mame/ui/custui.cpp:600
+msgid "Restore default colors"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:612
+msgid "UI Color Settings"
+msgstr "UI 色彩設定"
+
+#: src/frontend/mame/ui/custui.cpp:621
+#, c-format
+msgid "Double-click or press %1$s to change color"
+msgstr ""
+
+#: src/frontend/mame/ui/custui.cpp:629
+msgid "Menu Preview"
+msgstr "選單預覽"
+
+#: src/frontend/mame/ui/custui.cpp:639
+msgctxt "color-sample"
+msgid "Normal"
+msgstr "一般項目"
+
+#: src/frontend/mame/ui/custui.cpp:640
+msgctxt "color-sample"
+msgid "Subitem"
+msgstr "子項目"
+
+#: src/frontend/mame/ui/custui.cpp:641
+msgctxt "color-sample"
+msgid "Selected"
+msgstr "已選擇"
+
+#: src/frontend/mame/ui/custui.cpp:642
+msgctxt "color-sample"
+msgid "Mouse Over"
+msgstr "滑鼠經過"
+
+#: src/frontend/mame/ui/custui.cpp:643
+msgctxt "color-sample"
+msgid "Clone"
+msgstr "相容版本"
+
+#: src/frontend/mame/ui/custui.cpp:843
+msgid "ARGB Settings"
+msgstr "ARGB 設定"
+
+#: src/frontend/mame/ui/custui.cpp:848 src/frontend/mame/ui/custui.cpp:851
+msgctxt "color-channel"
+msgid "Alpha"
+msgstr "透明度"
+
+#: src/frontend/mame/ui/custui.cpp:856 src/frontend/mame/ui/custui.cpp:859
+msgctxt "color-channel"
+msgid "Red"
+msgstr "紅"
+
+#: src/frontend/mame/ui/custui.cpp:864 src/frontend/mame/ui/custui.cpp:867
+msgctxt "color-channel"
+msgid "Green"
+msgstr "綠"
+
+#: src/frontend/mame/ui/custui.cpp:872 src/frontend/mame/ui/custui.cpp:875
+msgctxt "color-channel"
+msgid "Blue"
+msgstr "藍"
+
+#: src/frontend/mame/ui/custui.cpp:878
+msgid "Choose from palette"
+msgstr "從色盤挑選"
+
+#: src/frontend/mame/ui/custui.cpp:921
+msgid "Color preview:"
+msgstr "顏色預覽："
+
+#: src/frontend/mame/ui/custui.cpp:1013
+msgctxt "color-preset"
+msgid "White"
+msgstr "白"
+
+#: src/frontend/mame/ui/custui.cpp:1014
+msgctxt "color-preset"
+msgid "Silver"
+msgstr "銀"
+
+#: src/frontend/mame/ui/custui.cpp:1015
+msgctxt "color-preset"
+msgid "Gray"
+msgstr "灰"
+
+#: src/frontend/mame/ui/custui.cpp:1016
+msgctxt "color-preset"
+msgid "Black"
+msgstr "黑"
+
+#: src/frontend/mame/ui/custui.cpp:1017
+msgctxt "color-preset"
+msgid "Red"
+msgstr "紅"
+
+#: src/frontend/mame/ui/custui.cpp:1018
+msgctxt "color-preset"
+msgid "Orange"
+msgstr "橘"
+
+#: src/frontend/mame/ui/custui.cpp:1019
+msgctxt "color-preset"
+msgid "Yellow"
+msgstr "黃"
+
+#: src/frontend/mame/ui/custui.cpp:1020
+msgctxt "color-preset"
+msgid "Green"
+msgstr "綠"
+
+#: src/frontend/mame/ui/custui.cpp:1021
+msgctxt "color-preset"
+msgid "Blue"
+msgstr "藍"
+
+#: src/frontend/mame/ui/custui.cpp:1022
+msgctxt "color-preset"
+msgid "Violet"
+msgstr "紫"
+
+#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:754
+#, c-format
+msgid "%1$s %2$s"
+msgstr "%1$s %2$s"
+
+#: src/frontend/mame/ui/barcode.cpp:74
+msgid "New Barcode:"
+msgstr "新條碼："
+
+#: src/frontend/mame/ui/barcode.cpp:77
+msgid "Enter Code"
+msgstr "輸入條碼"
+
+#: src/frontend/mame/ui/barcode.cpp:116
+msgid "Barcode length invalid!"
+msgstr "條碼長度無效！"
+
+#: src/frontend/mame/ui/mainmenu.cpp:98
+msgid "Input (general)"
+msgstr "輸入設定 （一般）"
+
+#: src/frontend/mame/ui/mainmenu.cpp:100
+msgid "Input (this Machine)"
+msgstr "輸入設定 （本機台）"
+
+#: src/frontend/mame/ui/mainmenu.cpp:103
+msgid "Analog Controls"
+msgstr "類比控制"
+
+#: src/frontend/mame/ui/mainmenu.cpp:105
+msgid "DIP Switches"
+msgstr "機台設定開關"
+
+#: src/frontend/mame/ui/mainmenu.cpp:107
+msgid "Machine Configuration"
+msgstr "機台設定"
+
+#: src/frontend/mame/ui/mainmenu.cpp:109
+msgid "Bookkeeping Info"
+msgstr "收入資訊"
+
+#: src/frontend/mame/ui/mainmenu.cpp:111
+msgid "Machine Information"
+msgstr "機台資訊"
+
+#: src/frontend/mame/ui/mainmenu.cpp:114
+msgid "Warning Information"
+msgstr "警示訊息"
+
+#: src/frontend/mame/ui/mainmenu.cpp:120
+msgid "Image Information"
+msgstr "映像檔資訊"
+
+#: src/frontend/mame/ui/mainmenu.cpp:122
+msgid "File Manager"
+msgstr "檔案管理員"
+
+#: src/frontend/mame/ui/mainmenu.cpp:129
+msgid "Tape Control"
+msgstr "磁帶控制"
+
+#: src/frontend/mame/ui/mainmenu.cpp:135
+msgid "BIOS Selection"
+msgstr "選擇 BIOS"
+
+#: src/frontend/mame/ui/mainmenu.cpp:138
+msgid "Slot Devices"
+msgstr "插槽裝置"
+
+#: src/frontend/mame/ui/mainmenu.cpp:141
+msgid "Barcode Reader"
+msgstr "條碼讀取器"
+
+#: src/frontend/mame/ui/mainmenu.cpp:144
+msgid "Network Devices"
+msgstr "網路裝置"
+
+#: src/frontend/mame/ui/mainmenu.cpp:149
+msgid "Slider Controls"
+msgstr "參數調整"
+
+#: src/frontend/mame/ui/mainmenu.cpp:154
+msgid "Crosshair Options"
+msgstr "十字準星選項"
+
+#: src/frontend/mame/ui/mainmenu.cpp:157 plugins/cheat/init.lua:799
+msgid "Cheat"
+msgstr "作弊引擎"
+
+#: src/frontend/mame/ui/mainmenu.cpp:160
+msgid "Plugin Options"
+msgstr "外掛選項"
+
+#: src/frontend/mame/ui/mainmenu.cpp:163
+msgid "External DAT View"
+msgstr "查閱外部文件"
+
+#: src/frontend/mame/ui/mainmenu.cpp:174
+#, c-format
+msgid "About %s"
+msgstr "關於 %s"
+
+#: src/frontend/mame/ui/mainmenu.cpp:182
+msgid "Start Machine"
+msgstr "啟動機台"
+
+#: src/frontend/mame/ui/mainmenu.cpp:186
+msgid "Select New Machine"
+msgstr "選擇新機台"
+
+#: src/frontend/mame/ui/mainmenu.cpp:187
+msgid "Return to Machine"
+msgstr "回到機台"
+
+#: src/frontend/mame/ui/selmenu.cpp:76
+msgctxt "selmenu-artwork"
+msgid "Snapshots"
+msgstr "擷圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:77
+msgctxt "selmenu-artwork"
+msgid "Cabinet"
+msgstr "筐體圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:78
+msgctxt "selmenu-artwork"
+msgid "Control Panel"
+msgstr "操作檯"
+
+#: src/frontend/mame/ui/selmenu.cpp:79
+msgctxt "selmenu-artwork"
+msgid "PCB"
+msgstr "PCB 圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:80
+msgctxt "selmenu-artwork"
+msgid "Flyer"
+msgstr "廣告圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:81
+msgctxt "selmenu-artwork"
+msgid "Title Screen"
+msgstr "標題畫面"
+
+#: src/frontend/mame/ui/selmenu.cpp:82
+msgctxt "selmenu-artwork"
+msgid "Ending"
+msgstr "結局"
+
+#: src/frontend/mame/ui/selmenu.cpp:83
+msgctxt "selmenu-artwork"
+msgid "Artwork Preview"
+msgstr "裝飾圖預覽"
+
+#: src/frontend/mame/ui/selmenu.cpp:84
+msgctxt "selmenu-artwork"
+msgid "Bosses"
+msgstr "首領"
+
+#: src/frontend/mame/ui/selmenu.cpp:85
+msgctxt "selmenu-artwork"
+msgid "Logo"
+msgstr "標題圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:86
+msgctxt "selmenu-artwork"
+msgid "Versus"
+msgstr "對戰"
+
+#: src/frontend/mame/ui/selmenu.cpp:87
+msgctxt "selmenu-artwork"
+msgid "Game Over"
+msgstr "遊戲結束"
+
+#: src/frontend/mame/ui/selmenu.cpp:88
+msgctxt "selmenu-artwork"
+msgid "HowTo"
+msgstr "說明圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:89
+msgctxt "selmenu-artwork"
+msgid "Scores"
+msgstr "得分"
+
+#: src/frontend/mame/ui/selmenu.cpp:90
+msgctxt "selmenu-artwork"
+msgid "Select"
+msgstr "精選"
+
+#: src/frontend/mame/ui/selmenu.cpp:91
+msgctxt "selmenu-artwork"
+msgid "Marquee"
+msgstr "標籤圖"
+
+#: src/frontend/mame/ui/selmenu.cpp:92
+msgctxt "selmenu-artwork"
+msgid "Covers"
+msgstr "封面"
+
+#: src/frontend/mame/ui/selmenu.cpp:96
+msgid "Add or remove favorite"
+msgstr "新增或移除最愛項目"
+
+#: src/frontend/mame/ui/selmenu.cpp:97
+msgid "Export displayed list to file"
+msgstr "匯出顯示的清單至檔案"
+
+#: src/frontend/mame/ui/selmenu.cpp:98
+msgid "Audit media"
+msgstr "驗證媒體"
+
+#: src/frontend/mame/ui/selmenu.cpp:99
+msgid "Show DATs view"
+msgstr "顯示文件檢視"
+
+#: src/frontend/mame/ui/selmenu.cpp:320
+msgid "Software part selection:"
+msgstr "軟體部分選項："
+
+#: src/frontend/mame/ui/selmenu.cpp:426
+msgid "BIOS selection:"
+msgstr "選擇 BIOS："
+
+#: src/frontend/mame/ui/selmenu.cpp:681
+#, c-format
+msgid "Software is clone of: %1$-.100s"
+msgstr "軟體相容於： %1$-.100s"
+
+#: src/frontend/mame/ui/selmenu.cpp:683
+msgid "Software is parent"
+msgstr "軟體為主檔"
+
+#: src/frontend/mame/ui/selmenu.cpp:688
+msgid "Supported: No"
+msgstr "已支援： 否"
+
+#: src/frontend/mame/ui/selmenu.cpp:693
+msgid "Supported: Partial"
+msgstr "已支援： 部分"
+
+#: src/frontend/mame/ui/selmenu.cpp:698
+msgid "Supported: Yes"
+msgstr "已支援： 是"
+
+#: src/frontend/mame/ui/selmenu.cpp:714
+msgid "Driver is parent"
+msgstr "驅動程式為主檔"
+
+#: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
+#, c-format
+msgid "Driver is clone of: %1$-.100s"
+msgstr "驅動程式相容於： %-.100s"
+
+#: src/frontend/mame/ui/selmenu.cpp:1287
+msgid "Return to previous menu"
+msgstr "回上一層選單"
+
+#: src/frontend/mame/ui/selmenu.cpp:2237
+msgid "Images"
+msgstr "圖片"
+
+#: src/frontend/mame/ui/selmenu.cpp:2238
+msgid "Infos"
+msgstr "資訊"
+
+#: src/frontend/mame/ui/selmenu.cpp:2547
+msgid ""
+"Required ROM/disk images for the selected system are missing or incorrect. "
+"Please acquire the correct files or select a different system.\n"
+"\n"
+msgstr ""
+"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。 請取得正確的檔案或選擇不同"
+"的系統。\n"
+"\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2563
+msgid ""
+"Required ROM/disk images for the selected software are missing or incorrect. "
+"Please acquire the correct files or select a different software item.\n"
+"\n"
+msgstr ""
+"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。 請取得正確的檔案或選擇不同"
+"的軟體項目。\n"
+"\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2579
+msgid "incorrect checksum"
+msgstr "不正確的檢查碼"
+
+#: src/frontend/mame/ui/selmenu.cpp:2582
+msgid "incorrect length"
+msgstr "不正確的長度"
+
+#: src/frontend/mame/ui/selmenu.cpp:2585
+msgid "not found"
+msgstr "未找到"
+
+#: src/frontend/mame/ui/selmenu.cpp:2596
+#, c-format
+msgid "%1$s (%2$s) - %3$s\n"
+msgstr "%1$s (%2$s) - %3$s\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2598
+#, c-format
+msgid "%1$s - %2$s\n"
+msgstr "%1$s - %2$s\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2602
+msgid "Press any key to continue."
+msgstr "按任意鍵繼續。"
+
+#: src/frontend/mame/ui/selmenu.cpp:2732
+msgid "General Info"
+msgstr "一般資訊"
+
+#: src/frontend/mame/ui/selmenu.cpp:2940
+#, c-format
+msgid "Romset\t%1$-.100s\n"
+msgstr "ROM組\t%1$-.100s\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2941
+#, c-format
+msgid "Year\t%1$s\n"
+msgstr "年代\t%1$s\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2942
+#, c-format
+msgid "Manufacturer\t%1$-.100s\n"
+msgstr "製造商\t%1$-.100s\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2949
+#, c-format
+msgid "Driver is Clone of\t%1$-.100s\n"
+msgstr "驅動程式相容於\t%1$-.100s\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2954
+msgid "Driver is Parent\t\n"
+msgstr "驅動程式為主檔\t\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2958
+msgid "Analog Controls\tYes\n"
+msgstr "類比控制\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2960
+msgid "Keyboard Inputs\tYes\n"
+msgstr "鍵盤輸入\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2963
+msgid "Overall\tNOT WORKING\n"
+msgstr "整體\t不可執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2965
+msgid "Overall\tUnemulated Protection\n"
+msgstr "整體\t未模擬保護\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2967
+msgid "Overall\tWorking\n"
+msgstr "整體\t可以執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2970
+msgid "Graphics\tUnimplemented\n"
+msgstr "圖形\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2972
+msgid "Graphics\tWrong Colors\n"
+msgstr "圖形\t色彩錯誤\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2974
+msgid "Graphics\tImperfect Colors\n"
+msgstr "圖形\t色彩不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2976
+msgid "Graphics\tImperfect\n"
+msgstr "圖形\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2978
+msgid "Graphics\tOK\n"
+msgstr "圖形\tOK\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2981
+msgid "Sound\tNone\n"
+msgstr "聲音\t無\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2983
+msgid "Sound\tUnimplemented\n"
+msgstr "聲音\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2985
+msgid "Sound\tImperfect\n"
+msgstr "聲音\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2987
+msgid "Sound\tOK\n"
+msgstr "聲音\tOK\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2990
+msgid "Capture\tUnimplemented\n"
+msgstr "擷取\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2992
+msgid "Capture\tImperfect\n"
+msgstr "擷取\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2995
+msgid "Camera\tUnimplemented\n"
+msgstr "相機\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2997
+msgid "Camera\tImperfect\n"
+msgstr "相機\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3000
+msgid "Microphone\tUnimplemented\n"
+msgstr "麥克風\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3002
+msgid "Microphone\tImperfect\n"
+msgstr "麥克風\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3005
+msgid "Controls\tUnimplemented\n"
+msgstr "控制\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3007
+msgid "Controls\tImperfect\n"
+msgstr "控制\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3010
+msgid "Keyboard\tUnimplemented\n"
+msgstr "鍵盤\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3012
+msgid "Keyboard\tImperfect\n"
+msgstr "鍵盤\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3015
+msgid "Mouse\tUnimplemented\n"
+msgstr "滑鼠\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3017
+msgid "Mouse\tImperfect\n"
+msgstr "滑鼠\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3020
+msgid "Media\tUnimplemented\n"
+msgstr "媒體\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3022
+msgid "Media\tImperfect\n"
+msgstr "媒體\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3025
+msgid "Disk\tUnimplemented\n"
+msgstr "磁碟\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3027
+msgid "Disk\tImperfect\n"
+msgstr "磁碟\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3030
+msgid "Printer\tUnimplemented\n"
+msgstr "印表機\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3032
+msgid "Printer\tImperfect\n"
+msgstr "印表機\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3035
+msgid "Mag. Tape\tUnimplemented\n"
+msgstr "磁帶\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3037
+msgid "Mag. Tape\tImperfect\n"
+msgstr "磁帶\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3040
+msgid "Punch Tape\tUnimplemented\n"
+msgstr "打孔帶\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3042
+msgid "Punch Tape\tImperfect\n"
+msgstr "打孔帶\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3045
+msgid "Mag. Drum\tUnimplemented\n"
+msgstr "磁鼓\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3047
+msgid "Mag. Drum\tImperfect\n"
+msgstr "磁鼓\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3050
+msgid "(EP)ROM\tUnimplemented\n"
+msgstr "(EP)ROM\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3052
+msgid "(EP)ROM\tImperfect\n"
+msgstr "(EP)ROM\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3055
+msgid "Communications\tUnimplemented\n"
+msgstr "通訊\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3057
+msgid "Communications\tImperfect\n"
+msgstr "通訊\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3060
+msgid "LAN\tUnimplemented\n"
+msgstr "區域網路\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3062
+msgid "LAN\tImperfect\n"
+msgstr "區域網路\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3065
+msgid "WAN\tUnimplemented\n"
+msgstr "外部網路\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3067
+msgid "WAN\tImperfect\n"
+msgstr "外部網路\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3070
+msgid "Timing\tUnimplemented\n"
+msgstr "計時\t無法執行\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3072
+msgid "Timing\tImperfect\n"
+msgstr "計時\t不完美\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3074
+msgid "Mechanical Machine\tYes\n"
+msgstr "機械式機台\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3074
+msgid "Mechanical Machine\tNo\n"
+msgstr "機械式機台\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3075
+msgid "Requires Artwork\tYes\n"
+msgstr "需要裝飾圖\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3075
+msgid "Requires Artwork\tNo\n"
+msgstr "需要裝飾圖\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3076
+msgid "Requires Clickable Artwork\tYes\n"
+msgstr "需要可點擊的裝飾圖\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3076
+msgid "Requires Clickable Artwork\tNo\n"
+msgstr "需要可點擊的裝飾圖\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3078
+msgid "Support Cocktail\tNo\n"
+msgstr "支援檯面型筐體\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3079
+msgid "Driver is BIOS\tYes\n"
+msgstr "驅動程式為 BIOS\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3079
+msgid "Driver is BIOS\tNo\n"
+msgstr "驅動程式為 BIOS\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3080
+msgid "Support Save\tYes\n"
+msgstr "支援即時存檔\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3080
+msgid "Support Save\tNo\n"
+msgstr "支援即時存檔\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3081
+msgid "Screen Orientation\tVertical\n"
+msgstr "畫面方向\t垂直\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3081
+msgid "Screen Orientation\tHorizontal\n"
+msgstr "畫面方向\t水平\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3091
+msgid "Requires CHD\tYes\n"
+msgstr "需要 CHD\t是\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3091
+msgid "Requires CHD\tNo\n"
+msgstr "需要 CHD\t否\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3104
+msgid "ROM Audit Result\tOK\n"
+msgstr "ROM 驗證結果\tOK\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3106
+msgid "ROM Audit Result\tBAD\n"
+msgstr "ROM 驗證結果\t錯誤\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3109
+msgid "Samples Audit Result\tNone Needed\n"
+msgstr "樣本檔驗證結果\t不需要\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3111
+msgid "Samples Audit Result\tOK\n"
+msgstr "樣本檔驗證結果\tOK\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3113
+msgid "Samples Audit Result\tBAD\n"
+msgstr "樣本檔驗證結果\t錯誤\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3117
+msgid ""
+"ROM Audit \tDisabled\n"
+"Samples Audit \tDisabled\n"
+msgstr ""
+"ROM 驗證 \t停用\n"
+"樣本檔驗證 \t停用\n"
+
+#: src/frontend/mame/ui/sndmenu.cpp:148
+msgid "Sound"
+msgstr "聲音"
+
+#: src/frontend/mame/ui/sndmenu.cpp:149
+msgid "Compressor"
+msgstr "壓縮"
+
+#: src/frontend/mame/ui/sndmenu.cpp:150
+msgid "Sample Rate"
+msgstr "取樣頻率"
+
+#: src/frontend/mame/ui/sndmenu.cpp:151
+msgid "Use External Samples"
+msgstr "使用外部樣本檔"
+
+#: src/frontend/mame/ui/devopt.cpp:45
+#, c-format
+msgid ""
+"[This option is currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"The selected option enables the following items:\n"
+msgstr ""
+"[ 此選項目前已掛載於執行中的系統 ]\n"
+"\n"
+"選項： %1$s\n"
+"裝置： %2$s\n"
+"\n"
+"已選用的選項啟用下列項目：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:46
+#, c-format
+msgid ""
+"[This option is NOT currently mounted in the running system]\n"
+"\n"
+"Option: %1$s\n"
+"Device: %2$s\n"
+"\n"
+"If you select this option, the following items will be enabled:\n"
+msgstr ""
+"[ 此選項目前「尚未」掛載於執行中的系統 ]\n"
+"\n"
+"選項： %1$s\n"
+"裝置： %2$s\n"
+"\n"
+"如選用此選項，下列項目將啟用：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:54
+msgid "* CPU:\n"
+msgstr "* CPU:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:98
+msgid "* Video:\n"
+msgstr "* 視訊：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:103
+#, c-format
+msgid "  Screen '%1$s': Vector\n"
+msgstr "  畫面 '%1$s'： 向量\n"
+
+#: src/frontend/mame/ui/devopt.cpp:116
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
+msgstr "  畫面 '%1$s'： %2$d × %3$d (V) %4$s Hz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:117
+#, c-format
+msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
+msgstr "  畫面 '%1$s': %2$d × %3$d (H) %4$s Hz\n"
+
+#: src/frontend/mame/ui/devopt.cpp:130
+msgid "* Sound:\n"
+msgstr "* 聲音:\n"
+
+#: src/frontend/mame/ui/devopt.cpp:189
+#, c-format
+msgid ""
+"* BIOS settings:\n"
+"  %1$d options    [default: %2$s]\n"
+msgstr ""
+"* BIOS 設定：\n"
+"  %1$d 選項    [預設值： %2$s]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:229 src/frontend/mame/ui/devopt.cpp:245
+#: src/frontend/mame/ui/devopt.cpp:290
+#, c-format
+msgid "  %1$s    [default: %2$s]\n"
+msgstr "  %1$s    [預設值： %2$s]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:234 src/frontend/mame/ui/devopt.cpp:250
+#, c-format
+msgid "  %1$s\n"
+msgstr "  %1$s\n"
+
+#: src/frontend/mame/ui/devopt.cpp:255
+msgid "* DIP switch settings:\n"
+msgstr "* 指撥開關設定：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:257
+msgid "* Configuration settings:\n"
+msgstr "* 配置設定：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:259
+msgid "* Input device(s):\n"
+msgstr "* 輸入裝置："
+
+#: src/frontend/mame/ui/devopt.cpp:261
+#, c-format
+msgid "  User inputs    [%1$d inputs]\n"
+msgstr "  使用者輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:263
+#, c-format
+msgid "  Mahjong inputs    [%1$d inputs]\n"
+msgstr "  麻將輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:265
+#, c-format
+msgid "  Hanafuda inputs    [%1$d inputs]\n"
+msgstr "  花牌輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:267
+#, c-format
+msgid "  Gambling inputs    [%1$d inputs]\n"
+msgstr "  博奕輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:269
+#, c-format
+msgid "  Analog inputs    [%1$d inputs]\n"
+msgstr "  類比輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:271
+#, c-format
+msgid "  Adjuster inputs    [%1$d inputs]\n"
+msgstr "  調節器輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:273
+#, c-format
+msgid "  Keypad inputs    [%1$d inputs]\n"
+msgstr "  數字鍵盤輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:275
+#, c-format
+msgid "  Keyboard inputs    [%1$d inputs]\n"
+msgstr "  鍵盤輸入    [%1$d 輸入]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:280
+msgid "* Media Options:\n"
+msgstr "* 媒體選項：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:282
+#, c-format
+msgid "  %1$s    [tag: %2$s]\n"
+msgstr "  %1$s    [標籤： %2$s]\n"
+
+#: src/frontend/mame/ui/devopt.cpp:288
+msgid "* Slot Options:\n"
+msgstr "* 插槽選項：\n"
+
+#: src/frontend/mame/ui/devopt.cpp:295
+msgid "[None]\n"
+msgstr "[ 無 ]\n"
 
 #: src/emu/inpttype.ipp:26
 msgctxt "input-name"
@@ -3397,7 +6587,7 @@ msgstr "自訂"
 msgid "Cheat Name"
 msgstr "作弊碼名稱"
 
-#: plugins/cheatfind/init.lua:398 plugins/cheatfind/init.lua:973
+#: plugins/cheatfind/init.lua:398 plugins/cheatfind/init.lua:977
 #, lua-format
 msgid "Default name is %s"
 msgstr "預設名稱為 %s"
@@ -3443,7 +6633,8 @@ msgstr ""
 "無法寫入檔案\n"
 "確認 cheatpath 資料夾是否存在"
 
-#: plugins/cheatfind/init.lua:492 plugins/autofire/autofire_menu.lua:219
+#: plugins/cheatfind/init.lua:492 plugins/autofire/autofire_menu.lua:215
+#: plugins/autofire/autofire_menu.lua:261
 msgid "Cancel"
 msgstr "取消"
 
@@ -3455,218 +6646,205 @@ msgstr "CPU 或 RAM"
 msgid "Changes to this only take effect when \"Start new search\" is selected"
 msgstr "此變更僅當選定 \"開始新搜尋\" 時生效"
 
-#: plugins/cheatfind/init.lua:510
+#: plugins/cheatfind/init.lua:511
 msgid "Automatic"
 msgstr "自動"
 
-#: plugins/cheatfind/init.lua:510
+#: plugins/cheatfind/init.lua:511
 msgid "Manual"
 msgstr "手動"
 
-#: plugins/cheatfind/init.lua:511
+#: plugins/cheatfind/init.lua:512
 msgid "Pause Mode"
 msgstr "暫停模式"
 
-#: plugins/cheatfind/init.lua:518
+#: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
 msgstr "當需要時手動切換暫停"
 
-#: plugins/cheatfind/init.lua:521
+#: plugins/cheatfind/init.lua:522
 msgid "Automatically toggle pause with on-screen menus"
 msgstr "螢幕選單出現時自動切換暫停"
 
-#: plugins/cheatfind/init.lua:542
+#: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
 msgstr "全部插槽已清除且目前狀態已儲存至插槽 1"
 
-#: plugins/cheatfind/init.lua:554
+#: plugins/cheatfind/init.lua:555
 msgid "Start new search"
 msgstr "開始新搜尋"
 
-#: plugins/cheatfind/init.lua:565
+#: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
 msgstr "記憶體狀態已儲存至插槽 %d"
 
-#: plugins/cheatfind/init.lua:581
+#: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
 msgstr "儲存現有的記憶體狀態至插槽 %d"
 
-#: plugins/cheatfind/init.lua:612
+#: plugins/cheatfind/init.lua:614
 #, lua-format
 msgid "%d total matches found"
 msgstr "總計發現 %d 符合"
 
-#: plugins/cheatfind/init.lua:620
+#: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
 msgstr "執行比較：插槽 $d %s 插槽 %d"
 
-#: plugins/cheatfind/init.lua:621
+#: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
 msgstr "執行比較  ：  插槽 %d %s 插槽 %d %s %d"
 
-#: plugins/cheatfind/init.lua:622
+#: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
 msgstr "執行比較  ：  插槽 %d BITWISE%s 插槽 %d"
 
-#: plugins/cheatfind/init.lua:623
+#: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
 msgstr "執行比較  :  插槽 %d %s %d"
 
-#: plugins/cheatfind/init.lua:664 plugins/cheatfind/init.lua:706
+#: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
 msgstr "插槽 %d"
 
-#: plugins/cheatfind/init.lua:675
+#: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
 msgstr "左值少於右值"
 
-#: plugins/cheatfind/init.lua:677
+#: plugins/cheatfind/init.lua:680
 msgid "Left greater than right"
 msgstr "左值多於右值"
 
-#: plugins/cheatfind/init.lua:679
+#: plugins/cheatfind/init.lua:682
 msgid "Left equal to right"
 msgstr "左值等於右值"
 
-#: plugins/cheatfind/init.lua:681
+#: plugins/cheatfind/init.lua:684
 msgid "Left not equal to right"
 msgstr "左值不等於右值"
 
-#: plugins/cheatfind/init.lua:683
+#: plugins/cheatfind/init.lua:686
 msgid "Left equal to right with bitmask"
 msgstr "位元遮罩下左值等於右值"
 
-#: plugins/cheatfind/init.lua:685
+#: plugins/cheatfind/init.lua:688
 msgid "Left not equal to right with bitmask"
 msgstr "位元遮罩下左值不等於右值"
 
-#: plugins/cheatfind/init.lua:687
+#: plugins/cheatfind/init.lua:690
 msgid "Left less than value"
 msgstr "左值少於原值"
 
-#: plugins/cheatfind/init.lua:689
+#: plugins/cheatfind/init.lua:692
 msgid "Left greater than value"
 msgstr "左值多於原值"
 
-#: plugins/cheatfind/init.lua:691
+#: plugins/cheatfind/init.lua:694
 msgid "Left equal to value"
 msgstr "左值等於原值"
 
-#: plugins/cheatfind/init.lua:693
+#: plugins/cheatfind/init.lua:696
 msgid "Left not equal to value"
 msgstr "左值不等於原值"
 
-#: plugins/cheatfind/init.lua:715
+#: plugins/cheatfind/init.lua:718
 msgid "Value"
 msgstr "值"
 
-#: plugins/cheatfind/init.lua:717
+#: plugins/cheatfind/init.lua:720
 msgid "Difference"
 msgstr "差異"
 
-#: plugins/cheatfind/init.lua:722
+#: plugins/cheatfind/init.lua:725
 msgid "Any"
 msgstr "任意"
 
-#: plugins/cheatfind/init.lua:728
+#: plugins/cheatfind/init.lua:731
 msgid "Data Format"
 msgstr "資料格式"
 
-#: plugins/cheatfind/init.lua:734
+#: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
 msgstr "插槽 1 的值"
 
-#: plugins/cheatfind/init.lua:734
+#: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
 msgstr "最後插槽的值"
 
-#: plugins/cheatfind/init.lua:737
+#: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
 msgstr "測試/寫入塞入值"
 
-#: plugins/cheatfind/init.lua:744
+#: plugins/cheatfind/init.lua:747
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr "如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
 
-#: plugins/cheatfind/init.lua:746
+#: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr "如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
 
-#: plugins/cheatfind/init.lua:748
+#: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
 msgstr "如果你想塞入 %s，用這個"
 
-#: plugins/cheatfind/init.lua:760 plugins/cheatfind/init.lua:771
-#: plugins/cheat/init.lua:671 plugins/cheat/init.lua:680
-#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:663
-#: src/frontend/mame/ui/videoopt.cpp:208
-msgid "Off"
-msgstr "關"
-
-#: plugins/cheatfind/init.lua:763 plugins/cheatfind/init.lua:774
-#: plugins/cheat/init.lua:668 src/frontend/mame/ui/menu.cpp:368
-#: src/frontend/mame/ui/menu.cpp:660 src/frontend/mame/ui/videoopt.cpp:192
-msgid "On"
-msgstr "開"
-
-#: plugins/cheatfind/init.lua:771
+#: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
 msgstr "僅對齊"
 
-#: plugins/cheatfind/init.lua:787
+#: plugins/cheatfind/init.lua:791
 msgid "Undo last search -- #"
 msgstr "撤銷前次搜尋 -- #"
 
-#: plugins/cheatfind/init.lua:791
+#: plugins/cheatfind/init.lua:795
 msgid "Match block"
 msgstr "符合區塊"
 
-#: plugins/cheatfind/init.lua:794
+#: plugins/cheatfind/init.lua:798
 msgid "All"
 msgstr "所有"
 
-#: plugins/cheatfind/init.lua:903
+#: plugins/cheatfind/init.lua:907
 #, lua-format
 msgid "Test Cheat %08X_%02X"
 msgstr "測試作弊碼 %08X_%02X"
 
-#: plugins/cheatfind/init.lua:943
+#: plugins/cheatfind/init.lua:947
 msgid "Cheat engine not available"
 msgstr "作弊引擎不可用"
 
-#: plugins/cheatfind/init.lua:999
+#: plugins/cheatfind/init.lua:1003
 msgid "Test"
 msgstr "測試"
 
-#: plugins/cheatfind/init.lua:999
+#: plugins/cheatfind/init.lua:1003
 msgid "Write"
 msgstr "寫入"
 
-#: plugins/cheatfind/init.lua:999
+#: plugins/cheatfind/init.lua:1003
 msgid "Watch"
 msgstr "監視"
 
-#: plugins/cheatfind/init.lua:1016
+#: plugins/cheatfind/init.lua:1020
 msgid "Page"
 msgstr "頁"
 
-#: plugins/cheatfind/init.lua:1034
+#: plugins/cheatfind/init.lua:1039
 msgid "Clear Watches"
 msgstr "清除監視"
 
-#: plugins/cheatfind/init.lua:1049
+#: plugins/cheatfind/init.lua:1054
 msgid "Cheat Finder"
 msgstr "作弊碼搜尋器"
 
@@ -3710,12 +6888,7 @@ msgstr "按下 $s 刪除"
 msgid "%s [%d Hz]"
 msgstr "%s [%d Hz]"
 
-#: plugins/autofire/autofire_menu.lua:68 plugins/autofire/autofire_menu.lua:103
-#: plugins/autofire/autofire_menu.lua:252
-msgid "input-name"
-msgstr "input-name"
-
-#: plugins/autofire/autofire_menu.lua:75 plugins/autofire/autofire_menu.lua:208
+#: plugins/autofire/autofire_menu.lua:75 plugins/autofire/autofire_menu.lua:204
 msgid "Add autofire button"
 msgstr "新增連射按鈕"
 
@@ -3744,33 +6917,23 @@ msgstr "放開畫格"
 msgid "Press button for hotkey or wait to leave unchanged"
 msgstr "按下熱鍵按鍵或稍後保持不變"
 
-#: plugins/autofire/autofire_menu.lua:123 plugins/cheat/init.lua:626
-#: src/frontend/mame/ui/inputmap.cpp:379
-msgid "Invalid sequence entered"
-msgstr "輸入了無效序列"
-
-#: plugins/autofire/autofire_menu.lua:161
+#: plugins/autofire/autofire_menu.lua:155
 msgid "Number of frames button will be pressed"
 msgstr "經過畫格數後按鈕將按下"
 
-#: plugins/autofire/autofire_menu.lua:169
+#: plugins/autofire/autofire_menu.lua:165
 msgid "Number of frames button will be released"
 msgstr "經過畫格數後按鈕將放開"
 
-#: plugins/autofire/autofire_menu.lua:181
+#: plugins/autofire/autofire_menu.lua:179
 msgid "Edit autofire button"
 msgstr "編輯連射按鈕"
 
-#: plugins/autofire/autofire_menu.lua:189 plugins/cheat/init.lua:650
+#: plugins/autofire/autofire_menu.lua:187 plugins/cheat/init.lua:650
 msgid "Done"
 msgstr "完成"
 
-#: plugins/autofire/autofire_menu.lua:217
-#: src/frontend/mame/ui/filecreate.cpp:183
-msgid "Create"
-msgstr "建立"
-
-#: plugins/autofire/autofire_menu.lua:245
+#: plugins/autofire/autofire_menu.lua:239
 msgid "Select an input for autofire"
 msgstr "選擇供連射用的按鍵"
 
@@ -3811,48 +6974,27 @@ msgstr "設定"
 msgid "Set hotkeys"
 msgstr "設定熱鍵"
 
-#: plugins/cheat/init.lua:698 src/frontend/mame/ui/cheatopt.cpp:140
-msgid "Reset All"
-msgstr "全部重設"
-
-#: plugins/cheat/init.lua:699 src/frontend/mame/ui/cheatopt.cpp:143
-msgid "Reload All"
-msgstr "全部重新載入"
-
-#: plugins/cheat/init.lua:746 src/frontend/mame/ui/cheatopt.cpp:87
-#, c-format, lua-format
-msgid ""
-"Cheat Comment:\n"
-"%s"
-msgstr ""
-"作弊碼註解：\n"
-"%s"
-
-#: plugins/cheat/init.lua:780
+#: plugins/cheat/init.lua:785
 #, lua-format
 msgid "Activated: %s = %s"
 msgstr "已啟動: %s = %s"
 
-#: plugins/cheat/init.lua:782 plugins/cheat/init.lua:840
+#: plugins/cheat/init.lua:787 plugins/cheat/init.lua:845
 #, lua-format
 msgid "Activated: %s"
 msgstr "已啟動: %s"
 
-#: plugins/cheat/init.lua:794 src/frontend/mame/ui/mainmenu.cpp:157
-msgid "Cheat"
-msgstr "作弊引擎"
-
-#: plugins/cheat/init.lua:844
+#: plugins/cheat/init.lua:849
 #, lua-format
 msgid "Enabled: %s"
 msgstr "啟用: %s"
 
-#: plugins/cheat/init.lua:849
+#: plugins/cheat/init.lua:854
 #, lua-format
 msgid "Disabled: %s"
 msgstr "已停用: %s"
 
-#: plugins/cheat/init.lua:908
+#: plugins/cheat/init.lua:913
 #, lua-format
 msgid "%s added"
 msgstr "%s 已加入"
@@ -3905,3110 +7047,17 @@ msgstr "MESSinfo"
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
 
-#: src/frontend/mame/ui/ui.cpp:473 src/frontend/mame/ui/ui.cpp:546
-msgid ""
-"\n"
-"\n"
-"Press any key to continue"
-msgstr ""
-"\n"
-"\n"
-"按任意鍵繼續"
-
-#: src/frontend/mame/ui/ui.cpp:558
-msgid "This driver requires images to be loaded in the following device(s): "
-msgstr "此驅動需要額外載入下列裝置的映像檔: "
-
-#: src/frontend/mame/ui/ui.cpp:1264
-#, c-format
-msgid ""
-"UI controls enabled\n"
-"Use %1$s to toggle"
-msgstr ""
-"啟用 UI 控制\n"
-"以 %1$s 切換"
-
-#: src/frontend/mame/ui/ui.cpp:1266
-#, c-format
-msgid ""
-"UI controls disabled\n"
-"Use %1$s to toggle"
-msgstr ""
-"停用 UI 控制\n"
-"以 %1$s 切換"
-
-#: src/frontend/mame/ui/ui.cpp:1459
-#, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press ''%1$s'' to quit,\n"
-"Press ''%2$s'' to return to emulation."
-msgstr ""
-"確定要退出嗎？\n"
-"\n"
-"按『%1$s』退出，\n"
-"按『%2$s』繼續模擬。"
-
-#: src/frontend/mame/ui/ui.cpp:1509
-msgid "Master Volume"
-msgstr "主音量"
-
-#: src/frontend/mame/ui/ui.cpp:1518
-#, c-format
-msgid "%1$s Volume"
-msgstr "%1$s 音量"
-
-#: src/frontend/mame/ui/ui.cpp:1540
-#, c-format
-msgid "Overclock CPU %1$s"
-msgstr "超頻 CPU %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1548
-#, c-format
-msgid "Overclock %1$s sound"
-msgstr "超頻 %1$s 聲音"
-
-#: src/frontend/mame/ui/ui.cpp:1567
-#, c-format
-msgid "%1$s Refresh Rate"
-msgstr "%1$s 更新率"
-
-#: src/frontend/mame/ui/ui.cpp:1572
-#, c-format
-msgid "%1$s Brightness"
-msgstr "%1$s 亮度"
-
-#: src/frontend/mame/ui/ui.cpp:1574
-#, c-format
-msgid "%1$s Contrast"
-msgstr "%1$s 對比"
-
-#: src/frontend/mame/ui/ui.cpp:1576
-#, c-format
-msgid "%1$s Gamma"
-msgstr "%1$s Gamma 值"
-
-#: src/frontend/mame/ui/ui.cpp:1580
-#, c-format
-msgid "%1$s Horiz Stretch"
-msgstr "%1$s 水平延展"
-
-#: src/frontend/mame/ui/ui.cpp:1582
-#, c-format
-msgid "%1$s Horiz Position"
-msgstr "%1$s 水平位置"
-
-#: src/frontend/mame/ui/ui.cpp:1584
-#, c-format
-msgid "%1$s Vert Stretch"
-msgstr "%1$s 垂直延展"
-
-#: src/frontend/mame/ui/ui.cpp:1586
-#, c-format
-msgid "%1$s Vert Position"
-msgstr "%1$s 垂直位置"
-
-#: src/frontend/mame/ui/ui.cpp:1602
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "雷射影碟 %1$s 水平延展"
-
-#: src/frontend/mame/ui/ui.cpp:1605
-#, c-format
-msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "雷射影碟 %1$s 水平位置"
-
-#: src/frontend/mame/ui/ui.cpp:1607
-#, c-format
-msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "雷射影碟 %1$s 垂直延展"
-
-#: src/frontend/mame/ui/ui.cpp:1610
-#, c-format
-msgid "Laserdisc '%1$s' Vert Position"
-msgstr "雷射影碟 %1$s 垂直位置"
-
-#: src/frontend/mame/ui/ui.cpp:1620
-msgid "Vector Flicker"
-msgstr "向量閃爍度"
-
-#: src/frontend/mame/ui/ui.cpp:1621
-msgid "Beam Width Minimum"
-msgstr "最小光束寬度"
-
-#: src/frontend/mame/ui/ui.cpp:1622
-msgid "Beam Width Maximum"
-msgstr "最大光束寬度"
-
-#: src/frontend/mame/ui/ui.cpp:1623
-msgid "Beam Dot Size"
-msgstr "光束點大小"
-
-#: src/frontend/mame/ui/ui.cpp:1624
-msgid "Beam Intensity Weight"
-msgstr "光束強度"
-
-#: src/frontend/mame/ui/ui.cpp:1637
-#, c-format
-msgid "Crosshair Scale %1$s"
-msgstr "十字準星尺度 %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1637 src/frontend/mame/ui/ui.cpp:1639
-msgid "X"
-msgstr "X"
-
-#: src/frontend/mame/ui/ui.cpp:1637 src/frontend/mame/ui/ui.cpp:1639
-msgid "Y"
-msgstr "Y"
-
-#: src/frontend/mame/ui/ui.cpp:1639
-#, c-format
-msgid "Crosshair Offset %1$s"
-msgstr "十字準星偏移 %1$s"
-
-#: src/frontend/mame/ui/ui.cpp:1671
-#, c-format
-msgid "%1$3ddB"
-msgstr "%1$3ddB"
-
-#: src/frontend/mame/ui/ui.cpp:1714
-#, c-format
-msgid "%1$d%%"
-msgstr "%1$d%%"
-
-#: src/frontend/mame/ui/ui.cpp:1729
-#, c-format
-msgid "%1$3.0f%%"
-msgstr "%1$3.0f%%"
-
-#: src/frontend/mame/ui/ui.cpp:1752 src/frontend/mame/ui/ui.cpp:1772
-#: src/frontend/mame/ui/ui.cpp:1791 src/frontend/mame/ui/ui.cpp:1809
-#: src/frontend/mame/ui/ui.cpp:1828 src/frontend/mame/ui/ui.cpp:1847
-#: src/frontend/mame/ui/ui.cpp:1866 src/frontend/mame/ui/ui.cpp:1885
-#: src/frontend/mame/ui/ui.cpp:1906 src/frontend/mame/ui/ui.cpp:1927
-#: src/frontend/mame/ui/ui.cpp:1948 src/frontend/mame/ui/ui.cpp:1969
-#, c-format
-msgid "%1$.3f"
-msgstr "%1$.3f"
-
-#: src/frontend/mame/ui/ui.cpp:1984 src/frontend/mame/ui/ui.cpp:1999
-#: src/frontend/mame/ui/ui.cpp:2014 src/frontend/mame/ui/ui.cpp:2029
-#: src/frontend/mame/ui/ui.cpp:2044
-#, c-format
-msgid "%1$1.2f"
-msgstr "%1$1.2f"
-
-#: src/frontend/mame/ui/ui.cpp:2060
-#, c-format
-msgid "Crosshair Scale X %1$1.3f"
-msgstr "十字準星尺度 X %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2060
-#, c-format
-msgid "Crosshair Scale Y %1$1.3f"
-msgstr "十字準星尺度 Y %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2077
-#, c-format
-msgid "Crosshair Offset X %1$1.3f"
-msgstr "十字準星偏移 X %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2077
-#, c-format
-msgid "Crosshair Offset Y %1$1.3f"
-msgstr "十字準星偏移 Y %1$1.3f"
-
-#: src/frontend/mame/ui/ui.cpp:2184
-msgid "**Error saving ui.ini**"
-msgstr "**儲存 ui.ini 時發生錯誤**"
-
-#: src/frontend/mame/ui/ui.cpp:2243
-#, c-format
-msgid "**Error saving %s.ini**"
-msgstr "**儲存 %s.ini 時發生錯誤**"
-
-#: src/frontend/mame/ui/ui.cpp:2247 src/frontend/mame/ui/miscmenu.cpp:785
-msgid ""
-"\n"
-"    Configuration saved    \n"
-"\n"
-msgstr ""
-"\n"
-"        設定已儲存        \n"
-"\n"
-
-#: src/frontend/mame/ui/selsoft.cpp:501 src/frontend/mame/ui/selgame.cpp:727
-#, c-format
-msgid ""
-"%s\n"
-" added to favorites list."
-msgstr ""
-"%s\n"
-" 已新增至最愛清單。"
-
-#: src/frontend/mame/ui/selsoft.cpp:506 src/frontend/mame/ui/selgame.cpp:732
-#: src/frontend/mame/ui/selgame.cpp:738
-#, c-format
-msgid ""
-"%s\n"
-" removed from favorites list."
-msgstr ""
-"%s\n"
-" 已從最愛清單移除。"
-
-#: src/frontend/mame/ui/selsoft.cpp:540
-msgid "[Start empty]"
-msgstr "[ 無卡啟動 ]"
-
-#: src/frontend/mame/ui/selsoft.cpp:540
-msgid "[Use file manager]"
-msgstr "[ 使用檔案管理員 ]"
-
-#: src/frontend/mame/ui/selsoft.cpp:723
-#, c-format
-msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr "%1$s %2$s ( %3$d / %4$d 軟體套件 )"
-
-#: src/frontend/mame/ui/selsoft.cpp:724
-#, c-format
-msgid "Driver: \"%1$s\" software list "
-msgstr "驅動程式： \"%1$s\" 軟體清單 "
-
-#: src/frontend/mame/ui/selsoft.cpp:729 src/frontend/mame/ui/selgame.cpp:1486
-#, c-format
-msgid "%1$s: %2$s - Search: %3$s_"
-msgstr "%1$s： %2$s - 搜尋： %3$s_"
-
-#: src/frontend/mame/ui/selsoft.cpp:731 src/frontend/mame/ui/selgame.cpp:1488
-#, c-format
-msgid "Search: %1$s_"
-msgstr "搜尋： %1$s_"
-
-#: src/frontend/mame/ui/selsoft.cpp:738
-#: src/frontend/mame/ui/simpleselgame.cpp:325
-#, c-format
-msgid "%1$-.100s"
-msgstr "%1$-.100s"
-
-#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:163
-msgid "Sound Options"
-msgstr "聲音選項"
-
-#: src/frontend/mame/ui/optsmenu.cpp:76
-msgid "General Inputs"
-msgstr "一般輸入"
-
-#: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:984
-msgid "Plugins"
-msgstr "外掛"
-
-#: src/frontend/mame/ui/optsmenu.cpp:81
-msgid "Save Configuration"
-msgstr "儲存設定"
-
-#: src/frontend/mame/ui/optsmenu.cpp:148
-msgid "Settings"
-msgstr "設定"
-
-#: src/frontend/mame/ui/optsmenu.cpp:206
-msgid "Filter"
-msgstr "篩選"
-
-#: src/frontend/mame/ui/optsmenu.cpp:218
-msgid "Customize UI"
-msgstr "自訂 UI"
-
-#: src/frontend/mame/ui/optsmenu.cpp:219
-msgid "Configure Directories"
-msgstr "設定目錄"
-
-#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:89
-#: src/frontend/mame/ui/slotopt.cpp:220
-msgid "[empty slot]"
-msgstr "[空插槽]"
-
-#: src/frontend/mame/ui/filesel.cpp:263
-msgid "[create]"
-msgstr "[建立]"
-
-#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:100
-msgid "[software list]"
-msgstr "[軟體清單]"
-
-#: src/frontend/mame/ui/filesel.cpp:323
-#, c-format
-msgid "Error accessing %s"
-msgstr "錯誤存取 %s"
-
-#: src/frontend/mame/ui/filesel.cpp:542
-msgid "Select access mode"
-msgstr "選擇存取模式"
-
-#: src/frontend/mame/ui/filesel.cpp:543
-msgid "Read-only"
-msgstr "唯讀"
-
-#: src/frontend/mame/ui/filesel.cpp:545
-msgid "Read-write"
-msgstr "讀寫"
-
-#: src/frontend/mame/ui/filesel.cpp:546
-msgid "Read this image, write to another image"
-msgstr "讀取此映像檔，寫入至其他映像檔"
-
-#: src/frontend/mame/ui/filesel.cpp:547
-msgid "Read this image, write to diff"
-msgstr "讀取此映像檔，寫入差異檔"
-
-#: src/frontend/mame/ui/submenu.cpp:31
-msgid "Miscellaneous Options"
-msgstr "其他選項"
-
-#: src/frontend/mame/ui/submenu.cpp:32
-msgid "Skip imperfect emulation warnings"
-msgstr "略過未完整模擬的警示訊息"
-
-#: src/frontend/mame/ui/submenu.cpp:33
-msgid "Re-select last machine launched"
-msgstr "重新選擇上次執行的機台"
-
-#: src/frontend/mame/ui/submenu.cpp:34
-msgid "Enlarge images in the right panel"
-msgstr "放大右側面版的圖片"
-
-#: src/frontend/mame/ui/submenu.cpp:35
-msgid "Cheats"
-msgstr "作弊引擎"
-
-#: src/frontend/mame/ui/submenu.cpp:36
-msgid "Show mouse pointer"
-msgstr "顯示滑鼠指標"
-
-#: src/frontend/mame/ui/submenu.cpp:37
-msgid "Confirm quit from machines"
-msgstr "確認離開機台"
-
-#: src/frontend/mame/ui/submenu.cpp:38
-msgid "Skip information screen at startup"
-msgstr "略過起始的資訊畫面"
-
-#: src/frontend/mame/ui/submenu.cpp:39
-msgid "Force 4:3 aspect for snapshot display"
-msgstr "強制擷圖顯示比例為 4:3"
-
-#: src/frontend/mame/ui/submenu.cpp:40
-msgid "Use image as background"
-msgstr "使用圖片作為背景"
-
-#: src/frontend/mame/ui/submenu.cpp:41
-msgid "Skip BIOS selection menu"
-msgstr "略過 BIOS 選擇選單"
-
-#: src/frontend/mame/ui/submenu.cpp:42
-msgid "Skip software parts selection menu"
-msgstr "略過軟體部分選擇選單"
-
-#: src/frontend/mame/ui/submenu.cpp:43
-msgid "Info auto audit"
-msgstr "資訊自動驗證"
-
-#: src/frontend/mame/ui/submenu.cpp:44
-msgid "Hide romless machine from available list"
-msgstr "在可用清單中隱藏無 ROM 機台"
-
-#: src/frontend/mame/ui/submenu.cpp:50
-msgid "Advanced Options"
-msgstr "進階選項"
-
-#: src/frontend/mame/ui/submenu.cpp:51
-msgid "Performance Options"
-msgstr "效能選項"
-
-#: src/frontend/mame/ui/submenu.cpp:52
-msgid "Auto frame skip"
-msgstr "自動省略畫格"
-
-#: src/frontend/mame/ui/submenu.cpp:53
-msgid "Frame skip"
-msgstr "省略畫格"
-
-#: src/frontend/mame/ui/submenu.cpp:54
-msgid "Throttle"
-msgstr "限制速度"
-
-#: src/frontend/mame/ui/submenu.cpp:55
-msgid "Mute when unthrottled"
-msgstr "當未限制速度時靜音"
-
-#: src/frontend/mame/ui/submenu.cpp:56
-msgid "Sleep"
-msgstr "休眠"
-
-#: src/frontend/mame/ui/submenu.cpp:57
-msgid "Speed"
-msgstr "速度"
-
-#: src/frontend/mame/ui/submenu.cpp:58
-msgid "Adjust speed to match refresh rate"
-msgstr "調整速度以符合更新率"
-
-#: src/frontend/mame/ui/submenu.cpp:59
-msgid "Low latency"
-msgstr "低延遲"
-
-#: src/frontend/mame/ui/submenu.cpp:61
-msgid "Rotation Options"
-msgstr "選轉選項"
-
-#: src/frontend/mame/ui/submenu.cpp:62 src/frontend/mame/ui/videoopt.cpp:180
-msgid "Rotate"
-msgstr "旋轉"
-
-#: src/frontend/mame/ui/submenu.cpp:63
-msgid "Rotate right"
-msgstr "右旋轉"
-
-#: src/frontend/mame/ui/submenu.cpp:64
-msgid "Rotate left"
-msgstr "左旋轉"
-
-#: src/frontend/mame/ui/submenu.cpp:65
-msgid "Auto rotate right"
-msgstr "自動右旋轉"
-
-#: src/frontend/mame/ui/submenu.cpp:66
-msgid "Auto rotate left"
-msgstr "自動左旋轉"
-
-#: src/frontend/mame/ui/submenu.cpp:67
-msgid "Flip X"
-msgstr "翻轉 X"
-
-#: src/frontend/mame/ui/submenu.cpp:68
-msgid "Flip Y"
-msgstr "翻轉 Y"
-
-#: src/frontend/mame/ui/submenu.cpp:70
-msgid "Artwork Options"
-msgstr "裝飾圖選項"
-
-#: src/frontend/mame/ui/submenu.cpp:71
-msgid "Zoom to screen area"
-msgstr "縮放至畫面區域"
-
-#: src/frontend/mame/ui/submenu.cpp:73
-msgid "State/Playback Options"
-msgstr "狀態/播放選項"
-
-#: src/frontend/mame/ui/submenu.cpp:74
-msgid "Automatic save/restore"
-msgstr "自動儲存/還原"
-
-#: src/frontend/mame/ui/submenu.cpp:75
-msgid "Allow rewind"
-msgstr "允許倒帶"
-
-#: src/frontend/mame/ui/submenu.cpp:76
-msgid "Rewind capacity"
-msgstr "倒帶容量"
-
-#: src/frontend/mame/ui/submenu.cpp:77
-msgid "Bilinear filtering for snapshots"
-msgstr "供截圖使用的雙線過濾"
-
-#: src/frontend/mame/ui/submenu.cpp:78
-msgid "Burn-in"
-msgstr "烙印擷圖"
-
-#: src/frontend/mame/ui/submenu.cpp:80
-msgid "Input Options"
-msgstr "輸入選項"
-
-#: src/frontend/mame/ui/submenu.cpp:81
-msgid "Coin lockout"
-msgstr "投幣鎖定"
-
-#: src/frontend/mame/ui/submenu.cpp:82
-msgid "Mouse"
-msgstr "滑鼠"
-
-#: src/frontend/mame/ui/submenu.cpp:83
-msgid "Joystick"
-msgstr "搖桿"
-
-#: src/frontend/mame/ui/submenu.cpp:84
-msgid "Lightgun"
-msgstr "光線槍"
-
-#: src/frontend/mame/ui/submenu.cpp:85
-msgid "Multi-keyboard"
-msgstr "多重鍵盤"
-
-#: src/frontend/mame/ui/submenu.cpp:86
-msgid "Multi-mouse"
-msgstr "多重滑鼠"
-
-#: src/frontend/mame/ui/submenu.cpp:87
-msgid "Steadykey"
-msgstr "穩定鍵"
-
-#: src/frontend/mame/ui/submenu.cpp:88
-msgid "UI active"
-msgstr "UI 啟動"
-
-#: src/frontend/mame/ui/submenu.cpp:89
-msgid "Offscreen reload"
-msgstr "畫面外重新裝填"
-
-#: src/frontend/mame/ui/submenu.cpp:90
-msgid "Joystick deadzone"
-msgstr "搖桿無反應區"
-
-#: src/frontend/mame/ui/submenu.cpp:91
-msgid "Joystick saturation"
-msgstr "搖桿飽和值"
-
-#: src/frontend/mame/ui/submenu.cpp:92
-msgid "Natural keyboard"
-msgstr "自然鍵盤"
-
-#: src/frontend/mame/ui/submenu.cpp:93
-msgid "Simultaneous contradictory"
-msgstr "同時發生的對立狀況"
-
-#: src/frontend/mame/ui/submenu.cpp:94
-msgid "Coin impulse"
-msgstr "投幣脈衝"
-
-#: src/frontend/mame/ui/submenu.cpp:100
-msgid "Device Mapping"
-msgstr "裝置映對"
-
-#: src/frontend/mame/ui/submenu.cpp:101
-msgid "Lightgun Device Assignment"
-msgstr "分配光線槍裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:102
-msgid "Trackball Device Assignment"
-msgstr "分配軌跡球裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:103
-msgid "Pedal Device Assignment"
-msgstr "分配踏板裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:104
-msgid "Adstick Device Assignment"
-msgstr "分配 Adstick 裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:105
-msgid "Paddle Device Assignment"
-msgstr "分配划槳裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:106
-msgid "Dial Device Assignment"
-msgstr "分配轉盤裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:107
-msgid "Positional Device Assignment"
-msgstr "分配指向裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:108
-msgid "Mouse Device Assignment"
-msgstr "分配滑鼠裝置"
-
-#: src/frontend/mame/ui/submenu.cpp:114 src/frontend/mame/ui/mainmenu.cpp:151
-msgid "Video Options"
-msgstr "視訊選項"
-
-#: src/frontend/mame/ui/submenu.cpp:115
-msgid "Video Mode"
-msgstr "視訊模式"
-
-#: src/frontend/mame/ui/submenu.cpp:116
-msgid "Number Of Screens"
-msgstr "畫面數"
-
-#: src/frontend/mame/ui/submenu.cpp:118
-msgid "Triple Buffering"
-msgstr "三重緩衝"
-
-#: src/frontend/mame/ui/submenu.cpp:119
-msgid "HLSL"
-msgstr "HLSL"
-
-#: src/frontend/mame/ui/submenu.cpp:121
-msgid "GLSL"
-msgstr "GLSL"
-
-#: src/frontend/mame/ui/submenu.cpp:122
-msgid "Bilinear Filtering"
-msgstr "雙線過濾"
-
-#: src/frontend/mame/ui/submenu.cpp:123
-msgid "Bitmap Prescaling"
-msgstr "點陣圖預縮放"
-
-#: src/frontend/mame/ui/submenu.cpp:124
-msgid "Window Mode"
-msgstr "視窗模式"
-
-#: src/frontend/mame/ui/submenu.cpp:125
-msgid "Enforce Aspect Ratio"
-msgstr "強制比例"
-
-#: src/frontend/mame/ui/submenu.cpp:126
-msgid "Start Out Maximized"
-msgstr "最大化開始"
-
-#: src/frontend/mame/ui/submenu.cpp:127
-msgid "Synchronized Refresh"
-msgstr "同步更新"
-
-#: src/frontend/mame/ui/submenu.cpp:128
-msgid "Wait Vertical Sync"
-msgstr "等待垂直同步"
-
-#: src/frontend/mame/ui/menu.cpp:666
-msgid "Auto"
-msgstr "自動"
-
-#: src/frontend/mame/ui/menu.cpp:1164
-#: src/frontend/mame/ui/simpleselgame.cpp:289
-msgid "Return to Previous Menu"
-msgstr "回上一層選單"
-
-#: src/frontend/mame/ui/videoopt.cpp:57
-#, c-format
-msgid "Screen #%d"
-msgstr "畫面 #%d"
-
-#: src/frontend/mame/ui/videoopt.cpp:184
-msgid "Zoom to Screen Area"
-msgstr "縮放至畫面區域"
-
-#: src/frontend/mame/ui/videoopt.cpp:196
-msgid "X Only"
-msgstr "僅 X 軸"
-
-#: src/frontend/mame/ui/videoopt.cpp:200
-msgid "Y Only"
-msgstr "僅 Y 軸"
-
-#: src/frontend/mame/ui/videoopt.cpp:204
-msgid "X or Y (Auto)"
-msgstr "X 軸或 Y 週（自動）"
-
-#: src/frontend/mame/ui/videoopt.cpp:211
-msgid "Non-Integer Scaling"
-msgstr "非整數縮放"
-
-#: src/frontend/mame/ui/videoopt.cpp:214
-msgid "Maintain Aspect Ratio"
-msgstr "維持長寬比例"
-
-#: src/frontend/mame/ui/videoopt.cpp:228
-msgid "Cannot change options while recording!"
-msgstr "正在錄製時無法變更選項！"
-
-#: src/frontend/mame/ui/info.cpp:31
-msgctxt "emulation-feature"
-msgid "protection"
-msgstr "保護"
-
-#: src/frontend/mame/ui/info.cpp:32
-msgctxt "emulation-feature"
-msgid "timing"
-msgstr "計時"
-
-#: src/frontend/mame/ui/info.cpp:33
-msgctxt "emulation-feature"
-msgid "graphics"
-msgstr "圖形"
-
-#: src/frontend/mame/ui/info.cpp:34
-msgctxt "emulation-feature"
-msgid "color palette"
-msgstr "色盤"
-
-#: src/frontend/mame/ui/info.cpp:35
-msgctxt "emulation-feature"
-msgid "sound"
-msgstr "聲音"
-
-#: src/frontend/mame/ui/info.cpp:36
-msgctxt "emulation-feature"
-msgid "capture hardware"
-msgstr "擷取硬體"
-
-#: src/frontend/mame/ui/info.cpp:37
-msgctxt "emulation-feature"
-msgid "camera"
-msgstr "相機"
-
-#: src/frontend/mame/ui/info.cpp:38
-msgctxt "emulation-feature"
-msgid "microphone"
-msgstr "麥克風"
-
-#: src/frontend/mame/ui/info.cpp:39
-msgctxt "emulation-feature"
-msgid "controls"
-msgstr "控制"
-
-#: src/frontend/mame/ui/info.cpp:40
-msgctxt "emulation-feature"
-msgid "keyboard"
-msgstr "鍵盤"
-
-#: src/frontend/mame/ui/info.cpp:41
-msgctxt "emulation-feature"
-msgid "mouse"
-msgstr "滑鼠"
-
-#: src/frontend/mame/ui/info.cpp:42
-msgctxt "emulation-feature"
-msgid "media"
-msgstr "媒體"
-
-#: src/frontend/mame/ui/info.cpp:43
-msgctxt "emulation-feature"
-msgid "disk"
-msgstr "磁碟"
-
-#: src/frontend/mame/ui/info.cpp:44
-msgctxt "emulation-feature"
-msgid "printer"
-msgstr "印表機"
-
-#: src/frontend/mame/ui/info.cpp:45
-msgctxt "emulation-feature"
-msgid "magnetic tape"
-msgstr "磁帶"
-
-#: src/frontend/mame/ui/info.cpp:46
-msgctxt "emulation-feature"
-msgid "punch tape"
-msgstr "打孔帶"
-
-#: src/frontend/mame/ui/info.cpp:47
-msgctxt "emulation-feature"
-msgid "magnetic drum"
-msgstr "磁鼓"
-
-#: src/frontend/mame/ui/info.cpp:48
-msgctxt "emulation-feature"
-msgid "solid state storage"
-msgstr "固態儲存"
-
-#: src/frontend/mame/ui/info.cpp:49
-msgctxt "emulation-feature"
-msgid "communications"
-msgstr "通訊"
-
-#: src/frontend/mame/ui/info.cpp:50
-msgctxt "emulation-feature"
-msgid "LAN"
-msgstr "區域網路"
-
-#: src/frontend/mame/ui/info.cpp:51
-msgctxt "emulation-feature"
-msgid "WAN"
-msgstr "外部網路"
-
-#: src/frontend/mame/ui/info.cpp:230
-msgid ""
-"One or more ROMs/CHDs for this machine are incorrect. The machine may not "
-"run correctly.\n"
-msgstr "本機台有一個或更多的 ROM/CHD 是不正確的。此機台可能無法正確執行。\n"
-
-#: src/frontend/mame/ui/info.cpp:240
-msgid ""
-"There are known problems with this machine\n"
-"\n"
-msgstr ""
-"本機台已知具有下列的問題\n"
-"\n"
-
-#: src/frontend/mame/ui/info.cpp:245
-msgid ""
-"One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr "本機台有一個或更多的 ROM/CHD 尚未正確地被 DUMP。\n"
-
-#: src/frontend/mame/ui/info.cpp:250
-msgid "Completely unemulated features: "
-msgstr "未完整模擬功能: "
-
-#: src/frontend/mame/ui/info.cpp:256 src/frontend/mame/ui/info.cpp:272
-#, c-format
-msgid "%s"
-msgstr "%s"
-
-#: src/frontend/mame/ui/info.cpp:256 src/frontend/mame/ui/info.cpp:272
-#: src/frontend/mame/ui/info.cpp:317
-#, c-format
-msgid ", %s"
-msgstr ", %s"
-
-#: src/frontend/mame/ui/info.cpp:266
-msgid "Imperfectly emulated features: "
-msgstr "未完美模擬功能: "
-
-#: src/frontend/mame/ui/info.cpp:281
-msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "尚未支援檯面型筐體模式的畫面翻轉。"
-
-#: src/frontend/mame/ui/info.cpp:283
-msgid "This machine requires external artwork files.\n"
-msgstr "此機台需要額外的裝飾圖檔"
-
-#: src/frontend/mame/ui/info.cpp:285
-msgid ""
-"This machine was never completed. It may exhibit strange behavior or missing "
-"elements that are not bugs in the emulation.\n"
-msgstr "本機台無法完成，並非模擬時的錯誤而可能呈現怪異的行為或缺少元件。\n"
-
-#: src/frontend/mame/ui/info.cpp:287
-msgid ""
-"This machine has no sound hardware, MAME will produce no sounds, this is "
-"expected behaviour.\n"
-msgstr "本機台無聲音硬體，故 MAME 將不會產生聲音，這是可預期的行為。\n"
-
-#: src/frontend/mame/ui/info.cpp:291
-msgid ""
-"\n"
-"THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
-"complete. There is nothing you can do to fix this problem except wait for "
-"the developers to improve the emulation.\n"
-msgstr ""
-"\n"
-"此機台無法執行，機台的模擬還不完全。除了等待開發人員改良模擬之外，沒有方法可"
-"以解決這個問題。\n"
-
-#: src/frontend/mame/ui/info.cpp:293
-msgid ""
-"\n"
-"Elements of this machine cannot be emulated as they require physical "
-"interaction or consist of mechanical devices. It is not possible to fully "
-"experience this machine.\n"
-msgstr ""
-"\n"
-"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。 "
-"故無法達成此機台的完整體驗。\n"
-
-#: src/frontend/mame/ui/info.cpp:315
-#, c-format
-msgid ""
-"\n"
-"\n"
-"There are working clones of this machine: %s"
-msgstr ""
-"\n"
-"\n"
-"本機台尚有可執行的仿製版： %s"
-
-#: src/frontend/mame/ui/info.cpp:339
-#, c-format
-msgid ""
-"%1$s\n"
-"%2$s %3$s\n"
-"Driver: %4$s\n"
-"\n"
-"CPU:\n"
-msgstr ""
-"%1$s\n"
-"%2$s %3$s\n"
-"驅動程式： %4$s\n"
-"\n"
-"CPU：\n"
-
-#: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
-msgid "GHz"
-msgstr "GHz"
-
-#: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
-msgid "MHz"
-msgstr "MHz"
-
-#: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
-msgid "kHz"
-msgstr "kHz"
-
-#: src/frontend/mame/ui/info.cpp:381 src/frontend/mame/ui/info.cpp:424
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
-msgid "Hz"
-msgstr "Hz"
-
-#: src/frontend/mame/ui/info.cpp:395
-msgid ""
-"\n"
-"Sound:\n"
-msgstr ""
-"\n"
-"聲音：\n"
-
-#: src/frontend/mame/ui/info.cpp:428
-msgid ""
-"\n"
-"Video:\n"
-msgstr ""
-"\n"
-"視訊：\n"
-
-#: src/frontend/mame/ui/info.cpp:432
-msgid "None\n"
-msgstr "無\n"
-
-#: src/frontend/mame/ui/info.cpp:439
-msgid "Vector"
-msgstr "向量"
-
-#: src/frontend/mame/ui/info.cpp:455
-#, c-format
-msgid "%1$s: %2$s\n"
-msgstr "%1$s: %2$s\n"
-
-#: src/frontend/mame/ui/info.cpp:455
-msgid "%2$s\n"
-msgstr "%2$s\n"
-
-#: src/frontend/mame/ui/info.cpp:472
-#, c-format
-msgid "Screen '%1$s'"
-msgstr "畫面 '%1$s'"
-
-#: src/frontend/mame/ui/info.cpp:474
-msgid "Screen"
-msgstr "畫面"
-
-#: src/frontend/mame/ui/info.cpp:580
-msgid "Not supported"
-msgstr "不支援"
-
-#: src/frontend/mame/ui/info.cpp:583
-msgid "Partially supported"
-msgstr "部分支援"
-
-#: src/frontend/mame/ui/info.cpp:592
-msgid "[empty]"
-msgstr "[ 空 ]"
-
-#: src/frontend/mame/ui/swlist.cpp:94
-msgid "[file manager]"
-msgstr "[ 檔案管理員 ]"
-
-#: src/frontend/mame/ui/swlist.cpp:228
-msgid "Switch Item Ordering"
-msgstr "切換項目順序"
-
-#: src/frontend/mame/ui/swlist.cpp:258
-#, c-format
-msgid "Switched Order: entries now ordered by %s"
-msgstr "切換順序：目前項目依照 %s 排序"
-
-#: src/frontend/mame/ui/swlist.cpp:258
-msgid "shortname"
-msgstr "短檔名"
-
-#: src/frontend/mame/ui/swlist.cpp:258
-msgid "description"
-msgstr "描述"
-
-#: src/frontend/mame/ui/swlist.cpp:391
-msgid "[compatible lists]"
-msgstr "[ 完整清單 ]"
-
-#: src/frontend/mame/ui/filecreate.cpp:79
-msgid "File Already Exists - Override?"
-msgstr "檔案已存在 — 是否覆蓋？"
-
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
-msgid "No"
-msgstr "否"
-
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
-msgid "Yes"
-msgstr "是"
-
-#: src/frontend/mame/ui/filecreate.cpp:171
-msgid "New Image Name:"
-msgstr "新映像檔名稱："
-
-#: src/frontend/mame/ui/filecreate.cpp:177
-msgid "Image Format:"
-msgstr "映像檔格式"
-
-#: src/frontend/mame/ui/filecreate.cpp:214
-msgid "Please enter a file extension too"
-msgstr "請一併輸入副檔名"
-
-#: src/frontend/mame/ui/filecreate.cpp:265
-msgid "Select image format"
-msgstr "選擇映像檔格式"
-
-#: src/frontend/mame/ui/filecreate.cpp:325
-msgid "Select initial contents"
-msgstr "選擇初始化內容"
-
-#: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:147
-msgid "Keyboard Mode"
-msgstr "鍵盤模式"
-
-#: src/frontend/mame/ui/keyboard.cpp:40
-msgid "Natural"
-msgstr "自然"
-
-#: src/frontend/mame/ui/keyboard.cpp:40
-msgid "Emulated"
-msgstr "模擬"
-
-#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:484
-#, c-format
-msgid "%1$s [root%2$s]"
-msgstr "%1$s [root%2$s]"
-
-#: src/frontend/mame/ui/keyboard.cpp:53
-msgid "[root%2$s]"
-msgstr "[root%2$s]"
-
-#: src/frontend/mame/ui/keyboard.cpp:56
-msgid "Enabled"
-msgstr "已啟用"
-
-#: src/frontend/mame/ui/keyboard.cpp:56
-msgid "Disabled"
-msgstr "已停用"
-
-#: src/frontend/mame/ui/utils.cpp:63
-msgctxt "swlist-info"
-msgid "Alternate Title"
-msgstr "別題名"
-
-#: src/frontend/mame/ui/utils.cpp:64
-msgctxt "swlist-info"
-msgid "Author"
-msgstr "作者"
-
-#: src/frontend/mame/ui/utils.cpp:65
-msgctxt "swlist-info"
-msgid "Barcode Number"
-msgstr "條碼編號"
-
-#: src/frontend/mame/ui/utils.cpp:66
-msgctxt "swlist-info"
-msgid "Developer"
-msgstr "開發商"
-
-#: src/frontend/mame/ui/utils.cpp:67
-msgctxt "swlist-info"
-msgid "Distributor"
-msgstr "經銷商"
-
-#: src/frontend/mame/ui/utils.cpp:68
-msgctxt "swlist-info"
-msgid "Installation Instructions"
-msgstr "安裝說明"
-
-#: src/frontend/mame/ui/utils.cpp:69
-msgctxt "swlist-info"
-msgid "ISBN"
-msgstr "ISBN"
-
-#: src/frontend/mame/ui/utils.cpp:70
-msgctxt "swlist-info"
-msgid "OEM"
-msgstr "OEM"
-
-#: src/frontend/mame/ui/utils.cpp:71
-msgctxt "swlist-info"
-msgid "Original Publisher"
-msgstr "原出版商"
-
-#: src/frontend/mame/ui/utils.cpp:72
-msgctxt "swlist-info"
-msgid "Part Number"
-msgstr "配件編號"
-
-#: src/frontend/mame/ui/utils.cpp:73
-msgctxt "swlist-info"
-msgid "PCB"
-msgstr "PCB"
-
-#: src/frontend/mame/ui/utils.cpp:74
-msgctxt "swlist-info"
-msgid "Programmer"
-msgstr "程式設計"
-
-#: src/frontend/mame/ui/utils.cpp:75
-msgctxt "swlist-info"
-msgid "Release Date"
-msgstr "發行日"
-
-#: src/frontend/mame/ui/utils.cpp:76
-msgctxt "swlist-info"
-msgid "Serial Number"
-msgstr "序號"
-
-#: src/frontend/mame/ui/utils.cpp:77
-msgctxt "swlist-info"
-msgid "Usage Instructions"
-msgstr "使用說明"
-
-#: src/frontend/mame/ui/utils.cpp:78
-msgctxt "swlist-info"
-msgid "Version"
-msgstr "版本"
-
-#: src/frontend/mame/ui/utils.cpp:84
-msgctxt "machine-filter"
-msgid "Unfiltered"
-msgstr "未篩選"
-
-#: src/frontend/mame/ui/utils.cpp:85
-msgctxt "machine-filter"
-msgid "Available"
-msgstr "可用"
-
-#: src/frontend/mame/ui/utils.cpp:86
-msgctxt "machine-filter"
-msgid "Unavailable"
-msgstr "不可用"
-
-#: src/frontend/mame/ui/utils.cpp:87
-msgctxt "machine-filter"
-msgid "Working"
-msgstr "可以執行"
-
-#: src/frontend/mame/ui/utils.cpp:88
-msgctxt "machine-filter"
-msgid "Not Working"
-msgstr "不可執行"
-
-#: src/frontend/mame/ui/utils.cpp:89
-msgctxt "machine-filter"
-msgid "Mechanical"
-msgstr "機械式"
-
-#: src/frontend/mame/ui/utils.cpp:90
-msgctxt "machine-filter"
-msgid "Not Mechanical"
-msgstr "非機械式"
-
-#: src/frontend/mame/ui/utils.cpp:91
-msgctxt "machine-filter"
-msgid "Category"
-msgstr "類別"
-
-#: src/frontend/mame/ui/utils.cpp:92
-msgctxt "machine-filter"
-msgid "Favorites"
-msgstr "最愛"
-
-#: src/frontend/mame/ui/utils.cpp:93
-msgctxt "machine-filter"
-msgid "BIOS"
-msgstr "BIOS"
-
-#: src/frontend/mame/ui/utils.cpp:94
-msgctxt "machine-filter"
-msgid "Not BIOS"
-msgstr "非 BIOS"
-
-#: src/frontend/mame/ui/utils.cpp:95
-msgctxt "machine-filter"
-msgid "Parents"
-msgstr "母檔"
-
-#: src/frontend/mame/ui/utils.cpp:96
-msgctxt "machine-filter"
-msgid "Clones"
-msgstr "仿製版"
-
-#: src/frontend/mame/ui/utils.cpp:97
-msgctxt "machine-filter"
-msgid "Manufacturer"
-msgstr "製造商"
-
-#: src/frontend/mame/ui/utils.cpp:98
-msgctxt "machine-filter"
-msgid "Year"
-msgstr "年代"
-
-#: src/frontend/mame/ui/utils.cpp:99
-msgctxt "machine-filter"
-msgid "Save Supported"
-msgstr "已支援即時存檔"
-
-#: src/frontend/mame/ui/utils.cpp:100
-msgctxt "machine-filter"
-msgid "Save Unsupported"
-msgstr "未支援即時存檔"
-
-#: src/frontend/mame/ui/utils.cpp:101
-msgctxt "machine-filter"
-msgid "CHD Required"
-msgstr "需要 CHD"
-
-#: src/frontend/mame/ui/utils.cpp:102
-msgctxt "machine-filter"
-msgid "No CHD Required"
-msgstr "不需要 CHD"
-
-#: src/frontend/mame/ui/utils.cpp:103
-msgctxt "machine-filter"
-msgid "Vertical Screen"
-msgstr "垂直螢幕"
-
-#: src/frontend/mame/ui/utils.cpp:104
-msgctxt "machine-filter"
-msgid "Horizontal Screen"
-msgstr "水平螢幕"
-
-#: src/frontend/mame/ui/utils.cpp:105
-msgctxt "machine-filter"
-msgid "Custom Filter"
-msgstr "自訂篩選"
-
-#: src/frontend/mame/ui/utils.cpp:109
-msgctxt "software-filter"
-msgid "Unfiltered"
-msgstr "未篩選"
-
-#: src/frontend/mame/ui/utils.cpp:110
-msgctxt "software-filter"
-msgid "Available"
-msgstr "可用"
-
-#: src/frontend/mame/ui/utils.cpp:111
-msgctxt "software-filter"
-msgid "Unavailable"
-msgstr "不可用"
-
-#: src/frontend/mame/ui/utils.cpp:112
-msgctxt "software-filter"
-msgid "Favorites"
-msgstr "最愛"
-
-#: src/frontend/mame/ui/utils.cpp:113
-msgctxt "software-filter"
-msgid "Parents"
-msgstr "母檔"
-
-#: src/frontend/mame/ui/utils.cpp:114
-msgctxt "software-filter"
-msgid "Clones"
-msgstr "仿製版"
-
-#: src/frontend/mame/ui/utils.cpp:115
-msgctxt "software-filter"
-msgid "Year"
-msgstr "年代"
-
-#: src/frontend/mame/ui/utils.cpp:116
-msgctxt "software-filter"
-msgid "Publisher"
-msgstr "出版商"
-
-#: src/frontend/mame/ui/utils.cpp:117
-msgctxt "software-filter"
-msgid "Developer"
-msgstr "開發商"
-
-#: src/frontend/mame/ui/utils.cpp:118
-msgctxt "software-filter"
-msgid "Distributor"
-msgstr "經銷商"
-
-#: src/frontend/mame/ui/utils.cpp:119
-msgctxt "software-filter"
-msgid "Author"
-msgstr "作者"
-
-#: src/frontend/mame/ui/utils.cpp:120
-msgctxt "software-filter"
-msgid "Programmer"
-msgstr "程式設計"
-
-#: src/frontend/mame/ui/utils.cpp:121
-msgctxt "software-filter"
-msgid "Supported"
-msgstr "已支援"
-
-#: src/frontend/mame/ui/utils.cpp:122
-msgctxt "software-filter"
-msgid "Partially Supported"
-msgstr "部分支援"
-
-#: src/frontend/mame/ui/utils.cpp:123
-msgctxt "software-filter"
-msgid "Unsupported"
-msgstr "不支援"
-
-#: src/frontend/mame/ui/utils.cpp:124
-msgctxt "software-filter"
-msgid "Release Region"
-msgstr "釋出區域"
-
-#: src/frontend/mame/ui/utils.cpp:125
-msgctxt "software-filter"
-msgid "Device Type"
-msgstr "裝置類別"
-
-#: src/frontend/mame/ui/utils.cpp:126
-msgctxt "software-filter"
-msgid "Software List"
-msgstr "軟體清單"
-
-#: src/frontend/mame/ui/utils.cpp:127
-msgctxt "software-filter"
-msgid "Custom Filter"
-msgstr "自訂篩選"
-
-#: src/frontend/mame/ui/utils.cpp:291
-msgid "<set up filters>"
-msgstr "<設定篩選>"
-
-#: src/frontend/mame/ui/utils.cpp:395
-msgid "Select custom filters:"
-msgstr "選擇自訂篩選："
-
-#: src/frontend/mame/ui/utils.cpp:546
-#, c-format
-msgid "Filter %1$u"
-msgstr "篩選 %1$u"
-
-#: src/frontend/mame/ui/utils.cpp:560
-msgid "Remove last filter"
-msgstr "移除最後篩選"
-
-#: src/frontend/mame/ui/utils.cpp:562
-msgid "Add filter"
-msgstr "新增篩選"
-
-#: src/frontend/mame/ui/utils.cpp:1001
-msgid "Select category:"
-msgstr "選擇類別："
-
-#: src/frontend/mame/ui/utils.cpp:1032
-msgid "[no category INI files]"
-msgstr "[沒有類別 INI 檔案]"
-
-#: src/frontend/mame/ui/utils.cpp:1040
-msgid "[no groups in INI file]"
-msgstr "[INI 檔案中無群組]"
-
-#: src/frontend/mame/ui/utils.cpp:1074
-msgid "No category INI files found"
-msgstr "沒有找到類別 INI 檔案"
-
-#: src/frontend/mame/ui/utils.cpp:1079
-msgid "File"
-msgstr "檔案"
-
-#: src/frontend/mame/ui/utils.cpp:1083
-msgid "No groups found in category file"
-msgstr "類別檔案中沒有找到群組"
-
-#: src/frontend/mame/ui/utils.cpp:1088
-msgid "Group"
-msgstr "群組"
-
-#: src/frontend/mame/ui/utils.cpp:1089
-msgid "Include clones"
-msgstr "包含仿製版"
-
-#: src/frontend/mame/ui/utils.cpp:2046 src/frontend/mame/ui/inifile.cpp:270
-msgctxt "swlist-info"
-msgid "Software list/item"
-msgstr "軟體列表/項目"
-
-#: src/frontend/mame/ui/datmenu.cpp:81 src/frontend/mame/ui/selmenu.cpp:2692
-msgid "Software List Info"
-msgstr "軟體列表資訊"
-
-#: src/frontend/mame/ui/datmenu.cpp:365
-msgid "Revision: "
-msgstr "版本： "
-
-#: src/frontend/mame/ui/miscmenu.cpp:78 src/frontend/mame/ui/confswitch.cpp:162
-#: src/frontend/mame/ui/slotopt.cpp:203
-msgid "Reset"
-msgstr "重設"
-
-#: src/frontend/mame/ui/miscmenu.cpp:236
-#, c-format
-msgid ""
-"Uptime: %1$d:%2$02d:%3$02d\n"
-"\n"
-msgstr ""
-"執行時間： %1$d:%2$02d:%3$02d\n"
-"\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:238
-#, c-format
-msgid ""
-"Uptime: %1$d:%2$02d\n"
-"\n"
-msgstr ""
-"執行時間： %1$d:%2$02d\n"
-"\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:242
-#, c-format
-msgid ""
-"Tickets dispensed: %1$d\n"
-"\n"
-msgstr ""
-"彩票分配數： %1$d\n"
-"\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:253
-msgid "Coin %1$c: NA%3$s\n"
-msgstr "投幣數 %1$c： NA%3$s\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:253
-#, c-format
-msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "投幣數 %1$c： %2$d%3$s\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:256
-msgid " (locked)"
-msgstr " （已鎖定）"
-
-#: src/frontend/mame/ui/miscmenu.cpp:456
-#, c-format
-msgid "P%d Visibility"
-msgstr "P$d 可見度"
-
-#: src/frontend/mame/ui/miscmenu.cpp:510
-#, c-format
-msgid "P%d Crosshair"
-msgstr "P%d 十字準星"
-
-#: src/frontend/mame/ui/miscmenu.cpp:527
-msgid "Visible Delay"
-msgstr "可見度延遲"
-
-#: src/frontend/mame/ui/miscmenu.cpp:639
-#, c-format
-msgid "%s.xml saved under ui folder."
-msgstr "%s.xml 已儲存於 ui 資料夾下。"
-
-#: src/frontend/mame/ui/miscmenu.cpp:665
-msgid "Name:             Description:\n"
-msgstr "名稱：            描述：\n"
-
-#: src/frontend/mame/ui/miscmenu.cpp:676
-#, c-format
-msgid "%s.txt saved under ui folder."
-msgstr "%s.txt 已儲存於 ui 資料夾下。"
-
-#: src/frontend/mame/ui/miscmenu.cpp:693
-msgid "Export list in XML format (like -listxml)"
-msgstr "匯出 XML 格式清單 （同 -listxml）"
-
-#: src/frontend/mame/ui/miscmenu.cpp:694
-msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr "匯出 TXT 格式清單 （同 -listxml，但不包含裝置）"
-
-#: src/frontend/mame/ui/miscmenu.cpp:695
-msgid "Export list in TXT format (like -listfull)"
-msgstr "匯出 TXT 格式清單 （同 -listfull）"
-
-#: src/frontend/mame/ui/miscmenu.cpp:829
-msgid "BIOS"
-msgstr "BIOS"
-
-#: src/frontend/mame/ui/miscmenu.cpp:833
-msgid "Driver"
-msgstr "驅動程式"
-
-#: src/frontend/mame/ui/miscmenu.cpp:836
-msgid "This machine has no BIOS."
-msgstr "此機台沒有 BIOS。"
-
-#: src/frontend/mame/ui/miscmenu.cpp:845 src/frontend/mame/ui/mainmenu.cpp:168
-msgid "Add To Favorites"
-msgstr "新增至最愛"
-
-#: src/frontend/mame/ui/miscmenu.cpp:847 src/frontend/mame/ui/mainmenu.cpp:170
-msgid "Remove From Favorites"
-msgstr "從最愛移除"
-
-#: src/frontend/mame/ui/miscmenu.cpp:850
-msgid "Save Machine Configuration"
-msgstr "儲存機台設定"
-
-#: src/frontend/mame/ui/miscmenu.cpp:861
-msgid "Configure Machine:"
-msgstr "設定機台："
-
-#: src/frontend/mame/ui/miscmenu.cpp:895 src/frontend/mame/ui/selmenu.cpp:2630
-msgid " (default)"
-msgstr " （預設）"
-
-#: src/frontend/mame/ui/miscmenu.cpp:973
-msgid "No plugins found"
-msgstr "未找到外掛"
-
-#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:132
-msgid "Pseudo terminals"
-msgstr "偽終端"
-
-#: src/frontend/mame/ui/info_pty.cpp:39
-msgid "[failed]"
-msgstr "[ 錯誤 ]"
-
-#: src/frontend/mame/ui/state.cpp:215
-msgid "No save states found"
-msgstr "未找到已儲存的狀態"
-
-#: src/frontend/mame/ui/state.cpp:265
-#, c-format
-msgid ""
-"Delete saved state %1$s?\n"
-"Press %2$s to delete\n"
-"Press %3$s to cancel"
-msgstr ""
-"刪除已儲存的狀態檔 %1$s?\n"
-"按下 %2$s 刪除\n"
-"按下 %3$s 取消"
-
-#: src/frontend/mame/ui/state.cpp:378
-#, c-format
-msgid "Error removing saved state file %1$s"
-msgstr "移除已儲存的狀態檔 %1$s 時發生錯誤"
-
-#: src/frontend/mame/ui/state.cpp:424
-#, c-format
-msgid "Press %1$s to delete"
-msgstr "按下  %1$s 刪除"
-
-#: src/frontend/mame/ui/state.cpp:497
-msgid "Load State"
-msgstr "載入狀態"
-
-#: src/frontend/mame/ui/state.cpp:497
-msgid "Select state to load"
-msgstr "選擇要載入的狀態"
-
-#: src/frontend/mame/ui/state.cpp:521
-msgid "Save State"
-msgstr "儲存狀態"
-
-#: src/frontend/mame/ui/state.cpp:521
-msgid "Press a key or joystick button, or select state to overwrite"
-msgstr "按下鍵盤按鍵、搖桿按鈕或選擇狀態以覆寫"
-
-#: src/frontend/mame/ui/slotopt.cpp:192
-#, c-format
-msgid "%s [internal]"
-msgstr "%s [內部]"
-
-#: src/frontend/mame/ui/inputmap.cpp:38
-msgid "User Interface"
-msgstr "使用者介面"
-
-#: src/frontend/mame/ui/inputmap.cpp:41
-#, c-format
-msgid "Player %1$d Controls"
-msgstr "玩家 %1$d 控制"
-
-#: src/frontend/mame/ui/inputmap.cpp:44
-msgid "Other Controls"
-msgstr "其他控制"
-
-#: src/frontend/mame/ui/inputmap.cpp:227
-msgid "This machine has no configurable inputs."
-msgstr "此機台沒有可設定的輸入"
-
-#: src/frontend/mame/ui/inputmap.cpp:310
-msgid "Pressed"
-msgstr "按住"
-
-#: src/frontend/mame/ui/inputmap.cpp:486
-#, c-format
-msgid "[root%1$s]"
-msgstr "[root%1$s]"
-
-#: src/frontend/mame/ui/inputmap.cpp:513
-#, c-format
-msgid "Press %1$s to set\n"
-msgstr "按下 %1$s 設定\n"
-
-#: src/frontend/mame/ui/inputmap.cpp:514
-#, c-format
-msgid "Press %1$s to append\n"
-msgstr "按下 %1$s 加入\n"
-
-#: src/frontend/mame/ui/inputmap.cpp:515
-#, c-format
-msgid "Press %1$s to clear\n"
-msgstr "按下 %1$s 清除\n"
-
-#: src/frontend/mame/ui/inputmap.cpp:516
-#, c-format
-msgid "Press %1$s to restore default\n"
-msgstr "按下 %1$s 還原預設值\n"
-
-#: src/frontend/mame/ui/tapectrl.cpp:85
-msgid "stopped"
-msgstr "已停止"
-
-#: src/frontend/mame/ui/tapectrl.cpp:87
-msgid "playing"
-msgstr "正在執行"
-
-#: src/frontend/mame/ui/tapectrl.cpp:87
-msgid "(playing)"
-msgstr "（正在執行）"
-
-#: src/frontend/mame/ui/tapectrl.cpp:88
-msgid "recording"
-msgstr "正在錄製"
-
-#: src/frontend/mame/ui/tapectrl.cpp:88
-msgid "(recording)"
-msgstr "（正在錄製）"
-
-#: src/frontend/mame/ui/tapectrl.cpp:95
-msgid "Pause/Stop"
-msgstr "暫停／停止"
-
-#: src/frontend/mame/ui/tapectrl.cpp:98
-msgid "Play"
-msgstr "執行"
-
-#: src/frontend/mame/ui/tapectrl.cpp:101
-msgid "Record"
-msgstr "記錄"
-
-#: src/frontend/mame/ui/tapectrl.cpp:104
-msgid "Rewind"
-msgstr "倒帶"
-
-#: src/frontend/mame/ui/tapectrl.cpp:107
-msgid "Fast Forward"
-msgstr "快進"
-
-#: src/frontend/mame/ui/imgcntrl.cpp:132
-msgid "Cannot save over directory"
-msgstr "無法跨目錄儲存"
-
-#: src/frontend/mame/ui/imgcntrl.cpp:165
-msgid ""
-"The software selected is missing one or more required ROM or CHD images.\n"
-"Please acquire the correct files or select a different one."
-msgstr ""
-"選定的軟體缺少一個或多個必要的 ROM 或 CHD 映像檔\n"
-"請取得正確的檔案或選擇不同的檔案。"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:150
-msgid ""
-"The selected game is missing one or more required ROM or CHD images. Please "
-"select a different game.\n"
-"\n"
-"Press any key to continue."
-msgstr ""
-"選定的遊戲缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他遊戲。\n"
-"按任意鍵繼續。"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:249
-#, c-format
-msgid ""
-"No machines found. Please check the rompath specified in the %1$s.ini file.\n"
-"\n"
-"If this is your first time using %2$s, please see the config.txt file in the "
-"docs directory for information on configuring %2$s."
-msgstr ""
-"找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
-"\n"
-"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
-"訊。"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:283
-#: src/frontend/mame/ui/selgame.cpp:855
-msgid "Configure Options"
-msgstr "設定選項"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:284
-#: src/frontend/mame/ui/selmenu.cpp:1287
-msgid "Exit"
-msgstr "結束"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:309
-#, c-format
-msgid "Type name or select: %1$s_"
-msgstr "輸入名稱或選擇： %1$s_"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:311
-msgid "Type name or select: (random)"
-msgstr "輸入名稱或選擇： (隨機)"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:328
-#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
-#, c-format
-msgid "%1$s, %2$-.100s"
-msgstr "%1$s, %2$-.100s"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:331
-#, c-format
-msgid "Driver: %1$-.100s"
-msgstr "驅動程式： %-.100s\n"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:347
-#: src/frontend/mame/ui/selmenu.cpp:723
-msgid "Overall: NOT WORKING"
-msgstr "整體： 不可執行"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:349
-#: src/frontend/mame/ui/selmenu.cpp:725
-msgid "Overall: Unemulated Protection"
-msgstr "整體： 未模擬保護"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:351
-#: src/frontend/mame/ui/selmenu.cpp:727
-msgid "Overall: Working"
-msgstr "整體： 可以執行"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:355
-#: src/frontend/mame/ui/selmenu.cpp:731
-msgid "Graphics: Unimplemented, "
-msgstr "圖形： 不完整，"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:357
-#: src/frontend/mame/ui/selmenu.cpp:733
-msgid "Graphics: Imperfect, "
-msgstr "圖形： 不完美， "
-
-#: src/frontend/mame/ui/simpleselgame.cpp:359
-#: src/frontend/mame/ui/selmenu.cpp:735
-msgid "Graphics: OK, "
-msgstr "圖形： OK， "
-
-#: src/frontend/mame/ui/simpleselgame.cpp:362
-#: src/frontend/mame/ui/selmenu.cpp:738
-msgid "Sound: None"
-msgstr "聲音： 無"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:364
-#: src/frontend/mame/ui/selmenu.cpp:740
-msgid "Sound: Unimplemented"
-msgstr "聲音： 無法執行"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:366
-#: src/frontend/mame/ui/selmenu.cpp:742
-msgid "Sound: Imperfect"
-msgstr "聲音： 不完美"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:368
-#: src/frontend/mame/ui/selmenu.cpp:744
-msgid "Sound: OK"
-msgstr "聲音： OK"
-
-#: src/frontend/mame/ui/cheatopt.cpp:100
-msgid "All cheats reloaded"
-msgstr "全部作弊碼已重新載入"
-
-#: src/frontend/mame/ui/dirmenu.cpp:37
-msgctxt "path-option"
-msgid "ROMs"
-msgstr "ROM"
-
-#: src/frontend/mame/ui/dirmenu.cpp:38
-msgctxt "path-option"
-msgid "Software Media"
-msgstr "軟體媒體"
-
-#: src/frontend/mame/ui/dirmenu.cpp:39
-msgctxt "path-option"
-msgid "Sound Samples"
-msgstr "聲音樣本檔"
-
-#: src/frontend/mame/ui/dirmenu.cpp:40
-msgctxt "path-option"
-msgid "Artwork"
-msgstr "裝飾圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:41
-msgctxt "path-option"
-msgid "Crosshairs"
-msgstr "十字準星"
-
-#: src/frontend/mame/ui/dirmenu.cpp:42
-msgctxt "path-option"
-msgid "Cheat Files"
-msgstr "作弊檔"
-
-#: src/frontend/mame/ui/dirmenu.cpp:43
-msgctxt "path-option"
-msgid "Plugins"
-msgstr "外掛"
-
-#: src/frontend/mame/ui/dirmenu.cpp:44
-msgctxt "path-option"
-msgid "UI Translations"
-msgstr "UI 翻譯"
-
-#: src/frontend/mame/ui/dirmenu.cpp:45
-msgctxt "path-option"
-msgid "INIs"
-msgstr "INI"
-
-#: src/frontend/mame/ui/dirmenu.cpp:46
-msgctxt "path-option"
-msgid "UI Settings"
-msgstr "UI 設定"
-
-#: src/frontend/mame/ui/dirmenu.cpp:47
-msgctxt "path-option"
-msgid "Plugin Data"
-msgstr "外掛資料"
-
-#: src/frontend/mame/ui/dirmenu.cpp:48
-msgctxt "path-option"
-msgid "DATs"
-msgstr "文件"
-
-#: src/frontend/mame/ui/dirmenu.cpp:49
-msgctxt "path-option"
-msgid "Category INIs"
-msgstr "類別 INI"
-
-#: src/frontend/mame/ui/dirmenu.cpp:50
-msgctxt "path-option"
-msgid "Snapshots"
-msgstr "擷圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:51
-msgctxt "path-option"
-msgid "Icons"
-msgstr "圖示"
-
-#: src/frontend/mame/ui/dirmenu.cpp:52
-msgctxt "path-option"
-msgid "Control Panels"
-msgstr "操作檯"
-
-#: src/frontend/mame/ui/dirmenu.cpp:53
-msgctxt "path-option"
-msgid "Cabinets"
-msgstr "筐體圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:54
-msgctxt "path-option"
-msgid "Marquees"
-msgstr "標籤圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:55
-msgctxt "path-option"
-msgid "PCBs"
-msgstr "PCB 圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:56
-msgctxt "path-option"
-msgid "Flyers"
-msgstr "廣告圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:57
-msgctxt "path-option"
-msgid "Title Screens"
-msgstr "標題畫面"
-
-#: src/frontend/mame/ui/dirmenu.cpp:58
-msgctxt "path-option"
-msgid "Game Endings"
-msgstr "遊戲結局"
-
-#: src/frontend/mame/ui/dirmenu.cpp:59
-msgctxt "path-option"
-msgid "Bosses"
-msgstr "首領"
-
-#: src/frontend/mame/ui/dirmenu.cpp:60
-msgctxt "path-option"
-msgid "Artwork Previews"
-msgstr "裝飾圖預覽"
-
-#: src/frontend/mame/ui/dirmenu.cpp:61
-msgctxt "path-option"
-msgid "Select"
-msgstr "精選"
-
-#: src/frontend/mame/ui/dirmenu.cpp:62
-msgctxt "path-option"
-msgid "Game Over Screens"
-msgstr "遊戲結束畫面"
-
-#: src/frontend/mame/ui/dirmenu.cpp:63
-msgctxt "path-option"
-msgid "HowTo"
-msgstr "說明圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:64
-msgctxt "path-option"
-msgid "Logos"
-msgstr "標題圖"
-
-#: src/frontend/mame/ui/dirmenu.cpp:65
-msgctxt "path-option"
-msgid "Scores"
-msgstr "得分"
-
-#: src/frontend/mame/ui/dirmenu.cpp:66
-msgctxt "path-option"
-msgid "Versus"
-msgstr "對戰"
-
-#: src/frontend/mame/ui/dirmenu.cpp:67
-msgctxt "path-option"
-msgid "Covers"
-msgstr "封面"
-
-#: src/frontend/mame/ui/dirmenu.cpp:120
-msgid "Folders Setup"
-msgstr "資料夾設定"
-
-#: src/frontend/mame/ui/dirmenu.cpp:171
-#, c-format
-msgid "Current %1$s Folders"
-msgstr "目前 %1$s 資料夾"
-
-#: src/frontend/mame/ui/dirmenu.cpp:183
-msgid "Change Folder"
-msgstr "變更資料夾"
-
-#: src/frontend/mame/ui/dirmenu.cpp:183
-msgid "Add Folder"
-msgstr "新增資料夾"
-
-#: src/frontend/mame/ui/dirmenu.cpp:186
-msgid "Remove Folder"
-msgstr "移除資料夾"
-
-#: src/frontend/mame/ui/dirmenu.cpp:421
-#, c-format
-msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "變更 %1$s 資料夾 - 搜尋： %2$s_"
-
-#: src/frontend/mame/ui/dirmenu.cpp:421
-#, c-format
-msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "新增 %1$s 資料夾 - 搜尋： %2$s_"
-
-#: src/frontend/mame/ui/dirmenu.cpp:432
-msgid "Press TAB to set"
-msgstr "按下 TAB 鍵設定"
-
-#: src/frontend/mame/ui/dirmenu.cpp:516
-#, c-format
-msgid "Remove %1$s Folder"
-msgstr "移除 %1$s 資料夾"
-
-#: src/frontend/mame/ui/viewgfx.cpp:436
-msgid " COLORS"
-msgstr " 色彩"
-
-#: src/frontend/mame/ui/viewgfx.cpp:436
-msgid " PENS"
-msgstr " PENS"
-
-#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
-#, c-format
-msgid "Zoom = 1/%1$d"
-msgstr "縮放 = 1/%1$d"
-
-#: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
-#, c-format
-msgid "Zoom = %1$d"
-msgstr "縮放 = %1$d"
-
-#: src/frontend/mame/ui/viewgfx.cpp:1262
-msgid "Expand to fit"
-msgstr "展開以符合"
-
-#: src/frontend/mame/ui/selgame.cpp:856
-msgid "Configure Machine"
-msgstr "設定機台"
-
-#: src/frontend/mame/ui/selgame.cpp:1470
-#, c-format
-msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr "%1$s %2$s （ %3$d / %4$d 機台 (%5$d BIOS) ）"
-
-#: src/frontend/mame/ui/selgame.cpp:1498
-#, c-format
-msgid "System: %1$-.100s"
-msgstr "系統： %1$-.100s"
-
-#: src/frontend/mame/ui/selector.cpp:118
-msgid "Selection List - Search: "
-msgstr "選項清單 - 搜尋： "
-
-#: src/frontend/mame/ui/selector.cpp:126
-#, c-format
-msgid "Double click or press %1$s to select"
-msgstr "雙擊或按下 %1$s 以選擇"
-
-#: src/frontend/mame/ui/auditmenu.cpp:51
-#, c-format
-msgid "Results will be saved to %1$s"
-msgstr "結果將儲存至 %1$s"
-
-#: src/frontend/mame/ui/auditmenu.cpp:82
-#, c-format
-msgid ""
-"Auditing ROMs for machine %2$u of %3$u...\n"
-"%1$s"
-msgstr ""
-"正在驗證供機台 %2$u 的 %3$u ROM 檔...\n"
-"%1$s"
-
-#: src/frontend/mame/ui/auditmenu.cpp:95
-#, c-format
-msgid "Audit ROMs for %1$u machines marked unavailable"
-msgstr "驗證標記為不可用的 %1$u 機台 ROM 檔"
-
-#: src/frontend/mame/ui/auditmenu.cpp:96
-#, c-format
-msgid "Audit ROMs for all %1$u machines"
-msgstr "驗證所有 %1$u 機台的 ROM 檔"
-
-#: src/frontend/mame/ui/custui.cpp:33
-msgid "Show All"
-msgstr "顯示全部"
-
-#: src/frontend/mame/ui/custui.cpp:34
-msgid "Hide Filters"
-msgstr "隱藏篩選"
-
-#: src/frontend/mame/ui/custui.cpp:35
-msgid "Hide Info/Image"
-msgstr "隱藏資訊/圖片"
-
-#: src/frontend/mame/ui/custui.cpp:36
-msgid "Hide Both"
-msgstr "隱藏兩者"
-
-#: src/frontend/mame/ui/custui.cpp:176
-msgid "Fonts"
-msgstr "字體"
-
-#: src/frontend/mame/ui/custui.cpp:177
-msgid "Colors"
-msgstr "顏色"
-
-#: src/frontend/mame/ui/custui.cpp:180
-msgid "Language"
-msgstr "語言"
-
-#: src/frontend/mame/ui/custui.cpp:183
-msgid "System Names"
-msgstr "系統名稱"
-
-#: src/frontend/mame/ui/custui.cpp:186
-msgid "Show side panels"
-msgstr "顯示側面版"
-
-#: src/frontend/mame/ui/custui.cpp:198
-msgid "UI Customization Settings"
-msgstr "UI 自訂設置"
-
-#: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
-msgid "[built-in]"
-msgstr "[內建]"
-
-#: src/frontend/mame/ui/custui.cpp:338
-msgid "default"
-msgstr "預設"
-
-#: src/frontend/mame/ui/custui.cpp:459
-msgid "UI Font"
-msgstr "UI 字體"
-
-#: src/frontend/mame/ui/custui.cpp:464
-msgid "Bold"
-msgstr "粗體"
-
-#: src/frontend/mame/ui/custui.cpp:465
-msgid "Italic"
-msgstr "斜體"
-
-#: src/frontend/mame/ui/custui.cpp:470
-msgid "Lines"
-msgstr "行"
-
-#: src/frontend/mame/ui/custui.cpp:476
-msgid "Infos text size"
-msgstr "資訊字體大小"
-
-#: src/frontend/mame/ui/custui.cpp:490
-msgid "UI Fonts Settings"
-msgstr "UI 字體設定"
-
-#: src/frontend/mame/ui/custui.cpp:499
-msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "文字樣本～永東國酬愛鬱靈鷹袋、南去經三國，東來過五湖。"
-
-#: src/frontend/mame/ui/custui.cpp:582
-msgid "Normal text"
-msgstr "一般文字"
-
-#: src/frontend/mame/ui/custui.cpp:583
-msgid "Selected color"
-msgstr "選擇色彩"
-
-#: src/frontend/mame/ui/custui.cpp:584
-msgid "Normal text background"
-msgstr "一般文字背景"
-
-#: src/frontend/mame/ui/custui.cpp:585
-msgid "Selected background color"
-msgstr "已選擇背景顏色"
-
-#: src/frontend/mame/ui/custui.cpp:586
-msgid "Subitem color"
-msgstr "子項目顏色"
-
-#: src/frontend/mame/ui/custui.cpp:587 src/frontend/mame/ui/custui.cpp:643
-msgid "Clone"
-msgstr "相容版本"
-
-#: src/frontend/mame/ui/custui.cpp:588
-msgid "Border"
-msgstr "邊框"
-
-#: src/frontend/mame/ui/custui.cpp:589
-msgid "Background"
-msgstr "背景"
-
-#: src/frontend/mame/ui/custui.cpp:590
-msgid "Dipswitch"
-msgstr "機台設定開關"
-
-#: src/frontend/mame/ui/custui.cpp:591
-msgid "Unavailable color"
-msgstr "未擁有遊戲顏色"
-
-#: src/frontend/mame/ui/custui.cpp:592
-msgid "Slider color"
-msgstr "參數調整"
-
-#: src/frontend/mame/ui/custui.cpp:593
-msgid "Gfx viewer background"
-msgstr "圖形檢視器背景"
-
-#: src/frontend/mame/ui/custui.cpp:594
-msgid "Mouse over color"
-msgstr "滑鼠經過顏色"
-
-#: src/frontend/mame/ui/custui.cpp:595
-msgid "Mouse over background color"
-msgstr "滑鼠經過背景顏色"
-
-#: src/frontend/mame/ui/custui.cpp:596
-msgid "Mouse down color"
-msgstr "滑鼠按下顏色"
-
-#: src/frontend/mame/ui/custui.cpp:597
-msgid "Mouse down background color"
-msgstr "滑鼠按下背景顏色"
-
-#: src/frontend/mame/ui/custui.cpp:600
-msgid "Restore originals colors"
-msgstr "還原至原本顏色"
-
-#: src/frontend/mame/ui/custui.cpp:612
-msgid "UI Colors Settings"
-msgstr "UI 色彩設定"
-
-#: src/frontend/mame/ui/custui.cpp:621
-#, c-format
-msgid "Double click or press %1$s to change the color value"
-msgstr "雙擊或按下 %1$s 以改變顏色值"
-
-#: src/frontend/mame/ui/custui.cpp:629
-msgid "Menu Preview"
-msgstr "選單預覽"
-
-#: src/frontend/mame/ui/custui.cpp:639
-msgid "Normal"
-msgstr "一般項目"
-
-#: src/frontend/mame/ui/custui.cpp:640
-msgid "Subitem"
-msgstr "子項目"
-
-#: src/frontend/mame/ui/custui.cpp:641
-msgid "Selected"
-msgstr "已選擇"
-
-#: src/frontend/mame/ui/custui.cpp:642
-msgid "Mouse Over"
-msgstr "滑鼠經過"
-
-#: src/frontend/mame/ui/custui.cpp:872
-msgid "ARGB Settings"
-msgstr "ARGB 設定"
-
-#: src/frontend/mame/ui/custui.cpp:877 src/frontend/mame/ui/custui.cpp:880
-msgctxt "color-channel"
-msgid "Alpha"
-msgstr "透明度"
-
-#: src/frontend/mame/ui/custui.cpp:885 src/frontend/mame/ui/custui.cpp:888
-msgctxt "color-channel"
-msgid "Red"
-msgstr "紅"
-
-#: src/frontend/mame/ui/custui.cpp:893 src/frontend/mame/ui/custui.cpp:896
-msgctxt "color-channel"
-msgid "Green"
-msgstr "綠"
-
-#: src/frontend/mame/ui/custui.cpp:901 src/frontend/mame/ui/custui.cpp:904
-msgctxt "color-channel"
-msgid "Blue"
-msgstr "藍"
-
-#: src/frontend/mame/ui/custui.cpp:907
-msgid "Choose from palette"
-msgstr "從色盤挑選"
-
-#: src/frontend/mame/ui/custui.cpp:946
-msgid "Color preview ="
-msgstr "顏色預覽 ="
-
-#: src/frontend/mame/ui/custui.cpp:1027
-msgctxt "color-preset"
-msgid "White"
-msgstr "白"
-
-#: src/frontend/mame/ui/custui.cpp:1028
-msgctxt "color-preset"
-msgid "Silver"
-msgstr "銀"
-
-#: src/frontend/mame/ui/custui.cpp:1029
-msgctxt "color-preset"
-msgid "Gray"
-msgstr "灰"
-
-#: src/frontend/mame/ui/custui.cpp:1030
-msgctxt "color-preset"
-msgid "Black"
-msgstr "黑"
-
-#: src/frontend/mame/ui/custui.cpp:1031
-msgctxt "color-preset"
-msgid "Red"
-msgstr "紅"
-
-#: src/frontend/mame/ui/custui.cpp:1032
-msgctxt "color-preset"
-msgid "Orange"
-msgstr "橘"
-
-#: src/frontend/mame/ui/custui.cpp:1033
-msgctxt "color-preset"
-msgid "Yellow"
-msgstr "黃"
-
-#: src/frontend/mame/ui/custui.cpp:1034
-msgctxt "color-preset"
-msgid "Green"
-msgstr "綠"
-
-#: src/frontend/mame/ui/custui.cpp:1035
-msgctxt "color-preset"
-msgid "Blue"
-msgstr "藍"
-
-#: src/frontend/mame/ui/custui.cpp:1036
-msgctxt "color-preset"
-msgid "Violet"
-msgstr "紫"
-
-#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:754
-#, c-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
-
-#: src/frontend/mame/ui/barcode.cpp:74
-msgid "New Barcode:"
-msgstr "新條碼："
-
-#: src/frontend/mame/ui/barcode.cpp:77
-msgid "Enter Code"
-msgstr "輸入條碼"
-
-#: src/frontend/mame/ui/barcode.cpp:116
-msgid "Barcode length invalid!"
-msgstr "條碼長度無效！"
-
-#: src/frontend/mame/ui/mainmenu.cpp:98
-msgid "Input (general)"
-msgstr "輸入設定 （一般）"
-
-#: src/frontend/mame/ui/mainmenu.cpp:100
-msgid "Input (this Machine)"
-msgstr "輸入設定 （本機台）"
-
-#: src/frontend/mame/ui/mainmenu.cpp:103
-msgid "Analog Controls"
-msgstr "類比控制"
-
-#: src/frontend/mame/ui/mainmenu.cpp:105
-msgid "DIP Switches"
-msgstr "機台設定開關"
-
-#: src/frontend/mame/ui/mainmenu.cpp:107
-msgid "Machine Configuration"
-msgstr "機台設定"
-
-#: src/frontend/mame/ui/mainmenu.cpp:109
-msgid "Bookkeeping Info"
-msgstr "收入資訊"
-
-#: src/frontend/mame/ui/mainmenu.cpp:111
-msgid "Machine Information"
-msgstr "機台資訊"
-
-#: src/frontend/mame/ui/mainmenu.cpp:114
-msgid "Warning Information"
-msgstr "警示訊息"
-
-#: src/frontend/mame/ui/mainmenu.cpp:120
-msgid "Image Information"
-msgstr "映像檔資訊"
-
-#: src/frontend/mame/ui/mainmenu.cpp:122
-msgid "File Manager"
-msgstr "檔案管理員"
-
-#: src/frontend/mame/ui/mainmenu.cpp:129
-msgid "Tape Control"
-msgstr "磁帶控制"
-
-#: src/frontend/mame/ui/mainmenu.cpp:135
-msgid "BIOS Selection"
-msgstr "選擇 BIOS"
-
-#: src/frontend/mame/ui/mainmenu.cpp:138
-msgid "Slot Devices"
-msgstr "插槽裝置"
-
-#: src/frontend/mame/ui/mainmenu.cpp:141
-msgid "Barcode Reader"
-msgstr "條碼讀取器"
-
-#: src/frontend/mame/ui/mainmenu.cpp:144
-msgid "Network Devices"
-msgstr "網路裝置"
-
-#: src/frontend/mame/ui/mainmenu.cpp:149
-msgid "Slider Controls"
-msgstr "參數調整"
-
-#: src/frontend/mame/ui/mainmenu.cpp:154
-msgid "Crosshair Options"
-msgstr "十字準星選項"
-
-#: src/frontend/mame/ui/mainmenu.cpp:160
-msgid "Plugin Options"
-msgstr "外掛選項"
-
-#: src/frontend/mame/ui/mainmenu.cpp:163
-msgid "External DAT View"
-msgstr "查閱外部文件"
-
-#: src/frontend/mame/ui/mainmenu.cpp:174
-#, c-format
-msgid "About %s"
-msgstr "關於 %s"
-
-#: src/frontend/mame/ui/mainmenu.cpp:182
-msgid "Start Machine"
-msgstr "啟動機台"
-
-#: src/frontend/mame/ui/mainmenu.cpp:186
-msgid "Select New Machine"
-msgstr "選擇新機台"
-
-#: src/frontend/mame/ui/mainmenu.cpp:187
-msgid "Return to Machine"
-msgstr "回到機台"
-
-#: src/frontend/mame/ui/selmenu.cpp:76
-msgctxt "selmenu-artwork"
-msgid "Snapshots"
-msgstr "擷圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:77
-msgctxt "selmenu-artwork"
-msgid "Cabinet"
-msgstr "筐體圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:78
-msgctxt "selmenu-artwork"
-msgid "Control Panel"
-msgstr "操作檯"
-
-#: src/frontend/mame/ui/selmenu.cpp:79
-msgctxt "selmenu-artwork"
-msgid "PCB"
-msgstr "PCB 圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:80
-msgctxt "selmenu-artwork"
-msgid "Flyer"
-msgstr "廣告圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:81
-msgctxt "selmenu-artwork"
-msgid "Title Screen"
-msgstr "標題畫面"
-
-#: src/frontend/mame/ui/selmenu.cpp:82
-msgctxt "selmenu-artwork"
-msgid "Ending"
-msgstr "結局"
-
-#: src/frontend/mame/ui/selmenu.cpp:83
-msgctxt "selmenu-artwork"
-msgid "Artwork Preview"
-msgstr "裝飾圖預覽"
-
-#: src/frontend/mame/ui/selmenu.cpp:84
-msgctxt "selmenu-artwork"
-msgid "Bosses"
-msgstr "首領"
-
-#: src/frontend/mame/ui/selmenu.cpp:85
-msgctxt "selmenu-artwork"
-msgid "Logo"
-msgstr "標題圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:86
-msgctxt "selmenu-artwork"
-msgid "Versus"
-msgstr "對戰"
-
-#: src/frontend/mame/ui/selmenu.cpp:87
-msgctxt "selmenu-artwork"
-msgid "Game Over"
-msgstr "遊戲結束"
-
-#: src/frontend/mame/ui/selmenu.cpp:88
-msgctxt "selmenu-artwork"
-msgid "HowTo"
-msgstr "說明圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:89
-msgctxt "selmenu-artwork"
-msgid "Scores"
-msgstr "得分"
-
-#: src/frontend/mame/ui/selmenu.cpp:90
-msgctxt "selmenu-artwork"
-msgid "Select"
-msgstr "精選"
-
-#: src/frontend/mame/ui/selmenu.cpp:91
-msgctxt "selmenu-artwork"
-msgid "Marquee"
-msgstr "標籤圖"
-
-#: src/frontend/mame/ui/selmenu.cpp:92
-msgctxt "selmenu-artwork"
-msgid "Covers"
-msgstr "封面"
-
-#: src/frontend/mame/ui/selmenu.cpp:96
-msgid "Add or remove favorite"
-msgstr "新增或移除最愛項目"
-
-#: src/frontend/mame/ui/selmenu.cpp:97
-msgid "Export displayed list to file"
-msgstr "匯出顯示的清單至檔案"
-
-#: src/frontend/mame/ui/selmenu.cpp:98
-msgid "Audit media"
-msgstr "驗證媒體"
-
-#: src/frontend/mame/ui/selmenu.cpp:99
-msgid "Show DATs view"
-msgstr "顯示文件檢視"
-
-#: src/frontend/mame/ui/selmenu.cpp:320
-msgid "Software part selection:"
-msgstr "軟體部分選項："
-
-#: src/frontend/mame/ui/selmenu.cpp:426
-msgid "BIOS selection:"
-msgstr "選擇 BIOS："
-
-#: src/frontend/mame/ui/selmenu.cpp:681
-#, c-format
-msgid "Software is clone of: %1$-.100s"
-msgstr "軟體相容於： %1$-.100s"
-
-#: src/frontend/mame/ui/selmenu.cpp:683
-msgid "Software is parent"
-msgstr "軟體為主檔"
-
-#: src/frontend/mame/ui/selmenu.cpp:688
-msgid "Supported: No"
-msgstr "已支援： 否"
-
-#: src/frontend/mame/ui/selmenu.cpp:693
-msgid "Supported: Partial"
-msgstr "已支援： 部分"
-
-#: src/frontend/mame/ui/selmenu.cpp:698
-msgid "Supported: Yes"
-msgstr "已支援： 是"
-
-#: src/frontend/mame/ui/selmenu.cpp:714
-msgid "Driver is parent"
-msgstr "驅動程式為主檔"
-
-#: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
-#, c-format
-msgid "Driver is clone of: %1$-.100s"
-msgstr "驅動程式相容於： %-.100s"
-
-#: src/frontend/mame/ui/selmenu.cpp:1287
-msgid "Return to previous menu"
-msgstr "回上一層選單"
-
-#: src/frontend/mame/ui/selmenu.cpp:2233
-msgid "Images"
-msgstr "圖片"
-
-#: src/frontend/mame/ui/selmenu.cpp:2234
-msgid "Infos"
-msgstr "資訊"
-
-#: src/frontend/mame/ui/selmenu.cpp:2543
-msgid ""
-"Required ROM/disk images for the selected system are missing or incorrect. "
-"Please acquire the correct files or select a different system.\n"
-"\n"
-msgstr ""
-"選定系統所需要的 ROM / 磁碟映像檔為缺少或不正確。 請取得正確的檔案或選擇不同"
-"的系統。\n"
-"\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2559
-msgid ""
-"Required ROM/disk images for the selected software are missing or incorrect. "
-"Please acquire the correct files or select a different software item.\n"
-"\n"
-msgstr ""
-"選定軟體所需要的 ROM / 磁碟映像檔為缺少或不正確。 請取得正確的檔案或選擇不同"
-"的軟體項目。\n"
-"\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2575
-msgid "incorrect checksum"
-msgstr "不正確的檢查碼"
-
-#: src/frontend/mame/ui/selmenu.cpp:2578
-msgid "incorrect length"
-msgstr "不正確的長度"
-
-#: src/frontend/mame/ui/selmenu.cpp:2581
-msgid "not found"
-msgstr "未找到"
-
-#: src/frontend/mame/ui/selmenu.cpp:2592
-#, c-format
-msgid "%1$s (%2$s) - %3$s\n"
-msgstr "%1$s (%2$s) - %3$s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2594
-#, c-format
-msgid "%1$s - %2$s\n"
-msgstr "%1$s - %2$s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2598
-msgid "Press any key to continue."
-msgstr "按任意鍵繼續。"
-
-#: src/frontend/mame/ui/selmenu.cpp:2728
-msgid "General Info"
-msgstr "一般資訊"
-
-#: src/frontend/mame/ui/selmenu.cpp:2936
-#, c-format
-msgid "Romset\t%1$-.100s\n"
-msgstr "ROM組\t%1$-.100s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2937
-#, c-format
-msgid "Year\t%1$s\n"
-msgstr "年代\t%1$s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2938
-#, c-format
-msgid "Manufacturer\t%1$-.100s\n"
-msgstr "製造商\t%1$-.100s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2946
-#, c-format
-msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr "驅動程式相容於\t%1$-.100s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2951
-msgid "Driver is Parent\t\n"
-msgstr "驅動程式為主檔\t\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2955
-msgid "Analog Controls\tYes\n"
-msgstr "類比控制\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2957
-msgid "Keyboard Inputs\tYes\n"
-msgstr "鍵盤輸入\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2960
-msgid "Overall\tNOT WORKING\n"
-msgstr "整體\t不可執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2962
-msgid "Overall\tUnemulated Protection\n"
-msgstr "整體\t未模擬保護\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2964
-msgid "Overall\tWorking\n"
-msgstr "整體\t可以執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2967
-msgid "Graphics\tUnimplemented\n"
-msgstr "圖形\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2969
-msgid "Graphics\tWrong Colors\n"
-msgstr "圖形\t色彩錯誤\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2971
-msgid "Graphics\tImperfect Colors\n"
-msgstr "圖形\t色彩不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2973
-msgid "Graphics\tImperfect\n"
-msgstr "圖形\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2975
-msgid "Graphics\tOK\n"
-msgstr "圖形\tOK\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2978
-msgid "Sound\tNone\n"
-msgstr "聲音\t無\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2980
-msgid "Sound\tUnimplemented\n"
-msgstr "聲音\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2982
-msgid "Sound\tImperfect\n"
-msgstr "聲音\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2984
-msgid "Sound\tOK\n"
-msgstr "聲音\tOK\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2987
-msgid "Capture\tUnimplemented\n"
-msgstr "擷取\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2989
-msgid "Capture\tImperfect\n"
-msgstr "擷取\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2992
-msgid "Camera\tUnimplemented\n"
-msgstr "相機\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2994
-msgid "Camera\tImperfect\n"
-msgstr "相機\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2997
-msgid "Microphone\tUnimplemented\n"
-msgstr "麥克風\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2999
-msgid "Microphone\tImperfect\n"
-msgstr "麥克風\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3002
-msgid "Controls\tUnimplemented\n"
-msgstr "控制\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3004
-msgid "Controls\tImperfect\n"
-msgstr "控制\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3007
-msgid "Keyboard\tUnimplemented\n"
-msgstr "鍵盤\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3009
-msgid "Keyboard\tImperfect\n"
-msgstr "鍵盤\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3012
-msgid "Mouse\tUnimplemented\n"
-msgstr "滑鼠\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3014
-msgid "Mouse\tImperfect\n"
-msgstr "滑鼠\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3017
-msgid "Media\tUnimplemented\n"
-msgstr "媒體\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3019
-msgid "Media\tImperfect\n"
-msgstr "媒體\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3022
-msgid "Disk\tUnimplemented\n"
-msgstr "磁碟\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3024
-msgid "Disk\tImperfect\n"
-msgstr "磁碟\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3027
-msgid "Printer\tUnimplemented\n"
-msgstr "印表機\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3029
-msgid "Printer\tImperfect\n"
-msgstr "印表機\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3032
-msgid "Mag. Tape\tUnimplemented\n"
-msgstr "磁帶\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3034
-msgid "Mag. Tape\tImperfect\n"
-msgstr "磁帶\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3037
-msgid "Punch Tape\tUnimplemented\n"
-msgstr "打孔帶\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3039
-msgid "Punch Tape\tImperfect\n"
-msgstr "打孔帶\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3042
-msgid "Mag. Drum\tUnimplemented\n"
-msgstr "磁鼓\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3044
-msgid "Mag. Drum\tImperfect\n"
-msgstr "磁鼓\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3047
-msgid "(EP)ROM\tUnimplemented\n"
-msgstr "(EP)ROM\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3049
-msgid "(EP)ROM\tImperfect\n"
-msgstr "(EP)ROM\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3052
-msgid "Communications\tUnimplemented\n"
-msgstr "通訊\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3054
-msgid "Communications\tImperfect\n"
-msgstr "通訊\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3057
-msgid "LAN\tUnimplemented\n"
-msgstr "區域網路\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3059
-msgid "LAN\tImperfect\n"
-msgstr "區域網路\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3062
-msgid "WAN\tUnimplemented\n"
-msgstr "外部網路\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3064
-msgid "WAN\tImperfect\n"
-msgstr "外部網路\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3067
-msgid "Timing\tUnimplemented\n"
-msgstr "計時\t無法執行\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3069
-msgid "Timing\tImperfect\n"
-msgstr "計時\t不完美\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3071
-msgid "Mechanical Machine\tYes\n"
-msgstr "機械式機台\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3071
-msgid "Mechanical Machine\tNo\n"
-msgstr "機械式機台\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3072
-msgid "Requires Artwork\tYes\n"
-msgstr "需要裝飾圖\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3072
-msgid "Requires Artwork\tNo\n"
-msgstr "需要裝飾圖\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3073
-msgid "Requires Clickable Artwork\tYes\n"
-msgstr "需要可點擊的裝飾圖\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3073
-msgid "Requires Clickable Artwork\tNo\n"
-msgstr "需要可點擊的裝飾圖\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3075
-msgid "Support Cocktail\tNo\n"
-msgstr "支援檯面型筐體\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3076
-msgid "Driver is BIOS\tYes\n"
-msgstr "驅動程式為 BIOS\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3076
-msgid "Driver is BIOS\tNo\n"
-msgstr "驅動程式為 BIOS\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3077
-msgid "Support Save\tYes\n"
-msgstr "支援即時存檔\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3077
-msgid "Support Save\tNo\n"
-msgstr "支援即時存檔\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3078
-msgid "Screen Orientation\tVertical\n"
-msgstr "畫面方向\t垂直\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3078
-msgid "Screen Orientation\tHorizontal\n"
-msgstr "畫面方向\t水平\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3088
-msgid "Requires CHD\tYes\n"
-msgstr "需要 CHD\t是\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3088
-msgid "Requires CHD\tNo\n"
-msgstr "需要 CHD\t否\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3101
-msgid "ROM Audit Result\tOK\n"
-msgstr "ROM 驗證結果\tOK\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3103
-msgid "ROM Audit Result\tBAD\n"
-msgstr "ROM 驗證結果\t錯誤\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3106
-msgid "Samples Audit Result\tNone Needed\n"
-msgstr "樣本檔驗證結果\t不需要\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3108
-msgid "Samples Audit Result\tOK\n"
-msgstr "樣本檔驗證結果\tOK\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3110
-msgid "Samples Audit Result\tBAD\n"
-msgstr "樣本檔驗證結果\t錯誤\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:3114
-msgid ""
-"ROM Audit \tDisabled\n"
-"Samples Audit \tDisabled\n"
-msgstr ""
-"ROM 驗證 \t停用\n"
-"樣本檔驗證 \t停用\n"
-
-#: src/frontend/mame/ui/sndmenu.cpp:148
-msgid "Sound"
-msgstr "聲音"
-
-#: src/frontend/mame/ui/sndmenu.cpp:149
-msgid "Compressor"
-msgstr "壓縮"
-
-#: src/frontend/mame/ui/sndmenu.cpp:150
-msgid "Sample Rate"
-msgstr "取樣頻率"
-
-#: src/frontend/mame/ui/sndmenu.cpp:151
-msgid "Use External Samples"
-msgstr "使用外部樣本檔"
-
-#: src/frontend/mame/ui/devopt.cpp:45
-#, c-format
-msgid ""
-"[This option is currently mounted in the running system]\n"
-"\n"
-"Option: %1$s\n"
-"Device: %2$s\n"
-"\n"
-"The selected option enables the following items:\n"
-msgstr ""
-"[ 此選項目前已掛載於執行中的系統 ]\n"
-"\n"
-"選項： %1$s\n"
-"裝置： %2$s\n"
-"\n"
-"已選用的選項啟用下列項目：\n"
-
-#: src/frontend/mame/ui/devopt.cpp:46
-#, c-format
-msgid ""
-"[This option is NOT currently mounted in the running system]\n"
-"\n"
-"Option: %1$s\n"
-"Device: %2$s\n"
-"\n"
-"If you select this option, the following items will be enabled:\n"
-msgstr ""
-"[ 此選項目前「尚未」掛載於執行中的系統 ]\n"
-"\n"
-"選項： %1$s\n"
-"裝置： %2$s\n"
-"\n"
-"如選用此選項，下列項目將啟用：\n"
-
-#: src/frontend/mame/ui/devopt.cpp:54
-msgid "* CPU:\n"
-msgstr "* CPU:\n"
-
-#: src/frontend/mame/ui/devopt.cpp:98
-msgid "* Video:\n"
-msgstr "* 視訊：\n"
-
-#: src/frontend/mame/ui/devopt.cpp:103
-#, c-format
-msgid "  Screen '%1$s': Vector\n"
-msgstr "  畫面 '%1$s'： 向量\n"
-
-#: src/frontend/mame/ui/devopt.cpp:116
-#, c-format
-msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr "  畫面 '%1$s'： %2$d × %3$d (V) %4$s Hz\n"
-
-#: src/frontend/mame/ui/devopt.cpp:117
-#, c-format
-msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr "  畫面 '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-
-#: src/frontend/mame/ui/devopt.cpp:130
-msgid "* Sound:\n"
-msgstr "* 聲音:\n"
-
-#: src/frontend/mame/ui/devopt.cpp:189
-#, c-format
-msgid ""
-"* BIOS settings:\n"
-"  %1$d options    [default: %2$s]\n"
-msgstr ""
-"* BIOS 設定：\n"
-"  %1$d 選項    [預設值： %2$s]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:229 src/frontend/mame/ui/devopt.cpp:245
-#: src/frontend/mame/ui/devopt.cpp:290
-#, c-format
-msgid "  %1$s    [default: %2$s]\n"
-msgstr "  %1$s    [預設值： %2$s]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:234 src/frontend/mame/ui/devopt.cpp:250
-#, c-format
-msgid "  %1$s\n"
-msgstr "  %1$s\n"
-
-#: src/frontend/mame/ui/devopt.cpp:255
-msgid "* DIP switch settings:\n"
-msgstr "* 指撥開關設定：\n"
-
-#: src/frontend/mame/ui/devopt.cpp:257
-msgid "* Configuration settings:\n"
-msgstr "* 配置設定：\n"
-
-#: src/frontend/mame/ui/devopt.cpp:259
-msgid "* Input device(s):\n"
-msgstr "* 輸入裝置："
-
-#: src/frontend/mame/ui/devopt.cpp:261
-#, c-format
-msgid "  User inputs    [%1$d inputs]\n"
-msgstr "  使用者輸入    [%1$d 輸入]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:263
-#, c-format
-msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr "  麻將輸入    [%1$d 輸入]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:265
-#, c-format
-msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr "  花牌輸入    [%1$d 輸入]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:267
-#, c-format
-msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr "  博奕輸入    [%1$d 輸入]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:269
-#, c-format
-msgid "  Analog inputs    [%1$d inputs]\n"
-msgstr "  類比輸入    [%1$d 輸入]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:271
-#, c-format
-msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr "  調節器輸入    [%1$d 輸入]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:273
 #, c-format
-msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr "  數字鍵盤輸入    [%1$d 輸入]\n"
+#~ msgid "%s.xml saved under ui folder."
+#~ msgstr "%s.xml 已儲存於 ui 資料夾下。"
 
-#: src/frontend/mame/ui/devopt.cpp:275
 #, c-format
-msgid "  Keyboard inputs    [%1$d inputs]\n"
-msgstr "  鍵盤輸入    [%1$d 輸入]\n"
+#~ msgid "%s.txt saved under ui folder."
+#~ msgstr "%s.txt 已儲存於 ui 資料夾下。"
 
-#: src/frontend/mame/ui/devopt.cpp:280
-msgid "* Media Options:\n"
-msgstr "* 媒體選項：\n"
-
-#: src/frontend/mame/ui/devopt.cpp:282
 #, c-format
-msgid "  %1$s    [tag: %2$s]\n"
-msgstr "  %1$s    [標籤： %2$s]\n"
-
-#: src/frontend/mame/ui/devopt.cpp:288
-msgid "* Slot Options:\n"
-msgstr "* 插槽選項：\n"
+#~ msgid "Double-click or press %1$s to change the color value"
+#~ msgstr "雙擊或按下 %1$s 以改變顏色值"
 
-#: src/frontend/mame/ui/devopt.cpp:295
-msgid "[None]\n"
-msgstr "[ 無 ]\n"
+#~ msgid "Restore originals colors"
+#~ msgstr "還原至原本顏色"

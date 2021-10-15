@@ -636,7 +636,7 @@ void menu_export::handle()
 					// and do the dirty work
 					info_xml_creator creator(machine().options());
 					creator.output(pfile, filter, include_devices);
-					machine().popmessage(_("%s.xml saved under ui folder."), filename);
+					machine().popmessage(_("%s.xml saved in UI settings folder."), filename);
 				}
 			}
 			break;
@@ -673,7 +673,7 @@ void menu_export::handle()
 						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
 					file.puts(buffer.str());
 					file.close();
-					machine().popmessage(_("%s.txt saved under ui folder."), filename);
+					machine().popmessage(_("%s.txt saved in UI settings folder."), filename);
 				}
 			}
 			break;
