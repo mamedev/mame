@@ -51,22 +51,22 @@ protected:
 	virtual void scsi_ctrl_changed() override;
 
 private:
-    enum ScsiMode
+    enum scsi_mode
     {
         MODE_D, // Disconnected
         MODE_T, // Target
         MODE_I	// Initiator
     };
 
-    enum ScsiDataSource
+    enum scsi_data_source
     {
         COMMAND_BUFFER,
         FIFO
     };
 
     // State tracking variables
-    ScsiMode mode;				  // Target or initiatior?
-    ScsiDataSource xfrDataSource; // where are we transferring data from?
+    scsi_mode mode;				  // Target or initiatior?
+    scsi_data_source xfrDataSource; // where are we transferring data from?
     int state;					  // SCSI controller state
     int xfr_phase;
     int command_length;
@@ -76,7 +76,8 @@ private:
     bool drq = false; // DRQ pin state
     bool dma_command;
     uint32_t tcounter;
-    uint8_t sync_period, clock_conv = 2; // TODO: spifi equivalents
+    uint8_t sync_period;
+    uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
     emu_timer *tm;
     int bus_id;
 

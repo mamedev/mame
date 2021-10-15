@@ -99,7 +99,6 @@
  *  TODO before opening first MR:
  *  - FIFO and ESCC cleanup (lots of it!)
  *  - SPIFI3 refactoring (actual AUTOSTAT too)
- *  - CD-ROM access if possible
  *  - Find better workaround for SCACHE enumeration
  *  - Save state support
  */
@@ -456,7 +455,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
     m_cpu->set_timintdis(false);
 
-    // Main memory
+    // Memory
     RAM(config, m_ram);
     m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
 
@@ -470,10 +469,7 @@ void news_r4k_state::machine_common(machine_config &config)
     M48T02(config, m_rtc);
 
     // ESCC setup
-    //CXD8421Q(config, m_escc, 0);
-        // General ESCC setup
     SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
-    //m_escc->out_int_callback().set(FUNC(cxd8421q_device::escc_irq_w));
 
     RS232_PORT(config, m_serial[0], default_rs232_devices, "pty");
     m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
@@ -496,10 +492,7 @@ void news_r4k_state::machine_common(machine_config &config)
     CXD8442Q(config, m_fifo0, 0);
     CXD8442Q(config, m_fifo1, 0);
 
-    // Wire ESCC and FIFO
-    // Sony loved DMA controllers so much, they decided to use two channels of DMA to enable
-    // duplex asynchronous serial transmission
-    // truly a love story for the ages
+    // ESCC FIFO
     m_escc->out_dtra_callback().set([this](int status)
                                             {
                                                 // LOG("DTR/REQ changed to 0x%x\n", status);
@@ -533,8 +526,8 @@ void news_r4k_state::machine_common(machine_config &config)
                                         // NEWS-OS to scan the ESCC and FIFO registers. It seems to work OK, but should be
                                         // revisited if the exact details can be worked out.
                                         generic_irq_w(0, 0x4, status);
-                                        escc1_int_status = status ? 0x8 : 0x0; // was; 0x20
-                                    });                                        // XXX
+                                        escc1_int_status = status ? 0x8 : 0x0; // guess
+                                    });
 
     // SONIC + WSC-SONIC3 ethernet controller
     CXD8452AQ(config, m_sonic3, 0);
