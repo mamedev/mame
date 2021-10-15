@@ -17,6 +17,8 @@ Main components:
 - 2x D4701AC incremental encoder counter
 - 315-5338A I/O custom
 - 93C45 serial EEPROM
+- 3773P power monitor / watchdog
+- MB3780A battery power monitor + battery
 - OSC 32.000 MHz
 - 1 4-dip bank
 
@@ -24,9 +26,12 @@ Sound PCB marked 'SOUND SEGA 1991 MADE IN JAPAN' with '837-8724-01' sticker ('83
 Main components:
 - Z0840008PSC audio CPU
 - 315-5476A Sega PCM
+- 315-5497 Sega QFP100 ASIC
 - YM2151
 - TMP82C51AP-8 (D71051C-10 on Exciting Boat Race)
 - Oki M6253
+- NEC B6391GF QFP80 gate array (next to unpopulated QFP80 silkscreened "5381")
+- 2x Sanyo LC7883KM digital filter / DAC
 - OSC 48.000 MHz
 - OSC 16.9344 MHz
 - 1 4-dip bank
@@ -47,6 +52,7 @@ Notes:
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm6253.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "machine/upd4701.h"
 #include "sound/rf5c68.h"
@@ -75,6 +81,7 @@ private:
 
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
+	void audio_io_map(address_map &map);
 };
 
 
@@ -86,11 +93,33 @@ void speedbsk_state::machine_start()
 void speedbsk_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0x8000, 0x8003).r("upd4701_0", FUNC(upd4701_device::read_xy));
+	map(0x8200, 0x8203).r("upd4701_1", FUNC(upd4701_device::read_xy));
+	map(0x8a00, 0x8a0f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
+	map(0x8a80, 0x8a83).rw("d71054", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	map(0x8ac0, 0x8ac1).rw("d71051", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x8b00, 0x8b03).rw("d71055_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8b40, 0x8b43).rw("d71055_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe000, 0xffff).ram().share("nvram");
 }
 
 void speedbsk_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
+	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
+	map(0xe000, 0xffff).ram();
+}
+
+void speedbsk_state::audio_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x01, 0x01).nopw();
+	map(0x02, 0x03).rw("tmp82c51", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x10, 0x13).nopw(); // misc. outputs
+	map(0x20, 0x20).nopr(); // or 6253 serial read?
+	map(0x21, 0x23).nopw();
+	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0x50, 0x50).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::select_w));
 }
 
 
@@ -106,17 +135,17 @@ static INPUT_PORTS_START( speedbsk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW") // on main PCB
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW2:4")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // only 4 dips
 
 	PORT_START("DSW2") // on audio PCB
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // only 4 dips
 INPUT_PORTS_END
 
@@ -129,6 +158,9 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 48_MHz_XTAL / 12)); // divider guessed
 	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &speedbsk_state::audio_io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MB8464A-10LL-SK + MB8730A + battery
 
 	I8251(config, "d71051", 0);
 
@@ -152,7 +184,8 @@ void speedbsk_state::speedbsk(machine_config &config)
 	// TODO: LED screen
 
 	// sound hardware, on sound PCB
-	I8251(config, "tmp82c51", 0);
+	i8251_device &tmp82c51(I8251(config, "tmp82c51", 0));
+	tmp82c51.rxrdy_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
 
