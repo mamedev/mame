@@ -373,9 +373,18 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 			// if filter is set on category, build category list
 			auto const &sorted(m_persistent_data.sorted_list());
 			if (!flt)
-				std::copy(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
+			{
+				for (ui_system_info const &sysinfo : sorted)
+					m_displaylist.emplace_back(sysinfo);
+			}
 			else
-				flt->apply(sorted.begin(), sorted.end(), std::back_inserter(m_displaylist));
+			{
+				for (ui_system_info const &sysinfo : sorted)
+				{
+					if (flt->apply(sysinfo))
+						m_displaylist.emplace_back(sysinfo);
+				}
+			}
 		}
 
 		// iterate over entries
