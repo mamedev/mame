@@ -3,6 +3,7 @@
 require('lfs')
 
 _G._ = emu.lang_translate
+_G._p = emu.lang_translate
 _G.N_ = function (message) return message end
 _G.N_p = function (context, message) return message end
 _G.emu.plugin = {} -- table to contain plugin interfaces

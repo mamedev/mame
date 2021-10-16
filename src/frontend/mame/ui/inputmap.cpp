@@ -93,7 +93,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 					item.group = entry.group();
 					item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item.is_optional = false;
-					item.name = entry.name();
+					item.name = _("input-name", entry.name());
 					item.owner = nullptr;
 
 					// stop after one, unless we're analog
@@ -165,7 +165,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						item.group = machine().ioport().type_group(field.type(), field.player());
 						item.type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 						item.is_optional = field.optional();
-						item.name = field.name();
+						item.name = _("input-name", field.name());
 						item.owner = &field.device();
 
 						// stop after one, unless we're analog
@@ -510,10 +510,10 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 	}
 
 	// pre-format messages
-	assignprompt = util::string_format(_("Press %1$s to set\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)));
-	appendprompt = util::string_format(_("Press %1$s to append\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)));
-	clearprompt = util::string_format(_("Press %1$s to clear\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
-	defaultprompt = util::string_format(_("Press %1$s to restore default\n"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));
+	assignprompt = util::string_format(_("Press %1$s to set\n"), ui().get_general_input_setting(IPT_UI_SELECT));
+	appendprompt = util::string_format(_("Press %1$s to append\n"), ui().get_general_input_setting(IPT_UI_SELECT));
+	clearprompt = util::string_format(_("Press %1$s to clear\n"), ui().get_general_input_setting(IPT_UI_CLEAR));
+	defaultprompt = util::string_format(_("Press %1$s to restore default\n"), ui().get_general_input_setting(IPT_UI_CLEAR));
 
 	// leave space for showing the input sequence below the menu
 	custombottom = 2.0f * ui().get_line_height() + 3.0f * ui().box_tb_border();

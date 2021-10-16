@@ -152,9 +152,9 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 {
 	core_options *opts = nullptr;
 	if (m_driver == nullptr)
-		opts = dynamic_cast<core_options*>(&mui.machine().options());
+		opts = dynamic_cast<core_options *>(&mui.machine().options());
 	else
-		opts = dynamic_cast<core_options*>(options);
+		opts = dynamic_cast<core_options *>(options);
 
 	for (option & sm_option : m_options)
 	{
@@ -358,9 +358,9 @@ void submenu::populate(float &customtop, float &custombottom)
 			{
 			case OPTION_BOOLEAN:
 				item_append_on_off(_(sm_option->description),
-					sm_option->options->bool_value(sm_option->name),
-					0,
-					static_cast<void*>(&(*sm_option)));
+						sm_option->options->bool_value(sm_option->name),
+						0,
+						static_cast<void*>(&(*sm_option)));
 				break;
 			case OPTION_INTEGER:
 				{
@@ -378,9 +378,9 @@ void submenu::populate(float &customtop, float &custombottom)
 					}
 					arrow_flags = get_arrow_flags(i_min, i_max, i_cur);
 					item_append(_(sm_option->description),
-						sm_option->entry->value(),
-						arrow_flags,
-						static_cast<void*>(&(*sm_option)));
+							sm_option->entry->value(),
+							arrow_flags,
+							static_cast<void*>(&(*sm_option)));
 				}
 				break;
 			case OPTION_FLOAT:
@@ -400,9 +400,9 @@ void submenu::populate(float &customtop, float &custombottom)
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
 					std::string tmptxt = string_format("%g", f_cur);
 					item_append(_(sm_option->description),
-						tmptxt,
-						arrow_flags,
-						static_cast<void*>(&(*sm_option)));
+							tmptxt,
+							arrow_flags,
+							static_cast<void*>(&(*sm_option)));
 				}
 				break;
 			case OPTION_STRING:
@@ -418,8 +418,8 @@ void submenu::populate(float &customtop, float &custombottom)
 			default:
 				arrow_flags = FLAG_RIGHT_ARROW;
 				item_append(_(sm_option->description),
-					sm_option->options->value(sm_option->name),
-					arrow_flags, static_cast<void*>(&(*sm_option)));
+						sm_option->options->value(sm_option->name),
+						arrow_flags, static_cast<void*>(&(*sm_option)));
 				break;
 			}
 			break;
@@ -456,7 +456,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 					std::begin(bottomtext), std::end(bottomtext),
 					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+					ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 		}
 	}
 }

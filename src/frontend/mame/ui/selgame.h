@@ -20,6 +20,9 @@
 
 namespace ui {
 
+class system_list;
+
+
 class menu_select_game : public menu_select_launch
 {
 public:
@@ -38,9 +41,7 @@ private:
 
 	using icon_cache = texture_lru<game_driver const *>;
 
-	class persistent_data;
-
-	persistent_data &m_persistent_data;
+	system_list &m_persistent_data;
 	icon_cache m_icons;
 	std::string m_icon_paths;
 	std::vector<std::reference_wrapper<ui_system_info const> > m_displaylist;
@@ -64,7 +65,7 @@ private:
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const override;
-	virtual std::string make_software_description(ui_software_info const &software) const override;
+	virtual std::string make_software_description(ui_software_info const &software, ui_system_info const *system) const override;
 
 	// filter navigation
 	virtual void filter_selected() override;
@@ -81,9 +82,6 @@ private:
 	void populate_search();
 	bool load_available_machines();
 	void load_custom_filters();
-
-	// General info
-	virtual void general_info(ui_system_info const &system, std::string &buffer) override;
 
 	// handlers
 	void inkey_select(const event *menu_event);

@@ -96,6 +96,32 @@ private:
 };
 
 
+// ======================> nes_srpg5in1_device
+
+class nes_srpg5in1_device : public nes_sxrom_device
+{
+public:
+	// construction/destruction
+	nes_srpg5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_prg() override { nes_sxrom_device::set_prg((m_outer & 0x07) << 4, 0x0f); }
+	virtual void set_chr() override { nes_sxrom_device::set_chr(0x00, 0x01); }
+
+private:
+	u8 m_outer, m_outer_count, m_outer_latch;
+};
+
+
 // ======================> nes_txc_22110_device
 
 class nes_txc_22110_device : public nes_sxrom_device
@@ -127,6 +153,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_JY820845C, nes_bmc_jy820845c_device)
 DECLARE_DEVICE_TYPE(NES_FARID_SLROM,   nes_farid_slrom_device)
 DECLARE_DEVICE_TYPE(NES_NINJARYU,      nes_ninjaryu_device)
 DECLARE_DEVICE_TYPE(NES_RESETSXROM,    nes_resetsxrom_device)
+DECLARE_DEVICE_TYPE(NES_SRPG_5IN1,     nes_srpg5in1_device)
 DECLARE_DEVICE_TYPE(NES_TXC_22110,     nes_txc_22110_device)
 
 #endif // MAME_BUS_NES_MMC1_CLONES_H

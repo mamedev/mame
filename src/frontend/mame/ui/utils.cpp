@@ -2042,14 +2042,20 @@ ui_software_info::ui_software_info(
 	, alttitles()
 	, available(false)
 {
+	// show the list/item here
+	infotext.append(longname);
+	infotext.append("\t\n\n");
+	infotext.append(_("swlist-info", "Software list/item"));
+	infotext.append(1, '\n');
+	infotext.append(listname);
+	infotext.append(1, ':');
+	infotext.append(shortname);
+
 	info.reserve(sw.info().size());
-	bool firstinfo(true);
 	for (software_info_item const &feature : sw.info())
 	{
-		// add info for the internal UI, localising recognised
-		if (!firstinfo)
-			infotext.append(2, '\n');
-		firstinfo = false;
+		// add info for the internal UI, localising recognised keys
+		infotext.append(2, '\n');
 		auto const found = std::lower_bound(
 				std::begin(ui::SOFTWARE_INFO_NAMES),
 				std::end(ui::SOFTWARE_INFO_NAMES),

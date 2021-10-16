@@ -40,7 +40,6 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_AX5705,         nes_ax5705_device,    "nes_ax5705",    "NES Cart AX5705 PCB")
 DEFINE_DEVICE_TYPE(NES_SC127,          nes_sc127_device,     "nes_sc127",     "NES Cart SC-127 PCB")
 DEFINE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device,     "nes_mbaby",     "NES Cart Mario Baby Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_ASN,            nes_asn_device,       "nes_asn",       "NES Cart Ai Senshi Nicol Bootleg PCB")
@@ -70,15 +69,9 @@ DEFINE_DEVICE_TYPE(NES_LH53,           nes_lh53_device,      "nes_lh53",      "N
 DEFINE_DEVICE_TYPE(NES_2708,           nes_2708_device,      "nes_2708",      "NES Cart BTL-2708 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_AC08,           nes_ac08_device,      "nes_ac08",      "NES Cart AC08 Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device,    "nes_mmalee",    "NES Cart Super Mario Bros. Malee 2 Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_SHUIGUAN,       nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
 DEFINE_DEVICE_TYPE(NES_RT01,           nes_rt01_device,      "nes_rt01",      "NES Cart RT-01 PCB")
 DEFINE_DEVICE_TYPE(NES_YUNG08,         nes_yung08_device,    "nes_yung08",    "NES Cart Super Mario Bros. 2 YUNG-08 PCB")
 
-
-nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_AX5705, tag, owner, clock)
-{
-}
 
 nes_sc127_device::nes_sc127_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_SC127, tag, owner, clock), m_irq_count(0), m_irq_enable(0)
@@ -235,11 +228,6 @@ nes_mmalee_device::nes_mmalee_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_SHUIGUAN, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
-{
-}
-
 nes_rt01_device::nes_rt01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_RT01, tag, owner, clock)
 {
@@ -252,28 +240,6 @@ nes_yung08_device::nes_yung08_device(const machine_config &mconfig, const char *
 
 
 
-
-void nes_ax5705_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_mmc_prg_bank));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_ax5705_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
-
-	m_mmc_prg_bank[0] = 0;
-	m_mmc_prg_bank[1] = 1;
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-	prg8_cd(0xfe);
-	prg8_ef(0xff);
-
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-}
 
 void nes_sc127_device::device_start()
 {
@@ -704,29 +670,6 @@ void nes_mmalee_device::pcb_reset()
 	prg32(0);
 }
 
-void nes_shuiguan_device::device_start()
-{
-	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
-	// always running and checking for IRQ every 114 cycles? or resetting every frame?
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(114));
-
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_shuiguan_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32((m_prg_chunks << 1) - 1);
-	chr8(0, m_chr_source);
-
-	m_irq_enable = 0;
-	m_irq_count = 0;
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-}
-
 void nes_rt01_device::device_start()
 {
 	common_start();
@@ -768,79 +711,6 @@ void nes_yung08_device::pcb_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- Board UNL-AX5705
-
- Games: Super Mario Bros. Pocker Mali (Crayon Shin-chan pirate hack)
-
- NES 2.0: mapper 530
-
- In MAME: Supported.
-
- -------------------------------------------------*/
-
-void nes_ax5705_device::set_prg()
-{
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-}
-
-void nes_ax5705_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t bank;
-	LOG_MMC(("ax5705 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x700f)
-	{
-		case 0x0000:
-			m_mmc_prg_bank[0] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
-			set_prg();
-			break;
-		case 0x0008:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-		case 0x2000:
-			m_mmc_prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
-			set_prg();
-			break;
-			/* CHR banks 0, 1, 4, 5 */
-		case 0x2008:
-		case 0x200a:
-		case 0x4008:
-		case 0x400a:
-			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x2009:
-		case 0x200b:
-		case 0x4009:
-		case 0x400b:
-			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-			/* CHR banks 2, 3, 6, 7 */
-		case 0x4000:
-		case 0x4002:
-		case 0x6000:
-		case 0x6002:
-			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x4001:
-		case 0x4003:
-		case 0x6001:
-		case 0x6003:
-			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-	}
-}
 
 /*-------------------------------------------------
 
@@ -2216,90 +2086,6 @@ void nes_mmalee_device::write_m(offs_t offset, uint8_t data)
 
 	if (!m_prgram.empty() && offset >= 0x1000 && offset < 0x1800)    // WRAM only in these 2K
 		m_prgram[offset & 0x7ff] = data;
-}
-
-/*-------------------------------------------------
-
- BTL-SHUIGUANPIPE
-
- Games: Shui Guan Pipe (Gimmick Pirate)
-
- iNES: mapper 183
-
- In MAME: Supported, but there are glitches (PPU or IRQ?)
-
- -------------------------------------------------*/
-
-// timer always running and checking IRQ every 114 CPU cycles?
-void nes_shuiguan_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_IRQ)
-	{
-		m_irq_count++;
-		m_irq_count &= 0xff;
-
-		if (m_irq_enable && !m_irq_count)
-			hold_irq_line();
-	}
-}
-
-void nes_shuiguan_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank;
-	LOG_MMC(("shuiguan write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x7000)
-	{
-		case 0x0000:
-			if (offset & 0x800 && !(offset & 0x0c)) // 0x8800-0x8803 + N*0x10
-				prg8_89(data);
-			break;
-		case 0x1000:
-			if (offset & 0x800 && !(offset & 0x0c)) // 0x9800-0x9803 + N*0x10
-			{
-				switch (data & 0x03)
-				{
-					case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
-					case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-					case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
-					case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-				}
-			}
-			break;
-		case 0x2000:
-			if (!(offset & 0x800) && !(offset & 0x0c))  // 0xa000-0xa003 + N*0x10
-				prg8_cd(data);
-			if (offset & 0x800 && !(offset & 0x0c)) // 0xa800-0xa803 + N*0x10
-				prg8_ab(data);
-			break;
-		case 0x3000:
-		case 0x4000:
-		case 0x5000:
-		case 0x6000:
-			bank = (((offset + 0x1000) >> 11) | (offset >> 3)) & 0x07;
-			if (offset & 4)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-		case 0x7000:
-			switch (offset & 0x0c)
-			{
-				case 0x00: m_irq_count = (m_irq_count & 0xf0) | ((data & 0x0f) << 0); break;
-				case 0x04: m_irq_count = (m_irq_count & 0x0f) | ((data & 0x0f) << 4); break;
-				case 0x08: m_irq_enable = data; break;
-				case 0x0c: break;
-			}
-			break;
-	}
-}
-
-uint8_t nes_shuiguan_device::read_m(offs_t offset)
-{
-	// always first bank??
-	LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
-	return m_prg[offset & 0x1fff];
 }
 
 /*-------------------------------------------------

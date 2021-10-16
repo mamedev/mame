@@ -37,7 +37,6 @@ simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_co
 	: menu(mui, container)
 	, m_error(false), m_rerandomize(false)
 	, m_search()
-	, m_skip_main_items(0)
 	, m_driverlist(driver_list::total() + 1)
 	, m_drivlist()
 	, m_cached_driver(nullptr)
@@ -45,6 +44,7 @@ simple_menu_select_game::simple_menu_select_game(mame_ui_manager &mui, render_co
 	, m_cached_unemulated(device_t::feature::NONE), m_cached_imperfect(device_t::feature::NONE)
 	, m_cached_color(ui().colors().background_color())
 {
+	set_needs_prev_menu_item(false);
 	build_driver_list();
 	if (gamename)
 		m_search.assign(gamename);
@@ -116,7 +116,7 @@ void simple_menu_select_game::handle()
 
 	// process the menu
 	const event *menu_event = process(0);
-	if (menu_event && menu_event->itemref)
+	if (menu_event)
 	{
 		if (m_error)
 		{
@@ -162,17 +162,18 @@ void simple_menu_select_game::inkey_select(const event *menu_event)
 {
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
-	// special case for configure inputs
-	if ((uintptr_t)driver == 1)
+	if ((uintptr_t)driver == 1) // special case for configure inputs
 	{
 		menu::stack_push<menu_simple_game_options>(
 				ui(),
 				container(),
 				[this] () { reset(reset_options::SELECT_FIRST); });
 	}
-
-	// anything else is a driver
-	else
+	else if (!driver) // special case for previous menu
+	{
+		stack_pop();
+	}
+	else // anything else is a driver
 	{
 		// audit the game first to see if we're going to work
 		driver_enumerator enumerator(machine().options(), *driver);
@@ -267,7 +268,11 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 		if (curmatch != -1)
 		{
 			int cloneof = m_drivlist->non_bios_clone(curmatch);
-			item_append(m_drivlist->driver(curmatch).name, m_drivlist->driver(curmatch).type.fullname(), (cloneof == -1) ? 0 : FLAG_INVERT, (void *)&m_drivlist->driver(curmatch));
+			item_append(
+					m_drivlist->driver(curmatch).type.fullname(),
+					m_drivlist->driver(curmatch).name,
+					(cloneof == -1) ? 0 : FLAG_INVERT,
+					(void *)&m_drivlist->driver(curmatch));
 		}
 	}
 
@@ -276,7 +281,12 @@ void simple_menu_select_game::populate(float &customtop, float &custombottom)
 	{
 		item_append(menu_item_type::SEPARATOR);
 		item_append(_("Configure Options"), 0, (void *)1);
-		m_skip_main_items = 1;
+		item_append(_("Exit"), 0, nullptr);
+	}
+	else
+	{
+		item_append(menu_item_type::SEPARATOR);
+		item_append(_("Return to Previous Menu"), 0, nullptr);
 	}
 
 	// configure the custom rendering
@@ -308,7 +318,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// determine the text to render below
-	driver = ((uintptr_t)selectedref > m_skip_main_items) ? (const game_driver *)selectedref : nullptr;
+	driver = ((uintptr_t)selectedref > 1) ? (const game_driver *)selectedref : nullptr;
 	if (driver)
 	{
 		// first line is game name

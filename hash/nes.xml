@@ -30293,12 +30293,13 @@ license:CC0
 	</software>
 
 	<software name="rafworld" cloneof="silius">
-		<description>RAF World (Jpn)</description>
+		<description>Rough World (Japan)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="TEC-RF"/>
 		<info name="release" value="19900810"/>
-		<info name="alt_title" value="ラフ"/>
+		<info name="alt_title" value="[rʌf] World"/>
+		<info name="alt_title" value="ラフWorld"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
@@ -56397,15 +56398,14 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="fjsanguo" supported="no">
-		<description>Fu Jia San Guo (Chi)</description>
+	<software name="fjsanguo" supported="partial">
+		<description>Fùjiǎ Sānguó (China)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1091"/>
 		<info name="alt_title" value="富甲三国"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" />  <!-- header says mapper 162! -->
+			<feature name="slot" value="hengg_xhzs" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[es-1091] fu jia san guo (c).prg" size="1048576" crc="913b95f7" sha1="5b1c9800bb1096911dcbefb595656509394c8fe9" offset="00000" status="baddump" />
 			</dataarea>
@@ -62746,6 +62746,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="batmandy" cloneof="batman">
+		<description>Batman - The Video Game (Brazil, pirate)</description>
+		<year>1992?</year>
+		<publisher>Dynacon</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="th21311" />
+			<feature name="pcb_model" value="TH2131-1" />
+			<dataarea name="prg" size="131072">
+				<rom name="nd940-p" size="131072" crc="c3a5e31e" sha1="1093ac63afb276c03315f34f8f35176085d03083" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nd941-c" size="131072" crc="f3b41c18" sha1="04c7ccb51c0a2b211c84289650ebba448d6f5413" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>
@@ -63592,6 +63608,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="fudomyodh" cloneof="demnswrd">
+		<description>Fudou Myouou Den (pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="不動明王伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ax40g" />
+			<dataarea name="prg" size="262144">
+				<rom name="ying zi chuan shuo 2 - fudou myouou den (j)[p1].prg" size="262144" crc="c23539a5" sha1="edb9c2125bf0ba9c3d39a72f1af5343a18f7d06c" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ying zi chuan shuo 2 - fudou myouou den (j)[p1].chr" size="131072" crc="aaa9acdd" sha1="4d39604b139e5802f541ee3c0033bd326195731e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gameinpp" supported="no">
 		<description>Gameinis  - PingPong (Asia)</description>
 		<year>19??</year>
@@ -64040,13 +64072,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="lweaponc" supported="no">
-		<description>Lethal Weapon (Chi)</description>
-		<year>19??</year>
+<!-- Zapper hit detection is erratic, but this is playable with regular joypad -->
+	<software name="lweaponc" supported="partial">
+		<description>Lethal Weapon (China)</description>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="tf1201" />
 			<feature name="pcb" value="UNL-TF1201" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="131072">
 				<rom name="lethal weapon (ch) [u].chr" size="131072" crc="b779fa62" sha1="ede029c2fbbd66cec7b3af84099f3cee377ec85f" offset="00000" status="baddump" />
 			</dataarea>
@@ -74258,8 +74292,8 @@ Other
 		</part>
 	</software>
 
-	<software name="lordkinga" cloneof="astyanax" supported="no">
-		<description>The Lord of King (Asia, Pirate)</description>
+	<software name="lordkinga" cloneof="astyanax">
+		<description>The Lord of King (Asia, pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -74880,10 +74914,11 @@ Other
 		</part>
 	</software>
 
-	<software name="suikanp" cloneof="gimmick" supported="no">
-		<description>Shui Guan Pipe (Gimmick pirate, Asia)</description>
+	<software name="suikanp" cloneof="gimmick">
+		<description>Gimmick! (Asia, pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="水管 Pipe V"/> <!-- cartridge label -->
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sgpipe" />
 			<feature name="pcb" value="BTL-SHUIGUANPIPE" />
@@ -76707,7 +76742,7 @@ be better to redump them properly. -->
 
 <!-- Pirate fighting games -->
 
-	<software name="cityfgt4" supported="no">
+	<software name="cityfgt4" supported="partial">
 		<description>City Fighter IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -77222,22 +77257,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="mortal kombat 4 (unl).prg" size="131072" crc="220e59e8" sha1="949ae51a54d028838793577bce6aa71b4d4629dd" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mk4p8" supported="no">
-		<description>Mortal Kombat 4 (Asia, 8 characters)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fk23c" />
-			<feature name="pcb" value="BMC-FK23C" />
-			<dataarea name="chr" size="524288">
-				<rom name="mortal kombat 4 (8p) [p1][u].chr" size="524288" crc="9f24edf3" sha1="f24200df66911c6abe81512e23361e8cbd98830f" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="524288">
-				<rom name="mortal kombat 4 (8p) [p1][u].prg" size="524288" crc="8c467dd2" sha1="e2f6f66e3855f09fcadb97d03dbd2f6be3480e48" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -78123,14 +78142,18 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="whero" supported="no">
+	<software name="whero">
 		<!-- China Forever - World Hero (Box?) -->
 		<description>World Hero (Asia)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="英雄传"/>
+		<info name="alt_title" value="Yīngxióng Zhuàn"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_whero" />
-			<feature name="pcb" value="UNL-WORLDHERO" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A1" />
+			<feature name="vrc4-pin4" value="PRG A0" />
 			<dataarea name="chr" size="524288">
 				<rom name="world hero (unl).chr" size="524288" crc="a7790fdd" sha1="7e8943ff4b1248e8e75f62c3b3f9585b0fd0fa21" offset="00000" status="baddump" />
 			</dataarea>
@@ -78140,13 +78163,18 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="wheroa" supported="no">
-		<description>World Hero (Asia, Alt)</description>
+<!-- This seems to be a later alteration of the parent that adds an initial NTSC/PAL select screen -->
+	<software name="wheroa" cloneof="whero">
+		<description>World Hero (Asia, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="英雄传"/>
+		<info name="alt_title" value="Yīngxióng Zhuàn"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_whero" />
-			<feature name="pcb" value="UNL-WORLDHERO" />
+			<feature name="slot" value="vrc4" />
+			<feature name="pcb" value="KONAMI-VRC-4" />
+			<feature name="vrc4-pin3" value="PRG A1" />
+			<feature name="vrc4-pin4" value="PRG A0" />
 			<dataarea name="chr" size="524288">
 				<rom name="world hero (unl)(tv system select).chr" size="524288" crc="a7790fdd" sha1="7e8943ff4b1248e8e75f62c3b3f9585b0fd0fa21" offset="00000" status="baddump" />
 			</dataarea>
@@ -78292,6 +78320,50 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="yuu yuu hakusho final - makai saikyou retsuden (english) (unl).prg" size="131072" crc="7709a696" sha1="463d17f20ba0a9320e14cbe0bf58e74929ac4f58" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Developer released digital downloads -->
+
+<!-- This was a promotional release to coincide with the third anniversary of the related 3DS game. -->
+	<software name="gottapro">
+		<description>Gotta Protectors - Amazon's Running Diet</description>
+		<year>2017</year>
+		<publisher>Ancient corp</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="262144">
+				<rom name="amazon_diet_EN.prg" size="262144" crc="9d374a54" sha1="fcfe44d43c609bef67ba893f7bdcbf228884d0b1" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="amazon_diet_EN.chr" size="262144" crc="11b171c6" sha1="eac3b8173fb7b1b4c7d01c17149e7396391f72b8" />
+			</dataarea>
+			<!-- Header had battery flag set, likely because old-style .nes files have no other way to indicate WRAM. Game only ever reads/writes 0x00 though. -->
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was a promotional release to coincide with the third anniversary of the related 3DS game. -->
+	<software name="mmknight" cloneof="gottapro">
+		<description>Minna de Mamotte Knight - Amazon no Diet Daisakusen</description>
+		<year>2017</year>
+		<publisher>Ancient corp</publisher>
+		<info name="alt_title" value="みんなでまもって騎士 アマゾンのダイエット大作戦"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="262144">
+				<rom name="amazon_diet_JP.prg" size="262144" crc="2851bcb6" sha1="b86a2ba58d0981f28a37a8f555911d842dfae50d" /> <!-- differs from parent set by only a single bit -->
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="amazon_diet_JP.chr" size="262144" crc="11b171c6" sha1="eac3b8173fb7b1b4c7d01c17149e7396391f72b8" />
+			</dataarea>
+			<!-- Header had battery flag set, likely because old-style .nes files have no other way to indicate WRAM. Game only ever reads/writes 0x00 though. -->
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -80972,6 +81044,25 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_5srpg">
+		<description>Super RPG 5 in 1 (CH501)</description>
+		<year>1996</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="srpg_5in1" />
+			<dataarea name="prg" size="2097152">
+				<rom name="super rpg 5 in 1 ch501.prg" size="2097152" crc="d65e0e3b" sha1="4d8502e6a55649f41d8b6f45e5c352d306dc1e8e" status="baddump" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge, only 8k used -->
+			<dataarea name="vram" size="32768">
+			</dataarea>
+			<!-- 64k WRAM on cartridge, battery backed up, 2x32k chips -->
+			<dataarea name="bwram" size="65536">
+				<rom value="0x00" size="65536" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_5tvg">
 		<description>TV Game 5 in 1</description>
 		<year>1989</year>
@@ -81386,6 +81477,22 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_7ew2">
+		<description>1994 New Series Red Pig 7 in 1 (EW-002)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830118c" />
+			<feature name="pcb" value="BMC-830118C" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 new series red pig 7-in-1 (ew-002).prg" size="524288" crc="31620c48" sha1="92b4fa687e69dcc2cd75e458ec38c5ed6ff623cf" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 new series red pig 7-in-1 (ew-002).chr" size="524288" crc="b6d9b8e7" sha1="28bde7b0ef3d7aeb8cb6f02dbdab89a7b8554a51" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_7k603">
 		<description>7 in 1 (K7603)</description>
 		<year>19??</year>
@@ -81402,7 +81509,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_7m22" supported="no">
+<!-- Guevara crashes after beating the first boss. Bad dump or bug on cartridge? -->
+	<software name="mc_7m22">
 		<description>7 in 1 (M-022)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -81414,6 +81522,38 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="7-in-1 (m-022) [p1][u].prg" size="524288" crc="b9e0e671" sha1="36eba88646c520fa0ff8f2cfd778f2e7b391e842" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7m26">
+		<description>1994 Super HiK 7 in 1 (M-026)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830118c" />
+			<feature name="pcb" value="BMC-830118C" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-026).prg" size="524288" crc="53588417" sha1="bb8354c11e7d3110bd95d1e149bb11c0f35ed455" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-026).chr" size="524288" crc="186291b1" sha1="26b70492774419f51d55c2d23cf9f84bc0fbf7b5" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_7m27">
+		<description>1994 Super HiK 7 in 1 (M-027)</description>
+		<year>1994</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830118c" />
+			<feature name="pcb" value="BMC-830118C" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-027).prg" size="524288" crc="8c1523d8" sha1="884b3b675612136fcc5e0fcff0274812d2015566" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 7-in-1 (m-027).chr" size="524288" crc="70f633d3" sha1="8ce05af67cd35062b2039c16f90b4f1e3cef8716" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

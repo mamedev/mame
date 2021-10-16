@@ -9,18 +9,22 @@
 *********************************************************************/
 
 #include "emu.h"
-
-#include "ui/ui.h"
 #include "ui/datmenu.h"
+
+#include "ui/systemlist.h"
+#include "ui/ui.h"
 #include "ui/utils.h"
 
+#include "luaengine.h"
 #include "mame.h"
+
+#include "drivenum.h"
 #include "rendfont.h"
 #include "softlist.h"
 #include "uiinput.h"
-#include "luaengine.h"
 
 #include <cmath>
+#include <string_view>
 
 
 namespace ui {
@@ -29,10 +33,10 @@ namespace ui {
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system)
 	: menu(mui, container)
 	, m_actual(0)
-	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
+	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(nullptr)
 	, m_issoft(false)
 
@@ -48,7 +52,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 		}
 	}
 	std::vector<std::string> lua_list;
-	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", driver ? driver->name : "", lua_list))
+	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", system ? system->driver->name : "", lua_list))
 	{
 		int count = 0;
 		for (std::string& item : lua_list)
@@ -65,10 +69,10 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const game_driver *driver)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system)
 	: menu(mui, container)
 	, m_actual(0)
-	, m_driver((driver == nullptr) ? &mui.machine().system() : driver)
+	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(swinfo)
 	, m_list(swinfo->listname)
 	, m_short(swinfo->shortname)
@@ -295,7 +299,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 {
 	float maxwidth = origx2 - origx1;
 	float width;
-	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->type.fullname();
+	std::string_view driver = m_issoft ? m_swinfo->longname : m_system->description;
 
 	float const lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	ui().draw_text_full(container(), driver, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
@@ -317,14 +321,23 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	x2 -= lr_border;
 	y1 += ui().box_tb_border();
 
-	ui().draw_text_full(container(), driver, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-		mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			driver,
+			x1, y1, x2 - x1,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 
 	maxwidth = 0;
-	for (auto & elem : m_items_list)
+	for (auto const &elem : m_items_list)
 	{
-		ui().draw_text_full(container(), elem.label, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
+		ui().draw_text_full(
+				container(),
+				elem.label,
+				0.0f, 0.0f, 1.0f,
+				ui::text_layout::CENTER, ui::text_layout::NEVER,
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+				&width, nullptr);
 		maxwidth += width;
 	}
 
@@ -344,18 +357,38 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 	// draw the text within it
 	int x = 0;
-	for (auto & elem : m_items_list)
+	for (auto const &elem : m_items_list)
 	{
 		x1 += space;
-		rgb_t fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : ui().colors().text_color();
-		rgb_t bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : ui().colors().text_bg_color();
-		ui().draw_text_full(container(), elem.label, x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NONE, fcolor, bcolor, &width, nullptr);
+		if (mouse_in_rect(x1 - (space / 2), y1, x1 + width + (space / 2), y2))
+			set_hover(HOVER_INFO_TEXT + 1 + x);
+
+		rgb_t const fcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0x00) : ui().colors().text_color();
+		rgb_t const bcolor = (m_actual == x) ? rgb_t(0xff, 0xff, 0xff, 0xff) : ui().colors().text_bg_color();
+		ui().draw_text_full(
+				container(),
+				elem.label,
+				x1, y1, 1.0f,
+				ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NONE, fcolor, bcolor,
+				&width, nullptr);
 
 		if (bcolor != ui().colors().text_bg_color())
-			ui().draw_textured_box(container(), x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
-				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+		{
+			ui().draw_textured_box(
+					container(),
+					x1 - (space / 2), y1, x1 + width + (space / 2), y2,
+					bcolor, rgb_t(255, 43, 43, 43),
+					hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+		}
 
-		ui().draw_text_full(container(), elem.label, x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fcolor, bcolor, &width, nullptr);
+		ui().draw_text_full(
+				container(),
+				elem.label,
+				x1, y1, 1.0f,
+				ui::text_layout::LEFT, ui::text_layout::NEVER,
+				mame_ui_manager::NORMAL, fcolor, bcolor,
+				&width, nullptr);
 		x1 += width + space;
 		++x;
 	}
@@ -382,8 +415,33 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	y1 += ui().box_tb_border();
 
 	// draw the text within it
-	ui().draw_text_full(container(), revision, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			revision,
+			x1, y1, x2 - x1,
+			ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
+}
+
+//-------------------------------------------------
+//  load data from DATs
+//-------------------------------------------------
+
+bool menu_dats_view::custom_mouse_down()
+{
+	if ((hover() > HOVER_INFO_TEXT) && ((hover() - HOVER_INFO_TEXT) <= m_items_list.size()))
+	{
+		if ((hover() - HOVER_INFO_TEXT - 1) != m_actual)
+		{
+			m_actual = hover() - HOVER_INFO_TEXT - 1;
+			reset(reset_options::SELECT_FIRST);
+		}
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 //-------------------------------------------------

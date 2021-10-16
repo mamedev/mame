@@ -3,126 +3,172 @@
 Watchpoint Debugger Commands
 ============================
 
+:ref:`debugger-command-wpset`
+    sets memory access watchpoints
+:ref:`debugger-command-wpclear`
+    clears watchpoints
+:ref:`debugger-command-wpdisable`
+    disables watchpoints
+:ref:`debugger-command-wpenable`
+    enables enables watchpoints
+:ref:`debugger-command-wplist`
+    lists watchpoints
 
-You can also type **help <command>** for further details on each command in the MAME Debugger interface.
-
-| :ref:`debugger-command-wpset` -- sets program, data, or I/O space watchpoint
-| :ref:`debugger-command-wpclear` -- clears a given watchpoint or all if no <wpnum> specified
-| :ref:`debugger-command-wpdisable` -- disables a given watchpoint or all if no <wpnum> specified
-| :ref:`debugger-command-wpenable` -- enables a given watchpoint or all if no <wpnum> specified
-| :ref:`debugger-command-wplist` -- lists all the watchpoints
-
- .. _debugger-command-wpset:
+.. _debugger-command-wpset:
 
 wpset
 -----
 
-|  **wp[{d|i}][set] <address>,<length>,<type>[,<condition>[,<action>]]**
-|
-| Sets a new watchpoint starting at the specified <address> and extending for <length>. The inclusive range of the watchpoint is <address> through <address> + <length> - 1.
-| The 'wpset' command sets a watchpoint on program memory; the 'wpdset' command sets a watchpoint on data memory; and the 'wpiset' sets a watchpoint on I/O memory.
-| The <type> parameter specifies which sort of accesses to trap on. It can be one of three values: 'r' for a read watchpoint 'w' for a write watchpoint, and 'rw' for a read/write watchpoint.
-|
-| The optional <condition> parameter lets you specify an expression that will be evaluated each time the watchpoint is hit. If the result of the expression is true (non-zero), the watchpoint will actually halt execution; otherwise, execution will continue with no notification.
-| The optional <action> parameter provides a command that is executed whenever the watchpoint is hit and the <condition> is true. Note that you may need to embed the action within braces { } in order to prevent commas and semicolons from being interpreted as applying to the wpset command itself.
-| Each watchpoint that is set is assigned an index which can be used in other watchpoint commands to reference this watchpoint.
-| In order to help <condition> expressions, two variables are available. The variable 'wpaddr' is set to the address that actually triggered the watchpoint, the variable 'wpdata' is set to the data that is being read or written, and the variable 'wpsize' is set to the size of the data in bytes.
-|
-| Examples:
-|
-|  wp 1234,6,rw
-|
-| Set a watchpoint that will halt execution whenever a read or write occurs in the address range 1234-1239 inclusive.
-|
-|  wp 23456,a,w,wpdata == 1
-|
-| Set a watchpoint that will halt execution whenever a write occurs in the address range 23456-2345f AND the data written is equal to 1.
-|
-|  wp 3456,20,r,1,{printf "Read @ %08X\\n",wpaddr; g}
-|
-| Set a watchpoint that will halt execution whenever a read occurs in the address range 3456-3475. When this happens, print Read @ <wpaddr> and continue executing.
-|
-|  temp0 = 0; wp 45678,1,w,wpdata==f0,{temp0++; g}
-|
-| Set a watchpoint that will halt execution whenever a write occurs to the address 45678 AND the value being written is equal to f0. When that happens, increment the variable temp0 and resume execution.
-|
-| Back to :ref:`debugger-watchpoints-list`
+**wp[{d|i|o}][set] <address>[:<space>],<length>,<type>[,<condition>[,<action>]]**
+
+Sets a new watchpoint starting at the specified **<address>** and
+extending for **<length>**.  The range of the watchpoint is
+**<address>** through **<address>+<length>-1**, inclusive.  The
+**<address>** may optionally be followed by a CPU and/or address space
+(see :ref:`debugger-devicespec` for details).  If an address space is
+not specified, the command suffix sets the address space: ``wpset``
+defaults to the first address space exposed by the CPU, ``wpdset``
+defaults to the space with index 1 (data), ``wpiset`` defaults to the
+space with index 2 (I/O), and ``wposet`` defaults to the space with
+index 3 (opcodes).  The **<type>** parameter specifies the access types
+to trap on – it can be one of three values: ``r`` for read accesses,
+``w`` for write accesses, or ``rw`` for both read and write accesses.
+
+The optional **<condition>** parameter lets you specify an expression
+that will be evaluated each time the watchpoint is triggered.  If the
+result of the expression is true (non-zero), the watchpoint will halt
+execution; otherwise, execution will continue with no notification.  The
+optional **<action>** parameter provides a command to be executed
+whenever the watchpoint is triggered and the **<condition>** is true.
+Note that you may need to surround the action with braces ``{ }`` to
+ensure commas and semicolons within the command are not interpreted in
+the context of the ``wpset`` command itself.
+
+Each watchpoint that is set is assigned a numeric index which can be
+used to refer to it in other watchpoint commands.  Watchpoint indices
+are unique throughout a session.
+
+To make **<condition>** expressions more useful, two variables are
+available: for all watchpoints, the variable **wpaddr** is set to the
+access address that triggered the watchpoint; for write watchpoints, the
+variable **wpdata** is set to the data being written.
+
+Examples:
+
+``wp 1234,6,rw``
+    Set a watchpoint for the visible CPU that will halt execution
+    whenever a read or write to the first address space occurs in the
+    address range 1234-1239, inclusive.
+``wp 23456:data,a,w,wpdata == 1``
+    Set a watchpoint for the visible CPU that will halt execution
+    whenever a write to the ``data`` space occurs in the address range
+    23456-2345f and the data written is equal to 1.
+``wp 3456:maincpu,20,r,1,{ printf "Read @ %08X\n",wpaddr ; g }``
+    Set a watchpoint for the CPU with the absolute tag path ``:maincpu``
+    that will halt execution whenever a read from the first address
+    space occurs in the address range 3456-3475.  When this happens,
+    print **Read @ <wpaddr>** to the debugger console and resume
+    execution.
+``temp0 = 0 ; wp 45678,1,w,wpdata==f0,{ temp0++ ; g }``
+    Set a watchpoint for the visible CPU that will halt execution
+    whenever a write do the first address space occurs at address 45678
+    where the value being written is equal to f0.  When this happens,
+    increment the variable **temp0** and resume execution.
+
+Back to :ref:`debugger-watchpoints-list`
 
 
- .. _debugger-command-wpclear:
+.. _debugger-command-wpclear:
 
 wpclear
 -------
 
-|  **wpclear [<wpnum>]**
-|
-| The wpclear command clears a watchpoint. If <wpnum> is specified, only the requested watchpoint is cleared, otherwise all watchpoints are cleared.
-|
-| Examples:
-|
-|  wpclear 3
-|
-| Clear watchpoint index 3.
-|
-|  wpclear
-|
-| Clear all watchpoints.
-|
-| Back to :ref:`debugger-watchpoints-list`
+**wpclear [<wpnum>]**
+
+Clear watchpoints.  If **<wpnum>** is specified, the watchpoint it
+refers to will be cleared.  If **<wpnum>** is not specified, all
+watchpoints will be cleared.
+
+Examples:
+
+``wpclear 3``
+    Clear the watchpoint with index 3.
+``wpclear``
+    Clear all watchpoints.
+
+Back to :ref:`debugger-watchpoints-list`
 
 
- .. _debugger-command-wpdisable:
+.. _debugger-command-wpdisable:
 
 wpdisable
 ---------
 
-|  **wpdisable [<wpnum>]**
-|
-| The wpdisable command disables a watchpoint. If <wpnum> is specified, only the requested watchpoint is disabled, otherwise all watchpoints are disabled. Note that disabling a watchpoint does not delete it, it just temporarily marks the watchpoint as inactive.
-|
-| Examples:
-|
-|  wpdisable 3
-|
-| Disable watchpoint index 3.
-|
-|  wpdisable
-|
-| Disable all watchpoints.
-|
-| Back to :ref:`debugger-watchpoints-list`
+**wpdisable [<wpnum>]**
+
+Disable watchpoints.  If **<wpnum>** is specified, the watchpoint it
+refers to will be disabled.  If **<wpnum>** is not specified, all
+watchpoints will be disabled.
+
+Note that disabling a watchpoint does not delete it, it just temporarily
+marks the watchpoint as inactive.  Disabled watchpoints will not cause
+execution to halt, their associated condition expressions will not be
+evaluated, and their associated commands will not be executed.
+
+Examples:
+
+``wpdisable 3``
+    Disable the watchpoint with index 3.
+``wpdisable``
+    Disable all watchpoints.
+
+Back to :ref:`debugger-watchpoints-list`
 
 
- .. _debugger-command-wpenable:
+.. _debugger-command-wpenable:
 
 wpenable
 --------
 
-|  **wpenable [<wpnum>]**
-|
-| The wpenable command enables a watchpoint. If <wpnum> is specified, only the requested watchpoint is enabled, otherwise all watchpoints are enabled.
-|
-| Examples:
-|
-|  wpenable 3
-|
-| Enable watchpoint index 3.
-|
-|  wpenable
-|
-| Enable all watchpoints.
-|
-| Back to :ref:`debugger-watchpoints-list`
+**wpenable [<wpnum>]**
+
+Enable watchpoints.  If **<wpnum>** is specified, the watchpoint it
+refers to will be enabled.  If **<wpnum>** is not specified, all
+watchpoints will be enabled.
+
+Examples:
+
+``wpenable 3``
+    Enable the watchpoint with index 3.
+``wpenable``
+    Enable all watchpoints.
+
+Back to :ref:`debugger-watchpoints-list`
 
 
- .. _debugger-command-wplist:
+.. _debugger-command-wplist:
 
 wplist
 ------
 
-|  **wplist**
-|
-| The wplist command lists all the current watchpoints, along with their index and any conditions or actions attached to them.
-|
-| Back to :ref:`debugger-watchpoints-list`
+**wplist [<CPU>]**
+
+List current watchpoints, along with their indices and any associated
+conditions or actions.  If no **<CPU>** is specified, watchpoints for
+all CPUs in the system will be listed; if a **<CPU>** is specified, only
+watchpoints for that CPU will be listed.  The **<CPU>** can be specified
+by tag or by debugger CPU number (see :ref:`debugger-devicespec` for
+details).
+
+Examples:
+
+``wplist``
+    List all watchpoints.
+``wplist .``
+    List all watchpoints for the visible CPU.
+``wplist maincpu``
+    List all watchpoints for the CPU with the absolute tag path
+    ``:maincpu``.
+
+Back to :ref:`debugger-watchpoints-list`
 

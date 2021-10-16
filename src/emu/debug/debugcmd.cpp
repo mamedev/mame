@@ -9,21 +9,26 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
-#include "debugger.h"
 #include "debugcmd.h"
+
+#include "debugbuf.h"
 #include "debugcon.h"
 #include "debugcpu.h"
-#include "debugbuf.h"
-#include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"
+#include "express.h"
 #include "points.h"
+
+#include "debugger.h"
+#include "emuopts.h"
 #include "natkeyboard.h"
 #include "render.h"
+#include "softlist.h"
+
 #include "corestr.h"
-#include <cctype>
+
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 
 
@@ -248,7 +253,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("bpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpclear, this, _1));
 	m_console.register_command("bpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, false, _1));
 	m_console.register_command("bpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, true, _1));
-	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_bplist, this, _1));
+	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bplist, this, _1));
 
 	m_console.register_command("wpset",     CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
 	m_console.register_command("wp",        CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
@@ -261,7 +266,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1));
 	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, false, _1));
 	m_console.register_command("wpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, true, _1));
-	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_wplist, this, _1));
+	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wplist, this, _1));
 
 	m_console.register_command("rpset",     CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
 	m_console.register_command("rp",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
@@ -333,8 +338,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1));
 
-	m_console.register_command("trace",     CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1));
-	m_console.register_command("traceover", CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_traceover, this, _1));
+	m_console.register_command("trace",     CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, false));
+	m_console.register_command("traceover", CMDFLAG_NONE, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, true));
 	m_console.register_command("traceflush",CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_traceflush, this, _1));
 
 	m_console.register_command("history",   CMDFLAG_NONE, 0, 2, std::bind(&debugger_commands::execute_history, this, _1));
@@ -1812,29 +1817,45 @@ void debugger_commands::execute_bplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
-
-	/* loop over all CPUs */
-	for (device_t &device : device_enumerator(m_machine.root_device()))
-		if (!device.debug()->breakpoint_list().empty())
-		{
-			m_console.printf("Device '%s' breakpoints:\n", device.tag());
-
-			/* loop over the breakpoints */
-			for (const auto &bpp : device.debug()->breakpoint_list())
+	auto const apply =
+			[this, &printed, &buffer] (device_t &device)
 			{
-				debug_breakpoint &bp = *bpp.second;
-				buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
-				if (std::string(bp.condition()).compare("1") != 0)
-					buffer.append(string_format(" if %s", bp.condition()));
-				if (std::string(bp.action()).compare("") != 0)
-					buffer.append(string_format(" do %s", bp.action()));
-				m_console.printf("%s\n", buffer);
-				printed++;
-			}
-		}
+				if (!device.debug()->breakpoint_list().empty())
+				{
+					m_console.printf("Device '%s' breakpoints:\n", device.tag());
 
-	if (printed == 0)
-		m_console.printf("No breakpoints currently installed\n");
+					// loop over the breakpoints
+					for (const auto &bpp : device.debug()->breakpoint_list())
+					{
+						debug_breakpoint &bp = *bpp.second;
+						buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+						if (std::string(bp.condition()).compare("1") != 0)
+							buffer.append(string_format(" if %s", bp.condition()));
+						if (std::string(bp.action()).compare("") != 0)
+							buffer.append(string_format(" do %s", bp.action()));
+						m_console.printf("%s\n", buffer);
+						printed++;
+					}
+				}
+			};
+
+	if (!params.empty())
+	{
+		device_t *cpu;
+		if (!validate_cpu_parameter(params[0], cpu))
+			return;
+		apply(*cpu);
+		if (!printed)
+			m_console.printf("No breakpoints currently installed for CPU %s\n", cpu->tag());
+	}
+	else
+	{
+		// loop over all CPUs
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			apply(device);
+		if (!printed)
+			m_console.printf("No breakpoints currently installed\n");
+	}
 }
 
 
@@ -1973,35 +1994,57 @@ void debugger_commands::execute_wplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
-
-	/* loop over all CPUs */
-	for (device_t &device : device_enumerator(m_machine.root_device()))
-		for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
-			if (!device.debug()->watchpoint_vector(spacenum).empty())
+	auto const apply =
+			[this, &printed, &buffer] (device_t &device)
 			{
-				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
-
-				m_console.printf("Device '%s' %s space watchpoints:\n", device.tag(),
-								 device.debug()->watchpoint_vector(spacenum).front()->space().name());
-
-				/* loop over the watchpoints */
-				for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
+				for (int spacenum = 0; spacenum < device.debug()->watchpoint_space_count(); ++spacenum)
 				{
-					buffer = string_format("%c%4X @ %0*X-%0*X %s", wp->enabled() ? ' ' : 'D', wp->index(),
-							wp->space().addrchars(), wp->address(),
-							wp->space().addrchars(), wp->address() + wp->length() - 1,
-							types[int(wp->type())]);
-					if (std::string(wp->condition()).compare("1") != 0)
-						buffer.append(string_format(" if %s", wp->condition()));
-					if (std::string(wp->action()).compare("") != 0)
-						buffer.append(string_format(" do %s", wp->action()));
-					m_console.printf("%s\n", buffer);
-					printed++;
-				}
-			}
+					if (!device.debug()->watchpoint_vector(spacenum).empty())
+					{
+						static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
 
-	if (printed == 0)
-		m_console.printf("No watchpoints currently installed\n");
+						m_console.printf(
+								"Device '%s' %s space watchpoints:\n",
+								device.tag(),
+								device.debug()->watchpoint_vector(spacenum).front()->space().name());
+
+						// loop over the watchpoints
+						for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
+						{
+							buffer = string_format(
+									"%c%4X @ %0*X-%0*X %s",
+									wp->enabled() ? ' ' : 'D', wp->index(),
+									wp->space().addrchars(), wp->address(),
+									wp->space().addrchars(), wp->address() + wp->length() - 1,
+									types[int(wp->type())]);
+							if (std::string(wp->condition()).compare("1") != 0)
+								buffer.append(string_format(" if %s", wp->condition()));
+							if (std::string(wp->action()).compare("") != 0)
+								buffer.append(string_format(" do %s", wp->action()));
+							m_console.printf("%s\n", buffer);
+							printed++;
+						}
+					}
+				}
+			};
+
+	if (!params.empty())
+	{
+		device_t *cpu;
+		if (!validate_cpu_parameter(params[0], cpu))
+			return;
+		apply(*cpu);
+		if (!printed)
+			m_console.printf("No watchpoints currently installed for CPU %s\n", cpu->tag());
+	}
+	else
+	{
+		// loop over all CPUs
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			apply(device);
+		if (!printed)
+			m_console.printf("No watchpoints currently installed\n");
+	}
 }
 
 
@@ -2353,6 +2396,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 	u64 i = 0;
 
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
+	auto dis = space->device().machine().disable_side_effects();
 	switch (space->addr_shift())
 	{
 	case -3:
@@ -3479,7 +3523,8 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 
 void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 {
-	u64 offset, length, bytes = 1;
+	u64 offset, length;
+	bool bytes = true;
 	address_space *space;
 
 	// validate parameters
@@ -3487,7 +3532,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 		return;
 	if (!validate_number_parameter(params[2], length))
 		return;
-	if (params.size() > 3 && !validate_number_parameter(params[3], bytes))
+	if (params.size() > 3 && !validate_boolean_parameter(params[3], bytes))
 		return;
 	if (!validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), AS_PROGRAM, space))
 		return;
@@ -3523,11 +3568,11 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 		topcodes.emplace_back(buffer.data_to_string(offset, size, true));
 
 		int osize = topcodes.back().size();
-		if(osize > max_opcodes_size)
+		if (osize > max_opcodes_size)
 			max_opcodes_size = osize;
 
 		int dsize = instructions.back().size();
-		if(dsize > max_disasm_size)
+		if (dsize > max_disasm_size)
 			max_disasm_size = dsize;
 
 		i += size;
@@ -3544,7 +3589,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 
 	if (bytes)
 	{
-		for(unsigned int i=0; i != pcs.size(); i++)
+		for (unsigned int i=0; i != pcs.size(); i++)
 		{
 			const char *comment = space->device().debug()->comment_text(pcs[i]);
 			if (comment)
@@ -3555,7 +3600,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 	}
 	else
 	{
-		for(unsigned int i=0; i != pcs.size(); i++)
+		for (unsigned int i=0; i != pcs.size(); i++)
 		{
 			const char *comment = space->device().debug()->comment_text(pcs[i]);
 			if (comment)
@@ -3570,11 +3615,11 @@ void debugger_commands::execute_dasm(const std::vector<std::string> &params)
 
 
 /*-------------------------------------------------
-    execute_trace_internal - functionality for
+    execute_trace - functionality for
     trace over and trace info
 -------------------------------------------------*/
 
-void debugger_commands::execute_trace_internal(const std::vector<std::string> &params, bool trace_over)
+void debugger_commands::execute_trace(const std::vector<std::string> &params, bool trace_over)
 {
 	const char *action = nullptr;
 	bool detect_loops = true;
@@ -3642,26 +3687,6 @@ void debugger_commands::execute_trace_internal(const std::vector<std::string> &p
 
 
 /*-------------------------------------------------
-    execute_trace - execute the trace command
--------------------------------------------------*/
-
-void debugger_commands::execute_trace(const std::vector<std::string> &params)
-{
-	execute_trace_internal(params, false);
-}
-
-
-/*-------------------------------------------------
-    execute_traceover - execute the trace over command
--------------------------------------------------*/
-
-void debugger_commands::execute_traceover(const std::vector<std::string> &params)
-{
-	execute_trace_internal(params, true);
-}
-
-
-/*-------------------------------------------------
     execute_traceflush - execute the trace flush command
 -------------------------------------------------*/
 
@@ -3678,8 +3703,8 @@ void debugger_commands::execute_traceflush(const std::vector<std::string> &param
 void debugger_commands::execute_history(const std::vector<std::string> &params)
 {
 	// validate parameters
-	address_space *space;
-	if (!validate_device_space_parameter(!params.empty() ? params[0] : std::string_view(), AS_PROGRAM, space))
+	device_t *device;
+	if (!validate_cpu_parameter(!params.empty() ? params[0] : std::string_view(), device))
 		return;
 
 	u64 count = device_debug::HISTORY_SIZE;
@@ -3690,34 +3715,31 @@ void debugger_commands::execute_history(const std::vector<std::string> &params)
 	if (count > device_debug::HISTORY_SIZE)
 		count = device_debug::HISTORY_SIZE;
 
-	device_execute_interface const *execute;
-	if (!space->device().interface(execute))
+	device_debug *const debug = device->debug();
+
+	device_disasm_interface *dasmintf;
+	if (!device->interface(dasmintf))
 	{
-		m_console.printf("Device %s is not a CPU\n", space->device().name());
+		m_console.printf("No disassembler available for device %s\n", device->name());
 		return;
 	}
-	device_debug *const debug = space->device().debug();
 
 	// loop over lines
-	device_disasm_interface *dasmintf;
-	if (!space->device().interface(dasmintf))
+	debug_disasm_buffer buffer(*device);
+	std::string instruction;
+	for (int index = int(unsigned(count)); index > 0; index--)
 	{
-		m_console.printf("No disassembler available for device %s\n", space->device().name());
-		return;
-	}
+		auto const pc = debug->history_pc(1 - index);
+		if (pc.second)
+		{
+			offs_t next_offset;
+			offs_t size;
+			u32 info;
+			instruction.clear();
+			buffer.disassemble(pc.first, instruction, next_offset, size, info);
 
-	debug_disasm_buffer buffer(space->device());
-
-	for (int index = 0; index < (int) count; index++)
-	{
-		offs_t const pc = debug->history_pc(-index);
-		std::string instruction;
-		offs_t next_offset;
-		offs_t size;
-		u32 info;
-		buffer.disassemble(pc, instruction, next_offset, size, info);
-
-		m_console.printf("%s: %s\n", buffer.pc_to_string(pc), instruction);
+			m_console.printf("%s: %s\n", buffer.pc_to_string(pc.first), instruction);
+		}
 	}
 }
 
@@ -4105,9 +4127,26 @@ void debugger_commands::execute_images(const std::vector<std::string> &params)
 {
 	image_interface_enumerator iter(m_machine.root_device());
 	for (device_image_interface &img : iter)
-		m_console.printf("%s: %s\n", img.brief_instance_name(), img.exists() ? img.filename() : "[empty slot]");
-	if (iter.first() == nullptr)
-		m_console.printf("No image devices in this driver\n");
+	{
+		if (!img.exists())
+		{
+			m_console.printf("%s: [no media]\n", img.brief_instance_name());
+		}
+		else if (img.loaded_through_softlist())
+		{
+			m_console.printf("%s: %s:%s:%s\n",
+					img.brief_instance_name(),
+					img.software_list_name(),
+					img.software_entry()->shortname(),
+					img.part_entry()->name());
+		}
+		else
+		{
+			m_console.printf("%s: %s\n", img.brief_instance_name(), img.filename());
+		}
+	}
+	if (!iter.first())
+		m_console.printf("No image devices present\n");
 }
 
 /*-------------------------------------------------
@@ -4116,21 +4155,18 @@ void debugger_commands::execute_images(const std::vector<std::string> &params)
 
 void debugger_commands::execute_mount(const std::vector<std::string> &params)
 {
-	bool done = false;
 	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
 	{
-		if (img.brief_instance_name() == params[0])
+		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
 			if (img.load(params[1]) != image_init_result::PASS)
 				m_console.printf("Unable to mount file %s on %s\n", params[1], params[0]);
 			else
 				m_console.printf("File %s mounted on %s\n", params[1], params[0]);
-			done = true;
-			break;
+			return;
 		}
 	}
-	if (!done)
-		m_console.printf("There is no image device :%s\n", params[0]);
+	m_console.printf("No image instance %s\n", params[0]);
 }
 
 /*-------------------------------------------------
@@ -4139,19 +4175,23 @@ void debugger_commands::execute_mount(const std::vector<std::string> &params)
 
 void debugger_commands::execute_unmount(const std::vector<std::string> &params)
 {
-	bool done = false;
 	for (device_image_interface &img : image_interface_enumerator(m_machine.root_device()))
 	{
-		if (img.brief_instance_name() == params[0])
+		if ((img.instance_name() == params[0]) || (img.brief_instance_name() == params[0]))
 		{
-			img.unload();
-			m_console.printf("Unmounted file from : %s\n", params[0]);
-			done = true;
-			break;
+			if (img.exists())
+			{
+				img.unload();
+				m_console.printf("Unmounted media from %s\n", params[0]);
+			}
+			else
+			{
+				m_console.printf("No media mounted on %s\n", params[0]);
+			}
+			return;
 		}
 	}
-	if (!done)
-		m_console.printf("There is no image device :%s\n", params[0]);
+	m_console.printf("No image instance %s\n", params[0]);
 }
 
 

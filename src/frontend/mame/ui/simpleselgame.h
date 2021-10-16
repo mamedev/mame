@@ -30,7 +30,7 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
+	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
@@ -48,7 +48,6 @@ private:
 	bool                    m_error;
 	bool                    m_rerandomize;
 	std::string             m_search;
-	int                     m_skip_main_items;
 	int                     m_matchlist[VISIBLE_GAMES_IN_LIST];
 	std::vector<const game_driver *>    m_driverlist;
 	std::unique_ptr<driver_enumerator>  m_drivlist;

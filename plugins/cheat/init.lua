@@ -712,6 +712,9 @@ function cheat.startplugin()
 					hotkeymenu = false
 					return true
 				end
+			elseif event == "cancel" then
+				hotkeymenu = false
+				return true
 			end
 			return false
 		end
@@ -722,7 +725,9 @@ function cheat.startplugin()
 			elseif index == 3 then
 				for num, cheat in pairs(cheats) do
 					cheat:set_enabled(false)
-					cheat:set_index(0)
+					if cheat.parameter then
+						cheat:set_index(0)
+					end
 				end
 			elseif index == 4 then
 				for num, cheat in pairs(cheats) do

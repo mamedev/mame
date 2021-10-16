@@ -200,10 +200,6 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			entry.configure_osd("TOGGLE_FILTER", "Toggle Filter");
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LCONTROL);
 			break;
-			// add a Not lcrtl condition to the toggle debug key
-		case IPT_UI_TOGGLE_DEBUG:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL);
-			break;
 
 			// LCTRL-F6 to decrease OpenGL prescaling
 		case IPT_OSD_6:

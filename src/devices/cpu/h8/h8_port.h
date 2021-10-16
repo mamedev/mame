@@ -28,6 +28,7 @@ public:
 	void set_info(int address, uint8_t default_ddr, uint8_t mask);
 
 	void ddr_w(uint8_t data);
+	uint8_t ddr_r();
 	void dr_w(uint8_t data);
 	uint8_t dr_r();
 	uint8_t port_r();

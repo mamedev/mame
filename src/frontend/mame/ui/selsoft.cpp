@@ -86,9 +86,9 @@ public:
 		, m_searchlist()
 	{
 		// add start empty item
-		m_swinfo.emplace_back(menu.m_driver);
+		m_swinfo.emplace_back(*menu.m_system.driver);
 
-		machine_config config(menu.m_driver, menu.machine().options());
+		machine_config config(*menu.m_system.driver, menu.machine().options());
 
 		// see if any media devices require an image to be loaded
 		m_has_empty_start = true;
@@ -156,7 +156,7 @@ public:
 					if (instance_name && type_name)
 					{
 						// add to collection and try to resolve parent if applicable
-						auto const ins(m_swinfo.emplace(m_swinfo.end(), swinfo, part, menu.m_driver, swlist.list_name(), instance_name, type_name));
+						auto const ins(m_swinfo.emplace(m_swinfo.end(), swinfo, part, *menu.m_system.driver, swlist.list_name(), instance_name, type_name));
 						if (!swinfo.parentname().empty())
 						{
 							if ((parentnames.end() == prevparent) || (swinfo.parentname() != prevparent->first))
@@ -243,14 +243,14 @@ public:
 						if ((a.shortname == b.parentname) && (a.instance == b.instance))
 							return true;
 						else
-							return compare_names(a.longname, b.longname);
+							return compare_names(a.longname, b.parentlongname);
 					}
 					else if (clonex && !cloney)
 					{
 						if ((a.parentname == b.shortname) && (a.instance == b.instance))
 							return false;
 						else
-							return compare_names(a.longname, b.longname);
+							return compare_names(a.parentlongname, b.longname);
 					}
 					else if ((a.parentname == b.parentname) && (a.instance == b.instance))
 					{
@@ -279,7 +279,7 @@ public:
 
 		// load custom filters info from file
 		emu_file file(menu.ui().options().ui_path(), OPEN_FLAG_READ);
-		if (!file.open(util::string_format("custom_%s_filter.ini", menu.m_driver.name)))
+		if (!file.open(util::string_format("custom_%s_filter.ini", menu.m_system.driver->name)))
 		{
 			software_filter::ptr flt(software_filter::create(file, m_filter_data));
 			if (flt)
@@ -361,31 +361,16 @@ private:
 //  ctor
 //-------------------------------------------------
 
-menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, game_driver const &driver)
-	: menu_select_software(mui, container, driver.type.fullname(), driver)
-{
-}
-
 menu_select_software::menu_select_software(mame_ui_manager &mui, render_container &container, ui_system_info const &system)
-	: menu_select_software(mui, container, system.description.c_str(), *system.driver)
-{
-}
-
-menu_select_software::menu_select_software(
-		mame_ui_manager &mui,
-		render_container &container,
-		char const *description,
-		game_driver const &driver)
 	: menu_select_launch(mui, container, true)
 	, m_icon_paths()
-	, m_description(description)
-	, m_driver(driver)
+	, m_system(system)
 	, m_displaylist()
 {
 	reselect_last::reselect(false);
 
 	using machine_data_cache = util::lru_cache_map<game_driver const *, std::shared_ptr<machine_data> >;
-	auto &cached(mui.get_session_data<menu_select_software, machine_data_cache>(8)[&driver]);
+	auto &cached(mui.get_session_data<menu_select_software, machine_data_cache>(8)[system.driver]);
 	if (!cached)
 		cached = std::make_shared<machine_data>(*this);
 	m_data = cached;
@@ -581,11 +566,10 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 				m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
 	}
 
-	item_append(menu_item_type::SEPARATOR, flags_ui);
-
 	// configure the custom rendering
+	skip_main_items = 0;
 	customtop = 4.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
-	custombottom = 5.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
+	custombottom = 4.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
 
 	if (old_software != -1)
 	{
@@ -713,7 +697,7 @@ render_texture *menu_select_software::get_icon_texture(int linenum, void *select
 void menu_select_software::get_selection(ui_software_info const *&software, ui_system_info const *&system) const
 {
 	software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
-	system = nullptr;
+	system = &m_system;
 }
 
 
@@ -722,7 +706,7 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 	// determine the text for the header
 	int vis_item = !m_search.empty() ? m_available_items : (m_available_items - 1);
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d software packages )"), emulator_info::get_appname(), bare_build_version, vis_item, m_data->swinfo().size() - 1);
-	line1 = string_format(_("Driver: \"%1$s\" software list "), m_description);
+	line1 = string_format(_("Driver: \"%1$s\" software list "), m_system.description);
 
 	software_filter const *const it(m_data->current_filter());
 	char const *const filter(it ? it->filter_text() : nullptr);
@@ -733,10 +717,10 @@ void menu_select_software::make_topbox_text(std::string &line0, std::string &lin
 }
 
 
-std::string menu_select_software::make_software_description(ui_software_info const &software) const
+std::string menu_select_software::make_software_description(ui_software_info const &software, ui_system_info const *system) const
 {
-	// first line is long name
-	return string_format(_("%1$-.100s"), software.longname);
+	// show list/item to make it less confusing when there are multiple lists mixed
+	return string_format(_("Software list/item: %1$s:%2$s"), software.listname, software.shortname);
 }
 
 
@@ -753,7 +737,7 @@ void menu_select_software::filter_selected()
 					if (software_filter::CUSTOM == new_type)
 					{
 						emu_file file(ui().options().ui_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-						if (!file.open(util::string_format("custom_%s_filter.ini", m_driver.name)))
+						if (!file.open(util::string_format("custom_%s_filter.ini", m_system.driver->name)))
 						{
 							filter.save_ini(file, 0);
 							file.close();

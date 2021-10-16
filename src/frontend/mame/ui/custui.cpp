@@ -9,18 +9,18 @@
 *********************************************************************/
 
 #include "emu.h"
-
 #include "ui/custui.h"
 
-#include "ui/ui.h"
 #include "ui/selector.h"
+#include "ui/ui.h"
 #include "ui/utils.h"
 
-#include "corestr.h"
 #include "drivenum.h"
 #include "emuopts.h"
-#include "osdepend.h"
 #include "uiinput.h"
+
+#include "corestr.h"
+#include "osdepend.h"
 
 #include <algorithm>
 #include <iterator>
@@ -579,25 +579,25 @@ void menu_colors_ui::handle()
 
 void menu_colors_ui::populate(float &customtop, float &custombottom)
 {
-	item_append(_("Normal text"), 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
-	item_append(_("Selected color"), 0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
-	item_append(_("Normal text background"), 0, (void *)(uintptr_t)MUI_TEXT_BG_COLOR);
-	item_append(_("Selected background color"), 0, (void *)(uintptr_t)MUI_SELECTED_BG_COLOR);
-	item_append(_("Subitem color"), 0, (void *)(uintptr_t)MUI_SUBITEM_COLOR);
-	item_append(_("Clone"), 0, (void *)(uintptr_t)MUI_CLONE_COLOR);
-	item_append(_("Border"), 0, (void *)(uintptr_t)MUI_BORDER_COLOR);
-	item_append(_("Background"), 0, (void *)(uintptr_t)MUI_BACKGROUND_COLOR);
-	item_append(_("Dipswitch"), 0, (void *)(uintptr_t)MUI_DIPSW_COLOR);
-	item_append(_("Unavailable color"), 0, (void *)(uintptr_t)MUI_UNAVAILABLE_COLOR);
-	item_append(_("Slider color"), 0, (void *)(uintptr_t)MUI_SLIDER_COLOR);
-	item_append(_("Gfx viewer background"), 0, (void *)(uintptr_t)MUI_GFXVIEWER_BG_COLOR);
-	item_append(_("Mouse over color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_COLOR);
-	item_append(_("Mouse over background color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_BG_COLOR);
-	item_append(_("Mouse down color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_COLOR);
-	item_append(_("Mouse down background color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_BG_COLOR);
+	item_append(_("color-option", "Normal text"),                 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
+	item_append(_("color-option", "Selected color"),              0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
+	item_append(_("color-option", "Normal text background"),      0, (void *)(uintptr_t)MUI_TEXT_BG_COLOR);
+	item_append(_("color-option", "Selected background color"),   0, (void *)(uintptr_t)MUI_SELECTED_BG_COLOR);
+	item_append(_("color-option", "Subitem color"),               0, (void *)(uintptr_t)MUI_SUBITEM_COLOR);
+	item_append(_("color-option", "Clone"),                       0, (void *)(uintptr_t)MUI_CLONE_COLOR);
+	item_append(_("color-option", "Border"),                      0, (void *)(uintptr_t)MUI_BORDER_COLOR);
+	item_append(_("color-option", "Background"),                  0, (void *)(uintptr_t)MUI_BACKGROUND_COLOR);
+	item_append(_("color-option", "DIP switch"),                  0, (void *)(uintptr_t)MUI_DIPSW_COLOR);
+	item_append(_("color-option", "Unavailable color"),           0, (void *)(uintptr_t)MUI_UNAVAILABLE_COLOR);
+	item_append(_("color-option", "Slider color"),                0, (void *)(uintptr_t)MUI_SLIDER_COLOR);
+	item_append(_("color-option", "Graphics viewer background"),  0, (void *)(uintptr_t)MUI_GFXVIEWER_BG_COLOR);
+	item_append(_("color-option", "Mouse over color"),            0, (void *)(uintptr_t)MUI_MOUSEOVER_COLOR);
+	item_append(_("color-option", "Mouse over background color"), 0, (void *)(uintptr_t)MUI_MOUSEOVER_BG_COLOR);
+	item_append(_("color-option", "Mouse down color"),            0, (void *)(uintptr_t)MUI_MOUSEDOWN_COLOR);
+	item_append(_("color-option", "Mouse down background color"), 0, (void *)(uintptr_t)MUI_MOUSEDOWN_BG_COLOR);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Restore originals colors"), 0, (void *)(uintptr_t)MUI_RESTORE);
+	item_append(_("Restore default colors"), 0, (void *)(uintptr_t)MUI_RESTORE);
 
 	custombottom = customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -609,7 +609,7 @@ void menu_colors_ui::populate(float &customtop, float &custombottom)
 void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
 	// top text
-	char const *const toptext[] = { _("UI Colors Settings") };
+	char const *const toptext[] = { _("UI Color Settings") };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
@@ -618,12 +618,12 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	// bottom text
 	// get the text for 'UI Select'
-	std::string const bottomtext[] = { util::string_format(_("Double click or press %1$s to change the color value"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD))) };
+	std::string const bottomtext[] = { util::string_format(_("Double-click or press %1$s to change color"), ui().get_general_input_setting(IPT_UI_SELECT)) };
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// compute maxwidth
 	char const *const topbuf = _("Menu Preview");
@@ -636,11 +636,11 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	std::string sampletxt[5];
 
-	sampletxt[0] = _("Normal");
-	sampletxt[1] = _("Subitem");
-	sampletxt[2] = _("Selected");
-	sampletxt[3] = _("Mouse Over");
-	sampletxt[4] = _("Clone");
+	sampletxt[0] = _("color-sample", "Normal");
+	sampletxt[1] = _("color-sample", "Subitem");
+	sampletxt[2] = _("color-sample", "Selected");
+	sampletxt[3] = _("color-sample", "Mouse Over");
+	sampletxt[4] = _("color-sample", "Clone");
 
 	for (auto & elem: sampletxt)
 	{
@@ -751,8 +751,6 @@ menu_rgb_ui::~menu_rgb_ui()
 
 void menu_rgb_ui::handle()
 {
-	bool changed = false;
-
 	// process the menu
 	const event *menu_event;
 
@@ -761,103 +759,77 @@ void menu_rgb_ui::handle()
 	else
 		menu_event = process(PROCESS_ONLYCHAR);
 
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (menu_event && menu_event->itemref != nullptr)
 	{
-		switch ((uintptr_t)menu_event->itemref)
+		bool changed = false;
+		switch (menu_event->iptkey)
 		{
+		case IPT_UI_LEFT:
+		case IPT_UI_RIGHT:
+			{
+				int updated = (IPT_UI_LEFT == menu_event->iptkey) ? -1 : 1;
+				switch (uintptr_t(menu_event->itemref))
+				{
+				case RGB_ALPHA:
+					updated += m_color->a();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_a(updated);
+						changed = true;
+					}
+					break;
+				case RGB_RED:
+					updated += m_color->r();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_r(updated);
+						changed = true;
+					}
+					break;
+				case RGB_GREEN:
+					updated += m_color->g();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_g(updated);
+						changed = true;
+					}
+					break;
+				case RGB_BLUE:
+					updated += m_color->b();
+					if ((0 <= updated) && (255 >= updated))
+					{
+						m_color->set_b(updated);
+						changed = true;
+					}
+					break;
+				}
+			}
+			break;
+
+		case IPT_UI_SELECT:
+			if (uintptr_t(menu_event->itemref) == PALETTE_CHOOSE)
+			{
+				menu::stack_push<menu_palette_sel>(ui(), container(), *m_color);
+				break;
+			}
+			[[fallthrough]];
+		case IPT_SPECIAL:
+			switch (uintptr_t(menu_event->itemref))
+			{
 			case RGB_ALPHA:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->a() > 1)
-				{
-					m_color->set_a(m_color->a() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->a() < 255)
-				{
-					m_color->set_a(m_color->a() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
 			case RGB_RED:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->r() > 1)
-				{
-					m_color->set_r(m_color->r() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->r() < 255)
-				{
-					m_color->set_r(m_color->r() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
 			case RGB_GREEN:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->g() > 1)
-				{
-					m_color->set_g(m_color->g() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->g() < 255)
-				{
-					m_color->set_g(m_color->g() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
-				break;
-
 			case RGB_BLUE:
-				if (menu_event->iptkey == IPT_UI_LEFT && m_color->b() > 1)
-				{
-					m_color->set_b(m_color->b() - 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_RIGHT && m_color->b() < 255)
-				{
-					m_color->set_b(m_color->b() + 1);
-					changed = true;
-				}
-
-				else if (menu_event->iptkey == IPT_UI_SELECT || menu_event->iptkey == IPT_SPECIAL)
-				{
-					inkey_special(menu_event);
-					changed = true;
-				}
-
+				inkey_special(menu_event);
+				changed = true;
 				break;
-
-			case PALETTE_CHOOSE:
-				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<menu_palette_sel>(ui(), container(), *m_color);
-				break;
+			}
+			break;
 		}
-	}
 
-	if (changed)
-		reset(reset_options::REMEMBER_REF);
+		if (changed)
+			reset(reset_options::REMEMBER_REF);
+	}
 }
 
 //-------------------------------------------------
@@ -867,13 +839,12 @@ void menu_rgb_ui::handle()
 void menu_rgb_ui::populate(float &customtop, float &custombottom)
 {
 	// set filter arrow
-	uint32_t arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	std::string s_text = std::string(m_search).append("_");
 	item_append(_("ARGB Settings"), FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 
 	if (m_lock_ref != RGB_ALPHA)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->a());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->a());
 		item_append(_("color-channel", "Alpha"), string_format("%3u", m_color->a()), arrow_flags, (void *)(uintptr_t)RGB_ALPHA);
 	}
 	else
@@ -881,7 +852,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 
 	if (m_lock_ref != RGB_RED)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->r());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->r());
 		item_append(_("color-channel", "Red"), string_format("%3u", m_color->r()), arrow_flags, (void *)(uintptr_t)RGB_RED);
 	}
 	else
@@ -889,7 +860,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 
 	if (m_lock_ref != RGB_GREEN)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->g());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->g());
 		item_append(_("color-channel", "Green"), string_format("%3u", m_color->g()), arrow_flags, (void *)(uintptr_t)RGB_GREEN);
 	}
 	else
@@ -897,7 +868,7 @@ void menu_rgb_ui::populate(float &customtop, float &custombottom)
 
 	if (m_lock_ref != RGB_BLUE)
 	{
-		arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->b());
+		uint32_t arrow_flags = get_arrow_flags<uint8_t>(0, 255, m_color->b());
 		item_append(_("color-channel", "Blue"), string_format("%3u", m_color->b()), arrow_flags, (void *)(uintptr_t)RGB_BLUE);
 	}
 	else
@@ -940,12 +911,21 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 += ui().box_tb_border();
 
 	// draw the text within it
-	ui().draw_text_full(container(), m_title, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
+	ui().draw_text_full(
+			container(),
+			m_title,
+			x1, y1, x2 - x1,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 
-	std::string sampletxt(_("Color preview ="));
-	ui().draw_text_full(container(), sampletxt, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
+	std::string sampletxt(_("Color preview:"));
+	ui().draw_text_full(
+			container(),
+			sampletxt,
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+			&width);
 	width += 2 * lr_border;
 	maxwidth = std::max(origx2 - origx1, width);
 
@@ -955,22 +935,28 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	y1 = origy2 + ui().box_tb_border();
 	y2 = origy2 + bottom;
 
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x1 + width, y2, UI_RED_COLOR);
+	// draw a box - force black to ensure the text is legible
+	ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t::black());
 
 	// take off the borders
 	x1 += lr_border;
 	y1 += ui().box_tb_border();
 
-	// draw the normal text
-	ui().draw_text_full(container(), sampletxt, x1, y1, width - lr_border, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
+	// draw the text label - force white to ensure it's legible
+	ui().draw_text_full(
+			container(),
+			sampletxt,
+			x1, y1, width - lr_border,
+			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
 
-	x1 += width + lr_border;
-	y1 -= ui().box_tb_border();
+	x1 += width + (lr_border * 2.0f);
+	x2 -= lr_border;
+	y2 -= ui().box_tb_border();
 
-	// draw color box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, *m_color);
+	// add white under half the sample swatch to make alpha effects visible
+	container().add_rect((x1 + x2) * 0.5f, y1, x2, y2, rgb_t::white(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	container().add_rect(x1, y1, x2, y2, *m_color, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 //-------------------------------------------------

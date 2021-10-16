@@ -13,9 +13,12 @@
 
 #include "ui/moptions.h"
 
-#include "corestr.h"
+#include "language.h"
+
 #include "drivenum.h"
 #include "softlist_dev.h"
+
+#include "corestr.h"
 
 #include <algorithm>
 #include <cstring>
@@ -262,6 +265,16 @@ favorite_manager::favorite_manager(ui_options &options)
 			tmpmatches.devicetype = chartrimcarriage(readbuf);
 			file.gets(readbuf, std::size(readbuf));
 			tmpmatches.available = atoi(readbuf);
+
+			// need to populate this, it isn't displayed anywhere else
+			tmpmatches.infotext.append(tmpmatches.longname);
+			tmpmatches.infotext.append("\t\n\n");
+			tmpmatches.infotext.append(_("swlist-info", "Software list/item"));
+			tmpmatches.infotext.append(1, '\n');
+			tmpmatches.infotext.append(tmpmatches.listname);
+			tmpmatches.infotext.append(1, ':');
+			tmpmatches.infotext.append(tmpmatches.shortname);
+
 			m_favorites.emplace(std::move(tmpmatches));
 		}
 		file.close();

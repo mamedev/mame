@@ -21,6 +21,8 @@
 
 
 struct ui_software_info;
+struct ui_system_info;
+
 
 namespace ui {
 
@@ -31,12 +33,13 @@ namespace ui {
 class menu_dats_view : public menu
 {
 public:
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const game_driver *driver = nullptr);
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system = nullptr);
 	virtual ~menu_dats_view() override;
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_mouse_down() override;
 
 private:
 	// draw dats menu
@@ -46,7 +49,7 @@ private:
 	virtual void handle() override;
 
 	int m_actual;
-	const game_driver  *m_driver;
+	const ui_system_info *m_system;
 	const ui_software_info *m_swinfo;
 	std::string m_list, m_short, m_long, m_parent;
 	void get_data();

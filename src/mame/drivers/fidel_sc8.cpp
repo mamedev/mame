@@ -3,7 +3,7 @@
 // thanks-to:yoyo_chessboard
 /******************************************************************************
 
-Fidelity Sensory Chess Challenger "8"
+Fidelity Sensory Chess Challenger "8" (SCC)
 
 It is the first chesscomputer with sensors under the chessboard.
 

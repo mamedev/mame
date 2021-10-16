@@ -54,9 +54,9 @@ class laserdisc_device;
 #define UI_LINE_WIDTH           (1.0f / 500.0f)
 
 /* handy colors */
-#define UI_GREEN_COLOR          rgb_t(0xef,0x10,0x60,0x10)
-#define UI_YELLOW_COLOR         rgb_t(0xef,0x60,0x60,0x10)
-#define UI_RED_COLOR            rgb_t(0xf0,0x60,0x10,0x10)
+#define UI_GREEN_COLOR          rgb_t(0xef,0x0a,0x66,0x0a)
+#define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
+#define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((uint32_t)~0)
@@ -229,6 +229,9 @@ public:
 		assert(result);
 		return *result;
 	}
+
+	// helper for getting a general input setting - used for instruction text
+	std::string get_general_input_setting(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
 
 private:
 	using handler_callback_func = std::function<uint32_t (render_container &)>;

@@ -123,12 +123,12 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// get the text for 'UI Select'
-	tempbuf[0] = string_format(_("Double click or press %1$s to select"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD)));
+	tempbuf[0] = string_format(_("Double-click or press %1$s to select"), ui().get_general_input_setting(IPT_UI_SELECT));
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 
 //-------------------------------------------------

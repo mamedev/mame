@@ -16,7 +16,7 @@
 #include "ui/utils.h"
 
 #include <atomic>
-#include <thread>
+#include <future>
 #include <vector>
 
 
@@ -25,32 +25,32 @@ namespace ui {
 class menu_audit : public menu
 {
 public:
-	enum class mode { FAST, ALL };
-
-	menu_audit(mame_ui_manager &mui, render_container &container, std::vector<ui_system_info> &availablesorted, mode audit_mode);
+	menu_audit(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_audit() override;
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_ui_cancel() override;
 
 private:
-	enum class phase { CONSENT, AUDIT };
+	enum class phase { CONFIRMATION, AUDIT, CANCELLATION };
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	void audit_fast();
-	void audit_all();
+	bool do_audit();
 	void save_available_machines();
 
-	std::thread m_worker_thread;
-	mode const m_audit_mode;
-	std::size_t const m_total;
-	std::string m_prompt[2];
-	std::vector<ui_system_info> &m_availablesorted;
+	std::string m_prompt;
+	std::vector<std::reference_wrapper<ui_system_info> > const &m_availablesorted;
+	std::size_t const m_unavailable;
+	std::vector<std::future<bool> > m_future;
+	std::atomic<std::size_t> m_next;
 	std::atomic<std::size_t> m_audited;
-	std::atomic<game_driver const *> m_current;
+	std::atomic<ui_system_info const *> m_current;
+	std::atomic<bool> m_cancel;
 	phase m_phase;
+	bool m_fast;
 };
 
 } // namespace ui

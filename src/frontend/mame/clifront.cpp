@@ -1118,8 +1118,6 @@ const char cli_frontend::s_softlist_xml_dtd[] =
 void cli_frontend::output_single_softlist(std::ostream &out, software_list_device &swlistdev)
 {
 	util::stream_format(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name(), util::xml::normalize_string(swlistdev.description().c_str()));
-	if (!swlistdev.notes().empty())
-		util::stream_format(out, "\t\t<notes>%s</notes>\n", util::xml::normalize_string(swlistdev.notes().c_str()));
 	for (const software_info &swinfo : swlistdev.get_info())
 	{
 		util::stream_format(out, "\t\t<software name=\"%s\"", util::xml::normalize_string(swinfo.shortname().c_str()));
@@ -1133,8 +1131,6 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		util::stream_format(out, "\t\t\t<description>%s</description>\n", util::xml::normalize_string(swinfo.longname().c_str()));
 		util::stream_format(out, "\t\t\t<year>%s</year>\n", util::xml::normalize_string(swinfo.year().c_str()));
 		util::stream_format(out, "\t\t\t<publisher>%s</publisher>\n", util::xml::normalize_string(swinfo.publisher().c_str()));
-		if (!swinfo.notes().empty())
-			util::stream_format(out, "\t\t\t<notes>%s</notes>\n", util::xml::normalize_string(swinfo.notes().c_str()));
 
 		for (const auto &flist : swinfo.info())
 			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));

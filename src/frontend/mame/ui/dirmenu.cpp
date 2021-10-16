@@ -22,6 +22,7 @@
 
 
 namespace ui {
+
 static int ADDING = 1;
 static int CHANGE = 2;
 
@@ -434,7 +435,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
 			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 
 /**************************************************
