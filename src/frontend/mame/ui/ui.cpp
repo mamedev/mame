@@ -893,11 +893,11 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 	auto y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
 
 	// add a box around that
-	draw_outlined_box(container,
-			x - box_lr_border(),
-			y - box_tb_border(),
-			x + actual_width + box_lr_border(),
-			y + actual_height + box_tb_border(), backcolor);
+	draw_outlined_box(
+			container,
+			x - box_lr_border(), y - box_tb_border(),
+			x + actual_width + box_lr_border(), y + actual_height + box_tb_border(),
+			backcolor);
 
 	// emit the text
 	layout.emit(container, x - actual_left, y);

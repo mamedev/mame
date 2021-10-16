@@ -407,16 +407,13 @@ float text_layout::actual_left()
 		m_current_line = nullptr;
 	}
 
-	float result;
-	if (empty())
+	if (empty()) // degenerate scenario
+		return 0.0f;
+
+	float result = 1.0f;
+	for (auto const &line : m_lines)
 	{
-		// degenerate scenario
-		result = 0.0f;
-	}
-	else
-	{
-		result = 1.0f;
-		for (const auto &line : m_lines)
+		if (line->width())
 			result = std::min(result, line->xoffset(*this));
 	}
 	return result;
