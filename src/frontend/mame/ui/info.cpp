@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/info.h"
+
+#include "ui/systemlist.h"
 #include "ui/ui.h"
 
 #include "drivenum.h"
@@ -337,7 +338,7 @@ std::string machine_info::game_info_string() const
 
 	// print description, manufacturer, and CPU:
 	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
-			m_machine.system().type.fullname(),
+			system_list::instance().systems()[driver_list::find(m_machine.system().name)].description,
 			m_machine.system().year,
 			m_machine.system().manufacturer,
 			core_filename_extract_base(m_machine.system().type.source()));
@@ -538,7 +539,8 @@ menu_image_info::~menu_image_info()
 
 void menu_image_info::populate(float &customtop, float &custombottom)
 {
-	item_append(machine().system().type.fullname(), FLAG_DISABLE, nullptr);
+	ui_system_info const &system(system_list::instance().systems()[driver_list::find(machine().system().name)]);
+	item_append(system.description, FLAG_DISABLE, nullptr);
 	item_append(std::string(), FLAG_DISABLE, nullptr);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))

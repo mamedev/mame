@@ -21,6 +21,7 @@
 #include "ui/menu.h"
 #include "ui/sliders.h"
 #include "ui/state.h"
+#include "ui/systemlist.h"
 #include "ui/viewgfx.h"
 
 #include "imagedev/cassette.h"
@@ -193,6 +194,9 @@ mame_ui_manager::~mame_ui_manager()
 void mame_ui_manager::init()
 {
 	load_ui_options();
+
+	// start loading system names as early as possible
+	ui::system_list::instance().cache_data(options());
 
 	// initialize the other UI bits
 	ui::menu::init(machine(), options());
@@ -1259,7 +1263,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 			machine().set_ui_active(!machine().ui_active());
 
 			// display a popup indicating the new status
-			std::string const name = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_TOGGLE_UI));
+			std::string const name = get_general_input_setting(IPT_UI_TOGGLE_UI);
 			if (machine().ui_active())
 				popup_time(2, _("UI controls enabled\nUse %1$s to toggle"), name);
 			else
@@ -1450,13 +1454,14 @@ uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
 	uint32_t state = 0;
 
 	// get the text for 'UI Select'
-	std::string ui_select_text = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT, 0, SEQ_TYPE_STANDARD));
+	std::string ui_select_text = get_general_input_setting(IPT_UI_SELECT);
 
 	// get the text for 'UI Cancel'
-	std::string ui_cancel_text = machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CANCEL, 0, SEQ_TYPE_STANDARD));
+	std::string ui_cancel_text = get_general_input_setting(IPT_UI_CANCEL);
 
 	// assemble the quit message
-	std::string quit_message = string_format(_("Are you sure you want to quit?\n\n"
+	std::string quit_message = string_format(
+			_("Are you sure you want to quit?\n\n"
 			"Press ''%1$s'' to quit,\n"
 			"Press ''%2$s'' to return to emulation."),
 			ui_select_text,
@@ -2251,6 +2256,19 @@ void mame_ui_manager::menu_reset()
 {
 	ui::menu::stack_reset(machine());
 }
+
+
+//-------------------------------------------------
+//  get_general_input_setting - get the current
+//  default setting for an input type (useful for
+//  prompting the user)
+//-------------------------------------------------
+
+std::string mame_ui_manager::get_general_input_setting(ioport_type type, int player, input_seq_type seqtype)
+{
+	return machine().input().seq_name(machine().ioport().type_seq(type, player, seqtype));
+}
+
 
 void ui_colors::refresh(const ui_options &options)
 {

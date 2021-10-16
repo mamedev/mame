@@ -276,10 +276,8 @@ protected:
 	// overridable event handling
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
+	virtual bool custom_ui_cancel() { return false; }
 	virtual bool custom_mouse_down() { return false; }
-
-	// test if search is active
-	virtual bool menu_has_search_active() { return false; }
 
 	static bool is_selectable(menu_item const &item)
 	{

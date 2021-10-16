@@ -165,6 +165,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/submenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/swlist.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/swlist.h",
+	MAME_DIR .. "src/frontend/mame/ui/systemlist.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/systemlist.h",
 	MAME_DIR .. "src/frontend/mame/ui/tapectrl.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/tapectrl.h",
 	MAME_DIR .. "src/frontend/mame/ui/text.cpp",

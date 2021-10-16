@@ -204,6 +204,7 @@ static const nes_pcb pcb_list[] =
 	{ "mk2",              UNL_MK2 },
 	{ "zemina",           ZEMINA_BOARD },
 	// misc bootleg boards
+	{ "ax40g",            UNL_AX40G },
 	{ "ax5705",           UNL_AX5705 },
 	{ "sc127",            UNL_SC127 },
 	{ "mariobaby",        BTL_MARIOBABY },
@@ -367,6 +368,7 @@ static const nes_pcb pcb_list[] =
 	{ "rt01",             UNL_RT01 },   // Russian Test Cart
 	{ "unl_43272",        UNL_43272 },
 	{ "tf1201",           UNL_TF1201 },
+	{ "th21311",          UNL_TH21311 },
 	{ "unl_cfight",       UNL_CITYFIGHT },
 	{ "ninjaryu",         UNL_NINJARYU },
 	{ "unl_eh8813a",      UNL_EH8813A },  // Dr. Mario II

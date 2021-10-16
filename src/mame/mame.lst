@@ -14515,6 +14515,7 @@ gteikokub                       // bootleg
 gteikokub2                      // bootleg
 gteikokub3                      // bootleg (Honly Enterprises)
 guttangt                        //
+guttangts3                      //
 highroll                        //
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
@@ -34864,6 +34865,7 @@ avefenix                        // bootleg (Video Game)
 avefenixl                       // bootleg (Laguna)
 avefenixrf                      // bootleg (Recreativos Franco)
 capitol                         // bootleg?
+cityatta                        // bootleg (Petaco S.A.)
 condor                          // bootleg (Sidam)
 condorn                         // bootleg (S C Novar)
 falcon                          // bootleg
@@ -34894,8 +34896,8 @@ pleiadbl                        // bootleg
 pleiadce                        // (c) 1981 Centuri + Tehkan
 pleiads                         // (c) 1981 Tehkan
 pleiadsb2                       // bootleg
-pleiadsi                        // bootleg?
-pleiadsn                        // Niemer S.A.
+pleiadsi                        // bootleg (Irecsa)
+pleiadsn                        // bootleg (Niemer S.A.)
 pleiadss                        // bootleg
 survival                        // (c) 1982 Rock-ola
 vautour                         // bootleg (Jeutel)
@@ -38961,6 +38963,10 @@ speedatk                        // CB-0 (c) SetaKikaku
 musicbal                        // (c) 1987
 speedbal                        // (c) 1987
 speedbala                       // (c) 1987
+
+@source:speedbsk.cpp
+boatrace
+speedbsk
 
 @source:speedspn.cpp
 speedspn                        // (c) 1994

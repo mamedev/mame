@@ -230,6 +230,9 @@ public:
 		return *result;
 	}
 
+	// helper for getting a general input setting - used for instruction text
+	std::string get_general_input_setting(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
+
 private:
 	using handler_callback_func = std::function<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;

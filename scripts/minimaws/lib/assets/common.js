@@ -37,6 +37,13 @@ function make_collapsible(heading, section)
 					}
 				}
 			});
+
+	return function ()
+	{
+		hidden = true;
+		icon.setAttribute('src', assetsurl + '/discloseup.svg');
+		section.style.display = 'none';
+	};
 }
 
 

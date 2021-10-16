@@ -46,6 +46,7 @@
 #include "logmacro.h"
 
 
+namespace {
 
 /***************************************************************************
     CONSTANTS
@@ -103,7 +104,7 @@ enum
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  REGISTER SYMBOL ENTRY
 //**************************************************************************
 
 // a symbol entry representing a register, with read/write callbacks
@@ -116,8 +117,8 @@ public:
 	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format);
 
 	// symbol access
-	virtual bool is_lval() const override;
-	virtual u64 value() const override;
+	virtual bool is_lval() const override { return m_setter != nullptr; }
+	virtual u64 value() const override { return m_getter(); }
 	virtual void set_value(u64 newvalue) override;
 
 private:
@@ -127,6 +128,61 @@ private:
 	u64                         m_value;
 };
 
+
+//-------------------------------------------------
+//  integer_symbol_entry - constructor
+//-------------------------------------------------
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
+	: symbol_entry(table, SMT_INTEGER, name, ""),
+		m_getter(ptr
+				? symbol_table::getter_func([ptr] () { return *ptr; })
+				: symbol_table::getter_func([this] () { return m_value; })),
+		m_setter((rw == symbol_table::READ_ONLY)
+				? symbol_table::setter_func(nullptr)
+				: ptr
+				? symbol_table::setter_func([ptr] (u64 value) { *ptr = value; })
+				: symbol_table::setter_func([this] (u64 value) { m_value = value; })),
+		m_value(0)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
+	: symbol_entry(table, SMT_INTEGER, name, ""),
+		m_getter([this] () { return m_value; }),
+		m_setter(nullptr),
+		m_value(constval)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
+	: symbol_entry(table, SMT_INTEGER, name, format),
+		m_getter(std::move(getter)),
+		m_setter(std::move(setter)),
+		m_value(0)
+{
+}
+
+
+//-------------------------------------------------
+//  set_value - set the value of this symbol
+//-------------------------------------------------
+
+void integer_symbol_entry::set_value(u64 newvalue)
+{
+	if (m_setter != nullptr)
+		m_setter(newvalue);
+	else
+		throw emu_fatalerror("Symbol '%s' is read-only", m_name);
+}
+
+
+
+//**************************************************************************
+//  FUNCTION SYMBOL ENTRY
+//**************************************************************************
 
 // a symbol entry representing a function
 class function_symbol_entry : public symbol_entry
@@ -140,7 +196,7 @@ public:
 	u16 maxparams() const { return m_maxparams; }
 
 	// symbol access
-	virtual bool is_lval() const override;
+	virtual bool is_lval() const override { return false; }
 	virtual u64 value() const override;
 	virtual void set_value(u64 newvalue) override;
 
@@ -153,6 +209,82 @@ private:
 	u16                         m_maxparams;
 	symbol_table::execute_func  m_execute;
 };
+
+
+//-------------------------------------------------
+//  function_symbol_entry - constructor
+//-------------------------------------------------
+
+function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, int minparams, int maxparams, symbol_table::execute_func execute)
+	: symbol_entry(table, SMT_FUNCTION, name, ""),
+		m_minparams(minparams),
+		m_maxparams(maxparams),
+		m_execute(std::move(execute))
+{
+}
+
+
+//-------------------------------------------------
+//  value - return the value of this symbol
+//-------------------------------------------------
+
+u64 function_symbol_entry::value() const
+{
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name);
+}
+
+
+//-------------------------------------------------
+//  set_value - set the value of this symbol
+//-------------------------------------------------
+
+void function_symbol_entry::set_value(u64 newvalue)
+{
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name);
+}
+
+
+//-------------------------------------------------
+//  execute - execute the function
+//-------------------------------------------------
+
+u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
+{
+	if (numparams < m_minparams)
+		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name, m_minparams);
+	if (numparams > m_maxparams)
+		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name, m_maxparams);
+	return m_execute(numparams, paramlist);
+}
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+inline std::pair<device_t &, char const *> get_device_search(running_machine &machine, device_memory_interface *memintf, char const *tag)
+{
+	if (tag)
+	{
+		if (('.' == tag[0]) && (!tag[1] || (':' == tag[1]) || ('^' == tag[1])))
+			return std::pair<device_t &, char const *>(memintf ? memintf->device() : machine.root_device(), tag + ((':' == tag[1]) ? 2 : 1));
+		else if (('^' == tag[0]) && memintf)
+			return std::pair<device_t &, char const *>(memintf->device(), tag);
+		else
+			return std::pair<device_t &, char const *>(machine.root_device(), tag);
+	}
+	else if (memintf)
+	{
+		return std::pair<device_t &, char const *>(memintf->device(), "");
+	}
+	else
+	{
+		return std::pair<device_t &, char const *>(machine.root_device(), "");
+	}
+}
+
+} // anonymous namespace
 
 
 
@@ -219,143 +351,6 @@ symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *na
 
 symbol_entry::~symbol_entry()
 {
-}
-
-
-
-//**************************************************************************
-//  REGISTER SYMBOL ENTRY
-//**************************************************************************
-
-//-------------------------------------------------
-//  integer_symbol_entry - constructor
-//-------------------------------------------------
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
-	: symbol_entry(table, SMT_INTEGER, name, ""),
-		m_getter(ptr
-				? symbol_table::getter_func([ptr] () { return *ptr; })
-				: symbol_table::getter_func([this] () { return m_value; })),
-		m_setter((rw == symbol_table::READ_ONLY)
-				? symbol_table::setter_func(nullptr)
-				: ptr
-				? symbol_table::setter_func([ptr] (u64 value) { *ptr = value; })
-				: symbol_table::setter_func([this] (u64 value) { m_value = value; })),
-		m_value(0)
-{
-}
-
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
-	: symbol_entry(table, SMT_INTEGER, name, ""),
-		m_getter([this] () { return m_value; }),
-		m_setter(nullptr),
-		m_value(constval)
-{
-}
-
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
-	: symbol_entry(table, SMT_INTEGER, name, format),
-		m_getter(std::move(getter)),
-		m_setter(std::move(setter)),
-		m_value(0)
-{
-}
-
-
-//-------------------------------------------------
-//  is_lval - is this symbol allowable as an lval?
-//-------------------------------------------------
-
-bool integer_symbol_entry::is_lval() const
-{
-	return (m_setter != nullptr);
-}
-
-
-//-------------------------------------------------
-//  value - return the value of this symbol
-//-------------------------------------------------
-
-u64 integer_symbol_entry::value() const
-{
-	return m_getter();
-}
-
-
-//-------------------------------------------------
-//  set_value - set the value of this symbol
-//-------------------------------------------------
-
-void integer_symbol_entry::set_value(u64 newvalue)
-{
-	if (m_setter != nullptr)
-		m_setter(newvalue);
-	else
-		throw emu_fatalerror("Symbol '%s' is read-only", m_name);
-}
-
-
-
-//**************************************************************************
-//  FUNCTION SYMBOL ENTRY
-//**************************************************************************
-
-//-------------------------------------------------
-//  function_symbol_entry - constructor
-//-------------------------------------------------
-
-function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, int minparams, int maxparams, symbol_table::execute_func execute)
-	: symbol_entry(table, SMT_FUNCTION, name, ""),
-		m_minparams(minparams),
-		m_maxparams(maxparams),
-		m_execute(std::move(execute))
-{
-}
-
-
-//-------------------------------------------------
-//  is_lval - is this symbol allowable as an lval?
-//-------------------------------------------------
-
-bool function_symbol_entry::is_lval() const
-{
-	return false;
-}
-
-
-//-------------------------------------------------
-//  value - return the value of this symbol
-//-------------------------------------------------
-
-u64 function_symbol_entry::value() const
-{
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name);
-}
-
-
-//-------------------------------------------------
-//  set_value - set the value of this symbol
-//-------------------------------------------------
-
-void function_symbol_entry::set_value(u64 newvalue)
-{
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name);
-}
-
-
-//-------------------------------------------------
-//  execute - execute the function
-//-------------------------------------------------
-
-u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
-{
-	if (numparams < m_minparams)
-		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name, m_minparams);
-	if (numparams > m_maxparams)
-		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name, m_maxparams);
-	return m_execute(numparams, paramlist);
 }
 
 
@@ -551,17 +546,13 @@ expression_error symbol_table::expression_get_space(const char *tag, int &spacen
 	if (tag)
 	{
 		// convert to lowercase then lookup the name (tags are enforced to be all lower case)
-		device_t *base;
-		if ((('^' == tag[0]) || (('.' == tag[0]) && ((':' == tag[1]) || !tag[1]))) && m_memintf)
-			base = &m_memintf->device();
-		else
-			base = &m_machine.root_device();
-		device = base->subdevice(strmakelower(tag));
+		auto base = get_device_search(m_machine, m_memintf, tag);
+		device = base.first.subdevice(strmakelower(base.second));
 
 		// if that failed, treat the last component as an address space
 		if (!device)
 		{
-			std::string_view t = tag;
+			std::string_view t = base.second;
 			auto const delimiter = t.find_last_of(":^");
 			bool const found = std::string_view::npos != delimiter;
 			if (!found || (':' == t[delimiter]))
@@ -569,7 +560,7 @@ expression_error symbol_table::expression_get_space(const char *tag, int &spacen
 				spacename = strmakelower(t.substr(found ? (delimiter + 1) : 0));
 				t = t.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
 				if (!t.empty())
-					device = base->subdevice(strmakelower(t));
+					device = base.first.subdevice(strmakelower(t));
 				else
 					device = m_memintf ? &m_memintf->device() : &m_machine.root_device();
 			}
@@ -740,11 +731,12 @@ u64 symbol_table::read_program_direct(address_space &space, int opcode, offs_t a
 
 u64 symbol_table::read_memory_region(const char *rgntag, offs_t address, int size)
 {
-	memory_region *region = m_machine.root_device().memregion(rgntag);
+	auto search = get_device_search(m_machine, m_memintf, rgntag);
+	memory_region *const region = search.first.memregion(search.second);
 	u64 result = ~u64(0) >> (64 - 8*size);
 
 	// make sure we get a valid base before proceeding
-	if (region != nullptr)
+	if (region)
 	{
 		// call ourself recursively until we are byte-sized
 		if (size > 1)
@@ -900,10 +892,11 @@ void symbol_table::write_program_direct(address_space &space, int opcode, offs_t
 
 void symbol_table::write_memory_region(const char *rgntag, offs_t address, int size, u64 data)
 {
-	memory_region *region = m_machine.root_device().memregion(rgntag);
+	auto search = get_device_search(m_machine, m_memintf, rgntag);
+	memory_region *const region = search.first.memregion(search.second);
 
 	// make sure we get a valid base before proceeding
-	if (region != nullptr)
+	if (region)
 	{
 		// call ourself recursively until we are byte-sized
 		if (size > 1)
@@ -984,9 +977,16 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 
 	case EXPSPACE_REGION:
 		if (!name)
+		{
 			return expression_error::MISSING_MEMORY_NAME;
-		if (!m_machine.root_device().memregion(name) || !m_machine.root_device().memregion(name)->base())
-			return expression_error::INVALID_MEMORY_NAME;
+		}
+		else
+		{
+			auto search = get_device_search(m_machine, m_memintf, name);
+			memory_region *const region = search.first.memregion(search.second);
+			if (!region || !region->base())
+				return expression_error::INVALID_MEMORY_NAME;
+		}
 		break;
 
 	default:

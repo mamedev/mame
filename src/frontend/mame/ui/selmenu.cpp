@@ -671,7 +671,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		isstar = mame_machine_manager::instance()->favorite().is_favorite_system_software(*swinfo);
 
 		// first line is long name or system
-		tempbuf[0] = make_software_description(*swinfo);
+		tempbuf[0] = make_software_description(*swinfo, system);
 
 		// next line is year, publisher
 		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year, swinfo->publisher);
@@ -857,14 +857,14 @@ void menu_select_launch::inkey_dats()
 	if (software)
 	{
 		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), software->driver);
+			menu::stack_push<menu_dats_view>(ui(), container(), system);
 		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
 			menu::stack_push<menu_dats_view>(ui(), container(), software);
 	}
 	else if (system)
 	{
 		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", system->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system->driver);
+			menu::stack_push<menu_dats_view>(ui(), container(), system);
 	}
 }
 
@@ -1435,11 +1435,11 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			// dismiss error
 		}
-		else if (menu_has_search_active())
+		else if (!m_search.empty())
 		{
 			// escape pressed with non-empty search text clears it
 			m_search.clear();
-			reset(reset_options::SELECT_FIRST);
+			reset(reset_options::REMEMBER_REF);
 		}
 		else
 		{
@@ -1960,12 +1960,22 @@ void menu_select_launch::draw(uint32_t flags)
 	float line = visible_top + (float(m_visible_lines) * line_height);
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
+	// make sure the selection
 	if (m_available_items < m_visible_lines)
 		m_visible_lines = m_available_items;
 	if (top_line < 0 || is_first_selected())
+	{
 		top_line = 0;
-	if (selected_index() < m_available_items && top_line + m_visible_lines >= m_available_items)
-		top_line = m_available_items - m_visible_lines;
+	}
+	else if (selected_index() < m_available_items)
+	{
+		if (selected_index() >= (top_line + m_visible_lines))
+			top_line = selected_index() - (m_visible_lines / 2);
+		if ((top_line + m_visible_lines) >= m_available_items)
+			top_line = m_available_items - m_visible_lines;
+		else if (selected_index() >= (top_line + m_visible_lines - 2))
+			top_line = selected_index() - m_visible_lines + ((selected_index() == (m_available_items - 1)) ? 1: 2);
+	}
 
 	// determine effective positions taking into account the hilighting arrows
 	float effective_width = visible_width - 2.0f * gutter_width;
@@ -2934,7 +2944,6 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	int cloneof = driver_list::non_bios_clone(driver);
 	if (0 <= cloneof)
 	{
-		// TODO: this shows the non-localised parent name in some situations
 		util::stream_format(
 				str,
 				_("Driver is Clone of\t%1$-.100s\n"),

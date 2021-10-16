@@ -2043,6 +2043,8 @@ ui_software_info::ui_software_info(
 	, available(false)
 {
 	// show the list/item here
+	infotext.append(longname);
+	infotext.append("\t\n\n");
 	infotext.append(_("swlist-info", "Software list/item"));
 	infotext.append(1, '\n');
 	infotext.append(listname);
