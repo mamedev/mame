@@ -247,6 +247,8 @@ public:
 	float width() const { return m_width; }
 	float height() const { return m_height; }
 	size_t character_count() const { return m_characters.size(); }
+	size_t center_justify_start() const { return m_center_justify_start; }
+	size_t right_justify_start() const { return m_right_justify_start; }
 	const positioned_char &character(size_t index) const { return m_characters[index]; }
 	positioned_char &character(size_t index) { return m_characters[index]; }
 
@@ -362,7 +364,7 @@ void text_layout::add_text(std::string_view text, text_justify line_justify, cha
 					break;
 
 				case word_wrapping::WORD:
-					word_wrap(line_justify);
+					word_wrap();
 					break;
 
 				case word_wrapping::NEVER:
@@ -527,7 +529,7 @@ void text_layout::truncate_wrap()
 //  word_wrap
 //-------------------------------------------------
 
-void text_layout::word_wrap(text_justify line_justify)
+void text_layout::word_wrap()
 {
 	// keep track of the last line and break
 	line *const last_line = m_current_line;
@@ -535,16 +537,25 @@ void text_layout::word_wrap(text_justify line_justify)
 
 	// start a new line with the same justification
 	start_new_line(last_line->character(last_line->character_count() - 1).style.size);
-	m_current_line->set_justification(line_justify);
 
 	// find the beginning of the word to wrap
 	size_t position = last_break;
 	while ((position + 1) < last_line->character_count() && is_space_character(last_line->character(position).character))
 		position++;
 
+	// carry over justification
+	if (last_line->right_justify_start() <= position)
+		m_current_line->set_justification(text_justify::RIGHT);
+	else if (last_line->center_justify_start() <= position)
+		m_current_line->set_justification(text_justify::CENTER);
+
 	// transcribe the characters
 	for (size_t i = position; i < last_line->character_count(); i++)
 	{
+		if (last_line->right_justify_start() == i)
+			m_current_line->set_justification(text_justify::RIGHT);
+		else if (last_line->center_justify_start() == i)
+			m_current_line->set_justification(text_justify::CENTER);
 		auto &ch = last_line->character(i);
 		m_current_line->add_character(*this, ch.character, ch.style, ch.source);
 	}
