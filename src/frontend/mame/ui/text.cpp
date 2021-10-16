@@ -537,7 +537,7 @@ void text_layout::word_wrap()
 
 	// find the beginning of the word to wrap
 	size_t position = last_break;
-	while ((position + 1) < last_line->character_count() && is_space_character(last_line->character(position).character))
+	while ((last_line->character_count() > position) && is_space_character(last_line->character(position).character))
 		position++;
 
 	// carry over justification
