@@ -122,7 +122,7 @@ void menu_directory::custom_render(void *selectedref, float top, float bottom, f
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -200,12 +200,12 @@ void menu_display_actual::custom_render(void *selectedref, float top, float bott
 	float const maxwidth(draw_text_box(
 			std::begin(m_folders), std::end(m_folders),
 			origx1, origx2, origy1 - (3.0f * ui().box_tb_border()) - (m_folders.size() * lineheight), origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f));
 	draw_text_box(
 			std::begin(m_heading), std::end(m_heading),
 			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + lineheight + (2.0f * ui().box_tb_border()),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -426,7 +426,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// bottom text
@@ -434,7 +434,7 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 
@@ -518,7 +518,7 @@ void menu_remove_folder::custom_render(void *selectedref, float top, float botto
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 

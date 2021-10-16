@@ -35,10 +35,11 @@ namespace ui {
 
 menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system)
 	: menu(mui, container)
-	, m_actual(0)
 	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(nullptr)
 	, m_issoft(false)
+	, m_layout()
+	, m_actual(0)
 
 {
 	for (device_image_interface& image : image_interface_enumerator(mui.machine().root_device()))
@@ -71,23 +72,24 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 
 menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system)
 	: menu(mui, container)
-	, m_actual(0)
 	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
 	, m_swinfo(swinfo)
+	, m_issoft(true)
+	, m_layout()
+	, m_actual(0)
 	, m_list(swinfo->listname)
 	, m_short(swinfo->shortname)
 	, m_long(swinfo->longname)
 	, m_parent(swinfo->parentname)
-	, m_issoft(true)
 
 {
-	if (swinfo != nullptr && !swinfo->infotext.empty())
+	if (swinfo && !swinfo->infotext.empty())
 		m_items_list.emplace_back(_("Software List Info"), 0, "");
 	std::vector<std::string> lua_list;
 	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(m_short).append(1, ',').append(m_list).c_str(), lua_list))
 	{
 		int count = 1;
-		for(std::string &item : lua_list)
+		for (std::string &item : lua_list)
 		{
 			std::string version;
 			mame_machine_manager::instance()->lua()->call_plugin("data_version", count - 1, version);
@@ -106,24 +108,109 @@ menu_dats_view::~menu_dats_view()
 }
 
 //-------------------------------------------------
+//  add text to layout
+//-------------------------------------------------
+
+void menu_dats_view::add_info_text(text_layout &layout, std::string_view text, rgb_t color, float size)
+{
+	char justify = 'l'; // left justify by default
+	if ((text.length() > 3) && (text[0] == '#') && (text[1] == 'j'))
+	{
+		auto const eol = text.find('\n');
+		if ((std::string_view::npos != eol) && (2 < eol))
+		{
+			justify = text[2];
+			text.remove_prefix(eol + 1);
+		}
+	}
+
+	if ('2' == justify)
+	{
+		while (!text.empty())
+		{
+			// pop a line from the front
+			auto const eol = text.find('\n');
+			std::string_view const line = (std::string_view::npos != eol)
+					? text.substr(0, eol + 1)
+					: text;
+			text.remove_prefix(line.length());
+
+			// split on the first tab
+			auto const split = line.find('\t');
+			if (std::string_view::npos != split)
+			{
+				layout.add_text(line.substr(0, split), text_layout::text_justify::LEFT, color, rgb_t::transparent(), size);
+				layout.add_text(" ", text_layout::text_layout::text_justify::LEFT, color, rgb_t::transparent(), size);
+				layout.add_text(line.substr(split + 1), text_layout::text_justify::RIGHT, color, rgb_t::transparent(), size);
+			}
+			else
+			{
+				layout.add_text(line, text_layout::text_justify::LEFT, color, rgb_t::transparent(), size);
+			}
+		}
+	}
+	else
+	{
+		// use the same alignment for all the text
+		auto const j =
+				('c' == justify) ? text_layout::text_justify::CENTER :
+				('r' == justify) ? text_layout::text_justify::RIGHT :
+				text_layout::text_justify::LEFT;
+		layout.add_text(text, j, color, rgb_t::transparent(), size);
+	}
+
+}
+
+//-------------------------------------------------
 //  handle
 //-------------------------------------------------
 
 void menu_dats_view::handle()
 {
-	const event *menu_event = process(FLAG_UI_DATS);
-	if (menu_event != nullptr)
+	event const *const menu_event = process(PROCESS_LR_ALWAYS | PROCESS_CUSTOM_NAV);
+	if (menu_event)
 	{
-		if (menu_event->iptkey == IPT_UI_LEFT && m_actual > 0)
+		switch (menu_event->iptkey)
 		{
-			m_actual--;
-			reset(reset_options::SELECT_FIRST);
-		}
+		case IPT_UI_LEFT:
+			if (m_actual > 0)
+			{
+				m_actual--;
+				reset(reset_options::SELECT_FIRST);
+			}
+			break;
 
-		if (menu_event->iptkey == IPT_UI_RIGHT && m_actual < m_items_list.size() - 1)
-		{
-			m_actual++;
-			reset(reset_options::SELECT_FIRST);
+		case IPT_UI_RIGHT:
+			if ((m_actual + 1) < m_items_list.size())
+			{
+				m_actual++;
+				reset(reset_options::SELECT_FIRST);
+			}
+			break;
+
+		case IPT_UI_UP:
+			--top_line;
+			break;
+
+		case IPT_UI_DOWN:
+			++top_line;
+			break;
+
+		case IPT_UI_PAGE_UP:
+			top_line -= m_visible_lines - 3;
+			break;
+
+		case IPT_UI_PAGE_DOWN:
+			top_line += m_visible_lines - 3;
+			break;
+
+		case IPT_UI_HOME:
+			top_line = 0;
+			break;
+
+		case IPT_UI_END:
+			top_line = m_layout->lines() - m_visible_lines;
+			break;
 		}
 	}
 }
@@ -138,9 +225,8 @@ void menu_dats_view::populate(float &customtop, float &custombottom)
 	if (!paused)
 		machine().pause();
 
-	(m_issoft == true) ? get_data_sw() : get_data();
+	m_layout = std::nullopt;
 
-	item_append(menu_item_type::SEPARATOR, (FLAG_UI_DATS | FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW));
 	customtop = 2.0f * ui().get_line_height() + 4.0f * ui().box_tb_border();
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 
@@ -162,7 +248,6 @@ void menu_dats_view::draw(uint32_t flags)
 	float const visible_left = (1.0f - visible_width) * 0.5f;
 	float const extra_height = 2.0f * line_height;
 	float const visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
-	int const visible_items = item_count() - 2;
 
 	// determine effective positions taking into account the hilighting arrows
 	float const effective_width = visible_width - 2.0f * gutter_width;
@@ -179,116 +264,104 @@ void menu_dats_view::draw(uint32_t flags)
 	// compute top/left of inner menu area by centering, if the menu is at the bottom of the extra, adjust
 	float const visible_top = ((1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f) + get_customtop();
 
-	// compute left box size
-	float x1 = visible_left;
-	float y1 = visible_top - ui().box_tb_border();
-	float x2 = x1 + visible_width;
-	float y2 = visible_top + visible_main_menu_height + ui().box_tb_border() + extra_height;
-	float line = visible_top + float(m_visible_lines) * line_height;
+	// compute text box size
+	float const x1 = visible_left;
+	float const y1 = visible_top - ui().box_tb_border();
+	float const x2 = x1 + visible_width;
+	float const y2 = visible_top + visible_main_menu_height + ui().box_tb_border() + extra_height;
+	float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+	float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+	float const separator = visible_top + float(m_visible_lines) * line_height;
 
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
+	if (!m_layout || (m_layout->width() != effective_width))
+	{
+		std::string buffer;
+		if (m_issoft)
+			get_data_sw(buffer);
+		else
+			get_data(buffer);
+		m_layout.emplace(ui().create_layout(container(), effective_width));
+		add_info_text(*m_layout, buffer, ui().colors().text_color());
+	}
+	int const visible_items = m_layout->lines();
 	m_visible_lines = (std::min)(visible_items, m_visible_lines);
 	top_line = (std::max)(0, top_line);
 	if (top_line + m_visible_lines >= visible_items)
 		top_line = visible_items - m_visible_lines;
 
 	clear_hover();
-	int const n_loop = (std::min)(visible_items, m_visible_lines);
-	for (int linenum = 0; linenum < n_loop; linenum++)
+	if (top_line)
 	{
-		float const line_y = visible_top + float(linenum) * line_height;
-		int const itemnum = top_line + linenum;
-		menu_item const &pitem = item(itemnum);
-		std::string_view const itemtext = pitem.text;
-		float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
-		float const line_y0 = line_y;
-		float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
-		float const line_y1 = line_y + line_height;
-
+		// if we're on the top line, display the up arrow
 		rgb_t fgcolor = ui().colors().text_color();
-		rgb_t bgcolor = ui().colors().text_bg_color();
-
-		if (!linenum && top_line)
+		if (mouse_in_rect(line_x0, visible_top, line_x1, visible_top + line_height))
 		{
-			// if we're on the top line, display the up arrow
-			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
-			{
-				fgcolor = ui().colors().mouseover_color();
-				bgcolor = ui().colors().mouseover_bg_color();
-				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-				set_hover(HOVER_ARROW_UP);
-			}
-			draw_arrow(
-					0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-					0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height,
-					fgcolor, ROT0);
+			fgcolor = ui().colors().mouseover_color();
+			highlight(
+					line_x0, visible_top,
+					line_x1, visible_top + line_height,
+					ui().colors().mouseover_bg_color());
+			set_hover(HOVER_ARROW_UP);
 		}
-		else if ((linenum == m_visible_lines - 1) && (itemnum != visible_items - 1))
-		{
-			// if we're on the bottom line, display the down arrow
-			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
-			{
-				fgcolor = ui().colors().mouseover_color();
-				bgcolor = ui().colors().mouseover_bg_color();
-				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-				set_hover(HOVER_ARROW_DOWN);
-			}
-			draw_arrow(
-					0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-					0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height,
-					fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
-		}
-		else if (pitem.subtext.empty())
-		{
-			// draw dats text
-			ui().draw_text_full(
-					container(), itemtext,
-					effective_left, line_y, effective_width,
-					ui::text_layout::LEFT, ui::text_layout::NEVER,
-					mame_ui_manager::NORMAL, fgcolor, bgcolor,
-					nullptr, nullptr);
-		}
+		draw_arrow(
+				0.5f * (x1 + x2) - 0.5f * ud_arrow_width, visible_top + 0.25f * line_height,
+				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, visible_top + 0.75f * line_height,
+				fgcolor, ROT0);
 	}
-
-	for (size_t count = visible_items; count < item_count(); count++)
+	if ((top_line + m_visible_lines) < visible_items)
 	{
-		menu_item const &pitem = item(count);
-		std::string_view const itemtext = pitem.text;
-		float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
-		float const line_y0 = line;
-		float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
-		float const line_y1 = line + line_height;
-		rgb_t const fgcolor = ui().colors().selected_color();
-		rgb_t const bgcolor = ui().colors().selected_bg_color();
-
-		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
-			set_hover(count);
-
-		if (pitem.type == menu_item_type::SEPARATOR)
+		// if we're on the bottom line, display the down arrow
+		float const line_y = visible_top + float(m_visible_lines - 1) * line_height;
+		rgb_t fgcolor = ui().colors().text_color();
+		if (mouse_in_rect(line_x0, line_y, line_x1, line_y + line_height))
 		{
-			container().add_line(
-					visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-					UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			fgcolor = ui().colors().mouseover_color();
+			highlight(
+					line_x0, line_y,
+					line_x1, line_y + line_height,
+					ui().colors().mouseover_bg_color());
+			set_hover(HOVER_ARROW_DOWN);
 		}
-		else
-		{
-			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
-			ui().draw_text_full(
-					container(), itemtext,
-					effective_left, line, effective_width,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, fgcolor, bgcolor,
-					nullptr, nullptr);
-		}
-		line += line_height;
+		draw_arrow(
+				0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height,
+				fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 	}
+
+	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	m_visible_items = m_visible_lines - (top_line ? 1 : 0) - (top_line + m_visible_lines != visible_items);
+	m_layout->emit(
+			container(),
+			top_line ? (top_line + 1) : 0, m_visible_items,
+			effective_left, visible_top + (top_line ? line_height : 0.0f));
+
+	// add visual separator before the "return to prevous menu" item
+	container().add_line(
+			visible_left, separator + (0.5f * line_height),
+			visible_left + visible_width, separator + (0.5f * line_height),
+			UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	menu_item const &pitem = item(0);
+	std::string_view const itemtext = pitem.text;
+	float const line_y0 = separator + line_height;
+	float const line_y1 = line_y0 + line_height;
+
+	if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
+		set_hover(0);
+
+	highlight(line_x0, line_y0, line_x1, line_y1, ui().colors().selected_bg_color());
+	ui().draw_text_full(
+			container(), itemtext,
+			effective_left, line_y0, effective_width,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+			mame_ui_manager::NORMAL,
+			ui().colors().selected_color(), ui().colors().selected_bg_color(),
+			nullptr, nullptr);
 
 	// if there is something special to add, do it by calling the virtual method
 	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
-
-	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
 }
 
 //-------------------------------------------------
@@ -299,11 +372,15 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 {
 	float maxwidth = origx2 - origx1;
 	float width;
-	std::string_view driver = m_issoft ? m_swinfo->longname : m_system->description;
+	std::string_view const driver = m_issoft ? m_swinfo->longname : m_system->description;
 
 	float const lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
-	ui().draw_text_full(container(), driver, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
+	ui().draw_text_full(
+			container(),
+			driver,
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * lr_border;
 	maxwidth = std::max(maxwidth, width);
 
@@ -325,7 +402,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 			container(),
 			driver,
 			x1, y1, x2 - x1,
-			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			text_layout::text_justify::CENTER, ui::text_layout::word_wrapping::NEVER,
 			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 
 	maxwidth = 0;
@@ -335,7 +412,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 				container(),
 				elem.label,
 				0.0f, 0.0f, 1.0f,
-				ui::text_layout::CENTER, ui::text_layout::NEVER,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
 				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 				&width, nullptr);
 		maxwidth += width;
@@ -369,7 +446,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 				container(),
 				elem.label,
 				x1, y1, 1.0f,
-				ui::text_layout::LEFT, ui::text_layout::NEVER,
+				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER,
 				mame_ui_manager::NONE, fcolor, bcolor,
 				&width, nullptr);
 
@@ -386,7 +463,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 				container(),
 				elem.label,
 				x1, y1, 1.0f,
-				ui::text_layout::LEFT, ui::text_layout::NEVER,
+				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER,
 				mame_ui_manager::NORMAL, fcolor, bcolor,
 				&width, nullptr);
 		x1 += width + space;
@@ -394,9 +471,14 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	}
 
 	// bottom
-	std::string revision;
-	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	ui().draw_text_full(container(), revision, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
+	std::string const revision(util::string_format(_("Revision: %1$s"), m_items_list[m_actual].revision));
+	ui().draw_text_full(
+			container(),
+			revision,
+			0.0f, 0.0f, 1.0f,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+			&width, nullptr);
 	width += 2 * lr_border;
 	maxwidth = std::max(origx2 - origx1, width);
 
@@ -419,7 +501,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 			container(),
 			revision,
 			x1, y1, x2 - x1,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
 			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 }
 
@@ -448,43 +530,17 @@ bool menu_dats_view::custom_mouse_down()
 //  load data from DATs
 //-------------------------------------------------
 
-void menu_dats_view::get_data()
+void menu_dats_view::get_data(std::string &buffer)
 {
-	std::vector<int> xstart, xend;
-	std::string buffer;
 	mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option, buffer);
-
-	float const aspect = machine().render().ui_aspect(&container());
-	float const line_height = ui().get_line_height();
-	float const gutter_width = 0.52f * line_height * aspect;
-	float const visible_width = 1.0f - (2.0f * ui().box_lr_border() * aspect);
-	float const effective_width = visible_width - 2.0f * gutter_width;
-
-	auto lines = ui().wrap_text(container(), buffer, 0.0f, 0.0f, effective_width, xstart, xend);
-	for (int x = 0; x < lines; ++x)
-	{
-		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		if ((tempbuf[0] != '#') || x)
-			item_append(std::move(tempbuf), (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
-	}
 }
 
-void menu_dats_view::get_data_sw()
+void menu_dats_view::get_data_sw(std::string &buffer)
 {
-	std::vector<int> xstart;
-	std::vector<int> xend;
-	std::string buffer;
 	if (m_items_list[m_actual].option == 0)
 		buffer = m_swinfo->infotext;
 	else
 		mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option - 1, buffer);
-
-	auto lines = ui().wrap_text(container(), buffer, 0.0f, 0.0f, 1.0f - (4.0f * ui().box_lr_border() * machine().render().ui_aspect(&container())), xstart, xend);
-	for (int x = 0; x < lines; ++x)
-	{
-		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
-		item_append(std::move(tempbuf), (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
-	}
 }
 
 } // namespace ui

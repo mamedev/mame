@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-16 04:41+1100\n"
-"PO-Revision-Date: 2021-10-14 21:22+0800\n"
+"PO-Revision-Date: 2021-10-16 12:57+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -1519,7 +1519,7 @@ msgstr "可见度延迟"
 #: src/frontend/mame/ui/miscmenu.cpp:639
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "%s.xml 已保存于 UI 设定文件夹"
 
 #: src/frontend/mame/ui/miscmenu.cpp:665
 msgid "Name:             Description:\n"
@@ -1528,7 +1528,7 @@ msgstr "名称：            描述：\n"
 #: src/frontend/mame/ui/miscmenu.cpp:676
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "%s.txt 已保存于 UI 设定文件夹"
 
 #: src/frontend/mame/ui/miscmenu.cpp:693
 msgid "Export list in XML format (like -listxml)"
@@ -2126,6 +2126,10 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"取消校验?\n"
+"\n"
+"按下 %1$s 取消\n"
+"按下 %2$s 继续"
 
 #: src/frontend/mame/ui/auditmenu.cpp:135
 #, c-format
@@ -2300,7 +2304,7 @@ msgstr "鼠标按下背景颜色"
 
 #: src/frontend/mame/ui/custui.cpp:600
 msgid "Restore default colors"
-msgstr ""
+msgstr "还原至缺省颜色"
 
 #: src/frontend/mame/ui/custui.cpp:612
 msgid "UI Color Settings"
@@ -2309,7 +2313,7 @@ msgstr "UI 色彩设定"
 #: src/frontend/mame/ui/custui.cpp:621
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "双击或按下 %1$s 改变颜色"
 
 #: src/frontend/mame/ui/custui.cpp:629
 msgid "Menu Preview"
@@ -3615,12 +3619,12 @@ msgstr "半押"
 #: src/emu/inpttype.ipp:119
 msgctxt "input-name"
 msgid "High"
-msgstr ""
+msgstr "大"
 
 #: src/emu/inpttype.ipp:120
 msgctxt "input-name"
 msgid "Low"
-msgstr ""
+msgstr "小"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
@@ -5225,42 +5229,42 @@ msgstr "P10 选择"
 #: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr "1 位玩家开始"
+msgstr "玩家 1 开始"
 
 #: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr "2 位玩家开始"
+msgstr "玩家 2 开始"
 
 #: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr "3 位玩家开始"
+msgstr "玩家 3 开始"
 
 #: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr "4 位玩家开始"
+msgstr "玩家 4 开始"
 
 #: src/emu/inpttype.ipp:501
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr "5 位玩家开始"
+msgstr "玩家 5 开始"
 
 #: src/emu/inpttype.ipp:502
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr "6 位玩家开始"
+msgstr "玩家 6 开始"
 
 #: src/emu/inpttype.ipp:503
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr "7 位玩家开始"
+msgstr "玩家 7 开始"
 
 #: src/emu/inpttype.ipp:504
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr "8 位玩家开始"
+msgstr "玩家 8 开始"
 
 #: src/emu/inpttype.ipp:509
 msgctxt "input-name"
@@ -5325,7 +5329,7 @@ msgstr "投币孔 12"
 #: src/emu/inpttype.ipp:521
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr ""
+msgstr "投钞孔 1"
 
 #: src/emu/inpttype.ipp:526
 msgctxt "input-name"
@@ -6305,7 +6309,7 @@ msgstr "鼠标 Y 10"
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "小键盘"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
@@ -6350,7 +6354,7 @@ msgstr "重新启动机台"
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "软体重新启动"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
@@ -6520,7 +6524,7 @@ msgstr "菜单 切换"
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "菜单 解除指标锁定"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
@@ -6560,7 +6564,7 @@ msgstr "菜单 新增/移除最爱项目"
 #: src/emu/inpttype.ipp:861
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr "菜单"
+msgstr "菜单 汇出列表"
 
 #: src/emu/inpttype.ipp:862
 msgctxt "input-name"
@@ -7046,18 +7050,3 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
-
-#, c-format
-#~ msgid "%s.xml saved under ui folder."
-#~ msgstr "%s.xml 已保存于 ui 文件夹。"
-
-#, c-format
-#~ msgid "%s.txt saved under ui folder."
-#~ msgstr "%s.txt 已保存于 ui 资料夹下。"
-
-#, c-format
-#~ msgid "Double-click or press %1$s to change the color value"
-#~ msgstr "双击或按下 %1$s 以改变颜色值"
-
-#~ msgid "Restore originals colors"
-#~ msgstr "还原至原本颜色"

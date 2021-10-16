@@ -443,7 +443,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	if (selectedref)
@@ -455,7 +455,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			draw_text_box(
 					std::begin(bottomtext), std::end(bottomtext),
 					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 					ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 		}
 	}

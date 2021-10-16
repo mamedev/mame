@@ -119,7 +119,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// get the text for 'UI Select'
@@ -127,7 +127,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 

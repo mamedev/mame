@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-16 04:41+1100\n"
-"PO-Revision-Date: 2021-10-14 21:20+0800\n"
+"PO-Revision-Date: 2021-10-16 12:55+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -300,7 +300,7 @@ msgstr "搜尋： %1$s_"
 #: src/frontend/mame/ui/selsoft.cpp:723
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "軟體列表/項目: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:163
 msgid "Sound Options"
@@ -1519,7 +1519,7 @@ msgstr "可見度延遲"
 #: src/frontend/mame/ui/miscmenu.cpp:639
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "%s.xml 已儲存於 UI 設定資料夾"
 
 #: src/frontend/mame/ui/miscmenu.cpp:665
 msgid "Name:             Description:\n"
@@ -1528,7 +1528,7 @@ msgstr "名稱：            描述：\n"
 #: src/frontend/mame/ui/miscmenu.cpp:676
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "%s.txt 已儲存於 UI 設定資料夾"
 
 #: src/frontend/mame/ui/miscmenu.cpp:693
 msgid "Export list in XML format (like -listxml)"
@@ -2126,6 +2126,10 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"取消驗證？\n"
+"\n"
+"按下 %1$s 取消\n"
+"按下 %2$s 繼續"
 
 #: src/frontend/mame/ui/auditmenu.cpp:135
 #, c-format
@@ -2300,7 +2304,7 @@ msgstr "滑鼠按下背景顏色"
 
 #: src/frontend/mame/ui/custui.cpp:600
 msgid "Restore default colors"
-msgstr ""
+msgstr "還原至預設顏色"
 
 #: src/frontend/mame/ui/custui.cpp:612
 msgid "UI Color Settings"
@@ -2309,7 +2313,7 @@ msgstr "UI 色彩設定"
 #: src/frontend/mame/ui/custui.cpp:621
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "雙擊或按下 %1$s 改變顏色"
 
 #: src/frontend/mame/ui/custui.cpp:629
 msgid "Menu Preview"
@@ -3615,12 +3619,12 @@ msgstr "半押"
 #: src/emu/inpttype.ipp:119
 msgctxt "input-name"
 msgid "High"
-msgstr ""
+msgstr "大"
 
 #: src/emu/inpttype.ipp:120
 msgctxt "input-name"
 msgid "Low"
-msgstr ""
+msgstr "小"
 
 #: src/emu/inpttype.ipp:125
 msgctxt "input-name"
@@ -5225,42 +5229,42 @@ msgstr "P10 選擇"
 #: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr "1 位玩家開始"
+msgstr "玩家 1 開始"
 
 #: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr "2 位玩家開始"
+msgstr "玩家 2 開始"
 
 #: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr "3 位玩家開始"
+msgstr "玩家 3 開始"
 
 #: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr "4 位玩家開始"
+msgstr "玩家 4 開始"
 
 #: src/emu/inpttype.ipp:501
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr "5 位玩家開始"
+msgstr "玩家 5 開始"
 
 #: src/emu/inpttype.ipp:502
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr "6 位玩家開始"
+msgstr "玩家 6 開始"
 
 #: src/emu/inpttype.ipp:503
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr "7 位玩家開始"
+msgstr "玩家 7 開始"
 
 #: src/emu/inpttype.ipp:504
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr "8 位玩家開始"
+msgstr "玩家 8 開始"
 
 #: src/emu/inpttype.ipp:509
 msgctxt "input-name"
@@ -5325,7 +5329,7 @@ msgstr "投幣孔 12"
 #: src/emu/inpttype.ipp:521
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr ""
+msgstr "吸鈔口 1"
 
 #: src/emu/inpttype.ipp:526
 msgctxt "input-name"
@@ -6305,7 +6309,7 @@ msgstr "滑鼠 Y 10"
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
 msgid "Keypad"
-msgstr ""
+msgstr "小鍵盤"
 
 #: src/emu/inpttype.ipp:807
 msgctxt "input-name"
@@ -6350,7 +6354,7 @@ msgstr "重新啟動機台"
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "軟體重新啟動"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
@@ -6520,7 +6524,7 @@ msgstr "選單 切換"
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "選單 釋放指標"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
@@ -6560,7 +6564,7 @@ msgstr "選單 新增/移除最愛項目"
 #: src/emu/inpttype.ipp:861
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr "選單"
+msgstr "選單 匯出清單"
 
 #: src/emu/inpttype.ipp:862
 msgctxt "input-name"
@@ -7046,18 +7050,3 @@ msgstr "MESSinfo"
 #: plugins/data/data_mameinfo.lua:20
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
-
-#, c-format
-#~ msgid "%s.xml saved under ui folder."
-#~ msgstr "%s.xml 已儲存於 ui 資料夾下。"
-
-#, c-format
-#~ msgid "%s.txt saved under ui folder."
-#~ msgstr "%s.txt 已儲存於 ui 資料夾下。"
-
-#, c-format
-#~ msgid "Double-click or press %1$s to change the color value"
-#~ msgstr "雙擊或按下 %1$s 以改變顏色值"
-
-#~ msgid "Restore originals colors"
-#~ msgstr "還原至原本顏色"

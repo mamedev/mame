@@ -396,7 +396,7 @@ private:
 			draw_text_box(
 					std::begin(text), std::end(text),
 					x, x2, y - top, y - ui().box_tb_border(),
-					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		}
 
@@ -1002,7 +1002,7 @@ private:
 			draw_text_box(
 					std::begin(text), std::end(text),
 					x, x2, y - top, y - ui().box_tb_border(),
-					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		}
 
@@ -2044,7 +2044,7 @@ ui_software_info::ui_software_info(
 {
 	// show the list/item here
 	infotext.append(longname);
-	infotext.append("\t\n\n");
+	infotext.append(2, '\n');
 	infotext.append(_("swlist-info", "Software list/item"));
 	infotext.append(1, '\n');
 	infotext.append(listname);

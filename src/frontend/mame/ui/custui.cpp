@@ -199,7 +199,7 @@ void menu_custom_ui::custom_render(void *selectedref, float top, float bottom, f
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -491,7 +491,7 @@ void menu_font_ui::custom_render(void *selectedref, float top, float bottom, flo
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	if (uintptr_t(selectedref) == INFOS_SIZE)
@@ -500,7 +500,7 @@ void menu_font_ui::custom_render(void *selectedref, float top, float bottom, flo
 		draw_text_box(
 				std::begin(bottomtext), std::end(bottomtext),
 				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-				ui::text_layout::LEFT, ui::text_layout::NEVER, false,
+				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER, false,
 				ui().colors().text_color(), UI_GREEN_COLOR, m_info_size);
 	}
 }
@@ -613,7 +613,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// bottom text
@@ -622,7 +622,7 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// compute maxwidth
@@ -630,8 +630,12 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	float width;
-	ui().draw_text_full(container(), topbuf, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
+	ui().draw_text_full(
+			container(),
+			topbuf,
+			0.0f, 0.0f, 1.0f,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	float maxwidth = width + 2.0f * lr_border;
 
 	std::string sampletxt[5];
@@ -644,8 +648,12 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 
 	for (auto & elem: sampletxt)
 	{
-		ui().draw_text_full(container(), elem, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-										mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
+		ui().draw_text_full(
+				container(),
+				elem,
+				0.0f, 0.0f, 1.0f,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * lr_border;
 		maxwidth = std::max(maxwidth, width);
 	}
@@ -666,8 +674,12 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	y2 -= ui().box_tb_border();
 
 	// draw the text within it
-	ui().draw_text_full(container(), topbuf, x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			topbuf,
+			x1, y1, x2 - x1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, nullptr);
 
 	// compute our bounds for menu preview
 	float line_height = ui().get_line_height();
@@ -685,30 +697,50 @@ void menu_colors_ui::custom_render(void *selectedref, float top, float bottom, f
 	y1 += ui().box_tb_border();
 
 	// draw normal text
-	ui().draw_text_full(container(), sampletxt[0], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, m_color_table[MUI_TEXT_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			sampletxt[0],
+			x1, y1, x2 - x1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, m_color_table[MUI_TEXT_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw subitem text
-	ui().draw_text_full(container(), sampletxt[1], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, m_color_table[MUI_SUBITEM_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			sampletxt[1],
+			x1, y1, x2 - x1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, m_color_table[MUI_SUBITEM_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw selected text
 	highlight(x1, y1, x2, y1 + line_height, m_color_table[MUI_SELECTED_BG_COLOR].color);
-	ui().draw_text_full(container(), sampletxt[2], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, m_color_table[MUI_SELECTED_COLOR].color, m_color_table[MUI_SELECTED_BG_COLOR].color, nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			sampletxt[2],
+			x1, y1, x2 - x1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, m_color_table[MUI_SELECTED_COLOR].color, m_color_table[MUI_SELECTED_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw mouse over text
 	highlight(x1, y1, x2, y1 + line_height, m_color_table[MUI_MOUSEOVER_BG_COLOR].color);
-	ui().draw_text_full(container(), sampletxt[3], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, m_color_table[MUI_MOUSEOVER_COLOR].color, m_color_table[MUI_MOUSEOVER_BG_COLOR].color, nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			sampletxt[3],
+			x1, y1, x2 - x1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, m_color_table[MUI_MOUSEOVER_COLOR].color, m_color_table[MUI_MOUSEOVER_BG_COLOR].color, nullptr, nullptr);
 	y1 += line_height;
 
 	// draw clone text
-	ui().draw_text_full(container(), sampletxt[4], x1, y1, x2 - x1, ui::text_layout::CENTER, ui::text_layout::NEVER,
-									mame_ui_manager::NORMAL, m_color_table[MUI_CLONE_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
+	ui().draw_text_full(
+			container(),
+			sampletxt[4],
+			x1, y1, x2 - x1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, m_color_table[MUI_CLONE_COLOR].color, m_color_table[MUI_TEXT_BG_COLOR].color, nullptr, nullptr);
 
 }
 
@@ -890,8 +922,12 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 	float width, maxwidth = origx2 - origx1;
 
 	// top text
-	ui().draw_text_full(container(), m_title, 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
+	ui().draw_text_full(
+			container(),
+			m_title,
+			0.0f, 0.0f, 1.0f,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width);
 	const float lr_border = ui().box_lr_border() * machine().render().ui_aspect(&container());
 	width += 2 * lr_border;
 	maxwidth = std::max(maxwidth, width);
@@ -915,7 +951,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 			container(),
 			m_title,
 			x1, y1, x2 - x1,
-			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
 			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
 
 	std::string sampletxt(_("Color preview:"));
@@ -923,7 +959,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 			container(),
 			sampletxt,
 			0.0f, 0.0f, 1.0f,
-			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
 			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 			&width);
 	width += 2 * lr_border;
@@ -947,7 +983,7 @@ void menu_rgb_ui::custom_render(void *selectedref, float top, float bottom, floa
 			container(),
 			sampletxt,
 			x1, y1, width - lr_border,
-			ui::text_layout::CENTER, ui::text_layout::NEVER,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
 			mame_ui_manager::NORMAL, rgb_t::white(), rgb_t::black());
 
 	x1 += width + (lr_border * 2.0f);

@@ -80,7 +80,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 			draw_text_box(
 					&m_prompt, &m_prompt + 1,
 					x, x2, y2 + ui().box_tb_border(), y2 + bottom,
-					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		}
 		break;
@@ -102,7 +102,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 			ui().draw_text_box(
 					container(),
 					std::move(text).str(),
-					ui::text_layout::CENTER,
+					text_layout::text_justify::CENTER,
 					0.5f, 0.5f,
 					ui().colors().background_color());
 		}
@@ -115,7 +115,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 					_("Cancel audit?\n\nPress %1$s to cancel\nPress %2$s to continue"),
 					ui().get_general_input_setting(IPT_UI_SELECT),
 					ui().get_general_input_setting(IPT_UI_CANCEL)),
-				ui::text_layout::CENTER,
+				text_layout::text_justify::CENTER,
 				0.5f, 0.5f,
 				UI_RED_COLOR);
 		break;
