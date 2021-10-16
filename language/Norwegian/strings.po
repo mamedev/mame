@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-16 04:41+1100\n"
+"POT-Creation-Date: 2021-10-17 07:08+1100\n"
 "PO-Revision-Date: 2018-08-05 19:10+0200\n"
 "Last-Translator: Imre Kristoffer Eilertsen <imreeil42@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
@@ -33,21 +33,21 @@ msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
 "Denne driveren krever at bilder lastes inn i de(n) følgende enhet(en): "
 
-#: src/frontend/mame/ui/ui.cpp:1268
+#: src/frontend/mame/ui/ui.cpp:1290
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1270
+#: src/frontend/mame/ui/ui.cpp:1292
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1464
+#: src/frontend/mame/ui/ui.cpp:1486
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -60,185 +60,185 @@ msgstr ""
 "Trykk «%1$s» for å avslutte,\n"
 "Trykk «%2$s» for å gå tilbake til emuleringen."
 
-#: src/frontend/mame/ui/ui.cpp:1514
+#: src/frontend/mame/ui/ui.cpp:1536
 msgid "Master Volume"
 msgstr "Hovedvolum"
 
-#: src/frontend/mame/ui/ui.cpp:1523
+#: src/frontend/mame/ui/ui.cpp:1545
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s volum"
 
-#: src/frontend/mame/ui/ui.cpp:1545
+#: src/frontend/mame/ui/ui.cpp:1567
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Overklokk CPU %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1553
+#: src/frontend/mame/ui/ui.cpp:1575
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr "Overklokk %1$s-lyd"
 
-#: src/frontend/mame/ui/ui.cpp:1572
+#: src/frontend/mame/ui/ui.cpp:1594
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s-oppfriskningsfrekvens"
 
-#: src/frontend/mame/ui/ui.cpp:1577
+#: src/frontend/mame/ui/ui.cpp:1599
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s lysstyrke"
 
-#: src/frontend/mame/ui/ui.cpp:1579
+#: src/frontend/mame/ui/ui.cpp:1601
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s kontrast"
 
-#: src/frontend/mame/ui/ui.cpp:1581
+#: src/frontend/mame/ui/ui.cpp:1603
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s gamma"
 
-#: src/frontend/mame/ui/ui.cpp:1585
+#: src/frontend/mame/ui/ui.cpp:1607
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s vannrett strekk"
 
-#: src/frontend/mame/ui/ui.cpp:1587
+#: src/frontend/mame/ui/ui.cpp:1609
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s vannrett posisjon"
 
-#: src/frontend/mame/ui/ui.cpp:1589
+#: src/frontend/mame/ui/ui.cpp:1611
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s loddrett strekk"
 
-#: src/frontend/mame/ui/ui.cpp:1591
+#: src/frontend/mame/ui/ui.cpp:1613
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s loddrett posisjon"
 
-#: src/frontend/mame/ui/ui.cpp:1607
+#: src/frontend/mame/ui/ui.cpp:1629
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisc %1$s vannrett strekk"
 
-#: src/frontend/mame/ui/ui.cpp:1610
+#: src/frontend/mame/ui/ui.cpp:1632
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisc %1$s vannrett posisjon"
 
-#: src/frontend/mame/ui/ui.cpp:1612
+#: src/frontend/mame/ui/ui.cpp:1634
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdisc %1$s loddrett strekk"
 
-#: src/frontend/mame/ui/ui.cpp:1615
+#: src/frontend/mame/ui/ui.cpp:1637
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisc %1$s loddrett posisjon"
 
-#: src/frontend/mame/ui/ui.cpp:1625
+#: src/frontend/mame/ui/ui.cpp:1647
 msgid "Vector Flicker"
 msgstr "Vektorflimring"
 
-#: src/frontend/mame/ui/ui.cpp:1626
+#: src/frontend/mame/ui/ui.cpp:1648
 msgid "Beam Width Minimum"
 msgstr "Minimum strålebredde"
 
-#: src/frontend/mame/ui/ui.cpp:1627
+#: src/frontend/mame/ui/ui.cpp:1649
 msgid "Beam Width Maximum"
 msgstr "Maks strålebredde"
 
-#: src/frontend/mame/ui/ui.cpp:1628
+#: src/frontend/mame/ui/ui.cpp:1650
 msgid "Beam Dot Size"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1629
+#: src/frontend/mame/ui/ui.cpp:1651
 msgid "Beam Intensity Weight"
 msgstr "Stråleintensitetsvekt"
 
-#: src/frontend/mame/ui/ui.cpp:1642
+#: src/frontend/mame/ui/ui.cpp:1664
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Siktehårskala %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1642 src/frontend/mame/ui/ui.cpp:1644
+#: src/frontend/mame/ui/ui.cpp:1664 src/frontend/mame/ui/ui.cpp:1666
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1642 src/frontend/mame/ui/ui.cpp:1644
+#: src/frontend/mame/ui/ui.cpp:1664 src/frontend/mame/ui/ui.cpp:1666
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1644
+#: src/frontend/mame/ui/ui.cpp:1666
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Siktehåravvik %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1676
+#: src/frontend/mame/ui/ui.cpp:1698
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1719
+#: src/frontend/mame/ui/ui.cpp:1741
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1734
+#: src/frontend/mame/ui/ui.cpp:1756
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1757 src/frontend/mame/ui/ui.cpp:1777
-#: src/frontend/mame/ui/ui.cpp:1796 src/frontend/mame/ui/ui.cpp:1814
-#: src/frontend/mame/ui/ui.cpp:1833 src/frontend/mame/ui/ui.cpp:1852
-#: src/frontend/mame/ui/ui.cpp:1871 src/frontend/mame/ui/ui.cpp:1890
-#: src/frontend/mame/ui/ui.cpp:1911 src/frontend/mame/ui/ui.cpp:1932
-#: src/frontend/mame/ui/ui.cpp:1953 src/frontend/mame/ui/ui.cpp:1974
+#: src/frontend/mame/ui/ui.cpp:1779 src/frontend/mame/ui/ui.cpp:1799
+#: src/frontend/mame/ui/ui.cpp:1818 src/frontend/mame/ui/ui.cpp:1836
+#: src/frontend/mame/ui/ui.cpp:1855 src/frontend/mame/ui/ui.cpp:1874
+#: src/frontend/mame/ui/ui.cpp:1893 src/frontend/mame/ui/ui.cpp:1912
+#: src/frontend/mame/ui/ui.cpp:1933 src/frontend/mame/ui/ui.cpp:1954
+#: src/frontend/mame/ui/ui.cpp:1975 src/frontend/mame/ui/ui.cpp:1996
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:1989 src/frontend/mame/ui/ui.cpp:2004
-#: src/frontend/mame/ui/ui.cpp:2019 src/frontend/mame/ui/ui.cpp:2034
-#: src/frontend/mame/ui/ui.cpp:2049
+#: src/frontend/mame/ui/ui.cpp:2011 src/frontend/mame/ui/ui.cpp:2026
+#: src/frontend/mame/ui/ui.cpp:2041 src/frontend/mame/ui/ui.cpp:2056
+#: src/frontend/mame/ui/ui.cpp:2071
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2065
+#: src/frontend/mame/ui/ui.cpp:2087
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Siktehårskala X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2065
+#: src/frontend/mame/ui/ui.cpp:2087
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Siktehårskala Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2082
+#: src/frontend/mame/ui/ui.cpp:2104
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Siktehåravvik X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2082
+#: src/frontend/mame/ui/ui.cpp:2104
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Siktehåravvik Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2189
+#: src/frontend/mame/ui/ui.cpp:2191
 msgid "**Error saving ui.ini**"
 msgstr "**Feil under lagring av ui.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2248
+#: src/frontend/mame/ui/ui.cpp:2250
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "Feil under lagring av %s.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2252 src/frontend/mame/ui/miscmenu.cpp:763
+#: src/frontend/mame/ui/ui.cpp:2254 src/frontend/mame/ui/miscmenu.cpp:763
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -678,24 +678,24 @@ msgstr "Synkronisert oppfriskning"
 msgid "Wait Vertical Sync"
 msgstr "Avvent V-synkro"
 
-#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:672
+#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:687
 #: src/frontend/mame/ui/videoopt.cpp:192 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
 msgid "On"
 msgstr "På"
 
-#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:675
+#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:690
 #: src/frontend/mame/ui/videoopt.cpp:208 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
 #: plugins/cheat/init.lua:680
 msgid "Off"
 msgstr "Av"
 
-#: src/frontend/mame/ui/menu.cpp:678
+#: src/frontend/mame/ui/menu.cpp:693
 msgid "Auto"
 msgstr "Auto"
 
-#: src/frontend/mame/ui/menu.cpp:1190
+#: src/frontend/mame/ui/menu.cpp:1256
 #: src/frontend/mame/ui/simpleselgame.cpp:289
 msgid "Return to Previous Menu"
 msgstr "Gå tilbake til forrige meny"
@@ -1453,13 +1453,14 @@ msgctxt "swlist-info"
 msgid "Software list/item"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:85 src/frontend/mame/ui/selmenu.cpp:2696
+#: src/frontend/mame/ui/datmenu.cpp:87 src/frontend/mame/ui/selmenu.cpp:2709
 msgid "Software List Info"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:398
-msgid "Revision: "
-msgstr "Revidering: "
+#: src/frontend/mame/ui/datmenu.cpp:474
+#, c-format
+msgid "Revision: %1$s"
+msgstr "Revidering: %1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:78 src/frontend/mame/ui/confswitch.cpp:165
 #: src/frontend/mame/ui/slotopt.cpp:203
@@ -1574,7 +1575,7 @@ msgstr ""
 msgid "Configure Machine:"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:873 src/frontend/mame/ui/selmenu.cpp:2634
+#: src/frontend/mame/ui/miscmenu.cpp:873 src/frontend/mame/ui/selmenu.cpp:2649
 msgid " (default)"
 msgstr " (standard)"
 
@@ -1766,7 +1767,7 @@ msgid "Configure Options"
 msgstr "Sett opp innstillingene"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:284
-#: src/frontend/mame/ui/selmenu.cpp:1287
+#: src/frontend/mame/ui/selmenu.cpp:1288
 msgid "Exit"
 msgstr "Avslutt"
 
@@ -1785,7 +1786,7 @@ msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:328
-#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
+#: src/frontend/mame/ui/selmenu.cpp:678 src/frontend/mame/ui/selmenu.cpp:709
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
@@ -1796,52 +1797,52 @@ msgid "Driver: %1$-.100s"
 msgstr "Driver: %1$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:347
-#: src/frontend/mame/ui/selmenu.cpp:723
+#: src/frontend/mame/ui/selmenu.cpp:724
 msgid "Overall: NOT WORKING"
 msgstr "Alt i alt: VIRKER IKKE"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:349
-#: src/frontend/mame/ui/selmenu.cpp:725
+#: src/frontend/mame/ui/selmenu.cpp:726
 msgid "Overall: Unemulated Protection"
 msgstr "Alt i alt: Uemulert beskyttelse"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:351
-#: src/frontend/mame/ui/selmenu.cpp:727
+#: src/frontend/mame/ui/selmenu.cpp:728
 msgid "Overall: Working"
 msgstr "Alt i alt: Fungerer"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:355
-#: src/frontend/mame/ui/selmenu.cpp:731
+#: src/frontend/mame/ui/selmenu.cpp:732
 msgid "Graphics: Unimplemented, "
 msgstr "Grafikk: Ikke implementert, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:357
-#: src/frontend/mame/ui/selmenu.cpp:733
+#: src/frontend/mame/ui/selmenu.cpp:734
 msgid "Graphics: Imperfect, "
 msgstr "Grafikk: Ikke perfekt, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:359
-#: src/frontend/mame/ui/selmenu.cpp:735
+#: src/frontend/mame/ui/selmenu.cpp:736
 msgid "Graphics: OK, "
 msgstr "Grafikk: OK, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:362
-#: src/frontend/mame/ui/selmenu.cpp:738
+#: src/frontend/mame/ui/selmenu.cpp:739
 msgid "Sound: None"
 msgstr "Lyd: Ingen"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:364
-#: src/frontend/mame/ui/selmenu.cpp:740
+#: src/frontend/mame/ui/selmenu.cpp:741
 msgid "Sound: Unimplemented"
 msgstr "Lyd: Ikke implementert"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:366
-#: src/frontend/mame/ui/selmenu.cpp:742
+#: src/frontend/mame/ui/selmenu.cpp:743
 msgid "Sound: Imperfect"
 msgstr "Lyd: Ikke perfekt"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:368
-#: src/frontend/mame/ui/selmenu.cpp:744
+#: src/frontend/mame/ui/selmenu.cpp:745
 msgid "Sound: OK"
 msgstr "Lyd: OK"
 
@@ -2317,114 +2318,114 @@ msgstr ""
 msgid "Menu Preview"
 msgstr "Menyforhåndsvisning"
 
-#: src/frontend/mame/ui/custui.cpp:639
+#: src/frontend/mame/ui/custui.cpp:643
 msgctxt "color-sample"
 msgid "Normal"
 msgstr "Normal"
 
-#: src/frontend/mame/ui/custui.cpp:640
+#: src/frontend/mame/ui/custui.cpp:644
 msgctxt "color-sample"
 msgid "Subitem"
 msgstr "Undergjenstand"
 
-#: src/frontend/mame/ui/custui.cpp:641
+#: src/frontend/mame/ui/custui.cpp:645
 msgctxt "color-sample"
 msgid "Selected"
 msgstr "Valgt"
 
-#: src/frontend/mame/ui/custui.cpp:642
+#: src/frontend/mame/ui/custui.cpp:646
 msgctxt "color-sample"
 msgid "Mouse Over"
 msgstr "Hold musen over"
 
-#: src/frontend/mame/ui/custui.cpp:643
+#: src/frontend/mame/ui/custui.cpp:647
 msgctxt "color-sample"
 msgid "Clone"
 msgstr "Klon"
 
-#: src/frontend/mame/ui/custui.cpp:843
+#: src/frontend/mame/ui/custui.cpp:875
 msgid "ARGB Settings"
 msgstr "ARGB-innstillinger"
 
-#: src/frontend/mame/ui/custui.cpp:848 src/frontend/mame/ui/custui.cpp:851
+#: src/frontend/mame/ui/custui.cpp:880 src/frontend/mame/ui/custui.cpp:883
 msgctxt "color-channel"
 msgid "Alpha"
 msgstr "Alfa"
 
-#: src/frontend/mame/ui/custui.cpp:856 src/frontend/mame/ui/custui.cpp:859
+#: src/frontend/mame/ui/custui.cpp:888 src/frontend/mame/ui/custui.cpp:891
 msgctxt "color-channel"
 msgid "Red"
 msgstr "Rød"
 
-#: src/frontend/mame/ui/custui.cpp:864 src/frontend/mame/ui/custui.cpp:867
+#: src/frontend/mame/ui/custui.cpp:896 src/frontend/mame/ui/custui.cpp:899
 msgctxt "color-channel"
 msgid "Green"
 msgstr "Grønn"
 
-#: src/frontend/mame/ui/custui.cpp:872 src/frontend/mame/ui/custui.cpp:875
+#: src/frontend/mame/ui/custui.cpp:904 src/frontend/mame/ui/custui.cpp:907
 msgctxt "color-channel"
 msgid "Blue"
 msgstr "Blå"
 
-#: src/frontend/mame/ui/custui.cpp:878
+#: src/frontend/mame/ui/custui.cpp:910
 msgid "Choose from palette"
 msgstr "Velg fra palett"
 
-#: src/frontend/mame/ui/custui.cpp:921
+#: src/frontend/mame/ui/custui.cpp:957
 msgid "Color preview:"
 msgstr "Fargeforhåndsvisning:"
 
-#: src/frontend/mame/ui/custui.cpp:1013
+#: src/frontend/mame/ui/custui.cpp:1049
 msgctxt "color-preset"
 msgid "White"
 msgstr "Hvit"
 
-#: src/frontend/mame/ui/custui.cpp:1014
+#: src/frontend/mame/ui/custui.cpp:1050
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "Sølv"
 
-#: src/frontend/mame/ui/custui.cpp:1015
+#: src/frontend/mame/ui/custui.cpp:1051
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "Grå"
 
-#: src/frontend/mame/ui/custui.cpp:1016
+#: src/frontend/mame/ui/custui.cpp:1052
 msgctxt "color-preset"
 msgid "Black"
 msgstr "Svart"
 
-#: src/frontend/mame/ui/custui.cpp:1017
+#: src/frontend/mame/ui/custui.cpp:1053
 msgctxt "color-preset"
 msgid "Red"
 msgstr "Rød"
 
-#: src/frontend/mame/ui/custui.cpp:1018
+#: src/frontend/mame/ui/custui.cpp:1054
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "Oransje"
 
-#: src/frontend/mame/ui/custui.cpp:1019
+#: src/frontend/mame/ui/custui.cpp:1055
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Gul"
 
-#: src/frontend/mame/ui/custui.cpp:1020
+#: src/frontend/mame/ui/custui.cpp:1056
 msgctxt "color-preset"
 msgid "Green"
 msgstr "Grønn"
 
-#: src/frontend/mame/ui/custui.cpp:1021
+#: src/frontend/mame/ui/custui.cpp:1057
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "Blå"
 
-#: src/frontend/mame/ui/custui.cpp:1022
+#: src/frontend/mame/ui/custui.cpp:1058
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "Fiolett"
 
-#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:754
+#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:755
 #, c-format
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
@@ -2647,391 +2648,391 @@ msgstr "Programvaredel-valg:"
 msgid "BIOS selection:"
 msgstr "BIOS-valg:"
 
-#: src/frontend/mame/ui/selmenu.cpp:681
+#: src/frontend/mame/ui/selmenu.cpp:682
 #, c-format
 msgid "Software is clone of: %1$-.100s"
 msgstr "Programvaren er en klone av: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:683
+#: src/frontend/mame/ui/selmenu.cpp:684
 msgid "Software is parent"
 msgstr "Programvaren er overordnet"
 
-#: src/frontend/mame/ui/selmenu.cpp:688
+#: src/frontend/mame/ui/selmenu.cpp:689
 msgid "Supported: No"
 msgstr "Støttet: Nei"
 
-#: src/frontend/mame/ui/selmenu.cpp:693
+#: src/frontend/mame/ui/selmenu.cpp:694
 msgid "Supported: Partial"
 msgstr "Støttet: Delvis"
 
-#: src/frontend/mame/ui/selmenu.cpp:698
+#: src/frontend/mame/ui/selmenu.cpp:699
 msgid "Supported: Yes"
 msgstr "Støttet: Ja"
 
-#: src/frontend/mame/ui/selmenu.cpp:714
+#: src/frontend/mame/ui/selmenu.cpp:715
 msgid "Driver is parent"
 msgstr "Driveren er overordnet"
 
-#: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
+#: src/frontend/mame/ui/selmenu.cpp:717 src/frontend/mame/ui/selmenu.cpp:719
 #, c-format
 msgid "Driver is clone of: %1$-.100s"
 msgstr "Driveren er en klone av: %1$-.100s"
 
-#: src/frontend/mame/ui/selmenu.cpp:1287
+#: src/frontend/mame/ui/selmenu.cpp:1288
 msgid "Return to previous menu"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2237
+#: src/frontend/mame/ui/selmenu.cpp:2246
 msgid "Images"
 msgstr "Bilder"
 
-#: src/frontend/mame/ui/selmenu.cpp:2238
+#: src/frontend/mame/ui/selmenu.cpp:2247
 msgid "Infos"
 msgstr "Info"
 
-#: src/frontend/mame/ui/selmenu.cpp:2547
+#: src/frontend/mame/ui/selmenu.cpp:2562
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2563
+#: src/frontend/mame/ui/selmenu.cpp:2578
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2579
+#: src/frontend/mame/ui/selmenu.cpp:2594
 msgid "incorrect checksum"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2582
+#: src/frontend/mame/ui/selmenu.cpp:2597
 msgid "incorrect length"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2585
+#: src/frontend/mame/ui/selmenu.cpp:2600
 msgid "not found"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2596
+#: src/frontend/mame/ui/selmenu.cpp:2611
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2598
+#: src/frontend/mame/ui/selmenu.cpp:2613
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2602
+#: src/frontend/mame/ui/selmenu.cpp:2617
 msgid "Press any key to continue."
 msgstr "Trykk på enhver knapp for å fortsette."
 
-#: src/frontend/mame/ui/selmenu.cpp:2732
+#: src/frontend/mame/ui/selmenu.cpp:2746
 msgid "General Info"
 msgstr "Generell info"
 
-#: src/frontend/mame/ui/selmenu.cpp:2940
+#: src/frontend/mame/ui/selmenu.cpp:2898
 #, c-format
-msgid "Romset\t%1$-.100s\n"
-msgstr "ROM-sett\t%1$-.100s\n"
+msgid "Romset\t%1$s\n"
+msgstr "ROM-sett\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2941
+#: src/frontend/mame/ui/selmenu.cpp:2899
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "År\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2942
+#: src/frontend/mame/ui/selmenu.cpp:2900
 #, c-format
-msgid "Manufacturer\t%1$-.100s\n"
-msgstr "Produsent\t%1$-.100s\n"
+msgid "Manufacturer\t%1$s\n"
+msgstr "Produsent\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2949
+#: src/frontend/mame/ui/selmenu.cpp:2907
 #, c-format
-msgid "Driver is Clone of\t%1$-.100s\n"
-msgstr "Driveren er klone av\t%1$-.100s\n"
+msgid "Driver is Clone of\t%1$s\n"
+msgstr "Driveren er klone av\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2954
+#: src/frontend/mame/ui/selmenu.cpp:2912
 msgid "Driver is Parent\t\n"
 msgstr "Driveren er overordnet\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2958
+#: src/frontend/mame/ui/selmenu.cpp:2916
 msgid "Analog Controls\tYes\n"
 msgstr "Analog styring\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2960
+#: src/frontend/mame/ui/selmenu.cpp:2918
 msgid "Keyboard Inputs\tYes\n"
 msgstr "Tastaturinndata\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2963
+#: src/frontend/mame/ui/selmenu.cpp:2921
 msgid "Overall\tNOT WORKING\n"
 msgstr "Alt i alt\tVIRKER IKKE\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2965
+#: src/frontend/mame/ui/selmenu.cpp:2923
 msgid "Overall\tUnemulated Protection\n"
 msgstr "Alt i alt\tUemulert beskyttelse\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2967
+#: src/frontend/mame/ui/selmenu.cpp:2925
 msgid "Overall\tWorking\n"
 msgstr "Alt i alt\tFungerer\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2970
+#: src/frontend/mame/ui/selmenu.cpp:2928
 msgid "Graphics\tUnimplemented\n"
 msgstr "Grafikk\tIkke implementer\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2972
+#: src/frontend/mame/ui/selmenu.cpp:2930
 msgid "Graphics\tWrong Colors\n"
 msgstr "Grafikk\tFeil farger\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2974
+#: src/frontend/mame/ui/selmenu.cpp:2932
 msgid "Graphics\tImperfect Colors\n"
 msgstr "Grafikk\tNoen fargeproblemer\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2976
+#: src/frontend/mame/ui/selmenu.cpp:2934
 msgid "Graphics\tImperfect\n"
 msgstr "Grafikk\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2978
+#: src/frontend/mame/ui/selmenu.cpp:2936
 msgid "Graphics\tOK\n"
 msgstr "Grafikk\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2981
+#: src/frontend/mame/ui/selmenu.cpp:2939
 msgid "Sound\tNone\n"
 msgstr "Lyd\tIngen\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2983
+#: src/frontend/mame/ui/selmenu.cpp:2941
 msgid "Sound\tUnimplemented\n"
 msgstr "Lyd\tIkke implementer\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2985
+#: src/frontend/mame/ui/selmenu.cpp:2943
 msgid "Sound\tImperfect\n"
 msgstr "Lyd\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2987
+#: src/frontend/mame/ui/selmenu.cpp:2945
 msgid "Sound\tOK\n"
 msgstr "Lyd\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2990
+#: src/frontend/mame/ui/selmenu.cpp:2948
 msgid "Capture\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2992
+#: src/frontend/mame/ui/selmenu.cpp:2950
 msgid "Capture\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2995
+#: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Camera\tUnimplemented\n"
 msgstr "Kamera\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2997
+#: src/frontend/mame/ui/selmenu.cpp:2955
 msgid "Camera\tImperfect\n"
 msgstr "Kamera\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3000
+#: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Microphone\tUnimplemented\n"
 msgstr "Mikrofon\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3002
+#: src/frontend/mame/ui/selmenu.cpp:2960
 msgid "Microphone\tImperfect\n"
 msgstr "Mikrofon\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3005
+#: src/frontend/mame/ui/selmenu.cpp:2963
 msgid "Controls\tUnimplemented\n"
 msgstr "Kontrollere\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3007
+#: src/frontend/mame/ui/selmenu.cpp:2965
 msgid "Controls\tImperfect\n"
 msgstr "Kontrollere\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3010
+#: src/frontend/mame/ui/selmenu.cpp:2968
 msgid "Keyboard\tUnimplemented\n"
 msgstr "Tastatur\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3012
+#: src/frontend/mame/ui/selmenu.cpp:2970
 msgid "Keyboard\tImperfect\n"
 msgstr "Tastatur\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Mouse\tUnimplemented\n"
 msgstr "Mus\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3017
+#: src/frontend/mame/ui/selmenu.cpp:2975
 msgid "Mouse\tImperfect\n"
 msgstr "Mus\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3020
+#: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Media\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:2980
 msgid "Media\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:2983
 msgid "Disk\tUnimplemented\n"
 msgstr "Disk\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3027
+#: src/frontend/mame/ui/selmenu.cpp:2985
 msgid "Disk\tImperfect\n"
 msgstr "Disk\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3030
+#: src/frontend/mame/ui/selmenu.cpp:2988
 msgid "Printer\tUnimplemented\n"
 msgstr "Skriver\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3032
+#: src/frontend/mame/ui/selmenu.cpp:2990
 msgid "Printer\tImperfect\n"
 msgstr "Skriver\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3035
+#: src/frontend/mame/ui/selmenu.cpp:2993
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3037
+#: src/frontend/mame/ui/selmenu.cpp:2995
 msgid "Mag. Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3040
+#: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Punch Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3042
+#: src/frontend/mame/ui/selmenu.cpp:3000
 msgid "Punch Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3045
+#: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3047
+#: src/frontend/mame/ui/selmenu.cpp:3005
 msgid "Mag. Drum\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3050
+#: src/frontend/mame/ui/selmenu.cpp:3008
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3052
+#: src/frontend/mame/ui/selmenu.cpp:3010
 msgid "(EP)ROM\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3055
+#: src/frontend/mame/ui/selmenu.cpp:3013
 msgid "Communications\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3057
+#: src/frontend/mame/ui/selmenu.cpp:3015
 msgid "Communications\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3060
+#: src/frontend/mame/ui/selmenu.cpp:3018
 msgid "LAN\tUnimplemented\n"
 msgstr "LAN\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3062
+#: src/frontend/mame/ui/selmenu.cpp:3020
 msgid "LAN\tImperfect\n"
 msgstr "LAN\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3065
+#: src/frontend/mame/ui/selmenu.cpp:3023
 msgid "WAN\tUnimplemented\n"
 msgstr "WAN\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3067
+#: src/frontend/mame/ui/selmenu.cpp:3025
 msgid "WAN\tImperfect\n"
 msgstr "WAN\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3070
+#: src/frontend/mame/ui/selmenu.cpp:3028
 msgid "Timing\tUnimplemented\n"
 msgstr "Timing\tIkke implementert\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3072
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Timing\tImperfect\n"
 msgstr "Timing\tIkke perfekt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3074
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Mechanical Machine\tYes\n"
 msgstr "Mekanisk maskin\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3074
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Mechanical Machine\tNo\n"
 msgstr "Mekanisk maskin\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3075
+#: src/frontend/mame/ui/selmenu.cpp:3033
 msgid "Requires Artwork\tYes\n"
 msgstr "Krever kunstverk\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3075
+#: src/frontend/mame/ui/selmenu.cpp:3033
 msgid "Requires Artwork\tNo\n"
 msgstr "Krever kunstverk\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3076
+#: src/frontend/mame/ui/selmenu.cpp:3034
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr "Krever klikkbare kunstverk\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3076
+#: src/frontend/mame/ui/selmenu.cpp:3034
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr "Krever klikkbare kunstverk\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3078
+#: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Cocktail\tNo\n"
 msgstr "Støtter Cocktail\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3079
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Driver is BIOS\tYes\n"
 msgstr "Driveren er BIOS\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3079
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Driver is BIOS\tNo\n"
 msgstr "Driveren er BIOS\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3080
+#: src/frontend/mame/ui/selmenu.cpp:3038
 msgid "Support Save\tYes\n"
 msgstr "Støtter lagring\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3080
+#: src/frontend/mame/ui/selmenu.cpp:3038
 msgid "Support Save\tNo\n"
 msgstr "Støtter lagring\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3081
+#: src/frontend/mame/ui/selmenu.cpp:3039
 msgid "Screen Orientation\tVertical\n"
 msgstr "Skjermposisjonering\tLoddrett\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3081
+#: src/frontend/mame/ui/selmenu.cpp:3039
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "Skjermposisjonering\tVannrett\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3091
+#: src/frontend/mame/ui/selmenu.cpp:3049
 msgid "Requires CHD\tYes\n"
 msgstr "Krever CHD\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3091
+#: src/frontend/mame/ui/selmenu.cpp:3049
 msgid "Requires CHD\tNo\n"
 msgstr "Krever CHD\tNei\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3104
+#: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "ROM Audit Result\tOK\n"
 msgstr "ROM-undersøkelsesresultat\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3106
+#: src/frontend/mame/ui/selmenu.cpp:3064
 msgid "ROM Audit Result\tBAD\n"
 msgstr "ROM-undersøkelsesresultat\tDÅRLIG\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3109
+#: src/frontend/mame/ui/selmenu.cpp:3067
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr "Samplingsundersøkelsesresultat\tIkke nødvendig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3111
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Samples Audit Result\tOK\n"
 msgstr ""
 "Samplingsundersøkelsesresultat\n"
 "OK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3113
+#: src/frontend/mame/ui/selmenu.cpp:3071
 msgid "Samples Audit Result\tBAD\n"
 msgstr "Samplingsundersøkelsesresultat\tDÅRLIG\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3117
+#: src/frontend/mame/ui/selmenu.cpp:3075
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
@@ -7074,10 +7075,6 @@ msgstr "MAMEinfo"
 
 #~ msgid "Add or remove favorites"
 #~ msgstr "Legg til eller fjern favoritter"
-
-#, c-format
-#~ msgid "Romset: %1$-.100s"
-#~ msgstr "ROM-sett: %1$-.100s"
 
 #~ msgid "Custom UI Settings"
 #~ msgstr "Tilpassede grensesnittinnstillinger"
