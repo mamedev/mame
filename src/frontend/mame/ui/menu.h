@@ -45,7 +45,6 @@ public:
 		FLAG_MULTILINE      = 1U << 3,
 		FLAG_REDTEXT        = 1U << 4,
 		FLAG_DISABLE        = 1U << 5,
-		FLAG_UI_DATS        = 1U << 6,
 		FLAG_UI_HEADING     = 1U << 7,
 		FLAG_COLOR_BOX      = 1U << 8
 	};
@@ -109,10 +108,11 @@ protected:
 		PROCESS_NOKEYS      = 1 << 0,
 		PROCESS_LR_ALWAYS   = 1 << 1,
 		PROCESS_LR_REPEAT   = 1 << 2,
-		PROCESS_CUSTOM_ONLY = 1 << 3,
-		PROCESS_ONLYCHAR    = 1 << 4,
-		PROCESS_NOINPUT     = 1 << 5,
-		PROCESS_NOIMAGE     = 1 << 6
+		PROCESS_CUSTOM_NAV  = 1 << 3,
+		PROCESS_CUSTOM_ONLY = 1 << 4,
+		PROCESS_ONLYCHAR    = 1 << 5,
+		PROCESS_NOINPUT     = 1 << 6,
+		PROCESS_NOIMAGE     = 1 << 7
 	};
 
 	// options for reset
@@ -276,10 +276,8 @@ protected:
 	// overridable event handling
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
+	virtual bool custom_ui_cancel() { return false; }
 	virtual bool custom_mouse_down() { return false; }
-
-	// test if search is active
-	virtual bool menu_has_search_active() { return false; }
 
 	static bool is_selectable(menu_item const &item)
 	{

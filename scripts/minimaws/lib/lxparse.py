@@ -391,11 +391,14 @@ class SoftwareHandler(ElementHandler):
             if self.cloneof is not None:
                 self.dbcurs.add_softwarecloneof(self.id, self.cloneof)
         elif name == 'notes':
-            self.notes = handler.text
-            self.dbcurs.update_software_notes(self.id, self.notes)
+            self.dbcurs.add_softwarenotes(self.id, handler.text)
 
 
 class SoftwareListHandler(ElementHandler):
+    CHILD_HANDLERS = {
+            'notes':            TextAccumulator,
+            'software':         SoftwareHandler }
+
     def __init__(self, dbconn, **kwargs):
         super(SoftwareListHandler, self).__init__(parent=None, **kwargs)
         self.dbconn = dbconn
@@ -414,33 +417,28 @@ class SoftwareListHandler(ElementHandler):
                     locator=self.locator)
         self.shortname = attrs['name']
         self.description = attrs['description']
-        self.notes = None
         self.entries = 0
         dbcurs = self.dbconn.cursor()
         self.id = dbcurs.add_softwarelist(self.shortname, self.description)
         dbcurs.close()
 
     def endMainElement(self, name):
-        if self.notes:
-            dbcurs = self.dbconn.cursor()
-            dbcurs.update_softwarelist_notes(self.id, self.notes)
-            dbcurs.close()
         self.dbconn.commit()
 
     def startChildElement(self, name, attrs):
-        if name == 'notes':
-            self.setChildHandler(name, attrs, TextAccumulator(self))
-        elif name == 'software':
-            self.setChildHandler(name, attrs, SoftwareHandler(self))
+        if name in self.CHILD_HANDLERS:
+            self.setChildHandler(name, attrs, self.CHILD_HANDLERS[name](self))
         else:
             raise xml.sax.SAXParseException(
-                    msg=('Expected "software" element but found "%s"' % (name, )),
+                    msg=('Found unexpected element "%s"' % (name, )),
                     exception=None,
                     locator=self.locator)
 
     def endChildHandler(self, name, handler):
         if name == 'notes':
-            self.notes = handler.text
+            dbcurs = self.dbconn.cursor()
+            dbcurs.add_softwarelistnotes(self.id, handler.text)
+            dbcurs.close()
         elif name == 'software':
             if self.entries >= 1023:
                 self.dbconn.commit()

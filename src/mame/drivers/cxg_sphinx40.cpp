@@ -309,7 +309,7 @@ void sphinx40_state::sphinx40(machine_config &config)
 
 ROM_START( sphinx40 )
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("gold.u3", 0x0000, 0x8000, CRC(e7cccd12) SHA1(4542f62963ab78796626c0c938e39e715d1c19f8) )
+	ROM_LOAD16_BYTE("gold.u3",   0x0000, 0x8000, CRC(e7cccd12) SHA1(4542f62963ab78796626c0c938e39e715d1c19f8) )
 	ROM_LOAD16_BYTE("orange.u2", 0x0001, 0x8000, CRC(9e0bbd15) SHA1(5867f35489d15c1e395f6b2aa91a76d74ad6f2f4) )
 ROM_END
 

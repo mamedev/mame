@@ -37,21 +37,21 @@ char const *const toolbar_icons_svg[] = {
 		// info
 		u8"<?xml version='1.0' encoding='UTF-8' standalone='no'?>"
 		"<svg xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' version='1.1' height='100' width='100'>"
-			"<circle cx='50' cy='50' r='47' fill='#001fff' stroke='#3f56ff' stroke-width='6' />"
+			"<circle cx='50' cy='50' r='47' fill='#001fff' stroke='#3f56ff' stroke-width='6' stroke-opacity='0.8' />"
 			"<circle cx='50' cy='20' r='10' fill='#ffffff' />"
 			"<path fill='#ffffff' d='m 59,38 v 34 a 10,4 0 0,0 10,4 v 8 h -36 v -8 a 10,4 0 0,0 10,-4 v -23 a 8,4 0 0,0 -8,-4 v -6 z' />"
 		"</svg>",
 		// previous menu
 		u8"<?xml version='1.0' encoding='UTF-8' standalone='no'?>"
 		"<svg xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' version='1.1' height='100' width='100'>"
-			"<rect y='8' x='8' height='84' width='84' fill='#001bdf' stroke='#001bdf' stroke-width='16' stroke-linejoin='round' />"
+			"<rect y='8' x='8' height='84' width='84' fill='#3f56ff' stroke='#3f56ff' stroke-width='16' stroke-opacity='0.8' stroke-linejoin='round' />"
 			"<rect y='10' x='10' height='80' width='80' fill='#001fff' stroke='#001fff' stroke-width='8' stroke-linejoin='round' />"
 			"<path fill='#ffffff' stroke='#ffffff' stroke-width='8' stroke-linejoin='round' d='m 16,46 28,-28 v 16 q 40,12 40,48 q -10,-24 -40,-24 v 16 z' />"
 		"</svg>",
 		// exit
 		u8"<?xml version='1.0' encoding='UTF-8' standalone='no'?>"
 		"<svg xmlns:svg='http://www.w3.org/2000/svg' xmlns='http://www.w3.org/2000/svg' version='1.1' height='100' width='100'>"
-			"<rect y='8' x='8' height='84' width='84' fill='#df0000' stroke='#df0000' stroke-width='16' stroke-linejoin='round' />"
+			"<rect y='8' x='8' height='84' width='84' fill='#ff3f3f' fill-opacity='0.8' stroke='#ff3f3f' stroke-opacity='0.8' stroke-width='16' stroke-linejoin='round' />"
 			"<rect y='10' x='10' height='80' width='80' fill='#ff0000' stroke='#ff0000' stroke-width='8' stroke-linejoin='round' />"
 			"<path fill='#ffffff' stroke='#ffffff' stroke-width='8' stroke-linejoin='round' d='m 16,24 8,-8 26,26 26,-26 8,8 -26,26 26,26 -8,8 -26,-26 -26,26 -8,-8 26,-26 z' />"
 		"</svg>" };

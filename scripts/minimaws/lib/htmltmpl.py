@@ -258,10 +258,6 @@ SOFTWARE_PROLOGUE = string.Template(
         '    <tr><th>Year:</th><td>${year}</td></tr>\n' \
         '    <tr><th>Publisher:</th><td>${publisher}</td></tr>\n');
 
-SOFTWARE_EPILOGUE = string.Template(
-        '<h2>Notes</h2>\n' \
-        '<p><pre>${notes}<p></pre>\n');
-
 SOFTWARE_CLONES_PROLOGUE = string.Template(
         '<h2 id="heading-clones">Clones</h2>\n' \
         '<table id="tbl-clones">\n' \
@@ -285,11 +281,27 @@ SOFTWARE_CLONES_ROW = string.Template(
         '            <td>${supported}</td>\n' \
         '        </tr>\n')
 
+SOFTWARE_NOTES_PROLOGUE = string.Template(
+        '<h2 id="heading-notes">Notes</h2>\n' \
+        '<div id="div-notes">\n')
+
+SOFTWARE_NOTES_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-notes"), document.getElementById("div-notes"))();</script>\n\n')
+
+SOFTWARE_PARTS_PROLOGUE = string.Template(
+        '<h2 id="heading-parts">Parts</h2>\n' \
+        '<div id="div-parts">\n\n')
+
+SOFTWARE_PARTS_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-parts"), document.getElementById("div-parts"));</script>\n\n')
+
 SOFTWARE_PART_PROLOGUE = string.Template(
-        '<h3>${heading}</h3>\n' \
-        '<table class="sysinfo">\n' \
-        '    <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
-        '    <tr><th>Interface:</th><td>${interface}</td></tr>\n')
+        '    <h3>${heading}</h3>\n' \
+        '    <table class="sysinfo">\n' \
+        '        <tr><th>Short name:</th><td>${shortname}</td></tr>\n' \
+        '        <tr><th>Interface:</th><td>${interface}</td></tr>\n')
 
 
 SOFTWARELIST_PROLOGUE = string.Template(
@@ -332,9 +344,13 @@ SOFTWARELIST_PROLOGUE = string.Template(
         '    </tr>\n' \
         '</table>\n')
 
-SOFTWARELIST_EPILOGUE = string.Template(
-        '<h2>Notes</h2>\n' \
-        '<p><pre>${notes}<p></pre>\n')
+SOFTWARELIST_NOTES_PROLOGUE = string.Template(
+        '<h2 id="heading-notes">Notes</h2>\n' \
+        '<div id="div-notes">\n')
+
+SOFTWARELIST_NOTES_EPILOGUE = string.Template(
+        '</div>\n' \
+        '<script>make_collapsible(document.getElementById("heading-notes"), document.getElementById("div-notes"))();</script>\n\n')
 
 SOFTWARELIST_MACHINE_TABLE_HEADER = string.Template(
         '<h2 id="heading-machines">Machines</h2>\n' \

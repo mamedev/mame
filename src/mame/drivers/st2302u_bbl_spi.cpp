@@ -59,7 +59,7 @@ private:
 
 	void bbl380_map(address_map &map);
 
-	required_device<st2xxx_device> m_maincpu;
+	required_device<st2205u_base_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void output_w(u8 data);
@@ -262,7 +262,7 @@ INPUT_PORTS_END
 
 void bbl380_state::bbl380(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000); // unknown clock; type not confirmed
+	ST2302U(config, m_maincpu, 32000000); // unknown clock; type not confirmed
 	m_maincpu->set_addrmap(AS_DATA, &bbl380_state::bbl380_map);
 	m_maincpu->in_pa_callback().set_ioport("IN0");
 	m_maincpu->in_pb_callback().set_ioport("IN1");
@@ -273,6 +273,14 @@ void bbl380_state::bbl380(machine_config &config)
 	// TODO, hook these up properly
 	//m_maincpu->spi_in_callback().set(FUNC(bbl380_state::spi_r));
 	//m_maincpu->spi_out_callback().set(FUNC(bbl380_state::spi_w));
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(0, "mono", 1.00);
+	m_maincpu->add_route(1, "mono", 1.00);
+	m_maincpu->add_route(2, "mono", 1.00);
+	m_maincpu->add_route(3, "mono", 1.00);
+
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD); // TFT color LCD
 	m_screen->set_refresh_hz(60);

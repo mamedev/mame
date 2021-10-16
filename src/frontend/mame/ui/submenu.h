@@ -12,8 +12,9 @@
 
 #pragma once
 
-#include "emuopts.h"
 #include "ui/menu.h"
+
+#include "emuopts.h"
 
 #include <string>
 #include <vector>

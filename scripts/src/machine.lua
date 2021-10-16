@@ -1393,6 +1393,22 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/gt913.h,MACHINES["GT913"] = true
+---------------------------------------------------
+
+if (MACHINES["GT913"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/gt913_io.cpp",
+		MAME_DIR .. "src/devices/machine/gt913_io.h",
+		MAME_DIR .. "src/devices/machine/gt913_kbd.cpp",
+		MAME_DIR .. "src/devices/machine/gt913_kbd.h",
+		MAME_DIR .. "src/devices/machine/gt913_snd.cpp",
+		MAME_DIR .. "src/devices/machine/gt913_snd.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/hd63450.h,MACHINES["HD63450"] = true
 ---------------------------------------------------
 

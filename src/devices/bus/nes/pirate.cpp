@@ -45,10 +45,7 @@ DEFINE_DEVICE_TYPE(NES_XIAOZY,      nes_xiaozy_device,      "nes_xiaozy",      "
 DEFINE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device,       "nes_edu2k",       "NES Cart Educational Computer 2000 PCB")
 DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
 DEFINE_DEVICE_TYPE(NES_MK2,         nes_mk2_device,         "nes_mk2",         "NES Cart Mortal Kombat 2 PCB")
-DEFINE_DEVICE_TYPE(NES_WHERO,       nes_whero_device,       "nes_whero",       "NES Cart World Heroes PCB")
 DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "NES Cart UNL-43272 PCB")
-DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
-DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
 
 
@@ -107,23 +104,8 @@ nes_mk2_device::nes_mk2_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-nes_whero_device::nes_whero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_WHERO, tag, owner, clock), m_reg(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), m_irq_enable_latch(0)
-{
-}
-
 nes_43272_device::nes_43272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_43272, tag, owner, clock), m_latch(0)
-{
-}
-
-nes_tf1201_device::nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_TF1201, tag, owner, clock), m_prg(0), m_swap(0), m_irq_count(0), m_irq_enable(0), m_irq_enable_latch(0)
-{
-}
-
-nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_CITYFIGHT, tag, owner, clock), m_prg_reg(0), m_prg_mode(0), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
 {
 }
 
@@ -303,34 +285,6 @@ void nes_mk2_device::pcb_reset()
 	m_irq_count = m_irq_count_latch = 0;
 }
 
-
-void nes_whero_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_enable_latch));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_irq_count_latch));
-	save_item(NAME(m_reg));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_whero_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0x100, m_chr_source);
-
-	m_irq_enable = 0;
-	m_irq_enable_latch = 0;
-	m_irq_count = 0;
-	m_irq_count_latch = 0;
-
-	m_reg = 0;
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-}
-
 void nes_43272_device::device_start()
 {
 	common_start();
@@ -344,59 +298,6 @@ void nes_43272_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_latch = 0x81;
-}
-
-void nes_tf1201_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_prg));
-	save_item(NAME(m_swap));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_enable_latch));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_tf1201_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-	m_prg = 0;
-	m_swap = 0;
-	m_irq_enable = 0;
-	m_irq_enable_latch = 0;
-	m_irq_count = 0;
-}
-
-void nes_cityfight_device::device_start()
-{
-	common_start();
-	irq_timer = timer_alloc(TIMER_IRQ);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
-
-	save_item(NAME(m_prg_reg));
-	save_item(NAME(m_prg_mode));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_cityfight_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-	m_prg_reg = 0;
-	m_prg_mode = 0;
-	m_irq_enable = 0;
-	m_irq_count = 0;
 }
 
 void nes_eh8813a_device::device_start()
@@ -915,102 +816,6 @@ void nes_mk2_device::write_m(offs_t offset, uint8_t data)
 	}
 }
 
-
-/*-------------------------------------------------
-
- UNL-WORLDHERO board emulation
-
-
- iNES:
-
- -------------------------------------------------*/
-
-// Same as Konami VRC IRQ...
-void nes_whero_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	/* Increment & check the IRQ scanline counter */
-	if (m_irq_enable && (++m_irq_count == 0x100))
-	{
-		m_irq_count = m_irq_count_latch;
-		m_irq_enable = m_irq_enable_latch;
-		hold_irq_line();
-	}
-}
-
-void nes_whero_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank, shift, mask1, mask2;
-	LOG_MMC(("World Hero write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x70c3)
-	{
-		case 0x0000:
-			if (!m_reg)
-				prg8_89(data);
-			else
-				prg8_cd(data);
-			break;
-
-		case 0x1000:
-			switch (data & 0x03)
-			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-			}
-			break;
-
-		case 0x1002:
-		case 0x1080:
-			if (m_reg != (data & 2))
-			{
-				m_reg = data & 2;
-				// swap banks!
-				prg8_89(m_prg_bank[2]);
-				prg8_cd(m_prg_bank[0]);
-			}
-			break;
-
-		case 0x2000:
-			prg8_ab(data);
-			break;
-
-		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
-		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
-		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
-		case 0x6000: case 0x6001: case 0x6002: case 0x6003:
-			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + BIT(offset, 1);
-			shift = (offset & 1) << 2;
-			mask1 = shift ? 0x00f : 0xff0;
-			mask2 = shift ? 0xff0 : 0x00f;
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & mask1) | ((data << shift) & mask2);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-
-		case 0x7000:
-			m_irq_count_latch = (m_irq_count_latch & 0xf0) | (data & 0x0f);
-			break;
-
-		case 0x7001:
-			m_irq_count_latch = (m_irq_count_latch & 0x0f) | ((data & 0x0f) << 4);
-			break;
-
-		case 0x7002:
-			//          m_irq_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			m_irq_enable = data & 0x02;
-			m_irq_enable_latch = data & 0x01;
-			if (data & 0x02)
-				m_irq_count = m_irq_count_latch;
-			break;
-
-		case 0x7003:
-			m_irq_enable = m_irq_enable_latch;
-			break;
-	}
-}
-
-
 /*-------------------------------------------------
 
  UNL-43272
@@ -1038,199 +843,6 @@ uint8_t nes_43272_device::read_h(offs_t offset)
 	LOG_MMC(("unl_43272 read_h, offset: %04x\n", offset));
 
 	return hi_access_rom(offset & mask);
-}
-
-
-/*-------------------------------------------------
-
- UNL-TF1201
-
- Games:
-
- In MESS: Preliminary Supported
-
- -------------------------------------------------*/
-
-void nes_tf1201_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	if (m_irq_enable_latch != m_irq_enable && scanline < 240)
-		m_irq_count -= 8;
-
-	if (m_irq_enable)
-	{
-		m_irq_count++;
-		if ((m_irq_count & 0xff) == 238)
-			hold_irq_line();
-	}
-}
-
-void nes_tf1201_device::update_prg()
-{
-	prg8_89(m_swap ? 0xff : m_prg);
-	prg8_cd(m_swap ? m_prg : 0xff );
-}
-
-void nes_tf1201_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank;
-	LOG_MMC(("unl_tf1201 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	offset = (offset & 0x7003) | ((offset & 0x0c) >> 2);    // nestopia does not OR here...
-
-	switch (offset & 0x7003)
-	{
-		case 0x0000:
-			m_prg = data;
-			update_prg();
-			break;
-		case 0x1000:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-		case 0x1001:
-			m_swap = data & 0x03;
-			update_prg();
-			break;
-		case 0x2000:
-			prg8_ab(data);
-			break;
-		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
-		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
-		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
-		case 0x6000: case 0x6001: case 0x6002: case 0x6003:
-			bank = (((offset - 0x3000) >> 11) | (offset & 0x1)) & 0x7;
-			if (offset & 2)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-		case 0x7000:
-			m_irq_count = (m_irq_count & 0xf0) | (data & 0x0f);
-			break;
-		case 0x7001:
-		case 0x7003:
-			m_irq_enable_latch = m_irq_enable;
-			m_irq_enable = BIT(data, 1);
-			break;
-		case 0x7002:
-			m_irq_count = (m_irq_count & 0x0f) | ((data & 0x0f) << 4);
-			break;
-	}
-}
-
-
-/*-------------------------------------------------
-
- UNL-CITYFIGHT
-
- Games:
-
- Additional audio register not emulated yet!
-
- In MESS: Preliminary Supported
-
- -------------------------------------------------*/
-
-void nes_cityfight_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	if (id == TIMER_IRQ)
-	{
-		if (m_irq_enable)
-		{
-			if (!m_irq_count)
-			{
-				hold_irq_line();
-				m_irq_count = 0xffff;
-			}
-			else
-				m_irq_count--;
-		}
-	}
-}
-
-void nes_cityfight_device::update_prg()
-{
-	prg32(m_prg_reg >> 2);
-	if (!m_prg_mode)
-		prg8_cd(m_prg_reg);
-}
-
-void nes_cityfight_device::write_h(offs_t offset, uint8_t data)
-{
-	int bank;
-	LOG_MMC(("unl_cityfight write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x700c)
-	{
-		case 0x1000:
-			switch (data & 0x03)
-			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-			}
-			m_prg_reg = data & 0xc;
-			break;
-		case 0x1004:
-		case 0x1008:
-		case 0x100c:
-			if (offset & 0x800)
-				LOG_MMC(("Extended Audio write, data %x!", data & 0x0f));//pcmwrite(0x4011, (V & 0xf) << 3);
-			else
-				m_prg_reg = data & 0xc;
-			break;
-
-
-		case 0x2000: case 0x2004: case 0x2008: case 0x200c:
-			bank = 2 + BIT(offset, 3);
-			if (offset & 4)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-		case 0x3000: case 0x3004: case 0x3008: case 0x300c:
-			bank = 4 + BIT(offset, 3);
-			if (offset & 4)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-		case 0x5000: case 0x5004: case 0x5008: case 0x500c:
-			bank = 0 + BIT(offset, 3);
-			if (offset & 4)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-		case 0x6000: case 0x6004: case 0x6008: case 0x600c:
-			bank = 6 + BIT(offset, 3);
-			if (offset & 4)
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
-			else
-				m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | ((data & 0x0f) << 0);
-			chr1_x(bank, m_mmc_vrom_bank[bank], m_chr_source);
-			break;
-
-		case 0x4000:
-		case 0x4004:
-		case 0x4008:
-		case 0x400c:
-			m_prg_mode = data & 1;
-			[[fallthrough]];
-		case 0x7000:
-			m_irq_count = (m_irq_count & 0x1e0) | ((data & 0x0f) << 1);
-			break;
-		case 0x7004:
-			m_irq_count = (m_irq_count & 0x1e) | ((data & 0x0f) << 5);
-			break;
-		case 0x7008:
-			m_irq_enable = BIT(data, 1);
-			break;
-	}
 }
 
 /*-------------------------------------------------

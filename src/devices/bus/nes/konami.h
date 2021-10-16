@@ -46,6 +46,9 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	// construction/destruction
+	nes_konami_vrc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -105,11 +108,12 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void set_prg();
-	uint8_t m_mmc_vrom_bank[8];
+	uint16_t m_mmc_vrom_bank[8];
 	uint8_t m_latch, m_mmc_prg_bank;
 
 	void irq_tick();
-	uint16_t m_irq_count, m_irq_count_latch;
+	void irq_ctrl_w(uint8_t data);
+	uint8_t m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 	int m_irq_mode;
 	int m_irq_prescale;

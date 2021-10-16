@@ -100,8 +100,6 @@ private:
 
 	int mini_printf(char *buffer, const char *format, int params, u64 *param);
 
-	void execute_trace_internal(const std::vector<std::string> &params, bool trace_over);
-
 	void execute_help(const std::vector<std::string> &params);
 	void execute_print(const std::vector<std::string> &params);
 	void execute_printf(const std::vector<std::string> &params);
@@ -160,8 +158,7 @@ private:
 	void execute_dasm(const std::vector<std::string> &params);
 	void execute_find(int spacenum, const std::vector<std::string> &params);
 	void execute_fill(int spacenum, const std::vector<std::string> &params);
-	void execute_trace(const std::vector<std::string> &params);
-	void execute_traceover(const std::vector<std::string> &params);
+	void execute_trace(const std::vector<std::string> &params, bool trace_over);
 	void execute_traceflush(const std::vector<std::string> &params);
 	void execute_history(const std::vector<std::string> &params);
 	void execute_trackpc(const std::vector<std::string> &params);

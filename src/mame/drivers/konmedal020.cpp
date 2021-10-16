@@ -37,7 +37,7 @@ public:
 	konmedal020_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_vga(*this, "vga"),
+		m_vga(*this, "oak"),
 		m_ymz(*this, "ymz")
 	{ }
 
@@ -49,7 +49,7 @@ protected:
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<vga_device> m_vga;
+	required_device<oak_oti111_vga_device> m_vga;
 	required_device<ymz280b_device> m_ymz;
 
 private:
@@ -66,10 +66,12 @@ void konmedal020_state::gs471_main(address_map &map)
 	map(0x200000, 0x23ffff).ram();
 	// Watchdog and system control at 0x380000
 	map(0x3e0000, 0x3e1fff).ram();  // NVRAM?
-	map(0x800000, 0x8fffff).ram();  // VGA VRAM, probably
-	map(0xf003b0, 0xf003bf).rw(m_vga, FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
-	map(0xf003c0, 0xf003cf).rw(m_vga, FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
-	map(0xf003d0, 0xf003df).rw(m_vga, FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+	map(0x800000, 0x8fffff).rw(m_vga, FUNC(oak_oti111_vga_device::mem_linear_r), FUNC(oak_oti111_vga_device::mem_linear_w));
+	map(0xe00000, 0xe0007f).rw(m_vga, FUNC(oak_oti111_vga_device::xga_read), FUNC(oak_oti111_vga_device::xga_write));
+	map(0xf003b0, 0xf003bf).rw(m_vga, FUNC(oak_oti111_vga_device::port_03b0_r), FUNC(oak_oti111_vga_device::port_03b0_w));
+	map(0xf003c0, 0xf003cf).rw(m_vga, FUNC(oak_oti111_vga_device::port_03c0_r), FUNC(oak_oti111_vga_device::port_03c0_w));
+	map(0xf003d0, 0xf003df).rw(m_vga, FUNC(oak_oti111_vga_device::port_03d0_r), FUNC(oak_oti111_vga_device::port_03d0_w));
+	map(0xf021e0, 0xf021e9).rw(m_vga, FUNC(oak_oti111_vga_device::dac_read), FUNC(oak_oti111_vga_device::dac_write));
 }
 
 static INPUT_PORTS_START( gs471 )
@@ -95,8 +97,9 @@ void konmedal020_state::gs471(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(vga_device::screen_update));
+	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_3);
 
-	VGA(config, m_vga, 0).set_screen("screen");
+	OTI111(config, m_vga, 0).set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

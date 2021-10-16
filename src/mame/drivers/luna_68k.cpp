@@ -22,6 +22,7 @@
  *  DPU8  video/framebuffer, Bt458 @ 108MHz
  *  CMC   communications (GPIB, Ethernet, serial), 68020 @ 12.5MHz?
  *
+ * This specific machine may be an SX-9100 Model 90?
  */
 #include "emu.h"
 
@@ -34,7 +35,6 @@
 #include "machine/mc146818.h"
 #include "machine/z80sio.h"
 #include "machine/am9513.h"
-#include "machine/clock.h"
 
 // busses and connectors
 #include "bus/rs232/rs232.h"
@@ -77,6 +77,14 @@ protected:
 	void common(machine_config &config);
 
 private:
+	u32 bus_error_r()
+	{
+		if (!machine().side_effects_disabled())
+			m_cpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+
+		return 0;
+	}
+
 	// devices
 	required_device<m68030_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -104,12 +112,14 @@ void luna_68k_state::machine_reset()
 
 void luna_68k_state::cpu_map(address_map &map)
 {
+	map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
 	map(0x40000000, 0x4001ffff).rom().region("eprom", 0);
 
 	map(0x50000000, 0x50000007).rw(m_sio, FUNC(upd7201_device::ba_cd_r), FUNC(upd7201_device::ba_cd_w)).umask32(0xff00ff00);
+	map(0x58000000, 0x5800007f).rw(m_rtc, FUNC(ds1287_device::read_direct), FUNC(ds1287_device::write_direct)).umask32(0xff00ff00);
 	map(0x60000000, 0x60000003).rw(m_stc, FUNC(am9513_device::read16), FUNC(am9513_device::write16));
 
-	map(0x70000000, 0x70000003).lr32([]() { return 0x00fe0000; }, "sw3"); // FIXME: possibly CPU board DIP switch?
+	map(0x70000000, 0x70000003).lr32([]() { return 0x000000fc; }, "sw3"); // FIXME: possibly CPU board DIP switch? (1=UP)
 	map(0x78000000, 0x78000003).lw32(
 		[this](u32 data) { m_cpu->space(0).install_ram(0, m_ram->mask(), m_ram->pointer()); }, "ram_size"); // FIXME: ram size/enable?
 }
@@ -144,7 +154,7 @@ void luna_68k_state::luna(machine_config &config)
 
 	UPD7201(config, m_sio, 9'830'000); // D9.83B0
 
-	// TODO: one of these is for console, other is keyboard
+	// console
 	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
 	m_serial[0]->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 	m_sio->out_txda_callback().set(m_serial[0], FUNC(rs232_port_device::write_txd));
@@ -153,6 +163,7 @@ void luna_68k_state::luna(machine_config &config)
 	m_serial[0]->rxd_handler().set(m_sio, FUNC(upd7201_device::rxa_w));
 	m_serial[0]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsa_w));
 
+	// keyboard
 	RS232_PORT(config, m_serial[1], default_rs232_devices, nullptr);
 	m_sio->out_txdb_callback().set(m_serial[1], FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
@@ -161,19 +172,20 @@ void luna_68k_state::luna(machine_config &config)
 	m_serial[1]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsb_w));
 
 	AM9513(config, m_stc, 9'830'000); // FIXME: clock? sources?
+	m_stc->fout_cb().set(m_stc, FUNC(am9513_device::gate1_w)); // assumption based on a common configuration
 	m_stc->out4_cb().set(m_sio, FUNC(upd7201_device::rxca_w));
 	m_stc->out4_cb().append(m_sio, FUNC(upd7201_device::txca_w));
 	m_stc->out5_cb().set(m_sio, FUNC(upd7201_device::rxcb_w));
 	m_stc->out5_cb().append(m_sio, FUNC(upd7201_device::txcb_w));
-
-	// HACK: arbitrary input clock for am9513 gate1
-	clock_device &stc_clock(CLOCK(config, "stc_clock", 1'000'000));
-	stc_clock.signal_handler().set(m_stc, FUNC(am9513_device::gate1_w));
 }
 
 ROM_START(luna)
 	ROM_REGION32_BE(0x20000, "eprom", 0)
 	ROM_LOAD16_WORD_SWAP("0283__ac__8117__1.05.ic88", 0x00000, 0x20000, CRC(c46dec54) SHA1(22ef9274f4ef85d446d56cce13a68273dc55f10a))
+
+	// HACK: force firmware to reinitialize nvram at first boot
+	ROM_REGION(64, "rtc", 0)
+	ROM_FILL(0, 64, 0xff)
 ROM_END
 
 } // anonymous namespace

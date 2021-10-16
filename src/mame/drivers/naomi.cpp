@@ -12020,6 +12020,10 @@ ROM_END
 /* 0042A */ GAME( 2009, ndcfboxa, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Naomi DIMM Firmware Update for CF-BOX (4.01) (GDS-0042A)", GAME_FLAGS )
 // 00??  Get Bass 2 (GDS-00xx)
 
+/* GDD-xxxx (Sega GD-ROM games) */
+// 0001B SEGA DRIVING SIMULATOR Ver,1.00
+// 0002  SEGA DRIVING SIMULATOR Ver. 2.00
+
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
 /* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )

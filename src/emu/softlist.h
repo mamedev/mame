@@ -133,7 +133,6 @@ public:
 	const std::string &parentname() const { return m_parentname; }
 	const std::string &year() const { return m_year; }
 	const std::string &publisher() const { return m_publisher; }
-	const std::string &notes() const { return m_notes; }
 	const std::list<software_info_item> &info() const { return m_info; }
 	const software_info_item::set &shared_features() const { return m_shared_features; }
 	software_support supported() const { return m_supported; }
@@ -151,7 +150,6 @@ private:
 	std::string                     m_parentname;
 	std::string                     m_year;             // Copyright year on title screen, actual release dates can be tracked in external resources
 	std::string                     m_publisher;
-	std::string                     m_notes;
 	std::list<software_info_item>   m_info;             // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
 	software_info_item::set         m_shared_features;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
 													    // by each part of this software entry (after loading these are stored in partdata->features)
@@ -167,7 +165,6 @@ void parse_software_list(
 		std::string_view filename,
 		std::string &listname,
 		std::string &description,
-		std::string &notes,
 		std::list<software_info> &infolist,
 		std::ostream &errors);
 

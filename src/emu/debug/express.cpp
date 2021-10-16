@@ -46,6 +46,7 @@
 #include "logmacro.h"
 
 
+namespace {
 
 /***************************************************************************
     CONSTANTS
@@ -103,7 +104,7 @@ enum
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  REGISTER SYMBOL ENTRY
 //**************************************************************************
 
 // a symbol entry representing a register, with read/write callbacks
@@ -116,8 +117,8 @@ public:
 	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format);
 
 	// symbol access
-	virtual bool is_lval() const override;
-	virtual u64 value() const override;
+	virtual bool is_lval() const override { return m_setter != nullptr; }
+	virtual u64 value() const override { return m_getter(); }
 	virtual void set_value(u64 newvalue) override;
 
 private:
@@ -127,6 +128,61 @@ private:
 	u64                         m_value;
 };
 
+
+//-------------------------------------------------
+//  integer_symbol_entry - constructor
+//-------------------------------------------------
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
+	: symbol_entry(table, SMT_INTEGER, name, ""),
+		m_getter(ptr
+				? symbol_table::getter_func([ptr] () { return *ptr; })
+				: symbol_table::getter_func([this] () { return m_value; })),
+		m_setter((rw == symbol_table::READ_ONLY)
+				? symbol_table::setter_func(nullptr)
+				: ptr
+				? symbol_table::setter_func([ptr] (u64 value) { *ptr = value; })
+				: symbol_table::setter_func([this] (u64 value) { m_value = value; })),
+		m_value(0)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
+	: symbol_entry(table, SMT_INTEGER, name, ""),
+		m_getter([this] () { return m_value; }),
+		m_setter(nullptr),
+		m_value(constval)
+{
+}
+
+
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
+	: symbol_entry(table, SMT_INTEGER, name, format),
+		m_getter(std::move(getter)),
+		m_setter(std::move(setter)),
+		m_value(0)
+{
+}
+
+
+//-------------------------------------------------
+//  set_value - set the value of this symbol
+//-------------------------------------------------
+
+void integer_symbol_entry::set_value(u64 newvalue)
+{
+	if (m_setter != nullptr)
+		m_setter(newvalue);
+	else
+		throw emu_fatalerror("Symbol '%s' is read-only", m_name);
+}
+
+
+
+//**************************************************************************
+//  FUNCTION SYMBOL ENTRY
+//**************************************************************************
 
 // a symbol entry representing a function
 class function_symbol_entry : public symbol_entry
@@ -140,7 +196,7 @@ public:
 	u16 maxparams() const { return m_maxparams; }
 
 	// symbol access
-	virtual bool is_lval() const override;
+	virtual bool is_lval() const override { return false; }
 	virtual u64 value() const override;
 	virtual void set_value(u64 newvalue) override;
 
@@ -153,6 +209,82 @@ private:
 	u16                         m_maxparams;
 	symbol_table::execute_func  m_execute;
 };
+
+
+//-------------------------------------------------
+//  function_symbol_entry - constructor
+//-------------------------------------------------
+
+function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, int minparams, int maxparams, symbol_table::execute_func execute)
+	: symbol_entry(table, SMT_FUNCTION, name, ""),
+		m_minparams(minparams),
+		m_maxparams(maxparams),
+		m_execute(std::move(execute))
+{
+}
+
+
+//-------------------------------------------------
+//  value - return the value of this symbol
+//-------------------------------------------------
+
+u64 function_symbol_entry::value() const
+{
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name);
+}
+
+
+//-------------------------------------------------
+//  set_value - set the value of this symbol
+//-------------------------------------------------
+
+void function_symbol_entry::set_value(u64 newvalue)
+{
+	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name);
+}
+
+
+//-------------------------------------------------
+//  execute - execute the function
+//-------------------------------------------------
+
+u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
+{
+	if (numparams < m_minparams)
+		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name, m_minparams);
+	if (numparams > m_maxparams)
+		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name, m_maxparams);
+	return m_execute(numparams, paramlist);
+}
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+inline std::pair<device_t &, char const *> get_device_search(running_machine &machine, device_memory_interface *memintf, char const *tag)
+{
+	if (tag)
+	{
+		if (('.' == tag[0]) && (!tag[1] || (':' == tag[1]) || ('^' == tag[1])))
+			return std::pair<device_t &, char const *>(memintf ? memintf->device() : machine.root_device(), tag + ((':' == tag[1]) ? 2 : 1));
+		else if (('^' == tag[0]) && memintf)
+			return std::pair<device_t &, char const *>(memintf->device(), tag);
+		else
+			return std::pair<device_t &, char const *>(machine.root_device(), tag);
+	}
+	else if (memintf)
+	{
+		return std::pair<device_t &, char const *>(memintf->device(), "");
+	}
+	else
+	{
+		return std::pair<device_t &, char const *>(machine.root_device(), "");
+	}
+}
+
+} // anonymous namespace
 
 
 
@@ -219,143 +351,6 @@ symbol_entry::symbol_entry(symbol_table &table, symbol_type type, const char *na
 
 symbol_entry::~symbol_entry()
 {
-}
-
-
-
-//**************************************************************************
-//  REGISTER SYMBOL ENTRY
-//**************************************************************************
-
-//-------------------------------------------------
-//  integer_symbol_entry - constructor
-//-------------------------------------------------
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
-	: symbol_entry(table, SMT_INTEGER, name, ""),
-		m_getter(ptr
-				? symbol_table::getter_func([ptr] () { return *ptr; })
-				: symbol_table::getter_func([this] () { return m_value; })),
-		m_setter((rw == symbol_table::READ_ONLY)
-				? symbol_table::setter_func(nullptr)
-				: ptr
-				? symbol_table::setter_func([ptr] (u64 value) { *ptr = value; })
-				: symbol_table::setter_func([this] (u64 value) { m_value = value; })),
-		m_value(0)
-{
-}
-
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
-	: symbol_entry(table, SMT_INTEGER, name, ""),
-		m_getter([this] () { return m_value; }),
-		m_setter(nullptr),
-		m_value(constval)
-{
-}
-
-
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::getter_func getter, symbol_table::setter_func setter, const std::string &format)
-	: symbol_entry(table, SMT_INTEGER, name, format),
-		m_getter(std::move(getter)),
-		m_setter(std::move(setter)),
-		m_value(0)
-{
-}
-
-
-//-------------------------------------------------
-//  is_lval - is this symbol allowable as an lval?
-//-------------------------------------------------
-
-bool integer_symbol_entry::is_lval() const
-{
-	return (m_setter != nullptr);
-}
-
-
-//-------------------------------------------------
-//  value - return the value of this symbol
-//-------------------------------------------------
-
-u64 integer_symbol_entry::value() const
-{
-	return m_getter();
-}
-
-
-//-------------------------------------------------
-//  set_value - set the value of this symbol
-//-------------------------------------------------
-
-void integer_symbol_entry::set_value(u64 newvalue)
-{
-	if (m_setter != nullptr)
-		m_setter(newvalue);
-	else
-		throw emu_fatalerror("Symbol '%s' is read-only", m_name);
-}
-
-
-
-//**************************************************************************
-//  FUNCTION SYMBOL ENTRY
-//**************************************************************************
-
-//-------------------------------------------------
-//  function_symbol_entry - constructor
-//-------------------------------------------------
-
-function_symbol_entry::function_symbol_entry(symbol_table &table, const char *name, int minparams, int maxparams, symbol_table::execute_func execute)
-	: symbol_entry(table, SMT_FUNCTION, name, ""),
-		m_minparams(minparams),
-		m_maxparams(maxparams),
-		m_execute(std::move(execute))
-{
-}
-
-
-//-------------------------------------------------
-//  is_lval - is this symbol allowable as an lval?
-//-------------------------------------------------
-
-bool function_symbol_entry::is_lval() const
-{
-	return false;
-}
-
-
-//-------------------------------------------------
-//  value - return the value of this symbol
-//-------------------------------------------------
-
-u64 function_symbol_entry::value() const
-{
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name);
-}
-
-
-//-------------------------------------------------
-//  set_value - set the value of this symbol
-//-------------------------------------------------
-
-void function_symbol_entry::set_value(u64 newvalue)
-{
-	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name);
-}
-
-
-//-------------------------------------------------
-//  execute - execute the function
-//-------------------------------------------------
-
-u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
-{
-	if (numparams < m_minparams)
-		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name, m_minparams);
-	if (numparams > m_maxparams)
-		throw emu_fatalerror("Function '%s' accepts no more than %d parameters", m_name, m_maxparams);
-	return m_execute(numparams, paramlist);
 }
 
 
@@ -540,14 +535,69 @@ void symbol_table::write_memory(address_space &space, offs_t address, u64 data, 
 
 
 //-------------------------------------------------
-//  expression_get_device - return a device
+//  expression_get_space - return a space
 //  based on a case insensitive tag search
 //-------------------------------------------------
 
-device_t *symbol_table::expression_get_device(const char *tag)
+expression_error symbol_table::expression_get_space(const char *tag, int &spacenum, device_memory_interface *&memory)
 {
-	// convert to lowercase then lookup the name (tags are enforced to be all lower case)
-	return m_machine.root_device().subdevice(strmakelower(tag));
+	device_t *device = nullptr;
+	std::string spacename;
+	if (tag)
+	{
+		// convert to lowercase then lookup the name (tags are enforced to be all lower case)
+		auto base = get_device_search(m_machine, m_memintf, tag);
+		device = base.first.subdevice(strmakelower(base.second));
+
+		// if that failed, treat the last component as an address space
+		if (!device)
+		{
+			std::string_view t = base.second;
+			auto const delimiter = t.find_last_of(":^");
+			bool const found = std::string_view::npos != delimiter;
+			if (!found || (':' == t[delimiter]))
+			{
+				spacename = strmakelower(t.substr(found ? (delimiter + 1) : 0));
+				t = t.substr(0, !found ? 0 : !delimiter ? 1 : delimiter);
+				if (!t.empty())
+					device = base.first.subdevice(strmakelower(t));
+				else
+					device = m_memintf ? &m_memintf->device() : &m_machine.root_device();
+			}
+		}
+	}
+	else if (m_memintf)
+	{
+		device = &m_memintf->device();
+	}
+
+	// if still no device, report error
+	if (!device)
+	{
+		memory = nullptr;
+		return expression_error::INVALID_MEMORY_NAME;
+	}
+
+	// ensure device has memory interface, and check for space if search not required
+	if (!device->interface(memory) || (spacename.empty() && (0 <= spacenum) && !memory->has_space(spacenum)))
+	{
+		memory = nullptr;
+		return expression_error::NO_SUCH_MEMORY_SPACE;
+	}
+
+	// find space by name or take first populated space
+	for (int i = 0; memory->max_space_count() > i; ++i)
+	{
+		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))
+		{
+			spacenum = i;
+			return expression_error::NONE;
+		}
+	}
+
+	// space not found
+	memory = nullptr;
+	return expression_error::NO_SUCH_MEMORY_SPACE;
 }
 
 
@@ -574,76 +624,45 @@ u64 symbol_table::memory_value(const char *name, expression_space spacenum, u32 
 {
 	device_memory_interface *memory = m_memintf;
 
+	bool logical = true;
+	int space = -1;
 	switch (spacenum)
 	{
-	case EXPSPACE_PROGRAM_LOGICAL:
-	case EXPSPACE_DATA_LOGICAL:
-	case EXPSPACE_IO_LOGICAL:
-	case EXPSPACE_SPACE3_LOGICAL:
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
-		{
-			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-			auto dis = m_machine.disable_side_effects(disable_se);
-			return read_memory(space, address, size, true);
-		}
-		break;
-
 	case EXPSPACE_PROGRAM_PHYSICAL:
 	case EXPSPACE_DATA_PHYSICAL:
 	case EXPSPACE_IO_PHYSICAL:
-	case EXPSPACE_SPACE3_PHYSICAL:
-		if (name != nullptr)
+	case EXPSPACE_OPCODE_PHYSICAL:
+		spacenum = expression_space(spacenum - (EXPSPACE_PROGRAM_PHYSICAL - EXPSPACE_PROGRAM_LOGICAL));
+		logical = false;
+		[[fallthrough]];
+	case EXPSPACE_PROGRAM_LOGICAL:
+	case EXPSPACE_DATA_LOGICAL:
+	case EXPSPACE_IO_LOGICAL:
+	case EXPSPACE_OPCODE_LOGICAL:
+		space = AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL);
+		expression_get_space(name, space, memory);
+		if (memory)
 		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
-		{
-			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 			auto dis = m_machine.disable_side_effects(disable_se);
-			return read_memory(space, address, size, false);
+			return read_memory(memory->space(space), address, size, logical);
 		}
 		break;
 
-	case EXPSPACE_RAMWRITE:
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_PROGRAM))
+	case EXPSPACE_PRGDIRECT:
+	case EXPSPACE_OPDIRECT:
+		space = (spacenum == EXPSPACE_OPDIRECT) ? AS_OPCODES : AS_PROGRAM;
+		expression_get_space(name, space, memory);
+		if (memory)
 		{
 			auto dis = m_machine.disable_side_effects(disable_se);
-			return read_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
-		}
-		break;
-
-	case EXPSPACE_OPCODE:
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_OPCODES))
-		{
-			auto dis = m_machine.disable_side_effects(disable_se);
-			return read_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size);
+			return read_program_direct(memory->space(space), (spacenum == EXPSPACE_OPDIRECT) ? 1 : 0, address, size);
 		}
 		break;
 
 	case EXPSPACE_REGION:
-		if (name == nullptr)
-			break;
-		return read_memory_region(name, address, size);
+		if (name)
+			return read_memory_region(name, address, size);
+		break;
 
 	default:
 		break;
@@ -712,11 +731,12 @@ u64 symbol_table::read_program_direct(address_space &space, int opcode, offs_t a
 
 u64 symbol_table::read_memory_region(const char *rgntag, offs_t address, int size)
 {
-	memory_region *region = m_machine.root_device().memregion(rgntag);
+	auto search = get_device_search(m_machine, m_memintf, rgntag);
+	memory_region *const region = search.first.memregion(search.second);
 	u64 result = ~u64(0) >> (64 - 8*size);
 
 	// make sure we get a valid base before proceeding
-	if (region != nullptr)
+	if (region)
 	{
 		// call ourself recursively until we are byte-sized
 		if (size > 1)
@@ -762,78 +782,44 @@ void symbol_table::set_memory_value(const char *name, expression_space spacenum,
 {
 	device_memory_interface *memory = m_memintf;
 
+	bool logical = true;
+	int space = -1;
 	switch (spacenum)
 	{
-	case EXPSPACE_PROGRAM_LOGICAL:
-	case EXPSPACE_DATA_LOGICAL:
-	case EXPSPACE_IO_LOGICAL:
-	case EXPSPACE_SPACE3_LOGICAL:
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL)))
-		{
-			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
-			auto dis = m_machine.disable_side_effects(disable_se);
-			write_memory(space, address, data, size, true);
-		}
-		break;
-
 	case EXPSPACE_PROGRAM_PHYSICAL:
 	case EXPSPACE_DATA_PHYSICAL:
 	case EXPSPACE_IO_PHYSICAL:
-	case EXPSPACE_SPACE3_PHYSICAL:
-		if (name != nullptr)
+	case EXPSPACE_OPCODE_PHYSICAL:
+		spacenum = expression_space(spacenum - (EXPSPACE_PROGRAM_PHYSICAL - EXPSPACE_PROGRAM_LOGICAL));
+		logical = false;
+		[[fallthrough]];
+	case EXPSPACE_PROGRAM_LOGICAL:
+	case EXPSPACE_DATA_LOGICAL:
+	case EXPSPACE_IO_LOGICAL:
+	case EXPSPACE_OPCODE_LOGICAL:
+		space = AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL);
+		expression_get_space(name, space, memory);
+		if (memory)
 		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL)))
-		{
-			address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 			auto dis = m_machine.disable_side_effects(disable_se);
-			write_memory(space, address, data, size, false);
+			write_memory(memory->space(space), address, data, size, logical);
 		}
 		break;
 
-	case EXPSPACE_RAMWRITE: {
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_PROGRAM))
+	case EXPSPACE_PRGDIRECT:
+	case EXPSPACE_OPDIRECT:
+		space = (spacenum == EXPSPACE_OPDIRECT) ? AS_OPCODES : AS_PROGRAM;
+		expression_get_space(name, space, memory);
+		if (memory)
 		{
 			auto dis = m_machine.disable_side_effects(disable_se);
-			write_program_direct(memory->space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			write_program_direct(memory->space(space), (spacenum == EXPSPACE_OPDIRECT) ? 1 : 0, address, size, data);
 		}
 		break;
-	}
-
-	case EXPSPACE_OPCODE: {
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device != nullptr)
-				device->interface(memory);
-		}
-		if (memory != nullptr && memory->has_space(AS_OPCODES))
-		{
-			auto dis = m_machine.disable_side_effects(disable_se);
-			write_program_direct(memory->space(AS_OPCODES), (spacenum == EXPSPACE_OPCODE), address, size, data);
-		}
-		break;
-	}
 
 	case EXPSPACE_REGION:
-		if (name == nullptr)
-			break;
-		write_memory_region(name, address, size, data);
+		if (name)
+			write_memory_region(name, address, size, data);
 		break;
 
 	default:
@@ -906,10 +892,11 @@ void symbol_table::write_program_direct(address_space &space, int opcode, offs_t
 
 void symbol_table::write_memory_region(const char *rgntag, offs_t address, int size, u64 data)
 {
-	memory_region *region = m_machine.root_device().memregion(rgntag);
+	auto search = get_device_search(m_machine, m_memintf, rgntag);
+	memory_region *const region = search.first.memregion(search.second);
 
 	// make sure we get a valid base before proceeding
-	if (region != nullptr)
+	if (region)
 	{
 		// call ourself recursively until we are byte-sized
 		if (size > 1)
@@ -966,84 +953,46 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 {
 	device_memory_interface *memory = m_memintf;
 
+	int spaceno = -1;
 	switch (space)
 	{
 	case EXPSPACE_PROGRAM_LOGICAL:
 	case EXPSPACE_DATA_LOGICAL:
 	case EXPSPACE_IO_LOGICAL:
-	case EXPSPACE_SPACE3_LOGICAL:
-		if (name != nullptr)
-		{
-			device_t *device = expression_get_device(name);
-			if (device == nullptr)
-				return expression_error::INVALID_MEMORY_NAME;
-			if (!device->interface(memory))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-		}
-		else if (memory == nullptr)
-			return expression_error::MISSING_MEMORY_NAME;
-		if (!memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
+	case EXPSPACE_OPCODE_LOGICAL:
+		spaceno = AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL);
+		return expression_get_space(name, spaceno, memory);
 
 	case EXPSPACE_PROGRAM_PHYSICAL:
 	case EXPSPACE_DATA_PHYSICAL:
 	case EXPSPACE_IO_PHYSICAL:
-	case EXPSPACE_SPACE3_PHYSICAL:
-		if (name)
-		{
-			device_t *device = expression_get_device(name);
-			if (device == nullptr)
-				return expression_error::INVALID_MEMORY_NAME;
-			if (!device->interface(memory))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-		}
-		else if (memory == nullptr)
-			return expression_error::MISSING_MEMORY_NAME;
-		if (!memory->has_space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
+	case EXPSPACE_OPCODE_PHYSICAL:
+		spaceno = AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL);
+		return expression_get_space(name, spaceno, memory);
 
-	case EXPSPACE_RAMWRITE:
-		if (name)
-		{
-			device_t *device = expression_get_device(name);
-			if (device == nullptr)
-				return expression_error::INVALID_MEMORY_NAME;
-			if (!device->interface(memory))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-		}
-		else if (memory == nullptr)
-			return expression_error::MISSING_MEMORY_NAME;
-		if (!memory->has_space(AS_PROGRAM))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
-
-	case EXPSPACE_OPCODE:
-		if (name)
-		{
-			device_t *device = expression_get_device(name);
-			if (device == nullptr)
-				return expression_error::INVALID_MEMORY_NAME;
-			if (!device->interface(memory))
-				return expression_error::NO_SUCH_MEMORY_SPACE;
-		}
-		else if (memory == nullptr)
-			return expression_error::MISSING_MEMORY_NAME;
-		if (!memory->has_space(AS_OPCODES))
-			return expression_error::NO_SUCH_MEMORY_SPACE;
-		break;
+	case EXPSPACE_PRGDIRECT:
+	case EXPSPACE_OPDIRECT:
+		spaceno = (space == EXPSPACE_OPDIRECT) ? AS_OPCODES : AS_PROGRAM;
+		return expression_get_space(name, spaceno, memory);
 
 	case EXPSPACE_REGION:
 		if (!name)
+		{
 			return expression_error::MISSING_MEMORY_NAME;
-		if (!m_machine.root_device().memregion(name) || !m_machine.root_device().memregion(name)->base())
-			return expression_error::INVALID_MEMORY_NAME;
+		}
+		else
+		{
+			auto search = get_device_search(m_machine, m_memintf, name);
+			memory_region *const region = search.first.memregion(search.second);
+			if (!region || !region->base())
+				return expression_error::INVALID_MEMORY_NAME;
+		}
 		break;
 
 	default:
 		return expression_error::NO_SUCH_MEMORY_SPACE;
 	}
+
 	return expression_error::NONE;
 }
 
@@ -1375,12 +1324,15 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	// check for memory @ and ! operators
 	if (string[0] == '@' || string[0] == '!')
 	{
-		try {
+		try
+		{
 			bool disable_se = string[0] == '@';
 			parse_memory_operator(token, buffer.c_str(), disable_se);
 			string += 1;
 			return;
-		} catch(const expression_error &) {
+		}
+		catch (const expression_error &)
+		{
 			// Try some other operator instead
 		}
 	}
@@ -1614,13 +1566,13 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 		string = dot + 1;
 	}
 
-	// length 3 means logical/physical, then space, then size
 	int length = (int)strlen(string);
 	bool physical = false;
 	int space = 'p';
 	int size;
 	if (length == 3)
 	{
+		// length 3 means logical/physical, then space, then size
 		if (string[0] != 'l' && string[0] != 'p')
 			throw expression_error(expression_error::INVALID_MEMORY_SPACE, token.offset() + (string - startstring));
 		if (string[1] != 'p' && string[1] != 'd' && string[1] != 'i' && string[1] != '3')
@@ -1629,21 +1581,22 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 		space = string[1];
 		size = string[2];
 	}
-
-	// length 2 means space then size
 	else if (length == 2)
 	{
+		// length 2 means space then size
 		space = string[0];
 		size = string[1];
 	}
-
-	// length 1 means size
 	else if (length == 1)
+	{
+		// length 1 means size
 		size = string[0];
-
-	// anything else is invalid
+	}
 	else
+	{
+		// anything else is invalid
 		throw expression_error(expression_error::INVALID_TOKEN, token.offset());
+	}
 
 	// convert the space to flags
 	expression_space memspace;
@@ -1652,9 +1605,9 @@ void parsed_expression::parse_memory_operator(parse_token &token, const char *st
 		case 'p':   memspace = physical ? EXPSPACE_PROGRAM_PHYSICAL : EXPSPACE_PROGRAM_LOGICAL; break;
 		case 'd':   memspace = physical ? EXPSPACE_DATA_PHYSICAL    : EXPSPACE_DATA_LOGICAL;    break;
 		case 'i':   memspace = physical ? EXPSPACE_IO_PHYSICAL      : EXPSPACE_IO_LOGICAL;      break;
-		case '3':   memspace = physical ? EXPSPACE_SPACE3_PHYSICAL  : EXPSPACE_SPACE3_LOGICAL;  break;
-		case 'o':   memspace = EXPSPACE_OPCODE;                                                 break;
-		case 'r':   memspace = EXPSPACE_RAMWRITE;                                               break;
+		case '3':   memspace = physical ? EXPSPACE_OPCODE_PHYSICAL  : EXPSPACE_OPCODE_LOGICAL;  break;
+		case 'r':   memspace = EXPSPACE_PRGDIRECT;                                              break;
+		case 'o':   memspace = EXPSPACE_OPDIRECT;                                               break;
 		case 'm':   memspace = EXPSPACE_REGION;                                                 break;
 		default:    throw expression_error(expression_error::INVALID_MEMORY_SPACE, token.offset() + (string - startstring));
 	}
