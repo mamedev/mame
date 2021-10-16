@@ -908,6 +908,7 @@ void qx10_state::qx10(machine_config &config)
 	m_scc->out_int_callback().set(FUNC(qx10_state::keyboard_irq));
 
 	AM9517A(config, m_dma_1, MAIN_CLK/4);
+	m_dma_1->dreq_active_low();
 	m_dma_1->out_hreq_callback().set(FUNC(qx10_state::dma_hrq_changed));
 	m_dma_1->out_eop_callback().set(FUNC(qx10_state::tc_w));
 	m_dma_1->in_memr_callback().set(FUNC(qx10_state::memory_read_byte));
@@ -916,7 +917,9 @@ void qx10_state::qx10(machine_config &config)
 	m_dma_1->in_ior_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_r));
 	m_dma_1->out_iow_callback<0>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma_1->out_iow_callback<1>().set(m_hgdc, FUNC(upd7220_device::dack_w));
+
 	AM9517A(config, m_dma_2, MAIN_CLK/4);
+	m_dma_2->dreq_active_low();
 
 	I8255(config, m_ppi, 0);
 	m_ppi->out_pa_callback().set("prndata", FUNC(output_latch_device::write));
