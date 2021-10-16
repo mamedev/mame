@@ -35,7 +35,7 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
-#define VERBOSE LOG_GENERAL
+//#define VERBOSE SPIFI3_DEBUG
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:

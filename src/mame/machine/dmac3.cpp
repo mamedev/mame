@@ -124,7 +124,7 @@ void dmac3_device::device_reset()
 void dmac3_device::reset_controller(DMAC3_Controller controller)
 {
     m_controllers[controller].csr = 0;
-    m_controllers[controller].intr &= INTR_INT; // TODO: is the external interrupt bit preserved? I assume so...
+    m_controllers[controller].intr &= INTR_INT; // TODO: is the external interrupt bit preserved?
     m_controllers[controller].length = 0;
     m_controllers[controller].address = 0;
     m_controllers[controller].conf = 0;

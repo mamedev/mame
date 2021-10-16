@@ -22,6 +22,7 @@
  *  - Cleanup
  *  - Hardware-accurate behavior of the FIFO - this is a best guess.
  *  - Actual clock rate
+ *  - Additional features and registers
  */
 
 #include "cxd8442q.h"
@@ -95,22 +96,11 @@ void cxd8442q_device::map(address_map &map)
 
         map(channel_base + 0x34, channel_base + 0x37).lrw8(NAME(([this, channel]()
                                                                  {
-                                                                     if(fifo_channels[channel].count > 0)
-                                                                     {
-                                                                        fifo_channels[channel].count--;
-                                                                        if(!fifo_channels[channel].count)
-                                                                        {
-                                                                            // time to clear interrupt if we got to 0
-                                                                            fifo_channels[channel].intstat &= ~0x3;
-                                                                        }
-                                                                     }
-                                                                     irq_check();
                                                                      return fifo_channels[channel].read_data_from_fifo();
                                                                  })),
                                                            NAME(([this, channel](offs_t offset, uint8_t data)
                                                                  {
-                                                                     fifo_channels[channel].count++; // TODO: move to write_data_to_fifo
-                                                                     LOG("FIFO CH%d: Pushing 0x%x, new count = 0x%x (%s)\n", channel, data, fifo_channels[channel].count, machine().describe_context());
+                                                                     LOG("FIFO CH%d: Pushing 0x%x\n", channel, data, machine().describe_context());
                                                                      fifo_channels[channel].write_data_to_fifo(data);
                                                                  })));
 
@@ -121,11 +111,10 @@ void cxd8442q_device::map(address_map &map)
 
 void cxd8442q_device::map_fifo_ram(address_map &map)
 {
-    // TODO: experiment to see if this is readable/writeable from the real NWS5000X
     map(0x0, FIFO_MAX_RAM_SIZE - 1).lrw32(NAME(([this](offs_t offset)
                                                 { return fifo_ram[offset]; })),
-                                          NAME(([this](offs_t offset, uint32_t data)
-                                                { fifo_ram[offset] = data; })));
+                                          NAME(([this](offs_t offset, uint32_t data, uint32_t mem_mask)
+                                                { COMBINE_DATA(&fifo_ram[offset]); })));
 }
 
 void cxd8442q_device::device_add_mconfig(machine_config &config) {}
@@ -243,6 +232,17 @@ uint32_t apfifo_channel::read_data_from_fifo()
     // read data out of RAM at the current read position (relative to the start address)
     uint32_t value = fifo_device.fifo_ram[address + fifo_r_position];
 
+    // Decrement count, and clear interrupt for this channel if we are out of data
+    if(count > 0)
+    {
+        --count;
+        if(!count)
+        {
+            intstat &= ~0x3;
+        }
+    }
+    fifo_device.irq_check();
+
     // Increment and check if we need to wrap around
     if (++fifo_r_position > mask)
     {
@@ -261,6 +261,7 @@ uint32_t apfifo_channel::read_data_from_fifo()
 void apfifo_channel::write_data_to_fifo(uint32_t data)
 {
     fifo_device.fifo_ram[address + fifo_w_position] = data;
+    ++count;
 
     // Increment and check if we need to wrap around
     if (++fifo_w_position > mask)

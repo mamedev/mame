@@ -81,8 +81,6 @@
  *
  *  Known issues:
  *  - Telnet has some weird behavior at times - some users hang when logging in, but logging in as root and using `su` to change to them works.
- *  - Sometimes, output from a command run as root on serial while a user is logged in over SXDM will show up in their `sxsession` console.
- *    Need to determine if emulation is inducing that.
  *  - Bootloader doesn't work with DRC enabled (see CPU section above)
  *  - Monitor ROM command `ss -r` doesn't show most register values
  *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly,
@@ -94,11 +92,11 @@
  *  - Parallel I/O
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
- *  - Triage the minor NEWS-OS issues mentioned above
+ *  - Triage the known issues mentioned above
  *
  *  TODO before opening first MR:
  *  - FIFO and ESCC cleanup (lots of it!)
- *  - SPIFI3 refactoring (actual AUTOSTAT too)
+ *  - SPIFI3 refactoring
  *  - Find better workaround for SCACHE enumeration
  *  - Save state support
  */
@@ -256,7 +254,7 @@ protected:
     required_device<r4400_device> m_cpu;
 #endif
 
-    // Main memory
+    // Memory
     required_device<ram_device> m_ram;
     required_device<ram_device> m_dma_ram;
     required_device<ram_device> m_net_ram;
@@ -264,12 +262,11 @@ protected:
     // ST Micro M48T02 Timekeeper NVRAM + RTC
     required_device<m48t02_device> m_rtc;
 
-    // Sony CXD8421Q ESCC1 serial controller (includes a Zilog ESCC)
-    // required_device<cxd8421q_device> m_escc;
+    // Zilog ESCC and Sony CXD8421Q ESCC1 serial controller
     required_device<z80scc_device> m_escc;
     required_device_array<rs232_port_device, 2> m_serial;
 
-    // Sony CXD8442Q APbus FIFO
+    // Sony CXD8442Q APbus FIFOs
     required_device<cxd8442q_device> m_fifo0;
     required_device<cxd8442q_device> m_fifo1;
 
@@ -288,7 +285,7 @@ protected:
     // DMAC3 DMA controller
     required_device<dmac3_device> m_dmac;
 
-    // HP SPIFI3 SCSI controller (2x)
+    // HP SPIFI3 SCSI controllers
     required_device<spifi3_device> m_scsi0;
     required_device<spifi3_device> m_scsi1;
     required_device<nscsi_bus_device> m_scsibus0;
@@ -493,33 +490,11 @@ void news_r4k_state::machine_common(machine_config &config)
     CXD8442Q(config, m_fifo1, 0);
 
     // ESCC FIFO
-    m_escc->out_dtra_callback().set([this](int status)
-                                            {
-                                                // LOG("DTR/REQ changed to 0x%x\n", status);
-                                                // Reverse polarity for DRQ active
-                                                m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status);
-                                            });
-    m_escc->out_wreqa_callback().set([this](int status)
-                                     {
-                                        LOG("WREQ changed to 0x%x\n", status);
-                                        m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status);
-                                     });
-    m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data)
-                                                                   {
-                                                                       LOG("Sent 0x%x to ESCC\n", data);
-                                                                       m_escc->da_w(0, data);
-                                                                   });
-    m_fifo1->bind_dma_r<cxd8442q_device::fifo_channel_number::CH3>([this]()
-                                                                   {
-                                                                       auto data = m_escc->da_r(0);
-                                                                       LOG("Got 0x%x from ESCC\n", data);
-                                                                       return data;
-                                                                   });
-
-    // INTEN0 = 3f1f
-    // INTEN1 = 3faf
-    // INTEN4 = 7
-    // INTEN5 = 7
+    // Reverse polarity for DMA signals
+    m_escc->out_dtra_callback().set([this](int status) { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
+    m_escc->out_wreqa_callback().set([this](int status) { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
+    m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data) { m_escc->da_w(0, data); });
+    m_fifo1->bind_dma_r<cxd8442q_device::fifo_channel_number::CH3>([this]() { return m_escc->da_r(0); });
     m_fifo1->out_int_callback().set([this](int status)
                                     {
                                         // Not sure if this is the actual mapping, or if sending any level 0 interrupt causes
@@ -529,7 +504,7 @@ void news_r4k_state::machine_common(machine_config &config)
                                         escc1_int_status = status ? 0x8 : 0x0; // guess
                                     });
 
-    // SONIC + WSC-SONIC3 ethernet controller
+    // SONIC + WSC-SONIC3 ethernet and DMA controllers
     CXD8452AQ(config, m_sonic3, 0);
     m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
     m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
@@ -633,16 +608,13 @@ void news_r4k_state::cpu_map(address_map &map)
     map.unmap_value_low();
 
     cpu_map_main_memory(map);
-    // This is the RAM that is used before main memory is initialized
-    // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
-    map(0x1e980000, 0x1e9fffff).ram(); // TODO: double-check RAM length (0x1e99ffff end?)
 
     // NEWS firmware
     map(0x1fc00000, 0x1fc3ffff).rom().region("mrom", 0);
     map(0x1f3c0000, 0x1f3c03ff).rom().region("idrom", 0);
     map(0x1e600000, 0x1e6003ff).rom().region("macrom", 0);
 
-    // Front panel DIP switches - TODO: mirror length
+    // Front panel DIP switches
     map(0x1f3d0000, 0x1f3d0007).r(FUNC(news_r4k_state::front_panel_r));
 
     // Hardware timers
@@ -657,9 +629,6 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1fa00000, 0x1fa00017).rw(FUNC(news_r4k_state::inten_r), FUNC(news_r4k_state::inten_w));
     map(0x1fa00020, 0x1fa00037).r(FUNC(news_r4k_state::intst_r));
 
-    // Port to shut off system (write a 0 to this)
-    // map(0x1fc40000, 0x1fc40003)
-
     // LEDs
     map(0x1f3f0000, 0x1f3f0017).w(FUNC(news_r4k_state::led_state_w));
 
@@ -668,7 +637,10 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // WSC-ESCC1 (CXD8421Q) serial controller
     map(0x1e900000, 0x1e93ffff).m(m_fifo1, FUNC(cxd8442q_device::map));
-    //map(0x1e980000, 0x1e98ffff).m(m_fifo1, FUNC(cxd8442q_device::map_fifo_ram)); seems to be covered by bootstrap RAM? Or does bootstrap use the FIFO RAM??
+
+    // Interestingly, this is also the RAM that is used before main memory is initialized
+    // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
+    map(0x1e980000, 0x1e99ffff).m(m_fifo1, FUNC(cxd8442q_device::map_fifo_ram));
     map(0x1e940000, 0x1e94000f).rw(FUNC(news_r4k_state::escc_ch_read<CHB>), FUNC(news_r4k_state::escc_ch_write<CHB>));
     map(0x1e950000, 0x1e95000f).rw(FUNC(news_r4k_state::escc_ch_read<CHA>), FUNC(news_r4k_state::escc_ch_write<CHA>));
     map(0x1e960000, 0x1e960003).lrw32(NAME([this](offs_t offset)
@@ -715,8 +687,8 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
     // SPIFI SCSI controllers
-    map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map)); // TODO: double-check actual end address
-    map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map)); // TODO: double-check actual end address
+    map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map));
+    map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map));
 
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
     map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
@@ -730,7 +702,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // HID (kb + ms)
     map(0x1f900000, 0x1f900047).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
 
-    // TODO: lp (0x1ed30000)
+    // TODO: lp line printer subsystem (0x1ed30000)
 
     // FDC controller register mapping
     // All of these addresses are within the corresponding FIFO device window (Window 2).
@@ -756,7 +728,7 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // Map FDC and sound FIFO register file
     map(0x1ed00000, 0x1ed3ffff).m(m_fifo0, FUNC(cxd8442q_device::map));
-    map(0x1ed80000, 0x1ed8ffff).m(m_fifo0, FUNC(cxd8442q_device::map_fifo_ram));
+    map(0x1ed80000, 0x1ed9ffff).m(m_fifo0, FUNC(cxd8442q_device::map_fifo_ram));
 
     // Assign debug mappings
     cpu_map_debug(map);
@@ -789,12 +761,12 @@ void news_r4k_state::cpu_map_main_memory(address_map &map)
                    {
                        if (data == 0x10001)
                        {
-                           LOGMASKED(LOG_GENERAL, "Enabling map shift!\n");
+                           LOGMASKED(LOG_GENERAL, "Enabling RAM map shift!\n");
                            m_map_shift = true;
                        }
                        else
                        {
-                           LOGMASKED(LOG_GENERAL, "Disabling map shift!\n");
+                           LOGMASKED(LOG_GENERAL, "Disabling RAM map shift!\n");
                            m_map_shift = false;
                        }
                    }));
@@ -1299,7 +1271,6 @@ PORT_DIPSETTING(0x10, "Auto Boot Enable")
 PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
 PORT_DIPSETTING(0x00, "No Diagnostic Test")
 PORT_DIPSETTING(0x20, "Run Diagnostic Test")
-// This default is actually 0, but the external slots aren't emulated.
 PORT_DIPNAME(0x40, 0x40, "External APbus Slot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
 PORT_DIPSETTING(0x00, "Enable External Slot Probe")
 PORT_DIPSETTING(0x40, "Disable External Slot Probe")
