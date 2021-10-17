@@ -196,10 +196,6 @@ void speedbsk_state::ppi1_portc_w(uint8_t data)
 	// ------1-  lcd rw
 	// -------0  lcd rs
 
-	// prevent bogus write at start
-	if (data == 0xff)
-		return;
-
 	m_lcd->rs_w(BIT(data, 0));
 	m_lcd->rw_w(BIT(data, 1));
 	m_lcd->e_w(BIT(data, 2));
@@ -234,6 +230,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 	I8255(config, m_ppi[1]);
 	// port a: output
 	m_ppi[1]->out_pb_callback().set(m_lcd, FUNC(hd44780_device::db_w));
+	m_ppi[1]->tri_pc_callback().set_constant(0);
 	m_ppi[1]->out_pc_callback().set(FUNC(speedbsk_state::ppi1_portc_w));
 
 	MSM6253(config, "adc", 0);
