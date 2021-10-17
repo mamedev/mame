@@ -79705,6 +79705,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_3cb3x">
+		<description>Super Cool Boy 3 in 1 (ABAB CB-403x)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="super cool boy 3-in-1 (abab cb-403x).prg" size="524288" crc="cc9b48f9" sha1="a94ad3a4cf8f8f7aa1ea2f9fe9ca21ff759d53fa" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="super cool boy 3-in-1 (abab cb-403x).chr" size="524288" crc="a7e2b191" sha1="cbae98aa7c95a9d0166dcd7377126feb0c643453" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_3k311">
 		<description>3 in 1 (K3011)</description>
 		<year>19??</year>
@@ -80129,6 +80144,69 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4cb11">
+		<description>Super Cool Boy 4 in 1 (CB-4011)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="super cool boy 4-in-1 (cb-4011).prg" size="524288" crc="a018596e" sha1="8210f0d75888e96ed9e7a056a5f7becd6421c1a1" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="super cool boy 4-in-1 (cb-4011).chr" size="524288" crc="3958dc0a" sha1="1787f4b15ad5b36a3df87ec8b18da011ffa53ced" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4cb34">
+		<description>Super Cool Boy 4 in 1 (CB-4034)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="super cool boy 4-in-1 (cb-4034).prg" size="524288" crc="ba86dc5d" sha1="74435b8c46a4e54f5b0901e06bde88738f206910" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="super cool boy 4-in-1 (cb-4034).chr" size="524288" crc="25e57754" sha1="29d9de458e5a3ffd9cf5d443fb1f902dfec3defc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Is this just a rom hack of the parent set or is there really a variant cartridge? -->
+	<software name="mc_4cb34a" cloneof="mc_4cb34">
+		<description>Super Cool Boy 4 in 1 (CB-4034, alt)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_sbig7in1" />
+			<feature name="pcb" value="BMC-SUPERBIG-7IN1" />
+			<dataarea name="prg" size="524288">
+				<rom name="super cool boy 4 in 1 (cb-4034).prg" size="524288" crc="56db7280" sha1="49f9e2ddebd0fa65d68eed96359553ace2273672" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="super cool boy 4 in 1 (cb-4034).chr" size="524288" crc="de619b44" sha1="351418a1a1821451bdf8c7c9f21d204f14c2d4cc" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Chip Dale 3 is a Heavy Barrel graphics hack that crashes at the start of the first level in MAME, just like the original cart. -->
+	<software name="mc_4cb35" supported="partial">
+		<description>Super Cool Boy 4 in 1 (CB-4035)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="super cool boy 4-in-1 (cb-4035).prg" size="524288" crc="a081d088" sha1="c53260978ce2fbbb06c757fe9c2a8a414ce26076" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="super cool boy 4-in-1 (cb-4035).chr" size="524288" crc="0c0500d0" sha1="6e470058ff439dfd0cd9213dae3ecce43db20284" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Like many unlicensed games the 3 zapper games do not work. -->
 	<software name="mc_4fg" supported="partial">
 		<description>Super 4-in-1 Fantasy Gun</description>
@@ -80391,6 +80469,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_4j274">
+		<description>4 in 1 (JH-274)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (t4a54c) (jh-274) [p1].prg" size="524288" crc="5018f6d6" sha1="a83c14b3c2117425a5e0c0f9edcaee1aa364d206" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (t4a54c) (jh-274) [p1].chr" size="524288" crc="8483d8e8" sha1="e84ed984aac5dbcffd640bb4ff9bd057270a9fc3" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4k106">
 		<description>4 in 1 (KS-106C)</description>
 		<year>19??</year>
@@ -80602,6 +80695,37 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Chip Dale 3 is a Heavy Barrel graphics hack that crashes at the start of the first level in MAME, just like the original cart. -->
+	<software name="mc_4y463" supported="partial">
+		<description>1998 HIGH 4 in 1 (YH-463)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="1998 high 4-in-1 (1+45674a) (yh-463) (unl).prg" size="524288" crc="d4625aab" sha1="de88ad11f0766ff7be5e3e1a974054f726f5b819" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1998 high 4-in-1 (1+45674a) (yh-463) (unl).chr" size="524288" crc="3e81efd2" sha1="e4635b30b4cde77577e7cd5e9a3c3772e1136494" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4yh03">
+		<description>4 in 1 (YH-4103)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="family4646" />
+			<dataarea name="prg" size="524288">
+				<rom name="4-in-1 (yh-4103).prg" size="524288" crc="a41e2f9f" sha1="4eaff3ca6578025b2442a8e18a1b540af314bc03" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="4-in-1 (yh-4103).chr" size="524288" crc="4ce94ccf" sha1="461bbe7f1c1877b113c5df73c7a6702211dd054a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -83202,22 +83326,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="super big 7-in-1 [p1].prg" size="1048576" crc="962e7f75" sha1="8e76e739c2d815e2e7fdbb5753aef1cb46d13205" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_scb4">
-		<description>Super Cool Boy 4 in 1 (CB-4034)</description>
-		<year>19??</year>
-		<publisher>&lt;pirate&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="bmc_sbig7in1" />
-			<feature name="pcb" value="BMC-SUPERBIG-7IN1" />
-			<dataarea name="chr" size="524288">
-				<rom name="super cool boy 4 in 1 (cb-4034).chr" size="524288" crc="de619b44" sha1="351418a1a1821451bdf8c7c9f21d204f14c2d4cc" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="524288">
-				<rom name="super cool boy 4 in 1 (cb-4034).prg" size="524288" crc="56db7280" sha1="49f9e2ddebd0fa65d68eed96359553ace2273672" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
