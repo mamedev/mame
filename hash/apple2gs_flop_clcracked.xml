@@ -2477,7 +2477,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="arkanoid">
+	<software name="arkanoid" cloneof="arkanoid">
 		<description>Arkanoid (clean crack)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
@@ -2489,7 +2489,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="arknoid2">
+	<software name="arknoid2" cloneof="arknoid2">
 		<description>Arkanoid II: Revenge of Doh (clean crack)</description>
 		<year>1988</year>
 		<publisher>Taito</publisher>
