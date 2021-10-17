@@ -95,6 +95,13 @@ void coco12_state::coco_ff60(address_map &map)
 	map(0x00, 0x7f).rw(FUNC(coco12_state::ff60_read), FUNC(coco12_state::ff60_write));
 }
 
+void coco12_state::ms1600_rom2(address_map &map)
+{
+	// $C000-$FEFF
+	map(0x0000, 0x2fff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
+	map(0x3000, 0x3eff).rom().region(MAINCPU_TAG, 0x7000).nopw();
+}
+
 
 //**************************************************************************
 //  INPUT PORTS
@@ -632,6 +639,12 @@ void coco12_state::cd6809(machine_config &config)
 	cartslot.halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 }
 
+void coco12_state::ms1600(machine_config &config)
+{
+	coco(config);
+	m_sam->set_addrmap(3, &coco12_state::ms1600_rom2);
+}
+
 //**************************************************************************
 //  ROMS
 //**************************************************************************
@@ -708,6 +721,11 @@ ROM_START(cd6809)
 	ROMX_LOAD("cd6809extbas84.rom", 0x0000, 0x2000, CRC(8dc853e2) SHA1(d572ce4497c115af53d2b0feeb52d3c7a7fec175), ROM_BIOS(1))
 ROM_END
 
+ROM_START(ms1600)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("ms1600.rom",  0x0000, 0x8000, CRC(66f0fafc) SHA1(6e709b8b44aa34a3235a889eb1c3615c0235c3d0))
+ROM_END
+
 #define rom_cocoh rom_coco
 #define rom_cocoeh rom_cocoe
 #define rom_coco2h rom_coco2
@@ -719,9 +737,9 @@ ROM_END
 
 //    YEAR   NAME       PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY                         FULLNAME                               FLAGS
 COMP( 1980,  coco,      0,      0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer",                      0 )
-COMP( 1981,  trsvidtx,  coco,   0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Videotex", MACHINE_NOT_WORKING )
-COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
+COMP( 1981,  trsvidtx,  coco,   0,      coco,    coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Videotex",                            MACHINE_NOT_WORKING )
 COMP( 1981,  cocoe,     coco,   0,      cocoe,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0)", 0 )
+COMP( 19??,  cocoh,     coco,   0,      cocoh,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (HD6309)",             MACHINE_UNOFFICIAL )
 COMP( 19??,  cocoeh,    coco,   0,      cocoeh,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer (Extended BASIC 1.0; HD6309)", MACHINE_UNOFFICIAL )
 COMP( 1983,  coco2,     coco,   0,      coco2,   coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2",                    0 )
 COMP( 19??,  coco2h,    coco,   0,      coco2h,  coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2 (HD6309)",           MACHINE_UNOFFICIAL )
@@ -729,7 +747,8 @@ COMP( 1985?, coco2b,    coco,   0,      coco2b,  coco,    coco12_state, empty_in
 COMP( 19??,  coco2bh,   coco,   0,      coco2bh, coco,    coco12_state, empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_UNOFFICIAL )
 COMP( 1983,  cp400,     coco,   0,      cp400,   coco,    coco12_state, empty_init, "Prológica",                    "CP400",                               0 )
 COMP( 1985,  cp400c2,   coco,   0,      cp400,   cp400c2, coco12_state, empty_init, "Prológica",                    "CP400 Color II",                      0 )
-COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
-COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",              0 )
 COMP( 1984,  mx1600,    coco,   0,      coco,    coco,    coco12_state, empty_init, "Dynacom",                      "MX-1600",                             0 )
 COMP( 1986,  t4426,     coco,   0,      t4426,   coco,    coco12_state, empty_init, "Terco AB",                     "Terco 4426 CNC Programming station",  0 )
+COMP( 1983,  lzcolor64, coco,   0,      coco,    coco,    coco12_state, empty_init, "Novo Tempo / LZ Equipamentos", "Color64",                             0 )
+COMP( 1983,  cd6809,    coco,   0,      cd6809,  coco,    coco12_state, empty_init, "Codimex",                      "CD-6809",                             0 )
+COMP( 1987,  ms1600,    coco,   0,      ms1600,  coco,    coco12_state, empty_init, "ILCE / SEP",                   "Micro-SEP 1600",                      0 )
