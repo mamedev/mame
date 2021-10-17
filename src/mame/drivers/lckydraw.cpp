@@ -65,7 +65,7 @@ private:
 	required_ioport_array<4> m_io_dips;
 	required_ioport_array<8> m_io_switches;
 	output_finder<48> m_digits;
-	output_finder<128> m_io_outputs;
+	output_finder<48> m_io_outputs;  // 16 solenoids + 32 lamps
 };
 
 void lckydraw_state::mem_map(address_map &map)
@@ -126,7 +126,7 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 		case 2:
 			// solenoids
 			{
-				for (u8 i = 0; i < 8; i++)
+				for (u8 i = 0; i < 2; i++)
 					if (BIT(m_p2_out[1], i))
 						for (u8 j = 0; j < 8; j++)
 							m_io_outputs[i*8+j] = BIT(data, j);
@@ -164,6 +164,9 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 							if (state)
 								m_samples->start(3, 3);  // 10 chime
 							break;
+						case 14:
+							machine().bookkeeping().coin_counter_w(0, state);
+							break;
 						default:
 							break;
 					}
@@ -179,10 +182,10 @@ void lckydraw_state::bus_w(offs_t offset, u8 data)
 		case 13:
 			// Lamps
 			{
-				for (u8 i = 0; i < 8; i++)
+				for (u8 i = 0; i < 4; i++)
 					if (BIT(m_p2_out[12], i))
 						for (u8 j = 0; j < 8; j++)
-							m_io_outputs[64+i*8+j] = BIT(data, j);
+							m_io_outputs[16+i*8+j] = BIT(data, j);
 			}
 			// Displays
 			{
@@ -411,7 +414,7 @@ ROM_START(lckydraw)
 	ROM_LOAD( "lckydrw3.rom", 0x0800, 0x0400, CRC(464155bb) SHA1(5bbf784dba9149575444e6b1250ac9b5c2bced87) )
 ROM_END
 
-ROM_START(lckydrawa)
+ROM_START(lckydrawa)  // stronger flippers
 	ROM_REGION( 0xc00, "maincpu", 0)
 	ROM_LOAD( "lckydrw1.rom", 0x0000, 0x0400, CRC(58ebb50f) SHA1(016ed66b4ee9979aa109c0ce085597a62d33bf8d) )
 	ROM_LOAD( "lckydrw2.rom", 0x0400, 0x0400, CRC(816b9e20) SHA1(0dd8acc633336f250960ebe89cc707fd115afeee) )

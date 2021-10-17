@@ -727,13 +727,16 @@ public:
 	}
 
 	void guttangt(machine_config &config);
+	void guttangts3(machine_config &config);
 	void init_guttangt();
+	void init_guttangts3();
 
 private:
 	void guttangt_map(address_map &map);
+	void guttangts3_map(address_map &map);
 	void guttangt_rombank_w(uint8_t data);
 
-	required_memory_bank m_rombank;
+	optional_memory_bank m_rombank;
 };
 
 

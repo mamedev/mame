@@ -9,7 +9,6 @@ TODO:
 - fscc9ps module switch and led
 - verify fscc9ps XTAL (checked against sound recording, 99.97% similarity)
 
-
 Hardware notes:
 
 Fidelity Sensory Chess Challenger "9" (SC9) overview:
@@ -34,8 +33,8 @@ Starting with SC9, Fidelity added a cartridge slot to their chess computers, mea
 extra book opening databases and recorded games.
 
 Known modules (*denotes undumped):
-- CB9: Challenger Book Openings 1 - 8KB (label not known)
-- CB16: Challenger Book Openings 2 - 2*8KB 101-1042A01,101-1042A02
+- CB9: Challenger Book Openings 1
+- CB16: Challenger Book Openings 2
 - *CG64: 64 Greatest Games
 - *EOA-EOE: Challenger Book Openings: Chess Encyclopedia Volume A-E (5 modules)
 - *TDF: Challenger Book Openings: Tarrasch Defense to the Queen's Gambit

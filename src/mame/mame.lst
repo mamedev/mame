@@ -2472,6 +2472,7 @@ rasce                           //
 @source:asuka.cpp
 asuka                           // B68 (c) 1988 Taito Corporation (World)
 asukaj                          // B68 (c) 1988 Taito Corporation (Japan)
+asukaja                         // B68 (c) 1988 Taito Corporation (Japan)
 bonzeadv                        // B41 (c) 1988 Taito Corporation Japan (World)
 bonzeadvo                       // B41 (c) 1988 Taito Corporation Japan (World)
 bonzeadvp                       //
@@ -11566,6 +11567,9 @@ cswat                           // (c) 1984
 @source:ct486.cpp
 ct486                           // 1993? 486 with CS4031
 
+@source:ctk551.cpp
+ctk551                          //
+
 @source:cubeqst.cpp
 cubeqst                         // (c) 1983 Simutrek Inc.
 cubeqsta                        // (c) 1983 Simutrek Inc.
@@ -13464,7 +13468,7 @@ sqrack                          // 1990 SQ-Rack
 sq2                             // 1991 SQ-2
 vfx                             // 1989 VFX
 vfxsd                           // 1989 VFX-SD
-ks32							// 1992 KS-32
+ks32                            // 1992 KS-32
 
 @source:esqasr.cpp
 asr10                           // 1992 ASR-10
@@ -14509,6 +14513,7 @@ gteikokub                       // bootleg
 gteikokub2                      // bootleg
 gteikokub3                      // bootleg (Honly Enterprises)
 guttangt                        //
+guttangts3                      //
 highroll                        //
 jumpbug                         // (c) 1981 Rock-ola
 jumpbugb                        // (c) 1981 Sega
@@ -14529,6 +14534,7 @@ mandinga                        // bootleg (Artemi)
 mandingac                       // bootleg (Centromatic)
 mandingaeg                      // bootleg (Electrogame)
 mandingarf                      // bootleg (Recreativos Franco S.A.)
+meteora                         // bootleg (Alca)
 mimonkey                        // (c) 1982 Universal Video Games (US Copyright Office info - http://cocatalog.loc.gov)
 mimonsco                        // (c) 1982 bootleg
 mimonscr                        // (c) 1982 bootleg
@@ -34858,6 +34864,7 @@ avefenix                        // bootleg (Video Game)
 avefenixl                       // bootleg (Laguna)
 avefenixrf                      // bootleg (Recreativos Franco)
 capitol                         // bootleg?
+cityatta                        // bootleg (Petaco S.A.)
 condor                          // bootleg (Sidam)
 condorn                         // bootleg (S C Novar)
 falcon                          // bootleg
@@ -34888,8 +34895,8 @@ pleiadbl                        // bootleg
 pleiadce                        // (c) 1981 Centuri + Tehkan
 pleiads                         // (c) 1981 Tehkan
 pleiadsb2                       // bootleg
-pleiadsi                        // bootleg?
-pleiadsn                        // Niemer S.A.
+pleiadsi                        // bootleg (Irecsa)
+pleiadsn                        // bootleg (Niemer S.A.)
 pleiadss                        // bootleg
 survival                        // (c) 1982 Rock-ola
 vautour                         // bootleg (Jeutel)
@@ -38955,6 +38962,10 @@ speedatk                        // CB-0 (c) SetaKikaku
 musicbal                        // (c) 1987
 speedbal                        // (c) 1987
 speedbala                       // (c) 1987
+
+@source:speedbsk.cpp
+boatrace
+speedbsk
 
 @source:speedspn.cpp
 speedspn                        // (c) 1994

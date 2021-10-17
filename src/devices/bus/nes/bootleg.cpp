@@ -40,7 +40,6 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_AX5705,         nes_ax5705_device,    "nes_ax5705",    "NES Cart AX5705 PCB")
 DEFINE_DEVICE_TYPE(NES_SC127,          nes_sc127_device,     "nes_sc127",     "NES Cart SC-127 PCB")
 DEFINE_DEVICE_TYPE(NES_MARIOBABY,      nes_mbaby_device,     "nes_mbaby",     "NES Cart Mario Baby Bootleg PCB")
 DEFINE_DEVICE_TYPE(NES_ASN,            nes_asn_device,       "nes_asn",       "NES Cart Ai Senshi Nicol Bootleg PCB")
@@ -73,11 +72,6 @@ DEFINE_DEVICE_TYPE(NES_MMALEE,         nes_mmalee_device,    "nes_mmalee",    "N
 DEFINE_DEVICE_TYPE(NES_RT01,           nes_rt01_device,      "nes_rt01",      "NES Cart RT-01 PCB")
 DEFINE_DEVICE_TYPE(NES_YUNG08,         nes_yung08_device,    "nes_yung08",    "NES Cart Super Mario Bros. 2 YUNG-08 PCB")
 
-
-nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_AX5705, tag, owner, clock)
-{
-}
 
 nes_sc127_device::nes_sc127_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_SC127, tag, owner, clock), m_irq_count(0), m_irq_enable(0)
@@ -246,28 +240,6 @@ nes_yung08_device::nes_yung08_device(const machine_config &mconfig, const char *
 
 
 
-
-void nes_ax5705_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_mmc_prg_bank));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_ax5705_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	chr8(0, m_chr_source);
-
-	m_mmc_prg_bank[0] = 0;
-	m_mmc_prg_bank[1] = 1;
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-	prg8_cd(0xfe);
-	prg8_ef(0xff);
-
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
-}
 
 void nes_sc127_device::device_start()
 {
@@ -739,79 +711,6 @@ void nes_yung08_device::pcb_reset()
 /*-------------------------------------------------
  mapper specific handlers
  -------------------------------------------------*/
-
-/*-------------------------------------------------
-
- Board UNL-AX5705
-
- Games: Super Mario Bros. Pocker Mali (Crayon Shin-chan pirate hack)
-
- NES 2.0: mapper 530
-
- In MAME: Supported.
-
- -------------------------------------------------*/
-
-void nes_ax5705_device::set_prg()
-{
-	prg8_89(m_mmc_prg_bank[0]);
-	prg8_ab(m_mmc_prg_bank[1]);
-}
-
-void nes_ax5705_device::write_h(offs_t offset, uint8_t data)
-{
-	uint8_t bank;
-	LOG_MMC(("ax5705 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x700f)
-	{
-		case 0x0000:
-			m_mmc_prg_bank[0] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
-			set_prg();
-			break;
-		case 0x0008:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-		case 0x2000:
-			m_mmc_prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
-			set_prg();
-			break;
-			/* CHR banks 0, 1, 4, 5 */
-		case 0x2008:
-		case 0x200a:
-		case 0x4008:
-		case 0x400a:
-			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x2009:
-		case 0x200b:
-		case 0x4009:
-		case 0x400b:
-			bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-			/* CHR banks 2, 3, 6, 7 */
-		case 0x4000:
-		case 0x4002:
-		case 0x6000:
-		case 0x6002:
-			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-		case 0x4001:
-		case 0x4003:
-		case 0x6001:
-		case 0x6003:
-			bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-			m_mmc_vrom_bank[bank] = (m_mmc_vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-			chr1_x(bank, m_mmc_vrom_bank[bank], CHRROM);
-			break;
-	}
-}
 
 /*-------------------------------------------------
 

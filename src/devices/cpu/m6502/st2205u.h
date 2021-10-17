@@ -56,6 +56,8 @@ public:
 		ST_LVCTR
 	};
 
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 protected:
 	st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 

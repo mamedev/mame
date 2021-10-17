@@ -56,7 +56,7 @@ class laserdisc_device;
 /* handy colors */
 #define UI_GREEN_COLOR          rgb_t(0xef,0x0a,0x66,0x0a)
 #define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
-#define UI_RED_COLOR            rgb_t(0xef,0xcc,0x14,0x14)
+#define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
 
 /* cancel return value for a UI handler */
 #define UI_HANDLER_CANCEL       ((uint32_t)~0)
@@ -207,10 +207,7 @@ public:
 
 	// other
 	void process_natural_keyboard();
-	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::WORD);
-
-	// word wrap
-	int wrap_text(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
+	ui::text_layout create_layout(render_container &container, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
 
 	// draw an outlined box with given line color and filled with a texture
 	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, uint32_t flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -229,6 +226,9 @@ public:
 		assert(result);
 		return *result;
 	}
+
+	// helper for getting a general input setting - used for instruction text
+	std::string get_general_input_setting(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
 
 private:
 	using handler_callback_func = std::function<uint32_t (render_container &)>;

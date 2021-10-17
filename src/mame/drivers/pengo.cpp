@@ -735,7 +735,7 @@ ROM_END
 void pengo_state::decode_pengo6(int end, int nodecend)
 {
 /*
-    Sega 513-5007 decryption
+    Sega 315-5007 decryption
 
     The values vary, but the translation mask is always laid out like this:
 

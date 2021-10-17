@@ -85,7 +85,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 {
 	float const sc_width(sdev.visible_area().width());
 	float const sc_height(sdev.visible_area().height());
-	auto justify = ui::text_layout::LEFT;
+	auto justify = ui::text_layout::text_justify::LEFT;
 	float x = 0;
 	if (xobj.is<float>())
 	{
@@ -95,11 +95,11 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 	{
 		char const *const justifystr(xobj.as<char const *>());
 		if (!strcmp(justifystr, "left"))
-			justify = ui::text_layout::LEFT;
+			justify = ui::text_layout::text_justify::LEFT;
 		else if (!strcmp(justifystr, "right"))
-			justify = ui::text_layout::RIGHT;
+			justify = ui::text_layout::text_justify::RIGHT;
 		else if (!strcmp(justifystr, "center"))
-			justify = ui::text_layout::CENTER;
+			justify = ui::text_layout::text_justify::CENTER;
 	}
 	else
 	{
@@ -111,7 +111,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 			sdev.container(),
 			msg,
 			x, y, (1.0f - x),
-			justify, ui::text_layout::WORD,
+			justify, ui::text_layout::word_wrapping::WORD,
 			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
 }
 

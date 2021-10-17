@@ -20,6 +20,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <vector>
 
 
@@ -273,14 +274,9 @@ private:
 
 	void get_title_search(std::string &title, std::string &search);
 
-	// handle keys
+	// event handling
 	virtual void handle_keys(uint32_t flags, int &iptkey) override;
-
-	// handle mouse
 	virtual void handle_events(uint32_t flags, event &ev) override;
-
-	// live search active?
-	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 	// draw game list
 	virtual void draw(uint32_t flags) override;
@@ -297,7 +293,7 @@ private:
 
 	// text for main top/bottom panels
 	virtual void make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const = 0;
-	virtual std::string make_software_description(ui_software_info const &software) const = 0;
+	virtual std::string make_software_description(ui_software_info const &software, ui_system_info const *system) const = 0;
 
 	// filter navigation
 	virtual void filter_selected() = 0;
@@ -316,6 +312,7 @@ private:
 	int                         m_info_view;
 	std::vector<std::string>    m_items_list;
 	std::string                 m_info_buffer;
+	std::optional<text_layout>  m_info_layout;
 
 	cache                   &m_cache;
 	bool                    m_is_swlist;

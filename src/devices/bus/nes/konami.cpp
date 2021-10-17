@@ -55,8 +55,13 @@ nes_konami_vrc1_device::nes_konami_vrc1_device(const machine_config &mconfig, co
 {
 }
 
+nes_konami_vrc2_device::nes_konami_vrc2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0)
+{
+}
+
 nes_konami_vrc2_device::nes_konami_vrc2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_VRC2, tag, owner, clock), m_latch(0)
+	: nes_konami_vrc2_device(mconfig, NES_VRC2, tag, owner, clock)
 {
 }
 
@@ -174,7 +179,7 @@ void nes_konami_vrc4_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_irq_mode = 0;
-	m_irq_prescale = 341;
+	m_irq_prescale = 0;
 	m_irq_enable = 0;
 	m_irq_enable_latch = 0;
 	m_irq_count = 0;
@@ -214,7 +219,7 @@ void nes_konami_vrc7_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_irq_mode = 0;
-	m_irq_prescale = 341;
+	m_irq_prescale = 0;
 	m_irq_enable = 0;
 	m_irq_enable_latch = 0;
 	m_irq_count = 0;
@@ -468,6 +473,19 @@ void nes_konami_vrc4_device::device_timer(emu_timer &timer, device_timer_id id, 
 	}
 }
 
+void nes_konami_vrc4_device::irq_ctrl_w(uint8_t data)
+{
+	m_irq_mode = data & 0x04;
+	m_irq_enable = data & 0x02;
+	m_irq_enable_latch = data & 0x01;
+	if (m_irq_enable)
+	{
+		m_irq_count = m_irq_count_latch;
+		m_irq_prescale = 341;
+	}
+	set_irq_line(CLEAR_LINE);
+}
+
 void nes_konami_vrc4_device::set_prg()
 {
 	if (m_latch & 0x02)
@@ -534,12 +552,7 @@ void nes_konami_vrc4_device::write_h(offs_t offset, uint8_t data)
 					m_irq_count_latch = (m_irq_count_latch & 0x0f) | ((data & 0x0f) << 4);
 					break;
 				case 0x200:
-					m_irq_mode = data & 0x04;
-					m_irq_enable = data & 0x02;
-					m_irq_enable_latch = data & 0x01;
-					if (data & 0x02)
-						m_irq_count = m_irq_count_latch;
-					set_irq_line(CLEAR_LINE);
+					irq_ctrl_w(data);
 					break;
 				case 0x300:
 					m_irq_enable = m_irq_enable_latch;
@@ -608,12 +621,7 @@ void nes_konami_vrc6_device::write_h(offs_t offset, uint8_t data)
 					m_irq_count_latch = data;
 					break;
 				case 0x100:
-					m_irq_mode = data & 0x04;
-					m_irq_enable = data & 0x02;
-					m_irq_enable_latch = data & 0x01;
-					if (data & 0x02)
-						m_irq_count = m_irq_count_latch;
-					set_irq_line(CLEAR_LINE);
+					irq_ctrl_w(data);
 					break;
 				case 0x200:
 					m_irq_enable = m_irq_enable_latch;
@@ -719,12 +727,7 @@ void nes_konami_vrc7_device::write_h(offs_t offset, uint8_t data)
 			m_irq_count_latch = data;
 			break;
 		case 0x7000:
-			m_irq_mode = data & 0x04;
-			m_irq_enable = data & 0x02;
-			m_irq_enable_latch = data & 0x01;
-			if (data & 0x02)
-				m_irq_count = m_irq_count_latch;
-			set_irq_line(CLEAR_LINE);
+			irq_ctrl_w(data);
 			break;
 		case 0x7008: case 0x7010: case 0x7018:
 			m_irq_enable = m_irq_enable_latch;

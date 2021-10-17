@@ -33,6 +33,12 @@ protected:
 
 	struct switch_group_descriptor
 	{
+		struct toggle
+		{
+			ioport_field *field;
+			ioport_value mask;
+		};
+
 		switch_group_descriptor(ioport_field const &f, ioport_diplocation const &loc) noexcept;
 
 		bool matches(ioport_field const &f, ioport_diplocation const &loc) const noexcept;
@@ -40,6 +46,7 @@ protected:
 
 		char const *name;
 		std::reference_wrapper<device_t> owner;
+		toggle toggles[32];
 		uint32_t mask;
 		uint32_t state;
 	};
@@ -75,11 +82,17 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_mouse_down() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 
+	std::vector<float> m_switch_group_y;
 	unsigned m_visible_switch_groups;
+	float m_single_width;
+	float m_nub_width;
+	float m_first_nub;
+	float m_clickable_height;
 };
 
 

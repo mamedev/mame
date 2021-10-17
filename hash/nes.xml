@@ -30293,12 +30293,13 @@ license:CC0
 	</software>
 
 	<software name="rafworld" cloneof="silius">
-		<description>RAF World (Jpn)</description>
+		<description>Rough World (Japan)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="TEC-RF"/>
 		<info name="release" value="19900810"/>
-		<info name="alt_title" value="ラフ"/>
+		<info name="alt_title" value="[rʌf] World"/>
+		<info name="alt_title" value="ラフWorld"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
@@ -62745,6 +62746,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="batmandy" cloneof="batman">
+		<description>Batman - The Video Game (Brazil, pirate)</description>
+		<year>1992?</year>
+		<publisher>Dynacon</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="th21311" />
+			<feature name="pcb_model" value="TH2131-1" />
+			<dataarea name="prg" size="131072">
+				<rom name="nd940-p" size="131072" crc="c3a5e31e" sha1="1093ac63afb276c03315f34f8f35176085d03083" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="nd941-c" size="131072" crc="f3b41c18" sha1="04c7ccb51c0a2b211c84289650ebba448d6f5413" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="beatnbox">
 		<description>Beat n Box (Kor)</description>
 		<year>19??</year>
@@ -63587,6 +63604,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="65536">
 				<rom name="flying superboy.chr" size="65536" crc="e9b4810d" sha1="7ca6956f689ee714283d7d0d9b9922448fefce88" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fudomyodh" cloneof="demnswrd">
+		<description>Fudou Myouou Den (pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="alt_title" value="不動明王伝"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="ax40g" />
+			<dataarea name="prg" size="262144">
+				<rom name="ying zi chuan shuo 2 - fudou myouou den (j)[p1].prg" size="262144" crc="c23539a5" sha1="edb9c2125bf0ba9c3d39a72f1af5343a18f7d06c" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="ying zi chuan shuo 2 - fudou myouou den (j)[p1].chr" size="131072" crc="aaa9acdd" sha1="4d39604b139e5802f541ee3c0033bd326195731e" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -74259,8 +74292,8 @@ Other
 		</part>
 	</software>
 
-	<software name="lordkinga" cloneof="astyanax" supported="no">
-		<description>The Lord of King (Asia, Pirate)</description>
+	<software name="lordkinga" cloneof="astyanax">
+		<description>The Lord of King (Asia, pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -76709,7 +76742,7 @@ be better to redump them properly. -->
 
 <!-- Pirate fighting games -->
 
-	<software name="cityfgt4" supported="no">
+	<software name="cityfgt4" supported="partial">
 		<description>City Fighter IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -78287,6 +78320,50 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="yuu yuu hakusho final - makai saikyou retsuden (english) (unl).prg" size="131072" crc="7709a696" sha1="463d17f20ba0a9320e14cbe0bf58e74929ac4f58" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Developer released digital downloads -->
+
+<!-- This was a promotional release to coincide with the third anniversary of the related 3DS game. -->
+	<software name="gottapro">
+		<description>Gotta Protectors - Amazon's Running Diet</description>
+		<year>2017</year>
+		<publisher>Ancient corp</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="262144">
+				<rom name="amazon_diet_EN.prg" size="262144" crc="9d374a54" sha1="fcfe44d43c609bef67ba893f7bdcbf228884d0b1" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="amazon_diet_EN.chr" size="262144" crc="11b171c6" sha1="eac3b8173fb7b1b4c7d01c17149e7396391f72b8" />
+			</dataarea>
+			<!-- Header had battery flag set, likely because old-style .nes files have no other way to indicate WRAM. Game only ever reads/writes 0x00 though. -->
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was a promotional release to coincide with the third anniversary of the related 3DS game. -->
+	<software name="mmknight" cloneof="gottapro">
+		<description>Minna de Mamotte Knight - Amazon no Diet Daisakusen</description>
+		<year>2017</year>
+		<publisher>Ancient corp</publisher>
+		<info name="alt_title" value="みんなでまもって騎士 アマゾンのダイエット大作戦"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="262144">
+				<rom name="amazon_diet_JP.prg" size="262144" crc="2851bcb6" sha1="b86a2ba58d0981f28a37a8f555911d842dfae50d" /> <!-- differs from parent set by only a single bit -->
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="amazon_diet_JP.chr" size="262144" crc="11b171c6" sha1="eac3b8173fb7b1b4c7d01c17149e7396391f72b8" />
+			</dataarea>
+			<!-- Header had battery flag set, likely because old-style .nes files have no other way to indicate WRAM. Game only ever reads/writes 0x00 though. -->
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>

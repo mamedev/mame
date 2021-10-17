@@ -267,6 +267,8 @@ favorite_manager::favorite_manager(ui_options &options)
 			tmpmatches.available = atoi(readbuf);
 
 			// need to populate this, it isn't displayed anywhere else
+			tmpmatches.infotext.append(tmpmatches.longname);
+			tmpmatches.infotext.append(1, '\n');
 			tmpmatches.infotext.append(_("swlist-info", "Software list/item"));
 			tmpmatches.infotext.append(1, '\n');
 			tmpmatches.infotext.append(tmpmatches.listname);
