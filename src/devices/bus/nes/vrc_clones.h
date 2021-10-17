@@ -8,6 +8,29 @@
 #include "konami.h"
 
 
+// ======================> nes_2yudb_device
+
+class nes_2yudb_device : public nes_konami_vrc4_device
+{
+public:
+	// construction/destruction
+	nes_2yudb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_prg() override { nes_konami_vrc4_device::set_prg(m_outer, 0x1f); }
+
+private:
+	u8 m_outer;
+};
+
+
 // ======================> nes_900218_device
 
 class nes_900218_device : public nes_konami_vrc2_device
@@ -66,6 +89,30 @@ protected:
 };
 
 
+// ======================> nes_bmc_830506c_device
+
+class nes_bmc_830506c_device : public nes_konami_vrc4_device
+{
+public:
+	// construction/destruction
+	nes_bmc_830506c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void irq_ack_w() override;
+	virtual void set_prg() override { nes_konami_vrc4_device::set_prg(m_outer, 0x0f); }
+
+private:
+	u8 m_outer;
+};
+
+
 // ======================> nes_cityfight_device
 
 class nes_cityfight_device : public nes_konami_vrc4_device
@@ -113,11 +160,11 @@ public:
 	// construction/destruction
 	nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, u8 data) override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	virtual void irq_ack_w() override;
 };
 
 
@@ -149,12 +196,14 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(NES_900218,    nes_900218_device)
-DECLARE_DEVICE_TYPE(NES_AX40G,     nes_ax40g_device)
-DECLARE_DEVICE_TYPE(NES_AX5705,    nes_ax5705_device)
-DECLARE_DEVICE_TYPE(NES_CITYFIGHT, nes_cityfight_device)
-DECLARE_DEVICE_TYPE(NES_SHUIGUAN,  nes_shuiguan_device)
-DECLARE_DEVICE_TYPE(NES_TF1201,    nes_tf1201_device)
-DECLARE_DEVICE_TYPE(NES_TH21311,   nes_th21311_device)
+DECLARE_DEVICE_TYPE(NES_2YUDB,       nes_2yudb_device)
+DECLARE_DEVICE_TYPE(NES_900218,      nes_900218_device)
+DECLARE_DEVICE_TYPE(NES_AX40G,       nes_ax40g_device)
+DECLARE_DEVICE_TYPE(NES_AX5705,      nes_ax5705_device)
+DECLARE_DEVICE_TYPE(NES_BMC_830506C, nes_bmc_830506c_device)
+DECLARE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device)
+DECLARE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device)
+DECLARE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device)
+DECLARE_DEVICE_TYPE(NES_TH21311,     nes_th21311_device)
 
 #endif // MAME_BUS_NES_VRC_CLONES_H

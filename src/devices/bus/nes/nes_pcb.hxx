@@ -217,6 +217,7 @@ static const nes_pcb pcb_list[] =
 	{ "smb2jb",           BTL_SMB2JB },
 	{ "yung08",           BTL_YUNG08 },
 	{ "btl_0353",         BTL_0353 },
+	{ "btl_2yudb",        BTL_2YUDB },
 	{ "btl_900218",       BTL_900218 },  // pirate The Lord of King
 	{ "09034a",           BTL_09034A },
 	{ "l001",             BTL_L001 },
@@ -261,6 +262,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_80013b",       BMC_80013B },
 	{ "bmc_810544c",      BMC_810544C },
 	{ "bmc_830425c",      BMC_830425C },
+	{ "bmc_830506c",      BMC_830506C },
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
 	{ "bmc_970630c",      BMC_970630C },

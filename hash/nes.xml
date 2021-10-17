@@ -51806,6 +51806,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_4jy5">
+		<description>1994 Super HiK 4 in 1 (JY-005)</description>
+		<year>1994</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_830506c" />
+			<dataarea name="prg" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-005).prg" size="524288" crc="1dbfc8f0" sha1="52c89d70d7e6f122fa5daff07b93ffb3c9b0de57" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="1994 super hik 4-in-1 (jy-005).chr" size="524288" crc="6043ee99" sha1="314eb5cb09ebca1c2190e4916262bacc9ab32085" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_3jy7">
 		<description>1994 Super HiK 3 in 1 (JY-007)</description>
 		<year>1994</year>
@@ -62295,14 +62310,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- FIXME: which board should this game use?? -->
-	<software name="2yudb" supported="no">
+	<software name="2yudb">
 		<description>2 in 1 - Yu Yu + Dragonball Z</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unknown" />
-			<feature name="pcb" value="UNKNOWN" /> <!-- The iNES file uses Mapper 23?? -->
+			<feature name="slot" value="btl_2yudb" />
 			<dataarea name="prg" size="524288">
 				<rom name="2-in-1 - yuu yuu + dragonball z.prg" size="524288" crc="592175b3" sha1="4097d5a814308e39d592466b60b64862699cc22a" offset="00000" status="baddump" />
 			</dataarea>
@@ -62746,6 +62759,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+<!-- This bootleg has various slowdown and flickering issues on real hardware and in MAME. -->
 	<software name="batmandy" cloneof="batman">
 		<description>Batman - The Video Game (Brazil, pirate)</description>
 		<year>1992?</year>
