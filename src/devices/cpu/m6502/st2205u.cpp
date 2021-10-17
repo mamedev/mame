@@ -53,6 +53,8 @@ DEFINE_DEVICE_TYPE(ST2302U, st2302u_device, "st2302u", "Sitronix ST2302U Integra
 
 st2205u_base_device::st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
 	: st2xxx_device(mconfig, type, tag, owner, clock, internal_map, data_bits, has_banked_ram)
+	, device_sound_interface(mconfig, *this)
+	, m_stream(nullptr)
 	, m_btc(0)
 	, m_tc_12bit{0}
 	, m_count_12bit{0}
@@ -99,8 +101,32 @@ st2302u_device::st2302u_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+void st2205u_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+{
+	// reset the output stream
+	outputs[0].fill(0);
+	outputs[1].fill(0);
+	outputs[2].fill(0);
+	outputs[3].fill(0);
+
+	int samples = outputs[0].samples();
+	int outpos = 0;
+	while (samples-- != 0)
+	{
+		for (int channel = 0; channel < 4; channel++)
+		{
+			s16 adpcm_contribution = m_adpcm_level[channel];
+			outputs[channel].add_int(outpos, adpcm_contribution * 0x10, 32768);
+		}
+
+		outpos++;
+	}
+}
+
 void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 {
+	m_stream = stream_alloc(0, 4, 48000);
+
 	m_timer_12bit[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t0_interrupt), this));
 	m_timer_12bit[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t1_interrupt), this));
 	m_timer_12bit[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::t2_interrupt), this));
@@ -132,6 +158,8 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 	save_item(NAME(m_dmod));
 	save_item(NAME(m_rctr));
 	save_item(NAME(m_lvctr));
+
+	save_item(NAME(m_adpcm_level));
 
 	mintf = std::move(intf);
 	save_common_registers();
@@ -332,6 +360,8 @@ void st2205u_base_device::device_reset()
 	m_rctr = 0;
 
 	m_lvctr = 0;
+
+	std::fill(std::begin(m_adpcm_level), std::end(m_adpcm_level), 0);
 }
 
 void st2205u_device::device_reset()
@@ -681,14 +711,13 @@ void st2205u_base_device::st2xxx_tclk_stop()
 u32 st2205u_base_device::tclk_pres_div(u8 mode) const
 {
 	assert(mode < 6);
-	if (mode < 3)
-		return 2 << mode;
-	else if (mode == 3)
-		return 32;
-	else if (mode == 4)
-		return 1024;
-	else
-		return 4096;
+
+	// dphh8630 game 17 "Gang Nam Style" uses mode 0 for ADPCM music and if a 32Mhz clock is used, requires a divider of 1
+	// alternatively the divider can remain as 2 if the code in timer_12bit_process processes the FIFO every call instead
+	// of toggling it with m_psg_on, which is correct?
+	const int divtable[8] = { 1, 4, 8, 32, 1024, 4096, 4096, 4096 };
+
+	return divtable[mode];
 }
 
 TIMER_CALLBACK_MEMBER(st2205u_base_device::t0_interrupt)
@@ -711,6 +740,29 @@ TIMER_CALLBACK_MEMBER(st2205u_base_device::t3_interrupt)
 	timer_12bit_process(3);
 }
 
+void st2205u_base_device::push_adpcm_value(int channel, u16 psg_data)
+{
+	// the ADPCM often ends up off-center before samples are played
+	// is the FIFO hookup causing non-ADPCM data to be processed as ADPCM
+	// if mode changes in m_psgm aren't in sync with the FIFO output?
+
+	m_stream->update();
+
+	if (BIT(psg_data, 8))
+		m_adpcm_level[channel] -= psg_data & 0xff;
+	else
+		m_adpcm_level[channel] += psg_data & 0xff;
+
+	LOGDAC("Playing ADPCM sample %c%02X on channel %d (new level is %04x)\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, channel, m_adpcm_level[channel]);
+}
+
+void st2205u_base_device::reset_adpcm_value(int channel)
+{
+	m_stream->update();
+
+	m_adpcm_level[channel] = 0;
+}
+
 void st2205u_base_device::timer_12bit_process(int t)
 {
 	if (BIT(m_psgc, t + 4))
@@ -723,9 +775,14 @@ void st2205u_base_device::timer_12bit_process(int t)
 
 			u16 psg_data = m_dac_fifo[t][m_fifo_pos[t]];
 			if (BIT(m_psgm, 2 * t + 1))
-				LOGDAC("Playing ADPCM sample %c%02X on channel %d\n", BIT(psg_data, 8) ? '-' : '+', psg_data & 0xff, t);
+			{
+				push_adpcm_value(t, psg_data);
+			}
 			else
+			{
+				reset_adpcm_value(t);
 				LOGDAC("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
+			}
 
 			--m_fifo_filled[t];
 			m_fifo_pos[t] = (m_fifo_pos[t] + 1) & 15;

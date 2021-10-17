@@ -34,13 +34,13 @@ enum expression_space
 	EXPSPACE_PROGRAM_LOGICAL,
 	EXPSPACE_DATA_LOGICAL,
 	EXPSPACE_IO_LOGICAL,
-	EXPSPACE_SPACE3_LOGICAL,
+	EXPSPACE_OPCODE_LOGICAL,
 	EXPSPACE_PROGRAM_PHYSICAL,
 	EXPSPACE_DATA_PHYSICAL,
 	EXPSPACE_IO_PHYSICAL,
-	EXPSPACE_SPACE3_PHYSICAL,
-	EXPSPACE_OPCODE,
-	EXPSPACE_RAMWRITE,
+	EXPSPACE_OPCODE_PHYSICAL,
+	EXPSPACE_PRGDIRECT,
+	EXPSPACE_OPDIRECT,
 	EXPSPACE_REGION
 };
 
@@ -204,7 +204,7 @@ private:
 	u64 read_memory_region(const char *rgntag, offs_t address, int size);
 	void write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
-	device_t *expression_get_device(const char *tag);
+	expression_error expression_get_space(const char *tag, int &spacenum, device_memory_interface *&memory);
 	void notify_memory_modified();
 
 	// internal state

@@ -244,25 +244,31 @@ void menu_software_list::handle()
 	// process the menu
 	const event *event = process(0);
 
-	if (event && event->itemref)
+	if (event)
 	{
-		if (event->itemref == ITEMREF_SWITCH_ITEM_ORDERING && event->iptkey == IPT_UI_SELECT)
+		if (event->iptkey == IPT_UI_SELECT)
 		{
-			m_ordered_by_shortname = !m_ordered_by_shortname;
+			if (event->itemref == ITEMREF_SWITCH_ITEM_ORDERING)
+			{
+				m_ordered_by_shortname = !m_ordered_by_shortname;
 
-			// reset the char buffer if we change ordering criterion
-			m_search.clear();
+				// reset the char buffer if we change ordering criterion
+				m_search.clear();
 
-			// reload the menu with the new order
-			reset(reset_options::REMEMBER_REF);
-			machine().popmessage(_("Switched Order: entries now ordered by %s"), m_ordered_by_shortname ? _("shortname") : _("description"));
-		}
-		// handle selections
-		else if (event->iptkey == IPT_UI_SELECT)
-		{
-			entry_info *info = (entry_info *) event->itemref;
-			m_result = info->short_name;
-			stack_pop();
+				// reload the menu with the new order
+				reset(reset_options::REMEMBER_REF);
+				machine().popmessage(
+						m_ordered_by_shortname
+							? _("Switched Order: entries now ordered by shortname")
+							: _("Switched Order: entries now ordered by description"));
+			}
+			else if (event->itemref)
+			{
+				// handle selections
+				entry_info *info = (entry_info *) event->itemref;
+				m_result = info->short_name;
+				stack_pop();
+			}
 		}
 		else if (event->iptkey == IPT_SPECIAL)
 		{
@@ -312,9 +318,11 @@ void menu_software_list::handle()
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
-			m_search.clear();
-			m_result = m_search;
-			stack_pop();
+			if (!m_search.empty())
+			{
+				m_search.clear();
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
+			}
 		}
 	}
 }

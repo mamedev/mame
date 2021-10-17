@@ -235,33 +235,6 @@ private:
 };
 
 
-// ======================> nes_whero_device
-
-class nes_whero_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_whero_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	uint8_t m_reg;
-	uint8_t m_mmc_vrom_bank[8];
-
-	uint16_t m_irq_count, m_irq_count_latch;
-	int m_irq_enable, m_irq_enable_latch;
-//  int m_irq_mode;
-};
-
-
 // ======================> nes_43272_device
 
 class nes_43272_device : public nes_nrom_device
@@ -281,65 +254,6 @@ protected:
 
 private:
 	uint16_t m_latch;
-};
-
-
-// ======================> nes_tf1201_device
-
-class nes_tf1201_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_tf1201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-
-private:
-	void update_prg();
-	uint8_t m_prg, m_swap;
-	uint16_t m_irq_count;
-	int m_irq_enable, m_irq_enable_latch;
-
-	uint8_t m_mmc_vrom_bank[8];
-};
-
-
-// ======================> nes_cityfight_device
-
-class nes_cityfight_device : public nes_nrom_device
-{
-public:
-	// construction/destruction
-	nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void write_h(offs_t offset, uint8_t data) override;
-
-	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
-private:
-	static constexpr device_timer_id TIMER_IRQ = 0;
-
-	void update_prg();
-
-	uint8_t m_prg_reg, m_prg_mode;
-	uint16_t m_irq_count;
-	int m_irq_enable;
-
-	emu_timer *irq_timer;
-
-	uint8_t m_mmc_vrom_bank[8];
 };
 
 
@@ -404,10 +318,7 @@ DECLARE_DEVICE_TYPE(NES_XIAOZY,      nes_xiaozy_device)
 DECLARE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device)
 DECLARE_DEVICE_TYPE(NES_T230,        nes_t230_device)
 DECLARE_DEVICE_TYPE(NES_MK2,         nes_mk2_device)
-DECLARE_DEVICE_TYPE(NES_WHERO,       nes_whero_device)
 DECLARE_DEVICE_TYPE(NES_43272,       nes_43272_device)
-DECLARE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device)
-DECLARE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device)
 DECLARE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device)
 //DECLARE_DEVICE_TYPE(NES_FUJIYA,      nes_fujiya_device)
 

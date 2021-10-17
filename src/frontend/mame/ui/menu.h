@@ -45,41 +45,8 @@ public:
 		FLAG_MULTILINE      = 1U << 3,
 		FLAG_REDTEXT        = 1U << 4,
 		FLAG_DISABLE        = 1U << 5,
-		FLAG_UI_DATS        = 1U << 6,
 		FLAG_UI_HEADING     = 1U << 7,
 		FLAG_COLOR_BOX      = 1U << 8
-	};
-
-	enum : unsigned {
-		INPUT_GROUPS,
-		INPUT_SPECIFIC,
-		SETTINGS_DIP_SWITCHES,
-		SETTINGS_DRIVER_CONFIG,
-		ANALOG,
-		BOOKKEEPING,
-		GAME_INFO,
-		WARN_INFO,
-		IMAGE_MENU_IMAGE_INFO,
-		IMAGE_MENU_FILE_MANAGER,
-		TAPE_CONTROL,
-		SLOT_DEVICES,
-		NETWORK_DEVICES,
-		KEYBOARD_MODE,
-		SLIDERS,
-		VIDEO_TARGETS,
-		VIDEO_OPTIONS,
-		CROSSHAIR,
-		CHEAT,
-		PLUGINS,
-		SELECT_GAME,
-		BIOS_SELECTION,
-		BARCODE_READ,
-		PTY_INFO,
-		EXTERNAL_DATS,
-		ADD_FAVORITE,
-		REMOVE_FAVORITE,
-		QUIT_GAME,
-		ABOUT
 	};
 
 	virtual ~menu();
@@ -141,10 +108,11 @@ protected:
 		PROCESS_NOKEYS      = 1 << 0,
 		PROCESS_LR_ALWAYS   = 1 << 1,
 		PROCESS_LR_REPEAT   = 1 << 2,
-		PROCESS_CUSTOM_ONLY = 1 << 3,
-		PROCESS_ONLYCHAR    = 1 << 4,
-		PROCESS_NOINPUT     = 1 << 5,
-		PROCESS_NOIMAGE     = 1 << 6
+		PROCESS_CUSTOM_NAV  = 1 << 3,
+		PROCESS_CUSTOM_ONLY = 1 << 4,
+		PROCESS_ONLYCHAR    = 1 << 5,
+		PROCESS_NOINPUT     = 1 << 6,
+		PROCESS_NOIMAGE     = 1 << 7
 	};
 
 	// options for reset
@@ -171,6 +139,7 @@ protected:
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
 
+	void set_needs_prev_menu_item(bool needs) { m_needs_prev_menu_item = needs; }
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 
@@ -307,10 +276,8 @@ protected:
 	// overridable event handling
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
+	virtual bool custom_ui_cancel() { return false; }
 	virtual bool custom_mouse_down() { return false; }
-
-	// test if search is active
-	virtual bool menu_has_search_active() { return false; }
 
 	static bool is_selectable(menu_item const &item)
 	{
@@ -390,6 +357,7 @@ protected: // TODO: remove need to expose these
 private:
 	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;
+	bool                    m_needs_prev_menu_item;
 	mame_ui_manager         &m_ui;              // UI we are attached to
 	render_container        &m_container;       // render_container we render to
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu

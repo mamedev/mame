@@ -371,7 +371,7 @@ function cheatfind.startplugin()
 		end
 
 		local function incdec(event, val, min, max)
-			local ret
+			local ret = false
 			if event == "left" and val ~= min then
 				val = val - 1
 				ret = true
@@ -500,8 +500,9 @@ function cheatfind.startplugin()
 				if (event == "left" or event == "right") and #menu_blocks ~= 0 then
 					manager.machine:popmessage(_("Changes to this only take effect when \"Start new search\" is selected"))
 				end
-				devsel = incdec(event, devsel, 1, #devtable)
-				return true
+				local r
+				devsel, r = incdec(event, devsel, 1, #devtable)
+				return r
 			end
 			return m, f
 		end
@@ -521,9 +522,9 @@ function cheatfind.startplugin()
 						manager.machine:popmessage(_("Automatically toggle pause with on-screen menus"))
 						emu.pause()
 					end
+					return true
 				end
-
-				return true
+				return false
 			end
 			return m, f
 		end
@@ -550,7 +551,7 @@ function cheatfind.startplugin()
 					return true
 				end
 			end
-				local opsel = 1
+			local opsel = 1
 			return { _("Start new search"), "", 0 }, f
 		end
 
@@ -577,6 +578,7 @@ function cheatfind.startplugin()
 						devsel = devcur
 						return true
 					end
+					return false
 				end
 				return { string.format(_("Save current memory state to Slot %d"), #menu_blocks[1] + 1), "", 0 }, f
 			end
@@ -615,6 +617,7 @@ function cheatfind.startplugin()
 						devsel = devcur
 						return true
 					end
+					return false
 				end
 
 				local slot_slot_comp = _("Perform Compare : Slot %d %s Slot %d")
@@ -659,7 +662,7 @@ function cheatfind.startplugin()
 			end
 			menu[#menu + 1] = function() return { "---", "", "off" }, nil end
 			menu[#menu + 1] = function()
-				local m = { _(leftop), "", 0 }
+				local m = { string.format("%d", leftop), "", 0 }
 				menu_lim(leftop, 1, #menu_blocks[1], m)
 				m[1] = string.format(_("Slot %d"), leftop)
 				return m, function(event) local r leftop, r = incdec(event, leftop, 1, #menu_blocks[1]) return r end
@@ -701,7 +704,7 @@ function cheatfind.startplugin()
 				if optable[opsel]:sub(3, 3) == "v" then
 					return nil
 				end
-				local m = { _(rightop), "", 0 }
+				local m = { string.format("%d", rightop), "", 0 }
 				menu_lim(rightop, 1, #menu_blocks[1], m)
 				m[1] = string.format(_("Slot %d"), rightop)
 				return m, function(event) local r rightop, r = incdec(event, rightop, 1, #menu_blocks[1]) return r end
@@ -783,6 +786,7 @@ function cheatfind.startplugin()
 							matchpg = 0
 							return true
 						end
+						return false
 					end
 					return { _("Undo last search -- #") .. #matches, "", 0 }, f
 				end
@@ -1022,6 +1026,7 @@ function cheatfind.startplugin()
 						end
 						menu_lim(matchpg, 0, max, m)
 						local function f(event)
+							local r
 							matchpg, r = incdec(event, matchpg, 0, max)
 							return r
 						end
@@ -1042,7 +1047,7 @@ function cheatfind.startplugin()
 		if event == "cancel" and pausesel == 1 then
 			emu.unpause()
 			menu_is_showing = false
-			return {0,0,0}
+			return false -- return false so menu will be popped off the stack
 		end
 		return menu_func[index](event)
 	end

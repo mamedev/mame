@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nathan Woods, Vas Crabb
 /*********************************************************************
 
     text.cpp
@@ -10,12 +10,15 @@
 
 #include "emu.h"
 #include "text.h"
-#include "rendfont.h"
+
 #include "render.h"
-#include "unicode.h"
+#include "rendfont.h"
+
+#include "util/unicode.h"
 
 #include <cstddef>
 #include <cstring>
+#include <utility>
 
 
 namespace ui {
@@ -76,6 +79,193 @@ inline bool is_breakable_char(char32_t ch)
 
 
 /***************************************************************************
+CLASS TO REPRESENT A LINE
+***************************************************************************/
+
+// information about the "source" of a character - also in a struct
+// to facilitate copying
+struct text_layout::source_info
+{
+	size_t start;
+	size_t span;
+};
+
+
+// this should really be "positioned glyph" as glyphs != characters, but
+// we'll get there eventually
+struct text_layout::positioned_char
+{
+	char32_t character;
+	char_style style;
+	source_info source;
+	float xoffset;
+	float xwidth;
+};
+
+
+class text_layout::line
+{
+public:
+	using size_type = size_t;
+	static constexpr size_type npos = ~size_type(0);
+
+	line(float yoffset, float height) : m_yoffset(yoffset), m_height(height)
+	{
+	}
+
+	// methods
+	void add_character(text_layout &layout, char32_t ch, char_style const &style, source_info const &source)
+	{
+		// get the width of this character
+		float const chwidth = layout.get_char_width(ch, style.size);
+
+		// append the positioned character
+		m_characters.emplace_back(positioned_char{ ch, style, source, m_width, chwidth });
+		m_width += chwidth;
+
+		// we might be bigger
+		m_height = std::max(m_height, style.size * layout.yscale());
+	}
+
+	void truncate(size_t position)
+	{
+		assert(position <= m_characters.size());
+
+		// are we actually truncating?
+		if (position < m_characters.size())
+		{
+			// set the width as appropriate
+			m_width = m_characters[position].xoffset;
+
+			// and resize the array
+			m_characters.resize(position);
+		}
+	}
+
+	void set_justification(text_justify justify)
+	{
+		switch (justify)
+		{
+		case text_justify::RIGHT:
+			if (npos == m_right_justify_start)
+				m_right_justify_start = m_characters.size();
+			[[fallthrough]];
+		case text_justify::CENTER:
+			if (npos == m_center_justify_start)
+				m_center_justify_start = m_characters.size();
+			break;
+		case text_justify::LEFT:
+			break;
+		}
+	}
+
+	void align_text(text_layout const &layout)
+	{
+		assert(m_right_justify_start >= m_center_justify_start);
+
+		if (m_characters.empty() || m_center_justify_start)
+		{
+			// at least some of the text is left-justified - anchor to left
+			m_anchor_pos = 0.0f;
+			m_anchor_target = 0.0f;
+			if ((layout.width() > m_width) && (m_characters.size() > m_center_justify_start))
+			{
+				// at least some text is not left-justified
+				if (m_right_justify_start == m_center_justify_start)
+				{
+					// all text that isn't left-justified is right-justified
+					float const right_offset = layout.width() - m_width;
+					for (size_t i = m_right_justify_start; m_characters.size() > i; ++i)
+						m_characters[i].xoffset += right_offset;
+					m_width = layout.width();
+				}
+				else if (m_characters.size() <= m_right_justify_start)
+				{
+					// all text that isn't left-justified is center-justified
+					float const center_width = m_width - m_characters[m_center_justify_start].xoffset;
+					float const center_offset = ((layout.width() - center_width) * 0.5f) - m_characters[m_center_justify_start].xoffset;
+					if (0.0f < center_offset)
+					{
+						for (size_t i = m_center_justify_start; m_characters.size() > i; ++i)
+							m_characters[i].xoffset += center_offset;
+						m_width += center_offset;
+					}
+				}
+				else
+				{
+					// left, right and center-justified parts
+					float const center_width = m_characters[m_right_justify_start].xoffset - m_characters[m_center_justify_start].xoffset;
+					float const center_offset = ((layout.width() - center_width) * 0.5f) - m_characters[m_center_justify_start].xoffset;
+					float const right_offset = layout.width() - m_width;
+					if (center_offset > right_offset)
+					{
+						// right-justified text pushes centre-justified text to the left
+						for (size_t i = m_center_justify_start; m_right_justify_start > i; ++i)
+							m_characters[i].xoffset += right_offset;
+					}
+					else if (0.0f < center_offset)
+					{
+						// left-justified text doesn't push centre-justified text to the right
+						for (size_t i = m_center_justify_start; m_right_justify_start > i; ++i)
+							m_characters[i].xoffset += center_offset;
+					}
+					for (size_t i = m_right_justify_start; m_characters.size() > i; ++i)
+						m_characters[i].xoffset += right_offset;
+					m_width = layout.width();
+				}
+			}
+		}
+		else if (m_characters.size() <= m_right_justify_start)
+		{
+			// all text is center-justified - anchor to center
+			m_anchor_pos = 0.5f;
+			m_anchor_target = 0.5f;
+		}
+		else
+		{
+			// at least some text is right-justified - anchor to right
+			m_anchor_pos = 1.0f;
+			m_anchor_target = 1.0f;
+			if ((layout.width() > m_width) && (m_right_justify_start > m_center_justify_start))
+			{
+				// mixed center-justified and right-justified text
+				float const center_width = m_characters[m_right_justify_start].xoffset;
+				float const center_offset = (layout.width() - m_width + (center_width * 0.5f)) - (layout.width() * 0.5f);
+				if (0.0f < center_offset)
+				{
+					for (size_t i = m_right_justify_start; m_characters.size() > i; ++i)
+						m_characters[i].xoffset += center_offset;
+					m_width += center_offset;
+				}
+			}
+		}
+	}
+
+	// accessors
+	float xoffset(text_layout const &layout) const { return (layout.width() * m_anchor_target) - (m_width * m_anchor_pos); }
+	float yoffset() const { return m_yoffset; }
+	float width() const { return m_width; }
+	float height() const { return m_height; }
+	size_t character_count() const { return m_characters.size(); }
+	size_t center_justify_start() const { return m_center_justify_start; }
+	size_t right_justify_start() const { return m_right_justify_start; }
+	const positioned_char &character(size_t index) const { return m_characters[index]; }
+	positioned_char &character(size_t index) { return m_characters[index]; }
+
+private:
+	std::vector<positioned_char> m_characters;
+	size_type m_center_justify_start = npos;
+	size_type m_right_justify_start = npos;
+	float m_yoffset;
+	float m_height;
+	float m_width = 0.0f;
+	float m_anchor_pos = 0.0f;
+	float m_anchor_target = 0.0f;
+};
+
+
+
+/***************************************************************************
 CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -122,7 +312,7 @@ text_layout::~text_layout()
 //  add_text
 //-------------------------------------------------
 
-void text_layout::add_text(std::string_view text, const char_style &style)
+void text_layout::add_text(std::string_view text, text_justify line_justify, char_style const &style)
 {
 	while (!text.empty())
 	{
@@ -130,25 +320,9 @@ void text_layout::add_text(std::string_view text, const char_style &style)
 		invalidate_calculated_actual_width();
 
 		// do we need to create a new line?
-		if (m_current_line == nullptr)
-		{
-			// get the current character
-			char32_t schar;
-			int const scharcount = uchar_from_utf8(&schar, text);
-			if (scharcount < 0)
-				break;
-
-			// if the line starts with a tab character, center it regardless
-			text_justify line_justify = justify();
-			if (schar == '\t')
-			{
-				text.remove_prefix(scharcount);
-				line_justify = text_layout::CENTER;
-			}
-
-			// start a new line
-			start_new_line(line_justify, style.size);
-		}
+		if (!m_current_line)
+			start_new_line(style.size);
+		m_current_line->set_justification(line_justify);
 
 		// get the current character
 		char32_t ch;
@@ -166,45 +340,43 @@ void text_layout::add_text(std::string_view text, const char_style &style)
 		// is this an endline?
 		if (ch == '\n')
 		{
-			// first, start a line if we have not already
-			if (m_current_line == nullptr)
-				start_new_line(LEFT, style.size);
-
-			// and then close up the current line
+			// close up the current line
+			m_current_line->align_text(*this);
 			m_current_line = nullptr;
 		}
 		else if (!m_truncating)
 		{
 			// if we hit a space, remember the location and width *without* the space
-			if (is_space_character(ch))
+			bool const is_space = is_space_character(ch);
+			if (is_space)
 				m_last_break = m_current_line->character_count();
 
 			// append the character
-			m_current_line->add_character(ch, style, source);
+			m_current_line->add_character(*this, ch, style, source);
 
 			// do we have to wrap?
-			if (wrap() != NEVER && m_current_line->width() > m_width)
+			if ((wrap() != word_wrapping::NEVER) && (m_current_line->width() > m_width))
 			{
 				switch (wrap())
 				{
-					case TRUNCATE:
-						truncate_wrap();
-						break;
+				case word_wrapping::TRUNCATE:
+					truncate_wrap();
+					break;
 
-					case WORD:
-						word_wrap();
-						break;
+				case word_wrapping::WORD:
+					word_wrap();
+					break;
 
-					default:
-						fatalerror("invalid word wrapping value");
-						break;
+				case word_wrapping::NEVER:
+					// can't happen due to if condition, but compile warns about it
+					break;
 				}
 			}
 			else
 			{
-				// we didn't wrap - if we hit any non-space breakable character, remember the location and width
-				// *with* the breakable character
-				if (ch != ' ' && is_breakable_char(ch))
+				// we didn't wrap - if we hit any non-space breakable character,
+				// remember the location and width *with* the breakable character
+				if (!is_space && is_breakable_char(ch))
 					m_last_break = m_current_line->character_count();
 			}
 		}
@@ -226,25 +398,23 @@ void text_layout::invalidate_calculated_actual_width()
 //  actual_left
 //-------------------------------------------------
 
-float text_layout::actual_left() const
+float text_layout::actual_left()
 {
-	float result;
-	if (empty())
+	if (m_current_line)
 	{
-		// degenerate scenario
-		result = 0;
+		// TODO: is there a sane way to allow an open line to be temporarily finalised and rolled back?
+		m_current_line->align_text(*this);
+		m_current_line = nullptr;
 	}
-	else
-	{
-		result = 1.0f;
-		for (const auto &line : m_lines)
-		{
-			result = std::min(result, line->xoffset());
 
-			// take an opportunity to break out easily
-			if (result <= 0)
-				break;
-		}
+	if (empty()) // degenerate scenario
+		return 0.0f;
+
+	float result = 1.0f;
+	for (auto const &line : m_lines)
+	{
+		if (line->width())
+			result = std::min(result, line->xoffset(*this));
 	}
 	return result;
 }
@@ -254,8 +424,15 @@ float text_layout::actual_left() const
 //  actual_width
 //-------------------------------------------------
 
-float text_layout::actual_width() const
+float text_layout::actual_width()
 {
+	if (m_current_line)
+	{
+		// TODO: is there a sane way to allow an open line to be temporarily finalised and rolled back?
+		m_current_line->align_text(*this);
+		m_current_line = nullptr;
+	}
+
 	// do we need to calculate the width?
 	if (m_calculated_actual_width < 0)
 	{
@@ -275,14 +452,12 @@ float text_layout::actual_width() const
 //  actual_height
 //-------------------------------------------------
 
-float text_layout::actual_height() const
+float text_layout::actual_height()
 {
-	line *last_line = (m_lines.size() > 0)
-		? m_lines[m_lines.size() - 1].get()
-		: nullptr;
-	return last_line
-		? last_line->yoffset() + last_line->height()
-		: 0;
+	if (!m_lines.empty())
+		return m_lines.back()->yoffset() + m_lines.back()->height();
+	else
+		return 0.0f;
 }
 
 
@@ -290,18 +465,12 @@ float text_layout::actual_height() const
 //  start_new_line
 //-------------------------------------------------
 
-void text_layout::start_new_line(text_layout::text_justify justify, float height)
+void text_layout::start_new_line(float height)
 {
-	// create a new line
-	std::unique_ptr<line> new_line(std::make_unique<line>(*this, justify, actual_height(), height * yscale()));
-
 	// update the current line
-	m_current_line = new_line.get();
+	m_current_line = m_lines.emplace_back(std::make_unique<line>(actual_height(), height * yscale())).get();
 	m_last_break = 0;
 	m_truncating = false;
-
-	// append it
-	m_lines.emplace_back(std::move(new_line));
 }
 
 
@@ -335,7 +504,7 @@ void text_layout::truncate_wrap()
 	source.start = truncate_char.source.start + truncate_char.source.span;
 	source.span = 0;
 
-	// figure out how wide an elipsis is
+	// figure out how wide an ellipsis is
 	float elipsis_width = get_char_width(elipsis, style.size);
 
 	// where should we really truncate from?
@@ -345,10 +514,10 @@ void text_layout::truncate_wrap()
 	// truncate!!!
 	m_current_line->truncate(truncate_position);
 
-	// and append the elipsis
-	m_current_line->add_character(elipsis, style, source);
+	// and append the ellipsis
+	m_current_line->add_character(*this, elipsis, style, source);
 
-	// take note that we are truncating; supress new characters
+	// take note that we are truncating; suppress new characters
 	m_truncating = true;
 }
 
@@ -360,26 +529,37 @@ void text_layout::truncate_wrap()
 void text_layout::word_wrap()
 {
 	// keep track of the last line and break
-	line *last_line = m_current_line;
-	size_t last_break = m_last_break;
+	line *const last_line = m_current_line;
+	size_t const last_break = m_last_break ? m_last_break : (last_line->character_count() - 1);
 
 	// start a new line with the same justification
-	start_new_line(last_line->justify(), last_line->character(last_line->character_count() - 1).style.size);
+	start_new_line(last_line->character(last_line->character_count() - 1).style.size);
 
-	// find the begining of the word to wrap
+	// find the beginning of the word to wrap
 	size_t position = last_break;
-	while (position + 1 < last_line->character_count() && is_space_character(last_line->character(position).character))
+	while ((last_line->character_count() > position) && is_space_character(last_line->character(position).character))
 		position++;
+
+	// carry over justification
+	if (last_line->right_justify_start() <= position)
+		m_current_line->set_justification(text_justify::RIGHT);
+	else if (last_line->center_justify_start() <= position)
+		m_current_line->set_justification(text_justify::CENTER);
 
 	// transcribe the characters
 	for (size_t i = position; i < last_line->character_count(); i++)
 	{
+		if (last_line->right_justify_start() == i)
+			m_current_line->set_justification(text_justify::RIGHT);
+		else if (last_line->center_justify_start() == i)
+			m_current_line->set_justification(text_justify::CENTER);
 		auto &ch = last_line->character(i);
-		m_current_line->add_character(ch.character, ch.style, ch.source);
+		m_current_line->add_character(*this, ch.character, ch.style, ch.source);
 	}
 
-	// and finally, truncate the last line
+	// and finally, truncate the previous line and adjust spacing
 	last_line->truncate(last_break);
+	last_line->align_text(*this);
 }
 
 
@@ -387,13 +567,20 @@ void text_layout::word_wrap()
 //  hit_test
 //-------------------------------------------------
 
-bool text_layout::hit_test(float x, float y, size_t &start, size_t &span) const
+bool text_layout::hit_test(float x, float y, size_t &start, size_t &span)
 {
+	if (m_current_line)
+	{
+		// TODO: is there a sane way to allow an open line to be temporarily finalised and rolled back?
+		m_current_line->align_text(*this);
+		m_current_line = nullptr;
+	}
+
 	for (const auto &line : m_lines)
 	{
 		if (y >= line->yoffset() && y < line->yoffset() + line->height())
 		{
-			float line_xoffset = line->xoffset();
+			float line_xoffset = line->xoffset(*this);
 			if (x >= line_xoffset && x < line_xoffset + line->width())
 			{
 				for (size_t i = 0; i < line->character_count(); i++)
@@ -439,56 +626,39 @@ void text_layout::restyle(size_t start, size_t span, rgb_t *fgcolor, rgb_t *bgco
 
 
 //-------------------------------------------------
-//  get_wrap_info
-//-------------------------------------------------
-
-int text_layout::get_wrap_info(std::vector<int> &xstart, std::vector<int> &xend) const
-{
-	// this is a hacky method (tailored to the need to implement
-	// mame_ui_manager::wrap_text) but so be it
-	int line_count = 0;
-	for (const auto &line : m_lines)
-	{
-		int start_pos = 0;
-		int end_pos = 0;
-
-		auto line_character_count = line->character_count();
-		if (line_character_count > 0)
-		{
-			start_pos = line->character(0).source.start;
-			end_pos = line->character(line_character_count - 1).source.start
-				+ line->character(line_character_count - 1).source.span;
-		}
-
-		line_count++;
-		xstart.push_back(start_pos);
-		xend.push_back(end_pos);
-	}
-	return line_count;
-}
-
-
-//-------------------------------------------------
 //  emit
 //-------------------------------------------------
 
 void text_layout::emit(render_container &container, float x, float y)
 {
-	for (const auto &line : m_lines)
+	emit(container, 0, m_lines.size(), x, y);
+}
+
+void text_layout::emit(render_container &container, size_t start, size_t lines, float x, float y)
+{
+	if (m_current_line)
 	{
-		float line_xoffset = line->xoffset();
+		// TODO: is there a sane way to allow an open line to be temporarily finalised and rolled back?
+		m_current_line->align_text(*this);
+		m_current_line = nullptr;
+	}
+
+	float const base_y = (m_lines.size() > start) ? m_lines[start]->yoffset() : 0.0f;
+	for (size_t l = start; ((start + lines) > l) && (m_lines.size() > l); ++l)
+	{
+		auto const &line = m_lines[l];
+		float const line_xoffset = line->xoffset(*this);
+		float const char_y = y + line->yoffset() - base_y;
+		float const char_height = line->height();
 
 		// emit every single character
 		for (auto i = 0; i < line->character_count(); i++)
 		{
 			auto &ch = line->character(i);
 
-			// position this specific character correctly (TODO - this doesn't
-			// handle differently sized text (yet)
-			float char_x = x + line_xoffset + ch.xoffset;
-			float char_y = y + line->yoffset();
-			float char_width = ch.xwidth;
-			float char_height = line->height();
+			// position this specific character correctly (TODO - this doesn't handle differently sized text (yet)
+			float const char_x = x + line_xoffset + ch.xoffset;
+			float const char_width = ch.xwidth;
 
 			// render the background of the character (if present)
 			if (ch.style.bgcolor.a() != 0)
@@ -496,94 +666,14 @@ void text_layout::emit(render_container &container, float x, float y)
 
 			// render the foreground
 			container.add_char(
-				char_x,
-				char_y,
-				char_height,
-				xscale() / yscale(),
-				ch.style.fgcolor,
-				font(),
-				ch.character);
+					char_x,
+					char_y,
+					char_height,
+					xscale() / yscale(),
+					ch.style.fgcolor,
+					font(),
+					ch.character);
 		}
-	}
-}
-
-
-//-------------------------------------------------
-//  line::ctor
-//-------------------------------------------------
-
-text_layout::line::line(text_layout &layout, text_justify justify, float yoffset, float height)
-	: m_layout(layout), m_justify(justify), m_yoffset(yoffset), m_width(0.0), m_height(height)
-{
-}
-
-
-//-------------------------------------------------
-//  line::add_character
-//-------------------------------------------------
-
-void text_layout::line::add_character(char32_t ch, const char_style &style, const source_info &source)
-{
-	// get the width of this character
-	float chwidth = m_layout.get_char_width(ch, style.size);
-
-	// create the positioned character
-	positioned_char positioned_char = { 0, };
-	positioned_char.character = ch;
-	positioned_char.xoffset = m_width;
-	positioned_char.xwidth = chwidth;
-	positioned_char.style = style;
-	positioned_char.source = source;
-
-	// append the character
-	m_characters.push_back(positioned_char);
-	m_width += chwidth;
-
-	// we might be bigger
-	m_height = std::max(m_height, style.size * m_layout.yscale());
-}
-
-
-//-------------------------------------------------
-//  line::xoffset
-//-------------------------------------------------
-
-float text_layout::line::xoffset() const
-{
-	float result;
-	switch (justify())
-	{
-		case LEFT:
-		default:
-			result = 0;
-			break;
-		case CENTER:
-			result = (m_layout.width() - width()) / 2;
-			break;
-		case RIGHT:
-			result = m_layout.width() - width();
-			break;
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  line::truncate
-//-------------------------------------------------
-
-void text_layout::line::truncate(size_t position)
-{
-	assert(position <= m_characters.size());
-
-	// are we actually truncating?
-	if (position < m_characters.size())
-	{
-		// set the width as appropriate
-		m_width = m_characters[position].xoffset;
-
-		// and resize the array
-		m_characters.resize(position);
 	}
 }
 

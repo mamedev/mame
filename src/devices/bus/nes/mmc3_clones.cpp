@@ -31,8 +31,8 @@
 DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
 DEFINE_DEVICE_TYPE(NES_FS6,           nes_fs6_device,           "nes_fs6",           "NES Cart Fight Street VI PCB")
 DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
-DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Spash Bomb PCB")
-DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY04646 PCB")
+DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Splash Bomb PCB")
+DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY4646 PCB")
 DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
 DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
 DEFINE_DEVICE_TYPE(NES_8237A,         nes_8237a_device,         "nes_8237a",         "NES Cart UNL-8237A PCB")
@@ -140,7 +140,7 @@ nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_FAMILY4646, tag, owner, clock)
 {
 }
@@ -384,8 +384,8 @@ nes_bmc_820720c_device::nes_bmc_820720c_device(const machine_config &mconfig, co
 {
 }
 
-nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock), m_reg(0)
+nes_bmc_830118c_device::nes_bmc_830118c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_830118C, tag, owner, clock)
 {
 }
 
@@ -414,12 +414,19 @@ nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char
 {
 }
 
-
+void nes_family4646_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
 
 void nes_family4646_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	mmc3_common_initialize(0x1f, 0xff, 0);
+	set_nt_mirroring(PPU_MIRROR_HORZ); // Space Shuttle on CB-4035 doesn't set mirroring bit. Whether this cart is hard-wired to reset correctly to horizontal mirroring is not clear.
 }
 
 void nes_pikay2k_device::device_start()
@@ -911,18 +918,10 @@ void nes_bmc_820720c_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
-void nes_bmc_830118c_device::device_start()
-{
-	mmc3_start();
-	save_item(NAME(m_reg));
-}
-
 void nes_bmc_830118c_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
-	m_reg = 0;
-	mmc3_common_initialize(0x7f, 0x7f, 0);
+	mmc3_common_initialize(0x0f, 0x7f, 0);
 }
 
 void nes_bmc_830832c_device::pcb_reset()
@@ -1078,29 +1077,60 @@ void nes_malisb_device::write_h(offs_t offset, uint8_t data)
  BMC-FAMILY-4646B
 
  Known Boards: Unknown Multigame Bootleg Board (4646B)
- Games: 2 in 1 - Family Kid & Aladdin 4
+ Games: 2 in 1 - Family Kid & Aladdin 4, various multicarts.
 
- MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
  iNES: mapper 134
 
- In MESS: Supported.
+ In MAME: Preliminary supported.
+
+ TODO: There are unknown writes to the unused reg 3,
+ though it seems only 0x00 is written. Next, some
+ carts have solder pad setting readable at 0x8000.
+ Lastly, YH-4103 doesn't soft reset cleanly like
+ the other carts, but does this happen on hardware?
 
  -------------------------------------------------*/
 
-void nes_family4646_device::write_m(offs_t offset, uint8_t data)
+void nes_family4646_device::prg_cb(int start, int bank)
+{
+	if (!BIT(m_reg[1], 7))    // MMC3 mode
+		nes_txrom_device::prg_cb(start, bank);
+	else if (start == 0)      // NROM mode, only uses MMC3's $8000 bank
+	{
+		if (BIT(m_reg[1], 3))
+		{
+			prg16_89ab(bank & ~0x01);
+			prg16_cdef(bank & ~0x01);
+		}
+		else
+			prg32(bank & ~0x03);
+	}
+}
+
+void nes_family4646_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("family4646 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset == 0x01)
-	{
-		m_prg_base = (data & 0x02) << 4;
-		m_prg_mask = 0x1f;
-		m_chr_base = (data & 0x20) << 3;
-		m_chr_mask = 0xff;
-		set_prg(m_prg_base, m_prg_mask);
+	int reg = offset & 0x03;
+	if (!BIT(m_reg[0], 7))    // lock bit
+		m_reg[reg] = data;
+	else if (reg == 2)        // final two bits of reg 2 respond regardless
+		m_reg[reg] = (m_reg[reg] & ~0x03) | (data & 0x03);
+	else
+		return;
+
+	m_prg_base = (m_reg[1] & 0x03) << 4;
+	m_prg_mask = 0x1f >> BIT(m_reg[1], 2);
+	set_prg(m_prg_base, m_prg_mask);
+
+	m_chr_base = (m_reg[1] & 0x30) << 3;
+	m_chr_mask = 0xff >> BIT(m_reg[1], 6);
+	if (BIT(m_reg[0], 3))    // CNROM-like mode
+		chr8(m_chr_base >> 3 | (m_reg[2] & (m_chr_mask >> 3)), m_chr_source);
+	else                     // MMC3 mode
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	}
 }
 
 /*-------------------------------------------------
@@ -3212,46 +3242,44 @@ void nes_bmc_820720c_device::write_h(offs_t offset, u8 data)
 
  BMC-830118C
 
+ Games: 7 in 1 (EW-002, M-022, M-026, M-027)
 
- MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
+ NES 2.0: mapper 348
 
- In MESS: Very Preliminary Support
+ In MAME: Preliminary supported.
+
+ TODO: Only M-022 seems to reliably soft reset to the
+ menu for all games. The other three carts are hit or
+ miss. MMC3 games in particular are not likely to
+ reset to the menu. Investigate further...
 
  -------------------------------------------------*/
 
 void nes_bmc_830118c_device::prg_cb(int start, int bank)
 {
-	if ((m_reg & 0x0c) != 0x0c)
-		prg8_x(start, (bank & 0x0f) | ((m_reg & 0x0c) << 2));
-	else
+	if (m_prg_base == 0x30)
 	{
-		if (start == 0)
+		if (start <= 1)
 		{
-			prg8_89((bank & 0x0f) | ((m_reg & 0x0c) << 2));
-			prg8_ab((bank & 0x0f) | 0x20);
-		}
-		else if (start == 2)
-		{
-			prg8_cd((bank & 0x0f) | ((m_reg & 0x0c) << 2));
-			prg8_ef((bank & 0x0f) | 0x20);
+			prg8_x(start, bank & ~2);
+			prg8_x(start + 2, bank | 2);
 		}
 	}
+	else
+		nes_txrom_device::prg_cb(start, bank);
 }
 
-void nes_bmc_830118c_device::chr_cb(int start, int bank, int source)
-{
-	chr1_x(start, (bank & 0x7f) | ((m_reg & 0x0c) << 5), source);
-}
-
-void nes_bmc_830118c_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_830118c_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_830118c write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset >= 0x800 && offset < 0x900)
+	if ((m_wram_protect & 0xc0) == 0x80)
 	{
-		m_reg = data;
+		m_prg_base = (data & 0x0c) << 2;
 		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = m_prg_base << 3;
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }

@@ -9,19 +9,20 @@ local function get_settings_filename()
 end
 
 local function initialize_button(settings)
-	if settings.port and settings.field and settings.key and settings.on_frames and settings.off_frames then
+	if settings.port and settings.mask and settings.type and settings.key and settings.on_frames and settings.off_frames then
 		local new_button = {
 			port = settings.port,
-			field = settings.field,
 			key = manager.machine.input:seq_from_tokens(settings.key),
 			on_frames = settings.on_frames,
 			off_frames = settings.off_frames,
 			counter = 0
 		}
-		local port = manager.machine.ioport.ports[settings.port]
+		local ioport = manager.machine.ioport
+		local port = ioport.ports[settings.port]
 		if port then
-			local field = port.fields[settings.field]
-			if field then
+			local field = port:field(settings.mask)
+			if field and (field.type == ioport:token_to_input_type(settings.type)) then
+				new_button.field = field.name
 				new_button.button = field
 				return new_button
 			end
@@ -35,7 +36,8 @@ local function serialize_settings(button_list)
 	for index, button in ipairs(button_list) do
 		setting = {
 			port = button.port,
-			field = button.field,
+			mask = button.button.mask,
+			type = manager.machine.ioport:input_type_to_token(button.button.type),
 			key = manager.machine.input:seq_to_tokens(button.key),
 			on_frames = button.on_frames,
 			off_frames = button.off_frames
