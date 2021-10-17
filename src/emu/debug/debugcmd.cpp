@@ -250,9 +250,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	m_console.register_command("bpset",     CMDFLAG_NONE, 1, 3, std::bind(&debugger_commands::execute_bpset, this, _1));
 	m_console.register_command("bp",        CMDFLAG_NONE, 1, 3, std::bind(&debugger_commands::execute_bpset, this, _1));
-	m_console.register_command("bpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpclear, this, _1));
-	m_console.register_command("bpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, false, _1));
-	m_console.register_command("bpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bpdisenable, this, true, _1));
+	m_console.register_command("bpclear",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_bpclear, this, _1));
+	m_console.register_command("bpdisable", CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_bpdisenable, this, false, _1));
+	m_console.register_command("bpenable",  CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_bpdisenable, this, true, _1));
 	m_console.register_command("bplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_bplist, this, _1));
 
 	m_console.register_command("wpset",     CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, -1, _1));
@@ -263,17 +263,17 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("wpi",       CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_IO, _1));
 	m_console.register_command("wposet",    CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_OPCODES, _1));
 	m_console.register_command("wpo",       CMDFLAG_NONE, 3, 5, std::bind(&debugger_commands::execute_wpset, this, AS_OPCODES, _1));
-	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1));
-	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, false, _1));
-	m_console.register_command("wpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, true, _1));
+	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_wpclear, this, _1));
+	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_wpdisenable, this, false, _1));
+	m_console.register_command("wpenable",  CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_wpdisenable, this, true, _1));
 	m_console.register_command("wplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_wplist, this, _1));
 
 	m_console.register_command("rpset",     CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
 	m_console.register_command("rp",        CMDFLAG_NONE, 1, 2, std::bind(&debugger_commands::execute_rpset, this, _1));
-	m_console.register_command("rpclear",   CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rpclear, this, _1));
-	m_console.register_command("rpdisable", CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, false, _1));
-	m_console.register_command("rpenable",  CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rpdisenable, this, true, _1));
-	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 0, std::bind(&debugger_commands::execute_rplist, this, _1));
+	m_console.register_command("rpclear",   CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_rpclear, this, _1));
+	m_console.register_command("rpdisable", CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_rpdisenable, this, false, _1));
+	m_console.register_command("rpenable",  CMDFLAG_NONE, 0, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_rpdisenable, this, true, _1));
+	m_console.register_command("rplist",    CMDFLAG_NONE, 0, 1, std::bind(&debugger_commands::execute_rplist, this, _1));
 
 	m_console.register_command("statesave", CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1));
 	m_console.register_command("ss",        CMDFLAG_NONE, 1, 1, std::bind(&debugger_commands::execute_statesave, this, _1));
@@ -1071,6 +1071,37 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 
 
 /*-------------------------------------------------
+    execute_index_command - helper for commands
+	that take multiple indices as arguments
+-------------------------------------------------*/
+
+template <typename T>
+void debugger_commands::execute_index_command(std::vector<std::string> const &params, T &&apply, char const *unused_message)
+{
+	std::vector<u64> index(params.size());
+	for (int paramnum = 0; paramnum < params.size(); paramnum++)
+	{
+		if (!validate_number_parameter(params[paramnum], index[paramnum]))
+			return;
+	}
+
+	for (device_t &device : device_enumerator(m_machine.root_device()))
+	{
+		for (auto param = index.begin(); index.end() != param; )
+		{
+			if (apply(device, *param))
+				param = index.erase(param);
+			else
+				++param;
+		}
+	}
+
+	for (auto const &param : index)
+		m_console.printf(unused_message, param);
+}
+
+
+/*-------------------------------------------------
     execute_printf - execute the printf command
 -------------------------------------------------*/
 
@@ -1740,31 +1771,24 @@ void debugger_commands::execute_bpset(const std::vector<std::string> &params)
 
 void debugger_commands::execute_bpclear(const std::vector<std::string> &params)
 {
-	u64 bpindex;
-
 	if (params.empty()) // if no parameters, clear all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->breakpoint_clear_all();
 		m_console.printf("Cleared all breakpoints\n");
 	}
-	else if (!validate_number_parameter(params[0], bpindex)) // otherwise, clear the specific one
+	else // otherwise, clear the specific ones
 	{
-		return;
-	}
-	else
-	{
-		bool found = false;
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->breakpoint_clear(bpindex))
-			{
-				found = true;
-				break;
-			}
-		if (found)
-			m_console.printf("Breakpoint %X cleared\n", u32(bpindex));
-		else
-			m_console.printf("Invalid breakpoint number %X\n", u32(bpindex));
+		execute_index_command(
+				params,
+				[this] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->breakpoint_clear(param))
+						return false;
+					m_console.printf("Breakpoint %X cleared\n", param);
+					return true;
+				},
+				"Invalid breakpoint number %X\n");
 	}
 }
 
@@ -1776,34 +1800,24 @@ void debugger_commands::execute_bpclear(const std::vector<std::string> &params)
 
 void debugger_commands::execute_bpdisenable(bool enable, const std::vector<std::string> &params)
 {
-	u64 bpindex;
-
-	if (params.empty()) // if 0 parameters, disable/enable all
+	if (params.empty()) // if no parameters, disable/enable all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->breakpoint_enable_all(enable);
-		if (!enable)
-			m_console.printf("Disabled all breakpoints\n");
-		else
-			m_console.printf("Enabled all breakpoints\n");
+		m_console.printf(enable ? "Enabled all breakpoints\n" : "Disabled all breakpoints\n");
 	}
-	else if (!validate_number_parameter(params[0], bpindex)) // otherwise, disable/enable the specific one
+	else // otherwise, disable/enable the specific ones
 	{
-		return;
-	}
-	else
-	{
-		bool found = false;
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->breakpoint_enable(bpindex, enable))
-			{
-				found = true;
-				break;
-			}
-		if (found)
-			m_console.printf("Breakpoint %X %s\n", u32(bpindex), enable ? "enabled" : "disabled");
-		else
-			m_console.printf("Invalid breakpoint number %X\n", u32(bpindex));
+		execute_index_command(
+				params,
+				[this, enable] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->breakpoint_enable(param, enable))
+						return false;
+					m_console.printf(enable ? "Breakpoint %X enabled\n" : "Breakpoint %X disabled\n", param);
+					return true;
+				},
+				"Invalid breakpoint number %X\n");
 	}
 }
 
@@ -1922,29 +1936,24 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 
 void debugger_commands::execute_wpclear(const std::vector<std::string> &params)
 {
-	u64 wpindex;
-
-	/* if 0 parameters, clear all */
-	if (params.empty())
+	if (params.empty()) // if no parameters, clear all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->watchpoint_clear_all();
 		m_console.printf("Cleared all watchpoints\n");
 	}
-
-	/* otherwise, clear the specific one */
-	else if (!validate_number_parameter(params[0], wpindex))
-		return;
-	else
+	else // otherwise, clear the specific ones
 	{
-		bool found = false;
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->watchpoint_clear(wpindex))
-				found = true;
-		if (found)
-			m_console.printf("Watchpoint %X cleared\n", u32(wpindex));
-		else
-			m_console.printf("Invalid watchpoint number %X\n", u32(wpindex));
+		execute_index_command(
+				params,
+				[this] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->watchpoint_clear(param))
+						return false;
+					m_console.printf("Watchpoint %X cleared\n", param);
+					return true;
+				},
+				"Invalid watchpoint number %X\n");
 	}
 }
 
@@ -1956,31 +1965,24 @@ void debugger_commands::execute_wpclear(const std::vector<std::string> &params)
 
 void debugger_commands::execute_wpdisenable(bool enable, const std::vector<std::string> &params)
 {
-	u64 wpindex;
-
-	if (params.empty()) // if no parameters, clear all
+	if (params.empty()) // if no parameters, disable/enable all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->watchpoint_enable_all(enable);
-		if (!enable)
-			m_console.printf("Disabled all watchpoints\n");
-		else
-			m_console.printf("Enabled all watchpoints\n");
+		m_console.printf(enable ? "Enabled all watchpoints\n" : "Disabled all watchpoints\n");
 	}
-	else if (!validate_number_parameter(params[0], wpindex)) // otherwise, clear the specific one
+	else // otherwise, disable/enable the specific ones
 	{
-		return;
-	}
-	else
-	{
-		bool found = false;
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->watchpoint_enable(wpindex, enable))
-				found = true;
-		if (found)
-			m_console.printf("Watchpoint %X %s\n", u32(wpindex), enable ? "enabled" : "disabled");
-		else
-			m_console.printf("Invalid watchpoint number %X\n", u32(wpindex));
+		execute_index_command(
+				params,
+				[this, enable] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->watchpoint_enable(param, enable))
+						return false;
+					m_console.printf(enable ? "Watchpoint %X enabled\n" : "Watchpoint %X disabled\n", param);
+					return true;
+				},
+				"Invalid watchpoint number %X\n");
 	}
 }
 
@@ -2070,9 +2072,9 @@ void debugger_commands::execute_rpset(const std::vector<std::string> &params)
 	if (params.size() > 1 && !debug_command_parameter_command(action = params[1].c_str()))
 		return;
 
-	// set the breakpoint
-	int const bpnum = cpu->debug()->registerpoint_set(condition.original_string(), action);
-	m_console.printf("Registerpoint %X set\n", bpnum);
+	// set the registerpoint
+	int const rpnum = cpu->debug()->registerpoint_set(condition.original_string(), action);
+	m_console.printf("Registerpoint %X set\n", rpnum);
 }
 
 
@@ -2083,29 +2085,24 @@ void debugger_commands::execute_rpset(const std::vector<std::string> &params)
 
 void debugger_commands::execute_rpclear(const std::vector<std::string> &params)
 {
-	u64 rpindex;
-
-	/* if 0 parameters, clear all */
-	if (params.empty())
+	if (params.empty()) // if no parameters, clear all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->registerpoint_clear_all();
 		m_console.printf("Cleared all registerpoints\n");
 	}
-
-	/* otherwise, clear the specific one */
-	else if (!validate_number_parameter(params[0], rpindex))
-		return;
-	else
+	else // otherwise, clear the specific ones
 	{
-		bool found = false;
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->registerpoint_clear(rpindex))
-				found = true;
-		if (found)
-			m_console.printf("Registerpoint %X cleared\n", u32(rpindex));
-		else
-			m_console.printf("Invalid registerpoint number %X\n", u32(rpindex));
+		execute_index_command(
+				params,
+				[this] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->registerpoint_clear(param))
+						return false;
+					m_console.printf("Registerpoint %X cleared\n", param);
+					return true;
+				},
+				"Invalid registerpoint number %X\n");
 	}
 }
 
@@ -2117,31 +2114,24 @@ void debugger_commands::execute_rpclear(const std::vector<std::string> &params)
 
 void debugger_commands::execute_rpdisenable(bool enable, const std::vector<std::string> &params)
 {
-	u64 rpindex;
-
-	if (params.empty()) // if no parameters, clear all
+	if (params.empty()) // if no parameters, disable/enable all
 	{
 		for (device_t &device : device_enumerator(m_machine.root_device()))
 			device.debug()->registerpoint_enable_all(enable);
-		if (!enable)
-			m_console.printf("Disabled all registerpoints\n");
-		else
-			m_console.printf("Enabled all registeroints\n");
+		m_console.printf(enable ? "Enabled all registerpoints\n" : "Disabled all registerpoints\n");
 	}
-	else if (!validate_number_parameter(params[0], rpindex)) // otherwise, clear the specific one
+	else // otherwise, disable/enable the specific ones
 	{
-		return;
-	}
-	else
-	{
-		bool found = false;
-		for (device_t &device : device_enumerator(m_machine.root_device()))
-			if (device.debug()->registerpoint_enable(rpindex, enable))
-				found = true;
-		if (found)
-			m_console.printf("Registerpoint %X %s\n", u32(rpindex), enable ? "enabled" : "disabled");
-		else
-			m_console.printf("Invalid registerpoint number %X\n", u32(rpindex));
+		execute_index_command(
+				params,
+				[this, enable] (device_t &device, u64 param) -> bool
+				{
+					if (!device.debug()->registerpoint_enable(param, enable))
+						return false;
+					m_console.printf(enable ? "Registerpoint %X enabled\n" : "Breakpoint %X disabled\n", param);
+					return true;
+				},
+				"Invalid registerpoint number %X\n");
 	}
 }
 
@@ -2155,26 +2145,42 @@ void debugger_commands::execute_rplist(const std::vector<std::string> &params)
 {
 	int printed = 0;
 	std::string buffer;
-
-	/* loop over all CPUs */
-	for (device_t &device : device_enumerator(m_machine.root_device()))
-		if (!device.debug()->registerpoint_list().empty())
-		{
-			m_console.printf("Device '%s' registerpoints:\n", device.tag());
-
-			/* loop over the breakpoints */
-			for (const debug_registerpoint &rp : device.debug()->registerpoint_list())
+	auto const apply =
+			[this, &printed, &buffer] (device_t &device)
 			{
-				buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
-				if (rp.action() != nullptr)
-					buffer.append(string_format(" do %s", rp.action()));
-				m_console.printf("%s\n", buffer);
-				printed++;
-			}
-		}
+				if (!device.debug()->registerpoint_list().empty())
+				{
+					m_console.printf("Device '%s' registerpoints:\n", device.tag());
 
-	if (printed == 0)
-		m_console.printf("No registerpoints currently installed\n");
+					// loop over the registerpoints
+					for (const auto &rp : device.debug()->registerpoint_list())
+					{
+						buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
+						if (rp.action() && *rp.action())
+							buffer.append(string_format(" do %s", rp.action()));
+						m_console.printf("%s\n", buffer);
+						printed++;
+					}
+				}
+			};
+
+	if (!params.empty())
+	{
+		device_t *cpu;
+		if (!validate_cpu_parameter(params[0], cpu))
+			return;
+		apply(*cpu);
+		if (!printed)
+			m_console.printf("No registerpoints currently installed for CPU %s\n", cpu->tag());
+	}
+	else
+	{
+		// loop over all CPUs
+		for (device_t &device : device_enumerator(m_machine.root_device()))
+			apply(device);
+		if (!printed)
+			m_console.printf("No registerpoints currently installed\n");
+	}
 }
 
 

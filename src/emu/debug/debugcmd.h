@@ -99,6 +99,8 @@ private:
 	void global_set(global_entry *global, u64 value);
 
 	int mini_printf(char *buffer, const char *format, int params, u64 *param);
+	template <typename T>
+	void execute_index_command(std::vector<std::string> const &params, T &&apply, char const *unused_message);
 
 	void execute_help(const std::vector<std::string> &params);
 	void execute_print(const std::vector<std::string> &params);

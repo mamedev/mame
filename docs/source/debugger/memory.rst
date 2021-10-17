@@ -64,7 +64,7 @@ Back to :ref:`debugger-memory-list`
 find
 ----
 
-**f[ind][{d|i|o}] <address>[:<space>],<length>[,<data>[,...]]**
+**f[ind][{d|i|o}] <address>[:<space>],<length>[,<data>[,…]]**
 
 Search through memory for the specified sequence of data.  The
 **<address>** is the address to begin searching from, optionally
@@ -113,7 +113,7 @@ Back to :ref:`debugger-memory-list`
 fill
 ----
 
-**fill[{d|i|o}] <address>[:<space>],<length>[,<data>[,...]]**
+**fill[{d|i|o}] <address>[:<space>],<length>[,<data>[,…]]**
 
 Overwrite a block of memory with copies of the supplied data sequence.
 The **<address>** specifies the address to begin writing at, optionally

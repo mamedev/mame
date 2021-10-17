@@ -159,7 +159,7 @@ Back to :ref:`debugger-general-list`
 print
 -----
 
-**print <item>[,...]**
+**print <item>[,…]**
 
 The **print** command prints the results of one or more expressions to
 the debugger console as hexadecimal numbers.
@@ -180,7 +180,7 @@ Back to :ref:`debugger-general-list`
 printf
 ------
 
-**printf <format>[,<argument>[,...]]**
+**printf <format>[,<argument>[,…]]**
 
 Prints a C-style formatted message to the debugger console.  Only a
 very limited subset of format specifiers and escape sequences are
@@ -223,7 +223,7 @@ Back to :ref:`debugger-general-list`
 logerror
 --------
 
-**logerror <format>[,<argument>[,...]]**
+**logerror <format>[,<argument>[,…]]**
 
 Prints a C-style formatted message to the error log.  See
 :ref:`debugger-command-printf` for details about the limited set of
@@ -246,7 +246,7 @@ Back to :ref:`debugger-general-list`
 tracelog
 --------
 
-**tracelog <format>[,<argument>[,...]]**
+**tracelog <format>[,<argument>[,…]]**
 
 Prints a C-style formatted message to the currently open trace file (see
 :ref:`debugger-command-trace` for more information).  If no trace file
@@ -272,7 +272,7 @@ Back to :ref:`debugger-general-list`
 tracesym
 --------
 
-**tracesym <item>[,...]**
+**tracesym <item>[,…]**
 
 Prints the specified symbols to the currently open trace file (see
 :ref:`debugger-command-trace` for more information).  If no trace file

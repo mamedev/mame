@@ -5,8 +5,6 @@
 
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
-#include "debug/dvbpoints.h"
-#include "debug/dvwpoints.h"
 
 #include <QtWidgets/QActionGroup>
 #include <QtWidgets/QHBoxLayout>
@@ -48,16 +46,25 @@ BreakpointsWindow::BreakpointsWindow(running_machine &machine, QWidget *parent) 
 	//
 	QActionGroup *typeGroup = new QActionGroup(this);
 	typeGroup->setObjectName("typegroup");
+
 	QAction *typeBreak = new QAction("Breakpoints", this);
 	typeBreak->setObjectName("typebreak");
+	typeBreak->setCheckable(true);
+	typeBreak->setActionGroup(typeGroup);
+	typeBreak->setShortcut(QKeySequence("Ctrl+1"));
+
 	QAction *typeWatch = new QAction("Watchpoints", this);
 	typeWatch->setObjectName("typewatch");
-	typeBreak->setCheckable(true);
 	typeWatch->setCheckable(true);
-	typeBreak->setActionGroup(typeGroup);
 	typeWatch->setActionGroup(typeGroup);
-	typeBreak->setShortcut(QKeySequence("Ctrl+1"));
 	typeWatch->setShortcut(QKeySequence("Ctrl+2"));
+
+	QAction *typeRegister = new QAction("Registerpoints", this);
+	typeRegister->setObjectName("typeregister");
+	typeRegister->setCheckable(true);
+	typeRegister->setActionGroup(typeGroup);
+	typeRegister->setShortcut(QKeySequence("Ctrl+3"));
+
 	typeBreak->setChecked(true);
 	connect(typeGroup, &QActionGroup::triggered, this, &BreakpointsWindow::typeChanged);
 
@@ -89,6 +96,11 @@ void BreakpointsWindow::typeChanged(QAction* changedTo)
 		m_breakpointsView = new DebuggerView(DVT_WATCH_POINTS, m_machine, this);
 		setWindowTitle("Debug: All Watchpoints");
 	}
+	else if (changedTo->text() == "Registerpoints")
+	{
+		m_breakpointsView = new DebuggerView(DVT_REGISTER_POINTS, m_machine, this);
+		setWindowTitle("Debug: All Registerpoints");
+	}
 
 	// Re-register
 	QVBoxLayout *layout = findChild<QVBoxLayout *>("vlayout");
@@ -110,6 +122,8 @@ void BreakpointsWindowQtConfig::buildFromQWidget(QWidget *widget)
 		m_bwType = 0;
 	else if (typeGroup->checkedAction()->text() == "Watchpoints")
 		m_bwType = 1;
+	else if (typeGroup->checkedAction()->text() == "Registerpoints")
+		m_bwType = 2;
 }
 
 

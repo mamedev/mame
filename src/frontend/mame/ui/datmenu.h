@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /***************************************************************************
 
     ui/datmenu.h
@@ -76,4 +76,4 @@ private:
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_DATMENU_H */
+#endif // MAME_FRONTEND_UI_DATMENU_H
