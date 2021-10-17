@@ -4447,6 +4447,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="batashes" supported="no">
 		<!-- SPS (CAPS) release 2526 -->
 		<description>Battle for the Ashes (Euro)</description>
@@ -6688,6 +6689,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="brianlar" supported="no">
 		<!-- SPS (CAPS) release 1225 -->
 		<description>Brian Lara's Cricket (Euro)</description>
@@ -7973,7 +7975,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- black screen after loading arcade mode (spurious irq?) -->
+	<!-- black screen after loading arcade mode [FDC] copy protection (enables 68k trace mode) -->
 	<software name="lewisch" supported="no">
 		<!-- SPS (CAPS) release 639 -->
 		<description>The Carl Lewis Challenge (Euro)</description>
@@ -12129,6 +12131,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="dicktr" supported="no">
 		<!-- SPS (CAPS) release 3083 -->
 		<description>Dick Tracy (Euro, Titus)</description>
@@ -18992,6 +18995,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="goochwcc" supported="no">
 		<!-- SPS (CAPS) release 1248 -->
 		<description>Graham Gooch World Class Cricket (Euro)</description>
@@ -26065,6 +26069,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="lxcess">
 		<!-- SPS (CAPS) release 3058 -->
 		<description>Lethal Xcess (Euro)</description>
@@ -26742,7 +26747,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Garbage on language screen select then black screen -->
+	<!-- Garbage on language screen select then black screen [FDC] copy protection check at PC=243AC (enables 68k trace mode) -->
+	<!-- Ocean logo has serious pitch issues -->
+	<!-- [Paula] BGM channels often doesn't playback -->
 	<software name="lostpatr" supported="no">
 		<!-- SPS (CAPS) release 773 -->
 		<description>Lost Patrol (Euro)</description>
@@ -29143,6 +29150,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="monstbus">
 		<!-- SPS (CAPS) release 3032 -->
 		<description>Monster Business (Euro)</description>
@@ -30660,7 +30668,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Fatal errors on mount without any meaningful message (!?) -->
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="odyssey" supported="no">
 		<!-- SPS (CAPS) release 2854 -->
 		<description>Odyssey (Euro, aud304312c 19970206)</description>
@@ -30682,7 +30690,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Fatal errors on mount without any meaningful message (!?) -->
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="odysseya" cloneof="odyssey" supported="no">
 		<!-- SPS (CAPS) release 195 -->
 		<description>Odyssey (Euro, aud304312b 19960201)</description>
@@ -30704,7 +30712,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Fatal errors on mount without any meaningful message (!?) -->
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="odysseyb" cloneof="odyssey" supported="no">
 		<!-- SPS (CAPS) release 897 -->
 		<description>Odyssey (Euro, aud304312a 19950523)</description>
@@ -42217,6 +42225,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="tennisch" supported="no">
 		<!-- SPS (CAPS) release 1153 -->
 		<description>Super Tennis Champs (Euro)</description>
@@ -48649,6 +48658,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="xr35b" cloneof="xr35" supported="no">
 		<!-- invalid - this was marked as SPS but these checksums don't appear in the list -->
 		<!-- SPS (CAPS) release 34 -->
