@@ -10,6 +10,7 @@
  * - https://github.com/mamedev/mame/blob/master/src/devices/machine/ncr5390.cpp
  * 
  * TODO:
+ *  - NetBSD compatibility
  *  - Single method for applying AUTO* mode
  *  - Reselection, target mode, SDTR
  *  - LUN selection (currently assumes 0)
@@ -35,7 +36,7 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
-//#define VERBOSE SPIFI3_DEBUG
+// #define VERBOSE SPIFI3_DEBUG
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -65,7 +66,6 @@ void spifi3_device::device_start()
     save_item(NAME(command_pos));
     save_item(NAME(state));
     save_item(NAME(xfr_phase));
-    save_item(NAME(command_length));
     save_item(NAME(dma_dir));
     save_item(NAME(irq));
     save_item(NAME(drq));
@@ -315,27 +315,26 @@ void spifi3_device::auxctrl_w(uint32_t data)
     spifi_reg.auxctrl = data;
     if(spifi_reg.auxctrl & AUXCTRL_SRST)
     {
-        // reset of some kind
+        // TODO: reset of some kind
         LOG("SRST asserted\n");
     }
     if(spifi_reg.auxctrl & AUXCTRL_CRST)
     {
         LOG("chip reset\n");
-        spifi_reg = {}; // Reset register values
+        spifi_reg = {};
         dma_command = false;
         dma_dir = DMA_NONE;
         tcounter = 0;
         command_pos = 0;
-        command_length = 0;
     }
     if(spifi_reg.auxctrl & AUXCTRL_SETRST)
     {
-        // bus reset?
+        // TODO: bus reset?
         LOG("SETRST asserted\n");
     }
     if(spifi_reg.auxctrl & AUXCTRL_DMAEDGE)
     {
-        // TODO: do we need to take action here? might be what enables DMA mode/DRQ?
+        // TODO: do we need to take action here?
         LOG("DMAEDGE asserted\n");
     }
 }
@@ -593,7 +592,6 @@ void spifi3_device::reset_disconnect()
     scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
 
     command_pos = 0;
-    command_length = 0;
     // memset(command, 0, sizeof(command)); TODO: spifi3 equiv
     mode = MODE_D;
 }
@@ -602,7 +600,7 @@ void spifi3_device::send_cmd_byte()
 {
     state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
 
-    if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE || command_length))
+    if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE))
     {
         // Send next data from cmbuf.
         if(command_pos > 11)
@@ -631,7 +629,7 @@ void spifi3_device::send_byte()
 
     state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
 
-    if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE || command_length))
+    if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE))
     {
         // Send next data from FIFO.
         scsi_bus->data_w(scsi_refid, m_even_fifo.front());
@@ -660,7 +658,8 @@ void spifi3_device::function_bus_complete()
 {
     LOG("function_bus_complete\n");
     state = IDLE;
-    spifi_reg.spstat = SPS_IDLE; // TODO:
+    spifi_reg.spstat = SPS_IDLE;
+
     // TODO: Any ICOND changes needed here?
     spifi_reg.intr |= INTR_FCOMP | INTR_BSRQ;
     spifi_reg.prcmd = 0;
@@ -673,8 +672,10 @@ void spifi3_device::function_complete()
 {
     LOG("function_complete\n");
     state = IDLE;
-    spifi_reg.spstat = SPS_IDLE; // TODO:
-    spifi_reg.intr |= INTR_FCOMP; // TODO: icond?
+    spifi_reg.spstat = SPS_IDLE;
+
+    // TODO: Any ICOND changes needed here?
+    spifi_reg.intr |= INTR_FCOMP;
     spifi_reg.prcmd = 0;
     dma_set(DMA_NONE);
     check_drq();
@@ -685,7 +686,9 @@ void spifi3_device::bus_complete()
 {
     LOG("bus_complete\n");
     state = IDLE;
-    spifi_reg.intr |= INTR_BSRQ; // TODO: icond? is BSRQ 1:1 w/ bus complete?
+
+    // TODO: Any ICOND changes needed here?
+    spifi_reg.intr |= INTR_BSRQ;
     spifi_reg.prcmd = 0;
     dma_set(DMA_NONE);
     check_drq();
@@ -793,6 +796,13 @@ void spifi3_device::start_automsg(int msg_phase)
     state = INIT_XFR;
     xfr_phase = msg_phase;
     // TODO: anything else? set ICOND AMSGOFF or something?
+}
+
+void spifi3_device::start_autocmd()
+{
+    LOGMASKED(LOG_AUTO, "start AUTOCMD\n");
+    state = INIT_XFR;
+    xfr_phase = S_PHASE_COMMAND;
 }
 
 void spifi3_device::step(bool timeout)
@@ -1084,40 +1094,18 @@ void spifi3_device::step(bool timeout)
 
         case DISC_SEL_ARBITRATION_INIT: // Arbitration and selection complete, time to execute the queued command
         {
-            // Wait for a command, or if autoidentify was enabled, just do it
-            // This is reverse engineered from what the NWS-5000 MROM does - NetBSD doesn't use this at all
-            // so this may not be fully accurate.
-            /*if (((spifi_reg.prcmd & PRC_NJMP) || !(spifi_reg.prcmd & PRC_COMMAND)) && !(spifi_reg.identify & 0x80)) // had && !(spifi_reg.cmlen & CML_ACOM_EN) here, but it needs to move
+            if (automsg_active())
             {
-                // dma starts after bus arbitration/selection is complete
-                check_drq();
-                break;
-            } */
-
-            // Extract the command length from the cmlen register and reset our index into the command buffer if a command was given
-            /*if(!(spifi_reg.prcmd & PRC_NJMP) && (spifi_reg.prcmd & PRC_COMMAND))
-            {
-                LOG("Starting command - length = %d\n", spifi_reg.cmlen & CML_LENMASK);
-                command_length = spifi_reg.cmlen & CML_LENMASK;
-                command_pos = 0;
+                state = DISC_SEL_ARBITRATION;
+                step(false);
             }
-            
-            else if((spifi_reg.cmlen & CML_AMSG_EN) && ((scsi_bus->ctrl_r() & S_PHASE_MASK) == S_PHASE_MSG_OUT))
-            {
-                LOG("Starting message - len = %d\n", spifi_reg.cmlen & CML_LENMASK);
-                command_length = spifi_reg.cmlen & CML_LENMASK;
-                command_pos = 0;
-            }
-
-            // Otherwise, we are here because the host enabled autoidentify, so CDB isn't the source of the command. Instead, we'll send identify
             else
             {
-                */
-                LOG("Starting autoidentify...\n");
-                command_pos = -1; // TODO: THIS IS TEMPORARY
-            // }
-            state = DISC_SEL_ARBITRATION;
-            step(false);
+                // TODO: It isn't clear what the correct behavior here should be.
+                // The NWS-5000 APmonitor, NEWS-OS, and NetBSD all set AUTOMSG, so this code path is never taken.
+                // For now, kick it up to the firmware or software to handle, hang, or panic.
+                bus_complete();
+            }
             break;
         }
 
@@ -1142,40 +1130,46 @@ void spifi3_device::step(bool timeout)
 
         case DISC_SEL_ATN_WAIT_REQ: // REQ asserted, either get read to send a byte, or complete the command.
         {
-            if(!(ctrl & S_REQ)) // Wait for REQ
+            if(!(ctrl & S_REQ))
             {
                 break;
             }
-            if((ctrl & S_PHASE_MASK) != S_PHASE_MSG_OUT) // No longer in MSG_OUT, we're done
+
+            // If we're no longer in MSG_OUT, we're done
+            if((ctrl & S_PHASE_MASK) != S_PHASE_MSG_OUT)
             {
                 function_complete();
                 break;
             }
-            if(spifi_reg.select & SEL_WATN) // Deassert ATN now if we asserted it before
+
+            // Deassert ATN now if we asserted it before
+            if(spifi_reg.select & SEL_WATN)
             {
                 scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
             }
+
             state = DISC_SEL_ATN_SEND_BYTE;
-            if(command_pos >= 0)
+            if(spifi_reg.identify & 0x80)
             {
-                send_cmd_byte(); // Send the next CDB byte
+                command_pos = -1; // temp
+                // Identify register has an identify packet - send it.
+                scsi_bus->data_w(scsi_refid, spifi_reg.identify);
+                spifi_reg.identify = 0x0;
+                scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+                scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
             }
-            else // autoidentify
+            else
             {
-                // TODO: refactor me
-                scsi_bus->data_w(scsi_refid, 0x80);         // TODO: calc DiscPriv and LUNTAR from register
-                scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK); // Send ACK
-                scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ); // Wait for REQ
+                // Send the next byte from the CDB
+                send_cmd_byte();
             }
             break;
         }
 
         case DISC_SEL_ATN_SEND_BYTE:
         {
-            command_length--;
-            if (command_pos < 0)
+            if (command_pos < 0 || command_pos >= (spifi_reg.cmlen & CML_LENMASK))
             {
-                // TODO: RE ALERT - MIGHT BE WAY OFF
                 // autoidentified target, now we need to see if autocmd is enabled. If so, we can just proceed to the XFR phase automatically.
                 command_pos = 0;
                 auto newPhase = (ctrl & S_PHASE_MASK);
@@ -1294,6 +1288,7 @@ void spifi3_device::step(bool timeout)
                     }
 
                     // if it's the last message byte, deassert ATN before sending
+                    // TODO: this if condition doesn't make sense - fix or remove it.
                     if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && m_even_fifo.size() == 1) || (dma_command && tcounter == 1)))
                     {
                         scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
@@ -1370,14 +1365,13 @@ void spifi3_device::step(bool timeout)
                 {
                     // WORKAROUND - I haven't been able to figure out how to make the interrupts and register values work out
                     // to where DMAC3 triggers a parity error only when PAD is needed. So, we'll just transfer it ourselves instead.
-                    // This is probably not hardware accurate.
-                    LOGMASKED(LOG_DATA, "applying pad workaround");
+                    LOGMASKED(LOG_DATA, "applying write pad workaround");
                     state = INIT_XFR_SEND_PAD_WAIT_REQ;
                 }
                 else if(newPhase == S_PHASE_DATA_IN)
                 {
                     // See above
-                    LOGMASKED(LOG_DATA, "applying pad workaround");
+                    LOGMASKED(LOG_DATA, "applying read pad workaround");
                     state = INIT_XFR_RECV_PAD_WAIT_REQ;
                 }
             }
@@ -1431,9 +1425,13 @@ void spifi3_device::step(bool timeout)
                 {
                     start_autostat(bus_id);
                 }
-                else if ((newPhase == S_PHASE_MSG_IN) && automsg_active())
+                else if ((newPhase == S_PHASE_MSG_IN || (newPhase == S_PHASE_MSG_OUT && xfr_phase != S_PHASE_MSG_OUT)) && automsg_active())
                 {
                     start_automsg(newPhase);
+                }
+                else if((newPhase == S_PHASE_COMMAND && xfr_phase != S_PHASE_COMMAND) && autocmd_active())
+                {
+                    start_autocmd();
                 }
             }
             else

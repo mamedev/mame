@@ -88,6 +88,7 @@
  *
  *  TODO:
  *  - More complete floppy support (only supports floppy boot at the moment)
+ *  - NetBSD SCSI support (mostly/entirely in SPIFI driver)
  *  - Sound (lots of undocumented hardware)
  *  - Parallel I/O
  *  - Framebuffer (and remaining kb/ms support)

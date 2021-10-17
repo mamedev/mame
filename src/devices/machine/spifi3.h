@@ -69,7 +69,6 @@ private:
     scsi_data_source xfrDataSource; // where are we transferring data from?
     int state;					  // SCSI controller state
     int xfr_phase;
-    int command_length;
     int command_pos;
     int dma_dir;
     bool irq = false; // IRQ pin state
@@ -375,6 +374,7 @@ private:
     {
         return spifi_reg.cmlen & CML_ACOM_EN;
     }
+    void start_autocmd();
 
     struct spifi_cmd_entry
     {
