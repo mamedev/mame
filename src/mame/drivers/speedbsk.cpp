@@ -49,6 +49,7 @@ Notes:
 
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm6253.h"
@@ -57,7 +58,9 @@ Notes:
 #include "machine/upd4701.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopm.h"
-
+#include "video/hd44780.h"
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -68,7 +71,9 @@ class speedbsk_state : public driver_device
 public:
 	speedbsk_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_ppi(*this, "ppi%u", 0U),
+		m_lcd(*this, "lcd")
 	{ }
 
 	void speedbsk(machine_config &config);
@@ -78,10 +83,17 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_device<hd44780_device> m_lcd;
 
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
 	void audio_io_map(address_map &map);
+
+	void lcd_palette(palette_device &palette) const;
+	HD44780_PIXEL_UPDATE(lcd_pixel_update);
+
+	void ppi1_portc_w(uint8_t data);
 };
 
 
@@ -95,11 +107,12 @@ void speedbsk_state::main_map(address_map &map)
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x8003).r("upd4701_0", FUNC(upd4701_device::read_xy));
 	map(0x8200, 0x8203).r("upd4701_1", FUNC(upd4701_device::read_xy));
+//	map(0x8800, 0x8800)
 	map(0x8a00, 0x8a0f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
 	map(0x8a80, 0x8a83).rw("d71054", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x8ac0, 0x8ac1).rw("d71051", FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x8b00, 0x8b03).rw("d71055_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x8b40, 0x8b43).rw("d71055_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8b00, 0x8b03).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x8b40, 0x8b43).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe000, 0xffff).ram().share("nvram");
 }
 
@@ -150,11 +163,58 @@ static INPUT_PORTS_START( speedbsk )
 INPUT_PORTS_END
 
 
+//**************************************************************************
+//  SERVICE LCD
+//**************************************************************************
+
+void speedbsk_state::lcd_palette(palette_device &palette) const
+{
+	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
+	palette.set_pen_color(1, rgb_t( 92,  83,  88)); // lcd pixel on
+	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
+}
+
+HD44780_PIXEL_UPDATE( speedbsk_state::lcd_pixel_update )
+{
+	// char size is 5x8
+	if (x > 4 || y > 7)
+		return;
+
+	if (line < 2 && pos < 20)
+		bitmap.pix(1 + y + line*8 + line, 1 + pos*6 + x) = state ? 1 : 2;
+}
+
+
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+void speedbsk_state::ppi1_portc_w(uint8_t data)
+{
+	// 76543---  unknown
+	// -----2--  lcd e
+	// ------1-  lcd rw
+	// -------0  lcd rs
+
+	// prevent bogus write at start
+	if (data == 0xff)
+		return;
+
+	m_lcd->rs_w(BIT(data, 0));
+	m_lcd->rw_w(BIT(data, 1));
+	m_lcd->e_w(BIT(data, 2));
+}
+
+
 void speedbsk_state::speedbsk(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, 32_MHz_XTAL / 4); // actually D70008AC-8, divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &speedbsk_state::main_map);
+
+	// placeholder
+	clock_device &irqclock(CLOCK(config, "irqclock", 60));
+	irqclock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 48_MHz_XTAL / 12)); // divider guessed
 	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
@@ -166,9 +226,15 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	PIT8254(config, "d71054", 0);
 
-	I8255(config, "d71055_0");
+	I8255(config, m_ppi[0]);
+	// port a: output
+	// port b: output
+	// port c: input
 
-	I8255(config, "d71055_1");
+	I8255(config, m_ppi[1]);
+	// port a: output
+	m_ppi[1]->out_pb_callback().set(m_lcd, FUNC(hd44780_device::db_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(speedbsk_state::ppi1_portc_w));
 
 	MSM6253(config, "adc", 0);
 
@@ -180,7 +246,21 @@ void speedbsk_state::speedbsk(machine_config &config)
 
 	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
 
-	// video hardware
+	// service lcd
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(6*20+1, 19);
+	screen.set_visarea(0, 6*20, 0, 19-1);
+	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", FUNC(speedbsk_state::lcd_palette), 3);
+
+	HD44780(config, m_lcd, 0);
+	m_lcd->set_lcd_size(2, 20);
+	m_lcd->set_pixel_update_cb(FUNC(speedbsk_state::lcd_pixel_update));
+
 	// TODO: LED screen
 
 	// sound hardware, on sound PCB
