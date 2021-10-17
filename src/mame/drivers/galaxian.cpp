@@ -15296,7 +15296,7 @@ GAME( 1980?,sstarcrs,    mooncrst, mooncrst,   mooncrsg,   galaxian_state, init_
 GAME( 198?, mooncmw,     mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Moon War (Moon Cresta bootleg)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 198?, starfgmc,    mooncrst, mooncrst,   mooncrsa,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)",                      MACHINE_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
-GAME( 1980, spcdrag,     mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Space Dragon (Moon Cresta bootleg, set 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spcdrag,     mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Space Dragon (Moon Cresta bootleg)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1980, floritas,    mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg",                      "Floritas (Moon Cresta bootleg)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1980, floritasm,   mooncrst, mooncrst,   smooncrs,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Multivideo)",         "Floritas (Multivideo Spanish Moon Cresta bootleg)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1980, mooncreg,    mooncrst, mooncrst,   mooncreg,   galaxian_state, init_mooncrsu,   ROT90,  "bootleg (Electrogame S.A.)",   "Moon Cresta (Electrogame S.A. Spanish bootleg)",         MACHINE_SUPPORTS_SAVE )
