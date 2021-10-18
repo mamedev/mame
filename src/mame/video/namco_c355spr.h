@@ -125,7 +125,7 @@ private:
 		bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
 		int transparent_color,
-		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height, uint8_t alpha, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
+		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
 		int priority);
 };
 

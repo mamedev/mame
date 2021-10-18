@@ -658,12 +658,12 @@ deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const ch
 
 
 inline void deco_zoomspr_device::dragngun_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,
-		int transparent_color,
-		int scalex, int scaley,bitmap_ind8 *pri_buffer,uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height, uint8_t alpha,
-		bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
-		int priority)
+	bitmap_rgb32& dest_bmp, const rectangle& clip, gfx_element* gfx,
+	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
+	int transparent_color,
+	int scalex, int scaley, bitmap_ind8* pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height,
+	bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap,
+	int priority)
 {
 	rectangle myclip;
 
@@ -681,26 +681,26 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 	myclip &= temp_bitmap.cliprect();
 
 	{
-		if( gfx )
+		if (gfx)
 		{
-			const pen_t *pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const uint8_t *code_base = gfx->get_data(code % gfx->elements());
+			const pen_t* pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const uint8_t* code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width()<<16)/sprite_screen_width;
-				int dy = (gfx->height()<<16)/sprite_screen_height;
+				int dx = (gfx->width() << 16) / sprite_screen_width;
+				int dy = (gfx->height() << 16) / sprite_screen_height;
 
-				int ex = sx+sprite_screen_width;
-				int ey = sy+sprite_screen_height;
+				int ex = sx + sprite_screen_width;
+				int ey = sy + sprite_screen_height;
 
 				int x_index_base;
 				int y_index;
 
-				if( flipx )
+				if (flipx)
 				{
-					x_index_base = (sprite_screen_width-1)*dx;
+					x_index_base = (sprite_screen_width - 1) * dx;
 					dx = -dx;
 				}
 				else
@@ -708,9 +708,9 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					x_index_base = 0;
 				}
 
-				if( flipy )
+				if (flipy)
 				{
-					y_index = (sprite_screen_height-1)*dy;
+					y_index = (sprite_screen_height - 1) * dy;
 					dy = -dy;
 				}
 				else
@@ -718,111 +718,62 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 					y_index = 0;
 				}
 
-				if( sx < clip.left())
+				if (sx < clip.left())
 				{ /* clip left */
-					int pixels = clip.left()-sx;
+					int pixels = clip.left() - sx;
 					sx += pixels;
-					x_index_base += pixels*dx;
+					x_index_base += pixels * dx;
 				}
-				if( sy < clip.top() )
+				if (sy < clip.top())
 				{ /* clip top */
-					int pixels = clip.top()-sy;
+					int pixels = clip.top() - sy;
 					sy += pixels;
-					y_index += pixels*dy;
+					y_index += pixels * dy;
 				}
 				/* NS 980211 - fixed incorrect clipping */
-				if( ex > clip.right()+1 )
+				if (ex > clip.right() + 1)
 				{ /* clip right */
-					int pixels = ex-clip.right()-1;
+					int pixels = ex - clip.right() - 1;
 					ex -= pixels;
 				}
-				if( ey > clip.bottom()+1 )
+				if (ey > clip.bottom() + 1)
 				{ /* clip bottom */
-					int pixels = ey-clip.bottom()-1;
+					int pixels = ey - clip.bottom() - 1;
 					ey -= pixels;
 				}
 
-				if( ex>sx )
+				if (ex > sx)
 				{ /* skip if inner loop doesn't draw anything */
 
-					/* case 1: no alpha */
-					if (alpha == 0xff)
+
+					for (int y = sy; y < ey; y++)
 					{
+						uint8_t const* const source = code_base + (y_index >> 16) * gfx->rowbytes();
+						uint32_t* const dest = &temp_bitmap.pix(y);
+						uint8_t* const pri = &pri_bitmap.pix(y);
+
+
+						int x_index = x_index_base;
+						for (int x = sx; x < ex; x++)
 						{
-							for( int y=sy; y<ey; y++ )
+							int c = source[x_index >> 16];
+							if (c != transparent_color)
 							{
-								uint8_t const *const source = code_base + (y_index>>16) * gfx->rowbytes();
-								uint32_t *const dest = &temp_bitmap.pix(y);
-								uint8_t *const pri = &pri_bitmap.pix(y);
-
-
-								int x_index = x_index_base;
-								for( int x=sx; x<ex; x++ )
+								if (priority >= pri[x])
 								{
-									int c = source[x_index>>16];
-									if (c != transparent_color)
-									{
-										if (priority >= pri[x])
-										{
-											dest[x] = pal[c];
-											dest[x] |= 0xff000000;
-										}
-										else // sprites can have a 'masking' effect on other sprites
-										{
-											dest[x] = 0x00000000;
-										}
-									}
-
-									x_index += dx;
+									dest[x] = pal[c];
+									dest[x] |= 0xff000000;
 								}
-
-								y_index += dy;
-							}
-						}
-					}
-
-					/* alpha-blended */
-					else
-					{
-						{
-							for( int y=sy; y<ey; y++ )
-							{
-								uint8_t const *const source = code_base + (y_index>>16) * gfx->rowbytes();
-								uint32_t *const dest = &temp_bitmap.pix(y);
-								uint8_t *const pri = &pri_bitmap.pix(y);
-								uint32_t *const tmapcolor = &dest_bmp.pix(y);
-
-
-								int x_index = x_index_base;
-								for( int x=sx; x<ex; x++ )
+								else // sprites can have a 'masking' effect on other sprites
 								{
-									int c = source[x_index>>16];
-									if (c != transparent_color)
-									{
-										if (priority >= pri[x])
-										{
-											// this logic doesn't seem correct.  Sprites CAN blend other sprites (needed in many places) but based on videos of the character select screen it appears that sprites can't blend already blended sprites
-											// I'm not sure which colour gets used but the video shows a single shade of yellow rather than the yellow blending the yellow)
-
-											if ((dest[x] & 0xff000000) == 0x00000000)
-												dest[x] = alpha_blend_r32(tmapcolor[x] & 0x00ffffff, pal[c] & 0x00ffffff, alpha); // if nothing has been drawn pull the pixel from the tilemap to blend with
-											else
-												dest[x] = alpha_blend_r32(dest[x] & 0x00ffffff, pal[c] & 0x00ffffff, alpha); // otherwise blend with what was previously drawn
-
-											dest[x] |= 0xff000000;
-										}
-										else // sprites can have a 'masking' effect on other sprites
-										{
-											dest[x] = 0x00000000;
-										}
-									}
-
-									x_index += dx;
+									dest[x] = 0x00000000;
 								}
-
-								y_index += dy;
 							}
+
+							x_index += dx;
 						}
+
+						y_index += dy;
 					}
 				}
 			}
@@ -892,7 +843,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		if ((spritedata[offs + 6] & 0x80) && (screen.frame_number() & 1)) // flicker
 			continue;
 
-		int sx, sy, colour, fx, fy, w, h, x, y, bx, by/*,alpha*/, scalex, scaley;
+		int sx, sy, colour, fx, fy, w, h, x, y, bx, by, scalex, scaley;
 		int zoomx, zoomy;
 		int xpos, ypos;
 
@@ -949,7 +900,8 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		else
 			ypos = (sy << 16) + (by * zoomy) - (16 * zoomy);
 
-		for (y = 0; y < h; y++) {
+		for (y = 0; y < h; y++)
+		{
 			if (!fx)
 				xpos = (sx << 16) - (bx * zoomx); /* The block offset scales with zoom, the base position does not */
 			else
@@ -968,7 +920,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 					fx, fy,
 					xpos >> 16, ypos >> 16,
 					15, zoomx, zoomy, nullptr, 0,
-					((xpos + (zoomx << 4)) >> 16) - (xpos >> 16), ((ypos + (zoomy << 4)) >> 16) - (ypos >> 16), 0xff/*alpha*/,
+					((xpos + (zoomx << 4)) >> 16) - (xpos >> 16), ((ypos + (zoomy << 4)) >> 16) - (ypos >> 16),
 					pri_bitmap, temp_bitmap,
 					priority
 				);
