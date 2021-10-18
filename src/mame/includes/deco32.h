@@ -276,6 +276,10 @@ private:
 	void lockload_okibank_hi_w(u8 data); // lockload
 
 	virtual void video_start() override;
+
+	u32 sprite_bank_callback(u32 sprite);
+
+	void expand_sprite_data();
 	void dragngun_init_common();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -643,11 +643,14 @@ WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_ZOOMSPR, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_spritebank_cb(*this, DEVICE_SELF, FUNC(deco_zoomspr_device::tile_callback_noindirect))
 {
 }
 
 void deco_zoomspr_device::device_start()
 {
+	// bind our handler
+	m_spritebank_cb.resolve();
 }
 
 void deco_zoomspr_device::device_reset()
@@ -830,74 +833,74 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 	}
 }
 
-void deco_zoomspr_device::dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, uint32_t dragngun_sprite_ctrl,  bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
+void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
-	const uint32_t *layout_ram;
-	const uint32_t *lookup_ram;
+	const uint32_t* layout_ram;
+	const uint32_t* lookup_ram;
 	int offs;
 	temp_bitmap.fill(0x00000000, cliprect);
 
 	/*
-	    Sprites are built from main control ram, which references tile
-	    layout ram, which finally references tile lookup ram which holds
-	    the actual tile indices to draw and index into the banking
-	    control.  Tile lookup and tile layout ram are double buffered.
+		Sprites are built from main control ram, which references tile
+		layout ram, which finally references tile lookup ram which holds
+		the actual tile indices to draw and index into the banking
+		control.  Tile lookup and tile layout ram are double buffered.
 
 
-	    Main sprite control ram, 8 * 32 bit words per sprite, so
+		Main sprite control ram, 8 * 32 bit words per sprite, so
 
-	    Word 0:
-	        0x0400 - Banking control for tile layout RAM + tile lookup ram
-	        0x0200 - ?
-	        0x01ff - Index into tile layout RAM
-	    Word 1 :
-	    Word 2 : X base position
-	    Word 3 : Y base position
-	    Word 4 :
-	        0x8000: X flip
-	        0x03ff: X size of block in pixels (for scaling)
-	    Word 5 :
-	        0x8000: Y flip
-	        0x03ff: Y size of block in pixels (for scaling)
-	    Word 6 :
-	        0x0000001f - colour.
-	        0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
-	        0x00000040 - ?  priority?
-	        0x00000080 - flicker
-	        0x40000000 - Additive/Subtractable blend? (dragngun)
-	    Word 7 :
+		Word 0:
+			0x0400 - Banking control for tile layout RAM + tile lookup ram
+			0x0200 - ?
+			0x01ff - Index into tile layout RAM
+		Word 1 :
+		Word 2 : X base position
+		Word 3 : Y base position
+		Word 4 :
+			0x8000: X flip
+			0x03ff: X size of block in pixels (for scaling)
+		Word 5 :
+			0x8000: Y flip
+			0x03ff: Y size of block in pixels (for scaling)
+		Word 6 :
+			0x0000001f - colour.
+			0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
+			0x00000040 - ?  priority?
+			0x00000080 - flicker
+			0x40000000 - Additive/Subtractable blend? (dragngun)
+		Word 7 :
 
 
-	    Tile layout ram, 4 * 32 bit words per sprite, so
+		Tile layout ram, 4 * 32 bit words per sprite, so
 
-	    Word 0:
-	        0x2000 - Selector for tile lookup bank!?!?!?!?!?!?
-	        0x1fff - Index into tile lookup ram (16 bit word based, NOT 32)
-	    Word 1:
-	        0xff00 - ?
-	        0x00f0 - Width
-	        0x000f - Height
-	    Word 2:
-	        0x01ff - X block offset
-	    Word 3:
-	        0x01ff - Y block offset
+		Word 0:
+			0x2000 - Selector for tile lookup bank!?!?!?!?!?!?
+			0x1fff - Index into tile lookup ram (16 bit word based, NOT 32)
+		Word 1:
+			0xff00 - ?
+			0x00f0 - Width
+			0x000f - Height
+		Word 2:
+			0x01ff - X block offset
+		Word 3:
+			0x01ff - Y block offset
 	*/
 
 	/* Sprite global disable bit - can't be, it's set in lockload calibration menu where the targets are sprites */
 //  if (dragngun_sprite_ctrl&0x40000000)
 //      return;
 
-	for (offs = 0;offs < 0x800;offs += 8)
+	for (offs = 0; offs < 0x800; offs += 8)
 	{
-		if ((spritedata[offs+6]&0x80) && (screen.frame_number() & 1)) // flicker
+		if ((spritedata[offs + 6] & 0x80) && (screen.frame_number() & 1)) // flicker
 			continue;
 
-		int sx,sy,colour,fx,fy,w,h,x,y,bx,by/*,alpha*/,scalex,scaley;
-		int zoomx,zoomy;
-		int xpos,ypos;
+		int sx, sy, colour, fx, fy, w, h, x, y, bx, by/*,alpha*/, scalex, scaley;
+		int zoomx, zoomy;
+		int xpos, ypos;
 
-		scalex=spritedata[offs+4]&0x3ff;
-		scaley=spritedata[offs+5]&0x3ff;
+		scalex = spritedata[offs + 4] & 0x3ff;
+		scaley = spritedata[offs + 5] & 0x3ff;
 		if (!scalex || !scaley) /* Zero pixel size in X or Y - skip block */
 			continue;
 
@@ -907,122 +910,89 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device &screen, bitmap_rg
 			layout_ram = dragngun_sprite_layout_1_ram;
 		else
 			layout_ram = dragngun_sprite_layout_0_ram;
-		h = (layout_ram[layoutram_offset + 1]>>0)&0xf;
-		w = (layout_ram[layoutram_offset + 1]>>4)&0xf;
+		h = (layout_ram[layoutram_offset + 1] >> 0) & 0xf;
+		w = (layout_ram[layoutram_offset + 1] >> 4) & 0xf;
 		if (!h || !w)
 			continue;
 
-		sx = spritedata[offs+2] & 0x3ff;
-		sy = spritedata[offs+3] & 0x3ff;
+		sx = spritedata[offs + 2] & 0x3ff;
+		sy = spritedata[offs + 3] & 0x3ff;
 		bx = layout_ram[layoutram_offset + 2] & 0x1ff;
 		by = layout_ram[layoutram_offset + 3] & 0x1ff;
-		if (bx&0x100) bx=1-(bx&0xff);
-		if (by&0x100) by=1-(by&0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
+		if (bx & 0x100) bx = 1 - (bx & 0xff);
+		if (by & 0x100) by = 1 - (by & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
 		if (sx >= 512) sx -= 1024;
 		if (sy >= 512) sy -= 1024;
 
-		colour = spritedata[offs+6]&0x1f;
+		colour = spritedata[offs + 6] & 0x1f;
 
 		int priority = (spritedata[offs + 6] & 0x60) >> 5;
-
-
-
-
-//      printf("%02x\n", priority);
 
 		if (priority == 0) priority = 7;
 		else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
 		else if (priority == 2) priority = 7;
 		else if (priority == 3) priority = 7;
 
-		fx = spritedata[offs+4]&0x8000;
-		fy = spritedata[offs+5]&0x8000;
+		fx = spritedata[offs + 4] & 0x8000;
+		fy = spritedata[offs + 5] & 0x8000;
 
 		int lookupram_offset = layout_ram[layoutram_offset + 0] & 0x1fff;
 
-//      if (spritedata[offs+0]&0x400)
+		//      if (spritedata[offs+0]&0x400)
 		if (layout_ram[layoutram_offset + 0] & 0x2000)
 			lookup_ram = dragngun_sprite_lookup_1_ram;
 		else
 			lookup_ram = dragngun_sprite_lookup_0_ram;
 
-		zoomx=scalex * 0x10000 / (w*16);
-		zoomy=scaley * 0x10000 / (h*16);
+		zoomx = scalex * 0x10000 / (w * 16);
+		zoomy = scaley * 0x10000 / (h * 16);
 
 		if (!fy)
-			ypos=(sy<<16) - (by*zoomy); /* The block offset scales with zoom, the base position does not */
+			ypos = (sy << 16) - (by * zoomy); /* The block offset scales with zoom, the base position does not */
 		else
-			ypos=(sy<<16) + (by*zoomy) - (16*zoomy);
+			ypos = (sy << 16) + (by * zoomy) - (16 * zoomy);
 
-		for (y=0; y<h; y++) {
+		for (y = 0; y < h; y++) {
 			if (!fx)
-				xpos=(sx<<16) - (bx*zoomx); /* The block offset scales with zoom, the base position does not */
+				xpos = (sx << 16) - (bx * zoomx); /* The block offset scales with zoom, the base position does not */
 			else
-				xpos=(sx<<16) + (bx*zoomx) - (16*zoomx);
+				xpos = (sx << 16) + (bx * zoomx) - (16 * zoomx);
 
-			for (x=0; x<w; x++) {
-				int bank,sprite;
-
-				sprite = lookup_ram[lookupram_offset];
-				sprite &= 0x3fff;
+			for (x = 0; x < w; x++)
+			{
+				int sprite = lookup_ram[lookupram_offset] & 0x3fff;
 
 				lookupram_offset++;
 
-				/* High bits of the sprite reference into the sprite control bits for banking */
-				switch (sprite&0x3000) {
-				default:
-				case 0x0000: sprite=(sprite&0xfff) | ((dragngun_sprite_ctrl&0x000f)<<12); break;
-				case 0x1000: sprite=(sprite&0xfff) | ((dragngun_sprite_ctrl&0x00f0)<< 8); break;
-				case 0x2000: sprite=(sprite&0xfff) | ((dragngun_sprite_ctrl&0x0f00)<< 4); break;
-				case 0x3000: sprite=(sprite&0xfff) | ((dragngun_sprite_ctrl&0xf000)<< 0); break;
-				}
-
-				/* Because of the unusual interleaved rom layout, we have to mangle the bank bits
-				even further to suit our gfx decode */
-				switch (sprite&0xf000) {
-				case 0x0000: sprite=0xc000 | (sprite&0xfff); break;
-				case 0x1000: sprite=0xd000 | (sprite&0xfff); break;
-				case 0x2000: sprite=0xe000 | (sprite&0xfff); break;
-				case 0x3000: sprite=0xf000 | (sprite&0xfff); break;
-
-				case 0xc000: sprite=0x0000 | (sprite&0xfff); break;
-				case 0xd000: sprite=0x1000 | (sprite&0xfff); break;
-				case 0xe000: sprite=0x2000 | (sprite&0xfff); break;
-				case 0xf000: sprite=0x3000 | (sprite&0xfff); break;
-				}
-
-				if (sprite&0x8000) bank=4; else bank=3;
-				sprite&=0x7fff;
-
-					dragngun_drawgfxzoom(
-						bitmap,cliprect,m_gfxdecode->gfx(bank),
-						sprite,
-						colour,
-						fx,fy,
-						xpos>>16,ypos>>16,
-						15,zoomx,zoomy,nullptr,0,
-						((xpos+(zoomx<<4))>>16) - (xpos>>16), ((ypos+(zoomy<<4))>>16) - (ypos>>16), 0xff/*alpha*/,
-						pri_bitmap, temp_bitmap,
-						priority
-						);
+				dragngun_drawgfxzoom(
+					bitmap, cliprect, m_gfxdecode->gfx(3),
+					m_spritebank_cb(sprite),
+					colour,
+					fx, fy,
+					xpos >> 16, ypos >> 16,
+					15, zoomx, zoomy, nullptr, 0,
+					((xpos + (zoomx << 4)) >> 16) - (xpos >> 16), ((ypos + (zoomy << 4)) >> 16) - (ypos >> 16), 0xff/*alpha*/,
+					pri_bitmap, temp_bitmap,
+					priority
+				);
 
 
 				if (fx)
-					xpos-=zoomx<<4;
+					xpos -= zoomx << 4;
 				else
-					xpos+=zoomx<<4;
+					xpos += zoomx << 4;
 			}
 			if (fy)
-				ypos-=zoomy<<4;
+				ypos -= zoomy << 4;
 			else
-				ypos+=zoomy<<4;
+				ypos += zoomy << 4;
 		}
 	}
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t const *const src = &temp_bitmap.pix(y);
-		uint32_t *const dst = &bitmap.pix(y);
+		uint32_t const* const src = &temp_bitmap.pix(y);
+		uint32_t* const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -1033,8 +1003,6 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device &screen, bitmap_rg
 				dst[x] = srcpix & 0x00ffffff;
 			}
 		}
-
 	}
-
 }
 

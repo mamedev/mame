@@ -8,6 +8,8 @@
 
 #include "screen.h"
 
+typedef device_delegate<uint32_t (uint32_t)> sprite_bank_delegate;
+
 class namco_c355spr_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
@@ -107,8 +109,9 @@ public:
 
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
-	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, uint32_t dragngun_sprite_ctrl, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
+	template <typename... T> void set_spritebank_cb(T &&... args) { m_spritebank_cb.set(std::forward<T>(args)...); }
 
 protected:
 	virtual void device_start() override;
@@ -123,6 +126,9 @@ private:
 		int transparent_color,
 		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height, uint8_t alpha, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
 		int priority);
+
+	uint32_t tile_callback_noindirect(uint32_t tile) { return tile; }
+	sprite_bank_delegate m_spritebank_cb;
 
 };
 
