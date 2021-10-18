@@ -476,6 +476,18 @@ void fghthist_state::fghthsta_memmap(address_map &map)
 	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
 }
 
+void dragngun_state::namcosprite_map(address_map &map)
+{
+	map(0x204800, 0x204fff).ram();             // clipping tables? (all entries set to 320x256 here)
+	map(0x208000, 0x208fff).ram().share("lay0");
+	map(0x20c000, 0x20cfff).ram().share("lay1");
+	map(0x210000, 0x217fff).ram().share("look0");
+	map(0x218000, 0x21ffff).ram().share("look1");
+	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
+	map(0x228000, 0x2283ff).ram();             // sprite index (just a table 0x00-0xff here)
+	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
+}
+
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
 // raster effects appear to need some work on it anyway?
 void dragngun_state::dragngun_map(address_map &map)
@@ -504,14 +516,10 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x01d4000, 0x01d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
 	map(0x01e0000, 0x01e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
 	map(0x01e4000, 0x01e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
-	map(0x0204800, 0x0204fff).ram(); // ace? 0x10 byte increments only  // 13f ff stuff
-	map(0x0208000, 0x0208fff).ram().share("lay0");
-	map(0x020c000, 0x020cfff).ram().share("lay1");
-	map(0x0210000, 0x0217fff).ram().share("look0");
-	map(0x0218000, 0x021ffff).ram().share("look1");
-	map(0x0220000, 0x0221fff).ram().share("spriteram"); /* Main spriteram */
-	map(0x0228000, 0x02283ff).ram(); //0x10 byte increments only
-	map(0x0230000, 0x0230003).w(FUNC(dragngun_state::spriteram_dma_w));
+
+	//  0x2xxxxx Namco Zooming Sprites
+	namcosprite_map(map);
+
 	map(0x0300000, 0x03fffff).rom().region("maincpu", 0x100000);
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0410000, 0x0410003).w(FUNC(dragngun_state::volume_w));
@@ -555,14 +563,10 @@ void dragngun_state::lockload_map(address_map &map)
 	map(0x1d4000, 0x1d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
 	map(0x1e0000, 0x1e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
 	map(0x1e4000, 0x1e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
-	map(0x204800, 0x204fff).ram();             //0x10 byte increments only
-	map(0x208000, 0x208fff).ram().share("lay0");
-	map(0x20c000, 0x20cfff).ram().share("lay1");
-	map(0x210000, 0x217fff).ram().share("look0");
-	map(0x218000, 0x21ffff).ram().share("look1");
-	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
-	map(0x228000, 0x2283ff).ram();             //0x10 byte increments only
-	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
+
+	//  0x2xxxxx Namco Zooming Sprites
+	namcosprite_map(map);
+
 	map(0x300000, 0x3fffff).rom().region("maincpu", 0x100000);
 	map(0x410000, 0x410003).w(FUNC(dragngun_state::volume_w));
 	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));

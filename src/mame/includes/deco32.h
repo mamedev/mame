@@ -287,6 +287,7 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void namcosprite_map(address_map &map);
 	void dragngun_map(address_map &map);
 	void lockload_map(address_map &map);
 	void lockloadu_map(address_map &map);
