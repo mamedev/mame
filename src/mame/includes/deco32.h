@@ -14,7 +14,7 @@
 #include "sound/ymopm.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
-#include "video/deco_zoomspr.h"
+#include "video/namco_c355spr.h"
 #include "emupal.h"
 #include "screen.h"
 
