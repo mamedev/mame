@@ -550,11 +550,30 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
  * 0x10000 sprite attr (page1)
  * 0x14000 sprite list (page1)
  */
-void namco_c355spr_device::get_single_sprite(const u16 *spritedata, c355_sprite *sprite_ptr)
+
+u16 namco_c355spr_device::read_spriteformat(int entry, u8 attr)
 {
 	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
 	const u16 *spriteformat = &spriteram16[0x4000 / 2];
+	return spriteformat[(entry << 2) + attr];
+}
+
+u16 namco_c355spr_device::read_spritetile(int entry)
+{
+	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
 	const u16 *spritetile   = &spriteram16[0x8000 / 2];
+	return spritetile[entry];
+}
+
+u16 namco_c355spr_device::read_spritetable(int entry, u8 attr)
+{
+	return m_pSpriteTable[(entry << 3) + attr];
+}
+
+
+void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
+{
+	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
 	rectangle clip;
 
 	/**
@@ -562,17 +581,17 @@ void namco_c355spr_device::get_single_sprite(const u16 *spritedata, c355_sprite 
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	const u16 palette = spritedata[6];
+	const u16 palette = m_pSpriteTable[(which*8)+6];
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 spriteformatram_offset = spritedata[0] & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
-	sprite_ptr->offset = spritedata[1];         /* OFFSET */
-	int hpos           = spritedata[2];         /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = spritedata[3];         /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = spritedata[4];         /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = spritedata[5];         /* VSIZE      max 0x3ff pixels */
-	/* spritedata[6] contains priority/palette */
-	/* spritedata[7] is used in Lucky & Wild, possibly for sprite-road priority */
+	const u16 spriteformatram_offset = read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = read_spritetable(which, 1);         /* OFFSET */
+	int hpos           = read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
+	/* read_spritetable(which, 6)  contains priority/palette */
+	/* read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
 
 	int xscroll = (s16)m_position[1];
 	int yscroll = (s16)m_position[0];
@@ -605,10 +624,10 @@ void namco_c355spr_device::get_single_sprite(const u16 *spritedata, c355_sprite 
 	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
 	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
 
-	int tile_index   = spriteformat[(spriteformatram_offset << 2) + 0];
-	const u16 format = spriteformat[(spriteformatram_offset << 2) + 1];
-	int dx           = spriteformat[(spriteformatram_offset << 2) + 2]; // should this also be masked and have a sign bit like dy?
-	const int dy     = spriteformat[(spriteformatram_offset << 2) + 3] & 0x1ff;
+	int tile_index   = read_spriteformat(spriteformatram_offset, 0);
+	const u16 format = read_spriteformat(spriteformatram_offset, 1);
+	int dx           = read_spriteformat(spriteformatram_offset, 2); // should this also be masked and have a sign bit like dy?
+	const int dy     = read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
 	int num_cols     = (format >> 4) & 0xf;
 	int num_rows     = (format) & 0xf;
 
@@ -680,7 +699,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *spritedata, c355_sprite 
 			{
 				x -= tile_screen_width;
 			}
-			const u16 tile = spritetile[tile_index++];
+			const u16 tile = read_spritetile(tile_index++);
 			sprite_ptr->tile[ind] = tile;
 			if ((tile & 0x8000) == 0)
 			{
@@ -712,15 +731,15 @@ int namco_c355spr_device::default_code2tile(int code)
 	return code;
 }
 
-void namco_c355spr_device::get_list(int no, const u16 *pSpriteList16, const u16 *pSpriteTable)
+void namco_c355spr_device::get_list(int no)
 {
 	/* draw the sprites */
 	c355_sprite *sprite_ptr = m_spritelist[no].get();
 	for (int i = 0; i < 256; i++)
 	{
 		sprite_ptr->disable = false;
-		const u16 which = pSpriteList16[i];
-		get_single_sprite(&pSpriteTable[(which & 0xff) * 8], sprite_ptr);
+		const u16 which = m_pSpriteList16[i];
+		get_single_sprite(which & 0xff, sprite_ptr);
 		sprite_ptr++;
 		if (which & 0x100) break;
 	}
@@ -735,9 +754,18 @@ void namco_c355spr_device::get_sprites(const rectangle cliprect)
 //  if (offs == 0)  // boot
 	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
 	// drawing this is what causes the bad tile in vshoot, do any games need 2 lists at the same time or should 1 list be configurable?
-		get_list(0, &m_spriteram[buffer][0x02000/2], &m_spriteram[buffer][0x00000/2]);
+	{
+		m_pSpriteList16 = &m_spriteram[buffer][0x02000 / 2];
+		m_pSpriteTable = &m_spriteram[buffer][0x00000 / 2];
+		get_list(0);
+
+	}
 //  else
-		get_list(1, &m_spriteram[buffer][0x14000/2], &m_spriteram[buffer][0x10000/2]);
+	{
+		m_pSpriteList16 = &m_spriteram[buffer][0x14000 / 2];
+		m_pSpriteTable = &m_spriteram[buffer][0x10000 / 2];
+		get_list(1);
+	}
 
 	copy_sprites(cliprect);
 }

@@ -56,6 +56,10 @@ protected:
 
 	c355_obj_code2tile_delegate m_code2tile;
 
+	u16 read_spritetile(int entry);
+	u16 read_spriteformat(int entry, u8 attr);
+	u16 read_spritetable(int entry, u8 attr);
+
 private:
 
 	struct c355_sprite
@@ -83,8 +87,8 @@ private:
 	int default_code2tile(int code);
 
 	// C355 Motion Object internals
-	void get_single_sprite(const u16 *spritedata, c355_sprite *sprite_ptr);
-	void get_list(int no, const u16 *pSpriteList16, const u16 *pSpriteTable);
+	void get_single_sprite(u16 which, c355_sprite *sprite_ptr);
+	void get_list(int no);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 	std::unique_ptr<c355_sprite []> m_spritelist[2];
@@ -92,6 +96,8 @@ private:
 	int m_palxor;
 	u16 m_position[4];
 	std::unique_ptr<u16 []> m_spriteram[2];
+	u16* m_pSpriteList16;
+	u16* m_pSpriteTable;
 	bitmap_ind16 m_tempbitmap;
 	bitmap_ind16 m_screenbitmap;
 
