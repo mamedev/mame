@@ -57,26 +57,26 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 
 void namco_c355spr_device::zdrawgfxzoom(
 		bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		u32 code,u32 color,bool flipx,bool flipy,int sx,int sy,
-		int scalex, int scaley, u8 prival)
+		u32 code,u32 color,bool flipx,bool flipy,int hpos,int vpos,
+		int hsize, int vsize, u8 prival)
 {
-	if (!scalex || !scaley) return;
+	if (!hsize || !vsize) return;
 	if (dest_bmp.bpp() == 16)
 	{
 		if (gfx)
 		{
 			const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 			const u8 *source_base = gfx->get_data(code % gfx->elements());
-			int sprite_screen_height = (scaley * gfx->height() + 0x8000) >> 16;
-			int sprite_screen_width = (scalex * gfx->width() + 0x8000) >> 16;
+			int sprite_screen_height = (vsize * gfx->height() + 0x8000) >> 16;
+			int sprite_screen_width = (hsize * gfx->width() + 0x8000) >> 16;
 			if (sprite_screen_width && sprite_screen_height)
 			{
 				/* compute sprite increment per screen pixel */
 				int dx = (gfx->width() << 16) / sprite_screen_width;
 				int dy = (gfx->height() << 16) / sprite_screen_height;
 
-				int ex = sx + sprite_screen_width;
-				int ey = sy + sprite_screen_height;
+				int ex = hpos + sprite_screen_width;
+				int ey = vpos + sprite_screen_height;
 
 				int x_index_base;
 				int y_index;
@@ -101,16 +101,16 @@ void namco_c355spr_device::zdrawgfxzoom(
 					y_index = 0;
 				}
 
-				if (sx < clip.min_x)
+				if (hpos < clip.min_x)
 				{ /* clip left */
-					int pixels = clip.min_x - sx;
-					sx += pixels;
+					int pixels = clip.min_x - hpos;
+					hpos += pixels;
 					x_index_base += pixels * dx;
 				}
-				if (sy < clip.min_y)
+				if (vpos < clip.min_y)
 				{ /* clip top */
-					int pixels = clip.min_y - sy;
-					sy += pixels;
+					int pixels = clip.min_y - vpos;
+					vpos += pixels;
 					y_index += pixels * dy;
 				}
 				if (ex > clip.max_x + 1)
@@ -124,14 +124,14 @@ void namco_c355spr_device::zdrawgfxzoom(
 					ey -= pixels;
 				}
 
-				if (ex > sx)
+				if (ex > hpos)
 				{ /* skip if inner loop doesn't draw anything */
-					for (int y = sy; y < ey; y++)
+					for (int y = vpos; y < ey; y++)
 					{
 						u8 const *const source = source_base + (y_index>>16) * gfx->rowbytes();
 						u16 *const dest = &dest_bmp.pix(y);
 						int x_index = x_index_base;
-						for (int x = sx; x < ex; x++)
+						for (int x = hpos; x < ex; x++)
 						{
 							const u8 c = source[x_index>>16];
 							if (c != 0xff)
@@ -349,6 +349,197 @@ u16 namco_c355spr_device::position_r(offs_t offset)
 
 /**************************************************************************************************************/
 
+template<class BitmapClass>
+void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri)
+{
+	if (pri == 0)
+	{
+		if (!m_external_prifill)
+		{
+			if (m_buffer == 0) // not buffered sprites
+				get_sprites(cliprect);
+		}
+	}
+	copybitmap(bitmap, cliprect, pri);
+}
+
+void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+{
+	draw_sprites(screen, bitmap, cliprect, pri);
+}
+
+void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
+{
+	draw_sprites(screen, bitmap, cliprect, pri);
+}
+
+void namco_c355spr_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_spriteram[0][offset]);
+}
+
+u16 namco_c355spr_device::spriteram_r(offs_t offset)
+{
+	return m_spriteram[0][offset];
+}
+
+WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
+{
+	if (state)
+	{
+		if (m_buffer > 0)
+			get_sprites(screen().visible_area());
+
+		if (m_buffer > 1)
+			std::copy_n(m_spriteram[0].get(), 0x20000/2, m_spriteram[1].get());
+	}
+}
+
+
+
+/* the sprites used dy DragonGun + Lock 'n' Loaded */
+
+// helicopter in lockload is only half drawn? (3rd attract demo)
+// how are we meant to mix these with the tilemaps, parts must go above / behind parts of tilemap '4/7' in lockload, could be more priority masking sprites we're missing / not drawing tho?
+// dragongun also does a masking trick on the dragon during the attract intro, it should not be visible but rather cause the fire to be invisible in the shape of the dragon (see note / hack in code to enable this effect)
+// dragongun 'waterfall' prior to one of the bosses also needs correct priority
+
+
+
+deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: namco_c355spr_device(mconfig, DECO_ZOOMSPR, tag, owner, clock)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+{
+}
+
+/******************************************************************************/
+
+
+inline void deco_zoomspr_device::dragngun_drawgfxzoom(
+	bitmap_rgb32& dest_bmp, const rectangle& clip, gfx_element* gfx,
+	uint32_t code, uint32_t color, int flipx, int flipy, int hpos, int vpos,
+	int transparent_color,
+	int hsize, int vsize, bitmap_ind8* pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height,
+	bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap,
+	int priority)
+{
+	rectangle myclip;
+
+	if (!hsize || !vsize) return;
+
+	/*
+	hsize and vsize are 16.16 fixed point numbers
+	1<<15 : shrink to 50%
+	1<<16 : uniform scale
+	1<<17 : double to 200%
+	*/
+
+	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	myclip = clip;
+	myclip &= temp_bitmap.cliprect();
+
+	{
+		if (gfx)
+		{
+			const pen_t* pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const uint8_t* code_base = gfx->get_data(code % gfx->elements());
+
+			if (sprite_screen_width && sprite_screen_height)
+			{
+				/* compute sprite increment per screen pixel */
+				int dx = (gfx->width() << 16) / sprite_screen_width;
+				int dy = (gfx->height() << 16) / sprite_screen_height;
+
+				int ex = hpos + sprite_screen_width;
+				int ey = vpos + sprite_screen_height;
+
+				int x_index_base;
+				int y_index;
+
+				if (flipx)
+				{
+					x_index_base = (sprite_screen_width - 1) * dx;
+					dx = -dx;
+				}
+				else
+				{
+					x_index_base = 0;
+				}
+
+				if (flipy)
+				{
+					y_index = (sprite_screen_height - 1) * dy;
+					dy = -dy;
+				}
+				else
+				{
+					y_index = 0;
+				}
+
+				if (hpos < clip.left())
+				{ /* clip left */
+					int pixels = clip.left() - hpos;
+					hpos += pixels;
+					x_index_base += pixels * dx;
+				}
+				if (vpos < clip.top())
+				{ /* clip top */
+					int pixels = clip.top() - vpos;
+					vpos += pixels;
+					y_index += pixels * dy;
+				}
+				/* NS 980211 - fixed incorrect clipping */
+				if (ex > clip.right() + 1)
+				{ /* clip right */
+					int pixels = ex - clip.right() - 1;
+					ex -= pixels;
+				}
+				if (ey > clip.bottom() + 1)
+				{ /* clip bottom */
+					int pixels = ey - clip.bottom() - 1;
+					ey -= pixels;
+				}
+
+				if (ex > hpos)
+				{ /* skip if inner loop doesn't draw anything */
+
+
+					for (int y = vpos; y < ey; y++)
+					{
+						uint8_t const* const source = code_base + (y_index >> 16) * gfx->rowbytes();
+						uint32_t* const dest = &temp_bitmap.pix(y);
+						uint8_t* const pri = &pri_bitmap.pix(y);
+
+
+						int x_index = x_index_base;
+						for (int x = hpos; x < ex; x++)
+						{
+							int c = source[x_index >> 16];
+							if (c != transparent_color)
+							{
+								if (priority >= pri[x])
+								{
+									dest[x] = pal[c];
+									dest[x] |= 0xff000000;
+								}
+								else // sprites can have a 'masking' effect on other sprites
+								{
+									dest[x] = 0x00000000;
+								}
+							}
+
+							x_index += dx;
+						}
+
+						y_index += dy;
+					}
+				}
+			}
+		}
+	}
+}
+
+
 /**
  * 0x00000 sprite attr (page0)
  * 0x02000 sprite list (page0)
@@ -359,11 +550,11 @@ u16 namco_c355spr_device::position_r(offs_t offset)
  * 0x10000 sprite attr (page1)
  * 0x14000 sprite list (page1)
  */
-void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sprite_ptr)
+void namco_c355spr_device::get_single_sprite(const u16 *spritedata, c355_sprite *sprite_ptr)
 {
 	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
-	const u16 *spriteformat16 = &spriteram16[0x4000 / 2];
-	const u16 *spritetile16   = &spriteram16[0x8000 / 2];
+	const u16 *spriteformat = &spriteram16[0x4000 / 2];
+	const u16 *spritetile   = &spriteram16[0x8000 / 2];
 	rectangle clip;
 
 	/**
@@ -371,17 +562,17 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	const u16 palette = pSource[6];
+	const u16 palette = spritedata[6];
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 linkno   = pSource[0] & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
-	sprite_ptr->offset = pSource[1];         /* OFFSET */
-	int hpos           = pSource[2];         /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = pSource[3];         /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = pSource[4];         /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = pSource[5];         /* VSIZE      max 0x3ff pixels */
-	/* pSource[6] contains priority/palette */
-	/* pSource[7] is used in Lucky & Wild, possibly for sprite-road priority */
+	const u16 spriteformatram_offset = spritedata[0] & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = spritedata[1];         /* OFFSET */
+	int hpos           = spritedata[2];         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = spritedata[3];         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = spritedata[4];         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = spritedata[5];         /* VSIZE      max 0x3ff pixels */
+	/* spritedata[6] contains priority/palette */
+	/* spritedata[7] is used in Lucky & Wild, possibly for sprite-road priority */
 
 	int xscroll = (s16)m_position[1];
 	int yscroll = (s16)m_position[0];
@@ -391,7 +582,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	yscroll &= 0x1ff; if (yscroll & 0x100) yscroll |= ~0x1ff;
 
 	if (screen().height() > 384)
-	{ /* Medium Resolution: System21 adjust */
+	{ /* Medium Resolution: vposstem21 adjust */
 			xscroll = (s16)m_position[1];
 			xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
 			if (yscroll < 0)
@@ -414,10 +605,10 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
 	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
 
-	int tile_index   = spriteformat16[linkno * 4 + 0];
-	const u16 format = spriteformat16[linkno * 4 + 1];
-	int dx           = spriteformat16[linkno * 4 + 2]; // should this also be masked and have a sign bit like dy?
-	const int dy     = spriteformat16[linkno * 4 + 3] & 0x1ff;
+	int tile_index   = spriteformat[(spriteformatram_offset << 2) + 0];
+	const u16 format = spriteformat[(spriteformatram_offset << 2) + 1];
+	int dx           = spriteformat[(spriteformatram_offset << 2) + 2]; // should this also be masked and have a sign bit like dy?
+	const int dy     = spriteformat[(spriteformatram_offset << 2) + 3] & 0x1ff;
 	int num_cols     = (format >> 4) & 0xf;
 	int num_rows     = (format) & 0xf;
 
@@ -468,7 +659,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 
 	u32 source_height_remaining = num_rows * 16;
 	u32 screen_height_remaining = vsize;
-	int sy = vpos;
+	int y = vpos;
 	int ind = 0;
 	for (int row = 0; row < num_rows; row++)
 	{
@@ -476,31 +667,31 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 		zoomy = (screen_height_remaining << 16) / source_height_remaining;
 		if (flipy)
 		{
-			sy -= tile_screen_height;
+			y -= tile_screen_height;
 		}
 		u32 source_width_remaining = num_cols * 16;
 		u32 screen_width_remaining = hsize;
-		int sx = hpos;
+		int x = hpos;
 		for (int col = 0; col < num_cols; col++)
 		{
 			int tile_screen_width = 16 * screen_width_remaining / source_width_remaining;
 			zoomx = (screen_width_remaining << 16) / source_width_remaining;
 			if (flipx)
 			{
-				sx -= tile_screen_width;
+				x -= tile_screen_width;
 			}
-			const u16 tile = spritetile16[tile_index++];
+			const u16 tile = spritetile[tile_index++];
 			sprite_ptr->tile[ind] = tile;
 			if ((tile & 0x8000) == 0)
 			{
-				sprite_ptr->x[ind] = sx;
-				sprite_ptr->y[ind] = sy;
+				sprite_ptr->x[ind] = x;
+				sprite_ptr->y[ind] = y;
 				sprite_ptr->zoomx[ind] = zoomx;
 				sprite_ptr->zoomy[ind] = zoomy;
 			}
 			if (!flipx)
 			{
-				sx += tile_screen_width;
+				x += tile_screen_width;
 			}
 			screen_width_remaining -= tile_screen_width;
 			source_width_remaining -= 16;
@@ -508,7 +699,7 @@ void namco_c355spr_device::get_single_sprite(const u16 *pSource, c355_sprite *sp
 		} /* next col */
 		if (!flipy)
 		{
-			sy += tile_screen_height;
+			y += tile_screen_height;
 		}
 		screen_height_remaining -= tile_screen_height;
 		source_height_remaining -= 16;
@@ -591,200 +782,11 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 	}
 }
 
-template<class BitmapClass>
-void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri)
+
+void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, uint32_t* spritetile_ram0, uint32_t* spritetile_ram1, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
-	if (pri == 0)
-	{
-		if (!m_external_prifill)
-		{
-			if (m_buffer == 0) // not buffered sprites
-				get_sprites(cliprect);
-		}
-	}
-	copybitmap(bitmap, cliprect, pri);
-}
-
-void namco_c355spr_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
-{
-	draw_sprites(screen, bitmap, cliprect, pri);
-}
-
-void namco_c355spr_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri)
-{
-	draw_sprites(screen, bitmap, cliprect, pri);
-}
-
-void namco_c355spr_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_spriteram[0][offset]);
-}
-
-u16 namco_c355spr_device::spriteram_r(offs_t offset)
-{
-	return m_spriteram[0][offset];
-}
-
-WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
-{
-	if (state)
-	{
-		if (m_buffer > 0)
-			get_sprites(screen().visible_area());
-
-		if (m_buffer > 1)
-			std::copy_n(m_spriteram[0].get(), 0x20000/2, m_spriteram[1].get());
-	}
-}
-
-
-
-/* the sprites used by DragonGun + Lock 'n' Loaded */
-
-// helicopter in lockload is only half drawn? (3rd attract demo)
-// how are we meant to mix these with the tilemaps, parts must go above / behind parts of tilemap '4/7' in lockload, could be more priority masking sprites we're missing / not drawing tho?
-// dragongun also does a masking trick on the dragon during the attract intro, it should not be visible but rather cause the fire to be invisible in the shape of the dragon (see note / hack in code to enable this effect)
-// dragongun 'waterfall' prior to one of the bosses also needs correct priority
-
-
-
-deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: namco_c355spr_device(mconfig, DECO_ZOOMSPR, tag, owner, clock)
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
-{
-}
-
-/******************************************************************************/
-
-
-inline void deco_zoomspr_device::dragngun_drawgfxzoom(
-	bitmap_rgb32& dest_bmp, const rectangle& clip, gfx_element* gfx,
-	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-	int transparent_color,
-	int scalex, int scaley, bitmap_ind8* pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height,
-	bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap,
-	int priority)
-{
-	rectangle myclip;
-
-	if (!scalex || !scaley) return;
-
-	/*
-	scalex and scaley are 16.16 fixed point numbers
-	1<<15 : shrink to 50%
-	1<<16 : uniform scale
-	1<<17 : double to 200%
-	*/
-
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	myclip = clip;
-	myclip &= temp_bitmap.cliprect();
-
-	{
-		if (gfx)
-		{
-			const pen_t* pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const uint8_t* code_base = gfx->get_data(code % gfx->elements());
-
-			if (sprite_screen_width && sprite_screen_height)
-			{
-				/* compute sprite increment per screen pixel */
-				int dx = (gfx->width() << 16) / sprite_screen_width;
-				int dy = (gfx->height() << 16) / sprite_screen_height;
-
-				int ex = sx + sprite_screen_width;
-				int ey = sy + sprite_screen_height;
-
-				int x_index_base;
-				int y_index;
-
-				if (flipx)
-				{
-					x_index_base = (sprite_screen_width - 1) * dx;
-					dx = -dx;
-				}
-				else
-				{
-					x_index_base = 0;
-				}
-
-				if (flipy)
-				{
-					y_index = (sprite_screen_height - 1) * dy;
-					dy = -dy;
-				}
-				else
-				{
-					y_index = 0;
-				}
-
-				if (sx < clip.left())
-				{ /* clip left */
-					int pixels = clip.left() - sx;
-					sx += pixels;
-					x_index_base += pixels * dx;
-				}
-				if (sy < clip.top())
-				{ /* clip top */
-					int pixels = clip.top() - sy;
-					sy += pixels;
-					y_index += pixels * dy;
-				}
-				/* NS 980211 - fixed incorrect clipping */
-				if (ex > clip.right() + 1)
-				{ /* clip right */
-					int pixels = ex - clip.right() - 1;
-					ex -= pixels;
-				}
-				if (ey > clip.bottom() + 1)
-				{ /* clip bottom */
-					int pixels = ey - clip.bottom() - 1;
-					ey -= pixels;
-				}
-
-				if (ex > sx)
-				{ /* skip if inner loop doesn't draw anything */
-
-
-					for (int y = sy; y < ey; y++)
-					{
-						uint8_t const* const source = code_base + (y_index >> 16) * gfx->rowbytes();
-						uint32_t* const dest = &temp_bitmap.pix(y);
-						uint8_t* const pri = &pri_bitmap.pix(y);
-
-
-						int x_index = x_index_base;
-						for (int x = sx; x < ex; x++)
-						{
-							int c = source[x_index >> 16];
-							if (c != transparent_color)
-							{
-								if (priority >= pri[x])
-								{
-									dest[x] = pal[c];
-									dest[x] |= 0xff000000;
-								}
-								else // sprites can have a 'masking' effect on other sprites
-								{
-									dest[x] = 0x00000000;
-								}
-							}
-
-							x_index += dx;
-						}
-
-						y_index += dy;
-					}
-				}
-			}
-		}
-	}
-}
-
-void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
-{
-	const uint32_t* layout_ram;
-	const uint32_t* lookup_ram;
+	const uint32_t* spriteformat;
+	const uint32_t* spritetile;
 	int offs;
 	temp_bitmap.fill(0x00000000, cliprect);
 
@@ -843,34 +845,35 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		if ((spritedata[offs + 6] & 0x80) && (screen.frame_number() & 1)) // flicker
 			continue;
 
-		int sx, sy, colour, fx, fy, w, h, x, y, bx, by, scalex, scaley;
+		int hpos, vpos, colour, fx, fy, w, h, x, y, dx, dy, hsize, vsize;
 		int zoomx, zoomy;
 		int xpos, ypos;
 
-		scalex = spritedata[offs + 4] & 0x3ff;
-		scaley = spritedata[offs + 5] & 0x3ff;
-		if (!scalex || !scaley) /* Zero pixel size in X or Y - skip block */
+		hsize = spritedata[offs + 4] & 0x3ff;
+		vsize = spritedata[offs + 5] & 0x3ff;
+		if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
 			continue;
 
-		int layoutram_offset = (spritedata[offs + 0] & 0x1ff) * 4;
+		int spriteformatram_offset = (spritedata[offs + 0] & 0x1ff);
 
 		if (spritedata[offs + 0] & 0x400)
-			layout_ram = dragngun_sprite_layout_1_ram;
+			spriteformat = spriteformat_ram1;
 		else
-			layout_ram = dragngun_sprite_layout_0_ram;
-		h = (layout_ram[layoutram_offset + 1] >> 0) & 0xf;
-		w = (layout_ram[layoutram_offset + 1] >> 4) & 0xf;
+			spriteformat = spriteformat_ram0;
+
+		h = (spriteformat[(spriteformatram_offset << 2) + 1] >> 0) & 0xf;
+		w = (spriteformat[(spriteformatram_offset << 2) + 1] >> 4) & 0xf;
 		if (!h || !w)
 			continue;
-
-		sx = spritedata[offs + 2] & 0x3ff;
-		sy = spritedata[offs + 3] & 0x3ff;
-		bx = layout_ram[layoutram_offset + 2] & 0x1ff;
-		by = layout_ram[layoutram_offset + 3] & 0x1ff;
-		if (bx & 0x100) bx = 1 - (bx & 0xff);
-		if (by & 0x100) by = 1 - (by & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
-		if (sx >= 512) sx -= 1024;
-		if (sy >= 512) sy -= 1024;
+		
+		hpos = spritedata[offs + 2] & 0x3ff;
+		vpos = spritedata[offs + 3] & 0x3ff;
+		dx = spriteformat[(spriteformatram_offset << 2) + 2] & 0x1ff;
+		dy = spriteformat[(spriteformatram_offset << 2) + 3] & 0x1ff;
+		if (dx & 0x100) dx = 1 - (dx & 0xff);
+		if (dy & 0x100) dy = 1 - (dy & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
+		if (hpos >= 512) hpos -= 1024;
+		if (vpos >= 512) vpos -= 1024;
 
 		colour = spritedata[offs + 6] & 0x1f;
 
@@ -884,32 +887,31 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		fx = spritedata[offs + 4] & 0x8000;
 		fy = spritedata[offs + 5] & 0x8000;
 
-		int lookupram_offset = layout_ram[layoutram_offset + 0] & 0x1fff;
+		int lookupram_offset = spriteformat[(spriteformatram_offset << 2) + 0] & 0x1fff;
 
-		//      if (spritedata[offs+0]&0x400)
-		if (layout_ram[layoutram_offset + 0] & 0x2000)
-			lookup_ram = dragngun_sprite_lookup_1_ram;
+		if (spriteformat[(spriteformatram_offset << 2) + 0] & 0x2000)
+			spritetile = spritetile_ram1;
 		else
-			lookup_ram = dragngun_sprite_lookup_0_ram;
+			spritetile = spritetile_ram0;
 
-		zoomx = scalex * 0x10000 / (w * 16);
-		zoomy = scaley * 0x10000 / (h * 16);
+		zoomx = hsize * 0x10000 / (w * 16);
+		zoomy = vsize * 0x10000 / (h * 16);
 
 		if (!fy)
-			ypos = (sy << 16) - (by * zoomy); /* The block offset scales with zoom, the base position does not */
+			ypos = (vpos << 16) - (dy * zoomy); /* The block offset scales with zoom, the base position does not */
 		else
-			ypos = (sy << 16) + (by * zoomy) - (16 * zoomy);
+			ypos = (vpos << 16) + (dy * zoomy) - (16 * zoomy);
 
 		for (y = 0; y < h; y++)
 		{
 			if (!fx)
-				xpos = (sx << 16) - (bx * zoomx); /* The block offset scales with zoom, the base position does not */
+				xpos = (hpos << 16) - (dx * zoomx); /* The block offset scales with zoom, the base position does not */
 			else
-				xpos = (sx << 16) + (bx * zoomx) - (16 * zoomx);
+				xpos = (hpos << 16) + (dx * zoomx) - (16 * zoomx);
 
 			for (x = 0; x < w; x++)
 			{
-				int sprite = lookup_ram[lookupram_offset] & 0x3fff;
+				int sprite = spritetile[lookupram_offset] & 0x3fff;
 
 				lookupram_offset++;
 
@@ -954,4 +956,3 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		}
 	}
 }
-

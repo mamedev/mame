@@ -83,7 +83,7 @@ private:
 	int default_code2tile(int code);
 
 	// C355 Motion Object internals
-	void get_single_sprite(const u16 *pSource, c355_sprite *sprite_ptr);
+	void get_single_sprite(const u16 *spritedata, c355_sprite *sprite_ptr);
 	void get_list(int no, const u16 *pSpriteList16, const u16 *pSpriteTable);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
@@ -114,7 +114,7 @@ public:
 
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
-	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, uint32_t* spritetile_ram0, uint32_t* spritetile_ram1, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
 

@@ -220,8 +220,8 @@ public:
 		: deco32_state(mconfig, type, tag)
 		, m_sprgenzoom(*this, "c355spr")
 		, m_spriteram(*this, "spriteram")
-		, m_sprite_layout_ram(*this, "lay%u", 0)
-		, m_sprite_lookup_ram(*this, "look%u", 0)
+		, m_sprite_spriteformat(*this, "lay%u", 0)
+		, m_sprite_spritetile(*this, "look%u", 0)
 		, m_vol_main(*this, "vol_main")
 		, m_vol_gun(*this, "vol_gun")
 		, m_io_inputs(*this, "INPUTS")
@@ -244,8 +244,8 @@ private:
 	required_device<deco_zoomspr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
-	required_shared_ptr_array<u32, 2> m_sprite_layout_ram;
-	required_shared_ptr_array<u32, 2> m_sprite_lookup_ram;
+	required_shared_ptr_array<u32, 2> m_sprite_spriteformat;
+	required_shared_ptr_array<u32, 2> m_sprite_spritetile;
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
