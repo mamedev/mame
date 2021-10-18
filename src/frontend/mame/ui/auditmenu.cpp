@@ -53,6 +53,7 @@ menu_audit::menu_audit(mame_ui_manager &mui, render_container &container)
 	, m_current(nullptr)
 	, m_cancel(false)
 	, m_phase(phase::CONFIRMATION)
+	, m_fast(true)
 {
 	std::string filename(emulator_info::get_configname());
 	filename += "_avail.ini";
