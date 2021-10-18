@@ -2,16 +2,29 @@
 // copyright-holders:Robbbert
 /****************************************************************************************************************
 
-  PINBALL
-  Gottlieb System 80A
+PINBALL
+Gottlieb System 80A
 
-  Same as system 80, except that the displays have 7 digits.
+Same as system 80, except that the displays have 7 digits.
 
-  Same issues as gts80
+Most games start up and will accept credits, and the test mode works.
+
+Many games are multiball, and therefore may not respond further to inputs.
+
+Caveman is missing its joystick. Need the manual. The video-pinball interface has not been written.
+ If you turn on DIPS6,7,8, you can enter test mode, insert coins and start a game.
+ But once in-game, no inputs work.
+
+Rocky has a habit of locking up. Have to reboot the machine with F3.
+
+Sound is wrong in all games.
+
+Note: If DIP28 is set to Novelty, then Match doesn't work.
 
 *****************************************************************************************************************/
 
 #include "emu.h"
+#include "machine/input_merger.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
 #include "cpu/i86/i86.h"
@@ -22,49 +35,64 @@
 #include "gts80a.lh"
 #include "gts80a_caveman.lh"
 
+namespace {
+
 class gts80a_state : public genpin_class
 {
 public:
 	gts80a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_riot1(*this, "riot1")
+		, m_riot2(*this, "riot2")
+		, m_riot3(*this, "riot3")
+		, m_io_dips(*this, "DSW%u", 0U)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
 	void gts80a(machine_config &config);
 	void gts80a_s(machine_config &config);
 	void gts80a_ss(machine_config &config);
-
-	void init_gts80a();
+	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
 
 private:
-	uint8_t port1a_r();
-	uint8_t port2a_r();
-	void port1b_w(uint8_t data);
-	void port2a_w(uint8_t data);
-	void port2b_w(uint8_t data);
-	void port3a_w(uint8_t data);
-	void port3b_w(offs_t offset, uint8_t data);
+	u8 port1a_r();
+	u8 port2a_r();
+	void port1b_w(u8 data);
+	void port2a_w(u8 data);
+	void port2b_w(u8 data);
+	void port3a_w(u8 data);
+	void port3b_w(u8 data);
 	void gts80a_map(address_map &map);
 
-	uint8_t m_port2;
-	uint8_t m_segment;
-	uint8_t m_lamprow;
-	uint8_t m_swrow;
+	u8 m_segment = 0;
+	u8 m_lamprow = 0;
+	u8 m_swrow = 0;
+	u8 m_soundex = 0;
+	u8 m_sol_state[9][2];
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	virtual void machine_start() override;
+	required_device<m6502_device> m_maincpu;
+	required_device<riot6532_device> m_riot1;
+	required_device<riot6532_device> m_riot2;
+	required_device<riot6532_device> m_riot3;
+	required_ioport_array<4> m_io_dips;
+	required_ioport_array<9> m_io_keyboard;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 	output_finder<60> m_digits;
+	output_finder<57> m_io_outputs;   // 8 solenoids, 1 outhole, 48 lamps
 };
 
 void gts80a_state::gts80a_map(address_map &map)
 {
 	map.global_mask(0x3fff);
 	map(0x0000, 0x017f).ram();
+	map(0x01cb, 0x01cb).lr8(NAME([] () { return 0xff; }));  // continual read
 	map(0x0200, 0x027f).rw("riot1", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x0280, 0x02ff).rw("riot2", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 	map(0x0300, 0x037f).rw("riot3", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
@@ -75,230 +103,229 @@ void gts80a_state::gts80a_map(address_map &map)
 }
 
 static INPUT_PORTS_START( gts80a )
-	PORT_START("DSW.0")
-	PORT_DIPNAME( 0x80, 0x00, "SW 1")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x80, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x00, "SW 2")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x40, DEF_STR(On))
-	PORT_DIPNAME( 0x20, 0x00, "SW 3")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x20, DEF_STR(On))
-	PORT_DIPNAME( 0x10, 0x00, "SW 4")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x10, DEF_STR(On))
-	PORT_DIPNAME( 0x08, 0x00, "SW 5")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x08, DEF_STR(On))
-	PORT_DIPNAME( 0x04, 0x00, "SW 6")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x04, DEF_STR(On))
-	PORT_DIPNAME( 0x02, 0x00, "SW 7")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x02, DEF_STR(On))
-	PORT_DIPNAME( 0x01, 0x00, "SW 8")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x01, DEF_STR(On))
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x80, 0x80, "SW 01")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPNAME( 0x40, 0x40, "SW 02")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPNAME( 0x20, 0x20, "SW 03")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPNAME( 0x10, 0x10, "SW 04")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPNAME( 0x08, 0x08, "SW 05")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
+	PORT_DIPNAME( 0x04, 0x04, "SW 06")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPNAME( 0x02, 0x02, "SW 07")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPNAME( 0x01, 0x01, "SW 08")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 
-	PORT_START("DSW.1")
-	PORT_DIPNAME( 0x80, 0x00, "SW 9")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x80, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x00, "SW 10")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x40, DEF_STR(On))
-	PORT_DIPNAME( 0x20, 0x00, "SW 11")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x20, DEF_STR(On))
-	PORT_DIPNAME( 0x10, 0x00, "SW 12")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x10, DEF_STR(On))
-	PORT_DIPNAME( 0x08, 0x00, "SW 13")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x80, 0x80, "SW 09")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPNAME( 0x40, 0x40, "SW 10")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPNAME( 0x20, 0x20, "SW 11")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPNAME( 0x10, 0x10, "SW 12")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPNAME( 0x08, 0x08, "SW 13")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
 	PORT_DIPNAME( 0x04, 0x00, "SW 14")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x04, DEF_STR(On))
-	PORT_DIPNAME( 0x02, 0x02, "SW 15")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x02, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPNAME( 0x02, 0x00, "SW 15")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
 	PORT_DIPNAME( 0x01, 0x00, "SW 16")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x01, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 
-	PORT_START("DSW.2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x80, 0x80, "SW 17")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x80, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
 	PORT_DIPNAME( 0x40, 0x40, "SW 18")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x40, DEF_STR(On))
-	PORT_DIPNAME( 0x20, 0x00, "SW 19")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x20, DEF_STR(On))
-	PORT_DIPNAME( 0x10, 0x00, "SW 20")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x10, DEF_STR(On))
-	PORT_DIPNAME( 0x08, 0x00, "SW 21")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x08, DEF_STR(On))
-	PORT_DIPNAME( 0x04, 0x00, "SW 22")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x04, DEF_STR(On))
-	PORT_DIPNAME( 0x02, 0x02, "SW 23")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x02, DEF_STR(On))
-	PORT_DIPNAME( 0x01, 0x01, "SW 24")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x01, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
+	PORT_DIPNAME( 0x20, 0x20, "SW 19")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
+	PORT_DIPNAME( 0x10, 0x10, "SW 20")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
+	PORT_DIPNAME( 0x08, 0x08, "SW 21")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
+	PORT_DIPNAME( 0x04, 0x04, "SW 22")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPNAME( 0x02, 0x00, "SW 23")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPNAME( 0x01, 0x00, "SW 24")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 
-	PORT_START("DSW.3")
-	PORT_DIPNAME( 0x80, 0x80, "SW 25")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x80, DEF_STR(On))
-	PORT_DIPNAME( 0x40, 0x40, "SW 26")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x40, DEF_STR(On))
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x80, 0x00, "SW 25")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x80, DEF_STR(Off))
+	PORT_DIPNAME( 0x40, 0x00, "SW 26")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x40, DEF_STR(Off))
 	PORT_DIPNAME( 0x20, 0x20, "SW 27")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x20, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x20, DEF_STR(Off))
 	PORT_DIPNAME( 0x10, 0x10, "SW 28")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x10, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x10, DEF_STR(Off))
 	PORT_DIPNAME( 0x08, 0x08, "SW 29")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x08, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x08, DEF_STR(Off))
 	PORT_DIPNAME( 0x04, 0x04, "SW 30")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x04, DEF_STR(On))
-	PORT_DIPNAME( 0x02, 0x00, "SW 31")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x02, DEF_STR(On))
-	PORT_DIPNAME( 0x01, 0x00, "SW 32")
-	PORT_DIPSETTING(    0x00, DEF_STR(Off))
-	PORT_DIPSETTING(    0x01, DEF_STR(On))
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x04, DEF_STR(Off))
+	PORT_DIPNAME( 0x02, 0x02, "SW 31")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x02, DEF_STR(Off))
+	PORT_DIPNAME( 0x01, 0x01, "SW 32")
+	PORT_DIPSETTING(    0x00, DEF_STR(On))
+	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 
 	PORT_START("X0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP00")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP01")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP02")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP03")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP04")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP05")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP06")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Play/Test")
 
 	PORT_START("X1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP10")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP11")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP12")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP13")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP14")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP15")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP16")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP20")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP21")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP22")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP23")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP24")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP25")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP26")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP30")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP31")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP33")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP34")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP35")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP36")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START )
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // won't boot if closed
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X8")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN3 )
-
-	PORT_START("X10")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START )
-
-	PORT_START("X20")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ASTERISK)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_PLUS_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT ) // won't boot if closed
-
-	PORT_START("X40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_0_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_DEL_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_END)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_PGUP)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X)
-
-	PORT_START("X80")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam") PORT_CHANGED_MEMBER(DEVICE_SELF, gts80a_state, slam_w, 0)
 INPUT_PORTS_END
 
-uint8_t gts80a_state::port1a_r()
+INPUT_CHANGED_MEMBER( gts80a_state::slam_w )
 {
-	char kbdrow[8];
-	uint8_t data = 0;
-	if ((m_lamprow < 4) && (m_segment==0x80))
-	{
-		sprintf(kbdrow,"DSW.%d",m_lamprow);
-		data = ioport(kbdrow)->read();
-	}
-	else
-	{
-		sprintf(kbdrow,"X%X",m_swrow);
-		data = ioport(kbdrow)->read();
-	}
-
-	return data;
+	m_riot2->porta_in_set(newval ? 0x80 : 0, 0x80);
 }
 
-uint8_t gts80a_state::port2a_r()
+u8 gts80a_state::port1a_r()
 {
-	return m_port2 | 0x80; // slam tilt off
+	u8 data = 0xff;
+	if ((m_lamprow < 4) && BIT(m_segment, 7))
+		data = m_io_dips[m_lamprow]->read();
+
+	for (u8 i = 0; i < 7; i++)
+		if (!BIT(m_swrow, i))
+			data &= m_io_keyboard[i]->read();
+
+	return data ^ 0xff;  // inverted by Z14 (7400)
+}
+
+u8 gts80a_state::port2a_r()
+{
+	return m_io_keyboard[8]->read(); // slam tilt
 }
 
 // sw strobes
-void gts80a_state::port1b_w(uint8_t data)
+void gts80a_state::port1b_w(u8 data)
 {
-	m_swrow = data;
+	m_swrow = data ^ 0xff;  // inverted by Z11 (7404)
 }
 
 // schematic and pinmame say '1' is indicated by m_segment !bits 4,5,6, but it is !bit 7
-void gts80a_state::port2a_w(uint8_t data)
+void gts80a_state::port2a_w(u8 data)
 {
-	m_port2 = data;
-	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	uint16_t seg1 = (uint16_t)patterns[m_segment & 15];
-	uint16_t seg2 = bitswap<16>(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	uint16_t seg2 = bitswap<10>(seg1, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	switch (data & 0x70)
 	{
 		case 0x10: // player 1&2
@@ -317,34 +344,137 @@ void gts80a_state::port2a_w(uint8_t data)
 }
 
 //d0-3 bcd data; d4-6 = centre segment; d7 = dipsw enable
-void gts80a_state::port2b_w(uint8_t data)
+void gts80a_state::port2b_w(u8 data)
 {
-	m_segment = data;//printf("%s:%X ",machine().describe_context().c_str(),data);
+	m_segment = data;
 }
 
-// solenoids
-void gts80a_state::port3a_w(uint8_t data)
+// solenoids and sound
+void gts80a_state::port3a_w(u8 data)
 {
-}
+	u8 i;
+	data ^= 0x1f;   // Z27 inverter
+	// Sound
+	u8 sndcmd = data & 15;
+	if (BIT(data, 4))  // Z31
+		sndcmd = 0;
 
-//pb0-3 = sound; pb4-7 = lamprow
-void gts80a_state::port3b_w(offs_t offset, uint8_t data)
-{
-	uint8_t sndcmd = data & 15;
-	m_lamprow = data >> 4;
-	if (m_r0_sound)
-		m_r0_sound->write(offset, sndcmd);
+	sndcmd ^= 15;  // inverted again by Z13 on the A3 board
+	if (m_r0_sound && (sndcmd & 15))
+		m_r0_sound->write(sndcmd);
+	else
 	if (m_r1_sound)
-		m_r1_sound->write(sndcmd);
+		m_r1_sound->write(sndcmd | m_soundex);
+
+	// Solenoids group 1
+	if (!BIT(data, 5))
+		for (i = 0; i < 4;i++)
+			m_sol_state[i][0] = (BIT(data, 0, 2) == i) ? 1 : 0;
+	else
+		for (i = 0; i < 4;i++)
+			m_sol_state[i][0] = 0;
+
+	// Solenoids group 2
+	if (!BIT(data, 6))
+		for (i = 0; i < 4;i++)
+			m_sol_state[i+4][0] = (BIT(data, 2, 2) == i) ? 1 : 0;
+	else
+		for (i = 4; i < 8;i++)
+			m_sol_state[i][0] = 0;
+
+	// Outhole
+	m_sol_state[8][0] = BIT(data, 7) ^ 1;
+
+	// Smooth solenoids
+	// Some solenoids get continuously pulsed, which is absorbed by the real thing, but
+	// causes issues for us. So we need to use only the first occurrence of a particular sound.
+	for (i = 0; i < 9; i++)
+	{
+		switch (m_sol_state[i][1])
+		{
+			case 0:   // was off
+				if (m_sol_state[i][0] == 1) // was off, coming on
+				{
+					m_io_outputs[i] = 1;
+					m_sol_state[i][1] = 1;  // remember
+				}
+				break;
+			case 1:   // was on
+				if (m_sol_state[i][0] == 0) // was on, going off
+				{
+					m_io_outputs[i] = 0;
+					m_sol_state[i][1] = 0;  // remember
+				}
+				else
+					m_io_outputs[i] = 0;  // still on from before
+				break;
+			default:
+				m_sol_state[i][1] = 0;
+				break;
+		}
+	}
+	// Activate solenoids
+	for (i = 0; i < 9; i++)
+	{
+		bool state = m_io_outputs[i] ? 1 : 0;
+		switch (i)
+		{
+			case 2:
+				machine().bookkeeping().coin_counter_w(0, state);
+				break;
+			case 3:
+				machine().bookkeeping().coin_counter_w(1, state);
+				break;
+			case 6:
+				machine().bookkeeping().coin_counter_w(2, state);
+				break;
+			case 7:
+				if (state)
+					m_samples->start(0, 6);  // knocker
+				break;
+			case 8:
+				if (state)
+					m_samples->start(0, 9);  // outhole
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+// Lamps
+void gts80a_state::port3b_w(u8 data)
+{
+	m_lamprow = BIT(data, 4, 4);
+	if (m_lamprow && (m_lamprow < 13))
+		for (u8 i = 0; i < 4; i++)
+			m_io_outputs[m_lamprow*4+i+5] = BIT(data, i);
+	m_soundex = m_io_outputs[18] << 4;   // Sound16 line (there's a Sound32 line, but haven't found its source)
+}
+
+void gts80a_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_lamprow));
+	save_item(NAME(m_swrow));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_soundex));
+	save_item(NAME(m_sol_state));
 }
 
 void gts80a_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	m_lamprow = 0;
+	m_swrow = 0;
+	m_segment = 0;
+	m_soundex = 0;
 }
 
-void gts80a_state::init_gts80a()
-{
-}
 
 /* with Sound Board */
 void gts80a_state::gts80a(machine_config &config)
@@ -353,32 +483,29 @@ void gts80a_state::gts80a(machine_config &config)
 	M6502(config, m_maincpu, XTAL(3'579'545)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gts80a_state::gts80a_map);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_gts80a);
 
 	/* Devices */
-	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));
-	riot1.in_pa_callback().set(FUNC(gts80a_state::port1a_r)); // sw_r
-	//riot1.out_pa_callback().set(FUNC(gts80a_state::port1a_w));
-	//riot1.in_pb_callback().set(FUNC(gts80a_state::port1b_r));
-	riot1.out_pb_callback().set(FUNC(gts80a_state::port1b_w)); // sw_w
-	riot1.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+	RIOT6532(config, m_riot1, XTAL(3'579'545)/4);
+	m_riot1->in_pa_callback().set(FUNC(gts80a_state::port1a_r)); // sw_r
+	m_riot1->out_pb_callback().set(FUNC(gts80a_state::port1b_w)); // sw_w
+	m_riot1->irq_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 
-	riot6532_device &riot2(RIOT6532(config, "riot2", XTAL(3'579'545)/4));
-	riot2.in_pa_callback().set(FUNC(gts80a_state::port2a_r)); // pa7 - slam tilt
-	riot2.out_pa_callback().set(FUNC(gts80a_state::port2a_w)); // digit select
-	//riot2.in_pb_callback().set(FUNC(gts80a_state::port2b_r));
-	riot2.out_pb_callback().set(FUNC(gts80a_state::port2b_w)); // seg
-	riot2.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+	RIOT6532(config, m_riot2, XTAL(3'579'545)/4);
+	m_riot2->in_pa_callback().set(FUNC(gts80a_state::port2a_r)); // pa7 - slam tilt
+	m_riot2->out_pa_callback().set(FUNC(gts80a_state::port2a_w)); // digit select
+	m_riot2->out_pb_callback().set(FUNC(gts80a_state::port2b_w)); // seg
+	m_riot2->irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
-	riot6532_device &riot3(RIOT6532(config, "riot3", XTAL(3'579'545)/4));
-	//riot3.in_pa_callback().set(FUNC(gts80a_state::port3a_r));
-	riot3.out_pa_callback().set(FUNC(gts80a_state::port3a_w)); // sol, snd
-	//riot3.in_pb_callback().set(FUNC(gts80a_state::port3b_r));
-	riot3.out_pb_callback().set(FUNC(gts80a_state::port3b_w)); // lamps
-	riot3.irq_callback().set_inputline("maincpu", M6502_IRQ_LINE);
+	RIOT6532(config, m_riot3, XTAL(3'579'545)/4);
+	m_riot3->out_pa_callback().set(FUNC(gts80a_state::port3a_w)); // sol, snd
+	m_riot3->out_pb_callback().set(FUNC(gts80a_state::port3b_w)); // lamps
+	m_riot3->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m6502_device::IRQ_LINE); // wire-or'd
 
 	/* Sound */
 	genpin_audio(config);
@@ -388,17 +515,16 @@ void gts80a_state::gts80a(machine_config &config)
 void gts80a_state::gts80a_s(machine_config &config)
 {
 	gts80a(config);
-	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
-
 
 void gts80a_state::gts80a_ss(machine_config &config)
 {
 	gts80a(config);
-	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
-	//GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
+	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
+//******************* CAVEMAN ****************************************************************
 
 class caveman_state : public gts80a_state
 {
@@ -407,16 +533,14 @@ public:
 		: gts80a_state(mconfig, type, tag)
 		, m_videocpu(*this, "video_cpu")
 		, m_vram(*this, "vram")
-
 	{ }
 
-
-	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void caveman(machine_config &config);
+
+private:
+	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void video_io_map(address_map &map);
 	void video_map(address_map &map);
-private:
 	required_device<cpu_device> m_videocpu;
 	required_shared_ptr<uint8_t> m_vram;
 };
@@ -430,10 +554,10 @@ uint32_t caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind1
 		{
 			uint8_t pix = m_vram[count];
 
-			bitmap.pix(y, x+0) = (pix >> 6)&0x3;
-			bitmap.pix(y, x+1) = (pix >> 4)&0x3;
-			bitmap.pix(y, x+2) = (pix >> 2)&0x3;
-			bitmap.pix(y, x+3) = (pix >> 0)&0x3;
+			bitmap.pix(y, x+0) = BIT(pix, 6, 2);
+			bitmap.pix(y, x+1) = BIT(pix, 4, 2);
+			bitmap.pix(y, x+2) = BIT(pix, 2, 2);
+			bitmap.pix(y, x+3) = BIT(pix, 0, 2);
 
 			count++;
 		}
@@ -826,30 +950,31 @@ ROM_START(touchdn)
 	ROM_LOAD("688-s.snd", 0x0800, 0x0800, CRC(5e9988a6) SHA1(5f531491722d3c30cf4a7c17982813a7c548387a))
 ROM_END
 
+} // Anonymous namespace
 
-/* cust  */GAME( 1981, dvlsdre,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Devil's Dare",                MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1981, dvlsdre2, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Devil's Dare (Sound Only)",   MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1982, rocky,    0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Rocky",                       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1982, rockyf,   rocky,   gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1982, spirit,   0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1982, punk,     0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1983, krullp,   0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, qbquest,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, sorbit,   0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, rflshdlx, 0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME( 1983, goinnuts, 0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, amazonh,  0,       gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, amazonha, amazonh, gts80a_ss, gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, rackempp, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1983, raimfire, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1984, jack2opn, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1984, touchdn,  0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Touchdown",                   MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1984, alienstr, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Alien Star",                  MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1984, thegames, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "The Games",                   MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1984, eldorado, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "El Dorado City of Gold",      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME( 1985, icefever, 0,       gts80a_s,  gts80a, gts80a_state, init_gts80a, ROT0, "Gottlieb", "Ice Fever",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1981, dvlsdre,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Devil's Dare",                MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1981, dvlsdre2, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Devil's Dare (Sound Only)",   MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, rocky,    0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky",                       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, rockyf,   rocky,   gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, spirit,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1982, punk,     0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1982, striker,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1983, krullp,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, qbquest,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, sorbit,   0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, rflshdlx, 0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME( 1983, goinnuts, 0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, amazonh,  0,       gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, amazonha, amazonh, gts80a_ss, gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, rackempp, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1983, raimfire, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, jack2opn, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, touchdn,  0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Touchdown",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, alienstr, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Alien Star",                  MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, thegames, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "The Games",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1984, eldorado, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "El Dorado City of Gold",      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME( 1985, icefever, 0,       gts80a_s,  gts80a, gts80a_state, empty_init, ROT0, "Gottlieb", "Ice Fever",                   MACHINE_IS_SKELETON_MECHANICAL)
 
 /* custom (+video) */
-GAME( 1981, caveman,  0,       caveman, caveman, caveman_state, init_gts80a, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1981, cavemana, caveman, caveman, caveman, caveman_state, init_gts80a, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, caveman,  0,       caveman, caveman, caveman_state, empty_init, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1981, cavemana, caveman, caveman, caveman, caveman_state, empty_init, ROT0, "Gottlieb", "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL)
