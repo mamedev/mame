@@ -464,7 +464,7 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = (spifi_reg.autodata & ADATA_EN) > 0; // TODO: ID check
+            dma_command = false;
             command_pos = 0;
             dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
             check_drq();
@@ -477,9 +477,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            // dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE); // TODO: proper setting of DMA???
-            dma_command = false; // TODO:
-            dma_set(DMA_NONE); // TODO:
+            dma_command = false;
+            dma_set(DMA_NONE);
             check_drq();
             step(false);
             break;
@@ -506,8 +505,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false; // TODO:
-            dma_set(DMA_NONE); // TODO:
+            dma_command = false;
+            dma_set(DMA_NONE);
             check_drq();
             step(false);
             break;
@@ -518,8 +517,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false; // TODO:
-            dma_set(DMA_NONE); // TODO:
+            dma_command = false;
+            dma_set(DMA_NONE);
             check_drq();
             step(false);
             break;
@@ -592,7 +591,6 @@ void spifi3_device::reset_disconnect()
     scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
 
     command_pos = 0;
-    // memset(command, 0, sizeof(command)); TODO: spifi3 equiv
     mode = MODE_D;
 }
 

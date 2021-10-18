@@ -28,7 +28,7 @@ nscsi_cdrom_sgi_device::nscsi_cdrom_sgi_device(const machine_config &mconfig, co
 }
 
 nscsi_cdrom_news_device::nscsi_cdrom_news_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "Sony", "CD-ROM CDU-541", "1.0", 0x00, 0x05)
+	nscsi_cdrom_device(mconfig, NSCSI_CDROM_NEWS, tag, owner, "Sony", "CD-ROM CDU-541", "1.0A", 0x00, 0x05)
 {
 }
 
