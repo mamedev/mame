@@ -197,7 +197,7 @@ void nes_rex_sl1632_device::write_h(offs_t offset, u8 data)
 			case 0x0000:
 			case 0x2000:
 				m_vrc2_prg_bank[BIT(offset, 13)] = data;
-				set_prg(m_prg_base, m_prg_mask);
+				prg8_x(BIT(offset, 13), data);
 				break;
 			case 0x1000:
 				m_mirror[0] = data & 1;
@@ -212,7 +212,7 @@ void nes_rex_sl1632_device::write_h(offs_t offset, u8 data)
 				u8 shift = (offset & 1) << 2;
 				u8 mask = 0x0f << shift;
 				m_vrc2_vrom_bank[bank] = (m_vrc2_vrom_bank[bank] & ~mask) | ((data << shift) & mask);
-				set_chr(m_chr_source, m_chr_base, m_chr_mask);
+				chr_cb(bank, 0, CHRROM);
 				break;
 			}
 		}
