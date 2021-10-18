@@ -537,6 +537,48 @@ void gts80_state::gts80_ss(machine_config &config)
 	GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 0.75);
 }
 
+/* SYSTEM-80 ALTERNATE ROMS =======================================================================
+
+This is a list of known alternate roms. Nothing has been tested. Comments are derived from the roms.
+
+All original games in this driver can be upgraded to 7 digits per player by replacing
+	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
+	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+with
+	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
+	ROM_LOAD("u3g807dc.bin", 0x3000, 0x1000, CRC(6e31242e) SHA1(14e371a0352a6068dec20af1f2b344e34a5b9011))
+
+
+Haunted House
+	ROM_LOAD( "669-3.cpu",    0x1000, 0x0800, CRC(cf178411) SHA1(284e709ff3a569e84d1499a23f41adcbd8553930) )   Hack set 669_3
+	ROM_LOAD( "669-3a.cpu",   0x1000, 0x0800, CRC(effe6851) SHA1(fdf2fdddfebdf9c871d4395c307bf1f3ca2b2d10) )   Hack set 669_3a
+	ROM_LOAD( "669-3b.cpu",   0x1000, 0x0800, CRC(2bfceb85) SHA1(9635cd29d5b53a4641b69f1648c1201924edd486) )   Hack set 669_3b
+	ROM_LOAD( "669-4.cpu",    0x1000, 0x0800, CRC(8724cdf8) SHA1(9c8d7433ea14b8b50014deb7574c9d5043a794cc) )   Hack set 669_4
+	ROM_LOAD( "669-4a.cpu",   0x1000, 0x0800, CRC(7b906d4b) SHA1(b22c5c94e52190fbf514b531674887be42a1f559) )   Hack set 669_4a
+	ROM_LOAD( "669-4b.cpu",   0x1000, 0x0800, CRC(71025a8a) SHA1(5a682a6dbff825217e000df4f824dea6ad89223b) )   Hack set 669_4b
+
+
+Mars, God of War
+	ROM_LOAD("666-2.cpu", 0x1000, 0x0800, CRC(6fb6d10b) SHA1(bd6fcebb52733e56f6fb66ce527cbbe3573b7250))   Hack
+
+
+Panthera
+	ROM_LOAD( "652-1.bin",    0x1000, 0x0200, CRC(0213164b) SHA1(c65c4cb6fb1fbddaf7a09adfd38e984a193219b8) )    'Game Rom 1'
+	ROM_LOAD( "652-2.bin",    0x1200, 0x0200, CRC(bd7bc39f) SHA1(9d0ac37bb3ec8c95990fd37a962a17a95ce97aa0) )    'Game Rom 2'
+
+
+Pink Panther
+	ROM_LOAD( "664_flipprojets.snd",    0x0000, 0x0200, CRC(48aeb325) SHA1(49dae08c635f191841188565bd89f07c4ad44c08) )
+
+
+Spiderman
+	ROM_LOAD( "653.gm",       0x0000, 0x0800, CRC(b2b1514a) SHA1(2f8179d171d411080ed5bc18a6c4c737a45a796c) )
+	ROM_LOAD( "653.snd",      0x0400, 0x0400, CRC(dfa35ede) SHA1(740bf1e02098b85783374c583b88d2fefe98ede4) )
+	ROM_LOAD( "653-cpu3.bin", 0x1000, 0x0800, CRC(10289804) SHA1(13d743ce3f97ffc99470dd9b612836c98034e919) )
+	ROM_LOAD( "653cpu3a.bin", 0x1000, 0x0800, CRC(b2b1514a) SHA1(2f8179d171d411080ed5bc18a6c4c737a45a796c) )
+
+*/
+
 /*-------------------------------------------------------------------
 / Black Hole #668
 /-------------------------------------------------------------------*/
@@ -748,20 +790,6 @@ ROM_START(panthera)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
-#ifdef MISSING_GAME // all missing games are using a similar set of ROMs.
-ROM_START(panther7)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
-	ROM_LOAD("u3g807dc.bin", 0x3000, 0x1000, CRC(6e31242e) SHA1(14e371a0352a6068dec20af1f2b344e34a5b9011))
-	ROM_LOAD("652.cpu", 0x1000, 0x0800, CRC(5386e5fb) SHA1(822f47951b702f9c6a1ce674baaab0a596f34413))
-
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
-	ROM_LOAD("652.snd", 0x0400, 0x0400, CRC(4d0cf2c0) SHA1(0da5d118ffd19b1e78dfaaee3e31c43750d45c8d))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
-ROM_END
-#endif
-
 ROM_START(grand8)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
@@ -788,20 +816,6 @@ ROM_START(pnkpnthr)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
 
-#ifdef MISSING_GAME // all missing games are using a similar set of ROMs.
-ROM_START(pnkpntr7)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
-	ROM_LOAD("u3g807dc.bin", 0x3000, 0x1000, CRC(6e31242e) SHA1(14e371a0352a6068dec20af1f2b344e34a5b9011))
-	ROM_LOAD("664-1.cpu", 0x1000, 0x0800, CRC(a0d3e69a) SHA1(590e68dc28067e61832927cd4b3eefcc066f0a92))
-
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
-	ROM_LOAD("664.snd", 0x0400, 0x0400, CRC(18f4abfd) SHA1(9e85eb7e9b1e2fe71be828ff1b5752424ed42588))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
-ROM_END
-#endif
-
 /*-------------------------------------------------------------------
 / Star Race #657
 /-------------------------------------------------------------------*/
@@ -819,23 +833,6 @@ ROM_START(starrace)
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
 ROM_END
-
-#ifdef MISSING_GAME // all missing games are using a similar set of ROMs.
-ROM_START(starrac7)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2g807dc.bin", 0x2000, 0x1000, CRC(f8a687b3) SHA1(ba7747c04a5967df760ace102e47c91d42e07a12))
-	ROM_LOAD("u3g807dc.bin", 0x3000, 0x1000, CRC(6e31242e) SHA1(14e371a0352a6068dec20af1f2b344e34a5b9011))
-	ROM_LOAD("657-1.cpu", 0x1000, 0x0200, CRC(27081372) SHA1(2d9cd81ffa44c389c4895043fa1e93b899544158))
-	ROM_RELOAD(0x1400, 0x0200)
-	ROM_LOAD("657-2.cpu", 0x1200, 0x0200, CRC(c56e31c8) SHA1(1e129fb6309e015a16f2bdb1e389cbc85d1919a7))
-	ROM_RELOAD(0x1600, 0x0200)
-
-	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
-	ROM_LOAD("657.snd", 0x0400, 0x0400, CRC(3a1d3995) SHA1(6f0bdb34c4fa11d5f8ecbb98ae55bafeb5d62c9e))
-	ROM_RELOAD( 0x0800, 0x0400)
-	ROM_LOAD("6530sy80.bin", 0x0c00, 0x0400, CRC(c8ba951d) SHA1(e4aa152b36695a0205c19a8914e4d77373f64c6c))
-ROM_END
-#endif
 
 /*-------------------------------------------------------------------
 / The Amazing Spider-Man #653
@@ -858,7 +855,7 @@ ROM_END
 /*-------------------------------------------------------------------
 / The Incredible Hulk (#500)
 /-------------------------------------------------------------------*/
-// Prototypes to test System 80 before production.
+// Prototype to test System 80 before production.
 
 /*-------------------------------------------------------------------
 / Time Line #659
