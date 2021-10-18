@@ -30,6 +30,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank);
 
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
+	typedef device_delegate<u16(int, u8)> c355_obj_entry_attr_delegate;
+	typedef device_delegate<u16(int)> c355_obj_entry_delegate;
+
 	void set_tile_callback(c355_obj_code2tile_delegate cb)
 	{
 		if (!cb.isnull())
@@ -55,6 +58,13 @@ protected:
 	virtual void device_stop() override;
 
 	c355_obj_code2tile_delegate m_code2tile;
+
+	c355_obj_entry_delegate m_read_spritetile;
+	c355_obj_entry_attr_delegate m_read_spriteformat;
+	c355_obj_entry_attr_delegate m_read_spritetable;
+	c355_obj_entry_attr_delegate m_read_cliptable;
+	c355_obj_entry_delegate m_read_spritelist;
+
 
 	u16 read_spritetile(int entry);
 	u16 read_spriteformat(int entry, u8 attr);

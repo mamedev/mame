@@ -33,6 +33,11 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	device_video_interface(mconfig, *this),
+	m_read_spritetile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetile)),
+	m_read_spriteformat(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spriteformat)),
+	m_read_spritetable(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetable)),
+	m_read_cliptable(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_cliptable)),
+	m_read_spritelist(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritelist)),
 	m_palxor(0),
 	m_buffer(0),
 	m_external_prifill(false),
@@ -296,6 +301,12 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 
 void namco_c355spr_device::device_start()
 {
+	m_read_spritetile.resolve();
+	m_read_spriteformat.resolve();
+	m_read_spritetable.resolve();
+	m_read_cliptable.resolve();
+	m_read_spritelist.resolve();
+
 	screen().register_screen_bitmap(m_tempbitmap);
 	screen().register_screen_bitmap(m_screenbitmap);
 	gfx_layout obj_layout =
@@ -591,17 +602,17 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	const u16 palette = read_spritetable(which, 6);
+	const u16 palette = m_read_spritetable(which, 6);
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
-	const u16 spriteformatram_offset = read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
-	sprite_ptr->offset = read_spritetable(which, 1);         /* OFFSET */
-	int hpos           = read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
-	/* read_spritetable(which, 6)  contains priority/palette */
-	/* read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
+	const u16 spriteformatram_offset = m_read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = m_read_spritetable(which, 1);         /* OFFSET */
+	int hpos           = m_read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = m_read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = m_read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = m_read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
+	/* m_read_spritetable(which, 6)  contains priority/palette */
+	/* m_read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
 
 	int xscroll = (s16)m_position[1];
 	int yscroll = (s16)m_position[0];
@@ -629,15 +640,15 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 	hpos -= xscroll;
 	vpos -= yscroll;
 	int clipentry = (palette >> 8) & 0xf;
-	clip.set(read_cliptable(clipentry, 0) - xscroll, read_cliptable(clipentry, 1) - xscroll, read_cliptable(clipentry, 2) - yscroll, read_cliptable(clipentry, 3) - yscroll);
+	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
 	sprite_ptr->clip = clip;
 	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
 	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
 
-	int tile_index   = read_spriteformat(spriteformatram_offset, 0);
-	const u16 format = read_spriteformat(spriteformatram_offset, 1);
-	int dx           = read_spriteformat(spriteformatram_offset, 2); // should this also be masked and have a sign bit like dy?
-	const int dy     = read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
+	int tile_index   = m_read_spriteformat(spriteformatram_offset, 0);
+	const u16 format = m_read_spriteformat(spriteformatram_offset, 1);
+	int dx           = m_read_spriteformat(spriteformatram_offset, 2); // should this also be masked and have a sign bit like dy?
+	const int dy     = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
 	int num_cols     = (format >> 4) & 0xf;
 	int num_rows     = (format) & 0xf;
 
@@ -709,7 +720,7 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 			{
 				x -= tile_screen_width;
 			}
-			const u16 tile = read_spritetile(tile_index++);
+			const u16 tile = m_read_spritetile(tile_index++);
 			sprite_ptr->tile[ind] = tile;
 			if ((tile & 0x8000) == 0)
 			{
@@ -748,7 +759,7 @@ void namco_c355spr_device::get_list(int no)
 	for (int i = 0; i < 256; i++)
 	{
 		sprite_ptr->disable = false;
-		const u16 which = read_spritelist(i);
+		const u16 which = m_read_spritelist(i);
 		get_single_sprite(which & 0xff, sprite_ptr);
 		sprite_ptr++;
 		if (which & 0x100) break;
@@ -925,12 +936,18 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		fx = spritedata[offs + 4] & 0x8000;
 		fy = spritedata[offs + 5] & 0x8000;
 
-		int lookupram_offset = spriteformat[(spriteformatram_offset << 2) + 0] & 0x1fff;
+		int lookupram_offset = spriteformat[(spriteformatram_offset << 2) + 0] & 0x3fff;
 
-		if (spriteformat[(spriteformatram_offset << 2) + 0] & 0x2000)
+		if (lookupram_offset & 0x2000)
+		{
 			spritetile = spritetile_ram1;
+			lookupram_offset &= 0x1fff;
+		}
 		else
+		{
 			spritetile = spritetile_ram0;
+			lookupram_offset &= 0x1fff;
+		}
 
 		zoomx = hsize * 0x10000 / (w * 16);
 		zoomy = vsize * 0x10000 / (h * 16);
