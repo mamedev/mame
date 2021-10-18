@@ -75216,7 +75216,7 @@ Other
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sl1632" />
-			<feature name="pcb" value="UNL-SL1632" />
+			<feature name="pcb" value="UNL-SL1632" /> <!-- Is this really found on this PCB? It doesn't seem to use the MMC3 mode at all. -->
 			<dataarea name="chr" size="131072">
 				<rom name="super mario bros. 13 (unl) [u].chr" size="131072" crc="e6498f3a" sha1="0f86081103d9fc270b280c9c00913031ea0a2f86" offset="00000" status="baddump" />
 			</dataarea>
@@ -78235,9 +78235,10 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="wushihun2" cloneof="wushihun">
-		<description>Wu Shi Hun (Asia, Alt 2)</description>
-		<year>19??</year>
+		<description>Wǔshì Hún (Asia, alt 2)</description>
+		<year>1995?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="武士魂"/>
 		<info name="alt_title" value="Samurai Spirits"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -78252,9 +78253,10 @@ be better to redump them properly. -->
 	</software>
 
 	<software name="wushihun1" cloneof="wushihun">
-		<description>Wu Shi Hun (Asia, Alt)</description>
-		<year>19??</year>
+		<description>Wǔshì Hún (Asia, alt)</description>
+		<year>1995?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="武士魂"/>
 		<info name="alt_title" value="Samurai Spirits"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
@@ -78268,10 +78270,11 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="wushihun" supported="partial">
-		<description>Wu Shi Hun (Asia)</description>
-		<year>19??</year>
+	<software name="wushihun">
+		<description>Wǔshì Hún (Asia)</description>
+		<year>1995?</year>
 		<publisher>Rex Soft</publisher>
+		<info name="alt_title" value="武士魂"/>
 		<info name="alt_title" value="Samurai Spirits"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sl1632" />
