@@ -218,7 +218,7 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag)
-		, m_sprgenzoom(*this, "spritegen_zoom")
+		, m_sprgenzoom(*this, "c355spr")
 		, m_spriteram(*this, "spriteram")
 		, m_sprite_layout_ram(*this, "lay%u", 0)
 		, m_sprite_lookup_ram(*this, "look%u", 0)
@@ -277,7 +277,7 @@ private:
 
 	virtual void video_start() override;
 
-	u32 sprite_bank_callback(u32 sprite);
+	int sprite_bank_callback(int sprite);
 
 	void expand_sprite_data();
 	void dragngun_init_common();

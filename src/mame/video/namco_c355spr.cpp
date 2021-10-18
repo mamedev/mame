@@ -29,20 +29,27 @@
 DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco 186/187 or C355 (Sprites)")
 DEFINE_DEVICE_TYPE(DECO_ZOOMSPR, deco_zoomspr_device, "deco_zoomspr", "Namco 186/187 or C355 (Sprites) (Dragon Gun)")
 
-namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, NAMCO_C355SPR, tag, owner, clock),
+namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	device_video_interface(mconfig, *this),
 	m_palxor(0),
 	m_buffer(0),
 	m_external_prifill(false),
 	m_gfx_region(*this, DEVICE_SELF),
-	m_colbase(0)
+	m_colbase(0),
+	m_colors(16),
+	m_granularity(256)
 {
 	std::fill(std::begin(m_position), std::end(m_position), 0);
 	std::fill(std::begin(m_scrolloffs), std::end(m_scrolloffs), 0);
 	for (int i = 0; i < 2; i++)
 		m_spriteram[i] = nullptr;
+}
+
+namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	namco_c355spr_device(mconfig, NAMCO_C355SPR, tag, owner, clock)
+{
 }
 
 
@@ -312,7 +319,8 @@ void namco_c355spr_device::device_start()
 		std::fill_n(m_spriteram[i].get(), 0x20000/2, 0);
 		save_pointer(NAME(m_spriteram[i]), 0x20000/2, i);
 	}
-	set_gfx(0, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfx_region->base(), 0, 0x10, m_colbase));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfx_region->base(), 0, m_colors, m_colbase));
+	gfx(0)->set_granularity(m_granularity);
 
 	save_item(NAME(m_position));
 }
@@ -641,19 +649,8 @@ WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 
 
 deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO_ZOOMSPR, tag, owner, clock)
+	: namco_c355spr_device(mconfig, DECO_ZOOMSPR, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
-	, m_spritebank_cb(*this, DEVICE_SELF, FUNC(deco_zoomspr_device::tile_callback_noindirect))
-{
-}
-
-void deco_zoomspr_device::device_start()
-{
-	// bind our handler
-	m_spritebank_cb.resolve();
-}
-
-void deco_zoomspr_device::device_reset()
 {
 }
 
@@ -686,7 +683,7 @@ inline void deco_zoomspr_device::dragngun_drawgfxzoom(
 	{
 		if( gfx )
 		{
-			const pen_t *pal = &m_gfxdecode->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
+			const pen_t *pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const uint8_t *code_base = gfx->get_data(code % gfx->elements());
 
 			if (sprite_screen_width && sprite_screen_height)
@@ -965,8 +962,8 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 				lookupram_offset++;
 
 				dragngun_drawgfxzoom(
-					bitmap, cliprect, m_gfxdecode->gfx(3),
-					m_spritebank_cb(sprite),
+					bitmap, cliprect, gfx(0),
+					m_code2tile(sprite),
 					colour,
 					fx, fy,
 					xpos >> 16, ypos >> 16,

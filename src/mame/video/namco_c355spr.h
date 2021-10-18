@@ -8,8 +8,6 @@
 
 #include "screen.h"
 
-typedef device_delegate<uint32_t (uint32_t)> sprite_bank_delegate;
-
 class namco_c355spr_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
@@ -22,6 +20,8 @@ public:
 	void set_palxor(int palxor) { m_palxor = palxor; }
 	void set_buffer(int buffer) { m_buffer = buffer; }
 	void set_external_prifill(bool external) { m_external_prifill = external; }
+	void set_colors(int colors) { m_colors = colors; }
+	void set_granularity(int granularity) { m_granularity = granularity; }
 
 	u16 spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -48,9 +48,13 @@ public:
 	bitmap_ind16 &screen_bitmap() { return m_screenbitmap; }
 
 protected:
+	namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_stop() override;
+
+	c355_obj_code2tile_delegate m_code2tile;
 
 private:
 
@@ -85,7 +89,6 @@ private:
 
 	std::unique_ptr<c355_sprite []> m_spritelist[2];
 	const c355_sprite *m_sprite_end[2];
-	c355_obj_code2tile_delegate m_code2tile;
 	int m_palxor;
 	u16 m_position[4];
 	std::unique_ptr<u16 []> m_spriteram[2];
@@ -99,10 +102,12 @@ private:
 
 	required_memory_region m_gfx_region;
 	u16 m_colbase;
+	int m_colors;
+	int m_granularity;
 };
 
 
-class deco_zoomspr_device : public device_t
+class deco_zoomspr_device : public namco_c355spr_device
 {
 public:
 	deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -111,11 +116,7 @@ public:
 
 	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* dragngun_sprite_layout_0_ram, uint32_t* dragngun_sprite_layout_1_ram, uint32_t* dragngun_sprite_lookup_0_ram, uint32_t* dragngun_sprite_lookup_1_ram, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
-	template <typename... T> void set_spritebank_cb(T &&... args) { m_spritebank_cb.set(std::forward<T>(args)...); }
-
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
 
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -126,10 +127,6 @@ private:
 		int transparent_color,
 		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height, uint8_t alpha, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
 		int priority);
-
-	uint32_t tile_callback_noindirect(uint32_t tile) { return tile; }
-	sprite_bank_delegate m_spritebank_cb;
-
 };
 
 // device type definition

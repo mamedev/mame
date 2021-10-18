@@ -1207,8 +1207,8 @@ extern void process_dvi_data(device_t *device,u8* dvi_data, int offset, int regi
 
 void dragngun_state::expand_sprite_data()
 {
-	u8 *rom = memregion("gfx4")->base();
-	size_t len = memregion("gfx4")->bytes();
+	u8 *rom = memregion("c355spr")->base();
+	size_t len = memregion("c355spr")->bytes();
 
 	for (int i = 0; i < len / 2; i++)
 	{
@@ -1220,7 +1220,7 @@ void dragngun_state::expand_sprite_data()
 
 
 
-u32 dragngun_state::sprite_bank_callback(u32 sprite)
+int dragngun_state::sprite_bank_callback(int sprite)
 {
 	/* High bits of the sprite reference into the sprite control bits for banking */
 	switch (sprite & 0x3000) {
@@ -1850,17 +1850,6 @@ static const gfx_layout tilelayout_5bpp =
 	16*16*5
 };
 
-static const gfx_layout spritelayout5 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(4,1) },
-	{ STEP16(0,8) },
-	{ STEP16(0,16*8) },
-	16*16*8
-};
-
 static GFXDECODE_START( gfx_captaven )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 ) /* Tiles 16x16 */
@@ -1879,7 +1868,6 @@ static GFXDECODE_START( gfx_dragngun )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 64 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp, 0,  8 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,   0, 32 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_nslasher )
@@ -2145,7 +2133,10 @@ void dragngun_state::dragngun(machine_config &config)
 
 	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
-	m_sprgenzoom->set_spritebank_cb(FUNC(dragngun_state::sprite_bank_callback));
+	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
+	m_sprgenzoom->set_palette(m_palette);
+	m_sprgenzoom->set_colors(32);
+	m_sprgenzoom->set_granularity(16);
 
 	// I750, these aren't emulated
 	//I82750PB(config, m_i82750pb, XTAL(25'000'000));
@@ -2272,7 +2263,10 @@ void dragngun_state::lockload(machine_config &config)
 
 	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
-	m_sprgenzoom->set_spritebank_cb(FUNC(dragngun_state::sprite_bank_callback));
+	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
+	m_sprgenzoom->set_palette(m_palette);
+	m_sprgenzoom->set_colors(32);
+	m_sprgenzoom->set_granularity(16);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -2921,7 +2915,7 @@ ROM_START( dragngun )
 	ROM_CONTINUE(            0x2c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x3c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000*2, "gfx4", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mar-15.bin", 0x000000, 0x100000,  CRC(ec976b20) SHA1(c120b3c56d5e02162e41dc7f726c260d0f8d2f1a) )
 	ROM_LOAD32_BYTE( "mar-13.bin", 0x000001, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
 	ROM_LOAD32_BYTE( "mar-11.bin", 0x000002, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
@@ -3001,7 +2995,7 @@ ROM_START( dragngunj )
 	ROM_CONTINUE(            0x2c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x3c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000*2, "gfx4", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mar-15.bin", 0x000000, 0x100000,  CRC(ec976b20) SHA1(c120b3c56d5e02162e41dc7f726c260d0f8d2f1a) )
 	ROM_LOAD32_BYTE( "mar-13.bin", 0x000001, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
 	ROM_LOAD32_BYTE( "mar-11.bin", 0x000002, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
@@ -3436,7 +3430,7 @@ ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly d
 	ROM_CONTINUE(            0x5c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x7c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000*2, "gfx4", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000000, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
 	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
@@ -3505,7 +3499,7 @@ ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly di
 	ROM_CONTINUE(            0x5c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x7c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000*2, "gfx4", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000000, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
 	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
@@ -3574,7 +3568,7 @@ ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragon
 	ROM_CONTINUE(            0x5c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x7c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000*2, "gfx4", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000000, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
 	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
 	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
