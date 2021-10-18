@@ -23,6 +23,12 @@ public:
 	void set_colors(int colors) { m_colors = colors; }
 	void set_granularity(int granularity) { m_granularity = granularity; }
 
+	template <typename... T> void set_read_spritetile(T &&... args) { m_read_spritetile.set(std::forward<T>(args)...); }
+	template <typename... T> void set_read_spriteformat(T &&... args) { m_read_spriteformat.set(std::forward<T>(args)...); }
+	template <typename... T> void set_read_spritetable(T &&... args) { m_read_spritetable.set(std::forward<T>(args)...); }
+	template <typename... T> void set_read_cliptable(T &&... args) { m_read_cliptable.set(std::forward<T>(args)...); }
+	template <typename... T> void set_read_spritelist(T &&... args) { m_read_spritelist.set(std::forward<T>(args)...); }
+
 	u16 spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 position_r(offs_t offset);
@@ -132,7 +138,7 @@ public:
 
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
-	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, uint32_t* spritetile_ram0, uint32_t* spritetile_ram1, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
 

@@ -278,6 +278,7 @@ private:
 	virtual void video_start() override;
 
 	int sprite_bank_callback(int sprite);
+	u16 read_spritetile(int lookupram_offset);
 
 	void expand_sprite_data();
 	void dragngun_init_common();

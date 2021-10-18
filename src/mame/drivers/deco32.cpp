@@ -2141,6 +2141,8 @@ void dragngun_state::dragngun(machine_config &config)
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_colors(32);
 	m_sprgenzoom->set_granularity(16);
+	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
+
 
 	// I750, these aren't emulated
 	//I82750PB(config, m_i82750pb, XTAL(25'000'000));

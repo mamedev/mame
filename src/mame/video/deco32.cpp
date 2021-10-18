@@ -176,6 +176,18 @@ u32 captaven_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+u16 dragngun_state::read_spritetile(int lookupram_offset)
+{
+	if (lookupram_offset & 0x2000)
+	{
+		return m_sprite_spritetile[1][lookupram_offset&0x1fff];
+	}
+	else
+	{
+		return m_sprite_spritetile[0][lookupram_offset&0x1fff];
+	}
+}
+
 u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
@@ -200,7 +212,7 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
 
-		m_sprgenzoom->dragngun_draw_sprites(screen,bitmap,clip,m_spriteram->buffer(), m_sprite_spriteformat[0], m_sprite_spriteformat[1], m_sprite_spritetile[0], m_sprite_spritetile[1], screen.priority(), m_temp_render_bitmap);
+		m_sprgenzoom->dragngun_draw_sprites(screen,bitmap,clip,m_spriteram->buffer(), m_sprite_spriteformat[0], m_sprite_spriteformat[1], screen.priority(), m_temp_render_bitmap);
 
 	}
 

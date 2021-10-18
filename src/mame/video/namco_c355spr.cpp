@@ -832,10 +832,9 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 }
 
 
-void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, uint32_t* spritetile_ram0, uint32_t* spritetile_ram1, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
 	const uint32_t* spriteformat;
-	const uint32_t* spritetile;
 	int offs;
 	temp_bitmap.fill(0x00000000, cliprect);
 
@@ -938,16 +937,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 
 		int lookupram_offset = spriteformat[(spriteformatram_offset << 2) + 0] & 0x3fff;
 
-		if (lookupram_offset & 0x2000)
-		{
-			spritetile = spritetile_ram1;
-			lookupram_offset &= 0x1fff;
-		}
-		else
-		{
-			spritetile = spritetile_ram0;
-			lookupram_offset &= 0x1fff;
-		}
+
 
 		zoomx = hsize * 0x10000 / (w * 16);
 		zoomy = vsize * 0x10000 / (h * 16);
@@ -966,7 +956,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 
 			for (x = 0; x < w; x++)
 			{
-				int sprite = spritetile[lookupram_offset] & 0x3fff;
+				int sprite = m_read_spritetile(lookupram_offset) & 0x3fff;
 
 				lookupram_offset++;
 
