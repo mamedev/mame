@@ -2138,6 +2138,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Gameplay screen blacks out randomly -->
 	<!-- ATK test: OK -->
 	<software name="amigakar" supported="no">
 		<!-- SPS (CAPS) release 45 -->
@@ -4798,7 +4799,6 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Most gameplay SFXs gets cut off [Paula] -->
 	<!-- ATK test: failed -->
 	<software name="battlesq" supported="partial">
 		<!-- SPS (CAPS) release 941 -->
@@ -4994,7 +4994,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- intro BGM hiccups [Paula] -->
+	<!-- boots in a500p only, [FDC]? -->
 	<!-- Has transparent stripes all over the place during intro [copper] -->
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="bchvolly" supported="partial">
@@ -28116,7 +28116,6 @@ license:CC0
 
 	<!-- Garbage on language screen select then black screen [FDC] copy protection check at PC=243AC (enables 68k trace mode) -->
 	<!-- Ocean logo has serious pitch issues -->
-	<!-- [Paula] BGM channels often doesn't playback -->
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="lostpatr" supported="no">
 		<!-- SPS (CAPS) release 773 -->
@@ -33448,7 +33447,6 @@ license:CC0
 	</software>
 
 	<!-- black screen [FDC] dsksync -->
-	<!-- Gameplay BGM gets cut off [Paula] -->
 	<!-- ATK test: failed -->
 	<software name="pang" supported="no">
 		<!-- SPS (CAPS) release 929 -->
@@ -49531,8 +49529,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- AI does not work on a500p (btanb?) -->
 	<!-- ATK test: OK -->
-	<software name="waylildr" supported="no">
+	<software name="waylildr" supported="partial">
 		<!-- SPS (CAPS) release 2096 -->
 		<description>The Way of the Little Dragon (Euro)</description>
 		<!-- retail, standalone -->
@@ -49964,6 +49963,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Ocean</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2654)wildwheels.ipf" size="1049180" crc="274020f5" sha1="9a2fdada1af9b804ca4f0bc8499a023fb04259c1"/>
@@ -50725,6 +50726,7 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="Sports manual copy-protection (Course Names)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps752)worldtourgolf.ipf" size="1049612" crc="f48fabed" sha1="3b4c4a5e1e7be30521fa00cbc7a4ed7564ae8c85"/>
@@ -50900,8 +50902,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="xit" supported="no">
+	<software name="xit" supported="yes">
 		<!-- SPS (CAPS) release 1585 -->
 		<description>X-It (Euro)</description>
 		<!-- retail, standalone -->
