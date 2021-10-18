@@ -59,6 +59,8 @@ protected:
 	u16 read_spritetile(int entry);
 	u16 read_spriteformat(int entry, u8 attr);
 	u16 read_spritetable(int entry, u8 attr);
+	u16 read_cliptable(int entry, u8 attr);
+	u16 read_spritelist(int entry);
 
 private:
 

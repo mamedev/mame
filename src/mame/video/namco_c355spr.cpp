@@ -570,10 +570,20 @@ u16 namco_c355spr_device::read_spritetable(int entry, u8 attr)
 	return m_pSpriteTable[(entry << 3) + attr];
 }
 
+u16 namco_c355spr_device::read_cliptable(int entry, u8 attr)
+{
+	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
+	const u16 *pWinAttr = &spriteram16[0x2400 / 2];
+	return pWinAttr[(entry << 2) + attr];
+}
+
+u16 namco_c355spr_device::read_spritelist(int entry)
+{
+	return m_pSpriteList16[entry];
+}
 
 void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 {
-	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
 	rectangle clip;
 
 	/**
@@ -581,7 +591,7 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	const u16 palette = m_pSpriteTable[(which*8)+6];
+	const u16 palette = read_spritetable(which, 6);
 	sprite_ptr->pri = ((palette >> 4) & 0xf);
 
 	const u16 spriteformatram_offset = read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
@@ -618,8 +628,8 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 
 	hpos -= xscroll;
 	vpos -= yscroll;
-	const u16 *pWinAttr = &spriteram16[0x2400 / 2 + ((palette >> 8) & 0xf) * 4];
-	clip.set(pWinAttr[0] - xscroll, pWinAttr[1] - xscroll, pWinAttr[2] - yscroll, pWinAttr[3] - yscroll);
+	int clipentry = (palette >> 8) & 0xf;
+	clip.set(read_cliptable(clipentry, 0) - xscroll, read_cliptable(clipentry, 1) - xscroll, read_cliptable(clipentry, 2) - yscroll, read_cliptable(clipentry, 3) - yscroll);
 	sprite_ptr->clip = clip;
 	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
 	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
@@ -738,7 +748,7 @@ void namco_c355spr_device::get_list(int no)
 	for (int i = 0; i < 256; i++)
 	{
 		sprite_ptr->disable = false;
-		const u16 which = m_pSpriteList16[i];
+		const u16 which = read_spritelist(i);
 		get_single_sprite(which & 0xff, sprite_ptr);
 		sprite_ptr++;
 		if (which & 0x100) break;
