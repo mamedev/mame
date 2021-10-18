@@ -378,7 +378,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	if (name[0] != 0)
 		m_console.source_script(name);
 
-	m_cheat.cpu[0] = m_cheat.cpu[1] = 0;
+	m_cheat.space = nullptr;
 }
 
 
@@ -2859,82 +2859,84 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 
 void debugger_commands::execute_cheatrange(bool init, const std::vector<std::string> &params)
 {
-	cheat_region_map cheat_region[100];
-	memset(cheat_region, 0, sizeof(cheat_region));
-
-	// validate parameters
-	address_space *space;
-	if (!validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
+	address_space *space = m_cheat.space;
+	if (!space && !init)
+	{
+		m_console.printf("Use cheatinit before cheatrange\n");
 		return;
+	}
 
+	u8 width = (space || !init) ? m_cheat.width : 1;
+	bool signed_cheat = (space || !init) ? m_cheat.signed_cheat : false;
+	bool swapped_cheat = (space || !init) ? m_cheat.swapped_cheat : false;
 	if (init)
 	{
-		m_cheat.width = 1;
-		m_cheat.signed_cheat = false;
-		m_cheat.swapped_cheat = false;
+		// first argument is sign/size/swap flags
 		if (!params.empty())
 		{
-			char const *srtpnt = params[0].c_str();
-
-			char sspec = std::tolower((unsigned char)*srtpnt);
-			if (sspec == 's')
-				m_cheat.signed_cheat = true;
-			else if (sspec == 'u')
-				m_cheat.signed_cheat = false;
-			else
+			std::string const &srtpnt = params[0];
+			if (!srtpnt.empty())
 			{
-				m_console.printf("Invalid sign: expected s or u\n");
-				return;
+				width = 1;
+				signed_cheat = false;
+				swapped_cheat = false;
 			}
 
-			char wspec = std::tolower((unsigned char)*(++srtpnt));
-			if (wspec == 'b')
-				m_cheat.width = 1;
-			else if (wspec == 'w')
-				m_cheat.width = 2;
-			else if (wspec == 'd')
-				m_cheat.width = 4;
-			else if (wspec == 'q')
-				m_cheat.width = 8;
-			else
+			if (srtpnt.length() >= 1)
 			{
-				m_console.printf("Invalid width: expected b, w, d or q\n");
-				return;
+				char const sspec = std::tolower((unsigned char)srtpnt[0]);
+				if (sspec == 's')
+					signed_cheat = true;
+				else if (sspec == 'u')
+					signed_cheat = false;
+				else
+				{
+					m_console.printf("Invalid sign: expected s or u\n");
+					return;
+				}
 			}
 
-			if (std::tolower((unsigned char)*(++srtpnt)) == 's')
-				m_cheat.swapped_cheat = true;
-			else
-				m_cheat.swapped_cheat = false;
+			if (srtpnt.length() >= 2)
+			{
+				char const wspec = std::tolower((unsigned char)srtpnt[1]);
+				if (wspec == 'b')
+					width = 1;
+				else if (wspec == 'w')
+					width = 2;
+				else if (wspec == 'd')
+					width = 4;
+				else if (wspec == 'q')
+					width = 8;
+				else
+				{
+					m_console.printf("Invalid width: expected b, w, d or q\n");
+					return;
+				}
+			}
+
+			if (srtpnt.length() >= 3)
+			{
+				if (std::tolower((unsigned char)srtpnt[2]) == 's')
+					swapped_cheat = true;
+				else
+				{
+					m_console.printf("Invalid swap: expected s\n");
+					return;
+				}
+			}
 		}
+
+		// fourth argument is device/space
+		if (!validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
+			return;
 	}
 
-	// initialize entire memory by default
-	u64 length = 0;
-	u8 region_count = 0;
-	if (params.size() <= 1)
-	{
-		for (address_map_entry &entry : space->map()->m_entrylist)
-		{
-			cheat_region[region_count].offset = entry.m_addrstart & space->addrmask();
-			cheat_region[region_count].endoffset = entry.m_addrend & space->addrmask();
-			cheat_region[region_count].share = entry.m_share;
-			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? false : true;
-
-			// disable double share regions
-			if (entry.m_share != nullptr)
-				for (u8 i = 0; i < region_count; i++)
-					if (cheat_region[i].share != nullptr)
-						if (strcmp(cheat_region[i].share, entry.m_share) == 0)
-							cheat_region[region_count].disabled = true;
-
-			region_count++;
-		}
-	}
-	else
+	cheat_region_map cheat_region[100]; // FIXME: magic number
+	unsigned region_count = 0;
+	if (params.size() >= (init ? 3 : 2))
 	{
 		// validate parameters
-		u64 offset;
+		u64 offset, length;
 		if (!validate_number_parameter(params[init ? 1 : 0], offset))
 			return;
 		if (!validate_number_parameter(params[init ? 2 : 1], length))
@@ -2947,61 +2949,76 @@ void debugger_commands::execute_cheatrange(bool init, const std::vector<std::str
 		cheat_region[region_count].disabled = false;
 		region_count++;
 	}
+	else
+	{
+		// initialize to entire memory by default
+		for (address_map_entry &entry : space->map()->m_entrylist)
+		{
+			cheat_region[region_count].offset = entry.m_addrstart & space->addrmask();
+			cheat_region[region_count].endoffset = entry.m_addrend & space->addrmask();
+			cheat_region[region_count].share = entry.m_share;
+			cheat_region[region_count].disabled = entry.m_write.m_type != AMH_RAM;
+
+			// disable duplicate share regions
+			if (entry.m_share)
+				for (unsigned i = 0; i < region_count; i++)
+					if (cheat_region[i].share && !strcmp(cheat_region[i].share, entry.m_share))
+						cheat_region[region_count].disabled = true;
+
+			if (!cheat_region[region_count].disabled)
+				region_count++;
+		}
+	}
 
 	// determine the writable extent of each region in total
 	u64 real_length = 0;
-	for (u8 i = 0; i < region_count; i++)
-		if (!cheat_region[i].disabled)
-			for (u64 curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += m_cheat.width)
-				if (cheat_address_is_valid(*space, curaddr))
-					real_length++;
+	for (unsigned i = 0; i < region_count; i++)
+		for (u64 curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += width)
+			if (cheat_address_is_valid(*space, curaddr))
+				real_length++;
 
-	if (real_length == 0)
+	if (!real_length)
 	{
 		m_console.printf("No writable bytes found in this area\n");
 		return;
 	}
 
-	u32 active_cheat = 0;
+	size_t active_cheat = 0;
 	if (init)
 	{
 		// initialize new cheat system
-		m_cheat.cheatmap.resize(real_length);
+		m_cheat.space = space;
+		m_cheat.width = width;
 		m_cheat.undo = 0;
-		m_cheat.cpu[0] = params.size() > 3 ? params[3][0] : '0';
+		m_cheat.signed_cheat = signed_cheat;
+		m_cheat.swapped_cheat = swapped_cheat;
 	}
 	else
 	{
-		// add range to cheat system
-		if (m_cheat.cpu[0] == 0)
-		{
-			m_console.printf("Use cheatinit before cheatrange\n");
-			return;
-		}
-
-		if (!validate_device_space_parameter(m_cheat.cpu, -1, space))
-			return;
-
 		active_cheat = m_cheat.cheatmap.size();
-		m_cheat.cheatmap.resize(m_cheat.cheatmap.size() + real_length);
 	}
+	m_cheat.cheatmap.resize(active_cheat + real_length);
 
 	// initialize cheatmap in the selected space
-	for (u8 i = 0; i < region_count; i++)
-		if (!cheat_region[i].disabled)
-			for (u64 curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += m_cheat.width)
-				if (cheat_address_is_valid(*space, curaddr))
-				{
-					m_cheat.cheatmap[active_cheat].previous_value = cheat_read_extended(&m_cheat, *space, curaddr);
-					m_cheat.cheatmap[active_cheat].first_value = m_cheat.cheatmap[active_cheat].previous_value;
-					m_cheat.cheatmap[active_cheat].offset = curaddr;
-					m_cheat.cheatmap[active_cheat].state = 1;
-					m_cheat.cheatmap[active_cheat].undo = 0;
-					active_cheat++;
-				}
+	for (unsigned i = 0; i < region_count; i++)
+		for (u64 curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += width)
+			if (cheat_address_is_valid(*space, curaddr))
+			{
+				m_cheat.cheatmap[active_cheat].previous_value = cheat_read_extended(&m_cheat, *space, curaddr);
+				m_cheat.cheatmap[active_cheat].first_value = m_cheat.cheatmap[active_cheat].previous_value;
+				m_cheat.cheatmap[active_cheat].offset = curaddr;
+				m_cheat.cheatmap[active_cheat].state = 1;
+				m_cheat.cheatmap[active_cheat].undo = 0;
+				active_cheat++;
+			}
 
-	// give a detailed init message to avoid searches being mistakingly carried out on the wrong CPU
-	m_console.printf("%u cheat initialized for CPU index %s ( aka %s )\n", active_cheat, m_cheat.cpu, space->device().tag());
+	// give a detailed init message to avoid searches being mistakenly carried out on the wrong CPU
+	m_console.printf(
+			"%u cheat locations initialized for %s '%s' %s space\n",
+			active_cheat,
+			space->device().type().fullname(),
+			space->device().tag(),
+			space->name());
 }
 
 
@@ -3029,15 +3046,12 @@ void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::s
 		CHEAT_CHANGEDBY
 	};
 
-	if (m_cheat.cpu[0] == 0)
+	address_space *const space = m_cheat.space;
+	if (!space)
 	{
 		m_console.printf("Use cheatinit before cheatnext\n");
 		return;
 	}
-
-	address_space *space;
-	if (!validate_device_space_parameter(m_cheat.cpu, AS_PROGRAM, space))
-		return;
 
 	u64 comp_value = 0;
 	if (params.size() > 1 && !validate_number_parameter(params[1], comp_value))
@@ -3186,30 +3200,36 @@ void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::s
 
 void debugger_commands::execute_cheatlist(const std::vector<std::string> &params)
 {
-	if (m_cheat.cpu[0] == 0)
+	address_space *const space = m_cheat.space;
+	if (!space)
 	{
 		m_console.printf("Use cheatinit before cheatlist\n");
 		return;
 	}
 
-	address_space *space;
-	if (!validate_device_space_parameter(m_cheat.cpu, -1, space))
-		return;
-
-	device_t &cpu = space->device();
-
 	FILE *f = nullptr;
 	if (params.size() > 0)
+	{
 		f = fopen(params[0].c_str(), "w");
+		if (!f)
+		{
+			m_console.printf("Error opening file '%s'\n", params[0]);
+			return;
+		}
+	}
 
+	std::string tag(space->device().tag());
 	char spaceletter;
 	switch (space->spacenum())
 	{
-		default:
 		case AS_PROGRAM: spaceletter = 'p';  break;
 		case AS_DATA:    spaceletter = 'd';  break;
 		case AS_IO:      spaceletter = 'i';  break;
-		case AS_OPCODES: spaceletter = 'o';  break;
+		case AS_OPCODES: spaceletter = '3';  break;
+		default:
+			tag.append(1, ':');
+			tag.append(space->name());
+			spaceletter = 'p';
 	}
 
 	char sizeletter;
@@ -3240,13 +3260,13 @@ void debugger_commands::execute_cheatlist(const std::vector<std::string> &params
 				output.rdbuf()->clear();
 				stream_format(
 						output,
-						"  <cheat desc=\"Possibility %d : %0*X (%0*X)\">\n"
+						"  <cheat desc=\"Possibility %d: %0*X (%0*X)\">\n"
 						"    <script state=\"run\">\n"
 						"      <action>%s.p%c%c@%0*X=%0*X</action>\n"
 						"    </script>\n"
 						"  </cheat>\n\n",
 						active_cheat, space->logaddrchars(), address, m_cheat.width * 2, value,
-						cpu.tag(), spaceletter, sizeletter, space->logaddrchars(), address, m_cheat.width * 2, cheat_byte_swap(&m_cheat, m_cheat.cheatmap[cheatindex].first_value) & sizemask);
+						tag, spaceletter, sizeletter, space->logaddrchars(), address, m_cheat.width * 2, cheat_byte_swap(&m_cheat, m_cheat.cheatmap[cheatindex].first_value) & sizemask);
 				auto const &text(output.vec());
 				fprintf(f, "%.*s", int(unsigned(text.size())), &text[0]);
 			}
@@ -3273,7 +3293,7 @@ void debugger_commands::execute_cheatundo(const std::vector<std::string> &params
 {
 	if (m_cheat.undo > 0)
 	{
-		u32 undo_count = 0;
+		u64 undo_count = 0;
 		for (u64 cheatindex = 0; cheatindex < m_cheat.cheatmap.size(); cheatindex += 1)
 		{
 			if (m_cheat.cheatmap[cheatindex].undo == m_cheat.undo)
@@ -3288,7 +3308,9 @@ void debugger_commands::execute_cheatundo(const std::vector<std::string> &params
 		m_console.printf("%u cheat reactivated\n", undo_count);
 	}
 	else
+	{
 		m_console.printf("Maximum undo reached\n");
+	}
 }
 
 
@@ -4013,7 +4035,7 @@ void debugger_commands::execute_memdump(const std::vector<std::string> &params)
 					sp.dump_maps(entries[0], entries[1]);
 					for (int mode = 0; mode < 2; mode ++)
 					{
-						fprintf(file, "  device %s space %s %s:\n", memory.device().tag(), sp.name(), mode ? "write" : "read");
+						fprintf(file, "  %s '%s' space %s %s:\n", memory.device().type().fullname(), memory.device().tag(), sp.name(), mode ? "write" : "read");
 						for (memory_entry &entry : entries[mode])
 						{
 							if (octal)

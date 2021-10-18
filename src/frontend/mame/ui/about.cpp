@@ -39,8 +39,19 @@ namespace {
 
 menu_about::menu_about(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
-	, m_title(util::string_format(_("%1$s %2$s"), emulator_info::get_appname(), bare_build_version))
-	, m_footer(util::string_format(_("Revision: %1$s"), bare_vcs_revision))
+	, m_header{
+			util::string_format(
+#ifdef MAME_DEBUG
+					_("%1$s %2$s (%3$s%4$sP%5$s, debug)"),
+#else
+					_("%1$s %2$s (%3$s%4$sP%5$s)"),
+#endif
+					emulator_info::get_appname(),
+					bare_build_version,
+					(sizeof(int) == sizeof(void *)) ? "I" : "",
+					(sizeof(long) == sizeof(void *)) ? "L" : (sizeof(long long) == sizeof(void *)) ? "LL" : "",
+					sizeof(void *) * 8),
+			util::string_format(_("Revision: %1$s"), bare_vcs_revision) }
 {
 }
 
@@ -60,23 +71,12 @@ menu_about::~menu_about()
 
 void menu_about::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	std::string_view tempbuf[1];
-
 	// draw the title
-	tempbuf[0] = m_title;
 	draw_text_box(
-			std::begin(tempbuf), std::end(tempbuf),
+			std::begin(m_header), std::end(m_header),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
-
-	// draw the footer
-	tempbuf[0] = m_footer;
-	draw_text_box(
-			std::begin(tempbuf), std::end(tempbuf),
-			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 
 
@@ -221,8 +221,7 @@ void menu_about::draw(uint32_t flags)
 void menu_about::populate(float &customtop, float &custombottom)
 {
 	// make space for the title and revision
-	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
-	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
+	customtop = (ui().get_line_height() * m_header.size()) + (ui().box_tb_border() * 3.0f);
 }
 
 

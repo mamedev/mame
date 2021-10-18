@@ -16,6 +16,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 
 
 namespace ui {
@@ -34,8 +35,7 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	std::string const m_title;
-	std::string const m_footer;
+	std::vector<std::string> const m_header;
 	std::optional<text_layout> m_layout;
 };
 

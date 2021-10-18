@@ -14,6 +14,9 @@ Breakpoint Debugger Commands
 :ref:`debugger-command-bplist`
     lists breakpoints
 
+Breakpoints halt execution and activate the debugger before a CPU
+executes an instruction at a particular address.
+
 
 .. _debugger-command-bpset:
 

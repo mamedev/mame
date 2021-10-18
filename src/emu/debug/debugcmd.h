@@ -67,20 +67,20 @@ private:
 	// TODO [RH 31 May 2016]: Move this cheat stuff into its own class
 	struct cheat_system
 	{
-		char        cpu[2];
+		address_space *space;
 		u8          width;
-		std::vector<cheat_map> cheatmap;
-		u8          undo;
 		u8          signed_cheat;
 		u8          swapped_cheat;
+		std::vector<cheat_map> cheatmap;
+		u8          undo;
 	};
 
 	struct cheat_region_map
 	{
-		u64         offset;
-		u64         endoffset;
-		const char *share;
-		u8          disabled;
+		u64         offset = 0U;
+		u64         endoffset = 0U;
+		const char *share = nullptr;
+		u8          disabled = 0U;
 	};
 
 	device_t &get_device_search_base(std::string_view &param);

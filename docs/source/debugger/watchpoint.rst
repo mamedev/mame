@@ -14,6 +14,10 @@ Watchpoint Debugger Commands
 :ref:`debugger-command-wplist`
     lists watchpoints
 
+Watchpoints halt execution and activate the debugger when a CPU accesses
+a location in a particular memory range.
+
+
 .. _debugger-command-wpset:
 
 wpset

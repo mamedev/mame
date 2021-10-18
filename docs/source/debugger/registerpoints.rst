@@ -14,6 +14,10 @@ Registerpoint Debugger Commands
 :ref:`debugger-command-rplist`
     lists registerpoints
 
+Registerpoints evaluate an expression each time a CPU executes an
+instruction and halt execution and activate the debugger if the result
+is true (non-zero).
+
 
 .. _debugger-command-rpset:
 
