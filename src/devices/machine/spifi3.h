@@ -256,6 +256,7 @@ private:
     const uint32_t SPS_MSGIN = 0x0d;
     const uint32_t SPS_DATAOUT = 0x0e;
     const uint32_t SPS_DATAIN = 0x0f;
+    uint32_t spstat_r();
 
     // prstat
     const uint32_t PRS_IO = 0x08;
@@ -375,6 +376,10 @@ private:
         return spifi_reg.cmlen & CML_ACOM_EN;
     }
     void start_autocmd();
+
+    // init_status
+    uint32_t init_status_r();
+    const uint32_t INIT_STATUS_ACK = 0x40;
 
     struct spifi_cmd_entry
     {

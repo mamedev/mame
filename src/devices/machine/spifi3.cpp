@@ -81,19 +81,7 @@ void spifi3_device::device_start()
 
 void spifi3_device::map(address_map &map)
 {
-    // Ugly address map
-    map(0x00, 0x03).lrw32(NAME([this]()
-                               {
-                                   uint32_t spstat = spifi_reg.spstat << 4 | ((spifi_reg.intr > 0) ? SPS_INTR : 0);
-                                   LOG("read spifi_reg.spstat = 0x%x\n", spstat);
-                                   return spstat;
-                               }),
-                          NAME([this](uint32_t data)
-                               {
-                                   LOG("write spifi_reg.spstat = 0x%x\n", data);
-                                   spifi_reg.spstat = data;
-                               }));
-
+    // Basic getters/setters
     map(0x08, 0x0b).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.cmdpage = 0x%x\n", spifi_reg.cmdpage); return spifi_reg.cmdpage; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.cmdpage = 0x%x\n", data); spifi_reg.cmdpage = data; }));
     map(0x18, 0x1b).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.svptr_hi = 0x%x\n", spifi_reg.svptr_hi); return spifi_reg.svptr_hi; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.svptr_hi = 0x%x\n", data); spifi_reg.svptr_hi = data; }));
     map(0x1c, 0x1f).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.svptr_mid = 0x%x\n", spifi_reg.svptr_mid); return spifi_reg.svptr_mid; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.svptr_mid = 0x%x\n", data); spifi_reg.svptr_mid = data; }));
@@ -101,6 +89,7 @@ void spifi3_device::map(address_map &map)
     map(0x28, 0x2b).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.imask = 0x%x\n", spifi_reg.imask); return spifi_reg.imask; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.imask = 0x%x\n", data); spifi_reg.imask = data; }));
     map(0x2c, 0x2f).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.prctrl = 0x%x\n", spifi_reg.prctrl); return spifi_reg.prctrl; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.prctrl = 0x%x\n", data); spifi_reg.prctrl = data; }));
     map(0x3c, 0x3f).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.fifodata = 0x%x\n", spifi_reg.fifodata); return spifi_reg.fifodata; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.fifodata = 0x%x\n", data); spifi_reg.fifodata = data; }));
+    map(0x40, 0x43).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.config = 0x%x\n", spifi_reg.config); return spifi_reg.config; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.config = 0x%x\n", data); spifi_reg.config = data; }));
     map(0x44, 0x47).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.data_xfer = 0x%x\n", spifi_reg.data_xfer); return spifi_reg.data_xfer; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.data_xfer = 0x%x\n", data); spifi_reg.data_xfer = data; }));
     map(0x48, 0x4b).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.autocmd = 0x%x\n", spifi_reg.autocmd); return spifi_reg.autocmd; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.autocmd = 0x%x\n", data); spifi_reg.autocmd = data; }));
     map(0x50, 0x53).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.resel = 0x%x\n", spifi_reg.resel); return spifi_reg.resel; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.resel = 0x%x\n", data); spifi_reg.resel = data; }));
@@ -119,9 +108,20 @@ void spifi3_device::map(address_map &map)
     map(0x94, 0x97).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.quecode = 0x%x\n", spifi_reg.quecode); return spifi_reg.quecode; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.quecode = 0x%x\n", data); spifi_reg.quecode = data; }));
     map(0x98, 0x9b).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.quetag = 0x%x\n", spifi_reg.quetag); return spifi_reg.quetag; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.quetag = 0x%x\n", data); spifi_reg.quetag = data; }));
     map(0x9c, 0x9f).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.quepage = 0x%x\n", spifi_reg.quepage); return spifi_reg.quepage; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.quepage = 0x%x\n", data); spifi_reg.quepage = data; }));
-    // mirror of above values goes here
 
-    // stuff I'm actively working on
+    // Registers with their own methods for accessing them
+    map(0x00, 0x03).r(FUNC(spifi3_device::spstat_r));
+    map(0x30, 0x33).r(FUNC(spifi3_device::prstat_r));
+    map(0x34, 0x37).r(FUNC(spifi3_device::init_status_r));
+    map(0x38, 0x3b).rw(FUNC(spifi3_device::fifoctrl_r), FUNC(spifi3_device::fifoctrl_w));
+    map(0x54, 0x57).w(FUNC(spifi3_device::select_w));
+    map(0x54, 0x57).lr32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.select = 0x%x\n", spifi_reg.select); return spifi_reg.select; }));
+    map(0x58, 0x5b).rw(FUNC(spifi3_device::prcmd_r), FUNC(spifi3_device::prcmd_w));
+    map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
+    map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
+    map(0x60, 0x63).lr32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.autodata = 0x%x\n", spifi_reg.autodata); return spifi_reg.autodata; }));
+
+    // Everything else
     map(0x04, 0x07).lrw32(NAME([this]()
                                {
                                    LOGMASKED(LOG_REGISTER, "read spifi_reg.cmlen = 0x%x\n", spifi_reg.cmlen);
@@ -192,42 +192,18 @@ void spifi3_device::map(address_map &map)
         check_irq();
     }));
 
-    map(0x34, 0x37).lrw32(NAME([this]()
-                               {
-                                   // NetBSD only lists this bit, but there is probably more in this register.
-                                   spifi_reg.init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? 0x40 : 0x0; // todo: make constant
-                                   LOGMASKED(LOG_REGISTER, "read spifi_reg.init_status = 0x%x\n", spifi_reg.init_status);
-                                   return spifi_reg.init_status;
-                               }),
-                          NAME([this](uint32_t data)
-                               {
-                                   LOGMASKED(LOG_REGISTER, "write spifi_reg.init_status = 0x%x\n", data);
-                                   spifi_reg.init_status = data;
-                               }));
-    
+    // This is a total guess based on what the NEWS-OS kernel does with this register.
+    // NetBSD doesn't use this register the same way.
     map(0x4c, 0x4f).lrw32(NAME([this]()
-                               { 
+                               {
                                    LOGMASKED(LOG_REGISTER, "read spifi_reg.autostat = 0x%x\n", spifi_reg.autostat);
                                    return spifi_reg.autostat;
                                }),
                           NAME([this](uint32_t data)
-                               { 
+                               {
                                    LOGMASKED(LOG_REGISTER, "write spifi_reg.autostat = 0x%x\n", data);
-                                   spifi_reg.autostat |= data; // This is a total guess based on what the NEWS-OS kernel does with this register.
-                                                               // NetBSD absolutely doesn't use it the same way.
-                                }));
-    
-
-    // Below this line probably won't need to change
-    map(0x30, 0x33).r(FUNC(spifi3_device::prstat_r));
-    map(0x38, 0x3b).rw(FUNC(spifi3_device::fifoctrl_r), FUNC(spifi3_device::fifoctrl_w));
-    map(0x40, 0x43).lrw32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.config = 0x%x\n", spifi_reg.config); return spifi_reg.config; }), NAME([this](uint32_t data) { LOGMASKED(LOG_REGISTER, "write spifi_reg.config = 0x%x\n", data); spifi_reg.config = data; }));
-    map(0x54, 0x57).w(FUNC(spifi3_device::select_w));
-    map(0x54, 0x57).lr32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.select = 0x%x\n", spifi_reg.select); return spifi_reg.select; }));
-    map(0x58, 0x5b).rw(FUNC(spifi3_device::prcmd_r), FUNC(spifi3_device::prcmd_w));
-    map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
-    map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
-    map(0x60, 0x63).lr32(NAME([this]() { LOGMASKED(LOG_REGISTER, "read spifi_reg.autodata = 0x%x\n", spifi_reg.autodata); return spifi_reg.autodata; }));
+                                   spifi_reg.autostat |= data;
+                               }));
 
     // Map command buffer
     map(0x200, 0x3ff).rw(FUNC(spifi3_device::cmd_buf_r), FUNC(spifi3_device::cmd_buf_w)).umask32(0xff);
@@ -301,6 +277,15 @@ void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
     {
         spifi_reg.cmbuf[cmd_entry].status = data;
     }
+}
+
+uint32_t spifi3_device::spstat_r()
+{
+    // TODO: barely anything is setting this right now. Based on NetBSD code, and the fact that practically nothing
+    // from this register was needed to get NEWS-OS to boot, I imagine this is mostly used for error handling and debug.
+    uint32_t spstat = spifi_reg.spstat << 4 | ((spifi_reg.intr > 0) ? SPS_INTR : 0);
+    LOG("read spifi_reg.spstat = 0x%x\n", spstat);
+    return spstat;
 }
 
 uint32_t spifi3_device::auxctrl_r()
@@ -531,6 +516,14 @@ void spifi3_device::prcmd_w(uint32_t data)
     }
 }
 
+uint32_t spifi3_device::init_status_r()
+{
+    // NetBSD only lists this bit, but there is probably more in this register.
+    auto init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
+    LOGMASKED(LOG_REGISTER, "read spifi_reg.init_status = 0x%x\n", init_status);
+    return init_status;
+}
+
 void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
     step(true);
@@ -700,7 +693,7 @@ void spifi3_device::dma_set(int dir)
     // account for data already in the fifo
     if (dir == DMA_OUT && !m_even_fifo.empty())
     {
-        decrement_tcounter(m_even_fifo.size()); // TODO: is this needed for SPIFI?
+        decrement_tcounter(m_even_fifo.size());
     }
 }
 
