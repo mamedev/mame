@@ -1938,6 +1938,9 @@ $(GENDIR)/mame.pot: FORCE
 	$(SILENT) find plugins -name "*.lua" -print0 | xargs -0 \
 		xgettext -o $@ --from-code=UTF-8 --language=Lua -k_:1 -k_p:1c,2 -kN_ -kN_p:1c,2 -j
 
-translation: $(GENDIR)/mame.pot
-	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% $<
-	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgattrib --clear-fuzzy --empty %% -o %%
+%.po: $(GENDIR)/mame.pot
+	$(SILENT) echo Updating $@
+	$(SILENT) msgmerge $(if $(SILENT),-q,) -U -N $@ $<
+	$(SILENT) msgattrib --clear-fuzzy --empty $@ -o $@
+
+translation: $(wildcard language/*/*.po)
