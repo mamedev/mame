@@ -78,6 +78,19 @@ protected:
 	u16 read_cliptable(int entry, u8 attr);
 	u16 read_spritelist(int entry);
 
+	// general
+	template<class BitmapClass>
+	void zdrawgfxzoom(
+		BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color,
+		bool flipx, bool flipy,
+		int sx, int sy,
+		int scalex, int scaley,
+		u8 prival,
+		bitmap_ind8 *pri_buffer, uint32_t pri_mask,
+		int sprite_screen_width, int sprite_screen_height,
+		bitmap_ind8 *pri_bitmap);
+
 private:
 
 	struct c355_sprite
@@ -94,15 +107,6 @@ private:
 		int pri;
 	};
 
-	// general
-	template<class BitmapClass>
-	void zdrawgfxzoom(
-		BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
-		u32 code, u32 color,
-		bool flipx, bool flipy,
-		int sx, int sy,
-		int scalex, int scaley,
-		u8 prival);
 
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
 	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
@@ -143,29 +147,11 @@ class deco_zoomspr_device : public namco_c355spr_device
 public:
 	deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-
 	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
 
 private:
-	required_device<gfxdecode_device> m_gfxdecode;
-
-
-	template<class BitmapClass>
-	void dragngun_drawgfxzoom(
-		BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
-		uint32_t code, uint32_t color,
-		bool flipx, bool flipy,
-		int sx, int sy,
-		int scalex, int scaley,
-		u8 priority,
-
-		bitmap_ind8 *pri_buffer, uint32_t pri_mask,
-		int sprite_screen_width, int sprite_screen_height,
-		bitmap_ind8 *pri_bitmap
-	);
 };
 
 // device type definition

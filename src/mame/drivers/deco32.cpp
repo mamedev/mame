@@ -2136,7 +2136,6 @@ void dragngun_state::dragngun(machine_config &config)
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_colors(32);
@@ -2270,7 +2269,6 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
 	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_colors(32);
