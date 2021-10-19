@@ -832,9 +832,8 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 }
 
 
-void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
-	int offs;
 	temp_bitmap.fill(0x00000000, cliprect);
 
 	/*
@@ -887,29 +886,29 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 //  if (dragngun_sprite_ctrl&0x40000000)
 //      return;
 
-	for (offs = 0; offs < 0x800; offs += 8)
+	for (int offs = 0; offs < 0x800/8; offs++)
 	{
-		if ((spritedata[offs + 6] & 0x80) && (screen.frame_number() & 1)) // flicker
+		if ((m_read_spritetable(offs, 6) & 0x80) && (screen.frame_number() & 1)) // flicker
 			continue;
 
 		int hpos, vpos, colour, fx, fy, w, h, x, y, dx, dy, hsize, vsize;
 		int zoomx, zoomy;
 		int xpos, ypos;
-
-		hsize = spritedata[offs + 4] & 0x3ff;
-		vsize = spritedata[offs + 5] & 0x3ff;
+		
+		hsize = m_read_spritetable(offs, 4) & 0x3ff;
+		vsize = m_read_spritetable(offs, 5) & 0x3ff;
 		if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
 			continue;
 
-		int spriteformatram_offset = (spritedata[offs + 0] & 0x7ff);
+		int spriteformatram_offset = (m_read_spritetable(offs, 0) & 0x7ff);
 
 		h = (m_read_spriteformat(spriteformatram_offset, 1) >> 0) & 0xf;
 		w = (m_read_spriteformat(spriteformatram_offset, 1) >> 4) & 0xf;
 		if (!h || !w)
 			continue;
 		
-		hpos = spritedata[offs + 2] & 0x3ff;
-		vpos = spritedata[offs + 3] & 0x3ff;
+		hpos = m_read_spritetable(offs, 2) & 0x3ff;
+		vpos = m_read_spritetable(offs, 3) & 0x3ff;
 		dx = m_read_spriteformat(spriteformatram_offset, 2) & 0x1ff;
 		dy = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
 		if (dx & 0x100) dx = 1 - (dx & 0xff);
@@ -917,17 +916,17 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		if (hpos >= 512) hpos -= 1024;
 		if (vpos >= 512) vpos -= 1024;
 
-		colour = spritedata[offs + 6] & 0x1f;
+		colour = m_read_spritetable(offs, 6) & 0x1f;
 
-		int priority = (spritedata[offs + 6] & 0x60) >> 5;
+		int priority = (m_read_spritetable(offs, 6) & 0x60) >> 5;
 
 		if (priority == 0) priority = 7;
 		else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
 		else if (priority == 2) priority = 7;
 		else if (priority == 3) priority = 7;
 
-		fx = spritedata[offs + 4] & 0x8000;
-		fy = spritedata[offs + 5] & 0x8000;
+		fx = m_read_spritetable(offs, 4) & 0x8000;
+		fy = m_read_spritetable(offs, 5) & 0x8000;
 
 		int lookupram_offset = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
 

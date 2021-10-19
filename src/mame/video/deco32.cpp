@@ -192,6 +192,11 @@ u16 dragngun_state::read_spriteformat(int spriteformatram_offset, u8 attr)
 		return m_sprite_spriteformat[0][((spriteformatram_offset & 0x1ff)<<2) + attr];
 }
 
+u16 dragngun_state::read_spritetable(int offs, u8 attr)
+{
+	return m_spriteram->buffer()[(offs << 3) + attr];
+}
+
 u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
@@ -216,7 +221,7 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
 
-		m_sprgenzoom->dragngun_draw_sprites(screen,bitmap,clip,m_spriteram->buffer(), screen.priority(), m_temp_render_bitmap);
+		m_sprgenzoom->dragngun_draw_sprites(screen,bitmap,clip, screen.priority(), m_temp_render_bitmap);
 
 	}
 

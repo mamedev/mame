@@ -138,7 +138,7 @@ public:
 
 	template <typename T> void set_gfxdecode(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 
-	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint32_t *spritedata, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
 

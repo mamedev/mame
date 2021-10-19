@@ -2143,6 +2143,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_sprgenzoom->set_granularity(16);
 	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
 	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
+	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
 
 
 	// I750, these aren't emulated
@@ -2276,6 +2277,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_sprgenzoom->set_granularity(16);
 	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
 	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
+	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
