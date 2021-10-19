@@ -2210,7 +2210,7 @@ void dragngun_state::namco_sprites(machine_config &config)
 	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
 	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
 	m_sprgenzoom->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
-	m_sprgenzoom->set_device_allocates_memory(false);
+	m_sprgenzoom->set_device_allocates_spriteram_and_bitmaps(false);
 }
 
 // DE-0420-1 + Bottom board DE-0421-0

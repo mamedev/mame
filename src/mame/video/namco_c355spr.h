@@ -56,16 +56,16 @@ public:
 			m_code2tile = c355_obj_code2tile_delegate(&namco_c355spr_device::default_code2tile, this);
 	}
 
-	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	void build_sprite_list_and_render_sprites(const rectangle cliprect, screen_device& screen);
+
+	void draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+
+	void build_sprite_list_and_render_sprites(const rectangle cliprect, screen_device &screen);
 
 	template<class BitmapClass>
-	void render_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass& temp_bitmap, int alt_precision);
-
-
+	void render_sprites(const rectangle cliprect, bitmap_ind8 *pri_bitmap, BitmapClass &temp_bitmap, int alt_precision);
 
 	void clear_screen_bitmap() { m_screenbitmap.fill(0xffff); }
 	void clear_screen_bitmap(const rectangle cliprect) { m_screenbitmap.fill(0xffff, cliprect); }
@@ -91,12 +91,6 @@ protected:
 	u16 read_spritetable(int entry, u8 attr, int whichlist);
 	u16 read_cliptable(int entry, u8 attr);
 	u16 read_spritelist(int entry, int whichlist);
-
-///	u16 default_read_spritetile(int entry) { fatalerror("read_spritetile callback must be set if m_device_allocates_spriteram_and_bitmaps is false"); }
-//	u16 default_read_spriteformat(int entry, u8 attr) { fatalerror("read_spriteformat callback must be set if m_device_allocates_spriteram_and_bitmaps is false"); }
-//	u16 default_read_spritetable(int entry, u8 attr, int whichlist) { fatalerror("read_spritetable callback must be set if m_device_allocates_spriteram_and_bitmaps is false"); }
-//	u16 default_read_cliptable(int entry, u8 attr) { fatalerror("read_cliptable callback must be set if m_device_allocates_spriteram_and_bitmaps is false"); }
-//	u16 default_read_spritelist(int entry, int whichlist) { fatalerror("read_spritelist callback must be set if m_device_allocates_spriteram_and_bitmaps is false"); }
 
 	int default_priority(int pal_pri) { return ((pal_pri >> 4) & 0xf); }
 
@@ -135,19 +129,21 @@ protected:
 	bitmap_ind16 m_renderbitmap;
 	bitmap_ind16 m_screenbitmap;
 
-	void build_sprite_list(int no, screen_device& screen);
+	void build_sprite_list(int no, screen_device &screen);
 
 private:
 
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
 	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
 
+	void copybitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+
 	// C355 Motion Object Emulation
 	// for pal_xor, supply either 0x0 (normal) or 0xf (palette mapping reversed)
 	int default_code2tile(int code);
 
 	// C355 Motion Object internals
-	void get_single_sprite(u16 which, c355_sprite* sprite_ptr, screen_device& screen, int no);
+	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen, int no);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 

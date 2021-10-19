@@ -257,8 +257,7 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	{
 		rectangle clip(cliprect.left(), cliprect.right(), 8, 247);
 
-		m_sprgenzoom->dragngun_draw_sprites(screen,bitmap,clip, screen.priority(), m_temp_render_bitmap);
-
+		m_sprgenzoom->draw_dg(screen, bitmap, clip, screen.priority(), m_temp_render_bitmap);
 	}
 
 	return 0;

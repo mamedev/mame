@@ -93,21 +93,21 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 
 template<class BitmapClass>
 void namco_c355spr_device::zdrawgfxzoom(
-	BitmapClass* dest_bmp, const rectangle& clip, gfx_element* gfx,
+	BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
 	u32 code, u32 color, bool flipx, bool flipy, int hpos, int vpos,
 	int hsize, int vsize, u8 prival,
 
-	bitmap_ind8* pri_buffer,
+	bitmap_ind8 *pri_buffer,
 	int sprite_screen_width, int  sprite_screen_height,
-	bitmap_ind8* pri_bitmap)
+	bitmap_ind8 *pri_bitmap)
 {
 	if (!hsize || !vsize) return;
 	if (!gfx) return;
 
 	const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	const pen_t* palpen = &gfx->palette().pen(pal);
+	const pen_t *palpen = &gfx->palette().pen(pal);
 
-	const u8* source_base = gfx->get_data(code % gfx->elements());
+	const u8 *source_base = gfx->get_data(code % gfx->elements());
 	if (sprite_screen_width && sprite_screen_height)
 	{
 		/* compute sprite increment per screen pixel */
@@ -167,10 +167,10 @@ void namco_c355spr_device::zdrawgfxzoom(
 		{ /* skip if inner loop doesn't draw anything */
 			for (int y = vpos; y < ey; y++)
 			{
-				u8 const* const source = source_base + (y_index >> 16) * gfx->rowbytes();
-				auto* const dest = &dest_bmp->pix(y);
+				u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
+				auto *const dest = &dest_bmp->pix(y);
 				int x_index = x_index_base;
-				u8* pri = nullptr;
+				u8 *pri = nullptr;
 
 				if (dest_bmp->bpp() == 32)
 					pri = &pri_bitmap->pix(y);
@@ -360,11 +360,6 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 void namco_c355spr_device::device_start()
 {
 	m_pri_cb.resolve();
-	m_read_spritetile.resolve();
-	m_read_spriteformat.resolve();
-	m_read_spritetable.resolve();
-	m_read_cliptable.resolve();
-	m_read_spritelist.resolve();
 
 	gfx_layout obj_layout =
 	{
@@ -389,8 +384,6 @@ void namco_c355spr_device::device_start()
 
 	if (m_device_allocates_spriteram_and_bitmaps)
 	{
-		printf("allocating memory\n");
-
 		for (int i = 0; i < 2; i++)
 		{
 			m_spriteram[i] = std::make_unique<u16[]>(0x20000 / 2);
@@ -398,18 +391,18 @@ void namco_c355spr_device::device_start()
 			save_pointer(NAME(m_spriteram[i]), 0x20000 / 2, i);
 		}
 
-	//	set_read_spritetile(FUNC(namco_c355spr_device::read_spritetile));
-	//	set_read_spriteformat(FUNC(namco_c355spr_device::read_spriteformat));
-	//	set_read_spritetable(FUNC(namco_c355spr_device::read_spritetable));
-	//	set_read_spritelist(FUNC(namco_c355spr_device::read_spritelist));
-	//	set_read_cliptable(FUNC(namco_c355spr_device::read_cliptable));
-
 		screen().register_screen_bitmap(m_renderbitmap);
 		screen().register_screen_bitmap(m_screenbitmap);
 	}
 
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfx_region->base(), 0, m_colors, m_colbase));
 	gfx(0)->set_granularity(m_granularity);
+
+	m_read_spritetile.resolve();
+	m_read_spriteformat.resolve();
+	m_read_spritetable.resolve();
+	m_read_cliptable.resolve();
+	m_read_spritelist.resolve();
 
 	save_item(NAME(m_position));
 
@@ -541,7 +534,7 @@ int namco_c355spr_device::default_code2tile(int code)
 	return code;
 }
 
-void namco_c355spr_device::build_sprite_list(int no, screen_device& screen)
+void namco_c355spr_device::build_sprite_list(int no, screen_device &screen)
 {
 	/* draw the sprites */
 	c355_sprite *sprite_ptr = m_spritelist[no].get();
@@ -567,13 +560,13 @@ void namco_c355spr_device::build_sprite_list_and_render_sprites(const rectangle 
 }
 
 template<class BitmapClass>
-void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass &temp_bitmap, int alt_precision)
+void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8 *pri_bitmap, BitmapClass &temp_bitmap, int alt_precision)
 {
 	temp_bitmap.fill(0xffff, cliprect);
 	for (int no = 0; no < 2; no++)
 	{
 		int i = 0;
-		c355_sprite* sprite_ptr = m_spritelist[no].get();
+		c355_sprite *sprite_ptr = m_spritelist[no].get();
 
 		while (sprite_ptr != m_sprite_end[no])
 		{
@@ -620,17 +613,12 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8*
 	}
 }
 
-
-void namco_c355spr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void namco_c355spr_device::copybitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
 {
-	build_sprite_list(0, screen);
-
-	render_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
-
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u32 const* const src = &temp_bitmap.pix(y);
-		u32* const dst = &bitmap.pix(y);
+		u32 const *const src = &temp_bitmap.pix(y);
+		u32 *const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
@@ -645,7 +633,17 @@ void namco_c355spr_device::dragngun_draw_sprites(screen_device& screen, bitmap_r
 }
 
 
-void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen, int no)
+void namco_c355spr_device::draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap)
+{
+	build_sprite_list(0, screen);
+
+	render_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
+
+	copybitmap(screen, bitmap, cliprect, pri_bitmap, temp_bitmap);
+}
+
+
+void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen, int no)
 {
 	/**
 	 * ----xxxx-------- window select
