@@ -585,6 +585,10 @@ expression_error symbol_table::expression_get_space(const char *tag, int &spacen
 		return expression_error::NO_SUCH_MEMORY_SPACE;
 	}
 
+	// allow short references to data, I/O and opcode spaces
+	if (spacename.empty() && spacenum != 0)
+		return expression_error::NONE;
+
 	// find space by name or take first populated space
 	for (int i = 0; memory->max_space_count() > i; ++i)
 	{
