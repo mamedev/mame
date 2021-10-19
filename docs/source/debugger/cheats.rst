@@ -30,7 +30,6 @@ infinite lives cheat for Raiden (``raiden``):
   :ref:`cheatinit command <debugger-command-cheatinit>`::
 
       >cheatinit ub
-      MAME debugger version 0.237 (mame0237)
       36928 cheat locations initialized for NEC V30 ':maincpu' program space
 * Allow the game to run, lose a life and break into the debugger.
 * Use the :ref:`cheatnext command <debugger-command-cheatnext>` to
@@ -55,7 +54,7 @@ infinite lives cheat for Raiden (``raiden``):
 
       <cheat desc="Possibility 1: 00B85 (01)">
         <script state="run">
-          <action>:maincpu.ppb@00B85=03</action>
+          <action>:maincpu.pb@0x00B85=0x03</action>
         </script>
       </cheat>
 

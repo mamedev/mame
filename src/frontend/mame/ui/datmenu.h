@@ -36,7 +36,7 @@ namespace ui {
 class menu_dats_view : public menu
 {
 public:
-	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo);
 	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_system_info *system = nullptr);
 	virtual ~menu_dats_view() override;
 

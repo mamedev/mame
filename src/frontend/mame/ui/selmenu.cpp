@@ -856,7 +856,7 @@ void menu_select_launch::inkey_dats()
 	ui_system_info const *system;
 	get_selection(software, system);
 	if (software && !software->startempty)
-		menu::stack_push<menu_dats_view>(ui(), container(), software);
+		menu::stack_push<menu_dats_view>(ui(), container(), *software);
 	else if (system)
 		menu::stack_push<menu_dats_view>(ui(), container(), system);
 }

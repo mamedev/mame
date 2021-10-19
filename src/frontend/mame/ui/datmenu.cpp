@@ -70,20 +70,20 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo)
 	: menu(mui, container)
-	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
-	, m_swinfo(swinfo)
+	, m_system(nullptr)
+	, m_swinfo(&swinfo)
 	, m_issoft(true)
 	, m_layout()
 	, m_actual(0)
-	, m_list(swinfo->listname)
-	, m_short(swinfo->shortname)
-	, m_long(swinfo->longname)
-	, m_parent(swinfo->parentname)
+	, m_list(swinfo.listname)
+	, m_short(swinfo.shortname)
+	, m_long(swinfo.longname)
+	, m_parent(swinfo.parentname)
 
 {
-	if (!swinfo->infotext.empty())
+	if (!swinfo.infotext.empty())
 		m_items_list.emplace_back(_("Software List Info"), 0, "");
 	std::vector<std::string> lua_list;
 	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(m_short).append(1, ',').append(m_list).c_str(), lua_list))

@@ -159,8 +159,9 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (machine().options().plugins() && !mame_machine_manager::instance()->lua()->get_menu().empty())
 		item_append(_("Plugin Options"), 0, (void *)PLUGINS);
 
-	if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
-		item_append(_("External DAT View"), 0, (void *)EXTERNAL_DATS);
+	if (machine().phase() >= machine_phase::RESET)
+		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
+			item_append(_("External DAT View"), 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);
 

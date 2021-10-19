@@ -88,11 +88,11 @@ bool debugger_commands::cheat_address_is_valid(address_space &space, offs_t addr
     the current cheat width, if signed
 -------------------------------------------------*/
 
-u64 debugger_commands::cheat_sign_extend(const cheat_system *cheatsys, u64 value)
+inline u64 debugger_commands::cheat_system::sign_extend(u64 value) const
 {
-	if (cheatsys->signed_cheat)
+	if (signed_cheat)
 	{
-		switch (cheatsys->width)
+		switch (width)
 		{
 		case 1: value = s8(value);  break;
 		case 2: value = s16(value); break;
@@ -106,11 +106,11 @@ u64 debugger_commands::cheat_sign_extend(const cheat_system *cheatsys, u64 value
     cheat_byte_swap - swap a value
 -------------------------------------------------*/
 
-u64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, u64 value)
+inline u64 debugger_commands::cheat_system::byte_swap(u64 value) const
 {
-	if (cheatsys->swapped_cheat)
+	if (swapped_cheat)
 	{
-		switch (cheatsys->width)
+		switch (width)
 		{
 		case 2: value = swapendian_int16(value);    break;
 		case 4: value = swapendian_int32(value);    break;
@@ -126,21 +126,21 @@ u64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, u64 value)
     and swapping if necessary
 -------------------------------------------------*/
 
-u64 debugger_commands::cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
+u64 debugger_commands::cheat_system::read_extended(offs_t address) const
 {
-	address &= space.logaddrmask();
-	u64 value = space.unmap();
-	if (space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
+	address &= space->logaddrmask();
+	u64 value = space->unmap();
+	if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, address))
 	{
-		switch (cheatsys->width)
+		switch (width)
 		{
-		case 1: value = space.read_byte(address);               break;
-		case 2: value = space.read_word_unaligned(address);     break;
-		case 4: value = space.read_dword_unaligned(address);    break;
-		case 8: value = space.read_qword_unaligned(address);    break;
+		case 1: value = space->read_byte(address);              break;
+		case 2: value = space->read_word_unaligned(address);    break;
+		case 4: value = space->read_dword_unaligned(address);   break;
+		case 8: value = space->read_qword_unaligned(address);   break;
 		}
 	}
-	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, value));
+	return sign_extend(byte_swap(value));
 }
 
 debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
@@ -3004,7 +3004,7 @@ void debugger_commands::execute_cheatrange(bool init, const std::vector<std::str
 		for (u64 curaddr = cheat_region[i].offset; curaddr <= cheat_region[i].endoffset; curaddr += width)
 			if (cheat_address_is_valid(*space, curaddr))
 			{
-				m_cheat.cheatmap[active_cheat].previous_value = cheat_read_extended(&m_cheat, *space, curaddr);
+				m_cheat.cheatmap[active_cheat].previous_value = m_cheat.read_extended(curaddr);
 				m_cheat.cheatmap[active_cheat].first_value = m_cheat.cheatmap[active_cheat].previous_value;
 				m_cheat.cheatmap[active_cheat].offset = curaddr;
 				m_cheat.cheatmap[active_cheat].state = 1;
@@ -3056,7 +3056,7 @@ void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::s
 	u64 comp_value = 0;
 	if (params.size() > 1 && !validate_number_parameter(params[1], comp_value))
 		return;
-	comp_value = cheat_sign_extend(&m_cheat, comp_value);
+	comp_value = m_cheat.sign_extend(comp_value);
 
 	// decode condition
 	u8 condition;
@@ -3093,8 +3093,10 @@ void debugger_commands::execute_cheatnext(bool initial, const std::vector<std::s
 	for (u64 cheatindex = 0; cheatindex < m_cheat.cheatmap.size(); cheatindex += 1)
 		if (m_cheat.cheatmap[cheatindex].state == 1)
 		{
-			u64 cheat_value = cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset);
-			u64 comp_byte = !initial ? m_cheat.cheatmap[cheatindex].previous_value : m_cheat.cheatmap[cheatindex].first_value;
+			u64 cheat_value = m_cheat.read_extended(m_cheat.cheatmap[cheatindex].offset);
+			u64 comp_byte = initial
+					? m_cheat.cheatmap[cheatindex].first_value
+					: m_cheat.cheatmap[cheatindex].previous_value;
 			u8 disable_byte = false;
 
 			switch (condition)
@@ -3218,29 +3220,46 @@ void debugger_commands::execute_cheatlist(const std::vector<std::string> &params
 		}
 	}
 
+	// get device/space syntax for memory access
 	std::string tag(space->device().tag());
-	char spaceletter;
+	std::string spaceletter;
 	switch (space->spacenum())
 	{
-		case AS_PROGRAM: spaceletter = 'p';  break;
-		case AS_DATA:    spaceletter = 'd';  break;
-		case AS_IO:      spaceletter = 'i';  break;
-		case AS_OPCODES: spaceletter = '3';  break;
-		default:
-			tag.append(1, ':');
-			tag.append(space->name());
-			spaceletter = 'p';
+	default:
+		tag.append(1, ':');
+		tag.append(space->name());
+		break;
+	case AS_PROGRAM:
+		spaceletter = "p";
+		break;
+	case AS_DATA:
+		spaceletter = "d";
+		break;
+	case AS_IO:
+		spaceletter = "i";
+		break;
+	case AS_OPCODES:
+		spaceletter = "3";
+		break;
 	}
 
+	// get size syntax for memory access and formatting values
+	bool const octal = space->is_octal();
+	int const addrchars = octal
+			? ((2 + space->logaddr_width()) / 3)
+			: ((3 + space->logaddr_width()) / 4);
+	int const datachars = octal
+			? ((2 + (m_cheat.width * 8)) / 3)
+			: ((3 + (m_cheat.width * 8)) / 4);
+	u64 const sizemask = util::make_bitmask<u64>(m_cheat.width * 8);
 	char sizeletter;
-	u64 sizemask;
 	switch (m_cheat.width)
 	{
-		default:
-		case 1:          sizeletter = 'b';   sizemask = 0xffU;               break;
-		case 2:          sizeletter = 'w';   sizemask = 0xffffU;             break;
-		case 4:          sizeletter = 'd';   sizemask = 0xffffffffU;         break;
-		case 8:          sizeletter = 'q';   sizemask = 0xffffffffffffffffU; break;
+	default:
+	case 1: sizeletter = 'b';   break;
+	case 2: sizeletter = 'w';   break;
+	case 4: sizeletter = 'd';   break;
+	case 8: sizeletter = 'q';   break;
 	}
 
 	// write the cheat list
@@ -3250,7 +3269,8 @@ void debugger_commands::execute_cheatlist(const std::vector<std::string> &params
 	{
 		if (m_cheat.cheatmap[cheatindex].state == 1)
 		{
-			u64 const value = cheat_byte_swap(&m_cheat, cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset)) & sizemask;
+			u64 const value = m_cheat.byte_swap(m_cheat.read_extended(m_cheat.cheatmap[cheatindex].offset)) & sizemask;
+			u64 const first_value = m_cheat.byte_swap(m_cheat.cheatmap[cheatindex].first_value) & sizemask;
 			offs_t const address = space->byte_to_address(m_cheat.cheatmap[cheatindex].offset);
 
 			if (!params.empty())
@@ -3260,23 +3280,31 @@ void debugger_commands::execute_cheatlist(const std::vector<std::string> &params
 				output.rdbuf()->clear();
 				stream_format(
 						output,
-						"  <cheat desc=\"Possibility %d: %0*X (%0*X)\">\n"
-						"    <script state=\"run\">\n"
-						"      <action>%s.p%c%c@%0*X=%0*X</action>\n"
-						"    </script>\n"
-						"  </cheat>\n\n",
-						active_cheat, space->logaddrchars(), address, m_cheat.width * 2, value,
-						tag, spaceletter, sizeletter, space->logaddrchars(), address, m_cheat.width * 2, cheat_byte_swap(&m_cheat, m_cheat.cheatmap[cheatindex].first_value) & sizemask);
+						octal ?
+							"  <cheat desc=\"Possibility %d: 0%0*o (0%0*o)\">\n"
+							"    <script state=\"run\">\n"
+							"      <action>%s.%s%c@0o%0*o=0o%0*o</action>\n"
+							"    </script>\n"
+							"  </cheat>\n\n" :
+							"  <cheat desc=\"Possibility %d: %0*X (%0*X)\">\n"
+							"    <script state=\"run\">\n"
+							"      <action>%s.%s%c@0x%0*X=0x%0*X</action>\n"
+							"    </script>\n"
+							"  </cheat>\n\n",
+						active_cheat, addrchars, address, datachars, value,
+						tag, spaceletter, sizeletter, addrchars, address, datachars, first_value);
 				auto const &text(output.vec());
 				fprintf(f, "%.*s", int(unsigned(text.size())), &text[0]);
 			}
 			else
 			{
 				m_console.printf(
-						"Address=%0*X Start=%0*X Current=%0*X\n",
-						space->logaddrchars(), address,
-						m_cheat.width * 2, cheat_byte_swap(&m_cheat, m_cheat.cheatmap[cheatindex].first_value) & sizemask,
-						m_cheat.width * 2, value);
+						octal
+							? "Address=0%0*o Start=0%0*o Current=0%0*o\n"
+							: "Address=%0*X Start=%0*X Current=%0*X\n",
+						addrchars, address,
+						datachars, first_value,
+						datachars, value);
 			}
 		}
 	}

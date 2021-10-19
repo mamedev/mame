@@ -73,6 +73,10 @@ private:
 		u8          swapped_cheat;
 		std::vector<cheat_map> cheatmap;
 		u8          undo;
+
+		u64 sign_extend(u64 value) const;
+		u64 byte_swap(u64 value) const;
+		u64 read_extended(offs_t address) const;
 	};
 
 	struct cheat_region_map
@@ -89,9 +93,6 @@ private:
 	bool debug_command_parameter_command(const char *param);
 
 	bool cheat_address_is_valid(address_space &space, offs_t address);
-	u64 cheat_sign_extend(const cheat_system *cheatsys, u64 value);
-	u64 cheat_byte_swap(const cheat_system *cheatsys, u64 value);
-	u64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
 	u64 get_cpunum();
 
