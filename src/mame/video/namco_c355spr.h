@@ -26,7 +26,7 @@ public:
 
 	// the Namco code currently requires us to allocate memory in the device, the Data East hookup uses access callbacks
 	void set_device_allocates_spriteram_and_bitmaps(bool allocate_memory) { m_device_allocates_spriteram_and_bitmaps = allocate_memory;  }
-	
+
 
 	template <typename... T> void set_priority_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_read_spritetile(T &&... args) { m_read_spritetile.set(std::forward<T>(args)...); }
@@ -62,7 +62,7 @@ public:
 
 	void draw_dg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
-	void build_sprite_list_and_render_sprites(const rectangle cliprect, screen_device &screen);
+	void build_sprite_list_and_render_sprites(const rectangle cliprect);
 
 	template<class BitmapClass>
 	void render_sprites(const rectangle cliprect, bitmap_ind8 *pri_bitmap, BitmapClass &temp_bitmap, int alt_precision);
@@ -129,7 +129,7 @@ protected:
 	bitmap_ind16 m_renderbitmap;
 	bitmap_ind16 m_screenbitmap;
 
-	void build_sprite_list(int no, screen_device &screen);
+	void build_sprite_list(int no);
 
 private:
 
@@ -143,8 +143,8 @@ private:
 	int default_code2tile(int code);
 
 	// C355 Motion Object internals
-	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen, int no);
-	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
+	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, int no);
+	template<class BitmapClass> void draw_sprites(BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 
 	int m_scrolloffs[2];
