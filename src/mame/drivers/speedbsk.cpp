@@ -1,47 +1,63 @@
-// license:BSD-3-Clause
-// copyright-holders:
+// license: BSD-3-Clause
+// copyright-holders: Dirk Best
+/***************************************************************************
 
-/*
-Speed Basketball by Sega (1992)
-https://www.youtube.com/watch?v=efs2KNNncn8
+    Speed Basketball
+    © 1992 Sega
 
-Exciting Boat Race by Sega (1993) (only sound PCB is dumped)
+    Exciting Boat Race (only sound PCB is dumped)
+    © 1993 Sega
 
-Hardware notes:
-Main PCB marked 'SEGA 1991 171-6202B' with '834-8700' and '921016.0639E' stickers.
-Main components:
-- D70008AC-8 main CPU
-- D71051G serial control unit
-- D71054G programmable timer / counter
-- 2x D71055G parallel interface unit
-- 2x D4701AC incremental encoder counter
-- 315-5338A I/O custom
-- 93C45 serial EEPROM
-- 3773P power monitor / watchdog
-- MB3780A battery power monitor + battery
-- OSC 32.000 MHz
-- 1 4-dip bank
+    Electromechnical games
 
-Sound PCB marked 'SOUND SEGA 1991 MADE IN JAPAN' with '837-8724-01' sticker ('837-9653' on Exciting Boat Race')
-Main components:
-- Z0840008PSC audio CPU
-- 315-5476A Sega PCM
-- 315-5497 Sega QFP100 ASIC
-- YM2151
-- TMP82C51AP-8 (D71051C-10 on Exciting Boat Race)
-- Oki M6253
-- NEC B6391GF QFP80 gate array (next to unpopulated QFP80 silkscreened "5381")
-- 2x Sanyo LC7883KM digital filter / DAC
-- OSC 48.000 MHz
-- OSC 16.9344 MHz
-- 1 4-dip bank
+    Hardware notes:
+    Main PCB marked 'SEGA 1991 171-6202B' with '834-8700' and '921016.0639E' stickers.
+    Main components:
+    - D70008AC-8 main CPU
+    - D71051G serial control unit
+    - D71054G programmable timer / counter
+    - 2x D71055G parallel interface unit
+    - 2x D4701AC incremental encoder counter
+    - 315-5338A I/O custom
+    - 93C45 serial EEPROM
+    - 3773P power monitor / watchdog
+    - MB3780A battery power monitor + battery
+    - OSC 32.000 MHz
+    - 1 4-dip bank
 
+    Sound PCB marked 'SOUND SEGA 1991 MADE IN JAPAN' with '837-8724-01' sticker ('837-9653' on Exciting Boat Race')
+    Main components:
+    - Z0840008PSC audio CPU
+    - 315-5476A Sega PCM
+    - 315-5497 Sega QFP100 ASIC
+    - YM2151
+    - TMP82C51AP-8 (D71051C-10 on Exciting Boat Race)
+    - Oki M6253
+    - NEC B6391GF QFP80 gate array (next to unpopulated QFP80 silkscreened "5381")
+    - 2x Sanyo LC7883KM digital filter / DAC
+    - OSC 48.000 MHz
+    - OSC 16.9344 MHz
+    - 1 4-dip bank
 
-Notes:
-- Speed Basketball only has some LEDs and lamps, the rest is mechanical.
-- The driver contains the ROMs for the sound PCB of Exciting Boat Race as a placeholder, since it's the same PCB as the one used by Speed Basketball.
-  Exciting Boat Race is a main + satellites arrangement with video, so when the other PCBs are found it should be moved out of here.
-*/
+    TODO:
+    - Outputs
+    - PIT input frequencies, outputs (IRQ, baud rate?)
+    - RF5C164 hookup (banking)
+    - UART clocks are set to 9600 baud, real clock unknown
+    - Verify all clocks, everything is guessed
+    - Unknown writes on the sound PCB
+    - Hook up dip switches (main PCB and sound PCB)
+    - ADC on the sound PCB
+    - EEPROM
+    - Coin counters
+
+    Notes:
+    - Speed Basketball only has some LEDs and lamps, the rest is mechanical.
+    Video: https://www.youtube.com/watch?v=efs2KNNncn8
+    - The driver contains the ROMs for the sound PCB of Exciting Boat Race as a placeholder, since it's the same PCB as the one used by Speed Basketball.
+    Exciting Boat Race is a main + satellites arrangement with video, so when the other PCBs are found it should be moved out of here.
+
+***************************************************************************/
 
 #include "emu.h"
 
@@ -66,6 +82,11 @@ Notes:
 
 namespace {
 
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
 class speedbsk_state : public driver_device
 {
 public:
@@ -89,25 +110,27 @@ private:
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
 	void audio_io_map(address_map &map);
+	void pcm_map(address_map &map);
 
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
+	void ppi1_porta_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
 };
 
 
-void speedbsk_state::machine_start()
-{
-}
-
+//**************************************************************************
+//  ADDRESS MAPS
+//**************************************************************************
 
 void speedbsk_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x8003).r("upd4701_0", FUNC(upd4701_device::read_xy));
 	map(0x8200, 0x8203).r("upd4701_1", FUNC(upd4701_device::read_xy));
-//	map(0x8800, 0x8800)
+	map(0x8600, 0x8600).portr("region");
+	map(0x8800, 0x8800).portr("photo_sensors");
 	map(0x8a00, 0x8a0f).rw("io", FUNC(sega_315_5338a_device::read), FUNC(sega_315_5338a_device::write));
 	map(0x8a80, 0x8a83).rw("d71054", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 	map(0x8ac0, 0x8ac1).rw("d71051", FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -119,7 +142,8 @@ void speedbsk_state::main_map(address_map &map)
 void speedbsk_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
-	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c68_device::map));
+	map(0x8000, 0xbfff).rom().region("audiocpu", 0x80000); // banked rom?
+	map(0xc000, 0xdfff).m("rfsnd", FUNC(rf5c164_device::rf5c164_map));
 	map(0xe000, 0xffff).ram();
 }
 
@@ -129,23 +153,76 @@ void speedbsk_state::audio_io_map(address_map &map)
 	map(0x01, 0x01).nopw();
 	map(0x02, 0x03).rw("tmp82c51", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x10, 0x13).nopw(); // misc. outputs
-	map(0x20, 0x20).nopr(); // or 6253 serial read?
+	map(0x20, 0x20).lr8(NAME([]() -> uint8_t { return 0x01; })); // some kind of serial read
 	map(0x21, 0x23).nopw();
+	map(0x30, 0x30).nopw(); // bankswitch?
 	map(0x40, 0x41).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x50, 0x50).rw("adc", FUNC(msm6253_device::d0_r), FUNC(msm6253_device::select_w));
 }
 
+void speedbsk_state::pcm_map(address_map &map)
+{
+	map(0x0000, 0xffff).ram();
+}
+
+
+//**************************************************************************
+//  INPUT PORT DEFINITIONS
+//**************************************************************************
 
 static INPUT_PORTS_START( speedbsk )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("switches")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("SHOOT RED")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("SHOOT GRN")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("service_panel")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Service A \xe2\x86\x91 INC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, right_w)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Service B \xe2\x86\x93 DEC") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_0", upd4701_device, left_w)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service C \xe2\x86\xb2 ENT") PORT_WRITE_LINE_DEVICE_MEMBER("upd4701_1", upd4701_device, right_w)
+
+	PORT_START("unk")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_PGDN) PORT_CODE_INC(KEYCODE_PGUP)
+
+	// this could be the dip switch on the main pcb
+	PORT_START("region")
+	PORT_DIPNAME( 0x03, 0x00, "Region" )
+	PORT_DIPSETTING(    0x00, "Jpn" )
+	PORT_DIPSETTING(    0x01, "USA" )
+	PORT_DIPSETTING(    0x02, "etc" )
+	PORT_DIPSETTING(    0x03, "***" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("photo_sensors")
+	PORT_DIPNAME( 0x01, 0x01, "Corner A" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Corner B" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Corner C" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Corner D" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Goal RED" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Goal GRN" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Poket R" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Poket G" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW") // on main PCB
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW2:1")
@@ -160,6 +237,18 @@ static INPUT_PORTS_START( speedbsk )
 	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // only 4 dips
+
+	PORT_START("track_x_red")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("track_y_red")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+
+	PORT_START("track_x_grn")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("track_y_grn")
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -189,6 +278,18 @@ HD44780_PIXEL_UPDATE( speedbsk_state::lcd_pixel_update )
 //  MACHINE EMULATION
 //**************************************************************************
 
+void speedbsk_state::ppi1_porta_w(uint8_t data)
+{
+	// 7-------  unknown
+	// -6------  unknown
+	// --5-----  unknown
+	// ---4----  unknown
+	// ----3---  unknown
+	// -----2--  unknown
+	// ------1-  coin counter?
+	// -------0  start lamp
+}
+
 void speedbsk_state::ppi1_portc_w(uint8_t data)
 {
 	// 76543---  unknown
@@ -201,6 +302,14 @@ void speedbsk_state::ppi1_portc_w(uint8_t data)
 	m_lcd->e_w(BIT(data, 2));
 }
 
+void speedbsk_state::machine_start()
+{
+}
+
+
+//**************************************************************************
+//  MACHINE DEFINTIONS
+//**************************************************************************
 
 void speedbsk_state::speedbsk(machine_config &config)
 {
@@ -212,34 +321,41 @@ void speedbsk_state::speedbsk(machine_config &config)
 	clock_device &irqclock(CLOCK(config, "irqclock", 60));
 	irqclock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", 48_MHz_XTAL / 12)); // divider guessed
-	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
-	audiocpu.set_addrmap(AS_IO, &speedbsk_state::audio_io_map);
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MB8464A-10LL-SK + MB8730A + battery
 
-	I8251(config, "d71051", 0);
+	// placeholder, uarts will operate at 9600 baud
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
+	uart_clock.signal_handler().set("d71051", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("d71051", FUNC(i8251_device::write_rxc));
+	uart_clock.signal_handler().append("tmp82c51", FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append("tmp82c51", FUNC(i8251_device::write_rxc));
+
+	i8251_device &uart_main(I8251(config, "d71051", 0));
+	uart_main.txd_handler().set("tmp82c51", FUNC(i8251_device::write_rxd));
+	uart_main.rts_handler().set("tmp82c51", FUNC(i8251_device::write_cts));
 
 	PIT8254(config, "d71054", 0);
 
 	I8255(config, m_ppi[0]);
 	// port a: output
 	// port b: output
-	// port c: input
+	m_ppi[0]->in_pc_callback().set_ioport("switches");
 
 	I8255(config, m_ppi[1]);
-	// port a: output
+	m_ppi[1]->out_pa_callback().set(FUNC(speedbsk_state::ppi1_porta_w));
 	m_ppi[1]->out_pb_callback().set(m_lcd, FUNC(hd44780_device::db_w));
 	m_ppi[1]->tri_pc_callback().set_constant(0);
 	m_ppi[1]->out_pc_callback().set(FUNC(speedbsk_state::ppi1_portc_w));
 
-	MSM6253(config, "adc", 0);
+	upd4701_device &upd1(UPD4701A(config, "upd4701_0"));
+	upd1.set_portx_tag("track_x_red");
+	upd1.set_porty_tag("track_y_red");
 
-	UPD4701A(config, "upd4701_0");
+	upd4701_device &upd2(UPD4701A(config, "upd4701_1"));
+	upd2.set_portx_tag("track_x_grn");
+	upd2.set_porty_tag("track_y_grn");
 
-	UPD4701A(config, "upd4701_1");
-
-	SEGA_315_5338A(config, "io", 0);
+	SEGA_315_5338A(config, "io", 32_MHz_XTAL);
 
 	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
 
@@ -261,16 +377,31 @@ void speedbsk_state::speedbsk(machine_config &config)
 	// TODO: LED screen
 
 	// sound hardware, on sound PCB
+	z80_device &audiocpu(Z80(config, "audiocpu", 48_MHz_XTAL / 12)); // divider guessed
+	audiocpu.set_addrmap(AS_PROGRAM, &speedbsk_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &speedbsk_state::audio_io_map);
+
 	i8251_device &tmp82c51(I8251(config, "tmp82c51", 0));
 	tmp82c51.rxrdy_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
+	tmp82c51.txd_handler().set("d71051", FUNC(i8251_device::write_rxd));
+	tmp82c51.rts_handler().set("d71051", FUNC(i8251_device::write_cts));
+
+	msm6253_device &adc(MSM6253(config, "adc", 0));
+	adc.set_input_tag<0>("unk");
 
 	SPEAKER(config, "mono").front_center(); // TODO: verify if stereo
 
-	YM2151(config, "ymsnd", 16.9344_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.75); // divider guessed, may use 48_MHz XTAL instead
+	YM2151(config, "ymsnd", 48_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.75); // unknown clock
 
-	RF5C68(config, "rfsnd", 16.9344_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.75); // actually Sega 315-5476A
+	rf5c164_device &rfsnd(RF5C164(config, "rfsnd", 48_MHz_XTAL / 4)); // Sega 315-5476A, unknown clock
+	rfsnd.add_route(ALL_OUTPUTS, "mono", 0.75);
+	rfsnd.set_addrmap(0, &speedbsk_state::pcm_map);
 }
 
+
+//**************************************************************************
+//  ROM DEFINTIONS
+//**************************************************************************
 
 ROM_START( speedbsk )
 	ROM_REGION( 0x8000, "maincpu", 0 )
@@ -308,8 +439,14 @@ ROM_START( boatrace )
 	ROM_LOAD( "315-5501_gal16v8.ic8", 0x400, 0x117, NO_DUMP )
 ROM_END
 
+
 } // Anonymous namespace
 
 
-GAME( 1992, speedbsk, 0, speedbsk, speedbsk, speedbsk_state, empty_init, ROT0, "Sega", "Speed Basketball", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1993, boatrace, 0, speedbsk, speedbsk, speedbsk_state, empty_init, ROT0, "Sega", "Exciting Boat Race", MACHINE_IS_SKELETON )
+//**************************************************************************
+//  SYSTEM DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT        ROTATION  COMPANY  FULLNAME              FLAGS
+GAME( 1992, speedbsk, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Speed Basketball",   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1993, boatrace, 0,      speedbsk, speedbsk, speedbsk_state, empty_init, ROT0,     "Sega",  "Exciting Boat Race", MACHINE_IS_SKELETON_MECHANICAL )
