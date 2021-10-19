@@ -66,7 +66,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 	u32 code, u32 color, bool flipx, bool flipy, int hpos, int vpos,
 	int hsize, int vsize, u8 prival,
 
-	bitmap_ind8* pri_buffer, uint32_t pri_mask,
+	bitmap_ind8* pri_buffer, u32 pri_mask,
 	int sprite_screen_width, int  sprite_screen_height,
 	bitmap_ind8* pri_bitmap
 )
@@ -74,73 +74,84 @@ void namco_c355spr_device::zdrawgfxzoom(
 	if (!hsize || !vsize) return;
 	if (!gfx) return;
 
-	if (dest_bmp->bpp() == 16)
+	rectangle myclip = clip;
+	myclip &= dest_bmp->cliprect();
+
+
+	const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
+	const pen_t* palpen = &gfx->palette().pen(pal);
+
+	const u8* source_base = gfx->get_data(code % gfx->elements());
+	if (sprite_screen_width && sprite_screen_height)
 	{
-		const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-		const u8* source_base = gfx->get_data(code % gfx->elements());
-		if (sprite_screen_width && sprite_screen_height)
+		/* compute sprite increment per screen pixel */
+		int dx = (gfx->width() << 16) / sprite_screen_width;
+		int dy = (gfx->height() << 16) / sprite_screen_height;
+
+		int ex = hpos + sprite_screen_width;
+		int ey = vpos + sprite_screen_height;
+
+		int x_index_base;
+		int y_index;
+
+		if (flipx)
 		{
-			/* compute sprite increment per screen pixel */
-			int dx = (gfx->width() << 16) / sprite_screen_width;
-			int dy = (gfx->height() << 16) / sprite_screen_height;
+			x_index_base = (sprite_screen_width - 1) * dx;
+			dx = -dx;
+		}
+		else
+		{
+			x_index_base = 0;
+		}
 
-			int ex = hpos + sprite_screen_width;
-			int ey = vpos + sprite_screen_height;
+		if (flipy)
+		{
+			y_index = (sprite_screen_height - 1) * dy;
+			dy = -dy;
+		}
+		else
+		{
+			y_index = 0;
+		}
 
-			int x_index_base;
-			int y_index;
+		if (hpos < clip.min_x)
+		{ /* clip left */
+			int pixels = clip.min_x - hpos;
+			hpos += pixels;
+			x_index_base += pixels * dx;
+		}
+		if (vpos < clip.min_y)
+		{ /* clip top */
+			int pixels = clip.min_y - vpos;
+			vpos += pixels;
+			y_index += pixels * dy;
+		}
+		if (ex > clip.max_x + 1)
+		{ /* clip right */
+			int pixels = ex - clip.max_x - 1;
+			ex -= pixels;
+		}
+		if (ey > clip.max_y + 1)
+		{ /* clip bottom */
+			int pixels = ey - clip.max_y - 1;
+			ey -= pixels;
+		}
 
-			if (flipx)
+		if (ex > hpos)
+		{ /* skip if inner loop doesn't draw anything */
+			for (int y = vpos; y < ey; y++)
 			{
-				x_index_base = (sprite_screen_width - 1) * dx;
-				dx = -dx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
+				u8 const* const source = source_base + (y_index >> 16) * gfx->rowbytes();
+				auto* const dest = &dest_bmp->pix(y);
+				int x_index = x_index_base;
+				u8* pri = nullptr;
 
-			if (flipy)
-			{
-				y_index = (sprite_screen_height - 1) * dy;
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
+				if (dest_bmp->bpp() == 32)
+					pri = &pri_bitmap->pix(y);
 
-			if (hpos < clip.min_x)
-			{ /* clip left */
-				int pixels = clip.min_x - hpos;
-				hpos += pixels;
-				x_index_base += pixels * dx;
-			}
-			if (vpos < clip.min_y)
-			{ /* clip top */
-				int pixels = clip.min_y - vpos;
-				vpos += pixels;
-				y_index += pixels * dy;
-			}
-			if (ex > clip.max_x + 1)
-			{ /* clip right */
-				int pixels = ex - clip.max_x - 1;
-				ex -= pixels;
-			}
-			if (ey > clip.max_y + 1)
-			{ /* clip bottom */
-				int pixels = ey - clip.max_y - 1;
-				ey -= pixels;
-			}
-
-			if (ex > hpos)
-			{ /* skip if inner loop doesn't draw anything */
-				for (int y = vpos; y < ey; y++)
+				for (int x = hpos; x < ex; x++)
 				{
-					u8 const* const source = source_base + (y_index >> 16) * gfx->rowbytes();
-					auto* const dest = &dest_bmp->pix(y);
-					int x_index = x_index_base;
-					for (int x = hpos; x < ex; x++)
+					if (dest_bmp->bpp() == 16)
 					{
 						const u8 c = source[x_index >> 16];
 						if (c != 0xff)
@@ -149,103 +160,14 @@ void namco_c355spr_device::zdrawgfxzoom(
 						}
 						x_index += dx;
 					}
-					y_index += dy;
-				}
-			}
-		}
-	}
-	else if (dest_bmp->bpp() == 32)
-	{
-		/*
-		hsize and vsize are 16.16 fixed point numbers
-		1<<15 : shrink to 50%
-		1<<16 : uniform scale
-		1<<17 : double to 200%
-		*/
-
-		/* KW 991012 -- Added code to force clip to bitmap boundary */
-		rectangle myclip = clip;
-		myclip &= dest_bmp->cliprect();
-
-		const pen_t* pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-		const uint8_t* code_base = gfx->get_data(code % gfx->elements());
-
-		if (sprite_screen_width && sprite_screen_height)
-		{
-			/* compute sprite increment per screen pixel */
-			int dx = (gfx->width() << 16) / sprite_screen_width;
-			int dy = (gfx->height() << 16) / sprite_screen_height;
-
-			int ex = hpos + sprite_screen_width;
-			int ey = vpos + sprite_screen_height;
-
-			int x_index_base;
-			int y_index;
-
-			if (flipx)
-			{
-				x_index_base = (sprite_screen_width - 1) * dx;
-				dx = -dx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			if (flipy)
-			{
-				y_index = (sprite_screen_height - 1) * dy;
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			if (hpos < clip.left())
-			{ /* clip left */
-				int pixels = clip.left() - hpos;
-				hpos += pixels;
-				x_index_base += pixels * dx;
-			}
-			if (vpos < clip.top())
-			{ /* clip top */
-				int pixels = clip.top() - vpos;
-				vpos += pixels;
-				y_index += pixels * dy;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if (ex > clip.right() + 1)
-			{ /* clip right */
-				int pixels = ex - clip.right() - 1;
-				ex -= pixels;
-			}
-			if (ey > clip.bottom() + 1)
-			{ /* clip bottom */
-				int pixels = ey - clip.bottom() - 1;
-				ey -= pixels;
-			}
-
-			if (ex > hpos)
-			{ /* skip if inner loop doesn't draw anything */
-
-
-				for (int y = vpos; y < ey; y++)
-				{
-					uint8_t const* const source = code_base + (y_index >> 16) * gfx->rowbytes();
-					auto* const dest = &dest_bmp->pix(y);
-					uint8_t* const pri = &pri_bitmap->pix(y);
-
-
-					int x_index = x_index_base;
-					for (int x = hpos; x < ex; x++)
+					else if (dest_bmp->bpp() == 32)
 					{
 						int c = source[x_index >> 16];
 						if (c != 15)
 						{
 							if (prival >= pri[x])
 							{
-								dest[x] = pal[c];
+								dest[x] = palpen[c];
 								dest[x] |= 0xff000000;
 							}
 							else // sprites can have a 'masking' effect on other sprites
@@ -256,9 +178,8 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 						x_index += dx;
 					}
-
-					y_index += dy;
 				}
+				y_index += dy;
 			}
 		}
 	}
@@ -528,7 +449,7 @@ WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 
 
 
-deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: namco_c355spr_device(mconfig, DECO_ZOOMSPR, tag, owner, clock)
 {
 }
@@ -973,12 +894,12 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint32_t const* const src = &temp_bitmap.pix(y);
-		uint32_t* const dst = &bitmap.pix(y);
+		u32 const* const src = &temp_bitmap.pix(y);
+		u32* const dst = &bitmap.pix(y);
 
 		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint32_t const srcpix = src[x];
+			u32 const srcpix = src[x];
 
 			if ((srcpix & 0xff000000) == 0xff000000)
 			{
