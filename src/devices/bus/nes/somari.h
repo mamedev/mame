@@ -14,14 +14,11 @@ class nes_somari_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_l(offs_t offset, uint8_t data) override { write_m(offset + 0x100, data); }
-	virtual void write_m(offs_t offset, uint8_t data) override;
-	void mmc1_w(offs_t offset, uint8_t data);
-	void mmc3_w(offs_t offset, uint8_t data);
-	void vrc2_w(offs_t offset, uint8_t data);
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_l(offs_t offset, u8 data) override { write_m(offset + 0x100, data); }
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
@@ -30,25 +27,25 @@ protected:
 	virtual void device_start() override;
 
 private:
+	void mmc1_reset_latch();
+	void mmc1_w(offs_t offset, u8 data);
+	void vrc2_w(offs_t offset, u8 data);
 	void update_prg();
 	void update_chr();
 	void update_mirror();
-	void bank_update_switchmode();
+	void update_all_banks();
 
-	uint8_t m_board_mode;
-
-	// MMC3 - inherited from txrom
-	uint8_t m_mmc3_mirror_reg;
+	u8 m_board_mode;
 
 	// MMC1
-	uint8_t m_count;
-	uint8_t m_mmc1_latch;
-	uint8_t m_mmc1_reg[4];
+	u8 m_mmc1_count;
+	u8 m_mmc1_latch;
+	u8 m_mmc1_reg[4];
 
 	// VRC2
-	uint8_t m_vrc_prg_bank[2];
-	uint8_t m_vrc_vrom_bank[8];
-	uint8_t m_vrc_mirror_reg;
+	u8 m_vrc_prg_bank[2];
+	u8 m_vrc_vrom_bank[8];
+	u8 m_vrc_mirror;
 };
 
 
