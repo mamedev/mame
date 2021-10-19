@@ -23,6 +23,7 @@ public:
 	void set_colors(int colors) { m_colors = colors; }
 	void set_granularity(int granularity) { m_granularity = granularity; }
 
+	template <typename... T> void set_priority_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 	template <typename... T> void set_read_spritetile(T &&... args) { m_read_spritetile.set(std::forward<T>(args)...); }
 	template <typename... T> void set_read_spriteformat(T &&... args) { m_read_spriteformat.set(std::forward<T>(args)...); }
 	template <typename... T> void set_read_spritetable(T &&... args) { m_read_spritetable.set(std::forward<T>(args)...); }
@@ -38,6 +39,7 @@ public:
 	typedef delegate<int (int)> c355_obj_code2tile_delegate;
 	typedef device_delegate<u16(int, u8)> c355_obj_entry_attr_delegate;
 	typedef device_delegate<u16(int)> c355_obj_entry_delegate;
+	typedef device_delegate<int(int)> c355_priority_delegate;
 
 	void set_tile_callback(c355_obj_code2tile_delegate cb)
 	{
@@ -66,19 +68,19 @@ protected:
 	virtual void device_stop() override;
 
 	c355_obj_code2tile_delegate m_code2tile;
-
+	c355_priority_delegate m_pri_cb;
 	c355_obj_entry_delegate m_read_spritetile;
 	c355_obj_entry_attr_delegate m_read_spriteformat;
 	c355_obj_entry_attr_delegate m_read_spritetable;
 	c355_obj_entry_attr_delegate m_read_cliptable;
 	c355_obj_entry_delegate m_read_spritelist;
 
-
 	u16 read_spritetile(int entry);
 	u16 read_spriteformat(int entry, u8 attr);
 	u16 read_spritetable(int entry, u8 attr);
 	u16 read_cliptable(int entry, u8 attr);
 	u16 read_spritelist(int entry);
+	int default_priority(int pal_pri) { return ((pal_pri >> 4) & 0xf); }
 
 	// general
 	template<class BitmapClass>

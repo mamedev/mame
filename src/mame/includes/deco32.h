@@ -288,6 +288,7 @@ private:
 	u16 read_spritetable(int offs, u8 attr);
 	u16 read_spritelist(int offs);
 	u16 read_cliptable(int offs, u8 attr);
+	int sprite_priority_callback(int priority);
 
 	void expand_sprite_data();
 	void dragngun_init_common();
@@ -296,6 +297,8 @@ private:
 
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
+
+	void namco_sprites(machine_config &config);
 
 	void namcosprite_map(address_map &map);
 	void dragngun_map(address_map &map);

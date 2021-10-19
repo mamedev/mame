@@ -33,6 +33,7 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	device_t(mconfig, type, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	device_video_interface(mconfig, *this),
+	m_pri_cb(*this, DEVICE_SELF, FUNC(namco_c355spr_device::default_priority)),
 	m_read_spritetile(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetile)),
 	m_read_spriteformat(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spriteformat)),
 	m_read_spritetable(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritetable)),
@@ -331,6 +332,7 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 
 void namco_c355spr_device::device_start()
 {
+	m_pri_cb.resolve();
 	m_read_spritetile.resolve();
 	m_read_spriteformat.resolve();
 	m_read_spritetable.resolve();
@@ -504,7 +506,16 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 	 * ------------xxxx palette select
 	 */
 	const u16 palette = m_read_spritetable(which, 6);
-	sprite_ptr->pri = ((palette >> 4) & 0xf);
+
+	int priority = m_pri_cb(palette);
+
+	if (priority == -1)
+	{
+		sprite_ptr->disable = true;
+		return;
+	}
+
+	sprite_ptr->pri = priority;
 
 	const u16 spriteformatram_offset = m_read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
 	sprite_ptr->offset = m_read_spritetable(which, 1);         /* OFFSET */
@@ -820,12 +831,6 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 
 void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
 {
-	if ((m_read_spritetable(which, 6) & 0x80) && (screen.frame_number() & 1)) // flicker
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
-
 	int hpos, vpos, palette, w, h, x, y, dx, dy, hsize, vsize;
 	int zoomx, zoomy;
 	int xpos, ypos;
@@ -868,12 +873,13 @@ void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, 
 	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
 	sprite_ptr->clip = clip;
 
-	int priority = (m_read_spritetable(which, 6) & 0x60) >> 5;
+	int priority = m_pri_cb(palette);
 
-	if (priority == 0) priority = 7;
-	else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
-	else if (priority == 2) priority = 7;
-	else if (priority == 3) priority = 7;
+	if (priority == -1)
+	{
+		sprite_ptr->disable = true;
+		return;
+	}
 
 	sprite_ptr->pri = priority;
 

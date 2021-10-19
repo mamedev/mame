@@ -2135,16 +2135,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
-	m_sprgenzoom->set_palette(m_palette);
-	m_sprgenzoom->set_colors(32);
-	m_sprgenzoom->set_granularity(16);
-	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
-	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
-	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
-	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
-	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
+	namco_sprites(config);
 
 	// I750, these aren't emulated
 	//I82750PB(config, m_i82750pb, XTAL(25'000'000));
@@ -2204,6 +2195,21 @@ void dragngun_state::lockloadu(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
 
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
+}
+
+void dragngun_state::namco_sprites(machine_config &config)
+{
+	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
+	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
+	m_sprgenzoom->set_palette(m_palette);
+	m_sprgenzoom->set_colors(32);
+	m_sprgenzoom->set_granularity(16);
+	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
+	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
+	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
+	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
+	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
+	m_sprgenzoom->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
 }
 
 // DE-0420-1 + Bottom board DE-0421-0
@@ -2269,16 +2275,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
-	m_sprgenzoom->set_palette(m_palette);
-	m_sprgenzoom->set_colors(32);
-	m_sprgenzoom->set_granularity(16);
-	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
-	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
-	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
-	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
-	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
+	namco_sprites(config);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");

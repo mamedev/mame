@@ -206,6 +206,33 @@ u16 dragngun_state::read_cliptable(int offs, u8 attr)
 {
 	return m_sprite_cliptable[(offs << 2) + attr];
 }
+
+int dragngun_state::sprite_priority_callback(int priority)
+{
+	/* For some reason, this bit when used in Dragon Gun causes the sprites
+	   to flicker every other frame (fake transparency)
+
+	   This would usually be a priority bit, but the flicker can't be a
+	   post-process mixing effect filtering out those priorities, because then
+	   it would still cut holes in sprites where it was drawn, and it doesn't.
+
+	   Instead sprites with this priority must simple be disabled every other
+	   frame.  maybe there's a register in the sprite chip to control this on
+	   a per-priority level?
+	*/
+
+	if ((priority & 0x80) && (m_screen->frame_number() & 1)) // flicker
+		return -1;
+
+	priority = (priority & 0x60) >> 5;
+	if (priority == 0) priority = 7;
+	else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
+	else if (priority == 2) priority = 7;
+	else if (priority == 3) priority = 7;
+	return priority;
+}
+
+
 u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
