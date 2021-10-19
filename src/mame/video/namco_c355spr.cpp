@@ -832,9 +832,8 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 }
 
 
-void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, uint32_t* spriteformat_ram0, uint32_t* spriteformat_ram1, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, const uint32_t* spritedata, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
-	const uint32_t* spriteformat;
 	int offs;
 	temp_bitmap.fill(0x00000000, cliprect);
 
@@ -902,22 +901,17 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
 			continue;
 
-		int spriteformatram_offset = (spritedata[offs + 0] & 0x1ff);
+		int spriteformatram_offset = (spritedata[offs + 0] & 0x7ff);
 
-		if (spritedata[offs + 0] & 0x400)
-			spriteformat = spriteformat_ram1;
-		else
-			spriteformat = spriteformat_ram0;
-
-		h = (spriteformat[(spriteformatram_offset << 2) + 1] >> 0) & 0xf;
-		w = (spriteformat[(spriteformatram_offset << 2) + 1] >> 4) & 0xf;
+		h = (m_read_spriteformat(spriteformatram_offset, 1) >> 0) & 0xf;
+		w = (m_read_spriteformat(spriteformatram_offset, 1) >> 4) & 0xf;
 		if (!h || !w)
 			continue;
 		
 		hpos = spritedata[offs + 2] & 0x3ff;
 		vpos = spritedata[offs + 3] & 0x3ff;
-		dx = spriteformat[(spriteformatram_offset << 2) + 2] & 0x1ff;
-		dy = spriteformat[(spriteformatram_offset << 2) + 3] & 0x1ff;
+		dx = m_read_spriteformat(spriteformatram_offset, 2) & 0x1ff;
+		dy = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
 		if (dx & 0x100) dx = 1 - (dx & 0xff);
 		if (dy & 0x100) dy = 1 - (dy & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
 		if (hpos >= 512) hpos -= 1024;
@@ -935,9 +929,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		fx = spritedata[offs + 4] & 0x8000;
 		fy = spritedata[offs + 5] & 0x8000;
 
-		int lookupram_offset = spriteformat[(spriteformatram_offset << 2) + 0] & 0x3fff;
-
-
+		int lookupram_offset = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
 
 		zoomx = hsize * 0x10000 / (w * 16);
 		zoomy = vsize * 0x10000 / (h * 16);
