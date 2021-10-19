@@ -50,7 +50,9 @@ public:
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 	void get_sprites(const rectangle cliprect);
-	void copy_sprites(const rectangle cliprect);
+
+	template<class BitmapClass>
+	void copy_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass& temp_bitmap, int alt_precision);
 
 	void clear_screen_bitmap() { m_screenbitmap.fill(0xffff); }
 	void clear_screen_bitmap(const rectangle cliprect) { m_screenbitmap.fill(0xffff, cliprect); }
@@ -150,7 +152,7 @@ public:
 	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
-	void get_single_sprite(u16 which, screen_device &screen, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 private:
 };

@@ -627,8 +627,8 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 			sprite_ptr->tile[ind] = tile;
 			if ((tile & 0x8000) == 0)
 			{
-				sprite_ptr->x[ind] = x;
-				sprite_ptr->y[ind] = y;
+				sprite_ptr->x[ind] = x << 16;
+				sprite_ptr->y[ind] = y << 16;
 				sprite_ptr->zoomx[ind] = zoomx;
 				sprite_ptr->zoomy[ind] = zoomy;
 			}
@@ -691,54 +691,63 @@ void namco_c355spr_device::get_sprites(const rectangle cliprect)
 		get_list(1);
 	}
 
-	copy_sprites(cliprect);
+	copy_sprites(cliprect, nullptr, m_tempbitmap, 0);
 }
 
-void namco_c355spr_device::copy_sprites(const rectangle cliprect)
+template<class BitmapClass>
+void namco_c355spr_device::copy_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass &temp_bitmap, int alt_precision)
 {
-//  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
-	m_tempbitmap.fill(0xffff, cliprect);
+	temp_bitmap.fill(0xffff, cliprect);
 	for (int no = 0; no < 2; no++)
 	{
-		//if (offs == no)
+		int i = 0;
+		c355_sprite* sprite_ptr = m_spritelist[no].get();
+
+		while (sprite_ptr != m_sprite_end[no])
 		{
-			int i = 0;
-			c355_sprite *sprite_ptr = m_spritelist[no].get();
-
-			while (sprite_ptr != m_sprite_end[no])
+			if (sprite_ptr->disable == false)
 			{
-				if (sprite_ptr->disable == false)
+				rectangle clip = sprite_ptr->clip;
+				clip &= cliprect;
+				for (int ind = 0; ind < sprite_ptr->size; ind++)
 				{
-					rectangle clip = sprite_ptr->clip;
-					clip &= cliprect;
-					for (int ind = 0; ind < sprite_ptr->size; ind++)
+					if ((sprite_ptr->tile[ind] & 0x8000) == 0)
 					{
-						if ((sprite_ptr->tile[ind] & 0x8000) == 0)
-						{
-							int sprite_screen_height = (sprite_ptr->zoomy[ind] * 16 + 0x8000) >> 16;
-							int sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
+						int sprite_screen_height;
+						int sprite_screen_width;
 
-							zdrawgfxzoom(
-								&m_tempbitmap,
-								clip,
-								gfx(0),
-								m_code2tile(sprite_ptr->tile[ind]) + sprite_ptr->offset,
-								sprite_ptr->color,
-								sprite_ptr->flipx, sprite_ptr->flipy,
-								sprite_ptr->x[ind], sprite_ptr->y[ind],
-								sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
-								nullptr, -1,
-								sprite_screen_width, sprite_screen_height,
-								nullptr);				
+						if (alt_precision)
+						{
+							sprite_screen_width = ((sprite_ptr->x[ind] + (sprite_ptr->zoomx[ind] << 4)) >> 16) - (sprite_ptr->x[ind] >> 16);
+							sprite_screen_height = ((sprite_ptr->y[ind] + (sprite_ptr->zoomy[ind] << 4)) >> 16) - (sprite_ptr->y[ind] >> 16);
 						}
+						else
+						{
+							sprite_screen_height = (sprite_ptr->zoomy[ind] * 16 + 0x8000) >> 16;
+							sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
+						}
+
+						zdrawgfxzoom(
+							&temp_bitmap,
+							clip,
+							gfx(0),
+							m_code2tile(sprite_ptr->tile[ind]) + sprite_ptr->offset,
+							sprite_ptr->color,
+							sprite_ptr->flipx, sprite_ptr->flipy,
+							sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,
+							sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
+							nullptr, alt_precision ? 0 : -1,
+							sprite_screen_width, sprite_screen_height,
+							pri_bitmap);
 					}
 				}
-				i++;
-				sprite_ptr++;
 			}
+			i++;
+			sprite_ptr++;
 		}
 	}
 }
+
 
 void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
@@ -788,7 +797,6 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 			0x01ff - Y block offset
 	*/
 
-	temp_bitmap.fill(0x00000000, cliprect);
 
 
 	int no = 0;
@@ -800,13 +808,14 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 		{
 			sprite_ptr->disable = false;
 			const u16 which = m_read_spritelist(i);
-			get_single_sprite(which & 0xff, screen, cliprect, pri_bitmap, temp_bitmap);
+			get_single_sprite(which & 0xff, sprite_ptr, screen, cliprect, pri_bitmap, temp_bitmap);
 			sprite_ptr++;
 			if (which & 0x100) break;
 		}
 		m_sprite_end[no] = sprite_ptr;
 	}
 
+	copy_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -826,10 +835,15 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 }
 
 
-void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
 	if ((m_read_spritetable(which, 6) & 0x80) && (screen.frame_number() & 1)) // flicker
+	{
+		sprite_ptr->disable = true;
 		return;
+	}
+
+	sprite_ptr->clip = cliprect;
 
 	int hpos, vpos, colour, w, h, x, y, dx, dy, hsize, vsize;
 	int zoomx, zoomy;
@@ -839,14 +853,22 @@ void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, co
 	hsize = m_read_spritetable(which, 4) & 0x3ff;
 	vsize = m_read_spritetable(which, 5) & 0x3ff;
 	if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
+	{
+		sprite_ptr->disable = true;
 		return;
+	}
 
 	int spriteformatram_offset = (m_read_spritetable(which, 0) & 0x7ff);
 
 	h = (m_read_spriteformat(spriteformatram_offset, 1) >> 0) & 0xf;
 	w = (m_read_spriteformat(spriteformatram_offset, 1) >> 4) & 0xf;
 	if (!h || !w)
+	{
+		sprite_ptr->disable = true;
 		return;
+	}
+
+	sprite_ptr->offset = m_read_spritetable(which, 1);
 
 	hpos = m_read_spritetable(which, 2) & 0x3ff;
 	vpos = m_read_spritetable(which, 3) & 0x3ff;
@@ -866,10 +888,18 @@ void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, co
 	else if (priority == 2) priority = 7;
 	else if (priority == 3) priority = 7;
 
+	sprite_ptr->pri = priority;
+
 	flipx = m_read_spritetable(which, 4) & 0x8000 ? true : false;
 	flipy = m_read_spritetable(which, 5) & 0x8000 ? true : false;
 
-	int lookupram_offset = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
+	sprite_ptr->flipx = flipx;
+	sprite_ptr->flipy = flipy;
+	sprite_ptr->size = h * w;
+	sprite_ptr->color = (colour & 0x1f);//^ m_palxor;
+
+
+	int tilelookup = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
 
 	zoomx = hsize * 0x10000 / (w * 16);
 	zoomy = vsize * 0x10000 / (h * 16);
@@ -879,6 +909,7 @@ void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, co
 	else
 		ypos = (vpos << 16) + (dy * zoomy) - (16 * zoomy);
 
+	int ind = 0;
 	for (y = 0; y < h; y++)
 	{
 		if (!flipx)
@@ -888,30 +919,25 @@ void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, co
 
 		for (x = 0; x < w; x++)
 		{
-			int sprite = m_read_spritetile(lookupram_offset) & 0x3fff;
+			int sprite = m_read_spritetile(tilelookup) & 0x3fff;
 
-			lookupram_offset++;
+			tilelookup++;
 
-			int sprite_screen_width = ((xpos + (zoomx << 4)) >> 16) - (xpos >> 16);
-			int sprite_screen_height = ((ypos + (zoomy << 4)) >> 16) - (ypos >> 16);
-
-			zdrawgfxzoom(
-				&temp_bitmap, cliprect, gfx(0),
-				m_code2tile(sprite),
-				colour,
-				flipx, flipy,
-				xpos >> 16, ypos >> 16,
-				zoomx, zoomy,
-				priority,
-				nullptr, 0,
-				sprite_screen_width, sprite_screen_height,
-				&pri_bitmap);
-
+			sprite_ptr->tile[ind] = sprite;
+			if ((sprite & 0x8000) == 0)
+			{
+				sprite_ptr->x[ind] = xpos;// >> 16;
+				sprite_ptr->y[ind] = ypos;// >> 16;
+				sprite_ptr->zoomx[ind] = zoomx;
+				sprite_ptr->zoomy[ind] = zoomy;
+			}
 
 			if (flipx)
 				xpos -= zoomx << 4;
 			else
 				xpos += zoomx << 4;
+
+			ind++;
 		}
 		if (flipy)
 			ypos -= zoomy << 4;
