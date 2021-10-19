@@ -1496,6 +1496,13 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			CUSTOM_REG(offset) = data;
 			break;
 
+		case REG_BPL1MOD:   case REG_BPL2MOD:
+			// bit 0 is implicitly ignored on writes,
+			// and wouldn't otherwise make sense with 68k inability of word reading with odd addresses.
+			// hpoker/hpokera would otherwise draw misaligned bottom GFX area without this (writes 0x27)
+			data &= ~1;
+			break;
+
 		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:
 		case REG_COLOR04:   case REG_COLOR05:   case REG_COLOR06:   case REG_COLOR07:
 		case REG_COLOR08:   case REG_COLOR09:   case REG_COLOR10:   case REG_COLOR11:
