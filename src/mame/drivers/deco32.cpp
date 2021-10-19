@@ -478,13 +478,13 @@ void fghthist_state::fghthsta_memmap(address_map &map)
 
 void dragngun_state::namcosprite_map(address_map &map)
 {
-	map(0x204800, 0x204fff).ram();             // clipping tables? (all entries set to 320x256 here)
+	map(0x204800, 0x204fff).ram().share("spclip");// (all entries set to 320x256 here)
 	map(0x208000, 0x208fff).ram().share("lay0");
 	map(0x20c000, 0x20cfff).ram().share("lay1");
 	map(0x210000, 0x217fff).ram().share("look0");
 	map(0x218000, 0x21ffff).ram().share("look1");
 	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
-	map(0x228000, 0x2283ff).ram();             // sprite index (just a table 0x00-0xff here)
+	map(0x228000, 0x2283ff).ram().share("spindex"); // sprite index (just a table 0x00-0xff here)
 	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
 }
 

@@ -67,7 +67,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 	int hsize, int vsize, u8 prival,
 
 	bitmap_ind8* pri_buffer, uint32_t pri_mask,
-	int sprite_screen_width2, int  sprite_screen_height2,
+	int sprite_screen_width, int  sprite_screen_height,
 	bitmap_ind8* pri_bitmap
 )
 {
@@ -78,8 +78,6 @@ void namco_c355spr_device::zdrawgfxzoom(
 	{
 		const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 		const u8* source_base = gfx->get_data(code % gfx->elements());
-		int sprite_screen_height = (vsize * gfx->height() + 0x8000) >> 16;
-		int sprite_screen_width = (hsize * gfx->width() + 0x8000) >> 16;
 		if (sprite_screen_width && sprite_screen_height)
 		{
 			/* compute sprite increment per screen pixel */
@@ -169,25 +167,24 @@ void namco_c355spr_device::zdrawgfxzoom(
 		rectangle myclip = clip;
 		myclip &= dest_bmp->cliprect();
 
-
 		const pen_t* pal = &gfx->palette().pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const uint8_t* code_base = gfx->get_data(code % gfx->elements());
 
-		if (sprite_screen_width2 && sprite_screen_height2)
+		if (sprite_screen_width && sprite_screen_height)
 		{
 			/* compute sprite increment per screen pixel */
-			int dx = (gfx->width() << 16) / sprite_screen_width2;
-			int dy = (gfx->height() << 16) / sprite_screen_height2;
+			int dx = (gfx->width() << 16) / sprite_screen_width;
+			int dy = (gfx->height() << 16) / sprite_screen_height;
 
-			int ex = hpos + sprite_screen_width2;
-			int ey = vpos + sprite_screen_height2;
+			int ex = hpos + sprite_screen_width;
+			int ey = vpos + sprite_screen_height;
 
 			int x_index_base;
 			int y_index;
 
 			if (flipx)
 			{
-				x_index_base = (sprite_screen_width2 - 1) * dx;
+				x_index_base = (sprite_screen_width - 1) * dx;
 				dx = -dx;
 			}
 			else
@@ -197,7 +194,7 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 			if (flipy)
 			{
-				y_index = (sprite_screen_height2 - 1) * dy;
+				y_index = (sprite_screen_height - 1) * dy;
 				dy = -dy;
 			}
 			else
@@ -799,6 +796,9 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 					{
 						if ((sprite_ptr->tile[ind] & 0x8000) == 0)
 						{
+							int sprite_screen_height = (sprite_ptr->zoomy[ind] * 16 + 0x8000) >> 16;
+							int sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
+
 							zdrawgfxzoom(
 								&m_tempbitmap,
 								clip,
@@ -809,7 +809,7 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 								sprite_ptr->x[ind], sprite_ptr->y[ind],
 								sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
 								nullptr, -1,
-								-1, -1,
+								sprite_screen_width, sprite_screen_height,
 								nullptr);				
 						}
 					}

@@ -222,6 +222,8 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_sprite_spriteformat(*this, "lay%u", 0)
 		, m_sprite_spritetile(*this, "look%u", 0)
+		, m_sprite_cliptable(*this, "spclip")
+		, m_sprite_indextable(*this, "spindex")
 		, m_vol_main(*this, "vol_main")
 		, m_vol_gun(*this, "vol_gun")
 		, m_io_inputs(*this, "INPUTS")
@@ -246,6 +248,9 @@ private:
 
 	required_shared_ptr_array<u32, 2> m_sprite_spriteformat;
 	required_shared_ptr_array<u32, 2> m_sprite_spritetile;
+	required_shared_ptr<u32> m_sprite_cliptable;
+	required_shared_ptr<u32> m_sprite_indextable;
+
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
