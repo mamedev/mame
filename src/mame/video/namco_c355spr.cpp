@@ -790,10 +790,23 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 
 	temp_bitmap.fill(0x00000000, cliprect);
 
-	for (int which = 0; which < 0x800 / 8; which++)
+
+	int no = 0;
+
 	{
-		get_single_sprite(which, screen, cliprect, pri_bitmap, temp_bitmap);
+		/* draw the sprites */
+		c355_sprite* sprite_ptr = m_spritelist[no].get();
+		for (int i = 0; i < 256; i++)
+		{
+			sprite_ptr->disable = false;
+			const u16 which = m_read_spritelist(i);
+			get_single_sprite(which & 0xff, screen, cliprect, pri_bitmap, temp_bitmap);
+			sprite_ptr++;
+			if (which & 0x100) break;
+		}
+		m_sprite_end[no] = sprite_ptr;
 	}
+
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -892,8 +905,7 @@ void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, co
 				priority,
 				nullptr, 0,
 				sprite_screen_width, sprite_screen_height,
-				&pri_bitmap
-			);
+				&pri_bitmap);
 
 
 			if (flipx)

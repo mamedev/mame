@@ -197,6 +197,11 @@ u16 dragngun_state::read_spritetable(int offs, u8 attr)
 	return m_spriteram->buffer()[(offs << 3) + attr];
 }
 
+u16 dragngun_state::read_spritelist(int offs)
+{
+	return m_sprite_indextable[offs];
+}
+
 u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);

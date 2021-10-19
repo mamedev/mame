@@ -286,6 +286,7 @@ private:
 	u16 read_spritetile(int lookupram_offset);
 	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
 	u16 read_spritetable(int offs, u8 attr);
+	u16 read_spritelist(int offs);
 
 	void expand_sprite_data();
 	void dragngun_init_common();

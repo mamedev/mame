@@ -91,8 +91,6 @@ protected:
 		int sprite_screen_width, int sprite_screen_height,
 		bitmap_ind8 *pri_bitmap);
 
-private:
-
 	struct c355_sprite
 	{
 		bool disable;
@@ -107,6 +105,17 @@ private:
 		int pri;
 	};
 
+	std::unique_ptr<c355_sprite []> m_spritelist[2];
+	const c355_sprite *m_sprite_end[2];
+	int m_palxor;
+	u16 m_position[4];
+	std::unique_ptr<u16 []> m_spriteram[2];
+	u16* m_pSpriteList16;
+	u16* m_pSpriteTable;
+	bitmap_ind16 m_tempbitmap;
+	bitmap_ind16 m_screenbitmap;
+
+private:
 
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
 	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
@@ -120,15 +129,6 @@ private:
 	void get_list(int no);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
-	std::unique_ptr<c355_sprite []> m_spritelist[2];
-	const c355_sprite *m_sprite_end[2];
-	int m_palxor;
-	u16 m_position[4];
-	std::unique_ptr<u16 []> m_spriteram[2];
-	u16* m_pSpriteList16;
-	u16* m_pSpriteTable;
-	bitmap_ind16 m_tempbitmap;
-	bitmap_ind16 m_screenbitmap;
 
 	int m_scrolloffs[2];
 	//u32 m_ramsize;

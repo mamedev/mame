@@ -2143,7 +2143,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
 	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
 	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
-
+	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
 
 	// I750, these aren't emulated
 	//I82750PB(config, m_i82750pb, XTAL(25'000'000));
@@ -2276,6 +2276,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
 	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
 	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
+	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
