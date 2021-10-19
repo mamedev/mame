@@ -287,6 +287,7 @@ private:
 	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
 	u16 read_spritetable(int offs, u8 attr);
 	u16 read_spritelist(int offs);
+	u16 read_cliptable(int offs, u8 attr);
 
 	void expand_sprite_data();
 	void dragngun_init_common();

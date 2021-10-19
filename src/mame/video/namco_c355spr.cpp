@@ -398,7 +398,7 @@ void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitm
 		if (!m_external_prifill)
 		{
 			if (m_buffer == 0) // not buffered sprites
-				get_sprites(cliprect);
+				get_sprites(cliprect, screen);
 		}
 	}
 	copybitmap(bitmap, cliprect, pri);
@@ -429,7 +429,7 @@ WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 	if (state)
 	{
 		if (m_buffer > 0)
-			get_sprites(screen().visible_area());
+			get_sprites(screen().visible_area(), screen());
 
 		if (m_buffer > 1)
 			std::copy_n(m_spriteram[0].get(), 0x20000/2, m_spriteram[1].get());
@@ -496,10 +496,8 @@ u16 namco_c355spr_device::read_spritelist(int entry)
 	return m_pSpriteList16[entry];
 }
 
-void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
+void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
 {
-	rectangle clip;
-
 	/**
 	 * ----xxxx-------- window select
 	 * --------xxxx---- priority
@@ -524,7 +522,7 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 	xscroll &= 0x1ff; if (xscroll & 0x100) xscroll |= ~0x1ff;
 	yscroll &= 0x1ff; if (yscroll & 0x100) yscroll |= ~0x1ff;
 
-	if (screen().height() > 384)
+	if (screen.height() > 384)
 	{ /* Medium Resolution: vposstem21 adjust */
 			xscroll = (s16)m_position[1];
 			xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
@@ -543,6 +541,7 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 	hpos -= xscroll;
 	vpos -= yscroll;
 	int clipentry = (palette >> 8) & 0xf;
+	rectangle clip;
 	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
 	sprite_ptr->clip = clip;
 	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
@@ -655,7 +654,7 @@ int namco_c355spr_device::default_code2tile(int code)
 	return code;
 }
 
-void namco_c355spr_device::get_list(int no)
+void namco_c355spr_device::get_list(int no, screen_device& screen)
 {
 	/* draw the sprites */
 	c355_sprite *sprite_ptr = m_spritelist[no].get();
@@ -663,14 +662,14 @@ void namco_c355spr_device::get_list(int no)
 	{
 		sprite_ptr->disable = false;
 		const u16 which = m_read_spritelist(i);
-		get_single_sprite(which & 0xff, sprite_ptr);
+		get_single_sprite(which & 0xff, sprite_ptr, screen);
 		sprite_ptr++;
 		if (which & 0x100) break;
 	}
 	m_sprite_end[no] = sprite_ptr;
 }
 
-void namco_c355spr_device::get_sprites(const rectangle cliprect)
+void namco_c355spr_device::get_sprites(const rectangle cliprect, screen_device &screen)
 {
 	int buffer = std::max(0, m_buffer - 1);
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
@@ -681,14 +680,14 @@ void namco_c355spr_device::get_sprites(const rectangle cliprect)
 	{
 		m_pSpriteList16 = &m_spriteram[buffer][0x02000 / 2];
 		m_pSpriteTable = &m_spriteram[buffer][0x00000 / 2];
-		get_list(0);
+		get_list(0, screen);
 
 	}
 //  else
 	{
 		m_pSpriteList16 = &m_spriteram[buffer][0x14000 / 2];
 		m_pSpriteTable = &m_spriteram[buffer][0x10000 / 2];
-		get_list(1);
+		get_list(1, screen);
 	}
 
 	copy_sprites(cliprect, nullptr, m_tempbitmap, 0);
@@ -797,23 +796,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 			0x01ff - Y block offset
 	*/
 
-
-
-	int no = 0;
-
-	{
-		/* draw the sprites */
-		c355_sprite* sprite_ptr = m_spritelist[no].get();
-		for (int i = 0; i < 256; i++)
-		{
-			sprite_ptr->disable = false;
-			const u16 which = m_read_spritelist(i);
-			get_single_sprite(which & 0xff, sprite_ptr, screen, cliprect, pri_bitmap, temp_bitmap);
-			sprite_ptr++;
-			if (which & 0x100) break;
-		}
-		m_sprite_end[no] = sprite_ptr;
-	}
+	get_list(0, screen);
 
 	copy_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
 
@@ -835,7 +818,7 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 }
 
 
-void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
 {
 	if ((m_read_spritetable(which, 6) & 0x80) && (screen.frame_number() & 1)) // flicker
 	{
@@ -843,9 +826,7 @@ void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, 
 		return;
 	}
 
-	sprite_ptr->clip = cliprect;
-
-	int hpos, vpos, colour, w, h, x, y, dx, dy, hsize, vsize;
+	int hpos, vpos, palette, w, h, x, y, dx, dy, hsize, vsize;
 	int zoomx, zoomy;
 	int xpos, ypos;
 	bool flipx, flipy;
@@ -879,7 +860,13 @@ void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, 
 	if (hpos >= 512) hpos -= 1024;
 	if (vpos >= 512) vpos -= 1024;
 
-	colour = m_read_spritetable(which, 6) & 0x1f;
+	palette = m_read_spritetable(which, 6);
+	int xscroll = 0;
+	int yscroll = 0;
+	int clipentry = (palette >> 8) & 0xf;
+	rectangle clip;
+	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
+	sprite_ptr->clip = clip;
 
 	int priority = (m_read_spritetable(which, 6) & 0x60) >> 5;
 
@@ -896,7 +883,7 @@ void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, 
 	sprite_ptr->flipx = flipx;
 	sprite_ptr->flipy = flipy;
 	sprite_ptr->size = h * w;
-	sprite_ptr->color = (colour & 0x1f);//^ m_palxor;
+	sprite_ptr->color = (palette & 0x1f);//^ m_palxor;
 
 
 	int tilelookup = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;

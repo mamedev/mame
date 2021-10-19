@@ -49,7 +49,7 @@ public:
 
 	void draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
-	void get_sprites(const rectangle cliprect);
+	void get_sprites(const rectangle cliprect, screen_device& screen);
 
 	template<class BitmapClass>
 	void copy_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass& temp_bitmap, int alt_precision);
@@ -117,6 +117,8 @@ protected:
 	bitmap_ind16 m_tempbitmap;
 	bitmap_ind16 m_screenbitmap;
 
+	void get_list(int no, screen_device& screen);
+
 private:
 
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
@@ -127,8 +129,7 @@ private:
 	int default_code2tile(int code);
 
 	// C355 Motion Object internals
-	void get_single_sprite(u16 which, c355_sprite *sprite_ptr);
-	void get_list(int no);
+	virtual void get_single_sprite(u16 which, c355_sprite* sprite_ptr, screen_device& screen);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 
@@ -152,7 +153,7 @@ public:
 	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
-	void get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
+	virtual void get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen) override;
 
 private:
 };
