@@ -192,12 +192,12 @@ u16 dragngun_state::read_spriteformat(int spriteformatram_offset, u8 attr)
 		return m_sprite_spriteformat[0][((spriteformatram_offset & 0x1ff)<<2) + attr];
 }
 
-u16 dragngun_state::read_spritetable(int offs, u8 attr)
+u16 dragngun_state::read_spritetable(int offs, u8 attr, int whichlist)
 {
 	return m_spriteram->buffer()[(offs << 3) + attr];
 }
 
-u16 dragngun_state::read_spritelist(int offs)
+u16 dragngun_state::read_spritelist(int offs, int whichlist)
 {
 	return m_sprite_indextable[offs];
 }

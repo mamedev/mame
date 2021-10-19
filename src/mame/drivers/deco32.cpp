@@ -2199,7 +2199,7 @@ void dragngun_state::lockloadu(machine_config &config)
 
 void dragngun_state::namco_sprites(machine_config &config)
 {
-	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
+	NAMCO_C355SPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
 	m_sprgenzoom->set_palette(m_palette);
 	m_sprgenzoom->set_colors(32);
@@ -2210,6 +2210,7 @@ void dragngun_state::namco_sprites(machine_config &config)
 	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
 	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
 	m_sprgenzoom->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
+	m_sprgenzoom->set_device_allocates_memory(false);
 }
 
 // DE-0420-1 + Bottom board DE-0421-0

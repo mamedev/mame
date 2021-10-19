@@ -19,6 +19,35 @@
 
 	TODO: verify which boards use which chips
 
+
+	dragongun does a masking trick on the dragon during the attract intro, it should not be visible but rather
+	cause the fire to be invisible in the shape of the dragon
+	dragongun 'waterfall' prior to one of the bosses also needs correct priority
+
+
+	relative to the start of the sprite area these offets are typically used
+	it is not clear if this is implemented in a single RAM chip, or multiple on some boards
+
+	 * 0x00000 sprite attr (page0) (solvalou service mode)
+	 * 0x02000 sprite list (page0) (solvalou service mode)
+	 *
+	 * 0x02400 window attributes
+	 * 0x04000 format
+	 * 0x08000 tile
+	 * 0x10000 sprite attr (page1)
+	 * 0x14000 sprite list (page1)
+ 
+ 	 TODO: solvalou service mode wants lists / attributes at 0x02000/2 & 0x00000/2
+	 Drawing this is what causes the bad tile in vshoot
+
+	 Do any games need 2 lists at the same time or should 1 list be configurable?
+
+	 It seems unlikely there are really 2 lists
+
+	 Maybe the list written by solvalou's service mode is where data gets copied for
+	 rendering by the sprite DMA trigger, but solvalou is choosing to write it there
+	 directly rather than trigger the DMA?
+
 */
 
 #include "emu.h"
@@ -27,7 +56,6 @@
 #include <algorithm>
 
 DEFINE_DEVICE_TYPE(NAMCO_C355SPR, namco_c355spr_device, "namco_c355spr", "Namco 186/187 or C355 (Sprites)")
-DEFINE_DEVICE_TYPE(DECO_ZOOMSPR, deco_zoomspr_device, "deco_zoomspr", "Namco 186/187 or C355 (Sprites) (Dragon Gun)")
 
 namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -45,7 +73,9 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	m_gfx_region(*this, DEVICE_SELF),
 	m_colbase(0),
 	m_colors(16),
-	m_granularity(256)
+	m_granularity(256),
+	m_draw_2_lists(true),
+	m_device_allocates_spriteram_and_bitmaps(true)
 {
 	std::fill(std::begin(m_position), std::end(m_position), 0);
 	std::fill(std::begin(m_scrolloffs), std::end(m_scrolloffs), 0);
@@ -67,15 +97,12 @@ void namco_c355spr_device::zdrawgfxzoom(
 	u32 code, u32 color, bool flipx, bool flipy, int hpos, int vpos,
 	int hsize, int vsize, u8 prival,
 
-	bitmap_ind8* pri_buffer, u32 pri_mask,
+	bitmap_ind8* pri_buffer,
 	int sprite_screen_width, int  sprite_screen_height,
 	bitmap_ind8* pri_bitmap)
 {
 	if (!hsize || !vsize) return;
 	if (!gfx) return;
-
-	//rectangle myclip = clip;
-	//myclip &= dest_bmp->cliprect();
 
 	const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const pen_t* palpen = &gfx->palette().pen(pal);
@@ -190,7 +217,7 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const src = &m_renderbitmap.pix(y);
 			u16 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
 			{
@@ -224,7 +251,7 @@ void namco_c355spr_device::copybitmap(bitmap_ind16 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const src = &m_renderbitmap.pix(y);
 			u16 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
 			{
@@ -260,7 +287,7 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const src = &m_renderbitmap.pix(y);
 			u16 *const srcrender = &m_screenbitmap.pix(y);
 			u32 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
@@ -298,7 +325,7 @@ void namco_c355spr_device::copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &c
 	{
 		for (int y = clip.min_y; y <= clip.max_y; y++)
 		{
-			u16 *const src = &m_tempbitmap.pix(y);
+			u16 *const src = &m_renderbitmap.pix(y);
 			u16 *const srcrender = &m_screenbitmap.pix(y);
 			u32 *const dest = &dest_bmp.pix(y);
 			for (int x = clip.min_x; x <= clip.max_x; x++)
@@ -339,8 +366,6 @@ void namco_c355spr_device::device_start()
 	m_read_cliptable.resolve();
 	m_read_spritelist.resolve();
 
-	screen().register_screen_bitmap(m_tempbitmap);
-	screen().register_screen_bitmap(m_screenbitmap);
 	gfx_layout obj_layout =
 	{
 		16,16,
@@ -353,19 +378,41 @@ void namco_c355spr_device::device_start()
 	};
 	obj_layout.total = m_gfx_region->bytes() / (16*16*8 / 8);
 
+
 	std::fill(std::begin(m_position), std::end(m_position), 0x0000);
+
 	for (int i = 0; i < 2; i++)
 	{
-		m_spritelist[i] = std::make_unique<c355_sprite []>(0x100);
+		m_spritelist[i] = std::make_unique<c355_sprite[]>(0x100);
 		m_sprite_end[i] = m_spritelist[i].get();
-		m_spriteram[i] = std::make_unique<u16 []>(0x20000/2);
-		std::fill_n(m_spriteram[i].get(), 0x20000/2, 0);
-		save_pointer(NAME(m_spriteram[i]), 0x20000/2, i);
 	}
+
+	if (m_device_allocates_spriteram_and_bitmaps)
+	{
+		printf("allocating memory\n");
+
+		for (int i = 0; i < 2; i++)
+		{
+			m_spriteram[i] = std::make_unique<u16[]>(0x20000 / 2);
+			std::fill_n(m_spriteram[i].get(), 0x20000 / 2, 0);
+			save_pointer(NAME(m_spriteram[i]), 0x20000 / 2, i);
+		}
+
+	//	set_read_spritetile(FUNC(namco_c355spr_device::read_spritetile));
+	//	set_read_spriteformat(FUNC(namco_c355spr_device::read_spriteformat));
+	//	set_read_spritetable(FUNC(namco_c355spr_device::read_spritetable));
+	//	set_read_spritelist(FUNC(namco_c355spr_device::read_spritelist));
+	//	set_read_cliptable(FUNC(namco_c355spr_device::read_cliptable));
+
+		screen().register_screen_bitmap(m_renderbitmap);
+		screen().register_screen_bitmap(m_screenbitmap);
+	}
+
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), obj_layout, m_gfx_region->base(), 0, m_colors, m_colbase));
 	gfx(0)->set_granularity(m_granularity);
 
 	save_item(NAME(m_position));
+
 }
 
 void namco_c355spr_device::device_stop()
@@ -400,7 +447,7 @@ void namco_c355spr_device::draw_sprites(screen_device &screen, BitmapClass &bitm
 		if (!m_external_prifill)
 		{
 			if (m_buffer == 0) // not buffered sprites
-				get_sprites(cliprect, screen);
+				build_sprite_list_and_render_sprites(cliprect, screen);
 		}
 	}
 	copybitmap(bitmap, cliprect, pri);
@@ -431,7 +478,7 @@ WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 	if (state)
 	{
 		if (m_buffer > 0)
-			get_sprites(screen().visible_area(), screen());
+			build_sprite_list_and_render_sprites(screen().visible_area(), screen());
 
 		if (m_buffer > 1)
 			std::copy_n(m_spriteram[0].get(), 0x20000/2, m_spriteram[1].get());
@@ -439,33 +486,9 @@ WRITE_LINE_MEMBER(namco_c355spr_device::vblank)
 }
 
 
-
-/* the sprites used dy DragonGun + Lock 'n' Loaded */
-
-// helicopter in lockload is only half drawn? (3rd attract demo)
-// how are we meant to mix these with the tilemaps, parts must go above / behind parts of tilemap '4/7' in lockload, could be more priority masking sprites we're missing / not drawing tho?
-// dragongun also does a masking trick on the dragon during the attract intro, it should not be visible but rather cause the fire to be invisible in the shape of the dragon (see note / hack in code to enable this effect)
-// dragongun 'waterfall' prior to one of the bosses also needs correct priority
-
-
-
-deco_zoomspr_device::deco_zoomspr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: namco_c355spr_device(mconfig, DECO_ZOOMSPR, tag, owner, clock)
-{
-}
-
 /******************************************************************************/
 
-/**
- * 0x00000 sprite attr (page0)
- * 0x02000 sprite list (page0)
- *
- * 0x02400 window attributes
- * 0x04000 format
- * 0x08000 tile
- * 0x10000 sprite attr (page1)
- * 0x14000 sprite list (page1)
- */
+
 
 u16 namco_c355spr_device::read_spriteformat(int entry, u8 attr)
 {
@@ -477,13 +500,20 @@ u16 namco_c355spr_device::read_spriteformat(int entry, u8 attr)
 u16 namco_c355spr_device::read_spritetile(int entry)
 {
 	u16 *spriteram16 = &m_spriteram[std::max(0, m_buffer - 1)][0];
-	const u16 *spritetile   = &spriteram16[0x8000 / 2];
+	const u16 *spritetile = &spriteram16[0x8000 / 2];
 	return spritetile[entry];
 }
 
-u16 namco_c355spr_device::read_spritetable(int entry, u8 attr)
+u16 namco_c355spr_device::read_spritetable(int entry, u8 attr, int whichlist)
 {
-	return m_pSpriteTable[(entry << 3) + attr];
+	u16 *ram;
+	int buffer = std::max(0, m_buffer - 1);
+	if (whichlist == 0)
+		ram = &m_spriteram[buffer][0x00000 / 2];
+	else
+		ram = &m_spriteram[buffer][0x10000 / 2];
+
+	return ram[(entry << 3) + attr];
 }
 
 u16 namco_c355spr_device::read_cliptable(int entry, u8 attr)
@@ -493,9 +523,16 @@ u16 namco_c355spr_device::read_cliptable(int entry, u8 attr)
 	return pWinAttr[(entry << 2) + attr];
 }
 
-u16 namco_c355spr_device::read_spritelist(int entry)
+u16 namco_c355spr_device::read_spritelist(int entry, int whichlist)
 {
-	return m_pSpriteList16[entry];
+	u16 *ram;
+	int buffer = std::max(0, m_buffer - 1);
+	if (whichlist == 0)
+		ram = &m_spriteram[buffer][0x02000 / 2];
+	else
+		ram = &m_spriteram[buffer][0x14000 / 2];
+
+	return ram[entry];
 }
 
 
@@ -504,47 +541,33 @@ int namco_c355spr_device::default_code2tile(int code)
 	return code;
 }
 
-void namco_c355spr_device::get_list(int no, screen_device& screen)
+void namco_c355spr_device::build_sprite_list(int no, screen_device& screen)
 {
 	/* draw the sprites */
 	c355_sprite *sprite_ptr = m_spritelist[no].get();
 	for (int i = 0; i < 256; i++)
 	{
 		sprite_ptr->disable = false;
-		const u16 which = m_read_spritelist(i);
-		get_single_sprite(which & 0xff, sprite_ptr, screen);
+		const u16 which = m_read_spritelist(i, no);
+		get_single_sprite(which & 0xff, sprite_ptr, screen, no);
 		sprite_ptr++;
 		if (which & 0x100) break;
 	}
 	m_sprite_end[no] = sprite_ptr;
 }
 
-void namco_c355spr_device::get_sprites(const rectangle cliprect, screen_device &screen)
+void namco_c355spr_device::build_sprite_list_and_render_sprites(const rectangle cliprect, screen_device &screen)
 {
-	int buffer = std::max(0, m_buffer - 1);
-//  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
+	if (m_draw_2_lists)
+		build_sprite_list(0, screen);
 
-//  if (offs == 0)  // boot
-	// TODO: solvalou service mode wants 0x14000/2 & 0x00000/2
-	// drawing this is what causes the bad tile in vshoot, do any games need 2 lists at the same time or should 1 list be configurable?
-	{
-		m_pSpriteList16 = &m_spriteram[buffer][0x02000 / 2];
-		m_pSpriteTable = &m_spriteram[buffer][0x00000 / 2];
-		get_list(0, screen);
+	build_sprite_list(1, screen);
 
-	}
-//  else
-	{
-		m_pSpriteList16 = &m_spriteram[buffer][0x14000 / 2];
-		m_pSpriteTable = &m_spriteram[buffer][0x10000 / 2];
-		get_list(1, screen);
-	}
-
-	copy_sprites(cliprect, nullptr, m_tempbitmap, 0);
+	render_sprites(cliprect, nullptr, m_renderbitmap, 0);
 }
 
 template<class BitmapClass>
-void namco_c355spr_device::copy_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass &temp_bitmap, int alt_precision)
+void namco_c355spr_device::render_sprites(const rectangle cliprect, bitmap_ind8* pri_bitmap, BitmapClass &temp_bitmap, int alt_precision)
 {
 	temp_bitmap.fill(0xffff, cliprect);
 	for (int no = 0; no < 2; no++)
@@ -585,7 +608,7 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect, bitmap_ind8* p
 							sprite_ptr->flipx, sprite_ptr->flipy,
 							sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,
 							sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
-							nullptr, alt_precision ? 0 : -1,
+							nullptr,
 							sprite_screen_width, sprite_screen_height,
 							pri_bitmap);
 					}
@@ -598,57 +621,11 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect, bitmap_ind8* p
 }
 
 
-void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+void namco_c355spr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
-/*
-		Sprites are built from main control ram, which references tile
-		layout ram, which finally references tile lookup ram which holds
-		the actual tile indices to draw and index into the banking
-		control.  Tile lookup and tile layout ram are double buffered.
+	build_sprite_list(0, screen);
 
-
-		Main sprite control ram, 8 * 32 bit words per sprite, so
-
-		Word 0:
-			0x0400 - Banking control for tile layout RAM + tile lookup ram
-			0x0200 - ?
-			0x01ff - Index into tile layout RAM
-		Word 1 :
-		Word 2 : X base position
-		Word 3 : Y base position
-		Word 4 :
-			0x8000: X flip
-			0x03ff: X size of block in pixels (for scaling)
-		Word 5 :
-			0x8000: Y flip
-			0x03ff: Y size of block in pixels (for scaling)
-		Word 6 :
-			0x0000001f - colour.
-			0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
-			0x00000040 - ?  priority?
-			0x00000080 - flicker
-			0x40000000 - Additive/Subtractable blend? (dragngun)
-		Word 7 :
-
-
-		Tile layout ram, 4 * 32 bit words per sprite, so
-
-		Word 0:
-			0x2000 - Selector for tile lookup bank!?!?!?!?!?!?
-			0x1fff - Index into tile lookup ram (16 bit word based, NOT 32)
-		Word 1:
-			0xff00 - ?
-			0x00f0 - Width
-			0x000f - Height
-		Word 2:
-			0x01ff - X block offset
-		Word 3:
-			0x01ff - Y block offset
-	*/
-
-	get_list(0, screen);
-
-	copy_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
+	render_sprites(cliprect, &pri_bitmap, temp_bitmap, 1);
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
@@ -668,14 +645,14 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 }
 
 
-void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
+void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen, int no)
 {
 	/**
 	 * ----xxxx-------- window select
 	 * --------xxxx---- priority
 	 * ------------xxxx palette select
 	 */
-	const u16 palette = m_read_spritetable(which, 6);
+	const u16 palette = m_read_spritetable(which, 6, no);
 
 	int priority = m_pri_cb(palette);
 
@@ -687,14 +664,14 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr,
 
 	sprite_ptr->pri = priority;
 
-	const u16 spriteformatram_offset = m_read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
-	sprite_ptr->offset = m_read_spritetable(which, 1);         /* OFFSET */
-	int hpos           = m_read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = m_read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = m_read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = m_read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
-	/* m_read_spritetable(which, 6)  contains priority/palette */
-	/* m_read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
+	const u16 spriteformatram_offset = m_read_spritetable(which, 0, no) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = m_read_spritetable(which, 1, no);         /* OFFSET */
+	int hpos           = m_read_spritetable(which, 2, no);         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = m_read_spritetable(which, 3, no);         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = m_read_spritetable(which, 4, no);         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = m_read_spritetable(which, 5, no);         /* VSIZE      max 0x3ff pixels */
+	/* m_read_spritetable(which, 6, no)  contains priority/palette */
+	/* m_read_spritetable(which, 7, no)   is used in Lucky & Wild, possibly for sprite-road priority */
 
 	int xscroll = (s16)m_position[1];
 	int yscroll = (s16)m_position[0];
