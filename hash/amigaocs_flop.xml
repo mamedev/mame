@@ -21685,14 +21685,16 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Doesn't load on a500p (with wrong GFX pitch too, btanb?) -->
 	<!-- ATK test: OK -->
-	<software name="hpoker" supported="no">
+	<software name="hpoker" supported="partial">
 		<!-- SPS (CAPS) release 1791 -->
 		<description>Hollywood Poker (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
 		<publisher>Diamond</publisher>
+		<!-- Up + fire to change cards after selection -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1791)hollywoodpoker.ipf" size="1049612" crc="d3828066" sha1="9bd25d93a94aa2a91c5267cdc53dae9e4a394c62"/>
@@ -21701,7 +21703,7 @@ license:CC0
 	</software>
 
 	<!-- ATK test: OK -->
-	<software name="hpokera" cloneof="hpoker" supported="no">
+	<software name="hpokera" cloneof="hpoker" supported="partial">
 		<!-- SPS (CAPS) release 1792 -->
 		<description>Hollywood Poker (Euro, Budget)</description>
 		<!-- budget, standalone -->
@@ -25108,6 +25110,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Has slight glitches during gameplay (empty box on startup, sprite overlap drawing, garbage stripe GFX from time to time) -->
 	<!-- ATK test: failed -->
 	<software name="kickoff2" supported="no">
 		<!-- SPS (CAPS) release 2191 -->
@@ -27517,7 +27520,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Mouse cursor is uncontrollable -->
+	<!-- Mouse cursor is uncontrollable, [joytest] reset counter -->
 	<!-- ATK test: OK -->
 	<software name="lifendth" supported="no">
 		<!-- SPS (CAPS) release 1126 -->
@@ -32588,7 +32591,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Guru Meditation -->
+	<!-- Guru Meditation, [FDC] copy protection (enables 68k trace mode, corrupt A2 at PC=3e4) -->
 	<!-- ATK test: OK -->
 	<software name="onslaugh" supported="no">
 		<!-- SPS (CAPS) release 869 -->
@@ -33267,6 +33270,8 @@ license:CC0
 	</software>
 
 	<!-- boot OK, has a stripe of garbage on bottom (especially noticeable on game end screen) -->
+	<!-- Has GFX pitch issues on PAL machines (btanb?) -->
+	<!-- Has optional Genias or Standard 4-players interface (unsupported) -->
 	<!-- ATK test: OK -->
 	<software name="overnet" supported="partial">
 		<!-- SPS (CAPS) release 2439 -->
@@ -33275,6 +33280,7 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Merit</publisher>
+		<!-- Developer: Genias -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2439)overthenet.ipf" size="1049180" crc="7fcbc438" sha1="ee82d07d9d32270075313f86726bb32e615cd835"/>
@@ -36926,6 +36932,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Guru Meditation, [Blitter] transfer at PC=00DBD6 that pitfalls existing code -->
+	<!-- [FDC] dsksync afterward -->
 	<!-- ATK test: failed -->
 	<software name="redheat" supported="no">
 		<!-- SPS (CAPS) release 565 -->
@@ -37483,6 +37491,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- No background GFXs, known to abuse of the [Copper] sprites -->
 	<!-- ATK test: OK -->
 	<software name="riskyw" supported="no">
 		<!-- SPS (CAPS) release 571 -->
@@ -37491,6 +37500,8 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -43851,6 +43862,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- black screen, [FDC] dsksync -->
+	<!-- Has GFX pitch issues on gameplay -->
 	<!-- ATK test: OK -->
 	<software name="suburban" supported="no">
 		<!-- SPS (CAPS) release 959 -->
@@ -44370,6 +44383,8 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Has GFX pitch issues on intro -->
+	<!-- Guru Meditation after intro -->
 	<!-- ATK test: OK -->
 	<software name="ssf2" supported="no">
 		<!-- SPS (CAPS) release 147 -->
@@ -44718,9 +44733,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, bird sample keeps repeating -->
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="swordhon" supported="partial">
+	<software name="swordhon" supported="yes">
 		<!-- SPS (CAPS) release 149 -->
 		<description>Sword of Honour (Euro)</description>
 		<!-- retail, standalone -->
@@ -44728,6 +44743,7 @@ license:CC0
 		<year>1992</year>
 		<publisher>Prestige</publisher>
 		<info name="usage" value="Sports manual copy-protection (Kodeord)" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -44912,8 +44928,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Has GFX wrong colors on initial training setup screen, "fixed" by blitter ball layer copies -->
 	<!-- ATK test: OK -->
-	<software name="tableten" supported="no">
+	<software name="tableten" supported="partial">
 		<!-- SPS (CAPS) release 1912 -->
 		<description>Table Tennis Simulation (Euro)</description>
 		<!-- retail, standalone -->
@@ -44971,6 +44988,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Crashes almost always after entering correct copy protection word, "FT I,FLAGS.DAT" printed on screen -->
+	<!-- If loading works (with -debug only?) no player data is loaded correctly -->
+	<!-- TODO: word is always "CLUB"? Is RNG working right? -->
 	<!-- ATK test: OK -->
 	<software name="tacmanit" supported="no">
 		<!-- SPS (CAPS) release 1853 -->
@@ -44979,6 +44999,9 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1994</year>
 		<publisher>Black Legend</publisher>
+		<info name="usage" value="Sports manual copy-protection"/>
+		<!-- Disks are referred in-game by Disk A or B, those diverges from the floppy markings tho -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -45405,7 +45428,8 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- boot OK, sports repeating samples -->
+	<!-- boot OK on a500 -->
+	<!-- a500p: black screen, caused by PORTS irq2 never cleared -->
 	<!-- ATK test: OK -->
 	<software name="terramex" supported="partial">
 		<!-- SPS (CAPS) release 391 -->
@@ -46001,7 +46025,7 @@ license:CC0
 	</software>
 
 	<!-- ATK test: OK -->
-	<software name="thdrcats" supported="no">
+	<software name="thdrcats" supported="yes">
 		<!-- SPS (CAPS) release 2921 -->
 		<description>ThunderCats (Euro)</description>
 		<!-- retail, standalone -->
@@ -46185,9 +46209,10 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up at language select screen -->
+	<!-- boot OK -->
+	<!-- TODO: verify character drawing GFX in point and click sections -->
 	<!-- ATK test: OK -->
-	<software name="trun1" supported="no">
+	<software name="trun1" supported="partial">
 		<!-- SPS (CAPS) release 2593 -->
 		<description>Time Runners 1 - Gateways in Time (Euro)</description>
 		<!-- retail, standalone -->
@@ -46201,9 +46226,10 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Locks up at language select screen -->
+	<!-- boot OK -->
+	<!-- TODO: verify character drawing GFX in point and click sections -->
 	<!-- ATK test: OK -->
-	<software name="trun2" supported="no">
+	<software name="trun2" supported="partial">
 		<!-- SPS (CAPS) release 2713 -->
 		<description>Time Runners 2 - The Space Stone (Euro)</description>
 		<!-- retail, standalone -->
@@ -46623,8 +46649,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="timexwrd" supported="no">
+	<software name="timexwrd" supported="yes">
 		<!-- SPS (CAPS) release 1132 -->
 		<description>The Times Crosswords Vol. 3 &amp; 4 (Euro)</description>
 		<!-- retail, standalone -->
@@ -46712,14 +46739,19 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK, has slight garbage GFX stripe on bottom of screen -->
+	<!-- Accesses [FDC] dskdatr during loading, no noticeable effect? -->
+	<!-- TODO: how to create data disk? -->
 	<!-- ATK test: OK -->
-	<software name="tipoffa" cloneof="tipoff" supported="no">
+	<software name="tipoffa" cloneof="tipoff" supported="partial">
 		<!-- SPS (CAPS) release 1269 -->
 		<description>Tip Off (Euro, French / German / Italian / Spanish)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
 		<publisher>Anco</publisher>
+		<info name="usage" value="Does not support external floppy drives"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049874">
@@ -47111,8 +47143,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- Transparency sprite issue when ball goes near the goal lines (i.e. top or bottom of field) -->
 	<!-- ATK test: OK -->
-	<software name="totlfoot" supported="no">
+	<software name="totlfoot" supported="partial">
 		<!-- SPS (CAPS) release 154 -->
 		<description>Total Football (Euro)</description>
 		<!-- retail, standalone -->
@@ -47161,8 +47194,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="totrecala" cloneof="totrecal" supported="no">
+	<software name="totrecala" cloneof="totrecal" supported="yes">
 		<!-- SPS (CAPS) release 1770 -->
 		<description>Total Recall (Euro, Budget)</description>
 		<!-- budget, standalone -->
@@ -47308,7 +47342,7 @@ license:CC0
 	</software>
 
 	<!-- black screen after AmigaDOS [FDC] dsksync -->
-	<!-- Mouse cursor is uncontrollable -->
+	<!-- Mouse cursor is uncontrollable, [joytest] reset counters -->
 	<!-- ATK test: C:79 H:U 1 Sector Bad -->
 	<software name="transarc" supported="no">
 		<!-- SPS (CAPS) release 744 -->
@@ -47441,14 +47475,17 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="trinity" supported="no">
+	<software name="trinity" supported="yes">
 		<!-- SPS (CAPS) release 2541 -->
 		<description>Trinity (Euro, r11)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1986</year>
 		<publisher>Infocom</publisher>
+		<info name="usage" value="Launch Trinity file from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2541)trinity.ipf" size="1049612" crc="fe8c6853" sha1="f7ff68729bd963521b2e89e80441cdf7d945458f"/>
@@ -47456,6 +47493,7 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- bad GFX pitch -->
 	<!-- ATK test: OK -->
 	<software name="triplex" supported="no">
 		<!-- SPS (CAPS) release 2048 -->
@@ -47464,6 +47502,9 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Axxiom</publisher>
+		<!-- As in title screen -->
+		<info name="alt_title" value="Tripple-X" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2048)triplex.ipf" size="1049612" crc="a6d1bb80" sha1="e33d788eb8ee97cb0b2f4e85d599d7acd802f1c5"/>
@@ -49385,8 +49426,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Incorrectly GFX drawn copy protection screen (repeats numpad at bottom) -->
-	<!-- TODO: verify afterwards -->
+	<!-- GFX garbage spawns on bottom (repeats bitplane layers from above) -->
 	<!-- ATK test: OK -->
 	<software name="waxworks" supported="no">
 		<!-- SPS (CAPS) release 2274 -->
@@ -49395,7 +49435,7 @@ license:CC0
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>Accolade</publisher>
-		<info name="usage" value="Sports manual copy-protection" />
+		<info name="usage" value="Sports code wheel copy-protection" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
