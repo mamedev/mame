@@ -95,7 +95,14 @@ private:
 	};
 
 	// general
-	void zdrawgfxzoom(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, int scalex, int scaley, u8 prival);
+	template<class BitmapClass>
+	void zdrawgfxzoom(
+		BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color,
+		bool flipx, bool flipy,
+		int sx, int sy,
+		int scalex, int scaley,
+		u8 prival);
 
 	void copybitmap(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 pri);
 	void copybitmap(bitmap_rgb32 &dest_bmp, const rectangle &clip, u8 pri);
@@ -145,12 +152,20 @@ protected:
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
+
+	template<class BitmapClass>
 	void dragngun_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
-		int transparent_color,
-		int scalex, int scaley, bitmap_ind8 *pri_buffer, uint32_t pri_mask, int sprite_screen_width, int  sprite_screen_height, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap,
-		int priority);
+		BitmapClass *dest_bmp, const rectangle &clip, gfx_element *gfx,
+		uint32_t code, uint32_t color,
+		bool flipx, bool flipy,
+		int sx, int sy,
+		int scalex, int scaley,
+		u8 priority,
+
+		bitmap_ind8 *pri_buffer, uint32_t pri_mask,
+		int sprite_screen_width, int sprite_screen_height,
+		bitmap_ind8 *pri_bitmap
+	);
 };
 
 // device type definition
