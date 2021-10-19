@@ -68,15 +68,13 @@ void namco_c355spr_device::zdrawgfxzoom(
 
 	bitmap_ind8* pri_buffer, u32 pri_mask,
 	int sprite_screen_width, int  sprite_screen_height,
-	bitmap_ind8* pri_bitmap
-)
+	bitmap_ind8* pri_bitmap)
 {
 	if (!hsize || !vsize) return;
 	if (!gfx) return;
 
-	rectangle myclip = clip;
-	myclip &= dest_bmp->cliprect();
-
+	//rectangle myclip = clip;
+	//myclip &= dest_bmp->cliprect();
 
 	const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const pen_t* palpen = &gfx->palette().pen(pal);
@@ -742,12 +740,9 @@ void namco_c355spr_device::copy_sprites(const rectangle cliprect)
 	}
 }
 
-
 void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
 {
-	temp_bitmap.fill(0x00000000, cliprect);
-
-	/*
+/*
 		Sprites are built from main control ram, which references tile
 		layout ram, which finally references tile lookup ram which holds
 		the actual tile indices to draw and index into the banking
@@ -793,103 +788,11 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 			0x01ff - Y block offset
 	*/
 
-	/* Sprite global disable bit - can't be, it's set in lockload calibration menu where the targets are sprites */
-//  if (dragngun_sprite_ctrl&0x40000000)
-//      return;
+	temp_bitmap.fill(0x00000000, cliprect);
 
-	for (int offs = 0; offs < 0x800/8; offs++)
+	for (int which = 0; which < 0x800 / 8; which++)
 	{
-		if ((m_read_spritetable(offs, 6) & 0x80) && (screen.frame_number() & 1)) // flicker
-			continue;
-
-		int hpos, vpos, colour, w, h, x, y, dx, dy, hsize, vsize;
-		int zoomx, zoomy;
-		int xpos, ypos;
-		bool flipx, flipy;
-
-		hsize = m_read_spritetable(offs, 4) & 0x3ff;
-		vsize = m_read_spritetable(offs, 5) & 0x3ff;
-		if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
-			continue;
-
-		int spriteformatram_offset = (m_read_spritetable(offs, 0) & 0x7ff);
-
-		h = (m_read_spriteformat(spriteformatram_offset, 1) >> 0) & 0xf;
-		w = (m_read_spriteformat(spriteformatram_offset, 1) >> 4) & 0xf;
-		if (!h || !w)
-			continue;
-		
-		hpos = m_read_spritetable(offs, 2) & 0x3ff;
-		vpos = m_read_spritetable(offs, 3) & 0x3ff;
-		dx = m_read_spriteformat(spriteformatram_offset, 2) & 0x1ff;
-		dy = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
-		if (dx & 0x100) dx = 1 - (dx & 0xff);
-		if (dy & 0x100) dy = 1 - (dy & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
-		if (hpos >= 512) hpos -= 1024;
-		if (vpos >= 512) vpos -= 1024;
-
-		colour = m_read_spritetable(offs, 6) & 0x1f;
-
-		int priority = (m_read_spritetable(offs, 6) & 0x60) >> 5;
-
-		if (priority == 0) priority = 7;
-		else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
-		else if (priority == 2) priority = 7;
-		else if (priority == 3) priority = 7;
-
-		flipx = m_read_spritetable(offs, 4) & 0x8000 ? true : false;
-		flipy = m_read_spritetable(offs, 5) & 0x8000 ? true : false;
-
-		int lookupram_offset = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
-
-		zoomx = hsize * 0x10000 / (w * 16);
-		zoomy = vsize * 0x10000 / (h * 16);
-
-		if (!flipy)
-			ypos = (vpos << 16) - (dy * zoomy); /* The block offset scales with zoom, the base position does not */
-		else
-			ypos = (vpos << 16) + (dy * zoomy) - (16 * zoomy);
-
-		for (y = 0; y < h; y++)
-		{
-			if (!flipx)
-				xpos = (hpos << 16) - (dx * zoomx); /* The block offset scales with zoom, the base position does not */
-			else
-				xpos = (hpos << 16) + (dx * zoomx) - (16 * zoomx);
-
-			for (x = 0; x < w; x++)
-			{
-				int sprite = m_read_spritetile(lookupram_offset) & 0x3fff;
-
-				lookupram_offset++;
-
-				int sprite_screen_width = ((xpos + (zoomx << 4)) >> 16) - (xpos >> 16);
-				int sprite_screen_height = ((ypos + (zoomy << 4)) >> 16) - (ypos >> 16);
-
-				zdrawgfxzoom(
-					&temp_bitmap, cliprect, gfx(0),
-					m_code2tile(sprite),
-					colour,
-					flipx, flipy,
-					xpos >> 16, ypos >> 16,
-					zoomx, zoomy,
-					priority,
-					nullptr, 0,
-					sprite_screen_width, sprite_screen_height,
-					&pri_bitmap
-				);
-
-
-				if (flipx)
-					xpos -= zoomx << 4;
-				else
-					xpos += zoomx << 4;
-			}
-			if (flipy)
-				ypos -= zoomy << 4;
-			else
-				ypos += zoomy << 4;
-		}
+		get_single_sprite(which, screen, cliprect, pri_bitmap, temp_bitmap);
 	}
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
@@ -906,5 +809,101 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 				dst[x] = srcpix & 0x00ffffff;
 			}
 		}
+	}
+}
+
+
+void deco_zoomspr_device::get_single_sprite(u16 which, screen_device& screen, const rectangle& cliprect, bitmap_ind8& pri_bitmap, bitmap_rgb32& temp_bitmap)
+{
+	if ((m_read_spritetable(which, 6) & 0x80) && (screen.frame_number() & 1)) // flicker
+		return;
+
+	int hpos, vpos, colour, w, h, x, y, dx, dy, hsize, vsize;
+	int zoomx, zoomy;
+	int xpos, ypos;
+	bool flipx, flipy;
+
+	hsize = m_read_spritetable(which, 4) & 0x3ff;
+	vsize = m_read_spritetable(which, 5) & 0x3ff;
+	if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
+		return;
+
+	int spriteformatram_offset = (m_read_spritetable(which, 0) & 0x7ff);
+
+	h = (m_read_spriteformat(spriteformatram_offset, 1) >> 0) & 0xf;
+	w = (m_read_spriteformat(spriteformatram_offset, 1) >> 4) & 0xf;
+	if (!h || !w)
+		return;
+
+	hpos = m_read_spritetable(which, 2) & 0x3ff;
+	vpos = m_read_spritetable(which, 3) & 0x3ff;
+	dx = m_read_spriteformat(spriteformatram_offset, 2) & 0x1ff;
+	dy = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
+	if (dx & 0x100) dx = 1 - (dx & 0xff);
+	if (dy & 0x100) dy = 1 - (dy & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
+	if (hpos >= 512) hpos -= 1024;
+	if (vpos >= 512) vpos -= 1024;
+
+	colour = m_read_spritetable(which, 6) & 0x1f;
+
+	int priority = (m_read_spritetable(which, 6) & 0x60) >> 5;
+
+	if (priority == 0) priority = 7;
+	else if (priority == 1) priority = 7; // set to 1 to have the 'masking effect' with the dragon on the dragngun attract mode, but that breaks the player select where it needs to be 3, probably missing some bits..
+	else if (priority == 2) priority = 7;
+	else if (priority == 3) priority = 7;
+
+	flipx = m_read_spritetable(which, 4) & 0x8000 ? true : false;
+	flipy = m_read_spritetable(which, 5) & 0x8000 ? true : false;
+
+	int lookupram_offset = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
+
+	zoomx = hsize * 0x10000 / (w * 16);
+	zoomy = vsize * 0x10000 / (h * 16);
+
+	if (!flipy)
+		ypos = (vpos << 16) - (dy * zoomy); /* The block offset scales with zoom, the base position does not */
+	else
+		ypos = (vpos << 16) + (dy * zoomy) - (16 * zoomy);
+
+	for (y = 0; y < h; y++)
+	{
+		if (!flipx)
+			xpos = (hpos << 16) - (dx * zoomx); /* The block offset scales with zoom, the base position does not */
+		else
+			xpos = (hpos << 16) + (dx * zoomx) - (16 * zoomx);
+
+		for (x = 0; x < w; x++)
+		{
+			int sprite = m_read_spritetile(lookupram_offset) & 0x3fff;
+
+			lookupram_offset++;
+
+			int sprite_screen_width = ((xpos + (zoomx << 4)) >> 16) - (xpos >> 16);
+			int sprite_screen_height = ((ypos + (zoomy << 4)) >> 16) - (ypos >> 16);
+
+			zdrawgfxzoom(
+				&temp_bitmap, cliprect, gfx(0),
+				m_code2tile(sprite),
+				colour,
+				flipx, flipy,
+				xpos >> 16, ypos >> 16,
+				zoomx, zoomy,
+				priority,
+				nullptr, 0,
+				sprite_screen_width, sprite_screen_height,
+				&pri_bitmap
+			);
+
+
+			if (flipx)
+				xpos -= zoomx << 4;
+			else
+				xpos += zoomx << 4;
+		}
+		if (flipy)
+			ypos -= zoomy << 4;
+		else
+			ypos += zoomy << 4;
 	}
 }

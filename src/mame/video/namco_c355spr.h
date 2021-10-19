@@ -150,6 +150,7 @@ public:
 	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
+	void get_single_sprite(u16 which, screen_device &screen, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 private:
 };
