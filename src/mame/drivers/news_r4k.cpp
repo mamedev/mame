@@ -250,7 +250,7 @@ protected:
 
     // MIPS R4400 CPU
 #ifndef NO_MIPS3
-    required_device<r4400be_device> m_cpu;
+    required_device<r4400scbe_device> m_cpu;
 #else
     required_device<r4400_device> m_cpu;
 #endif
@@ -364,6 +364,7 @@ protected:
     // Constants
     const uint32_t ICACHE_SIZE = 16384;
     const uint32_t DCACHE_SIZE = 16384;
+    const uint32_t SCACHE_SIZE = 0x100000;
     const char *MAIN_MEMORY_DEFAULT = "64M";
     const int FREERUN_FREQUENCY = 1000000; // Hz
     const int TIMER0_FREQUENCY = 100;      // Hz
@@ -441,9 +442,11 @@ void news_r4k_state::machine_common(machine_config &config)
 {
     // CPU setup
 #ifndef NO_MIPS3
-    R4400BE(config, m_cpu, 75_MHz_XTAL);
+    R4400SCBE(config, m_cpu, 75_MHz_XTAL);
+    m_cpu->set_force_no_drc(true);
     m_cpu->set_icache_size(ICACHE_SIZE);
     m_cpu->set_dcache_size(DCACHE_SIZE);
+    m_cpu->set_scache_size(SCACHE_SIZE);
     m_cpu->set_secondary_cache_line_size(0x40);         // because config[23:22] = 0b10
     m_cpu->set_system_clock((75_MHz_XTAL).value() / 3); // because config[30:28] = 0b001
 #else

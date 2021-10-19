@@ -107,6 +107,7 @@ static const uint8_t fpmode_source[4] =
 DEFINE_DEVICE_TYPE(R4000BE,   r4000be_device,   "r4000be",   "MIPS R4000 (big)")
 DEFINE_DEVICE_TYPE(R4000LE,   r4000le_device,   "r4000le",   "MIPS R4000 (little)")
 DEFINE_DEVICE_TYPE(R4400BE,   r4400be_device,   "r4400be",   "MIPS R4400 (big)")
+DEFINE_DEVICE_TYPE(R4400SCBE,   r4400scbe_device,   "r4400scbe",   "MIPS R4400SC (big)")
 DEFINE_DEVICE_TYPE(R4400LE,   r4400le_device,   "r4400le",   "MIPS R4400 (little)")
 DEFINE_DEVICE_TYPE(VR4300BE,  vr4300be_device,  "vr4300be",  "NEC VR4300 (big)")
 DEFINE_DEVICE_TYPE(VR4300LE,  vr4300le_device,  "vr4300le",  "NEC VR4300 (little)")
@@ -5610,5 +5611,124 @@ void r5000be_device::handle_cache(uint32_t op)
 	default:
 		logerror("%s: MIPS3: %08x specifies invalid cache type %d, vaddr %08x\n", machine().describe_context(), op, CACHE_TYPE, vaddr);
 		break;
+	}
+}
+
+void r4400scbe_device::set_scache_size(uint32_t size)
+{
+	scache_size = size;
+}
+
+void r4400scbe_device::device_start()
+{
+	if(scache_size < 1 || c_secondary_cache_line_size == 0)
+	{
+		fatalerror("SCACHE size and/or line size were not set!");
+	}
+
+	mips3_device::device_start();
+
+	// MIPS-III secondary cache tag size depends on the cache line size
+	// (how many bytes are transferred with one cache operation) and the
+	// size of the cache itself.
+	// For example, the Sony NEWS NWS-5000X has a 1MB secondary cache
+	// and a cache line size of 16 words. So, the slice of the physical
+	// address used to index into the cache is bits 19:6.
+	// See chapter 11 of the R4000 user manual for more details.
+	if (c_secondary_cache_line_size <= 0x10)
+	{
+		scache_line_index = 4;
+	}
+	else if (c_secondary_cache_line_size <= 0x20)
+	{
+		scache_line_index = 5;
+	}
+	else if (c_secondary_cache_line_size <= 0x40)
+	{
+		scache_line_index = 6;
+	}
+	else
+	{
+		scache_line_index = 7;
+	}
+
+	uint32_t tag_size = scache_size >> scache_line_index;
+	tag_mask = scache_size - 1;
+
+	m_scache_tag = std::make_unique<uint32_t[]>(tag_size);
+	save_pointer(NAME(m_scache_tag), tag_size);
+}
+
+inline uint32_t r4400scbe_device::virt_to_phys_safe(uint32_t vaddr)
+{
+	// A real implementation would throw TLB exceptions when appropriate
+	// This could potentially throw off some firmware/software.
+	return (vtlb_table()[vaddr >> 12] & ~0xfff) | (vaddr & 0xfff);
+}
+
+
+void r4400scbe_device::handle_cache(uint32_t op)
+{
+	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0) && !(SR & (SR_EXL | SR_ERL)))
+	{
+		m_badcop_value = 0;
+		generate_exception(EXCEPTION_BADCOP, 1);
+		return;
+	}
+
+	if (CACHE_TYPE == 3) // Secondary cache
+	{
+		const uint32_t vaddr = RSVAL32 + SIMMVAL;
+		switch (CACHE_OP)
+		{
+			// Index Load Tag
+			case 1:
+			{
+				// Get physical address and use it to get the tag
+				const uint32_t index = (virt_to_phys_safe(vaddr) & tag_mask) >> scache_line_index;
+				const auto tag = m_scache_tag[index];
+
+				// Decode entry and marshal each field to the TagLo register
+				// Note: A full implementation would also need to load the ECC register here
+				const auto cs = (tag & 0x1c00000) >> 22;
+				const auto stag = (tag & 0x7ffff);
+				const auto pidx = (vaddr & 0x380000) >> 19;
+				m_core->cpr[0][COP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
+
+				// std::cout << std::hex << machine().describe_context() << " index load tag vaddr " << std::hex << vaddr << " result " << std::hex << tag << " setting taglo to " << std::hex << m_core->cpr[0][COP0_TagLo] << std::endl;
+				break;
+			}
+
+			// Index Store Tag
+			case 2:
+			{
+				// Prepare index for tag
+				const uint32_t index = (virt_to_phys_safe(vaddr) & tag_mask) >> scache_line_index;
+
+				// Assemble and set tag entry
+				// Note: A full implementation would also need to calculate the ECC bits here
+				const auto tag_lo = m_core->cpr[0][COP0_TagLo];
+				const auto cs = (tag_lo & 0x1c00) >> 10;
+				const auto stag = (tag_lo & 0xffffe000) >> 13;
+				const auto pidx = (vaddr & 0x7000) >> 12;
+				m_scache_tag[index] = cs << 22 | pidx << 19 | stag;
+
+				// std::cout << std::hex << machine().describe_context() << " index store tag vaddr " << std::hex << vaddr << " tlbaddress " << tlbaddress << " index " << index << " new_entry " << std::hex << m_scache_tag[index] << std::endl;
+				break;
+			}
+
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			{
+				// Pretend it was a hit
+				SR |= SR_CH;
+			}
+		default:
+			// Other cache operations are treated as a no-op for now
+			break;
+		}
 	}
 }

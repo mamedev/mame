@@ -25,6 +25,7 @@ MIPS III/IV emulator.
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
 DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
 DECLARE_DEVICE_TYPE(R4400BE, r4400be_device)
+DECLARE_DEVICE_TYPE(R4400SCBE, r4400scbe_device) // experimental partial scache support
 DECLARE_DEVICE_TYPE(R4400LE, r4400le_device)
 // NEC VR4300 series is MIPS III with 32-bit address bus and slightly custom COP0/TLB
 DECLARE_DEVICE_TYPE(VR4300BE, vr4300be_device)
@@ -686,6 +687,43 @@ public:
 		: mips3_device(mconfig, R4400BE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 64)
 	{
 	}
+};
+
+class r4400scbe_device : public mips3_device {
+	// This is a highly experimental implementation of the
+	// secondary cache subsystem, emulating only the tag memory.
+	// This allows the emulated platform to manipulate the secondary
+	// cache without actually implementing it. Like the other MIPS-III
+	// implementations, this will act as if every access is a hit. However,
+	// this naive implementation will not work for everything.
+public:
+	// construction/destruction
+	r4400scbe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, R4400SCBE, tag, owner, clock, MIPS3_TYPE_R4400, ENDIANNESS_BIG, 64)
+	{
+	}
+
+	// SCACHE configuration
+	void set_scache_size(uint32_t size);
+
+protected:
+	virtual void device_start() override;
+	void handle_cache(uint32_t op) override;
+
+	// No-side-effect conversion from virtual to physical addresses
+	uint32_t virt_to_phys_safe(uint32_t vaddr);
+
+	// Size of the secondary cache in bytes
+	uint32_t scache_size = 0;
+
+	// Secondary cache line shift
+	uint32_t scache_line_index = 0;
+
+	// Mask for extracting the tag from a physical address
+	uint32_t tag_mask = 0;
+
+	// Tag memory
+	std::unique_ptr<uint32_t[]> m_scache_tag;
 };
 
 class r4400le_device : public mips3_device {
