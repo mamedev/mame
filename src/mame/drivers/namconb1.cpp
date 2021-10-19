@@ -995,6 +995,7 @@ void namconb1_state::namconb1(machine_config &config)
 	m_c355spr->set_palxor(0x0);
 	m_c355spr->set_buffer(2); // triple buffered
 	m_c355spr->set_color_base(0);
+	m_c355spr->set_draw_2_lists(false); // prevents bad tile on top left of vshoot during certain scenes
 
 	NAMCO_C123TMAP(config, m_c123tmap);
 	m_c123tmap->set_palette(m_c116);
