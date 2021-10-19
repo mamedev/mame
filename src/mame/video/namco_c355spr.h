@@ -131,7 +131,7 @@ private:
 	int default_code2tile(int code);
 
 	// C355 Motion Object internals
-	virtual void get_single_sprite(u16 which, c355_sprite* sprite_ptr, screen_device& screen);
+	void get_single_sprite(u16 which, c355_sprite* sprite_ptr, screen_device& screen);
 	template<class BitmapClass> void draw_sprites(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int pri);
 
 
@@ -155,7 +155,6 @@ public:
 	void dragngun_draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &pri_bitmap, bitmap_rgb32 &temp_bitmap);
 
 protected:
-	virtual void get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device &screen) override;
 
 private:
 };

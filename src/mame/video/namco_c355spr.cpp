@@ -498,167 +498,6 @@ u16 namco_c355spr_device::read_spritelist(int entry)
 	return m_pSpriteList16[entry];
 }
 
-void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
-{
-	/**
-	 * ----xxxx-------- window select
-	 * --------xxxx---- priority
-	 * ------------xxxx palette select
-	 */
-	const u16 palette = m_read_spritetable(which, 6);
-
-	int priority = m_pri_cb(palette);
-
-	if (priority == -1)
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
-
-	sprite_ptr->pri = priority;
-
-	const u16 spriteformatram_offset = m_read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
-	sprite_ptr->offset = m_read_spritetable(which, 1);         /* OFFSET */
-	int hpos           = m_read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
-	int vpos           = m_read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
-	u16 hsize          = m_read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
-	u16 vsize          = m_read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
-	/* m_read_spritetable(which, 6)  contains priority/palette */
-	/* m_read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
-
-	int xscroll = (s16)m_position[1];
-	int yscroll = (s16)m_position[0];
-
-//  xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
-	xscroll &= 0x1ff; if (xscroll & 0x100) xscroll |= ~0x1ff;
-	yscroll &= 0x1ff; if (yscroll & 0x100) yscroll |= ~0x1ff;
-
-	if (screen.height() > 384)
-	{ /* Medium Resolution: vposstem21 adjust */
-			xscroll = (s16)m_position[1];
-			xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
-			if (yscroll < 0)
-			{ /* solvalou */
-				yscroll += 0x20;
-			}
-			yscroll += 0x10;
-	}
-	else
-	{
-		xscroll += m_scrolloffs[0];
-		yscroll += m_scrolloffs[1];
-	}
-
-	hpos -= xscroll;
-	vpos -= yscroll;
-	int clipentry = (palette >> 8) & 0xf;
-	rectangle clip;
-	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
-	sprite_ptr->clip = clip;
-	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
-	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
-
-	int tile_index   = m_read_spriteformat(spriteformatram_offset, 0);
-	const u16 format = m_read_spriteformat(spriteformatram_offset, 1);
-	int dx           = m_read_spriteformat(spriteformatram_offset, 2); // should this also be masked and have a sign bit like dy?
-	const int dy     = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
-	int num_cols     = (format >> 4) & 0xf;
-	int num_rows     = (format) & 0xf;
-
-	if (num_cols == 0) num_cols = 0x10;
-	const bool flipx = (hsize & 0x8000);
-	hsize &= 0x3ff;//0x1ff;
-	if (hsize == 0)
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
-	u32 zoomx = (hsize << 16) / (num_cols * 16);
-	dx = (dx * zoomx + 0x8000) >> 16;
-	if (flipx)
-	{
-		hpos += dx;
-	}
-	else
-	{
-		hpos -= dx;
-	}
-
-	if (num_rows == 0) num_rows = 0x10;
-	const bool flipy = (vsize & 0x8000);
-	vsize &= 0x3ff;
-	if (vsize == 0)
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
-	u32 zoomy = (vsize << 16) / (num_rows * 16);
-	s32 dy_zoomed = ((dy & 0xff) * zoomy + 0x8000) >> 16;
-	if (dy & 0x100) dy_zoomed = -dy_zoomed;
-
-	if (!flipy)
-	{
-		vpos -= dy_zoomed;
-	}
-	else
-	{
-		vpos += dy_zoomed;
-	}
-
-	sprite_ptr->flipx = flipx;
-	sprite_ptr->flipy = flipy;
-	sprite_ptr->size = num_rows * num_cols;
-	sprite_ptr->color = (palette & 0xf) ^ m_palxor;
-
-	u32 source_height_remaining = num_rows * 16;
-	u32 screen_height_remaining = vsize;
-	int y = vpos;
-	int ind = 0;
-	for (int row = 0; row < num_rows; row++)
-	{
-		int tile_screen_height = 16 * screen_height_remaining / source_height_remaining;
-		zoomy = (screen_height_remaining << 16) / source_height_remaining;
-		if (flipy)
-		{
-			y -= tile_screen_height;
-		}
-		u32 source_width_remaining = num_cols * 16;
-		u32 screen_width_remaining = hsize;
-		int x = hpos;
-		for (int col = 0; col < num_cols; col++)
-		{
-			int tile_screen_width = 16 * screen_width_remaining / source_width_remaining;
-			zoomx = (screen_width_remaining << 16) / source_width_remaining;
-			if (flipx)
-			{
-				x -= tile_screen_width;
-			}
-			const u16 tile = m_read_spritetile(tile_index++);
-			sprite_ptr->tile[ind] = tile;
-			if ((tile & 0x8000) == 0)
-			{
-				sprite_ptr->x[ind] = x << 16;
-				sprite_ptr->y[ind] = y << 16;
-				sprite_ptr->zoomx[ind] = zoomx;
-				sprite_ptr->zoomy[ind] = zoomy;
-			}
-			if (!flipx)
-			{
-				x += tile_screen_width;
-			}
-			screen_width_remaining -= tile_screen_width;
-			source_width_remaining -= 16;
-			ind++;
-		} /* next col */
-		if (!flipy)
-		{
-			y += tile_screen_height;
-		}
-		screen_height_remaining -= tile_screen_height;
-		source_height_remaining -= 16;
-	} /* next row */
-}
-
 
 int namco_c355spr_device::default_code2tile(int code)
 {
@@ -829,49 +668,14 @@ void deco_zoomspr_device::dragngun_draw_sprites(screen_device& screen, bitmap_rg
 }
 
 
-void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
+void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, screen_device& screen)
 {
-	int hpos, vpos, palette, w, h, x, y, dx, dy, hsize, vsize;
-	int zoomx, zoomy;
-	int xpos, ypos;
-	bool flipx, flipy;
-
-	hsize = m_read_spritetable(which, 4) & 0x3ff;
-	vsize = m_read_spritetable(which, 5) & 0x3ff;
-	if (!hsize || !vsize) /* Zero pixel size in X or Y - skip block */
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
-
-	int spriteformatram_offset = (m_read_spritetable(which, 0) & 0x7ff);
-
-	h = (m_read_spriteformat(spriteformatram_offset, 1) >> 0) & 0xf;
-	w = (m_read_spriteformat(spriteformatram_offset, 1) >> 4) & 0xf;
-	if (!h || !w)
-	{
-		sprite_ptr->disable = true;
-		return;
-	}
-
-	sprite_ptr->offset = m_read_spritetable(which, 1);
-
-	hpos = m_read_spritetable(which, 2) & 0x3ff;
-	vpos = m_read_spritetable(which, 3) & 0x3ff;
-	dx = m_read_spriteformat(spriteformatram_offset, 2) & 0x1ff;
-	dy = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
-	if (dx & 0x100) dx = 1 - (dx & 0xff);
-	if (dy & 0x100) dy = 1 - (dy & 0xff); /* '1 - ' is strange, but correct for Dragongun 'Winners' screen. */
-	if (hpos >= 512) hpos -= 1024;
-	if (vpos >= 512) vpos -= 1024;
-
-	palette = m_read_spritetable(which, 6);
-	int xscroll = 0;
-	int yscroll = 0;
-	int clipentry = (palette >> 8) & 0xf;
-	rectangle clip;
-	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
-	sprite_ptr->clip = clip;
+	/**
+	 * ----xxxx-------- window select
+	 * --------xxxx---- priority
+	 * ------------xxxx palette select
+	 */
+	const u16 palette = m_read_spritetable(which, 6);
 
 	int priority = m_pri_cb(palette);
 
@@ -883,58 +687,150 @@ void deco_zoomspr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr, 
 
 	sprite_ptr->pri = priority;
 
-	flipx = m_read_spritetable(which, 4) & 0x8000 ? true : false;
-	flipy = m_read_spritetable(which, 5) & 0x8000 ? true : false;
+	const u16 spriteformatram_offset = m_read_spritetable(which, 0) & 0x7ff; /* LINKNO     0x000..0x7ff for format table entries - finalapr code masks with 0x3ff, but vshoot requires 0x7ff */
+	sprite_ptr->offset = m_read_spritetable(which, 1);         /* OFFSET */
+	int hpos           = m_read_spritetable(which, 2);         /* HPOS       0x000..0x7ff (signed) */
+	int vpos           = m_read_spritetable(which, 3);         /* VPOS       0x000..0x7ff (signed) */
+	u16 hsize          = m_read_spritetable(which, 4);         /* HSIZE      max 0x3ff pixels */
+	u16 vsize          = m_read_spritetable(which, 5);         /* VSIZE      max 0x3ff pixels */
+	/* m_read_spritetable(which, 6)  contains priority/palette */
+	/* m_read_spritetable(which, 7)   is used in Lucky & Wild, possibly for sprite-road priority */
+
+	int xscroll = (s16)m_position[1];
+	int yscroll = (s16)m_position[0];
+
+//  xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
+	xscroll &= 0x1ff; if (xscroll & 0x100) xscroll |= ~0x1ff;
+	yscroll &= 0x1ff; if (yscroll & 0x100) yscroll |= ~0x1ff;
+
+	if (screen.height() > 384)
+	{ /* Medium Resolution: vposstem21 adjust */
+			xscroll = (s16)m_position[1];
+			xscroll &= 0x3ff; if (xscroll & 0x200) xscroll |= ~0x3ff;
+			if (yscroll < 0)
+			{ /* solvalou */
+				yscroll += 0x20;
+			}
+			yscroll += 0x10;
+	}
+	else
+	{
+		xscroll += m_scrolloffs[0];
+		yscroll += m_scrolloffs[1];
+	}
+
+	hpos -= xscroll;
+	vpos -= yscroll;
+
+	int clipentry = (palette >> 8) & 0xf;
+	rectangle clip;
+	clip.set(m_read_cliptable(clipentry, 0) - xscroll, m_read_cliptable(clipentry, 1) - xscroll, m_read_cliptable(clipentry, 2) - yscroll, m_read_cliptable(clipentry, 3) - yscroll);
+	sprite_ptr->clip = clip;
+
+
+	hpos &= 0x7ff; if (hpos & 0x400) hpos |= ~0x7ff; /* sign extend */
+	vpos &= 0x7ff; if (vpos & 0x400) vpos |= ~0x7ff; /* sign extend */
+
+	int tile_index   = m_read_spriteformat(spriteformatram_offset, 0);
+	const u16 format = m_read_spriteformat(spriteformatram_offset, 1);
+	const int dx      = m_read_spriteformat(spriteformatram_offset, 2) & 0x1ff; // should this also be masked and have a sign bit like dy?
+	const int dy     = m_read_spriteformat(spriteformatram_offset, 3) & 0x1ff;
+	int num_cols     = (format >> 4) & 0xf;
+	int num_rows     = (format) & 0xf;
+
+	if (num_cols == 0) num_cols = 0x10;
+	const bool flipx = (hsize & 0x8000);
+	hsize &= 0x3ff;//0x1ff;
+	if (hsize == 0)
+	{
+		sprite_ptr->disable = true;
+		return;
+	}
+	u32 zoomx = (hsize << 16) / (num_cols * 16);
+	s32 dx_zoomed = ((dx & 0xff) * zoomx + 0x8000) >> 16;
+	if (dx & 0x100) dx_zoomed = -dx_zoomed;
+
+	if (!flipx)
+	{
+		hpos -= dx_zoomed;
+	}
+	else
+	{
+		hpos += dx_zoomed;
+	}
+
+	if (num_rows == 0) num_rows = 0x10;
+	const bool flipy = (vsize & 0x8000);
+	vsize &= 0x3ff;
+	if (vsize == 0)
+	{
+		sprite_ptr->disable = true;
+		return;
+	}
+	u32 zoomy = (vsize << 16) / (num_rows * 16);
+	s32 dy_zoomed = ((dy & 0xff) * zoomy + 0x8000) >> 16;
+	if (dy & 0x100) dy_zoomed = -dy_zoomed;
+
+	if (!flipy)
+	{
+		vpos -= dy_zoomed;
+	}
+	else
+	{
+		vpos += dy_zoomed;
+	}
 
 	sprite_ptr->flipx = flipx;
 	sprite_ptr->flipy = flipy;
-	sprite_ptr->size = h * w;
-	sprite_ptr->color = (palette & 0x1f);//^ m_palxor;
+	sprite_ptr->size = num_rows * num_cols;
+	sprite_ptr->color = (palette & (m_colors-1)) ^ m_palxor;
 
-
-	int tilelookup = m_read_spriteformat(spriteformatram_offset, 0) & 0x3fff;
-
-	zoomx = hsize * 0x10000 / (w * 16);
-	zoomy = vsize * 0x10000 / (h * 16);
-
-	if (!flipy)
-		ypos = (vpos << 16) - (dy * zoomy); /* The block offset scales with zoom, the base position does not */
-	else
-		ypos = (vpos << 16) + (dy * zoomy) - (16 * zoomy);
-
+	u32 source_height_remaining = num_rows * 16;
+	u32 screen_height_remaining = vsize;
+	int y = vpos;
 	int ind = 0;
-	for (y = 0; y < h; y++)
+	for (int row = 0; row < num_rows; row++)
 	{
-		if (!flipx)
-			xpos = (hpos << 16) - (dx * zoomx); /* The block offset scales with zoom, the base position does not */
-		else
-			xpos = (hpos << 16) + (dx * zoomx) - (16 * zoomx);
-
-		for (x = 0; x < w; x++)
+		int tile_screen_height = 16 * screen_height_remaining / source_height_remaining;
+		zoomy = (screen_height_remaining << 16) / source_height_remaining;
+		if (flipy)
 		{
-			int sprite = m_read_spritetile(tilelookup) & 0x3fff;
-
-			tilelookup++;
-
-			sprite_ptr->tile[ind] = sprite;
-			if ((sprite & 0x8000) == 0)
+			y -= tile_screen_height;
+		}
+		u32 source_width_remaining = num_cols * 16;
+		u32 screen_width_remaining = hsize;
+		int x = hpos;
+		for (int col = 0; col < num_cols; col++)
+		{
+			int tile_screen_width = 16 * screen_width_remaining / source_width_remaining;
+			zoomx = (screen_width_remaining << 16) / source_width_remaining;
+			if (flipx)
 			{
-				sprite_ptr->x[ind] = xpos;// >> 16;
-				sprite_ptr->y[ind] = ypos;// >> 16;
+				x -= tile_screen_width;
+			}
+			const u16 tile = m_read_spritetile(tile_index++);
+			sprite_ptr->tile[ind] = tile;
+			if ((tile & 0x8000) == 0)
+			{
+				sprite_ptr->x[ind] = x << 16;
+				sprite_ptr->y[ind] = y << 16;
 				sprite_ptr->zoomx[ind] = zoomx;
 				sprite_ptr->zoomy[ind] = zoomy;
 			}
-
-			if (flipx)
-				xpos -= zoomx << 4;
-			else
-				xpos += zoomx << 4;
-
+			if (!flipx)
+			{
+				x += tile_screen_width;
+			}
+			screen_width_remaining -= tile_screen_width;
+			source_width_remaining -= 16;
 			ind++;
+		} /* next col */
+		if (!flipy)
+		{
+			y += tile_screen_height;
 		}
-		if (flipy)
-			ypos -= zoomy << 4;
-		else
-			ypos += zoomy << 4;
-	}
+		screen_height_remaining -= tile_screen_height;
+		source_height_remaining -= 16;
+	} /* next row */
 }
+
