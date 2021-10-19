@@ -14,7 +14,7 @@
 
 #define LOG_WARN    (1U << 1)   // Show warnings
 #define LOG_DMA     (1U << 2)   // Show DMA setups
-#define LOG_SYNC    (1U << 3)	// Show sync block setups
+#define LOG_SYNC    (1U << 3)   // Show sync block setups
 
 #define VERBOSE (LOG_WARN | LOG_DMA | LOG_SYNC)
 
@@ -268,12 +268,12 @@ void amiga_fdc_device::live_run(const attotime &limit)
 				if(cur_live.shift_reg == dsksync) {
 					if(adkcon & 0x0400) {
 						// FIXME: exact dsksync behaviour
-						// - Some games currently writes two dsksync to the buffer (marked as "[FDC] dsksync"), 
+						// - Some games currently writes two dsksync to the buffer (marked as "[FDC] dsksync"),
 						//   removing one will make most of them happy.
 						//   This is reported as 0-lower cylinder good and everything else as bad in the ATK suite;
 						// - Some games trashes memory, mostly the ones with "[FDC] dsksync bootblock":
 						//   they attempt to load the tracks in AmigaDOS in the same way that's done by the
-						//   Kickstart to check if the disk is bootable. 
+						//   Kickstart to check if the disk is bootable.
 						//   This is reported as 0-upper cylinder bad in the ATK suite;
 						if(dma_state == DMA_WAIT_START) {
 							cur_live.bit_counter = 0;
@@ -299,7 +299,7 @@ void amiga_fdc_device::live_run(const attotime &limit)
 							cur_live.bit_counter = 0;
 					}
 					//else
-					//	LOGSYNC("%s: no DSKSYNC\n", this->tag());
+					//  LOGSYNC("%s: no DSKSYNC\n", this->tag());
 
 					dskbyt |= 0x1000;
 					m_write_dsksyn(1);
@@ -367,7 +367,7 @@ void amiga_fdc_device::dma_check()
 	dskbyt &= 0x9fff;
 	if(dma_enabled()) {
 		LOGDMA("%s: DMA start dskpt=%08x dsklen=%04x dir=%s adkcon=%04x dsksync=%04x\n",
-			machine().describe_context(), 
+			machine().describe_context(),
 			dskpt, dsklen & 0x3fff, BIT(dsklen, 14) ? "RAM->disk" : "disk->RAM", adkcon, dsksync
 		);
 

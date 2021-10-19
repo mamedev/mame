@@ -4,16 +4,16 @@
 
     MOS Technology 8364 "Paula"
 
-	TODO:
-	- Inherit FDC, serial and irq controller to here;
-	- Move Agnus "location" logic from here;
-	- low-pass filter;
-	- convert volume values to non-linear dB scale (cfr. )
-	- Verify ADKCON modulation;
-	- Verify manual mode;
-	- When a DMA stop occurs, is the correlated channel playback stopped
-	  at the end of the current cycle or as soon as possible like current
-	  implementation?
+    TODO:
+    - Inherit FDC, serial and irq controller to here;
+    - Move Agnus "location" logic from here;
+    - low-pass filter;
+    - convert volume values to non-linear dB scale (cfr. )
+    - Verify ADKCON modulation;
+    - Verify manual mode;
+    - When a DMA stop occurs, is the correlated channel playback stopped
+      at the end of the current cycle or as soon as possible like current
+      implementation?
 
 ***************************************************************************/
 
@@ -253,7 +253,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 	}
 
 	int samples = outputs[0].samples() * CLOCK_DIVIDER;
-	
+
 	if (LIVE_AUDIO_VIEW)
 		popmessage(print_audio_state());
 
@@ -341,7 +341,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 					{
 						dma_reload(chan, false);
 						// reload the data pointer, otherwise aliasing / buzzing outside the given buffer will be heard
-						// For example: Xenon 2 sets up location=0x63298 length=0x20 
+						// For example: Xenon 2 sets up location=0x63298 length=0x20
 						// for silencing channels on-the-fly without relying on irqs.
 						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
 						chan->dat = m_mem_r(chan->curlocation);

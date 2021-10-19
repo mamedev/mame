@@ -11,14 +11,14 @@ license:CC0
 
     Most images for the initial import are from SPS / CAPS collections
 
-	ATK test notes refers to Amiga Test Kit v1.18:
-	https://github.com/keirf/Amiga-Stuff
-	Specifically the Floppy Drive Test Read Item, the test note refers 
-	to the flop1 been tested from DF1 up with a -bench 90:
-	- OK means that all tracks have been reported good;
-	- a generic "failed" means that most if not all tracks reports as bad (test didn't complete);
-	- C refers to the Track number(s), H is the (U)pper, (L)ower head (if not omitted),
-	  "1 Sector Bad" reports as one sector being bad, otherwise "Bad" [Track];
+    ATK test notes refers to Amiga Test Kit v1.18:
+    https://github.com/keirf/Amiga-Stuff
+    Specifically the Floppy Drive Test Read Item, the test note refers
+    to the flop1 been tested from DF1 up with a -bench 90:
+    - OK means that all tracks have been reported good;
+    - a generic "failed" means that most if not all tracks reports as bad (test didn't complete);
+    - C refers to the Track number(s), H is the (U)pper, (L)ower head (if not omitted),
+      "1 Sector Bad" reports as one sector being bad, otherwise "Bad" [Track];
 
     todo (SPS):
     - see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
@@ -21271,7 +21271,7 @@ license:CC0
 		<year>1991</year>
 		<publisher>Gremlin Graphics</publisher>
 		<info name="usage" value="Sports manual copy-protection"/>
-		
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1010622">
 				<rom name="(sps127)heroquest.ipf" size="1010622" crc="910577eb" sha1="a40aaba4de04248e5fcc5443c818da7790ef910c"/>

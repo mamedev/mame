@@ -148,7 +148,7 @@ private:
 	sound_stream *m_stream;
 
 	TIMER_CALLBACK_MEMBER( signal_irq );
-	
+
 	std::string print_audio_state();
 };
 
