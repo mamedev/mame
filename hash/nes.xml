@@ -62625,11 +62625,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="avmsnzs1" cloneof="avmsnzs" supported="partial">
-		<description>AV Mei Shao Nv Zhan Shi (Asia, Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="AV Pretty Girl Fight"/>
+	<software name="avmsnzs">
+		<description>AV Měi Shàonǚ Zhànshì Girl Fighting (Asia)</description>
+		<year>1994</year>
+		<publisher>Ge De Industry</publisher>
+		<info name="alt_title" value="AV美少女戰士"/>
+		<info name="alt_title" value="AV Bishoujo Senshi"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="somari" />
 			<feature name="pcb" value="SOMERITEAM-SL-12" />
@@ -62638,23 +62639,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="av pretty girl fight (unl) (as) [a1].prg" size="131072" crc="8a34d37c" sha1="893c9dd94677fe5b88a4d65adfd4245da14aa9f5" offset="00000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="avmsnzs" supported="partial">
-		<description>AV Mei Shao Nv Zhan Shi (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="AV Pretty Girl Fight"/>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="somari" />
-			<feature name="pcb" value="SOMERITEAM-SL-12" />
-			<dataarea name="chr" size="524288">
-				<rom name="av mei shao nv zhan shi (unl).chr" size="524288" crc="cbeeaa5d" sha1="71d401f3b8de595b49269ddf240e50650ad6bc37" offset="00000" status="baddump" />
-			</dataarea>
-			<dataarea name="prg" size="131072">
-				<rom name="av mei shao nv zhan shi (unl).prg" size="131072" crc="64130ad8" sha1="84a3afb5f556a8f14ec2a6dcaf4ff219992bb90a" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -66414,10 +66398,10 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="kartfght" supported="no">
+	<software name="kartfght">
 		<description>Kart Fighter (Asia, SOMARI-W)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994?</year>
+		<publisher>Ge De Industry</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="somari" />
 			<feature name="pcb" value="SOMERITEAM-SL-12" />
@@ -67060,10 +67044,10 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="somari" supported="no">
+	<software name="somari">
 		<description>Somari (Asia, SOMARI-W)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Ge De Industry</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="somari" />
 			<feature name="pcb" value="SOMERITEAM-SL-12" />
@@ -67076,10 +67060,10 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="somari1" cloneof="somari" supported="no">
+	<software name="somari1" cloneof="somari">
 		<description>Somari (Asia, SOMARI-P)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1994</year>
+		<publisher>Ge De Industry</publisher>
 		<info name="serial" value="NT-616"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="somari" />
@@ -76840,6 +76824,7 @@ be better to redump them properly. -->
 		<description>Garou Densetsu Special (Asia, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="餓狼伝説 Special"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -76854,8 +76839,9 @@ be better to redump them properly. -->
 
 	<software name="garousp">
 		<description>Garou Densetsu Special (Asia, SOMARI-W)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1995</year>
+		<publisher>Ge De Industry</publisher>
+		<info name="alt_title" value="餓狼伝説 Special"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="somari" />
 			<feature name="pcb" value="SOMERITEAM-SL-12" />
@@ -76872,6 +76858,7 @@ be better to redump them properly. -->
 		<description>Garou Densetsu Special (Asia, alt)</description>
 		<year>1995</year>
 		<publisher>Kasheng</publisher>
+		<info name="alt_title" value="餓狼伝説 Special"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="kasing" />
 			<dataarea name="chr" size="262144">

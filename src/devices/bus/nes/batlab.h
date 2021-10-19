@@ -48,7 +48,7 @@ private:
 	u32 m_dpcm_addr;
 	u8 m_dpcm_ctrl;
 
-	uint16_t m_irq_count, m_irq_count_latch;
+	u16 m_irq_count, m_irq_count_latch;
 	int m_irq_enable;
 };
 
