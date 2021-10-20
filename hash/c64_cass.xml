@@ -3516,7 +3516,61 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="dkong">
+	<software name="docthede" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+		<description>Doc the Destroyer</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="597590">
+				<rom name="Doc_the_Destroyer.tap" size="597590" crc="71146947" sha1="ce4ddab52930a1db3357712f8fce9fedaf6e9908"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dodgygee" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+		<description>Dodgy Geezers</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="718005">
+				<rom name="Dodgy_Geezers.tap" size="718005" crc="112f069e" sha1="7eb8a77811703ed801867de3b14449a512c188de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dominate">
+		<description>Dominator</description>
+		<year>1989</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1807101">
+				<rom name="Dominator.tap" size="1807101" crc="a9dcbce4" sha1="61526c5f4453ea27bbf91d9c531f3797135cec90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="donalddp">
+		<description>Donald Duck's Playground</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="424018">
+				<rom name="Donald_Duck's_Playground.tap" size="424018" crc="9ffcb3e5" sha1="d3a1d5662188c0a4d31209b283aa8494625db53d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="424018">
+				<rom name="Donald_Duck's_Playground_a1.tap" size="424018" crc="2e57ae12" sha1="1f8397fa5ebbdc5f3e0673ab651e05c1f77dae99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong" supported="no"> <!-- game partially loads and stops with a black screen -->
 		<description>Donkey Kong</description>
 		<year>1986</year>
 		<publisher>Erbe</publisher>
@@ -3524,6 +3578,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="451003">
 				<rom name="Donkey_Kong.tap" size="451003" crc="aa968d2c" sha1="c6d61dc30ba8cf979dfed2a04e5603d86f6957ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongo" cloneof="dkong" supported="no"> <!-- game partially loads and stops with a black screen -->
+		<description>Donkey Kong (Ocean)</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="451003">
+				<rom name="Donkey_Kong.tap" size="451003" crc="c372aa24" sha1="2700243e8dca605b46866c5bf6af9c3d14b01823"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3546,6 +3612,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="ddragon">
+		<description>Double Dragon</description>
+		<year>1988</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1404030">
+				<rom name="Double_Dragon.tap" size="1404030" crc="3fc64cff" sha1="9aa675974ae500aee72038c1194ba9f10f6ba82e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ddragon2">
 		<description>Double Dragon II: The Revenge</description>
 		<year>1991</year>
@@ -3554,6 +3632,126 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1810722">
 				<rom name="Double_Dragon_II-_The_Revenge.tap" size="1810722" crc="473d4a2f" sha1="e6ec5acea1850bae8fecc2a6df36ff3f8fc59034"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbltake">
+		<description>Double Take</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="714939">
+				<rom name="Double_Take.tap" size="714939" crc="d6bcac39" sha1="498c32044c277bf155f1090f3812899ad16be5c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doughboy">
+		<description>Dough Boy</description>
+		<year>1983</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="516294">
+				<rom name="Doughboy.tap" size="516294" crc="cd1851ec" sha1="a8022051d205deba2256fd12990ab444aa5779fb"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="516543">
+				<rom name="Doughboy_a1.tap" size="516543" crc="43b6882b" sha1="cf12a0fba1a6af3cc779aa28dc6c6d82946e38d6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlair">
+		<description>Dragon's Lair</description>
+		<year>1986</year>
+		<publisher>Software Projects</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1222090">
+				<rom name="Dragon's_Lair.tap" size="1222090" crc="acfe16e8" sha1="f2ff5962ee2d8d0601d86ae3ce8b759415907d86"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="1222090">
+				<rom name="Dragon's_Lair_a1.tap" size="1222090" crc="1bcc3461" sha1="dac6e54d5b6ec93bde01c722adf4367b8cfc0a3c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlair2">
+		<description>Dragon's Lair Part II: Escape from Singe's Castle</description>
+		<year>1987</year>
+		<publisher>Software Projects</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1265044">
+				<rom name="Dragon's_Lair_Part_II-_Escape_from_Singe's_Castle.tap" size="1265044" crc="6b321750" sha1="4f5dab8bd35dc2486156cfa02dae27bc6860ba51"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlairp" cloneof="dlair">
+		<description>Dragon's Lair (Preview)</description>
+		<year>1986</year>
+		<publisher>Software Projects</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="980926">
+				<rom name="Dragon's_Lair_Preview.tap" size="980926" crc="360fdbf0" sha1="368704513e0d0bd891abf87cd028a9042b175f3f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="981341">
+				<rom name="Dragon's_Lair_Preview_a1.tap" size="981341" crc="05f74201" sha1="e11da9387edc626af97d8e5cdbd90af04a7799bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragonso">
+		<description>Dragons of Flame</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1480746">
+				<rom name="Dragons_of_Flame.tap" size="1480746" crc="fd73a511" sha1="484e4ae201274896b2591dafe57e588846e3a311"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dreamwar">
+		<description>Dream Warrior</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="585934">
+				<rom name="Dream_Warrior.tap" size="585934" crc="61663493" sha1="e7eb185c8cf29fbc7ff933d84a71add10a8730b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="drelbs">
+		<description>Drelbs</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="322842">
+				<rom name="Drelbs.tap" size="322842" crc="eb570e2e" sha1="3d965e1ebced001292bda7f78eaab4e8ff550958"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="322842">
+				<rom name="Drelbs_a1.tap" size="322842" crc="36f1705d" sha1="4537a83382c042b01923a04d692d2dfbcce9a238"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3570,6 +3768,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="druid">
+		<description>Druid</description>
+		<year>1984</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="748498">
+				<rom name="Druid.tap" size="748498" crc="597a81fe" sha1="97ff2221e4ca3c2df85d0a89af7e2a207569d67b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="748650">
+				<rom name="Druid_a1.tap" size="748650" crc="8846b7bd" sha1="616be82418fe2f3ede537bfd784bab4fe695c336"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ducksht">
 		<description>Duck Shoot</description>
 		<year>1984</year>
@@ -3582,6 +3798,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="dynamicd">
+		<description>Dynamic Duo</description>
+		<year>1989</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="631614">
+				<rom name="Dynamic_Duo.tap" size="631614" crc="a0dca0c4" sha1="dc400685fdfad31e7e4f9ba38d9ca7a141471941"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="631573">
+				<rom name="Dynamic_Duo_a1.tap" size="631573" crc="eb0e6524" sha1="dccd6f7ef057fecdf4a1007e0c2e9ef907ca9cb1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dynadan">
 		<description>Dynamite Dan</description>
 		<year>1985</year>
@@ -3590,6 +3824,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="451159">
 				<rom name="Dynamite_Dan.tap" size="451159" crc="13e40892" sha1="3ad5a4906ef34b139b6ff4a20d0b7526477e73a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dynastyw">
+		<description>Dynasty Wars</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="565162">
+				<rom name="Dynasty_Wars_Side_1.tap" size="565162" crc="6333ec08" sha1="a6bcd29be64921f7b3f6b8e5adc4f01a29249389"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="398740">
+				<rom name="Dynasty_Wars_Side_2.tap" size="398740" crc="b5c9ca00" sha1="a1c965a2a6cf12c504c7e8d9ebd5514008915ff9"/>
 			</dataarea>
 		</part>
 	</software>
