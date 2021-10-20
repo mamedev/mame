@@ -227,6 +227,7 @@ static const nes_pcb pcb_list[] =
 	{ "dbz5",             REXSOFT_DBZ5 },
 	{ "sl1632",           REXSOFT_SL1632 },
 	{ "somari",           SOMARI_SL12 },  // mapper 116
+	{ "huang2",           SOMARI_HUANG2 },  // mapper 116 also
 	{ "nitra",            NITRA_TDA },
 	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },

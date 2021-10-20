@@ -341,6 +341,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("dbz5",             NES_REX_DBZ5);
 	device.option_add_internal("sl1632",           NES_REX_SL1632);
 	device.option_add_internal("somari",           NES_SOMARI); // mapper 116
+	device.option_add_internal("huang2",           NES_HUANG2); // mapper 116 also
 	device.option_add_internal("nitra",            NES_NITRA);
 	device.option_add_internal("fs6",              NES_FS6); // mapper 196 alt? (for Street Fighter VI / Fight Street VI);
 	device.option_add_internal("sbros11",          NES_SBROS11);

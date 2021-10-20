@@ -23,6 +23,9 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	// construction/destruction
+	nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
@@ -41,6 +44,7 @@ private:
 	u8 m_mmc1_count;
 	u8 m_mmc1_latch;
 	u8 m_mmc1_reg[4];
+	u8 m_mmc1_prg_shift;
 
 	// VRC2
 	u8 m_vrc_prg_bank[2];
@@ -49,7 +53,18 @@ private:
 };
 
 
+// ======================> nes_huang2_device
+
+class nes_huang2_device : public nes_somari_device
+{
+public:
+	// construction/destruction
+	nes_huang2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(NES_SOMARI, nes_somari_device)
+DECLARE_DEVICE_TYPE(NES_HUANG2, nes_huang2_device)
 
 #endif // MAME_BUS_NES_SOMARI_H
