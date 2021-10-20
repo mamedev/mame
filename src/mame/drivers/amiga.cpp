@@ -1607,6 +1607,7 @@ void amiga_state::amiga_base(machine_config &config)
 
 	// floppy drives
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	m_fdc->index_callback().set(m_cia_1, FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
@@ -1864,7 +1865,7 @@ void a3000_state::a3000(machine_config &config)
 	// real-time clock
 	RP5C01(config, "rtc", XTAL(32'768));
 
-	// todo: zorro3 slots, super dmac, scsi
+	// TODO: zorro3 slots, super dmac, scsi
 
 	// software
 	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
@@ -1949,7 +1950,7 @@ void a600_state::a600(machine_config &config)
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
-	// todo: pcmcia
+	// TODO: pcmcia
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
@@ -2008,7 +2009,7 @@ void a1200_state::a1200(machine_config &config)
 	subdevice<amiga_keyboard_bus_device>("kbd").set_default_option("a1200_us");
 #endif
 
-	// todo: pcmcia
+	// TODO: pcmcia
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
@@ -2059,7 +2060,7 @@ void a4000_state::a4000(machine_config &config)
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set(FUNC(a4000_state::ide_interrupt_w));
 
-	// todo: zorro3
+	// TODO: zorro3
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
@@ -2088,7 +2089,7 @@ void a4000_state::a400030(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a400030_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	// todo: ide
+	// TODO: ide
 }
 
 void a4000_state::a400030n(machine_config &config)
@@ -2163,7 +2164,7 @@ void a4000_state::a4000t(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000t_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	// todo: ide, zorro3, scsi, super dmac
+	// TODO: ide, zorro3, scsi, super dmac
 }
 
 void a4000_state::a4000tn(machine_config &config)
@@ -2422,7 +2423,8 @@ ROM_END
 
 ROM_START( cd32 )
 	ROM_REGION32_BE(0x100000, "kickstart", 0)
-//  ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(a4fbc94a) SHA1(816ce6c5077875850c7d43452230a9ba3a2902db)) // todo: this is the real dump
+	// TODO: this is the real dump
+//  ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(a4fbc94a) SHA1(816ce6c5077875850c7d43452230a9ba3a2902db))
 	ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9))
 ROM_END
 
