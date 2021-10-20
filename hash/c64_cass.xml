@@ -3575,6 +3575,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="cosmcaus">
+		<description>Cosmic Causeway: Trailblazer II</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="566034">
+				<rom name="Cosmic_Causeway-_Trailblazer_II.tap" size="566034" crc="643518cc" sha1="ec8ef2beb5a23c2774817131f0ae54e750434063"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmconv">
 		<description>Cosmic Convoy</description>
 		<year>1983</year>
@@ -3595,6 +3607,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="792125">
 				<rom name="Cosmic_Cruiser.tap" size="792125" crc="6e0e74b0" sha1="98aca119e15b756a182114e97240faccc87deb10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crackdow" supported="no"> <!-- game loads but doesn't run (just displays a black screen) -->
+		<description>Crack Down</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="498814">
+				<rom name="Crack_Down_Side_1.tap" size="498814" crc="09d9058f" sha1="6114e545cefc9e75c7ecfd7273f0bc265b22181a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="628772">
+				<rom name="Crack_Down_Side_2.tap" size="628772" crc="bbdaa5d4" sha1="2de6612af15b5f2dc9dca802321749db50abbe4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3629,6 +3661,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="crazycart" cloneof="crazycar">
+		<description>Crazy Cars (Titus)</description>
+		<year>1988</year>
+		<publisher>Titus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="497987">
+				<rom name="Crazy_Cars.tap" size="497987" crc="2f30d165" sha1="efd12673de8b7de471cf9271371a072fa80c3779"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crazycom">
+		<description>Crazy Comet</description>
+		<year>1985</year>
+		<publisher>Martech</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="191354">
+				<rom name="Crazy_Comets.tap" size="191354" crc="9ff1633e" sha1="ad015a11ad62906bc01105bae001a0aeb462124a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="crzykong">
 		<description>Crazy Kong</description>
 		<year>1983</year>
@@ -3647,6 +3703,58 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="crzykonga" cloneof="crzykong">
+		<description>Crazy Kong (alt)</description>
+		<year>1983</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="573578">
+				<rom name="Crazy_Kong.tap" size="573578" crc="80179e0d" sha1="b06e3eb0764099ae65dbcd85f9454124a1537993"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creature" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+		<description>Creatures</description>
+		<year>1990</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="636691">
+				<rom name="Creatures_Side_1.tap" size="636691" crc="89033ea3" sha1="2cf4af2377ddff737826ab85d38adf84c7cbd1ff"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1406280">
+				<rom name="Creatures_Side_2.tap" size="1406280" crc="cdef5fca" sha1="7e6916a0581bd5a869e6a5f4cae205b2778d7abd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creature2">
+		<description>Creatures 2: Torture Trouble</description>
+		<year>1992</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="734532">
+				<rom name="Creatures_2-_Torture_Trouble_Side_1.tap" size="734532" crc="8111f9e0" sha1="0ddaa6836a99336fc3fd1e144c80d500282e133a"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="2175328">
+				<rom name="Creatures_2-_Torture_Trouble_Side_2.tap" size="2175328" crc="60196bbe" sha1="0b6b31abeac56143140ebb2631f30d673a7e2250"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="critmass">
 		<description>Critical Mass</description>
 		<year>1990</year>
@@ -3661,6 +3769,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="623200">
 				<rom name="Critical_Mass_a1.tap" size="623200" crc="b5ebd1ce" sha1="156f016375b0e51cb9801fcb1134c11e75938cc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="critmassd" cloneof="critmass">
+		<description>Critical Mass (Durell)</description>
+		<year>1985</year>
+		<publisher>Durell</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="850043">
+				<rom name="Critical_Mass.tap" size="850043" crc="656ff126" sha1="71b6ad6e49144c6c3d89661bdd6ac7acb810a919"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="843087">
+				<rom name="Critical_Mass_a1.tap" size="843087" crc="2126fb68" sha1="9f5dc999dc321facb2024253266877a7e31440bf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccastles">
+		<description>Crystal Castles</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="261276">
+				<rom name="Crystal_Castles.tap" size="261276" crc="bbc599b4" sha1="407398a0c1be1caaec18c14d47f34e500cc4f25e"/>
 			</dataarea>
 		</part>
 	</software>
