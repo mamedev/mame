@@ -229,8 +229,8 @@ private:
     const uint32_t FIFOC_LOAD = 0xc0;
     uint32_t fifoctrl_r();
     void fifoctrl_w(uint32_t data);
-    std::queue<uint32_t> m_even_fifo; // 0, 2, 4, 6, 8, 10, 12, 14
-    std::queue<uint32_t> m_odd_fifo;  // 1, 3, 5, 7, 9, 11, 13, 15
+    std::queue<uint32_t> m_even_fifo;
+    std::queue<uint32_t> m_odd_fifo;
     void clear_queue(std::queue<uint32_t> queue)
     {
         while(!queue.empty())
@@ -290,7 +290,7 @@ private:
     const uint32_t ICOND_NXTREQ = 0xa0;
     const uint32_t ICOND_UKMSGZ = 0xc0;
     const uint32_t ICOND_UKMSGNZ = 0xc1;
-    const uint32_t ICOND_UBF = 0xe0; /* Unexpected bus free */
+    const uint32_t ICOND_UBF = 0xe0; // Unexpected bus free
 
     // Config register
     const uint32_t CONFIG_INITIATOR_ID = 0x7;

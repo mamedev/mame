@@ -96,9 +96,8 @@
  *  - Triage the known issues mentioned above
  *
  *  TODO before opening first MR:
- *  - FIFO and ESCC cleanup (lots of it!)
+ *  - FIFO cleanup (lots of it!)
  *  - SPIFI3 refactoring
- *  - Find better workaround for SCACHE enumeration
  *  - Save state support
  */
 
@@ -140,11 +139,12 @@
 #define LOG_LED (1U << 3)
 #define LOG_MEMORY (1U << 4)
 #define LOG_APBUS (1U << 5)
+#define LOG_ESCC (1U << 6)
 
 #define NEWS_R4K_INFO (LOG_LED)
 #define NEWS_R4K_DEBUG (LOG_GENERAL | LOG_INTERRUPT | LOG_LED)
 #define NEWS_R4K_TRACE (NEWS_R4K_DEBUG | LOG_ALL_INTERRUPT | LOG_APBUS)
-#define NEWS_R4K_MAX (NEWS_R4K_TRACE | LOG_MEMORY)
+#define NEWS_R4K_MAX (NEWS_R4K_TRACE | LOG_MEMORY | LOG_ESCC)
 
 #define VERBOSE NEWS_R4K_INFO
 
@@ -377,49 +377,26 @@ protected:
     uint8_t ram_r(offs_t offset);
     void ram_w(offs_t offset, uint8_t data);
 
-    // avaliable ESCC channels
-    enum ESCC_Channel
+    // CXD8421Q glue logic for the ESCC (still debating if this should be separated or not)
+    enum escc_channel
     {
         CHA,
         CHB
     };
 
     // Direct channel access
-    template <ESCC_Channel channel>
+    uint32_t escc_ch_read(escc_channel channel, offs_t offset);
+    void escc_ch_write(escc_channel channel, offs_t offset, uint32_t data);
+    template <escc_channel channel>
     uint32_t escc_ch_read(offs_t offset) { return escc_ch_read(channel, offset); }
-    template <ESCC_Channel channel>
+    template <escc_channel channel>
     void escc_ch_write(offs_t offset, uint32_t data) { escc_ch_write(channel, offset, data); }
 
-    // temp
-    uint32_t escc_ch_read(ESCC_Channel channel, offs_t offset)
-    {
-        if (offset < 2)
-        {
-            offset |= (channel == CHA ? 0x2 : 0x0);
-            return m_escc->ab_dc_r(offset);
-        } 
-        else 
-        {
-            // Placeholder for ESCC1 extport and ctl registers
-            LOG("escc1 ch%d r non-passthrough: 0x%x\n", channel, offset);
-            return 0x0;
-        }
-    }
-
-    void escc_ch_write(ESCC_Channel channel, offs_t offset, uint32_t data)
-    {
-        if (offset < 2)
-        {
-            offset |= (channel == CHA ? 0x2 : 0x0);
-            m_escc->ab_dc_w(offset, data);
-        } 
-        else
-        {
-            // Placeholder for ESCC1 extport and ctl registers
-            LOG("escc1 ch%d w non-passthrough: 0x%x = 0x%x\n", channel, offset, data);
-            return;
-        }
-    }
+    // Interrupts
+    uint32_t escc1_int_status_r(offs_t offset);
+    void escc1_int_status_w(offs_t offset, uint32_t data);
+    uint32_t escc1_int_mask_r(offs_t offset);
+    void escc1_int_mask_w(offs_t offset, uint32_t data);
 };
 
 /*
@@ -440,7 +417,6 @@ static void news_scsi_devices(device_slot_interface &device)
  */
 void news_r4k_state::machine_common(machine_config &config)
 {
-    // CPU setup
 #ifndef NO_MIPS3
     R4400SCBE(config, m_cpu, 75_MHz_XTAL);
     m_cpu->set_force_no_drc(true);
@@ -456,7 +432,6 @@ void news_r4k_state::machine_common(machine_config &config)
     m_cpu->set_addrmap(AS_PROGRAM, &news_r4k_state::cpu_map);
     m_cpu->set_timintdis(false);
 
-    // Memory
     RAM(config, m_ram);
     m_ram->set_default_size(MAIN_MEMORY_DEFAULT);
 
@@ -466,11 +441,9 @@ void news_r4k_state::machine_common(machine_config &config)
     RAM(config, m_net_ram);
     m_net_ram->set_default_size("32KB");
 
-    // Timekeeper IC
     M48T02(config, m_rtc);
 
-    // ESCC setup
-    SCC85230(config, m_escc, 9.8304_MHz_XTAL); // 9.8304MHz per NetBSD source
+    SCC85230(config, m_escc, 9.8304_MHz_XTAL);
 
     RS232_PORT(config, m_serial[0], default_rs232_devices, "pty");
     m_serial[0]->cts_handler().set(m_escc, FUNC(z80scc_device::ctsa_w));
@@ -489,12 +462,10 @@ void news_r4k_state::machine_common(machine_config &config)
     m_escc->out_dtrb_callback().set(m_serial[1], FUNC(rs232_port_device::write_dtr));
     m_escc->out_int_callback().set(FUNC(news_r4k_state::irq_w<ESCC>));
 
-    // APbus FIFOs
     CXD8442Q(config, m_fifo0, 0);
     CXD8442Q(config, m_fifo1, 0);
 
-    // ESCC FIFO
-    // Reverse polarity for DMA signals
+    // Reverse polarity for ESCC DMA signals
     m_escc->out_dtra_callback().set([this](int status) { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
     m_escc->out_wreqa_callback().set([this](int status) { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
     m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data) { m_escc->da_w(0, data); });
@@ -508,7 +479,6 @@ void news_r4k_state::machine_common(machine_config &config)
                                         escc1_int_status = status ? 0x8 : 0x0; // guess
                                     });
 
-    // SONIC + WSC-SONIC3 ethernet and DMA controllers
     CXD8452AQ(config, m_sonic3, 0);
     m_sonic3->set_addrmap(0, &news_r4k_state::sonic3_map);
     m_sonic3->irq_out().set(FUNC(news_r4k_state::irq_w<irq0_number::SONIC>));
@@ -524,7 +494,6 @@ void news_r4k_state::machine_common(machine_config &config)
     // Not sure if needing to use this means something else isn't set up correctly.
     m_sonic->set_promisc(true);
 
-    // Keyboard and mouse
     // Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
     // See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/ms_ap.c#L103
     // where the mouse interrupt handler is initialized using the Keyboard interrupt.
@@ -532,8 +501,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r4k_state::irq_w<KBD>));
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
 
-    // Floppy controller - National Semiconductor PC8477B
-    // TODO: find out the difference between B and A. Only A is emulated in MAME, but it works so it might not be significant
+    // TODO: find out the difference between PC8477B and PC8477A. Only A is emulated in MAME, but it works so it might not be significant
     PC8477A(config, m_fdc, 24_MHz_XTAL, pc8477a_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
@@ -544,17 +512,14 @@ void news_r4k_state::machine_common(machine_config &config)
     m_fifo0->bind_dma_r<cxd8442q_device::fifo_channel_number::CH2>([this]()
                                                                  { return (uint32_t)(m_fdc->dma_r()); });
 
-    // DMA controller
     DMAC3(config, m_dmac, 0);
     m_dmac->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
     m_dmac->set_bus(m_cpu, 0);
     m_dmac->irq_out().set(FUNC(news_r4k_state::irq_w<DMAC>));
 
-    // Create SCSI buses
     NSCSI_BUS(config, m_scsibus0);
     NSCSI_BUS(config, m_scsibus1);
 
-    // Create SCSI connectors (bus 0)
     NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
@@ -563,7 +528,6 @@ void news_r4k_state::machine_common(machine_config &config)
     NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
 
-    // Create SCSI connectors (bus 1)
     NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:2", news_scsi_devices, nullptr);
@@ -572,8 +536,7 @@ void news_r4k_state::machine_common(machine_config &config)
     NSCSI_CONNECTOR(config, "scsi1:5", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
-    // Connect SPIFI3s to the buses
-    // TODO: Actual clock frequency
+    // TODO: Actual SPIFI3 clock frequency
     NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3).clock(16'000'000).machine_config([this](device_t *device)
                                                                                                      {
                                                                                                          spifi3_device &adapter = downcast<spifi3_device &>(*device);
@@ -638,41 +601,29 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // APbus
     map(0x14c00000, 0x14c0008f).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
+    map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset)
+                                        { return m_dma_ram->read(offset); }),
+                                     NAME([this](offs_t offset, uint8_t data)
+                                        {
+                                            LOGMASKED(LOG_MEMORY, "Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                            m_dma_ram->write(offset, data);
+                                        }));
 
-    // WSC-ESCC1 (CXD8421Q) serial controller
+    // ESCC + WSC-ESCC1 (CXD8421Q) serial controller
     map(0x1e900000, 0x1e93ffff).m(m_fifo1, FUNC(cxd8442q_device::map));
+    map(0x1e940000, 0x1e94000f).rw(FUNC(news_r4k_state::escc_ch_read<CHB>), FUNC(news_r4k_state::escc_ch_write<CHB>));
+    map(0x1e950000, 0x1e95000f).rw(FUNC(news_r4k_state::escc_ch_read<CHA>), FUNC(news_r4k_state::escc_ch_write<CHA>));
+    map(0x1e960000, 0x1e960003).rw(FUNC(news_r4k_state::escc1_int_status_r), FUNC(news_r4k_state::escc1_int_status_w));
+    map(0x1e960004, 0x1e960007).rw(FUNC(news_r4k_state::escc1_int_mask_r), FUNC(news_r4k_state::escc1_int_mask_w));
 
     // Interestingly, this is also the RAM that is used before main memory is initialized
     // It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
     map(0x1e980000, 0x1e99ffff).m(m_fifo1, FUNC(cxd8442q_device::map_fifo_ram));
-    map(0x1e940000, 0x1e94000f).rw(FUNC(news_r4k_state::escc_ch_read<CHB>), FUNC(news_r4k_state::escc_ch_write<CHB>));
-    map(0x1e950000, 0x1e95000f).rw(FUNC(news_r4k_state::escc_ch_read<CHA>), FUNC(news_r4k_state::escc_ch_write<CHA>));
-    map(0x1e960000, 0x1e960003).lrw32(NAME([this](offs_t offset)
-                                           {
-                                               LOG("Read ESCC1 int status 0x%x (%s)\n", escc1_int_status, machine().describe_context());
-                                               return escc1_int_status;
-                                           }),
-                                      NAME([this](offs_t offset, uint32_t data)
-                                           {
-                                               LOG("Clear ESCC1 int status (%s)\n", machine().describe_context());
-                                               escc1_int_status = 0; // assume clear for now
-                                           }));
-    map(0x1e960004, 0x1e960007).lrw32(NAME([this](offs_t offset)
-                                           {
-                                               LOG("Read ESCC1 int mask 0x%x (%s)\n", escc1_int_mask, machine().describe_context());
-                                               return escc1_int_mask;
-                                           }),
-                                      NAME([this](offs_t offset, uint32_t data)
-                                           {
-                                               LOG("Set ESCC1 int mask 0x%x (%s)\n", data, machine().describe_context());
-                                               escc1_int_mask = data;
-                                           }));
 
     // SONIC3 APbus interface and SONIC ethernet controller
     map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map));
     map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff);
-    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset)
-                                          { return m_net_ram->read(offset); }),
+    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
                                           {
                                               LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
@@ -680,13 +631,6 @@ void news_r4k_state::cpu_map(address_map &map)
                                           }));
 
     // DMAC3 DMA Controller
-    map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset)
-                                          { return m_dma_ram->read(offset); }),
-                                     NAME([this](offs_t offset, uint8_t data)
-                                          {
-                                              LOGMASKED(LOG_MEMORY, "Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
-                                              m_dma_ram->write(offset, data);
-                                          }));
     map(0x1e200000, 0x1e200017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL0>));
     map(0x1e300000, 0x1e300017).m(m_dmac, FUNC(dmac3_device::map<dmac3_device::CTRL1>));
 
@@ -694,22 +638,10 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1e280000, 0x1e2803ff).m(m_scsi0, FUNC(spifi3_device::map));
     map(0x1e380000, 0x1e3803ff).m(m_scsi1, FUNC(spifi3_device::map));
 
-    // TODO: DSC-39 xb framebuffer/video card (0x14900000)
-    map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
-                                         {
-                                             LOGMASKED(LOG_GENERAL, "xb read attempted, offset 0x%x\n", offset);
-                                             return 0xff;
-                                         }));
-
-    // TODO: sb sound subsystem (0x1ed00000)
-
     // HID (kb + ms)
     map(0x1f900000, 0x1f900047).m(m_hid, FUNC(news_hid_hle_device::map_apbus));
 
-    // TODO: lp line printer subsystem (0x1ed30000)
-
     // FDC controller register mapping
-    // All of these addresses are within the corresponding FIFO device window (Window 2).
     // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
@@ -717,9 +649,7 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // The NEWS monitor ROM FDC routines won't run if DRV2 is inactive.
     // TODO: The 5000X only has a single floppy drive. Why is this needed?
-    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset)
-                                         { return m_fdc->sra_r() & ~0x40; }))
-        .umask32(0x000000ff);
+    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset) { return m_fdc->sra_r() & ~0x40; })).umask32(0x000000ff);
 
     // TODO: Floppy aux registers
     map(0x1ed60200, 0x1ed60207).noprw();
@@ -733,6 +663,12 @@ void news_r4k_state::cpu_map(address_map &map)
     // Map FDC and sound FIFO register file
     map(0x1ed00000, 0x1ed3ffff).m(m_fifo0, FUNC(cxd8442q_device::map));
     map(0x1ed80000, 0x1ed9ffff).m(m_fifo0, FUNC(cxd8442q_device::map_fifo_ram));
+
+    // TODO: DSC-39 xb framebuffer/video card (0x14900000)
+    map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset) { return 0xff; }));
+
+    // TODO: sb sound subsystem (0x1ed00000)
+    // TODO: lp line printer subsystem (0x1ed30000)
 
     // Assign debug mappings
     cpu_map_debug(map);
@@ -1036,6 +972,7 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
     pte.pfnum = raw_pte & ENTRY_PFNUM;
 
     // This might be able to trigger some kind of interrupt - for now, we'll mark it as a fatal error, but this can be improved for sure.
+    // My suspicion is that this would trigger INT4 based on the NetBSD source.
     if (!pte.valid)
     {
         fatalerror("APbus DMA TLB out of universe! Raw PTE (v_address = 0x%x, page_address = 0x%x): 0x%x\n", v_address, apbus_page_address, raw_pte);
@@ -1238,6 +1175,61 @@ uint32_t news_r4k_state::bus_error()
     m_cpu->bus_error();
 #endif
     return 0;
+}
+
+uint32_t news_r4k_state::escc_ch_read(escc_channel channel, offs_t offset)
+{
+    if (offset < 2)
+    {
+        offset |= (channel == CHA ? 0x2 : 0x0);
+        return m_escc->ab_dc_r(offset);
+    }
+    else
+    {
+        // Placeholder for ESCC1 extport and ctl registers
+        LOG("escc1 ch%d r non-passthrough: 0x%x\n", channel, offset);
+        return 0x0;
+    }
+}
+
+void news_r4k_state::escc_ch_write(escc_channel channel, offs_t offset, uint32_t data)
+{
+    if (offset < 2)
+    {
+        offset |= (channel == CHA ? 0x2 : 0x0);
+        m_escc->ab_dc_w(offset, data);
+    }
+    else
+    {
+        // Placeholder for ESCC1 extport and ctl registers
+        LOG("escc1 ch%d w non-passthrough: 0x%x = 0x%x\n", channel, offset, data);
+        return;
+    }
+}
+
+uint32_t news_r4k_state::escc1_int_status_r(offs_t offset)
+{
+    LOGMASKED(LOG_ESCC, "Read ESCC1 int status 0x%x (%s)\n", escc1_int_status, machine().describe_context());
+    return escc1_int_status;
+}
+
+void news_r4k_state::escc1_int_status_w(offs_t offset, uint32_t data)
+{
+    // assume clear for now
+    LOGMASKED(LOG_ESCC, "Clear ESCC1 int status (%s)\n", machine().describe_context());
+    escc1_int_status = 0;
+}
+
+uint32_t news_r4k_state::escc1_int_mask_r(offs_t offset)
+{
+    LOGMASKED(LOG_ESCC, "Read ESCC1 int mask 0x%x (%s)\n", escc1_int_mask, machine().describe_context());
+    return escc1_int_mask;
+}
+
+void news_r4k_state::escc1_int_mask_w(offs_t offset, uint32_t data)
+{
+    LOGMASKED(LOG_ESCC, "Set ESCC1 int mask 0x%x (%s)\n", data, machine().describe_context());
+    escc1_int_mask = data;
 }
 
 /*
