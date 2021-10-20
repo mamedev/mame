@@ -2337,6 +2337,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bonanzab">
+		<description>Bonanza Bros</description>
+		<year>1992</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="470674">
+				<rom name="Bonanza_Bros_Side_1.tap" size="470674" crc="83989f8f" sha1="5f21b6dc67cce19987ddf47b0e91ad1108e9ac93"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1091548">
+				<rom name="Bonanza_Bros_Side_2.tap" size="1091548" crc="c1327638" sha1="da671c4cbc627cf42b4faaaa4b0239329280dd24"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="boogaboo">
 		<description>Booga-Boo the Flea</description>
 		<year>1984</year>
@@ -2385,6 +2405,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bbobsb">
+		<description>Bounty Bob Strikes Back!</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="436402">
+				<rom name="Bounty_Bob_Strikes_Back.tap" size="436402" crc="3905cdaf" sha1="b2ba18caa3b00254e8852901b2705393827b7fea"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="brainstrm">
 		<description>Brainstorm</description>
 		<year>1987</year>
@@ -2397,6 +2429,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bravesta">
+		<description>Brave Starr</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="638567">
+				<rom name="BraveStarr.tap" size="638567" crc="30089a42" sha1="834784b130cd8b05864f915a8b03f17b1e7ea0cf"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="breakthru">
 		<description>Breakthru</description>
 		<year>1986</year>
@@ -2405,6 +2449,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="550638">
 				<rom name="Breakthru.tap" size="550638" crc="53cb8944" sha1="fb5bc5bc0adc44f12da09f54b94beb65e77bf5bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breakthruu" cloneof="breakthru">
+		<description>Breakthru (U.S. Gold)</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="550577">
+				<rom name="Breakthru.tap" size="550577" crc="318cf83a" sha1="a573203c57bbbd3234204551d86450bd8c805438"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbloodax" supported="no"> <!-- tape doesn't load fully (drops to READY message with flashing cursor) -->
+		<description>Brian Bloodaxe</description>
+		<year>1985</year>
+		<publisher>The Edge</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="345742">
+				<rom name="Brian_Bloodaxe.tap" size="345742" crc="77f095f0" sha1="53280742bc7be4b85742dd49710a7f5c69de9067"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="345742">
+				<rom name="Brian_Bloodaxe_a1.tap" size="345742" crc="7c9b2f57" sha1="34d4c243eebf2e203041dd4d2ad0053505d79ae6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2445,6 +2519,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="bublboblf" cloneof="bublbobl">
+		<description>Bubble Bobble (Firebird)</description>
+		<year>1987</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="763833">
+				<rom name="Bubble_Bobble.tap" size="763833" crc="ab72e534" sha1="daa282c60107b4446353b92cc953329085e1f43e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="763853">
+				<rom name="Bubble_Bobble_a1.tap" size="763853" crc="0c9d8879" sha1="9ca3d8f93f0159cfaf4dd52dcb90bcebde26722d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bubldizzy">
 		<description>Bubble Dizzy</description>
 		<year>1992</year>
@@ -2453,6 +2545,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="756473">
 				<rom name="Bubble_Dizzy.tap" size="756473" crc="e82b9536" sha1="efb97ffd227f78f655164d0d2b0bfbd2d9d3fecd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckroge">
+		<description>Buck Rogers: Planet of Zoom</description>
+		<year>1983</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="221746">
+				<rom name="Buck_Rogers-_Planet_of_Zoom.tap" size="221746" crc="6d578c6b" sha1="c2b00179c70e98300edea89a667dae7b81293d3c"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="221746">
+				<rom name="Buck_Rogers-_Planet_of_Zoom_a1.tap" size="221746" crc="e3a698d3" sha1="f8cf2460eb090a0eddba9eda330fb0d20a8ed307"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2501,6 +2611,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="buggyboy">
+		<description>Buggy Boy</description>
+		<year>1987</year>
+		<publisher>Elite Systems</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="686107">
+				<rom name="Buggy_Boy.tap" size="686107" crc="0372aa46" sha1="88f8977bf2e42a3c26cacdae6f373fbeb79050e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bulldog">
+		<description>Bulldog</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="576126">
+				<rom name="Bulldog.tap" size="576126" crc="e1037525" sha1="78fbbb25239909809f6a331388ababa7642bc466"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bullseye">
 		<description>Bullseye</description>
 		<year>1984</year>
@@ -2545,6 +2679,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="742303">
 				<rom name="Burger_Chase.tap" size="742303" crc="0590dce3" sha1="24828c68414435e64f2ce02596a46f00412018ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btime">
+		<description>Burger Time</description>
+		<year>1984</year>
+		<publisher>Interceptor Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1333458">
+				<rom name="Burger_Time.tap" size="1333458" crc="618e2adb" sha1="06549b41da20cd629996afb0beef66d8ea5b27e3"/>
 			</dataarea>
 		</part>
 	</software>
