@@ -10,6 +10,9 @@ Speed Basketball (Sega)
 <mamelayout version="2">
 
 	<element name="hole" defstate="0">
+		<disk state="3">
+			<color red="0.8" green="0.8" blue="0.2" />
+		</disk>
 		<disk state="2">
 			<color red="0.2" green="0.8" blue="0.2" />
 		</disk>

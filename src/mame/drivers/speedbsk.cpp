@@ -34,13 +34,14 @@
     - TMP82C51AP-8 (D71051C-10 on Exciting Boat Race)
     - Oki M6253
     - NEC B6391GF QFP80 gate array (next to unpopulated QFP80 silkscreened "5381")
+    - 2x NEC D6382GF DSP
     - 2x Sanyo LC7883KM digital filter / DAC
     - OSC 48.000 MHz
     - OSC 16.9344 MHz
     - 1 4-dip bank
 
     TODO:
-    - Outputs (start lamp), LED screen with scores
+    - Outputs (solenoids), LED screen with scores
     - PIT input frequencies, outputs (IRQ, baud rate?)
     - RF5C164 hookup (banking)
     - UART clocks are set to 9600 baud, real clock unknown
@@ -54,6 +55,7 @@
     Notes:
     - Speed Basketball only has some LEDs and lamps, the rest is mechanical.
     Video: https://www.youtube.com/watch?v=efs2KNNncn8
+    - Speed Soccer / Speed Shot is on the same hardware
     - The driver contains the ROMs for the sound PCB of Exciting Boat Race as a placeholder, since it's the same PCB as the one used by Speed Basketball.
     Exciting Boat Race is a main + satellites arrangement with video, so when the other PCBs are found it should be moved out of here.
 
@@ -75,6 +77,8 @@
 #include "sound/rf5c68.h"
 #include "sound/ymopm.h"
 #include "video/hd44780.h"
+#include "video/pwm.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -97,7 +101,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi%u", 0U),
 		m_lcd(*this, "lcd"),
-		m_lamps(*this, "hole_%u", 1U)
+		m_lamp_pwm(*this, "lamp_pwm%u", 0),
+		m_lamps(*this, "hole_%u", 1U),
+		m_start_lamp(*this, "start_lamp")
 	{ }
 
 	void speedbsk(machine_config &config);
@@ -109,8 +115,10 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<hd44780_device> m_lcd;
+	optional_device_array<pwm_display_device, 6> m_lamp_pwm;
 
 	output_finder<24> m_lamps;
+	output_finder<> m_start_lamp;
 
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
@@ -120,8 +128,8 @@ private:
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
-	template<int N> void lamp_red_w(uint8_t data);
-	template<int N> void lamp_grn_w(uint8_t data);
+	template<int N> void lamp_w(uint8_t data);
+	template<int N> void lamp_output_w(offs_t offset, u8 data);
 	void solenoid1_w(uint8_t data);
 	void solenoid2_w(uint8_t data);
 	void ppi1_porta_w(uint8_t data);
@@ -248,13 +256,13 @@ static INPUT_PORTS_START( speedbsk )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED ) // only 4 dips
 
 	PORT_START("track_x_red")
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("track_y_red")
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
 
 	PORT_START("track_x_grn")
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_PLAYER(2)
 
 	PORT_START("track_y_grn")
 	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(2)
@@ -288,23 +296,21 @@ HD44780_PIXEL_UPDATE( speedbsk_state::lcd_pixel_update )
 //**************************************************************************
 
 template<int N>
-void speedbsk_state::lamp_red_w(uint8_t data)
+void speedbsk_state::lamp_w(uint8_t data)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		int old = m_lamps[N * 8 + i];
-		m_lamps[N * 8 + i] = BIT(data, i) ? 1 : (old == 1) ? 0 : old;
-	}
+	// N 0-2: red, 3-5: green
+	m_lamp_pwm[N]->matrix(1, data);
 }
 
 template<int N>
-void speedbsk_state::lamp_grn_w(uint8_t data)
+void speedbsk_state::lamp_output_w(offs_t offset, u8 data)
 {
-	for (int i = 0; i < 8; i++)
-	{
-		int old = m_lamps[N * 8 + i];
-		m_lamps[N * 8 + i] = BIT(data, i) ? 2 : (old == 2) ? 0 : old;
-	}
+	offset = (N % 3) * 8 + (offset >> 6);
+	int mask = (N <= 2) ? 1 : 2;
+	int old = m_lamps[offset] & ~mask;
+
+	// output state 0: off, 1: red, 2: green, 3: yellow
+	m_lamps[offset] = (data ? mask : 0) | old;
 }
 
 void speedbsk_state::solenoid1_w(uint8_t data)
@@ -331,6 +337,8 @@ void speedbsk_state::ppi1_porta_w(uint8_t data)
 	// -----2--  unknown
 	// ------1-  coin counter?
 	// -------0  start lamp
+
+	m_start_lamp = BIT(data, 0);
 }
 
 void speedbsk_state::ppi1_portc_w(uint8_t data)
@@ -349,6 +357,7 @@ void speedbsk_state::machine_start()
 {
 	// resolve outputs
 	m_lamps.resolve();
+	m_start_lamp.resolve();
 }
 
 
@@ -401,12 +410,22 @@ void speedbsk_state::speedbsk(machine_config &config)
 	upd2.set_porty_tag("track_y_grn");
 
 	sega_315_5338a_device &io(SEGA_315_5338A(config, "io", 32_MHz_XTAL));
-	io.out_pa_callback().set(FUNC(speedbsk_state::lamp_red_w<0>));
-	io.out_pb_callback().set(FUNC(speedbsk_state::lamp_red_w<1>));
-	io.out_pc_callback().set(FUNC(speedbsk_state::lamp_red_w<2>));
-	io.out_pd_callback().set(FUNC(speedbsk_state::lamp_grn_w<0>));
-	io.out_pe_callback().set(FUNC(speedbsk_state::lamp_grn_w<1>));
-	io.out_pf_callback().set(FUNC(speedbsk_state::lamp_grn_w<2>));
+	io.out_pa_callback().set(FUNC(speedbsk_state::lamp_w<0>));
+	io.out_pb_callback().set(FUNC(speedbsk_state::lamp_w<1>));
+	io.out_pc_callback().set(FUNC(speedbsk_state::lamp_w<2>));
+	io.out_pd_callback().set(FUNC(speedbsk_state::lamp_w<3>));
+	io.out_pe_callback().set(FUNC(speedbsk_state::lamp_w<4>));
+	io.out_pf_callback().set(FUNC(speedbsk_state::lamp_w<5>));
+
+	for (int i = 0; i < 6; i++)
+		PWM_DISPLAY(config, m_lamp_pwm[i]).set_size(1, 8);
+
+	m_lamp_pwm[0]->output_x().set(FUNC(speedbsk_state::lamp_output_w<0>));
+	m_lamp_pwm[1]->output_x().set(FUNC(speedbsk_state::lamp_output_w<1>));
+	m_lamp_pwm[2]->output_x().set(FUNC(speedbsk_state::lamp_output_w<2>));
+	m_lamp_pwm[3]->output_x().set(FUNC(speedbsk_state::lamp_output_w<3>));
+	m_lamp_pwm[4]->output_x().set(FUNC(speedbsk_state::lamp_output_w<4>));
+	m_lamp_pwm[5]->output_x().set(FUNC(speedbsk_state::lamp_output_w<5>));
 
 	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
 
