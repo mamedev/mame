@@ -40,7 +40,7 @@
     - 1 4-dip bank
 
     TODO:
-    - Outputs
+    - Outputs (start lamp), LED screen with scores
     - PIT input frequencies, outputs (IRQ, baud rate?)
     - RF5C164 hookup (banking)
     - UART clocks are set to 9600 baud, real clock unknown
@@ -79,6 +79,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "speedbsk.lh"
+
 
 namespace {
 
@@ -94,7 +96,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi%u", 0U),
-		m_lcd(*this, "lcd")
+		m_lcd(*this, "lcd"),
+		m_lamps(*this, "hole_%u", 1U)
 	{ }
 
 	void speedbsk(machine_config &config);
@@ -107,6 +110,8 @@ private:
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<hd44780_device> m_lcd;
 
+	output_finder<24> m_lamps;
+
 	void main_map(address_map &map);
 	void audio_map(address_map &map);
 	void audio_io_map(address_map &map);
@@ -115,6 +120,10 @@ private:
 	void lcd_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(lcd_pixel_update);
 
+	template<int N> void lamp_red_w(uint8_t data);
+	template<int N> void lamp_grn_w(uint8_t data);
+	void solenoid1_w(uint8_t data);
+	void solenoid2_w(uint8_t data);
 	void ppi1_porta_w(uint8_t data);
 	void ppi1_portc_w(uint8_t data);
 };
@@ -200,17 +209,17 @@ static INPUT_PORTS_START( speedbsk )
 
 	PORT_START("photo_sensors")
 	PORT_DIPNAME( 0x01, 0x01, "Corner A" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Corner B" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Corner C" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, "Corner D" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Goal RED" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -278,6 +287,40 @@ HD44780_PIXEL_UPDATE( speedbsk_state::lcd_pixel_update )
 //  MACHINE EMULATION
 //**************************************************************************
 
+template<int N>
+void speedbsk_state::lamp_red_w(uint8_t data)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		int old = m_lamps[N * 8 + i];
+		m_lamps[N * 8 + i] = BIT(data, i) ? 1 : (old == 1) ? 0 : old;
+	}
+}
+
+template<int N>
+void speedbsk_state::lamp_grn_w(uint8_t data)
+{
+	for (int i = 0; i < 8; i++)
+	{
+		int old = m_lamps[N * 8 + i];
+		m_lamps[N * 8 + i] = BIT(data, i) ? 2 : (old == 2) ? 0 : old;
+	}
+}
+
+void speedbsk_state::solenoid1_w(uint8_t data)
+{
+	// 7-------  solenoid direction
+	// -6------  solenoid on
+	// --543210  solenoid select 1xx
+}
+
+void speedbsk_state::solenoid2_w(uint8_t data)
+{
+	// 7-------  not used?
+	// -6------  solenoid on
+	// --543210  solenoid select 2xx
+}
+
 void speedbsk_state::ppi1_porta_w(uint8_t data)
 {
 	// 7-------  unknown
@@ -304,6 +347,8 @@ void speedbsk_state::ppi1_portc_w(uint8_t data)
 
 void speedbsk_state::machine_start()
 {
+	// resolve outputs
+	m_lamps.resolve();
 }
 
 
@@ -337,8 +382,8 @@ void speedbsk_state::speedbsk(machine_config &config)
 	PIT8254(config, "d71054", 0);
 
 	I8255(config, m_ppi[0]);
-	// port a: output
-	// port b: output
+	m_ppi[0]->out_pa_callback().set(FUNC(speedbsk_state::solenoid1_w));
+	m_ppi[0]->out_pb_callback().set(FUNC(speedbsk_state::solenoid2_w));
 	m_ppi[0]->in_pc_callback().set_ioport("switches");
 
 	I8255(config, m_ppi[1]);
@@ -355,7 +400,13 @@ void speedbsk_state::speedbsk(machine_config &config)
 	upd2.set_portx_tag("track_x_grn");
 	upd2.set_porty_tag("track_y_grn");
 
-	SEGA_315_5338A(config, "io", 32_MHz_XTAL);
+	sega_315_5338a_device &io(SEGA_315_5338A(config, "io", 32_MHz_XTAL));
+	io.out_pa_callback().set(FUNC(speedbsk_state::lamp_red_w<0>));
+	io.out_pb_callback().set(FUNC(speedbsk_state::lamp_red_w<1>));
+	io.out_pc_callback().set(FUNC(speedbsk_state::lamp_red_w<2>));
+	io.out_pd_callback().set(FUNC(speedbsk_state::lamp_grn_w<0>));
+	io.out_pe_callback().set(FUNC(speedbsk_state::lamp_grn_w<1>));
+	io.out_pf_callback().set(FUNC(speedbsk_state::lamp_grn_w<2>));
 
 	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
 
@@ -373,6 +424,8 @@ void speedbsk_state::speedbsk(machine_config &config)
 	HD44780(config, m_lcd, 0);
 	m_lcd->set_lcd_size(2, 20);
 	m_lcd->set_pixel_update_cb(FUNC(speedbsk_state::lcd_pixel_update));
+
+	config.set_default_layout(layout_speedbsk);
 
 	// TODO: LED screen
 
