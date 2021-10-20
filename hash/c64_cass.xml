@@ -3952,6 +3952,33 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="darkforc">
+		<description>Dark Force</description>
+		<year>1990</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side A: Night Breed"/>
+			<dataarea name="cass" size="2466088">
+				<rom name="Dark_Force_Tape_1_Side_1.tap" size="2466088" crc="aabda25f" sha1="6453832d22ea7cae4ca3628ad674e0a2360595d8"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side A: Midnight Resistance"/>
+			<dataarea name="cass" size="726358">
+				<rom name="Dark_Force_Tape_2_Side_1.tap" size="726358" crc="a6e9c743" sha1="6bb9b535b84bb777f97f23385d26e64d1418a2b9"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side B: Midnight Resistance Data"/>
+			<dataarea name="cass" size="990398">
+				<rom name="Dark_Force_Tape_2_Side_2.tap" size="990398" crc="0626c0df" sha1="d2e429e9949df17058c589459c2db8ae845c2fd0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="darkstar">
 		<description>Dark Star</description>
 		<year>1984</year>
@@ -3964,6 +3991,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="daysofth">
+		<description>Days of Thunder</description>
+		<year>1990</year>
+		<publisher>Mindscape</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="760462">
+				<rom name="Days_of_Thunder.tap" size="760462" crc="68e65cf6" sha1="1ac514e7825d220f983c14367d1748b3f67b1822"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="deadevil">
 		<description>Deadly Evil</description>
 		<year>1990</year>
@@ -3972,6 +4011,91 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="325903">
 				<rom name="Deadly_Evil.tap" size="325903" crc="f09d5cf1" sha1="8468bad17a345e2f219f1f4420a7aafa2991b9d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathorg">
+		<description>Death or Glory</description>
+		<year>1987</year>
+		<publisher>Mind Games</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="401362">
+				<rom name="Death_or_Glory.tap" size="401362" crc="ba5f7d8a" sha1="da4a73da5f48b9c5bf9b1327c90ad94052c6c41a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dwish3">
+		<description>Death Wish 3</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="617740">
+				<rom name="Death_Wish_3.tap" size="617740" crc="0c6cac06" sha1="1921e5b5808bd908b81267f96aa4462c1ed963fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decathln" supported="no"> <!-- game loads but doesn't run (just displays a blue screen) -->
+		<description>Decathlon</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="alt_title" value="The Activision Decathlon"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="996863">
+				<rom name="Decathlon.tap" size="996863" crc="3f3d2159" sha1="1b90743be027fd03c6d2811d7e3fe4a4f97c7633"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deceptor" supported="no"> <!-- game loads but doesn't run (just displays a black screen) -->
+		<description>Deceptor</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1176542">
+				<rom name="Deceptor.tap" size="1176542" crc="ef2fdea0" sha1="8916b1f3e4b8e8d113740c5a4bb95e06c480634a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thedeep">
+		<description>The Deep</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1290598">
+				<rom name="Deep,_The.tap" size="1290598" crc="77d2b047" sha1="d1572954167caa879b2bc646a97c2a8abd9a9fea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deflektr">
+		<description>Deflektor</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="549576">
+				<rom name="Deflektor.tap" size="549576" crc="ad1d8c2f" sha1="42a4bb3d2535e4f1adc214a50ec9633b0457c533"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="delta">
+		<description>Delta</description>
+		<year>1987</year>
+		<publisher>Thalamus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="505231">
+				<rom name="Delta.tap" size="505231" crc="ce13a6c9" sha1="d6b9a09dbf14acbf336e01a146d26808d1aa3bea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4000,6 +4124,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="desrtfox">
+		<description>Desert Fox</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="538560">
+				<rom name="Desert_Fox.tap" size="538560" crc="42d15564" sha1="03c1da4034e0b6c5822128eb84328c7b6c02be16"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dsrthawk">
 		<description>Desert Hawk</description>
 		<year>1988</year>
@@ -4008,6 +4144,36 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="451058">
 				<rom name="Desert_Hawk.tap" size="451058" crc="52ce81c0" sha1="17d5128bfe29ef6f25ca7d809d1d0f0dc4924018"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dicktrac">
+		<description>Dick Tracy</description>
+		<year>1990</year>
+		<publisher>Titus</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1577092">
+				<rom name="Dick_Tracy.tap" size="1577092" crc="25180237" sha1="b862785b0273cd816ba50ecba5a3644976d52b6b"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="1577070">
+				<rom name="Dick_Tracy_a1.tap" size="1577070" crc="ee1614d2" sha1="11cba9a4593e5b6b89f02aac1cf7c9e136fb4a77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug">
+		<description>Dig Dug</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="221746">
+				<rom name="Dig_Dug.tap" size="221746" crc="e2a1ef17" sha1="df8d1480feeb60e315c57e01509a987a1f632995"/>
 			</dataarea>
 		</part>
 	</software>
