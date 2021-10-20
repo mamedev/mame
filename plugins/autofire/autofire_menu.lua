@@ -234,13 +234,14 @@ end
 -- Button selection menu
 
 local function populate_button_menu()
+	local ioport = manager.machine.ioport
 	menu = {}
 	inputs = {}
 	menu[#menu + 1] = {_('Select an input for autofire'), '', 'off'}
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
-	for port_key, port in pairs(manager.machine.ioport.ports) do
+	for port_key, port in pairs(ioport.ports) do
 		for field_key, field in pairs(port.fields) do
 			if is_supported_input(field) then
 				inputs[#inputs + 1] = {
@@ -251,7 +252,29 @@ local function populate_button_menu()
 			end
 		end
 	end
-	-- TODO: group by device so we can sort table.sort(inputs, function(x, y) return x.ioport_field.name < y.ioport_field.name end)
+
+	local function compare(x, y)
+		if x.ioport_field.device.tag < y.ioport_field.device.tag then
+			return true
+		elseif x.ioport_field.device.tag > y.ioport_field.device.tag then
+			return false
+		end
+		groupx = ioport:type_group(x.ioport_field.type, x.ioport_field.player)
+		groupy = ioport:type_group(y.ioport_field.type, y.ioport_field.player)
+		if groupx < groupy then
+			return true
+		elseif groupx > groupy then
+			return false
+		elseif x.ioport_field.type < y.ioport_field.type then
+			return true
+		elseif x.ioport_field.type > y.ioport_field.type then
+			return false
+		else
+			return x.ioport_field.name < y.ioport_field.name
+		end
+	end
+	table.sort(inputs, compare)
+
 	for i, input in pairs(inputs) do
 		menu[header_height + i] = { _p('input-name', input.ioport_field.name), '', '' }
 	end
