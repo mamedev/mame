@@ -481,9 +481,9 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 			else
 				item_append(menu_item_type::SEPARATOR);
 			if (item.owner->owner())
-				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), 0, nullptr);
+				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			else
-				item_append(string_format(_("[root%1$s]"), item.owner->tag()), 0, nullptr);
+				item_append(string_format(_("[root%1$s]"), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			prev_owner = item.owner;
 		}
 

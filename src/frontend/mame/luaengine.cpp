@@ -432,31 +432,33 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	return sol::lua_nil;
 }
 
-void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
+std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
 {
 	std::string field = "menu_pop_" + menu;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>());
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_populate: %s\n", err.what());
 		}
 		else
 		{
-			sol::table table = res;
-			for(auto &entry : table)
+			std::tuple<sol::table, std::optional<long> > table = res;
+			for (auto &entry : std::get<0>(table))
 			{
-				if(entry.second.is<sol::table>())
+				if (entry.second.is<sol::table>())
 				{
 					sol::table enttable = entry.second.as<sol::table>();
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
+			return std::get<1>(table);
 		}
 	}
+	return std::nullopt;
 }
 
 bool lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)

@@ -117,7 +117,8 @@ void menu_plugin_opt::handle()
 void menu_plugin_opt::populate(float &customtop, float &custombottom)
 {
 	std::vector<std::tuple<std::string, std::string, std::string>> menu_list;
-	mame_machine_manager::instance()->lua()->menu_populate(m_menu, menu_list);
+	auto const sel = mame_machine_manager::instance()->lua()->menu_populate(m_menu, menu_list);
+
 	uintptr_t i = 1;
 	for(auto &item : menu_list)
 	{
@@ -126,13 +127,15 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 		const std::string &tflags = std::get<2>(item);
 
 		uint32_t flags = 0;
-		if(tflags == "off")
+		if (tflags == "off")
 			flags = FLAG_DISABLE;
-		else if(tflags == "l")
+		else if (tflags == "heading")
+			flags = FLAG_DISABLE | FLAG_UI_HEADING;
+		else if (tflags == "l")
 			flags = FLAG_LEFT_ARROW;
-		else if(tflags == "r")
+		else if (tflags == "r")
 			flags = FLAG_RIGHT_ARROW;
-		else if(tflags == "lr")
+		else if (tflags == "lr")
 			flags = FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
 
 		if(text == "---")
@@ -141,9 +144,14 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 			i++;
 		}
 		else
-			item_append(text, subtext, flags, (void *)i++);
+		{
+			item_append(text, subtext, flags, reinterpret_cast<void *>(i++));
+		}
 	}
 	item_append(menu_item_type::SEPARATOR);
+
+	if (sel)
+		set_selection(reinterpret_cast<void *>(uintptr_t(*sel)));
 }
 
 menu_plugin_opt::~menu_plugin_opt()
