@@ -507,8 +507,8 @@ void gts80b_state::machine_start()
 	save_item(NAME(m_soundex));
 	save_item(NAME(m_sol_state));
 	save_item(NAME(m_dispcmd));
-	save_item(NAME(m_in_cmd_mode[2]));
-	save_item(NAME(m_digit[2]));
+	save_item(NAME(m_in_cmd_mode));
+	save_item(NAME(m_digit));
 }
 
 void gts80b_state::machine_reset()
