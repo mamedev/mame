@@ -115,7 +115,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<hd44780_device> m_lcd;
-	optional_device_array<pwm_display_device, 6> m_lamp_pwm;
+	required_device_array<pwm_display_device, 6> m_lamp_pwm;
 
 	output_finder<24> m_lamps;
 	output_finder<> m_start_lamp;
