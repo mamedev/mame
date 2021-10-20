@@ -8,7 +8,7 @@ Memory Debugger Commands
 :ref:`debugger-command-find`
     search emulated memory for data
 :ref:`debugger-command-fill`
-    search emulated memory with specified pattern
+    fill emulated memory with specified pattern
 :ref:`debugger-command-dump`
     dump emulated memory to a file as text
 :ref:`debugger-command-strdump`
