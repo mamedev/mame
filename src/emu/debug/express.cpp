@@ -585,7 +585,11 @@ expression_error symbol_table::expression_get_space(const char *tag, int &spacen
 		return expression_error::NO_SUCH_MEMORY_SPACE;
 	}
 
-	// find space by name or take first populated space
+	// search not required
+	if (spacename.empty() && (0 <= spacenum))
+		return expression_error::NONE;
+
+	// find space by name or take first populated space if required
 	for (int i = 0; memory->max_space_count() > i; ++i)
 	{
 		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))

@@ -91,16 +91,13 @@ function timer.startplugin()
 
 	local function menu_populate()
 		local time = os.time() - start_time
-		return {{ _("Current time"), "", "off" },
-			{ sectohms(time), "", "off" },
-			{ _("Total time"), "", "off" },
-			{ sectohms(total_time + time), "", "off" },
-			{ _("Play Count"), "", "off" },
-			{ play_count, "", "off" }}
+		return {{ _("Current time"), sectohms(time), "off" },
+			{ _("Total time"), sectohms(total_time + time), "off" },
+			{ _("Play Count"), play_count, "off" }}
 	end
 
 	local function menu_callback(index, event)
-		return true
+		return false
 	end
 
 	emu.register_menu(menu_callback, menu_populate, _("Timer"))

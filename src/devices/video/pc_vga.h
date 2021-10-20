@@ -716,6 +716,9 @@ protected:
 private:
 	void start_command();
 	void do_pxblt();
+	u32 read_map_pixel(int x, int y, int map);
+	void write_map_pixel(int x, int y, int map, u32 pixel);
+	u32 rop(u32 src, u32 dst, u8 rop);
 
 	u8 m_pelmap;
 	u32 m_pelmap_base[4];

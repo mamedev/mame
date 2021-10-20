@@ -92,28 +92,32 @@ class nes_konami_vrc4_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_konami_vrc4_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
 	static constexpr device_timer_id TIMER_IRQ = 0;
 
-	nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	nes_konami_vrc4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void set_prg();
-	uint16_t m_mmc_vrom_bank[8];
-	uint8_t m_latch, m_mmc_prg_bank;
+	void set_mirror(u8 data);
+	void set_prg(int prg_base, int prg_mask);
+	virtual void set_prg() { set_prg(0x00, 0x1f); }
+	u16 m_mmc_vrom_bank[8];
+	u8 m_mmc_prg_bank[2];
+	u8 m_prg_flip;
 
 	void irq_tick();
-	void irq_ctrl_w(uint8_t data);
-	uint8_t m_irq_count, m_irq_count_latch;
+	virtual void irq_ack_w();
+	void irq_ctrl_w(u8 data);
+	u8 m_irq_count, m_irq_count_latch;
 	int m_irq_enable, m_irq_enable_latch;
 	int m_irq_mode;
 	int m_irq_prescale;

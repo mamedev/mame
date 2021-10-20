@@ -855,18 +855,10 @@ void menu_select_launch::inkey_dats()
 	ui_software_info const *software;
 	ui_system_info const *system;
 	get_selection(software, system);
-	if (software)
-	{
-		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system);
-		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
-			menu::stack_push<menu_dats_view>(ui(), container(), software);
-	}
+	if (software && !software->startempty)
+		menu::stack_push<menu_dats_view>(ui(), container(), *software);
 	else if (system)
-	{
-		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", system->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system);
-	}
+		menu::stack_push<menu_dats_view>(ui(), container(), system);
 }
 
 
@@ -1299,23 +1291,28 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	x1 = (std::min)(backtrack_pos - (float(toolbar_count) * x_spacing), x1 + ((x2 - x1 - total_width) * 0.5f));
 	for (int z = 0; toolbar_count > z; ++z, x1 += x_spacing)
 	{
+		auto const bitmap = toolbar_bitmaps[z];
 		x2 = x1 + x_size;
 		color = rgb_t (0xffcccccc);
 		if (mouse_in_rect(x1, y1, x2, y2))
 		{
-			set_hover(HOVER_B_FAV + toolbar_bitmaps[z]);
-			color = rgb_t::white();
+			bool const need_selection = (TOOLBAR_BITMAP_FAVORITE == bitmap) || (TOOLBAR_BITMAP_INFO == bitmap);
+			if (!need_selection || get_selection_ptr())
+			{
+				set_hover(HOVER_B_FAV + bitmap);
+				color = rgb_t::white();
+			}
 			float ypos = y2 + ui().get_line_height() + 2.0f * ui().box_tb_border();
 			ui().draw_text_box(
 					container(),
-					_(hover_msg[toolbar_bitmaps[z]]),
+					_(hover_msg[bitmap]),
 					text_layout::text_justify::CENTER, (x1 + x2) * 0.5f, ypos,
 					ui().colors().background_color());
 		}
 		container().add_quad(
 				x1, y1, x2, y2,
 				color,
-				m_cache.toolbar_textures()[toolbar_bitmaps[z]].get(),
+				m_cache.toolbar_textures()[bitmap].get(),
 				PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 }
@@ -1527,7 +1524,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			m_topline_datsview -= m_right_visible_lines - 1;
+			m_topline_datsview -= m_right_visible_lines - 3;
 			return;
 		}
 
@@ -1545,7 +1542,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			m_topline_datsview += m_right_visible_lines - 1;
+			m_topline_datsview += m_right_visible_lines - 3;
 			return;
 		}
 
@@ -1715,9 +1712,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				else if (hover() == HOVER_UI_LEFT)
 					ev.iptkey = IPT_UI_LEFT;
 				else if (hover() == HOVER_DAT_DOWN)
-					m_topline_datsview += m_right_visible_lines - 1;
+					m_topline_datsview += m_right_visible_lines - 3;
 				else if (hover() == HOVER_DAT_UP)
-					m_topline_datsview -= m_right_visible_lines - 1;
+					m_topline_datsview -= m_right_visible_lines - 3;
 				else if (hover() == HOVER_LPANEL_ARROW)
 				{
 					if (get_focus() == focused_menu::LEFT)
@@ -2850,31 +2847,31 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, m_info_view, 0, total - 1, title_size);
 
-	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-	if (m_total_lines < r_visible_lines)
-		r_visible_lines = m_total_lines;
+	m_right_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
+	if (m_total_lines < m_right_visible_lines)
+		m_right_visible_lines = m_total_lines;
 	if (m_topline_datsview < 0)
 		m_topline_datsview = 0;
-	if (m_topline_datsview + r_visible_lines >= m_total_lines)
-		m_topline_datsview = m_total_lines - r_visible_lines;
+	if ((m_topline_datsview + m_right_visible_lines) >= m_total_lines)
+		m_topline_datsview = m_total_lines - m_right_visible_lines;
 
-	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_right_visible_lines = r_visible_lines
-			- (m_topline_datsview ? 1 : 0)
-			- ((m_topline_datsview + r_visible_lines < m_total_lines) ? 1 : 0);
+	// get the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	bool const up_arrow = m_topline_datsview > 0;
+	bool const down_arrow = (m_topline_datsview + m_right_visible_lines) < m_total_lines;
+	int const r_visible_lines = m_right_visible_lines - (up_arrow ? 1 : 0) - (down_arrow ? 1 : 0);
 
 	if (mouse_in_rect(origx1 + gutter_width, oy1, origx2 - gutter_width, origy2))
 		set_hover(HOVER_INFO_TEXT);
 
-	if (m_topline_datsview) // up arrow
+	if (up_arrow)
 		draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-	if (m_total_lines > (m_topline_datsview + r_visible_lines)) // bottom arrow
-		draw_info_arrow(1, origx1, origx2, oy1 + (float(r_visible_lines - 1) * line_height), line_height, text_size, ud_arrow_width);
+	if (down_arrow)
+		draw_info_arrow(1, origx1, origx2, oy1 + (float(m_right_visible_lines - 1) * line_height * text_size), line_height, text_size, ud_arrow_width);
 
 	m_info_layout->emit(
 			container(),
-			m_topline_datsview ? (m_topline_datsview + 1) : 0, m_right_visible_lines,
-			origx1 + gutter_width, oy1 + (m_topline_datsview ? line_height : 0.0f));
+			m_topline_datsview ? (m_topline_datsview + 1) : 0, r_visible_lines,
+			origx1 + gutter_width, oy1 + (m_topline_datsview ? (line_height * text_size) : 0.0f));
 }
 
 

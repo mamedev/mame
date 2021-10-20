@@ -211,7 +211,7 @@ The system and software selection menus use additional controls
 **Shift+Tab**
     Moves keyboard/controller focus to the previous UI panel.
 **Left Alt+F**
-    Adds or removes the selected system or software list time from the favorites
+    Adds or removes the selected system or software list item from the favorites
     list.
 **Left Alt+E**
     Exports the currently displayed list of systems.
@@ -220,7 +220,7 @@ The system and software selection menus use additional controls
     or software list item.  (Shows information loaded by the data plugin from
     external files, including history.xml and mameinfo.dat.)
 **F1**
-    Audits system ROMs.
+    Audits system ROMs and disk images.
 
 
 .. _default-arcade-keys:

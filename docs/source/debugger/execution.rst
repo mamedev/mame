@@ -285,7 +285,7 @@ Back to :ref:`debugger-execution-list`
 ignore
 ------
 
-**ignore [<CPU>[,<CPU>[,...]]]**
+**ignore [<CPU>[,<CPU>[,…]]]**
 
 Ignores the specified CPUs in the debugger.  CPUs can be specified by
 tag or debugger CPU number (see :ref:`debugger-devicespec` for details).
@@ -316,7 +316,7 @@ Back to :ref:`debugger-execution-list`
 observe
 -------
 
-**observe [<CPU>[,<CPU>[,...]]]**
+**observe [<CPU>[,<CPU>[,…]]]**
 
 Allow interaction with the specified CPUs in the debugger.  CPUs can be
 specified by tag or debugger CPU number (see :ref:`debugger-devicespec`

@@ -893,11 +893,11 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 	auto y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
 
 	// add a box around that
-	draw_outlined_box(container,
-			x - box_lr_border(),
-			y - box_tb_border(),
-			x + actual_width + box_lr_border(),
-			y + actual_height + box_tb_border(), backcolor);
+	draw_outlined_box(
+			container,
+			x - box_lr_border(), y - box_tb_border(),
+			x + actual_width + box_lr_border(), y + actual_height + box_tb_border(),
+			backcolor);
 
 	// emit the text
 	layout.emit(container, x - actual_left, y);
@@ -2268,7 +2268,22 @@ void mame_ui_manager::menu_reset()
 
 std::string mame_ui_manager::get_general_input_setting(ioport_type type, int player, input_seq_type seqtype)
 {
-	return machine().input().seq_name(machine().ioport().type_seq(type, player, seqtype));
+	input_seq seq(machine().ioport().type_seq(type, player, seqtype));
+	input_code codes[16]; // TODO: remove magic number
+	unsigned len(0U);
+	for (unsigned i = 0U; std::size(codes) > i; ++i)
+	{
+		if (input_seq::not_code == seq[i])
+			++i;
+		else
+			codes[len++] = seq[i];
+		if (input_seq::end_code == seq[i])
+			break;
+	}
+	seq.reset();
+	for (unsigned i = 0U; len > i; ++i)
+		seq += codes[i];
+	return machine().input().seq_name(seq);
 }
 
 

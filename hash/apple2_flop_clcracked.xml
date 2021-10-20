@@ -346,7 +346,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cartime10b">
+	<software name="cartime10b" cloneof="carmntime10">
 		<description>Where in Time is Carmen Sandiego (Version 1.0) (imperfect clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -3326,7 +3326,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="allabtamb">
+	<software name="allabtamb" cloneof="allabtam">
 		<description>All About America (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Unicorn Software</publisher>
@@ -3824,7 +3824,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="animateb">
+	<software name="animateb" cloneof="animate">
 		<description>Animate (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Broderbund Software</publisher>
@@ -4395,7 +4395,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bsstoryb11b">
+	<software name="bsstoryb11b" cloneof="bsstoryb11">
 		<description>Bank Street StoryBook 1.1 (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
@@ -4440,7 +4440,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bswriter2b">
+	<software name="bswriter2b" cloneof="bswriter2">
 		<description>Bank Street Writer II (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -5206,7 +5206,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="bldkitb">
+	<software name="bldkitb" cloneof="bldkit">
 		<description>Boulderdash Construction Kit (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
@@ -5713,7 +5713,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cntralncb">
+	<software name="cntralncb" cloneof="cntralnc">
 		<description>Centauri Alliance (imperfect clean crack)</description>
 		<year>1990</year>
 		<publisher>Broderbund Software</publisher>
@@ -7077,7 +7077,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="crtvplayb">
+	<software name="crtvplayb" cloneof="crtvplay">
 		<description>Creative Play (imperfect clean crack)</description>
 		<year>1982</year>
 		<publisher>The Regents of the University of California</publisher>
@@ -8089,7 +8089,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dondrab">
+	<software name="dondrab" cloneof="dondra">
 		<description>Dondra - A New Beginning (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Spectrum Holobyte</publisher>
@@ -9144,7 +9144,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="felonythb">
+	<software name="felonythb" cloneof="felonyth">
 		<description>Felony (Thunder Mountain release) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Thunder Mountain</publisher>
@@ -9375,7 +9375,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="5rowaddsubb">
+	<software name="5rowaddsubb" cloneof="5rowaddsub">
 		<description>Five in a Row - Addition and Subtraction (imperfect clean crack)</description>
 		<year>1992</year>
 		<publisher>Critical Thinking Press</publisher>
@@ -10415,7 +10415,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="goldfngrb">
+	<software name="goldfngrb" cloneof="goldfngr">
 		<description>Goldfinger (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Mindscape</publisher>
@@ -11024,7 +11024,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="microz7b">
+	<software name="microz7b" cloneof="microz7">
 		<description>Microzine 7 (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -11099,7 +11099,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="microz9b">
+	<software name="microz9b" cloneof="microz9">
 		<description>Microzine 9 (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Scholastic</publisher>
@@ -11218,7 +11218,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="microz14b">
+	<software name="microz14b" cloneof="microz14">
 		<description>Microzine 14 (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Scholastic</publisher>
@@ -12237,7 +12237,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="highstksb">
+	<software name="highstksb" cloneof="highstks">
 		<description>High Stakes (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Mindscape</publisher>
@@ -12599,11 +12599,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="amzthgr2b">
+	<software name="amzthgr2b" cloneof="amzthgr2">
 		<description>In Search of the Most Amazing Thing (Revision 2) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Spinnaker Software</publisher>
 		<info name="release" value="2018-03-16"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -12628,11 +12634,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ijonesrab">
+	<software name="ijonesrab" cloneof="ijonesra">
 		<description>Indiana Jones in Revenge of the Ancients (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
 		<info name="release" value="2018-10-02"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -13435,7 +13447,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="kungfumb">
+	<software name="kungfumb" cloneof="kungfum">
 		<description>Kung Fu Master (imperfect clean crack)</description>
 		<year>1983</year>
 		<publisher>Data East</publisher>
@@ -14024,7 +14036,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lcksmth50cb">
+	<software name="lcksmth50cb" cloneof="lcksmth50c">
 		<description>Locksmith (Version 5.0 Revision C) (imperfect clean crack)</description>
 		<year>1983</year>
 		<publisher>Omega MicroWare</publisher>
@@ -14059,7 +14071,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="lcksmth50fb">
+	<software name="lcksmth50fb" cloneof="lcksmth50f">
 		<description>Locksmith (Version 5.0 Revision F) (imperfect clean crack)</description>
 		<year>1983</year>
 		<publisher>Omega Microware</publisher>
@@ -15612,7 +15624,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="matskll2b">
+	<software name="matskll2b" cloneof="matskll2">
 		<description>Mathematics Skills Software Level 2 (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Addison-Wesley</publisher>
@@ -17664,7 +17676,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pxcartnkb">
+	<software name="pxcartnkb" cloneof="pxcartnk">
 		<description>Mr. Pixel's Cartoon Kit (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
@@ -17771,7 +17783,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="multchoib">
+	<software name="multchoib" cloneof="multchoi">
 		<description>Multiple Choices (imperfect clean crack)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
@@ -18282,7 +18294,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mystsntcb">
+	<software name="mystsntcb" cloneof="mystsntc">
 		<description>Mystery Sentences (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -18778,7 +18790,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="opfrogb">
+	<software name="opfrogb" cloneof="opfrog">
 		<description>Operation Frog (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -19843,11 +19855,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="prjspcstb">
+	<software name="prjspcstb" cloneof="prjspcst">
 		<description>Project Space Station (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Hesware</publisher>
 		<info name="release" value="2016-08-01"/>
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -20077,7 +20095,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="pyrapzlrb">
+	<software name="pyrapzlrb" cloneof="pyrapzlr">
 		<description>Pyramid Puzzler (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
@@ -20932,7 +20950,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="secfilerb">
+	<software name="secfilerb" cloneof="secfiler">
 		<description>Secret Filer (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -21072,7 +21090,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tenlrobtb">
+	<software name="tenlrobtb" cloneof="tenlrobt">
 		<description>Ten Little Robots (imperfect clean crack)</description>
 		<year>1983</year>
 		<publisher>Unicorn Software</publisher>
@@ -21300,7 +21318,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="forbcstlb">
+	<software name="forbcstlb" cloneof="forbcstl">
 		<description>Forbidden Castle (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
@@ -21348,7 +21366,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fractv31b">
+	<software name="fractv31b" cloneof="fractv31">
 		<description>Fractions (Version 3.1 / 25-NOV-83) (imperfect clean crack)</description>
 		<year>1983</year>
 		<publisher>Edu-Ware Services</publisher>
@@ -21545,7 +21563,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mastrsatb">
+	<software name="mastrsatb" cloneof="mastrsat">
 		<description>Mastering the SAT (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
@@ -21606,7 +21624,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="millr2b">
+	<software name="millr2b" cloneof="millrel2">
 		<description>Millionaire Release 2 (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Designware</publisher>
@@ -26266,7 +26284,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rboots40b">
+	<software name="rboots40b" cloneof="rboots40">
 		<description>Rocky's Boots (Version 4.0) (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>The Learning Company</publisher>
@@ -26491,7 +26509,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hangtwntb">
+	<software name="hangtwntb" cloneof="hangtwnt">
 		<description>The Hangtown Trilogy (Version 2.2) (imperfect clean crack)</description>
 		<year>1990</year>
 		<publisher>Critical Thinking Press</publisher>
@@ -26791,7 +26809,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tagtmwrsb">
+	<software name="tagtmwrsb" cloneof="tagtmwrs">
 		<description>Tag Team Wrestling (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Data East</publisher>
@@ -26852,7 +26870,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="submissnb">
+	<software name="submissnb" cloneof="submissn">
 		<description>Sub Mission (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
@@ -26900,7 +26918,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="teidolonb">
+	<software name="teidolonb" cloneof="teidolon">
 		<description>The Eidolon (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Epyx</publisher>
@@ -26968,7 +26986,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="techncopb">
+	<software name="techncopb" cloneof="techncop">
 		<description>Techno Cop (imperfect clean crack)</description>
 		<year>1988</year>
 		<publisher>Gray Matter</publisher>
@@ -27063,7 +27081,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="circtsimb">
+	<software name="circtsimb" cloneof="circtsim">
 		<description>The Circuit Simulator (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Natural Intelligence</publisher>
@@ -27083,7 +27101,7 @@ license:CC0
 	</software>
 
 	<software name="readmc13">
-		<description>The Reading Machine (Version 1.3, 1984-03-02) (cleanly cracked)</description>
+		<description>The Reading Machine (Version 1.3 / 1984-03-02) (cleanly cracked)</description>
 		<year>1984</year>
 		<publisher>Southwest Edpsych Services</publisher>
 		<info name="release" value="2016-07-31"/>
@@ -27151,7 +27169,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="carmneurb">
+	<software name="carmneurb" cloneof="carmneur">
 		<description>Where in Europe is Carmen Sandiego? (imperfect clean crack)</description>
 		<year>1988</year>
 		<publisher>Broderbund Software</publisher>
@@ -28123,7 +28141,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stymkr64b">
+	<software name="stymkr64b" cloneof="stymkr64">
 		<description>Story Maker (64K Version) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -28808,7 +28826,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robody11b">
+	<software name="robody11b" cloneof="robody11">
 		<description>Robot Odyssey (Version 1.1) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>The Learning Company</publisher>
@@ -29287,7 +29305,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rdwksdvb">
+	<software name="rdwksdvb" cloneof="rdwksdv">
 		<description>Reading Workshop: Distant Views (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Scott, Foresman and Company</publisher>
@@ -29770,7 +29788,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stytre14b">
+	<software name="stytre14b" cloneof="stytre14">
 		<description>Story Tree (Version 1.4) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -30364,7 +30382,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="winnieb">
+	<software name="winnieb" cloneof="winnie">
 		<description>Winnie the Pooh in the Hundred Acre Wood (Sierra On-Line) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Sierra On-Line</publisher>
@@ -30548,7 +30566,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="sokobanb">
+	<software name="sokobanb" cloneof="sokoban">
 		<description>Soko-Ban (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Spectrum Holobyte</publisher>
@@ -30664,7 +30682,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="swsfamrbb">
+	<software name="swsfamrbb" cloneof="swsfamrb">
 		<description>Swiss Family Robinson (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Windham Classics</publisher>
@@ -30778,7 +30796,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ttnktuktb">
+	<software name="ttnktuktb" cloneof="ttnktukt">
 		<description>Tink Tonk - Tuk Goes to Town (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
@@ -31172,7 +31190,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="readwkrfb">
+	<software name="readwkrfb" cloneof="readwkrf">
 		<description>Reading Workshop: Running Free (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Scott, Foresman and Company</publisher>
@@ -32199,7 +32217,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="voodooisb">
+	<software name="voodooisb" cloneof="voodoois">
 		<description>Voodoo Island (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
@@ -33142,7 +33160,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="suctyp12b">
+	<software name="suctyp12b" cloneof="suctyp12">
 		<description>Success with Typing (Version 1.2) (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Scholastic</publisher>
@@ -33353,7 +33371,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="talesmstb">
+	<software name="talesmstb" cloneof="talesmst">
 		<description>Tales of Mystery (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scholastic</publisher>
@@ -33469,7 +33487,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wizozb">
+	<software name="wizozb" cloneof="wizoz">
 		<description>The Wizard of Oz (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
@@ -33758,7 +33776,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="robodyv2b">
+	<software name="robodyv2b" cloneof="robodyv2">
 		<description>Robot Odyssey I (Version 2.0) (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>The Learning Company</publisher>
@@ -33819,7 +33837,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tttsubfb">
+	<software name="tttsubfb" cloneof="tttsubf">
 		<description>Tink! Tink! Tink's Subtraction Fair (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
@@ -33854,7 +33872,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tonkbdyb">
+	<software name="tonkbdyb" cloneof="tonkbdy">
 		<description>Tonk in the Land of the Buddy-Bots (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Mindscape</publisher>
@@ -34134,7 +34152,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="crmusa89b">
+	<software name="crmusa89b" cloneof="crmusa89">
 		<description>Where in the USA is Carmen Sandiego? (Version 2.0, 26-APR-1989) (imperfect clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -34182,7 +34200,7 @@ license:CC0
 	</software>
 
 	<software name="crmwld89">
-		<description>Where in the World is Carmen Sandiego? (Version 15-AUG-1989) (cleanly cracked)</description>
+		<description>Where in the World is Carmen Sandiego? (Version 2.0 / 15-AUG-1989) (cleanly cracked)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2018-09-05"/>
@@ -34207,12 +34225,18 @@ license:CC0
 	</software>
 
 	<software name="crmwld89b">
-		<description>Where in the World is Carmen Sandiego? (Version 15-AUG-1989) (imperfect clean crack)</description>
+		<description>Where in the World is Carmen Sandiego? (Version 2.0 / 15-AUG-1989) (imperfect clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
 		<info name="release" value="2018-09-05"/>
 		<!-- This ProDOS re-release is dated 15-AUG-1989 according to file
 		metadata. -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines.
+
+		This 'imperfect crack' version remains in here for
+		documentation purposes. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -34628,7 +34652,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="trsrisldb">
+	<software name="trsrisldb" cloneof="trsrisld">
 		<description>Treasure Island (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Windham Classics</publisher>
@@ -36042,7 +36066,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="cpsat11ab">
+	<software name="cpsat11ab" cloneof="cpsat11a">
 		<description>Computer Preparation for the SAT (Version 1.1A) (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Harcourt Brace Jovanovich</publisher>
@@ -36220,7 +36244,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wgbbenhb">
+	<software name="wgbbenhb" cloneof="wgbbenh">
 		<description>The World's Greatest Baseball Game (Enhanced Version) (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>Quest</publisher>
@@ -36562,7 +36586,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="certmoreb">
+	<software name="certmoreb" cloneof="certmore">
 		<description>Certificates and More! (imperfect clean crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
@@ -37068,7 +37092,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ewalg610b">
+	<software name="ewalg610b" cloneof="ewalg610">
 		<description>Algebra Volume 6 (Version 1.0) (imperfect clean crack)</description>
 		<year>1983</year>
 		<publisher>EduWare Services</publisher>
@@ -37279,7 +37303,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ndcarmenb">
+	<software name="ndcarmenb" cloneof="ndcarmen">
 		<description>Where in North Dakota is Carmen Sandiego? (imperfect clean crack)</description>
 		<year>1989</year>
 		<publisher>Broderbund Software</publisher>
@@ -38065,7 +38089,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="spcjournb">
+	<software name="spcjournb" cloneof="spcjourn">
 		<description>Space Journey (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Scott, Foresman and Company</publisher>
@@ -38748,7 +38772,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="conceptrb">
+	<software name="conceptrb" cloneof="conceptr">
 		<description>Conceptor (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>Mentor Learning Systems</publisher>
@@ -39329,7 +39353,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mathtwstb">
+	<software name="mathtwstb" cloneof="mathtwst">
 		<description>The Math Twister (imperfect clean crack)</description>
 		<year>1986</year>
 		<publisher>The Ellen Nelson Learning Library</publisher>
@@ -39648,7 +39672,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dondrar2b">
+	<software name="dondrar2b" cloneof="dondrar2">
 		<description>Dondra: A New Beginning (Revision 2) (imperfect clean crack)</description>
 		<year>1987</year>
 		<publisher>Spectrum Holobyte</publisher>
@@ -41588,7 +41612,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mcspst10b">
+	<software name="mcspst10b" cloneof="mcspst10">
 		<description>MECC-A405 Sports Stats (Version 1.0) (imperfect clean crack)</description>
 		<year>1985</year>
 		<publisher>MECC</publisher>
@@ -43050,7 +43074,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="algvl411b">
+	<software name="algvl411b" cloneof="algvl411">
 		<description>Algebra Volume 4 (Version 1.1) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>Peachtree Software</publisher>
@@ -43235,7 +43259,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="algv3rev0b">
+	<software name="algv3rev0b" cloneof="algv3rev0">
 		<description>Algebra Volume 3 (Revision 0) (imperfect clean crack)</description>
 		<year>1984</year>
 		<publisher>EduWare</publisher>

@@ -1,5 +1,5 @@
-// copyright-holders:R. Belmont
 // license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     apple2e.cpp - Apple IIe/IIc/IIc Plus and clones

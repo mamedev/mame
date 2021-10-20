@@ -2869,6 +2869,13 @@ Bubbles ROM labels are in this format:
 |    16-3012-1       |   <-- Williams game number & ROM number
 +--------------------+
 
++--------------------+
+| Video Sound Rom 5  |
+| (c) 1982 WILLIAMS  |
+| ELECTRONICS        |
+|         STD. 771   |
++--------------------+
+
 ROM | Board|  "B" ROMs  |
  ## | Loc. |  label #   |  Part Number
 ----+------+------------+----------------
@@ -2889,29 +2896,71 @@ Instruction Manual 16-3012-101 states Brown labels
 
 Observed, but currently unverified, sets include:
   Red Label "B" ROMs numbers 16-3012-13 through 16-3012-24
-  Red Label "B" ROMs numbers 16-3012-40 through 16-3012-51
   Red Label "B" ROMs numbers 16-3012-52 through 16-3012-63
 
-Uses a standard D-9144 ROM Board Assembly, see Joust or Robotron above
+
+D-9144-3012 ROM Board Assembly:
++----------------------------------------------+
+|       2J3                           2J4      |
+|              +---------------+               |
+|              | 6821 PIA @ 1B |               |
+|2             +---------------+             L |
+|J   4049BP    7420N       7474     SN7425N  E |
+|2     7474    74LS139N    7411PC   SN7404N  D |
+| +----------+    +----------+    +----------+ |
+| | ROM3  4A |    | ROM2  4C |    | ROM1  4E | |
+| +----------+    +----------+    +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM6  5A |WW  | ROM5  5C |WW  | ROM4  5E | |
+| +----------+12  +----------+34  +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM9  6A |    | ROM8  6C |    | ROM7  6E | |
+| +----------+    +----------+    +----------+ |
+| +----------+    +----------+    +----------+ |
+| | ROM10 7A |    | ROM11 7C |    | ROM12 7E | |
+| +----------+    +----------+    +----------+ |
+| +------------------+            +----------+ |
+| | VTI 8220  VL2001 |  74LS245N  |  74154N  | |
+| +------------------+            +----------+ |
+| +------------------+  74LS244N               |
+| | VTI 8220  VL2001 |    +------------------+ |
+| +------------------+    |  2J1  connector  | |
++-------------------------+------------------+-+
+
+Connectors:
+2J1 40 pin ribbon cable connetor
+2J2  6 pin header (KEY pin 4)
+2J3 10 pin header (KEY pin 9)
+2J4  9 pin header (KEY pin 1)
+
+LED - 7Seg LED display
+
+Wire W1 & W3 with Zero Ohm resistors for 2732 ROMs
+Wire W2 & W4 with Zero Ohm resistors for 2532 ROMs
+
+
+For the sound ROM:
+  Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
+  Drawing Set 16-3012-103 states "Video Sound ROM 8"
 
 */
 ROM_START( bubbles )
-	ROM_REGION( 0x19000, "maincpu", 0 )
-	ROM_LOAD( "bubbles.10b", 0x0d000, 0x1000, CRC(26e7869b) SHA1(db428e79fc325ae3c8cab460267c27cdbc35a3bd) )
-	ROM_LOAD( "bubbles.11b", 0x0e000, 0x1000, CRC(5a5b572f) SHA1(f0c3a330abf9c8cfb6007ee372409450d2a15a93) )
-	ROM_LOAD( "bubbles.12b", 0x0f000, 0x1000, CRC(ce22d2e2) SHA1(be4b9800c846660ce2b2ddd75ad872dcf174979a) )
-	ROM_LOAD( "bubbles.1b",  0x10000, 0x1000, CRC(8234f55c) SHA1(4d60942320c03ae50b0b17267062a321cf49e240) )
-	ROM_LOAD( "bubbles.2b",  0x11000, 0x1000, CRC(4a188d6a) SHA1(2788c4a21659799e59ab82bc8d1864a3abe3b6d7) )
-	ROM_LOAD( "bubbles.3b",  0x12000, 0x1000, CRC(7728f07f) SHA1(2a2c6dd8c2196dcd5e71b38554a56ee03d2aa454) )
-	ROM_LOAD( "bubbles.4b",  0x13000, 0x1000, CRC(040be7f9) SHA1(de4d212cd2967b2dcd7b2c09dea2c1b06ce4c5bd) )
-	ROM_LOAD( "bubbles.5b",  0x14000, 0x1000, CRC(0b5f29e0) SHA1(ae52f8c69c8b821abb458288c8ee0bc6c28fe535) )
-	ROM_LOAD( "bubbles.6b",  0x15000, 0x1000, CRC(4dd0450d) SHA1(d55aa8fb8f2974ce5ba7155b01bc3e3622f202af) )
-	ROM_LOAD( "bubbles.7b",  0x16000, 0x1000, CRC(e0a26ec0) SHA1(2da6213df6c15735a8bbd6750cfb1a1b6232a6f5) )
-	ROM_LOAD( "bubbles.8b",  0x17000, 0x1000, CRC(4fd23d8d) SHA1(9d71caa30bc3f4151789279d21651e5a4fe4a484) )
-	ROM_LOAD( "bubbles.9b",  0x18000, 0x1000, CRC(b48559fb) SHA1(551a49a12353044dbbf28dba2bd860c2d00c50bd) )
+	ROM_REGION( 0x19000, "maincpu", 0 ) // Solid red Label "B" ROMs numbers 16-3012-40 through 16-3012-51
+	ROM_LOAD( "bubbles_rom_10b_16-3012-49.a7", 0x0d000, 0x1000, CRC(26e7869b) SHA1(db428e79fc325ae3c8cab460267c27cdbc35a3bd) )
+	ROM_LOAD( "bubbles_rom_11b_16-3012-50.c7", 0x0e000, 0x1000, CRC(5a5b572f) SHA1(f0c3a330abf9c8cfb6007ee372409450d2a15a93) )
+	ROM_LOAD( "bubbles_rom_12b_16-3012-51.e7", 0x0f000, 0x1000, CRC(ce22d2e2) SHA1(be4b9800c846660ce2b2ddd75ad872dcf174979a) )
+	ROM_LOAD( "bubbles_rom_1b_16-3012-40.4e",  0x10000, 0x1000, CRC(8234f55c) SHA1(4d60942320c03ae50b0b17267062a321cf49e240) )
+	ROM_LOAD( "bubbles_rom_2b_16-3012-41.4c",  0x11000, 0x1000, CRC(4a188d6a) SHA1(2788c4a21659799e59ab82bc8d1864a3abe3b6d7) )
+	ROM_LOAD( "bubbles_rom_3b_16-3012-42.4a",  0x12000, 0x1000, CRC(7728f07f) SHA1(2a2c6dd8c2196dcd5e71b38554a56ee03d2aa454) )
+	ROM_LOAD( "bubbles_rom_4b_16-3012-43.5e",  0x13000, 0x1000, CRC(040be7f9) SHA1(de4d212cd2967b2dcd7b2c09dea2c1b06ce4c5bd) )
+	ROM_LOAD( "bubbles_rom_5b_16-3012-44.5c",  0x14000, 0x1000, CRC(0b5f29e0) SHA1(ae52f8c69c8b821abb458288c8ee0bc6c28fe535) )
+	ROM_LOAD( "bubbles_rom_6b_16-3012-45.5a",  0x15000, 0x1000, CRC(4dd0450d) SHA1(d55aa8fb8f2974ce5ba7155b01bc3e3622f202af) )
+	ROM_LOAD( "bubbles_rom_7b_16-3012-46.6e",  0x16000, 0x1000, CRC(e0a26ec0) SHA1(2da6213df6c15735a8bbd6750cfb1a1b6232a6f5) )
+	ROM_LOAD( "bubbles_rom_8b_16-3012-47.6c",  0x17000, 0x1000, CRC(4fd23d8d) SHA1(9d71caa30bc3f4151789279d21651e5a4fe4a484) )
+	ROM_LOAD( "bubbles_rom_9b_16-3012-48.6a",  0x18000, 0x1000, CRC(b48559fb) SHA1(551a49a12353044dbbf28dba2bd860c2d00c50bd) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) // Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
-	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) ) // Drawing Set 16-3012-103 states "Video Sound ROM 8"
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "video_sound_rom_5_std_771.ic12",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
@@ -2929,12 +2978,12 @@ ROM_START( bubblesr )
 	ROM_LOAD( "bubblesr.4b",  0x13000, 0x1000, CRC(0c65eaab) SHA1(c622906cbda07421a7024955f3b9e8d173f4b6cb) )
 	ROM_LOAD( "bubblesr.5b",  0x14000, 0x1000, CRC(7ece4e13) SHA1(c6ec7145c2d3bf51877c7fb995d9732b09e04cf0) )
 	ROM_LOAD( "bubbles.6b",   0x15000, 0x1000, CRC(4dd0450d) SHA1(d55aa8fb8f2974ce5ba7155b01bc3e3622f202af) )
-	ROM_LOAD( "bubbles.7b",   0x16000, 0x1000, CRC(e0a26ec0) SHA1(2da6213df6c15735a8bbd6750cfb1a1b6232a6f5) )
+	ROM_LOAD( "bubbles.7b",   0x16000, 0x1000, CRC(e0a26ec0) SHA1(2da6213df6c15735a8bbd6750cfb1a1b6232a6f5) ) // = bub_prot.7b
 	ROM_LOAD( "bubblesr.8b",  0x17000, 0x1000, CRC(598b9bd6) SHA1(993cc3fac58310d0e617e58e3a0753002b987df1) )
 	ROM_LOAD( "bubbles.9b",   0x18000, 0x1000, CRC(b48559fb) SHA1(551a49a12353044dbbf28dba2bd860c2d00c50bd) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) // Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
-	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) ) // Drawing Set 16-3012-103 states "Video Sound ROM 8"
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "video_sound_rom_5_std_771.ic12",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694
@@ -2952,12 +3001,12 @@ ROM_START( bubblesp )
 	ROM_LOAD( "bub_prot.4b",  0x13000, 0x1000, CRC(4e264f01) SHA1(a6fd2d0613f78c45b3873e06efa2dd99530ed0c8) )
 	ROM_LOAD( "bub_prot.5b",  0x14000, 0x1000, CRC(121b0be6) SHA1(75ed718b9e83c32390ee0fe2c34e0300ecd98a85) )
 	ROM_LOAD( "bub_prot.6b",  0x15000, 0x1000, CRC(80e90b25) SHA1(92c83b4333f4f0f65638b1827ace01b02c490339) )
-	ROM_LOAD( "bubbles.7b",   0x16000, 0x1000, CRC(e0a26ec0) SHA1(2da6213df6c15735a8bbd6750cfb1a1b6232a6f5) )
+	ROM_LOAD( "bub_prot.7b",  0x16000, 0x1000, CRC(e0a26ec0) SHA1(2da6213df6c15735a8bbd6750cfb1a1b6232a6f5) )
 	ROM_LOAD( "bub_prot.8b",  0x17000, 0x1000, CRC(96fb19c8) SHA1(3b1720e5efe2adc1f633216419bdf00c7e7b817d) )
 	ROM_LOAD( "bub_prot.9b",  0x18000, 0x1000, CRC(be7e1028) SHA1(430b33c8d83ee6756a3ef9298792b71066c88326) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) // Instruction Manual 16-3012-101 states "ROM 13" P/N A-5342-10127 (same as Splat)
-	ROM_LOAD( "bubbles.snd",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) ) // Drawing Set 16-3012-103 states "Video Sound ROM 8"
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "video_sound_rom_5_std_771.ic12",  0xf000, 0x1000, CRC(689ce2aa) SHA1(b70d2553f731f9a20ddaf9af2f93b7e9c44d4d99) )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "decoder_rom_4.3g", 0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) ) // Universal Horizontal decoder ROM - 7641-5 BPROM - P/N A-5342-09694

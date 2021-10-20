@@ -111,7 +111,7 @@ private:
 	void start_new_line(float height);
 	float get_char_width(char32_t ch, float size);
 	void truncate_wrap();
-	void word_wrap(text_justify line_justify);
+	void word_wrap();
 	void invalidate_calculated_actual_width();
 };
 

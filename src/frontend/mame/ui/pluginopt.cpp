@@ -72,40 +72,40 @@ void menu_plugin_opt::handle()
 {
 	const event *menu_event = process(0);
 
-	if (menu_event && uintptr_t(menu_event->itemref))
+	if (menu_event)
 	{
 		std::string key;
 		switch (menu_event->iptkey)
 		{
-			case IPT_UI_UP:
-				key = "up";
-				break;
-			case IPT_UI_DOWN:
-				key = "down";
-				break;
-			case IPT_UI_LEFT:
-				key = "left";
-				break;
-			case IPT_UI_RIGHT:
-				key = "right";
-				break;
-			case IPT_UI_SELECT:
-				key = "select";
-				break;
-			case IPT_UI_DISPLAY_COMMENT:
-				key = "comment";
-				break;
-			case IPT_UI_CLEAR:
-				key = "clear";
-				break;
-			case IPT_UI_CANCEL:
-				key = "cancel";
-				break;
-			case IPT_SPECIAL:
-				key = std::to_string((u32)menu_event->unichar);
-				break;
-			default:
-				return;
+		case IPT_UI_UP:
+			key = "up";
+			break;
+		case IPT_UI_DOWN:
+			key = "down";
+			break;
+		case IPT_UI_LEFT:
+			key = "left";
+			break;
+		case IPT_UI_RIGHT:
+			key = "right";
+			break;
+		case IPT_UI_SELECT:
+			key = "select";
+			break;
+		case IPT_UI_DISPLAY_COMMENT:
+			key = "comment";
+			break;
+		case IPT_UI_CLEAR:
+			key = "clear";
+			break;
+		case IPT_UI_CANCEL:
+			key = "cancel";
+			break;
+		case IPT_SPECIAL:
+			key = std::to_string((u32)menu_event->unichar);
+			break;
+		default:
+			return;
 		}
 		if (mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(menu_event->itemref), key))
 			reset(reset_options::REMEMBER_REF);

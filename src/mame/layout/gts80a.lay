@@ -36,94 +36,94 @@ copyright-holders:Robbbert
 
 		<!-- Player 1 Score -->
 
-		<element name="digit15" ref="digit">
+		<element name="digit5" ref="digit">
 			<bounds left="10" top="45" right="44" bottom="84" />
 		</element>
-		<element name="digit5" ref="digit">
+		<element name="digit4" ref="digit">
 			<bounds left="54" top="45" right="88" bottom="84" />
 		</element>
-		<element name="digit4" ref="digit">
+		<element name="digit3" ref="digit">
 			<bounds left="98" top="45" right="132" bottom="84" />
 		</element>
-		<element name="digit3" ref="digit">
+		<element name="digit2" ref="digit">
 			<bounds left="142" top="45" right="176" bottom="84" />
 		</element>
-		<element name="digit2" ref="digit">
+		<element name="digit1" ref="digit">
 			<bounds left="186" top="45" right="220" bottom="84" />
 		</element>
-		<element name="digit1" ref="digit">
+		<element name="digit0" ref="digit">
 			<bounds left="230" top="45" right="264" bottom="84" />
 		</element>
-		<element name="digit0" ref="digit">
+		<element name="digit15" ref="digit">
 			<bounds left="274" top="45" right="308" bottom="84" />
 		</element>
 
 		<!-- Player 2 Score -->
-		<element name="digit12" ref="digit">
+		<element name="digit11" ref="digit">
 			<bounds left="10" top="105" right="44" bottom="144" />
 		</element>
-		<element name="digit11" ref="digit">
+		<element name="digit10" ref="digit">
 			<bounds left="54" top="105" right="88" bottom="144" />
 		</element>
-		<element name="digit10" ref="digit">
+		<element name="digit9" ref="digit">
 			<bounds left="98" top="105" right="132" bottom="144" />
 		</element>
-		<element name="digit9" ref="digit">
+		<element name="digit8" ref="digit">
 			<bounds left="142" top="105" right="176" bottom="144" />
 		</element>
-		<element name="digit8" ref="digit">
+		<element name="digit7" ref="digit">
 			<bounds left="186" top="105" right="220" bottom="144" />
 		</element>
-		<element name="digit7" ref="digit">
+		<element name="digit6" ref="digit">
 			<bounds left="230" top="105" right="264" bottom="144" />
 		</element>
-		<element name="digit6" ref="digit">
+		<element name="digit12" ref="digit">
 			<bounds left="274" top="105" right="308" bottom="144" />
 		</element>
 
 		<!-- Player 3 Score -->
-		<element name="digit35" ref="digit">
+		<element name="digit25" ref="digit">
 			<bounds left="10" top="165" right="44" bottom="204" />
 		</element>
-		<element name="digit25" ref="digit">
+		<element name="digit24" ref="digit">
 			<bounds left="54" top="165" right="88" bottom="204" />
 		</element>
-		<element name="digit24" ref="digit">
+		<element name="digit23" ref="digit">
 			<bounds left="98" top="165" right="132" bottom="204" />
 		</element>
-		<element name="digit23" ref="digit">
+		<element name="digit22" ref="digit">
 			<bounds left="142" top="165" right="176" bottom="204" />
 		</element>
-		<element name="digit22" ref="digit">
+		<element name="digit21" ref="digit">
 			<bounds left="186" top="165" right="220" bottom="204" />
 		</element>
-		<element name="digit21" ref="digit">
+		<element name="digit20" ref="digit">
 			<bounds left="230" top="165" right="264" bottom="204" />
 		</element>
-		<element name="digit20" ref="digit">
+		<element name="digit35" ref="digit">
 			<bounds left="274" top="165" right="308" bottom="204" />
 		</element>
 
 		<!-- Player 4 Score -->
-		<element name="digit32" ref="digit">
+		<element name="digit31" ref="digit">
 			<bounds left="10" top="225" right="44" bottom="264" />
 		</element>
-		<element name="digit31" ref="digit">
+		<element name="digit30" ref="digit">
 			<bounds left="54" top="225" right="88" bottom="264" />
 		</element>
-		<element name="digit30" ref="digit">
+		<element name="digit29" ref="digit">
 			<bounds left="98" top="225" right="132" bottom="264" />
 		</element>
-		<element name="digit29" ref="digit">
+		<element name="digit28" ref="digit">
 			<bounds left="142" top="225" right="176" bottom="264" />
 		</element>
-		<element name="digit28" ref="digit">
+		<element name="digit27" ref="digit">
 			<bounds left="186" top="225" right="220" bottom="264" />
 		</element>
-		<element name="digit27" ref="digit">
+		<element name="digit26" ref="digit">
 			<bounds left="230" top="225" right="264" bottom="264" />
 		</element>
-		<element name="digit26" ref="digit">
+		<element name="digit32" ref="digit">
 			<bounds left="274" top="225" right="308" bottom="264" />
 		</element>
 

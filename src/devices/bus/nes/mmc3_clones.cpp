@@ -31,8 +31,8 @@
 DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
 DEFINE_DEVICE_TYPE(NES_FS6,           nes_fs6_device,           "nes_fs6",           "NES Cart Fight Street VI PCB")
 DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
-DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Spash Bomb PCB")
-DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY04646 PCB")
+DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Splash Bomb PCB")
+DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY4646 PCB")
 DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
 DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
 DEFINE_DEVICE_TYPE(NES_8237A,         nes_8237a_device,         "nes_8237a",         "NES Cart UNL-8237A PCB")
@@ -140,7 +140,7 @@ nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_FAMILY4646, tag, owner, clock)
 {
 }
@@ -414,12 +414,19 @@ nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char
 {
 }
 
-
+void nes_family4646_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
 
 void nes_family4646_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	mmc3_common_initialize(0x1f, 0xff, 0);
+	set_nt_mirroring(PPU_MIRROR_HORZ); // Space Shuttle on CB-4035 doesn't set mirroring bit. Whether this cart is hard-wired to reset correctly to horizontal mirroring is not clear.
 }
 
 void nes_pikay2k_device::device_start()
@@ -1070,29 +1077,60 @@ void nes_malisb_device::write_h(offs_t offset, uint8_t data)
  BMC-FAMILY-4646B
 
  Known Boards: Unknown Multigame Bootleg Board (4646B)
- Games: 2 in 1 - Family Kid & Aladdin 4
+ Games: 2 in 1 - Family Kid & Aladdin 4, various multicarts.
 
- MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
  iNES: mapper 134
 
- In MESS: Supported.
+ In MAME: Preliminary supported.
+
+ TODO: There are unknown writes to the unused reg 3,
+ though it seems only 0x00 is written. Next, some
+ carts have solder pad setting readable at 0x8000.
+ Lastly, YH-4103 doesn't soft reset cleanly like
+ the other carts, but does this happen on hardware?
 
  -------------------------------------------------*/
 
-void nes_family4646_device::write_m(offs_t offset, uint8_t data)
+void nes_family4646_device::prg_cb(int start, int bank)
+{
+	if (!BIT(m_reg[1], 7))    // MMC3 mode
+		nes_txrom_device::prg_cb(start, bank);
+	else if (start == 0)      // NROM mode, only uses MMC3's $8000 bank
+	{
+		if (BIT(m_reg[1], 3))
+		{
+			prg16_89ab(bank & ~0x01);
+			prg16_cdef(bank & ~0x01);
+		}
+		else
+			prg32(bank & ~0x03);
+	}
+}
+
+void nes_family4646_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("family4646 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset == 0x01)
-	{
-		m_prg_base = (data & 0x02) << 4;
-		m_prg_mask = 0x1f;
-		m_chr_base = (data & 0x20) << 3;
-		m_chr_mask = 0xff;
-		set_prg(m_prg_base, m_prg_mask);
+	int reg = offset & 0x03;
+	if (!BIT(m_reg[0], 7))    // lock bit
+		m_reg[reg] = data;
+	else if (reg == 2)        // final two bits of reg 2 respond regardless
+		m_reg[reg] = (m_reg[reg] & ~0x03) | (data & 0x03);
+	else
+		return;
+
+	m_prg_base = (m_reg[1] & 0x03) << 4;
+	m_prg_mask = 0x1f >> BIT(m_reg[1], 2);
+	set_prg(m_prg_base, m_prg_mask);
+
+	m_chr_base = (m_reg[1] & 0x30) << 3;
+	m_chr_mask = 0xff >> BIT(m_reg[1], 6);
+	if (BIT(m_reg[0], 3))    // CNROM-like mode
+		chr8(m_chr_base >> 3 | (m_reg[2] & (m_chr_mask >> 3)), m_chr_source);
+	else                     // MMC3 mode
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	}
 }
 
 /*-------------------------------------------------

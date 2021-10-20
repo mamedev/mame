@@ -873,6 +873,7 @@ void tek4132_state::tek4132(machine_config &config)
 	m_nov[1]->do_callback().set(FUNC(tek4132_state::nov_do));
 
 	AM9517A(config, m_sdma, 4'000'000); // clock?
+	m_sdma->dreq_active_low();
 
 	INPUT_MERGER_ALL_HIGH(config, m_sirq);
 	//m_sirq->output_handler().set(m_icu, FUNC(ns32202_device::ir_w<4>));
