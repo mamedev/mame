@@ -432,7 +432,7 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	return sol::lua_nil;
 }
 
-std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
+std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string> > &menu_list, std::string &flags)
 {
 	std::string field = "menu_pop_" + menu;
 	sol::object obj = sol().registry()[field];
@@ -446,7 +446,7 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 		}
 		else
 		{
-			std::tuple<sol::table, std::optional<long> > table = res;
+			std::tuple<sol::table, std::optional<long>, std::string> table = res;
 			for (auto &entry : std::get<0>(table))
 			{
 				if (entry.second.is<sol::table>())
@@ -455,27 +455,31 @@ std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vect
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
+			flags = std::get<2>(table);
 			return std::get<1>(table);
 		}
 	}
+	flags.clear();
 	return std::nullopt;
 }
 
-bool lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
+std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
-	bool ret = false;
+	std::pair<bool, std::optional<long> > ret(false, std::nullopt);
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), index, event);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_callback: %s\n", err.what());
 		}
 		else
+		{
 			ret = res;
+		}
 	}
 	return ret;
 }

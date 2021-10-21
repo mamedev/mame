@@ -114,20 +114,42 @@ function populate_input()
 		for tag, port in pairs(manager.machine.ioport.ports) do
 			for name, field in pairs(port.fields) do
 				if supported(field) then
-					input_choices[#input_choices + 1] = field
+					table.insert(input_choices, field)
 				end
 			end
 		end
 		table.sort(input_choices, compare)
+
+		local index = 1
+		local prev
+		while index <= #input_choices do
+			local current = input_choices[index]
+			if (not prev) or (prev.device.tag ~= current.device.tag) then
+				table.insert(input_choices, index, false)
+				index = index + 2
+			else
+				index = index + 1
+			end
+			prev = current
+		end
 	end
 
 	input_item_first_choice = #items + 1
 	local selection = input_item_first_choice
 	for index, field in ipairs(input_choices) do
-		items[#items + 1] = { _p('input-name', field.name), '', '' }
-		if input_start_field and (field.port.tag == input_start_field.port.tag) and (field.mask == input_start_field.mask) and (field.type == input_start_field.type) then
-			selection = #items
-			input_start_field = nil
+		if field then
+			items[#items + 1] = { _p('input-name', field.name), '', '' }
+			if input_start_field and (field.port.tag == input_start_field.port.tag) and (field.mask == input_start_field.mask) and (field.type == input_start_field.type) then
+				selection = #items
+				input_start_field = nil
+			end
+		else
+			local device = input_choices[index + 1].device
+			if device.owner then
+				items[#items + 1] = { string.format(_('plugin-inputmacro', '%s [root%s]'), device.name, device.tag), '', 'heading' }
+			else
+				items[#items + 1] = { string.format(_('plugin-inputmacro', '[root%s]'), device.tag), '', 'heading' }
+			end
 		end
 	end
 	input_start_field = nil
@@ -145,6 +167,7 @@ end
 local edit_current_macro
 local edit_start_selection
 local edit_start_step
+local edit_menu_active
 local edit_insert_position
 local edit_name_buffer
 local edit_items
@@ -379,6 +402,10 @@ local function add_edit_items(items)
 
 	items[#items + 1] = { _p('plugin-inputmacro', 'Name'), edit_name_buffer and (edit_name_buffer .. '_') or edit_current_macro.name, '' }
 	edit_items[#items] = { action = 'name' }
+	if not (edit_start_selection or edit_start_step or edit_menu_active) then
+		edit_start_selection = #items
+	end
+	edit_menu_active = true
 
 	local binding = edit_current_macro.binding
 	local activation = binding and input:seq_name(binding) or _p('plugin-inputmacro', '[not set]')
@@ -453,7 +480,9 @@ local function handle_add(index, event)
 	if handle_edit_items(index, event) then
 		return true
 	elseif event == 'cancel' then
+		input_choices = nil
 		edit_current_macro = nil
+		edit_menu_active = false
 		edit_items = nil
 		table.remove(menu_stack)
 		return true
@@ -462,6 +491,8 @@ local function handle_add(index, event)
 			table.insert(macros, edit_current_macro)
 			macros_start_macro = #macros
 		end
+		input_choices = nil
+		edit_menu_active = false
 		edit_current_macro = nil
 		edit_items = nil
 		table.remove(menu_stack)
@@ -474,7 +505,9 @@ local function handle_edit(index, event)
 	if handle_edit_items(index, event) then
 		return true
 	elseif (event == 'cancel') or ((index == edit_item_exit) and (event == 'select')) then
+		input_choices = nil
 		edit_current_macro = nil
+		edit_menu_active = false
 		edit_items = nil
 		table.remove(menu_stack)
 		return true
@@ -500,7 +533,7 @@ local function populate_add()
 
 	local selection = edit_start_selection
 	edit_start_selection = nil
-	return items, selection
+	return items, selection, 'lrrepeat'
 end
 
 local function populate_edit()
@@ -517,7 +550,7 @@ local function populate_edit()
 
 	local selection = edit_start_selection
 	edit_start_selection = nil
-	return items, selection
+	return items, selection, 'lrrepeat'
 end
 
 
@@ -532,7 +565,6 @@ function handle_macros(index, event)
 		if event == 'select' then
 			edit_current_macro = new_macro()
 			edit_insert_position = #edit_current_macro.steps + 1
-			edit_start_selection = 1 -- not actually selectable, but it will take the first item
 			macros_selection_save = index
 			table.insert(menu_stack, MENU_TYPES.ADD)
 			return true

@@ -6697,7 +6697,7 @@ msgstr "总计发现 %d 符合"
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr "执行比较：插槽 $d %s 插槽 %d"
+msgstr "执行比较：插槽 %d %s 插槽 %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
@@ -6886,7 +6886,7 @@ msgstr "连发按钮"
 #: plugins/autofire/autofire_menu.lua:59
 #, lua-format
 msgid "Press %s to delete"
-msgstr "按下 $s 删除"
+msgstr "按下 %s 删除"
 
 #: plugins/autofire/autofire_menu.lua:68
 #, lua-format
