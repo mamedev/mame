@@ -29,6 +29,8 @@ target_sources(formats PRIVATE
 
 	${MAME_DIR}/src/lib/formats/flopimg.cpp
 	${MAME_DIR}/src/lib/formats/flopimg.h
+	${MAME_DIR}/src/lib/formats/flopimg_legacy.cpp
+	${MAME_DIR}/src/lib/formats/flopimg_legacy.h
 
 	${MAME_DIR}/src/lib/formats/cqm_dsk.cpp
 	${MAME_DIR}/src/lib/formats/cqm_dsk.h
@@ -55,6 +57,8 @@ target_sources(formats PRIVATE
 	${MAME_DIR}/src/lib/formats/dfi_dsk.cpp
 	${MAME_DIR}/src/lib/formats/dfi_dsk.h
 	${MAME_DIR}/src/lib/formats/fdi_dsk.cpp
+	${MAME_DIR}/src/lib/formats/rpk.cpp
+	${MAME_DIR}/src/lib/formats/rpk.h
 
 	${MAME_DIR}/src/lib/formats/fsmgr.h
 	${MAME_DIR}/src/lib/formats/fsmgr.cpp

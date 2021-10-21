@@ -226,6 +226,8 @@ set(EMU_SRCS
 	${MAME_DIR}/src/emu/debug/dvmemory.h
 	${MAME_DIR}/src/emu/debug/dvbpoints.cpp
 	${MAME_DIR}/src/emu/debug/dvbpoints.h
+	${MAME_DIR}/src/emu/debug/dvrpoints.cpp
+	${MAME_DIR}/src/emu/debug/dvrpoints.h
 	${MAME_DIR}/src/emu/debug/dvwpoints.cpp
 	${MAME_DIR}/src/emu/debug/dvwpoints.h
 	${MAME_DIR}/src/emu/debug/dvstate.cpp

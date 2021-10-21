@@ -16,6 +16,8 @@ endif()
 
 if ((${CMAKE_SYSTEM_NAME} STREQUAL "Windows") AND (CMAKE_CXX_COMPILER_ID MATCHES "Clang"))
 	target_compile_options(bgfx PRIVATE -Wno-unneeded-internal-declaration)
+	target_compile_options(bgfx PRIVATE -Wno-ignored-attributes) # many instances in ImGui
+
 endif()
 
 target_link_libraries(bgfx PRIVATE bx bimg)
@@ -55,6 +57,7 @@ target_sources(bgfx PRIVATE
 	${MAME_DIR}/3rdparty/bgfx/src/glcontext_html5.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/glcontext_wgl.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/nvapi.cpp
+	${MAME_DIR}/3rdparty/bgfx/src/renderer_agc.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/renderer_d3d11.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/renderer_d3d12.cpp
 	${MAME_DIR}/3rdparty/bgfx/src/renderer_d3d9.cpp

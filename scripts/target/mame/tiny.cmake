@@ -122,10 +122,8 @@ macro(createProjects_mame_tiny _target  _subtarget)
 		${MAME_DIR}/src/mame/includes/circus.h
 		${MAME_DIR}/src/mame/video/circus.cpp
 		${MAME_DIR}/src/mame/drivers/exidy.cpp
-		${MAME_DIR}/src/mame/includes/exidy.h
 		${MAME_DIR}/src/mame/audio/exidy.cpp
 		${MAME_DIR}/src/mame/audio/exidy.h
-		${MAME_DIR}/src/mame/video/exidy.cpp
 		${MAME_DIR}/src/mame/audio/exidy440.cpp
 		${MAME_DIR}/src/mame/audio/exidy440.h
 		${MAME_DIR}/src/mame/audio/nl_fireone.h

@@ -7,10 +7,7 @@
 
 add_library(utf8proc STATIC EXCLUDE_FROM_ALL)
 
-target_compile_definitions(utf8proc PRIVATE
-	UTF8PROC_DLLEXPORT=
-	ZLIB_CONST
-)
+target_compile_definitions(utf8proc PRIVATE UTF8PROC_STATIC)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 	target_compile_definitions(utf8proc PRIVATE verbose=-1)

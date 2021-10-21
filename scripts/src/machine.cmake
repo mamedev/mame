@@ -1389,6 +1389,22 @@ endif()
 
 ###################################################
 ##
+##@src/devices/machine/gt913.h,list(APPEND MACHINES GT913)
+###################################################
+
+if("GT913" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/gt913_io.cpp
+		${MAME_DIR}/src/devices/machine/gt913_io.h
+		${MAME_DIR}/src/devices/machine/gt913_kbd.cpp
+		${MAME_DIR}/src/devices/machine/gt913_kbd.h
+		${MAME_DIR}/src/devices/machine/gt913_snd.cpp
+		${MAME_DIR}/src/devices/machine/gt913_snd.h
+	)
+endif()
+
+###################################################
+##
 ##@src/devices/machine/hd63450.h,list(APPEND MACHINES HD63450)
 ###################################################
 
@@ -3441,6 +3457,18 @@ endif()
 
 ###################################################
 ##
+##@src/devices/machine/upd4991a.h,list(APPEND MACHINES UPD4991A)
+###################################################
+
+if("UPD4991A" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/upd4991a.cpp
+		${MAME_DIR}/src/devices/machine/upd4991a.h
+	)
+endif()
+
+###################################################
+##
 ##@src/devices/machine/upd4992.h,list(APPEND MACHINES UPD4992)
 ###################################################
 
@@ -4150,7 +4178,6 @@ if("WATCHDOG" IN_LIST MACHINES)
 	)
 endif()
 
-
 ###################################################
 ##
 ##@src/devices/machine/smartmed.h,list(APPEND MACHINES SMARTMEDIA)
@@ -4159,6 +4186,17 @@ if("SMARTMEDIA" IN_LIST MACHINES)
 	list(APPEND MACHINE_SRCS
 		${MAME_DIR}/src/devices/machine/smartmed.cpp
 		${MAME_DIR}/src/devices/machine/smartmed.h
+	)
+endif()
+
+###################################################
+##
+##@src/devices/machine/spi_sdcard.h,list(APPEND MACHINES SPISDCARD)
+###################################################
+if("SPISDCARD" IN_LIST MACHINES)
+	list(APPEND MACHINE_SRCS
+		${MAME_DIR}/src/devices/machine/spi_sdcard.cpp
+		${MAME_DIR}/src/devices/machine/spi_sdcard.h
 	)
 endif()
 

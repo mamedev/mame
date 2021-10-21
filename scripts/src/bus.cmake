@@ -2429,6 +2429,8 @@ if("A2BUS" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/a2bus/a2sam.h
 		${MAME_DIR}/src/devices/bus/a2bus/a2scsi.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/a2scsi.h
+		${MAME_DIR}/src/devices/bus/a2bus/a2sd.cpp
+		${MAME_DIR}/src/devices/bus/a2bus/a2sd.h
 		${MAME_DIR}/src/devices/bus/a2bus/a2softcard.cpp
 		${MAME_DIR}/src/devices/bus/a2bus/a2softcard.h
 		${MAME_DIR}/src/devices/bus/a2bus/a2ssc.cpp
@@ -2675,36 +2677,38 @@ endif()
 
 if("RS232" IN_LIST BUSES)
 	list(APPEND BUS_SRCS
+		${MAME_DIR}/src/devices/bus/rs232/exorterm.cpp
+		${MAME_DIR}/src/devices/bus/rs232/exorterm.h
+		${MAME_DIR}/src/devices/bus/rs232/hlemouse.cpp
+		${MAME_DIR}/src/devices/bus/rs232/hlemouse.h
+		${MAME_DIR}/src/devices/bus/rs232/ie15.cpp
+		${MAME_DIR}/src/devices/bus/rs232/ie15.h
 		${MAME_DIR}/src/devices/bus/rs232/keyboard.cpp
 		${MAME_DIR}/src/devices/bus/rs232/keyboard.h
 		${MAME_DIR}/src/devices/bus/rs232/loopback.cpp
 		${MAME_DIR}/src/devices/bus/rs232/loopback.h
+		${MAME_DIR}/src/devices/bus/rs232/mboardd.cpp
+		${MAME_DIR}/src/devices/bus/rs232/mboardd.h
 		${MAME_DIR}/src/devices/bus/rs232/null_modem.cpp
 		${MAME_DIR}/src/devices/bus/rs232/null_modem.h
+		${MAME_DIR}/src/devices/bus/rs232/patchbox.cpp
+		${MAME_DIR}/src/devices/bus/rs232/patchbox.h
 		${MAME_DIR}/src/devices/bus/rs232/printer.cpp
 		${MAME_DIR}/src/devices/bus/rs232/printer.h
-		${MAME_DIR}/src/devices/bus/rs232/rs232.cpp
-		${MAME_DIR}/src/devices/bus/rs232/rs232.h
 		${MAME_DIR}/src/devices/bus/rs232/pty.cpp
 		${MAME_DIR}/src/devices/bus/rs232/pty.h
-		${MAME_DIR}/src/devices/bus/rs232/hlemouse.cpp
-		${MAME_DIR}/src/devices/bus/rs232/hlemouse.h
+		${MAME_DIR}/src/devices/bus/rs232/rs232.cpp
+		${MAME_DIR}/src/devices/bus/rs232/rs232.h
+		${MAME_DIR}/src/devices/bus/rs232/rs232_sync_io.cpp
+		${MAME_DIR}/src/devices/bus/rs232/rs232_sync_io.h
 		${MAME_DIR}/src/devices/bus/rs232/sun_kbd.cpp
 		${MAME_DIR}/src/devices/bus/rs232/sun_kbd.h
+		${MAME_DIR}/src/devices/bus/rs232/swtpc8212.cpp
+		${MAME_DIR}/src/devices/bus/rs232/swtpc8212.h
 		${MAME_DIR}/src/devices/bus/rs232/terminal.cpp
 		${MAME_DIR}/src/devices/bus/rs232/terminal.h
 		${MAME_DIR}/src/devices/bus/rs232/xvd701.cpp
 		${MAME_DIR}/src/devices/bus/rs232/xvd701.h
-		${MAME_DIR}/src/devices/bus/rs232/ie15.cpp
-		${MAME_DIR}/src/devices/bus/rs232/ie15.h
-		${MAME_DIR}/src/devices/bus/rs232/swtpc8212.cpp
-		${MAME_DIR}/src/devices/bus/rs232/swtpc8212.h
-		${MAME_DIR}/src/devices/bus/rs232/exorterm.cpp
-		${MAME_DIR}/src/devices/bus/rs232/exorterm.h
-		${MAME_DIR}/src/devices/bus/rs232/rs232_sync_io.cpp
-		${MAME_DIR}/src/devices/bus/rs232/rs232_sync_io.h
-		${MAME_DIR}/src/devices/bus/rs232/mboardd.cpp
-		${MAME_DIR}/src/devices/bus/rs232/mboardd.h
 	)
 endif()
 
@@ -2776,6 +2780,8 @@ if("NES" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes/ave.h
 		${MAME_DIR}/src/devices/bus/nes/bandai.cpp
 		${MAME_DIR}/src/devices/bus/nes/bandai.h
+		${MAME_DIR}/src/devices/bus/nes/batlab.cpp
+		${MAME_DIR}/src/devices/bus/nes/batlab.h
 		${MAME_DIR}/src/devices/bus/nes/benshieng.cpp
 		${MAME_DIR}/src/devices/bus/nes/benshieng.h
 		${MAME_DIR}/src/devices/bus/nes/bootleg.cpp
@@ -2800,12 +2806,12 @@ if("NES" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes/henggedianzi.h
 		${MAME_DIR}/src/devices/bus/nes/hes.cpp
 		${MAME_DIR}/src/devices/bus/nes/hes.h
-		${MAME_DIR}/src/devices/bus/nes/hosenkan.cpp
-		${MAME_DIR}/src/devices/bus/nes/hosenkan.h
 		${MAME_DIR}/src/devices/bus/nes/irem.cpp
 		${MAME_DIR}/src/devices/bus/nes/irem.h
 		${MAME_DIR}/src/devices/bus/nes/jaleco.cpp
 		${MAME_DIR}/src/devices/bus/nes/jaleco.h
+		${MAME_DIR}/src/devices/bus/nes/jncota.cpp
+		${MAME_DIR}/src/devices/bus/nes/jncota.h
 		${MAME_DIR}/src/devices/bus/nes/jy.cpp
 		${MAME_DIR}/src/devices/bus/nes/jy.h
 		${MAME_DIR}/src/devices/bus/nes/kaiser.cpp
@@ -2818,6 +2824,8 @@ if("NES" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes/legacy.h
 		${MAME_DIR}/src/devices/bus/nes/mmc1.cpp
 		${MAME_DIR}/src/devices/bus/nes/mmc1.h
+		${MAME_DIR}/src/devices/bus/nes/mmc1_clones.cpp
+		${MAME_DIR}/src/devices/bus/nes/mmc1_clones.h
 		${MAME_DIR}/src/devices/bus/nes/mmc2.cpp
 		${MAME_DIR}/src/devices/bus/nes/mmc2.h
 		${MAME_DIR}/src/devices/bus/nes/mmc3.cpp
@@ -2848,8 +2856,6 @@ if("NES" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes/rexsoft.h
 		${MAME_DIR}/src/devices/bus/nes/sachen.cpp
 		${MAME_DIR}/src/devices/bus/nes/sachen.h
-		${MAME_DIR}/src/devices/bus/nes/sachen.cpp
-		${MAME_DIR}/src/devices/bus/nes/sachen.h
 		${MAME_DIR}/src/devices/bus/nes/sealie.cpp
 		${MAME_DIR}/src/devices/bus/nes/sealie.h
 		${MAME_DIR}/src/devices/bus/nes/somari.cpp
@@ -2866,6 +2872,8 @@ if("NES" IN_LIST BUSES)
 		${MAME_DIR}/src/devices/bus/nes/tengen.h
 		${MAME_DIR}/src/devices/bus/nes/txc.cpp
 		${MAME_DIR}/src/devices/bus/nes/txc.h
+		${MAME_DIR}/src/devices/bus/nes/vrc_clones.cpp
+		${MAME_DIR}/src/devices/bus/nes/vrc_clones.h
 		${MAME_DIR}/src/devices/bus/nes/waixing.cpp
 		${MAME_DIR}/src/devices/bus/nes/waixing.h
 		${MAME_DIR}/src/devices/bus/nes/zemina.cpp
@@ -4356,6 +4364,8 @@ if("CBUS" IN_LIST BUSES)
 	list(APPEND BUS_SRCS
 		${MAME_DIR}/src/devices/bus/cbus/pc9801_26.cpp
 		${MAME_DIR}/src/devices/bus/cbus/pc9801_26.h
+		${MAME_DIR}/src/devices/bus/cbus/pc9801_55.cpp
+		${MAME_DIR}/src/devices/bus/cbus/pc9801_55.h
 		${MAME_DIR}/src/devices/bus/cbus/pc9801_86.cpp
 		${MAME_DIR}/src/devices/bus/cbus/pc9801_86.h
 		${MAME_DIR}/src/devices/bus/cbus/pc9801_118.cpp

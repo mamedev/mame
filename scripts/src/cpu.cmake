@@ -700,10 +700,13 @@ if("H8" IN_LIST CPUS)
 		${MAME_DIR}/src/devices/cpu/h8/h8_sci.h
 		${MAME_DIR}/src/devices/cpu/h8/h8_watchdog.cpp
 		${MAME_DIR}/src/devices/cpu/h8/h8_watchdog.h
+		${MAME_DIR}/src/devices/cpu/h8/gt913.cpp
+		${MAME_DIR}/src/devices/cpu/h8/gt913.h
 		${GEN_DIR}/emu/cpu/h8/h8.hxx
 		${GEN_DIR}/emu/cpu/h8/h8h.hxx
 		${GEN_DIR}/emu/cpu/h8/h8s2000.hxx
 		${GEN_DIR}/emu/cpu/h8/h8s2600.hxx
+		${GEN_DIR}/emu/cpu/h8/gt913.hxx
 	)
 
 	add_custom_command(
@@ -733,6 +736,13 @@ if("H8" IN_LIST CPUS)
 		DEPENDS ${MAME_DIR}/src/devices/cpu/h8/h8make.py ${MAME_DIR}/src/devices/cpu/h8/h8.lst
 		OUTPUT ${GEN_DIR}/emu/cpu/h8/h8s2600.hxx
 		COMMENT "Generating H8S/2600 source file..."
+	)
+	add_custom_command(
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/h8/
+		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/h8/h8make.py ${MAME_DIR}/src/devices/cpu/h8/gt913.lst s g ${GEN_DIR}/emu/cpu/h8/gt913.hxx
+		DEPENDS ${MAME_DIR}/src/devices/cpu/h8/h8make.py ${MAME_DIR}/src/devices/cpu/h8/gt913.lst
+		OUTPUT ${GEN_DIR}/emu/cpu/h8/gt913.hxx
+		COMMENT "Generating GT913 source file..."
 	)
 endif()
 
@@ -765,11 +775,19 @@ if(("H8" IN_LIST CPUS) OR TOOLS)
 		OUTPUT ${GEN_DIR}/emu/cpu/h8/h8s2600d.hxx
 		COMMENT "Generating H8S/2600 disassembler source file..."
 	)
+	add_custom_command(
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${GEN_DIR}/emu/cpu/h8/
+		COMMAND ${PYTHON_EXECUTABLE} ${MAME_DIR}/src/devices/cpu/h8/h8make.py ${MAME_DIR}/src/devices/cpu/h8/gt913.lst d g ${GEN_DIR}/emu/cpu/h8/gt913d.hxx
+		DEPENDS ${MAME_DIR}/src/devices/cpu/h8/h8make.py ${MAME_DIR}/src/devices/cpu/h8/gt913.lst
+		OUTPUT ${GEN_DIR}/emu/cpu/h8/gt913d.hxx
+		COMMENT "Generating GT913 disassembler source file..."
+	)
 
 	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/h8/h8d.hxx)
 	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/h8/h8hd.hxx)
 	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/h8/h8s2000d.hxx)
 	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/h8/h8s2600d.hxx)
+	list(APPEND DASM_SRCS ${GEN_DIR}/emu/cpu/h8/gt913d.hxx)
 
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/h8d.cpp)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/h8d.h)
@@ -779,6 +797,8 @@ if(("H8" IN_LIST CPUS) OR TOOLS)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/h8s2000d.h)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/h8s2600d.cpp)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/h8s2600d.h)
+	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/gt913d.cpp)
+	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/h8/gt913d.h)
 endif()
 
 ##################################################
@@ -2923,8 +2943,12 @@ if (("Z80" IN_LIST CPUS) OR ("KC80" IN_LIST CPUS) OR TOOLS)
 		${MAME_DIR}/src/devices/cpu/z80/tmpz84c011.h
 		${MAME_DIR}/src/devices/cpu/z80/tmpz84c015.cpp
 		${MAME_DIR}/src/devices/cpu/z80/tmpz84c015.h
+		${MAME_DIR}/src/devices/cpu/z80/ez80.cpp
+		${MAME_DIR}/src/devices/cpu/z80/ez80.h
 		${MAME_DIR}/src/devices/cpu/z80/lz8420m.cpp
 		${MAME_DIR}/src/devices/cpu/z80/lz8420m.h
+		${MAME_DIR}/src/devices/cpu/z80/r800.cpp
+		${MAME_DIR}/src/devices/cpu/z80/r800.h
 	)
 endif()
 
@@ -3468,6 +3492,16 @@ endif()
 if(("DSP56000" IN_LIST CPUS) OR TOOLS)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/dsp56000/dsp56000d.cpp)
 	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/dsp56000/dsp56000d.h)
+endif()
+
+##################################################
+## DEC VAX, disassembler only
+##@src/devices/cpu/vax/vax.h,list(APPEND CPUS VAX)
+##################################################
+
+if(("VAX" IN_LIST CPUS) OR TOOLS)
+	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/vax/vaxdasm.cpp)
+	list(APPEND DASM_SRCS ${MAME_DIR}/src/devices/cpu/vax/vaxdasm.h)
 endif()
 
 ##################################################

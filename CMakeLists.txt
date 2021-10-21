@@ -17,7 +17,7 @@ else()
 	set(projectname ${TARGET}${SUBTARGET})
 endif()
 
-project(${projectname} VERSION 0.234 LANGUAGES CXX C)
+project(${projectname} VERSION 0.236 LANGUAGES CXX C)
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	enable_language(OBJCXX OBJC)
 endif()
@@ -146,7 +146,7 @@ else()
 	set(LIBTYPE STATIC)
 endif()
 
-find_package(PythonInterp 3.6 REQUIRED)
+find_package(PythonInterp 3.2 REQUIRED)
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	set_option(NOASM ON)
@@ -218,6 +218,7 @@ if (MSVC)
 		add_compile_options(/MP)         # enable multi-core compilation
 	endif()
 	add_compile_options(/bigobj)
+	add_compile_options(/Zc:__cplusplus)
 	add_compile_options(/W4) # ExtraWarnings
 	if(NOT NOWERROR)
 		add_compile_options(/WX) # FatalWarnings
@@ -682,21 +683,15 @@ dump_mame_options()
 if (TOOLS)
 	add_custom_target(cleansrc)
 	file(GLOB_RECURSE CLEARSRC_FILES
-		${MAME_DIR}/src/*.c
-		${MAME_DIR}/src/*.cpp
-		${MAME_DIR}/src/*.h
-		${MAME_DIR}/src/*.hpp
-		${MAME_DIR}/src/*.hxx
+		${MAME_DIR}/src/*.c ${MAME_DIR}/src/*.cpp
+		${MAME_DIR}/src/*.h ${MAME_DIR}/src/*.hpp ${MAME_DIR}/src/*.hxx
 		${MAME_DIR}/src/*.ipp
 		${MAME_DIR}/src/*.lay
-		${MAME_DIR}/src/*.lst
-		${MAME_DIR}/src/*.mak
 		${MAME_DIR}/src/*.mm
-		${MAME_DIR}/hash/*.hsi
-		${MAME_DIR}/hash/*.xml
+		${MAME_DIR}/src/*.lst
+		${MAME_DIR}/hash/*.hsi ${MAME_DIR}/hash/*.xml
 		${MAME_DIR}/bgfx/*.json
-		${MAME_DIR}/plugins/*.lua
-		${MAME_DIR}/plugins/*.json
+		${MAME_DIR}/plugins/*.lua ${MAME_DIR}/plugins/*.json
 		${MAME_DIR}/scripts/*.cmake
 	)
 	list(APPEND CLEARSRC_FILES ${MAME_DIR}/CMakeLists.txt)

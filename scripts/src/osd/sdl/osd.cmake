@@ -169,6 +169,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 		${MAME_DIR}/src/osd/modules/debugger/osx/memoryviewer.h
 		${MAME_DIR}/src/osd/modules/debugger/osx/pointsviewer.mm
 		${MAME_DIR}/src/osd/modules/debugger/osx/pointsviewer.h
+		${MAME_DIR}/src/osd/modules/debugger/osx/registerpointsview.mm
+		${MAME_DIR}/src/osd/modules/debugger/osx/registerpointsview.h
 		${MAME_DIR}/src/osd/modules/debugger/osx/registersview.mm
 		${MAME_DIR}/src/osd/modules/debugger/osx/registersview.h
 		${MAME_DIR}/src/osd/modules/debugger/osx/watchpointsview.mm

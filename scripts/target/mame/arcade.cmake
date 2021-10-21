@@ -651,6 +651,7 @@ list(APPEND MACHINES SMC91C9X)
 list(APPEND MACHINES SEGA_SCU)
 list(APPEND MACHINES SMPC)
 #list(APPEND MACHINES SPG2XX)
+#list(APPEND MACHINES SPISDCARD)
 list(APPEND MACHINES STVCD)
 #list(APPEND MACHINES SUN4C_MMU)
 list(APPEND MACHINES SWTPC8212)
@@ -676,6 +677,7 @@ list(APPEND MACHINES TSB12LV01A)
 #list(APPEND MACHINES TTL7474)
 #list(APPEND MACHINES UCB1200)
 list(APPEND MACHINES UPD1990A)
+#list(APPEND MACHINES UPD4991A)
 list(APPEND MACHINES UPD4992)
 list(APPEND MACHINES UPD4701)
 list(APPEND MACHINES UPD7001)
@@ -862,6 +864,7 @@ list(APPEND FORMATS NASLITE_DSK)
 list(APPEND FORMATS BASICDSK)
 list(APPEND FORMATS IBMXDF_DSK)
 list(APPEND FORMATS IPF_DSK)
+list(APPEND FORMATS TZX_CAS)
 
 ##################################################
 ## this is the list of driver libraries that
@@ -1614,10 +1617,6 @@ createMAMEProjects(_target, _subtarget, "cinemat"
 	${MAME_DIR}/src/mame/audio/nl_warrior.cpp
 	${MAME_DIR}/src/mame/audio/nl_warrior.h
 	${MAME_DIR}/src/mame/drivers/cchasm.cpp
-	${MAME_DIR}/src/mame/includes/cchasm.h
-	${MAME_DIR}/src/mame/machine/cchasm.cpp
-	${MAME_DIR}/src/mame/audio/cchasm.cpp
-	${MAME_DIR}/src/mame/video/cchasm.cpp
 	${MAME_DIR}/src/mame/drivers/dlair.cpp
 	${MAME_DIR}/src/mame/drivers/dlair2.cpp
 	${MAME_DIR}/src/mame/drivers/embargo.cpp
@@ -1741,8 +1740,6 @@ createMAMEProjects(_target, _subtarget, "dataeast"
 	${MAME_DIR}/src/mame/video/decocass.cpp
 	${MAME_DIR}/src/mame/drivers/deshoros.cpp
 	${MAME_DIR}/src/mame/drivers/dietgo.cpp
-	${MAME_DIR}/src/mame/includes/dietgo.h
-	${MAME_DIR}/src/mame/video/dietgo.cpp
 	${MAME_DIR}/src/mame/drivers/dreambal.cpp
 	${MAME_DIR}/src/mame/drivers/exprraid.cpp
 	${MAME_DIR}/src/mame/includes/exprraid.h
@@ -1752,11 +1749,7 @@ createMAMEProjects(_target, _subtarget, "dataeast"
 	${MAME_DIR}/src/mame/includes/firetrap.h
 	${MAME_DIR}/src/mame/video/firetrap.cpp
 	${MAME_DIR}/src/mame/drivers/funkyjet.cpp
-	${MAME_DIR}/src/mame/includes/funkyjet.h
-	${MAME_DIR}/src/mame/video/funkyjet.cpp
 	${MAME_DIR}/src/mame/drivers/karnov.cpp
-	${MAME_DIR}/src/mame/includes/karnov.h
-	${MAME_DIR}/src/mame/video/karnov.cpp
 	${MAME_DIR}/src/mame/drivers/kchamp.cpp
 	${MAME_DIR}/src/mame/includes/kchamp.h
 	${MAME_DIR}/src/mame/video/kchamp.cpp
@@ -1940,10 +1933,8 @@ createMAMEProjects(_target, _subtarget, "exidy"
 	${MAME_DIR}/src/mame/audio/circus.cpp
 	${MAME_DIR}/src/mame/video/circus.cpp
 	${MAME_DIR}/src/mame/drivers/exidy.cpp
-	${MAME_DIR}/src/mame/includes/exidy.h
 	${MAME_DIR}/src/mame/audio/exidy.cpp
 	${MAME_DIR}/src/mame/audio/exidy.h
-	${MAME_DIR}/src/mame/video/exidy.cpp
 	${MAME_DIR}/src/mame/drivers/exidy440.cpp
 	${MAME_DIR}/src/mame/includes/exidy440.h
 	${MAME_DIR}/src/mame/audio/exidy440.cpp
@@ -2206,6 +2197,7 @@ createMAMEProjects(_target, _subtarget, "irem"
 	${MAME_DIR}/src/mame/drivers/redalert.cpp
 	${MAME_DIR}/src/mame/includes/redalert.h
 	${MAME_DIR}/src/mame/audio/redalert.cpp
+	${MAME_DIR}/src/mame/audio/redalert.h
 	${MAME_DIR}/src/mame/video/redalert.cpp
 	${MAME_DIR}/src/mame/drivers/shisen.cpp
 	${MAME_DIR}/src/mame/includes/shisen.h
@@ -2496,6 +2488,7 @@ createMAMEProjects(_target, _subtarget, "konami"
 	${MAME_DIR}/src/mame/drivers/konblands.cpp
 	${MAME_DIR}/src/mame/drivers/kongs470.cpp
 	${MAME_DIR}/src/mame/drivers/konmedal.cpp
+	${MAME_DIR}/src/mame/drivers/konmedal020.cpp
 	${MAME_DIR}/src/mame/drivers/konmedal68k.cpp
 	${MAME_DIR}/src/mame/drivers/kontest.cpp
 	${MAME_DIR}/src/mame/drivers/konendev.cpp
@@ -3558,6 +3551,7 @@ createMAMEProjects(_target, _subtarget, "sega"
 	${MAME_DIR}/src/mame/video/segaybd.cpp
 	${MAME_DIR}/src/mame/includes/segaipt.h
 	${MAME_DIR}/src/mame/drivers/sg1000a.cpp
+	${MAME_DIR}/src/mame/drivers/speedbsk.cpp
 	${MAME_DIR}/src/mame/drivers/stactics.cpp
 	${MAME_DIR}/src/mame/includes/stactics.h
 	${MAME_DIR}/src/mame/video/stactics.cpp
@@ -3752,8 +3746,6 @@ createMAMEProjects(_target, _subtarget, "seta"
 	${MAME_DIR}/src/mame/video/pin64.cpp
 	${MAME_DIR}/src/mame/video/pin64.h
 	${MAME_DIR}/src/mame/drivers/hanaawas.cpp
-	${MAME_DIR}/src/mame/includes/hanaawas.h
-	${MAME_DIR}/src/mame/video/hanaawas.cpp
 	${MAME_DIR}/src/mame/drivers/jclub2.cpp
 	${MAME_DIR}/src/mame/drivers/macs.cpp
 	${MAME_DIR}/src/mame/drivers/seta.cpp
@@ -3922,8 +3914,6 @@ createMAMEProjects(_target, _subtarget, "taito"
 	${MAME_DIR}/src/mame/includes/ashnojoe.h
 	${MAME_DIR}/src/mame/video/ashnojoe.cpp
 	${MAME_DIR}/src/mame/drivers/asuka.cpp
-	${MAME_DIR}/src/mame/includes/asuka.h
-	${MAME_DIR}/src/mame/video/asuka.cpp
 	${MAME_DIR}/src/mame/drivers/bigevglf.cpp
 	${MAME_DIR}/src/mame/includes/bigevglf.h
 	${MAME_DIR}/src/mame/video/bigevglf.cpp
@@ -4600,6 +4590,7 @@ createMAMEProjects(_target, _subtarget, "pinball"
 	${MAME_DIR}/src/mame/drivers/play_1.cpp
 	${MAME_DIR}/src/mame/drivers/play_2.cpp
 	${MAME_DIR}/src/mame/drivers/play_3.cpp
+	${MAME_DIR}/src/mame/drivers/recel.cpp
 	${MAME_DIR}/src/mame/drivers/rowamet.cpp
 	${MAME_DIR}/src/mame/drivers/s11.cpp
 	${MAME_DIR}/src/mame/includes/s11.h
@@ -4685,6 +4676,8 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/acefruit.cpp
 	${MAME_DIR}/src/mame/drivers/aces1.cpp
 	${MAME_DIR}/src/mame/drivers/acesp.cpp
+	${MAME_DIR}/src/mame/machine/ace_sp_reelctrl.cpp
+	${MAME_DIR}/src/mame/machine/ace_sp_reelctrl.h
 	${MAME_DIR}/src/mame/drivers/age_candy.cpp
 	${MAME_DIR}/src/mame/drivers/alinvade.cpp
 	${MAME_DIR}/src/mame/drivers/amaticmg.cpp
@@ -5034,8 +5027,6 @@ createMAMEProjects(_target, _subtarget, "misc"
 	${MAME_DIR}/src/mame/drivers/tapatune.cpp
 	${MAME_DIR}/src/mame/drivers/tattack.cpp
 	${MAME_DIR}/src/mame/drivers/taxidriv.cpp
-	${MAME_DIR}/src/mame/includes/taxidriv.h
-	${MAME_DIR}/src/mame/video/taxidriv.cpp
 	${MAME_DIR}/src/mame/drivers/teamjocs.cpp
 	${MAME_DIR}/src/mame/drivers/tecnodar.cpp
 	${MAME_DIR}/src/mame/drivers/thayers.cpp

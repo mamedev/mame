@@ -59,6 +59,10 @@ target_compile_definitions(osd_${OSD} PRIVATE DIRECT3D_VERSION=0x0900)
 
 target_compile_definitions(osd_${OSD} PRIVATE DIRECTINPUT_VERSION=0x0800)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	add_compile_options(-Wno-ignored-attributes) # many instances in ImGui
+endif()
+
 target_sources(osd_${OSD} PRIVATE
 	${MAME_DIR}/src/osd/modules/render/d3d/d3dhlsl.cpp
 	${MAME_DIR}/src/osd/modules/render/d3d/d3dcomm.h

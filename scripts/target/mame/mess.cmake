@@ -530,6 +530,7 @@ list(APPEND MACHINES ER2055)
 list(APPEND MACHINES EXORTERM)
 list(APPEND MACHINES F3853)
 list(APPEND MACHINES F4702)
+list(APPEND MACHINES GT913)
 list(APPEND MACHINES HD63450)
 list(APPEND MACHINES HD64610)
 list(APPEND MACHINES HP_DC100_TAPE)
@@ -692,6 +693,7 @@ list(APPEND MACHINES SEGA_SCU)
 list(APPEND MACHINES SMPC)
 list(APPEND MACHINES SPG2XX)
 list(APPEND MACHINES SPG290)
+list(APPEND MACHINES SPISDCARD)
 list(APPEND MACHINES STVCD)
 list(APPEND MACHINES SUN4C_MMU)
 list(APPEND MACHINES SWTPC8212)
@@ -729,6 +731,7 @@ list(APPEND MACHINES TTL7474)
 list(APPEND MACHINES TUBE)
 list(APPEND MACHINES UCB1200)
 list(APPEND MACHINES UPD1990A)
+list(APPEND MACHINES UPD4991A)
 #list(APPEND MACHINES UPD4992)
 list(APPEND MACHINES UPD4701)
 list(APPEND MACHINES UPD7001)
@@ -1343,6 +1346,7 @@ macro(linkProjects_mame_mess _target, _subtarget _projectname)
 		olivetti
 		olympia_mess
 		omnibyte
+		omron
 		openuni
 		orion
 		osborne
@@ -1978,6 +1982,7 @@ createMESSProjects(_target _subtarget "casio"
 	${MAME_DIR}/src/mame/drivers/fp6000.cpp
 	${MAME_DIR}/src/mame/machine/fp6000_kbd.cpp
 	${MAME_DIR}/src/mame/machine/fp6000_kbd.h
+	${MAME_DIR}/src/mame/drivers/ctk551.cpp
 	${MAME_DIR}/src/mame/drivers/ht6000.cpp
 	${MAME_DIR}/src/mame/drivers/pb1000.cpp
 	${MAME_DIR}/src/mame/drivers/pv1000.cpp
@@ -2367,6 +2372,7 @@ createMESSProjects(_target _subtarget "fidelity"
 	${MAME_DIR}/src/mame/drivers/fidel_cc1.cpp
 	${MAME_DIR}/src/mame/drivers/fidel_cc10.cpp
 	${MAME_DIR}/src/mame/drivers/fidel_cc7.cpp
+	${MAME_DIR}/src/mame/drivers/fidel_checkc2.cpp
 	${MAME_DIR}/src/mame/drivers/fidel_chesster.cpp
 	${MAME_DIR}/src/mame/drivers/fidel_csc.cpp
 	${MAME_DIR}/src/mame/drivers/fidel_dames.cpp
@@ -2948,6 +2954,8 @@ createMESSProjects(_target _subtarget "nec"
 	${MAME_DIR}/src/mame/drivers/pc8401a.cpp
 	${MAME_DIR}/src/mame/includes/pc8401a.h
 	${MAME_DIR}/src/mame/video/pc8401a.cpp
+	${MAME_DIR}/src/mame/machine/pc80s31k.cpp
+	${MAME_DIR}/src/mame/machine/pc80s31k.h	
 	${MAME_DIR}/src/mame/drivers/pc8001.cpp
 	${MAME_DIR}/src/mame/includes/pc8001.h
 	${MAME_DIR}/src/mame/drivers/pc8801.cpp
@@ -2964,6 +2972,12 @@ createMESSProjects(_target _subtarget "nec"
 	${MAME_DIR}/src/mame/machine/pc9801_cd.h
 	${MAME_DIR}/src/mame/machine/pc9801_memsw.cpp
 	${MAME_DIR}/src/mame/machine/pc9801_memsw.h
+	${MAME_DIR}/src/mame/drivers/pc98ha.cpp
+	${MAME_DIR}/src/mame/includes/pc98ha.h
+	${MAME_DIR}/src/mame/drivers/pc9801_epson.cpp
+	${MAME_DIR}/src/mame/includes/pc9801_epson.h
+	${MAME_DIR}/src/mame/drivers/pc9821.cpp
+	${MAME_DIR}/src/mame/includes/pc9821.h
 	${MAME_DIR}/src/mame/drivers/tk80bs.cpp
 )
 
@@ -3099,6 +3113,10 @@ createMESSProjects(_target _subtarget "omnibyte"
 	${MAME_DIR}/src/mame/includes/ob68k1a.h
 )
 
+createMESSProjects(_target _subtarget "omron"
+	${MAME_DIR}/src/mame/drivers/luna_68k.cpp
+)
+
 createMESSProjects(_target _subtarget "openuni"
 	${MAME_DIR}/src/mame/drivers/hektor.cpp
 )
@@ -3116,7 +3134,6 @@ createMESSProjects(_target _subtarget "osborne"
 	${MAME_DIR}/src/mame/machine/osborne1.cpp
 	${MAME_DIR}/src/mame/drivers/osbexec.cpp
 	${MAME_DIR}/src/mame/drivers/vixen.cpp
-	${MAME_DIR}/src/mame/includes/vixen.h
 )
 
 createMESSProjects(_target _subtarget "osi"
