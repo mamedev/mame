@@ -34,9 +34,14 @@ Common Issues and Questions (FAQ)
 Why does my game show an error screen if I insert coins rapidly?
 ----------------------------------------------------------------
 
-This is not a bug in MAME. On original arcade hardware, you simply could not insert coins as fast as you can mashing the button. The only ways you could get credit feeding at that kind of pace was if the coin mech hardware was defective or if you were physically trying to cheat the coin mech.
+This is not a bug in MAME.  On original arcade hardware, you simply could not
+insert coins as fast as you can mash the button.  The only ways you could feed
+credits at that kind of pace was if the coin mech hardware was defective or if
+you were physically trying to cheat the coin mech.
 
-In either case, the game would display an error for the operator to look into the situation to prevent cheating them out of their hard-earned cash. Keep a slow, coin-insert-ish pace and you'll not trigger this.
+In either case, the game would display an error for the operator to look into
+the situation to prevent cheating them out of their hard-earned cash.  Keep a
+slow, coin-insert-ish pace and you won’t trigger this.
 
 
 .. _broken-package:
@@ -142,7 +147,7 @@ parent will always be somewhat arbitrary, but we do have some guidelines:
 * Prefer English language
 * Prefer most widespread release
 * Prefer most complete version
-* Prefer versions that are uncensored, and have story and/cutscenes intact
+* Prefer versions that are uncensored, and have story/cutscenes intact
 * Prefer versions that keep the original gameplay balance
 * Prefer releases from original developers/publishers rather than licensees
 * Prefer releases without region-specific notices or warnings
@@ -167,9 +172,12 @@ How do I legally obtain ROMs or disk images to run on MAME?
 
 You have several options:
 
-* You can obtain a license to them by purchasing one via a distributor or vendor who has proper authority to do so.
-* You can download one of the ROM sets that have been released for free to the public for non-commerical use.
-* You can purchase an actual arcade PCB, read the ROMs or disks yourself, and let MAME use that data.
+* You can obtain a license to them by purchasing one via a distributor or vendor
+  who has proper authority to do so.
+* You can download one of the ROM sets that have been released for free to the
+  public for non-commercial use.
+* You can purchase an actual arcade PCB, read the ROMs or disks yourself, and
+  let MAME use that data.
 
 Beyond these options, you are on your own.
 
@@ -179,7 +187,8 @@ Beyond these options, you are on your own.
 Isn't copying ROMs a legal gray area?
 -------------------------------------
 
-No, it's not. You are not permitted to make copies of software without the copyright owner's permission. This is a black & white issue.
+No, it’s not.  You are not permitted to make copies of software without the
+copyright owner’s permission.  This is a black and white issue.
 
 
 .. _Abandonware:
@@ -187,7 +196,8 @@ No, it's not. You are not permitted to make copies of software without the copyr
 Can't game ROMs be considered abandonware?
 ------------------------------------------
 
-No. Even the companies that went under had their assets purchased by somebody, and that person is the copyright owner.
+No.  Even the companies that went under had their assets purchased by somebody,
+and that person is the copyright owner.
 
 
 .. _Old-Sets:
@@ -203,7 +213,13 @@ As time passes, MAME is perfecting the emulation of older games, even when the r
 What about those arcade cabinets on eBay that come with all the ROMs?
 ---------------------------------------------------------------------
 
-If the seller does not have a proper license to include the ROMs with his system, he is not allowed to legally include any ROMs with his system. If he has purchased a license to the ROMs in your name from a distributor or vendor with legitimate licenses, then he is okay to include them with the cabinet. After signing an agreement, cabinet owners that include legitimate licensed ROMs may be permitted to include a version of MAME that runs those ROMs and nothing more.
+If the seller does not have a proper license to include the ROMs with their
+system, they are not legally permitted to include any ROMs with the system.
+If they have purchased a license to the ROMs in your name from a distributor or
+vendor with legitimate licenses, then they may include the ROMs with the
+cabinet.  After signing an agreement, cabinet owners that include legitimate
+licensed ROMs may be permitted to include a version of MAME that runs those ROMs
+and nothing more.
 
 
 .. _ROM-DVDs:
@@ -211,9 +227,17 @@ If the seller does not have a proper license to include the ROMs with his system
 What about those guys who burn DVDs of ROMs for the price of the media?
 -----------------------------------------------------------------------
 
-What they are doing is just as illegal as selling the ROMs outright. As long as somebody owns the copyright, making illegal copies is illegal, period. If someone went on the internet and started a business of selling cheap copies of the latest U2 album for the price of media, do you think they would get away with it?
+What they are doing is just as unlawful as selling the ROMs outright.  As long
+as somebody holds the copyright, making unauthorised copies is unlawful.  If
+someone went on the internet and started a business of selling cheap copies of
+U2 albums for the price of media, do you think they would get away with it?
 
-Even worse, a lot of these folks like to claim that they are helping the project. In fact, they only create more problems for the MAME team. We are not associated with these people in any way regardless of how "official" they may attempt to appear. You are only helping criminals make a profit through selling software they have no right to sell. **Anybody using the MAME name and/or logo to sell such products is also in violation of the MAME trademark.**
+Even worse, a lot of these people like to claim that they are helping the
+project.  In reality, they only create more problems for the MAME team.  We are
+not associated with these people in any way, regardless of how “official” they
+may attempt to appear.  By buying from them, you only help criminals profit from
+selling software they have no right to sell.  **Anyone using the MAME name
+and/or logo to sell such products is also in violation of the MAME trademark.**
 
 
 .. _DMCA-exemption:
@@ -221,7 +245,12 @@ Even worse, a lot of these folks like to claim that they are helping the project
 But isn't there a special DMCA exemption that makes ROM copying legal?
 ----------------------------------------------------------------------
 
-No, you have misread the exemptions. The exemption allows people to reverse engineer the copy protection or encryption in computer programs that are obsolete. The exemption simply means that figuring out how these obsolete programs worked is not illegal according to the DMCA. It does not have any effect on the legality of violating the copyright on computer programs, which is what you are doing if you make copies of ROMs.
+No, you have misread the exemptions.  The exemption allows people to
+reverse-engineer the copy protection or encryption in computer programs that are
+obsolete.  The exemption simply means that figuring out how these obsolete
+programs worked is not illegal according to the DMCA.  It does not have any
+effect on the legality of making unauthorised copies of computer programs, which
+is what you are doing if you make copies of ROMs.
 
 
 .. _24-hours:
@@ -229,7 +258,9 @@ No, you have misread the exemptions. The exemption allows people to reverse engi
 But isn't it OK to download and "try" ROMs for 24 hours?
 --------------------------------------------------------
 
-This is an urban legend that was made up by people who put ROMs up for download on their sites, in order to justify the fact that they were breaking the law. There is nothing like this in any copyright law.
+This is an urban legend that was made up by people who made ROMs available for
+download from their web sites, in order to justify the fact that they were
+breaking the law.  There is no provision like this in any copyright law.
 
 
 .. _commercial-use:
@@ -326,7 +357,7 @@ for.  This may be set to any player button – typically you’ll it to
 button you press to use the autofire effect.  This can be any combination MAME
 supports as a digital input.
 
-**On frames** and **Off frames*** are how long to leave the button pressed and
+**On frames** and **Off frames** are how long to leave the button pressed and
 released in terms of the system frame rate.  Some systems do not read the inputs
 fast enough for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon)
 or other combinations.  Try fine-tuning these to your taste.
