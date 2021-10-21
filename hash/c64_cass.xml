@@ -3456,7 +3456,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="commandoa" cloneof="Commando">
+	<software name="commandoa" cloneof="commando">
 		<description>Commando (alt)</description>
 		<year>1985</year>
 		<publisher>Elite Systems</publisher>
