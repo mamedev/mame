@@ -269,8 +269,8 @@ What happened to the MAME support for autofire?
 A Lua plugin with providing enhanced autofire support was added in MAME 0.210,
 and the old built-in autofire functionality was removed in MAME 0.216.  This
 new plugin has more functionality than the built-in autofire feature in older
-version of MAME; for example, you can configure a alternate buttons for
-different for autofire rates.
+versions of MAME; for example, you can configure alternate buttons for
+different autofire rates.
 
 You can enable and configure the new autofire system with the following steps:
 
