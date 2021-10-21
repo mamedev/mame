@@ -61,6 +61,7 @@ Love & Berry Ver 1.003                      834-14661-02              ROM  EXP  
 Love & Berry Ver 2.000                      834-14661-02              ROM  EXP    253-5508-0446   AAFE-01D8493xxxx
 Love & Berry 3 EXP Ver 1.002                834-14661-01    MDA-C0042 CF   US/EXP 253-5508-0446   AAFE-01D64704904
 Love & Berry 3 CHN                          ???-?????       MDA-C0071 CF   EXP    253-5508-0446   AAFE-01G15765216
+Manpuku Suizokukan                          8340004      F            ROM  JP     253-5508-0640JN AAFE-01E32815002
 Marine & Marine                             ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 Medalink                                    837-14699                 no
 Medalink                                    837-14700                 no
@@ -74,6 +75,7 @@ Tetris Giant / Tetris Dekaris               834-14970    G  MDA-C0076 CF   ANY  
 Tetris Giant / Tetris Dekaris Ver.2.000     834-14970    G            ROM  ANY    253-5508-0604   AAFE-xxxxxxxxxxx
 Thomas: The Tank Engine                     ???-?????                 no          ???-????-????   AAFE-xxxxxxxxxxx
 UNO the Medal (Medalink)                    ???-?????                 ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
+Yataimura Kingyosukui (1-player, Japan)     8340003      D            ROM  JP     253-5509-5151J  AAFE-01C68774814
 Yataimura Kingyosukui (4-player, China)     837-14875                 CF   EXP    253-5508-0563J  AAFE-xxxxxxxxxxx
 Unknown                                     834-14865                      JAP
 
@@ -487,6 +489,24 @@ ROM_START( dinoking )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, CRC(f77c49dc) SHA1(e10173bbbd5930ed159cec9a7dba308e2a3f3c43) )
 ROM_END
 
+ROM_START( kingyo )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x01000000, CRC(02f8ee37) SHA1(b3c3e28a25d73a5d465e3ac72a393dc8036fe4d4) )
+	ROM_LOAD( "ic63",  0x01000000, 0x01000000, CRC(98b1738a) SHA1(f5e300e7179d9df0bd50055b0c7a780934b526ab) )
+	ROM_LOAD( "ic64",  0x02000000, 0x01000000, CRC(27998de0) SHA1(12321f42472c96461e970287e3edf6a685577350) )
+	ROM_LOAD( "ic65",  0x02000000, 0x01000000, CRC(548b3a81) SHA1(071f3373050b75931027f1ef3e1197acb9f069e4) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-5151-jpn.ic15", 0, 0x800, CRC(d29c911a) SHA1(5e256fd90e6ce039dd065dfc74d3aff999c46de0) )
+ROM_END
+
 ROM_START( lovebery )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -525,6 +545,21 @@ ROM_START( lovebero )
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, CRC(9e519dc6) SHA1(69a1efc81c9dc44fcb8fc9c17bd7f879d3259950) )
+ROM_END
+
+ROM_START( manpuku )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x04000000, CRC(a6712d70) SHA1(afbcf4dca754600d632de3ae14f578652be7ba83) )
+
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0640-jpn.ic15", 0, 0x800, CRC(2fe1e48c) SHA1(50a684afd3bdcf0eff59df859d6ebb3b8534ec07) )
 ROM_END
 
 // Mirage World
@@ -772,8 +807,10 @@ GAME( 2009, bingogal,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2009, bingogals,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Bingo Galaxy (satellite)", GAME_FLAGS ) // 28.05.2009
 GAME( 2009, brickppl,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Brick People / Block PeePoo (Ver 1.002)", GAME_FLAGS )
 GAME( 2005, dinoking,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King (USA)", GAME_FLAGS )
+GAME( 2009, kingyo,segasp,       segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (1-player, Japan, Ver 1.005)", GAME_FLAGS ) // キッズ屋台村 金魚すくい
 GAME( 2006, lovebery,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 2.000)", GAME_FLAGS )
 GAME( 2006, lovebero,lovebery,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 1st-2nd Collection (Export, Ver 1.003)", GAME_FLAGS )
+GAME( 2013, manpuku,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Manpuku Suizokukan", GAME_FLAGS ) // まんぷくすいぞくかん
 GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Mirage World (satellite)", GAME_FLAGS )
 GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
@@ -783,7 +820,7 @@ GAME( 2006, dinokior,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2008, dinoki25,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Dinosaur King - D-Team VS. the Alpha Fortress (Export, Ver 2.500) (MDA-C0047)", GAME_FLAGS )
 GAME( 2010, dinokich,dinoki25,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Konglongwang - D-Kids VS Alpha Yaosai (China, Ver 2.501) (MDA-C0081)", GAME_FLAGS ) // D-Kids VS 亚法要塞
 GAME( 2008, dinoki4,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)", GAME_FLAGS ) // Ancient Ruler Dinosaur King - Wake up! New Power!!
-GAME( 2009, kingyoch,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
+GAME( 2009, kingyoch,kingyo,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Kingyosukui (4-player, China, Ver 1.000)", GAME_FLAGS )
 GAME( 2007, loveber3,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (USA, Export, Ver 1.002) (MDA-C0042)", GAME_FLAGS )
 GAME( 2010, loveber3cn,loveber3, segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Love And Berry - 3rd-5th Collection (China, Ver 1.001) (MDA-C0071)", GAME_FLAGS )
 GAME( 2009, tetgiano,tetgiant,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (MDA-C0076)", GAME_FLAGS )
