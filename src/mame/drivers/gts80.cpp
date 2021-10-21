@@ -579,13 +579,16 @@ ROM_LOAD( "653cpu3a.bin", 0x1000, 0x0800, CRC(b2b1514a) SHA1(2f8179d171d411080ed
 
 */
 
+#define GTS80_BIOS \
+	ROM_REGION( 0x4000, "maincpu", ROMREGION_ERASEFF ) \
+	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe) ) \
+	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9) )
+
 /*-------------------------------------------------------------------
 / Black Hole #668
 /-------------------------------------------------------------------*/
 ROM_START(blckhole)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("668-4.cpu", 0x1000, 0x0800, CRC(01b53045) SHA1(72d73bbb09358b331696cd1cc44fc4958feffbe2))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -594,9 +597,7 @@ ROM_START(blckhole)
 ROM_END
 
 ROM_START(blckhole2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("668-2.cpu", 0x1000, 0x0800, CRC(df03ffea) SHA1(7ca8fc321f74b9193104c282c7b4b92af93694c9))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -605,9 +606,7 @@ ROM_START(blckhole2)
 ROM_END
 
 ROM_START(blckhols)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("668-a2.cpu", 0x1000, 0x0800, CRC(df56f896) SHA1(1ec945a7ed8d25064476791adab2b554371dadbe))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -620,9 +619,7 @@ ROM_END
 / Circus #654
 /-------------------------------------------------------------------*/
 ROM_START(circusp)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("654-1.cpu", 0x1000, 0x0200, CRC(0eeb2731) SHA1(087cd6400bf0775bda0264422b3f790a77852bc4))
 	ROM_RELOAD(0x1400, 0x0200)
 	ROM_LOAD("654-2.cpu", 0x1200, 0x0200, CRC(01e23569) SHA1(47088421254e487aa1d1e87ea911dc1634e7d9ad))
@@ -638,9 +635,7 @@ ROM_END
 / Counterforce #656
 /-------------------------------------------------------------------*/
 ROM_START(cntforce)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("656-1.cpu", 0x1000, 0x0200, CRC(42baf51d) SHA1(6c7947df6e4d7ed2fd48410705018bde91db3356))
 	ROM_RELOAD(0x1400, 0x0200)
 	ROM_LOAD("656-2.cpu", 0x1200, 0x0200, CRC(0e185c30) SHA1(01d9fb5d335c24bed9f747d6e23f57adb6ef09a5))
@@ -661,9 +656,7 @@ ROM_END
 / Eclipse #671
 /-------------------------------------------------------------------*/
 ROM_START(eclipse)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("671-a.cpu", 0x1000, 0x0800, CRC(efad7312) SHA1(fcfd5e5c7924d65ac42561994797156a80018667))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -676,9 +669,7 @@ ROM_END
 / Force II #661
 /-------------------------------------------------------------------*/
 ROM_START(forceii)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("661-2.cpu", 0x1000, 0x0800, CRC(a4fa42a4) SHA1(c17af4f0da6d5630e43db44655bece0e26b0112a))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -691,9 +682,7 @@ ROM_END
 / Haunted House #669, since serial no. 5000
 /-------------------------------------------------------------------*/
 ROM_START(hh)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("669-2.cpu", 0x1000, 0x0800, CRC(f3085f77) SHA1(ebd43588401a735d9c941d06d67ac90183139e90))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -702,9 +691,7 @@ ROM_START(hh)
 ROM_END
 
 ROM_START(hh_1)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("669-1.cpu", 0x1000, 0x0800, CRC(96e72b93) SHA1(3eb3d3e064ba2fe637bba2a93ffd07f00edfa0f2))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -716,9 +703,7 @@ ROM_END
 / James Bond #658
 /-------------------------------------------------------------------*/
 ROM_START(jamesb)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("658-1.cpu", 0x1000, 0x0800, CRC(b841ad7a) SHA1(3396e82351c975781cac9112bfa341a3b799f296))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -728,9 +713,7 @@ ROM_START(jamesb)
 ROM_END
 
 ROM_START(jamesb2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("658-x.cpu", 0x1000, 0x0800, CRC(e7e0febf) SHA1(2c101a88b61229f30ed15d38f395bc538999d766))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -743,9 +726,7 @@ ROM_END
 / Mars - God of War #666
 /-------------------------------------------------------------------*/
 ROM_START(marsp)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("666-1.cpu", 0x1000, 0x0800, CRC(bb7d476a) SHA1(22d5d7f0e52c5180f73a1ca0b3c6bd4b7d0843d6))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -754,9 +735,7 @@ ROM_START(marsp)
 ROM_END
 
 ROM_START(marspf)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("666-1.cpu", 0x1000, 0x0800, CRC(bb7d476a) SHA1(22d5d7f0e52c5180f73a1ca0b3c6bd4b7d0843d6))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -765,9 +744,7 @@ ROM_START(marspf)
 ROM_END
 
 ROM_START(marspp)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("666s-1.cpu", 0x1000, 0x0800, CRC(029e0bcf) SHA1(20764464ede38bee2a726fc2ae98a60375b3cb1c))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -779,9 +756,7 @@ ROM_END
 / Panthera #652
 /-------------------------------------------------------------------*/
 ROM_START(panthera)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("652.cpu", 0x1000, 0x0800, CRC(5386e5fb) SHA1(822f47951b702f9c6a1ce674baaab0a596f34413))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -791,9 +766,7 @@ ROM_START(panthera)
 ROM_END
 
 ROM_START(grand8)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("652.cpu", 0x1000, 0x0800, CRC(5386e5fb) SHA1(822f47951b702f9c6a1ce674baaab0a596f34413))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -805,9 +778,7 @@ ROM_END
 / Pink Panther #664
 /-------------------------------------------------------------------*/
 ROM_START(pnkpnthr)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("664-1.cpu", 0x1000, 0x0800, CRC(a0d3e69a) SHA1(590e68dc28067e61832927cd4b3eefcc066f0a92))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -820,9 +791,7 @@ ROM_END
 / Star Race #657
 /-------------------------------------------------------------------*/
 ROM_START(starrace)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("657-1.cpu", 0x1000, 0x0200, CRC(27081372) SHA1(2d9cd81ffa44c389c4895043fa1e93b899544158))
 	ROM_RELOAD(0x1400, 0x0200)
 	ROM_LOAD("657-2.cpu", 0x1200, 0x0200, CRC(c56e31c8) SHA1(1e129fb6309e015a16f2bdb1e389cbc85d1919a7))
@@ -838,9 +807,7 @@ ROM_END
 / The Amazing Spider-Man #653
 /-------------------------------------------------------------------*/
 ROM_START(spidermn)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("653-1.cpu", 0x1000, 0x0200, CRC(674ddc58) SHA1(c9be45391b8dd58a0836801807d593d4c7da9904))
 	ROM_RELOAD(0x1400, 0x0200)
 	ROM_LOAD("653-2.cpu", 0x1200, 0x0200, CRC(ff1ddfd7) SHA1(dd7b98e491045916153b760f36432506277a4093))
@@ -861,9 +828,7 @@ ROM_END
 / Time Line #659
 /-------------------------------------------------------------------*/
 ROM_START(timeline)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("659.cpu", 0x1000, 0x0800, CRC(d6950e3b) SHA1(939b45a9ee4bb122fbea534ad728ec6b85120416))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -876,9 +841,7 @@ ROM_END
 / Volcano (Sound and Speech) #667
 /-------------------------------------------------------------------*/
 ROM_START(vlcno_ax)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("667-a-x.cpu", 0x1000, 0x0800, CRC(1f51c351) SHA1(8e1850808faab843ac324040ca665a83809cdc7b))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
@@ -887,9 +850,7 @@ ROM_START(vlcno_ax)
 ROM_END
 
 ROM_START(vlcno_1c)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("667-1c.cpu", 0x1000, 0x0800, CRC(e364202d) SHA1(128eaa5b390e309f4cf89f3631da0341f1419ffe))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -899,9 +860,7 @@ ROM_START(vlcno_1c)
 ROM_END
 
 ROM_START(vlcno_1b)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("667-1b.cpu", 0x1000, 0x0800, CRC(a422d862) SHA1(2785388eb43c08405774a9413ffa52c1591a84f2))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -911,9 +870,7 @@ ROM_START(vlcno_1b)
 ROM_END
 
 ROM_START(vlcno_1a)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("667-1a.cpu", 0x1000, 0x0800, CRC(5931c6f7) SHA1(e104a6c3ca2175bb49199e06963e26185dd563d2))
 
 	ROM_REGION(0x1000, "r0sound:audiocpu", 0)
@@ -926,9 +883,7 @@ ROM_END
 / System 80 Test Fixture
 /-------------------------------------------------------------------*/
 ROM_START(s80tst)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("u2_80.bin", 0x2000, 0x1000, CRC(4f0bc7b1) SHA1(612cbacdca5cfa6ad23940796df3b7c385be79fe))
-	ROM_LOAD("u3_80.bin", 0x3000, 0x1000, CRC(1e69f9d0) SHA1(ad738cac2555830257b531e5e533b15362f624b9))
+	GTS80_BIOS
 	ROM_LOAD("80tst.cpu", 0x1000, 0x0800, CRC(a0f9e56b) SHA1(5146745ab61fea4b3070c6cf4324a9e77a7cee36))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
