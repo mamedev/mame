@@ -16966,6 +16966,7 @@ ice_tbd                         // ICE - Turbo Drive
 
 @source:icecold.cpp
 icecold                         //
+icecoldf                        //
 zekepeak                        //
 
 @source:ichiban.cpp
