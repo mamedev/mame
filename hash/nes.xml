@@ -62609,10 +62609,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- nointro & cah4e3 -->
 	<software name="avjjmj2">
-		<description>AV Jiu Ji Ma Jiang II (Asia)</description>
+		<description>AV Jiūjí Májiàng II (Asia)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="AV Kyuukyoku Mahjong 2"/>
+		<publisher>Kasheng</publisher>
+		<info name="alt_title" value="AV究極麻將II"/>
+		<info name="alt_title" value="AV Kyuukyoku Mahjong II"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="kasing" />
 			<feature name="pcb" value="KASING" />
@@ -62621,6 +62622,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="av kyuukyoku mahjong 2 (asia) (unl).prg" size="131072" crc="0b9d4276" sha1="d8267c9f23d03e08e588cbfdb19baacac2977639" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avjjmj2a" cloneof="avjjmj2">
+		<description>AV Jiūjí Májiàng II (Asia, alt)</description>
+		<year>1995?</year>
+		<publisher>Ge De Industry</publisher>
+		<info name="alt_title" value="AV究極麻將II"/>
+		<info name="alt_title" value="AV Kyuukyoku Mahjong II"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="huang2" />
+			<dataarea name="prg" size="131072">
+				<rom name="av jiu ji ma jiang 2 (unl) [a1].prg" size="131072" crc="8e045b2a" sha1="7c62936b0e0c46999f743cb098d0d718273e7540" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="av jiu ji ma jiang 2 (unl) [a1].chr" size="131072" crc="812938be" sha1="e2f3caed57a212d4593458e6bbcc8f1a8fcbcbf2" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

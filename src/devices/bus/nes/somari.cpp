@@ -34,10 +34,21 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_SOMARI, nes_somari_device, "nes_somari", "NES Cart Team Somari PCB")
+DEFINE_DEVICE_TYPE(NES_HUANG2, nes_huang2_device, "nes_huang2", "NES Cart Huang-2 PCB")
 
+
+nes_somari_device::nes_somari_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_board_mode(0), m_mmc1_count(0), m_mmc1_latch(0), m_mmc1_prg_shift(type == NES_HUANG2), m_vrc_mirror(0)
+{
+}
 
 nes_somari_device::nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_txrom_device(mconfig, NES_SOMARI, tag, owner, clock), m_board_mode(0), m_mmc1_count(0), m_mmc1_latch(0), m_vrc_mirror(0)
+	: nes_somari_device(mconfig, NES_SOMARI, tag, owner, clock)
+{
+}
+
+nes_huang2_device::nes_huang2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_somari_device(mconfig, NES_HUANG2, tag, owner, clock)
 {
 }
 
@@ -90,6 +101,15 @@ void nes_somari_device::pcb_reset()
 /*-------------------------------------------------
 
  SOMERI TEAM
+
+ Games: Somari, Kart Fighter, Garou Densetsu Special,
+ AV Bishoujo Senshi, AV Kyuukyoku Mahjong 2
+
+ Like Rex Soft's SL-1632 these boards use Huang chips
+ which simulate the behavior of MMC1, MMC3, and VRC2.
+ There is a second revision, Huang-2, that appears to
+ only have been used for AV Kyuukyoku Mahjong 2. Its
+ MMC1 mode has nonstandard PRG banking.
 
  iNES: mapper 116
 
@@ -184,11 +204,11 @@ void nes_somari_device::update_prg()
 					break;
 				case 2:
 					prg16_89ab(0);
-					prg16_cdef(m_mmc1_reg[3]);
+					prg16_cdef(m_mmc1_reg[3] >> m_mmc1_prg_shift);
 					break;
 				case 3:
-					prg16_89ab(m_mmc1_reg[3]);
-					prg16_cdef(0x0f);
+					prg16_89ab(m_mmc1_reg[3] >> m_mmc1_prg_shift);
+					prg16_cdef(0x0f >> m_mmc1_prg_shift);
 					break;
 			}
 			break;

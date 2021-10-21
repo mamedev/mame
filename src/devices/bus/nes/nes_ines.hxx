@@ -736,6 +736,11 @@ void nes_cart_slot_device::call_load_ines()
 			else if (submapper == 3)
 				pcb_id = IREM_HOLYDIVR;
 		}
+		// iNES Mapper 116
+		else if (mapper == 116 && submapper == 2)
+		{
+			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
+		}
 		// iNES Mapper 185
 		else if (mapper == 185)
 		{
@@ -1236,6 +1241,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			else if (submapper == 3)
 				pcb_id = IREM_HOLYDIVR;
+		}
+		// iNES Mapper 116
+		else if (mapper == 116 && submapper == 2)
+		{
+			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
 		}
 	}
 
