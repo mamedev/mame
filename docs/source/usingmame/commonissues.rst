@@ -44,11 +44,25 @@ In either case, the game would display an error for the operator to look into th
 Why is my non-official MAME package (e.g. EmuCR build) broken? Why is my official update broken?
 ------------------------------------------------------------------------------------------------
 
-In many cases, updates to various subsystems such as HLSL, BGFX, or Lua plugins come as updates to the external shader files as well as to the core MAME code. Unfortunately, builds that come from third parties may come as just a main MAME executable or with outdated external files, which can break the coupling between these external files and MAME core code. Despite repeated attempts at contacting some of these third parties to warn them, they persist in distributing broken MAME updates.
+Many MAME features, such as software lists, HLSL or BGFX shaders, Lua plugins
+and UI translations, use external files.  Updates to these features often
+require the external files to be updated along with MAME.  Unfortunately, builds
+provided by third parties may only include the main MAME executable, or may
+include outdated external files.  Using an updated MAME executable with outdated
+external files causes issues with features reliant on the external files.
+Despite repeated requests that they distribute MAME complete with matching
+external files, some of these third parties persist in distributing incomplete
+or broken MAME updates.
 
-As we have no control over how third parties distribute these, all we really can do is disclaim the use of sites like EmuCR and say that we cannot provide support for packages we didn't build. Compile your own MAME or use one of the official packages provided by us.
+As we have no control over how third parties distribute MAME, all we really can
+do is recommend against obtaining MAME from sites like EmuCR.  We cannot provide
+any support for packages we didn’t build ourselves.  You can completely avoid
+these issues by compiling MAME yourself, or using an official package we
+provide.
 
-You may also run into this problem if you have not replaced the contents of the HLSL and BGFX folders with the latest files when updating your MAME install with a new official build.
+You may also encounter this problem if you do not update the contents of the
+hlsl, bgfs or plugins folders when updating your MAME installation with a new
+official build.
 
 
 .. _faster-if-X:
@@ -255,44 +269,56 @@ What happened to the MAME support for autofire?
 A Lua plugin with providing enhanced autofire support was added in MAME 0.210,
 and the old built-in autofire functionality was removed in MAME 0.216.  This
 new plugin has more functionality than the built-in autofire feature in older
-version of MAME; for example, you can configure an alternate buttons for
+version of MAME; for example, you can configure a alternate buttons for
 different for autofire rates.
 
 You can enable and configure the new autofire system with the following steps:
 
 * Start MAME with no system selected.
-* Choose *Plugins* at the bottom (just above Exit)
-* Turn Autofire on.
+* Choose **Configure Options** at the bottom (use **Tab** to move focus, or
+  double-click the menu item).
+* Choose **Plugins** near the bottom of the Settings menu.
+* Turn **Autofire plugin** on (use **Left**/**Right** or click the arrows to
+  change options).
 
 The setting will be automatically saved for future use.
 
 Once you’re running a system of your choice, bring up the MAME menu (using the
-**Tab** key by default), select *Plugin Options* and then select *Autofire*.
-From there, depending on whether you have an existing autofire button set up or
-not, it will either show the existing entry/entries or it will ask you to select
-the input for the autofire.
+**Tab** key by default), select **Plugin Options***, and then select
+**Autofire**.  From there you can select an existing autofire button to change
 
-Typically you’ll be choosing *P1 Button 1* for systems like Galaga, Alcon, and
-the like.  The *Hotkey* is the button you press for the autofire effect.  This
-can be any keyboard key or joystick button you wish.  As of 0.216, mouse buttons
-are not yet supported.
+The **Input** is the button on the emulated system that you want to use autofire
+for.  This may be set to any player button – typically you’ll it to
+*P1 Button 1* for games like Galaga, Alcon, and the like.  The **Hotkey** is the
+button you press to use the autofire effect.  This can be any combination MAME
+supports as a digital input.
 
-*On frames* and *Off frames* are how long to leave the button pressed and
-released in number of frames.  Some systems do not read the inputs fast enough
-for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon) or other
-combinations.  Try fine-tuning these to your taste.
+**On frames** and **Off frames*** are how long to leave the button pressed and
+released in terms of the system frame rate.  Some systems do not read the inputs
+fast enough for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon)
+or other combinations.  Try fine-tuning these to your taste.
 
-The autofire configuration for that system will be saved in a ``systemname.cfg``
-file (e.g. ``alcon.cfg``) inside the Autofire folder for future use.  Each
-system will have its own configuration.
+The autofire configuration for each system will be saved in a ``systemname.cfg``
+file (e.g. ``alcon.cfg``) inside the **autofire** folder in your plugin data
+folder.  Each system will have its own configuration.
 
-Note that if you set the autofire button to an input button that's also defined in MAME's inputs for the running system, you may get unexpected results-- Using Gradius as an example:
+Note that if you set the autofire button to an input button that’s also assigned
+to one of MAME’s inputs for the running system, you may get unexpected results.
+Using Gradius as an example:
 
- If you set button 1 on your controller to fire, then set autofire to button 1 as well, holding the button down to shoot will not trigger the autofire because the button never gets released from you holding the non-autofire button 1. This will also happen if you set a different button as autofire (say, button 3 in this case), and hold button 1 down while holding button 3 down.
+* If you set button 1 on your controller to fire, then set an autofire hotkey to
+  button 1 as well, holding the button down to shoot will not trigger the
+  autofire effect because the button never gets released, since you’re holding
+  the non-autofire button 1.  This will also happen if you set a different
+  button as autofire (say, button 3 in this case), and hold button 1 down while
+  holding button 3 down.
+* If you set button 3 on your controller to autofire and set button 3 to be
+  powerup as well, you will trigger the powerup action every time you grab a
+  powerup because the powerup button is also being held down along with the
+  autofire button.
 
- If you set button 3 on your controller to autofire and set button 3 to be powerup as well, you will trigger the powerup action every time you grab a powerup because the powerup button is also being held down along with the autofire button.
-
- It is suggested you choose a button for autofire that is not in use for anything else in the current system.
+It is suggested you choose buttons for autofire hotkeys that are not in use for
+anything else in the current system.
 
 
 .. _gsync-freesync:

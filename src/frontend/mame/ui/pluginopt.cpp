@@ -72,11 +72,11 @@ menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &contain
 
 void menu_plugin_opt::handle()
 {
-	const event *menu_event = process(m_process_flags);
-
+	event const *const menu_event = process(m_process_flags);
+	void *const itemref = menu_event ? menu_event->itemref : get_selection_ref();
+	std::string key;
 	if (menu_event)
 	{
-		std::string key;
 		switch (menu_event->iptkey)
 		{
 		case IPT_UI_UP:
@@ -107,15 +107,17 @@ void menu_plugin_opt::handle()
 			key = std::to_string((u32)menu_event->unichar);
 			break;
 		default:
-			if (!m_need_idle)
-				return;
+			break;
 		}
-		auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(menu_event->itemref), key);
+	}
+	if (!key.empty() || m_need_idle)
+	{
+		auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
 		if (result.second)
 			set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
 		if (result.first)
 			reset(reset_options::REMEMBER_REF);
-		else if (menu_event->iptkey == IPT_UI_CANCEL)
+		else if (menu_event && (menu_event->iptkey == IPT_UI_CANCEL))
 			stack_pop();
 	}
 }
