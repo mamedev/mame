@@ -61,8 +61,8 @@ these issues by compiling MAME yourself, or using an official package we
 provide.
 
 You may also encounter this problem if you do not update the contents of the
-hlsl, bgfs or plugins folders when updating your MAME installation with a new
-official build.
+``hlsl``, ``bgfx`` or ``plugins`` folders when updating your MAME installation
+with a new official build.
 
 
 .. _faster-if-X:
@@ -132,15 +132,32 @@ If you have several games and you wish to verify that they are compatible with t
 .. _Parent-Sets:
 
 Why is it that some games have the US version as the main set, some have Japanese, and some are the World?
------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
-While this rule isn't always true, there is typically a method to how sets are arranged. The usual priority is to go with the **World** set if it's available, **US** if no World English set exists, and **Japanese** or other origin region if no World or US English set.
+Parent and clone sets are a convenience feature to help keep different versions
+of the same system or software together.  The decision on which set to make the
+parent will always be somewhat arbitrary, but we do have some guidelines:
 
-Exceptions arise where the US or World sets have significant censorship/changes from the original version. For instance, Gals Panic (set **galsnew**) uses the US version as parent because it has additional features compared to the world export version (set **galsnewa**). These features are optional censorship, an additional control layout option (stick with no button use), and English-language voice clips.
+* Prefer latest release version
+* Prefer English language
+* Prefer most widespread release
+* Prefer most complete version
+* Prefer versions that are uncensored, and have story and/cutscenes intact
+* Prefer versions that keep the original gameplay balance
+* Prefer releases from original developers/publishers rather than licensees
+* Prefer releases without region-specific notices or warnings
 
-Another exception comes for games where it was licensed to a third party for export release. Pac-Man, for instance, was published by Midway in the US though it was created by Namco. As a result, the parent set is the Japanese **puckman** set, which retains the Namco copyright.
+It’s not always possible to choose a set that’s preferred according to all
+criteria.
 
-Lastly, a developer adding a new set can choose to use whatever naming and parent scheme they wish and are not restricted to the above rules. Most follow these guidelines, however.
+As an example, the World release of Ghouls’n Ghosts (*ghouls*) is the parent of
+the US release (*ghoulsu*) and the Japanese original Daimakaimura, as it is the
+most widespread English-language release, and has the story and cutscenes
+intact.
+
+Another example is Midway Pac-Man (*pacman*), which is a clone of Namco Puck
+Man (*puckman*), because Pac-Man is a licensed version for the US market, while
+Puck Man was released by Namco themselves.
 
 
 .. _Legal-ROMs:
@@ -246,9 +263,22 @@ Additional troubleshooting information can be found on Microsoft's website at ht
 I have a controller that doesn't want to work with the standard Microsoft Windows version of MAME, what can I do?
 -----------------------------------------------------------------------------------------------------------------
 
-By default, MAME on Microsoft Windows tries to do raw reads of the joystick(s), mouse/mice, and keyboard(s). This works with most devices and provides the most stable results. However, some devices need special drivers to translate their output and these drivers may not work with raw input.
+By default, MAME on Microsoft Windows tries to read joystick(s), mouse/mice and
+keyboard(s) using the RawInput API.  This works with most devices, and allows
+multiple keyboards and mice to be used independently.  However, some device
+drivers are not compatible with RawInput, and it may be necessary to use
+DirectInput or window events to receive input.  This is also the case for most
+software that simulates mouse or keyboard input, like JoyToKey, VNC or Remote
+Desktop.
 
-One thing you can try is setting the keyboardprovider, mouseprovider, or joystickprovider setting (depending on which kind of device your input device acts as) from rawinput to one of the other options such as dinput or win32. See :ref:`osd-commandline-options` for details on supported providers.
+You can try changing the
+:ref:`keyboardprovider <mame-commandline-keyboardprovider>`,
+:ref:`mouseprovider <mame-commandline-mouseprovider>`,
+:ref:`joystickprovider <mame-commandline-joystickprovider>` or
+:ref:`lightgunprovider <mame-commandline-lightgunprovider>` setting (depending
+on which kind of device you’re having issues with) from ``rawinput`` to one of
+the other options such as ``dinput`` or ``win32``.  See
+:ref:`osd-commandline-options` for details on input provider options
 
 
 .. _ExternalOPL:
@@ -256,9 +286,13 @@ One thing you can try is setting the keyboardprovider, mouseprovider, or joystic
 What happened to the MAME support for external OPL2-carrying soundcards?
 ------------------------------------------------------------------------
 
-MAME added support in version 0.23 for the use of a soundcard's onboard OPL2 (Yamaha YM3812 chip) instead of emulating the OPL2. This feature was never supported on the official Windows version of MAME and was dropped entirely as of MAME 0.60, because the OPL2 emulation in MAME had become advanced enough to be a better solution in almost all cases as of that time; now it's superior to using a sound card's YM3812 in all cases, especially as modern cards lack a YM3812.
-
-Unofficial builds of MAME may have supported it for varying amounts of time as well.
+MAME 0.23 added support for using a sound card’s onboard OPL2 (Yamaha YM3812
+chip) instead of emulating the OPL2.  This feature was only supported for DOS –
+it was never supported in official Windows versions of MAME.  It dropped
+entirely as of MAME 0.60, as the OPL2 emulation in MAME had become advanced
+enough to be a better solution in almost all cases.  MAME’s OPL2 emulation is
+now superior to using a sound card’s YM3812 in all cases, especially as modern
+sound cards lack a YM3812.
 
 
 .. _Autofire:
@@ -266,11 +300,10 @@ Unofficial builds of MAME may have supported it for varying amounts of time as w
 What happened to the MAME support for autofire?
 -----------------------------------------------
 
-A Lua plugin with providing enhanced autofire support was added in MAME 0.210,
-and the old built-in autofire functionality was removed in MAME 0.216.  This
-new plugin has more functionality than the built-in autofire feature in older
-versions of MAME; for example, you can configure alternate buttons for
-different autofire rates.
+A Lua plugin providing enhanced autofire support was added in MAME 0.210, and
+the built-in autofire functionality was removed in MAME 0.216.  This plugin has
+more functionality than the built-in autofire feature it replaced; for example,
+you can configure alternate buttons for different autofire rates.
 
 You can enable and configure the new autofire system with the following steps:
 
@@ -329,7 +362,7 @@ Does MAME support G-Sync or FreeSync? How do I configure MAME to use them?
 MAME supports both G-Sync and FreeSync right out of the box for Windows and Linux, however macOS does not support G-Sync or FreeSync.
 
 * Make sure your monitor is capable of at least 120Hz G-Sync/FreeSync. If your monitor is only capable of 60Hz in G-Sync/FreeSync modes, you will hit problems with drivers such as *Pac-Man* that run at 60.60606Hz and may hit problems with others that are very close to but not quite 60Hz.
-* If playing MAME windowed or using the BGFX video system, you'll need to make sure that you have G-Sync/FreeSync turned on for windowed applications as well as full screen in your video driver. 
+* If playing MAME windowed or using the BGFX video system, you'll need to make sure that you have G-Sync/FreeSync turned on for windowed applications as well as full screen in your video driver.
 * Be sure to leave triple buffering turned off.
 * Turning VSync on is suggested in general with G-Sync and FreeSync.
 * Low Latency Mode will not affect MAME performance with G-Sync/FreeSync.
