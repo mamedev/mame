@@ -47,7 +47,7 @@ public:
     template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
     template <DMAC3_Controller controller> auto dma_r_cb() { return m_dma_r[controller].bind(); }
     template <DMAC3_Controller controller> auto dma_w_cb() { return m_dma_w[controller].bind(); }
-    auto irq_out() { return m_irq_handler.bind(); } // XXX Seems to be one IRQ pin for both controllers?
+    auto irq_out() { return m_irq_handler.bind(); }
 
     template <DMAC3_Controller controller> void irq_w(int state)
     {
@@ -83,7 +83,7 @@ protected:
     // Timers and interrupts
     emu_timer *m_irq_check;
     emu_timer *m_dma_check;
-    bool m_irq = false; // Chip-level IRQ
+    bool m_irq = false;
     TIMER_CALLBACK_MEMBER(irq_check);
     TIMER_CALLBACK_MEMBER(dma_check);
 
@@ -138,10 +138,10 @@ protected:
     {
         CONF_IPER = 0x8000,
         CONF_MPER = 0x4000,
-        CONF_PCEN = 0x2000, // parity check enable?
+        CONF_PCEN = 0x2000,
         CONF_DERR = 0x1000,
         CONF_DCEN = 0x0800,
-        CONF_ODDP = 0x0200, // if I had to guess, odd parity?
+        CONF_ODDP = 0x0200,
         CONF_WIDTH = 0x00ff,
         CONF_SLOWACCESS = 0x0020, // SPIFI access mode (see NetBSD source code)
         CONF_FASTACCESS = 0x0001, // DMAC3 access mode (see NetBSD source code)

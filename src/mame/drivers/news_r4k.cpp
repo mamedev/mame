@@ -47,15 +47,11 @@
  *  General Emulation Status (major chips only, there are additional smaller chips including CPLDs on the boards)
  *  CPU card:
  *   - MIPS R4400: emulated, with the caveats above
- *     - The DRC breaks the NEWS-OS APbus bootloader, so for now, the `-nodrc` flag is required to boot NEWS-OS.
- *       The monitor ROM and the NetBSD floppy bootloader seems OK with DRC so far.
- *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache): not emulated
- *     - The lack of secondary cache doesn't stop NEWS-OS from booting... except for the fact that the memory allocator hangs
- *       early in the boot flow if the secondary cache size is 0KB as measured by the kernel because the scache size is used
- *       when determining some of the variables used by the memory allocator. This can be bypassed using the debugger.
- *       Caveat: other NEWS-OS 4 kernels will have this in a different spot.
- *        - NEWS-OS 4.2.1aRD CD-ROM miniroot: Set breakpoint at 0x80001B90, then update memory location 0x800B7DFC to 0x100000 (1024 KB)
- *        - Vanilla NEWS-OS 4.2.1aRD (FCS#2): Set breakpoint at 0x800CD5E8, then update memory location 0x801AECB0 to 0x100000 (1024 KB)
+ *     - The DRC breaks the NEWS-OS APbus bootloader, so for now, DRC is forced disable.
+ *       The monitor ROM works just fine with DRC. NetBSD doesn't boot without DRC,
+ *       so you must recompile without the DRC disable or with R4000.cpp to use the NetBSD floppy.
+ *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache): partially emulated
+ *     - Tag manipulation is implemented. This seems to be enough for NEWS-OS 4 to work.
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
  *   - Main memory: partially emulated (memory controller is unknown and not emulated - memory configurations other than 64MB don't work at the moment)
@@ -64,13 +60,12 @@
  *   - National Semi PC8477B Floppy Controller: emulated (uses the -A version currently, but it seems to work)
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
  *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
- *     - The ESCC FIFO is unemulated at the moment, so the NEWS-OS 4.2.1aRD kernel only boots with a recompiled kernel removing the esccf async driver
  *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and DMA for sound, floppy, etc.)
- *   - National Semi DP83932B-VF SONIC Ethernet controller: Emulated (still testing though)
- *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: partially emulated
+ *   - National Semi DP83932B-VF SONIC Ethernet controller: emulated
+ *   - Sony CXD8452AQ WSC-SONIC3 SONIC Ethernet APbus interface controller: mostly(?) emulated
  *   - Sony CXD8418Q WSC-PARK3: not fully emulated, but some of the general platform functions may come from this chip (most likely a gate array based on what the PARK2 was in older gen NEWS systems)
  *   - Sony CXD8403Q DMAC3Q DMA controller: Partially emulated
- *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: Partially emulated
+ *   - 2x HP 1TV3-0302 SPIFI3 SCSI controllers: Partially emulated, only works with the monitor ROM and NEWS-OS 4 right now.
  *   - ST Micro M58T02-150PC1 Timekeeper RAM: emulated
  *  DSC-39 XB Framebuffer/video card:
  *   - Sony CXD8486Q XB: not emulated (most likely APbus interface)
@@ -94,6 +89,7 @@
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
  *  - Triage the known issues mentioned above
+ *  - Figure out SPIFI3/DMAC3 handshake for pad
  *
  *  TODO before opening first MR:
  *  - FIFO cleanup (lots of it!)

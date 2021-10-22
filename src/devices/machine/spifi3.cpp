@@ -297,6 +297,7 @@ uint32_t spifi3_device::auxctrl_r()
 void spifi3_device::auxctrl_w(uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "write spifi_reg.auxctrl = 0x%x\n", data);
+    auto prev_auxctrl = spifi_reg.auxctrl;
     spifi_reg.auxctrl = data;
     if(spifi_reg.auxctrl & AUXCTRL_SRST)
     {
@@ -312,10 +313,12 @@ void spifi3_device::auxctrl_w(uint32_t data)
         tcounter = 0;
         command_pos = 0;
     }
-    if(spifi_reg.auxctrl & AUXCTRL_SETRST)
+    if((spifi_reg.auxctrl & AUXCTRL_SETRST) && !(prev_auxctrl & AUXCTRL_SETRST))
     {
-        // TODO: bus reset?
-        LOG("SETRST asserted\n");
+        LOG("SETRST asserted - resetting SCSI bus\n");
+		state = BUSRESET_WAIT_INT;
+		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
+		delay(130);
     }
     if(spifi_reg.auxctrl & AUXCTRL_DMAEDGE)
     {
@@ -532,7 +535,8 @@ void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param
 void spifi3_device::check_irq()
 {
     // There are various ways interrupts can be triggered by the SPIFI - this method is a work in progress.
-    bool irqState = (spifi_reg.intr & ~spifi_reg.imask) > 0; // ICOND plays a role here - need to determine how to make sure it is in sync
+    // TODO: ICOND, which doesn't seem to be needed much on the "happy path" (no errors)
+    bool irqState = (spifi_reg.intr & ~spifi_reg.imask) > 0;
     if (irq != irqState)
     {
         LOGMASKED(LOG_INTERRUPT, "Setting IRQ line to %d\n", irqState);
@@ -825,12 +829,6 @@ void spifi3_device::step(bool timeout)
             state = IDLE;
             scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
             reset_disconnect();
-
-            // TODO: spifi3 equivalent of the below?
-            /*if (!(config & 0x40)) {
-                istatus |= I_SCSI_RESET;
-                check_irq();
-            }*/
             break;
         }
 
@@ -895,13 +893,7 @@ void spifi3_device::step(bool timeout)
             if(ctrl & S_BSY) // Check if target responded
             {
                 state = (state & STATE_MASK) | (ARB_DESKEW_WAIT << SUB_SHIFT);
-                /*
-                TODO: Reselection
-                if(c == CD_RESELECT)
-                {
-                    scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
-                }
-                */
+                // TODO: reselection logic for this step
                 delay_cycles(2);
             }
             else // If not, we ran out of time - wait until the next timeout and check again
@@ -928,10 +920,12 @@ void spifi3_device::step(bool timeout)
             scsi_bus->data_w(scsi_refid, 0);
             scsi_bus->ctrl_w(scsi_refid, 0, S_SEL); // Clear SEL - target may now assert REQ
 
-            if(false) //c == CD_RESELECT) // TODO: spifi3 equiv for target mode
+            // TODO: reselection logic for this step
+            // Target mode not supported for now
+            if(false)
             {
                 LOG("mode switch to Target\n");
-                mode = MODE_T; // Target mode not supported for now
+                mode = MODE_T;
             }
             else
             {
@@ -956,13 +950,7 @@ void spifi3_device::step(bool timeout)
             else if(ctrl & S_BSY) // Got response from target, wait before allowing transaction
             {
                 state = (state & STATE_MASK) | (ARB_DESKEW_WAIT << SUB_SHIFT);
-                /*
-                TODO: Reselection
-                if(c == CD_RESELECT)
-                {
-                    scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
-                }
-                */
+                // TODO: reselection logic for this step
                 delay_cycles(2);
             }
             break;
@@ -978,13 +966,7 @@ void spifi3_device::step(bool timeout)
             if(ctrl & S_BSY) // Last chance for target to respond
             {
                 state = (state & STATE_MASK) | (ARB_DESKEW_WAIT << SUB_SHIFT);
-                /*
-                TODO: Reselection
-                if(c == CD_RESELECT)
-                {
-                    scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
-                }
-                */
+                // TODO: reselection logic for this step
                 delay_cycles(2);
 
             }
@@ -992,8 +974,7 @@ void spifi3_device::step(bool timeout)
             {
                 scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
                 state = IDLE;
-                spifi_reg.intr = INTR_TIMEO; // signal timeout
-                // TODO: Set Z state flag?
+                spifi_reg.intr = INTR_TIMEO;
                 reset_disconnect();
                 check_irq();
             }
@@ -1170,21 +1151,17 @@ void spifi3_device::step(bool timeout)
                     scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // TODO: Deassert ACK - just trying this out
                     state = INIT_XFR;
                     xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-                    step(false); // TODO: delay needed?
+                    step(false);
                 }
                 else if ((newPhase == S_PHASE_MSG_OUT || newPhase == S_PHASE_MSG_IN) && automsg_active())
                 {
                     start_automsg(newPhase);
-                    step(false); // TODO: delay needed?
+                    step(false);
                 }
                 else
                 {
                     function_bus_complete();
                 }
-            }
-            else if(false) //c == CD_SELECT_ATN_STOP) // How to determine if we need to stop here?
-            {
-                function_bus_complete();
             }
             else
             {
@@ -1274,7 +1251,7 @@ void spifi3_device::step(bool timeout)
                     // can't send if the fifo is empty and we are sending data
                     if (m_even_fifo.empty() && xfr_phase == S_PHASE_DATA_OUT)
                     {
-                        xfrDataSource = FIFO;
+                        xfr_data_source = FIFO;
                         break;
                     }
 
@@ -1287,12 +1264,13 @@ void spifi3_device::step(bool timeout)
 
                     if(xfr_phase == S_PHASE_DATA_OUT)
                     {
-                        xfrDataSource = FIFO;
+                        xfr_data_source = FIFO;
                         send_byte();
                     }
-                    else // send from cdb buffer on command or message
+                    else
                     {
-                        xfrDataSource = COMMAND_BUFFER;
+                        // Both commands and messages come from the CDB
+                        xfr_data_source = COMMAND_BUFFER;
                         send_cmd_byte();
                     }
                     break;
@@ -1303,7 +1281,7 @@ void spifi3_device::step(bool timeout)
                 case S_PHASE_MSG_IN:
                 {
                     // can't receive if the fifo is full
-                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && autostat_active(bus_id)))
+                    if (m_even_fifo.size() == 8 && !(xfr_phase == S_PHASE_STATUS && autostat_active(bus_id) && !(xfr_phase == S_PHASE_MSG_IN && automsg_active())))
                     {
                         break;
                     }
@@ -1319,7 +1297,7 @@ void spifi3_device::step(bool timeout)
                         state = INIT_XFR_RECV_BYTE_ACK;
                     }
 
-                    xfrDataSource = FIFO;
+                    xfr_data_source = FIFO;
                     recv_byte();
                     break;
                 }
@@ -1342,7 +1320,7 @@ void spifi3_device::step(bool timeout)
             }
 
             // check for command complete
-            if (xfrDataSource == FIFO && (dma_command && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty())))
+            if (xfr_data_source == FIFO && (dma_command && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty())))
             {
                 LOGMASKED(LOG_DATA, "DMA transfer complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
@@ -1366,7 +1344,7 @@ void spifi3_device::step(bool timeout)
                     state = INIT_XFR_RECV_PAD_WAIT_REQ;
                 }
             }
-            else if (xfrDataSource == FIFO && (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
+            else if (xfr_data_source == FIFO && (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
             {
                 LOGMASKED(LOG_DATA, "Non-DMA transfer out complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
@@ -1376,7 +1354,7 @@ void spifi3_device::step(bool timeout)
                     start_automsg(newPhase);
                 }
             }
-            else if (xfrDataSource == FIFO && (!dma_command && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
+            else if (xfr_data_source == FIFO && (!dma_command && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
             {
                 LOG("Non-DMA transfer in complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
@@ -1386,7 +1364,7 @@ void spifi3_device::step(bool timeout)
                     start_automsg(newPhase);
                 }
             }
-            else if(xfrDataSource == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command
+            else if(xfr_data_source == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command
             {
                 LOGMASKED(LOG_STATE, "Command transfer complete, new phase = %d\n", ctrl & S_PHASE_MASK);
                 state = INIT_XFR_BUS_COMPLETE;

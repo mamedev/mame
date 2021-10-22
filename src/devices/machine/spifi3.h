@@ -65,14 +65,14 @@ private:
     };
 
     // State tracking variables
-    scsi_mode mode;				  // Target or initiatior?
-    scsi_data_source xfrDataSource; // where are we transferring data from?
-    int state;					  // SCSI controller state
+    scsi_mode mode;
+    scsi_data_source xfr_data_source;
+    int state;
     int xfr_phase;
     int command_pos;
     int dma_dir;
-    bool irq = false; // IRQ pin state
-    bool drq = false; // DRQ pin state
+    bool irq = false;
+    bool drq = false;
     bool dma_command;
     uint32_t tcounter;
     uint8_t sync_period;
