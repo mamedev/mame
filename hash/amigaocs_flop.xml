@@ -23971,8 +23971,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: C:0 H:U Bad -->
-	<software name="khanwcs" supported="no">
+	<software name="khanwcs" supported="yes">
 		<!-- SPS (CAPS) release 129 -->
 		<description>Jahangir Khan's World Championship Squash (Euro)</description>
 		<!-- retail, standalone -->

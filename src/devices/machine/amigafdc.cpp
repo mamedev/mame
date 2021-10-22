@@ -2,7 +2,7 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    Amiga floppy disk controller emulation
+    Amiga floppy disk controller emulation "Trackdisk"
 
 ***************************************************************************/
 
@@ -24,7 +24,7 @@
 #define LOGDMA(...)      LOGMASKED(LOG_DMA, __VA_ARGS__)
 #define LOGSYNC(...)     LOGMASKED(LOG_SYNC, __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga FDC")
+DEFINE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device, "amiga_fdc", "Amiga \"Trackdisk\" FDC")
 
 void amiga_fdc_device::floppy_formats(format_registration &fr)
 {
@@ -33,16 +33,16 @@ void amiga_fdc_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_IPF_FORMAT);
 }
 
-amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, AMIGA_FDC, tag, owner, clock),
-	m_write_index(*this),
-	m_read_dma(*this),
-	m_write_dma(*this),
-	m_write_dskblk(*this),
-	m_write_dsksyn(*this),
-	m_leds(*this, "led%u", 1U),
-	m_fdc_led(*this, "fdc_led"),
-	floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
+amiga_fdc_device::amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+    : device_t(mconfig, AMIGA_FDC, tag, owner, clock)
+	, m_write_index(*this)
+	, m_read_dma(*this)
+	, m_write_dma(*this)
+	, m_write_dskblk(*this)
+	, m_write_dsksyn(*this)
+	, m_leds(*this, "led%u", 1U)
+	, m_fdc_led(*this, "fdc_led")
+	, floppy(nullptr), t_gen(nullptr), dsklen(0), pre_dsklen(0), dsksync(0), dskbyt(0), adkcon(0), dmacon(0), dskpt(0), dma_value(0), dma_state(0)
 {
 }
 
@@ -69,7 +69,6 @@ void amiga_fdc_device::device_start()
 
 	t_gen = timer_alloc(0);
 }
-
 
 void amiga_fdc_device::device_reset()
 {
