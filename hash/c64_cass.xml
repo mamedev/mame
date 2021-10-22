@@ -3290,7 +3290,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="cobra" supported="no">
+	<software name="cobra" supported="no"> <!-- game loads but crashes as soon as game runs (garbled graphics) -->
 		<description>Cobra</description>
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
@@ -4522,6 +4522,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="emotion">
+		<description>E-motion</description>
+		<year>1990</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="791430">
+				<rom name="E-motion.tap" size="791430" crc="fcf6e2f9" sha1="2c12a6ef198d5c0fc852c9e6982f0ca076810e15"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eagleemp">
 		<description>Eagle Empire</description>
 		<year>1984</year>
@@ -4530,6 +4542,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1056466">
 				<rom name="Eagle_Empire.tap" size="1056466" crc="326ec783" sha1="a5e02fa2d87da8d7c520d2414dd938e398f8bc34"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddduck">
+		<description>Edd the Duck</description>
+		<year>1990</year>
+		<publisher>Impulze</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="952925">
+				<rom name="Edd_the_Duck.tap" size="952925" crc="b9a00fde" sha1="5e710d65250b19a57525f13fb64c816b75fda78f"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="939919">
+				<rom name="Edd_the_Duck_a1.tap" size="939919" crc="9a26b6ed" sha1="445799be9efa88eb2fc9b1bb9716a259045eb3ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4558,6 +4588,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="enduroa" cloneof="enduro">
+		<description>Enduro Racer (Activision)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="496247">
+				<rom name="Enduro_Racer.tap" size="496247" crc="3caf17a5" sha1="3656d12af4af7de7cd02a68f5b0b6c129838d706"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="enghumpty">
 		<description>Engineer Humpty</description>
 		<year>1984</year>
@@ -4576,6 +4618,40 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="epyxepic">
+		<description>Epyx Epics</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side A: Summer Games"/>
+			<dataarea name="cass" size="619035">
+				<rom name="Epyx_Epics_Tape_1_Side_1.tap" size="619035" crc="a6f86a81" sha1="57da1799887be7933a789d1090e46a351dea5482"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side B: Summer Games"/>
+			<dataarea name="cass" size="778018">
+				<rom name="Epyx_Epics_Tape_1_Side_2.tap" size="778018" crc="c87aec60" sha1="b40ee3ce862793acb921cbbdbaaa4df4351c4527"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side A: Impossible Mission / Pitstop II"/>
+			<dataarea name="cass" size="1089441">
+				<rom name="Epyx_Epics_Tape_2_Side_1.tap" size="1089441" crc="3e44f36c" sha1="86855c3561ece160f65a512cd3f1e8b14e3654b7"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side B: Breakdance"/>
+			<dataarea name="cass" size="813978">
+				<rom name="Epyx_Epics_Tape_2_Side_2.tap" size="813978" crc="e3db7724" sha1="93bc40fef2e93d1f3eddceadf2960aee2297208a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="erebus">
 		<description>Erebus</description>
 		<year>1988</year>
@@ -4584,6 +4660,30 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="455594">
 				<rom name="Erebus.tap" size="455594" crc="11e447c5" sha1="a2dcf44bb28e001fc607049fb8b2021923e91dbc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escape">
+		<description>Escape</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="577571">
+				<rom name="Escape.tap" size="577571" crc="54181063" sha1="9ab635ddca3933681da85c5add79ce4efdbb461c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escapemc">
+		<description>Escape-MCP</description>
+		<year>1983</year>
+		<publisher>Rabbit Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="420184">
+				<rom name="Escape-MCP.tap" size="420184" crc="95381151" sha1="6f5f17ca1f16f3c9df372343daec4bd9b5b68dbf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4600,6 +4700,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="everysec">
+		<description>Every Second Counts</description>
+		<year>1988</year>
+		<publisher>TV Games</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="901121">
+				<rom name="Every_Second_Counts.tap" size="901121" crc="727f5608" sha1="0d667e69dedabba939960ded7893285a12fe9056"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="901120">
+				<rom name="Every_Second_Counts_a1.tap" size="901120" crc="4eb2ccd8" sha1="d2dc50799be5e7c3d034ca9305ee19937e8afcb6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="excaliba">
 		<description>Excaliba</description>
 		<year>1985</year>
@@ -4612,6 +4730,31 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="501963">
 				<rom name="excaliba side b.tap" size="501963" crc="ea2769b1" sha1="34ad13cbea6c8fb1bd80854080a606040f4f2395"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fabwanda">
+		<description>The Fabulous Wanda and the Secret of Life, the Universe, and Everything</description>
+		<year>1983</year>
+		<publisher>Games Machine</publisher>
+		<info name="alt_title" value="The Fabulous Wanda"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1124222">
+				<rom name="Fabulous_Wanda,_The_-_and_the_Secret_of_Life,_the_Universe,_and_Everything.tap" size="1124222" crc="c178742b" sha1="9dc4125a4a9a6496e8102944c7661711b943b16a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fairligh">
+		<description>Fairlight</description>
+		<year>1986</year>
+		<publisher>The Edge</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="486349">
+				<rom name="Fairlight.tap" size="486349" crc="598ded18" sha1="36fa556342dd503202ee7ebf943a17c453ebd219"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4654,6 +4797,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="1551138">
 				<rom name="Fall_Guy_a1.tap" size="1551138" crc="73611933" sha1="00f474343d39ea094ddbbeffab2e8e1b1f7eab1b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="famous5">
+		<description>Famous Five</description>
+		<year>1987</year>
+		<publisher>Mastertronic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A: Amaurote / Motos / Knucklebusters"/>
+			<dataarea name="cass" size="1481766">
+				<rom name="Famous_Five_Side_1.tap" size="1481766" crc="1588974d" sha1="d1d1b682cdb220b9b84cd3fd41734327f326d115"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B: Milk Race / Invasion"/>
+			<dataarea name="cass" size="1085330">
+				<rom name="Famous_Five_Side_2.tap" size="1085330" crc="4653470a" sha1="dde40f2942d0d59f2fcaeb7910637f409ddc8f0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fwdizzy">
+		<description>Fantasy World Dizzy</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="694577">
+				<rom name="Fantasy_World_Dizzy.tap" size="694577" crc="2c27634a" sha1="977c49720ecffd3650b67d8f79296575f1ffedaa"/>
 			</dataarea>
 		</part>
 	</software>
