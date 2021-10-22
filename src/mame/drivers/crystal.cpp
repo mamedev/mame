@@ -803,7 +803,9 @@ void crystal_state::init_donghaer()
 
 void crystal_state::init_maldaiza()
 {
-	//uint16_t *rom = (uint16_t*)memregion("flash")->base();
+	uint16_t *rom = (uint16_t*)memregion("flash")->base();
+	rom[WORD_XOR_LE(0x09b12 / 2)] = 0x9004; // PUSH %R2
+	rom[WORD_XOR_LE(0x09b14 / 2)] = 0x8202; // LD   (%SP,0x8),%R2
 	// ...
 }
 
