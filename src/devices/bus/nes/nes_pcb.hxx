@@ -323,6 +323,8 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
 	{ "bmc_hik8in1",      BMC_HIK8IN1 },
+	{ "bmc_jy208",        BMC_JY208 },
+	{ "bmc_sfc12",        BMC_SFC12 },
 	{ "bmc_hik4in1",      BMC_SUPERHIK_4IN1 },
 	{ "bmc_mario7in1",    BMC_MARIOPARTY_7IN1 },
 	{ "bmc_f15",          BMC_F15 },

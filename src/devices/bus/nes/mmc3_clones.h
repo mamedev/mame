@@ -681,19 +681,51 @@ class nes_bmc_hik8_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	// construction/destruction
+	nes_bmc_hik8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 
+	u8 m_reg[4];
+
 private:
-	uint8_t m_reg[4];
-	uint8_t m_count;
+	u8 m_count;
+};
+
+
+// ======================> nes_bmc_jy208_device
+
+class nes_bmc_jy208_device : public nes_bmc_hik8_device
+{
+public:
+	// construction/destruction
+	nes_bmc_jy208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_m(offs_t offset, u8 data) override;
+
+protected:
+	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+};
+
+
+// ======================> nes_bmc_sfc12_device
+
+class nes_bmc_sfc12_device : public nes_bmc_hik8_device
+{
+public:
+	// construction/destruction
+	nes_bmc_sfc12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
 };
 
 
@@ -1123,6 +1155,8 @@ DECLARE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device)
+DECLARE_DEVICE_TYPE(NES_BMC_JY208,     nes_bmc_jy208_device)
+DECLARE_DEVICE_TYPE(NES_BMC_SFC12,     nes_bmc_sfc12_device)
 DECLARE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device)
 DECLARE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device)
