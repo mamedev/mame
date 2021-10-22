@@ -5064,152 +5064,152 @@ msgid "P9 Select"
 msgstr ""
 
 #: src/emu/inpttype.ipp:463
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Up"
 msgstr ""
 
 #: src/emu/inpttype.ipp:464
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Down"
 msgstr ""
 
 #: src/emu/inpttype.ipp:465
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left"
 msgstr ""
 
 #: src/emu/inpttype.ipp:466
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right"
 msgstr ""
 
 #: src/emu/inpttype.ipp:467
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Up"
 msgstr ""
 
 #: src/emu/inpttype.ipp:468
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Down"
 msgstr ""
 
 #: src/emu/inpttype.ipp:469
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Left"
 msgstr ""
 
 #: src/emu/inpttype.ipp:470
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Right"
 msgstr ""
 
 #: src/emu/inpttype.ipp:471
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Up"
 msgstr ""
 
 #: src/emu/inpttype.ipp:472
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Down"
 msgstr ""
 
 #: src/emu/inpttype.ipp:473
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Left"
 msgstr ""
 
 #: src/emu/inpttype.ipp:474
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Right"
 msgstr ""
 
 #: src/emu/inpttype.ipp:475
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 1"
 msgstr ""
 
 #: src/emu/inpttype.ipp:476
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 2"
 msgstr ""
 
 #: src/emu/inpttype.ipp:477
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 3"
 msgstr ""
 
 #: src/emu/inpttype.ipp:478
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 4"
 msgstr ""
 
 #: src/emu/inpttype.ipp:479
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 5"
 msgstr ""
 
 #: src/emu/inpttype.ipp:480
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 6"
 msgstr ""
 
 #: src/emu/inpttype.ipp:481
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 7"
 msgstr ""
 
 #: src/emu/inpttype.ipp:482
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 8"
 msgstr ""
 
 #: src/emu/inpttype.ipp:483
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 9"
 msgstr ""
 
 #: src/emu/inpttype.ipp:484
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 10"
 msgstr ""
 
 #: src/emu/inpttype.ipp:485
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 11"
 msgstr ""
 
 #: src/emu/inpttype.ipp:486
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 12"
 msgstr ""
 
 #: src/emu/inpttype.ipp:487
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 13"
 msgstr ""
 
 #: src/emu/inpttype.ipp:488
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 14"
 msgstr ""
 
 #: src/emu/inpttype.ipp:489
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 15"
 msgstr ""
 
 #: src/emu/inpttype.ipp:490
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 16"
 msgstr ""
 
 #: src/emu/inpttype.ipp:491
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Start"
 msgstr ""
 
 #: src/emu/inpttype.ipp:492
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Select"
 msgstr ""
 
