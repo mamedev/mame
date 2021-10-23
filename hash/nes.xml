@@ -82544,8 +82544,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- Van-1 doesn't load but instead reloads the menu with corrupt graphics -->
-	<software name="mc_fcya1" supported="partial">
+	<software name="mc_fcya1">
 		<description>Famicom Yarou Vol.1 - 7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
