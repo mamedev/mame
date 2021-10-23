@@ -733,7 +733,7 @@ u32 st0016_cpu_device::update(screen_device &screen, bitmap_ind16 &bitmap, const
 	{
 		int h, j;
 		FILE *p = fopen("vram.bin", "wb");
-		fwrite(m_spriteram.get(), 1, 0x1000 * MAX_SPR_BANK, p);
+		fwrite(&m_spriteram[0], 1, 0x1000 * MAX_SPR_BANK, p);
 		fclose(p);
 
 		p = fopen("vram.txt","wt");
