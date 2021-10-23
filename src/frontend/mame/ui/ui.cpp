@@ -212,7 +212,7 @@ void mame_ui_manager::init()
 			ui_callback_type::GENERAL,
 			[this] (render_container &container) -> uint32_t
 			{
-				draw_text_box(container, messagebox_text, ui::text_layout::LEFT, 0.5f, 0.5f, colors().background_color());
+				draw_text_box(container, messagebox_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
 				return 0;
 			});
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((std::size(non_char_keys) + 7) / 8);
@@ -436,7 +436,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		[this, &poller, &warning_text, &warning_color, &config_menu] (render_container &container) -> uint32_t
 		{
 			// draw a standard message window
-			draw_text_box(container, warning_text, ui::text_layout::LEFT, 0.5f, 0.5f, warning_color);
+			draw_text_box(container, warning_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, warning_color);
 
 			if (machine().ui_input().pressed(IPT_UI_CANCEL))
 			{
@@ -673,7 +673,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 
 	// display any popup messages
 	if (osd_ticks() < m_popup_text_end)
-		draw_text_box(container, messagebox_poptext, ui::text_layout::CENTER, 0.5f, 0.9f, colors().background_color());
+		draw_text_box(container, messagebox_poptext, ui::text_layout::text_justify::CENTER, 0.5f, 0.9f, colors().background_color());
 	else
 		m_popup_text_end = 0;
 
@@ -818,7 +818,12 @@ void mame_ui_manager::draw_outlined_box(render_container &container, float x0, f
 
 void mame_ui_manager::draw_text(render_container &container, std::string_view buf, float x, float y)
 {
-	draw_text_full(container, buf, x, y, 1.0f - x, ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NORMAL, colors().text_color(), colors().text_bg_color(), nullptr, nullptr);
+	draw_text_full(
+			container,
+			buf,
+			x, y, 1.0f - x,
+			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
+			mame_ui_manager::NORMAL, colors().text_color(), colors().text_bg_color(), nullptr, nullptr);
 }
 
 
@@ -884,15 +889,15 @@ void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout
 	auto actual_left = layout.actual_left();
 	auto actual_width = layout.actual_width();
 	auto actual_height = layout.actual_height();
-	auto x = std::min(std::max(xpos - actual_width / 2, box_lr_border()), 1.0f - actual_width - box_lr_border());
-	auto y = std::min(std::max(ypos - actual_height / 2, box_tb_border()), 1.0f - actual_height - box_tb_border());
+	auto x = std::clamp(xpos - actual_width / 2, box_lr_border(), 1.0f - actual_width - box_lr_border());
+	auto y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
 
 	// add a box around that
-	draw_outlined_box(container,
-			x - box_lr_border(),
-			y - box_tb_border(),
-			x + actual_width + box_lr_border(),
-			y + actual_height + box_tb_border(), backcolor);
+	draw_outlined_box(
+			container,
+			x - box_lr_border(), y - box_tb_border(),
+			x + actual_width + box_lr_border(), y + actual_height + box_tb_border(),
+			backcolor);
 
 	// emit the text
 	layout.emit(container, x - actual_left, y);
@@ -1120,8 +1125,12 @@ bool mame_ui_manager::can_paste()
 
 void mame_ui_manager::draw_fps_counter(render_container &container)
 {
-	draw_text_full(container, machine().video().speed_text(), 0.0f, 0.0f, 1.0f,
-		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+	draw_text_full(
+			container,
+			machine().video().speed_text(),
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
+			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -1132,8 +1141,12 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 void mame_ui_manager::draw_timecode_counter(render_container &container)
 {
 	std::string tempstring;
-	draw_text_full(container, machine().video().timecode_text(tempstring), 0.0f, 0.0f, 1.0f,
-		ui::text_layout::RIGHT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
+	draw_text_full(
+			container,
+			machine().video().timecode_text(tempstring),
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
+			OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -1144,8 +1157,12 @@ void mame_ui_manager::draw_timecode_counter(render_container &container)
 void mame_ui_manager::draw_timecode_total(render_container &container)
 {
 	std::string tempstring;
-	draw_text_full(container, machine().video().timecode_total_text(tempstring), 0.0f, 0.0f, 1.0f,
-		ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
+	draw_text_full(
+			container,
+			machine().video().timecode_total_text(tempstring),
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
+			OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -1156,7 +1173,12 @@ void mame_ui_manager::draw_timecode_total(render_container &container)
 void mame_ui_manager::draw_profiler(render_container &container)
 {
 	std::string_view text = g_profiler.text(machine());
-	draw_text_full(container, text, 0.0f, 0.0f, 1.0f, ui::text_layout::LEFT, ui::text_layout::WORD, OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+	draw_text_full(
+			container,
+			text,
+			0.0f, 0.0f, 1.0f,
+			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
+			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 }
 
 
@@ -1467,7 +1489,7 @@ uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
 			ui_select_text,
 			ui_cancel_text);
 
-	draw_text_box(container, quit_message, ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+	draw_text_box(container, quit_message, ui::text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	machine().pause();
 
 	// if the user press ENTER, quit the game
@@ -2101,26 +2123,6 @@ ui::text_layout mame_ui_manager::create_layout(render_container &container, floa
 
 
 //-------------------------------------------------
-//  wrap_text
-//-------------------------------------------------
-
-int mame_ui_manager::wrap_text(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size)
-{
-	// create the layout
-	auto layout = create_layout(container, origwrapwidth, ui::text_layout::LEFT, ui::text_layout::WORD);
-
-	// add the text
-	layout.add_text(
-			origs,
-			rgb_t::black(),
-			rgb_t::black(),
-			text_size);
-
-	// and get the wrapping info
-	return layout.get_wrap_info(xstart, xend);
-}
-
-//-------------------------------------------------
 //  draw_textured_box - add primitives to
 //  draw an outlined box with the given
 //  textured background and line color
@@ -2266,7 +2268,22 @@ void mame_ui_manager::menu_reset()
 
 std::string mame_ui_manager::get_general_input_setting(ioport_type type, int player, input_seq_type seqtype)
 {
-	return machine().input().seq_name(machine().ioport().type_seq(type, player, seqtype));
+	input_seq seq(machine().ioport().type_seq(type, player, seqtype));
+	input_code codes[16]; // TODO: remove magic number
+	unsigned len(0U);
+	for (unsigned i = 0U; std::size(codes) > i; ++i)
+	{
+		if (input_seq::not_code == seq[i])
+			++i;
+		else
+			codes[len++] = seq[i];
+		if (input_seq::end_code == seq[i])
+			break;
+	}
+	seq.reset();
+	for (unsigned i = 0U; len > i; ++i)
+		seq += codes[i];
+	return machine().input().seq_name(seq);
 }
 
 

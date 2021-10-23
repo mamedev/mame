@@ -5,6 +5,7 @@
 #include "cpu/m6502/st2205u.h"
 #include "video/bl_handhelds_lcdc.h"
 #include "screen.h"
+#include "speaker.h"
 
 class st22xx_bbl338_state : public driver_device
 {
@@ -25,11 +26,12 @@ public:
 protected:
 	virtual void machine_start() override;
 
-	required_device<st2xxx_device> m_maincpu;
+	required_device<st2205u_base_device> m_maincpu;
 
 private:
 	u8 porta_r();
 	void portb_w(u8 data);
+	void porta_w(u8 data);
 
 	void st22xx_bbl338_map(address_map &map);
 	void st22xx_dphh8213_map(address_map &map);
@@ -248,11 +250,21 @@ u8 st22xx_bbl338_state::porta_r()
 
 	// TODO: bit 7 is I/O for some bitbanged SPI device (used for the menu)
 	input |= 0xc0;
+
+	logerror("%s: port a read\n", machine().describe_context());
+
 	return input;
+}
+
+void st22xx_bbl338_state::porta_w(u8 data)
+{
+	// Menu control writes?
+	logerror("%s: port a write %02x\n", machine().describe_context(), data);
 }
 
 void st22xx_bbl338_state::portb_w(u8 data)
 {
+//	logerror("%s: port b write %02x\n", machine().describe_context(), data);
 	m_portb = data;
 }
 
@@ -306,8 +318,17 @@ void st22xx_bbl338_state::st22xx_dphh8213(machine_config &config)
 	ST2302U(config, m_maincpu, 24000000);
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_bbl338_state::st22xx_dphh8213_map);
 	m_maincpu->in_pa_callback().set(FUNC(st22xx_bbl338_state::porta_r));
+	m_maincpu->out_pa_callback().set(FUNC(st22xx_bbl338_state::porta_w));
+
 	m_maincpu->out_pb_callback().set(FUNC(st22xx_bbl338_state::portb_w));
 	m_maincpu->in_pc_callback().set_ioport("PORTC");
+
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(0, "mono", 1.00);
+	m_maincpu->add_route(1, "mono", 1.00);
+	m_maincpu->add_route(2, "mono", 1.00);
+	m_maincpu->add_route(3, "mono", 1.00);
+
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);

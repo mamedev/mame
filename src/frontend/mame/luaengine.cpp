@@ -85,7 +85,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 {
 	float const sc_width(sdev.visible_area().width());
 	float const sc_height(sdev.visible_area().height());
-	auto justify = ui::text_layout::LEFT;
+	auto justify = ui::text_layout::text_justify::LEFT;
 	float x = 0;
 	if (xobj.is<float>())
 	{
@@ -95,11 +95,11 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 	{
 		char const *const justifystr(xobj.as<char const *>());
 		if (!strcmp(justifystr, "left"))
-			justify = ui::text_layout::LEFT;
+			justify = ui::text_layout::text_justify::LEFT;
 		else if (!strcmp(justifystr, "right"))
-			justify = ui::text_layout::RIGHT;
+			justify = ui::text_layout::text_justify::RIGHT;
 		else if (!strcmp(justifystr, "center"))
-			justify = ui::text_layout::CENTER;
+			justify = ui::text_layout::text_justify::CENTER;
 	}
 	else
 	{
@@ -111,7 +111,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 			sdev.container(),
 			msg,
 			x, y, (1.0f - x),
-			justify, ui::text_layout::WORD,
+			justify, ui::text_layout::word_wrapping::WORD,
 			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
 }
 
@@ -432,48 +432,54 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	return sol::lua_nil;
 }
 
-void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
+std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string> > &menu_list, std::string &flags)
 {
 	std::string field = "menu_pop_" + menu;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>());
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_populate: %s\n", err.what());
 		}
 		else
 		{
-			sol::table table = res;
-			for(auto &entry : table)
+			std::tuple<sol::table, std::optional<long>, std::string> table = res;
+			for (auto &entry : std::get<0>(table))
 			{
-				if(entry.second.is<sol::table>())
+				if (entry.second.is<sol::table>())
 				{
 					sol::table enttable = entry.second.as<sol::table>();
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
+			flags = std::get<2>(table);
+			return std::get<1>(table);
 		}
 	}
+	flags.clear();
+	return std::nullopt;
 }
 
-bool lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
+std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
-	bool ret = false;
+	std::pair<bool, std::optional<long> > ret(false, std::nullopt);
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), index, event);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_callback: %s\n", err.what());
 		}
 		else
+		{
 			ret = res;
+		}
 	}
 	return ret;
 }

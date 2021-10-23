@@ -20,6 +20,7 @@
 
 #include <map>
 #include <memory>
+#include <optional>
 #include <vector>
 
 
@@ -311,6 +312,7 @@ private:
 	int                         m_info_view;
 	std::vector<std::string>    m_items_list;
 	std::string                 m_info_buffer;
+	std::optional<text_layout>  m_info_layout;
 
 	cache                   &m_cache;
 	bool                    m_is_swlist;

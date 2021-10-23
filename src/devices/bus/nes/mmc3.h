@@ -40,6 +40,7 @@ protected:
 	// are there MMC3 clones which need more regs?
 	uint16_t m_mmc_prg_bank[4];
 	uint16_t m_mmc_vrom_bank[8];  // a few clones need more than the 6 banks used by base MMC3 (e.g. waixing_g)
+	uint8_t m_mmc_mirror;
 
 	int m_prg_base, m_prg_mask; // MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
 	int m_chr_base, m_chr_mask; // while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.

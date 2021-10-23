@@ -168,6 +168,8 @@ protected:
 	u8 m_lvctr;
 
 	s16 m_adpcm_level[4];
+	u8 m_psg_amplitude[4];
+	u32 m_psg_freqcntr[4];
 };
 
 class st2205u_device : public st2205u_base_device

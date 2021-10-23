@@ -53,6 +53,8 @@ void marineb_state::machine_reset()
 {
 	m_palette_bank = 0;
 	m_column_scroll = 0;
+
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); // needed to prevent NMI from occurring on soft reset due to race condition
 }
 
 void marineb_state::machine_start()
@@ -74,6 +76,14 @@ WRITE_LINE_MEMBER(marineb_state::nmi_mask_w)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+uint8_t marineb_state::system_watchdog_r()
+{
+	// '161 counter is cleared by RD7, not WR7 (except on wanted and bcruzm12)
+	if (!machine().side_effects_disabled())
+		m_watchdog->reset_w();
+	return m_system->read();
+}
+
 void marineb_state::marineb_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
@@ -88,7 +98,13 @@ void marineb_state::marineb_map(address_map &map)
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb800, 0xb800).portr("SYSTEM").nopw();     /* also watchdog */
+	map(0xb800, 0xb800).r(FUNC(marineb_state::system_watchdog_r)).nopw();
+}
+
+void marineb_state::wanted_map(address_map &map)
+{
+	marineb_map(map);
+	map(0xb800, 0xb800).portr("SYSTEM").w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
 
@@ -525,13 +541,13 @@ GFXDECODE_END
 WRITE_LINE_MEMBER(marineb_state::marineb_vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 {
 	if (state && m_irq_mask)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -546,6 +562,8 @@ void marineb_state::marineb(machine_config &config)
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::nmi_mask_w));
 	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w));
 	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w));
+
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 16);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -602,6 +620,7 @@ void marineb_state::wanted(machine_config &config)
 	marineb(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &marineb_state::wanted_map);
 	m_maincpu->set_addrmap(AS_IO, &marineb_state::wanted_io_map);
 
 	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));

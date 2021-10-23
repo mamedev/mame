@@ -335,7 +335,7 @@ void menu_settings_dip_switches::custom_render(void *selectedref, float top, flo
 					container(),
 					group.name,
 					nameleft, liney + (lineheight * (DIP_SWITCH_HEIGHT - 1.0f) / 2.0f), namewidth,
-					ui::text_layout::RIGHT, ui::text_layout::NEVER,
+					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
 					mame_ui_manager::NORMAL, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			// draw the group outline

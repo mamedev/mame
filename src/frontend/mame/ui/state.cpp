@@ -431,13 +431,13 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 		draw_text_box(
 				std::begin(text), std::next(std::begin(text), count),
 				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + (count * ui().get_line_height()) + (3.0f * ui().box_tb_border()),
-				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
 
 	// draw the confirmation prompt if necessary
 	if (!m_confirm_prompt.empty())
-		ui().draw_text_box(container(), m_confirm_prompt, ui::text_layout::CENTER, 0.5f, 0.5f, ui().colors().background_color());
+		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5f, 0.5f, ui().colors().background_color());
 }
 
 

@@ -14,6 +14,10 @@ Watchpoint Debugger Commands
 :ref:`debugger-command-wplist`
     lists watchpoints
 
+Watchpoints halt execution and activate the debugger when a CPU accesses
+a location in a particular memory range.
+
+
 .. _debugger-command-wpset:
 
 wpset
@@ -83,10 +87,10 @@ Back to :ref:`debugger-watchpoints-list`
 wpclear
 -------
 
-**wpclear [<wpnum>]**
+**wpclear [<wpnum>[,…]]**
 
-Clear watchpoints.  If **<wpnum>** is specified, the watchpoint it
-refers to will be cleared.  If **<wpnum>** is not specified, all
+Clear watchpoints.  If **<wpnum>** is specified, the watchpoints
+referred to will be cleared.  If **<wpnum>** is not specified, all
 watchpoints will be cleared.
 
 Examples:
@@ -104,10 +108,10 @@ Back to :ref:`debugger-watchpoints-list`
 wpdisable
 ---------
 
-**wpdisable [<wpnum>]**
+**wpdisable [<wpnum>[,…]]**
 
-Disable watchpoints.  If **<wpnum>** is specified, the watchpoint it
-refers to will be disabled.  If **<wpnum>** is not specified, all
+Disable watchpoints.  If **<wpnum>** is specified, the watchpoints
+referred to will be disabled.  If **<wpnum>** is not specified, all
 watchpoints will be disabled.
 
 Note that disabling a watchpoint does not delete it, it just temporarily
@@ -130,10 +134,10 @@ Back to :ref:`debugger-watchpoints-list`
 wpenable
 --------
 
-**wpenable [<wpnum>]**
+**wpenable [<wpnum>[,…]]**
 
-Enable watchpoints.  If **<wpnum>** is specified, the watchpoint it
-refers to will be enabled.  If **<wpnum>** is not specified, all
+Enable watchpoints.  If **<wpnum>** is specified, the watchpoints
+referred to will be enabled.  If **<wpnum>** is not specified, all
 watchpoints will be enabled.
 
 Examples:

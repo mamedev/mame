@@ -62,54 +62,62 @@ menu_plugin::~menu_plugin()
 {
 }
 
-menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, char *menu) :
-		ui::menu(mui, container),
-		m_menu(menu)
+menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu) :
+	ui::menu(mui, container),
+	m_menu(menu),
+	m_process_flags(0U),
+	m_need_idle(false)
 {
 }
 
 void menu_plugin_opt::handle()
 {
-	const event *menu_event = process(0);
-
-	if (menu_event && uintptr_t(menu_event->itemref))
+	event const *const menu_event = process(m_process_flags);
+	void *const itemref = menu_event ? menu_event->itemref : get_selection_ref();
+	std::string key;
+	if (menu_event)
 	{
-		std::string key;
 		switch (menu_event->iptkey)
 		{
-			case IPT_UI_UP:
-				key = "up";
-				break;
-			case IPT_UI_DOWN:
-				key = "down";
-				break;
-			case IPT_UI_LEFT:
-				key = "left";
-				break;
-			case IPT_UI_RIGHT:
-				key = "right";
-				break;
-			case IPT_UI_SELECT:
-				key = "select";
-				break;
-			case IPT_UI_DISPLAY_COMMENT:
-				key = "comment";
-				break;
-			case IPT_UI_CLEAR:
-				key = "clear";
-				break;
-			case IPT_UI_CANCEL:
-				key = "cancel";
-				break;
-			case IPT_SPECIAL:
-				key = std::to_string((u32)menu_event->unichar);
-				break;
-			default:
-				return;
+		case IPT_UI_UP:
+			key = "up";
+			break;
+		case IPT_UI_DOWN:
+			key = "down";
+			break;
+		case IPT_UI_LEFT:
+			key = "left";
+			break;
+		case IPT_UI_RIGHT:
+			key = "right";
+			break;
+		case IPT_UI_SELECT:
+			key = "select";
+			break;
+		case IPT_UI_DISPLAY_COMMENT:
+			key = "comment";
+			break;
+		case IPT_UI_CLEAR:
+			key = "clear";
+			break;
+		case IPT_UI_CANCEL:
+			key = "cancel";
+			break;
+		case IPT_SPECIAL:
+			key = std::to_string((u32)menu_event->unichar);
+			break;
+		default:
+			break;
 		}
-		if (mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(menu_event->itemref), key))
+	}
+	if (!key.empty() || m_need_idle)
+	{
+		auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
+		if (result.second)
+			set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
+		if (result.first)
 			reset(reset_options::REMEMBER_REF);
-		else if (menu_event->iptkey == IPT_UI_CANCEL)
+		else if (menu_event && (menu_event->iptkey == IPT_UI_CANCEL))
 			stack_pop();
 	}
 }
@@ -117,33 +125,78 @@ void menu_plugin_opt::handle()
 void menu_plugin_opt::populate(float &customtop, float &custombottom)
 {
 	std::vector<std::tuple<std::string, std::string, std::string>> menu_list;
-	mame_machine_manager::instance()->lua()->menu_populate(m_menu, menu_list);
+	std::string flags;
+	auto const sel = mame_machine_manager::instance()->lua()->menu_populate(m_menu, menu_list, flags);
+
 	uintptr_t i = 1;
-	for(auto &item : menu_list)
+	for (auto &item : menu_list)
 	{
-		const std::string &text = std::get<0>(item);
-		const std::string &subtext = std::get<1>(item);
-		const std::string &tflags = std::get<2>(item);
+		std::string &text = std::get<0>(item);
+		std::string &subtext = std::get<1>(item);
+		std::string_view tflags = std::get<2>(item);
 
-		uint32_t flags = 0;
-		if(tflags == "off")
-			flags = FLAG_DISABLE;
-		else if(tflags == "l")
-			flags = FLAG_LEFT_ARROW;
-		else if(tflags == "r")
-			flags = FLAG_RIGHT_ARROW;
-		else if(tflags == "lr")
-			flags = FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
-
-		if(text == "---")
+		uint32_t item_flags_or = uint32_t(0);
+		uint32_t item_flags_and = ~uint32_t(0);
+		auto flag_start = tflags.find_first_not_of(' ');
+		while (std::string_view::npos != flag_start)
 		{
-			item_append(menu_item_type::SEPARATOR);
-			i++;
+			tflags.remove_prefix(flag_start);
+			auto const flag_end = tflags.find(' ');
+			auto const flag = tflags.substr(0, flag_end);
+			tflags.remove_prefix(flag.length());
+			flag_start = tflags.find_first_not_of(' ');
+
+			if (flag == "off")
+				item_flags_or |= FLAG_DISABLE;
+			else if (flag == "on")
+				item_flags_and &= ~FLAG_DISABLE;
+			else if (flag == "l")
+				item_flags_or |= FLAG_LEFT_ARROW;
+			else if (flag == "r")
+				item_flags_or |= FLAG_RIGHT_ARROW;
+			else if (flag == "lr")
+				item_flags_or |= FLAG_RIGHT_ARROW | FLAG_LEFT_ARROW;
+			else if (flag == "invert")
+				item_flags_or |= FLAG_INVERT;
+			else if (flag == "heading")
+				item_flags_or |= FLAG_DISABLE | FLAG_UI_HEADING;
 		}
+
+		if (text == "---")
+			item_append(menu_item_type::SEPARATOR);
 		else
-			item_append(text, subtext, flags, (void *)i++);
+			item_append(std::move(text), std::move(subtext), item_flags_or & item_flags_and, reinterpret_cast<void *>(i));
+		++i;
 	}
 	item_append(menu_item_type::SEPARATOR);
+
+	if (sel)
+		set_selection(reinterpret_cast<void *>(uintptr_t(*sel)));
+
+	m_process_flags = 0U;
+	m_need_idle = false;
+	if (!flags.empty())
+	{
+		std::string_view mflags = flags;
+		auto flag_start = mflags.find_first_not_of(' ');
+		while (std::string_view::npos != flag_start)
+		{
+			mflags.remove_prefix(flag_start);
+			auto const flag_end = mflags.find(' ');
+			auto const flag = mflags.substr(0, flag_end);
+			mflags.remove_prefix(flag.length());
+			flag_start = mflags.find_first_not_of(' ');
+
+			if (flag == "lralways")
+				m_process_flags |= PROCESS_LR_ALWAYS;
+			else if (flag == "lrrepeat")
+				m_process_flags |= PROCESS_LR_REPEAT;
+			else if (flag == "customnav")
+				m_process_flags |= PROCESS_CUSTOM_NAV;
+			else if (flag == "idle")
+				m_need_idle = true;
+		}
+	}
 }
 
 menu_plugin_opt::~menu_plugin_opt()

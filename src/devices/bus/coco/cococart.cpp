@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "cococart.h"
+#include "formats/rpk.h"
 
 #include "coco_dcmodem.h"
 #include "coco_fdc.h"
@@ -93,6 +94,23 @@ enum
 	TIMER_CART,
 	TIMER_NMI,
 	TIMER_HALT
+};
+
+
+// definitions of RPK PCBs in layout.xml
+static const char *coco_rpk_pcbdefs[] =
+{
+	"standard",
+	"paged16k",
+	nullptr
+};
+
+
+// ...and their mappings to "default card slots"
+static const char *coco_rpk_cardslottypes[] =
+{
+	"pak",
+	"banked_16k"
 };
 
 
@@ -475,6 +493,63 @@ void cococart_slot_device::set_cart_base_update(cococart_base_update_delegate up
 
 
 //-------------------------------------------------
+//  read_coco_rpk
+//-------------------------------------------------
+
+static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&stream, rpk_file::ptr &result)
+{
+	// sanity checks
+	static_assert(std::size(coco_rpk_pcbdefs) - 1 == std::size(coco_rpk_cardslottypes));
+
+	// set up the RPK reader
+	rpk_reader reader(coco_rpk_pcbdefs, false);
+
+	// and read the RPK file
+	return reader.read(std::move(stream), result);
+}
+
+
+//-------------------------------------------------
+//  read_coco_rpk
+//-------------------------------------------------
+
+static std::error_condition read_coco_rpk(std::unique_ptr<util::random_read> &&stream, u8 *mem, offs_t cart_length, offs_t &actual_length)
+{
+	actual_length = 0;
+
+	// open the RPK
+	rpk_file::ptr file;
+	std::error_condition err = read_coco_rpk(std::move(stream), file);
+	if (err)
+		return err;
+
+	// for now, we are just going to load all sockets into the contiguous block of memory
+	// that cartridges use
+	offs_t pos = 0;
+	for (const rpk_socket &socket : file->sockets())
+	{
+		// only ROM supported for now; if we see anything else it should have been caught in the RPK code
+		assert(socket.type() == rpk_socket::socket_type::ROM);
+
+		// read all bytes
+		std::vector<uint8_t> contents;
+		err = socket.read_file(contents);
+		if (err)
+			return err;
+
+		// copy the bytes
+		offs_t size = (offs_t) std::min(contents.size(), (size_t)cart_length - pos);
+		memcpy(&mem[pos], &contents[0], size);
+		pos += size;
+	}
+
+	// we're done!
+	actual_length = pos;
+	return std::error_condition();
+}
+
+
+//-------------------------------------------------
 //  call_load
 //-------------------------------------------------
 
@@ -486,14 +561,26 @@ image_init_result cococart_slot_device::call_load()
 		u8 *base = cart_mem->base();
 		offs_t read_length, cart_length = cart_mem->bytes();
 
-		if (!loaded_through_softlist())
+		if (loaded_through_softlist())
 		{
-			read_length = fread(base, cart_length);
+			// loaded through softlist
+			read_length = get_software_region_length("rom");
+			memcpy(base, get_software_region("rom"), read_length);
+		}
+		else if (is_filetype("rpk"))
+		{
+			// RPK file
+			util::core_file::ptr proxy;
+			std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+			if (!err)
+				err = read_coco_rpk(std::move(proxy), base, cart_length, read_length);
+			if (err)
+				return image_init_result::FAIL;
 		}
 		else
 		{
-			read_length = get_software_region_length("rom");
-			memcpy(base, get_software_region("rom"), read_length);
+			// conventional ROM image
+			read_length = fread(base, cart_length);
 		}
 
 		while (read_length < cart_length)
@@ -513,9 +600,25 @@ image_init_result cococart_slot_device::call_load()
 
 std::string cococart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	return software_get_default_slot("pak");
-}
+	// this is the default for anything not in an RPK file
+	int pcb_type = 0;
 
+	// is this an RPK?
+	if (hook.is_filetype("rpk"))
+	{
+		// RPK file
+		rpk_file::ptr file;
+		util::core_file::ptr proxy;
+		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+		if (!err)
+			err = read_coco_rpk(std::move(proxy), file);
+		if (!err)
+			pcb_type = file->pcb_type();
+	}
+
+	// lookup the default slot
+	return software_get_default_slot(coco_rpk_cardslottypes[pcb_type]);
+}
 
 
 //**************************************************************************

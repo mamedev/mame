@@ -14,6 +14,9 @@ Breakpoint Debugger Commands
 :ref:`debugger-command-bplist`
     lists breakpoints
 
+Breakpoints halt execution and activate the debugger before a CPU
+executes an instruction at a particular address.
+
 
 .. _debugger-command-bpset:
 
@@ -75,10 +78,10 @@ Back to :ref:`debugger-breakpoint-list`
 bpclear
 -------
 
-**bpclear [<bpnum>]**
+**bpclear [<bpnum>[,…]]**
 
-Clear breakpoints.  If **<bpnum>** is specified, the breakpoint it
-refers to will be cleared.  If **<bpnum>** is not specified, all
+Clear breakpoints.  If **<bpnum>** is specified, the breakpoints
+referred to will be cleared.  If **<bpnum>** is not specified, all
 breakpoints will be cleared.
 
 Examples:
@@ -96,10 +99,10 @@ Back to :ref:`debugger-breakpoint-list`
 bpdisable
 ---------
 
-**bpdisable [<bpnum>]**
+**bpdisable [<bpnum>[,…]]**
 
-Disable breakpoints.  If **<bpnum>** is specified, the breakpoint it
-refers to will be disabled.  If **<bpnum>** is not specified, all
+Disable breakpoints.  If **<bpnum>** is specified, the breakpoints
+referred to will be disabled.  If **<bpnum>** is not specified, all
 breakpoints will be disabled.
 
 Note that disabling a breakpoint does not delete it, it just temporarily
@@ -122,10 +125,10 @@ Back to :ref:`debugger-breakpoint-list`
 bpenable
 --------
 
-**bpenable [<bpnum>]**
+**bpenable [<bpnum>[,…]]**
 
-Enable breakpoints.  If **<bpnum>** is specified, the breakpoint it
-refers to will be enabled.  If **<bpnum>** is not specified, all
+Enable breakpoints.  If **<bpnum>** is specified, the breakpoint
+referred to will be enabled.  If **<bpnum>** is not specified, all
 breakpoints will be enabled.
 
 Examples:

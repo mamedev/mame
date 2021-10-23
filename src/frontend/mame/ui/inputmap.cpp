@@ -282,7 +282,7 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 		draw_text_box(
 				std::begin(text), std::end(text),
 				x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
 	else
@@ -299,7 +299,7 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 			draw_text_box(
 					std::begin(text), std::end(text),
 					x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-					ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
 		}
 		else if (selectedref)
@@ -311,7 +311,7 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 				draw_text_box(
 						std::begin(text), std::end(text),
 						x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-						ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+						text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 						ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 			}
 			else
@@ -322,7 +322,7 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 				draw_text_box(
 						std::begin(text), std::end(text),
 						x1, x2, y2 + ui().box_tb_border(), y2 + bottom,
-						ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+						text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 						ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 			}
 		}
@@ -481,9 +481,9 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 			else
 				item_append(menu_item_type::SEPARATOR);
 			if (item.owner->owner())
-				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), 0, nullptr);
+				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			else
-				item_append(string_format(_("[root%1$s]"), item.owner->tag()), 0, nullptr);
+				item_append(string_format(_("[root%1$s]"), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			prev_owner = item.owner;
 		}
 

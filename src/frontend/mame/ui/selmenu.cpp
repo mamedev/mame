@@ -321,7 +321,7 @@ void menu_select_launch::software_parts::custom_render(void *selectedref, float 
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -427,7 +427,7 @@ void menu_select_launch::bios_selection::custom_render(void *selectedref, float 
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -527,6 +527,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_info_view(-1)
 	, m_items_list()
 	, m_info_buffer()
+	, m_info_layout()
 	, m_cache(mui.get_session_data<menu_select_launch, cache_wrapper>(machine()))
 	, m_is_swlist(is_swlist)
 	, m_focus(focused_menu::MAIN)
@@ -653,7 +654,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	draw_text_box(
 			tempbuf, tempbuf + 3,
 			origx1, origx2, origy1 - top, y1,
-			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, true,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// draw toolbar
@@ -760,7 +761,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	draw_text_box(
 			std::begin(tempbuf), std::end(tempbuf),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::NEVER, true,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, true,
 			ui().colors().text_color(), color, 1.0f);
 
 	// is favorite? draw the star
@@ -854,18 +855,10 @@ void menu_select_launch::inkey_dats()
 	ui_software_info const *software;
 	ui_system_info const *system;
 	get_selection(software, system);
-	if (software)
-	{
-		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system);
-		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
-			menu::stack_push<menu_dats_view>(ui(), container(), software);
-	}
+	if (software && !software->startempty)
+		menu::stack_push<menu_dats_view>(ui(), container(), *software);
 	else if (system)
-	{
-		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", system->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system);
-	}
+		menu::stack_push<menu_dats_view>(ui(), container(), system);
 }
 
 
@@ -948,7 +941,7 @@ void menu_select_launch::draw_info_arrow(int ub, float origx1, float origx2, flo
 bool menu_select_launch::draw_error_text()
 {
 	if (m_ui_error)
-		ui().draw_text_box(container(), m_error_text, ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+		ui().draw_text_box(container(), m_error_text, text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 
 	return m_ui_error;
 }
@@ -1039,7 +1032,7 @@ float menu_select_launch::draw_left_panel(
 		ui().draw_text_full(
 				container(), str,
 				x1t, y1, x2 - x1,
-				ui::text_layout::LEFT, ui::text_layout::NEVER,
+				text_layout::text_justify::LEFT, text_layout::word_wrapping::NEVER,
 				mame_ui_manager::NORMAL, fgcolor, bgcolor,
 				nullptr, nullptr, text_size);
 		y1 += line_height_max;
@@ -1276,7 +1269,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	m_cache.cache_toolbar(machine(), x_size, y2 - y1);
 
 	// add backtrack button
-	rgb_t color(0xefefefef);
+	rgb_t color(0xffcccccc);
 	if (mouse_in_rect(backtrack_pos, y1, x2, y2))
 	{
 		set_hover(HOVER_BACKTRACK);
@@ -1285,7 +1278,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 		ui().draw_text_box(
 				container(),
 				have_parent ? _("Return to previous menu") : _("Exit"),
-				ui::text_layout::RIGHT, 1.0f - lr_border, ypos,
+				text_layout::text_justify::RIGHT, 1.0f - lr_border, ypos,
 				ui().colors().background_color());
 	}
 	container().add_quad(
@@ -1298,23 +1291,28 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	x1 = (std::min)(backtrack_pos - (float(toolbar_count) * x_spacing), x1 + ((x2 - x1 - total_width) * 0.5f));
 	for (int z = 0; toolbar_count > z; ++z, x1 += x_spacing)
 	{
+		auto const bitmap = toolbar_bitmaps[z];
 		x2 = x1 + x_size;
-		color = rgb_t (0xefefefef);
+		color = rgb_t (0xffcccccc);
 		if (mouse_in_rect(x1, y1, x2, y2))
 		{
-			set_hover(HOVER_B_FAV + toolbar_bitmaps[z]);
-			color = rgb_t::white();
+			bool const need_selection = (TOOLBAR_BITMAP_FAVORITE == bitmap) || (TOOLBAR_BITMAP_INFO == bitmap);
+			if (!need_selection || get_selection_ptr())
+			{
+				set_hover(HOVER_B_FAV + bitmap);
+				color = rgb_t::white();
+			}
 			float ypos = y2 + ui().get_line_height() + 2.0f * ui().box_tb_border();
 			ui().draw_text_box(
 					container(),
-					_(hover_msg[toolbar_bitmaps[z]]),
-					ui::text_layout::CENTER, (x1 + x2) * 0.5f, ypos,
+					_(hover_msg[bitmap]),
+					text_layout::text_justify::CENTER, (x1 + x2) * 0.5f, ypos,
 					ui().colors().background_color());
 		}
 		container().add_quad(
 				x1, y1, x2, y2,
 				color,
-				m_cache.toolbar_textures()[toolbar_bitmaps[z]].get(),
+				m_cache.toolbar_textures()[bitmap].get(),
 				PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 }
@@ -1526,7 +1524,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			m_topline_datsview -= m_right_visible_lines - 1;
+			m_topline_datsview -= m_right_visible_lines - 3;
 			return;
 		}
 
@@ -1544,7 +1542,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		// Infos
 		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
 		{
-			m_topline_datsview += m_right_visible_lines - 1;
+			m_topline_datsview += m_right_visible_lines - 3;
 			return;
 		}
 
@@ -1714,9 +1712,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				else if (hover() == HOVER_UI_LEFT)
 					ev.iptkey = IPT_UI_LEFT;
 				else if (hover() == HOVER_DAT_DOWN)
-					m_topline_datsview += m_right_visible_lines - 1;
+					m_topline_datsview += m_right_visible_lines - 3;
 				else if (hover() == HOVER_DAT_UP)
-					m_topline_datsview -= m_right_visible_lines - 1;
+					m_topline_datsview -= m_right_visible_lines - 3;
 				else if (hover() == HOVER_LPANEL_ARROW)
 				{
 					if (get_focus() == focused_menu::LEFT)
@@ -2064,7 +2062,7 @@ void menu_select_launch::draw(uint32_t flags)
 					container(),
 					itemtext,
 					effective_left + icon_offset, line_y, effective_width - icon_offset,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
 					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					nullptr, nullptr);
 		}
@@ -2079,7 +2077,7 @@ void menu_select_launch::draw(uint32_t flags)
 					container(),
 					subitem_text,
 					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext),
-					ui::text_layout::RIGHT, ui::text_layout::NEVER,
+					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
 					mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					&subitem_width, nullptr);
 			subitem_width += gutter_width;
@@ -2091,7 +2089,7 @@ void menu_select_launch::draw(uint32_t flags)
 					container(),
 					itemtext,
 					effective_left + icon_offset, line_y, effective_width - icon_offset - subitem_width,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+					text_layout::text_justify::LEFT, text_layout::word_wrapping::TRUNCATE,
 					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					&item_width, nullptr);
 
@@ -2100,7 +2098,7 @@ void menu_select_launch::draw(uint32_t flags)
 					container(),
 					subitem_text,
 					effective_left + icon_offset + item_width, line_y, effective_width - icon_offset - item_width,
-					ui::text_layout::RIGHT, ui::text_layout::NEVER,
+					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
 					mame_ui_manager::NORMAL, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					nullptr, nullptr);
 		}
@@ -2138,13 +2136,21 @@ void menu_select_launch::draw(uint32_t flags)
 
 		if (pitem.type == menu_item_type::SEPARATOR)
 		{
-			container().add_line(visible_left, line + 0.5f * line_height, visible_left + visible_width, line + 0.5f * line_height,
-					UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container().add_line(
+					visible_left, line + 0.5f * line_height,
+					visible_left + visible_width, line + 0.5f * line_height,
+					UI_LINE_WIDTH,
+					ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
 		else
 		{
-			ui().draw_text_full(container(), itemtext, effective_left, line, effective_width, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+			ui().draw_text_full(
+					container(),
+					itemtext,
+					effective_left, line, effective_width,
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+					mame_ui_manager::NORMAL, fgcolor, bgcolor,
+					nullptr, nullptr);
 		}
 		line += line_height;
 	}
@@ -2273,7 +2279,9 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
-			ui().draw_textured_box(container(), x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
+			ui().draw_textured_box(
+					container(),
+					x1 + UI_LINE_WIDTH, y1 + UI_LINE_WIDTH, x1 + midl - UI_LINE_WIDTH, y1 + line_height,
 					bgcolor, rgb_t(43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 		else if (bgcolor == ui().colors().mouseover_bg_color())
@@ -2282,8 +2290,12 @@ float menu_select_launch::draw_right_box_title(float x1, float y1, float x2, flo
 					bgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 		}
 
-		ui().draw_text_full(container(), buffer[cells], x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
-				ui::text_layout::CENTER, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
+		ui().draw_text_full(
+				container(),
+				buffer[cells],
+				x1 + UI_LINE_WIDTH, y1, midl - UI_LINE_WIDTH,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+				mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, text_size);
 		x1 += midl;
 	}
 
@@ -2386,7 +2398,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 		float text_length;
 		ui().draw_text_full(container(),
 				_("selmenu-artwork", arts_info[x].first), origx1, origy1, origx2 - origx1,
-				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
 				&text_length, nullptr);
 		title_size = (std::max)(text_length + 0.01f, title_size);
 	}
@@ -2412,7 +2424,7 @@ std::string menu_select_launch::arts_render_common(float origx1, float origy1, f
 
 	ui().draw_text_full(container(),
 			snaptext, origx1, origy1 + ui().box_tb_border(), origx2 - origx1,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor,
 			nullptr, nullptr, tmp_size);
 
 	draw_common_arrow(origx1, origy1 + ui().box_tb_border(), origx2, origy2, m_image_view, FIRST_VIEW, LAST_VIEW, title_size);
@@ -2682,9 +2694,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 {
 	float const line_height = ui().get_line_height();
 	float text_size = ui().options().infos_size();
-	std::vector<int> xstart;
-	std::vector<int> xend;
-	const char *first = "";
+	std::string_view first;
 	ui_software_info const *software;
 	ui_system_info const *system;
 	int total;
@@ -2693,11 +2703,12 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (software && !software->startempty)
 	{
 		m_info_driver = nullptr;
-		first = N_("Software List Info");
+		first = _("Software List Info");
 
 		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
 			m_info_buffer.clear();
+			m_info_layout = std::nullopt;
 			if (software == m_info_software)
 			{
 				m_info_view = ui_globals::cur_sw_dats_view;
@@ -2729,11 +2740,12 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	{
 		game_driver const &driver(system ? *system->driver : *software->driver);
 		m_info_software = nullptr;
-		first = N_("General Info");
+		first = _("General Info");
 
 		if (&driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
 			m_info_buffer.clear();
+			m_info_layout = std::nullopt;
 			if (&driver == m_info_driver)
 			{
 				m_info_view = ui_globals::curdats_view;
@@ -2772,18 +2784,18 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_("selmenu-artwork", first)));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : first);
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_("selmenu-artwork", first)));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : first);
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,
 				origx1, origy1, origx2 - origx1,
-				ui::text_layout::CENTER, ui::text_layout::NEVER,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
 				mame_ui_manager::NONE, ui().colors().text_color(), ui().colors().text_bg_color(),
 				&txt_length, nullptr);
 		txt_length += 0.01f;
@@ -2807,122 +2819,59 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 
 	if (bgcolor != ui().colors().text_bg_color())
 	{
-		ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
+		ui().draw_textured_box(
+				container(),
+				origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
+				origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 	}
 
-	ui().draw_text_full(container(), snaptext, origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
-			ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
+	ui().draw_text_full(
+			container(),
+			snaptext,
+			origx1, origy1, origx2 - origx1,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER,
+			mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
 
-	char justify = 'l'; // left justify
-	if ((m_info_buffer.length() >= 3) && (m_info_buffer[0] == '#'))
+	sc = origx2 - origx1 - (2.0f * gutter_width);
+	if (!m_info_layout || (m_info_layout->width() != sc))
 	{
-		if (m_info_buffer[1] == 'j')
-			justify = m_info_buffer[2];
+		m_info_layout.emplace(
+				ui().create_layout(
+					container(),
+					sc,
+					text_layout::text_justify::LEFT, text_layout::word_wrapping::WORD));
+		menu_dats_view::add_info_text(*m_info_layout, m_info_buffer, ui().colors().text_color(), text_size);
+		m_total_lines = m_info_layout->lines();
 	}
 
 	draw_common_arrow(origx1, origy1, origx2, origy2, m_info_view, 0, total - 1, title_size);
-	if (justify == 'f')
-	{
-		m_total_lines = ui().wrap_text(
-				container(), m_info_buffer,
-				0.0f, 0.0f, 1.0f - (2.0f * gutter_width),
-				xstart, xend,
-				text_size);
-	}
-	else
-	{
-		m_total_lines = ui().wrap_text(
-				container(), m_info_buffer,
-				origx1, origy1, origx2 - origx1 - (2.0f * gutter_width),
-				xstart, xend,
-				text_size);
-	}
 
-	int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-	if (m_total_lines < r_visible_lines)
-		r_visible_lines = m_total_lines;
+	m_right_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
+	if (m_total_lines < m_right_visible_lines)
+		m_right_visible_lines = m_total_lines;
 	if (m_topline_datsview < 0)
 		m_topline_datsview = 0;
-	if (m_topline_datsview + r_visible_lines >= m_total_lines)
-		m_topline_datsview = m_total_lines - r_visible_lines;
+	if ((m_topline_datsview + m_right_visible_lines) >= m_total_lines)
+		m_topline_datsview = m_total_lines - m_right_visible_lines;
+
+	// get the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
+	bool const up_arrow = m_topline_datsview > 0;
+	bool const down_arrow = (m_topline_datsview + m_right_visible_lines) < m_total_lines;
+	int const r_visible_lines = m_right_visible_lines - (up_arrow ? 1 : 0) - (down_arrow ? 1 : 0);
 
 	if (mouse_in_rect(origx1 + gutter_width, oy1, origx2 - gutter_width, origy2))
 		set_hover(HOVER_INFO_TEXT);
 
-	sc = origx2 - origx1 - (2.0f * gutter_width);
-	for (int r = 0; r < r_visible_lines; ++r)
-	{
-		int itemline = r + m_topline_datsview;
-		std::string_view const tempbuf(std::string_view(m_info_buffer).substr(xstart[itemline], xend[itemline] - xstart[itemline]));
-		if (!tempbuf.empty() && (tempbuf[0] == '#'))
-			continue;
+	if (up_arrow)
+		draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
+	if (down_arrow)
+		draw_info_arrow(1, origx1, origx2, oy1 + (float(m_right_visible_lines - 1) * line_height * text_size), line_height, text_size, ud_arrow_width);
 
-		if (r == 0 && m_topline_datsview != 0) // up arrow
-		{
-			draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-		}
-		else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1) // bottom arrow
-		{
-			draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-		}
-		else if (justify == '2') // two-column layout
-		{
-			// split at first tab
-			std::string_view::size_type const splitpos(tempbuf.find('\t'));
-			std::string_view const leftcol(tempbuf.substr(0, (std::string_view::npos == splitpos) ? 0U : splitpos));
-			std::string_view const rightcol(tempbuf.substr((std::string_view::npos == splitpos) ? 0U : (splitpos + 1U)));
-
-			// measure space needed, condense if necessary
-			float const leftlen(ui().get_string_width(leftcol, text_size));
-			float const rightlen(ui().get_string_width(rightcol, text_size));
-			float const textlen(leftlen + rightlen);
-			float const tmp_size3((textlen > sc) ? (text_size * (sc / textlen)) : text_size);
-
-			// draw in two parts
-			ui().draw_text_full(
-					container(), leftcol,
-					origx1 + gutter_width, oy1, sc,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
-					nullptr, nullptr,
-					tmp_size3);
-			ui().draw_text_full(
-					container(), rightcol,
-					origx1 + gutter_width, oy1, sc,
-					ui::text_layout::RIGHT, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
-					nullptr, nullptr,
-					tmp_size3);
-		}
-		else if (justify == 'f' || justify == 'p') // full or partial justify
-		{
-			// check size
-			float const textlen = ui().get_string_width(tempbuf, text_size);
-			float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
-			ui().draw_text_full(
-					container(), tempbuf,
-					origx1 + gutter_width, oy1, origx2 - origx1,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
-					nullptr, nullptr,
-					tmp_size3);
-		}
-		else
-		{
-			ui().draw_text_full(
-					container(), tempbuf,
-					origx1 + gutter_width, oy1, origx2 - origx1,
-					ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
-					nullptr, nullptr,
-					text_size);
-		}
-
-		oy1 += (line_height * text_size);
-	}
-	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	m_right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
+	m_info_layout->emit(
+			container(),
+			m_topline_datsview ? (m_topline_datsview + 1) : 0, r_visible_lines,
+			origx1 + gutter_width, oy1 + (m_topline_datsview ? (line_height * text_size) : 0.0f));
 }
 
 
@@ -2937,17 +2886,23 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 
 	str << "#j2\n";
 
-	util::stream_format(str, _("Romset\t%1$-.100s\n"), driver.name);
+	if (system)
+		str << system->description;
+	else
+		str << driver.type.fullname();
+	str << "\t\n\n";
+
+	util::stream_format(str, _("Romset\t%1$s\n"), driver.name);
 	util::stream_format(str, _("Year\t%1$s\n"), driver.year);
-	util::stream_format(str, _("Manufacturer\t%1$-.100s\n"), driver.manufacturer);
+	util::stream_format(str, _("Manufacturer\t%1$s\n"), driver.manufacturer);
 
 	int cloneof = driver_list::non_bios_clone(driver);
 	if (0 <= cloneof)
 	{
 		util::stream_format(
 				str,
-				_("Driver is Clone of\t%1$-.100s\n"),
-				system ? system->parent : driver_list::driver(cloneof).type.fullname());
+				_("Driver is Clone of\t%1$s\n"),
+				system ? std::string_view(system->parent) : std::string_view(driver_list::driver(cloneof).type.fullname()));
 	}
 	else
 	{

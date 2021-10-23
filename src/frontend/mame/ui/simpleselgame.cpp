@@ -149,7 +149,7 @@ void simple_menu_select_game::handle()
 				container(),
 				_("The selected game is missing one or more required ROM or CHD images. "
 				"Please select a different game.\n\nPress any key to continue."),
-				ui::text_layout::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
+				text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
 	}
 }
 
@@ -314,7 +314,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	draw_text_box(
 			tempbuf, tempbuf + 1,
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 
 	// determine the text to render below
@@ -396,7 +396,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	draw_text_box(
 			tempbuf, tempbuf + 4,
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, true,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, true,
 			ui().colors().text_color(), driver ? m_cached_color : ui().colors().background_color(), 1.0f);
 }
 

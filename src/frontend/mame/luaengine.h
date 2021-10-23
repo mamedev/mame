@@ -16,12 +16,10 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
+#include <tuple>
 #include <vector>
-
-#if defined(__GNUC__) && (__GNUC__ > 6)
-#pragma GCC diagnostic ignored "-Wnoexcept-type"
-#endif
 
 #define SOL_SAFE_USERTYPE 1
 #include "sol/sol.hpp"
@@ -50,8 +48,8 @@ public:
 
 	bool frame_hook();
 
-	void menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list);
-	bool menu_callback(const std::string &menu, int index, const std::string &event);
+	std::optional<long> menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string> > &menu_list, std::string &flags);
+	std::pair<bool, std::optional<long> > menu_callback(const std::string &menu, int index, const std::string &event);
 
 	void set_machine(running_machine *machine);
 	std::vector<std::string> &get_menu() { return m_menu; }

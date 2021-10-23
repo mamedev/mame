@@ -37,7 +37,7 @@ class menu
 {
 public:
 	// flags for menu items
-	enum : unsigned
+	enum : uint32_t
 	{
 		FLAG_LEFT_ARROW     = 1U << 0,
 		FLAG_RIGHT_ARROW    = 1U << 1,
@@ -45,7 +45,6 @@ public:
 		FLAG_MULTILINE      = 1U << 3,
 		FLAG_REDTEXT        = 1U << 4,
 		FLAG_DISABLE        = 1U << 5,
-		FLAG_UI_DATS        = 1U << 6,
 		FLAG_UI_HEADING     = 1U << 7,
 		FLAG_COLOR_BOX      = 1U << 8
 	};
@@ -109,10 +108,11 @@ protected:
 		PROCESS_NOKEYS      = 1 << 0,
 		PROCESS_LR_ALWAYS   = 1 << 1,
 		PROCESS_LR_REPEAT   = 1 << 2,
-		PROCESS_CUSTOM_ONLY = 1 << 3,
-		PROCESS_ONLYCHAR    = 1 << 4,
-		PROCESS_NOINPUT     = 1 << 5,
-		PROCESS_NOIMAGE     = 1 << 6
+		PROCESS_CUSTOM_NAV  = 1 << 3,
+		PROCESS_CUSTOM_ONLY = 1 << 4,
+		PROCESS_ONLYCHAR    = 1 << 5,
+		PROCESS_NOINPUT     = 1 << 6,
+		PROCESS_NOIMAGE     = 1 << 7
 	};
 
 	// options for reset
