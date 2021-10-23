@@ -52437,6 +52437,25 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_7j208">
+		<description>Rockman 7 in 1 (JY-208)</description>
+		<year>199?</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy208" />
+			<feature name="mirroring" value="4screen" />
+			<dataarea name="prg" size="2097152">
+				<rom name="rockman 7-in-1 (jy-208).prg" size="2097152" crc="413d3dbf" sha1="47fbef7a2b3a33435b64e02d9068d20049369415" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="rockman 7-in-1 (jy-208).chr" size="524288" crc="9a69e951" sha1="2f5dffbb134025c79011741ebdbf67a7b0490927" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Sachen / Thin Chen (and clones) -->
 
@@ -66955,6 +66974,44 @@ All musics were removed in this game.
 		</part>
 	</software>
 
+	<software name="mc_rockma" cloneof="mc_rockm" supported="no">
+		<description>Rockman 6 in 1 (alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fk23ca" />
+			<feature name="pcb" value="BMC-FK23CA" />
+			<dataarea name="prg" size="2097152">
+				<rom name="rockman 6-in-1 (rev1).prg" size="2097152" crc="9cd36298" sha1="35a6d451f5c439f167ff153580fa3d8196bf6fe9" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="rockman 6-in-1 (rev1).chr" size="524288" crc="775b088c" sha1="6b4ed379be4d7948a20f171251629338f243bd8e" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_rockmb" cloneof="mc_rockm">
+		<description>Rockman 6 in 1 (alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_sfc12" />
+			<feature name="pcb_model" value="SFC-12" />
+			<dataarea name="prg" size="2097152">
+				<rom name="rockman 6-in-1 (rev2).prg" size="2097152" crc="c07f8390" sha1="3fd7f18502a34afa962e9885f7cfa1a8be0b3f6a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="524288">
+				<rom name="rockman 6-in-1 (rev2).chr" size="524288" crc="775b088c" sha1="6b4ed379be4d7948a20f171251629338f243bd8e" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sanguo4" supported="partial">
 		<description>San Guo Zhi 4 - Chi Bi Feng Yun (Chi)</description>
 		<year>1995</year>
@@ -78693,18 +78750,19 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_101" supported="no">
+<!-- Most games seem to work fine. Several have totally garbled graphics. -->
+	<software name="mc_101" supported="partial">
 		<description>101 in 1 Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="bmc_hik8in1" />
 			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
-			<dataarea name="chr" size="2097152">
-				<rom name="101-in-1 games [p1].chr" size="2097152" crc="c2d35bf6" sha1="da5b113bca888ce34e84848a141b6b2fba805bbb" offset="00000" status="baddump" />
+			<dataarea name="prg" size="4194304">
+				<rom name="101-in-1 games [p1].prg" size="4194304" crc="63ac35dc" sha1="225fd85cd45f2dd597fdd060902282dcae2065af" status="baddump" />
 			</dataarea>
-			<dataarea name="prg" size="2097152">
-				<rom name="101-in-1 games [p1].prg" size="2097152" crc="d7ac7034" sha1="4fffb520e455ae8f3e622b84c651d15a1bf7a7c2" offset="00000" status="baddump" />
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -82486,8 +82544,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- Van-1 doesn't load but instead reloads the menu with corrupt graphics -->
-	<software name="mc_fcya1" supported="partial">
+	<software name="mc_fcya1">
 		<description>Famicom Yarou Vol.1 - 7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -83180,7 +83237,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s4" supported="no">
+	<software name="mc_s4" supported="partial">
 		<description>Super 4 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -83260,7 +83317,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s7" supported="no">
+	<software name="mc_s7">
 		<description>Super 7 in 1</description>
 		<!-- Hik 7 in 1?? check -->
 		<year>19??</year>
@@ -83293,7 +83350,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s8kf" supported="no">
+<!-- Yuu Yuu 5 has the same gfx issues as the single cart yuyufin. Power Rangers 5 has very weird freezing/unfreezing and sprite corruption. -->
+	<software name="mc_s8kf" supported="partial">
 		<description>Super HIK 8 in 1 King Fighter</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -83326,7 +83384,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s8" supported="no">
+	<software name="mc_s8">
 		<description>Super 8 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -83338,6 +83396,9 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="1048576">
 				<rom name="super 8-in-1 [p1].prg" size="1048576" crc="c082e6d3" sha1="3668364e8a540c0ced39d16d74de42ef5ae3c403" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -83502,7 +83563,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_sh7" supported="no">
+<!-- Choplifter freezes immediately after starting a new game -->
+	<software name="mc_sh7" supported="partial">
 		<description>Super HIK 7 in 1 (K7006)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -83552,7 +83614,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_stv3">
+<!-- Lion King 5 has broken graphics. It looks like the same issue that affects many Chinese games. -->
+	<software name="mc_stv3" supported="partial">
 		<description>Super TV Game 3 in 1 (VT-414 PCB)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

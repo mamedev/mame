@@ -391,7 +391,7 @@ static const nes_mmc mmc_list[] =
 	{ 353, BMC_810305C },          // Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
-	// 356 7-in-1 Rockman (JY-208)
+	{ 356, BMC_JY208 },
 	// 357 Bit Corp 4-in-1 (ID 4602)
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
@@ -407,7 +407,7 @@ static const nes_mmc mmc_list[] =
 	// 369 Super Mario Bros Party multicart
 	{ 370, BMC_F600 },              // Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart
-	// 372 Rockman 1-6 multicart very close to mapper 45
+	{ 372, BMC_SFC12 },
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
