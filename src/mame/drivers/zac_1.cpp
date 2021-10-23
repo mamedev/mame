@@ -761,9 +761,9 @@ ROM_START(hotwheel)
 	ROM_LOAD ( "htwhls_5.u5", 0x1000, 0x0400, CRC(e28f3c60) SHA1(eb780be60b41017d105288cef71906d15474b8fa))
 ROM_END
 // Alternatives for rom3
-//	ROM_LOAD( "hw04-3-425i.bin", 0x0800, 0x0400, CRC(ef0dcd76) SHA1(2250ecb883534df394466bdae96cef1ab7adf190) )
-//	ROM_LOAD( "hw04-3-429a.bin", 0x0800, 0x0400, CRC(997daff6) SHA1(c0889f1c48e72cdf4b10548442002b31499d4123) )
-//	ROM_LOAD( "hw04-3-5245.bin", 0x0800, 0x0400, CRC(2067112a) SHA1(8a6c21c6d0fff97b3577f0334d0f5e45a1f076c8) )
+//  ROM_LOAD( "hw04-3-425i.bin", 0x0800, 0x0400, CRC(ef0dcd76) SHA1(2250ecb883534df394466bdae96cef1ab7adf190) )
+//  ROM_LOAD( "hw04-3-429a.bin", 0x0800, 0x0400, CRC(997daff6) SHA1(c0889f1c48e72cdf4b10548442002b31499d4123) )
+//  ROM_LOAD( "hw04-3-5245.bin", 0x0800, 0x0400, CRC(2067112a) SHA1(8a6c21c6d0fff97b3577f0334d0f5e45a1f076c8) )
 
 /*--------------------------------
 // House of Diamonds (07/78)
@@ -793,9 +793,9 @@ ROM_START(locomotp)
 	ROM_LOAD("loc-snd.fil", 0x0000, 0x0800, CRC(51ea9d2a) SHA1(9a68687af2c1cad2a261f61a67a625d906c502e1))
 ROM_END
 // Alternate dumps (not working)
-//	ROM_LOAD( "loc-2.fil",  0x1c00, 0x0800, CRC(2ca902ac) SHA1(39d2728194933527f2aa4b2f5c2b2695b31bbedf) )
-//	ROM_LOAD( "loc-4.fil",  0x0c00, 0x0800, CRC(c370a033) SHA1(e21c008662d7253d0eabf68832f93eb458999748) )
-//	ROM_LOAD( "loc-5.fil",  0x1000, 0x0800, CRC(ba1f3e71) SHA1(f691a9b50295a1ec60c85c820c90d4af629ebc9c) )
+//  ROM_LOAD( "loc-2.fil",  0x1c00, 0x0800, CRC(2ca902ac) SHA1(39d2728194933527f2aa4b2f5c2b2695b31bbedf) )
+//  ROM_LOAD( "loc-4.fil",  0x0c00, 0x0800, CRC(c370a033) SHA1(e21c008662d7253d0eabf68832f93eb458999748) )
+//  ROM_LOAD( "loc-5.fil",  0x1000, 0x0800, CRC(ba1f3e71) SHA1(f691a9b50295a1ec60c85c820c90d4af629ebc9c) )
 
 /*--------------------------------
 / Shooting the Rapids (04/79)
@@ -823,9 +823,9 @@ ROM_START(sshtlzac)
 	ROM_REGION(0x1000, "audiocpu", ROMREGION_ERASEFF)
 	ROM_LOAD("spcshtl.snd", 0x0000, 0x0800, CRC(9a61781c) SHA1(0293640653d8cc9532debd31bbb70f025b4e6d03))
 // Alternate dumps
-//	ROM_LOAD( "campioneflash1-2-3.bin", 0x0000, 0x0800, CRC(61894206) SHA1(f78724b416c27c26990ad28c1c4f5376353be55b) )
-//	ROM_LOAD( "flash17.bin",  0x0000, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef) )
-//	ROM_LOAD( "spaceshuttle3.bin", 0x0800, 0x0400, CRC(c6a95dfc) SHA1(135e65264455da41c35a68378227b1b84517f98c) )
+//  ROM_LOAD( "campioneflash1-2-3.bin", 0x0000, 0x0800, CRC(61894206) SHA1(f78724b416c27c26990ad28c1c4f5376353be55b) )
+//  ROM_LOAD( "flash17.bin",  0x0000, 0x0800, CRC(5049326d) SHA1(3b2f4ea054962bf4ba41d46663b7d3d9a77590ef) )
+//  ROM_LOAD( "spaceshuttle3.bin", 0x0800, 0x0400, CRC(c6a95dfc) SHA1(135e65264455da41c35a68378227b1b84517f98c) )
 ROM_END
 
 /*--------------------------------
@@ -862,8 +862,8 @@ ROM_START(stargodb) // alternate version of the stargod set, with variable repla
 	ROM_LOAD ( "stargod.u5",  0x1000, 0x0400, CRC(536484f8) SHA1(7c40bf7e8b5b21cce44d96633581730ea9eeb176))
 ROM_END
 // Alternate stargod dumps (not working)
-//	ROM_LOAD( "stargod5.lgc", 0x1000, 0x0400, CRC(03cd4e24) SHA1(b73d383dc71e44277de9116a702b899a54ce32b9) )
-//	ROM_LOAD( "stargod.snd",  0x7800, 0x0800, CRC(5079e493) SHA1(51d366cdd09ad00b8b016b0ea1c85ac95ef94d71) )
+//  ROM_LOAD( "stargod5.lgc", 0x1000, 0x0400, CRC(03cd4e24) SHA1(b73d383dc71e44277de9116a702b899a54ce32b9) )
+//  ROM_LOAD( "stargod.snd",  0x7800, 0x0800, CRC(5079e493) SHA1(51d366cdd09ad00b8b016b0ea1c85ac95ef94d71) )
 
 /*--------------------------------
 / Winter Sports (01/78)

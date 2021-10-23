@@ -318,7 +318,7 @@ license:CC0
 		<publisher>Broderbund Software</publisher>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -352,7 +352,7 @@ license:CC0
 		<publisher>Broderbund Software</publisher>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -3307,7 +3307,7 @@ license:CC0
 		<info name="release" value="2018-11-06"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -3333,7 +3333,7 @@ license:CC0
 		<info name="release" value="2018-11-06"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -3352,7 +3352,8 @@ license:CC0
 			<dataarea name="flop" size="143360">
 				<rom name="all about america (imperfect 4am crack) - disk 2a - maps and quizzes.dsk" size="143360" crc="93b110dd" sha1="75e378b79110c4d45a6c7774b04e98ae2aa87f7c" />
 			</dataarea>
-		</part>	</software>
+		</part>
+	</software>
 
 	<software name="allabtpm">
 		<description>All About Purim (cleanly cracked)</description>
@@ -3796,7 +3797,7 @@ license:CC0
 		<!-- "Animate" is a 1986 graphics program created by Steven Ohmert and distributed by Broderbund Software. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -3831,7 +3832,7 @@ license:CC0
 		<info name="release" value="2017-06-28"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -4327,7 +4328,7 @@ license:CC0
 		<info name="release" value="2017-08-21"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -4381,7 +4382,7 @@ license:CC0
 		<info name="release" value="2017-01-10"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -4402,7 +4403,7 @@ license:CC0
 		<info name="release" value="2017-01-10"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -4426,7 +4427,7 @@ license:CC0
 		<info name="release" value="2017-01-17"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -4447,7 +4448,7 @@ license:CC0
 		<info name="release" value="2017-01-17"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -5197,7 +5198,7 @@ license:CC0
 		<!-- "Boulderdash Construction Kit" is a 1987 arcade game developed by Pat Montelo and Fernando Herrera. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -5213,7 +5214,7 @@ license:CC0
 		<info name="release" value="2017-05-16"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -5673,7 +5674,7 @@ license:CC0
 		<!-- "Centauri Alliance" is a 1990 roleplaying game by Michael Cranford, Tom Wilcox, Diane Wilcox, Gene Hamm, and Nancy Morris, and distributed by Broderbund Software. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A - Program"/>
@@ -5720,7 +5721,7 @@ license:CC0
 		<info name="release" value="2017-01-17"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -7061,7 +7062,7 @@ license:CC0
 		<info name="release" value="2016-10-17"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -7084,7 +7085,7 @@ license:CC0
 		<info name="release" value="2016-10-17"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -8049,7 +8050,7 @@ license:CC0
 		<info name="release" value="2018-09-18"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A"/>
@@ -8096,7 +8097,7 @@ license:CC0
 		<info name="release" value="2018-09-18"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -8688,7 +8689,7 @@ license:CC0
 		<info name="release" value="2017-05-02"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -9135,7 +9136,7 @@ license:CC0
 		<info name="release" value="2018-03-16"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -9151,7 +9152,7 @@ license:CC0
 		<info name="release" value="2018-03-16"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -9359,7 +9360,7 @@ license:CC0
 		<info name="release" value="2016-04-07"/>
 		<!-- Disks re-cracked in September 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -9382,7 +9383,7 @@ license:CC0
 		<info name="release" value="2016-04-07"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -10406,7 +10407,7 @@ license:CC0
 		<info name="release" value="2018-10-06"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -10422,7 +10423,7 @@ license:CC0
 		<info name="release" value="2018-10-06"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -11008,7 +11009,7 @@ license:CC0
 		published by Scholastic between 1983 and 1992. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -11033,7 +11034,7 @@ license:CC0
 		published by Scholastic between 1983 and 1992. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -11083,7 +11084,7 @@ license:CC0
 		published by Scholastic between 1983 and 1992. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -11108,7 +11109,7 @@ license:CC0
 		published by Scholastic between 1983 and 1992. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -11202,7 +11203,7 @@ license:CC0
 		published by Scholastic between 1983 and 1992. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -11227,7 +11228,7 @@ license:CC0
 		published by Scholastic between 1983 and 1992. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -12228,7 +12229,7 @@ license:CC0
 		<info name="release" value="2018-10-05"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -12244,7 +12245,7 @@ license:CC0
 		<info name="release" value="2018-10-05"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -12590,7 +12591,7 @@ license:CC0
 		<info name="release" value="2018-03-16"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -12606,7 +12607,7 @@ license:CC0
 		<info name="release" value="2018-03-16"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -12625,7 +12626,7 @@ license:CC0
 		<info name="release" value="2018-10-02"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -12641,7 +12642,7 @@ license:CC0
 		<info name="release" value="2018-10-02"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -13438,7 +13439,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -13454,7 +13455,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -14027,7 +14028,7 @@ license:CC0
 		<info name="release" value="2016-08-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -14043,7 +14044,7 @@ license:CC0
 		<info name="release" value="2016-08-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -14062,7 +14063,7 @@ license:CC0
 		<info name="release" value="2018-06-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -14078,7 +14079,7 @@ license:CC0
 		<info name="release" value="2018-06-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -15615,7 +15616,7 @@ license:CC0
 		<info name="release" value="2017-04-13"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -17667,7 +17668,7 @@ license:CC0
 		<info name="release" value="2018-09-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -17683,7 +17684,7 @@ license:CC0
 		<info name="release" value="2018-09-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -17767,7 +17768,7 @@ license:CC0
 		<info name="release" value="2018-06-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -17790,7 +17791,7 @@ license:CC0
 		<info name="release" value="2018-06-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -18278,7 +18279,7 @@ license:CC0
 		<info name="release" value="2016-12-24"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -18301,7 +18302,7 @@ license:CC0
 		<info name="release" value="2016-12-24"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -18774,7 +18775,7 @@ license:CC0
 		<info name="release" value="2016-12-03"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -18797,7 +18798,7 @@ license:CC0
 		<info name="release" value="2016-12-03"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -19839,7 +19840,7 @@ license:CC0
 		<info name="release" value="2016-08-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -19862,7 +19863,7 @@ license:CC0
 		<info name="release" value="2016-08-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -20086,7 +20087,7 @@ license:CC0
 		<info name="release" value="2019-01-25"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -20102,7 +20103,7 @@ license:CC0
 		<info name="release" value="2019-01-25"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -20941,7 +20942,7 @@ license:CC0
 		<info name="release" value="2019-05-11"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -20957,7 +20958,7 @@ license:CC0
 		<info name="release" value="2019-05-11"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -21081,7 +21082,7 @@ license:CC0
 		<!-- This is an undated updated revision that had updated copy protection. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -21098,7 +21099,7 @@ license:CC0
 		<!-- This is an undated updated revision that had updated copy protection. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -21309,7 +21310,7 @@ license:CC0
 		<info name="release" value="2019-02-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -21325,7 +21326,7 @@ license:CC0
 		<info name="release" value="2019-02-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -21357,7 +21358,7 @@ license:CC0
 		<info name="release" value="2019-04-08"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -21373,7 +21374,7 @@ license:CC0
 		<info name="release" value="2019-04-08"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -21535,7 +21536,7 @@ license:CC0
 		<info name="release" value="2019-02-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -21570,7 +21571,7 @@ license:CC0
 		<info name="release" value="2019-02-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -21608,7 +21609,7 @@ license:CC0
 		<info name="release" value="2019-02-09"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -21631,7 +21632,7 @@ license:CC0
 		<info name="release" value="2019-02-09"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -26275,7 +26276,7 @@ license:CC0
 		<info name="release" value="2016-04-01"/>
 		<!-- Disks re-cracked in September 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -26291,7 +26292,7 @@ license:CC0
 		<info name="release" value="2016-04-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -26493,7 +26494,7 @@ license:CC0
 		<info name="release" value="2016-04-27"/>
 		<!-- Disks re-cracked in September 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -26516,7 +26517,7 @@ license:CC0
 		<info name="release" value="2016-04-27"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -26800,7 +26801,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -26816,7 +26817,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -26861,7 +26862,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -26877,7 +26878,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -26909,7 +26910,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -26925,7 +26926,7 @@ license:CC0
 		<info name="release" value="2016-07-26"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -26970,7 +26971,7 @@ license:CC0
 		<info name="release" value="2016-07-28"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -26993,7 +26994,7 @@ license:CC0
 		<info name="release" value="2016-07-28"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -27072,7 +27073,7 @@ license:CC0
 		<info name="release" value="2016-07-31"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -27088,7 +27089,7 @@ license:CC0
 		<info name="release" value="2016-07-31"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -27153,7 +27154,7 @@ license:CC0
 		<info name="release" value="2016-08-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -27176,7 +27177,7 @@ license:CC0
 		<info name="release" value="2016-08-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -28125,7 +28126,7 @@ license:CC0
 		<!-- This version only requires 64K of memory. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Program"/>
@@ -28149,7 +28150,7 @@ license:CC0
 		<!-- This version only requires 64K of memory. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -28810,7 +28811,7 @@ license:CC0
 		<info name="release" value="2017-04-18"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -28833,7 +28834,7 @@ license:CC0
 		<info name="release" value="2017-04-18"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -29289,7 +29290,7 @@ license:CC0
 		<info name="release" value="2017-05-04"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -29312,7 +29313,7 @@ license:CC0
 		<info name="release" value="2017-05-04"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -29772,7 +29773,7 @@ license:CC0
 		<info name="release" value="2017-06-11"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -29795,7 +29796,7 @@ license:CC0
 		<info name="release" value="2017-06-11"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -30366,7 +30367,7 @@ license:CC0
 		<info name="release" value="2017-07-18"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -30389,7 +30390,7 @@ license:CC0
 		<info name="release" value="2017-07-18"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -30550,7 +30551,7 @@ license:CC0
 		<info name="release" value="2017-08-04"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -30573,7 +30574,7 @@ license:CC0
 		<info name="release" value="2017-08-04"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -30673,7 +30674,7 @@ license:CC0
 		<info name="release" value="2017-08-12"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -30689,7 +30690,7 @@ license:CC0
 		<info name="release" value="2017-08-12"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -30787,7 +30788,7 @@ license:CC0
 		<info name="release" value="2017-09-02"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -30803,7 +30804,7 @@ license:CC0
 		<info name="release" value="2017-09-02"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -31138,7 +31139,7 @@ license:CC0
 		<info name="release" value="2017-09-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A-1"/>
@@ -31197,7 +31198,7 @@ license:CC0
 		<info name="release" value="2017-09-23"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -32208,7 +32209,7 @@ license:CC0
 		<info name="release" value="2017-12-19"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -32224,7 +32225,7 @@ license:CC0
 		<info name="release" value="2017-12-19"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -33132,7 +33133,7 @@ license:CC0
 		<info name="release" value="2018-03-07"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
@@ -33167,7 +33168,7 @@ license:CC0
 		<info name="release" value="2018-03-07"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -33355,7 +33356,7 @@ license:CC0
 		<info name="release" value="2018-03-12"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -33378,7 +33379,7 @@ license:CC0
 		<info name="release" value="2018-03-12"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -33465,7 +33466,7 @@ license:CC0
 		<info name="release" value="2018-03-13"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A - Boot"/>
@@ -33494,7 +33495,7 @@ license:CC0
 		<info name="release" value="2018-03-13"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -33754,7 +33755,7 @@ license:CC0
 		<info name="release" value="2018-05-27"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -33783,7 +33784,7 @@ license:CC0
 		<info name="release" value="2018-05-27"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -33828,7 +33829,7 @@ license:CC0
 		<info name="release" value="2018-05-30"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -33844,7 +33845,7 @@ license:CC0
 		<info name="release" value="2018-05-30"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -33863,7 +33864,7 @@ license:CC0
 		<info name="release" value="2018-06-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -33879,7 +33880,7 @@ license:CC0
 		<info name="release" value="2018-06-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -34130,7 +34131,7 @@ license:CC0
 		file metadata.-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -34161,7 +34162,7 @@ license:CC0
 		file metadata.-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -34208,7 +34209,7 @@ license:CC0
 		metadata. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -34233,7 +34234,7 @@ license:CC0
 		metadata. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -34624,7 +34625,7 @@ license:CC0
 		<info name="release" value="2018-10-03"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -34659,7 +34660,7 @@ license:CC0
 		<info name="release" value="2018-10-03"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -36038,7 +36039,7 @@ license:CC0
 		<info name="release" value="2019-09-05"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Mathematics"/>
@@ -36073,7 +36074,7 @@ license:CC0
 		<info name="release" value="2019-09-05"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -36216,7 +36217,7 @@ license:CC0
 		<!-- "The World's Greatest Baseball Game (Enhanced Version)" is a 1986 sports game developed by Quest. It is preserved here for the first time. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Interactive and statistical game play"/>
@@ -36251,7 +36252,7 @@ license:CC0
 		<info name="release" value="2019-09-29"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -36564,7 +36565,7 @@ license:CC0
 		<info name="release" value="2019-11-21"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Program"/>
@@ -36593,7 +36594,7 @@ license:CC0
 		<info name="release" value="2019-11-21"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -37083,7 +37084,7 @@ license:CC0
 		<info name="release" value="2020-02-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -37099,7 +37100,7 @@ license:CC0
 		<info name="release" value="2020-02-01"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -37287,7 +37288,7 @@ license:CC0
 		-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -37315,7 +37316,7 @@ license:CC0
 		-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -38080,7 +38081,7 @@ license:CC0
 		<info name="release" value="2020-06-28"/>
 		<!-- Disks re-cracked in September 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -38096,7 +38097,7 @@ license:CC0
 		<info name="release" value="2020-06-28"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -38756,7 +38757,7 @@ license:CC0
 		<info name="release" value="2020-08-08"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -38779,7 +38780,7 @@ license:CC0
 		<info name="release" value="2020-08-08"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -39344,7 +39345,7 @@ license:CC0
 		<info name="release" value="2020-09-29"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -39360,7 +39361,7 @@ license:CC0
 		<info name="release" value="2020-09-29"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -39632,7 +39633,7 @@ license:CC0
 		<info name="release" value="2020-12-04"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 Side A"/>
@@ -39679,7 +39680,7 @@ license:CC0
 		<info name="release" value="2020-12-04"/>
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -41603,7 +41604,7 @@ license:CC0
 		<!--"Sports Stats" is a 1985 educational program developed by Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown, and distributed by MECC. This is version 1.0.-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -41621,7 +41622,7 @@ license:CC0
 		<!--"Sports Stats" is a 1985 educational program developed by Jim Sydow, Ron Geiser, Reed Christiansen, Dave Laden, Curt Traaseth, and Jean Brown, and distributed by MECC. This is version 1.0.-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -43065,7 +43066,7 @@ license:CC0
 		<!--"Algebra Volume 4" is a 1984 educational program developed and distributed by Peachtree Software (formerly EduWare).-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -43082,7 +43083,7 @@ license:CC0
 		<!--"Algebra Volume 4" is a 1984 educational program developed and distributed by Peachtree Software (formerly EduWare).-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -43250,7 +43251,7 @@ license:CC0
 		<!--"Algebra Volume 3" is a 1984 educational program developed and distributed by EduWare.-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -43267,7 +43268,7 @@ license:CC0
 		<!--"Algebra Volume 3" is a 1984 educational program developed and distributed by EduWare.-->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines.
+		in the previous version not working on some machines.
 
 		This 'imperfect crack' version remains in here for
 		documentation purposes. -->
@@ -45579,7 +45580,7 @@ license:CC0
 		<!-- "Street Sports Baseball" is a 1987 sports game. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233452">
@@ -45596,7 +45597,7 @@ license:CC0
 		<!-- "Street Sports Football" is a 1988 sports game developed by Paul Nickels, Michael Polan, and Kevin Quinlan. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -45620,7 +45621,7 @@ license:CC0
 		<!-- "Sub Battle Simulator" is a 1986 simulation game developed by Digital Illusions. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -45644,7 +45645,7 @@ license:CC0
 		<!-- "Summer Games" is a 1984 sports game developed by Chuck Sommerville, Kevin McClard, Scott Nelson, Erin Murphy, Stephen Mudry, Brian McGhie, Stephen Landrum, Jon Leupp, and Randy Glover. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -45668,7 +45669,7 @@ license:CC0
 		<!-- "Summer Games II" is a 1985 sports game developed by John Stouffer, Greg Broniak, Vera Petrusha, Dr. Keith Dreyer, Jeff Webb, Tim Grost, Ken Evans, Doug Matson, Matt Decker, Pat Findling, and Chris Oesterling. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -45692,7 +45693,7 @@ license:CC0
 		<!-- "Temple of Apshai Trilogy" is a 1985 roleplaying game designed by Stephen Landrum, with graphics by Michael Kosaka. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233494">
@@ -45709,7 +45710,7 @@ license:CC0
 		<!-- "The Ancient Art of War at Sea" is a 1988 simulation game developed by Dave Murry and Barry Murry and distributed by Broderbund Software. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 
 		<part name="flop1" interface="floppy_5_25">
@@ -45734,7 +45735,7 @@ license:CC0
 		<!-- "The Games: Winter Edition" is a 1988 sports game. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A-1"/>
@@ -45776,7 +45777,7 @@ license:CC0
 		<!-- "The World's Greatest Football Game" is a 1985 sports game developed by Nexa Corp. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
@@ -45800,7 +45801,7 @@ license:CC0
 		<!-- "World Karate Championship" is a 1986 sports game developed by Rebecca Heineman, with artwork by Mike Patrick and Mike Packard. -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="233482">

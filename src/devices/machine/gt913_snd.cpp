@@ -1,20 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /***************************************************************************
-	Casio GT913 sound (HLE)
+    Casio GT913 sound (HLE)
 
-	This is the sound portion of the GT913.
-	Up to 24 voices can be mixed into a 16-bit stereo serial bitstream,
-	which is then input to either a serial DAC or a HG51B-based DSP,
-	depending on the model of keyboard.
+    This is the sound portion of the GT913.
+    Up to 24 voices can be mixed into a 16-bit stereo serial bitstream,
+    which is then input to either a serial DAC or a HG51B-based DSP,
+    depending on the model of keyboard.
 
-	Currently, the actual sample format in ROM is unknown.
-	The serial output is twos-complement 16-bit PCM, but the data in ROM
-	doesn't seem to be - reading it as such produces sounds that are
-	somewhat recognizable, but highly distorted.
+    Currently, the actual sample format in ROM is unknown.
+    The serial output is twos-complement 16-bit PCM, but the data in ROM
+    doesn't seem to be - reading it as such produces sounds that are
+    somewhat recognizable, but highly distorted.
 
-	For now, all known (and unknown) register writes are just logged
-	without generating any sound.
+    For now, all known (and unknown) register writes are just logged
+    without generating any sound.
 
 ***************************************************************************/
 

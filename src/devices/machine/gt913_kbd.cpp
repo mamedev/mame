@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /***************************************************************************
-	Casio GT913 keyboard controller (HLE)
+    Casio GT913 keyboard controller (HLE)
 
-	This is the keyboard controller portion of the GT913.
-	The actual keyboard keys (as opposed to console buttons) have two
-	contacts per key, which allows the controller to detect the velocity
-	of the keypress. The detected velocity is read as a 7-bit value
-	from the data port, along with the actual key scan code.
+    This is the keyboard controller portion of the GT913.
+    The actual keyboard keys (as opposed to console buttons) have two
+    contacts per key, which allows the controller to detect the velocity
+    of the keypress. The detected velocity is read as a 7-bit value
+    from the data port, along with the actual key scan code.
 
-	Right now, velocity is just simulated using an (optional) analog
-	control. The keyboard FIFO size is also basically a guess based on
-	the CTK-551's 16-key polyphony.
+    Right now, velocity is just simulated using an (optional) analog
+    control. The keyboard FIFO size is also basically a guess based on
+    the CTK-551's 16-key polyphony.
 
 ***************************************************************************/
 
@@ -37,7 +37,7 @@ gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const 
 void gt913_kbd_hle_device::device_start()
 {
 	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
-	
+
 	save_item(NAME(m_status));
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_read));

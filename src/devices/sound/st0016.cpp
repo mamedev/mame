@@ -4,8 +4,8 @@
       Seta custom ST-0016 chip
       sound emulation by R. Belmont, Tomasz Slanina, and David Haywood
 
-	  TODO:
-	  - Verify keyon/off flag behavior
+      TODO:
+      - Verify keyon/off flag behavior
 ************************************/
 
 #include "emu.h"
@@ -238,12 +238,12 @@ void st0016_device::voice_t::reg_w(offs_t offset, u8 data, int voice)
 
 				/*
 				LOG("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
-					m_start,
-					m_end,
-					m_lpstart,
-					m_lpend,
-					m_freq,
-					m_regs[0x16]);
+				    m_start,
+				    m_end,
+				    m_lpstart,
+				    m_lpend,
+				    m_freq,
+				    m_regs[0x16]);
 				*/
 			}
 		}

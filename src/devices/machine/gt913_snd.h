@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Devin Acker
 /***************************************************************************
-	Casio GT913 sound (HLE)
+    Casio GT913 sound (HLE)
 ***************************************************************************/
 
 #ifndef MAME_AUDIO_GT913_H
@@ -30,7 +30,7 @@ protected:
 	// device_t overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	uint8_t m_gain;
 	uint16_t m_data[3];

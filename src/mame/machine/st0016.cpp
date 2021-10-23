@@ -497,8 +497,8 @@ void st0016_cpu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 				/*
 				if (plx | ply) //parent
 				{
-					lx = plx;
-					ly = ply;
+				    lx = plx;
+				    ly = ply;
 				}
 				*/
 

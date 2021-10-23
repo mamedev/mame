@@ -399,7 +399,7 @@ void nes_cityfight_device::write_h(offs_t offset, u8 data)
 
 u8 nes_shuiguan_device::read_m(offs_t offset)
 {
-//	LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
+//  LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
 	return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
