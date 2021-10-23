@@ -128,8 +128,8 @@ void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int i
 	m_mmc_vrom_bank[3] = 5;
 	m_mmc_vrom_bank[4] = 6;
 	m_mmc_vrom_bank[5] = 7;
-	m_mmc_vrom_bank[6] = 0;
-	m_mmc_vrom_bank[7] = 0;
+	m_mmc_vrom_bank[6] = 0;  // extension reg used by clone boards
+	m_mmc_vrom_bank[7] = 0;  // extension reg used by clone boards
 
 	m_mmc_mirror = 0;
 	m_latch = 0;
