@@ -518,11 +518,11 @@ void menu::draw(uint32_t flags)
 	if (!customonly)
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, ui().colors().background_color());
 
+	if ((m_selected >= (top_line + m_visible_lines)) || (m_selected < (top_line + 1)))
+		top_line = m_selected - (m_visible_lines / 2);
 	if (top_line < 0 || is_first_selected())
 		top_line = 0;
-	else if (m_selected >= (top_line + m_visible_lines))
-		top_line = m_selected - (m_visible_lines / 2);
-	if ((top_line > (m_items.size() - m_visible_lines)) || is_last_selected())
+	else if ((top_line > (m_items.size() - m_visible_lines)) || is_last_selected())
 		top_line = m_items.size() - m_visible_lines;
 	else if (m_selected >= (top_line + m_visible_lines - 2))
 		top_line = m_selected - m_visible_lines + ((m_selected == (m_items.size() - 1)) ? 1: 2);

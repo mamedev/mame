@@ -28,14 +28,22 @@
 //  constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(NES_900218,    nes_900218_device,    "nes_900218",    "NES Cart 900218 PCB")
-DEFINE_DEVICE_TYPE(NES_AX40G,     nes_ax40g_device,     "nes_ax40g",     "NES Cart UNL-AX-40G PCB")
-DEFINE_DEVICE_TYPE(NES_AX5705,    nes_ax5705_device,    "nes_ax5705",    "NES Cart AX5705 PCB")
-DEFINE_DEVICE_TYPE(NES_CITYFIGHT, nes_cityfight_device, "nes_cityfight", "NES Cart City Fighter PCB")
-DEFINE_DEVICE_TYPE(NES_SHUIGUAN,  nes_shuiguan_device,  "nes_shuiguan",  "NES Cart Shui Guan Pipe Pirate PCB")
-DEFINE_DEVICE_TYPE(NES_TF1201,    nes_tf1201_device,    "nes_tf1201",    "NES Cart UNL-TF1201 PCB")
-DEFINE_DEVICE_TYPE(NES_TH21311,   nes_th21311_device,   "nes_th21311",   "NES Cart UNL-TH2131-1 PCB")
+DEFINE_DEVICE_TYPE(NES_2YUDB,       nes_2yudb_device,       "nes_2yudb",       "NES Cart Yu Yu Hakusho - Dragon Ball Z 2 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_900218,      nes_900218_device,      "nes_900218",      "NES Cart 900218 PCB")
+DEFINE_DEVICE_TYPE(NES_AX40G,       nes_ax40g_device,       "nes_ax40g",       "NES Cart UNL-AX-40G PCB")
+DEFINE_DEVICE_TYPE(NES_AX5705,      nes_ax5705_device,      "nes_ax5705",      "NES Cart AX5705 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_830506C, nes_bmc_830506c_device, "nes_bmc_830506c", "NES Cart BMC 830506C PCB")
+DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
+DEFINE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device,    "nes_shuiguan",    "NES Cart Shui Guan Pipe Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
+DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
+DEFINE_DEVICE_TYPE(NES_TH21311,     nes_th21311_device,     "nes_th21311",     "NES Cart UNL-TH2131-1 PCB")
 
+
+nes_2yudb_device::nes_2yudb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_2YUDB, tag, owner, clock), m_outer(0)
+{
+}
 
 nes_900218_device::nes_900218_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc2_device(mconfig, NES_900218, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
@@ -52,6 +60,11 @@ nes_ax5705_device::nes_ax5705_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_bmc_830506c_device::nes_bmc_830506c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_BMC_830506C, tag, owner, clock), m_outer(0)
+{
+}
+
 nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc4_device(mconfig, NES_CITYFIGHT, tag, owner, clock)
 {
@@ -59,6 +72,11 @@ nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const 
 
 nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc4_device(mconfig, NES_SHUIGUAN, tag, owner, clock)
+{
+}
+
+nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_T230, tag, owner, clock)
 {
 }
 
@@ -73,6 +91,22 @@ nes_th21311_device::nes_th21311_device(const machine_config &mconfig, const char
 }
 
 
+
+void nes_2yudb_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_outer));
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A3
+	m_vrc_ls_prg_b = 2;  // A2
+}
+
+void nes_2yudb_device::pcb_reset()
+{
+	m_outer = 0;
+	nes_konami_vrc4_device::pcb_reset();
+}
 
 void nes_900218_device::device_start()
 {
@@ -113,6 +147,22 @@ void nes_ax5705_device::device_start()
 	m_vrc_ls_prg_b = 0;  // A0
 }
 
+void nes_bmc_830506c_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+	save_item(NAME(m_outer));
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 1;  // A1
+	m_vrc_ls_prg_b = 0;  // A0
+}
+
+void nes_bmc_830506c_device::pcb_reset()
+{
+	m_outer = 0;
+	nes_konami_vrc4_device::pcb_reset();
+}
+
 void nes_cityfight_device::device_start()
 {
 	nes_konami_vrc4_device::device_start();
@@ -136,6 +186,15 @@ void nes_shuiguan_device::pcb_reset()
 {
 	nes_konami_vrc4_device::pcb_reset();
 	m_reg = 0;
+}
+
+void nes_t230_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A3
+	m_vrc_ls_prg_b = 2;  // A2
 }
 
 void nes_tf1201_device::device_start()
@@ -377,6 +436,43 @@ void nes_shuiguan_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ Board UNL-T-230
+
+ Games: Dragon Ball Z IV (Unl)
+
+ VRC4 clone that uses CHRRAM instead of CHRROM and
+ has nonstandard PRG banking.
+
+ NES 2.0: mapper 529
+
+ In MAME: Supported.
+
+ TODO: This cart and its appearance on the 2yudb set
+ have IRQ timing issues that cause a bouncing status
+ bar in fights. Other emulators also have issues
+ on the split line so perhaps some noise is expected?
+
+ -------------------------------------------------*/
+
+void nes_t230_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("t230 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x7000)
+	{
+		case 0x0000:
+			break;  // PRG banking at $8000 ignored
+		case 0x2000:
+			prg16_89ab(data);
+			break;
+		default:
+			nes_konami_vrc4_device::write_h(offset, data);
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
  UNL-TF1201
 
  Games: Leathal Weapon (Leathal Enforcers clone)
@@ -391,14 +487,9 @@ void nes_shuiguan_device::write_h(offs_t offset, u8 data)
 
  -------------------------------------------------*/
 
-void nes_tf1201_device::write_h(offs_t offset, u8 data)
+void nes_tf1201_device::irq_ack_w()
 {
-	LOG_MMC(("unl_tf1201 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	if ((offset & 0x7003) == 0x7003)
-		set_irq_line(CLEAR_LINE);
-	else
-		nes_konami_vrc4_device::write_h(offset, data);
+	set_irq_line(CLEAR_LINE);
 }
 
 /*-------------------------------------------------
@@ -463,3 +554,65 @@ void nes_th21311_device::write_h(offs_t offset, u8 data)
  MULTIGAME CARTS BASED ON VRC
 
  -------------------------------------------------*/
+
+/*-------------------------------------------------
+
+ Board BTL-2YUDB
+
+ Games: 2 in 1 Datach Yu Yu Hakusho + Dragon Ball Z
+
+ VRC4 clone that uses CHRRAM instead of the usual
+ CHRROM and has a bit for selecting the outer PRG bank.
+
+ NES 2.0: mapper 520
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_2yudb_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("2yudb write_h, offset: %04x, data: %02x\n", offset, data));
+
+	nes_konami_vrc4_device::write_h(offset, data);
+
+	if (offset >= 0x3000 && offset < 0x7000 && !BIT(offset, m_vrc_ls_prg_b))
+	{
+		u8 bank = ((offset >> 12) - 3) * 2 + BIT(offset, m_vrc_ls_prg_a);
+		m_outer = (m_mmc_vrom_bank[bank] & 0x08) << 2;
+		set_prg();
+	}
+}
+
+/*-------------------------------------------------
+
+ Board BMC-830506C
+
+ Games: 1995 Super HiK 4 in 1 (JY-005)
+
+ VRC4 clone with banking for multicart menu.
+
+ NES 2.0: mapper 362
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_830506c_device::irq_ack_w()
+{
+	set_irq_line(CLEAR_LINE);
+}
+
+void nes_bmc_830506c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_830506c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	nes_konami_vrc4_device::write_h(offset, data);
+
+	if (offset >= 0x3000 && offset < 0x7000 && BIT(offset, m_vrc_ls_prg_b))
+	{
+		u8 bank = ((offset >> 12) - 3) * 2 + BIT(offset, m_vrc_ls_prg_a);
+		m_outer = (m_mmc_vrom_bank[bank] & 0x180) >> 3;
+		set_prg();
+	}
+}

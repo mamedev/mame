@@ -15,11 +15,26 @@ local content_height = 0
 -- Stack of menus (see MENU_TYPES)
 local menu_stack = { MENU_TYPES.MAIN }
 
+-- Button to select when showing the main menu (so newly added button can be selected)
+local initial_button
+
+-- Saved selection on main menu (to restore after configure menu is dismissed)
+local main_selection_save
+
+-- Whether configure menu is active (so first item can be selected initially)
+local configure_menu_active = false
+
+-- Saved selection on configure menu (to restore after button menu is dismissed)
+local configure_selection_save
+
 -- Button being created/edited
 local current_button = {}
 
+-- Initial button to select when opening buttons menu
+local initial_input
+
 -- Inputs that can be autofired (to list in BUTTON menu)
-local inputs = {}
+local inputs
 
 -- Returns the section (from MENU_SECTIONS) and the index within that section
 local function menu_section(index)
@@ -56,39 +71,58 @@ local function populate_main_menu(buttons)
 	local input = manager.machine.input
 	local menu = {}
 	menu[#menu + 1] = {_('Autofire buttons'), '', 'off'}
-	menu[#menu + 1] = {string.format(_('Press %s to delete'), input:seq_name(ioport:type_seq(ioport:token_to_input_type("UI_CLEAR")))), '', 'off'}
+	menu[#menu + 1] = {string.format(_('Press %s to delete'), input:seq_name(ioport:type_seq(ioport:token_to_input_type('UI_CLEAR')))), '', 'off'}
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
+	-- Use frame rate of first screen or 60Hz if no screens
+	local freq = 60
+	local screen = manager.machine.screens:at(1)
+	if screen then
+		freq = 1 / screen.frame_period
+	end
+
 	for index, button in ipairs(buttons) do
-		-- Assume refresh rate of 60 Hz; maybe better to use screen_device refresh()?
-		local rate = 60 / (button.on_frames + button.off_frames)
-		-- Round to two decimal places
+		-- Round rate to two decimal places
+		local rate = freq / (button.on_frames + button.off_frames)
 		rate = math.floor(rate * 100) / 100
-		local text = string.format(_('%s [%d Hz]'), _p("input-name", button.button.name), rate)
+		local text = string.format(_('%s [%g Hz]'), _p('input-name', button.button.name), rate)
 		local subtext = input:seq_name(button.key)
 		menu[#menu + 1] = {text, subtext, ''}
+		if index == initial_button then
+			main_selection_save = #menu
+		end
 	end
+	initial_button = nil
 	content_height = #menu
 
 	menu[#menu + 1] = {'---', '', ''}
 	menu[#menu + 1] = {_('Add autofire button'), '', ''}
-	return menu
+
+	local selection = main_selection_save
+	main_selection_save = nil
+	return menu, selection
 end
 
 local function handle_main_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
 	if section == MENU_SECTIONS.CONTENT then
 		if event == 'select' then
+			main_selection_save = index
 			current_button = buttons[adjusted_index]
 			table.insert(menu_stack, MENU_TYPES.EDIT)
 			return true
 		elseif event == 'clear' then
 			table.remove(buttons, adjusted_index)
+			main_selection_save = index
+			if adjusted_index > #buttons then
+				main_selection_save = main_selection_save - 1
+			end
 			return true
 		end
 	elseif section == MENU_SECTIONS.FOOTER then
 		if event == 'select' then
+			main_selection_save = index
 			current_button = create_new_button()
 			table.insert(menu_stack, MENU_TYPES.ADD)
 			return true
@@ -100,12 +134,16 @@ end
 -- Add/edit menus (mostly identical)
 
 local function populate_configure_menu(menu)
-	local button_name = current_button.button and _p("input-name", current_button.button.name) or _('NOT SET')
+	local button_name = current_button.button and _p('input-name', current_button.button.name) or _('NOT SET')
 	local key_name = current_button.key and manager.machine.input:seq_name(current_button.key) or _('NOT SET')
 	menu[#menu + 1] = {_('Input'), button_name, ''}
+	if not (configure_menu_active or configure_selection_save) then
+		configure_selection_save = #menu
+	end
 	menu[#menu + 1] = {_('Hotkey'), key_name, ''}
 	menu[#menu + 1] = {_('On frames'), current_button.on_frames, current_button.on_frames > 1 and 'lr' or 'r'}
 	menu[#menu + 1] = {_('Off frames'), current_button.off_frames, current_button.off_frames > 1 and 'lr' or 'r'}
+	configure_menu_active = true
 end
 
 -- Borrowed from the cheat plugin
@@ -120,7 +158,7 @@ local function poll_for_hotkey()
 	while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
 		if poller.modified then
 			if not poller.valid then
-				manager.machine:popmessage(_("Invalid sequence entered"))
+				manager.machine:popmessage(_('Invalid sequence entered'))
 				clearmsg = false
 				break
 			end
@@ -138,7 +176,11 @@ local function handle_configure_menu(index, event)
 	if index == 1 then
 		-- Input
 		if event == 'select' then
+			configure_selection_save = header_height + index
 			table.insert(menu_stack, MENU_TYPES.BUTTON)
+			if current_button.port and current_button.field then
+				initial_input = {port_name = current_button.port, ioport_field = current_button.button}
+			end
 			return true
 		end
 	elseif index == 2 then
@@ -159,6 +201,9 @@ local function handle_configure_menu(index, event)
 		elseif event == 'right' then
 			current_button.on_frames = current_button.on_frames + 1
 			return true
+		elseif event == 'clear' then
+			current_button.on_frames = 1
+			return true
 		end
 	elseif index == 4 then
 		-- Off frames
@@ -168,6 +213,9 @@ local function handle_configure_menu(index, event)
 			return true
 		elseif event == 'right' then
 			current_button.off_frames = current_button.off_frames + 1
+			return true
+		elseif event == 'clear' then
+			current_button.off_frames = 1
 			return true
 		end
 	end
@@ -185,12 +233,17 @@ local function populate_edit_menu()
 
 	menu[#menu + 1] = {'---', '', ''}
 	menu[#menu + 1] = {_('Done'), '', ''}
-	return menu
+
+	local selection = configure_selection_save
+	configure_selection_save = nil
+	return menu, selection, 'lrrepeat'
 end
 
 local function handle_edit_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
 	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'cancel') then
+		inputs = nil
+		configure_menu_active = false
 		table.remove(menu_stack)
 		return true
 	elseif section == MENU_SECTIONS.CONTENT then
@@ -214,15 +267,21 @@ local function populate_add_menu()
 	else
 		menu[#menu + 1] = {_('Cancel'), '', ''}
 	end
-	return menu
+
+	local selection = configure_selection_save
+	configure_selection_save = nil
+	return menu, selection, 'lrrepeat'
 end
 
 local function handle_add_menu(index, event, buttons)
 	local section, adjusted_index = menu_section(index)
 	if ((section == MENU_SECTIONS.FOOTER) and (event == 'select')) or (event == 'cancel') then
+		inputs = nil
+		configure_menu_active = false
 		table.remove(menu_stack)
 		if is_button_complete(current_button) and (event == 'select') then
-			buttons[#buttons + 1] = current_button
+			table.insert(buttons, current_button)
+			initial_button = #buttons
 		end
 		return true
 	elseif section == MENU_SECTIONS.CONTENT then
@@ -234,33 +293,87 @@ end
 -- Button selection menu
 
 local function populate_button_menu()
+	local ioport = manager.machine.ioport
 	menu = {}
-	inputs = {}
 	menu[#menu + 1] = {_('Select an input for autofire'), '', 'off'}
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
-	for port_key, port in pairs(manager.machine.ioport.ports) do
-		for field_key, field in pairs(port.fields) do
-			if is_supported_input(field) then
-				inputs[#inputs + 1] = {
-					port_name = port_key,
-					field_name = field_key,
-					ioport_field = field
-				}
+	if not inputs then
+		inputs = {}
+
+		for port_key, port in pairs(ioport.ports) do
+			for field_key, field in pairs(port.fields) do
+				if is_supported_input(field) then
+					inputs[#inputs + 1] = {
+						port_name = port_key,
+						field_name = field_key,
+						ioport_field = field
+					}
+				end
+			end
+		end
+
+		local function compare(x, y)
+			if x.ioport_field.device.tag < y.ioport_field.device.tag then
+				return true
+			elseif x.ioport_field.device.tag > y.ioport_field.device.tag then
+				return false
+			end
+			groupx = ioport:type_group(x.ioport_field.type, x.ioport_field.player)
+			groupy = ioport:type_group(y.ioport_field.type, y.ioport_field.player)
+			if groupx < groupy then
+				return true
+			elseif groupx > groupy then
+				return false
+			elseif x.ioport_field.type < y.ioport_field.type then
+				return true
+			elseif x.ioport_field.type > y.ioport_field.type then
+				return false
+			else
+				return x.ioport_field.name < y.ioport_field.name
+			end
+		end
+		table.sort(inputs, compare)
+
+		local i = 1
+		local prev
+		while i <= #inputs do
+			local current = inputs[i]
+			if (not prev) or (prev.ioport_field.device.tag ~= current.ioport_field.device.tag) then
+				table.insert(inputs, i, false)
+				i = i + 2
+			else
+				i = i + 1
+			end
+			prev = current
+		end
+	end
+
+	local selection = header_height + 1
+	for i, input in ipairs(inputs) do
+		if input then
+			menu[header_height + i] = { _p('input-name', input.ioport_field.name), '', '' }
+			if initial_input and (initial_input.port_name == input.port_name) and (initial_input.ioport_field.mask == input.ioport_field.mask) and (initial_input.ioport_field.type == input.ioport_field.type) then
+				selection = header_height + i
+				initial_input = nil
+			end
+		else
+			local device = inputs[i + 1].ioport_field.device
+			if device.owner then
+				menu[header_height + i] = {string.format(_('%s [root%s]'), device.name, device.tag), '', 'heading'}
+			else
+				menu[header_height + i] = {string.format(_('[root%s]'), device.tag), '', 'heading'}
 			end
 		end
 	end
-	-- TODO: group by device so we can sort table.sort(inputs, function(x, y) return x.ioport_field.name < y.ioport_field.name end)
-	for i, input in pairs(inputs) do
-		menu[header_height + i] = { _p("input-name", input.ioport_field.name), '', '' }
-	end
 	content_height = #menu
+	initial_input = nil
 
 	menu[#menu + 1] = {'---', '', ''}
 	menu[#menu + 1] = {_('Cancel'), '', ''}
 
-	return menu
+	return menu, selection
 end
 
 local function handle_button_menu(index, event)
@@ -284,7 +397,7 @@ function lib:init_menu(buttons)
 	content_height = 0
 	menu_stack = { MENU_TYPES.MAIN }
 	current_button = {}
-	inputs = {}
+	inputs = nil
 end
 
 function lib:populate_menu(buttons)

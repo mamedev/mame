@@ -315,6 +315,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("smb2jb",           NES_SMB2JB);
 	device.option_add_internal("yung08",           NES_YUNG08);
 	device.option_add_internal("btl_0353",         NES_0353);       // used by Lucky (Roger) Rabbit FDS conversion
+	device.option_add_internal("btl_2yudb",        NES_2YUDB);
 	device.option_add_internal("btl_900218",       NES_900218);
 	device.option_add_internal("09034a",           NES_09034A);
 	device.option_add_internal("l001",             NES_L001);
@@ -340,6 +341,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("dbz5",             NES_REX_DBZ5);
 	device.option_add_internal("sl1632",           NES_REX_SL1632);
 	device.option_add_internal("somari",           NES_SOMARI); // mapper 116
+	device.option_add_internal("huang2",           NES_HUANG2); // mapper 116 also
 	device.option_add_internal("nitra",            NES_NITRA);
 	device.option_add_internal("fs6",              NES_FS6); // mapper 196 alt? (for Street Fighter VI / Fight Street VI);
 	device.option_add_internal("sbros11",          NES_SBROS11);
@@ -380,8 +382,9 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_60311c",       NES_BMC_60311C);
 	device.option_add_internal("bmc_80013b",       NES_BMC_80013B);
 	device.option_add_internal("bmc_810544c",      NES_BMC_810544C);
-	device.option_add_internal("bmc_830928c",      NES_BMC_830928C);
 	device.option_add_internal("bmc_830425c",      NES_BMC_830425C);
+	device.option_add_internal("bmc_830506c",      NES_BMC_830506C);
+	device.option_add_internal("bmc_830928c",      NES_BMC_830928C);
 	device.option_add_internal("bmc_850437c",      NES_BMC_850437C);
 	device.option_add_internal("bmc_970630c",      NES_BMC_970630C);
 	device.option_add_internal("bmc_jy820845c",    NES_BMC_JY820845C);
@@ -448,12 +451,15 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
 	device.option_add_internal("bmc_sbig7in1",     NES_BMC_SBIG7);
 	device.option_add_internal("bmc_hik8in1",      NES_BMC_HIK8);
+	device.option_add_internal("bmc_jy208",        NES_BMC_JY208);
+	device.option_add_internal("bmc_sfc12",        NES_BMC_SFC12);
 	device.option_add_internal("bmc_hik4in1",      NES_BMC_HIK4);
 	device.option_add_internal("bmc_mario7in1",    NES_BMC_MARIO7IN1);
 	device.option_add_internal("bmc_f15",          NES_BMC_F15);
 	device.option_add_internal("bmc_f600",         NES_BMC_F600);
 	device.option_add_internal("bmc_gn45",         NES_BMC_GN45);
 	device.option_add_internal("bmc_gold7in1",     NES_BMC_GOLD7IN1);
+	device.option_add_internal("bmc_l6in1",        NES_BMC_L6IN1);
 	device.option_add_internal("bmc_00202650",     NES_BMC_00202650);
 	device.option_add_internal("bmc_411120c",      NES_BMC_411120C);
 	device.option_add_internal("bmc_810305c",      NES_BMC_810305C);

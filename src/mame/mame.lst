@@ -10629,19 +10629,20 @@ bujutsu                         // G?645 (c)1997
 racjamdx                        // G?676 (c)1997 Japan JAA
 
 @source:coco12.cpp
+cd6809                          // Codimex CD-6809
 coco                            // Color Computer
 coco2                           // Color Computer 2
 coco2b                          // Color Computer 2B (uses M6847T1 video chip)
-cocoe                           // Color Computer (Extended BASIC 1.0)
-cocoh                           // Color Computer with HD6309 CPU
-coco2h                          // Color Computer 2 with HD6309 CPU
 coco2bh                         // Color Computer 2B (uses M6847T1 video chip) with HD6309 CPU
+coco2h                          // Color Computer 2 with HD6309 CPU
+cocoe                           // Color Computer (Extended BASIC 1.0)
 cocoeh                          // Color Computer (Extended BASIC 1.0) with HD6309 CPU
+cocoh                           // Color Computer with HD6309 CPU
 cp400                           // Prológica CP400
 cp400c2                         // Prológica CP400 Color II
 lzcolor64                       // Novo Tempo / LZ Equipamentos Color64
+ms1600                          // ILCE / SEP Micro-SEP 1600
 mx1600                          // Dynacom MX-1600
-cd6809                          // Codimex CD-6809
 t4426                           // Terco 4426 CNC programming station
 trsvidtx                        // TRS-80 Videotex
 
@@ -10812,8 +10813,9 @@ cortex                          //
 @source:cosmic.cpp
 cosmica                         // 7910-AII (c) [1979]
 cosmica1                        // 7910-A (c) [1979]
-cosmica2                        // 7910 (c) 1979
-cosmica3                        // 7910-AII (c) [1979]
+cosmica22                       // 7910-AII (c) [1979]
+cosmica23                       // 7910-AII (c) [1979]
+cosmica2a                       // 7910 (c) 1979
 devzone                         // 8022 (c) [1980]
 devzone2                        // 8022 (c) [1980]
 magspot                         // ???? (c) [1980]
@@ -11289,6 +11291,7 @@ sfau                            // 27/06/1995 (c) 1995 (USA)
 sfz2a                           // 27/02/1996 (c) 1996 (Asia)
 sfz2ad                          //
 sfz2al                          // 26/08/1996 (c) 1996 (Asia)
+sfz2alr1                        // 05/08/1996 (c) 1996 (Asia)
 sfz2alb                         // 13/08/1996 (c) 1996 (Brazil)
 sfz2ald                         //
 sfz2alh                         // 13/08/1996 (c) 1996 (Hispanic)
@@ -14422,6 +14425,7 @@ galaxiac                        // (c) 1979
 amidar                          // GX337 (c) 1982 Konami
 amidar1                         // GX337 (c) 1981 Konami
 amidarb                         // bootleg
+amidarc                         // bootleg
 amidaro                         // GX337 (c) 1982 Konami + Olympia license
 amidars                         // GX337 (c) 1982 Konami
 amidaru                         // GX337 (c) 1982 Konami + Stern license
@@ -14470,6 +14474,8 @@ exodus                          // Subelectro - bootleg?
 explorer                        // bootleg
 fantastc                        // (c) Taito (Brazil) - rewrite of Galaga
 fantazia                        // bootleg
+floritas                        // bootleg
+floritasm                       // bootleg (Multivideo)
 frogf                           // bootleg
 frogg                           // bootleg
 frogger                         // GX392 (c) 1981 Konami
@@ -14631,7 +14637,6 @@ spacbatt                        // bootleg
 spacempr                        // bootleg
 spactrai                        //
 spcdrag                         // bootleg
-spcdraga                        // bootleg
 spcmission                      // bootleg (SegaSA / Sonic)
 spctrek                         // bootleg
 spctbird                        // (c) Fortrek
@@ -15881,7 +15886,6 @@ countdwn                        //
 dragon                          //
 geniep                          //
 gts1                            //
-gts1s                           //
 hexagone                        //
 hulk                            //
 jokrpokr                        //
@@ -16965,6 +16969,7 @@ ice_tbd                         // ICE - Turbo Drive
 
 @source:icecold.cpp
 icecold                         //
+icecoldf                        //
 zekepeak                        //
 
 @source:ichiban.cpp
@@ -33537,6 +33542,7 @@ beastfp                         // (c) 1984 Epos Corporation
 bigbucks                        // (c) 1986 Dynasoft Inc.
 birdiy                          // (c) 1983 Mama Top
 bucaner                         // hack
+bucanera                        // hack
 bwcasino                        // (c) 1983 Epos Corporation
 candory                         // graphics hack of Ponpoko
 cannonbp                        // hack
@@ -37715,11 +37721,13 @@ dinokich                        // 2010.05 Konglongwang - D-Kids VS Alpha Yaosai
 dinoki4                         // 2008.08 Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior                        //
+kingyo                          // 2009.10 Yataimura Kingyosukui (1-player, Japan, Ver 1.005)
 kingyoch                        // 2009.03 Yataimura Kingyosukui (4-player, China, Ver 1.000)
 loveber3                        //
 loveber3cn                      //
 lovebero                        //
 lovebery                        // 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+manpuku                         // 2013.09 Manpuku Suizokukan
 mirworld                        // 2007.06 Mirage World (satellite)
 ochaken                         //
 segasp                          //
@@ -39725,6 +39733,7 @@ sun3_460                        //
 sun_s10                         //
 sun_s20                         //
 sun4_20                         //
+sun4_25                         //
 sun4_110                        //
 sun4_300                        //
 sun4_400                        //

@@ -169,7 +169,7 @@ private:
 		BRFC_1,
 		CALLFD_1,
 		RDTBL_1, RDTBL_2, RDTBL_3,
-		PI_1,
+		PI_1, PI_2, PI_3, PI_4,
 		UNKNOWN
 	};
 
@@ -215,6 +215,7 @@ private:
 
 	// interrupt state
 	u16 m_if;
+	u16 m_irq;
 };
 
 DECLARE_DEVICE_TYPE(MN1880, mn1880_device)

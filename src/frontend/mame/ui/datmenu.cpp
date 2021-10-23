@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Maurizio Petrarota
+// copyright-holders:Maurizio Petrarota, Vas Crabb
 /*********************************************************************
 
     ui/datmenu.cpp
@@ -70,20 +70,20 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 //  ctor
 //-------------------------------------------------
 
-menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const ui_system_info *system)
+menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo)
 	: menu(mui, container)
-	, m_system(!system ? &system_list::instance().systems()[driver_list::find(mui.machine().system().name)] : system)
-	, m_swinfo(swinfo)
+	, m_system(nullptr)
+	, m_swinfo(&swinfo)
 	, m_issoft(true)
 	, m_layout()
 	, m_actual(0)
-	, m_list(swinfo->listname)
-	, m_short(swinfo->shortname)
-	, m_long(swinfo->longname)
-	, m_parent(swinfo->parentname)
+	, m_list(swinfo.listname)
+	, m_short(swinfo.shortname)
+	, m_long(swinfo.longname)
+	, m_parent(swinfo.parentname)
 
 {
-	if (swinfo && !swinfo->infotext.empty())
+	if (!swinfo.infotext.empty())
 		m_items_list.emplace_back(_("Software List Info"), 0, "");
 	std::vector<std::string> lua_list;
 	if (mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(m_short).append(1, ',').append(m_list).c_str(), lua_list))
@@ -140,7 +140,7 @@ void menu_dats_view::add_info_text(text_layout &layout, std::string_view text, r
 			if (std::string_view::npos != split)
 			{
 				layout.add_text(line.substr(0, split), text_layout::text_justify::LEFT, color, rgb_t::transparent(), size);
-				layout.add_text(" ", text_layout::text_layout::text_justify::LEFT, color, rgb_t::transparent(), size);
+				layout.add_text(" ", text_layout::text_justify::LEFT, color, rgb_t::transparent(), size);
 				layout.add_text(line.substr(split + 1), text_layout::text_justify::RIGHT, color, rgb_t::transparent(), size);
 			}
 			else
@@ -278,10 +278,13 @@ void menu_dats_view::draw(uint32_t flags)
 	if (!m_layout || (m_layout->width() != effective_width))
 	{
 		std::string buffer;
-		if (m_issoft)
-			get_data_sw(buffer);
-		else
-			get_data(buffer);
+		if (!m_items_list.empty())
+		{
+			if (m_issoft)
+				get_data_sw(buffer);
+			else
+				get_data(buffer);
+		}
 		m_layout.emplace(ui().create_layout(container(), effective_width));
 		add_info_text(*m_layout, buffer, ui().colors().text_color());
 	}
@@ -339,8 +342,8 @@ void menu_dats_view::draw(uint32_t flags)
 
 	// add visual separator before the "return to prevous menu" item
 	container().add_line(
-			visible_left, separator + (0.5f * line_height),
-			visible_left + visible_width, separator + (0.5f * line_height),
+			x1, separator + (0.5f * line_height),
+			x2, separator + (0.5f * line_height),
 			UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	menu_item const &pitem = item(0);
@@ -471,38 +474,41 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	}
 
 	// bottom
-	std::string const revision(util::string_format(_("Revision: %1$s"), m_items_list[m_actual].revision));
-	ui().draw_text_full(
-			container(),
-			revision,
-			0.0f, 0.0f, 1.0f,
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
-			&width, nullptr);
-	width += 2 * lr_border;
-	maxwidth = std::max(origx2 - origx1, width);
+	if (!m_items_list.empty())
+	{
+		std::string const revision(util::string_format(_("Revision: %1$s"), m_items_list[m_actual].revision));
+		ui().draw_text_full(
+				container(),
+				revision,
+				0.0f, 0.0f, 1.0f,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
+				&width, nullptr);
+		width += 2 * lr_border;
+		maxwidth = std::max(origx2 - origx1, width);
 
-	// compute our bounds
-	x1 = 0.5f - 0.5f * maxwidth;
-	x2 = x1 + maxwidth;
-	y1 = origy2 + ui().box_tb_border();
-	y2 = origy2 + bottom;
+		// compute our bounds
+		x1 = 0.5f - 0.5f * maxwidth;
+		x2 = x1 + maxwidth;
+		y1 = origy2 + ui().box_tb_border();
+		y2 = origy2 + bottom;
 
-	// draw a box
-	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
+		// draw a box
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_GREEN_COLOR);
 
-	// take off the borders
-	x1 += lr_border;
-	x2 -= lr_border;
-	y1 += ui().box_tb_border();
+		// take off the borders
+		x1 += lr_border;
+		x2 -= lr_border;
+		y1 += ui().box_tb_border();
 
-	// draw the text within it
-	ui().draw_text_full(
-			container(),
-			revision,
-			x1, y1, x2 - x1,
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
-			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
+		// draw the text within it
+		ui().draw_text_full(
+				container(),
+				revision,
+				x1, y1, x2 - x1,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+				mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color());
+	}
 }
 
 //-------------------------------------------------

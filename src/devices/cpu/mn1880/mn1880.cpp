@@ -21,17 +21,21 @@
       MN1870, which lacks a number of MN1880 instructions and differs in
       some other important ways. Many have been guessed at.
     * Some instruction behavior, especially for repeated cases, has been
-      guessed at and may not be strictly correct.
-    * No interrupts have been emulated, though some interrupt registers
-      have been tentatively identified. Obviously they must be internally
-      vectored through the table at the start of the program space.
-    * The PI (software interrupt) instruction is likewise unemulated,
-      since its vector is uncertain; though possibly implicitly inserted
-      when an interrupt is acknowledged, explicit uses of it are
+      guessed at and may not be strictly correct. It seems possible that
+      many of the more complicated instructions are not supposed to be
+      repeatable.
+    * Interrupt behavior, including vectoring, has also been guessed at,
+      though the specific sources of each interrupt remain largely
+      unidentified and completely unemulated. Separate interrupt enable
+      registers have been provided for each CPU, though these seem to
+      share the same internal addresses. Repeated instructions are fully
+      interruptible. Interrupt acknowledgment has been implemented as a
+      special invocation of the PI instruction; however, PI usage is
       nonexistent in extant code.
     * The output queue has been implemented only for memory writes, even
       though the MN1870 documentation shows it as applicable for
-      instructions that do none of those.
+      instructions that do none of those. It may also be used to
+      pipeline updates to XP, YP, SP or FS.
     * Every cycle fetches a byte from the instruction space, whether it
       is needed for execution or not. This fetching may not happen quite
       so continuously on actual hardware (a few dummy fetches may be
@@ -84,6 +88,7 @@ mn1880_device::mn1880_device(const machine_config &mconfig, device_type type, co
 	, m_output_queue_state(0xff)
 	, m_icount(0)
 	, m_if(0)
+	, m_irq(0)
 {
 }
 
@@ -246,6 +251,7 @@ void mn1880_device::device_start()
 	save_item(STRUCT_MEMBER(m_cpu, ie));
 	save_item(STRUCT_MEMBER(m_cpu, iemask));
 	save_item(NAME(m_if));
+	save_item(NAME(m_irq));
 	save_item(NAME(m_cpum));
 	save_item(NAME(m_ustate));
 	save_item(NAME(m_da));
@@ -275,6 +281,7 @@ void mn1880_device::device_reset()
 	m_cpu[1].lp = 0x0160;
 
 	m_if = 0;
+	m_irq = 0;
 	m_cpum = 0x0c;
 	m_ustate = microstate::NEXT;
 	m_output_queue_state = 0xff;
@@ -480,12 +487,24 @@ void mn1880_device::execute_run()
 	{
 		cpu_registers &cpu = get_active_cpu();
 
-		if (m_ustate == microstate::NEXT && cpu.wait == 0)
+		if (m_ustate == microstate::NEXT)
 		{
-			if (!BIT(cpu.fs, 4))
-				debugger_instruction_hook(cpu.irp);
-			if (!output_queued() && !BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
-				m_ustate = s_decode_map[cpu.ir];
+			m_irq = cpu.iemask ? 0 : cpu.ie & m_if;
+			if (m_irq != 0)
+			{
+				cpu.wait = 0;
+				if (!BIT(cpu.fs, 4))
+					--cpu.ip;
+				if (!output_queued())
+					m_ustate = microstate::PI_1;
+			}
+			else if (cpu.wait == 0)
+			{
+				if (!BIT(cpu.fs, 4))
+					debugger_instruction_hook(cpu.irp);
+				if (!output_queued() && !BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
+					m_ustate = s_decode_map[cpu.ir];
+			}
 		}
 
 		u8 input = m_cache.read_byte(cpu.ip);
@@ -504,12 +523,17 @@ void mn1880_device::execute_run()
 					m_data.write_byte(m_da, m_tmp1 & 0x00ff);
 					m_output_queue_state = 0xff;
 				}
-				if (BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
+				if (m_irq != 0)
+					m_ustate = microstate::PI_1;
+				else
 				{
-					++cpu.ip;
-					m_da = input;
+					if (BIT(s_input_queue_map[cpu.ir >> 4], cpu.ir & 0x0f))
+					{
+						++cpu.ip;
+						m_da = input;
+					}
+					m_ustate = s_decode_map[cpu.ir];
 				}
-				m_ustate = s_decode_map[cpu.ir];
 			}
 			break;
 
@@ -2239,6 +2263,7 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::RETI_3:
+			cpu.iemask = false;
 			m_tmp1 = m_data.read_byte(m_da);
 			++m_da;
 			m_ustate = microstate::RETI_4;
@@ -2334,6 +2359,53 @@ void mn1880_device::execute_run()
 			break;
 
 		case microstate::PI_1:
+			m_tmp2 = cpu.ip;
+			if (m_irq != 0)
+			{
+				// IRQ0 (first of four external edge inputs?) has the highest priority (after RESET)
+				unsigned level = 32 - count_leading_zeros_32((m_irq - 1) & ~m_irq);
+				(void)standard_irq_callback(level);
+				cpu.ie &= ~(1 << level); // No separate in-service lockout; handler must re-enable specific interrupt
+				m_if &= ~(1 << level);
+				cpu.iemask = true;
+				cpu.ip = 0x0004 + (level << 1);
+			}
+			else
+				cpu.ip = 0x0002; // PI vector unconfirmed
+			if (BIT(m_cpum, 4))
+				cpu.ip |= 0x0020;
+			m_da = cpu.sp - 1;
+			if ((cpu.fs & 0x1f) != 0)
+			{
+				m_tmp1 = cpu.ir;
+				m_ustate = microstate::PI_2;
+			}
+			else
+				m_ustate = microstate::PI_3;
+			break;
+
+		case microstate::PI_2:
+			m_data.write_byte(m_da, m_tmp1);
+			--m_da;
+			m_ustate = microstate::PI_3;
+			break;
+
+		case microstate::PI_3:
+			m_data.write_byte(m_da, m_tmp2 >> 8);
+			--m_da;
+			m_tmp1 = u16(input) << 8;
+			++cpu.ip;
+			m_ustate = microstate::PI_4;
+			break;
+
+		case microstate::PI_4:
+			m_data.write_byte(m_da, m_tmp2 & 0x00ff);
+			--m_da;
+			m_tmp2 = cpu.fs;
+			cpu.branch(m_tmp1 | input); // FS repeat bits are cleared here
+			m_ustate = microstate::CALL_3;
+			break;
+
 		case microstate::UNKNOWN:
 			logerror("%04X: Unknown or unemulated instruction %02X encountered\n", cpu.irp, cpu.ir);
 			next_instruction(input);

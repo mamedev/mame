@@ -43,7 +43,6 @@ DEFINE_DEVICE_TYPE(NES_DAOU306,     nes_daou306_device,     "nes_daou306",     "
 DEFINE_DEVICE_TYPE(NES_CC21,        nes_cc21_device,        "nes_cc21",        "NES Cart CC-21 PCB")
 DEFINE_DEVICE_TYPE(NES_XIAOZY,      nes_xiaozy_device,      "nes_xiaozy",      "NES Cart Xiao Zhuan Yuan PCB")
 DEFINE_DEVICE_TYPE(NES_EDU2K,       nes_edu2k_device,       "nes_edu2k",       "NES Cart Educational Computer 2000 PCB")
-DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
 DEFINE_DEVICE_TYPE(NES_MK2,         nes_mk2_device,         "nes_mk2",         "NES Cart Mortal Kombat 2 PCB")
 DEFINE_DEVICE_TYPE(NES_43272,       nes_43272_device,       "nes_43272",       "NES Cart UNL-43272 PCB")
 DEFINE_DEVICE_TYPE(NES_EH8813A,     nes_eh8813a_device,     "nes_eh8813a",     "NES Cart UNL-EH8813A PCB")
@@ -91,11 +90,6 @@ nes_xiaozy_device::nes_xiaozy_device(const machine_config &mconfig, const char *
 
 nes_edu2k_device::nes_edu2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_EDU2K, tag, owner, clock)
-{
-}
-
-nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_T230, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_mode(0), m_irq_enable(0), m_irq_enable_latch(0)
 {
 }
 
@@ -236,31 +230,6 @@ void nes_edu2k_device::pcb_reset()
 	chr8(0, m_chr_source);
 
 	m_latch = 0;
-}
-
-void nes_t230_device::device_start()
-{
-	common_start();
-	save_item(NAME(m_irq_mode));
-	save_item(NAME(m_irq_enable));
-	save_item(NAME(m_irq_enable_latch));
-	save_item(NAME(m_irq_count));
-	save_item(NAME(m_irq_count_latch));
-	save_item(NAME(m_mmc_vrom_bank));
-}
-
-void nes_t230_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg16_89ab(0);
-	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
-
-	m_irq_mode = 0;
-	m_irq_enable = m_irq_enable_latch = 0;
-	m_irq_count = m_irq_count_latch = 0;
-
-	memset(m_mmc_vrom_bank, 0, sizeof(m_mmc_vrom_bank));
 }
 
 void nes_mk2_device::device_start()
@@ -674,80 +643,6 @@ uint8_t nes_edu2k_device::read_m(offs_t offset)
 {
 	LOG_MMC(("edu2k read_m, offset: %04x\n", offset));
 	return m_prgram[((m_latch * 0x2000) + offset) & (m_prgram.size() - 1)];
-}
-
-/*-------------------------------------------------
-
- Board UNL-T-230
-
- Games: Dragon Ball Z IV (Unl)
-
- This mapper appears to be similar to Konami VRC-2
- but the game has no VROM and only 1 VRAM bank, so we
- completely skip the chr bankswitch. If other games
- using the same board and using CHR should surface,
- we need to investigate this...
-
- In MESS: Supported
-
- -------------------------------------------------*/
-
-// Identical to Konami IRQ
-void nes_t230_device::hblank_irq(int scanline, int vblank, int blanked)
-{
-	/* Increment & check the IRQ scanline counter */
-	if (m_irq_enable && (++m_irq_count == 0x100))
-	{
-		m_irq_count = m_irq_count_latch;
-		m_irq_enable = m_irq_enable_latch;
-		hold_irq_line();
-	}
-}
-
-void nes_t230_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("t230 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x700c)
-	{
-		case 0x0000:
-			break;
-		case 0x2000:
-			prg16_89ab(data);
-			break;
-		case 0x1000:
-		case 0x1004:
-		case 0x1008:
-		case 0x100c:
-			switch (data & 0x03)
-			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-			}
-			break;
-
-		case 0x7000:
-			m_irq_count_latch &= ~0x0f;
-			m_irq_count_latch |= data & 0x0f;
-			break;
-		case 0x7004:
-			m_irq_count_latch &= ~0xf0;
-			m_irq_count_latch |= (data << 4) & 0xf0;
-			break;
-		case 0x7008:
-			m_irq_mode = data & 0x04;   // currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			m_irq_enable = data & 0x02;
-			m_irq_enable_latch = data & 0x01;
-			if (data & 0x02)
-				m_irq_count = m_irq_count_latch;
-			break;
-
-		default:
-			logerror("unl_t230_w uncaught offset: %04x value: %02x\n", offset, data);
-			break;
-	}
 }
 
 /*-------------------------------------------------

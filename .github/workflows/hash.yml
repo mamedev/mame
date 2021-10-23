@@ -1,12 +1,18 @@
-name: XML validation
+name: XML/JSON validation
 
 on:
   push:
     paths:
+    - '.github/**'
+    - 'ctrlr/*'
     - 'hash/*'
+    - 'plugins/**'
   pull_request:
     paths:
+    - '.github/**'
+    - 'ctrlr/*'
     - 'hash/*'
+    - 'plugins/**'
 
 jobs:
   validate:
@@ -16,8 +22,12 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libxml2-utils
+        sudo apt-get install -y libxml2-utils python3-jsonschema
+    - name: Validate (controller configuration)
+      run: for x in ctrlr/*.cfg ; do xmllint --noout "$x" ; done
     - name: Validate (HSI)
       run: for x in hash/*.hsi ; do xmllint --noout "$x" ; done
-    - name: Validate (XML)
+    - name: Validate (software list)
       run: for x in hash/*.xml ; do xmllint --noout --valid "$x" ; done
+    - name: Validate (plugin properties)
+      run: for x in plugins/*/plugin.json ; do jsonschema -i "$x" plugins/plugin.schema ; done

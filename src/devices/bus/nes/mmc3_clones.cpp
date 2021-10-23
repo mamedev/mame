@@ -31,8 +31,8 @@
 DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
 DEFINE_DEVICE_TYPE(NES_FS6,           nes_fs6_device,           "nes_fs6",           "NES Cart Fight Street VI PCB")
 DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
-DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Spash Bomb PCB")
-DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY04646 PCB")
+DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Splash Bomb PCB")
+DEFINE_DEVICE_TYPE(NES_FAMILY4646,    nes_family4646_device,    "nes_family4646",    "NES Cart BMC-FAMILY4646 PCB")
 DEFINE_DEVICE_TYPE(NES_PIKAY2K,       nes_pikay2k_device,       "nes_pikay2k",       "NES Cart PIKACHU Y2K PCB")
 DEFINE_DEVICE_TYPE(NES_8237,          nes_8237_device,          "nes_8237",          "NES Cart UNL-8237 PCB")
 DEFINE_DEVICE_TYPE(NES_8237A,         nes_8237a_device,         "nes_8237a",         "NES Cart UNL-8237A PCB")
@@ -65,6 +65,8 @@ DEFINE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device,      "nes_bmc_8in1", 
 DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK8,      nes_bmc_hik8_device,      "nes_bmc_hik8",      "NES Cart BMC HIK 8 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_JY208,     nes_bmc_jy208_device,     "nes_bmc_jy208",     "NES Cart BMC JY-208 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_SFC12,     nes_bmc_sfc12_device,     "nes_bmc_sfc12",     "NES Cart BMC SFC-12 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HIK4,      nes_bmc_hik4_device,      "nes_bmc_hik4",      "NES Cart BMC HIK 4 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_MARIO7IN1, nes_bmc_mario7in1_device, "nes_bmc_mario7in1", "NES Cart BMC Mario 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_F15,       nes_bmc_f15_device,       "nes_bmc_f15",       "NES Cart BMC F-15 PCB")
@@ -73,6 +75,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45", 
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3033,     nes_bmc_k3033_device,     "nes_bmc_k3033",     "NES Cart BMC K-3033 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_L6IN1,     nes_bmc_l6in1_device,     "nes_bmc_l6in1",     "NES Cart BMC L6IN1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_00202650,  nes_bmc_00202650_device,  "nes_bmc_00202650",  "NES Cart BMC 00202650 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_810305C,   nes_bmc_810305c_device,   "nes_bmc_810305c",   "NES Cart BMC 81-03-05-C PCB")
@@ -140,7 +143,7 @@ nes_malisb_device::nes_malisb_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_family4646_device::nes_family4646_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_FAMILY4646, tag, owner, clock)
 {
 }
@@ -317,8 +320,23 @@ nes_bmc_sbig7_device::nes_bmc_sbig7_device(const machine_config &mconfig, const 
 {
 }
 
-nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_BMC_HIK8, tag, owner, clock), m_count(0)
+nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, type, tag, owner, clock), m_count(0)
+{
+}
+
+nes_bmc_hik8_device::nes_bmc_hik8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_hik8_device(mconfig, NES_BMC_HIK8, tag, owner, clock)
+{
+}
+
+nes_bmc_jy208_device::nes_bmc_jy208_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_hik8_device(mconfig, NES_BMC_JY208, tag, owner, clock)
+{
+}
+
+nes_bmc_sfc12_device::nes_bmc_sfc12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_hik8_device(mconfig, NES_BMC_SFC12, tag, owner, clock)
 {
 }
 
@@ -361,6 +379,11 @@ nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const 
 
 nes_bmc_k3033_device::nes_bmc_k3033_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_K3033, tag, owner, clock), m_mmc3_mode(false)
+{
+}
+
+nes_bmc_l6in1_device::nes_bmc_l6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_L6IN1, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -414,12 +437,19 @@ nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char
 {
 }
 
-
+void nes_family4646_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
 
 void nes_family4646_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	mmc3_common_initialize(0x1f, 0xff, 0);
+	set_nt_mirroring(PPU_MIRROR_HORZ); // Space Shuttle on CB-4035 doesn't set mirroring bit. Whether this cart is hard-wired to reset correctly to horizontal mirroring is not clear.
 }
 
 void nes_pikay2k_device::device_start()
@@ -746,7 +776,7 @@ void nes_bmc_hik8_device::pcb_reset()
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
 	m_count = 0;
-	memset(m_reg, 0, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	mmc3_common_initialize(0x3f, 0xff, 0);
 }
 
@@ -849,6 +879,20 @@ void nes_bmc_k3033_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 	prg16_89ab(0);
 	prg16_cdef(0);
+}
+
+void nes_bmc_l6in1_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_l6in1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x0f, 0x07, 0);
 }
 
 void nes_bmc_00202650_device::device_start()
@@ -1070,29 +1114,60 @@ void nes_malisb_device::write_h(offs_t offset, uint8_t data)
  BMC-FAMILY-4646B
 
  Known Boards: Unknown Multigame Bootleg Board (4646B)
- Games: 2 in 1 - Family Kid & Aladdin 4
+ Games: 2 in 1 - Family Kid & Aladdin 4, various multicarts.
 
- MMC3 clone
+ MMC3 clone with banking for multigame menu.
 
  iNES: mapper 134
 
- In MESS: Supported.
+ In MAME: Preliminary supported.
+
+ TODO: There are unknown writes to the unused reg 3,
+ though it seems only 0x00 is written. Next, some
+ carts have solder pad setting readable at 0x8000.
+ Lastly, YH-4103 doesn't soft reset cleanly like
+ the other carts, but does this happen on hardware?
 
  -------------------------------------------------*/
 
-void nes_family4646_device::write_m(offs_t offset, uint8_t data)
+void nes_family4646_device::prg_cb(int start, int bank)
+{
+	if (!BIT(m_reg[1], 7))    // MMC3 mode
+		nes_txrom_device::prg_cb(start, bank);
+	else if (start == 0)      // NROM mode, only uses MMC3's $8000 bank
+	{
+		if (BIT(m_reg[1], 3))
+		{
+			prg16_89ab(bank & ~0x01);
+			prg16_cdef(bank & ~0x01);
+		}
+		else
+			prg32(bank & ~0x03);
+	}
+}
+
+void nes_family4646_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("family4646 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	if (offset == 0x01)
-	{
-		m_prg_base = (data & 0x02) << 4;
-		m_prg_mask = 0x1f;
-		m_chr_base = (data & 0x20) << 3;
-		m_chr_mask = 0xff;
-		set_prg(m_prg_base, m_prg_mask);
+	int reg = offset & 0x03;
+	if (!BIT(m_reg[0], 7))    // lock bit
+		m_reg[reg] = data;
+	else if (reg == 2)        // final two bits of reg 2 respond regardless
+		m_reg[reg] = (m_reg[reg] & ~0x03) | (data & 0x03);
+	else
+		return;
+
+	m_prg_base = (m_reg[1] & 0x03) << 4;
+	m_prg_mask = 0x1f >> BIT(m_reg[1], 2);
+	set_prg(m_prg_base, m_prg_mask);
+
+	m_chr_base = (m_reg[1] & 0x30) << 3;
+	m_chr_mask = 0xff >> BIT(m_reg[1], 6);
+	if (BIT(m_reg[0], 3))    // CNROM-like mode
+		chr8(m_chr_base >> 3 | (m_reg[2] & (m_chr_mask >> 3)), m_chr_source);
+	else                     // MMC3 mode
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);
-	}
 }
 
 /*-------------------------------------------------
@@ -2510,46 +2585,93 @@ void nes_bmc_sbig7_device::write_h(offs_t offset, uint8_t data)
  BMC-HIK8IN1
 
  Known Boards: Unknown Multigame Bootleg Board
- Games: Street Fighter V, various multigame carts
+ Games: Many, many multigame carts
 
  iNES: mapper 45
 
- In MESS: Supported. It also uses mmc3_irq.
+ In MAME: Supported. It also uses mmc3_irq.
 
  -------------------------------------------------*/
 
-void nes_bmc_hik8_device::write_m(offs_t offset, uint8_t data)
+void nes_bmc_hik8_device::write_m(offs_t offset, u8 data)
 {
 	LOG_MMC(("bmc_hik8 write_m, offset: %04x, data: %02x\n", offset, data));
 
-	/* This bit is the "register lock". Once register are locked, writes go to WRAM
-	 and there is no way to unlock them (except by resetting the machine) */
-	if ((m_reg[3] & 0x40) && !m_prgram.empty())
-		m_prgram[offset] = data;
-	else
+	nes_txrom_device::write_m(offset, data);  // registers overlay WRAM
+
+	if (!BIT(m_reg[3], 6))  // outer register lock bit
 	{
 		m_reg[m_count] = data;
 		m_count = (m_count + 1) & 0x03;
 
-		if (!m_count)
-		{
-			LOG_MMC(("bmc_hik8 write_m, command completed %02x %02x %02x %02x\n", m_reg[3],
-						m_reg[2], m_reg[1], m_reg[0]));
+		m_prg_base = (m_reg[2] & 0xc0) << 2 | m_reg[1];
+		m_prg_mask = ~m_reg[3] & 0x3f;
+		set_prg(m_prg_base, m_prg_mask);
 
-			m_prg_base = m_reg[1];
-			m_prg_mask = 0x3f ^ (m_reg[3] & 0x3f);
-			m_chr_base = ((m_reg[2] & 0xf0) << 4) | m_reg[0];
-			if (BIT(m_reg[2], 3))
-				m_chr_mask = (1 << ((m_reg[2] & 7) + 1)) - 1;
-			else if (m_reg[2])
-				m_chr_mask = 0;
-			else
-				m_chr_mask = 0xff;  // i.e. we use the vrom_bank with no masking
-
-			set_prg(m_prg_base, m_prg_mask);
-			set_chr(m_chr_source, m_chr_base, m_chr_mask);
-		}
+		m_chr_base = (m_reg[2] & 0xf0) << 4 | m_reg[0];
+		m_chr_mask = 0xff >> (~m_reg[2] & 0x0f);
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
+}
+
+/*-------------------------------------------------
+
+ BMC-JY-208
+
+ Games: Rockman 7 in 1
+
+ Variant of the HIK8IN1 boards that adds 8K of VRAM
+ to be used presumably by Rockman 4/6 and a 4 screen
+ mirroring mode for Sachen's Rocman X.
+
+ NES 2.0: mapper 356
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_jy208_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (BIT(m_reg[2], 5))
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+	else
+		chr8(0, CHRRAM);
+}
+
+void nes_bmc_jy208_device::write_m(offs_t offset, u8 data)
+{
+	nes_bmc_hik8_device::write_m(offset, data);
+
+	if (BIT(m_reg[2], 6))
+	{
+		set_nt_mirroring(PPU_MIRROR_4SCREEN);  // actually change NT pointers
+		m_mirroring = PPU_MIRROR_4SCREEN;      // prevent MMC3 mirror switching
+	}
+	else
+		m_mirroring = PPU_MIRROR_NONE;         // allow MMC3 mirror switching
+}
+
+/*-------------------------------------------------
+
+ BMC-SFC-12
+
+ Games: Rockman 6 in 1 (alt 2)
+
+ Variant of the HIK8IN1 boards that adds 8K of VRAM
+ to be used presumably by Rockman 4/6.
+
+ NES 2.0: mapper 372
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_sfc12_device::set_chr(u8 chr, int chr_base, int chr_mask)
+{
+	if (BIT(m_reg[2], 5))
+		chr8(0, CHRRAM);
+	else
+		nes_txrom_device::set_chr(chr, chr_base, chr_mask);
 }
 
 /*-------------------------------------------------
@@ -2973,6 +3095,60 @@ void nes_bmc_k3033_device::write_m(offs_t offset, u8 data)
 			prg16_cdef(bank | mode);
 		}
 	}
+}
+
+/*-------------------------------------------------
+
+ BMC-L6IN1
+
+ Games: New Star 6 in 1
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 345
+
+ Note: Cabal leaves the APU in a bad state so that
+ after soft resetting and loading Track & Field there
+ is a constant drone pitch. This is likely a game bug.
+
+ -------------------------------------------------*/
+
+void nes_bmc_l6in1_device::set_prg(int prg_base, int prg_mask)
+{
+	if (m_reg & 0x0c)    // MMC3 mode
+		nes_txrom_device::set_prg(prg_base, prg_mask);
+	else                // AxROM mode
+		prg32(prg_base >> 2 | (m_reg & 0x03));
+}
+
+void nes_bmc_l6in1_device::set_mirror()
+{
+	if (BIT(m_reg, 5))
+		set_nt_mirroring(BIT(m_reg, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	else
+		set_nt_mirroring(m_mmc_mirror ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+void nes_bmc_l6in1_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_l6in1 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if ((m_wram_protect & 0xc0) == 0x80)
+	{
+		m_reg = data;
+		m_prg_base = (m_reg & 0xc0) >> 2;
+		set_prg(m_prg_base, m_prg_mask);
+		set_mirror();
+	}
+}
+
+void nes_bmc_l6in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_l6in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	txrom_write(offset, data);
+	if ((offset & 0x6001) == 0x2000)
+		set_mirror();
 }
 
 /*-------------------------------------------------

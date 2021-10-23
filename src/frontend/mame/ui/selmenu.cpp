@@ -855,18 +855,10 @@ void menu_select_launch::inkey_dats()
 	ui_software_info const *software;
 	ui_system_info const *system;
 	get_selection(software, system);
-	if (software)
-	{
-		if (software->startempty && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", software->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system);
-		else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str()) || !software->infotext.empty())
-			menu::stack_push<menu_dats_view>(ui(), container(), software);
-	}
+	if (software && !software->startempty)
+		menu::stack_push<menu_dats_view>(ui(), container(), *software);
 	else if (system)
-	{
-		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", system->driver->name, true))
-			menu::stack_push<menu_dats_view>(ui(), container(), system);
-	}
+		menu::stack_push<menu_dats_view>(ui(), container(), system);
 }
 
 
@@ -1299,23 +1291,28 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	x1 = (std::min)(backtrack_pos - (float(toolbar_count) * x_spacing), x1 + ((x2 - x1 - total_width) * 0.5f));
 	for (int z = 0; toolbar_count > z; ++z, x1 += x_spacing)
 	{
+		auto const bitmap = toolbar_bitmaps[z];
 		x2 = x1 + x_size;
 		color = rgb_t (0xffcccccc);
 		if (mouse_in_rect(x1, y1, x2, y2))
 		{
-			set_hover(HOVER_B_FAV + toolbar_bitmaps[z]);
-			color = rgb_t::white();
+			bool const need_selection = (TOOLBAR_BITMAP_FAVORITE == bitmap) || (TOOLBAR_BITMAP_INFO == bitmap);
+			if (!need_selection || get_selection_ptr())
+			{
+				set_hover(HOVER_B_FAV + bitmap);
+				color = rgb_t::white();
+			}
 			float ypos = y2 + ui().get_line_height() + 2.0f * ui().box_tb_border();
 			ui().draw_text_box(
 					container(),
-					_(hover_msg[toolbar_bitmaps[z]]),
+					_(hover_msg[bitmap]),
 					text_layout::text_justify::CENTER, (x1 + x2) * 0.5f, ypos,
 					ui().colors().background_color());
 		}
 		container().add_quad(
 				x1, y1, x2, y2,
 				color,
-				m_cache.toolbar_textures()[toolbar_bitmaps[z]].get(),
+				m_cache.toolbar_textures()[bitmap].get(),
 				PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 }
@@ -2697,7 +2694,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 {
 	float const line_height = ui().get_line_height();
 	float text_size = ui().options().infos_size();
-	const char *first = "";
+	std::string_view first;
 	ui_software_info const *software;
 	ui_system_info const *system;
 	int total;
@@ -2706,7 +2703,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (software && !software->startempty)
 	{
 		m_info_driver = nullptr;
-		first = N_("Software List Info");
+		first = _("Software List Info");
 
 		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
@@ -2743,7 +2740,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	{
 		game_driver const &driver(system ? *system->driver : *software->driver);
 		m_info_software = nullptr;
-		first = N_("General Info");
+		first = _("General Info");
 
 		if (&driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
@@ -2787,13 +2784,13 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_("selmenu-artwork", first)));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : first);
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_("selmenu-artwork", first)));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : first);
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,

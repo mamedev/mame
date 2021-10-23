@@ -67,20 +67,24 @@ private:
 	// TODO [RH 31 May 2016]: Move this cheat stuff into its own class
 	struct cheat_system
 	{
-		char        cpu[2];
+		address_space *space;
 		u8          width;
-		std::vector<cheat_map> cheatmap;
-		u8          undo;
 		u8          signed_cheat;
 		u8          swapped_cheat;
+		std::vector<cheat_map> cheatmap;
+		u8          undo;
+
+		u64 sign_extend(u64 value) const;
+		u64 byte_swap(u64 value) const;
+		u64 read_extended(offs_t address) const;
 	};
 
 	struct cheat_region_map
 	{
-		u64         offset;
-		u64         endoffset;
-		const char *share;
-		u8          disabled;
+		u64         offset = 0U;
+		u64         endoffset = 0U;
+		const char *share = nullptr;
+		u8          disabled = 0U;
 	};
 
 	device_t &get_device_search_base(std::string_view &param);
@@ -89,9 +93,6 @@ private:
 	bool debug_command_parameter_command(const char *param);
 
 	bool cheat_address_is_valid(address_space &space, offs_t address);
-	u64 cheat_sign_extend(const cheat_system *cheatsys, u64 value);
-	u64 cheat_byte_swap(const cheat_system *cheatsys, u64 value);
-	u64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
 	u64 get_cpunum();
 
@@ -99,6 +100,8 @@ private:
 	void global_set(global_entry *global, u64 value);
 
 	int mini_printf(char *buffer, const char *format, int params, u64 *param);
+	template <typename T>
+	void execute_index_command(std::vector<std::string> const &params, T &&apply, char const *unused_message);
 
 	void execute_help(const std::vector<std::string> &params);
 	void execute_print(const std::vector<std::string> &params);

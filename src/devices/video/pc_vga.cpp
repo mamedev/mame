@@ -5881,7 +5881,7 @@ void xga_copro_device::start_command()
 			logerror("line draw write\n");
 			break;
 		case 8:
-			logerror("pxblt\n");
+			do_pxblt();
 			break;
 		case 9:
 			logerror("inverting pxblt\n");
@@ -5892,9 +5892,325 @@ void xga_copro_device::start_command()
 	}
 }
 
-void do_pxblt()
+// Can maps be not byte aligned? XGA manual says they must be 32bit aligned in at least some cases.
+u32 xga_copro_device::read_map_pixel(int x, int y, int map)
 {
+	offs_t addr = m_pelmap_base[map];
+	int width = m_pelmap_width[map] + 1;
+	int height = m_pelmap_height[map] + 1;
+	int endian = m_pelmap_format[map] & 8;
+	int wbytes, bits;
+	u8 byte;
+	if((x > width) || (y > height) || (x < 0) || (y < 0))
+		return 0;
+	switch(m_pelmap_format[map] & 7)
+	{
+		case 0:
+			wbytes = width / 8;
+			addr += y * wbytes;
+			addr += x / 8;
+			byte = m_mem_read_cb(addr);
+			bits = (x % 8) - (endian ? 8 : 0);
+			return (byte >> bits) & 1;
+		case 1:
+			wbytes = width / 4;
+			addr += y * wbytes;
+			addr += x / 4;
+			byte = m_mem_read_cb(addr);
+			bits = (x % 4) - (endian ? 4 : 0);
+			return (byte >> (bits * 2)) & 3;
+		case 2:
+			wbytes = width / 2;
+			addr += y * wbytes;
+			addr += x / 2;
+			byte = m_mem_read_cb(addr);
+			bits = (x % 2) - (endian ? 2 : 0);
+			return (byte >> (bits * 4)) & 0xf;
+		case 3:
+			wbytes = width;
+			addr += y * wbytes;
+			addr += x;
+			//logerror("r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
+			return m_mem_read_cb(addr);
+		case 4:
+			wbytes = width * 2;
+			addr += y * wbytes;
+			addr += x * 2;
+			if(endian)
+				return m_mem_read_cb(addr + 1) | (m_mem_read_cb(addr) << 8);
+			return m_mem_read_cb(addr) | (m_mem_read_cb(addr + 1) << 8);
+		case 5:
+			wbytes = width * 4;
+			addr += y * wbytes;
+			addr += x * 4;
+			if(endian)
+				return m_mem_read_cb(addr + 3) | (m_mem_read_cb(addr + 2) << 8) |
+						(m_mem_read_cb(addr + 1) << 16) | (m_mem_read_cb(addr) << 24);
+			return m_mem_read_cb(addr) | (m_mem_read_cb(addr + 1) << 8) |
+					(m_mem_read_cb(addr + 2) << 16) | (m_mem_read_cb(addr + 3) << 24);
+	}
+	logerror("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
+	return 0;
+}
 
+void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
+{
+	offs_t addr = m_pelmap_base[map];
+	int width = m_pelmap_width[map] + 1;
+	int height = m_pelmap_height[map] + 1;
+	int endian = m_pelmap_format[map] & 8;
+	int wbytes;
+	u8 byte, mask;
+	if((x > width) || (y > height) || (x < 0) || (y < 0))
+		return;
+	switch(m_pelmap_format[map] & 7)
+	{
+		case 0:
+			wbytes = width / 8;
+			addr += y * wbytes;
+			addr += x / 8;
+			byte = m_mem_read_cb(addr);
+			mask = 1 << ((x % 8) - (endian ? 8 : 0));
+			byte = (byte & ~mask) | ((pixel ? 0xff : 0) & mask);
+			m_mem_write_cb(addr, byte);
+			break;
+		case 1:
+			wbytes = width / 4;
+			addr += y * wbytes;
+			addr += x / 4;
+			byte = m_mem_read_cb(addr);
+			mask = 3 << (((x % 4) - (endian ? 4 : 0)) * 2);
+			byte = (byte & ~mask) | ((pixel ? 0xff : 0) & mask);
+			m_mem_write_cb(addr, byte);
+			break;
+		case 2:
+			wbytes = width / 2;
+			addr += y * wbytes;
+			addr += x / 2;
+			byte = m_mem_read_cb(addr);
+			mask = 0xf << (((x % 2) - (endian ? 2 : 0)) * 4);
+			byte = (byte & ~mask) | ((pixel ? 0xff : 0) & mask);
+			m_mem_write_cb(addr, byte);
+			break;
+		case 3:
+			wbytes = width;
+			addr += y * wbytes;
+			addr += x;
+			//logerror("w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
+			m_mem_write_cb(addr, (u8)pixel);
+			break;
+		case 4:
+			wbytes = width * 2;
+			addr += y * wbytes;
+			addr += x * 2;
+			if(endian)
+			{
+				m_mem_write_cb(addr + 1, pixel & 0xff);
+				m_mem_write_cb(addr, pixel >> 8);
+			}
+			else
+			{
+				m_mem_write_cb(addr, pixel & 0xff);
+				m_mem_write_cb(addr + 1, pixel >> 8);
+			}
+			break;
+		case 5:
+			wbytes = width * 4;
+			addr += y * wbytes;
+			addr += x * 4;
+			if(endian)
+			{
+				m_mem_write_cb(addr + 3, pixel & 0xff);
+				m_mem_write_cb(addr + 2, pixel >> 8);
+				m_mem_write_cb(addr + 1, pixel >> 16);
+				m_mem_write_cb(addr, pixel >> 24);
+			}
+			else
+			{
+				m_mem_write_cb(addr, pixel & 0xff);
+				m_mem_write_cb(addr + 1, pixel >> 8);
+				m_mem_write_cb(addr + 2, pixel >> 16);
+				m_mem_write_cb(addr + 3, pixel >> 24);
+			}
+			break;
+		default:
+			logerror("invalid pixel map mode %d %d\n", map, m_pelmap_format[map] & 7);
+			break;
+	}
+}
+
+u32 xga_copro_device::rop(u32 s, u32 d, u8 op)
+{
+	if(m_var == TYPE::OTI111)
+	{
+		switch(op)
+		{
+			default:
+			case 0:
+				return 0;
+			case 1:
+				return ~s & ~d;
+			case 2:
+				return ~s & d;
+			case 3:
+				return ~s;
+			case 4:
+				return s & ~d;
+			case 5:
+				return ~d;
+			case 6:
+				return s ^ d;
+			case 7:
+				return ~s | ~d;
+			case 8:
+				return s & d;
+			case 9:
+				return s ^ ~d;
+			case 10:
+				return d;
+			case 11:
+				return ~s | d;
+			case 12:
+				return s;
+			case 13:
+				return s | ~d;
+			case 14:
+				return s | d;
+			case 15:
+				return -1;
+		}
+	}
+	switch(op)
+	{
+		default:
+		case 0:
+			return 0;
+		case 1:
+			return s & d;
+		case 2:
+			return s & ~d;
+		case 3:
+			return s;
+		case 4:
+			return ~s & d;
+		case 5:
+			return d;
+		case 6:
+			return s ^ d;
+		case 7:
+			return s | d;
+		case 8:
+			return ~s & ~d;
+		case 9:
+			return s ^ ~d;
+		case 10:
+			return ~d;
+		case 11:
+			return s | ~d;
+		case 12:
+			return ~s;
+		case 13:
+			return ~s | d;
+		case 14:
+			return ~s | ~d;
+		case 15:
+			return -1;
+		case 16:
+			return std::max(s, d);
+		case 17:
+			return std::min(s, d);
+		case 18:
+			return 0; // saturate add
+		case 19:
+			return 0; // saturate sub d - s
+		case 20:
+			return 0; // saturate sub s - d
+		case 21:
+			return 0; // avg
+	}
+}
+
+void xga_copro_device::do_pxblt()
+{
+	u8 dir = (m_pelop >> 25) & 2;
+	int xstart, xend, xdir, ystart, yend, ydir;
+	u8 srcmap = ((m_pelop >> 20) & 0xf) - 1;
+	u8 dstmap = ((m_pelop >> 16) & 0xf) - 1;
+	u8 patmap = ((m_pelop >> 12) & 0xf) - 1;
+	logerror("pxblt src %d pat %d dst %d dim1 %d dim2 %d srcbase %x dstbase %x\n", srcmap+1, dstmap+1, patmap+1, m_opdim1 & 0xfff, m_opdim2 & 0xfff, m_pelmap_base[srcmap+1], m_pelmap_base[dstmap+1]);
+	logerror("%d %d %d %d\n", m_srcxaddr & 0xfff, m_srcyaddr & 0xfff, m_dstxaddr & 0xfff, m_dstyaddr & 0xfff);
+	if((srcmap > 2) || (dstmap > 2) || ((patmap > 2) && (patmap != 7) && (patmap != 8)))
+	{
+		logerror("invalid pelmap\n");
+		return;
+	}
+	if(dir & 1)
+	{
+		ystart = (m_opdim2 & 0xfff) + 1;
+		yend = 0;
+		ydir = -1;
+	}
+	else
+	{
+		ystart = 0;
+		yend = (m_opdim2 & 0xfff) + 1;
+		ydir = 1;
+	}
+	if(dir & 2)
+	{
+		xstart = (m_opdim1 & 0xfff) + 1;
+		xend = 0;
+		xdir = -1;
+	}
+	else
+	{
+		xstart = 0;
+		xend = (m_opdim1 & 0xfff) + 1;
+		xdir = 1;
+	}
+
+	std::function<s16(s16)> dstwrap;
+	if(m_var == TYPE::OTI111)
+		dstwrap = [](s16 addr) { return addr & 0xfff; };
+	else
+	{
+		dstwrap = [](s16 addr)
+		{
+			addr = addr & 0x1fff;
+			return (addr & 0x1800) == 0x1800 ? addr | 0xf800 : addr;
+		};
+	}
+
+	for(int y = ystart; y != yend; y += ydir)
+	{
+		u16 patxaddr = m_patxaddr & 0xfff;
+		u16 srcxaddr = m_srcxaddr & 0xfff;
+		s16 dstxaddr = dstwrap(m_dstxaddr);
+		s16 dstyaddr = dstwrap(m_dstyaddr);
+		for(int x = xstart; x != xend; x += xdir)
+		{
+			u32 src, dst, pat;
+			if(patmap < 3)
+			{
+				pat = read_map_pixel(patxaddr, m_patyaddr & 0xfff, patmap + 1);
+				patxaddr += xdir;
+			}
+			else
+				pat = 1; //TODO: generate from source mode
+			if(pat)
+				src = (((m_pelop >> 28) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr & 0xfff, srcmap + 1) : m_fcolor;
+			else
+				src = (((m_pelop >> 30) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr & 0xfff, srcmap + 1) : m_bcolor;
+			srcxaddr += xdir;
+			dst = read_map_pixel(dstxaddr, dstyaddr, dstmap + 1);
+			dst = (dst & ~m_pelbmask) | (rop(src, dst, pat ? m_fmix : m_bmix) & m_pelbmask);
+			write_map_pixel(dstxaddr, dstyaddr, dstmap + 1, dst); // TODO: color compare
+			dstxaddr = dstwrap(dstxaddr + xdir);
+		}
+		m_patyaddr += ydir;
+		m_srcyaddr += ydir;
+		m_dstyaddr += ydir;
+	}
 }
 
 u8 xga_copro_device::xga_read(offs_t offset)
@@ -5942,8 +6258,12 @@ u8 xga_copro_device::xga_read(offs_t offset)
 		case 0x2f:
 			return m_dir >> 24;
 		case 0x48:
+			if(m_var == TYPE::OTI111)
+				return m_fmix << 4 | m_bmix;
 			return m_fmix;
 		case 0x49:
+			if(m_var == TYPE::OTI111)
+				return 0;
 			return m_bmix;
 		case 0x4a:
 			return m_destccc;
@@ -6104,9 +6424,17 @@ void xga_copro_device::xga_write(offs_t offset, u8 data)
 			m_dir = (m_dir & ~0xff000000) | (data << 24);
 			break;
 		case 0x48:
+			if(m_var == TYPE::OTI111)
+			{
+				m_fmix = data >> 4;
+				m_bmix = data & 0xf;
+				break;
+			}
 			m_fmix = data;
 			break;
 		case 0x49:
+			if(m_var == TYPE::OTI111)
+				break;
 			m_bmix = data;
 			break;
 		case 0x4a:
@@ -6250,6 +6578,8 @@ void xga_copro_device::xga_write(offs_t offset, u8 data)
 
 void xga_copro_device::device_start()
 {
+	m_mem_read_cb.resolve_safe(0);
+	m_mem_write_cb.resolve_safe();
 }
 
 void xga_copro_device::device_reset()
@@ -6292,6 +6622,7 @@ void oak_oti111_vga_device::device_start()
 {
 	svga_device::device_start();
 	vga.svga_intf.vram_size = 0x100000;
+	std::fill(std::begin(m_oak_regs), std::end(m_oak_regs), 0);
 }
 
 u8 oak_oti111_vga_device::dac_read(offs_t offset)
@@ -6305,4 +6636,61 @@ void oak_oti111_vga_device::dac_write(offs_t offset, u8 data)
 {
 	if(offset >= 6)
 		vga_device::port_03c0_w(offset, data);
+}
+
+
+u8 oak_oti111_vga_device::port_03d0_r(offs_t offset)
+{
+	uint8_t res = 0xff;
+	switch(offset)
+	{
+		case 14:
+			return m_oak_idx;
+		case 15:
+			return m_oak_idx <= 0x3a ? m_oak_regs[m_oak_idx] : 0;
+		default:
+			if (CRTC_PORT_ADDR == 0x3d0)
+				res = vga_device::port_03d0_r(offset);
+			break;
+	}
+
+	return res;
+}
+
+void oak_oti111_vga_device::port_03d0_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 14:
+			m_oak_idx = data;
+			break;
+		case 15:
+			if(m_oak_idx > 0x3a)
+				break;
+			m_oak_regs[m_oak_idx] = data;
+			switch(m_oak_idx)
+			{
+				case 0x21:
+					svga.rgb8_en = BIT(data, 2);
+					break;
+				case 0x33:
+					vga.crtc.no_wrap = BIT(data, 0);
+					break;
+			}
+			break;
+		default:
+			if (CRTC_PORT_ADDR == 0x3d0)
+				vga_device::port_03d0_w(offset,data);
+			break;
+	}
+}
+
+uint16_t oak_oti111_vga_device::offset()
+{
+	uint16_t off = svga_device::offset();
+
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
+		return vga.crtc.offset << 4;  // TODO: there must a register to control this
+	else
+		return off;
 }

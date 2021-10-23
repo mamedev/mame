@@ -387,3 +387,39 @@ access type) requires a tag to be specified.
 
 Memory accesses can be used as both lvalues and rvalues, so you can write
 ``b@100 = ff`` to store a byte in memory.
+
+
+Functions
+~~~~~~~~~
+
+The debugger supports a number of useful utility functions in expressions.
+
+min(<a>, <b>)
+    Returns the lesser of the two arguments.
+max(<a>, <b>)
+    Returns the greater of the two arguments.
+if(<cond>, <trueval>, <falseval>)
+    Returns **<trueval>** if **<cond>** is true (non-zero), or
+    **<falseval>** otherwise.  Note that the expressions for
+    **<trueval>** and **<falseval>** are both evaluated irrespective of
+    whether **<cond>** is true or false.
+abs(<x>)
+    Reinterprets the argument as a 64-bit signed integer and returns the
+    absolute value.
+bit(<x>, <n>[, <w>])
+    Extracts and right-aligns a bit field **<w>** bits wide from **<x>**
+    with least significant bit position position **<n>**, counting from
+    the least significant bit.  If **<w>** is omitted, a single bit is
+    extracted.
+s8(<x>)
+    Sign-extends the argument from 8 bits to 64 bits (overwrites bits 8
+    through 63, inclusive, with the value of bit 7, counting from the
+    least significant bit).
+s16(<x>)
+    Sign-extends the argument from 16 bits to 64 bits (overwrites bits
+    16 through 63, inclusive, with the value of bit 15, counting from
+    the least significant bit).
+s32(<x>)
+    Sign-extends the argument from 32 bits to 64 bits (overwrites bits
+    32 through 63, inclusive, with the value of bit 31, counting from
+    the least significant bit).
