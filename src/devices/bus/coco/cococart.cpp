@@ -67,6 +67,8 @@
 #include "dragon_serial.h"
 #include "dragon_sprites.h"
 
+#include "ioprocsfilter.h"
+
 
 /***************************************************************************
     PARAMETERS
@@ -570,7 +572,10 @@ image_init_result cococart_slot_device::call_load()
 		else if (is_filetype("rpk"))
 		{
 			// RPK file
-			std::error_condition err = read_coco_rpk(util::core_file_read(image_core_file()), base, cart_length, read_length);
+			util::core_file::ptr proxy;
+			std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+			if (!err)
+				err = read_coco_rpk(std::move(proxy), base, cart_length, read_length);
 			if (err)
 				return image_init_result::FAIL;
 		}
@@ -605,7 +610,10 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 	{
 		// RPK file
 		rpk_file::ptr file;
-		std::error_condition err = read_coco_rpk(util::core_file_read(*hook.image_file()), file);
+		util::core_file::ptr proxy;
+		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+		if (!err)
+			err = read_coco_rpk(std::move(proxy), file);
 		if (!err)
 			pcb_type = file->pcb_type();
 	}
