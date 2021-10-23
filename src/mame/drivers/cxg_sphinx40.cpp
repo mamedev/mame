@@ -42,6 +42,7 @@ LCD module
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
@@ -49,6 +50,7 @@ LCD module
 #include "sound/dac.h"
 #include "video/pwm.h"
 #include "video/hd61603.h"
+
 #include "speaker.h"
 
 // internal artwork

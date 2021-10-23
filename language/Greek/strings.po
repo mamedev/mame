@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-17 07:08+1100\n"
-"PO-Revision-Date: 2021-10-12 23:00+0300\n"
+"PO-Revision-Date: 2021-10-22 17:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -551,7 +551,7 @@ msgstr "Μοχλός"
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Lightgun"
-msgstr "Lightgun"
+msgstr "Όπλο φωτός"
 
 #: src/frontend/mame/ui/submenu.cpp:85
 msgid "Multi-keyboard"
@@ -611,7 +611,7 @@ msgstr "Ανάθεση Συσκευής Πεταλιού"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Adstick Device Assignment"
-msgstr "Ανάθεση Συσκευής Ad μοχλού"
+msgstr "Ανάθεση Συσκευής AD μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "Paddle Device Assignment"
@@ -1533,7 +1533,7 @@ msgstr "Ορατή Καθυστέρηση"
 #: src/frontend/mame/ui/miscmenu.cpp:639
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "%s.xml αποθηκεύτηκε στο φάκελο ρυθμίσεων του UI."
 
 #: src/frontend/mame/ui/miscmenu.cpp:665
 msgid "Name:             Description:\n"
@@ -1542,7 +1542,7 @@ msgstr "Όνομα:             Περιγραφή:\n"
 #: src/frontend/mame/ui/miscmenu.cpp:676
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "%s.txt αποθηκεύτηκε στο φάκελο ρυθμίσεων του UI."
 
 #: src/frontend/mame/ui/miscmenu.cpp:693
 msgid "Export list in XML format (like -listxml)"
@@ -2145,6 +2145,10 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"Ακύρωση του ελέγχου?\n"
+"\n"
+"Πατήστε %1$s για ακύρωση\n"
+"Πατήστε %2$s για συνέχεια"
 
 #: src/frontend/mame/ui/auditmenu.cpp:135
 #, c-format
@@ -2296,7 +2300,7 @@ msgstr "Χρώμα Slider"
 #: src/frontend/mame/ui/custui.cpp:593
 msgctxt "color-option"
 msgid "Graphics viewer background"
-msgstr ""
+msgstr "Φόντο προβολής γραφικών"
 
 #: src/frontend/mame/ui/custui.cpp:594
 msgctxt "color-option"
@@ -2320,7 +2324,7 @@ msgstr "Χρώμα φόντου Mouse down"
 
 #: src/frontend/mame/ui/custui.cpp:600
 msgid "Restore default colors"
-msgstr ""
+msgstr "Επαναφορά προεπιλεγμένων χρωμάτων"
 
 #: src/frontend/mame/ui/custui.cpp:612
 msgid "UI Color Settings"
@@ -2329,7 +2333,7 @@ msgstr "Ρυθμίσεις χρωμάτων UI"
 #: src/frontend/mame/ui/custui.cpp:621
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "Κάντε διπλό κλικ ή πατήστε %1$s για να αλλάξετε το χρώμα"
 
 #: src/frontend/mame/ui/custui.cpp:629
 msgid "Menu Preview"
@@ -5096,152 +5100,152 @@ msgid "P9 Select"
 msgstr "P9 Επιλογή"
 
 #: src/emu/inpttype.ipp:463
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Up"
 msgstr "P10 Επάνω"
 
 #: src/emu/inpttype.ipp:464
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Down"
 msgstr "P10 Κάτω"
 
 #: src/emu/inpttype.ipp:465
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left"
 msgstr "P10 Αριστερά"
 
 #: src/emu/inpttype.ipp:466
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right"
 msgstr "P10 Δεξιά"
 
 #: src/emu/inpttype.ipp:467
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Up"
 msgstr "P10 Δεξιός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:468
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Down"
 msgstr "P10 Δεξιός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:469
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Left"
 msgstr "P10 Δεξιός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:470
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Right"
 msgstr "P10 Δεξιός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:471
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Up"
 msgstr "P10 Αριστερός μοχλός/Επάνω"
 
 #: src/emu/inpttype.ipp:472
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Down"
 msgstr "P10 Αριστερός μοχλός/Κάτω"
 
 #: src/emu/inpttype.ipp:473
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Left"
 msgstr "P10 Αριστερός μοχλός/Αριστερά"
 
 #: src/emu/inpttype.ipp:474
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Right"
 msgstr "P10 Αριστερός μοχλός/Δεξιά"
 
 #: src/emu/inpttype.ipp:475
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 1"
 msgstr "P10 Πλήκτρο 1"
 
 #: src/emu/inpttype.ipp:476
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 2"
 msgstr "P10 Πλήκτρο 2"
 
 #: src/emu/inpttype.ipp:477
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 3"
 msgstr "P10 Πλήκτρο 3"
 
 #: src/emu/inpttype.ipp:478
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 4"
 msgstr "P10 Πλήκτρο 4"
 
 #: src/emu/inpttype.ipp:479
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 5"
 msgstr "P10 Πλήκτρο 5"
 
 #: src/emu/inpttype.ipp:480
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 6"
 msgstr "P10 Πλήκτρο 6"
 
 #: src/emu/inpttype.ipp:481
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 7"
 msgstr "P10 Πλήκτρο 7"
 
 #: src/emu/inpttype.ipp:482
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 8"
 msgstr "P10 Πλήκτρο 8"
 
 #: src/emu/inpttype.ipp:483
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 9"
 msgstr "P10 Πλήκτρο 9"
 
 #: src/emu/inpttype.ipp:484
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 10"
 msgstr "P10 Πλήκτρο 10"
 
 #: src/emu/inpttype.ipp:485
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 11"
 msgstr "P10 Πλήκτρο 11"
 
 #: src/emu/inpttype.ipp:486
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 12"
 msgstr "P10 Πλήκτρο 12"
 
 #: src/emu/inpttype.ipp:487
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 13"
 msgstr "P10 Πλήκτρο 13"
 
 #: src/emu/inpttype.ipp:488
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 14"
 msgstr "P10 Πλήκτρο 14"
 
 #: src/emu/inpttype.ipp:489
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 15"
 msgstr "P10 Πλήκτρο 15"
 
 #: src/emu/inpttype.ipp:490
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 16"
 msgstr "P10 Πλήκτρο 16"
 
 #: src/emu/inpttype.ipp:491
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Start"
 msgstr "P10 Έναρξη"
 
 #: src/emu/inpttype.ipp:492
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Select"
 msgstr "P10 Επιλογή"
 
@@ -7077,21 +7081,3 @@ msgstr "MESSinfo"
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
 
-#, c-format
-#~ msgid "%s.xml saved under ui folder."
-#~ msgstr "%s.xml αποθηκεύτηκε στο φάκελο ui."
-
-#, c-format
-#~ msgid "%s.txt saved under ui folder."
-#~ msgstr "%s.txt αποθηκεύτηκε στο φάκελο ui."
-
-#, c-format
-#~ msgid "Double-click or press %1$s to change the color value"
-#~ msgstr ""
-#~ "Κάντε διπλό κλικ ή πατήστε %1$s για να αλλάξετε την τιμή του χρώματος"
-
-#~ msgid "Gfx viewer background"
-#~ msgstr "Φόντο Gfx προβολής"
-
-#~ msgid "Restore originals colors"
-#~ msgstr "Επαναφορά αρχικών χρωμάτων"

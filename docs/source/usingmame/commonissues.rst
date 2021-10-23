@@ -34,9 +34,14 @@ Common Issues and Questions (FAQ)
 Why does my game show an error screen if I insert coins rapidly?
 ----------------------------------------------------------------
 
-This is not a bug in MAME. On original arcade hardware, you simply could not insert coins as fast as you can mashing the button. The only ways you could get credit feeding at that kind of pace was if the coin mech hardware was defective or if you were physically trying to cheat the coin mech.
+This is not a bug in MAME.  On original arcade hardware, you simply could not
+insert coins as fast as you can mash the button.  The only ways you could feed
+credits at that kind of pace was if the coin mech hardware was defective or if
+you were physically trying to cheat the coin mech.
 
-In either case, the game would display an error for the operator to look into the situation to prevent cheating them out of their hard-earned cash. Keep a slow, coin-insert-ish pace and you'll not trigger this.
+In either case, the game would display an error for the operator to look into
+the situation to prevent cheating them out of their hard-earned cash.  Keep a
+slow, coin-insert-ish pace and you won’t trigger this.
 
 
 .. _broken-package:
@@ -44,11 +49,25 @@ In either case, the game would display an error for the operator to look into th
 Why is my non-official MAME package (e.g. EmuCR build) broken? Why is my official update broken?
 ------------------------------------------------------------------------------------------------
 
-In many cases, updates to various subsystems such as HLSL, BGFX, or Lua plugins come as updates to the external shader files as well as to the core MAME code. Unfortunately, builds that come from third parties may come as just a main MAME executable or with outdated external files, which can break the coupling between these external files and MAME core code. Despite repeated attempts at contacting some of these third parties to warn them, they persist in distributing broken MAME updates.
+Many MAME features, such as software lists, HLSL or BGFX shaders, Lua plugins
+and UI translations, use external files.  Updates to these features often
+require the external files to be updated along with MAME.  Unfortunately, builds
+provided by third parties may only include the main MAME executable, or may
+include outdated external files.  Using an updated MAME executable with outdated
+external files causes issues with features reliant on the external files.
+Despite repeated requests that they distribute MAME complete with matching
+external files, some of these third parties persist in distributing incomplete
+or broken MAME updates.
 
-As we have no control over how third parties distribute these, all we really can do is disclaim the use of sites like EmuCR and say that we cannot provide support for packages we didn't build. Compile your own MAME or use one of the official packages provided by us.
+As we have no control over how third parties distribute MAME, all we really can
+do is recommend against obtaining MAME from sites like EmuCR.  We cannot provide
+any support for packages we didn’t build ourselves.  You can completely avoid
+these issues by compiling MAME yourself, or using an official package we
+provide.
 
-You may also run into this problem if you have not replaced the contents of the HLSL and BGFX folders with the latest files when updating your MAME install with a new official build.
+You may also encounter this problem if you do not update the contents of the
+``hlsl``, ``bgfx`` or ``plugins`` folders when updating your MAME installation
+with a new official build.
 
 
 .. _faster-if-X:
@@ -118,15 +137,32 @@ If you have several games and you wish to verify that they are compatible with t
 .. _Parent-Sets:
 
 Why is it that some games have the US version as the main set, some have Japanese, and some are the World?
------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------
 
-While this rule isn't always true, there is typically a method to how sets are arranged. The usual priority is to go with the **World** set if it's available, **US** if no World English set exists, and **Japanese** or other origin region if no World or US English set.
+Parent and clone sets are a convenience feature to help keep different versions
+of the same system or software together.  The decision on which set to make the
+parent will always be somewhat arbitrary, but we do have some guidelines:
 
-Exceptions arise where the US or World sets have significant censorship/changes from the original version. For instance, Gals Panic (set **galsnew**) uses the US version as parent because it has additional features compared to the world export version (set **galsnewa**). These features are optional censorship, an additional control layout option (stick with no button use), and English-language voice clips.
+* Prefer latest release version
+* Prefer English language
+* Prefer most widespread release
+* Prefer most complete version
+* Prefer versions that are uncensored, and have story/cutscenes intact
+* Prefer versions that keep the original gameplay balance
+* Prefer releases from original developers/publishers rather than licensees
+* Prefer releases without region-specific notices or warnings
 
-Another exception comes for games where it was licensed to a third party for export release. Pac-Man, for instance, was published by Midway in the US though it was created by Namco. As a result, the parent set is the Japanese **puckman** set, which retains the Namco copyright.
+It’s not always possible to choose a set that’s preferred according to all
+criteria.
 
-Lastly, a developer adding a new set can choose to use whatever naming and parent scheme they wish and are not restricted to the above rules. Most follow these guidelines, however.
+As an example, the World release of Ghouls’n Ghosts (*ghouls*) is the parent of
+the US release (*ghoulsu*) and the Japanese original Daimakaimura, as it is the
+most widespread English-language release, and has the story and cutscenes
+intact.
+
+Another example is Midway Pac-Man (*pacman*), which is a clone of Namco Puck
+Man (*puckman*), because Pac-Man is a licensed version for the US market, while
+Puck Man was released by Namco themselves.
 
 
 .. _Legal-ROMs:
@@ -136,9 +172,12 @@ How do I legally obtain ROMs or disk images to run on MAME?
 
 You have several options:
 
-* You can obtain a license to them by purchasing one via a distributor or vendor who has proper authority to do so.
-* You can download one of the ROM sets that have been released for free to the public for non-commerical use.
-* You can purchase an actual arcade PCB, read the ROMs or disks yourself, and let MAME use that data.
+* You can obtain a license to them by purchasing one via a distributor or vendor
+  who has proper authority to do so.
+* You can download one of the ROM sets that have been released for free to the
+  public for non-commercial use.
+* You can purchase an actual arcade PCB, read the ROMs or disks yourself, and
+  let MAME use that data.
 
 Beyond these options, you are on your own.
 
@@ -148,7 +187,8 @@ Beyond these options, you are on your own.
 Isn't copying ROMs a legal gray area?
 -------------------------------------
 
-No, it's not. You are not permitted to make copies of software without the copyright owner's permission. This is a black & white issue.
+No, it’s not.  You are not permitted to make copies of software without the
+copyright owner’s permission.  This is a black and white issue.
 
 
 .. _Abandonware:
@@ -156,7 +196,8 @@ No, it's not. You are not permitted to make copies of software without the copyr
 Can't game ROMs be considered abandonware?
 ------------------------------------------
 
-No. Even the companies that went under had their assets purchased by somebody, and that person is the copyright owner.
+No.  Even the companies that went under had their assets purchased by somebody,
+and that person is the copyright owner.
 
 
 .. _Old-Sets:
@@ -172,7 +213,13 @@ As time passes, MAME is perfecting the emulation of older games, even when the r
 What about those arcade cabinets on eBay that come with all the ROMs?
 ---------------------------------------------------------------------
 
-If the seller does not have a proper license to include the ROMs with his system, he is not allowed to legally include any ROMs with his system. If he has purchased a license to the ROMs in your name from a distributor or vendor with legitimate licenses, then he is okay to include them with the cabinet. After signing an agreement, cabinet owners that include legitimate licensed ROMs may be permitted to include a version of MAME that runs those ROMs and nothing more.
+If the seller does not have a proper license to include the ROMs with their
+system, they are not legally permitted to include any ROMs with the system.
+If they have purchased a license to the ROMs in your name from a distributor or
+vendor with legitimate licenses, then they may include the ROMs with the
+cabinet.  After signing an agreement, cabinet owners that include legitimate
+licensed ROMs may be permitted to include a version of MAME that runs those ROMs
+and nothing more.
 
 
 .. _ROM-DVDs:
@@ -180,9 +227,17 @@ If the seller does not have a proper license to include the ROMs with his system
 What about those guys who burn DVDs of ROMs for the price of the media?
 -----------------------------------------------------------------------
 
-What they are doing is just as illegal as selling the ROMs outright. As long as somebody owns the copyright, making illegal copies is illegal, period. If someone went on the internet and started a business of selling cheap copies of the latest U2 album for the price of media, do you think they would get away with it?
+What they are doing is just as unlawful as selling the ROMs outright.  As long
+as somebody holds the copyright, making unauthorised copies is unlawful.  If
+someone went on the internet and started a business of selling cheap copies of
+U2 albums for the price of media, do you think they would get away with it?
 
-Even worse, a lot of these folks like to claim that they are helping the project. In fact, they only create more problems for the MAME team. We are not associated with these people in any way regardless of how "official" they may attempt to appear. You are only helping criminals make a profit through selling software they have no right to sell. **Anybody using the MAME name and/or logo to sell such products is also in violation of the MAME trademark.**
+Even worse, a lot of these people like to claim that they are helping the
+project.  In reality, they only create more problems for the MAME team.  We are
+not associated with these people in any way, regardless of how “official” they
+may attempt to appear.  By buying from them, you only help criminals profit from
+selling software they have no right to sell.  **Anyone using the MAME name
+and/or logo to sell such products is also in violation of the MAME trademark.**
 
 
 .. _DMCA-exemption:
@@ -190,7 +245,12 @@ Even worse, a lot of these folks like to claim that they are helping the project
 But isn't there a special DMCA exemption that makes ROM copying legal?
 ----------------------------------------------------------------------
 
-No, you have misread the exemptions. The exemption allows people to reverse engineer the copy protection or encryption in computer programs that are obsolete. The exemption simply means that figuring out how these obsolete programs worked is not illegal according to the DMCA. It does not have any effect on the legality of violating the copyright on computer programs, which is what you are doing if you make copies of ROMs.
+No, you have misread the exemptions.  The exemption allows people to
+reverse-engineer the copy protection or encryption in computer programs that are
+obsolete.  The exemption simply means that figuring out how these obsolete
+programs worked is not illegal according to the DMCA.  It does not have any
+effect on the legality of making unauthorised copies of computer programs, which
+is what you are doing if you make copies of ROMs.
 
 
 .. _24-hours:
@@ -198,7 +258,9 @@ No, you have misread the exemptions. The exemption allows people to reverse engi
 But isn't it OK to download and "try" ROMs for 24 hours?
 --------------------------------------------------------
 
-This is an urban legend that was made up by people who put ROMs up for download on their sites, in order to justify the fact that they were breaking the law. There is nothing like this in any copyright law.
+This is an urban legend that was made up by people who made ROMs available for
+download from their web sites, in order to justify the fact that they were
+breaking the law.  There is no provision like this in any copyright law.
 
 
 .. _commercial-use:
@@ -232,9 +294,22 @@ Additional troubleshooting information can be found on Microsoft's website at ht
 I have a controller that doesn't want to work with the standard Microsoft Windows version of MAME, what can I do?
 -----------------------------------------------------------------------------------------------------------------
 
-By default, MAME on Microsoft Windows tries to do raw reads of the joystick(s), mouse/mice, and keyboard(s). This works with most devices and provides the most stable results. However, some devices need special drivers to translate their output and these drivers may not work with raw input.
+By default, MAME on Microsoft Windows tries to read joystick(s), mouse/mice and
+keyboard(s) using the RawInput API.  This works with most devices, and allows
+multiple keyboards and mice to be used independently.  However, some device
+drivers are not compatible with RawInput, and it may be necessary to use
+DirectInput or window events to receive input.  This is also the case for most
+software that simulates mouse or keyboard input, like JoyToKey, VNC or Remote
+Desktop.
 
-One thing you can try is setting the keyboardprovider, mouseprovider, or joystickprovider setting (depending on which kind of device your input device acts as) from rawinput to one of the other options such as dinput or win32. See :ref:`osd-commandline-options` for details on supported providers.
+You can try changing the
+:ref:`keyboardprovider <mame-commandline-keyboardprovider>`,
+:ref:`mouseprovider <mame-commandline-mouseprovider>`,
+:ref:`joystickprovider <mame-commandline-joystickprovider>` or
+:ref:`lightgunprovider <mame-commandline-lightgunprovider>` setting (depending
+on which kind of device you’re having issues with) from ``rawinput`` to one of
+the other options such as ``dinput`` or ``win32``.  See
+:ref:`osd-commandline-options` for details on input provider options
 
 
 .. _ExternalOPL:
@@ -242,9 +317,13 @@ One thing you can try is setting the keyboardprovider, mouseprovider, or joystic
 What happened to the MAME support for external OPL2-carrying soundcards?
 ------------------------------------------------------------------------
 
-MAME added support in version 0.23 for the use of a soundcard's onboard OPL2 (Yamaha YM3812 chip) instead of emulating the OPL2. This feature was never supported on the official Windows version of MAME and was dropped entirely as of MAME 0.60, because the OPL2 emulation in MAME had become advanced enough to be a better solution in almost all cases as of that time; now it's superior to using a sound card's YM3812 in all cases, especially as modern cards lack a YM3812.
-
-Unofficial builds of MAME may have supported it for varying amounts of time as well.
+MAME 0.23 added support for using a sound card’s onboard OPL2 (Yamaha YM3812
+chip) instead of emulating the OPL2.  This feature was only supported for DOS –
+it was never supported in official Windows versions of MAME.  It dropped
+entirely as of MAME 0.60, as the OPL2 emulation in MAME had become advanced
+enough to be a better solution in almost all cases.  MAME’s OPL2 emulation is
+now superior to using a sound card’s YM3812 in all cases, especially as modern
+sound cards lack a YM3812.
 
 
 .. _Autofire:
@@ -252,47 +331,58 @@ Unofficial builds of MAME may have supported it for varying amounts of time as w
 What happened to the MAME support for autofire?
 -----------------------------------------------
 
-A Lua plugin with providing enhanced autofire support was added in MAME 0.210,
-and the old built-in autofire functionality was removed in MAME 0.216.  This
-new plugin has more functionality than the built-in autofire feature in older
-version of MAME; for example, you can configure an alternate buttons for
-different for autofire rates.
+A Lua plugin providing enhanced autofire support was added in MAME 0.210, and
+the built-in autofire functionality was removed in MAME 0.216.  This plugin has
+more functionality than the built-in autofire feature it replaced; for example,
+you can configure alternate buttons for different autofire rates.
 
 You can enable and configure the new autofire system with the following steps:
 
 * Start MAME with no system selected.
-* Choose *Plugins* at the bottom (just above Exit)
-* Turn Autofire on.
+* Choose **Configure Options** at the bottom (use **Tab** to move focus, or
+  double-click the menu item).
+* Choose **Plugins** near the bottom of the Settings menu.
+* Turn **Autofire plugin** on (use **Left**/**Right** or click the arrows to
+  change options).
 
 The setting will be automatically saved for future use.
 
 Once you’re running a system of your choice, bring up the MAME menu (using the
-**Tab** key by default), select *Plugin Options* and then select *Autofire*.
-From there, depending on whether you have an existing autofire button set up or
-not, it will either show the existing entry/entries or it will ask you to select
-the input for the autofire.
+**Tab** key by default), select **Plugin Options***, and then select
+**Autofire**.  From there you can select an existing autofire button to change
 
-Typically you’ll be choosing *P1 Button 1* for systems like Galaga, Alcon, and
-the like.  The *Hotkey* is the button you press for the autofire effect.  This
-can be any keyboard key or joystick button you wish.  As of 0.216, mouse buttons
-are not yet supported.
+The **Input** is the button on the emulated system that you want to use autofire
+for.  This may be set to any player button – typically you’ll it to
+*P1 Button 1* for games like Galaga, Alcon, and the like.  The **Hotkey** is the
+button you press to use the autofire effect.  This can be any combination MAME
+supports as a digital input.
 
-*On frames* and *Off frames* are how long to leave the button pressed and
-released in number of frames.  Some systems do not read the inputs fast enough
-for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon) or other
-combinations.  Try fine-tuning these to your taste.
+**On frames** and **Off frames** are how long to leave the button pressed and
+released in terms of the system frame rate.  Some systems do not read the inputs
+fast enough for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon)
+or other combinations.  Try fine-tuning these to your taste.
 
-The autofire configuration for that system will be saved in a ``systemname.cfg``
-file (e.g. ``alcon.cfg``) inside the Autofire folder for future use.  Each
-system will have its own configuration.
+The autofire configuration for each system will be saved in a ``systemname.cfg``
+file (e.g. ``alcon.cfg``) inside the **autofire** folder in your plugin data
+folder.  Each system will have its own configuration.
 
-Note that if you set the autofire button to an input button that's also defined in MAME's inputs for the running system, you may get unexpected results-- Using Gradius as an example:
+Note that if you set the autofire button to an input button that’s also assigned
+to one of MAME’s inputs for the running system, you may get unexpected results.
+Using Gradius as an example:
 
- If you set button 1 on your controller to fire, then set autofire to button 1 as well, holding the button down to shoot will not trigger the autofire because the button never gets released from you holding the non-autofire button 1. This will also happen if you set a different button as autofire (say, button 3 in this case), and hold button 1 down while holding button 3 down.
+* If you set button 1 on your controller to fire, then set an autofire hotkey to
+  button 1 as well, holding the button down to shoot will not trigger the
+  autofire effect because the button never gets released, since you’re holding
+  the non-autofire button 1.  This will also happen if you set a different
+  button as autofire (say, button 3 in this case), and hold button 1 down while
+  holding button 3 down.
+* If you set button 3 on your controller to autofire and set button 3 to be
+  powerup as well, you will trigger the powerup action every time you grab a
+  powerup because the powerup button is also being held down along with the
+  autofire button.
 
- If you set button 3 on your controller to autofire and set button 3 to be powerup as well, you will trigger the powerup action every time you grab a powerup because the powerup button is also being held down along with the autofire button.
-
- It is suggested you choose a button for autofire that is not in use for anything else in the current system.
+It is suggested you choose buttons for autofire hotkeys that are not in use for
+anything else in the current system.
 
 
 .. _gsync-freesync:
@@ -303,7 +393,7 @@ Does MAME support G-Sync or FreeSync? How do I configure MAME to use them?
 MAME supports both G-Sync and FreeSync right out of the box for Windows and Linux, however macOS does not support G-Sync or FreeSync.
 
 * Make sure your monitor is capable of at least 120Hz G-Sync/FreeSync. If your monitor is only capable of 60Hz in G-Sync/FreeSync modes, you will hit problems with drivers such as *Pac-Man* that run at 60.60606Hz and may hit problems with others that are very close to but not quite 60Hz.
-* If playing MAME windowed or using the BGFX video system, you'll need to make sure that you have G-Sync/FreeSync turned on for windowed applications as well as full screen in your video driver. 
+* If playing MAME windowed or using the BGFX video system, you'll need to make sure that you have G-Sync/FreeSync turned on for windowed applications as well as full screen in your video driver.
 * Be sure to leave triple buffering turned off.
 * Turning VSync on is suggested in general with G-Sync and FreeSync.
 * Low Latency Mode will not affect MAME performance with G-Sync/FreeSync.

@@ -1,11 +1,11 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Jack Li
-local exports = {}
-exports.name = 'autofire'
-exports.version = '0.0.3'
-exports.description = 'Autofire plugin'
-exports.license = 'The BSD 3-Clause License'
-exports.author = { name = 'Jack Li' }
+local exports = {
+	name = 'autofire',
+	version = '0.0.4',
+	description = 'Autofire plugin',
+	license = 'The BSD 3-Clause License',
+	author = { name = 'Jack Li' } }
 
 local autofire = exports
 

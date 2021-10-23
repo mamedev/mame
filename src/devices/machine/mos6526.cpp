@@ -902,7 +902,10 @@ uint8_t mos6526_device::read(offs_t offset)
 	case ICR:
 		data = (m_ir1 << 7) | m_icr;
 
-		if (machine().side_effects_disabled())
+		// Do not reset irqs unless one is effectively issued.
+		// cfr. amigaocs_flop.xml barb2paln4 that polls for Timer B status 
+		//      until it expires at PC=7821c and other places.
+		if (machine().side_effects_disabled() || !m_icr)
 			return data;
 
 		m_icr_read = true;

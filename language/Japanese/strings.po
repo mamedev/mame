@@ -403,7 +403,7 @@ msgstr "起動時に情報画面をスキップ"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Force 4:3 aspect for snapshot display"
-msgstr "スナップショットの表示で4：3アスペクト比を強制"
+msgstr "スナップショットの表示で4:3アスペクト比を強制"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Use image as background"
@@ -3206,297 +3206,297 @@ msgstr "[なし]\n"
 #: src/emu/inpttype.ipp:26
 msgctxt "input-name"
 msgid "P1 Up"
-msgstr ""
+msgstr "1P上"
 
 #: src/emu/inpttype.ipp:27
 msgctxt "input-name"
 msgid "P1 Down"
-msgstr ""
+msgstr "1P下"
 
 #: src/emu/inpttype.ipp:28
 msgctxt "input-name"
 msgid "P1 Left"
-msgstr ""
+msgstr "1P左"
 
 #: src/emu/inpttype.ipp:29
 msgctxt "input-name"
 msgid "P1 Right"
-msgstr ""
+msgstr "1P右"
 
 #: src/emu/inpttype.ipp:30
 msgctxt "input-name"
 msgid "P1 Right Stick/Up"
-msgstr ""
+msgstr "1P右レバー／上"
 
 #: src/emu/inpttype.ipp:31
 msgctxt "input-name"
 msgid "P1 Right Stick/Down"
-msgstr ""
+msgstr "1P右レバー／下"
 
 #: src/emu/inpttype.ipp:32
 msgctxt "input-name"
 msgid "P1 Right Stick/Left"
-msgstr ""
+msgstr "1P右レバー／左"
 
 #: src/emu/inpttype.ipp:33
 msgctxt "input-name"
 msgid "P1 Right Stick/Right"
-msgstr ""
+msgstr "1P右レバー／右"
 
 #: src/emu/inpttype.ipp:34
 msgctxt "input-name"
 msgid "P1 Left Stick/Up"
-msgstr ""
+msgstr "1P左レバー／上"
 
 #: src/emu/inpttype.ipp:35
 msgctxt "input-name"
 msgid "P1 Left Stick/Down"
-msgstr ""
+msgstr "1P左レバー／下"
 
 #: src/emu/inpttype.ipp:36
 msgctxt "input-name"
 msgid "P1 Left Stick/Left"
-msgstr ""
+msgstr "1P左レバー／左"
 
 #: src/emu/inpttype.ipp:37
 msgctxt "input-name"
 msgid "P1 Left Stick/Right"
-msgstr ""
+msgstr "1P左レバー／右"
 
 #: src/emu/inpttype.ipp:38
 msgctxt "input-name"
 msgid "P1 Button 1"
-msgstr ""
+msgstr "1Pボタン1"
 
 #: src/emu/inpttype.ipp:39
 msgctxt "input-name"
 msgid "P1 Button 2"
-msgstr ""
+msgstr "1Pボタン2"
 
 #: src/emu/inpttype.ipp:40
 msgctxt "input-name"
 msgid "P1 Button 3"
-msgstr ""
+msgstr "1Pボタン3"
 
 #: src/emu/inpttype.ipp:41
 msgctxt "input-name"
 msgid "P1 Button 4"
-msgstr ""
+msgstr "1Pボタン4"
 
 #: src/emu/inpttype.ipp:42
 msgctxt "input-name"
 msgid "P1 Button 5"
-msgstr ""
+msgstr "1Pボタン5"
 
 #: src/emu/inpttype.ipp:43
 msgctxt "input-name"
 msgid "P1 Button 6"
-msgstr ""
+msgstr "1Pボタン6"
 
 #: src/emu/inpttype.ipp:44
 msgctxt "input-name"
 msgid "P1 Button 7"
-msgstr ""
+msgstr "1Pボタン7"
 
 #: src/emu/inpttype.ipp:45
 msgctxt "input-name"
 msgid "P1 Button 8"
-msgstr ""
+msgstr "1Pボタン8"
 
 #: src/emu/inpttype.ipp:46
 msgctxt "input-name"
 msgid "P1 Button 9"
-msgstr ""
+msgstr "1Pボタン9"
 
 #: src/emu/inpttype.ipp:47
 msgctxt "input-name"
 msgid "P1 Button 10"
-msgstr ""
+msgstr "1Pボタン10"
 
 #: src/emu/inpttype.ipp:48
 msgctxt "input-name"
 msgid "P1 Button 11"
-msgstr ""
+msgstr "1Pボタン11"
 
 #: src/emu/inpttype.ipp:49
 msgctxt "input-name"
 msgid "P1 Button 12"
-msgstr ""
+msgstr "1Pボタン12"
 
 #: src/emu/inpttype.ipp:50
 msgctxt "input-name"
 msgid "P1 Button 13"
-msgstr ""
+msgstr "1Pボタン13"
 
 #: src/emu/inpttype.ipp:51
 msgctxt "input-name"
 msgid "P1 Button 14"
-msgstr ""
+msgstr "1Pボタン14"
 
 #: src/emu/inpttype.ipp:52
 msgctxt "input-name"
 msgid "P1 Button 15"
-msgstr ""
+msgstr "1Pボタン15"
 
 #: src/emu/inpttype.ipp:53
 msgctxt "input-name"
 msgid "P1 Button 16"
-msgstr ""
+msgstr "1Pボタン16"
 
 #: src/emu/inpttype.ipp:54
 msgctxt "input-name"
 msgid "P1 Start"
-msgstr ""
+msgstr "1Pスタート"
 
 #: src/emu/inpttype.ipp:55
 msgctxt "input-name"
 msgid "P1 Select"
-msgstr ""
+msgstr "1Pセレクト"
 
 #: src/emu/inpttype.ipp:60
 msgctxt "input-name"
 msgid "P1 Mahjong A"
-msgstr ""
+msgstr "1P麻雀Ａ"
 
 #: src/emu/inpttype.ipp:61
 msgctxt "input-name"
 msgid "P1 Mahjong B"
-msgstr ""
+msgstr "1P麻雀Ｂ"
 
 #: src/emu/inpttype.ipp:62
 msgctxt "input-name"
 msgid "P1 Mahjong C"
-msgstr ""
+msgstr "1P麻雀Ｃ"
 
 #: src/emu/inpttype.ipp:63
 msgctxt "input-name"
 msgid "P1 Mahjong D"
-msgstr ""
+msgstr "1P麻雀Ｄ"
 
 #: src/emu/inpttype.ipp:64
 msgctxt "input-name"
 msgid "P1 Mahjong E"
-msgstr ""
+msgstr "1P麻雀Ｅ"
 
 #: src/emu/inpttype.ipp:65
 msgctxt "input-name"
 msgid "P1 Mahjong F"
-msgstr ""
+msgstr "1P麻雀Ｆ"
 
 #: src/emu/inpttype.ipp:66
 msgctxt "input-name"
 msgid "P1 Mahjong G"
-msgstr ""
+msgstr "1P麻雀Ｇ"
 
 #: src/emu/inpttype.ipp:67
 msgctxt "input-name"
 msgid "P1 Mahjong H"
-msgstr ""
+msgstr "1P麻雀Ｈ"
 
 #: src/emu/inpttype.ipp:68
 msgctxt "input-name"
 msgid "P1 Mahjong I"
-msgstr ""
+msgstr "1P麻雀Ｉ"
 
 #: src/emu/inpttype.ipp:69
 msgctxt "input-name"
 msgid "P1 Mahjong J"
-msgstr ""
+msgstr "1P麻雀Ｊ"
 
 #: src/emu/inpttype.ipp:70
 msgctxt "input-name"
 msgid "P1 Mahjong K"
-msgstr ""
+msgstr "1P麻雀Ｋ"
 
 #: src/emu/inpttype.ipp:71
 msgctxt "input-name"
 msgid "P1 Mahjong L"
-msgstr ""
+msgstr "1P麻雀Ｌ"
 
 #: src/emu/inpttype.ipp:72
 msgctxt "input-name"
 msgid "P1 Mahjong M"
-msgstr ""
+msgstr "1P麻雀Ｍ"
 
 #: src/emu/inpttype.ipp:73
 msgctxt "input-name"
 msgid "P1 Mahjong N"
-msgstr ""
+msgstr "1P麻雀Ｎ"
 
 #: src/emu/inpttype.ipp:74
 msgctxt "input-name"
 msgid "P1 Mahjong O"
-msgstr ""
+msgstr "1P麻雀Ｏ"
 
 #: src/emu/inpttype.ipp:75
 msgctxt "input-name"
 msgid "P1 Mahjong P"
-msgstr ""
+msgstr "1P麻雀Ｐ"
 
 #: src/emu/inpttype.ipp:76
 msgctxt "input-name"
 msgid "P1 Mahjong Q"
-msgstr ""
+msgstr "1P麻雀Ｑ"
 
 #: src/emu/inpttype.ipp:77
 msgctxt "input-name"
 msgid "P1 Mahjong Kan"
-msgstr ""
+msgstr "1P麻雀カン"
 
 #: src/emu/inpttype.ipp:78
 msgctxt "input-name"
 msgid "P1 Mahjong Pon"
-msgstr ""
+msgstr "1P麻雀ポン"
 
 #: src/emu/inpttype.ipp:79
 msgctxt "input-name"
 msgid "P1 Mahjong Chi"
-msgstr ""
+msgstr "1P麻雀チー"
 
 #: src/emu/inpttype.ipp:80
 msgctxt "input-name"
 msgid "P1 Mahjong Reach"
-msgstr ""
+msgstr "1P麻雀リーチ"
 
 #: src/emu/inpttype.ipp:81
 msgctxt "input-name"
 msgid "P1 Mahjong Ron"
-msgstr ""
+msgstr "1P麻雀ロン"
 
 #: src/emu/inpttype.ipp:82
 msgctxt "input-name"
 msgid "P1 Mahjong Flip Flop"
-msgstr ""
+msgstr "1P麻雀フリップフロップ"
 
 #: src/emu/inpttype.ipp:83
 msgctxt "input-name"
 msgid "P1 Mahjong Bet"
-msgstr ""
+msgstr "1P麻雀ベット"
 
 #: src/emu/inpttype.ipp:84
 msgctxt "input-name"
 msgid "P1 Mahjong Take Score"
-msgstr ""
+msgstr "1P麻雀テイクスコアー"
 
 #: src/emu/inpttype.ipp:85
 msgctxt "input-name"
 msgid "P1 Mahjong Double Up"
-msgstr ""
+msgstr "1P麻雀ダブルアップ"
 
 #: src/emu/inpttype.ipp:86
 msgctxt "input-name"
 msgid "P1 Mahjong Big"
-msgstr ""
+msgstr "1P麻雀ビッグ"
 
 #: src/emu/inpttype.ipp:87
 msgctxt "input-name"
 msgid "P1 Mahjong Small"
-msgstr ""
+msgstr "1P麻雀スモール"
 
 #: src/emu/inpttype.ipp:88
 msgctxt "input-name"
 msgid "P1 Mahjong Last Chance"
-msgstr ""
+msgstr "1P麻雀ラストチャンス"
 
 #: src/emu/inpttype.ipp:93
 msgctxt "input-name"
@@ -3561,7 +3561,7 @@ msgstr ""
 #: src/emu/inpttype.ipp:109 src/emu/inpttype.ipp:544
 msgctxt "input-name"
 msgid "Service"
-msgstr ""
+msgstr "サービス"
 
 #: src/emu/inpttype.ipp:110
 msgctxt "input-name"
@@ -3676,297 +3676,297 @@ msgstr ""
 #: src/emu/inpttype.ipp:144
 msgctxt "input-name"
 msgid "P2 Up"
-msgstr ""
+msgstr "2P上"
 
 #: src/emu/inpttype.ipp:145
 msgctxt "input-name"
 msgid "P2 Down"
-msgstr ""
+msgstr "2P下"
 
 #: src/emu/inpttype.ipp:146
 msgctxt "input-name"
 msgid "P2 Left"
-msgstr ""
+msgstr "2P左"
 
 #: src/emu/inpttype.ipp:147
 msgctxt "input-name"
 msgid "P2 Right"
-msgstr ""
+msgstr "2P右"
 
 #: src/emu/inpttype.ipp:148
 msgctxt "input-name"
 msgid "P2 Right Stick/Up"
-msgstr ""
+msgstr "2P右レバー／上"
 
 #: src/emu/inpttype.ipp:149
 msgctxt "input-name"
 msgid "P2 Right Stick/Down"
-msgstr ""
+msgstr "2P右レバー／下"
 
 #: src/emu/inpttype.ipp:150
 msgctxt "input-name"
 msgid "P2 Right Stick/Left"
-msgstr ""
+msgstr "2P右レバー／左"
 
 #: src/emu/inpttype.ipp:151
 msgctxt "input-name"
 msgid "P2 Right Stick/Right"
-msgstr ""
+msgstr "2P右レバー／右"
 
 #: src/emu/inpttype.ipp:152
 msgctxt "input-name"
 msgid "P2 Left Stick/Up"
-msgstr ""
+msgstr "2P左レバー／上"
 
 #: src/emu/inpttype.ipp:153
 msgctxt "input-name"
 msgid "P2 Left Stick/Down"
-msgstr ""
+msgstr "2P左レバー／下"
 
 #: src/emu/inpttype.ipp:154
 msgctxt "input-name"
 msgid "P2 Left Stick/Left"
-msgstr ""
+msgstr "2P左レバー／左"
 
 #: src/emu/inpttype.ipp:155
 msgctxt "input-name"
 msgid "P2 Left Stick/Right"
-msgstr ""
+msgstr "2P左レバー／右"
 
 #: src/emu/inpttype.ipp:156
 msgctxt "input-name"
 msgid "P2 Button 1"
-msgstr ""
+msgstr "2Pボタン1"
 
 #: src/emu/inpttype.ipp:157
 msgctxt "input-name"
 msgid "P2 Button 2"
-msgstr ""
+msgstr "2Pボタン2"
 
 #: src/emu/inpttype.ipp:158
 msgctxt "input-name"
 msgid "P2 Button 3"
-msgstr ""
+msgstr "2Pボタン3"
 
 #: src/emu/inpttype.ipp:159
 msgctxt "input-name"
 msgid "P2 Button 4"
-msgstr ""
+msgstr "2Pボタン4"
 
 #: src/emu/inpttype.ipp:160
 msgctxt "input-name"
 msgid "P2 Button 5"
-msgstr ""
+msgstr "2Pボタン5"
 
 #: src/emu/inpttype.ipp:161
 msgctxt "input-name"
 msgid "P2 Button 6"
-msgstr ""
+msgstr "2Pボタン6"
 
 #: src/emu/inpttype.ipp:162
 msgctxt "input-name"
 msgid "P2 Button 7"
-msgstr ""
+msgstr "2Pボタン7"
 
 #: src/emu/inpttype.ipp:163
 msgctxt "input-name"
 msgid "P2 Button 8"
-msgstr ""
+msgstr "2Pボタン8"
 
 #: src/emu/inpttype.ipp:164
 msgctxt "input-name"
 msgid "P2 Button 9"
-msgstr ""
+msgstr "2Pボタン9"
 
 #: src/emu/inpttype.ipp:165
 msgctxt "input-name"
 msgid "P2 Button 10"
-msgstr ""
+msgstr "2Pボタン10"
 
 #: src/emu/inpttype.ipp:166
 msgctxt "input-name"
 msgid "P2 Button 11"
-msgstr ""
+msgstr "2Pボタン11"
 
 #: src/emu/inpttype.ipp:167
 msgctxt "input-name"
 msgid "P2 Button 12"
-msgstr ""
+msgstr "2Pボタン12"
 
 #: src/emu/inpttype.ipp:168
 msgctxt "input-name"
 msgid "P2 Button 13"
-msgstr ""
+msgstr "2Pボタン13"
 
 #: src/emu/inpttype.ipp:169
 msgctxt "input-name"
 msgid "P2 Button 14"
-msgstr ""
+msgstr "2Pボタン14"
 
 #: src/emu/inpttype.ipp:170
 msgctxt "input-name"
 msgid "P2 Button 15"
-msgstr ""
+msgstr "2Pボタン15"
 
 #: src/emu/inpttype.ipp:171
 msgctxt "input-name"
 msgid "P2 Button 16"
-msgstr ""
+msgstr "2Pボタン16"
 
 #: src/emu/inpttype.ipp:172
 msgctxt "input-name"
 msgid "P2 Start"
-msgstr ""
+msgstr "2Pスタート"
 
 #: src/emu/inpttype.ipp:173
 msgctxt "input-name"
 msgid "P2 Select"
-msgstr ""
+msgstr "2Pセレクト"
 
 #: src/emu/inpttype.ipp:178
 msgctxt "input-name"
 msgid "P2 Mahjong A"
-msgstr ""
+msgstr "2P麻雀Ａ"
 
 #: src/emu/inpttype.ipp:179
 msgctxt "input-name"
 msgid "P2 Mahjong B"
-msgstr ""
+msgstr "2P麻雀Ｂ"
 
 #: src/emu/inpttype.ipp:180
 msgctxt "input-name"
 msgid "P2 Mahjong C"
-msgstr ""
+msgstr "2P麻雀Ｃ"
 
 #: src/emu/inpttype.ipp:181
 msgctxt "input-name"
 msgid "P2 Mahjong D"
-msgstr ""
+msgstr "2P麻雀Ｄ"
 
 #: src/emu/inpttype.ipp:182
 msgctxt "input-name"
 msgid "P2 Mahjong E"
-msgstr ""
+msgstr "2P麻雀Ｅ"
 
 #: src/emu/inpttype.ipp:183
 msgctxt "input-name"
 msgid "P2 Mahjong F"
-msgstr ""
+msgstr "2P麻雀Ｆ"
 
 #: src/emu/inpttype.ipp:184
 msgctxt "input-name"
 msgid "P2 Mahjong G"
-msgstr ""
+msgstr "2P麻雀Ｇ"
 
 #: src/emu/inpttype.ipp:185
 msgctxt "input-name"
 msgid "P2 Mahjong H"
-msgstr ""
+msgstr "2P麻雀Ｈ"
 
 #: src/emu/inpttype.ipp:186
 msgctxt "input-name"
 msgid "P2 Mahjong I"
-msgstr ""
+msgstr "2P麻雀Ｉ"
 
 #: src/emu/inpttype.ipp:187
 msgctxt "input-name"
 msgid "P2 Mahjong J"
-msgstr ""
+msgstr "2P麻雀Ｊ"
 
 #: src/emu/inpttype.ipp:188
 msgctxt "input-name"
 msgid "P2 Mahjong K"
-msgstr ""
+msgstr "2P麻雀Ｋ"
 
 #: src/emu/inpttype.ipp:189
 msgctxt "input-name"
 msgid "P2 Mahjong L"
-msgstr ""
+msgstr "2P麻雀Ｌ"
 
 #: src/emu/inpttype.ipp:190
 msgctxt "input-name"
 msgid "P2 Mahjong M"
-msgstr ""
+msgstr "2P麻雀Ｍ"
 
 #: src/emu/inpttype.ipp:191
 msgctxt "input-name"
 msgid "P2 Mahjong N"
-msgstr ""
+msgstr "2P麻雀Ｎ"
 
 #: src/emu/inpttype.ipp:192
 msgctxt "input-name"
 msgid "P2 Mahjong O"
-msgstr ""
+msgstr "2P麻雀Ｏ"
 
 #: src/emu/inpttype.ipp:193
 msgctxt "input-name"
 msgid "P2 Mahjong P"
-msgstr ""
+msgstr "2P麻雀Ｐ"
 
 #: src/emu/inpttype.ipp:194
 msgctxt "input-name"
 msgid "P2 Mahjong Q"
-msgstr ""
+msgstr "2P麻雀Ｑ"
 
 #: src/emu/inpttype.ipp:195
 msgctxt "input-name"
 msgid "P2 Mahjong Kan"
-msgstr ""
+msgstr "2P麻雀カン"
 
 #: src/emu/inpttype.ipp:196
 msgctxt "input-name"
 msgid "P2 Mahjong Pon"
-msgstr ""
+msgstr "2P麻雀ポン"
 
 #: src/emu/inpttype.ipp:197
 msgctxt "input-name"
 msgid "P2 Mahjong Chi"
-msgstr ""
+msgstr "2P麻雀チー"
 
 #: src/emu/inpttype.ipp:198
 msgctxt "input-name"
 msgid "P2 Mahjong Reach"
-msgstr ""
+msgstr "2P麻雀リーチ"
 
 #: src/emu/inpttype.ipp:199
 msgctxt "input-name"
 msgid "P2 Mahjong Ron"
-msgstr ""
+msgstr "2P麻雀ロン"
 
 #: src/emu/inpttype.ipp:200
 msgctxt "input-name"
 msgid "P2 Mahjong Bet"
-msgstr ""
+msgstr "2P麻雀ベット"
 
 #: src/emu/inpttype.ipp:201
 msgctxt "input-name"
 msgid "P2 Mahjong Last Chance"
-msgstr ""
+msgstr "2P麻雀ラストチャンス"
 
 #: src/emu/inpttype.ipp:202
 msgctxt "input-name"
 msgid "P2 Mahjong Take Score"
-msgstr ""
+msgstr "2P麻雀テイクスコアー"
 
 #: src/emu/inpttype.ipp:203
 msgctxt "input-name"
 msgid "P2 Mahjong Double Up"
-msgstr ""
+msgstr "2P麻雀ダブルアップ"
 
 #: src/emu/inpttype.ipp:204
 msgctxt "input-name"
 msgid "P2 Mahjong Flip Flop"
-msgstr ""
+msgstr "2P麻雀フリップフロップ"
 
 #: src/emu/inpttype.ipp:205
 msgctxt "input-name"
 msgid "P2 Mahjong Big"
-msgstr ""
+msgstr "2P麻雀ビッグ"
 
 #: src/emu/inpttype.ipp:206
 msgctxt "input-name"
 msgid "P2 Mahjong Small"
-msgstr ""
+msgstr "2P麻雀スモール"
 
 #: src/emu/inpttype.ipp:211
 msgctxt "input-name"
@@ -4021,1302 +4021,1302 @@ msgstr ""
 #: src/emu/inpttype.ipp:225
 msgctxt "input-name"
 msgid "P3 Up"
-msgstr ""
+msgstr "3P上"
 
 #: src/emu/inpttype.ipp:226
 msgctxt "input-name"
 msgid "P3 Down"
-msgstr ""
+msgstr "3P下"
 
 #: src/emu/inpttype.ipp:227
 msgctxt "input-name"
 msgid "P3 Left"
-msgstr ""
+msgstr "3P左"
 
 #: src/emu/inpttype.ipp:228
 msgctxt "input-name"
 msgid "P3 Right"
-msgstr ""
+msgstr "3P右"
 
 #: src/emu/inpttype.ipp:229
 msgctxt "input-name"
 msgid "P3 Right Stick/Up"
-msgstr ""
+msgstr "3P右レバー／上"
 
 #: src/emu/inpttype.ipp:230
 msgctxt "input-name"
 msgid "P3 Right Stick/Down"
-msgstr ""
+msgstr "3P右レバー／下"
 
 #: src/emu/inpttype.ipp:231
 msgctxt "input-name"
 msgid "P3 Right Stick/Left"
-msgstr ""
+msgstr "3P右レバー／左"
 
 #: src/emu/inpttype.ipp:232
 msgctxt "input-name"
 msgid "P3 Right Stick/Right"
-msgstr ""
+msgstr "3P右レバー／右"
 
 #: src/emu/inpttype.ipp:233
 msgctxt "input-name"
 msgid "P3 Left Stick/Up"
-msgstr ""
+msgstr "3P左レバー／上"
 
 #: src/emu/inpttype.ipp:234
 msgctxt "input-name"
 msgid "P3 Left Stick/Down"
-msgstr ""
+msgstr "3P左レバー／下"
 
 #: src/emu/inpttype.ipp:235
 msgctxt "input-name"
 msgid "P3 Left Stick/Left"
-msgstr ""
+msgstr "3P左レバー／左"
 
 #: src/emu/inpttype.ipp:236
 msgctxt "input-name"
 msgid "P3 Left Stick/Right"
-msgstr ""
+msgstr "3P左レバー／右"
 
 #: src/emu/inpttype.ipp:237
 msgctxt "input-name"
 msgid "P3 Button 1"
-msgstr ""
+msgstr "3Pボタン1"
 
 #: src/emu/inpttype.ipp:238
 msgctxt "input-name"
 msgid "P3 Button 2"
-msgstr ""
+msgstr "3Pボタン2"
 
 #: src/emu/inpttype.ipp:239
 msgctxt "input-name"
 msgid "P3 Button 3"
-msgstr ""
+msgstr "3Pボタン3"
 
 #: src/emu/inpttype.ipp:240
 msgctxt "input-name"
 msgid "P3 Button 4"
-msgstr ""
+msgstr "3Pボタン4"
 
 #: src/emu/inpttype.ipp:241
 msgctxt "input-name"
 msgid "P3 Button 5"
-msgstr ""
+msgstr "3Pボタン5"
 
 #: src/emu/inpttype.ipp:242
 msgctxt "input-name"
 msgid "P3 Button 6"
-msgstr ""
+msgstr "3Pボタン6"
 
 #: src/emu/inpttype.ipp:243
 msgctxt "input-name"
 msgid "P3 Button 7"
-msgstr ""
+msgstr "3Pボタン7"
 
 #: src/emu/inpttype.ipp:244
 msgctxt "input-name"
 msgid "P3 Button 8"
-msgstr ""
+msgstr "3Pボタン8"
 
 #: src/emu/inpttype.ipp:245
 msgctxt "input-name"
 msgid "P3 Button 9"
-msgstr ""
+msgstr "3Pボタン9"
 
 #: src/emu/inpttype.ipp:246
 msgctxt "input-name"
 msgid "P3 Button 10"
-msgstr ""
+msgstr "3Pボタン10"
 
 #: src/emu/inpttype.ipp:247
 msgctxt "input-name"
 msgid "P3 Button 11"
-msgstr ""
+msgstr "3Pボタン11"
 
 #: src/emu/inpttype.ipp:248
 msgctxt "input-name"
 msgid "P3 Button 12"
-msgstr ""
+msgstr "3Pボタン12"
 
 #: src/emu/inpttype.ipp:249
 msgctxt "input-name"
 msgid "P3 Button 13"
-msgstr ""
+msgstr "3Pボタン13"
 
 #: src/emu/inpttype.ipp:250
 msgctxt "input-name"
 msgid "P3 Button 14"
-msgstr ""
+msgstr "3Pボタン14"
 
 #: src/emu/inpttype.ipp:251
 msgctxt "input-name"
 msgid "P3 Button 15"
-msgstr ""
+msgstr "3Pボタン15"
 
 #: src/emu/inpttype.ipp:252
 msgctxt "input-name"
 msgid "P3 Button 16"
-msgstr ""
+msgstr "3Pボタン16"
 
 #: src/emu/inpttype.ipp:253
 msgctxt "input-name"
 msgid "P3 Start"
-msgstr ""
+msgstr "3Pスタート"
 
 #: src/emu/inpttype.ipp:254
 msgctxt "input-name"
 msgid "P3 Select"
-msgstr ""
+msgstr "3Pセレクト"
 
 #: src/emu/inpttype.ipp:259
 msgctxt "input-name"
 msgid "P4 Up"
-msgstr ""
+msgstr "4P上"
 
 #: src/emu/inpttype.ipp:260
 msgctxt "input-name"
 msgid "P4 Down"
-msgstr ""
+msgstr "4P下"
 
 #: src/emu/inpttype.ipp:261
 msgctxt "input-name"
 msgid "P4 Left"
-msgstr ""
+msgstr "4P左"
 
 #: src/emu/inpttype.ipp:262
 msgctxt "input-name"
 msgid "P4 Right"
-msgstr ""
+msgstr "4P右"
 
 #: src/emu/inpttype.ipp:263
 msgctxt "input-name"
 msgid "P4 Right Stick/Up"
-msgstr ""
+msgstr "4P右レバー／上"
 
 #: src/emu/inpttype.ipp:264
 msgctxt "input-name"
 msgid "P4 Right Stick/Down"
-msgstr ""
+msgstr "4P右レバー／下"
 
 #: src/emu/inpttype.ipp:265
 msgctxt "input-name"
 msgid "P4 Right Stick/Left"
-msgstr ""
+msgstr "4P右レバー／左"
 
 #: src/emu/inpttype.ipp:266
 msgctxt "input-name"
 msgid "P4 Right Stick/Right"
-msgstr ""
+msgstr "4P右レバー／右"
 
 #: src/emu/inpttype.ipp:267
 msgctxt "input-name"
 msgid "P4 Left Stick/Up"
-msgstr ""
+msgstr "4P左レバー／上"
 
 #: src/emu/inpttype.ipp:268
 msgctxt "input-name"
 msgid "P4 Left Stick/Down"
-msgstr ""
+msgstr "4P左レバー／下"
 
 #: src/emu/inpttype.ipp:269
 msgctxt "input-name"
 msgid "P4 Left Stick/Left"
-msgstr ""
+msgstr "4P左レバー／左"
 
 #: src/emu/inpttype.ipp:270
 msgctxt "input-name"
 msgid "P4 Left Stick/Right"
-msgstr ""
+msgstr "4P左レバー／右"
 
 #: src/emu/inpttype.ipp:271
 msgctxt "input-name"
 msgid "P4 Button 1"
-msgstr ""
+msgstr "4Pボタン1"
 
 #: src/emu/inpttype.ipp:272
 msgctxt "input-name"
 msgid "P4 Button 2"
-msgstr ""
+msgstr "4Pボタン2"
 
 #: src/emu/inpttype.ipp:273
 msgctxt "input-name"
 msgid "P4 Button 3"
-msgstr ""
+msgstr "4Pボタン3"
 
 #: src/emu/inpttype.ipp:274
 msgctxt "input-name"
 msgid "P4 Button 4"
-msgstr ""
+msgstr "4Pボタン4"
 
 #: src/emu/inpttype.ipp:275
 msgctxt "input-name"
 msgid "P4 Button 5"
-msgstr ""
+msgstr "4Pボタン5"
 
 #: src/emu/inpttype.ipp:276
 msgctxt "input-name"
 msgid "P4 Button 6"
-msgstr ""
+msgstr "4Pボタン6"
 
 #: src/emu/inpttype.ipp:277
 msgctxt "input-name"
 msgid "P4 Button 7"
-msgstr ""
+msgstr "4Pボタン7"
 
 #: src/emu/inpttype.ipp:278
 msgctxt "input-name"
 msgid "P4 Button 8"
-msgstr ""
+msgstr "4Pボタン8"
 
 #: src/emu/inpttype.ipp:279
 msgctxt "input-name"
 msgid "P4 Button 9"
-msgstr ""
+msgstr "4Pボタン9"
 
 #: src/emu/inpttype.ipp:280
 msgctxt "input-name"
 msgid "P4 Button 10"
-msgstr ""
+msgstr "4Pボタン10"
 
 #: src/emu/inpttype.ipp:281
 msgctxt "input-name"
 msgid "P4 Button 11"
-msgstr ""
+msgstr "4Pボタン11"
 
 #: src/emu/inpttype.ipp:282
 msgctxt "input-name"
 msgid "P4 Button 12"
-msgstr ""
+msgstr "4Pボタン12"
 
 #: src/emu/inpttype.ipp:283
 msgctxt "input-name"
 msgid "P4 Button 13"
-msgstr ""
+msgstr "4Pボタン13"
 
 #: src/emu/inpttype.ipp:284
 msgctxt "input-name"
 msgid "P4 Button 14"
-msgstr ""
+msgstr "4Pボタン14"
 
 #: src/emu/inpttype.ipp:285
 msgctxt "input-name"
 msgid "P4 Button 15"
-msgstr ""
+msgstr "4Pボタン15"
 
 #: src/emu/inpttype.ipp:286
 msgctxt "input-name"
 msgid "P4 Button 16"
-msgstr ""
+msgstr "4Pボタン16"
 
 #: src/emu/inpttype.ipp:287
 msgctxt "input-name"
 msgid "P4 Start"
-msgstr ""
+msgstr "4Pスタート"
 
 #: src/emu/inpttype.ipp:288
 msgctxt "input-name"
 msgid "P4 Select"
-msgstr ""
+msgstr "4Pセレクト"
 
 #: src/emu/inpttype.ipp:293
 msgctxt "input-name"
 msgid "P5 Up"
-msgstr ""
+msgstr "5P上"
 
 #: src/emu/inpttype.ipp:294
 msgctxt "input-name"
 msgid "P5 Down"
-msgstr ""
+msgstr "5P下"
 
 #: src/emu/inpttype.ipp:295
 msgctxt "input-name"
 msgid "P5 Left"
-msgstr ""
+msgstr "5P左"
 
 #: src/emu/inpttype.ipp:296
 msgctxt "input-name"
 msgid "P5 Right"
-msgstr ""
+msgstr "5P右"
 
 #: src/emu/inpttype.ipp:297
 msgctxt "input-name"
 msgid "P5 Right Stick/Up"
-msgstr ""
+msgstr "5P右レバー／上"
 
 #: src/emu/inpttype.ipp:298
 msgctxt "input-name"
 msgid "P5 Right Stick/Down"
-msgstr ""
+msgstr "5P右レバー／下"
 
 #: src/emu/inpttype.ipp:299
 msgctxt "input-name"
 msgid "P5 Right Stick/Left"
-msgstr ""
+msgstr "5P右レバー／左"
 
 #: src/emu/inpttype.ipp:300
 msgctxt "input-name"
 msgid "P5 Right Stick/Right"
-msgstr ""
+msgstr "5P右レバー／右"
 
 #: src/emu/inpttype.ipp:301
 msgctxt "input-name"
 msgid "P5 Left Stick/Up"
-msgstr ""
+msgstr "5P左レバー／上"
 
 #: src/emu/inpttype.ipp:302
 msgctxt "input-name"
 msgid "P5 Left Stick/Down"
-msgstr ""
+msgstr "5P左レバー／下"
 
 #: src/emu/inpttype.ipp:303
 msgctxt "input-name"
 msgid "P5 Left Stick/Left"
-msgstr ""
+msgstr "5P左レバー／左"
 
 #: src/emu/inpttype.ipp:304
 msgctxt "input-name"
 msgid "P5 Left Stick/Right"
-msgstr ""
+msgstr "5P左レバー／右"
 
 #: src/emu/inpttype.ipp:305
 msgctxt "input-name"
 msgid "P5 Button 1"
-msgstr ""
+msgstr "5Pボタン1"
 
 #: src/emu/inpttype.ipp:306
 msgctxt "input-name"
 msgid "P5 Button 2"
-msgstr ""
+msgstr "5Pボタン2"
 
 #: src/emu/inpttype.ipp:307
 msgctxt "input-name"
 msgid "P5 Button 3"
-msgstr ""
+msgstr "5Pボタン3"
 
 #: src/emu/inpttype.ipp:308
 msgctxt "input-name"
 msgid "P5 Button 4"
-msgstr ""
+msgstr "5Pボタン4"
 
 #: src/emu/inpttype.ipp:309
 msgctxt "input-name"
 msgid "P5 Button 5"
-msgstr ""
+msgstr "5Pボタン5"
 
 #: src/emu/inpttype.ipp:310
 msgctxt "input-name"
 msgid "P5 Button 6"
-msgstr ""
+msgstr "5Pボタン6"
 
 #: src/emu/inpttype.ipp:311
 msgctxt "input-name"
 msgid "P5 Button 7"
-msgstr ""
+msgstr "5Pボタン7"
 
 #: src/emu/inpttype.ipp:312
 msgctxt "input-name"
 msgid "P5 Button 8"
-msgstr ""
+msgstr "5Pボタン8"
 
 #: src/emu/inpttype.ipp:313
 msgctxt "input-name"
 msgid "P5 Button 9"
-msgstr ""
+msgstr "5Pボタン9"
 
 #: src/emu/inpttype.ipp:314
 msgctxt "input-name"
 msgid "P5 Button 10"
-msgstr ""
+msgstr "5Pボタン10"
 
 #: src/emu/inpttype.ipp:315
 msgctxt "input-name"
 msgid "P5 Button 11"
-msgstr ""
+msgstr "5Pボタン11"
 
 #: src/emu/inpttype.ipp:316
 msgctxt "input-name"
 msgid "P5 Button 12"
-msgstr ""
+msgstr "5Pボタン12"
 
 #: src/emu/inpttype.ipp:317
 msgctxt "input-name"
 msgid "P5 Button 13"
-msgstr ""
+msgstr "5Pボタン13"
 
 #: src/emu/inpttype.ipp:318
 msgctxt "input-name"
 msgid "P5 Button 14"
-msgstr ""
+msgstr "5Pボタン14"
 
 #: src/emu/inpttype.ipp:319
 msgctxt "input-name"
 msgid "P5 Button 15"
-msgstr ""
+msgstr "5Pボタン15"
 
 #: src/emu/inpttype.ipp:320
 msgctxt "input-name"
 msgid "P5 Button 16"
-msgstr ""
+msgstr "5Pボタン16"
 
 #: src/emu/inpttype.ipp:321
 msgctxt "input-name"
 msgid "P5 Start"
-msgstr ""
+msgstr "5Pスタート"
 
 #: src/emu/inpttype.ipp:322
 msgctxt "input-name"
 msgid "P5 Select"
-msgstr ""
+msgstr "5Pセレクト"
 
 #: src/emu/inpttype.ipp:327
 msgctxt "input-name"
 msgid "P6 Up"
-msgstr ""
+msgstr "6P上"
 
 #: src/emu/inpttype.ipp:328
 msgctxt "input-name"
 msgid "P6 Down"
-msgstr ""
+msgstr "6P下"
 
 #: src/emu/inpttype.ipp:329
 msgctxt "input-name"
 msgid "P6 Left"
-msgstr ""
+msgstr "6P左"
 
 #: src/emu/inpttype.ipp:330
 msgctxt "input-name"
 msgid "P6 Right"
-msgstr ""
+msgstr "6P右"
 
 #: src/emu/inpttype.ipp:331
 msgctxt "input-name"
 msgid "P6 Right Stick/Up"
-msgstr ""
+msgstr "6P右レバー／上"
 
 #: src/emu/inpttype.ipp:332
 msgctxt "input-name"
 msgid "P6 Right Stick/Down"
-msgstr ""
+msgstr "6P右レバー／下"
 
 #: src/emu/inpttype.ipp:333
 msgctxt "input-name"
 msgid "P6 Right Stick/Left"
-msgstr ""
+msgstr "6P右レバー／左"
 
 #: src/emu/inpttype.ipp:334
 msgctxt "input-name"
 msgid "P6 Right Stick/Right"
-msgstr ""
+msgstr "6P右レバー／右"
 
 #: src/emu/inpttype.ipp:335
 msgctxt "input-name"
 msgid "P6 Left Stick/Up"
-msgstr ""
+msgstr "6P左レバー／上"
 
 #: src/emu/inpttype.ipp:336
 msgctxt "input-name"
 msgid "P6 Left Stick/Down"
-msgstr ""
+msgstr "6P左レバー／下"
 
 #: src/emu/inpttype.ipp:337
 msgctxt "input-name"
 msgid "P6 Left Stick/Left"
-msgstr ""
+msgstr "6P左レバー／左"
 
 #: src/emu/inpttype.ipp:338
 msgctxt "input-name"
 msgid "P6 Left Stick/Right"
-msgstr ""
+msgstr "6P左レバー／右"
 
 #: src/emu/inpttype.ipp:339
 msgctxt "input-name"
 msgid "P6 Button 1"
-msgstr ""
+msgstr "6Pボタン1"
 
 #: src/emu/inpttype.ipp:340
 msgctxt "input-name"
 msgid "P6 Button 2"
-msgstr ""
+msgstr "6Pボタン2"
 
 #: src/emu/inpttype.ipp:341
 msgctxt "input-name"
 msgid "P6 Button 3"
-msgstr ""
+msgstr "6Pボタン3"
 
 #: src/emu/inpttype.ipp:342
 msgctxt "input-name"
 msgid "P6 Button 4"
-msgstr ""
+msgstr "6Pボタン4"
 
 #: src/emu/inpttype.ipp:343
 msgctxt "input-name"
 msgid "P6 Button 5"
-msgstr ""
+msgstr "6Pボタン5"
 
 #: src/emu/inpttype.ipp:344
 msgctxt "input-name"
 msgid "P6 Button 6"
-msgstr ""
+msgstr "6Pボタン6"
 
 #: src/emu/inpttype.ipp:345
 msgctxt "input-name"
 msgid "P6 Button 7"
-msgstr ""
+msgstr "6Pボタン7"
 
 #: src/emu/inpttype.ipp:346
 msgctxt "input-name"
 msgid "P6 Button 8"
-msgstr ""
+msgstr "6Pボタン8"
 
 #: src/emu/inpttype.ipp:347
 msgctxt "input-name"
 msgid "P6 Button 9"
-msgstr ""
+msgstr "6Pボタン9"
 
 #: src/emu/inpttype.ipp:348
 msgctxt "input-name"
 msgid "P6 Button 10"
-msgstr ""
+msgstr "6Pボタン10"
 
 #: src/emu/inpttype.ipp:349
 msgctxt "input-name"
 msgid "P6 Button 11"
-msgstr ""
+msgstr "6Pボタン11"
 
 #: src/emu/inpttype.ipp:350
 msgctxt "input-name"
 msgid "P6 Button 12"
-msgstr ""
+msgstr "6Pボタン12"
 
 #: src/emu/inpttype.ipp:351
 msgctxt "input-name"
 msgid "P6 Button 13"
-msgstr ""
+msgstr "6Pボタン13"
 
 #: src/emu/inpttype.ipp:352
 msgctxt "input-name"
 msgid "P6 Button 14"
-msgstr ""
+msgstr "6Pボタン14"
 
 #: src/emu/inpttype.ipp:353
 msgctxt "input-name"
 msgid "P6 Button 15"
-msgstr ""
+msgstr "6Pボタン15"
 
 #: src/emu/inpttype.ipp:354
 msgctxt "input-name"
 msgid "P6 Button 16"
-msgstr ""
+msgstr "6Pボタン16"
 
 #: src/emu/inpttype.ipp:355
 msgctxt "input-name"
 msgid "P6 Start"
-msgstr ""
+msgstr "6Pスタート"
 
 #: src/emu/inpttype.ipp:356
 msgctxt "input-name"
 msgid "P6 Select"
-msgstr ""
+msgstr "6Pセレクト"
 
 #: src/emu/inpttype.ipp:361
 msgctxt "input-name"
 msgid "P7 Up"
-msgstr ""
+msgstr "7P上"
 
 #: src/emu/inpttype.ipp:362
 msgctxt "input-name"
 msgid "P7 Down"
-msgstr ""
+msgstr "7P下"
 
 #: src/emu/inpttype.ipp:363
 msgctxt "input-name"
 msgid "P7 Left"
-msgstr ""
+msgstr "7P左"
 
 #: src/emu/inpttype.ipp:364
 msgctxt "input-name"
 msgid "P7 Right"
-msgstr ""
+msgstr "7P右"
 
 #: src/emu/inpttype.ipp:365
 msgctxt "input-name"
 msgid "P7 Right Stick/Up"
-msgstr ""
+msgstr "7P右レバー／上"
 
 #: src/emu/inpttype.ipp:366
 msgctxt "input-name"
 msgid "P7 Right Stick/Down"
-msgstr ""
+msgstr "7P右レバー／下"
 
 #: src/emu/inpttype.ipp:367
 msgctxt "input-name"
 msgid "P7 Right Stick/Left"
-msgstr ""
+msgstr "7P右レバー／左"
 
 #: src/emu/inpttype.ipp:368
 msgctxt "input-name"
 msgid "P7 Right Stick/Right"
-msgstr ""
+msgstr "7P右レバー／右"
 
 #: src/emu/inpttype.ipp:369
 msgctxt "input-name"
 msgid "P7 Left Stick/Up"
-msgstr ""
+msgstr "7P左レバー／上"
 
 #: src/emu/inpttype.ipp:370
 msgctxt "input-name"
 msgid "P7 Left Stick/Down"
-msgstr ""
+msgstr "7P左レバー／下"
 
 #: src/emu/inpttype.ipp:371
 msgctxt "input-name"
 msgid "P7 Left Stick/Left"
-msgstr ""
+msgstr "7P左レバー／左"
 
 #: src/emu/inpttype.ipp:372
 msgctxt "input-name"
 msgid "P7 Left Stick/Right"
-msgstr ""
+msgstr "7P左レバー／右"
 
 #: src/emu/inpttype.ipp:373
 msgctxt "input-name"
 msgid "P7 Button 1"
-msgstr ""
+msgstr "7Pボタン1"
 
 #: src/emu/inpttype.ipp:374
 msgctxt "input-name"
 msgid "P7 Button 2"
-msgstr ""
+msgstr "7Pボタン2"
 
 #: src/emu/inpttype.ipp:375
 msgctxt "input-name"
 msgid "P7 Button 3"
-msgstr ""
+msgstr "7Pボタン3"
 
 #: src/emu/inpttype.ipp:376
 msgctxt "input-name"
 msgid "P7 Button 4"
-msgstr ""
+msgstr "7Pボタン4"
 
 #: src/emu/inpttype.ipp:377
 msgctxt "input-name"
 msgid "P7 Button 5"
-msgstr ""
+msgstr "7Pボタン5"
 
 #: src/emu/inpttype.ipp:378
 msgctxt "input-name"
 msgid "P7 Button 6"
-msgstr ""
+msgstr "7Pボタン6"
 
 #: src/emu/inpttype.ipp:379
 msgctxt "input-name"
 msgid "P7 Button 7"
-msgstr ""
+msgstr "7Pボタン7"
 
 #: src/emu/inpttype.ipp:380
 msgctxt "input-name"
 msgid "P7 Button 8"
-msgstr ""
+msgstr "7Pボタン8"
 
 #: src/emu/inpttype.ipp:381
 msgctxt "input-name"
 msgid "P7 Button 9"
-msgstr ""
+msgstr "7Pボタン9"
 
 #: src/emu/inpttype.ipp:382
 msgctxt "input-name"
 msgid "P7 Button 10"
-msgstr ""
+msgstr "7Pボタン10"
 
 #: src/emu/inpttype.ipp:383
 msgctxt "input-name"
 msgid "P7 Button 11"
-msgstr ""
+msgstr "7Pボタン11"
 
 #: src/emu/inpttype.ipp:384
 msgctxt "input-name"
 msgid "P7 Button 12"
-msgstr ""
+msgstr "7Pボタン12"
 
 #: src/emu/inpttype.ipp:385
 msgctxt "input-name"
 msgid "P7 Button 13"
-msgstr ""
+msgstr "7Pボタン13"
 
 #: src/emu/inpttype.ipp:386
 msgctxt "input-name"
 msgid "P7 Button 14"
-msgstr ""
+msgstr "7Pボタン14"
 
 #: src/emu/inpttype.ipp:387
 msgctxt "input-name"
 msgid "P7 Button 15"
-msgstr ""
+msgstr "7Pボタン15"
 
 #: src/emu/inpttype.ipp:388
 msgctxt "input-name"
 msgid "P7 Button 16"
-msgstr ""
+msgstr "7Pボタン16"
 
 #: src/emu/inpttype.ipp:389
 msgctxt "input-name"
 msgid "P7 Start"
-msgstr ""
+msgstr "7Pスタート"
 
 #: src/emu/inpttype.ipp:390
 msgctxt "input-name"
 msgid "P7 Select"
-msgstr ""
+msgstr "7Pセレクト"
 
 #: src/emu/inpttype.ipp:395
 msgctxt "input-name"
 msgid "P8 Up"
-msgstr ""
+msgstr "8P上"
 
 #: src/emu/inpttype.ipp:396
 msgctxt "input-name"
 msgid "P8 Down"
-msgstr ""
+msgstr "8P下"
 
 #: src/emu/inpttype.ipp:397
 msgctxt "input-name"
 msgid "P8 Left"
-msgstr ""
+msgstr "8P左"
 
 #: src/emu/inpttype.ipp:398
 msgctxt "input-name"
 msgid "P8 Right"
-msgstr ""
+msgstr "8P右"
 
 #: src/emu/inpttype.ipp:399
 msgctxt "input-name"
 msgid "P8 Right Stick/Up"
-msgstr ""
+msgstr "8P右レバー／上"
 
 #: src/emu/inpttype.ipp:400
 msgctxt "input-name"
 msgid "P8 Right Stick/Down"
-msgstr ""
+msgstr "8P右レバー／下"
 
 #: src/emu/inpttype.ipp:401
 msgctxt "input-name"
 msgid "P8 Right Stick/Left"
-msgstr ""
+msgstr "8P右レバー／左"
 
 #: src/emu/inpttype.ipp:402
 msgctxt "input-name"
 msgid "P8 Right Stick/Right"
-msgstr ""
+msgstr "8P右レバー／右"
 
 #: src/emu/inpttype.ipp:403
 msgctxt "input-name"
 msgid "P8 Left Stick/Up"
-msgstr ""
+msgstr "8P左レバー／上"
 
 #: src/emu/inpttype.ipp:404
 msgctxt "input-name"
 msgid "P8 Left Stick/Down"
-msgstr ""
+msgstr "8P左レバー／下"
 
 #: src/emu/inpttype.ipp:405
 msgctxt "input-name"
 msgid "P8 Left Stick/Left"
-msgstr ""
+msgstr "8P左レバー／左"
 
 #: src/emu/inpttype.ipp:406
 msgctxt "input-name"
 msgid "P8 Left Stick/Right"
-msgstr ""
+msgstr "8P左レバー／右"
 
 #: src/emu/inpttype.ipp:407
 msgctxt "input-name"
 msgid "P8 Button 1"
-msgstr ""
+msgstr "8Pボタン1"
 
 #: src/emu/inpttype.ipp:408
 msgctxt "input-name"
 msgid "P8 Button 2"
-msgstr ""
+msgstr "8Pボタン2"
 
 #: src/emu/inpttype.ipp:409
 msgctxt "input-name"
 msgid "P8 Button 3"
-msgstr ""
+msgstr "8Pボタン3"
 
 #: src/emu/inpttype.ipp:410
 msgctxt "input-name"
 msgid "P8 Button 4"
-msgstr ""
+msgstr "8Pボタン4"
 
 #: src/emu/inpttype.ipp:411
 msgctxt "input-name"
 msgid "P8 Button 5"
-msgstr ""
+msgstr "8Pボタン5"
 
 #: src/emu/inpttype.ipp:412
 msgctxt "input-name"
 msgid "P8 Button 6"
-msgstr ""
+msgstr "8Pボタン6"
 
 #: src/emu/inpttype.ipp:413
 msgctxt "input-name"
 msgid "P8 Button 7"
-msgstr ""
+msgstr "8Pボタン7"
 
 #: src/emu/inpttype.ipp:414
 msgctxt "input-name"
 msgid "P8 Button 8"
-msgstr ""
+msgstr "8Pボタン8"
 
 #: src/emu/inpttype.ipp:415
 msgctxt "input-name"
 msgid "P8 Button 9"
-msgstr ""
+msgstr "8Pボタン9"
 
 #: src/emu/inpttype.ipp:416
 msgctxt "input-name"
 msgid "P8 Button 10"
-msgstr ""
+msgstr "8Pボタン10"
 
 #: src/emu/inpttype.ipp:417
 msgctxt "input-name"
 msgid "P8 Button 11"
-msgstr ""
+msgstr "8Pボタン11"
 
 #: src/emu/inpttype.ipp:418
 msgctxt "input-name"
 msgid "P8 Button 12"
-msgstr ""
+msgstr "8Pボタン12"
 
 #: src/emu/inpttype.ipp:419
 msgctxt "input-name"
 msgid "P8 Button 13"
-msgstr ""
+msgstr "8Pボタン13"
 
 #: src/emu/inpttype.ipp:420
 msgctxt "input-name"
 msgid "P8 Button 14"
-msgstr ""
+msgstr "8Pボタン14"
 
 #: src/emu/inpttype.ipp:421
 msgctxt "input-name"
 msgid "P8 Button 15"
-msgstr ""
+msgstr "8Pボタン15"
 
 #: src/emu/inpttype.ipp:422
 msgctxt "input-name"
 msgid "P8 Button 16"
-msgstr ""
+msgstr "8Pボタン16"
 
 #: src/emu/inpttype.ipp:423
 msgctxt "input-name"
 msgid "P8 Start"
-msgstr ""
+msgstr "8Pスタート"
 
 #: src/emu/inpttype.ipp:424
 msgctxt "input-name"
 msgid "P8 Select"
-msgstr ""
+msgstr "8Pセレクト"
 
 #: src/emu/inpttype.ipp:429
 msgctxt "input-name"
 msgid "P9 Up"
-msgstr ""
+msgstr "9P上"
 
 #: src/emu/inpttype.ipp:430
 msgctxt "input-name"
 msgid "P9 Down"
-msgstr ""
+msgstr "9P下"
 
 #: src/emu/inpttype.ipp:431
 msgctxt "input-name"
 msgid "P9 Left"
-msgstr ""
+msgstr "9P左"
 
 #: src/emu/inpttype.ipp:432
 msgctxt "input-name"
 msgid "P9 Right"
-msgstr ""
+msgstr "9P右"
 
 #: src/emu/inpttype.ipp:433
 msgctxt "input-name"
 msgid "P9 Right Stick/Up"
-msgstr ""
+msgstr "9P右レバー／上"
 
 #: src/emu/inpttype.ipp:434
 msgctxt "input-name"
 msgid "P9 Right Stick/Down"
-msgstr ""
+msgstr "9P右レバー／下"
 
 #: src/emu/inpttype.ipp:435
 msgctxt "input-name"
 msgid "P9 Right Stick/Left"
-msgstr ""
+msgstr "9P右レバー／左"
 
 #: src/emu/inpttype.ipp:436
 msgctxt "input-name"
 msgid "P9 Right Stick/Right"
-msgstr ""
+msgstr "9P右レバー／右"
 
 #: src/emu/inpttype.ipp:437
 msgctxt "input-name"
 msgid "P9 Left Stick/Up"
-msgstr ""
+msgstr "9P左レバー／上"
 
 #: src/emu/inpttype.ipp:438
 msgctxt "input-name"
 msgid "P9 Left Stick/Down"
-msgstr ""
+msgstr "9P左レバー／下"
 
 #: src/emu/inpttype.ipp:439
 msgctxt "input-name"
 msgid "P9 Left Stick/Left"
-msgstr ""
+msgstr "9P左レバー／左"
 
 #: src/emu/inpttype.ipp:440
 msgctxt "input-name"
 msgid "P9 Left Stick/Right"
-msgstr ""
+msgstr "9P左レバー／右"
 
 #: src/emu/inpttype.ipp:441
 msgctxt "input-name"
 msgid "P9 Button 1"
-msgstr ""
+msgstr "9Pボタン1"
 
 #: src/emu/inpttype.ipp:442
 msgctxt "input-name"
 msgid "P9 Button 2"
-msgstr ""
+msgstr "9Pボタン2"
 
 #: src/emu/inpttype.ipp:443
 msgctxt "input-name"
 msgid "P9 Button 3"
-msgstr ""
+msgstr "9Pボタン3"
 
 #: src/emu/inpttype.ipp:444
 msgctxt "input-name"
 msgid "P9 Button 4"
-msgstr ""
+msgstr "9Pボタン4"
 
 #: src/emu/inpttype.ipp:445
 msgctxt "input-name"
 msgid "P9 Button 5"
-msgstr ""
+msgstr "9Pボタン5"
 
 #: src/emu/inpttype.ipp:446
 msgctxt "input-name"
 msgid "P9 Button 6"
-msgstr ""
+msgstr "9Pボタン6"
 
 #: src/emu/inpttype.ipp:447
 msgctxt "input-name"
 msgid "P9 Button 7"
-msgstr ""
+msgstr "9Pボタン7"
 
 #: src/emu/inpttype.ipp:448
 msgctxt "input-name"
 msgid "P9 Button 8"
-msgstr ""
+msgstr "9Pボタン8"
 
 #: src/emu/inpttype.ipp:449
 msgctxt "input-name"
 msgid "P9 Button 9"
-msgstr ""
+msgstr "9Pボタン9"
 
 #: src/emu/inpttype.ipp:450
 msgctxt "input-name"
 msgid "P9 Button 10"
-msgstr ""
+msgstr "9Pボタン10"
 
 #: src/emu/inpttype.ipp:451
 msgctxt "input-name"
 msgid "P9 Button 11"
-msgstr ""
+msgstr "9Pボタン11"
 
 #: src/emu/inpttype.ipp:452
 msgctxt "input-name"
 msgid "P9 Button 12"
-msgstr ""
+msgstr "9Pボタン12"
 
 #: src/emu/inpttype.ipp:453
 msgctxt "input-name"
 msgid "P9 Button 13"
-msgstr ""
+msgstr "9Pボタン13"
 
 #: src/emu/inpttype.ipp:454
 msgctxt "input-name"
 msgid "P9 Button 14"
-msgstr ""
+msgstr "9Pボタン14"
 
 #: src/emu/inpttype.ipp:455
 msgctxt "input-name"
 msgid "P9 Button 15"
-msgstr ""
+msgstr "9Pボタン15"
 
 #: src/emu/inpttype.ipp:456
 msgctxt "input-name"
 msgid "P9 Button 16"
-msgstr ""
+msgstr "9Pボタン16"
 
 #: src/emu/inpttype.ipp:457
 msgctxt "input-name"
 msgid "P9 Start"
-msgstr ""
+msgstr "9Pスタート"
 
 #: src/emu/inpttype.ipp:458
 msgctxt "input-name"
 msgid "P9 Select"
-msgstr ""
+msgstr "9Pセレクト"
 
 #: src/emu/inpttype.ipp:463
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Up"
-msgstr ""
+msgstr "10P上"
 
 #: src/emu/inpttype.ipp:464
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Down"
-msgstr ""
+msgstr "10P下"
 
 #: src/emu/inpttype.ipp:465
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left"
-msgstr ""
+msgstr "10P左"
 
 #: src/emu/inpttype.ipp:466
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right"
-msgstr ""
+msgstr "10P右"
 
 #: src/emu/inpttype.ipp:467
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Up"
-msgstr ""
+msgstr "10P右レバー／上"
 
 #: src/emu/inpttype.ipp:468
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Down"
-msgstr ""
+msgstr "10P右レバー／下"
 
 #: src/emu/inpttype.ipp:469
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Left"
-msgstr ""
+msgstr "10P右レバー／左"
 
 #: src/emu/inpttype.ipp:470
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Right Stick/Right"
-msgstr ""
+msgstr "10P右レバー／右"
 
 #: src/emu/inpttype.ipp:471
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Up"
-msgstr ""
+msgstr "10P左レバー／上"
 
 #: src/emu/inpttype.ipp:472
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Down"
-msgstr ""
+msgstr "10P左レバー／下"
 
 #: src/emu/inpttype.ipp:473
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Left"
-msgstr ""
+msgstr "10P左レバー／左"
 
 #: src/emu/inpttype.ipp:474
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Left Stick/Right"
-msgstr ""
+msgstr "10P左レバー／右"
 
 #: src/emu/inpttype.ipp:475
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 1"
-msgstr ""
+msgstr "10Pボタン1"
 
 #: src/emu/inpttype.ipp:476
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 2"
-msgstr ""
+msgstr "10Pボタン2"
 
 #: src/emu/inpttype.ipp:477
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 3"
-msgstr ""
+msgstr "10Pボタン3"
 
 #: src/emu/inpttype.ipp:478
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 4"
-msgstr ""
+msgstr "10Pボタン4"
 
 #: src/emu/inpttype.ipp:479
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 5"
-msgstr ""
+msgstr "10Pボタン5"
 
 #: src/emu/inpttype.ipp:480
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 6"
-msgstr ""
+msgstr "10Pボタン6"
 
 #: src/emu/inpttype.ipp:481
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 7"
-msgstr ""
+msgstr "10Pボタン7"
 
 #: src/emu/inpttype.ipp:482
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 8"
-msgstr ""
+msgstr "10Pボタン8"
 
 #: src/emu/inpttype.ipp:483
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 9"
-msgstr ""
+msgstr "10Pボタン9"
 
 #: src/emu/inpttype.ipp:484
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 10"
-msgstr ""
+msgstr "10Pボタン10"
 
 #: src/emu/inpttype.ipp:485
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 11"
-msgstr ""
+msgstr "10Pボタン11"
 
 #: src/emu/inpttype.ipp:486
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 12"
-msgstr ""
+msgstr "10Pボタン12"
 
 #: src/emu/inpttype.ipp:487
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 13"
-msgstr ""
+msgstr "10Pボタン13"
 
 #: src/emu/inpttype.ipp:488
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 14"
-msgstr ""
+msgstr "10Pボタン14"
 
 #: src/emu/inpttype.ipp:489
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 15"
-msgstr ""
+msgstr "10Pボタン15"
 
 #: src/emu/inpttype.ipp:490
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Button 16"
-msgstr ""
+msgstr "10Pボタン16"
 
 #: src/emu/inpttype.ipp:491
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Start"
-msgstr ""
+msgstr "10Pスタート"
 
 #: src/emu/inpttype.ipp:492
-msgctxt "input_name"
+msgctxt "input-name"
 msgid "P10 Select"
-msgstr ""
+msgstr "10Pセレクト"
 
 #: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr ""
+msgstr "1人プレイスタート"
 
 #: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr ""
+msgstr "2人プレイスタート"
 
 #: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr ""
+msgstr "3人プレイスタート"
 
 #: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr ""
+msgstr "4人プレイスタート"
 
 #: src/emu/inpttype.ipp:501
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr ""
+msgstr "5人プレイスタート"
 
 #: src/emu/inpttype.ipp:502
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr ""
+msgstr "6人プレイスタート"
 
 #: src/emu/inpttype.ipp:503
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr ""
+msgstr "7人プレイスタート"
 
 #: src/emu/inpttype.ipp:504
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr ""
+msgstr "8人プレイスタート"
 
 #: src/emu/inpttype.ipp:509
 msgctxt "input-name"
 msgid "Coin 1"
-msgstr ""
+msgstr "コイン1"
 
 #: src/emu/inpttype.ipp:510
 msgctxt "input-name"
 msgid "Coin 2"
-msgstr ""
+msgstr "コイン2"
 
 #: src/emu/inpttype.ipp:511
 msgctxt "input-name"
 msgid "Coin 3"
-msgstr ""
+msgstr "コイン3"
 
 #: src/emu/inpttype.ipp:512
 msgctxt "input-name"
 msgid "Coin 4"
-msgstr ""
+msgstr "コイン4"
 
 #: src/emu/inpttype.ipp:513
 msgctxt "input-name"
 msgid "Coin 5"
-msgstr ""
+msgstr "コイン5"
 
 #: src/emu/inpttype.ipp:514
 msgctxt "input-name"
 msgid "Coin 6"
-msgstr ""
+msgstr "コイン6"
 
 #: src/emu/inpttype.ipp:515
 msgctxt "input-name"
 msgid "Coin 7"
-msgstr ""
+msgstr "コイン7"
 
 #: src/emu/inpttype.ipp:516
 msgctxt "input-name"
 msgid "Coin 8"
-msgstr ""
+msgstr "コイン8"
 
 #: src/emu/inpttype.ipp:517
 msgctxt "input-name"
 msgid "Coin 9"
-msgstr ""
+msgstr "コイン9"
 
 #: src/emu/inpttype.ipp:518
 msgctxt "input-name"
 msgid "Coin 10"
-msgstr ""
+msgstr "コイン10"
 
 #: src/emu/inpttype.ipp:519
 msgctxt "input-name"
 msgid "Coin 11"
-msgstr ""
+msgstr "コイン11"
 
 #: src/emu/inpttype.ipp:520
 msgctxt "input-name"
 msgid "Coin 12"
-msgstr ""
+msgstr "コイン12"
 
 #: src/emu/inpttype.ipp:521
 msgctxt "input-name"
@@ -5326,22 +5326,22 @@ msgstr ""
 #: src/emu/inpttype.ipp:526
 msgctxt "input-name"
 msgid "Service 1"
-msgstr "サービス１"
+msgstr "サービス1"
 
 #: src/emu/inpttype.ipp:527
 msgctxt "input-name"
 msgid "Service 2"
-msgstr "サービス２"
+msgstr "サービス2"
 
 #: src/emu/inpttype.ipp:528
 msgctxt "input-name"
 msgid "Service 3"
-msgstr "サービス３"
+msgstr "サービス3"
 
 #: src/emu/inpttype.ipp:529
 msgctxt "input-name"
 msgid "Service 4"
-msgstr "サービス４"
+msgstr "サービス4"
 
 #: src/emu/inpttype.ipp:534
 msgctxt "input-name"
@@ -5401,152 +5401,152 @@ msgstr ""
 #: src/emu/inpttype.ipp:554
 msgctxt "input-name"
 msgid "P1 Pedal 1"
-msgstr ""
+msgstr "1Pペダル1"
 
 #: src/emu/inpttype.ipp:555
 msgctxt "input-name"
 msgid "P2 Pedal 1"
-msgstr ""
+msgstr "2Pペダル1"
 
 #: src/emu/inpttype.ipp:556
 msgctxt "input-name"
 msgid "P3 Pedal 1"
-msgstr ""
+msgstr "3Pペダル1"
 
 #: src/emu/inpttype.ipp:557
 msgctxt "input-name"
 msgid "P4 Pedal 1"
-msgstr ""
+msgstr "4Pペダル1"
 
 #: src/emu/inpttype.ipp:558
 msgctxt "input-name"
 msgid "P5 Pedal 1"
-msgstr ""
+msgstr "5Pペダル1"
 
 #: src/emu/inpttype.ipp:559
 msgctxt "input-name"
 msgid "P6 Pedal 1"
-msgstr ""
+msgstr "6Pペダル1"
 
 #: src/emu/inpttype.ipp:560
 msgctxt "input-name"
 msgid "P7 Pedal 1"
-msgstr ""
+msgstr "7Pペダル1"
 
 #: src/emu/inpttype.ipp:561
 msgctxt "input-name"
 msgid "P8 Pedal 1"
-msgstr ""
+msgstr "8Pペダル1"
 
 #: src/emu/inpttype.ipp:562
 msgctxt "input-name"
 msgid "P9 Pedal 1"
-msgstr ""
+msgstr "9Pペダル1"
 
 #: src/emu/inpttype.ipp:563
 msgctxt "input-name"
 msgid "P10 Pedal 1"
-msgstr ""
+msgstr "10Pペダル1"
 
 #: src/emu/inpttype.ipp:568
 msgctxt "input-name"
 msgid "P1 Pedal 2"
-msgstr ""
+msgstr "1Pペダル2"
 
 #: src/emu/inpttype.ipp:569
 msgctxt "input-name"
 msgid "P2 Pedal 2"
-msgstr ""
+msgstr "2Pペダル2"
 
 #: src/emu/inpttype.ipp:570
 msgctxt "input-name"
 msgid "P3 Pedal 2"
-msgstr ""
+msgstr "3Pペダル2"
 
 #: src/emu/inpttype.ipp:571
 msgctxt "input-name"
 msgid "P4 Pedal 2"
-msgstr ""
+msgstr "4Pペダル2"
 
 #: src/emu/inpttype.ipp:572
 msgctxt "input-name"
 msgid "P5 Pedal 2"
-msgstr ""
+msgstr "5Pペダル2"
 
 #: src/emu/inpttype.ipp:573
 msgctxt "input-name"
 msgid "P6 Pedal 2"
-msgstr ""
+msgstr "6Pペダル2"
 
 #: src/emu/inpttype.ipp:574
 msgctxt "input-name"
 msgid "P7 Pedal 2"
-msgstr ""
+msgstr "7Pペダル2"
 
 #: src/emu/inpttype.ipp:575
 msgctxt "input-name"
 msgid "P8 Pedal 2"
-msgstr ""
+msgstr "8Pペダル2"
 
 #: src/emu/inpttype.ipp:576
 msgctxt "input-name"
 msgid "P9 Pedal 2"
-msgstr ""
+msgstr "9Pペダル2"
 
 #: src/emu/inpttype.ipp:577
 msgctxt "input-name"
 msgid "P10 Pedal 2"
-msgstr ""
+msgstr "10Pペダル2"
 
 #: src/emu/inpttype.ipp:582
 msgctxt "input-name"
 msgid "P1 Pedal 3"
-msgstr ""
+msgstr "1Pペダル3"
 
 #: src/emu/inpttype.ipp:583
 msgctxt "input-name"
 msgid "P2 Pedal 3"
-msgstr ""
+msgstr "2Pペダル3"
 
 #: src/emu/inpttype.ipp:584
 msgctxt "input-name"
 msgid "P3 Pedal 3"
-msgstr ""
+msgstr "3Pペダル3"
 
 #: src/emu/inpttype.ipp:585
 msgctxt "input-name"
 msgid "P4 Pedal 3"
-msgstr ""
+msgstr "4Pペダル3"
 
 #: src/emu/inpttype.ipp:586
 msgctxt "input-name"
 msgid "P5 Pedal 3"
-msgstr ""
+msgstr "5Pペダル3"
 
 #: src/emu/inpttype.ipp:587
 msgctxt "input-name"
 msgid "P6 Pedal 3"
-msgstr ""
+msgstr "6Pペダル3"
 
 #: src/emu/inpttype.ipp:588
 msgctxt "input-name"
 msgid "P7 Pedal 3"
-msgstr ""
+msgstr "7Pペダル3"
 
 #: src/emu/inpttype.ipp:589
 msgctxt "input-name"
 msgid "P8 Pedal 3"
-msgstr ""
+msgstr "8Pペダル3"
 
 #: src/emu/inpttype.ipp:590
 msgctxt "input-name"
 msgid "P9 Pedal 3"
-msgstr ""
+msgstr "9Pペダル3"
 
 #: src/emu/inpttype.ipp:591
 msgctxt "input-name"
 msgid "P10 Pedal 3"
-msgstr ""
+msgstr "10Pペダル3"
 
 #: src/emu/inpttype.ipp:596
 msgctxt "input-name"
@@ -6101,202 +6101,202 @@ msgstr ""
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Lightgun X"
-msgstr ""
+msgstr "ライトガンX軸"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Lightgun X 2"
-msgstr ""
+msgstr "ライトガンX軸2"
 
 #: src/emu/inpttype.ipp:752
 msgctxt "input-name"
 msgid "Lightgun X 3"
-msgstr ""
+msgstr "ライトガンX軸3"
 
 #: src/emu/inpttype.ipp:753
 msgctxt "input-name"
 msgid "Lightgun X 4"
-msgstr ""
+msgstr "ライトガンX軸4"
 
 #: src/emu/inpttype.ipp:754
 msgctxt "input-name"
 msgid "Lightgun X 5"
-msgstr ""
+msgstr "ライトガンX軸5"
 
 #: src/emu/inpttype.ipp:755
 msgctxt "input-name"
 msgid "Lightgun X 6"
-msgstr ""
+msgstr "ライトガンX軸6"
 
 #: src/emu/inpttype.ipp:756
 msgctxt "input-name"
 msgid "Lightgun X 7"
-msgstr ""
+msgstr "ライトガンX軸7"
 
 #: src/emu/inpttype.ipp:757
 msgctxt "input-name"
 msgid "Lightgun X 8"
-msgstr ""
+msgstr "ライトガンX軸8"
 
 #: src/emu/inpttype.ipp:758
 msgctxt "input-name"
 msgid "Lightgun X 9"
-msgstr ""
+msgstr "ライトガンX軸9"
 
 #: src/emu/inpttype.ipp:759
 msgctxt "input-name"
 msgid "Lightgun X 10"
-msgstr ""
+msgstr "ライトガンX軸10"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Lightgun Y"
-msgstr ""
+msgstr "ライトガンY軸"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Lightgun Y 2"
-msgstr ""
+msgstr "ライトガンY軸2"
 
 #: src/emu/inpttype.ipp:766
 msgctxt "input-name"
 msgid "Lightgun Y 3"
-msgstr ""
+msgstr "ライトガンY軸3"
 
 #: src/emu/inpttype.ipp:767
 msgctxt "input-name"
 msgid "Lightgun Y 4"
-msgstr ""
+msgstr "ライトガンY軸4"
 
 #: src/emu/inpttype.ipp:768
 msgctxt "input-name"
 msgid "Lightgun Y 5"
-msgstr ""
+msgstr "ライトガンY軸5"
 
 #: src/emu/inpttype.ipp:769
 msgctxt "input-name"
 msgid "Lightgun Y 6"
-msgstr ""
+msgstr "ライトガンY軸6"
 
 #: src/emu/inpttype.ipp:770
 msgctxt "input-name"
 msgid "Lightgun Y 7"
-msgstr ""
+msgstr "ライトガンY軸7"
 
 #: src/emu/inpttype.ipp:771
 msgctxt "input-name"
 msgid "Lightgun Y 8"
-msgstr ""
+msgstr "ライトガンY軸8"
 
 #: src/emu/inpttype.ipp:772
 msgctxt "input-name"
 msgid "Lightgun Y 9"
-msgstr ""
+msgstr "ライトガンY軸9"
 
 #: src/emu/inpttype.ipp:773
 msgctxt "input-name"
 msgid "Lightgun Y 10"
-msgstr ""
+msgstr "ライトガンY軸10"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr ""
+msgstr "マウスX軸"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr ""
+msgstr "マウスX軸2"
 
 #: src/emu/inpttype.ipp:780
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr ""
+msgstr "マウスX軸3"
 
 #: src/emu/inpttype.ipp:781
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr ""
+msgstr "マウスX軸4"
 
 #: src/emu/inpttype.ipp:782
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr ""
+msgstr "マウスX軸5"
 
 #: src/emu/inpttype.ipp:783
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr ""
+msgstr "マウスX軸6"
 
 #: src/emu/inpttype.ipp:784
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr ""
+msgstr "マウスX軸7"
 
 #: src/emu/inpttype.ipp:785
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr ""
+msgstr "マウスX軸8"
 
 #: src/emu/inpttype.ipp:786
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr ""
+msgstr "マウスX軸9"
 
 #: src/emu/inpttype.ipp:787
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr ""
+msgstr "マウスX軸10"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "Mouse Y"
-msgstr ""
+msgstr "マウスY軸"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "Mouse Y 2"
-msgstr ""
+msgstr "マウスY軸2"
 
 #: src/emu/inpttype.ipp:794
 msgctxt "input-name"
 msgid "Mouse Y 3"
-msgstr ""
+msgstr "マウスY軸3"
 
 #: src/emu/inpttype.ipp:795
 msgctxt "input-name"
 msgid "Mouse Y 4"
-msgstr ""
+msgstr "マウスY軸4"
 
 #: src/emu/inpttype.ipp:796
 msgctxt "input-name"
 msgid "Mouse Y 5"
-msgstr ""
+msgstr "マウスY軸5"
 
 #: src/emu/inpttype.ipp:797
 msgctxt "input-name"
 msgid "Mouse Y 6"
-msgstr ""
+msgstr "マウスY軸6"
 
 #: src/emu/inpttype.ipp:798
 msgctxt "input-name"
 msgid "Mouse Y 7"
-msgstr ""
+msgstr "マウスY軸7"
 
 #: src/emu/inpttype.ipp:799
 msgctxt "input-name"
 msgid "Mouse Y 8"
-msgstr ""
+msgstr "マウスY軸8"
 
 #: src/emu/inpttype.ipp:800
 msgctxt "input-name"
 msgid "Mouse Y 9"
-msgstr ""
+msgstr "マウスY軸9"
 
 #: src/emu/inpttype.ipp:801
 msgctxt "input-name"
 msgid "Mouse Y 10"
-msgstr ""
+msgstr "マウスY軸10"
 
 #: src/emu/inpttype.ipp:806
 msgctxt "input-name"
@@ -6406,22 +6406,22 @@ msgstr ""
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "UI Up"
-msgstr ""
+msgstr "UI上"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "UI Down"
-msgstr ""
+msgstr "UI下"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "UI Left"
-msgstr ""
+msgstr "UI左"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "UI Right"
-msgstr ""
+msgstr "UI右"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
@@ -6456,12 +6456,12 @@ msgstr ""
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "UI Select"
-msgstr ""
+msgstr "UI選択"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr ""
+msgstr "UIキャンセル"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
@@ -7144,17 +7144,11 @@ msgstr "MAMEinfoファイル"
 #~ "ウェアを選択してください。\n"
 #~ "\n"
 
-#~ msgid "Keyboard Mode:"
-#~ msgstr "キーボードモード:"
-
 #~ msgid "Save machine configuration"
 #~ msgstr "マシン設定を保存する"
 
 #~ msgid "Configure machine:"
 #~ msgstr "マシン設定"
-
-#~ msgid "Support Cocktail\tYes\n"
-#~ msgstr "カクテルモード対応\tはい\n"
 
 #~ msgid ""
 #~ "The selected machine is missing one or more required ROM or CHD images. "

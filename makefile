@@ -1073,7 +1073,7 @@ endif
 ifneq ($(GIT_AVAILABLE),git)
 	IGNORE_GIT := 1
 endif
-ifeq ($(wildcard .git/*),)
+ifeq ($(filter .git,$(wildcard .*)),)
 	IGNORE_GIT := 1
 endif
 
@@ -1757,17 +1757,23 @@ endif
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo '#define BARE_BUILD_VERSION "0.236"' > $@
+	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
+	@echo 'extern const char bare_vcs_revision[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
-	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
+	@echo 'const char bare_vcs_revision[] = BARE_VCS_REVISION;' >> $@
+	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo #define BARE_BUILD_VERSION "0.236" > $@
+	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
+	@echo extern const char bare_vcs_revision[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
-	@echo const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))"; >> $@
+	@echo const char bare_vcs_revision[] = BARE_VCS_REVISION; >> $@
+	@echo const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")"; >> $@
 endif
 
 

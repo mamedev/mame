@@ -159,7 +159,7 @@ Back to :ref:`debugger-general-list`
 print
 -----
 
-**print <item>[,...]**
+**print <item>[,…]**
 
 The **print** command prints the results of one or more expressions to
 the debugger console as hexadecimal numbers.
@@ -180,7 +180,7 @@ Back to :ref:`debugger-general-list`
 printf
 ------
 
-**printf <format>[,<argument>[,...]]**
+**printf <format>[,<argument>[,…]]**
 
 Prints a C-style formatted message to the debugger console.  Only a
 very limited subset of format specifiers and escape sequences are
@@ -223,7 +223,7 @@ Back to :ref:`debugger-general-list`
 logerror
 --------
 
-**logerror <format>[,<argument>[,...]]**
+**logerror <format>[,<argument>[,…]]**
 
 Prints a C-style formatted message to the error log.  See
 :ref:`debugger-command-printf` for details about the limited set of
@@ -246,7 +246,7 @@ Back to :ref:`debugger-general-list`
 tracelog
 --------
 
-**tracelog <format>[,<argument>[,...]]**
+**tracelog <format>[,<argument>[,…]]**
 
 Prints a C-style formatted message to the currently open trace file (see
 :ref:`debugger-command-trace` for more information).  If no trace file
@@ -272,7 +272,7 @@ Back to :ref:`debugger-general-list`
 tracesym
 --------
 
-**tracesym <item>[,...]**
+**tracesym <item>[,…]**
 
 Prints the specified symbols to the currently open trace file (see
 :ref:`debugger-command-trace` for more information).  If no trace file
@@ -415,6 +415,8 @@ Loads the most recent RAM-based saved state.  When enabled, rewind
 states are saved when :ref:`debugger-command-step`,
 :ref:`debugger-command-over` and :ref:`debugger-command-out` commands
 are used, storing the machine state as of the moment before stepping.
+May be abbreviated to ``rw``.
+
 Consecutively loading rewind states can work like reverse execution.
 Depending on which steps forward were taken previously, the behavior can
 be similar to GDB's **reverse-stepi** and **reverse-next** commands.
@@ -445,7 +447,7 @@ Creates a save state at the current moment in emulated time.  The state
 file is written to the configured save state directory (see the
 :ref:`state_directory <mame-commandline-statedirectory>` option), and
 the **.sta** extension is automatically appended to the specified file
-name.
+name.  May be abbreviates to ``ss``.
 
 All output from this command is currently echoed into the running machine
 window.
@@ -473,6 +475,7 @@ Restores a saved state file from disk.  The specified state file is read
 from the configured save state directory (see the
 :ref:`state_directory <mame-commandline-statedirectory>` option), and the
 **.sta** extension is automatically appended to the specified file name.
+May be abbreviated to ``sl``.
 
 All output for this command is currently echoed into the running machine
 window.  Previous memory and PC tracking statistics are cleared.

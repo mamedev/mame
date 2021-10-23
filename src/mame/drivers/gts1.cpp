@@ -71,7 +71,7 @@ ToDo:
   -- If the lucky number matches you'll still get a free credit.
   -- Some games will go straight to test 11, or instant game over.
 
-- Sound boards
+- Z80-based sound board for hexagone and sahalove.
 
 - Outputs to lamps and to optional solenoids.
 
@@ -85,6 +85,8 @@ ToDo:
 #include "machine/r10696.h"
 #include "machine/r10788.h"
 #include "cpu/pps4/pps4.h"
+#include "audio/gottlieb.h"
+#include "speaker.h"
 #include "gts1.lh"
 
 #define VERBOSE    1
@@ -101,11 +103,13 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_dips(*this, "DSW%u", 0U)
 		, m_switches(*this, "X%u", 0U)
+		, m_r0_sound(*this, "r0sound")
 		, m_digit8(*this, "digit8_%u", 0U)
 		, m_digit7(*this, "digit7_%u", 0U)
 	{ }
 
 	void gts1(machine_config &config);
+	void gts1s(machine_config &config);
 
 private:
 	u8 gts1_solenoid_r(offs_t offset);
@@ -132,7 +136,8 @@ private:
 	required_region_ptr<u8> m_pm;
 	required_shared_ptr<u8> m_nvram;
 	required_ioport_array<3> m_dips;
-	required_ioport_array<6> m_switches;
+	required_ioport_array<7> m_switches;
+	optional_device<gottlieb_sound_r0_device> m_r0_sound;
 	output_finder<32> m_digit8; // digits 0-5,8-13,16-21,24-29
 	output_finder<32> m_digit7; // digits 6,7,14,15 on repurposed digital clock display
 
@@ -256,59 +261,62 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gts1_switches )
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD)     PORT_NAME("Play/Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("SW.10")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("SW.20")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("SW.30")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("SW.40")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("SW.50")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("SW.60")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("SW.70")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Play/Test")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP10")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP20")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP30")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP40")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP50")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP60")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP70")
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("SW.11")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("SW.21")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("SW.31")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("SW.41")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("SW.51")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("SW.61")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("SW.71")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP11")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP21")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP31")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP41")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP51")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP61")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP71")
 
 	PORT_START("X2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("SW.12")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("SW.22")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("SW.32")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("SW.42")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("SW.52")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("SW.62")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("SW.72")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP12")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP22")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP32")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP42")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP52")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP62")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP72")
 
 	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("SW.13")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("SW.23")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("SW.33")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("SW.43")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("SW.53")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("SW.63")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("SW.73")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP13")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP23")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP33")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP43")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP53")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP63")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP73")
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Tilt")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("SW.14")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("SW.24")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("SW.34")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("SW.44")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("SW.54")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("SW.64")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("SW.74")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP14")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP24")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP34")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP54")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP64")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP74")
 
 	PORT_START("X5")
+	PORT_BIT( 0xFF, IP_ACTIVE_LOW, IPT_UNUSED ) // not connected but it is tested
+
+	PORT_START("X6")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gts1 )
@@ -416,15 +424,15 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 			m_samples->start(0, 6);
 		break;
 	case  2:  // tens chime
-		if (data)
+		if (!m_r0_sound && data)
 			m_samples->start(3, 3);
 		break;
 	case  3:  // hundreds chime
-		if (data)
+		if (!m_r0_sound && data)
 			m_samples->start(2, 2);
 		break;
 	case  4:  // thousands chime
-		if (data)
+		if (!m_r0_sound && data)
 			m_samples->start(1, 1);
 		break;
 	case  5:  // optional per machine
@@ -448,13 +456,15 @@ void gts1_state::gts1_solenoid_w(offs_t offset, u8 data) // WORKS
 	case 15:    // spare
 		break;
 	}
+	if (m_r0_sound && data)
+		m_r0_sound->write(offset);
 }
 
 u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are working; can't go in-game to try the others **********
 {
 	u8 data = 0;
 	if (offset > 7)
-		for (u8 i = 0; i < 5; i++)
+		for (u8 i = 0; i < 6; i++)
 			if (BIT(m_strobe, i))
 			{
 				data |= BIT(m_switches[i]->read(), offset & 7);
@@ -466,7 +476,7 @@ u8 gts1_state::gts1_switches_r(offs_t offset) // only switches with offset 0 are
 void gts1_state::gts1_switches_w(offs_t offset, u8 data) // WORKS
 {
 	// outputs O-0 to O-4 are the 5 strobe lines
-	if (offset < 5)
+	if (offset < 6)
 	{
 		if (data)
 			m_strobe |= (1<<offset);
@@ -552,7 +562,7 @@ u8 gts1_state::gts1_nvram_r(offs_t offset) // WORKS
 			if (m_nvram_e2)
 			{
 				data = m_nvram[m_nvram_addr];
-				LOG("%s: NVRAM READ @[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data);
+				//LOG("%s: NVRAM READ @[%02x] -> %x\n", __FUNCTION__, m_nvram_addr, data);
 			}
 			break;
 		case 1: // group B
@@ -592,7 +602,7 @@ void gts1_state::nvram_w()
 {
 	if (m_nvram_wr && m_nvram_e2)
 	{
-		LOG("%s: NVRAM WRITE @[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, m_nvram_data);
+		//LOG("%s: NVRAM WRITE @[%02x] <- %x\n", __FUNCTION__, m_nvram_addr, m_nvram_data);
 		m_nvram[m_nvram_addr] = m_nvram_data;
 		//if (m_nvram_addr == 0xb1) machine().debug_break();
 	}
@@ -616,7 +626,7 @@ u8 gts1_state::gts1_lamp_apm_r(offs_t offset) // Think this works - dips seem to
 				data = BIT(m_dips[m_z30_out]->read(),4,4);
 			break;
 		case 2: // 3 hardwired switches
-			data = m_switches[5]->read();
+			data = m_switches[6]->read();
 			break;
 	}
 	//LOG("%s: offs=%d, m_z30_out=%d, data=%d\n", __FUNCTION__, offset, m_z30_out, data);
@@ -645,11 +655,12 @@ void gts1_state::gts1_lamp_apm_w(offs_t offset, u8 data) // Working for the dips
 
 u8 gts1_state::gts1_pa_r() // TODO: address normal or inverted? data normal or inverted? ***************
 {
-	u16 addr = m_6351_addr; // ^ 0x3ff;
+	u16 addr = m_6351_addr ^ 0x3ff;
 	// return nibble from personality module ROM
 	u8 data = m_pm[addr];
 	LOG("%s: PROM READ @[%03x]:%02x\n", __FUNCTION__, addr, data);
-	return ~data & 15;  // inverted = game over at start; normal = test mode at start
+	//machine().debug_break();
+	return ~data;  // inverted = game over at start; normal = test mode at start
 }
 
 void gts1_state::gts1_do_w(u8 data)
@@ -705,19 +716,22 @@ void gts1_state::gts1(machine_config & config)
 	genpin_audio(config);
 }
 
+void gts1_state::gts1s(machine_config &config)
+{
+	gts1(config);
+	SPEAKER(config, "speaker").front_center();
+	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
+
+#define GTS1_BIOS \
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF ) \
+	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345) ) \
+	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e) )
+
 
 ROM_START( gts1 )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
-
-	ROM_REGION( 0x0400, "module", ROMREGION_ERASEFF )
-ROM_END
-
-ROM_START( gts1s )
-	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", ROMREGION_ERASEFF )
 ROM_END
@@ -726,45 +740,37 @@ ROM_END
 / Asteroid Annie and the Aliens (12/1980) #442
 /-------------------------------------------------------------------*/
 ROM_START(astannie)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("442.cpu",   0x0000, 0x0400, CRC(579521e0) SHA1(b1b19473e1ca3373955ee96104b87f586c4c311c))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("442.snd", 0x0400, 0x0400, CRC(c70195b4) SHA1(ff06197f07111d6a4b8942dcfe8d2279bda6f281))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / Buck Rogers (01/1980) #437
 /-------------------------------------------------------------------*/
 ROM_START(buckrgrs)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("437.cpu",   0x0000, 0x0400, CRC(e57d9278) SHA1(dfc4ebff1e14b9a074468671a8e5ac7948d5b352))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("437.snd", 0x0400, 0x0400, CRC(732b5a27) SHA1(7860ea54e75152246c3ac3205122d750b243b40c))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / Charlie's Angels (11/1978) #425
 /-------------------------------------------------------------------*/
 ROM_START(charlies)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("425.cpu",   0x0000, 0x0400, CRC(928b4279) SHA1(51096d45e880d6a8263eaeaa0cdab0f61ad2f58d))
@@ -773,9 +779,7 @@ ROM_END
 / Cleopatra (11/1977) #409
 /-------------------------------------------------------------------*/
 ROM_START(cleoptra)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("409.cpu",   0x0000, 0x0400, CRC(8063ff71) SHA1(205f09f067bf79544d2ce2a48d23259901f935dd))
@@ -785,9 +789,7 @@ ROM_END
 / Close Encounters of the Third Kind (10/1978) #424
 /-------------------------------------------------------------------*/
 ROM_START(closeenc)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("424.cpu",   0x0000, 0x0400, CRC(a7a5dd13) SHA1(223c67b9484baa719c91de52b363ff22813db160))
@@ -797,9 +799,7 @@ ROM_END
 / Count-Down (05/1979) #422
 /-------------------------------------------------------------------*/
 ROM_START(countdwn)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("422.cpu",   0x0000, 0x0400, CRC(51bc2df0) SHA1(d4b555d106c6b4e420b0fcd1df8871f869476c22))
@@ -809,9 +809,7 @@ ROM_END
 / Dragon (10/1978) #419
 /-------------------------------------------------------------------*/
 ROM_START(dragon)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("419.cpu",   0x0000, 0x0400, CRC(018d9b3a) SHA1(da37ef5017c71bc41bdb1f30d3fd7ac3b7e1ee7e))
@@ -821,27 +819,22 @@ ROM_END
 / Genie (11/1979) #435
 /-------------------------------------------------------------------*/
 ROM_START(geniep)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("435.cpu",   0x0000, 0x0400, CRC(7749fd92) SHA1(9cd3e799842392e3939877bf295759c27f199e58))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("435.snd", 0x0400, 0x0400, CRC(4a98ceed) SHA1(f1d7548e03107033c39953ee04b043b5301dbb47))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / Joker Poker (08/1978) #417
 /-------------------------------------------------------------------*/
 ROM_START(jokrpokr)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("417.cpu",   0x0000, 0x0400, CRC(33dade08) SHA1(23b8dbd7b6c84b806fc0d2da95478235cbf9f80a))
@@ -850,18 +843,19 @@ ROM_END
 /*-------------------------------------------------------------------
 / Jungle Queen (1985)
 /-------------------------------------------------------------------*/
+// Conversion kit
+// Rumoured to use same roms as Pinball Pool
+
 /*-------------------------------------------------------------------
 / L'Hexagone (04/1986)
 /-------------------------------------------------------------------*/
 ROM_START(hexagone)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("435.cpu",   0x0000, 0x0400, CRC(7749fd92) SHA1(9cd3e799842392e3939877bf295759c27f199e58))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x10000, "audiocpu", 0) // Z-80 code
 	ROM_LOAD("hexagone.bin", 0x0000, 0x4000, CRC(002b5464) SHA1(e2d971c4e85b4fb6580c2d3945c9946ea0cebc2e))
 ROM_END
 /*-------------------------------------------------------------------
@@ -872,9 +866,7 @@ ROM_END
 / Pinball Pool (08/1979) #427
 /-------------------------------------------------------------------*/
 ROM_START(pinpool)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("427.cpu",   0x0000, 0x0400, CRC(c496393d) SHA1(e91d9596aacdb4277fa200a3f8f9da099c278f32))
@@ -884,27 +876,22 @@ ROM_END
 / Roller Disco (02/1980) #440
 /-------------------------------------------------------------------*/
 ROM_START(roldisco)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("440.cpu",   0x0000, 0x0400, CRC(bc50631f) SHA1(6aa3124d09fc4e369d087a5ad6dd1737ace55e41))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("440.snd", 0x0400, 0x0400, CRC(4a0a05ae) SHA1(88f21b5638494d8e78dc0b6b7d69873b76b5f75d))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / Sahara Love (1984)
 /-------------------------------------------------------------------*/
 ROM_START(sahalove)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("412.cpu",   0x0000, 0x0400, CRC(84a86b83) SHA1(f331f2ffd7d1b279b4ffbb939aa8649e723f5fac))
@@ -917,9 +904,7 @@ ROM_END
 / Sinbad (05/1978) #412
 /-------------------------------------------------------------------*/
 ROM_START(sinbad)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("412.cpu",   0x0000, 0x0400, CRC(84a86b83) SHA1(f331f2ffd7d1b279b4ffbb939aa8649e723f5fac))
@@ -937,14 +922,13 @@ ROM_END
 /*-------------------------------------------------------------------
 / Sky Warrior (1983)
 /-------------------------------------------------------------------*/
+// Conversion kit
 
 /*-------------------------------------------------------------------
 / Solar Ride (02/1979) #421
 /-------------------------------------------------------------------*/
 ROM_START(solaride)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("421.cpu",   0x0000, 0x0400, CRC(6b5c5da6) SHA1(a09b7009473be53586f53f48b7bfed9a0c5ecd55))
@@ -954,98 +938,84 @@ ROM_END
 / The Incredible Hulk (10/1979) #433
 /-------------------------------------------------------------------*/
 ROM_START(hulk)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("433.cpu",   0x0000, 0x0400, CRC(c05d2b52) SHA1(393fe063b029246317c90ee384db95a84d61dbb7))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("433.snd", 0x0400, 0x0400, CRC(20cd1dff) SHA1(93e7c47ff7051c3c0dc9f8f95aa33ba094e7cf25))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / Torch (02/1980) #438
 /-------------------------------------------------------------------*/
 ROM_START(torch)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("438.cpu",   0x0000, 0x0400, CRC(2d396a64) SHA1(38a1862771500faa471071db08dfbadc6e8759e8))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("438.snd", 0x0400, 0x0400, CRC(a9619b48) SHA1(1906bc1b059bf31082e3b4546f5a30159479ad3c))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / Totem (10/1979) #429
 /-------------------------------------------------------------------*/
 ROM_START(totem)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("429.cpu",   0x0000, 0x0400, CRC(7885a384) SHA1(1770662af7d48ad8297097a9877c5c497119978d))
 
-	ROM_REGION( 0x10000, "audiocpu", 0)
+	ROM_REGION( 0x1000, "r0sound:audiocpu", 0)
 	ROM_LOAD("429.snd", 0x0400, 0x0400, CRC(5d1b7ed4) SHA1(4a584f880e907fb21da78f3b3a0617f20599688f))
 	ROM_RELOAD( 0x0800, 0x0400)
 	ROM_LOAD("6530sys1.bin", 0x0c00, 0x0400, CRC(b7831321) SHA1(c94f4bee97854d0373653a6867016e27d3fc1340))
-	ROM_RELOAD( 0xfc00, 0x0400)
 ROM_END
 
 /*-------------------------------------------------------------------
 / System 1 Test prom
 /-------------------------------------------------------------------*/
 ROM_START(sys1test)
-	ROM_REGION( 0x1000, "maincpu", 0)
-	ROM_LOAD("u5_cf.bin", 0x0000, 0x0800, CRC(e0d4b405) SHA1(17aadd79c0dcbb336aadd5d203bc6ca866492345))
-	ROM_LOAD("u4_ce.bin", 0x0800, 0x0800, CRC(4cd312dd) SHA1(31245daa9972ef8652caee69986585bb8239e86e))
+	GTS1_BIOS
 
 	ROM_REGION( 0x0400, "module", 0 )
 	ROM_LOAD("test.cpu",  0x0000, 0x0400, CRC(8b0704bb) SHA1(5f0eb8d5af867b815b6012c9d078927398efe6d8))
 ROM_END
 
 
-GAME(1977,  gts1,     0,      gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-
-//Exact same roms as gts1 with added hardware we'll likely need roms for to emulate properly
-GAME(1979,  gts1s,    gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 with sound board", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(19??,  sys1test, gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1977,  gts1,     0,      gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(19??,  sys1test, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
 
 // chimes
-GAME(1977,  cleoptra, gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbad,   gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  sinbadn,  sinbad, gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  jokrpokr, gts1,   gts1, jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  dragon,   gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  solaride, gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  countdwn, gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1977,  cleoptra, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Cleopatra",                            MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  sinbad,   gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  sinbadn,  sinbad, gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Sinbad (Norway)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  jokrpokr, gts1,   gts1,  jokrpokr, gts1_state, empty_init, ROT0, "Gottlieb",         "Joker Poker",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  dragon,   gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Dragon",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  solaride, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Solar Ride",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  countdwn, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Count-Down",                           MACHINE_IS_SKELETON_MECHANICAL)
 
 // NE555 beeper
-GAME(1978,  closeenc, gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1978,  charlies, gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  pinpool,  gts1,   gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  closeenc, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Close Encounters of the Third Kind",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1978,  charlies, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Charlie's Angels",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  pinpool,  gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Pinball Pool",                         MACHINE_IS_SKELETON_MECHANICAL)
 
 // sound card
-GAME(1979,  totem,    gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  hulk,     gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1979,  geniep,   gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  buckrgrs, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  torch,    gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  roldisco, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1980,  astannie, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  totem,    gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Totem",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  hulk,     gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "The Incredible Hulk",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1979,  geniep,   gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Genie (Pinball)",                      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  buckrgrs, gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Buck Rogers",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  torch,    gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Torch",                                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  roldisco, gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Roller Disco",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1980,  astannie, gts1,   gts1s, gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "Asteroid Annie and the Aliens",        MACHINE_IS_SKELETON_MECHANICAL)
 
 // homebrew
-GAME(1984,  sahalove, sinbad, gts1, gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
-GAME(1986,  hexagone, gts1s,  gts1, gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  sahalove, sinbad, gts1,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "Sahara Love (France)",                 MACHINE_IS_SKELETON_MECHANICAL) // based on sinbad, 150 units produced, not sure it's 'homebrew'
+GAME(1986,  hexagone, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Christian Tabart", "L'Hexagone (France)",                  MACHINE_IS_SKELETON_MECHANICAL)
