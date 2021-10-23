@@ -67,8 +67,6 @@
 #include "dragon_serial.h"
 #include "dragon_sprites.h"
 
-#include "ioprocsfilter.h"
-
 
 /***************************************************************************
     PARAMETERS
