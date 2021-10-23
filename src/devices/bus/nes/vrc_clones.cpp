@@ -447,6 +447,11 @@ void nes_shuiguan_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
+ TODO: This cart and its appearance on the 2yudb set
+ have IRQ timing issues that cause a bouncing status
+ bar in fights. Other emulators also have issues
+ on the split line so perhaps some noise is expected?
+
  -------------------------------------------------*/
 
 void nes_t230_device::write_h(offs_t offset, u8 data)
