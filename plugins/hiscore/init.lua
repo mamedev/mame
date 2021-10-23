@@ -1,16 +1,17 @@
 -- hiscore.lua
 -- by borgar@borgar.net, WTFPL license
 --
--- This uses MAME's built-in Lua scripting to implment
+-- This uses MAME's built-in Lua scripting to implement
 -- high-score saving with hiscore.dat infom just as older
 -- builds did in the past.
 --
-local exports = {}
-exports.name = "hiscore"
-exports.version = "1.0.0"
-exports.description = "Hiscore"
-exports.license = "WTFPL license"
-exports.author = { name = "borgar@borgar.net" }
+local exports = {
+	name = 'hiscore',
+	version = '1.0.0',
+	description = 'Hiscore',
+	license = 'WTFPL license',
+	author = { name = 'borgar@borgar.net' } }
+
 local hiscore = exports
 
 local hiscore_plugin_path = ""
@@ -21,46 +22,97 @@ end
 
 function hiscore.startplugin()
 
+	local function get_data_path()
+		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/hiscore/'
+	end
+
+	-- configuration
+	local config_read = false
+	local timed_save = true
+
+	-- read configuration file from data directory
+	local function read_config()
+		if config_read then
+			return true
+		end
+		local filename = get_data_path() .. 'plugin.cfg'
+		local file = io.open(filename, 'r')
+		if file then
+			local json = require('json')
+			local parsed_settings = json.parse(file:read('a'))
+			file:close()
+			if parsed_settings then
+				if parsed_settings.only_save_at_exit and (parsed_settings.only_save_at_exit ~= 0) then
+					timed_save = false
+				end
+				-- TODO: other settings?  maybe path overrides for hiscore.dat or the hiscore data?
+				config_read = true
+				return true
+			else
+				emu.print_error(string.format('Error loading hiscore plugin settings: error parsing file "%s" as JSON\n', filename))
+			end
+		end
+		return false
+	end
+
+	-- save configuration file
+	local function save_config()
+		local path = get_data_path()
+		local attr = lfs.attributes(path)
+		if not attr then
+			lfs.mkdir(path)
+		elseif attr.mode ~= 'directory' then
+			emu.print_error(string.format('Error saving hiscore plugin settings: "%s" is not a directory\n', path))
+			return
+		end
+		local settings = { only_save_at_exit = not timed_save }
+		-- TODO: other settings?
+		local filename = path .. 'plugin.cfg'
+		local json = require('json')
+		local data = json.stringify(settings, { indent = true })
+		local file = io.open(filename, 'w')
+		if not file then
+			emu.print_error(string.format('Error saving hiscore plugin settings: error opening file "%s" for writing\n', filename))
+			return
+		end
+		file:write(data)
+		file:close()
+	end
+
+	-- build menu
+	local function populate_menu()
+		local items = { }
+		local setting = timed_save and _p('plugin-hiscore', 'When updated') or _p('plugin-hiscore', 'On exit')
+		table.insert(items, { _p('plugin-hiscore', 'Hiscore Support Options'), '', 'off' })
+		table.insert(items, { '---', '', '' })
+		table.insert(items, { _p('plugin-hiscore', 'Save scores'), setting, timed_save and 'l' or 'r' })
+		return items
+	end
+
+	-- handle menu events
+	local function handle_menu(index, event)
+		if event == 'left' then
+			timed_save = false
+			return true
+		elseif event == 'right' then
+			timed_save = true
+			return true
+		end
+		return false
+	end
+
 	local hiscoredata_path = "hiscore.dat";
-	local hiscore_path = "hi";
-	local config_path = emu.subst_env(manager.options.entries.inipath:value():match("[^;]+") .. "/hiscore.ini");
 
 	local current_checksum = 0;
 	local default_checksum = 0;
 
-	local config_read = false;
 	local scores_have_been_read = false;
 	local mem_check_passed = false;
 	local found_hiscore_entry = false;
-	local timed_save = true;
 	local delaytime = 0;
 
-	local positions = {};
-	-- Configuration file will be searched in the first path defined
-	-- in mame inipath option.
-	local function read_config()
-	  if config_read then return true end;
-	  local file = io.open( config_path, "r" );
-	  if file then
-		file:close()
-		emu.print_verbose( "hiscore: config found" );
-		local _conf = {}
-		for line in io.lines(config_path) do
-		  token, spaces, value = string.match(line, '([^ ]+)([ ]+)([^ ]+)');
-		  if token ~= nil and token ~= '' then
-			_conf[token] = value;
-		  end
-		end
-		hiscore_path = emu.subst_env(_conf["hi_path"] or hiscore_path);
-		timed_save = _conf["only_save_at_exit"] ~= "1"
-		-- hiscoredata_path = _conf["dat_path"]; -- don't know if I should do it, but wathever
-		return true
-	  end
-	  return false
-	end
-
 	local function parse_table ( dsting )
-	  local _table = {};
+	  local _table = {}
 	  for line in string.gmatch(dsting, '([^\n]+)') do
 		local delay = line:match('^@delay=([.%d]*)')
 		if delay and #delay > 0 then
@@ -154,13 +206,13 @@ function hiscore.startplugin()
 	end
 
 
-	local function get_file_name ()
+	local function get_file_name()
 	  local r;
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
-		r = hiscore_path .. '/' .. emu.romname() .. "_" .. soft .. ".hi";
+		r = get_data_path() .. emu.romname() .. "_" .. soft .. ".hi";
 	  else
-		r = hiscore_path .. '/' .. emu.romname() .. ".hi";
+		r = get_data_path() .. emu.romname() .. ".hi";
 	  end
 	  return r;
 	end
@@ -171,13 +223,13 @@ function hiscore.startplugin()
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
-		lfs.mkdir( hiscore_path );
+		lfs.mkdir( get_data_path() );
 		output = io.open(get_file_name(), "wb");
 	  end
 	  emu.print_verbose("hiscore: write_scores output")
 	  if output then
 		for ri,row in ipairs(posdata) do
-		  t = {};
+		  t = {}
 		  for i=0,row["size"]-1 do
 			t[i+1] = row["mem"]:read_u8(row["addr"] + i)
 		  end
@@ -264,16 +316,16 @@ function hiscore.startplugin()
 	end
 
 	local function reset()
-	  -- the notifier will still be attached even if the running game has no hiscore.dat entry
-	  if mem_check_passed and found_hiscore_entry then
-		local checksum = check_scores(positions)
-		if checksum ~= current_checksum and checksum ~= default_checksum then
-		  write_scores(positions)
+		-- the notifier will still be attached even if the running game has no hiscore.dat entry
+		if mem_check_passed and found_hiscore_entry then
+			local checksum = check_scores(positions)
+			if checksum ~= current_checksum and checksum ~= default_checksum then
+				write_scores(positions)
+			end
 		end
-	  end
-	  found_hiscore_entry = false
-	  mem_check_passed = false
-	  scores_have_been_read = false;
+		found_hiscore_entry = false
+		mem_check_passed = false
+		scores_have_been_read = false;
 	end
 
 	emu.register_start(function()
@@ -282,7 +334,7 @@ function hiscore.startplugin()
 		scores_have_been_read = false;
 		last_write_time = -10
 		emu.print_verbose("Starting " .. emu.gamename())
-		config_read = read_config();
+		read_config();
 		local dat = read_hiscore_dat()
 		if dat and dat ~= "" then
 			emu.print_verbose( "hiscore: found hiscore.dat entry for " .. emu.romname() );
@@ -301,17 +353,23 @@ function hiscore.startplugin()
 			found_hiscore_entry = true
 		end
 	end)
+
 	emu.register_frame(function()
 		if found_hiscore_entry then
 			tick()
 		end
 	end)
+
 	emu.register_stop(function()
 		reset()
+		save_config()
 	end)
+
 	emu.register_prestart(function()
 		reset()
 	end)
+
+	emu.register_menu(handle_menu, populate_menu, _p('plugin-hiscore', 'Hiscore Support'))
 end
 
 return exports

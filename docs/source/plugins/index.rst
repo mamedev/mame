@@ -68,5 +68,6 @@ sample code that you can use as a starting point when writing your own plugins.
     dummy
     gdbstub
     hiscore
+    inputmacro
     layout
     timer

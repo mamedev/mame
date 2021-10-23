@@ -609,7 +609,7 @@ function populate_macros()
 			end
 		end
 	else
-		items[#items + 1] = { _p('plugin-inputmacro', 'No macros'), '', 'off' }
+		items[#items + 1] = { _p('plugin-inputmacro', '[no macros]'), '', 'off' }
 	end
 	macros_start_macro = nil
 
