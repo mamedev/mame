@@ -314,7 +314,7 @@ void rgum_state::rgum(machine_config &config)
 	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 16));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50); // guessed to use the same xtal as the crtc
 	aysnd.port_a_read_callback().set([this](){ return machine().rand() & 0x01; }); // TODO: hack! Otherwise it flashes 'RAM ERROR 0', then black screen
-	aysnd.port_b_read_callback().set([this](){ return 0x00; }); // 'micro palline err.' (microballs err.) if bit 0 is set
+	aysnd.port_b_read_callback().set_constant(0x00); // 'micro palline err.' (microballs err.) if bit 0 is set
 
 	UPD7759(config, "upd").add_route(ALL_OUTPUTS, "mono", 0.50);
 }
