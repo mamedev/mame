@@ -15103,8 +15103,8 @@ ROM_START( guttangts3 )
 	ROM_REGION( 0x100, "extra_prom", 0 ) // decryption related?
 	ROM_LOAD( "9g-tbp28l22.bin", 0x000, 0x100, CRC(1093293a) SHA1(71f436c9e670cdc8de03363d118d1d83e4b7048f) )
 
-	ROM_REGION( 0x200, "plds", 0 )
-	ROM_LOAD( "pal16l8cn", 0x000, 0x104, NO_DUMP )
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pal16l8cn.11j", 0x000, 0x117, BAD_DUMP CRC(c75e94db) SHA1(3ecf73884691c44e211b1cfaead3d79baa394b7b) ) // Bruteforced and untested
 ROM_END
 
 /*************************************
