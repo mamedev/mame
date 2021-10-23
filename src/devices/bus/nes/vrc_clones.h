@@ -152,6 +152,22 @@ private:
 };
 
 
+// ======================> nes_t230_device
+
+class nes_t230_device : public nes_konami_vrc4_device
+{
+public:
+	// construction/destruction
+	nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+};
+
+
 // ======================> nes_tf1201_device
 
 class nes_tf1201_device : public nes_konami_vrc4_device
@@ -203,6 +219,7 @@ DECLARE_DEVICE_TYPE(NES_AX5705,      nes_ax5705_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830506C, nes_bmc_830506c_device)
 DECLARE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device)
 DECLARE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device)
+DECLARE_DEVICE_TYPE(NES_T230,        nes_t230_device)
 DECLARE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device)
 DECLARE_DEVICE_TYPE(NES_TH21311,     nes_th21311_device)
 
