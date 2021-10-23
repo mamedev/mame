@@ -1,4 +1,4 @@
--- to use this get the package from http://greatstone.free.fr/hi2txt/
+-- to use this get the package from https://greatstoneex.github.io/hi2txt-doc/
 -- extract the hi2txt.zip and place it in your history path
 
 local dat = {}

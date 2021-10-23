@@ -1,11 +1,11 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Miodrag Milanovic
-local exports = {}
-exports.name = "dummy"
-exports.version = "0.0.1"
-exports.description = "A dummy example"
-exports.license = "The BSD 3-Clause License"
-exports.author = { name = "Miodrag Milanovic" }
+local exports = {
+	name = "dummy",
+	version = "0.0.1",
+	description = "A dummy example",
+	license = "The BSD 3-Clause License",
+	author = { name = "Miodrag Milanovic" }}
 
 local dummy = exports
 
@@ -19,7 +19,7 @@ function dummy.startplugin()
 	end)
 
 	local function menu_populate()
-		return {{ "This is a", "test", "off" }, { "Also a", "test", 0 }}
+		return {{ "This is a", "test", "off" }, { "Also a", "test", "" }}
 	end
 
 	local function menu_callback(index, event)

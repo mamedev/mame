@@ -3,28 +3,30 @@ name: Build documentation
 on:
   push:
     paths:
+    - '.github/**'
     - 'docs/**'
   pull_request:
     paths:
+    - '.github/**'
     - 'docs/**'
 
 jobs:
   build-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y librsvg2-bin latexmk python3-pip python3-sphinx texlive texlive-formats-extra texlive-science
-          pip3 install sphinxcontrib-svg2pdfconverter
-      - name: Build HTML
-        run: make -C docs html
-      - name: Build PDF
-        run: make -C docs latexpdf
-      - uses: actions/upload-artifact@master
-        with:
-          name: mame-docs-${{ github.sha }}
-          path: |
-            docs/build/html
-            docs/build/latex/MAME.pdf
+    - uses: actions/checkout@master
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y librsvg2-bin latexmk python3-pip python3-sphinx texlive texlive-formats-extra texlive-science
+        pip3 install sphinxcontrib-svg2pdfconverter
+    - name: Build HTML
+      run: make -C docs html
+    - name: Build PDF
+      run: make -C docs latexpdf
+    - uses: actions/upload-artifact@master
+      with:
+        name: mame-docs-${{ github.sha }}
+        path: |
+          docs/build/html
+          docs/build/latex/MAME.pdf
