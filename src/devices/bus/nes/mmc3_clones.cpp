@@ -73,6 +73,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GN45,      nes_bmc_gn45_device,      "nes_bmc_gn45", 
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD7IN1,  nes_bmc_gold7in1_device,  "nes_bmc_gold7in1",  "NES Cart BMC Golden 7 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3006,     nes_bmc_k3006_device,     "nes_bmc_k3006",     "NES Cart BMC K-3006 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3033,     nes_bmc_k3033_device,     "nes_bmc_k3033",     "NES Cart BMC K-3033 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_L6IN1,     nes_bmc_l6in1_device,     "nes_bmc_l6in1",     "NES Cart BMC L6IN1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_00202650,  nes_bmc_00202650_device,  "nes_bmc_00202650",  "NES Cart BMC 00202650 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_411120C,   nes_bmc_411120c_device,   "nes_bmc_411120c",   "NES Cart BMC 411120C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_810305C,   nes_bmc_810305c_device,   "nes_bmc_810305c",   "NES Cart BMC 81-03-05-C PCB")
@@ -361,6 +362,11 @@ nes_bmc_k3006_device::nes_bmc_k3006_device(const machine_config &mconfig, const 
 
 nes_bmc_k3033_device::nes_bmc_k3033_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_BMC_K3033, tag, owner, clock), m_mmc3_mode(false)
+{
+}
+
+nes_bmc_l6in1_device::nes_bmc_l6in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_L6IN1, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -856,6 +862,20 @@ void nes_bmc_k3033_device::pcb_reset()
 	mmc3_common_initialize(0x0f, 0x7f, 0);
 	prg16_89ab(0);
 	prg16_cdef(0);
+}
+
+void nes_bmc_l6in1_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_l6in1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x0f, 0x07, 0);
 }
 
 void nes_bmc_00202650_device::device_start()
@@ -3011,6 +3031,60 @@ void nes_bmc_k3033_device::write_m(offs_t offset, u8 data)
 			prg16_cdef(bank | mode);
 		}
 	}
+}
+
+/*-------------------------------------------------
+
+ BMC-L6IN1
+
+ Games: New Star 6 in 1
+
+ MMC3 clone with banking for multigame menu.
+
+ NES 2.0: mapper 345
+
+ Note: Cabal leaves the APU in a bad state so that
+ after soft resetting and loading Track & Field there
+ is a constant drone pitch. This is likely a game bug.
+
+ -------------------------------------------------*/
+
+void nes_bmc_l6in1_device::set_prg(int prg_base, int prg_mask)
+{
+	if (m_reg & 0x0c)    // MMC3 mode
+		nes_txrom_device::set_prg(prg_base, prg_mask);
+	else                // AxROM mode
+		prg32(prg_base >> 2 | (m_reg & 0x03));
+}
+
+void nes_bmc_l6in1_device::set_mirror()
+{
+	if (BIT(m_reg, 5))
+		set_nt_mirroring(BIT(m_reg, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	else
+		set_nt_mirroring(m_mmc_mirror ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+void nes_bmc_l6in1_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_l6in1 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if ((m_wram_protect & 0xc0) == 0x80)
+	{
+		m_reg = data;
+		m_prg_base = (m_reg & 0xc0) >> 2;
+		set_prg(m_prg_base, m_prg_mask);
+		set_mirror();
+	}
+}
+
+void nes_bmc_l6in1_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_l6in1 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	txrom_write(offset, data);
+	if ((offset & 0x6001) == 0x2000)
+		set_mirror();
 }
 
 /*-------------------------------------------------

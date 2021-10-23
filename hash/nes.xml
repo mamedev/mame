@@ -60292,10 +60292,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="everqst" cloneof="satomihk" supported="no">
-		<description>Everquest (Chi)</description>
-		<year>19??</year>
+	<software name="everqst" cloneof="satomihk">
+		<description>EverQuest - Wújìn de Rènwù (China)</description>
+		<year>1999</year>
 		<publisher>Waixing</publisher>
+		<info name="alt_title" value="EverQuest 无尽的任务"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -60304,6 +60305,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -60512,12 +60517,12 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanguoyj1" cloneof="destempr" supported="no">
-		<description>San Guo Zhi - Ying Jie Zhan (Chi, Alt)</description>
-		<year>19??</year>
+	<software name="sanguoyj1" cloneof="destempr">
+		<description>Sānguózhì - Yīngjié Zhuàn (China, alt)</description>
+		<year>2001?</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1001"/>
-		<info name="alt_title" value="三国志英杰传"/>
+		<info name="alt_title" value="三國志英杰傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -60527,15 +60532,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="sanguoyj2" cloneof="destempr" supported="no">
-		<description>San Guo Zhi - Ying Jie Zhan (Chi, Alt 2)</description>
-		<year>19??</year>
+	<software name="sanguoyj2" cloneof="destempr">
+		<description>Sānguózhì - Yīngjié Zhuàn (China, alt 2)</description>
+		<year>2001?</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1001"/>
-		<info name="alt_title" value="三国志英杰传"/>
+		<info name="alt_title" value="三國志英杰傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -60545,15 +60554,19 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
-	<software name="sanguoyj" cloneof="destempr" supported="no">
-		<description>San Guo Zhi - Ying Jie Zhan (Chi)</description>
-		<year>19??</year>
+	<software name="sanguoyj" cloneof="destempr">
+		<description>Sānguózhì - Yīngjié Zhuàn (China)</description>
+		<year>2001?</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1001"/>
-		<info name="alt_title" value="三国志英杰传"/>
+		<info name="alt_title" value="三國志英杰傳"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="NES-TLROM" />
@@ -60562,6 +60575,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -81458,6 +81475,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_6ns">
+		<description>New Star 6 in 1 Game Cartridge</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_l6in1" />
+			<dataarea name="prg" size="524288">
+				<rom name="new star 6-in-1 game cartridge (l6in1).prg" size="524288" crc="78a1c568" sha1="0216c5485b18547715017f5ff56b7de2edaed4bc" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- The UNIF file contained separate PRG banks -->
 	<software name="mc_63gb">
 		<description>Ghostbusters 63 in 1</description>
@@ -82454,7 +82486,8 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_fcya1" supported="no">
+<!-- Van-1 doesn't load but instead reloads the menu with corrupt graphics -->
+	<software name="mc_fcya1" supported="partial">
 		<description>Famicom Yarou Vol.1 - 7 in 1</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
