@@ -526,6 +526,18 @@ public:
 	virtual void map(address_map &map) override;
 };
 
+class pc8477b_device : public ps2_fdc_device {
+public:
+	pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, mode_t mode)
+		: pc8477b_device(mconfig, tag, owner, clock)
+	{
+		set_mode(mode);
+	}
+	pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void map(address_map &map) override;
+};
+
 class wd37c65c_device : public upd765_family_device {
 public:
 	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -591,6 +603,7 @@ DECLARE_DEVICE_TYPE(N82077AA,       n82077aa_device)
 DECLARE_DEVICE_TYPE(PC_FDC_SUPERIO, pc_fdc_superio_device)
 DECLARE_DEVICE_TYPE(DP8473,         dp8473_device)
 DECLARE_DEVICE_TYPE(PC8477A,        pc8477a_device)
+DECLARE_DEVICE_TYPE(PC8477B,        pc8477b_device)
 DECLARE_DEVICE_TYPE(WD37C65C,       wd37c65c_device)
 DECLARE_DEVICE_TYPE(MCS3201,        mcs3201_device)
 DECLARE_DEVICE_TYPE(TC8566AF,       tc8566af_device)

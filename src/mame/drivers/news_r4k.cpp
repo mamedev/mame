@@ -57,7 +57,7 @@
  *   - Main memory: partially emulated (memory controller is unknown and not emulated - memory configurations other than 64MB don't work at the moment)
  *  I/O board:
  *   - Sony CXD8409Q Parallel Interface: not emulated
- *   - National Semi PC8477B Floppy Controller: emulated (uses the -A version currently, but it seems to work)
+ *   - National Semi PC8477B Floppy Controller: emulated (-A differences unemulated but seem to be unneeded)
  *   - Zilog Z8523010VSC ESCC serial interface: emulated (see following)
  *   - Sony CXD8421Q WSC-ESCC1 serial APbus interface controller: skeleton (ESCC connections, probably DMA, APbus interface, etc. handled by this chip)
  *   - 2x Sony CXD8442Q WSC-FIFO APbus FIFO/interface chips: partially emulated (handles APbus connections and DMA for sound, floppy, etc.)
@@ -138,7 +138,7 @@
 #define LOG_ESCC (1U << 6)
 
 #define NEWS_R4K_INFO (LOG_LED)
-#define NEWS_R4K_DEBUG (LOG_GENERAL | LOG_INTERRUPT | LOG_LED)
+#define NEWS_R4K_DEBUG (NEWS_R4K_INFO | LOG_GENERAL | LOG_INTERRUPT)
 #define NEWS_R4K_TRACE (NEWS_R4K_DEBUG | LOG_ALL_INTERRUPT | LOG_APBUS)
 #define NEWS_R4K_MAX (NEWS_R4K_TRACE | LOG_MEMORY | LOG_ESCC)
 
@@ -171,7 +171,6 @@ public:
           m_scsibus1(*this, "scsi1"),
           m_led(*this, "led%u", 0U) {}
 
-    // NWS-5000X
     void nws5000x(machine_config &config);
     void init_nws5000x();
 
@@ -274,7 +273,7 @@ protected:
     required_device<dp83932c_device> m_sonic;
 
     // National Semiconductor PC8477B floppy controller
-    required_device<pc8477a_device> m_fdc;
+    required_device<pc8477b_device> m_fdc;
 
     // NEWS keyboard and mouse
     required_device<news_hid_hle_device> m_hid;
@@ -365,8 +364,7 @@ protected:
     const int FREERUN_FREQUENCY = 1000000; // Hz
     const int TIMER0_FREQUENCY = 100;      // Hz
     const uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
-    const uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000;             // 128 kibibytes
-    const uint32_t MAP_ENTRY_COUNT = APBUS_DMA_MAP_RAM_SIZE / 8; // 8 bytes per entry
+    const uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
 
     // RAM debug
     bool m_map_shift = false;
@@ -497,8 +495,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r4k_state::irq_w<KBD>));
     m_hid->irq_out<news_hid_hle_device::MOUSE>().set(FUNC(news_r4k_state::irq_w<KBD>));
 
-    // TODO: find out the difference between PC8477B and PC8477A. Only A is emulated in MAME, but it works so it might not be significant
-    PC8477A(config, m_fdc, 24_MHz_XTAL, pc8477a_device::mode_t::PS2);
+    PC8477B(config, m_fdc, 24_MHz_XTAL, pc8477b_device::mode_t::PS2);
     FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
     // Note - FDC IRQ might go through the FIFO first. Might need to be updated in the future.
@@ -641,7 +638,7 @@ void news_r4k_state::cpu_map(address_map &map)
     // TODO: to be hardware accurate, these shouldn't be umasked.
     // instead, they should be duplicated across each 32-bit segment to emulate the open address lines
     // (i.e. status register A and B values of 56 c0 look like 56565656 c0c0c0c0)
-    map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477a_device::map)).umask32(0x000000ff);
+    map(0x1ed60000, 0x1ed6001f).m(m_fdc, FUNC(pc8477b_device::map)).umask32(0x000000ff);
 
     // The NEWS monitor ROM FDC routines won't run if DRV2 is inactive.
     // TODO: The 5000X only has a single floppy drive. Why is this needed?
@@ -674,6 +671,7 @@ void news_r4k_state::cpu_map(address_map &map)
  * cpu_map_main_memory
  *
  * Maps the main memory and supporting items into the provided address map.
+ * TODO: Memory controller logic for non-64MB configurations
  */
 void news_r4k_state::cpu_map_main_memory(address_map &map)
 {
@@ -717,9 +715,6 @@ void news_r4k_state::cpu_map_main_memory(address_map &map)
  */
 void news_r4k_state::cpu_map_debug(address_map &map)
 {
-    // APbus regions
-    // map(0x14c00004, 0x14c00007).lr32(NAME([this](offs_t offset) { return 0x4; }));
-
     // APbus WBFLUSH + unknown
     map(0x1f520000, 0x1f520017).nopw();
     map(0x1f520000, 0x1f520017).lr8(NAME([this](offs_t offset)
@@ -781,6 +776,7 @@ void news_r4k_state::sonic3_map(address_map &map)
  * ram_r
  *
  * Method that returns the byte at `offset` in main memory.
+ * TODO: Memory controller logic for non-64MB configurations
  */
 uint8_t news_r4k_state::ram_r(offs_t offset)
 {
@@ -804,6 +800,7 @@ uint8_t news_r4k_state::ram_r(offs_t offset)
  * ram_w
  *
  * Method that writes the byte `data` at `offset` in main memory.
+ * TODO: Memory controller logic for non-64MB configurations
  */
 void news_r4k_state::ram_w(offs_t offset, uint8_t data)
 {
@@ -956,8 +953,11 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 {
     // Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
     uint32_t apbus_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
+    if(apbus_page_address >= (APBUS_DMA_MAP_ADDRESS + APBUS_DMA_MAP_RAM_SIZE))
+    {
+        fatalerror("APbus address decoder ran past the bounds of the DMA map RAM!");
+    }
 
-    // TODO: bounds check of apbus_page_address
     uint64_t raw_pte = m_cpu->space(0).read_qword(apbus_page_address);
 
     // Marshal raw data to struct
@@ -1054,10 +1054,7 @@ void news_r4k_state::freerun_w(offs_t offset, uint32_t data)
 /*
  * timer0_w
  *
- * Clears the TIMER0 interrupt - why this exists instead of just using INTCLR, I have no idea (yet).
- * Maybe different values being written to this address control it somehow? NetBSD only uses 1.
- * Maybe this will be more clear after SCSI is implemented and a NEWS-OS boot can be attempted.
- * If NEWS-OS 4, 6, and NetBSD all only write a 1, then this level of emulation is probably sufficient anyways.
+ * Clears the TIMER0 interrupt and starts the timer again.
  * See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/newsmips/news5000.c#L114
  */
 void news_r4k_state::timer0_w(offs_t offset, uint32_t data)
