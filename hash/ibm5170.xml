@@ -10640,6 +10640,49 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="buzzrace">
+		<description>Buzz Aldrin's Race into Space</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="developer" value="Strategic Visions" />
+		<info name="version" value="Version 1.00 March 11, 1993" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 1 of 7] [Startup Disk].img" size="1474560" crc="515fa80e" sha1="e198a5fe50731ab3077a3f43ab458eb2536f02ef"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 2 of 7] [Data Disk 1].img" size="1474560" crc="18d4fda6" sha1="ef6395ac29a26e833d1c3ec54ec5e406545bb10f"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 3 of 7] [Data Disk 2].img" size="1474560" crc="7328f2b4" sha1="601f0ecf0be993ffbc0a59facef3e61ba9eb7e1c"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 4 of 7] [Data Disk 3].img" size="1474560" crc="5543c2f2" sha1="f6bd721fbbdb18c16a1505031502001a5e5b687d"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 5 of 7] [Data Disk 4].img" size="1474560" crc="daf47e6b" sha1="7300a6e3a8244a0cc1dad29ffabcd27ccd86b0d6"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 6 of 7] [Data Disk 5].img" size="1474560" crc="311802d0" sha1="fd68c242f88dec982e6ccc12dc4264455e79aa49"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Buzz Aldrin [Interplay] [1993] [3.5HD] [Disk 7 of 7] [Data Disk 6].img" size="1474560" crc="6db1c98c" sha1="112c37e20c574f39d837a70998aeb15aa4c63727"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bytsz137">
 		<description>Byte Size Software #137 - Boppin' &amp; Dits and Dats</description>
 		<year>1995</year>
@@ -10903,29 +10946,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Commander Keen in Aliens Ate My Baby Sitter (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="colonize">
-		<description>Sid Meier's Colonization</description>
-		<year>1994</year>
-		<publisher>MicroProse</publisher>
-		<info name="developer" value="Microprose" />
-		<info name="version" value="2.25 - 15 Sept 94" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3d8870fe" sha1="05e48f9484e17216f372226327b637867f04f23f"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="e7b9f904" sha1="5a24d1a62607f477ff41de5686f7fb6e19f3c6e9"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size = "1474560">
-				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="8e1d0f15" sha1="a37fe28e8662fa6855eef9347d83ed3fcafc0b06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12362,8 +12382,8 @@ license:CC0
 		<description>F-15 Strike Eagle III (3.5")</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
-		<info name="version" value="4108.03" />
 		<info name="developer" value="MPS Labs" />
+		<info name="version" value="4108.03" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1474560">
 				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="736c95a6" sha1="a368f0e6675d3dbc888cfd938f09ab91392bb470"/>
@@ -12395,8 +12415,8 @@ license:CC0
 		<description>F-15 Strike Eagle III (5.25")</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
-		<info name="version" value="4108.01" />
 		<info name="developer" value="MPS Labs" />
+		<info name="version" value="4108.01" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="F-15 Strike Eagle 3 [MicroProse] [1993] [5.25HD] [Disk 1 of 6].img" size="1228800" crc="0bf0d6c3" sha1="51b109c7242adbfef56cc3210ca0c46bd90fccc1"/>
@@ -12433,8 +12453,8 @@ license:CC0
 		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (v1.3, 3.5")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
-		<info name="version" value="1.3" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="1.3" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Legend of Kyrandia [Virgin] [1992] [3.5HD] [1 of 4].img" size="1474560" crc="88c6742b" sha1="dcd249c0c721612a020e309e044a1be620a72237"/>
@@ -12461,8 +12481,8 @@ license:CC0
 		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (v1.7, 3.5", France)</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
-		<info name="version" value="1.7" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="1.7" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Legend of Kyrandia, The - Book One (France) (v1.7) (Disk 1).img" size="1474560" crc="9df53388" sha1="96df77412dfe2a0c80bca51e72cabf3058ba1d26"/>
@@ -12489,8 +12509,8 @@ license:CC0
 		<description>Fables &amp; Fiends - Book One: The Legend of Kyrandia (v1.0, 5.25")</description>
 		<year>1992</year>
 		<publisher>Virgin Games</publisher>
-		<info name="version" value="1.0" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="1.0" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1228800">
 				<rom name="Legend of Kyrandia [Virgin] [1992] [5.25HD] [Disk 1 of 5].img" size="1228800" crc="3871517c" sha1="d9307326a1b9f540871b47c2fe4f3ea4211b2cd1"/>
@@ -12522,8 +12542,8 @@ license:CC0
 		<description>Fables &amp; Fiends - Book Two: The Hand of Fate</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
-		<info name="version" value="v1.00c" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="v1.00c" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Hand of Fate [1993] [Virgin] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="c747690b" sha1="659353b54a015a8916a84091bcddfde30265dbf3"/>
@@ -12570,8 +12590,8 @@ license:CC0
 		<description>Fables &amp; Fiends - Book Two: The Hand of Fate (Germany)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
-		<info name="version" value="1.41" />
 		<info name="developer" value="Westwood Studios" />
+		<info name="version" value="1.41" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 1 of 8].img" size="1474560" crc="f109ad49" sha1="c11eebac377d87990374f802a47f3574e92310fa" status="baddump" />
@@ -12610,6 +12630,23 @@ license:CC0
 		<part name="flop8" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="The Hand of Fate [1994] [Virgin] [DE] [3.5HD] [Disk 8 of 8].img" size="1474560" crc="ee9bfc16" sha1="52fed013a128433583c40bb8fcc3ada9b28597d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="twinion">
+		<description>Fates of Twinion</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="Requires installation of The Sierra / Imagination Network"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fates of Twinion [Sierra] [1993] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="16fe32d4" sha1="ea5141e4c00949cb3bfc36b9c2399b4221fd2177" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Fates of Twinion [Sierra] [1993] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="5bafa268" sha1="82898fa82cc52a4d36194db10735c4d7fbb46676" />
 			</dataarea>
 		</part>
 	</software>
@@ -14814,6 +14851,44 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="lsl6">
+		<description>Leisure Suit Larry 6: Shape Up or Slip Out!</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Sierra On-Line" />
+		<info name="version" value="1.000 November 18, 1993" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 6 [Sierra] [1993] [3.5HD] [Disk 1 of 6].img" size="1474560" crc="5fccd493" sha1="8d9e9b5b56f15c5da04c75e629214177467c375e"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 6 [Sierra] [1993] [3.5HD] [Disk 2 of 6].img" size="1474560" crc="fa49b842" sha1="31574e9d4166291301ebc332b3c62380d4a55070"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 6 [Sierra] [1993] [3.5HD] [Disk 3 of 6].img" size="1474560" crc="b6f96d6e" sha1="0d17de84160060a38cb1f647155f96da34b99668"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 6 [Sierra] [1993] [3.5HD] [Disk 4 of 6].img" size="1474560" crc="4454b94a" sha1="17a63b2c3f921d551febefc570a1dc4fdef7eed8"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 6 [Sierra] [1993] [3.5HD] [Disk 5 of 6].img" size="1474560" crc="67c127ff" sha1="61075cb17a4aff9740b9282785e6d5b6571c00bd"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Leisure Suit Larry 6 [Sierra] [1993] [3.5HD] [Disk 6 of 6].img" size="1474560" crc="145c2009" sha1="2e111e7a5efb40885436990d883c07e3395a0c22"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lemmings">
 		<!-- Dumped via Kryoflux -->
 		<description>Lemmings</description>
@@ -16923,6 +16998,123 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="yserbius">
+		<description>Shadow of Yserbius</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Ybarra Productions" />
+		<info name="usage" value="Requires installation of The Sierra / Imagination Network"/>
+		<info name="version" value="1.1 01.04.94" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Shadow of Yserbius [Sierra] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="12d05885" sha1="f4bed37d08dc0114df875dd173e6e82399875230"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Shadow of Yserbius [Sierra] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="3129f6ba" sha1="ad3f10ff3e79d04232e4226b42b0c89e321dafc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="colonize">
+		<description>Sid Meier's Colonization</description>
+		<year>1994</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Microprose" />
+		<info name="version" value="2.25 - 15 Sept 94" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="3d8870fe" sha1="05e48f9484e17216f372226327b637867f04f23f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="e7b9f904" sha1="5a24d1a62607f477ff41de5686f7fb6e19f3c6e9"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sid Meier's Colonization [Microprose] [1994] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="8e1d0f15" sha1="a37fe28e8662fa6855eef9347d83ed3fcafc0b06"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sierrain">
+		<description>The Sierra ImagiNation Network</description>
+		<year>1994</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="v2.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="32e08f5c" sha1="095cb0f545f624c1c4dbe77de8b6c10c4d65e828"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="07b40f54" sha1="9a6bf226aa663fad3bb5ec3e325ef2f7147de372"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="6603d7db" sha1="8b840495c906f56c0467f5da8a6c9925c1985c7a"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="232e971b" sha1="8f606642e2433849077fdf23f37bcacf0746687b"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="deeda763" sha1="cb3028b01dd0fbb1867bddd3912d15abfee6b116"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sierraina" cloneof="sierrain">
+		<description>The Sierra ImagiNation Network (older)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="version" value="v2.3" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1993] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="462ec8c0" sha1="058d20ac20b4059cc5e5b1451a40b68a8731a98c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1993] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="7da835c1" sha1="5ee0ab611c203935d4fbd206f92c05abb139e187"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1993] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="a148e061" sha1="7e4219d6191938923b767b36c0bbccdc4ba6f9b1"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1993] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="72cb3fbb" sha1="91e0ba9ee9e1e99156b24548c3e7c68b62a1f51f"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Sierra Imagination Network [Sierra] [1993] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="616a4394" sha1="b48bd58343afce80f8cd45e2671a8e0422977805"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sierranw">
+		<description>The Sierra Network</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="The Sierra Network [Sierra] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="b6b5bc88" sha1="5e493b0fcf35926a7084da322738b73fcbebc318"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="silverb2p">
 		<description>Silverball 2 Plus</description>
 		<year>1994</year>
@@ -17804,7 +17996,7 @@ license:CC0
 	</software>
 
 	<software name="swxwing">
-		<description>Star Wars - X-Wing - Space Combat Simulator</description>
+		<description>Star Wars: X-Wing - Space Combat Simulator</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
 		<info name="version" value="Version 1.0" />
@@ -17837,7 +18029,7 @@ license:CC0
 
 	<!-- The game is the same as the parent, only the readme file on disk 1 is translated to german -->
 	<software name="swxwingde" cloneof="swxwing">
-		<description>Star Wars - X-Wing - Space Combat Simulator (Germany)</description>
+		<description>Star Wars: X-Wing - Space Combat Simulator (Germany)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
 		<info name="version" value="Version 1.0" />
@@ -17870,7 +18062,7 @@ license:CC0
 
 	<!-- The game is the same as the parent, only the readme file on disk 1 is translated to spanish -->
 	<software name="swxwinges" cloneof="swxwing">
-		<description>Star Wars - X-Wing - Space Combat Simulator (Spain)</description>
+		<description>Star Wars: X-Wing - Space Combat Simulator (Spain)</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
 		<info name="version" value="Version 1.0" />
@@ -17901,10 +18093,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="swxwingbw" cloneof="swxwing">
-		<description>Star Wars - X-Wing: B-Wing Expansion</description>
+	<software name="swxwingbw">
+		<description>Star Wars: X-Wing - B-Wing Expansion</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="usage" value="Add-on for Star Wars: X-Wing. Requires 'Star Wars: X-Wing' previously installed"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="bwing.img" size="1474560" crc="91d0f97a" sha1="edb745afa6376808314364e08c3000594edf2c3b"/>
@@ -17912,10 +18105,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="swxwingip" cloneof="swxwing">
-		<description>Star Wars - X-Wing: Imperial Pursuit</description>
+	<software name="swxwingip">
+		<description>Star Wars: X-Wing - Imperial Pursuit</description>
 		<year>1993</year>
 		<publisher>LucasArts</publisher>
+		<info name="usage" value="Add-on for Star Wars: X-Wing. Requires 'Star Wars: X-Wing' previously installed"/>
 		<info name="version" value="Version 1.1" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -17925,32 +18119,66 @@ license:CC0
 	</software>
 
 	<software name="swtiefgt">
-		<description>Star Wars - TIE Fighter</description>
+		<description>Star Wars: TIE Fighter</description>
 		<year>1994</year>
 		<publisher>LucasArts</publisher>
+		<info name="version" value="V1.0 06/15/94" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="swtiefgt.img" size="1474560" crc="b850f9a2" sha1="a439a1c8a600e77fe572b10779905a59ffdfaf62"/>
+				<rom name="Tie Fighter [LucasArts] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="4e5ff67c" sha1="05a42ffcc715cc93ab5d57116096d45785827e9a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="swtiefgtd2.img" size="1474560" crc="70ce3029" sha1="803b58d8aa94d6b5eb8e0b118e1934fefef11bce"/>
+				<rom name="Tie Fighter [LucasArts] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="f54a2212" sha1="d17c0f18adb4b35450903845a256a1c1df1e0943"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="swtiefgtd3.img" size="1474560" crc="e084c30d" sha1="710cff3865fe5d84c8d44cf3ef2b1ca0121d147a"/>
+				<rom name="Tie Fighter [LucasArts] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="24393300" sha1="2f50bee02ad59046ca41f443060a7346e8a9b104"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="swtiefgtd4.img" size="1474560" crc="5cc5ec97" sha1="a21fbeaab34f82db9a51381975d314f845bf2c26"/>
+				<rom name="Tie Fighter [LucasArts] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="8dbdd43b" sha1="f7e57b284a140a16b60e4688250fb6be2ca477c5"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
-				<rom name="swtiefgtd5.img" size="1474560" crc="7751ed1f" sha1="4fc14b87a62ab1db717227ef3ad9343ce3aa7193"/>
+				<rom name="Tie Fighter [LucasArts] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="32954739" sha1="ad96ddf5ce90851a383daa2c33d5711ca2d629ec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- The game is the same as the parent, only the install.exe file on disk 1 is different -->
+	<software name="swtiefgtde" cloneof="swtiefgt">
+		<description>Star Wars: TIE Fighter (Germany)</description>
+		<year>1994</year>
+		<publisher>LucasArts</publisher>
+		<info name="version" value="V1.0 06/15/94" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tie Fighter (Germany) [LucasArts] [1994] [3.5HD] [Disk 1 of 5].img" size="1474560" crc="0c93ed45" sha1="910c55c30c3f34fb27a5ae3a9fe52fa69a128ca5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tie Fighter (Germany) [LucasArts] [1994] [3.5HD] [Disk 2 of 5].img" size="1474560" crc="f54a2212" sha1="d17c0f18adb4b35450903845a256a1c1df1e0943"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tie Fighter (Germany) [LucasArts] [1994] [3.5HD] [Disk 3 of 5].img" size="1474560" crc="24393300" sha1="2f50bee02ad59046ca41f443060a7346e8a9b104"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tie Fighter (Germany) [LucasArts] [1994] [3.5HD] [Disk 4 of 5].img" size="1474560" crc="8dbdd43b" sha1="f7e57b284a140a16b60e4688250fb6be2ca477c5"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="Tie Fighter (Germany) [LucasArts] [1994] [3.5HD] [Disk 5 of 5].img" size="1474560" crc="32954739" sha1="ad96ddf5ce90851a383daa2c33d5711ca2d629ec"/>
 			</dataarea>
 		</part>
 	</software>
