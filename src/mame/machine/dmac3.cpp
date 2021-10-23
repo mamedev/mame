@@ -34,33 +34,33 @@ void dmac3_device::device_start()
     m_dma_check = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dmac3_device::dma_check), this));
 }
 
-uint32_t dmac3_device::csr_r(DMAC3_Controller controller)
+uint32_t dmac3_device::csr_r(dmac3_controller controller)
 {
     uint32_t val = m_controllers[controller].csr;
     return val;
 }
-uint32_t dmac3_device::intr_r(DMAC3_Controller controller)
+uint32_t dmac3_device::intr_r(dmac3_controller controller)
 {
     uint32_t val = m_controllers[controller].intr;
     return val;
 }
-uint32_t dmac3_device::length_r(DMAC3_Controller controller)
+uint32_t dmac3_device::length_r(dmac3_controller controller)
 {
     uint32_t val = m_controllers[controller].length;
     return val;
 }
-uint32_t dmac3_device::address_r(DMAC3_Controller controller)
+uint32_t dmac3_device::address_r(dmac3_controller controller)
 {
     uint32_t val = m_controllers[controller].address;
     return val;
 }
-uint32_t dmac3_device::conf_r(DMAC3_Controller controller)
+uint32_t dmac3_device::conf_r(dmac3_controller controller)
 {
     uint32_t val = m_controllers[controller].conf;
     return val;
 }
 
-void dmac3_device::csr_w(DMAC3_Controller controller, uint32_t data)
+void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d csr_w: 0x%x\n", controller, data);
     if(data & CSR_RESET)
@@ -74,7 +74,7 @@ void dmac3_device::csr_w(DMAC3_Controller controller, uint32_t data)
     }
 }
 
-void dmac3_device::intr_w(DMAC3_Controller controller, uint32_t data)
+void dmac3_device::intr_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d intr_w: 0x%x\n", controller, data);
     auto intr_clear_bits = data & INTR_CLR_MASK; // Get 1s on bits to clear
@@ -86,19 +86,19 @@ void dmac3_device::intr_w(DMAC3_Controller controller, uint32_t data)
     // TODO: does it make sense to clear INTR_INT??
 }
 
-void dmac3_device::length_w(DMAC3_Controller controller, uint32_t data)
+void dmac3_device::length_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d length_w: 0x%x\n", controller, data);
     m_controllers[controller].length = data;
 }
 
-void dmac3_device::address_w(DMAC3_Controller controller, uint32_t data)
+void dmac3_device::address_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d address_w: 0x%x (%s)\n", controller, data, machine().describe_context());
     m_controllers[controller].address = data;
 }
 
-void dmac3_device::conf_w(DMAC3_Controller controller, uint32_t data)
+void dmac3_device::conf_w(dmac3_controller controller, uint32_t data)
 {
 #if (VERBOSE & LOG_REGISTER) > 0 // No need for the extra comparison if logging isn't enabled
     // Only log if something other than the access mode changed
@@ -117,11 +117,11 @@ void dmac3_device::conf_w(DMAC3_Controller controller, uint32_t data)
 void dmac3_device::device_reset()
 {
     // Reset both controllers
-    reset_controller(DMAC3_Controller::CTRL0);
-    reset_controller(DMAC3_Controller::CTRL1);
+    reset_controller(dmac3_controller::CTRL0);
+    reset_controller(dmac3_controller::CTRL1);
 }
 
-void dmac3_device::reset_controller(DMAC3_Controller controller)
+void dmac3_device::reset_controller(dmac3_controller controller)
 {
     m_controllers[controller].csr = 0;
     m_controllers[controller].intr &= INTR_INT; // TODO: is the external interrupt bit preserved?

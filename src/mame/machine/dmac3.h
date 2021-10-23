@@ -26,7 +26,7 @@ public:
 
     // DMAC3 has two controllers on-chip
     // The 5000X uses controllers 0 and 1 for SPIFI/SCSI bus 0 and 1 respectively
-    enum DMAC3_Controller
+    enum dmac3_controller
     {
         CTRL0 = 0,
         CTRL1 = 1,
@@ -34,7 +34,7 @@ public:
 
     // Address map setup
     template <typename... T> void set_apbus_address_translator(T &&... args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
-    template <DMAC3_Controller controller> void map(address_map &map)
+    template <dmac3_controller controller> void map(address_map &map)
     {
         map(0x0, 0x3).rw(FUNC(dmac3_device::csr_r<controller>), FUNC(dmac3_device::csr_w<controller>));
         map(0x4, 0x7).rw(FUNC(dmac3_device::intr_r<controller>), FUNC(dmac3_device::intr_w<controller>));
@@ -45,11 +45,11 @@ public:
 
     // Signal routing
     template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
-    template <DMAC3_Controller controller> auto dma_r_cb() { return m_dma_r[controller].bind(); }
-    template <DMAC3_Controller controller> auto dma_w_cb() { return m_dma_w[controller].bind(); }
+    template <dmac3_controller controller> auto dma_r_cb() { return m_dma_r[controller].bind(); }
+    template <dmac3_controller controller> auto dma_w_cb() { return m_dma_w[controller].bind(); }
     auto irq_out() { return m_irq_handler.bind(); }
 
-    template <DMAC3_Controller controller> void irq_w(int state)
+    template <dmac3_controller controller> void irq_w(int state)
     {
         if (state)
         {
@@ -62,7 +62,7 @@ public:
         m_irq_check->adjust(attotime::zero);
     }
 
-    template <DMAC3_Controller controller> void drq_w(int state)
+    template <dmac3_controller controller> void drq_w(int state)
     {
         m_controllers[controller].drq = (state != 0);
         m_dma_check->adjust(attotime::zero);
@@ -88,7 +88,7 @@ protected:
     TIMER_CALLBACK_MEMBER(dma_check);
 
     // Other methods
-    void reset_controller(DMAC3_Controller controller);
+    void reset_controller(dmac3_controller controller);
 
     // DMAC3 has two controllers on-chip
     struct dmac3_register_file
@@ -148,30 +148,30 @@ protected:
     };
 
     // Register file accessors
-    uint32_t csr_r(DMAC3_Controller controller);
-    uint32_t intr_r(DMAC3_Controller controller);
-    uint32_t length_r(DMAC3_Controller controller);
-    uint32_t address_r(DMAC3_Controller controller);
-    uint32_t conf_r(DMAC3_Controller controller);
+    uint32_t csr_r(dmac3_controller controller);
+    uint32_t intr_r(dmac3_controller controller);
+    uint32_t length_r(dmac3_controller controller);
+    uint32_t address_r(dmac3_controller controller);
+    uint32_t conf_r(dmac3_controller controller);
 
-    void csr_w(DMAC3_Controller controller, uint32_t data);
-    void intr_w(DMAC3_Controller controller, uint32_t data);
-    void length_w(DMAC3_Controller controller, uint32_t data);
-    void address_w(DMAC3_Controller controller, uint32_t data);
-    void conf_w(DMAC3_Controller controller, uint32_t data);
+    void csr_w(dmac3_controller controller, uint32_t data);
+    void intr_w(dmac3_controller controller, uint32_t data);
+    void length_w(dmac3_controller controller, uint32_t data);
+    void address_w(dmac3_controller controller, uint32_t data);
+    void conf_w(dmac3_controller controller, uint32_t data);
 
     // Templates as partial functions for register file accessors since they can be bound at compile time
-    template <DMAC3_Controller controller> uint32_t csr_r() { return csr_r(controller); }
-    template <DMAC3_Controller controller> uint32_t intr_r() { return intr_r(controller); }
-    template <DMAC3_Controller controller> uint32_t length_r() { return length_r(controller); }
-    template <DMAC3_Controller controller> uint32_t address_r() { return address_r(controller); }
-    template <DMAC3_Controller controller> uint32_t conf_r() { return conf_r(controller); }
+    template <dmac3_controller controller> uint32_t csr_r() { return csr_r(controller); }
+    template <dmac3_controller controller> uint32_t intr_r() { return intr_r(controller); }
+    template <dmac3_controller controller> uint32_t length_r() { return length_r(controller); }
+    template <dmac3_controller controller> uint32_t address_r() { return address_r(controller); }
+    template <dmac3_controller controller> uint32_t conf_r() { return conf_r(controller); }
 
-    template <DMAC3_Controller controller> void csr_w(uint32_t data) { csr_w(controller, data); }
-    template <DMAC3_Controller controller> void intr_w(uint32_t data) { intr_w(controller, data); }
-    template <DMAC3_Controller controller> void length_w(uint32_t data) { length_w(controller, data); }
-    template <DMAC3_Controller controller> void address_w(uint32_t data) { address_w(controller, data); }
-    template <DMAC3_Controller controller> void conf_w(uint32_t data) { conf_w(controller, data); }
+    template <dmac3_controller controller> void csr_w(uint32_t data) { csr_w(controller, data); }
+    template <dmac3_controller controller> void intr_w(uint32_t data) { intr_w(controller, data); }
+    template <dmac3_controller controller> void length_w(uint32_t data) { length_w(controller, data); }
+    template <dmac3_controller controller> void address_w(uint32_t data) { address_w(controller, data); }
+    template <dmac3_controller controller> void conf_w(uint32_t data) { conf_w(controller, data); }
 };
 
 DECLARE_DEVICE_TYPE(DMAC3, dmac3_device)

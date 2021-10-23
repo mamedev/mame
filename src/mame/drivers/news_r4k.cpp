@@ -80,20 +80,24 @@
  *  - Monitor ROM command `ss -r` doesn't show most register values
  *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly,
  *     both on real hardware and in emulation)
+ *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver.
+ *  - SCSI performance seems variable from run to run. Will probably need to do some runtime profiling on that.
  *
  *  TODO:
  *  - More complete floppy support (only supports floppy boot at the moment)
- *  - NetBSD SCSI support (mostly/entirely in SPIFI driver)
+ *  - NetBSD SCSI support (mostly/entirely changes needed in the SPIFI driver)
  *  - Sound (lots of undocumented hardware)
  *  - Parallel I/O
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
- *  - Triage the known issues mentioned above
- *  - Figure out SPIFI3/DMAC3 handshake for pad
+ *  - Triage and fix the known issues mentioned above
+ *  - Figure out SPIFI3/DMAC3 handshake for pad to eliminate SPIFI workaround
  *
  *  TODO before opening first MR:
- *  - FIFO cleanup (lots of it!)
+ *  - FIFO cleanup
+ *  - ESCC TODOs
  *  - SPIFI3 refactoring
+ *  - WSC-SONIC3 cleanup
  *  - Save state support
  */
 
