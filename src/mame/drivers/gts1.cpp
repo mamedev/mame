@@ -92,6 +92,7 @@ ToDo:
 #define VERBOSE    1
 #include "logmacro.h"
 
+namespace {
 
 class gts1_state : public genpin_class
 {
@@ -989,6 +990,7 @@ ROM_START(sys1test)
 	ROM_LOAD("test.cpu",  0x0000, 0x0400, CRC(8b0704bb) SHA1(5f0eb8d5af867b815b6012c9d078927398efe6d8))
 ROM_END
 
+} // Anonymous namespace
 
 GAME(1977,  gts1,     0,      gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1",                  MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
 GAME(19??,  sys1test, gts1,   gts1,  gts1,     gts1_state, empty_init, ROT0, "Gottlieb",         "System 1 Test prom",                   MACHINE_IS_SKELETON_MECHANICAL)
