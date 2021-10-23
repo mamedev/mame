@@ -27,7 +27,7 @@
 
 #include "cxd8442q.h"
 
-#define VERBOSE 0
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIFOQ")
@@ -39,7 +39,6 @@ cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag,
 
 void cxd8442q_device::map(address_map &map)
 {
-    map.unmap_value_low();
     // Each channel has the same structure
     // The devices are mapped at the platform level, so this device only needs to handle the DMA and assorted details
     for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
@@ -70,12 +69,7 @@ void cxd8442q_device::map(address_map &map)
                                                                       fifo_channels[channel].dma_mode = data;
                                                                       if (data & apfifo_channel::DMA_EN)
                                                                       {
-                                                                          fifo_channels[channel].reset_for_transaction();
                                                                           fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(DMA_TIMER));
-                                                                      }
-                                                                      else
-                                                                      {
-                                                                          fifo_channels[channel].intstat = 0x0; // XXX
                                                                       }
                                                                   })));
 
@@ -84,12 +78,23 @@ void cxd8442q_device::map(address_map &map)
                                                             NAME(([this, channel](offs_t offset, uint32_t data)
                                                                   {
                                                                       LOG("FIFO CH%d: Set intctrl = 0x%x (%s)\n", channel, data, machine().describe_context());
+                                                                      // It isn't 100% clear what the trigger for clearing intstat is
+                                                                      // but this seems like a reasonable place for it to go, and it works.
+                                                                      fifo_channels[channel].intstat = 0x0;
                                                                       fifo_channels[channel].intctrl = data;
                                                                       irq_check();
                                                                   })));
 
         map(channel_base + 0x1c, channel_base + 0x1f).lr32(NAME(([this, channel]()
-                                                                 { return fifo_channels[channel].intstat; })));
+                                                                 {
+                                                                     // There is more in this register, but this is the minimum to get the ESCCF working.
+                                                                     auto intstat = fifo_channels[channel].intstat;
+                                                                     auto mask = fifo_channels[channel].intctrl & 0x1;
+                                                                     return intstat & mask; 
+                                                                 })));
+
+        // These locations are written to a lot but not emulating them doesn't stop it from working for simple cases
+        map(channel_base + 0x20, channel_base + 0x2f).noprw();
 
         map(channel_base + 0x30, channel_base + 0x33).lr32(NAME(([this, channel]()
                                                                  { return fifo_channels[channel].count; })));
@@ -103,9 +108,6 @@ void cxd8442q_device::map(address_map &map)
                                                                      LOG("FIFO CH%d: Pushing 0x%x\n", channel, data, machine().describe_context());
                                                                      fifo_channels[channel].write_data_to_fifo(data);
                                                                  })));
-
-    // These locations are written to a lot but not emulating them doesn't stop it from working for simple cases
-    map(channel_base + 0x20, channel_base + 0x2f).noprw();
     }
 }
 
@@ -139,19 +141,19 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
     bool dma_active = false;
     for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
     {
-        apfifo_channel &thisChannel = fifo_channels[channel];
+        apfifo_channel &this_channel = fifo_channels[channel];
 
         // Skip this channel if we don't need to do anything
-        if (!(thisChannel.dma_mode & apfifo_channel::DMA_EN))
+        if (!(this_channel.dma_mode & apfifo_channel::DMA_EN))
         {
             continue;
         }
 
         // Check DRQ to see if the device is ready to give or receive data
-        if (thisChannel.drq_r())
+        if (this_channel.drq_r())
         {
             // TODO: error condition?
-            if(thisChannel.dma_cycle())
+            if(this_channel.dma_cycle())
             {
                 dma_active = true;
             }
@@ -171,7 +173,7 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
 
 bool apfifo_channel::dma_cycle()
 {
-    // TODO: Error handling (FIFO overrun, etc)
+    // TODO: Error handling (FIFO overrun, etc) - for now it will send stale data or overwrite fresh data in those cases
     bool stay_active = true;
     if (dma_r_callback != nullptr && (dma_mode & (DMA_DIRECTION | DMA_EN)) == DMA_EN)
     {
@@ -185,7 +187,10 @@ bool apfifo_channel::dma_cycle()
             fifo_w_position = 0;
         }
 
-        intstat = 3; // IRQ since we have data. This is likely not how the real chip works
+        // IRQ since we have data.
+        // This is likely not how the real chip works - it probably has some kind of threshold of received bytes to interrupt the CPU less frequently.
+        // That said, we can still receive bytes until the CPU shuts us off to read out the data, so there is still speedup here compared to polling.
+        intstat = 0x1;
         fifo_device.irq_check();
     }
     else if ((dma_w_callback != nullptr) && (count > 0) && ((dma_mode & (DMA_DIRECTION | DMA_EN)) == (DMA_DIRECTION | DMA_EN)))
@@ -204,7 +209,7 @@ bool apfifo_channel::dma_cycle()
         if (count == 0)
         {
             stay_active = false;
-            intstat = 3;
+            intstat = 0x1;
             fifo_device.irq_check();
         }
     }
@@ -214,17 +219,17 @@ bool apfifo_channel::dma_cycle()
 
 void cxd8442q_device::irq_check()
 {
-    bool irqState = false;
+    bool irq_state = false;
     for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
     {
-        apfifo_channel &thisChannel = fifo_channels[channel];
-        auto mask = thisChannel.intctrl & 0x1;
-        if ((thisChannel.intstat & mask) != 0)
+        apfifo_channel &this_channel = fifo_channels[channel];
+        auto mask = this_channel.intctrl & 0x1;
+        if(this_channel.intstat & mask)
         {
-            irqState = true;
+            irq_state = true;
         }
     }
-    out_irq(irqState);
+    out_irq(irq_state);
 }
 
 uint32_t apfifo_channel::read_data_from_fifo()
@@ -238,7 +243,7 @@ uint32_t apfifo_channel::read_data_from_fifo()
         --count;
         if(!count)
         {
-            intstat &= ~0x3;
+            intstat &= ~0x1;
         }
     }
     fifo_device.irq_check();
@@ -248,8 +253,6 @@ uint32_t apfifo_channel::read_data_from_fifo()
     {
         fifo_r_position = 0;
     }
-
-    // TODO: detect when FIFO has no valid data? Or is that a silent failure on the system?
 
     // Based on testing with the 5000X FDC subsystem, the monitor ROM uses `lb` commands in the 4-byte region
     // to read out the value of the 8-bit floppy data register. So, this ensures that the right data shows up

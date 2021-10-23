@@ -56,19 +56,6 @@ public:
         intstat = 0; // interrupt status
         count = 0;
         drq = false;
-        reset_for_transaction();
-    }
-
-    /*
-     * reset_for_transaction
-     *
-     * Prepare the channel for a new transaction.
-     * TODO: determine (how?) if the hardware actually does this
-     */
-    void reset_for_transaction()
-    {
-        fifo_w_position = 0;
-        fifo_r_position = 0;
     }
 
     bool dma_cycle();
@@ -108,8 +95,6 @@ private:
     // Callback pointers
     std::function<uint32_t(void)> dma_r_callback;
     std::function<void(uint32_t)> dma_w_callback;
-
-    // TODO: Channel-level IRQ?
 };
 
 class cxd8442q_device : public device_t
