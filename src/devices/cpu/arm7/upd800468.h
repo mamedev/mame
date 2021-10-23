@@ -8,6 +8,7 @@
 
 #include "arm7.h"
 #include "arm7core.h"
+#include "machine/gt913_kbd.h"
 #include "machine/vic_pl192.h"
 
 /***************************************************************************
@@ -40,6 +41,7 @@ protected:
 private:
 	address_space_config m_program_config;
 
+	required_device<gt913_kbd_hle_device> m_kbd;
 	required_device<vic_upd800468_device> m_vic;
 
 	memory_view m_ram_view;

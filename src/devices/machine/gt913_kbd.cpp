@@ -29,15 +29,15 @@ DEFINE_DEVICE_TYPE(GT913_KBD_HLE, gt913_kbd_hle_device, "gt913_kbd_hle", "Casio 
 gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GT913_KBD_HLE, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "KO0", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12"),
-	m_intc(nullptr), m_intc_tag(nullptr), m_irq(0),
-	m_velocity(*this, "VELOCITY")
+	m_velocity(*this, "VELOCITY"),
+	m_irq_func(*this)
 {
 }
 
 void gt913_kbd_hle_device::device_start()
 {
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
-	
+	m_irq_func.resolve_safe();
+
 	save_item(NAME(m_status));
 	save_item(NAME(m_fifo));
 	save_item(NAME(m_fifo_read));
@@ -75,7 +75,9 @@ void gt913_kbd_hle_device::update_status()
 		m_status |= 0x8000;
 
 	if (BIT(m_status, 15) && BIT(m_status, 14))
-		m_intc->internal_interrupt(m_irq);
+		m_irq_func(1);
+	else
+		m_irq_func(0);
 }
 
 uint16_t gt913_kbd_hle_device::read()

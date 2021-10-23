@@ -122,8 +122,8 @@ u32 vic_pl190_device::cur_vect_addr_r()
 
 void vic_pl190_device::cur_vect_addr_w(u32 data)
 {
-	priority_mask = 0xffff;
-	priority = 0xff;
+	priority_mask = ~0;
+	priority = ~0;
 	timer_set(attotime::zero, TIMER_CHECK_IRQ);
 }
 
@@ -189,8 +189,8 @@ void vic_pl190_device::update_vector()
 	}
 
 	// no vectored interrupt taken, use the default
-	priority_mask = 0xffff;
-	priority = 0xff;
+	priority_mask = ~0;
+	priority = ~0;
 	vicaddress = defaddress;
 }
 
@@ -252,8 +252,8 @@ void vic_pl190_device::device_reset()
 	raw_intr = intr_select = intr_en = soft_intr = 0;
 	defaddress = vicaddress = protection = 0;
 
-	priority_mask = 0xffff;
-	priority = 0xff;
+	priority_mask = ~0;
+	priority = ~0;
 
 	for(int i = 0; i < 32; i++)
 	{
