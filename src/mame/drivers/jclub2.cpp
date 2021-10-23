@@ -191,7 +191,7 @@ public:
 		m_soundbank(*this, "soundbank")
 	{ }
 
-	required_device<cpu_device> m_soundcpu;
+	required_device<st0016_cpu_device> m_soundcpu;
 	required_memory_bank m_soundbank;
 
 	void eeprom_s29290_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
