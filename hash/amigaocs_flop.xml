@@ -94,7 +94,7 @@ license:CC0
 
 	<!-- ATK test: OK -->
 	<software name="hostile" supported="no">
-		<description>Hostile Breed (Euro, Prototype)</description>
+		<description>Hostile Breed (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -119,7 +119,7 @@ license:CC0
 
 	<!-- ATK test: failed -->
 	<software name="nobby" supported="no">
-		<description>Nobby the Aardvark (Euro, Prototype)</description>
+		<description>Nobby the Aardvark (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>Thalamus</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1010,7 +1010,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="advski1" cloneof="advski" supported="no">
 		<!-- SPS (CAPS) release 1805 -->
-		<description>Advanced Ski Simulator (Euro, Alt)</description>
+		<description>Advanced Ski Simulator (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -1808,7 +1808,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="alloallo1" cloneof="alloallo" supported="no">
 		<!-- SPS (CAPS) release 1213 -->
-		<description>'Allo 'Allo! Cartoon Fun. (Euro, Alt)</description>
+		<description>'Allo 'Allo! Cartoon Fun. (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -2081,7 +2081,7 @@ license:CC0
 	<!-- ATK test: C:79 H:U Bad -->
 	<software name="amegas1" cloneof="amegas" supported="no">
 		<!-- SPS (CAPS) release 1656 -->
-		<description>Amegas (Euro, Tenstar Pack, Alt)</description>
+		<description>Amegas (Euro, Tenstar Pack, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
@@ -2754,7 +2754,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="arena1" cloneof="arena" supported="no">
 		<!-- SPS (CAPS) release 1642 -->
-		<description>Arena (Euro, Alt)</description>
+		<description>Arena (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1986</year>
@@ -4148,7 +4148,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="barbpsya" cloneof="barbpsy" supported="no">
 		<!-- SPS (CAPS) release 1643 -->
-		<description>Barbarian (Euro, Psygnosis, Alt)</description>
+		<description>Barbarian (Euro, Psygnosis, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
@@ -4625,7 +4625,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="btlchessa" cloneof="btlchess" supported="no">
 		<!-- SPS (CAPS) release 2368 -->
-		<description>Battle Chess (Euro, Alt)</description>
+		<description>Battle Chess (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
@@ -6433,7 +6433,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="bloodwyca" cloneof="bloodwyc" supported="no">
 		<!-- SPS (CAPS) release 439 -->
-		<description>Bloodwych (Euro, Alt)</description>
+		<description>Bloodwych (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -6554,7 +6554,7 @@ license:CC0
 	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="bluesb1" cloneof="bluesb" supported="no">
 		<!-- SPS (CAPS) release 3082 -->
-		<description>The Blues Brothers (Euro, Alt)</description>
+		<description>The Blues Brothers (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -7881,7 +7881,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="calephar" supported="no">
 		<!-- SPS (CAPS) release 2661 -->
-		<description>Calephar (Euro, Prototype)</description>
+		<description>Calephar (Euro, prototype)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
@@ -7917,7 +7917,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="calgamea" cloneof="calgame" supported="no">
 		<!-- SPS (CAPS) release 1447 -->
-		<description>California Games (Euro, Alt)</description>
+		<description>California Games (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
@@ -10267,7 +10267,7 @@ license:CC0
 	<!-- ATK test: C:79 H:U Bad -->
 	<software name="coloradoa" cloneof="colorado" supported="no">
 		<!-- SPS (CAPS) release 3088 -->
-		<description>Colorado (Euro, Alt)</description>
+		<description>Colorado (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -10594,7 +10594,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="corporat1" cloneof="corporat" supported="no">
 		<!-- SPS (CAPS) release 2858 -->
-		<description>Corporation (Euro, Alt)</description>
+		<description>Corporation (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -13581,7 +13581,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="drgnbretga" cloneof="drgnbret" supported="no">
 		<!-- SPS (CAPS) release 1272 -->
-		<description>Dragons Breath (Ger, Alt)</description>
+		<description>Dragons Breath (Ger, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -13646,7 +13646,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="dlairsc1" cloneof="dlairsc" supported="no">
 		<!-- SPS (CAPS) release 2495 -->
-		<description>Dragon's Lair: Escape from Singe's Castle (Euro, Alt)</description>
+		<description>Dragon's Lair: Escape from Singe's Castle (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -18404,7 +18404,7 @@ license:CC0
 	<!-- ATK test: C:1 Bad -->
 	<software name="fullmpa" cloneof="fullmp" supported="no">
 		<!-- SPS (CAPS) release 2566 -->
-		<description>Full Metal Planete (Euro, Alt)</description>
+		<description>Full Metal Planete (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -18831,7 +18831,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="galactica" cloneof="galactic" supported="no">
 		<!-- SPS (CAPS) release 682 -->
-		<description>Galactic Empire (Euro, Alt)</description>
+		<description>Galactic Empire (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -19815,7 +19815,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="godsa" cloneof="gods" supported="no">
 		<!-- SPS (CAPS) release 2877 -->
-		<description>Gods (Euro, v1.00, Alt)</description>
+		<description>Gods (Euro, v1.00, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -20267,7 +20267,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="gremlin2a" cloneof="gremlin2" supported="no">
 		<!-- SPS (CAPS) release 2208 -->
-		<description>Gremlins 2 - The New Batch (Euro, Alt)</description>
+		<description>Gremlins 2 - The New Batch (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -24107,7 +24107,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="jawsa" cloneof="jaws" supported="no">
 		<!-- SPS (CAPS) release 1184 -->
-		<description>Jaws (Euro, Alt)</description>
+		<description>Jaws (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -25316,7 +25316,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="koff2wca" cloneof="koff2wc" supported="no">
 		<!-- SPS (CAPS) release 1270 -->
-		<description>Kick Off 2 Plus World Cup '90 (Euro, Alt)</description>
+		<description>Kick Off 2 Plus World Cup '90 (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -25346,7 +25346,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="koff2wcg1" cloneof="koff2wc" supported="no">
 		<!-- SPS (CAPS) release 853 -->
-		<description>Kick Off 2 Plus World Cup '90 (Ger, Alt)</description>
+		<description>Kick Off 2 Plus World Cup '90 (Ger, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -25854,7 +25854,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U 1 Sector Bad -->
 	<software name="kingchica" cloneof="kingchic" supported="no">
 		<!-- SPS (CAPS) release 1795 -->
-		<description>The King of Chicago (Euro, Alt)</description>
+		<description>The King of Chicago (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
@@ -26945,7 +26945,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="legvalora" cloneof="legvalor" supported="no">
 		<!-- SPS (CAPS) release 838 -->
-		<description>Legends of Valour (Euro, Alt)</description>
+		<description>Legends of Valour (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -27317,7 +27317,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="lemmingsua" cloneof="lemmings" supported="no">
 		<!-- SPS (CAPS) release 1977 -->
-		<description>Lemmings (USA, Alt)</description>
+		<description>Lemmings (USA, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, NTSC) -->
 		<year>1991</year>
@@ -31078,7 +31078,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="murdera" cloneof="murder" supported="no">
 		<!-- SPS (CAPS) release 704 -->
-		<description>Murder (Euro, Alt)</description>
+		<description>Murder (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -31588,7 +31588,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="tnzsa" cloneof="tnzs" supported="no">
 		<!-- SPS (CAPS) release 2875 -->
-		<description>The New Zealand Story (Euro, Alt)</description>
+		<description>The New Zealand Story (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -31984,7 +31984,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="nobuddie" supported="no">
 		<!-- SPS (CAPS) release 2766 -->
-		<description>No Buddies Land (Euro, Prototype)</description>
+		<description>No Buddies Land (Euro, prototype)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
@@ -32053,7 +32053,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="no2prizea" cloneof="no2prize" supported="no">
 		<!-- SPS (CAPS) release 3060 -->
-		<description>No Second Prize (Euro, Alt)</description>
+		<description>No Second Prize (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -33641,7 +33641,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="parasola" cloneof="parasol" supported="no">
 		<!-- SPS (CAPS) release 2093 -->
-		<description>Parasol Stars - The Story of Rainbow Islands II (Euro, Alt)</description>
+		<description>Parasol Stars - The Story of Rainbow Islands II (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -34186,7 +34186,7 @@ license:CC0
 	<!-- ATK test: C:79 H:U 1 Sector Bad -->
 	<software name="pbmagica" cloneof="pbmagic" supported="no">
 		<!-- SPS (CAPS) release 2414 -->
-		<description>Pinball Magic (Euro, Alt)</description>
+		<description>Pinball Magic (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -35940,7 +35940,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="pushovera" cloneof="pushover" supported="no">
 		<!-- SPS (CAPS) release 1268 -->
-		<description>PushOver (Euro, Alt)</description>
+		<description>PushOver (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -36533,7 +36533,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="rbislanda" cloneof="rbisland" supported="no">
 		<!-- SPS (CAPS) release 26 -->
-		<description>Rainbow Islands (Euro, Alt)</description>
+		<description>Rainbow Islands (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -37256,7 +37256,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="rickdangb" cloneof="rickdang" supported="no">
 		<!-- SPS (CAPS) release 2372 -->
-		<description>Rick Dangerous (Euro, Alt, Unlimited Lives?)</description>
+		<description>Rick Dangerous (Euro, alt, unlimited lives?)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -39081,7 +39081,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="sensibcea" cloneof="sensibce" supported="no">
 		<!-- SPS (CAPS) release 2391 -->
-		<description>Sensible Soccer v1.1 (Euro, Alt)</description>
+		<description>Sensible Soccer v1.1 (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -39485,7 +39485,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="beasta" cloneof="beast" supported="no">
 		<!-- SPS (CAPS) release 1414 -->
-		<description>Shadow of the Beast (Euro, Alt)</description>
+		<description>Shadow of the Beast (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -39545,7 +39545,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="beast2a" cloneof="beast2" supported="no">
 		<!-- SPS (CAPS) release 1481 -->
-		<description>Shadow of the Beast II (Euro, Alt)</description>
+		<description>Shadow of the Beast II (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -39671,7 +39671,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="shadwara" cloneof="shadwar" supported="no">
 		<!-- SPS (CAPS) release 1679 -->
-		<description>Shadow Warriors (Euro, Alt)</description>
+		<description>Shadow Warriors (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
@@ -40171,7 +40171,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="silkworma" cloneof="silkworm" supported="no">
 		<!-- SPS (CAPS) release 2413 -->
-		<description>Silkworm (Euro, Alt)</description>
+		<description>Silkworm (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -40302,7 +40302,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="simcityb" cloneof="simcity" supported="no">
 		<!-- SPS (CAPS) release 1870 -->
-		<description>Sim City (Euro, 512k, Alt)</description>
+		<description>Sim City (Euro, 512k, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -40317,7 +40317,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="simcityc" cloneof="simcity" supported="no">
 		<!-- SPS (CAPS) release 2192 -->
-		<description>Sim City (Euro, 512k, Alt 2)</description>
+		<description>Sim City (Euro, 512k, alt 2)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -41317,7 +41317,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="snoopya" cloneof="snoopy" supported="no">
 		<!-- SPS (CAPS) release 2929 -->
-		<description>Snoopy - The Cool Computer Game (Euro, Alt)</description>
+		<description>Snoopy - The Cool Computer Game (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -41332,7 +41332,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="snowbros" supported="no">
 		<!-- SPS (CAPS) release 2601 -->
-		<description>Snow Bros. (Euro, Prototype)</description>
+		<description>Snow Bros. (Euro, prototype)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
@@ -41516,7 +41516,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="sonshush" supported="no">
 		<!-- SPS (CAPS) release 2513 -->
-		<description>Son Shu Shi (Euro, Prototype)</description>
+		<description>Son Shu Shi (Euro, prototype)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
@@ -42852,7 +42852,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="starwarsa" cloneof="starwars" supported="no">
 		<!-- SPS (CAPS) release 2926 -->
-		<description>Star Wars (Euro, Alt)</description>
+		<description>Star Wars (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
@@ -42970,7 +42970,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="stardusta" cloneof="stardust" supported="no">
 		<!-- SPS (CAPS) release 2103 -->
-		<description>Stardust (Euro, Alt)</description>
+		<description>Stardust (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -43557,7 +43557,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="sf2a" cloneof="sf2" supported="no">
 		<!-- SPS (CAPS) release 1371 -->
-		<description>Street Fighter II - The World Warrior (Euro, Alt)</description>
+		<description>Street Fighter II - The World Warrior (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -44336,7 +44336,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="ssinva" cloneof="ssinv" supported="no">
 		<!-- SPS (CAPS) release 2480 -->
-		<description>Super Space Invaders (Euro, Alt)</description>
+		<description>Super Space Invaders (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -45387,7 +45387,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="term2a" cloneof="term2" supported="no">
 		<!-- SPS (CAPS) release 2598 -->
-		<description>Terminator 2 - Judgment Day (Euro, Alt)</description>
+		<description>Terminator 2 - Judgment Day (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -45508,7 +45508,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U 1 Sector Bad -->
 	<software name="tdriva" cloneof="tdriv" supported="no">
 		<!-- SPS (CAPS) release 2094 -->
-		<description>Test Drive (Euro, Alt)</description>
+		<description>Test Drive (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
@@ -47705,7 +47705,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="turricn2a" cloneof="turricn2" supported="no">
 		<!-- SPS (CAPS) release 2634 -->
-		<description>Turrican II (Euro, Alt)</description>
+		<description>Turrican II (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -47952,7 +47952,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="typhoona" cloneof="typhoon" supported="no">
 		<!-- SPS (CAPS) release 1472 -->
-		<description>Typhoon (Euro, v1.01, Alt)</description>
+		<description>Typhoon (Euro, v1.01, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1987</year>
@@ -50879,7 +50879,7 @@ license:CC0
 	<!-- ATK test: failed -->
 	<software name="wwferta" cloneof="wwfert" supported="no">
 		<!-- SPS (CAPS) release 2449 -->
-		<description>WWF European Rampage Tour (Euro, Alt)</description>
+		<description>WWF European Rampage Tour (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
@@ -51104,7 +51104,7 @@ license:CC0
 	<!-- ATK test: C:0 H:U Bad -->
 	<software name="xenon2a" cloneof="xenon2" supported="no">
 		<!-- SPS (CAPS) release 2874 -->
-		<description>Xenon 2 - Megablast (Euro, Alt)</description>
+		<description>Xenon 2 - Megablast (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -51228,7 +51228,7 @@ license:CC0
 	<!-- ATK test: OK -->
 	<software name="xr35a" cloneof="xr35" supported="no">
 		<!-- SPS (CAPS) release 1110 -->
-		<description>XR-35 Fighter Mission (Euro, Alt)</description>
+		<description>XR-35 Fighter Mission (Euro, alt)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>

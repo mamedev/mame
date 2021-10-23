@@ -16,6 +16,7 @@
 #include "ui/ui.h"
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 
@@ -40,7 +41,7 @@ private:
 class menu_plugin_opt : public menu
 {
 public:
-	menu_plugin_opt(mame_ui_manager &mui, render_container &container, char *menu);
+	menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu);
 	virtual ~menu_plugin_opt();
 
 protected:
@@ -50,7 +51,9 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	std::string m_menu;
+	std::string const m_menu;
+	uint32_t m_process_flags;
+	bool m_need_idle;
 };
 
 } // namespace ui

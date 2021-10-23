@@ -68,6 +68,10 @@ void konmedal020_state::gs471_main(address_map &map)
 	map(0x3e0000, 0x3e1fff).ram();  // NVRAM?
 	map(0x800000, 0x8fffff).rw(m_vga, FUNC(oak_oti111_vga_device::mem_linear_r), FUNC(oak_oti111_vga_device::mem_linear_w));
 	map(0xe00000, 0xe0007f).rw(m_vga, FUNC(oak_oti111_vga_device::xga_read), FUNC(oak_oti111_vga_device::xga_write));
+	map(0xe00070, 0xe00071).lrw8([this](offs_t a){ return m_vga->xga_read(0x70 + (a ^ 1)); }, "srcxr",
+			[this](offs_t a, u8 data){ m_vga->xga_write(0x70 + (a ^ 1), data); }, "srcxw");
+	map(0xe00078, 0xe00079).lrw8([this](offs_t a){ return m_vga->xga_read(0x78 + (a ^ 1)); }, "dstxr",
+			[this](offs_t a, u8 data){ m_vga->xga_write(0x78 + (a ^ 1), data); }, "dstxw");
 	map(0xf003b0, 0xf003bf).rw(m_vga, FUNC(oak_oti111_vga_device::port_03b0_r), FUNC(oak_oti111_vga_device::port_03b0_w));
 	map(0xf003c0, 0xf003cf).rw(m_vga, FUNC(oak_oti111_vga_device::port_03c0_r), FUNC(oak_oti111_vga_device::port_03c0_w));
 	map(0xf003d0, 0xf003df).rw(m_vga, FUNC(oak_oti111_vga_device::port_03d0_r), FUNC(oak_oti111_vga_device::port_03d0_w));

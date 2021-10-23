@@ -380,7 +380,7 @@ static const nes_mmc mmc_list[] =
 	// 342 COOLGIRL homebrew
 	// 343 reset-based 4-in-1 pirate?
 	// 344 3/6-in-1 GN-26 multicart, not in nes.xml
-	// 345 BMC-L6IN1 multicart, not in nes.xml?
+	{ 345, BMC_L6IN1 },
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
 	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
 	{ 348, BMC_830118C },
@@ -391,7 +391,7 @@ static const nes_mmc mmc_list[] =
 	{ 353, BMC_810305C },          // Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
-	// 356 7-in-1 Rockman (JY-208)
+	{ 356, BMC_JY208 },
 	// 357 Bit Corp 4-in-1 (ID 4602)
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
@@ -407,7 +407,7 @@ static const nes_mmc mmc_list[] =
 	// 369 Super Mario Bros Party multicart
 	{ 370, BMC_F600 },              // Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart
-	// 372 Rockman 1-6 multicart very close to mapper 45
+	{ 372, BMC_SFC12 },
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
@@ -735,6 +735,11 @@ void nes_cart_slot_device::call_load_ines()
 				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			else if (submapper == 3)
 				pcb_id = IREM_HOLYDIVR;
+		}
+		// iNES Mapper 116
+		else if (mapper == 116 && submapper == 2)
+		{
+			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
 		}
 		// iNES Mapper 185
 		else if (mapper == 185)
@@ -1236,6 +1241,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 				pcb_id = JALECO_JF16;    // Mapper 78 is used for 2 diff boards
 			else if (submapper == 3)
 				pcb_id = IREM_HOLYDIVR;
+		}
+		// iNES Mapper 116
+		else if (mapper == 116 && submapper == 2)
+		{
+			pcb_id = SOMARI_HUANG2; // Mapper 116 is used for 2 diff boards
 		}
 	}
 

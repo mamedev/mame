@@ -12946,6 +12946,55 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="pga">
+		<description>PGA Tour Golf</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Sterling Silver Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PGA Tour Golf [Electronic Arts] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="6c98a89d" sha1="021fcded5606fd76bd65ddb0bb55a245764ba155"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgaa" cloneof="pga">
+		<description>PGA Tour Golf (alt)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Sterling Silver Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PGA Tour Golf (alt) [Electronic Arts] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="a6a0cffb" sha1="d6796468a21801d2b216ac5be14bd525fe4b3ceb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgab" cloneof="pga">
+		<description>PGA Tour Golf (Special Maxell edition)</description>
+		<year>1990</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Sterling Silver Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="PGA Tour Golf (Special Maxell edition) [Electronic Arts] [1990] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="c53b565e" sha1="4bbb3332c3ba4daf78e625cdf1c48868a4a07efc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgatc">
+		<description>PGA Tour Golf: Tournament Course Disk</description>
+		<year>1991</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Sterling Silver Software" />
+		<info name="usage" value="Requires PGA Tour Golf installed" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PGA Tour Golf - Tournament Course [Electronic Arts] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="90c61742" sha1="28d23b9822697c5623730d1a75e5b9cc236b9bf9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ppursuit">
 		<description>Pharaoh's Pursuit</description>
 		<year>1990</year>
@@ -13155,6 +13204,28 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="CGA/MCGA Data Disc"/>
 			<dataarea name="flop" size = "2152123">
 				<rom name="power drift disk 2.mfm" size="2152123" crc="0908919d" sha1="775e37a340f321d08faeae460953bf922b359c8e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmonger">
+		<description>PowerMonger</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Bullfrog Productions" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PowerMonger [Electronic Arts] [1992] [3.5DD] [Disk 1 of 3].img" size="737280" crc="65241a81" sha1="9b101351aa98f80d4725c33320f9d4836a27bee2"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PowerMonger [Electronic Arts] [1992] [3.5DD] [Disk 2 of 3].img" size="737280" crc="c50348fa" sha1="71ffeb80e0d0f2d8cbd739d3849c8aa6927d0673"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="PowerMonger [Electronic Arts] [1992] [3.5DD] [Disk 3 of 3].img" size="737280" crc="8c68f80d" sha1="aa74dea06253c1f34b55d7a7ab96d42229b303ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13647,7 +13718,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silpheed">
-		<description>Silpheed (5.25", 2.3, Sierra's Value Pack)</description>
+		<description>Silpheed (5.25", v2.3, Sierra's Value Pack)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Game Arts" />
@@ -13680,7 +13751,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silpheeda" cloneof="silpheed">
-		<description>Silpheed (5.25", 1.0)</description>
+		<description>Silpheed (5.25", v1.0)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Game Arts" />
@@ -13710,7 +13781,7 @@ has been replaced with an all-zero block. -->
 	<software name="silpheed35" cloneof="silpheed">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<!-- This version was only distributed with the IBM PS/1 Sound/Joystick Card and is newer than the boxed retail version of the game. -->
-		<description>Silpheed (3.5", 3.21, IBM Special Pak)</description>
+		<description>Silpheed (3.5", v3.21, IBM Special Pak)</description>
 		<year>1990</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Game Arts" />
@@ -13730,7 +13801,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="silpheed35a" cloneof="silpheed">
 		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
-		<description>Silpheed (3.5", 2.3, Sierra's Value Pack)</description>
+		<description>Silpheed (3.5", v2.3, Sierra's Value Pack)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Game Arts" />
@@ -13749,7 +13820,7 @@ has been replaced with an all-zero block. -->
 	</software>
 
 	<software name="silpheed35b" cloneof="silpheed">
-		<description>Silpheed (3.5", 1.0)</description>
+		<description>Silpheed (3.5", v1.0)</description>
 		<year>1989</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="developer" value="Game Arts" />
@@ -13762,6 +13833,24 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Silpheed (USA) (3.5'') (Disk 2).img" size="737280" crc="b1970f1b" sha1="d6ade8882cedf3218c161c116d045702c8f9ffb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="silpheed35c" cloneof="silpheed">
+		<description>Silpheed (3.5", v3.2)</description>
+		<year>1990</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Game Arts" />
+		<info name="version" value="3.2" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silpheed v3.2 [Sierra] [1990] [3.5DD] [Disk 1 of 2].img" size="737280" crc="f57d1e01" sha1="743cc2eef61921642a7b4529af0f45ebd900e92f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Silpheed v3.2 [Sierra] [1990] [3.5DD] [Disk 2 of 2].img" size="737280" crc="254d6941" sha1="81b6712eb18706f08055cb4921f3972f3c33d641"/>
 			</dataarea>
 		</part>
 	</software>

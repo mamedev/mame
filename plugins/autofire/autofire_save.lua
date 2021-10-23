@@ -50,13 +50,15 @@ end
 function lib:load_settings()
 	local buttons = {}
 	local json = require('json')
-	local file = io.open(get_settings_path() .. get_settings_filename(), 'r')
+	local filename = get_settings_path() .. get_settings_filename()
+	local file = io.open(filename, 'r')
 	if not file then
 		return buttons
 	end
 	local loaded_settings = json.parse(file:read('a'))
 	file:close()
 	if not loaded_settings then
+		emu.print_error(string.format('Error loading autofire settings: error parsing file "%s" as JSON\n', filename))
 		return buttons
 	end
 	for index, button_settings in ipairs(loaded_settings) do
@@ -74,6 +76,7 @@ function lib:save_settings(buttons)
 	if not attr then
 		lfs.mkdir(path)
 	elseif attr.mode ~= 'directory' then
+		emu.print_error(string.format('Error autofire settings macros: "%s" is not a directory\n', path))
 		return
 	end
 	if #buttons == 0 then
@@ -83,11 +86,14 @@ function lib:save_settings(buttons)
 	local json = require('json')
 	local settings = serialize_settings(buttons)
 	local data = json.stringify(settings, {indent = true})
-	local file = io.open(path .. get_settings_filename(), 'w')
-	if file then
-		file:write(data)
-		file:close()
+	local filename = path .. get_settings_filename()
+	local file = io.open(filename, 'w')
+	if not file then
+		emu.print_error(string.format('Error saving autofire settings: error opening file "%s" for writing\n', filename))
+		return
 	end
+	file:write(data)
+	file:close()
 end
 
 return lib

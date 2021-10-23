@@ -11,14 +11,16 @@ Some games start up and will accept credits, and the test mode works.
 
 Most games are multiball, and therefore may not respond further to inputs.
 
-Sound is missing/wrong in all games.
+Sound is missing/wrong in all games. Most sound boards need to be emulated.
 
-Some games have the slam switch as normally open instead of the usual closed.
- A few of these games can be fooled into starting by holding down the 0 key for a few seconds.
+The test rom says U4 is faulty. Using MOS6532_NEW fixes this error, but the games ramdomly slam-tilt instead.
 
-The test rom says U4 is faulty.
+'Master' has a different memory map, and there's jumps to apparently unused parts of the rom. (See @ 2020).
+ When it's displaying the high scores, it will run into the weeds after showing the first score.
 
 PinMAME used for the display character generator.
+
+When asked to enter your initials, use the Advance buttons to select a letter, and the Start button to enter it.
 
 *****************************************************************************************************************/
 
@@ -59,6 +61,7 @@ public:
 	void gts80b_s(machine_config &config);
 	void gts80b(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(slam_w);
+	void init_s80c();
 
 private:
 	u8 port1a_r();
@@ -76,9 +79,9 @@ private:
 	u8 m_soundex = 0;
 	u8 m_sol_state[9][2];
 	u8 m_dispcmd;
-	u8 m_port2b;
 	bool m_in_cmd_mode[2];
 	u8 m_digit[2];
+	bool m_slam_low = false;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -242,34 +245,34 @@ static INPUT_PORTS_START( gts80b )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP23")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP24")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP25")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP26")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP26")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP30")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP31")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP32")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP33")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP34")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP35")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("INP36")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP30")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP31")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP33")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP34")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP35")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP36")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP40")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP41")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP42")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP43")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP44")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP45")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP46")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP46")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START )
 
 	PORT_START("X5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP50")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP51")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP52")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP53")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME("INP54")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("INP55")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("INP56")
@@ -278,21 +281,21 @@ static INPUT_PORTS_START( gts80b )
 	PORT_START("X6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME("INP60")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("INP61")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP62")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("INP63")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP63")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP64")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP65")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP66")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP66")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP70")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP71")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP72")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP73")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP74")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F4) PORT_NAME("INP76")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X8")
@@ -301,7 +304,8 @@ INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( gts80b_state::slam_w )
 {
-	m_riot2->porta_in_set(newval ? 0x80 : 0, 0x80);
+	u8 val = m_slam_low ? 0 : 0x80;
+	m_riot2->porta_in_set(newval ? val : val^0x80, 0x80);
 }
 
 static const uint16_t patterns[] = {
@@ -338,7 +342,8 @@ u8 gts80b_state::port1a_r()
 
 u8 gts80b_state::port2a_r()
 {
-	return m_io_keyboard[8]->read(); // slam tilt
+	u8 val = m_slam_low ? 0x80 : 0;
+	return m_io_keyboard[8]->read() ^ val; // slam tilt
 }
 
 // sw strobes
@@ -350,16 +355,15 @@ void gts80b_state::port1b_w(u8 data)
 void gts80b_state::port2a_w(u8 data)
 {
 	if (BIT(data, 4))
-		m_dispcmd = (m_dispcmd & 0xf0) | m_port2b;
+		m_dispcmd = (m_dispcmd & 0xf0) | BIT(m_segment, 0, 4);
 	if (BIT(data, 5))
-		m_dispcmd = (m_dispcmd & 0x0f) | (m_port2b << 4);
+		m_dispcmd = (m_dispcmd & 0x0f) | (m_segment << 4);
 }
 
 //d0-3 data; d4-5 = which display enabled; d6 = display reset; d7 = dipsw enable
 void gts80b_state::port2b_w(u8 data)
 {
 	m_segment = data;
-	m_port2b = data & 15;
 	uint16_t segment;
 
 	// crude approximation of the Rockwell display chips
@@ -505,6 +509,9 @@ void gts80b_state::machine_start()
 	save_item(NAME(m_segment));
 	save_item(NAME(m_soundex));
 	save_item(NAME(m_sol_state));
+	save_item(NAME(m_dispcmd));
+	save_item(NAME(m_in_cmd_mode));
+	save_item(NAME(m_digit));
 }
 
 void gts80b_state::machine_reset()
@@ -521,6 +528,12 @@ void gts80b_state::machine_reset()
 	m_digit[1] = 0;
 }
 
+// The last bunch of machines has slam-tilt normally open
+void gts80b_state::init_s80c()
+{
+	m_slam_low = true;
+}
+
 
 /* with Sound Board */
 void gts80b_state::gts80b(machine_config &config)
@@ -535,21 +548,21 @@ void gts80b_state::gts80b(machine_config &config)
 	config.set_default_layout(layout_gts80b);
 
 	/* Devices */
-	riot6532_device &riot1(RIOT6532(config, "riot1", XTAL(3'579'545)/4));
-	riot1.in_pa_callback().set(FUNC(gts80b_state::port1a_r)); // sw_r
-	riot1.out_pb_callback().set(FUNC(gts80b_state::port1b_w)); // sw_w
-	riot1.irq_callback().set("irq", FUNC(input_merger_device::in_w<0>));
+	RIOT6532(config, m_riot1, XTAL(3'579'545)/4);
+	m_riot1->in_pa_callback().set(FUNC(gts80b_state::port1a_r)); // sw_r
+	m_riot1->out_pb_callback().set(FUNC(gts80b_state::port1b_w)); // sw_w
+	m_riot1->irq_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 
-	riot6532_device &riot2(RIOT6532(config, "riot2", XTAL(3'579'545)/4));
-	riot2.in_pa_callback().set(FUNC(gts80b_state::port2a_r)); // pa7 - slam tilt
-	riot2.out_pa_callback().set(FUNC(gts80b_state::port2a_w)); // digit select
-	riot2.out_pb_callback().set(FUNC(gts80b_state::port2b_w)); // seg
-	riot2.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+	RIOT6532(config, m_riot2, XTAL(3'579'545)/4);
+	m_riot2->in_pa_callback().set(FUNC(gts80b_state::port2a_r)); // pa7 - slam tilt
+	m_riot2->out_pa_callback().set(FUNC(gts80b_state::port2a_w)); // digit select
+	m_riot2->out_pb_callback().set(FUNC(gts80b_state::port2b_w)); // seg
+	m_riot2->irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 
-	riot6532_device &riot3(RIOT6532(config, "riot3", XTAL(3'579'545)/4));
-	riot3.out_pa_callback().set(FUNC(gts80b_state::port3a_w)); // sol, snd
-	riot3.out_pb_callback().set(FUNC(gts80b_state::port3b_w)); // lamps
-	riot3.irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
+	RIOT6532(config, m_riot3, XTAL(3'579'545)/4);
+	m_riot3->out_pa_callback().set(FUNC(gts80b_state::port3a_w)); // sol, snd
+	m_riot3->out_pb_callback().set(FUNC(gts80b_state::port3b_w)); // lamps
+	m_riot3->irq_callback().set("irq", FUNC(input_merger_device::in_w<2>));
 
 	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set_inputline("maincpu", m6502_device::IRQ_LINE);
 
@@ -602,6 +615,193 @@ void gts80b_state::bonebstr(machine_config &config)
 //  gts80s_b3a(config);
 }
 
+/* SYSTEM-80B ALTERNATE ROMS =======================================================================
+
+This is a list of known alternate roms. Nothing has been tested. Comments are derived from the roms.
+Loading address is not shown. In some cases, suffix X = French, suffix Y = German, no suffix = English.
+The majority of these are freeplay roms from flipprojets.
+
+Amazon Hunt II
+ROM_LOAD( "prom1_684c.bin", 0x000000, 0x002000, CRC(fe08af7d) SHA1(54ea8205f649c9ab8a62354b023acf823c24fc1f) )
+
+Amazon Hunt III
+ROM_LOAD( "prom1_684d.bin", 0x000000, 0x002000, CRC(7db1a9a9) SHA1(41927730ae4571d0a0488baee4d10b756524440e) )
+ROM_LOAD( "684d-1-cpu_fp.rom", 0x000000, 0x002000, CRC(6110c1f0) SHA1(e478510b02fa7d26c0c619f2bfdadd1503a1f6d1) )
+
+Arena
+ROM_LOAD( "prom1_709.bin", 0x000000, 0x002000, CRC(33ade406) SHA1(daea04b9ccd95b2e4ee3d45ad8ea6e1851cf8cc6) )
+ROM_LOAD( "prom2_709.bin", 0x000000, 0x000800, CRC(4783b689) SHA1(d10d4cbf8d00c9d0db57cdac32ef96498275eea6) )
+ROM_LOAD( "prom1_709x.bin", 0x000000, 0x002000, CRC(7389f4dc) SHA1(3dc72f011ebb2debbc005761da4b9720a279db2a) )
+ROM_LOAD( "prom2_709x.bin", 0x000000, 0x000800, CRC(49b127d8) SHA1(0436f83e969b4bfc7edaf881bf7556a868c88cdc) )
+ROM_LOAD( "prom1_709y.bin", 0x000000, 0x002000, CRC(d41ce2b1) SHA1(044fd0bcabb317d0fa84ff17036f6dba90201cbf) )
+ROM_LOAD( "prom2_709y.bin", 0x000000, 0x000800, CRC(e170d1cd) SHA1(bd7919eb9e480309f794ac25a371c7b818dcd01b) )
+ROM_LOAD( "prom1_709a.bin", 0x000000, 0x002000, CRC(21f500cb) SHA1(ce76a8a5eb71e57aca70880a2e40979f083173ef) )
+ROM_LOAD( "prom2_709a.bin", 0x000000, 0x000800, CRC(13c8813b) SHA1(756e3583fd55b72e0bfb15e9b4a60740b389ca2e) )
+
+Bad Girls
+ROM_LOAD( "prom1_717.bin", 0x000000, 0x002000, CRC(05e8259b) SHA1(d1e4e50e44e215dcfa510e4d45d6c39e136452b1) )
+ROM_LOAD( "prom2_717.bin", 0x000000, 0x001000, CRC(583933ec) SHA1(89da6750d779d68db578715b058f9321695b79b0) )
+ROM_LOAD( "prom1_717x.bin", 0x000000, 0x002000, CRC(32f42091) SHA1(0709f251b5633a68a93066721d105141fb79d74a) )
+ROM_LOAD( "prom2_717x.bin", 0x000000, 0x001000, CRC(58c35099) SHA1(ff76bd28175ea0f5d0437c16c5ae6886339edfe2) )
+ROM_LOAD( "prom1_717y.bin", 0x000000, 0x002000, CRC(34a93b4b) SHA1(14522c5c1c476d5507100d3554db6c2236d48df3) )
+ROM_LOAD( "prom2_717y.bin", 0x000000, 0x001000, CRC(55aa30ac) SHA1(9544485ccf52a2ad51a00cce0c12871db099699f) )
+
+Big House
+ROM_LOAD( "prom1_713.bin", 0x000000, 0x002000, CRC(8a8510a2) SHA1(729a7254d00fee7c4aa29684e944df4eab113565) )
+ROM_LOAD( "prom2_713.bin", 0x000000, 0x001000, CRC(047c8ef5) SHA1(3afa2a0011b724836b69b2ef386597e0953dfadf) )
+ROM_LOAD( "prom1_713x.bin", 0x000000, 0x002000, CRC(51012001) SHA1(5ad45694273234b2d13028b90c2a58245394095e) )
+ROM_LOAD( "prom2_713x.bin", 0x000000, 0x001000, CRC(767efc44) SHA1(6b8f9a580e6a6ad92c9efe9f4345496d5063b7a8) )
+ROM_LOAD( "prom1_713y.bin", 0x000000, 0x002000, CRC(8f51d4c3) SHA1(972582aedfdbccd7a14d841b4ec156ab73e8c88f) )
+ROM_LOAD( "prom2_713y.bin", 0x000000, 0x001000, CRC(214f0afb) SHA1(9874773e4ffa2472e78d42dfa9e21a621bf7b49e) )
+
+Bone Busters
+ROM_LOAD( "prom1_719.bin", 0x000000, 0x002000, CRC(c5914b1f) SHA1(599a6da358d294304e07425fdde3f1ece0f4f57a) )
+ROM_LOAD( "prom2_719.bin", 0x000000, 0x001000, CRC(681643df) SHA1(76af6951e4403b4951298d35a9058bcebfa6bc43) )
+ROM_LOAD( "prom1_719x.bin", 0x000000, 0x002000, CRC(5aa1bb17) SHA1(6499608e83261c1fd152e9bf982ce1470b6edf93) )
+ROM_LOAD( "prom2_719x.bin", 0x000000, 0x001000, CRC(73b6486e) SHA1(1baf17f31b16d564ed5e3bdf9f74b21f83ed76fa) )
+ROM_LOAD( "prom1_719y.bin", 0x000000, 0x002000, CRC(0063411b) SHA1(8bf7350acff3ac7d76ed2dee42aceee1de486497) )
+ROM_LOAD( "prom2_719y.bin", 0x000000, 0x001000, CRC(3b85c8bd) SHA1(5c99349dc3ae05b82932d6ec9d2d1a29c2a7e36d) )
+
+Bounty Hunter
+ROM_LOAD( "prom1_694.bin", 0x000000, 0x002000, CRC(9e68b714) SHA1(bb33b1e8fb50776731c450e2c05c49dcd5535f41) )
+ROM_LOAD( "prom1_694y.bin", 0x000000, 0x002000, CRC(07b9333f) SHA1(1355201be26ac8f7bca96275443e33c9a01eedf3) )
+
+Chicago Cubs Triple Play
+ROM_LOAD( "prom1_f1.cpu", 0x000000, 0x002000, CRC(4b58be44) SHA1(db7734692b3ff158cbd229b2d3ca723cfe963c7b) )
+ROM_LOAD( "prom1_fp.cpu", 0x000000, 0x002000, CRC(521946d4) SHA1(527ed3f221e0ca5fe1778e3095c9b8a414911206) )
+ROM_LOAD( "prom1_696.bin", 0x000000, 0x002000, CRC(4bc2371f) SHA1(fea37984e7b7833ea1fac3f3a82758c87b6d629c) )
+ROM_LOAD( "prom1_696y.bin", 0x000000, 0x002000, CRC(7b6e6819) SHA1(ca2a739301a8be1ff7dd139171cd28f29d5aad59) )
+
+Diamond Lady
+ROM_LOAD( "prom1_711.bin", 0x000000, 0x002000, CRC(eef4da86) SHA1(74b274adfddc29fed91d00af52fc4e477b571fe8) )
+ROM_LOAD( "prom2_711.bin", 0x000000, 0x000800, CRC(862951dc) SHA1(b15899ecf7ec869e3722cef3f5c16b0dadd2514e) )
+ROM_LOAD( "prom2_711x.bin", 0x000000, 0x000800, CRC(943019a8) SHA1(558c3696339bb6e150b4ddb499bc60897d5954ec) )
+ROM_LOAD( "prom1_711x.bin", 0x000000, 0x002000, CRC(1d7feafd) SHA1(70f02157fcd94ff7b66750054b542642a3a051b2) )
+ROM_LOAD( "prom1_711y.bin", 0x000000, 0x002000, CRC(4a070002) SHA1(80f1b2bd36c7133d92a35fb995cf268ff4259e86) )
+ROM_LOAD( "prom2_711y.bin", 0x000000, 0x000800, CRC(f0ef69f6) SHA1(1f48bb656bb20073e2ff261199cb94919f0bb2ab) )
+
+Excalibur
+ROM_LOAD( "prom1_715.bin", 0x000000, 0x002000, CRC(86cf464b) SHA1(c857187e6f3dd1f5b5013c95d3ded8a9a5a2e485) )
+ROM_LOAD( "prom2_715.bin", 0x000000, 0x001000, CRC(082d64ab) SHA1(0eae3b549839fc281d2487d483d0b4e723ebdc48) )
+ROM_LOAD( "prom1_715x.bin", 0x000000, 0x002000, CRC(65601620) SHA1(d8a0f13618f5af4954e0079890ad1ce6ae490d57) )
+ROM_LOAD( "prom2_715x.bin", 0x000000, 0x001000, CRC(499e2e41) SHA1(1e3fcba18882bd7df30a43843916aa5d7968eecc) )
+ROM_LOAD( "prom1_715y.bin", 0x000000, 0x002000, CRC(76d20188) SHA1(fd822702a6ad880b88f88886b752d7a1087095fd) )
+ROM_LOAD( "prom2_715y.bin", 0x000000, 0x001000, CRC(49079396) SHA1(92361a87464e39afeb74fe531b7d4356323405b8) )
+
+Genesis
+ROM_LOAD( "prom1_705.bin", 0x000000, 0x002000, CRC(662722b1) SHA1(1a7cf2f6cf92b5e6a288272ff785f215b241842f) )
+ROM_LOAD( "prom2_705.bin", 0x000000, 0x000800, CRC(ac9f3a0f) SHA1(0e44888dc046121794e824d128628f991245c1cb) )
+ROM_LOAD( "prom1_705x.bin", 0x000000, 0x002000, CRC(4d94f012) SHA1(8da4793345365330d13873edee9ffded173ed935) )
+ROM_LOAD( "prom2_705x.bin", 0x000000, 0x000800, CRC(ea7f824f) SHA1(45f619153e0584cffd33e6e09e6f5a97ab9522b2) )
+ROM_LOAD( "prom1_705y.bin", 0x000000, 0x002000, CRC(24af8cef) SHA1(4b54f5ed32afc11bf3dc8b16e046add6ddbf93ab) )
+ROM_LOAD( "prom2_705y.bin", 0x000000, 0x000800, CRC(e8fc30af) SHA1(2401bff3cf566cae4e6de6167fa004c5fe232928) )
+
+Gold Wings
+ROM_LOAD( "prom1_707.bin", 0x000000, 0x002000, CRC(58f19602) SHA1(b17c7aadcb314e6639446ed08de7666f5ea3dd66) )
+ROM_LOAD( "prom2_707.bin", 0x000000, 0x000800, CRC(a5318c20) SHA1(8b4dcf45b13657ff753237a2e7d0352fda7755ef) )
+ROM_LOAD( "prom1_707x.bin", 0x000000, 0x002000, CRC(90dd07b7) SHA1(0058812c0ba94e4bb62579e84bc3f61918d2e6ab) )
+ROM_LOAD( "prom2_707x.bin", 0x000000, 0x000800, CRC(50337adf) SHA1(dc286d52e6872edd68af442cbd0442babc174b93) )
+ROM_LOAD( "prom1_707y.bin", 0x000000, 0x002000, CRC(912c5086) SHA1(ecd8d42ebc0840098b9ee3a6b9fe8fde4cb1467f) )
+ROM_LOAD( "prom2_707y.bin", 0x000000, 0x000800, CRC(f69c963c) SHA1(9e39344ecfcca1115e12c559c66eaa21716c0ce2) )
+
+Hollywood Heat
+ROM_LOAD( "prom1_703.bin", 0x000000, 0x002000, CRC(63bc8395) SHA1(b4007b5a6b78e162c9b3e0243f01fa30501323ae) )
+ROM_LOAD( "prom2_703.bin", 0x000000, 0x000800, CRC(a465e5f3) SHA1(56afa2f67aebcd17345bba76ecb814653719ee7b) )
+ROM_LOAD( "prom1_703x.bin", 0x000000, 0x002000, CRC(9b7df518) SHA1(02c649370c3424929813dcf8321bcc5f8cc85c88) )
+ROM_LOAD( "prom2_703x.bin", 0x000000, 0x000800, CRC(969ca81f) SHA1(2606a0f63434056c5d2b509a885c9919a7a5d70f) )
+ROM_LOAD( "prom1_703y.bin", 0x000000, 0x002000, CRC(11fa2432) SHA1(c08a7481d5d2f74ead9de1b0c8816d3dbf321f0f) )
+ROM_LOAD( "prom2_703y.bin", 0x000000, 0x000800, CRC(bf60b631) SHA1(944089895d4253dd094a8f6b7168f9e62a75568a) )
+
+Hot Shots
+ROM_LOAD( "prom1_718.bin", 0x000000, 0x002000, CRC(74c0f7d7) SHA1(7af87d03fb604e7192ff4ee7581c034e8b2556da) )
+ROM_LOAD( "prom2_718.bin", 0x000000, 0x001000, CRC(7695c7db) SHA1(90188ff83b888262ba849e5af9d99145c5bc1c30) )
+ROM_LOAD( "prom2_718x.bin", 0x000000, 0x001000, CRC(476e260c) SHA1(2b88920c77462d190f9b98aebf8fcb5c9e853ecd) )
+ROM_LOAD( "prom1_718x.bin", 0x000000, 0x002000, CRC(dedba56b) SHA1(b9b435173f1325e57532c7001777dec862213d97) )
+ROM_LOAD( "prom1_718y.bin", 0x000000, 0x002000, CRC(dca0b300) SHA1(d7473ea1398dff2bd861d4b49b0cee2764599b34) )
+ROM_LOAD( "prom2_718y.bin", 0x000000, 0x001000, CRC(7e2f0d59) SHA1(b8a7b9be3e4d705631e017da87b27be53ed23f30) )
+
+Monte Carlo
+ROM_LOAD( "prom1_708.bin", 0x000000, 0x002000, CRC(5b703cf8) SHA1(dfb3eb886675989a1bbae7a2581e522869d81392) )
+ROM_LOAD( "prom2_708.bin", 0x000000, 0x000800, CRC(6860e315) SHA1(cecb1815334506dfebf29efe3e4e2a838010e8db) )
+ROM_LOAD( "prom1_708x.bin", 0x000000, 0x002000, CRC(dbe0f749) SHA1(2a1fc7606dbc99ac534901ed91943d6dd49bd4e2) )
+ROM_LOAD( "prom2_708x.bin", 0x000000, 0x000800, CRC(f6842631) SHA1(7447994d2055c7fa12aaf35e93436ee829f5b7ae) )
+ROM_LOAD( "prom1_708y.bin", 0x000000, 0x002000, CRC(bcf93933) SHA1(846c7d7c1da7516dbe0d19b4fc87eecfb69b13c1) )
+ROM_LOAD( "prom2_708y.bin", 0x000000, 0x000800, CRC(2a5e0c4f) SHA1(b386168bd911b9977104c47da962d0248f22614b) )
+ROM_LOAD( "prom1_708a.bin", 0x000000, 0x002000, CRC(25787b75) SHA1(f8ad7a22018b5414bf1ea412004ee63cb55c2036) )
+ROM_LOAD( "prom2_708a.bin", 0x000000, 0x000800, CRC(5dd75c06) SHA1(911f7e56b7602c9bc9b51dde7719d3e0562f0702) )
+ROM_LOAD( "prom1_708a.bin", 0x000000, 0x002000, CRC(d47c24ae) SHA1(034ae4515e3ab94b054e85aef96f4376b43a1157) )
+ROM_LOAD( "prom2_708a.bin", 0x000000, 0x000800, CRC(8e72a68f) SHA1(8320c44020f7d5f9e887b17556252f1c617235ac) )
+
+Night Moves
+ROM_LOAD( "prom1_c101.bin", 0x000000, 0x002000, CRC(1cd28cac) SHA1(304139bcd4d496f913399d9945a46aadf32078f9) )
+ROM_LOAD( "prom2_c101.bin", 0x000000, 0x001000, CRC(a2bc00e4) SHA1(5c3e9033f5c72b87058b2f70a0ff0811cc6770fa) )
+
+Raven
+ROM_LOAD( "prom1r.cpu",   0x000000, 0x002000, CRC(51629598) SHA1(a5408fad2baec43633f407665f006fae74f3d9aa) )  // Rambo hack
+ROM_LOAD( "prom2a.cpu",   0x000000, 0x000800, CRC(a693785e) SHA1(7c8878f1c3c5205b3ae46a78c881bbd2b722838d) )  // Rambo hack
+ROM_LOAD( "prom1_702.bin", 0x000000, 0x002000, CRC(d6e5120b) SHA1(1d00bce8170b5ad4185e6517ba1a0f46c8ae7444) )
+ROM_LOAD( "prom2_702.bin", 0x000000, 0x000800, CRC(481f3fb8) SHA1(22ffa55ed362219ebedbc40edcf866ff152a01b9) )
+ROM_LOAD( "prom2_702y.bin", 0x000000, 0x000800, CRC(4ca540a5) SHA1(50bb240465d80b7763574e1261f8d0ddda5ad587) )
+ROM_LOAD( "prom1_702y.bin", 0x000000, 0x002000, CRC(ab3bbef5) SHA1(199ebb3359a1617148264b307b8b294c037f27a4) )
+ROM_LOAD( "prom1_702a.bin", 0x000000, 0x002000, CRC(d6e5120b) SHA1(1d00bce8170b5ad4185e6517ba1a0f46c8ae7444) )
+ROM_LOAD( "prom2_702a.bin", 0x000000, 0x000800, CRC(a693785e) SHA1(7c8878f1c3c5205b3ae46a78c881bbd2b722838d) )
+
+Robo-War
+ROM_LOAD( "prom1_714.bin", 0x000000, 0x002000, CRC(96da77eb) SHA1(402208f5ac52d8f1e7193bf7c86faa106afe3492) )
+ROM_LOAD( "prom2_714.bin", 0x000000, 0x000800, CRC(893177ed) SHA1(791540a64d498979e5b0c8baf4ceb2fd5ff7f047) )
+ROM_LOAD( "prom1_714x.bin", 0x000000, 0x002000, CRC(51cd5108) SHA1(9ba30ba0eaaabc8e60c79dc2322aeec51e4de09a) )
+ROM_LOAD( "prom2_714x.bin", 0x000000, 0x000800, CRC(1afa0e69) SHA1(178813494b877ac9ca36863661596b4df04df1bb) )
+
+Rock
+ROM_LOAD( "prom1_697.bin", 0x000000, 0x002000, CRC(77736ac3) SHA1(30c6322dcda033cbd1cbda5f1bfe97c2067c37f5) )
+ROM_LOAD( "prom1_697y.bin", 0x000000, 0x002000, CRC(792b4be4) SHA1(4ee2755024dcc31aaa4cb3b4266fa48291e49d23) )
+
+Rock Encore
+ROM_LOAD( "prom1c.cpu",   0x000000, 0x002000, CRC(410d02f6) SHA1(87968576bf5dcca886bcadd4ab379fff080e6eeb) )  // Clash hack
+ROM_LOAD( "prom1_704.bin", 0x000000, 0x002000, CRC(77736ac3) SHA1(30c6322dcda033cbd1cbda5f1bfe97c2067c37f5) )
+ROM_LOAD( "prom1_704y.bin", 0x000000, 0x002000, CRC(792b4be4) SHA1(4ee2755024dcc31aaa4cb3b4266fa48291e49d23) )
+
+Spring Break
+ROM_LOAD( "prom1_706.bin", 0x000000, 0x002000, CRC(2424a214) SHA1(d4d48082652e99731833fbb57a1c04fea6b564b0) )
+ROM_LOAD( "prom2_706.bin", 0x000000, 0x000800, CRC(47171062) SHA1(0d2e7777f695ab22170be861019c05ddeade5f85) )
+ROM_LOAD( "prom1_706s.bin", 0x000000, 0x002000, CRC(dc956db7) SHA1(8bdb357c0a4c78967b4bb053f9d807897a28ad88) )
+ROM_LOAD( "prom2_706s.bin", 0x000000, 0x000800, CRC(911cd14f) SHA1(2bc3ff6a3889da69b97f8ec318f93208e3d42cfe) )
+ROM_LOAD( "prom1_706x.bin", 0x000000, 0x002000, CRC(8866bddf) SHA1(e8e54dbd5887241d96f21cb878024436e35f4e40) )
+ROM_LOAD( "prom2_706x.bin", 0x000000, 0x000800, CRC(c0ee0555) SHA1(3d2aef5a8a6452f9f87b4ec2040643dda5843ebd) )
+ROM_LOAD( "prom1_706y.bin", 0x000000, 0x002000, CRC(11ae0ad4) SHA1(b187c31a0fc2aa7f53655820be26e370e379004c) )
+ROM_LOAD( "prom2_706y.bin", 0x000000, 0x000800, CRC(fa4b750d) SHA1(89f797f65fc18473419080810bca4590f77e2502) )
+ROM_LOAD( "prom1_706a.bin", 0x000000, 0x002000, CRC(3638cb30) SHA1(6c19ca94255a3dbceb8dd33b2e56287836b1ecba) )
+ROM_LOAD( "prom2_706a.bin", 0x000000, 0x000800, CRC(d9d841b4) SHA1(8b9773e5ae9917d27089deca3b8311cb74e7f88e) )
+
+Tag Team
+ROM_LOAD( "prom1_698.bin", 0x000000, 0x002000, CRC(3f052c44) SHA1(176fbe35a4ad5832b1ba61889a858b8585dc86be) )
+ROM_LOAD( "prom2_698.bin", 0x000000, 0x000800, CRC(fd1615ce) SHA1(3a6c3525552286b86e5340af2bf196f12adc9b35) )
+ROM_LOAD( "prom1_698y.bin", 0x000000, 0x002000, CRC(ae1ed7a2) SHA1(e1f640bd350c8c9edc8742de897d92bb58950c3c) )
+ROM_LOAD( "prom2_698y.bin", 0x000000, 0x000800, CRC(5e6d2da7) SHA1(9b23d1ac34163edeaceffe806a2a559f3d408b41) )
+ROM_LOAD( "prom1_698a.bin", 0x000000, 0x002000, CRC(9c2c0058) SHA1(92e28a0e5fb454b046d1cd365e39ebdd6fa6baf1) )
+ROM_LOAD( "prom2_698a.bin", 0x000000, 0x000800, CRC(6d56b636) SHA1(8f50f2742be727835e7343307787b4b5daa1623a) )
+
+TX-Sector
+ROM_LOAD( "prom1_712.bin", 0x000000, 0x002000, CRC(13283b01) SHA1(e4e0602ead0ec4d4f54a39df3d08b1aaeb92f1ca) )
+ROM_LOAD( "prom2_712.bin", 0x000000, 0x000800, CRC(f12514e6) SHA1(80bca17c33df99ed1a7acc21f7f70ea90e7c0463) )
+ROM_LOAD( "prom1_712x.bin", 0x000000, 0x002000, CRC(45e47931) SHA1(a92d323c4892cd1aa429cd884a8f1d33f0379667) )
+ROM_LOAD( "prom2_712x.bin", 0x000000, 0x000800, CRC(1bd08247) SHA1(968cc30e5e5c783e73cb3278a58189c4f8b8186f) )
+ROM_LOAD( "prom1_712y.bin", 0x000000, 0x002000, CRC(0c374395) SHA1(52a7035598ba83aaf149550e7d08190f9773c25a) )
+ROM_LOAD( "prom2_712y.bin", 0x000000, 0x000800, CRC(2b17261f) SHA1(a3195190c0d5116b60e487a7b7f3a28c1f110e89) )
+
+Victory
+ROM_LOAD( "prom1_710.bin", 0x000000, 0x002000, CRC(3eba52ec) SHA1(e3cbdd803373e614c5b9bb5e61c9e2dfcf25df6c) )
+ROM_LOAD( "prom2_710.bin", 0x000000, 0x000800, CRC(6a42eaf4) SHA1(3e28b01473266db463986a4283e1be85f2410fb1) )
+ROM_LOAD( "prom1_710x.bin", 0x000000, 0x002000, CRC(a626da77) SHA1(300674ffb48deed503aae62a3b53b9941058605b) )
+ROM_LOAD( "prom2_710x.bin", 0x000000, 0x000800, CRC(dffcfa77) SHA1(3efaca85295ca55268b8d7c7cfe8f09f159d5fbd) )
+ROM_LOAD( "prom1_710y.bin", 0x000000, 0x002000, CRC(6daebe71) SHA1(bc49c074210f3f3cc5314282e32cebb7ce67a81d) )
+ROM_LOAD( "prom2_710y.bin", 0x000000, 0x000800, CRC(b191a87a) SHA1(f205ffb41c5ba34e3cefc96ca870a5d08bee8854) )
+
+Unknown - these are for this hardware, but it's not known which specific machine they work on
+ROM_LOAD( "prom1_bb.cpu", 0x000000, 0x002000, CRC(a035eb2d) SHA1(0f467b506bd514129e4175af3e35a666e09ec41b) )  // Beach Bums hack
+ROM_LOAD( "prom1_b.cpu",  0x000000, 0x002000, CRC(6556d711) SHA1(9d0ccaf05d0aa5a68e5514a2ade7773959868bbb) )  // Bubba the Redneck Werewolf hack
+
+*/
 
 /*-------------------------------------------------------------------
 / Ace High (#700) 1985 (Prototype)
@@ -1879,9 +2079,10 @@ ROM_START(s80btest)
 	ROM_RELOAD(0xe000, 0x2000)
 
 	ROM_REGION(0x10000, "cpu3", ROMREGION_ERASEFF)
+	ROM_LOAD("testd.snd", 0x8000, 0x2000, CRC(5d04a6d9) SHA1(f83bd8692146af7d234c1a32d0b688e76d1b2b85))
 
 	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("testd.snd", 0x8000, 0x2000, CRC(5d04a6d9) SHA1(f83bd8692146af7d234c1a32d0b688e76d1b2b85))
+	ROM_LOAD("testy.snd", 0x8000, 0x2000, CRC(bd998860) SHA1(8a23376cc646c9854af204e32034bf40ebe23656) )
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -1983,26 +2184,26 @@ GAME(1988, diamondpg, diamondp, gts80b_s2, gts80b, gts80b_state, empty_init, ROT
 GAME(1988, txsector,  0,        gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "TX-Sector",                                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, txsectorf, txsector, gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "TX-Sector (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, txsectorg, txsector, gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "TX-Sector (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, bighouse,  0,        gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Big House",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, bighousef, bighouse, gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Big House (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, bighouseg, bighouse, gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Big House (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, bighouse,  0,        gts80b_s3, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, bighousef, bighouse, gts80b_s3, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, bighouseg, bighouse, gts80b_s3, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Big House (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, robowars,  0,        gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Robo-War",                                  MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, robowarsf, robowars, gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Robo-War (French)",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, excalibr,  0,        gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Excalibur",                                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, excalibrf, excalibr, gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Excalibur (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, excalibrg, excalibr, gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Excalibur (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988, badgirls,  0,        gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Bad Girls",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988, badgirlsf, badgirls, gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Bad Girls (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1988, badgirlsg, badgirls, gts80b_s3, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Bad Girls (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, hotshots,  0,        gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Hot Shots",                                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, hotshotsf, hotshots, gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Hot Shots (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, hotshotsg, hotshots, gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Hot Shots (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, bonebstr,  0,        bonebstr,  gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Bone Busters Inc.",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, bonebstrf, bonebstr, bonebstr,  gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Bone Busters Inc. (French)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, bonebstrg, bonebstr, bonebstr,  gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Bone Busters Inc. (German)",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989, nmoves,    0,        gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "International Concepts", "Night Moves",                               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, amazonh3,  0,        gts80b_s1, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Amazon Hunt III (French)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1987, amazonh3a, amazonh3, gts80b_s1, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "Amazon Hunt III (rev. 1, French)",          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988, badgirls,  0,        gts80b_s3, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988, badgirlsf, badgirls, gts80b_s3, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1988, badgirlsg, badgirls, gts80b_s3, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bad Girls (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, hotshots,  0,        gts80b_s2, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots",                                 MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, hotshotsf, hotshots, gts80b_s2, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, hotshotsg, hotshots, gts80b_s2, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Hot Shots (German)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, bonebstr,  0,        bonebstr,  gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc.",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, bonebstrf, bonebstr, bonebstr,  gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc. (French)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, bonebstrg, bonebstr, bonebstr,  gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Bone Busters Inc. (German)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989, nmoves,    0,        gts80b_s2, gts80b, gts80b_state, init_s80c,  ROT0, "International Concepts", "Night Moves",                               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, amazonh3,  0,        gts80b_s1, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Amazon Hunt III (French)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987, amazonh3a, amazonh3, gts80b_s1, gts80b, gts80b_state, init_s80c,  ROT0, "Gottlieb",               "Amazon Hunt III (rev. 1, French)",          MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?, s80btest,  0,        gts80b_s2, gts80b, gts80b_state, empty_init, ROT0, "Gottlieb",               "System 80B Test",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, mmmaster,  0,        gts80b_s1, gts80b, gts80b_state, empty_init, ROT0, "ManilaMatic",            "Master",                                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1988, topsound,  0,        gts80b_s1, gts80b, gts80b_state, empty_init, ROT0, "ManilaMatic",            "Top Sound (French)",                        MACHINE_IS_SKELETON_MECHANICAL)
