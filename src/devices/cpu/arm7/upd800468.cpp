@@ -145,9 +145,9 @@ void upd800468_device::device_add_mconfig(machine_config &config)
 	m_vic->out_irq_cb().set_inputline(DEVICE_SELF, ARM7_IRQ_LINE);
 	m_vic->out_fiq_cb().set_inputline(DEVICE_SELF, ARM7_FIRQ_LINE);
 
-	UPD800468_TIMER(config, m_timer[0], clock());
-	UPD800468_TIMER(config, m_timer[1], clock());
-	UPD800468_TIMER(config, m_timer[2], clock());
+	UPD800468_TIMER(config, m_timer[0], clock() >> 3);
+	UPD800468_TIMER(config, m_timer[1], clock() >> 3);
+	UPD800468_TIMER(config, m_timer[2], clock() >> 3);
 	m_timer[0]->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<21>));
 	m_timer[1]->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<22>));
 	m_timer[2]->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<23>));
@@ -199,7 +199,7 @@ u8 upd800468_device::port_ddr_r(offs_t num)
 void upd800468_device::port_ddr_w(offs_t num, u8 data)
 {
 	m_port_ddr[num] = data;
-	logerror("ddr_w: %02x\n", data);
+//	logerror("ddr_w: %02x\n", data);
 	port_update(num);
 }
 
@@ -216,7 +216,7 @@ void upd800468_device::port_w(offs_t num, u8 data)
 
 void upd800468_device::port_update(offs_t num)
 {
-	logerror("out: %02x\n", m_port_data[num] & m_port_ddr[num]);
+//	logerror("out: %02x\n", m_port_data[num] & m_port_ddr[num]);
 	m_out_cb[num](m_port_data[num] & m_port_ddr[num]);
 }
 

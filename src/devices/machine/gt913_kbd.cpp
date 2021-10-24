@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(GT913_KBD_HLE, gt913_kbd_hle_device, "gt913_kbd_hle", "Casio 
 
 gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GT913_KBD_HLE, tag, owner, clock),
-	device_matrix_keyboard_interface(mconfig, *this, "KO0", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12"),
+	device_matrix_keyboard_interface(mconfig, *this, "FI0", "FI1", "FI2", "FI3", "FI4", "FI5", "FI6", "FI7", "FI8", "FI9", "FI10", "KI0", "KI1", "KI2"),
 	m_velocity(*this, "VELOCITY"),
 	m_irq_cb(*this)
 {

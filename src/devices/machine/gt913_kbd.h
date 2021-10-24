@@ -17,7 +17,7 @@
 
 // ======================> gt913_kbd_hle_device
 
-class gt913_kbd_hle_device : public device_t, protected device_matrix_keyboard_interface<13>
+class gt913_kbd_hle_device : public device_t, protected device_matrix_keyboard_interface<14>
 {
 public:
 	// construction/destruction
