@@ -210,6 +210,7 @@ public:
 	void stars_update_origin();
 	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask);
 	void null_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void galaxian_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
 	void galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void background_draw_colorsplit(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t color, int split, int split_flipped);
 	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
@@ -813,6 +814,8 @@ public:
 	}
 
 	void monsterz(machine_config& config);
+
+	void init_monsterz();
 
 protected:
 	virtual void machine_start() override;

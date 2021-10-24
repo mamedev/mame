@@ -930,12 +930,8 @@ void galaxian_state::null_draw_background(bitmap_rgb32 &bitmap, const rectangle 
 }
 
 
-
-void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void galaxian_state::galaxian_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx)
 {
-	/* erase the background to black first */
-	bitmap.fill(rgb_t::black(), cliprect);
-
 	/* update the star origin to the current frame */
 	stars_update_origin();
 
@@ -948,9 +944,18 @@ void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectan
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint32_t star_offs = m_star_rng_origin + y * 512;
-			stars_draw_row(bitmap, 256, y, star_offs, 0xff);
+			stars_draw_row(bitmap, maxx, y, star_offs, 0xff);
 		}
 	}
+}
+
+
+void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	/* erase the background to black first */
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	galaxian_draw_stars(bitmap, cliprect, 256);
 }
 
 

@@ -686,7 +686,6 @@ TODO:
 - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode) + fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
 - timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
 - monsterz : galaxian_state::sprites_draw "the first three sprites match against y-1", it looks like y+1 for this game (probably also applies to sfx)
-- monsterz : stars should scroll?
 - zigzag   : full Dip Switches and Inputs
 - zigzag2  : full Dip Switches and Inputs
 - jumpbug  : full Dip Switches and Inputs - missing possible discrete sounds
@@ -8887,6 +8886,12 @@ void nihon_sfx_state::init_sfx()
 	m_sfx_tilemap = true;
 }
 
+void monsterz_state::init_monsterz()
+{
+	init_sfx();
+	m_draw_background_ptr = draw_background_delegate(&galaxian_state::galaxian_draw_background, this);
+}
+
 
 void galaxian_state::init_atlantis()
 {
@@ -15522,10 +15527,10 @@ GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state,     i
 GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 // SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player
-GAME( 1983, sfx,         0,        sfx,        sfx,        nihon_sfx_state, init_sfx,  ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skelagon,    sfx,      sfx,        sfx,        nihon_sfx_state, init_sfx,  ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu USA license)", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, monsterz,    0,        monsterz,   monsterz,   monsterz_state,  init_sfx,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, monsterza,   monsterz, monsterz,   monsterz,   monsterz_state,  init_sfx,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sfx,         0,        sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skelagon,    sfx,      sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu USA license)", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, monsterz,    0,        monsterz,   monsterz,   monsterz_state,  init_monsterz,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, monsterza,   monsterz, monsterz,   monsterz,   monsterz_state,  init_monsterz,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 2)", MACHINE_SUPPORTS_SAVE )
 
 
 /*
