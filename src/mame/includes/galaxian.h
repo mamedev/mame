@@ -779,36 +779,56 @@ public:
 	}
 
 	void sfx(machine_config &config);
-	void monsterz(machine_config &config);
 
 	void init_sfx();
 
 protected:
 	virtual void machine_start() override;
 
-private:
 	uint8_t sample_io_r(offs_t offset);
 	void sample_io_w(offs_t offset, uint8_t data);
 	void sample_control_w(uint8_t data);
-
-	uint8_t monsterz_protection_r();
-	void monsterz_porta_1_w(uint8_t data);
-	void monsterz_portb_1_w(uint8_t data);
-	void monsterz_portc_1_w(uint8_t data);
-	void monsterz_set_latch();
 
 	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void sfx_map(address_map &map);
 	void sfx_sample_map(address_map &map);
 	void sfx_sample_portmap(address_map &map);
-	void monsterz_map(address_map &map);
-	void monsterz_sound_map(address_map &map);
 
 	required_device<cpu_device> m_audio2;
 	required_device<dac_byte_interface> m_dac;
 
 	uint8_t m_sample_control;
+};
+
+
+class monsterz_state : public taiyo_sfx_state
+{
+public:
+	monsterz_state(const machine_config& mconfig, device_type type, const char* tag)
+		: taiyo_sfx_state(mconfig, type, tag)
+		, m_dac2(*this, "dac2")
+	{
+	}
+
+	void monsterz(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	void monsterz_map(address_map& map);
+	void monsterz_sound_map(address_map& map);
+	void monsterz_sound_portmap(address_map& map);
+	void monsterz_sample_map(address_map& map);
+	void monsterz_ay8910_w(offs_t offset, uint8_t data);
+
+	required_device<dac_byte_interface> m_dac2;
+
+	uint32_t m_monsterz_shift;
+	uint32_t m_monsterz_shift2;
+	uint8_t m_monsterz_audio_portb;
+	uint8_t m_monsterz_sample_portc;
 };
 
 
