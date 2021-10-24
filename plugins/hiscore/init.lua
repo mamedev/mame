@@ -1,5 +1,5 @@
 -- hiscore.lua
--- by borgar@borgar.net, WTFPL license
+-- by borgar@borgar.net, CC0 license
 --
 -- This uses MAME's built-in Lua scripting to implement
 -- high-score saving with hiscore.dat infom just as older
@@ -9,7 +9,7 @@ local exports = {
 	name = 'hiscore',
 	version = '1.0.0',
 	description = 'Hiscore',
-	license = 'WTFPL license',
+	license = 'CC0',
 	author = { name = 'borgar@borgar.net' } }
 
 local hiscore = exports
