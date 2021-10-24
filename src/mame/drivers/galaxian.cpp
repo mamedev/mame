@@ -7886,14 +7886,20 @@ void monsterz_state::monsterz(machine_config &config)
 	m_ay8910[0]->port_b_write_callback().set([this](uint8_t data)
 		{
 			if ((m_monsterz_audio_portb & 0x01) && !(data & 0x01))
+			{
+				machine().scheduler().boost_interleave(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
 				m_maincpu->set_input_line(0, HOLD_LINE);
+			}
 			m_monsterz_audio_portb = data;
 		});
 
 	m_ppi8255[2]->out_pc_callback().set([this](uint8_t data)
 		{
 			if ((m_monsterz_sample_portc & 0x01) && !(data & 0x01))
+			{
+				machine().scheduler().boost_interleave(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
 				m_audiocpu->set_input_line(0, HOLD_LINE);
+			}
 			m_monsterz_sample_portc = data;
 		});
 
