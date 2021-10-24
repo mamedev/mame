@@ -19,7 +19,7 @@
 #define SONIC3_DEBUG (LOG_GENERAL | LOG_INTERRUPT)
 #define SONIC3_TRACE (SONIC3_DEBUG | LOG_DATA)
 
-#define VERBOSE SONIC3_DEBUG
+// #define VERBOSE SONIC3_DEBUG
 
 #include "logmacro.h"
 
@@ -219,7 +219,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
     if (m_sonic3_reg.rx_count > DMA_START || m_sonic3_reg.tx_count > DMA_START)
     {
         // Schedule another run if needed
-        m_dma_check->adjust(attotime::from_usec(DMA_TIMER));
+        m_dma_check->adjust(attotime::from_nsec(DMA_TIMER));
     }
 }
 

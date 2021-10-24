@@ -79,7 +79,7 @@ protected:
     // APbus DMA
     // TODO: Actual frequency, since we don't have DRQ to implictly rate limit
     //       Might be the APbus frequency.
-    const int DMA_TIMER = 1;
+    const int DMA_TIMER = 100;
     device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
     required_address_space m_bus;
     emu_timer *m_dma_check;

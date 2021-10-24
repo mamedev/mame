@@ -27,7 +27,7 @@
 
 #include "cxd8442q.h"
 
-#define VERBOSE 1
+// #define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIFOQ")

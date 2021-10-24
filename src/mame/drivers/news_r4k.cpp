@@ -95,7 +95,6 @@
  *
  *  TODO before opening first MR:
  *  - SPIFI3 refactoring
- *  - WSC-SONIC3 cleanup
  *  - Save state support
  */
 
