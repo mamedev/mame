@@ -768,10 +768,10 @@ private:
 };
 
 
-class taiyo_sfx_state : public galaxian_state
+class nihon_sfx_state : public galaxian_state
 {
 public:
-	taiyo_sfx_state(const machine_config &mconfig, device_type type, const char *tag)
+	nihon_sfx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: galaxian_state(mconfig, type, tag)
 		, m_audio2(*this, "audio2")
 		, m_dac(*this, "dac")
@@ -790,6 +790,7 @@ protected:
 	void sample_control_w(uint8_t data);
 
 	void sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sfx_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 
 	void sfx_map(address_map &map);
 	void sfx_sample_map(address_map &map);
@@ -802,11 +803,11 @@ protected:
 };
 
 
-class monsterz_state : public taiyo_sfx_state
+class monsterz_state : public nihon_sfx_state
 {
 public:
 	monsterz_state(const machine_config& mconfig, device_type type, const char* tag)
-		: taiyo_sfx_state(mconfig, type, tag)
+		: nihon_sfx_state(mconfig, type, tag)
 		, m_dac2(*this, "dac2")
 	{
 	}

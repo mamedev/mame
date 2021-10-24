@@ -1066,7 +1066,7 @@ void galaxian_state::turtles_draw_background(bitmap_rgb32 &bitmap, const rectang
 }
 
 
-void taiyo_sfx_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void nihon_sfx_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// current schematics are unreadable, assuming like Turtles
 	bitmap.fill(rgb_t(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
@@ -1227,6 +1227,12 @@ void galaxian_state::theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &c
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
+}
+
+
+void nihon_sfx_state::sfx_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+{
+	scramble_draw_bullet(bitmap, cliprect, offs, x + 16, y);
 }
 
 
