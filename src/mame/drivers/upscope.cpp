@@ -37,11 +37,11 @@
 class upscope_state : public amiga_state
 {
 public:
-	upscope_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_prev_cia1_porta(0xff),
-		m_parallel_data(0xff),
-		m_ppi(*this, "ppi")
+	upscope_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_prev_cia1_porta(0xff)
+		, m_parallel_data(0xff)
+		, m_ppi(*this, "ppi")
 	{ }
 
 	void upscope(machine_config &config);

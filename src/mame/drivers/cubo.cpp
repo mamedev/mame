@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Dirk Best,Stephane Humbert
+// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Dirk Best, Stephane Humbert
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)
@@ -328,11 +328,11 @@ routines :
 class cubo_state : public amiga_state
 {
 public:
-	cubo_state(const machine_config &mconfig, device_type type, const char *tag) :
-	amiga_state(mconfig, type, tag),
-	m_player_ports(*this, {"P1", "P2"}),
-	m_microtouch(*this, "microtouch"),
-	m_cdda(*this, "cdda")
+	cubo_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_player_ports(*this, {"P1", "P2"})
+		, m_microtouch(*this, "microtouch")
+		, m_cdda(*this, "cdda")
 	{ }
 
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);

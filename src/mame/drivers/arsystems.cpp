@@ -67,8 +67,7 @@ public:
 		: amiga_state(mconfig, type, tag)
 		, m_bios_region(*this, "user2")
 		, m_rom_board(*this, "user3")
-	{
-	}
+	{ }
 
 	void arcadia(machine_config &config);
 	void argh(machine_config &config);

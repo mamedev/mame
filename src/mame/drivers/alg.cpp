@@ -60,14 +60,14 @@ namespace {
 class alg_state : public amiga_state
 {
 public:
-	alg_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_laserdisc(*this, "laserdisc"),
-		m_gun1x(*this, "GUN1X"),
-		m_gun1y(*this, "GUN1Y"),
-		m_gun2x(*this, "GUN2X"),
-		m_gun2y(*this, "GUN2Y"),
-		m_triggers(*this, "TRIGGERS")
+	alg_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_laserdisc(*this, "laserdisc")
+		, m_gun1x(*this, "GUN1X")
+		, m_gun1y(*this, "GUN1Y")
+		, m_gun2x(*this, "GUN2X")
+		, m_gun2y(*this, "GUN2Y")
+		, m_triggers(*this, "TRIGGERS")
 	{ }
 
 	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);

@@ -227,10 +227,10 @@ DEFINE_DEVICE_TYPE(A1000_KBRESET, a1000_kbreset_device, "a1000kbrst", "Amiga 100
 class a1000_state : public amiga_state
 {
 public:
-	a1000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_bootrom(*this, "bootrom"),
-		m_wom(*this, "wom")
+	a1000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_bootrom(*this, "bootrom")
+		, m_wom(*this, "wom")
 	{ }
 
 	void init_pal();
@@ -256,12 +256,12 @@ private:
 class a2000_state : public amiga_state
 {
 public:
-	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_rtc(*this, "u65"),
-		m_zorro(*this, "zorrobus"),
-		m_zorro2_int2(0),
-		m_zorro2_int6(0)
+	a2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_rtc(*this, "u65")
+		, m_zorro(*this, "zorrobus")
+		, m_zorro2_int2(0)
+		, m_zorro2_int6(0)
 	{ }
 
 	void init_pal();
@@ -296,11 +296,11 @@ private:
 class a500_state : public amiga_state
 {
 public:
-	a500_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_side(*this, EXP_SLOT_TAG),
-		m_side_int2(0),
-		m_side_int6(0)
+	a500_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_side(*this, EXP_SLOT_TAG)
+		, m_side_int2(0)
+		, m_side_int6(0)
 	{ }
 
 	void init_pal();
@@ -331,14 +331,14 @@ private:
 class cdtv_state : public amiga_state
 {
 public:
-	cdtv_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_rtc(*this, "u61"),
-		m_dmac(*this, "u36"),
-		m_tpi(*this, "u32"),
-		m_cdrom(*this, "cdrom"),
-		m_dmac_irq(0),
-		m_tpi_irq(0)
+	cdtv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_rtc(*this, "u61")
+		, m_dmac(*this, "u36")
+		, m_tpi(*this, "u32")
+		, m_cdrom(*this, "cdrom")
+		, m_dmac_irq(0)
+		, m_tpi_irq(0)
 	{ }
 
 	void init_pal();
@@ -381,8 +381,8 @@ private:
 class a3000_state : public amiga_state
 {
 public:
-	a3000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag)
+	a3000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
 	{ }
 
 	u32 scsi_r(offs_t offset, u32 mem_mask = ~0);
@@ -404,12 +404,12 @@ private:
 class a500p_state : public amiga_state
 {
 public:
-	a500p_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_rtc(*this, "u9"),
-		m_side(*this, EXP_SLOT_TAG),
-		m_side_int2(0),
-		m_side_int6(0)
+	a500p_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_rtc(*this, "u9")
+		, m_side(*this, EXP_SLOT_TAG)
+		, m_side_int2(0)
+		, m_side_int6(0)
 	{ }
 
 	u16 clock_r(offs_t offset);
@@ -441,9 +441,9 @@ private:
 class a600_state : public amiga_state
 {
 public:
-	a600_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_gayle_int2(0)
+	a600_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_gayle_int2(0)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
@@ -466,9 +466,9 @@ private:
 class a1200_state : public amiga_state
 {
 public:
-	a1200_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_gayle_int2(0)
+	a1200_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_gayle_int2(0)
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
@@ -491,14 +491,14 @@ private:
 class a4000_state : public amiga_state
 {
 public:
-	a4000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_ata(*this, "ata"),
-		m_ramsey_config(0),
-		m_gary_coldboot(1),
-		m_gary_timeout(0),
-		m_gary_toenb(0),
-		m_ide_interrupt(0)
+	a4000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_ata(*this, "ata")
+		, m_ramsey_config(0)
+		, m_gary_coldboot(1)
+		, m_gary_timeout(0)
+		, m_gary_toenb(0)
+		, m_ide_interrupt(0)
 	{ }
 
 	u32 scsi_r(offs_t offset, u32 mem_mask = ~0);
@@ -536,10 +536,10 @@ private:
 class cd32_state : public amiga_state
 {
 public:
-	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
-		amiga_state(mconfig, type, tag),
-		m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"}),
-		m_cdda(*this, "cdda")
+	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
+		: amiga_state(mconfig, type, tag)
+		, m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"})
+		, m_cdda(*this, "cdda")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER( akiko_int_w );
