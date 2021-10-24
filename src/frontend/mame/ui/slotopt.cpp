@@ -221,7 +221,7 @@ void menu_slot_devices::custom_render(void *selectedref, float top, float bottom
 		draw_text_box(
 				std::begin(text), std::end(text),
 				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
 }

@@ -9,6 +9,16 @@ license:CC0
 Cartridges(MCU+ROM) for Entex Select-A-Game Machine, note that the manual and
 label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartridge"
 
+Games released, MCU:
+- Baseball 4       - HD38800
+- Basketball 3     - HD38800
+- Football 4       - TMS1670
+- Pac-Man 2        - HD38800
+- Pinball          - HD38800
+- Space Invader 2  - HD38800
+
+Battleship and Turtles were announced but unreleased.
+
 -->
 
 <softwarelist name="entex_sag" description="Select-A-Game cartridges">

@@ -556,7 +556,7 @@ void nes_sachen_3014_device::write_h(offs_t offset, u8 data)
 
 u8 nes_sachen_3014_device::read_h(offs_t offset)
 {
-//	LOG_MMC(("Sachen 3014 read_h, offset: %04x\n", offset));
+//  LOG_MMC(("Sachen 3014 read_h, offset: %04x\n", offset));
 	u8 temp = hi_access_rom(offset);
 
 	if ((offset & 0x7000) == 0x6000)

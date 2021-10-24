@@ -91,12 +91,12 @@ public:
 	void pengou(machine_config &config);
 	void pengo(machine_config &config);
 
-	void init_penta();
+	void init_pengo6();
 
 private:
 	template <uint8_t Which> DECLARE_WRITE_LINE_MEMBER(coin_counter_w);
 
-	void decode_penta(int end, int nodecend);
+	void decode_pengo6(int end, int nodecend);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<ls259_device> m_latch;
@@ -448,7 +448,7 @@ void pengo_state::jrpacmbl(machine_config &config)
  *************************************/
 
 
-ROM_START( pengo )
+ROM_START( pengo ) // Uses Sega 315-5010 encrypted Z80 CPU
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-1689c.ic8",  0x0000, 0x1000, CRC(f37066a8) SHA1(0930de17a763a527057f60783a92662b09554426) )
 	ROM_LOAD( "epr-1690b.ic7",  0x1000, 0x1000, CRC(baf48143) SHA1(4c97529e61eeca5d94938b1dfbeac41bf8cbaf7d) )
@@ -475,7 +475,7 @@ ROM_START( pengo )
 ROM_END
 
 
-ROM_START( pengo2 )
+ROM_START( pengo2 ) // Uses Sega 315-5010 encrypted Z80 CPU
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic8.2",          0x0000, 0x1000, CRC(e4924b7b) SHA1(44297658af8f8c884eba02b792346c5008137dfe) )
 	ROM_LOAD( "ic7.2",          0x1000, 0x1000, CRC(72e7775d) SHA1(49e04178ee171f727dd023c019395679cfbad452) )
@@ -556,7 +556,7 @@ ROM_START( pengo3u ) //  Sega game ID# 834-5091 PENGO
 ROM_END
 
 
-ROM_START( pengo4 ) // Sega game ID# 834-5081 PENGO (REV.A of this set known to exist, but not currently dumped)
+ROM_START( pengo4 ) // Sega game ID# 834-5081 PENGO (REV.A of this set known to exist, but not currently dumped) - Uses Sega 315-5010 encrypted Z80 CPU
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-1738.ic8",    0x0000, 0x1000, CRC(68ba25ea) SHA1(ce937831b7b210b4a625514bd4e6b3a7a36d008e) )
 	ROM_LOAD( "epr-1739.ic7",    0x1000, 0x1000, CRC(41e7b5b3) SHA1(d512d41ee3f5716070250e7ab63342e4fbf92875) )
@@ -595,7 +595,7 @@ A PCB (not dumped) with dated ROMs like the set below has been seen with later d
 
 PCB labeled as 834-5081 PENGO REV.A
 */
-ROM_START( pengo5 ) // Sega game ID# 834-5081 PENGO - PCB has an additional label Bally N.E.
+ROM_START( pengo5 ) // Sega game ID# 834-5081 PENGO - PCB has an additional label Bally N.E. - Uses Sega 315-5010 encrypted Z80 CPU
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0_oct6-82.ic8",    0x0000, 0x1000, CRC(43e45441) SHA1(e94a9f9971e57cd53fe425059a6cb7cadbd206f1) )
 	ROM_LOAD( "1_oct11-82.ic7",   0x1000, 0x1000, CRC(30a52a90) SHA1(e5ff7e16f40b42e56847d63ecbf4a0793f510c42) )
@@ -621,7 +621,7 @@ ROM_START( pengo5 ) // Sega game ID# 834-5081 PENGO - PCB has an additional labe
 	ROM_LOAD( "pr1636.ic70",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // timing - not used
 ROM_END
 
-ROM_START( pengo6 ) // Sega game ID# 834-5078 PENGO  REV.A - Uses Sega 315-5007 encrypted Z80 CPU. Same encryption as bootlegs pengob and penta and not one of the standard Sega ones. Why?
+ROM_START( pengo6 ) // Sega game ID# 834-5078 PENGO  REV.A - Uses Sega 315-5007 encrypted Z80 CPU
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-1701a.ic8",  0x0000, 0x1000, CRC(6ad6b227) SHA1(818f061009597d467af0156aa7e6e367369c421b) )
 	ROM_LOAD( "epr-1702.ic7",   0x1000, 0x1000, CRC(cea1e8d1) SHA1(ac04d55c8cf20db9edc80788424b5c0c3b4ff446) )
@@ -647,20 +647,18 @@ ROM_START( pengo6 ) // Sega game ID# 834-5078 PENGO  REV.A - Uses Sega 315-5007 
 	ROM_LOAD( "pr1636.ic70",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // timing - not used
 ROM_END
 
-ROM_START( pengob )
+ROM_START( pengob ) // based on pengo6, uses daughterboard with a Z80 plus additional circuitry to replicate Sega's 315-5007 encryption
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1",            0x0000, 0x2000, CRC(e04064db) SHA1(6689066b443807646894a357317f468bfc92368a) )
-	ROM_LOAD( "2",            0x2000, 0x2000, CRC(75752424) SHA1(634e696a692c7245dfa5c5dfd4ce87755c2a90d4) )
-	ROM_LOAD( "021_pn03.bin", 0x4000, 0x1000, CRC(7824e3ef) SHA1(3395bb537614de8da763d05f0d2e312145017e8f) ) // 3 (1/2)
-	ROM_LOAD( "020_pn07.bin", 0x5000, 0x1000, CRC(377b9663) SHA1(35327dc0f0c19fa5a863aaf8d8f3bfcd2a5717a9) ) // 3 (2/2)
-	ROM_LOAD( "032_pn04.bin", 0x6000, 0x1000, CRC(bfde44c1) SHA1(97e8a360ce09faa36d864d7020b1669a349867c6) ) // 4 (1/2)
-	ROM_LOAD( "031_pn08.bin", 0x7000, 0x1000, CRC(64e8c30d) SHA1(aa50c21db2ac8361fc575f0785e2aae57f338564) ) // 4 (2/2)
+	ROM_LOAD( "1", 0x0000, 0x2000, CRC(e04064db) SHA1(6689066b443807646894a357317f468bfc92368a) ) // == epr-1701a.ic8 + epr-1702.ic7
+	ROM_LOAD( "2", 0x2000, 0x2000, CRC(75752424) SHA1(634e696a692c7245dfa5c5dfd4ce87755c2a90d4) ) //           (2/2) == epr-1704.ic14
+	ROM_LOAD( "3", 0x4000, 0x2000, CRC(9269931d) SHA1(d77fbbf1baddcdb5d0c4ae6cd750ee2bf6efb9bf) ) // == epr-1705.ic21 + epr-1706.ic20
+	ROM_LOAD( "4", 0x6000, 0x2000, CRC(10e36e9e) SHA1(b4e91deb020c97c7d9eb70d4643c5245485533e7) ) // == epr-1707.ic32 + epr-1708a.ic31
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "5",              0x0000, 0x1000, CRC(1232437b) SHA1(7ec410a2a802514449ccb05684762c25f29556b0) ) // tiles (bank 1)
-	ROM_CONTINUE(               0x2000, 0x1000 ) // sprites (bank 1)
-	ROM_LOAD( "epr-1695.ic105", 0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) // tiles (bank 2)
-	ROM_CONTINUE(               0x3000, 0x1000 ) // sprites (bank 2)
+	ROM_LOAD( "5", 0x0000, 0x1000, CRC(1232437b) SHA1(7ec410a2a802514449ccb05684762c25f29556b0) ) // tiles (bank 1)
+	ROM_CONTINUE(  0x2000, 0x1000 ) // sprites (bank 1)
+	ROM_LOAD( "6", 0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) // tiles (bank 2)  == epr-1695.ic105
+	ROM_CONTINUE(  0x3000, 0x1000 ) // sprites (bank 2)
 
 	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "pr1633.ic78",    0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) // color palette
@@ -672,22 +670,22 @@ ROM_START( pengob )
 ROM_END
 
 
-ROM_START( penta )
+ROM_START( penta ) // based on pengo6, uses daughterboard with a Z80 plus additional circuitry to replicate Sega's 315-5007 encryption
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "008_pn01.bin", 0x0000, 0x1000, CRC(22f328df) SHA1(ba13b8d20ccde995a158cf62b4bc48cb369a0788) )
 	ROM_LOAD( "007_pn05.bin", 0x1000, 0x1000, CRC(15bbc7d3) SHA1(1823e3ba7388d3f4d9262e9b9cf70f123862c546) )
 	ROM_LOAD( "015_pn02.bin", 0x2000, 0x1000, CRC(de82b74a) SHA1(301c1223dd0b111f8439affcb96b6e29106364ed) )
-	ROM_LOAD( "014_pn06.bin", 0x3000, 0x1000, CRC(160f3836) SHA1(ff90c82d52ed0c2c17a7aeabc9401ee9d8cf4d2d) )
-	ROM_LOAD( "021_pn03.bin", 0x4000, 0x1000, CRC(7824e3ef) SHA1(3395bb537614de8da763d05f0d2e312145017e8f) )
-	ROM_LOAD( "020_pn07.bin", 0x5000, 0x1000, CRC(377b9663) SHA1(35327dc0f0c19fa5a863aaf8d8f3bfcd2a5717a9) )
-	ROM_LOAD( "032_pn04.bin", 0x6000, 0x1000, CRC(bfde44c1) SHA1(97e8a360ce09faa36d864d7020b1669a349867c6) )
-	ROM_LOAD( "031_pn08.bin", 0x7000, 0x1000, CRC(64e8c30d) SHA1(aa50c21db2ac8361fc575f0785e2aae57f338564) )
+	ROM_LOAD( "014_pn06.bin", 0x3000, 0x1000, CRC(160f3836) SHA1(ff90c82d52ed0c2c17a7aeabc9401ee9d8cf4d2d) ) // == epr-1704.ic14
+	ROM_LOAD( "021_pn03.bin", 0x4000, 0x1000, CRC(7824e3ef) SHA1(3395bb537614de8da763d05f0d2e312145017e8f) ) // == epr-1705.ic21
+	ROM_LOAD( "020_pn07.bin", 0x5000, 0x1000, CRC(377b9663) SHA1(35327dc0f0c19fa5a863aaf8d8f3bfcd2a5717a9) ) // == epr-1706.ic20
+	ROM_LOAD( "032_pn04.bin", 0x6000, 0x1000, CRC(bfde44c1) SHA1(97e8a360ce09faa36d864d7020b1669a349867c6) ) // == epr-1707.ic32
+	ROM_LOAD( "031_pn08.bin", 0x7000, 0x1000, CRC(64e8c30d) SHA1(aa50c21db2ac8361fc575f0785e2aae57f338564) ) // == epr-1708a.ic31
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "092_pn09.bin",   0x0000, 0x1000, CRC(6afeba9d) SHA1(cd723fb94aa90dbaac9a6fe085c0f4786d2fa092) ) // tiles (bank 1)
-	ROM_CONTINUE(               0x2000, 0x1000 ) // sprites (bank 1)
-	ROM_LOAD( "epr-1695.ic105", 0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) // tiles (bank 2)
-	ROM_CONTINUE(               0x3000, 0x1000 ) // sprites (bank 2)
+	ROM_LOAD( "092_pn09.bin", 0x0000, 0x1000, CRC(6afeba9d) SHA1(cd723fb94aa90dbaac9a6fe085c0f4786d2fa092) ) // tiles (bank 1)
+	ROM_CONTINUE(             0x2000, 0x1000 ) // sprites (bank 1)
+	ROM_LOAD( "105_pn10.bin", 0x1000, 0x1000, CRC(5bfd26e9) SHA1(bdec535e486b43a8f5550334beff423eeace10b2) ) // tiles (bank 2)  == epr-1695.ic105
+	ROM_CONTINUE(             0x3000, 0x1000 ) // sprites (bank 2)
 
 	ROM_REGION( 0x0420, "proms", 0 )
 	ROM_LOAD( "pr1633.ic78",    0x0000, 0x0020, CRC(3a5844ec) SHA1(680eab0e1204c9b74adc11588461651b474021bb) ) // color palette
@@ -734,11 +732,12 @@ ROM_END
  *************************************/
 
 
-
-void pengo_state::decode_penta(int end, int nodecend)
+void pengo_state::decode_pengo6(int end, int nodecend)
 {
 /*
-    the values vary, but the translation mask is always laid out like this:
+    Sega 315-5007 decryption
+
+    The values vary, but the translation mask is always laid out like this:
 
       0 1 2 3 4 5 6 7 8 9 a b c d e f
     0 A A B B A A B B C C D D C C D D
@@ -807,9 +806,9 @@ void pengo_state::decode_penta(int end, int nodecend)
 	}
 }
 
-void pengo_state::init_penta()
+void pengo_state::init_pengo6()
 {
-	decode_penta(0x8000, 0x8000);
+	decode_pengo6(0x8000, 0x8000);
 }
 
 } // Anonymous namespace
@@ -823,11 +822,11 @@ void pengo_state::init_penta()
 
 GAME( 1982, pengo,    0,        pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 1 rev C, encrypted)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1982, pengo2,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2, encrypted)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2, rev A, not encrypted)", MACHINE_SUPPORTS_SAVE ) /* Sega game ID# 834-5092 PENGO REV.A */
-GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 3, not encrypted)",        MACHINE_SUPPORTS_SAVE ) /* Sega game ID# 834-5091 PENGO */
-GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 4, encrypted)",            MACHINE_SUPPORTS_SAVE ) /* Sega game ID# 834-5081 PENGO */
+GAME( 1982, pengo2u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 2, rev A, not encrypted)", MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5092 PENGO REV.A
+GAME( 1982, pengo3u,  pengo,    pengou,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 3, not encrypted)",        MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5091 PENGO
+GAME( 1982, pengo4,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 4, encrypted)",            MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5081 PENGO
 GAME( 1982, pengo5,   pengo,    pengoe,   pengo,    pengo_state, empty_init,  ROT90, "Sega",                     "Pengo (set 5, encrypted)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pengo6,   pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "Sega",                     "Pengo (set 6, encrypted)",            MACHINE_SUPPORTS_SAVE ) /* Sega game ID# 834-5078 PENGO REV.A */
-GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg",                  "Pengo (bootleg)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_penta,  ROT90, "bootleg (Grinbee Shouji)", "Penta",                               MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
+GAME( 1982, pengo6,   pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "Sega",                     "Pengo (set 6, encrypted)",            MACHINE_SUPPORTS_SAVE ) // Sega game ID# 834-5078 PENGO REV.A
+GAME( 1982, pengob,   pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "bootleg",                  "Pengo (bootleg)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, penta,    pengo,    pengo,    pengo,    pengo_state, init_pengo6, ROT90, "bootleg (Grinbee Shouji)", "Penta",                               MACHINE_SUPPORTS_SAVE ) // Grinbee Shouji was a subsidiary of Orca
 GAME( 1983, jrpacmbl, jrpacman, jrpacmbl, jrpacmbl, pengo_state, empty_init,  ROT90, "bootleg",                  "Jr. Pac-Man (Pengo hardware)",        MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

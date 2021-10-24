@@ -139,8 +139,8 @@ Misc:
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
-      * There are two known CV1000-B PCB revisions. The newer one uses an updated FPGA firmware
-        and has some minor hardware differences.
+      * There are two known CV1000-B PCB revisions. The newer one has some minor hardware differences
+        and uses an updated FPGA firmware, they are not compatible with eachother.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
 

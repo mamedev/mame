@@ -66,6 +66,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
@@ -133,11 +134,11 @@ private:
 		uint16_t dat;
 	};
 
-	void dma_reload(audio_channel *chan);
+	void dma_reload(audio_channel *chan, bool startup);
 
 	// callbacks
 	devcb_read16 m_mem_r;
-	devcb_write_line m_int_w;
+	devcb_write8 m_int_w;
 
 	// internal state
 	uint16_t m_dmacon;
@@ -147,6 +148,8 @@ private:
 	sound_stream *m_stream;
 
 	TIMER_CALLBACK_MEMBER( signal_irq );
+
+	std::string print_audio_state();
 };
 
 // device type definition

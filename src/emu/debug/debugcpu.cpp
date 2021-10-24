@@ -434,6 +434,7 @@ device_debug::device_debug(device_t &device)
 	, m_total_cycles(0)
 	, m_last_total_cycles(0)
 	, m_pc_history_index(0)
+	, m_pc_history_valid(0)
 	, m_bplist()
 	, m_rplist(std::make_unique<std::forward_list<debug_registerpoint>>())
 	, m_triggered_breakpoint(nullptr)
@@ -722,7 +723,10 @@ void device_debug::instruction_hook(offs_t curpc)
 	debugcpu.set_within_instruction(true);
 
 	// update the history
-	m_pc_history[m_pc_history_index++ % HISTORY_SIZE] = curpc;
+	m_pc_history[m_pc_history_index] = curpc;
+	m_pc_history_index = (m_pc_history_index + 1) % std::size(m_pc_history);
+	if (std::size(m_pc_history) > m_pc_history_valid)
+		++m_pc_history_valid;
 
 	// update total cycles
 	m_last_total_cycles = m_total_cycles;
@@ -1352,13 +1356,28 @@ void device_debug::registerpoint_enable_all(bool enable)
 //  history
 //-------------------------------------------------
 
-offs_t device_debug::history_pc(int index) const
+std::pair<offs_t, bool> device_debug::history_pc(int index) const
 {
-	if (index > 0)
-		index = 0;
-	if (index <= -HISTORY_SIZE)
-		index = -HISTORY_SIZE + 1;
-	return m_pc_history[(m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history)];
+	if ((index <= 0) && (-index < m_pc_history_valid))
+	{
+		int const i = (m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history);
+		return std::make_pair(m_pc_history[i], true);
+	}
+	else
+	{
+		return std::make_pair(offs_t(0), false);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_track_pc - turn visited PC tracking on or
+//  off
+//-------------------------------------------------
+
+void device_debug::set_track_pc(bool value)
+{
+	m_track_pc = value;
 }
 
 
@@ -1369,7 +1388,7 @@ offs_t device_debug::history_pc(int index) const
 //  TODO: Take a CPU context as input
 //-------------------------------------------------
 
-bool device_debug::track_pc_visited(const offs_t& pc) const
+bool device_debug::track_pc_visited(offs_t pc) const
 {
 	if (m_track_pc_set.empty())
 		return false;
@@ -1383,7 +1402,7 @@ bool device_debug::track_pc_visited(const offs_t& pc) const
 //  TODO: Take a CPU context as input
 //-------------------------------------------------
 
-void device_debug::set_track_pc_visited(const offs_t& pc)
+void device_debug::set_track_pc_visited(offs_t pc)
 {
 	const u32 crc = compute_opcode_crc32(pc);
 	m_track_pc_set.insert(dasm_pc_tag(pc, crc));

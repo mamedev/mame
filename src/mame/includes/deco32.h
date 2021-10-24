@@ -14,7 +14,7 @@
 #include "sound/ymopm.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
-#include "video/deco_zoomspr.h"
+#include "video/namco_c355spr.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -218,10 +218,12 @@ class dragngun_state : public deco32_state
 public:
 	dragngun_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag)
-		, m_sprgenzoom(*this, "spritegen_zoom")
+		, m_sprgenzoom(*this, "c355spr")
 		, m_spriteram(*this, "spriteram")
-		, m_sprite_layout_ram(*this, "lay%u", 0)
-		, m_sprite_lookup_ram(*this, "look%u", 0)
+		, m_sprite_spriteformat(*this, "lay%u", 0)
+		, m_sprite_spritetile(*this, "look%u", 0)
+		, m_sprite_cliptable(*this, "spclip")
+		, m_sprite_indextable(*this, "spindex")
 		, m_vol_main(*this, "vol_main")
 		, m_vol_gun(*this, "vol_gun")
 		, m_io_inputs(*this, "INPUTS")
@@ -241,11 +243,14 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(lockload_gun_trigger);
 
 private:
-	required_device<deco_zoomspr_device> m_sprgenzoom;
+	required_device<namco_c355spr_device> m_sprgenzoom;
 	required_device<buffered_spriteram32_device> m_spriteram;
 
-	required_shared_ptr_array<u32, 2> m_sprite_layout_ram;
-	required_shared_ptr_array<u32, 2> m_sprite_lookup_ram;
+	required_shared_ptr_array<u32, 2> m_sprite_spriteformat;
+	required_shared_ptr_array<u32, 2> m_sprite_spritetile;
+	required_shared_ptr<u32> m_sprite_cliptable;
+	required_shared_ptr<u32> m_sprite_indextable;
+
 	required_device<lc7535_device> m_vol_main;
 	optional_device<lc7535_device> m_vol_gun;
 
@@ -276,6 +281,16 @@ private:
 	void lockload_okibank_hi_w(u8 data); // lockload
 
 	virtual void video_start() override;
+
+	int sprite_bank_callback(int sprite);
+	u16 read_spritetile(int lookupram_offset);
+	u16 read_spriteformat(int spriteformatram_offset, u8 attr);
+	u16 read_spritetable(int offs, u8 attr, int whichlist);
+	u16 read_spritelist(int offs, int whichlist);
+	u16 read_cliptable(int offs, u8 attr);
+	int sprite_priority_callback(int priority);
+
+	void expand_sprite_data();
 	void dragngun_init_common();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -283,6 +298,9 @@ private:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void namco_sprites(machine_config &config);
+
+	void namcosprite_map(address_map &map);
 	void dragngun_map(address_map &map);
 	void lockload_map(address_map &map);
 	void lockloadu_map(address_map &map);

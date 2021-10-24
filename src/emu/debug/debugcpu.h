@@ -14,6 +14,7 @@
 #pragma once
 
 #include <set>
+#include <utility>
 
 
 //**************************************************************************
@@ -129,12 +130,12 @@ public:
 	u32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
-	offs_t history_pc(int index) const;
+	std::pair<offs_t, bool> history_pc(int index) const;
 
 	// pc tracking
-	void set_track_pc(bool value) { m_track_pc = value; }
-	bool track_pc_visited(const offs_t& pc) const;
-	void set_track_pc_visited(const offs_t& pc);
+	void set_track_pc(bool value);
+	bool track_pc_visited(offs_t pc) const;
+	void set_track_pc_visited(offs_t pc);
 	void track_pc_data_clear() { m_track_pc_set.clear(); }
 
 	// memory tracking
@@ -200,6 +201,7 @@ private:
 	// history
 	offs_t                  m_pc_history[HISTORY_SIZE]; // history of recent PCs
 	u32                     m_pc_history_index;         // current history index
+	u32                     m_pc_history_valid;         // number of valid PC history entries
 
 	// breakpoints and watchpoints
 	std::multimap<offs_t, std::unique_ptr<debug_breakpoint>> m_bplist;     // list of breakpoints

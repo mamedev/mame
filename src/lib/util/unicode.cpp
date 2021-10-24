@@ -14,7 +14,6 @@
 
 #ifdef _WIN32
 #include "strconv.h"
-#define UTF8PROC_DLLEXPORT
 #endif
 
 #include <utf8proc.h>
@@ -455,14 +454,14 @@ int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 // wstring_from_utf8
 //-------------------------------------------------
 
-std::wstring wstring_from_utf8(const std::string &utf8string)
+std::wstring wstring_from_utf8(std::string_view utf8string)
 {
 #ifdef _WIN32
 	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
 	return osd::text::to_wstring(utf8string);
 #else
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	return converter.from_bytes(utf8string);
+	return converter.from_bytes(utf8string.data(), utf8string.data() + utf8string.length());
 #endif
 }
 
@@ -471,14 +470,14 @@ std::wstring wstring_from_utf8(const std::string &utf8string)
 // utf8_from_wstring
 //-------------------------------------------------
 
-std::string utf8_from_wstring(const std::wstring &string)
+std::string utf8_from_wstring(std::wstring_view string)
 {
 #ifdef _WIN32
 	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
 	return osd::text::from_wstring(string);
 #else
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-	return converter.to_bytes(string);
+	return converter.to_bytes(string.data(), string.data() + string.length());
 #endif
 }
 

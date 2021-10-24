@@ -2209,7 +2209,7 @@ project "utf8proc"
 	kind "StaticLib"
 
 	defines {
-		"UTF8PROC_DLLEXPORT="
+		"UTF8PROC_STATIC",
 	}
 
 	configuration "Debug"
@@ -2223,9 +2223,6 @@ project "utf8proc"
 		}
 
 	configuration { }
-		defines {
-			"ZLIB_CONST",
-		}
 
 	files {
 		MAME_DIR .. "3rdparty/utf8proc/utf8proc.c"

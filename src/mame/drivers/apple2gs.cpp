@@ -495,6 +495,8 @@ private:
 	int m_inh_slot, m_cnxx_slot;
 	int m_motoroff_time;
 
+	bool m_romswitch;
+
 	bool m_page2;
 	bool m_an0, m_an1, m_an2, m_an3;
 
@@ -1434,6 +1436,7 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_inh_bank));
 	save_item(NAME(m_cnxx_slot));
 	save_item(NAME(m_page2));
+	save_item(NAME(m_romswitch));
 	save_item(NAME(m_an0));
 	save_item(NAME(m_an1));
 	save_item(NAME(m_an2));
@@ -1527,6 +1530,7 @@ void apple2gs_state::machine_start()
 void apple2gs_state::machine_reset()
 {
 	m_page2 = false;
+	m_romswitch = false;
 	m_video->m_page2 = false;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
@@ -2028,14 +2032,14 @@ void apple2gs_state::lc_update(int offset, bool writing)
 		{
 			m_lcbank->set_bank(1);
 			m_lcaux->set_bank(1);
-			m_lc00->set_bank(1);
+			m_lc00->set_bank(1 + (m_romswitch ? 2 : 0));
 			m_lc01->set_bank(1);
 		}
 		else
 		{
 			m_lcbank->set_bank(0);
 			m_lcaux->set_bank(0);
-			m_lc00->set_bank(0);
+			m_lc00->set_bank(0 + (m_romswitch ? 2 : 0));
 			m_lc01->set_bank(0);
 		}
 	}
@@ -2073,7 +2077,19 @@ void apple2gs_state::do_io(int offset)
 		case 0x20:
 			break;
 
-		case 0x28:
+		case 0x28:  //  ROMSWITCH - not used by the IIgs firmware or SSW, but does exist at least on ROM 0/1 (need to test on ROM 3 hw)
+			if (!m_is_rom3)
+			{
+				m_romswitch = !m_romswitch;
+				if (m_lcram)
+				{
+					m_lc00->set_bank(1 + (m_romswitch ? 2 : 0));
+				}
+				else
+				{
+					m_lc00->set_bank(0 + (m_romswitch ? 2 : 0));
+				}
+			}
 			break;
 
 		case 0x30:
@@ -4087,6 +4103,8 @@ void apple2gs_state::lc00_map(address_map &map)
 {
 	map(0x0000, 0x2fff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_00_w));
 	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::lc_00_r), FUNC(apple2gs_state::lc_00_w));
+	map(0x6000, 0x8fff).rom().region("maincpu", 0x39000).w(FUNC(apple2gs_state::lc_00_w));
+	map(0x9000, 0xbfff).rw(FUNC(apple2gs_state::lc_00_r), FUNC(apple2gs_state::lc_00_w));
 }
 
 void apple2gs_state::lc01_map(address_map &map)

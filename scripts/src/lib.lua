@@ -25,6 +25,12 @@ project "utils"
 		ext_includedir("utf8proc"),
 	}
 
+if not _OPTIONS["with-system-utf8proc"] then
+	defines {
+		"UTF8PROC_STATIC",
+	}
+end
+
 	files {
 		MAME_DIR .. "src/lib/util/abi.h",
 		MAME_DIR .. "src/lib/util/avhuff.cpp",

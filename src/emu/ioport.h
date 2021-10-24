@@ -364,7 +364,6 @@ enum ioport_type
 		IPT_UI_SHOW_PROFILER,
 		IPT_UI_TOGGLE_UI,
 		IPT_UI_RELEASE_POINTER,
-		IPT_UI_TOGGLE_DEBUG,
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
 		IPT_UI_LOAD_STATE,
@@ -373,8 +372,7 @@ enum ioport_type
 		IPT_UI_DATS,
 		IPT_UI_FAVORITES,
 		IPT_UI_EXPORT,
-		IPT_UI_AUDIT_FAST,
-		IPT_UI_AUDIT_ALL,
+		IPT_UI_AUDIT,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,

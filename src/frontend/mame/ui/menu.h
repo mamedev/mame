@@ -37,7 +37,7 @@ class menu
 {
 public:
 	// flags for menu items
-	enum : unsigned
+	enum : uint32_t
 	{
 		FLAG_LEFT_ARROW     = 1U << 0,
 		FLAG_RIGHT_ARROW    = 1U << 1,
@@ -45,41 +45,8 @@ public:
 		FLAG_MULTILINE      = 1U << 3,
 		FLAG_REDTEXT        = 1U << 4,
 		FLAG_DISABLE        = 1U << 5,
-		FLAG_UI_DATS        = 1U << 6,
 		FLAG_UI_HEADING     = 1U << 7,
 		FLAG_COLOR_BOX      = 1U << 8
-	};
-
-	enum : unsigned {
-		INPUT_GROUPS,
-		INPUT_SPECIFIC,
-		SETTINGS_DIP_SWITCHES,
-		SETTINGS_DRIVER_CONFIG,
-		ANALOG,
-		BOOKKEEPING,
-		GAME_INFO,
-		WARN_INFO,
-		IMAGE_MENU_IMAGE_INFO,
-		IMAGE_MENU_FILE_MANAGER,
-		TAPE_CONTROL,
-		SLOT_DEVICES,
-		NETWORK_DEVICES,
-		KEYBOARD_MODE,
-		SLIDERS,
-		VIDEO_TARGETS,
-		VIDEO_OPTIONS,
-		CROSSHAIR,
-		CHEAT,
-		PLUGINS,
-		SELECT_GAME,
-		BIOS_SELECTION,
-		BARCODE_READ,
-		PTY_INFO,
-		EXTERNAL_DATS,
-		ADD_FAVORITE,
-		REMOVE_FAVORITE,
-		QUIT_GAME,
-		ABOUT
 	};
 
 	virtual ~menu();
@@ -132,7 +99,6 @@ private:
 	void draw_text_box();
 
 protected:
-	using cleanup_callback = std::function<void(running_machine &)>;
 	using bitmap_ptr = widgets_manager::bitmap_ptr;
 	using texture_ptr = widgets_manager::texture_ptr;
 
@@ -142,10 +108,11 @@ protected:
 		PROCESS_NOKEYS      = 1 << 0,
 		PROCESS_LR_ALWAYS   = 1 << 1,
 		PROCESS_LR_REPEAT   = 1 << 2,
-		PROCESS_CUSTOM_ONLY = 1 << 3,
-		PROCESS_ONLYCHAR    = 1 << 4,
-		PROCESS_NOINPUT     = 1 << 5,
-		PROCESS_NOIMAGE     = 1 << 6
+		PROCESS_CUSTOM_NAV  = 1 << 3,
+		PROCESS_CUSTOM_ONLY = 1 << 4,
+		PROCESS_ONLYCHAR    = 1 << 5,
+		PROCESS_NOINPUT     = 1 << 6,
+		PROCESS_NOIMAGE     = 1 << 7
 	};
 
 	// options for reset
@@ -172,6 +139,7 @@ protected:
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
 
+	void set_needs_prev_menu_item(bool needs) { m_needs_prev_menu_item = needs; }
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 
@@ -180,8 +148,6 @@ protected:
 	void stack_pop() { m_global_state->stack_pop(); }
 	void stack_reset() { m_global_state->stack_reset(); }
 	bool stack_has_special_main_menu() const { return m_global_state->stack_has_special_main_menu(); }
-
-	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
@@ -310,10 +276,8 @@ protected:
 	// overridable event handling
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
+	virtual bool custom_ui_cancel() { return false; }
 	virtual bool custom_mouse_down() { return false; }
-
-	// test if search is active
-	virtual bool menu_has_search_active() { return false; }
 
 	static bool is_selectable(menu_item const &item)
 	{
@@ -336,8 +300,6 @@ private:
 		global_state(global_state &&) = delete;
 		~global_state();
 
-		void add_cleanup_callback(cleanup_callback &&callback);
-
 		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 		render_texture *bgrnd_texture() { return m_bgrnd_texture.get(); }
 
@@ -351,10 +313,7 @@ private:
 		bool stack_has_special_main_menu() const;
 
 	private:
-		using cleanup_callback_vector = std::vector<cleanup_callback>;
-
 		running_machine         &m_machine;
-		cleanup_callback_vector m_cleanup_callbacks;
 
 		bitmap_ptr              m_bgrnd_bitmap;
 		texture_ptr             m_bgrnd_texture;
@@ -398,6 +357,7 @@ protected: // TODO: remove need to expose these
 private:
 	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;
+	bool                    m_needs_prev_menu_item;
 	mame_ui_manager         &m_ui;              // UI we are attached to
 	render_container        &m_container;       // render_container we render to
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu

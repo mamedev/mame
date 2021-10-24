@@ -41,8 +41,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_speaker(*this, "speaker")
 		, m_digits(*this, "digit%u", 0U)
-		, m_io_lamps(*this, "lamp%u", 0U)
-		, m_io_solenoids(*this, "sol%u", 0U)
+		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
 	void zac_proto(machine_config &config);
@@ -64,8 +63,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	output_finder<11> m_digits;
-	output_finder<84> m_io_lamps;
-	output_finder<12> m_io_solenoids;
+	output_finder<12+84> m_io_outputs;
 };
 
 
@@ -234,7 +232,7 @@ void zac_proto_state::out0_w(offs_t offset, uint8_t data)
 			break;
 	}
 	for (u8 i = 0; i < 6; i++)
-		m_io_solenoids[offset*6+i] = BIT(data, i);
+		m_io_outputs[offset*6+i] = BIT(data, i);
 }
 
 // lamps
@@ -242,7 +240,7 @@ void zac_proto_state::out1_w(offs_t offset, uint8_t data)
 {
 	data &= 0x3f;
 	for (u8 i = 0; i < 6; i++)
-		m_io_lamps[offset*6+i] = BIT(data, i);
+		m_io_outputs[12+offset*6+i] = BIT(data, i);
 }
 
 // need to implement blanking of leading zeroes
@@ -291,8 +289,7 @@ WRITE_LINE_MEMBER(zac_proto_state::audio_clock)
 void zac_proto_state::machine_start()
 {
 	m_digits.resolve();
-	m_io_lamps.resolve();
-	m_io_solenoids.resolve();
+	m_io_outputs.resolve();
 
 	save_item(NAME(m_u36));
 	save_item(NAME(m_u37));

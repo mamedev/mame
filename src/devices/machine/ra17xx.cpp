@@ -104,7 +104,7 @@ void ra17xx_device::io_w(address_space &space, offs_t offset, uint8_t data)
 		// SOS command
 		if (m_bl >= 16)
 		{
-			logerror("Attempt to write to nonexistent output %d\n");
+			logerror("Attempt to write to nonexistent output 0x%02X\n",m_bl);
 		}
 		else if (data & (1 << 3))
 		{
