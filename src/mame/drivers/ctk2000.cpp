@@ -48,6 +48,9 @@ public:
 
 	void ctk2000(machine_config &config);
 
+	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
+	DECLARE_WRITE_LINE_MEMBER(lcd_w) { m_lcdc->db_w(state << 4); }
+
 	template<unsigned IRQ>
 	DECLARE_INPUT_CHANGED_MEMBER(test_w)
 	{
@@ -99,6 +102,9 @@ void ctk2000_state::ctk2000(machine_config &config)
 	// CPU
 	UPD800468(config, m_maincpu, 48'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ctk2000_state::ctk2000_map);
+	m_maincpu->port_in_cb<2>().set_ioport("P2_R");
+	m_maincpu->port_out_cb<2>().set_ioport("P2_W");
+	m_maincpu->port_out_cb<3>().set_ioport("P3");
 
 	// LCD
 	HD44780(config, m_lcdc, 0);
@@ -240,10 +246,21 @@ INPUT_PORTS_START(ctk2100)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Function")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Variation / Fill In / Fast Forward")
 
-	PORT_START("TEST")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("IRQ 21") PORT_CHANGED_MEMBER(DEVICE_SELF, ctk2000_state, test_w<21>, 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("IRQ 22") PORT_CHANGED_MEMBER(DEVICE_SELF, ctk2000_state, test_w<22>, 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("IRQ 23") PORT_CHANGED_MEMBER(DEVICE_SELF, ctk2000_state, test_w<23>, 0)
+	PORT_START("P2_R")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM )  PORT_CUSTOM_MEMBER(ctk2000_state, lcd_r)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2_W")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk2000_state, lcd_w)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, e_w)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rw_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rs_w)
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 INPUT_PORTS_END
 

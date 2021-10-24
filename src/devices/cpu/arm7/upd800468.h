@@ -49,10 +49,26 @@ public:
 	
 	void upd800468_map(address_map &map);
 
+	template<offs_t i> auto port_in_cb() { return m_in_cb[i].bind(); }
+	template<offs_t i> auto port_out_cb() { return m_out_cb[i].bind(); }
+
+	template<offs_t i> u8 port_ddr_r() { return port_ddr_r(i); }
+	template<offs_t i> void port_ddr_w(u8 data) { port_ddr_w(i, data); }
+
+	template<offs_t i> u8 port_r() { return port_r(i); }
+	template<offs_t i> void port_w(u8 data) { port_w(i, data); }
+
 	u32 ram_enable_r();
 	void ram_enable_w(u32 data);
 
 protected:
+	u8 port_ddr_r(offs_t);
+	void port_ddr_w(offs_t, u8);
+
+	u8 port_r(offs_t);
+	void port_w(offs_t, u8);
+	void port_update(offs_t);
+
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
@@ -67,11 +83,15 @@ private:
 	required_device_array<upd800468_timer_device, 3> m_timer;
 	required_device<gt913_kbd_hle_device> m_kbd;
 
+	devcb_read8::array<4> m_in_cb;
+	devcb_write8::array<4> m_out_cb;
+	u8 m_port_ddr[4], m_port_data[4];
+
 	memory_view m_ram_view;
 	u32 m_ram_enable;
 };
 
-// device type definition
+// device type 
 DECLARE_DEVICE_TYPE(UPD800468_TIMER, upd800468_timer_device)
 DECLARE_DEVICE_TYPE(UPD800468, upd800468_device)
 

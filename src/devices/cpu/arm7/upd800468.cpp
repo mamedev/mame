@@ -93,6 +93,16 @@ void upd800468_device::upd800468_map(address_map &map)
 	map(0x1fff00a4, 0x1fff00a5).w(m_kbd, FUNC(gt913_kbd_hle_device::status_w)).umask32(0x0000ffff);
 
 	// TODO: 8-channel ADC at 0x1fff00c0
+	map(0x1fff00c0, 0x1fff00cf).nopr();
+
+	map(0x1fff0141, 0x1fff0141).rw(FUNC(upd800468_device::port_ddr_r<0>), FUNC(upd800468_device::port_ddr_w<0>)).umask32(0x0000ff00);
+	map(0x1fff0142, 0x1fff0142).rw(FUNC(upd800468_device::port_r<0>), FUNC(upd800468_device::port_w<0>)).umask32(0x00ff0000);
+	map(0x1fff0145, 0x1fff0145).rw(FUNC(upd800468_device::port_ddr_r<1>), FUNC(upd800468_device::port_ddr_w<1>)).umask32(0x0000ff00);
+	map(0x1fff0146, 0x1fff0146).rw(FUNC(upd800468_device::port_r<1>), FUNC(upd800468_device::port_w<1>)).umask32(0x00ff0000);
+	map(0x1fff0149, 0x1fff0149).rw(FUNC(upd800468_device::port_ddr_r<2>), FUNC(upd800468_device::port_ddr_w<2>)).umask32(0x0000ff00);
+	map(0x1fff014a, 0x1fff014a).rw(FUNC(upd800468_device::port_r<2>), FUNC(upd800468_device::port_w<2>)).umask32(0x00ff0000);
+	map(0x1fff014d, 0x1fff014d).rw(FUNC(upd800468_device::port_ddr_r<3>), FUNC(upd800468_device::port_ddr_w<3>)).umask32(0x0000ff00);
+	map(0x1fff014e, 0x1fff014e).rw(FUNC(upd800468_device::port_r<3>), FUNC(upd800468_device::port_w<3>)).umask32(0x00ff0000);
 
 	map(0x2a003504, 0x2a003507).rw(m_timer[0], FUNC(upd800468_timer_device::rate_r), FUNC(upd800468_timer_device::rate_w));
 	map(0x2a003508, 0x2a003508).rw(m_timer[0], FUNC(upd800468_timer_device::control_r), FUNC(upd800468_timer_device::control_w)).umask32(0x000000ff);
@@ -115,8 +125,9 @@ upd800468_device::upd800468_device(const machine_config &mconfig, const char *ta
 	: arm7_cpu_device(mconfig, UPD800468, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(upd800468_device::upd800468_map), this))
 	, m_vic(*this, "vic")
-	, m_timer(*this, "timer%u", 1)
+	, m_timer(*this, "timer%u", 0)
 	, m_kbd(*this, "kbd")
+	, m_in_cb(*this), m_out_cb(*this)
 	, m_ram_view(*this, "ramview")
 {
 }
@@ -153,6 +164,11 @@ void upd800468_device::device_start()
 {
 	arm7_cpu_device::device_start();
 
+	m_in_cb.resolve_all_safe(0x00);
+	m_out_cb.resolve_all_safe();
+
+	save_item(NAME(m_port_data));
+	save_item(NAME(m_port_ddr));
 	save_item(NAME(m_ram_enable));
 }
 
@@ -164,8 +180,44 @@ void upd800468_device::device_reset()
 {
 	arm7_cpu_device::device_reset();
 
+	for (offs_t i = 0; i < 4; i++)
+	{
+		m_port_data[i] = 0;
+		m_port_ddr[i] = 0xff;
+		port_update(i);
+	}
+
 	m_ram_enable = 0;
 	m_ram_view.disable();
+}
+
+u8 upd800468_device::port_ddr_r(offs_t num)
+{
+	return m_port_ddr[num];
+}
+
+void upd800468_device::port_ddr_w(offs_t num, u8 data)
+{
+	m_port_ddr[num] = data;
+	logerror("ddr_w: %02x\n", data);
+	port_update(num);
+}
+
+u8 upd800468_device::port_r(offs_t num)
+{
+	return (m_port_data[num] & m_port_ddr[num]) | (m_in_cb[num]() & ~m_port_ddr[num]);
+}
+
+void upd800468_device::port_w(offs_t num, u8 data)
+{
+	m_port_data[num] = data;
+	port_update(num);
+}
+
+void upd800468_device::port_update(offs_t num)
+{
+	logerror("out: %02x\n", m_port_data[num] & m_port_ddr[num]);
+	m_out_cb[num](m_port_data[num] & m_port_ddr[num]);
 }
 
 u32 upd800468_device::ram_enable_r()

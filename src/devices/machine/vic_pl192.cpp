@@ -280,6 +280,8 @@ vic_pl190_device::vic_pl190_device(const machine_config &mconfig, const char *ta
 }
 
 
+
+
 void vic_upd800468_device::int_clear_w(u32 data)
 {
 	raw_intr &= ~data;
