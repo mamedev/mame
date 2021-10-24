@@ -20,7 +20,7 @@
     TODO:
     - Needs verifications for Part numbers
     - Verify DTC114Y function for Slow motion in Avenue Pad 6
-	- Default button layout related issue, MT #08047
+    - Default button layout related issue, MT #08047
 
 **********************************************************************/
 
