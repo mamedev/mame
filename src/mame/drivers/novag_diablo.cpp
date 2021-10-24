@@ -283,7 +283,7 @@ void diablo_state::diablo68k(machine_config &config)
 	irq_clock.set_pulse_width(attotime::from_nsec(1380)); // active for 1.38us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M68K_IRQ_IPL1);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
