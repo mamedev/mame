@@ -1661,7 +1661,7 @@ void a1000_state::a1000(machine_config &config)
 			.set_delays(attotime::from_msec(152), attotime::from_usec(176), attotime::from_msec(704))
 			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
 
 	SOFTWARE_LIST(config, "a1000_list").set_original("amiga_a1000");
@@ -1698,7 +1698,7 @@ void a2000_state::a2000(machine_config &config)
 			.set_delays(attotime::from_msec(112), attotime::from_msec(74), attotime::from_msec(1294))
 			.kbrst_cb().set(FUNC(a2000_state::kbreset_w));
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// real-time clock
 	MSM6242(config, m_rtc, XTAL(32'768));
@@ -1747,7 +1747,7 @@ void a500_state::a500(machine_config &config)
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// cpu slot
 	EXP_SLOT(config, m_side, 0).set_space(m_maincpu, AS_PROGRAM);
@@ -1797,7 +1797,7 @@ void cdtv_state::cdtv(machine_config &config)
 	u62.set_addrmap(AS_PROGRAM, &cdtv_state::lcd_mem);
 #endif
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// standard sram
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
@@ -1860,7 +1860,7 @@ void a3000_state::a3000(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	// real-time clock
 	RP5C01(config, "rtc", XTAL(32'768));
@@ -1897,7 +1897,7 @@ void a500p_state::a500p(machine_config &config)
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	// real-time clock
 	MSM6242(config, m_rtc, XTAL(32'768));
@@ -1937,7 +1937,7 @@ void a600_state::a600(machine_config &config)
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
 	gayle.set_id(a600_state::GAYLE_ID);
@@ -1977,7 +1977,7 @@ void a1200_state::a1200(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1200_state::a1200_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	amiga_base(config);
 
@@ -2038,7 +2038,7 @@ void a4000_state::a4000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	amiga_base(config);
 
@@ -2111,7 +2111,7 @@ void cd32_state::cd32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cd32_state::cd32_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	amiga_base(config);
 

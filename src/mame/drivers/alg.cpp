@@ -332,7 +332,7 @@ void alg_state::alg_r1(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alg_state::main_map_r1);
 
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&alg_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&alg_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

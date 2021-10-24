@@ -536,7 +536,7 @@ protected:
 	};
 
 	// chipset
-	bool IS_OCS() const { return m_denise_id == 0xff; }
+	bool IS_OCS() const { return m_denise_id == 0xffff; }
 	bool IS_ECS() const { return m_denise_id == 0xfc; }
 	bool IS_AGA() const { return m_denise_id == 0xf8; }
 
