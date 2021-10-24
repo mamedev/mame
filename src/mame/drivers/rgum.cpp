@@ -43,6 +43,8 @@ public:
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_maincpu(*this, "maincpu"),
+		m_aysnd(*this, "aysnd"),
+		m_upd(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
@@ -52,14 +54,26 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_aysnd;
+	required_device<upd7759_device> m_upd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	uint8_t m_hbeat;
+	bool m_aysnd_data_next;
+	bool m_aysnd_toggle_enabled;
+
+	void aysnd_2000_w(uint8_t data);
+	void aysnd_2002_w(uint8_t data);
+	void upd_data_w(uint8_t data);
+	uint8_t upd_ready_r();
+	uint8_t upd_busy_r();
+	uint8_t upd_reset_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
@@ -71,6 +85,14 @@ void rgum_state::video_start()
 	m_hbeat = 0;
 
 	save_item(NAME(m_hbeat));
+	save_item(NAME(m_aysnd_data_next));
+	save_item(NAME(m_aysnd_toggle_enabled));
+}
+
+void rgum_state::machine_reset()
+{
+	m_aysnd_data_next = false;
+	m_aysnd_toggle_enabled = false;
 }
 
 uint32_t rgum_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -94,6 +116,51 @@ uint32_t rgum_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
+void rgum_state::aysnd_2000_w(uint8_t data)
+{
+	m_aysnd_toggle_enabled = true;
+}
+
+void rgum_state::aysnd_2002_w(uint8_t data)
+{
+	// AY-3-8910 interface is bizarre. Address is written to $2000 and then $2002 with successive instructions, then data is written to both $2000 and $2002.
+	// Sound data contains many pairs where the address byte is $50. Do these control some other device?
+	m_aysnd->address_data_w(m_aysnd_data_next, data);
+	if (m_aysnd_toggle_enabled)
+	{
+		m_aysnd_data_next = !m_aysnd_data_next;
+		m_aysnd_toggle_enabled = false;
+	}
+}
+
+void rgum_state::upd_data_w(u8 data)
+{
+	m_upd->port_w(data);
+	m_upd->start_w(1);
+}
+
+uint8_t rgum_state::upd_ready_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_upd->reset_w(1);
+		m_upd->start_w(0);
+	}
+	return 0;
+}
+
+uint8_t rgum_state::upd_busy_r()
+{
+	return m_upd->busy_r() ? 0x80 : 0;
+}
+
+uint8_t rgum_state::upd_reset_r()
+{
+	if (!machine().side_effects_disabled())
+		m_upd->reset_w(0);
+	return 0;
+}
+
 void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10, second 8255, UPD7759
 {
 	map(0x0000, 0x07ff).ram(); // not all of it?
@@ -101,14 +168,15 @@ void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10, second 825
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	map(0x2000, 0x2000).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x2002, 0x2002).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x2000, 0x2000).w(FUNC(rgum_state::aysnd_2000_w));
+	map(0x2002, 0x2002).r("aysnd", FUNC(ay8910_device::data_r)).w(FUNC(rgum_state::aysnd_2002_w));
 
-	map(0x2801, 0x2801).nopr();  // read but value discarded?
-	map(0x2802, 0x2802).nopr();
-	map(0x2803, 0x2803).nopr();
+	map(0x2800, 0x2800).w(FUNC(rgum_state::upd_data_w));
+	map(0x2801, 0x2801).r(FUNC(rgum_state::upd_ready_r));
+	map(0x2802, 0x2802).r(FUNC(rgum_state::upd_busy_r));
+	map(0x2803, 0x2803).r(FUNC(rgum_state::upd_reset_r));
 
-	// map(0x2c00, 0x2c03).w(); // ?
+	map(0x2c00, 0x2c03).w("ppi8255_1", FUNC(i8255_device::write));
 
 	map(0x3000, 0x3003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
@@ -121,8 +189,6 @@ void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10, second 825
 
 READ_LINE_MEMBER(rgum_state::heartbeat_r)
 {
-	m_hbeat ^= 1;
-
 	return m_hbeat;
 }
 
@@ -289,6 +355,7 @@ void rgum_state::rgum(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("DSW1");
 	ppi.in_pc_callback().set_ioport("DSW2");
+	ppi.out_pc_callback().set([this](uint8_t data) { m_hbeat = BIT(data, 0); });
 
 	I8255A(config, "ppi8255_1");
 
