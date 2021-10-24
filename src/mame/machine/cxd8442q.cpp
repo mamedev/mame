@@ -87,7 +87,7 @@ void cxd8442q_device::map(address_map &map)
 
         map(channel_base + 0x1c, channel_base + 0x1f).lr32(NAME(([this, channel]()
                                                                  {
-                                                                     // There is more in this register, but this is the minimum to get the ESCCF working.
+                                                                     // There seems to be more in this register, but this is the minimum to get the ESCCF working.
                                                                      auto intstat = fifo_channels[channel].intstat;
                                                                      auto mask = fifo_channels[channel].intctrl & 0x1;
                                                                      return intstat & mask; 
@@ -152,7 +152,6 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
         // Check DRQ to see if the device is ready to give or receive data
         if (this_channel.drq_r())
         {
-            // TODO: error condition?
             if(this_channel.dma_cycle())
             {
                 dma_active = true;

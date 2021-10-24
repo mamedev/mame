@@ -94,8 +94,6 @@
  *  - Figure out SPIFI3/DMAC3 handshake for pad to eliminate SPIFI workaround
  *
  *  TODO before opening first MR:
- *  - FIFO cleanup
- *  - ESCC TODOs
  *  - SPIFI3 refactoring
  *  - WSC-SONIC3 cleanup
  *  - Save state support
