@@ -686,7 +686,7 @@ TODO:
 - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode) + fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
 - timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
 - monsterz : galaxian_state::sprites_draw "the first three sprites match against y-1", it looks like y+1 for this game (probably also applies to sfx)
-- monsterz : sprites should scroll?
+- monsterz : stars should scroll?
 - zigzag   : full Dip Switches and Inputs
 - zigzag2  : full Dip Switches and Inputs
 - jumpbug  : full Dip Switches and Inputs - missing possible discrete sounds
