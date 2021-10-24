@@ -199,13 +199,16 @@ u8 upd800468_device::port_ddr_r(offs_t num)
 void upd800468_device::port_ddr_w(offs_t num, u8 data)
 {
 	m_port_ddr[num] = data;
-//	logerror("ddr_w: %02x\n", data);
+//	logerror("port %u ddr_w: %02x\n", num, data);
 	port_update(num);
 }
 
 u8 upd800468_device::port_r(offs_t num)
 {
-	return (m_port_data[num] & m_port_ddr[num]) | (m_in_cb[num]() & ~m_port_ddr[num]);
+	// port input seemingly does not use the ddr value
+	// (ctk2100 port 2 ddr lower 4 bits are always high, but the corresponding data bits
+	//  are apparently expected to be bidirectional, otherwise reading LCD status fails)
+	return m_in_cb[num]();
 }
 
 void upd800468_device::port_w(offs_t num, u8 data)
@@ -216,7 +219,7 @@ void upd800468_device::port_w(offs_t num, u8 data)
 
 void upd800468_device::port_update(offs_t num)
 {
-//	logerror("out: %02x\n", m_port_data[num] & m_port_ddr[num]);
+//	logerror("port %u out: %02x\n", num, m_port_data[num] & m_port_ddr[num]);
 	m_out_cb[num](m_port_data[num] & m_port_ddr[num]);
 }
 

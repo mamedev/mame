@@ -57,6 +57,8 @@ public:
 		m_maincpu->subdevice<vic_upd800468_device>("vic")->irq_w<IRQ>(newval);
 	}
 
+	DECLARE_WRITE_LINE_MEMBER(apo_w);
+
 private:
 	void ctk2000_map(address_map &map);
 
@@ -70,6 +72,11 @@ private:
 	required_device<hd44780_device> m_lcdc;
 };
 
+WRITE_LINE_MEMBER(ctk2000_state::apo_w)
+{
+	logerror("apo_w: %x\n", state);
+	/* TODO: when 0, this should turn off the LCD, speakers, etc. */
+}
 
 HD44780_PIXEL_UPDATE(ctk2000_state::lcd_update)
 {
@@ -230,6 +237,7 @@ INPUT_PORTS_START(ctk2100)
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("maincpu:kbd:KI1")
+	// "song bank" and "tone" seem to be swapped in the schematic
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Song Bank")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Tone")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Tempo Up")
@@ -257,7 +265,7 @@ INPUT_PORTS_START(ctk2100)
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk2000_state, lcd_w)
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, e_w)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk2000_state, apo_w)
 
 	PORT_START("P3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rw_w)
@@ -275,5 +283,5 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME     FLAGS
-SYST( 2009, ctk2100, 0,      0,      ctk2000, ctk2100, ctk2000_state, empty_init, "Casio", "CTK-2100",  MACHINE_IS_SKELETON )
+SYST( 2009, ctk2100, 0,      0,      ctk2000, ctk2100, ctk2000_state, empty_init, "Casio", "CTK-2100",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
