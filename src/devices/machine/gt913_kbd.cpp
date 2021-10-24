@@ -30,13 +30,13 @@ gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const 
 	device_t(mconfig, GT913_KBD_HLE, tag, owner, clock),
 	device_matrix_keyboard_interface(mconfig, *this, "KO0", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12"),
 	m_velocity(*this, "VELOCITY"),
-	m_irq_func(*this)
+	m_irq_cb(*this)
 {
 }
 
 void gt913_kbd_hle_device::device_start()
 {
-	m_irq_func.resolve_safe();
+	m_irq_cb.resolve_safe();
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_fifo));
@@ -75,9 +75,9 @@ void gt913_kbd_hle_device::update_status()
 		m_status |= 0x8000;
 
 	if (BIT(m_status, 15) && BIT(m_status, 14))
-		m_irq_func(1);
+		m_irq_cb(1);
 	else
-		m_irq_func(0);
+		m_irq_cb(0);
 }
 
 uint16_t gt913_kbd_hle_device::read()

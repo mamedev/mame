@@ -280,7 +280,11 @@ vic_pl190_device::vic_pl190_device(const machine_config &mconfig, const char *ta
 }
 
 
-
+void vic_upd800468_device::int_clear_w(u32 data)
+{
+	raw_intr &= ~data;
+	timer_set(attotime::zero, TIMER_CHECK_IRQ);
+}
 
 void vic_upd800468_device::map(address_map &map)
 {
@@ -288,6 +292,7 @@ void vic_upd800468_device::map(address_map &map)
 
 	map(0x100, 0x17f).rw(NAME(vic_pl190_device::vect_addr_r), NAME(vic_pl190_device::vect_addr_w));
 	map(0x200, 0x27f).rw(NAME(vic_pl190_device::vect_ctl_r), NAME(vic_pl190_device::vect_ctl_w));
+	map(0x2c8, 0x2cb).w(NAME(vic_upd800468_device::int_clear_w));
 }
 
 vic_upd800468_device::vic_upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

@@ -12,13 +12,35 @@
 #include "machine/vic_pl192.h"
 
 /***************************************************************************
-	DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-
-/***************************************************************************
 	TYPE DEFINITIONS
 ***************************************************************************/
+
+class upd800468_timer_device : public device_t
+{
+public:
+	upd800468_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	auto irq_cb() { return m_irq_cb.bind(); }
+
+	u32 rate_r();
+	void rate_w(u32);
+
+	u8 control_r();
+	void control_w(u8);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+private:
+	devcb_write_line m_irq_cb;
+
+	emu_timer *m_timer;
+	u32 m_rate;
+	u8 m_control;
+};
 
 class upd800468_device : public arm7_cpu_device
 {
@@ -41,15 +63,16 @@ protected:
 private:
 	address_space_config m_program_config;
 
-	required_device<gt913_kbd_hle_device> m_kbd;
 	required_device<vic_upd800468_device> m_vic;
+	required_device_array<upd800468_timer_device, 3> m_timer;
+	required_device<gt913_kbd_hle_device> m_kbd;
 
 	memory_view m_ram_view;
 	u32 m_ram_enable;
 };
 
-
 // device type definition
+DECLARE_DEVICE_TYPE(UPD800468_TIMER, upd800468_timer_device)
 DECLARE_DEVICE_TYPE(UPD800468, upd800468_device)
 
 #endif // MAME_CPU_ARM7_UPD800468_H

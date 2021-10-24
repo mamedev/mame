@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	gt913_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	auto irq_cb() { return m_irq_func.bind(); }
+	auto irq_cb() { return m_irq_cb.bind(); }
 
 	uint16_t read();
 	void status_w(uint16_t data);
@@ -43,7 +43,7 @@ protected:
 private:
 	optional_ioport m_velocity;
 
-	devcb_write_line m_irq_func;
+	devcb_write_line m_irq_cb;
 
 	uint16_t m_status;
 	uint8_t m_fifo[16];

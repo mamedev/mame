@@ -20,6 +20,8 @@ public:
 	void map(address_map &map);
 
 protected:
+	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
+
 	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	u32 irq_status_r();
@@ -73,8 +75,6 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
-
 	void set_irq_line(int irq, int state);
 
 	address_space_config m_mmio_config;
@@ -89,6 +89,9 @@ public:
 	vic_upd800468_device(const machine_config &mconfig, const char* tag, device_t *owner, uint32_t clock = 0);
 
 	void map(address_map &map);
+
+protected:
+	void int_clear_w(u32 data);
 };
 
 class vic_pl192_device : public vic_pl190_device
