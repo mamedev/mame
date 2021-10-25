@@ -46372,4 +46372,28 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="wntgames">
+		<description>Winter Games (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2016-07-26"/>
+		<!-- "Winter Games" is a 1985 sports game developed by Action Graphics.  -->
+		<!-- Disks re-cracked on August 28th, 2021 due to subtle
+		timing difference between Disk II and IWM hardware that resulted
+        in the previous version not working on some machines. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="winter games (4am crack) side a.dsk" size="143360" crc="ad1360c5" sha1="d7c3b67d3ed5336f68a232eaa84a2766eabc4c1e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="winter games (4am crack) side b.dsk" size="143360" crc="b8d713fd" sha1="e2c6b9b0dfdf2f23c59c03ec803b0ffb79135482" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
