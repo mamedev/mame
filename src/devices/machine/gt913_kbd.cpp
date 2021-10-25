@@ -51,7 +51,7 @@ void gt913_kbd_hle_device::device_reset()
 	m_fifo_read = m_fifo_write = 0;
 
 	reset_key_state();
-	start_processing(attotime::from_hz(1200));
+	start_processing(attotime::from_hz(9600));
 }
 
 void gt913_kbd_hle_device::key_add(uint8_t row, uint8_t column, int state)
