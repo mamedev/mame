@@ -1,3 +1,7 @@
+-- license:BSD-3-Clause
+-- copyright-holders:Vas Crabb
+
+
 -- Constants
 
 local MENU_TYPES = { MACROS = 0, ADD = 1, EDIT = 2, INPUT = 3 }

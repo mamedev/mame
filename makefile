@@ -1712,8 +1712,9 @@ genieclean:
 
 clean: genieclean
 	@echo Cleaning...
-	-@rm -rf $(BUILDDIR)
-	-@rm -rf 3rdparty/bgfx/.build
+	-$(SILENT)rm -f language/*/*.mo
+	-$(SILENT)rm -rf $(BUILDDIR)
+	-$(SILENT)rm -rf 3rdparty/bgfx/.build
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 

@@ -4,7 +4,7 @@ local exports = {
 	name = "dummy",
 	version = "0.0.1",
 	description = "A dummy example",
-	license = "The BSD 3-Clause License",
+	license = "BSD-3-Clause",
 	author = { name = "Miodrag Milanovic" }}
 
 local dummy = exports

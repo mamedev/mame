@@ -5,7 +5,7 @@ local exports = {}
 exports.name = "cheatfind"
 exports.version = "0.0.1"
 exports.description = "Cheat finder helper library"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local cheatfind = exports
