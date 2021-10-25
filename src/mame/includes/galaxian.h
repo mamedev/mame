@@ -413,10 +413,10 @@ protected:
 	uint8_t m_konami_sound_control;
 	uint8_t m_irq_enabled;
 	int m_irq_line = INPUT_LINE_NMI;
-	uint8_t m_frogger_adjust = false;
+	bool m_frogger_adjust = false;
 	uint8_t m_x_scale = GALAXIAN_XSCALE;
 	uint8_t m_h0_start = GALAXIAN_H0START;
-	uint8_t m_sfx_tilemap = false;
+	bool m_sfx_adjust = false;
 
 	extend_tile_info_delegate m_extend_tile_info_ptr;
 	extend_sprite_info_delegate m_extend_sprite_info_ptr;

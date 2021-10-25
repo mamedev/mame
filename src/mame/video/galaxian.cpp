@@ -387,7 +387,7 @@ void galaxian_state::eagle_palette(palette_device &palette)
 void galaxian_state::video_start()
 {
 	/* create a tilemap for the background */
-	if (!m_sfx_tilemap)
+	if (!m_sfx_adjust)
 	{
 		/* normal galaxian hardware is row-based and individually scrolling columns */
 		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxian_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, m_x_scale*8,8, 32,32);
@@ -518,7 +518,7 @@ void galaxian_state::galaxian_objram_w(offs_t offset, uint8_t data)
 			/* Frogger: top and bottom 4 bits swapped entering the adder */
 			if (m_frogger_adjust)
 				data = (data >> 4) | (data << 4);
-			if (!m_sfx_tilemap)
+			if (!m_sfx_adjust)
 				m_bg_tilemap->set_scrolly(offset >> 1, data);
 			else
 				m_bg_tilemap->set_scrollx(offset >> 1, m_x_scale*data);
@@ -561,10 +561,13 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	for (sprnum = 7; sprnum >= 0; sprnum--)
 	{
 		const uint8_t *base = &spritebase[sprnum * 4];
+
 		/* Frogger: top and bottom 4 bits swapped entering the adder */
 		uint8_t base0 = m_frogger_adjust ? ((base[0] >> 4) | (base[0] << 4)) : base[0];
-		/* the first three sprites match against y-1 */
-		uint8_t sy = 240 - (base0 - (sprnum < 3));
+
+		/* the first three sprites match against y-1 (seems other way around for sfx/monsterz) */
+		uint8_t sy = 240 - (base0 - (m_sfx_adjust ? (sprnum >= 3) : (sprnum < 3)));
+
 		uint16_t code = base[1] & 0x3f;
 		uint8_t flipx = base[1] & 0x40;
 		uint8_t flipy = base[1] & 0x80;

@@ -685,7 +685,6 @@ TODO:
 - streakng/ghostmun: $4800-4bff
 - smooncrs : fix read/writes at/to unmapped memory (when player 2, "cocktail" mode) + fix the ?#! bug with "bullets" (when player 2, "cocktail" mode)
 - timefgtr : missing player bullets, sprite ROM extend(see later levels), sound is too slow, some sprites missing
-- monsterz : galaxian_state::sprites_draw "the first three sprites match against y-1", it looks like y+1 for this game (probably also applies to sfx)
 - zigzag   : full Dip Switches and Inputs
 - zigzag2  : full Dip Switches and Inputs
 - jumpbug  : full Dip Switches and Inputs - missing possible discrete sounds
@@ -8883,7 +8882,7 @@ void nihon_sfx_state::init_sfx()
 	common_init(nullptr, nullptr, &galaxian_state::upper_extend_tile_info, nullptr);
 	m_draw_background_ptr = draw_background_delegate(&nihon_sfx_state::sfx_draw_background, this);
 	m_draw_bullet_ptr = draw_bullet_delegate(&nihon_sfx_state::sfx_draw_bullet, this);
-	m_sfx_tilemap = true;
+	m_sfx_adjust = true;
 }
 
 void monsterz_state::init_monsterz()
