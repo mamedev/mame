@@ -62891,6 +62891,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1999</year>
 		<publisher>EduBank</publisher>
 		<info name="alt_title" value="영재컴 꼬꼬마 Pack 1"/>
+		<info name="alt_title" value="Brilliant Com Cocoma Pack 1"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cocoma" />
 			<dataarea name="prg" size="524288">
@@ -62907,6 +62908,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>1999</year>
 		<publisher>EduBank</publisher>
 		<info name="alt_title" value="영재컴 꼬꼬마 Pack 2"/>
+		<info name="alt_title" value="Brilliant Com Cocoma Pack 2"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cocoma" />
 			<dataarea name="prg" size="524288">
