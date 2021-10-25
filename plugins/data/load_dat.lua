@@ -144,11 +144,11 @@ function datfile.open(file, vertag, fixupcb)
 					break
 				end
 			end
-			
+
 			data = data:gsub("[\n\r]$end%s*[\n\r]$%w+%s*[\n\r]", "\n")
 			data = data:gsub("[\n\r]$end%s*[\n\r].-[\n\r]$%w+%s*[\n\r]", "\n")
 			data = data:gsub("[\n\r]$end%s*[\n\r].*", "")
-			
+
 			if #tags > 0 and infotype then
 				data = data:gsub("\r", "") -- strip crs
 				if fixupcb then
