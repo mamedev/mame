@@ -294,7 +294,7 @@ void macp_state::ay1_b_w(u8 data)
 
 u8 macp_state::ay1_b_r()
 {
-	return 0x7f | (m_relay_ctrl == 3) ? 0 : 1;  // BIT 7 low indicates 40volt supply is available
+	return 0x7f | (m_relay_ctrl == 3 ? 0 : 1);  // BIT 7 low indicates 40volt supply is available
 }
 
 WRITE_LINE_MEMBER( macp_state::irq_w )
