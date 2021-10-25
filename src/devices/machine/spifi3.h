@@ -70,10 +70,8 @@ private:
     int state;
     int xfr_phase;
     int command_pos;
-    int dma_dir;
     bool irq = false;
     bool drq = false;
-    bool dma_command;
     uint32_t tcounter;
     uint8_t sync_period;
     uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
@@ -188,6 +186,11 @@ private:
         DMA_IN,
         DMA_OUT
     };
+    static inline bool dma_command(dma_direction current_direction)
+    {
+        return current_direction != DMA_NONE;
+    }
+    dma_direction dma_dir;
 
     // State-related functions
     void step(bool timeout);
@@ -200,7 +203,7 @@ private:
     void function_complete();
     void function_bus_complete();
     void bus_complete();
-    void dma_set(int dir);
+    void dma_set(dma_direction dir);
     void decrement_tcounter(int count = 1);
     bool transfer_count_zero();
     void delay(int cycles);
@@ -328,6 +331,19 @@ private:
     bool autodata_out(int target_id)
     {
         return autodata_active(target_id) && !(spifi_reg.autodata & ADATA_IN);
+    }
+    dma_direction dma_setting(int target_id)
+    {
+        // TODO: LUN? That is also written to this register in NetBSD
+        //       (and probably NEWS-OS). Need to figure out how to get
+        //       a device with multiple LUNs to test to nail down this
+        //       logic.
+        dma_direction result = DMA_NONE;
+        if ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id)
+        {
+            result = (spifi_reg.autodata & ADATA_IN) ? DMA_IN : DMA_OUT;
+        }
+        return result;
     }
 
     // Autostat register

@@ -83,7 +83,7 @@
  *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver.
  *  - SCSI performance seems variable from run to run. Will probably need to do some runtime profiling on that.
  *
- *  TODO:
+ *  TODO (in no particular order):
  *  - More complete floppy support (only supports floppy boot at the moment)
  *  - NetBSD SCSI support (mostly/entirely changes needed in the SPIFI driver)
  *  - Sound (lots of undocumented hardware)
@@ -92,10 +92,10 @@
  *  - APbus expansion slots
  *  - Triage and fix the known issues mentioned above
  *  - Figure out SPIFI3/DMAC3 handshake for pad to eliminate SPIFI workaround
+ *  - Save state support
  *
  *  TODO before opening first MR:
  *  - SPIFI3 refactoring
- *  - Save state support
  */
 
 #include "emu.h"
@@ -514,13 +514,13 @@ void news_r4k_state::machine_common(machine_config &config)
     NSCSI_BUS(config, m_scsibus0);
     NSCSI_BUS(config, m_scsibus1);
 
-    NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:0", news_scsi_devices, "harddisk");
     NSCSI_CONNECTOR(config, "scsi0:1", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:2", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:3", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:4", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi0:5", news_scsi_devices, nullptr);
-    NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, nullptr);
+    NSCSI_CONNECTOR(config, "scsi0:6", news_scsi_devices, "cdrom");
 
     NSCSI_CONNECTOR(config, "scsi1:0", news_scsi_devices, nullptr);
     NSCSI_CONNECTOR(config, "scsi1:1", news_scsi_devices, nullptr);

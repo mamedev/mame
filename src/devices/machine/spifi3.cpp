@@ -36,7 +36,7 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
-// #define VERBOSE SPIFI3_DEBUG
+// #define VERBOSE SPIFI3_TRACE
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -308,7 +308,6 @@ void spifi3_device::auxctrl_w(uint32_t data)
     {
         LOG("chip reset\n");
         spifi_reg = {};
-        dma_command = false;
         dma_dir = DMA_NONE;
         tcounter = 0;
         command_pos = 0;
@@ -428,10 +427,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = true; // TODO: This seems to be triggered by a write to the AUTODATA register. Not sure how to "reset" that, so to speak
-            dma_set(DMA_OUT); // TODO: This seems to be triggered by a write to the AUTODATA register. Not sure how to "reset" that, so to speak
-            check_drq();
-            step(false);
+            const dma_direction luntar_dma_setting = dma_setting(bus_id);
+            dma_set(luntar_dma_setting == DMA_OUT ? DMA_OUT : DMA_NONE);
             break;
         }
         case PRC_DATAIN:
@@ -440,10 +437,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = (spifi_reg.autodata & ADATA_IN) > 0; // TODO: ID check
-            dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
-            check_drq();
-            step(false);
+            const dma_direction luntar_dma_setting = dma_setting(bus_id);
+            dma_set(luntar_dma_setting == DMA_IN ? DMA_IN : DMA_NONE);
             break;
         }
         case PRC_COMMAND:
@@ -452,11 +447,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            dma_command = false;
             command_pos = 0;
-            dma_set(dma_command ? ((xfr_phase & S_INP) ? DMA_IN : DMA_OUT) : DMA_NONE);
-            check_drq();
-            step(false);
+            dma_set(DMA_NONE);
             break;
         }
         case PRC_STATUS:
@@ -464,11 +456,7 @@ void spifi3_device::prcmd_w(uint32_t data)
             LOGMASKED(LOG_CMD, "start command STATUS\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-            dma_command = false;
             dma_set(DMA_NONE);
-            check_drq();
-            step(false);
             break;
         }
         case PRC_TRPAD:
@@ -484,7 +472,6 @@ void spifi3_device::prcmd_w(uint32_t data)
                 state = INIT_XFR_SEND_PAD_WAIT_REQ;
             }
             scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-            step(false);
             break;
         }
         case PRC_MSGOUT:
@@ -492,11 +479,7 @@ void spifi3_device::prcmd_w(uint32_t data)
             LOGMASKED(LOG_CMD, "start command MSGOUT\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-            dma_command = false;
             dma_set(DMA_NONE);
-            check_drq();
-            step(false);
             break;
         }
         case PRC_MSGIN:
@@ -504,19 +487,22 @@ void spifi3_device::prcmd_w(uint32_t data)
             LOGMASKED(LOG_CMD, "start command MSGIN\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-            dma_command = false;
             dma_set(DMA_NONE);
-            check_drq();
-            step(false);
             break;
         }
         default:
         {
             LOG("Unimplemented command %d!\n", data);
-            break;
+            return;
         }
     }
+
+    if(data != PRC_TRPAD)
+    {
+        check_drq();
+    }
+
+    step(false);
 }
 
 uint32_t spifi3_device::init_status_r()
@@ -690,7 +676,7 @@ void spifi3_device::bus_complete()
     check_irq();
 }
 
-void spifi3_device::dma_set(int dir)
+void spifi3_device::dma_set(dma_direction dir)
 {
     dma_dir = dir;
 
@@ -703,7 +689,7 @@ void spifi3_device::dma_set(int dir)
 
 void spifi3_device::decrement_tcounter(int count)
 {
-    if (!dma_command)
+    if (!dma_command(dma_dir))
     {
         return;
     }
@@ -779,10 +765,7 @@ void spifi3_device::start_autostat(int target_id)
     LOGMASKED(LOG_AUTO, "start AUTOSTAT\n");
     state = INIT_XFR;
     xfr_phase = S_PHASE_STATUS;
-
-    // Below this is a guess
-    dma_command = false;
-    dma_dir = DMA_NONE;
+    dma_set(DMA_NONE);
 }
 
 void spifi3_device::start_automsg(int msg_phase)
@@ -1257,7 +1240,7 @@ void spifi3_device::step(bool timeout)
 
                     // if it's the last message byte, deassert ATN before sending
                     // TODO: this if condition doesn't make sense - fix or remove it.
-                    if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command && m_even_fifo.size() == 1) || (dma_command && tcounter == 1)))
+                    if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command(dma_dir) && m_even_fifo.size() == 1) || (dma_command(dma_dir) && tcounter == 1)))
                     {
                         scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
                     }
@@ -1288,7 +1271,7 @@ void spifi3_device::step(bool timeout)
 
                     // if it's the last message byte, ACK remains asserted.
                     // However, if AUTOMSG is enabled, automatically accept the message by lowering ACK before continuing.
-                    if((xfr_phase == S_PHASE_MSG_IN && (!dma_command || tcounter == 1)))
+                    if((xfr_phase == S_PHASE_MSG_IN && (!dma_command(dma_dir) || tcounter == 1)))
                     {
                         state = automsg_active() ? INIT_XFR_RECV_BYTE_ACK_AUTOMSG : INIT_XFR_RECV_BYTE_NACK;
                     }
@@ -1320,7 +1303,7 @@ void spifi3_device::step(bool timeout)
             }
 
             // check for command complete
-            if (xfr_data_source == FIFO && (dma_command && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty())))
+            if (xfr_data_source == FIFO && (dma_command(dma_dir) && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty())))
             {
                 LOGMASKED(LOG_DATA, "DMA transfer complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
@@ -1344,7 +1327,7 @@ void spifi3_device::step(bool timeout)
                     state = INIT_XFR_RECV_PAD_WAIT_REQ;
                 }
             }
-            else if (xfr_data_source == FIFO && (!dma_command && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
+            else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
             {
                 LOGMASKED(LOG_DATA, "Non-DMA transfer out complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
@@ -1354,7 +1337,7 @@ void spifi3_device::step(bool timeout)
                     start_automsg(newPhase);
                 }
             }
-            else if (xfr_data_source == FIFO && (!dma_command && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
+            else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
             {
                 LOG("Non-DMA transfer in complete\n");
                 state = INIT_XFR_BUS_COMPLETE;
@@ -1375,15 +1358,7 @@ void spifi3_device::step(bool timeout)
                 {
                     state = INIT_XFR;
                     xfr_phase = newPhase;
-                    dma_command = true;
-                    if (newPhase == S_PHASE_DATA_IN)
-                    {
-                        dma_dir = DMA_IN;
-                    }
-                    else
-                    {
-                        dma_dir = DMA_OUT;
-                    }
+                    dma_set(newPhase == S_PHASE_DATA_IN ? DMA_IN : DMA_OUT);
 
                     clear_queue(m_even_fifo); // TODO: can this be removed?
 
@@ -1469,7 +1444,7 @@ void spifi3_device::step(bool timeout)
             // Bypass the rest of the state machine, because if we allow this to do another cycle,
             // the bus will be free and the interrupts won't be set correctly.
             // This would have gone to INIT_XFR_FUNCTION_COMPLETE otherwise.
-            if (dma_command && !transfer_count_zero() && !m_even_fifo.empty())
+            if (dma_command(dma_dir) && !transfer_count_zero() && !m_even_fifo.empty())
             {
                 break;
             }
@@ -1483,7 +1458,7 @@ void spifi3_device::step(bool timeout)
         case INIT_XFR_FUNCTION_COMPLETE:
         {
             // wait for dma transfer to complete or fifo to drain
-            if (dma_command && !transfer_count_zero() && !m_even_fifo.empty())
+            if (dma_command(dma_dir) && !transfer_count_zero() && !m_even_fifo.empty())
             {
                 break;
             }
@@ -1495,7 +1470,7 @@ void spifi3_device::step(bool timeout)
         case INIT_XFR_BUS_COMPLETE:
         {
             // wait for dma transfer to complete or fifo to drain
-            if (dma_command && !transfer_count_zero() && !m_even_fifo.empty())
+            if (dma_command(dma_dir) && !transfer_count_zero() && !m_even_fifo.empty())
             {
                 break;
             }
