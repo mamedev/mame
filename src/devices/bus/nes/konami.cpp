@@ -455,13 +455,13 @@ void nes_konami_vrc4_device::device_timer(emu_timer &timer, device_timer_id id, 
 				// A prescaler divides the passing CPU cycles by 114, 114, then 113 (and repeats that order).
 				// This approximates 113+2/3 CPU cycles, which is one NTSC scanline.
 				// Since this is a CPU-based IRQ, though, it is triggered also during non visible scanlines...
-				if (m_irq_prescale < 3)
+				m_irq_prescale -= 3;
+
+				if (m_irq_prescale <= 0)
 				{
 					m_irq_prescale += 341;
 					irq_tick();
 				}
-
-				m_irq_prescale -= 3;
 			}
 		}
 	}

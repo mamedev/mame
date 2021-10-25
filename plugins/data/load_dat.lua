@@ -106,21 +106,21 @@ function datfile.open(file, vertag, fixupcb)
 				local tags, data
 				while not data do
 					local npos
-					local spos, epos = buffer:find("[\n\r]$[^=]*=[^\n\r]*", pos)
+					local spos, epos = buffer:find("[\n\r]$[^=\n\r]*=[^\n\r]*", pos)
 					if not spos then
 						return nil
 					end
-					npos, epos = buffer:find("[\n\r]$%w*[\n\r]+", epos)
+					npos, epos = buffer:find("[\n\r]$%w+%s*[\n\r]+", epos)
 					if not npos then
 						return nil
 					end
 					tags = buffer:sub(spos, epos)
-					spos, npos = buffer:find("[\n\r]$end[\n\r]", epos)
+					spos, npos = buffer:find("[\n\r]$[^=\n\r]*=[^\n\r]*", epos)
 					if not spos then
 						return nil
 					end
 					data = buffer:sub(epos, spos)
-					pos = npos
+					pos = spos
 				end
 				return tags, data
 			end
@@ -129,6 +129,8 @@ function datfile.open(file, vertag, fixupcb)
 		for info, data in gmatchpos() do
 			local tags = {}
 			local infotype
+			info = info:gsub(utf8.char(0xfeff), "") --remove boms
+			data = data:gsub(utf8.char(0xfeff), "")
 			for s in info:gmatch("[\n\r]$([^\n\r]*)") do
 				if s:find("=", 1, true) then
 					local m1, m2 = s:match("([^=]*)=(.*)")
@@ -142,6 +144,10 @@ function datfile.open(file, vertag, fixupcb)
 					break
 				end
 			end
+
+			data = data:gsub("[\n\r]$end%s*[\n\r]$%w+%s*[\n\r]", "\n")
+			data = data:gsub("[\n\r]$end%s*[\n\r].-[\n\r]$%w+%s*[\n\r]", "\n")
+			data = data:gsub("[\n\r]$end%s*[\n\r].*", "")
 
 			if #tags > 0 and infotype then
 				data = data:gsub("\r", "") -- strip crs

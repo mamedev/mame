@@ -4,7 +4,7 @@ local exports = {
 	name = 'inputmacro',
 	version = '0.0.1',
 	description = 'Input macro plugin',
-	license = 'The BSD 3-Clause License',
+	license = 'BSD-3-Clause',
 	author = { name = 'Vas Crabb' } }
 
 

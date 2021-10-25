@@ -26,7 +26,7 @@ inline std::string &mbstring_from_wstring(std::string &dst, UINT code_page, cons
 	// convert UTF-16 to the specified code page
 	const int dst_char_count = WideCharToMultiByte(code_page, 0, src.data(), src.length(), nullptr, 0, nullptr, nullptr);
 	dst.resize(dst_char_count);
-	WideCharToMultiByte(code_page, 0, &src[0], src.length(), dst.data(), dst_char_count, nullptr, nullptr);
+	WideCharToMultiByte(code_page, 0, src.data(), src.length(), dst.data(), dst_char_count, nullptr, nullptr);
 
 	return dst;
 }
@@ -41,7 +41,7 @@ inline std::wstring &wstring_from_mbstring(std::wstring &dst, const std::string_
 	// convert multibyte string (in specified code page) to UTF-16
 	const int dst_char_count = MultiByteToWideChar(code_page, 0, src.data(), src.length(), nullptr, 0);
 	dst.resize(dst_char_count);
-	MultiByteToWideChar(code_page, 0, &src[0], src.length(), dst.data(), dst_char_count);
+	MultiByteToWideChar(code_page, 0, src.data(), src.length(), dst.data(), dst_char_count);
 
 	return dst;
 }

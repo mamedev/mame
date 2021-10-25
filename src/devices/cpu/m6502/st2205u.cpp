@@ -117,6 +117,9 @@ void st2205u_base_device::sound_stream_update(sound_stream &stream, std::vector<
 		{
 			s16 adpcm_contribution = m_adpcm_level[channel];
 			outputs[channel].add_int(outpos, adpcm_contribution * 0x10, 32768);
+
+			auto psg_contribution = std::sin((double)m_psg_freqcntr[channel]/4096.0f);
+			outputs[channel].add_int(outpos, psg_contribution * m_psg_amplitude[channel]*0x80,32768);
 		}
 
 		outpos++;
@@ -160,6 +163,8 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 	save_item(NAME(m_lvctr));
 
 	save_item(NAME(m_adpcm_level));
+	save_item(NAME(m_psg_amplitude));
+	save_item(NAME(m_psg_freqcntr));
 
 	mintf = std::move(intf);
 	save_common_registers();
@@ -362,6 +367,8 @@ void st2205u_base_device::device_reset()
 	m_lvctr = 0;
 
 	std::fill(std::begin(m_adpcm_level), std::end(m_adpcm_level), 0);
+	std::fill(std::begin(m_psg_amplitude), std::end(m_psg_amplitude), 0);
+	std::fill(std::begin(m_psg_freqcntr), std::end(m_psg_freqcntr), 0);
 }
 
 void st2205u_device::device_reset()
@@ -782,6 +789,9 @@ void st2205u_base_device::timer_12bit_process(int t)
 			{
 				reset_adpcm_value(t);
 				LOGDAC("Playing %s sample %02X on channel %d\n", BIT(m_psgm, 2 * t) ? "tone" : "DAC", psg_data & 0xff, t);
+
+				m_psg_amplitude[t] = psg_data & 0xff; // amplitude is controller by the data writes
+				m_psg_freqcntr[t] += 0x80; // the frequency is determined by the timer speed (there must be a better way to do this?)
 			}
 
 			--m_fifo_filled[t];

@@ -1,47 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Casio CTK-551 keyboard (and related models)
+    Casio CTK-551 keyboard (and related models)
 
-	Casio released several keyboard models with the same main board.
-	As usual, some of them were also rebranded by Radio Shack.
+    Casio released several keyboard models with the same main board.
+    As usual, some of them were also rebranded by Radio Shack.
 
-	- CTK-531, CTK-533
-	  Basic 61-key model
-	- CTK-541, Optimus MD-1150
-	  Adds velocity-sensitive keys
-	- CTK-551, CTK-558, Radio Shack MD-1160
-	  Adds pitch wheel and different selection of demo songs
+    - CTK-531, CTK-533
+      Basic 61-key model
+    - CTK-541, Optimus MD-1150
+      Adds velocity-sensitive keys
+    - CTK-551, CTK-558, Radio Shack MD-1160
+      Adds pitch wheel and different selection of demo songs
 
-	Main board (JCM456-MA1M):
+    Main board (JCM456-MA1M):
 
-	LSI1: CPU (Casio GT913F)
-	      Custom chip based on H8/300 instruction set, built in peripheral controllers & sound generator
+    LSI1: CPU (Casio GT913F)
+          Custom chip based on H8/300 instruction set, built in peripheral controllers & sound generator
 
-	LSI2: 8Mbit ROM (OKI MSM538002E)
+    LSI2: 8Mbit ROM (OKI MSM538002E)
 
-	LSI3: LCD controller (HD44780 compatible)
-	      May be either a Samsung KS0066U-10B or Epson SED1278F2A.
+    LSI3: LCD controller (HD44780 compatible)
+          May be either a Samsung KS0066U-10B or Epson SED1278F2A.
 
-	IC1:  stereo DAC (NEC uPD6379GR)
+    IC1:  stereo DAC (NEC uPD6379GR)
 
-	CTK-541 service manual with schematics, pinouts, etc.:
-	https://revenant1.net/ctk541.pdf
+    CTK-541 service manual with schematics, pinouts, etc.:
+    https://revenant1.net/ctk541.pdf
 
-	To access the test mode (not mentioned in the service manual):
-	Hold the "Start/Stop" and keypad 0 buttons together when turning on the keyboard.
-	Afterwards, press one of these buttons:
-	- Tone: LCD test (press repeatedly)
-	- Keypad 0: switch test (press all front panel buttons in a specific order, generally left to right)
-	- Keypad 1 or Rhythm: pedal and key test
-	- Keypad 2: ROM test
-	- Keypad 4/5/6: sound volume test
-	- Keypad 7/8: stereo test
-	- Keypad 9: MIDI loopback test
-	- Keypad + or Song Bank: power source test
-	- Keypad -: pitch wheel test
-	- FFWD: exit test mode
-	- Stop: power off
+    To access the test mode (not mentioned in the service manual):
+    Hold the "Start/Stop" and keypad 0 buttons together when turning on the keyboard.
+    Afterwards, press one of these buttons:
+    - Tone: LCD test (press repeatedly)
+    - Keypad 0: switch test (press all front panel buttons in a specific order, generally left to right)
+    - Keypad 1 or Rhythm: pedal and key test
+    - Keypad 2: ROM test
+    - Keypad 4/5/6: sound volume test
+    - Keypad 7/8: stereo test
+    - Keypad 9: MIDI loopback test
+    - Keypad + or Song Bank: power source test
+    - Keypad -: pitch wheel test
+    - FFWD: exit test mode
+    - Stop: power off
 
  */
 
@@ -267,7 +267,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Song Bank")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Rhythm")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Tone")
-	
+
 	PORT_START("maincpu:kbd:KO9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)

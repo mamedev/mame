@@ -629,6 +629,9 @@ void esripsys_state::init_esripsys()
 
 	subdevice<nvram_device>("nvram")->set_base(m_cmos_ram.get(), CMOS_RAM_SIZE);
 
+	// FIXME: arbitrarily initialize bank1 to avoid debugger crash
+	membank("bank1")->set_base(&memregion("game_cpu")->base()[0x10000]);
+
 	membank("bank2")->set_base(&rom[0x0000]);
 	membank("bank3")->set_base(&rom[0x4000]);
 	membank("bank4")->set_base(&rom[0x8000]);

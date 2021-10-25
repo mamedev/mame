@@ -17932,4 +17932,52 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="rboots4035">
+		<description>Rocky's Boots (Version 4.1) (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>The Learning Company</publisher>
+		<info name="release" value="2021-10-10"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card. -->
+		<!--"Rocky's Boots" is a 1988 educational game developed by Warren Robinett and Leslie Grimm, and distributed by The Learning Company. It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296202">
+				<rom name="rocky's boots v4.1 800k.woz" size="1296202" crc="9547ceae" sha1="9ed4042968ce40c1d5049befe27ecc74d81e4aea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brdstale3">
+		<description>The Bard's Tale III: Thief of Fate (800K 3.5")</description>
+		<year>1988</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2021-10-12"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card. -->
+		<!--"The Bard's Tale III: Thief of Fate" is a 1988 roleplaying game developed by Rebecca Heineman and distributed by Electronic Arts. It requires a Apple IIgs, //c+, or //e or 64K ][+ with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296176">
+				<rom name="the bard's tale iii 800k.woz" size="1296176" crc="d388b56d" sha1="7e45ae4673d40093f535606d13d032cadaa410ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newprntshop">
+		<description>The New Print Shop (800K 3.5")</description>
+		<year>1990</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2021-10-12"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card. -->
+		<!--"The New Print Shop" is a 1990 graphics program developed by Don Lloyd and distributed by Broderbund Software. It requires a Apple IIgs, //c+, or 128K //e with a compatible drive controller card.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296152">
+				<rom name="the new print shop 800k.woz" size="1296152" crc="df2c9138" sha1="d5f690d14861672cbefb9ab9a1ad275a087979e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

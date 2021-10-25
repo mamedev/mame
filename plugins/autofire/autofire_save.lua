@@ -76,7 +76,7 @@ function lib:save_settings(buttons)
 	if not attr then
 		lfs.mkdir(path)
 	elseif attr.mode ~= 'directory' then
-		emu.print_error(string.format('Error autofire settings macros: "%s" is not a directory\n', path))
+		emu.print_error(string.format('Error saving autofire settings: "%s" is not a directory\n', path))
 		return
 	end
 	if #buttons == 0 then

@@ -1,3 +1,7 @@
+-- license:BSD-3-Clause
+-- copyright-holders:Vas Crabb
+
+
 -- Constants
 
 local MENU_TYPES = { MACROS = 0, ADD = 1, EDIT = 2, INPUT = 3 }
@@ -609,7 +613,7 @@ function populate_macros()
 			end
 		end
 	else
-		items[#items + 1] = { _p('plugin-inputmacro', 'No macros'), '', 'off' }
+		items[#items + 1] = { _p('plugin-inputmacro', '[no macros]'), '', 'off' }
 	end
 	macros_start_macro = nil
 

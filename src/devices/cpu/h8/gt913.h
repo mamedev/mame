@@ -38,7 +38,7 @@ protected:
 	virtual void internal_update(uint64_t current_time) override;
 	virtual void irq_setup() override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	
+
 	virtual void device_add_mconfig(machine_config &config) override;
 	void map(address_map &map);
 
@@ -58,12 +58,12 @@ protected:
 
 	required_memory_bank m_bank;
 	uint16_t             m_banknum;
-	
+
 	required_device<gt913_intc_device> m_intc;
 
 	/* sound */
 	required_device<gt913_sound_hle_device> m_sound;
-	
+
 	/* key controller */
 	required_device<gt913_kbd_hle_device> m_kbd;
 
@@ -72,7 +72,7 @@ protected:
 
 	/* serial port */
 	required_device<h8_sci_device> m_sci;
-	
+
 	/* 3x 8-bit I/O ports */
 	required_device_array<h8_port_device, 3> m_port;
 };

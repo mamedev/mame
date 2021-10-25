@@ -35,6 +35,7 @@ DEFINE_DEVICE_TYPE(NES_AX5705,      nes_ax5705_device,      "nes_ax5705",      "
 DEFINE_DEVICE_TYPE(NES_BMC_830506C, nes_bmc_830506c_device, "nes_bmc_830506c", "NES Cart BMC 830506C PCB")
 DEFINE_DEVICE_TYPE(NES_CITYFIGHT,   nes_cityfight_device,   "nes_cityfight",   "NES Cart City Fighter PCB")
 DEFINE_DEVICE_TYPE(NES_SHUIGUAN,    nes_shuiguan_device,    "nes_shuiguan",    "NES Cart Shui Guan Pipe Pirate PCB")
+DEFINE_DEVICE_TYPE(NES_T230,        nes_t230_device,        "nes_t230",        "NES Cart T-230 PCB")
 DEFINE_DEVICE_TYPE(NES_TF1201,      nes_tf1201_device,      "nes_tf1201",      "NES Cart UNL-TF1201 PCB")
 DEFINE_DEVICE_TYPE(NES_TH21311,     nes_th21311_device,     "nes_th21311",     "NES Cart UNL-TH2131-1 PCB")
 
@@ -71,6 +72,11 @@ nes_cityfight_device::nes_cityfight_device(const machine_config &mconfig, const 
 
 nes_shuiguan_device::nes_shuiguan_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_konami_vrc4_device(mconfig, NES_SHUIGUAN, tag, owner, clock)
+{
+}
+
+nes_t230_device::nes_t230_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_konami_vrc4_device(mconfig, NES_T230, tag, owner, clock)
 {
 }
 
@@ -180,6 +186,15 @@ void nes_shuiguan_device::pcb_reset()
 {
 	nes_konami_vrc4_device::pcb_reset();
 	m_reg = 0;
+}
+
+void nes_t230_device::device_start()
+{
+	nes_konami_vrc4_device::device_start();
+
+	// VRC4 pins 3 and 4
+	m_vrc_ls_prg_a = 3;  // A3
+	m_vrc_ls_prg_b = 2;  // A2
 }
 
 void nes_tf1201_device::device_start()
@@ -384,7 +399,7 @@ void nes_cityfight_device::write_h(offs_t offset, u8 data)
 
 u8 nes_shuiguan_device::read_m(offs_t offset)
 {
-//	LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
+//  LOG_MMC(("shuiguan read_m, offset: %04x\n", offset));
 	return m_prg[(m_reg * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
@@ -412,6 +427,43 @@ void nes_shuiguan_device::write_h(offs_t offset, u8 data)
 			break;
 		case 0x2800:
 			prg8_ab(data);
+			break;
+		default:
+			nes_konami_vrc4_device::write_h(offset, data);
+			break;
+	}
+}
+
+/*-------------------------------------------------
+
+ Board UNL-T-230
+
+ Games: Dragon Ball Z IV (Unl)
+
+ VRC4 clone that uses CHRRAM instead of CHRROM and
+ has nonstandard PRG banking.
+
+ NES 2.0: mapper 529
+
+ In MAME: Supported.
+
+ TODO: This cart and its appearance on the 2yudb set
+ have IRQ timing issues that cause a bouncing status
+ bar in fights. Other emulators also have issues
+ on the split line so perhaps some noise is expected?
+
+ -------------------------------------------------*/
+
+void nes_t230_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("t230 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x7000)
+	{
+		case 0x0000:
+			break;  // PRG banking at $8000 ignored
+		case 0x2000:
+			prg16_89ab(data);
 			break;
 		default:
 			nes_konami_vrc4_device::write_h(offset, data);
