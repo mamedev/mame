@@ -88,10 +88,12 @@ public:
 	void nimbus(machine_config &config);
 
 	uint32_t m_debug_machine;
+	uint32_t m_debug_trap;
 
-	void decode_subbios(device_t *device, offs_t pc, uint8_t raw_flag);
+	void decode_subbios(device_t *device, offs_t pc);
+	void decode_subbios_return(device_t *device, offs_t pc);
 	void decode_dos21(device_t *device, offs_t pc);
-
+	
 private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8031_device> m_iocpu;
@@ -156,6 +158,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
+	DECLARE_READ_LINE_MEMBER(nimbus_fdc_enmf_r);
+	
 	void nimbus_via_write_portb(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_bsy);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_cd);
@@ -189,8 +193,8 @@ private:
 	void rmni_sound_reset();
 	void mouse_js_reset();
 	void check_scsi_irq();
-	void set_scsi_drqlat(bool clock, bool clear);
-
+	void set_scsi_drqlat(bool	clock, bool clear);
+	
 	int m_scsi_iena;
 	int m_scsi_msg;
 	int m_scsi_bsy;
@@ -224,8 +228,8 @@ private:
 	/* Mouse/Joystick */
 	struct
 	{
-		int8_t      m_mouse_x;
-		int8_t      m_mouse_y;
+		int8_t		m_mouse_x;
+		int8_t   	m_mouse_y;
 
 		uint8_t   m_mouse_pcx;
 		uint8_t   m_mouse_pcy;
@@ -243,16 +247,18 @@ private:
 	void nimbus_iocpu_mem(address_map &map);
 	void nimbus_mem(address_map &map);
 
-	void decode_dssi_none(uint16_t ds, uint16_t si, uint8_t raw_flag);
-	void decode_dssi_generic(uint16_t ds, uint16_t si, uint8_t raw_flag);
-	void decode_dssi_f_fill_area(uint16_t ds, uint16_t si, uint8_t raw_flag);
-	void decode_dssi_f_plot_character_string(uint16_t ds, uint16_t si, uint8_t raw_flag);
-	void decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si, uint8_t raw_flag);
-	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si, uint8_t raw_flag);
-	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si, uint8_t raw_flag);
-
+	void decode_dssi_none(uint16_t ds, uint16_t si);
+	void decode_dssi_generic(uint16_t ds, uint16_t si);
+	void decode_dssi_f_fill_area(uint16_t ds, uint16_t si);
+	void decode_dssi_f_plot_character_string(uint16_t ds, uint16_t si);
+	void decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si);
+	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si);
+	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si);
+	
 	void debug_command(const std::vector<std::string> &params);
 	void video_debug(const std::vector<std::string> &params);
+	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+
 };
 
 #endif // MAME_INCLUDES_RMNIMBUS_H
