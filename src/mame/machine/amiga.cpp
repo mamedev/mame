@@ -142,7 +142,6 @@ constexpr XTAL amiga_state::CLK_7M_NTSC;
 constexpr XTAL amiga_state::CLK_C1_NTSC;
 constexpr XTAL amiga_state::CLK_E_NTSC;
 
-
 /*************************************
  *
  *  Machine reset
@@ -1131,6 +1130,30 @@ WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
 //**************************************************************************
 //  CUSTOM CHIPS
 //**************************************************************************
+
+void amiga_state::ocs_map(address_map &map)
+{
+	// In progress: remove this catch-all trampoline, move everything into devices
+	map(0x000, 0x1ff).rw(FUNC(amiga_state::custom_chip_r), FUNC(amiga_state::custom_chip_w));
+
+	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_8364_device::audio_channel_map<0>));
+	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
+	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<2>));
+	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_8364_device::audio_channel_map<3>));
+}
+
+void amiga_state::ecs_map(address_map &map)
+{
+	ocs_map(map);
+	// ...
+}
+
+void amiga_state::aga_map(address_map &map)
+{
+	ecs_map(map);
+	// ...
+}
+
 
 void amiga_state::custom_chip_reset()
 {

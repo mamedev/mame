@@ -63,6 +63,8 @@ public:
 
 	void update();
 
+	template <u8 ch> void audio_channel_map(address_map &map);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,6 +74,13 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
+	template <u8 ch> void audxlch_w(u16 data);
+	template <u8 ch> void audxlcl_w(u16 data);
+	template <u8 ch> void audxlen_w(u16 data);
+	template <u8 ch> void audxper_w(u16 data);
+	template <u8 ch> void audxvol_w(u16 data);
+	template <u8 ch> void audxdat_w(u16 data);
+
 	enum
 	{
 		CHAN_0 = 0,

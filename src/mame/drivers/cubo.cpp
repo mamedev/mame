@@ -435,7 +435,7 @@ void cubo_state::cubo_mem(address_map &map)
 	map(0xa80000, 0xb7ffff).noprw();
 	map(0xb80000, 0xb8003f).rw("akiko", FUNC(akiko_device::read), FUNC(akiko_device::write));
 	map(0xbf0000, 0xbfffff).rw(FUNC(cubo_state::cia_r), FUNC(cubo_state::gayle_cia_w));
-	map(0xc00000, 0xdfffff).rw(FUNC(cubo_state::custom_chip_r), FUNC(cubo_state::custom_chip_w));
+	map(0xc00000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap32));
 	map(0xe00000, 0xe7ffff).rom().region("kickstart", 0x80000);
 	map(0xe80000, 0xf7ffff).noprw();
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -1040,7 +1040,8 @@ void cubo_state::cubo(machine_config &config)
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cubo_state::cubo_mem);
 
-	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+ 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
@@ -1062,13 +1063,13 @@ void cubo_state::cubo(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_PAL));
-	paula.add_route(0, "lspeaker", 0.25);
-	paula.add_route(1, "rspeaker", 0.25);
-	paula.add_route(2, "rspeaker", 0.25);
-	paula.add_route(3, "lspeaker", 0.25);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_PAL);
+	m_paula->add_route(0, "lspeaker", 0.25);
+	m_paula->add_route(1, "rspeaker", 0.25);
+	m_paula->add_route(2, "rspeaker", 0.25);
+	m_paula->add_route(3, "lspeaker", 0.25);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, "lspeaker", 0.50);

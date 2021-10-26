@@ -211,10 +211,10 @@ void arcadia_amiga_state::a500_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).m(m_overlay, FUNC(address_map_bank_device::amap16));
 	map(0xa00000, 0xbfffff).rw(FUNC(arcadia_amiga_state::cia_r), FUNC(arcadia_amiga_state::cia_w));
-	map(0xc00000, 0xd7ffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xc00000, 0xd7ffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xd80000, 0xddffff).noprw();
-	map(0xde0000, 0xdeffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
-	map(0xdf0000, 0xdfffff).rw(FUNC(arcadia_amiga_state::custom_chip_r), FUNC(arcadia_amiga_state::custom_chip_w));
+	map(0xde0000, 0xdeffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
+	map(0xdf0000, 0xdfffff).m(m_chipset, FUNC(address_map_bank_device::amap16));
 	map(0xe00000, 0xe7ffff).nopw().r(FUNC(arcadia_amiga_state::rom_mirror_r));
 	map(0xe80000, 0xefffff).noprw(); // autoconfig space (installed by devices)
 	map(0xf80000, 0xffffff).rom().region("kickstart", 0);
@@ -307,7 +307,8 @@ void arcadia_amiga_state::arcadia(machine_config &config)
 	M68000(config, m_maincpu, amiga_state::CLK_7M_NTSC);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arcadia_amiga_state::arcadia_map);
 
-	ADDRESS_MAP_BANK(config, m_overlay).set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_overlay).set_map(&arcadia_amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
+	ADDRESS_MAP_BANK(config, m_chipset).set_map(&arcadia_amiga_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

@@ -316,11 +316,12 @@ public:
 		, m_cia_1(*this, "cia_1")
 		, m_rs232(*this, "rs232")
 		, m_centronics(*this, "centronics")
-		, m_paula(*this, "amiga")
+		, m_paula(*this, "paula")
 		, m_fdc(*this, "fdc")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_overlay(*this, "overlay")
+		, m_chipset(*this, "chipset")
 		, m_input_device(*this, "input")
 		, m_joy0dat_port(*this, "joy_0_dat")
 		, m_joy1dat_port(*this, "joy_1_dat")
@@ -578,7 +579,7 @@ protected:
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
-
+	required_device<address_map_bank_device> m_chipset;
 
 	// i/o ports
 	optional_ioport m_input_device;
@@ -603,6 +604,10 @@ protected:
 
 	uint16_t m_custom_regs[256];
 	static const char *const s_custom_reg_names[0x100];
+
+	void ocs_map(address_map &map);
+	void ecs_map(address_map &map);
+	void aga_map(address_map &map);
 
 private:
 	// blitter helpers

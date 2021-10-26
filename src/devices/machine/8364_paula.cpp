@@ -104,6 +104,60 @@ void paula_8364_device::update()
 //  IMPLEMENTATION
 //**************************************************************************
 
+template <u8 ch> void paula_8364_device::audio_channel_map(address_map &map)
+{
+	// TODO: location addresses belongs to Agnus
+	map(0x00, 0x01).w(FUNC(paula_8364_device::audxlch_w<ch>));
+	map(0x02, 0x03).w(FUNC(paula_8364_device::audxlcl_w<ch>));
+	map(0x04, 0x05).w(FUNC(paula_8364_device::audxlen_w<ch>));
+	map(0x06, 0x07).w(FUNC(paula_8364_device::audxper_w<ch>));
+	map(0x08, 0x09).w(FUNC(paula_8364_device::audxvol_w<ch>));
+	map(0x0a, 0x0b).w(FUNC(paula_8364_device::audxdat_w<ch>));
+}
+
+// Instantiate channel maps
+template void paula_8364_device::audio_channel_map<0>(address_map &map);
+template void paula_8364_device::audio_channel_map<1>(address_map &map);
+template void paula_8364_device::audio_channel_map<2>(address_map &map);
+template void paula_8364_device::audio_channel_map<3>(address_map &map);
+
+template <u8 ch> void paula_8364_device::audxlch_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].loc = (m_channel[ch].loc & 0x0000ffff) | ((data & 0x001f) << 16);
+}
+
+template <u8 ch> void paula_8364_device::audxlcl_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].loc = (m_channel[ch].loc & 0xffff0000) | ((data & 0xfffe) <<  0);
+}
+
+template <u8 ch> void paula_8364_device::audxlen_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].len = data;
+}
+
+template <u8 ch> void paula_8364_device::audxper_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].per = data;
+}
+
+template <u8 ch> void paula_8364_device::audxvol_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].vol = data;
+}
+
+template <u8 ch> void paula_8364_device::audxdat_w(u16 data)
+{
+	m_stream->update();
+	m_channel[ch].dat = data;
+	m_channel[ch].manualmode = true;
+}
+
 uint16_t paula_8364_device::reg_r(offs_t offset)
 {
 	switch (offset)
@@ -130,7 +184,7 @@ void paula_8364_device::reg_w(offs_t offset, uint16_t data)
 		m_dmacon = (data & 0x8000) ? (m_dmacon | (data & 0x021f)) : (m_dmacon & ~(data & 0x021f));  // only bits 15, 9 and 5 to 0
 		// update the DMA latches on each channel and reload if fresh
 		// This holds true particularly for Ocean games (bchvolly, lostpatr, pang) and waylildr:
-		// they sets a DMA length for a channel then enable DMA then resets that length to 1
+		// they sets a DMA length for a channel then enable DMA finally resets that length to 1
 		// after a short delay loop.
 		for (int channum = 0; channum < 4; channum++)
 		{
@@ -147,33 +201,7 @@ void paula_8364_device::reg_w(offs_t offset, uint16_t data)
 		m_adkcon = (data & 0x8000) ? (m_adkcon | (data & 0x7fff)) : (m_adkcon & ~(data & 0x7fff));
 		break;
 
-	// FIXME: location belongs to Agnus
-	case REG_AUD0LCL: m_channel[CHAN_0].loc = (m_channel[CHAN_0].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD0LCH: m_channel[CHAN_0].loc = (m_channel[CHAN_0].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
-	case REG_AUD1LCL: m_channel[CHAN_1].loc = (m_channel[CHAN_1].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD1LCH: m_channel[CHAN_1].loc = (m_channel[CHAN_1].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
-	case REG_AUD2LCL: m_channel[CHAN_2].loc = (m_channel[CHAN_2].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD2LCH: m_channel[CHAN_2].loc = (m_channel[CHAN_2].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
-	case REG_AUD3LCL: m_channel[CHAN_3].loc = (m_channel[CHAN_3].loc & 0xffff0000) | ((data & 0xfffe) <<  0); break; // 15-bit
-	case REG_AUD3LCH: m_channel[CHAN_3].loc = (m_channel[CHAN_3].loc & 0x0000ffff) | ((data & 0x001f) << 16); break; // 3-bit on ocs, 5-bit ecs
 
-	// audio data
-	case REG_AUD0LEN: m_channel[CHAN_0].len = data; break;
-	case REG_AUD0PER: m_channel[CHAN_0].per = data; break;
-	case REG_AUD0VOL: m_channel[CHAN_0].vol = data & 0x7f; break;
-	case REG_AUD0DAT: m_channel[CHAN_0].dat = data; m_channel[CHAN_0].manualmode = true; break;
-	case REG_AUD1LEN: m_channel[CHAN_1].len = data; break;
-	case REG_AUD1PER: m_channel[CHAN_1].per = data; break;
-	case REG_AUD1VOL: m_channel[CHAN_1].vol = data & 0x7f; break;
-	case REG_AUD1DAT: m_channel[CHAN_1].dat = data; m_channel[CHAN_1].manualmode = true; break;
-	case REG_AUD2LEN: m_channel[CHAN_2].len = data; break;
-	case REG_AUD2PER: m_channel[CHAN_2].per = data; break;
-	case REG_AUD2VOL: m_channel[CHAN_2].vol = data & 0x7f; break;
-	case REG_AUD2DAT: m_channel[CHAN_2].dat = data; m_channel[CHAN_2].manualmode = true; break;
-	case REG_AUD3LEN: m_channel[CHAN_3].len = data; break;
-	case REG_AUD3PER: m_channel[CHAN_3].per = data; break;
-	case REG_AUD3VOL: m_channel[CHAN_3].vol = data & 0x7f; break;
-	case REG_AUD3DAT: m_channel[CHAN_3].dat = data; m_channel[CHAN_3].manualmode = true; break;
 	}
 }
 
