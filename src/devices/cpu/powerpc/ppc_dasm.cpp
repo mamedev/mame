@@ -28,7 +28,7 @@
  * and print instructions.
  */
 
-constexpr int I_COMMON = I_POWER | I_POWERPC;
+constexpr int I_COMMON = powerpc_disassembler::I_POWER | powerpc_disassembler::I_POWERPC;
 
 const powerpc_disassembler::IDESCR powerpc_disassembler::itab[] =
 {
