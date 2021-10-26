@@ -14,8 +14,6 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 
-premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++17"', 'CLANG_CXX_LIBRARY = "libc++"' }
-
 MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
@@ -74,8 +72,7 @@ end
 
 function precompiledheaders()
 	if _OPTIONS["precompile"]==nil or (_OPTIONS["precompile"]~=nil and _OPTIONS["precompile"]=="1") then
-		configuration { "not xcode4" }
-			pchheader("emu.h")
+		pchheader("emu.h")
 		configuration { }
 	end
 end
@@ -144,16 +141,11 @@ newoption {
 		{ "freebsd",       "FreeBSD"                },
 		{ "netbsd",        "NetBSD"                 },
 		{ "openbsd",       "OpenBSD"                },
-		{ "pnacl",         "Native Client - PNaCl"  },
 		{ "linux",         "Linux"                  },
-		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
-		{ "steamlink",     "Steam Link"             },
-		{ "rpi",           "Raspberry Pi"           },
-		{ "ci20",          "Creator-Ci20"           },
 	},
 }
 
@@ -474,17 +466,11 @@ configurations {
 	"Release",
 }
 
-if _ACTION == "xcode4" then
-	platforms {
-		"x64",
-	}
-else
-	platforms {
-		"x32",
-		"x64",
-		"Native", -- for targets where bitness is not specified
-	}
-end
+platforms {
+	"x32",
+	"x64",
+	"Native", -- for targets where bitness is not specified
+}
 
 language "C++"
 
@@ -528,35 +514,7 @@ configuration { "Release", "vs20*" }
 		}
 	end
 
-configuration { "vsllvm" }
-	buildoptions {
-		"/bigobj",
-	}
-	flags {
-		"NoPCH",
-		"ExtraWarnings",
-	}
-	if not _OPTIONS["NOWERROR"] then
-		flags{
-			"FatalWarnings",
-		}
-	end
-
-
-configuration { "Debug", "vsllvm" }
-	flags {
-		"Symbols",
-		"NoMultiProcessorCompilation",
-	}
-
-configuration { "Release", "vsllvm" }
-	flags {
-		"Optimize",
-		"NoEditAndContinue",
-		"NoIncrementalLink",
-	}
-
--- Force VS2015/17 targets to use bundled SDL2
+-- Force Visual Studio targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
 		_OPTIONS["with-bundled-sdl2"] = "1"
@@ -785,11 +743,9 @@ local version = str_to_version(_OPTIONS["gcc_version"])
 		"-std=c++17",
 	}
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
-	if not ("pnacl" == _OPTIONS["gcc"]) then
-		buildoptions {
-			"-pipe",
-		}
-	end
+	buildoptions {
+		"-pipe",
+	}
 -- add -g if we need symbols, and ensure we have frame pointers
 if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
@@ -1075,7 +1031,7 @@ end
 
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
-		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "pnacl") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 			if (version < 60000) then
 				print("Clang version 6.0 or later needed")
 				os.exit(-1)
@@ -1228,17 +1184,7 @@ configuration { "android-arm64" }
 		"-Wno-asm-operand-widths",
 	}
 
-configuration { "pnacl" }
-	buildoptions {
-		"-std=gnu89",
-		"-Wno-inline-new-delete",
-	}
-	buildoptions_cpp {
-		"-std=c++17",
-	}
-	archivesplit_size "20"
-
-configuration { "linux-* or rpi or ci20"}
+configuration { "linux-*"}
 		links {
 			"dl",
 			"rt",
@@ -1252,42 +1198,7 @@ configuration { "linux-* or rpi or ci20"}
 
 
 
-configuration { "steamlink" }
-	links {
-		"dl",
-		"EGL",
-		"GLESv2",
-		"SDL2",
-	}
-	defines {
-		"EGL_API_FB",
-	}
-
-configuration { "rpi" }
-	links {
-		"SDL2",
-		"fontconfig",
-		"X11",
-		"GLESv2",
-		"EGL",
-		"bcm_host",
-		"vcos",
-		"vchiq_arm",
-		"pthread",
-	}
-
-
-configuration { "ci20" }
-	links {
-		"SDL2",
-		"asound",
-		"fontconfig",
-		"freetype",
-		"pthread",
-	}
-
-
-configuration { "osx* or xcode4" }
+configuration { "osx*" }
 		links {
 			"pthread",
 		}
@@ -1318,19 +1229,6 @@ configuration { "mingw*" }
 			"userenv",
 		}
 
-configuration { "vsllvm" }
-	defines {
-		"XML_STATIC",
-		"WIN32",
-		"_WIN32",
-		"_CRT_NONSTDC_NO_DEPRECATE",
-		"_CRT_SECURE_NO_DEPRECATE",
-		"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
-	}
-	includedirs {
-		MAME_DIR .. "3rdparty/dxsdk/Include"
-	}
-
 configuration { "vs20*" }
 		defines {
 			"XML_STATIC",
@@ -1341,8 +1239,6 @@ configuration { "vs20*" }
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
 
--- Windows Store/Phone projects already link against the available libraries.
-if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
 			"user32",
 			"winmm",
@@ -1355,7 +1251,6 @@ if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or
 			"shell32",
 			"userenv",
 		}
-end
 
 		buildoptions {
 			"/WX",     -- Treats all compiler warnings as errors.
@@ -1461,39 +1356,6 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}
-configuration { "winphone8* or winstore8*" }
-	linkoptions {
-		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
-	}
-configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-tautological-constant-out-of-range-compare",
-			"-Wno-ignored-qualifiers",
-			"-Wno-missing-field-initializers",
-			"-Wno-ignored-pragma-optimize",
-			"-Wno-unknown-warning-option",
-			"-Wno-unused-function",
-			"-Wno-unused-label",
-			"-Wno-unused-local-typedef",
-			"-Wno-unused-const-variable",
-			"-Wno-unused-parameter",
-			"-Wno-unneeded-internal-declaration",
-			"-Wno-unused-private-field",
-			"-Wno-missing-braces",
-			"-Wno-unused-variable",
-			"-Wno-tautological-pointer-compare",
-			"-Wno-nonportable-include-path",
-			"-Wno-enum-conversion",
-			"-Wno-pragma-pack",
-			"-Wno-new-returns-null",
-			"-Wno-sign-compare",
-			"-Wno-switch",
-			"-Wno-tautological-undefined-compare",
-			"-Wno-deprecated-declarations",
-			"-Wno-macro-redefined",
-			"-Wno-narrowing",
-		}
-
 
 configuration { }
 

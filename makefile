@@ -1021,19 +1021,6 @@ ifeq (posix,$(SHELLTYPE))
 MSBUILD_PARAMS := $(subst /,-,$(MSBUILD_PARAMS))
 endif
 endif
-ifdef FASTBUILD
-FASTBUILD_PARAMS := -j$(NUMBER_OF_PROCESSORS)
-ifeq ($(CONFIG),debug)
-FASTBUILD_TARGET := all-Debug
-else
-FASTBUILD_TARGET := all-Release
-endif
-ifeq ($(ARCHITECTURE),_x64)
-FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x64
-else
-FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x32
-endif
-endif
 else
 ifdef OVERRIDE_CC
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 2> /dev/null)
@@ -1164,84 +1151,6 @@ windows_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
-# Visual Studio 2015
-#-------------------------------------------------
-
-.PHONY: vs2015
-vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_intel
-vs2015_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_xp
-vs2015_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_uwp
-vs2015_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_fastbuild
-vs2015_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2015-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
-# Visual Studio 2017
-#-------------------------------------------------
-
-.PHONY: vs2017
-vs2017: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_intel
-vs2017_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_xp
-vs2017_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2017-xp vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_uwp
-vs2017_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_fastbuild
-vs2017_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2017-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
 # Visual Studio 2019
 #-------------------------------------------------
 
@@ -1264,31 +1173,6 @@ vs2019_intel: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2019
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2019_uwp
-vs2019_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2019
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2019_fastbuild
-vs2019_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2019-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
-# Visual Studio LLVM
-#-------------------------------------------------
-
-.PHONY: vsllvm
-vsllvm: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vsllvm
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vsllvm/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1464,14 +1348,6 @@ macosx_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)32
 
-.PHONY: xcode4
-xcode4: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=osx xcode4
-
-.PHONY: xcode4-ios
-xcode4-ios: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=ios xcode4
-
 #-------------------------------------------------
 # gmake-solaris
 #-------------------------------------------------
@@ -1607,93 +1483,6 @@ openbsd: openbsd_x86
 openbsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32
-
-#-------------------------------------------------
-# gmake-steamlink
-#-------------------------------------------------
-
-$(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef MARVELL_SDK_PATH
-	$(error MARVELL_SDK_PATH is not set)
-endif
-ifndef MARVELL_ROOTFS
-	$(error MARVELL_ROOTFS is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  $(MAKETYPE)
-
-.PHONY: steamlink
-steamlink: generate $(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile
-ifndef MARVELL_SDK_PATH
-	$(error MARVELL_SDK_PATH is not set)
-endif
-ifndef MARVELL_ROOTFS
-	$(error MARVELL_ROOTFS is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-steamlink config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-steamlink config=$(CONFIG)
-
-#-------------------------------------------------
-# gmake-rpi
-#-------------------------------------------------
-
-$(PROJECTDIR_SDL)/$(MAKETYPE)-rpi/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef RASPBERRY_SDK_PATH
-	$(error RASPBERRY_SDK_PATH is not set)
-endif
-ifndef RASPBERRY_SYSROOT
-	$(error RASPBERRY_SYSROOT is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)
-
-.PHONY: rpi
-rpi: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi/Makefile
-ifndef RASPBERRY_SDK_PATH
-	$(error RASPBERRY_SDK_PATH is not set)
-endif
-ifndef RASPBERRY_SYSROOT
-	$(error RASPBERRY_SYSROOT is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi config=$(CONFIG)
-
-#-------------------------------------------------
-# gmake-ci20
-#-------------------------------------------------
-
-$(PROJECTDIR_SDL)/$(MAKETYPE)-ci20/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef MIPS_LINUXGNU_ROOT
-	$(error MIPS_LINUXGNU_ROOT is not set)
-endif
-ifndef CI20_SYSROOT
-	$(error CI20_SYSROOT is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=ci20 --gcc_version=4.9.2 --osd=sdl --targetos=ci20 --targetos=ci20 --NO_USE_MIDI=1  --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)
-
-.PHONY: ci20
-ci20: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20/Makefile
-ifndef MIPS_LINUXGNU_ROOT
-	$(error MIPS_LINUXGNU_ROOT is not set)
-endif
-ifndef CI20_SYSROOT
-	$(error CI20_SYSROOT is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20 config=$(CONFIG)
-
-#-------------------------------------------------
-# cmake
-#-------------------------------------------------
-
-.PHONY: cmake
-cmake: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) cmake
-ifneq (posix,$(SHELLTYPE))
-	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt
-	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt
-else
-	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt
-	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt
-endif
 
 #-------------------------------------------------
 # Clean/bootstrap
