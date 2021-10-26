@@ -38,7 +38,6 @@ newoption {
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "rpi",           "RaspberryPi"            },
 		{ "solaris",       "Solaris"                },
-		{ "ci20",          "Creator-Ci20"           },
 	},
 }
 
@@ -231,16 +230,6 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
 		end
 
-		if "ci20" == _OPTIONS["gcc"] then
-			if not os.getenv("MIPS_LINUXGNU_ROOT") then
-				print("Set MIPS_LINUXGNU_ROOT envrionment variable.")
-			end
-			premake.gcc.cc  = "$(MIPS_LINUXGNU_ROOT)/bin/mips-mti-linux-gnu-gcc"
-			premake.gcc.cxx = "$(MIPS_LINUXGNU_ROOT)/bin/mips-mti-linux-gnu-g++"
-			premake.gcc.ar  = "$(MIPS_LINUXGNU_ROOT)/bin/mips-mti-linux-gnu-ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
-		end
-
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
@@ -293,10 +282,6 @@ function toolchain(_buildDir, _subDir)
 
 		if "rpi" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
-		end
-
-		if "ci20" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
 		end
 	elseif _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 
@@ -578,62 +563,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "rpi", "Debug" }
 		targetdir (_buildDir .. "rpi/bin/Debug")
-
-	configuration { "ci20" }
-		objdir ( _buildDir .. "ci20/obj")
-		includedirs {
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/include/c++/4.9",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/include/mipsel-linux-gnu/c++/4.9",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/include/c++/4.9/backward",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/lib/gcc/mipsel-linux-gnu/4.9/include",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/local/include",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/lib/gcc/mipsel-linux-gnu/4.9/include-fixed",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/include/mipsel-linux-gnu",
-			"$(CI20_SYSROOT)/mipsel-r2-hard/usr/include",
-		}
-		links {
-			"c",
-			"dl",
-			"m",
-			"gcc",
-			"stdc++",
-			"gcc_s",
-		}
-
-		buildoptions {
-			"--sysroot=$(CI20_SYSROOT)",
-			"-Wno-pragmas",
-			"-Wno-undef",
-			"-EL",
-			"-mel",
-			"-march=mips32r2",
-			"-mllsc",
-			"-mabi=32",
-		}
-		linkoptions {
-			"--sysroot=$(CI20_SYSROOT)",
-			"-Wl,-rpath=$(CI20_SYSROOT)/mipsel-r2-hard/usr/lib/mipsel-linux-gnu/",
-			"-Wl,-rpath=$(CI20_SYSROOT)/mipsel-r2-hard/lib/mipsel-linux-gnu/",
-			"-nostdlib",
-			"-EL",
-			"-mel",
-			"-march=mips32r2",
-			"-mllsc",
-			"-mabi=32",
-			"$(MIPS_LINUXGNU_ROOT)/lib/gcc/mips-mti-linux-gnu/4.9.2/mipsel-r2-hard/lib/crtbegin.o",
-			"$(MIPS_LINUXGNU_ROOT)/lib/gcc/mips-mti-linux-gnu/4.9.2/mipsel-r2-hard/lib/crtend.o",
-			"-L$(CI20_SYSROOT)/mipsel-r2-hard/usr/lib/gcc/mipsel-linux-gnu/4.9",
-			"-L$(CI20_SYSROOT)/mipsel-r2-hard/usr/lib/mipsel-linux-gnu",
-			"-L$(CI20_SYSROOT)/mipsel-r2-hard/usr/lib",
-			"-L$(CI20_SYSROOT)/mipsel-r2-hard/lib/mipsel-linux-gnu",
-			"-L$(CI20_SYSROOT)/mipsel-r2-hard/lib",
-		}
-
-	configuration { "ci20", "Release" }
-		targetdir (_buildDir .. "ci20/bin/Release")
-
-	configuration { "ci20", "Debug" }
-		targetdir (_buildDir .. "ci20/bin/Debug")
 
 	configuration { "mingw-clang" }
 		buildoptions {

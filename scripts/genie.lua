@@ -151,7 +151,6 @@ newoption {
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
 		{ "rpi",           "Raspberry Pi"           },
-		{ "ci20",          "Creator-Ci20"           },
 	},
 }
 
@@ -1224,7 +1223,7 @@ configuration { "android-arm64" }
 		"-Wno-asm-operand-widths",
 	}
 
-configuration { "linux-* or rpi or ci20"}
+configuration { "linux-* or rpi"}
 		links {
 			"dl",
 			"rt",
@@ -1248,16 +1247,6 @@ configuration { "rpi" }
 		"bcm_host",
 		"vcos",
 		"vchiq_arm",
-		"pthread",
-	}
-
-
-configuration { "ci20" }
-	links {
-		"SDL2",
-		"asound",
-		"fontconfig",
-		"freetype",
 		"pthread",
 	}
 
