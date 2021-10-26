@@ -144,7 +144,6 @@ newoption {
 		{ "freebsd",       "FreeBSD"                },
 		{ "netbsd",        "NetBSD"                 },
 		{ "openbsd",       "OpenBSD"                },
-		{ "pnacl",         "Native Client - PNaCl"  },
 		{ "linux",         "Linux"                  },
 		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
@@ -785,11 +784,9 @@ local version = str_to_version(_OPTIONS["gcc_version"])
 		"-std=c++17",
 	}
 -- this speeds it up a bit by piping between the preprocessor/compiler/assembler
-	if not ("pnacl" == _OPTIONS["gcc"]) then
-		buildoptions {
-			"-pipe",
-		}
-	end
+	buildoptions {
+		"-pipe",
+	}
 -- add -g if we need symbols, and ensure we have frame pointers
 if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
@@ -1075,7 +1072,7 @@ end
 
 
 		local version = str_to_version(_OPTIONS["gcc_version"])
-		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "pnacl") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
+		if string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android") then
 			if (version < 60000) then
 				print("Clang version 6.0 or later needed")
 				os.exit(-1)
@@ -1227,16 +1224,6 @@ configuration { "android-arm64" }
 	buildoptions {
 		"-Wno-asm-operand-widths",
 	}
-
-configuration { "pnacl" }
-	buildoptions {
-		"-std=gnu89",
-		"-Wno-inline-new-delete",
-	}
-	buildoptions_cpp {
-		"-std=c++17",
-	}
-	archivesplit_size "20"
 
 configuration { "linux-* or rpi or ci20"}
 		links {

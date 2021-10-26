@@ -40,15 +40,6 @@ end
 			"GLESv2",
 			"SDL2",
 		}
-	configuration { "pnacl" }
-		kind "ConsoleApp"
-		targetextension ".pexe"
-		links {
-			"ppapi",
-			"ppapi_gles2",
-			"pthread",
-		}
-
 	configuration { "winstore*" }
 		kind "WindowedApp"
 

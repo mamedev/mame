@@ -36,7 +36,6 @@ newoption {
 		{ "openbsd",       "OpenBSD"                },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
-		{ "pnacl",         "Native Client - PNaCl"  },
 		{ "rpi",           "RaspberryPi"            },
 		{ "solaris",       "Solaris"                },
 		{ "steamlink",     "Steam Link"             },
@@ -301,25 +300,6 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.cxx = toolchainPrefix .. "clang++"
 			premake.gcc.ar  = toolchainPrefix .. "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx-clang")
-		end
-
-		if "pnacl" == _OPTIONS["gcc"] then
-
-			if not os.getenv("NACL_SDK_ROOT") then
-				print("Set NACL_SDK_ROOT enviroment variables.")
-			end
-
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
-			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_pnacl/bin/pnacl-"
-			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_pnacl/bin/pnacl-"
-			end
-
-			premake.gcc.cc  = naclToolchain .. "clang"
-			premake.gcc.cxx = naclToolchain .. "clang++"
-			premake.gcc.ar  = naclToolchain .. "ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-pnacl")
 		end
 
 		if "rpi" == _OPTIONS["gcc"] then
@@ -1021,36 +1001,6 @@ function toolchain(_buildDir, _subDir)
 			"-Wno-extern-c-compat",
 		}
 
-	configuration { "pnacl" }
-		buildoptions {
-			"-U__STRICT_ANSI__", -- strcasecmp, setenv, unsetenv,...
-			"-fno-stack-protector",
-			"-fdiagnostics-show-option",
-			"-fdata-sections",
-			"-ffunction-sections",
-			"-Wunused-value",
-		}
-
-	configuration { "pnacl" }
-		buildoptions {
-			"-Wno-tautological-undefined-compare",
-			"-Wno-cast-align",
-		}
-		includedirs {
-			"$(NACL_SDK_ROOT)/include",
-			"$(NACL_SDK_ROOT)/include/pnacl",
-		}
-
-	configuration { "pnacl" }
-		targetdir (_buildDir .. "pnacl" .. "/bin")
-		objdir (_buildDir .. "pnacl" .. "/obj")
-
-	configuration { "pnacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Debug" }
-
-	configuration { "pnacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
-
 	configuration { "osx*", "x32", "not arm64" }
 		objdir (_buildDir .. "osx_clang" .. "/obj")
 		buildoptions {
@@ -1135,12 +1085,6 @@ function strip()
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) " .. (_OPTIONS['TOOLCHAIN'] or "$(MINGW32)/bin/") .. "strip -s \"$(TARGET)\"",
-		}
-
-	configuration { "pnacl" }
-		postbuildcommands {
-			"$(SILENT) echo Running pnacl-finalize.",
-			"$(SILENT) " .. naclToolchain .. "finalize \"$(TARGET)\""
 		}
 
 	configuration { "asmjs" }

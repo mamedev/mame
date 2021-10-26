@@ -878,14 +878,9 @@ end
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") and not (_OPTIONS["targetos"]=="pnacl") then
+	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
 		defines {
 			"LUA_USE_POSIX",
-		}
-	end
-	if ("pnacl" == _OPTIONS["gcc"]) then
-		defines {
-			"LUA_32BITS",
 		}
 	end
 
@@ -951,11 +946,6 @@ project "lualibs"
 			"/wd4055", -- warning C4055: 'type cast': from data pointer 'void *' to function pointer 'xxx'
 			"/wd4152", -- warning C4152: nonstandard extension, function/data pointer conversion in expression
 			"/wd4130", -- warning C4130: '==': logical operation on address of string constant
-		}
-
-	configuration { "pnacl"}
-		buildoptions {
-			"-Wno-char-subscripts",
 		}
 
 	configuration { }
