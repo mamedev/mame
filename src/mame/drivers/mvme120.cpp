@@ -23,7 +23,8 @@
 #define LOG_SETUP   0x02
 #define LOG_PRINTF  0x04
 
-#define VERBOSE (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+#define VERBOSE 0
+//#define VERBOSE (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
 #define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
 #define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
@@ -94,7 +95,7 @@ void mvme120_state::mvme120_mem(address_map &map)
 	map(0x000000, 0x000007).ram().w(FUNC(mvme120_state::bootvect_w));       /* After four memory cycles we act as RAM */
 	map(0x000000, 0x000007).rom().r(FUNC(mvme120_state::bootvect_r));       /* ROM mirror just during reset */
 	map(0x000008, 0x01ffff).ram(); 											/* 128KB RAM */
-	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 147bug */
+	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 120bug */
 	map(0xf10000, 0xf1ffff).rom().region("roms", 0x10000);					/* ROM/EEPROM bank 2 - unpopulated */
 	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
 	map(0xf40000, 0xf40000).rw(FUNC(mvme120_state::ctrlreg_r), FUNC(mvme120_state::ctrlreg_w)).mirror(0x1fffc);
@@ -115,7 +116,7 @@ void mvme120_state::mvme121_mem(address_map &map)
 	map(0x000000, 0x000007).ram().w(FUNC(mvme120_state::bootvect_w));       /* After four memory cycles we act as RAM */
 	map(0x000000, 0x000007).rom().r(FUNC(mvme120_state::bootvect_r));       /* ROM mirror just during reset */
 	map(0x000008, 0x07ffff).ram(); 											/* 512KB RAM */
-	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 147bug */
+	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 120bug */
 	map(0xf10000, 0xf1ffff).rom().region("roms", 0x10000); 					/* ROM/EEPROM bank 2 - unpopulated */
 	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
 	map(0xf40000, 0xf40000).rw(FUNC(mvme120_state::ctrlreg_r), FUNC(mvme120_state::ctrlreg_w)).mirror(0x1fffc);
@@ -135,7 +136,7 @@ void mvme120_state::mvme122_mem(address_map &map)
 	map(0x000000, 0x000007).ram().w(FUNC(mvme120_state::bootvect_w));       /* After four memory cycles we act as RAM */
 	map(0x000000, 0x000007).rom().r(FUNC(mvme120_state::bootvect_r));       /* ROM mirror just during reset */
 	map(0x000008, 0x01ffff).ram(); 											/* 128KB RAM */
-	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 147bug */
+	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 120bug */
 	map(0xf10000, 0xf1ffff).rom().region("roms", 0x10000); 					/* ROM/EEPROM bank 2 - unpopulated */
 	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
 	map(0xf40000, 0xf40000).rw(FUNC(mvme120_state::ctrlreg_r), FUNC(mvme120_state::ctrlreg_w)).mirror(0x1fffc);
@@ -154,8 +155,8 @@ void mvme120_state::mvme123_mem(address_map &map)
 	map(0x000000, 0x000007).ram().w(FUNC(mvme120_state::bootvect_w));       /* After four memory cycles we act as RAM */
 	map(0x000000, 0x000007).rom().r(FUNC(mvme120_state::bootvect_r));       /* ROM mirror just during reset */
 	map(0x000008, 0x07ffff).ram(); 											/* 512KB RAM */
-	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); //mirror(0x00780000); /* ROM/EEPROM bank 1 - 147bug */
-	map(0xf10000, 0xf1ffff).rom().region("roms", 0x10000); //mirror(0x00780000); /* ROM/EEPROM bank 2 - unpopulated */
+	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 120bug */
+	map(0xf10000, 0xf1ffff).rom().region("roms", 0x10000);					/* ROM/EEPROM bank 2 - unpopulated */
 	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
 	map(0xf40000, 0xf40000).rw(FUNC(mvme120_state::ctrlreg_r), FUNC(mvme120_state::ctrlreg_w)).mirror(0x1fffc);
 	
@@ -305,12 +306,12 @@ ROM_START (mvme120)
 	ROM_DEFAULT_BIOS("120bug-v2.0")
 
 	ROM_SYSTEM_BIOS(0, "120bug-v2.0", "MVME120 120bug v2.0")
-	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(0))
-	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(0))
 	
 	ROM_SYSTEM_BIOS(1, "120bug-v1.1", "MVME120 120bug v1.1")
-	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(1))
-	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START (mvme121)
@@ -318,25 +319,25 @@ ROM_START (mvme121)
 	ROM_DEFAULT_BIOS("120bug-v2.0")
 
 	ROM_SYSTEM_BIOS(0, "120bug-v2.0", "MVME120 120bug v2.0")
-	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(0))
-	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(0))
 	
 	ROM_SYSTEM_BIOS(1, "120bug-v1.1", "MVME120 120bug v1.1")
-	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(1))
-	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START (mvme122)
 	ROM_REGION16_BE(0x20000, "roms", 0)
-	ROM_DEFAULT_BIOS("12xbug-v1.0")
+	ROM_DEFAULT_BIOS("120bug-v2.0")
 
 	ROM_SYSTEM_BIOS(0, "120bug-v2.0", "MVME120 120bug v2.0")
-	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(0))
-	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(0))
 	
 	ROM_SYSTEM_BIOS(1, "120bug-v1.1", "MVME120 120bug v1.1")
-	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(1))
-	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 ROM_START (mvme123)
@@ -344,12 +345,12 @@ ROM_START (mvme123)
 	ROM_DEFAULT_BIOS("120bug-v2.0")
 
 	ROM_SYSTEM_BIOS(0, "120bug-v2.0", "MVME120 120bug v2.0")
-	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(0))
-	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(0))
 	
 	ROM_SYSTEM_BIOS(1, "120bug-v1.1", "MVME120 120bug v1.1")
-	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_BIOS(1))
-	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 /* Driver */
