@@ -32,16 +32,13 @@
 #include <SDL2/SDL.h>
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, ascii, "ITEM_ID_"#mame, (char*) #mame }
-#elif defined(OSD_UWP)
-#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char *) UI }
-#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #else
 // osd mini
 #endif
 
 // FIXME: sdl_key can be removed from the table below. It is no longer used.
 
-#if defined(OSD_WINDOWS) || defined(OSD_SDL) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS) || defined(OSD_SDL)
 key_trans_entry keyboard_trans_table::s_default_table[] =
 {
 	//              MAME key       sdl scancode  sdl key       di scancode     virtual key     uwp vkey       ascii     ui
@@ -227,7 +224,7 @@ input_item_id keyboard_trans_table::lookup_mame_code(const char *scode) const
 }
 
 // Windows specific lookup methods
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode) const
 {
@@ -241,10 +238,6 @@ input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode) cons
 	// default to an "other" switch
 	return ITEM_ID_OTHER_SWITCH;
 }
-
-#endif
-
-#if defined(OSD_WINDOWS)
 
 //============================================================
 //  wininput_vkey_for_mame_code
@@ -267,22 +260,6 @@ int keyboard_trans_table::vkey_for_mame_code(input_code code) const
 }
 
 #endif
-
-#if defined(OSD_UWP)
-
-const char* keyboard_trans_table::ui_label_for_mame_key(input_item_id itemid) const
-{
-	// scan the table for a match
-	for (int tablenum = 0; tablenum < m_table_size; tablenum++)
-		if (m_table[tablenum].mame_key == itemid)
-			return m_table[tablenum].ui_name;
-
-	// We didn't find one
-	return nullptr;
-}
-
-#endif
-
 
 int input_module_base::init(const osd_options &options)
 {

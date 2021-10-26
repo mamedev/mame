@@ -9,7 +9,7 @@
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 // standard windows headers
 #include <windows.h>
