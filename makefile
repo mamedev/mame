@@ -1633,21 +1633,6 @@ endif
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi config=$(CONFIG)
 
 #-------------------------------------------------
-# cmake
-#-------------------------------------------------
-
-.PHONY: cmake
-cmake: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) cmake
-ifneq (posix,$(SHELLTYPE))
-	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt
-	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt
-else
-	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt
-	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt
-endif
-
-#-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
 
