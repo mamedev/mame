@@ -52,12 +52,6 @@ newoption {
 	description = "Set Android platform version (default: android-21).",
 }
 
-newoption {
-	trigger = "with-windows",
-	value = "#",
-	description = "Set the Windows target platform version (default: 10.0.10240.0).",
-}
-
 function toolchain(_buildDir, _subDir)
 
 	location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION)
@@ -67,11 +61,6 @@ function toolchain(_buildDir, _subDir)
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
 		androidPlatform = "android-24"
-	end
-
-	local windowsPlatform = "10.0.10240.0"
-	if _OPTIONS["with-windows"] then
-		windowsPlatform = _OPTIONS["with-windows"]
 	end
 
 	if _ACTION == "gmake" or _ACTION == "ninja" then
@@ -265,16 +254,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "x64", "vs*", "Debug" }
 		targetdir (_buildDir .. _ACTION .. "/bin/x64/Debug")
-
-	configuration { "ARM", "vs*" }
-		targetdir (_buildDir .. _ACTION .. "/bin/ARM")
-		objdir (_buildDir .. _ACTION .. "/obj")
-
-	configuration { "ARM", "vs*", "Release" }
-		targetdir (_buildDir .. _ACTION .. "/bin/ARM/Release")
-
-	configuration { "ARM", "vs*", "Debug" }
-		targetdir (_buildDir .. _ACTION .. "/bin/ARM/Debug")
 
 	configuration { "x32", "vs*-clang" }
 		objdir (_buildDir .. _ACTION .. "-clang/obj")
