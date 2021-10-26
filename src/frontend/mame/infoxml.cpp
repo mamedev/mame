@@ -69,8 +69,8 @@ public:
 	bool done() const { return m_done; }
 
 private:
-	const std::function<bool(const char *shortname, bool &done)> &	m_callback;
-	bool															m_done;
+	const std::function<bool(const char *shortname, bool &done)> &  m_callback;
+	bool                                                            m_done;
 };
 
 
@@ -91,9 +91,9 @@ public:
 	bool done() const { return m_done || m_devfilter.done(); }
 
 private:
-	driver_enumerator &	m_drivlist;
-	device_filter &		m_devfilter;
-	bool				m_done;
+	driver_enumerator & m_drivlist;
+	device_filter &     m_devfilter;
+	bool                m_done;
 };
 
 
@@ -592,8 +592,8 @@ std::string normalize_string(const char *string)
 
 
 //-------------------------------------------------
-//	device_filter::filter - apply the filter, if
-//	present
+//  device_filter::filter - apply the filter, if
+//  present
 //-------------------------------------------------
 
 bool device_filter::filter(const char *shortname)
@@ -604,7 +604,7 @@ bool device_filter::filter(const char *shortname)
 
 //-------------------------------------------------
 //  filtered_driver_enumerator::next - take a number
-//	of game_drivers, while applying filters
+//  of game_drivers, while applying filters
 //-------------------------------------------------
 
 std::vector<std::reference_wrapper<const game_driver>> filtered_driver_enumerator::next(int count)

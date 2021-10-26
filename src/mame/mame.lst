@@ -62,6 +62,7 @@ slspirit                        // (c) 1999 Promat
 48in1                           // MAME based bootleg
 48in1a                          // MAME based bootleg
 48in1b                          // MAME based bootleg
+48in1c                          // MAME based bootleg
 4in1a                           // MAME based bootleg
 4in1b                           // MAME based bootleg
 60in1                           // MAME based bootleg
@@ -10813,8 +10814,9 @@ cortex                          //
 @source:cosmic.cpp
 cosmica                         // 7910-AII (c) [1979]
 cosmica1                        // 7910-A (c) [1979]
-cosmica2                        // 7910 (c) 1979
-cosmica3                        // 7910-AII (c) [1979]
+cosmica22                       // 7910-AII (c) [1979]
+cosmica23                       // 7910-AII (c) [1979]
+cosmica2a                       // 7910 (c) 1979
 devzone                         // 8022 (c) [1980]
 devzone2                        // 8022 (c) [1980]
 magspot                         // ???? (c) [1980]
@@ -11290,6 +11292,7 @@ sfau                            // 27/06/1995 (c) 1995 (USA)
 sfz2a                           // 27/02/1996 (c) 1996 (Asia)
 sfz2ad                          //
 sfz2al                          // 26/08/1996 (c) 1996 (Asia)
+sfz2alr1                        // 05/08/1996 (c) 1996 (Asia)
 sfz2alb                         // 13/08/1996 (c) 1996 (Brazil)
 sfz2ald                         //
 sfz2alh                         // 13/08/1996 (c) 1996 (Hispanic)
@@ -12402,7 +12405,8 @@ bmdct                           // GX995 (c) 2000 (Japan)
 bmfinal                         // GXC01 (c) 2002 (Japan)
 hmcompm2                        // GX988 (c) 2000
 hmcompmx                        // GX858 (c) 1999
-popn1                           // GX803 (c) 1998 (Asia)
+popn1                           // GX803 (c) 1998 (Export)
+popn1a                          // GX803 (c) 1998 (Asia)
 popn1k                          // GX803 (c) 1998 (Korea)
 popn1j                          // GX803 (c) 1998 (Japan)
 popn2                           // GX831 (c) 1998 (Japan)
@@ -14423,6 +14427,7 @@ galaxiac                        // (c) 1979
 amidar                          // GX337 (c) 1982 Konami
 amidar1                         // GX337 (c) 1981 Konami
 amidarb                         // bootleg
+amidarc                         // bootleg
 amidaro                         // GX337 (c) 1982 Konami + Olympia license
 amidars                         // GX337 (c) 1982 Konami
 amidaru                         // GX337 (c) 1982 Konami + Stern license
@@ -14471,6 +14476,8 @@ exodus                          // Subelectro - bootleg?
 explorer                        // bootleg
 fantastc                        // (c) Taito (Brazil) - rewrite of Galaga
 fantazia                        // bootleg
+floritas                        // bootleg
+floritasm                       // bootleg (Multivideo)
 frogf                           // bootleg
 frogg                           // bootleg
 frogger                         // GX392 (c) 1981 Konami
@@ -14542,6 +14549,7 @@ mimonscr                        // (c) 1982 bootleg
 mimonscra                       // (c) 1982 bootleg
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
+monsterza                       // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
 moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
@@ -14632,7 +14640,6 @@ spacbatt                        // bootleg
 spacempr                        // bootleg
 spactrai                        //
 spcdrag                         // bootleg
-spcdraga                        // bootleg
 spcmission                      // bootleg (SegaSA / Sonic)
 spctrek                         // bootleg
 spctbird                        // (c) Fortrek
@@ -15882,7 +15889,6 @@ countdwn                        //
 dragon                          //
 geniep                          //
 gts1                            //
-gts1s                           //
 hexagone                        //
 hulk                            //
 jokrpokr                        //
@@ -16966,6 +16972,7 @@ ice_tbd                         // ICE - Turbo Drive
 
 @source:icecold.cpp
 icecold                         //
+icecoldf                        //
 zekepeak                        //
 
 @source:ichiban.cpp
@@ -37717,11 +37724,13 @@ dinokich                        // 2010.05 Konglongwang - D-Kids VS Alpha Yaosai
 dinoki4                         // 2008.08 Kodai Ouja Kyouryuu King - Mezame yo! Arata-naru Chikara!! (Japan, Ver 4.000) (MDA-C0061)
 dinoking                        // 2005.09 Kodai Ouja Kyouryuu King / Ancient Ruler Dinosaur King
 dinokior                        //
+kingyo                          // 2009.10 Yataimura Kingyosukui (1-player, Japan, Ver 1.005)
 kingyoch                        // 2009.03 Yataimura Kingyosukui (4-player, China, Ver 1.000)
 loveber3                        //
 loveber3cn                      //
 lovebero                        //
 lovebery                        // 2004.10 Oshare Majo Love and Berry / Fashionable Witch Love and Berry
+manpuku                         // 2013.09 Manpuku Suizokukan
 mirworld                        // 2007.06 Mirage World (satellite)
 ochaken                         //
 segasp                          //

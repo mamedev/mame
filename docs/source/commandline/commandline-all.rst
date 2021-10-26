@@ -6,6 +6,8 @@ Universal Commandline Options
 This section contains configuration options that are applicable to *all* MAME
 sub-builds (both SDL and Windows native).
 
+.. contents:: :local:
+
 
 Commands and Verbs
 ------------------
@@ -684,7 +686,7 @@ OSD-related Options
 
 .. _mame-commandline-uifontprovider:
 
-**-uifontprovider**
+**-uifontprovider** *<module>*
 
     Chooses provider for UI font rendering. The default setting is ``auto``.
 
@@ -727,7 +729,7 @@ Example:
 
 .. _mame-commandline-keyboardprovider:
 
-**-keyboardprovider**
+**-keyboardprovider** *<module>*
 
     Chooses how MAME will get keyboard input. The default is ``auto``.
 
@@ -779,7 +781,7 @@ Example:
 
 .. _mame-commandline-mouseprovider:
 
-**\-mouseprovider**
+**-mouseprovider** *<module>*
 
     Chooses how MAME will get mouse input. The default is ``auto``.
 
@@ -827,7 +829,7 @@ Example:
 
 .. _mame-commandline-lightgunprovider:
 
-**\-lightgunprovider**
+**-lightgunprovider** *<module>*
 
     Chooses how MAME will get light gun input. The default is ``auto``.
 
@@ -874,7 +876,7 @@ Example:
 
 .. _mame-commandline-joystickprovider:
 
-**\-joystickprovider**
+**-joystickprovider** *<module>*
 
     Chooses how MAME will get joystick input. The default is ``auto``.
 
@@ -922,9 +924,9 @@ OSD CLI Options
 
 .. _mame-commandline-listmidi:
 
-**\-listmidi**
+**-listmidi**
 
-    Create a list of available MIDI I/O devices for use with emulation.
+    List available MIDI I/O devices for use with emulation.
 
     Example:
         .. code-block:: bash
@@ -938,9 +940,9 @@ OSD CLI Options
 
 .. _mame-commandline-listnetwork:
 
-**\-listnetwork**
+**-listnetwork**
 
-    Create a list of available Network Adapters for use with emulation.
+    List available network adapters for use with emulation.
 
     Example 1:
         .. code-block:: bash
@@ -3448,7 +3450,8 @@ Debugging Options
     Activates the integrated debugger.  By default, pressing the tilde
     (**~**) key during emulation breaks into the debugger.  MAME also
     breaks into the debugger after the initial soft reset on startup if
-    the debugger is active.
+    the debugger is active.  See :ref:`debugger` for information on using
+    the debugger.
 
     The default is OFF (**-nodebug**).
 
@@ -3456,6 +3459,40 @@ Debugging Options
         .. code-block:: bash
 
             mame indy_4610 -debug
+
+.. _mame-commandline-debugger:
+
+**-debugger** *<module>*
+
+    Chooses the module to use for debugging the target system when the
+    :ref:`debug <mame-commandline-debug>` option is on.  Available debugger
+    modules depend on the host platform and build options.
+
+    Supported debugger modules:
+
+    windows
+        Win32 GUI debugger (default on Windows).  Only supported on Windows.
+    qt
+        Qt GUI debugger (default on Linux).  Supported on Windows, Linux and
+        macOS, but only included on Linux by default.  Set ``USE_QTDEBUG=1``
+        when compiling MAME to include the Qt debugger on Windows or macOS.
+    osx
+        Cocoa GUI debugger (default on macOS).  Only supported on macOS.
+    imgui
+        ImgUi GUI debugger displayed in first MAME window.  Requires
+        :ref:`video <mame-commandline-video>` option to be set to **bgfx**.
+        Supported on all platforms with BGFX video output support.
+    gdbstub
+        Acts as a remote debugging server for the GNU debugger (GDB).  Only a
+        small subset of the CPUs emulated by MAME are supported.  Use the
+        :ref:`debugger_port <mame-commandline-debuggerport>` option to set the
+        listening port on the loopback interface.  Supported on all platforms
+        with TCP socket support.
+
+    Example:
+        .. code-block:: bash
+
+            mame ambush -debug -debugger qt
 
 .. _mame-commandline-debugscript:
 
@@ -3469,7 +3506,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame galaga -debugscript testscript.txt
+            mame galaga -debug -debugscript testscript.txt
 
 .. _mame-commandline-updateinpause:
 
@@ -3503,6 +3540,21 @@ Debugging Options
         .. code-block:: bash
 
             mame ibm_5150 -watchdog 30
+
+.. _mame-commandline-debuggerport:
+
+**-debugger_port** *<port>*
+
+    Set the TCP port number to listen on for GDB connections when using the GDB
+    stub debugger module (see the :ref:`debugger <mame-commandline-debugger>`
+    option).
+
+    The default is ``23946``.
+
+    Example:
+        .. code-block:: bash
+
+            mame rfjet -debug -debugger gdbstub -debugger_port 2159
 
 .. _mame-commandline-debuggerfont:
 
@@ -3912,7 +3964,7 @@ HTTP Server Options
 
 .. _mame-commandline-httpport:
 
-**-http_port** *[port]*
+**-http_port** *<port>*
 
     Choose HTTP server port.
 
@@ -3925,7 +3977,7 @@ HTTP Server Options
 
 .. _mame-commandline-httproot:
 
-**-http_root** *[rootfolder]*
+**-http_root** *<rootfolder>*
 
     Choose HTTP server document root.
 

@@ -1586,13 +1586,13 @@ license:CC0
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1296282">
+			<dataarea name="flop" size="819264">
 				<rom name="space quest ii - vohual's revenge iigs - disk 1 (trex crack).2mg" size="819264" crc="4d463103" sha1="50df27602f17af84e2a2e4e3b221bd87aa98dad0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1296282">
+			<dataarea name="flop" size="819264">
 				<rom name="space quest ii - vohual's revenge  iigs - disk 2 (trex crack).2mg" size="819264" crc="809875fc" sha1="d90165d8c51d7d54d8a17c4082e8688048950389"/>
 			</dataarea>
 		</part>

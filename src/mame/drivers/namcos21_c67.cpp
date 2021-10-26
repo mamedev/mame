@@ -372,7 +372,7 @@ uint32_t namcos21_c67_state::screen_update(screen_device &screen, bitmap_ind16 &
 	int pri;
 	bitmap.fill(0xff, cliprect );
 	screen.priority().fill(0, cliprect);
-	m_c355spr->get_sprites(cliprect); // TODO : buffered?
+	m_c355spr->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	m_c355spr->draw(screen, bitmap, cliprect, 2 );
 

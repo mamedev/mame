@@ -63,38 +63,38 @@
 
         ROM [0xc0050000] 0x10000 floats copied to [0x40180000]
 
-		ROM [0xff800000 - 0xff80171f] sound data headers, 32 bytes each
-		    Word 0: sound data pointer (offset from 0xff800000)
-			Word 1: uncompressed length?
-			Word 2: ?
-			Word 3: same as word 1?
-			Word 4: ?
-			Word 5: ?
-			Word 6: ?
-			Word 7: 0
+        ROM [0xff800000 - 0xff80171f] sound data headers, 32 bytes each
+            Word 0: sound data pointer (offset from 0xff800000)
+            Word 1: uncompressed length?
+            Word 2: ?
+            Word 3: same as word 1?
+            Word 4: ?
+            Word 5: ?
+            Word 6: ?
+            Word 7: 0
 
-		ROM [0xff801720 -> ] compressed audio data
+        ROM [0xff801720 -> ] compressed audio data
 
-		[0x0000100c] bitmask of active sound channels (max 16 channels?)
-		[0x00001018 -> ] sound channel data, 64 bytes each
-			+0x00: sound data pointer in ROM
-			+0x04: 0
-			+0x08: uncompressed length
-			+0x0c: uncompressed length
-			+0x10: 0?
-			+0x14: 0 - sample rate?
-			+0x18: 0?
-			+0x1c: sample rate? (halfword)
-			+0x1e: ?? (halfword)
-			+0x20: ?
-			+0x24: ?
-			+0x28: ?
-			+0x2c: ?
-			+0x30: ?
-			+0x34: ?
-			+0x36: ? (halfword)
-			+0x38: ?
-			+0x3c: ?
+        [0x0000100c] bitmask of active sound channels (max 16 channels?)
+        [0x00001018 -> ] sound channel data, 64 bytes each
+            +0x00: sound data pointer in ROM
+            +0x04: 0
+            +0x08: uncompressed length
+            +0x0c: uncompressed length
+            +0x10: 0?
+            +0x14: 0 - sample rate?
+            +0x18: 0?
+            +0x1c: sample rate? (halfword)
+            +0x1e: ?? (halfword)
+            +0x20: ?
+            +0x24: ?
+            +0x28: ?
+            +0x2c: ?
+            +0x30: ?
+            +0x34: ?
+            +0x36: ? (halfword)
+            +0x38: ?
+            +0x3c: ?
 
 
 
@@ -519,7 +519,7 @@ uint32_t rollext_state::a0000000_r(offs_t offset, uint32_t mem_mask)
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				data |= 0x200;		// 0 causes inf loop
+				data |= 0x200;      // 0 causes inf loop
 				data |= m_eeprom_in->read() << 8;
 			}
 			if (ACCESSING_BITS_0_7)
@@ -686,7 +686,7 @@ static INPUT_PORTS_START(rollext)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 
 	PORT_START("EEPROMOUT")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)	
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 

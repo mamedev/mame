@@ -529,6 +529,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },
 	{ "pic16c62x",       le, -1, []() -> util::disasm_interface * { return new pic16c62x_disassembler; } },
 	{ "pic17",           le, -1, []() -> util::disasm_interface * { return new pic17_disassembler; } },
+	{ "power",           be,  0, []() -> util::disasm_interface * { return new power_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },

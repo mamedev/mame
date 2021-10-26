@@ -2694,7 +2694,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 {
 	float const line_height = ui().get_line_height();
 	float text_size = ui().options().infos_size();
-	const char *first = "";
+	std::string_view first;
 	ui_software_info const *software;
 	ui_system_info const *system;
 	int total;
@@ -2703,7 +2703,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	if (software && !software->startempty)
 	{
 		m_info_driver = nullptr;
-		first = N_("Software List Info");
+		first = _("Software List Info");
 
 		if ((m_info_software != software) || (m_info_view != ui_globals::cur_sw_dats_view))
 		{
@@ -2740,7 +2740,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	{
 		game_driver const &driver(system ? *system->driver : *software->driver);
 		m_info_software = nullptr;
-		first = N_("General Info");
+		first = _("General Info");
 
 		if (&driver != m_info_driver || ui_globals::curdats_view != m_info_view)
 		{
@@ -2784,13 +2784,13 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 	float const ud_arrow_width = line_height * aspect;
 	float oy1 = origy1 + line_height;
 
-	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : std::string_view(_("selmenu-artwork", first)));
+	std::string_view const snaptext(m_info_view ? std::string_view(m_items_list[m_info_view - 1]) : first);
 
 	// get width of widest title
 	float title_size(0.0f);
 	for (std::size_t x = 0; total > x; ++x)
 	{
-		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : std::string_view(_("selmenu-artwork", first)));
+		std::string_view const name(x ? std::string_view(m_items_list[x - 1]) : first);
 		float txt_length(0.0f);
 		ui().draw_text_full(
 				container(), name,

@@ -37,7 +37,7 @@ class menu
 {
 public:
 	// flags for menu items
-	enum : unsigned
+	enum : uint32_t
 	{
 		FLAG_LEFT_ARROW     = 1U << 0,
 		FLAG_RIGHT_ARROW    = 1U << 1,

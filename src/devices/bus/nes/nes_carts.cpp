@@ -341,6 +341,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("dbz5",             NES_REX_DBZ5);
 	device.option_add_internal("sl1632",           NES_REX_SL1632);
 	device.option_add_internal("somari",           NES_SOMARI); // mapper 116
+	device.option_add_internal("huang2",           NES_HUANG2); // mapper 116 also
 	device.option_add_internal("nitra",            NES_NITRA);
 	device.option_add_internal("fs6",              NES_FS6); // mapper 196 alt? (for Street Fighter VI / Fight Street VI);
 	device.option_add_internal("sbros11",          NES_SBROS11);
@@ -450,12 +451,15 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
 	device.option_add_internal("bmc_sbig7in1",     NES_BMC_SBIG7);
 	device.option_add_internal("bmc_hik8in1",      NES_BMC_HIK8);
+	device.option_add_internal("bmc_jy208",        NES_BMC_JY208);
+	device.option_add_internal("bmc_sfc12",        NES_BMC_SFC12);
 	device.option_add_internal("bmc_hik4in1",      NES_BMC_HIK4);
 	device.option_add_internal("bmc_mario7in1",    NES_BMC_MARIO7IN1);
 	device.option_add_internal("bmc_f15",          NES_BMC_F15);
 	device.option_add_internal("bmc_f600",         NES_BMC_F600);
 	device.option_add_internal("bmc_gn45",         NES_BMC_GN45);
 	device.option_add_internal("bmc_gold7in1",     NES_BMC_GOLD7IN1);
+	device.option_add_internal("bmc_l6in1",        NES_BMC_L6IN1);
 	device.option_add_internal("bmc_00202650",     NES_BMC_00202650);
 	device.option_add_internal("bmc_411120c",      NES_BMC_411120C);
 	device.option_add_internal("bmc_810305c",      NES_BMC_810305C);

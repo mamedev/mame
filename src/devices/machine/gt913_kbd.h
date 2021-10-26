@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Devin Acker
 /***************************************************************************
-	Casio GT913 keyboard controller (HLE)
+    Casio GT913 keyboard controller (HLE)
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_GT913_KBD_H

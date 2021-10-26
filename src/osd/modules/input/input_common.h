@@ -360,9 +360,6 @@ struct key_trans_entry {
 #elif defined(OSD_WINDOWS)
 	int             scan_code;
 	unsigned char   virtual_key;
-#elif defined(OSD_UWP)
-	int             scan_code;
-	Windows::System::VirtualKey virtual_key;
 #endif
 
 	char            ascii_key;
@@ -396,9 +393,6 @@ public:
 #if defined(OSD_WINDOWS)
 	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
 	int vkey_for_mame_code(input_code code) const;
-#elif defined(OSD_UWP)
-	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
-	const char* ui_label_for_mame_key(input_item_id code) const;
 #endif
 
 	static keyboard_trans_table& instance()

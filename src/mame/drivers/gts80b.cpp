@@ -15,6 +15,9 @@ Sound is missing/wrong in all games. Most sound boards need to be emulated.
 
 The test rom says U4 is faulty. Using MOS6532_NEW fixes this error, but the games ramdomly slam-tilt instead.
 
+'Master' has a different memory map, and there's jumps to apparently unused parts of the rom. (See @ 2020).
+ When it's displaying the high scores, it will run into the weeds after showing the first score.
+
 PinMAME used for the display character generator.
 
 When asked to enter your initials, use the Advance buttons to select a letter, and the Start button to enter it.

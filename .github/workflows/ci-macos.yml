@@ -1,6 +1,22 @@
 name: CI (macOS)
 
-on: [push, pull_request]
+on:
+  push:
+    paths:
+    - '.github/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
+  pull_request:
+    paths:
+    - '.github/**'
+    - '3rdparty/**'
+    - 'scripts/**'
+    - 'src/**'
+    - 'COPYING'
+    - 'makefile'
 
 jobs:
   build-macos:
