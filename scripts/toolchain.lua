@@ -17,8 +17,6 @@ newoption {
 	allowed = {
 		{ "android-arm",   "Android - ARM"          },
 		{ "android-arm64", "Android - ARM64"        },
-		{ "android-mips",  "Android - MIPS"         },
-		{ "android-mips64","Android - MIPS64"       },
 		{ "android-x86",   "Android - x86"          },
 		{ "android-x64",   "Android - x64"          },
 		{ "asmjs",         "Emscripten/asm.js"      },
@@ -134,8 +132,6 @@ function toolchain(_buildDir, _subDir)
 			local platformToolchainMap = {
 				['arm']    = "arm-linux-androideabi",
 				['arm64']  = "aarch64-linux-android",
-				['mips64'] = "mips64el-linux-android",
-				['mips']   = "mipsel-linux-android",
 				['x86']    = "i686-linux-android",
 				['x64']    = "x86_64-linux-android",
 			}

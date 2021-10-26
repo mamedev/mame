@@ -180,12 +180,6 @@ end
 			if _OPTIONS["PLATFORM"]=="arm64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
 			end
-			if _OPTIONS["PLATFORM"]=="mips" then
-				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
-			end
-			if _OPTIONS["PLATFORM"]=="mips64" then
-				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
-			end
 			if _OPTIONS["PLATFORM"]=="x86" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
 			end
