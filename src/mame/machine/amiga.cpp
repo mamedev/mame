@@ -1133,9 +1133,17 @@ WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
 
 void amiga_state::ocs_map(address_map &map)
 {
-	// In progress: remove this catch-all trampoline, move everything into devices
+	// In progress: remove this catch-all trampoline, move almost everything into devices
 	map(0x000, 0x1ff).rw(FUNC(amiga_state::custom_chip_r), FUNC(amiga_state::custom_chip_w));
 
+	map(0x010, 0x011).r(m_fdc, FUNC(amiga_fdc_device::adkcon_r));
+	map(0x01a, 0x01b).r(m_fdc, FUNC(amiga_fdc_device::dskbytr_r));
+	// FIXME: these two belongs to Agnus, also shouldn't be readable
+	map(0x020, 0x021).rw(m_fdc, FUNC(amiga_fdc_device::dskpth_r), FUNC(amiga_fdc_device::dskpth_w));
+	map(0x022, 0x023).rw(m_fdc, FUNC(amiga_fdc_device::dskptl_r), FUNC(amiga_fdc_device::dskptl_w));
+	map(0x024, 0x025).w(m_fdc, FUNC(amiga_fdc_device::dsklen_w));
+
+	map(0x07e, 0x07f).w(m_fdc, FUNC(amiga_fdc_device::dsksync_w));
 	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_8364_device::audio_channel_map<0>));
 	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
 	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<2>));
@@ -1272,7 +1280,7 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 			return m_fdc->adkcon_r();
 
 		case REG_DSKDATR:
-			popmessage("DSKDAT R, contact MESSdev");
+			popmessage("DSKDAT R, contact MAMEdev");
 			break;
 	}
 
@@ -1287,9 +1295,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 	if (LOG_CUSTOM)
 		logerror("%06X:write to custom %s = %04X\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff], data);
 
-	// paula will handle some of those registers
-	m_paula->reg_w(offset, data);
-
 	switch (offset)
 	{
 		case REG_BLTDDAT:   case REG_DMACONR:   case REG_VPOSR:     case REG_VHPOSR:
@@ -1300,7 +1305,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			return;
 
 		case REG_DSKDAT:
-			popmessage("DSKDAT W %04x, contact MESSdev",data);
+			popmessage("DSKDAT W %04x, contact MAMEdev",data);
 			break;
 
 		case REG_DSKSYNC:
@@ -1454,6 +1459,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			data &= 0x9fff;
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			m_fdc->dmacon_set(data);
+			m_paula->dmacon_set(data);
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
@@ -1502,6 +1508,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 		case REG_ADKCON:
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			m_fdc->adkcon_set(data);
+			m_paula->adkcon_set(data);
 			break;
 
 		case REG_BPL1PTH:   case REG_BPL2PTH:   case REG_BPL3PTH:   case REG_BPL4PTH:

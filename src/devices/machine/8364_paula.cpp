@@ -46,7 +46,6 @@ paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *
 	: device_t(mconfig, PAULA_8364, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_mem_r(*this), m_int_w(*this),
-	m_dmacon(0), m_adkcon(0),
 	m_stream(nullptr)
 {
 }
@@ -74,8 +73,7 @@ void paula_8364_device::device_start()
 
 void paula_8364_device::device_reset()
 {
-	m_dmacon = 0;
-	m_adkcon = 0;
+	m_dma_master_enable = false;
 	for (auto &chan : m_channel)
 	{
 		chan.loc = 0;
@@ -87,6 +85,8 @@ void paula_8364_device::device_reset()
 		chan.curlocation = 0;
 		chan.curlength = 0;
 		chan.dma_enabled = false;
+		chan.atper = false;
+		chan.atvol = false;
 	}
 }
 
@@ -158,50 +158,36 @@ template <u8 ch> void paula_8364_device::audxdat_w(u16 data)
 	m_channel[ch].manualmode = true;
 }
 
-uint16_t paula_8364_device::reg_r(offs_t offset)
+void paula_8364_device::dmacon_set(u16 data)
 {
-	switch (offset)
+	m_stream->update();
+
+	m_dma_master_enable = bool(BIT(data, 9));
+
+	// update the DMA latches on each channel and reload if fresh
+	// This holds true particularly for Ocean games (bchvolly, lostpatr, pang) and waylildr:
+	// they sets a DMA length for a channel then enable DMA finally resets that length to 1
+	// after a short delay loop.
+	for (int channum = 0; channum < 4; channum++)
 	{
-	case REG_DMACONR:
-		return m_dmacon;
+		audio_channel *chan = &m_channel[channum];
+		if (!chan->dma_enabled && ((data >> channum) & 1))
+			dma_reload(chan, true);
 
-	case REG_ADKCONR:
-		return m_adkcon;
+		chan->dma_enabled = bool(BIT(data, channum));
 	}
-
-	return 0xffff;
 }
 
-void paula_8364_device::reg_w(offs_t offset, uint16_t data)
+void paula_8364_device::adkcon_set(u16 data)
 {
-	if (offset >= 0xa0 && offset <= 0xdf)
-		m_stream->update();
+	m_stream->update();
 
-	switch (offset)
+	for (int channum = 0; channum < 4; channum++)
 	{
-	case REG_DMACON:
-		m_stream->update();
-		m_dmacon = (data & 0x8000) ? (m_dmacon | (data & 0x021f)) : (m_dmacon & ~(data & 0x021f));  // only bits 15, 9 and 5 to 0
-		// update the DMA latches on each channel and reload if fresh
-		// This holds true particularly for Ocean games (bchvolly, lostpatr, pang) and waylildr:
-		// they sets a DMA length for a channel then enable DMA finally resets that length to 1
-		// after a short delay loop.
-		for (int channum = 0; channum < 4; channum++)
-		{
-			audio_channel *chan = &m_channel[channum];
-			if (!chan->dma_enabled && ((m_dmacon >> channum) & 1))
-				dma_reload(chan, true);
+		audio_channel *chan = &m_channel[channum];
 
-			chan->dma_enabled = BIT(m_dmacon, channum);
-		}
-		break;
-
-	case REG_ADKCON:
-		m_stream->update();
-		m_adkcon = (data & 0x8000) ? (m_adkcon | (data & 0x7fff)) : (m_adkcon & ~(data & 0x7fff));
-		break;
-
-
+		chan->atper = bool(BIT(data, channum + 4));
+		chan->atvol = bool(BIT(data, channum));
 	}
 }
 
@@ -236,14 +222,14 @@ std::string paula_8364_device::print_audio_state()
 {
 	std::ostringstream outbuffer;
 
-	util::stream_format(outbuffer, "DMACON: %04x (%d) ADKCON %04x\n", m_dmacon, BIT(m_dmacon, 9), m_adkcon);
+	util::stream_format(outbuffer, "DMA master %d\n", m_dma_master_enable);
 	for (auto &chan : m_channel)
 	{
-		util::stream_format(outbuffer, "%d (%d) (%d%d) REGS: %06x %04x %03x %02x %d LIVE: %06x %04x %d\n"
+		util::stream_format(outbuffer, "%d DMA (%d) ADK (%d%d) REGS: %06x %04x %03x %02x %d LIVE: %06x %04x %d\n"
 			, chan.index
-			, BIT(m_dmacon, chan.index)
-			, BIT(m_adkcon, chan.index+4)
-			, BIT(m_adkcon, chan.index)
+			, chan.dma_enabled
+			, chan.atper
+			, chan.atvol
 			, chan.loc
 			, chan.len
 			, chan.per
@@ -267,7 +253,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 	int channum, sampoffs = 0;
 
 	// if all DMA off, disable all channels
-	if (BIT(m_dmacon, 9) == 0)
+	if (m_dma_master_enable == false)
 	{
 		m_channel[0].dma_enabled =
 		m_channel[1].dma_enabled =
@@ -317,7 +303,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 			volume *= 4;
 
 			// are we modulating the period of the next channel?
-			if ((m_adkcon >> channum) & 0x10)
+			if (chan->atper)
 			{
 				nextper = chan->dat;
 				nextvol = -1;
@@ -325,7 +311,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 			}
 
 			// are we modulating the volume of the next channel?
-			else if ((m_adkcon >> channum) & 0x01)
+			else if (chan->atvol)
 			{
 				nextper = -1;
 				nextvol = chan->dat;
