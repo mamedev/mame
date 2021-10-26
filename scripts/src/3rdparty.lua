@@ -934,12 +934,9 @@ project "lualibs"
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
-	}
-if (_OPTIONS["osd"] ~= "uwp") then
-	includedirs {
 		MAME_DIR .. "3rdparty/linenoise",
 	}
-end
+
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
@@ -952,16 +949,8 @@ end
 		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
-	}
-if (_OPTIONS["osd"] == "uwp") then
-	files {
-		MAME_DIR .. "3rdparty/lua-linenoise/linenoise_none.c",
-	}
-else
-	files {
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
-end
 
 --------------------------------------------------
 -- SQLite3 library objects
@@ -2095,7 +2084,6 @@ end
 -- linenoise library
 --------------------------------------------------
 
-if (_OPTIONS["osd"] ~= "uwp") then
 project "linenoise"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
@@ -2117,7 +2105,6 @@ project "linenoise"
 		MAME_DIR .. "3rdparty/linenoise/utf8.c",
 		MAME_DIR .. "3rdparty/linenoise/linenoise.c",
 	}
-end
 
 
 --------------------------------------------------
