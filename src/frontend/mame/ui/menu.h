@@ -278,6 +278,7 @@ protected:
 	virtual void handle_keys(uint32_t flags, int &iptkey);
 	virtual bool custom_ui_cancel() { return false; }
 	virtual bool custom_mouse_down() { return false; }
+	virtual bool custom_mouse_scroll(int lines) { return false; }
 
 	static bool is_selectable(menu_item const &item)
 	{

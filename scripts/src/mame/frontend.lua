@@ -171,6 +171,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/tapectrl.h",
 	MAME_DIR .. "src/frontend/mame/ui/text.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/text.h",
+	MAME_DIR .. "src/frontend/mame/ui/textbox.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/textbox.h",
 	MAME_DIR .. "src/frontend/mame/ui/toolbar.ipp",
 	MAME_DIR .. "src/frontend/mame/ui/ui.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/ui.h",

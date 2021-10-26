@@ -978,16 +978,11 @@ void menu::handle_events(uint32_t flags, event &ev)
 
 		// caught scroll event
 		case ui_event::type::MOUSE_WHEEL:
-			if (!(flags & PROCESS_ONLYCHAR))
+			if (!custom_mouse_scroll((0 < local_menu_event.zdelta) ? -local_menu_event.num_lines : local_menu_event.num_lines) && !(flags & (PROCESS_ONLYCHAR | PROCESS_CUSTOM_NAV)))
 			{
 				if (local_menu_event.zdelta > 0)
 				{
-					if (flags & PROCESS_CUSTOM_NAV) // FIXME: DAT menu logic - let the derived class handle this
-					{
-						top_line -= local_menu_event.num_lines;
-						return;
-					}
-					else if (is_first_selected())
+					if (is_first_selected())
 					{
 						select_last_item();
 					}
@@ -1002,12 +997,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				}
 				else
 				{
-					if (flags & PROCESS_CUSTOM_NAV) // FIXME: DAT menu logic - let the derived class handle this
-					{
-						top_line += local_menu_event.num_lines;
-						return;
-					}
-					else if (is_last_selected())
+					if (is_last_selected())
 					{
 						select_first_item();
 					}
