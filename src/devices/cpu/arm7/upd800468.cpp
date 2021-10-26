@@ -5,6 +5,8 @@
  NEC uPD800468
  ARM7TDMI core with internal peripherals and external ROM/flash
 
+ Used in late 2000s/early 2010s Casio keyboards, like the CTK-2000 series.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -92,8 +94,7 @@ void upd800468_device::upd800468_map(address_map &map)
 	map(0x1fff00a2, 0x1fff00a3).r(m_kbd, FUNC(gt913_kbd_hle_device::status_r)).umask32(0xffff0000);
 	map(0x1fff00a4, 0x1fff00a5).w(m_kbd, FUNC(gt913_kbd_hle_device::status_w)).umask32(0x0000ffff);
 
-	// TODO: 8-channel ADC at 0x1fff00c0
-	map(0x1fff00c0, 0x1fff00cf).nopr();
+	map(0x1fff00c0, 0x1fff00cf).r(FUNC(upd800468_device::adc_r));
 
 	map(0x1fff0141, 0x1fff0141).rw(FUNC(upd800468_device::port_ddr_r<0>), FUNC(upd800468_device::port_ddr_w<0>)).umask32(0x0000ff00);
 	map(0x1fff0142, 0x1fff0142).rw(FUNC(upd800468_device::port_r<0>), FUNC(upd800468_device::port_w<0>)).umask32(0x00ff0000);
@@ -127,7 +128,7 @@ upd800468_device::upd800468_device(const machine_config &mconfig, const char *ta
 	, m_vic(*this, "vic")
 	, m_timer(*this, "timer%u", 0)
 	, m_kbd(*this, "kbd")
-	, m_in_cb(*this), m_out_cb(*this)
+	, m_adc_cb(*this), m_in_cb(*this), m_out_cb(*this)
 	, m_ram_view(*this, "ramview")
 {
 }
@@ -142,9 +143,12 @@ device_memory_interface::space_config_vector upd800468_device::memory_space_conf
 void upd800468_device::device_add_mconfig(machine_config &config)
 {
 	UPD800468_VIC(config, m_vic, 0);
-	m_vic->out_irq_cb().set_inputline(DEVICE_SELF, ARM7_IRQ_LINE);
-	m_vic->out_fiq_cb().set_inputline(DEVICE_SELF, ARM7_FIRQ_LINE);
+	m_vic->out_irq_cb().set_inputline(*this, ARM7_IRQ_LINE);
+	m_vic->out_fiq_cb().set_inputline(*this, ARM7_FIRQ_LINE);
 
+	// this is probably not 100% accurate timing-wise
+	// for the ctk2100 it works ok for e.g. MIDI tempo and the auto power off interval
+	// it's unclear if there's supposed to be a register for setting a divider for each timer
 	UPD800468_TIMER(config, m_timer[0], clock() >> 3);
 	UPD800468_TIMER(config, m_timer[1], clock() >> 3);
 	UPD800468_TIMER(config, m_timer[2], clock() >> 3);
@@ -152,6 +156,7 @@ void upd800468_device::device_add_mconfig(machine_config &config)
 	m_timer[1]->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<22>));
 	m_timer[2]->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<23>));
 
+	// key/button controller is compatible with the one from earlier keyboards
 	GT913_KBD_HLE(config, m_kbd, 0);
 	m_kbd->irq_cb().set(m_vic, FUNC(vic_upd800468_device::irq_w<31>));
 }
@@ -164,6 +169,7 @@ void upd800468_device::device_start()
 {
 	arm7_cpu_device::device_start();
 
+	m_adc_cb.resolve_all_safe(0x000);
 	m_in_cb.resolve_all_safe(0x00);
 	m_out_cb.resolve_all_safe();
 
@@ -189,6 +195,13 @@ void upd800468_device::device_reset()
 
 	m_ram_enable = 0;
 	m_ram_view.disable();
+}
+
+u16 upd800468_device::adc_r(offs_t num)
+{
+	// TODO: verify strange-seeming ADC behavior
+	// ctk2100 reads a 10-bit value, then inverts the highest bit, and seemingly treats the result as unsigned
+	return m_adc_cb[num]() ^ 0x200;
 }
 
 u8 upd800468_device::port_ddr_r(offs_t num)

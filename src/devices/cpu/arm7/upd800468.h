@@ -49,6 +49,8 @@ public:
 	
 	void upd800468_map(address_map &map);
 
+	template<offs_t i> auto adc_cb() { return m_adc_cb[i].bind(); }
+
 	template<offs_t i> auto port_in_cb() { return m_in_cb[i].bind(); }
 	template<offs_t i> auto port_out_cb() { return m_out_cb[i].bind(); }
 
@@ -62,6 +64,8 @@ public:
 	void ram_enable_w(u32 data);
 
 protected:
+	u16 adc_r(offs_t);
+
 	u8 port_ddr_r(offs_t);
 	void port_ddr_w(offs_t, u8);
 
@@ -83,6 +87,7 @@ private:
 	required_device_array<upd800468_timer_device, 3> m_timer;
 	required_device<gt913_kbd_hle_device> m_kbd;
 
+	devcb_read16::array<8> m_adc_cb;
 	devcb_read8::array<4> m_in_cb;
 	devcb_write8::array<4> m_out_cb;
 	u8 m_port_ddr[4], m_port_data[4];

@@ -51,12 +51,6 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(lcd_r) { return m_lcdc->db_r() >> 4; }
 	DECLARE_WRITE_LINE_MEMBER(lcd_w) { m_lcdc->db_w(state << 4); }
 
-	template<unsigned IRQ>
-	DECLARE_INPUT_CHANGED_MEMBER(test_w)
-	{
-		m_maincpu->subdevice<vic_upd800468_device>("vic")->irq_w<IRQ>(newval);
-	}
-
 	DECLARE_WRITE_LINE_MEMBER(apo_w);
 
 private:
@@ -112,6 +106,11 @@ void ctk2000_state::ctk2000(machine_config &config)
 	m_maincpu->port_in_cb<2>().set_ioport("P2_R");
 	m_maincpu->port_out_cb<2>().set_ioport("P2_W");
 	m_maincpu->port_out_cb<3>().set_ioport("P3");
+	// ADCs 0, 5, 6, 7 are connected to the mic input
+	// ADC 4 is connected to the pitch wheel (for ctk3000)
+	m_maincpu->adc_cb<1>().set_ioport("AIN1");
+	m_maincpu->adc_cb<2>().set_ioport("AIN2");
+	m_maincpu->adc_cb<3>().set_ioport("AIN3");
 
 	// LCD
 	HD44780(config, m_lcdc, 0);
@@ -273,6 +272,21 @@ INPUT_PORTS_START(ctk2100)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rs_w)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	PORT_START("AIN1")
+	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_OTHER )  PORT_NAME("Pedal")
+
+	PORT_START("AIN2")
+	PORT_CONFNAME( 0x3ff, 0x000, "Power Source" )
+	PORT_CONFSETTING(     0x000, "AC Adapter" )
+	PORT_CONFSETTING(     0x3ff, "Battery" )
+
+	PORT_START("AIN3")
+	PORT_BIT( 0x3ff, IP_ACTIVE_LOW, IPT_UNUSED )   PORT_CONDITION("AIN2", 0x3ff, EQUALS, 0)
+	PORT_CONFNAME( 0x3ff, 0x3ff, "Battery Level" ) PORT_CONDITION("AIN2", 0x3ff, NOTEQUALS, 0)
+	// values here are somewhat arbitrary - ctk2100 only checks if the value is above/below a certain threshold
+	PORT_CONFSETTING(     0x100, "Low" )
+	PORT_CONFSETTING(     0x3ff, "Normal" )
+
 INPUT_PORTS_END
 
 ROM_START(ctk2100)
@@ -283,5 +297,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY  FULLNAME     FLAGS
-SYST( 2009, ctk2100, 0,      0,      ctk2000, ctk2100, ctk2000_state, empty_init, "Casio", "CTK-2100",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-
+SYST( 2009, ctk2100, 0,      0,      ctk2000, ctk2100, ctk2000_state, empty_init, "Casio", "CTK-2100",  MACHINE_NO_SOUND | MACHINE_NODEVICE_MICROPHONE | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
