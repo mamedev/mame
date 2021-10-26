@@ -1609,30 +1609,6 @@ openbsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32
 
 #-------------------------------------------------
-# gmake-steamlink
-#-------------------------------------------------
-
-$(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef MARVELL_SDK_PATH
-	$(error MARVELL_SDK_PATH is not set)
-endif
-ifndef MARVELL_ROOTFS
-	$(error MARVELL_ROOTFS is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  $(MAKETYPE)
-
-.PHONY: steamlink
-steamlink: generate $(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile
-ifndef MARVELL_SDK_PATH
-	$(error MARVELL_SDK_PATH is not set)
-endif
-ifndef MARVELL_ROOTFS
-	$(error MARVELL_ROOTFS is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-steamlink config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-steamlink config=$(CONFIG)
-
-#-------------------------------------------------
 # gmake-rpi
 #-------------------------------------------------
 

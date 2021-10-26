@@ -38,7 +38,6 @@ newoption {
 		{ "osx-clang",     "OSX (Clang compiler)"   },
 		{ "rpi",           "RaspberryPi"            },
 		{ "solaris",       "Solaris"                },
-		{ "steamlink",     "Steam Link"             },
 		{ "ci20",          "Creator-Ci20"           },
 	},
 }
@@ -220,16 +219,6 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux-clang")
-		end
-
-		if "steamlink" == _OPTIONS["gcc"] then
-			if not os.getenv("MARVELL_SDK_PATH") then
-				print("Set MARVELL_SDK_PATH envrionment variable.")
-			end
-			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
-			premake.gcc.cxx = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-g++"
-			premake.gcc.ar  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-steamlink")
 		end
 
 		if "rpi" == _OPTIONS["gcc"] then
@@ -558,28 +547,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "x64", "mingw64-gcc", "Debug" }
 		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x64/Debug")
-
-	configuration { "steamlink" }
-		objdir ( _buildDir .. "steamlink/obj")
-		defines {
-			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
-		}
-		buildoptions {
-			"-marm",
-			"-mfloat-abi=hard",
-			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
-		}
-		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"--sysroot=$(MARVELL_SDK_PATH)/rootfs",
-		}
-
-	configuration { "steamlink", "Release" }
-		targetdir (_buildDir .. "steamlink/bin/Release")
-
-	configuration { "steamlink", "Debug" }
-		targetdir (_buildDir .. "steamlink/bin/Debug")
 
 	configuration { "rpi" }
 		objdir ( _buildDir .. "rpi/obj")

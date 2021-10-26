@@ -150,7 +150,6 @@ newoption {
 		{ "windows",       "Windows"                },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
-		{ "steamlink",     "Steam Link"             },
 		{ "rpi",           "Raspberry Pi"           },
 		{ "ci20",          "Creator-Ci20"           },
 	},
@@ -1238,17 +1237,6 @@ configuration { "linux-* or rpi or ci20"}
 		end
 
 
-
-configuration { "steamlink" }
-	links {
-		"dl",
-		"EGL",
-		"GLESv2",
-		"SDL2",
-	}
-	defines {
-		"EGL_API_FB",
-	}
 
 configuration { "rpi" }
 	links {

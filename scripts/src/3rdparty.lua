@@ -1311,12 +1311,8 @@ end
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/bimg/include",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/dxsdk/include",
+		MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
 	}
-
-	configuration { "not steamlink"}
-		includedirs {
-			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-		}
 
 	configuration { "android-*"}
 		buildoptions {
