@@ -542,7 +542,7 @@ configuration { "Release", "vsllvm" }
 		"NoIncrementalLink",
 	}
 
--- Force VS2015/17 targets to use bundled SDL2
+-- Force Visual Studio targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
 		_OPTIONS["with-bundled-sdl2"] = "1"
