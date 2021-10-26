@@ -1021,19 +1021,6 @@ ifeq (posix,$(SHELLTYPE))
 MSBUILD_PARAMS := $(subst /,-,$(MSBUILD_PARAMS))
 endif
 endif
-ifdef FASTBUILD
-FASTBUILD_PARAMS := -j$(NUMBER_OF_PROCESSORS)
-ifeq ($(CONFIG),debug)
-FASTBUILD_TARGET := all-Debug
-else
-FASTBUILD_TARGET := all-Release
-endif
-ifeq ($(ARCHITECTURE),_x64)
-FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x64
-else
-FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x32
-endif
-endif
 else
 ifdef OVERRIDE_CC
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 2> /dev/null)
@@ -1193,13 +1180,6 @@ vs2019_uwp: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2019
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2019_fastbuild
-vs2019_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2019-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
