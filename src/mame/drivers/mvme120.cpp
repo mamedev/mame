@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Joakim Larsson Edstrom
+// copyright-holders:Katherine Rohl
 /*
  *	Motorola MVME120 CPU board.
  *  This is an early MVME system from 1984, using standard Motorola parts
