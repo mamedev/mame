@@ -573,11 +573,6 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "winstore*" }
-		defines {
-			"NO_GETENV"
-		}
-
 	configuration { }
 
 	files {
@@ -768,11 +763,6 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
-		}
-
 	configuration { }
 		defines {
 			"_7ZIP_PPMD_SUPPPORT",
@@ -860,11 +850,6 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd592", -- error #592: variable "xxx" is used before its value is set
 		}
 end
-
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h",
-		}
 
 	configuration { }
 		defines {
@@ -961,11 +946,6 @@ end
 		ext_includedir("sqlite3"),
 	}
 
-	configuration { "winstore*" }
-		forcedincludes {
-			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
-		}
-
 	configuration {}
 
 	files {
@@ -1010,10 +990,6 @@ if _OPTIONS["vs"]=="clangcl" then
 			"-Wno-implicit-int-float-conversion",
 		}
 end
-	configuration { "winstore*" }
-		defines {
-			"SQLITE_OS_WINRT",
-		}
 
 	configuration { }
 

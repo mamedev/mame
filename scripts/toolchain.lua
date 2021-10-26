@@ -43,10 +43,6 @@ newoption {
 	allowed = {
 		{ "intel-15",      "Intel C++ Compiler XE 15.0" },
 		{ "clangcl",       "Visual Studio 2019 using Clang/LLVM" },
-		{ "winphone8",     "Windows Phone 8.0" },
-		{ "winphone81",    "Windows Phone 8.1" },
-		{ "winstore81",    "Windows Store 8.1" },
-		{ "winstore82",    "Universal Windows App" }
 	},
 }
 
@@ -222,27 +218,11 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.ar  = toolchainPrefix .. "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx-clang")
 		end
-	elseif _ACTION == "vs2019" or _ACTION == "vs2019-fastbuild" then
+	elseif _ACTION == "vs2019" then
 
 		if "clangcl" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("ClangCL")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
-		end
-
-		if "winstore82" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "v142"
-			premake.vstudio.storeapp = "10.0"
-
-			-- If needed, depending on GENie version, enable file-level configuration
-			if enablefilelevelconfig ~= nil then
-				enablefilelevelconfig()
-			end
-
-			local action = premake.action.current()
-			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
-
-			platforms { "ARM" }
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
 		end
 
 		if "intel-15" == _OPTIONS["vs"] then
@@ -317,15 +297,6 @@ function toolchain(_buildDir, _subDir)
 	configuration { "vs*-clang" }
 		buildoptions {
 			"-Qunused-arguments",
-		}
-
-	configuration { "winphone8* or winstore8*" }
-		removeflags {
-			"StaticRuntime",
-			"NoExceptions",
-		}
-		flags {
-			"WinMain"
 		}
 
 	configuration { "mingw*" }

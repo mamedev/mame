@@ -40,8 +40,6 @@ end
 			"GLESv2",
 			"SDL2",
 		}
-	configuration { "winstore*" }
-		kind "WindowedApp"
 
 	configuration {  }
 
@@ -58,36 +56,6 @@ end
 				"$(SILENT) objdump --section=.text --line-numbers --syms --demangle $(TARGET) >$(subst .exe,.sym,$(TARGET))"
 			}
 	end
-
-	configuration { "winstore*" }
-		-- Windows Required Files
-		files {
-			-- Manifest file
-			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
-		}
-
-	configuration { "winstore*" }
-		files {
-			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
-		}
-		configuration "**/scripts/resources/uwp/assets/*.png"
-			flags { "DeploymentContent" }
-
-	-- Effects and Shaders
-	configuration { "winstore*" }
-		files {
-			MAME_DIR .. "artwork/*",
-			MAME_DIR .. "artwork/**/*",
-			MAME_DIR .. "bgfx/*",
-			MAME_DIR .. "bgfx/**/*",
-			MAME_DIR .. "hash/*",
-			MAME_DIR .. "language/*",
-			MAME_DIR .. "language/**/*",
-			MAME_DIR .. "plugins/*",
-			MAME_DIR .. "plugins/**/*",
-		}
-		configuration "**/*"
-			flags { "DeploymentContent" }
 
 	configuration { "Release" }
 		targetsuffix ""
