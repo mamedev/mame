@@ -150,7 +150,6 @@ newoption {
 		{ "windows",       "Windows"                },
 		{ "haiku",         "Haiku"                  },
 		{ "solaris",       "Solaris SunOS"          },
-		{ "rpi",           "Raspberry Pi"           },
 	},
 }
 
@@ -1223,7 +1222,7 @@ configuration { "android-arm64" }
 		"-Wno-asm-operand-widths",
 	}
 
-configuration { "linux-* or rpi"}
+configuration { "linux-*"}
 		links {
 			"dl",
 			"rt",
@@ -1235,20 +1234,6 @@ configuration { "linux-* or rpi"}
 			}
 		end
 
-
-
-configuration { "rpi" }
-	links {
-		"SDL2",
-		"fontconfig",
-		"X11",
-		"GLESv2",
-		"EGL",
-		"bcm_host",
-		"vcos",
-		"vchiq_arm",
-		"pthread",
-	}
 
 
 configuration { "osx* or xcode4" }

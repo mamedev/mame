@@ -36,7 +36,6 @@ newoption {
 		{ "openbsd",       "OpenBSD"                },
 		{ "osx",           "OSX (GCC compiler)"     },
 		{ "osx-clang",     "OSX (Clang compiler)"   },
-		{ "rpi",           "RaspberryPi"            },
 		{ "solaris",       "Solaris"                },
 	},
 }
@@ -220,16 +219,6 @@ function toolchain(_buildDir, _subDir)
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux-clang")
 		end
 
-		if "rpi" == _OPTIONS["gcc"] then
-			if not os.getenv("RASPBERRY_SDK_PATH") then
-				print("Set RASPBERRY_SDK_PATH envrionment variable.")
-			end
-			premake.gcc.cc  = "$(RASPBERRY_SDK_PATH)/bin/arm-linux-gnueabihf-gcc"
-			premake.gcc.cxx = "$(RASPBERRY_SDK_PATH)/bin/arm-linux-gnueabihf-g++"
-			premake.gcc.ar  = "$(RASPBERRY_SDK_PATH)/bin/arm-linux-gnueabihf-ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
-		end
-
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW32") then
 				print("Set MINGW32 envrionment variable.")
@@ -278,10 +267,6 @@ function toolchain(_buildDir, _subDir)
 			premake.gcc.cxx = toolchainPrefix .. "clang++"
 			premake.gcc.ar  = toolchainPrefix .. "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-osx-clang")
-		end
-
-		if "rpi" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-rpi")
 		end
 	elseif _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 
@@ -532,37 +517,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "x64", "mingw64-gcc", "Debug" }
 		targetdir (_buildDir .. "mingw-gcc" .. "/bin/x64/Debug")
-
-	configuration { "rpi" }
-		objdir ( _buildDir .. "rpi/obj")
-		libdirs {
-			"$(RASPBERRY_SYSROOT)/opt/vc/lib",
-		}
-		includedirs {
-			"$(RASPBERRY_SYSROOT)/opt/vc/include",
-			"$(RASPBERRY_SYSROOT)/opt/vc/include/interface/vcos/pthreads",
-			"$(RASPBERRY_SYSROOT)/opt/vc/include/interface/vmcs_host/linux",
-		}
-		defines {
-			"__VCCOREVER__=0x04000000", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
-		}
-		linkoptions {
-			"-Wl,--gc-sections",
-		}
-		buildoptions {
-			"--sysroot=$(RASPBERRY_SYSROOT)",
-		}
-		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"--sysroot=$(RASPBERRY_SYSROOT)",
-		}
-
-	configuration { "rpi", "Release" }
-		targetdir (_buildDir .. "rpi/bin/Release")
-
-	configuration { "rpi", "Debug" }
-		targetdir (_buildDir .. "rpi/bin/Debug")
 
 	configuration { "mingw-clang" }
 		buildoptions {
@@ -940,10 +894,6 @@ function toolchain(_buildDir, _subDir)
 		targetdir (_buildDir .. "ios-simulator" .. "/bin")
 		objdir (_buildDir .. "ios-simulator" .. "/obj")
 
-	configuration { "rpi" }
-		targetdir (_buildDir .. "rpi" .. "/bin")
-		objdir (_buildDir .. "rpi" .. "/obj")
-
 	configuration {} -- reset configuration
 
 	return true
@@ -966,7 +916,7 @@ function strip()
 			"$(SILENT) " .. toolchainPrefix .. "strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-* or rpi" }
+	configuration { "linux-*" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) strip -s \"$(TARGET)\""

@@ -1350,14 +1350,6 @@ end
 			"-Wno-unused-function",
 			"-Wno-unused-variable",
 		}
-	configuration { "rpi" }
-		buildoptions {
-			"-Wno-unused-but-set-variable",
-			"-Wno-unused-variable",
-		}
-		defines {
-			"__STDC_VERSION__=199901L",
-		}
 
 	configuration { }
 
