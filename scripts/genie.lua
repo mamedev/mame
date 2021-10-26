@@ -14,8 +14,6 @@ newoption {
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 
-premake.xcode.parameters = { 'CLANG_CXX_LANGUAGE_STANDARD = "c++17"', 'CLANG_CXX_LIBRARY = "libc++"' }
-
 MAME_DIR = (path.getabsolute("..") .. "/")
 --MAME_DIR = string.gsub(MAME_DIR, "(%s)", "\\%1")
 local MAME_BUILD_DIR = (MAME_DIR .. _OPTIONS["build-dir"] .. "/")
@@ -74,8 +72,7 @@ end
 
 function precompiledheaders()
 	if _OPTIONS["precompile"]==nil or (_OPTIONS["precompile"]~=nil and _OPTIONS["precompile"]=="1") then
-		configuration { "not xcode4" }
-			pchheader("emu.h")
+		pchheader("emu.h")
 		configuration { }
 	end
 end
@@ -145,7 +142,6 @@ newoption {
 		{ "netbsd",        "NetBSD"                 },
 		{ "openbsd",       "OpenBSD"                },
 		{ "linux",         "Linux"                  },
-		{ "ios",           "iOS"                    },
 		{ "macosx",        "OSX"                    },
 		{ "windows",       "Windows"                },
 		{ "haiku",         "Haiku"                  },
@@ -470,17 +466,11 @@ configurations {
 	"Release",
 }
 
-if _ACTION == "xcode4" then
-	platforms {
-		"x64",
-	}
-else
-	platforms {
-		"x32",
-		"x64",
-		"Native", -- for targets where bitness is not specified
-	}
-end
+platforms {
+	"x32",
+	"x64",
+	"Native", -- for targets where bitness is not specified
+}
 
 language "C++"
 
@@ -1236,7 +1226,7 @@ configuration { "linux-*"}
 
 
 
-configuration { "osx* or xcode4" }
+configuration { "osx*" }
 		links {
 			"pthread",
 		}

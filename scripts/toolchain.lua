@@ -24,8 +24,6 @@ newoption {
 		{ "freebsd-clang", "FreeBSD (clang compiler)"},
 		{ "linux-gcc",     "Linux (GCC compiler)"   },
 		{ "linux-clang",   "Linux (Clang compiler)" },
-		{ "ios-arm",       "iOS - ARM"              },
-		{ "ios-simulator", "iOS - Simulator"        },
 		{ "mingw32-gcc",   "MinGW32"                },
 		{ "mingw64-gcc",   "MinGW64"                },
 		{ "mingw-clang",   "MinGW (clang compiler)" },
@@ -58,25 +56,9 @@ newoption {
 }
 
 newoption {
-	trigger = "xcode",
-	value = "xcode_target",
-	description = "Choose XCode target",
-	allowed = {
-		{ "osx", "OSX" },
-		{ "ios", "iOS" },
-	}
-}
-
-newoption {
 	trigger = "with-android",
 	value   = "#",
 	description = "Set Android platform version (default: android-21).",
-}
-
-newoption {
-	trigger = "with-ios",
-	value   = "#",
-	description = "Set iOS target version (default: 8.0).",
 }
 
 newoption {
@@ -94,11 +76,6 @@ function toolchain(_buildDir, _subDir)
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	elseif _OPTIONS["PLATFORM"]:find("64", -2) then
 		androidPlatform = "android-24"
-	end
-
-	local iosPlatform = ""
-	if _OPTIONS["with-ios"] then
-		iosPlatform = _OPTIONS["with-ios"]
 	end
 
 	local windowsPlatform = "10.0.10240.0"
@@ -177,20 +154,6 @@ function toolchain(_buildDir, _subDir)
 
 		if "openbsd" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-openbsd")
-		end
-
-		if "ios-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ios-arm")
-		end
-
-		if "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ios-simulator")
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
@@ -400,17 +363,6 @@ function toolchain(_buildDir, _subDir)
 		if "intel-15" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
-		end
-	elseif _ACTION == "xcode4" then
-
-
-		if "osx" == _OPTIONS["xcode"] then
-			premake.xcode.toolset = "macosx"
-			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
-
-		elseif "ios" == _OPTIONS["xcode"] then
-			premake.xcode.toolset = "iphoneos"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 		end
 	end
 
@@ -881,14 +833,6 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "osx*", "arm64", "Debug" }
 		targetdir (_buildDir .. "osx_clang" .. "/bin/x64/Debug")
-
-	configuration { "ios-arm" }
-		targetdir (_buildDir .. "ios-arm" .. "/bin")
-		objdir (_buildDir .. "ios-arm" .. "/obj")
-
-	configuration { "ios-simulator" }
-		targetdir (_buildDir .. "ios-simulator" .. "/bin")
-		objdir (_buildDir .. "ios-simulator" .. "/obj")
 
 	configuration {} -- reset configuration
 
