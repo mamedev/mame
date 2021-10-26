@@ -19,11 +19,6 @@ public:
 
 	void map(address_map &map);
 
-protected:
-	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
-
-	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
 	u32 irq_status_r();
 	u32 fiq_status_r();
 	u32 raw_intr_r();
@@ -53,6 +48,11 @@ protected:
 
 	u32 vect_ctl_r(offs_t offset);
 	void vect_ctl_w(offs_t offset, u32 data);
+
+protected:
+	static constexpr device_timer_id TIMER_CHECK_IRQ = 0;
+
+	vic_pl190_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void update_vector();
 
@@ -90,7 +90,6 @@ public:
 
 	void map(address_map &map);
 
-protected:
 	void int_clear_w(u32 data);
 };
 
@@ -101,13 +100,13 @@ public:
 
 	void map(address_map &map);
 
-protected:
-
 	u16 sw_priority_r();
 	void sw_priority_w(u16 data);
 
 	u8 daisy_priority_r();
 	void daisy_priority_w(u8 data);
+
+protected:
 
 	virtual void update_vector() override;
 

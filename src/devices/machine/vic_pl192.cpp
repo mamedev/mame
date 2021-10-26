@@ -196,19 +196,19 @@ void vic_pl190_device::update_vector()
 
 void vic_pl190_device::map(address_map &map)
 {
-	map(0x000, 0x003).r(NAME(vic_pl190_device::irq_status_r));
-	map(0x004, 0x007).r(NAME(vic_pl190_device::fiq_status_r));
-	map(0x008, 0x00b).r(NAME(vic_pl190_device::raw_intr_r));
-	map(0x00c, 0x00f).rw(NAME(vic_pl190_device::int_select_r), NAME(vic_pl190_device::int_select_w));
-	map(0x010, 0x013).rw(NAME(vic_pl190_device::int_enable_r), NAME(vic_pl190_device::int_enable_w));
-	map(0x014, 0x017).w(NAME(vic_pl190_device::int_en_clear_w));
-	map(0x018, 0x01b).rw(NAME(vic_pl190_device::soft_int_r), NAME(vic_pl190_device::soft_int_w));
-	map(0x01c, 0x01f).w(NAME(vic_pl190_device::soft_int_clear_w));
-	map(0x020, 0x020).rw(NAME(vic_pl190_device::protection_r), NAME(vic_pl190_device::protection_w)).umask32(0x000000ff);
-	map(0x030, 0x033).rw(NAME(vic_pl190_device::cur_vect_addr_r), NAME(vic_pl190_device::cur_vect_addr_w));
-	map(0x034, 0x037).rw(NAME(vic_pl190_device::def_vect_addr_r), NAME(vic_pl190_device::def_vect_addr_w));
-	map(0x100, 0x13f).rw(NAME(vic_pl190_device::vect_addr_r), NAME(vic_pl190_device::vect_addr_w));
-	map(0x200, 0x23f).rw(NAME(vic_pl190_device::vect_ctl_r), NAME(vic_pl190_device::vect_ctl_w));
+	map(0x000, 0x003).r(FUNC(vic_pl190_device::irq_status_r));
+	map(0x004, 0x007).r(FUNC(vic_pl190_device::fiq_status_r));
+	map(0x008, 0x00b).r(FUNC(vic_pl190_device::raw_intr_r));
+	map(0x00c, 0x00f).rw(FUNC(vic_pl190_device::int_select_r), FUNC(vic_pl190_device::int_select_w));
+	map(0x010, 0x013).rw(FUNC(vic_pl190_device::int_enable_r), FUNC(vic_pl190_device::int_enable_w));
+	map(0x014, 0x017).w(FUNC(vic_pl190_device::int_en_clear_w));
+	map(0x018, 0x01b).rw(FUNC(vic_pl190_device::soft_int_r), FUNC(vic_pl190_device::soft_int_w));
+	map(0x01c, 0x01f).w(FUNC(vic_pl190_device::soft_int_clear_w));
+	map(0x020, 0x020).rw(FUNC(vic_pl190_device::protection_r), FUNC(vic_pl190_device::protection_w)).umask32(0x000000ff);
+	map(0x030, 0x033).rw(FUNC(vic_pl190_device::cur_vect_addr_r), FUNC(vic_pl190_device::cur_vect_addr_w));
+	map(0x034, 0x037).rw(FUNC(vic_pl190_device::def_vect_addr_r), FUNC(vic_pl190_device::def_vect_addr_w));
+	map(0x100, 0x13f).rw(FUNC(vic_pl190_device::vect_addr_r), FUNC(vic_pl190_device::vect_addr_w));
+	map(0x200, 0x23f).rw(FUNC(vic_pl190_device::vect_ctl_r), FUNC(vic_pl190_device::vect_ctl_w));
 	map(0xfe0, 0xfe0).lr8([this](offs_t offset){ return periph_id[0]; }, "periph_id0").umask32(0x000000ff);
 	map(0xfe4, 0xfe4).lr8([this](offs_t offset){ return periph_id[1]; }, "periph_id1").umask32(0x000000ff);
 	map(0xfe8, 0xfe8).lr8([this](offs_t offset){ return periph_id[2]; }, "periph_id2").umask32(0x000000ff);
@@ -292,9 +292,9 @@ void vic_upd800468_device::map(address_map &map)
 {
 	vic_pl190_device::map(map);
 
-	map(0x100, 0x17f).rw(NAME(vic_pl190_device::vect_addr_r), NAME(vic_pl190_device::vect_addr_w));
-	map(0x200, 0x27f).rw(NAME(vic_pl190_device::vect_ctl_r), NAME(vic_pl190_device::vect_ctl_w));
-	map(0x2c8, 0x2cb).w(NAME(vic_upd800468_device::int_clear_w));
+	map(0x100, 0x17f).rw(FUNC(vic_pl190_device::vect_addr_r), FUNC(vic_pl190_device::vect_addr_w));
+	map(0x200, 0x27f).rw(FUNC(vic_pl190_device::vect_ctl_r), FUNC(vic_pl190_device::vect_ctl_w));
+	map(0x2c8, 0x2cb).w(FUNC(vic_upd800468_device::int_clear_w));
 }
 
 vic_upd800468_device::vic_upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -357,20 +357,20 @@ void vic_pl192_device::update_vector()
 
 void vic_pl192_device::map(address_map &map)
 {
-	map(0x000, 0x003).r(NAME(vic_pl190_device::irq_status_r));
-	map(0x004, 0x007).r(NAME(vic_pl190_device::fiq_status_r));
-	map(0x008, 0x00b).r(NAME(vic_pl190_device::raw_intr_r));
-	map(0x00c, 0x00f).rw(NAME(vic_pl190_device::int_select_r), NAME(vic_pl190_device::int_select_w));
-	map(0x010, 0x013).rw(NAME(vic_pl190_device::int_enable_r), NAME(vic_pl190_device::int_enable_w));
-	map(0x014, 0x017).w(NAME(vic_pl190_device::int_en_clear_w));
-	map(0x018, 0x01b).rw(NAME(vic_pl190_device::soft_int_r), NAME(vic_pl190_device::soft_int_w));
-	map(0x01c, 0x01f).w(NAME(vic_pl190_device::soft_int_clear_w));
-	map(0x020, 0x020).rw(NAME(vic_pl190_device::protection_r), NAME(vic_pl190_device::protection_w)).umask32(0x000000ff);
-	map(0x024, 0x025).rw(NAME(vic_pl192_device::sw_priority_r), NAME(vic_pl192_device::sw_priority_w)).umask32(0x0000ffff);
-	map(0x028, 0x028).rw(NAME(vic_pl192_device::daisy_priority_r), NAME(vic_pl192_device::daisy_priority_w)).umask32(0x000000ff);
-	map(0x100, 0x17f).rw(NAME(vic_pl190_device::vect_addr_r), NAME(vic_pl190_device::vect_addr_w));
-	map(0x200, 0x27f).rw(NAME(vic_pl190_device::vect_ctl_r), NAME(vic_pl190_device::vect_ctl_w));
-	map(0xf00, 0xf03).rw(NAME(vic_pl190_device::cur_vect_addr_r), NAME(vic_pl190_device::cur_vect_addr_w));
+	map(0x000, 0x003).r(FUNC(vic_pl190_device::irq_status_r));
+	map(0x004, 0x007).r(FUNC(vic_pl190_device::fiq_status_r));
+	map(0x008, 0x00b).r(FUNC(vic_pl190_device::raw_intr_r));
+	map(0x00c, 0x00f).rw(FUNC(vic_pl190_device::int_select_r), FUNC(vic_pl190_device::int_select_w));
+	map(0x010, 0x013).rw(FUNC(vic_pl190_device::int_enable_r), FUNC(vic_pl190_device::int_enable_w));
+	map(0x014, 0x017).w(FUNC(vic_pl190_device::int_en_clear_w));
+	map(0x018, 0x01b).rw(FUNC(vic_pl190_device::soft_int_r), FUNC(vic_pl190_device::soft_int_w));
+	map(0x01c, 0x01f).w(FUNC(vic_pl190_device::soft_int_clear_w));
+	map(0x020, 0x020).rw(FUNC(vic_pl190_device::protection_r), FUNC(vic_pl190_device::protection_w)).umask32(0x000000ff);
+	map(0x024, 0x025).rw(FUNC(vic_pl192_device::sw_priority_r), FUNC(vic_pl192_device::sw_priority_w)).umask32(0x0000ffff);
+	map(0x028, 0x028).rw(FUNC(vic_pl192_device::daisy_priority_r), FUNC(vic_pl192_device::daisy_priority_w)).umask32(0x000000ff);
+	map(0x100, 0x17f).rw(FUNC(vic_pl190_device::vect_addr_r), FUNC(vic_pl190_device::vect_addr_w));
+	map(0x200, 0x27f).rw(FUNC(vic_pl190_device::vect_ctl_r), FUNC(vic_pl190_device::vect_ctl_w));
+	map(0xf00, 0xf03).rw(FUNC(vic_pl190_device::cur_vect_addr_r), FUNC(vic_pl190_device::cur_vect_addr_w));
 	map(0xfe0, 0xfe0).lr8([this](offs_t offset) { return periph_id[0]; }, "periph_id0").umask32(0x000000ff);
 	map(0xfe4, 0xfe4).lr8([this](offs_t offset) { return periph_id[1]; }, "periph_id1").umask32(0x000000ff);
 	map(0xfe8, 0xfe8).lr8([this](offs_t offset) { return periph_id[2]; }, "periph_id2").umask32(0x000000ff);
