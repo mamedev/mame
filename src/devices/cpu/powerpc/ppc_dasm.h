@@ -20,15 +20,16 @@
 
 #pragma once
 
-enum implementation : int
-{
-	I_POWER   = 1 << 0,
-	I_POWERPC = 1 << 1,
-};
 
 class powerpc_disassembler : public util::disasm_interface
 {
 public:
+	enum implementation : int
+	{
+		I_POWER   = 1 << 0,
+		I_POWERPC = 1 << 1,
+	};
+
 	powerpc_disassembler(bool powerpc = true)
 		: m_implementation(powerpc ? I_POWERPC : I_POWER)
 	{
