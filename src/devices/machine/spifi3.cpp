@@ -36,7 +36,7 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
-// #define VERBOSE SPIFI3_TRACE
+#define VERBOSE SPIFI3_TRACE
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -131,15 +131,16 @@ void spifi3_device::map(address_map &map)
                                {
                                    LOGMASKED(LOG_REGISTER, "write spifi_reg.cmlen = 0x%x\n", data);
                                    spifi_reg.cmlen = data;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Not sure if this is where this is actually cleared.
-                                                                      // Putting it here prevents NEWS-OS from trying to
-                                                                      // transition to the DATAOUT phase too early when it sees
-                                                                      // the CNTZERO condition flag
+
+                                   // Not sure if this is where this is actually cleared.
+                                   // Putting it here prevents NEWS-OS from trying to
+                                   // transition to the DATAOUT phase too early when it sees
+                                   // the CNTZERO condition flag
+                                   spifi_reg.icond &= ~ICOND_CNTZERO;
                                }));
     map(0x0c, 0x0f).lrw32(NAME([this]()
                                {
                                    uint8_t count_hi = (tcounter >> 16) & 0xff;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Does a read clear this?
                                    LOGMASKED(LOG_REGISTER, "read spifi_reg.count_hi = 0x%x\n", count_hi);
                                    return count_hi;
                                }),
@@ -153,7 +154,6 @@ void spifi3_device::map(address_map &map)
     map(0x10, 0x13).lrw32(NAME([this]()
                                {
                                    uint8_t count_mid = (tcounter >> 8) & 0xff;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Does a read clear this?
                                    LOGMASKED(LOG_REGISTER, "read spifi_reg.count_mid = 0x%x\n", count_mid);
                                    return count_mid;
                                }),
@@ -168,7 +168,6 @@ void spifi3_device::map(address_map &map)
     map(0x14, 0x17).lrw32(NAME([this]()
                                {
                                    uint8_t count_lo = tcounter & 0xff;
-                                   spifi_reg.icond &= ~ICOND_CNTZERO; // Does a read clear this?
                                    LOGMASKED(LOG_REGISTER, "read spifi_reg.count_low = 0x%x\n", count_lo);
                                    return count_lo;
                                }),
@@ -456,6 +455,8 @@ void spifi3_device::prcmd_w(uint32_t data)
             LOGMASKED(LOG_CMD, "start command STATUS\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+
+            command_pos = 0;
             dma_set(DMA_NONE);
             break;
         }
@@ -508,7 +509,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 uint32_t spifi3_device::init_status_r()
 {
     // NetBSD only lists this bit, but there is probably more in this register.
-    auto init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
+    const auto init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
     LOGMASKED(LOG_REGISTER, "read spifi_reg.init_status = 0x%x\n", init_status);
     return init_status;
 }
@@ -522,7 +523,7 @@ void spifi3_device::check_irq()
 {
     // There are various ways interrupts can be triggered by the SPIFI - this method is a work in progress.
     // TODO: ICOND, which doesn't seem to be needed much on the "happy path" (no errors)
-    bool irqState = (spifi_reg.intr & ~spifi_reg.imask) > 0;
+    const bool irqState = spifi_reg.intr & ~spifi_reg.imask;
     if (irq != irqState)
     {
         LOGMASKED(LOG_INTERRUPT, "Setting IRQ line to %d\n", irqState);
@@ -566,7 +567,7 @@ void spifi3_device::check_drq()
 
 bool spifi3_device::transfer_count_zero()
 {
-    return (spifi_reg.icond & ICOND_CNTZERO) > 0;
+    return spifi_reg.icond & ICOND_CNTZERO;
 }
 
 void spifi3_device::reset_disconnect()
@@ -1130,7 +1131,6 @@ void spifi3_device::step(bool timeout)
                 auto newPhase = (ctrl & S_PHASE_MASK);
                 if(newPhase == S_PHASE_COMMAND && autocmd_active())
                 {
-                    // LOG("Select complete, autocmd enabled so moving on to XFR phase!\n");
                     scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // TODO: Deassert ACK - just trying this out
                     state = INIT_XFR;
                     xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
@@ -1238,9 +1238,8 @@ void spifi3_device::step(bool timeout)
                         break;
                     }
 
-                    // if it's the last message byte, deassert ATN before sending
-                    // TODO: this if condition doesn't make sense - fix or remove it.
-                    if (xfr_phase == S_PHASE_MSG_OUT && ((!dma_command(dma_dir) && m_even_fifo.size() == 1) || (dma_command(dma_dir) && tcounter == 1)))
+                    // if it's the last message byte, ensure ATN is low before sending
+                    if((xfr_phase == S_PHASE_MSG_OUT) && (command_pos == (spifi_reg.cmlen & CML_LENMASK) - 1))
                     {
                         scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
                     }
@@ -1359,11 +1358,7 @@ void spifi3_device::step(bool timeout)
                     state = INIT_XFR;
                     xfr_phase = newPhase;
                     dma_set(newPhase == S_PHASE_DATA_IN ? DMA_IN : DMA_OUT);
-
-                    clear_queue(m_even_fifo); // TODO: can this be removed?
-
                     check_drq();
-                    step(false);
                 }
                 else if(newPhase == S_PHASE_STATUS && autostat_active(bus_id))
                 {
@@ -1396,8 +1391,6 @@ void spifi3_device::step(bool timeout)
                         LOGMASKED(LOG_AUTO, "Autocmd enabled, proceeding to command automatically\n");
                         state = INIT_XFR;
                         xfr_phase = newPhase;
-
-                        step(false); // TODO: can this be removed?
                     }
                     else if ((newPhase == S_PHASE_MSG_IN) && automsg_active())
                     {
@@ -1451,7 +1444,9 @@ void spifi3_device::step(bool timeout)
             LOGMASKED(LOG_AUTO, "AUTOMSG cleared ACK\n");
             scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
             function_complete();
-            step(false); // TODO: can this be removed?
+
+            // Since we auto-accepted the message, we step again here to complete the disconnect
+            step(false);
             break;
         }
 
