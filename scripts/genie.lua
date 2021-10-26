@@ -514,34 +514,6 @@ configuration { "Release", "vs20*" }
 		}
 	end
 
-configuration { "vsllvm" }
-	buildoptions {
-		"/bigobj",
-	}
-	flags {
-		"NoPCH",
-		"ExtraWarnings",
-	}
-	if not _OPTIONS["NOWERROR"] then
-		flags{
-			"FatalWarnings",
-		}
-	end
-
-
-configuration { "Debug", "vsllvm" }
-	flags {
-		"Symbols",
-		"NoMultiProcessorCompilation",
-	}
-
-configuration { "Release", "vsllvm" }
-	flags {
-		"Optimize",
-		"NoEditAndContinue",
-		"NoIncrementalLink",
-	}
-
 -- Force Visual Studio targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
@@ -1257,19 +1229,6 @@ configuration { "mingw*" }
 			"userenv",
 		}
 
-configuration { "vsllvm" }
-	defines {
-		"XML_STATIC",
-		"WIN32",
-		"_WIN32",
-		"_CRT_NONSTDC_NO_DEPRECATE",
-		"_CRT_SECURE_NO_DEPRECATE",
-		"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
-	}
-	includedirs {
-		MAME_DIR .. "3rdparty/dxsdk/Include"
-	}
-
 configuration { "vs20*" }
 		defines {
 			"XML_STATIC",
@@ -1404,35 +1363,6 @@ configuration { "winphone8* or winstore8*" }
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
-configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-tautological-constant-out-of-range-compare",
-			"-Wno-ignored-qualifiers",
-			"-Wno-missing-field-initializers",
-			"-Wno-ignored-pragma-optimize",
-			"-Wno-unknown-warning-option",
-			"-Wno-unused-function",
-			"-Wno-unused-label",
-			"-Wno-unused-local-typedef",
-			"-Wno-unused-const-variable",
-			"-Wno-unused-parameter",
-			"-Wno-unneeded-internal-declaration",
-			"-Wno-unused-private-field",
-			"-Wno-missing-braces",
-			"-Wno-unused-variable",
-			"-Wno-tautological-pointer-compare",
-			"-Wno-nonportable-include-path",
-			"-Wno-enum-conversion",
-			"-Wno-pragma-pack",
-			"-Wno-new-returns-null",
-			"-Wno-sign-compare",
-			"-Wno-switch",
-			"-Wno-tautological-undefined-compare",
-			"-Wno-deprecated-declarations",
-			"-Wno-macro-redefined",
-			"-Wno-narrowing",
-		}
-
 
 configuration { }
 

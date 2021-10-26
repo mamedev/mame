@@ -667,12 +667,6 @@ end
 			"-include stdint.h"
 		}
 
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-enum-conversion",
-			"-Wno-unused-function",
-		}
-
 	configuration { }
 		defines {
 			"WORDS_BIGENDIAN=0",
@@ -1021,12 +1015,6 @@ end
 			"SQLITE_OS_WINRT",
 		}
 
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-deprecated-declarations",
-			"-Wno-unused-variable",
-		}
-
 	configuration { }
 
 	files {
@@ -1290,12 +1278,6 @@ project "bgfx"
 			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
 		}
 
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-unneeded-internal-declaration",
-			"-Wno-unused-const-variable",
-		}
-
 if _OPTIONS["vs"]=="intel-15" then
 		buildoptions {
 			"/Qwd906",              -- message #906: effect of this "#pragma pack" directive is local to function "xxx"
@@ -1489,15 +1471,6 @@ project "portaudio"
 			"/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 		}
 	end
-
-	configuration { "vsllvm" }
-		buildoptions {
-			"-Wno-deprecated-declarations",
-			"-Wno-missing-braces",
-			"-Wno-switch",
-			"-Wno-unused-function",
-			"-Wno-unused-variable",
-		}
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {

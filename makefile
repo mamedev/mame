@@ -1183,17 +1183,6 @@ ifdef MSBUILD
 endif
 
 #-------------------------------------------------
-# Visual Studio LLVM
-#-------------------------------------------------
-
-.PHONY: vsllvm
-vsllvm: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vsllvm
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vsllvm/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
 # android-ndk
 #-------------------------------------------------
 
