@@ -58,7 +58,7 @@ private:
         MODE_I	// Initiator
     };
 
-    enum scsi_data_source
+    enum scsi_data_target
     {
         COMMAND_BUFFER,
         FIFO
@@ -66,7 +66,7 @@ private:
 
     // State tracking variables
     scsi_mode mode;
-    scsi_data_source xfr_data_source;
+    scsi_data_target xfr_data_source;
     int state;
     int xfr_phase;
     int command_pos;
@@ -197,8 +197,7 @@ private:
     void check_irq();
     void check_drq();
     void reset_disconnect();
-    void send_byte();
-    void send_cmd_byte();
+    void send_byte(scsi_data_target data_source);
     void recv_byte();
     void function_complete();
     void function_bus_complete();

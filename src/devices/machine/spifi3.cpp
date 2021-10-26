@@ -36,7 +36,7 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
-#define VERBOSE SPIFI3_TRACE
+// #define VERBOSE SPIFI3_DEBUG
 #include "logmacro.h"
 
 #define DELAY_HACK // TODO:
@@ -375,7 +375,6 @@ void spifi3_device::select_w(uint32_t data)
         // Selects cmbuf entry, maybe? - can be manually set before a command based on NetBSD source, not supported yet
         spifi_reg.cmdpage = target_id;
         state = DISC_SEL_ARBITRATION_INIT;
-        dma_set(DMA_OUT);
         arbitrate();
     }
 }
@@ -422,22 +421,22 @@ void spifi3_device::prcmd_w(uint32_t data)
         // TODO: a lot of these can be consolidated
         case PRC_DATAOUT:
         {
-            LOGMASKED(LOG_CMD, "start command DATAOUT\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            const dma_direction luntar_dma_setting = dma_setting(bus_id);
-            dma_set(luntar_dma_setting == DMA_OUT ? DMA_OUT : DMA_NONE);
+            const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_OUT ? DMA_OUT : DMA_NONE;
+            dma_set(luntar_dma_setting);
+            LOGMASKED(LOG_CMD, "start command DATAOUT, DMA = %d\n", luntar_dma_setting);
             break;
         }
         case PRC_DATAIN:
         {
-            LOGMASKED(LOG_CMD, "start command DATAIN\n");
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
-            const dma_direction luntar_dma_setting = dma_setting(bus_id);
-            dma_set(luntar_dma_setting == DMA_IN ? DMA_IN : DMA_NONE);
+            const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_IN ? DMA_IN : DMA_NONE;
+            dma_set(luntar_dma_setting);
+            LOGMASKED(LOG_CMD, "start command DATAIN, DMA = %d\n", luntar_dma_setting);
             break;
         }
         case PRC_COMMAND:
@@ -578,11 +577,11 @@ void spifi3_device::reset_disconnect()
     mode = MODE_D;
 }
 
-void spifi3_device::send_cmd_byte()
+void spifi3_device::send_byte(scsi_data_target data_source)
 {
     state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
 
-    if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE))
+    if(data_source == COMMAND_BUFFER && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE)) // TODO: Why do we exclude DISC_SEL_SEND_BYTE?
     {
         // Send next data from cmbuf.
         if(command_pos > 11)
@@ -592,27 +591,12 @@ void spifi3_device::send_cmd_byte()
         LOGMASKED(LOG_CMD, "Sending byte from cmbuf[%d].cdb[%d] = 0x%x\n", scsi_id, command_pos, spifi_reg.cmbuf[scsi_id].cdb[command_pos]);
         scsi_bus->data_w(scsi_refid, spifi_reg.cmbuf[scsi_id].cdb[command_pos++]);
     }
-    else
+    else if(data_source == FIFO && (state & STATE_MASK) != INIT_XFR_SEND_PAD)
     {
-        scsi_bus->data_w(scsi_refid, 0);
-    }
-
-    scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK); // Send ACK
-    scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ); // Wait for REQ
-    delay_cycles(sync_period); // Delay till next cycle
-}
-
-void spifi3_device::send_byte()
-{
-    if(m_even_fifo.empty() && ((state & STATE_MASK) != INIT_XFR_SEND_PAD))
-    {
-        fatalerror("spifi3_device::send_byte - Tried to send data with an empty FIFO!\n");
-    }
-
-    state = (state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT);
-
-    if((state & STATE_MASK) != INIT_XFR_SEND_PAD && ((state & STATE_MASK) != DISC_SEL_SEND_BYTE))
-    {
+        if(m_even_fifo.empty())
+        {
+            fatalerror("spifi3_device::send_byte - Tried to send data with an empty FIFO!\n");
+        }
         // Send next data from FIFO.
         scsi_bus->data_w(scsi_refid, m_even_fifo.front());
         m_even_fifo.pop();
@@ -693,6 +677,10 @@ void spifi3_device::decrement_tcounter(int count)
     if (!dma_command(dma_dir))
     {
         return;
+    }
+    if(count > tcounter)
+    {
+        fatalerror("tcounter ran out of bytes!");
     }
 
     tcounter -= count;
@@ -1117,7 +1105,7 @@ void spifi3_device::step(bool timeout)
             else
             {
                 // Send the next byte from the CDB
-                send_cmd_byte();
+                send_byte(COMMAND_BUFFER);
             }
             break;
         }
@@ -1167,7 +1155,7 @@ void spifi3_device::step(bool timeout)
             }
 
             state = DISC_SEL_SEND_BYTE;
-            send_cmd_byte();
+            send_byte(COMMAND_BUFFER);
             break;
         }
 
@@ -1247,13 +1235,13 @@ void spifi3_device::step(bool timeout)
                     if(xfr_phase == S_PHASE_DATA_OUT)
                     {
                         xfr_data_source = FIFO;
-                        send_byte();
+                        send_byte(FIFO);
                     }
                     else
                     {
                         // Both commands and messages come from the CDB
                         xfr_data_source = COMMAND_BUFFER;
-                        send_cmd_byte();
+                        send_byte(COMMAND_BUFFER);
                     }
                     break;
                 }
@@ -1499,7 +1487,7 @@ void spifi3_device::step(bool timeout)
             else
             {
                 state = INIT_XFR_SEND_PAD;
-                send_byte();
+                send_byte(FIFO);
             }
             break;
         }

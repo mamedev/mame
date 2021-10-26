@@ -82,6 +82,8 @@
  *     both on real hardware and in emulation)
  *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver.
  *  - SCSI performance seems variable from run to run. Will probably need to do some runtime profiling on that.
+ *  - Running a binary multiple times with dbx (debugger) can corrupt it. I'm suspecting some SCSI issues here because I've been able to use dbx to do
+ *    that before. Wouldn't be surprised if this is related to the pad workaround, since using dbx was how I found out pad was needed to begin with.
  *
  *  TODO (in no particular order):
  *  - More complete floppy support (only supports floppy boot at the moment)
@@ -95,7 +97,7 @@
  *  - Save state support
  *
  *  TODO before opening first MR:
- *  - SPIFI3 refactoring
+ *  - Finish SPIFI3 refactoring and bug squash
  */
 
 #include "emu.h"
