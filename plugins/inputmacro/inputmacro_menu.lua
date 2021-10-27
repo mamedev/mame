@@ -9,6 +9,7 @@ local MENU_TYPES = { MACROS = 0, ADD = 1, EDIT = 2, INPUT = 3 }
 
 -- Globals
 
+local commonui
 local macros
 local menu_stack
 
@@ -51,118 +52,43 @@ end
 
 -- Input menu
 
-local input_action
+local input_menu
 local input_start_field
-local input_choices
-local input_item_first_choice
-local input_item_cancel
 
-function handle_input(index, action)
-	if (action == 'cancel') or ((index == input_item_cancel) and (action == 'select')) then
-		table.remove(menu_stack)
-		input_action = nil
-		return true
-	elseif action == 'select' then
-		field = input_choices[index - input_item_first_choice + 1]
-		if field then
-			table.remove(menu_stack)
-			input_action(field)
-			input_action = nil
+function start_input_menu(handler, start_field)
+	local function supported(f)
+		if f.is_analog or f.is_toggle then
+			return false
+		elseif (f.type_class == 'config') or (f.type_class == 'dipswitch') then
+			return false
+		else
 			return true
 		end
 	end
-	return false
+
+	local function action(field)
+		if field then
+			handler(field)
+		end
+		table.remove(menu_stack)
+		input_menu = nil
+		input_start_field = nil
+	end
+
+	if not commonui then
+		commonui = require('commonui')
+	end
+	input_menu = commonui.input_selection_menu(action, _p('plugin-inputmacro', 'Set Input'), supported)
+	input_start_field = start_field
+	table.insert(menu_stack, MENU_TYPES.INPUT)
+end
+
+function handle_input(index, action)
+	return input_menu:handle(index, action)
 end
 
 function populate_input()
-	local items = { }
-
-	items[#items + 1] = { _p('plugin-inputmacro', 'Set Input'), '', 'off' }
-	items[#items + 1] = { '---', '', '' }
-
-	if not input_choices then
-		local ioport = manager.machine.ioport
-
-		local function supported(f)
-			if f.is_analog or f.is_toggle then
-				return false
-			elseif (f.type_class == 'config') or (f.type_class == 'dipswitch') then
-				return false
-			else
-				return true
-			end
-		end
-
-		local function compare(a, b)
-			if a.device.tag < b.device.tag then
-				return true
-			elseif a.device.tag > b.device.tag then
-				return false
-			end
-			groupa = ioport:type_group(a.type, a.player)
-			groupb = ioport:type_group(b.type, b.player)
-			if groupa < groupb then
-				return true
-			elseif groupa > groupb then
-				return false
-			elseif a.type < b.type then
-				return true
-			elseif a.type > b.type then
-				return false
-			else
-				return a.name < b.name
-			end
-		end
-
-		input_choices = { }
-		for tag, port in pairs(manager.machine.ioport.ports) do
-			for name, field in pairs(port.fields) do
-				if supported(field) then
-					table.insert(input_choices, field)
-				end
-			end
-		end
-		table.sort(input_choices, compare)
-
-		local index = 1
-		local prev
-		while index <= #input_choices do
-			local current = input_choices[index]
-			if (not prev) or (prev.device.tag ~= current.device.tag) then
-				table.insert(input_choices, index, false)
-				index = index + 2
-			else
-				index = index + 1
-			end
-			prev = current
-		end
-	end
-
-	input_item_first_choice = #items + 1
-	local selection = input_item_first_choice
-	for index, field in ipairs(input_choices) do
-		if field then
-			items[#items + 1] = { _p('input-name', field.name), '', '' }
-			if input_start_field and (field.port.tag == input_start_field.port.tag) and (field.mask == input_start_field.mask) and (field.type == input_start_field.type) then
-				selection = #items
-				input_start_field = nil
-			end
-		else
-			local device = input_choices[index + 1].device
-			if device.owner then
-				items[#items + 1] = { string.format(_('plugin-inputmacro', '%s [root%s]'), device.name, device.tag), '', 'heading' }
-			else
-				items[#items + 1] = { string.format(_('plugin-inputmacro', '[root%s]'), device.tag), '', 'heading' }
-			end
-		end
-	end
-	input_start_field = nil
-
-	items[#items + 1] = { '---', '', '' }
-	items[#items + 1] = { _p('plugin-inputmacro', 'Cancel'), '', '' }
-	input_item_cancel = #items
-
-	return items, selection
+	return input_menu:populate(input_start_field)
 end
 
 
@@ -320,14 +246,13 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'input' then
 		local inputs = edit_current_macro.steps[command.step].inputs
 		if event == 'select' then
-			input_action =
+			local hanlder =
 				function(field)
 					inputs[command.input].port = field.port
 					inputs[command.input].field = field
 				end
-			input_start_field = inputs[command.input].field
+			start_input_menu(hanlder, inputs[command.input].field)
 			edit_start_selection = index
-			table.insert(menu_stack, MENU_TYPES.INPUT)
 			return true
 		elseif event == 'clear' then
 			if #inputs > 1 then
@@ -338,14 +263,14 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'addinput' then
 		if event == 'select' then
 			local inputs = edit_current_macro.steps[command.step].inputs
-			input_action =
+			local handler =
 				function(field)
 					inputs[#inputs + 1] = {
 						port = field.port,
 						field = field }
 				end
+			start_input_menu(handler)
 			edit_start_selection = index
-			table.insert(menu_stack, MENU_TYPES.INPUT)
 			return true
 		end
 	elseif command.action == 'deletestep' then
@@ -368,7 +293,7 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'addstep' then
 		if event == 'select' then
 			local steps = edit_current_macro.steps
-			input_action =
+			local handler =
 				function(field)
 					local newstep = {
 						inputs = {
@@ -384,8 +309,8 @@ local function handle_edit_items(index, event)
 					edit_start_step = edit_insert_position
 					edit_insert_position = edit_insert_position + 1
 				end
+			start_input_menu(handler)
 			edit_start_selection = index
-			table.insert(menu_stack, MENU_TYPES.INPUT)
 			return true
 		elseif event == 'left' then
 			edit_insert_position = edit_insert_position - 1
@@ -484,7 +409,7 @@ local function handle_add(index, event)
 	if handle_edit_items(index, event) then
 		return true
 	elseif event == 'cancel' then
-		input_choices = nil
+		commonui = nil
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
@@ -495,7 +420,7 @@ local function handle_add(index, event)
 			table.insert(macros, edit_current_macro)
 			macros_start_macro = #macros
 		end
-		input_choices = nil
+		commonui = nil
 		edit_menu_active = false
 		edit_current_macro = nil
 		edit_items = nil
@@ -509,7 +434,7 @@ local function handle_edit(index, event)
 	if handle_edit_items(index, event) then
 		return true
 	elseif (event == 'cancel') or ((index == edit_item_exit) and (event == 'select')) then
-		input_choices = nil
+		commonui = nil
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil

@@ -100,14 +100,14 @@ function autofire.startplugin()
 		if menu_handler then
 			return menu_handler:populate_menu(buttons)
 		else
-			return {{_('Failed to load autofire menu'), '', ''}}
+			return {{_p('plugin-autofire', 'Failed to load autofire menu'), '', 'off'}}
 		end
 	end
 
 	emu.register_frame_done(process_frame)
 	emu.register_start(load_settings)
 	emu.register_stop(save_settings)
-	emu.register_menu(menu_callback, menu_populate, _('Autofire'))
+	emu.register_menu(menu_callback, menu_populate, _p('plugin-autofire', 'Autofire'))
 end
 
 return exports

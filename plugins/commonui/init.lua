@@ -1,0 +1,123 @@
+-- license:BSD-3-Clause
+-- copyright-holders:Vas Crabb
+local exports = {
+	name = 'commonui',
+	version = '0.0.1',
+	description = 'Common plugin UI helpers',
+	license = 'BSD-3-Clause',
+	author = { name = 'Vas Crabb' } }
+
+
+local commonui = exports
+
+function commonui.input_selection_menu(action, title, filter)
+	menu = { }
+
+	local choices
+	local index_first_choice
+	local index_cancel
+
+	local function populate_choices()
+		local ioport = manager.machine.ioport
+
+		local function compare(a, b)
+			if a.device.tag < b.device.tag then
+				return true
+			elseif a.device.tag > b.device.tag then
+				return false
+			end
+			groupa = ioport:type_group(a.type, a.player)
+			groupb = ioport:type_group(b.type, b.player)
+			if groupa < groupb then
+				return true
+			elseif groupa > groupb then
+				return false
+			elseif a.type < b.type then
+				return true
+			elseif a.type > b.type then
+				return false
+			else
+				return a.name < b.name
+			end
+		end
+
+		choices = { }
+		for tag, port in pairs(manager.machine.ioport.ports) do
+			for name, field in pairs(port.fields) do
+				if (not filter) or filter(field) then
+					table.insert(choices, field)
+				end
+			end
+		end
+		table.sort(choices, compare)
+
+		local index = 1
+		local prev
+		while index <= #choices do
+			local current = choices[index]
+			if (not prev) or (prev.device.tag ~= current.device.tag) then
+				table.insert(choices, index, false)
+				index = index + 2
+			else
+				index = index + 1
+			end
+			prev = current
+		end
+	end
+
+	function menu:populate(initial_selection)
+		if not choices then
+			populate_choices()
+		end
+
+		local items = { }
+
+		if title then
+			table.insert(items, { title, '', 'off' })
+			table.insert(items, { '---', '', '' })
+		end
+
+		index_first_choice = #items + 1
+		local selection = index_first_choice
+		for index, field in ipairs(choices) do
+			if field then
+				table.insert(items, { _p('input-name', field.name), '', '' })
+				if initial_selection and (field.port.tag == initial_selection.port.tag) and (field.mask == initial_selection.mask) and (field.type == initial_selection.type) then
+					selection = #items
+					initial_selection = nil
+				end
+			else
+				local device = choices[index + 1].device
+				if device.owner then
+					table.insert(items, { string.format(_('plugin-commonui', '%s [root%s]'), device.name, device.tag), '', 'heading' })
+				else
+					table.insert(items, { string.format(_('plugin-commonui', '[root%s]'), device.tag), '', 'heading' })
+				end
+			end
+		end
+
+		table.insert(items, { '---', '', '' })
+		table.insert(items, { _p('plugin-commonui', 'Cancel'), '', '' })
+		index_cancel = #items
+
+		return items, selection
+	end
+
+	function menu:handle(index, event)
+		if (event == 'cancel') or ((index == input_item_cancel) and (event == 'select')) then
+			action(nil)
+			return true
+		elseif event == 'select' then
+			local field = choices[index - index_first_choice + 1]
+			if field then
+				action(field)
+				return true
+			end
+		end
+		return false
+	end
+
+	return menu
+end
+
+return exports
