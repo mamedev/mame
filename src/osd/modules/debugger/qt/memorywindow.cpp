@@ -196,8 +196,6 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 
 	// Set to the current CPU's memory view
 	setToCurrentCpu();
-
-	osd_printf_debug("MemoryWindow constructed OK!\n");
 }
 
 
