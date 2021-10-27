@@ -324,11 +324,11 @@ public:
 	void prg32(int bank);
 	void prg16_89ab(int bank);
 	void prg16_cdef(int bank);
-	void prg8_89(int bank);
-	void prg8_ab(int bank);
-	void prg8_cd(int bank);
-	void prg8_ef(int bank);
 	void prg8_x(int start, int bank);
+	void prg8_89(int bank) { prg8_x(0, bank); };
+	void prg8_ab(int bank) { prg8_x(1, bank); };
+	void prg8_cd(int bank) { prg8_x(2, bank); };
+	void prg8_ef(int bank) { prg8_x(3, bank); };
 
 
 	// CHR
