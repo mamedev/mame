@@ -12,12 +12,11 @@ TARGET ?= mame
 PYTHON_EXECUTABLE ?= python
 REGENIE ?= 1
 GITHUB_REPO ?= https://github.com/libretro/mame/
-<<<<<<< HEAD
 platform ?=android-arm64
 #platform ?=android-arm
-=======
+
 DEBUG ?= 0
->>>>>>> master
+
 
 ###########################################################################
 #

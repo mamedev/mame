@@ -22,6 +22,7 @@
 #include "zippath.h"
 
 #include <cstring>
+#include <time.h>
 
 
 namespace ui {
@@ -204,6 +205,37 @@ void menu_file_create::handle()
 		case IPT_UI_SELECT:
 			if ((event->itemref == ITEMREF_CREATE) || (event->itemref == ITEMREF_NEW_IMAGE_NAME))
 			{
+
+
+				char buffer[128] ;
+				
+				
+				
+				
+				
+				
+				
+				
+				time_t rawtime;
+　				struct tm * timeinfo;
+　				time ( &rawtime );
+　				timeinfo = localtime ( &rawtime );
+　　				int year,month,day,hour,min,sec;
+　　				year = 1900+timeinfo->tm_year;
+　　				month = 1+timeinfo->tm_mon;
+　　				day = timeinfo->tm_mday;
+　				hour = timeinfo->tm_hour;
+　　				min = timeinfo->tm_min;
+　　				sec = timeinfo->tm_sec;
+				
+				
+				sprintf(buffer,"%4d%02d%02d%02d%02d%02d.bin",year, month,day,hour,min,sec);
+　				
+				
+	
+				
+				m_filename= buffer;
+				
 				std::string tmp_file(m_filename);
 				if (tmp_file.find('.') != -1 && tmp_file.find('.') < tmp_file.length() - 1)
 				{
@@ -218,6 +250,7 @@ void menu_file_create::handle()
 		case IPT_SPECIAL:
 			if (get_selection_ref() == ITEMREF_NEW_IMAGE_NAME)
 			{
+
 				input_character(m_filename, event->unichar, &osd_is_valid_filename_char);
 				reset(reset_options::REMEMBER_POSITION);
 			}
