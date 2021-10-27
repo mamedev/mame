@@ -6,7 +6,7 @@ local exports = {}
 exports.name = "timer"
 exports.version = "0.0.2"
 exports.description = "Game play timer"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local timer = exports

@@ -43,6 +43,8 @@ ToDO:
 #include "speaker.h"
 #include "gts80.lh"
 
+namespace {
+
 class gts80_state : public genpin_class
 {
 public:
@@ -890,6 +892,8 @@ ROM_START(s80tst)
 	ROM_LOAD("80tst-s1.snd", 0x7000, 0x0800, CRC(b9dbdd21) SHA1(dfe42c9e6e02f82ffd0cafe164df3211cdc2d966))
 	ROM_LOAD("80tst-s2.snd", 0x7800, 0x0800, CRC(1a4b1e9d) SHA1(18e7ffbdbdaf83ab1c8daa5fa5201d9f54390758))
 ROM_END
+
+} // Anonymous namespace
 
 /* disp1 */GAME(1981, s80tst,    0,        gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 

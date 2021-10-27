@@ -1104,9 +1104,9 @@ ROM_START( cosmica23 ) // Main: 7910-AII, sub: 7910-BII, no sound sub PCB
 ROM_END
 
 /* This set appears to be an intermediate version between the 'II' (cosmica) version and the early cosmica1 version; It still has the (C) 1979 titlescreen
-  (which was removed on the II version since it may have came out in 1980?), and on all tms2708 eproms on a special rom daughterboard called "7910-V3"; 
+  (which was removed on the II version since it may have came out in 1980?), and on all tms2708 eproms on a special rom daughterboard called "7910-V3";
   one possible reason is that 2708 eproms became cheaper than tms2516s for a time, so production was switched to them for a while between the early and II versions? */
-ROM_START( cosmica2a ) 
+ROM_START( cosmica2a )
 /* ROMs a-1 and b-2 match ii-1 from cosmica
    ROMs c-3 and d-4 are unique
    ROMs e-5 and f-6 match ii-3 from cosmica

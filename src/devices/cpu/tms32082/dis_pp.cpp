@@ -25,7 +25,7 @@ std::string tms32082_pp_disassembler::get_reg_name(int reg, bool read)
 
 		case 0x07:
 		case 0x0f:
-			return util::string_format("0");		// a7 and a15 read as zero
+			return util::string_format("0");        // a7 and a15 read as zero
 
 		case 0x06:
 		case 0x0e:
@@ -136,16 +136,16 @@ std::string tms32082_pp_disassembler::make_mem_transfer(int mode, int dst, int a
 
 	switch (le)
 	{
-		case 0:		// store
+		case 0:     // store
 			transfer_text = util::string_format("&%s*(%s) = %s", TRANSFER_SIZE[size], make_ea(mode, a, scale, size, imm, x), get_reg_name(dst, true));
 			break;
-		case 1:		// address unit arithmetic
+		case 1:     // address unit arithmetic
 			transfer_text = util::string_format("%s = %s", get_reg_name(dst, false), make_ea(mode, a, scale, size, imm, x));
 			break;
-		case 2:		// zero-extended load
+		case 2:     // zero-extended load
 			transfer_text = util::string_format("%s = &%s*(%s)", get_reg_name(dst, false), TRANSFER_SIZE[size], make_ea(mode, a, scale, size, imm, x));
 			break;
-		case 3:		// sign-extended load
+		case 3:     // sign-extended load
 			transfer_text = util::string_format("%s = &s%s*(%s)", get_reg_name(dst, false), TRANSFER_SIZE[size], make_ea(mode, a, scale, size, imm, x));
 			break;
 	}
@@ -218,13 +218,13 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 	int gbits = (op >> 15) & 3;
 
 	if (lbits == 0 && gbits == 0)
-	{		
+	{
 		switch ((op >> 13) & 3)
 		{
 			case 0:
 			{
 				// 7. Conditional DU||Conditional Move
-				int cond = (op >> 32) & 0xf;				
+				int cond = (op >> 32) & 0xf;
 				int ncvz = (op >> 25) & 0xf;
 
 				m_alu_condition = make_condition(cond, ncvz);
@@ -258,7 +258,7 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 				int dst = ((op >> 3) & 7) | (m_dstbank << 3);
 				int src = ((op >> 10) & 7) | (4 << 3);
 
-				int cond = (op >> 32) & 0xf;				
+				int cond = (op >> 32) & 0xf;
 				int ncvz = (op >> 25) & 0xf;
 
 				bool r = (op & (1 << 29)) ? true : false;
@@ -275,14 +275,14 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 			case 3:
 			{
 				// 10. Conditional Non-D Data Unit
-			
+
 				// no transfer, only modifies ALU operation
 				m_src1bank = (op >> 6) & 0xf;
 				m_dstbank = (op >> 18) & 0xf;
 
 				int cond = (op >> 32) & 0xf;
-		//		bool c = (op & (1 << 31)) ? true : false;
-		//		bool r = (op & (1 << 30)) ? true : false;
+		//      bool c = (op & (1 << 31)) ? true : false;
+		//      bool r = (op & (1 << 30)) ? true : false;
 				int ncvz = (op >> 25) & 0xf;
 
 				m_alu_condition = make_condition(cond, ncvz);
@@ -292,20 +292,20 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 
 	}
 	else if (lbits == 0 && gbits != 0)
-	{		
+	{
 		if (op & 0x4)
 		{
 			// 9. Conditional DU||Conditional Global
 			int global_im = (op >> 22) & 7;
-			int global_x = ((op >> 22) & 7) | 8;		// global x-registers: x8-x10
+			int global_x = ((op >> 22) & 7) | 8;        // global x-registers: x8-x10
 			int bank = (op >> 18) & 7;
 			int global_le = ((op >> 9) & 1) | ((op >> 16) & 2);
 			int gmode = (op >> 13) & 0xf;
 			int reg = (op >> 10) & 7;
 			int global_size = (op >> 7) & 3;
 			bool global_s = (op & (1 << 6)) ? true : false;
-			int global_a = ((op >> 3) & 7) | 8;		// global a-registers: a8-a12
-			int cond = (op >> 32) & 0xf;			
+			int global_a = ((op >> 3) & 7) | 8;     // global a-registers: a8-a12
+			int cond = (op >> 32) & 0xf;
 			int ncvz = (op >> 25) & 0xf;
 
 			m_alu_condition = make_condition(cond, ncvz);
@@ -319,17 +319,17 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 		}
 		else
 		{
-			// 5. Global(Long Offset)			
+			// 5. Global(Long Offset)
 			int bank = (op >> 18) & 0xf;
 			int global_le = ((op >> 9) & 1) | ((op >> 16) & 2);
 			int gmode = (op >> 13) & 0xf;
 			int reg = (op >> 10) & 7;
 			int global_size = (op >> 7) & 3;
 			bool global_s = (op & (1 << 6)) ? true : false;
-			int global_a = ((op >> 3) & 7) | 8;		// global a-registers: a8-a12
+			int global_a = ((op >> 3) & 7) | 8;     // global a-registers: a8-a12
 
 			int offset = (op >> 22) & 0x7fff;
-			int x = (offset & 7) | 8;		// global x-registers: x8-x10
+			int x = (offset & 7) | 8;       // global x-registers: x8-x10
 
 			// s-bit is MSB for immediate value when transfer size is 8 bits
 			if (global_size == 0)
@@ -346,7 +346,7 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 			{
 				// 2. Move||Local
 				int lmode = (op >> 35) & 0xf;
-				int d = ((op >> 32) & 7) | (0x4 << 3);		// d-registers are in bank 4
+				int d = ((op >> 32) & 7) | (0x4 << 3);      // d-registers are in bank 4
 				int local_le = ((op >> 31) & 1) | ((op >> 16) & 2);
 				int local_size = (op >> 29) & 3;
 				bool local_s = (op & (1 << 28)) ? true : false;
@@ -381,7 +381,7 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 			{
 				// 6. Non-D DU||Local
 				int lmode = (op >> 35) & 0xf;
-				int d = ((op >> 32) & 7) | (0x4 << 3);		// d-registers are in bank 4
+				int d = ((op >> 32) & 7) | (0x4 << 3);      // d-registers are in bank 4
 				int le = ((op >> 31) & 1) | ((op >> 16) & 2);
 				int size = (op >> 29) & 3;
 				bool s = (op & (1 << 28)) ? true : false;
@@ -425,20 +425,20 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 		// (gbits != 0 && lbits != 0)
 		// 1. Double Parallel
 		int lmode = (op >> 35) & 0xf;
-		int d = ((op >> 32) & 7) | (0x4 << 3);		// d-registers are in bank 4
+		int d = ((op >> 32) & 7) | (0x4 << 3);      // d-registers are in bank 4
 		int local_le = ((op >> 31) & 1) | ((op >> 20) & 2);
 		int local_size = (op >> 29) & 3;
 		bool local_s = (op & (1 << 28)) ? true : false;
 		int local_a = (op >> 25) & 7;
-		int global_im = (op >> 22) & 7;		
-		int global_x = ((op >> 22) & 7) | 8;		// global x-registers: x8-x10
+		int global_im = (op >> 22) & 7;
+		int global_x = ((op >> 22) & 7) | 8;        // global x-registers: x8-x10
 		int bank = (op >> 18) & 7;
-		int global_le = ((op >> 9) & 1) | ((op >> 16) & 2);		
+		int global_le = ((op >> 9) & 1) | ((op >> 16) & 2);
 		int gmode = (op >> 13) & 0xf;
-		int reg = (op >> 10) & 7;		
+		int reg = (op >> 10) & 7;
 		int global_size = (op >> 7) & 3;
 		bool global_s = (op & (1 << 6)) ? true : false;
-		int global_a = ((op >> 3) & 7) | 8;		// global a-registers: a8-a12
+		int global_a = ((op >> 3) & 7) | 8;     // global a-registers: a8-a12
 		int local_im = op & 7;
 		int local_x = op & 7;
 
@@ -462,12 +462,12 @@ std::string tms32082_pp_disassembler::format_alu_op(int aluop, int a, const std:
 
 		switch (modifier)
 		{
-			case 0:		break;											// normal operation
-			case 1:		break;											// cin (TODO)
-			case 4:		a_text = util::string_format("0"); break;		// A port = 0
-			case 5:		a_text = util::string_format("0"); break;		// A port = 0, cin (TODO)
-			case 6:		a_text = util::string_format("0"); break;		// A port = 0 and %! if maskgen instruction. lmbc if not maskgen instruction. (TODO)
-			case 7:		a_text = util::string_format("0"); break;		// A port = 0, %!, and cin if maskgen instruction. rmbc if not maskgen instruction. (TODO)
+			case 0:     break;                                          // normal operation
+			case 1:     break;                                          // cin (TODO)
+			case 4:     a_text = util::string_format("0"); break;       // A port = 0
+			case 5:     a_text = util::string_format("0"); break;       // A port = 0, cin (TODO)
+			case 6:     a_text = util::string_format("0"); break;       // A port = 0 and %! if maskgen instruction. lmbc if not maskgen instruction. (TODO)
+			case 7:     a_text = util::string_format("0"); break;       // A port = 0, %!, and cin if maskgen instruction. rmbc if not maskgen instruction. (TODO)
 		}
 
 		int bits = (aluop & 1) | ((aluop >> 1) & 2) | ((aluop >> 2) & 4) | ((aluop >> 3) & 8);
@@ -535,14 +535,14 @@ std::string tms32082_pp_disassembler::format_alu_op(int aluop, int a, const std:
 			case 0x44:      // ~A &  B &  C | ~A &  B & ~C                             = ~A & B
 				return util::string_format("%s = ~%s & %s", dst_text, a_text, b_text);
 
-			case 0x22:		//  A & ~B & ~C |  A & ~B & C                              = A & ~B
+			case 0x22:      //  A & ~B & ~C |  A & ~B & C                              = A & ~B
 				return util::string_format("%s = %s & ~%s", dst_text, a_text, b_text);
 
-			case 0xaf:		//  A  &  B &  C |  A & ~B &  C |  A &  B & ~C |
+			case 0xaf:      //  A  &  B &  C |  A & ~B &  C |  A &  B & ~C |
 							// ~A  &  B & ~C |  A & ~B & ~C | ~A & ~B & ~C             = A | ~C
 				return util::string_format("%s = %s | ~%s", dst_text, a_text, c_text);
 
-			case 0xfa:		//  A  &  B &  C | ~A &  B &  C |  A & ~B &  C |
+			case 0xfa:      //  A  &  B &  C | ~A &  B &  C |  A & ~B &  C |
 							// ~A  & ~B &  C |  A &  B & ~C |  A & ~B & ~C             = A | C
 				return util::string_format("%s = %s | %s", dst_text, a_text, c_text);
 
@@ -646,7 +646,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 			if ((op & 0xfaa8100000000000U) == 0x8800000000000000U)
 			{
 				int operation = (op >> 39) & 0x1f;
-				
+
 				parallel_transfer(op);
 
 				switch (operation)
@@ -669,7 +669,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 					case 0:
 					case 1:     // Base set ALU (5-bit immediate)
 					{
-						parallel_transfer(op);						
+						parallel_transfer(op);
 
 						int dst = (op >> 48) & 7;
 						int src1 = (op >> 45) & 7;
@@ -728,7 +728,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 								break;
 						}
 
-						m_alu_operation = format_alu_op(aluop, a, dst_text, a_text, b_text, c_text);					
+						m_alu_operation = format_alu_op(aluop, a, dst_text, a_text, b_text, c_text);
 						break;
 					}
 
@@ -793,7 +793,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 								break;
 						}
 
-						m_alu_operation = format_alu_op(aluop, a, dst_text, a_text, b_text, c_text);						
+						m_alu_operation = format_alu_op(aluop, a, dst_text, a_text, b_text, c_text);
 						break;
 					}
 
@@ -890,7 +890,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 			{
 				stream << " || ";
 			}
-		}		
+		}
 		if (m_parallel_transfer.length() > 0)
 		{
 			stream << m_parallel_condition;

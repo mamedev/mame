@@ -189,8 +189,8 @@ private:
 	void rmni_sound_reset();
 	void mouse_js_reset();
 	void check_scsi_irq();
-	void set_scsi_drqlat(bool	clock, bool clear);
-	
+	void set_scsi_drqlat(bool clock, bool clear);
+
 	int m_scsi_iena;
 	int m_scsi_msg;
 	int m_scsi_bsy;
@@ -224,8 +224,8 @@ private:
 	/* Mouse/Joystick */
 	struct
 	{
-		int8_t		m_mouse_x;
-		int8_t   	m_mouse_y;
+		int8_t      m_mouse_x;
+		int8_t      m_mouse_y;
 
 		uint8_t   m_mouse_pcx;
 		uint8_t   m_mouse_pcy;

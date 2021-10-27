@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /***************************************************************************
-	Casio GT913 I/O (HLE)
+    Casio GT913 I/O (HLE)
 
-	TODO:
-	- timer behavior is unverified (see comment in timer_control_w and timer_adjust)
-	- various other unemulated registers
+    TODO:
+    - timer behavior is unverified (see comment in timer_control_w and timer_adjust)
+    - various other unemulated registers
 
 ***************************************************************************/
 

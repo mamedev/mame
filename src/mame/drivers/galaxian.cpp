@@ -1014,7 +1014,7 @@ uint8_t galaxian_state::explorer_sound_latch_r()
  *
  *************************************/
 
-void taiyo_sfx_state::machine_start()
+void nihon_sfx_state::machine_start()
 {
 	galaxian_state::machine_start();
 
@@ -1024,7 +1024,7 @@ void taiyo_sfx_state::machine_start()
 }
 
 
-uint8_t taiyo_sfx_state::sample_io_r(offs_t offset)
+uint8_t nihon_sfx_state::sample_io_r(offs_t offset)
 {
 	// the decoding here is very simplistic, and you can address both simultaneously
 	uint8_t result = 0xff;
@@ -1033,7 +1033,7 @@ uint8_t taiyo_sfx_state::sample_io_r(offs_t offset)
 }
 
 
-void taiyo_sfx_state::sample_io_w(offs_t offset, uint8_t data)
+void nihon_sfx_state::sample_io_w(offs_t offset, uint8_t data)
 {
 	// the decoding here is very simplistic, and you can address both simultaneously
 	if (offset & 0x04) m_ppi8255[2]->write(offset & 3, data);
@@ -1041,7 +1041,7 @@ void taiyo_sfx_state::sample_io_w(offs_t offset, uint8_t data)
 }
 
 
-void taiyo_sfx_state::sample_control_w(uint8_t data)
+void nihon_sfx_state::sample_control_w(uint8_t data)
 {
 	uint8_t old = m_sample_control;
 	m_sample_control = data;
@@ -1059,56 +1059,27 @@ void taiyo_sfx_state::sample_control_w(uint8_t data)
  *
  *************************************/
 
-/* Preliminary protection notes (based on z80 disasm):
-
-    The initial protection routine is on the maincpu at $c591-$c676.
-    It accesses the 8255, expects an irq, and reads $d800 256 times which is xored against data
-    starting at $0100 to confirm a checksum stored in $0011-$0019. Then it reads the (presumably)same
-    block to store it in RAM at $3800-$3fff. 9 blocks in total.
-    It is presumed that this data comes from another ROM, and scrambled/encrypted a bit.
-    The data(code) in the extra RAM is later jumped/called to in many parts of the game.
-*/
-
-uint8_t taiyo_sfx_state::monsterz_protection_r()
+void monsterz_state::monsterz_ay8910_w(offs_t offset, uint8_t data)
 {
-	return m_protection_result;
+	if (offset & 0x04) m_dac2->write(data);
+	galaxian_state::konami_ay8910_w(offset, data);
 }
 
-
-void taiyo_sfx_state::monsterz_set_latch()
+void monsterz_state::machine_start()
 {
-	// read from a rom (which one?? "a-3e.k3" from audiocpu ($2700-$2fff) looks very suspicious)
-	uint8_t *rom = memregion("audiocpu")->base();
-	m_protection_result = rom[0x2000 | (m_protection_state & 0x1fff)]; // probably needs a bitswap<8>
+	nihon_sfx_state::machine_start();
 
-	// and an irq on the main z80 afterwards
-	m_maincpu->set_input_line(0, HOLD_LINE );
+	m_monsterz_shift = 0x00;
+	m_monsterz_shift2 = 0x00;
+	m_monsterz_audio_portb = 0xff;
+	m_monsterz_sample_portc = 0xff;
+
+	save_item(NAME(m_monsterz_shift));
+	save_item(NAME(m_monsterz_shift2));
+	save_item(NAME(m_monsterz_audio_portb));
+	save_item(NAME(m_monsterz_sample_portc));
 }
 
-
-void taiyo_sfx_state::monsterz_porta_1_w(uint8_t data)
-{
-	// d7 high: set latch + advance address high bits (and reset low bits?)
-	if (data & 0x80)
-	{
-		monsterz_set_latch();
-		m_protection_state = (m_protection_state + 0x100) & 0xff00;
-	}
-}
-
-void taiyo_sfx_state::monsterz_portb_1_w(uint8_t data)
-{
-	// d3 high: set latch + advance address low bits
-	if (data & 0x08)
-	{
-		monsterz_set_latch();
-		m_protection_state = ((m_protection_state + 1) & 0x00ff) | (m_protection_state & 0xff00);
-	}
-}
-
-void taiyo_sfx_state::monsterz_portc_1_w(uint8_t data)
-{
-}
 
 /*************************************
  *
@@ -2372,44 +2343,45 @@ void galaxian_state::turpins_map(address_map &map)
 
 
 // this is the same as theend, except for separate RGB background controls and some extra ROM space at $7000 and $C000
-void taiyo_sfx_state::sfx_map(address_map &map)
+void nihon_sfx_state::sfx_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(taiyo_sfx_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(taiyo_sfx_state::galaxian_objram_w)).share("spriteram");
-	map(0x6800, 0x6800).mirror(0x07f8).w(FUNC(taiyo_sfx_state::scramble_background_red_w));
-	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(taiyo_sfx_state::irq_enable_w));
-	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(taiyo_sfx_state::coin_count_0_w));
-	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(taiyo_sfx_state::scramble_background_blue_w));
-	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(taiyo_sfx_state::galaxian_stars_enable_w));
-	map(0x6805, 0x6805).mirror(0x07f8).w(FUNC(taiyo_sfx_state::scramble_background_green_w));
-	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(taiyo_sfx_state::galaxian_flip_screen_x_w));
-	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(taiyo_sfx_state::galaxian_flip_screen_y_w));
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(nihon_sfx_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(nihon_sfx_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).mirror(0x07f8).w(FUNC(nihon_sfx_state::scramble_background_red_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(nihon_sfx_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(nihon_sfx_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(nihon_sfx_state::scramble_background_blue_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(nihon_sfx_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8).w(FUNC(nihon_sfx_state::scramble_background_green_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(nihon_sfx_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(nihon_sfx_state::galaxian_flip_screen_y_w));
 	map(0x7000, 0x7fff).rom();
-	map(0x8000, 0xbfff).rw(FUNC(taiyo_sfx_state::theend_ppi8255_r), FUNC(taiyo_sfx_state::theend_ppi8255_w));
+	map(0x8000, 0xbfff).rw(FUNC(nihon_sfx_state::theend_ppi8255_r), FUNC(nihon_sfx_state::theend_ppi8255_w));
 	map(0xc000, 0xefff).rom();
 }
 
 
-void taiyo_sfx_state::monsterz_map(address_map &map)
+void monsterz_state::monsterz_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x3fff).ram(); // extra RAM used by protection
 	map(0x4000, 0x47ff).ram();
-	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(taiyo_sfx_state::galaxian_videoram_w)).share("videoram");
-	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(taiyo_sfx_state::galaxian_objram_w)).share("spriteram");
-	map(0x6800, 0x6800).mirror(0x07f8).w(FUNC(taiyo_sfx_state::scramble_background_red_w));
-	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(taiyo_sfx_state::irq_enable_w));
-	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(taiyo_sfx_state::coin_count_0_w));
-	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(taiyo_sfx_state::scramble_background_blue_w));
-	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(taiyo_sfx_state::galaxian_stars_enable_w));
-	map(0x6805, 0x6805).mirror(0x07f8).w(FUNC(taiyo_sfx_state::scramble_background_green_w));
-	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(taiyo_sfx_state::galaxian_flip_screen_x_w));
-	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(taiyo_sfx_state::galaxian_flip_screen_y_w));
-	map(0x8000, 0xbfff).rw(FUNC(taiyo_sfx_state::theend_ppi8255_r), FUNC(taiyo_sfx_state::theend_ppi8255_w));
+	map(0x4800, 0x4bff).mirror(0x0400).ram().w(FUNC(nihon_sfx_state::galaxian_videoram_w)).share("videoram");
+	map(0x5000, 0x50ff).mirror(0x0700).ram().w(FUNC(nihon_sfx_state::galaxian_objram_w)).share("spriteram");
+	map(0x6800, 0x6800).mirror(0x07f8).w(FUNC(nihon_sfx_state::scramble_background_red_w));
+	map(0x6801, 0x6801).mirror(0x07f8).w(FUNC(nihon_sfx_state::irq_enable_w));
+	map(0x6802, 0x6802).mirror(0x07f8).w(FUNC(nihon_sfx_state::coin_count_0_w));
+	map(0x6803, 0x6803).mirror(0x07f8).w(FUNC(nihon_sfx_state::scramble_background_blue_w));
+	map(0x6804, 0x6804).mirror(0x07f8).w(FUNC(nihon_sfx_state::galaxian_stars_enable_w));
+	map(0x6805, 0x6805).mirror(0x07f8).w(FUNC(nihon_sfx_state::scramble_background_green_w));
+	map(0x6806, 0x6806).mirror(0x07f8).w(FUNC(nihon_sfx_state::galaxian_flip_screen_x_w));
+	map(0x6807, 0x6807).mirror(0x07f8).w(FUNC(nihon_sfx_state::galaxian_flip_screen_y_w));
+	map(0x7000, 0x7000).nopr(); // watchdog?
+	map(0x8000, 0xbfff).rw(FUNC(nihon_sfx_state::theend_ppi8255_r), FUNC(nihon_sfx_state::theend_ppi8255_w));
 	map(0xc000, 0xd7ff).rom();
-	map(0xd800, 0xd800).r(FUNC(taiyo_sfx_state::monsterz_protection_r));
+	map(0xd800, 0xdfff).lr8(NAME([this]() { return bitswap<8>(m_monsterz_shift ^ 0x40050, 7, 18, 0, 1, 4, 6, 5, 3); }));
 }
 
 
@@ -2719,12 +2691,26 @@ void galaxian_state::konami_sound_portmap(address_map &map)
 	map(0x00, 0xff).rw(FUNC(galaxian_state::konami_ay8910_r), FUNC(galaxian_state::konami_ay8910_w));
 }
 
-void taiyo_sfx_state::monsterz_sound_map(address_map &map)
+void monsterz_state::monsterz_sound_map(address_map &map)
 {
 	konami_sound_map(map);
-	map(0x0000, 0x3fff).rom().region("audiocpu", 0); // sound board has space for extra ROM
+	map(0x0000, 0x4fff).rom().region("audiocpu", 0); // sound board has space for extra ROM
+	map(0xd000, 0xd000).lr8(NAME([this]() { return bitswap<8>(m_monsterz_shift2 ^ 0x188, 14, 5, 8, 3, 7, 4, 2, 1); }));
+	map(0xd000, 0xd000).lw8(NAME([this](uint8_t data) { m_monsterz_shift = (m_monsterz_shift << 8) | data; }));
 }
 
+void monsterz_state::monsterz_sound_portmap(address_map& map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0xff).rw(FUNC(galaxian_state::konami_ay8910_r), FUNC(monsterz_state::monsterz_ay8910_w));
+}
+
+void monsterz_state::monsterz_sample_map(address_map& map)
+{
+	sfx_sample_map(map);
+	map(0x4000, 0x5fff).unmaprw();
+	map(0x4000, 0x4000).lw8(NAME([this](uint8_t data) { m_monsterz_shift2 = (m_monsterz_shift2 << 8) | data; }));
+}
 
 // Checkman with 1 x AY-8910A
 
@@ -2820,16 +2806,16 @@ void kingball_state::kingball_sound_portmap(address_map &map)
 
 // SF-X sample player
 
-void taiyo_sfx_state::sfx_sample_map(address_map &map)
+void nihon_sfx_state::sfx_sample_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x8000, 0x83ff).mirror(0x6c00).ram();
 }
 
-void taiyo_sfx_state::sfx_sample_portmap(address_map &map)
+void nihon_sfx_state::sfx_sample_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0xff).rw(FUNC(taiyo_sfx_state::sample_io_r), FUNC(taiyo_sfx_state::sample_io_w));
+	map(0x00, 0xff).rw(FUNC(nihon_sfx_state::sample_io_r), FUNC(nihon_sfx_state::sample_io_w));
 }
 
 void galaxian_state::turpins_sound_map(address_map &map)
@@ -6267,6 +6253,18 @@ static INPUT_PORTS_START( sfx )
 	PORT_BIT( 0xff, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( monsterz )
+	PORT_INCLUDE(sfx)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 
 /* verified from Z80 code */
 static INPUT_PORTS_START( scobra )
@@ -7859,19 +7857,19 @@ void galaxian_state::ckongs(machine_config &config)
 }
 
 
-void taiyo_sfx_state::sfx(machine_config &config)
+void nihon_sfx_state::sfx(machine_config &config)
 {
 	scramble_base(config);
 
 	config.device_remove("watchdog");
 
 	// alternate memory map
-	m_maincpu->set_addrmap(AS_PROGRAM, &taiyo_sfx_state::sfx_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nihon_sfx_state::sfx_map);
 
 	/* 3rd CPU for the sample player */
 	Z80(config, m_audio2, KONAMI_SOUND_CLOCK/8);
-	m_audio2->set_addrmap(AS_PROGRAM, &taiyo_sfx_state::sfx_sample_map);
-	m_audio2->set_addrmap(AS_IO, &taiyo_sfx_state::sfx_sample_portmap);
+	m_audio2->set_addrmap(AS_PROGRAM, &nihon_sfx_state::sfx_sample_map);
+	m_audio2->set_addrmap(AS_IO, &nihon_sfx_state::sfx_sample_portmap);
 
 	I8255A(config, m_ppi8255[2]);
 	m_ppi8255[2]->in_pa_callback().set("soundlatch2", FUNC(generic_latch_8_device::read));
@@ -7880,26 +7878,48 @@ void taiyo_sfx_state::sfx(machine_config &config)
 
 	/* port on 2nd 8910 is used for communication */
 	m_ay8910[1]->port_a_write_callback().set("soundlatch2", FUNC(generic_latch_8_device::write));
-	m_ay8910[1]->port_b_write_callback().set(FUNC(taiyo_sfx_state::sample_control_w));
+	m_ay8910[1]->port_b_write_callback().set(FUNC(nihon_sfx_state::sample_control_w));
+
+	// cut screen edges
+	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND + 3 * 8 * GALAXIAN_XSCALE, GALAXIAN_HBSTART - 2 * 8 * GALAXIAN_XSCALE, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 
 	/* DAC for the sample player */
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // 16-pin IC (not identified by schematics)
 }
 
 
-void taiyo_sfx_state::monsterz(machine_config &config)
+void monsterz_state::monsterz(machine_config &config)
 {
 	sfx(config);
 
 	// alternate memory map
-	m_maincpu->set_addrmap(AS_PROGRAM, &taiyo_sfx_state::monsterz_map);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &taiyo_sfx_state::monsterz_sound_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &monsterz_state::monsterz_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &monsterz_state::monsterz_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &monsterz_state::monsterz_sound_portmap);
+	m_audio2->set_addrmap(AS_PROGRAM, &monsterz_state::monsterz_sample_map);
 
-	m_ppi8255[1]->out_pa_callback().set(FUNC(taiyo_sfx_state::monsterz_porta_1_w));
-	m_ppi8255[1]->out_pb_callback().set(FUNC(taiyo_sfx_state::monsterz_portb_1_w));
-	m_ppi8255[1]->out_pc_callback().set(FUNC(taiyo_sfx_state::monsterz_portc_1_w));
+	m_ay8910[0]->port_b_write_callback().set([this](uint8_t data)
+		{
+			if ((m_monsterz_audio_portb & 0x01) && !(data & 0x01))
+			{
+				machine().scheduler().boost_interleave(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
+				m_maincpu->set_input_line(0, HOLD_LINE);
+			}
+			m_monsterz_audio_portb = data;
+		});
 
-	// there are likely other differences too, but those can wait until after protection is sorted out
+	m_ppi8255[2]->out_pc_callback().set([this](uint8_t data)
+		{
+			if ((m_monsterz_sample_portc & 0x01) && !(data & 0x01))
+			{
+				machine().scheduler().boost_interleave(m_screen->scan_period(), attotime(0, m_screen->refresh_attoseconds()));
+				m_audiocpu->set_input_line(0, HOLD_LINE);
+			}
+			m_monsterz_sample_portc = data;
+		});
+
+	/* DAC for the sample player */
+	DAC_8BIT_R2R(config, m_dac2, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // TODO: check dac type
 }
 
 
@@ -8856,12 +8876,19 @@ void galaxian_state::init_mandinga()
 	space.unmap_read(0x7000, 0x7000, 0x7ff);
 }
 
-void taiyo_sfx_state::init_sfx()
+void nihon_sfx_state::init_sfx()
 {
 	// basic configuration
-	common_init(&galaxian_state::scramble_draw_bullet, nullptr, &galaxian_state::upper_extend_tile_info, nullptr);
-	m_draw_background_ptr = draw_background_delegate(&taiyo_sfx_state::sfx_draw_background, this);
-	m_sfx_tilemap = true;
+	common_init(nullptr, nullptr, &galaxian_state::upper_extend_tile_info, nullptr);
+	m_draw_background_ptr = draw_background_delegate(&nihon_sfx_state::sfx_draw_background, this);
+	m_draw_bullet_ptr = draw_bullet_delegate(&nihon_sfx_state::sfx_draw_bullet, this);
+	m_sfx_adjust = true;
+}
+
+void monsterz_state::init_monsterz()
+{
+	init_sfx();
+	m_draw_background_ptr = draw_background_delegate(&galaxian_state::galaxian_draw_background, this);
 }
 
 
@@ -14317,22 +14344,52 @@ ROM_START( monsterz )
 	ROM_LOAD( "b-6e.h1",      0xd000, 0x1000, CRC(77d7aa8d) SHA1(62aaf582ba55f7b21f6cf13b4fb6c2c54bb729f5) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a-5e.k5",      0x0000, 0x1000, CRC(b5bcdb4e) SHA1(db0965e5636e0f4e9cd4f4a7d808c413ecf733db) )
+	ROM_LOAD( "a-6.k6",       0x1000, 0x1000, CRC(24832b2e) SHA1(2a67888e86ce1a3182303e841513ba2a07977359) )
+	ROM_LOAD( "a-7e.k7",      0x2000, 0x1000, CRC(20ebea81) SHA1(473c688365b256d8593663ff95768f4a5bb1289d) )
+	ROM_LOAD( "a-8.k8",       0x3000, 0x1000, CRC(b833a15b) SHA1(0d21aaa0ca5ccba89118b205a6b3b36b15663c47) )
+	ROM_LOAD( "a-9.k9",       0x4000, 0x1000, CRC(cbd76ec2) SHA1(9434350ee93ca71efe78018b69913386353306ff) )
+
+	ROM_REGION( 0x10000, "audio2", 0 )
 	ROM_LOAD( "a-1e.k1",      0x0000, 0x1000, CRC(b88ba44e) SHA1(85c141fb411d541b1e20412f5fefd18395f635ae) )
 	ROM_LOAD( "a-2.k2",       0x1000, 0x1000, CRC(8913c94e) SHA1(6c4fe065217a234d45761f8ad4d2c4e7078a0abd) )
 	ROM_LOAD( "a-3e.k3",      0x2000, 0x1000, CRC(a8fa5095) SHA1(5cabe5497a79a0c43e78a84ae87c824af60a2a3f) )
 	ROM_LOAD( "a-4.k4",       0x3000, 0x1000, CRC(93f81317) SHA1(167708be94cb9a47290067a20bc5ff6f018b93b6) )
 
-	ROM_REGION( 0x10000, "audio2", 0 )
-	ROM_LOAD( "a-5e.k5",      0x0000, 0x1000, CRC(b5bcdb4e) SHA1(db0965e5636e0f4e9cd4f4a7d808c413ecf733db) )
-	ROM_LOAD( "a-6.k6",       0x1000, 0x1000, CRC(24832b2e) SHA1(2a67888e86ce1a3182303e841513ba2a07977359) )
-	ROM_LOAD( "a-7e.k7",      0x2000, 0x1000, CRC(20ebea81) SHA1(473c688365b256d8593663ff95768f4a5bb1289d) )
-	// 0x3000 empty ?
-	ROM_LOAD( "a-8.k8",       0x4000, 0x1000, CRC(b833a15b) SHA1(0d21aaa0ca5ccba89118b205a6b3b36b15663c47) )
-	ROM_LOAD( "a-9.k9",       0x5000, 0x1000, CRC(cbd76ec2) SHA1(9434350ee93ca71efe78018b69913386353306ff) )
-
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "b-7e.a5",      0x0000, 0x1000, CRC(ddd4158d) SHA1(9701e2d8a0226455dfbed650e58bb4be05918fe8) )
 	ROM_LOAD( "b-8e.c5",      0x1000, 0x1000, CRC(b1331b4c) SHA1(fa1af406ecd6919b4846aea68d3edb70106f9273) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.g9",      0x0000, 0x0020, CRC(b7ea00d7) SHA1(f658c6ac8123ae1e6b68ae513cc02c4d9d2b4e47) )
+ROM_END
+
+
+ROM_START( monsterza )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b-1.a1",       0x0000, 0x1000, CRC(97886542) SHA1(01f4f9bd55f9eae28162cbb22a26f7cda22cd3f3) )
+	ROM_LOAD( "b-2.b1",       0x1000, 0x1000, CRC(184ffcb4) SHA1(829d6ca13773aba7c3a81e122171befbe3666110) )
+	ROM_LOAD( "b-3.c1",       0x2000, 0x1000, CRC(b7b10ac7) SHA1(51d544d4db456df756a95d7f1853fffed9259647) )
+	ROM_LOAD( "b-4.e1",       0x3000, 0x1000, CRC(fb02c736) SHA1(24466116dd07b856b1afff62b8312c67ff466b95) )
+	ROM_LOAD( "b-5.f1",       0xc000, 0x1000, CRC(43be6f5b) SHA1(18fe89839187de7aa76597d391677b45521d679d) )
+	ROM_LOAD( "b-6.k1",       0xd000, 0x1000, CRC(a21ae2f6) SHA1(71695265de1fcb635d4260ccb129b652f003a7d2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a-5.kj5",      0x0000, 0x1000, CRC(b5bcdb4e) SHA1(db0965e5636e0f4e9cd4f4a7d808c413ecf733db) )
+	ROM_LOAD( "a-6.kj6",      0x1000, 0x1000, CRC(24832b2e) SHA1(2a67888e86ce1a3182303e841513ba2a07977359) )
+	ROM_LOAD( "a-7.kj7",      0x2000, 0x1000, CRC(20ebea81) SHA1(473c688365b256d8593663ff95768f4a5bb1289d) )
+	ROM_LOAD( "a-8.kj8",      0x3000, 0x1000, CRC(b833a15b) SHA1(0d21aaa0ca5ccba89118b205a6b3b36b15663c47) )
+	ROM_LOAD( "a-9.kj9",      0x4000, 0x1000, CRC(cbd76ec2) SHA1(9434350ee93ca71efe78018b69913386353306ff) )
+
+	ROM_REGION( 0x10000, "audio2", 0 )
+	ROM_LOAD( "a-1.kj1",      0x0000, 0x1000, CRC(b88ba44e) SHA1(85c141fb411d541b1e20412f5fefd18395f635ae) )
+	ROM_LOAD( "a-2.kj2",      0x1000, 0x1000, CRC(8913c94e) SHA1(6c4fe065217a234d45761f8ad4d2c4e7078a0abd) )
+	ROM_LOAD( "a-3.kj3",      0x2000, 0x1000, CRC(a8fa5095) SHA1(5cabe5497a79a0c43e78a84ae87c824af60a2a3f) )
+	ROM_LOAD( "a-4.kj4",      0x3000, 0x1000, CRC(93f81317) SHA1(167708be94cb9a47290067a20bc5ff6f018b93b6) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "b-7.a5",       0x0000, 0x1000, CRC(ddd4158d) SHA1(9701e2d8a0226455dfbed650e58bb4be05918fe8) )
+	ROM_LOAD( "b-8.b5",       0x1000, 0x1000, CRC(b1331b4c) SHA1(fa1af406ecd6919b4846aea68d3edb70106f9273) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "prom.g9",      0x0000, 0x0020, CRC(b7ea00d7) SHA1(f658c6ac8123ae1e6b68ae513cc02c4d9d2b4e47) )
@@ -15469,9 +15526,10 @@ GAME( 19??, scorpionmc,  scorpion, scorpnmc,   scorpnmc,   galaxian_state,     i
 GAME( 19??, aracnis,     scorpion, scorpnmc,   aracnis,    galaxian_state,     init_batman2,  ROT90,  "bootleg",            "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 // SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player
-GAME( 1983, sfx,         0,        sfx,        sfx,        taiyo_sfx_state, init_sfx,  ORIENTATION_FLIP_X, "Taiyo System (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
-GAME( 1983, skelagon,    sfx,      sfx,        sfx,        taiyo_sfx_state, init_sfx,  ORIENTATION_FLIP_X, "Taiyo System (Nichibutsu USA license)", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
-GAME( 1982, monsterz,    0,        monsterz,   sfx,        taiyo_sfx_state, init_sfx,  ORIENTATION_FLIP_X, "Taiyo System",                          "Monster Zero", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1983, sfx,         0,        sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu license)",     "SF-X",         MACHINE_SUPPORTS_SAVE )
+GAME( 1983, skelagon,    sfx,      sfx,        sfx,        nihon_sfx_state, init_sfx,       ORIENTATION_FLIP_X, "Nihon Game (Nichibutsu USA license)", "Skelagon",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1982, monsterz,    0,        monsterz,   monsterz,   monsterz_state,  init_monsterz,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, monsterza,   monsterz, monsterz,   monsterz,   monsterz_state,  init_monsterz,  ORIENTATION_FLIP_X, "Nihon Game",                          "Monster Zero (set 2)", MACHINE_SUPPORTS_SAVE )
 
 
 /*

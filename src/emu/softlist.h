@@ -152,7 +152,7 @@ private:
 	std::string                     m_publisher;
 	std::list<software_info_item>   m_info;             // Here we store info like developer, serial #, etc. which belong to the software entry as a whole
 	software_info_item::set         m_shared_features;  // Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited
-													    // by each part of this software entry (after loading these are stored in partdata->features)
+														// by each part of this software entry (after loading these are stored in partdata->features)
 	std::list<software_part> m_partdata;
 };
 

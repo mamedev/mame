@@ -127,7 +127,7 @@ public:
 	virtual void update() = 0;
 	virtual void complete_destroy() = 0;
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 	virtual bool win_has_menu() = 0;
 #endif
 

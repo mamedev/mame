@@ -1,20 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /***************************************************************************
-	Casio GT913
+    Casio GT913
 
-	This chip powers several late-90s/early-2000s Casio keyboards.
-	It's based on the H8/300 instruction set, but with different encoding
-	for many opcodes, as well as:
+    This chip powers several late-90s/early-2000s Casio keyboards.
+    It's based on the H8/300 instruction set, but with different encoding
+    for many opcodes, as well as:
 
-	- Dedicated bank switching instructions (20-bit external address bus)
-	- Two timers, three 8-bit ports, two 8-bit ADCs
-	- Keyboard controller w/ key velocity detection
-	- MIDI UART
-	- 24-voice PCM sound (currently not emulated / fully understood)
+    - Dedicated bank switching instructions (20-bit external address bus)
+    - Two timers, three 8-bit ports, two 8-bit ADCs
+    - Keyboard controller w/ key velocity detection
+    - MIDI UART
+    - 24-voice PCM sound (currently not emulated / fully understood)
 
-	Earlier and later Casio keyboard models contain "uPD912" and "uPD914" chips,
-	which are presumably similar.
+    Earlier and later Casio keyboard models contain "uPD912" and "uPD914" chips,
+    which are presumably similar.
 
 ***************************************************************************/
 
@@ -45,7 +45,7 @@ std::unique_ptr<util::disasm_interface> gt913_device::create_disassembler()
 
 void gt913_device::map(address_map &map)
 {
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank");
@@ -80,7 +80,7 @@ void gt913_device::map(address_map &map)
 	map(0xfff1, 0xfff1).rw(m_port[1], FUNC(h8_port_device::ddr_r), FUNC(h8_port_device::ddr_w));
 	map(0xfff2, 0xfff2).rw(m_port[0], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 	map(0xfff3, 0xfff3).rw(m_port[1], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
-//	map(0xfff4, 0xfff4).nopw(); probably not port 3 DDR - ctk551 writes 0x00 but uses port 3 for output only
+//  map(0xfff4, 0xfff4).nopw(); probably not port 3 DDR - ctk551 writes 0x00 but uses port 3 for output only
 	map(0xfff5, 0xfff5).rw(m_port[2], FUNC(h8_port_device::port_r), FUNC(h8_port_device::dr_w));
 }
 

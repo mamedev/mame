@@ -1758,7 +1758,7 @@ void nes_bmc_970630c_device::write_h(offs_t offset, u8 data)
 
 u8 nes_bmc_970630c_device::read_h(offs_t offset)
 {
-//	LOG_MMC(("bmc_970630c read_h, offset: %04x\n", offset));
+//  LOG_MMC(("bmc_970630c read_h, offset: %04x\n", offset));
 
 	if (m_latch)
 		return 0;    // TODO: menu supposedly varies by solder pad value returned here, but it doesn't seem to work...
