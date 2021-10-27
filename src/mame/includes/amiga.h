@@ -406,7 +406,8 @@ public:
 	uint16_t m_genlock_color;
 
 	/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-	uint8_t m_separate_bitplanes[2][64];
+	// FIXME: we instantiate 256 entries so that it pleases AGA
+	uint8_t m_separate_bitplanes[2][256];
 
 	/* aga */
 	int m_aga_diwhigh_written;

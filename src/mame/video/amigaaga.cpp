@@ -80,6 +80,15 @@ VIDEO_START_MEMBER(amiga_state,amiga_aga)
 {
 	VIDEO_START_CALL_MEMBER( amiga );
 
+	for (int j = 0; j < 256; j++)
+	{
+		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4) | ((j >> 3) & 8);
+		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4) | ((j >> 4) & 8);
+
+		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 16);
+		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 16) : pf1pix;
+	}
+
 	m_aga_diwhigh_written = 0;
 }
 
@@ -732,7 +741,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				else if (dualpf)
 				{
 					/* mask out the sprite if it doesn't have priority */
-					pix = sprpix & 0x1f;
+					pix = sprpix & 0xff;
 					pri = (sprpix >> 12);
 					if (pix)
 					{

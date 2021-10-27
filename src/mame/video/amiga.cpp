@@ -124,10 +124,8 @@ void amiga_state::amiga_palette(palette_device &palette) const
 
 VIDEO_START_MEMBER( amiga_state, amiga )
 {
-	int j;
-
 	/* generate tables that produce the correct playfield color for dual playfield mode */
-	for (j = 0; j < 64; j++)
+	for (int j = 0; j < 64; j++)
 	{
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
 		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4);
@@ -135,6 +133,8 @@ VIDEO_START_MEMBER( amiga_state, amiga )
 		m_separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
 		m_separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
 	}
+	// TODO: verify usage of values in the 64-255 range
+	// (should black out pf1 if j & 0x40, pf2 if j & 0x80)
 
 #if GUESS_COPPER_OFFSET
 	m_wait_offset = 3;
