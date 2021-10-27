@@ -651,7 +651,6 @@ static INPUT_PORTS_START( cubo )
 	PORT_DIPNAME( 0x80, 0x80, "DSW2 8" )
 	PORT_DIPSETTING(    0x80, "Reset" )
 	PORT_DIPSETTING(    0x00, "Set" )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cndypuzl )
@@ -1030,9 +1029,36 @@ static INPUT_PORTS_START( mgprem11 )
 	PORT_DIPSETTING(    0x00, "OK" )
 	PORT_DIPSETTING(    0x01, "ERROR!" )
 	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( eldoralg )
+	PORT_INCLUDE( cubo )
+
+	// TODO: verify layout
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P1 G") PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 F") PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 D") PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 E") PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("P2 G") PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 F") PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 C") PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 D") PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 A") PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 E") PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 B") PORT_PLAYER(2)
+
+	PORT_MODIFY("DIPSW1")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )                     /* Hold at boot for test mode */
+
+	PORT_MODIFY("DIPSW2")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN2 )
+INPUT_PORTS_END
 
 void cubo_state::cubo(machine_config &config)
 {
@@ -1328,82 +1354,17 @@ void cubo_state::init_mgprem11()
 	m_input_hack = &cubo_state::mgprem11_input_hack;
 }
 
-static INPUT_PORTS_START( odeontw2 )
-//  PORT_INCLUDE( cd32 )
-	PORT_START("CIA0PORTA")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("CIA0PORTB")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-
-	PORT_START("DIPSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1 1" )
-	PORT_DIPSETTING(    0x01, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x02, 0x02, "DSW1 2" )
-	PORT_DIPSETTING(    0x02, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW1 3" )
-	PORT_DIPSETTING(    0x04, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x08, 0x08, "DSW1 4" )
-	PORT_DIPSETTING(    0x08, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x10, 0x10, "DSW1 5" )
-	PORT_DIPSETTING(    0x10, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x20, 0x20, "DSW1 6" )
-	PORT_DIPSETTING(    0x20, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW1 7" )
-	PORT_DIPSETTING(    0x40, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x80, 0x80, "DSW1 8" )
-	PORT_DIPSETTING(    0x80, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-
-	PORT_START("DIPSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2 1" )
-	PORT_DIPSETTING(    0x01, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x02, 0x02, "DSW2 2" )
-	PORT_DIPSETTING(    0x02, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW2 3" )
-	PORT_DIPSETTING(    0x04, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x08, 0x08, "DSW2 4" )
-	PORT_DIPSETTING(    0x08, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x10, 0x10, "DSW2 5" )
-	PORT_DIPSETTING(    0x10, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x20, 0x20, "DSW2 6" )
-	PORT_DIPSETTING(    0x20, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW2 7" )
-	PORT_DIPSETTING(    0x40, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-	PORT_DIPNAME( 0x80, 0x80, "DSW2 8" )
-	PORT_DIPSETTING(    0x80, "Reset" )
-	PORT_DIPSETTING(    0x00, "Set" )
-
-INPUT_PORTS_END
-
-
 
 GAME( 1993, cubo,      0,    cubo, cubo,     cubo_state, init_cubo,     ROT0, "Commodore",  "Cubo BIOS",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IS_BIOS_ROOT )
 GAME( 1995, cndypuzl,  cubo, cubo, cndypuzl, cubo_state, init_cndypuzl, ROT0, "CD Express", "Candy Puzzle (v1.0)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, haremchl,  cubo, cubo, haremchl, cubo_state, init_haremchl, ROT0, "CD Express", "Harem Challenge",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, lsrquiz,   cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* no player 2 inputs (ingame), wrong pitch for most gfxs */
-GAME( 1995, lsrquizg,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Greece",         MACHINE_NOT_WORKING )
-GAME( 1995, lsrquiz2i, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* wrong pitch for some gfxs, crashes during gameplay */
+GAME( 1995, lsrquiz,   cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Italy",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no player 2 inputs (ingame), wrong pitch for most gfxs
+GAME( 1995, lsrquizg,  cubo, cubo, lsrquiz,  cubo_state, init_lsrquiz,  ROT0, "CD Express", "Laser Quiz Greece",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, lsrquiz2i, cubo, cubo, lsrquiz2, cubo_state, init_lsrquiz2, ROT0, "CD Express", "Laser Quiz 2 Italy (v1.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // wrong pitch for some gfxs, crashes during gameplay 
 GAME( 1995, lasstixx,  cubo, cubo, lasstixx, cubo_state, init_lasstixx, ROT0, "CD Express", "Laser Strixx 2",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, mgnumber,  cubo, cubo, mgnumber, cubo_state, init_mgnumber, ROT0, "CD Express", "Magic Number",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, mgprem11,  cubo, cubo, mgprem11, cubo_state, init_mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 19??, odeontw,   cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING )
-GAME( 1999, odeontw2,  cubo, cubo, odeontw2, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING )
-
+GAME( 1997, eldoralg,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "Shangai Games", "Eldorado (4.2)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // touchscreen is offset and cannot be calibrated, joystick buttons aren't recognized properly, has slight GFX bug with roulette ball
+GAME( 1998, odeontw,   cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister (v1.4)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "Invalid NVRAM", accesses area $6xxxxx and claims invalid RAM config if bypassed
+GAME( 1998, odeontw2,  cubo, cubo, eldoralg, cubo_state, init_cubo,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Resets halfway thru "please wait" in service mode, therefore NVRAM cannot be inited
 // Laser Gate 2
-GAME( 19??, eldoralg,  cubo, cubo, cubo,     cubo_state, init_cubo,     ROT0, "CD Express", "Eldorado (4.2)",            MACHINE_NOT_WORKING )
