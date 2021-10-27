@@ -335,13 +335,13 @@ void mquake_state::mquake(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	paula_8364_device &paula(PAULA_8364(config, "amiga", amiga_state::CLK_C1_NTSC));
-	paula.add_route(0, "lspeaker", 0.50);
-	paula.add_route(1, "rspeaker", 0.50);
-	paula.add_route(2, "rspeaker", 0.50);
-	paula.add_route(3, "lspeaker", 0.50);
-	paula.mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
-	paula.int_cb().set(FUNC(amiga_state::paula_int_w));
+	PAULA_8364(config, m_paula, amiga_state::CLK_C1_NTSC);
+	m_paula->add_route(0, "lspeaker", 0.50);
+	m_paula->add_route(1, "rspeaker", 0.50);
+	m_paula->add_route(2, "rspeaker", 0.50);
+	m_paula->add_route(3, "lspeaker", 0.50);
+	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
 	ES5503(config, m_es5503, amiga_state::CLK_7M_NTSC); /* ES5503 is likely mono due to channel strobe used as bank select */
 	m_es5503->set_channels(1);
