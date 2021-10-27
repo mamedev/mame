@@ -132,10 +132,6 @@ target_sources(osd_${OSD} PRIVATE
 	${MAME_DIR}/src/osd/modules/render/blit13.h
 )
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
-	target_sources(osd_${OSD} PRIVATE ${MAME_DIR}/src/osd/windows/main.cpp)
-endif()
-
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
 	target_sources(osd_${OSD} PRIVATE
 		${MAME_DIR}/src/osd/modules/debugger/debugosx.mm

@@ -159,7 +159,6 @@ target_sources(ocore_${OSD} PRIVATE
 	${MAME_DIR}/src/osd/strconv.h
 	${MAME_DIR}/src/osd/osdsync.cpp
 	${MAME_DIR}/src/osd/osdsync.h
-	${MAME_DIR}/src/osd/windows/main.cpp
 	${MAME_DIR}/src/osd/windows/winutf8.cpp
 	${MAME_DIR}/src/osd/windows/winutf8.h
 	${MAME_DIR}/src/osd/windows/winutil.cpp
