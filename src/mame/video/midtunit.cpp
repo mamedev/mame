@@ -72,22 +72,22 @@ void midtunit_video_device::debug_init()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 0, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("midblit", CMDFLAG_CUSTOM_HELP, 1, 4, std::bind(&midtunit_video_device::debug_commands, this, _1));
 	}
 }
 
-void midtunit_video_device::debug_commands(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 
 	if (params[0] == "pngdma")
-		debug_png_dma_command(ref, params);
+		debug_png_dma_command(params);
 	else
-		debug_help_command(ref, params);
+		debug_help_command(params);
 }
 
-void midtunit_video_device::debug_help_command(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -96,7 +96,7 @@ void midtunit_video_device::debug_help_command(int ref, const std::vector<std::s
 	con.printf("  midblit help -- this list\n");
 }
 
-void midtunit_video_device::debug_png_dma_command(int ref, const std::vector<std::string> &params)
+void midtunit_video_device::debug_png_dma_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 

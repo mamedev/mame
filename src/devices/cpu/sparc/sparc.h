@@ -155,6 +155,7 @@ protected:
 	required_device<sparc_mmu_interface> m_mmu;
 
 	// address spaces
+	std::string m_asi_names[0x10];
 	address_space_config m_debugger_config;
 	address_space_config m_asi_config[0x10];
 	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_asi[0x20];

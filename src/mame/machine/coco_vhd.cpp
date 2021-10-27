@@ -135,10 +135,9 @@ void coco_vhd_image_device::coco_vhd_readwrite(uint8_t data)
 	}
 
 	/* perform the seek */
-	seek_position = ((uint64_t) 256) * m_logical_record_number;
+	seek_position = uint64_t(256) * m_logical_record_number;
 	total_size = length();
-	result = fseek(std::min(seek_position, total_size), SEEK_SET);
-	if (result < 0)
+	if (fseek(std::min(seek_position, total_size), SEEK_SET))
 	{
 		m_status = VHDSTATUS_ACCESS_DENIED;
 		return;

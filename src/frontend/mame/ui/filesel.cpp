@@ -347,7 +347,7 @@ void menu_file_selector::type_search_char(char32_t ch)
 	std::string const current(m_filename);
 	if (input_character(m_filename, ch, uchar_is_printable))
 	{
-		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
+		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
 
 		file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
 
@@ -482,17 +482,9 @@ void menu_file_selector::handle()
 {
 	// process the menu
 	event const *const event = process(0);
-	if (event && event->itemref)
+	if (event)
 	{
-		// handle selections
-		if (event->iptkey == IPT_UI_SELECT)
-		{
-			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
-
-			// reset the char buffer when pressing IPT_UI_SELECT
-			m_filename.clear();
-		}
-		else if (event->iptkey == IPT_SPECIAL)
+		if (event->iptkey == IPT_SPECIAL)
 		{
 			// if it's any other key and we're not maxed out, update
 			type_search_char(event->unichar);
@@ -500,6 +492,18 @@ void menu_file_selector::handle()
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
+			if (!m_filename.empty())
+			{
+				m_filename.clear();
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+			}
+		}
+		else if (event->itemref && (event->iptkey == IPT_UI_SELECT))
+		{
+			// handle selections
+			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
+
+			// reset the char buffer when pressing IPT_UI_SELECT
 			m_filename.clear();
 		}
 	}

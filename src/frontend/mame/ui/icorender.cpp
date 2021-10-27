@@ -80,10 +80,9 @@ bool load_ico_png(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb3
 	if (9U >= dir.size)
 		return false;
 	fp.seek(dir.offset, SEEK_SET);
-	util::png_error const err(util::png_read_bitmap(fp, bitmap));
-	switch (err)
+	std::error_condition const err(util::png_read_bitmap(fp, bitmap));
+	if (!err)
 	{
-	case util::png_error::NONE:
 		// found valid PNG image
 		assert(bitmap.valid());
 		if ((dir.get_width() == bitmap.width()) && ((dir.get_height() == bitmap.height())))
@@ -100,16 +99,20 @@ bool load_ico_png(util::core_file &fp, icon_dir_entry_t const &dir, bitmap_argb3
 					dir.get_height());
 		}
 		return true;
-
-	case util::png_error::BAD_SIGNATURE:
+	}
+	else if (util::png_error::BAD_SIGNATURE == err)
+	{
 		// doesn't look like PNG data - just fall back to DIB without the file header
 		return false;
-
-	default:
+	}
+	else
+	{
 		// invalid PNG data or I/O error
 		LOG(
-				"Error %u reading PNG image data from ICO file at offset %u (directory size %u)\n",
-				unsigned(err),
+				"Error %s:%d %s reading PNG image data from ICO file at offset %u (directory size %u)\n",
+				err.category().name(),
+				err.value(),
+				err.message(),
 				dir.offset,
 				dir.size);
 		return false;
@@ -175,9 +178,13 @@ bool load_ico_image(util::core_file &fp, unsigned index, icon_dir_entry_t const 
 bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_argb32 &bitmap)
 {
 	// read the directory entry
+	std::error_condition err;
+	size_t actual;
 	icon_dir_entry_t dir;
-	fp.seek(sizeof(icon_dir_t) + (sizeof(icon_dir_entry_t) * index), SEEK_SET);
-	if (fp.read(&dir, sizeof(dir)) != sizeof(dir))
+	err = fp.seek(sizeof(icon_dir_t) + (sizeof(icon_dir_entry_t) * index), SEEK_SET);
+	if (!err)
+		err = fp.read(&dir, sizeof(dir), actual);
+	if (err || (sizeof(dir) != actual))
 	{
 		LOG("Failed to read ICO file directory entry %u\n", index);
 		return false;
@@ -204,9 +211,13 @@ bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_
 int images_in_ico(util::core_file &fp)
 {
 	// read and check the icon file header
+	std::error_condition err;
+	size_t actual;
 	icon_dir_t header;
-	fp.seek(0, SEEK_SET);
-	if (fp.read(&header, sizeof(header)) != sizeof(header))
+	err = fp.seek(0, SEEK_SET);
+	if (!err)
+		err = fp.read(&header, sizeof(header), actual);
+	if (err || (sizeof(header) != actual))
 	{
 		LOG("Failed to read ICO file header\n");
 		return -1;
@@ -272,9 +283,10 @@ void render_load_ico_highest_detail(util::core_file &fp, bitmap_argb32 &bitmap)
 	{
 		// now load all the directory entries
 		size_t const dir_bytes(sizeof(icon_dir_entry_t) * count);
-		std::unique_ptr<icon_dir_entry_t []> dir(new icon_dir_entry_t [count]);
-		std::unique_ptr<unsigned []> index(new unsigned [count]);
-		if (count && (fp.read(dir.get(), dir_bytes) != dir_bytes))
+		std::unique_ptr<icon_dir_entry_t []> dir(new (std::nothrow) icon_dir_entry_t [count]);
+		std::unique_ptr<unsigned []> index(new (std::nothrow) unsigned [count]);
+		size_t actual;
+		if (count && (!dir || !index || fp.read(dir.get(), dir_bytes, actual) || (dir_bytes != actual)))
 		{
 			LOG("Failed to read ICO file directory entries\n");
 		}

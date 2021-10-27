@@ -530,6 +530,7 @@ MACHINES["ER2055"] = true
 MACHINES["EXORTERM"] = true
 MACHINES["F3853"] = true
 MACHINES["F4702"] = true
+MACHINES["GT913"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_DC100_TAPE"] = true
@@ -1345,6 +1346,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"olivetti",
 		"olympia",
 		"omnibyte",
+		"omron",
 		"openuni",
 		"orion",
 		"osborne",
@@ -2023,6 +2025,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
 	MAME_DIR .. "src/mame/machine/fp6000_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/fp6000_kbd.h",
+	MAME_DIR .. "src/mame/drivers/ctk2000.cpp",
+	MAME_DIR .. "src/mame/drivers/ctk551.cpp",
 	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
@@ -3277,6 +3281,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/msbc1.cpp",
 	MAME_DIR .. "src/mame/drivers/ob68k1a.cpp",
 	MAME_DIR .. "src/mame/includes/ob68k1a.h",
+}
+
+createMESSProjects(_target, _subtarget, "omron")
+files {
+	MAME_DIR .. "src/mame/drivers/luna_68k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "openuni")

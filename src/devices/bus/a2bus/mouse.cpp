@@ -66,6 +66,12 @@
 #include "emu.h"
 #include "mouse.h"
 
+#include "machine/6821pia.h"
+#include "cpu/m6805/m68705.h"
+
+
+namespace {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -79,11 +85,59 @@
 #define MOUSE_YAXIS_TAG     "a2mse_y"
 
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-DEFINE_DEVICE_TYPE(A2BUS_MOUSE, a2bus_mouse_device, "a2mouse", "Apple II Mouse Card")
+class a2bus_mouse_device:
+		public device_t,
+		public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
+
+protected:
+	a2bus_mouse_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+
+	void pia_out_a(uint8_t data);
+	void pia_out_b(uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
+	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+
+	uint8_t mcu_port_a_r();
+	uint8_t mcu_port_b_r();
+	void mcu_port_a_w(uint8_t data);
+	void mcu_port_b_w(uint8_t data);
+	void mcu_port_c_w(uint8_t data);
+
+	required_device<pia6821_device> m_pia;
+	required_device<m68705p_device> m_mcu;
+	required_ioport m_mouseb;
+	required_ioport_array<2> m_mousexy;
+
+private:
+	template <unsigned AXIS, u8 DIR, u8 CLK> void update_axis();
+
+	required_region_ptr<uint8_t> m_rom;
+	int m_rom_bank;
+	uint8_t m_port_a_in, m_port_b_in;
+	int m_last[2], m_count[2];
+};
+
 
 ROM_START( mouse )
 	ROM_REGION(0x800, MOUSE_ROM_REGION, 0)
@@ -97,7 +151,7 @@ ROM_START( mouse )
 	ROM_LOAD( "mmi_pal16r4a,binary.2a", 0x000000, 0x000100, CRC(1da5c745) SHA1(ba267b69a2fda2a2348b140979ece562411bb37b) )
 ROM_END
 
-static INPUT_PORTS_START( mouse )
+INPUT_PORTS_START( mouse )
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
@@ -324,3 +378,12 @@ template <unsigned AXIS, u8 DIR, u8 CLK> void a2bus_mouse_device::update_axis()
 		}
 	}
 }
+
+}
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_MOUSE, device_a2bus_card_interface, a2bus_mouse_device, "a2mouse", "Apple II Mouse Card")

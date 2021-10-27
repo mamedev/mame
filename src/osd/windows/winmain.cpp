@@ -22,6 +22,7 @@
 
 // standard C headers
 #include <cctype>
+#include <clocale>
 #include <cstdarg>
 #include <cstdio>
 
@@ -31,15 +32,6 @@
 #include <mmsystem.h>
 #include <tchar.h>
 #include <io.h>
-
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#include <wrl/client.h>
-using namespace Windows::Storage;
-using namespace Platform;
-using namespace Windows::ApplicationModel;
-using namespace Windows::ApplicationModel::Core;
-using namespace Windows::UI::Popups;
-#endif
 
 #define DEBUG_SLOW_LOCKS    0
 
@@ -56,8 +48,6 @@ using namespace Windows::UI::Popups;
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
 //  winui_output_error
@@ -83,45 +73,6 @@ public:
 	}
 };
 
-#else
-
-//============================================================
-//  winuniversal_output_error
-//============================================================
-
-class winuniversal_output_error : public osd_output
-{
-public:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override
-	{
-		char buffer[2048];
-		if (channel == OSD_OUTPUT_CHANNEL_ERROR)
-		{
-			vsnprintf(buffer, std::size(buffer), msg, args);
-
-			std::wstring wcbuffer(osd::text::to_wstring(buffer));
-			std::wstring wcappname(osd::text::to_wstring(emulator_info::get_appname()));
-
-			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.data()), ref new Platform::String(wcbuffer.data()));
-			dlg->ShowAsync();
-		}
-		else if (channel == OSD_OUTPUT_CHANNEL_VERBOSE)
-		{
-			vsnprintf(buffer, std::size(buffer), msg, args);
-			std::wstring wcbuffer = osd::text::to_wstring(buffer);
-			OutputDebugString(wcbuffer.c_str());
-
-			// Chain to next anyway
-			chain_output(channel, msg, args);
-		}
-		else
-			chain_output(channel, msg, args);
-	}
-};
-
-#endif
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -133,10 +84,8 @@ int _CRT_glob = 0;
 //  LOCAL VARIABLES
 //**************************************************************************
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 static int timeresult = !TIMERR_NOERROR;
 static TIMECAPS timecaps;
-#endif
 
 static running_machine *g_current_machine;
 
@@ -278,14 +227,13 @@ const options_entry windows_options::s_option_entries[] =
 //  MAIN ENTRY POINT
 //**************************************************************************
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-
 //============================================================
 //  main
 //============================================================
 
 int main(int argc, char *argv[])
 {
+	std::setlocale(LC_ALL, "");
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
 
 	// use small output buffers on non-TTYs (i.e. pipes)
@@ -363,83 +311,6 @@ static BOOL WINAPI control_handler(DWORD type)
 	return TRUE;
 }
 
-#else
-
-// The main function is only used to initialize our IFrameworkView class.
-[Platform::MTAThread]
-int main(Platform::Array<Platform::String^>^ args)
-{
-	auto direct3DApplicationSource = ref new MameViewSource();
-	CoreApplication::Run(direct3DApplicationSource);
-	return 0;
-}
-
-MameMainApp::MameMainApp()
-{
-	// Turn off application view scaling so XBOX gets full screen
-	Windows::UI::ViewManagement::ApplicationViewScaling::TrySetDisableLayoutScaling(true);
-}
-
-void MameMainApp::Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ applicationView)
-{
-	// Register event handlers for app lifecycle.
-}
-
-// Called when the CoreWindow object is created (or re-created).
-void MameMainApp::SetWindow(Windows::UI::Core::CoreWindow^ window)
-{
-	// Attach event handlers on the window for input, etc.
-}
-
-// Initializes scene resources, or loads a previously saved app state.
-void MameMainApp::Load(Platform::String^ entryPoint)
-{
-}
-
-void MameMainApp::Run()
-{
-	// use small output buffers on non-TTYs (i.e. pipes)
-	if (!isatty(fileno(stdout)))
-		setvbuf(stdout, (char *) nullptr, _IOFBF, 64);
-	if (!isatty(fileno(stderr)))
-		setvbuf(stderr, (char *) nullptr, _IOFBF, 64);
-
-	// parse config and cmdline options
-	m_options = std::make_unique<windows_options>();
-	m_osd = std::make_unique<windows_osd_interface>(*m_options.get());
-
-	// Since we're a GUI app, out errors to message boxes
-	// Initialize this after the osd interface so that we are first in the
-	// output order
-	winuniversal_output_error winerror;
-	osd_output::push(&winerror);
-
-	m_osd->register_options();
-
-	// To satisfy the latter things, pass in the module path name
-	char exe_path[MAX_PATH];
-	GetModuleFileNameA(nullptr, exe_path, MAX_PATH);
-	char* args[3] = { exe_path, (char*)"-verbose", (char*)"-mouse" };
-
-	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), std::size(args), args);
-	osd_output::pop(&winerror);
-}
-
-// Required for IFrameworkView.
-void MameMainApp::Uninitialize()
-{
-	// Terminate events do not cause Uninitialize to be called. It will be called if your IFrameworkView
-	// class is torn down while the app is in the foreground.
-}
-
-IFrameworkView^ MameViewSource::CreateView()
-{
-	return ref new MameMainApp();
-}
-
-#endif
-
-
 //============================================================
 //  windows_options
 //============================================================
@@ -448,21 +319,6 @@ windows_options::windows_options()
 : osd_options()
 {
 	add_entries(s_option_entries);
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-	String^ path = ApplicationData::Current->LocalFolder->Path + L"\\";
-	set_default_value(OPTION_INIPATH, osd::text::from_wstring((LPCWSTR)path->Data()) + ";" + ini_path());
-	set_default_value(OPTION_CFG_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) +  cfg_directory());
-	set_default_value(OPTION_NVRAM_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + nvram_directory());
-	set_default_value(OPTION_INPUT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + input_directory());
-	set_default_value(OPTION_STATE_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + state_directory());
-	set_default_value(OPTION_SNAPSHOT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + snapshot_directory());
-	set_default_value(OPTION_DIFF_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + diff_directory());
-	set_default_value(OPTION_COMMENT_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory());
-	set_default_value(OPTION_SHARE_DIRECTORY, osd::text::from_wstring((LPCWSTR)path->Data()) + share_directory());
-
-	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()));
-	set_default_value(OPTION_MEDIAPATH, osd::text::from_wstring((LPCWSTR)path->Data()) + media_path());
-#endif
 }
 
 
@@ -577,13 +433,11 @@ void windows_osd_interface::init(running_machine &machine)
 	if (options.oslog())
 		machine.add_logerror_callback(&windows_osd_interface::output_oslog);
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// crank up the multimedia timer resolution to its max
 	// this gives the system much finer timeslices
 	timeresult = timeGetDevCaps(&timecaps, sizeof(timecaps));
 	if (timeresult == TIMERR_NOERROR)
 		timeBeginPeriod(timecaps.wPeriodMin);
-#endif
 
 	// create and start the profiler
 	if (profile > 0)
@@ -617,11 +471,9 @@ void windows_osd_interface::osd_exit()
 	diagnostics_module::get_instance()->stop_profiler();
 	diagnostics_module::get_instance()->print_profiler_results();
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// restore the timer resolution
 	if (timeresult == TIMERR_NOERROR)
 		timeEndPeriod(timecaps.wPeriodMin);
-#endif
 
 	// one last pass at events
 	winwindow_process_events(machine(), false, false);
@@ -639,8 +491,6 @@ void osd_setup_osd_specific_emu_options(emu_options &opts)
 }
 
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-
 //============================================================
 //  check_for_double_click_start
 //============================================================
@@ -655,5 +505,3 @@ static int is_double_click_start(int argc)
 	// try to determine if MAME was simply double-clicked
 	return (argc <= 1 && startup_info.dwFlags && !(startup_info.dwFlags & STARTF_USESTDHANDLES));
 }
-
-#endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)

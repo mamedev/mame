@@ -472,7 +472,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="aokidenp" cloneof="aokiden">
 		<!-- snescentral.com -->
-		<description>Aoki Densetsu Shoot! (Jpn, Prototype)</description>
+		<description>Aoki Densetsu Shoot! (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>KSS</publisher>
 		<info name="alt_title" value="蒼き伝説シュート!" />
@@ -504,7 +504,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="apoclyp2">
 		<!-- Simon Nicol -->
 		<!-- Notes: this prototype wasn't obtained by dumping a cartridge -->
-		<description>Apocalypse II (Euro, Prototype)</description>
+		<description>Apocalypse II (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -541,7 +541,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="metaljck">
 		<!-- ruiner9 -->
-		<description>Armored Police Metal Jack (USA, Prototype 19920730)</description>
+		<description>Armored Police Metal Jack (USA, prototype 19920730)</description>
 		<year>1992</year>
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -583,7 +583,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="batmanrj">
 		<!-- udisi -->
 		<!-- Notes: this title is often referred as 'real shitty batman' due to its internal (possibly hacked) name -->
-		<description>Batman - Revenge of the Joker (USA, Prototype)</description>
+		<description>Batman - Revenge of the Joker (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Icom Simulations</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -609,7 +609,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="batmanrnjp" cloneof="batmanrn">
 		<!-- d4s -->
-		<description>Batman Returns (Jpn, Prototype)</description>
+		<description>Batman Returns (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -634,7 +634,7 @@ Beyond that last category are the roms waiting to be classified.
 		<!-- nesworld.com -->
 		<!-- Notes: the rom dump of the NES world prototype matched almost entirely the known one that was floating around except for a graphic
 		        tile which was corrupt in the NES world dump, so the latter won't be included because it is most certainly just a corrupt dump -->
-		<description>Battle Blaze (USA, Prototype)</description>
+		<description>Battle Blaze (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>American Sammy</publisher>
 		<part name="cart" interface="snes_cart">
@@ -659,7 +659,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="beethovup" cloneof="beethov">
 		<!-- nintendoplayer.com -->
-		<description>Beethoven - The Ultimate Canine Caper! (USA, Prototype 19930913)</description>
+		<description>Beethoven - The Ultimate Canine Caper! (USA, prototype 19930913)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">
@@ -729,7 +729,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="bof2up" cloneof="bof2">
 		<!-- lostlevels.org -->
-		<description>Breath of Fire II (USA, Prototype)</description>
+		<description>Breath of Fire II (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -768,7 +768,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="capcomssp" cloneof="sshotout">
 		<!-- lostlevels.org -->
-		<description>Capcom's Soccer Shootout (USA, Prototype)</description>
+		<description>Capcom's Soccer Shootout (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -796,7 +796,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="captcommup" cloneof="captcomm">
 		<!-- lostlevels.org -->
 		<!-- Notes: identical to the final US release -->
-		<description>Captain Commando (USA, Final Prototype)</description>
+		<description>Captain Commando (USA, final prototype)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -825,7 +825,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="cvaniadxp" cloneof="cvaniavk">
 		<!-- legrospixel.com -->
 		<!-- Notes: identical to the final release -->
-		<description>Castlevania - Dracula X (USA, Final Prototype)</description>
+		<description>Castlevania - Dracula X (USA, final prototype)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -855,7 +855,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="clocktowp" cloneof="clocktow">
 		<!-- nintendoplayer.com -->
 		<!-- Notes: 64Kibits of SRAM (16Kibits in retail) -->
-		<description>Clock Tower (Jpn, Prototype)</description>
+		<description>Clock Tower (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Human Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -965,7 +965,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="congo">
 		<!-- nesworld.com -->
-		<description>Congo - The Movie - The Secret of Zinj (USA, Prototype)</description>
+		<description>Congo - The Movie - The Secret of Zinj (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1057,7 +1057,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="dsp1demo" supported="no"> <!-- possibly corrupt -->
 		<!-- nintendoplayer.com -->
-		<description>DSP1 Tech Demo (USA, Prototype)</description>
+		<description>DSP1 Tech Demo (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SN-10 (internal)" />
@@ -1200,7 +1200,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="espnspedp" cloneof="espnsped">
 		<!-- retrogamesuk -->
 		<!-- Notes: There is no sram chip on this prototype board -->
-		<description>ESPN Speedworld (USA, Prototype)</description>
+		<description>ESPN Speedworld (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1228,7 +1228,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="eurit">
 		<!-- lostlevels.org -->
-		<description>Eurit (USA, Prototype 19950529)</description>
+		<description>Eurit (USA, prototype 19950529)</description>
 		<year>1995</year>
 		<publisher>Radical Entertainment</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1256,7 +1256,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="falcon">
 		<!-- legrospixel.com -->
-		<description>Falcon (USA, Prototype)</description>
+		<description>Falcon (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Spectrum HoloByte</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1316,7 +1316,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="ffant3p" cloneof="ffant3">
 		<!-- Rick N. Bruns -->
-		<description>Final Fantasy III (USA, Prototype)</description>
+		<description>Final Fantasy III (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Square</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1356,7 +1356,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="firemenu" cloneof="firemen">
 		<!-- DuoFan -->
-		<description>The Firemen (USA, Prototype)</description>
+		<description>The Firemen (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Human Entertainment</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1382,7 +1382,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="fireteam">
 		<!-- snescentral.com -->
-		<description>Fireteam Rogue (USA, Prototype 19950116)</description>
+		<description>Fireteam Rogue (USA, prototype 19950116)</description>
 		<year>1995</year>
 		<publisher>Accolade</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1412,7 +1412,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="fireteama" cloneof="fireteam">
 		<!-- Carnivol -->
-		<description>Fireteam Rogue (USA, Earlier Prototype)</description>
+		<description>Fireteam Rogue (USA, earlier prototype)</description>
 		<year>1995</year>
 		<publisher>Accolade</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1442,7 +1442,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="flintup" cloneof="flint">
 		<!-- zidanax -->
-		<description>The Flintstones (USA, Prototype)</description>
+		<description>The Flintstones (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1509,7 +1509,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="gooftropup" cloneof="gooftrop">
 		<!-- nintendoplayer.com -->
 		<!-- Notes: identical to the final release -->
-		<description>Disney's Goof Troop (USA, Final Prototype)</description>
+		<description>Disney's Goof Troop (USA, final prototype)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1532,7 +1532,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="harvmoonup" cloneof="harvmoon">
 		<!-- nintendoplayer.com -->
 		<!-- Notes: identical to the final release except the board has no save capability -->
-		<description>Harvest Moon (USA, Final Prototype)</description>
+		<description>Harvest Moon (USA, final prototype)</description>
 		<year>1997</year>
 		<publisher>Natsume</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1560,7 +1560,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="havoc" cloneof="kingartw">
 		<!-- Carnivol -->
-		<description>Havoc (USA, Prototype)</description>
+		<description>Havoc (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Argonaut Software</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1578,7 +1578,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="hebepopnjp" cloneof="hebepopn">
 		<!-- lytron -->
-		<description>Hebereke no Popoon (Jpn, Prototype 19931101)</description>
+		<description>Hebereke no Popoon (Jpn, prototype 19931101)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="37" />
@@ -1595,7 +1595,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="humangp2p" cloneof="f1polep2">
 		<!-- snescentral.com -->
-		<description>Human Grand Prix II (Jpn, Prototype)</description>
+		<description>Human Grand Prix II (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="HUMAN No. 10358" />
@@ -1627,7 +1627,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="mtitlep" cloneof="mtitle">
 		<!-- snescentral.com -->
 		<!-- Notes: identical to the final release except it has full save capability -->
-		<description>The Irem Major Title (Euro, Final Prototype)</description>
+		<description>The Irem Major Title (Euro, final prototype)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1653,7 +1653,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="itadaki2p" cloneof="itadaki2">
 		<!-- unknown/auction -->
 		<!-- Notes: according to build date it was compiled three days before the retail -->
-		<description>Itadaki Street 2 - Neon Sign wa Barairo ni (Jpn, Prototype 19931220)</description>
+		<description>Itadaki Street 2 - Neon Sign wa Barairo ni (Jpn, prototype 19931220)</description>
 		<year>1994</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="SHVC-I2" />
@@ -1714,7 +1714,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="jeffseup">
 		<!-- nintendoplayer.com -->
-		<description>Jeff's Shoot'Em Up (USA, Prototype)</description>
+		<description>Jeff's Shoot'Em Up (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Iguana Entertainment</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1732,7 +1732,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="jleagueup" cloneof="jleague">
 		<!-- lostlevels.org -->
-		<description>Justice League Task Force (USA, Prototype)</description>
+		<description>Justice League Task Force (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1810,7 +1810,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="zelda3up" cloneof="zelda3">
 		<!-- jollerancher -->
 		<!-- Notes: identical to the final release -->
-		<description>The Legend of Zelda - A Link to the Past (USA, Final Prototype)</description>
+		<description>The Legend of Zelda - A Link to the Past (USA, final prototype)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="1992" />
@@ -1838,7 +1838,7 @@ Beyond that last category are the roms waiting to be classified.
 		<!-- MattyXB -->
 		<!-- Notes: hosted in a SHVC-006, the standard Japanese cartridge shell.
 		            Unlike the retail version, this prototype has full save capability -->
-		<description>Little Magic (Euro, Prototype)</description>
+		<description>Little Magic (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -1863,7 +1863,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mshup" cloneof="msh">
 		<!-- pending: awaiting documentation -->
-		<description>Marvel Super Heroes - War of the Gems (USA, Prototype)</description>
+		<description>Marvel Super Heroes - War of the Gems (USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1877,7 +1877,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="megaman7p" cloneof="megaman7">
 		<!-- lostlevels.org -->
 		<!-- Notes: identical to the final release -->
-		<description>Mega Man 7 (USA, Final Prototype)</description>
+		<description>Mega Man 7 (USA, final prototype)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1906,7 +1906,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="megamnx3up" cloneof="megamnx3">
 		<!-- lostlevels.org -->
 		<!-- Notes: the software matches the final release, but the hardware differs significantly  -->
-		<description>Mega Man X3 (USA, Final Prototype)</description>
+		<description>Mega Man X3 (USA, final prototype)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2063,7 +2063,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mk3up2" cloneof="mk3">
 		<!-- legrospixel.com -->
-		<description>Mortal Kombat 3 (USA, Prototype 19950713)</description>
+		<description>Mortal Kombat 3 (USA, prototype 19950713)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2104,7 +2104,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mrbloopy">
 		<!-- unknown/auction -->
-		<description>Mr. Bloopy - Saves the World (USA, Prototype 19950216)</description>
+		<description>Mr. Bloopy - Saves the World (USA, prototype 19950216)</description>
 		<year>1994</year>
 		<publisher>Compedia</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2139,7 +2139,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mrtuffa" cloneof="mrtuff">
 		<!-- lostlevels.org -->
-		<description>Mr. Tuff (Euro, Prototype 19940712)</description>
+		<description>Mr. Tuff (Euro, prototype 19940712)</description>
 		<year>1994</year>
 		<publisher>Sales Curve Interactive</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -2203,7 +2203,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="nbajamup" cloneof="nbajam">
 		<!-- lostlevels.org -->
 		<!-- Notes: it is a few bytes away from retail version's so it is likely the final prototype -->
-		<description>NBA Jam (USA, Final Prototype)</description>
+		<description>NBA Jam (USA, final prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2232,7 +2232,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="nbajamupa" cloneof="nbajam">
 		<!-- nintendoplayer.com -->
 		<!-- Notes: this prototype is uncensored, the chip labels can be read as 'JAM XXX' -->
-		<description>NBA Jam (USA, Prototype)</description>
+		<description>NBA Jam (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2301,7 +2301,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="nightbst">
 		<!-- DuoFan -->
-		<description>Nightmare Busters (Jpn, Prototype)</description>
+		<description>Nightmare Busters (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Arcade Zone</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -2329,7 +2329,7 @@ Beyond that last category are the roms waiting to be classified.
 		<!-- nesworld.com -->
 		<!-- Notes: a sticker on the board says 'THE PAGEMASTER 8/29/94 Property of Fox Interactive'
 		            but for consistency with other undocumented prototypes of this title, the build date will be used -->
-		<description>The Pagemaster (USA, Prototype 19940825)</description>
+		<description>The Pagemaster (USA, prototype 19940825)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2386,7 +2386,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="piratedwup" cloneof="piratedw">
 		<!-- nesworld.com -->
-		<description>The Pirates of Dark Water (USA, Prototype)</description>
+		<description>The Pirates of Dark Water (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -2413,7 +2413,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="ppersia2p" cloneof="ppersia2">
 		<!-- legrospixel.com -->
-		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro, Prototype 19950417)</description>
+		<description>Prince of Persia 2 - The Shadow &amp; The Flame (Euro, prototype 19950417)</description>
 		<year>1995</year>
 		<publisher>Titus</publisher>
 		<info name="serial" value="12634" />
@@ -2442,7 +2442,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="rpmp" cloneof="rpm">
 		<!-- Yakushi~Kabuto -->
-		<description>Radical Psycho Machine Racing (USA, Prototype 19910814)</description>
+		<description>Radical Psycho Machine Racing (USA, prototype 19910814)</description>
 		<year>1991</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2466,7 +2466,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="rapbaskt">
 		<!-- Notes: this binary was released by a developer, it isn't an image -->
-		<description>Rap Basketball (USA, Prototype)</description>
+		<description>Rap Basketball (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Bonsai Entertainment Corporation</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -2479,7 +2479,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="reliefp" cloneof="relief">
 		<!-- ? -->
-		<description>Relief Pitcher (USA, Prototype)</description>
+		<description>Relief Pitcher (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Left Field Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2507,7 +2507,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="rhirol95">
 		<!-- DreamTR -->
-		<description>RHI Roller Hockey '95 (USA, Prototype)</description>
+		<description>RHI Roller Hockey '95 (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Radical Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2538,7 +2538,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="rnrracinp" cloneof="rnrracin">
 		<!-- snescentral.com -->
-		<description>Rock n' Roll Racing (Euro, Prototype)</description>
+		<description>Rock n' Roll Racing (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2557,7 +2557,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="rockman7p" cloneof="megaman7">
 		<!-- lostlevels.org -->
-		<description>Rockman 7 - Shukumei no Taiketsu! (Jpn, Prototype 19941111)</description>
+		<description>Rockman 7 - Shukumei no Taiketsu! (Jpn, prototype 19941111)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2634,7 +2634,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="unflfoot">
 		<!-- lostlevels.org -->
-		<description>Sculptured Software's NFL Football (USA, Prototype)</description>
+		<description>Sculptured Software's NFL Football (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sculptured Software</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -2662,7 +2662,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sdf1gpp" cloneof="sdf1gp">
 		<!-- John Weidman -->
-		<description>SD F-1 Grand Prix (Jpn, Prototype)</description>
+		<description>SD F-1 Grand Prix (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Video System</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2696,7 +2696,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="shooterp">
 		<!-- nintendoplayer.com -->
-		<description>Shooter (USA, Prototype)</description>
+		<description>Shooter (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Punk Development</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -2770,7 +2770,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="speedyup1" cloneof="speedy">
 		<!-- alcoatjez -->
 		<!-- Notes: Sunsoft splash screen -->
-		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Sunsoft Prototype)</description>
+		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Sunsoft prototype)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2797,7 +2797,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="starfoxp" cloneof="starwing">
 		<!-- unknown/auction -->
-		<description>Star Fox (USA, Final Prototype)</description>
+		<description>Star Fox (USA, final prototype)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2849,7 +2849,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="seagal">
 		<!-- nintendoplayer.com -->
-		<description>Steven Seagal Is The Final Option (USA, Prototype)</description>
+		<description>Steven Seagal Is The Final Option (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>TecMagik Entertainment Ltd.</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -2886,7 +2886,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="strikerp1" cloneof="striker">
 		<!-- Niiue -->
-		<description>Striker (Euro, NTSC Prototype)</description>
+		<description>Striker (Euro, NTSC prototype)</description>
 		<year>1993</year>
 		<publisher>Argonaut Software</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2905,7 +2905,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="stuntfxp" cloneof="stuntfx">
 		<!-- Retrology -->
 		<!-- Notes: identical software but significantly different hardware -->
-		<description>Stunt Race FX (Euro, Final Prototype)</description>
+		<description>Stunt Race FX (Euro, final prototype)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SPAL-CQ" />
@@ -2964,7 +2964,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sbbrosp" cloneof="spang">
 		<!-- lostlevels.org -->
-		<description>Super Buster Bros. (USA, Prototype)</description>
+		<description>Super Buster Bros. (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -2989,7 +2989,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="schinwl2p" cloneof="schinwl2">
 		<!-- lostlevels.org -->
-		<description>Super Chinese World 2 - Uchuu Ichibutou Taikai (Jpn, Prototype)</description>
+		<description>Super Chinese World 2 - Uchuu Ichibutou Taikai (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Culture Brain</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3017,7 +3017,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sdriftop" cloneof="sdrifto">
 		<!-- snescentral.com -->
-		<description>Super Drift Out - World Rally Championships (USA, Prototype 19950518)</description>
+		<description>Super Drift Out - World Rally Championships (USA, prototype 19950518)</description>
 		<year>1995</year>
 		<publisher>Accolade ~ Visco</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -3048,7 +3048,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="fireprw2p" cloneof="fireprw2">
 		<!-- snescentral.com -->
 		<!-- Notes: 99% identical to the final release -->
-		<description>Super Fire Pro Wrestling 2 (Jpn, Final Prototype)</description>
+		<description>Super Fire Pro Wrestling 2 (Jpn, final prototype)</description>
 		<year>1992</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="HUMAN No. 138" />
@@ -3075,7 +3075,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="fireprw3p" cloneof="fireprw3">
 		<!-- snescentral.com -->
-		<description>Super Fire Pro Wrestling III - Final Bout (Jpn, Prototype)</description>
+		<description>Super Fire Pro Wrestling III - Final Bout (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Human Entertainment</publisher>
 		<info name="serial" value="HUMAN No. 10113" />
@@ -3107,7 +3107,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sgossunp" cloneof="sgossun">
 		<!-- dizrythmia / snescentral.com -->
-		<description>Super Gussun Oyoyo (Jpn, Prototype)</description>
+		<description>Super Gussun Oyoyo (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3137,7 +3137,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="smasup" cloneof="smas">
 		<!-- nintendoplayer.com -->
 		<!-- Notes: identical to the final release -->
-		<description>Super Mario All-Stars (USA, Final Prototype)</description>
+		<description>Super Mario All-Stars (USA, final prototype)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-4M" />
@@ -3205,7 +3205,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="smkartup" cloneof="smkart">
 		<!-- retrogamesuk -->
 		<!-- Notes: identical to the final release -->
-		<description>Super Mario Kart (USA, Final Prototype)</description>
+		<description>Super Mario Kart (USA, final prototype)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="1992" />
@@ -3242,7 +3242,7 @@ Beyond that last category are the roms waiting to be classified.
 		<!-- Van Halen -->
 		<!-- Notes: the rom is final but the board differs very significantly
 		            the coprocessor has its own allocated memory -->
-		<description>Super Mario World 2 - Yoshi's Island (USA, Final Prototype)</description>
+		<description>Super Mario World 2 - Yoshi's Island (USA, final prototype)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="release" value="1995" />
@@ -3335,7 +3335,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="starwarsp" cloneof="starwars">
 		<!-- legrospixel.com -->
 		<!-- Notes: identical to the final release, except it has full save capability -->
-		<description>Super Star Wars (USA, Final Prototype)</description>
+		<description>Super Star Wars (USA, final prototype)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3387,7 +3387,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="superunop" cloneof="superuno">
 		<!-- snescentral.com -->
-		<description>Super Uno (Jpn, Prototype)</description>
+		<description>Super Uno (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Tomy</publisher>
 		<info name="alt_title" value="スーパーUNO" />
@@ -3414,7 +3414,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sylvestr1" cloneof="sylvestr">
 		<!-- pending: awaiting documentation -->
-		<description>Sylvester and Tweety (USA, Prototype 19931215)</description>
+		<description>Sylvester and Tweety (USA, prototype 19931215)</description>
 		<year>1993</year>
 		<publisher>Visual Concepts</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -3426,7 +3426,7 @@ Beyond that last category are the roms waiting to be classified.
 	</software>
 
 	<software name="sylvestr2" cloneof="sylvestr">
-		<description>Sylvester and Tweety (USA, Prototype 19931011)</description>
+		<description>Sylvester and Tweety (USA, prototype 19931011)</description>
 		<year>1993</year>
 		<publisher>Visual Concepts</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -3439,7 +3439,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="syvalionp" cloneof="syvalion">
 		<!-- TeamEurope -->
-		<description>Syvalion (Euro, Prototype)</description>
+		<description>Syvalion (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Toshiba EMI</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3464,7 +3464,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="tecmonbaup" cloneof="tecmonba">
 		<!-- i2a2n2 -->
-		<description>Tecmo Super NBA Basketball (USA, Prototype 19921026)</description>
+		<description>Tecmo Super NBA Basketball (USA, prototype 19921026)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3489,7 +3489,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="tmnt4up" cloneof="tmnt4">
 		<!-- nintendoplayer.com -->
-		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (USA, Prototype)</description>
+		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3512,7 +3512,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="testcart">
 		<!-- Lord Nightmare -->
-		<description>Burn-In/Test Cartridge Rev D (USA, Prototype)</description>
+		<description>Burn-In/Test Cartridge Rev D (USA, prototype)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="PN23278" />
@@ -3532,7 +3532,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="tkous" cloneof="tko">
 		<!-- nesworld.com -->
-		<description>TKO Super Championship Boxing (USA, Prototype 199208xx)</description>
+		<description>TKO Super Championship Boxing (USA, prototype 199208xx)</description>
 		<year>1992</year>
 		<publisher>Sofel</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3623,7 +3623,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="wildgunsup" cloneof="wildguns">
 		<!-- lostleves.org -->
-		<description>Wild Guns (USA, Final Prototype)</description>
+		<description>Wild Guns (USA, final prototype)</description>
 		<year>1995</year>
 		<publisher>Natsume</publisher>
 		<info name="release" value="199507xx" />
@@ -3688,7 +3688,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="yoshicokup" cloneof="yoshicok">
 		<!-- legrospixel.com -->
-		<description>Yoshi's Cookie (USA, Prototype 19930119)</description>
+		<description>Yoshi's Cookie (USA, prototype 19930119)</description>
 		<year>1993</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3711,7 +3711,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="zoopp" cloneof="zoop">
 		<!-- nesworld.com -->
-		<description>Zoop (USA, Prototype 19950720)</description>
+		<description>Zoop (USA, prototype 19950720)</description>
 		<year>1996</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3748,7 +3748,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="arcus">
 		<!-- Notes: not much is known about this rom, this title was displayed at the 1993 Summer CES but there is no evidence of any localization progress -->
-		<description>Arcus Odyssey (USA, Prototype)</description>
+		<description>Arcus Odyssey (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -3764,7 +3764,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="batman">
 		<!-- Notes: never announced, unknown source, it isn't even known whether it is an image or a binary
 		            however Software Creations was indeed known for developing comic based video games -->
-		<description>Batman (USA, Prototype)</description>
+		<description>Batman (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Software Creations</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -3780,7 +3780,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="bobbywld">
 		<!-- Notes: while it appears clear that this is a dumped rom image,
 		            there's still an ongoing debate about whether it was released or cancelled -->
-		<description>Bobby's World (USA, Prototype)</description>
+		<description>Bobby's World (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Hi-Tech Expressions</publisher> <!-- cancelled? -->
 		<info name="serial" value="SNS-ABWE-USA" /> <!-- based on header -->
@@ -3795,7 +3795,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="bubsyup1" cloneof="bubsy">
 		<!-- Notes: this rom image was released by a bbs group in March 1993
 		            it is 23 bytes away from the final release so it is most certainly the final prototype -->
-		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Final Prototype)</description>
+		<description>Bubsy in Claws Encounters of the Furred Kind (USA, final prototype)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3808,7 +3808,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="bubsyup2" cloneof="bubsy">
 		<!-- Notes: this rom image was released without any documentation -->
-		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype)</description>
+		<description>Bubsy in Claws Encounters of the Furred Kind (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3821,7 +3821,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="chodorap" cloneof="mcfang">
 		<!-- Notes: this rom image was released without any documentation -->
-		<description>Chou Makai Taisen! Dorabocchan (Jpn, Prototype 19921221)</description>
+		<description>Chou Makai Taisen! Dorabocchan (Jpn, prototype 19921221)</description>
 		<year>1993</year>
 		<publisher>Naxat Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3837,7 +3837,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="contra3p1" cloneof="sprobot">
 		<!-- Notes: this rom image was released in 2014 without any documentation, despite its name, it is a prototype of Contra III
 		            the rom was overdumped to 4MiB likely due to header based dumping tools, the right size "should be" 1MiB -->
-		<description>Contra IV: The Alien Wars (USA, Prototype)</description>
+		<description>Contra IV: The Alien Wars (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3851,7 +3851,7 @@ Beyond that last category are the roms waiting to be classified.
 	</software>
 
 	<software name="contra3p2" cloneof="sprobot">
-		<description>Contra III - The Alien Wars (USA, Prototype, Alt)</description>
+		<description>Contra III - The Alien Wars (USA, prototype, alt)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3866,7 +3866,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="cybernatup" cloneof="cybernat">
 		<!-- Notes: this rom image was released by retrology with only a picture of the cartridge (model SNS-006) -->
-		<description>Cybernator (USA, Prototype 199211)</description>
+		<description>Cybernator (USA, prototype 199211)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3879,7 +3879,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="darkkingp" cloneof="darkking">
 		<!-- unknown/auction -->
-		<description>Dark Kingdom (Jpn, Prototype Ver. 0.55)</description>
+		<description>Dark Kingdom (Jpn, prototype Ver. 0.55)</description>
 		<year>1994</year>
 		<publisher>Nihon Telenet</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3906,7 +3906,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="demonblzp" cloneof="demoncrt">
 		<!-- Notes: this rom image was released without any documentation -->
-		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn, Prototype)</description>
+		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3919,7 +3919,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="firearm">
 		<!-- Notes: released on the snesorama boards in 2010 without any documentation, due to the bad internal size it is likely a compiled binary -->
-		<description>Firearm (USA, Prototype)</description> <!-- it supposedly had the date stamp 19931217 but it is not confirmed -->
+		<description>Firearm (USA, prototype)</description> <!-- it supposedly had the date stamp 19931217 but it is not confirmed -->
 		<year>1993</year>
 		<publisher>Malibu Interactive</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -3932,7 +3932,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="firstsamp" cloneof="firstsam">
 		<!-- Notes: removal recommended, floating ROM labelled "beta" without any proof after a mismatching redump -->
-		<description>First Samurai (Euro, Prototype?)</description>
+		<description>First Samurai (Euro, prototype?)</description>
 		<year>1993</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3945,7 +3945,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="flintsmp" cloneof="flintsm">
 		<!-- Notes: this legitimate prototype cartridge owned by nesworld.com is glued shut so there is no information about the board -->
-		<description>The Flintstones - The Treasure of Sierra Madrock (USA, Prototype)</description>
+		<description>The Flintstones - The Treasure of Sierra Madrock (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="snes_cart">
@@ -3960,7 +3960,7 @@ Beyond that last category are the roms waiting to be classified.
 	</software>
 
 	<software name="ggoemon3p" cloneof="ggoemon3">
-		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn, Prototype 19941024)</description>
+		<description>Ganbare Goemon 3 - Shishi Juurokubee no Karakuri Manjigatame (Jpn, prototype 19941024)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="がんばれゴエモン3 獅子重禄兵衛のからくり卍固め" />
@@ -3978,7 +3978,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="hakpro94p" cloneof="hakpro94">
 		<!-- unknown/auction -->
-		<description>Hakunetsu Pro Yakyuu '94 - Ganba League 3 (Jpn, Prototype 19931119)</description>
+		<description>Hakunetsu Pro Yakyuu '94 - Ganba League 3 (Jpn, prototype 19931119)</description>
 		<year>1993</year>
 		<publisher>Epic / Sony Records</publisher>
 		<info name="alt_title" value="白熱プロ野球'94 ガンバリーグ3" />
@@ -4004,7 +4004,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="jellybo2">
 		<!-- Notes: there is no public information about this prototype -->
-		<description>Jelly Boy 2 (Jpn, Prototype)</description>
+		<description>Jelly Boy 2 (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Game Freak</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4020,7 +4020,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="mazingera" cloneof="mazinger">
 		<!-- Notes: removal recommended, floating rom with a good checksum, unknown source,
 		            could be a prototype, but could also be a hack or bad dump with a fixed checksum -->
-		<description>Mazinger Z (Jpn, Prototype?)</description>
+		<description>Mazinger Z (Jpn, prototype?)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="alt_title" value="マジンガーZ" />
@@ -4035,7 +4035,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="mickmack">
 		<!-- Notes: not much is known about this prototype, but it was shown during the Winter 1993 CES
 		        the header was likely hacked with a bbs phone number -->
-		<description>Mick &amp; Mack as the Global Gladiators (USA, Prototype Hacked)</description>
+		<description>Mick &amp; Mack as the Global Gladiators (USA, prototype Hacked)</description>
 		<year>1993</year>
 		<publisher>Virgin Games</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4049,7 +4049,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="mickeypa">
 		<!-- Notes: not much is known about the origin of this prototype,
 		            but one of the developers, Eric Browning, confirmed he worked on this game in an interview -->
-		<description>Mickey's Playtown Adventure - A Day of Discovery! (USA, Prototype)</description>
+		<description>Mickey's Playtown Adventure - A Day of Discovery! (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Hi-Tech Expressions</publisher> <!-- cancelled -->
 		<info name="serial" value="SNS-AMPE-USA" /> <!-- based on header -->
@@ -4063,7 +4063,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mrbloopya" cloneof="mrbloopy">
 		<!-- Notes: the following prototype is hosted in a board that doesn't appear legitimate, a confirmation is required -->
-		<description>Mr. Bloopy - Saves the World (USA, Prototype 19940621 Level 11-G)</description>
+		<description>Mr. Bloopy - Saves the World (USA, prototype 19940621 Level 11-G)</description>
 		<year>1994</year>
 		<publisher>Compedia</publisher>  <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4076,7 +4076,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mrbloopyb" cloneof="mrbloopy">
 		<!-- Notes: the following prototype is hosted in a board that doesn't appear legitimate, a confirmation is required -->
-		<description>Mr. Bloopy - Saves the World (USA, Prototype 19940621 Levels 000)</description>
+		<description>Mr. Bloopy - Saves the World (USA, prototype 19940621 Levels 000)</description>
 		<year>1994</year>
 		<publisher>Compedia</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4089,7 +4089,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="mrbloopyc" cloneof="mrbloopy">
 		<!-- Notes: the following prototype is hosted in a board that doesn't appear legitimate, a confirmation is required -->
-		<description>Mr. Bloopy - Saves the World (USA, Prototype 19940622 Levels-B)</description>
+		<description>Mr. Bloopy - Saves the World (USA, prototype 19940622 Levels-B)</description>
 		<year>1994</year>
 		<publisher>Compedia</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4102,7 +4102,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="muhammad">
 		<!-- Notes: the source of this prototype is unknown, but this game was seen during the Summer 1993 CES -->
-		<description>Muhammad Ali Heavyweight Boxing (USA, Prototype)</description>
+		<description>Muhammad Ali Heavyweight Boxing (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Park Place Productions</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4115,7 +4115,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="nflqb96up" cloneof="nflqb96">
 		<!-- Notes: no public source -->
-		<description>NFL Quarterback Club 96 (USA, Prototype)</description>
+		<description>NFL Quarterback Club 96 (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4130,7 +4130,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="oonitap" cloneof="oonita">
 		<!-- unknown/auction -->
-		<description>Oonita Atsushi FMW (Jpn, Prototype)</description>
+		<description>Oonita Atsushi FMW (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4157,7 +4157,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="pagemstrup1" cloneof="pagemstr">
 		<!-- Notes: released by bbs group ACC (accumulators) at the beginning of August 1993, the header was hacked -->
-		<description>The Pagemaster (USA, Prototype 19940718)</description>
+		<description>The Pagemaster (USA, prototype 19940718)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4173,7 +4173,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="pagemstrup2" cloneof="pagemstr">
 		<!-- Notes: released by bbs group ACC (accumulators) at the end of August 1993 -->
-		<description>The Pagemaster (USA, Prototype 19940823)</description>
+		<description>The Pagemaster (USA, prototype 19940823)</description>
 		<year>1994</year>
 		<publisher>Fox Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4187,7 +4187,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="pikiinyap" cloneof="pikiinya">
 		<!-- unknown/auction -->
-		<description>Pikiinya! (Jpn, Prototype)</description>
+		<description>Pikiinya! (Jpn, prototype)</description>
 		<year>1997</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="alt_title" value="ピキーニャ!" />
@@ -4219,7 +4219,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="powrslid">
 		<!-- unknown/auction -->
-		<description>Power Slide Super FX 94 Ects Demo (Euro, Prototype 19940412)</description>
+		<description>Power Slide Super FX 94 Ects Demo (Euro, prototype 19940412)</description>
 		<year>1994</year>
 		<publisher>Elite</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4247,7 +4247,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="prime">
 		<!-- Notes: not much is known about this rom, but many sources corroborate this game was in development by Malibu Interactive -->
-		<description>Prime (USA, Prototype)</description>
+		<description>Prime (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Malibu Interactive</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4304,7 +4304,7 @@ Beyond that last category are the roms waiting to be classified.
 	</software>
 
 	<software name="shadowa" cloneof="shadow">
-		<description>The Shadow (USA, Prototype, Alt)</description>
+		<description>The Shadow (USA, prototype, alt)</description>
 		<year>199?</year>
 		<publisher>Ocean</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4316,7 +4316,7 @@ Beyond that last category are the roms waiting to be classified.
 	</software>
 
 	<software name="shadow">
-		<description>The Shadow (USA, Prototype)</description>
+		<description>The Shadow (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Ocean</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4329,7 +4329,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="solstic2p" cloneof="equinox">
 		<!-- Notes: no source and no documentation -->
-		<description>Solstice II (Jpn, Prototype 19930303)</description>
+		<description>Solstice II (Jpn, prototype 19930303)</description>
 		<year>1993</year>
 		<publisher>Epic / Sony Records</publisher>
 		<part name="cart" interface="snes_cart">
@@ -4344,7 +4344,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="spellcra">
 		<!-- Notes: not much is known about this rom, but this game was mentioned in the May 1993 issue of Nintendo Power -->
-		<description>SpellCraft - Aspects of Valor (USA, Prototype)</description>
+		<description>SpellCraft - Aspects of Valor (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Ybarra Productions</publisher> <!-- cancelled -->
 		<info name="serial" value="SNS-C5-USA" />
@@ -4379,7 +4379,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sfulmetl">
 		<!-- Notes: not much is known about this floating rom -->
-		<description>Super Full Metal (Euro, Prototype)</description>
+		<description>Super Full Metal (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>Infogrames</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4392,7 +4392,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="sbeast">
 		<!-- Notes: not much is known about this rom, but this game was being shown at Summer CES 1992 -->
-		<description>Super Shadow of the Beast (USA, Prototype)</description>
+		<description>Super Shadow of the Beast (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>IGS</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4406,7 +4406,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="sylvestr">
 		<!-- Notes: this is the same rom as the 1993 Oct 11th prototype except it is padded, it might be an overdump,
 		            after documentation of the Oct 11th prototype is obtained, this one might be removed -->
-		<description>Sylvester and Tweety (USA, Prototype)</description>
+		<description>Sylvester and Tweety (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Visual Concepts</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4419,7 +4419,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="tinhead">
 		<!-- Notes: not much is known about this rom, but the game producer, Stuart Whyte, has confirmed its development -->
-		<description>Tinhead (Euro, Prototype)</description>
+		<description>Tinhead (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Microprose</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4432,7 +4432,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="univsold">
 		<!-- Notes: not much is known about this rom, but the game was shown during the 1992 Summer CES -->
-		<description>Universal Soldier (USA, Prototype)</description>
+		<description>Universal Soldier (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Carolco</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4445,7 +4445,7 @@ Beyond that last category are the roms waiting to be classified.
 
 	<software name="wilee">
 		<!-- Notes: appears to be a very early prototype, a more advanced version exists but is undumped -->
-		<description>Wile E Coyote's Revenge (Euro, Prototype)</description>
+		<description>Wile E Coyote's Revenge (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>Sunsoft</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -4459,7 +4459,7 @@ Beyond that last category are the roms waiting to be classified.
 	<software name="wizapp" cloneof="wizap">
 		<!-- Notes: there were two versions in goodsnes differing only on two header bytes,
 		            one of them is probably hacked, the other is included but commented out until a redump is issued -->
-		<description>Wizap! - Ankoku no Ou (Jpn, Prototype, Hacked?)</description>
+		<description>Wizap! - Ankoku no Ou (Jpn, prototype, hacked?)</description>
 		<year>1994</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="alt_title" value="ウィザップ!~暗黒の王" />
@@ -4992,7 +4992,7 @@ more investigation needed...
 	</software>
 
 	<software name="sonic4a" cloneof="speedy">
-		<description>Sonic the Hedgehog (Alt)</description>
+		<description>Sonic the Hedgehog (alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5118,7 +5118,7 @@ more investigation needed...
 
 	<software name="boogerup" cloneof="booger" supported="no"> <!-- incomplete dump -->
 		<!-- Notes: incomplete dump, only 1 out of the 6 chips are available, the original prototype board is unknown -->
-		<description>Boogerman - A Pick and Flick Adventure (USA, Prototype)</description>
+		<description>Boogerman - A Pick and Flick Adventure (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5135,7 +5135,7 @@ more investigation needed...
 	</software>
 
 	<software name="choplft3up" cloneof="choplft3">
-		<description>Choplifter III - Rescue &amp; Survive (USA, Prototype)</description>
+		<description>Choplifter III - Rescue &amp; Survive (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Extreme Entertainment Group</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5148,7 +5148,7 @@ more investigation needed...
 
 	<software name="clayfgt2up" cloneof="clayfgt2" supported="no"> <!-- incomplete dump -->
 		<!-- Notes: incomplete dump, only 3 out of the 6 chips are available, the original prototype board is unknown -->
-		<description>Clay Fighter 2 - Judgment Clay (USA, Prototype)</description>
+		<description>Clay Fighter 2 - Judgment Clay (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5215,7 +5215,7 @@ more investigation needed...
 		<!-- nintendoplayer.com -->
 		<!-- Notes: contains corrupt data,
 		            the sram is only 64Kibits instead of 256Kibits of the retail release -->
-		<description>Mario Paint (Prototype Ver. E-5)</description>
+		<description>Mario Paint (prototype Ver. E-5)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<info name="alt_title" value="マリオペイント" />
@@ -5385,7 +5385,7 @@ more investigation needed...
 	</software>
 
 	<software name="smhito3a" cloneof="smhito3">
-		<description>SM Choukyoushi Hitomi Vol. 3 (Jpn, Alt)</description>
+		<description>SM Choukyoushi Hitomi Vol. 3 (Jpn, alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5425,7 +5425,7 @@ more investigation needed...
 	</software>
 
 	<software name="spidxmenup" cloneof="spidxmen">
-		<description>Spider-Man and the X-Men in Arcade's Revenge (USA, Prototype)</description>
+		<description>Spider-Man and the X-Men in Arcade's Revenge (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5454,7 +5454,7 @@ more investigation needed...
 	</software>
 
 	<software name="suprputtp" cloneof="suprputt">
-		<description>Super Putty (Euro, Prototype)</description>
+		<description>Super Putty (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5479,7 +5479,7 @@ more investigation needed...
 
 	<software name="syndicatup" cloneof="syndicat" supported="no"> <!-- incomplete dump -->
 		<!-- Notes: underdump, owned by Retrology -->
-		<description>Syndicate (USA, Prototype 19941011)</description>
+		<description>Syndicate (USA, prototype 19941011)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -5502,7 +5502,7 @@ more investigation needed...
 		<!-- nesworld.com -->
 		<!-- retrogamesuk -->
 		<!-- Notes: the second chip is probably corrupt -->
-		<description>Tony Meola's Sidekicks Soccer (USA, Prototype)</description>
+		<description>Tony Meola's Sidekicks Soccer (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="snes_cart">
@@ -6420,7 +6420,7 @@ more investigation needed...
 	</software>
 
 	<software name="aladdinua" cloneof="aladdin">
-		<description>Disney's Aladdin (USA, Alt)</description>
+		<description>Disney's Aladdin (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SNS-RJ-USA" />
@@ -7118,7 +7118,7 @@ more investigation needed...
 	</software>
 
 	<software name="bahamuta" cloneof="bahamut">
-		<description>Bahamut Lagoon (Jpn, Alt)</description>
+		<description>Bahamut Lagoon (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-AXBJ-JPN" />
@@ -9822,7 +9822,7 @@ more investigation needed...
 	</software>
 
 	<software name="ctriggerja" cloneof="ctrigger">
-		<description>Chrono Trigger (Jpn, Alt)</description>
+		<description>Chrono Trigger (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-ACTJ-JPN " />
@@ -11023,7 +11023,7 @@ more investigation needed...
 	</software>
 
 	<software name="dstall3ca" cloneof="dstall3">
-		<description>Derby Stallion III (Jpn, Alt)</description>
+		<description>Derby Stallion III (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>ASCII Entertainment</publisher>
 		<info name="serial" value="SHVC-AD3J-JPN" />
@@ -11732,7 +11732,7 @@ more investigation needed...
 	</software>
 
 	<software name="dbzbutodja" cloneof="dbzbutod">
-		<description>Dragon Ball Z - Super Butouden (Jpn, Alt)</description>
+		<description>Dragon Ball Z - Super Butouden (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-Z2" />
@@ -11778,7 +11778,7 @@ more investigation needed...
 	</software>
 
 	<software name="dbzbuto2ja1" cloneof="dbzbuto2">
-		<description>Dragon Ball Z - Super Butouden 2 (Jpn, Alt)</description>
+		<description>Dragon Ball Z - Super Butouden 2 (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="SHVC-EF" />
@@ -12012,7 +12012,7 @@ more investigation needed...
 	</software>
 
 	<software name="dquest6a" cloneof="dquest6">
-		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn, Alt)</description>
+		<description>Dragon Quest VI - Maboroshi no Daichi (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="SHVC-AQ6J-JPN" />
@@ -13196,7 +13196,7 @@ more investigation needed...
 	</software>
 
 	<software name="ffant5ja" cloneof="ffant5j">
-		<description>Final Fantasy V (Jpn, Alt)</description>
+		<description>Final Fantasy V (Jpn, alt)</description>
 		<year>1992</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-F5" />
@@ -13253,7 +13253,7 @@ more investigation needed...
 	</software>
 
 	<software name="ffant6ja" cloneof="ffant3">
-		<description>Final Fantasy VI (Jpn, Alt)</description>
+		<description>Final Fantasy VI (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-F6" />
@@ -13764,7 +13764,7 @@ more investigation needed...
 	</software>
 
 	<software name="gunhazrd1" cloneof="gunhazrd">
-		<description>Front Mission Series - Gun Hazard (Jpn, Alt)</description>
+		<description>Front Mission Series - Gun Hazard (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-AZGJ-JPN" />
@@ -15994,7 +15994,7 @@ more investigation needed...
 	</software>
 
 	<software name="powyak3a" cloneof="powyak3">
-		<description>Jikkyou Powerful Pro Yakyuu 3 (Jpn, Alt)</description>
+		<description>Jikkyou Powerful Pro Yakyuu 3 (Jpn, alt)</description>
 		<year>1996</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SHVC-A3JJ-JPN" />
@@ -16571,7 +16571,7 @@ more investigation needed...
 	</software>
 
 	<software name="kamaita1" cloneof="kamaita">
-		<description>Kamaitachi no Yoru (Jpn, Alt)</description>
+		<description>Kamaitachi no Yoru (Jpn, alt)</description>
 		<year>1994</year>
 		<publisher>Chunsoft</publisher>
 		<info name="serial" value="SHVC-EU" />
@@ -17666,7 +17666,7 @@ more investigation needed...
 	</software>
 
 	<software name="lionkinga" cloneof="lionking">
-		<description>The Lion King (Euro, Alt)</description>
+		<description>The Lion King (Euro, alt)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="SNSP-ALKP FRA" />
@@ -18293,7 +18293,7 @@ more investigation needed...
 	</software>
 
 	<software name="mariowara" cloneof="mariowar">
-		<description>Mario &amp; Wario (Jpn, Alt)</description>
+		<description>Mario &amp; Wario (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-WE" />
@@ -19037,7 +19037,7 @@ more investigation needed...
 	</software>
 
 	<software name="mkua" cloneof="mk">
-		<description>Mortal Kombat (USA, Alt)</description>
+		<description>Mortal Kombat (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="SNS-KX-USA" />
@@ -22289,7 +22289,7 @@ more investigation needed...
 	</software>
 
 	<software name="romsaga2a" cloneof="romsaga2">
-		<description>Romancing Sa-Ga 2 (Jpn, Alt)</description>
+		<description>Romancing Sa-Ga 2 (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-2L" />
@@ -23081,7 +23081,7 @@ more investigation needed...
 	</software>
 
 	<software name="manaua" cloneof="mana">
-		<description>Secret of Mana (USA, Alt)</description>
+		<description>Secret of Mana (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SNS-K2-USA" />
@@ -23136,7 +23136,7 @@ more investigation needed...
 	</software>
 
 	<software name="seikndn2a" cloneof="mana">
-		<description>Seiken Densetsu 2 (Jpn, Alt)</description>
+		<description>Seiken Densetsu 2 (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-K2" />
@@ -23192,7 +23192,7 @@ more investigation needed...
 	</software>
 
 	<software name="seikndn3a" cloneof="seikndn3">
-		<description>Seiken Densetsu 3 (Jpn, Alt)</description>
+		<description>Seiken Densetsu 3 (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Square</publisher>
 		<info name="serial" value="SHVC-A3DJ-JPN" />
@@ -23496,7 +23496,7 @@ more investigation needed...
 
 	<software name="shinmomoa1" cloneof="shinmomo">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Shin Momotarou Densetsu (Jpn, Alt)</description>
+		<description>Shin Momotarou Densetsu (Jpn, alt)</description>
 		<year>1992</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-M5" />
@@ -24728,7 +24728,7 @@ more investigation needed...
 	</software>
 
 	<software name="sf2a" cloneof="sf2">
-		<description>Street Fighter II - The World Warrior (Euro, Alt)</description>
+		<description>Street Fighter II - The World Warrior (Euro, alt)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SNSP-S2-FAH, SNSP-S2-NOE, SNSP-S2-NOE-1" />
@@ -24771,7 +24771,7 @@ more investigation needed...
 	</software>
 
 	<software name="sf2ja" cloneof="sf2">
-		<description>Street Fighter II - The World Warrior (Jpn, Alt)</description>
+		<description>Street Fighter II - The World Warrior (Jpn, alt)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-S2" />
@@ -24880,7 +24880,7 @@ more investigation needed...
 
 	<software name="sf2tja" cloneof="sf2t">
 		<!-- Notes: Also re-released through Nintendo Power -->
-		<description>Street Fighter II Turbo - Hyper Fighting (Jpn, Alt)</description>
+		<description>Street Fighter II Turbo - Hyper Fighting (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SHVC-TI" />
@@ -24929,7 +24929,7 @@ more investigation needed...
 	</software>
 
 	<software name="sf2tub" cloneof="sf2t">
-		<description>Street Fighter II Turbo - Hyper Fighting (USA, Alt)</description>
+		<description>Street Fighter II Turbo - Hyper Fighting (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="SNS-TI-USA" />
@@ -25719,7 +25719,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc2ja1" cloneof="dkongc2">
-		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, Alt)</description>
+		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, alt)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ADNJ-JPN / G740814" />
@@ -25776,7 +25776,7 @@ more investigation needed...
 	</software>
 
 	<software name="dkongc2j1" cloneof="dkongc2">
-		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, Rev. A, Alt)</description>
+		<description>Super Donkey Kong 2 - Dixie &amp; Diddy (Jpn, Rev. A, alt)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-ADNJ-JPN-1 / G743669" />
@@ -26478,7 +26478,7 @@ more investigation needed...
 	</software>
 
 	<software name="sgboyj1" cloneof="sgboy">
-		<description>Super Game Boy (Jpn, Alt)</description> <!-- Alternate hardware -->
+		<description>Super Game Boy (Jpn, alt)</description> <!-- Alternate hardware -->
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-SGB" />
@@ -27174,7 +27174,7 @@ more investigation needed...
 	</software>
 
 	<software name="smasa" cloneof="smas">
-		<description>Super Mario All-Stars (Euro, Alt)</description>
+		<description>Super Mario All-Stars (Euro, alt)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNSP-4M-FAH" />
@@ -27242,7 +27242,7 @@ more investigation needed...
 	</software>
 
 	<software name="smasua" cloneof="smas">
-		<description>Super Mario All-Stars (USA, Alt)</description>
+		<description>Super Mario All-Stars (USA, alt)</description>
 		<year>1993</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SNS-4M-USA" />
@@ -27771,7 +27771,7 @@ more investigation needed...
 	</software>
 
 	<software name="smetroidj" cloneof="smetroid">
-		<description>Super Metroid (Jpn, Alt PCB)</description>
+		<description>Super Metroid (Jpn, alt PCB)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="SHVC-RI" />
@@ -32544,7 +32544,7 @@ Alternate board (XL-1)
 	</software>
 
 	<software name="yuyua" cloneof="yuyu">
-		<description>Yu Yu Hakusho (Jpn, Alt)</description>
+		<description>Yu Yu Hakusho (Jpn, alt)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
 		<info name="serial" value="SHVC-YY" />
@@ -34269,7 +34269,7 @@ List of unclassified roms
 	</software>
 
 	<software name="90minutep" cloneof="90minute">
-		<description>90 Minutes - European Prime Goal (Euro, Prototype)</description>
+		<description>90 Minutes - European Prime Goal (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -34485,7 +34485,7 @@ List of unclassified roms
 	</software>
 
 	<software name="pugshuntup" cloneof="pugshunt">
-		<description>The Addams Family - Pugsley's Scavenger Hunt (USA, Prototype)</description>
+		<description>The Addams Family - Pugsley's Scavenger Hunt (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34724,7 +34724,7 @@ List of unclassified roms
 	</software>
 
 	<software name="aladdinup" cloneof="aladdin">
-		<description>Disney's Aladdin (USA, Prototype)</description>
+		<description>Disney's Aladdin (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -34779,7 +34779,7 @@ List of unclassified roms
 	</software>
 
 	<software name="alien3up" cloneof="alien3">
-		<description>Alien³ (USA, Prototype)</description>
+		<description>Alien³ (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35003,7 +35003,7 @@ List of unclassified roms
 	</software>
 
 	<software name="arabianp" cloneof="arabian">
-		<description>Arabian Nights - Sabaku no Seirei Ou (Jpn, Prototype)</description>
+		<description>Arabian Nights - Sabaku no Seirei Ou (Jpn, prototype)</description>
 		<year>1996</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35096,7 +35096,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ardyligtjp" cloneof="ardyligt">
-		<description>Ardy Lightfoot (Jpn, Prototype)</description>
+		<description>Ardy Lightfoot (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35124,7 +35124,7 @@ List of unclassified roms
 	</software>
 
 	<software name="aretha2p1" cloneof="aretha2">
-		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype)</description>
+		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Yanoman Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35138,7 +35138,7 @@ List of unclassified roms
 	</software>
 
 	<software name="aretha2p2" cloneof="aretha2">
-		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype Earlier)</description>
+		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, earlier prototype)</description>
 		<year>1994</year>
 		<publisher>Yanoman Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35380,7 +35380,7 @@ List of unclassified roms
 	</software>
 
 	<software name="barbvac">
-		<description>Barbie Vacation Adventure (USA, Prototype)</description>
+		<description>Barbie Vacation Adventure (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<info name="release" value="199402xx" />
@@ -35665,7 +35665,7 @@ List of unclassified roms
 	</software>
 
 	<software name="btoadsup" cloneof="btoads">
-		<description>Battletoads in Battlemaniacs (USA, Prototype)</description>
+		<description>Battletoads in Battlemaniacs (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35695,7 +35695,7 @@ List of unclassified roms
 	</software>
 
 	<software name="beautyp" cloneof="beauty">
-		<description>Disney's Beauty and the Beast (Euro, Prototype)</description>
+		<description>Disney's Beauty and the Beast (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35760,7 +35760,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bestofp" cloneof="bestof">
-		<description>Best of the Best - Championship Karate (Euro, Prototype)</description>
+		<description>Best of the Best - Championship Karate (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35832,7 +35832,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bigskyup" cloneof="bigsky">
-		<description>Big Sky Trooper (USA, Prototype)</description>
+		<description>Big Sky Trooper (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36047,7 +36047,7 @@ List of unclassified roms
 	</software>
 
 	<software name="blackthrp" cloneof="blackhwk">
-		<description>Blackthorne (USA, Prototype CES Version)</description>
+		<description>Blackthorne (USA, prototype CES version)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36101,7 +36101,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bluesbp" cloneof="bluesb">
-		<description>The Blues Brothers (Euro, Prototype)</description>
+		<description>The Blues Brothers (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Titus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36204,7 +36204,7 @@ List of unclassified roms
 	</software>
 
 	<software name="bountyswp" cloneof="bountysw">
-		<description>Bounty Sword (Jpn, Prototype 19950516)</description>
+		<description>Bounty Sword (Jpn, prototype 19950516)</description>
 		<year>1995</year>
 		<publisher>Pioneer</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36271,7 +36271,7 @@ List of unclassified roms
 	</software>
 
 	<software name="draculaup" cloneof="dracula">
-		<description>Bram Stoker's Dracula (USA, Prototype)</description>
+		<description>Bram Stoker's Dracula (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36401,7 +36401,7 @@ List of unclassified roms
 	</software>
 
 	<software name="brutalup" cloneof="brutal">
-		<description>Brutal - Paws of Fury (USA, Prototype)</description>
+		<description>Brutal - Paws of Fury (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>CyberSoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36465,7 +36465,7 @@ List of unclassified roms
 
 <!-- Prototype for the European version of Jim Power -->
 	<software name="buckrog" cloneof="jimpower">
-		<description>Buck Rogers - The Arcade Game (Euro, Prototype)</description>
+		<description>Buck Rogers - The Arcade Game (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -36565,7 +36565,7 @@ List of unclassified roms
 	</software>
 
 	<software name="calripknup" cloneof="calripkn">
-		<description>Cal Ripken Jr. Baseball (USA, Prototype)</description>
+		<description>Cal Ripken Jr. Baseball (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36805,7 +36805,7 @@ List of unclassified roms
 	</software>
 
 	<software name="chavezp" cloneof="chavez">
-		<description>Chavez (USA, Prototype)</description>
+		<description>Chavez (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36846,7 +36846,7 @@ List of unclassified roms
 	</software>
 
 	<software name="chesterwp" cloneof="chesterw">
-		<description>Chester Cheetah - Wild Wild Quest (USA, Prototype)</description>
+		<description>Chester Cheetah - Wild Wild Quest (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Kaneko</publisher>
 		<part name="cart" interface="snes_cart">
@@ -36991,7 +36991,7 @@ List of unclassified roms
 	</software>
 
 	<software name="chuckrckup" cloneof="chuckrck">
-		<description>Chuck Rock (USA, Prototype)</description>
+		<description>Chuck Rock (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37018,7 +37018,7 @@ List of unclassified roms
 	</software>
 
 	<software name="civilizp" cloneof="civiliz">
-		<description>Sid Meier's Civilization (USA, Prototype)</description>
+		<description>Sid Meier's Civilization (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Koei</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37312,7 +37312,7 @@ List of unclassified roms
 	</software>
 
 	<software name="coolspotup" cloneof="coolspot">
-		<description>Cool Spot (USA, Prototype)</description>
+		<description>Cool Spot (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37336,7 +37336,7 @@ List of unclassified roms
 	</software>
 
 	<software name="coolsknk">
-		<description>Cooly Skunk (Jpn, Prototype)</description>
+		<description>Cooly Skunk (Jpn, prototype)</description>
 		<year>1996</year>
 		<publisher>Visit</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37348,7 +37348,7 @@ List of unclassified roms
 	</software>
 
 	<software name="cornbust">
-		<description>Corn Buster (Euro, Prototype)</description>
+		<description>Corn Buster (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37470,7 +37470,7 @@ List of unclassified roms
 	</software>
 
 	<software name="cyborg9p" cloneof="cyborg9">
-		<description>Cyborg 009 (Jpn, Prototype)</description>
+		<description>Cyborg 009 (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>BEC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -37950,7 +37950,7 @@ List of unclassified roms
 	</software>
 
 	<software name="desertfp" cloneof="desertf">
-		<description>Desert Fighter (Euro, Prototype)</description>
+		<description>Desert Fighter (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38354,7 +38354,7 @@ List of unclassified roms
 
 <!-- binary built from source -->
 	<software name="dorque1">
-		<description>Dorque &amp; Imp (Euro, Prototype World 1)</description>
+		<description>Dorque &amp; Imp (Euro, prototype World 1)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -38367,7 +38367,7 @@ List of unclassified roms
 
 <!-- binary built from source -->
 	<software name="dorque2" cloneof="dorque1">
-		<description>Dorque &amp; Imp (Euro, Prototype World 2)</description>
+		<description>Dorque &amp; Imp (Euro, prototype World 2)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -38380,7 +38380,7 @@ List of unclassified roms
 
 <!-- binary built from source -->
 	<software name="dorque3" cloneof="dorque1">
-		<description>Dorque &amp; Imp (Euro, Prototype World 3)</description>
+		<description>Dorque &amp; Imp (Euro, prototype World 3)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -38744,7 +38744,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dlairp" cloneof="dlair">
-		<description>Dragon's Lair (Euro, Prototype)</description>
+		<description>Dragon's Lair (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38830,7 +38830,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dreamtvp1" cloneof="dreamtv">
-		<description>Dream TV (USA, Prototype, Alt)</description>
+		<description>Dream TV (USA, prototype, alt)</description>
 		<year>1994</year>
 		<publisher>Triffix</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38842,7 +38842,7 @@ List of unclassified roms
 	</software>
 
 	<software name="dreamtvp" cloneof="dreamtv">
-		<description>Dream TV (USA, Prototype)</description>
+		<description>Dream TV (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Triffix</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39108,7 +39108,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ejim2up" cloneof="ejim2">
-		<description>Earthworm Jim 2 (USA, Prototype)</description>
+		<description>Earthworm Jim 2 (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39296,7 +39296,7 @@ List of unclassified roms
 	</software>
 
 	<software name="equinoxup" cloneof="equinox">
-		<description>Equinox (USA, Prototype)</description>
+		<description>Equinox (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39367,7 +39367,7 @@ List of unclassified roms
 	</software>
 
 	<software name="espnbbup" cloneof="espnbb">
-		<description>ESPN Baseball Tonight (USA, Prototype)</description>
+		<description>ESPN Baseball Tonight (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39438,7 +39438,7 @@ List of unclassified roms
 	</software>
 
 	<software name="mbrallsr">
-		<description>Exertainment Mountain Bike Rally &amp; Speed Racer (Euro, Prototype)</description>
+		<description>Exertainment Mountain Bike Rally &amp; Speed Racer (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Life Fitness</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39593,7 +39593,7 @@ List of unclassified roms
 	</software>
 
 	<software name="f1polepoup" cloneof="f1polepo">
-		<description>F1 Pole Position (USA, Prototype)</description>
+		<description>F1 Pole Position (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39788,7 +39788,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fatfurspp" cloneof="fatfursp">
-		<description>Fatal Fury Special (Euro, Prototype)</description>
+		<description>Fatal Fury Special (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -39801,7 +39801,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fedap" cloneof="feda">
-		<description>Feda - The Emblem of Justice (Jpn, Prototype)</description>
+		<description>Feda - The Emblem of Justice (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Yanoman Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39832,7 +39832,7 @@ List of unclassified roms
 	</software>
 
 	<software name="feverpitp" cloneof="feverpit">
-		<description>Fever Pitch Soccer (Euro, Prototype)</description>
+		<description>Fever Pitch Soccer (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39944,7 +39944,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fghthistp" cloneof="fghthist">
-		<description>Fighter's History (USA, Prototype)</description>
+		<description>Fighter's History (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -40042,7 +40042,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ffight3up" cloneof="ffight3">
-		<description>Final Fight 3 (USA, Prototype)</description>
+		<description>Final Fight 3 (USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40250,7 +40250,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fstrikerp" cloneof="fstriker">
-		<description>Fire Striker (USA, Prototype)</description>
+		<description>Fire Striker (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>DTMC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40376,7 +40376,7 @@ List of unclassified roms
 	</software>
 
 	<software name="flintp" cloneof="flint">
-		<description>The Flintstones (Euro, Prototype)</description>
+		<description>The Flintstones (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40562,7 +40562,7 @@ List of unclassified roms
 	</software>
 
 	<software name="franticp" cloneof="frantic">
-		<description>Frantic Flea (Euro, Prototype)</description>
+		<description>Frantic Flea (Euro, prototype)</description>
 		<year>1996</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="snes_cart">
@@ -40684,7 +40684,7 @@ List of unclassified roms
 	</software>
 
 	<software name="fullthrtup" cloneof="fullthrt">
-		<description>Full Throttle - All-American Racing (USA, Prototype)</description>
+		<description>Full Throttle - All-American Racing (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>CyberSoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -41057,7 +41057,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ganpurup" cloneof="ganpuru">
-		<description>Ganpuru - Gunman's Proof (Jpn, Prototype)</description>
+		<description>Ganpuru - Gunman's Proof (Jpn, prototype)</description>
 		<year>1997</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -41197,7 +41197,7 @@ List of unclassified roms
 	</software>
 
 	<software name="genocid2p" cloneof="genocid2">
-		<description>Genocide 2 (Jpn, Prototype)</description>
+		<description>Genocide 2 (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -41502,7 +41502,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gokuparop" cloneof="gokuparo">
-		<description>Gokujou Parodius (Jpn, Prototype)</description>
+		<description>Gokujou Parodius (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -41840,7 +41840,7 @@ List of unclassified roms
 	</software>
 
 	<software name="gunforce">
-		<description>GunForce - Battle Fire Engulfed Terror Island (Euro, Prototype)</description>
+		<description>GunForce - Battle Fire Engulfed Terror Island (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Irem</publisher>
 		<part name="cart" interface="snes_cart">
@@ -41866,7 +41866,7 @@ List of unclassified roms
 	</software>
 
 	<software name="haganejp" cloneof="hagane">
-		<description>Hagane (Jpn, Prototype)</description>
+		<description>Hagane (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -42137,7 +42137,7 @@ List of unclassified roms
 	</software>
 
 	<software name="harleyup" cloneof="harley">
-		<description>Harley's Humongous Adventure (USA, Prototype)</description>
+		<description>Harley's Humongous Adventure (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">
@@ -42954,7 +42954,7 @@ List of unclassified roms
 	</software>
 
 	<software name="hookup" cloneof="hook">
-		<description>Hook (USA, Prototype)</description>
+		<description>Hook (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43071,7 +43071,7 @@ List of unclassified roms
 	</software>
 
 	<software name="huntredp" cloneof="huntred">
-		<description>The Hunt for Red October (Euro, Prototype)</description>
+		<description>The Hunt for Red October (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43123,7 +43123,7 @@ List of unclassified roms
 	</software>
 
 	<software name="hurricanp" cloneof="hurrican">
-		<description>Hurricanes (Euro, Prototype)</description>
+		<description>Hurricanes (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43306,7 +43306,7 @@ List of unclassified roms
 	</software>
 
 	<software name="illgaiap" cloneof="illtime">
-		<description>Illusion of Gaia (USA, Prototype)</description>
+		<description>Illusion of Gaia (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43408,7 +43408,7 @@ List of unclassified roms
 	</software>
 
 	<software name="crashdumup" cloneof="crashdum">
-		<description>The Incredible Crash Dummies (USA, Prototype)</description>
+		<description>The Incredible Crash Dummies (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43605,7 +43605,7 @@ List of unclassified roms
 	</software>
 
 	<software name="ironcomm">
-		<description>Iron Commando (Euro, Prototype)</description>
+		<description>Iron Commando (Euro, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43710,7 +43710,7 @@ List of unclassified roms
 	</software>
 
 	<software name="izzyqstup" cloneof="izzyqst">
-		<description>Izzy's Quest for the Olympic Rings (USA, Prototype)</description>
+		<description>Izzy's Quest for the Olympic Rings (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="snes_cart">
@@ -43735,7 +43735,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jlexct95p" cloneof="jlexct95">
-		<description>J.League Excite Stage '95 (Jpn, Prototype)</description>
+		<description>J.League Excite Stage '95 (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Epoch</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -44123,7 +44123,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jikkscr2p" cloneof="jikkscr2">
-		<description>Jikkyou World Soccer 2 - Fighting Eleven (Jpn, Prototype)</description>
+		<description>Jikkyou World Soccer 2 - Fighting Eleven (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Konami</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -44149,7 +44149,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jimpower">
-		<description>Jim Power - The Lost Dimension in 3D (Euro, Prototype)</description>
+		<description>Jim Power - The Lost Dimension in 3D (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
 		<part name="cart" interface="snes_cart">
@@ -44393,7 +44393,7 @@ List of unclassified roms
 	</software>
 
 	<software name="joemacp" cloneof="joemac">
-		<description>Joe &amp; Mac - Caveman Ninja (Euro, Prototype)</description>
+		<description>Joe &amp; Mac - Caveman Ninja (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Elite Systems</publisher>
 		<part name="cart" interface="snes_cart">
@@ -44432,7 +44432,7 @@ List of unclassified roms
 	</software>
 
 	<software name="joemac2up" cloneof="joemac3">
-		<description>Joe &amp; Mac 2 - Lost in the Tropics (USA, Prototype)</description>
+		<description>Joe &amp; Mac 2 - Lost in the Tropics (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -44459,7 +44459,7 @@ List of unclassified roms
 	</software>
 
 	<software name="joemac3p" cloneof="joemac3">
-		<description>Joe &amp; Mac 3 - Lost in the Tropics (Euro, Prototype)</description>
+		<description>Joe &amp; Mac 3 - Lost in the Tropics (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="snes_cart">
@@ -44640,7 +44640,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jungleup" cloneof="jungle">
-		<description>Walt Disney's Classics - The Jungle Book (USA, Prototype)</description>
+		<description>Walt Disney's Classics - The Jungle Book (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -44697,7 +44697,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jparkp" cloneof="jpark">
-		<description>Jurassic Park (Euro, Prototype)</description>
+		<description>Jurassic Park (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -44797,7 +44797,7 @@ List of unclassified roms
 	</software>
 
 	<software name="jpark2up" cloneof="jpark2">
-		<description>Jurassic Park II - The Chaos Continues (USA, Prototype)</description>
+		<description>Jurassic Park II - The Chaos Continues (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -45275,7 +45275,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kickoff3p" cloneof="kickoff3">
-		<description>Kick Off 3 - European Challenge (Euro, Prototype)</description>
+		<description>Kick Off 3 - European Challenge (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -45343,7 +45343,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kidklownup" cloneof="kidklown">
-		<description>Kid Klown in Crazy Chase (USA, Prototype)</description>
+		<description>Kid Klown in Crazy Chase (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -45495,7 +45495,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kinstup" cloneof="kinst">
-		<description>Killer Instinct (USA, Prototype)</description>
+		<description>Killer Instinct (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -45549,7 +45549,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kingartwup" cloneof="kingartw">
-		<description>King Arthur's World (USA, Prototype)</description>
+		<description>King Arthur's World (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -45781,7 +45781,7 @@ List of unclassified roms
 	</software>
 
 	<software name="kishinkop" cloneof="kishinko">
-		<description>Kishin Kourinden Oni (Jpn, Prototype)</description>
+		<description>Kishin Kourinden Oni (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46369,7 +46369,7 @@ List of unclassified roms
 	</software>
 
 	<software name="lawnmowrup" cloneof="lawnmowr">
-		<description>The Lawnmower Man (USA, Prototype)</description>
+		<description>The Lawnmower Man (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>T*HQ</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46457,7 +46457,7 @@ List of unclassified roms
 	</software>
 
 	<software name="legendup" cloneof="legend">
-		<description>Legend (USA, Prototype)</description>
+		<description>Legend (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Seika</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46685,7 +46685,7 @@ List of unclassified roms
 	</software>
 
 	<software name="lilmagicjp" cloneof="lilmagic">
-		<description>Little Magic (Jpn, Prototype)</description>
+		<description>Little Magic (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Altron</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46731,7 +46731,7 @@ List of unclassified roms
 <!-- This is believed to match the original prototype binary, even if no extensive analysis has been carried out
 to ensure nothing has been touched in the Retro Quest cart production in 2013/2014 -->
 	<software name="lobo">
-		<description>Lobo (USA, Prototype, Dumped from bootleg cart)</description>
+		<description>Lobo (USA, prototype, dumped from bootleg cart)</description>
 		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46875,7 +46875,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="lostvikup" cloneof="lostvik">
-		<description>The Lost Vikings (USA, Prototype)</description>
+		<description>The Lost Vikings (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -46985,7 +46985,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="lufiap" cloneof="lufia">
-		<description>Lufia &amp; The Fortress of Doom (USA, Prototype)</description>
+		<description>Lufia &amp; The Fortress of Doom (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Taito</publisher>
 		<part name="cart" interface="snes_cart">
@@ -47269,7 +47269,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mickeymqup" cloneof="mickeymq">
-		<description>The Magical Quest Starring Mickey Mouse (USA, Prototype)</description>
+		<description>The Magical Quest Starring Mickey Mouse (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="snes_cart">
@@ -47555,7 +47555,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="manchestp" cloneof="manchest">
-		<description>Manchester United Championship Soccer (Euro, Prototype)</description>
+		<description>Manchester United Championship Soccer (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -47797,7 +47797,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="frankenp" cloneof="franken">
-		<description>Mary Shelley's Frankenstein (USA, Prototype)</description>
+		<description>Mary Shelley's Frankenstein (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -47849,7 +47849,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="maskup" cloneof="mask">
-		<description>The Mask (USA, Prototype)</description>
+		<description>The Mask (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="snes_cart">
@@ -48029,7 +48029,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="megalop" cloneof="megalo">
-		<description>Mega Lo Mania (Euro, Prototype)</description>
+		<description>Mega Lo Mania (Euro, prototype)</description>
 		<year>1991</year>
 		<publisher>Virgin Interactive</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -48493,7 +48493,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mightmg3p" cloneof="mightmg3">
-		<description>Might and Magic III - Isles of Terra (USA, Prototype)</description>
+		<description>Might and Magic III - Isles of Terra (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>FCI</publisher>
 		<part name="cart" interface="snes_cart">
@@ -48535,7 +48535,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mightmaxup" cloneof="mightmax">
-		<description>Mighty Max (USA, Prototype)</description>
+		<description>Mighty Max (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -48796,7 +48796,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mkp" cloneof="mk">
-		<description>Mortal Kombat (Euro, Prototype)</description>
+		<description>Mortal Kombat (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -48823,7 +48823,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mk3p" cloneof="mk3">
-		<description>Mortal Kombat 3 (Euro, Prototype)</description>
+		<description>Mortal Kombat 3 (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -48835,7 +48835,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mk3up1" cloneof="mk3">
-		<description>Mortal Kombat 3 (USA, Prototype, Alt)</description>
+		<description>Mortal Kombat 3 (USA, prototype, alt)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -48954,7 +48954,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mrnutzup" cloneof="mrnutz">
-		<description>Mr Nutz (USA, Prototype)</description>
+		<description>Mr Nutz (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49019,7 +49019,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mrtuff">
-		<description>Mr. Tuff (Euro, Prototype 19941205)</description>
+		<description>Mr. Tuff (Euro, prototype 19941205)</description>
 		<year>1994</year>
 		<publisher>Sales Curve Interactive</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -49410,7 +49410,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbajamteup" cloneof="nbajamte">
-		<description>NBA Jam - Tournament Edition (USA, Prototype)</description>
+		<description>NBA Jam - Tournament Edition (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49546,7 +49546,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nbashowp" cloneof="nbashow">
-		<description>NBA Showdown (USA, Prototype)</description>
+		<description>NBA Showdown (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49575,7 +49575,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ncaabaskp" cloneof="wlbasket">
-		<description>NCAA Basketball (USA, Prototype)</description>
+		<description>NCAA Basketball (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49664,7 +49664,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="networkq">
-		<description>Network Q Rally (USA, Prototype)</description>
+		<description>Network Q Rally (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Europress</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49815,7 +49815,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nflqbup" cloneof="nflqb">
-		<description>NFL Quarterback Club (USA, Prototype)</description>
+		<description>NFL Quarterback Club (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49902,7 +49902,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nhl94up" cloneof="nhl94">
-		<description>NHL '94 (USA, Prototype)</description>
+		<description>NHL '94 (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -49942,7 +49942,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="nhl97up" cloneof="nhl97">
-		<description>NHL '97 (USA, Prototype)</description>
+		<description>NHL '97 (USA, prototype)</description>
 		<year>1996</year>
 		<publisher>Black Pearl</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50738,7 +50738,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ootwp" cloneof="anotherw">
-		<description>Out of This World (USA, Prototype)</description>
+		<description>Out of This World (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Interplay</publisher>
 		<part name="cart" interface="snes_cart">
@@ -50890,7 +50890,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pacintimp" cloneof="pacintim">
-		<description>Pac-in-Time (Euro, Prototype)</description>
+		<description>Pac-in-Time (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -51526,7 +51526,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="phalanxup" cloneof="phalanx">
-		<description>Phalanx - The Enforce Fighter A-144 (USA, Prototype)</description>
+		<description>Phalanx - The Enforce Fighter A-144 (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -51565,7 +51565,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="phantomup" cloneof="phantom">
-		<description>Phantom 2040 (USA, Prototype)</description>
+		<description>Phantom 2040 (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Viacom New Media</publisher>
 		<part name="cart" interface="snes_cart">
@@ -51807,7 +51807,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pbdreamsp" cloneof="pbdreams">
-		<description>Pinball Dreams (Euro, Prototype)</description>
+		<description>Pinball Dreams (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="snes_cart">
@@ -51914,7 +51914,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pinkie">
-		<description>Pinkie (USA, Prototype)</description>
+		<description>Pinkie (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Data Design</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52024,7 +52024,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pitfallup" cloneof="pitfall">
-		<description>Pitfall - The Mayan Adventure (USA, Prototype)</description>
+		<description>Pitfall - The Mayan Adventure (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52160,7 +52160,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pocky2up" cloneof="pocky2">
-		<description>Pocky &amp; Rocky 2 (USA, Prototype)</description>
+		<description>Pocky &amp; Rocky 2 (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Natsume</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52380,7 +52380,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="powerinsp" cloneof="powerins">
-		<description>Power Instinct (USA, Prototype)</description>
+		<description>Power Instinct (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52435,7 +52435,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="powerpigp" cloneof="powerpig">
-		<description>Power Piggs of the Dark Age (Euro, Prototype)</description>
+		<description>Power Piggs of the Dark Age (Euro, prototype)</description>
 		<year>1996</year>
 		<publisher>Titus</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52526,7 +52526,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="primalup" cloneof="primal">
-		<description>Primal Rage (USA, Prototype)</description>
+		<description>Primal Rage (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52739,7 +52739,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="proyakpzp" cloneof="proyakpz">
-		<description>Pro Yakyuu Nettou Puzzle Stadium (Jpn, Prototype)</description>
+		<description>Pro Yakyuu Nettou Puzzle Stadium (Jpn, prototype)</description>
 		<year>1997</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52780,7 +52780,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="pushoverup" cloneof="pushover">
-		<description>Push-Over (USA, Prototype)</description>
+		<description>Push-Over (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -52905,7 +52905,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="rtype3p" cloneof="rtype3">
-		<description>R-Type III - The Third Lightning (Euro, Prototype)</description>
+		<description>R-Type III - The Third Lightning (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Jaleco</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -53003,7 +53003,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="radrexup" cloneof="radrex">
-		<description>Radical Rex (USA, Prototype)</description>
+		<description>Radical Rex (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53071,7 +53071,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ranmap" cloneof="ranma">
-		<description>Ranma ½ (Euro, Prototype)</description>
+		<description>Ranma ½ (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53355,7 +53355,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="targa" cloneof="rrr2">
-		<description>Targa (Prototype)</description>
+		<description>Targa (prototype)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53570,7 +53570,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="riseroboup" cloneof="riserobo">
-		<description>Rise of the Robots (USA, Prototype)</description>
+		<description>Rise of the Robots (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53606,7 +53606,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="roadriotup" cloneof="roadriot">
-		<description>Road Riot 4WD (USA, Prototype)</description>
+		<description>Road Riot 4WD (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>T*HQ</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53618,7 +53618,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="roadrunnp" cloneof="roadrunn">
-		<description>Road Runner (Euro, Prototype)</description>
+		<description>Road Runner (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53721,7 +53721,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="rockyrod">
-		<description>Rocky Rodent (Euro, Prototype)</description>
+		<description>Rocky Rodent (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Irem</publisher>
 		<part name="cart" interface="snes_cart">
@@ -53746,7 +53746,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="mvpbbp" cloneof="mvpbb">
-		<description>Roger Clemens' MVP Baseball (USA, Prototype)</description>
+		<description>Roger Clemens' MVP Baseball (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -54033,7 +54033,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="samspirp" cloneof="samsho">
-		<description>Samurai Spirits (Jpn, Prototype)</description>
+		<description>Samurai Spirits (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -54407,7 +54407,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sensiblep" cloneof="sensible">
-		<description>Sensible Soccer - European Champions (Euro, Prototype)</description>
+		<description>Sensible Soccer - European Champions (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Renegade Software</publisher>
 		<part name="cart" interface="snes_cart">
@@ -54529,7 +54529,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="shadowrnup" cloneof="shadowrn">
-		<description>Shadowrun (USA, Prototype)</description>
+		<description>Shadowrun (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Data East</publisher>
 		<part name="cart" interface="snes_cart">
@@ -54612,7 +54612,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="shaqfuup" cloneof="shaqfu">
-		<description>Shaq Fu (USA, Prototype)</description>
+		<description>Shaq Fu (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="snes_cart">
@@ -54654,7 +54654,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="shienp" cloneof="shien">
-		<description>Shien's Revenge (USA, Prototype)</description>
+		<description>Shien's Revenge (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55257,7 +55257,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ninjasasp" cloneof="ninjasas">
-		<description>Shounen Ninja Sasuke (Jpn, Prototype)</description>
+		<description>Shounen Ninja Sasuke (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55330,7 +55330,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="simantp" cloneof="simant">
-		<description>SimAnt (USA, Prototype)</description>
+		<description>SimAnt (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55491,7 +55491,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="skuljaggp" cloneof="skuljagg">
-		<description>Skuljagger - Revolt of the Westicans (USA, Prototype)</description>
+		<description>Skuljagger - Revolt of the Westicans (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>ASC Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55518,7 +55518,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="skyblazrupa" cloneof="skyblazr">
-		<description>Skyblazer (USA, Prototype, Alt)</description>
+		<description>Skyblazer (USA, prototype, alt)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55530,7 +55530,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="skyblazrup" cloneof="skyblazr">
-		<description>Skyblazer (USA, Prototype)</description>
+		<description>Skyblazer (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Sony Imagesoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55559,7 +55559,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="smashtenp" cloneof="smashten">
-		<description>Smash Tennis (Euro, Prototype)</description>
+		<description>Smash Tennis (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -55637,7 +55637,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="soccerkdjp" cloneof="soccerkd">
-		<description>Soccer Kid (Jpn, Prototype)</description>
+		<description>Soccer Kid (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Yanoman Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56013,7 +56013,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="spaceaceup" cloneof="spaceace">
-		<description>Space Ace (USA, Prototype)</description>
+		<description>Space Ace (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Absolute Entertainment</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -56191,7 +56191,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="spawnp" cloneof="spawn">
-		<description>Spawn (Prototype?)</description>
+		<description>Spawn (prototype?)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56241,7 +56241,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="speedy">
-		<description>Speedy Gonzales in Los Gatos Bandidos (Euro, Prototype)</description>
+		<description>Speedy Gonzales in Los Gatos Bandidos (Euro, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56254,7 +56254,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="speedyup" cloneof="speedy">
 		<!-- Notes: Acclaim splash screen -->
-		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Acclaim Prototype)</description>
+		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Acclaim prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -56320,7 +56320,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="spidermnup" cloneof="spidermn">
-		<description>Spider-Man (USA, Prototype)</description>
+		<description>Spider-Man (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56412,7 +56412,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="spillfbp" cloneof="spillfb">
-		<description>Sports Illustrated Championship Football &amp; Baseball (USA, Prototype)</description>
+		<description>Sports Illustrated Championship Football &amp; Baseball (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Malibu Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56499,7 +56499,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="starfox2">
 		<!-- compiled from source by an Argonaut dev, newer but inaccurate header -->
-		<description>Star Fox 2 (Jpn, Prototype)</description>
+		<description>Star Fox 2 (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Argonaut</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -56515,7 +56515,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="starfox2a" cloneof="starfox2">
 		<!-- compiled from source by an Argonaut dev, older -->
-		<description>Star Fox 2 (Jpn, Earlier Prototype)</description>
+		<description>Star Fox 2 (Jpn, earlier prototype)</description>
 		<year>1995</year>
 		<publisher>Argonaut</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -56542,7 +56542,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="stds9up" cloneof="stds9">
-		<description>Star Trek - Deep Space Nine - Crossroads of Time (USA, Prototype)</description>
+		<description>Star Trek - Deep Space Nine - Crossroads of Time (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Playmates Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56661,7 +56661,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="stargateup" cloneof="stargate">
-		<description>Stargate (USA, Prototype)</description>
+		<description>Stargate (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56800,7 +56800,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="street95p" cloneof="street95">
-		<description>Street Hockey '95 (USA, Prototype)</description>
+		<description>Street Hockey '95 (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>GTE Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56839,7 +56839,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sracerup" cloneof="sracer">
-		<description>Street Racer (USA, Prototype)</description>
+		<description>Street Racer (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -56879,7 +56879,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="strikerp" cloneof="striker">
-		<description>Striker (Euro, Prototype)</description>
+		<description>Striker (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Elite</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -57148,7 +57148,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="aquagamep" cloneof="jpondcs">
-		<description>The Super Aquatic Games Starring the Aquabats (USA, Prototype)</description>
+		<description>The Super Aquatic Games Starring the Aquabats (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Seika</publisher>
 		<part name="cart" interface="snes_cart">
@@ -57560,7 +57560,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sbombmn3jp" cloneof="sbombmn3">
-		<description>Super Bomberman 3 (Jpn, Prototype)</description>
+		<description>Super Bomberman 3 (Jpn, prototype)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -57671,7 +57671,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="scaesarsp" cloneof="scaesars">
-		<description>Super Caesars Palace (USA, Prototype)</description>
+		<description>Super Caesars Palace (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -57873,7 +57873,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sdanyp" cloneof="sdany">
-		<description>Super Dany (Fra, Prototype)</description>
+		<description>Super Dany (Fra, prototype)</description>
 		<year>1998</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -57912,7 +57912,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sddragonp" cloneof="sddragon">
-		<description>Super Double Dragon (Euro, Prototype)</description>
+		<description>Super Double Dragon (Euro, prototype)</description>
 		<year>1992</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -58410,7 +58410,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sgossunpa" cloneof="sgossun">
-		<description>Super Gussun Oyoyo (Jpn, Prototype, Alt)</description>
+		<description>Super Gussun Oyoyo (Jpn, prototype, alt)</description>
 		<year>1995</year>
 		<publisher>Banpresto</publisher>
 		<part name="cart" interface="snes_cart">
@@ -58505,7 +58505,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="shimpactp" cloneof="shimpact">
-		<description>Super High Impact (USA, Prototype)</description>
+		<description>Super High Impact (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -58603,7 +58603,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sicricktp" cloneof="sicrickt">
-		<description>Super International Cricket (Euro, Prototype)</description>
+		<description>Super International Cricket (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -58616,7 +58616,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sjpondp" cloneof="sjpond2">
-		<description>Super James Pond (USA, Prototype)</description>
+		<description>Super James Pond (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>ASC Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -58807,7 +58807,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sloopz">
-		<description>Super Loopz (Euro, Prototype)</description>
+		<description>Super Loopz (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59181,7 +59181,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="suprbajap" cloneof="suprbaja">
-		<description>Super Off Road - The Baja (USA, Prototype)</description>
+		<description>Super Off Road - The Baja (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59206,7 +59206,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="superozup" cloneof="superozu">
-		<description>Super Oozumou - Nessen Ooichiban (Jpn, Prototype)</description>
+		<description>Super Oozumou - Nessen Ooichiban (Jpn, prototype)</description>
 		<year>1992</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59258,7 +59258,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="spinbaljp" cloneof="spinbal">
-		<description>Super Pinball - Behind the Mask (Jpn, Prototype)</description>
+		<description>Super Pinball - Behind the Mask (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59687,7 +59687,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="supersol">
-		<description>Super Solitaire (Euro, Prototype)</description>
+		<description>Super Solitaire (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Extreme Entertainment Group</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59742,7 +59742,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="starwarspa" cloneof="starwars">
-		<description>Super Star Wars (USA, Earlier Prototype)</description>
+		<description>Super Star Wars (USA, Earlier prototype)</description>
 		<year>1992</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59808,7 +59808,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="esbp" cloneof="esb">
-		<description>Super Star Wars - The Empire Strikes Back (Euro, Prototype)</description>
+		<description>Super Star Wars - The Empire Strikes Back (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>JVC</publisher>
 		<part name="cart" interface="snes_cart">
@@ -59923,7 +59923,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="strollup" cloneof="stroll">
-		<description>Super Troll Islands (USA, Prototype)</description>
+		<description>Super Troll Islands (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>ASC Games</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60048,7 +60048,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sturric2upa" cloneof="sturric2">
-		<description>Super Turrican 2 (USA, Prototype, Alt)</description>
+		<description>Super Turrican 2 (USA, prototype, alt)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60060,7 +60060,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sturric2up" cloneof="sturric2">
-		<description>Super Turrican 2 (USA, Prototype)</description>
+		<description>Super Turrican 2 (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60355,7 +60355,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<software name="syndicatp" cloneof="syndicat">
 		<!-- Notes: this rom is suspicious, could be not legitimate -->
-		<description>Syndicate (Euro, Prototype 19940902)</description>
+		<description>Syndicate (Euro, prototype 19940902)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60693,7 +60693,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tarzan">
-		<description>Edgar Rice Burroughs' Tarzan: Lord of the Jungle (Prototype)</description>
+		<description>Edgar Rice Burroughs' Tarzan: Lord of the Jungle (prototype)</description>
 		<year>199?</year>
 		<publisher>Gametek</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60747,7 +60747,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tazmaniaup" cloneof="tazmania">
-		<description>Taz-Mania (USA, Prototype)</description>
+		<description>Taz-Mania (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60759,7 +60759,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="secretstp" cloneof="secretst">
-		<description>Tecmo Secret of the Stars (USA, Prototype)</description>
+		<description>Tecmo Secret of the Stars (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60805,7 +60805,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tecmobbp" cloneof="tecmobb">
-		<description>Tecmo Super Baseball (USA, Prototype)</description>
+		<description>Tecmo Super Baseball (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60852,7 +60852,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tecmosbwp" cloneof="tecmosbw">
-		<description>Tecmo Super Bowl (USA, Prototype)</description>
+		<description>Tecmo Super Bowl (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Tecmo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60966,7 +60966,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tmnttfup" cloneof="tmnttf">
-		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (USA, Prototype)</description>
+		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -60990,7 +60990,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tmnt4up1" cloneof="tmnt4">
-		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (USA, Prototype, Alt)</description>
+		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (USA, prototype, alt)</description>
 		<year>1992</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61116,7 +61116,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="term2p" cloneof="term2">
-		<description>T2 - Terminator 2 - Judgment Day (Euro, Prototype)</description>
+		<description>T2 - Terminator 2 - Judgment Day (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61141,7 +61141,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="termintrp" cloneof="termintr">
-		<description>The Terminator (Euro, Prototype)</description>
+		<description>The Terminator (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61443,7 +61443,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="timeslipp" cloneof="timeslip">
-		<description>Time Slip (Euro, Prototype)</description>
+		<description>Time Slip (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Vic Tokai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61479,7 +61479,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="timetraxup" cloneof="timetrax">
-		<description>Time Trax (USA, Prototype)</description>
+		<description>Time Trax (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>T*HQ</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61556,7 +61556,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ttoonbblup" cloneof="ttoonbbl">
-		<description>Tiny Toon Adventures - Buster Busts Loose! (USA, Prototype)</description>
+		<description>Tiny Toon Adventures - Buster Busts Loose! (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61598,7 +61598,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ttoonwakp" cloneof="ttoonwak">
-		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Euro, Prototype)</description>
+		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61723,7 +61723,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tomjerryup" cloneof="tomjerry">
-		<description>Tom &amp; Jerry (USA, Prototype)</description>
+		<description>Tom &amp; Jerry (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Hi Tech Expressions</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61887,7 +61887,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="totalcarupa" cloneof="totalcar">
-		<description>Total Carnage (USA, Prototype, Alt)</description>
+		<description>Total Carnage (USA, prototype, alt)</description>
 		<year>1993</year>
 		<publisher>Malibu Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61899,7 +61899,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="totalcarup" cloneof="totalcar">
-		<description>Total Carnage (USA, Prototype)</description>
+		<description>Total Carnage (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Malibu Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -61939,7 +61939,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tougedenp" cloneof="tougeden">
-		<description>Touge Densetsu - Saisoku Battle (Jpn, Prototype)</description>
+		<description>Touge Densetsu - Saisoku Battle (Jpn, prototype)</description>
 		<year>1996</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62059,7 +62059,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="troddlerp" cloneof="troddler">
-		<description>Troddlers (Euro, Prototype)</description>
+		<description>Troddlers (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Seika</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62208,7 +62208,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="trueliesup" cloneof="truelies">
-		<description>True Lies (USA, Prototype)</description>
+		<description>True Lies (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62496,7 +62496,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="tekkamanp" cloneof="tekkaman">
-		<description>Uchuu no Kishi Tekkaman Blade (Jpn, Prototype)</description>
+		<description>Uchuu no Kishi Tekkaman Blade (Jpn, prototype)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62557,7 +62557,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ultimar2p" cloneof="ultimar2">
-		<description>Ultima - Runes of Virtue II (USA, Prototype 19930730)</description>
+		<description>Ultima - Runes of Virtue II (USA, prototype 19930730)</description>
 		<year>1994</year>
 		<publisher>FCI</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62571,7 +62571,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ultimar2pa" cloneof="ultimar2">
-		<description>Ultima - Runes of Virtue II (USA, Prototype 1994xxxx)</description>
+		<description>Ultima - Runes of Virtue II (USA, prototype 1994xxxx)</description>
 		<year>1994</year>
 		<publisher>FCI</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62617,7 +62617,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ultima6jp" cloneof="ultima6">
-		<description>Ultima VI - Itsuwari no Yogensha (Jpn, Prototype)</description>
+		<description>Ultima VI - Itsuwari no Yogensha (Jpn, prototype)</description>
 		<year>1992</year>
 		<publisher>Pony Canyon</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62681,7 +62681,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="ultima7p" cloneof="ultima7">
-		<description>Ultima - The Black Gate (USA, Prototype)</description>
+		<description>Ultima - The Black Gate (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>FCI</publisher>
 		<part name="cart" interface="snes_cart">
@@ -62835,7 +62835,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="umizurimp" cloneof="umizurim">
-		<description>Umizuri Meijin - Suzuki Hen (Jpn, Prototype)</description>
+		<description>Umizuri Meijin - Suzuki Hen (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -62850,7 +62850,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="undake30">
-		<description>Undake 30 Same Game Daisakusen - Mario Version (Jpn, Not for sale)</description>
+		<description>Undake 30 Same Game Daisakusen - Mario Version (Jpn, not for sale)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SHVC-ANZJ-JPN" />
@@ -63012,7 +63012,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="utopiaup" cloneof="utopia">
-		<description>Utopia - The Creation of a Nation (USA, Prototype)</description>
+		<description>Utopia - The Creation of a Nation (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63039,7 +63039,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="valdiserfp" cloneof="valdiser">
-		<description>Val d'Isere Championship (Fra, Prototype 19931027)</description>
+		<description>Val d'Isere Championship (Fra, prototype 19931027)</description>
 		<year>1994</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63164,7 +63164,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="vbartup" cloneof="vbart">
-		<description>Virtual Bart (USA, Prototype)</description>
+		<description>Virtual Bart (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63189,7 +63189,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="vsocceru" cloneof="vsoccer">
-		<description>Virtual Soccer (USA, Prototype)</description>
+		<description>Virtual Soccer (USA, prototype)</description>
 		<year>1993</year>
 		<publisher>Hudson</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63338,7 +63338,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="warlockupa" cloneof="warlock">
-		<description>Warlock (USA, Prototype, Alt)</description>
+		<description>Warlock (USA, prototype, alt)</description>
 		<year>1995</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63350,7 +63350,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="warlockup" cloneof="warlock">
-		<description>Warlock (USA, Prototype)</description>
+		<description>Warlock (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63399,7 +63399,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="waynegp" cloneof="wayneg">
-		<description>Wayne Gretzky and the NHLPA All-Stars (USA, Prototype)</description>
+		<description>Wayne Gretzky and the NHLPA All-Stars (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63555,7 +63555,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wildgunsjp" cloneof="wildguns">
-		<description>Wild Guns (Jpn, Prototype)</description>
+		<description>Wild Guns (Jpn, prototype)</description>
 		<year>1994</year>
 		<publisher>Natsume</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63567,7 +63567,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wildgunsjs" cloneof="wildguns">
-		<description>Wild Guns (Jpn, Sample)</description>
+		<description>Wild Guns (Jpn, sample)</description>
 		<year>1994</year>
 		<publisher>Natsume</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63646,7 +63646,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wingscrtp" cloneof="wingscrt">
-		<description>Wing Commander - The Secret Missions (Euro, Prototype)</description>
+		<description>Wing Commander - The Secret Missions (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63683,7 +63683,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wings2p" cloneof="blazsky">
-		<description>Wings 2 - Aces High (USA, Prototype)</description>
+		<description>Wings 2 - Aces High (USA, prototype)</description>
 		<year>1992</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63873,7 +63873,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wolfn3dup" cloneof="wolfn3d">
-		<description>Wolfenstein 3D (USA, Prototype)</description>
+		<description>Wolfenstein 3D (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63885,7 +63885,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wolfn3dup2" cloneof="wolfn3d">
-		<description>Wolfenstein 3D (USA, Prototype 2)</description>
+		<description>Wolfenstein 3D (USA, prototype 2)</description>
 		<year>1994</year>
 		<publisher>Imagineer</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63924,7 +63924,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wolverinupa" cloneof="wolverin">
-		<description>Wolverine - Adamantium Rage (USA, Prototype, Alt)</description>
+		<description>Wolverine - Adamantium Rage (USA, prototype, alt)</description>
 		<year>1994</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -63936,7 +63936,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wolverinup" cloneof="wolverin">
-		<description>Wolverine - Adamantium Rage (USA, Prototype)</description>
+		<description>Wolverine - Adamantium Rage (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>LJN</publisher>
 		<part name="cart" interface="snes_cart">
@@ -64064,7 +64064,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wcstrikrp" cloneof="wcstrikr">
-		<description>World Cup Striker (Euro, Prototype)</description>
+		<description>World Cup Striker (Euro, prototype)</description>
 		<year>1994</year>
 		<publisher>GameTek</publisher>
 		<part name="cart" interface="snes_cart">
@@ -64166,7 +64166,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="wh2p" cloneof="wh2">
-		<description>World Heroes 2 (USA, Prototype)</description>
+		<description>World Heroes 2 (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Takara</publisher>
 		<part name="cart" interface="snes_cart">
@@ -64333,7 +64333,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="xproto">
-		<description>X (Jpn, Prototype)</description>
+		<description>X (Jpn, prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -64370,7 +64370,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="xkaliberup" cloneof="xkaliber">
-		<description>X-Kaliber 2097 (USA, Prototype)</description>
+		<description>X-Kaliber 2097 (USA, prototype)</description>
 		<year>1994</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="snes_cart">
@@ -65036,7 +65036,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="zombiesp" cloneof="zombies">
-		<description>Zombies (Euro, Prototype)</description>
+		<description>Zombies (Euro, prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="snes_cart">
@@ -65161,7 +65161,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 <!-- Non game cartridges -->
 
 	<software name="ggenie2" cloneof="ggenie" supported="no"> <!-- unemulated additional hardware -->
-		<description>Game Genie (USA, Alt)</description>
+		<description>Game Genie (USA, alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -65337,7 +65337,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sgboyup" cloneof="sgboy">
-		<description>Super Game Boy (USA, Prototype)</description>
+		<description>Super Game Boy (USA, prototype)</description>
 		<year>199?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="snes_cart">
@@ -65400,7 +65400,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 
 	<!-- we shall emulate the additional hardware here... -->
 	<software name="scd" supported="partial">
-		<description>Super Disc (Jpn, v0.95, Prototype)</description>
+		<description>Super Disc (Jpn, v0.95, prototype)</description>
 		<year>1992?</year>
 		<publisher>Sony ~ Nintendo</publisher>
 		<part name="cart" interface="snes_cart">

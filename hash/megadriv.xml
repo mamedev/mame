@@ -19770,6 +19770,17 @@ but dumps still have to be confirmed.
 		</part>
 	</software>
 
+	<software name="mkp" cloneof="mk">
+		<description>Mortal Kombat (prototype)</description>
+		<year>1993</year>
+		<publisher>Arena</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" width="16" endianness="big" size="2097152">
+				<rom name="mortal kombat (prototype b).md" size="2097152" crc="195b0397" sha1="802840b135ab778c749cb6fb27bbb595a263a1c3"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mk2">
 		<description>Mortal Kombat II (World)</description>
 		<year>1994</year>

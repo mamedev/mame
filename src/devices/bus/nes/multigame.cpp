@@ -8,6 +8,10 @@
 
  Here we emulate several PCBs used in multigame pirate carts (not MMC-3 based)
 
+ TODO: Investigate further Gunsmoke on mc_8et40 and mc_2gn91. Both exhibit the
+ same bug where enemies/barrels don't appear until they are halfway down the
+ screen. They are both almost the same minor hack of the US release.
+
  ***********************************************************************************************************/
 
 
@@ -33,6 +37,7 @@ DEFINE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron6in1_device,    "nes_caltron6i
 DEFINE_DEVICE_TYPE(NES_CALTRON9IN1,    nes_caltron9in1_device,    "nes_caltron9in1",    "NES Cart Caltron 9 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_RUMBLESTATION,  nes_rumblestat_device,     "nes_rumblestat",     "NES Cart Rumblestation PCB")
 DEFINE_DEVICE_TYPE(NES_SVISION16,      nes_svision16_device,      "nes_svision16",      "NES Cart Supervision 16 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_FARID_UNROM,    nes_farid_unrom_device,    "nes_farid_unrom",    "NES Cart Farid UNROM 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_KN42,           nes_kn42_device,           "nes_kn42",           "NES Cart KN-42 PCB")
 DEFINE_DEVICE_TYPE(NES_N625092,        nes_n625092_device,        "nes_n625092",        "NES Cart N625092 PCB")
 DEFINE_DEVICE_TYPE(NES_A65AS,          nes_a65as_device,          "nes_a65as",          "NES Cart A65AS PCB")
@@ -46,11 +51,13 @@ DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_81054
 DEFINE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device,    "nes_bmc_830425c",    "NES Cart BMC 830425C-4391T PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device,    "nes_bmc_830928c",    "NES Cart BMC 830928C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device,    "nes_bmc_970630c",    "NES Cart BMC 970630C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device,    "nes_bmc_gkcxin1",    "NES Cart BMC GKCXIN1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_GN91B,      nes_bmc_gn91b_device,      "nes_bmc_gn91b",      "NES Cart BMC GN-91B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_HP898F,     nes_bmc_hp898f_device,     "nes_bmc_hp898f",     "NES Cart BMC HP-898F PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device,      "nes_bmc_k1029",      "NES Cart BMC K-1029 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
@@ -88,6 +95,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device,    "nes_bmc_gold2
 DEFINE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device,    "nes_bmc_th22913",    "NES Cart BMC TH2291-3 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device,  "nes_bmc_4in1reset",  "NES Cart BMC 4 in 1 (Reset Based) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device, "nes_bmc_42in1reset", "NES Cart BMC 42 in 1 (Reset Based) PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_NC20MB,     nes_bmc_nc20mb_device,     "nes_bmc_nc20mb",     "NES Cart BMC NC-20MB PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device,      "nes_bmc_lc160",      "NES Cart BMC Little Com 160 PCB")
 
 
@@ -136,6 +144,11 @@ nes_rumblestat_device::nes_rumblestat_device(const machine_config &mconfig, cons
 
 nes_svision16_device::nes_svision16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_SVISION16, tag, owner, clock), m_latch1(0), m_latch2(0)
+{
+}
+
+nes_farid_unrom_device::nes_farid_unrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_FARID_UNROM, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -204,6 +217,11 @@ nes_bmc_850437c_device::nes_bmc_850437c_device(const machine_config &mconfig, co
 {
 }
 
+nes_bmc_970630c_device::nes_bmc_970630c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_970630C, tag, owner, clock), m_latch(0)
+{
+}
+
 nes_ntd03_device::nes_ntd03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_NTD03, tag, owner, clock)
 {
@@ -226,6 +244,11 @@ nes_bmc_gkb_device::nes_bmc_gkb_device(const machine_config &mconfig, const char
 
 nes_bmc_gkcxin1_device::nes_bmc_gkcxin1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_GKCXIN1, tag, owner, clock)
+{
+}
+
+nes_bmc_gn91b_device::nes_bmc_gn91b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_GN91B, tag, owner, clock), m_latch(0)
 {
 }
 
@@ -401,8 +424,18 @@ nes_bmc_4in1reset_device::nes_bmc_4in1reset_device(const machine_config &mconfig
 {
 }
 
+nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_mirror_flip(type == NES_BMC_NC20MB)
+{
+}
+
 nes_bmc_42in1reset_device::nes_bmc_42in1reset_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock), m_latch(0)
+	: nes_bmc_42in1reset_device(mconfig, NES_BMC_42IN1RESET, tag, owner, clock)
+{
+}
+
+nes_bmc_nc20mb_device::nes_bmc_nc20mb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_42in1reset_device(mconfig, NES_BMC_NC20MB, tag, owner, clock)
 {
 }
 
@@ -512,6 +545,21 @@ void nes_svision16_device::pcb_reset()
 
 	m_latch1 = 0;
 	m_latch2 = 0;
+}
+
+void nes_farid_unrom_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_farid_unrom_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_reg &= 0x87;    // only middle four bits cleared on soft reset
 }
 
 void nes_kn42_device::device_start()
@@ -667,6 +715,21 @@ void nes_bmc_850437c_device::pcb_reset()
 	m_reg[0] = m_reg[1] = 0;
 }
 
+void nes_bmc_970630c_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_970630c_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
+}
+
 void nes_ntd03_device::device_start()
 {
 	common_start();
@@ -700,6 +763,21 @@ void nes_bmc_gka_device::pcb_reset()
 	chr8(0, CHRROM);
 
 	m_reg[0] = m_reg[1] = 0;
+}
+
+void nes_bmc_gn91b_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_gn91b_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(7);
+	chr8(0, CHRRAM);
+
+	m_latch = 0;
 }
 
 void nes_bmc_k3036_device::pcb_reset()
@@ -1277,6 +1355,35 @@ u8 nes_svision16_device::read_m(offs_t offset)
 
 /*-------------------------------------------------
 
+ FARID_UNROM_8-IN-1
+
+ Games: 8 in 1
+
+ NES 2.0: mapper 324
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_farid_unrom_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("farid_unrom write_h, offset: %04x, data: %02x\n", offset, data));
+
+	// this pcb is subject to bus conflict
+	data = account_bus_conflict(offset, data);
+
+	if (BIT(data, 7) && !(m_reg & 0x88))
+		m_reg = data;
+	else
+		m_reg = (m_reg & 0x78) | (data & 0x87);
+
+	u8 bank = (m_reg & 0x70) >> 1 | (m_reg & 0x07);
+	prg16_89ab(bank);
+	prg16_cdef(bank | 0x07);
+}
+
+/*-------------------------------------------------
+
  Bootleg Board KN-42
 
  Games: 2 in 1 - Big Nose & Big Nose Freaks Out
@@ -1339,10 +1446,6 @@ void nes_a65as_device::write_h(offs_t offset, uint8_t data)
  NES 2.0: mapper 265
 
  In MAME: Supported.
-
- TODO: Gunsmoke on 8-in-1 (ET40) has invisible sprites
- that suddenly appear closer to the bottom of the screen.
- Mirroring is correct, so is this a bug on the cartridge?
 
  -------------------------------------------------*/
 
@@ -1618,7 +1721,60 @@ void nes_bmc_850437c_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ BMC-970630C
+
+ Games: 2 in 1 (NT-811), 4 in 1 1999
+
+ NES 2.0: mapper 380
+
+ In MAME: Supported.
+
+ TODO: Contra has the same graphics glitches as in
+ BMC-8157. These are marked as partially supported
+ in the softlist, but maybe this is just a BTANB?
+
+ -------------------------------------------------*/
+
+void nes_bmc_970630c_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_970630c write_h, offset: %04x, data: %02x\n", offset, data));
+
+	u8 bank = (offset >> 2) & 0x1f;
+	if (BIT(offset, 9))    // NROM mode
+	{
+		u8 mode = !BIT(offset, 0);
+		prg16_89ab(bank & ~mode);
+		prg16_cdef(bank | mode);
+	}
+	else                   // UNROM-esque mode
+	{
+		prg16_89ab(bank);
+		prg16_cdef(bank | 0x07);
+	}
+
+	set_nt_mirroring(BIT(offset, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	m_latch = BIT(offset, 8);
+}
+
+u8 nes_bmc_970630c_device::read_h(offs_t offset)
+{
+//  LOG_MMC(("bmc_970630c read_h, offset: %04x\n", offset));
+
+	if (m_latch)
+		return 0;    // TODO: menu supposedly varies by solder pad value returned here, but it doesn't seem to work...
+	else
+		return hi_access_rom(offset);
+}
+
+/*-------------------------------------------------
+
  BMC-NTD-03
+
+ Games: ASDER 20 in 1
+
+ NES 2.0: mapper 290
+
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
@@ -1745,11 +1901,13 @@ void nes_bmc_gkb_device::write_h(offs_t offset, u8 data)
  Board BMC-GKCXIN1
 
  Unknown Bootleg Multigame Board
- Games: 21 in 1
+ Games: 21 in 1, 64 in 1
 
  NES 2.0: mapper 288
 
  In MAME: Supported.
+
+ TODO: This has some sort of solder pad settings.
 
  -------------------------------------------------*/
 
@@ -1759,6 +1917,32 @@ void nes_bmc_gkcxin1_device::write_h(offs_t offset, u8 data)
 
 	prg32((offset >> 3) & 0x03);
 	chr8(offset & 0x07, CHRROM);
+}
+
+/*-------------------------------------------------
+
+ Board BMC-GN-91B
+
+ Unknown Bootleg Multigame Board
+ Games: 2 in 1
+
+ NES 2.0: mapper 431
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_gn91b_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_gn91b write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset < 0x4000)
+	{
+		m_latch = (offset & 0x10) >> 1;
+		prg16_cdef(m_latch | 0x07);
+		set_nt_mirroring(m_latch ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	}
+	prg16_89ab(m_latch | (data & 0x07));
 }
 
 /*-------------------------------------------------
@@ -2844,17 +3028,22 @@ uint8_t nes_bmc_gold150_device::read_h(offs_t offset)
 
 /*-------------------------------------------------
 
- BMC-42IN1RESETBASED
+ BMC-42IN1RESETBASED, BMC-NC-20MB
 
- Unknown Bootleg Multigame Board
- Games: 42 (22 + 20) in 1
+ Games: 42 (22 + 20) in 1, 20 in 1 (CA-006)
 
- There is an identical dump identified as SUPER22GAMES
- that supposedly selected between the two menus by
- dip switch. It's not clear which, if any, variants of
- this cart exist, nor if this is really reset-based.
+ Here we implement two nearly identical mappers. The
+ NC-20MB board does not have the reset latch and its
+ mirroring bit is inverted from the 42 in 1.
+
+ There is an identical dump of the 42 in 1 identified
+ as SUPER22GAMES that supposedly selected between the
+ two menus via dip switch. It's not clear which, if
+ any, variants of this cart exist, nor if this is
+ really reset-based.
 
  iNES: mapper 233
+ NES 2.0: mapper 433
 
  In MAME: Supported.
 
@@ -2869,8 +3058,8 @@ void nes_bmc_42in1reset_device::write_h(offs_t offset, u8 data)
 	prg16_89ab(bank & ~mode);
 	prg16_cdef(bank | mode);
 
-	// some sources say there are 1-screen modes, but this works as is
-	set_nt_mirroring(BIT(data, 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+	// some sources say there are 1-screen modes for 42-in-1, but this works as is
+	set_nt_mirroring(BIT(data, 6) ^ m_mirror_flip ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 }
 
 /*-------------------------------------------------
@@ -3005,6 +3194,12 @@ void nes_bmc_k1029_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
+ TODO: Several games have incorrect mirroring bits
+ on all carts they appear on. It's subtle so it's
+ likely a BTANB? Noticeable in Flappy, Pacman, and
+ Warpman title scrolls and at bottom of screen in
+ Zippy Race in-game.
+
  -------------------------------------------------*/
 
 void nes_n625092_device::write_h(offs_t offset, u8 data)
@@ -3013,7 +3208,7 @@ void nes_n625092_device::write_h(offs_t offset, u8 data)
 
 	m_latch[BIT(offset, 14)] = offset;
 
-	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);    // NesDev shows the high bit here, but is it correct? So far no cart is large enough to use this.
+	u8 bank = (m_latch[0] & 0x200) >> 3 | (m_latch[0] & 0xe0) >> 2 | (m_latch[1] & 0x07);
 	u8 mode = BIT(m_latch[0], 1);
 	if (mode && BIT(m_latch[0], 8))    // UNROM mode
 	{

@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "language.h"
+
 #include "emuopts.h"
 
 #include "corestr.h"
@@ -17,44 +19,18 @@
 #include <memory>
 #include <new>
 #include <unordered_map>
+#include <utility>
 
 
 namespace {
 
-constexpr uint32_t MO_MAGIC = 0x950412de;
-constexpr uint32_t MO_MAGIC_REVERSED = 0xde120495;
-
-struct cstr_hash
-{
-	size_t operator()(char const *s) const noexcept
-	{
-		// Bernstein string hash
-		size_t result(5381);
-		while (*s)
-			result = ((result << 5) + result) + u8(*s++);
-		return result;
-	}
-};
-
-struct cstr_compare
-{
-	size_t operator()(char const *x, char const *y) const noexcept
-	{
-		return !std::strcmp(x, y);
-	}
-};
+constexpr u32 MO_MAGIC = 0x950412de;
+constexpr u32 MO_MAGIC_REVERSED = 0xde120495;
 
 std::unique_ptr<u32 []> f_translation_data;
-std::unordered_map<char const *, char const *, cstr_hash, cstr_compare> f_translation_map;
+std::unordered_map<std::string_view, std::pair<char const *, u32> > f_translation_map;
 
 } // anonymous namespace
-
-
-char const *lang_translate(char const *word)
-{
-	auto const found = f_translation_map.find(word);
-	return (f_translation_map.end() != found) ? found->second : word;
-}
 
 
 void load_translation(emu_options &m_options)
@@ -84,7 +60,7 @@ void load_translation(emu_options &m_options)
 		return;
 	}
 
-	f_translation_data.reset(new (std::nothrow) uint32_t [(size + 3) / 4]);
+	f_translation_data.reset(new (std::nothrow) u32 [(size + 3) / 4]);
 	if (!f_translation_data)
 	{
 		file.close();
@@ -169,12 +145,81 @@ void load_translation(emu_options &m_options)
 			continue;
 		}
 
-		char const *const original = &data[original_offset];
-		char const *const translation = &data[translation_offset];
-		auto const ins = f_translation_map.emplace(original, translation);
+		std::string_view const original(&data[original_offset], original_length);
+		char const *const translation(&data[translation_offset]);
+		auto const ins = f_translation_map.emplace(original, std::make_pair(translation, translation_length));
 		if (!ins.second)
-			osd_printf_warning("Loading translation file %s: translation %u '%s'='%s' conflicts with previous translation '%s'='%s'\n", name, i, original, translation, ins.first->first, ins.first->second);
+		{
+			osd_printf_warning(
+					"Loading translation file %s: translation %u '%s'='%s' conflicts with previous translation '%s'='%s'\n",
+					name,
+					i,
+					original,
+					translation,
+					ins.first->first,
+					ins.first->second.first);
+		}
 	}
 
 	osd_printf_verbose("Loaded %u translations from file %s\n", f_translation_map.size(), name);
+}
+
+
+char const *lang_translate(char const *message)
+{
+	auto const found = f_translation_map.find(message);
+	if (f_translation_map.end() != found)
+		return found->second.first;
+	return message;
+}
+
+
+std::string_view lang_translate(std::string_view message)
+{
+	auto const found = f_translation_map.find(message);
+	if (f_translation_map.end() != found)
+		return std::string_view(found->second.first, found->second.second);
+	return message;
+}
+
+
+char const *lang_translate(char const *context, char const *message)
+{
+	if (!f_translation_map.empty())
+	{
+		auto const ctxlen(std::strlen(context));
+		auto const msglen(std::strlen(message));
+		std::string key;
+		key.reserve(ctxlen + 1 + msglen);
+		key.append(context, ctxlen);
+		key.append(1, '\004');
+		key.append(message, msglen);
+		auto const found = f_translation_map.find(key);
+		if (f_translation_map.end() != found)
+			return found->second.first;
+	}
+	return message;
+}
+
+
+std::string_view lang_translate(char const *context, std::string_view message)
+{
+	return lang_translate(std::string_view(context), message);
+}
+
+
+std::string_view lang_translate(std::string_view context, std::string_view message)
+{
+	if (!f_translation_map.empty())
+	{
+		std::string key;
+		key.reserve(context.length() + 1 + message.length());
+		key.append(context);
+		key.append(1, '\004');
+		key.append(message);
+		auto const found = f_translation_map.find(key);
+		if (f_translation_map.end() != found)
+			return std::string_view(found->second.first, found->second.second);
+	}
+	return message;
 }

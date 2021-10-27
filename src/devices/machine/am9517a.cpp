@@ -145,19 +145,43 @@ enum
 //  dma_request -
 //-------------------------------------------------
 
-void am9517a_device::dma_request(int channel, int state)
+void am9517a_device::dma_request(int channel, bool state)
 {
 	LOG("AM9517A Channel %u DMA Request: %u\n", channel, state);
 
-	if (state ^ COMMAND_DREQ_ACTIVE_LOW)
-	{
+	if (state)
 		m_status |= (1 << (channel + 4));
-	}
 	else
-	{
 		m_status &= ~(1 << (channel + 4));
-	}
+
 	trigger(1);
+}
+
+
+//-------------------------------------------------
+//  mask_channel -
+//-------------------------------------------------
+
+void am9517a_device::mask_channel(int channel, bool state)
+{
+	LOG("AM9517A Channel %u Mask: %u\n", channel, state);
+
+	if (state)
+		m_mask |= 1 << channel;
+	else
+		m_mask &= ~(1 << channel);
+}
+
+
+//-------------------------------------------------
+//  set_mask_register -
+//-------------------------------------------------
+
+void am9517a_device::set_mask_register(uint8_t mask)
+{
+	LOG("AM9517A Mask Register: %01x\n", mask);
+
+	m_mask = mask;
 }
 
 
@@ -167,7 +191,7 @@ void am9517a_device::dma_request(int channel, int state)
 
 inline bool am9517a_device::is_request_active(int channel)
 {
-	return (BIT(m_status, channel + 4) & ~BIT(m_mask, channel)) ? true : false;
+	return (BIT(COMMAND_DREQ_ACTIVE_LOW ? ~m_status : m_status, channel + 4) && !BIT(m_mask, channel)) ? true : false;
 }
 
 
@@ -424,6 +448,7 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 		m_hack(0),
 		m_ready(1),
 		m_command(0),
+		m_status(0),
 		m_out_hreq_cb(*this),
 		m_out_eop_cb(*this),
 		m_in_memr_cb(*this),
@@ -518,7 +543,7 @@ void am9517a_device::device_reset()
 {
 	m_state = STATE_SI;
 	m_command = 0;
-	m_status = 0;
+	m_status &= 0xf0;
 	m_request = 0;
 	m_mask = 0x0f;
 	m_temp = 0;
@@ -765,7 +790,8 @@ uint8_t am9517a_device::read(offs_t offset)
 			break;
 		}
 
-		m_msb = !m_msb;
+		if (!machine().side_effects_disabled())
+			m_msb = !m_msb;
 	}
 	else
 	{
@@ -773,9 +799,12 @@ uint8_t am9517a_device::read(offs_t offset)
 		{
 		case REGISTER_STATUS:
 			data = m_status;
+			if (COMMAND_DREQ_ACTIVE_LOW)
+				data ^= 0xf0;
 
 			// clear TC bits
-			m_status &= 0xf0;
+			if (!machine().side_effects_disabled())
+				m_status &= 0xf0;
 			break;
 
 		case REGISTER_TEMPORARY:
@@ -867,17 +896,7 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 		case REGISTER_SINGLE_MASK:
 			{
 				int channel = data & 0x03;
-
-				if (BIT(data, 2))
-				{
-					m_mask |= (1 << channel);
-				}
-				else
-				{
-					m_mask &= ~(1 << channel);
-				}
-
-				LOG("AM9517A Mask Register: %01x\n", m_mask);
+				mask_channel(channel, BIT(data, 2));
 			}
 			break;
 
@@ -907,18 +926,11 @@ void am9517a_device::write(offs_t offset, uint8_t data)
 			break;
 
 		case REGISTER_CLEAR_MASK:
-			LOG("AM9517A Clear Mask Register\n");
-
-			m_mask = 0;
+			set_mask_register(0);
 			break;
 
 		case REGISTER_MASK:
-			m_mask = data & 0x0f;
-
-			LOG("AM9517A Mask Register: %01x\n", m_mask);
-
-			// tek4132 firmware indicates setting mask bits also sets status
-			m_status |= (data & 0x0f) << 4;
+			set_mask_register(data & 0x0f);
 			break;
 		}
 	}
@@ -1093,7 +1105,8 @@ uint8_t v5x_dmau_device::read(offs_t offset)
 		case 0x0b:  // Status
 			ret = m_status;
 			// clear TC bits
-			m_status &= 0xf0;
+			if (!machine().side_effects_disabled())
+				m_status &= 0xf0;
 			break;
 		case 0x0c:  // Temporary (low)
 			ret = m_temp & 0xff;
@@ -1266,7 +1279,7 @@ void pcxport_dmac_device::device_reset()
 {
 	m_state = STATE_SI;
 	m_command = 0;
-	m_status = 0;
+	m_status &= 0xf0;
 	m_request = 0;
 	m_mask = 0;
 	m_temp = 0;

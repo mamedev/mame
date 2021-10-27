@@ -21,6 +21,9 @@
 #include <vector>
 
 
+struct ui_system_info;
+
+
 namespace ui {
 
 class menu_network_devices : public menu
@@ -130,7 +133,7 @@ public:
 	menu_machine_configure(
 			mame_ui_manager &mui,
 			render_container &container,
-			game_driver const &drv,
+			ui_system_info const &info,
 			std::function<void (bool, bool)> &&handler = nullptr,
 			float x0 = 0.0f, float y0 = 0.0f);
 	virtual ~menu_machine_configure();
@@ -159,7 +162,7 @@ private:
 	void setup_bios();
 
 	std::function<void (bool, bool)> const m_handler;
-	game_driver const &m_drv;
+	ui_system_info const &m_sys;
 	emu_options m_opts;
 	float const m_x0;
 	float const m_y0;

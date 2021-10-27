@@ -47,17 +47,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
 	DECLARE_WRITE_LINE_MEMBER( field_sync );
 
-	void coco2bh(machine_config &config);
-	void coco2h(machine_config &config);
-	void cocoeh(machine_config &config);
-	void cocoh(machine_config &config);
-	void coco2b(machine_config &config);
-	void cd6809(machine_config &config);
-	void coco2(machine_config &config);
-	void t4426(machine_config &config);
-	void cp400(machine_config &config);
-	void cocoe(machine_config &config);
 	void coco(machine_config &config);
+	void cocoh(machine_config &config);
+	void cocoe(machine_config &config);
+	void cocoeh(machine_config &config);
+	void coco2(machine_config &config);
+	void coco2h(machine_config &config);
+	void coco2b(machine_config &config);
+	void coco2bh(machine_config &config);
+	void cp400(machine_config &config);
+	void t4426(machine_config &config);
+	void cd6809(machine_config &config);
+	void ms1600(machine_config &config);
 protected:
 	virtual void device_start() override;
 
@@ -76,6 +77,7 @@ protected:
 	void coco_io1(address_map &map);
 	void coco_io2(address_map &map);
 	void coco_ff60(address_map &map);
+	void ms1600_rom2(address_map &map);
 
 private:
 	void configure_sam(void);

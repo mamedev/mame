@@ -216,21 +216,27 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/powerpc/ppc.h"
+#include "machine/3dom2.h"
+
 #include "bus/ata/ataintf.h"
 #include "bus/ata/cr589.h"
-#include "machine/3dom2.h"
+#include "cpu/powerpc/ppc.h"
 #include "machine/eepromser.h"
 #include "machine/timekpr.h"
 #include "sound/dac.h"
 #include "sound/ymz280b.h"
-#include "cdrom.h"
+
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
 #include "romload.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "cdrom.h"
+
+
+namespace {
 
 #define M2_CLOCK        XTAL(66'666'700)
 
@@ -239,7 +245,7 @@ Notes:
 
 /*************************************
  *
- *  ROM definition(s)
+ *  driver state class
  *
  *************************************/
 
@@ -365,10 +371,10 @@ private:
 		m_ata_int = param;
 	}
 
-	void debug_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
 
-	void dump_task_command(int ref, const std::vector<std::string> &params);
+	void dump_task_command(const std::vector<std::string> &params);
 };
 
 
@@ -693,13 +699,13 @@ void konamim2_state::machine_start()
 	m_available_cdroms = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 
 	// TODO: REMOVE
-	m_atapi_timer = machine().scheduler().timer_alloc( timer_expired_delegate( FUNC( konamim2_state::atapi_delay ),this ) );
+	m_atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(konamim2_state::atapi_delay), this));
 	m_atapi_timer->adjust( attotime::never );
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 0, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("m2", CMDFLAG_NONE, 1, 4, std::bind(&konamim2_state::debug_commands, this, _1));
 	}
 }
 
@@ -1472,36 +1478,13 @@ void konamim2_state::init_hellngt()
 }
 
 
-
-/*************************************
- *
- *  Game driver(s)
- *
- *************************************/
-
-GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         MACHINE_IMPERFECT_TIMING )
-//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
-GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
-GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
-
-//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )
-
-
 /*************************************
  *
  *  Debugging Aids
  *
  *************************************/
 
-void konamim2_state::debug_help_command(int ref, const std::vector<std::string> &params)
+void konamim2_state::debug_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -1510,20 +1493,20 @@ void konamim2_state::debug_help_command(int ref, const std::vector<std::string> 
 	con.printf("  konm2 dump_dspp,<address> -- Dump DSPP object at <address>\n");
 }
 
-void konamim2_state::debug_commands(int ref, const std::vector<std::string> &params)
+void konamim2_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 
 	if (params[0] == "help")
-		debug_help_command(ref, params);
+		debug_help_command(params);
 	else if (params[0] == "dump_task")
-		dump_task_command(ref, params);
+		dump_task_command(params);
 	else if (params[0] == "dump_dspp")
 		subdevice<dspp_device>("bda:dspp")->dump_state();
 }
 
-void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &params)
+void konamim2_state::dump_task_command(const std::vector<std::string> &params)
 {
 	typedef uint32_t   Item;
 	typedef uint32_t   m2ptr;
@@ -1678,3 +1661,28 @@ void konamim2_state::dump_task_command(int ref, const std::vector<std::string> &
 	con.printf("UserData:       %08X\n", task.pt_UserData);
 	con.printf("\n");
 }
+
+} // anonymous namespace
+
+
+
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
+
+GAME( 1997, polystar,  0,        polystar, polystar, konamim2_state, empty_init,    ROT0, "Konami", "Tobe! Polystars (ver JAA)",    MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, totlvice,  0,        totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EBA)",         MACHINE_IMPERFECT_TIMING )
+//GAME( 1997, totlvicd, totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver EAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvicj,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver JAD)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvica,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver AAB)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1997, totlvicu,  totlvice, totlvice, totlvice, konamim2_state, init_totlvice, ROT0, "Konami", "Total Vice (ver UAC)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1998, btltryst,  0,        btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAC)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+//GAME( 1998, btltrysta, btltryst, btltryst, btltryst, konamim2_state, init_btltryst, ROT0, "Konami", "Battle Tryst (ver JAA)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, heatof11,  0,        heatof11, heatof11, konamim2_state, init_btltryst, ROT0, "Konami", "Heat of Eleven '98 (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1998, evilngt,   0,        evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver UBA)",         MACHINE_IMPERFECT_TIMING )
+GAME( 1998, evilngte,  evilngt,  evilngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Evil Night (ver EAA)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
+GAME( 1998, hellngt,   evilngt,  hellngt,  hellngt,  konamim2_state, init_hellngt,  ROT0, "Konami", "Hell Night (ver EAA)",         MACHINE_IMPERFECT_TIMING )
+
+//CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    driver_device, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_NO_SOUND )

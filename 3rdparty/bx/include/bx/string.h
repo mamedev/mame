@@ -227,6 +227,12 @@ namespace bx
 	/// Concatinate string.
 	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num = INT32_MAX);
 
+	/// Test whether the string _str begins with prefix.
+	bool hasPrefix(const StringView& _str, const StringView& _prefix);
+
+	/// Test whether the string _str ends with suffix.
+	bool hasSuffix(const StringView& _str, const StringView& _suffix);
+
 	/// Find character in string. Limit search to _max characters.
 	StringView strFind(const StringView& _str, char _ch);
 

@@ -30,6 +30,24 @@
 		  "format": "%1.2f",
 		  "screen": "raster" },
 		{ "type": "float",
+		  "name": "rasterbloom_smooth",
+		  "text": "Raster bloom temporal smoothing",
+		  "default":  0.5,
+		  "max"    :  0.99,
+		  "min"    :  0.0,
+		  "step"   :  0.01,
+		  "format": "%1.2f",
+		  "screen": "raster" },
+		{ "type": "float",
+		  "name": "rasterbloom",
+		  "text": "Raster bloom amplitude",
+		  "default":  0.01,
+		  "max"    :  0.1,
+		  "min"    :  0.0,
+		  "step"   :  0.001,
+		  "format": "%1.3f",
+		  "screen": "raster" },
+		{ "type": "float",
 		  "name": "halation",
 		  "text": "Halation amplitude",
 		  "default":  0.0,
@@ -145,6 +163,9 @@
 		{   "name": "internal2",
 			"mode": "guest"
 		},
+		{   "name": "mipmap",
+			"mode": "guest"
+		},
 		{   "name": "blur",
 			"mode": "guest"
 		},
@@ -154,6 +175,18 @@
 
 	],
 	"passes": [
+		{
+			"effect": "crt-geom/mipmap8",
+			"name": "mipmap",
+			"uniforms": [
+				{ "uniform": "u_smooth",   "slider": "rasterbloom_smooth" }
+			],
+			"input": [
+				{ "sampler": "s_screen",   "target": "internal2" },
+				{ "sampler": "s_mipmap",   "target": "mipmap" }
+			],
+			"output": "mipmap"
+		},
 		{
 			"effect": "crt-geom/phosphor_apply",
 			"name": "phosphor apply",
@@ -229,7 +262,8 @@
 			"input": [
 				{ "sampler": "mpass_texture", "target": "internal1" },
 				{ "sampler": "mask_texture", "texture": "bgfx/chains/crt-geom/aperture_2_4_rgb.png", "selection": "Shadow mask" },
-				{ "sampler": "blur_texture", "target": "blur" }
+				{ "sampler": "blur_texture", "target": "blur" },
+				{ "sampler": "mipmap_texture", "target": "mipmap" }
 			],
 
 			"output": "output"

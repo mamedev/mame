@@ -86,13 +86,17 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 	}
 
 	// get the total length
-	totallength = infile->size();
+	if (infile->length(totallength))
+	{
+		fprintf(stderr, "Fatal error: unable to get length of file\n");
+		goto cleanup;
+	}
 	if (totallength < splitsize)
 	{
 		fprintf(stderr, "Fatal error: file is smaller than the split size\n");
 		goto cleanup;
 	}
-	if ((uint64_t)splitsize * MAX_PARTS < totallength)
+	if ((uint64_t(splitsize) * MAX_PARTS) < totallength)
 	{
 		fprintf(stderr, "Fatal error: too many splits (maximum is %d)\n", MAX_PARTS);
 		goto cleanup;
@@ -133,12 +137,11 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 	// now iterate until done
 	for (partnum = 0; partnum < 1000; partnum++)
 	{
-		uint32_t actual, length;
-
 		printf("Reading part %d...", partnum);
 
 		// read as much as we can from the file
-		length = infile->read(splitbuffer, splitsize);
+		size_t length;
+		infile->read(splitbuffer, splitsize, length); // FIXME check error return
 		if (length == 0)
 			break;
 
@@ -163,8 +166,9 @@ static int split_file(const char *filename, const char *basename, uint32_t split
 		printf(" writing %s.%03d...", basefilename.c_str(), partnum);
 
 		// write the data
-		actual = outfile->write(splitbuffer, length);
-		if (actual != length)
+		size_t actual;
+		filerr = outfile->write(splitbuffer, length, actual);
+		if (filerr || (actual != length) || outfile->flush())
 		{
 			printf("\n");
 			fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");
@@ -285,8 +289,6 @@ static int join_file(const char *filename, const char *outname, int write_output
 	// now iterate through each file
 	while (splitfile->gets(buffer, sizeof(buffer)))
 	{
-		uint32_t length, actual;
-
 		// make sure the hash and filename are in the right place
 		if (strncmp(buffer, "hash=", 5) != 0 || strncmp(buffer + 5 + SHA1_DIGEST_SIZE * 2, " file=", 6) != 0)
 		{
@@ -300,6 +302,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 
 		// read the file's contents
 		infilename.insert(0, basepath);
+		uint32_t length;
 		filerr = util::core_file::load(infilename.c_str(), &splitbuffer, length);
 		if (filerr)
 		{
@@ -324,8 +327,9 @@ static int join_file(const char *filename, const char *outname, int write_output
 		{
 			printf(" writing...");
 
-			actual = outfile->write(splitbuffer, length);
-			if (actual != length)
+			size_t actual;
+			filerr = outfile->write(splitbuffer, length, actual);
+			if (filerr || (actual != length) || outfile->flush())
 			{
 				printf("\n");
 				fprintf(stderr, "Fatal error: Error writing output file (out of space?)\n");

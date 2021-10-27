@@ -17,7 +17,7 @@ Amstrad hardware consists of:
 rom/ram selection
 
 
-On the Amstrad, any part of the 64k memory can be access by the video
+On the Amstrad, any part of the 64k memory can be accessed by the video
 hardware (GA and CRTC - the CRTC specifies the memory address to access,
 and the GA fetches 2 bytes of data for each 1us cycle.
 
@@ -82,7 +82,7 @@ static const uint8_t asic_unlock_seq[15] =
 /* pointers to current ram configuration selected for banks */
 
 /* the hardware allows selection of 256 ROMs. Rom 0 is usually BASIC and Rom 7 is AMSDOS */
-/* With the CPC hardware, if a expansion ROM is not connected, BASIC rom will be selected instead */
+/* With the CPC hardware, if an expansion ROM is not connected, BASIC rom will be selected instead */
 /* data present on input of ppi, and data written to ppi output */
 #define amstrad_ppi_PortA 0
 #define amstrad_ppi_PortB 1
@@ -244,9 +244,9 @@ void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param
 /* KC Compact
 
 The palette is defined by a colour rom. The only rom dump that exists (from the KC-Club webpage)
-is 2K, which seems correct. In this rom the same 32 bytes of data is repeated throughout the rom.
+is 2K, which seems correct. In this rom the same 32 bytes of data are repeated throughout the rom.
 
-When a I/O write is made to "Gate Array" to select the colour, Bit 7 and 6 are used by the
+When an I/O write is made to "Gate Array" to select the colour, Bit 7 and 6 are used by the
 "Gate Array" to define the function, bit 7 = 0, bit 6 = 1. In the  Amstrad CPC, bits 4..0
 define the hardware colour number, but in the KC Compact, it seems bits 5..0
 define the hardware colour number allowing 64 colours to be chosen.
@@ -265,7 +265,7 @@ Bit Function
 1,0 Blue value
 
 Green value, Red value, Blue value: 0 = 0%, 01/10 = 50%, 11 = 100%.
-The 01 case is not used, it is unknown if this produces a different amount of colour.
+The 01 case is not used, it is unknown if this produces a different amount of colours.
 */
 
 uint8_t amstrad_state::kccomp_get_colour_element(int colour_value)
@@ -287,7 +287,7 @@ uint8_t amstrad_state::kccomp_get_colour_element(int colour_value)
 
 
 /* the colour rom has the same 32 bytes repeated, but it might be possible to put a new rom in
-with different data and be able to select the other entries - not tested on a real kc compact yet
+with different data and be able to select the other entries - not tested on a real KC compact yet
 and not supported by this driver */
 void amstrad_state::kccomp_palette(palette_device &palette) const
 {
@@ -375,7 +375,7 @@ void amstrad_state::amstrad_vh_update_mode()
 {
 	if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
 	{
-		/* select a cpc plus mode */
+		/* select a CPC plus mode */
 		switch ( m_gate_array.mrer & 0x03 )
 		{
 		case 0:     /* Mode 0: 160x200, 16 colours */
@@ -384,7 +384,7 @@ void amstrad_state::amstrad_vh_update_mode()
 			m_gate_array.ticks_increment = 1;
 			break;
 
-		case 1:     /* Mode 1: 320x200, 4 colous */
+		case 1:     /* Mode 1: 320x200, 4 colours */
 			m_gate_array.mode_lookup = m_mode1_lookup;
 			m_gate_array.max_colour_ticks = 2;
 			m_gate_array.ticks_increment = 1;
@@ -437,7 +437,7 @@ void amstrad_state::amstrad_vh_update_mode()
 		}
 		else
 		{
-			/* select an original cpc mode */
+			/* select an original CPC mode */
 			switch ( m_gate_array.mrer & 0x03 )
 			{
 			case 0:     /* Mode 0: 160x200, 16 colours */
@@ -446,7 +446,7 @@ void amstrad_state::amstrad_vh_update_mode()
 				m_gate_array.ticks_increment = 1;
 				break;
 
-			case 1:     /* Mode 1: 320x200, 4 colous */
+			case 1:     /* Mode 1: 320x200, 4 colours */
 				m_gate_array.mode_lookup = m_mode1_lookup;
 				m_gate_array.max_colour_ticks = 2;
 				m_gate_array.ticks_increment = 1;
@@ -1598,7 +1598,7 @@ Bit Value Function        Bit Value Function
 5   x     not used        5   x     not used
 4   1     Select border   4   0     Select pen
 3   x     | ignored       3   x     | Pen Number
-2   x     |               2   x       |
+2   x     |               2   x     |
 1   x     |               1   x     |
 0   x     |               0   x     |
 */
@@ -1647,8 +1647,8 @@ Mode changing is synchronised with HSYNC. If the mode is changed, it will take e
 
 Rom configuration selection :
 -----------------------------
-Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addressess &0000-&3fff and is used to access the operating system rom. When the lower rom area is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
-Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addressess &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area is enabled, reading from &c000-&ffff will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff, the data returned will be the data in the ram.
+Bit 2 is used to enable or disable the lower rom area. The lower rom area occupies memory addresses &0000-&3fff and is used to access the operating system rom. When the lower rom area is enabled, reading from &0000-&3FFF will return data in the rom. When a value is written to &0000-&3FFF, it will be written to the ram underneath the rom. When it is disabled, data read from &0000-&3FFF will return the data in the ram.
+Similarly, bit 3 controls enabling or disabling of the upper rom area. The upper rom area occupies memory addresses &C000-&FFFF and is BASIC or any expansion roms which may be plugged into a rom board/box. See the document on upper rom selection for more details. When the upper rom area is enabled, reading from &c000-&ffff will return data in the rom. When data is written to &c000-&FFFF, it will be written to the ram at the same address as the rom. When the upper rom area is disabled, and data is read from &c000-&ffff, the data returned will be the data in the ram.
 
 Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 	case 0x02:
@@ -1813,9 +1813,9 @@ b1 b0 Function Read/Write
 /* I/O port allocation
    -------------------
 
-Many thanks to Mark Rison for providing the original information. Thankyou to Richard Wilson for his discoveries concerning RAM management I/O decoding.
+Many thanks to Mark Rison for providing the original information. Thank you to Richard Wilson for his discoveries concerning RAM management I/O decoding.
 
-This document will explain the decoding of the I/O ports. The port address is not decoded fully which means a hardware device can be accessed through more than one address, in addition, using some addressess can access more than one element of the hardware at the same time. The CPC IN/OUT design differs from the norm in that port numbers are defined using 16 bits, as opposed to the traditional 8 bits.
+This document will explain the decoding of the I/O ports. The port address is not decoded fully which means a hardware device can be accessed through more than one address, in addition, using some addresses can access more than one element of the hardware at the same time. The CPC IN/OUT design differs from the norm in that port numbers are defined using 16 bits, as opposed to the traditional 8 bits.
 
 IN r,(C)/OUT (C),r instructions: Bits b15-b8 come from the B register, bits b7-b0 come from "r"
 IN A,(n)/OUT (n),A instructions: Bits b15-b8 come from the A register, bits b7-b0 come from "n"
@@ -1831,8 +1831,8 @@ Hardware device       Read/Write Port bits
 Gate-Array            Write Only 0   1   -   -   -   -   -   -   -   -   -   -   -   -   -   -
 RAM Configuration     Write Only 0   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
 CRTC                  Read/Write -   0   -   -   -   -   r1  r0  -   -   -   -   -   -   -   -
-ROM select            Write only -   -   0   -   -   -   -   -   -   -   -   -   -   -   -   -
-Printer port          Write only -   -   -   0   -   -   -   -   -   -   -   -   -   -   -   -
+ROM select            Write Only -   -   0   -   -   -   -   -   -   -   -   -   -   -   -   -
+Printer port          Write Only -   -   -   0   -   -   -   -   -   -   -   -   -   -   -   -
 8255 PPI              Read/Write -   -   -   -   0   -   r1  r0  -   -   -   -   -   -   -   -
 Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -   -   -   -   -
 
@@ -2568,7 +2568,7 @@ Note:
 6 This bit is connected to /EXP signal on the expansion port.
   On the KC Compact this bit is used to define bit 7 of the printer data.
   On the CPC, it is possible to use this bit to define bit 7 of the printer data, so a 8-bit printer port is made, with a hardware modification,
-  On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
+  On the CPC this can be used by a expansion device to report its presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
 WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
@@ -3339,7 +3339,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state::amstrad_plus_cartridge)
 		// RIFF chunk bits
 		char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
 		char chunklen[4];             // chunk length (always little-endian)
-		int chunksize;                // chunk length, calcaulated from the above
+		int chunksize;                // chunk length, calculated from the above
 		int ramblock;                 // 16k RAM block chunk is to be loaded into
 		unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
 

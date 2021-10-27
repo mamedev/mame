@@ -101,7 +101,7 @@ public:
 	named_delegate &operator=(std::nullptr_t) noexcept { reset(); return *this; }
 
 	// getters
-	char const *name() const { return m_name; }
+	char const *name() const noexcept { return m_name; }
 
 	// unsetter
 	void reset() noexcept { basetype::reset(); m_name = nullptr; }

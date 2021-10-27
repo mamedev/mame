@@ -8,7 +8,7 @@
 
 #include "input_module.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 // MAME headers
 #include "emu.h"
@@ -81,23 +81,11 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 	for (input_type_entry &entry : typelist)
 		switch (entry.type())
 		{
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
-#else
-			// UWP: Hotkey Select + X => UI_CONFIGURE (Menu)
-			case IPT_UI_CONFIGURE:
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::or_code, JOYCODE_SELECT, JOYCODE_BUTTON3);
-				break;
-
-			// UWP: Hotkey Select + Start => CANCEL
-			case IPT_UI_CANCEL:
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ESC, input_seq::or_code, JOYCODE_SELECT, JOYCODE_START);
-				break;
-#endif
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
 				uimode = options().ui_mode_key();
@@ -156,10 +144,6 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 				entry.configure_osd("POST_PROCESS", "Toggle Post-Processing");
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LALT, KEYCODE_LCONTROL);
 				break;
-			// add a NOT-lctrl-lalt to our default F5
-			case IPT_UI_TOGGLE_DEBUG: // emu/input.c: input_seq(KEYCODE_F5)
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);
-				break;
 
 			// leave everything else alone
 			default:
@@ -167,4 +151,4 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 		}
 }
 
-#endif // defined(OSD_WINDOWS) || defined(OSD_UWP)
+#endif // defined(OSD_WINDOWS)

@@ -483,6 +483,7 @@ private:
 	void msx2(machine_config &config);
 	void msx2p(machine_config &config);
 	void msx2_pal(machine_config &config);
+	void turbor(machine_config &config);
 
 	void msx2_cartlist(machine_config &config);
 	void msx2_floplist(machine_config &config);

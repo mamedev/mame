@@ -227,6 +227,7 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_dasm(powerpc_disassembler())
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = POWERPC_MIN_PAGE_SHIFT;

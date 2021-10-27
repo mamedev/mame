@@ -286,9 +286,24 @@ namespace bx
 		return _c - _a * _b;
 	}
 
+	inline BX_CONSTEXPR_FUNC float add(float _a, float _b)
+	{
+		return _a + _b;
+	}
+
+	inline BX_CONSTEXPR_FUNC float sub(float _a, float _b)
+	{
+		return _a - _b;
+	}
+
+	inline BX_CONSTEXPR_FUNC float mul(float _a, float _b)
+	{
+		return _a * _b;
+	}
+
 	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
 	{
-		return _a * _b + _c;
+		return add(mul(_a, _b), _c);
 	}
 
 	inline BX_CONSTEXPR_FUNC float rcp(float _a)
@@ -383,7 +398,7 @@ namespace bx
 	template<typename Ty>
 	inline Ty load(const void* _ptr)
 	{
-		Ty result;
+		Ty result(init::None);
 		memCopy(&result, _ptr, sizeof(Ty) );
 		return result;
 	}
@@ -394,7 +409,21 @@ namespace bx
 		memCopy(_ptr, &_a, sizeof(Ty) );
 	}
 
-	inline Vec3::Vec3()
+	inline Vec3::Vec3(init::NoneType)
+	{
+	}
+
+	constexpr Vec3::Vec3(init::ZeroType)
+		: x(0.0f)
+		, y(0.0f)
+		, z(0.0f)
+	{
+	}
+
+	constexpr Vec3::Vec3(init::IdentityType)
+		: x(0.0f)
+		, y(0.0f)
+		, z(0.0f)
 	{
 	}
 
@@ -409,6 +438,57 @@ namespace bx
 		: x(_x)
 		, y(_y)
 		, z(_z)
+	{
+	}
+
+	inline Plane::Plane(init::NoneType)
+		: normal(init::None)
+	{
+	}
+
+	constexpr Plane::Plane(init::ZeroType)
+		: normal(init::Zero)
+		, dist(0.0f)
+	{
+	}
+
+	constexpr Plane::Plane(init::IdentityType)
+		: normal(0.0f, 1.0f, 0.0f)
+		, dist(0.0f)
+	{
+	}
+
+	constexpr Plane::Plane(Vec3 _normal, float _dist)
+		: normal(_normal)
+		, dist(_dist)
+	{
+	}
+
+	inline Quaternion::Quaternion(init::NoneType)
+	{
+	}
+
+	constexpr Quaternion::Quaternion(init::ZeroType)
+		: x(0.0f)
+		, y(0.0f)
+		, z(0.0f)
+		, w(0.0f)
+	{
+	}
+
+	constexpr Quaternion::Quaternion(init::IdentityType)
+		: x(0.0f)
+		, y(0.0f)
+		, z(0.0f)
+		, w(1.0f)
+	{
+	}
+
+	constexpr Quaternion::Quaternion(float _x, float _y, float _z, float _w)
+		: x(_x)
+		, y(_y)
+		, z(_z)
+		, w(_w)
 	{
 	}
 
@@ -650,7 +730,7 @@ namespace bx
 
 	inline BX_CONST_FUNC Vec3 fromLatLong(float _u, float _v)
 	{
-		Vec3 result;
+		Vec3 result(init::None);
 		const float phi   = _u * kPi2;
 		const float theta = _v * kPi;
 
@@ -705,6 +785,39 @@ namespace bx
 		};
 	}
 
+	inline BX_CONSTEXPR_FUNC Quaternion add(const Quaternion _a, const Quaternion _b)
+	{
+		return
+		{
+			_a.x + _b.x,
+			_a.y + _b.y,
+			_a.z + _b.z,
+			_a.w + _b.w,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Quaternion sub(const Quaternion _a, const Quaternion _b)
+	{
+		return
+		{
+			_a.x - _b.x,
+			_a.y - _b.y,
+			_a.z - _b.z,
+			_a.w - _b.w,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion _a, float _b)
+	{
+		return
+		{
+			_a.x * _b,
+			_a.y * _b,
+			_a.z * _b,
+			_a.w * _b,
+		};
+	}
+
 	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion _a, const Quaternion _b)
 	{
 		const float ax = _a.x;
@@ -751,15 +864,9 @@ namespace bx
 		const float norm = dot(_a, _a);
 		if (0.0f < norm)
 		{
-			const float invNorm = 1.0f / sqrt(norm);
+			const float invNorm = rsqrt(norm);
 
-			return
-			{
-				_a.x * invNorm,
-				_a.y * invNorm,
-				_a.z * invNorm,
-				_a.w * invNorm,
-			};
+			return mul(_a, invNorm);
 		}
 
 		return
@@ -769,6 +876,19 @@ namespace bx
 			0.0f,
 			1.0f,
 		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Quaternion lerp(const Quaternion _a, const Quaternion _b, float _t)
+	{
+		const float sa    = 1.0f - _t;
+		const float adotb = dot(_a, _b);
+		const float sb    = sign(adotb) * _t;
+
+		const Quaternion aa = mul(_a, sa);
+		const Quaternion bb = mul(_b, sb);
+		const Quaternion qq = add(aa, bb);
+
+		return normalize(qq);
 	}
 
 	inline BX_CONST_FUNC Vec3 toEuler(const Quaternion _a)
@@ -786,6 +906,57 @@ namespace bx
 			atan2(2.0f * (xx * ww - yy * zz), 1.0f - 2.0f * (xsq + zsq) ),
 			atan2(2.0f * (yy * ww + xx * zz), 1.0f - 2.0f * (ysq + zsq) ),
 			asin( 2.0f * (xx * yy + zz * ww) ),
+		};
+	}
+
+	inline BX_CONST_FUNC Vec3 toXAxis(const Quaternion _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float ysq = square(yy);
+		const float zsq = square(zz);
+
+		return
+		{
+			1.0f - 2.0f * ysq     - 2.0f * zsq,
+			       2.0f * xx * yy + 2.0f * zz * ww,
+			       2.0f * xx * zz - 2.0f * yy * ww,
+		};
+	}
+
+	inline BX_CONST_FUNC Vec3 toYAxis(const Quaternion _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float xsq = square(xx);
+		const float zsq = square(zz);
+
+		return
+		{
+			       2.0f * xx * yy - 2.0f * zz * ww,
+			1.0f - 2.0f * xsq     - 2.0f * zsq,
+			       2.0f * yy * zz + 2.0f * xx * ww,
+		};
+	}
+
+	inline BX_CONST_FUNC Vec3 toZAxis(const Quaternion _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float xsq = square(xx);
+		const float ysq = square(yy);
+
+		return
+		{
+			       2.0f * xx * zz + 2.0f * yy * ww,
+			       2.0f * yy * zz - 2.0f * xx * ww,
+			1.0f - 2.0f * xsq     - 2.0f * ysq,
 		};
 	}
 
@@ -872,8 +1043,8 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos)
 	{
-		Vec3 tangent;
-		Vec3 bitangent;
+		Vec3 tangent(init::None);
+		Vec3 bitangent(init::None);
 		calcTangentFrame(tangent, bitangent, _normal);
 
 		store(&_result[ 0], mul(bitangent, _scale) );
@@ -891,8 +1062,8 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos, float _angle)
 	{
-		Vec3 tangent;
-		Vec3 bitangent;
+		Vec3 tangent(init::None);
+		Vec3 bitangent(init::None);
 		calcTangentFrame(tangent, bitangent, _normal, _angle);
 
 		store(&_result[0], mul(bitangent, _scale) );
@@ -969,7 +1140,7 @@ namespace bx
 
 	inline Vec3 mul(const Vec3& _vec, const float* _mat)
 	{
-		Vec3 result;
+		Vec3 result(init::None);
 		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8] + _mat[12];
 		result.y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9] + _mat[13];
 		result.z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14];
@@ -978,7 +1149,7 @@ namespace bx
 
 	inline Vec3 mulXyz0(const Vec3& _vec, const float* _mat)
 	{
-		Vec3 result;
+		Vec3 result(init::None);
 		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8];
 		result.y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9];
 		result.z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10];

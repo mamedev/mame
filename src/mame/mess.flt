@@ -207,6 +207,8 @@ crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
+ctk2000.cpp
+ctk551.cpp
 cvicny.cpp
 cxg_ch2001.cpp
 cxg_dominator.cpp
@@ -548,6 +550,7 @@ llc2.cpp
 lms46.cpp
 lnw80.cpp
 lola8a.cpp
+luna_68k.cpp
 lviv.cpp
 lwriter.cpp
 lynx.cpp

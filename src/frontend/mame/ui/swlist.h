@@ -63,8 +63,9 @@ class menu_software_list : public menu
 public:
 	menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~menu_software_list() override;
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+
+protected:
+	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
 	struct entry_info
@@ -84,11 +85,13 @@ private:
 	const char *                    m_interface;
 	std::string &                   m_result;
 	std::list<entry_info>           m_entrylist;
-	std::string                     m_filename_buffer;
+	std::string                     m_search;
 	bool                            m_ordered_by_shortname;
 
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle() override;
+
 	// functions
-	int compare_entries(const entry_info &e1, const entry_info &e2, bool shortname);
 	void append_software_entry(const software_info &swinfo);
 };
 

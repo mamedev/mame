@@ -15,6 +15,7 @@
 #include "ui/selector.h"
 #include "ui/submenu.h"
 #include "ui/ui.h"
+#include "ui/utils.h"
 
 #include "infoxml.h"
 #include "mame.h"
@@ -635,7 +636,7 @@ void menu_export::handle()
 					// and do the dirty work
 					info_xml_creator creator(machine().options());
 					creator.output(pfile, filter, include_devices);
-					machine().popmessage(_("%s.xml saved under ui folder."), filename);
+					machine().popmessage(_("%s.xml saved in UI settings folder."), filename);
 				}
 			}
 			break;
@@ -672,7 +673,7 @@ void menu_export::handle()
 						util::stream_format(buffer, "%-18s\"%s\"\n", drvlist.driver().name, drvlist.driver().type.fullname());
 					file.puts(buffer.str());
 					file.close();
-					machine().popmessage(_("%s.txt saved under ui folder."), filename);
+					machine().popmessage(_("%s.txt saved in UI settings folder."), filename);
 				}
 			}
 			break;
@@ -702,22 +703,22 @@ void menu_export::populate(float &customtop, float &custombottom)
 menu_machine_configure::menu_machine_configure(
 		mame_ui_manager &mui,
 		render_container &container,
-		game_driver const &drv,
+		ui_system_info const &info,
 		std::function<void (bool, bool)> &&handler,
 		float x0, float y0)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
-	, m_drv(drv)
+	, m_sys(info)
 	, m_x0(x0)
 	, m_y0(y0)
 	, m_curbios(0)
-	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(drv))
+	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(*info.driver))
 	, m_want_favorite(m_was_favorite)
 {
 	// parse the INI file
 	std::ostringstream error;
 	osd_setup_osd_specific_emu_options(m_opts);
-	mame_options::parse_standard_inis(m_opts, error, &m_drv);
+	mame_options::parse_standard_inis(m_opts, error, m_sys.driver);
 	setup_bios();
 }
 
@@ -726,9 +727,9 @@ menu_machine_configure::~menu_machine_configure()
 	if (m_was_favorite != m_want_favorite)
 	{
 		if (m_want_favorite)
-			mame_machine_manager::instance()->favorite().add_favorite_system(m_drv);
+			mame_machine_manager::instance()->favorite().add_favorite_system(*m_sys.driver);
 		else
-			mame_machine_manager::instance()->favorite().remove_favorite_system(m_drv);
+			mame_machine_manager::instance()->favorite().remove_favorite_system(*m_sys.driver);
 	}
 
 	if (m_handler)
@@ -752,7 +753,7 @@ void menu_machine_configure::handle()
 			{
 			case SAVE:
 				{
-					const std::string filename(m_drv.name);
+					const std::string filename(m_sys.driver->name);
 					emu_file file(machine().options().ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 					std::error_condition const filerr = file.open(filename + ".ini");
 					if (!filerr)
@@ -773,15 +774,15 @@ void menu_machine_configure::handle()
 				break;
 			case CONTROLLER:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), m_sys.driver, &m_opts);
 				break;
 			case VIDEO:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), m_sys.driver, &m_opts);
 				break;
 			case ADVANCED:
 				if (menu_event->iptkey == IPT_UI_SELECT)
-					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), &m_drv, &m_opts);
+					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), m_sys.driver, &m_opts);
 				break;
 			default:
 				break;
@@ -835,29 +836,29 @@ void menu_machine_configure::populate(float &customtop, float &custombottom)
 
 void menu_machine_configure::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	char const *const text[] = { _("Configure Machine:"), m_drv.type.fullname() };
+	char const *const text[] = { _("Configure Machine:"), m_sys.description.c_str() };
 	draw_text_box(
 			std::begin(text), std::end(text),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
 void menu_machine_configure::setup_bios()
 {
-	if (!m_drv.rom)
+	if (!m_sys.driver->rom)
 		return;
 
 	std::string specbios(m_opts.bios());
 	char const *default_name(nullptr);
-	for (tiny_rom_entry const *rom = m_drv.rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (tiny_rom_entry const *rom = m_sys.driver->rom; !ROMENTRY_ISEND(rom); ++rom)
 	{
 		if (ROMENTRY_ISDEFAULT_BIOS(rom))
 			default_name = rom->name;
 	}
 
 	std::size_t bios_count = 0;
-	for (romload::system_bios const &bios : romload::entries(m_drv.rom).get_system_bioses())
+	for (romload::system_bios const &bios : romload::entries(m_sys.driver->rom).get_system_bioses())
 	{
 		std::string name(bios.get_description());
 		u32 const bios_flags(bios.get_value());
@@ -934,13 +935,20 @@ void menu_plugins_configure::handle()
 
 void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
-	plugin_options& plugins = mame_machine_manager::instance()->plugins();
+	plugin_options const &plugins = mame_machine_manager::instance()->plugins();
 
-	for (auto &curentry : plugins.plugins())
+	bool first(true);
+	for (auto const &curentry : plugins.plugins())
 	{
-		bool enabled = curentry.m_start;
-		item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+		if ("library" != curentry.m_type)
+		{
+			first = false;
+			bool const enabled = curentry.m_start;
+			item_append_on_off(curentry.m_description, enabled, 0, (void *)(uintptr_t)curentry.m_name.c_str());
+		}
 	}
+	if (first)
+		item_append(_("No plugins found"), 0, nullptr);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 }
@@ -955,7 +963,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 

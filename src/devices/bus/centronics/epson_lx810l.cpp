@@ -50,7 +50,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device, "lx810l", "Espon LX-810L")
+DEFINE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device, "lx810l", "Epson LX-810L")
 DEFINE_DEVICE_TYPE(EPSON_AP2000, epson_ap2000_device, "ap2000", "Epson ActionPrinter 2000")
 
 
@@ -400,7 +400,7 @@ void epson_lx810l_device::fakemem_w(uint8_t data)
 uint8_t epson_lx810l_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
-	uint8_t hp_sensor = m_cr_pos_abs <= 0 ? 0 : 1;
+	uint8_t hp_sensor = m_real_cr_pos <= 0 ? 0 : 1; // use m_real_cr_pos instead of m_cr_pos_abs (fixes walking carriage on mame soft reset)
 	//uint8_t pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
 
 	result |= hp_sensor; /* home position */

@@ -25,10 +25,14 @@ project "utils"
 		ext_includedir("utf8proc"),
 	}
 
+if not _OPTIONS["with-system-utf8proc"] then
+	defines {
+		"UTF8PROC_STATIC",
+	}
+end
+
 	files {
-		MAME_DIR .. "src/lib/util/bitstream.h",
-		MAME_DIR .. "src/lib/util/coretmpl.h",
-		MAME_DIR .. "src/lib/util/lrucache.h",
+		MAME_DIR .. "src/lib/util/abi.h",
 		MAME_DIR .. "src/lib/util/avhuff.cpp",
 		MAME_DIR .. "src/lib/util/avhuff.h",
 		MAME_DIR .. "src/lib/util/aviio.cpp",
@@ -36,6 +40,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/base64.hpp",
 		MAME_DIR .. "src/lib/util/bitmap.cpp",
 		MAME_DIR .. "src/lib/util/bitmap.h",
+		MAME_DIR .. "src/lib/util/bitstream.h",
 		MAME_DIR .. "src/lib/util/cdrom.cpp",
 		MAME_DIR .. "src/lib/util/cdrom.h",
 		MAME_DIR .. "src/lib/util/chd.cpp",
@@ -54,6 +59,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/corefile.h",
 		MAME_DIR .. "src/lib/util/corestr.cpp",
 		MAME_DIR .. "src/lib/util/corestr.h",
+		MAME_DIR .. "src/lib/util/coretmpl.h",
 		MAME_DIR .. "src/lib/util/coreutil.cpp",
 		MAME_DIR .. "src/lib/util/coreutil.h",
 		MAME_DIR .. "src/lib/util/crypto.hpp",
@@ -61,6 +67,9 @@ project "utils"
 		MAME_DIR .. "src/lib/util/delegate.h",
 		MAME_DIR .. "src/lib/util/disasmintf.cpp",
 		MAME_DIR .. "src/lib/util/disasmintf.h",
+		MAME_DIR .. "src/lib/util/dynamicclass.cpp",
+		MAME_DIR .. "src/lib/util/dynamicclass.h",
+		MAME_DIR .. "src/lib/util/dynamicclass.ipp",
 		MAME_DIR .. "src/lib/util/endianness.h",
 		MAME_DIR .. "src/lib/util/flac.cpp",
 		MAME_DIR .. "src/lib/util/flac.h",
@@ -80,6 +89,7 @@ project "utils"
 		MAME_DIR .. "src/lib/util/ioprocsvec.h",
 		MAME_DIR .. "src/lib/util/jedparse.cpp",
 		MAME_DIR .. "src/lib/util/jedparse.h",
+		MAME_DIR .. "src/lib/util/lrucache.h",
 		MAME_DIR .. "src/lib/util/md5.cpp",
 		MAME_DIR .. "src/lib/util/md5.h",
 		MAME_DIR .. "src/lib/util/msdib.cpp",

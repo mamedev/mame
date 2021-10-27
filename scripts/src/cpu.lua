@@ -160,6 +160,8 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/arm7ops.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.cpp",
 		MAME_DIR .. "src/devices/cpu/arm7/lpc210x.h",
+		MAME_DIR .. "src/devices/cpu/arm7/upd800468.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/upd800468.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",
@@ -700,6 +702,8 @@ if CPUS["H8"] then
 		MAME_DIR .. "src/devices/cpu/h8/h8_sci.h",
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.cpp",
 		MAME_DIR .. "src/devices/cpu/h8/h8_watchdog.h",
+		MAME_DIR .. "src/devices/cpu/h8/gt913.cpp",
+		MAME_DIR .. "src/devices/cpu/h8/gt913.h",
 	}
 
 	dependency {
@@ -707,6 +711,7 @@ if CPUS["H8"] then
 		{ MAME_DIR .. "src/devices/cpu/h8/h8h.cpp",      GEN_DIR .. "emu/cpu/h8/h8h.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/h8/h8s2000.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2000.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/h8/h8s2600.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2600.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/h8/gt913.cpp",    GEN_DIR .. "emu/cpu/h8/gt913.hxx" },
 	}
 
 	custombuildtask {
@@ -714,19 +719,22 @@ if CPUS["H8"] then
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8h.hxx",      { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300H source file...",  PYTHON .. " $(1) $(<) s h   $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2000.hxx",  { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 source file...", PYTHON .. " $(1) $(<) s s20 $(@)" }},
 		{ MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2600.hxx",  { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 source file...", PYTHON .. " $(1) $(<) s s26 $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/h8/gt913.lst" , GEN_DIR .. "emu/cpu/h8/gt913.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating GT913 source file...",    PYTHON .. " $(1) $(<) s g   $(@)" }},
 	}
 end
 
 if opt_tool(CPUS, "H8") then
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8d.hxx",      { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300 disassembler source file...",   PYTHON .. " $(1) $(<) d o   $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8hd.hxx",     { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300H disassembler source file...",  PYTHON .. " $(1) $(<) d h   $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2000d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 disassembler source file...", PYTHON .. " $(1) $(<) d s20 $(@)" }})
-	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" , GEN_DIR .. "emu/cpu/h8/h8s2600d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 disassembler source file...", PYTHON .. " $(1) $(<) d s26 $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8d.hxx",      { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300 disassembler source file...",   PYTHON .. " $(1) $(<) d o   $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8hd.hxx",     { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8-300H disassembler source file...",  PYTHON .. " $(1) $(<) d h   $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8s2000d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2000 disassembler source file...", PYTHON .. " $(1) $(<) d s20 $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/h8.lst" ,    GEN_DIR .. "emu/cpu/h8/h8s2600d.hxx", { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating H8S/2600 disassembler source file...", PYTHON .. " $(1) $(<) d s26 $(@)" }})
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/h8/gt913.lst" , GEN_DIR .. "emu/cpu/h8/gt913d.hxx",   { MAME_DIR .. "src/devices/cpu/h8/h8make.py" }, {"@echo Generating GT913 disassembler source file...",    PYTHON .. " $(1) $(<) d g   $(@)" }})
 
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8d.cpp",       GEN_DIR .. "emu/cpu/h8/h8d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8hd.cpp",      GEN_DIR .. "emu/cpu/h8/h8hd.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8s2000d.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2000d.hxx" })
 	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/h8s2600d.cpp",  GEN_DIR .. "emu/cpu/h8/h8s2600d.hxx" })
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/h8/gt913d.cpp",    GEN_DIR .. "emu/cpu/h8/gt913d.hxx" })
 
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8d.h")
@@ -736,6 +744,8 @@ if opt_tool(CPUS, "H8") then
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2000d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2600d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/h8s2600d.h")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/gt913d.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/h8/gt913d.h")
 end
 
 --------------------------------------------------
@@ -2701,8 +2711,12 @@ if (CPUS["Z80"]~=null or CPUS["KC80"]~=null) then
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c011.h",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/tmpz84c015.h",
+		MAME_DIR .. "src/devices/cpu/z80/ez80.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/ez80.h",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/lz8420m.h",
+		MAME_DIR .. "src/devices/cpu/z80/r800.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 	}
 end
 

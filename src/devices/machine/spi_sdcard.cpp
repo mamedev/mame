@@ -225,6 +225,37 @@ void spi_sdcard_device::do_command()
 		send_data(5);
 		break;
 
+	case 10: // CMD10 - SEND_CID
+		m_data[0] = 0x01;   // initial R1 response
+		m_data[1] = 0x00;   // throwaway byte before data transfer
+		m_data[2] = 0xfe;   // data token
+		m_data[3] =  'M';   // Manufacturer ID - we'll use M for MAME
+		m_data[4] =  'M';   // OEM ID - MD for MAMEdev
+		m_data[5] =  'D';
+		m_data[6] =  'M';   // Product Name - "MCARD"
+		m_data[7] =  'C';
+		m_data[8] =  'A';
+		m_data[9] =  'R';
+		m_data[10] = 'D';
+		m_data[11] = 0x10;  // Product Revision in BCD (1.0)
+		{
+			u32 uSerial = 0x12345678;
+			m_data[12] = (uSerial>>24) & 0xff;  // PSN - Product Serial Number
+			m_data[13] = (uSerial>>16) & 0xff;
+			m_data[14] = (uSerial>>8) & 0xff;
+			m_data[15] = (uSerial & 0xff);
+		}
+		m_data[16] = 0x01;  // MDT - Manufacturing Date
+		m_data[17] = 0x59;  // 0x15 9 = 2021, September
+		m_data[18] = 0x00;  // CRC7, bit 0 is always 0
+		{
+			util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], 16);
+			m_data[19] = (crc16 >> 8) & 0xff;
+			m_data[20] = (crc16 & 0xff);
+		}
+		send_data(3 + 16 + 2);
+		break;
+
 	case 16: // CMD16 - SET_BLOCKLEN
 		m_blksize = (m_cmd[3] << 8) | m_cmd[4];
 		if (hard_disk_set_block_size(m_harddisk, m_blksize))
@@ -255,6 +286,11 @@ void spi_sdcard_device::do_command()
 			}
 			LOGMASKED(LOG_GENERAL, "reading LBA %x\n", blk);
 			hard_disk_read(m_harddisk, blk, &m_data[3]);
+			{
+				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);
+				m_data[m_blksize + 3] = (crc16 >> 8) & 0xff;
+				m_data[m_blksize + 4] = (crc16 & 0xff);
+			}
 			send_data(3 + m_blksize + 2);
 		}
 		else

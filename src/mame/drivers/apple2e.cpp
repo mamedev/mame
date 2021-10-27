@@ -1,5 +1,5 @@
-// copyright-holders:R. Belmont
 // license:BSD-3-Clause
+// copyright-holders:R. Belmont
 /***************************************************************************
 
     apple2e.cpp - Apple IIe/IIc/IIc Plus and clones
@@ -116,6 +116,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 
 #define IICP_NEW_IWM (0)
 
+#include "machine/apple2common.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
 #include "cpu/mcs48/mcs48.h"
@@ -123,16 +125,16 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "imagedev/cassette.h"
 #include "imagedev/flopdrv.h"
 #include "machine/appldriv.h"
+#include "machine/applefdintf.h"
 #include "machine/bankdev.h"
+#include "machine/ds1315.h"
+#include "machine/iwm.h"
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 #include "machine/sonydriv.h"
 #include "machine/timer.h"
-#include "machine/ds1315.h"
-#include "machine/apple2common.h"
-#include "machine/applefdintf.h"
-#include "machine/iwm.h"
+#include "sound/spkrdev.h"
 
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/a2alfam2.h"
@@ -198,6 +200,9 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 
 #include "formats/ap2_dsk.h"
 #include "formats/ap_dsk35.h"
+
+
+namespace {
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -5780,6 +5785,9 @@ ROM_START(zijini)
 	ROM_REGION(0x100,"slot6",0)
 	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
 ROM_END
+
+} // anonymous namespace
+
 
 /*    YEAR  NAME        PARENT   COMPAT  MACHINE      INPUT      CLASS          INIT        COMPANY             FULLNAME */
 COMP( 1983, apple2e,    0,       apple2, apple2e,     apple2e,   apple2e_state, empty_init, "Apple Computer",   "Apple //e", MACHINE_SUPPORTS_SAVE )

@@ -476,6 +476,18 @@ void fghthist_state::fghthsta_memmap(address_map &map)
 	map(0x200000, 0x207fff).rw(FUNC(fghthist_state::ioprot_r), FUNC(fghthist_state::ioprot_w)).umask32(0xffff0000).share("prot32ram"); // only maps on 16-bits
 }
 
+void dragngun_state::namcosprite_map(address_map &map)
+{
+	map(0x204800, 0x204fff).ram().share("spclip");// (all entries set to 320x256 here)
+	map(0x208000, 0x208fff).ram().share("lay0");
+	map(0x20c000, 0x20cfff).ram().share("lay1");
+	map(0x210000, 0x217fff).ram().share("look0");
+	map(0x218000, 0x21ffff).ram().share("look1");
+	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
+	map(0x228000, 0x2283ff).ram().share("spindex"); // sprite index (just a table 0x00-0xff here)
+	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
+}
+
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
 // raster effects appear to need some work on it anyway?
 void dragngun_state::dragngun_map(address_map &map)
@@ -504,14 +516,10 @@ void dragngun_state::dragngun_map(address_map &map)
 	map(0x01d4000, 0x01d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
 	map(0x01e0000, 0x01e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
 	map(0x01e4000, 0x01e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
-	map(0x0204800, 0x0204fff).ram(); // ace? 0x10 byte increments only  // 13f ff stuff
-	map(0x0208000, 0x0208fff).ram().share("lay0");
-	map(0x020c000, 0x020cfff).ram().share("lay1");
-	map(0x0210000, 0x0217fff).ram().share("look0");
-	map(0x0218000, 0x021ffff).ram().share("look1");
-	map(0x0220000, 0x0221fff).ram().share("spriteram"); /* Main spriteram */
-	map(0x0228000, 0x02283ff).ram(); //0x10 byte increments only
-	map(0x0230000, 0x0230003).w(FUNC(dragngun_state::spriteram_dma_w));
+
+	//  0x2xxxxx Namco Zooming Sprites
+	namcosprite_map(map);
+
 	map(0x0300000, 0x03fffff).rom().region("maincpu", 0x100000);
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0410000, 0x0410003).w(FUNC(dragngun_state::volume_w));
@@ -555,14 +563,10 @@ void dragngun_state::lockload_map(address_map &map)
 	map(0x1d4000, 0x1d5fff).rw("tilegen2", FUNC(deco16ic_device::pf2_data_dword_r), FUNC(deco16ic_device::pf2_data_dword_w)); // unused
 	map(0x1e0000, 0x1e3fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<2>)).share("pf3_rowscroll32");
 	map(0x1e4000, 0x1e5fff).ram().w(FUNC(dragngun_state::pf_rowscroll_w<3>)).share("pf4_rowscroll32"); // unused
-	map(0x204800, 0x204fff).ram();             //0x10 byte increments only
-	map(0x208000, 0x208fff).ram().share("lay0");
-	map(0x20c000, 0x20cfff).ram().share("lay1");
-	map(0x210000, 0x217fff).ram().share("look0");
-	map(0x218000, 0x21ffff).ram().share("look1");
-	map(0x220000, 0x221fff).ram().share("spriteram"); /* Main spriteram */
-	map(0x228000, 0x2283ff).ram();             //0x10 byte increments only
-	map(0x230000, 0x230003).w(FUNC(dragngun_state::spriteram_dma_w));
+
+	//  0x2xxxxx Namco Zooming Sprites
+	namcosprite_map(map);
+
 	map(0x300000, 0x3fffff).rom().region("maincpu", 0x100000);
 	map(0x410000, 0x410003).w(FUNC(dragngun_state::volume_w));
 	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
@@ -1205,6 +1209,49 @@ void captaven_state::init_captaven()
 
 extern void process_dvi_data(device_t *device,u8* dvi_data, int offset, int regionsize);
 
+void dragngun_state::expand_sprite_data()
+{
+	u8 *rom = memregion("c355spr")->base();
+	size_t len = memregion("c355spr")->bytes();
+
+	for (int i = 0; i < len / 2; i++)
+	{
+		u8 temp = rom[i];
+		rom[i + len / 2] = temp & 0x0f;
+		rom[i] = (temp >> 4) & 0x0f;
+	}
+}
+
+
+
+int dragngun_state::sprite_bank_callback(int sprite)
+{
+	/* High bits of the sprite reference into the sprite control bits for banking */
+	switch (sprite & 0x3000) {
+	default:
+	case 0x0000: sprite = (sprite & 0xfff) | ((m_sprite_ctrl & 0x000f) << 12); break;
+	case 0x1000: sprite = (sprite & 0xfff) | ((m_sprite_ctrl & 0x00f0) << 8); break;
+	case 0x2000: sprite = (sprite & 0xfff) | ((m_sprite_ctrl & 0x0f00) << 4); break;
+	case 0x3000: sprite = (sprite & 0xfff) | ((m_sprite_ctrl & 0xf000) << 0); break;
+	}
+
+	/* Because of the unusual interleaved rom layout, we have to mangle the bank bits
+	even further to suit our gfx decode */
+	switch (sprite & 0xf000) {
+	case 0x0000: sprite = 0xc000 | (sprite & 0xfff); break;
+	case 0x1000: sprite = 0xd000 | (sprite & 0xfff); break;
+	case 0x2000: sprite = 0xe000 | (sprite & 0xfff); break;
+	case 0x3000: sprite = 0xf000 | (sprite & 0xfff); break;
+
+	case 0xc000: sprite = 0x0000 | (sprite & 0xfff); break;
+	case 0xd000: sprite = 0x1000 | (sprite & 0xfff); break;
+	case 0xe000: sprite = 0x2000 | (sprite & 0xfff); break;
+	case 0xf000: sprite = 0x3000 | (sprite & 0xfff); break;
+	}
+
+	return sprite;
+}
+
 void dragngun_state::dragngun_init_common()
 {
 	const u8 *SRC_RAM = memregion("gfx1")->base();
@@ -1216,6 +1263,8 @@ void dragngun_state::dragngun_init_common()
 
 	std::copy(&SRC_RAM[0x00000], &SRC_RAM[0x10000], &DST_RAM[0x080000]);
 	std::copy(&SRC_RAM[0x10000], &SRC_RAM[0x20000], &DST_RAM[0x110000]);
+
+	expand_sprite_data();
 
 #if 0
 	{
@@ -1276,6 +1325,8 @@ void dragngun_state::init_lockload()
 //  ROM[0x1fe3c0/4] = 0xe1a00000;//  NOP test switch lock
 //  ROM[0x1fe3cc/4] = 0xe1a00000;//  NOP test switch lock
 //  ROM[0x1fe40c/4] = 0xe1a00000;//  NOP test switch lock
+
+	expand_sprite_data();
 
 	save_item(NAME(m_oki2_bank));
 }
@@ -1803,28 +1854,6 @@ static const gfx_layout tilelayout_5bpp =
 	16*16*5
 };
 
-static const gfx_layout spritelayout4 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(0,1) },
-	{ STEP16(0,8) },
-	{ STEP16(0,16*8) },
-	16*16*8
-};
-
-static const gfx_layout spritelayout5 =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ STEP4(4,1) },
-	{ STEP16(0,8) },
-	{ STEP16(0,16*8) },
-	16*16*8
-};
-
 static GFXDECODE_START( gfx_captaven )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 128 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,      0, 128 ) /* Tiles 16x16 */
@@ -1843,8 +1872,6 @@ static GFXDECODE_START( gfx_dragngun )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,      0, 64 ) /* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,      0, 64 ) /* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp, 0,  8 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout4,   0, 32 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,   0, 32 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_nslasher )
@@ -2108,8 +2135,7 @@ void dragngun_state::dragngun(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
+	namco_sprites(config);
 
 	// I750, these aren't emulated
 	//I82750PB(config, m_i82750pb, XTAL(25'000'000));
@@ -2169,6 +2195,22 @@ void dragngun_state::lockloadu(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_size(DECO_32x32);    // lockload definitely wants pf34 half width..
 
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
+}
+
+void dragngun_state::namco_sprites(machine_config &config)
+{
+	NAMCO_C355SPR(config, m_sprgenzoom, 0);
+	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
+	m_sprgenzoom->set_palette(m_palette);
+	m_sprgenzoom->set_colors(32);
+	m_sprgenzoom->set_granularity(16);
+	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
+	m_sprgenzoom->set_read_spriteformat(FUNC(dragngun_state::read_spriteformat));
+	m_sprgenzoom->set_read_spritetable(FUNC(dragngun_state::read_spritetable));
+	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
+	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
+	m_sprgenzoom->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
+	m_sprgenzoom->set_device_allocates_spriteram_and_bitmaps(false);
 }
 
 // DE-0420-1 + Bottom board DE-0421-0
@@ -2234,8 +2276,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
-	DECO_ZOOMSPR(config, m_sprgenzoom, 0);
-	m_sprgenzoom->set_gfxdecode(m_gfxdecode);
+	namco_sprites(config);
 
 	DECO146PROT(config, m_ioprot, 0);
 	m_ioprot->port_a_cb().set_ioport("INPUTS");
@@ -2884,15 +2925,15 @@ ROM_START( dragngun )
 	ROM_CONTINUE(            0x2c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x3c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000, "gfx4", 0 )
-	ROM_LOAD32_BYTE( "mar-09.bin", 0x000003, 0x100000,  CRC(18fec9e1) SHA1(1290a9c13b4fd7d2197b39ec616206796e3a17a8) )
-	ROM_LOAD32_BYTE( "mar-10.bin", 0x400003, 0x100000,  CRC(73126fbc) SHA1(9b9c31335e4db726863b219072c83810008f88f9) )
-	ROM_LOAD32_BYTE( "mar-11.bin", 0x000002, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
-	ROM_LOAD32_BYTE( "mar-12.bin", 0x400002, 0x100000,  CRC(4c412512) SHA1(ccd5014bc9f9648cf5fa56bb8d54fc72a7099ca3) )
-	ROM_LOAD32_BYTE( "mar-13.bin", 0x000001, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
-	ROM_LOAD32_BYTE( "mar-14.bin", 0x400001, 0x100000,  CRC(22d38c71) SHA1(62273665975f3e6000fa4b01755aeb70e5dd002d) )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mar-15.bin", 0x000000, 0x100000,  CRC(ec976b20) SHA1(c120b3c56d5e02162e41dc7f726c260d0f8d2f1a) )
+	ROM_LOAD32_BYTE( "mar-13.bin", 0x000001, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
+	ROM_LOAD32_BYTE( "mar-11.bin", 0x000002, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
+	ROM_LOAD32_BYTE( "mar-09.bin", 0x000003, 0x100000,  CRC(18fec9e1) SHA1(1290a9c13b4fd7d2197b39ec616206796e3a17a8) )
 	ROM_LOAD32_BYTE( "mar-16.bin", 0x400000, 0x100000,  CRC(8b329bc8) SHA1(6e34eb6e2628a01a699d20a5155afb2febc31255) )
+	ROM_LOAD32_BYTE( "mar-14.bin", 0x400001, 0x100000,  CRC(22d38c71) SHA1(62273665975f3e6000fa4b01755aeb70e5dd002d) )
+	ROM_LOAD32_BYTE( "mar-12.bin", 0x400002, 0x100000,  CRC(4c412512) SHA1(ccd5014bc9f9648cf5fa56bb8d54fc72a7099ca3) )
+	ROM_LOAD32_BYTE( "mar-10.bin", 0x400003, 0x100000,  CRC(73126fbc) SHA1(9b9c31335e4db726863b219072c83810008f88f9) )
 
 	// this is standard DVI data, see http://www.fileformat.info/format/dvi/egff.htm
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
@@ -2964,15 +3005,15 @@ ROM_START( dragngunj )
 	ROM_CONTINUE(            0x2c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x3c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000, "gfx4", 0 )
-	ROM_LOAD32_BYTE( "mar-09.bin", 0x000003, 0x100000,  CRC(18fec9e1) SHA1(1290a9c13b4fd7d2197b39ec616206796e3a17a8) )
-	ROM_LOAD32_BYTE( "mar-10.bin", 0x400003, 0x100000,  CRC(73126fbc) SHA1(9b9c31335e4db726863b219072c83810008f88f9) )
-	ROM_LOAD32_BYTE( "mar-11.bin", 0x000002, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
-	ROM_LOAD32_BYTE( "mar-12.bin", 0x400002, 0x100000,  CRC(4c412512) SHA1(ccd5014bc9f9648cf5fa56bb8d54fc72a7099ca3) )
-	ROM_LOAD32_BYTE( "mar-13.bin", 0x000001, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
-	ROM_LOAD32_BYTE( "mar-14.bin", 0x400001, 0x100000,  CRC(22d38c71) SHA1(62273665975f3e6000fa4b01755aeb70e5dd002d) )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mar-15.bin", 0x000000, 0x100000,  CRC(ec976b20) SHA1(c120b3c56d5e02162e41dc7f726c260d0f8d2f1a) )
+	ROM_LOAD32_BYTE( "mar-13.bin", 0x000001, 0x100000,  CRC(d675821c) SHA1(ff195422d0bef62d1f9c7784bba1e6b7ab5cd211) )
+	ROM_LOAD32_BYTE( "mar-11.bin", 0x000002, 0x100000,  CRC(1fc638a4) SHA1(003dcfbb65a8f32a1a030502a11432287cf8b4e0) )
+	ROM_LOAD32_BYTE( "mar-09.bin", 0x000003, 0x100000,  CRC(18fec9e1) SHA1(1290a9c13b4fd7d2197b39ec616206796e3a17a8) )
 	ROM_LOAD32_BYTE( "mar-16.bin", 0x400000, 0x100000,  CRC(8b329bc8) SHA1(6e34eb6e2628a01a699d20a5155afb2febc31255) )
+	ROM_LOAD32_BYTE( "mar-14.bin", 0x400001, 0x100000,  CRC(22d38c71) SHA1(62273665975f3e6000fa4b01755aeb70e5dd002d) )
+	ROM_LOAD32_BYTE( "mar-12.bin", 0x400002, 0x100000,  CRC(4c412512) SHA1(ccd5014bc9f9648cf5fa56bb8d54fc72a7099ca3) )
+	ROM_LOAD32_BYTE( "mar-10.bin", 0x400003, 0x100000,  CRC(73126fbc) SHA1(9b9c31335e4db726863b219072c83810008f88f9) )
 
 	ROM_REGION32_LE( 0x1000000, "dvi", 0 ) /* Video data - unused for now */
 	ROM_LOAD32_BYTE( "mar-17.bin",  0x000003,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
@@ -3399,15 +3440,15 @@ ROM_START( lockload ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly d
 	ROM_CONTINUE(            0x5c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x7c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000, "gfx4", 0 )
-	ROM_LOAD32_BYTE( "mbm-08.a14",  0x000003, 0x100000,  CRC(5358a43b) SHA1(778637fc63a0957338c7da3adb2555ffada177c4) )
-	ROM_LOAD32_BYTE( "mbm-09.a16",  0x400003, 0x100000,  CRC(2cce162f) SHA1(db5795465a36971861e8fb7436db0805717ad101) )
-	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
-	ROM_LOAD32_BYTE( "mbm-11.a20",  0x400002, 0x100000,  CRC(8a2a2a9f) SHA1(d11e0ea2785e35123bc56a8f18ce22f58432b599) )
-	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
-	ROM_LOAD32_BYTE( "mbm-13.a22",  0x400001, 0x100000,  CRC(678b9052) SHA1(ae8fc921813e53e9dbc3960e772c1c4de94c22a7) )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000000, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
+	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
+	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
+	ROM_LOAD32_BYTE( "mbm-08.a14",  0x000003, 0x100000,  CRC(5358a43b) SHA1(778637fc63a0957338c7da3adb2555ffada177c4) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400000, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
+	ROM_LOAD32_BYTE( "mbm-13.a22",  0x400001, 0x100000,  CRC(678b9052) SHA1(ae8fc921813e53e9dbc3960e772c1c4de94c22a7) )
+	ROM_LOAD32_BYTE( "mbm-11.a20",  0x400002, 0x100000,  CRC(8a2a2a9f) SHA1(d11e0ea2785e35123bc56a8f18ce22f58432b599) )
+	ROM_LOAD32_BYTE( "mbm-09.a16",  0x400003, 0x100000,  CRC(2cce162f) SHA1(db5795465a36971861e8fb7436db0805717ad101) )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mbm-07.n19",  0x00000, 0x80000,  CRC(414f3793) SHA1(ed5f63e57390d503193fd1e9f7294ae1da6d3539) )
@@ -3468,15 +3509,15 @@ ROM_START( gunhard ) /* Board No. DE-0420-1 + Bottom board DE-0421-0 slightly di
 	ROM_CONTINUE(            0x5c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x7c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000, "gfx4", 0 )
-	ROM_LOAD32_BYTE( "mbm-08.a14",  0x000003, 0x100000,  CRC(5358a43b) SHA1(778637fc63a0957338c7da3adb2555ffada177c4) )
-	ROM_LOAD32_BYTE( "mbm-09.a16",  0x400003, 0x100000,  CRC(2cce162f) SHA1(db5795465a36971861e8fb7436db0805717ad101) )
-	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
-	ROM_LOAD32_BYTE( "mbm-11.a20",  0x400002, 0x100000,  CRC(8a2a2a9f) SHA1(d11e0ea2785e35123bc56a8f18ce22f58432b599) )
-	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
-	ROM_LOAD32_BYTE( "mbm-13.a22",  0x400001, 0x100000,  CRC(678b9052) SHA1(ae8fc921813e53e9dbc3960e772c1c4de94c22a7) )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000000, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
+	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
+	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
+	ROM_LOAD32_BYTE( "mbm-08.a14",  0x000003, 0x100000,  CRC(5358a43b) SHA1(778637fc63a0957338c7da3adb2555ffada177c4) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400000, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
+	ROM_LOAD32_BYTE( "mbm-13.a22",  0x400001, 0x100000,  CRC(678b9052) SHA1(ae8fc921813e53e9dbc3960e772c1c4de94c22a7) )
+	ROM_LOAD32_BYTE( "mbm-11.a20",  0x400002, 0x100000,  CRC(8a2a2a9f) SHA1(d11e0ea2785e35123bc56a8f18ce22f58432b599) )
+	ROM_LOAD32_BYTE( "mbm-09.a16",  0x400003, 0x100000,  CRC(2cce162f) SHA1(db5795465a36971861e8fb7436db0805717ad101) )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mbm-07.n19",  0x00000, 0x80000,  CRC(414f3793) SHA1(ed5f63e57390d503193fd1e9f7294ae1da6d3539) )
@@ -3537,15 +3578,15 @@ ROM_START( lockloadu ) /* Board No. DE-0359-2 + Bottom board DE-0360-4, a Dragon
 	ROM_CONTINUE(            0x5c0000, 0x40000 ) /* 2/4 */
 	ROM_CONTINUE(            0x7c0000, 0x40000 ) /* 3/4 */
 
-	ROM_REGION( 0x800000, "gfx4", 0 )
-	ROM_LOAD32_BYTE( "mbm-08.a14",  0x000003, 0x100000,  CRC(5358a43b) SHA1(778637fc63a0957338c7da3adb2555ffada177c4) )
-	ROM_LOAD32_BYTE( "mbm-09.a16",  0x400003, 0x100000,  CRC(2cce162f) SHA1(db5795465a36971861e8fb7436db0805717ad101) )
-	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
-	ROM_LOAD32_BYTE( "mbm-11.a20",  0x400002, 0x100000,  CRC(8a2a2a9f) SHA1(d11e0ea2785e35123bc56a8f18ce22f58432b599) )
-	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
-	ROM_LOAD32_BYTE( "mbm-13.a22",  0x400001, 0x100000,  CRC(678b9052) SHA1(ae8fc921813e53e9dbc3960e772c1c4de94c22a7) )
+	ROM_REGION( 0x800000*2, "c355spr", ROMREGION_ERASE00 )
 	ROM_LOAD32_BYTE( "mbm-14.a23",  0x000000, 0x100000,  CRC(5aaaf929) SHA1(5ee30db9b83db664d77e6b5e0988ce3366460df6) )
+	ROM_LOAD32_BYTE( "mbm-12.a21",  0x000001, 0x100000,  CRC(7d221d66) SHA1(25c9c20485e443969c0bf4d74c4211c3881dabcd) )
+	ROM_LOAD32_BYTE( "mbm-10.a19",  0x000002, 0x100000,  CRC(232e1c91) SHA1(868d4eb4873ecc210cbb3a266cae0b6ad8f11add) )
+	ROM_LOAD32_BYTE( "mbm-08.a14",  0x000003, 0x100000,  CRC(5358a43b) SHA1(778637fc63a0957338c7da3adb2555ffada177c4) )
 	ROM_LOAD32_BYTE( "mbm-15.a25",  0x400000, 0x100000,  CRC(789ce7b1) SHA1(3fb390ce0620ce7a63f7f46eac1ff0eb8ed76d26) )
+	ROM_LOAD32_BYTE( "mbm-13.a22",  0x400001, 0x100000,  CRC(678b9052) SHA1(ae8fc921813e53e9dbc3960e772c1c4de94c22a7) )
+	ROM_LOAD32_BYTE( "mbm-11.a20",  0x400002, 0x100000,  CRC(8a2a2a9f) SHA1(d11e0ea2785e35123bc56a8f18ce22f58432b599) )
+	ROM_LOAD32_BYTE( "mbm-09.a16",  0x400003, 0x100000,  CRC(2cce162f) SHA1(db5795465a36971861e8fb7436db0805717ad101) )
 
 	ROM_REGION32_LE( 0x1000000, "dvi", ROMREGION_ERASE00 ) /* Video data - same as Dragongun, probably leftover from a conversion */
 //  ROM_LOAD( "mar-17.bin",  0x00000,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) )

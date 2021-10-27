@@ -257,7 +257,10 @@ image_init_result ti99_cartridge_device::call_load()
 	}
 	else
 	{
-		std::error_condition err = rpk_open(machine().options(), util::core_file_read(image_core_file()), machine().system().name, m_rpk);
+		util::core_file::ptr proxy;
+		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+		if (!err)
+			err = rpk_open(machine().options(), std::move(proxy), machine().system().name, m_rpk);
 		if (err)
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());

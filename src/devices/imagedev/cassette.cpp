@@ -14,6 +14,7 @@
 #include "formats/imageutl.h"
 
 #include "util/ioprocs.h"
+#include "util/ioprocsfilter.h"
 
 #define LOG_WARN          (1U<<1)   // Warnings
 #define LOG_DETAIL        (1U<<2)   // Details
@@ -260,7 +261,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 	check_for_file();
 	if (is_create || (length()==0)) // empty existing images are fine to write over.
 	{
-		auto io = util::core_file_read_write(image_core_file(), 0x00);
+		auto io = util::random_read_write_fill(image_core_file(), 0x00);
 		if (io)
 		{
 			// creating an image
@@ -285,7 +286,7 @@ image_init_result cassette_image_device::internal_load(bool is_create)
 			// we probably don't want to retry...
 			retry = false;
 
-			auto io = util::core_file_read_write(image_core_file(), 0x00);
+			auto io = util::random_read_write_fill(image_core_file(), 0x00);
 			if (io)
 			{
 				// try opening the cassette

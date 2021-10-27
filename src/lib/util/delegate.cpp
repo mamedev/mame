@@ -24,20 +24,6 @@
 	#define LOG(...) do { if (false) printf(__VA_ARGS__); } while (false)
 #endif
 
-// on some architectures, function pointers point to descriptors
-// usually this is a global pointer value along with the branch target
-// other platforms using this convention include:
-// * AIX, Classic MacOS and WinNT on 32-bit POWER/PowerPC
-// * pretty much anything on Itanium
-// separately, on some architectures, function descriptors are stored in
-// vtables directly
-#if defined(__ia64__)
-	#define MAME_DELEGATE_VT_DESCRIPTOR 1
-#endif
-#ifndef MAME_DELEGATE_VT_DESCRIPTOR
-	#define MAME_DELEGATE_VT_DESCRIPTOR 0
-#endif
-
 
 
 //**************************************************************************
@@ -87,11 +73,11 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 	// apply the "this" delta to the object first - the value is shifted to the left one bit position for the ARM-like variant
 	LOG("Input this=%p ptr=%p adj=%ld ", reinterpret_cast<void const *>(object), reinterpret_cast<void const *>(m_function), long(m_this_delta));
 	object = reinterpret_cast<delegate_generic_class *>(
-			reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> (MAME_DELEGATE_ITANIUM_ARM ? 1 : 0)));
+			reinterpret_cast<std::uint8_t *>(object) + (m_this_delta >> ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 1 : 0)));
 	LOG("Calculated this=%p ", reinterpret_cast<void const *>(object));
 
 	// test the virtual member function flag - it's the low bit of either the ptr or adj field, depending on the variant
-	if (MAME_DELEGATE_ITANIUM_ARM ? !(m_this_delta & 1) : !(m_function & 1))
+	if ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? !(m_this_delta & 1) : !(m_function & 1))
 	{
 		// conventional function pointer
 		LOG("ptr=%p\n", reinterpret_cast<void const *>(m_function));
@@ -100,9 +86,9 @@ delegate_generic_function delegate_mfp_itanium::convert_to_generic(delegate_gene
 	else
 	{
 		// byte index into the vtable to the function
-		std::uint8_t const *const vtable_ptr = *reinterpret_cast<std::uint8_t const *const *>(object) + m_function - (MAME_DELEGATE_ITANIUM_ARM ? 0 : 1);
+		std::uint8_t const *const vtable_ptr = *reinterpret_cast<std::uint8_t const *const *>(object) + m_function - ((MAME_ABI_CXX_ITANIUM_MFP_TYPE == MAME_ABI_CXX_ITANIUM_MFP_ARM) ? 0 : 1);
 		delegate_generic_function result;
-		if (MAME_DELEGATE_VT_DESCRIPTOR)
+		if (MAME_ABI_CXX_VTABLE_FNDESC)
 			result = reinterpret_cast<delegate_generic_function>(uintptr_t(vtable_ptr));
 		else
 			result = *reinterpret_cast<delegate_generic_function const *>(vtable_ptr);
@@ -159,7 +145,7 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 		{
 			// relative jump with 32-bit displacement (typically a resolved PLT entry)
 			LOG("Found relative jump at %p ", func);
-			func += 5 + *reinterpret_cast<std::int32_t const *>(func + 1);
+			func += std::ptrdiff_t(5) + *reinterpret_cast<std::int32_t const *>(func + 1);
 			LOG("redirecting to %p\n", func);
 			continue;
 		}
@@ -182,7 +168,16 @@ delegate_generic_function delegate_mfp_msvc::adjust_this_pointer(delegate_generi
 			else if ((0x48 == func[3]) && (0x8b == func[4]))
 			{
 				// clang virtual function call thunk - mov rax,QWORD PTR [rcx] ; mov rax,QWORD PTR [rax+...] ; jmp rax
-				if  ((0x40 == func[5]) && (0x48 == func[7]) && (0xff == func[8]) && (0xe0 == func[9]))
+				if  ((0x00 == func[5]) && (0x48 == func[6]) && (0xff == func[7]) && (0xe0 == func[8]))
+				{
+					// no displacement
+					LOG("Found virtual member function thunk at %p ", func);
+					std::uint8_t const *const vptr = *reinterpret_cast<std::uint8_t const *const *>(object);
+					func = *reinterpret_cast<std::uint8_t const *const *>(vptr);
+					LOG("redirecting to %p\n", func);
+					continue;
+				}
+				else if  ((0x40 == func[5]) && (0x48 == func[7]) && (0xff == func[8]) && (0xe0 == func[9]))
 				{
 					// 8-bit displacement
 					LOG("Found virtual member function thunk at %p ", func);

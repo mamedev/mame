@@ -211,7 +211,7 @@ vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t 
 vme_device::vme_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_a32_config("VME A32", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
+	, m_a32_config("a32", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor())
 	, m_allocspaces(true)
 	, m_cputag("maincpu")
 {

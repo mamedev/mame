@@ -68,7 +68,7 @@ local exports = {}
 exports.name = "cheat"
 exports.version = "0.0.1"
 exports.description = "Cheat plugin"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local cheat = exports
@@ -712,6 +712,9 @@ function cheat.startplugin()
 					hotkeymenu = false
 					return true
 				end
+			elseif event == "cancel" then
+				hotkeymenu = false
+				return true
 			end
 			return false
 		end
@@ -722,7 +725,9 @@ function cheat.startplugin()
 			elseif index == 3 then
 				for num, cheat in pairs(cheats) do
 					cheat:set_enabled(false)
-					cheat:set_index(0)
+					if cheat.parameter then
+						cheat:set_index(0)
+					end
 				end
 			elseif index == 4 then
 				for num, cheat in pairs(cheats) do

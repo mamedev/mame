@@ -2287,7 +2287,15 @@ namespace bgfx { namespace d3d11
 					if (NULL != m_swapChain
 					&&  m_needPresent)
 					{
-						hr = m_swapChain->Present(syncInterval, 0);
+						uint32_t presentFlags = 0;
+
+						if (!syncInterval
+						&&  m_dxgi.tearingSupported() )
+						{
+							presentFlags |= DXGI_PRESENT_ALLOW_TEARING;
+						}
+
+						hr = m_swapChain->Present(syncInterval, presentFlags);
 
 						m_needPresent = false;
 					}
@@ -2968,11 +2976,12 @@ namespace bgfx { namespace d3d11
 			const uint32_t index = (_flags & BGFX_SAMPLER_BORDER_COLOR_MASK) >> BGFX_SAMPLER_BORDER_COLOR_SHIFT;
 			_flags &= BGFX_SAMPLER_BITS_MASK;
 
-			// Force both min+max anisotropic, can't be set individually.
-			_flags |= 0 != (_flags & (BGFX_SAMPLER_MIN_ANISOTROPIC|BGFX_SAMPLER_MAG_ANISOTROPIC) )
-					? BGFX_SAMPLER_MIN_ANISOTROPIC|BGFX_SAMPLER_MAG_ANISOTROPIC
-					: 0
-					;
+			// Force min+mag anisotropic (can't be set individually) and remove mip (not supported).
+			if (0 != (_flags & (BGFX_SAMPLER_MIN_ANISOTROPIC|BGFX_SAMPLER_MAG_ANISOTROPIC)))
+			{
+				_flags |= BGFX_SAMPLER_MIN_ANISOTROPIC|BGFX_SAMPLER_MAG_ANISOTROPIC;
+				_flags &= ~BGFX_SAMPLER_MIP_MASK;
+			}
 
 			uint32_t hash;
 			ID3D11SamplerState* sampler;
@@ -3033,7 +3042,7 @@ namespace bgfx { namespace d3d11
 				sd.MinLOD = 0;
 				sd.MaxLOD = D3D11_FLOAT32_MAX;
 
-				m_device->CreateSamplerState(&sd, &sampler);
+				DX_CHECK(m_device->CreateSamplerState(&sd, &sampler));
 				DX_CHECK_REFCOUNT(sampler, 1);
 
 				m_samplerStateCache.add(hash, sampler);
@@ -3367,18 +3376,10 @@ namespace bgfx { namespace d3d11
 					data = (const char*)m_uniforms[handle.idx];
 				}
 
-#define CASE_IMPLEMENT_UNIFORM(_uniform, _dxsuffix, _type) \
-		case UniformType::_uniform: \
-		case UniformType::_uniform|kUniformFragmentBit: \
-				{ \
-					setShaderUniform(uint8_t(type), loc, data, num); \
-				} \
-				break;
-
 				switch ( (uint32_t)type)
 				{
 				case UniformType::Mat3:
-				case UniformType::Mat3|kUniformFragmentBit: \
+				case UniformType::Mat3|kUniformFragmentBit:
 					 {
 						 float* value = (float*)data;
 						 for (uint32_t ii = 0, count = num/3; ii < count; ++ii,  loc += 3*16, value += 9)
@@ -3401,9 +3402,16 @@ namespace bgfx { namespace d3d11
 					}
 					break;
 
-				CASE_IMPLEMENT_UNIFORM(Sampler, I, int);
-				CASE_IMPLEMENT_UNIFORM(Vec4,    F, float);
-				CASE_IMPLEMENT_UNIFORM(Mat4,    F, float);
+				case UniformType::Sampler:
+				case UniformType::Sampler | kUniformFragmentBit:
+				case UniformType::Vec4:
+				case UniformType::Vec4 | kUniformFragmentBit:
+				case UniformType::Mat4:
+				case UniformType::Mat4 | kUniformFragmentBit:
+					{
+						setShaderUniform(uint8_t(type), loc, data, num);
+					}
+					break;
 
 				case UniformType::End:
 					break;
@@ -3412,7 +3420,6 @@ namespace bgfx { namespace d3d11
 					BX_TRACE("%4d: INVALID 0x%08x, t %d, l %d, n %d, c %d", _uniformBuffer.getPos(), opcode, type, loc, num, copy);
 					break;
 				}
-#undef CASE_IMPLEMENT_UNIFORM
 			}
 		}
 

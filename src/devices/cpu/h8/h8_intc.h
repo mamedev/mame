@@ -60,6 +60,14 @@ protected:
 	void check_level_irqs(bool force_update = false);
 };
 
+class gt913_intc_device : public h8_intc_device {
+public:
+	gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
 class h8h_intc_device : public h8_intc_device {
 public:
 	h8h_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -105,8 +113,9 @@ private:
 	virtual void device_reset() override;
 };
 
-DECLARE_DEVICE_TYPE(H8_INTC,  h8_intc_device)
-DECLARE_DEVICE_TYPE(H8H_INTC, h8h_intc_device)
-DECLARE_DEVICE_TYPE(H8S_INTC, h8s_intc_device)
+DECLARE_DEVICE_TYPE(H8_INTC,    h8_intc_device)
+DECLARE_DEVICE_TYPE(H8H_INTC,   h8h_intc_device)
+DECLARE_DEVICE_TYPE(H8S_INTC,   h8s_intc_device)
+DECLARE_DEVICE_TYPE(GT913_INTC, gt913_intc_device)
 
 #endif // MAME_CPU_H8_H8_INTC_H

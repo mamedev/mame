@@ -18,6 +18,7 @@
 
 BX_ERROR_RESULT(BGFX_ERROR_TEXTURE_VALIDATION,      BX_MAKEFOURCC('b', 'g', 0, 1) );
 BX_ERROR_RESULT(BGFX_ERROR_FRAME_BUFFER_VALIDATION, BX_MAKEFOURCC('b', 'g', 0, 2) );
+BX_ERROR_RESULT(BGFX_ERROR_IDENTIFIER_VALIDATION,   BX_MAKEFOURCC('b', 'g', 0, 3) );
 
 namespace bgfx
 {
@@ -973,7 +974,7 @@ namespace bgfx
 		return s_predefinedName[_enum];
 	}
 
-	PredefinedUniform::Enum nameToPredefinedUniformEnum(const char* _name)
+	PredefinedUniform::Enum nameToPredefinedUniformEnum(const bx::StringView& _name)
 	{
 		for (uint32_t ii = 0; ii < PredefinedUniform::Count; ++ii)
 		{
@@ -2584,6 +2585,7 @@ namespace bgfx
 	}
 
 	BGFX_RENDERER_CONTEXT(noop);
+	BGFX_RENDERER_CONTEXT(agc);
 	BGFX_RENDERER_CONTEXT(d3d9);
 	BGFX_RENDERER_CONTEXT(d3d11);
 	BGFX_RENDERER_CONTEXT(d3d12);
@@ -2607,6 +2609,7 @@ namespace bgfx
 	static RendererCreator s_rendererCreator[] =
 	{
 		{ noop::rendererCreate,   noop::rendererDestroy,   BGFX_RENDERER_NOOP_NAME,       true                              }, // Noop
+		{ agc::rendererCreate,    agc::rendererDestroy,    BGFX_RENDERER_AGC_NAME,        !!BGFX_CONFIG_RENDERER_AGC        }, // GNM
 		{ d3d9::rendererCreate,   d3d9::rendererDestroy,   BGFX_RENDERER_DIRECT3D9_NAME,  !!BGFX_CONFIG_RENDERER_DIRECT3D9  }, // Direct3D9
 		{ d3d11::rendererCreate,  d3d11::rendererDestroy,  BGFX_RENDERER_DIRECT3D11_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D11 }, // Direct3D11
 		{ d3d12::rendererCreate,  d3d12::rendererDestroy,  BGFX_RENDERER_DIRECT3D12_NAME, !!BGFX_CONFIG_RENDERER_DIRECT3D12 }, // Direct3D12
@@ -4234,7 +4237,14 @@ namespace bgfx
 		BX_ASSERT(0 < _num, "Requesting 0 vertices.");
 		BX_ASSERT(isValid(_layout), "Invalid VertexLayout.");
 
-		s_ctx->allocTransientVertexBuffer(_tvb, _num, _layout);
+		VertexLayoutHandle layoutHandle;
+		{
+			BGFX_MUTEX_SCOPE(s_ctx->m_resourceApiLock);
+			layoutHandle = s_ctx->findOrCreateVertexLayout(_layout, true);
+		}
+		BX_ASSERT(isValid(layoutHandle), "Failed to allocate vertex layout handle (BGFX_CONFIG_MAX_VERTEX_LAYOUTS, max: %d).", BGFX_CONFIG_MAX_VERTEX_LAYOUTS);
+
+		s_ctx->allocTransientVertexBuffer(_tvb, _num, layoutHandle, _layout.m_stride);
 
 		BX_ASSERT(_num == _tvb->size / _layout.m_stride
 			, "Failed to allocate transient vertex buffer (requested %d, available %d). "
@@ -4633,6 +4643,55 @@ namespace bgfx
 		bx::Error err;
 		isTextureValid(_depth, _cubeMap, _numLayers, _format, _flags, &err);
 		return err.isOk();
+	}
+
+	void isIdentifierValid(const bx::StringView& _name, bx::Error* _err)
+	{
+		BX_ERROR_SCOPE(_err, "Uniform identifier validation");
+
+		BGFX_ERROR_CHECK(false
+			|| !_name.isEmpty()
+			, _err
+			, BGFX_ERROR_IDENTIFIER_VALIDATION
+			, "Identifier can't be empty."
+			, ""
+			);
+
+		BGFX_ERROR_CHECK(false
+			|| PredefinedUniform::Count == nameToPredefinedUniformEnum(_name)
+			, _err
+			, BGFX_ERROR_IDENTIFIER_VALIDATION
+			, "Identifier can't use predefined uniform name."
+			, ""
+			);
+
+		const char ch = *_name.getPtr();
+		BGFX_ERROR_CHECK(false
+			|| bx::isAlpha(ch)
+			|| '_' == ch
+			, _err
+			, BGFX_ERROR_IDENTIFIER_VALIDATION
+			, "The first character of an identifier should be either an alphabet character or an underscore."
+			, ""
+			);
+
+		bool result = true;
+
+		for (const char* ptr = _name.getPtr() + 1, *term = _name.getTerm()
+			; ptr != term && result
+			; ++ptr
+			)
+		{
+			result &= bx::isAlphaNum(*ptr) || '_' == *ptr;
+		}
+
+		BGFX_ERROR_CHECK(false
+			|| result
+			, _err
+			, BGFX_ERROR_IDENTIFIER_VALIDATION
+			, "Identifier contains invalid characters. Identifier must be the alphabet character, number, or underscore."
+			, ""
+			);
 	}
 
 	void calcTextureSize(TextureInfo& _info, uint16_t _width, uint16_t _height, uint16_t _depth, bool _cubeMap, bool _hasMips, uint16_t _numLayers, TextureFormat::Enum _format)

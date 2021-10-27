@@ -11,7 +11,7 @@ driver by
 TODO:
 - map missing inputs (temp mapped to z-x-left shift)
 - is there (still..) some kind of protection ? timers looks weird (2nd player timer is frozen) (this seems fixed now -AS)
-- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently.
+- colors (afaik color(?) prom outputs are connected to one of pals), Missing color prom apparently. Reference: https://www.youtube.com/watch?v=inc4tyuh4qk
 
 
 Basic hw is...
