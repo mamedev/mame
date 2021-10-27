@@ -609,7 +609,7 @@ std::string cococart_slot_device::get_default_card_software(get_default_card_sof
 		// RPK file
 		rpk_file::ptr file;
 		util::core_file::ptr proxy;
-		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+		std::error_condition err = util::core_file::open_proxy(*hook.image_file(), proxy);
 		if (!err)
 			err = read_coco_rpk(std::move(proxy), file);
 		if (!err)
