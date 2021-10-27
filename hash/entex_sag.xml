@@ -64,6 +64,18 @@ Battleship and Turtles were announced but unreleased.
 		</part>
 	</software>
 
+	<software name="pacman2">
+		<description>Pac-Man 2</description>
+		<year>1981</year>
+		<publisher>Entex</publisher>
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
+				<rom name="pac1_hd38800a36" offset="0x0000" size="0x1000" crc="6050bc45" sha1="093d0905b73dc9050adb6a6d700ca4f068f009c1" />
+				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pinball">
 		<description>Pinball</description>
 		<year>1981</year>
