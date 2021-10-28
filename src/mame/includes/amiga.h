@@ -610,6 +610,10 @@ protected:
 	void ecs_map(address_map &map);
 	void aga_map(address_map &map);
 
+	// TODO: move to Agnus/Alice
+	void bplcon0_w(u16 data);
+	void aga_bplcon0_w(u16 data);
+
 private:
 	// blitter helpers
 	uint32_t blit_ascending();

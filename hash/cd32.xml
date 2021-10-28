@@ -713,7 +713,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
+	<!-- Boot OK, has stripe glitch during FMV, road doesn't draw when player is on the left side of the road -->
 	<!-- http://redump.org/disc/3306/ -->
 	<software name="blkviper" supported="no">
 		<description>Black Viper</description>
@@ -915,9 +915,9 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Doesn't boot -->
+	<!-- GFX color glitch with Flair mascot at boot -->
 	<!-- http://redump.org/disc/16189/ -->
-	<software name="dstreets" supported="no">
+	<software name="dstreets" supported="partial">
 		<description>Dangerous Streets</description>
 		<year>1994</year>
 		<publisher>Flair</publisher>
@@ -1382,7 +1382,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Glitchy sprites, no sound, like the Ami1200 AGA version -->
+	<!-- Glitchy sprites, no sound, like the Amiga 1200 AGA version -->
 	<software name="pballill" supported="no">
 		<description>Pinball Illusions</description>
 		<year>1995</year>
@@ -1435,7 +1435,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Heavy GFX glitches in Project-X, DSKDAT W 0000 in F17 Challenge-->
+	<!-- Heavy GFX glitches in Project-X, DSKDAT W 0000 (?) in F17 Challenge-->
 	<software name="projxf17" supported="no">
 		<description>Project-X and F17 Challenge</description>
 		<year>1994</year>
@@ -1622,8 +1622,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- http://redump.org/disc/3307/ -->
-	<software name="strippot" supported="no">
+	<software name="strippot" supported="yes">
 		<description>Strip Pot</description>
 		<year>1994</year>
 		<publisher>Guildhall Leisure</publisher>
@@ -1648,8 +1649,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- 2nd screen text has an overlayed glitchy black stripe in the swimming event -->
 	<!-- http://redump.org/disc/3230/ -->
-	<software name="solympix" supported="no">
+	<software name="solympix" supported="partial">
 		<description>Summer Olympix</description>
 		<year>1994</year>
 		<publisher>Flair</publisher>

@@ -1148,6 +1148,8 @@ void amiga_state::ocs_map(address_map &map)
 	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
 	map(0x0c0, 0x0cb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<2>));
 	map(0x0d0, 0x0db).m(m_paula, FUNC(paula_8364_device::audio_channel_map<3>));
+
+	map(0x100, 0x101).w(FUNC(amiga_state::bplcon0_w));
 }
 
 void amiga_state::ecs_map(address_map &map)
@@ -1159,7 +1161,8 @@ void amiga_state::ecs_map(address_map &map)
 void amiga_state::aga_map(address_map &map)
 {
 	ecs_map(map);
-	// ...
+
+	map(0x100, 0x101).w(FUNC(amiga_state::aga_bplcon0_w));
 }
 
 
@@ -1172,6 +1175,24 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_INTENA) = 0x0000;
 	CUSTOM_REG(REG_SERDATR) = SERDATR_RXD | SERDATR_TSRE | SERDATR_TBE;
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
+}
+
+void amiga_state::bplcon0_w(u16 data)
+{
+	// FIXME: verify OCS / ECS games trying to set this up
+	if ((data & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) == (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2))
+	{
+		/* planes go from 0 to 6, inclusive */
+		popmessage( "This game is doing funky planes stuff. (planes > 6, %04x)", data );
+		data &= ~BPLCON0_BPU0;
+	}
+	CUSTOM_REG(REG_BPLCON0) = data;
+}
+
+void amiga_state::aga_bplcon0_w(u16 data)
+{
+	// just allow all (AGA surfninj title screen relies on this)
+	CUSTOM_REG(REG_BPLCON0) = data;
 }
 
 uint16_t amiga_state::custom_chip_r(offs_t offset)
@@ -1516,6 +1537,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			data &= ( m_chip_ram_mask >> 16 );
 			break;
 
+#ifdef UNUSED_FUNCTION
 		case REG_BPLCON0:
 			if ((data & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) == (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2))
 			{
@@ -1525,6 +1547,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			}
 			CUSTOM_REG(offset) = data;
 			break;
+#endif
 
 		case REG_BPL1MOD:   case REG_BPL2MOD:
 			// bit 0 is implicitly ignored on writes,
