@@ -31336,12 +31336,6 @@ slotunbl                        // ???
 mustache                        // (c) 1987 March
 mustachei                       // (c) 1987 IG SPA
 
-@source:mvme120.cpp
-mvme120							// (c) 1984 Motorola
-mvme121							// (c) 1984 Motorola
-mvme122							// (c) 1984 Motorola
-mvme123							// (c) 1984 Motorola
-
 @source:mvme147.cpp
 mvme147                         // (c) 1989 Motorola
 
@@ -39967,6 +39961,9 @@ s3670                           //
 
 @source:synthex.cpp
 synthex                         //
+
+@source:sys1121.cpp
+sys1121							// (c) 1984 Motorola
 
 @source:sys2900.cpp
 sys2900                         //

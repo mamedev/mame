@@ -3044,9 +3044,9 @@ files {
 	MAME_DIR .. "src/mame/drivers/mekd3.cpp",
 	MAME_DIR .. "src/mame/drivers/mekd4.cpp",
 	MAME_DIR .. "src/mame/drivers/mekd5.cpp",
-	MAME_DIR .. "src/mame/drivers/mvme120.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme147.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme162.cpp",
+	MAME_DIR .. "src/mame/drivers/sys1121.cpp",
 	MAME_DIR .. "src/mame/drivers/uchroma68.cpp",
 }
 
