@@ -18,13 +18,7 @@
  *  Looks like you also have to reboot the system once before the terminal
  *  works properly? Still working on that.
  */
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "bus/vme/vme.h"
-#include "bus/rs232/rs232.h"
-#include "machine/clock.h"
-#include "machine/mc68901.h"
-#include "bus/vme/vme_mvme120.h"
+#include "vme_mvme120.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -64,9 +58,9 @@ INPUT_PORTS_START(mvme120)
 	PORT_START("S3")
 	
 	// described as "autoboot" and "cache disable" in the manual
-	PORT_DIPNAME(0x01, 0x00, "Unknown")            	PORT_DIPLOCATION("S3:1")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_autoboot, 0)
-	PORT_DIPSETTING(   0x01, "On")
-	PORT_DIPSETTING(   0x00, "Off")
+	PORT_DIPNAME(0x01, 0x00, DEF_STR( Unknown ) )  	PORT_DIPLOCATION("S3:1")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_autoboot, 0)
+	PORT_DIPSETTING(   0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ) )
 	
 	PORT_DIPNAME(0x02, 0x00, "Baud Rate Select")    PORT_DIPLOCATION("S3:2")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_baudrate, 0)
 	PORT_DIPSETTING(   0x02, "10.0MHz CPU")
@@ -86,6 +80,7 @@ vme_mvme120_device::vme_mvme120_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu (*this, "maincpu")
+	, m_maincpu_region (*this, "maincpu")
 	, m_mfp (*this, "mfp")
 	, m_rs232 (*this, "rs232")
 	, m_input_s3(*this, "S3")
@@ -119,36 +114,94 @@ vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, 
 
 void vme_mvme120_device::mvme120_mem(address_map &map)
 {
-	map(0x000000, 0x000007).ram().w(FUNC(vme_mvme120_card_device::bootvect_w));       /* After four memory cycles we act as RAM */
-	map(0x000000, 0x000007).rom().r(FUNC(vme_mvme120_card_device::bootvect_r));       /* ROM mirror just during reset */
-	map(0x000008, 0x01ffff).ram(); 											/* 128KB RAM */
-	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); /* VMEbus 24-bit addresses */
-	map(0xf00000, 0xf0ffff).rom().region("roms", 0x00000); 					/* ROM/EEPROM bank 1 - 120bug */
-	map(0xf10000, 0xf1ffff).rom().region("roms", 0x10000);					/* ROM/EEPROM bank 2 - unpopulated */
+	map(0x000000, 0x000007).ram().w(FUNC(vme_mvme120_card_device::bootvect_w));       // After four memory cycles we act as RAM
+	map(0x000000, 0x000007).rom().r(FUNC(vme_mvme120_card_device::bootvect_r));       // ROM mirror just during reset
+	map(0x000008, 0x01ffff).ram();
+	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
+	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
 	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
 	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
 	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
-	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); /* VMEbus 24-bit addresses */
-	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); /* VMEbus 16-bit addresses */
+	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
 	
 	// $F80002-F80003 clear cache bank   2	
 	// $F80004-F80005 clear cache bank 1
 	// $F80006-F80007 clear cache bank 1+2
 	// (above mirrored to $F9FFFF)
-	
 }
 
-/* Start it up */
+void vme_mvme120_device::mvme121_mem(address_map &map)
+{
+	map(0x000000, 0x000007).ram().w(FUNC(vme_mvme120_card_device::bootvect_w));		// After four memory cycles we act as RAM
+	map(0x000000, 0x000007).rom().r(FUNC(vme_mvme120_card_device::bootvect_r));		// ROM mirror just during reset
+	map(0x000008, 0x07ffff).ram();
+	map(0x080000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
+	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
+	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
+	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
+	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
+	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
+	
+	// $F80002-F80003 clear cache bank   2	
+	// $F80004-F80005 clear cache bank 1
+	// $F80006-F80007 clear cache bank 1+2
+	// (above mirrored to $F9FFFF)
+}
+
+void vme_mvme120_device::mvme122_mem(address_map &map)
+{
+	map(0x000000, 0x000007).ram().w(FUNC(vme_mvme120_card_device::bootvect_w));       // After four memory cycles we act as RAM
+	map(0x000000, 0x000007).rom().r(FUNC(vme_mvme120_card_device::bootvect_r));       // ROM mirror just during reset
+	map(0x000008, 0x01ffff).ram();
+	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
+	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
+	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
+	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
+	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
+	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
+	
+	// $F80002-F80003 clear cache bank   2	
+	// $F80004-F80005 clear cache bank 1
+	// $F80006-F80007 clear cache bank 1+2
+	// (above mirrored to $F9FFFF)
+}
+
+void vme_mvme120_device::mvme123_mem(address_map &map)
+{
+	map(0x000000, 0x000007).ram().w(FUNC(vme_mvme120_card_device::bootvect_w));       // After four memory cycles we act as RAM
+	map(0x000000, 0x000007).rom().r(FUNC(vme_mvme120_card_device::bootvect_r));       // ROM mirror just during reset
+	map(0x000008, 0x07ffff).ram();
+	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
+	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
+	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
+	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
+	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
+	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
+	
+	// $F80002-F80003 clear cache bank   2	
+	// $F80004-F80005 clear cache bank 1
+	// $F80006-F80007 clear cache bank 1+2
+	// (above mirrored to $F9FFFF)
+}
+
 void vme_mvme120_device::device_start ()
 {
 	LOG("%s\n", FUNCNAME);
 
-	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (uint16_t*)(memregion ("roms")->base ());
+	// Setup pointer to bootvector in ROM for bootvector handler bootvect_r
+	m_sysrom = (uint16_t *)m_maincpu_region->base();
 	m_boot_memory_cycles = 0;
-	m_ctrlreg = 0xFF;		/* all bits are set to 1 when /RESET asserted */
+	m_ctrlreg = 0xFF;		// all bits are set to 1 when /RESET asserted
 	
-	m_mfp->tai_w(1);		/* Tied to +5V */
+	m_mfp->tai_w(1);		// Tied to +5V
 
 }
 
@@ -156,11 +209,11 @@ void vme_mvme120_device::device_reset ()
 {
 	LOG("%s\n", FUNCNAME);
 
-	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
-	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
-		m_sysrom = (uint16_t*)(memregion ("roms")->base ());
+	// Reset pointer to bootvector in ROM for bootvector handler bootvect_r
+	if (m_sysrom == &m_sysram[0]) // Condition needed because memory map is not setup first time
+		m_sysrom = (uint16_t *)m_maincpu_region->base();
 	m_boot_memory_cycles = 0;
-	m_ctrlreg = 0xFF;		/* all bits are set to 1 when /RESET asserted */
+	m_ctrlreg = 0xFF;		// all bits are set to 1 when /RESET asserted
 }
 
 //
@@ -187,8 +240,9 @@ WRITE_LINE_MEMBER(vme_mvme120_device::mfp_interrupt)
 	}
 }
 
-/* Dummy VMEbus access */
-uint16_t vme_mvme120_device::vme_a24_r(){
+// Dummy VMEbus access
+uint16_t vme_mvme120_device::vme_a24_r()
+{
 	//LOG("%s\n", FUNCNAME);
 	
 	// Simulate VMEbus timeout.
@@ -198,10 +252,11 @@ uint16_t vme_mvme120_device::vme_a24_r(){
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	
-	return (uint16_t) 0;
+	return 0;
 }
 
-void vme_mvme120_device::vme_a24_w(uint16_t data){	
+void vme_mvme120_device::vme_a24_w(uint16_t data)
+{	
 	// Simulate VMEbus timeout.
 	m_mfp->i2_w(ASSERT_LINE);
 	m_mfp->i2_w(CLEAR_LINE);
@@ -212,16 +267,19 @@ void vme_mvme120_device::vme_a24_w(uint16_t data){
 	//LOG("%s\n", FUNCNAME);
 }
 
-uint16_t vme_mvme120_device::vme_a16_r(){
+uint16_t vme_mvme120_device::vme_a16_r()
+{
 	//LOG("%s\n", FUNCNAME);
-	return (uint16_t) 0;
+	return 0;
 }
 
-void vme_mvme120_device::vme_a16_w(uint16_t data){
+void vme_mvme120_device::vme_a16_w(uint16_t data)
+{
 	//LOG("%s\n", FUNCNAME);
 }
 
-uint8_t vme_mvme120_device::ctrlreg_r(offs_t offset){
+uint8_t vme_mvme120_device::ctrlreg_r(offs_t offset)
+{
 	// Control Register
 	// b0 - BRDFAIL
 	// b1 - /CTS
@@ -235,7 +293,8 @@ uint8_t vme_mvme120_device::ctrlreg_r(offs_t offset){
 	return m_ctrlreg;
 }
 
-void vme_mvme120_device::ctrlreg_w(offs_t offset, uint8_t data){
+void vme_mvme120_device::ctrlreg_w(offs_t offset, uint8_t data)
+{
 	LOG("%s: vme120 control register set to $%02X\n", FUNCNAME, data);
 	m_ctrlreg = data;
 	
@@ -243,8 +302,9 @@ void vme_mvme120_device::ctrlreg_w(offs_t offset, uint8_t data){
 	m_rs232->write_rts(!BIT(m_ctrlreg, 1));
 }
 
-/* Boot vector handler, the PCB hardwires the first 8 bytes from 0xfff00000 to 0x0 at reset*/
-uint16_t vme_mvme120_device::bootvect_r(offs_t offset){
+// Boot vector handler, the PCB hardwires the first 8 bytes from 0xfff00000 to 0x0 at reset
+uint16_t vme_mvme120_device::bootvect_r(offs_t offset)
+{
 	if(m_boot_memory_cycles++ >= 4)
 	{
 		m_sysrom = &m_sysram[0]; // We're RAM again.
@@ -254,7 +314,8 @@ uint16_t vme_mvme120_device::bootvect_r(offs_t offset){
 	return m_sysrom[offset];
 }
 
-void vme_mvme120_device::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask){
+void vme_mvme120_device::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
 	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
@@ -275,7 +336,7 @@ static const input_device_default terminal_defaults[] =
  */
 void vme_mvme120_device::device_add_mconfig(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68010(config, m_maincpu, MVME120_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme120_card_device::mvme120_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme120_card_device::mvme120_mem);
@@ -301,17 +362,23 @@ void vme_mvme120_device::device_add_mconfig(machine_config &config)
 void vme_mvme120_card_device::device_add_mconfig(machine_config &config)
 {
 	vme_mvme120_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme120_card_device::mvme120_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme120_card_device::mvme120_mem);
 }
 
 void vme_mvme121_card_device::device_add_mconfig(machine_config &config)
 {
 	vme_mvme120_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme121_card_device::mvme121_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme121_card_device::mvme121_mem);
 }
 
 void vme_mvme122_card_device::device_add_mconfig(machine_config &config)
 {
 	vme_mvme120_device::device_add_mconfig(config);
 	
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme122_card_device::mvme122_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme122_card_device::mvme122_mem);
 	m_maincpu->set_clock(MVME122_CPU_CLOCK);
 	
 	m_mfp->set_clock(MVME122_CPU_CLOCK / 4);
@@ -321,6 +388,8 @@ void vme_mvme122_card_device::device_add_mconfig(machine_config &config)
 void vme_mvme123_card_device::device_add_mconfig(machine_config &config)
 {
 	vme_mvme120_device::device_add_mconfig(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme123_card_device::mvme123_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme123_card_device::mvme123_mem);
 	
 	m_maincpu->set_clock(MVME122_CPU_CLOCK);
 	
@@ -328,7 +397,7 @@ void vme_mvme123_card_device::device_add_mconfig(machine_config &config)
 	m_mfp->set_timer_clock(MVME122_CPU_CLOCK / 4);
 }
 
-/* DIP switch and jumpers */
+// DIP switch and jumpers
 INPUT_CHANGED_MEMBER(vme_mvme120_device::s3_autoboot)
 {
 	// TODO: verify
@@ -341,18 +410,18 @@ INPUT_CHANGED_MEMBER(vme_mvme120_device::s3_baudrate)
 	//m_mfp->i1_w(BIT(m_input_s3->read(), 1));
 }
 
-/* ROM definitions */
+// ROM definitions
 ROM_START (mvme120)
-	ROM_REGION16_BE(0x20000, "roms", 0)
-	ROM_DEFAULT_BIOS("120bug-v2.0")
+	ROM_REGION16_BE(0x20000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("12xbug-v2.0")
 
-	ROM_SYSTEM_BIOS(0, "120bug-v2.0", "MVME120 120bug v2.0")
-	ROMX_LOAD("120bug-2.0-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("120bug-2.0-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(0, "12xbug-v2.0", "MVME120 12xbug v2.0")
+	ROMX_LOAD("12xbug-2.0-u44.bin", 0x0000, 0x4000, CRC(87d62dac) SHA1(c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("12xbug-2.0-u52.bin", 0x0001, 0x4000, CRC(5651b61d) SHA1(0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(0))
 	
-	ROM_SYSTEM_BIOS(1, "120bug-v1.1", "MVME120 120bug v1.1")
-	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "12xbug-v1.1", "MVME120 12xbug v1.1")
+	ROMX_LOAD("12xbug-1.1-u44.bin", 0x0000, 0x4000, CRC(bf4d6cf1) SHA1(371bb55611eddeb6231a92af7c1e34d4ec0321b5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("12xbug-1.1-u52.bin", 0x0001, 0x4000, CRC(76fabe32) SHA1(2f933d0eb46d00db0051ce23c3e53ccef75a2c69), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
 
 const tiny_rom_entry *vme_mvme120_device::device_rom_region() const

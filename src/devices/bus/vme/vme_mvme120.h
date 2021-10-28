@@ -81,6 +81,8 @@ protected:
 	
 	// add the rest of the devices here...
 	required_device<cpu_device> m_maincpu;
+	required_memory_region m_maincpu_region;	
+	
 	required_device<mc68901_device> m_mfp;
 	required_device<rs232_port_device> m_rs232;
 	
@@ -105,6 +107,11 @@ protected:
 	// Add the devices' registers and callbacks here...
 	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);	
 	DECLARE_WRITE_LINE_MEMBER(mfp_interrupt);
+	
+	// Memory maps for the 12x variants
+	void mvme121_mem(address_map &map);
+	void mvme122_mem(address_map &map);
+	void mvme123_mem(address_map &map);
 	
 	const mvme120_board_t  m_board_id;
 };
