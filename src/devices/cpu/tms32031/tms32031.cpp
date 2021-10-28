@@ -6,10 +6,10 @@
 
     TMS320C3x family 32-bit floating point DSP emulator
 
-    TMS320C30/1/2 difference table:
+    TMS320C3x family difference table:
 
     |-------------------|-------------------|-------------------|-------------------|
-    | Feature           | 'C30              | 'C31              | 'C32              |
+    | Feature           | 'C30              | 'C31/'VC33        | 'C32              |
     |-------------------|-------------------|-------------------|-------------------|
     | External Bus      | Two buses:        | One bus:          | One bus:          |
     |                   | Primary bus:      | 32-bit data       | 32-bit data       |
@@ -35,9 +35,12 @@
     |-------------------|-------------------|-------------------|-------------------|
     | Boot Loader       | No                | Yes               | Yes               |
     |-------------------|-------------------|-------------------|-------------------|
-    | On-Chip RAM       | 2k                | 2k                | 512               |
+    | On-Chip RAM       | 2k                | 2k('31)/34k('33)  | 512               |
     | (Words)           | Address:          | Address:          | Address:          |
     |                   | 809800-809fff     | 809800-809fff     | 87fe00-87ffff     |
+    |                   |                   | ('C31,'VC33)      |                   |
+    |                   |                   | 800000-807fff     |                   |
+    |                   |                   | ('VC33 only)      |                   |
     |-------------------|-------------------|-------------------|-------------------|
     | DMA               | 1 Channel         | 1 Channel         | 2 Channels        |
     |                   | CPU greater       | CPU greater       | Configurable      |
@@ -62,6 +65,8 @@
     TODO:
     - merge and implement internal peripheral emulations
     - implement chip family difference
+    - interlocked operation
+    - instruction pipelining
 
 ***************************************************************************/
 
@@ -148,6 +153,7 @@ const int GIEFLAG   = 0x2000;
 DEFINE_DEVICE_TYPE(TMS32030, tms32030_device, "tms32030", "Texas Instruments TMS320C30")
 DEFINE_DEVICE_TYPE(TMS32031, tms32031_device, "tms32031", "Texas Instruments TMS320C31")
 DEFINE_DEVICE_TYPE(TMS32032, tms32032_device, "tms32032", "Texas Instruments TMS320C32")
+DEFINE_DEVICE_TYPE(TMS32033, tms32033_device, "tms32033", "Texas Instruments TMS320VC33")
 
 // memory map common to all 'C30 devices
 // TODO: expand to cover all the standard internal peripherals
@@ -193,6 +199,8 @@ void tms32030_device::internal_32030(address_map &map)
 	//map(0x808060, 0x808060) Expansion-Bus Control
 	//map(0x808064, 0x808064) Primary-Bus Control
 	map(0x809800, 0x809fff).ram();
+	//map(0x809800, 0x809bff).ram(); // RAM block 0
+	//map(0x809c00, 0x809fff).ram(); // RAM block 1
 	//map(0x80a000, 0xffffff) STRB
 }
 
@@ -203,6 +211,8 @@ void tms32031_device::internal_32031(address_map &map)
 	//map(0x000000, 0x7fffff) STRB
 	//map(0x808064, 0x808064) Primary-Bus Control
 	map(0x809800, 0x809fff).ram();
+	//map(0x809800, 0x809bff).ram(); // RAM block 0
+	//map(0x809c00, 0x809fff).ram(); // RAM block 1
 	//map(0x80a000, 0xffffff) STRB
 }
 
@@ -220,8 +230,25 @@ void tms32032_device::internal_32032(address_map &map)
 	//map(0x808068, 0x808068) STRB1 Bus Control
 	//map(0x810000, 0x82ffff) IOSTRB
 	map(0x87fe00, 0x87ffff).ram();
+	//map(0x87fe00, 0x87feff).ram(); // RAM block 0
+	//map(0x87ff00, 0x87ffff).ram(); // RAM block 1
 	//map(0x880000, 0x8fffff) STRB0
 	//map(0x900000, 0xffffff) STRB1
+}
+
+void tms32033_device::internal_32033(address_map &map)
+{
+	common_3203x(map);
+
+	//map(0x000000, 0x7fffff) STRB
+	map(0x800000, 0x807fff).ram();
+	//map(0x800000, 0x803fff).ram(); // RAM block 2
+	//map(0x804000, 0x807fff).ram(); // RAM block 3
+	//map(0x808064, 0x808064) Primary-Bus Control
+	map(0x809800, 0x809fff).ram();
+	//map(0x809800, 0x809bff).ram(); // RAM block 0
+	//map(0x809c00, 0x809fff).ram(); // RAM block 1
+	//map(0x80a000, 0xffffff) STRB
 }
 
 
@@ -380,7 +407,7 @@ void tms3203x_device::tmsreg::from_double(double val)
 //  tms3203x_device - constructor
 //-------------------------------------------------
 
-tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_map)
+tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24, -2, internal_map),
 		m_chip_type(chiptype),
@@ -392,8 +419,10 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 		m_irq_pending(false),
 		m_is_idling(false),
 		m_icount(0),
+		m_clock_per_inst(clock_per_inst),  // 1('VC33)/2 clocks per cycle
 		m_internal_rom(*this, "internal_rom"),
 		m_mcbl_mode(false),
+		m_is_lopower(false),
 		m_xf0_cb(*this),
 		m_xf1_cb(*this),
 		m_iack_cb(*this),
@@ -411,17 +440,22 @@ tms3203x_device::tms3203x_device(const machine_config &mconfig, device_type type
 }
 
 tms32030_device::tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32030, tag, owner, clock, CHIP_TYPE_TMS32030, address_map_constructor(FUNC(tms32030_device::internal_32030), this))
+	: tms3203x_device(mconfig, TMS32030, tag, owner, clock, CHIP_TYPE_TMS32030, 2, address_map_constructor(FUNC(tms32030_device::internal_32030), this))
 {
 }
 
 tms32031_device::tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, address_map_constructor(FUNC(tms32031_device::internal_32031), this))
+	: tms3203x_device(mconfig, TMS32031, tag, owner, clock, CHIP_TYPE_TMS32031, 2, address_map_constructor(FUNC(tms32031_device::internal_32031), this))
 {
 }
 
 tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, address_map_constructor(FUNC(tms32032_device::internal_32032), this))
+	: tms3203x_device(mconfig, TMS32032, tag, owner, clock, CHIP_TYPE_TMS32032, 2, address_map_constructor(FUNC(tms32032_device::internal_32032), this))
+{
+}
+
+tms32033_device::tms32033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms3203x_device(mconfig, TMS32033, tag, owner, clock, CHIP_TYPE_TMS32031, 1, address_map_constructor(FUNC(tms32033_device::internal_32033), this))
 {
 }
 
@@ -522,6 +556,7 @@ void tms3203x_device::device_start()
 	save_item(NAME(m_is_idling));
 	save_item(NAME(m_mcbl_mode));
 	save_item(NAME(m_hold_state));
+	save_item(NAME(m_is_lopower));
 
 	// register our state for the debugger
 	state_add(TMS3203X_PC,      "PC",        m_pc);
@@ -588,7 +623,7 @@ void tms3203x_device::device_reset()
 	m_primary_bus_control = 0x000010f8;
 
 	// reset internal stuff
-	m_delayed = m_irq_pending = m_is_idling = false;
+	m_delayed = m_irq_pending = m_is_idling = m_is_lopower = false;
 }
 
 
@@ -822,7 +857,7 @@ uint32_t tms3203x_device::execute_min_cycles() const noexcept
 
 uint32_t tms3203x_device::execute_max_cycles() const noexcept
 {
-	return 4;
+	return 5 * 16; // max opcode cycle * low power operation mode
 }
 
 
@@ -834,6 +869,28 @@ uint32_t tms3203x_device::execute_max_cycles() const noexcept
 uint32_t tms3203x_device::execute_input_lines() const noexcept
 {
 	return 14;
+}
+
+
+//-------------------------------------------------
+//  execute_clocks_to_cycles - convert the raw
+//  clock into cycles per second
+//-------------------------------------------------
+
+uint64_t tms3203x_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
+{
+	return (clocks + m_clock_per_inst - 1) / m_clock_per_inst;
+}
+
+
+//-------------------------------------------------
+//  execute_cycles_to_clocks - convert a cycle
+//  count back to raw clocks
+//-------------------------------------------------
+
+uint64_t tms3203x_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
+{
+	return cycles * m_clock_per_inst;
 }
 
 
