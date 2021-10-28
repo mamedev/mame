@@ -413,8 +413,14 @@ void amiga_state::aga_fetch_bitplane_data(int plane)
  *
  *************************************/
 
-rgb_t amiga_state::aga_update_ham(int newpix)
+rgb_t amiga_state::aga_update_ham(int newpix, int planes)
 {
+	// if not in AGA mode just return the legacy HAM6 mode
+	// CD32 would otherwise have ... interesting result with CDTV townona
+	if (!(planes & 8))
+		return m_palette->pen(amiga_state::update_ham(newpix));
+
+	// HAM8
 	switch (newpix & 0x03)
 	{
 		case 0:
@@ -717,7 +723,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				if (ham)
 				{
 					/* update the HAM color */
-					pfpix0 = aga_update_ham(pfpix0);
+					pfpix0 = aga_update_ham(pfpix0, planes);
 
 					pix = sprpix & 0xff;
 					pri = (sprpix >> 10);

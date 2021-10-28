@@ -1998,8 +1998,6 @@ void a1200_state::a1200(machine_config &config)
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
 
-	config.device_remove("palette");
-
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
@@ -2058,8 +2056,6 @@ void a4000_state::a4000(machine_config &config)
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-
-	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
@@ -2138,8 +2134,6 @@ void cd32_state::cd32(machine_config &config)
 	akiko.sda_w_callback().set("i2cmem", FUNC(i2cmem_device::write_sda));
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
-
-	config.device_remove("palette");
 
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 

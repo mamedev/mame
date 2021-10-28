@@ -648,7 +648,7 @@ private:
 	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
 	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);
 	void aga_fetch_bitplane_data(int plane);
-	rgb_t aga_update_ham(int newpix);
+	rgb_t aga_update_ham(int newpix, int plane);
 
 	enum
 	{
