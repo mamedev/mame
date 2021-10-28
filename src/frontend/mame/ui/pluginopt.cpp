@@ -91,6 +91,12 @@ void menu_plugin_opt::handle()
 		case IPT_UI_RIGHT:
 			key = "right";
 			break;
+		case IPT_UI_PREV_GROUP:
+			key = "prevgroup";
+			break;
+		case IPT_UI_NEXT_GROUP:
+			key = "nextgroup";
+			break;
 		case IPT_UI_SELECT:
 			key = "select";
 			break;
@@ -110,7 +116,7 @@ void menu_plugin_opt::handle()
 			break;
 		}
 	}
-	if (!key.empty() || m_need_idle)
+	if (!key.empty() || (m_process_flags & PROCESS_NOKEYS) || m_need_idle)
 	{
 		auto const result = mame_machine_manager::instance()->lua()->menu_callback(m_menu, uintptr_t(itemref), key);
 		if (result.second)
@@ -195,6 +201,8 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 				m_process_flags |= PROCESS_CUSTOM_NAV;
 			else if (flag == "idle")
 				m_need_idle = true;
+			else if (flag == "nokeys")
+				m_process_flags |= PROCESS_NOKEYS;
 		}
 	}
 }

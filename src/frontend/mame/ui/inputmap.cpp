@@ -386,6 +386,7 @@ void menu_input::handle()
 	{
 		// otherwise, handle the events
 		input_item_data &item = *reinterpret_cast<input_item_data *>(menu_event->itemref);
+		input_item_data *newsel = &item;
 		switch (menu_event->iptkey)
 		{
 		case IPT_UI_SELECT: // an item was selected: begin polling
@@ -415,14 +416,63 @@ void menu_input::handle()
 			break;
 
 		case IPT_UI_LEFT: // flip between set and append
-		case IPT_UI_RIGHT: // not very discoverable, but with the prompt it isn't opaque
+		case IPT_UI_RIGHT: // not very discoverable, but with the prompt it isn't completely opaque
 			if (record_next || !item.seq.empty())
 				record_next = !record_next;
+			break;
+
+		case IPT_UI_PREV_GROUP:
+			{
+				auto current = std::distance(data.data(), &item);
+				bool found_break = false;
+				while (0 < current)
+				{
+					if (!found_break)
+					{
+						if (data[--current].owner != item.owner)
+							found_break = true;
+					}
+					else if (data[current].owner != data[current - 1].owner)
+					{
+						newsel = &data[current];
+						set_selection(newsel);
+						set_top_line(selected_index() - 1);
+						break;
+					}
+					else
+					{
+						--current;
+					}
+					if (found_break && !current)
+					{
+						newsel = &data[current];
+						set_selection(newsel);
+						set_top_line(selected_index() - 1);
+						break;
+					}
+				}
+			}
+			break;
+
+		case IPT_UI_NEXT_GROUP:
+			{
+				auto current = std::distance(data.data(), &item);
+				while (data.size() > ++current)
+				{
+					if (data[current].owner != item.owner)
+					{
+						newsel = &data[current];
+						set_selection(newsel);
+						set_top_line(selected_index() - 1);
+						break;
+					}
+				}
+			}
 			break;
 		}
 
 		// if the selection changed, reset the "record next" flag
-		if (&item != lastitem)
+		if (newsel != lastitem)
 		{
 			if (erroritem)
 			{
@@ -468,7 +518,6 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 	// build the menu
 	std::string text, subtext;
 	const device_t *prev_owner = nullptr;
-	bool first_entry = true;
 	for (input_item_data &item : data)
 	{
 		// generate the name of the item itself, based off the base name and the type
@@ -476,10 +525,6 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 
 		if (item.owner && (item.owner != prev_owner))
 		{
-			if (first_entry)
-				first_entry = false;
-			else
-				item_append(menu_item_type::SEPARATOR);
 			if (item.owner->owner())
 				item_append(string_format(_("%1$s [root%2$s]"), item.owner->type().fullname(), item.owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 			else

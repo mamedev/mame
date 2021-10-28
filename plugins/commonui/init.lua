@@ -104,6 +104,7 @@ function commonui.input_selection_menu(action, title, filter)
 	end
 
 	function menu:handle(index, event)
+		local selection
 		if (event == 'cancel') or ((index == input_item_cancel) and (event == 'select')) then
 			action(nil)
 			return true
@@ -113,8 +114,27 @@ function commonui.input_selection_menu(action, title, filter)
 				action(field)
 				return true
 			end
+		elseif event == 'prevgroup' then
+			local found_break = false
+			while (index > index_first_choice) and (not selection) do
+				index = index - 1
+				if not choices[index - index_first_choice + 1] then
+					if found_break then
+						selection = index + 1
+					else
+						found_break = true
+					end
+				end
+			end
+		elseif event == 'nextgroup' then
+			while ((index - index_first_choice + 2) < #choices) and (not selection) do
+				index = index + 1
+				if not choices[index - index_first_choice + 1] then
+					selection = index + 1
+				end
+			end
 		end
-		return false
+		return false, selection
 	end
 
 	return menu

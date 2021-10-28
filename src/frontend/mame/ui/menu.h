@@ -179,6 +179,7 @@ protected:
 	void clear_hover() { m_hover = m_items.size() + 1; }
 
 	// scroll position control
+	void set_top_line(int index) { top_line = (0 < index) ? (index - 1) : index; }
 	void centre_selection() { top_line = m_selected - (m_visible_lines / 2); }
 
 	// test if the given key is pressed and we haven't already reported a key

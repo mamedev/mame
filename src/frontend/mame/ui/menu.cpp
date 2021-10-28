@@ -1072,10 +1072,14 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	bool const ignoreleft = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_LEFT_ARROW);
 	bool const ignoreright = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_RIGHT_ARROW);
 
-	// accept left/right keys as-is with repeat
+	// accept left/right/prev/next keys as-is with repeat if appropriate
 	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
 	if (!ignoreright && exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
+		return;
+	if (exclusive_input_pressed(iptkey, IPT_UI_PREV_GROUP, 0))
+		return;
+	if (exclusive_input_pressed(iptkey, IPT_UI_NEXT_GROUP, 0))
 		return;
 
 	// up backs up by one item

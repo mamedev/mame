@@ -747,6 +747,8 @@ void lua_engine::initialize()
 	emu["print_error"] = [] (const char *str) { osd_printf_error("%s\n", str); };
 	emu["print_info"] = [] (const char *str) { osd_printf_info("%s\n", str); };
 	emu["print_debug"] = [] (const char *str) { osd_printf_debug("%s\n", str); };
+	emu["osd_ticks"] = &osd_ticks;
+	emu["osd_ticks_per_second"] = &osd_ticks_per_second;
 	emu["driver_find"] =
 		[] (sol::this_state s, const char *driver) -> sol::object
 		{
