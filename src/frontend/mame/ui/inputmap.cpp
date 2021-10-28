@@ -510,10 +510,10 @@ void menu_input::populate_sorted(float &customtop, float &custombottom)
 	const char *nameformat[INPUT_TYPE_TOTAL] = { nullptr };
 
 	// create a mini lookup table for name format based on type
-	nameformat[INPUT_TYPE_DIGITAL] = "%s";
-	nameformat[INPUT_TYPE_ANALOG] = "%s Analog";
-	nameformat[INPUT_TYPE_ANALOG_INC] = "%s Analog Inc";
-	nameformat[INPUT_TYPE_ANALOG_DEC] = "%s Analog Dec";
+	nameformat[INPUT_TYPE_DIGITAL] = "%1$s";
+	nameformat[INPUT_TYPE_ANALOG] = _("input-name", "%1$s Analog");
+	nameformat[INPUT_TYPE_ANALOG_INC] = _("input-name", "%1$s Analog Inc");
+	nameformat[INPUT_TYPE_ANALOG_DEC] = _("input-name", "%1$s Analog Dec");
 
 	// build the menu
 	std::string text, subtext;

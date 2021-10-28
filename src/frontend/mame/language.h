@@ -12,25 +12,11 @@
 
 #pragma once
 
-#include <string_view>
+#include "util/language.h"
 
 
-//**************************************************************************
-//  LOCALIZATION SUPPORT
-//**************************************************************************
+void load_translation(emu_options &options);
 
-#define _(...) lang_translate(__VA_ARGS__)
-
-#define N_(msg) (msg)
-#define N_p(ctx, msg) (msg)
-
-void load_translation(emu_options &option);
-
-char const *lang_translate(char const *message);
-std::string_view lang_translate(std::string_view message);
-
-char const *lang_translate(char const *context, char const *message);
-std::string_view lang_translate(char const *context, std::string_view message);
-std::string_view lang_translate(std::string_view context, std::string_view message);
+using util::lang_translate;
 
 #endif // MAME_FRONTEND_MAME_LANGUAGE_H
