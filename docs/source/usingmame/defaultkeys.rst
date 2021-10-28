@@ -59,10 +59,11 @@ and saving/loading save states.
     Change current UI option setting when an arrow is present on it.
 **Right Arrow**
     Change current UI option setting when an arrow is present on it.
-**Home**
-    Highlight first UI menu option.
-**End**
-    Select last UI menu option.
+**Home**/**End**
+    Highlight first or last UI menu option.
+**[** **]**
+    Move to previous or next group in UI menus that support it (e.g. move to the
+    inputs for the previous or next device in the Input (this Machine) menu).
 **Enter**/**Joystick 1 Button 1**
     Select currently highlighted UI menu option.
 **Space**

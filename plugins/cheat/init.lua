@@ -597,58 +597,56 @@ function cheat.startplugin()
 
 	local hotkeymenu = false
 	local hotkeylist = {}
+	local commonui
+	local poller
 
 	local function menu_populate()
 		local menu = {}
 		if hotkeymenu then
 			local ioport = manager.machine.ioport
 			local input = manager.machine.input
+
 			menu[1] = {_("Select cheat to set hotkey"), "", "off"}
-			menu[2] = {string.format(_("Press %s to clear hotkey"), input:seq_name(ioport:type_seq(ioport:token_to_input_type("UI_CLEAR")))), "", "off"}
+			menu[2] = {string.format(_("Press %s to clear hotkey"), manager.ui:get_general_input_setting(ioport:token_to_input_type("UI_CLEAR"))), "", "off"}
 			menu[3] = {"---", "", "off"}
 			hotkeylist = {}
 
 			local function hkcbfunc(cheat, event)
-				if event == "clear" then
-					cheat.hotkeys = nil
-					return
-				end
-
-				local poller = input:switch_sequence_poller()
-				manager.machine:popmessage(_("Press button for hotkey or wait to leave unchanged"))
-				manager.machine.video:frame_update()
-				poller:start()
-				local time = os.clock()
-				local clearmsg = true
-				while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
-					if poller.modified then
-						if not poller.valid then
-							manager.machine:popmessage(_("Invalid sequence entered"))
-							clearmsg = false
-							break
+				if poller then
+					if poller:poll() then
+						if poller.sequence then
+							cheat.hotkeys = { pressed = false, keys = poller.sequence }
 						end
-						manager.machine:popmessage(input:seq_name(poller.sequence))
-						manager.machine.video:frame_update()
+						poller = nil
+						return true
 					end
+				elseif event == "clear" then
+					cheat.hotkeys = nil
+					return true
+				elseif event == "select" then
+					if not commonui then
+						commonui = require('commonui')
+					end
+					poller = commonui.switch_polling_helper()
+					return true
 				end
-				if poller.modified and poller.valid then
-					cheat.hotkeys = { pressed = false, keys = poller.sequence }
-				end
-				if clearmsg then
-					manager.machine:popmessage()
-				end
-				manager.machine.video:frame_update()
+				return false
 			end
 
 			for num, cheat in ipairs(cheats) do
 				if cheat.script then
-					menu[#menu + 1] = {cheat.desc, cheat.hotkeys and input:seq_name(cheat.hotkeys.keys) or _("None"), ""}
+					local setting = cheat.hotkeys and input:seq_name(cheat.hotkeys.keys) or _("None")
+					menu[#menu + 1] = {cheat.desc, setting, ""}
 					hotkeylist[#hotkeylist + 1] = function(event) return hkcbfunc(cheat, event) end
 				end
 			end
 			menu[#menu + 1] = {"---", "", ""}
 			menu[#menu + 1] = {_("Done"), "", ""}
-			return menu
+			if poller then
+				return poller:overlay(menu)
+			else
+				return menu
+			end
 		end
 		for num, cheat in ipairs(cheats) do
 			menu[num] = {}
@@ -703,7 +701,10 @@ function cheat.startplugin()
 	local function menu_callback(index, event)
 		manager.machine:popmessage()
 		if hotkeymenu then
-			if event == "select" or event == "clear" then
+			if event == "cancel" then
+				hotkeymenu = false
+				return true
+			else
 				index = index - 3
 				if index >= 1 and index <= #hotkeylist then
 					hotkeylist[index](event)
@@ -712,9 +713,6 @@ function cheat.startplugin()
 					hotkeymenu = false
 					return true
 				end
-			elseif event == "cancel" then
-				hotkeymenu = false
-				return true
 			end
 			return false
 		end

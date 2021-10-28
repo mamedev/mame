@@ -127,7 +127,7 @@ function inputmacro.startplugin()
 	emu.register_frame_done(process_frame)
 	emu.register_start(start)
 	emu.register_stop(stop)
-	emu.register_menu(menu_callback, menu_populate, _('Input Macros'))
+	emu.register_menu(menu_callback, menu_populate, _p('plugin-inputmacro', 'Input Macros'))
 end
 
 return exports

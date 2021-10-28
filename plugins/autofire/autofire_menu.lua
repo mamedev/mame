@@ -1,5 +1,8 @@
 local lib = {}
 
+-- Common UI helper library
+local commonui
+
 -- Set of all menus
 local MENU_TYPES = { MAIN = 0, EDIT = 1, ADD = 2, BUTTON = 3 }
 
@@ -26,6 +29,9 @@ local configure_menu_active = false
 
 -- Saved selection on configure menu (to restore after button menu is dismissed)
 local configure_selection_save
+
+-- Helper for polling for hotkeys
+local hotkey_poller
 
 -- Button being created/edited
 local current_button = {}
@@ -66,7 +72,7 @@ local function populate_main_menu(buttons)
 	local input = manager.machine.input
 	local menu = {}
 	menu[#menu + 1] = {_p('plugin-autofire', 'Autofire buttons'), '', 'off'}
-	menu[#menu + 1] = {string.format(_p('plugin-autofire', 'Press %s to delete'), input:seq_name(ioport:type_seq(ioport:token_to_input_type('UI_CLEAR')))), '', 'off'}
+	menu[#menu + 1] = {string.format(_p('plugin-autofire', 'Press %s to delete'), manager.ui:get_general_input_setting(ioport:token_to_input_type('UI_CLEAR'))), '', 'off'}
 	menu[#menu + 1] = {'---', '', ''}
 	header_height = #menu
 
@@ -139,39 +145,25 @@ local function populate_configure_menu(menu)
 	if not (configure_menu_active or configure_selection_save) then
 		configure_selection_save = #menu
 	end
-	menu[#menu + 1] = {_p('plugin-autofire', 'Hotkey'), key_name, ''}
+	menu[#menu + 1] = {_p('plugin-autofire', 'Hotkey'), key_name, hotkey_poller and 'lr' or ''}
 	menu[#menu + 1] = {_p('plugin-autofire', 'On frames'), current_button.on_frames, current_button.on_frames > 1 and 'lr' or 'r'}
 	menu[#menu + 1] = {_p('plugin-autofire', 'Off frames'), current_button.off_frames, current_button.off_frames > 1 and 'lr' or 'r'}
 	configure_menu_active = true
 end
 
--- Borrowed from the cheat plugin
-local function poll_for_hotkey()
-	local input = manager.machine.input
-	local poller = input:switch_sequence_poller()
-	manager.machine:popmessage(_p('plugin-autofire', 'Press button for hotkey or wait to leave unchanged'))
-	manager.machine.video:frame_update()
-	poller:start()
-	local time = os.clock()
-	local clearmsg = true
-	while (not poller:poll()) and (poller.modified or (os.clock() < time + 1)) do
-		if poller.modified then
-			if not poller.valid then
-				manager.machine:popmessage(_p('plugin-autofire', 'Invalid sequence entered'))
-				clearmsg = false
-				break
-			end
-			manager.machine:popmessage(input:seq_name(poller.sequence))
-			manager.machine.video:frame_update()
-		end
-	end
-	if clearmsg then
-		manager.machine:popmessage()
-	end
-	return poller.valid and poller.sequence or nil
-end
-
 local function handle_configure_menu(index, event)
+	if hotkey_poller then
+		-- special handling for polling for hotkey
+		if hotkey_poller:poll() then
+			if hotkey_poller.sequence then
+				current_button.key = hotkey_poller.sequence
+			end
+			hotkey_poller = nil
+			return true
+		end
+		return false
+	end
+
 	if index == 1 then
 		-- Input
 		if event == 'select' then
@@ -185,11 +177,11 @@ local function handle_configure_menu(index, event)
 	elseif index == 2 then
 		-- Hotkey
 		if event == 'select' then
-			local keycode = poll_for_hotkey()
-			if keycode then
-				current_button.key = keycode
-				return true
+			if not commonui then
+				commonui = require('commonui')
 			end
+			hotkey_poller = commonui.switch_polling_helper()
+			return true
 		end
 	elseif index == 3 then
 		-- On frames
@@ -235,7 +227,11 @@ local function populate_edit_menu()
 
 	local selection = configure_selection_save
 	configure_selection_save = nil
-	return menu, selection, 'lrrepeat'
+	if hotkey_poller then
+		return hotkey_poller:overlay(menu, selection, 'lrrepeat')
+	else
+		return menu, selection, 'lrrepeat'
+	end
 end
 
 local function handle_edit_menu(index, event, buttons)
@@ -268,7 +264,11 @@ local function populate_add_menu()
 
 	local selection = configure_selection_save
 	configure_selection_save = nil
-	return menu, selection, 'lrrepeat'
+	if hotkey_poller then
+		return hotkey_poller:overlay(menu, selection, 'lrrepeat')
+	else
+		return menu, selection, 'lrrepeat'
+	end
 end
 
 local function handle_add_menu(index, event, buttons)
@@ -306,7 +306,9 @@ local function populate_button_menu()
 		table.remove(menu_stack)
 	end
 
-	local commonui = require('commonui')
+	if not commonui then
+		commonui = require('commonui')
+	end
 	input_menu = commonui.input_selection_menu(action, _p('plugin-autofire', 'Select an input for autofire'), is_supported_input)
 	return input_menu:populate(initial_input)
 end

@@ -10,6 +10,7 @@ local exports = {
 
 local commonui = exports
 
+
 function commonui.input_selection_menu(action, title, filter)
 	menu = { }
 
@@ -89,9 +90,9 @@ function commonui.input_selection_menu(action, title, filter)
 			else
 				local device = choices[index + 1].device
 				if device.owner then
-					table.insert(items, { string.format(_('plugin-commonui', '%s [root%s]'), device.name, device.tag), '', 'heading' })
+					table.insert(items, { string.format(_p('plugin-commonui', '%s [root%s]'), device.name, device.tag), '', 'heading' })
 				else
-					table.insert(items, { string.format(_('plugin-commonui', '[root%s]'), device.tag), '', 'heading' })
+					table.insert(items, { string.format(_p('plugin-commonui', '[root%s]'), device.tag), '', 'heading' })
 				end
 			end
 		end
@@ -139,5 +140,75 @@ function commonui.input_selection_menu(action, title, filter)
 
 	return menu
 end
+
+
+function commonui.switch_polling_helper(starting_sequence)
+	helper = { }
+
+	local machine = manager.machine
+	local cancel = machine.ioport:token_to_input_type('UI_CANCEL')
+	local cancel_prompt = manager.ui:get_general_input_setting(cancel)
+	local input = machine.input
+	local uiinput = machine.uiinput
+	local poller = input:switch_sequence_poller()
+	local modified_ticks = 0
+
+	if starting_sequence then
+		poller:start(starting_sequence)
+	else
+		poller:start()
+	end
+
+	function helper:overlay(items, selection, flags)
+		if flags then
+			flags = flags .. " nokeys"
+		else
+			flags = "nokeys"
+		end
+		return items, selection, flags
+	end
+
+	function helper:poll()
+		-- prevent race condition between uiinput:pressed() and poll()
+		if (modified_ticks == 0) and poller.modified then
+			modified_ticks = emu.osd_ticks()
+		end
+
+		if uiinput:pressed(cancel) then
+			-- UI_CANCEL pressed, abort
+			machine:popmessage()
+			if (not poller.modified) or (modified_ticks == emu.osd_ticks()) then
+				-- cancelled immediately
+				self.sequence = nil
+				return true -- TODO: communicate this better?
+			else
+				-- entered something before cancelling
+				self.sequence = nil
+				return true
+			end
+		elseif poller:poll() then
+			if poller.valid then
+				-- valid sequence entered
+				machine:popmessage()
+				self.sequence = poller.sequence
+				return true
+			else
+				-- invalid sequence entered
+				machine:popmessage(_p('plugin-commonui', 'Invalid sequence entered'))
+				self.sequence = nil
+				return true
+			end
+		else
+			machine:popmessage(string.format(
+					_p('plugin-commonui', 'Enter sequence or press %s to cancel\n%s'),
+					cancel_prompt,
+					input:seq_name(poller.sequence)))
+			return false
+		end
+	end
+
+	return helper
+end
+
 
 return exports
