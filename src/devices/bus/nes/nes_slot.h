@@ -347,8 +347,8 @@ public:
 	// CHR helpers
 	void chr8(int bank, int source);
 	void chr4_x(int start, int bank, int source);
-	void chr4_0(int bank, int source){ chr4_x(0, bank, source); }
-	void chr4_4(int bank, int source){ chr4_x(4, bank, source); }
+	void chr4_0(int bank, int source) { chr4_x(0, bank, source); }
+	void chr4_4(int bank, int source) { chr4_x(4, bank, source); }
 	void chr2_x(int start, int bank, int source);
 	void chr2_0(int bank, int source) { chr2_x(0, bank, source); }
 	void chr2_2(int bank, int source) { chr2_x(2, bank, source); }
