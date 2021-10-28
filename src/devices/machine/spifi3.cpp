@@ -1304,13 +1304,13 @@ void spifi3_device::step(bool timeout)
                 {
                     // WORKAROUND - I haven't been able to figure out how to make the interrupts and register values work out
                     // to where DMAC3 triggers a parity error only when PAD is needed. So, we'll just transfer it ourselves instead.
-                    LOGMASKED(LOG_DATA, "applying write pad workaround");
+                    LOGMASKED(LOG_GENERAL, "applying write pad workaround\n");
                     state = INIT_XFR_SEND_PAD_WAIT_REQ;
                 }
                 else if(newPhase == S_PHASE_DATA_IN)
                 {
                     // See above
-                    LOGMASKED(LOG_DATA, "applying read pad workaround");
+                    LOGMASKED(LOG_GENERAL, "applying read pad workaround\n");
                     state = INIT_XFR_RECV_PAD_WAIT_REQ;
                 }
             }

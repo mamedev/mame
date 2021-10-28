@@ -51,7 +51,7 @@
  *       The monitor ROM works just fine with DRC. NetBSD doesn't boot without DRC,
  *       so you must recompile without the DRC disable or with R4000.cpp to use the NetBSD floppy.
  *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache): partially emulated
- *     - Tag manipulation is implemented. This seems to be enough for NEWS-OS 4 to work.
+ *     - Tag manipulation is implemented. This seems to be enough for NEWS-OS 4 to work, at least to a reasonable degree
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
  *   - Main memory: partially emulated (memory controller is unknown and not emulated - memory configurations other than 64MB don't work at the moment)
@@ -75,15 +75,21 @@
  *  ~2GB HD image that plays well with the NEWS-OS installer: `chdman createhd -o test.chd -s 2088960000`
  *
  *  Known issues:
- *  - Telnet has some weird behavior at times - some users hang when logging in, but logging in as root and using `su` to change to them works.
- *  - Bootloader doesn't work with DRC enabled (see CPU section above)
+ *  - ps has some weird behavior at times, usually random hangs
+ *  - At one point, I saw some telnet issues (root would work, one regular user couldn't log in even though `su user` from root also worked).
+ *    I haven't been able to reproduce that recently.
+ *  - NEWS-OS APbus bootloader doesn't work with DRC enabled (see CPU section above)
  *  - Monitor ROM command `ss -r` doesn't show most register values
  *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly,
  *     both on real hardware and in emulation)
  *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver.
  *  - SCSI performance seems variable from run to run. Will probably need to do some runtime profiling on that.
- *  - Running a binary multiple times with dbx (debugger) can corrupt it. I'm suspecting some SCSI issues here because I've been able to use dbx to do
- *    that before. Wouldn't be surprised if this is related to the pad workaround, since using dbx was how I found out pad was needed to begin with.
+ *  - Running a binary multiple times with dbx (debugger) can corrupt the system state (some syscalls start failing, random programs fail to load).
+ *    At first, I suspected SCSI issues here because dbx was what triggered the need for the pad workaround.
+ *    It could still be that, but "power cycling" the emulated platform, even after using the halt command (which synchronizes disks)
+ *    restores the emulated system to a good state, so it might not actually be a SCSI issue (unless it is only a read issue).
+ *  - Reboot/halt+boot fails because the ESCC FIFO isn't reset properly. For now, the emulator must be hard reset.
+ *    It prints out a message (`esccf0: ai->ai_addr points AProm`) and then tries to allocate and use a different FIFO (which fails)
  *
  *  TODO (in no particular order):
  *  - More complete floppy support (only supports floppy boot at the moment)
@@ -374,7 +380,8 @@ protected:
     uint8_t ram_r(offs_t offset);
     void ram_w(offs_t offset, uint8_t data);
 
-    // CXD8421Q glue logic for the ESCC (still debating if this should be separated or not)
+    // CXD8421Q glue logic and secondary control for the ESCC
+    // TODO: This probably belongs in a separate device, especially if the other features are ever implemented.
     enum escc_channel
     {
         CHA,
