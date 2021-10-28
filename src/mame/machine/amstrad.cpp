@@ -843,7 +843,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 {
 	amstrad_update_video();
 
-	/* The gate array reacts to de-assertion of the hsycnc 6845 line */
+	/* The gate array reacts to de-assertion of the hsync 6845 line */
 	if ( m_gate_array.hsync && !state )
 	{
 		m_gate_array.hsync_counter++;
@@ -2503,6 +2503,7 @@ void amstrad_state::update_psg()
 	{
 	case 0:
 		{/* Inactive */
+			m_ppi_port_inputs[amstrad_ppi_PortA] = 0xff;
 		} break;
 	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */

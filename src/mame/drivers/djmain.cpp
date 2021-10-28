@@ -1832,6 +1832,27 @@ ROM_END
 
 ROM_START( popn1 )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "803t_a01.6a", 0x000000, 0x80000, CRC(e85032bc) SHA1(625ac755a77a861ecede766d77fbecb29683844b) )
+	ROM_LOAD16_BYTE( "803j_a02.8a", 0x000001, 0x80000, CRC(17e90be0) SHA1(8857d46d63b7cd97aed5c7a5cf804fe5311255ac) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "803t_a03.19a", 0x000000, 0x80000, CRC(a0970b32) SHA1(4bf06f977f67f13d0994e80021faaefed015ca1c) )
+	ROM_LOAD16_BYTE( "803t_a04.20a", 0x000001, 0x80000, CRC(a158b950) SHA1(535d994a68fe56c8a93d460e5272b1a0b081383d) )
+	ROM_LOAD16_BYTE( "803t_a05.22a", 0x100000, 0x80000, CRC(8a23c18d) SHA1(714b68a3112dff52feba6a50ae15c02d041b1def) )
+	ROM_LOAD16_BYTE( "803t_a06.24a", 0x100001, 0x80000, CRC(bd6450ff) SHA1(bb89c65d1b0e38c0a26ec4cccd35103583efff45) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
+	ROM_LOAD16_BYTE( "803t_a07.22d", 0x000000, 0x80000, CRC(4c97dbf0) SHA1(c33f84e2c1a59294413163a5546cb2fe092e42d1) )
+	ROM_LOAD16_BYTE( "803t_a08.23d", 0x000001, 0x80000, CRC(cc6b21d3) SHA1(eac3b92bc392265df08b0311320c4e23f257c58b) )
+	ROM_LOAD16_BYTE( "803t_a09.25d", 0x100000, 0x80000, CRC(45ab3978) SHA1(c34b800dfb14affcb705dffa566d046a6d1e7c7c) )
+	ROM_LOAD16_BYTE( "803t_a10.27d", 0x100001, 0x80000, CRC(a487ad02) SHA1(ca9edb611ddf2f1e7d42b049ce867b173fce3634) )
+
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_IMAGE( "803_ta_hdd", 0, SHA1(be833a3c0f1e5953271fa7d8d6e81211fbe9710f) ) /* GQ803AA  pop'n music ver1.01  1998/10/14 (C) KONAMI */
+ROM_END
+
+ROM_START( popn1a )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "803aaa01.6a", 0x000000, 0x80000, CRC(70466eff) SHA1(d59f97a6882ad65afa3b5de491d44bb4d839d286) )
 	ROM_LOAD16_BYTE( "803aaa02.8a", 0x000001, 0x80000, CRC(c102c909) SHA1(630a74ccec78d36adaba38a85ed6a0e45dca96a4) )
 
@@ -2237,7 +2258,8 @@ GAME( 2001, bm6thmix, 0,        djmainj, bm6thmix,  djmain_state, init_bm6thmix,
 GAME( 2001, bm7thmix, 0,        djmainj, bm6thmix,  djmain_state, init_bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
 GAME( 2002, bmfinal,  0,        djmainj, bm6thmix,  djmain_state, init_bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
-GAME( 1998, popn1,    0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A, HDD 1.00)", 0 )
+GAME( 1998, popn1,    0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver TA-A, HDD 1.01)", 0 )
+GAME( 1998, popn1a,   popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A, HDD 1.00)", 0 )
 GAME( 1998, popn1k,   popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver KA-A, HDD 1.01)", 0 ) // KA-A based on filenames provided, no warning message
 GAME( 1998, popn1j,   popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A, HDD 1.00)", 0 )
 GAME( 1999, popn2,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )

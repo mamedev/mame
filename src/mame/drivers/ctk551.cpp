@@ -1,47 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Casio CTK-551 keyboard (and related models)
+    Casio CTK-551 keyboard (and related models)
 
-	Casio released several keyboard models with the same main board.
-	As usual, some of them were also rebranded by Radio Shack.
+    Casio released several keyboard models with the same main board.
+    As usual, some of them were also rebranded by Radio Shack.
 
-	- CTK-531, CTK-533
-	  Basic 61-key model
-	- CTK-541, Optimus MD-1150
-	  Adds velocity-sensitive keys
-	- CTK-551, CTK-558, Radio Shack MD-1160
-	  Adds pitch wheel and different selection of demo songs
+    - CTK-531, CTK-533
+      Basic 61-key model
+    - CTK-541, Optimus MD-1150
+      Adds velocity-sensitive keys
+    - CTK-551, CTK-558, Radio Shack MD-1160
+      Adds pitch wheel and different selection of demo songs
 
-	Main board (JCM456-MA1M):
+    Main board (JCM456-MA1M):
 
-	LSI1: CPU (Casio GT913F)
-	      Custom chip based on H8/300 instruction set, built in peripheral controllers & sound generator
+    LSI1: CPU (Casio GT913F)
+          Custom chip based on H8/300 instruction set, built in peripheral controllers & sound generator
 
-	LSI2: 8Mbit ROM (OKI MSM538002E)
+    LSI2: 8Mbit ROM (OKI MSM538002E)
 
-	LSI3: LCD controller (HD44780 compatible)
-	      May be either a Samsung KS0066U-10B or Epson SED1278F2A.
+    LSI3: LCD controller (HD44780 compatible)
+          May be either a Samsung KS0066U-10B or Epson SED1278F2A.
 
-	IC1:  stereo DAC (NEC uPD6379GR)
+    IC1:  stereo DAC (NEC uPD6379GR)
 
-	CTK-541 service manual with schematics, pinouts, etc.:
-	https://revenant1.net/ctk541.pdf
+    CTK-541 service manual with schematics, pinouts, etc.:
+    https://revenant1.net/ctk541.pdf
 
-	To access the test mode (not mentioned in the service manual):
-	Hold the "Start/Stop" and keypad 0 buttons together when turning on the keyboard.
-	Afterwards, press one of these buttons:
-	- Tone: LCD test (press repeatedly)
-	- Keypad 0: switch test (press all front panel buttons in a specific order, generally left to right)
-	- Keypad 1 or Rhythm: pedal and key test
-	- Keypad 2: ROM test
-	- Keypad 4/5/6: sound volume test
-	- Keypad 7/8: stereo test
-	- Keypad 9: MIDI loopback test
-	- Keypad + or Song Bank: power source test
-	- Keypad -: pitch wheel test
-	- FFWD: exit test mode
-	- Stop: power off
+    To access the test mode (not mentioned in the service manual):
+    Hold the "Start/Stop" and keypad 0 buttons together when turning on the keyboard.
+    Afterwards, press one of these buttons:
+    - Tone: LCD test (press repeatedly)
+    - Keypad 0: switch test (press all front panel buttons in a specific order, generally left to right)
+    - Keypad 1 or Rhythm: pedal and key test
+    - Keypad 2: ROM test
+    - Keypad 4/5/6: sound volume test
+    - Keypad 7/8: stereo test
+    - Keypad 9: MIDI loopback test
+    - Keypad + or Song Bank: power source test
+    - Keypad -: pitch wheel test
+    - FFWD: exit test mode
+    - Stop: power off
 
  */
 
@@ -180,7 +180,7 @@ void ctk551_state::ctk551(machine_config &config)
 }
 
 INPUT_PORTS_START(ctk551)
-	PORT_START("maincpu:kbd:KO0")
+	PORT_START("maincpu:kbd:FI0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C2")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C2#")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D2")
@@ -190,7 +190,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F2#")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G2")
 
-	PORT_START("maincpu:kbd:KO1")
+	PORT_START("maincpu:kbd:FI1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G2#")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A2#")
@@ -200,7 +200,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D3")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D3#")
 
-	PORT_START("maincpu:kbd:KO2")
+	PORT_START("maincpu:kbd:FI2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("E3")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F3")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F3#")
@@ -210,7 +210,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A3#")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("B3")
 
-	PORT_START("maincpu:kbd:KO3")
+	PORT_START("maincpu:kbd:FI3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C4#")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D4")
@@ -220,7 +220,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F4#")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G4")
 
-	PORT_START("maincpu:kbd:KO4")
+	PORT_START("maincpu:kbd:FI4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G4#")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A4")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A4#")
@@ -230,7 +230,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D5")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D5#")
 
-	PORT_START("maincpu:kbd:KO5")
+	PORT_START("maincpu:kbd:FI5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("E5")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F5")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F5#")
@@ -240,7 +240,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A5#")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("B5")
 
-	PORT_START("maincpu:kbd:KO6")
+	PORT_START("maincpu:kbd:FI6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C6")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C6#")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("D6")
@@ -250,7 +250,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("F6#")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G6")
 
-	PORT_START("maincpu:kbd:KO7")
+	PORT_START("maincpu:kbd:FI7")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("G6#")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A6")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("A6#")
@@ -258,7 +258,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("C7")
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("maincpu:kbd:KO8")
+	PORT_START("maincpu:kbd:FI8")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
@@ -267,8 +267,8 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Song Bank")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Rhythm")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Tone")
-	
-	PORT_START("maincpu:kbd:KO9")
+
+	PORT_START("maincpu:kbd:FI9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
@@ -278,7 +278,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Transpose / Tune / MIDI")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Chord Book")
 
-	PORT_START("maincpu:kbd:KO10")
+	PORT_START("maincpu:kbd:FI10")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
@@ -288,7 +288,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Start / Stop")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Sync / Fill In")
 
-	PORT_START("maincpu:kbd:KO11")
+	PORT_START("maincpu:kbd:KI0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Right Hand On/Off")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Left Hand On/Off")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Fast Forward")
@@ -298,9 +298,12 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Tempo Up")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER )  PORT_NAME("Volume Up")
 
-	PORT_START("maincpu:kbd:KO12")
+	PORT_START("maincpu:kbd:KI1")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ctk551_state, switch_r)
+
+	PORT_START("maincpu:kbd:KI2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("maincpu:kbd:VELOCITY")
 	PORT_BIT( 0x7f, 0x7f, IPT_POSITIONAL ) PORT_NAME("Key Velocity") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)

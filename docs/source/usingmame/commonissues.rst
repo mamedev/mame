@@ -344,45 +344,13 @@ You can enable and configure the new autofire system with the following steps:
 * Choose **Plugins** near the bottom of the Settings menu.
 * Turn **Autofire plugin** on (use **Left**/**Right** or click the arrows to
   change options).
+* Exit MAME completely and start MAME again so the setting takes effect.
 
 The setting will be automatically saved for future use.
 
-Once you’re running a system of your choice, bring up the MAME menu (using the
-**Tab** key by default), select **Plugin Options***, and then select
-**Autofire**.  From there you can select an existing autofire button to change
-
-The **Input** is the button on the emulated system that you want to use autofire
-for.  This may be set to any player button – typically you’ll it to
-*P1 Button 1* for games like Galaga, Alcon, and the like.  The **Hotkey** is the
-button you press to use the autofire effect.  This can be any combination MAME
-supports as a digital input.
-
-**On frames** and **Off frames** are how long to leave the button pressed and
-released in terms of the system frame rate.  Some systems do not read the inputs
-fast enough for 1 and 1 to be usable.  You may need to try 2 and 2 (e.g. Alcon)
-or other combinations.  Try fine-tuning these to your taste.
-
-The autofire configuration for each system will be saved in a ``systemname.cfg``
-file (e.g. ``alcon.cfg``) inside the **autofire** folder in your plugin data
-folder.  Each system will have its own configuration.
-
-Note that if you set the autofire button to an input button that’s also assigned
-to one of MAME’s inputs for the running system, you may get unexpected results.
-Using Gradius as an example:
-
-* If you set button 1 on your controller to fire, then set an autofire hotkey to
-  button 1 as well, holding the button down to shoot will not trigger the
-  autofire effect because the button never gets released, since you’re holding
-  the non-autofire button 1.  This will also happen if you set a different
-  button as autofire (say, button 3 in this case), and hold button 1 down while
-  holding button 3 down.
-* If you set button 3 on your controller to autofire and set button 3 to be
-  powerup as well, you will trigger the powerup action every time you grab a
-  powerup because the powerup button is also being held down along with the
-  autofire button.
-
-It is suggested you choose buttons for autofire hotkeys that are not in use for
-anything else in the current system.
+See :ref:`plugins-autofire` for more information about using the autofire
+plugin, or :ref:`plugins` for more information about using plugins with MAME in
+general.
 
 
 .. _gsync-freesync:

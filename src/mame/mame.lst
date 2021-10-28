@@ -62,6 +62,7 @@ slspirit                        // (c) 1999 Promat
 48in1                           // MAME based bootleg
 48in1a                          // MAME based bootleg
 48in1b                          // MAME based bootleg
+48in1c                          // MAME based bootleg
 4in1a                           // MAME based bootleg
 4in1b                           // MAME based bootleg
 60in1                           // MAME based bootleg
@@ -3275,6 +3276,7 @@ cshift                          // (c) 1984
 gghost                          // (c) 1984
 gimeabrk                        // (c) 1985
 grudge                          // prototype - Bally/Midway
+grudgei                         //
 grudgep                         //
 hattrick                        // (c) 1984
 teamht                          //
@@ -12404,7 +12406,8 @@ bmdct                           // GX995 (c) 2000 (Japan)
 bmfinal                         // GXC01 (c) 2002 (Japan)
 hmcompm2                        // GX988 (c) 2000
 hmcompmx                        // GX858 (c) 1999
-popn1                           // GX803 (c) 1998 (Asia)
+popn1                           // GX803 (c) 1998 (Export)
+popn1a                          // GX803 (c) 1998 (Asia)
 popn1k                          // GX803 (c) 1998 (Korea)
 popn1j                          // GX803 (c) 1998 (Japan)
 popn2                           // GX831 (c) 1998 (Japan)
@@ -14547,6 +14550,7 @@ mimonscr                        // (c) 1982 bootleg
 mimonscra                       // (c) 1982 bootleg
 mltiwars                        // bootleg (Gayton Games)
 monsterz                        // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
+monsterza                       // (c) 1982 Nihon (Arcade TV Game List - P.102, Left, 20 from top)
 moonal2                         // [1980] Nichibutsu
 moonal2b                        // [1980] Nichibutsu
 moonaln                         // [Nichibutsu] (Karateco license) or hack
