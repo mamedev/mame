@@ -51,7 +51,7 @@ DECLARE_DEVICE_TYPE(VME_MVME123,   vme_mvme123_card_device)
 //**************************************************************************
 class vme_mvme120_device :  public device_t, public device_vme_card_interface
 {
-protected:
+public:
 	/* Board types */
 	enum mvme120_board_t {
 		mvme120_board,
@@ -59,11 +59,17 @@ protected:
 		mvme122_board,
 		mvme123_board
 	};
-	
+		
 	vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme120_board_t board_id);
+
+	// Switch and jumper handlers
+	DECLARE_INPUT_CHANGED_MEMBER(s3_autoboot);
+	DECLARE_INPUT_CHANGED_MEMBER(s3_baudrate);
 	
+protected:
 	void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual ioport_constructor device_input_ports() const override;
 	
 	uint16_t bootvect_r(offs_t offset);
 	void bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -77,6 +83,8 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
 	required_device<rs232_port_device> m_rs232;
+	
+	required_ioport m_input_s3;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint16_t  *m_sysrom;
@@ -127,7 +135,7 @@ public :
 
 protected:
 	vme_mvme121_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme120_board)
+		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme121_board)
 	{ }
 
 	// optional information overrides
@@ -142,7 +150,7 @@ public :
 
 protected:
 	vme_mvme122_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme120_board)
+		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme122_board)
 	{ }
 
 	// optional information overrides
@@ -157,7 +165,7 @@ public :
 
 protected:
 	vme_mvme123_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme120_board)
+		: vme_mvme120_device(mconfig, type, tag, owner, clock, mvme123_board)
 	{ }
 
 	// optional information overrides

@@ -60,15 +60,61 @@ DEFINE_DEVICE_TYPE(VME_MVME121,   vme_mvme121_card_device,   "mvme121",   "Motor
 DEFINE_DEVICE_TYPE(VME_MVME122,   vme_mvme122_card_device,   "mvme122",   "Motorola MVME-122")
 DEFINE_DEVICE_TYPE(VME_MVME123,   vme_mvme123_card_device,   "mvme123",   "Motorola MVME-123")
 
+INPUT_PORTS_START(mvme120)
+	PORT_START("S3")
+	
+	// described as "autoboot" and "cache disable" in the manual
+	PORT_DIPNAME(0x01, 0x00, "Unknown")            	PORT_DIPLOCATION("S3:1")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_autoboot, 0)
+	PORT_DIPSETTING(   0x01, "On")
+	PORT_DIPSETTING(   0x00, "Off")
+	
+	PORT_DIPNAME(0x02, 0x00, "Baud Rate Select")    PORT_DIPLOCATION("S3:2")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_baudrate, 0)
+	PORT_DIPSETTING(   0x02, "10.0MHz CPU")
+	PORT_DIPSETTING(   0x00, "12.5MHz CPU")
+	
+	PORT_DIPNAME(0x0C, 0x08, "Reset Vector Source")	PORT_DIPLOCATION("S3:3,4")	//
+	PORT_DIPSETTING(   0x08, "Onboard ROM")
+	PORT_DIPSETTING(   0x04, "VMEbus")
+INPUT_PORTS_END
+
+ioport_constructor vme_mvme120_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(mvme120);
+}
+
 vme_mvme120_device::vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme120_board_t board_id) :
 	device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_maincpu (*this, "maincpu")
 	, m_mfp (*this, "mfp")
 	, m_rs232 (*this, "rs232")
+	, m_input_s3(*this, "S3")
 	, m_board_id(board_id)
 {
 
+}
+
+vme_mvme120_card_device::vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: vme_mvme120_card_device(mconfig, VME_MVME120, tag, owner, clock)
+{
+
+}
+
+vme_mvme121_card_device::vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: vme_mvme121_card_device(mconfig, VME_MVME121, tag, owner, clock)
+{
+
+}
+
+vme_mvme122_card_device::vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: vme_mvme122_card_device(mconfig, VME_MVME122, tag, owner, clock)
+{
+}
+
+vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: vme_mvme123_card_device(mconfig, VME_MVME123, tag, owner, clock)
+{
+	
 }
 
 void vme_mvme120_device::mvme120_mem(address_map &map)
@@ -282,6 +328,19 @@ void vme_mvme123_card_device::device_add_mconfig(machine_config &config)
 	m_mfp->set_timer_clock(MVME122_CPU_CLOCK / 4);
 }
 
+/* DIP switch and jumpers */
+INPUT_CHANGED_MEMBER(vme_mvme120_device::s3_autoboot)
+{
+	// TODO: verify
+	//m_mfp->i0_w(BIT(m_input_s3->read(), 0));
+}
+
+INPUT_CHANGED_MEMBER(vme_mvme120_device::s3_baudrate)
+{
+	// TODO: verify
+	//m_mfp->i1_w(BIT(m_input_s3->read(), 1));
+}
+
 /* ROM definitions */
 ROM_START (mvme120)
 	ROM_REGION16_BE(0x20000, "roms", 0)
@@ -295,29 +354,6 @@ ROM_START (mvme120)
 	ROMX_LOAD("120bug-1.1-u44.bin", 0x0000, 0x4000, CRC (87d62dac) SHA1 (c57eb9f8aefe29794b8fc5f0afbaff9b59d38c73), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("120bug-1.1-u52.bin", 0x0001, 0x4000, CRC (5651b61d) SHA1 (0d0004dff3c88b2f0b18951b4f2acd7f65f701b1), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
-
-vme_mvme120_card_device::vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme120_card_device(mconfig, VME_MVME120, tag, owner, clock)
-{
-
-}
-
-vme_mvme121_card_device::vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme121_card_device(mconfig, VME_MVME121, tag, owner, clock)
-{
-
-}
-
-vme_mvme122_card_device::vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme122_card_device(mconfig, VME_MVME122, tag, owner, clock)
-{
-}
-
-vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: vme_mvme123_card_device(mconfig, VME_MVME123, tag, owner, clock)
-{
-	
-}
 
 const tiny_rom_entry *vme_mvme120_device::device_rom_region() const
 {
