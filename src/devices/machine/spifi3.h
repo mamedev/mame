@@ -223,7 +223,7 @@ private:
     // Based on the existence of CLREVEN/ODD, the fact that NetBSD only uses EVEN, and the max is 8
     // even though this is a 4 bit value, it seems likely that there are actually two FIFOs,
     // one in the even slots, and one in the odd slots
-    const uint32_t FIFOC_FSLOT = 0x0f; // Free slots in FIFO - max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT)
+    const uint32_t FIFOC_FSLOT = 0x0f; // Free slots in FIFO, max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT)
     const uint32_t FIFOC_SSTKACT = 0x10;
     const uint32_t FIFOC_RQOVRN = 0x20;
     const uint32_t FIFOC_CLREVEN = 0x00;
@@ -415,57 +415,56 @@ private:
 
     struct register_file
     {
-        /*00*/ uint32_t spstat = 0;
+        uint32_t spstat = 0;
         uint32_t cmlen = 0;
         uint32_t cmdpage = 0;
-        // uint32_t count_hi = 0;
+        // count_hi, count_mid, count_low
 
-        /*10*/ // uint32_t count_mid = 0;
-        // uint32_t count_low = 0;
         uint32_t svptr_hi = 0;
         uint32_t svptr_mid = 0;
+        uint32_t svptr_low = 0;
 
-        /*20*/ uint32_t svptr_low = 0;
         uint32_t intr = 0;
         uint32_t imask = 0;
         uint32_t prctrl = 0;
 
-        /*30*/ uint32_t prstat = 0;
+        uint32_t prstat = 0;
         uint32_t init_status = 0;
         uint32_t fifoctrl = 0;
         uint32_t fifodata = 0;
 
-        /*40*/ uint32_t config = 0;
+        uint32_t config = 0;
         uint32_t data_xfer = 0;
         uint32_t autocmd = 0;
         uint32_t autostat = 0;
 
-        /*50*/ uint32_t resel = 0;
+        uint32_t resel = 0;
         uint32_t select = 0;
         uint32_t prcmd = 0;
         uint32_t auxctrl = 0;
 
-        /*60*/ uint32_t autodata = 0;
+        uint32_t autodata = 0;
         uint32_t loopctrl = 0;
         uint32_t loopdata = 0;
         uint32_t identify = 0;
 
-        /*70*/ uint32_t complete = 0;
-        uint32_t scsi_status = 0x1; // MROM reads this to check if the SPIFI is alive at system boot, so the WO description from NetBSD might be wrong.
+        uint32_t complete = 0;
+
+        // MROM reads this to check if the SPIFI is alive at system boot, so the WO description from NetBSD might be wrong.
+        uint32_t scsi_status = 0x1;
         uint32_t data = 0;
         uint32_t icond = 0;
 
-        /*80*/ uint32_t fastwide = 0;
+        uint32_t fastwide = 0;
         uint32_t exctrl = 0;
         uint32_t exstat = 0;
         uint32_t test = 0;
 
-        /*90*/ uint32_t quematch = 0;
+        uint32_t quematch = 0;
         uint32_t quecode = 0;
         uint32_t quetag = 0;
         uint32_t quepage = 0;
 
-        // uint32_t image[88]; // mirror of the previous values
         spifi_cmd_entry cmbuf[8];
     } spifi_reg;
 };

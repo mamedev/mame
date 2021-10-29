@@ -748,6 +748,7 @@ void spifi3_device::start_autocmd()
 
 void spifi3_device::start_autodata(int data_phase)
 {
+    LOGMASKED(LOG_AUTO, "start AUTODATA\n");
     state = INIT_XFR;
     xfr_phase = data_phase;
     dma_set(data_phase == S_PHASE_DATA_IN ? DMA_IN : DMA_OUT);
@@ -767,6 +768,7 @@ void spifi3_device::auto_phase_transfer(int new_phase)
     {
         fatalerror("spifi3 auto_phase_transfer called without phase transition!");
     }
+    LOGMASKED(LOG_STATE, "Phase changed to %d\n", new_phase);
     state = INIT_XFR_BUS_COMPLETE;
     command_pos = 0;
 
@@ -1070,7 +1072,7 @@ void spifi3_device::step(bool timeout)
             if(!(spifi_reg.select & SEL_WATN))
             {
                 // The NWS-5000 APmonitor, NEWS-OS, and NetBSD all set SEL_WATN, so this code path is never taken.
-                fatalerror("SEL_WATN was not asserted - this is not yet implemented!");
+                fatalerror("spifi3 SEL_WATN was not asserted - this is not yet implemented!");
                 state = DISC_SEL_WAIT_REQ;
             }
             else
@@ -1109,10 +1111,8 @@ void spifi3_device::step(bool timeout)
             state = DISC_SEL_ATN_SEND_BYTE;
             if(spifi_reg.identify & 0x80)
             {
-                command_pos = -1; // temp
                 // Identify register has an identify packet - send it.
                 scsi_bus->data_w(scsi_refid, spifi_reg.identify);
-                spifi_reg.identify = 0x0;
                 scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
                 scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
             }
@@ -1126,24 +1126,20 @@ void spifi3_device::step(bool timeout)
 
         case DISC_SEL_ATN_SEND_BYTE:
         {
-            if (command_pos < 0 || command_pos >= (spifi_reg.cmlen & CML_LENMASK))
+            if ((spifi_reg.identify & 0x80) || command_pos >= (spifi_reg.cmlen & CML_LENMASK))
             {
                 // autoidentified target, now we need to see if autocmd is enabled. If so, we can just proceed to the XFR phase automatically.
+                spifi_reg.identify = 0x0; // in case we just sent an ID packet
                 command_pos = 0;
                 const auto new_phase = (ctrl & S_PHASE_MASK);
-                if(new_phase == S_PHASE_COMMAND && autocmd_active())
+                auto_phase_transfer(new_phase);
+                if (state == INIT_XFR_BUS_COMPLETE) // auto_phase_transfer fell through
                 {
-                    start_autocmd();
-                    step(false);
-                }
-                else if ((new_phase == S_PHASE_MSG_OUT || new_phase == S_PHASE_MSG_IN) && automsg_active())
-                {
-                    start_automsg(new_phase);
-                    step(false);
+                    function_bus_complete();
                 }
                 else
                 {
-                    function_bus_complete();
+                    step(false);
                 }
             }
             else
@@ -1310,13 +1306,13 @@ void spifi3_device::step(bool timeout)
                 {
                     // WORKAROUND - I haven't been able to figure out how to make the interrupts and register values work out
                     // to where DMAC3 triggers a parity error only when PAD is needed. So, we'll just transfer it ourselves instead.
-                    LOGMASKED(LOG_GENERAL, "applying write pad workaround\n");
+                    LOG("applying write pad workaround\n");
                     state = INIT_XFR_SEND_PAD_WAIT_REQ;
                 }
                 else if(xfr_phase == S_PHASE_DATA_IN && new_phase == S_PHASE_DATA_IN)
                 {
                     // See above
-                    LOGMASKED(LOG_GENERAL, "applying read pad workaround\n");
+                    LOG("applying read pad workaround\n");
                     state = INIT_XFR_RECV_PAD_WAIT_REQ;
                 }
                 else
@@ -1331,19 +1327,18 @@ void spifi3_device::step(bool timeout)
             }
             else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
             {
-                LOG("Non-DMA transfer in complete\n");
+                LOGMASKED(LOG_DATA, "Non-DMA transfer in complete\n");
                 auto_phase_transfer(new_phase);
             }
             else if(xfr_data_source == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command
             {
-                LOGMASKED(LOG_STATE, "Command transfer complete, new phase = %d\n", ctrl & S_PHASE_MASK);
                 if(new_phase != xfr_phase)
                 {
                     auto_phase_transfer(new_phase);
                 }
                 else
                 {
-                    fatalerror("Ran out of CDB bytes to transfer!");
+                    fatalerror("spifi3 ran out of CDB bytes to transfer!");
                 }
             }
             else
@@ -1351,7 +1346,6 @@ void spifi3_device::step(bool timeout)
                 const auto new_phase = ctrl & S_PHASE_MASK;
                 if (new_phase != xfr_phase)
                 {
-                    LOGMASKED(LOG_STATE, "Phase changed to %d\n", new_phase);
                     auto_phase_transfer(new_phase);
                 }
                 else
@@ -1486,8 +1480,7 @@ void spifi3_device::step(bool timeout)
 
         default:
         {
-            LOG("step() unexpected state %d.%d\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
-            exit(0);
+            fatalerror("spifi step() unexpected state %d.%d\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT);
         }
     }
 }

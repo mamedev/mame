@@ -36,28 +36,23 @@ void dmac3_device::device_start()
 
 uint32_t dmac3_device::csr_r(dmac3_controller controller)
 {
-    uint32_t val = m_controllers[controller].csr;
-    return val;
+    return m_controllers[controller].csr;
 }
 uint32_t dmac3_device::intr_r(dmac3_controller controller)
 {
-    uint32_t val = m_controllers[controller].intr;
-    return val;
+    return m_controllers[controller].intr;
 }
 uint32_t dmac3_device::length_r(dmac3_controller controller)
 {
-    uint32_t val = m_controllers[controller].length;
-    return val;
+    return m_controllers[controller].length;
 }
 uint32_t dmac3_device::address_r(dmac3_controller controller)
 {
-    uint32_t val = m_controllers[controller].address;
-    return val;
+    return m_controllers[controller].address;
 }
 uint32_t dmac3_device::conf_r(dmac3_controller controller)
 {
-    uint32_t val = m_controllers[controller].conf;
-    return val;
+    return m_controllers[controller].conf;
 }
 
 void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
@@ -77,8 +72,8 @@ void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 void dmac3_device::intr_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d intr_w: 0x%x\n", controller, data);
-    auto intr_clear_bits = data & INTR_CLR_MASK; // Get 1s on bits to clear
-    auto intr_enable_bits = data & INTR_EN_MASK; // Get 1s on bits to set
+    const auto intr_clear_bits = data & INTR_CLR_MASK; // Get 1s on bits to clear
+    const auto intr_enable_bits = data & INTR_EN_MASK; // Get 1s on bits to set
     m_controllers[controller].intr &= ~intr_clear_bits; // Clear requested interrupt flags
     m_controllers[controller].intr &= ~INTR_EN_MASK;	// Clear all mask bits
     m_controllers[controller].intr |= intr_enable_bits; // Set mask bits to new mask
@@ -88,7 +83,7 @@ void dmac3_device::intr_w(dmac3_controller controller, uint32_t data)
 
 void dmac3_device::length_w(dmac3_controller controller, uint32_t data)
 {
-    LOGMASKED(LOG_REGISTER, "dmac3-%d length_w: 0x%x\n", controller, data);
+    LOGMASKED(LOG_REGISTER, "dmac3-%d length_w: 0x%x (%s)\n", controller, data, machine().describe_context());
     m_controllers[controller].length = data;
 }
 
@@ -107,7 +102,7 @@ void dmac3_device::conf_w(dmac3_controller controller, uint32_t data)
 
     if((data & ~CONF_WIDTH) != (m_controllers[controller].conf & ~CONF_WIDTH))
     {
-        LOGMASKED(LOG_REGISTER, "dmac3-%d conf_w: 0x%x\n", controller, data);
+        LOGMASKED(LOG_REGISTER, "dmac3-%d conf_w: 0x%x (%s)\n", controller, data, machine().describe_context());
     }
 #endif
 
@@ -139,12 +134,12 @@ TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)
     // If both controllers have no interrupt conditions, IRQ can be cleared.
     for (int controller = 0; controller < 2; ++controller)
     {
-        uint32_t intr = m_controllers[controller].intr;
-        newIrq |= ((intr & INTR_INT) > 0) && ((intr & INTR_INTEN) > 0); // External interrupt (SPIFI)
-        newIrq |= ((intr & INTR_EOPI) > 0) && ((intr & INTR_EOPIE) > 0); // End-of-operation interrupt
-        newIrq |= ((intr & INTR_DRQI) > 0) && ((intr & INTR_DRQIE) > 0); // DRQ interrupt (?)
-        newIrq |= ((intr & INTR_TCI) > 0) && ((intr & INTR_TCIE) > 0); // Transfer count interrupt (?)
-        newIrq |= (intr & (INTR_PERR)) > 0; // XXX DREQ, EOP?
+        const uint32_t intr = m_controllers[controller].intr;
+        newIrq |= (intr & INTR_INT) && (intr & INTR_INTEN); // External interrupt (SPIFI)
+        newIrq |= (intr & INTR_EOPI) && (intr & INTR_EOPIE); // End-of-operation interrupt
+        newIrq |= (intr & INTR_DRQI) && (intr & INTR_DRQIE); // DRQ interrupt (?)
+        newIrq |= (intr & INTR_TCI) && (intr & INTR_TCIE); // Transfer count interrupt (?)
+        newIrq |= (intr & INTR_PERR); // XXX DREQ, EOP?
     }
 
     if (m_irq != newIrq)
@@ -181,14 +176,14 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
         if(m_controllers[controller].csr & CSR_RECV)
         {
             // Device to memory
-            uint8_t data = m_dma_r[controller]();
+            const uint8_t data = m_dma_r[controller]();
             LOGMASKED(LOG_DATA, "dma_r data 0x%02x address 0x%08x count %d\n", data, address, m_controllers[controller].length);
             m_bus->write_byte(address, data);
         }
         else
         {
             // Memory to device
-            uint8_t data = m_bus->read_byte(address);
+            const uint8_t data = m_bus->read_byte(address);
             LOGMASKED(LOG_DATA, "dma_w data 0x%02x address 0x%08x count %d\n", data, address, m_controllers[controller].length);
             m_dma_w[controller](data);
         }

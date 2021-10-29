@@ -3833,8 +3833,6 @@ files {
 	MAME_DIR .. "src/mame/machine/cxd8442q.h",
 	MAME_DIR .. "src/mame/machine/cxd8452aq.cpp",
 	MAME_DIR .. "src/mame/machine/cxd8452aq.h",
-	MAME_DIR .. "src/mame/machine/cxd8421q.cpp",
-	MAME_DIR .. "src/mame/machine/cxd8421q.h",
 	MAME_DIR .. "src/mame/machine/news_hid.cpp",
 	MAME_DIR .. "src/mame/machine/news_hid.h",
 }
