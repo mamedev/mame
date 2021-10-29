@@ -157,7 +157,7 @@ vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, 
 
 void vme_mvme120_device::mvme120_mem(address_map &map)
 {
-	map(0x000000, 0x01ffff).ram().share("localram");
+	map(0x000000, 0x01ffff).ram().share(m_localram);
 	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
@@ -175,7 +175,7 @@ void vme_mvme120_device::mvme120_mem(address_map &map)
 
 void vme_mvme120_device::mvme121_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("localram");
+	map(0x000000, 0x07ffff).ram().share(m_localram);
 	map(0x080000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
@@ -193,7 +193,7 @@ void vme_mvme120_device::mvme121_mem(address_map &map)
 
 void vme_mvme120_device::mvme122_mem(address_map &map)
 {
-	map(0x000000, 0x01ffff).ram().share("localram");
+	map(0x000000, 0x01ffff).ram().share(m_localram);
 	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
@@ -205,7 +205,7 @@ void vme_mvme120_device::mvme122_mem(address_map &map)
 
 void vme_mvme120_device::mvme123_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("localram");
+	map(0x000000, 0x07ffff).ram().share(m_localram);
 	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
@@ -333,11 +333,11 @@ uint8_t vme_mvme120_device::ctrlreg_r(offs_t offset)
 	// b0 - BRDFAIL
 	// b1 - /CTS
 	// b2 - /IE
-	// b3 - /PAREN
+	// b3 - /PAREN		- When asserted, parity errors do not cause /BERR.
 	// b4 - CACHEN
 	// b5 - FREEZE
 	// b6 - /ALTCLR
-	// b7 - /WWP
+	// b7 - /WWP		- When asserted, bad parity is written to RAM.
 	
 	return m_ctrlreg;
 }
@@ -370,7 +370,6 @@ void vme_mvme120_device::device_add_mconfig(machine_config &config)
 	M68010(config, m_maincpu, MVME120_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vme_mvme120_card_device::mvme120_mem);
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_mvme120_card_device::mvme120_mem);
-
 	
 	MC68901(config, m_mfp, MVME120_MFP_CLOCK);
 	m_mfp->set_timer_clock(MVME120_MFP_CLOCK);
@@ -386,7 +385,26 @@ void vme_mvme120_device::device_add_mconfig(machine_config &config)
 	m_rs232->set_option_device_input_defaults("terminal", terminal_defaults);
 
 	// Missing: MMU, VMEbus
+	
 	VME(config, "vme", 0);
+
+	/*
+	// Onboard RAM is always visible to VMEbus. (Decoding controlled by U28.)
+	m_vme->install_device(vme_device::A24_SC, 0, 0x1FFFF,
+		read16_delegate(*this, FUNC(vme_mvme120_device::vme_to_ram_r)), 
+		write16_delegate(*this, FUNC(vme_mvme120_device::vme_to_ram_w)), 
+		0xFFFF);
+	*/
+}
+
+uint16_t vme_mvme120_device::vme_to_ram_r(address_space &space, offs_t address, uint16_t mem_mask)
+{
+	return m_localram[address];
+}
+
+void vme_mvme120_device::vme_to_ram_w(address_space &space, offs_t address, uint16_t data, uint16_t mem_mask)
+{
+	m_localram[address] = data;
 }
  
 void vme_mvme120_card_device::device_add_mconfig(machine_config &config)

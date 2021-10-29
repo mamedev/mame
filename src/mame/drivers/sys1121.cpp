@@ -1,19 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Katherine Rohl
 /*
- *	Motorola MVME120 CPU board.
- *  This is an early MVME system from 1984, using standard Motorola parts
- *  instead of the many ASICs of later boards.
+ *  Motorola SYS1121 VME chassis. 
  *
- *	The following configurations were available:
- *  MVME120 - 10MHz 68010, 128KB RAM, 4KB SRAM cache, 68451 MMU
- *  MVME121 - 10MHz 68010, 512KB RAM, 4KB SRAM cache, 68451 MMU
- *  MVME122 - 12.5MHz 68010, 128KB RAM, no cache, no MMU
- *  MVME123 - 12.5MHz 68010, 512KB RAM, 4KB SRAM cache, no MMU
- *
- *  Current state, it crashes at $F058D8 while testing CPU exception handling.
- *  If you skip over that address (pc=F058E2 in the debugger) it continues
- *  through the self-test.
+ *  The basic configuration was an MVME12x MPU,
+ *  an MVME050 system controller, and an MVME320 disk
+ *  controller.
  */
  
 #include "bus/vme/vme_mvme120.h"
@@ -26,14 +18,15 @@ sys1121_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device (mconfig, type, tag)
 	{
 	}
+
+	void sys1121(machine_config &config);
+	
+protected:
 	virtual void machine_start () override { }
 //  virtual void machine_reset () override;
-
-	void init_sys1121()      { }
-	void sys1121(machine_config &config);
 };
 
-/* Input ports */
+// Input ports
 static INPUT_PORTS_START (sys1121)
 INPUT_PORTS_END
 
@@ -58,9 +51,9 @@ void sys1121_state::sys1121(machine_config &config)
 	VME_SLOT(config, "slot8", mvme120_vme_cards, nullptr, 8, "vme");
 }
 
-/* ROM definitions */
-ROM_START (sys1121) ROM_END
+// This is a VME chassis so any ROMs are contained in the cards.
+ROM_START (sys1121) 
+ROM_END
 
-/* Driver */
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
 COMP( 1984, sys1121, 0,       0,      sys1121, sys1121, sys1121_state, empty_init, "Motorola", "SYS1121",  MACHINE_IS_SKELETON )

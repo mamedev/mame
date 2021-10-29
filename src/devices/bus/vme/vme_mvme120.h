@@ -48,6 +48,9 @@ public:
 	// Switch and jumper handlers
 	DECLARE_INPUT_CHANGED_MEMBER(s3_autoboot);
 	DECLARE_INPUT_CHANGED_MEMBER(s3_baudrate);
+			
+	uint16_t vme_to_ram_r(address_space &space, offs_t offset, uint16_t mem_mask);
+	void vme_to_ram_w(address_space &space, offs_t address, uint16_t data, uint16_t mem_mask);
 	
 protected:
 	void device_add_mconfig(machine_config &config) override;
@@ -70,6 +73,7 @@ protected:
 	required_ioport m_input_s3;
 	
 	memory_passthrough_handler *m_rom_shadow_tap;
+	memory_passthrough_handler *m_ram_wwp_tap;
 
 	required_region_ptr<uint16_t> m_sysrom;
 	required_shared_ptr<uint16_t> m_localram;
