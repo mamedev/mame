@@ -1038,6 +1038,18 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="silicon_artfx">
+		<description>Silicon ArtFX - Produced by the Multimedia Design Group of the Corporate Marketing Division</description>
+		<year>199?</year> <!-- late 94 or early 95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="silicon_art_fx" sha1="4b0069a100926cac8ddabb828e7af8df1fab6c4c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="sgi_demos_6_5_12">
 		<description>Silicon Graphics General and Platform Demos 6.5.12</description>
 		<year>2001</year> <!-- 05/01 -->
@@ -1283,6 +1295,19 @@ license:CC0
 
 	<!-- Development and compilers -->
 
+	<software name="ada95_1_1">
+		<description>Ada95 Compiler 1.1</description>
+		<year>1995</year> <!-- 08/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0373-002"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="ada95_compiler_1_1" sha1="af44b8bda05558b12dffa31939bedc14d3fe37b7" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ada95_1_2">
 		<description>Ada95 Compiler 1.2 for IRIX 5.3, 6.2 and 6.3</description>
 		<year>1996</year> <!-- 10/96 -->
@@ -1322,6 +1347,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="cpp_trans_2_1_1">
+		<description>C++ Translator 2.1.1</description>
+		<year>1991</year> <!-- 11/91 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0001-003"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0001_003_cpp_translator_2_1_1_nov1991" sha1="72b5331fd142bdb52b8d0a2fa93f2265d22611a0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cpp_trans_3_0_1">
+		<description>C++ Translator 3.0.1</description>
+		<year>1993</year> <!-- 05/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0001-005"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0001_005_cpp_translator_3_0_1_may1993" sha1="5a86aacd863530443daacf2c3d80518d254f5bf1" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cpp_trans_3_1">
+		<description>C++ Translator 3.1</description>
+		<year>1993</year> <!-- 03/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0130-001"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0130_001_cpp_translator_3_1_mar1993" sha1="f87a391fa4af5fe80f94f830e4f170f24281fc3a" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="cpp_trans_3_2">
 		<description>C++ Translator 3.2</description>
 		<year>1993</year> <!-- 08/93 -->
@@ -1331,6 +1395,19 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="812_0130_003_cpp_translator_3_2_aug1993" sha1="8b1f809f61a95211b328105d9093ea9278de1c41" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="cpp_trans_4_0">
+		<description>C++ Translator 4.0</description>
+		<year>1994</year> <!-- 11/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0130-005"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0130_005_cpp_translator_4_0_nov1994" sha1="609147e2d214bc54ed8ce652c639e86d3359d1ea" />
 			</diskarea>
 		</part>
 	</software>
@@ -1644,6 +1721,58 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="f77_3_4">
+		<description>FORTRAN 77 Compiler 3.4</description>
+		<year>1991</year> <!-- 09/91 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0014-001"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_3_4" sha1="e884a030c04797be870b4549da07b3c1c3172a90" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_3_5_1">
+		<description>FORTRAN 77 Compiler 3.5.1</description>
+		<year>1993</year> <!-- 05/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0014-005"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_3_5_1" sha1="05f0ffd5fb4bc765f32e8d8f4647c89fbf693acb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_3_6_1">
+		<description>FORTRAN 77 Compiler 3.6.1</description>
+		<year>1993</year> <!-- 06/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0132-002"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_3_6_1" sha1="a5226618d9fcc956c753a0dbabe9a5f85c7d6c1e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_4_0_plus">
+		<description>FORTRAN 77 Compiler 4.0+</description>
+		<year>1993</year> <!-- 09/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0132-004"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_4_0_plus" sha1="7a1f8dc99eca38849e1aff270c38c09d57ccb166" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="f77_4_0_1">
 		<description>FORTRAN 77 Compiler 4.0.1</description>
 		<year>1994</year> <!-- 03/94 -->
@@ -1653,6 +1782,77 @@ license:CC0
 			<!-- Origin: private dump -->
 			<diskarea name="cdrom">
 				<disk name="fortran_77_compiler_4_0_1" sha1="1d214d44deb8d68833e334628e333a54f7ce7c04" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f77_4_0_2">
+		<description>FORTRAN 77 Compiler 4.0.2</description>
+		<year>1994</year> <!-- 11/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0132-007"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="fortran_77_compiler_4_0_2" sha1="2f3292d9ac482ce458a10e47e1ad9c4b8d0311ba" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="f90_6_1">
+		<!-- a slightly newer version than what is in MIPSpro 6.1 -->
+		<description>Fortran 90 Compiler 6.1 (August 1995)</description>
+		<year>1995</year> <!-- 08/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0402-002"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0402_002_fortran_90_compiler_6_1_aug1995" sha1="170304d1b5284e60d9b4e275353e3f0740388200" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mipspro_6_1">
+		<description>MIPSpro 6.1</description>
+		<year>1995</year> <!-- 07/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0400-001"/>
+			<feature name="part_id" value="MIPSpro C++ 6.1"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0400_001_mipspro_cpp_6_1_jul1995" sha1="4eb6d33e9666e5d8b5ada2dbe9fa3b71620b77fa" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0403-001"/>
+			<feature name="part_id" value="MIPSpro Fortran 77 Compiler 6.1"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0403_001_fortran_77_compiler_6_1_jul1995" sha1="452560cdc588027cc99580671280bd31fb7c4f95" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0402-001"/>
+			<feature name="part_id" value="MIPSpro Fortran 90 Compiler 6.1"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0402_001_fortran_90_compiler_6_1_jul1995" sha1="56c216f27b7a43ab0c9c8d353358b6b11c48265d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="mipspro_6_2">
+		<description>MIPSpro 6.2</description>
+		<year>1996</year> <!-- 03/96 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0400-002"/>
+			<feature name="part_id" value="MIPSpro C++ 6.2"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0400_002_mipspro_cpp_6_2_mar1996" sha1="da667906b46340d8aec0338473b1c8d3fcc20ca6" />
 			</diskarea>
 		</part>
 	</software>
@@ -1725,6 +1925,36 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mipspro_7_4">
+		<description>MIPSpro 7.4</description>
+		<year>2002</year> <!-- 11/02 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_number" value="812-0707-010"/>
+			<feature name="part_id" value="MIPSpro C Compiler 7.4 for IRIX 6.5 or later"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0707_010_mipspro_c_compiler_7_4_nov2002" sha1="24918ce875c7f79d88103312269f01ba71f236ac" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_number" value="812-0400-010"/>
+			<feature name="part_id" value="MIPSpro C++ Compiler 7.4 for IRIX 6.5 or later"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0400_010_mipspro_cpp_compiler_7_4_nov2002" sha1="5046c2f41762857ebd6c7d3df170ed95576412ab" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_number" value="812-0403-010"/>
+			<feature name="part_id" value="MIPSpro Fortran 77 Compiler 7.4 for IRIX 6.5 or later"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0403_010_mipspro_fortran_77_compiler_7_4_nov2002" sha1="f149de4cb7e85febc7ba4b2538fdcc172b4af0ff" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="mipspro_may_99">
 		<description>MIPSpro All-Compiler CD May 1999 for IRIX 6.5 and later</description>
 		<year>1999</year> <!-- 05/99 -->
@@ -1734,6 +1964,123 @@ license:CC0
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="mipspro_all_compiler_cd_may_1999_for_irix_6_5_and_later" sha1="6257a45e2a656da0aeaeaeae3d91fdaed5135a8a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pascal_1_3_1">
+		<description>Pascal Compiler 1.3.1</description>
+		<year>1993</year> <!-- 05/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0003-004"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0003_004_pascal_compiler_1_3_1_may1993" sha1="62598d4bf5780b859b0a2a5274e74f39a0b44a24" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pascal_1_4_3">
+		<description>Pascal Compiler 1.4.3</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0131-004"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0131_004_pascal_compiler_1_4_3_mar1994" sha1="d3da4d33871967f754a062a4274d96fe64733611" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pascal_1_4_4">
+		<description>Pascal Compiler 1.4.4</description>
+		<year>1994</year> <!-- 11/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0131-005"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0131_005_pascal_compiler_1_4_4_nov1994" sha1="11527b09d689163e5699c8f45a16b6a8e5cc1895" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_c_2_0">
+		<description>Power C 2.0</description>
+		<year>1992</year> <!-- 03/92 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0043-002"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0043_002_power_c_2_0" sha1="ee1c70e5b19254b4c463e361998e117e44920a71" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_c_2_1_1">
+		<description>Power C 2.1.1</description>
+		<year>1993</year> <!-- 05/93 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0043-004"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0043_004_power_c_2_1_1" sha1="271ff07593f7df5a9a31942dc7cb2186085743f6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_f77_4_0_1a">
+		<description>Power Fortran Accelerator 4.0.1 03/1994</description>
+		<year>1994</year> <!-- 03/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0134-004"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0134_004_power_fortran_4_0_1_mar1994" sha1="824cf26ca96d4e582f79fc2bf98bc7b53824ed67" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_f77_4_0_1b">
+		<description>Power Fortran Accelerator 4.0.1 04/1994</description>
+		<year>1994</year> <!-- 04/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0134-005"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0134_005_power_fortran_4_0_1_apr1994" sha1="d6aa34c3b82e0b52f7009813ee96a9e6567d8758" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_f77_6_0">
+		<description>MIPSpro Power Fortran 77 6.0</description>
+		<year>1994</year> <!-- 08/94 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0294-001"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0294_001_power_fortran_77_6_0_aug1994" sha1="6e2027da97ab64edcf29c59e90d61bb325c6bd52" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="power_f77_6_1">
+		<description>MIPSpro Power Fortran 77 6.1</description>
+		<year>1995</year> <!-- 07/95 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0395-001"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="812_0395_001_power_fortran_77_6_1_jul1995" sha1="2b82800e92231b546335317d68f2e3489ed2d442" />
 			</diskarea>
 		</part>
 	</software>
