@@ -573,7 +573,7 @@ void menu_select_game::build_available_list()
 void menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
 {
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
+	menu::stack_reset(mui);
 
 	// add the quit entry followed by the game select entry
 	menu::stack_push_special_main<menu_quit_game>(mui, container);

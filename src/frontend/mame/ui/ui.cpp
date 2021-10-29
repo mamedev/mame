@@ -199,7 +199,7 @@ void mame_ui_manager::init()
 	ui::system_list::instance().cache_data(options());
 
 	// initialize the other UI bits
-	ui::menu::init(machine(), options());
+	ui::menu::init(*this);
 	ui_gfx_init(machine());
 
 	m_ui_colors.refresh(options());
@@ -460,7 +460,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
 
 	// loop over states
-	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
+	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this); state++)
 	{
 		// default to standard colors
 		warning_color = colors().background_color();
@@ -579,7 +579,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			config_menu = false;
 
 			// loop while we have a handler
-			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
+			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this))
 				machine().video().frame_update();
 		}
 
@@ -593,7 +593,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		m_last_launch_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	// if we're the empty driver, force the menus on
-	if (ui::menu::stack_has_special_main_menu(machine()))
+	if (ui::menu::stack_has_special_main_menu(*this))
 		show_menu();
 	else if (config_menu)
 	{
@@ -642,7 +642,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
-		if (ui::menu::stack_has_special_main_menu(machine()))
+		if (ui::menu::stack_has_special_main_menu(*this))
 			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;
@@ -1188,7 +1188,7 @@ void mame_ui_manager::draw_profiler(render_container &container)
 
 void mame_ui_manager::start_save_state()
 {
-	ui::menu::stack_reset(machine());
+	ui::menu::stack_reset(*this);
 	show_menu();
 	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container());
 }
@@ -1200,7 +1200,7 @@ void mame_ui_manager::start_save_state()
 
 void mame_ui_manager::start_load_state()
 {
-	ui::menu::stack_reset(machine());
+	ui::menu::stack_reset(*this);
 	show_menu();
 	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container());
 }
@@ -2256,7 +2256,7 @@ void mame_ui_manager::save_main_option()
 
 void mame_ui_manager::menu_reset()
 {
-	ui::menu::stack_reset(machine());
+	ui::menu::stack_reset(*this);
 }
 
 

@@ -636,7 +636,7 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 
 	mame_machine_manager::instance()->schedule_new_driver(driver);
 	mui.machine().schedule_hard_reset();
-	stack_reset(mui.machine());
+	stack_reset(mui);
 }
 
 

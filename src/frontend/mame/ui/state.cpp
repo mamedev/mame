@@ -344,7 +344,7 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 	s_last_file_selected = std::move(name);
 
 	// no matter what, pop out
-	menu::stack_pop(machine());
+	menu::stack_pop();
 }
 
 

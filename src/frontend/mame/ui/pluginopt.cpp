@@ -46,7 +46,7 @@ void menu_plugin::populate(float &customtop, float &custombottom)
 void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, char *menu)
 {
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
+	menu::stack_reset(mui);
 
 	// add the plugin menu entry
 	menu::stack_push<menu_plugin_opt>(mui, container, menu);

@@ -33,21 +33,12 @@
 namespace ui {
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-std::mutex menu::s_global_state_guard;
-menu::global_state_map menu::s_global_states;
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-menu::global_state_ptr menu::get_global_state(running_machine &machine)
+menu::global_state &menu::get_global_state(mame_ui_manager &ui)
 {
-	std::lock_guard<std::mutex> guard(s_global_state_guard);
-	auto const it(s_global_states.find(&machine));
-	return (it != s_global_states.end()) ? it->second : global_state_ptr();
+	return ui.get_session_data<menu, global_state_wrapper>(ui);
 }
 
 //-------------------------------------------------
@@ -113,7 +104,6 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 
 menu::global_state::~global_state()
 {
-	// it shouldn't really be possible to get here with active menus because of reference loops
 	assert(!m_stack);
 	assert(!m_free);
 
@@ -183,34 +173,10 @@ bool menu::global_state::stack_has_special_main_menu() const
 //  init - initialize the menu system
 //-------------------------------------------------
 
-void menu::init(running_machine &machine, ui_options &mopt)
+void menu::init(mame_ui_manager &ui)
 {
-	// initialize the menu stack
-	{
-		std::lock_guard<std::mutex> guard(s_global_state_guard);
-		auto const ins(s_global_states.emplace(&machine, std::make_shared<global_state>(machine, mopt)));
-		assert(ins.second); // calling init twice is bad
-		if (ins.second)
-			machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&menu::exit, &machine)); // add an exit callback to free memory
-		else
-			ins.first->second->stack_reset();
-	}
-}
-
-
-//-------------------------------------------------
-//  exit - clean up after ourselves
-//-------------------------------------------------
-
-void menu::exit(running_machine &machine)
-{
-	// free menus
-	global_state_ptr const state(get_global_state(machine));
-	state->stack_reset();
-	state->clear_free_list();
-
-	std::lock_guard<std::mutex> guard(s_global_state_guard);
-	s_global_states.erase(&machine);
+	global_state &state(get_global_state(ui));
+	assert(!state.topmost_menu<menu>()); // calling init twice is bad
 }
 
 
@@ -228,7 +194,7 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_items()
 	, m_visible_lines(0)
 	, m_visible_items(0)
-	, m_global_state(get_global_state(mui.machine()))
+	, m_global_state(get_global_state(mui))
 	, m_special_main_menu(false)
 	, m_needs_prev_menu_item(true)
 	, m_ui(mui)
@@ -244,8 +210,6 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_mouse_x(-1.0f)
 	, m_mouse_y(-1.0f)
 {
-	assert(m_global_state); // not calling init is bad
-
 	reset(reset_options::SELECT_FIRST);
 
 	top_line = 0;
@@ -1267,21 +1231,21 @@ void menu::do_handle()
 
 uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 {
-	global_state_ptr const state(get_global_state(mui.machine()));
+	global_state &state(get_global_state(mui));
 
 	// if we have no menus stacked up, start with the main menu
-	if (!state->topmost_menu<menu>())
-		state->stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(mui, container)));
+	if (!state.topmost_menu<menu>())
+		state.stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(mui, container)));
 
 	// update the menu state
-	if (state->topmost_menu<menu>())
-		state->topmost_menu<menu>()->do_handle();
+	if (state.topmost_menu<menu>())
+		state.topmost_menu<menu>()->do_handle();
 
 	// clear up anything pending to be released
-	state->clear_free_list();
+	state.clear_free_list();
 
 	// if the menus are to be hidden, return a cancel here
-	if (mui.is_menu_active() && ((mui.machine().ui_input().pressed(IPT_UI_CONFIGURE) && !state->stack_has_special_main_menu()) || !state->topmost_menu<menu>()))
+	if (mui.is_menu_active() && ((mui.machine().ui_input().pressed(IPT_UI_CONFIGURE) && !state.stack_has_special_main_menu()) || !state.topmost_menu<menu>()))
 		return UI_HANDLER_CANCEL;
 
 	return 0;
@@ -1297,7 +1261,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
-	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state.hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1307,7 +1271,7 @@ void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 
 void menu::draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uint32_t orientation)
 {
-	container().add_quad(x0, y0, x1, y1, fgcolor, m_global_state->arrow_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, fgcolor, m_global_state.arrow_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1341,8 +1305,8 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 void menu::draw_background()
 {
 	// draw background image if available
-	if (ui().options().use_background_image() && m_global_state->bgrnd_bitmap() && m_global_state->bgrnd_bitmap()->valid())
-		container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white(), m_global_state->bgrnd_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	if (ui().options().use_background_image() && m_global_state.bgrnd_bitmap() && m_global_state.bgrnd_bitmap()->valid())
+		container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white(), m_global_state.bgrnd_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 

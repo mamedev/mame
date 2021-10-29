@@ -61,10 +61,10 @@ public:
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
 	// Global initialization
-	static void init(running_machine &machine, ui_options &mopt);
+	static void init(mame_ui_manager &ui);
 
 	// reset the menus, clearing everything
-	static void stack_reset(running_machine &machine) { get_global_state(machine)->stack_reset(); }
+	static void stack_reset(mame_ui_manager &ui) { get_global_state(ui).stack_reset(); }
 
 	// push a new menu onto the stack
 	template <typename T, typename... Params>
@@ -81,10 +81,10 @@ public:
 	}
 
 	// pop a menu from the stack
-	static void stack_pop(running_machine &machine) { get_global_state(machine)->stack_pop(); }
+	static void stack_pop(mame_ui_manager &ui) { get_global_state(ui).stack_pop(); }
 
 	// test if one of the menus in the stack requires hide disable
-	static bool stack_has_special_main_menu(running_machine &machine) { return get_global_state(machine)->stack_has_special_main_menu(); }
+	static bool stack_has_special_main_menu(mame_ui_manager &ui) { return get_global_state(ui).stack_has_special_main_menu(); }
 
 	// master handler
 	static uint32_t ui_handler(render_container &container, mame_ui_manager &mui);
@@ -143,11 +143,11 @@ protected:
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 
-	template <typename T> T *topmost_menu() const { return m_global_state->topmost_menu<T>(); }
-	template <typename T> static T *topmost_menu(running_machine &machine) { return get_global_state(machine)->topmost_menu<T>(); }
-	void stack_pop() { m_global_state->stack_pop(); }
-	void stack_reset() { m_global_state->stack_reset(); }
-	bool stack_has_special_main_menu() const { return m_global_state->stack_has_special_main_menu(); }
+	template <typename T> T *topmost_menu() const { return m_global_state.topmost_menu<T>(); }
+	template <typename T> static T *topmost_menu(mame_ui_manager &ui) { return get_global_state(ui).topmost_menu<T>(); }
+	void stack_pop() { m_global_state.stack_pop(); }
+	void stack_reset() { m_global_state.stack_reset(); }
+	bool stack_has_special_main_menu() const { return m_global_state.stack_has_special_main_menu(); }
 
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
@@ -191,7 +191,7 @@ protected:
 
 	// highlight
 	void highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor);
-	render_texture *hilight_main_texture() { return m_global_state->hilight_main_texture(); }
+	render_texture *hilight_main_texture() { return m_global_state.hilight_main_texture(); }
 
 	// draw arrow
 	void draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uint32_t orientation);
@@ -314,17 +314,26 @@ private:
 		void clear_free_list();
 		bool stack_has_special_main_menu() const;
 
-	private:
+	protected:
 		running_machine         &m_machine;
 
+	private:
 		bitmap_ptr              m_bgrnd_bitmap;
 		texture_ptr             m_bgrnd_texture;
 
 		std::unique_ptr<menu>   m_stack;
 		std::unique_ptr<menu>   m_free;
 	};
-	using global_state_ptr = std::shared_ptr<global_state>;
-	using global_state_map = std::map<running_machine *, global_state_ptr>;
+
+	// this is to satisfy the std::any requirement that objects be copyable
+	class global_state_wrapper : public global_state
+	{
+	public:
+		global_state_wrapper(mame_ui_manager &ui) : global_state(ui.machine(), ui.options()), m_options(ui.options()) { }
+		global_state_wrapper(global_state_wrapper const &that) : global_state(that.m_machine, that.m_options), m_options(that.m_options) { }
+	private:
+		ui_options const        &m_options;
+	};
 
 	// request the specific handling of the game selection main menu
 	bool is_special_main_menu() const;
@@ -337,15 +346,14 @@ private:
 	virtual void handle() = 0;
 
 	// push a new menu onto the stack
-	static void stack_push(std::unique_ptr<menu> &&menu) { get_global_state(menu->machine())->stack_push(std::move(menu)); }
+	static void stack_push(std::unique_ptr<menu> &&menu) { menu->m_global_state.stack_push(std::move(menu)); }
 
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction);
 
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= m_items.size(); }
 
-	static void exit(running_machine &machine);
-	static global_state_ptr get_global_state(running_machine &machine);
+	static global_state &get_global_state(mame_ui_manager &ui);
 
 	int                     m_selected;   // which item is selected
 	int                     m_hover;      // which item is being hovered over
@@ -357,7 +365,7 @@ protected: // TODO: remove need to expose these
 	int m_visible_items;    // number of visible items
 
 private:
-	global_state_ptr const  m_global_state;
+	global_state            &m_global_state;
 	bool                    m_special_main_menu;
 	bool                    m_needs_prev_menu_item;
 	mame_ui_manager         &m_ui;              // UI we are attached to
@@ -375,9 +383,6 @@ private:
 	bool                    m_mouse_button;
 	float                   m_mouse_x;
 	float                   m_mouse_y;
-
-	static std::mutex       s_global_state_guard;
-	static global_state_map s_global_states;
 };
 
 } // namespace ui

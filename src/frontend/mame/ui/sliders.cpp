@@ -298,7 +298,7 @@ uint32_t menu_sliders::ui_handler(render_container &container, mame_ui_manager &
 	uint32_t result;
 
 	// if this is the first call, push the sliders menu
-	if (topmost_menu<menu_sliders>(mui.machine()) == nullptr)
+	if (!topmost_menu<menu_sliders>(mui))
 		menu::stack_push<menu_sliders>(mui, container, true);
 
 	// handle standard menus
@@ -306,9 +306,9 @@ uint32_t menu_sliders::ui_handler(render_container &container, mame_ui_manager &
 
 	// if we are cancelled, pop the sliders menu
 	if (result == UI_HANDLER_CANCEL)
-		menu::stack_pop(mui.machine());
+		menu::stack_pop(mui);
 
-	menu_sliders *uim = topmost_menu<menu_sliders>(mui.machine());
+	menu_sliders *uim = topmost_menu<menu_sliders>(mui);
 	return uim && uim->m_menuless_mode ? 0 : UI_HANDLER_CANCEL;
 }
 

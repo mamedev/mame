@@ -199,7 +199,7 @@ void menu_file_manager::handle()
 void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
 {
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
+	menu::stack_reset(mui);
 
 	// add the quit entry followed by the game select entry
 	menu::stack_push_special_main<menu_quit_game>(mui, container);
