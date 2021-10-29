@@ -336,48 +336,12 @@ void device_nes_cart_interface::prg16_cdef(int bank)
 	update_prg_banks(2, 3);
 }
 
-void device_nes_cart_interface::prg8_89(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[0] = bank;
-	update_prg_banks(0, 0);
-}
-
-void device_nes_cart_interface::prg8_ab(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[1] = bank;
-	update_prg_banks(1, 1);
-}
-
-void device_nes_cart_interface::prg8_cd(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[2] = bank;
-	update_prg_banks(2, 2);
-}
-
-void device_nes_cart_interface::prg8_ef(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[3] = bank;
-	update_prg_banks(3, 3);
-}
-
-/* We also define an additional helper to map 8k PRG-ROM to one of the banks (passed as parameter) */
+// We define a parameterized helper to map 8k PRG-ROM to one of the banks
 void device_nes_cart_interface::prg8_x(int start, int bank)
 {
 	assert(start < 4);
 
-	/* assumes that bank references an 8k chunk */
+	// assumes that bank references an 8k chunk
 	bank = prg_8k_bank_num(bank);
 
 	m_prg_bank[start] = bank;

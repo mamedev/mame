@@ -37,8 +37,9 @@ DEFINE_DEVICE_TYPE(PCE_ARCADE_PAD_6, pce_arcade_pad_6_device, "pce_arcade_pad_6"
 
 
 static INPUT_PORTS_START( pce_joypad6 )
+	// Action button order on original pad is bottom row: III, II, I, and top row: IV, V, VI
 	PORT_START("BUTTONS_0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button I")    // Rightmost in bottom row
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button I")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button II")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SELECT  ) PORT_NAME("Select")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START   ) PORT_NAME("Run")
@@ -50,7 +51,7 @@ static INPUT_PORTS_START( pce_joypad6 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 
 	PORT_START("BUTTONS_1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button III")  // Leftmost in bottom row
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button III")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Button IV")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Button V")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Button VI")
@@ -180,7 +181,7 @@ void pce_joypad6_base_device::device_add_mconfig(machine_config &config)
 
 	LS157(config, m_muxer[1]);
 	m_muxer[1]->a_in_callback().set_ioport("BUTTONS_1");
-	m_muxer[1]->b_in_callback().set_constant(0x0); //6-button pad header
+	m_muxer[1]->b_in_callback().set_constant(0x0); // 6-button pad header
 
 	LS157(config, m_muxer[2]);
 	m_muxer[2]->a_in_callback().set(m_muxer[0], FUNC(ls157_device::output_r));

@@ -40,17 +40,6 @@ end
 			"GLESv2",
 			"SDL2",
 		}
-	configuration { "pnacl" }
-		kind "ConsoleApp"
-		targetextension ".pexe"
-		links {
-			"ppapi",
-			"ppapi_gles2",
-			"pthread",
-		}
-
-	configuration { "winstore*" }
-		kind "WindowedApp"
 
 	configuration {  }
 
@@ -68,36 +57,6 @@ end
 			}
 	end
 
-	configuration { "winstore*" }
-		-- Windows Required Files
-		files {
-			-- Manifest file
-			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
-		}
-
-	configuration { "winstore*" }
-		files {
-			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
-		}
-		configuration "**/scripts/resources/uwp/assets/*.png"
-			flags { "DeploymentContent" }
-
-	-- Effects and Shaders
-	configuration { "winstore*" }
-		files {
-			MAME_DIR .. "artwork/*",
-			MAME_DIR .. "artwork/**/*",
-			MAME_DIR .. "bgfx/*",
-			MAME_DIR .. "bgfx/**/*",
-			MAME_DIR .. "hash/*",
-			MAME_DIR .. "language/*",
-			MAME_DIR .. "language/**/*",
-			MAME_DIR .. "plugins/*",
-			MAME_DIR .. "plugins/**/*",
-		}
-		configuration "**/*"
-			flags { "DeploymentContent" }
-
 	configuration { "Release" }
 		targetsuffix ""
 		if _OPTIONS["PROFILE"] then
@@ -112,9 +71,6 @@ end
 
 	configuration { "mingw*" or "vs20*" }
 		targetextension ".exe"
-
-	configuration { "rpi" }
-		targetextension ""
 
 	configuration { "asmjs" }
 		targetextension ".bc"
@@ -192,12 +148,6 @@ end
 			if _OPTIONS["PLATFORM"]=="arm64" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/arm64-v8a")
 			end
-			if _OPTIONS["PLATFORM"]=="mips" then
-				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips")
-			end
-			if _OPTIONS["PLATFORM"]=="mips64" then
-				targetdir(MAME_DIR .. "android-project/app/src/main/libs/mips64")
-			end
 			if _OPTIONS["PLATFORM"]=="x86" then
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86")
 			end
@@ -263,12 +213,8 @@ if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
 		"lualibs",
-	}
-if (_OPTIONS["osd"] ~= "uwp") then
-	links {
 		"linenoise",
 	}
-end
 end
 	links {
 		ext_lib("zlib"),
@@ -414,13 +360,6 @@ if (STANDALONE~=true) then
 		}
 
 	configuration { "vs20*" }
-		prebuildcommands {
-			"mkdir \"" .. path.translate(GEN_DIR  .. "resource/","\\") .. "\" 2>NUL",
-			"@echo Emitting ".. rctarget .. "vers.rc...",
-			PYTHON .. " \"" .. path.translate(MAME_DIR .. "scripts/build/verinfo.py","\\") .. "\" -r -b " .. rctarget .. " \"" .. path.translate(GEN_DIR .. "version.cpp","\\") .. "\" > \"" .. path.translate(GEN_DIR  .. "resource/" .. rctarget .. "vers.rc", "\\") .. "\"" ,
-		}
-
-	configuration { "vsllvm" }
 		prebuildcommands {
 			"mkdir \"" .. path.translate(GEN_DIR  .. "resource/","\\") .. "\" 2>NUL",
 			"@echo Emitting ".. rctarget .. "vers.rc...",
