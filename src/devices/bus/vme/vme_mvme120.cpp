@@ -160,7 +160,7 @@ void vme_mvme120_device::mvme12x_base_mem(address_map &map)
 {
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
-	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
+	map(0xf20000, 0xf2003f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
 	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
 	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
 	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
@@ -190,7 +190,6 @@ void vme_mvme120_device::mvme121_mem(address_map &map)
 	map(0x000000, 0x07ffff).ram().share(m_localram);
 	map(0x080000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
-	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	// $F80002-F80003 clear cache bank   2	
 	// $F80004-F80005 clear cache bank 1
 	// $F80006-F80007 clear cache bank 1+2
@@ -210,7 +209,6 @@ void vme_mvme120_device::mvme123_mem(address_map &map)
 	mvme12x_base_mem(map);
 	map(0x000000, 0x07ffff).ram().share(m_localram);
 	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	
 	// $F80002-F80003 clear cache bank   2	
 	// $F80004-F80005 clear cache bank 1
 	// $F80006-F80007 clear cache bank 1+2
