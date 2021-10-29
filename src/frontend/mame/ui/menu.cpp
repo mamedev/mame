@@ -169,18 +169,6 @@ bool menu::global_state::stack_has_special_main_menu() const
 
 
 
-//-------------------------------------------------
-//  init - initialize the menu system
-//-------------------------------------------------
-
-void menu::init(mame_ui_manager &ui)
-{
-	global_state &state(get_global_state(ui));
-	assert(!state.topmost_menu<menu>()); // calling init twice is bad
-}
-
-
-
 /***************************************************************************
     CORE MENU MANAGEMENT
 ***************************************************************************/

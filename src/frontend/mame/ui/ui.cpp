@@ -199,7 +199,6 @@ void mame_ui_manager::init()
 	ui::system_list::instance().cache_data(options());
 
 	// initialize the other UI bits
-	ui::menu::init(*this);
 	ui_gfx_init(machine());
 
 	m_ui_colors.refresh(options());

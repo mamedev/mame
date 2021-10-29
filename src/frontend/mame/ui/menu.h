@@ -60,9 +60,6 @@ public:
 	void item_append(menu_item_type type, uint32_t flags = 0);
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
-	// Global initialization
-	static void init(mame_ui_manager &ui);
-
 	// reset the menus, clearing everything
 	static void stack_reset(mame_ui_manager &ui) { get_global_state(ui).stack_reset(); }
 
