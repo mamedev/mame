@@ -12,23 +12,6 @@
 #include "machine/clock.h"
 #include "machine/mc68901.h"
 
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
-
-//#define VERBOSE 0
-#define VERBOSE (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
-
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
-
 #ifdef _MSC_VER
 #define FUNCNAME __func__
 #else
@@ -53,14 +36,14 @@ class vme_mvme120_device :  public device_t, public device_vme_card_interface
 {
 public:
 	/* Board types */
-	enum mvme120_board_t {
+	enum mvme12x_variant {
 		mvme120_board,
 		mvme121_board,
 		mvme122_board,
 		mvme123_board
 	};
 		
-	vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme120_board_t board_id);
+	vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme12x_variant board_id);
 
 	// Switch and jumper handlers
 	DECLARE_INPUT_CHANGED_MEMBER(s3_autoboot);
@@ -71,49 +54,44 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	
-	uint16_t bootvect_r(offs_t offset);
-	void bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	
 	virtual void device_start () override;
 	virtual void device_reset () override;
 	
 	void mvme120_mem(address_map &map);
+	void mvme121_mem(address_map &map);
+	void mvme122_mem(address_map &map);
+	void mvme123_mem(address_map &map);
 	
-	// add the rest of the devices here...
 	required_device<cpu_device> m_maincpu;
-	required_memory_region m_maincpu_region;	
 	
 	required_device<mc68901_device> m_mfp;
 	required_device<rs232_port_device> m_rs232;
 	
 	required_ioport m_input_s3;
+	
+	memory_passthrough_handler *m_rom_shadow_tap;
 
-	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
-	uint16_t  *m_sysrom;
-	uint16_t  m_sysram[2];
-	uint8_t	  m_boot_memory_cycles;
+	required_region_ptr<uint16_t> m_sysrom;
+	required_shared_ptr<uint16_t> m_localram;
 
-	// "VME120 Control Register"
-	uint8_t		m_ctrlreg;
+	uint8_t		m_ctrlreg;				// "VME120 Control Register"
+	uint8_t		m_memory_read_count;	// For boot ROM shadowing $000000
+
 	uint8_t 	ctrlreg_r(offs_t offset);
 	void 		ctrlreg_w(offs_t offset, uint8_t data);
 	
-	// VMEbus dummy
+	// VMEbus dummy lines
 	uint16_t vme_a24_r();
 	void vme_a24_w(uint16_t data);
 	uint16_t vme_a16_r();
 	void vme_a16_w(uint16_t data);
+
+	uint16_t rom_shadow_tap(offs_t address, u16 data, u16 mem_mask);
 	
-	// Add the devices' registers and callbacks here...
 	DECLARE_WRITE_LINE_MEMBER(watchdog_reset);	
 	DECLARE_WRITE_LINE_MEMBER(mfp_interrupt);
-	
-	// Memory maps for the 12x variants
-	void mvme121_mem(address_map &map);
-	void mvme122_mem(address_map &map);
-	void mvme123_mem(address_map &map);
-	
-	const mvme120_board_t  m_board_id;
+
+	const mvme12x_variant  m_board_id;
 };
 
 

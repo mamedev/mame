@@ -18,29 +18,7 @@
 #include "emu.h"
 #include "bus/vme/vme.h"
 #include "bus/vme/vme_mvme120.h"
-
-#define LOG_GENERAL 0x01
-#define LOG_SETUP   0x02
-#define LOG_PRINTF  0x04
-
-//#define VERBOSE 0
-#define VERBOSE (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
-
-#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
-#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
-
-#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
-#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
-
-#if VERBOSE & LOG_PRINTF
-#define logerror printf
-#endif
-
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
+#include "logmacro.h"
 
 class sys1121_state : public driver_device
 {
@@ -49,10 +27,10 @@ sys1121_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device (mconfig, type, tag)
 	{
 	}
-	virtual void machine_start () override { LOGSETUP("%s\n", FUNCNAME); }
+	virtual void machine_start () override { }
 //  virtual void machine_reset () override;
 
-	void init_sys1121()      { LOGSETUP("%s\n", FUNCNAME); }
+	void init_sys1121()      { }
 	void sys1121(machine_config &config);
 };
 
