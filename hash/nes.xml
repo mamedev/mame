@@ -46607,6 +46607,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="32768">
 				<rom name="family trainer 10 - rairai kyonsees (japan) (beta).chr" size="32768" crc="c688741a" sha1="ab747dc1d1007f46de07d2c44a7cacdacd691fb9" offset="00000" status="baddump" />
 			</dataarea>
@@ -46627,6 +46628,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="32768">
 				<rom name="family trainer 10 - rairai kyonsees (japan).chr" size="32768" crc="ecb80045" sha1="6ef04bcc4fd32949a6f7460b3ab7f5d00f55218d" offset="00000" status="baddump" />
 			</dataarea>
@@ -46647,6 +46649,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="131072">
 				<rom name="family trainer 6 - manhattan police (japan).chr" size="131072" crc="b40d4a42" sha1="595f4f58ce13686a872299225232bd360752e25f" offset="00000" status="baddump" />
 			</dataarea>
