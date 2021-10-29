@@ -11,19 +11,21 @@
 #include "bus/vme/vme_mvme120.h"
 #include "logmacro.h"
 
+namespace {
+
 class sys1121_state : public driver_device
 {
-public:
-sys1121_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device (mconfig, type, tag)
-	{
-	}
+	public:
+	sys1121_state(const machine_config &mconfig, device_type type, const char *tag)
+			: driver_device (mconfig, type, tag)
+		{
+		}
 
-	void sys1121(machine_config &config);
-	
-protected:
-	virtual void machine_start () override { }
-//  virtual void machine_reset () override;
+		void sys1121(machine_config &config);
+		
+	protected:
+		virtual void machine_start () override { }
+	//  virtual void machine_reset () override;
 };
 
 // Input ports
@@ -54,6 +56,8 @@ void sys1121_state::sys1121(machine_config &config)
 // This is a VME chassis so any ROMs are contained in the cards.
 ROM_START (sys1121) 
 ROM_END
+
+}
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
 COMP( 1984, sys1121, 0,       0,      sys1121, sys1121, sys1121_state, empty_init, "Motorola", "SYS1121",  MACHINE_IS_SKELETON )

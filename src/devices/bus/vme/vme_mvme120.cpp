@@ -19,6 +19,7 @@
  *  works properly? Still working on that.
  */
 
+#include "emu.h"
 #include "vme_mvme120.h"
 
 #define LOG_PRINTF  (1U << 1)
@@ -48,7 +49,7 @@ DEFINE_DEVICE_TYPE(VME_MVME121,   vme_mvme121_card_device,   "mvme121",   "Motor
 DEFINE_DEVICE_TYPE(VME_MVME122,   vme_mvme122_card_device,   "mvme122",   "Motorola MVME-122")
 DEFINE_DEVICE_TYPE(VME_MVME123,   vme_mvme123_card_device,   "mvme123",   "Motorola MVME-123")
 
-INPUT_PORTS_START(mvme120)
+static INPUT_PORTS_START(mvme120)
 	PORT_START("S3")
 	// described as "autoboot" and "cache disable" in the manual
 	PORT_DIPNAME(0x01, 0x00, DEF_STR( Unknown ) )  	PORT_DIPLOCATION("S3:1")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_autoboot, 0)
@@ -155,10 +156,8 @@ vme_mvme123_card_device::vme_mvme123_card_device(const machine_config &mconfig, 
 	
 }
 
-void vme_mvme120_device::mvme120_mem(address_map &map)
+void vme_mvme120_device::mvme12x_base_mem(address_map &map)
 {
-	map(0x000000, 0x01ffff).ram().share(m_localram);
-	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
 	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
@@ -167,6 +166,18 @@ void vme_mvme120_device::mvme120_mem(address_map &map)
 	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
 	
+	// $F80002-F80003 clear cache bank   2	
+	// $F80004-F80005 clear cache bank 1
+	// $F80006-F80007 clear cache bank 1+2
+	// (above mirrored to $F9FFFF)
+}
+
+void vme_mvme120_device::mvme120_mem(address_map &map)
+{
+	mvme12x_base_mem(map);
+	map(0x000000, 0x01ffff).ram().share(m_localram);
+	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
+	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
 	// $F80002-F80003 clear cache bank   2	
 	// $F80004-F80005 clear cache bank 1
 	// $F80006-F80007 clear cache bank 1+2
@@ -175,16 +186,11 @@ void vme_mvme120_device::mvme120_mem(address_map &map)
 
 void vme_mvme120_device::mvme121_mem(address_map &map)
 {
+	mvme12x_base_mem(map);
 	map(0x000000, 0x07ffff).ram().share(m_localram);
 	map(0x080000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
-	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
-	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
-	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
 	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
 	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
-	
 	// $F80002-F80003 clear cache bank   2	
 	// $F80004-F80005 clear cache bank 1
 	// $F80006-F80007 clear cache bank 1+2
@@ -193,26 +199,17 @@ void vme_mvme120_device::mvme121_mem(address_map &map)
 
 void vme_mvme120_device::mvme122_mem(address_map &map)
 {
+	mvme12x_base_mem(map);
 	map(0x000000, 0x01ffff).ram().share(m_localram);
 	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
-	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
-	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
-	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
-	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
+	// No MMU, no cache
 }
 
 void vme_mvme120_device::mvme123_mem(address_map &map)
 {
+	mvme12x_base_mem(map);
 	map(0x000000, 0x07ffff).ram().share(m_localram);
 	map(0x020000, 0xefffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
-	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
-	map(0xf20000, 0xf2003f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
-	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
-	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
-	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
 	
 	// $F80002-F80003 clear cache bank   2	
 	// $F80004-F80005 clear cache bank 1
@@ -220,14 +217,14 @@ void vme_mvme120_device::mvme123_mem(address_map &map)
 	// (above mirrored to $F9FFFF)
 }
 
-void vme_mvme120_device::device_start ()
+void vme_mvme120_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
 	
 	m_ctrlreg = 0xFF;		// all bits are set to 1 when /RESET asserted
 }
 
-void vme_mvme120_device::device_reset ()
+void vme_mvme120_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
 	

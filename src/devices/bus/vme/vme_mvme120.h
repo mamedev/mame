@@ -18,12 +18,6 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define MVME120_MASTER_CLOCK 	20_MHz_XTAL
-#define MVME122_MASTER_CLOCK 	25_MHz_XTAL
-
-#define MVME120_CPU_CLOCK		( MVME120_MASTER_CLOCK / 2 )
-#define MVME122_CPU_CLOCK		( MVME122_MASTER_CLOCK / 2 )
-
 DECLARE_DEVICE_TYPE(VME_MVME120,   vme_mvme120_card_device)
 DECLARE_DEVICE_TYPE(VME_MVME121,   vme_mvme121_card_device)
 DECLARE_DEVICE_TYPE(VME_MVME122,   vme_mvme122_card_device)
@@ -60,6 +54,7 @@ protected:
 	virtual void device_start () override;
 	virtual void device_reset () override;
 	
+	void mvme12x_base_mem(address_map &map);
 	void mvme120_mem(address_map &map);
 	void mvme121_mem(address_map &map);
 	void mvme122_mem(address_map &map);
