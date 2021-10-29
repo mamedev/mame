@@ -15,8 +15,7 @@
  *  If you skip over that address (pc=F058E2 in the debugger) it continues
  *  through the self-test.
  */
-#include "emu.h"
-#include "bus/vme/vme.h"
+ 
 #include "bus/vme/vme_mvme120.h"
 #include "logmacro.h"
 
