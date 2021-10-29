@@ -414,9 +414,10 @@ void spifi3_device::prcmd_w(uint32_t data)
     LOGMASKED(LOG_REGISTER, "write spifi_reg.prcmd = 0x%x\n", data);
     spifi_reg.prcmd = data;
 
-    switch(data)
+    // TODO: NJMP and other commands
+    const auto cmd = data & PRCMD_MASK;
+    switch (cmd)
     {
-        // TODO: a lot of these can be consolidated
         case PRC_DATAOUT:
         {
             state = INIT_XFR;
@@ -437,19 +438,12 @@ void spifi3_device::prcmd_w(uint32_t data)
             LOGMASKED(LOG_CMD, "start command DATAIN, DMA = %d\n", luntar_dma_setting);
             break;
         }
+        case PRC_MSGOUT:
+        case PRC_MSGIN:
         case PRC_COMMAND:
-        {
-            LOGMASKED(LOG_CMD, "start command COMMAND\n");
-            state = INIT_XFR;
-            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-
-            command_pos = 0;
-            dma_set(DMA_NONE);
-            break;
-        }
         case PRC_STATUS:
         {
-            LOGMASKED(LOG_CMD, "start command STATUS\n");
+            LOGMASKED(LOG_CMD, "start command %s\n", prcmd_command_names[cmd]);
             state = INIT_XFR;
             xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
 
@@ -470,22 +464,6 @@ void spifi3_device::prcmd_w(uint32_t data)
                 state = INIT_XFR_SEND_PAD_WAIT_REQ;
             }
             scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
-            break;
-        }
-        case PRC_MSGOUT:
-        {
-            LOGMASKED(LOG_CMD, "start command MSGOUT\n");
-            state = INIT_XFR;
-            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-            dma_set(DMA_NONE);
-            break;
-        }
-        case PRC_MSGIN:
-        {
-            LOGMASKED(LOG_CMD, "start command MSGIN\n");
-            state = INIT_XFR;
-            xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
-            dma_set(DMA_NONE);
             break;
         }
         default:
@@ -762,9 +740,52 @@ void spifi3_device::start_automsg(int msg_phase)
 void spifi3_device::start_autocmd()
 {
     LOGMASKED(LOG_AUTO, "start AUTOCMD\n");
+    scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // Deassert ACK since we are automatically moving to the command phase
     state = INIT_XFR;
     xfr_phase = S_PHASE_COMMAND;
     dma_set(DMA_NONE);
+}
+
+void spifi3_device::start_autodata(int data_phase)
+{
+    state = INIT_XFR;
+    xfr_phase = data_phase;
+    dma_set(data_phase == S_PHASE_DATA_IN ? DMA_IN : DMA_OUT);
+    check_drq();
+}
+
+/*
+ * auto_phase_transfer
+ *
+ * This will override the current xfr_phase if needed, otherwise will proceed to BSRQ
+ * This is called when a new xfr_phase is detected and there is the possibility of an
+ * auto-progression to a new phase
+ */
+void spifi3_device::auto_phase_transfer(int new_phase)
+{
+    if(xfr_phase == new_phase)
+    {
+        fatalerror("spifi3 auto_phase_transfer called without phase transition!");
+    }
+    state = INIT_XFR_BUS_COMPLETE;
+    command_pos = 0;
+
+    if ((new_phase == S_PHASE_DATA_IN && autodata_in(bus_id)) || (new_phase == S_PHASE_DATA_OUT && autodata_out(bus_id)))
+    {
+        start_autodata(new_phase);
+    }
+    else if(new_phase == S_PHASE_STATUS && autostat_active(bus_id))
+    {
+        start_autostat(bus_id);
+    }
+    else if ((new_phase == S_PHASE_MSG_IN || new_phase == S_PHASE_MSG_OUT) && automsg_active())
+    {
+        start_automsg(new_phase);
+    }
+    else if((new_phase == S_PHASE_COMMAND && xfr_phase != S_PHASE_COMMAND) && autocmd_active())
+    {
+        start_autocmd();
+    }
 }
 
 void spifi3_device::step(bool timeout)
@@ -1049,7 +1070,7 @@ void spifi3_device::step(bool timeout)
             if(!(spifi_reg.select & SEL_WATN))
             {
                 // The NWS-5000 APmonitor, NEWS-OS, and NetBSD all set SEL_WATN, so this code path is never taken.
-                fatalerror("SEL_WATN was not asserted - this is not supported!");
+                fatalerror("SEL_WATN was not asserted - this is not yet implemented!");
                 state = DISC_SEL_WAIT_REQ;
             }
             else
@@ -1112,9 +1133,7 @@ void spifi3_device::step(bool timeout)
                 const auto new_phase = (ctrl & S_PHASE_MASK);
                 if(new_phase == S_PHASE_COMMAND && autocmd_active())
                 {
-                    scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // Deassert ACK since we are automatically moving to the command phase
-                    state = INIT_XFR;
-                    xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+                    start_autocmd();
                     step(false);
                 }
                 else if ((new_phase == S_PHASE_MSG_OUT || new_phase == S_PHASE_MSG_IN) && automsg_active())
@@ -1283,104 +1302,57 @@ void spifi3_device::step(bool timeout)
             }
 
             // check for command complete
+            const auto new_phase = (ctrl & S_PHASE_MASK);
             if (xfr_data_source == FIFO && (dma_command(dma_dir) && transfer_count_zero() && (dma_dir == DMA_IN || m_even_fifo.empty())))
             {
                 LOGMASKED(LOG_DATA, "DMA transfer complete\n");
-                state = INIT_XFR_BUS_COMPLETE;
-
-                const auto new_phase = (ctrl & S_PHASE_MASK);
-                if(new_phase == S_PHASE_STATUS && autostat_active(bus_id))
-                {
-                    start_autostat(bus_id);
-                }
-                else if(new_phase == S_PHASE_DATA_OUT)
+                if(xfr_phase == S_PHASE_DATA_OUT && new_phase == S_PHASE_DATA_OUT)
                 {
                     // WORKAROUND - I haven't been able to figure out how to make the interrupts and register values work out
                     // to where DMAC3 triggers a parity error only when PAD is needed. So, we'll just transfer it ourselves instead.
                     LOGMASKED(LOG_GENERAL, "applying write pad workaround\n");
                     state = INIT_XFR_SEND_PAD_WAIT_REQ;
                 }
-                else if(new_phase == S_PHASE_DATA_IN)
+                else if(xfr_phase == S_PHASE_DATA_IN && new_phase == S_PHASE_DATA_IN)
                 {
                     // See above
                     LOGMASKED(LOG_GENERAL, "applying read pad workaround\n");
                     state = INIT_XFR_RECV_PAD_WAIT_REQ;
                 }
+                else
+                {
+                    auto_phase_transfer(new_phase);
+                }
             }
             else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && (xfr_phase & S_INP) == 0 && m_even_fifo.empty()))
             {
                 LOGMASKED(LOG_DATA, "Non-DMA transfer out complete\n");
-                state = INIT_XFR_BUS_COMPLETE;
-                const auto new_phase = (ctrl & S_PHASE_MASK);
-                if ((new_phase == S_PHASE_MSG_IN) && automsg_active())
-                {
-                    start_automsg(new_phase);
-                }
+                auto_phase_transfer(new_phase);
             }
             else if (xfr_data_source == FIFO && (!dma_command(dma_dir) && ((xfr_phase & S_INP) == S_INP) && m_even_fifo.size() == 1))
             {
                 LOG("Non-DMA transfer in complete\n");
-                state = INIT_XFR_BUS_COMPLETE;
-                const auto new_phase = (ctrl & S_PHASE_MASK);
-                if ((new_phase == S_PHASE_MSG_IN) && automsg_active())
-                {
-                    start_automsg(new_phase);
-                }
+                auto_phase_transfer(new_phase);
             }
             else if(xfr_data_source == COMMAND_BUFFER && (command_pos >= (spifi_reg.cmlen & CML_LENMASK))) // Done transferring message or command
             {
                 LOGMASKED(LOG_STATE, "Command transfer complete, new phase = %d\n", ctrl & S_PHASE_MASK);
-                state = INIT_XFR_BUS_COMPLETE;
-
-                // If autodata is enabled for this target, then we don't need to notify the host, we just keep going with the transfer instead.
-                const auto new_phase = (ctrl & S_PHASE_MASK);
-                if ((new_phase == S_PHASE_DATA_IN && autodata_in(bus_id)) || (new_phase == S_PHASE_DATA_OUT && autodata_out(bus_id)))
+                if(new_phase != xfr_phase)
                 {
-                    state = INIT_XFR;
-                    xfr_phase = new_phase;
-                    dma_set(new_phase == S_PHASE_DATA_IN ? DMA_IN : DMA_OUT);
-                    check_drq();
+                    auto_phase_transfer(new_phase);
                 }
-                else if(new_phase == S_PHASE_STATUS && autostat_active(bus_id))
+                else
                 {
-                    start_autostat(bus_id);
-                }
-                else if ((new_phase == S_PHASE_MSG_IN || (new_phase == S_PHASE_MSG_OUT && xfr_phase != S_PHASE_MSG_OUT)) && automsg_active())
-                {
-                    start_automsg(new_phase);
-                }
-                else if((new_phase == S_PHASE_COMMAND && xfr_phase != S_PHASE_COMMAND) && autocmd_active())
-                {
-                    start_autocmd();
+                    fatalerror("Ran out of CDB bytes to transfer!");
                 }
             }
             else
             {
-                // check for phase change
                 const auto new_phase = ctrl & S_PHASE_MASK;
                 if (new_phase != xfr_phase)
                 {
                     LOGMASKED(LOG_STATE, "Phase changed to %d\n", new_phase);
-                    command_pos = 0;
-
-                    if(new_phase == S_PHASE_STATUS && autostat_active(bus_id))
-                    {
-                        start_autostat(bus_id);
-                    }
-                    else if (new_phase == S_PHASE_COMMAND && autocmd_active())
-                    {
-                        LOGMASKED(LOG_AUTO, "Autocmd enabled, proceeding to command automatically\n");
-                        state = INIT_XFR;
-                        xfr_phase = new_phase;
-                    }
-                    else if ((new_phase == S_PHASE_MSG_IN) && automsg_active())
-                    {
-                        start_automsg(new_phase);
-                    }
-                    else
-                    {
-                        state = INIT_XFR_BUS_COMPLETE;
-                    }
+                    auto_phase_transfer(new_phase);
                 }
                 else
                 {
@@ -1465,17 +1437,8 @@ void spifi3_device::step(bool timeout)
             const auto new_phase = (ctrl & S_PHASE_MASK);
             if(new_phase != xfr_phase)
             {
-                command_pos = 0;
-
-                if(new_phase == S_PHASE_STATUS && autostat_active(bus_id))
-                {
-                    start_autostat(bus_id);
-                    step(false);
-                }
-                else
-                {
-                    bus_complete();
-                }
+                auto_phase_transfer(new_phase);
+                step(false);
             }
             else
             {
@@ -1502,17 +1465,8 @@ void spifi3_device::step(bool timeout)
             const auto new_phase = (ctrl & S_PHASE_MASK);
             if(new_phase != xfr_phase)
             {
-                command_pos = 0;
-
-                if(new_phase == S_PHASE_STATUS && autostat_active(bus_id))
-                {
-                    start_autostat(bus_id);
-                    step(false);
-                }
-                else
-                {
-                    bus_complete();
-                }
+                auto_phase_transfer(new_phase);
+                step(false);
             }
             else
             {

@@ -10,8 +10,8 @@
  * Based on internet research, it seems some HP PA-RISC systems also used the SPIFI3, including the E55.
  *
  * Because this driver was developed to work with NetBSD, NEWS-OS, and the NWS-5000 monitor ROM, only
- * the features and flows that Sony used are implemented. Emulating non-Sony designs using this chip will likely 
- * require similar RE work to determine the exact SPIFI features used and support for them added into this driver.  
+ * the features and flows that Sony used are implemented. Emulating non-Sony designs using this chip will likely
+ * require similar RE work to determine the exact SPIFI features used and add support for them into this driver.
  * In its current state, this driver is unlikely to work out of the box with any other machines.
  *
  * Register definitions were derived from the NetBSD source code, copyright (c) 2000 Tsubai Masanari.
@@ -209,6 +209,7 @@ private:
     void delay_cycles(int cycles);
     void arbitrate();
     void clear_fifo();
+    void auto_phase_transfer(int new_phase);
 
     // AUXCTRL constants and functions
     const uint32_t AUXCTRL_DMAEDGE = 0x04;
@@ -319,6 +320,7 @@ private:
     const uint32_t ADATA_EN = 0x80;
     const uint32_t ADATA_TARGET_ID = 0x07;
     void autodata_w(uint32_t data);
+    void start_autodata(int data_phase);
     bool autodata_active(int target_id)
     {
         return (spifi_reg.autodata & ADATA_EN) && ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id);
@@ -370,6 +372,8 @@ private:
         PRC_CLRACK = 0x10,
         PRC_NJMP = 0x80
     };
+    const uint32_t PRCMD_MASK = 0x1f;
+    const std::string prcmd_command_names[9] = {"PRC_DATAOUT", "PRC_DATAIN", "PRC_COMMAND", "PRC_STATUS", "PRC_TRPAD", "UNKNOWN", "PRC_MSGOUT", "PRC_MSGIN", "PRC_KILLREQ"};
     uint32_t prcmd_r();
     void prcmd_w(uint32_t data);
 
