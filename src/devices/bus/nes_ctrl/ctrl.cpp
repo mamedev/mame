@@ -57,6 +57,7 @@
 #include "partytap.h"
 #include "powerpad.h"
 #include "suborkey.h"
+#include "taptapmat.h"
 #include "zapper.h"
 
 
@@ -211,4 +212,5 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("hori_4p", NES_HORI4P);
 	device.option_add("barcode_battler", NES_BARCODE_BATTLER);
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
+	device.option_add("taptapmat", NES_TAPTAPMAT);
 }

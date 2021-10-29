@@ -2930,6 +2930,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/taptapmat.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/taptapmat.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.h",
 	}
