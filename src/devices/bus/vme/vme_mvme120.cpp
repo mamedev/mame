@@ -50,7 +50,6 @@ DEFINE_DEVICE_TYPE(VME_MVME123,   vme_mvme123_card_device,   "mvme123",   "Motor
 
 INPUT_PORTS_START(mvme120)
 	PORT_START("S3")
-	
 	// described as "autoboot" and "cache disable" in the manual
 	PORT_DIPNAME(0x01, 0x00, DEF_STR( Unknown ) )  	PORT_DIPLOCATION("S3:1")	PORT_CHANGED_MEMBER(DEVICE_SELF, vme_mvme120_device, s3_autoboot, 0)
 	PORT_DIPSETTING(   0x01, DEF_STR( On ) )
@@ -60,9 +59,58 @@ INPUT_PORTS_START(mvme120)
 	PORT_DIPSETTING(   0x02, "10.0MHz CPU")
 	PORT_DIPSETTING(   0x00, "12.5MHz CPU")
 	
-	PORT_DIPNAME(0x0C, 0x08, "Reset Vector Source")	PORT_DIPLOCATION("S3:3,4")	//
+	PORT_DIPNAME(0x0C, 0x08, "Reset Vector Source")	PORT_DIPLOCATION("S3:3,4")
 	PORT_DIPSETTING(   0x08, "Onboard ROM")
 	PORT_DIPSETTING(   0x04, "VMEbus")
+	
+	// Select whether MSR bit 7 monitors ACFAIL* or SYSFAIL* on the VME bus.
+	PORT_START("J2")
+	PORT_DIPNAME(0x01, 0x01, "ACFAIL*/SYSFAIL* Select")
+	PORT_DIPSETTING(   0x00, "ACFAIL*")
+	PORT_DIPSETTING(   0x01, "SYSFAIL*")
+	
+	PORT_START("J3-J4")	// Different configurations of jumpers in J3 and J4.
+	PORT_DIPNAME(0x03, 0x03, "VMEbus Request Level")
+	PORT_DIPSETTING(   0x00, "Level 0")
+	PORT_DIPSETTING(   0x01, "Level 1")
+	PORT_DIPSETTING(   0x02, "Level 2")
+	PORT_DIPSETTING(   0x03, "Level 3")
+	
+	PORT_START("J5")
+	PORT_DIPNAME(0x01, 0x01, "Abort Switch Enable")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	
+	PORT_START("J6")
+	PORT_DIPNAME(0x01, 0x01, "Reset Switch Enable")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	
+	PORT_START("J7")	// Enable/disable VME IRQs reaching the MFP.
+	PORT_DIPNAME(0x01, 0x01, "VME IRQ1")			PORT_DIPLOCATION("J7:1")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x01, DEF_STR( On ))
+	PORT_DIPNAME(0x02, 0x02, "VME IRQ2")			PORT_DIPLOCATION("J7:2")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x02, DEF_STR( On ))
+	PORT_DIPNAME(0x04, 0x04, "VME IRQ3")			PORT_DIPLOCATION("J7:3")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x04, DEF_STR( On ))
+	PORT_DIPNAME(0x08, 0x08, "VME IRQ4")			PORT_DIPLOCATION("J7:4")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x08, DEF_STR( On ))
+	PORT_DIPNAME(0x10, 0x10, "VME IRQ5")			PORT_DIPLOCATION("J7:5")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x10, DEF_STR( On ))
+	PORT_DIPNAME(0x20, 0x20, "VME IRQ6")			PORT_DIPLOCATION("J7:6")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x20, DEF_STR( On ))
+	PORT_DIPNAME(0x40, 0x40, "VME IRQ7")			PORT_DIPLOCATION("J7:7")
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
+	PORT_DIPSETTING(   0x40, DEF_STR( On ))
+	
+	// EPROM configuration is J8
+	// Cache configuration is J9/J17	
 INPUT_PORTS_END
 
 ioport_constructor vme_mvme120_device::device_input_ports() const
@@ -238,8 +286,6 @@ WRITE_LINE_MEMBER(vme_mvme120_device::mfp_interrupt)
 // Dummy VMEbus access
 uint16_t vme_mvme120_device::vme_a24_r()
 {
-	//LOG("%s\n", FUNCNAME);
-	
 	// Simulate VMEbus timeout.
 	m_mfp->i2_w(ASSERT_LINE);
 	m_mfp->i2_w(CLEAR_LINE);
@@ -258,19 +304,27 @@ void vme_mvme120_device::vme_a24_w(uint16_t data)
 	
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	
-	//LOG("%s\n", FUNCNAME);
 }
 
 uint16_t vme_mvme120_device::vme_a16_r()
 {
-	//LOG("%s\n", FUNCNAME);
+	m_mfp->i2_w(ASSERT_LINE);
+	m_mfp->i2_w(CLEAR_LINE);
+	
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	
 	return 0;
 }
 
 void vme_mvme120_device::vme_a16_w(uint16_t data)
 {
-	//LOG("%s\n", FUNCNAME);
+	// Simulate VMEbus timeout.
+	m_mfp->i2_w(ASSERT_LINE);
+	m_mfp->i2_w(CLEAR_LINE);
+	
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
 uint8_t vme_mvme120_device::ctrlreg_r(offs_t offset)

@@ -50,6 +50,13 @@ void sys1121_state::sys1121(machine_config &config)
 {
 	VME(config, "vme", 0);
 	VME_SLOT(config, "slot1", mvme120_vme_cards, "mvme120", 1, "vme");
+	VME_SLOT(config, "slot2", mvme120_vme_cards, nullptr, 2, "vme");
+	VME_SLOT(config, "slot3", mvme120_vme_cards, nullptr, 3, "vme");
+	VME_SLOT(config, "slot4", mvme120_vme_cards, nullptr, 4, "vme");
+	VME_SLOT(config, "slot5", mvme120_vme_cards, nullptr, 5, "vme");
+	VME_SLOT(config, "slot6", mvme120_vme_cards, nullptr, 6, "vme");
+	VME_SLOT(config, "slot7", mvme120_vme_cards, nullptr, 7, "vme");
+	VME_SLOT(config, "slot8", mvme120_vme_cards, nullptr, 8, "vme");
 }
 
 /* ROM definitions */
