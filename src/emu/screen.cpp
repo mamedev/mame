@@ -635,12 +635,12 @@ void screen_device::allocate_scan_bitmaps()
 					else
 						m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
 				}
-				m_scan_widths.push_back(m_width);
+				m_scan_widths.push_back(effwidth);
 			}
 		}
 		else
 		{
-			for (int i = effheight; i < old_height; i++)
+			for (int i = old_height - 1; i >= effheight; i--)
 			{
 				for (int j = 0; j < 2; j++)
 				{

@@ -749,12 +749,13 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find('\n');
+		size_t found1 = copyright.find_first_of('\n');
+		size_t found2 = copyright.find_last_of('\n');
 
-		tempbuf[0].clear();
-		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
-		tempbuf[2] = copyright.substr(0, found);
-		tempbuf[3] = copyright.substr(found + 1);
+		tempbuf[0] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
+		tempbuf[1] = copyright.substr(0, found1);
+		tempbuf[2] = copyright.substr(found1 + 1, found2 - (found1 + 1));
+		tempbuf[3] = copyright.substr(found2 + 1);
 	}
 
 	// draw the footer
