@@ -160,8 +160,8 @@ void vme_mvme120_device::mvme12x_base_mem(address_map &map)
 {
 	map(0xf00000, 0xf0ffff).rom().region("maincpu", 0x00000);				// ROM/EEPROM bank 1 - 120bug
 	map(0xf10000, 0xf1ffff).rom().region("maincpu", 0x10000);				// ROM/EEPROM bank 2 - unpopulated
-	map(0xf20000, 0xf2003f).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write)).mirror(0x1ffc0).umask16(0x00ff);
-	map(0xf40000, 0xf40000).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w)).mirror(0x1fffc);
+	map(0xf20000, 0xf2003f).mirror(0x1ffc0).umask16(0x00ff).rw(m_mfp, FUNC(mc68901_device::read), FUNC(mc68901_device::write));
+	map(0xf40000, 0xf40000).mirror(0x1fffc).rw(FUNC(vme_mvme120_card_device::ctrlreg_r), FUNC(vme_mvme120_card_device::ctrlreg_w));
 	// $F60000-F6003F 68451 MMU, mirrored to $F7FFFF
 	map(0xfa0000, 0xfeffff).rw(FUNC(vme_mvme120_card_device::vme_a24_r), FUNC(vme_mvme120_card_device::vme_a24_w)); // VMEbus 24-bit addresses
 	map(0xff0000, 0xffffff).rw(FUNC(vme_mvme120_card_device::vme_a16_r), FUNC(vme_mvme120_card_device::vme_a16_w)); // VMEbus 16-bit addresses
@@ -218,8 +218,6 @@ void vme_mvme120_device::mvme123_mem(address_map &map)
 void vme_mvme120_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
-	
-	m_ctrlreg = 0xFF;		// all bits are set to 1 when /RESET asserted
 }
 
 void vme_mvme120_device::device_reset()
@@ -236,7 +234,7 @@ void vme_mvme120_device::device_reset()
 		rom_shadow_tap(offset, data, mem_mask);
 	});
 
-	m_ctrlreg = 0xFF;		// all bits are set to 1 when /RESET asserted
+	ctrlreg_w(0, 0xFF);	// /RESET flips the latch bits to $FF
 }
 
 uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
@@ -258,14 +256,15 @@ uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_ma
 WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
 {
 	if (state) {
-		printf("vme_mvme120_card_device::watchdog_reset\n");
-		logerror("vme_mvme120_card_device::watchdog_reset\n");
+		LOG("%s: MFP watchdog reset\n", FUNCNAME);
 		machine().schedule_soft_reset();
 	}
 }
 
 WRITE_LINE_MEMBER(vme_mvme120_device::mfp_interrupt)
 {
+	LOG("%s: MFP asserting interrupt\n", FUNCNAME);
+	
 	// MFP interrupts are gated by bit 2 of the control register.
 	if(state && !BIT(m_ctrlreg, 2))
 	{
@@ -278,60 +277,48 @@ WRITE_LINE_MEMBER(vme_mvme120_device::mfp_interrupt)
 	}
 }
 
-// Dummy VMEbus access
-uint16_t vme_mvme120_device::vme_a24_r()
+void vme_mvme120_device::vme_bus_timeout()
 {
-	// Simulate VMEbus timeout.
 	m_mfp->i2_w(ASSERT_LINE);
 	m_mfp->i2_w(CLEAR_LINE);
 	
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	
+}
+
+// Dummy VMEbus access
+uint16_t vme_mvme120_device::vme_a24_r()
+{
+	vme_bus_timeout();
 	return 0;
 }
 
 void vme_mvme120_device::vme_a24_w(uint16_t data)
 {	
-	// Simulate VMEbus timeout.
-	m_mfp->i2_w(ASSERT_LINE);
-	m_mfp->i2_w(CLEAR_LINE);
-	
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	vme_bus_timeout();
 }
 
 uint16_t vme_mvme120_device::vme_a16_r()
 {
-	m_mfp->i2_w(ASSERT_LINE);
-	m_mfp->i2_w(CLEAR_LINE);
-	
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
-	
+	vme_bus_timeout();
 	return 0;
 }
 
 void vme_mvme120_device::vme_a16_w(uint16_t data)
 {
-	// Simulate VMEbus timeout.
-	m_mfp->i2_w(ASSERT_LINE);
-	m_mfp->i2_w(CLEAR_LINE);
-	
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
-	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	vme_bus_timeout();
 }
 
 uint8_t vme_mvme120_device::ctrlreg_r(offs_t offset)
 {
 	// Control Register
-	// b0 - BRDFAIL
-	// b1 - /CTS
-	// b2 - /IE
+	// b0 - BRDFAIL		- Controls FAIL LED
+	// b1 - /CTS		- Asserts RTS on serial port 1
+	// b2 - /IE			- When asserted, MFP interrupts reach the CPU
 	// b3 - /PAREN		- When asserted, parity errors do not cause /BERR.
-	// b4 - CACHEN
-	// b5 - FREEZE
-	// b6 - /ALTCLR
+	// b4 - CACHEN		- Enable SRAM cache
+	// b5 - FREEZE		- Cache cannot be updated (but can be invalidated)
+	// b6 - /ALTCLR		- "Allows bus error to start alternate interrupt mode" (?)
 	// b7 - /WWP		- When asserted, bad parity is written to RAM.
 	
 	return m_ctrlreg;

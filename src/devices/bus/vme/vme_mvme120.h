@@ -80,6 +80,7 @@ protected:
 	void 		ctrlreg_w(offs_t offset, uint8_t data);
 	
 	// VMEbus dummy lines
+	void vme_bus_timeout();
 	uint16_t vme_a24_r();
 	void vme_a24_w(uint16_t data);
 	uint16_t vme_a16_r();
