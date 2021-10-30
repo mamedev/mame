@@ -13706,6 +13706,9 @@ f1gpb                           // bootleg
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
 
+@source:f387x.cpp
+f387x                           // (c) 1979 Fairchild
+
 @source:facit4440.cpp
 facit4440                       // 1984
 
