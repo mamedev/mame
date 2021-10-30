@@ -26,8 +26,12 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
+
 #include <array>
+#include <locale>
+#include <sstream>
 #include <utility>
+
 
 //============================================================
 //  PROTOTYPES
@@ -1958,25 +1962,24 @@ void shaders::delete_resources()
 
 static void get_vector(const char *data, int count, float *out, bool report_error)
 {
-	if (count > 3 &&
-		sscanf(data, "%f,%f,%f,%f", &out[0], &out[1], &out[2], &out[3]) < 4 && report_error)
+	std::istringstream is(data);
+	is.imbue(std::locale::classic());
+	for (int i = 0; count > i; )
 	{
-		osd_printf_error("Illegal quad vector value = %s\n", data);
-	}
-	else if (count > 2 &&
-		sscanf(data, "%f,%f,%f", &out[0], &out[1], &out[2]) < 3 && report_error)
-	{
-		osd_printf_error("Illegal triple vector value = %s\n", data);
-	}
-	else if (count > 1 &&
-		sscanf(data, "%f,%f", &out[0], &out[1]) < 2 && report_error)
-	{
-		osd_printf_error("Illegal double vector value = %s\n", data);
-	}
-	else if (count > 0 &&
-		sscanf(data, "%f", &out[0]) < 1 && report_error)
-	{
-		osd_printf_error("Illegal single vector value = %s\n", data);
+		is >> out[i];
+		bool bad = !is;
+		if (++i < count)
+		{
+			char ch;
+			is >> ch;
+			bad = bad || !is || (',' != ch);
+		}
+		if (bad)
+		{
+			if (report_error)
+				osd_printf_error("Illegal %d-item vector value = %s\n", count, data);
+			return;
+		}
 	}
 }
 

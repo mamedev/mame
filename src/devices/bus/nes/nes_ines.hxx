@@ -380,7 +380,7 @@ static const nes_mmc mmc_list[] =
 	// 342 COOLGIRL homebrew
 	// 343 reset-based 4-in-1 pirate?
 	// 344 3/6-in-1 GN-26 multicart, not in nes.xml
-	// 345 BMC-L6IN1 multicart, not in nes.xml?
+	{ 345, BMC_L6IN1 },
 	{ 346, KAISER_KS7012 },        // Zanac alt FDS conversion
 	{ 347, KAISER_KS7030 },        // Doki Doki Panic alt FDS conversion
 	{ 348, BMC_830118C },
@@ -391,7 +391,7 @@ static const nes_mmc mmc_list[] =
 	{ 353, BMC_810305C },          // Super Mario Family multicart
 	// 354 250-in-1 multicart with FDS Bubble Bobble
 	// 355 Hwang Shinwei 3-D Block etc, currently has unemulated PIC16C54
-	// 356 7-in-1 Rockman (JY-208)
+	{ 356, BMC_JY208 },
 	// 357 Bit Corp 4-in-1 (ID 4602)
 	// 358 JY multicarts, variant of mapper 282
 	// 359 BMC-SB-5013 multicarts
@@ -407,7 +407,7 @@ static const nes_mmc mmc_list[] =
 	// 369 Super Mario Bros Party multicart
 	{ 370, BMC_F600 },              // Golden Mario Party II multicart
 	// 371 Spanish PEC-586 computer main cart
-	// 372 Rockman 1-6 multicart very close to mapper 45
+	{ 372, BMC_SFC12 },
 	// 373 Super 4-in-1, not in nes.xml?
 	{ 374, BMC_RESETSXROM },
 	// 375 135-in-1 2MB multicart
@@ -792,7 +792,13 @@ void nes_cart_slot_device::call_load_ines()
 	if (BIT(local_options, 1))
 		battery_size = NES_BATTERY_SIZE; // with original iNES format we can only support 8K WRAM battery
 	m_cart->set_trainer(BIT(local_options, 2) ? true : false);
-	m_cart->set_four_screen_vram(BIT(local_options, 3) ? true : false);
+
+	// A select few boards or their variants have on-cart RAM to support 4-screen mirroring
+	if ((BIT(local_options, 3) && (m_pcb_id == STD_TXROM || m_pcb_id == NAMCOT_34X3)) || m_pcb_id == IREM_LROG017 || m_pcb_id == SACHEN_SHERO)
+	{
+		m_cart->set_four_screen_vram(true);
+		m_cart->set_mirroring(PPU_MIRROR_4SCREEN);
+	}
 
 	if (ines20)
 	{
@@ -1041,36 +1047,32 @@ void nes_cart_slot_device::call_load_ines()
 	m_cart->set_bus_conflict(bus_conflict);
 
 	// SETUP step 4: logging what we have found
-	if (!ines20)
+	logerror("Loaded game in %s format:\n", ines20 ? "NES 2.0" : "iNES");
+	logerror("-- Mapper: %u\n", mapper);
+	if (ines20)
+		logerror("-- Submapper: %u\n", header[8] >> 4);
+	logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
+	logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
+	logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
+	logerror("-- Mirroring: %s\n", BIT(header[6], 0) ? "Vertical" : "Horizontal");
+	if (battery_size)
+		logerror("-- Battery found\n");
+	if (m_cart->get_trainer())
+		logerror("-- Trainer found\n");
+	if (m_cart->get_four_screen_vram())
+		logerror("-- 4-screen VRAM\n");
+	if (ines20)
 	{
-		logerror("Loaded game in iNES format:\n");
-		logerror("-- Mapper %u\n", mapper);
-		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
-		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
-		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
-		logerror("-- Mirroring %s\n", BIT(header[6], 0) ? "Vertical" : "Horizontal");
-		if (battery_size)
-			logerror("-- Battery found\n");
-		if (m_cart->get_trainer())
-			logerror("-- Trainer found\n");
-		if (m_cart->get_four_screen_vram())
-			logerror("-- 4-screen VRAM\n");
-		logerror("-- TV System: %s\n", ((header[10] & 3) == 0) ? "NTSC" : (header[10] & 1) ? "Both NTSC and PAL" : "PAL");
+		logerror("-- PRG NVWRAM: %d\n", header[10] >> 4);
+		logerror("-- PRG WRAM: %d\n", header[10] & 0x0f);
+		logerror("-- CHR NVWRAM: %d\n", header[11] >> 4);
+		logerror("-- CHR WRAM: %d\n", header[11] & 0x0f);
+
+		static const char *timing[] = { "NTSC", "PAL", "Multi-region", "Dendy" };
+		logerror("-- CPU/PPU Timing: %s\n", timing[header[12] & 3]);
 	}
 	else
-	{
-		logerror("Loaded game in Extended iNES format:\n");
-		logerror("-- Mapper: %u\n", mapper);
-		logerror("-- Submapper: %u\n", (header[8] & 0xf0) >> 4);
-		logerror("-- PRG 0x%x (%d x 16k chunks)\n", prg_size, prg_size / 0x4000);
-		logerror("-- VROM 0x%x (%d x 8k chunks)\n", vrom_size, vrom_size / 0x2000);
-		logerror("-- VRAM 0x%x (%d x 8k chunks)\n", vram_size, vram_size / 0x2000);
-		logerror("-- PRG NVWRAM: %d\n", (header[10] & 0xf0) >> 4);
-		logerror("-- PRG WRAM: %d\n", header[10] & 0x0f);
-		logerror("-- CHR NVWRAM: %d\n", (header[11] & 0xf0) >> 4);
-		logerror("-- CHR WRAM: %d\n", header[11] & 0x0f);
-		logerror("-- TV System: %s\n", (header[12] & 2) ? "Both NTSC and PAL" : (header[12] & 1) ? "PAL" : "NTSC");
-	}
+		logerror("-- TV System: %s\n", ((header[10] & 3) == 0) ? "NTSC" : (header[10] & 1) ? "Both NTSC and PAL" : "PAL");
 
 	// SETUP step 5: allocate pointers for PRG/VROM
 	if (prg_size)

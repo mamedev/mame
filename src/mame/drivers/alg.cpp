@@ -7,12 +7,12 @@
     Amiga 500 + Sony laserdisc player LDP-1450
     (LDP-3300P for Zorton Brothers, LDP-1500 for Marbella Vice)
 
-	TODO:
-	- Implement LD comms (thru Amiga SERDAT / SERDATR ports);
-	- Why it enables FDC DMA like at all?
-	  Is the board really capable of reading floppies for some reason?
-	- Picmatic games may really belong to a different driver, 
-	  just sharing the Amiga base state;
+    TODO:
+    - Implement LD comms (thru Amiga SERDAT / SERDATR ports);
+    - Why it enables FDC DMA like at all?
+      Is the board really capable of reading floppies for some reason?
+    - Picmatic games may really belong to a different driver,
+      just sharing the Amiga base state;
 
     Games Supported:
 

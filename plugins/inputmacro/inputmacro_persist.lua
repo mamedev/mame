@@ -1,3 +1,7 @@
+-- license:BSD-3-Clause
+-- copyright-holders:Vas Crabb
+
+
 -- Helpers
 
 local function settings_path()

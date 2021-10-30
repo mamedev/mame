@@ -17,14 +17,15 @@ parameter animation, some things can only be done with scripting.  MAME uses an
 event-based model.  Scripts can supply functions that will be called after
 certain events, or when certain data is required.
 
-Layout scripting requires the layout plugin to be enabled.  For example, to run
-BWB Double Take with the Lua script in the layout enabled, you might use this
-command::
+Layout scripting requires the :ref:`layout plugin <plugins-layout>` to be
+enabled.  For example, to run BWB Double Take with the Lua script in the layout
+enabled, you might use this command::
 
     mame -plugins -plugin layout v4dbltak
 
-If you may want to add the settings to enable the layout plugin to an INI file
-to save having to enable it every time you start a system.
+You may want to add the settings to enable the layout plugin to an INI file to
+save having to enable it every time you start a system.  See :ref:`plugins` for
+more information about using plugins with MAME.
 
 
 .. _layscript-examples:

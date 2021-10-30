@@ -1885,15 +1885,29 @@ ROM_END
 
 ROM_START( grudge )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "gm-3a.bin", 0x00000, 0x8000, CRC(eabeec2b) SHA1(92098512e3dbcda36f42e10fada01323fab4b08a) )
-	ROM_LOAD( "gm-4a.bin", 0x08000, 0x8000, CRC(72664f18) SHA1(98202d7a775792d2d1c44a26540ac35afaffa6b2) )
-	ROM_LOAD( "gm-1a.bin", 0x10000, 0x8000, CRC(ad168726) SHA1(c4d084e3752d6c4365d2460ca3146b148dcccc1d) )
-	ROM_LOAD( "gm-2a.bin", 0x18000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) )
-	ROM_LOAD( "gm-5a.bin", 0x18000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // same as 2a, confirmed as identical on PCB
-	ROM_LOAD( "gm-6b.bin", 0x1e000, 0x2000, CRC(513d8cdd) SHA1(563e5a2b7e71b4e1447bd41339174129a5884517) ) // mostly the same as 2a/5a except for a small table, corrupt text if we don't use this here..
+	ROM_LOAD( "ab0.8a.romab0",                0x00000, 0x8000, CRC(eabeec2b) SHA1(92098512e3dbcda36f42e10fada01323fab4b08a) ) // blank label
+	ROM_LOAD( "ab4.9a.romab4",                0x08000, 0x8000, CRC(2dddb371) SHA1(fbe53a78fb17e5dc17bf6a475a170b850e63cdb6) ) // handwritten label "AB4"
+	ROM_LOAD( "g.m._cd-0_9-21-87.13a.romcd0", 0x10000, 0x8000, CRC(ad168726) SHA1(c4d084e3752d6c4365d2460ca3146b148dcccc1d) ) // handwritten label "G.M.  CD-0  9-21-87"
+	ROM_LOAD( "cd4.15a.romcd4",               0x18000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // handwritten label "CD4"
+	ROM_LOAD( "cd12.18a.romcd4",              0x18000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // handwritten label "CD12" - same as CD4, confirmed as identical on PCB
 
 	ROM_REGION( 0x10000, "gfx1", 0 )     /* up to 64k of sprites */
-	ROM_LOAD( "gm-6a.bin", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
+	ROM_LOAD( "g.m._gr0_9-21-87.8a.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) ) // handwritten label "G.M.  GR0  9-21-87"
+
+	MOTHERBOARD_PALS
+ROM_END
+
+ROM_START( grudgei )
+	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "gm-3a.bin", 0x00000, 0x8000, CRC(eabeec2b) SHA1(92098512e3dbcda36f42e10fada01323fab4b08a) ) // == ab0.8a.romab0
+	ROM_LOAD( "gm-4a.bin", 0x08000, 0x8000, CRC(72664f18) SHA1(98202d7a775792d2d1c44a26540ac35afaffa6b2) ) // Modified from above AB4 ROM to use the Italian language
+	ROM_LOAD( "gm-1a.bin", 0x10000, 0x8000, CRC(ad168726) SHA1(c4d084e3752d6c4365d2460ca3146b148dcccc1d) ) // == cd0.13a.romcd0
+	ROM_LOAD( "gm-2a.bin", 0x18000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // == cd4.15a.romcd4 & cd12.18a.romcd4
+	ROM_LOAD( "gm-5a.bin", 0x18000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // == cd4.15a.romcd4 & cd12.18a.romcd4, confirmed as identical on PCB
+	ROM_LOAD( "gm-6b.bin", 0x1e000, 0x2000, CRC(513d8cdd) SHA1(563e5a2b7e71b4e1447bd41339174129a5884517) ) // mostly the same as 2a/5a except for a small table, used for Italian text (corrupt text if we don't use this here.. )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )     /* up to 64k of sprites */
+	ROM_LOAD( "gm-6a.bin", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) ) // == g.m._gr0_9-21-87.8a.gr0
 
 	MOTHERBOARD_PALS
 ROM_END
@@ -1906,7 +1920,7 @@ ROM_START( grudgep )
 	ROM_LOAD( "grudge.cd4", 0x18000, 0x8000, CRC(6b60e47e) SHA1(5a399942d4ef9b7349fffd07c07092b667cf6247) )
 
 	ROM_REGION( 0x8000, "gfx1", 0 )     /* up to 64k of sprites */
-	ROM_LOAD( "grudge.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
+	ROM_LOAD( "grudge.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) ) // == g.m._gr0_9-21-87.8a.gr0
 
 	MOTHERBOARD_PALS
 ROM_END
@@ -2484,7 +2498,8 @@ GAME( 1985, gimeabrk,  0,        balsente, gimeabrk, balsente_state, init_gimeab
 GAME( 1985, minigolf,  0,        balsente, minigolf, balsente_state, init_minigolf,  ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf2, minigolf, balsente, minigolf2,balsente_state, init_minigolf2, ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviabb,  0,        balsente, triviag1, balsente_state, init_triviag2,  ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, grudge,    0,        grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
+GAME( 1987, grudge,    0,        grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, prototype)", MACHINE_SUPPORTS_SAVE ) // only the PCB was found
+GAME( 1987, grudgei,   grudge,   grudge,   grudge,   balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // PCB came from a dedicated cabinet complete with artwork
 GAME( 1987, grudgep,   grudge,   grudge,   grudgep,  balsente_state, init_grudge,    ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */

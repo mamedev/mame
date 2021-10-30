@@ -18,7 +18,7 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="crowman" supported="no">
 		<description>The Curse of Crowley Manor</description>
@@ -106,7 +106,7 @@ license:CC0
 	</software>
 
 	<!-- Utilities -->
-	
+
 	<!-- TODO: how to actually draw? Missing key? -->
 	<software name="micropai" supported="no">
 		<!-- Stylized with double hyphen in the middle on title screen -->

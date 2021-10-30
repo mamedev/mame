@@ -45427,7 +45427,7 @@ ExtractDisk  [08]"PCM set        " -> "gc-clusterz music disk(vol.1-7)_08.d88"
 		<info name="alt_title" value="りみちゃんの危険な夜"/>
 		<info name="usage" value="Needs BASIC V1H"/>
 		<!--combined image-->
-		<!--rom name="rimichan no kikenna yoru.d88" size="697664" crc="e5a47323" sha1="35f3c83d562f14f4c812fe8c131cf918d9600b2co"/-->
+		<!--rom name="rimichan no kikenna yoru.d88" size="697664" crc="e5a47323" sha1="35f3c83d562f14f4c812fe8c131cf918d9600b2c"/-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1" />

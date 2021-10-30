@@ -43,6 +43,8 @@ ToDO:
 #include "speaker.h"
 #include "gts80.lh"
 
+namespace {
+
 class gts80_state : public genpin_class
 {
 public:
@@ -568,11 +570,10 @@ ROM_LOAD( "652-2.bin",    0x1200, 0x0200, CRC(bd7bc39f) SHA1(9d0ac37bb3ec8c95990
 
 
 Pink Panther
-ROM_LOAD( "664_flipprojets.snd",    0x0000, 0x0200, CRC(48aeb325) SHA1(49dae08c635f191841188565bd89f07c4ad44c08) )
+ROM_LOAD( "664_flipprojets.snd",    0x0000, 0x0400, CRC(48aeb325) SHA1(49dae08c635f191841188565bd89f07c4ad44c08) )
 
 
 Spiderman
-ROM_LOAD( "653.gm",       0x0000, 0x0800, CRC(b2b1514a) SHA1(2f8179d171d411080ed5bc18a6c4c737a45a796c) )
 ROM_LOAD( "653.snd",      0x0400, 0x0400, CRC(dfa35ede) SHA1(740bf1e02098b85783374c583b88d2fefe98ede4) )
 ROM_LOAD( "653-cpu3.bin", 0x1000, 0x0800, CRC(10289804) SHA1(13d743ce3f97ffc99470dd9b612836c98034e919) )
 ROM_LOAD( "653cpu3a.bin", 0x1000, 0x0800, CRC(b2b1514a) SHA1(2f8179d171d411080ed5bc18a6c4c737a45a796c) )
@@ -890,6 +891,8 @@ ROM_START(s80tst)
 	ROM_LOAD("80tst-s1.snd", 0x7000, 0x0800, CRC(b9dbdd21) SHA1(dfe42c9e6e02f82ffd0cafe164df3211cdc2d966))
 	ROM_LOAD("80tst-s2.snd", 0x7800, 0x0800, CRC(1a4b1e9d) SHA1(18e7ffbdbdaf83ab1c8daa5fa5201d9f54390758))
 ROM_END
+
+} // Anonymous namespace
 
 /* disp1 */GAME(1981, s80tst,    0,        gts80_ss, gts80, gts80_state, empty_init, ROT0, "Gottlieb",         "System 80 Test",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 

@@ -5906,40 +5906,41 @@ u32 xga_copro_device::read_map_pixel(int x, int y, int map)
 	switch(m_pelmap_format[map] & 7)
 	{
 		case 0:
-			wbytes = m_pelmap_width[map] / 8;
+			wbytes = width / 8;
 			addr += y * wbytes;
 			addr += x / 8;
 			byte = m_mem_read_cb(addr);
 			bits = (x % 8) - (endian ? 8 : 0);
 			return (byte >> bits) & 1;
 		case 1:
-			wbytes = m_pelmap_width[map] / 4;
+			wbytes = width / 4;
 			addr += y * wbytes;
 			addr += x / 4;
 			byte = m_mem_read_cb(addr);
 			bits = (x % 4) - (endian ? 4 : 0);
 			return (byte >> (bits * 2)) & 3;
 		case 2:
-			wbytes = m_pelmap_width[map] / 2;
+			wbytes = width / 2;
 			addr += y * wbytes;
 			addr += x / 2;
 			byte = m_mem_read_cb(addr);
 			bits = (x % 2) - (endian ? 2 : 0);
 			return (byte >> (bits * 4)) & 0xf;
 		case 3:
-			wbytes = m_pelmap_width[map];
+			wbytes = width;
 			addr += y * wbytes;
 			addr += x;
+			//logerror("r %d %d %d %d %d %x\n",map,width, height,x,y, addr);
 			return m_mem_read_cb(addr);
 		case 4:
-			wbytes = m_pelmap_width[map] * 2;
+			wbytes = width * 2;
 			addr += y * wbytes;
 			addr += x * 2;
 			if(endian)
 				return m_mem_read_cb(addr + 1) | (m_mem_read_cb(addr) << 8);
 			return m_mem_read_cb(addr) | (m_mem_read_cb(addr + 1) << 8);
 		case 5:
-			wbytes = m_pelmap_width[map] * 4;
+			wbytes = width * 4;
 			addr += y * wbytes;
 			addr += x * 4;
 			if(endian)
@@ -5965,7 +5966,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 	switch(m_pelmap_format[map] & 7)
 	{
 		case 0:
-			wbytes = m_pelmap_width[map] / 8;
+			wbytes = width / 8;
 			addr += y * wbytes;
 			addr += x / 8;
 			byte = m_mem_read_cb(addr);
@@ -5974,7 +5975,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			m_mem_write_cb(addr, byte);
 			break;
 		case 1:
-			wbytes = m_pelmap_width[map] / 4;
+			wbytes = width / 4;
 			addr += y * wbytes;
 			addr += x / 4;
 			byte = m_mem_read_cb(addr);
@@ -5983,7 +5984,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			m_mem_write_cb(addr, byte);
 			break;
 		case 2:
-			wbytes = m_pelmap_width[map] / 2;
+			wbytes = width / 2;
 			addr += y * wbytes;
 			addr += x / 2;
 			byte = m_mem_read_cb(addr);
@@ -5992,13 +5993,14 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			m_mem_write_cb(addr, byte);
 			break;
 		case 3:
-			wbytes = m_pelmap_width[map];
+			wbytes = width;
 			addr += y * wbytes;
 			addr += x;
+			//logerror("w %d %d %d %d %d %x %x\n",map,width, height,x,y, addr, pixel);
 			m_mem_write_cb(addr, (u8)pixel);
 			break;
 		case 4:
-			wbytes = m_pelmap_width[map] * 2;
+			wbytes = width * 2;
 			addr += y * wbytes;
 			addr += x * 2;
 			if(endian)
@@ -6013,7 +6015,7 @@ void xga_copro_device::write_map_pixel(int x, int y, int map, u32 pixel)
 			}
 			break;
 		case 5:
-			wbytes = m_pelmap_width[map] * 4;
+			wbytes = width * 4;
 			addr += y * wbytes;
 			addr += x * 4;
 			if(endian)
@@ -6055,7 +6057,7 @@ u32 xga_copro_device::rop(u32 s, u32 d, u8 op)
 			case 4:
 				return s & ~d;
 			case 5:
-				return ~s;
+				return ~d;
 			case 6:
 				return s ^ d;
 			case 7:
@@ -6135,61 +6137,75 @@ void xga_copro_device::do_pxblt()
 	u8 srcmap = ((m_pelop >> 20) & 0xf) - 1;
 	u8 dstmap = ((m_pelop >> 16) & 0xf) - 1;
 	u8 patmap = ((m_pelop >> 12) & 0xf) - 1;
-	logerror("pxblt src %d pat %d dst %d dim1 %d dim2 %d\n", srcmap, dstmap, patmap, m_opdim1, m_opdim2);
-	if((srcmap > 3) || (dstmap > 3) || ((patmap > 3) && (patmap != 7) && (patmap != 8)))
+	logerror("pxblt src %d pat %d dst %d dim1 %d dim2 %d srcbase %x dstbase %x\n", srcmap+1, dstmap+1, patmap+1, m_opdim1 & 0xfff, m_opdim2 & 0xfff, m_pelmap_base[srcmap+1], m_pelmap_base[dstmap+1]);
+	logerror("%d %d %d %d\n", m_srcxaddr & 0xfff, m_srcyaddr & 0xfff, m_dstxaddr & 0xfff, m_dstyaddr & 0xfff);
+	if((srcmap > 2) || (dstmap > 2) || ((patmap > 2) && (patmap != 7) && (patmap != 8)))
 	{
 		logerror("invalid pelmap\n");
 		return;
 	}
 	if(dir & 1)
 	{
-		ystart = m_opdim2 + 1;
+		ystart = (m_opdim2 & 0xfff) + 1;
 		yend = 0;
 		ydir = -1;
 	}
 	else
 	{
 		ystart = 0;
-		yend = m_opdim2 + 1;
+		yend = (m_opdim2 & 0xfff) + 1;
 		ydir = 1;
 	}
 	if(dir & 2)
 	{
-		xstart = m_opdim1 + 1;
+		xstart = (m_opdim1 & 0xfff) + 1;
 		xend = 0;
 		xdir = -1;
 	}
 	else
 	{
 		xstart = 0;
-		xend = m_opdim1 + 1;
+		xend = (m_opdim1 & 0xfff) + 1;
 		xdir = 1;
+	}
+
+	std::function<s16(s16)> dstwrap;
+	if(m_var == TYPE::OTI111)
+		dstwrap = [](s16 addr) { return addr & 0xfff; };
+	else
+	{
+		dstwrap = [](s16 addr)
+		{
+			addr = addr & 0x1fff;
+			return (addr & 0x1800) == 0x1800 ? addr | 0xf800 : addr;
+		};
 	}
 
 	for(int y = ystart; y != yend; y += ydir)
 	{
-		u16 patxaddr = m_patxaddr;
-		u16 srcxaddr = m_srcxaddr;
-		u16 dstxaddr = m_dstxaddr;
+		u16 patxaddr = m_patxaddr & 0xfff;
+		u16 srcxaddr = m_srcxaddr & 0xfff;
+		s16 dstxaddr = dstwrap(m_dstxaddr);
+		s16 dstyaddr = dstwrap(m_dstyaddr);
 		for(int x = xstart; x != xend; x += xdir)
 		{
 			u32 src, dst, pat;
-			if(patmap <= 3)
+			if(patmap < 3)
 			{
-				pat = read_map_pixel(patxaddr, m_patyaddr, patmap + 1);
+				pat = read_map_pixel(patxaddr, m_patyaddr & 0xfff, patmap + 1);
 				patxaddr += xdir;
 			}
 			else
 				pat = 1; //TODO: generate from source mode
 			if(pat)
-				src = (((m_pelop >> 28) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr, srcmap + 1) : m_fcolor;
+				src = (((m_pelop >> 28) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr & 0xfff, srcmap + 1) : m_fcolor;
 			else
-				src = (((m_pelop >> 30) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr, srcmap + 1) : m_bcolor;
+				src = (((m_pelop >> 30) & 3) == 2) ? read_map_pixel(srcxaddr, m_srcyaddr & 0xfff, srcmap + 1) : m_bcolor;
 			srcxaddr += xdir;
-			dst = read_map_pixel(dstxaddr, m_dstyaddr, dstmap + 1);
+			dst = read_map_pixel(dstxaddr, dstyaddr, dstmap + 1);
 			dst = (dst & ~m_pelbmask) | (rop(src, dst, pat ? m_fmix : m_bmix) & m_pelbmask);
-			write_map_pixel(dstxaddr, m_dstyaddr, dstmap + 1, dst); // TODO: color compare
-			dstxaddr += xdir;
+			write_map_pixel(dstxaddr, dstyaddr, dstmap + 1, dst); // TODO: color compare
+			dstxaddr = dstwrap(dstxaddr + xdir);
 		}
 		m_patyaddr += ydir;
 		m_srcyaddr += ydir;
@@ -6606,6 +6622,7 @@ void oak_oti111_vga_device::device_start()
 {
 	svga_device::device_start();
 	vga.svga_intf.vram_size = 0x100000;
+	std::fill(std::begin(m_oak_regs), std::end(m_oak_regs), 0);
 }
 
 u8 oak_oti111_vga_device::dac_read(offs_t offset)
@@ -6619,4 +6636,61 @@ void oak_oti111_vga_device::dac_write(offs_t offset, u8 data)
 {
 	if(offset >= 6)
 		vga_device::port_03c0_w(offset, data);
+}
+
+
+u8 oak_oti111_vga_device::port_03d0_r(offs_t offset)
+{
+	uint8_t res = 0xff;
+	switch(offset)
+	{
+		case 14:
+			return m_oak_idx;
+		case 15:
+			return m_oak_idx <= 0x3a ? m_oak_regs[m_oak_idx] : 0;
+		default:
+			if (CRTC_PORT_ADDR == 0x3d0)
+				res = vga_device::port_03d0_r(offset);
+			break;
+	}
+
+	return res;
+}
+
+void oak_oti111_vga_device::port_03d0_w(offs_t offset, uint8_t data)
+{
+	switch(offset)
+	{
+		case 14:
+			m_oak_idx = data;
+			break;
+		case 15:
+			if(m_oak_idx > 0x3a)
+				break;
+			m_oak_regs[m_oak_idx] = data;
+			switch(m_oak_idx)
+			{
+				case 0x21:
+					svga.rgb8_en = BIT(data, 2);
+					break;
+				case 0x33:
+					vga.crtc.no_wrap = BIT(data, 0);
+					break;
+			}
+			break;
+		default:
+			if (CRTC_PORT_ADDR == 0x3d0)
+				vga_device::port_03d0_w(offset,data);
+			break;
+	}
+}
+
+uint16_t oak_oti111_vga_device::offset()
+{
+	uint16_t off = svga_device::offset();
+
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb32_en)
+		return vga.crtc.offset << 4;  // TODO: there must a register to control this
+	else
+		return off;
 }

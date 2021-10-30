@@ -27,7 +27,7 @@ levels of brightness by strobing elements longer.
 
 
 TODO:
-- multiple brightness levels doesn't work for SVGs
+- SVG screens and rendlay digit elements don't support multiple brightness levels
 
 */
 

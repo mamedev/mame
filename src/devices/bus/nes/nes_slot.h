@@ -85,8 +85,9 @@ enum
 	TXC_22110, TXC_22211, TXC_COMMANDOS, TXC_DUMARACING,
 	TXC_MJBLOCK, TXC_STRIKEW, TXC_TW,
 	// Multigame Carts
-	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15, BMC_F600,
-	BMC_GN45, BMC_HIK8IN1, BMC_S24IN1SC03, BMC_T262, BMC_TELETUBBIES,
+	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15, BMC_F600, BMC_L6IN1,
+	BMC_GN45, BMC_HIK8IN1, BMC_SFC12, BMC_JY208,
+	BMC_S24IN1SC03, BMC_T262, BMC_TELETUBBIES,
 	BMC_WS, BMC_SUPERBIG_7IN1, BMC_SUPERHIK_4IN1, BMC_BALLGAMES_11IN1,
 	BMC_MARIOPARTY_7IN1, BMC_GOLD_7IN1, BMC_SUPER_700IN1, BMC_FAMILY_4646,
 	BMC_36IN1, BMC_21IN1, BMC_150IN1, BMC_35IN1, BMC_64IN1,
@@ -323,11 +324,11 @@ public:
 	void prg32(int bank);
 	void prg16_89ab(int bank);
 	void prg16_cdef(int bank);
-	void prg8_89(int bank);
-	void prg8_ab(int bank);
-	void prg8_cd(int bank);
-	void prg8_ef(int bank);
 	void prg8_x(int start, int bank);
+	void prg8_89(int bank) { prg8_x(0, bank); }
+	void prg8_ab(int bank) { prg8_x(1, bank); }
+	void prg8_cd(int bank) { prg8_x(2, bank); }
+	void prg8_ef(int bank) { prg8_x(3, bank); }
 
 
 	// CHR
@@ -346,22 +347,22 @@ public:
 	// CHR helpers
 	void chr8(int bank, int source);
 	void chr4_x(int start, int bank, int source);
-	void chr4_0(int bank, int source){ chr4_x(0, bank, source); };
-	void chr4_4(int bank, int source){ chr4_x(4, bank, source); };
+	void chr4_0(int bank, int source) { chr4_x(0, bank, source); }
+	void chr4_4(int bank, int source) { chr4_x(4, bank, source); }
 	void chr2_x(int start, int bank, int source);
-	void chr2_0(int bank, int source) { chr2_x(0, bank, source); };
-	void chr2_2(int bank, int source) { chr2_x(2, bank, source); };
-	void chr2_4(int bank, int source) { chr2_x(4, bank, source); };
-	void chr2_6(int bank, int source) { chr2_x(6, bank, source); };
+	void chr2_0(int bank, int source) { chr2_x(0, bank, source); }
+	void chr2_2(int bank, int source) { chr2_x(2, bank, source); }
+	void chr2_4(int bank, int source) { chr2_x(4, bank, source); }
+	void chr2_6(int bank, int source) { chr2_x(6, bank, source); }
 	void chr1_x(int start, int bank, int source);
-	void chr1_0(int bank, int source) { chr1_x(0, bank, source); };
-	void chr1_1(int bank, int source) { chr1_x(1, bank, source); };
-	void chr1_2(int bank, int source) { chr1_x(2, bank, source); };
-	void chr1_3(int bank, int source) { chr1_x(3, bank, source); };
-	void chr1_4(int bank, int source) { chr1_x(4, bank, source); };
-	void chr1_5(int bank, int source) { chr1_x(5, bank, source); };
-	void chr1_6(int bank, int source) { chr1_x(6, bank, source); };
-	void chr1_7(int bank, int source) { chr1_x(7, bank, source); };
+	void chr1_0(int bank, int source) { chr1_x(0, bank, source); }
+	void chr1_1(int bank, int source) { chr1_x(1, bank, source); }
+	void chr1_2(int bank, int source) { chr1_x(2, bank, source); }
+	void chr1_3(int bank, int source) { chr1_x(3, bank, source); }
+	void chr1_4(int bank, int source) { chr1_x(4, bank, source); }
+	void chr1_5(int bank, int source) { chr1_x(5, bank, source); }
+	void chr1_6(int bank, int source) { chr1_x(6, bank, source); }
+	void chr1_7(int bank, int source) { chr1_x(7, bank, source); }
 
 
 	// NameTable & Mirroring
@@ -427,7 +428,7 @@ public:
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
 
-	int get_pcb_id() { return m_pcb_id; };
+	int get_pcb_id() { return m_pcb_id; }
 
 	void pcb_start(uint8_t *ciram_ptr);
 	void pcb_reset();
@@ -435,7 +436,7 @@ public:
 	// temporarily here
 	int m_crc_hack;
 
-	int get_crc_hack() { return m_crc_hack; };
+	int get_crc_hack() { return m_crc_hack; }
 
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 

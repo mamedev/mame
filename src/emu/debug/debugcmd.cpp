@@ -1072,7 +1072,7 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 
 /*-------------------------------------------------
     execute_index_command - helper for commands
-	that take multiple indices as arguments
+    that take multiple indices as arguments
 -------------------------------------------------*/
 
 template <typename T>
