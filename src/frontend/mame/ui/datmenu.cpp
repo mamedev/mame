@@ -24,6 +24,7 @@
 #include "uiinput.h"
 
 #include <cmath>
+#include <limits>
 #include <string_view>
 
 
@@ -41,6 +42,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	, m_actual(0)
 
 {
+	set_process_flags(PROCESS_LR_ALWAYS | PROCESS_CUSTOM_NAV);
 	for (device_image_interface& image : image_interface_enumerator(mui.machine().root_device()))
 	{
 		if (image.filename())
@@ -81,6 +83,7 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 	, m_parent(swinfo.parentname)
 
 {
+	set_process_flags(PROCESS_LR_ALWAYS | PROCESS_CUSTOM_NAV);
 	if (!swinfo.infotext.empty())
 		m_items_list.emplace_back(_("Software List Info"), 0, "");
 	std::vector<std::string> lua_list;
@@ -163,12 +166,11 @@ void menu_dats_view::add_info_text(text_layout &layout, std::string_view text, r
 //  handle
 //-------------------------------------------------
 
-void menu_dats_view::handle()
+void menu_dats_view::handle(event const *ev)
 {
-	event const *const menu_event = process(PROCESS_LR_ALWAYS | PROCESS_CUSTOM_NAV);
-	if (menu_event)
+	if (ev)
 	{
-		switch (menu_event->iptkey)
+		switch (ev->iptkey)
 		{
 		case IPT_UI_LEFT:
 			if (m_actual > 0)
@@ -187,7 +189,7 @@ void menu_dats_view::handle()
 			break;
 
 		default:
-			handle_key(menu_event->iptkey);
+			handle_key(ev->iptkey);
 		}
 	}
 }
@@ -371,7 +373,7 @@ bool menu_dats_view::custom_mouse_down()
 //  populate selected DAT text
 //-------------------------------------------------
 
-float menu_dats_view::populate_text(std::optional<text_layout> &layout, float width)
+void menu_dats_view::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
 	if (!layout || (layout->width() != width))
 	{
@@ -385,8 +387,8 @@ float menu_dats_view::populate_text(std::optional<text_layout> &layout, float wi
 		}
 		layout.emplace(ui().create_layout(container(), width));
 		add_info_text(*layout, buffer, ui().colors().text_color());
+		lines = std::numeric_limits<int>::max();
 	}
-	return width;
 }
 
 //-------------------------------------------------

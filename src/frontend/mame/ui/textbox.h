@@ -29,7 +29,7 @@ protected:
 	void reset_layout();
 	void handle_key(int key);
 
-	virtual float populate_text(std::optional<text_layout> &layout, float width) = 0;
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) = 0;
 
 	virtual bool custom_mouse_scroll(int lines) override;
 
@@ -39,6 +39,8 @@ private:
 	std::optional<text_layout> m_layout;
 	float m_layout_width;
 	float m_desired_width;
+	int m_desired_lines;
+	int m_window_lines;
 	int m_top_line;
 };
 

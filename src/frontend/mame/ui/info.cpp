@@ -481,7 +481,7 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
   menu_game_info - handle the game information menu
 -------------------------------------------------*/
 
-menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
 {
 }
 
@@ -489,15 +489,26 @@ menu_game_info::~menu_game_info()
 {
 }
 
-void menu_game_info::populate(float &customtop, float &custombottom)
+void menu_game_info::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
-	item_append(ui().machine_info().game_info_string(), FLAG_MULTILINE, nullptr);
+	if (!layout || (layout->width() != width))
+	{
+		rgb_t const color = ui().colors().text_color();
+		layout.emplace(ui().create_layout(container(), width));
+		layout->add_text(ui().machine_info().game_info_string(), color);
+		lines = layout->lines();
+	}
+	width = layout->actual_width();
 }
 
-void menu_game_info::handle()
+void menu_game_info::populate(float &customtop, float &custombottom)
 {
-	// process the menu
-	process(0);
+}
+
+void menu_game_info::handle(event const *ev)
+{
+	if (ev)
+		handle_key(ev->iptkey);
 }
 
 
@@ -505,7 +516,7 @@ void menu_game_info::handle()
   menu_warn_info - handle the emulation warnings menu
 -------------------------------------------------*/
 
-menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
 {
 }
 
@@ -513,15 +524,26 @@ menu_warn_info::~menu_warn_info()
 {
 }
 
-void menu_warn_info::populate(float &customtop, float &custombottom)
+void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
-	item_append(ui().machine_info().warnings_string(), FLAG_MULTILINE, nullptr);
+	if (!layout || (layout->width() != width))
+	{
+		rgb_t const color = ui().colors().text_color();
+		layout.emplace(ui().create_layout(container(), width));
+		layout->add_text(ui().machine_info().warnings_string(), color);
+		lines = layout->lines();
+	}
+	width = layout->actual_width();
 }
 
-void menu_warn_info::handle()
+void menu_warn_info::populate(float &customtop, float &custombottom)
 {
-	// process the menu
-	process(0);
+}
+
+void menu_warn_info::handle(event const *ev)
+{
+	if (ev)
+		handle_key(ev->iptkey);
 }
 
 
@@ -537,6 +559,11 @@ menu_image_info::~menu_image_info()
 {
 }
 
+void menu_image_info::menu_activated()
+{
+	reset(reset_options::REMEMBER_POSITION);
+}
+
 void menu_image_info::populate(float &customtop, float &custombottom)
 {
 	ui_system_info const &system(system_list::instance().systems()[driver_list::find(machine().system().name)]);
@@ -547,10 +574,8 @@ void menu_image_info::populate(float &customtop, float &custombottom)
 		image_info(&image);
 }
 
-void menu_image_info::handle()
+void menu_image_info::handle(event const *ev)
 {
-	// process the menu
-	process(0);
 }
 
 

@@ -34,7 +34,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void fill_image_line(device_image_interface *img, std::string &instance, std::string &filename);
 
@@ -44,4 +44,4 @@ private:
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_FILEMNGR_H */
+#endif // MAME_FRONTEND_UI_FILEMNGR_H

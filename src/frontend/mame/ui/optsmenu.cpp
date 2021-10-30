@@ -38,6 +38,7 @@ menu_simple_game_options::menu_simple_game_options(
 	: menu(mui, container)
 	, m_handler(std::move(handler))
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 //-------------------------------------------------
@@ -55,12 +56,11 @@ menu_simple_game_options::~menu_simple_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_simple_game_options::handle()
+void menu_simple_game_options::handle(event const *ev)
 {
 	// process the menu
-	event const *const menu_event(process(PROCESS_LR_REPEAT));
-	if (menu_event && menu_event->itemref)
-		handle_item_event(*menu_event);
+	if (ev && ev->itemref)
+		handle_item_event(*ev);
 }
 
 //-------------------------------------------------
@@ -167,6 +167,7 @@ menu_game_options::menu_game_options(
 	, m_filter_data(filter_data)
 	, m_main_filter(filter_data.get_current_filter_type())
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 //-------------------------------------------------
@@ -182,13 +183,11 @@ menu_game_options::~menu_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_game_options::handle()
+void menu_game_options::handle(event const *ev)
 {
 	// process the menu
-	process_parent();
-	event const *const menu_event(process(PROCESS_LR_REPEAT | PROCESS_NOIMAGE));
-	if (menu_event && menu_event->itemref)
-		handle_item_event(*menu_event);
+	if (ev && ev->itemref)
+		handle_item_event(*ev);
 }
 
 //-------------------------------------------------

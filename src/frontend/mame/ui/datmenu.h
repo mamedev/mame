@@ -46,7 +46,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool custom_mouse_down() override;
 
-	virtual float populate_text(std::optional<text_layout> &layout, float width) override;
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
 	struct list_items
@@ -59,7 +59,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void get_data(std::string &buffer);
 	void get_data_sw(std::string &buffer);

@@ -50,6 +50,7 @@ menu_about::menu_about(mame_ui_manager &mui, render_container &container)
 					sizeof(void *) * 8),
 			util::string_format(_("about-header", "Revision: %1$s"), bare_vcs_revision) }
 {
+	set_process_flags(PROCESS_CUSTOM_NAV);
 }
 
 
@@ -81,7 +82,7 @@ void menu_about::custom_render(void *selectedref, float top, float bottom, float
 //  populate_text - populate the about box text
 //-------------------------------------------------
 
-float menu_about::populate_text(std::optional<text_layout> &layout, float width)
+void menu_about::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
 	if (!layout || (layout->width() != width))
 	{
@@ -92,8 +93,9 @@ float menu_about::populate_text(std::optional<text_layout> &layout, float width)
 			layout->add_text(*line, color);
 			layout->add_text("\n", color);
 		}
+		lines = layout->lines();
 	}
-	return layout->actual_width();
+	width = layout->actual_width();
 }
 
 
@@ -112,11 +114,10 @@ void menu_about::populate(float &customtop, float &custombottom)
 //  handle - manages inputs in the about modal
 //-------------------------------------------------
 
-void menu_about::handle()
+void menu_about::handle(event const *ev)
 {
-	event const *const event = process(PROCESS_CUSTOM_NAV);
-	if (event)
-		handle_key(event->iptkey);
+	if (ev)
+		handle_key(ev->iptkey);
 }
 
 } // namespace ui

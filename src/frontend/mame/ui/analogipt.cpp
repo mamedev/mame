@@ -52,6 +52,7 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container)
 	, m_field_data()
 	, m_visible_fields(0U)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 
@@ -121,18 +122,15 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 }
 
 
-void menu_analog::handle()
+void menu_analog::handle(event const *ev)
 {
-	// process the menu
-	event const *const menu_event(process(PROCESS_LR_REPEAT));
-
 	// handle events
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
-		item_data &data(*reinterpret_cast<item_data *>(menu_event->itemref));
+		item_data &data(*reinterpret_cast<item_data *>(ev->itemref));
 		int newval(data.cur);
 
-		switch (menu_event->iptkey)
+		switch (ev->iptkey)
 		{
 		// if selected, reset to default value
 		case IPT_UI_SELECT:

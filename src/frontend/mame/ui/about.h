@@ -31,11 +31,11 @@ public:
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	virtual float populate_text(std::optional<text_layout> &layout, float width) override;
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	std::vector<std::string> const m_header;
 };

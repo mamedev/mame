@@ -45,12 +45,11 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 }
 
-void menu_input_groups::handle()
+void menu_input_groups::handle(event const *ev)
 {
 	// process the menu
-	const event *const menu_event = process(0);
-	if (menu_event && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_input_general>(ui(), container(), int(uintptr_t(menu_event->itemref) - 1));
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
+		menu::stack_push<menu_input_general>(ui(), container(), int(uintptr_t(ev->itemref) - 1));
 }
 
 
@@ -243,6 +242,7 @@ void menu_input_specific::update_input(input_item_data &seqchangeditem)
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
+
 menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 	, data()
@@ -254,11 +254,19 @@ menu_input::menu_input(mame_ui_manager &mui, render_container &container)
 	, record_next(false)
 	, modified_ticks(0)
 {
+	set_process_flags(PROCESS_LR_ALWAYS);
 }
 
 menu_input::~menu_input()
 {
 }
+
+void menu_input::menu_activated()
+{
+	// scripts can change settings out from under us
+	reset(reset_options::REMEMBER_REF);
+}
+
 
 /*-------------------------------------------------
     toggle_none_default - toggle between "NONE"
@@ -329,13 +337,12 @@ void menu_input::custom_render(void *selectedref, float top, float bottom, float
 	}
 }
 
-void menu_input::handle()
+void menu_input::handle(event const *ev)
 {
 	input_item_data *seqchangeditem = nullptr;
 	bool invalidate = false;
 
 	// process the menu
-	const event *const menu_event = process(pollingitem ? PROCESS_NOKEYS : PROCESS_LR_ALWAYS);
 	if (pollingitem)
 	{
 		// if we are polling, handle as a special case
@@ -349,6 +356,7 @@ void menu_input::handle()
 		{
 			// if UI_CANCEL is pressed, abort
 			pollingitem = nullptr;
+			set_process_flags(PROCESS_LR_ALWAYS);
 			if (!seq_poll->modified() || modified_ticks == osd_ticks())
 			{
 				// cancelled immediately - toggle between default and none
@@ -366,6 +374,7 @@ void menu_input::handle()
 		else if (seq_poll->poll()) // poll again; if finished, update the sequence
 		{
 			pollingitem = nullptr;
+			set_process_flags(PROCESS_LR_ALWAYS);
 			if (seq_poll->valid())
 			{
 				record_next = true;
@@ -382,14 +391,15 @@ void menu_input::handle()
 			seq_poll.reset();
 		}
 	}
-	else if (menu_event && menu_event->itemref)
+	else if (ev && ev->itemref)
 	{
 		// otherwise, handle the events
-		input_item_data &item = *reinterpret_cast<input_item_data *>(menu_event->itemref);
+		input_item_data &item = *reinterpret_cast<input_item_data *>(ev->itemref);
 		input_item_data *newsel = &item;
-		switch (menu_event->iptkey)
+		switch (ev->iptkey)
 		{
 		case IPT_UI_SELECT: // an item was selected: begin polling
+			set_process_flags(PROCESS_NOKEYS);
 			errormsg.clear();
 			erroritem = nullptr;
 			modified_ticks = 0;

@@ -44,7 +44,7 @@ private:
 	using entry_list = std::list<software_part_menu_entry>;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// variables
 	entry_list              m_entries;
@@ -89,7 +89,7 @@ private:
 	bool                            m_ordered_by_shortname;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// functions
 	void append_software_entry(const software_info &swinfo);
@@ -104,7 +104,7 @@ public:
 	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
 	virtual ~menu_software() override;
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 private:
 	const char *                    m_interface;
@@ -113,4 +113,4 @@ private:
 
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_SWLIST_H */
+#endif // MAME_FRONTEND_UI_SWLIST_H
