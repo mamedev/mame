@@ -1143,6 +1143,8 @@ void amiga_state::ocs_map(address_map &map)
 	map(0x022, 0x023).rw(m_fdc, FUNC(amiga_fdc_device::dskptl_r), FUNC(amiga_fdc_device::dskptl_w));
 	map(0x024, 0x025).w(m_fdc, FUNC(amiga_fdc_device::dsklen_w));
 
+	map(0x02a, 0x02b).w(FUNC(amiga_state::vposw_w));
+
 	map(0x07e, 0x07f).w(m_fdc, FUNC(amiga_fdc_device::dsksync_w));
 	map(0x0a0, 0x0ab).m(m_paula, FUNC(paula_8364_device::audio_channel_map<0>));
 	map(0x0b0, 0x0bb).m(m_paula, FUNC(paula_8364_device::audio_channel_map<1>));
@@ -1175,6 +1177,13 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_INTENA) = 0x0000;
 	CUSTOM_REG(REG_SERDATR) = SERDATR_RXD | SERDATR_TSRE | SERDATR_TBE;
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
+}
+
+void amiga_state::vposw_w(u16 data)
+{
+	CUSTOM_REG(REG_VPOSR) = data & VPOSR_LOF;
+	if (data & 7)
+		popmessage("Upper VPOSW set %02x", data);
 }
 
 void amiga_state::bplcon0_w(u16 data)
