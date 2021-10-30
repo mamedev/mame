@@ -36,7 +36,7 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<f8_cpu_device> m_maincpu;
 	required_device<rs232_port_device> m_rs232c;
 	required_ioport_array<6> m_keypad;
 };
@@ -72,7 +72,6 @@ void f387x_state::opor_w(u8 data)
 
 void f387x_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0002).lr8(NAME([](offs_t offset) { return offset == 0 ? 0x29 : 0x80; })); // FIXME: actually done by decoding ROMC and masking D7
 	map(0x2b80, 0x2bff).ram(); // F6810
 	map(0x8000, 0x87ff).rom().region("pepbug", 0);
 }
@@ -157,6 +156,7 @@ void f387x_state::f387x(machine_config &config)
 	F8(config, m_maincpu, 2_MHz_XTAL); // F3850PC
 	m_maincpu->set_addrmap(AS_PROGRAM, &f387x_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &f387x_state::io_map);
+	m_maincpu->romc08_callback().set_constant(0x80);
 
 	F3853(config, "smi", 0);
 
