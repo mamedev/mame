@@ -33,8 +33,10 @@ public:
     };
 
     // Address map setup
-    template <typename... T> void set_apbus_address_translator(T &&... args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
-    template <dmac3_controller controller> void map(address_map &map)
+    template <typename... T>
+    void set_apbus_address_translator(T &&...args) { m_apbus_virt_to_phys_callback.set(std::forward<T>(args)...); }
+    template <dmac3_controller controller>
+    void map(address_map &map)
     {
         map(0x0, 0x3).rw(FUNC(dmac3_device::csr_r<controller>), FUNC(dmac3_device::csr_w<controller>));
         map(0x4, 0x7).rw(FUNC(dmac3_device::intr_r<controller>), FUNC(dmac3_device::intr_w<controller>));
@@ -44,12 +46,16 @@ public:
     }
 
     // Signal routing
-    template <typename T> void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
-    template <dmac3_controller controller> auto dma_r_cb() { return m_dma_r[controller].bind(); }
-    template <dmac3_controller controller> auto dma_w_cb() { return m_dma_w[controller].bind(); }
+    template <typename T>
+    void set_bus(T &&tag, int spacenum) { m_bus.set_tag(std::forward<T>(tag), spacenum); }
+    template <dmac3_controller controller>
+    auto dma_r_cb() { return m_dma_r[controller].bind(); }
+    template <dmac3_controller controller>
+    auto dma_w_cb() { return m_dma_w[controller].bind(); }
     auto irq_out() { return m_irq_handler.bind(); }
 
-    template <dmac3_controller controller> void irq_w(int state)
+    template <dmac3_controller controller>
+    void irq_w(int state)
     {
         if (state)
         {
@@ -62,7 +68,8 @@ public:
         m_irq_check->adjust(attotime::zero);
     }
 
-    template <dmac3_controller controller> void drq_w(int state)
+    template <dmac3_controller controller>
+    void drq_w(int state)
     {
         m_controllers[controller].drq = (state != 0);
         m_dma_check->adjust(attotime::zero);
@@ -76,7 +83,7 @@ protected:
     // Connections to other devices
     required_address_space m_bus;
     devcb_write_line m_irq_handler;
-    devcb_read8::array<2> m_dma_r; // XXX 32b? 64b?
+    devcb_read8::array<2> m_dma_r;  // XXX 32b? 64b?
     devcb_write8::array<2> m_dma_w; // XXX 32b? 64b?
     device_delegate<uint32_t(uint32_t)> m_apbus_virt_to_phys_callback;
 
@@ -93,15 +100,15 @@ protected:
     // DMAC3 has two controllers on-chip
     struct dmac3_register_file
     {
-        uint32_t csr = 0; // Status register
-        uint32_t intr = 0; // Interrupt status register
-        uint32_t length = 0; // Transfer count register
+        uint32_t csr = 0;     // Status register
+        uint32_t intr = 0;    // Interrupt status register
+        uint32_t length = 0;  // Transfer count register
         uint32_t address = 0; // Starting byte offset
-        uint32_t conf = 0; // Transaction configuration register
-        bool drq = false; // XXX Is this something different from DREQ?
+        uint32_t conf = 0;    // Transaction configuration register
+        bool drq = false;     // XXX Is this something different from DREQ?
     } m_controllers[2];
 
-     // Bitmasks for DMAC3 registers
+    // Bitmasks for DMAC3 registers
     enum DMAC3_CSR_MASKS : uint32_t
     {
         CSR_SEND = 0x0000,
@@ -125,7 +132,7 @@ protected:
         INTR_EOP = 0x0100,
         INTR_EOPIE = 0x0200, // End of operation interrupt enable (guess)
         INTR_EOPI = 0x0400,
-        INTR_DREQ = 0x1000, // Is this just DRQ? Or is this for triggering DMA requests to the host?
+        INTR_DREQ = 0x1000,  // Is this just DRQ? Or is this for triggering DMA requests to the host?
         INTR_DRQIE = 0x2000, // Interrupt on DRQ enable?
         INTR_DRQI = 0x4000,
         INTR_PERR = 0x8000,
@@ -161,17 +168,27 @@ protected:
     void conf_w(dmac3_controller controller, uint32_t data);
 
     // Templates as partial functions for register file accessors since they can be bound at compile time
-    template <dmac3_controller controller> uint32_t csr_r() { return csr_r(controller); }
-    template <dmac3_controller controller> uint32_t intr_r() { return intr_r(controller); }
-    template <dmac3_controller controller> uint32_t length_r() { return length_r(controller); }
-    template <dmac3_controller controller> uint32_t address_r() { return address_r(controller); }
-    template <dmac3_controller controller> uint32_t conf_r() { return conf_r(controller); }
+    template <dmac3_controller controller>
+    uint32_t csr_r() { return csr_r(controller); }
+    template <dmac3_controller controller>
+    uint32_t intr_r() { return intr_r(controller); }
+    template <dmac3_controller controller>
+    uint32_t length_r() { return length_r(controller); }
+    template <dmac3_controller controller>
+    uint32_t address_r() { return address_r(controller); }
+    template <dmac3_controller controller>
+    uint32_t conf_r() { return conf_r(controller); }
 
-    template <dmac3_controller controller> void csr_w(uint32_t data) { csr_w(controller, data); }
-    template <dmac3_controller controller> void intr_w(uint32_t data) { intr_w(controller, data); }
-    template <dmac3_controller controller> void length_w(uint32_t data) { length_w(controller, data); }
-    template <dmac3_controller controller> void address_w(uint32_t data) { address_w(controller, data); }
-    template <dmac3_controller controller> void conf_w(uint32_t data) { conf_w(controller, data); }
+    template <dmac3_controller controller>
+    void csr_w(uint32_t data) { csr_w(controller, data); }
+    template <dmac3_controller controller>
+    void intr_w(uint32_t data) { intr_w(controller, data); }
+    template <dmac3_controller controller>
+    void length_w(uint32_t data) { length_w(controller, data); }
+    template <dmac3_controller controller>
+    void address_w(uint32_t data) { address_w(controller, data); }
+    template <dmac3_controller controller>
+    void conf_w(uint32_t data) { conf_w(controller, data); }
 };
 
 DECLARE_DEVICE_TYPE(DMAC3, dmac3_device)

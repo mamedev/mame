@@ -90,7 +90,7 @@ void cxd8442q_device::map(address_map &map)
                                                                      // There seems to be more in this register, but this is the minimum to get the ESCCF working.
                                                                      auto intstat = fifo_channels[channel].intstat;
                                                                      auto mask = fifo_channels[channel].intctrl & 0x1;
-                                                                     return intstat & mask; 
+                                                                     return intstat & mask;
                                                                  })));
 
         // These locations are written to a lot but not emulating them doesn't stop it from working for simple cases
@@ -100,9 +100,7 @@ void cxd8442q_device::map(address_map &map)
                                                                  { return fifo_channels[channel].count; })));
 
         map(channel_base + 0x34, channel_base + 0x37).lrw8(NAME(([this, channel]()
-                                                                 {
-                                                                     return fifo_channels[channel].read_data_from_fifo();
-                                                                 })),
+                                                                 { return fifo_channels[channel].read_data_from_fifo(); })),
                                                            NAME(([this, channel](offs_t offset, uint8_t data)
                                                                  {
                                                                      LOG("FIFO CH%d: Pushing 0x%x\n", channel, data, machine().describe_context());
@@ -152,7 +150,7 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
         // Check DRQ to see if the device is ready to give or receive data
         if (this_channel.drq_r())
         {
-            if(this_channel.dma_cycle())
+            if (this_channel.dma_cycle())
             {
                 dma_active = true;
             }
@@ -223,7 +221,7 @@ void cxd8442q_device::irq_check()
     {
         apfifo_channel &this_channel = fifo_channels[channel];
         auto mask = this_channel.intctrl & 0x1;
-        if(this_channel.intstat & mask)
+        if (this_channel.intstat & mask)
         {
             irq_state = true;
         }
@@ -237,10 +235,10 @@ uint32_t apfifo_channel::read_data_from_fifo()
     uint32_t value = fifo_device.fifo_ram[address + fifo_r_position];
 
     // Decrement count, and clear interrupt for this channel if we are out of data
-    if(count > 0)
+    if (count > 0)
     {
         --count;
-        if(!count)
+        if (!count)
         {
             intstat &= ~0x1;
         }

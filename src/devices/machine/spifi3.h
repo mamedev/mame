@@ -48,14 +48,14 @@ public:
 protected:
     virtual void device_start() override;
     virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void scsi_ctrl_changed() override;
+    virtual void scsi_ctrl_changed() override;
 
 private:
     enum scsi_mode
     {
         MODE_D, // Disconnected
         MODE_T, // Target
-        MODE_I	// Initiator
+        MODE_I  // Initiator
     };
 
     enum scsi_data_target
@@ -236,7 +236,7 @@ private:
     std::queue<uint32_t> m_odd_fifo;
     void clear_queue(std::queue<uint32_t> queue)
     {
-        while(!queue.empty())
+        while (!queue.empty())
         {
             queue.pop();
         }
@@ -304,10 +304,10 @@ private:
     const uint32_t CONFIG_DMABURST = 0x80;
 
     // Select register
-    const uint32_t SEL_SETATN = 0x02;	// Set ATN??? NetBSD doesn't use this...
+    const uint32_t SEL_SETATN = 0x02;   // Set ATN??? NetBSD doesn't use this...
     const uint32_t SEL_IRESELEN = 0x04; // Enable reselection phase
-    const uint32_t SEL_ISTART = 0x08;	// Start selection
-    const uint32_t SEL_WATN = 0x80;		// Select with ATN
+    const uint32_t SEL_ISTART = 0x08;   // Start selection
+    const uint32_t SEL_WATN = 0x80;     // Select with ATN
     const uint32_t SEL_TARGET = 0x70;
     void select_w(uint32_t data);
     int get_target_id()

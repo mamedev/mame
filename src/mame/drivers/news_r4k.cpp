@@ -326,15 +326,14 @@ protected:
     uint8_t apbus_cmd_r(offs_t offset);
     void apbus_cmd_w(offs_t offset, uint32_t data);
     uint32_t apbus_virt_to_phys(uint32_t v_address);
-    std::map<offs_t, std::string> m_apbus_cmd_decoder
-    {
-        {0xc, "INTMSK"}, // Interrupt mask
-        {0x14, "INSTST"}, // Interrupt status
+    std::map<offs_t, std::string> m_apbus_cmd_decoder {
+        {0xc, "INTMSK"},    // Interrupt mask
+        {0x14, "INSTST"},   // Interrupt status
         {0x1c, "BER_ADDR"}, // Bus error address
         {0x34, "CFG_CTRL"}, // config control
-        {0x5c, "DER_A"}, // DMA error address
-        {0x6c, "DER_S"}, // DMA error slot
-        {0x84, "DMA"} // unmapped DMA coherency (?)
+        {0x5c, "DER_A"},    // DMA error address
+        {0x6c, "DER_S"},    // DMA error slot
+        {0x84, "DMA"}       // unmapped DMA coherency (?)
     };
 
     // APbus DMA page table entry structure
@@ -470,10 +469,14 @@ void news_r4k_state::machine_common(machine_config &config)
     CXD8442Q(config, m_fifo1, 0);
 
     // Reverse polarity for ESCC DMA signals
-    m_escc->out_dtra_callback().set([this](int status) { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
-    m_escc->out_wreqa_callback().set([this](int status) { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
-    m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data) { m_escc->da_w(0, data); });
-    m_fifo1->bind_dma_r<cxd8442q_device::fifo_channel_number::CH3>([this]() { return m_escc->da_r(0); });
+    m_escc->out_dtra_callback().set([this](int status)
+                                    { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
+    m_escc->out_wreqa_callback().set([this](int status)
+                                     { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
+    m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data)
+                                                                   { m_escc->da_w(0, data); });
+    m_fifo1->bind_dma_r<cxd8442q_device::fifo_channel_number::CH3>([this]()
+                                                                   { return m_escc->da_r(0); });
     m_fifo1->out_int_callback().set([this](int status)
                                     {
                                         // Not sure if this is the actual mapping, or if sending any level 0 interrupt causes
@@ -513,7 +516,7 @@ void news_r4k_state::machine_common(machine_config &config)
     m_fdc->drq_wr_callback().set([this](int status)
                                  { m_fifo0->drq_w<cxd8442q_device::fifo_channel_number::CH2>(status); });
     m_fifo0->bind_dma_r<cxd8442q_device::fifo_channel_number::CH2>([this]()
-                                                                 { return (uint32_t)(m_fdc->dma_r()); });
+                                                                   { return (uint32_t)(m_fdc->dma_r()); });
 
     DMAC3(config, m_dmac, 0);
     m_dmac->set_apbus_address_translator(FUNC(news_r4k_state::apbus_virt_to_phys));
@@ -605,12 +608,12 @@ void news_r4k_state::cpu_map(address_map &map)
     // APbus
     map(0x14c00000, 0x14c0008f).rw(FUNC(news_r4k_state::apbus_cmd_r), FUNC(news_r4k_state::apbus_cmd_w));
     map(0x14c20000, 0x14c3ffff).lrw8(NAME([this](offs_t offset)
-                                        { return m_dma_ram->read(offset); }),
+                                          { return m_dma_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
-                                        {
-                                            LOGMASKED(LOG_MEMORY, "Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
-                                            m_dma_ram->write(offset, data);
-                                        }));
+                                          {
+                                              LOGMASKED(LOG_MEMORY, "Write to DMA map @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
+                                              m_dma_ram->write(offset, data);
+                                          }));
 
     // ESCC + WSC-ESCC1 (CXD8421Q) serial controller
     map(0x1e900000, 0x1e93ffff).m(m_fifo1, FUNC(cxd8442q_device::map));
@@ -626,7 +629,8 @@ void news_r4k_state::cpu_map(address_map &map)
     // SONIC3 APbus interface and SONIC ethernet controller
     map(0x1e500000, 0x1e50003f).m(m_sonic3, FUNC(cxd8452aq_device::map));
     map(0x1e610000, 0x1e6101ff).m(m_sonic, FUNC(dp83932c_device::map)).umask64(0x000000000000ffff);
-    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset) { return m_net_ram->read(offset); }),
+    map(0x1e620000, 0x1e627fff).lrw8(NAME([this](offs_t offset)
+                                          { return m_net_ram->read(offset); }),
                                      NAME([this](offs_t offset, uint8_t data)
                                           {
                                               LOGMASKED(LOG_MEMORY, "Host write to net RAM @ offset 0x%x: 0x%x (%s)\n", offset, data, machine().describe_context());
@@ -652,7 +656,9 @@ void news_r4k_state::cpu_map(address_map &map)
 
     // The NEWS monitor ROM FDC routines won't run if DRV2 is inactive.
     // TODO: The 5000X only has a single floppy drive. Why is this needed?
-    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset) { return m_fdc->sra_r() & ~0x40; })).umask32(0x000000ff);
+    map(0x1ed60000, 0x1ed60003).lr8(NAME([this](offs_t offset)
+                                         { return m_fdc->sra_r() & ~0x40; }))
+        .umask32(0x000000ff);
 
     // TODO: Floppy aux registers
     map(0x1ed60200, 0x1ed60207).noprw();
@@ -668,7 +674,8 @@ void news_r4k_state::cpu_map(address_map &map)
     map(0x1ed80000, 0x1ed9ffff).m(m_fifo0, FUNC(cxd8442q_device::map_fifo_ram));
 
     // TODO: DSC-39 xb framebuffer/video card (0x14900000)
-    map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset) { return 0xff; }));
+    map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
+                                         { return 0xff; }));
 
     // TODO: sb sound subsystem (0x1ed00000)
     // TODO: lp line printer subsystem (0x1ed30000)
@@ -963,7 +970,7 @@ uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 {
     // Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
     uint32_t apbus_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
-    if(apbus_page_address >= (APBUS_DMA_MAP_ADDRESS + APBUS_DMA_MAP_RAM_SIZE))
+    if (apbus_page_address >= (APBUS_DMA_MAP_ADDRESS + APBUS_DMA_MAP_RAM_SIZE))
     {
         fatalerror("APbus address decoder ran past the bounds of the DMA map RAM!");
     }
@@ -1029,7 +1036,7 @@ void news_r4k_state::apbus_cmd_w(offs_t offset, uint32_t data)
     // Don't take the performance hit unless user cares about logs
 #if (VERBOSE & LOG_APBUS) > 0
     auto cmd_iter = m_apbus_cmd_decoder.find(offset);
-    if (cmd_iter != m_apbus_cmd_decoder.end() )
+    if (cmd_iter != m_apbus_cmd_decoder.end())
     {
         LOGMASKED(LOG_APBUS, "APbus %s command invoked, data 0x%x\n", cmd_iter->second, data);
     }
@@ -1251,31 +1258,39 @@ void news_r4k_state::escc1_int_mask_w(offs_t offset, uint32_t data)
  * Since the APbus expansion slots are not emulated yet, setting this avoids a harmless error message during the monitor ROM boot sequence
  */
 static INPUT_PORTS_START(nws5000)
-PORT_START("FRONT_PANEL")
-PORT_DIPNAME(0x01, 0x00, "Console") PORT_DIPLOCATION("FRONT_PANEL:1")
-PORT_DIPSETTING(0x00, "Serial Terminal")
-PORT_DIPSETTING(0x01, "Bitmap")
-PORT_DIPNAME(0x02, 0x00, "Bitmap Disable") PORT_DIPLOCATION("FRONT_PANEL:2")
-PORT_DIPSETTING(0x00, "Enable Built-in Bitmap")
-PORT_DIPSETTING(0x02, "Disable Built-in Bitmap")
-PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable") PORT_DIPLOCATION("FRONT_PANEL:3")
-PORT_DIPSETTING(0x00, "Disable Abort/Resume")
-PORT_DIPSETTING(0x04, "Enable Abort/Resume")
-PORT_DIPNAME(0x08, 0x00, "Clear NVRAM") PORT_DIPLOCATION("FRONT_PANEL:4")
-PORT_DIPSETTING(0x00, "Normal Operation (No Clear)")
-PORT_DIPSETTING(0x08, "Clear NVRAM")
-PORT_DIPNAME(0x10, 0x00, "Auto Boot") PORT_DIPLOCATION("FRONT_PANEL:5")
-PORT_DIPSETTING(0x00, "Auto Boot Disable")
-PORT_DIPSETTING(0x10, "Auto Boot Enable")
-PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test") PORT_DIPLOCATION("FRONT_PANEL:6")
-PORT_DIPSETTING(0x00, "No Diagnostic Test")
-PORT_DIPSETTING(0x20, "Run Diagnostic Test")
-PORT_DIPNAME(0x40, 0x40, "External APbus Slot Probe Disable") PORT_DIPLOCATION("FRONT_PANEL:7")
-PORT_DIPSETTING(0x00, "Enable External Slot Probe")
-PORT_DIPSETTING(0x40, "Disable External Slot Probe")
-PORT_DIPNAME(0x80, 0x00, "No Memory Mode") PORT_DIPLOCATION("FRONT_PANEL:8")
-PORT_DIPSETTING(0x00, "Main Memory Enabled")
-PORT_DIPSETTING(0x80, "Main Memory Disabled");
+    PORT_START("FRONT_PANEL")
+        PORT_DIPNAME(0x01, 0x00, "Console")
+            PORT_DIPLOCATION("FRONT_PANEL:1")
+            PORT_DIPSETTING(0x00, "Serial Terminal")
+            PORT_DIPSETTING(0x01, "Bitmap")
+        PORT_DIPNAME(0x02, 0x00, "Bitmap Disable")
+            PORT_DIPLOCATION("FRONT_PANEL:2")
+            PORT_DIPSETTING(0x00, "Enable Built-in Bitmap")
+            PORT_DIPSETTING(0x02, "Disable Built-in Bitmap")
+        PORT_DIPNAME(0x04, 0x00, "Abort/Resume Enable")
+            PORT_DIPLOCATION("FRONT_PANEL:3")
+            PORT_DIPSETTING(0x00, "Disable Abort/Resume")
+            PORT_DIPSETTING(0x04, "Enable Abort/Resume")
+        PORT_DIPNAME(0x08, 0x00, "Clear NVRAM")
+            PORT_DIPLOCATION("FRONT_PANEL:4")
+            PORT_DIPSETTING(0x00, "Normal Operation (No Clear)")
+            PORT_DIPSETTING(0x08, "Clear NVRAM")
+        PORT_DIPNAME(0x10, 0x00, "Auto Boot")
+            PORT_DIPLOCATION("FRONT_PANEL:5")
+            PORT_DIPSETTING(0x00, "Auto Boot Disable")
+            PORT_DIPSETTING(0x10, "Auto Boot Enable")
+        PORT_DIPNAME(0x20, 0x00, "Run Diagnostic Test")
+            PORT_DIPLOCATION("FRONT_PANEL:6")
+            PORT_DIPSETTING(0x00, "No Diagnostic Test")
+            PORT_DIPSETTING(0x20, "Run Diagnostic Test")
+        PORT_DIPNAME(0x40, 0x40, "External APbus Slot Probe Disable")
+            PORT_DIPLOCATION("FRONT_PANEL:7")
+            PORT_DIPSETTING(0x00, "Enable External Slot Probe")
+            PORT_DIPSETTING(0x40, "Disable External Slot Probe")
+        PORT_DIPNAME(0x80, 0x00, "No Memory Mode")
+            PORT_DIPLOCATION("FRONT_PANEL:8")
+            PORT_DIPSETTING(0x00, "Main Memory Enabled")
+            PORT_DIPSETTING(0x80, "Main Memory Disabled");
 INPUT_PORTS_END
 
 ROM_START(nws5000x)

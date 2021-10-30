@@ -50,10 +50,10 @@ public:
     void reset()
     {
         mask = 0;
-        address = 0; // start address in FIFO RAM
+        address = 0;  // start address in FIFO RAM
         dma_mode = 0; // fifo dma mode
-        intctrl = 0; // interrupt control
-        intstat = 0; // interrupt status
+        intctrl = 0;  // interrupt control
+        intstat = 0;  // interrupt status
         count = 0;
         drq = false;
     }

@@ -8,12 +8,11 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_REGISTER (1U << 1)
 #define LOG_INTERRUPT (1U << 2)
-#define LOG_DATA  (1U << 3)
+#define LOG_DATA (1U << 3)
 
-#define DMAC3_DEBUG (LOG_GENERAL|LOG_REGISTER|LOG_INTERRUPT)
-#define DMAC3_TRACE (DMAC3_DEBUG|LOG_DATA)
+#define DMAC3_DEBUG (LOG_GENERAL | LOG_REGISTER | LOG_INTERRUPT)
+#define DMAC3_TRACE (DMAC3_DEBUG | LOG_DATA)
 
-// #define VERBOSE DMAC3_DEBUG
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(DMAC3, dmac3_device, "dmac3", "Sony CXD8403Q DMA Controller")
@@ -23,7 +22,7 @@ dmac3_device::dmac3_device(machine_config const &mconfig, char const *tag, devic
 {
 }
 
-void dmac3_device::device_start() 
+void dmac3_device::device_start()
 {
     m_apbus_virt_to_phys_callback.resolve();
     m_irq_handler.resolve_safe();
@@ -58,7 +57,7 @@ uint32_t dmac3_device::conf_r(dmac3_controller controller)
 void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d csr_w: 0x%x\n", controller, data);
-    if(data & CSR_RESET)
+    if (data & CSR_RESET)
     {
         LOGMASKED(LOG_GENERAL, "dmac3-%d chip reset\n", controller);
         reset_controller(controller);
@@ -72,10 +71,10 @@ void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 void dmac3_device::intr_w(dmac3_controller controller, uint32_t data)
 {
     LOGMASKED(LOG_REGISTER, "dmac3-%d intr_w: 0x%x\n", controller, data);
-    const auto intr_clear_bits = data & INTR_CLR_MASK; // Get 1s on bits to clear
-    const auto intr_enable_bits = data & INTR_EN_MASK; // Get 1s on bits to set
+    const auto intr_clear_bits = data & INTR_CLR_MASK;  // Get 1s on bits to clear
+    const auto intr_enable_bits = data & INTR_EN_MASK;  // Get 1s on bits to set
     m_controllers[controller].intr &= ~intr_clear_bits; // Clear requested interrupt flags
-    m_controllers[controller].intr &= ~INTR_EN_MASK;	// Clear all mask bits
+    m_controllers[controller].intr &= ~INTR_EN_MASK;    // Clear all mask bits
     m_controllers[controller].intr |= intr_enable_bits; // Set mask bits to new mask
     m_irq_check->adjust(attotime::zero);
     // TODO: does it make sense to clear INTR_INT??
@@ -100,7 +99,7 @@ void dmac3_device::conf_w(dmac3_controller controller, uint32_t data)
     // since, at least for now, DMAC and SPIFI accesses will go through regardless
     // of this setting.
 
-    if((data & ~CONF_WIDTH) != (m_controllers[controller].conf & ~CONF_WIDTH))
+    if ((data & ~CONF_WIDTH) != (m_controllers[controller].conf & ~CONF_WIDTH))
     {
         LOGMASKED(LOG_REGISTER, "dmac3-%d conf_w: 0x%x (%s)\n", controller, data, machine().describe_context());
     }
@@ -135,11 +134,11 @@ TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)
     for (int controller = 0; controller < 2; ++controller)
     {
         const uint32_t intr = m_controllers[controller].intr;
-        newIrq |= (intr & INTR_INT) && (intr & INTR_INTEN); // External interrupt (SPIFI)
+        newIrq |= (intr & INTR_INT) && (intr & INTR_INTEN);  // External interrupt (SPIFI)
         newIrq |= (intr & INTR_EOPI) && (intr & INTR_EOPIE); // End-of-operation interrupt
         newIrq |= (intr & INTR_DRQI) && (intr & INTR_DRQIE); // DRQ interrupt (?)
-        newIrq |= (intr & INTR_TCI) && (intr & INTR_TCIE); // Transfer count interrupt (?)
-        newIrq |= (intr & INTR_PERR); // XXX DREQ, EOP?
+        newIrq |= (intr & INTR_TCI) && (intr & INTR_TCIE);   // Transfer count interrupt (?)
+        newIrq |= (intr & INTR_PERR);                        // XXX DREQ, EOP?
     }
 
     if (m_irq != newIrq)
@@ -156,7 +155,10 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
     for (int controller = 0; controller < 2; ++controller)
     {
         // Check if controller is active and has something to do
-        if(!(m_controllers[controller].csr & CSR_ENABLE) || !(m_controllers[controller].length) || !m_controllers[controller].drq) { continue; }
+        if (!(m_controllers[controller].csr & CSR_ENABLE) || !(m_controllers[controller].length) || !m_controllers[controller].drq)
+        {
+            continue;
+        }
 
         // If the MSB is set, use the address register as a physical address with no address mapping.
         // Otherwise, we must translate the address from an APbus virtual address to the physical address.
@@ -173,7 +175,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
             address = address & ~0x80000000;
         }
 
-        if(m_controllers[controller].csr & CSR_RECV)
+        if (m_controllers[controller].csr & CSR_RECV)
         {
             // Device to memory
             const uint8_t data = m_dma_r[controller]();
@@ -193,7 +195,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
 
         // Decrement transfer count
         --m_controllers[controller].length;
-        if(!m_controllers[controller].length)
+        if (!m_controllers[controller].length)
         {
             // Neither NEWS-OS nor NetBSD seem to expect an EOPI to be the main trigger of a DMA completion
             // In fact, NEWS-OS gets confused if EOPI is set but the SPIFI hasn't actually completed the transfer.
@@ -204,7 +206,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::dma_check)
         }
 
         // If DRQ is still active, do it again
-        if(m_controllers[controller].drq)
+        if (m_controllers[controller].drq)
         {
             active = true;
         }
