@@ -28,7 +28,6 @@ menu_device_config::menu_device_config(
 		device_slot_interface *slot,
 		device_slot_interface::slot_option const *option)
 	: menu_textbox(mui, container)
-	, m_owner(slot)
 	, m_option(option)
 {
 	m_mounted = machine().root_device().subdevice(slot->device().subtag(option->name())) != nullptr;

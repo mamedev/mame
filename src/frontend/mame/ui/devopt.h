@@ -31,7 +31,6 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
 
-	device_slot_interface *const m_owner;
 	device_slot_interface::slot_option const *const m_option;
 	bool m_mounted;
 };
