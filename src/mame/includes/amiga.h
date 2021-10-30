@@ -611,6 +611,7 @@ protected:
 	void aga_map(address_map &map);
 
 	// TODO: move to Agnus/Alice
+	u16 vposr_r();
 	void vposw_w(u16 data);
 	void bplcon0_w(u16 data);
 	void aga_bplcon0_w(u16 data);

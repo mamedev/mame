@@ -1,6 +1,6 @@
 // license: BSD-3-Clause
 // copyright-holders: Aaron Giles, Dirk Best
-/***************************************************************************
+/******************************************************************************
 
     MOS Technology 8364 "Paula"
 
@@ -10,12 +10,14 @@
     - low-pass filter;
     - convert volume values to non-linear dB scale (cfr. )
     - Verify ADKCON modulation;
-    - Verify manual mode;
+    - Verify manual mode:
+	  \- AGA roadkill during gameplay, which also has very long period setups,
+	     extremely aliased;
     - When a DMA stop occurs, is the correlated channel playback stopped
       at the end of the current cycle or as soon as possible like current
       implementation?
 
-***************************************************************************/
+******************************************************************************/
 
 #include "emu.h"
 #include "8364_paula.h"
@@ -148,7 +150,7 @@ template <u8 ch> void paula_8364_device::audxper_w(u16 data)
 template <u8 ch> void paula_8364_device::audxvol_w(u16 data)
 {
 	m_stream->update();
-	m_channel[ch].vol = data;
+	m_channel[ch].vol = data & 0x7f;
 }
 
 template <u8 ch> void paula_8364_device::audxdat_w(u16 data)

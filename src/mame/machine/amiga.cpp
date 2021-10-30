@@ -1136,6 +1136,8 @@ void amiga_state::ocs_map(address_map &map)
 	// In progress: remove this catch-all trampoline, move almost everything into devices
 	map(0x000, 0x1ff).rw(FUNC(amiga_state::custom_chip_r), FUNC(amiga_state::custom_chip_w));
 
+	map(0x004, 0x005).r(FUNC(amiga_state::vposr_r));
+
 	map(0x010, 0x011).r(m_fdc, FUNC(amiga_fdc_device::adkcon_r));
 	map(0x01a, 0x01b).r(m_fdc, FUNC(amiga_fdc_device::dskbytr_r));
 	// FIXME: these two belongs to Agnus, also shouldn't be readable
@@ -1179,9 +1181,17 @@ void amiga_state::custom_chip_reset()
 	CUSTOM_REG(REG_BEAMCON0) = (m_agnus_id & 0x10) ? 0x0000 : 0x0020;
 }
 
+u16 amiga_state::vposr_r()
+{
+	u16 res = CUSTOM_REG(REG_VPOSR) & VPOSR_LOF;
+	res |= m_agnus_id << 8;
+	res |= ((amiga_gethvpos() >> 16) & 0xff);
+	return res;
+}
+
 void amiga_state::vposw_w(u16 data)
 {
-	CUSTOM_REG(REG_VPOSR) = data & VPOSR_LOF;
+	CUSTOM_REG(REG_VPOSR) = (data & VPOSR_LOF) | (data & 7);
 	if (data & 7)
 		popmessage("Upper VPOSW set %02x", data);
 }
@@ -1219,11 +1229,13 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 		case REG_DMACONR:
 			return CUSTOM_REG(REG_DMACON);
 
+#ifdef UNUSED_FUNCTION
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0xff00;
 			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos() >> 16;
 
 			return CUSTOM_REG(REG_VPOSR);
+#endif
 
 		case REG_VHPOSR:
 			return amiga_gethvpos() & 0xffff;

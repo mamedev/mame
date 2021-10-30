@@ -4,6 +4,10 @@
 
     Commodore Amiga
 
+	Notes:
+	- On ECS/AGA machines, holding down both port 1 fire buttons
+	  will bring you to the Amiga Early Startup Control Screen.
+
 ***************************************************************************/
 
 #include "emu.h"
