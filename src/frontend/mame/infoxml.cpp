@@ -30,6 +30,7 @@
 #include <cctype>
 #include <cstring>
 #include <future>
+#include <locale>
 #include <queue>
 #include <type_traits>
 #include <unordered_set>
@@ -491,6 +492,9 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 			{
 				prepared_info result;
 				std::ostringstream stream;
+
+				// make this locale neutral
+				stream.imbue(std::locale(""));
 
 				// output each of the drivers
 				for (const game_driver &driver : drivers)
