@@ -32,7 +32,7 @@ private:
 	virtual void handle(event const *ev) override;
 
 	device_slot_interface::slot_option const *const m_option;
-	bool m_mounted;
+	bool const m_mounted;
 };
 
 } // namespace ui

@@ -208,6 +208,7 @@ void menu_network_devices::handle(event const *ev)
 
 menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
 {
+	set_process_flags(PROCESS_CUSTOM_NAV);
 }
 
 menu_bookkeeping::~menu_bookkeeping()
