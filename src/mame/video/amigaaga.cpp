@@ -152,6 +152,8 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 {
 	int dmaenable = (CUSTOM_REG(REG_DMACON) & (DMACON_SPREN | DMACON_DMAEN)) == (DMACON_SPREN | DMACON_DMAEN);
 	int num, maxdma;
+	const u16 sprctl_offs[4] = {2, 4, 4, 8};
+	const u16 spr_fmode_inc = sprctl_offs[(CUSTOM_REG(REG_FMODE) >> 2) & 0x03];
 
 	/* channels are limited by DDFSTART */
 	maxdma = (CUSTOM_REG(REG_DDFSTRT) - 0x14) / 4;
@@ -173,27 +175,23 @@ void amiga_state::aga_update_sprite_dma(int scanline)
 
 			/* fetch data into the control words */
 			CUSTOM_REG(REG_SPR0POS + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
-			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
-			/* fetch additional words */
-			switch((CUSTOM_REG(REG_FMODE) >> 2) & 0x03)
-			{
-				case 0:
-					break;
-				case 1:
-				case 2:
-					CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
-					break;
-				case 3:
-					CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 3*4;
-					break;
-			}
+			// Diggers AGA suggests that the fmode increments with ctl is interleaved.
+			// (it enables sprite 0 only, and +8 for the vstop values)
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = read_chip_ram(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + spr_fmode_inc);
+			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 2 * spr_fmode_inc;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
 
+		u16 spr0ctl = CUSTOM_REG(REG_SPR0CTL + 4 * num);
 		/* compute vstart/vstop */
-		vstart = (CUSTOM_REG(REG_SPR0POS + 4 * num) >> 8) | ((CUSTOM_REG(REG_SPR0CTL + 4 * num) << 6) & 0x100);
-		vstop = (CUSTOM_REG(REG_SPR0CTL + 4 * num) >> 8) | ((CUSTOM_REG(REG_SPR0CTL + 4 * num) << 7) & 0x100);
+		// bits 6 and 5 are respectively vstart bit 9 and vstop bit 9
+		// TODO: do they disable with non-AGA modes?
+		vstart = (CUSTOM_REG(REG_SPR0POS + 4 * num) >> 8);
+		vstart |= (spr0ctl & 0x04) ? 0x100 : 0;
+		vstart |= (spr0ctl & 0x40) ? 0x200 : 0;
+		vstop = (spr0ctl >> 8);
+		vstop |= (spr0ctl & 0x02) ? 0x100 : 0;
+		vstop |= (spr0ctl & 0x20) ? 0x200 : 0;
 
 		/* if we hit vstart, enable the comparitor */
 		if (scanline == vstart)
