@@ -46,6 +46,7 @@
 #include "4score.h"
 #include "arkpaddle.h"
 #include "bcbattle.h"
+#include "dorepiano.h"
 #include "fckeybrd.h"
 #include "fcmat.h"
 #include "hori.h"
@@ -204,6 +205,7 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("vaus", NES_ARKPADDLE_FC);
 	device.option_add("family_trainer", NES_FTRAINER);
 	device.option_add("konamihs", NES_KONAMIHS);
+	device.option_add("konami_piano", NES_DOREPIANO);
 	device.option_add("mj_panel", NES_MJPANEL);
 	device.option_add("pachinko", NES_PACHINKO);
 	device.option_add("partytap", NES_PARTYTAP);
