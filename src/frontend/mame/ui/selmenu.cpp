@@ -1277,7 +1277,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 		float const ypos = y2 + ui().get_line_height() + 2.0f * ui().box_tb_border();
 		ui().draw_text_box(
 				container(),
-				have_parent ? _("Return to previous menu") : _("Exit"),
+				have_parent ? _("Return to Previous Menu") : _("Exit"),
 				text_layout::text_justify::RIGHT, 1.0f - lr_border, ypos,
 				ui().colors().background_color());
 	}
