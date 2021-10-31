@@ -93,7 +93,7 @@ void menu_control_floppy_image::hook_load(const std::string &filename)
 	m_state = SELECT_RW;
 }
 
-void menu_control_floppy_image::handle()
+void menu_control_floppy_image::menu_activated()
 {
 	switch (m_state) {
 	case DO_CREATE: {
@@ -121,7 +121,7 @@ void menu_control_floppy_image::handle()
 	case SELECT_FORMAT:
 		if(!output_format) {
 			m_state = START_FILE;
-			handle();
+			menu_activated();
 		} else {
 			const auto &fs = fd.get_create_fs();
 			output_filename = util::zippath_combine(m_current_directory, m_current_file);
@@ -140,7 +140,7 @@ void menu_control_floppy_image::handle()
 	case SELECT_INIT:
 		if(m_submenu_result.i == -1) {
 			m_state = START_FILE;
-			handle();
+			menu_activated();
 		} else {
 			create_fs = &fd.get_create_fs()[m_submenu_result.i];
 			do_load_create();
@@ -179,7 +179,7 @@ void menu_control_floppy_image::handle()
 		break;
 
 	default:
-		menu_control_device_image::handle();
+		menu_control_device_image::menu_activated();
 	}
 }
 

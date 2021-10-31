@@ -26,7 +26,7 @@ static int m_ptr = -1;
 
 void osd_output::push(osd_output *delegate)
 {
-	if (m_ptr < MAXSTACK)
+	if (m_ptr < MAXSTACK - 1)
 	{
 		delegate->m_chain = (m_ptr >= 0 ? m_stack[m_ptr] : nullptr);
 		m_ptr++;
@@ -37,7 +37,7 @@ void osd_output::push(osd_output *delegate)
 void osd_output::pop(osd_output *delegate)
 {
 	int f = -1;
-	for (int i=0; i<=m_ptr; i++)
+	for (int i = 0; i <= m_ptr; i++)
 		if (m_stack[i] == delegate)
 		{
 			f = i;

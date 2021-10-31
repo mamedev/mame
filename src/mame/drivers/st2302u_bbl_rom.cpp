@@ -264,7 +264,7 @@ void st22xx_bbl338_state::porta_w(u8 data)
 
 void st22xx_bbl338_state::portb_w(u8 data)
 {
-//	logerror("%s: port b write %02x\n", machine().describe_context(), data);
+//  logerror("%s: port b write %02x\n", machine().describe_context(), data);
 	m_portb = data;
 }
 

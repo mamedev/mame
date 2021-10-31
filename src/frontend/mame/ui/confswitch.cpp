@@ -82,6 +82,13 @@ menu_confswitch::~menu_confswitch()
 }
 
 
+void menu_confswitch::menu_activated()
+{
+	// switches can have input assignments, and scripts are a thing
+	reset(reset_options::REMEMBER_REF);
+}
+
+
 void menu_confswitch::populate(float &customtop, float &custombottom)
 {
 	// locate relevant fields if necessary
@@ -162,31 +169,28 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), 0, (void *)1);
+	item_append(_("Reset Machine"), 0, (void *)1);
 }
 
 
-void menu_confswitch::handle()
+void menu_confswitch::handle(event const *ev)
 {
-	// process the menu
-	event const *const menu_event(process(0));
-
 	// handle events
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
-		if (uintptr_t(menu_event->itemref) == 1U)
+		if (uintptr_t(ev->itemref) == 1U)
 		{
 			// reset
-			if (menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
 		}
 		else
 		{
 			// actual settings
-			ioport_field &field(*reinterpret_cast<ioport_field *>(menu_event->itemref));
+			ioport_field &field(*reinterpret_cast<ioport_field *>(ev->itemref));
 			bool changed(false);
 
-			switch (menu_event->iptkey)
+			switch (ev->iptkey)
 			{
 			// if selected, reset to default value
 			case IPT_UI_SELECT:

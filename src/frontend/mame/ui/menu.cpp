@@ -33,21 +33,12 @@
 namespace ui {
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-std::mutex menu::s_global_state_guard;
-menu::global_state_map menu::s_global_states;
-
-/***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
-menu::global_state_ptr menu::get_global_state(running_machine &machine)
+menu::global_state &menu::get_global_state(mame_ui_manager &ui)
 {
-	std::lock_guard<std::mutex> guard(s_global_state_guard);
-	auto const it(s_global_states.find(&machine));
-	return (it != s_global_states.end()) ? it->second : global_state_ptr();
+	return ui.get_session_data<menu, global_state_wrapper>(ui);
 }
 
 //-------------------------------------------------
@@ -75,19 +66,20 @@ bool menu::exclusive_input_pressed(int &iptkey, int key, int repeat)
     CORE SYSTEM MANAGEMENT
 ***************************************************************************/
 
-menu::global_state::global_state(running_machine &machine, ui_options const &options)
-	: widgets_manager(machine)
-	, m_machine(machine)
+menu::global_state::global_state(mame_ui_manager &ui)
+	: widgets_manager(ui.machine())
+	, m_ui(ui)
 	, m_bgrnd_bitmap()
-	, m_bgrnd_texture(nullptr, machine.render())
+	, m_bgrnd_texture(nullptr, ui.machine().render())
 	, m_stack()
 	, m_free()
+	, m_hide(false)
 {
-	render_manager &render(machine.render());
+	render_manager &render(ui.machine().render());
 
 	// create a texture for main menu background
 	m_bgrnd_texture.reset(render.texture_alloc(render_texture::hq_scale));
-	if (options.use_background_image() && (&machine.system() == &GAME_NAME(___empty)))
+	if (ui.options().use_background_image() && (&ui.machine().system() == &GAME_NAME(___empty)))
 	{
 		m_bgrnd_bitmap = std::make_unique<bitmap_argb32>(0, 0);
 		emu_file backgroundfile(".", OPEN_FLAG_READ);
@@ -113,10 +105,6 @@ menu::global_state::global_state(running_machine &machine, ui_options const &opt
 
 menu::global_state::~global_state()
 {
-	// it shouldn't really be possible to get here with active menus because of reference loops
-	assert(!m_stack);
-	assert(!m_free);
-
 	stack_reset();
 	clear_free_list();
 }
@@ -124,6 +112,11 @@ menu::global_state::~global_state()
 
 void menu::global_state::stack_push(std::unique_ptr<menu> &&menu)
 {
+	if (m_stack && m_stack->m_active)
+	{
+		m_stack->m_active = false;
+		m_stack->menu_deactivated();
+	}
 	menu->m_parent = std::move(m_stack);
 	m_stack = std::move(menu);
 	m_stack->machine().ui_input().reset();
@@ -134,11 +127,14 @@ void menu::global_state::stack_pop()
 {
 	if (m_stack)
 	{
+		if (m_stack->m_one_shot)
+			m_hide = true;
+		m_stack->menu_dismissed();
 		std::unique_ptr<menu> menu(std::move(m_stack));
 		m_stack = std::move(menu->m_parent);
 		menu->m_parent = std::move(m_free);
 		m_free = std::move(menu);
-		m_machine.ui_input().reset();
+		m_ui.machine().ui_input().reset();
 	}
 }
 
@@ -177,40 +173,46 @@ bool menu::global_state::stack_has_special_main_menu() const
 }
 
 
-
-
-//-------------------------------------------------
-//  init - initialize the menu system
-//-------------------------------------------------
-
-void menu::init(running_machine &machine, ui_options &mopt)
+uint32_t menu::global_state::ui_handler(render_container &container)
 {
-	// initialize the menu stack
+	// if we have no menus stacked up, start with the main menu
+	if (!m_stack)
+		stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(m_ui, container)));
+
+	// ensure topmost menu is active - need a loop because it could push another menu
+	while (m_stack && !m_stack->m_active)
 	{
-		std::lock_guard<std::mutex> guard(s_global_state_guard);
-		auto const ins(s_global_states.emplace(&machine, std::make_shared<global_state>(machine, mopt)));
-		assert(ins.second); // calling init twice is bad
-		if (ins.second)
-			machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&menu::exit, &machine)); // add an exit callback to free memory
-		else
-			ins.first->second->stack_reset();
+		m_stack->m_active = true;
+		m_stack->menu_activated();
 	}
-}
 
+	// update the menu state
+	m_hide = false;
+	if (m_stack)
+		m_stack->do_handle();
 
-//-------------------------------------------------
-//  exit - clean up after ourselves
-//-------------------------------------------------
+	// clear up anything pending being released
+	clear_free_list();
 
-void menu::exit(running_machine &machine)
-{
-	// free menus
-	global_state_ptr const state(get_global_state(machine));
-	state->stack_reset();
-	state->clear_free_list();
+	// if the menus are to be hidden, return a cancel here
+	if (m_ui.is_menu_active() && (m_hide || !m_stack))
+	{
+		if (m_stack)
+		{
+			if (m_stack->m_one_shot)
+			{
+				stack_pop();
+			}
+			else if (m_stack->m_active)
+			{
+				m_stack->m_active = false;
+				m_stack->menu_deactivated();
+			}
+		}
+		return UI_HANDLER_CANCEL;
+	}
 
-	std::lock_guard<std::mutex> guard(s_global_state_guard);
-	s_global_states.erase(&machine);
+	return 0;
 }
 
 
@@ -224,16 +226,18 @@ void menu::exit(running_machine &machine)
 //-------------------------------------------------
 
 menu::menu(mame_ui_manager &mui, render_container &container)
-	: m_selected(0)
-	, m_items()
-	, m_visible_lines(0)
-	, m_visible_items(0)
-	, m_global_state(get_global_state(mui.machine()))
-	, m_special_main_menu(false)
-	, m_needs_prev_menu_item(true)
+	: m_global_state(get_global_state(mui))
 	, m_ui(mui)
 	, m_container(container)
 	, m_parent()
+	, m_items()
+	, m_process_flags(0)
+	, m_selected(0)
+	, m_hover(1)
+	, m_special_main_menu(false)
+	, m_one_shot(false)
+	, m_needs_prev_menu_item(true)
+	, m_active(false)
 	, m_event()
 	, m_customtop(0.0f)
 	, m_custombottom(0.0f)
@@ -244,11 +248,11 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_mouse_x(-1.0f)
 	, m_mouse_y(-1.0f)
 {
-	assert(m_global_state); // not calling init is bad
-
 	reset(reset_options::SELECT_FIRST);
 
 	top_line = 0;
+	m_visible_lines = 0;
+	m_visible_items = 0;
 }
 
 
@@ -322,11 +326,6 @@ void menu::item_append(menu_item_type type, uint32_t flags)
 
 void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
-	if ((flags & FLAG_MULTILINE) != 0) // only allow multiline as the first item
-		assert(m_items.size() == 1);
-	else if (m_items.size() >= 2) // only allow a single multi-line item
-		assert((m_items[0].flags & FLAG_MULTILINE) == 0);
-
 	// allocate a new item and populate it
 	menu_item pitem;
 	pitem.text = std::move(text);
@@ -374,7 +373,7 @@ void menu::item_append_on_off(const std::string &text, bool state, uint32_t flag
 //  and returning any interesting events
 //-------------------------------------------------
 
-const menu::event *menu::process(uint32_t flags, float x0, float y0)
+const menu::event *menu::process()
 {
 	// reset the event
 	m_event.iptkey = IPT_INVALID;
@@ -382,21 +381,31 @@ const menu::event *menu::process(uint32_t flags, float x0, float y0)
 	// first make sure our selection is valid
 	validate_selection(1);
 
-	// draw the menu
-	if (m_items.size() > 1 && (m_items[0].flags & FLAG_MULTILINE) != 0)
-		draw_text_box();
-	else
-		draw(flags);
+	// if we're not running the emulation, draw parent menus in the background
+	auto const draw_parent =
+			[] (auto &self, menu *parent) -> bool
+			{
+				if (!parent || !(parent->is_special_main_menu() || self(self, parent->m_parent.get())))
+					return false;
+				else
+					parent->draw(PROCESS_NOINPUT);
+				return true;
+			};
+	if (draw_parent(draw_parent, m_parent.get()))
+		container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(114, 0, 0, 0), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+
+	// draw the menu proper
+	draw(m_process_flags);
 
 	// process input
-	if (!(flags & PROCESS_NOKEYS) && !(flags & PROCESS_NOINPUT))
+	if (!(m_process_flags & (PROCESS_NOKEYS | PROCESS_NOINPUT)))
 	{
 		// read events
-		handle_events(flags, m_event);
+		handle_events(m_process_flags, m_event);
 
 		// handle the keys if we don't already have an event
 		if (m_event.iptkey == IPT_INVALID)
-			handle_keys(flags, m_event.iptkey);
+			handle_keys(m_process_flags, m_event.iptkey);
 	}
 
 	// update the selected item in the event
@@ -456,7 +465,6 @@ void menu::draw(uint32_t flags)
 	}
 
 	bool const customonly = (flags & PROCESS_CUSTOM_ONLY);
-	bool const noimage = (flags & PROCESS_NOIMAGE);
 	bool const noinput = (flags & PROCESS_NOINPUT);
 	float const aspect = machine().render().ui_aspect(&container());
 	float const line_height = ui().get_line_height();
@@ -465,7 +473,7 @@ void menu::draw(uint32_t flags)
 	float const gutter_width = lr_arrow_width * 1.3f;
 	float const lr_border = ui().box_lr_border() * aspect;
 
-	if (&machine().system() == &GAME_NAME(___empty) && !noimage)
+	if (is_special_main_menu())
 		draw_background();
 
 	// compute the width and height of the full menu
@@ -778,87 +786,6 @@ void menu::custom_render(void *selectedref, float top, float bottom, float x, fl
 {
 }
 
-//-------------------------------------------------
-//  draw_text_box - draw a multiline
-//  word-wrapped text box with a menu item at the
-//  bottom
-//-------------------------------------------------
-
-void menu::draw_text_box()
-{
-	std::string_view const text = m_items[0].text;
-	std::string_view const backtext = m_items[1].text;
-	float const aspect = machine().render().ui_aspect(&container());
-	float line_height = ui().get_line_height();
-	float lr_arrow_width = 0.4f * line_height * aspect;
-	float gutter_width = lr_arrow_width;
-	float const lr_border = ui().box_lr_border() * aspect;
-	float target_width, target_height, prior_width;
-	float target_x, target_y;
-
-	// compute the multi-line target width/height
-	ui().draw_text_full(
-			container(),
-			text,
-			0, 0, 1.0f - 2.0f * lr_border - 2.0f * gutter_width,
-			text_layout::text_justify::LEFT, text_layout::word_wrapping::WORD,
-			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
-			&target_width, &target_height);
-	target_height += 2.0f * line_height;
-	if (target_height > 1.0f - 2.0f * ui().box_tb_border())
-		target_height = floorf((1.0f - 2.0f * ui().box_tb_border()) / line_height) * line_height;
-
-	// maximum against "return to prior menu" text
-	prior_width = ui().get_string_width(backtext) + 2.0f * gutter_width;
-	target_width = std::max(target_width, prior_width);
-
-	// determine the target location
-	target_x = 0.5f - 0.5f * target_width;
-	target_y = 0.5f - 0.5f * target_height;
-
-	// make sure we stay on-screen
-	if (target_x < lr_border + gutter_width)
-		target_x = lr_border + gutter_width;
-	if (target_x + target_width + gutter_width + lr_border > 1.0f)
-		target_x = 1.0f - lr_border - gutter_width - target_width;
-	if (target_y < ui().box_tb_border())
-		target_y = ui().box_tb_border();
-	if (target_y + target_height + ui().box_tb_border() > 1.0f)
-		target_y = 1.0f - ui().box_tb_border() - target_height;
-
-	// add a box around that
-	ui().draw_outlined_box(
-			container(),
-			target_x - lr_border - gutter_width, target_y - ui().box_tb_border(),
-			target_x + target_width + gutter_width + lr_border, target_y + target_height + ui().box_tb_border(),
-			(m_items[0].flags & FLAG_REDTEXT) ?  UI_RED_COLOR : ui().colors().background_color());
-	ui().draw_text_full(
-			container(),
-			text,
-			target_x, target_y, target_width,
-			text_layout::text_justify::LEFT, text_layout::word_wrapping::WORD,
-			mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(),
-			nullptr, nullptr);
-
-	// draw the "return to prior menu" text with a hilight behind it
-	highlight(
-			target_x + 0.5f * UI_LINE_WIDTH,
-			target_y + target_height - line_height,
-			target_x + target_width - 0.5f * UI_LINE_WIDTH,
-			target_y + target_height,
-			ui().colors().selected_bg_color());
-	ui().draw_text_full(
-			container(),
-			backtext,
-			target_x, target_y + target_height - line_height, target_width,
-			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
-			mame_ui_manager::NORMAL, ui().colors().selected_color(), ui().colors().selected_bg_color(),
-			nullptr, nullptr);
-
-	// artificially set the hover to the last item so a double-click exits
-	m_hover = m_items.size() - 1;
-}
-
 
 //-------------------------------------------------
 //  map_mouse - map mouse pointer location to menu
@@ -978,16 +905,11 @@ void menu::handle_events(uint32_t flags, event &ev)
 
 		// caught scroll event
 		case ui_event::type::MOUSE_WHEEL:
-			if (!(flags & PROCESS_ONLYCHAR))
+			if (!custom_mouse_scroll((0 < local_menu_event.zdelta) ? -local_menu_event.num_lines : local_menu_event.num_lines) && !(flags & (PROCESS_ONLYCHAR | PROCESS_CUSTOM_NAV)))
 			{
 				if (local_menu_event.zdelta > 0)
 				{
-					if (flags & PROCESS_CUSTOM_NAV) // FIXME: DAT menu logic - let the derived class handle this
-					{
-						top_line -= local_menu_event.num_lines;
-						return;
-					}
-					else if (is_first_selected())
+					if (is_first_selected())
 					{
 						select_last_item();
 					}
@@ -1002,12 +924,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				}
 				else
 				{
-					if (flags & PROCESS_CUSTOM_NAV) // FIXME: DAT menu logic - let the derived class handle this
-					{
-						top_line += local_menu_event.num_lines;
-						return;
-					}
-					else if (is_last_selected())
+					if (is_last_selected())
 					{
 						select_first_item();
 					}
@@ -1045,8 +962,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 
 void menu::handle_keys(uint32_t flags, int &iptkey)
 {
-	bool ignorepause = stack_has_special_main_menu();
-	int code;
+	bool const ignorepause = (flags & PROCESS_IGNOREPAUSE) || stack_has_special_main_menu();
 
 	// bail if no items
 	if (m_items.empty())
@@ -1060,6 +976,16 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 			iptkey = IPT_UI_CANCEL;
 			stack_pop();
 		}
+		return;
+	}
+
+	// UI configure hides the menus
+	if (!(flags & PROCESS_NOKEYS) && exclusive_input_pressed(iptkey, IPT_UI_CONFIGURE, 0) && !m_global_state.stack_has_special_main_menu())
+	{
+		if (m_one_shot)
+			stack_pop();
+		else
+			m_global_state.hide_menu();
 		return;
 	}
 
@@ -1082,10 +1008,14 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	bool const ignoreleft = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_LEFT_ARROW);
 	bool const ignoreright = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_RIGHT_ARROW);
 
-	// accept left/right keys as-is with repeat
+	// accept left/right/prev/next keys as-is with repeat if appropriate
 	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
 	if (!ignoreright && exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
+		return;
+	if (exclusive_input_pressed(iptkey, IPT_UI_PREV_GROUP, 0))
+		return;
+	if (exclusive_input_pressed(iptkey, IPT_UI_NEXT_GROUP, 0))
 		return;
 
 	// up backs up by one item
@@ -1187,10 +1117,23 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	// see if any other UI keys are pressed
 	if (iptkey == IPT_INVALID)
 	{
-		for (code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
+		for (int code = IPT_UI_FIRST + 1; code < IPT_UI_LAST; code++)
 		{
-			if (code == IPT_UI_CONFIGURE || (code == IPT_UI_LEFT && ignoreleft) || (code == IPT_UI_RIGHT && ignoreright) || (code == IPT_UI_PAUSE && ignorepause))
-				continue;
+			switch (code)
+			{
+			case IPT_UI_LEFT:
+				if (ignoreleft)
+					continue;
+				break;
+			case IPT_UI_RIGHT:
+				if (ignoreright)
+					continue;
+				break;
+			case IPT_UI_PAUSE:
+				if (ignorepause)
+					continue;
+				break;
+			}
 			if (exclusive_input_pressed(iptkey, code, 0))
 				break;
 		}
@@ -1258,7 +1201,7 @@ void menu::do_handle()
 		// let implementation add other items
 		populate(m_customtop, m_custombottom);
 	}
-	handle();
+	handle(process());
 }
 
 
@@ -1271,26 +1214,10 @@ void menu::do_handle()
 //  and calls the menu handler
 //-------------------------------------------------
 
-uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
+delegate<uint32_t (render_container &)> menu::get_ui_handler(mame_ui_manager &mui)
 {
-	global_state_ptr const state(get_global_state(mui.machine()));
-
-	// if we have no menus stacked up, start with the main menu
-	if (!state->topmost_menu<menu>())
-		state->stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(mui, container)));
-
-	// update the menu state
-	if (state->topmost_menu<menu>())
-		state->topmost_menu<menu>()->do_handle();
-
-	// clear up anything pending to be released
-	state->clear_free_list();
-
-	// if the menus are to be hidden, return a cancel here
-	if (mui.is_menu_active() && ((mui.machine().ui_input().pressed(IPT_UI_CONFIGURE) && !state->stack_has_special_main_menu()) || !state->topmost_menu<menu>()))
-		return UI_HANDLER_CANCEL;
-
-	return 0;
+	global_state &state(get_global_state(mui));
+	return delegate<uint32_t (render_container &)>(&global_state::ui_handler, &state);
 }
 
 /***************************************************************************
@@ -1303,7 +1230,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
-	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state.hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1313,7 +1240,7 @@ void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 
 void menu::draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uint32_t orientation)
 {
-	container().add_quad(x0, y0, x1, y1, fgcolor, m_global_state->arrow_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, fgcolor, m_global_state.arrow_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(orientation) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1347,8 +1274,8 @@ void menu::extra_text_draw_box(float origx1, float origx2, float origy, float ys
 void menu::draw_background()
 {
 	// draw background image if available
-	if (ui().options().use_background_image() && m_global_state->bgrnd_bitmap() && m_global_state->bgrnd_bitmap()->valid())
-		container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white(), m_global_state->bgrnd_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	if (ui().options().use_background_image() && m_global_state.bgrnd_bitmap() && m_global_state.bgrnd_bitmap()->valid())
+		container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white(), m_global_state.bgrnd_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 

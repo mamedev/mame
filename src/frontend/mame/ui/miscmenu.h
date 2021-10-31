@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "ui/menu.h"
+#include "ui/textbox.h"
 
 #include "crsshair.h"
 #include "emuopts.h"
@@ -34,18 +34,22 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 };
 
-class menu_bookkeeping : public menu
+class menu_bookkeeping : public menu_textbox
 {
 public:
 	menu_bookkeeping(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_bookkeeping();
 
+protected:
+	virtual void menu_activated() override;
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	attotime prevtime;
 };
@@ -77,7 +81,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	std::vector<crosshair_item_data> m_data;
 	std::vector<std::string> m_pics;
@@ -91,7 +95,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 };
 
 class menu_bios_selection : public menu
@@ -102,7 +106,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 };
 
 
@@ -118,7 +122,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	std::vector<const game_driver*> m_list;
 };
@@ -134,8 +138,7 @@ public:
 			mame_ui_manager &mui,
 			render_container &container,
 			ui_system_info const &info,
-			std::function<void (bool, bool)> &&handler = nullptr,
-			float x0 = 0.0f, float y0 = 0.0f);
+			std::function<void (bool, bool)> &&handler = nullptr);
 	virtual ~menu_machine_configure();
 
 protected:
@@ -157,15 +160,13 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void setup_bios();
 
 	std::function<void (bool, bool)> const m_handler;
 	ui_system_info const &m_sys;
 	emu_options m_opts;
-	float const m_x0;
-	float const m_y0;
 	s_bios m_bios;
 	std::size_t m_curbios;
 	bool const m_was_favorite;
@@ -184,7 +185,7 @@ public:
 
 protected:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 };

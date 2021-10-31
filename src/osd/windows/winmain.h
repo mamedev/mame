@@ -9,7 +9,6 @@
 #ifndef __WINDOWS_WINMAIN_H__
 #define __WINDOWS_WINMAIN_H__
 
-#include <winapifamily.h>
 #include "osdepend.h"
 #include "modules/lib/osdobj_common.h"
 
@@ -267,10 +266,8 @@ struct _EXCEPTION_POINTERS;
 
 class windows_osd_interface : public osd_common_t
 {
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// Access to exception filter static method
 	friend int main(int argc, char *argv[]);
-#endif
 
 public:
 	// construction/destruction
@@ -321,33 +318,6 @@ private:
 
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };
-
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-
-ref class MameMainApp sealed : public Windows::ApplicationModel::Core::IFrameworkView
-{
-private:
-	std::unique_ptr<windows_options>        m_options;
-	std::unique_ptr<windows_osd_interface>  m_osd;
-
-public:
-	MameMainApp();
-
-	// IFrameworkView Methods.
-	virtual void Initialize(Windows::ApplicationModel::Core::CoreApplicationView^ applicationView);
-	virtual void SetWindow(Windows::UI::Core::CoreWindow^ window);
-	virtual void Load(Platform::String^ entryPoint);
-	virtual void Run();
-	virtual void Uninitialize();
-};
-
-ref class MameViewSource sealed : Windows::ApplicationModel::Core::IFrameworkViewSource
-{
-public:
-	virtual Windows::ApplicationModel::Core::IFrameworkView^ CreateView();
-};
-
-#endif
 
 //============================================================
 //  GLOBAL VARIABLES

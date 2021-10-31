@@ -16,9 +16,11 @@
 #include "ui/menu.h"
 
 namespace ui {
+
 //-------------------------------------------------
 //  class sound options menu
 //-------------------------------------------------
+
 class menu_sound_options : public menu
 {
 public:
@@ -38,7 +40,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	uint16_t          m_cur_rates;
 	static const int  m_sound_rate[];
@@ -48,4 +50,4 @@ private:
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_SNDMENU_H */
+#endif // MAME_FRONTEND_UI_SNDMENU_H

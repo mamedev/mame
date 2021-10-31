@@ -9,7 +9,7 @@
 #include "modules/osdmodule.h"
 #include "modules/lib/osdlib.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 #include <windows.h>
 
@@ -353,11 +353,7 @@ public:
 		// accept qualifiers from the name
 		std::string name(_name);
 		if (name.compare("default") == 0)
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-			name = "Tahoma";
-#else
 			name = "Segoe UI";
-#endif
 		bool bold = (strreplace(name, "[B]", "") + strreplace(name, "[b]", "") > 0);
 		bool italic = (strreplace(name, "[I]", "") + strreplace(name, "[i]", "") > 0);
 

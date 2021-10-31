@@ -436,6 +436,11 @@ ui:get_string_width(str)
 ui:set_aggressive_input_focus(enable)
     On some platforms, this controls whether MAME should accept input focus in
     more situations than when its windows have UI focus.
+ui:get_general_input_setting(type, [player])
+    Gets a description of the configured input sequence for the specified input
+    type and player suitable for using in prompts.  The input type is an
+    enumerated value.  The player number is a zero-based index.  If the player
+    number is not supplied, it is assumed to be zero.
 
 Properties
 ^^^^^^^^^^

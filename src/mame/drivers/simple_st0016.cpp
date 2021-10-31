@@ -25,6 +25,7 @@ Dips verified for Neratte Chu (nratechu) from manual
 #include "machine/timer.h"
 #include "sound/st0016.h"
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -533,9 +534,10 @@ uint32_t st0016_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void st0016_state::st0016(machine_config &config)
 {
 	// basic machine hardware
-	ST0016_CPU(config, m_maincpu, 8000000); // 8 MHz ?
+	ST0016_CPU(config, m_maincpu, XTAL(48'000'000) / 6); // 8 MHz (48 MHz / 6) verified from nratechu (https://www.youtube.com/watch?v=scKF95t4-lU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &st0016_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &st0016_state::st0016_io);
+	m_maincpu->set_screen(m_screen);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(st0016_state::interrupt), "screen", 0, 1);
 
@@ -547,6 +549,13 @@ void st0016_state::st0016(machine_config &config)
 	m_screen->set_visarea(0*8, 48*8-1, 0*8, 48*8-1);
 	m_screen->set_screen_update(FUNC(st0016_state::screen_update));
 	m_screen->set_palette("maincpu:palette");
+
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
 }
 
 void st0016_state::mayjinsn(machine_config &config)

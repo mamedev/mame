@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders: Devin Acker
 /***************************************************************************
-	Casio GT913 I/O (HLE)
+    Casio GT913 I/O (HLE)
 ***************************************************************************/
 
 #ifndef MAME_MACHINE_GT913_IO_H

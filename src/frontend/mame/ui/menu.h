@@ -42,11 +42,9 @@ public:
 		FLAG_LEFT_ARROW     = 1U << 0,
 		FLAG_RIGHT_ARROW    = 1U << 1,
 		FLAG_INVERT         = 1U << 2,
-		FLAG_MULTILINE      = 1U << 3,
-		FLAG_REDTEXT        = 1U << 4,
-		FLAG_DISABLE        = 1U << 5,
-		FLAG_UI_HEADING     = 1U << 7,
-		FLAG_COLOR_BOX      = 1U << 8
+		FLAG_DISABLE        = 1U << 4,
+		FLAG_UI_HEADING     = 1U << 5,
+		FLAG_COLOR_BOX      = 1U << 6
 	};
 
 	virtual ~menu();
@@ -60,11 +58,8 @@ public:
 	void item_append(menu_item_type type, uint32_t flags = 0);
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
-	// Global initialization
-	static void init(running_machine &machine, ui_options &mopt);
-
 	// reset the menus, clearing everything
-	static void stack_reset(running_machine &machine) { get_global_state(machine)->stack_reset(); }
+	static void stack_reset(mame_ui_manager &ui) { get_global_state(ui).stack_reset(); }
 
 	// push a new menu onto the stack
 	template <typename T, typename... Params>
@@ -81,28 +76,24 @@ public:
 	}
 
 	// pop a menu from the stack
-	static void stack_pop(running_machine &machine) { get_global_state(machine)->stack_pop(); }
+	static void stack_pop(mame_ui_manager &ui) { get_global_state(ui).stack_pop(); }
 
 	// test if one of the menus in the stack requires hide disable
-	static bool stack_has_special_main_menu(running_machine &machine) { return get_global_state(machine)->stack_has_special_main_menu(); }
+	static bool stack_has_special_main_menu(mame_ui_manager &ui) { return get_global_state(ui).stack_has_special_main_menu(); }
 
 	// master handler
-	static uint32_t ui_handler(render_container &container, mame_ui_manager &mui);
+	static delegate<uint32_t (render_container &)> get_ui_handler(mame_ui_manager &mui);
 
 	// Used by sliders
 	void validate_selection(int scandir);
 
 	void do_handle();
 
-private:
-	virtual void draw(uint32_t flags);
-	void draw_text_box();
-
 protected:
 	using bitmap_ptr = widgets_manager::bitmap_ptr;
 	using texture_ptr = widgets_manager::texture_ptr;
 
-	// flags to pass to process
+	// flags to pass to set_process_flags
 	enum
 	{
 		PROCESS_NOKEYS      = 1 << 0,
@@ -112,7 +103,7 @@ protected:
 		PROCESS_CUSTOM_ONLY = 1 << 4,
 		PROCESS_ONLYCHAR    = 1 << 5,
 		PROCESS_NOINPUT     = 1 << 6,
-		PROCESS_NOIMAGE     = 1 << 7
+		PROCESS_IGNOREPAUSE = 1 << 7
 	};
 
 	// options for reset
@@ -139,19 +130,16 @@ protected:
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
 
+	void set_one_shot(bool oneshot) { m_one_shot = oneshot; }
 	void set_needs_prev_menu_item(bool needs) { m_needs_prev_menu_item = needs; }
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
 
-	template <typename T> T *topmost_menu() const { return m_global_state->topmost_menu<T>(); }
-	template <typename T> static T *topmost_menu(running_machine &machine) { return get_global_state(machine)->topmost_menu<T>(); }
-	void stack_pop() { m_global_state->stack_pop(); }
-	void stack_reset() { m_global_state->stack_reset(); }
-	bool stack_has_special_main_menu() const { return m_global_state->stack_has_special_main_menu(); }
-
-	// process a menu, drawing it and returning any interesting events
-	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
-	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
+	template <typename T> T *topmost_menu() const { return m_global_state.topmost_menu<T>(); }
+	template <typename T> static T *topmost_menu(mame_ui_manager &ui) { return get_global_state(ui).topmost_menu<T>(); }
+	void stack_pop() { m_global_state.stack_pop(); }
+	void stack_reset() { m_global_state.stack_reset(); }
+	bool stack_has_special_main_menu() const { return m_global_state.stack_has_special_main_menu(); }
 
 	menu_item &item(int index) { return m_items[index]; }
 	menu_item const &item(int index) const { return m_items[index]; }
@@ -179,6 +167,7 @@ protected:
 	void clear_hover() { m_hover = m_items.size() + 1; }
 
 	// scroll position control
+	void set_top_line(int index) { top_line = (0 < index) ? (index - 1) : index; }
 	void centre_selection() { top_line = m_selected - (m_visible_lines / 2); }
 
 	// test if the given key is pressed and we haven't already reported a key
@@ -190,7 +179,7 @@ protected:
 
 	// highlight
 	void highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor);
-	render_texture *hilight_main_texture() { return m_global_state->hilight_main_texture(); }
+	render_texture *hilight_main_texture() { return m_global_state.hilight_main_texture(); }
 
 	// draw arrow
 	void draw_arrow(float x0, float y0, float x1, float y1, rgb_t fgcolor, uint32_t orientation);
@@ -274,14 +263,21 @@ protected:
 	}
 
 	// overridable event handling
+	void set_process_flags(uint32_t flags) { m_process_flags = flags; }
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
 	virtual bool custom_ui_cancel() { return false; }
 	virtual bool custom_mouse_down() { return false; }
+	virtual bool custom_mouse_scroll(int lines) { return false; }
+
+	// event notifications
+	virtual void menu_activated() { }
+	virtual void menu_deactivated() { }
+	virtual void menu_dismissed() { }
 
 	static bool is_selectable(menu_item const &item)
 	{
-		return ((item.flags & (menu::FLAG_MULTILINE | menu::FLAG_DISABLE)) == 0 && item.type != menu_item_type::SEPARATOR);
+		return (!(item.flags & menu::FLAG_DISABLE) && (item.type != menu_item_type::SEPARATOR));
 	}
 
 	// get arrows status
@@ -295,7 +291,7 @@ private:
 	class global_state : public widgets_manager
 	{
 	public:
-		global_state(running_machine &machine, ui_options const &options);
+		global_state(mame_ui_manager &ui);
 		global_state(global_state const &) = delete;
 		global_state(global_state &&) = delete;
 		~global_state();
@@ -312,70 +308,88 @@ private:
 		void clear_free_list();
 		bool stack_has_special_main_menu() const;
 
-	private:
-		running_machine         &m_machine;
+		void hide_menu() { m_hide = true; }
 
+		uint32_t ui_handler(render_container &container);
+
+	protected:
+		mame_ui_manager         &m_ui;
+
+	private:
 		bitmap_ptr              m_bgrnd_bitmap;
 		texture_ptr             m_bgrnd_texture;
 
 		std::unique_ptr<menu>   m_stack;
 		std::unique_ptr<menu>   m_free;
+
+		bool                    m_hide;
 	};
-	using global_state_ptr = std::shared_ptr<global_state>;
-	using global_state_map = std::map<running_machine *, global_state_ptr>;
+
+	// this is to satisfy the std::any requirement that objects be copyable
+	class global_state_wrapper : public global_state
+	{
+	public:
+		global_state_wrapper(mame_ui_manager &ui) : global_state(ui) { }
+		global_state_wrapper(global_state_wrapper const &that) : global_state(that.m_ui) { }
+	};
+
+	// process a menu, drawing it and returning any interesting events
+	const event *process();
+	virtual void draw(uint32_t flags);
 
 	// request the specific handling of the game selection main menu
 	bool is_special_main_menu() const;
 	void set_special_main_menu(bool disable);
 
-	// To be reimplemented in the menu subclass
+	// to be implemented in derived classes
 	virtual void populate(float &customtop, float &custombottom) = 0;
 
-	// To be reimplemented in the menu subclass
-	virtual void handle() = 0;
+	// to be implemented in derived classes
+	virtual void handle(event const *ev) = 0;
 
 	// push a new menu onto the stack
-	static void stack_push(std::unique_ptr<menu> &&menu) { get_global_state(menu->machine())->stack_push(std::move(menu)); }
+	static void stack_push(std::unique_ptr<menu> &&menu) { menu->m_global_state.stack_push(std::move(menu)); }
 
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, std::string_view text, int direction);
 
 	bool first_item_visible() const { return top_line <= 0; }
 	bool last_item_visible() const { return (top_line + m_visible_lines) >= m_items.size(); }
 
-	static void exit(running_machine &machine);
-	static global_state_ptr get_global_state(running_machine &machine);
+	static global_state &get_global_state(mame_ui_manager &ui);
 
-	int                     m_selected;   // which item is selected
-	int                     m_hover;      // which item is being hovered over
-	std::vector<menu_item>  m_items;      // array of items
-
-protected: // TODO: remove need to expose these
+protected: // TODO: remove need to expose these - only used here and in selmenu.cpp
 	int top_line;           // main box top line
 	int m_visible_lines;    // main box visible lines
 	int m_visible_items;    // number of visible items
 
 private:
-	global_state_ptr const  m_global_state;
-	bool                    m_special_main_menu;
-	bool                    m_needs_prev_menu_item;
-	mame_ui_manager         &m_ui;              // UI we are attached to
-	render_container        &m_container;       // render_container we render to
-	std::unique_ptr<menu>   m_parent;           // pointer to parent menu
-	event                   m_event;            // the UI event that occurred
+	global_state            &m_global_state;        // reference to global state for session
+	mame_ui_manager         &m_ui;                  // UI we are attached to
+	render_container        &m_container;           // render_container we render to
+	std::unique_ptr<menu>   m_parent;               // pointer to parent menu in the stack
 
-	float                   m_customtop;        // amount of extra height to add at the top
-	float                   m_custombottom;     // amount of extra height to add at the bottom
+	std::vector<menu_item>  m_items;                // array of items
 
-	int                     m_resetpos;         // reset position
-	void                    *m_resetref;        // reset reference
+	uint32_t                m_process_flags;        // event processing options
+	int                     m_selected;             // which item is selected
+	int                     m_hover;                // which item is being hovered over
+	bool                    m_special_main_menu;    // true if no real emulation running under the menu
+	bool                    m_one_shot;             // true for menus outside the normal stack
+	bool                    m_needs_prev_menu_item; // true to automatically create item to dismiss menu
+	bool                    m_active;               // whether the menu is currently visible and topmost
+
+	event                   m_event;                // the UI event that occurred
+
+	float                   m_customtop;            // amount of extra height to add at the top
+	float                   m_custombottom;         // amount of extra height to add at the bottom
+
+	int                     m_resetpos;             // item index to select after repopulating
+	void                    *m_resetref;            // item reference value to select after repopulating
 
 	bool                    m_mouse_hit;
 	bool                    m_mouse_button;
 	float                   m_mouse_x;
 	float                   m_mouse_y;
-
-	static std::mutex       s_global_state_guard;
-	static global_state_map s_global_states;
 };
 
 } // namespace ui

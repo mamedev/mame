@@ -200,7 +200,7 @@ void menu_slot_devices::populate(float &customtop, float &custombottom)
 		item_append(slot.slot_name(), opt_name, item_flags, (void *)&slot);
 	}
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), 0, ITEMREF_RESET);
+	item_append(_("Reset Machine"), 0, ITEMREF_RESET);
 
 	// leave space for the name of the current option at the bottom
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
@@ -231,26 +231,24 @@ void menu_slot_devices::custom_render(void *selectedref, float top, float bottom
 //  handle - process an input event
 //-------------------------------------------------
 
-void menu_slot_devices::handle()
+void menu_slot_devices::handle(event const *ev)
 {
 	// process the menu
-	event const *const menu_event(process(0));
-
-	if (menu_event && menu_event->itemref != nullptr)
+	if (ev && ev->itemref != nullptr)
 	{
-		if (menu_event->itemref == ITEMREF_RESET)
+		if (ev->itemref == ITEMREF_RESET)
 		{
-			if (menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
 		}
-		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 		{
-			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
-			rotate_slot_device(*slot, menu_event->iptkey == IPT_UI_LEFT ? step_t::PREVIOUS : step_t::NEXT);
+			device_slot_interface *slot = (device_slot_interface *)ev->itemref;
+			rotate_slot_device(*slot, ev->iptkey == IPT_UI_LEFT ? step_t::PREVIOUS : step_t::NEXT);
 		}
-		else if (menu_event->iptkey == IPT_UI_SELECT)
+		else if (ev->iptkey == IPT_UI_SELECT)
 		{
-			device_slot_interface *slot = (device_slot_interface *)menu_event->itemref;
+			device_slot_interface *slot = (device_slot_interface *)ev->itemref;
 			device_slot_interface::slot_option const *const option = get_current_option(*slot);
 			if (option)
 				menu::stack_push<menu_device_config>(ui(), container(), slot, option);

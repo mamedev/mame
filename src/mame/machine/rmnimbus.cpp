@@ -109,16 +109,16 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define MOUSE_NONE		0x00
-#define MOUSE_LEFT		0x01
-#define MOUSE_RIGHT		0x02
-#define MOUSE_DOWN		0x04
-#define MOUSE_UP		0x08
-#define MOUSE_LBUTTON	0x10
-#define MOUSE_RBUTTON	0x20
+#define MOUSE_NONE      0x00
+#define MOUSE_LEFT      0x01
+#define MOUSE_RIGHT     0x02
+#define MOUSE_DOWN      0x04
+#define MOUSE_UP        0x08
+#define MOUSE_LBUTTON   0x10
+#define MOUSE_RBUTTON   0x20
 
 // Frequency in Hz to poll for mouse movement.
-#define MOUSE_POLL_FREQUENCY	5000
+#define MOUSE_POLL_FREQUENCY    5000
 
 #define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
@@ -1163,14 +1163,14 @@ void rmnimbus_state::hdc_reset()
 	m_scsi_req = 0;
 
 	// Latched req, IC11b
-	m_scsi_reqlat = 0; 
+	m_scsi_reqlat = 0;
 }
 
-/* 
-	The SCSI code outputs a 1 to indicate an active line, even though it is active low
-	The inputs on the RM schematic are fed through inverters, but because of the above
-	we don't need to invert them, unless the schematic uses the signal directly
-	For consistency we will invert msg before latching.
+/*
+    The SCSI code outputs a 1 to indicate an active line, even though it is active low
+    The inputs on the RM schematic are fed through inverters, but because of the above
+    we don't need to invert them, unless the schematic uses the signal directly
+    For consistency we will invert msg before latching.
 */
 
 void rmnimbus_state::check_scsi_irq()
@@ -1185,13 +1185,13 @@ WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 }
 
 // This emulates the 74LS74 latched version of req
-void rmnimbus_state::set_scsi_drqlat(bool	clock, bool clear)
-{ 
+void rmnimbus_state::set_scsi_drqlat(bool   clock, bool clear)
+{
 	if (clear)
 		m_scsi_reqlat = 0;
 	else if (clock)
 		m_scsi_reqlat = 1;
-		
+
 	if(m_scsi_reqlat)
 		hdc_drq(true);
 	else
@@ -1202,9 +1202,9 @@ void rmnimbus_state::hdc_post_rw()
 {
 	if(m_scsi_req)
 		m_scsibus->write_ack(1);
-		
+
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
-	set_scsi_drqlat(false, true);		
+	set_scsi_drqlat(false, true);
 }
 
 void rmnimbus_state::hdc_drq(bool state)
@@ -1220,10 +1220,10 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 {
 	m_scsi_cd = state;
-	
+
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
 	set_scsi_drqlat(false, !m_scsi_cd);
-	
+
 	check_scsi_irq();
 }
 
@@ -1247,16 +1247,16 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 {
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
-	
+
 	// This is the state of the actual line from the SCSI
 	m_scsi_req = state;
-	
+
 	// Latched req, is forced low by C/D being set to command
 	set_scsi_drqlat(rising, m_scsi_cd);
-	
+
 	if (!m_scsi_reqlat)
 		m_scsibus->write_ack(0);
-	
+
 	check_scsi_irq();
 }
 
@@ -1551,41 +1551,41 @@ void rmnimbus_state::mouse_js_reset()
 
 void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int   mouse_x 	= 0;	// Current mouse X and Y
-	int   mouse_y 	= 0;
-	int   xdiff 	= 0;	// Difference from previous X and Y
-	int   ydiff 	= 0;
-	
-	uint8_t	intstate_x;		// Used to calculate if we should trigger interrupt
-	uint8_t	intstate_y;
-	int     xint;			// X and Y interrupts to trigger
+	int   mouse_x   = 0;    // Current mouse X and Y
+	int   mouse_y   = 0;
+	int   xdiff     = 0;    // Difference from previous X and Y
+	int   ydiff     = 0;
+
+	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
+	uint8_t intstate_y;
+	int     xint;           // X and Y interrupts to trigger
 	int     yint;
 
-	uint8_t   mxa;			// Values of quadrature encoders for X and Y
+	uint8_t   mxa;          // Values of quadrature encoders for X and Y
 	uint8_t   mxb;
 	uint8_t   mya;
 	uint8_t   myb;
 
 	// Read mouse buttons
 	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
-	
+
 	// Read mose positions and calculate difference from previous value
 	mouse_x = m_io_mousex->read();
 	mouse_y = m_io_mousey->read();
 
 	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
 	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
-	
+
 	// check and compensate for wrap.....
-	if (xdiff > 0x80) 
+	if (xdiff > 0x80)
 		xdiff -= 0x100;
 	else if (xdiff < -0x80)
 		xdiff += 0x100;
 
-	if (ydiff > 0x80) 
+	if (ydiff > 0x80)
 		ydiff -= 0x100;
 	else if (ydiff < -0x80)
-		ydiff += 0x100;	
+		ydiff += 0x100;
 
 	// convert movement into emulated movement of quadrature encoder in mouse.
 	if (xdiff < 0)
@@ -1597,7 +1597,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nimbus_mouse.m_mouse_pcy++;
 	else if (ydiff > 0)
 		m_nimbus_mouse.m_mouse_pcy--;
-	
+
 	// Compensate for quadrature wrap.
 	m_nimbus_mouse.m_mouse_pcx &= 0x03;
 	m_nimbus_mouse.m_mouse_pcy &= 0x03;

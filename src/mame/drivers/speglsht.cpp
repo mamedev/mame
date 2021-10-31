@@ -109,6 +109,7 @@ Notes:
 #include "emupal.h"
 #include "machine/st0016.h"
 #include "cpu/mips/mips1.h"
+#include "speaker.h"
 #include <algorithm>
 
 namespace {
@@ -157,7 +158,7 @@ private:
 	uint32_t cop_r(offs_t offset);
 	uint32_t irq_ack_clear();
 
-	uint32_t screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void st0016_rom_bank_w(uint8_t data);
 	void speglsht_mem(address_map &map);
@@ -380,7 +381,7 @@ void speglsht_state::video_start()
 		bitmap.pix(y, x) = (b) | ((g)<<8) | ((r)<<16); \
 }
 
-uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t speglsht_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int dy=(m_videoreg&0x20)?(256*512):0; //visible frame
 
@@ -398,10 +399,10 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 	m_maincpu->draw_screen(screen, *m_bitmap, cliprect);
 
 	//copy temporary bitmap to rgb 32 bit bitmap
-	for(int y=cliprect.min_y; y<cliprect.max_y;y++)
+	for(int y=cliprect.min_y; y<=cliprect.max_y;y++)
 	{
 		uint16_t const *const srcline = &m_bitmap->pix(y);
-		for(int x=cliprect.min_x; x<cliprect.max_x;x++)
+		for(int x=cliprect.min_x; x<=cliprect.max_x;x++)
 		{
 			if(srcline[x])
 			{
@@ -417,12 +418,13 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 void speglsht_state::speglsht(machine_config &config)
 {
 	/* basic machine hardware */
-	ST0016_CPU(config, m_maincpu, 8000000); /* 8 MHz ? */
+	ST0016_CPU(config, m_maincpu, XTAL(42'954'545) / 6); // 7.159 MHz (42.9545 MHz / 6)
 	m_maincpu->set_addrmap(AS_PROGRAM, &speglsht_state::st0016_mem);
 	m_maincpu->set_addrmap(AS_IO, &speglsht_state::st0016_io);
 	m_maincpu->set_vblank_int("screen", FUNC(speglsht_state::irq0_line_hold));
+	m_maincpu->set_screen("screen");
 
-	R3051(config, m_subcpu, 25000000);
+	R3051(config, m_subcpu, XTAL(50'000'000) / 2); // 25 MHz (50 MHz / 2)
 	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
 	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
@@ -435,10 +437,17 @@ void speglsht_state::speglsht(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 319, 8, 239-8);
-	screen.set_screen_update(FUNC(speglsht_state::screen_update_speglsht));
+	screen.set_screen_update(FUNC(speglsht_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
 	PALETTE(config, m_palette).set_entries(16*16*4+1);
+
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
 }
 
 ROM_START( speglsht )

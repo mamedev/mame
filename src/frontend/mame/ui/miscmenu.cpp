@@ -86,21 +86,19 @@ menu_bios_selection::~menu_bios_selection()
     menu_bios_selection - menu that
 -------------------------------------------------*/
 
-void menu_bios_selection::handle()
+void menu_bios_selection::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (ev && ev->itemref)
 	{
-		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		if ((uintptr_t)ev->itemref == 1 && ev->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
 		else
 		{
-			device_t *dev = (device_t *)menu_event->itemref;
+			device_t *dev = (device_t *)ev->itemref;
 			int bios_val = 0;
 
-			switch (menu_event->iptkey)
+			switch (ev->iptkey)
 			{
 				// reset to default
 				case IPT_UI_SELECT:
@@ -111,7 +109,7 @@ void menu_bios_selection::handle()
 				case IPT_UI_LEFT: case IPT_UI_RIGHT:
 				{
 					int const cnt = ([bioses = romload::entries(dev->rom_region()).get_system_bioses()] () { return std::distance(bioses.begin(), bioses.end()); })();
-					bios_val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
+					bios_val = dev->system_bios() + ((ev->iptkey == IPT_UI_LEFT) ? -1 : +1);
 
 					// wrap
 					if (bios_val < 1)
@@ -181,18 +179,21 @@ void menu_network_devices::populate(float &customtop, float &custombottom)
     menu_network_devices - menu that
 -------------------------------------------------*/
 
-void menu_network_devices::handle()
+void menu_network_devices::handle(event const *ev)
 {
-	/* process the menu */
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	// process the menu
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
-			device_network_interface *network = (device_network_interface *)menu_event->itemref;
+		if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
+		{
+			device_network_interface *network = (device_network_interface *)ev->itemref;
 			int curr = network->get_interface();
-			if (menu_event->iptkey == IPT_UI_LEFT) curr--; else curr++;
-			if (curr==-2) curr = netdev_count() - 1;
+			if (ev->iptkey == IPT_UI_LEFT)
+				curr--;
+			else
+				curr++;
+			if (curr == -2)
+				curr = netdev_count() - 1;
 			network->set_interface(curr);
 			reset(reset_options::REMEMBER_REF);
 		}
@@ -205,79 +206,95 @@ void menu_network_devices::handle()
     information menu
 -------------------------------------------------*/
 
-menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_bookkeeping::menu_bookkeeping(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
 {
+	set_process_flags(PROCESS_CUSTOM_NAV);
 }
 
 menu_bookkeeping::~menu_bookkeeping()
 {
 }
 
-void menu_bookkeeping::handle()
+void menu_bookkeeping::menu_activated()
 {
-	/* process the menu */
-	process(0);
+	// stuff can change while the menu is hidden
+	reset_layout();
+}
 
-	/* if the time has rolled over another second, regenerate */
-	attotime const curtime = machine().time();
-	if (prevtime.seconds() != curtime.seconds())
-		reset(reset_options::REMEMBER_POSITION);
+void menu_bookkeeping::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
+{
+	if (!layout || (layout->width() != width))
+	{
+		rgb_t const color = ui().colors().text_color();
+		layout.emplace(ui().create_layout(container(), width));
+
+		// show total time first
+		prevtime = machine().time();
+		if (prevtime.seconds() >= (60 * 60))
+			layout->add_text(util::string_format(_("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60), color);
+		else
+			layout->add_text(util::string_format(_("Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60), color);
+
+		// show tickets at the top
+		int const tickets = machine().bookkeeping().get_dispensed_tickets();
+		if (tickets > 0)
+			layout->add_text(util::string_format(_("Tickets dispensed: %1$d\n\n"), tickets), color);
+
+		// loop over coin counters
+		for (int ctrnum = 0; ctrnum < bookkeeping_manager::COIN_COUNTERS; ctrnum++)
+		{
+			int const count = machine().bookkeeping().coin_counter_get_count(ctrnum);
+			bool const locked = machine().bookkeeping().coin_lockout_get_state(ctrnum);
+
+			// display the coin counter number
+			// display how many coins
+			// display whether or not we are locked out
+			layout->add_text(
+					util::string_format(
+						(count == 0) ? _("Coin %1$c: NA%3$s\n") : _("Coin %1$c: %2$d%3$s\n"),
+						ctrnum + 'A',
+						count,
+						locked ? _(" (locked)") : ""),
+					color);
+		}
+
+		lines = layout->lines();
+	}
+	width = layout->actual_width();
 }
 
 void menu_bookkeeping::populate(float &customtop, float &custombottom)
 {
-	int tickets = machine().bookkeeping().get_dispensed_tickets();
-	std::ostringstream tempstring;
-	int ctrnum;
-
-	/* show total time first */
-	prevtime = machine().time();
-	if (prevtime.seconds() >= (60 * 60))
-		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
-	else
-		util::stream_format(tempstring, _("Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60);
-
-	/* show tickets at the top */
-	if (tickets > 0)
-		util::stream_format(tempstring, _("Tickets dispensed: %1$d\n\n"), tickets);
-
-	/* loop over coin counters */
-	for (ctrnum = 0; ctrnum < bookkeeping_manager::COIN_COUNTERS; ctrnum++)
-	{
-		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
-
-		/* display the coin counter number */
-		/* display how many coins */
-		/* display whether or not we are locked out */
-		util::stream_format(tempstring,
-				(count == 0) ? _("Coin %1$c: NA%3$s\n") : _("Coin %1$c: %2$d%3$s\n"),
-				ctrnum + 'A',
-				count,
-				machine().bookkeeping().coin_lockout_get_state(ctrnum) ? _(" (locked)") : "");
-	}
-
-	/* append the single item */
-	item_append(tempstring.str(), FLAG_MULTILINE, nullptr);
 }
+
+void menu_bookkeeping::handle(event const *ev)
+{
+	// if the time has rolled over another second, regenerate
+	// TODO: what about other bookkeeping events happening with the menu open?
+	attotime const curtime = machine().time();
+	if (curtime.seconds() != prevtime.seconds())
+		reset_layout();
+
+	if (ev)
+		handle_key(ev->iptkey);
+}
+
 
 /*-------------------------------------------------
     menu_crosshair - handle the crosshair settings
     menu
 -------------------------------------------------*/
 
-void menu_crosshair::handle()
+void menu_crosshair::handle(event const *ev)
 {
-	// process the menu
-	event const *const menu_event(process(PROCESS_LR_REPEAT));
-
 	// handle events
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
-		crosshair_item_data &data(*reinterpret_cast<crosshair_item_data *>(menu_event->itemref));
+		crosshair_item_data &data(*reinterpret_cast<crosshair_item_data *>(ev->itemref));
 		bool changed(false);
 		int newval(data.cur);
 
-		switch (menu_event->iptkey)
+		switch (ev->iptkey)
 		{
 		// if selected, reset to default value
 		case IPT_UI_SELECT:
@@ -325,7 +342,7 @@ void menu_crosshair::handle()
 		// crosshair graphic name
 		if (data.type == CROSSHAIR_ITEM_PIC)
 		{
-			switch (menu_event->iptkey)
+			switch (ev->iptkey)
 			{
 			case IPT_UI_SELECT:
 				{
@@ -371,6 +388,7 @@ void menu_crosshair::handle()
 
 menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container) : menu(mui, container)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 void menu_crosshair::populate(float &customtop, float &custombottom)
@@ -559,12 +577,12 @@ void menu_quit_game::populate(float &customtop, float &custombottom)
 {
 }
 
-void menu_quit_game::handle()
+void menu_quit_game::handle(event const *ev)
 {
-	/* request a reset */
+	// request a reset
 	machine().schedule_exit();
 
-	/* reset the menu stack */
+	// reset the menu stack
 	stack_reset();
 }
 
@@ -582,21 +600,19 @@ menu_export::~menu_export()
 }
 
 //-------------------------------------------------
-//  handlethe options menu
+//  handle the export menu
 //-------------------------------------------------
 
-void menu_export::handle()
+void menu_export::handle(event const *ev)
 {
 	// process the menu
-	process_parent();
-	const event *const menu_event = process(PROCESS_NOIMAGE);
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
-		switch (uintptr_t(menu_event->itemref))
+		switch (uintptr_t(ev->itemref))
 		{
 		case 1:
 		case 3:
-			if (menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_SELECT)
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
@@ -631,7 +647,7 @@ void menu_export::handle()
 					};
 
 					// do we want to show devices?
-					bool include_devices = uintptr_t(menu_event->itemref) == 1;
+					bool include_devices = uintptr_t(ev->itemref) == 1;
 
 					// and do the dirty work
 					info_xml_creator creator(machine().options());
@@ -641,7 +657,7 @@ void menu_export::handle()
 			}
 			break;
 		case 2:
-			if (menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_SELECT)
 			{
 				std::string filename("exported");
 				emu_file infile(ui().options().ui_path(), OPEN_FLAG_READ);
@@ -704,13 +720,10 @@ menu_machine_configure::menu_machine_configure(
 		mame_ui_manager &mui,
 		render_container &container,
 		ui_system_info const &info,
-		std::function<void (bool, bool)> &&handler,
-		float x0, float y0)
+		std::function<void (bool, bool)> &&handler)
 	: menu(mui, container)
 	, m_handler(std::move(handler))
 	, m_sys(info)
-	, m_x0(x0)
-	, m_y0(y0)
 	, m_curbios(0)
 	, m_was_favorite(mame_machine_manager::instance()->favorite().is_favorite_system(*info.driver))
 	, m_want_favorite(m_was_favorite)
@@ -737,19 +750,18 @@ menu_machine_configure::~menu_machine_configure()
 }
 
 //-------------------------------------------------
-//  handlethe options menu
+//  handle the machine options menu
 //-------------------------------------------------
 
-void menu_machine_configure::handle()
+void menu_machine_configure::handle(event const *ev)
 {
 	// process the menu
-	process_parent();
-	const event *menu_event = process(PROCESS_NOIMAGE, m_x0, m_y0);
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	//process_parent(); FIXME: drawn in the wrong order, can't see menu
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_SELECT)
 		{
-			switch ((uintptr_t)menu_event->itemref)
+			switch ((uintptr_t)ev->itemref)
 			{
 			case SAVE:
 				{
@@ -773,24 +785,24 @@ void menu_machine_configure::handle()
 				reset(reset_options::REMEMBER_POSITION);
 				break;
 			case CONTROLLER:
-				if (menu_event->iptkey == IPT_UI_SELECT)
+				if (ev->iptkey == IPT_UI_SELECT)
 					menu::stack_push<submenu>(ui(), container(), submenu::control_options(), m_sys.driver, &m_opts);
 				break;
 			case VIDEO:
-				if (menu_event->iptkey == IPT_UI_SELECT)
+				if (ev->iptkey == IPT_UI_SELECT)
 					menu::stack_push<submenu>(ui(), container(), submenu::video_options(), m_sys.driver, &m_opts);
 				break;
 			case ADVANCED:
-				if (menu_event->iptkey == IPT_UI_SELECT)
+				if (ev->iptkey == IPT_UI_SELECT)
 					menu::stack_push<submenu>(ui(), container(), submenu::advanced_options(), m_sys.driver, &m_opts);
 				break;
 			default:
 				break;
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+		else if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 		{
-			(menu_event->iptkey == IPT_UI_LEFT) ? --m_curbios : ++m_curbios;
+			(ev->iptkey == IPT_UI_LEFT) ? --m_curbios : ++m_curbios;
 			m_opts.set_value(OPTION_BIOS, m_bios[m_curbios].second, OPTION_PRIORITY_CMDLINE);
 			reset(reset_options::REMEMBER_POSITION);
 		}
@@ -903,21 +915,19 @@ menu_plugins_configure::~menu_plugins_configure()
 }
 
 //-------------------------------------------------
-//  handlethe options menu
+//  handle the plugins menu
 //-------------------------------------------------
 
-void menu_plugins_configure::handle()
+void menu_plugins_configure::handle(event const *ev)
 {
 	// process the menu
 	bool changed = false;
-	plugin_options& plugins = mame_machine_manager::instance()->plugins();
-	process_parent();
-	const event *menu_event = process(PROCESS_NOIMAGE);
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	plugin_options &plugins = mame_machine_manager::instance()->plugins();
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT)
 		{
-			plugin_options::plugin *p = plugins.find((const char*)menu_event->itemref);
+			plugin_options::plugin *p = plugins.find((const char*)ev->itemref);
 			if (p)
 			{
 				p->m_start = !p->m_start;

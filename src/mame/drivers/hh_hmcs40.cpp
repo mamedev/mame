@@ -24,7 +24,7 @@ known chips:
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
  @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
- *A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
+  A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *A41     HD38800  1982, Gakken Puck Monster

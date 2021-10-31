@@ -171,7 +171,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	ui_software_info const &m_uiinfo;
 	s_parts const          m_parts;
@@ -191,7 +191,7 @@ private:
 	bios_selection(mame_ui_manager &mui, render_container &container, s_bios &&biosname, void const *driver, bool software, bool inlist);
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void const  *m_driver;
 	bool        m_software, m_inlist;
@@ -294,15 +294,14 @@ void menu_select_launch::software_parts::populate(float &customtop, float &custo
 //  handle
 //-------------------------------------------------
 
-void menu_select_launch::software_parts::handle()
+void menu_select_launch::software_parts::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-	if (menu_event && (menu_event->iptkey) == IPT_UI_SELECT && menu_event->itemref)
+	if (ev && (ev->iptkey == IPT_UI_SELECT) && ev->itemref)
 	{
 		for (auto const &elem : m_parts)
 		{
-			if ((void*)&elem == menu_event->itemref)
+			if ((void*)&elem == ev->itemref)
 			{
 				launch_system(ui(), *m_uiinfo.driver, &m_uiinfo, &elem.first, nullptr);
 				break;
@@ -374,15 +373,14 @@ void menu_select_launch::bios_selection::populate(float &customtop, float &custo
 //  handle
 //-------------------------------------------------
 
-void menu_select_launch::bios_selection::handle()
+void menu_select_launch::bios_selection::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-	if (menu_event && menu_event->iptkey == IPT_UI_SELECT && menu_event->itemref)
+	if (ev && (ev->iptkey == IPT_UI_SELECT) && ev->itemref)
 	{
 		for (auto & elem : m_bios)
 		{
-			if ((void*)&elem.first == menu_event->itemref)
+			if ((void*)&elem.first == ev->itemref)
 			{
 				if (!m_software)
 				{
@@ -541,6 +539,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_flags(256)
 {
 	set_needs_prev_menu_item(false);
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 
@@ -636,7 +635,7 @@ void menu_select_launch::launch_system(mame_ui_manager &mui, game_driver const &
 
 	mame_machine_manager::instance()->schedule_new_driver(driver);
 	mui.machine().schedule_hard_reset();
-	stack_reset(mui.machine());
+	stack_reset(mui);
 }
 
 
@@ -675,11 +674,11 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		tempbuf[0] = make_software_description(*swinfo, system);
 
 		// next line is year, publisher
-		tempbuf[1] = string_format(_("%1$s, %2$-.100s"), swinfo->year, swinfo->publisher);
+		tempbuf[1] = string_format(_("%1$s, %2$s"), swinfo->year, swinfo->publisher);
 
 		// next line is parent/clone
 		if (!swinfo->parentname.empty())
-			tempbuf[2] = string_format(_("Software is clone of: %1$-.100s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname : swinfo->parentname);
+			tempbuf[2] = string_format(_("Software is clone of: %1$s"), !swinfo->parentlongname.empty() ? swinfo->parentlongname : swinfo->parentname);
 		else
 			tempbuf[2] = _("Software is parent");
 
@@ -706,7 +705,7 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		isstar = mame_machine_manager::instance()->favorite().is_favorite_system(driver);
 
 		// first line is year, manufacturer
-		tempbuf[0] = string_format(_("%1$s, %2$-.100s"), driver.year, driver.manufacturer);
+		tempbuf[0] = string_format(_("%1$s, %2$s"), driver.year, driver.manufacturer);
 
 		// next line is clone/parent status
 		int cloneof = driver_list::non_bios_clone(driver);
@@ -714,9 +713,9 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 		if (0 > cloneof)
 			tempbuf[1] = _("Driver is parent");
 		else if (system)
-			tempbuf[1] = string_format(_("Driver is clone of: %1$-.100s"), system->parent);
+			tempbuf[1] = string_format(_("Driver is clone of: %1$s"), system->parent);
 		else
-			tempbuf[1] = string_format(_("Driver is clone of: %1$-.100s"), driver_list::driver(cloneof).type.fullname());
+			tempbuf[1] = string_format(_("Driver is clone of: %1$s"), driver_list::driver(cloneof).type.fullname());
 
 		// next line is overall driver status
 		system_flags const &flags(get_system_flags(driver));
@@ -749,12 +748,13 @@ void menu_select_launch::custom_render(void *selectedref, float top, float botto
 	else
 	{
 		std::string copyright(emulator_info::get_copyright());
-		size_t found = copyright.find('\n');
+		size_t found1 = copyright.find_first_of('\n');
+		size_t found2 = copyright.find_last_of('\n');
 
-		tempbuf[0].clear();
-		tempbuf[1] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
-		tempbuf[2] = copyright.substr(0, found);
-		tempbuf[3] = copyright.substr(found + 1);
+		tempbuf[0] = string_format(_("%1$s %2$s"), emulator_info::get_appname(), build_version);
+		tempbuf[1] = copyright.substr(0, found1);
+		tempbuf[2] = copyright.substr(found1 + 1, found2 - (found1 + 1));
+		tempbuf[3] = copyright.substr(found2 + 1);
 	}
 
 	// draw the footer
@@ -1277,7 +1277,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 		float const ypos = y2 + ui().get_line_height() + 2.0f * ui().box_tb_border();
 		ui().draw_text_box(
 				container(),
-				have_parent ? _("Return to previous menu") : _("Exit"),
+				have_parent ? _("Return to Previous Menu") : _("Exit"),
 				text_layout::text_justify::RIGHT, 1.0f - lr_border, ypos,
 				ui().colors().background_color());
 	}
@@ -1406,8 +1406,6 @@ void menu_select_launch::get_title_search(std::string &snaptext, std::string &se
 
 void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 {
-	bool const ignorepause = stack_has_special_main_menu();
-
 	// bail if no items
 	if (item_count() == 0)
 		return;
@@ -1602,15 +1600,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			rotate_focus(-1);
 	}
 
-	// pause enables/disables pause
-	if (!m_ui_error && !ignorepause && exclusive_input_pressed(iptkey, IPT_UI_PAUSE, 0))
-	{
-		if (machine().paused())
-			machine().resume();
-		else
-			machine().pause();
-	}
-
 	// handle a toggle cheats request
 	if (!m_ui_error && machine().ui_input().pressed_repeat(IPT_UI_TOGGLE_CHEAT, 0))
 		mame_machine_manager::instance()->cheat().set_enable(!mame_machine_manager::instance()->cheat().enabled());
@@ -1627,6 +1616,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			{
 			case IPT_UI_FOCUS_NEXT:
 			case IPT_UI_FOCUS_PREV:
+			case IPT_UI_PAUSE:
 				continue;
 			case IPT_UI_LEFT:
 				if (ignoreleft)
@@ -1634,10 +1624,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 				break;
 			case IPT_UI_RIGHT:
 				if (ignoreright)
-					continue;
-				break;
-			case IPT_UI_PAUSE:
-				if (ignorepause)
 					continue;
 				break;
 			}

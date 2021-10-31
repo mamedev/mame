@@ -4,7 +4,7 @@ local exports = {
 	name = 'inputmacro',
 	version = '0.0.1',
 	description = 'Input macro plugin',
-	license = 'The BSD 3-Clause License',
+	license = 'BSD-3-Clause',
 	author = { name = 'Vas Crabb' } }
 
 
@@ -127,7 +127,7 @@ function inputmacro.startplugin()
 	emu.register_frame_done(process_frame)
 	emu.register_start(start)
 	emu.register_stop(stop)
-	emu.register_menu(menu_callback, menu_populate, _('Input Macros'))
+	emu.register_menu(menu_callback, menu_populate, _p('plugin-inputmacro', 'Input Macros'))
 end
 
 return exports

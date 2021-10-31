@@ -8,17 +8,21 @@
 
 #include "input_module.h"
 
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
 
 // MAMEOS headers
 #include "winmain.h"
 
+#include "util/language.h"
+
+#include "osdepend.h"
+
 #include "input_common.h"
 #include "input_windows.h"
+
 
 bool windows_osd_interface::should_hide_mouse() const
 {
@@ -81,23 +85,11 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 	for (input_type_entry &entry : typelist)
 		switch (entry.type())
 		{
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
-#else
-			// UWP: Hotkey Select + X => UI_CONFIGURE (Menu)
-			case IPT_UI_CONFIGURE:
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::or_code, JOYCODE_SELECT, JOYCODE_BUTTON3);
-				break;
-
-			// UWP: Hotkey Select + Start => CANCEL
-			case IPT_UI_CANCEL:
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ESC, input_seq::or_code, JOYCODE_SELECT, JOYCODE_START);
-				break;
-#endif
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
 				uimode = options().ui_mode_key();
@@ -116,15 +108,16 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 
 			// alt-enter for fullscreen
 			case IPT_OSD_1:
-				entry.configure_osd("TOGGLE_FULLSCREEN", "Toggle Fullscreen");
+				entry.configure_osd("TOGGLE_FULLSCREEN", N_p("input-name", "Toggle Fullscreen"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ENTER, KEYCODE_LALT, input_seq::or_code, KEYCODE_ENTER, KEYCODE_RALT);
 				break;
 
 			// lalt-F12 for fullscreen snap (HLSL)
 			case IPT_OSD_2:
-				entry.configure_osd("RENDER_SNAP", "Take Rendered Snapshot");
+				entry.configure_osd("RENDER_SNAP", N_p("input-name", "Take Rendered Snapshot"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LALT, input_seq::not_code, KEYCODE_LSHIFT);
 				break;
+
 			// add a NOT-lalt to our default F12
 			case IPT_UI_SNAPSHOT: // emu/input.c: input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT)
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
@@ -132,7 +125,7 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 
 			// lshift-lalt-F12 for fullscreen video (HLSL, BGFX)
 			case IPT_OSD_3:
-				entry.configure_osd("RENDER_AVI", "Record Rendered Video");
+				entry.configure_osd("RENDER_AVI", N_p("input-name", "Record Rendered Video"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
 				break;
 
@@ -153,7 +146,7 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 
 			// lctrl-lalt-F5 to toggle post-processing
 			case IPT_OSD_4:
-				entry.configure_osd("POST_PROCESS", "Toggle Post-Processing");
+				entry.configure_osd("POST_PROCESS", N_p("input-name", "Toggle Post-Processing"));
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LALT, KEYCODE_LCONTROL);
 				break;
 
@@ -163,4 +156,4 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 		}
 }
 
-#endif // defined(OSD_WINDOWS) || defined(OSD_UWP)
+#endif // defined(OSD_WINDOWS)

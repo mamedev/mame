@@ -387,7 +387,7 @@ void galaxian_state::eagle_palette(palette_device &palette)
 void galaxian_state::video_start()
 {
 	/* create a tilemap for the background */
-	if (!m_sfx_tilemap)
+	if (!m_sfx_adjust)
 	{
 		/* normal galaxian hardware is row-based and individually scrolling columns */
 		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(galaxian_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, m_x_scale*8,8, 32,32);
@@ -518,7 +518,7 @@ void galaxian_state::galaxian_objram_w(offs_t offset, uint8_t data)
 			/* Frogger: top and bottom 4 bits swapped entering the adder */
 			if (m_frogger_adjust)
 				data = (data >> 4) | (data << 4);
-			if (!m_sfx_tilemap)
+			if (!m_sfx_adjust)
 				m_bg_tilemap->set_scrolly(offset >> 1, data);
 			else
 				m_bg_tilemap->set_scrollx(offset >> 1, m_x_scale*data);
@@ -561,10 +561,13 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	for (sprnum = 7; sprnum >= 0; sprnum--)
 	{
 		const uint8_t *base = &spritebase[sprnum * 4];
+
 		/* Frogger: top and bottom 4 bits swapped entering the adder */
 		uint8_t base0 = m_frogger_adjust ? ((base[0] >> 4) | (base[0] << 4)) : base[0];
-		/* the first three sprites match against y-1 */
-		uint8_t sy = 240 - (base0 - (sprnum < 3));
+
+		/* the first three sprites match against y-1 (seems other way around for sfx/monsterz) */
+		uint8_t sy = 240 - (base0 - (m_sfx_adjust ? (sprnum >= 3) : (sprnum < 3)));
+
 		uint16_t code = base[1] & 0x3f;
 		uint8_t flipx = base[1] & 0x40;
 		uint8_t flipy = base[1] & 0x80;
@@ -930,12 +933,8 @@ void galaxian_state::null_draw_background(bitmap_rgb32 &bitmap, const rectangle 
 }
 
 
-
-void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void galaxian_state::galaxian_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx)
 {
-	/* erase the background to black first */
-	bitmap.fill(rgb_t::black(), cliprect);
-
 	/* update the star origin to the current frame */
 	stars_update_origin();
 
@@ -948,9 +947,18 @@ void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectan
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint32_t star_offs = m_star_rng_origin + y * 512;
-			stars_draw_row(bitmap, 256, y, star_offs, 0xff);
+			stars_draw_row(bitmap, maxx, y, star_offs, 0xff);
 		}
 	}
+}
+
+
+void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	/* erase the background to black first */
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	galaxian_draw_stars(bitmap, cliprect, 256);
 }
 
 
@@ -1066,7 +1074,7 @@ void galaxian_state::turtles_draw_background(bitmap_rgb32 &bitmap, const rectang
 }
 
 
-void taiyo_sfx_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void nihon_sfx_state::sfx_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// current schematics are unreadable, assuming like Turtles
 	bitmap.fill(rgb_t(m_background_red * 0x55, m_background_green * 0x47, m_background_blue * 0x55), cliprect);
@@ -1227,6 +1235,12 @@ void galaxian_state::theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &c
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
 	galaxian_draw_pixel(bitmap, cliprect, y, x++, rgb_t(m_bullet_color[offs].r(), m_bullet_color[offs].b(), m_bullet_color[offs].g()));
+}
+
+
+void nihon_sfx_state::sfx_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+{
+	scramble_draw_bullet(bitmap, cliprect, offs, x + 16, y);
 }
 
 
