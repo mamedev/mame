@@ -394,27 +394,25 @@ menu_select_software::~menu_select_software()
 //  handle
 //-------------------------------------------------
 
-void menu_select_software::handle()
+void menu_select_software::handle(event const *ev)
 {
 	if (m_prev_selected == nullptr)
 		m_prev_selected = item(0).ref;
 
-	// ignore pause keys by swallowing them before we process the menu
-	machine().ui_input().pressed(IPT_UI_PAUSE);
+	// FIXME: everything above here used run before events were processed
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event)
+	if (ev)
 	{
 		if (dismiss_error())
 		{
-			// reset the error on any future event
+			// reset the error on any subsequent menu event
 		}
-		else switch (menu_event->iptkey)
+		else switch (ev->iptkey)
 		{
 		case IPT_UI_SELECT:
-			if ((get_focus() == focused_menu::MAIN) && menu_event->itemref)
-				inkey_select(menu_event);
+			if ((get_focus() == focused_menu::MAIN) && ev->itemref)
+				inkey_select(ev);
 			break;
 
 		case IPT_UI_LEFT:
@@ -470,12 +468,12 @@ void menu_select_software::handle()
 			break;
 
 		default:
-			if (menu_event->itemref)
+			if (ev->itemref)
 			{
-				if (menu_event->iptkey == IPT_UI_FAVORITES)
+				if (ev->iptkey == IPT_UI_FAVORITES)
 				{
 					// handle UI_FAVORITES
-					ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
+					ui_software_info *swinfo = (ui_software_info *)ev->itemref;
 
 					if ((uintptr_t)swinfo > 2)
 					{

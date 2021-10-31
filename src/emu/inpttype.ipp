@@ -8,18 +8,14 @@
 
 ***************************************************************************/
 
+#include "util/language.h"
+
 
 /***************************************************************************
     BUILT-IN CORE MAPPINGS
 ***************************************************************************/
 
 namespace {
-
-// can't get frontend/mame/language.h from here
-#ifndef N_p
-#define N_p(ctx, msg) (msg)
-#endif
-
 
 #define CORE_INPUT_TYPES_P1 \
 		CORE_INPUT_TYPES_BEGIN(p1) \

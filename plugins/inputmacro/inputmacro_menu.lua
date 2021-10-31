@@ -9,6 +9,7 @@ local MENU_TYPES = { MACROS = 0, ADD = 1, EDIT = 2, INPUT = 3 }
 
 -- Globals
 
+local commonui
 local macros
 local menu_stack
 
@@ -51,118 +52,43 @@ end
 
 -- Input menu
 
-local input_action
+local input_menu
 local input_start_field
-local input_choices
-local input_item_first_choice
-local input_item_cancel
 
-function handle_input(index, action)
-	if (action == 'cancel') or ((index == input_item_cancel) and (action == 'select')) then
-		table.remove(menu_stack)
-		input_action = nil
-		return true
-	elseif action == 'select' then
-		field = input_choices[index - input_item_first_choice + 1]
-		if field then
-			table.remove(menu_stack)
-			input_action(field)
-			input_action = nil
+function start_input_menu(handler, start_field)
+	local function supported(f)
+		if f.is_analog or f.is_toggle then
+			return false
+		elseif (f.type_class == 'config') or (f.type_class == 'dipswitch') then
+			return false
+		else
 			return true
 		end
 	end
-	return false
+
+	local function action(field)
+		if field then
+			handler(field)
+		end
+		table.remove(menu_stack)
+		input_menu = nil
+		input_start_field = nil
+	end
+
+	if not commonui then
+		commonui = require('commonui')
+	end
+	input_menu = commonui.input_selection_menu(action, _p('plugin-inputmacro', 'Set Input'), supported)
+	input_start_field = start_field
+	table.insert(menu_stack, MENU_TYPES.INPUT)
+end
+
+function handle_input(index, action)
+	return input_menu:handle(index, action)
 end
 
 function populate_input()
-	local items = { }
-
-	items[#items + 1] = { _p('plugin-inputmacro', 'Set Input'), '', 'off' }
-	items[#items + 1] = { '---', '', '' }
-
-	if not input_choices then
-		local ioport = manager.machine.ioport
-
-		local function supported(f)
-			if f.is_analog or f.is_toggle then
-				return false
-			elseif (f.type_class == 'config') or (f.type_class == 'dipswitch') then
-				return false
-			else
-				return true
-			end
-		end
-
-		local function compare(a, b)
-			if a.device.tag < b.device.tag then
-				return true
-			elseif a.device.tag > b.device.tag then
-				return false
-			end
-			groupa = ioport:type_group(a.type, a.player)
-			groupb = ioport:type_group(b.type, b.player)
-			if groupa < groupb then
-				return true
-			elseif groupa > groupb then
-				return false
-			elseif a.type < b.type then
-				return true
-			elseif a.type > b.type then
-				return false
-			else
-				return a.name < b.name
-			end
-		end
-
-		input_choices = { }
-		for tag, port in pairs(manager.machine.ioport.ports) do
-			for name, field in pairs(port.fields) do
-				if supported(field) then
-					table.insert(input_choices, field)
-				end
-			end
-		end
-		table.sort(input_choices, compare)
-
-		local index = 1
-		local prev
-		while index <= #input_choices do
-			local current = input_choices[index]
-			if (not prev) or (prev.device.tag ~= current.device.tag) then
-				table.insert(input_choices, index, false)
-				index = index + 2
-			else
-				index = index + 1
-			end
-			prev = current
-		end
-	end
-
-	input_item_first_choice = #items + 1
-	local selection = input_item_first_choice
-	for index, field in ipairs(input_choices) do
-		if field then
-			items[#items + 1] = { _p('input-name', field.name), '', '' }
-			if input_start_field and (field.port.tag == input_start_field.port.tag) and (field.mask == input_start_field.mask) and (field.type == input_start_field.type) then
-				selection = #items
-				input_start_field = nil
-			end
-		else
-			local device = input_choices[index + 1].device
-			if device.owner then
-				items[#items + 1] = { string.format(_('plugin-inputmacro', '%s [root%s]'), device.name, device.tag), '', 'heading' }
-			else
-				items[#items + 1] = { string.format(_('plugin-inputmacro', '[root%s]'), device.tag), '', 'heading' }
-			end
-		end
-	end
-	input_start_field = nil
-
-	items[#items + 1] = { '---', '', '' }
-	items[#items + 1] = { _p('plugin-inputmacro', 'Cancel'), '', '' }
-	input_item_cancel = #items
-
-	return items, selection
+	return input_menu:populate(input_start_field)
 end
 
 
@@ -176,6 +102,7 @@ local edit_insert_position
 local edit_name_buffer
 local edit_items
 local edit_item_exit
+local edit_switch_poller
 
 local function current_macro_complete()
 	if not edit_current_macro.binding then
@@ -188,36 +115,18 @@ local function current_macro_complete()
 	return true
 end
 
-local function set_binding()
-	local input = manager.machine.input
-	local poller = input:switch_sequence_poller()
-	manager.machine:popmessage(_p('plugin-inputmacro', 'Enter activation sequence or wait to leave unchanged'))
-	manager.machine.video:frame_update()
-	poller:start()
-	local time = os.clock()
-	local clearmsg = true
-	while (not poller:poll()) and (poller.modified or (os.clock() < (time + 1))) do
-		if poller.modified then
-			if not poller.valid then
-				manager.machine:popmessage(_p('plugin-inputmacro', 'Invalid sequence entered'))
-				clearmsg = false
-				break
-			end
-			manager.machine:popmessage(input:seq_name(poller.sequence))
-			manager.machine.video:frame_update()
-		end
-	end
-	if clearmsg then
-		manager.machine:popmessage()
-	end
-	if poller.valid then
-		edit_current_macro.binding = poller.sequence
-		return true
-	end
-	return false
-end
-
 local function handle_edit_items(index, event)
+	if edit_switch_poller then
+		if edit_switch_poller:poll() then
+			if edit_switch_poller.sequence then
+				edit_current_macro.binding = edit_switch_poller.sequence
+			end
+			edit_switch_poller = nil
+			return true
+		end
+		return false
+	end
+
 	local command = edit_items[index]
 
 	local namecancel = false
@@ -275,7 +184,11 @@ local function handle_edit_items(index, event)
 		end
 	elseif command.action == 'binding' then
 		if event == 'select' then
-			return set_binding()
+			if not commonui then
+				commonui = require('commonui')
+			end
+			edit_switch_poller = commonui.switch_polling_helper()
+			return true
 		end
 	elseif command.action == 'releaseaction' then
 		if (event == 'select') or (event == 'left') or (event == 'right') then
@@ -320,14 +233,13 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'input' then
 		local inputs = edit_current_macro.steps[command.step].inputs
 		if event == 'select' then
-			input_action =
+			local hanlder =
 				function(field)
 					inputs[command.input].port = field.port
 					inputs[command.input].field = field
 				end
-			input_start_field = inputs[command.input].field
+			start_input_menu(hanlder, inputs[command.input].field)
 			edit_start_selection = index
-			table.insert(menu_stack, MENU_TYPES.INPUT)
 			return true
 		elseif event == 'clear' then
 			if #inputs > 1 then
@@ -338,14 +250,14 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'addinput' then
 		if event == 'select' then
 			local inputs = edit_current_macro.steps[command.step].inputs
-			input_action =
+			local handler =
 				function(field)
 					inputs[#inputs + 1] = {
 						port = field.port,
 						field = field }
 				end
+			start_input_menu(handler)
 			edit_start_selection = index
-			table.insert(menu_stack, MENU_TYPES.INPUT)
 			return true
 		end
 	elseif command.action == 'deletestep' then
@@ -368,7 +280,7 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'addstep' then
 		if event == 'select' then
 			local steps = edit_current_macro.steps
-			input_action =
+			local handler =
 				function(field)
 					local newstep = {
 						inputs = {
@@ -384,8 +296,8 @@ local function handle_edit_items(index, event)
 					edit_start_step = edit_insert_position
 					edit_insert_position = edit_insert_position + 1
 				end
+			start_input_menu(handler)
 			edit_start_selection = index
-			table.insert(menu_stack, MENU_TYPES.INPUT)
 			return true
 		elseif event == 'left' then
 			edit_insert_position = edit_insert_position - 1
@@ -413,7 +325,7 @@ local function add_edit_items(items)
 
 	local binding = edit_current_macro.binding
 	local activation = binding and input:seq_name(binding) or _p('plugin-inputmacro', '[not set]')
-	items[#items + 1] = { _p('plugin-inputmacro', 'Activation sequence'), activation, '' }
+	items[#items + 1] = { _p('plugin-inputmacro', 'Activation sequence'), activation, edit_switch_poller and 'lr' or '' }
 	edit_items[#items] = { action = 'binding' }
 
 	local releaseaction = edit_current_macro.earlycancel and _p('plugin-inputmacro', 'Stop immediately') or _p('plugin-inputmacro', 'Complete macro')
@@ -484,7 +396,6 @@ local function handle_add(index, event)
 	if handle_edit_items(index, event) then
 		return true
 	elseif event == 'cancel' then
-		input_choices = nil
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
@@ -495,7 +406,6 @@ local function handle_add(index, event)
 			table.insert(macros, edit_current_macro)
 			macros_start_macro = #macros
 		end
-		input_choices = nil
 		edit_menu_active = false
 		edit_current_macro = nil
 		edit_items = nil
@@ -509,7 +419,6 @@ local function handle_edit(index, event)
 	if handle_edit_items(index, event) then
 		return true
 	elseif (event == 'cancel') or ((index == edit_item_exit) and (event == 'select')) then
-		input_choices = nil
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
@@ -537,7 +446,11 @@ local function populate_add()
 
 	local selection = edit_start_selection
 	edit_start_selection = nil
-	return items, selection, 'lrrepeat'
+	if edit_switch_poller then
+		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
+	else
+		return items, selection, 'lrrepeat'
+	end
 end
 
 local function populate_edit()
@@ -554,7 +467,11 @@ local function populate_edit()
 
 	local selection = edit_start_selection
 	edit_start_selection = nil
-	return items, selection, 'lrrepeat'
+	if edit_switch_poller then
+		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
+	else
+		return items, selection, 'lrrepeat'
+	end
 end
 
 
@@ -601,7 +518,7 @@ function populate_macros()
 	local items = { }
 
 	items[#items + 1] = { _p('plugin-inputmacro', 'Input Macros'), '', 'off' }
-	items[#items + 1] = { string.format(_p('plugin-inputmacro', 'Press %s to delete'), input:seq_name(ioport:type_seq(ioport:token_to_input_type('UI_CLEAR')))), '', 'off' }
+	items[#items + 1] = { string.format(_p('plugin-inputmacro', 'Press %s to delete'), manager.ui:get_general_input_setting(ioport:token_to_input_type('UI_CLEAR'))), '', 'off' }
 	items[#items + 1] = { '---', '', '' }
 
 	macros_item_first_macro = #items + 1

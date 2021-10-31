@@ -124,14 +124,12 @@ void menu_software_parts::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_software_parts::handle()
+void menu_software_parts::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(0);
-
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT && event->itemref != nullptr)
+	if (ev && (ev->iptkey == IPT_UI_SELECT) && ev->itemref)
 	{
-		software_part_menu_entry *entry = (software_part_menu_entry *) event->itemref;
+		software_part_menu_entry *entry = (software_part_menu_entry *)ev->itemref;
 		m_result = entry->type;
 		*m_selected_part = entry->part;
 		stack_pop();
@@ -239,16 +237,14 @@ void menu_software_list::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_software_list::handle()
+void menu_software_list::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(0);
-
-	if (event)
+	if (ev)
 	{
-		if (event->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_SELECT)
 		{
-			if (event->itemref == ITEMREF_SWITCH_ITEM_ORDERING)
+			if (ev->itemref == ITEMREF_SWITCH_ITEM_ORDERING)
 			{
 				m_ordered_by_shortname = !m_ordered_by_shortname;
 
@@ -262,23 +258,23 @@ void menu_software_list::handle()
 							? _("Switched Order: entries now ordered by shortname")
 							: _("Switched Order: entries now ordered by description"));
 			}
-			else if (event->itemref)
+			else if (ev->itemref)
 			{
 				// handle selections
-				entry_info *info = (entry_info *) event->itemref;
+				entry_info *info = (entry_info *)ev->itemref;
 				m_result = info->short_name;
 				stack_pop();
 			}
 		}
-		else if (event->iptkey == IPT_SPECIAL)
+		else if (ev->iptkey == IPT_SPECIAL)
 		{
-			if (input_character(m_search, event->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : [] (char32_t ch) { return true; }))
+			if (input_character(m_search, ev->unichar, m_ordered_by_shortname ? is_valid_softlist_part_char : [] (char32_t ch) { return true; }))
 			{
 				// display the popup
 				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_search);
 
 				// identify the selected entry
-				entry_info const *const cur_selected = (uintptr_t(event->itemref) != 1)
+				entry_info const *const cur_selected = (uintptr_t(ev->itemref) != 1)
 						? reinterpret_cast<entry_info const *>(get_selection_ref())
 						: nullptr;
 
@@ -315,7 +311,7 @@ void menu_software_list::handle()
 				}
 			}
 		}
-		else if (event->iptkey == IPT_UI_CANCEL)
+		else if (ev->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
 			if (!m_search.empty())
@@ -410,15 +406,13 @@ void menu_software::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_software::handle()
+void menu_software::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(0);
-
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
-		//menu::stack_push<menu_software_list>(ui(), container(), (software_list_config *)event->itemref, image);
-		*m_result = reinterpret_cast<software_list_device *>(event->itemref);
+		//menu::stack_push<menu_software_list>(ui(), container(), (software_list_config *)ev->itemref, image);
+		*m_result = reinterpret_cast<software_list_device *>(ev->itemref);
 		stack_pop();
 	}
 }

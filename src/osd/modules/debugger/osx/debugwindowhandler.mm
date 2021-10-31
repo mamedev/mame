@@ -114,7 +114,7 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 				keyEquivalent:@"b"];
 	[newMenu addItemWithTitle:@"Devices Window"
 					   action:@selector(debugNewDevicesWindow:)
-				keyEquivalent:@"D"];
+				keyEquivalent:@""];
 
 	[menu addItem:[NSMenuItem separatorItem]];
 

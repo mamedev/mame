@@ -51,6 +51,7 @@
 #include "ui/uimain.h"
 
 #include "util/ioprocsfilter.h"
+#include "util/language.h"
 #include "util/path.h"
 #include "util/xmlfile.h"
 
@@ -1693,6 +1694,8 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 
 void render_target::load_additional_layout_files(const char *basename, bool have_artwork)
 {
+	using util::lang_translate;
+
 	m_external_artwork = false;
 
 	// if override_artwork defined, load that and skip artwork other than default
@@ -1841,7 +1844,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			viewnode->set_attribute(
 					"name",
 					util::string_format(
-						"Screen %1$u Standard (%2$u:%3$u)",
+						_("view-name", "Screen %1$u Standard (%2$u:%3$u)"),
 						i, screens[i].physical_x(), screens[i].physical_y()).c_str());
 			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 			if (!screennode)
@@ -1867,7 +1870,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				viewnode->set_attribute(
 						"name",
 						util::string_format(
-							"Screen %1$u Pixel Aspect (%2$u:%3$u)",
+							_("view-name", "Screen %1$u Pixel Aspect (%2$u:%3$u)"),
 							i, screens[i].native_x(), screens[i].native_y()).c_str());
 				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 				if (!screennode)
@@ -1889,7 +1892,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			viewnode->set_attribute("name", "Cocktail");
+			viewnode->set_attribute("name", _("view-name", "Cocktail"));
 
 			util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
 			if (!mirrornode)
@@ -2009,10 +2012,10 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 					};
 
 			// generate linear views
-			generate_view("Left-to-Right", screens.size(), false, [] (unsigned x, unsigned y) { return x; });
-			generate_view("Left-to-Right (Gapless)", screens.size(), true, [] (unsigned x, unsigned y) { return x; });
-			generate_view("Top-to-Bottom", 1U, false, [] (unsigned x, unsigned y) { return y; });
-			generate_view("Top-to-Bottom (Gapless)", 1U, true, [] (unsigned x, unsigned y) { return y; });
+			generate_view(_("view-name", "Left-to-Right"), screens.size(), false, [] (unsigned x, unsigned y) { return x; });
+			generate_view(_("view-name", "Left-to-Right (Gapless)"), screens.size(), true, [] (unsigned x, unsigned y) { return x; });
+			generate_view(_("view-name", "Top-to-Bottom"), 1U, false, [] (unsigned x, unsigned y) { return y; });
+			generate_view(_("view-name", "Top-to-Bottom (Gapless)"), 1U, true, [] (unsigned x, unsigned y) { return y; });
 
 			// generate fake cocktail view for systems with two screens
 			if (screens.size() == 2U)
@@ -2024,7 +2027,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 				if (!viewnode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				viewnode->set_attribute("name", "Cocktail");
+				viewnode->set_attribute("name", _("view-name", "Cocktail"));
 
 				util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
 				if (!mirrornode)
@@ -2063,7 +2066,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				if (!remainder || (((majdim + 1) / 2) <= remainder))
 				{
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", majdim, mindim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom"), majdim, mindim).c_str(),
 							majdim,
 							false,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2072,7 +2075,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", majdim, mindim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"), majdim, mindim).c_str(),
 							majdim,
 							true,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2081,7 +2084,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", mindim, majdim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right"), mindim, majdim).c_str(),
 							mindim,
 							false,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2090,7 +2093,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", mindim, majdim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"), mindim, majdim).c_str(),
 							mindim,
 							true,
 							[&screens, majdim] (unsigned x, unsigned y)

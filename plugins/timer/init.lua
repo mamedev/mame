@@ -86,7 +86,7 @@ function timer.startplugin()
 		local hrs = math.floor(time / 3600)
 		local min = math.floor((time % 3600) / 60)
 		local sec = time % 60
-		return string.format("%03d:%02d:%02d", hrs, min, sec)
+		return string.format(_p("plugin-timer", "%03d:%02d:%02d"), hrs, min, sec)
 	end
 
 	local lastupdate
@@ -95,9 +95,9 @@ function timer.startplugin()
 		lastupdate = os.time()
 		local time = lastupdate - start_time
 		return
-			{{ _("Current time"), sectohms(time), "off" },
-			 { _("Total time"), sectohms(total_time + time), "off" },
-			 { _("Play Count"), play_count, "off" }},
+			{{ _p("plugin-timer", "Current time"), sectohms(time), "off" },
+			 { _p("plugin-timer", "Total time"), sectohms(total_time + time), "off" },
+			 { _p("plugin-timer", "Play Count"), play_count, "off" }},
 			nil,
 			"idle"
 	end
@@ -106,7 +106,7 @@ function timer.startplugin()
 		return os.time() > lastupdate
 	end
 
-	emu.register_menu(menu_callback, menu_populate, _("Timer"))
+	emu.register_menu(menu_callback, menu_populate, _p("plugin-timer", "Timer"))
 end
 
 return exports

@@ -82,17 +82,26 @@ menu_load_save_state_base::file_entry::file_entry(std::string &&file_name, std::
 //  ctor
 //-------------------------------------------------
 
-menu_load_save_state_base::menu_load_save_state_base(mame_ui_manager &mui, render_container &container, std::string_view header, std::string_view footer, bool must_exist)
+menu_load_save_state_base::menu_load_save_state_base(
+		mame_ui_manager &mui,
+		render_container &container,
+		std::string_view header,
+		std::string_view footer,
+		bool must_exist,
+		bool one_shot)
 	: menu(mui, container)
 	, m_switch_poller(machine().input())
 	, m_header(header)
 	, m_footer(footer)
 	, m_confirm_delete(nullptr)
 	, m_must_exist(must_exist)
+	, m_one_shot(one_shot)
 	, m_first_time(true)
 	, m_was_paused(false)
 	, m_keys_released(false)
 {
+	set_one_shot(one_shot);
+	set_needs_prev_menu_item(!one_shot);
 }
 
 
@@ -212,10 +221,12 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 
 	if (m_entries_vec.empty())
 	{
-		item_append(_("No save states found"), 0, nullptr);
+		item_append(_("[no saved states found]"), FLAG_DISABLE, nullptr);
 		set_selection(nullptr);
 	}
 	item_append(menu_item_type::SEPARATOR);
+	if (m_one_shot)
+		item_append(_("Cancel"), 0, nullptr);
 
 	// set up custom render proc
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
@@ -240,27 +251,28 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_load_save_state_base::handle()
+void menu_load_save_state_base::handle(event const *ev)
 {
-	// process the menu
-	event const *const event = process(0);
-
 	// process the event
-	if (event && (event->iptkey == IPT_UI_SELECT))
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
 	{
-		if (event->itemref)
+		if (ev->itemref)
 		{
 			// user selected one of the entries
-			file_entry const &entry = file_entry_from_itemref(event->itemref);
+			file_entry const &entry = file_entry_from_itemref(ev->itemref);
 			slot_selected(std::string(entry.file_name()));
 		}
+		else
+		{
+			stack_pop();
+		}
 	}
-	else if (event && (event->iptkey == IPT_UI_CLEAR))
+	else if (ev && (ev->iptkey == IPT_UI_CLEAR))
 	{
-		if (event->itemref)
+		if (ev->itemref)
 		{
 			// prompt to confirm delete
-			m_confirm_delete = &file_entry_from_itemref(event->itemref);
+			m_confirm_delete = &file_entry_from_itemref(ev->itemref);
 			m_confirm_prompt = util::string_format(
 					_("Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
 					m_confirm_delete->visible_name(),
@@ -344,7 +356,7 @@ void menu_load_save_state_base::slot_selected(std::string &&name)
 	s_last_file_selected = std::move(name);
 
 	// no matter what, pop out
-	menu::stack_pop(machine());
+	menu::stack_pop();
 }
 
 
@@ -409,7 +421,13 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 
 void menu_load_save_state_base::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	extra_text_render(top, bottom, origx1, origy1, origx2, origy2, m_header, std::string_view());
+	// draw menu title
+	draw_text_box(
+			&m_header, &m_header + 1,
+			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
+			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
+
 	std::string_view text[2];
 	unsigned count(0U);
 
@@ -493,8 +511,8 @@ bool menu_load_save_state_base::is_present(const std::string &name) const
 //  ctor
 //-------------------------------------------------
 
-menu_load_state::menu_load_state(mame_ui_manager &mui, render_container &container)
-	: menu_load_save_state_base(mui, container, _("Load State"), _("Select state to load"), true)
+menu_load_state::menu_load_state(mame_ui_manager &mui, render_container &container, bool one_shot)
+	: menu_load_save_state_base(mui, container, _("Load State"), _("Select state to load"), true, one_shot)
 {
 }
 
@@ -517,8 +535,8 @@ void menu_load_state::process_file(std::string &&file_name)
 //  ctor
 //-------------------------------------------------
 
-menu_save_state::menu_save_state(mame_ui_manager &mui, render_container &container)
-	: menu_load_save_state_base(mui, container, _("Save State"), _("Press a key or joystick button, or select state to overwrite"), false)
+menu_save_state::menu_save_state(mame_ui_manager &mui, render_container &container, bool one_shot)
+	: menu_load_save_state_base(mui, container, _("Save State"), _("Press a key or joystick button, or select state to overwrite"), false, one_shot)
 {
 }
 

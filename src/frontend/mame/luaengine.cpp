@@ -747,6 +747,8 @@ void lua_engine::initialize()
 	emu["print_error"] = [] (const char *str) { osd_printf_error("%s\n", str); };
 	emu["print_info"] = [] (const char *str) { osd_printf_info("%s\n", str); };
 	emu["print_debug"] = [] (const char *str) { osd_printf_debug("%s\n", str); };
+	emu["osd_ticks"] = &osd_ticks;
+	emu["osd_ticks_per_second"] = &osd_ticks_per_second;
 	emu["driver_find"] =
 		[] (sol::this_state s, const char *driver) -> sol::object
 		{
@@ -1737,6 +1739,10 @@ void lua_engine::initialize()
 	ui_type["get_char_width"] = [] (mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); };
 	ui_type["get_string_width"] = &mame_ui_manager::get_string_width;
 	ui_type["set_aggressive_input_focus"] = [](mame_ui_manager &m, bool aggressive_focus) { osd_set_aggressive_input_focus(aggressive_focus); };
+	ui_type["get_general_input_setting"] = sol::overload(
+			// TODO: overload with sequence type string - parser isn't available here
+			[] (mame_ui_manager &ui, ioport_type type, int player) { return ui.get_general_input_setting(type, player, SEQ_TYPE_STANDARD); },
+			[] (mame_ui_manager &ui, ioport_type type) { return ui.get_general_input_setting(type, 0, SEQ_TYPE_STANDARD); });
 	ui_type["options"] = sol::property([] (mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); });
 	ui_type["line_height"] = sol::property(&mame_ui_manager::get_line_height);
 	ui_type["menu_active"] = sol::property(&mame_ui_manager::is_menu_active);

@@ -147,14 +147,11 @@ menu_select_game::~menu_select_game()
 }
 
 //-------------------------------------------------
-//  handle
+//  menu_activated
 //-------------------------------------------------
 
-void menu_select_game::handle()
+void menu_select_game::menu_activated()
 {
-	if (!m_prev_selected)
-		m_prev_selected = item(0).ref;
-
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
 	{
@@ -167,10 +164,21 @@ void menu_select_game::handle()
 		stack_reset();
 		return;
 	}
+}
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void menu_select_game::handle(event const *ev)
+{
+	if (!m_prev_selected)
+		m_prev_selected = item(0).ref;
 
 	// if I have to select software, force software list submenu
 	if (reselect_last::get())
 	{
+		// FIXME: this is never hit, need a better way to return to software selection if necessary
 		const ui_system_info *system;
 		const ui_software_info *software;
 		get_selection(software, system);
@@ -178,18 +186,16 @@ void menu_select_game::handle()
 		return;
 	}
 
-	// ignore pause keys by swallowing them before we process the menu
-	machine().ui_input().pressed(IPT_UI_PAUSE);
+	// FIXME: everything above here used to run before events were processed
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event)
+	if (ev)
 	{
 		if (dismiss_error())
 		{
-			// reset the error on any future menu_event
+			// reset the error on any subsequent menu event
 		}
-		else switch (menu_event->iptkey)
+		else switch (ev->iptkey)
 		{
 		case IPT_UI_UP:
 			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < m_filter_highlight))
@@ -220,17 +226,17 @@ void menu_select_game::handle()
 			break;
 
 		default:
-			if (menu_event->itemref)
+			if (ev->itemref)
 			{
-				switch (menu_event->iptkey)
+				switch (ev->iptkey)
 				{
 				case IPT_UI_SELECT:
 					if (get_focus() == focused_menu::MAIN)
 					{
 						if (m_populated_favorites)
-							inkey_select_favorite(menu_event);
+							inkey_select_favorite(ev);
 						else
-							inkey_select(menu_event);
+							inkey_select(ev);
 					}
 					break;
 
@@ -242,8 +248,7 @@ void menu_select_game::handle()
 								ui(),
 								container(),
 								*reinterpret_cast<ui_system_info const *>(m_prev_selected),
-								nullptr,
-								menu_event->mouse.x0, menu_event->mouse.y0);
+								nullptr);
 					}
 					else
 					{
@@ -257,8 +262,7 @@ void menu_select_game::handle()
 								{
 									if (changed)
 										reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
-								},
-								menu_event->mouse.x0, menu_event->mouse.y0);
+								});
 					}
 					break;
 
@@ -289,12 +293,12 @@ void menu_select_game::handle()
 					break;
 
 				case IPT_UI_FAVORITES:
-					if (uintptr_t(menu_event->itemref) > skip_main_items)
+					if (uintptr_t(ev->itemref) > skip_main_items)
 					{
 						favorite_manager &mfav(mame_machine_manager::instance()->favorite());
 						if (!m_populated_favorites)
 						{
-							auto const &info(*reinterpret_cast<ui_system_info const *>(menu_event->itemref));
+							auto const &info(*reinterpret_cast<ui_system_info const *>(ev->itemref));
 							auto const &driver(*info.driver);
 							if (!mfav.is_favorite_system(driver))
 							{
@@ -309,7 +313,7 @@ void menu_select_game::handle()
 						}
 						else
 						{
-							ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(menu_event->itemref));
+							ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(ev->itemref));
 							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
 							mfav.remove_favorite_software(*swinfo);
 							reset(reset_options::SELECT_FIRST);
@@ -573,7 +577,7 @@ void menu_select_game::build_available_list()
 void menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
 {
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
+	menu::stack_reset(mui);
 
 	// add the quit entry followed by the game select entry
 	menu::stack_push_special_main<menu_quit_game>(mui, container);

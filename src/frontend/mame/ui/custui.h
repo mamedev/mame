@@ -44,7 +44,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void find_languages();
 	void find_sysnames();
@@ -82,7 +82,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void list();
 
@@ -143,7 +143,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	s_color_table m_color_table[MUI_RESTORE];
 	void restore_colors();
@@ -173,7 +173,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void inkey_special(const event *menu_event);
 
@@ -196,7 +196,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;

@@ -30,6 +30,7 @@
 #include <cctype>
 #include <cstring>
 #include <future>
+#include <locale>
 #include <queue>
 #include <type_traits>
 #include <unordered_set>
@@ -100,6 +101,7 @@ private:
 typedef std::set<std::add_pointer_t<device_type>, device_type_compare> device_type_set;
 
 std::string normalize_string(const char *string);
+std::string normalize_string(std::string_view string);
 
 // internal helper
 void output_header(std::ostream &out, bool dtd);
@@ -440,6 +442,11 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 		device_type_set m_dev_set;
 	};
 
+	// TODO: maybe not the best place for this as it affects the stream passed in
+	// if the device part is threaded, the local streams used by the tasks can be
+	// imbued and the stream passed in can be left alone
+	out.imbue(std::locale::classic());
+
 	// prepare a driver enumerator and the queue
 	driver_enumerator drivlist(m_lookup_options);
 	device_filter devfilter(filter);
@@ -491,6 +498,7 @@ void info_xml_creator::output(std::ostream &out, const std::function<bool(const 
 			{
 				prepared_info result;
 				std::ostringstream stream;
+				stream.imbue(std::locale::classic());
 
 				// output each of the drivers
 				for (const game_driver &driver : drivers)
@@ -568,26 +576,30 @@ namespace
 
 std::string normalize_string(const char *string)
 {
-	std::ostringstream stream;
+	if (string)
+		return normalize_string(std::string_view(string));
+	else
+		return std::string();
+}
 
-	if (string != nullptr)
+std::string normalize_string(std::string_view string)
+{
+	std::string result;
+	result.reserve(string.length());
+
+	for (char ch : string)
 	{
-		while (*string)
+		switch (ch)
 		{
-			switch (*string)
-			{
-			case '\"': stream << "&quot;"; break;
-			case '&': stream << "&amp;"; break;
-			case '<': stream << "&lt;"; break;
-			case '>': stream << "&gt;"; break;
-			default:
-				stream << *string;
-				break;
-			}
-			++string;
+		case '\"':  result.append("&quot;");    break;
+		case '&':   result.append("&amp;");     break;
+		case '<':   result.append("&lt;");      break;
+		case '>':   result.append("&gt;");      break;
+		default:    result.append(1, ch);       break;
 		}
 	}
-	return stream.str();
+
+	return result;
 }
 
 
@@ -647,7 +659,8 @@ void output_header(std::ostream &out, bool dtd)
 	}
 
 	// top-level tag
-	out << util::string_format("<%s build=\"%s\" debug=\""
+	util::stream_format(out,
+			"<%s build=\"%s\" debug=\""
 #ifdef MAME_DEBUG
 			"yes"
 #else
@@ -667,7 +680,7 @@ void output_header(std::ostream &out, bool dtd)
 void output_footer(std::ostream &out)
 {
 	// close the top level tag
-	out << util::string_format("</%s>\n", XML_ROOT);
+	util::stream_format(out, "</%s>\n", XML_ROOT);
 }
 
 
@@ -726,14 +739,14 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	}
 
 	// print the header and the machine name
-	out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
+	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(driver.name));
 
 	// strip away any path information from the source_file and output it
 	const char *start = strrchr(driver.type.source(), '/');
 	if (!start)
 		start = strrchr(driver.type.source(), '\\');
 	start = start ? (start + 1) : driver.type.source();
-	out << util::string_format(" sourcefile=\"%s\"", normalize_string(start));
+	util::stream_format(out, " sourcefile=\"%s\"", normalize_string(start));
 
 	// append bios and runnable flags
 	if (driver.flags & machine_flags::IS_BIOS_ROOT)
@@ -744,9 +757,9 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	// display clone information
 	int clone_of = drivlist.find(driver.parent);
 	if (clone_of != -1 && !(drivlist.driver(clone_of).flags & machine_flags::IS_BIOS_ROOT))
-		out << util::string_format(" cloneof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
+		util::stream_format(out, " cloneof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
 	if (clone_of != -1)
-		out << util::string_format(" romof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
+		util::stream_format(out, " romof=\"%s\"", normalize_string(drivlist.driver(clone_of).name));
 
 	// display sample information and close the game tag
 	output_sampleof(out, config.root_device());
@@ -754,15 +767,15 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 
 	// output game description
 	if (driver.type.fullname() != nullptr)
-		out << util::string_format("\t\t<description>%s</description>\n", normalize_string(driver.type.fullname()));
+		util::stream_format(out, "\t\t<description>%s</description>\n", normalize_string(driver.type.fullname()));
 
 	// print the year only if is a number or another allowed character (? or +)
-	if (driver.year != nullptr && strspn(driver.year, "0123456789?+") == strlen(driver.year))
-		out << util::string_format("\t\t<year>%s</year>\n", normalize_string(driver.year));
+	if (driver.year && strspn(driver.year, "0123456789?+") == strlen(driver.year))
+		util::stream_format(out, "\t\t<year>%s</year>\n", normalize_string(driver.year));
 
 	// print the manufacturer information
 	if (driver.manufacturer != nullptr)
-		out << util::string_format("\t\t<manufacturer>%s</manufacturer>\n", normalize_string(driver.manufacturer));
+		util::stream_format(out, "\t\t<manufacturer>%s</manufacturer>\n", normalize_string(driver.manufacturer));
 
 	// now print various additional information
 	output_bios(out, config.root_device());
@@ -785,7 +798,7 @@ void output_one(std::ostream &out, driver_enumerator &drivlist, const game_drive
 	output_ramoptions(out, config.root_device());
 
 	// close the topmost tag
-	out << util::string_format("\t</%s>\n", XML_TOP);
+	util::stream_format(out, "\t</%s>\n", XML_TOP);
 }
 
 
@@ -824,15 +837,16 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 			}
 
 	// start to output info
-	out << util::string_format("\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
+	util::stream_format(out, "\t<%s name=\"%s\"", XML_TOP, normalize_string(device.shortname()));
 	std::string src(device.source());
 	strreplace(src,"../", "");
-	out << util::string_format(" sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src.c_str()));
+	util::stream_format(out, " sourcefile=\"%s\" isdevice=\"yes\" runnable=\"no\"", normalize_string(src));
 	auto const parent(device.type().parent_rom_device_type());
 	if (parent)
-		out << util::string_format(" romof=\"%s\"", normalize_string(parent->shortname()));
+		util::stream_format(out, " romof=\"%s\"", normalize_string(parent->shortname()));
 	output_sampleof(out, device);
-	out << ">\n" << util::string_format("\t\t<description>%s</description>\n", normalize_string(device.name()));
+	out << ">\n";
+	util::stream_format(out, "\t\t<description>%s</description>\n", normalize_string(device.name()));
 
 	output_bios(out, device);
 	output_rom(out, config, nullptr, nullptr, device);
@@ -854,7 +868,7 @@ void output_one_device(std::ostream &out, machine_config &config, device_t &devi
 	output_images(out, device, devtag);
 	output_slots(out, config, device, devtag, nullptr);
 	output_software_lists(out, device, devtag);
-	out << util::string_format("\t</%s>\n", XML_TOP);
+	util::stream_format(out, "\t</%s>\n", XML_TOP);
 }
 
 
@@ -909,7 +923,7 @@ void output_device_refs(std::ostream &out, device_t &root)
 {
 	for (device_t &device : device_enumerator(root))
 		if (&device != &root)
-			out << util::string_format("\t\t<device_ref name=\"%s\"/>\n", normalize_string(device.shortname()));
+			util::stream_format(out, "\t\t<device_ref name=\"%s\"/>\n", normalize_string(device.shortname()));
 }
 
 
@@ -926,7 +940,7 @@ void output_sampleof(std::ostream &out, device_t &device)
 		samples_iterator sampiter(samples);
 		if (sampiter.altbasename() != nullptr)
 		{
-			out << util::string_format(" sampleof=\"%s\"", normalize_string(sampiter.altbasename()));
+			util::stream_format(out, " sampleof=\"%s\"", normalize_string(sampiter.altbasename()));
 
 			// must stop here, as there can only be one attribute of the same name
 			return;
@@ -954,8 +968,8 @@ void output_bios(std::ostream &out, device_t const &device)
 	{
 		// output extracted name and descriptions'
 		out << "\t\t<biosset";
-		out << util::string_format(" name=\"%s\"", normalize_string(bios.get_name()));
-		out << util::string_format(" description=\"%s\"", normalize_string(bios.get_description()));
+		util::stream_format(out, " name=\"%s\"", normalize_string(bios.get_name()));
+		util::stream_format(out, " description=\"%s\"", normalize_string(bios.get_description()));
 		if (defaultname && !std::strcmp(defaultname, bios.get_name()))
 			out << " default=\"yes\"";
 		out << "/>\n";
@@ -1062,13 +1076,13 @@ void output_rom(std::ostream &out, machine_config &config, driver_enumerator *dr
 			// add name, merge, bios, and size tags
 			char const *const name(rom->name);
 			if (name && name[0])
-				out << util::string_format(" name=\"%s\"", normalize_string(name));
+				util::stream_format(out, " name=\"%s\"", normalize_string(name));
 			if (merge_name)
-				out << util::string_format(" merge=\"%s\"", normalize_string(merge_name));
+				util::stream_format(out, " merge=\"%s\"", normalize_string(merge_name));
 			if (bios_name)
-				out << util::string_format(" bios=\"%s\"", normalize_string(bios_name));
+				util::stream_format(out, " bios=\"%s\"", normalize_string(bios_name));
 			if (!is_disk)
-				out << util::string_format(" size=\"%u\"", rom_file_size(rom));
+				util::stream_format(out, " size=\"%u\"", rom_file_size(rom));
 
 			// dump checksum information only if there is a known dump
 			if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))
@@ -1077,17 +1091,17 @@ void output_rom(std::ostream &out, machine_config &config, driver_enumerator *dr
 				out << " status=\"nodump\"";
 
 			// append a region name
-			out << util::string_format(" region=\"%s\"", region->name);
+			util::stream_format(out, " region=\"%s\"", region->name);
 
 			if (!is_disk)
 			{
 				// for non-disk entries, print offset
-				out << util::string_format(" offset=\"%x\"", ROM_GETOFFSET(rom));
+				util::stream_format(out, " offset=\"%x\"", ROM_GETOFFSET(rom));
 			}
 			else
 			{
 				// for disk entries, add the disk index
-				out << util::string_format(" index=\"%x\" writable=\"%s\"", DISK_GETINDEX(rom), DISK_ISREADONLY(rom) ? "no" : "yes");
+				util::stream_format(out, " index=\"%x\" writable=\"%s\"", DISK_GETINDEX(rom), DISK_ISREADONLY(rom) ? "no" : "yes");
 			}
 
 			// add optional flag
@@ -1120,7 +1134,7 @@ void output_sample(std::ostream &out, device_t &device)
 				continue;
 
 			// output the sample name
-			out << util::string_format("\t\t<sample name=\"%s\"/>\n", normalize_string(samplename));
+			util::stream_format(out, "\t\t<sample name=\"%s\"/>\n", normalize_string(samplename));
 		}
 	}
 }
@@ -1143,9 +1157,9 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 
 			out << "\t\t<chip";
 			out << " type=\"cpu\"";
-			out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-			out << util::string_format(" name=\"%s\"", normalize_string(exec.device().name()));
-			out << util::string_format(" clock=\"%d\"", exec.device().clock());
+			util::stream_format(out, " tag=\"%s\"", normalize_string(newtag));
+			util::stream_format(out, " name=\"%s\"", normalize_string(exec.device().name()));
+			util::stream_format(out, " clock=\"%d\"", exec.device().clock());
 			out << "/>\n";
 		}
 	}
@@ -1160,10 +1174,10 @@ void output_chips(std::ostream &out, device_t &device, const char *root_tag)
 
 			out << "\t\t<chip";
 			out << " type=\"audio\"";
-			out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
-			out << util::string_format(" name=\"%s\"", normalize_string(sound.device().name()));
+			util::stream_format(out, " tag=\"%s\"", normalize_string(newtag));
+			util::stream_format(out, " name=\"%s\"", normalize_string(sound.device().name()));
 			if (sound.device().clock() != 0)
-				out << util::string_format(" clock=\"%d\"", sound.device().clock());
+				util::stream_format(out, " clock=\"%d\"", sound.device().clock());
 			out << "/>\n";
 		}
 	}
@@ -1185,7 +1199,7 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			std::string newtag(screendev.tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
-			out << util::string_format("\t\t<display tag=\"%s\"", normalize_string(newtag.c_str()));
+			util::stream_format(out, "\t\t<display tag=\"%s\"", normalize_string(newtag));
 
 			switch (screendev.screen_type())
 			{
@@ -1229,12 +1243,12 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			if (screendev.screen_type() != SCREEN_TYPE_VECTOR)
 			{
 				const rectangle &visarea = screendev.visible_area();
-				out << util::string_format(" width=\"%d\"", visarea.width());
-				out << util::string_format(" height=\"%d\"", visarea.height());
+				util::stream_format(out, " width=\"%d\"", visarea.width());
+				util::stream_format(out, " height=\"%d\"", visarea.height());
 			}
 
 			// output refresh rate
-			out << util::string_format(" refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
+			util::stream_format(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds()));
 
 			// output raw video parameters only for games that are not vector
 			// and had raw parameters specified
@@ -1242,13 +1256,13 @@ void output_display(std::ostream &out, device_t &device, machine_flags::type con
 			{
 				int pixclock = screendev.width() * screendev.height() * ATTOSECONDS_TO_HZ(screendev.refresh_attoseconds());
 
-				out << util::string_format(" pixclock=\"%d\"", pixclock);
-				out << util::string_format(" htotal=\"%d\"", screendev.width());
-				out << util::string_format(" hbend=\"%d\"", screendev.visible_area().min_x);
-				out << util::string_format(" hbstart=\"%d\"", screendev.visible_area().max_x+1);
-				out << util::string_format(" vtotal=\"%d\"", screendev.height());
-				out << util::string_format(" vbend=\"%d\"", screendev.visible_area().min_y);
-				out << util::string_format(" vbstart=\"%d\"", screendev.visible_area().max_y+1);
+				util::stream_format(out, " pixclock=\"%d\"", pixclock);
+				util::stream_format(out, " htotal=\"%d\"", screendev.width());
+				util::stream_format(out, " hbend=\"%d\"", screendev.visible_area().min_x);
+				util::stream_format(out, " hbstart=\"%d\"", screendev.visible_area().max_x+1);
+				util::stream_format(out, " vtotal=\"%d\"", screendev.height());
+				util::stream_format(out, " vbend=\"%d\"", screendev.visible_area().min_y);
+				util::stream_format(out, " vbstart=\"%d\"", screendev.visible_area().max_y+1);
 			}
 			out << " />\n";
 		}
@@ -1271,7 +1285,7 @@ void output_sound(std::ostream &out, device_t &device)
 	if (snditer.first() == nullptr)
 		speakers = 0;
 
-	out << util::string_format("\t\t<sound channels=\"%d\"/>\n", speakers);
+	util::stream_format(out, "\t\t<sound channels=\"%d\"/>\n", speakers);
 }
 
 
@@ -1297,7 +1311,7 @@ void output_ioport_condition(std::ostream &out, const ioport_condition &conditio
 	case ioport_condition::NOTLESSTHAN:     rel = "ge"; break;
 	}
 
-	out << util::string_format("<condition tag=\"%s\" mask=\"%u\" relation=\"%s\" value=\"%u\"/>\n", normalize_string(condition.tag()), condition.mask(), rel, condition.value());
+	util::stream_format(out, "<condition tag=\"%s\" mask=\"%u\" relation=\"%s\" value=\"%u\"/>\n", normalize_string(condition.tag()), condition.mask(), rel, condition.value());
 }
 
 //-------------------------------------------------
@@ -1700,13 +1714,13 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 	// Output the input info
 	// First basic info
 	out << "\t\t<input";
-	out << util::string_format(" players=\"%d\"", nplayer);
+	util::stream_format(out, " players=\"%d\"", nplayer);
 	if (ncoin != 0)
-		out << util::string_format(" coins=\"%d\"", ncoin);
+		util::stream_format(out, " coins=\"%d\"", ncoin);
 	if (service)
-		out << util::string_format(" service=\"yes\"");
+		util::stream_format(out, " service=\"yes\"");
 	if (tilt)
-		out << util::string_format(" tilt=\"yes\"");
+		util::stream_format(out, " tilt=\"yes\"");
 	out << ">\n";
 
 	// Then controller specific ones
@@ -1716,21 +1730,21 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 			//printf("type %s - player %d - buttons %d\n", elem.type, elem.player, elem.nbuttons);
 			if (elem.analog)
 			{
-				out << util::string_format("\t\t\t<control type=\"%s\"", normalize_string(elem.type));
+				util::stream_format(out, "\t\t\t<control type=\"%s\"", normalize_string(elem.type));
 				if (nplayer > 1)
-					out << util::string_format(" player=\"%d\"", elem.player);
+					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
-					out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
+					util::stream_format(out, " buttons=\"%d\"", strcmp(elem.type, "stick") ? elem.nbuttons : elem.maxbuttons);
 					if (elem.reqbuttons < elem.nbuttons)
-						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
+						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
 				}
 				if (elem.min != 0 || elem.max != 0)
-					out << util::string_format(" minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
+					util::stream_format(out, " minimum=\"%d\" maximum=\"%d\"", elem.min, elem.max);
 				if (elem.sensitivity != 0)
-					out << util::string_format(" sensitivity=\"%d\"", elem.sensitivity);
+					util::stream_format(out, " sensitivity=\"%d\"", elem.sensitivity);
 				if (elem.keydelta != 0)
-					out << util::string_format(" keydelta=\"%d\"", elem.keydelta);
+					util::stream_format(out, " keydelta=\"%d\"", elem.keydelta);
 				if (elem.reverse)
 					out << " reverse=\"yes\"";
 
@@ -1742,14 +1756,14 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 				if (elem.helper[0] == 0 && elem.helper[1] != 0) { elem.helper[0] = elem.helper[1]; elem.helper[1] = 0; }
 				if (elem.helper[1] == 0 && elem.helper[2] != 0) { elem.helper[1] = elem.helper[2]; elem.helper[2] = 0; }
 				const char *joys = (elem.helper[2] != 0) ? "triple" : (elem.helper[1] != 0) ? "double" : "";
-				out << util::string_format("\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
+				util::stream_format(out, "\t\t\t<control type=\"%s%s\"", joys, normalize_string(elem.type));
 				if (nplayer > 1)
-					out << util::string_format(" player=\"%d\"", elem.player);
+					util::stream_format(out, " player=\"%d\"", elem.player);
 				if (elem.nbuttons > 0)
 				{
-					out << util::string_format(" buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
+					util::stream_format(out, " buttons=\"%d\"", strcmp(elem.type, "joy") ? elem.nbuttons : elem.maxbuttons);
 					if (elem.reqbuttons < elem.nbuttons)
-						out << util::string_format(" reqbuttons=\"%d\"", elem.reqbuttons);
+						util::stream_format(out, " reqbuttons=\"%d\"", elem.reqbuttons);
 				}
 				for (int lp = 0; lp < 3 && elem.helper[lp] != 0; lp++)
 				{
@@ -1759,7 +1773,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 					switch (elem.helper[lp] & (DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT))
 					{
 						case DIR_UP | DIR_DOWN | DIR_LEFT | DIR_RIGHT:
-							helper = string_format("%d", (elem.ways == 0) ? 8 : elem.ways);
+							helper = util::string_format(std::locale::classic(), "%d", (elem.ways == 0) ? 8 : elem.ways);
 							ways = helper.c_str();
 							break;
 						case DIR_LEFT | DIR_RIGHT:
@@ -1784,7 +1798,7 @@ void output_input(std::ostream &out, const ioport_list &portlist)
 							ways = "strange2";
 							break;
 					}
-					out << util::string_format(" ways%s=\"%s\"", plural, ways);
+					util::stream_format(out, " ways%s=\"%s\"", plural, ways);
 				}
 				out << "/>\n";
 			}
@@ -1811,15 +1825,15 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 
 				// output the switch name information
 				std::string const normalized_field_name(normalize_string(field.name()));
-				std::string const normalized_newtag(normalize_string(newtag.c_str()));
-				out << util::string_format("\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name.c_str(), normalized_newtag.c_str(), field.mask());
+				std::string const normalized_newtag(normalize_string(newtag));
+				util::stream_format(out, "\t\t<%s name=\"%s\" tag=\"%s\" mask=\"%u\">\n", outertag, normalized_field_name, normalized_newtag, field.mask());
 				if (!field.condition().none())
 					output_ioport_condition(out, field.condition(), 3);
 
 				// loop over locations
 				for (ioport_diplocation const &diploc : field.diplocations())
 				{
-					out << util::string_format("\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, normalize_string(diploc.name()), diploc.number());
+					util::stream_format(out, "\t\t\t<%s name=\"%s\" number=\"%u\"", loctag, normalize_string(diploc.name()), diploc.number());
 					if (diploc.inverted())
 						out << " inverted=\"yes\"";
 					out << "/>\n";
@@ -1828,7 +1842,7 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 				// loop over settings
 				for (ioport_setting const &setting : field.settings())
 				{
-					out << util::string_format("\t\t\t<%s name=\"%s\" value=\"%u\"", innertag, normalize_string(setting.name()), setting.value());
+					util::stream_format(out, "\t\t\t<%s name=\"%s\" value=\"%u\"", innertag, normalize_string(setting.name()), setting.value());
 					if (setting.value() == field.defvalue())
 						out << " default=\"yes\"";
 					if (setting.condition().none())
@@ -1839,12 +1853,12 @@ void output_switches(std::ostream &out, const ioport_list &portlist, const char 
 					{
 						out << ">\n";
 						output_ioport_condition(out, setting.condition(), 4);
-						out << util::string_format("\t\t\t</%s>\n", innertag);
+						util::stream_format(out, "\t\t\t</%s>\n", innertag);
 					}
 				}
 
 				// terminate the switch entry
-				out << util::string_format("\t\t</%s>\n", outertag);
+				util::stream_format(out, "\t\t</%s>\n", outertag);
 			}
 }
 
@@ -1857,13 +1871,13 @@ void output_ports(std::ostream &out, const ioport_list &portlist)
 	// cycle through ports
 	for (auto &port : portlist)
 	{
-		out << util::string_format("\t\t<port tag=\"%s\">\n", normalize_string(port.second->tag()));
+		util::stream_format(out, "\t\t<port tag=\"%s\">\n", normalize_string(port.second->tag()));
 		for (ioport_field const &field : port.second->fields())
 		{
 			if (field.is_analog())
-				out << util::string_format("\t\t\t<analog mask=\"%u\"/>\n", field.mask());
+				util::stream_format(out, "\t\t\t<analog mask=\"%u\"/>\n", field.mask());
 		}
-		out << util::string_format("\t\t</port>\n");
+		util::stream_format(out, "\t\t</port>\n");
 	}
 
 }
@@ -1880,7 +1894,7 @@ void output_adjusters(std::ostream &out, const ioport_list &portlist)
 		for (ioport_field const &field : port.second->fields())
 			if (field.type() == IPT_ADJUSTER)
 			{
-				out << util::string_format("\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.name()), field.defvalue());
+				util::stream_format(out, "\t\t<adjuster name=\"%s\" default=\"%d\"/>\n", normalize_string(field.name()), field.defvalue());
 			}
 }
 
@@ -1955,7 +1969,7 @@ void output_features(std::ostream &out, device_type type, device_t::feature_type
 	{
 		if (flags & feature.first)
 		{
-			out << util::string_format("\t\t<feature type=\"%s\"", feature.second);
+			util::stream_format(out, "\t\t<feature type=\"%s\"", feature.second);
 			if (type.unemulated_features() & feature.first)
 			{
 				out << " status=\"unemulated\"";
@@ -1991,11 +2005,11 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
 
 			// print m_output device type
-			out << util::string_format("\t\t<device type=\"%s\"", normalize_string(imagedev.image_type_name()));
+			util::stream_format(out, "\t\t<device type=\"%s\"", normalize_string(imagedev.image_type_name()));
 
 			// does this device have a tag?
 			if (imagedev.device().tag())
-				out << util::string_format(" tag=\"%s\"", normalize_string(newtag.c_str()));
+				util::stream_format(out, " tag=\"%s\"", normalize_string(newtag));
 
 			// is this device available as media switch?
 			if (!loadable)
@@ -2006,7 +2020,7 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 				out << " mandatory=\"1\"";
 
 			if (imagedev.image_interface() && imagedev.image_interface()[0])
-				out << util::string_format(" interface=\"%s\"", normalize_string(imagedev.image_interface()));
+				util::stream_format(out, " interface=\"%s\"", normalize_string(imagedev.image_interface()));
 
 			// close the XML tag
 			out << ">\n";
@@ -2017,8 +2031,8 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 				char const *const shortname = imagedev.brief_instance_name().c_str();
 
 				out << "\t\t\t<instance";
-				out << util::string_format(" name=\"%s\"", normalize_string(name));
-				out << util::string_format(" briefname=\"%s\"", normalize_string(shortname));
+				util::stream_format(out, " name=\"%s\"", normalize_string(name));
+				util::stream_format(out, " briefname=\"%s\"", normalize_string(shortname));
 				out << "/>\n";
 
 				char const *extensions(imagedev.file_extensions());
@@ -2027,7 +2041,7 @@ void output_images(std::ostream &out, device_t &device, const char *root_tag)
 					char const *end(extensions);
 					while (*end && (',' != *end))
 						++end;
-					out << util::string_format("\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string(extensions, end).c_str()));
+					util::stream_format(out, "\t\t\t<extension name=\"%s\"/>\n", normalize_string(std::string_view(extensions, end - extensions)));
 					extensions = *end ? (end + 1) : nullptr;
 				}
 			}
@@ -2056,7 +2070,7 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 
 			// print m_output device type
 			if (listed)
-				out << util::string_format("\t\t<slot name=\"%s\">\n", normalize_string(newtag.c_str()));
+				util::stream_format(out, "\t\t<slot name=\"%s\">\n", normalize_string(newtag));
 
 			for (auto &option : slot.option_list())
 			{
@@ -2071,9 +2085,9 @@ void output_slots(std::ostream &out, machine_config &config, device_t &device, c
 
 					if (listed && option.second->selectable())
 					{
-						out << util::string_format("\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
-						out << util::string_format(" devname=\"%s\"", normalize_string(dev->shortname()));
-						if (slot.default_option() != nullptr && strcmp(slot.default_option(), option.second->name())==0)
+						util::stream_format(out, "\t\t\t<slotoption name=\"%s\"", normalize_string(option.second->name()));
+						util::stream_format(out, " devname=\"%s\"", normalize_string(dev->shortname()));
+						if (slot.default_option() && !strcmp(slot.default_option(), option.second->name()))
 							out << " default=\"yes\"";
 						out << "/>\n";
 					}
@@ -2106,10 +2120,10 @@ void output_software_lists(std::ostream &out, device_t &root, const char *root_t
 
 		std::string newtag(swlist.tag()), oldtag(":");
 		newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
-		out << util::string_format("\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag.c_str()), normalize_string(swlist.list_name().c_str()), swlist.is_original() ? "original" : "compatible");
+		util::stream_format(out, "\t\t<softwarelist tag=\"%s\" name=\"%s\" status=\"%s\"", normalize_string(newtag), normalize_string(swlist.list_name()), swlist.is_original() ? "original" : "compatible");
 
 		if (swlist.filter())
-			out << util::string_format(" filter=\"%s\"", normalize_string(swlist.filter()));
+			util::stream_format(out, " filter=\"%s\"", normalize_string(swlist.filter()));
 		out << "/>\n";
 	}
 }
@@ -2135,15 +2149,15 @@ void output_ramoptions(std::ostream &out, device_t &root)
 				{
 					assert(!havedefault);
 					havedefault = true;
-					out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", normalize_string(option.first), option.second);
 				}
 				else
 				{
-					out << util::string_format("\t\t<ramoption name=\"%s\">%u</ramoption>\n", normalize_string(option.first.c_str()), option.second);
+					util::stream_format(out, "\t\t<ramoption name=\"%s\">%u</ramoption>\n", normalize_string(option.first), option.second);
 				}
 			}
 			if (!havedefault)
-				out << util::string_format("\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
+				util::stream_format(out, "\t\t<ramoption name=\"%s\" default=\"yes\">%u</ramoption>\n", ram.default_size_string(), defsize);
 			break;
 		}
 	}

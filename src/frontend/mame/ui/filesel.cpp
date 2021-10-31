@@ -478,18 +478,17 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_file_selector::handle()
+void menu_file_selector::handle(event const *ev)
 {
 	// process the menu
-	event const *const event = process(0);
-	if (event)
+	if (ev)
 	{
-		if (event->iptkey == IPT_SPECIAL)
+		if (ev->iptkey == IPT_SPECIAL)
 		{
 			// if it's any other key and we're not maxed out, update
-			type_search_char(event->unichar);
+			type_search_char(ev->unichar);
 		}
-		else if (event->iptkey == IPT_UI_CANCEL)
+		else if (ev->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
 			if (!m_filename.empty())
@@ -498,10 +497,10 @@ void menu_file_selector::handle()
 				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
 			}
 		}
-		else if (event->itemref && (event->iptkey == IPT_UI_SELECT))
+		else if (ev->itemref && (ev->iptkey == IPT_UI_SELECT))
 		{
 			// handle selections
-			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
+			select_item(*reinterpret_cast<file_selector_entry const *>(ev->itemref));
 
 			// reset the char buffer when pressing IPT_UI_SELECT
 			m_filename.clear();
@@ -556,13 +555,12 @@ void menu_select_rw::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_select_rw::handle()
+void menu_select_rw::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(0);
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	if (ev && ev->iptkey == IPT_UI_SELECT)
 	{
-		m_result = result_from_itemref(event->itemref);
+		m_result = result_from_itemref(ev->itemref);
 		stack_pop();
 	}
 }

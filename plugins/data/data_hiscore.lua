@@ -1217,7 +1217,7 @@ function dat.check(set, softlist)
 
 	if curset == set then
 		if output then
-			return _("High Scores")
+			return _p("plugin-data", "High Scores")
 		else
 			return nil
 		end
@@ -1265,7 +1265,7 @@ function dat.check(set, softlist)
 		end
 	end
 	if output then
-		return _("High Scores")
+		return _p("plugin-data", "High Scores")
 	else
 		return nil
 	end
