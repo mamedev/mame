@@ -11576,6 +11576,9 @@ ct486                           // 1993? 486 with CS4031
 @source:ctk551.cpp
 ctk551                          //
 
+@source:ctk2000.cpp
+ctk2100                         //
+
 @source:cubeqst.cpp
 cubeqst                         // (c) 1983 Simutrek Inc.
 cubeqsta                        // (c) 1983 Simutrek Inc.
