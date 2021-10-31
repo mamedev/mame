@@ -30,6 +30,7 @@ To do:
  *
  *************************************/
 
+// FIXME: you have to enable this *and* correlated macro in amiga.cpp
 #define GUESS_COPPER_OFFSET 0
 #define LOG_SPRITE_DMA      0
 
@@ -726,7 +727,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pfpix0 = aga_update_ham(pfpix0, planes);
 
 					pix = sprpix & 0xff;
-					pri = (sprpix >> 10);
+					pri = (sprpix >> 12);
 
 					/* sprite has priority */
 					if (sprpix && pf1pri > pri)
@@ -849,10 +850,10 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 #if GUESS_COPPER_OFFSET
 	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
-		if (machine.input().code_pressed(KEYCODE_Q))
-			popmessage("%d", wait_offset -= 1);
-		if (machine.input().code_pressed(KEYCODE_W))
-			popmessage("%d", wait_offset += 1);
+		if (machine().input().code_pressed(KEYCODE_Q))
+			popmessage("%d", m_wait_offset -= 1);
+		if (machine().input().code_pressed(KEYCODE_W))
+			popmessage("%d", m_wait_offset += 1);
 	}
 #endif
 }

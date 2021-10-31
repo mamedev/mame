@@ -1192,8 +1192,9 @@ u16 amiga_state::vposr_r()
 void amiga_state::vposw_w(u16 data)
 {
 	CUSTOM_REG(REG_VPOSR) = (data & VPOSR_LOF) | (data & 7);
-	if (data & 7)
-		popmessage("Upper VPOSW set %02x", data);
+	// TODO: high bits of screen height
+//	if (data & 7)
+//		popmessage("Upper VPOSW set %02x", data);
 }
 
 void amiga_state::bplcon0_w(u16 data)
