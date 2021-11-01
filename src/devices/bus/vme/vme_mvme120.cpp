@@ -22,6 +22,12 @@
 #include "emu.h"
 #include "vme_mvme120.h"
 
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
 #define LOG_PRINTF  (1U << 1)
 #define LOG_SETUP 	(1U << 2)
 #define LOG_GENERAL (1U << 3)

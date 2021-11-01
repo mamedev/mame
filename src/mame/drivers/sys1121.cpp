@@ -8,6 +8,7 @@
  *  controller.
  */
  
+#include "emu.h"
 #include "bus/vme/vme_mvme120.h"
 #include "logmacro.h"
 
@@ -24,8 +25,8 @@ class sys1121_state : public driver_device
 		void sys1121(machine_config &config);
 		
 	protected:
-		virtual void machine_start () override { }
-	//  virtual void machine_reset () override;
+		virtual void machine_start() override { }
+	//  virtual void machine_reset() override;
 };
 
 // Input ports

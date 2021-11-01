@@ -12,12 +12,6 @@
 #include "machine/clock.h"
 #include "machine/mc68901.h"
 
-#ifdef _MSC_VER
-#define FUNCNAME __func__
-#else
-#define FUNCNAME __PRETTY_FUNCTION__
-#endif
-
 DECLARE_DEVICE_TYPE(VME_MVME120,   vme_mvme120_card_device)
 DECLARE_DEVICE_TYPE(VME_MVME121,   vme_mvme121_card_device)
 DECLARE_DEVICE_TYPE(VME_MVME122,   vme_mvme122_card_device)
