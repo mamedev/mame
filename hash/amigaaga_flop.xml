@@ -46,13 +46,17 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="airbuc_a" supported="no">
+	<software name="airbuc_a" supported="partial">
 		<!-- SPS (CAPS) release 2567 -->
 		<description>Air Bucks (Euro, v1.2)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Impressions</publisher>
+		<notes><![CDATA[
+boot OK
+Some animations seems too fast
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -517,6 +521,9 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Team 17</publisher>
+		<notes><![CDATA[
+Guru Meditation
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -532,14 +539,18 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="breathle" supported="no">
+	<software name="breathle" supported="partial">
 		<!-- SPS (CAPS) release 178 -->
 		<description>Breathless (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
 		<publisher>Power Computing</publisher>
-		<info name="usage" value="Requires AGA" />
+		<notes><![CDATA[
+boot OK
+Copy protection code never changes on fails (may be btanb)
+]]></notes>
+		<info name="usage" value="Requires AGA, sports code sheet copy protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -623,7 +634,13 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Hangs at copyright screen, [FDC] copy protection check at PC=437f2 (enables 68k trace mode)
+Wrong GFX colors for options menu and level intro text
+Wrong pitch during gameplay
+]]></notes>
 		<info name="usage" value="Requires AGA" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048872">
@@ -799,6 +816,9 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Renegade</publisher>
+		<notes><![CDATA[
+Black screen, [FDC] copy protection
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -929,7 +949,11 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Rasputin</publisher>
-		<info name="usage" value="Requires AGA" />
+		<notes><![CDATA[
+Has GFX garbage on bottom of white layer on intro
+Has GFX pitch garbage on gameplay
+]]></notes>
+		<info name="usage" value="Requires AGA, sports sheet copy protection (load-up matrix), load disk 2 to skip intro" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -951,7 +975,7 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Max Design</publisher>
-		<info name="usage" value="Requires AGA" />
+		<info name="usage" value="Requires AGA, sports manual copy-protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -1013,6 +1037,12 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Flair Software</publisher>
+		<notes><![CDATA[
+Guru Meditation
+Wrong colors and composition for Flair mascot sprite
+Hangs again on FMV display with [FDC] DSKDATR
+ATK test: OK
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1078,13 +1108,16 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="diggers" supported="no">
+	<software name="diggers" supported="yes">
 		<!-- SPS (CAPS) release 1172 -->
 		<description>Diggers (Euro, 19930914)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Millennium</publisher>
+		<notes><![CDATA[
+boot OK
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1279,6 +1312,9 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Black Legend</publisher>
+		<notes><![CDATA[
+Has GFX pitch issues on intro and gameplay
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1313,6 +1349,11 @@ license:CC0
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
 		<publisher>Manyk</publisher>
+		<notes><![CDATA[
+Prints checksum error on boot
+ATK test: failed (only tracks 0, 1, 39, 40 reports good)
+Omake: hold port 1 button 1 during boot to show CPU, chipset and RAM detection
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
@@ -1412,6 +1453,9 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Microprose</publisher>
+		<notes><![CDATA[
+Guru Meditation after changing the unit name
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1446,6 +1490,9 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Core Design</publisher>
+		<notes><![CDATA[
+Black screen after AmigaDOS loading, [FDC] copy protection check (enables 68k trace mode)
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1566,7 +1613,12 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Microprose</publisher>
-		<info name="usage" value="Requires AGA" />
+		<notes><![CDATA[
+Serious GFX pitch corruption when scrolling left or right
+Classic IM works ok
+]]></notes>
+		<info name="usage" value="Requires AGA, sports manual copy-protection" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
@@ -1723,6 +1775,12 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Hangs at copyright screen, [FDC] copy protection check at PC=6051a (enables 68k trace mode)
+Another [FDC] copy protection is at PC=609b4 (draws Ocean logo with rainbow colors, hangs), [FDC] dsksync
+Title screen text on bottom flickers, ditto for mission intro screens
+Gameplay looks way too fast
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1915,6 +1973,9 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Impressions</publisher>
+		<notes><![CDATA[
+Crashes with black screen after few disk swaps
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -1983,6 +2044,9 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Millennium</publisher>
+		<notes><![CDATA[
+Doesn't draw gameplay screen, status bar is offset
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Install" />
@@ -2005,7 +2069,11 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Interactivision</publisher>
-		<info name="usage" value="Requires AGA" />
+		<notes><![CDATA[
+Doesn't accept input at copy protection screen, expects PORTS irq
+Player GFX sprite is half corrupt when moving between rooms, leaves a stuck shadow under invicibility state
+]]></notes>
+		<info name="usage" value="Requires AGA, sports sheet copy protection (monster names)" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1715)naughtyones.ipf" size="1049612" crc="a262b416" sha1="4b98febe1395b1e00646aa61a04d7d187c0543fe"/>
@@ -2116,6 +2184,9 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Flair Software</publisher>
+		<notes><![CDATA[
+Black screen, [FDC] dsksync
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -2166,6 +2237,9 @@ Draws GFX pitch garbage during gameplay
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Hangs after pressing one key on insert name screen
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -2592,7 +2666,14 @@ Doesn't draw left bumper during gameplay [Copper]?
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Acid</publisher>
+		<notes><![CDATA[
+GFX pitch garbage on various title screens
+Severe scrolling issues on gameplay
+Pausing game cannot be unpaused from pad (goes slow-mo instead). This also causes severe corruption on road RAM GFXs, making it unplayable
+Engine noise and collision bumps sounds ugly and extremely aliased, enables [Paula] manual mode
+]]></notes>
 		<info name="usage" value="Requires AGA" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -3290,7 +3371,12 @@ Doesn't draw left bumper during gameplay [Copper]?
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
 		<publisher>Core Design</publisher>
+		<notes><![CDATA[
+Hangs at a corrupted green screen (prints "now loading")
+ATK test: C:0 H:U Bad
+]]></notes>
 		<info name="usage" value="Requires AGA" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049304">
@@ -3426,6 +3512,12 @@ Doesn't draw left bumper during gameplay [Copper]?
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
+		<notes><![CDATA[
+Erratic delay scrolls
+Has solid green squares drawn across the foreground, which collides too
+Wrong playfield-sprite priority when info box is smashed with ball
+Status bar is offset
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
@@ -3767,6 +3859,10 @@ Doesn't draw left bumper during gameplay [Copper]?
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Doesn't load at disk swap
+Incorrect priority for mouse pointer arm, [Copper] disable?
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -3789,6 +3885,11 @@ Doesn't draw left bumper during gameplay [Copper]?
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1994</year>
 		<publisher>Team 17</publisher>
+		<notes><![CDATA[
+Wrong GFX pitch on intro
+Accepts live disk swaps only (tries to load if disk drive is empty?), enables GCR precomp [FDC]
+Crashes after few seconds of gameplay
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -4044,7 +4145,12 @@ Player sprite colors gets glitchy on the leftmost side of the beach screen
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1995</year>
 		<publisher>Black Legend</publisher>
+		<notes><![CDATA[
+Erratic background scrolling, and status bar glitches out, GFX pitch with FMODE
+Cannot exit from inventory menu?
+]]></notes>
 		<info name="usage" value="Requires AGA" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4282,13 +4388,16 @@ Player sprite colors gets glitchy on the leftmost side of the beach screen
 		</part>
 	</software>
 
-	<software name="2wwar_a" supported="no">
+	<software name="2wwar_a" supported="yes">
 		<!-- SPS (CAPS) release 1772 -->
 		<description>When Two Worlds War (Euro, v1.01, AGA)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Impressions</publisher>
+		<notes><![CDATA[
+boot OK, not extensively tested (German language)
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -4355,6 +4464,10 @@ Player sprite colors gets glitchy on the leftmost side of the beach screen
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1996</year>
 		<publisher>Ocean</publisher>
+		<notes><![CDATA[
+Hangs on main menu, expects audio ch 0 irq status to be on [Paula] INTREQ
+Has serious GFX scroll offsets and color issues on gameplay
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
@@ -4383,7 +4496,12 @@ Player sprite colors gets glitchy on the leftmost side of the beach screen
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Black Magic</publisher>
+		<notes><![CDATA[
+Black screen, partial boot if maincpu is severely underclocked, [CIA] timings?
+ATK test: OK
+]]></notes>
 		<info name="usage" value="Requires AGA" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -4434,7 +4552,7 @@ Player sprite colors gets glitchy on the leftmost side of the beach screen
 		<!-- (Amiga, AGA, PAL) -->
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
-		<info name="usage" value="Requires AGA" />
+		<info name="usage" value="Requires AGA, sports code wheel" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -4578,10 +4696,13 @@ boot OK
 		</part>
 	</software>
 
-	<software name="riserab2" supported="partial">
+	<software name="riserab2" supported="no">
 		<description>Rise of the Rabbits 2</description>
 		<year>1998</year>
 		<publisher>Pink Pig Software</publisher>
+		<notes><![CDATA[
+No foreground layer, background layer is full white
+]]></notes>
 		<info name="usage" value="Requires AGA" />
 
 		<part name="flop1" interface="floppy_3_5">
