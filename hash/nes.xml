@@ -12167,7 +12167,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw" cloneof="athlwrld" supported="partial">
+	<software name="train1aw" cloneof="athlwrld">
 		<description>Family Trainer 1 - Athletic World (Jpn, v1.1)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -12188,7 +12188,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw1" cloneof="athlwrld" supported="partial">
+	<software name="train1aw1" cloneof="athlwrld">
 		<description>Family Trainer 1 - Athletic World (Jpn)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -12255,7 +12255,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train4jr" supported="partial">
+	<software name="train4jr">
 		<description>Family Trainer 4 - Jogging Race (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>

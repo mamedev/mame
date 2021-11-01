@@ -46,8 +46,8 @@
 #include "4score.h"
 #include "arkpaddle.h"
 #include "bcbattle.h"
-#include "ftrainer.h"
 #include "fckeybrd.h"
+#include "fcmat.h"
 #include "hori.h"
 #include "joypad.h"
 #include "konamihs.h"
@@ -57,7 +57,6 @@
 #include "partytap.h"
 #include "powerpad.h"
 #include "suborkey.h"
-#include "taptapmat.h"
 #include "zapper.h"
 
 
