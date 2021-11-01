@@ -819,7 +819,7 @@ screen:draw_box(left, top, right, bottom, [line], [fill])
     most-significant to least-significant byte.  If the line colour is not
     provided, the UI text colour is used; if the fill colour is not provided,
     the UI background colour is used.
-screen:draw_line(x1, y1, x2, y2, bottom, [color])
+screen:draw_line(x1, y1, x2, y2, [color])
     Draws a line from (x1, y1) to (x2, y2).
 
     Coordinates are floating-point numbers in units of emulated screen pixels,
@@ -2431,7 +2431,7 @@ container:draw_box(left, top, right, bottom, [line], [fill])
     most-significant to least-significant byte.  If the line colour is not
     provided, the UI text colour is used; if the fill colour is not provided,
     the UI background colour is used.
-container:draw_line(x1, y1, x2, y2, bottom, [color])
+container:draw_line(x1, y1, x2, y2, [color])
     Draws a line from (x1, y1) to (x2, y2).
 
     Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
