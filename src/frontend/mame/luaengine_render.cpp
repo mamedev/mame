@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "luaengine.ipp"
 
+#include "mame.h"
+#include "ui/ui.h"
+
 #include "render.h"
 #include "rendlay.h"
 
@@ -351,6 +354,68 @@ void lua_engine::initialize_render(sol::table &emu)
 
 
 	auto render_container_type = sol().registry().new_usertype<render_container>("render_container", sol::no_constructor);
+	render_container_type["draw_box"] =
+			[] (render_container &ctnr, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				x1 = std::clamp(x1, 0.0f, 1.0f);
+				y1 = std::clamp(y1, 0.0f, 1.0f);
+				x2 = std::clamp(x2, 0.0f, 1.0f);
+				y2 = std::clamp(y2, 0.0f, 1.0f);
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = ui.colors().background_color();
+				ui.draw_outlined_box(ctnr, x1, y1, x2, y2, *fgcolor, *bgcolor);
+			};
+	render_container_type["draw_line"] =
+			[] (render_container &ctnr, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
+			{
+				x1 = std::clamp(x1, 0.0f, 1.0f);
+				y1 = std::clamp(y1, 0.0f, 1.0f);
+				x2 = std::clamp(x2, 0.0f, 1.0f);
+				y2 = std::clamp(y2, 0.0f, 1.0f);
+				if (!color)
+					color = mame_machine_manager::instance()->ui().colors().text_color();
+				ctnr.add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			};
+	render_container_type["draw_text"] =
+			[this] (render_container &ctnr, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				auto justify = ui::text_layout::text_justify::LEFT;
+				float x = 0;
+				if (xobj.is<float>())
+				{
+					x = std::clamp(xobj.as<float>(), 0.0f, 1.0f);
+				}
+				else if (xobj.is<char const *>())
+				{
+					char const *const justifystr(xobj.as<char const *>());
+					if (!strcmp(justifystr, "left"))
+						justify = ui::text_layout::text_justify::LEFT;
+					else if (!strcmp(justifystr, "right"))
+						justify = ui::text_layout::text_justify::RIGHT;
+					else if (!strcmp(justifystr, "center"))
+						justify = ui::text_layout::text_justify::CENTER;
+				}
+				else
+				{
+					luaL_error(m_lua_state, "Error in param 1 to draw_text");
+					return;
+				}
+				y = std::clamp(y, 0.0f, 1.0f);
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = 0;
+				ui.draw_text_full(
+						ctnr,
+						msg,
+						x, y, (1.0f - x),
+						justify, ui::text_layout::word_wrapping::WORD,
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+			};
 	render_container_type["user_settings"] = sol::property(&render_container::get_user_settings, &render_container::set_user_settings);
 	render_container_type["orientation"] = sol::property(
 			&render_container::orientation,

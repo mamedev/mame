@@ -178,8 +178,8 @@ void menu_textbox::draw(uint32_t flags)
 			set_hover(HOVER_ARROW_UP);
 		}
 		draw_arrow(
-				0.5f * (x1 + x2) - 0.5f * ud_arrow_width, visible_top + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, visible_top + 0.75f * line_height,
+				0.5f * (x1 + x2 - ud_arrow_width), visible_top + (0.25f * line_height),
+				0.5f * (x1 + x2 + ud_arrow_width), visible_top + (0.75f * line_height),
 				fgcolor, ROT0);
 	}
 	if ((m_top_line + m_window_lines) < visible_items)
@@ -197,8 +197,8 @@ void menu_textbox::draw(uint32_t flags)
 			set_hover(HOVER_ARROW_DOWN);
 		}
 		draw_arrow(
-				0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height,
+				0.5f * (x1 + x2 - ud_arrow_width), line_y + (0.25f * line_height),
+				0.5f * (x1 + x2 + ud_arrow_width), line_y + (0.75f * line_height),
 				fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 	}
 

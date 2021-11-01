@@ -41,9 +41,23 @@ void menu_sliders::handle(event const *ev)
 	// process the menu
 	if (ev)
 	{
-		// handle keys if there is a valid item selected
-		if (ev->itemref && (ev->type == menu_item_type::SLIDER))
+		if (ev->iptkey == IPT_UI_ON_SCREEN_DISPLAY)
 		{
+			// toggle visibility
+			if (m_menuless_mode)
+			{
+				stack_pop();
+			}
+			else
+			{
+				m_hidden = !m_hidden;
+				set_process_flags(PROCESS_LR_REPEAT | (m_hidden ? PROCESS_CUSTOM_ONLY : 0));
+			}
+
+		}
+		else if (ev->itemref && (ev->type == menu_item_type::SLIDER))
+		{
+			// handle keys if there is a valid item selected
 			const slider_state *slider = (const slider_state *)ev->itemref;
 			int32_t curvalue = slider->update(nullptr, SLIDER_NOCHANGE);
 			int32_t increment = 0;
@@ -53,24 +67,11 @@ void menu_sliders::handle(event const *ev)
 
 			switch (ev->iptkey)
 			{
-				// toggle visibility
-				case IPT_UI_ON_SCREEN_DISPLAY:
-					if (m_menuless_mode)
-					{
-						stack_pop();
-					}
-					else
-					{
-						m_hidden = !m_hidden;
-						set_process_flags(PROCESS_LR_REPEAT | (m_hidden ? PROCESS_CUSTOM_ONLY : 0));
-					}
-					break;
-
 				// decrease value
 				case IPT_UI_LEFT:
 					if (alt_pressed && shift_pressed)
 						increment = -1;
-					if (alt_pressed)
+					else if (alt_pressed)
 						increment = -(curvalue - slider->minval);
 					else if (shift_pressed)
 						increment = (slider->incval > 10) ? -(slider->incval / 10) : -1;
@@ -84,7 +85,7 @@ void menu_sliders::handle(event const *ev)
 				case IPT_UI_RIGHT:
 					if (alt_pressed && shift_pressed)
 						increment = 1;
-					if (alt_pressed)
+					else if (alt_pressed)
 						increment = slider->maxval - curvalue;
 					else if (shift_pressed)
 						increment = (slider->incval > 10) ? (slider->incval / 10) : 1;
@@ -116,10 +117,9 @@ void menu_sliders::handle(event const *ev)
 				reset(reset_options::REMEMBER_REF);
 			}
 		}
-
-		// if we are selecting an invalid item and we are hidden, skip to the next one
 		else if (m_hidden)
 		{
+			// if we are selecting an invalid item and we are hidden, skip to the next one
 			if (ev->iptkey == IPT_UI_UP || ev->iptkey == IPT_UI_PAGE_UP)
 			{
 				// if we got here via up or page up, select the previous item

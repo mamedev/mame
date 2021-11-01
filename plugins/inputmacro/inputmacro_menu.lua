@@ -308,7 +308,30 @@ local function handle_edit_items(index, event)
 		end
 	end
 
-	return namecancel
+	local selection
+	if command.step then
+		if event == 'prevgroup' then
+			if command.step > 1 then
+				local found_break = false
+				selection = index - 1
+				while (not edit_items[selection]) or (edit_items[selection].step == command.step) do
+					selection = selection - 1
+				end
+				local step = edit_items[selection].step
+				while edit_items[selection - 1] and (edit_items[selection - 1].step == step) do
+					selection = selection - 1
+				end
+			end
+		elseif event == 'nextgroup' then
+			if command.step < #edit_current_macro.steps then
+				selection = index + 1
+				while (not edit_items[selection]) or (edit_items[selection].step == command.step) do
+					selection = selection + 1
+				end
+			end
+		end
+	end
+	return namecancel, selection
 end
 
 local function add_edit_items(items)
@@ -393,14 +416,15 @@ local function add_edit_items(items)
 end
 
 local function handle_add(index, event)
-	if handle_edit_items(index, event) then
-		return true
+	local handled, selection = handle_edit_items(index, event)
+	if handled then
+		return true, selection
 	elseif event == 'cancel' then
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
 		table.remove(menu_stack)
-		return true
+		return true, selection
 	elseif (index == edit_item_exit) and (event == 'select') then
 		if current_macro_complete() then
 			table.insert(macros, edit_current_macro)
@@ -410,22 +434,23 @@ local function handle_add(index, event)
 		edit_current_macro = nil
 		edit_items = nil
 		table.remove(menu_stack)
-		return true
+		return true, selection
 	end
-	return false
+	return false, selection
 end
 
 local function handle_edit(index, event)
-	if handle_edit_items(index, event) then
-		return true
+	local handled, selection = handle_edit_items(index, event)
+	if handled then
+		return true, selection
 	elseif (event == 'cancel') or ((index == edit_item_exit) and (event == 'select')) then
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
 		table.remove(menu_stack)
-		return true
+		return true, selection
 	end
-	return false
+	return false, selection
 end
 
 local function populate_add()
@@ -449,7 +474,7 @@ local function populate_add()
 	if edit_switch_poller then
 		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
 	else
-		return items, selection, 'lrrepeat'
+		return items, selection, 'lrrepeat' .. (edit_name_buffer and ' ignorepause' or '')
 	end
 end
 
@@ -470,7 +495,7 @@ local function populate_edit()
 	if edit_switch_poller then
 		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
 	else
-		return items, selection, 'lrrepeat'
+		return items, selection, 'lrrepeat' .. (edit_name_buffer and ' ignorepause' or '')
 	end
 end
 

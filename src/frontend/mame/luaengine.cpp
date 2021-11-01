@@ -59,63 +59,6 @@ struct lua_engine::devenum
 
 namespace {
 
-void do_draw_box(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
-	mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
-}
-
-void do_draw_line(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
-	sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-}
-
-void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y, const char *msg, rgb_t fgcolor, rgb_t bgcolor)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	auto justify = ui::text_layout::text_justify::LEFT;
-	float x = 0;
-	if (xobj.is<float>())
-	{
-		x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
-	}
-	else if (xobj.is<char const *>())
-	{
-		char const *const justifystr(xobj.as<char const *>());
-		if (!strcmp(justifystr, "left"))
-			justify = ui::text_layout::text_justify::LEFT;
-		else if (!strcmp(justifystr, "right"))
-			justify = ui::text_layout::text_justify::RIGHT;
-		else if (!strcmp(justifystr, "center"))
-			justify = ui::text_layout::text_justify::CENTER;
-	}
-	else
-	{
-		luaL_error(L, "Error in param 1 to draw_text");
-		return;
-	}
-	y = std::clamp(y, 0.0f, sc_height) / sc_height;
-	mame_machine_manager::instance()->ui().draw_text_full(
-			sdev.container(),
-			msg,
-			x, y, (1.0f - x),
-			justify, ui::text_layout::word_wrapping::WORD,
-			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
-}
-
-
 struct image_interface_formats
 {
 	image_interface_formats(device_image_interface &i) : image(i) { }
@@ -1444,24 +1387,74 @@ void lua_engine::initialize()
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
-	screen_dev_type["draw_box"] = sol::overload(
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
-			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, bgcolor); },
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor)
-			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, mame_machine_manager::instance()->ui().colors().background_color()); },
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
-			{ auto const &colors(mame_machine_manager::instance()->ui().colors()); do_draw_box(sdev, x1, y1, x2, y2, colors.text_color(), colors.background_color()); });
-	screen_dev_type["draw_line"] = sol::overload(
-			&do_draw_line,
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
-			{ do_draw_line(sdev, x1, y1, x2, y2, mame_machine_manager::instance()->ui().colors().text_color()); });
-	screen_dev_type["draw_text"] = sol::overload(
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor, uint32_t bgcolor)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, bgcolor); },
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, 0); },
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, mame_machine_manager::instance()->ui().colors().text_color(), 0); });
+	screen_dev_type["draw_box"] =
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = ui.colors().background_color();
+				ui.draw_outlined_box(sdev.container(), x1, y1, x2, y2, *fgcolor, *bgcolor);
+			};
+	screen_dev_type["draw_line"] =
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				if (!color)
+					color = mame_machine_manager::instance()->ui().colors().text_color();
+				sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			};
+	screen_dev_type["draw_text"] =
+			[this] (screen_device &sdev, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				auto justify = ui::text_layout::text_justify::LEFT;
+				float x = 0;
+				if (xobj.is<float>())
+				{
+					x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
+				}
+				else if (xobj.is<char const *>())
+				{
+					char const *const justifystr(xobj.as<char const *>());
+					if (!strcmp(justifystr, "left"))
+						justify = ui::text_layout::text_justify::LEFT;
+					else if (!strcmp(justifystr, "right"))
+						justify = ui::text_layout::text_justify::RIGHT;
+					else if (!strcmp(justifystr, "center"))
+						justify = ui::text_layout::text_justify::CENTER;
+				}
+				else
+				{
+					luaL_error(m_lua_state, "Error in param 1 to draw_text");
+					return;
+				}
+				y = std::clamp(y, 0.0f, sc_height) / sc_height;
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = 0;
+				ui.draw_text_full(
+						sdev.container(),
+						msg,
+						x, y, (1.0f - x),
+						justify, ui::text_layout::word_wrapping::WORD,
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+			};
 	screen_dev_type["orientation"] =
 		[] (screen_device &sdev)
 		{

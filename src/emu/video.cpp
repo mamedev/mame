@@ -213,21 +213,22 @@ void video_manager::frame_update(bool from_debugger)
 	// only render sound and video if we're in the running phase
 	machine_phase const phase = machine().phase();
 	bool skipped_it = m_skipping_this_frame;
-	if (phase == machine_phase::RUNNING && (!machine().paused() || machine().options().update_in_pause()))
-	{
-		bool anything_changed = finish_screen_updates();
-
-		// if none of the screens changed and we haven't skipped too many frames in a row,
-		// mark this frame as skipped to prevent throttling; this helps for games that
-		// don't update their screen at the monitor refresh rate
-		if (!anything_changed && !m_auto_frameskip && m_frameskip_level == 0 && m_empty_skip_count++ < 3)
-			skipped_it = true;
-		else
-			m_empty_skip_count = 0;
-	}
+	bool const update_screens = (phase == machine_phase::RUNNING) && (!machine().paused() || machine().options().update_in_pause());
+	bool anything_changed = update_screens && finish_screen_updates();
 
 	// draw the user interface
 	emulator_info::draw_user_interface(machine());
+
+	// let plugins draw over the UI
+	anything_changed = emulator_info::frame_hook() || anything_changed;
+
+	// if none of the screens changed and we haven't skipped too many frames in a row,
+	// mark this frame as skipped to prevent throttling; this helps for games that
+	// don't update their screen at the monitor refresh rate
+	if (!anything_changed && !m_auto_frameskip && (m_frameskip_level == 0) && (m_empty_skip_count++ < 3))
+		skipped_it = true;
+	else
+		m_empty_skip_count = 0;
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
@@ -648,9 +649,6 @@ bool video_manager::finish_screen_updates()
 	for (screen_device &screen : iter)
 		if (screen.update_quads())
 			anything_changed = true;
-
-	// draw HUD from LUA callback (if any)
-	anything_changed |= emulator_info::frame_hook();
 
 	// update our movie recording and burn-in state
 	if (!machine().paused())

@@ -1013,10 +1013,6 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 		return;
 	if (!ignoreright && exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
-	if (exclusive_input_pressed(iptkey, IPT_UI_PREV_GROUP, 0))
-		return;
-	if (exclusive_input_pressed(iptkey, IPT_UI_NEXT_GROUP, 0))
-		return;
 
 	// up backs up by one item
 	if (exclusive_input_pressed(iptkey, IPT_UI_UP, 6))

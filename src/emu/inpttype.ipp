@@ -848,14 +848,14 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TOGGLE_UI,         N_p("input-name", "UI Toggle"),              input_seq(KEYCODE_SCRLOCK, input_seq::not_code, KEYCODE_LSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_RELEASE_POINTER,   N_p("input-name", "UI Release Pointer"),     input_seq(KEYCODE_RCONTROL, KEYCODE_RALT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_PASTE,             N_p("input-name", "UI Paste Text"),          input_seq(KEYCODE_SCRLOCK, KEYCODE_LSHIFT) ) \
-		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SAVE_STATE,        N_p("input-name", "Save State"),             input_seq(KEYCODE_F7, KEYCODE_LSHIFT) ) \
-		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LOAD_STATE,        N_p("input-name", "Load State"),             input_seq(KEYCODE_F7, input_seq::not_code, KEYCODE_LSHIFT) ) \
-		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TAPE_START,        N_p("input-name", "UI (First) Tape Start"),  input_seq(KEYCODE_F2, input_seq::not_code, KEYCODE_LSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SAVE_STATE,        N_p("input-name", "Save State"),             input_seq(KEYCODE_F7, KEYCODE_LSHIFT, input_seq::or_code, KEYCODE_F7, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_LOAD_STATE,        N_p("input-name", "Load State"),             input_seq(KEYCODE_F7, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TAPE_START,        N_p("input-name", "UI (First) Tape Start"),  input_seq(KEYCODE_F2, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_TAPE_STOP,         N_p("input-name", "UI (First) Tape Stop"),   input_seq(KEYCODE_F2, KEYCODE_LSHIFT) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_DATS,              N_p("input-name", "UI External DAT View"),   input_seq(KEYCODE_LALT, KEYCODE_D) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_FAVORITES,         N_p("input-name", "UI Add/Remove favorite"), input_seq(KEYCODE_LALT, KEYCODE_F) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_EXPORT,            N_p("input-name", "UI Export List"),         input_seq(KEYCODE_LALT, KEYCODE_E) ) \
-		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_AUDIT,             N_p("input-name", "UI Audit Media"),         input_seq(KEYCODE_F1, input_seq::not_code, KEYCODE_LSHIFT) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_AUDIT,             N_p("input-name", "UI Audit Media"),         input_seq(KEYCODE_F1, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_RSHIFT) ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_OSD \

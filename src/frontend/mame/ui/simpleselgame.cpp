@@ -205,6 +205,7 @@ void simple_menu_select_game::inkey_cancel()
 	if (!m_search.empty())
 	{
 		m_search.clear();
+		m_rerandomize = true;
 		reset(reset_options::SELECT_FIRST);
 	}
 }

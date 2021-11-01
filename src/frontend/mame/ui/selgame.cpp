@@ -43,12 +43,6 @@ extern const char UI_VERSION_TAG[];
 
 namespace ui {
 
-namespace {
-
-constexpr uint32_t FLAGS_UI = ui::menu::FLAG_LEFT_ARROW | ui::menu::FLAG_RIGHT_ARROW;
-
-} // anonymous namespace
-
 bool menu_select_game::s_first_start = true;
 
 
@@ -398,7 +392,7 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
 				old_item_selected = curitem;
 
-			item_append(elem.description, elem.is_clone ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&elem);
+			item_append(elem.description, elem.is_clone ? FLAG_INVERT : 0, (void *)&elem);
 			curitem++;
 		}
 	}
@@ -423,14 +417,13 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 								cloneof = false;
 						}
 
-						item_append(info.longname, cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
+						item_append(info.longname, cloneof ? FLAG_INVERT : 0, (void *)&info);
 					}
 					else
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
-						item_append(info.longname, info.devicetype,
-									info.parentname.empty() ? FLAGS_UI : (FLAG_INVERT | FLAGS_UI), (void *)&info);
+						item_append(info.longname, info.devicetype, info.parentname.empty() ? 0 : FLAG_INVERT, (void *)&info);
 					}
 					curitem++;
 				});
@@ -439,9 +432,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(menu_item_type::SEPARATOR, FLAGS_UI);
-		item_append(_("Configure Options"), FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(menu_item_type::SEPARATOR, 0);
+		item_append(_("Configure Options"), 0, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), 0, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 3;
 	}
 	else
