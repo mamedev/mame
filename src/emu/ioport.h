@@ -1242,7 +1242,7 @@ private:
 class analog_field
 {
 	friend class ioport_manager;
-	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings) noexcept;
+	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings);
 
 public:
 	// construction/destruction
