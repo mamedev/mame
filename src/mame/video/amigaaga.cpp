@@ -553,9 +553,9 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			}
 
 			/* compute the pixel fetch parameters */
-			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
 			// TODO: does ddf_start_pixel offsets with fmode != 0?
-			// wbenc30 expects a +8 to align the screen, which may or may not be right
+			// wbenc30 expects a +8 to align the screen with fmode == 3, which may or may not be right
+			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
 			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs - ((defbitoffs >= 31) ? 16 : 0)) : (17 + defbitoffs));
 
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
@@ -835,13 +835,28 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	/* end of the line: time to add the modulos */
 	if (scanline >= m_diw.top() && scanline < m_diw.bottom())
 	{
-		/* update odd planes */
-		for (pl = 0; pl < planes; pl += 2)
-			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL1MOD);
+		int16_t odd_modulo = CUSTOM_REG_SIGNED(REG_BPL1MOD);
+		int16_t even_modulo = CUSTOM_REG_SIGNED(REG_BPL2MOD);
+		// bscan2, vkart AGA
+		if (CUSTOM_REG(REG_FMODE) & 0x4000)
+		{
+			int vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
+			vstart |= (CUSTOM_REG(REG_DIWHIGH) & 7) << 8;
+			int16_t current_modulo = ((vstart ^ (scanline ^ 1)) & 1) ? odd_modulo : even_modulo;
+			
+			for (pl = 0; pl < planes; pl ++)
+				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += current_modulo;
+		}
+		else
+		{
+			/* update odd planes */
+			for (pl = 0; pl < planes; pl += 2)
+				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += odd_modulo;
 
-		/* update even planes */
-		for (pl = 1; pl < planes; pl += 2)
-			CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += CUSTOM_REG_SIGNED(REG_BPL2MOD);
+			/* update even planes */
+			for (pl = 1; pl < planes; pl += 2)
+				CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += even_modulo;
+		}
 	}
 
 	/* restore color00 */
