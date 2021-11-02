@@ -465,7 +465,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	int pl;
 	int defbitoffs = 0;
 	rgb_t *aga_palette = m_aga_palette;
-
+	
 	int save_scanline = scanline;
 
 	/* on the first scanline, reset the COPPER and HAM color */
@@ -724,11 +724,12 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			{
 				int pix, pri;
 
-				/* hold-and-modify mode -- assume low-res (hi-res not supported by the hardware) */
+				/* hold-and-modify mode -- hires and shres supported (cfr. roadkill) */
 				if (ham)
 				{
 					/* update the HAM color */
 					pfpix0 = aga_update_ham(pfpix0, planes);
+					pfpix1 = (hires) ? aga_update_ham(pfpix1, planes) : aga_palette[pfpix0];
 
 					pix = sprpix & 0xff;
 					pri = (sprpix >> 12);
@@ -743,8 +744,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					/* playfield has priority */
 					else
 					{
-						dst[x*2+0] =
-						dst[x*2+1] = pfpix0;
+						dst[x*2+0] = pfpix0;
+						dst[x*2+1] = pfpix1;
 					}
 				}
 
