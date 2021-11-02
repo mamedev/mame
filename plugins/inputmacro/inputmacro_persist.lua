@@ -104,7 +104,7 @@ function lib:load_settings()
 	local settings = json.parse(file:read('a'))
 	file:close()
 	if not settings then
-		emu.print_error(string.format('Error loading input macros: error parsing file "%s" as JSON\n', filename))
+		emu.print_error(string.format('Error loading input macros: error parsing file "%s" as JSON', filename))
 		return { }
 	end
 
@@ -124,7 +124,7 @@ function lib:save_settings(macros)
 	if not stat then
 		lfs.mkdir(path)
 	elseif stat.mode ~= 'directory' then
-		emu.print_error(string.format('Error saving input macros: "%s" is not a directory\n', path))
+		emu.print_error(string.format('Error saving input macros: "%s" is not a directory', path))
 		return
 	end
 	filename = path .. settings_filename()
@@ -139,7 +139,7 @@ function lib:save_settings(macros)
 	local text = json.stringify(settings, { indent = true })
 	local file = io.open(filename, 'w')
 	if not file then
-		emu.print_error(string.format('Error saving input macros: error opening file "%s" for writing\n', filename))
+		emu.print_error(string.format('Error saving input macros: error opening file "%s" for writing', filename))
 		return
 	end
 	file:write(text)

@@ -56,7 +56,6 @@
 #define OPTION_REWIND_CAPACITY      "rewind_capacity"
 #define OPTION_PLAYBACK             "playback"
 #define OPTION_RECORD               "record"
-#define OPTION_RECORD_TIMECODE      "record_timecode"
 #define OPTION_EXIT_AFTER_PLAYBACK  "exit_after_playback"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
@@ -342,7 +341,6 @@ public:
 	int rewind_capacity() const { return int_value(OPTION_REWIND_CAPACITY); }
 	const char *playback() const { return value(OPTION_PLAYBACK); }
 	const char *record() const { return value(OPTION_RECORD); }
-	bool record_timecode() const { return bool_value(OPTION_RECORD_TIMECODE); }
 	bool exit_after_playback() const { return bool_value(OPTION_EXIT_AFTER_PLAYBACK); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }

@@ -1133,38 +1133,6 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 
 
 //-------------------------------------------------
-//  draw_timecode_counter
-//-------------------------------------------------
-
-void mame_ui_manager::draw_timecode_counter(render_container &container)
-{
-	std::string tempstring;
-	draw_text_full(
-			container,
-			machine().video().timecode_text(tempstring),
-			0.0f, 0.0f, 1.0f,
-			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
-}
-
-
-//-------------------------------------------------
-//  draw_timecode_total
-//-------------------------------------------------
-
-void mame_ui_manager::draw_timecode_total(render_container &container)
-{
-	std::string tempstring;
-	draw_text_full(
-			container,
-			machine().video().timecode_total_text(tempstring),
-			0.0f, 0.0f, 1.0f,
-			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
-}
-
-
-//-------------------------------------------------
 //  draw_profiler
 //-------------------------------------------------
 
@@ -1248,14 +1216,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (show_fps_counter())
 		draw_fps_counter(container);
 
-	// Show the duration of current part (intro or gameplay or extra)
-	if (show_timecode_counter())
-		draw_timecode_counter(container);
-
-	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
-	if (show_timecode_total())
-		draw_timecode_total(container);
-
 	// draw the profiler if visible
 	if (show_profiler())
 		draw_profiler(container);
@@ -1301,10 +1261,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	image_handler_ingame();
-
-	// handle a save input timecode request
-	if (machine().ui_input().pressed(IPT_UI_TIMECODE))
-		machine().video().save_input_timecode();
 
 	if (ui_disabled)
 		return ui_disabled;

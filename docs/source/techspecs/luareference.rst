@@ -63,6 +63,83 @@ Core classes
 Many of MAME’s core classes used to implement an emulation session are available
 to Lua scripts.
 
+.. _luareference-core-attotime:
+
+Attotime
+~~~~~~~~
+
+Wraps MAME’s ``attotime`` class, which represents a high-precision time
+interval.  Attotime values support addition and subtraction with other attotime
+values, and multiplication and division by integers.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.attotime()
+    Creates an attotime value representing zero (i.e. no elapsed time).
+emu.attotime(seconds, attoseconds)
+    Creates an attotime with the specified whole and fractional parts.
+emu.attotime(attotime)
+    Creates a copy of an existing attotime value.
+emu.attotime.from_double(seconds)
+    Creates an attotime value representing the specified number of seconds.
+emu.attotime.from_ticks(periods, frequency)
+    Creates an attotime representing the specified number of periods of the
+    specified frequency in Hertz.
+emu.attotime.from_seconds(seconds)
+    Creates an attotime value representing the specified whole number of
+    seconds.
+emu.attotime.from_msec(milliseconds)
+    Creates an attotime value representing the specified whole number of
+    milliseconds.
+emu.attotime.from_usec(microseconds)
+    Creates an attotime value representing the specified whole number of
+    microseconds.
+emu.attotime.from_nsec(nanoseconds)
+    Creates an attotime value representing the specified whole number of
+    nanoseconds.
+
+Methods
+^^^^^^^
+
+t:as_double()
+    Returns the time interval in seconds as a floating-point value.
+t:as_hz()
+    Interprets the interval as a period and returns the corresponding frequency
+    in Hertz as a floating-point value.
+t:as_khz()
+    Interprets the interval as a period and returns the corresponding frequency
+    kilohertz as a floating-point value.
+t:as_mhz()
+    Interprets the interval as a period and returns the corresponding frequency
+    megahertz as a floating-point value.
+t:as_ticks(frequency)
+    Returns the interval as a whole number of periods at the specified
+    frequency.  The frequency is specified in Hertz.
+
+Properties
+^^^^^^^^^^
+
+t.is_zero (read-only)
+    Whether the value represents no elapsed time.
+t.is_never (read-only)
+    Whether the value is greater than the maximum number of whole seconds that
+    can be represented (treated as an unreachable time in the future or
+    overflow).
+t.attoseconds (read-only)
+    The fraction seconds portion of the interval in attoseconds.
+t.seconds (read-only)
+    The number of whole seconds in the interval.
+t.msec (read-only)
+    The number of whole milliseconds in the fractional seconds portion of the
+    interval.
+t.usec (read-only)
+    The number of whole microseconds in the fractional seconds portion of the
+    interval.
+t.nsec (read-only)
+    The number of whole nanoseconds in the fractional seconds portion of the
+    interval.
+
 .. _luareference-core-mameman:
 
 MAME machine manager
@@ -147,6 +224,9 @@ machine:logerror(msg)
 Properties
 ^^^^^^^^^^
 
+machine.time (read-only)
+    The elapsed emulated time for the current session as an
+    :ref:`attotime <luareference-core-attotime>`.
 machine.system (read-only)
     The :ref:`driver metadata <luareference-core-driver>` for the current
     system.

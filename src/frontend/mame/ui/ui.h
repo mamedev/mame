@@ -186,8 +186,6 @@ public:
 	void decrease_frameskip();
 	void request_quit();
 	void draw_fps_counter(render_container &container);
-	void draw_timecode_counter(render_container &container);
-	void draw_timecode_total(render_container &container);
 	void draw_profiler(render_container &container);
 	void start_save_state();
 	void start_load_state();

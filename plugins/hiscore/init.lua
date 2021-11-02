@@ -49,7 +49,7 @@ function hiscore.startplugin()
 				config_read = true
 				return true
 			else
-				emu.print_error(string.format('Error loading hiscore plugin settings: error parsing file "%s" as JSON\n', filename))
+				emu.print_error(string.format('Error loading hiscore plugin settings: error parsing file "%s" as JSON', filename))
 			end
 		end
 		return false
@@ -62,7 +62,7 @@ function hiscore.startplugin()
 		if not attr then
 			lfs.mkdir(path)
 		elseif attr.mode ~= 'directory' then
-			emu.print_error(string.format('Error saving hiscore plugin settings: "%s" is not a directory\n', path))
+			emu.print_error(string.format('Error saving hiscore plugin settings: "%s" is not a directory', path))
 			return
 		end
 		local settings = { only_save_at_exit = not timed_save }
@@ -72,7 +72,7 @@ function hiscore.startplugin()
 		local data = json.stringify(settings, { indent = true })
 		local file = io.open(filename, 'w')
 		if not file then
-			emu.print_error(string.format('Error saving hiscore plugin settings: error opening file "%s" for writing\n', filename))
+			emu.print_error(string.format('Error saving hiscore plugin settings: error opening file "%s" for writing', filename))
 			return
 		end
 		file:write(data)

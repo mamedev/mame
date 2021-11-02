@@ -1484,22 +1484,6 @@ Core State/Playback Options
          you should only record and playback with all configuration (.cfg),
          NVRAM (.nv), and memory card files deleted.
 
-.. _mame-commandline-recordtimecode:
-
-**-record_timecode**
-
-    Tells MAME to create a timecode file. It contains a line with elapsed times
-    on each press of timecode shortcut key (default is **F12**).  This option
-    works only when recording mode is enabled (**-record** option).  The
-    timecode file is saved in the ``inp`` folder.
-
-    By default, no timecode file is saved.
-
-    Example:
-        .. code-block:: bash
-
-            mame pacman -record worldrecord -record_timecode
-
 .. _mame-commandline-mngwrite:
 
 **-mngwrite** *<filename>*

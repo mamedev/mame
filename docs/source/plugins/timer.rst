@@ -1,3 +1,5 @@
+.. _plugins-timer:
+
 Timer Plugin
 ============
 

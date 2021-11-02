@@ -58,7 +58,7 @@ function lib:load_settings()
 	local loaded_settings = json.parse(file:read('a'))
 	file:close()
 	if not loaded_settings then
-		emu.print_error(string.format('Error loading autofire settings: error parsing file "%s" as JSON\n', filename))
+		emu.print_error(string.format('Error loading autofire settings: error parsing file "%s" as JSON', filename))
 		return buttons
 	end
 	for index, button_settings in ipairs(loaded_settings) do
@@ -76,7 +76,7 @@ function lib:save_settings(buttons)
 	if not attr then
 		lfs.mkdir(path)
 	elseif attr.mode ~= 'directory' then
-		emu.print_error(string.format('Error saving autofire settings: "%s" is not a directory\n', path))
+		emu.print_error(string.format('Error saving autofire settings: "%s" is not a directory', path))
 		return
 	end
 	if #buttons == 0 then
@@ -89,7 +89,7 @@ function lib:save_settings(buttons)
 	local filename = path .. get_settings_filename()
 	local file = io.open(filename, 'w')
 	if not file then
-		emu.print_error(string.format('Error saving autofire settings: error opening file "%s" for writing\n', filename))
+		emu.print_error(string.format('Error saving autofire settings: error opening file "%s" for writing', filename))
 		return
 	end
 	file:write(data)

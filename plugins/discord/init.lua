@@ -83,7 +83,7 @@ function discord.startplugin()
 			data = data .. res
 		until #res == 0 and #data > 0 or time + 1 < os.time()
 		if #data == 0 then
-			emu.print_verbose("discord: timed out waiting for response, closing connection\n");
+			emu.print_verbose("discord: timed out waiting for response, closing connection");
 			pipe = nil
 		end
 		--print(data)

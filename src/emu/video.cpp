@@ -103,11 +103,6 @@ video_manager::video_manager(running_machine &machine)
 	, m_snap_native(true)
 	, m_snap_width(0)
 	, m_snap_height(0)
-	, m_timecode_enabled(false)
-	, m_timecode_write(false)
-	, m_timecode_text("")
-	, m_timecode_start(attotime::zero)
-	, m_timecode_total(attotime::zero)
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&video_manager::exit, this));
@@ -373,45 +368,6 @@ void video_manager::save_active_screen_snapshots()
 		if (!filerr)
 			save_snapshot(nullptr, file);
 	}
-}
-
-
-//-------------------------------------------------
-//  save_input_timecode - add a line of current
-//  timestamp to inp.timecode file
-//-------------------------------------------------
-
-void video_manager::save_input_timecode()
-{
-	// if record timecode input is not active, do nothing
-	if (!m_timecode_enabled) {
-		return;
-	}
-	m_timecode_write = true;
-}
-
-std::string &video_manager::timecode_text(std::string &str)
-{
-	attotime elapsed_time = machine().time() - m_timecode_start;
-	str = string_format(" %s%s%02d:%02d %s",
-			m_timecode_text,
-			m_timecode_text.empty() ? "" : " ",
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60,
-			machine().paused() ? "[paused] " : "");
-	return str;
-}
-
-std::string &video_manager::timecode_total_text(std::string &str)
-{
-	attotime elapsed_time = m_timecode_total;
-	if (machine().ui().show_timecode_counter()) {
-		elapsed_time += machine().time() - m_timecode_start;
-	}
-	str = string_format("TOTAL %02d:%02d ",
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60);
-	return str;
 }
 
 
