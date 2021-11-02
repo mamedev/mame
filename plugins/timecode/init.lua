@@ -158,7 +158,7 @@ function timecode.startplugin()
 
 
 	local function start()
-		hotkey_seq = manager.machine.input:seq_from_tokens('KEYCODE_F12 NOT KEYCODE_LSHIFT NOT KEYCODE_RSHIFT')
+		hotkey_seq = manager.machine.input:seq_from_tokens('KEYCODE_F12 NOT KEYCODE_LSHIFT NOT KEYCODE_RSHIFT NOT KEYCODE_LALT NOT KEYCODE_RALT')
 
 		-- try to load configuration
 		local cfgname = get_settings_path() .. 'plugin.cfg'

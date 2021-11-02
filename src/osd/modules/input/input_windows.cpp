@@ -139,11 +139,6 @@ void windows_osd_interface::customize_input_type_list(std::vector<input_type_ent
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LALT);
 				break;
 
-			// add a NOT-lalt to write timecode file
-			case IPT_UI_TIMECODE: // emu/input.c: input_seq(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT)
-				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, input_seq::not_code, KEYCODE_LSHIFT, input_seq::not_code, KEYCODE_LALT);
-				break;
-
 			// lctrl-lalt-F5 to toggle post-processing
 			case IPT_OSD_4:
 				entry.configure_osd("POST_PROCESS", N_p("input-name", "Toggle Post-Processing"));
