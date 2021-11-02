@@ -504,8 +504,7 @@ void menu::draw(uint32_t flags)
 	visible_main_menu_height += 0.01f;
 
 	// if we are too wide or too tall, clamp it down
-	if (visible_width + 2.0f * lr_border > 1.0f)
-		visible_width = 1.0f - 2.0f * lr_border;
+	visible_width = std::min(visible_width, 1.0f - ((lr_border + (aspect * UI_LINE_WIDTH)) * 2.0f));
 
 	// if the menu and extra menu won't fit, take away part of the regular menu, it will scroll
 	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * ui().box_tb_border() > 1.0f)

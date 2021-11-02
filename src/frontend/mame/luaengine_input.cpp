@@ -244,6 +244,12 @@ void lua_engine::initialize_input(sol::table &emu)
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
 			settings.seq[seq_type] = seq;
+			if (seq.is_default())
+				settings.cfg[seq_type].clear();
+			else if (!seq.length())
+				settings.cfg[seq_type] = "NONE";
+			else
+				settings.cfg[seq_type] = f.port().device().machine().input().seq_to_tokens(seq);
 			f.set_user_settings(settings);
 		};
 	ioport_field_type["input_seq"] =

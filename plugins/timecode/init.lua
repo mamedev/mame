@@ -12,19 +12,22 @@ local timecode = exports
 
 function timecode.startplugin()
 	local file                  -- the timecode log file
-	local enabled               -- whether timecode recording is enabled
 	local write                 -- whether to record a timecode on the next emulated frame
 	local text                  -- name of current part
+	local frame_count           -- emulated frame counter
+	local start_frame           -- start frame count for current part
 	local start_time            -- start time for current part
 	local total_time            -- total time of parts so far this session
 	local count                 -- current timecode number
 	local show_counter          -- whether to show elapsed time since last timecode
 	local show_total            -- whether to show the total time of parts
 
+	local frame_mode            -- 0 to count frames, 1 to assume 60 Hz
 	local hotkey_seq            -- input sequence to record timecode
 	local hotkey_pressed        -- whether the hotkey was pressed on the last frame update
 	local hotkey_cfg            -- configuration string for the hotkey
 
+	local item_framemode        -- menu index of frame mode item
 	local item_hotkey           -- menu index of hotkey item
 	local commonui              -- common UI helpers
 	local hotkey_poller         -- helper for configuring hotkey
@@ -35,48 +38,114 @@ function timecode.startplugin()
 	end
 
 
+	local function set_default_hotkey()
+		hotkey_seq = manager.machine.input:seq_from_tokens('KEYCODE_F12 NOT KEYCODE_LSHIFT NOT KEYCODE_RSHIFT NOT KEYCODE_LALT NOT KEYCODE_RALT')
+		hotkey_cfg = nil
+	end
+
+
+	local function load_settings()
+		-- set defaults
+		frame_mode = 1
+		set_default_hotkey()
+
+		-- try to open configuration file
+		local cfgname = get_settings_path() .. 'plugin.cfg'
+		local cfgfile = io.open(cfgname, 'r')
+		if not cfgfile then
+			return -- probably harmless, configuration just doesn't exist yet
+		end
+
+		-- parse settings as JSON
+		local json = require('json')
+		local settings = json.parse(cfgfile:read('a'))
+		cfgfile:close()
+		if not settings then
+			emu.print_error(string.format('Error loading timecode recorder settings: error parsing file "%s" as JSON', cfgname))
+			return
+		end
+
+		-- recover frame mode
+		local count_frames = settings.count_frames
+		if count_frames ~= nil then
+			frame_mode = count_frames and 0 or 1
+		end
+
+		-- recover hotkey assignment
+		hotkey_cfg = settings.hotkey
+		if hotkey_cfg then
+			local seq = manager.machine.input:seq_from_tokens(hotkey_cfg)
+			if seq then
+				hotkey_seq = seq
+			end
+		end
+	end
+
+
+	local function save_settings()
+		local path = get_settings_path()
+		local attr = lfs.attributes(path)
+		if not attr then
+			lfs.mkdir(path)
+		elseif attr.mode ~= 'directory' then
+			emu.print_error(string.format('Error saving timecode recorder settings: "%s" is not a directory', path))
+			return
+		end
+		local json = require('json')
+		local settings = { count_frames = frame_mode == 0 }
+		if hotkey_cfg then
+			settings.hotkey = hotkey_cfg
+		end
+		local data = json.stringify(settings, { indent = true })
+		local cfgname = path .. 'plugin.cfg'
+		local cfgfile = io.open(cfgname, 'w')
+		if not cfgfile then
+			emu.print_error(string.format('Error saving timecode recorder settings: error opening file "%s" for writing', cfgname))
+			return
+		end
+		cfgfile:write(data)
+		cfgfile:close()
+	end
+
+
 	local function process_frame()
-		if (not manager.machine.paused) and file and write then
+		if (not file) or manager.machine.paused then
+			return
+		end
+		if write then
 			write = false
 			count = count + 1
 			show_total = true
 
-			-- milliseconds from beginning of playback
+			-- time from beginning of playback in milliseconds, HH:MM:SS.fff and frames
 			local curtime = manager.machine.time
-			local cursec = curtime.seconds
-			local msec_start = (cursec * 1000) + curtime.msec
+			local sec_start = curtime.seconds
+			local msec_start = (sec_start * 1000) + curtime.msec
 			local msec_start_str = string.format('%015d', msec_start)
-
-			-- display the timecode
 			local curtime_str = string.format(
 					'%02d:%02d:%02d.%03d',
-					cursec // (60 * 60),
-					(cursec // 60) % 60,
-					cursec % 60,
+					sec_start // (60 * 60),
+					(sec_start // 60) % 60,
+					sec_start % 60,
 					msec_start % 1000)
+			local frame_start_str = string.format('%015d', (frame_mode == 0) and frame_count or (msec_start * 60 // 1000))
 
-			-- milliseconds from previous timecode
+			-- elapsed from previous timecode in milliseconds, HH:MM:SS.fff and frames
 			local elapsed = curtime - start_time
-			local elapsedsec = elapsed.seconds
-			local msec_elapsed = (elapsedsec * 1000) + elapsed.msec
+			local sec_elapsed = elapsed.seconds
+			local msec_elapsed = (sec_elapsed * 1000) + elapsed.msec
 			local msec_elapsed_str = string.format('%015d', msec_elapsed)
-
-			-- elapsed from previous timecode
-			start_time = curtime
 			local elapsed_str = string.format(
 					'%02d:%02d:%02d.%03d',
-					elapsedsec // (60 * 60),
-					(elapsedsec // 60) % 60,
-					elapsedsec % 60,
+					sec_elapsed // (60 * 60),
+					(sec_elapsed // 60) % 60,
+					sec_elapsed % 60,
 					msec_elapsed % 1000)
+			local frame_elapsed_str = string.format('%015d', (frame_mode == 0) and (frame_count - start_frame) or (msec_elapsed * 60 // 1000))
 
-			-- number of frames from beginning of playback
-			-- TODO: should this account for actual frame rate rather than assuming 60fps?
-			local frame_start_str = string.format('%015d', msec_start * 60 // 1000)
-
-			-- number of frames from previous timecode
-			-- TODO: should this account for actual frame rate rather than assuming 60fps?
-			local frame_elapsed_str = string.format('%015d', msec_elapsed * 60 // 1000)
+			-- update start of part
+			start_frame = frame_count
+			start_time = curtime
 
 			local message
 			local key
@@ -125,6 +194,7 @@ function timecode.startplugin()
 						msec_start_str, msec_elapsed_str,
 						frame_start_str, frame_elapsed_str))
 		end
+		frame_count = frame_count + 1
 	end
 
 
@@ -147,7 +217,7 @@ function timecode.startplugin()
 			total_str = string.format(_p('plugin-timecode', 'TOTAL %02d:%02d '), (total // 60) % 60, total % 60)
 			machine.render.ui_container:draw_text('left', 0, total_str, 0xf010f010, 0xff000000)
 		end
-		if enabled then
+		if file then
 			local pressed = machine.input:seq_pressed(hotkey_seq)
 			if (not hotkey_pressed) and pressed then
 				write = true
@@ -158,35 +228,15 @@ function timecode.startplugin()
 
 
 	local function start()
-		hotkey_seq = manager.machine.input:seq_from_tokens('KEYCODE_F12 NOT KEYCODE_LSHIFT NOT KEYCODE_RSHIFT NOT KEYCODE_LALT NOT KEYCODE_RALT')
-
-		-- try to load configuration
-		local cfgname = get_settings_path() .. 'plugin.cfg'
-		local cfgfile = io.open(cfgname, 'r')
-		if cfgfile then
-			local json = require('json')
-			local settings = json.parse(cfgfile:read('a'))
-			cfgfile:close()
-			if not settings then
-				emu.print_error(string.format('Error loading timecode recorder settings: error parsing file "%s" as JSON', cfgname))
-			else
-				hotkey_cfg = settings.hotkey
-				if hotkey_cfg then
-					local seq = manager.machine.input:seq_from_tokens(hotkey_cfg)
-					if seq then
-						hotkey_seq = seq
-					end
-				end
-			end
-		end
+		file = nil
+		show_counter = false
+		show_total = false
+		load_settings()
 
 		-- only do timecode recording if we're doing input recording
 		local options = manager.machine.options.entries
 		local filename = options.record:value()
-		enabled = #filename > 0
-		show_counter = false
-		show_total = false
-		if enabled then
+		if #filename > 0 then
 			filename = filename .. '.timecode'
 			emu.print_info(string.format('Record input timecode file: %s', filename))
 			file = emu.file(options.input_directory:value(), 0x0e) -- FIXME: magic number for flags
@@ -194,10 +244,12 @@ function timecode.startplugin()
 			if openerr then
 				-- TODO: this used to throw a fatal error and log the error description
 				emu.print_error('Failed to open file for input timecode recording')
-				enabled = false
+				file = nil
 			else
 				write = false
 				text = ''
+				frame_count = 0
+				start_frame = 0
 				start_time = emu.attotime()
 				total_time = emu.attotime()
 				count = 0
@@ -231,27 +283,7 @@ function timecode.startplugin()
 		end
 
 		-- try to save settings
-		local path = get_settings_path()
-		local attr = lfs.attributes(path)
-		if not attr then
-			lfs.mkdir(path)
-		elseif attr.mode ~= 'directory' then
-			emu.print_error(string.format('Error saving timecode recorder settings: "%s" is not a directory', path))
-			return
-		end
-		if hotkey_cfg then
-			local json = require('json')
-			local settings = { hotkey = hotkey_cfg }
-			local data = json.stringify(settings, { indent = true })
-			local cfgname = path .. 'plugin.cfg'
-			local cfgfile = io.open(cfgname, 'w')
-			if not cfgfile then
-				emu.print_error(string.format('Error saving timecode recorder settings: error opening file "%s" for writing', cfgname))
-				return
-			end
-			cfgfile:write(data)
-			cfgfile:close()
-		end
+		save_settings()
 	end
 
 
@@ -265,12 +297,22 @@ function timecode.startplugin()
 				hotkey_poller = nil
 				return true
 			end
-		elseif (index == item_hotkey) and (event == 'select') then
-			if not commonui then
-				commonui = require('commonui')
+		elseif index == item_framemode then
+			if (event == 'select') or (event == 'left') or (event == 'right') then
+				frame_mode = (frame_mode ~= 0) and 0 or 1
+				return true
 			end
-			hotkey_poller = commonui.switch_polling_helper()
-			return true
+		elseif index == item_hotkey then
+			if event == 'select' then
+				if not commonui then
+					commonui = require('commonui')
+				end
+				hotkey_poller = commonui.switch_polling_helper()
+				return true
+			elseif event == 'clear' then
+				set_default_hotkey()
+				return true
+			end
 		end
 		return false
 	end
@@ -280,8 +322,14 @@ function timecode.startplugin()
 		local result = { }
 		table.insert(result, { _p('plugin-timecode', 'Timecode Recorder'), '', 'off' })
 		table.insert(result, { '---', '', '' })
+
+		local frame_mode_val = (frame_mode > 0) and _p('plugin-timecode', 'Assume 60 Hz') or _p('plugins-timecode', 'Count emulated frames')
+		table.insert(result, { _p('plugin-timecode', 'Frame numbers'), frame_mode_val, (frame_mode > 0) and 'l' or 'r' })
+		item_framemode = #result
+
 		table.insert(result, { _p('plugin-timecode', 'Hotkey'), manager.machine.input:seq_name(hotkey_seq), hotkey_poller and 'lr' or '' })
 		item_hotkey = #result
+
 		if hotkey_poller then
 			return hotkey_poller:overlay(result)
 		else

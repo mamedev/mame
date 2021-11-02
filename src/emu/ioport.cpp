@@ -695,7 +695,7 @@ const char *ioport_field::name() const
 const input_seq &ioport_field::seq(input_seq_type seqtype) const noexcept
 {
 	// if no live state, return default
-	if (m_live == nullptr)
+	if (!m_live)
 		return defseq(seqtype);
 
 	// if the sequence is the special default code, return the expanded default value
@@ -736,7 +736,7 @@ void ioport_field::set_defseq(input_seq_type seqtype, const input_seq &newseq)
 	m_seq[seqtype] = newseq;
 
 	// also update live state unless previously customized
-	if (m_live != nullptr && !was_changed)
+	if (m_live && !was_changed)
 		m_live->seq[seqtype] = newseq;
 }
 
@@ -875,14 +875,18 @@ std::string ioport_field::key_name(int which) const
 //  settings for the given input field
 //-------------------------------------------------
 
-void ioport_field::get_user_settings(user_settings &settings) const noexcept
+void ioport_field::get_user_settings(user_settings &settings) const
 {
 	// zap the entire structure
 	settings = user_settings();
 
 	// copy the basics
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+	{
 		settings.seq[seqtype] = seq(seqtype);
+		if (m_live)
+			settings.cfg[seqtype] = m_live->cfg[seqtype];
+	}
 
 	// if there's a list of settings or we're an adjuster, copy the current value
 	if (!m_settinglist.empty() || m_type == IPT_ADJUSTER)
@@ -909,16 +913,16 @@ void ioport_field::get_user_settings(user_settings &settings) const noexcept
 //  settings for the given input field
 //-------------------------------------------------
 
-void ioport_field::set_user_settings(const user_settings &settings) noexcept
+void ioport_field::set_user_settings(const user_settings &settings)
 {
 	// copy the basics
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 	{
-		const input_seq &defseq = manager().type_seq(m_type, m_player, input_seq_type(seqtype));
-		if (defseq == settings.seq[seqtype])
+		if (settings.seq[seqtype].is_default())
 			m_live->seq[seqtype].set_default();
 		else
 			m_live->seq[seqtype] = settings.seq[seqtype];
+		m_live->cfg[seqtype] = settings.cfg[seqtype];
 	}
 
 	// if there's a list of settings or we're an adjuster, copy the current value
@@ -1898,7 +1902,21 @@ void ioport_manager::set_type_seq(ioport_type type, int player, input_seq_type s
 {
 	input_type_entry *const entry = m_type_to_entry[type][player];
 	if (entry)
-		entry->set_seq(seqtype, newseq);
+	{
+		if (newseq.is_default())
+		{
+			entry->set_seq(seqtype, entry->defseq(seqtype));
+			entry->set_cfg(seqtype, "");
+		}
+		else
+		{
+			entry->set_seq(seqtype, newseq);
+			if (!newseq.length())
+				entry->set_cfg(seqtype, "NONE");
+			else
+				entry->set_cfg(seqtype, machine().input().seq_to_tokens(newseq));
+		}
+	}
 }
 
 
@@ -2086,9 +2104,12 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 		int type = token_to_input_type(portnode->get_attribute_string("type", ""), player);
 
 		// initialize sequences to invalid defaults
-		input_seq newseq[SEQ_TYPE_TOTAL];
-		for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-			newseq[seqtype].set(INPUT_CODE_INVALID);
+		std::pair<input_seq, char const *> newseq[SEQ_TYPE_TOTAL];
+		for (auto &seq : newseq)
+		{
+			seq.first.set(INPUT_CODE_INVALID);
+			seq.second = "";
+		}
 
 		// loop over new sequences
 		for (util::xml::data_node const *seqnode = portnode->get_child("newseq"); seqnode; seqnode = seqnode->get_next_sibling("newseq"))
@@ -2098,19 +2119,28 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 			if ((seqtype != -1) && seqnode->get_value())
 			{
 				if (!strcmp(seqnode->get_value(), "NONE"))
-					newseq[seqtype].reset();
+					newseq[seqtype].first.reset();
 				else
-					machine().input().seq_from_tokens(newseq[seqtype], seqnode->get_value());
+					machine().input().seq_from_tokens(newseq[seqtype].first, seqnode->get_value());
+				newseq[seqtype].second = seqnode->get_value();
 			}
 		}
 
 		// load into the appropriate place for the config type/level
 		if (config_type::SYSTEM == cfg_type)
+		{
 			load_system_config(*portnode, type, player, newseq);
+		}
 		else if ((config_type::CONTROLLER == cfg_type) && (config_level::DEFAULT != cfg_level))
+		{
+			for (auto &seq : newseq)
+				seq.second = "";
 			load_controller_config(*portnode, type, player, newseq);
+		}
 		else
+		{
 			load_default_config(type, player, newseq);
+		}
 	}
 
 	// after applying the controller config, push that back into the backup, since that is
@@ -2230,7 +2260,10 @@ void ioport_manager::load_remap_table(util::xml::data_node const &parentnode)
 //  to defaults for all systems
 //-------------------------------------------------
 
-bool ioport_manager::load_default_config(int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL])
+bool ioport_manager::load_default_config(
+		int type,
+		int player,
+		const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL])
 {
 	// find a matching port in the list
 	for (input_type_entry &entry : m_typelist)
@@ -2238,8 +2271,11 @@ bool ioport_manager::load_default_config(int type, int player, const input_seq (
 		if (entry.type() == type && entry.player() == player)
 		{
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-					entry.set_seq(seqtype, newseq[seqtype]);
+			{
+				if (newseq[seqtype].first[0] != INPUT_CODE_INVALID)
+					entry.set_seq(seqtype, newseq[seqtype].first);
+				entry.set_cfg(seqtype, newseq[seqtype].second);
+			}
 			return true;
 		}
 	}
@@ -2252,7 +2288,11 @@ bool ioport_manager::load_default_config(int type, int player, const input_seq (
 //  profile settings to defaults
 //-------------------------------------------------
 
-bool ioport_manager::load_controller_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL])
+bool ioport_manager::load_controller_config(
+		util::xml::data_node const &portnode,
+		int type,
+		int player,
+		const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL])
 {
 	// without a tag, apply to the defaults for all systems
 	char const *const tag = portnode.get_attribute_string("tag", nullptr);
@@ -2278,8 +2318,8 @@ bool ioport_manager::load_controller_config(util::xml::data_node const &portnode
 			// if a sequence was specified, override the developer-specified default for the field
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
-				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-					field.set_defseq(seqtype, newseq[seqtype]);
+				if (newseq[seqtype].first[0] != INPUT_CODE_INVALID)
+					field.set_defseq(seqtype, newseq[seqtype].first);
 			}
 
 			// fetch configurable attributes
@@ -2342,7 +2382,11 @@ bool ioport_manager::load_controller_config(util::xml::data_node const &portnode
 //  configuration for the current system
 //-------------------------------------------------
 
-void ioport_manager::load_system_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL])
+void ioport_manager::load_system_config(
+		util::xml::data_node const &portnode,
+		int type,
+		int player,
+		const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL])
 {
 	// system-specific configuration should always apply by port/field
 	char const *const tag = portnode.get_attribute_string("tag", nullptr);
@@ -2364,8 +2408,9 @@ void ioport_manager::load_system_config(util::xml::data_node const &portnode, in
 				// if a sequence was specified, copy it in
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
-					if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-						field.live().seq[seqtype] = newseq[seqtype];
+					if (newseq[seqtype].first[0] != INPUT_CODE_INVALID)
+						field.live().seq[seqtype] = newseq[seqtype].first;
+					field.live().cfg[seqtype] = newseq[seqtype].second;
 				}
 
 				// fetch configurable attributes
@@ -2461,27 +2506,6 @@ void ioport_manager::save_config(config_type cfg_type, util::xml::data_node *par
 
 
 //-------------------------------------------------
-//  save_sequence - add a node for an input
-//  sequence
-//-------------------------------------------------
-
-void ioport_manager::save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq)
-{
-	// get the string for the sequence
-	std::string seqstring;
-	if (seq.length() == 0)
-		seqstring.assign("NONE");
-	else
-		seqstring = machine().input().seq_to_tokens(seq);
-
-	// add the new node
-	util::xml::data_node *const seqnode = parentnode.add_child("newseq", seqstring.c_str());
-	if (seqnode != nullptr)
-		seqnode->set_attribute("type", seqtypestrings[type]);
-}
-
-
-//-------------------------------------------------
 //  save_this_input_field_type - determine if the
 //  given port type is worth saving
 //-------------------------------------------------
@@ -2519,7 +2543,7 @@ void ioport_manager::save_default_inputs(util::xml::data_node &parentnode)
 			// see if any of the sequences have changed
 			input_seq_type seqtype;
 			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-				if (entry.seq(seqtype) != entry.defseq(seqtype))
+				if (!entry.cfg(seqtype).empty())
 					break;
 
 			// if so, we need to add a node
@@ -2527,15 +2551,21 @@ void ioport_manager::save_default_inputs(util::xml::data_node &parentnode)
 			{
 				// add a new port node
 				util::xml::data_node *const portnode = parentnode.add_child("port", nullptr);
-				if (portnode != nullptr)
+				if (portnode)
 				{
 					// add the port information and attributes
 					portnode->set_attribute("type", input_type_to_token(entry.type(), entry.player()).c_str());
 
 					// add only the sequences that have changed from the defaults
 					for (input_seq_type type = SEQ_TYPE_STANDARD; type < SEQ_TYPE_TOTAL; ++type)
-						if (entry.seq(type) != entry.defseq(type))
-							save_sequence(*portnode, type, entry.type(), entry.seq(type));
+					{
+						if (!entry.cfg(type).empty())
+						{
+							util::xml::data_node *const seqnode = portnode->add_child("newseq", entry.cfg(type).c_str());
+							if (seqnode)
+								seqnode->set_attribute("type", seqtypestrings[type]);
+						}
+					}
 				}
 			}
 		}
@@ -2566,22 +2596,22 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 			{
 				// determine if we changed
 				bool changed = false;
-				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-					changed |= (field.seq(seqtype) != field.defseq(seqtype));
+				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; (seqtype < SEQ_TYPE_TOTAL) && !changed; ++seqtype)
+					changed = !field.live().cfg[seqtype].empty();
 
 				if (!field.is_analog())
 				{
 					// non-analog changes
-					changed |= ((field.live().value & field.mask()) != (field.defvalue() & field.mask()));
-					changed |= (field.live().toggle != field.toggle());
+					changed = changed || ((field.live().value & field.mask()) != (field.defvalue() & field.mask()));
+					changed = changed || (field.live().toggle != field.toggle());
 				}
 				else
 				{
 					// analog changes
-					changed |= (field.live().analog->m_delta != field.delta());
-					changed |= (field.live().analog->m_centerdelta != field.centerdelta());
-					changed |= (field.live().analog->m_sensitivity != field.sensitivity());
-					changed |= (field.live().analog->m_reverse != field.analog_reverse());
+					changed = changed || (field.live().analog->m_delta != field.delta());
+					changed = changed || (field.live().analog->m_centerdelta != field.centerdelta());
+					changed = changed || (field.live().analog->m_sensitivity != field.sensitivity());
+					changed = changed || (field.live().analog->m_reverse != field.analog_reverse());
 				}
 
 				// if we did change, add a new node
@@ -2599,8 +2629,14 @@ void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 
 						// add sequences if changed
 						for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-							if (field.seq(seqtype) != field.defseq(seqtype))
-								save_sequence(*portnode, seqtype, field.type(), field.seq(seqtype));
+						{
+							if (!field.live().cfg[seqtype].empty())
+							{
+								util::xml::data_node *const seqnode = portnode->add_child("newseq", field.live().cfg[seqtype].c_str());
+								if (seqnode)
+									seqnode->set_attribute("type", seqtypestrings[seqtype]);
+							}
+						}
 
 						if (!field.is_analog())
 						{
