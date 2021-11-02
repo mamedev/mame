@@ -1,7 +1,7 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Vas Crabb
 local exports = {
-	name = 'inputmacro',
+	name = 'timecode',
 	version = '0.0.1',
 	description = 'Timecode recorder plugin',
 	license = 'BSD-3-Clause',
