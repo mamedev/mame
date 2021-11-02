@@ -554,6 +554,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 			/* compute the pixel fetch parameters */
 			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
+			// TODO: does ddf_start_pixel offsets with fmode != 0?
+			// wbenc30 expects a +8 to align the screen, which may or may not be right
 			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs - ((defbitoffs >= 31) ? 16 : 0)) : (17 + defbitoffs));
 
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
@@ -581,6 +583,10 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		{
 			odelay = CUSTOM_REG(REG_BPLCON1) & 0xf;
 			edelay = ( CUSTOM_REG(REG_BPLCON1) >> 4 ) & 0x0f;
+			// extended delays for AGA
+			// FIXME: gives more GFX pitch corruption to games that uses it (sockid_a)
+			odelay += (CUSTOM_REG(REG_BPLCON1) & 0x0c00) >> 6;
+			edelay += (CUSTOM_REG(REG_BPLCON1) & 0xc000) >> 10;
 
 			if ( hires )
 			{

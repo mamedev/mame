@@ -5,8 +5,10 @@
     Commodore Amiga
 
 	Notes:
-	- On ECS/AGA machines, holding down both port 1 fire buttons
+	- On Kickstart 2.0 onward holding down both port 1 fire buttons
 	  will bring you to the Amiga Early Startup Control Screen.
+	  This gives you several diagnostic options, including booting from
+	  non-DF0 drive, switch video modes and test expansion boards.
 
 ***************************************************************************/
 

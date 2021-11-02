@@ -260,7 +260,7 @@ int amiga_state::copper_execute_next(int xpos)
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	if (LOG_COPPER)
-		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", m_last_scanline, xpos / 2, m_copper_pc, word0, word1);
+		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", m_last_scanline, xpos / 2, m_copper_pc - 4, word0, word1);
 
 	/* handle a move */
 	if ((word0 & 1) == 0)
