@@ -131,7 +131,329 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
+	enum : uint8_t
+	{
+		SCR_WDTH8               = 0x01,
+		SCR_DMAP                = 0x04,
+		SCR_SO                  = 0x08,
+		SCR_BETEN               = 0x10,
+		SCR_PRV                 = 0x20,
+		SCR_WPV                 = 0x40,
+		SCR_BETO                = 0x80,
+
+		PCTLR_WIDTH             = 0x1f,
+		PCTLR_STOP              = 0x40,
+		PCTLR_PC_EN             = 0x80,
+
+		BLKC_BD                 = 0x7f,
+		BLKC_BKEN               = 0x80,
+
+		LPICF_PBSIZ             = 0x06,
+		LPICF_PBSIZ_1           = 0x00,
+		LPICF_PBSIZ_2           = 0x02,
+		LPICF_PBSIZ_4           = 0x04,
+		LPICF_PBSIZ_INVALID     = 0x06,
+
+		LPOLCF_PIXPOL           = 0x01,
+		LPOLCF_LPPOL            = 0x02,
+		LPOLCF_FLMPOL           = 0x04,
+		LPOLCF_LCKPOL           = 0x08,
+
+		LACDRC_MASK             = 0x0f,
+
+		LPXCD_MASK              = 0x3f,
+
+		LCKCON_PCDS             = 0x01,
+		LCKCON_DWIDTH           = 0x02,
+		LCKCON_WS               = 0x30,
+		LCKCON_WS_1             = 0x00,
+		LCKCON_WS_2             = 0x10,
+		LCKCON_WS_3             = 0x20,
+		LCKCON_WS_4             = 0x30,
+		LCKCON_DMA16            = 0x40,
+		LCKCON_LCDON            = 0x80,
+		LCKCON_LCDC_EN          = 0x80,
+
+		LBAR_MASK               = 0x7f,
+
+		LPOSR_POS               = 0x07,
+		LPOSR_BOS               = 0x08,
+
+		LFRCM_YMOD              = 0x0f,
+		LFRCM_XMOD              = 0xf0,
+	};
+
+	enum : uint16_t
+	{
+		GRPBASE_VALID           = 0x0001,
+		GRPBASE_BASE_ADDR       = 0xfff0,
+
+		GRPMASK_BASE_MASK       = 0xfff0,
+
+		PLLCR_DISPLL            = 0x0008,
+		PLLCR_CLKEN             = 0x0010,
+		PLLCR_SYSCLK_SEL_DIV2   = 0x0000,
+		PLLCR_SYSCLK_SEL_DIV4   = 0x0100,
+		PLLCR_SYSCLK_SEL_DIV8   = 0x0200,
+		PLLCR_SYSCLK_SEL_DIV16  = 0x0300,
+		PLLCR_SYSCLK_SEL_DIV1_0 = 0x0400,
+		PLLCR_SYSCLK_SEL_DIV1_1 = 0x0500,
+		PLLCR_SYSCLK_SEL_DIV1_2 = 0x0600,
+		PLLCR_SYSCLK_SEL_DIV1_3 = 0x0700,
+		PLLCR_SYSCLK_SEL        = 0x0700,
+		PLLCR_PIXCLK_SEL_DIV2   = 0x0000,
+		PLLCR_PIXCLK_SEL_DIV4   = 0x0800,
+		PLLCR_PIXCLK_SEL_DIV8   = 0x1000,
+		PLLCR_PIXCLK_SEL_DIV16  = 0x1800,
+		PLLCR_PIXCLK_SEL_DIV1_0 = 0x2000,
+		PLLCR_PIXCLK_SEL_DIV1_1 = 0x2800,
+		PLLCR_PIXCLK_SEL_DIV1_2 = 0x3000,
+		PLLCR_PIXCLK_SEL_DIV1_3 = 0x3800,
+		PLLCR_PIXCLK_SEL        = 0x3800,
+
+		PLLFSR_PCNT             = 0x00ff,
+		PLLFSR_QCNT             = 0x0f00,
+		PLLFSR_PROT             = 0x4000,
+		PLLFSR_CLK32            = 0x8000,
+
+		ICR_POL6                = 0x0100,
+		ICR_POL3                = 0x0200,
+		ICR_POL2                = 0x0400,
+		ICR_POL1                = 0x0800,
+		ICR_ET6                 = 0x1000,
+		ICR_ET3                 = 0x2000,
+		ICR_ET2                 = 0x4000,
+		ICR_ET1                 = 0x8000,
+
+		PWMC_CLKSEL             = 0x0007,
+		PWMC_PWMEN              = 0x0010,
+		PWMC_POL                = 0x0040,
+		PWMC_PIN                = 0x0080,
+		PWMC_LOAD               = 0x0100,
+		PWMC_IRQEN              = 0x4000,
+		PWMC_PWMIRQ             = 0x8000,
+
+		TCTL_TEN                = 0x0001,
+		TCTL_TEN_ENABLE         = 0x0001,
+		TCTL_CLKSOURCE          = 0x000e,
+		TCTL_CLKSOURCE_STOP     = 0x0000,
+		TCTL_CLKSOURCE_SYSCLK   = 0x0002,
+		TCTL_CLKSOURCE_SYSCLK16 = 0x0004,
+		TCTL_CLKSOURCE_TIN      = 0x0006,
+		TCTL_CLKSOURCE_32KHZ4   = 0x0008,
+		TCTL_CLKSOURCE_32KHZ5   = 0x000a,
+		TCTL_CLKSOURCE_32KHZ6   = 0x000c,
+		TCTL_CLKSOURCE_32KHZ7   = 0x000e,
+		TCTL_IRQEN              = 0x0010,
+		TCTL_IRQEN_ENABLE       = 0x0010,
+		TCTL_OM                 = 0x0020,
+		TCTL_OM_ACTIVELOW       = 0x0000,
+		TCTL_OM_TOGGLE          = 0x0020,
+		TCTL_CAPTURE            = 0x00c0,
+		TCTL_CAPTURE_NOINT      = 0x0000,
+		TCTL_CAPTURE_RISING     = 0x0040,
+		TCTL_CAPTURE_FALLING    = 0x0080,
+		TCTL_CAPTURE_BOTH       = 0x00c0,
+		TCTL_FRR                = 0x0100,
+		TCTL_FRR_RESTART        = 0x0000,
+		TCTL_FRR_FREERUN        = 0x0100,
+
+		TSTAT_COMP              = 0x0001,
+		TSTAT_CAPT              = 0x0002,
+
+		WCTLR_WDRST             = 0x0008,
+		WCTLR_LOCK              = 0x0004,
+		WCTLR_FI                = 0x0002,
+		WCTLR_WDEN              = 0x0001,
+
+		SPIS_SPISEN             = 0x0100,
+		SPIS_POL                = 0x0200,
+		SPIS_PHA                = 0x0400,
+		SPIS_OVRWR              = 0x0800,
+		SPIS_DATA_RDY           = 0x1000,
+		SPIS_ENPOL              = 0x2000,
+		SPIS_IRQEN              = 0x4000,
+		SPIS_SPIS_IRQ           = 0x8000,
+
+		SPIM_CLOCK_COUNT        = 0x000f,
+		SPIM_POL                = 0x0010,
+		SPIM_POL_HIGH           = 0x0000,
+		SPIM_POL_LOW            = 0x0010,
+		SPIM_PHA                = 0x0020,
+		SPIM_PHA_NORMAL         = 0x0000,
+		SPIM_PHA_OPPOSITE       = 0x0020,
+		SPIM_IRQEN              = 0x0040,
+		SPIM_SPIMIRQ            = 0x0080,
+		SPIM_XCH                = 0x0100,
+		SPIM_XCH_IDLE           = 0x0000,
+		SPIM_XCH_INIT           = 0x0100,
+		SPIM_SPMEN              = 0x0200,
+		SPIM_SPMEN_DISABLE      = 0x0000,
+		SPIM_SPMEN_ENABLE       = 0x0200,
+		SPIM_RATE               = 0xe000,
+		SPIM_RATE_4             = 0x0000,
+		SPIM_RATE_8             = 0x2000,
+		SPIM_RATE_16            = 0x4000,
+		SPIM_RATE_32            = 0x6000,
+		SPIM_RATE_64            = 0x8000,
+		SPIM_RATE_128           = 0xa000,
+		SPIM_RATE_256           = 0xc000,
+		SPIM_RATE_512           = 0xe000,
+
+		USTCNT_TX_AVAIL_EN      = 0x0001,
+		USTCNT_TX_HALF_EN       = 0x0002,
+		USTCNT_TX_EMPTY_EN      = 0x0004,
+		USTCNT_RX_RDY_EN        = 0x0008,
+		USTCNT_RX_HALF_EN       = 0x0010,
+		USTCNT_RX_FULL_EN       = 0x0020,
+		USTCNT_CTS_DELTA_EN     = 0x0040,
+		USTCNT_GPIO_DELTA_EN    = 0x0080,
+		USTCNT_8_7              = 0x0100,
+		USTCNT_STOP_BITS        = 0x0200,
+		USTCNT_ODD_EVEN         = 0x0400,
+		USTCNT_PARITY_EN        = 0x0800,
+		USTCNT_RX_CLK_CONT      = 0x1000,
+		USTCNT_TX_EN            = 0x2000,
+		USTCNT_RX_EN            = 0x4000,
+		USTCNT_UART_EN          = 0x8000,
+
+		UBAUD_PRESCALER         = 0x00ff,
+		UBAUD_DIVIDE            = 0x0700,
+		UBAUD_DIVIDE_1          = 0x0000,
+		UBAUD_DIVIDE_2          = 0x0100,
+		UBAUD_DIVIDE_4          = 0x0200,
+		UBAUD_DIVIDE_8          = 0x0300,
+		UBAUD_DIVIDE_16         = 0x0400,
+		UBAUD_DIVIDE_32         = 0x0500,
+		UBAUD_DIVIDE_64         = 0x0600,
+		UBAUD_DIVIDE_128        = 0x0700,
+		UBAUD_BAUD_SRC          = 0x0800,
+		UBAUD_GPIO_SRC          = 0x1000,
+		UBAUD_GPIO_DIR          = 0x2000,
+		UBAUD_GPIO              = 0x4000,
+		UBAUD_GPIO_DELTA        = 0x8000,
+
+		URX_PARITY_ERROR        = 0x0100,
+		URX_BREAK               = 0x0200,
+		URX_FRAME_ERROR         = 0x0400,
+		URX_OVRUN               = 0x0800,
+		URX_DATA_READY          = 0x2000,
+		URX_FIFO_HALF           = 0x4000,
+		URX_FIFO_FULL           = 0x8000,
+
+		UTX_CTS_DELTA           = 0x0100,
+		UTX_CTS_STATUS          = 0x0200,
+		UTX_IGNORE_CTS          = 0x0800,
+		UTX_SEND_BREAK          = 0x1000,
+		UTX_TX_AVAIL            = 0x2000,
+		UTX_FIFO_HALF           = 0x4000,
+		UTX_FIFO_EMPTY          = 0x8000,
+
+		UMISC_IRDA_LOOP         = 0x0010,
+		UMISC_IRDA_ENABLE       = 0x0020,
+		UMISC_RTS               = 0x0040,
+		UMISC_RTS_CONT          = 0x0080,
+		UMISC_LOOP              = 0x1000,
+		UMISC_FORCE_PERR        = 0x2000,
+		UMISC_CLK_SRC           = 0x4000,
+
+		CXP_MASK                = 0x03ff,
+		CXP_CC                  = 0xc000,
+		CXP_CC_XLU              = 0x0000,
+		CXP_CC_BLACK            = 0x4000,
+		CXP_CC_INVERSE          = 0x8000,
+		CXP_CC_INVALID          = 0xc000,
+
+		CYP_MASK                = 0x01ff,
+
+		CWCH_CH                 = 0x001f,
+		CWCH_CW                 = 0x1f00,
+
+		LGPMR_PAL2              = 0x0007,
+		LGPMR_PAL3              = 0x0070,
+		LGPMR_PAL0              = 0x0700,
+		LGPMR_PAL1              = 0x7000,
+
+		RTCCTL_38_4             = 0x0020,
+		RTCCTL_ENABLE           = 0x0080,
+
+		RTCINT_STOPWATCH        = 0x0001,
+		RTCINT_MINUTE           = 0x0002,
+		RTCINT_ALARM            = 0x0004,
+		RTCINT_DAY              = 0x0008,
+		RTCINT_SECOND           = 0x0010,
+
+		RTCSTPWTCH_MASK         = 0x003f,
+	};
+
+	enum : uint32_t
+	{
+		CSAB_WAIT               = 0x00000007,
+		CSAB_RO                 = 0x00000008,
+		CSAB_MASK               = 0x0000ff00,
+		CSAB_BSW                = 0x00010000,
+		CSAB_COMPARE            = 0xff000000,
+
+		CSCD_WAIT               = 0x00000007,
+		CSCD_RO                 = 0x00000008,
+		CSCD_MASK               = 0x0000fff0,
+		CSCD_BSW                = 0x00010000,
+		CSCD_COMPARE            = 0xfff00000,
+
+		INT_SPIM                = 0x00000001,
+		INT_TIMER2              = 0x00000002,
+		INT_UART                = 0x00000004,
+		INT_WDT                 = 0x00000008,
+		INT_RTC                 = 0x00000010,
+		INT_RESERVED            = 0x00000020,
+		INT_KB                  = 0x00000040,
+		INT_PWM                 = 0x00000080,
+		INT_INT0                = 0x00000100,
+		INT_INT1                = 0x00000200,
+		INT_INT2                = 0x00000400,
+		INT_INT3                = 0x00000800,
+		INT_INT4                = 0x00001000,
+		INT_INT5                = 0x00002000,
+		INT_INT6                = 0x00004000,
+		INT_INT7                = 0x00008000,
+		INT_KBDINTS             = 0x0000ff00,
+		INT_IRQ1                = 0x00010000,
+		INT_IRQ2                = 0x00020000,
+		INT_IRQ3                = 0x00040000,
+		INT_IRQ6                = 0x00080000,
+		INT_PEN                 = 0x00100000,
+		INT_SPIS                = 0x00200000,
+		INT_TIMER1              = 0x00400000,
+		INT_IRQ7                = 0x00800000,
+
+		INT_M68K_LINE1          = INT_IRQ1,
+		INT_M68K_LINE2          = INT_IRQ2,
+		INT_M68K_LINE3          = INT_IRQ3,
+		INT_M68K_LINE4          = INT_INT0 | INT_INT1 | INT_INT2 | INT_INT3 | INT_INT4 | INT_INT5 | INT_INT6 | INT_INT7 |
+									INT_PWM | INT_KB | INT_RTC | INT_WDT | INT_UART | INT_TIMER2 | INT_SPIM,
+		INT_M68K_LINE5          = INT_PEN,
+		INT_M68K_LINE6          = INT_IRQ6 | INT_TIMER1 | INT_SPIS,
+		INT_M68K_LINE7          = INT_IRQ7,
+		INT_M68K_LINE67         = INT_M68K_LINE6 | INT_M68K_LINE7,
+		INT_M68K_LINE567        = INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7,
+		INT_M68K_LINE4567       = INT_M68K_LINE4 | INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7,
+		INT_M68K_LINE34567      = INT_M68K_LINE3 | INT_M68K_LINE4 | INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7,
+		INT_M68K_LINE234567     = INT_M68K_LINE2 | INT_M68K_LINE3 | INT_M68K_LINE4 | INT_M68K_LINE5 | INT_M68K_LINE6 | INT_M68K_LINE7,
+
+		INT_IRQ1_SHIFT          = 0x00000001,
+		INT_IRQ2_SHIFT          = 0x00000002,
+		INT_IRQ3_SHIFT          = 0x00000004,
+		INT_IRQ6_SHIFT          = 0x00000008,
+		INT_PEN_SHIFT           = 0x00000010,
+		INT_SPIS_SHIFT          = 0x00000020,
+		INT_TIMER1_SHIFT        = 0x00000040,
+		INT_IRQ7_SHIFT          = 0x00000080,
+
+		RTCHMSR_SECONDS         = 0x0000003f,
+		RTCHMSR_MINUTES         = 0x003f0000,
+		RTCHMSR_HOURS           = 0x1f000000,
+	};
+
 	void scr_w(uint8_t data); // 0x000
 
 	void grpbasea_w(uint16_t data); // 0x100
@@ -537,13 +859,11 @@ private:
 
 	template<int Timer> uint32_t get_timer_frequency();
 	template<int Timer> void maybe_start_timer(uint32_t new_enable);
-	template<int Timer> void timer_compare_event();
 
 	void register_state_save();
 
-	TIMER_CALLBACK_MEMBER(timer1_hit);
-	TIMER_CALLBACK_MEMBER(timer2_hit);
-	TIMER_CALLBACK_MEMBER(pwm_transition);
+	template<int Timer> TIMER_CALLBACK_MEMBER(timer_tick);
+	TIMER_CALLBACK_MEMBER(pwm_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
 
 	emu_timer *m_gptimer[2];
