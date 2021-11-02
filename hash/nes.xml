@@ -12167,7 +12167,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw" cloneof="athlwrld" supported="partial">
+	<software name="train1aw" cloneof="athlwrld">
 		<description>Family Trainer 1 - Athletic World (Jpn, v1.1)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -12188,7 +12188,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw1" cloneof="athlwrld" supported="partial">
+	<software name="train1aw1" cloneof="athlwrld">
 		<description>Family Trainer 1 - Athletic World (Jpn)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -12255,7 +12255,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train4jr" supported="partial">
+	<software name="train4jr">
 		<description>Family Trainer 4 - Jogging Race (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -37030,18 +37030,18 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This game uses an unemulated whack-a-mole pad -->
-	<software name="supermog" supported="no">
+	<software name="supermog">
 		<description>Super Mogura Tataki!! Pokkun Moguraa (Japan)</description>
 		<year>1989</year>
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-X1"/>
 		<info name="release" value="19891208"/>
-		<info name="alt_title" value="ぽっくんモグラー"/>
+		<info name="alt_title" value="スーパーモグラたたき‼︎ぽっくんモグラー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="taptapmat" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="36a9c087" sha1="0f46f52d3995234e933933e3b525ba76fe3aa7d2" offset="00000" />
 			</dataarea>
