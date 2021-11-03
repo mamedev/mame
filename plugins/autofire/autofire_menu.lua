@@ -62,7 +62,7 @@ local function create_new_button()
 end
 
 local function is_button_complete(button)
-	return button.port and button.field and button.key and button.on_frames and button.off_frames and button.button and button.counter
+	return button.port and button.mask and button.type and button.key and button.on_frames and button.off_frames and button.button and button.counter
 end
 
 -- Main menu
@@ -169,7 +169,7 @@ local function handle_configure_menu(index, event)
 		if event == 'select' then
 			configure_selection_save = header_height + index
 			table.insert(menu_stack, MENU_TYPES.BUTTON)
-			if current_button.port and current_button.field then
+			if current_button.port and current_button.button then
 				initial_input = current_button.button
 			end
 			return true
@@ -298,7 +298,8 @@ local function populate_button_menu()
 	local function action(field)
 		if field then
 			current_button.port = field.port.tag
-			current_button.field = field.name
+			current_button.mask = field.mask
+			current_button.type = field.type
 			current_button.button = field
 		end
 		initial_input = nil
