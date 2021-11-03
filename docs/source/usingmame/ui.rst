@@ -267,6 +267,47 @@ axis of the left analog stick on your controller, you *should not* assign either
 the **Steering Wheel Analog Inc** or **Steering Wheel Analog Dec** setting to
 the X axis of the same analog stick.
 
+You can assign one or more analog axes to the axis setting for an emulated
+analog input.  When multiple axes are assigned to an axis setting using **or**
+operations, only the first axis that is not in the neutral position will take
+effect.  For example suppose for Atari Star Wars you assign the **AD Stick X
+Analog** axis setting to **Joy 1 LSX or Joy 1 RSX** on an Xbox-style controller.
+You will be able to control the emulated X axis using the X axis of the left
+stick.  If the left stick is in the neutral position (centred) on the X axis,
+you will be able to control the emulated X axis using the X axis of the right
+stick; however, if the left stick is *not* centred on the X axis, the X axis of
+the right stick will be ignored.
+
+MAME allows you to assign either the full range of an axis or the range on one
+side of the neutral position (a *half axis*) to an axis setting.  Assigning a
+half axis is usually used for pedals or other absolute inputs where the neutral
+position is at one end of the input range.  For example suppose for **Ridge
+Racer** you assign the **Brake Pedal Analog** setting to the portion of a
+vertical joystick axis below the neutral position.  If the joystick is at or
+above the neutral position vertically, the brake pedal will be released; if the
+joystick is below the neutral position vertically, the brake pedal will be
+applied proportionally.  Half axes are displayed as the name of the axis
+followed by a plus or minus sign (**+** or **-**).  Plus refers to the portion
+of the axis below or to the right of the neutral position; minus refers to the
+portion of the axis above or to the left of the neutral position.  For pedal
+or analog trigger controls, the active range is treated as being above the
+neutral position (the half axis indicated by a minus sign).
+
+When you select an axis setting, MAME will wait for you to enter an input:
+
+* Move an analog control to assign it to the axis setting.
+* When appending to a setting, move the last assigned analog control to cycle
+  between the full range of the axis and the portion of the axis on either side
+  of the neutral position.
+* When appending to a setting, move an analog control other than the last
+  assigned control to add an **or** operation.
+* Pressing **UI Cancel** (**Escape** by default) *before* activating an analog
+  axis input clears the setting or restores the default assignment.
+* Pressing **UI Cancel** *after* activating analog axis input leaves the setting
+  unchanged.
+* The new setting is shown below the menu.  Wait one second after activating an
+  input to accept the new setting.
+
 To adjust sensitivity, auto-centring speed and inversion settings for emulated
 analog inputs, or to see how they respond to your settings, select **Analog
 Controls** from the main menu during emulation.  Settings for emulated analog
@@ -285,8 +326,9 @@ Each emulated input has four settings on the **Analog Controls** menu:
   increment/decrement settings.
 * The *auto-centering speed* setting controls how fast the input value returns
   to the neutral state when the controls assigned to the increment/decrement
-  settings are released.
-* The **reverse** setting allows the direction of the emulated input’s response
+  settings are released.  Setting it to zero (**0**) will result in the value
+  not automatically returning to the neutral position.
+* The *reverse* setting allows the direction of the emulated input’s response
   to controls to be inverted.  This applies to controls assigned to the axis
   setting *and* the increment/decrement settings.
 * The *sensitivity* setting adjusts the input value’s response to the control

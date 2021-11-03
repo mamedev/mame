@@ -705,16 +705,12 @@ const char *ioport_field::name() const
 
 const input_seq &ioport_field::seq(input_seq_type seqtype) const noexcept
 {
-	// if no live state, return default
-	if (!m_live)
-		return defseq(seqtype);
+	// if the sequence is not the special default code, return it
+	if (m_live && !m_live->seq[seqtype].is_default())
+		return m_live->seq[seqtype];
 
-	// if the sequence is the special default code, return the expanded default value
-	if (m_live->seq[seqtype].is_default())
-		return manager().type_seq(m_type, m_player, seqtype);
-
-	// otherwise, return the sequence as-is
-	return m_live->seq[seqtype];
+	// otherwise return the default sequence
+	return defseq(seqtype);
 }
 
 
@@ -741,14 +737,8 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const noexcept
 
 void ioport_field::set_defseq(input_seq_type seqtype, const input_seq &newseq)
 {
-	const bool was_changed = seq(seqtype) != defseq(seqtype);
-
 	// set the new sequence
 	m_seq[seqtype] = newseq;
-
-	// also update live state unless previously customized
-	if (m_live && !was_changed)
-		m_live->seq[seqtype] = newseq;
 }
 
 

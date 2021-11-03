@@ -469,7 +469,7 @@ bool input_seq::is_valid() const noexcept
 			if (lastcode.internal())
 				return false;
 
-			// if this is the end, we're ok
+			// if this is the end, we're OK
 			if (code == end_code)
 				return true;
 
