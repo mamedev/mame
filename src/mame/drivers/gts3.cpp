@@ -48,6 +48,8 @@ ToDo:
 #include "machine/input_merger.h"
 #include "gts3.lh"
 
+namespace {
+
 class gts3_state : public genpin_class
 {
 public:
@@ -625,6 +627,8 @@ ROM_START(tt_game)
 	ROM_REGION(0x10000, "cpu2", ROMREGION_ERASEFF)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, NO_DUMP)
 ROM_END
+
+} // anonymous namespace
 
 GAME(1989,  lca,      0,   gts3, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action!", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  lca2,     lca, gts3, gts3, gts3_state, empty_init, ROT0, "Gottlieb", "Lights...Camera...Action! (rev.2)", MACHINE_IS_SKELETON_MECHANICAL)
