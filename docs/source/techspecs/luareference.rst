@@ -106,13 +106,16 @@ t:as_double()
     Returns the time interval in seconds as a floating-point value.
 t:as_hz()
     Interprets the interval as a period and returns the corresponding frequency
-    in Hertz as a floating-point value.
+    in Hertz as a floating-point value.  Returns zero if ``t.is_never`` is true.
+    The interval must not be zero.
 t:as_khz()
     Interprets the interval as a period and returns the corresponding frequency
-    kilohertz as a floating-point value.
+    kilohertz as a floating-point value.  Returns zero if ``t.is_never`` is
+    true.  The interval must not be zero.
 t:as_mhz()
     Interprets the interval as a period and returns the corresponding frequency
-    megahertz as a floating-point value.
+    megahertz as a floating-point value.  Returns zero if ``t.is_never`` is
+    true.  The interval must not be zero.
 t:as_ticks(frequency)
     Returns the interval as a whole number of periods at the specified
     frequency.  The frequency is specified in Hertz.
