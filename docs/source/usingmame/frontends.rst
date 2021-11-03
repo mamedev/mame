@@ -30,9 +30,9 @@ starting point.
     `source code is on GitHub <https://github.com/npwoods/bletchmame>`__.
 `IV/Play <http://www.mameui.info/>`__ (Microsoft Windows)
     A simple Windows program for launching systems in MAME.  Written in C#, the
-    `souce code is on GitHub <https://github.com/Mataniko/IV-Play>`__.
-`EmuLoader <http://emuloader.mameworld.info/>`__ (Microsoft Windows)
-    EmuLoader provides a Windows interface for launching systems in multiple
+    `source code is on GitHub <https://github.com/Mataniko/IV-Play>`__.
+`Emu Loader <http://emuloader.mameworld.info/>`__ (Microsoft Windows)
+    Emu Loader provides a Windows interface for launching systems in multiple
     emulators, including MAME, Supermodel and DEMUL.  Written in Delphi Pascal,
     the source code is available
     `on the download page <https://emuloader.mameworld.info/downloads.htm>`__.

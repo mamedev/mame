@@ -226,6 +226,7 @@ void menu_analog::handle(event const *ev)
 			{
 			// if selected, reset to default value
 			case IPT_UI_SELECT:
+			case IPT_UI_CLEAR:
 				newval = data.defvalue;
 				break;
 
@@ -360,25 +361,25 @@ void menu_analog::populate(float &customtop, float &custombottom)
 		{
 		default:
 		case ANALOG_ITEM_KEYSPEED:
-			text = string_format("%s Digital Speed", field->name());
+			text = string_format(_("%1$s Increment/Decrement Speed"), field->name());
 			subtext = string_format("%d", settings.delta);
 			data.cur = settings.delta;
 			break;
 
 		case ANALOG_ITEM_CENTERSPEED:
-			text = string_format("%s Autocenter Speed", field->name());
+			text = string_format(_("%1$s Auto-centering Speed"), field->name());
 			subtext = string_format("%d", settings.centerdelta);
 			data.cur = settings.centerdelta;
 			break;
 
 		case ANALOG_ITEM_REVERSE:
-			text = string_format("%s Reverse", field->name());
+			text = string_format(_("%1$s Reverse"), field->name());
 			subtext.assign(settings.reverse ? "On" : "Off");
 			data.cur = settings.reverse;
 			break;
 
 		case ANALOG_ITEM_SENSITIVITY:
-			text = string_format("%s Sensitivity", field->name());
+			text = string_format(_("%1$s Sensitivity"), field->name());
 			subtext = string_format("%d", settings.sensitivity);
 			data.cur = settings.sensitivity;
 			break;

@@ -137,6 +137,174 @@ combinations to the **Config Menu**, **Pause** and/or **UI Cancel** inputs to
 make it possible to use MAME without a keyboard.
 
 
+.. _ui-inptcfg:
+
+Configuring inputs
+------------------
+
+MAME needs a flexible input system to support the control schemes of the vast
+array of systems it emulates.  In MAME, inputs that only have two distinct
+states, on and off or active and inactive, are called *digital inputs*, and all
+other inputs are called *analog inputs*, even if this is not strictly true.
+
+To assign MAME’s user interface controls or the default inputs for all systems,
+select **Input (general)** from the main menu during emulation, or select
+**Configure Options** from the system selection menu and then select **General
+Inputs**.  From there, select a category.
+
+To assign inputs for the currently running machine, select **Input (this
+Machine)** from the main menu during emulation.  Inputs are grouped by device
+and sorted by type.  You can move between devices with the next group and
+previous group keys/buttons (**[** and **]** on the keyboard by default).
+
+The input assignment menus show the name of the emulated input or user interface
+control on the left, and the input (or combination of inputs) assigned to it on
+the right.
+
+To adjust the sensitivity, auto-centre speed and inversion settings, or to see
+how emulated analog controls react to your inputs, select **Analog Controls**
+from the main menu during emulation.  (This item only appears on the main menu
+for systems with analog controls.)
+
+
+.. _ui-inptcfg-digital:
+
+Digital input settings
+~~~~~~~~~~~~~~~~~~~~~~
+
+Each emulated digital input has a single assignment setting.  For flexibility,
+MAME can combine host inputs (keys, buttons and joystick axes) using logical
+**and**, **not** and **or** operations.  This is best illustrated with some
+examples:
+
+Kbd 1
+    In this simple case, pressing the **1** key on the keyboard activates the
+    emulated input or user interface control.
+Kbd Down or Joy 1 Down
+    Pressing the down arrow on the keyboard or moving the first joystick down
+    activates the emulated input or user interface control.
+Kbd P not Kbd Shift not Kbd Right Shift
+    Pressing the **P** key on the keyboard while not pressing either **Shift**
+    key activates the emulated input or user interface control.  MAME does not
+    show the implicit **and** operations.
+Kbd P Kbd Shift or Kbd P Kbd Right Shift
+    Pressing the **P** key while also pressing either of the **Shift** keys
+    activates the emulated input or user interface control.  Once again, the
+    implicit **and** operations are not shown.
+
+(In technical terms, MAME uses Boolean sum of products logic to combine inputs.)
+
+When a digital input setting is highlighted, the prompt below the menu shows
+whether selecting it will set the assignment or append an **or** operation to
+it.  Press **UI Left/Right** before selecting the setting to switch between
+setting or appending an **or** operation.  Press **UI Clear** (**Delete** or
+**Forward Delete** by default) to clear the setting or restore the default
+assignment.
+
+When you select a digital input setting, MAME will wait for you to enter an
+input or a combination of inputs for a logical **and** operation:
+
+* Press a key or button or move an analog control once to add it to the **and**
+  operation.
+* Press a key or button or move an analog control twice to add a **not** item to
+  the **and** operation.  Pressing the same key or button or moving the same
+  analog control additional times toggles the **not** on and off.
+* Pressing **UI Cancel** (**Escape** by default) *before* activating any other
+  inputs clears the setting or restores the default assignment.
+* Pressing **UI Cancel** *after* activating another input leaves the setting
+  unchanged.
+* The new setting is shown below the menu.  Wait one second after activating an
+  input to accept the new setting.
+
+Here’s how to produce some example settings:
+
+Kbd 1
+    Press the **1** key on the keyboard once, then wait one second to accept the
+    setting.
+Kbd F12 Kbd Shift Keyboard Alt
+    Press the **P** key on the keyboard once, press the left **Shift** key once,
+    press the left **Alt** key once, then wait one second to accept the setting.
+Kbd P not Kbd Shift not Kbd Right Shift
+    Press the **P** key on the keyboard once, press the left **Shift** key
+    twice, press the right **Shift** key twice, then wait one second to accept
+    the setting.
+
+
+.. _ui-inptcfg-analog:
+
+Analog input settings
+~~~~~~~~~~~~~~~~~~~~~
+
+Each emulated analog input has three assignment settings:
+
+* Use the *axis setting* to assign an analog axis to control the emulated analog
+  input.  The axis setting uses the name of the input with the suffix “Analog”.
+  For example the axis setting for the steering wheel in Ridge Racer is called
+  **Steering Wheel Analog**.
+* Use the *increment setting* assign an input (or combination of inputs) to
+  increase the value of the emulated analog input.  The increment setting uses
+  the name of the input with the suffix “Analog Inc”.  For example the increment
+  setting for the steering wheel in Ridge Racer is called **Steering Wheel
+  Analog Inc**.  This is a digital input setting – if an analog axis is
+  assigned to it, MAME will not increase the emulated input value at a
+  proportional speed.
+* Use the *decrement setting* assign an input (or combination of inputs) to
+  decrease the value of the emulated analog input.  The decrement setting uses
+  the name of the input with the suffix “Analog Dec”.  For example the decrement
+  setting for the steering wheel in Ridge Racer is called **Steering Wheel
+  Analog Dec**.  This is a digital input setting – if an analog axis is
+  assigned to it, MAME will not decrease the emulated input value at a
+  proportional speed.
+
+The increment and decrement settings are most useful for controlling an emulated
+analog input using digital controls (for example keyboard keys, joystick
+buttons, or a directional pad).  They are configured in the same way as emulated
+digital inputs (:ref:`see above <ui-inptcfg-digital>`).  **It’s important that
+you don’t assign the same control to the axis setting as well as the increment
+and/or decrement settings for the same emulated input at the same time.**  For
+example if you assign Ridge Racer’s **Steering Wheel Analog** setting to the X
+axis of the left analog stick on your controller, you *should not* assign either
+the **Steering Wheel Analog Inc** or **Steering Wheel Analog Dec** setting to
+the X axis of the same analog stick.
+
+To adjust sensitivity, auto-centring speed and inversion settings for emulated
+analog inputs, or to see how they respond to your settings, select **Analog
+Controls** from the main menu during emulation.  Settings for emulated analog
+inputs are grouped by device and sorted by type.  You can move between devices
+with the next group and previous group keys/buttons (**[** and **]** on the
+keyboard by default).  The state of the emulated analog inputs is shown below
+the menu, and reacts in real time.  Press the **On Screen Display** key or
+button (the backtick/tilde key by default on a US ANSI QWERTY keyboard) to hide
+the menu to make it easier to test without changing settings.  Press the same
+key or button to show the menu again.
+
+Each emulated input has four settings on the **Analog Controls** menu:
+
+* The *increment/decrement speed* setting controls how fast the input value
+  increases or decreases in response to the controls assigned to the
+  increment/decrement settings.
+* The *auto-centering speed* setting controls how fast the input value returns
+  to the neutral state when the controls assigned to the increment/decrement
+  settings are released.
+* The **reverse** setting allows the direction of the emulated input’s response
+  to controls to be inverted.  This applies to controls assigned to the axis
+  setting *and* the increment/decrement settings.
+* The *sensitivity* setting adjusts the input value’s response to the control
+  assigned to the axis setting.
+
+
+Use the UI left/right keys or buttons to adjust the highlighted setting.
+Selecting a setting or pressing the UI clear key/button (**Forward Delete** by
+default) restores its default value.
+
+The units for the increment/decrement speed, auto-centering speed and
+sensitivity settings are tied to the driver/device implementation.  The
+increment/decrement speed and auto-centering speed settings are also tied to the
+frame rate of the first emulated screen in the system.  The response to controls
+assigned to the increment/decrement settings will change if the system changes
+the frame rate of this screen.
+
+
 .. _ui-selmenu:
 
 The system and software selection menus

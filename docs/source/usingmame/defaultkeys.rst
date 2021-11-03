@@ -30,7 +30,7 @@ and saving/loading save states.
 
 **Tab**
     Toggles the configuration menu.
-**~** (tilde key)
+**`**/**~** (backtick/tilde key)
     Toggles the On-Screen Display.
 
     If you are running with -debug, this key sends a ‘break’ in emulation.

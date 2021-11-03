@@ -296,6 +296,17 @@ const struct
 	{ INPUT_STRING_None, "None" },
 };
 
+
+inline bool input_seq_good(running_machine &machine, input_seq const &seq)
+{
+	if (INPUT_CODE_INVALID == seq[0])
+		return false;
+	else if (seq.empty())
+		return true;
+	else
+		return input_seq::end_code != machine.input().seq_clean(seq)[0];
+}
+
 } // anonymous namespace
 
 
@@ -2122,25 +2133,18 @@ void ioport_manager::load_config(config_type cfg_type, config_level cfg_level, u
 					newseq[seqtype].first.reset();
 				else
 					machine().input().seq_from_tokens(newseq[seqtype].first, seqnode->get_value());
-				newseq[seqtype].second = seqnode->get_value();
+				if (config_type::CONTROLLER != cfg_type)
+					newseq[seqtype].second = seqnode->get_value();
 			}
 		}
 
 		// load into the appropriate place for the config type/level
 		if (config_type::SYSTEM == cfg_type)
-		{
 			load_system_config(*portnode, type, player, newseq);
-		}
 		else if ((config_type::CONTROLLER == cfg_type) && (config_level::DEFAULT != cfg_level))
-		{
-			for (auto &seq : newseq)
-				seq.second = "";
 			load_controller_config(*portnode, type, player, newseq);
-		}
 		else
-		{
 			load_default_config(type, player, newseq);
-		}
 	}
 
 	// after applying the controller config, push that back into the backup, since that is
@@ -2272,7 +2276,7 @@ bool ioport_manager::load_default_config(
 		{
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
-				if (newseq[seqtype].first[0] != INPUT_CODE_INVALID)
+				if (input_seq_good(machine(), newseq[seqtype].first))
 					entry.set_seq(seqtype, newseq[seqtype].first);
 				entry.set_cfg(seqtype, newseq[seqtype].second);
 			}
@@ -2318,7 +2322,7 @@ bool ioport_manager::load_controller_config(
 			// if a sequence was specified, override the developer-specified default for the field
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
-				if (newseq[seqtype].first[0] != INPUT_CODE_INVALID)
+				if (input_seq_good(machine(), newseq[seqtype].first))
 					field.set_defseq(seqtype, newseq[seqtype].first);
 			}
 
@@ -2408,7 +2412,7 @@ void ioport_manager::load_system_config(
 				// if a sequence was specified, copy it in
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				{
-					if (newseq[seqtype].first[0] != INPUT_CODE_INVALID)
+					if (input_seq_good(machine(), newseq[seqtype].first))
 						field.live().seq[seqtype] = newseq[seqtype].first;
 					field.live().cfg[seqtype] = newseq[seqtype].second;
 				}
@@ -3557,7 +3561,7 @@ void analog_field::frame_update(running_machine &machine)
 	input_item_class itemclass;
 	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
 
-	// use programmatically set value if avaiable
+	// use programmatically set value if available
 	if (m_was_written)
 	{
 		m_was_written = false;
@@ -3567,7 +3571,23 @@ void analog_field::frame_update(running_machine &machine)
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
 	{
-		if (m_previousanalog != rawvalue)
+		if (!m_absolute && !m_positionalscale)
+		{
+			// if port is relative, we use the value to simulate the speed of relative movement
+			// sensitivity adjustment is allowed for this mode
+			if (rawvalue)
+			{
+				if (m_field.analog_reset())
+					m_accum = rawvalue / 8;
+				else
+					m_accum += rawvalue / 8;
+
+				// do not bother with other control types if the analog data is changing
+				m_lastdigital = false;
+				return;
+			}
+		}
+		else if (m_previousanalog != rawvalue)
 		{
 			// only update if analog value changed
 			m_previousanalog = rawvalue;
@@ -3580,8 +3600,10 @@ void analog_field::frame_update(running_machine &machine)
 				// if port is absolute, then just return the absolute data supplied
 				m_accum = apply_inverse_sensitivity(rawvalue);
 			}
-			else if (m_positionalscale != 0)
+			else
 			{
+				assert(m_positionalscale); // only way to get here due to previous if
+
 				// if port is positional, we will take the full analog control and divide it
 				// into positions, that way as the control is moved full scale,
 				// it moves through all the positions
@@ -3591,27 +3613,17 @@ void analog_field::frame_update(running_machine &machine)
 				rawvalue = std::min(rawvalue, m_maximum);
 				m_accum = apply_inverse_sensitivity(rawvalue);
 			}
-			else
-				// if port is relative, we use the value to simulate the speed of relative movement
-				// sensitivity adjustment is allowed for this mode
-				m_accum += rawvalue;
 
-			m_lastdigital = false;
 			// do not bother with other control types if the analog data is changing
+			m_lastdigital = false;
 			return;
-		}
-		else
-		{
-			// we still have to update fake relative from joystick control
-			if (!m_absolute && m_positionalscale == 0)
-				m_accum += rawvalue;
 		}
 	}
 
 	// if we got it from a relative device, use that as the starting delta
 	// also note that the last input was not a digital one
 	s32 delta = 0;
-	if (itemclass == ITEM_CLASS_RELATIVE && rawvalue != 0)
+	if (itemclass == ITEM_CLASS_RELATIVE && rawvalue)
 	{
 		delta = rawvalue;
 		m_lastdigital = false;
@@ -3663,9 +3675,9 @@ void analog_field::frame_update(running_machine &machine)
 		s32 center = apply_inverse_sensitivity(m_center);
 		if (m_lastdigital && !keypressed)
 		{
-			// autocenter from positive values
 			if (m_accum >= center)
 			{
+				// autocenter from positive values
 				m_accum -= apply_scale(m_centerdelta, m_keyscalepos);
 				if (m_accum < center)
 				{
@@ -3673,10 +3685,9 @@ void analog_field::frame_update(running_machine &machine)
 					m_lastdigital = false;
 				}
 			}
-
-			// autocenter from negative values
 			else
 			{
+				// autocenter from negative values
 				m_accum += apply_scale(m_centerdelta, m_keyscaleneg);
 				if (m_accum > center)
 				{

@@ -3431,11 +3431,10 @@ Debugging Options
 
 **-[no]debug**
 
-    Activates the integrated debugger.  By default, pressing the tilde
-    (**~**) key during emulation breaks into the debugger.  MAME also
-    breaks into the debugger after the initial soft reset on startup if
-    the debugger is active.  See :ref:`debugger` for information on using
-    the debugger.
+    Activates the integrated debugger.  By default, pressing the backtick/tilde
+    (**~**) key during emulation breaks into the debugger.  MAME also breaks
+    into the debugger after the initial soft reset on startup if the debugger is
+    active.  See :ref:`debugger` for information on using the debugger.
 
     The default is OFF (**-nodebug**).
 
