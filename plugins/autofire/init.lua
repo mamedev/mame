@@ -44,7 +44,7 @@ function autofire.startplugin()
 
 		for i, button in ipairs(buttons) do
 			local key = button.port .. '\0' .. button.mask .. '.' .. button.type
-			local state = button_states[key] or { 0, button.button }
+			local state = button_states[key] or {0, button.button}
 			state[1] = process_button(button) | state[1]
 			button_states[key] = state
 		end
