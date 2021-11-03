@@ -40,7 +40,7 @@ function inputmacro.startplugin()
 	end
 
 	local function process_frame()
-		previous_inputs = active_inputs
+		local previous_inputs = active_inputs
 		active_inputs = { }
 
 		for index, macro in ipairs(macros) do
@@ -98,8 +98,6 @@ function inputmacro.startplugin()
 	end
 
 	local function start()
-		menu = nil
-		active_inputs = { }
 		input = manager.machine.input
 		local persister = require('inputmacro/inputmacro_persist')
 		macros = persister.load_settings()
@@ -108,6 +106,10 @@ function inputmacro.startplugin()
 	local function stop()
 		local persister = require('inputmacro/inputmacro_persist')
 		persister:save_settings(macros)
+
+		macros = { }
+		active_inputs = { }
+		menu = nil
 	end
 
 	local function menu_callback(index, event)
