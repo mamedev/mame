@@ -120,6 +120,8 @@ void retro_osd_interface::update(bool skip_redraw)
 	// if we're running, disable some parts of the debugger
  	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
+
+	RLOOP=0;
 }
 
 //============================================================
@@ -131,8 +133,6 @@ void retro_osd_interface::input_update()
 	process_events_buf();
 	poll_inputs(machine());
 	check_osd_inputs(machine());
-
-	RLOOP=0;
 }
 
 //============================================================

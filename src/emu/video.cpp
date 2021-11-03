@@ -243,15 +243,19 @@ void video_manager::frame_update(bool from_debugger)
 	if (!from_debugger && !skipped_it && phase > machine_phase::INIT && m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
+#if !defined(__LIBRETRO__)
 	// get most recent input now
 	machine().osd().input_update();
+#endif
 
 	emulator_info::periodic_check();
 
 	if (!from_debugger)
 	{
+#if !defined(__LIBRETRO__)
 		// perform tasks for this frame
 		machine().call_notifiers(MACHINE_NOTIFY_FRAME);
+#endif
 
 		// update frameskipping
 		if (phase > machine_phase::INIT)
