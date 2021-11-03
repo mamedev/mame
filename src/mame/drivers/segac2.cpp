@@ -674,11 +674,11 @@ void pclub_state::print_club_camera_w(uint16_t data)
 void segac2_state::segac_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x800001, 0x800001).mirror(0x13fdfe).rw(FUNC(segac2_state::prot_r), FUNC(segac2_state::prot_w));
-	map(0x800201, 0x800201).mirror(0x13fdfe).w(FUNC(segac2_state::control_w));
+	map(0x800000, 0x800001).mirror(0x13fdfe).rw(FUNC(segac2_state::prot_r), FUNC(segac2_state::prot_w)).umask16(0x00ff);
+	map(0x800200, 0x800201).mirror(0x13fdfe).w(FUNC(segac2_state::control_w)).umask16(0x00ff);
 	map(0x840000, 0x84001f).mirror(0x13fee0).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
 	map(0x840100, 0x840107).mirror(0x13fef8).rw(m_ymsnd, FUNC(ym3438_device::read), FUNC(ym3438_device::write)).umask16(0x00ff);
-	map(0x880101, 0x880101).mirror(0x13fefe).w(FUNC(segac2_state::counter_timer_w));
+	map(0x880100, 0x880101).mirror(0x13fefe).w(FUNC(segac2_state::counter_timer_w)).umask16(0x00ff);
 	map(0x8c0000, 0x8c0fff).mirror(0x13f000).rw(FUNC(segac2_state::palette_r), FUNC(segac2_state::palette_w)).share("paletteram");
 	map(0xc00000, 0xc0001f).mirror(0x18ff00).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xe00000, 0xe0ffff).mirror(0x1f0000).ram().share("nvram");
@@ -2905,7 +2905,7 @@ GAME( 1994, puyopuy2,   0,        segac2,     puyopuy2, segac2_state,    init_pu
 
 GAME( 1994, zunkyou,    0,        segac2,     zunkyou,  segac2_state,    init_zunkyou,  ROT0,   "Sega", "Zunzunkyou no Yabou (Japan)", 0 )
 
-GAME( 1994, headonch,   0,        segac2,     headonch, segac2_state,    init_noprot,   ROT0,   "hack", "Head On Channel (prototype, hack)", 0 )
+GAME( 1994, headonch,   0,        segac2,     headonch, segac2_state,    init_noprot,   ROT0,   "hack", "Monita to Rimoko no Head On Channel (prototype, hack)", 0 )
 
 /* Atlus Print Club 'Games' (C-2 Hardware) requires printer and camera emulation */
 GAME( 1995, pclubj,     0,        segac2,     pclub,    pclub_state,     init_pclubj,   ROT0,   "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )

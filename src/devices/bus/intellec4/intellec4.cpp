@@ -264,6 +264,12 @@ void device_univ_card_interface::set_bus(univ_bus_device &bus)
 #include "prommemory.h"
 #include "tapereader.h"
 
+
+// must come after including the headers that declare these extern
+template class device_finder<bus::intellec4::device_univ_card_interface, false>;
+template class device_finder<bus::intellec4::device_univ_card_interface, true>;
+
+
 void intellec4_univ_cards(device_slot_interface &device)
 {
 	device.option_add("imm4_22", INTELLEC4_INST_DATA_STORAGE);

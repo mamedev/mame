@@ -22,6 +22,7 @@ public:
 	yamaha_psr16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_rombank(*this, "rombank")
 	{
 	}
 
@@ -29,8 +30,12 @@ public:
 	void psr36(machine_config &config);
 	void pss680(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	u8 busy_r();
+	void bank_w(u8 data);
 
 	void common_map(address_map &map);
 	void psr16_map(address_map &map);
@@ -38,13 +43,28 @@ private:
 	void pss680_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
+	optional_memory_bank m_rombank;
 };
+
+void yamaha_psr16_state::machine_start()
+{
+	if (m_rombank.found())
+	{
+		m_rombank->configure_entries(0, 0x10, memregion("program")->base(), 0x4000);
+		m_rombank->set_entry(0);
+	}
+}
 
 
 u8 yamaha_psr16_state::busy_r()
 {
 	// Code waits for bit 7 of $0200 to go low before writing to $02XX
 	return 0;
+}
+
+void yamaha_psr16_state::bank_w(u8 data)
+{
+	m_rombank->set_entry(data & 0x0f);
 }
 
 void yamaha_psr16_state::common_map(address_map &map)
@@ -76,10 +96,11 @@ void yamaha_psr16_state::psr36_map(address_map &map)
 void yamaha_psr16_state::pss680_map(address_map &map)
 {
 	common_map(map);
-	map(0x1800, 0x1802).nopw();
+	map(0x1800, 0x1800).w(FUNC(yamaha_psr16_state::bank_w));
+	map(0x1801, 0x1802).nopw();
 	map(0x1810, 0x1811).nopr();
 	map(0x2000, 0x3fff).ram();
-	map(0x4000, 0x7fff).rom().region("program", 0x8000);
+	map(0x4000, 0x7fff).bankr("rombank");
 	map(0x8000, 0xffff).rom().region("program", 0);
 }
 

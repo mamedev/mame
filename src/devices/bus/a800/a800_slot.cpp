@@ -392,15 +392,16 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		std::vector<uint8_t> head(0x10);
-		uint32_t len = hook.image_file()->size();
-		int type = A800_8K;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
 		// check whether there is an header, to identify the cart type
+		int type = A800_8K;
 		if ((len % 0x1000) == 0x10)
 		{
-			hook.image_file()->read(&head[0], 0x10);
+			size_t actual;
+			uint8_t head[0x10];
+			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		else    // otherwise try to guess based on size
@@ -414,12 +415,12 @@ std::string a800_cart_slot_device::get_default_card_software(get_default_card_so
 		if (type >= A5200_4K)
 			osd_printf_info("This game is not designed for A800. You might want to run it in A5200.\n");
 
-		slot_string = a800_get_slot(type);
+		char const *const slot_string = a800_get_slot(type);
 
 		return std::string(slot_string);
 	}
-	else
-		return software_get_default_slot("a800_8k");
+
+	return software_get_default_slot("a800_8k");
 }
 
 
@@ -427,15 +428,16 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		std::vector<uint8_t> head(0x10);
-		uint32_t len = hook.image_file()->size();
-		int type = A5200_8K;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
 		// check whether there is an header, to identify the cart type
+		int type = A5200_8K;
 		if ((len % 0x1000) == 0x10)
 		{
-			hook.image_file()->read(&head[0], 0x10);
+			size_t actual;
+			uint8_t head[0x10];
+			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		else
@@ -447,12 +449,12 @@ std::string a5200_cart_slot_device::get_default_card_software(get_default_card_s
 		if (type < A5200_4K)
 			osd_printf_info("This game is not designed for A5200. You might want to run it in A800 or A800XL.\n");
 
-		slot_string = a800_get_slot(type);
+		char const *const slot_string = a800_get_slot(type);
 
 		return std::string(slot_string);
 	}
-	else
-		return software_get_default_slot("a5200");
+
+	return software_get_default_slot("a5200");
 }
 
 
@@ -460,15 +462,16 @@ std::string xegs_cart_slot_device::get_default_card_software(get_default_card_so
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		std::vector<uint8_t> head(0x10);
-		uint32_t len = hook.image_file()->size();
-		int type = A800_8K;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
 		// check whether there is an header, to identify the cart type
+		int type = A800_8K;
 		if ((len % 0x1000) == 0x10)
 		{
-			hook.image_file()->read(&head[0], 0x10);
+			size_t actual;
+			uint8_t head[0x10];
+			hook.image_file()->read(&head[0], 0x10, actual); // FIXME: check error return or read returning short
 			type = identify_cart_type(&head[0]);
 		}
 		if (type != A800_XEGS)
@@ -480,12 +483,12 @@ std::string xegs_cart_slot_device::get_default_card_software(get_default_card_so
 				osd_printf_info("You might want to run it in A800 or A800XL.\n");
 		}
 
-		slot_string = a800_get_slot(type);
+		char const *const slot_string = a800_get_slot(type);
 
 		return std::string(slot_string);
 	}
-	else
-		return software_get_default_slot("xegs");
+
+	return software_get_default_slot("xegs");
 }
 
 

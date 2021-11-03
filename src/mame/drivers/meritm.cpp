@@ -181,6 +181,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "machine/z80pio.h"
 #include "sound/ay8910.h"
@@ -260,6 +261,8 @@ private:
 	DECLARE_MACHINE_START(crt260);
 	DECLARE_MACHINE_START(common);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
 	void crt250_switch_banks(  );
 	void switch_banks(  );
 	int touch_coord_transform(int *touch_x, int *touch_y);
@@ -1073,6 +1076,20 @@ MACHINE_START_MEMBER(meritm_state, crt260)
 	save_pointer(NAME(m_ram), 0x8000);
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
+{
+	/* this is a workaround to signal the v9938 vblank interrupt correctly */
+	m_vint = 0x08;
+	m_z80pio[0]->port_a_write(m_vint);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
+{
+	/* this is a workaround to signal the v9938 vblank interrupt correctly */
+	m_vint = 0x18;
+	m_z80pio[0]->port_a_write(m_vint);
+}
+
 void meritm_state::crt250(machine_config &config)
 {
 	Z80(config, m_maincpu, SYSTEM_CLK/6);
@@ -1105,12 +1122,15 @@ void meritm_state::crt250(machine_config &config)
 	V9938(config, m_v9938[0], SYSTEM_CLK);
 	m_v9938[0]->set_screen_ntsc("screen");
 	m_v9938[0]->set_vram_size(0x20000);
-	m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
+	//m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
 	V9938(config, m_v9938[1], SYSTEM_CLK);
 	m_v9938[1]->set_screen_ntsc("screen");
 	m_v9938[1]->set_vram_size(0x20000);
-	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp1_interrupt));
+	//m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp1_interrupt));
+
+	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 

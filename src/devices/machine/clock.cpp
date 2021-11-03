@@ -12,9 +12,6 @@ pulse width (active time) can be set directly with set_pulse_width.
 
 Output signal at machine start is right after falling edge.
 
-TODO:
-- add one-shot trigger? eg. monostable 555
-
 */
 
 #include "emu.h"

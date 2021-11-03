@@ -439,7 +439,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="crimsona" cloneof="crimson">
-		<description>Crimson (Alt Disk 1)</description>
+		<description>Crimson (alt Disk 1)</description>
 		<year>1988</year>
 		<publisher>ブラザー工業 (Brother Kougyou)</publisher>
 		<info name="release" value="198804xx"/>
@@ -511,7 +511,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="daisenra" cloneof="daisenr">
-		<description>Daisenryaku X1 (Alt)</description>
+		<description>Daisenryaku X1 (alt)</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<info name="release" value="198702xx"/>
@@ -524,11 +524,11 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="daiva">
-		<description>Daiva</description>
+		<description>Daiva Story 3: Trial of Nirvana</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198703xx"/>
-		<info name="alt_title" value="ディーヴァ"/>
+		<info name="alt_title" value="ディーヴァ ストーリー3·ニルヴァーナの試練"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="daiva1.d88" size="348848" crc="9a4c6b41" sha1="e57e772e89dbafce891c6f14dbb4747eb9ade59a"/>
@@ -542,11 +542,11 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="daivaa" cloneof="daiva">
-		<description>Daiva (Alt)</description>
+		<description>Daiva Story 3: Trial of Nirvana (alt)</description>
 		<year>1987</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198703xx"/>
-		<info name="alt_title" value="ディーヴァ"/>
+		<info name="alt_title" value="ディーヴァ ストーリー3·ニルヴァーナの試練"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348304">
 				<rom name="daivaa1.d88" size="348304" crc="dfe64250" sha1="e3e2bc53ad128bfd42b41184d0fa616335328fcd"/>
@@ -604,7 +604,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="megamitb" cloneof="megamit">
-		<description>Digital Devil Monogatari - Megami Tensei (Alt Disk 1)</description>
+		<description>Digital Devil Monogatari - Megami Tensei (alt Disk 1)</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198705xx"/>
@@ -622,7 +622,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="megamita" cloneof="megamit">
-		<description>Digital Devil Monogatari - Megami Tensei (Alt)</description>
+		<description>Digital Devil Monogatari - Megami Tensei (alt)</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198705xx"/>
@@ -750,7 +750,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="fzonea" cloneof="fzone">
-		<description>Final Zone (Alt)</description>
+		<description>Final Zone (alt)</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198611xx"/>
@@ -911,7 +911,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="gradiusa" cloneof="gradius">
-		<description>Gradius (Alt)</description>
+		<description>Gradius (alt)</description>
 		<year>1987</year>
 		<publisher>コナミ (Konami)</publisher>
 		<info name="release" value="198702xx"/>
@@ -924,7 +924,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="gradiusb" cloneof="gradius">
-		<description>Gradius (Alt 2)</description>
+		<description>Gradius (alt 2)</description>
 		<year>1987</year>
 		<publisher>コナミ (Konami)</publisher>
 		<info name="release" value="198702xx"/>
@@ -1024,7 +1024,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="hfoxa" cloneof="hfox">
-		<description>Hurry Fox X1 (Alt)</description>
+		<description>Hurry Fox X1 (alt)</description>
 		<year>1985</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="198507xx"/>
@@ -1068,7 +1068,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="hydlidea" cloneof="hydlide">
-		<description>Hydlide (Alt)</description>
+		<description>Hydlide (alt)</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198506xx"/>
@@ -1099,7 +1099,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="hydlide2a" cloneof="hydlide2">
-		<description>Hydlide II - Shine of Darkness (Alt)</description>
+		<description>Hydlide II - Shine of Darkness (alt)</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198512xx"/>
@@ -1117,7 +1117,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="hydlide2b" cloneof="hydlide2">
-		<description>Hydlide II - Shine of Darkness (Alt 2)</description>
+		<description>Hydlide II - Shine of Darkness (alt 2)</description>
 		<year>1985</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198512xx"/>
@@ -1158,7 +1158,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="hydlide3a" cloneof="hydlide3">
-		<description>Hydlide 3 - The Space Memories (Alt)</description>
+		<description>Hydlide 3 - The Space Memories (alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198807xx"/>
@@ -1182,7 +1182,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 
 <!-- is this correct? it mixes hydlide 1 and 3 -->
 	<software name="hydlide3b" cloneof="hydlide3">
-		<description>Hydlide 3 - The Space Memories (Alt 2)</description>
+		<description>Hydlide 3 - The Space Memories (alt 2)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198807xx"/>
@@ -1333,7 +1333,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="kugyokuda" cloneof="kugyokud">
-		<description>Kugyokuden (Alt)</description>
+		<description>Kugyokuden (alt)</description>
 		<year>1986</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
 		<info name="release" value="198612xx"/>
@@ -1547,7 +1547,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="mulea" cloneof="mule">
-		<description>M.U.L.E. (Alt)</description>
+		<description>M.U.L.E. (alt)</description>
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<info name="release" value="198808xx"/>
@@ -1598,7 +1598,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="maiduma" cloneof="maidum">
-		<description>Maidum (Alt)</description>
+		<description>Maidum (alt)</description>
 		<year>1986</year>
 		<publisher>NCS</publisher>
 		<info name="release" value="198612xx"/>
@@ -1939,7 +1939,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="ojibinbma" cloneof="ojibinbm">
-		<description>Ouji Binbin Monogatari (Alt)</description>
+		<description>Ouji Binbin Monogatari (alt)</description>
 		<year>1988</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<info name="release" value="198801xx"/>
@@ -1957,7 +1957,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="ojibinbmb" cloneof="ojibinbm">
-		<description>Ouji Binbin Monogatari (Alt 2)</description>
+		<description>Ouji Binbin Monogatari (alt 2)</description>
 		<year>1988</year>
 		<publisher>イーストキューブ (East Cube)</publisher>
 		<info name="release" value="198801xx"/>
@@ -2001,7 +2001,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="outroyda" cloneof="outroyd">
-		<description>Outroyd (Alt)</description>
+		<description>Outroyd (alt)</description>
 		<year>1986</year>
 		<publisher>ストラットフォードC.C.C. (Stratford)</publisher>
 		<info name="release" value="198606xx"/>
@@ -2193,7 +2193,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="romanciaa" cloneof="romancia">
-		<description>Romancia (Alt)</description>
+		<description>Romancia (alt)</description>
 		<year>1986</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="198611xx"/>
@@ -2290,7 +2290,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="seijodena" cloneof="seijoden">
-		<description>Seijo Densetsu (Alt)</description>
+		<description>Seijo Densetsu (alt)</description>
 		<year>1986</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
 		<info name="release" value="198609xx"/>
@@ -2316,7 +2316,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="seijopana" cloneof="seijopan">
-		<description>Seijo Panic (Alt)</description>
+		<description>Seijo Panic (alt)</description>
 		<year>1987</year>
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
 		<info name="release" value="198702xx"/>
@@ -2342,7 +2342,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="shanghaia" cloneof="shanghai">
-		<description>Shanghai (Alt)</description>
+		<description>Shanghai (alt)</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<info name="release" value="198710xx"/>
@@ -2456,7 +2456,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="sorcera" cloneof="sorcer">
-		<description>Sorcerian (Alt?)</description>
+		<description>Sorcerian (alt?)</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- Turbo only -->
@@ -2690,7 +2690,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="sorcerutila" cloneof="sorcer">
-		<description>Sorcerian Utility Disk Vol.1 (Alt)</description>
+		<description>Sorcerian Utility Disk Vol.1 (alt)</description>
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<!-- Turbo only -->
@@ -2733,7 +2733,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="sharriera" cloneof="sharrier">
-		<description>Space Harrier (Alt)</description>
+		<description>Space Harrier (alt)</description>
 		<year>1988</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="release" value="198808xx"/>
@@ -2838,7 +2838,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="slaydocka" cloneof="slaydock">
-		<description>Super Laydock - Mission Striker (Alt)</description>
+		<description>Super Laydock - Mission Striker (alt)</description>
 		<year>1988</year>
 		<publisher>T&amp;E Soft</publisher>
 		<info name="release" value="198801xx"/>
@@ -2886,7 +2886,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="smbspa" cloneof="smbsp">
-		<description>Super Mario Bros. Special (Alt)</description>
+		<description>Super Mario Bros. Special (alt)</description>
 		<year>1986</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- Turbo only -->
@@ -3124,7 +3124,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="ultima4a" cloneof="ultima4">
-		<description>Ultima IV - Quest of the Avatar (Alt)</description>
+		<description>Ultima IV - Quest of the Avatar (alt)</description>
 		<year>1987</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="release" value="198710xx"/>
@@ -3203,7 +3203,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
     <rom name="zzz-unk-wib_usr.d88" size="414992" crc="61bd9a53" sha1="a0e65a7fd206e71e3025dcb1bcd63947914f33f0"/>
 -->
 	<software name="wibarma" cloneof="wibarm">
-		<description>Wibarm (Alt)</description>
+		<description>Wibarm (alt)</description>
 		<year>1986</year>
 		<publisher>アルシスソフト (Arsys Soft)</publisher>
 		<info name="release" value="198609xx"/>
@@ -3328,7 +3328,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="woodypoca" cloneof="woodypoc">
-		<description>Woody Poco (Alt)</description>
+		<description>Woody Poco (alt)</description>
 		<year>1986</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<info name="release" value="198612xx"/>
@@ -3341,7 +3341,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="woodypocb" cloneof="woodypoc">
-		<description>Woody Poco (Alt 2)</description>
+		<description>Woody Poco (alt 2)</description>
 		<year>1986</year>
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<info name="release" value="198612xx"/>
@@ -3564,7 +3564,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="marsa" cloneof="mars">
-		<description>The Curse of Mars (Alt)</description>
+		<description>The Curse of Mars (alt)</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3575,7 +3575,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="marsb" cloneof="mars">
-		<description>The Curse of Mars (Alt 2?)</description>
+		<description>The Curse of Mars (alt 2?)</description>
 		<year>1988?</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3638,7 +3638,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="dialidea" cloneof="dialide">
-		<description>Dialide (Alt?)</description>
+		<description>Dialide (alt?)</description>
 		<year>1989?</year>
 		<publisher>CATsoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3868,7 +3868,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="lovechasa" cloneof="lovechas">
-		<description>Love Chaser (Alt)</description>
+		<description>Love Chaser (alt)</description>
 		<year>1987?</year>
 		<publisher>チャンピオンソフト (Champion Soft)</publisher>
 		<info name="alt_title" value="ラブチェイサー"/>
@@ -3897,7 +3897,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="marvelsa" cloneof="marvels">
-		<description>Marvelous (Alt)</description>
+		<description>Marvelous (alt)</description>
 		<year>1986?</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="マーベラス"/>
@@ -3909,7 +3909,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="marvelsb" cloneof="marvels">
-		<description>Marvelous (Alt 2)</description>
+		<description>Marvelous (alt 2)</description>
 		<year>1986?</year>
 		<publisher>データウエスト (Data West)</publisher>
 		<info name="alt_title" value="マーベラス"/>
@@ -3944,7 +3944,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="newtypea" cloneof="newtype">
-		<description>Newtype X-1 (Alt)</description>
+		<description>Newtype X-1 (alt)</description>
 		<year>1986?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -4030,7 +4030,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="saziria" cloneof="saziri">
-		<description>Sa・Zi・Ri (Alt)</description>
+		<description>Sa・Zi・Ri (alt)</description>
 		<year>1988?</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="紫醜羅"/>
@@ -4103,7 +4103,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="vipa" cloneof="vip">
-		<description>V.I.P. - Visual Instrument Player (Alt)</description>
+		<description>V.I.P. - Visual Instrument Player (alt)</description>
 		<year>19??</year>
 		<publisher>Kamiya</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -4119,7 +4119,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="vipb" cloneof="vip">
-		<description>V.I.P. - Visual Instrument Player (Alt 2)</description>
+		<description>V.I.P. - Visual Instrument Player (alt 2)</description>
 		<year>19??</year>
 		<publisher>Kamiya</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -4130,7 +4130,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="vipc" cloneof="vip" supported="no">
-		<description>V.I.P. - Visual Instrument Player (Alt 3?)</description>
+		<description>V.I.P. - Visual Instrument Player (alt 3?)</description>
 		<year>19??</year>
 		<publisher>Kamiya</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -4175,7 +4175,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="xeviousa" cloneof="xevious">
-		<description>Xevious (Alt)</description>
+		<description>Xevious (alt)</description>
 		<year>19??</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<info name="alt_title" value="ゼビウス"/>
@@ -5225,7 +5225,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="x1demoa" supported="no">
-		<description>X1 Demo (Alt)</description>
+		<description>X1 Demo (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5258,7 +5258,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="x1gdemoa">
-		<description>X1g Demo (Alt)</description>
+		<description>X1g Demo (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5326,7 +5326,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="turbobasa" cloneof="turbobas">
-		<description>Turbo BASIC CZ-8FB02 (Alt)</description>
+		<description>Turbo BASIC CZ-8FB02 (alt)</description>
 		<year>19??</year>
 		<publisher>シャープ (Sharp)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5392,7 +5392,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="swordosa" cloneof="swordos">
-		<description>Sword-OS (Alt)?</description>
+		<description>Sword-OS (alt)?</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5414,7 +5414,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="jodanosa" cloneof="jodanos">
-		<description>Jodan-OS (Alt?)</description>
+		<description>Jodan-OS (alt?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -5459,7 +5459,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 
 <!-- This was a spare "ExtraHyper_Game.d88" file, which is not bootable. Investigate what is it! -->
 	<software name="extrahypa" cloneof="extrahyp">
-		<description>Extra Hyper (Alt Data?)</description>
+		<description>Extra Hyper (alt Data?)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -6225,7 +6225,7 @@ From GAME1-25_List.txt:
 	</software>
 
 	<software name="gameea" cloneof="gamee">
-		<description>Game E (Alt)</description>
+		<description>Game E (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">

@@ -530,6 +530,7 @@ MACHINES["ER2055"] = true
 MACHINES["EXORTERM"] = true
 MACHINES["F3853"] = true
 MACHINES["F4702"] = true
+MACHINES["GT913"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
 MACHINES["HP_DC100_TAPE"] = true
@@ -1345,6 +1346,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"olivetti",
 		"olympia",
 		"omnibyte",
+		"omron",
 		"openuni",
 		"orion",
 		"osborne",
@@ -2023,6 +2025,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/fp6000.cpp",
 	MAME_DIR .. "src/mame/machine/fp6000_kbd.cpp",
 	MAME_DIR .. "src/mame/machine/fp6000_kbd.h",
+	MAME_DIR .. "src/mame/drivers/ctk2000.cpp",
+	MAME_DIR .. "src/mame/drivers/ctk551.cpp",
 	MAME_DIR .. "src/mame/drivers/ht6000.cpp",
 	MAME_DIR .. "src/mame/drivers/pb1000.cpp",
 	MAME_DIR .. "src/mame/drivers/pv1000.cpp",
@@ -2435,6 +2439,7 @@ files {
 	MAME_DIR .. "src/mame/audio/channelf.cpp",
 	MAME_DIR .. "src/mame/audio/channelf.h",
 	MAME_DIR .. "src/mame/video/channelf.cpp",
+	MAME_DIR .. "src/mame/drivers/f387x.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fairlight")
@@ -2457,6 +2462,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/fidel_cc1.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc10.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_cc7.cpp",
+	MAME_DIR .. "src/mame/drivers/fidel_checkc2.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_chesster.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_csc.cpp",
 	MAME_DIR .. "src/mame/drivers/fidel_dames.cpp",
@@ -3109,6 +3115,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc8401a.cpp",
 	MAME_DIR .. "src/mame/includes/pc8401a.h",
 	MAME_DIR .. "src/mame/video/pc8401a.cpp",
+	MAME_DIR .. "src/mame/machine/pc80s31k.cpp",
+	MAME_DIR .. "src/mame/machine/pc80s31k.h",
 	MAME_DIR .. "src/mame/drivers/pc8001.cpp",
 	MAME_DIR .. "src/mame/includes/pc8001.h",
 	MAME_DIR .. "src/mame/drivers/pc8801.cpp",
@@ -3274,6 +3282,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/msbc1.cpp",
 	MAME_DIR .. "src/mame/drivers/ob68k1a.cpp",
 	MAME_DIR .. "src/mame/includes/ob68k1a.h",
+}
+
+createMESSProjects(_target, _subtarget, "omron")
+files {
+	MAME_DIR .. "src/mame/drivers/luna_68k.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "openuni")

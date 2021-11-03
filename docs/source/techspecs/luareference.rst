@@ -63,6 +63,83 @@ Core classes
 Many of MAME’s core classes used to implement an emulation session are available
 to Lua scripts.
 
+.. _luareference-core-attotime:
+
+Attotime
+~~~~~~~~
+
+Wraps MAME’s ``attotime`` class, which represents a high-precision time
+interval.  Attotime values support addition and subtraction with other attotime
+values, and multiplication and division by integers.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.attotime()
+    Creates an attotime value representing zero (i.e. no elapsed time).
+emu.attotime(seconds, attoseconds)
+    Creates an attotime with the specified whole and fractional parts.
+emu.attotime(attotime)
+    Creates a copy of an existing attotime value.
+emu.attotime.from_double(seconds)
+    Creates an attotime value representing the specified number of seconds.
+emu.attotime.from_ticks(periods, frequency)
+    Creates an attotime representing the specified number of periods of the
+    specified frequency in Hertz.
+emu.attotime.from_seconds(seconds)
+    Creates an attotime value representing the specified whole number of
+    seconds.
+emu.attotime.from_msec(milliseconds)
+    Creates an attotime value representing the specified whole number of
+    milliseconds.
+emu.attotime.from_usec(microseconds)
+    Creates an attotime value representing the specified whole number of
+    microseconds.
+emu.attotime.from_nsec(nanoseconds)
+    Creates an attotime value representing the specified whole number of
+    nanoseconds.
+
+Methods
+^^^^^^^
+
+t:as_double()
+    Returns the time interval in seconds as a floating-point value.
+t:as_hz()
+    Interprets the interval as a period and returns the corresponding frequency
+    in Hertz as a floating-point value.
+t:as_khz()
+    Interprets the interval as a period and returns the corresponding frequency
+    kilohertz as a floating-point value.
+t:as_mhz()
+    Interprets the interval as a period and returns the corresponding frequency
+    megahertz as a floating-point value.
+t:as_ticks(frequency)
+    Returns the interval as a whole number of periods at the specified
+    frequency.  The frequency is specified in Hertz.
+
+Properties
+^^^^^^^^^^
+
+t.is_zero (read-only)
+    Whether the value represents no elapsed time.
+t.is_never (read-only)
+    Whether the value is greater than the maximum number of whole seconds that
+    can be represented (treated as an unreachable time in the future or
+    overflow).
+t.attoseconds (read-only)
+    The fraction seconds portion of the interval in attoseconds.
+t.seconds (read-only)
+    The number of whole seconds in the interval.
+t.msec (read-only)
+    The number of whole milliseconds in the fractional seconds portion of the
+    interval.
+t.usec (read-only)
+    The number of whole microseconds in the fractional seconds portion of the
+    interval.
+t.nsec (read-only)
+    The number of whole nanoseconds in the fractional seconds portion of the
+    interval.
+
 .. _luareference-core-mameman:
 
 MAME machine manager
@@ -147,6 +224,9 @@ machine:logerror(msg)
 Properties
 ^^^^^^^^^^
 
+machine.time (read-only)
+    The elapsed emulated time for the current session as an
+    :ref:`attotime <luareference-core-attotime>`.
 machine.system (read-only)
     The :ref:`driver metadata <luareference-core-driver>` for the current
     system.
@@ -436,6 +516,11 @@ ui:get_string_width(str)
 ui:set_aggressive_input_focus(enable)
     On some platforms, this controls whether MAME should accept input focus in
     more situations than when its windows have UI focus.
+ui:get_general_input_setting(type, [player])
+    Gets a description of the configured input sequence for the specified input
+    type and player suitable for using in prompts.  The input type is an
+    enumerated value.  The player number is a zero-based index.  If the player
+    number is not supplied, it is assumed to be zero.
 
 Properties
 ^^^^^^^^^^
@@ -799,12 +884,12 @@ screen:pixels()
 screen:draw_box(left, top, right, bottom, [line], [fill])
     Draws an outlined rectangle with edges at the specified positions.
 
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
+    Coordinates are floating-point numbers in units of emulated screen pixels,
+    with the origin at (0, 0).  Note that emulated screen pixels often aren’t
+    square.  The coordinate system is rotated if the screen is rotated, which is
+    usually the case for vertical-format screens.  Before rotation, the origin
+    is at the top left, and coordinates increase to the right and downwards.
+    Coordinates are limited to the screen area.
 
     The fill and line colours are in alpha/red/green/blue (ARGB) format.
     Channel values are in the range 0 (transparent or off) to 255 (opaque or
@@ -814,15 +899,15 @@ screen:draw_box(left, top, right, bottom, [line], [fill])
     most-significant to least-significant byte.  If the line colour is not
     provided, the UI text colour is used; if the fill colour is not provided,
     the UI background colour is used.
-screen:draw_line(x1, y1, x2, y2, bottom, [color])
+screen:draw_line(x1, y1, x2, y2, [color])
     Draws a line from (x1, y1) to (x2, y2).
 
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
+    Coordinates are floating-point numbers in units of emulated screen pixels,
+    with the origin at (0, 0).  Note that emulated screen pixels often aren’t
+    square.  The coordinate system is rotated if the screen is rotated, which is
+    usually the case for vertical-format screens.  Before rotation, the origin
+    is at the top left, and coordinates increase to the right and downwards.
+    Coordinates are limited to the screen area.
 
     The line colour is in alpha/red/green/blue (ARGB) format.  Channel values
     are in the range 0 (transparent or off) to 255 (opaque or full intensity),
@@ -842,21 +927,21 @@ screen:draw_text(x|justify, y, text, [foreground], [background])
     right-aligned at the right edge of the screen, respectively.  The second
     argument specifies the Y coordinate of the maximum ascent of the text.
 
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
+    Coordinates are floating-point numbers in units of emulated screen pixels,
+    with the origin at (0, 0).  Note that emulated screen pixels often aren’t
+    square.  The coordinate system is rotated if the screen is rotated, which is
+    usually the case for vertical-format screens.  Before rotation, the origin
+    is at the top left, and coordinates increase to the right and downwards.
+    Coordinates are limited to the screen area.
 
-    The foreground and background colours is in alpha/red/green/blue (ARGB)
-    format.  Channel values are in the range 0 (transparent or off) to 255 (opaque or full intensity),
-    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
-    The channel values must be packed into the bytes of a 32-bit unsigned
-    integer, in the order alpha, red, green, blue from most-significant to
-    least-significant byte.  If the foreground colour is not provided, the UI
-    text colour is used; if the background colour is not provided, the UI
-    background colour is used.
+    The foreground and background colours are in alpha/red/green/blue (ARGB)
+    format.  Channel values are in the range 0 (transparent or off) to 255
+    (opaque or full intensity), inclusive.  Colour channel values are not
+    pre-multiplied by the alpha value.  The channel values must be packed into
+    the bytes of a 32-bit unsigned integer, in the order alpha, red, green, blue
+    from most-significant to least-significant byte.  If the foreground colour
+    is not provided, the UI text colour is used; if the background colour is not
+    provided, it is fully transparent.
 
 Properties
 ^^^^^^^^^^
@@ -2406,6 +2491,73 @@ manager.machine.render.ui_container
     sliders and pop-up messages.
 manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
+
+Methods
+^^^^^^^
+
+container:draw_box(left, top, right, bottom, [line], [fill])
+    Draws an outlined rectangle with edges at the specified positions.
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    screen that showss the user interface.  Note that the aspect ratio is
+    usually not square.  Coordinates are limited to the window or screen area.
+
+    The fill and line colours are in alpha/red/green/blue (ARGB) format.
+    Channel values are in the range 0 (transparent or off) to 255 (opaque or
+    full intensity), inclusive.  Colour channel values are not pre-multiplied by
+    the alpha value.  The channel values must be packed into the bytes of a
+    32-bit unsigned integer, in the order alpha, red, green, blue from
+    most-significant to least-significant byte.  If the line colour is not
+    provided, the UI text colour is used; if the fill colour is not provided,
+    the UI background colour is used.
+container:draw_line(x1, y1, x2, y2, [color])
+    Draws a line from (x1, y1) to (x2, y2).
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    screen that showss the user interface.  Note that the aspect ratio is
+    usually not square.  Coordinates are limited to the window or screen area.
+
+    Coordinates are floating-point numbers in units of screen pixels, with the
+    origin at (0, 0).  Note that screen pixels often aren’t square.  The
+    coordinate system is rotated if the screen is rotated, which is usually the
+    case for vertical-format screens.  Before rotation, the origin is at the top
+    left, and coordinates increase to the right and downwards.  Coordinates are
+    limited to the screen area.
+
+    The line colour is in alpha/red/green/blue (ARGB) format.  Channel values
+    are in the range 0 (transparent or off) to 255 (opaque or full intensity),
+    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
+    The channel values must be packed into the bytes of a 32-bit unsigned
+    integer, in the order alpha, red, green, blue from most-significant to
+    least-significant byte.  If the line colour is not provided, the UI text
+    colour is used.
+container:draw_text(x|justify, y, text, [foreground], [background])
+    Draws text at the specified position.  If the screen is rotated the text
+    will be rotated.
+
+    If the first argument is a number, the text will be left-aligned at this X
+    coordinate.  If the first argument is a string, it must be ``"left"``,
+    ``"center"`` or ``"right"`` to draw the text left-aligned at the
+    left edge of the window or screen, horizontally centred in the window or
+    screen, or right-aligned at the right edge of the window or screen,
+    respectively.  The second argument specifies the Y coordinate of the maximum
+    ascent of the text.
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    screen that showss the user interface.  Note that the aspect ratio is
+    usually not square.  Coordinates are limited to the window or screen area.
+
+    The foreground and background colours are in alpha/red/green/blue (ARGB)
+    format.  Channel values are in the range 0 (transparent or off) to 255
+    (opaque or full intensity), inclusive.  Colour channel values are not
+    pre-multiplied by the alpha value.  The channel values must be packed into
+    the bytes of a 32-bit unsigned integer, in the order alpha, red, green, blue
+    from most-significant to least-significant byte.  If the foreground colour
+    is not provided, the UI text colour is used; if the background colour is not
+    provided, it is fully transparent.
 
 Properties
 ^^^^^^^^^^

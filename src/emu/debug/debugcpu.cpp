@@ -434,6 +434,7 @@ device_debug::device_debug(device_t &device)
 	, m_total_cycles(0)
 	, m_last_total_cycles(0)
 	, m_pc_history_index(0)
+	, m_pc_history_valid(0)
 	, m_bplist()
 	, m_rplist(std::make_unique<std::forward_list<debug_registerpoint>>())
 	, m_triggered_breakpoint(nullptr)
@@ -566,10 +567,10 @@ void device_debug::reinstall(address_space &space, read_or_write mode)
 		if (m_track_mem)
 			switch (space.data_width())
 			{
-			case  8: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 16: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 32: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
-			case 64: m_phw[id] = space.install_read_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case  8: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u8  &data, u8 ) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 16: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u16 &data, u16) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 32: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u32 &data, u32) { write_tracking(space, address, data); }, m_phw[id]); break;
+			case 64: m_phw[id] = space.install_write_tap(0, space.addrmask(), "track_mem", [this, &space](offs_t address, u64 &data, u64) { write_tracking(space, address, data); }, m_phw[id]); break;
 			}
 	}
 }
@@ -581,6 +582,21 @@ void device_debug::reinstall_all(read_or_write mode)
 		if (m_memory->has_space(i))
 			reinstall(m_memory->space(i), mode);
 }
+
+//-------------------------------------------------
+//  set_track_mem - start or stop tracking memory
+//  writes
+//-------------------------------------------------
+
+void device_debug::set_track_mem(bool value)
+{
+	if (m_track_mem != value)
+	{
+		m_track_mem = value;
+		reinstall_all(read_or_write::WRITE);
+	}
+}
+
 
 //-------------------------------------------------
 //  start_hook - the scheduler calls this hook
@@ -707,7 +723,10 @@ void device_debug::instruction_hook(offs_t curpc)
 	debugcpu.set_within_instruction(true);
 
 	// update the history
-	m_pc_history[m_pc_history_index++ % HISTORY_SIZE] = curpc;
+	m_pc_history[m_pc_history_index] = curpc;
+	m_pc_history_index = (m_pc_history_index + 1) % std::size(m_pc_history);
+	if (std::size(m_pc_history) > m_pc_history_valid)
+		++m_pc_history_valid;
 
 	// update total cycles
 	m_last_total_cycles = m_total_cycles;
@@ -1337,13 +1356,28 @@ void device_debug::registerpoint_enable_all(bool enable)
 //  history
 //-------------------------------------------------
 
-offs_t device_debug::history_pc(int index) const
+std::pair<offs_t, bool> device_debug::history_pc(int index) const
 {
-	if (index > 0)
-		index = 0;
-	if (index <= -HISTORY_SIZE)
-		index = -HISTORY_SIZE + 1;
-	return m_pc_history[(m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history)];
+	if ((index <= 0) && (-index < m_pc_history_valid))
+	{
+		int const i = (m_pc_history_index + std::size(m_pc_history) - 1 + index) % std::size(m_pc_history);
+		return std::make_pair(m_pc_history[i], true);
+	}
+	else
+	{
+		return std::make_pair(offs_t(0), false);
+	}
+}
+
+
+//-------------------------------------------------
+//  set_track_pc - turn visited PC tracking on or
+//  off
+//-------------------------------------------------
+
+void device_debug::set_track_pc(bool value)
+{
+	m_track_pc = value;
 }
 
 
@@ -1354,7 +1388,7 @@ offs_t device_debug::history_pc(int index) const
 //  TODO: Take a CPU context as input
 //-------------------------------------------------
 
-bool device_debug::track_pc_visited(const offs_t& pc) const
+bool device_debug::track_pc_visited(offs_t pc) const
 {
 	if (m_track_pc_set.empty())
 		return false;
@@ -1368,7 +1402,7 @@ bool device_debug::track_pc_visited(const offs_t& pc) const
 //  TODO: Take a CPU context as input
 //-------------------------------------------------
 
-void device_debug::set_track_pc_visited(const offs_t& pc)
+void device_debug::set_track_pc_visited(offs_t pc)
 {
 	const u32 crc = compute_opcode_crc32(pc);
 	m_track_pc_set.insert(dasm_pc_tag(pc, crc));
@@ -1607,12 +1641,20 @@ void device_debug::prepare_for_step_overout(offs_t pc)
 	}
 
 	// if we're stepping out and this isn't a step out instruction, reset the steps until stop to a high number
+	// (TODO: this doesn't work with conditional return instructions)
 	if ((m_flags & DEBUG_FLAG_STEPPING_OUT) != 0)
 	{
 		if ((dasmresult & util::disasm_interface::SUPPORTED) != 0 && (dasmresult & util::disasm_interface::STEP_OUT) == 0)
 			m_stepsleft = 100;
 		else
-			m_stepsleft = 1;
+		{
+			// add extra instructions for delay slots
+			int extraskip = (dasmresult & util::disasm_interface::OVERINSTMASK) >> util::disasm_interface::OVERINSTSHIFT;
+			m_stepsleft = extraskip + 1;
+
+			// take the last few steps normally
+			m_flags = (m_flags | DEBUG_FLAG_STEPPING) & ~DEBUG_FLAG_STEPPING_OUT;
+		}
 	}
 }
 

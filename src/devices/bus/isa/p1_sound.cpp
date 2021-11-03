@@ -7,7 +7,7 @@
     Memory-mapped, uses IRQ3 and IRQ7, no DMA.
 
     Copyright MESS Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+    Visit https://mamedev.org for licensing and usage restrictions.
 
 **********************************************************************/
 

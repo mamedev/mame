@@ -11,13 +11,14 @@
 #include "emu.h"
 #include "ui/optsmenu.h"
 
-#include "ui/ui.h"
-#include "ui/submenu.h"
-#include "ui/selector.h"
 #include "ui/custui.h"
-#include "ui/sndmenu.h"
-#include "ui/inputmap.h"
 #include "ui/dirmenu.h"
+#include "ui/inputmap.h"
+#include "ui/miscmenu.h"
+#include "ui/selector.h"
+#include "ui/sndmenu.h"
+#include "ui/submenu.h"
+#include "ui/ui.h"
 
 #include "mame.h"
 #include "mameopts.h"
@@ -37,6 +38,7 @@ menu_simple_game_options::menu_simple_game_options(
 	: menu(mui, container)
 	, m_handler(std::move(handler))
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 //-------------------------------------------------
@@ -54,12 +56,11 @@ menu_simple_game_options::~menu_simple_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_simple_game_options::handle()
+void menu_simple_game_options::handle(event const *ev)
 {
 	// process the menu
-	event const *const menu_event(process(PROCESS_LR_REPEAT));
-	if (menu_event && menu_event->itemref)
-		handle_item_event(*menu_event);
+	if (ev && ev->itemref)
+		handle_item_event(*ev);
 }
 
 //-------------------------------------------------
@@ -74,6 +75,8 @@ void menu_simple_game_options::populate(float &customtop, float &custombottom)
 	item_append(_(submenu::control_options()[0].description), 0, (void *)(uintptr_t)CONTROLLER_MENU);
 	item_append(_("General Inputs"), 0, (void *)(uintptr_t)CGI_MENU);
 	item_append(_(submenu::advanced_options()[0].description), 0, (void *)(uintptr_t)ADVANCED_MENU);
+	if (machine().options().plugins())
+		item_append(_("Plugins"), 0, (void *)(uintptr_t)PLUGINS_MENU);
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Save Configuration"), 0, (void *)(uintptr_t)SAVE_CONFIG);
 
@@ -125,6 +128,10 @@ void menu_simple_game_options::handle_item_event(event const &menu_event)
 			ui_globals::reset = true;
 		}
 		break;
+	case PLUGINS_MENU:
+		if (menu_event.iptkey == IPT_UI_SELECT)
+			menu::stack_push<menu_plugins_configure>(ui(), container());
+		break;
 	case SAVE_CONFIG:
 		if (menu_event.iptkey == IPT_UI_SELECT)
 			ui().save_main_option();
@@ -142,7 +149,7 @@ void menu_simple_game_options::custom_render(void *selectedref, float top, float
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -160,6 +167,7 @@ menu_game_options::menu_game_options(
 	, m_filter_data(filter_data)
 	, m_main_filter(filter_data.get_current_filter_type())
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 //-------------------------------------------------
@@ -175,13 +183,11 @@ menu_game_options::~menu_game_options()
 //  handle
 //-------------------------------------------------
 
-void menu_game_options::handle()
+void menu_game_options::handle(event const *ev)
 {
 	// process the menu
-	process_parent();
-	event const *const menu_event(process(PROCESS_LR_REPEAT | PROCESS_NOIMAGE));
-	if (menu_event && menu_event->itemref)
-		handle_item_event(*menu_event);
+	if (ev && ev->itemref)
+		handle_item_event(*ev);
 }
 
 //-------------------------------------------------

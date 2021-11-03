@@ -275,7 +275,7 @@ adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag,
 
 adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp21xx_device(mconfig, ADSP2181, tag, owner, clock, CHIP_TYPE_ADSP2181)
-	, m_io_config("I/O", ENDIANNESS_LITTLE, 16, 11, -1)
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 11, -1)
 { }
 
 

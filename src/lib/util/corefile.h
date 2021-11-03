@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "ioprocs.h"
 #include "osdfile.h"
 #include "strformat.h"
 
@@ -34,7 +35,7 @@ namespace util {
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class core_file
+class core_file : public random_read_write
 {
 public:
 	typedef std::unique_ptr<core_file> ptr;
@@ -43,16 +44,16 @@ public:
 	// ----- file open/close -----
 
 	// open a file with the specified filename
-	static std::error_condition open(std::string_view filename, std::uint32_t openflags, ptr &file);
+	static std::error_condition open(std::string_view filename, std::uint32_t openflags, ptr &file) noexcept;
 
 	// open a RAM-based "file" using the given data and length (read-only)
-	static std::error_condition open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
+	static std::error_condition open_ram(const void *data, std::size_t length, std::uint32_t openflags, ptr &file) noexcept;
 
 	// open a RAM-based "file" using the given data and length (read-only), copying the data
-	static std::error_condition open_ram_copy(const void *data, std::size_t length, std::uint32_t openflags, ptr &file);
+	static std::error_condition open_ram_copy(const void *data, std::size_t length, std::uint32_t openflags, ptr &file) noexcept;
 
 	// open a proxy "file" that forwards requests to another file object
-	static std::error_condition open_proxy(core_file &file, ptr &proxy);
+	static std::error_condition open_proxy(core_file &file, ptr &proxy) noexcept;
 
 	// close an open file
 	virtual ~core_file();
@@ -60,23 +61,11 @@ public:
 
 	// ----- file positioning -----
 
-	// adjust the file pointer within the file
-	virtual int seek(std::int64_t offset, int whence) = 0;
-
-	// return the current file pointer
-	virtual std::uint64_t tell() const = 0;
-
 	// return true if we are at the EOF
 	virtual bool eof() const = 0;
 
-	// return the total size of the file
-	virtual std::uint64_t size() const = 0;
-
 
 	// ----- file read -----
-
-	// standard binary read from a file
-	virtual std::uint32_t read(void *buffer, std::uint32_t length) = 0;
 
 	// read one character from the file
 	virtual int getc() = 0;
@@ -92,14 +81,11 @@ public:
 	virtual const void *buffer() = 0;
 
 	// open a file with the specified filename, read it into memory, and return a pointer
-	static std::error_condition load(std::string_view filename, void **data, std::uint32_t &length);
-	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data);
+	static std::error_condition load(std::string_view filename, void **data, std::uint32_t &length) noexcept;
+	static std::error_condition load(std::string_view filename, std::vector<uint8_t> &data) noexcept;
 
 
 	// ----- file write -----
-
-	// standard binary write to a file
-	virtual std::uint32_t write(const void *buffer, std::uint32_t length) = 0;
 
 	// write a line of text to the file
 	virtual int puts(std::string_view s) = 0;
@@ -113,13 +99,6 @@ public:
 
 	// file truncation
 	virtual std::error_condition truncate(std::uint64_t offset) = 0;
-
-	// flush file buffers
-	virtual std::error_condition flush() = 0;
-
-
-protected:
-	core_file();
 };
 
 } // namespace util

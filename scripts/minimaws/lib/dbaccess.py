@@ -33,6 +33,11 @@ class SchemaQueries(object):
             '    shortname       TEXT    NOT NULL,\n' \
             '    description     TEXT    NOT NULL,\n' \
             '    UNIQUE (shortname ASC))'
+    CREATE_SOFTWARELISTNOTES = \
+            'CREATE TABLE softwarelistnotes (\n' \
+            '    softwarelist    INTEGER PRIMARY KEY,\n' \
+            '    notes           TEXT    NOT NULL,\n' \
+            '    FOREIGN KEY (softwarelist) REFERENCES softwarelist (id))'
     CREATE_SOFTWARE = \
             'CREATE TABLE software (\n' \
             '    id              INTEGER PRIMARY KEY,\n' \
@@ -50,6 +55,11 @@ class SchemaQueries(object):
             '    parent          INTEGER NOT NULL,\n' \
             '    FOREIGN KEY (id) REFERENCES software (id),\n' \
             '    FOREIGN KEY (parent) REFERENCES software (id))'
+    CREATE_SOFTWARENOTES = \
+            'CREATE TABLE softwarenotes (\n' \
+            '    software        INTEGER PRIMARY KEY,\n' \
+            '    notes           TEXT    NOT NULL,\n' \
+            '    FOREIGN KEY (software) REFERENCES software (id))'
     CREATE_SOFTWAREINFO = \
             'CREATE TABLE softwareinfo (\n' \
             '    id              INTEGER PRIMARY KEY,\n' \
@@ -390,8 +400,10 @@ class SchemaQueries(object):
             CREATE_SOFTWARESHAREDFEATTYPE,
             CREATE_SOFTWAREPARTFEATURETYPE,
             CREATE_SOFTWARELIST,
+            CREATE_SOFTWARELISTNOTES,
             CREATE_SOFTWARE,
             CREATE_SOFTWARECLONEOF,
+            CREATE_SOFTWARENOTES,
             CREATE_SOFTWAREINFO,
             CREATE_SOFTWARESHAREDFEAT,
             CREATE_SOFTWAREPART,
@@ -500,7 +512,9 @@ class UpdateQueries(object):
     ADD_SOFTWARESHAREDFEATTYPE = 'INSERT OR IGNORE INTO softwaresharedfeattype (name) VALUES (?)'
     ADD_SOFTWAREPARTFEATURETYPE = 'INSERT OR IGNORE INTO softwarepartfeaturetype (name) VALUES(?)'
     ADD_SOFTWARELIST = 'INSERT INTO softwarelist (shortname, description) VALUES (?, ?)'
+    ADD_SOFTWARELISTNOTES = 'INSERT INTO softwarelistnotes (softwarelist, notes) VALUES (?, ?)'
     ADD_SOFTWARE = 'INSERT INTO software (softwarelist, shortname, supported, description, year, publisher) VALUES (?, ?, ?, ?, ?, ?)'
+    ADD_SOFTWARENOTES = 'INSERT INTO softwarenotes (software, notes) VALUES (?, ?)'
     ADD_SOFTWAREINFO = 'INSERT INTO softwareinfo (software, infotype, value) SELECT ?, id, ? FROM softwareinfotype WHERE name = ?'
     ADD_SOFTWARESHAREDFEAT = 'INSERT INTO softwaresharedfeat (software, sharedfeattype, value) SELECT ?, id, ? FROM softwaresharedfeattype WHERE name = ?'
     ADD_SOFTWAREPART = 'INSERT INTO softwarepart (software, shortname, interface) VALUES (?, ?, ?)'
@@ -785,15 +799,15 @@ class QueryCursor(object):
     def get_softwarelist_details(self, shortname, pattern):
         if pattern is not None:
             return self.dbcurs.execute(
-                    'SELECT softwarelist.id AS id, softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
-                    'FROM softwarelist LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
+                    'SELECT softwarelist.id AS id, softwarelist.shortname AS shortname, softwarelist.description AS description, softwarelistnotes.notes AS notes, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
+                    'FROM softwarelist LEFT JOIN softwarelistnotes ON softwarelist.id = softwarelistnotes.softwarelist LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
                     'WHERE softwarelist.shortname = ? AND software.shortname GLOB ? ' \
                     'GROUP BY softwarelist.id',
                     (shortname, pattern))
         else:
             return self.dbcurs.execute(
-                    'SELECT softwarelist.id AS id, softwarelist.shortname AS shortname, softwarelist.description AS description, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
-                    'FROM softwarelist LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
+                    'SELECT softwarelist.id AS id, softwarelist.shortname AS shortname, softwarelist.description AS description, softwarelistnotes.notes AS notes, COUNT(software.id) AS total, COUNT(CASE software.supported WHEN 0 THEN 1 ELSE NULL END) AS supported, COUNT(CASE software.supported WHEN 1 THEN 1 ELSE NULL END) AS partiallysupported, COUNT(CASE software.supported WHEN 2 THEN 1 ELSE NULL END) AS unsupported ' \
+                    'FROM softwarelist LEFT JOIN softwarelistnotes ON softwarelist.id = softwarelistnotes.softwarelist LEFT JOIN software ON softwarelist.id = software.softwarelist ' \
                     'WHERE softwarelist.shortname = ? ' \
                     'GROUP BY softwarelist.id',
                     (shortname, ))
@@ -836,8 +850,8 @@ class QueryCursor(object):
 
     def get_software_details(self, softwarelist, software):
         return self.dbcurs.execute(
-                'SELECT software.id AS id, software.shortname AS shortname, software.supported AS supported, software.description AS description, software.year AS year, software.publisher AS publisher, softwarelist.shortname AS softwarelist, softwarelist.description AS softwarelistdescription, parent.shortname AS parent, parent.description AS parentdescription, parentsoftwarelist.shortname AS parentsoftwarelist, parentsoftwarelist.description AS parentsoftwarelistdescription ' \
-                'FROM software LEFT JOIN softwarelist ON software.softwarelist = softwarelist.id LEFT JOIN softwarecloneof ON software.id = softwarecloneof.id LEFT JOIN software AS parent ON softwarecloneof.parent = parent.id LEFT JOIN softwarelist AS parentsoftwarelist ON parent.softwarelist = parentsoftwarelist.id ' \
+                'SELECT software.id AS id, software.shortname AS shortname, software.supported AS supported, software.description AS description, software.year AS year, software.publisher AS publisher, softwarelist.shortname AS softwarelist, softwarelist.description AS softwarelistdescription, parent.shortname AS parent, parent.description AS parentdescription, parentsoftwarelist.shortname AS parentsoftwarelist, parentsoftwarelist.description AS parentsoftwarelistdescription, softwarenotes.notes AS notes ' \
+                'FROM software LEFT JOIN softwarelist ON software.softwarelist = softwarelist.id LEFT JOIN softwarecloneof ON software.id = softwarecloneof.id LEFT JOIN software AS parent ON softwarecloneof.parent = parent.id LEFT JOIN softwarelist AS parentsoftwarelist ON parent.softwarelist = parentsoftwarelist.id LEFT JOIN softwarenotes ON softwarenotes.software = software.id ' \
                 'WHERE software.softwarelist = (SELECT id FROM softwarelist WHERE shortname = ?) AND software.shortname = ?',
                 (softwarelist, software))
 
@@ -912,6 +926,9 @@ class UpdateCursor(object):
         self.dbcurs.execute(UpdateQueries.ADD_SOFTWARELIST, (shortname, description))
         return self.dbcurs.lastrowid
 
+    def add_softwarelistnotes(self, softwarelist, notes):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWARELISTNOTES, (softwarelist, notes))
+
     def add_softwareinfotype(self, name):
         self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREINFOTYPE, (name, ))
 
@@ -928,6 +945,9 @@ class UpdateCursor(object):
     def add_softwarecloneof(self, software, parent):
         self.dbcurs.execute(UpdateQueries.ADD_TEMPORARY_SOFTWARECLONEOF, (software, parent))
         return self.dbcurs.lastrowid
+
+    def add_softwarenotes(self, software, notes):
+        self.dbcurs.execute(UpdateQueries.ADD_SOFTWARENOTES, (software, notes))
 
     def add_softwareinfo(self, software, infotype, value):
         self.dbcurs.execute(UpdateQueries.ADD_SOFTWAREINFO, (software, value, infotype))

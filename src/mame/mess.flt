@@ -207,6 +207,8 @@ crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
+ctk2000.cpp
+ctk551.cpp
 cvicny.cpp
 cxg_ch2001.cpp
 cxg_dominator.cpp
@@ -302,6 +304,7 @@ exelv.cpp
 exorciser.cpp
 exorterm.cpp
 exp85.cpp
+f387x.cpp
 facit4440.cpp
 falco5220.cpp
 falcots.cpp
@@ -316,6 +319,7 @@ fidel_card.cpp
 fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
+fidel_checkc2.cpp
 fidel_chesster.cpp
 fidel_csc.cpp
 fidel_dames.cpp
@@ -547,6 +551,7 @@ llc2.cpp
 lms46.cpp
 lnw80.cpp
 lola8a.cpp
+luna_68k.cpp
 lviv.cpp
 lwriter.cpp
 lynx.cpp

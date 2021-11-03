@@ -188,20 +188,9 @@ protected:
 // Calling then looks like: DYNAMIC_CALL(CreateDXGIFactory1, p1, p2, etc)
 //=========================================================================================================
 
-#if !defined(OSD_UWP)
-
 #define OSD_DYNAMIC_API(apiname, ...) osd::dynamic_module::ptr m_##apiname##module = osd::dynamic_module::open( { __VA_ARGS__ } )
 #define OSD_DYNAMIC_API_FN(apiname, ret, conv, fname, ...) ret(conv *m_##fname##_pfn)( __VA_ARGS__ ) = m_##apiname##module->bind<ret(conv *)( __VA_ARGS__ )>(#fname)
 #define OSD_DYNAMIC_CALL(fname, ...) (*m_##fname##_pfn) ( __VA_ARGS__ )
 #define OSD_DYNAMIC_API_TEST(fname) (m_##fname##_pfn != nullptr)
-
-#else
-
-#define OSD_DYNAMIC_API(apiname, ...)
-#define OSD_DYNAMIC_API_FN(apiname, ret, conv, fname, ...)
-#define OSD_DYNAMIC_CALL(fname, ...) fname( __VA_ARGS__ )
-#define OSD_DYNAMIC_API_TEST(fname) (true)
-
-#endif
 
 #endif  /* __OSDLIB__ */

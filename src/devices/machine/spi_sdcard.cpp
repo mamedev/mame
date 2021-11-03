@@ -1,14 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-    SD Card emulation, SPI interface only currently
+    SD Card emulation, SPI interface.
     Emulation by R. Belmont
 
-    This emulates an SDHC card, which means the block size is fixed at 512 bytes and makes things simpler.
-    Adapting the code to also handle SD version 2 non-HC cards would be relatively straightforward as well;
-    the block size defaults to 1 byte in that case but can be overridden with CMD16.
+    This emulates either an SDHC (SPI_SDCARD) or an SDV2 card (SPI_SDCARDV2).  SDHC has a fixed
+    512 byte block size and the arguments to the read/write commands are block numbers.  SDV2
+    has a variable block size defaulting to 512 and the arguments to the read/write commands
+    are byte offsets.
 
-    Adding the native 4-bit-wide SD interface is also possible
+    The block size set with CMD16 must match the underlying CHD block size if it's not 512.
+
+    Adding the native 4-bit-wide SD interface is also possible; this should be broken up into a base
+    SD Card class with SPI and SD frontends in that case.
 
     Multiple block read/write commands are not supported but would be straightforward to add.
 
@@ -35,7 +39,8 @@
 static constexpr u8 DATA_RESPONSE_OK        = 0x05;
 static constexpr u8 DATA_RESPONSE_IO_ERROR  = 0x0d;
 
-DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_device, "spi_sdcard", "SD Card (SPI Interface)")
+DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device, "spi_sdhccard", "SDHC Card (SPI Interface)")
+DEFINE_DEVICE_TYPE(SPI_SDCARDV2, spi_sdcard_sdv2_device, "spi_sdv2card", "SDV2 Card (SPI Interface)")
 
 spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -43,13 +48,20 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	m_image(*this, "image"),
 	m_harddisk(nullptr),
 	m_in_latch(0), m_out_latch(0), m_cmd_ptr(0), m_state(0), m_out_ptr(0), m_out_count(0), m_ss(0), m_in_bit(0),
-	m_cur_bit(0), m_write_ptr(0), m_bACMD(false)
+	m_cur_bit(0), m_write_ptr(0), m_blksize(512), m_bACMD(false)
 {
 }
 
-spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
+{
+	m_type = SD_TYPE_V2;
+}
+
+spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
 {
+	m_type = SD_TYPE_HC;
 }
 
 void spi_sdcard_device::device_start()
@@ -65,6 +77,8 @@ void spi_sdcard_device::device_start()
 	save_item(NAME(m_in_bit));
 	save_item(NAME(m_cur_bit));
 	save_item(NAME(m_write_ptr));
+	save_item(NAME(m_blksize));
+	save_item(NAME(m_type));
 	save_item(NAME(m_cmd));
 	save_item(NAME(m_data));
 	save_item(NAME(m_bACMD));
@@ -134,9 +148,14 @@ void spi_sdcard_device::spi_clock_w(int state)
 
 					case SD_STATE_WRITE_DATA:
 						m_data[m_write_ptr++] = m_in_latch;
-						if (m_write_ptr == 514)
+						if (m_write_ptr == (m_blksize + 2))
 						{
 							u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+							if (m_type == SD_TYPE_V2)
+							{
+								blk /= m_blksize;
+							}
+
 							LOGMASKED(LOG_GENERAL, "writing LBA %x, data %02x %02x %02x %02x\n", blk, m_data[0], m_data[1], m_data[2], m_data[3]);
 							if (hard_disk_write(m_harddisk, blk, &m_data[0]))
 							{
@@ -206,6 +225,53 @@ void spi_sdcard_device::do_command()
 		send_data(5);
 		break;
 
+	case 10: // CMD10 - SEND_CID
+		m_data[0] = 0x01;   // initial R1 response
+		m_data[1] = 0x00;   // throwaway byte before data transfer
+		m_data[2] = 0xfe;   // data token
+		m_data[3] =  'M';   // Manufacturer ID - we'll use M for MAME
+		m_data[4] =  'M';   // OEM ID - MD for MAMEdev
+		m_data[5] =  'D';
+		m_data[6] =  'M';   // Product Name - "MCARD"
+		m_data[7] =  'C';
+		m_data[8] =  'A';
+		m_data[9] =  'R';
+		m_data[10] = 'D';
+		m_data[11] = 0x10;  // Product Revision in BCD (1.0)
+		{
+			u32 uSerial = 0x12345678;
+			m_data[12] = (uSerial>>24) & 0xff;  // PSN - Product Serial Number
+			m_data[13] = (uSerial>>16) & 0xff;
+			m_data[14] = (uSerial>>8) & 0xff;
+			m_data[15] = (uSerial & 0xff);
+		}
+		m_data[16] = 0x01;  // MDT - Manufacturing Date
+		m_data[17] = 0x59;  // 0x15 9 = 2021, September
+		m_data[18] = 0x00;  // CRC7, bit 0 is always 0
+		{
+			util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], 16);
+			m_data[19] = (crc16 >> 8) & 0xff;
+			m_data[20] = (crc16 & 0xff);
+		}
+		send_data(3 + 16 + 2);
+		break;
+
+	case 16: // CMD16 - SET_BLOCKLEN
+		m_blksize = (m_cmd[3] << 8) | m_cmd[4];
+		if (hard_disk_set_block_size(m_harddisk, m_blksize))
+		{
+			m_data[0] = 0;
+		}
+		else
+		{
+			m_data[0] = 0xff;   // indicate an error
+			// if false was returned, it means the hard disk is a CHD file, and we can't resize the
+			// blocks on CHD files.
+			logerror("spi_sdcard: Couldn't change block size to %d, wrong CHD file?", m_blksize);
+		}
+		send_data(1);
+		break;
+
 	case 17: // CMD17 - READ_SINGLE_BLOCK
 		if (m_harddisk)
 		{
@@ -214,9 +280,18 @@ void spi_sdcard_device::do_command()
 			// byte of space between R1 and the data packet.
 			m_data[2] = 0xfe; // data token
 			u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+			if (m_type == SD_TYPE_V2)
+			{
+				blk /= m_blksize;
+			}
 			LOGMASKED(LOG_GENERAL, "reading LBA %x\n", blk);
 			hard_disk_read(m_harddisk, blk, &m_data[3]);
-			send_data(3 + 512 + 2);
+			{
+				util::crc16_t crc16 = util::crc16_creator::simple(&m_data[3], m_blksize);
+				m_data[m_blksize + 3] = (crc16 >> 8) & 0xff;
+				m_data[m_blksize + 4] = (crc16 & 0xff);
+			}
+			send_data(3 + m_blksize + 2);
 		}
 		else
 		{
@@ -250,7 +325,14 @@ void spi_sdcard_device::do_command()
 
 	case 58: // CMD58 - READ_OCR
 		m_data[0] = 0;
-		m_data[1] = 0x40; // indicate SDHC support
+		if (m_type == SD_TYPE_HC)
+		{
+			m_data[1] = 0x40; // indicate SDHC support
+		}
+		else
+		{
+			m_data[1] = 0;
+		}
 		m_data[2] = 0;
 		m_data[3] = 0;
 		m_data[4] = 0;

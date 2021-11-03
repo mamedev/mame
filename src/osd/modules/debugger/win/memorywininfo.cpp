@@ -32,21 +32,29 @@ memorywin_info::memorywin_info(debugger_windows_interface &debugger) :
 
 	// create the options menu
 	HMENU const optionsmenu = CreatePopupMenu();
-	AppendMenu(optionsmenu, MF_ENABLED, ID_1_BYTE_CHUNKS, TEXT("1-byte chunks\tCtrl+1"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_2_BYTE_CHUNKS, TEXT("2-byte chunks\tCtrl+2"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_4_BYTE_CHUNKS, TEXT("4-byte chunks\tCtrl+4"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_8_BYTE_CHUNKS, TEXT("8-byte chunks\tCtrl+8"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOATING_POINT_32BIT, TEXT("32 bit floating point\tCtrl+9"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOATING_POINT_64BIT, TEXT("64 bit floating point"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOATING_POINT_80BIT, TEXT("80 bit floating point"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_1_BYTE_CHUNKS_HEX, TEXT("1-byte Chunks (Hex)\tCtrl+1"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_2_BYTE_CHUNKS_HEX, TEXT("2-byte Chunks (Hex)\tCtrl+2"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_4_BYTE_CHUNKS_HEX, TEXT("4-byte Chunks (Hex)\tCtrl+4"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_8_BYTE_CHUNKS_HEX, TEXT("8-byte Chunks (Hex)\tCtrl+8"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_1_BYTE_CHUNKS_OCT, TEXT("1-byte Chunks (Octal)\tCtrl+3"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_2_BYTE_CHUNKS_OCT, TEXT("2-byte Chunks (Octal)\tCtrl+5"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_4_BYTE_CHUNKS_OCT, TEXT("4-byte Chunks (Octal)\tCtrl+7"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_8_BYTE_CHUNKS_OCT, TEXT("8-byte Chunks (Octal)\tCtrl+9"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOAT_32BIT, TEXT("32-bit Floating Point\tCtrl+Shift+F"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOAT_64BIT, TEXT("64-bit Floating Point\tCtrl+Shift+D"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_FLOAT_80BIT, TEXT("80-bit Floating Point\tCtrl+Shift+E"));
+	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_HEX_ADDRESSES, TEXT("Hexadecimal Addresses\tCtrl+Shift+H"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_DEC_ADDRESSES, TEXT("Decimal Addresses"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_OCT_ADDRESSES, TEXT("Octal Addresses\tCtrl+Shift+O"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_LOGICAL_ADDRESSES, TEXT("Logical Addresses\tCtrl+L"));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_PHYSICAL_ADDRESSES, TEXT("Physical Addresses\tCtrl+Y"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 	AppendMenu(optionsmenu, MF_ENABLED, ID_REVERSE_VIEW, TEXT("Reverse View\tCtrl+R"));
 	AppendMenu(optionsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_INCREASE_MEM_WIDTH, TEXT("Increase bytes per line\tCtrl+P"));
-	AppendMenu(optionsmenu, MF_ENABLED, ID_DECREASE_MEM_WIDTH, TEXT("Decrease bytes per line\tCtrl+O"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_INCREASE_MEM_WIDTH, TEXT("Increase Bytes Per Line\tCtrl+P"));
+	AppendMenu(optionsmenu, MF_ENABLED, ID_DECREASE_MEM_WIDTH, TEXT("Decrease Bytes Per Line\tCtrl+O"));
 	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
 
 	// set up the view to track the initial expression
@@ -83,47 +91,87 @@ bool memorywin_info::handle_key(WPARAM wparam, LPARAM lparam)
 {
 	if (GetAsyncKeyState(VK_CONTROL) & 0x8000)
 	{
-		switch (wparam)
+		if (GetAsyncKeyState(VK_SHIFT))
 		{
-		case '1':
-			SendMessage(window(), WM_COMMAND, ID_1_BYTE_CHUNKS, 0);
-			return true;
+			switch (wparam)
+			{
+			case 'F':
+				SendMessage(window(), WM_COMMAND, ID_FLOAT_32BIT, 0);
+				return true;
 
-		case '2':
-			SendMessage(window(), WM_COMMAND, ID_2_BYTE_CHUNKS, 0);
-			return true;
+			case 'D':
+				SendMessage(window(), WM_COMMAND, ID_FLOAT_64BIT, 0);
+				return true;
 
-		case '4':
-			SendMessage(window(), WM_COMMAND, ID_4_BYTE_CHUNKS, 0);
-			return true;
+			case 'E':
+				SendMessage(window(), WM_COMMAND, ID_FLOAT_80BIT, 0);
+				return true;
 
-		case '8':
-			SendMessage(window(), WM_COMMAND, ID_8_BYTE_CHUNKS, 0);
-			return true;
+			case 'H':
+				SendMessage(window(), WM_COMMAND, ID_HEX_ADDRESSES, 0);
+				return true;
 
-		case '9':
-			SendMessage(window(), WM_COMMAND, ID_FLOATING_POINT_32BIT, 0);
-			return true;
+			case 'O':
+				SendMessage(window(), WM_COMMAND, ID_OCT_ADDRESSES, 0);
+				return true;
+			}
+		}
+		else
+		{
+			switch (wparam)
+			{
+			case '1':
+				SendMessage(window(), WM_COMMAND, ID_1_BYTE_CHUNKS_HEX, 0);
+				return true;
 
-		case 'L':
-			SendMessage(window(), WM_COMMAND, ID_LOGICAL_ADDRESSES, 0);
-			return true;
+			case '2':
+				SendMessage(window(), WM_COMMAND, ID_2_BYTE_CHUNKS_HEX, 0);
+				return true;
 
-		case 'Y':
-			SendMessage(window(), WM_COMMAND, ID_PHYSICAL_ADDRESSES, 0);
-			return true;
+			case '4':
+				SendMessage(window(), WM_COMMAND, ID_4_BYTE_CHUNKS_HEX, 0);
+				return true;
 
-		case 'R':
-			SendMessage(window(), WM_COMMAND, ID_REVERSE_VIEW, 0);
-			return true;
+			case '8':
+				SendMessage(window(), WM_COMMAND, ID_8_BYTE_CHUNKS_HEX, 0);
+				return true;
 
-		case 'P':
-			SendMessage(window(), WM_COMMAND, ID_INCREASE_MEM_WIDTH, 0);
-			return true;
+			case '3':
+				SendMessage(window(), WM_COMMAND, ID_1_BYTE_CHUNKS_OCT, 0);
+				return true;
 
-		case 'O':
-			SendMessage(window(), WM_COMMAND, ID_DECREASE_MEM_WIDTH, 0);
-			return true;
+			case '5':
+				SendMessage(window(), WM_COMMAND, ID_2_BYTE_CHUNKS_OCT, 0);
+				return true;
+
+			case '7':
+				SendMessage(window(), WM_COMMAND, ID_4_BYTE_CHUNKS_OCT, 0);
+				return true;
+
+			case '9':
+				SendMessage(window(), WM_COMMAND, ID_8_BYTE_CHUNKS_OCT, 0);
+				return true;
+
+			case 'L':
+				SendMessage(window(), WM_COMMAND, ID_LOGICAL_ADDRESSES, 0);
+				return true;
+
+			case 'Y':
+				SendMessage(window(), WM_COMMAND, ID_PHYSICAL_ADDRESSES, 0);
+				return true;
+
+			case 'R':
+				SendMessage(window(), WM_COMMAND, ID_REVERSE_VIEW, 0);
+				return true;
+
+			case 'P':
+				SendMessage(window(), WM_COMMAND, ID_INCREASE_MEM_WIDTH, 0);
+				return true;
+
+			case 'O':
+				SendMessage(window(), WM_COMMAND, ID_DECREASE_MEM_WIDTH, 0);
+				return true;
+			}
 		}
 	}
 	return editwin_info::handle_key(wparam, lparam);
@@ -180,16 +228,28 @@ void memorywin_info::update_menu()
 
 	auto *const memview = downcast<memoryview_info *>(m_views[0].get());
 	HMENU const menu = GetMenu(window());
-	CheckMenuItem(menu, ID_1_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_8BIT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_2_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_16BIT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_4_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_32BIT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_8_BYTE_CHUNKS, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::HEX_64BIT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_FLOATING_POINT_32BIT, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::FLOAT_32BIT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_FLOATING_POINT_64BIT, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::FLOAT_64BIT ? MF_CHECKED : MF_UNCHECKED));
-	CheckMenuItem(menu, ID_FLOATING_POINT_80BIT, MF_BYCOMMAND | (memview->data_format() == debug_view_memory::data_format::FLOAT_80BIT ? MF_CHECKED : MF_UNCHECKED));
+
+	CheckMenuItem(menu, ID_1_BYTE_CHUNKS_HEX, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::HEX_8BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_2_BYTE_CHUNKS_HEX, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::HEX_16BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_4_BYTE_CHUNKS_HEX, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::HEX_32BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_8_BYTE_CHUNKS_HEX, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::HEX_64BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_1_BYTE_CHUNKS_OCT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::OCTAL_8BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_2_BYTE_CHUNKS_OCT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::OCTAL_16BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_4_BYTE_CHUNKS_OCT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::OCTAL_32BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_8_BYTE_CHUNKS_OCT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::OCTAL_64BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOAT_32BIT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::FLOAT_32BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOAT_64BIT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::FLOAT_64BIT) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_FLOAT_80BIT, MF_BYCOMMAND | ((memview->data_format() == debug_view_memory::data_format::FLOAT_80BIT) ? MF_CHECKED : MF_UNCHECKED));
+
+	CheckMenuItem(menu, ID_HEX_ADDRESSES, MF_BYCOMMAND | ((memview->address_radix() == 16) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_DEC_ADDRESSES, MF_BYCOMMAND | ((memview->address_radix() == 10) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_OCT_ADDRESSES, MF_BYCOMMAND | ((memview->address_radix() == 8) ? MF_CHECKED : MF_UNCHECKED));
+
 	CheckMenuItem(menu, ID_LOGICAL_ADDRESSES, MF_BYCOMMAND | (memview->physical() ? MF_UNCHECKED : MF_CHECKED));
 	CheckMenuItem(menu, ID_PHYSICAL_ADDRESSES, MF_BYCOMMAND | (memview->physical() ? MF_CHECKED : MF_UNCHECKED));
+
 	CheckMenuItem(menu, ID_REVERSE_VIEW, MF_BYCOMMAND | (memview->reverse() ? MF_CHECKED : MF_UNCHECKED));
+
 	EnableMenuItem(menu, ID_DECREASE_MEM_WIDTH, MF_BYCOMMAND | ((memview->chunks_per_row() > 1) ? MF_ENABLED : MF_GRAYED));
 }
 
@@ -219,32 +279,60 @@ bool memorywin_info::handle_command(WPARAM wparam, LPARAM lparam)
 	case 0:
 		switch (LOWORD(wparam))
 		{
-		case ID_1_BYTE_CHUNKS:
+		case ID_1_BYTE_CHUNKS_HEX:
 			memview->set_data_format(debug_view_memory::data_format::HEX_8BIT);
 			return true;
 
-		case ID_2_BYTE_CHUNKS:
+		case ID_2_BYTE_CHUNKS_HEX:
 			memview->set_data_format(debug_view_memory::data_format::HEX_16BIT);
 			return true;
 
-		case ID_4_BYTE_CHUNKS:
+		case ID_4_BYTE_CHUNKS_HEX:
 			memview->set_data_format(debug_view_memory::data_format::HEX_32BIT);
 			return true;
 
-		case ID_8_BYTE_CHUNKS:
+		case ID_8_BYTE_CHUNKS_HEX:
 			memview->set_data_format(debug_view_memory::data_format::HEX_64BIT);
 			return true;
 
-		case ID_FLOATING_POINT_32BIT:
+		case ID_1_BYTE_CHUNKS_OCT:
+			memview->set_data_format(debug_view_memory::data_format::OCTAL_8BIT);
+			return true;
+
+		case ID_2_BYTE_CHUNKS_OCT:
+			memview->set_data_format(debug_view_memory::data_format::OCTAL_16BIT);
+			return true;
+
+		case ID_4_BYTE_CHUNKS_OCT:
+			memview->set_data_format(debug_view_memory::data_format::OCTAL_32BIT);
+			return true;
+
+		case ID_8_BYTE_CHUNKS_OCT:
+			memview->set_data_format(debug_view_memory::data_format::OCTAL_64BIT);
+			return true;
+
+		case ID_FLOAT_32BIT:
 			memview->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
 			return true;
 
-		case ID_FLOATING_POINT_64BIT:
+		case ID_FLOAT_64BIT:
 			memview->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
 			return true;
 
-		case ID_FLOATING_POINT_80BIT:
+		case ID_FLOAT_80BIT:
 			memview->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
+			return true;
+
+		case ID_HEX_ADDRESSES:
+			memview->set_address_radix(16);
+			return true;
+
+		case ID_DEC_ADDRESSES:
+			memview->set_address_radix(10);
+			return true;
+
+		case ID_OCT_ADDRESSES:
+			memview->set_address_radix(8);
 			return true;
 
 		case ID_LOGICAL_ADDRESSES:

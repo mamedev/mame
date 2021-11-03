@@ -472,7 +472,7 @@ void eagv5_state::main_map(address_map &map)
 void eagv5_state::sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
-	map(0x000001, 0x000001).mirror(0x00fffe).w(m_sublatch, FUNC(generic_latch_8_device::write));
+	map(0x000000, 0x000001).mirror(0x00fffe).w(m_sublatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
 	map(0x044000, 0x047fff).ram();
 	map(0x140000, 0x140000).r(FUNC(eagv5_state::sub_ack_r));
 	map(0x140001, 0x140001).r(m_mainlatch, FUNC(generic_latch_8_device::read));

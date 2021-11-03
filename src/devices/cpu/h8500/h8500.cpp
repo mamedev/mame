@@ -15,7 +15,7 @@
 h8500_device::h8500_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int addrbits, int buswidth, int ramsize, int defmode, address_map_constructor map)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, buswidth, addrbits, 0, map)
-	, m_ram_config("internal RAM", ENDIANNESS_BIG, 16, ramsize, 0, address_map_constructor(FUNC(h8500_device::ram_map), this))
+	, m_ram_config("intram", ENDIANNESS_BIG, 16, ramsize, 0, address_map_constructor(FUNC(h8500_device::ram_map), this))
 	, m_mode_control(defmode)
 	, m_pc(0)
 	, m_ppc(0)

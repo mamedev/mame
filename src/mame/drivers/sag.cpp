@@ -10,27 +10,16 @@ and the cartridge holds the MCU(processor, ROM, RAM).
 Hardware notes:
 - cyan/red VFD display Futaba DM-16Z + cyan VFD 9-digit panel Futaba 9-ST-11A 1F
 - 1-bit sound, two 7-button control panels attached to each side
-- edge connector to cartridge, MCU on cartridge (see below for each MCU type)
+- edge connector to cartridge, MCU on cartridge (HD38800 or TMS1670)
 
-Games released, MCU: (*denotes undumped)
-- Baseball 4       - HD38800
-- Basketball 3     - HD38800
-- Football 4       - TMS1670
-- *Pac-Man 2       - HD38800
-- Pinball          - HD38800
-- Space Invader 2  - HD38800
+A 2nd version of the console was announced, called Table Top Game Machine,
+supposed to be backward-compatible, but Entex didn't release it. Their next
+console was the Adventure Vision.
 
-Battleship and Turtles were announced but unreleased.
-A 2nd version of the console was also announced, called Table Top Game Machine,
-but Entex didn't release it. Their next console was the Adventure Vision.
-
-MAME external artwork is recommended for the per-game VFD overlays. For internal
-artwork, remember that the orientation can be rotated in the video options.
-By default, the "visitor" side is at the bottom. This is how most of the games
-are played, Space Invader 2 is an exception.
-
-TODO:
-- add the rest of the games
+MAME external artwork is recommended for the per-game VFD overlays. The artwork
+orientation can be rotated in the video options. By default, the "visitor" side
+is at the bottom. This is how most of the games are played, Space Invader 2 is
+an exception.
 
 ******************************************************************************/
 

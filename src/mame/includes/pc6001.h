@@ -7,13 +7,19 @@
 
 
 #include "cpu/z80/z80.h"
+#include "formats/dsk_dsk.h"
+#include "formats/msx_dsk.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
+#include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
+#include "machine/pc80s31k.h"
 #include "machine/timer.h"
+#include "machine/upd765.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
-//#include "sound/ymopn.h"
+#include "sound/ymopn.h"
 #include "video/mc6847.h"
 
 #include "bus/generic/slot.h"
@@ -28,24 +34,26 @@
 class pc6001_state : public driver_device
 {
 public:
-	pc6001_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_ppi(*this, "ppi8255"),
-		m_ram(*this, "ram"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_cassette(*this, "cassette"),
-		m_cas_hack(*this, "cas_hack"),
-		m_cart(*this, "cartslot"),
-		m_region_maincpu(*this, "maincpu"),
-		m_region_gfx1(*this, "gfx1"),
-		m_io_mode4_dsw(*this, "MODE4_DSW"),
-		m_io_p1(*this, "P1"),
-		m_io_p2(*this, "P2"),
-		m_io_keys(*this, "key%u", 1U),
-		m_io_key_modifiers(*this, "key_modifiers"),
-		m_bank1(*this, "bank1"),
-		m_palette(*this, "palette")
+	pc6001_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_ppi(*this, "ppi8255")
+		, m_ram(*this, "ram")
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_cassette(*this, "cassette")
+		, m_cas_hack(*this, "cas_hack")
+		, m_cart(*this, "cartslot")
+		, m_ay(*this, "aysnd")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_gfx1(*this, "gfx1")
+		, m_io_mode4_dsw(*this, "MODE4_DSW")
+		, m_io_p1(*this, "P1")
+		, m_io_p2(*this, "P2")
+		, m_io_keys(*this, "key%u", 1U)
+		, m_io_fn_keys(*this, "key_fn")
+		, m_io_key_modifiers(*this, "key_modifiers")
+		, m_bank1(*this, "bank1")
+		, m_palette(*this, "palette")
 	{ }
 
 	void system_latch_w(uint8_t data);
@@ -54,10 +62,11 @@ public:
 
 	void pc6001_palette(palette_device &palette) const;
 
-	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vrtc_irq);
+//  INTERRUPT_GEN_MEMBER(vrtc_irq);
 	TIMER_CALLBACK_MEMBER(audio_callback);
+	TIMER_CALLBACK_MEMBER(sub_trig_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
@@ -68,11 +77,7 @@ public:
 	void ppi_portc_w(uint8_t data);
 	uint8_t ppi_portc_r();
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
-
 	void pc6001(machine_config &config);
-	void pc6001_io(address_map &map);
-	void pc6001_map(address_map &map);
 protected:
 	required_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_ram;
@@ -81,14 +86,16 @@ protected:
 	optional_device<cassette_image_device> m_cassette;
 	optional_device<generic_slot_device> m_cas_hack;
 	required_device<generic_slot_device> m_cart;
-	required_memory_region m_region_maincpu;
+	optional_device<ay8910_device> m_ay;
+	optional_memory_region m_region_maincpu;
 	required_memory_region m_region_gfx1;
 	required_ioport m_io_mode4_dsw;
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
 	required_ioport_array<3> m_io_keys;
+	required_ioport m_io_fn_keys;
 	required_ioport m_io_key_modifiers;
-	required_memory_bank m_bank1;
+	optional_memory_bank m_bank1;
 	required_device<palette_device> m_palette;
 
 	memory_region *m_cart_rom;
@@ -97,16 +104,24 @@ protected:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	void default_cartridge_reset();
+	void default_cassette_hack_reset();
+	void default_keyboard_hle_reset();
+	void irq_reset(u8 timer_default_setting);
+
 	virtual void video_start() override;
+
+	void pc6001_map(address_map &map);
+	void pc6001_io(address_map &map);
 
 	// i/o functions
 	uint8_t check_joy_press();
 	uint8_t check_keyboard_press();
 	inline void cassette_latch_control(bool new_state);
 	inline void ppi_control_hack_w(uint8_t data);
-	inline void set_timer_divider(uint8_t data);
+	inline void set_timer_divider();
 	inline void set_videoram_bank(uint32_t offs);
-	inline void set_maincpu_irq_line(uint8_t vector_num);
 
 	// video functions
 	void draw_gfx_mode4(bitmap_ind16 &bitmap,const rectangle &cliprect,int attr);
@@ -119,14 +134,13 @@ protected:
 	emu_timer *m_timer_irq_timer;
 	uint8_t *m_video_base;
 	std::unique_ptr<uint8_t[]> m_video_ram;
-	uint8_t m_irq_vector;
 	uint8_t m_cas_switch;
 	uint8_t m_sys_latch;
 	uint32_t m_cas_offset;
 	uint32_t m_cas_maxsize;
 	uint8_t m_bank_opt;
-	uint8_t m_timer_irq_mask;
-	uint8_t m_timer_irq_mask2;
+	bool m_timer_enable;
+	bool m_timer_irq_mask;
 	uint8_t m_port_c_8255;
 	uint8_t m_cur_keycode;
 
@@ -134,22 +148,52 @@ private:
 	uint32_t m_old_key1;
 	uint32_t m_old_key2;
 	uint32_t m_old_key3;
+	u8 m_old_key_fn;
 
+	emu_timer *m_sub_trig_timer;
+
+// IRQ model
+protected:
+	// vanilla PC-6001 just maps sub CPU and Timer IRQs, mapping is otherwise confirmed by $b8-$bf vector setups in SR machines
+	enum{
+		SUB_CPU_IRQ = 0,
+		JOYSTICK_IRQ,
+		TIMER_IRQ,
+		VOICE_IRQ,
+		VRTC_IRQ,
+		RS232_IRQ,
+		PRINTER_IRQ,
+		EXT_IRQ
+	};
+
+	u8 timer_ack();
+	u8 joystick_ack();
+	u8 sub_ack();
+	virtual u8 vrtc_ack();
+	void set_irq_level(int which);
+	void set_subcpu_irq_vector(u8 vector_num);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+
+	virtual u8 get_timer_base_divider();
+
+private:
+	u8 m_irq_pending;
+	u8 m_sub_vector;
 };
 
 
 class pc6001mk2_state : public pc6001_state
 {
 public:
-	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6001_state(mconfig, type, tag),
-		m_bank2(*this, "bank2"),
-		m_bank3(*this, "bank3"),
-		m_bank4(*this, "bank4"),
-		m_bank5(*this, "bank5"),
-		m_bank6(*this, "bank6"),
-		m_bank7(*this, "bank7"),
-		m_bank8(*this, "bank8")
+	pc6001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6001_state(mconfig, type, tag)
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_bank8(*this, "bank8")
 	{ }
 
 	uint8_t mk2_bank_r0_r();
@@ -178,24 +222,27 @@ public:
 	void pc6001mk2_palette(palette_device &palette) const;
 	void pc6001mk2(machine_config &config);
 
-	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	void pc6001mk2_io(address_map &map);
-	void pc6001mk2_map(address_map &map);
 protected:
+	void pc6001mk2_map(address_map &map);
+	void pc6001mk2_io(address_map &map);
+
 	uint8_t m_bgcol_bank;
 	uint8_t m_gfx_bank_on;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
-	required_memory_bank m_bank5;
-	required_memory_bank m_bank6;
-	required_memory_bank m_bank7;
-	required_memory_bank m_bank8;
-	inline void refresh_crtc_params();
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
+	optional_memory_bank m_bank5;
+	optional_memory_bank m_bank6;
+	optional_memory_bank m_bank7;
+	optional_memory_bank m_bank8;
+	virtual void refresh_crtc_params();
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
+
+	virtual u8 vrtc_ack() override;
 
 private:
 	uint8_t m_bank_r0;
@@ -213,79 +260,113 @@ private:
 class pc6601_state : public pc6001mk2_state
 {
 public:
-	pc6601_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6001mk2_state(mconfig, type, tag)
+	pc6601_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6001mk2_state(mconfig, type, tag)
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
+		, m_pc80s31(*this, "pc80s31")
+		, m_fdc_intf_view(*this, "fdc_intf")
 	{ }
-
-	uint8_t fdc_r();
-	void fdc_w(uint8_t data);
 
 	void pc6601(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
 	void pc6601_io(address_map &map);
+
+	void pc6601_fdc_io(address_map &map);
+	void pc6601_fdc_config(machine_config &config);
+	static void floppy_formats(format_registration &fr);
+
+	required_device<upd765a_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+	required_device<pc80s31_device> m_pc80s31;
+	memory_view m_fdc_intf_view;
+
+	u8 fdc_mon_r();
+	void fdc_mon_w(u8 data);
+	void fdc_sel_w(u8 data);
 };
 
-class pc6001sr_state : public pc6601_state
+class pc6001mk2sr_state : public pc6601_state
 {
 public:
-	pc6001sr_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pc6601_state(mconfig, type, tag),
-		m_sr_irq_vectors(*this, "irq_vectors")
+	pc6001mk2sr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6601_state(mconfig, type, tag)
+		, m_sr_bank(*this, "sr_bank_%u", 1U)
+		, m_sr_irq_vectors(*this, "irq_vectors")
+//      , m_gvram_view(*this, "gvram_view")
+		, m_sr_scrollx(*this, "sr_scrollx")
+		, m_sr_scrolly(*this, "sr_scrolly")
+		, m_ym(*this, "ymsnd")
 	{ }
 
-	void pc6001sr(machine_config &config);
+	void pc6001mk2sr(machine_config &config);
 
 protected:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 
+	void pc6001mk2sr_map(address_map &map);
+	void sr_banked_map(address_map &map);
+	void pc6001mk2sr_io(address_map &map);
+
+	virtual u8 vrtc_ack() override;
+	virtual u8 get_timer_base_divider() override;
+
 private:
-	uint8_t m_sr_bank_r[8];
-	uint8_t m_sr_bank_w[8];
-	uint8_t m_kludge;
+	required_device_array<address_map_bank_device, 16> m_sr_bank;
+	required_shared_ptr<u8> m_sr_irq_vectors;
+	required_shared_ptr<u8> m_sr_scrollx;
+	required_shared_ptr<u8> m_sr_scrolly;
+	required_device<ym2203_device> m_ym;
+
+	u8 m_sr_bank_reg[16];
 	bool m_sr_text_mode;
-	uint8_t m_sr_text_rows;
-	std::unique_ptr<uint8_t []> m_gvram;
-	uint8_t m_bitmap_yoffs,m_bitmap_xoffs;
+	u8 m_sr_text_rows;
+	std::unique_ptr<u8 []> m_gvram;
+	u8 m_bitmap_yoffs, m_bitmap_xoffs;
+	u8 m_width80;
 
-	enum{
-		SUB_CPU_IRQ = 0,
-		JOYSTICK_IRQ,
-		TIMER_IRQ,
-		VOICE_IRQ,
-		VRTC_IRQ,
-		RS232_IRQ,
-		PRINTER_IRQ,
-		EXT_IRQ
-	};
+//  memory_view m_gvram_view;
 
-	required_shared_ptr<uint8_t> m_sr_irq_vectors;
+	virtual u8 hw_rev_r();
+	u8 sr_bank_reg_r(offs_t offset);
+	void sr_bank_reg_w(offs_t offset, u8 data);
 
-	uint8_t hw_rev_r();
-	uint8_t sr_bank_rn_r(offs_t offset);
-	void sr_bank_rn_w(offs_t offset, uint8_t data);
-	uint8_t sr_bank_wn_r(offs_t offset);
-	void sr_bank_wn_w(offs_t offset, uint8_t data);
-	void sr_work_ram0_w(offs_t offset, uint8_t data);
-	void sr_work_ram1_w(offs_t offset, uint8_t data);
-	void sr_work_ram2_w(offs_t offset, uint8_t data);
-	void sr_work_ram3_w(offs_t offset, uint8_t data);
-	void sr_work_ram4_w(offs_t offset, uint8_t data);
-	void sr_work_ram5_w(offs_t offset, uint8_t data);
-	void sr_work_ram6_w(offs_t offset, uint8_t data);
-	void sr_work_ram7_w(offs_t offset, uint8_t data);
-	void sr_mode_w(uint8_t data);
-	void sr_vram_bank_w(uint8_t data);
-	void sr_system_latch_w(uint8_t data);
-	void necsr_ppi8255_w(offs_t offset, uint8_t data);
-	void sr_bitmap_yoffs_w(uint8_t data);
-	void sr_bitmap_xoffs_w(uint8_t data);
+	void sr_mode_w(u8 data);
+	void sr_vram_bank_w(u8 data);
+	void sr_system_latch_w(u8 data);
+	void necsr_ppi8255_w(offs_t offset, u8 data);
+
+	virtual void refresh_crtc_params() override;
+	void sr_bitmap_yoffs_w(u8 data);
+	void sr_bitmap_xoffs_w(u8 data);
+	void refresh_gvram_access(bool is_write);
+	u8 work_ram_r(offs_t offset);
+	void work_ram_w(offs_t offset, u8 data);
+	u8 sr_gvram_r(offs_t offset);
+	void sr_gvram_w(offs_t offset, u8 data);
+	void crt_mode_w(u8 data);
 
 	INTERRUPT_GEN_MEMBER(sr_vrtc_irq);
 
-	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
-	void pc6001sr_io(address_map &map);
-	void pc6001sr_map(address_map &map);
+};
+
+class pc6601sr_state : public pc6001mk2sr_state
+{
+public:
+	pc6601sr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pc6001mk2sr_state(mconfig, type, tag)
+	{ }
+
+	void pc6601sr(machine_config &config);
+
+private:
+	virtual u8 hw_rev_r() override;
 };
 
 #endif

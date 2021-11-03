@@ -1447,32 +1447,33 @@ Example layout files
 These layout files demonstrate various artwork system features.  They are all
 internal layouts included in MAME.
 
-`sstrangr.lay <https://git.redump.net/mame/tree/src/mame/layout/sstrangr.lay?h=mame0226>`_
+`sstrangr.lay <https://git.redump.net/mame/tree/src/mame/layout/sstrangr.lay?h=mame0235>`_
     A simple case of using translucent colour overlays to visually separate and
     highlight elements on a black and white screen.
-`seawolf.lay <https://git.redump.net/mame/tree/src/mame/layout/seawolf.lay?h=mame0226>`_
+`seawolf.lay <https://git.redump.net/mame/tree/src/mame/layout/seawolf.lay?h=mame0235>`_
     This system uses lamps for key gameplay elements.  Blending modes are used
     for the translucent colour overlay placed over the monitor, and the lamps
     reflected in front of the monitor.  Also uses collections to allow parts of
-    the layout to be disabled selectively.
-`armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0226>`_
+    the layout to be disabled selectively.  The shapes on the overlay are drawn
+    using embedded SVG images.
+`armora.lay <https://git.redump.net/mame/tree/src/mame/layout/armora.lay?h=mame0235>`_
     This game’s monitor is viewed directly through a translucent colour overlay
     rather than being reflected from inside the cabinet.  This means the overlay
     reflects ambient light as well as affecting the colour of the video image.
-`tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0226>`_
+`tranz330.lay <https://git.redump.net/mame/tree/src/mame/layout/tranz330.lay?h=mame0235>`_
     A multi-segment alphanumeric display and keypad.  The keys are clickable,
     and provide visual feedback when pressed.
-`esq2by16.lay <https://git.redump.net/mame/tree/src/mame/layout/esq2by16.lay?h=mame0226>`_
+`esq2by16.lay <https://git.redump.net/mame/tree/src/mame/layout/esq2by16.lay?h=mame0235>`_
     Builds up a multi-line dot matrix character display.  Repeats are used to
     avoid repetition for the rows in a character, characters in a line, and
     lines in a page.  Group colors allow a single element to be used for all
     four display colours.
-`cgang.lay <https://git.redump.net/mame/tree/src/mame/layout/cgang.lay?h=mame0226>`_
+`cgang.lay <https://git.redump.net/mame/tree/src/mame/layout/cgang.lay?h=mame0235>`_
     Animates the position of element items to simulate an electromechanical
     shooting gallery game.  Also demonstrates effective use of components to
     build up complex graphics.
-`unkeinv.lay <https://git.redump.net/mame/tree/src/mame/layout/unkeinv.lay?h=mame0226>`_
+`unkeinv.lay <https://git.redump.net/mame/tree/src/mame/layout/unkeinv.lay?h=mame0235>`_
     Shows the position of a slider control with LEDs on it.
-`md6802.lay <https://git.redump.net/mame/tree/src/mame/layout/md6802.lay?h=mame0226>`_
+`md6802.lay <https://git.redump.net/mame/tree/src/mame/layout/md6802.lay?h=mame0235>`_
     Effectively using groups as a procedural programming language to build up an
     image of a trainer board.

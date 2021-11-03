@@ -10,12 +10,33 @@
 #include "emu.h"
 #include "bus/a2gameio/gizmo.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
-// device type definition
-DEFINE_DEVICE_TYPE(APPLE2_GIZMO, apple2_gizmo_device, "a2gizmo", "HAL Labs Gizmo")
+namespace {
+
+// ======================> apple2_gizmo_device
+
+class apple2_gizmo_device : public device_t, public device_a2gameio_interface
+{
+public:
+	// construction/destruction
+	apple2_gizmo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+	// device_a2gameio_interface overrides
+	virtual DECLARE_READ_LINE_MEMBER(sw0_r) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an0_w) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an1_w) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an2_w) override;
+
+private:
+	// input ports
+	required_ioport m_player1;
+	int m_an0, m_an1, m_an2;
+};
 
 //**************************************************************************
 //  INPUT PORTS
@@ -73,3 +94,13 @@ WRITE_LINE_MEMBER(apple2_gizmo_device::an2_w)
 {
 	m_an2 = state;
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(APPLE2_GIZMO, device_a2gameio_interface, apple2_gizmo_device, "a2gizmo", "HAL Labs Gizmo")

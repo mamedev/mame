@@ -1143,10 +1143,12 @@ offs_t m88000_disassembler::dasm_jump(std::ostream &stream, const char *mnemonic
 	util::stream_format(stream, "%-12sr%d", mnemonic, inst & 0x0000001f);
 
 	// Set flags for jump to subroutine, return to r1 and/or optional delay slot
-	return 4 | SUPPORTED |
-			((inst & 0x0000081f) == 0x00000001 ? STEP_OUT : 0) |
-			(BIT(inst, 11) ? STEP_OVER : 0) |
-			(BIT(inst, 10) ? STEP_OVER | step_over_extra(1) : 0);
+	if (BIT(inst, 11))
+		return 4 | SUPPORTED | STEP_OVER | (BIT(inst, 10) ? step_over_extra(1) : 0);
+	else if ((inst & 0x0000001f) == 0x00000001)
+		return 4 | SUPPORTED | STEP_OUT | (BIT(inst, 10) ? step_over_extra(1) : 0);
+	else
+		return 4 | SUPPORTED;
 }
 
 offs_t m88000_disassembler::dasm_vec9(std::ostream &stream, const char *mnemonic, u32 inst)
@@ -1183,9 +1185,10 @@ offs_t m88000_disassembler::dasm_d26(std::ostream &stream, const char *mnemonic,
 	util::stream_format(stream, "%-12s$%08x", mnemonic, pc + disp);
 
 	// Set flags for branch to subroutine and/or optional delay slot
-	return 4 | SUPPORTED |
-			(BIT(inst, 27) ? STEP_OVER : 0) |
-			(BIT(inst, 26) ? STEP_OVER | step_over_extra(1) : 0);
+	if (BIT(inst, 27))
+		return 4 | SUPPORTED | STEP_OVER | (BIT(inst, 26) ? step_over_extra(1) : 0);
+	else
+		return 4 | SUPPORTED;
 }
 
 offs_t m88000_disassembler::dasm_none(std::ostream &stream, const char *mnemonic, u32 inst)

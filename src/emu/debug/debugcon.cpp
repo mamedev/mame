@@ -10,13 +10,19 @@
 
 #include "emu.h"
 #include "debugcon.h"
+
 #include "debugcpu.h"
 #include "debugvw.h"
 #include "textbuf.h"
+
 #include "debugger.h"
+
 #include "corestr.h"
+
 #include <cctype>
 #include <fstream>
+#include <iterator>
+
 
 /***************************************************************************
     CONSTANTS
@@ -65,8 +71,8 @@ debugger_console::debugger_console(running_machine &machine)
 	m_machine.add_logerror_callback(std::bind(&debugger_console::errorlog_write_line, this, _1));
 
 	/* register our own custom-command help */
-	register_command("helpcustom", CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1, _2));
-	register_command("condump", CMDFLAG_NONE, 0, 1, 1, std::bind(&debugger_console::execute_condump, this, _1, _2));
+	register_command("helpcustom", CMDFLAG_NONE, 0, 0, std::bind(&debugger_console::execute_help_custom, this, _1));
+	register_command("condump", CMDFLAG_NONE, 1, 1, std::bind(&debugger_console::execute_condump, this, _1));
 
 	/* first CPU is visible by default */
 	for (device_t &device : device_enumerator(m_machine.root_device()))
@@ -106,10 +112,25 @@ void debugger_console::exit()
 
 ***************************************************************************/
 
-debugger_console::debug_command::debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler)
-	: params(nullptr), help(nullptr), handler(std::move(_handler)), flags(_flags), ref(_ref), minparams(_minparams), maxparams(_maxparams)
+inline bool debugger_console::debug_command::compare::operator()(const debug_command &a, const debug_command &b) const
 {
-	strcpy(command, _command);
+	return core_stricmp(a.command.c_str(), b.command.c_str()) < 0;
+}
+
+inline bool debugger_console::debug_command::compare::operator()(const char *a, const debug_command &b) const
+{
+	return core_stricmp(a, b.command.c_str()) < 0;
+}
+
+inline bool debugger_console::debug_command::compare::operator()(const debug_command &a, const char *b) const
+{
+	return core_stricmp(a.command.c_str(), b) < 0;
+}
+
+
+debugger_console::debug_command::debug_command(const char *_command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler)
+	: command(_command), params(nullptr), help(nullptr), handler(std::move(_handler)), flags(_flags), minparams(_minparams), maxparams(_maxparams)
+{
 }
 
 
@@ -117,14 +138,14 @@ debugger_console::debug_command::debug_command(const char *_command, u32 _flags,
     execute_help_custom - execute the helpcustom command
 ------------------------------------------------------------*/
 
-void debugger_console::execute_help_custom(int ref, const std::vector<std::string> &params)
+void debugger_console::execute_help_custom(const std::vector<std::string> &params)
 {
 	char buf[64];
 	for (const debug_command &cmd : m_commandlist)
 	{
 		if (cmd.flags & CMDFLAG_CUSTOM_HELP)
 		{
-			snprintf(buf, 63, "%s help", cmd.command);
+			snprintf(buf, 63, "%s help", cmd.command.c_str());
 			buf[63] = 0;
 			char *temp_params[1] = { buf };
 			internal_execute_command(true, 1, &temp_params[0]);
@@ -136,7 +157,7 @@ void debugger_console::execute_help_custom(int ref, const std::vector<std::strin
     execute_condump - execute the condump command
 ------------------------------------------------------------*/
 
-void debugger_console::execute_condump(int ref, const std::vector<std::string>& params)
+void debugger_console::execute_condump(const std::vector<std::string>& params)
 {
 	std::string filename = params[0];
 	const char* mode;
@@ -245,15 +266,12 @@ void debugger_console::trim_parameter(char **paramptr, bool keep_quotes)
 
 CMDERR debugger_console::internal_execute_command(bool execute, int params, char **param)
 {
-	int i, foundcount = 0;
-	char *p, *command;
-	size_t len;
-
-	/* no params is an error */
+	// no params is an error
 	if (params == 0)
 		return CMDERR::none();
 
-	/* the first parameter has the command and the real first parameter; separate them */
+	// the first parameter has the command and the real first parameter; separate them
+	char *p, *command;
 	for (p = param[0]; *p && isspace(u8(*p)); p++) { }
 	for (command = p; *p && !isspace(u8(*p)); p++) { }
 	if (*p != 0)
@@ -271,46 +289,39 @@ CMDERR debugger_console::internal_execute_command(bool execute, int params, char
 		param[0] = nullptr;
 	}
 
-	/* search the command list */
-	len = strlen(command);
-	debug_command *found = nullptr;
-	for (debug_command &cmd : m_commandlist)
-		if (!core_strnicmp(command, cmd.command, len))
-		{
-			foundcount++;
-			found = &cmd;
-			if (strlen(cmd.command) == len)
-			{
-				foundcount = 1;
-				break;
-			}
-		}
+	// search the command list
+	size_t const len = strlen(command);
+	auto const found = m_commandlist.lower_bound(command);
 
-	/* error if not found */
-	if (!found)
+	// error if not found
+	if ((m_commandlist.end() == found) || core_strnicmp(command, found->command.c_str(), len))
 		return CMDERR::unknown_command(0);
-	if (foundcount > 1)
-		return CMDERR::ambiguous_command(0);
+	if (found->command.length() > len)
+	{
+		auto const next = std::next(found);
+		if ((m_commandlist.end() != next) && !core_strnicmp(command, next->command.c_str(), len))
+			return CMDERR::ambiguous_command(0);
+	}
 
-	/* NULL-terminate and trim space around all the parameters */
-	for (i = 1; i < params; i++)
+	// NUL-terminate and trim space around all the parameters
+	for (int i = 1; i < params; i++)
 		*param[i]++ = 0;
 
-	/* now go back and trim quotes and braces and any spaces they reveal*/
-	for (i = 0; i < params; i++)
+	// now go back and trim quotes and braces and any spaces they reveal
+	for (int i = 0; i < params; i++)
 		trim_parameter(&param[i], found->flags & CMDFLAG_KEEP_QUOTES);
 
-	/* see if we have the right number of parameters */
+	// see if we have the right number of parameters
 	if (params < found->minparams)
 		return CMDERR::not_enough_params(0);
 	if (params > found->maxparams)
 		return CMDERR::too_many_params(0);
 
-	/* execute the handler */
+	// execute the handler
 	if (execute)
 	{
 		std::vector<std::string> params_vec(param, param + params);
-		found->handler(found->ref, params_vec);
+		found->handler(params_vec);
 	}
 	return CMDERR::none();
 }
@@ -457,15 +468,16 @@ CMDERR debugger_console::validate_command(const char *command)
     register_command - register a command handler
 -------------------------------------------------*/
 
-void debugger_console::register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler)
+void debugger_console::register_command(const char *command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler)
 {
 	if (m_machine.phase() != machine_phase::INIT)
 		throw emu_fatalerror("Can only call debugger_console::register_command() at init time!");
 	if (!(m_machine.debug_flags & DEBUG_FLAG_ENABLED))
 		throw emu_fatalerror("Cannot call debugger_console::register_command() when debugger is not running");
 
-	assert(strlen(command) < 32);
-	m_commandlist.emplace_front(command, flags, ref, minparams, maxparams, handler);
+	auto const ins = m_commandlist.emplace(command, flags, minparams, maxparams, std::move(handler));
+	if (!ins.second)
+		osd_printf_error("error: Duplicate debugger command %s registered\n", command);
 }
 
 

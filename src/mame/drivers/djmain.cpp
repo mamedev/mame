@@ -1572,6 +1572,27 @@ ROM_START( hmcompmx )
 	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
 ROM_END
 
+ROM_START( bmcmxaac )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "858aac01.6a", 0x000000, 0x80000, CRC(1563b021) SHA1(5b63c3f0db4704ef92ee388777611ba8d5f6a1b7) )
+	ROM_LOAD16_BYTE( "858aac02.8a", 0x000001, 0x80000, CRC(53ae5d66) SHA1(cfbf870cf9c2fa8270d62423a21f3a5c19382a66) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "858aac03.19a", 0x000000, 0x80000, CRC(8559f457) SHA1(133092994087864a6c29e9d51dcdbef2e2c2a123) )
+	ROM_LOAD16_BYTE( "858aac04.20a", 0x000001, 0x80000, CRC(770824d3) SHA1(5c21bc39f8128957d76be85bc178c96976987f5f) )
+	ROM_LOAD16_BYTE( "858aac05.22a", 0x100000, 0x80000, CRC(2e14cf83) SHA1(799b2162f7b11678d1d260f7e1eb841abda55a60) )
+	ROM_LOAD16_BYTE( "858aac06.24a", 0x100001, 0x80000, CRC(2be07788) SHA1(5cc2408f907ca6156efdcbb2c10a30e9b81797f8) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
+	ROM_LOAD16_BYTE( "858aac07.22d", 0x000000, 0x80000, CRC(2a925ec8) SHA1(9ffb657e0723dd4b0b6c50e67c8f89007d59fa04) )
+	ROM_LOAD16_BYTE( "858aac08.23d", 0x000001, 0x80000, CRC(1f11304b) SHA1(ae48e93f694cec075b785b79f692a37d66d5a78b) )
+	ROM_LOAD16_BYTE( "858aac09.25d", 0x100000, 0x80000, CRC(46b7c6e2) SHA1(913de33f10bd86f261567f634eece2f157d0c9b0) )
+	ROM_LOAD16_BYTE( "858aac10.27d", 0x100001, 0x80000, CRC(15d1230f) SHA1(848df167e9e20c1d1e9f3bf79bcc4fc1d2121944) )
+
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_IMAGE( "858aac11", 0, SHA1(31cb039c20783f399885f3d9a7582593dae0ed40) ) /* ver 1.00 AA */
+ROM_END
+
 ROM_START( bm4thmix )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "847jaa01.6a", 0x000000, 0x80000, CRC(81138a1b) SHA1(ebe211126f871e541881e1670f56d50b058dead3) )
@@ -1810,6 +1831,27 @@ ROM_START( bmfinal )
 ROM_END
 
 ROM_START( popn1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
+	ROM_LOAD16_BYTE( "803t_a01.6a", 0x000000, 0x80000, CRC(e85032bc) SHA1(625ac755a77a861ecede766d77fbecb29683844b) )
+	ROM_LOAD16_BYTE( "803j_a02.8a", 0x000001, 0x80000, CRC(17e90be0) SHA1(8857d46d63b7cd97aed5c7a5cf804fe5311255ac) )
+
+	ROM_REGION( 0x200000, "gfx1", 0)        /* SPRITE */
+	ROM_LOAD16_BYTE( "803t_a03.19a", 0x000000, 0x80000, CRC(a0970b32) SHA1(4bf06f977f67f13d0994e80021faaefed015ca1c) )
+	ROM_LOAD16_BYTE( "803t_a04.20a", 0x000001, 0x80000, CRC(a158b950) SHA1(535d994a68fe56c8a93d460e5272b1a0b081383d) )
+	ROM_LOAD16_BYTE( "803t_a05.22a", 0x100000, 0x80000, CRC(8a23c18d) SHA1(714b68a3112dff52feba6a50ae15c02d041b1def) )
+	ROM_LOAD16_BYTE( "803t_a06.24a", 0x100001, 0x80000, CRC(bd6450ff) SHA1(bb89c65d1b0e38c0a26ec4cccd35103583efff45) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )       /* TILEMAP */
+	ROM_LOAD16_BYTE( "803t_a07.22d", 0x000000, 0x80000, CRC(4c97dbf0) SHA1(c33f84e2c1a59294413163a5546cb2fe092e42d1) )
+	ROM_LOAD16_BYTE( "803t_a08.23d", 0x000001, 0x80000, CRC(cc6b21d3) SHA1(eac3b92bc392265df08b0311320c4e23f257c58b) )
+	ROM_LOAD16_BYTE( "803t_a09.25d", 0x100000, 0x80000, CRC(45ab3978) SHA1(c34b800dfb14affcb705dffa566d046a6d1e7c7c) )
+	ROM_LOAD16_BYTE( "803t_a10.27d", 0x100001, 0x80000, CRC(a487ad02) SHA1(ca9edb611ddf2f1e7d42b049ce867b173fce3634) )
+
+	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
+	DISK_IMAGE( "803_ta_hdd", 0, SHA1(be833a3c0f1e5953271fa7d8d6e81211fbe9710f) ) /* GQ803AA  pop'n music ver1.01  1998/10/14 (C) KONAMI */
+ROM_END
+
+ROM_START( popn1a )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* MC68EC020FG25 MPU */
 	ROM_LOAD16_BYTE( "803aaa01.6a", 0x000000, 0x80000, CRC(70466eff) SHA1(d59f97a6882ad65afa3b5de491d44bb4d839d286) )
 	ROM_LOAD16_BYTE( "803aaa02.8a", 0x000001, 0x80000, CRC(c102c909) SHA1(630a74ccec78d36adaba38a85ed6a0e45dca96a4) )
@@ -2202,6 +2244,7 @@ GAME( 1998, bm2ndmix, 0,        djmainj, bm2ndmix,  djmain_state, init_beatmania
 GAME( 1998, bm2ndmxa, bm2ndmix, djmainj, bm2ndmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 2nd MIX (ver JA-A)", 0 )
 GAME( 1998, bm3rdmix, 0,        djmainj, bm3rdmix,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania 3rd MIX (ver JA-A)", 0 )
 GAME( 1999, bmcompmx, 0,        djmainj, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver JA-B)", 0 )
+GAME( 1999, bmcmxaac, bmcompmx, djmainu, bmcompmx,  djmain_state, init_beatmania, ROT0, "Konami", "beatmania complete MIX (ver AA-C)", 0 )
 GAME( 1999, hmcompmx, bmcompmx, djmainu, bmcompmx,  djmain_state, init_hmcompmx,  ROT0, "Konami", "hiphopmania complete MIX (ver UA-B)", 0 )
 GAME( 1999, bm4thmix, 0,        djmainj, bm4thmix,  djmain_state, init_bm4thmix,  ROT0, "Konami", "beatmania 4th MIX (ver JA-A)", 0 )
 GAME( 1999, bs4thmix, bm4thmix, djmainu, bm4thmix,  djmain_state, init_bs4thmix,  ROT0, "Konami", "beatstage 4th MIX (ver KA-A)", 0 )
@@ -2215,7 +2258,8 @@ GAME( 2001, bm6thmix, 0,        djmainj, bm6thmix,  djmain_state, init_bm6thmix,
 GAME( 2001, bm7thmix, 0,        djmainj, bm6thmix,  djmain_state, init_bm7thmix,  ROT0, "Konami", "beatmania 7th MIX (ver JA-B)", 0 )
 GAME( 2002, bmfinal,  0,        djmainj, bm6thmix,  djmain_state, init_bmfinal,   ROT0, "Konami", "beatmania THE FINAL (ver JA-A)", 0 )
 
-GAME( 1998, popn1,    0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A, HDD 1.00)", 0 )
+GAME( 1998, popn1,    0,        djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver TA-A, HDD 1.01)", 0 )
+GAME( 1998, popn1a,   popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver AA-A, HDD 1.00)", 0 )
 GAME( 1998, popn1k,   popn1,    djmaina, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver KA-A, HDD 1.01)", 0 ) // KA-A based on filenames provided, no warning message
 GAME( 1998, popn1j,   popn1,    djmainj, popn1,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 1 (ver JA-A, HDD 1.00)", 0 )
 GAME( 1999, popn2,    0,        djmainj, popn2,     djmain_state, init_beatmania, ROT0, "Konami", "Pop'n Music 2 (ver JA-A)", 0 )

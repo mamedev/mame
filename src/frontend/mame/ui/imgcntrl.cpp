@@ -185,6 +185,7 @@ void menu_control_device_image::hook_load(const std::string &name)
 
 void menu_control_device_image::populate(float &customtop, float &custombottom)
 {
+	throw emu_fatalerror("menu_control_device_image::populate: Shouldn't get here!");
 }
 
 
@@ -192,7 +193,17 @@ void menu_control_device_image::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_control_device_image::handle()
+void menu_control_device_image::handle(event const *ev)
+{
+	throw emu_fatalerror("menu_control_device_image::handle: Shouldn't get here!");
+}
+
+
+//-------------------------------------------------
+//  menu_activated
+//-------------------------------------------------
+
+void menu_control_device_image::menu_activated()
 {
 	switch(m_state)
 	{
@@ -244,28 +255,28 @@ void menu_control_device_image::handle()
 		break;
 
 	case SELECT_ONE_PART:
-		switch(m_submenu_result.swparts) {
-		case menu_software_parts::result::ENTRY: {
+		switch (m_submenu_result.swparts)
+		{
+		case menu_software_parts::result::ENTRY:
 			load_software_part();
 			break;
-		}
 
 		default: // return to list
 			m_state = SELECT_SOFTLIST;
 			break;
-
 		}
 		break;
 
 	case SELECT_OTHER_PART:
-		switch(m_submenu_result.swparts) {
+		switch (m_submenu_result.swparts)
+		{
 		case menu_software_parts::result::ENTRY:
 			load_software_part();
 			break;
 
 		case menu_software_parts::result::FMGR:
 			m_state = START_FILE;
-			handle();
+			menu_activated();
 			break;
 
 		case menu_software_parts::result::EMPTY:
@@ -275,18 +286,17 @@ void menu_control_device_image::handle()
 
 		case menu_software_parts::result::SWLIST:
 			m_state = START_SOFTLIST;
-			handle();
+			menu_activated();
 			break;
 
 		case menu_software_parts::result::INVALID: // return to system
 			stack_pop();
 			break;
-
 		}
 		break;
 
 	case SELECT_FILE:
-		switch(m_submenu_result.filesel)
+		switch (m_submenu_result.filesel)
 		{
 		case menu_file_selector::result::EMPTY:
 			m_image.unload();
@@ -304,7 +314,7 @@ void menu_control_device_image::handle()
 
 		case menu_file_selector::result::SOFTLIST:
 			m_state = START_SOFTLIST;
-			handle();
+			menu_activated();
 			break;
 
 		default: // return to system
@@ -313,42 +323,50 @@ void menu_control_device_image::handle()
 		}
 		break;
 
-	case CREATE_FILE: {
-		bool can_create, need_confirm;
-		test_create(can_create, need_confirm);
-		if(can_create) {
-			if(need_confirm) {
-				menu::stack_push<menu_confirm_save_as>(ui(), container(), &m_create_confirmed);
-				m_state = CREATE_CONFIRM;
-			} else {
-				m_state = DO_CREATE;
-				handle();
+	case CREATE_FILE:
+		{
+			bool can_create, need_confirm;
+			test_create(can_create, need_confirm);
+			if (can_create)
+			{
+				if (need_confirm)
+				{
+					menu::stack_push<menu_confirm_save_as>(ui(), container(), &m_create_confirmed);
+					m_state = CREATE_CONFIRM;
+				}
+				else
+				{
+					m_state = DO_CREATE;
+					menu_activated();
+				}
 			}
-		} else {
-			m_state = START_FILE;
-			handle();
+			else
+			{
+				m_state = START_FILE;
+				menu_activated();
+			}
 		}
 		break;
-	}
 
 	case CREATE_CONFIRM:
 		m_state = m_create_confirmed ? DO_CREATE : START_FILE;
-		handle();
+		menu_activated();
 		break;
 
 	case CHECK_CREATE:
 		m_state = m_create_ok ? CREATE_FILE : START_FILE;
-		handle();
+		menu_activated();
 		break;
 
-	case DO_CREATE: {
-		auto path = util::zippath_combine(m_current_directory, m_current_file);
-		image_init_result err = m_image.create(path, nullptr, nullptr);
-		if (err != image_init_result::PASS)
-			machine().popmessage("Error: %s", m_image.error());
-		stack_pop();
+	case DO_CREATE:
+		{
+			auto path = util::zippath_combine(m_current_directory, m_current_file);
+			image_init_result err = m_image.create(path, nullptr, nullptr);
+			if (err != image_init_result::PASS)
+				machine().popmessage("Error: %s", m_image.error());
+			stack_pop();
+		}
 		break;
-	}
 	}
 }
 

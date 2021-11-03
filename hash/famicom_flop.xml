@@ -1916,7 +1916,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="smb2">
+<!-- Does not respond to input on title screen -->
+	<software name="smb2" supported="no">
 		<description>Super Mario Bros. 2</description>
 		<year>1986</year>
 		<publisher>Nintendo</publisher>
@@ -2635,7 +2636,8 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-	<software name="doremiko">
+<!-- This game uses an unemulated Konami piano keyboard -->
+	<software name="doremiko" supported="partial">
 		<description>Doremikko</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>

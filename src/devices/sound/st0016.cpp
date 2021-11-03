@@ -3,6 +3,9 @@
 /************************************
       Seta custom ST-0016 chip
       sound emulation by R. Belmont, Tomasz Slanina, and David Haywood
+
+      TODO:
+      - Verify keyon/off flag behavior
 ************************************/
 
 #include "emu.h"
@@ -27,13 +30,10 @@ DEFINE_DEVICE_TYPE(ST0016, st0016_device, "st0016", "Seta ST0016 (Audio)")
 st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ST0016, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_memory_interface(mconfig, *this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 21) // shares character RAM area?
 	, m_stream(nullptr)
-	, m_ram_read_cb(*this)
-	, m_vpos{ 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_frac{ 0, 0, 0, 0, 0, 0, 0, 0 }
-	, m_lponce{ 0, 0, 0, 0, 0, 0, 0, 0 }
 {
-	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 }
 
 
@@ -43,13 +43,29 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 
 void st0016_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, 44100);
-	m_ram_read_cb.resolve_safe(0);
+	// Find our direct access
+	space(0).cache(m_cache);
 
-	save_item(NAME(m_vpos));
-	save_item(NAME(m_frac));
-	save_item(NAME(m_lponce));
-	save_item(NAME(m_regs));
+	// allocate stream
+	m_stream = stream_alloc(0, 2, clock() / 128);
+
+	// set host device to each voices
+	for (auto & elem : m_voice)
+		elem.m_host = m_cache;
+
+	save_item(STRUCT_MEMBER(m_voice, m_regs));
+	save_item(STRUCT_MEMBER(m_voice, m_start));
+	save_item(STRUCT_MEMBER(m_voice, m_end));
+	save_item(STRUCT_MEMBER(m_voice, m_lpstart));
+	save_item(STRUCT_MEMBER(m_voice, m_lpend));
+	save_item(STRUCT_MEMBER(m_voice, m_freq));
+	save_item(STRUCT_MEMBER(m_voice, m_vol_l));
+	save_item(STRUCT_MEMBER(m_voice, m_vol_r));
+	save_item(STRUCT_MEMBER(m_voice, m_flags));
+	save_item(STRUCT_MEMBER(m_voice, m_pos));
+	save_item(STRUCT_MEMBER(m_voice, m_frac));
+	save_item(STRUCT_MEMBER(m_voice, m_lponce));
+	save_item(STRUCT_MEMBER(m_voice, m_out));
 }
 
 
@@ -59,106 +75,179 @@ void st0016_device::device_start()
 
 void st0016_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int v, i, snum;
-	unsigned char *slot;
-	int32_t mix[48000*2];
-	int32_t *mixp;
-	int16_t sample;
-	int sptr, eptr, freq, lsptr, leptr;
+	outputs[0].fill(0);
+	outputs[1].fill(0);
 
-	memset(mix, 0, sizeof(mix[0])*outputs[0].samples()*2);
-
-	for (v = 0; v < 8; v++)
+	for (int sampleind = 0; sampleind < outputs[0].samples(); sampleind++)
 	{
-		slot = (unsigned char *)&m_regs[v * 32];
-
-		if (slot[0x16] & 0x06)
+		for (int v = 0; v < 8; v++)
 		{
-			mixp = &mix[0];
-
-			sptr = slot[0x02]<<16 | slot[0x01]<<8 | slot[0x00];
-			eptr = slot[0x0e]<<16 | slot[0x0d]<<8 | slot[0x0c];
-			freq = slot[0x11]<<8 | slot[0x10];
-			lsptr = slot[0x06]<<16 | slot[0x05]<<8 | slot[0x04];
-			leptr = slot[0x0a]<<16 | slot[0x09]<<8 | slot[0x08];
-
-			for (snum = 0; snum < outputs[0].samples(); snum++)
+			// check if voice is activated
+			if (m_voice[v].update())
 			{
-				sample = m_ram_read_cb((sptr + m_vpos[v]) & 0x1fffff) << 8;
-
-				*mixp++ += (sample * (char)slot[0x14]) >> 8;
-				*mixp++ += (sample * (char)slot[0x15]) >> 8;
-
-				m_frac[v] += freq;
-				m_vpos[v] += (m_frac[v]>>16);
-				m_frac[v] &= 0xffff;
-
-				// stop if we're at the end
-				if (m_lponce[v])
-				{
-					// we've looped once, check loop end rather than sample end
-					if ((m_vpos[v] + sptr) >= leptr)
-					{
-						m_vpos[v] = (lsptr - sptr);
-					}
-				}
-				else
-				{
-					// not looped yet, check sample end
-					if ((m_vpos[v] + sptr) >= eptr)
-					{
-						if (slot[0x16] & 0x01)  // loop?
-						{
-							m_vpos[v] = (lsptr - sptr);
-							m_lponce[v] = 1;
-						}
-						else
-						{
-							slot[0x16] = 0;
-							m_vpos[v] = m_frac[v] = 0;
-						}
-					}
-				}
+				outputs[0].add_int(sampleind, (m_voice[v].m_out * m_voice[v].m_vol_l) >> 8, 32768 << 4);
+				outputs[1].add_int(sampleind, (m_voice[v].m_out * m_voice[v].m_vol_r) >> 8, 32768 << 4);
 			}
 		}
 	}
+}
 
-	mixp = &mix[0];
-	for (i = 0; i < outputs[0].samples(); i++)
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector st0016_device::memory_space_config() const
+{
+	return space_config_vector{ std::make_pair(0, &m_data_config) };
+}
+
+//-------------------------------------------------
+//  update - update single voice
+//-------------------------------------------------
+
+bool st0016_device::voice_t::update()
+{
+	if (m_flags & 0x06) // TODO: keyon flag?
 	{
-		outputs[0].put_int(i, *mixp++, 32768<<4);
-		outputs[1].put_int(i, *mixp++, 32768<<4);
+		m_out = s16(s8(m_host.read_byte(m_pos & 0x1fffff))) << 8;
+		m_frac += m_freq;
+		m_pos += (m_frac >> 16);
+		m_frac &= 0xffff;
+
+		// stop if we're at the end
+		if (m_lponce)
+		{
+			// we've looped once, check loop end rather than sample end
+			if (m_pos >= m_lpend)
+			{
+				m_pos = m_lpstart;
+			}
+		}
+		else
+		{
+			// not looped yet, check sample end
+			if (m_pos >= m_end)
+			{
+				if (BIT(m_flags, 0))  // loop?
+				{
+					m_pos = m_lpstart;
+					m_lponce = true;
+				}
+				else
+				{
+					m_flags = 0;
+					m_pos = m_frac = 0;
+				}
+			}
+		}
+		return true;
+	}
+	else
+	{
+		m_out = 0;
+		return false;
 	}
 }
 
+//-------------------------------------------------
+//  snd_r - read sound registers
+//-------------------------------------------------
 
-uint8_t st0016_device::snd_r(offs_t offset)
+u8 st0016_device::snd_r(offs_t offset)
 {
-	return m_regs[offset];
+	if (offset < 0x100)
+	{
+		m_stream->update();
+		return m_voice[offset >> 5].reg_r(offset & 0x1f);
+	}
+	return 0;
 }
 
-void st0016_device::snd_w(offs_t offset, uint8_t data)
+//-------------------------------------------------
+//  snd_w - write sound registers
+//-------------------------------------------------
+
+void st0016_device::snd_w(offs_t offset, u8 data)
 {
-	int voice = offset/32;
-	int reg = offset & 0x1f;
-	int oldreg = m_regs[offset];
-	int vbase = offset & ~0x1f;
+	if (offset < 0x100)
+	{
+		m_stream->update();
+		m_voice[offset >> 5].reg_w(offset & 0x1f, data, offset >> 5);
+	}
+}
+
+//-------------------------------------------------
+//  reg_r - read single voice registers
+//-------------------------------------------------
+
+u8 st0016_device::voice_t::reg_r(offs_t offset)
+{
+	return m_regs[offset & 0x1f];
+}
+
+//-------------------------------------------------
+//  reg_w - write single voice registers
+//-------------------------------------------------
+
+void st0016_device::voice_t::reg_w(offs_t offset, u8 data, int voice)
+{
+	offset &= 0x1f;
 
 	m_regs[offset] = data;
-
-	if ((voice < 8) && (data != oldreg))
+	switch (offset)
 	{
-		if ((reg == 0x16) && (data != 0))
+	case 0x00: // Start position bit 0-7
+	case 0x01: // Start position bit 8-15
+	case 0x02: // Start position bit 16-23
+		m_start = (m_regs[0x02] << 16) | (m_regs[0x01] << 8) | m_regs[0x00];
+		break;
+	case 0x04: // Loop start position bit 0-7
+	case 0x05: // Loop start position bit 8-15
+	case 0x06: // Loop start position bit 16-23
+		m_lpstart = (m_regs[0x06] << 16) | (m_regs[0x05] << 8) | m_regs[0x04];
+		break;
+	case 0x08: // Loop end position bit 0-7
+	case 0x09: // Loop end position bit 8-15
+	case 0x0a: // Loop end position bit 16-23
+		m_lpend = (m_regs[0x0a] << 16) | (m_regs[0x09] << 8) | m_regs[0x08];
+		break;
+	case 0x0c: // End position bit 0-7
+	case 0x0d: // End position bit 8-15
+	case 0x0e: // End position bit 16-23
+		m_end = (m_regs[0x0e] << 16) | (m_regs[0x0d] << 8) | m_regs[0x0c];
+		break;
+	case 0x10: // Frequency bit 0-7
+	case 0x11: // Frequency bit 8-15
+		m_freq = (m_regs[0x11] << 8) | m_regs[0x10];
+		break;
+	case 0x14: // Left volume
+		m_vol_l = (char)data;
+		break;
+	case 0x15: // Right volume
+		m_vol_r = (char)data;
+		break;
+	case 0x16:
+		if (data != m_flags)
 		{
-			m_vpos[voice] = m_frac[voice] = m_lponce[voice] = 0;
+			if (data != 0)
+			{
+				m_pos = m_start;
+				m_frac = 0;
+				m_lponce = false;
 
-			LOG("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
-				m_regs[vbase+2]<<16   | m_regs[vbase+1]<<8   | m_regs[vbase+2],
-				m_regs[vbase+0xe]<<16 | m_regs[vbase+0xd]<<8 | m_regs[vbase+0xc],
-				m_regs[vbase+6]<<16   | m_regs[vbase+5]<<8   | m_regs[vbase+4],
-				m_regs[vbase+0xa]<<16 | m_regs[vbase+0x9]<<8 | m_regs[vbase+0x8],
-				m_regs[vbase+0x11]<<8 | m_regs[vbase+0x10],
-				m_regs[vbase+0x16]);
+				/*
+				LOG("Key on V%02d: st %06x-%06x lp %06x-%06x frq %x flg %x\n", voice,
+				    m_start,
+				    m_end,
+				    m_lpstart,
+				    m_lpend,
+				    m_freq,
+				    m_regs[0x16]);
+				*/
+			}
 		}
+		m_flags = m_regs[0x16];
+		break;
 	}
 }

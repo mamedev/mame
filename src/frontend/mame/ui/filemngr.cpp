@@ -106,7 +106,6 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 void menu_file_manager::populate(float &customtop, float &custombottom)
 {
 	std::string tmp_inst, tmp_name;
-	bool first_entry = true;
 
 	if (!m_warnings.empty())
 	{
@@ -132,18 +131,14 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 				if (!scan.user_loadable())
 					continue;
 
-				// if it is a children device, and not something further down the device tree, we want it in the menu!
+				// if it is a child device, and not something further down the device tree, we want it in the menu!
 				if (strcmp(scan.device().owner()->tag(), dev.tag()) == 0)
 					if (devtags.insert(scan.device().tag()).second)
 					{
 						// check whether we already had some devices with the same owner: if not, output the owner tag!
 						if (!tag_appended)
 						{
-							if (first_entry)
-								first_entry = false;
-							else
-								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", dev.tag()), 0, nullptr);
+							item_append(string_format(_("[root%1$s]"), dev.tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 							tag_appended = true;
 						}
 						// finally, append the image interface to the menu
@@ -156,7 +151,7 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	item_append(menu_item_type::SEPARATOR);
 
 	if (m_warnings.empty() || m_curr_selected)
-		item_append("Reset", 0, (void *)1);
+		item_append(_("Reset Machine"), 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -166,19 +161,18 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_file_manager::handle()
+void menu_file_manager::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(0);
-	if (event && event->itemref && (event->iptkey == IPT_UI_SELECT))
+	if (ev && ev->itemref && (ev->iptkey == IPT_UI_SELECT))
 	{
-		if ((uintptr_t)event->itemref == 1)
+		if ((uintptr_t)ev->itemref == 1)
 		{
 			machine().schedule_hard_reset();
 		}
 		else
 		{
-			selected_device = (device_image_interface *) event->itemref;
+			selected_device = (device_image_interface *) ev->itemref;
 			if (selected_device)
 			{
 				m_curr_selected = true;
@@ -199,7 +193,7 @@ void menu_file_manager::handle()
 void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
 {
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
+	menu::stack_reset(mui);
 
 	// add the quit entry followed by the game select entry
 	menu::stack_push_special_main<menu_quit_game>(mui, container);

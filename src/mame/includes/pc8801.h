@@ -5,11 +5,11 @@
     PC-8801 (c) 1981 NEC
 
 ********************************************************************************************/
+
 #ifndef MAME_INCLUDES_PC8801_H
 #define MAME_INCLUDES_PC8801_H
 
 #pragma once
-
 
 #include "cpu/z80/z80.h"
 #include "bus/centronics/ctronics.h"
@@ -20,7 +20,7 @@
 #include "machine/i8255.h"
 #include "machine/timer.h"
 #include "machine/upd1990a.h"
-#include "machine/upd765.h"
+#include "machine/pc80s31k.h"
 #include "sound/beep.h"
 #include "sound/ymopn.h"
 #include "emupal.h"
@@ -41,9 +41,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_fdccpu(*this, "fdccpu")
-		, m_fdc(*this, "upd765")
-		, m_fdd(*this, "upd765:%u", 0U)
+		, m_pc80s31(*this, "pc80s31")
 		, m_pic(*this, I8214_TAG)
 		, m_rtc(*this, UPD1990A_TAG)
 		, m_cassette(*this, "cassette")
@@ -53,15 +51,27 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void pc8801mc(machine_config &config);
-	void pc8801fh(machine_config &config);
 	void pc8801(machine_config &config);
+	void pc8801mk2mr(machine_config &config);
+	void pc8801fh(machine_config &config);
 	void pc8801ma(machine_config &config);
+	void pc8801mc(machine_config &config);
 
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<pc80s31_device> m_pc80s31;
+	optional_device<i8214_device> m_pic;
+	required_device<upd1990a_device> m_rtc;
+	required_device<cassette_image_device> m_cassette;
+	required_device<beep_device> m_beeper;
+	required_device<ym2608_device> m_opna;
+	required_device<ym2203_device> m_opn;
+	required_device<palette_device> m_palette;
 
 private:
 	struct crtc_t
@@ -77,19 +87,6 @@ private:
 		uint8_t x,y;
 		attotime time;
 	};
-
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<cpu_device> m_fdccpu;
-	required_device<upd765a_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_fdd;
-	optional_device<i8214_device> m_pic;
-	required_device<upd1990a_device> m_rtc;
-	required_device<cassette_image_device> m_cassette;
-	required_device<beep_device> m_beeper;
-	required_device<ym2608_device> m_opna;
-	required_device<ym2203_device> m_opn;
-	required_device<palette_device> m_palette;
 
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_hi_work_ram;

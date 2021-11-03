@@ -62,18 +62,18 @@ enum
 
 static char const *const pcbdefs[] =
 {
-	"standard",		// PCB_STANDARD
-	"paged12k",		// PCB_PAGED12K
-	"paged",		// PCB_PAGED16K
-	"minimem",		// PCB_MINIMEM
-	"super",		// PCB_SUPER
-	"mbx",			// PCB_MBX
-	"paged379i",	// PCB_PAGED379I
-	"paged378",		// PCB_PAGED378
-	"paged377",		// PCB_PAGED377
-	"pagedcru",		// PCB_PAGEDCRU
-	"gromemu",		// PCB_GROMEMU
-	"paged7",		// PCB_PAGED7
+	"standard",     // PCB_STANDARD
+	"paged12k",     // PCB_PAGED12K
+	"paged",        // PCB_PAGED16K
+	"minimem",      // PCB_MINIMEM
+	"super",        // PCB_SUPER
+	"mbx",          // PCB_MBX
+	"paged379i",    // PCB_PAGED379I
+	"paged378",     // PCB_PAGED378
+	"paged377",     // PCB_PAGED377
+	"pagedcru",     // PCB_PAGEDCRU
+	"gromemu",      // PCB_GROMEMU
+	"paged7",       // PCB_PAGED7
 	nullptr
 };
 
@@ -257,7 +257,10 @@ image_init_result ti99_cartridge_device::call_load()
 	}
 	else
 	{
-		std::error_condition err = rpk_open(machine().options(), util::core_file_read(image_core_file()), machine().system().name, m_rpk);
+		util::core_file::ptr proxy;
+		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
+		if (!err)
+			err = rpk_open(machine().options(), std::move(proxy), machine().system().name, m_rpk);
 		if (err)
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());

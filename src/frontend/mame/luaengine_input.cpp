@@ -203,7 +203,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor);
+	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", sol::no_constructor);
 	ioport_port_type["read"] = &ioport_port::read;
 	ioport_port_type["write"] = &ioport_port::write;
 	ioport_port_type["field"] = &ioport_port::field;
@@ -244,6 +244,12 @@ void lua_engine::initialize_input(sol::table &emu)
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
 			settings.seq[seq_type] = seq;
+			if (seq.is_default())
+				settings.cfg[seq_type].clear();
+			else if (!seq.length())
+				settings.cfg[seq_type] = "NONE";
+			else
+				settings.cfg[seq_type] = f.port().device().machine().input().seq_to_tokens(seq);
 			f.set_user_settings(settings);
 		};
 	ioport_field_type["input_seq"] =

@@ -527,6 +527,7 @@ PCB Layouts missing
 
 
 #include "emu.h"
+#include "cpu/z80/r800.h"
 #include "includes/msx.h"
 #include "formats/dsk_dsk.h"
 #include "formats/dmk_dsk.h"
@@ -1541,6 +1542,15 @@ void msx2_state::msx2_pal(machine_config &config)
 {
 	msx2(config);
 	m_v9938->set_screen_pal("screen");
+}
+
+void msx2_state::turbor(machine_config &config)
+{
+	msx2p(config);
+
+	R800(config.replace(), m_maincpu, 28.636363_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
+	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
 }
 
 
@@ -8563,7 +8573,7 @@ ROM_END
 
 void msx2_state::fsa1gt(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8608,7 +8618,7 @@ ROM_END
 
 void msx2_state::fsa1st(machine_config &config)
 {
-	msx2(config);
+	turbor(config);
 	// AY8910/YM2149?
 	// FDC: tc8566af, 1 3.5" DSDD drive
 	// 2 Cartridge slots
@@ -8835,7 +8845,7 @@ COMP(1987, hbf1xd,     0,        0,     hbf1xd,     msx2jp,   msx2_state, empty_
 COMP(1988, hbf1xdm2,   0,        0,     hbf1xdm2,   msx2jp,   msx2_state, empty_init, "Sony", "HB-F1XDMK2 (Japan) (MSX2)", 0)
 COMP(19??, hbf5,       0,        0,     hbf5,       msx2,     msx2_state, empty_init, "Sony", "HB-F5 (MSX2)", 0)
 COMP(1985, hbf9p,      0,        0,     hbf9p,      msx2,     msx2_state, empty_init, "Sony", "HB-F9P (MSX2)", 0)
-COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russion (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
+COMP(19??, hbf9pr,     hbf9p,    0,     hbf9pr,     msx2,     msx2_state, empty_init, "Sony", "HB-F9P Russian (MSX2)", MACHINE_NOT_WORKING) // Keyboard responds differently
 COMP(1985, hbf9s,      hbf9p,    0,     hbf9s,      msx2,     msx2_state, empty_init, "Sony", "HB-F9S (MSX2)", 0)
 COMP(1986, hbf500,     hbf500p,  0,     hbf500,     msx2jp,   msx2_state, empty_init, "Sony", "HB-F500 (Japan) (MSX2)", 0)
 COMP(198?, hbf500f,    hbf500p,  0,     hbf500f,    msx2,     msx2_state, empty_init, "Sony", "HB-F500F (MSX2)", 0) // French keyboard?

@@ -29626,7 +29626,7 @@ INPUT_PORTS_START( sc4mondx ) // this structure is generated
 		// 0x0010 - "deflt" // standard input (expected here)
 INPUT_PORTS_END
 
-// So which Top Box roms should thse use? Why do some play without one?
+// So which Top Box roms should these use? Why do some play without one?
 
 // Waits for Top Box
 GAMEL( 200?, sc4mondxd, sc4mondx, sc4_3reel_200, sc4mondx, sc4_state, init_sc4mondx, ROT0, "Mazooma", "Monopoly Deluxe (PR2202, MPDX 1.1) (Mazooma) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_sc4mondxe )// PR2202 MONOPOLY DELUXE         MONOPOLY  DELUXE  MAZ       MONOPOLY  TRIPLE

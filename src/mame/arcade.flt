@@ -656,6 +656,7 @@ konblands.cpp
 konendev.cpp
 kongs470.cpp
 konmedal.cpp
+konmedal020.cpp
 konmedal68k.cpp
 kontest.cpp
 kopunch.cpp
@@ -1211,6 +1212,7 @@ special_gambl.cpp
 spectra.cpp
 speedatk.cpp
 speedbal.cpp
+speedbsk.cpp
 speedspn.cpp
 speglsht.cpp
 spiders.cpp
@@ -1523,10 +1525,11 @@ zwackery.cpp
 -ng_mv2f
 -ng_mv4f
 //saturn.cpp
--saturn
--saturnjp
--saturneu
--vsaturn
 -hisaturn
+-saturn
+-saturneu
+-saturnjp
+-saturnkr
+-vsaturn
 //vectrex.cpp
 -vectrex

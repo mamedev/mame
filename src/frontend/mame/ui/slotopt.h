@@ -34,7 +34,7 @@ private:
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	device_slot_interface::slot_option const *get_current_option(device_slot_interface &slot) const;
 	void set_slot_device(device_slot_interface &slot, std::string_view val);

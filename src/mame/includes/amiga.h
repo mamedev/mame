@@ -458,7 +458,7 @@ public:
 	uint16_t custom_chip_r(offs_t offset);
 	void custom_chip_w(offs_t offset, uint16_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
+	void paula_int_w(offs_t channel, u8 state);
 
 	uint16_t rom_mirror_r(offs_t offset, uint16_t mem_mask = ~0);
 	uint32_t rom_mirror32_r(offs_t offset, uint32_t mem_mask = ~0);

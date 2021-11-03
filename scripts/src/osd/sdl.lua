@@ -381,12 +381,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl",
 	}
 
-	if _OPTIONS["targetos"]=="windows" then
-		files {
-			MAME_DIR .. "src/osd/windows/main.cpp",
-		}
-	end
-
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/debugosx.mm",
@@ -420,6 +414,8 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/memoryviewer.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/pointsviewer.h",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.mm",
+			MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
 			MAME_DIR .. "src/osd/modules/debugger/osx/registersview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",

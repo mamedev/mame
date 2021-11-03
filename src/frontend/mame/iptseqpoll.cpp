@@ -300,8 +300,8 @@ bool input_sequence_poller::poll()
 		m_modified = true;
 	}
 
-	// if we're recorded at least one item and 2/3 of a second has passed, we're done
-	if (m_last_ticks && ((m_last_ticks + (osd_ticks_per_second() * 2 / 3)) < newticks))
+	// if we've recorded at least one item and one second has passed, we're done
+	if (m_last_ticks && ((m_last_ticks + osd_ticks_per_second()) < newticks))
 		return true;
 
 	// return false to indicate we are still polling

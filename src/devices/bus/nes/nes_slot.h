@@ -23,11 +23,10 @@ enum
 	STD_CNROM, STD_CPROM,
 	STD_EXROM, STD_FXROM, STD_GXROM,
 	STD_HKROM, STD_PXROM,
-	STD_SXROM, STD_TXROM, STD_TXSROM,
-	STD_TKROM, STD_TQROM,
+	STD_SXROM, STD_SOROM, STD_SZROM,
+	STD_TXROM, STD_TXSROM, STD_TKROM, STD_TQROM,
 	STD_UXROM, STD_UN1ROM, UXROM_CC,
 	HVC_FAMBASIC, NES_QJ, PAL_ZZ, STD_EVENT,
-	STD_SXROM_A, STD_SOROM, STD_SOROM_A,
 	STD_DISKSYS,
 	STD_NROM368,//homebrew extension of NROM!
 	// Discrete components boards (by various manufacturer)
@@ -65,14 +64,14 @@ enum
 	NAMCOT_163, NAMCOT_175, NAMCOT_340,
 	NAMCOT_3425, NAMCOT_34X3, NAMCOT_3446,
 	// NTDEC
-	NTDEC_ASDER, NTDEC_FIGHTINGHERO, NTDEC_N715021,
+	NTDEC_2746, NTDEC_ASDER, NTDEC_FIGHTINGHERO, NTDEC_N715021,
 	// Rex Soft
 	REXSOFT_SL1632, REXSOFT_DBZ5,
 	// Sachen
 	SACHEN_8259A, SACHEN_8259B, SACHEN_8259C, SACHEN_8259D,
 	SACHEN_SA009, SACHEN_SA0036, SACHEN_SA0037,
 	SACHEN_SA72007, SACHEN_SA72008, SACHEN_SA9602B,
-	SACHEN_TCA01, SACHEN_TCU01, SACHEN_TCU02, SACHEN_3013,
+	SACHEN_TCA01, SACHEN_TCU01, SACHEN_TCU02, SACHEN_3013, SACHEN_3014,
 	SACHEN_74LS374, SACHEN_74LS374_ALT, SACHEN_SHERO,
 	// Sunsoft
 	SUNSOFT_1, SUNSOFT_2, SUNSOFT_3, SUNSOFT_4,
@@ -86,8 +85,9 @@ enum
 	TXC_22110, TXC_22211, TXC_COMMANDOS, TXC_DUMARACING,
 	TXC_MJBLOCK, TXC_STRIKEW, TXC_TW,
 	// Multigame Carts
-	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15, BMC_GN45,
-	BMC_HIK8IN1, BMC_NOVEL1, BMC_NOVEL2, BMC_S24IN1SC03, BMC_T262,
+	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15, BMC_F600, BMC_L6IN1,
+	BMC_GN45, BMC_HIK8IN1, BMC_SFC12, BMC_JY208,
+	BMC_S24IN1SC03, BMC_T262, BMC_TELETUBBIES,
 	BMC_WS, BMC_SUPERBIG_7IN1, BMC_SUPERHIK_4IN1, BMC_BALLGAMES_11IN1,
 	BMC_MARIOPARTY_7IN1, BMC_GOLD_7IN1, BMC_SUPER_700IN1, BMC_FAMILY_4646,
 	BMC_36IN1, BMC_21IN1, BMC_150IN1, BMC_35IN1, BMC_64IN1,
@@ -95,29 +95,35 @@ enum
 	BMC_72IN1, BMC_SUPER_42IN1, BMC_76IN1,
 	BMC_31IN1, BMC_22GAMES, BMC_20IN1,
 	BMC_70IN1, BMC_500IN1, BMC_800IN1, BMC_1200IN1,
-	BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_HP898F, BMC_VT5201, BMC_BENSHIENG,
-	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C, BMC_850437C,
-	BMC_N32_4IN1, BMC_NT639, BMC_NTD_03, BMC_G63IN1,
-	BMC_FCGENJIN_8IN1, BMC_FK23C, BMC_FK23CA,
+	BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_GN91B,
+	BMC_HP898F, BMC_VT5201, BMC_BENSHIENG,
+	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C,
+	BMC_830506C, BMC_830928C, BMC_850437C, BMC_970630C,
+	BMC_N32_4IN1, BMC_NC20MB, BMC_NT639, BMC_NTD_03, BMC_SRPG_5IN1,
+	BMC_EL860947C, BMC_EL861121C, BMC_FK23C, BMC_FK23CA, BMC_JY820845C,
 	BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
-	BMC_2751, BMC_8157, BMC_830118C, BMC_830832C, BMC_841101C,
-	BMC_411120C, BMC_GOLD150, BMC_GOLD260, BMC_SUPER22,
+	BMC_2751, BMC_8157, BMC_00202650,
+	BMC_411120C, BMC_810305C, BMC_820720C, BMC_830118C,
+	BMC_830832C, BMC_YY841101C, BMC_YY841155C,
+	BMC_GOLD150, BMC_GOLD260,
 	BMC_12IN1, BMC_4IN1RESET, BMC_42IN1RESET, BMC_LITTLECOM160, BMC_CTC09,
-	BMC_K1029, BMC_K3006, BMC_K3036, BMC_K3046, BMC_SA005A, BMC_TJ03,
-	BMC_RESETSXROM, BMC_RESETTXROM0, BMC_RESETTXROM1, BMC_RESETTXROM2, BMC_TECHLINE9IN1,
+	BMC_K1029, BMC_K3006, BMC_K3033, BMC_K3036, BMC_K3046, BMC_SA005A, BMC_TJ03,
+	BMC_RESETSXROM, BMC_RESETTXROM, BMC_TECHLINE9IN1,
 	// Unlicensed
-	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX5705, UNL_KN42, UNL_KOF97,
-	UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
-	UNL_UXROM, UNL_MK2, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
+	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX40G, UNL_AX5705, UNL_KN42,
+	UNL_KOF97, UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
+	UNL_MK2, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K,
 	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_158B, UNL_2708,
-	UNL_MALISB, UNL_AC08, UNL_A9746, UNL_WORLDHERO,
-	UNL_43272, UNL_TF1201, UNL_CITYFIGHT, UNL_NINJARYU, UNL_EH8813A, UNL_RT01,
+	UNL_MALISB, UNL_AC08, UNL_A9746, UNL_43272, UNL_TF1201, UNL_TH21311,
+	UNL_CITYFIGHT, UNL_NINJARYU, UNL_EH8813A, UNL_RT01,
 	// Bootleg boards
-	BTL_0353, BTL_09034A, BTL_AISENSHINICOL, BTL_BATMANFS,
-	BTL_CONTRAJ, BTL_DRAGONNINJA, BTL_MARIOBABY, BTL_PALTHENA,
-	BTL_PIKACHUY2K, BTL_SBROS11, BTL_SMB2JA, BTL_SMB2JB,
-	BTL_SMB3, BTL_SHUIGUAN, BTL_TOBIDASE, BTL_YUNG08,
+	BTL_0353, BTL_09034A, BTL_2YUDB, BTL_900218, BTL_AISENSHINICOL,
+	BTL_BATMANFS, BTL_CONTRAJ, BTL_DRAGONNINJA, BTL_L001, BTL_MARIOBABY,
+	BTL_PALTHENA, BTL_PIKACHUY2K, BTL_SBROS11, BTL_SHUIGUAN,
+	BTL_SMB2JA, BTL_SMB2JB, BTL_SMB3, BTL_TOBIDASE, BTL_YUNG08,
+	// Shenzhen Jncota
+	JNCOTA_KT1001,
 	// Kaiser
 	KAISER_KS106C,  KAISER_KS202,  KAISER_KS7010,  KAISER_KS7012,
 	KAISER_KS7013B, KAISER_KS7016, KAISER_KS7016B, KAISER_KS7017,
@@ -128,9 +134,9 @@ enum
 	UNL_LH31, UNL_LH32, UNL_LH42, UNL_LH51, UNL_LH53,
 	// Misc: these are needed to convert mappers to boards, I will sort them later
 	OPENCORP_DAOU306, HES_BOARD, SVISION16_BOARD, RUMBLESTATION_BOARD, JYCOMPANY_A, JYCOMPANY_B, JYCOMPANY_C,
-	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12,
+	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12, SOMARI_HUANG2,
 	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1, SUBOR_TYPE2,
-	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, CONY_BOARD, YOKO_BOARD,
+	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, YOKO_BOARD,
 	RCM_GS2015, RCM_GS2004, RCM_GS2013, RCM_TF9IN1, RCM_3DBLOCK,
 	WAIXING_TYPE_A, WAIXING_TYPE_A1, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
 	WAIXING_TYPE_E, WAIXING_TYPE_F, WAIXING_TYPE_G, WAIXING_TYPE_H, WAIXING_TYPE_H1,
@@ -138,9 +144,14 @@ enum
 	WAIXING_SGZLZ, WAIXING_SGZ, WAIXING_WXZS, WAIXING_SECURITY, WAIXING_SH2,
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD, ZEMINA_BOARD,
+	// homebrew PCBs
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
-	UNL_CUFROM, UNL_UNROM512, UNL_2A03PURITANS,   // homebrew PCBs
+	UNL_2A03PURITANS, FARID_SLROM8IN1, FARID_UNROM8IN1,
+	// Batlab Electronics
+	BATMAP_000, BATMAP_SRRX,
+	// Sealie
+	UNL_CUFROM, UNL_UNROM512, UNL_DPCMCART,
 	// FFE boards, for mappers 6, 8, 17
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	// Unsupported (for place-holder boards, with no working emulation) & no-board (at init)
@@ -172,6 +183,8 @@ enum
 class device_nes_cart_interface : public device_interface
 {
 public:
+	enum class mmc1_type : u8 { MMC1, MMC1A, MMC1B, MMC1C };
+
 	// construction/destruction
 	virtual ~device_nes_cart_interface();
 
@@ -195,6 +208,7 @@ public:
 
 	void prg_alloc(size_t size, const char *tag);
 	void vrom_alloc(size_t size, const char *tag);
+	void misc_rom_alloc(size_t size, const char *tag);
 	void prgram_alloc(size_t size);
 	void vram_alloc(size_t size);
 	void battery_alloc(size_t size);
@@ -209,8 +223,11 @@ public:
 	void set_trainer(bool val) { m_has_trainer = val; }
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
+	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
+	void set_outer_prg_size(int val) { m_outer_prg_size = val; }
+	void set_outer_chr_size(int val) { m_outer_chr_size = val; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
 	uint8_t get_open_bus() { return m_open_bus; }
@@ -223,6 +240,7 @@ public:
 	uint8_t *get_ciram_base() { return m_ciram; }
 	uint8_t *get_battery_base() { return &m_battery[0]; }
 	uint8_t *get_mapper_sram_base() { return m_mapper_sram; }
+	uint8_t *get_misc_rom_base() { return m_misc_rom; }
 
 	uint32_t get_prg_size() const { return m_prg_size; }
 	uint32_t get_prgram_size() const { return m_prgram.size(); }
@@ -230,6 +248,7 @@ public:
 	uint32_t get_vram_size() const { return m_vram.size(); }
 	uint32_t get_battery_size() const { return m_battery.size(); }
 	uint32_t get_mapper_sram_size() const { return m_mapper_sram_size; }
+	uint32_t get_misc_rom_size() const { return m_misc_rom_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
 	virtual void hblank_irq(int scanline, int vblank, int blanked) {}
@@ -270,15 +289,20 @@ protected:
 	// these are specific of some boards but must be accessible from the driver
 	// E.g. additional save ram for HKROM, X1-005 & X1-017 boards, or ExRAM for MMC5
 	uint8_t *m_mapper_sram;
+	uint8_t *m_misc_rom;
 	std::vector<uint8_t> m_ext_ntram;
 	uint32_t m_mapper_sram_size;
+	uint32_t m_misc_rom_size;
 
 	int m_ce_mask;
 	int m_ce_state;
+	mmc1_type m_mmc1_type;
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
 	int m_n163_vol;
+	int m_outer_prg_size;
+	int m_outer_chr_size;
 
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
@@ -300,11 +324,11 @@ public:
 	void prg32(int bank);
 	void prg16_89ab(int bank);
 	void prg16_cdef(int bank);
-	void prg8_89(int bank);
-	void prg8_ab(int bank);
-	void prg8_cd(int bank);
-	void prg8_ef(int bank);
 	void prg8_x(int start, int bank);
+	void prg8_89(int bank) { prg8_x(0, bank); }
+	void prg8_ab(int bank) { prg8_x(1, bank); }
+	void prg8_cd(int bank) { prg8_x(2, bank); }
+	void prg8_ef(int bank) { prg8_x(3, bank); }
 
 
 	// CHR
@@ -323,22 +347,22 @@ public:
 	// CHR helpers
 	void chr8(int bank, int source);
 	void chr4_x(int start, int bank, int source);
-	void chr4_0(int bank, int source){ chr4_x(0, bank, source); };
-	void chr4_4(int bank, int source){ chr4_x(4, bank, source); };
+	void chr4_0(int bank, int source) { chr4_x(0, bank, source); }
+	void chr4_4(int bank, int source) { chr4_x(4, bank, source); }
 	void chr2_x(int start, int bank, int source);
-	void chr2_0(int bank, int source) { chr2_x(0, bank, source); };
-	void chr2_2(int bank, int source) { chr2_x(2, bank, source); };
-	void chr2_4(int bank, int source) { chr2_x(4, bank, source); };
-	void chr2_6(int bank, int source) { chr2_x(6, bank, source); };
+	void chr2_0(int bank, int source) { chr2_x(0, bank, source); }
+	void chr2_2(int bank, int source) { chr2_x(2, bank, source); }
+	void chr2_4(int bank, int source) { chr2_x(4, bank, source); }
+	void chr2_6(int bank, int source) { chr2_x(6, bank, source); }
 	void chr1_x(int start, int bank, int source);
-	void chr1_0(int bank, int source) { chr1_x(0, bank, source); };
-	void chr1_1(int bank, int source) { chr1_x(1, bank, source); };
-	void chr1_2(int bank, int source) { chr1_x(2, bank, source); };
-	void chr1_3(int bank, int source) { chr1_x(3, bank, source); };
-	void chr1_4(int bank, int source) { chr1_x(4, bank, source); };
-	void chr1_5(int bank, int source) { chr1_x(5, bank, source); };
-	void chr1_6(int bank, int source) { chr1_x(6, bank, source); };
-	void chr1_7(int bank, int source) { chr1_x(7, bank, source); };
+	void chr1_0(int bank, int source) { chr1_x(0, bank, source); }
+	void chr1_1(int bank, int source) { chr1_x(1, bank, source); }
+	void chr1_2(int bank, int source) { chr1_x(2, bank, source); }
+	void chr1_3(int bank, int source) { chr1_x(3, bank, source); }
+	void chr1_4(int bank, int source) { chr1_x(4, bank, source); }
+	void chr1_5(int bank, int source) { chr1_x(5, bank, source); }
+	void chr1_6(int bank, int source) { chr1_x(6, bank, source); }
+	void chr1_7(int bank, int source) { chr1_x(7, bank, source); }
 
 
 	// NameTable & Mirroring
@@ -404,7 +428,7 @@ public:
 	// hack until disk system is made modern!
 	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
 
-	int get_pcb_id() { return m_pcb_id; };
+	int get_pcb_id() { return m_pcb_id; }
 
 	void pcb_start(uint8_t *ciram_ptr);
 	void pcb_reset();
@@ -412,7 +436,7 @@ public:
 	// temporarily here
 	int m_crc_hack;
 
-	int get_crc_hack() { return m_crc_hack; };
+	int get_crc_hack() { return m_crc_hack; }
 
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 
@@ -448,5 +472,6 @@ DECLARE_DEVICE_TYPE(NES_CART_SLOT, nes_cart_slot_device)
 
 #define NESSLOT_PRGROM_REGION_TAG ":cart:prg_rom"
 #define NESSLOT_CHRROM_REGION_TAG ":cart:chr_rom"
+#define NESSLOT_MISC_ROM_REGION_TAG ":cart:misc_rom"
 
 #endif // MAME_BUS_NES_NES_SLOT_H

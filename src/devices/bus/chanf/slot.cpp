@@ -196,16 +196,16 @@ std::string channelf_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
-		int type;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
+		int type;
 		if (len == 0x40000)
 			type = CF_MULTI;
 		else
 			type = CF_CHESS;    // is there any way to detect the other carts from fullpath?
 
-		slot_string = chanf_get_slot(type);
+		char const *const slot_string = chanf_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 
