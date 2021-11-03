@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-31 10:10+1100\n"
-"PO-Revision-Date: 2021-11-02 15:04-0300\n"
+"PO-Revision-Date: 2021-11-03 13:50-0300\n"
 "Last-Translator: Felipe <felipefplzx@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -18,6 +18,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 3.0\n"
+"X-Language: pt_BR\n"
+"X-Source-Language: C\n"
 
 #: src/frontend/mame/ui/ui.cpp:477 src/frontend/mame/ui/ui.cpp:550
 msgid ""
@@ -1020,6 +1022,7 @@ msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
 #: src/frontend/mame/ui/info.cpp:456
+#, qt-format
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
@@ -1118,6 +1121,7 @@ msgid "%1$s [root%2$s]"
 msgstr "%1$s [root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:53
+#, qt-format
 msgid "[root%2$s]"
 msgstr "[root%2$s]"
 
@@ -1513,6 +1517,7 @@ msgstr ""
 "\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:253
+#, qt-format
 msgid "Coin %1$c: NA%3$s\n"
 msgstr "Ficha %1$c: NA%3$s\n"
 
@@ -1697,13 +1702,13 @@ msgstr "Analógico %1$s"
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr "Incrementar Analógico %1$s"
+msgstr "Aumentar Analógico %1$s"
 
 #: src/frontend/mame/ui/inputmap.cpp:526
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr "Decrementar Analógico %1$s"
+msgstr "Diminuir Analógico %1$s"
 
 #: src/frontend/mame/ui/inputmap.cpp:568
 #, c-format
@@ -2031,7 +2036,7 @@ msgstr "Pré-Visualização do Trabalho de Arte"
 #: src/frontend/mame/ui/dirmenu.cpp:62
 msgctxt "path-option"
 msgid "Select"
-msgstr "Select"
+msgstr "Selecionar"
 
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
@@ -3687,12 +3692,12 @@ msgstr "Jogador 1 Hanafuda Não"
 #: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
-msgstr "Pôr a Chave"
+msgstr "Inserir Crédito"
 
 #: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
-msgstr "Tirar a Chave"
+msgstr "Remover Crédito"
 
 #: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:540
 msgctxt "input-name"
@@ -5457,7 +5462,7 @@ msgstr "Ficha 12"
 #: src/emu/inpttype.ipp:517
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr "Bill 1"
+msgstr "Leitor de Cédulas 1"
 
 #: src/emu/inpttype.ipp:522
 msgctxt "input-name"
@@ -6087,152 +6092,152 @@ msgstr "Track Y 10"
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr "Analógico AD X"
+msgstr "Direcional AD X"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr "Analógico AD X 2"
+msgstr "Direcional AD X 2"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr "Analógico AD X 3"
+msgstr "Direcional AD X 3"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr "Analógico AD X 4"
+msgstr "Direcional AD X 4"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr "Analógico AD X 5"
+msgstr "Direcional AD X 5"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr "Analógico AD X 6"
+msgstr "Direcional AD X 6"
 
 #: src/emu/inpttype.ipp:710
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr "Analógico AD X 7"
+msgstr "Direcional AD X 7"
 
 #: src/emu/inpttype.ipp:711
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr "Analógico AD X 8"
+msgstr "Direcional AD X 8"
 
 #: src/emu/inpttype.ipp:712
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr "Analógico AD X 9"
+msgstr "Direcional AD X 9"
 
 #: src/emu/inpttype.ipp:713
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr "Analógico AD X 10"
+msgstr "Direcional AD X 10"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr "Analógico AD Y"
+msgstr "Direcional AD Y"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr "Analógico AD Y 2"
+msgstr "Direcional AD Y 2"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr "Analógico AD Y 3"
+msgstr "Direcional AD Y 3"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr "Analógico AD Y 4"
+msgstr "Direcional AD Y 4"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr "Analógico AD Y 5"
+msgstr "Direcional AD Y 5"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr "Analógico AD Y 6"
+msgstr "Direcional AD Y 6"
 
 #: src/emu/inpttype.ipp:724
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr "Analógico AD Y 7"
+msgstr "Direcional AD Y 7"
 
 #: src/emu/inpttype.ipp:725
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr "Analógico AD Y 8"
+msgstr "Direcional AD Y 8"
 
 #: src/emu/inpttype.ipp:726
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr "Analógico AD Y 9"
+msgstr "Direcional AD Y 9"
 
 #: src/emu/inpttype.ipp:727
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr "Analógico AD Y 10"
+msgstr "Direcional AD Y 10"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr "Analógico AD Z"
+msgstr "Direcional AD Z"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr "Analógico AD Z 2"
+msgstr "Direcional AD Z 2"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr "Analógico AD Z 3"
+msgstr "Direcional AD Z 3"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr "Analógico AD Z 4"
+msgstr "Direcional AD Z 4"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr "Analógico AD Z 5"
+msgstr "Direcional AD Z 5"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr "Analógico AD Z 6"
+msgstr "Direcional AD Z 6"
 
 #: src/emu/inpttype.ipp:738
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr "Analógico AD Z 7"
+msgstr "Direcional AD Z 7"
 
 #: src/emu/inpttype.ipp:739
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr "Analógico AD Z 8"
+msgstr "Direcional AD Z 8"
 
 #: src/emu/inpttype.ipp:740
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr "Analógico AD Z 9"
+msgstr "Direcional AD Z 9"
 
 #: src/emu/inpttype.ipp:741
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr "Analógico AD Z 10"
+msgstr "Direcional AD Z 10"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
@@ -7359,7 +7364,7 @@ msgstr "%03d:%02d:%02d"
 #: plugins/timer/init.lua:98
 msgctxt "plugin-timer"
 msgid "Current time"
-msgstr "Tempo atual"
+msgstr "Tempo decorrido"
 
 #: plugins/timer/init.lua:99
 msgctxt "plugin-timer"
@@ -7513,7 +7518,7 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
-"Enter sequence or press %s to cancel\n"
+"Insira a sequência ou pressione %s pra cancelar\n"
 "%s"
 
 #~ msgid "shortname"
@@ -7695,12 +7700,15 @@ msgstr ""
 #~ msgid "  %1$d×%2$s %3$d.%4$06d MHz\n"
 #~ msgstr "  %1$d×%2$s %3$d.%4$06d MHz\n"
 
+#, qt-format
 #~ msgid "  %1$d×%2$s %5$d.%6$03d kHz\n"
 #~ msgstr "  %1$d×%2$s %5$d.%6$03d kHz\n"
 
+#, qt-format
 #~ msgid "  %2$s %3$d.%4$06d MHz\n"
 #~ msgstr "  %2$s %3$d.%4$06d MHz\n"
 
+#, qt-format
 #~ msgid "  %2$s %5$d.%6$03d kHz\n"
 #~ msgstr "  %2$s %5$d.%6$03d kHz\n"
 
@@ -7716,6 +7724,7 @@ msgstr ""
 #~ msgid "  %1$d×%2$s\n"
 #~ msgstr "  %1$d×%2$s\n"
 
+#, qt-format
 #~ msgid "  %2$s\n"
 #~ msgstr "  %2$s\n"
 
@@ -7843,6 +7852,7 @@ msgstr ""
 #~ msgid "Right operand"
 #~ msgstr "Operando direito"
 
+#, qt-format
 #~ msgid "Test cheat at addr %08X"
 #~ msgstr "Testar a trapaça no endr %08X"
 
