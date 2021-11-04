@@ -1449,6 +1449,11 @@ void running_machine::retro_machineexit(){
 
 void running_machine::retro_loop(){
 
+	// get most recent input now 
+	m_manager.osd().input_update();
+	// perform tasks for this frame
+	call_notifiers(MACHINE_NOTIFY_FRAME);
+
 	while (RLOOP==1) {
 
 		// execute CPUs if not paused
