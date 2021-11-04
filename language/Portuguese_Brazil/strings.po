@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-31 10:10+1100\n"
-"PO-Revision-Date: 2021-11-03 13:50-0300\n"
+"PO-Revision-Date: 2021-11-04 09:25-0300\n"
 "Last-Translator: Felipe <felipefplzx@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -372,11 +372,11 @@ msgstr "Somente-gravação"
 
 #: src/frontend/mame/ui/filesel.cpp:549
 msgid "Read this image, write to another image"
-msgstr "Ler esta imagem, gravar pra outra imagem"
+msgstr "Ler esta imagem, gravar em outra imagem"
 
 #: src/frontend/mame/ui/filesel.cpp:550
 msgid "Read this image, write to diff"
-msgstr "Ler esta imagem, gravar pra diff"
+msgstr "Ler esta imagem, gravar no diff"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Miscellaneous Options"
@@ -416,7 +416,7 @@ msgstr "Manter o aspecto 4:3 para as exibições dos snapshots"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Use image as background"
-msgstr "Usar imagem como cenário de fundo"
+msgstr "Usar a imagem como cenário de fundo"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Skip BIOS selection menu"
@@ -648,7 +648,7 @@ msgstr "Número de Telas"
 
 #: src/frontend/mame/ui/submenu.cpp:118
 msgid "Triple Buffering"
-msgstr "Buffering Triplo"
+msgstr "Triplo Buffering"
 
 #: src/frontend/mame/ui/submenu.cpp:119
 msgid "HLSL"
@@ -2662,7 +2662,7 @@ msgstr "Versus"
 #: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
 msgid "Game Over"
-msgstr "Fim do Jogo"
+msgstr "Game Over"
 
 #: src/frontend/mame/ui/selmenu.cpp:88
 msgctxt "selmenu-artwork"
@@ -3367,42 +3367,42 @@ msgstr "Jogador 1 Direito"
 #: src/emu/inpttype.ipp:26
 msgctxt "input-name"
 msgid "P1 Right Stick/Up"
-msgstr "Jogador 1 Analógico Direito/Pra Cima"
+msgstr "Jogador 1 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:27
 msgctxt "input-name"
 msgid "P1 Right Stick/Down"
-msgstr "Jogador 1 Analógico Direito/Pra Baixo"
+msgstr "Jogador 1 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:28
 msgctxt "input-name"
 msgid "P1 Right Stick/Left"
-msgstr "Jogador 1 Analógico Direito/Esquerdo"
+msgstr "Jogador 1 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:29
 msgctxt "input-name"
 msgid "P1 Right Stick/Right"
-msgstr "Jogador 1 Analógico Direito/Direito"
+msgstr "Jogador 1 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:30
 msgctxt "input-name"
 msgid "P1 Left Stick/Up"
-msgstr "Jogador 1 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 1 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:31
 msgctxt "input-name"
 msgid "P1 Left Stick/Down"
-msgstr "Jogador 1 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 1 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:32
 msgctxt "input-name"
 msgid "P1 Left Stick/Left"
-msgstr "Jogador 1 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 1 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:33
 msgctxt "input-name"
 msgid "P1 Left Stick/Right"
-msgstr "Jogador 1 Analógico Esquerdo/Direito"
+msgstr "Jogador 1 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:34
 msgctxt "input-name"
@@ -3837,42 +3837,42 @@ msgstr "Jogador 2 Direito"
 #: src/emu/inpttype.ipp:144
 msgctxt "input-name"
 msgid "P2 Right Stick/Up"
-msgstr "Jogador 2 Analógico Direito/Pra Cima"
+msgstr "Jogador 2 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:145
 msgctxt "input-name"
 msgid "P2 Right Stick/Down"
-msgstr "Jogador 2 Analógico Direito/Pra Baixo"
+msgstr "Jogador 2 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:146
 msgctxt "input-name"
 msgid "P2 Right Stick/Left"
-msgstr "Jogador 2 Analógico Direito/Esquerdo"
+msgstr "Jogador 2 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:147
 msgctxt "input-name"
 msgid "P2 Right Stick/Right"
-msgstr "Jogador 2 Analógico Direito/Direito"
+msgstr "Jogador 2 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:148
 msgctxt "input-name"
 msgid "P2 Left Stick/Up"
-msgstr "Jogador 2 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 2 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:149
 msgctxt "input-name"
 msgid "P2 Left Stick/Down"
-msgstr "Jogador 2 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 2 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:150
 msgctxt "input-name"
 msgid "P2 Left Stick/Left"
-msgstr "Jogador 2 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 2 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:151
 msgctxt "input-name"
 msgid "P2 Left Stick/Right"
-msgstr "Jogador 2 Analógico Esquerdo/Direito"
+msgstr "Jogador 2 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:152
 msgctxt "input-name"
@@ -4182,42 +4182,42 @@ msgstr "Jogador 3 Direito"
 #: src/emu/inpttype.ipp:225
 msgctxt "input-name"
 msgid "P3 Right Stick/Up"
-msgstr "Jogador 3 Analógico Direito/Pra Cima"
+msgstr "Jogador 3 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:226
 msgctxt "input-name"
 msgid "P3 Right Stick/Down"
-msgstr "Jogador 3 Analógico Direito/Pra Baixo"
+msgstr "Jogador 3 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:227
 msgctxt "input-name"
 msgid "P3 Right Stick/Left"
-msgstr "Jogador 3 Analógico Direito/Esquerdo"
+msgstr "Jogador 3 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:228
 msgctxt "input-name"
 msgid "P3 Right Stick/Right"
-msgstr "Jogador 3 Analógico Direito/Direito"
+msgstr "Jogador 3 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:229
 msgctxt "input-name"
 msgid "P3 Left Stick/Up"
-msgstr "Jogador 3 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 3 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:230
 msgctxt "input-name"
 msgid "P3 Left Stick/Down"
-msgstr "Jogador 3 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 3 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:231
 msgctxt "input-name"
 msgid "P3 Left Stick/Left"
-msgstr "Jogador 3 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 3 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:232
 msgctxt "input-name"
 msgid "P3 Left Stick/Right"
-msgstr "Jogador 3 Analógico Esquerdo/Direito"
+msgstr "Jogador 3 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:233
 msgctxt "input-name"
@@ -4332,42 +4332,42 @@ msgstr "Jogador 4 Direito"
 #: src/emu/inpttype.ipp:259
 msgctxt "input-name"
 msgid "P4 Right Stick/Up"
-msgstr "Jogador 4 Analógico Direito/Pra Cima"
+msgstr "Jogador 4 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:260
 msgctxt "input-name"
 msgid "P4 Right Stick/Down"
-msgstr "Jogador 4 Analógico Direito/Pra Baixo"
+msgstr "Jogador 4 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:261
 msgctxt "input-name"
 msgid "P4 Right Stick/Left"
-msgstr "Jogador 4 Analógico Direito/Esquerdo"
+msgstr "Jogador 4 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:262
 msgctxt "input-name"
 msgid "P4 Right Stick/Right"
-msgstr "Jogador 4 Analógico Direito/Direito"
+msgstr "Jogador 4 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:263
 msgctxt "input-name"
 msgid "P4 Left Stick/Up"
-msgstr "Jogador 4 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 4 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:264
 msgctxt "input-name"
 msgid "P4 Left Stick/Down"
-msgstr "Jogador 4 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 4 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:265
 msgctxt "input-name"
 msgid "P4 Left Stick/Left"
-msgstr "Jogador 4 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 4 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:266
 msgctxt "input-name"
 msgid "P4 Left Stick/Right"
-msgstr "Jogador 4 Analógico Esquerdo/Direito"
+msgstr "Jogador 4 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:267
 msgctxt "input-name"
@@ -4482,42 +4482,42 @@ msgstr "Jogador 5 Direito"
 #: src/emu/inpttype.ipp:293
 msgctxt "input-name"
 msgid "P5 Right Stick/Up"
-msgstr "Jogador 5 Analógico Direito/Pra Cima"
+msgstr "Jogador 5 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:294
 msgctxt "input-name"
 msgid "P5 Right Stick/Down"
-msgstr "Jogador 5 Analógico Direito/Pra Baixo"
+msgstr "Jogador 5 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:295
 msgctxt "input-name"
 msgid "P5 Right Stick/Left"
-msgstr "Jogador 5 Analógico Direito/Esquerdo"
+msgstr "Jogador 5 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:296
 msgctxt "input-name"
 msgid "P5 Right Stick/Right"
-msgstr "Jogador 5 Analógico Direito/Direito"
+msgstr "Jogador 5 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:297
 msgctxt "input-name"
 msgid "P5 Left Stick/Up"
-msgstr "Jogador 5 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 5 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:298
 msgctxt "input-name"
 msgid "P5 Left Stick/Down"
-msgstr "Jogador 5 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 5 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:299
 msgctxt "input-name"
 msgid "P5 Left Stick/Left"
-msgstr "Jogador 5 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 5 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:300
 msgctxt "input-name"
 msgid "P5 Left Stick/Right"
-msgstr "Jogador 5 Analógico Esquerdo/Direito"
+msgstr "Jogador 5 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:301
 msgctxt "input-name"
@@ -4632,42 +4632,42 @@ msgstr "Jogador 6 Direito"
 #: src/emu/inpttype.ipp:327
 msgctxt "input-name"
 msgid "P6 Right Stick/Up"
-msgstr "Jogador 6 Analógico Direito/Pra Cima"
+msgstr "Jogador 6 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:328
 msgctxt "input-name"
 msgid "P6 Right Stick/Down"
-msgstr "Jogador 6 Analógico Direito/Pra Baixo"
+msgstr "Jogador 6 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:329
 msgctxt "input-name"
 msgid "P6 Right Stick/Left"
-msgstr "Jogador 6 Analógico Direito/Esquerdo"
+msgstr "Jogador 6 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:330
 msgctxt "input-name"
 msgid "P6 Right Stick/Right"
-msgstr "Jogador 6 Analógico Direito/Direito"
+msgstr "Jogador 6 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:331
 msgctxt "input-name"
 msgid "P6 Left Stick/Up"
-msgstr "Jogador 6 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 6 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:332
 msgctxt "input-name"
 msgid "P6 Left Stick/Down"
-msgstr "Jogador 6 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 6 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:333
 msgctxt "input-name"
 msgid "P6 Left Stick/Left"
-msgstr "Jogador 6 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 6 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:334
 msgctxt "input-name"
 msgid "P6 Left Stick/Right"
-msgstr "Jogador 6 Analógico Esquerdo/Direito"
+msgstr "Jogador 6 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:335
 msgctxt "input-name"
@@ -4782,42 +4782,42 @@ msgstr "Jogador 7 Direito"
 #: src/emu/inpttype.ipp:361
 msgctxt "input-name"
 msgid "P7 Right Stick/Up"
-msgstr "Jogador 7 Analógico Direito/Pra Cima"
+msgstr "Jogador 7 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:362
 msgctxt "input-name"
 msgid "P7 Right Stick/Down"
-msgstr "Jogador 7 Analógico Direito/Pra Baixo"
+msgstr "Jogador 7 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:363
 msgctxt "input-name"
 msgid "P7 Right Stick/Left"
-msgstr "Jogador 7 Analógico Direito/Esquerdo"
+msgstr "Jogador 7 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:364
 msgctxt "input-name"
 msgid "P7 Right Stick/Right"
-msgstr "Jogador 7 Analógico Direito/Direito"
+msgstr "Jogador 7 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:365
 msgctxt "input-name"
 msgid "P7 Left Stick/Up"
-msgstr "Jogador 7 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 7 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:366
 msgctxt "input-name"
 msgid "P7 Left Stick/Down"
-msgstr "Jogador 7 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 7 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:367
 msgctxt "input-name"
 msgid "P7 Left Stick/Left"
-msgstr "Jogador 7 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 7 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:368
 msgctxt "input-name"
 msgid "P7 Left Stick/Right"
-msgstr "Jogador 7 Analógico Esquerdo/Direito"
+msgstr "Jogador 7 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:369
 msgctxt "input-name"
@@ -4932,42 +4932,42 @@ msgstr "Jogador 8 Direito"
 #: src/emu/inpttype.ipp:395
 msgctxt "input-name"
 msgid "P8 Right Stick/Up"
-msgstr "Jogador 8 Analógico Direito/Pra Cima"
+msgstr "Jogador 8 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:396
 msgctxt "input-name"
 msgid "P8 Right Stick/Down"
-msgstr "Jogador 8 Analógico Direito/Pra Baixo"
+msgstr "Jogador 8 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:397
 msgctxt "input-name"
 msgid "P8 Right Stick/Left"
-msgstr "Jogador 8 Analógico Direito/Esquerdo"
+msgstr "Jogador 8 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:398
 msgctxt "input-name"
 msgid "P8 Right Stick/Right"
-msgstr "Jogador 8 Analógico Direito/Direito"
+msgstr "Jogador 8 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:399
 msgctxt "input-name"
 msgid "P8 Left Stick/Up"
-msgstr "Jogador 8 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 8 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:400
 msgctxt "input-name"
 msgid "P8 Left Stick/Down"
-msgstr "Jogador 8 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 8 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:401
 msgctxt "input-name"
 msgid "P8 Left Stick/Left"
-msgstr "Jogador 8 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 8 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:402
 msgctxt "input-name"
 msgid "P8 Left Stick/Right"
-msgstr "Jogador 8 Analógico Esquerdo/Direito"
+msgstr "Jogador 8 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:403
 msgctxt "input-name"
@@ -5082,42 +5082,42 @@ msgstr "Jogador 9 Direito"
 #: src/emu/inpttype.ipp:429
 msgctxt "input-name"
 msgid "P9 Right Stick/Up"
-msgstr "Jogador 9 Analógico Direito/Pra Cima"
+msgstr "Jogador 9 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:430
 msgctxt "input-name"
 msgid "P9 Right Stick/Down"
-msgstr "Jogador 9 Analógico Direito/Pra Baixo"
+msgstr "Jogador 9 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:431
 msgctxt "input-name"
 msgid "P9 Right Stick/Left"
-msgstr "Jogador 9 Analógico Direito/Esquerdo"
+msgstr "Jogador 9 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:432
 msgctxt "input-name"
 msgid "P9 Right Stick/Right"
-msgstr "Jogador 9 Analógico Direito/Direito"
+msgstr "Jogador 9 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:433
 msgctxt "input-name"
 msgid "P9 Left Stick/Up"
-msgstr "Jogador 9 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 9 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:434
 msgctxt "input-name"
 msgid "P9 Left Stick/Down"
-msgstr "Jogador 9 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 9 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:435
 msgctxt "input-name"
 msgid "P9 Left Stick/Left"
-msgstr "Jogador 9 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 9 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:436
 msgctxt "input-name"
 msgid "P9 Left Stick/Right"
-msgstr "Jogador 9 Analógico Esquerdo/Direito"
+msgstr "Jogador 9 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:437
 msgctxt "input-name"
@@ -5232,42 +5232,42 @@ msgstr "Jogador 10 Direito"
 #: src/emu/inpttype.ipp:463
 msgctxt "input-name"
 msgid "P10 Right Stick/Up"
-msgstr "Jogador 10 Analógico Direito/Pra Cima"
+msgstr "Jogador 10 Direcional Direito/Pra Cima"
 
 #: src/emu/inpttype.ipp:464
 msgctxt "input-name"
 msgid "P10 Right Stick/Down"
-msgstr "Jogador 10 Analógico Direito/Pra Baixo"
+msgstr "Jogador 10 Direcional Direito/Pra Baixo"
 
 #: src/emu/inpttype.ipp:465
 msgctxt "input-name"
 msgid "P10 Right Stick/Left"
-msgstr "Jogador 10 Analógico Direito/Esquerdo"
+msgstr "Jogador 10 Direcional Direito/Esquerdo"
 
 #: src/emu/inpttype.ipp:466
 msgctxt "input-name"
 msgid "P10 Right Stick/Right"
-msgstr "Jogador 10 Analógico Direito/Direito"
+msgstr "Jogador 10 Direcional Direito/Direito"
 
 #: src/emu/inpttype.ipp:467
 msgctxt "input-name"
 msgid "P10 Left Stick/Up"
-msgstr "Jogador 10 Analógico Esquerdo/Pra Cima"
+msgstr "Jogador 10 Direcional Esquerdo/Pra Cima"
 
 #: src/emu/inpttype.ipp:468
 msgctxt "input-name"
 msgid "P10 Left Stick/Down"
-msgstr "Jogador 10 Analógico Esquerdo/Pra Baixo"
+msgstr "Jogador 10 Direcional Esquerdo/Pra Baixo"
 
 #: src/emu/inpttype.ipp:469
 msgctxt "input-name"
 msgid "P10 Left Stick/Left"
-msgstr "Jogador 10 Analógico Esquerdo/Esquerdo"
+msgstr "Jogador 10 Direcional Esquerdo/Esquerdo"
 
 #: src/emu/inpttype.ipp:470
 msgctxt "input-name"
 msgid "P10 Left Stick/Right"
-msgstr "Jogador 10 Analógico Esquerdo/Direito"
+msgstr "Jogador 10 Direcional Esquerdo/Direito"
 
 #: src/emu/inpttype.ipp:471
 msgctxt "input-name"
@@ -5362,7 +5362,7 @@ msgstr "Selecionar Jogador 10"
 #: src/emu/inpttype.ipp:493
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr "Start do Jogador 1"
+msgstr "Jogador 1 Start"
 
 #: src/emu/inpttype.ipp:494
 msgctxt "input-name"
@@ -5792,102 +5792,102 @@ msgstr "Paddle V 10"
 #: src/emu/inpttype.ipp:620
 msgctxt "input-name"
 msgid "Positional"
-msgstr "Positional"
+msgstr "Posicional"
 
 #: src/emu/inpttype.ipp:621
 msgctxt "input-name"
 msgid "Positional 2"
-msgstr "Positional 2"
+msgstr "Posicional 2"
 
 #: src/emu/inpttype.ipp:622
 msgctxt "input-name"
 msgid "Positional 3"
-msgstr "Positional 3"
+msgstr "Posicional 3"
 
 #: src/emu/inpttype.ipp:623
 msgctxt "input-name"
 msgid "Positional 4"
-msgstr "Positional 4"
+msgstr "Posicional 4"
 
 #: src/emu/inpttype.ipp:624
 msgctxt "input-name"
 msgid "Positional 5"
-msgstr "Positional 5"
+msgstr "Posicional 5"
 
 #: src/emu/inpttype.ipp:625
 msgctxt "input-name"
 msgid "Positional 6"
-msgstr "Positional 6"
+msgstr "Posicional 6"
 
 #: src/emu/inpttype.ipp:626
 msgctxt "input-name"
 msgid "Positional 7"
-msgstr "Positional 7"
+msgstr "Posicional 7"
 
 #: src/emu/inpttype.ipp:627
 msgctxt "input-name"
 msgid "Positional 8"
-msgstr "Positional 8"
+msgstr "Posicional 8"
 
 #: src/emu/inpttype.ipp:628
 msgctxt "input-name"
 msgid "Positional 9"
-msgstr "Positional 9"
+msgstr "Posicional 9"
 
 #: src/emu/inpttype.ipp:629
 msgctxt "input-name"
 msgid "Positional 10"
-msgstr "Positional 10"
+msgstr "Posicional 10"
 
 #: src/emu/inpttype.ipp:634
 msgctxt "input-name"
 msgid "Positional V"
-msgstr "Positional V"
+msgstr "Posicional V"
 
 #: src/emu/inpttype.ipp:635
 msgctxt "input-name"
 msgid "Positional V 2"
-msgstr "Positional V 2"
+msgstr "Posicional V 2"
 
 #: src/emu/inpttype.ipp:636
 msgctxt "input-name"
 msgid "Positional V 3"
-msgstr "Positional V 3"
+msgstr "Posicional V 3"
 
 #: src/emu/inpttype.ipp:637
 msgctxt "input-name"
 msgid "Positional V 4"
-msgstr "Positional V 4"
+msgstr "Posicional V 4"
 
 #: src/emu/inpttype.ipp:638
 msgctxt "input-name"
 msgid "Positional V 5"
-msgstr "Positional V 5"
+msgstr "Posicional V 5"
 
 #: src/emu/inpttype.ipp:639
 msgctxt "input-name"
 msgid "Positional V 6"
-msgstr "Positional V 6"
+msgstr "Posicional V 6"
 
 #: src/emu/inpttype.ipp:640
 msgctxt "input-name"
 msgid "Positional V 7"
-msgstr "Positional V 7"
+msgstr "Posicional V 7"
 
 #: src/emu/inpttype.ipp:641
 msgctxt "input-name"
 msgid "Positional V 8"
-msgstr "Positional V 8"
+msgstr "Posicional V 8"
 
 #: src/emu/inpttype.ipp:642
 msgctxt "input-name"
 msgid "Positional V 9"
-msgstr "Positional V 9"
+msgstr "Posicional V 9"
 
 #: src/emu/inpttype.ipp:643
 msgctxt "input-name"
 msgid "Positional V 10"
-msgstr "Positional V 10"
+msgstr "Posicional V 10"
 
 #: src/emu/inpttype.ipp:648
 msgctxt "input-name"
