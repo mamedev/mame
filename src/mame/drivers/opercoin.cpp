@@ -54,8 +54,18 @@ public:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	virtual void machine_start() override;
+	void prg_map(address_map &map);
 };
+
+void multibaby_state::prg_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0x4000, 0x47ff).ram();
+	//map(0x8000, 0x8000).w("psg", FUNC(ay8910_device::address_w));
+	//map(0x8001, 0x8001).r("psg", FUNC(ay8910_device::data_r));
+	//map(0x8002, 0x8002).w("psg", FUNC(ay8910_device::data_w));
+	//map(0xe000, 0xe000).nopw();
+}
 
 static INPUT_PORTS_START( multibaby )
 	PORT_START("DSW1")
@@ -65,13 +75,11 @@ static INPUT_PORTS_START( multibaby )
 	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
 INPUT_PORTS_END
 
-void multibaby_state::machine_start()
-{
-}
 
 void multibaby_state::multibaby(machine_config &config)
 {
 	Z80(config, m_maincpu, 8.000_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &multibaby_state::prg_map);
 
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &psg(AY8910(config, "psg", 8.000_MHz_XTAL / 4)); // Divisor unknown

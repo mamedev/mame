@@ -20,94 +20,94 @@ license:CC0
 		<bounds left="0" top="25" right="325" bottom="205" />
 
 		<!-- Top Row -->
-		<element name="digit8_5" ref="digit8_">
+		<element name="digit8_13" ref="digit8_">
 			<bounds left="10" top="45" right="30" bottom="84" />
 		</element>
-		<element name="digit8_4" ref="digit8_">
+		<element name="digit8_12" ref="digit8_">
 			<bounds left="34" top="45" right="54" bottom="84" />
 		</element>
-		<element name="digit8_3" ref="digit8_">
+		<element name="digit8_11" ref="digit8_">
 			<bounds left="58" top="45" right="78" bottom="84" />
 		</element>
-		<element name="digit8_2" ref="digit8_">
+		<element name="digit8_10" ref="digit8_">
 			<bounds left="87" top="45" right="107" bottom="84" />
 		</element>
-		<element name="digit8_1" ref="digit8_">
+		<element name="digit8_9" ref="digit8_">
 			<bounds left="111" top="45" right="131" bottom="84" />
 		</element>
-		<element name="digit8_0" ref="digit8_">
+		<element name="digit8_8" ref="digit8_">
 			<bounds left="135" top="45" right="155" bottom="84" />
 		</element>
-		<element name="digit8_13" ref="digit8_">
+		<element name="digit8_5" ref="digit8_">
 			<bounds left="170" top="45" right="190" bottom="84" />
 		</element>
-		<element name="digit8_12" ref="digit8_">
+		<element name="digit8_4" ref="digit8_">
 			<bounds left="194" top="45" right="214" bottom="84" />
 		</element>
-		<element name="digit8_11" ref="digit8_">
+		<element name="digit8_3" ref="digit8_">
 			<bounds left="218" top="45" right="238" bottom="84" />
 		</element>
-		<element name="digit8_10" ref="digit8_">
+		<element name="digit8_2" ref="digit8_">
 			<bounds left="247" top="45" right="267" bottom="84" />
 		</element>
-		<element name="digit8_9" ref="digit8_">
+		<element name="digit8_1" ref="digit8_">
 			<bounds left="271" top="45" right="291" bottom="84" />
 		</element>
-		<element name="digit8_8" ref="digit8_">
+		<element name="digit8_0" ref="digit8_">
 			<bounds left="295" top="45" right="315" bottom="84" />
 		</element>
 
 		<!-- Bottom Row -->
-		<element name="digit8_21" ref="digit8_">
+		<element name="digit8_29" ref="digit8_">
 			<bounds left="10" top="100" right="30" bottom="139" />
 		</element>
-		<element name="digit8_20" ref="digit8_">
+		<element name="digit8_28" ref="digit8_">
 			<bounds left="34" top="100" right="54" bottom="139" />
 		</element>
-		<element name="digit8_19" ref="digit8_">
+		<element name="digit8_27" ref="digit8_">
 			<bounds left="58" top="100" right="78" bottom="139" />
 		</element>
-		<element name="digit8_18" ref="digit8_">
+		<element name="digit8_26" ref="digit8_">
 			<bounds left="87" top="100" right="107" bottom="139" />
 		</element>
-		<element name="digit8_17" ref="digit8_">
+		<element name="digit8_25" ref="digit8_">
 			<bounds left="111" top="100" right="131" bottom="139" />
 		</element>
-		<element name="digit8_16" ref="digit8_">
+		<element name="digit8_24" ref="digit8_">
 			<bounds left="135" top="100" right="155" bottom="139" />
 		</element>
 		<!-- Digits 22 and 23 are not used -->
-		<element name="digit8_29" ref="digit8_">
+		<element name="digit8_21" ref="digit8_">
 			<bounds left="170" top="100" right="190" bottom="139" />
 		</element>
-		<element name="digit8_28" ref="digit8_">
+		<element name="digit8_20" ref="digit8_">
 			<bounds left="194" top="100" right="214" bottom="139" />
 		</element>
-		<element name="digit8_27" ref="digit8_">
+		<element name="digit8_19" ref="digit8_">
 			<bounds left="218" top="100" right="238" bottom="139" />
 		</element>
-		<element name="digit8_26" ref="digit8_">
+		<element name="digit8_18" ref="digit8_">
 			<bounds left="247" top="100" right="267" bottom="139" />
 		</element>
-		<element name="digit8_25" ref="digit8_">
+		<element name="digit8_17" ref="digit8_">
 			<bounds left="271" top="100" right="291" bottom="139" />
 		</element>
-		<element name="digit8_24" ref="digit8_">
+		<element name="digit8_16" ref="digit8_">
 			<bounds left="295" top="100" right="315" bottom="139" />
 		</element>
 		<!-- Digits 30 and 31 are not used -->
 
 		<!-- 4 digit display -->
-		<element name="digit7_15" ref="digit7_">
+		<element name="digit7_7" ref="digit7_">
 			<bounds left="121" top="155" right="136" bottom="189" />
 		</element>
-		<element name="digit7_14" ref="digit7_">
+		<element name="digit7_6" ref="digit7_">
 			<bounds left="140" top="155" right="155" bottom="189" />
 		</element>
-		<element name="digit7_7" ref="digit7_">
+		<element name="digit7_15" ref="digit7_">
 			<bounds left="170" top="155" right="185" bottom="189" />
 		</element>
-		<element name="digit7_6" ref="digit7_">
+		<element name="digit7_14" ref="digit7_">
 			<bounds left="189" top="155" right="204" bottom="189" />
 		</element>
 	</view>

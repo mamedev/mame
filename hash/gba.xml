@@ -625,7 +625,7 @@ license:CC0
 	</software>
 
 	<software name="jimnvsjngp" cloneof="jimnvsjn">
-		<description>Jimmy Neutron vs. Jimmy Negatron (Ger, Prototype)</description>
+		<description>Jimmy Neutron vs. Jimmy Negatron (Ger, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -673,7 +673,7 @@ license:CC0
 	</software>
 
 	<software name="aerop" cloneof="aero">
-		<description>Aero the Acro-Bat - Rascal Rival Revenge (Euro, Prototype 20020327)</description>
+		<description>Aero the Acro-Bat - Rascal Rival Revenge (Euro, prototype 20020327)</description>
 		<year>2002</year>
 		<publisher>Metro 3D</publisher>
 		<part name="cart" interface="gba_cart">
@@ -1026,7 +1026,7 @@ license:CC0
 	</software>
 
 	<software name="asbas2k4pa" cloneof="asbas2k4">
-		<description>All-Star Baseball 2004 (USA, Prototype Earlier)</description>
+		<description>All-Star Baseball 2004 (USA, prototype earlier)</description>
 		<year>2003</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="gba_cart">
@@ -1038,7 +1038,7 @@ license:CC0
 	</software>
 
 	<software name="asbas2k4p" cloneof="asbas2k4">
-		<description>All-Star Baseball 2004 (USA, Prototype)</description>
+		<description>All-Star Baseball 2004 (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="gba_cart">
@@ -2082,7 +2082,7 @@ license:CC0
 	</software>
 
 	<software name="banjopilp" cloneof="banjopil">
-		<description>Banjo-Pilot (Prototype)</description>
+		<description>Banjo-Pilot (prototype)</description>
 		<year>2005</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -2123,7 +2123,7 @@ license:CC0
 	</software>
 
 	<software name="banjokazp" cloneof="banjokaz">
-		<description>Banjo-Kazooie - Grunty's Revenge (Euro, Prototype)</description>
+		<description>Banjo-Kazooie - Grunty's Revenge (Euro, prototype)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -2135,7 +2135,7 @@ license:CC0
 	</software>
 
 	<software name="banjokazp2" cloneof="banjokaz">
-		<description>Banjo-Kazooie - Grunty's Revenge (Euro, Prototype Earlier)</description>
+		<description>Banjo-Kazooie - Grunty's Revenge (Euro, prototype earlier)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -2544,7 +2544,7 @@ license:CC0
 	</software>
 
 	<software name="rockmx3bp" cloneof="rockmx3b">
-		<description>Battle Network Rockman EXE 3 Black (Jpn, Promo)</description>
+		<description>Battle Network Rockman EXE 3 Black (Jpn, promo)</description>
 		<year>2003</year>
 		<publisher>Capcom</publisher>
 		<info name="alt_title" value="バトルネットワーク ロックマン エグゼ3 ブラック"/>
@@ -2625,7 +2625,7 @@ license:CC0
 	</software>
 
 	<software name="btoads">
-		<description>Battletoads (Prototype)</description>
+		<description>Battletoads (prototype)</description>
 		<year>200?</year>
 		<publisher>Rare</publisher>
 		<part name="cart" interface="gba_cart">
@@ -3207,7 +3207,7 @@ license:CC0
 
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="bluangel1" cloneof="bluangel">
-		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 1)</description>
+		<description>Blue Angelo - Angels from the Shrine (Europe, prototype 1)</description>
 		<year>200?</year>
 		<publisher>VetaSoft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -3219,7 +3219,7 @@ license:CC0
 
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="bluangel">
-		<description>Blue Angelo - Angels from the Shrine (Europe, Prototype 2)</description>
+		<description>Blue Angelo - Angels from the Shrine (Europe, prototype 2)</description>
 		<year>200?</year>
 		<publisher>VetaSoft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -3349,7 +3349,7 @@ license:CC0
 
 	<!-- This game has an integrated UV sensor (AGB-013). -->
 	<software name="boktaiud" cloneof="boktai">
-		<description>Boktai - The Sun Is in Your Hand (USA, Demo)</description>
+		<description>Boktai - The Sun Is in Your Hand (USA, demo)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -4164,7 +4164,7 @@ license:CC0
 	</software>
 
 	<software name="brokencp" cloneof="brokenc">
-		<description>Broken Circle (Euro, Prototype)</description>
+		<description>Broken Circle (Euro, prototype)</description>
 		<year>2009</year>
 		<publisher>7 Raven Studios</publisher>
 		<part name="cart" interface="gba_cart">
@@ -4455,7 +4455,7 @@ license:CC0
 	</software>
 
 	<software name="caesarsp" cloneof="caesars">
-		<description>Caesars Palace Advance - Millennium Gold Edition (USA, Prototype)</description>
+		<description>Caesars Palace Advance - Millennium Gold Edition (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Majesco</publisher>
 		<part name="cart" interface="gba_cart">
@@ -4548,7 +4548,7 @@ license:CC0
 	</software>
 
 	<software name="harlock">
-		<description>Captain Harlock (Euro, Prototype Demo)</description>
+		<description>Captain Harlock (Euro, prototype demo)</description>
 		<year>2003</year>
 		<publisher>Otaboo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -5842,7 +5842,7 @@ license:CC0
 	</software>
 
 	<software name="contradvp" cloneof="contradv">
-		<description>Contra Advance (Prototype)</description>
+		<description>Contra Advance (prototype)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -6111,7 +6111,7 @@ license:CC0
 	</software>
 
 	<software name="crzychsepa" cloneof="crzychse">
-		<description>Crazy Chase (Euro, Prototype Early)</description>
+		<description>Crazy Chase (Euro, prototype early)</description>
 		<year>2002</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gba_cart">
@@ -6123,7 +6123,7 @@ license:CC0
 	</software>
 
 	<software name="crzychsep" cloneof="crzychse">
-		<description>Crazy Chase (Euro, Prototype)</description>
+		<description>Crazy Chase (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gba_cart">
@@ -6314,7 +6314,7 @@ license:CC0
 	</software>
 
 	<software name="cthdup" cloneof="cthd">
-		<description>Crouching Tiger, Hidden Dragon (USA, Prototype)</description>
+		<description>Crouching Tiger, Hidden Dragon (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -6337,7 +6337,7 @@ license:CC0
 	</software>
 
 	<software name="cruisnvp" cloneof="cruisnv">
-		<description>Cruis'n Velocity (USA, Prototype)</description>
+		<description>Cruis'n Velocity (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
 		<part name="cart" interface="gba_cart">
@@ -6373,7 +6373,7 @@ license:CC0
 	</software>
 
 	<software name="ctspecfp" cloneof="ctspecf">
-		<description>CT Special Forces (Euro, Prototype)</description>
+		<description>CT Special Forces (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>L.S.P.</publisher>
 		<part name="cart" interface="gba_cart">
@@ -7238,7 +7238,7 @@ license:CC0
 	</software>
 
 	<software name="dkpilot">
-		<description>Diddy Kong Pilot (Prototype)</description>
+		<description>Diddy Kong Pilot (prototype)</description>
 		<year>200?</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -7720,7 +7720,7 @@ license:CC0
 	</software>
 
 	<software name="dkkswingud" cloneof="dkkswing">
-		<description>DK - King of Swing (USA, Demo Kiosk)</description>
+		<description>DK - King of Swing (USA, demo Kiosk)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -8870,7 +8870,7 @@ license:CC0
 	</software>
 
 	<software name="driver2p" cloneof="driver2">
-		<description>Driver 2 Advance (Euro, Prototype)</description>
+		<description>Driver 2 Advance (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="gba_cart">
@@ -8938,7 +8938,7 @@ license:CC0
 	</software>
 
 	<software name="droopytop" cloneof="droopyto">
-		<description>Droopy's Tennis Open (Euro, Prototype)</description>
+		<description>Droopy's Tennis Open (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>L.S.P.</publisher>
 		<part name="cart" interface="gba_cart">
@@ -9150,7 +9150,7 @@ license:CC0
 	</software>
 
 	<software name="dune">
-		<description>Frank Herbert's Dune - Ornithopter Assault (Prototype)</description>
+		<description>Frank Herbert's Dune - Ornithopter Assault (prototype)</description>
 		<year>200?</year>
 		<publisher>Cryo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -9408,7 +9408,7 @@ license:CC0
 	</software>
 
 	<software name="eggmaniap" cloneof="eggmania">
-		<description>Eggo Mania (Euro, Prototype)</description>
+		<description>Eggo Mania (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gba_cart">
@@ -10218,7 +10218,7 @@ license:CC0
 	</software>
 
 	<software name="f_srobo2">
-		<description>Famicom Mini - Dai-2-ji Super Robot Taisen (Jpn, Promo)</description>
+		<description>Famicom Mini - Dai-2-ji Super Robot Taisen (Jpn, promo)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -10230,7 +10230,7 @@ license:CC0
 	</software>
 
 	<software name="f_zgundm">
-		<description>Famicom Mini - Kidou Senshi Z Gundam - Hot Scramble (Jpn, Promo)</description>
+		<description>Famicom Mini - Kidou Senshi Z Gundam - Hot Scramble (Jpn, promo)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="AGB-FGZJ-JPN"/>
@@ -11009,7 +11009,7 @@ license:CC0
 	</software>
 
 	<software name="filadecap" cloneof="filadeca">
-		<description>FILA Decathlon (Euro, Prototype)</description>
+		<description>FILA Decathlon (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -11384,7 +11384,7 @@ license:CC0
 	</software>
 
 	<software name="nemogp" cloneof="nemo">
-		<description>Findet Nemo (Ger, Prototype)</description>
+		<description>Findet Nemo (Ger, prototype)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -11461,7 +11461,7 @@ license:CC0
 	</software>
 
 	<software name="fireater">
-		<description>Fire Eaters - Zero Bandits (Euro, Demo)</description>
+		<description>Fire Eaters - Zero Bandits (Euro, demo)</description>
 		<year>2001</year>
 		<publisher>Lost Boys Games</publisher>
 		<part name="cart" interface="gba_cart">
@@ -11516,7 +11516,7 @@ license:CC0
 	</software>
 
 	<software name="firembjp1" cloneof="firemb">
-		<description>Fire Emblem - Rekka no Ken (Jpn, Prototype 0219)</description>
+		<description>Fire Emblem - Rekka no Ken (Jpn, prototype 0219)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<info name="alt_title" value="ファイアーエムブレム 烈火の剣"/>
@@ -11529,7 +11529,7 @@ license:CC0
 	</software>
 
 	<software name="firembjp2" cloneof="firemb">
-		<description>Fire Emblem - Rekka no Ken (Jpn, Prototype 0206)</description>
+		<description>Fire Emblem - Rekka no Ken (Jpn, prototype 0206)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<info name="alt_title" value="ファイアーエムブレム 烈火の剣"/>
@@ -11602,7 +11602,7 @@ license:CC0
 	</software>
 
 	<software name="firembssjp" cloneof="firembss">
-		<description>Fire Emblem - Seima no Kouseki (Jpn, Prototype)</description>
+		<description>Fire Emblem - Seima no Kouseki (Jpn, prototype)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<info name="alt_title" value="ファイアーエムブレム 聖魔の光石"/>
@@ -11670,7 +11670,7 @@ license:CC0
 	</software>
 
 	<software name="flashb">
-		<description>Flashback Legends (Fra, Prototype)</description>
+		<description>Flashback Legends (Fra, prototype)</description>
 		<year>20??</year>
 		<publisher>Delphine Software</publisher>
 		<part name="cart" interface="gba_cart">
@@ -13640,7 +13640,7 @@ license:CC0
 	</software>
 
 	<software name="gp1racin">
-		<description>GP-1 Racing (USA, Prototype)</description>
+		<description>GP-1 Racing (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>Edge Interactive</publisher>
 		<part name="cart" interface="gba_cart">
@@ -13765,7 +13765,7 @@ license:CC0
 	</software>
 
 	<software name="gremlinsp" cloneof="gremlins">
-		<description>Gremlins - Stripe vs Gizmo (Euro, Prototype)</description>
+		<description>Gremlins - Stripe vs Gizmo (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>L.S.P.</publisher>
 		<part name="cart" interface="gba_cart">
@@ -13921,7 +13921,7 @@ license:CC0
 	</software>
 
 	<software name="gtracerspa" cloneof="gtracers">
-		<description>GT Racers (Euro, Prototype, 20050713)</description>
+		<description>GT Racers (Euro, prototype, 20050713)</description>
 		<year>2005</year>
 		<publisher>Liquid Games</publisher>
 		<part name="cart" interface="gba_cart">
@@ -13932,7 +13932,7 @@ license:CC0
 	</software>
 
 	<software name="gtracersp" cloneof="gtracers">
-		<description>GT Racers (Euro, Prototype, 20051014)</description>
+		<description>GT Racers (Euro, prototype, 20051014)</description>
 		<year>2005</year>
 		<publisher>Liquid Games</publisher>
 		<part name="cart" interface="gba_cart">
@@ -13968,7 +13968,7 @@ license:CC0
 	</software>
 
 	<software name="ggxjp" cloneof="ggx">
-		<description>Guilty Gear X - Advance Edition (Jpn, Prototype)</description>
+		<description>Guilty Gear X - Advance Edition (Jpn, prototype)</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
 		<info name="alt_title" value="ギルティギア ゼクス アドバンスエディション"/>
@@ -14799,7 +14799,7 @@ license:CC0
 	</software>
 
 	<software name="hauntedm">
-		<description>The Haunted Mansion (USA, Prototype)</description>
+		<description>The Haunted Mansion (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>TDK Mediactive</publisher>
 		<part name="cart" interface="gba_cart">
@@ -14949,7 +14949,7 @@ license:CC0
 	</software>
 
 	<software name="heyarnldp" cloneof="heyarnld">
-		<description>Hey Arnold! - The Movie (Euro, Prototype)</description>
+		<description>Hey Arnold! - The Movie (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -15071,7 +15071,7 @@ license:CC0
 	</software>
 
 	<software name="hischoolp" cloneof="hischool">
-		<description>High School Musical (USA, Prototype)</description>
+		<description>High School Musical (USA, prototype)</description>
 		<year>2007</year>
 		<publisher>Disney Interactive Studios</publisher>
 		<part name="cart" interface="gba_cart">
@@ -15083,7 +15083,7 @@ license:CC0
 	</software>
 
 	<software name="hikarugod" cloneof="hikarugo">
-		<description>Hikaru no Go (Jpn, Promotional Demo)</description>
+		<description>Hikaru no Go (Jpn, promotional demo)</description>
 		<year>2001?</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -15283,7 +15283,7 @@ license:CC0
 	</software>
 
 	<software name="kirbyamjd" cloneof="kirbyam">
-		<description>Hoshi no Kirby - Kagami no Daimeikyuu (Jpn, Demo?)</description>
+		<description>Hoshi no Kirby - Kagami no Daimeikyuu (Jpn, demo?)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -16669,7 +16669,7 @@ license:CC0
 	</software>
 
 	<software name="jlin4allup" cloneof="jlin4all">
-		<description>Justice League - Injustice for All (USA, Prototype)</description>
+		<description>Justice League - Injustice for All (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>Midway</publisher>
 		<part name="cart" interface="gba_cart">
@@ -16796,7 +16796,7 @@ license:CC0
 	</software>
 
 	<software name="kaisertl" cloneof="invader">
-		<description>Kaisertal - Fight the Necronis War (Euro, Demo)</description>
+		<description>Kaisertal - Fight the Necronis War (Euro, demo)</description>
 		<year>2001</year>
 		<publisher>Formula</publisher>
 		<part name="cart" interface="gba_cart">
@@ -17180,7 +17180,7 @@ license:CC0
 	</software>
 
 	<software name="kien">
-		<description>Kien (USA, Prototype)</description>
+		<description>Kien (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>DSI Games</publisher>
 		<part name="cart" interface="gba_cart">
@@ -17419,7 +17419,7 @@ license:CC0
 	</software>
 
 	<software name="kofexjp" cloneof="kofex">
-		<description>The King of Fighters EX - NeoBlood (Jpn, Prototype)</description>
+		<description>The King of Fighters EX - NeoBlood (Jpn, prototype)</description>
 		<year>2002</year>
 		<publisher>Marvelous Entertainment</publisher>
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズEX"/>
@@ -17929,7 +17929,7 @@ license:CC0
 	</software>
 
 	<software name="krazyracup" cloneof="krazyrac">
-		<description>Konami Krazy Racers (USA, Prototype)</description>
+		<description>Konami Krazy Racers (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -18531,7 +18531,7 @@ license:CC0
 	</software>
 
 	<software name="traidprup" cloneof="traidpr">
-		<description>Lara Croft Tomb Raider - The Prophecy (USA, Prototype)</description>
+		<description>Lara Croft Tomb Raider - The Prophecy (USA, prototype)</description>
 		<year>2002?</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -18669,7 +18669,7 @@ license:CC0
 	</software>
 
 	<software name="zeldamcpud" cloneof="zeldamcp">
-		<description>The Legend of Zelda - The Minish Cap (USA, Demo Kiosk)</description>
+		<description>The Legend of Zelda - The Minish Cap (USA, demo Kiosk)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -18840,7 +18840,7 @@ license:CC0
 	</software>
 
 	<software name="legorac2p" cloneof="legorac2">
-		<description>LEGO Racers 2 (Euro, Prototype)</description>
+		<description>LEGO Racers 2 (Euro, prototype)</description>
 		<year>2001</year>
 		<publisher>Electronic Arts</publisher>
 		<part name="cart" interface="gba_cart">
@@ -20294,7 +20294,7 @@ license:CC0
 	</software>
 
 	<software name="marilsssud" cloneof="marilsss">
-		<description>Mario &amp; Luigi - Superstar Saga (USA, Demo Kiosk)</description>
+		<description>Mario &amp; Luigi - Superstar Saga (USA, demo Kiosk)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -21933,7 +21933,7 @@ license:CC0
 	</software>
 
 	<software name="metroid0p" cloneof="metroid0">
-		<description>Metroid - Zero Mission (Euro, Prototype)</description>
+		<description>Metroid - Zero Mission (Euro, prototype)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -21979,7 +21979,7 @@ license:CC0
 	</software>
 
 	<software name="metroid0up" cloneof="metroid0">
-		<description>Metroid - Zero Mission (USA, Prototype)</description>
+		<description>Metroid - Zero Mission (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -22010,7 +22010,7 @@ license:CC0
 	</software>
 
 	<software name="metrdfsnp2" cloneof="metrdfsn">
-		<description>Metroid Fusion (Euro, Prototype 20020911)</description>
+		<description>Metroid Fusion (Euro, prototype 20020911)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -22022,7 +22022,7 @@ license:CC0
 	</software>
 
 	<software name="metrdfsnp1" cloneof="metrdfsn">
-		<description>Metroid Fusion (Euro, Prototype 20020916)</description>
+		<description>Metroid Fusion (Euro, prototype 20020916)</description>
 		<year>2002</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -23116,7 +23116,7 @@ license:CC0
 	</software>
 
 	<software name="morning">
-		<description>The Morning Adventure (Spa, Promo)</description>
+		<description>The Morning Adventure (Spa, promo)</description>
 		<year>2003?</year>
 		<publisher>Virtual Toys</publisher>
 		<part name="cart" interface="gba_cart">
@@ -23228,7 +23228,7 @@ license:CC0
 	</software>
 
 	<software name="motogpp" cloneof="motogp">
-		<description>Moto GP (Euro, Prototype)</description>
+		<description>Moto GP (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -23278,7 +23278,7 @@ license:CC0
 	</software>
 
 	<software name="motoxchl">
-		<description>Motocross Challenge (USA, Prototype)</description>
+		<description>Motocross Challenge (USA, prototype)</description>
 		<year>2007</year>
 		<publisher>DHG Games</publisher>
 		<part name="cart" interface="gba_cart">
@@ -24995,7 +24995,7 @@ license:CC0
 
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="overstrm">
-		<description>Overstorm (Euro, Prototype Demo)</description>
+		<description>Overstorm (Euro, prototype demo)</description>
 		<year>2003</year>
 		<publisher>Polyzoom</publisher>
 		<part name="cart" interface="gba_cart">
@@ -26452,7 +26452,7 @@ license:CC0
 	</software>
 
 	<software name="pokerubygp" cloneof="pokeruby">
-		<description>Pokémon - Rubin-Edition (Ger, Prototype)</description>
+		<description>Pokémon - Rubin-Edition (Ger, prototype)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -26728,7 +26728,7 @@ license:CC0
 	</software>
 
 	<software name="pokemysdud" cloneof="pokemysd">
-		<description>Pokémon Mystery Dungeon - Red Rescue Team (USA, Demo Kiosk)</description>
+		<description>Pokémon Mystery Dungeon - Red Rescue Team (USA, demo Kiosk)</description>
 		<year>2006</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -26950,7 +26950,7 @@ license:CC0
 	</software>
 
 	<software name="powrpkpd" cloneof="powrpkp">
-		<description>Power Pro Kun Pocket 1, 2 (Jpn, Promo)</description>
+		<description>Power Pro Kun Pocket 1, 2 (Jpn, promo)</description>
 		<year>2004</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -27043,7 +27043,7 @@ license:CC0
 	</software>
 
 	<software name="powrpkp5d" cloneof="powrpkp5">
-		<description>Power Pro Kun Pocket 5 (Jpn, Promo)</description>
+		<description>Power Pro Kun Pocket 5 (Jpn, promo)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -27091,7 +27091,7 @@ license:CC0
 	</software>
 
 	<software name="powrpkp6d" cloneof="powrpkp6">
-		<description>Power Pro Kun Pocket 6 (Jpn, Promo)</description>
+		<description>Power Pro Kun Pocket 6 (Jpn, promo)</description>
 		<year>2003</year>
 		<publisher>Konami</publisher>
 		<part name="cart" interface="gba_cart">
@@ -27314,7 +27314,7 @@ license:CC0
 	</software>
 
 	<software name="pmanp" cloneof="pman">
-		<description>Prehistorik Man (USA, Prototype)</description>
+		<description>Prehistorik Man (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Titus</publisher>
 		<part name="cart" interface="gba_cart">
@@ -27717,7 +27717,7 @@ license:CC0
 	</software>
 
 	<software name="qwakd" cloneof="qwak">
-		<description>Qwak (Euro, Demo)</description>
+		<description>Qwak (Euro, demo)</description>
 		<year>2007</year>
 		<publisher>qwak.co.uk</publisher>
 		<part name="cart" interface="gba_cart">
@@ -27983,7 +27983,7 @@ license:CC0
 	</software>
 
 	<software name="rayman3p" cloneof="rayman3">
-		<description>Rayman 3 (Euro, Prototype)</description>
+		<description>Rayman 3 (Euro, prototype)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -28021,7 +28021,7 @@ license:CC0
 	</software>
 
 	<software name="raymanp" cloneof="rayman">
-		<description>Rayman Advance (Euro, Prototype)</description>
+		<description>Rayman Advance (Euro, prototype)</description>
 		<year>2001</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -28238,7 +28238,7 @@ license:CC0
 	</software>
 
 	<software name="revil2d">
-		<description>Resident Evil 2 (Euro, Prototype Demo)</description>
+		<description>Resident Evil 2 (Euro, prototype demo)</description>
 		<year>2000?</year>
 		<publisher>Raylight Studios</publisher>
 		<part name="cart" interface="gba_cart">
@@ -28249,7 +28249,7 @@ license:CC0
 	</software>
 
 	<software name="revshinp" cloneof="revshin">
-		<description>The Revenge of Shinobi (Euro, Prototype)</description>
+		<description>The Revenge of Shinobi (Euro, prototype)</description>
 		<year>2003</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gba_cart">
@@ -28652,7 +28652,7 @@ license:CC0
 	</software>
 
 	<software name="rcktpwbbp" cloneof="rcktpwbb">
-		<description>Rocket Power - Beach Bandits (USA, Prototype V0.14)</description>
+		<description>Rocket Power - Beach Bandits (USA, prototype V0.14)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -29274,7 +29274,7 @@ license:CC0
 	</software>
 
 	<software name="santajrp" cloneof="santajr">
-		<description>Santa Claus Jr. Advance (Euro, Prototype)</description>
+		<description>Santa Claus Jr. Advance (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>JoWooD Entertainment AG</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31498,7 +31498,7 @@ license:CC0
 	<!-- This comes from a proto cart: it is mostly similar to the final release, with single byte differences
 	The cart also contained a non-empty SRAM save which we currently include in the set, even if we don't load it. -->
 	<software name="sonicup" cloneof="sonic" supported="partial">
-		<description>Sonic Advance (USA, Prototype)</description>
+		<description>Sonic Advance (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31558,7 +31558,7 @@ license:CC0
 
 <!-- This comes from a proto cart: first half is the final release; second half is generic padding. not very interesting, sadly. -->
 	<software name="sonic2up" cloneof="sonic2" supported="partial">
-		<description>Sonic Advance 2 (USA, Prototype)</description>
+		<description>Sonic Advance 2 (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31570,7 +31570,7 @@ license:CC0
 	</software>
 
 	<software name="sonic3p" cloneof="sonic3" supported="partial">
-		<description>Sonic Advance 3 (Jpn, Prototype)</description>
+		<description>Sonic Advance 3 (Jpn, prototype)</description>
 		<year>2004</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32054,7 +32054,7 @@ license:CC0
 	</software>
 
 	<software name="spiritgp" cloneof="spirit">
-		<description>Spirit - Der Wilde Mustang (Ger, Prototype)</description>
+		<description>Spirit - Der Wilde Mustang (Ger, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32206,7 +32206,7 @@ license:CC0
 	</software>
 
 	<software name="spongbfd">
-		<description>SpongeBob SquarePants - Revenge of the Flying Dutchman (USA, Prototype)</description>
+		<description>SpongeBob SquarePants - Revenge of the Flying Dutchman (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32295,7 +32295,7 @@ license:CC0
 	</software>
 
 	<software name="spongbmvup" cloneof="spongbmv" supported="no">
-		<description>SpongeBob SquarePants - The Movie (USA, Prototype)</description>
+		<description>SpongeBob SquarePants - The Movie (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32518,7 +32518,7 @@ license:CC0
 	</software>
 
 	<software name="spyroflmup" cloneof="spyroflm">
-		<description>Spyro 2 - Season of Flame (USA, Prototype)</description>
+		<description>Spyro 2 - Season of Flame (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>Universal Interactive</publisher>
 		<part name="cart" interface="gba_cart">
@@ -32878,7 +32878,7 @@ license:CC0
 	</software>
 
 	<software name="starskyhup" cloneof="starskyh" supported="no">
-		<description>Starsky &amp; Hutch (USA, Prototype)</description>
+		<description>Starsky &amp; Hutch (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>Empire Entertainment</publisher>
 		<part name="cart" interface="gba_cart">
@@ -33384,7 +33384,7 @@ license:CC0
 	</software>
 
 	<software name="sdodgebup" cloneof="sdodgeb">
-		<description>Super Dodge Ball Advance (USA, Prototype)</description>
+		<description>Super Dodge Ball Advance (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>Atlus</publisher>
 		<part name="cart" interface="gba_cart">
@@ -33557,7 +33557,7 @@ license:CC0
 	</software>
 
 	<software name="smad" cloneof="sma">
-		<description>Super Mario Advance (USA, Demo Kiosk)</description>
+		<description>Super Mario Advance (USA, demo Kiosk)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -35213,7 +35213,7 @@ license:CC0
 	</software>
 
 	<software name="tintoyd1" cloneof="tintoyd">
-		<description>Tin Toy Advance (Demo 1, 20010529)</description>
+		<description>Tin Toy Advance (demo 1, 20010529)</description>
 		<year>2001</year>
 		<publisher>Mutation Software</publisher>
 		<part name="cart" interface="gba_cart">
@@ -35224,7 +35224,7 @@ license:CC0
 	</software>
 
 	<software name="tintoyd">
-		<description>Tin Toy Advance (Demo 2, 20010717)</description>
+		<description>Tin Toy Advance (demo 2, 20010717)</description>
 		<year>2001</year>
 		<publisher>Mutation Software</publisher>
 		<part name="cart" interface="gba_cart">
@@ -35525,7 +35525,7 @@ license:CC0
 	</software>
 
 	<software name="splintclp" cloneof="splintcl" supported="no">
-		<description>Tom Clancy's Splinter Cell (Euro, Prototype)</description>
+		<description>Tom Clancy's Splinter Cell (Euro, prototype)</description>
 		<year>2003</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gba_cart">
@@ -35817,7 +35817,7 @@ license:CC0
 	</software>
 
 	<software name="tootuff">
-		<description>Tootuff - The Gagmachine (Euro, Prototype)</description>
+		<description>Tootuff - The Gagmachine (Euro, prototype)</description>
 		<year>2002</year>
 		<publisher>Infogrames</publisher>
 		<part name="cart" interface="gba_cart">
@@ -36379,7 +36379,7 @@ license:CC0
 
 <!-- These were dumped by drx... Are more info available? -->
 	<software name="turok">
-		<description>Turok Dinosaur Hunter (Prototype)</description>
+		<description>Turok Dinosaur Hunter (prototype)</description>
 		<year>200?</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="gba_cart">
@@ -36390,7 +36390,7 @@ license:CC0
 	</software>
 
 	<software name="turoka" cloneof="turok">
-		<description>Turok Dinosaur Hunter (Prototype, Brighter)</description>
+		<description>Turok Dinosaur Hunter (prototype brighter)</description>
 		<year>200?</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="gba_cart">
@@ -36401,7 +36401,7 @@ license:CC0
 	</software>
 
 	<software name="turokb" cloneof="turok">
-		<description>Turok Dinosaur Hunter (Prototype, Earlier)</description>
+		<description>Turok Dinosaur Hunter (prototype earlier)</description>
 		<year>200?</year>
 		<publisher>Acclaim</publisher>
 		<part name="cart" interface="gba_cart">
@@ -36529,7 +36529,7 @@ license:CC0
 
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="tyrian2k">
-		<description>Tyrian 2000 (USA, Prototype)</description>
+		<description>Tyrian 2000 (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Stealth Productions</publisher>
 		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
@@ -37381,7 +37381,7 @@ license:CC0
 	</software>
 
 	<software name="wariowarup" cloneof="wariowar">
-		<description>WarioWare, Inc. - Mega Microgame$! (USA, Prototype)</description>
+		<description>WarioWare, Inc. - Mega Microgame$! (USA, prototype)</description>
 		<year>2003</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -37561,7 +37561,7 @@ license:CC0
 	</software>
 
 	<software name="wildthrnp" cloneof="wildthrn">
-		<description>The Wild Thornberrys Movie (USA, Prototype)</description>
+		<description>The Wild Thornberrys Movie (USA, prototype)</description>
 		<year>2002</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -38033,7 +38033,7 @@ license:CC0
 
 	<!-- Released by the developer as a digital download on the web. -->
 	<software name="worldreb">
-		<description>World Reborn (USA, Prototype)</description>
+		<description>World Reborn (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>Destination Software</publisher>
 		<part name="cart" interface="gba_cart">
@@ -38162,7 +38162,7 @@ license:CC0
 	</software>
 
 	<software name="wwfroadwp" cloneof="wwfroadw">
-		<description>WWF - Road to WrestleMania (USA, Prototype)</description>
+		<description>WWF - Road to WrestleMania (USA, prototype)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
 		<part name="cart" interface="gba_cart">
@@ -39510,7 +39510,7 @@ license:CC0
 
 	<!-- Tech demo compiled from source code. This is a later build from code marked "Copyright (C) 1999-2001 NINTENDO Co.,Ltd." -->
 	<software name="yoshi">
-		<description>Sample Yoshi Game (Prototype, 20010214)</description>
+		<description>Sample Yoshi Game (prototype, 20010214)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">
@@ -39522,7 +39522,7 @@ license:CC0
 
 	<!-- Tech demo compiled from source code. This is an earlier build from code marked "Copyright (C) 1999-2000 NINTENDO Co.,Ltd." -->
 	<software name="yoshia" cloneof="yoshi">
-		<description>Sample Yoshi Game (Prototype, 20000601)</description>
+		<description>Sample Yoshi Game (prototype, 20000601)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="gba_cart">

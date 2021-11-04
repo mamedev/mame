@@ -66,7 +66,7 @@ DIP locations verified for:
 #include "includes/bagman.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
+#include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -149,20 +149,16 @@ void bagman_state::main_map(address_map &map)
 }
 
 
-
-void bagman_state::pickin_map(address_map &map)
+void pickin_state::pickin_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x7000, 0x77ff).ram();
-	map(0x8800, 0x8bff).ram().w(FUNC(bagman_state::videoram_w)).share("videoram");
-	map(0x9800, 0x9bff).ram().w(FUNC(bagman_state::colorram_w)).share("colorram"); // Includes spriteram
-	map(0x9c00, 0x9fff).nopw(); // Written to, but unused
+	map(0x8800, 0x8bff).ram().w(FUNC(pickin_state::videoram_w)).share("videoram");
+	map(0x9800, 0x9bff).ram().w(FUNC(pickin_state::colorram_w)).share("colorram"); // Includes spriteram
+	map(0x9c00, 0x9fff).nopw(); // Written to in pickin, but unused
 	map(0xa000, 0xa007).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0xa800, 0xa800).portr("DSW");
-
-	// Guess
-	map(0xb000, 0xb000).w("ay2", FUNC(ay8910_device::address_w));
-	map(0xb800, 0xb800).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r));
 }
 
 void bagman_state::main_portmap(address_map &map)
@@ -171,6 +167,31 @@ void bagman_state::main_portmap(address_map &map)
 	map(0x08, 0x09).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x0c, 0x0c).r("aysnd", FUNC(ay8910_device::data_r));
 	//map(0x56, 0x56).nopw();
+}
+
+uint8_t pickin_state::aysnd_r()
+{
+	uint8_t data = 0xff;
+	if (!m_mainlatch->q5_r())
+		data &= m_aysnd[0]->data_r();
+	if (!m_mainlatch->q6_r())
+		data &= m_aysnd[1]->data_r();
+	return data;
+}
+
+void pickin_state::aysnd_w(offs_t offset, uint8_t data)
+{
+	if (!m_mainlatch->q5_r())
+		m_aysnd[0]->address_data_w(offset, data);
+	if (!m_mainlatch->q6_r())
+		m_aysnd[1]->address_data_w(offset, data);
+}
+
+void pickin_state::pickin_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x08, 0x09).w(FUNC(pickin_state::aysnd_w));
+	map(0x0c, 0x0c).r(FUNC(pickin_state::aysnd_r));
 }
 
 
@@ -528,32 +549,34 @@ void bagman_state::sbagmani(machine_config &config)
 	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
 }
 
-void bagman_state::pickin(machine_config &config)
+void pickin_state::pickin(machine_config &config)
 {
 	// Basic machine hardware
 	Z80(config, m_maincpu, BAGMAN_H0);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bagman_state::pickin_map);
-	m_maincpu->set_addrmap(AS_IO, &bagman_state::main_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pickin_state::pickin_map);
+	m_maincpu->set_addrmap(AS_IO, &pickin_state::pickin_portmap);
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flipscreen_x_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flipscreen_y_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
-	m_mainlatch->q_out_cb<4>().set(FUNC(bagman_state::coin_counter_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(pickin_state::irq_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(pickin_state::flipscreen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(pickin_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(pickin_state::video_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(pickin_state::coin_counter_w));
 	m_mainlatch->q_out_cb<5>().set_nop(); // ????
 	m_mainlatch->q_out_cb<6>().set_nop(); // ????
 	m_mainlatch->q_out_cb<7>().set_nop(); // ????
 
+	WATCHDOG_TIMER(config, "watchdog");
+
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(bagman_state::screen_update));
+	screen.set_screen_update(FUNC(pickin_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(pickin_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pickin);
-	PALETTE(config, m_palette, FUNC(bagman_state::bagman_palette), 64);
+	PALETTE(config, m_palette, FUNC(pickin_state::bagman_palette), 64);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -564,7 +587,10 @@ void bagman_state::pickin(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	// Maybe
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.40);
+	ay8910_device &ay2(AY8910(config, "ay2", 1500000));
+	ay2.port_a_read_callback().set_constant(0xff); // needed to avoid spurious credits on startup
+	ay2.port_b_read_callback().set_constant(0xff);
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.40);
 }
 
 /*
@@ -585,32 +611,34 @@ z80
 */
 
 
-void bagman_state::botanic(machine_config &config)
+void pickin_state::botanic(machine_config &config)
 {
 	// Basic machine hardware
 	Z80(config, m_maincpu, BAGMAN_H0);
-	m_maincpu->set_addrmap(AS_PROGRAM, &bagman_state::pickin_map);
-	m_maincpu->set_addrmap(AS_IO, &bagman_state::main_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pickin_state::pickin_map);
+	m_maincpu->set_addrmap(AS_IO, &pickin_state::pickin_portmap);
 
 	LS259(config, m_mainlatch);
-	m_mainlatch->q_out_cb<0>().set(FUNC(bagman_state::irq_mask_w));
-	m_mainlatch->q_out_cb<1>().set(FUNC(bagman_state::flipscreen_x_w));
-	m_mainlatch->q_out_cb<2>().set(FUNC(bagman_state::flipscreen_y_w));
-	m_mainlatch->q_out_cb<3>().set(FUNC(bagman_state::video_enable_w));
-	m_mainlatch->q_out_cb<4>().set(FUNC(bagman_state::coin_counter_w));
+	m_mainlatch->q_out_cb<0>().set(FUNC(pickin_state::irq_mask_w));
+	m_mainlatch->q_out_cb<1>().set(FUNC(pickin_state::flipscreen_x_w));
+	m_mainlatch->q_out_cb<2>().set(FUNC(pickin_state::flipscreen_y_w));
+	m_mainlatch->q_out_cb<3>().set(FUNC(pickin_state::video_enable_w));
+	m_mainlatch->q_out_cb<4>().set(FUNC(pickin_state::coin_counter_w));
 	m_mainlatch->q_out_cb<5>().set_nop();    // ????
 	m_mainlatch->q_out_cb<6>().set_nop();    // ????
 	m_mainlatch->q_out_cb<7>().set_nop();    // ????
 
+	WATCHDOG_TIMER(config, "watchdog");
+
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(BAGMAN_HCLK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
-	screen.set_screen_update(FUNC(bagman_state::screen_update));
+	screen.set_screen_update(FUNC(pickin_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(bagman_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(pickin_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bagman);
-	PALETTE(config, m_palette, FUNC(bagman_state::bagman_palette), 64);
+	PALETTE(config, m_palette, FUNC(pickin_state::bagman_palette), 64);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -920,8 +948,8 @@ ROM_START( botanic2 ) // PCB has Valadon logo with 'bajo licencia Itisa (Palamos
 	ROM_LOAD( "1.1c",    0x0000, 0x1000, CRC(a1148d89) SHA1(b1424693cebc410749216457d07bae54b903bc07) )
 	ROM_LOAD( "3.1f",    0x1000, 0x1000, CRC(70be5565) SHA1(a7eab667a82d3e7321f393073f29c6e5e865ec6b) )
 
-	ROM_REGION( 0x0040, "proms", 0 ) // strangely uses one PROM from bagman and one from botanic
-	ROM_LOAD( "82s123.6r",       0x0000, 0x0020, CRC(2a855523) SHA1(91e032233fee397c90b7c1662934aca9e0671482) )
+	ROM_REGION( 0x0040, "proms", 0 ) // the PCB incorrectly had a bagman PROM left in place, we're using the one from the other Botanic sets instead but marked as BAD_DUMP
+	ROM_LOAD( "bota_3p.3p",      0x0000, 0x0020, BAD_DUMP CRC(a8a2ddd2) SHA1(fc2da863d13e92f7682f393a08bc9357841ae7ea) )
 	ROM_LOAD( "b-tbp18s030.3r",  0x0020, 0x0020, CRC(edf88f34) SHA1(b9c342d51303d552f87df2543a34e38c30acd07c) )
 
 	ROM_REGION( 0x0020, "5110ctrl", 0)
@@ -1232,6 +1260,14 @@ void bagman_state::init_bagmans3()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xed01, 0xed01, read8smo_delegate(*this, []() { return 0x01; }, "hack_r"));
 }
 
+void bagman_state::init_botanic2()
+{
+	// the protection PAL here must have been changed, the code checks for a fixed value of 0x0b
+	// if this isn't returned the title screen bank doesn't get set correctly, there is a garbage enemy
+	// tile at the top left corner of the 2nd screen, and the player moves very slowly on the 2nd stage
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa000, 0xa000, read8smo_delegate(*this, []() { return 0x0b; }, "prot_r"));
+}
+
 GAME( 1982, bagman,    0,       bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Bagman",                                  MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagnard,   bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Le Bagnard (set 1)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bagnarda,  bagman,  bagman,   bagman,    bagman_state,   empty_init,    ROT270, "Valadon Automation",                             "Le Bagnard (set 2)",                      MACHINE_SUPPORTS_SAVE )
@@ -1247,10 +1283,10 @@ GAME( 1984, sbagman2,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,
 GAME( 1984, sbagmani,  sbagman, sbagmani, sbagman,   bagman_state,   empty_init,    ROT90,  "Valadon Automation (Itisa license)",             "Super Bagman (Itisa, Spain)",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Different color PROMs, needs correct decoding
 GAME( 1984, sbagmans,  sbagman, sbagman,  sbagman,   bagman_state,   empty_init,    ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)",        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, pickin,    0,       pickin,   pickin,    bagman_state,   empty_init,    ROT270,    "Valadon Automation",                             "Pickin'",                                 MACHINE_SUPPORTS_SAVE )
+GAME( 1983, pickin,    0,       pickin,   pickin,    pickin_state,   empty_init,    ROT270, "Valadon Automation",                             "Pickin'",                                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, botanic,   0,       botanic,  botanici,  bagman_state,   empty_init,    ROT90,     "Itisa",                                          "Botanic (English / Spanish, set 1)",      MACHINE_SUPPORTS_SAVE )
-GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   empty_init,    ROT90,     "Itisa",                                          "Botanic (English / Spanish, set 2)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // At the title screen, Botanic in corrupted in the first loop, OK from the second on. Colors likely wrong, too. Has a leftover 5110.
-GAME( 1984, botanicf,  botanic, botanic,  botanicf,  bagman_state,   empty_init,    ROT270,    "Itisa (Valadon Automation license)",             "Botanic (French)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic,   0,       botanic,  botanici,  pickin_state,   empty_init,    ROT90,  "Itisa",                                          "Botanic (English / Spanish)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, botanic2,  botanic, bagman,   botanici2, bagman_state,   init_botanic2, ROT90,  "Itisa",                                          "Botanic (English / Spanish, Bagman conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, botanicf,  botanic, botanic,  botanicf,  pickin_state,   empty_init,    ROT270, "Itisa (Valadon Automation license)",             "Botanic (French)",                        MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init,    ROT0,      "Itisa",                                          "Squash (Itisa)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1984, squaitsa,  0,       botanic,  squaitsa,  squaitsa_state, empty_init,    ROT0,   "Itisa",                                          "Squash (Itisa)",                          MACHINE_SUPPORTS_SAVE )

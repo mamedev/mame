@@ -18,10 +18,10 @@
 
 ************************************************************************/
 
-#include <cassert>
-
-#include "flopimg.h"
 #include "formats/dvk_mx_dsk.h"
+
+#include "ioprocs.h"
+
 
 const floppy_image_format_t::desc_e dvk_mx_format::dvk_mx_new_desc[] = {
 	/* 01 */ { FM, 0x00, 8*2 }, // eight 0x0000 words
@@ -81,9 +81,14 @@ bool dvk_mx_format::supports_save() const
 	return false;
 }
 
-void dvk_mx_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
+void dvk_mx_format::find_size(util::random_read &io, uint8_t &track_count, uint8_t &head_count, uint8_t &sector_count)
 {
-	uint64_t size = io_generic_size(io);
+	uint64_t size;
+	if (io.length(size))
+	{
+		track_count = head_count = sector_count = 0;
+		return;
+	}
 
 	switch (size)
 	{
@@ -108,7 +113,7 @@ void dvk_mx_format::find_size(io_generic *io, uint8_t &track_count, uint8_t &hea
 	}
 }
 
-int dvk_mx_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int dvk_mx_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t track_count, head_count, sector_count;
 
@@ -117,7 +122,8 @@ int dvk_mx_format::identify(io_generic *io, uint32_t form_factor, const std::vec
 	if (track_count)
 	{
 		uint8_t sectdata[512];
-		io_generic_read(io, sectdata, 512, 512);
+		size_t actual;
+		io.read_at(512, sectdata, 512, actual);
 		// check value in RT-11 home block.  see src/tools/imgtool/modules/rt11.cpp
 		if (pick_integer_le(sectdata, 0724, 2) == 6)
 			return 100;
@@ -129,7 +135,7 @@ int dvk_mx_format::identify(io_generic *io, uint32_t form_factor, const std::vec
 	return 0;
 }
 
-bool dvk_mx_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool dvk_mx_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint8_t track_count, head_count, sector_count;
 
@@ -150,7 +156,8 @@ bool dvk_mx_format::load(io_generic *io, uint32_t form_factor, const std::vector
 	{
 		for (int head = 0; head < head_count; head++)
 		{
-			io_generic_read(io, sectdata, (track * head_count + head) * track_size, track_size);
+			size_t actual;
+			io.read_at((track * head_count + head) * track_size, sectdata, track_size, actual);
 			generate_track(dvk_mx_new_desc, track, head, sectors, sector_count, 45824, image);
 		}
 	}

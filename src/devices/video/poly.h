@@ -50,19 +50,32 @@
 //  CONSTANTS
 //**************************************************************************
 
-static constexpr u8 POLY_FLAG_INCLUDE_BOTTOM_EDGE = 0x01;
-static constexpr u8 POLY_FLAG_INCLUDE_RIGHT_EDGE  = 0x02;
-static constexpr u8 POLY_FLAG_NO_WORK_QUEUE       = 0x04;
-static constexpr u8 POLY_FLAG_NO_CLIPPING         = 0x08;
+static constexpr u8 POLY_FLAG_NO_WORK_QUEUE       = 0x01;
+static constexpr u8 POLY_FLAG_NO_CLIPPING         = 0x02;
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// base class for poly_array
+class poly_array_base
+{
+public:
+	// construction
+	poly_array_base() { }
+
+	// destruction
+	virtual ~poly_array_base() { }
+
+	// reset
+	virtual void reset() = 0;
+};
+
+
 // class for managing an array of items
 template<class ArrayType, int TrackingCount>
-class poly_array
+class poly_array : public poly_array_base
 {
 public:
 	// this is really architecture-specific, but 64 is a reasonable
@@ -95,7 +108,7 @@ public:
 	}
 
 	// destruction
-	~poly_array() { m_base = nullptr; }
+	virtual ~poly_array() { m_base = nullptr; }
 
 	// getters
 	u32 count() const { return m_next; }
@@ -106,6 +119,7 @@ public:
 	// return an item by index
 	ArrayType &byindex(u32 index)
 	{
+		assert(index < m_next);
 		if (index < m_allocated)
 			return *item_ptr(index);
 		assert(m_chain);
@@ -115,6 +129,8 @@ public:
 	// return a contiguous chunk of items
 	ArrayType *contiguous(u32 index, u32 count, u32 &chunk)
 	{
+		assert(index < m_next);
+		assert(index + count <= m_next);
 		if (index < m_allocated)
 		{
 			chunk = std::min(count, m_allocated - index);
@@ -135,7 +151,7 @@ public:
 	}
 
 	// operations
-	void reset()
+	virtual void reset() override
 	{
 		m_next = 0;
 
@@ -151,7 +167,7 @@ public:
 	}
 
 	// allocate a return a new item
-	ArrayType &next(int index = 0)
+	ArrayType &next(int tracking_index = 0)
 	{
 		// track the maximum
 		if (m_next > m_max)
@@ -174,24 +190,25 @@ public:
 		m_next++;
 		if (TrackingCount > 0)
 		{
-			assert(index < TrackingCount);
-			m_last[index] = item;
+			assert(tracking_index < TrackingCount);
+			m_last[tracking_index] = item;
 		}
 		return *item;
 	}
 
 	// return the last
-	ArrayType &last(int index = 0) const
+	ArrayType &last(int tracking_index = 0) const
 	{
-		assert(index < TrackingCount);
-		assert(m_last[index] != nullptr);
-		return *m_last[index];
+		assert(tracking_index < TrackingCount);
+		assert(m_last[tracking_index] != nullptr);
+		return *m_last[tracking_index];
 	}
 
 private:
 	// internal helper to make size pointers
 	ArrayType *item_ptr(u32 index)
 	{
+		assert(index < m_allocated);
 		return reinterpret_cast<ArrayType *>(m_base + index * ITEM_SIZE);
 	}
 
@@ -219,13 +236,13 @@ private:
 	// repopulate items
 	void repopulate()
 	{
-		for (int index = 0; index < TrackingCount; index++)
-			if (m_last[index] != nullptr)
+		for (int tracking_index = 0; tracking_index < TrackingCount; tracking_index++)
+			if (m_last[tracking_index] != nullptr)
 			{
-				if (m_last[index] == item_ptr(m_next))
+				if (m_last[tracking_index] == item_ptr(m_next))
 					m_next++;
 				else
-					next(index) = *m_last[index];
+					next(tracking_index) = *m_last[tracking_index];
 			}
 	}
 
@@ -252,7 +269,7 @@ public:
 		vertex_t(BaseType _x, BaseType _y) { x = _x; y = _y; }
 
 		BaseType x, y;                          // X, Y coordinates
-		std::array<BaseType, MaxParams> p;      // interpolated parameters
+		std::array<BaseType, MaxParams> p;      // iterated parameters
 	};
 
 	// a single extent describes a span and a list of parameter extents
@@ -269,21 +286,23 @@ public:
 	};
 
 	// delegate type for scanline callbacks
-	typedef delegate<void (int32_t, const extent_t &, const ObjectType &, int)> render_delegate;
+	using render_delegate = delegate<void (int32_t, extent_t const &, ObjectType const &, int)>;
+
+	// poly_array of object data
+	using objectdata_array = poly_array<ObjectType, 1>;
 
 	// construction/destruction
 	poly_manager(running_machine &machine);
 	virtual ~poly_manager();
 
-	// getters
-	uint32_t triangles_drawn() const { return m_triangles; }
-
 	// synchronization
-	void wait(const char *debug_reason = "general");
+	void wait(char const *debug_reason = "general");
 
-	// object data allocators
-	ObjectType &object_data_alloc();
-	ObjectType &object_data_last() const { return m_object.last(); }
+	// return a reference to our ObjectType poly_array
+	objectdata_array &object_data() { return m_object; }
+
+	// register a poly_array to be reset after a wait
+	void register_poly_array(poly_array_base &array) { m_arrays.push_back(&array); }
 
 	// tiles
 	template<int ParamCount>
@@ -296,19 +315,18 @@ public:
 	uint32_t render_triangle_fan(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v);
 	template<int ParamCount>
 	uint32_t render_triangle_strip(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v);
-	uint32_t render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents);
 
 	// polygons
 	template<int NumVerts, int ParamCount>
-	uint32_t render_polygon(const rectangle &cliprect, render_delegate callback, const vertex_t *v);
+	uint32_t render_polygon(rectangle const &cliprect, render_delegate callback, vertex_t const *v);
+
+	// direct custom extents
+	template<int ParamCount>
+	uint32_t render_extents(rectangle const &cliprect, render_delegate callback, int startscanline, int numscanlines, extent_t const *extents);
 
 	// public helpers
 	template<int ParamCount>
-	int zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, BaseType clipval);
-
-protected:
-	// optional overrides
-	virtual void reset_after_wait() { }
+	int zclip_if_less(int numverts, vertex_t const *v, vertex_t *outv, BaseType clipval);
 
 private:
 	// number of profiling ticks before we consider a wait "long"
@@ -317,8 +335,8 @@ private:
 	static constexpr int SCANLINES_PER_BUCKET = 32;
 	static constexpr int TOTAL_BUCKETS        = (512 / SCANLINES_PER_BUCKET);
 
-	// polygon_info describes a single polygon, which includes the poly_params
-	struct polygon_info
+	// primitive_info describes a single primitive
+	struct primitive_info
 	{
 		poly_manager *      m_owner;                // pointer back to the poly manager
 		ObjectType *        m_object;               // object data pointer
@@ -335,15 +353,14 @@ private:
 		}
 
 		std::atomic<uint32_t> count_next;             // number of scanlines and index of next item to process
-		polygon_info *        polygon;                // pointer to polygon
+		primitive_info *      primitive;              // pointer to primitive
 		int32_t               scanline;               // starting scanline
 		uint32_t              previtem;               // index of previous item in the same bucket
 		extent_t              extent[SCANLINES_PER_BUCKET]; // array of scanline extents
 	};
 
 	// internal array types
-	using polygon_array = poly_array<polygon_info, 0>;
-	using objectdata_array = poly_array<ObjectType, 1>;
+	using primitive_array = poly_array<primitive_info, 0>;
 	using unit_array = poly_array<work_unit, 0>;
 
 	// round in a cross-platform consistent manner
@@ -356,14 +373,14 @@ private:
 	}
 
 	// internal helpers
-	polygon_info &polygon_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
+	primitive_info &primitive_alloc(int minx, int maxx, int miny, int maxy, render_delegate callback)
 	{
 		// return and initialize the next one
-		polygon_info &polygon = m_polygon.next();
-		polygon.m_owner = this;
-		polygon.m_object = &object_data_last();
-		polygon.m_callback = callback;
-		return polygon;
+		primitive_info &primitive = m_primitive.next();
+		primitive.m_owner = this;
+		primitive.m_object = &m_object.last();
+		primitive.m_callback = callback;
+		return primitive;
 	}
 
 	// enqueue work items in contiguous chunks
@@ -390,9 +407,10 @@ private:
 	osd_work_queue *m_queue;               // work queue
 
 	// arrays
-	polygon_array m_polygon;               // array of polygons
+	primitive_array m_primitive;           // array of primitives
 	objectdata_array m_object;             // array of object data
 	unit_array m_unit;                     // array of work units
+	std::vector<poly_array_base *> m_arrays; // list of arrays we are managing
 
 	// buckets
 	uint32_t m_unit_bucket[TOTAL_BUCKETS]; // buckets for tracking unit usage
@@ -400,7 +418,7 @@ private:
 	// statistics
 	uint32_t m_tiles;                       // number of tiles queued
 	uint32_t m_triangles;                   // number of triangles queued
-	uint32_t m_quads;                       // number of quads queued
+	uint32_t m_polygons;                    // number of polygons queued
 	uint64_t m_pixels;                      // number of pixels rendered
 #if KEEP_POLY_STATISTICS
 	uint32_t m_conflicts[WORK_MAX_THREADS] = { 0 }; // number of conflicts found, per thread
@@ -448,14 +466,20 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::poly_manager(running_machi
 	m_queue(nullptr),
 	m_tiles(0),
 	m_triangles(0),
-	m_quads(0),
+	m_polygons(0),
 	m_pixels(0)
 {
 	// create the work queue
 	if (!(Flags & POLY_FLAG_NO_WORK_QUEUE))
 		m_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 
+	// initialize the buckets to empty
 	std::fill_n(&m_unit_bucket[0], std::size(m_unit_bucket), 0xffffffff);
+
+	// register our arrays for reset
+	register_poly_array(m_primitive);
+	register_poly_array(m_object);
+	register_poly_array(m_unit);
 
 	// request a pre-save callback for synchronization
 	machine.save().register_presave(save_prepost_delegate(FUNC(poly_manager::presave), this));
@@ -504,7 +528,7 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 
 	// output global stats
 	osd_printf_info("Total triangles = %d\n", m_triangles);
-	osd_printf_info("Total quads = %d\n", m_quads);
+	osd_printf_info("Total polygons = %d\n", m_polygons);
 	if (m_pixels > 1000000000)
 		osd_printf_info("Total pixels   = %d%09d\n", uint32_t(m_pixels / 1000000000), uint32_t(m_pixels % 1000000000));
 	else
@@ -512,7 +536,7 @@ poly_manager<BaseType, ObjectType, MaxParams, Flags>::~poly_manager()
 
 	osd_printf_info("Conflicts:   %d resolved, %d total\n", resolved, conflicts);
 	osd_printf_info("Units:       %5d used, %5d allocated, %4d bytes each, %7d total\n", m_unit.max(), m_unit.allocated(), int(m_unit.itemsize()), int(m_unit.allocated() * m_unit.itemsize()));
-	osd_printf_info("Polygons:    %5d used, %5d allocated, %4d bytes each, %7d total\n", m_polygon.max(), m_polygon.allocated(), int(m_polygon.itemsize()), int(m_polygon.allocated() * m_polygon.itemsize()));
+	osd_printf_info("Primitives:  %5d used, %5d allocated, %4d bytes each, %7d total\n", m_primitive.max(), m_primitive.allocated(), int(m_primitive.itemsize()), int(m_primitive.allocated() * m_primitive.itemsize()));
 	osd_printf_info("Object data: %5d used, %5d allocated, %4d bytes each, %7d total\n", m_object.max(), m_object.allocated(), int(m_object.itemsize()), int(m_object.allocated() * m_object.itemsize()));
 }
 #endif
@@ -564,17 +588,17 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 	while (1)
 	{
 		work_unit &unit = *(work_unit *)param;
-		polygon_info &polygon = *unit.polygon;
+		primitive_info &primitive = *unit.primitive;
 		int count = unit.count_next & 0xff;
 		uint32_t orig_count_next;
 
 		// if our previous item isn't done yet, enqueue this item to the end and proceed
 		if (unit.previtem != 0xffffffff)
 		{
-			work_unit &prevunit = polygon.m_owner->m_unit.byindex(unit.previtem);
+			work_unit &prevunit = primitive.m_owner->m_unit.byindex(unit.previtem);
 			if (prevunit.count_next != 0)
 			{
-				uint32_t unitnum = polygon.m_owner->m_unit.indexof(unit);
+				uint32_t unitnum = primitive.m_owner->m_unit.indexof(unit);
 				uint32_t new_count_next;
 
 				// attempt to atomically swap in this new value
@@ -586,9 +610,9 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 
 #if KEEP_POLY_STATISTICS
 				// track resolved conflicts
-				polygon.m_owner->m_conflicts[threadid]++;
+				primitive.m_owner->m_conflicts[threadid]++;
 				if (orig_count_next != 0)
-					polygon.m_owner->m_resolved[threadid]++;
+					primitive.m_owner->m_resolved[threadid]++;
 #endif
 				// if we succeeded, skip out early so we can do other work
 				if (orig_count_next != 0)
@@ -598,7 +622,7 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 
 		// iterate over extents
 		for (int curscan = 0; curscan < count; curscan++)
-			polygon.m_callback(unit.scanline + curscan, unit.extent[curscan], *polygon.m_object, threadid);
+			primitive.m_callback(unit.scanline + curscan, unit.extent[curscan], *primitive.m_object, threadid);
 
 		// set our count to 0 and re-fetch the original count value
 		do
@@ -610,7 +634,7 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 		orig_count_next >>= 8;
 		if (orig_count_next == 0)
 			break;
-		param = &polygon.m_owner->m_unit.byindex(orig_count_next);
+		param = &primitive.m_owner->m_unit.byindex(orig_count_next);
 	}
 	return nullptr;
 }
@@ -621,7 +645,7 @@ void *poly_manager<BaseType, ObjectType, MaxParams, Flags>::work_item_callback(v
 //-------------------------------------------------
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
-void poly_manager<BaseType, ObjectType, MaxParams, Flags>::wait(const char *debug_reason)
+void poly_manager<BaseType, ObjectType, MaxParams, Flags>::wait(char const *debug_reason)
 {
 	// early out if no units outstanding
 	if (m_unit.count() == 0)
@@ -645,27 +669,12 @@ void poly_manager<BaseType, ObjectType, MaxParams, Flags>::wait(const char *debu
 	m_waitmap[debug_reason].update(items, get_profile_ticks() - time);
 #endif
 
-	// reset all the poly arrays
-	m_polygon.reset();
-	m_unit.reset();
-	m_object.reset();
-
 	// clear the buckets
 	std::fill_n(&m_unit_bucket[0], std::size(m_unit_bucket), 0xffffffff);
 
-	// allow derived classes to do additional cleanup
-	reset_after_wait();
-}
-
-
-//-------------------------------------------------
-//  object_data_alloc - allocate a new ObjectType
-//-------------------------------------------------
-
-template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
-ObjectType &poly_manager<BaseType, ObjectType, MaxParams, Flags>::object_data_alloc()
-{
-	return m_object.next();
+	// reset all the poly arrays
+	for (auto array : m_arrays)
+		array->reset();
 }
 
 
@@ -677,8 +686,8 @@ template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
 uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(rectangle const &cliprect, render_delegate callback, vertex_t const &_v1, vertex_t const &_v2)
 {
-	const vertex_t *v1 = &_v1;
-	const vertex_t *v2 = &_v2;
+	vertex_t const *v1 = &_v1;
+	vertex_t const *v2 = &_v2;
 
 	// first sort by Y
 	if (v2->y < v1->y)
@@ -690,7 +699,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 
 	// clip coordinates
 	int32_t v1yclip = v1y;
-	int32_t v2yclip = v2y + ((Flags & POLY_FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
+	int32_t v2yclip = v2y;
 	if (!(Flags & POLY_FLAG_NO_CLIPPING))
 	{
 		v1yclip = std::max(v1yclip, cliprect.top());
@@ -705,8 +714,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 	if (minx > maxx)
 		return 0;
 
-	// allocate and populate a new polygon
-	polygon_info &polygon = polygon_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v2yclip, callback);
+	// allocate and populate a new primitive
+	primitive_info &primitive = primitive_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v2yclip, callback);
 
 	// compute parameter deltas
 	std::array<BaseType, ParamCount> param_dpdx;
@@ -729,10 +738,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 	// force start < stop
 	if (istartx > istopx)
 		std::swap(istartx, istopx);
-
-	// include the right edge if requested
-	if (Flags & POLY_FLAG_INCLUDE_RIGHT_EDGE)
-		istopx++;
 
 	// apply left/right clipping
 	if (!(Flags & POLY_FLAG_NO_CLIPPING))
@@ -757,7 +762,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_tile(recta
 		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
-		unit.polygon = &polygon;
+		unit.primitive = &primitive;
 		unit.count_next = std::min(v2yclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
@@ -805,9 +810,9 @@ template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
 uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(const rectangle &cliprect, render_delegate callback, const vertex_t &_v1, const vertex_t &_v2, const vertex_t &_v3)
 {
-	const vertex_t *v1 = &_v1;
-	const vertex_t *v2 = &_v2;
-	const vertex_t *v3 = &_v3;
+	vertex_t const *v1 = &_v1;
+	vertex_t const *v2 = &_v2;
+	vertex_t const *v3 = &_v3;
 
 	// first sort by Y
 	if (v2->y < v1->y)
@@ -825,7 +830,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 
 	// clip coordinates
 	int32_t v1yclip = v1y;
-	int32_t v3yclip = v3y + ((Flags & POLY_FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
+	int32_t v3yclip = v3y;
 	if (!(Flags & POLY_FLAG_NO_CLIPPING))
 	{
 		v1yclip = std::max(v1yclip, cliprect.top());
@@ -838,8 +843,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 	BaseType minx = std::min(std::min(v1->x, v2->x), v3->x);
 	BaseType maxx = std::max(std::max(v1->x, v2->x), v3->x);
 
-	// allocate and populate a new polygon
-	polygon_info &polygon = polygon_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v3yclip, callback);
+	// allocate and populate a new primitive
+	primitive_info &primitive = primitive_alloc(round_coordinate(minx), round_coordinate(maxx), v1yclip, v3yclip, callback);
 
 	// compute the slopes for each portion of the triangle
 	BaseType dxdy_v1v2 = (v2->y == v1->y) ? BaseType(0.0) : (v2->x - v1->x) / (v2->y - v1->y);
@@ -898,7 +903,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
-		unit.polygon = &polygon;
+		unit.primitive = &primitive;
 		unit.count_next = std::min(v3yclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
@@ -923,10 +928,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 			// force start < stop
 			if (istartx > istopx)
 				std::swap(istartx, istopx);
-
-			// include the right edge if requested
-			if (Flags & POLY_FLAG_INCLUDE_RIGHT_EDGE)
-				istopx++;
 
 			// apply left/right clipping
 			if (!(Flags & POLY_FLAG_NO_CLIPPING))
@@ -970,7 +971,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle(c
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_fan(const rectangle &cliprect, render_delegate callback, int numverts, const vertex_t *v)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_fan(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v)
 {
 	// iterate over vertices
 	uint32_t pixels = 0;
@@ -987,7 +988,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_f
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_strip(const rectangle &cliprect, render_delegate callback, int numverts, const vertex_t *v)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_strip(rectangle const &cliprect, render_delegate callback, int numverts, vertex_t const *v)
 {
 	// iterate over vertices
 	uint32_t pixels = 0;
@@ -998,12 +999,13 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_s
 
 
 //-------------------------------------------------
-//  render_triangle_custom - perform a custom
-//  render of an object, given specific extents
+//  render_extents - perform a custom render of
+//  an object, given specific extents
 //-------------------------------------------------
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_custom(const rectangle &cliprect, render_delegate callback, int startscanline, int numscanlines, const extent_t *extents)
+template<int ParamCount>
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_extents(rectangle const &cliprect, render_delegate callback, int startscanline, int numscanlines, extent_t const *extents)
 {
 	// clip coordinates
 	int32_t v1yclip = startscanline;
@@ -1016,8 +1018,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 			return 0;
 	}
 
-	// allocate and populate a new polygon
-	polygon_info &polygon = polygon_alloc(0, 0, v1yclip, v3yclip, callback);
+	// allocate and populate a new primitive
+	primitive_info &primitive = primitive_alloc(0, 0, v1yclip, v3yclip, callback);
 
 	// compute the X extents for each scanline
 	int32_t pixels = 0;
@@ -1033,7 +1035,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
-		unit.polygon = &polygon;
+		unit.primitive = &primitive;
 		unit.count_next = std::min(v3yclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
@@ -1042,7 +1044,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 		// iterate over extents
 		for (int extnum = 0; extnum < unit.count_next; extnum++)
 		{
-			const extent_t &srcextent = extents[(curscan + extnum) - startscanline];
+			extent_t const &srcextent = extents[(curscan + extnum) - startscanline];
 			int32_t istartx = srcextent.startx, istopx = srcextent.stopx;
 
 			// apply left/right clipping
@@ -1060,7 +1062,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 			extent.stopx = istopx;
 
 			// fill in the parameters for the extent
-			for (int paramnum = 0; paramnum < MaxParams; paramnum++)
+			for (int paramnum = 0; paramnum < ParamCount; paramnum++)
 			{
 				extent.param[paramnum].start = srcextent.param[paramnum].start;
 				extent.param[paramnum].dpdx = srcextent.param[paramnum].dpdx;
@@ -1091,7 +1093,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_triangle_c
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int NumVerts, int ParamCount>
-uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(const rectangle &cliprect, render_delegate callback, const vertex_t *v)
+uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(rectangle const &cliprect, render_delegate callback, vertex_t const *v)
 {
 	// determine min/max Y vertices
 	BaseType minx = v[0].x;
@@ -1114,7 +1116,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 
 	// clip coordinates
 	int32_t minyclip = miny;
-	int32_t maxyclip = maxy + ((Flags & POLY_FLAG_INCLUDE_BOTTOM_EDGE) ? 1 : 0);
+	int32_t maxyclip = maxy;
 	if (!(Flags & POLY_FLAG_NO_CLIPPING))
 	{
 		minyclip = std::max(minyclip, cliprect.top());
@@ -1123,16 +1125,16 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 			return 0;
 	}
 
-	// allocate a new polygon
-	polygon_info &polygon = polygon_alloc(round_coordinate(minx), round_coordinate(maxx), minyclip, maxyclip, callback);
+	// allocate a new primitive
+	primitive_info &primitive = primitive_alloc(round_coordinate(minx), round_coordinate(maxx), minyclip, maxyclip, callback);
 
 	// walk forward to build up the forward edge list
 	struct poly_edge
 	{
 		poly_edge *next;                       // next edge in sequence
 		int index;                             // index of this edge
-		const vertex_t *v1;                    // pointer to first vertex
-		const vertex_t *v2;                    // pointer to second vertex
+		vertex_t const *v1;                    // pointer to first vertex
+		vertex_t const *v2;                    // pointer to second vertex
 		BaseType dxdy;                         // dx/dy along the edge
 		std::array<BaseType, MaxParams> dpdy;  // per-parameter dp/dy values
 	};
@@ -1180,7 +1182,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 	// determine which list is left/right:
 	// if the first vertex is shared, compare the slopes
 	// if the first vertex is not shared, compare the X coordinates
-	const poly_edge *ledge, *redge;
+	poly_edge const *ledge, *redge;
 	if ((fedgelist[0].v1 == bedgelist[0].v1 && fedgelist[0].dxdy < bedgelist[0].dxdy) ||
 		(fedgelist[0].v1 != bedgelist[0].v1 && fedgelist[0].v1->x < bedgelist[0].v1->x))
 	{
@@ -1207,7 +1209,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 		scaninc = SCANLINES_PER_BUCKET - uint32_t(curscan) % SCANLINES_PER_BUCKET;
 
 		// fill in the work unit basics
-		unit.polygon = &polygon;
+		unit.primitive = &primitive;
 		unit.count_next = std::min(maxyclip - curscan, scaninc);
 		unit.scanline = curscan;
 		unit.previtem = m_unit_bucket[bucketnum];
@@ -1249,10 +1251,6 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 				}
 			}
 
-			// include the right edge if requested
-			if (Flags & POLY_FLAG_INCLUDE_RIGHT_EDGE)
-				istopx++;
-
 			// apply left/right clipping
 			if (!(Flags & POLY_FLAG_NO_CLIPPING))
 			{
@@ -1278,8 +1276,8 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 	// enqueue the work items
 	queue_items(startunit);
 
-	// return the total number of pixels in the triangle
-	m_quads++;
+	// return the total number of pixels in the polygon
+	m_polygons++;
 	m_pixels += pixels;
 	return pixels;
 }
@@ -1292,7 +1290,7 @@ uint32_t poly_manager<BaseType, ObjectType, MaxParams, Flags>::render_polygon(co
 
 template<typename BaseType, class ObjectType, int MaxParams, u8 Flags>
 template<int ParamCount>
-int poly_manager<BaseType, ObjectType, MaxParams, Flags>::zclip_if_less(int numverts, const vertex_t *v, vertex_t *outv, BaseType clipval)
+int poly_manager<BaseType, ObjectType, MaxParams, Flags>::zclip_if_less(int numverts, vertex_t const *v, vertex_t *outv, BaseType clipval)
 {
 	bool prevclipped = (v[numverts - 1].p[0] < clipval);
 	vertex_t *nextout = outv;
@@ -1305,8 +1303,8 @@ int poly_manager<BaseType, ObjectType, MaxParams, Flags>::zclip_if_less(int numv
 		// if we switched from clipped to non-clipped, interpolate a vertex
 		if (thisclipped != prevclipped)
 		{
-			const vertex_t &v1 = v[(vertnum == 0) ? (numverts - 1) : (vertnum - 1)];
-			const vertex_t &v2 = v[vertnum];
+			vertex_t const &v1 = v[(vertnum == 0) ? (numverts - 1) : (vertnum - 1)];
+			vertex_t const &v2 = v[vertnum];
 			BaseType frac = (clipval - v1.p[0]) / (v2.p[0] - v1.p[0]);
 			nextout->x = v1.x + frac * (v2.x - v1.x);
 			nextout->y = v1.y + frac * (v2.y - v1.y);

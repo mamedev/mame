@@ -25,6 +25,7 @@ public:
 	void *get_ptr(offs_t offset) const override;
 	void lookup(offs_t address, offs_t &start, offs_t &end, handler_entry_write<Width, AddrShift> *&handler) const override;
 
+	offs_t dispatch_entry(offs_t address) const override;
 	void dump_map(std::vector<memory_entry> &map) const override;
 
 	std::string name() const override;
@@ -44,7 +45,7 @@ public:
 	const handler_entry_write<Width, AddrShift> *const *get_dispatch() const override;
 	void select_a(int slot) override;
 	void select_u(int slot) override;
-	void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges) override;
+	void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges) override;
 	handler_entry_write<Width, AddrShift> *dup() override;
 
 private:

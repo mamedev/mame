@@ -94,7 +94,15 @@ static const u32 size_mask[] = { 0x000000ffU, 0x0000ffffU, 0x00000000U, 0xffffff
 template <int Width>ns32000_device<Width>::ns32000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int databits, int addrbits)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
-	, m_interrupt_config("interrupt", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_iam_config("iam", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_iac_config("iac", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_eim_config("eim", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_eic_config("eic", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_sif_config("sif", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_nif_config("nif", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_odt_config("odt", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_rmw_config("rmw", ENDIANNESS_LITTLE, databits, addrbits, 0)
+	, m_ear_config("ear", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_fpu(*this, finder_base::DUMMY_TAG)
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 	, m_icount(0)
@@ -3327,15 +3335,15 @@ template <int Width> device_memory_interface::space_config_vector ns32000_device
 	return space_config_vector{
 		std::make_pair(AS_PROGRAM, &m_program_config),
 
-		std::make_pair(ST_IAM, &m_interrupt_config),
-		std::make_pair(ST_IAC, &m_interrupt_config),
-		std::make_pair(ST_EIM, &m_interrupt_config),
-		std::make_pair(ST_EIC, &m_interrupt_config),
-		std::make_pair(ST_SIF, &m_program_config),
-		std::make_pair(ST_NIF, &m_program_config),
-		std::make_pair(ST_ODT, &m_program_config),
-		std::make_pair(ST_RMW, &m_program_config),
-		std::make_pair(ST_EAR, &m_program_config),
+		std::make_pair(ST_IAM, &m_iam_config),
+		std::make_pair(ST_IAC, &m_iac_config),
+		std::make_pair(ST_EIM, &m_eim_config),
+		std::make_pair(ST_EIC, &m_eic_config),
+		std::make_pair(ST_SIF, &m_sif_config),
+		std::make_pair(ST_NIF, &m_nif_config),
+		std::make_pair(ST_ODT, &m_odt_config),
+		std::make_pair(ST_RMW, &m_rmw_config),
+		std::make_pair(ST_EAR, &m_ear_config),
 	};
 }
 

@@ -852,8 +852,8 @@ void ladybug_state::ladybug(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn1", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SN76489(config, "sn2", 4_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void dorodon_state::dorodon(machine_config &config)
@@ -893,11 +893,11 @@ void mrsdyna_state::mrsdyna(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
 }
 
 void sraider_state::sraider(machine_config &config)
@@ -931,11 +931,11 @@ void sraider_state::sraider(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489(config, "sn1", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn2", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn3", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn4", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
+	SN76489(config, "sn5", 4000000).add_route(ALL_OUTPUTS, "mono", 0.2);
 }
 
 

@@ -22,18 +22,22 @@ ToDo:
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
+#include "imagedev/cassette.h"
 #include "machine/k7659kb.h"
 #include "machine/ram.h"
 #include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
 #include "machine/z80pio.h"
-#include "imagedev/cassette.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class llc2_state : public driver_device
 {
@@ -55,9 +59,11 @@ public:
 
 	void init_llc2();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	void machine_start() override;
-	void machine_reset() override;
 	void rom_disable_w(u8 data);
 	void basic_enable_w(u8 data);
 	u8 port1b_r();
@@ -83,8 +89,8 @@ private:
 /* Address maps */
 void llc2_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bankr0").bankw("bankw0");
-	map(0x4000, 0x5fff).bankr("bankr1").bankw("bankw1");
+	map(0x0000, 0x3fff).bankr(m_bankr[0]).bankw(m_bankw[0]);
+	map(0x4000, 0x5fff).bankr(m_bankr[1]).bankw(m_bankw[1]);
 	map(0x6000, 0xbfff).ram();
 	map(0xc000, 0xffff).ram().share("videoram");
 }
@@ -293,6 +299,8 @@ ROM_START( llc2 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD ("llc2font.d17",   0x0000, 0x0800, CRC(ce53e55d) SHA1(da23d93f14a8a1f8d82bb72470a96b0bfd81ed1b) )
 ROM_END
+
+} // anonymous namespace
 
 
 /* Driver */

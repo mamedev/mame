@@ -7,7 +7,7 @@ do
 		if not buttonchar then buttonchar = require("data/button_char") end
 		return buttonchar(str)
 	end
-	datread, ver = datread.open("command.dat", "# Version:", convert)
+	datread, ver = datread.open("command.dat", "#[^V]*Ver[^.:]*[.:]", convert)
 end
 
 function dat.check(set, softlist)
@@ -19,7 +19,6 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	info = "#jf\n" .. info
 	return _("Command")
 end
 

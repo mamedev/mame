@@ -123,7 +123,7 @@ tt5665_device::tt5665_device(const machine_config &mconfig, const char *tag, dev
 	, device_rom_interface(mconfig, *this)
 	, m_ss_state(~u8(0))
 	, m_s0_s1_state(0)
-	, m_command(-1)
+	, m_command{-1,-1}
 	, m_stream(nullptr)
 	, m_daol_output(0.0)
 	, m_daol_timing(0)
@@ -290,14 +290,15 @@ void tt5665_device::set_s0_s1(int s0_s1)
 //  read - read the status register
 //-------------------------------------------------
 
-u8 tt5665_device::read()
+u8 tt5665_device::read(offs_t offset)
 {
+	const u8 ch = offset & 1;
 	u8 result = 0xf0;    // naname expects bits 4-7 to be 1
 
 	// set the bit to 1 if something is playing on a given channel
 	m_stream->update();
 	for (int voicenum = 0; voicenum < TT5665_VOICES; voicenum++)
-		if (m_voice[voicenum].m_playing || m_voice[voicenum + 4].m_playing) // TODO: all or DAOL/DAOR only?
+		if (m_voice[voicenum + (ch * 4)].m_playing)
 			result |= 1 << voicenum;
 
 	return result;
@@ -308,84 +309,77 @@ u8 tt5665_device::read()
 //  write - write to the command register
 //-------------------------------------------------
 
-void tt5665_device::write(u8 command)
+void tt5665_device::write(offs_t offset, u8 data)
 {
-	// if a command is pending, process the second half
-	if (m_command != -1)
+	const u8 ch = offset & 1;
+	if (m_command[ch] != -1) // if a command is pending, process the second half
 	{
 		// the chip can only play one voice at a time, but has extra phrase spaces. that's are main difference from MSM 6295.
-		int voicemask = (command >> 4) & 3;
-		int basemask = (command >> 6) & 3;
+		const int voicemask = (data >> 4) & 3;
+		const int basemask = (data >> 6) & 3;
 
 		// update the stream
 		m_stream->update();
 
 		// determine which voice
-		for (int b = 0; b < 2; b++)
+		tt5665_voice &voice = m_voice[voicemask + (ch * 4)];
+
+		const int sample_ind = (basemask << 7) | m_command[ch];
+		if (!voice.m_playing) // TODO: Same as MSM6295?
 		{
-			tt5665_voice &voice = m_voice[voicemask + (b * 4)];
+			// determine the start/stop positions
+			const offs_t base = sample_ind * 8;
 
-			const int sample_ind = (basemask << 7) | m_command;
-			if (!voice.m_playing) // TODO: Same as MSM6295?
+			offs_t start = read_byte(base + 0) << 16;
+			start |= read_byte(base + 1) << 8;
+			start |= read_byte(base + 2) << 0;
+			start &= 0xffffff;
+
+			offs_t stop = read_byte(base + 3) << 16;
+			stop |= read_byte(base + 4) << 8;
+			stop |= read_byte(base + 5) << 0;
+			stop &= 0xffffff;
+
+			if (start < stop)
 			{
-				// determine the start/stop positions
-				offs_t base = sample_ind * 8;
+				// set up the voice to play this sample
+				voice.m_playing = true;
+				voice.m_base_offset = start;
+				voice.m_sample = 0;
+				voice.m_count = 2 * (stop - start + 1);
 
-				offs_t start = read_byte(base + 0) << 16;
-				start |= read_byte(base + 1) << 8;
-				start |= read_byte(base + 2) << 0;
-				start &= 0xffffff;
-
-				offs_t stop = read_byte(base + 3) << 16;
-				stop |= read_byte(base + 4) << 8;
-				stop |= read_byte(base + 5) << 0;
-				stop &= 0xffffff;
-
-				if (start < stop)
-				{
-					// set up the voice to play this sample
-					voice.m_playing = true;
-					voice.m_base_offset = start;
-					voice.m_sample = 0;
-					voice.m_count = 2 * (stop - start + 1);
-
-					// also reset the ADPCM parameters
-					voice.m_adpcm.reset();
-					voice.m_volume = s_volume_table[command & 0x0f];
-				}
-
-				// invalid samples go here
-				else
-				{
-					logerror("Requested to play invalid sample %04x\n", sample_ind);
-				}
+				// also reset the ADPCM parameters
+				voice.m_adpcm.reset();
+				voice.m_volume = s_volume_table[data & 0x0f];
 			}
 			else
 			{
-				logerror("Requested to play sample %04x on non-stopped voice\n", sample_ind);
+				// invalid samples go here
+				logerror("Requested to play invalid sample %04x\n", sample_ind);
 			}
-
-			// reset the command
-			m_command = -1;
 		}
+		else
+		{
+			logerror("Requested to play sample %04x on non-stopped voice\n", sample_ind);
+		}
+
+		// reset the command
+		m_command[ch] = -1;
 	}
-
-	// if this is the start of a command, remember the sample number for next time
-	else if (command & 0x80)
-		m_command = command & 0x7f;
-
-	// otherwise, see if this is a silence command
-	else
+	else if (data & 0x80) // if this is the start of a command, remember the sample number for next time
+	{
+		m_command[ch] = data & 0x7f;
+	}
+	else // otherwise, see if this is a silence command
 	{
 		// update the stream, then turn it off
 		m_stream->update();
 
 		// determine which voice(s) (voice is set by a 1 bit in bits 3-6 of the command
-		int voicemask = command >> 3;
+		int voicemask = data >> 3;
 		for (int voicenum = 0; voicenum < TT5665_VOICES; voicenum++, voicemask >>= 1)
 			if (voicemask & 1)
-				for (int b = 0; b < 2; b++)
-					m_voice[voicenum + (b * 4)].m_playing = false;
+				m_voice[voicenum + (ch * 4)].m_playing = false;
 	}
 }
 
@@ -421,7 +415,7 @@ void tt5665_device::tt5665_voice::generate_adpcm(device_rom_interface &rom, s32 
 		return;
 
 	// fetch the next sample byte
-	int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
+	const int nibble = rom.read_byte(m_base_offset + m_sample / 2) >> (((m_sample & 1) << 2) ^ 4);
 
 	// output to the buffer, scaling by the volume
 	// signal in range -2048..2047; 12 bit built-in DAC

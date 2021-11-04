@@ -131,6 +131,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 
 
 #include "emu.h"
+
 #include "bus/isa/trident.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
@@ -141,6 +142,7 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "video/pc_vga.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -152,6 +154,7 @@ class calchase_state : public pcat_base_state
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag)
+		, m_iocard(*this, "IOCARD%u", 1U)
 	{
 	}
 
@@ -165,6 +168,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
+	required_ioport_array<5> m_iocard;
 	std::unique_ptr<uint32_t[]> m_bios_ram;
 	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
@@ -176,11 +180,7 @@ private:
 	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
-	uint16_t calchase_iocard1_r();
-	uint16_t calchase_iocard2_r();
-	uint16_t calchase_iocard3_r();
-	uint16_t calchase_iocard4_r();
-	uint16_t calchase_iocard5_r();
+	template <unsigned N> uint16_t iocard_r();
 	uint32_t calchase_idle_skip_r();
 	void calchase_idle_skip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
@@ -380,30 +380,10 @@ void calchase_state::nvram_w(offs_t offset, uint8_t data)
 	m_nvram_data[offset] = data;
 }
 
-uint16_t calchase_state::calchase_iocard1_r()
+template <unsigned N>
+uint16_t calchase_state::iocard_r()
 {
-	return ioport("IOCARD1")->read();
-}
-
-uint16_t calchase_state::calchase_iocard2_r()
-{
-	return ioport("IOCARD2")->read();
-}
-
-uint16_t calchase_state::calchase_iocard3_r()
-{
-	return ioport("IOCARD3")->read();
-}
-
-/* These two controls wheel pot or whatever this game uses ... */
-uint16_t calchase_state::calchase_iocard4_r()
-{
-	return ioport("IOCARD4")->read();
-}
-
-uint16_t calchase_state::calchase_iocard5_r()
-{
-	return ioport("IOCARD5")->read();
+	return m_iocard[N]->read();
 }
 
 
@@ -414,11 +394,11 @@ void calchase_state::calchase_map(address_map &map)
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000c8000, 0x000cffff).noprw();
 	//map(0x000d0000, 0x000d0003).ram();  // XYLINX - Sincronus serial communication
-	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::calchase_iocard1_r));
-	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::calchase_iocard2_r));
-	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::calchase_iocard3_r));
-	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::calchase_iocard4_r));
-	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::calchase_iocard5_r));
+	map(0x000d0004, 0x000d0005).r(FUNC(calchase_state::iocard_r<0>));
+	map(0x000d000c, 0x000d000d).r(FUNC(calchase_state::iocard_r<1>));
+	map(0x000d0032, 0x000d0033).r(FUNC(calchase_state::iocard_r<2>));
+	map(0x000d0030, 0x000d0031).r(FUNC(calchase_state::iocard_r<3>)); // These two controls wheel pot or whatever this game uses ...
+	map(0x000d0034, 0x000d0035).r(FUNC(calchase_state::iocard_r<4>));
 	map(0x000d0008, 0x000d000b).nopw(); // ???
 	map(0x000d0024, 0x000d0025).w("ldac", FUNC(dac_word_interface::data_w));
 	map(0x000d0028, 0x000d0029).w("rdac", FUNC(dac_word_interface::data_w));
@@ -496,6 +476,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("IOCARD2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // guess
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset SW")
@@ -514,6 +495,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("IOCARD3")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -565,6 +547,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+
 	PORT_START("IOCARD5")
 	PORT_DIPNAME( 0x01, 0x01, "DSWA" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

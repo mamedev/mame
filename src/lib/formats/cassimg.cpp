@@ -199,12 +199,15 @@ cassette_image::error cassette_image::lookup_sample(int channel, size_t sample, 
 
 
 
-cassette_image::cassette_image(const Format *format, void *file, const io_procs *procs, int flags)
+cassette_image::cassette_image(const Format *format, util::random_read_write::ptr &&io, int flags) :
+	m_format(format),
+	m_io(std::move(io)),
+	m_channels(0),
+	m_flags(flags),
+	m_sample_frequency(0),
+	m_blocks(),
+	m_sample_count(0)
 {
-	m_format = format;
-	m_io.file = file;
-	m_io.procs = procs;
-	m_flags = flags;
 }
 
 
@@ -217,17 +220,24 @@ cassette_image::~cassette_image()
 
 
 
-cassette_image::error cassette_image::open(void *file, const io_procs *procs,
-	const Format *format, int flags, ptr &outcassette)
+cassette_image::error cassette_image::open(
+		util::random_read_write::ptr &&io,
+		const Format *format,
+		int flags,
+		ptr &outcassette)
 {
 	const Format *const formats[2] = { format, nullptr };
-	return open_choices(file, procs, {}, formats, flags, outcassette);
+	return open_choices(std::move(io), { }, formats, flags, outcassette);
 }
 
 
 
-cassette_image::error cassette_image::open_choices(void *file, const io_procs *procs, const std::string &extension,
-	const Format *const *formats, int flags, ptr &outcassette)
+cassette_image::error cassette_image::open_choices(
+		util::random_read_write::ptr &&io,
+		const std::string &extension,
+		const Format *const *formats,
+		int flags,
+		ptr &outcassette)
 {
 	// if not specified, use the dummy arguments
 	if (!formats)
@@ -235,7 +245,7 @@ cassette_image::error cassette_image::open_choices(void *file, const io_procs *p
 
 	// create the cassette object
 	ptr cassette;
-	try { cassette.reset(new cassette_image(nullptr, file, procs, flags)); }
+	try { cassette.reset(new cassette_image(nullptr, std::move(io), flags)); }
 	catch (std::bad_alloc const &) { return error::OUT_OF_MEMORY; }
 
 	// identify the image
@@ -275,8 +285,12 @@ cassette_image::error cassette_image::open_choices(void *file, const io_procs *p
 
 
 
-cassette_image::error cassette_image::create(void *file, const io_procs *procs, const Format *format,
-	const Options *opts, int flags, ptr &outcassette)
+cassette_image::error cassette_image::create(
+		util::random_read_write::ptr &&io,
+		const Format *format,
+		const Options *opts,
+		int flags,
+		ptr &outcassette)
 {
 	static const Options default_options = { 1, 16, 44100 };
 
@@ -294,7 +308,7 @@ cassette_image::error cassette_image::create(void *file, const io_procs *procs, 
 
 	// create the cassette object
 	ptr cassette;
-	try { cassette.reset(new cassette_image(format, file, procs, flags)); }
+	try { cassette.reset(new cassette_image(format, std::move(io), flags)); }
 	catch (std::bad_alloc const &) { return error::OUT_OF_MEMORY; }
 
 	// read the options
@@ -334,13 +348,13 @@ cassette_image::Info cassette_image::get_info() const
 
 
 
-void cassette_image::change(void *file, const io_procs *procs, const Format *format, int flags)
+void cassette_image::change(util::random_read_write::ptr &&io, const Format *format, int flags)
 {
-	if ((flags & FLAG_READONLY) == 0)
+	if (!(flags & FLAG_READONLY))
 		flags |= CASSETTE_FLAG_DIRTY;
-	m_io.file = file;
-	m_io.procs = procs;
+
 	m_format = format;
+	m_io = std::move(io);
 	m_flags = flags;
 }
 
@@ -352,7 +366,8 @@ void cassette_image::change(void *file, const io_procs *procs, const Format *for
 
 void cassette_image::image_read(void *buffer, uint64_t offset, size_t length)
 {
-	io_generic_read(&m_io, buffer, offset, length);
+	size_t actual;
+	m_io->read_at(offset, buffer, length, actual);
 }
 
 
@@ -360,7 +375,7 @@ void cassette_image::image_read(void *buffer, uint64_t offset, size_t length)
 uint8_t cassette_image::image_read_byte(uint64_t offset)
 {
 	uint8_t data;
-	io_generic_read(&m_io, &data, offset, 1);
+	image_read(&data, offset, 1);
 	return data;
 }
 
@@ -368,14 +383,17 @@ uint8_t cassette_image::image_read_byte(uint64_t offset)
 
 void cassette_image::image_write(const void *buffer, uint64_t offset, size_t length)
 {
-	io_generic_write(&m_io, buffer, offset, length);
+	size_t actual;
+	m_io->write_at(offset, buffer, length, actual);
 }
 
 
 
 uint64_t cassette_image::image_size()
 {
-	return io_generic_size(&m_io);
+	uint64_t size = 0;
+	m_io->length(size);
+	return size;
 }
 
 
@@ -900,20 +918,19 @@ done:
 
 void cassette_image::dump(const char *filename)
 {
-	FILE *f = fopen(filename, "wb");
-	if (!f)
+	util::random_read_write::ptr saved_io = util::stdio_read_write(fopen(filename, "wb"), 0);
+	if (!saved_io)
 		return;
 
-	io_generic saved_io = m_io;
-	const Format *saved_format = m_format;
+	Format const *const saved_format = m_format;
 
-	m_io.file = f;
-	m_io.procs = &stdio_ioprocs_noclose;
+	using std::swap;
+
+	swap(m_io, saved_io);
 	m_format = &wavfile_format;
+
 	perform_save();
 
-	m_io = saved_io;
+	swap(m_io, saved_io);
 	m_format = saved_format;
-
-	fclose(f);
 }

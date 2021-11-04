@@ -50,11 +50,11 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 class device_memory_interface : public device_interface
 {
 	friend class device_scheduler;
-	template <typename T, typename U> struct is_related_class { static constexpr bool value = std::is_convertible<std::add_pointer_t<T>, std::add_pointer_t<U> >::value; };
-	template <typename T, typename U> struct is_related_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && is_related_class<T, U>::value; };
-	template <typename T, typename U> struct is_related_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && is_related_class<T, U>::value; };
-	template <typename T, typename U> struct is_unrelated_device { static constexpr bool value = emu::detail::is_device_implementation<T>::value && !is_related_class<T, U>::value; };
-	template <typename T, typename U> struct is_unrelated_interface { static constexpr bool value = emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value; };
+	template <typename T, typename U> using is_related_class = std::bool_constant<std::is_convertible_v<std::add_pointer_t<T>, std::add_pointer_t<U> > >;
+	template <typename T, typename U> using is_related_device = std::bool_constant<emu::detail::is_device_implementation<T>::value && is_related_class<T, U>::value >;
+	template <typename T, typename U> using is_related_interface = std::bool_constant<emu::detail::is_device_interface<T>::value && is_related_class<T, U>::value >;
+	template <typename T, typename U> using is_unrelated_device = std::bool_constant<emu::detail::is_device_implementation<T>::value && !is_related_class<T, U>::value >;
+	template <typename T, typename U> using is_unrelated_interface = std::bool_constant<emu::detail::is_device_interface<T>::value && !is_related_class<T, U>::value >;
 
 public:
 	// construction/destruction

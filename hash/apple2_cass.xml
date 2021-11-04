@@ -344,7 +344,7 @@ To load and run a tape:
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="600-2006-00" />
-		<info name="P/N" value="A2T0004X" />
+		<info name="partno" value="A2T0004X" />
 		<info name="usage" value="cass1 >Load 16K, cass2 ]Load 16K" />
 		<part name="cass1" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft ][ floating point BASIC" />
@@ -2209,7 +2209,7 @@ To load and run a tape:
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="600-2003-00" />
-		<info name="P/N" value="A2T0006X" />
+		<info name="partno" value="A2T0006X" />
 		<info name="usage" value="*280.3FFR start.length CTRL+Y 4K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="RAM Test" />

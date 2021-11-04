@@ -16,6 +16,9 @@
 
 #include "m20_dsk.h"
 
+#include "ioprocs.h"
+
+
 m20_format::m20_format()
 {
 }
@@ -40,21 +43,27 @@ bool m20_format::supports_save() const
 	return true;
 }
 
-int m20_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int m20_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	if(io_generic_size(io) == 286720)
+	uint64_t size;
+	if (io.length(size))
+		return 0;
+
+	if (size == 286720)
 		return 50;
+
 	return 0;
 }
 
-bool m20_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	for (int track = 0; track < 35; track++)
 		for (int head = 0; head < 2; head ++) {
 			bool mfm = track || head;
 			desc_pc_sector sects[16];
 			uint8_t sectdata[16*256];
-			io_generic_read(io, sectdata, 16*256*(track*2+head), 16*256);
+			size_t actual;
+			io.read_at(16*256*(track*2+head), sectdata, 16*256, actual);
 			for (int i = 0; i < 16; i++) {
 				int j = i/2 + (i & 1 ? 0 : 8);
 				sects[i].track = track;
@@ -76,7 +85,7 @@ bool m20_format::load(io_generic *io, uint32_t form_factor, const std::vector<ui
 	return true;
 }
 
-bool m20_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool m20_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	uint64_t file_offset = 0;
 
@@ -87,26 +96,27 @@ bool m20_format::save(io_generic *io, const std::vector<uint32_t> &variants, flo
 	auto bitstream = generate_bitstream_from_track(0, 0, 4000, image);
 	auto sectors = extract_sectors_from_bitstream_fm_pc(bitstream);
 
-	for (int i = 0; i < 16; i++)
-	{
-		io_generic_write(io, sectors[i + 1].data(), file_offset, 128);
+	for (int i = 0; i < 16; i++) {
+		size_t actual;
+		io.write_at(file_offset, sectors[i + 1].data(), 128, actual);
 		file_offset += 256; //128;
 	}
 
 	// rest are mfm tracks
-	for (int track = 0; track < track_count; track++)
-	{
-		for (int head = 0; head < head_count; head++)
-		{
+	for (int track = 0; track < track_count; track++) {
+		for (int head = 0; head < head_count; head++) {
 			// skip track 0, head 0
-			if (track == 0) { if (head_count == 1) break; else head++; }
+			if (track == 0) {
+				if (head_count == 1) break;
+				else head++;
+			}
 
 			bitstream = generate_bitstream_from_track(track, head, 2000, image);
 			sectors = extract_sectors_from_bitstream_mfm_pc(bitstream);
 
-			for (int i = 0; i < 16; i++)
-			{
-				io_generic_write(io, sectors[i + 1].data(), file_offset, 256);
+			for (int i = 0; i < 16; i++) {
+				size_t actual;
+				io.write_at(file_offset, sectors[i + 1].data(), 256, actual);
 				file_offset += 256;
 			}
 		}

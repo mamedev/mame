@@ -151,7 +151,7 @@ void sun4_mmu_base_device::device_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 0, 1, 1, std::bind(&sun4_mmu_base_device::l2p_command, this, _1, _2));
+		machine().debugger().console().register_command("l2p", CMDFLAG_NONE, 1, 1, std::bind(&sun4_mmu_base_device::l2p_command, this, _1));
 	}
 
 	m_cache_word_size = m_cache_line_size >> 2;
@@ -985,7 +985,7 @@ bool sun4_mmu_base_device::translate(uint32_t &addr)
 	return entry.valid;
 }
 
-void sun4_mmu_base_device::l2p_command(int ref, const std::vector<std::string> &params)
+void sun4_mmu_base_device::l2p_command(const std::vector<std::string> &params)
 {
 	uint64_t addr, offset;
 

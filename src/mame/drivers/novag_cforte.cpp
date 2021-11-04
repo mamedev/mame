@@ -22,12 +22,13 @@ TODO:
 #include "emu.h"
 
 #include "cpu/m6502/r65c02.h"
-#include "machine/sensorboard.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
-#include "machine/timer.h"
+#include "machine/sensorboard.h"
 #include "sound/beep.h"
 #include "video/hlcd0538.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -42,7 +43,6 @@ public:
 	cforte_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_display(*this, "display"),
 		m_board(*this, "board"),
 		m_lcd(*this, "hlcd0538"),
@@ -59,7 +59,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_device<pwm_display_device> m_display;
 	required_device<sensorboard_device> m_board;
 	required_device<hlcd0538_device> m_lcd;
@@ -68,10 +67,6 @@ private:
 
 	// address maps
 	void main_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void update_display();
@@ -248,10 +243,9 @@ void cforte_state::cforte(machine_config &config)
 	R65C02(config, m_maincpu, 10_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cforte_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL/128); // 256Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(cforte_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_usec(11)); // active for 11us
-	TIMER(config, "irq_off").configure_periodic(FUNC(cforte_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 32.768_kHz_XTAL/128)); // 256Hz
+	irq_clock.set_pulse_width(attotime::from_usec(11)); // active for 11us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

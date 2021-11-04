@@ -1,6 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 /**************************************************************************
+
 Change Lanes
 (C) Taito 1983
 
@@ -49,12 +50,11 @@ void changela_state::changela_68705_port_a_w(uint8_t data)
 void changela_state::changela_68705_port_c_w(uint8_t data)
 {
 	/* PC3 is connected to the CLOCK input of the LS374, so we latch the data on rising edge */
-	if (BIT(data, 3) && ~BIT(m_port_c_out, 3))
+	if (BIT(data, 3) && !BIT(m_port_c_out, 3))
 		m_mcu_out = m_port_a_out & (BIT(m_port_c_out, 2) ? 0xff : m_mcu_in);
 
 	/* PC2 is connected to the /OE input of the LS374 */
-	if (BIT(data, 2))
-		m_mcu->pa_w(BIT(data, 2) ? 0xff : m_mcu_in);
+	m_mcu->pa_w(BIT(data, 2) ? 0xff : m_mcu_in);
 
 	m_port_c_out = data;
 }

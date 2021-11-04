@@ -59,14 +59,14 @@
 
 #define BUFFER "ram"
 
-DEFINE_DEVICE_TYPE_NS(TI99_CCDCC, bus::ti99::peb, corcomp_dcc_device, CCDCC_TAG, "CorComp Disk Controller Card")
-DEFINE_DEVICE_TYPE_NS(TI99_CCFDC, bus::ti99::peb, corcomp_fdca_device, CCFDC_TAG, "CorComp Floppy Disk Controller Card Rev A")
+DEFINE_DEVICE_TYPE(TI99_CCDCC, bus::ti99::peb::corcomp_dcc_device, CCDCC_TAG, "CorComp Disk Controller Card")
+DEFINE_DEVICE_TYPE(TI99_CCFDC, bus::ti99::peb::corcomp_fdca_device, CCFDC_TAG, "CorComp Floppy Disk Controller Card Rev A")
 
-DEFINE_DEVICE_TYPE_NS(CCDCC_PALU2, bus::ti99::peb, ccdcc_palu2_device, CCDCC_PALU2_TAG, "CorComp DCC PAL u2")
-DEFINE_DEVICE_TYPE_NS(CCDCC_PALU1, bus::ti99::peb, ccdcc_palu1_device, CCDCC_PALU1_TAG, "CorComp DCC PAL u1")
+DEFINE_DEVICE_TYPE(CCDCC_PALU2, bus::ti99::peb::ccdcc_palu2_device, CCDCC_PALU2_TAG, "CorComp DCC PAL u2")
+DEFINE_DEVICE_TYPE(CCDCC_PALU1, bus::ti99::peb::ccdcc_palu1_device, CCDCC_PALU1_TAG, "CorComp DCC PAL u1")
 
-DEFINE_DEVICE_TYPE_NS(CCFDC_PALU12, bus::ti99::peb, ccfdc_palu12_device, CCFDC_PALU12_TAG, "CorComp FDC PAL u12")
-DEFINE_DEVICE_TYPE_NS(CCFDC_PALU6, bus::ti99::peb, ccfdc_palu6_device, CCFDC_PALU6_TAG, "CorComp FDC PAL u6")
+DEFINE_DEVICE_TYPE(CCFDC_PALU12, bus::ti99::peb::ccfdc_palu12_device, CCFDC_PALU12_TAG, "CorComp FDC PAL u12")
+DEFINE_DEVICE_TYPE(CCFDC_PALU6, bus::ti99::peb::ccfdc_palu6_device, CCFDC_PALU6_TAG, "CorComp FDC PAL u6")
 
 namespace bus::ti99::peb {
 

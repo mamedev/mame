@@ -786,6 +786,66 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
+void a2_video_device::text_update_inverse(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
+{
+	uint8_t const *const aux_page = m_aux_ptr ? m_aux_ptr : m_ram_ptr;
+
+	uint32_t const start_address = m_page2 ? 0x800 : 0x400;
+
+	beginrow = (std::max)(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = (std::min)(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
+
+	const int startrow = (beginrow / 8) * 8;
+	const int stoprow = ((endrow / 8) + 1) * 8;
+	const int startcol = (cliprect.left() / 14);
+	const int stopcol = ((cliprect.right() / 14) + 1);
+
+	//printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
+
+	int fg = 0;
+	int bg = 0;
+	switch (m_sysconfig & 0x03)
+	{
+		case 0: case 4: bg = WHITE; break;
+		case 1: bg = WHITE; break;
+		case 2: bg = GREEN; break;
+		case 3: bg = ORANGE; break;
+	}
+
+	for (int row = startrow; row < stoprow; row += 8)
+	{
+		if (m_80col)
+		{
+			for (int col = startcol; col < stopcol; col++)
+			{
+				/* calculate address */
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+
+				plot_text_character(bitmap, col * 14, row, 1, aux_page[address],
+					fg, bg);
+				plot_text_character(bitmap, col * 14 + 7, row, 1, m_ram_ptr[address],
+					fg, bg);
+			}
+		}
+		else
+		{
+			for (int col = startcol; col < stopcol; col++)
+			{
+				/* calculate address */
+				uint32_t const address = start_address + ((((row/8) & 0x07) << 7) | (((row/8) & 0x18) * 5 + col));
+				if (((m_sysconfig & 7) == 4) && (m_dhires))
+				{
+					u8 tmp = aux_page[address];
+					fg = tmp>>4;
+					bg = tmp & 0xf;
+				}
+
+				plot_text_character(bitmap, col * 14, row, 2, m_ram_ptr[address], fg, bg);
+			}
+		}
+	}
+}
+
 void a2_video_device::text_update_orig(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;

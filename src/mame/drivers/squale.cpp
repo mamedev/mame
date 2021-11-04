@@ -629,7 +629,7 @@ DEVICE_IMAGE_LOAD_MEMBER( squale_state::cart_load )
 
 	if ( ! size || size > 0x10000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 

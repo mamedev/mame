@@ -833,7 +833,7 @@ GAME( 1985, gngprot,   gng, gng,     gng,      gng_state, empty_init, ROT0, "Cap
 GAME( 1985, gngblita,  gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngc,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",            MACHINE_SUPPORTS_SAVE ) // rev c?
 GAME( 1985, gngt,      gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan Revision C)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makai-Mura (Japan Revision G)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimur,  gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurc, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision C)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1985, makaimurg, gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan Revision G)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1989, diamond,   0,   diamond, diamond,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                MACHINE_SUPPORTS_SAVE )

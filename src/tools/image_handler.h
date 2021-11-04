@@ -3,26 +3,25 @@
 
 // Image generic handler class and helpers
 
-#ifndef TOOLS_IMAGE_HANDLER_H
-#define TOOLS_IMAGE_HANDLER_H
+#ifndef MAME_TOOLS_IMAGE_HANDLER_H
+#define MAME_TOOLS_IMAGE_HANDLER_H
+
+#pragma once
 
 #include "../emu/emucore.h"
+
 #include "formats/fsmgr.h"
 
+#include <cstdint>
 #include <map>
-#include <vector>
 #include <memory>
+#include <string>
+#include <vector>
+
 
 using u8  = uint8_t;
 using u16 = uint16_t;
 using u32 = uint32_t;
-
-struct iofile_ram {
-	std::vector<u8> *data;
-	int64_t pos;
-};
-
-io_generic *ram_open(std::vector<u8> &data);
 
 struct floppy_format_info {
 	floppy_image_format_t *m_format;
@@ -117,5 +116,4 @@ private:
 
 };
 
-#endif
-
+#endif // MAME_TOOLS_IMAGE_HANDLER_H

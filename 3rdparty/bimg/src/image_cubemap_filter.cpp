@@ -849,8 +849,8 @@ namespace bimg
 		const float kGoldenSection = 0.61803398875f;
 		float offset = kGoldenSection;
 
-		bx::Vec3 tangentX;
-		bx::Vec3 tangentY;
+		bx::Vec3 tangentX(bx::init::None);
+		bx::Vec3 tangentY(bx::init::None);
 		bx::calcTangentFrame(tangentX, tangentY, _dir);
 
 		for (uint32_t ii = 0; ii < kNumSamples; ++ii)

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Aaron Giles, Andrew Gardner
@@ -59,12 +59,8 @@ import os
 import png
 import sys
 
-if sys.version_info >= (3,):
-    def b2p(v):
-        return bytes([v])
-else:
-    def b2p(v):
-        return chr(v)
+def b2p(v):
+    return bytes([v])
 
 
 ########################################

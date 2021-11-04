@@ -27,11 +27,13 @@ the S14001A in the 70s), this time a 65C02 software solution.
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/r65c02.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -46,7 +48,6 @@ public:
 	chesster_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_irq_on(*this, "irq_on"),
 		m_rombank(*this, "rombank"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
@@ -65,7 +66,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_irq_on;
 	required_memory_bank m_rombank;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
@@ -73,10 +73,6 @@ private:
 
 	// address maps
 	void main_map(address_map &map);
-
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
 
 	// I/O handlers
 	void control_w(offs_t offset, u8 data);
@@ -190,10 +186,9 @@ void chesster_state::chesster(machine_config &config)
 	R65C02(config, m_maincpu, 5_MHz_XTAL); // RP65C02G
 	m_maincpu->set_addrmap(AS_PROGRAM, &chesster_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(9500); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
-	TIMER(config, m_irq_on).configure_periodic(FUNC(chesster_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(2600)); // active for 2.6us
-	TIMER(config, "irq_off").configure_periodic(FUNC(chesster_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 9500)); // from 555 timer, measured (9.6kHz on a Chesster, 9.3kHz on a Kishon)
+	irq_clock.set_pulse_width(attotime::from_nsec(2600)); // active for 2.6us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

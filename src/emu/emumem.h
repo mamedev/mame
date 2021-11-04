@@ -18,6 +18,7 @@
 #define MAME_EMU_EMUMEM_H
 
 #include <optional>
+#include <set>
 #include <type_traits>
 
 using s8 = std::int8_t;
@@ -476,7 +477,6 @@ template<int Width, int AddrShift> class memory_units_descriptor;
 // =====================-> The root class of all handlers
 
 // Handlers the refcounting as part of the interface
-
 class handler_entry
 {
 	DISABLE_COPYING(handler_entry);
@@ -485,10 +485,11 @@ class handler_entry
 
 public:
 	// Typing flags
-	static constexpr u32 F_DISPATCH    = 0x00000001; // handler that forwards the access to other handlers
-	static constexpr u32 F_UNITS       = 0x00000002; // handler that merges/splits an access among multiple handlers (unitmask support)
-	static constexpr u32 F_PASSTHROUGH = 0x00000004; // handler that passes through the request to another handler
-	static constexpr u32 F_VIEW        = 0x00000008; // handler for a view (kinda like dispatch except not entirely)
+	static constexpr u32 F_UNMAP       = 0x00000001; // the unmapped memory accessed handler
+	static constexpr u32 F_DISPATCH    = 0x00000002; // handler that forwards the access to other handlers
+	static constexpr u32 F_UNITS       = 0x00000004; // handler that merges/splits an access among multiple handlers (unitmask support)
+	static constexpr u32 F_PASSTHROUGH = 0x00000008; // handler that passes through the request to another handler
+	static constexpr u32 F_VIEW        = 0x00000010; // handler for a view (kinda like dispatch except not entirely)
 
 	// Start/end of range flags
 	static constexpr u8 START = 1;
@@ -528,6 +529,8 @@ public:
 
 	virtual void select_a(int slot);
 	virtual void select_u(int slot);
+
+	virtual offs_t dispatch_entry(offs_t address) const;
 
 protected:
 	// Address range storage
@@ -624,7 +627,7 @@ public:
 	// Return the internal structures of the root dispatch
 	virtual const handler_entry_read<Width, AddrShift> *const *get_dispatch() const;
 
-	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges);
+	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_read<Width, AddrShift> **dispatch, handler_entry::range *ranges);
 	virtual handler_entry_read<Width, AddrShift> *dup();
 };
 
@@ -699,7 +702,7 @@ public:
 	// Return the internal structures of the root dispatch
 	virtual const handler_entry_write<Width, AddrShift> *const *get_dispatch() const;
 
-	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges);
+	virtual void init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges);
 	virtual handler_entry_write<Width, AddrShift> *dup();
 };
 
@@ -1567,7 +1570,7 @@ public:
 			fatalerror("Requesting cache() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
 		if(Endian != m_config.endianness())
 			fatalerror("Requesting cache() with endianness %s while the config says %s\n",
-					   endianness_names[Endian], endianness_names[m_config.endianness()]);
+					   util::endian_to_string_view(Endian), util::endian_to_string_view(m_config.endianness()));
 
 		v.set(this, get_cache_info());
 	}
@@ -1581,7 +1584,7 @@ public:
 			fatalerror("Requesting specific() with data width %d while the config says %d\n", 8 << Width, m_config.data_width());
 		if(Endian != m_config.endianness())
 			fatalerror("Requesting spefific() with endianness %s while the config says %s\n",
-					   endianness_names[Endian], endianness_names[m_config.endianness()]);
+					   util::endian_to_string_view(Endian), util::endian_to_string_view(m_config.endianness()));
 
 		v.set(this, get_specific_info());
 	}
@@ -1964,33 +1967,6 @@ private:
 
 #define ACCESSING_BITS_0_31             ((mem_mask & 0xffffffffU) != 0)
 #define ACCESSING_BITS_32_63            ((mem_mask & 0xffffffff00000000U) != 0)
-
-
-// macros for accessing bytes and words within larger chunks
-
-// read/write a byte to a 16-bit space
-#define BYTE_XOR_BE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0))
-#define BYTE_XOR_LE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,1))
-
-// read/write a byte to a 32-bit space
-#define BYTE4_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(3,0))
-#define BYTE4_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,3))
-
-// read/write a word to a 32-bit space
-#define WORD_XOR_BE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(2,0))
-#define WORD_XOR_LE(a)                  ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,2))
-
-// read/write a byte to a 64-bit space
-#define BYTE8_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(7,0))
-#define BYTE8_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,7))
-
-// read/write a word to a 64-bit space
-#define WORD2_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(6,0))
-#define WORD2_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,6))
-
-// read/write a dword to a 64-bit space
-#define DWORD_XOR_BE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
-#define DWORD_XOR_LE(a)                 ((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
 
 
 // helpers for checking address alignment

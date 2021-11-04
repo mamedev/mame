@@ -1557,10 +1557,13 @@ void i386_device::report_invalid_opcode()
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid opcode %02X at %08X %s\n", m_opcode, m_pc - 1, m_lock ? "with lock" : "");
 #else
-	logerror("i386: Invalid opcode");
+	logerror("Invalid opcode");
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 }
 
@@ -1569,10 +1572,13 @@ void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
 #else
-	logerror("i386: Invalid %s modrm %01X", opcode, modrm);
+	logerror("Invalid %s modrm %01X", opcode, modrm);
 	for (int a = 0; a < m_opcode_bytes_length; a++)
 		logerror(" %02X", m_opcode_bytes[a]);
-	logerror(" at %08X\n", m_opcode_pc);
+	logerror(" at %08X %s\n", m_opcode_pc, m_lock ? "with lock" : "");
+	logerror("Backtrace:\n");
+	for (uint32_t i = 1; i < 16; i++)
+		logerror("  %08X\n", m_opcode_addrs[(m_opcode_addrs_index - i) & 15]);
 #endif
 	i386_trap(6, 0, 0);
 }
@@ -2441,6 +2447,8 @@ void i386_device::zero_state()
 	memset( m_opcode_bytes, 0, sizeof(m_opcode_bytes) );
 	m_opcode_pc = 0;
 	m_opcode_bytes_length = 0;
+	memset(m_opcode_addrs, 0, sizeof(m_opcode_addrs));
+	m_opcode_addrs_index = 0;
 }
 
 void i386_device::device_reset()
@@ -2790,6 +2798,8 @@ void i386_device::execute_run()
 #ifdef DEBUG_MISSING_OPCODE
 		m_opcode_bytes_length = 0;
 		m_opcode_pc = m_pc;
+		m_opcode_addrs[m_opcode_addrs_index] = m_opcode_pc;
+		m_opcode_addrs_index = (m_opcode_addrs_index + 1) & 15;
 #endif
 		try
 		{

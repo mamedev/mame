@@ -121,7 +121,7 @@ private:
 	uint8_t m_last_playmode;
 	uint8_t m_ay8910_a;
 	uint16_t m_x, m_y, m_yline;
-	uint8_t m_colours, m_mode, m_op;
+	uint8_t m_colours, m_mode, m_upmode;
 	uint32_t m_debug_video;
 	uint8_t m_vector;
 	uint8_t m_eeprom_bits;
@@ -189,6 +189,7 @@ private:
 	void rmni_sound_reset();
 	void mouse_js_reset();
 	void check_scsi_irq();
+	void set_scsi_drqlat(bool clock, bool clear);
 
 	int m_scsi_iena;
 	int m_scsi_msg;
@@ -196,6 +197,7 @@ private:
 	int m_scsi_io;
 	int m_scsi_cd;
 	int m_scsi_req;
+	int m_scsi_reqlat;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -222,12 +224,9 @@ private:
 	/* Mouse/Joystick */
 	struct
 	{
-		uint8_t   m_mouse_px;
-		uint8_t   m_mouse_py;
+		int8_t      m_mouse_x;
+		int8_t      m_mouse_y;
 
-		uint8_t   m_mouse_x;
-		uint8_t   m_mouse_y;
-		uint8_t   m_mouse_pc;
 		uint8_t   m_mouse_pcx;
 		uint8_t   m_mouse_pcy;
 
@@ -252,8 +251,8 @@ private:
 	void decode_dssi_f_plonk_char(uint16_t ds, uint16_t si, uint8_t raw_flag);
 	void decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si, uint8_t raw_flag);
 
-	void debug_command(int ref, const std::vector<std::string> &params);
-	void video_debug(int ref, const std::vector<std::string> &params);
+	void debug_command(const std::vector<std::string> &params);
+	void video_debug(const std::vector<std::string> &params);
 };
 
 #endif // MAME_INCLUDES_RMNIMBUS_H

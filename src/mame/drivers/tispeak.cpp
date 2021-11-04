@@ -551,7 +551,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tispeak_state::cart_load)
 
 	if (size > m_cart_max_size)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid file size");
 		return image_init_result::FAIL;
 	}
 

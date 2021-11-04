@@ -87,6 +87,10 @@ protected:
 	void tcnt_w(offs_t offset, uint8_t data);
 	uint8_t toc_r(offs_t offset);
 	void toc_w(offs_t offset, uint8_t data);
+	uint8_t tctl1_r();
+	void tctl1_w(uint8_t data);
+	uint8_t tctl2_r();
+	void tctl2_w(uint8_t data);
 	uint8_t tmsk1_r();
 	void tmsk1_w(uint8_t data);
 	uint8_t tflg1_r();
@@ -176,6 +180,8 @@ private:
 	uint8_t m_wait_state;
 	uint8_t m_stop_state;
 
+	uint8_t m_tctl1;
+	uint8_t m_tctl2;
 	uint8_t m_tflg1;
 	uint8_t m_tmsk1;
 	uint16_t m_toc[5];
@@ -562,6 +568,9 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void mc68hc11_reg_map(memory_view::memory_view_entry &block, offs_t base) override;
+
+private:
+	uint8_t reg01_r();
 };
 
 class mc68hc811e2_device : public mc68hc11_cpu_device

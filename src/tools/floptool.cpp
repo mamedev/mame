@@ -6,17 +6,19 @@
 
 ***************************************************************************/
 
-#include <cstdio>
-#include <cstring>
-#include <cctype>
-#include <cstdlib>
-#include <ctime>
-#include <cstdarg>
-#include <cassert>
-#include <map>
-
 #include "image_handler.h"
+
 #include "corestr.h"
+#include "ioprocs.h"
+
+#include <cassert>
+#include <cctype>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
 
 static formats_table formats;
 

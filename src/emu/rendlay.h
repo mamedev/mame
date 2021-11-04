@@ -25,7 +25,7 @@ namespace emu::render::detail {
 
 struct bounds_step
 {
-	void get(render_bounds &result) const { result = bounds; }
+	render_bounds get() const { return bounds; }
 
 	int             state;
 	render_bounds   bounds;
@@ -35,7 +35,7 @@ using bounds_vector = std::vector<bounds_step>;
 
 struct color_step
 {
-	void get(render_color &result) const { result = color; }
+	render_color get() const { return color; }
 
 	int             state;
 	render_color    color;
@@ -52,12 +52,11 @@ class view_environment;
 
 /// \brief A description of a piece of visible artwork
 ///
-/// Most view_items (except for those in the screen layer) have exactly
+/// Most view items (except for those referencing screens) have exactly
 /// one layout_element which describes the contents of the item.
 /// Elements are separate from items because they can be re-used
 /// multiple times within a layout.  Even though an element can contain
-/// a number of components, they are treated as if they were a single
-/// bitmap.
+/// a number of components, they are drawn as a single textured quad.
 class layout_element
 {
 public:
@@ -76,13 +75,14 @@ public:
 	void preload();
 
 private:
-	/// \brief An image, rectangle, or disk in an element
+	/// \brief A drawing component within a layout element
 	///
-	/// Each layout_element contains one or more components. Each
+	/// Each #layout_element contains one or more components. Each
 	/// component can describe either an image or a rectangle/disk
-	/// primitive. Each component also has a "state" associated with it,
-	/// which controls whether or not the component is visible (if the
-	/// owning item has the same state, it is visible).
+	/// primitive.  A component can also have a state mask and value
+	/// for controlling visibility.  If the state of the item
+	/// instantiating the element matches the component's state value
+	/// for the bits that are set in the mask, the component is visible.
 	class component
 	{
 	public:
@@ -188,14 +188,14 @@ private:
 };
 
 
-/// \brief A reusable group of elements
+/// \brief A reusable group of items
 ///
 /// Views expand/flatten groups into their component elements applying
-/// an optional coordinate transform.  This is mainly useful duplicating
-/// the same sublayout in multiple views.  It would be more useful
-/// within a view if it could be parameterised.  Groups only exist while
-/// parsing a layout file - no information about element grouping is
-/// preserved.
+/// an optional coordinate transform.  This is useful for duplicating
+/// the same sublayout in multiple views, or grouping related items to
+/// simplify overall view arrangement.  Groups only exist while parsing
+/// a layout file - no information about element grouping is preserved
+/// after the views have been built.
 class layout_group
 {
 public:
@@ -233,7 +233,7 @@ private:
 };
 
 
-/// \brief A single view within a layout_file
+/// \brief A single view within a #layout_file
 ///
 /// The view is described using arbitrary coordinates that are scaled to
 /// fit within the render target.  Pixels within a view are assumed to
@@ -261,8 +261,8 @@ public:
 
 	public:
 		using state_delegate = delegate<int ()>;
-		using bounds_delegate = delegate<void (render_bounds &)>;
-		using color_delegate = delegate<void (render_color &)>;
+		using bounds_delegate = delegate<render_bounds ()>;
+		using color_delegate = delegate<render_color ()>;
 
 		// construction/destruction
 		item(
@@ -280,8 +280,8 @@ public:
 		screen_device *screen() const { return m_screen; }
 		bool bounds_animated() const { return m_bounds.size() > 1U; }
 		bool color_animated() const { return m_color.size() > 1U; }
-		render_bounds bounds() const { render_bounds result; m_get_bounds(result); return result; }
-		render_color color() const { render_color result; m_get_color(result); return result; }
+		render_bounds bounds() const { return m_get_bounds(); }
+		render_color color() const { return m_get_color(); }
 		int blend_mode() const { return m_blend_mode; }
 		u32 visibility_mask() const { return m_visibility_mask; }
 		int orientation() const { return m_orientation; }
@@ -323,8 +323,8 @@ public:
 		int get_input_field_conditional() const;
 		int get_anim_output() const;
 		int get_anim_input() const;
-		void get_interpolated_bounds(render_bounds &result) const;
-		void get_interpolated_color(render_color &result) const;
+		render_bounds get_interpolated_bounds() const;
+		render_color get_interpolated_color() const;
 
 		static layout_element *find_element(view_environment &env, util::xml::data_node const &itemnode, element_map &elemmap);
 		static bounds_vector make_bounds(view_environment &env, util::xml::data_node const &itemnode, layout_group::transform const &trans);

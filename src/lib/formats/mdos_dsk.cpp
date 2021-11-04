@@ -50,7 +50,9 @@
  */
 
 #include "mdos_dsk.h"
-#include "formats/imageutl.h"
+#include "imageutl.h"
+
+#include "ioprocs.h"
 
 
 mdos_format::mdos_format() : wd177x_format(formats)
@@ -72,12 +74,13 @@ const char *mdos_format::extensions() const
 	return "dsk";
 }
 
-int mdos_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int mdos_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-  int type = find_size(io, form_factor, variants);
+	int type = find_size(io, form_factor, variants);
 
 	if (type != -1)
 		return 75;
+
 	return 0;
 }
 
@@ -109,12 +112,15 @@ int mdos_format::parse_date_field(uint8_t *str)
 	return (high - 0x30) * 10 + (low - 0x30);
 }
 
-int mdos_format::find_size(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int mdos_format::find_size(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
-	uint64_t size = io_generic_size(io);
+	size_t actual;
+	uint64_t size;
+	if (io.length(size))
+		return -1;
 
 	// Look at the disk id sector.
-	io_generic_read(io, &info, 0, sizeof(struct disk_id_sector));
+	io.read_at(0, &info, sizeof(struct disk_id_sector), actual);
 
 	LOG_FORMATS("MDOS floppy dsk: size %d bytes, %d total sectors, %d remaining bytes, expected form factor %x\n", (uint32_t)size, (uint32_t)size / 128, (uint32_t)size % 128, form_factor);
 
@@ -176,8 +182,8 @@ int mdos_format::find_size(io_generic *io, uint32_t form_factor, const std::vect
 	// the extent of the disk are free or available.
 
 	uint8_t cluster_allocation[128], cluster_available[128];
-	io_generic_read(io, &cluster_allocation, 1 * 128, sizeof(cluster_allocation));
-	io_generic_read(io, &cluster_available, 2 * 128, sizeof(cluster_available));
+	io.read_at(1 * 128, &cluster_allocation, sizeof(cluster_allocation), actual);
+	io.read_at(2 * 128, &cluster_available, sizeof(cluster_available), actual);
 
 	for (int cluster = 0; cluster < sizeof(cluster_allocation) * 8; cluster++) {
 		if (cluster * 4 * 128 + 4 * 128 > size) {

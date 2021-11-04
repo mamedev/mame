@@ -11,6 +11,18 @@
     Dips: 2 x 8 dips banks
 
     Video: https://www.youtube.com/watch?v=89XJpor9dSQ
+
+    Other games using the same PCB include:
+    * Casino Nights (coin pusher)
+    * Chuck Rock (coin pusher)
+    * Disco Fever (coin pusher)
+    * Hi Ball (redemption)
+    * Pharaoh's Treasure (coin pusher)
+    * Pirates Treasure (coin pusher)
+    * Rock 'n' Roll II (coin pusher)
+    * Royal Casino (coin pusher)
+    * Summer Time (coin pusher)
+    * Wheel of Fortune (coin pusher)
 */
 
 #include "emu.h"

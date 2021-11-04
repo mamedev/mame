@@ -89,17 +89,21 @@
 
 *****************************************************************************/
 
+#include "imgtool.h"
+#include "charconv.h"
+#include "iflopimg.h"
+
+#include "macutil.h"
+
+#include "formats/ap_dsk35.h"
+#include "formats/imageutl.h"
+#include "opresolv.h"
+
 #include <cctype>
-#include <cstring>
-#include <ctime>
 #include <climits>
 #include <cstddef>
-
-#include "formats/imageutl.h"
-#include "imgtool.h"
-#include "macutil.h"
-#include "iflopimg.h"
-#include "formats/ap_dsk35.h"
+#include <cstring>
+#include <ctime>
 
 /* if 1, check consistency of B-Tree (most of the checks will eventually be
     suppressed when the image is opened as read-only and only enabled when

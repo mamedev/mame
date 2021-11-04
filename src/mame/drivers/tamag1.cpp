@@ -1,23 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
 // thanks-to:digshadow, segher
-/***************************************************************************
+/*******************************************************************************
 
   Bandai Tamagotchi generation 1 hardware
   * PCB label TMG-M1
   * Seiko Epson E0C6S46 MCU under epoxy
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/e0c6200/e0c6s46.h"
 #include "sound/spkrdev.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include "tama.lh"
 
+
+namespace {
 
 class tamag1_state : public driver_device
 {
@@ -48,11 +52,9 @@ void tamag1_state::machine_start()
 }
 
 
-/***************************************************************************
-
-  Video
-
-***************************************************************************/
+/*******************************************************************************
+    Video
+*******************************************************************************/
 
 E0C6S46_PIXEL_UPDATE(tamag1_state::pixel_update)
 {
@@ -88,11 +90,9 @@ void tamag1_state::tama_palette(palette_device &palette) const
 
 
 
-/***************************************************************************
-
-  Inputs
-
-***************************************************************************/
+/*******************************************************************************
+    Input Ports
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
 {
@@ -113,11 +113,9 @@ INPUT_PORTS_END
 
 
 
-/***************************************************************************
-
-  Machine Config
-
-***************************************************************************/
+/*******************************************************************************
+    Machine Configs
+*******************************************************************************/
 
 void tamag1_state::tama(machine_config &config)
 {
@@ -145,20 +143,25 @@ void tamag1_state::tama(machine_config &config)
 
 
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*******************************************************************************
+    ROM Definitions
+*******************************************************************************/
 
 ROM_START( tama )
 	ROM_REGION( 0x3000, "maincpu", 0 )
-	ROM_LOAD( "tama.b", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
+	ROM_LOAD( "tama.bin", 0x0000, 0x3000, CRC(5c864cb1) SHA1(4b4979cf92dc9d2fb6d7295a38f209f3da144f72) )
 
 	ROM_REGION( 0x3000, "maincpu:test", 0 )
-	ROM_LOAD( "test.b", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
+	ROM_LOAD( "test.bin", 0x0000, 0x3000, CRC(4372220e) SHA1(6e13d015113e16198c0059b9d0c38d7027ae7324) ) // this rom is on the die too, test pin enables it?
 ROM_END
 
+} // anonymous namespace
+
+
+
+/*******************************************************************************
+    Drivers
+*******************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY,  FULLNAME,           FLAGS
 CONS( 1997, tama, 0,      0,      tama,    tama,  tamag1_state, empty_init, "Bandai", "Tamagotchi (USA)", MACHINE_SUPPORTS_SAVE )

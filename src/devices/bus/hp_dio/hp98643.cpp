@@ -13,7 +13,7 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98643, bus::hp_dio, dio16_98643_device, "dio98643", "HP98643A LANIC Ethernet card")
+DEFINE_DEVICE_TYPE(HPDIO_98643, bus::hp_dio::dio16_98643_device, "dio98643", "HP98643A LANIC Ethernet card")
 
 namespace bus::hp_dio {
 

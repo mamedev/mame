@@ -315,7 +315,6 @@ protected:
 	void xrl_a_r(uint8_t r);
 	void illegal(uint8_t r);
 	uint8_t ds5002fp_protected(size_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask);
-
 };
 
 

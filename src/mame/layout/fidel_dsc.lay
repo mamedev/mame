@@ -302,12 +302,29 @@ license:CC0
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 			<color red="1" green="0.9" blue="0.6" />
 		</disk>
+		<disk state="1">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.9" green="0.72" blue="0.54" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="1" green="0.9" blue="0.6" />
+		</disk>
+
 		<disk state="2">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 			<color red="1" green="0.9" blue="0.6" />
 		</disk>
+		<disk state="2">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.9" green="0.72" blue="0.54" />
+		</disk>
+		<disk state="2">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="1" green="0.9" blue="0.6" />
+		</disk>
 		<text state="2" string="[K]">
-			<bounds x="0.12" y="0.2" width="0.8" height="0.55" />
+			<bounds x="0.13" y="0.28" width="0.8" height="0.4" />
 			<color red="0.75" green="0.4" blue="0" />
 		</text>
 
@@ -315,40 +332,91 @@ license:CC0
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 			<color red="0.3" green="0.1" blue="0" />
 		</disk>
+		<disk state="3">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.4" green="0.2" blue="0.05" />
+		</disk>
+		<disk state="3">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.3" green="0.1" blue="0" />
+		</disk>
+
 		<disk state="4">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
 			<color red="0.3" green="0.1" blue="0" />
 		</disk>
+		<disk state="4">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.4" green="0.2" blue="0.05" />
+		</disk>
+		<disk state="4">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.3" green="0.1" blue="0" />
+		</disk>
 		<text state="4" string="[K]">
-			<bounds x="0.12" y="0.2" width="0.8" height="0.55" />
+			<bounds x="0.13" y="0.28" width="0.8" height="0.4" />
 			<color red="0.75" green="0.2" blue="0" />
 		</text>
 
 		<!-- selected pieces -->
 		<disk state="5">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
-			<color red="0.8" green="0.7" blue="0.4" />
+			<color red="0.7" green="0.63" blue="0.42" />
 		</disk>
+		<disk state="5">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.63" green="0.504" blue="0.378" />
+		</disk>
+		<disk state="5">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.7" green="0.63" blue="0.42" />
+		</disk>
+
 		<disk state="6">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
-			<color red="0.8" green="0.7" blue="0.4" />
+			<color red="0.7" green="0.63" blue="0.42" />
+		</disk>
+		<disk state="6">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.63" green="0.504" blue="0.378" />
+		</disk>
+		<disk state="6">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.7" green="0.63" blue="0.42" />
 		</disk>
 		<text state="6" string="[K]">
-			<bounds x="0.12" y="0.2" width="0.8" height="0.55" />
-			<color red="0.6" green="0.25" blue="0" />
+			<bounds x="0.13" y="0.28" width="0.8" height="0.4" />
+			<color red="0.525" green="0.28" blue="0" />
 		</text>
 
 		<disk state="7">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
-			<color red="0.45" green="0.2" blue="0.1" />
+			<color red="0.44" green="0.28" blue="0.14" />
 		</disk>
+		<disk state="7">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.52" green="0.36" blue="0.24" />
+		</disk>
+		<disk state="7">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.44" green="0.28" blue="0.14" />
+		</disk>
+
 		<disk state="8">
 			<bounds x="0.1" y="0.1" width="0.8" height="0.8" />
-			<color red="0.45" green="0.2" blue="0.1" />
+			<color red="0.44" green="0.28" blue="0.14" />
+		</disk>
+		<disk state="8">
+			<bounds x="0.18" y="0.18" width="0.64" height="0.64" />
+			<color red="0.52" green="0.36" blue="0.24" />
+		</disk>
+		<disk state="8">
+			<bounds x="0.2" y="0.2" width="0.6" height="0.6" />
+			<color red="0.44" green="0.28" blue="0.14" />
 		</disk>
 		<text state="8" string="[K]">
-			<bounds x="0.12" y="0.2" width="0.8" height="0.55" />
-			<color red="0.9" green="0.35" blue="0.1" />
+			<bounds x="0.13" y="0.28" width="0.8" height="0.4" />
+			<color red="0.8" green="0.52" blue="0.14" />
 		</text>
 	</element>
 
@@ -542,8 +610,7 @@ license:CC0
 		<group ref="sb_board"><bounds x="3" y="3" width="100" height="100" /></group>
 		<group ref="sb_ui"><bounds x="-14.75" y="13.625" width="12.5" height="78.75" /></group>
 
-	<!-- right side -->
-
+		<!-- right side -->
 		<element ref="btn_white"><bounds x="107" y="14.5" width="7" height="7" /></element>
 		<element ref="btn_white"><bounds x="107" y="24.5" width="7" height="7" /></element>
 		<element ref="btn_white"><bounds x="107" y="34.5" width="7" height="7" /></element>
@@ -572,8 +639,7 @@ license:CC0
 		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="107" y="84.5" width="7" height="7" /><color alpha="0.3" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="107" y="94.5" width="7" height="7" /><color alpha="0.3" /></element>
 
-	<!-- 7seg leds -->
-
+		<!-- 7seg leds -->
 		<element name="digit3" ref="digit">
 			<bounds x="84.18" y="-11.5" width="5.66" height="8.5" />
 		</element>

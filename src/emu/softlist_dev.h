@@ -91,8 +91,6 @@ private:
 // device representing a software list
 class software_list_device : public device_t
 {
-	friend class softlist_parser;
-
 public:
 	enum class softlist_type
 	{

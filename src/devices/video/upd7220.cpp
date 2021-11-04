@@ -426,6 +426,7 @@ inline void upd7220_device::reset_figs_param()
 	m_figs.m_d2 = 0x0008;
 	m_figs.m_dm = 0xffff;
 	m_figs.m_gd = 0;
+	m_figs.m_figure_type = 0;
 }
 
 
@@ -1301,6 +1302,10 @@ void upd7220_device::process_fifo()
 			{
 				LOG("uPD7220 RA%u: %02x\n", m_ra_addr, data);
 
+				if (m_ra_addr == 8)
+					m_pattern = (m_pattern & 0xff00) | data;
+				else if (m_ra_addr == 9)
+					m_pattern = (m_pattern & 0xff) | (data << 8);
 				m_ra[m_ra_addr] = data;
 				m_ra_addr++;
 			}
@@ -1323,6 +1328,12 @@ void upd7220_device::process_fifo()
 
 		if (m_param_ptr == 3 || (m_param_ptr == 2 && m_cr & 0x10))
 		{
+			m_pattern = (m_pattern & 0xff00) | m_pr[1];
+			if (m_param_ptr == 3)
+				m_pattern = (m_pattern & 0xff) | (m_pr[2] << 8);
+			LOG("uPD7220 PATTERN: %04x\n", m_pattern);
+			if (m_figs.m_figure_type)
+				break;
 			LOG("%02x = %02x %02x (%c) %06x %04x\n",m_cr,m_pr[2],m_pr[1],m_pr[1]?m_pr[1]:' ',m_ead,m_figs.m_dc);
 			fifo_set_direction(FIFO_WRITE);
 
@@ -1347,6 +1358,8 @@ void upd7220_device::process_fifo()
 			m_figs.m_dir = m_pr[1] & 0x7;
 			m_figs.m_figure_type = (m_pr[1] & 0xf8) >> 3;
 
+			LOG("uPD7220 DIR: %02x\n", m_figs.m_dir);
+			LOG("uPD7220 FIG: %02x\n", m_figs.m_figure_type);
 			//if(m_figs.m_dir != 2)
 			//  printf("DIR %02x\n",m_pr[1]);
 		}
@@ -1354,30 +1367,46 @@ void upd7220_device::process_fifo()
 		// the Decision Mate V during start-up test upload only 2 params before execute the
 		// RDAT command, so I assume this is the expected behaviour, but this needs to be verified.
 		if (m_param_ptr == 3)
+		{
 			m_figs.m_dc = (m_pr[2]) | (m_figs.m_dc & 0x3f00);
+			LOG("uPD7220 DC: %04x\n", m_figs.m_dc);
+		}
 
 		if (m_param_ptr == 4)
 		{
 			m_figs.m_dc = (m_pr[2]) | ((m_pr[3] & 0x3f) << 8);
 			m_figs.m_gd = (m_pr[3] & 0x40) && ((m_mode & UPD7220_MODE_DISPLAY_MASK) == UPD7220_MODE_DISPLAY_MIXED);
+			LOG("uPD7220 DC: %04x\n", m_figs.m_dc);
+			LOG("uPD7220 GD: %02x\n", m_figs.m_gd);
 		}
 
 		if (m_param_ptr == 6)
+		{
 			m_figs.m_d = (m_pr[4]) | ((m_pr[5] & 0x3f) << 8);
+			LOG("uPD7220 D: %04x\n", m_figs.m_d);
+		}
 
 		if (m_param_ptr == 8)
+		{
 			m_figs.m_d2 = (m_pr[6]) | ((m_pr[7] & 0x3f) << 8);
+			LOG("uPD7220 D2: %04x\n", m_figs.m_d2);
+		}
 
 		if (m_param_ptr == 10)
+		{
 			m_figs.m_d1 = (m_pr[8]) | ((m_pr[9] & 0x3f) << 8);
+			LOG("uPD7220 D1: %04x\n", m_figs.m_d1);
+		}
 
 		if (m_param_ptr == 12)
+		{
 			m_figs.m_dm = (m_pr[10]) | ((m_pr[11] & 0x3f) << 8);
+			LOG("uPD7220 DM: %04x\n", m_figs.m_dm);
+		}
 
 		break;
 
 	case COMMAND_FIGD: /* figure draw start */
-		m_pattern = (m_ra[8]) | (m_ra[9]<<8);
 		if(m_figs.m_figure_type == 0)
 			draw_pixel();
 		else if(m_figs.m_figure_type == 1)

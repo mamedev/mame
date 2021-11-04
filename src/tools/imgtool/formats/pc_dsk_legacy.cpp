@@ -11,6 +11,8 @@
 #include "formats/pc_dsk_legacy.h"
 #include "formats/basicdsk.h"
 
+#include "opresolv.h"
+
 struct pc_disk_sizes
 {
 	uint32_t image_size;

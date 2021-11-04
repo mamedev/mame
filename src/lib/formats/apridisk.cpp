@@ -12,6 +12,8 @@
 
 #include "imageutl.h"
 
+#include "ioprocs.h"
+
 
 apridisk_format::apridisk_format()
 {
@@ -32,10 +34,11 @@ const char *apridisk_format::extensions() const
 	return "dsk";
 }
 
-int apridisk_format::identify(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants)
+int apridisk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants)
 {
 	uint8_t header[APR_HEADER_SIZE];
-	io_generic_read(io, header, 0, APR_HEADER_SIZE);
+	size_t actual;
+	io.read_at(0, header, APR_HEADER_SIZE, actual);
 
 	const char magic[] = "ACT Apricot disk image\x1a\x04";
 
@@ -45,21 +48,26 @@ int apridisk_format::identify(io_generic *io, uint32_t form_factor, const std::v
 		return 0;
 }
 
-bool apridisk_format::load(io_generic *io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apridisk_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	desc_pc_sector sectors[80][2][18];
 	std::unique_ptr<uint8_t []> sector_data(new uint8_t [MAX_SECTORS * SECTOR_SIZE]);
 	uint8_t *data_ptr = sector_data.get();
 	int track_count = 0, head_count = 0, sector_count = 0;
 
-	uint64_t file_size = io_generic_size(io);
+	uint64_t file_size;
+	if (io.length(file_size))
+		return false;
+
 	uint64_t file_offset = APR_HEADER_SIZE;
 
 	while (file_offset < file_size)
 	{
+		size_t actual;
+
 		// read sector header
 		uint8_t sector_header[16];
-		io_generic_read(io, sector_header, file_offset, 16);
+		io.read_at(file_offset, sector_header, 16, actual);
 
 		uint32_t type = pick_integer_le(&sector_header, 0, 4);
 		uint16_t compression = pick_integer_le(&sector_header, 4, 2);
@@ -94,7 +102,7 @@ bool apridisk_format::load(io_generic *io, uint32_t form_factor, const std::vect
 			case APR_COMPRESSED:
 				{
 					uint8_t comp[3];
-					io_generic_read(io, comp, file_offset, 3);
+					io.read_at(file_offset, comp, 3, actual);
 					uint16_t length = pick_integer_le(comp, 0, 2);
 
 					if (length != SECTOR_SIZE)
@@ -108,7 +116,7 @@ bool apridisk_format::load(io_generic *io, uint32_t form_factor, const std::vect
 				break;
 
 			case APR_UNCOMPRESSED:
-				io_generic_read(io, data_ptr, file_offset, SECTOR_SIZE);
+				io.read_at(file_offset, data_ptr, SECTOR_SIZE, actual);
 				break;
 
 			default:
@@ -140,7 +148,7 @@ bool apridisk_format::load(io_generic *io, uint32_t form_factor, const std::vect
 	return true;
 }
 
-bool apridisk_format::save(io_generic *io, const std::vector<uint32_t> &variants, floppy_image *image)
+bool apridisk_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image)
 {
 	return false;
 }

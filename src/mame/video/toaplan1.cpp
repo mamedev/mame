@@ -229,7 +229,6 @@ void toaplan1_state::register_common()
 
 void toaplan1_rallybik_state::video_start()
 {
-	m_spritegen->alloc_sprite_bitmap(*m_screen);
 	m_spritegen->gfx(0)->set_colorbase(64*16);
 
 	create_tilemaps();
@@ -671,6 +670,18 @@ void toaplan1_state::log_vram()
     Sprite Handlers
 ***************************************************************************/
 
+void toaplan1_rallybik_state::pri_cb(u8 priority, u32 &pri_mask)
+{
+	switch (priority)
+	{
+		case 0: pri_mask = GFX_PMASK_1|GFX_PMASK_2|GFX_PMASK_4|GFX_PMASK_8; break; // disable?
+		case 1: pri_mask = GFX_PMASK_2|GFX_PMASK_4|GFX_PMASK_8;             break; // over tilemap priority ~0x4, under tilemap priority 0x5~
+		case 2: pri_mask = GFX_PMASK_4|GFX_PMASK_8;                         break; // over tilemap priority ~0x8, under tilemap priority 0x9~
+		case 3: pri_mask = GFX_PMASK_8;                                     break; // over tilemap priority ~0xc, under tilemap priority 0xd~
+	}
+}
+
+
 void toaplan1_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u16 *source = (u16 *)m_buffered_spriteram.get();
@@ -744,26 +755,24 @@ u32 toaplan1_rallybik_state::screen_update(screen_device &screen, bitmap_rgb32 &
 {
 	log_vram();
 
-	m_spritegen->draw_sprites_to_tempbitmap(cliprect, m_buffered_spriteram.get(),  m_spriteram.bytes());
+	screen.priority().fill(0, cliprect);
 
 	// first draw everything, including "disabled" tiles and priority 0
-	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 1);
 
 	// then draw the higher priority layers in order
 	for (int priority = 1; priority < 16; priority++)
 	{
-		m_tilemap[3]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
-		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
-		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), 0);
-
-		//if (pririoty==0x00)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,0);
-		if (priority==0x04)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,1);
-		if (priority==0x08)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,2);
-		if (priority==0x0c)  m_spritegen->copy_sprites_from_tempbitmap(bitmap,cliprect,3);
-
+		// get priority mask
+		// value: 0x1 (tilemap priority 0x0~0x4), 0x2 (tilemap priority 0x5~0x8), 0x4 (tilemap priority 0x9~0xc), 0x8 (tilemap priority 0xd~)
+		int primask = 1 << (((priority - 1) >> 2));
+		m_tilemap[3]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), primask);
+		m_tilemap[2]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), primask);
+		m_tilemap[1]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), primask);
+		m_tilemap[0]->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), primask);
 	}
 
+	m_spritegen->draw_sprites(bitmap, cliprect, m_buffered_spriteram.get(), m_spriteram.bytes());
 	return 0;
 }
 

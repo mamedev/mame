@@ -22,6 +22,7 @@
 
 
 namespace util {
+
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
@@ -58,7 +59,7 @@ struct arbitrary_datetime
 //  date of the epoch's begining
 //---------------------------------------------------------
 
-template<typename Rep, int Y, int M, int D, int H, int N, int S, typename Ratio>
+template <typename Rep, int Y, int M, int D, int H, int N, int S, typename Ratio>
 class arbitrary_clock
 {
 public:
@@ -89,7 +90,7 @@ public:
 	//  with a different scale to this arbitrary_clock's scale
 	//---------------------------------------------------------
 
-	template<typename Rep2, int YY, int MM, int DD, int HH, int NN, int SS, typename Ratio2>
+	template <typename Rep2, int YY, int MM, int DD, int HH, int NN, int SS, typename Ratio2>
 	static time_point from_arbitrary_time_point(const std::chrono::time_point<arbitrary_clock<Rep2, YY, MM, DD, HH, NN, SS, Ratio2> > &tp)
 	{
 		arbitrary_datetime dt;
@@ -111,7 +112,7 @@ public:
 	//  of this scale to one of different scale
 	//---------------------------------------------------------
 
-	template<typename Rep2, int YY, int MM, int DD, int HH, int NN, int SS, typename Ratio2>
+	template <typename Rep2, int YY, int MM, int DD, int HH, int NN, int SS, typename Ratio2>
 	static std::chrono::time_point<arbitrary_clock<Rep2, YY, MM, DD, HH, NN, SS, Ratio2> > to_arbitrary_time_point(const time_point &tp)
 	{
 		return arbitrary_clock<Rep2, YY, MM, DD, HH, NN, SS, Ratio2>::from_arbitrary_time_point(tp);
@@ -125,14 +126,14 @@ public:
 	static struct tm to_tm(const time_point &tp)
 	{
 		std::chrono::time_point<tm_conversion_clock> normalized_tp = to_arbitrary_time_point<
-			std::int64_t,
-			tm_conversion_clock::base_year,
-			tm_conversion_clock::base_month,
-			tm_conversion_clock::base_day,
-			tm_conversion_clock::base_hour,
-			tm_conversion_clock::base_minute,
-			tm_conversion_clock::base_second,
-			tm_conversion_clock::period>(tp);
+				std::int64_t,
+				tm_conversion_clock::base_year,
+				tm_conversion_clock::base_month,
+				tm_conversion_clock::base_day,
+				tm_conversion_clock::base_hour,
+				tm_conversion_clock::base_minute,
+				tm_conversion_clock::base_second,
+				tm_conversion_clock::period>(tp);
 		return internal_to_tm(normalized_tp.time_since_epoch());
 	}
 
@@ -144,14 +145,14 @@ public:
 	static std::chrono::time_point<std::chrono::system_clock> to_system_clock(const time_point &tp)
 	{
 		auto normalized_tp = to_arbitrary_time_point<
-			std::int64_t,
-			system_conversion_clock::base_year,
-			system_conversion_clock::base_month,
-			system_conversion_clock::base_day,
-			system_conversion_clock::base_hour,
-			system_conversion_clock::base_minute,
-			system_conversion_clock::base_second,
-			system_conversion_clock::period>(tp);
+				std::int64_t,
+				system_conversion_clock::base_year,
+				system_conversion_clock::base_month,
+				system_conversion_clock::base_day,
+				system_conversion_clock::base_hour,
+				system_conversion_clock::base_minute,
+				system_conversion_clock::base_second,
+				system_conversion_clock::period>(tp);
 		return std::chrono::time_point<std::chrono::system_clock>(normalized_tp.time_since_epoch() + system_clock_adjustment);
 	}
 

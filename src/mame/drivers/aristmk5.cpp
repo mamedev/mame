@@ -6163,6 +6163,32 @@ ROM_START( peaflut )
 ROM_END
 
 
+// 01J00011 / JB001 / 25 Credit Multiplier / 20 Line Multiline
+// Peacock Flutter / NSW/ACT / A - 10/03/00
+// EPROM labels have 2/4 and 3/4 printed on the wrong ROMs
+// Variations (% and NO):
+//    87.93% 99
+//    90.05% 01
+//    92.23% 02
+ROM_START( peafluta )
+	ARISTOCRAT_MK5_GALS
+	ARISTOCRAT_MK5_EEPROM
+	/*
+	    Checksum code found at 0x000b98
+	    0x000000-0x0638db is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xfb820166
+	        Calculated Checksum 0xfb820166  (OK)
+	    0x0638dc-0x1da6f3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0638dc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	*/
+	ROM_REGION32_LE( 0x400000, "game_prg", ROMREGION_ERASEFF )
+	ROM_LOAD32_WORD( "01j00011.u7",  0x000000, 0x80000, CRC(e4f0164c) SHA1(420d051b6b5c31f178113a0a4050f2177fc12cc3) )  // 01J00011 Peacock Flutter 500 1/4 jb001 512k (c) 2000 Aristocrat P U7
+	ROM_LOAD32_WORD( "01j00011.u11", 0x000002, 0x80000, CRC(d96b3986) SHA1(d6dfc0c7180f13be46d855e51ad0c2b0015436f0) )  // 01J00011 Peacock Flutter 500 3/4 jb001 512k (c) 2000 Aristocrat P U11
+	ROM_LOAD32_WORD( "01j00011.u8",  0x100000, 0x80000, CRC(3460c79d) SHA1(a0c632030fe9f1a7bdbf30d8ac4202903dce9676) )  // 01J00011 Peacock Flutter 500 2/4 jb001 512k (c) 2000 Aristocrat P U8
+	ROM_LOAD32_WORD( "01j00011.u12", 0x100002, 0x80000, CRC(7243a1b1) SHA1(522321066423677734525e0967381b6989ff13c2) )  // 01J00011 Peacock Flutter 500 4/4 jb001 512k (c) 2000 Aristocrat P U12
+ROM_END
+
+
 // 0200460V / 586/4(a) / 5 Credit Multiplier / 20 Line Multiline
 // Penguin Pays 100cm / NSW/ACT / D - 03/06/97
 // Variations (% and NO):
@@ -8731,6 +8757,7 @@ GAMEL( 1999, pantmaga,    pantmag,  aristmk5,           pantmaga,     aristmk5_s
 GAMEL( 2001, partygrs,    aristmk5, aristmk5_usa_touch, aristmk5_usa, aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (AHG1567, US)",                             MACHINE_NOT_WORKING, layout_magimaska )       // MV4115/6, A - 10/11/01
 GAMEL( 2001, partygrsa,   partygrs, aristmk5_usa_touch, bootsctnua,   aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Party Gras (BHG1284, US)",                             MACHINE_NOT_WORKING, layout_bparty )          // MV4115/3, B - 06/02/01
 GAMEL( 2000, peaflut,     aristmk5, aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Peacock Flutter (02J00011, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_trstrove )        // JB001, A - 10/03/00, Rev 8
+GAMEL( 2000, peafluta,    peaflut,  aristmk5,           trstrove,     aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Peacock Flutter (01J00011, NSW/ACT)",                  MACHINE_NOT_WORKING, layout_trstrove )        // JB001, A - 10/03/00, Rev 8
 GAMEL( 1997, pengpay,     aristmk5, aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200460V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_cashchama )       // 586/4(a), D - 03/06/97, Rev 3
 GAMEL( 1996, pengpaya,    pengpay,  aristmk5,           cashchama,    aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200357V, NSW/ACT)",                     0,                   layout_cashchama )       // 586/4, C - 12/11/96
 GAMEL( 1997, pengpayb,    pengpay,  aristmk5,           swhr2,        aristmk5_state, init_aristmk5, ROT0, "Aristocrat", "Penguin Pays (0200359V, NSW/ACT)",                     MACHINE_NOT_WORKING, layout_swhr2 )           // 586/3(a), D - 03/06/97, Rev 4

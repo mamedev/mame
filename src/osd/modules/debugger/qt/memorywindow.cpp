@@ -330,7 +330,7 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 		{
 			// get the last known PC to write to this memory location
 			debug_view_xy const pos = memView.cursor_position();
-			offs_t const address = memView.addressAtCursorPosition(pos);
+			offs_t const address = addressSpace->byte_to_address(memView.addressAtCursorPosition(pos));
 			offs_t a = address & addressSpace->logaddrmask();
 			bool good = false;
 			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), TRANSLATE_READ_DEBUG, a))
@@ -355,7 +355,10 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 						memValue);
 				if (pc != offs_t(-1))
 				{
-					m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
+					if (addressSpace->is_octal())
+						m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 8).arg(pc, 2, 8);
+					else
+						m_lastPc = QString("Address %1 written at PC=%2").arg(address, 2, 16).arg(pc, 2, 16);
 					good = true;
 				}
 				else

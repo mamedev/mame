@@ -900,6 +900,48 @@ static INPUT_PORTS_START(namcona1_quiz)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_SERVICE1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(zelost) // TODO: to be adjusted when the game will work, for now using PORT_NAME to name them as the I/O test does
+	PORT_START("P1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON8) PORT_PLAYER(3) PORT_NAME("LINE 8")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_PLAYER(3) PORT_NAME("LINE 6")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_PLAYER(3) PORT_NAME("LINE 4")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(3) PORT_NAME("LINE 2")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("D.GAME") // double up game?
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("PAY OUT")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // "
+
+	PORT_START("P2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("A.L.B.") // ???
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON7) PORT_PLAYER(3) PORT_NAME("LINE 7")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_PLAYER(3) PORT_NAME("LINE 5")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(3) PORT_NAME("LINE 3")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("T.SCORE") // take score?
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN) // "
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(3) PORT_NAME("LINE 1")
+
+	PORT_START("P3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+
+	PORT_START("P4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+
+	PORT_START("DSW")
+	PORT_DIPNAME(0x01, 0x01, "DIP2 (Freeze)")
+	PORT_DIPSETTING(   0x01, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPNAME(0x02, 0x02, "DIP1 (Test)")
+	PORT_DIPSETTING(   0x02, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+	PORT_SERVICE(0x40, IP_ACTIVE_LOW)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN) // no effect in I/O test
+INPUT_PORTS_END
+
 /***************************************************************************/
 
 static const gfx_layout cg_layout_8bpp =
@@ -1462,6 +1504,18 @@ ROM_START(zelos)
 	// not populated
 ROM_END
 
+ROM_START(zelost) // this uses a different ROM board: Namco MDROM PCB - 8625961102 with MB8464A-15LL battery-backed RAM
+	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_BYTE("zs1 stp 1e.3e", 0x000001, 0x080000, CRC(3a593d12) SHA1(1941c5e88e425f83fc8e22e48e7bf18f231efb78))
+	ROM_LOAD16_BYTE("zs1 stp 0e.6e", 0x000000, 0x080000, CRC(e331f84c) SHA1(77812e50c49093883a9ec71290f45d398abac5fd))
+
+	ROM_REGION16_BE(0x800000, "maskrom", ROMREGION_ERASE00)
+	// not populated
+
+	ROM_REGION(0x0800, "eeprom", 0) // default EEPROM, to avoid error on start-up
+	ROM_LOAD("eeprom", 0x0000, 0x0800, CRC(ac117acc) SHA1(fa7d8d1f47cc0cbcc37d1fa4d41d76a109320b0b))
+ROM_END
+
 // NA-1 (C69 MCU)
 GAME(1992, bkrtmaq,    0,        namcona1, namcona1_quiz,  namcona1_state, init_bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1992, cgangpzl,   0,        namcona1,  namcona1_joy,  namcona1_state, init_cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
@@ -1487,3 +1541,4 @@ GAME(1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, init_
 GAME(1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, init_quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, init_xday2, ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME(1994, zelos,      0,        zelos,     namcona1_joy,  namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, main unit)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // waits for communication with the terminals
+GAME(1994, zelost,     0,        zelos,     zelost,        namcona2_state, init_zelos,    ROT0, "Namco", "Zelos (Japan, terminal)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL) // no way to insert medal. Maybe needs communication with main unit?

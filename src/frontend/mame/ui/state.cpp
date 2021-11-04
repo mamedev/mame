@@ -264,8 +264,8 @@ void menu_load_save_state_base::handle()
 			m_confirm_prompt = util::string_format(
 					_("Delete saved state %1$s?\nPress %2$s to delete\nPress %3$s to cancel"),
 					m_confirm_delete->visible_name(),
-					machine().input().seq_name(machine().ioport().type_seq(IPT_UI_SELECT)),
-					machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CANCEL)));
+					ui().get_general_input_setting(IPT_UI_SELECT),
+					ui().get_general_input_setting(IPT_UI_CANCEL));
 		}
 	}
 	else if (!m_confirm_delete)
@@ -365,14 +365,16 @@ void menu_load_save_state_base::handle_keys(uint32_t flags, int &iptkey)
 						machine().options().state_directory(),
 						machine().get_statename(machine().options().state_name()),
 						m_confirm_delete->file_name()));
-			osd_file::error const err(osd_file::remove(filename));
-			if (osd_file::error::NONE != err)
+			std::error_condition const err(osd_file::remove(filename));
+			if (err)
 			{
 				osd_printf_error(
-						"Error removing file %s for state %s (%d)\n",
+						"Error removing file %s for state %s (%s:%d %s)\n",
 						filename,
 						m_confirm_delete->visible_name(),
-						std::underlying_type_t<osd_file::error>(err));
+						err.category().name(),
+						err.value(),
+						err.message());
 				machine().popmessage(_("Error removing saved state file %1$s"), filename);
 			}
 
@@ -429,13 +431,13 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 		draw_text_box(
 				std::begin(text), std::next(std::begin(text), count),
 				origx1, origx2, origy2 + ui().box_tb_border(), origy2 + (count * ui().get_line_height()) + (3.0f * ui().box_tb_border()),
-				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 				ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 	}
 
 	// draw the confirmation prompt if necessary
 	if (!m_confirm_prompt.empty())
-		ui().draw_text_box(container(), m_confirm_prompt, ui::text_layout::CENTER, 0.5f, 0.5f, ui().colors().background_color());
+		ui().draw_text_box(container(), m_confirm_prompt, text_layout::text_justify::CENTER, 0.5f, 0.5f, ui().colors().background_color());
 }
 
 
