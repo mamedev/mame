@@ -691,10 +691,10 @@ function cheat.startplugin()
 				end
 			end
 		end
-		menu[#menu + 1] = {"---", "", 0}
-		menu[#menu + 1] = {_("Set hotkeys"), "", 0}
-		menu[#menu + 1] = {_("Reset All"), "", 0}
-		menu[#menu + 1] = {_("Reload All"), "", 0}
+		menu[#menu + 1] = {"---", "", ""}
+		menu[#menu + 1] = {_("Set hotkeys"), "", ""}
+		menu[#menu + 1] = {_("Reset All"), "", ""}
+		menu[#menu + 1] = {_("Reload All"), "", ""}
 		return menu
 	end
 

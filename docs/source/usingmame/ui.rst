@@ -222,8 +222,9 @@ Kbd 1
     Press the **1** key on the keyboard once, then wait one second to accept the
     setting.
 Kbd F12 Kbd Shift Keyboard Alt
-    Press the **P** key on the keyboard once, press the left **Shift** key once,
-    press the left **Alt** key once, then wait one second to accept the setting.
+    Press the **F12** key on the keyboard once, press the left **Shift** key
+    once, press the left **Alt** key once, then wait one second to accept the
+    setting.
 Kbd P not Kbd Shift not Kbd Right Shift
     Press the **P** key on the keyboard once, press the left **Shift** key
     twice, press the right **Shift** key twice, then wait one second to accept
