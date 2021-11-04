@@ -360,7 +360,7 @@ function cheatfind.startplugin()
 
 		local function menu_lim(val, min, max, menuitem)
 			if min == max then
-				menuitem[3] = "on" 
+				menuitem[3] = "on"
 			elseif val == min then
 				menuitem[3] = "r"
 			elseif val == max then

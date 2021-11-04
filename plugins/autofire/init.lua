@@ -16,6 +16,7 @@ function autofire.startplugin()
 	--   'mask' - mask of the button field being autofired
 	--   'type' - input type of the button being autofired
 	--   'key' - input_seq of the keybinding
+	--   'key_cfg' - configuration string for the keybinding
 	--   'on_frames' - number of frames button is pressed
 	--   'off_frames' - number of frames button is released
 	--   'button' - reference to ioport_field
@@ -43,10 +44,12 @@ function autofire.startplugin()
 		local button_states = {}
 
 		for i, button in ipairs(buttons) do
-			local key = button.port .. '\0' .. button.mask .. '.' .. button.type
-			local state = button_states[key] or {0, button.button}
-			state[1] = process_button(button) | state[1]
-			button_states[key] = state
+			if button.button then
+				local key = button.port .. '\0' .. button.mask .. '.' .. button.type
+				local state = button_states[key] or {0, button.button}
+				state[1] = process_button(button) | state[1]
+				button_states[key] = state
+			end
 		end
 		for i, state in pairs(button_states) do
 			state[2]:set_value(state[1])

@@ -20,6 +20,7 @@ local function make_macro(setting)
 	local result = {
 		name = setting.name,
 		binding = manager.machine.input:seq_from_tokens(setting.binding),
+		bindingcfg = setting.binding,
 		earlycancel = setting.earlycancel,
 		loop = setting.loop,
 		steps = { } }
@@ -33,13 +34,18 @@ local function make_macro(setting)
 				duration = step.duration }
 			for j, input in ipairs(step.inputs) do
 				if input.port and input.mask and input.type then
+					local ipt = {
+						port = input.port,
+						mask = input.mask,
+						type = ioport:token_to_input_type(input.type) }
 					local port = ioport.ports[input.port]
 					if port then
 						local field = port:field(input.mask)
-						if field and (field.type == ioport:token_to_input_type(input.type)) then
-							table.insert(s.inputs, { port = port, field = field })
+						if field and (field.type == ipt.type) then
+							ipt.field = field
 						end
 					end
+					table.insert(s.inputs, ipt)
 				end
 			end
 			if #s.inputs > 0 then
@@ -66,7 +72,7 @@ local function make_settings(macros)
 	for i, macro in ipairs(macros) do
 		local m = {
 			name = macro.name,
-			binding = input:seq_to_tokens(macro.binding),
+			binding = macro.bindingcfg,
 			earlycancel = macro.earlycancel,
 			loop = macro.loop,
 			steps = { } }
@@ -79,9 +85,9 @@ local function make_settings(macros)
 			table.insert(m.steps, s)
 			for k, input in ipairs(step.inputs) do
 				local b = {
-					port = input.port.tag,
-					mask = input.field.mask,
-					type = ioport:input_type_to_token(input.field.type) }
+					port = input.port,
+					mask = input.mask,
+					type = ioport:input_type_to_token(input.type) }
 				table.insert(s.inputs, b)
 			end
 		end

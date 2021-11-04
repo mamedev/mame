@@ -16,6 +16,7 @@ local function initialize_button(settings)
 			mask = settings.mask,
 			type = ioport:token_to_input_type(settings.type),
 			key = manager.machine.input:seq_from_tokens(settings.key),
+			key_cfg = settings.key,
 			on_frames = settings.on_frames,
 			off_frames = settings.off_frames,
 			counter = 0
@@ -25,9 +26,9 @@ local function initialize_button(settings)
 			local field = port:field(settings.mask)
 			if field and (field.type == new_button.type) then
 				new_button.button = field
-				return new_button
 			end
 		end
+		return new_button
 	end
 	return nil
 end
@@ -35,15 +36,15 @@ end
 local function serialize_settings(button_list)
 	local settings = {}
 	for index, button in ipairs(button_list) do
-		setting = {
+		local setting = {
 			port = button.port,
-			mask = button.button.mask,
-			type = manager.machine.ioport:input_type_to_token(button.button.type),
-			key = manager.machine.input:seq_to_tokens(button.key),
+			mask = button.mask,
+			type = manager.machine.ioport:input_type_to_token(button.type),
+			key = button.key_cfg,
 			on_frames = button.on_frames,
 			off_frames = button.off_frames
 		}
-		settings[#settings + 1] = setting
+		table.insert(settings, setting)
 	end
 	return settings
 end

@@ -15,11 +15,14 @@ function inputmacro.startplugin()
 	  Configuration data:
 	  * name: display name (string)
 	  * binding: activation sequence (input sequence)
+	  * bindingcfg: activation sequence configuration (string)
 	  * earlycancel: cancel or complete on release (Boolean)
-	  * loop: -1 = release, 0 = prolong, >0 = loop to step on hold (int)
+	  * loop: -1 = release, 0 = prolong, >0 = loop to step on hold (integer)
 	  * steps:
 	    * inputs:
-	      * port: port (I/O port)
+	      * port: port tag (string)
+	      * mask: port field mask (integer)
+	      * type: port field type (integer)
 	      * field: field (I/O port field)
 	    * delay: delay before activating inputs in frames (integer)
 	    * duration: duration to activate inputs for (integer)
@@ -35,7 +38,9 @@ function inputmacro.startplugin()
 
 	local function activate_inputs(inputs)
 		for index, input in ipairs(inputs) do
-			active_inputs[string.format('%s.%d.%d', input.port.tag, input.field.mask, input.field.type)] = input.field
+			if input.field then
+				active_inputs[string.format('%s.%d.%d', input.port, input.mask, input.type)] = input.field
+			end
 		end
 	end
 

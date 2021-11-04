@@ -662,7 +662,7 @@ function cheat.startplugin()
 					menu[num][3] = "off"
 				elseif cheat.is_oneshot then
 					menu[num][2] = _("Set")
-					menu[num][3] = "" 
+					menu[num][3] = ""
 				else
 					if cheat.enabled then
 						menu[num][2] = _("On")
