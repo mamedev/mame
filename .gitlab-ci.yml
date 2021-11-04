@@ -134,6 +134,8 @@ libretro-build-osx-x64:
   extends:
     - .libretro-osx-x64-make-default
     - .core-defs
+  variables:
+    MACOSX_DEPLOYMENT_TARGET: "10.14"
   cache:
     <<: *global_cache
     key: "$CI_COMMIT_REF_SLUG-osx-x64"
