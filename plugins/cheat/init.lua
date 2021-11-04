@@ -522,7 +522,9 @@ function cheat.startplugin()
 		if cheat.screen then
 			for name, screen in pairs(cheat.screen) do
 				local scr = manager.machine.screens[screen]
-				if not scr then
+				if screen == "ui" then
+					scr = manager.machine.render.ui_container
+				elseif not scr then
 					local tag
 					local nxt, coll = manager.machine.screens:pairs()
 					tag, scr = nxt(coll) -- get any screen

@@ -172,7 +172,7 @@ function xml.conv_cheat(data)
 	end
 
 	local function convert_output(data)
-		local str = "draw_text(screen,"
+		local str = "draw_text(ui,"
 		if data["align"] then
 			str = str .. data["align"]
 		else
@@ -276,6 +276,7 @@ function xml.conv_cheat(data)
 		if output then
 			data["cheat"][count]["screen"] = {}
 			data["cheat"][count]["screen"]["screen"] = ":screen"
+			data["cheat"][count]["screen"]["ui"] = "ui"
 		end
 	end
 	return data["cheat"]
