@@ -723,13 +723,13 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
 			{
 				int pix, pri;
-
+				
 				/* hold-and-modify mode -- hires and shres supported (cfr. roadkill) */
 				if (ham)
 				{
 					/* update the HAM color */
-					pfpix0 = aga_update_ham(pfpix0, planes);
-					pfpix1 = (hires) ? aga_update_ham(pfpix1, planes) : aga_palette[pfpix0];
+					const rgb_t pfpix0_rgb = aga_update_ham(pfpix0, planes);
+					const rgb_t pfpix1_rgb = (hires) ? aga_update_ham(pfpix1, planes) : pfpix0_rgb;
 
 					pix = sprpix & 0xff;
 					pri = (sprpix >> 12);
@@ -744,8 +744,8 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					/* playfield has priority */
 					else
 					{
-						dst[x*2+0] = pfpix0;
-						dst[x*2+1] = pfpix1;
+						dst[x*2+0] = pfpix0_rgb;
+						dst[x*2+1] = pfpix1_rgb;
 					}
 				}
 
