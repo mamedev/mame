@@ -152,4 +152,4 @@ protected:
 };
 
 
-#endif // MAME_BUS_VME_VME_FCCPU20_H
+#endif // MAME_BUS_VME_VME_MVME120_H
