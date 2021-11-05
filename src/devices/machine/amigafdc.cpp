@@ -297,8 +297,6 @@ void amiga_fdc_device::live_run(const attotime &limit)
 						} else if(cur_live.bit_counter != 8)
 							cur_live.bit_counter = 0;
 					}
-					//else
-					//  LOGSYNC("%s: no DSKSYNC\n", this->tag());
 
 					dskbyt |= 0x1000;
 					m_write_dsksyn(1);

@@ -1593,6 +1593,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			else
 			{
 				data &= 0xfff;
+				// Extra Half-Brite
 				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
 			}
 			break;

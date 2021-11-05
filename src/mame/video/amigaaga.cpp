@@ -47,14 +47,16 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
 	int r,g,b;
 	int cr,cg,cb;
 	int color;
+	u8 pal_bank = (CUSTOM_REG(REG_BPLCON3) >> 13) & 0x07;
 
-	color = ((CUSTOM_REG(REG_BPLCON3) >> 13) & 0x07)*32 + color_reg;
+	color = (pal_bank * 32) + color_reg;
 	r = (data & 0xf00) >> 8;
 	g = (data & 0x0f0) >> 4;
 	b = (data & 0x00f) >> 0;
 	cr = m_aga_palette[color].r();
 	cg = m_aga_palette[color].g();
 	cb = m_aga_palette[color].b();
+	// LOCT bit
 	if (BIT(CUSTOM_REG(REG_BPLCON3),9))
 	{
 		// load low nibbles
@@ -68,7 +70,13 @@ void amiga_state::aga_palette_write(int color_reg, uint16_t data)
 		cg = (g << 4) | g;
 		cb = (b << 4) | b;
 	}
-	m_aga_palette[color] = rgb_t(cr,cg,cb);
+	m_aga_palette[color] = rgb_t(cr, cg, cb);
+	// make a copy for Extra Half Brite mode
+	if (pal_bank == 0)
+	{
+		m_aga_ehb_palette[color_reg] = rgb_t(cr, cg, cb);
+		m_aga_ehb_palette[color_reg + 32] = rgb_t(cr >> 1, cg >> 1, cb >> 1);
+	}
 }
 
 /*************************************
@@ -453,7 +461,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 {
 	uint16_t save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
-	int hires = 0, dualpf = 0, ham = 0;
+	int hires = 0, dualpf = 0, ham = 0, ehb = 0;
 	int pf1pri = 0, pf2pri = 0;
 	int planes = 0;
 
@@ -542,6 +550,12 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
+			// In AGA Extra Half-Brite applies if this condition is satisfied
+			// (bit 9 of BPLCON2 is KILLEHB)
+			// cfr. bblow_a main menu
+			// TODO: verify if it needs no hires and no shres too
+			//ehb = !ham && !dualpf && planes == 6 && !bool(BIT(CUSTOM_REG(REG_BPLCON2), 9));
+			ehb = (CUSTOM_REG(REG_BPLCON0) & 0x7c10) == 0x6000 && !bool(BIT(CUSTOM_REG(REG_BPLCON2), 9));
 
 			/* get default bitoffset */
 			switch(CUSTOM_REG(REG_FMODE) & 0x3)
@@ -802,8 +816,10 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					/* playfield has priority */
 					else
 					{
-						dst[x*2+0] = aga_palette[pfpix0];
-						dst[x*2+1] = aga_palette[pfpix1];
+						// TODO: does it applies to sprites too?
+						rgb_t *dst_palette = ehb ? m_aga_ehb_palette : aga_palette;
+						dst[x*2+0] = dst_palette[pfpix0];
+						dst[x*2+1] = dst_palette[pfpix1];
 					}
 				}
 			}

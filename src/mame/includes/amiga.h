@@ -412,6 +412,7 @@ public:
 	/* aga */
 	int m_aga_diwhigh_written;
 	rgb_t m_aga_palette[256];
+	rgb_t m_aga_ehb_palette[32 + 32];
 	uint64_t m_aga_bpldat[8];
 	uint16_t m_aga_sprdata[8][4];
 	uint16_t m_aga_sprdatb[8][4];
