@@ -447,7 +447,7 @@ void gp_1_state::machine_reset()
 	m_u14 = 0;
 	m_digit = 0xff;
 	m_last_solenoid = 15;
-	for (u8 i = 0; i < std::distance(m_io_outputs.begin(), m_io_outputs.end()); i++)
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 	for (u8 i = 0; i < std::size(m_segment); i++)
 		m_segment[i] = 0;
