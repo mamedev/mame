@@ -10,8 +10,11 @@
 
 #include "wavfile.h"
 
-#include <cstdio>
+#include "osdcomm.h" // little_endianize_int16
+
 #include <cassert>
+#include <cstdio>
+#include <cstring>
 
 static const char magic1[4] = { 'R', 'I', 'F', 'F' };
 static const char magic2[4] = { 'W', 'A', 'V', 'E' };

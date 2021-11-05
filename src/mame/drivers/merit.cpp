@@ -1765,6 +1765,21 @@ ROM_START( casino5a ) /* Standard version, the rom set with 3315-02 U5-1 is the 
 	ROM_LOAD( "chr8_u40a.u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
 ROM_END
 
+ROM_START( casino5b )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program roms on a CTR-202A daughter card */
+	ROM_LOAD( "3315-12_u5-0.u5", 0x0000, 0x2000, CRC(50116e80) SHA1(3563a685cba25bf6d2b47280f17488d6427b3bd8) ) /* Internal designation: PCFSP 331502SP */
+	ROM_LOAD( "3315-12_u6-0.u6", 0x2000, 0x4000, CRC(7050ca92) SHA1(8ea351cee84812b31d7a6c3de77a7f43e8b077f8) )
+	ROM_LOAD( "3315-12_u7-0.u7", 0x6000, 0x4000, CRC(ddd97b53) SHA1(57f86efa3d87e8eb226506f4a37481c5132a5a6a) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr8_u40a.u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+ROM_END
+
 ROM_START( mroundup )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "kru1cd_u5.u5",  0x0000, 0x2000, CRC(7bd90672) SHA1(5f763e807370df991cc2c4abaeb8184c42149a0e) ) /* Internal designation: RUM1HRV0 */
@@ -2630,6 +2645,7 @@ GAME( 1982, mpchoicea,  pitboss,  pitboss, mpchoicea, merit_state, empty_init, R
 
 GAME( 1989, casino5,    0,        casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1984, casino5a,   casino5,  casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5b,   casino5,  casino5, casino5,   merit_state, empty_init, ROT0,  "Merit", "Casino Five (3315-12, U5-0)",       MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, mroundup,   0,        pitboss, mroundup,  merit_state, empty_init, ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 

@@ -12,8 +12,6 @@ For more information see:
 
 #include "ace_tap.h"
 
-#include <cassert>
-
 
 #define SMPLO   -32768
 #define SILENCE 0

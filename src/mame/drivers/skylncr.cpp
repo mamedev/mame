@@ -162,6 +162,7 @@ public:
 	void mbutrfly(machine_config &config);
 	void olymp(machine_config &config);
 
+	void init_leadera();
 	void init_mbutrfly() { save_item(NAME(m_mbutrfly_prot)); }
 	void init_miaction();
 	void init_olymp();
@@ -1918,6 +1919,23 @@ ROM_START( leader )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp22", 0x40001, 0x20000, CRC(04cc0118) SHA1(016ccbe7daf8c4676830aadcc906a64e2826d11a) )
 ROM_END
 
+ROM_START( leadera ) // this has the same GFX ROMs as butrfly, with different program
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "leader 2ka.bin",  0x00000, 0x10000, CRC(2664db55) SHA1(de4c07a8ba8fab772441395b6d05272ee54d9614) ) // on sub board with Altera EPM7032
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "u29", 0x00000, 0x20000, CRC(2ff775ea) SHA1(2219c75cbac2969485607446ab116587bdee7278) )
+	ROM_LOAD16_BYTE( "u31", 0x00001, 0x20000, CRC(029d2214) SHA1(cf8256157db0b297ed457b3da6b6517907128843) )
+	ROM_LOAD16_BYTE( "u33", 0x40000, 0x20000, CRC(37bad677) SHA1(c077f0c07b097b376a01e5637446e4c4f82d9e28) )
+	ROM_LOAD16_BYTE( "u35", 0x40001, 0x20000, CRC(d14c7713) SHA1(c229ef64f3b0a04ff8e27bc56cff6a55ca34b80c) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "u52", 0x00000, 0x20000, CRC(15051537) SHA1(086c38c05c605f297a7bc470eb51763a7648e72c) )
+	ROM_LOAD16_BYTE( "u54", 0x00001, 0x20000, CRC(8e34d029) SHA1(ae316f2f34768938a07d62db110ce59d2751abaa) )
+	ROM_LOAD16_BYTE( "u56", 0x40000, 0x20000, CRC(a53daaef) SHA1(7b88bb986bd5e47576163d6999f8770c720c5bfc) )
+	ROM_LOAD16_BYTE( "u58", 0x40001, 0x20000, CRC(21ca47f8) SHA1(b192be06a2eb817776309580dc64fd76772a8d50) )
+ROM_END
+
 /*
   Neraidoula
 
@@ -2174,7 +2192,7 @@ ROM_START( speedway ) // runs on a Rolla PCB with small sub board with main CPU,
 	ROM_LOAD( "v3.bin", 0x00000, 0x10000, CRC(ef777180) SHA1(f1a554677543082eb7df2e204d0d4c987b7c6bbb) ) //TMS 27C512
 
 	ROM_REGION( 0x80000, "gfx1", 0 ) // all HN27C301AG
-	ROM_LOAD16_BYTE( "1.u29", 0x00000, 0x20000, CRC(3b360aac) SHA1(a6f31deea53deb8a7da2804c979390ed91ee9f50) ) // 1xxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "1.u29", 0x00000, 0x20000, CRC(72e001fe) SHA1(dbb02f8425c175d5ee401754e6c11ce4d429e621) )
 	ROM_LOAD16_BYTE( "2.u31", 0x00001, 0x20000, CRC(a491bdcf) SHA1(793faa829de50f67a44541136b66407ee9744971) )
 	ROM_LOAD16_BYTE( "3.u33", 0x40000, 0x20000, CRC(935fc941) SHA1(12e5f7fea932a86298928b70b342e0825a3caca1) )
 	ROM_LOAD16_BYTE( "4.u35", 0x40001, 0x20000, CRC(aa8164ce) SHA1(027fa9743ad9d80bd86e59d684180f75dc6d60a0) )
@@ -2339,6 +2357,22 @@ void skylncr_state::init_speedway() // TODO: complete this. These XORs and range
 	}
 }
 
+void skylncr_state::init_leadera()
+{
+	uint8_t *const ROM = memregion("maincpu")->base();
+
+	for (int x = 0x000d; x < 0x4000; x++)
+		ROM[x] ^= 0x08;
+
+	for (int x = 0x4000; x < 0x8000; x++)
+		ROM[x] ^= 0x10;
+
+	for (int x = 0xc000; x < 0x10000; x++)
+		ROM[x] ^= 0x40;
+
+	ROM[0x762a] = ROM[0x762b] = 0x00; // TODO: some minor protection? bypass for now
+}
+
 } // Anonymous namespace
 
 
@@ -2352,6 +2386,7 @@ GAME( 1995, butrfly,   0,        skylncr,  skylncr,  skylncr_state,  empty_init,
 GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  init_mbutrfly, ROT0, "Bordun International", "Magical Butterfly (version U350C, protected)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  empty_init,    ROT0, "Bordun International", "Mad Zoo (version U450C)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  empty_init,    ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, leadera,   leader,   skylncr,  leader,   skylncr_state,  init_leadera,  ROT0, "bootleg",              "Leader (version Z 2F, Greece)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Needs correct protection emulation instead of ROM patch
 GAME( 199?, speedway,  0,        olymp,    leader,   skylncr_state,  init_speedway, ROT0, "hack (Drivers)",       "Speedway",                                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // Incomplete decryption (?)
 GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  empty_init,    ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", MACHINE_SUPPORTS_SAVE )
 GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  empty_init,    ROT0, "bootleg",              "Neraidoula",                                     MACHINE_SUPPORTS_SAVE )

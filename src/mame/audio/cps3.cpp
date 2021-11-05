@@ -135,6 +135,13 @@ void cps3_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 			vptr->frac = frac;
 		}
 	}
+
+	// clamp the output; unknown what the real chip does
+	for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
+	{
+		outputs[0].put_clamp(sampindex, outputs[0].getraw(sampindex));
+		outputs[1].put_clamp(sampindex, outputs[1].getraw(sampindex));
+	}
 }
 
 

@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info1)
 
 	tileinfo.set(0,
 			code+bank*256,
-			0 + 64 * (attr & 0x0f),
+			1 + 64 * (attr & 0x0f),
 			0);
 }
 

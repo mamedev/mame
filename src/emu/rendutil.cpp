@@ -25,7 +25,7 @@ namespace {
 
 struct jpeg_corefile_source : public jpeg_source_mgr
 {
-	static void source(j_decompress_ptr cinfo, util::core_file &file);
+	static void source(j_decompress_ptr cinfo, util::random_read &file);
 
 private:
 	static constexpr unsigned INPUT_BUF_SIZE = 4096;
@@ -40,7 +40,8 @@ private:
 	{
 		jpeg_corefile_source &src = *static_cast<jpeg_corefile_source *>(cinfo->src);
 
-		size_t nbytes = src.infile->read(src.buffer, INPUT_BUF_SIZE);
+		size_t nbytes;
+		src.infile->read(src.buffer, INPUT_BUF_SIZE, nbytes); // TODO: check error return
 
 		if (0 >= nbytes)
 		{
@@ -79,12 +80,12 @@ private:
 	{
 	}
 
-	util::core_file *infile;
+	util::random_read *infile;
 	JOCTET *buffer;
 	bool start_of_file;
 };
 
-void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::core_file &file)
+void jpeg_corefile_source::source(j_decompress_ptr cinfo, util::random_read &file)
 {
 	jpeg_corefile_source *src;
 	if (!cinfo->src)
@@ -662,7 +663,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, float length_
     into a bitmap
 -------------------------------------------------*/
 
-void render_load_msdib(bitmap_argb32 &bitmap, util::core_file &file)
+void render_load_msdib(bitmap_argb32 &bitmap, util::random_read &file)
 {
 	// deallocate previous bitmap
 	bitmap.reset();
@@ -682,7 +683,7 @@ void render_load_msdib(bitmap_argb32 &bitmap, util::core_file &file)
     bitmap
 -------------------------------------------------*/
 
-void render_load_jpeg(bitmap_argb32 &bitmap, util::core_file &file)
+void render_load_jpeg(bitmap_argb32 &bitmap, util::random_read &file)
 {
 	// deallocate previous bitmap
 	bitmap.reset();
@@ -764,7 +765,7 @@ cleanup:
     bitmap
 -------------------------------------------------*/
 
-bool render_load_png(bitmap_argb32 &bitmap, util::core_file &file, bool load_as_alpha_to_existing)
+bool render_load_png(bitmap_argb32 &bitmap, util::random_read &file, bool load_as_alpha_to_existing)
 {
 	// deallocate if we're not overlaying alpha
 	if (!load_as_alpha_to_existing)
@@ -772,15 +773,15 @@ bool render_load_png(bitmap_argb32 &bitmap, util::core_file &file, bool load_as_
 
 	// read the PNG data
 	util::png_info png;
-	util::png_error const result = png.read_file(file);
-	if (result != util::png_error::NONE)
+	std::error_condition const result = png.read_file(file);
+	if (result)
 	{
 		osd_printf_error("Error reading PNG file\n");
 		return false;
 	}
 
 	// if less than 8 bits, upsample
-	if (util::png_error::NONE != png.expand_buffer_8bit())
+	if (png.expand_buffer_8bit())
 	{
 		osd_printf_error("Error upsampling PNG bitmap\n");
 		return false;
@@ -790,7 +791,7 @@ bool render_load_png(bitmap_argb32 &bitmap, util::core_file &file, bool load_as_
 	if (!load_as_alpha_to_existing)
 	{
 		// non-alpha case
-		if (util::png_error::NONE != png.copy_to_bitmap(bitmap, hasalpha))
+		if (png.copy_to_bitmap(bitmap, hasalpha))
 		{
 			osd_printf_error("Error copying PNG bitmap to MAME bitmap\n");
 			return false;
@@ -930,13 +931,13 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const util::png_info
     render_detect_image - detect image format
 -------------------------------------------------*/
 
-ru_imgformat render_detect_image(util::core_file &file)
+ru_imgformat render_detect_image(util::random_read &file)
 {
 	// PNG: check for valid header
 	{
-		util::png_error const png = util::png_info::verify_header(file);
-		file.seek(0, SEEK_SET);
-		if (util::png_error::NONE == png)
+		std::error_condition const png = util::png_info::verify_header(file);
+		file.seek(0, SEEK_SET); // TODO: check error return
+		if (!png)
 			return RENDUTIL_IMGFORMAT_PNG;
 	}
 
@@ -953,7 +954,7 @@ ru_imgformat render_detect_image(util::core_file &file)
 		jpeg_corefile_source::source(&cinfo, file);
 		jpeg_read_header(&cinfo, TRUE);
 		jpeg_destroy_decompress(&cinfo);
-		file.seek(0, SEEK_SET);
+		file.seek(0, SEEK_SET); // TODO: check error return
 		return RENDUTIL_IMGFORMAT_JPEG;
 
 	notjpeg:

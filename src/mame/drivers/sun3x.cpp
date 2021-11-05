@@ -9,7 +9,6 @@
   TODO:
     - Improve interrupt controller emulation.
     - Figure out how the IOMMU works.
-    - Intersil 7170 device for 3/460 and 3/480 (they use the same PROMs).
     - Sun custom MMU for original Sun 3 models.
     - AM7990 LANCE chip support for everyone.
     - Figure out how the parallel printer port maps to Centronics and make it so.
@@ -136,6 +135,7 @@
 #include "formats/mfi_dsk.h"
 #include "formats/pc_dsk.h"
 #include "imagedev/floppy.h"
+#include "machine/icm7170.h"
 #include "machine/ncr539x.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -265,7 +265,7 @@ void sun3x_state::sun3_460_mem(address_map &map)
 	map(0x62000000, 0x6200000f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x62002000, 0x6200200f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff00ff00);
 	map(0x63000000, 0x6301ffff).rom().region("user1", 0);
-
+	map(0x64002000, 0x64002011).rw("rtc", FUNC(icm7170_device::read), FUNC(icm7170_device::write));
 	map(0x6f00003c, 0x6f00003f).rw(FUNC(sun3x_state::printer_r), FUNC(sun3x_state::printer_w));
 	map(0xfefe0000, 0xfefeffff).rom().region("user1", 0);
 }
@@ -635,7 +635,7 @@ void sun3x_state::sun3_460(machine_config &config)
 	M68030(config, m_maincpu, 33000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sun3x_state::sun3_460_mem);
 
-	M48T02(config, TIMEKEEPER_TAG, 0);
+	ICM7170(config, "rtc", 32768).irq().set_inputline(m_maincpu, M68K_IRQ_7);
 
 	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
 	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
@@ -700,5 +700,5 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT        COMPANY             FULLNAME             FLAGS
-COMP( 198?, sun3_80,  0,      0,      sun3_80,  sun3x, sun3x_state, empty_init, "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
-COMP( 198?, sun3_460, 0,      0,      sun3_460, sun3x, sun3x_state, empty_init, "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus
+COMP( 1989, sun3_80,  0,      0,      sun3_80,  sun3x, sun3x_state, empty_init, "Sun Microsystems", "Sun 3/80",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Hydra
+COMP( 1989, sun3_460, 0,      0,      sun3_460, sun3x, sun3x_state, empty_init, "Sun Microsystems", "Sun 3/460/470/480", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Pegasus

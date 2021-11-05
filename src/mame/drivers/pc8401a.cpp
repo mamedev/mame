@@ -12,7 +12,6 @@
 
     - keyboard interrupt
     - RTC TP pulse
-    - disassembler for NEC uPD70008C (RST mnemonics are different from Z80)
     - clock does not advance in menu
     - mirror e800-ffff to 6800-7fff
     - soft power on/off

@@ -50,9 +50,9 @@
 
 #include "ui/uimain.h"
 
-#include "xmlfile.h"
-
-#include <zlib.h>
+#include "util/ioprocsfilter.h"
+#include "util/path.h"
+#include "util/xmlfile.h"
 
 #include <algorithm>
 
@@ -2117,58 +2117,56 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 bool render_target::load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device)
 {
 	// +1 to ensure data is terminated for XML parser
-	auto tempout = make_unique_clear<u8 []>(layout_data.decompressed_size + 1);
-
-	z_stream stream;
-	int zerr;
-
-	// initialize the stream
-	memset(&stream, 0, sizeof(stream));
-	stream.next_out = tempout.get();
-	stream.avail_out = layout_data.decompressed_size;
-
-	zerr = inflateInit(&stream);
-	if (zerr != Z_OK)
+	std::unique_ptr<u8 []> tempout(new (std::nothrow) u8 [layout_data.decompressed_size + 1]);
+	auto inflater(util::zlib_read(util::ram_read(layout_data.data, layout_data.compressed_size), 8192));
+	if (!tempout || !inflater)
 	{
-		osd_printf_error("render_target::load_layout_file: zlib initialization error\n");
+		osd_printf_error("render_target::load_layout_file: not enough memory to decompress layout\n");
 		return false;
 	}
 
-	// decompress this chunk
-	stream.next_in = (unsigned char *)layout_data.data;
-	stream.avail_in = layout_data.compressed_size;
-	zerr = inflate(&stream, Z_NO_FLUSH);
-
-	// stop at the end of the stream
-	if (zerr == Z_STREAM_END)
+	size_t decompressed = 0;
+	do
 	{
-		// OK
+		size_t actual;
+		std::error_condition const err = inflater->read(
+				&tempout[decompressed],
+				layout_data.decompressed_size - decompressed,
+				actual);
+		decompressed += actual;
+		if (err)
+		{
+			osd_printf_error(
+					"render_target::load_layout_file: error decompressing layout (%s:%d %s)\n",
+					err.category().name(),
+					err.value(),
+					err.message());
+			return false;
+		}
+		if (!actual && (layout_data.decompressed_size < decompressed))
+		{
+			osd_printf_warning(
+					"render_target::load_layout_file: expected %u bytes of decompressed data but only got %u\n",
+					layout_data.decompressed_size,
+					decompressed);
+			break;
+		}
 	}
-	else if (zerr != Z_OK)
-	{
-		osd_printf_error("render_target::load_layout_file: zlib decompression error\n");
-		inflateEnd(&stream);
-		return false;
-	}
+	while (layout_data.decompressed_size > decompressed);
+	inflater.reset();
 
-	// clean up
-	zerr = inflateEnd(&stream);
-	if (zerr != Z_OK)
-		osd_printf_error("render_target::load_layout_file: zlib cleanup error\n");
-
+	tempout[decompressed] = 0U;
 	util::xml::file::ptr rootnode(util::xml::file::string_read(reinterpret_cast<char const *>(tempout.get()), nullptr));
 	tempout.reset();
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
 	if (!load_layout_file(device ? *device : m_manager.machine().root_device(), *rootnode, m_manager.machine().options().art_path(), dirname))
 	{
-		osd_printf_warning("Improperly formatted XML string, ignoring\n");
+		osd_printf_warning("render_target::load_layout_file: Improperly formatted XML string, ignoring\n");
 		return false;
 	}
-	else
-	{
-		return true;
-	}
+
+	return true;
 }
 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
@@ -2186,7 +2184,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 	emu_file layoutfile(m_manager.machine().options().art_path(), OPEN_FLAG_READ);
 	layoutfile.set_restrict_to_mediapath(1);
 	bool result(false);
-	for (osd_file::error filerr = layoutfile.open(fname); osd_file::error::NONE == filerr; filerr = layoutfile.open_next())
+	for (std::error_condition filerr = layoutfile.open(fname); !filerr; filerr = layoutfile.open_next())
 	{
 		// read the file and parse as XML
 		util::xml::file::ptr const rootnode(util::xml::file::read(layoutfile, &parseopt));

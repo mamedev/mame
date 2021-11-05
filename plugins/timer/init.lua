@@ -6,7 +6,7 @@ local exports = {}
 exports.name = "timer"
 exports.version = "0.0.2"
 exports.description = "Game play timer"
-exports.license = "The BSD 3-Clause License"
+exports.license = "BSD-3-Clause"
 exports.author = { name = "Carl" }
 
 local timer = exports
@@ -89,18 +89,21 @@ function timer.startplugin()
 		return string.format("%03d:%02d:%02d", hrs, min, sec)
 	end
 
+	local lastupdate
+
 	local function menu_populate()
-		local time = os.time() - start_time
-		return {{ _("Current time"), "", "off" },
-			{ sectohms(time), "", "off" },
-			{ _("Total time"), "", "off" },
-			{ sectohms(total_time + time), "", "off" },
-			{ _("Play Count"), "", "off" },
-			{ play_count, "", "off" }}
+		lastupdate = os.time()
+		local time = lastupdate - start_time
+		return
+			{{ _("Current time"), sectohms(time), "off" },
+			 { _("Total time"), sectohms(total_time + time), "off" },
+			 { _("Play Count"), play_count, "off" }},
+			nil,
+			"idle"
 	end
 
 	local function menu_callback(index, event)
-		return true
+		return os.time() > lastupdate
 	end
 
 	emu.register_menu(menu_callback, menu_populate, _("Timer"))

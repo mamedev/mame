@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/excali64_dsk.h"
 
 excali64_format::excali64_format() : wd177x_format(formats)

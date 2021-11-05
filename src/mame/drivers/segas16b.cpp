@@ -1332,44 +1332,6 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //**************************************************************************
 
 //-------------------------------------------------
-//  altbeast_common_i8751_sim - simulate the I8751
-//  from Altered Beast
-//-------------------------------------------------
-
-void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank)
-{
-	// signal a VBLANK to the main CPU
-	m_maincpu->set_input_line(4, HOLD_LINE);
-
-	// set tile banks
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int bank = m_workram[0x3094 / 2] & 0x00ff;
-	// alt_bank is used for the alt ROM loading (where there are space between the ROMs)
-	// alternatively the ROM loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
-	// board so presumably our MCU simulation should act accordingly.
-	if (alt_bank) bank = (bank & 0x1) | ((bank & 0xfe) << 1);
-
-	rom_5704_bank_w(space, 1, bank, 0x00ff);
-
-	// process any new sound data
-	uint16_t temp = m_workram[soundoffs];
-	if ((temp & 0xff00) != 0x0000)
-	{
-		m_mapper->write(0x03, temp >> 8);
-		m_workram[soundoffs] = temp & 0x00ff;
-	}
-
-	// read inputs
-	m_workram[inputoffs] = ~ioport("SERVICE")->read() << 8;
-}
-
-void segas16b_state::altbeasj_i8751_sim()
-{
-	altbeast_common_i8751_sim(0x30d4/2, 0x30d0/2, 1);
-}
-
-
-//-------------------------------------------------
 //  tturf_i8751_sim - simulate the I8751
 //  from Tough Turf
 //-------------------------------------------------
@@ -3971,8 +3933,6 @@ void segas16b_state::system16b(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
-	// see note in segas16a.cpp, also used here for consistency
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -3982,12 +3942,12 @@ void segas16b_state::system16b(machine_config &config)
 
 #if USE_NL
 	YM2151(config, m_ym2151, MASTER_CLOCK_8MHz/2)
-		.add_route(0, "netlist", 1.0, 0)
-		.add_route(1, "netlist", 1.0, 1);
+		.add_route(0, "netlist", 0.43, 0)
+		.add_route(1, "netlist", 0.43, 1);
 	UPD7759(config, m_upd7759);
 	m_upd7759->md_w(0);
 	m_upd7759->drq().set(FUNC(segas16b_state::upd7759_generate_nmi));
-	m_upd7759->add_route(0, "netlist", 1.0, 2);
+	m_upd7759->add_route(0, "netlist", 0.48, 2);
 
 	NETLIST_SOUND(config, "netlist", 48000)
 		.set_source(netlist_segas16b_audio)
@@ -4186,7 +4146,6 @@ void segas16b_state::lockonph(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas16b_state::lockonph_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas16b_state::lockonph_sound_iomap);
 
-
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
@@ -4197,8 +4156,6 @@ void segas16b_state::lockonph(machine_config &config)
 	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224); // wrong, other XTAL seems to be 17Mhz?
 	m_screen->set_screen_update(FUNC(segas16b_state::screen_update));
 	m_screen->set_palette(m_palette);
-	// see note in segas16a.cpp, also used here for consistency
-	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
 	SEGAIC16VID(config, m_segaic16vid, 0, m_gfxdecode);
@@ -4236,10 +4193,13 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 
 	// sound hardware
 	config.device_remove("ym2151");
+	config.device_remove("upd");
+#if USE_NL
+	config.device_remove("netlist");
+#endif
+
 	YM2413(config, m_ym2413, XTAL(20'000'000)/4); // 20MHz OSC divided by 4 (verified)
 	m_ym2413->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	config.device_remove("upd");
 }
 
 INTERRUPT_GEN_MEMBER(dfjail_state::soundirq_cb)
@@ -4280,7 +4240,7 @@ void dfjail_state::dfjail(machine_config &config)
 	//config.device_remove("ym2151");
 	config.device_remove("upd");
 
-	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.5); // AD7533KN
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.25); // AD7533KN
 }
 
 
@@ -4679,6 +4639,9 @@ ROM_END
 //  Jyuohki (Altered Beast), Sega System 16B
 //  CPU: 68000 + i8751 (317-0077)
 //  ROM Board type: 171-5521
+//  Sega game ID: 833-6660-09 JYUOHKI
+//    Main board: 837-6662-06
+//     ROM board: 834-6661-09
 //
 ROM_START( altbeastj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
@@ -4715,7 +4678,7 @@ ROM_START( altbeastj )
 	ROM_LOAD( "opr-11673.a12", 0x30000, 0x20000, CRC(400c4a36) SHA1(de4bdfa91734410e0a7f6a16bf8336db172f458a) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0077.c2", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0077.c2", 0x00000, 0x1000, CRC(eef80d68) SHA1(a932129a4e7ba9f813f0f46253940c90fac98d50) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
@@ -7979,36 +7942,36 @@ ROM_END
 //
 ROM_START( riotcity )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "epr-14612.bin", 0x000000, 0x20000, CRC(a1b331ec) SHA1(49136ffed35ecc9e5e9a6ea7acbe534e6ccc9dd8) )
-	ROM_LOAD16_BYTE( "epr-14610.bin", 0x000001, 0x20000, CRC(cd4f2c50) SHA1(c7a7e95901c664a72195c202b50a159db8d5981d) )
-	ROM_LOAD16_BYTE( "epr-14613.bin", 0x040000, 0x20000, CRC(0659df4c) SHA1(a24005ce354113732306c318de373c818400a9c8) )
-	ROM_LOAD16_BYTE( "epr-14611.bin", 0x040001, 0x20000, CRC(d9e6f80b) SHA1(5ac56b3685bb121a4f07be3d81209807436e76ec) )
+	ROM_LOAD16_BYTE( "epr-14612.a7", 0x000000, 0x20000, CRC(a1b331ec) SHA1(49136ffed35ecc9e5e9a6ea7acbe534e6ccc9dd8) )
+	ROM_LOAD16_BYTE( "epr-14610.a5", 0x000001, 0x20000, CRC(cd4f2c50) SHA1(c7a7e95901c664a72195c202b50a159db8d5981d) )
+	ROM_LOAD16_BYTE( "epr-14613.a8", 0x040000, 0x20000, CRC(0659df4c) SHA1(a24005ce354113732306c318de373c818400a9c8) )
+	ROM_LOAD16_BYTE( "epr-14611.a6", 0x040001, 0x20000, CRC(d9e6f80b) SHA1(5ac56b3685bb121a4f07be3d81209807436e76ec) )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 ) // tiles
-	ROM_LOAD( "epr-14616.bin", 0x00000, 0x20000, CRC(46d30368) SHA1(a791ef0e881345b6be0b28f32af17127edb5b590) ) // plane 1
-	ROM_LOAD( "epr-14625.bin", 0x20000, 0x20000, CRC(abfb80fe) SHA1(5f0d61d55f27e8f776b573e3193164c4d70ec12b) )
-	ROM_LOAD( "epr-14617.bin", 0x40000, 0x20000, CRC(884e40f9) SHA1(f7eeae57544e7d95139588137605986732937d38) ) // plane 2
-	ROM_LOAD( "epr-14626.bin", 0x60000, 0x20000, CRC(4ef55846) SHA1(2f23474e7d1d8880dc251ada55c5fca2fc19256a) )
-	ROM_LOAD( "epr-14618.bin", 0x80000, 0x20000, CRC(00eb260e) SHA1(f293180fb9a053c98022ef086bf4002563752f61) ) // plane 3
-	ROM_LOAD( "epr-14627.bin", 0xa0000, 0x20000, CRC(961e5f82) SHA1(dc88b511dff6cdebf96fe8bf388bf76098296b0f) )
+	ROM_LOAD( "epr-14616.a14", 0x00000, 0x20000, CRC(46d30368) SHA1(a791ef0e881345b6be0b28f32af17127edb5b590) ) // plane 1
+	ROM_LOAD( "epr-14625.b14", 0x20000, 0x20000, CRC(abfb80fe) SHA1(5f0d61d55f27e8f776b573e3193164c4d70ec12b) )
+	ROM_LOAD( "epr-14617.a15", 0x40000, 0x20000, CRC(884e40f9) SHA1(f7eeae57544e7d95139588137605986732937d38) ) // plane 2
+	ROM_LOAD( "epr-14626.b15", 0x60000, 0x20000, CRC(4ef55846) SHA1(2f23474e7d1d8880dc251ada55c5fca2fc19256a) )
+	ROM_LOAD( "epr-14618.a16", 0x80000, 0x20000, CRC(00eb260e) SHA1(f293180fb9a053c98022ef086bf4002563752f61) ) // plane 3
+	ROM_LOAD( "epr-14627.b16", 0xa0000, 0x20000, CRC(961e5f82) SHA1(dc88b511dff6cdebf96fe8bf388bf76098296b0f) )
 
 	ROM_REGION16_BE( 0x1c0000, "sprites", 0 ) // sprites
-	ROM_LOAD16_BYTE( "epr-14619.bin",  0x000001, 0x020000, CRC(6f2b5ef7) SHA1(a0186fcc5b12c31b65b84355f88bcb10b1434135) )
-	ROM_CONTINUE(                      0x100001, 0x020000 )
-	ROM_LOAD16_BYTE( "epr-14622.bin",  0x000000, 0x020000, CRC(7ca7e40d) SHA1(57d26cc1b530cb867b2a4779bb5108ac457b2154) )
-	ROM_CONTINUE(                      0x100000, 0x020000 )
-	ROM_LOAD16_BYTE( "epr-14620.bin",  0x040001, 0x020000, CRC(66183333) SHA1(44bb9d57cd0308c0d7b6a10ba9bd95763ceea775) )
-	ROM_CONTINUE(                      0x140001, 0x020000 )
-	ROM_LOAD16_BYTE( "epr-14623.bin",  0x040000, 0x020000, CRC(98630049) SHA1(216ae0b4a59f306b51bd50dfcbf831c3186a4d2a) )
-	ROM_CONTINUE(                      0x140000, 0x020000 )
-	ROM_LOAD16_BYTE( "epr-14621.bin",  0x080001, 0x020000, CRC(c0f2820e) SHA1(ae433f6c5065ed495f5f57f50d6abe5ff98b041e) )
-	ROM_CONTINUE(                      0x180001, 0x020000 )
-	ROM_LOAD16_BYTE( "epr-14624.bin",  0x080000, 0x020000, CRC(d1a68448) SHA1(7591f0476e899a11042d9b7e93f99b64de48b0ef) )
-	ROM_CONTINUE(                      0x180000, 0x020000 )
+	ROM_LOAD16_BYTE( "epr-14619.b1",  0x000001, 0x020000, CRC(6f2b5ef7) SHA1(a0186fcc5b12c31b65b84355f88bcb10b1434135) )
+	ROM_CONTINUE(                     0x100001, 0x020000 )
+	ROM_LOAD16_BYTE( "epr-14622.b5",  0x000000, 0x020000, CRC(7ca7e40d) SHA1(57d26cc1b530cb867b2a4779bb5108ac457b2154) )
+	ROM_CONTINUE(                     0x100000, 0x020000 )
+	ROM_LOAD16_BYTE( "epr-14620.b2",  0x040001, 0x020000, CRC(66183333) SHA1(44bb9d57cd0308c0d7b6a10ba9bd95763ceea775) )
+	ROM_CONTINUE(                     0x140001, 0x020000 )
+	ROM_LOAD16_BYTE( "epr-14623.b6",  0x040000, 0x020000, CRC(98630049) SHA1(216ae0b4a59f306b51bd50dfcbf831c3186a4d2a) )
+	ROM_CONTINUE(                     0x140000, 0x020000 )
+	ROM_LOAD16_BYTE( "epr-14621.b3",  0x080001, 0x020000, CRC(c0f2820e) SHA1(ae433f6c5065ed495f5f57f50d6abe5ff98b041e) )
+	ROM_CONTINUE(                     0x180001, 0x020000 )
+	ROM_LOAD16_BYTE( "epr-14624.b7",  0x080000, 0x020000, CRC(d1a68448) SHA1(7591f0476e899a11042d9b7e93f99b64de48b0ef) )
+	ROM_CONTINUE(                     0x180000, 0x020000 )
 
 	ROM_REGION( 0x50000, "soundcpu", 0 ) // sound CPU
-	ROM_LOAD( "epr-14614.bin", 0x00000, 0x10000, CRC(c65cc69a) SHA1(28a75dd2085b8e1447fe4e6af210a54a6666fcb1) )
-	ROM_LOAD( "epr-14615.bin", 0x10000, 0x20000, CRC(46653db1) SHA1(7a43d8742ee451d93bb5f1b0f4f261b274c3f0ef) )
+	ROM_LOAD( "epr-14614.a10", 0x00000, 0x10000, CRC(c65cc69a) SHA1(28a75dd2085b8e1447fe4e6af210a54a6666fcb1) )
+	ROM_LOAD( "epr-14615.a11", 0x10000, 0x20000, CRC(46653db1) SHA1(7a43d8742ee451d93bb5f1b0f4f261b274c3f0ef) )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "315-5298.b9",  0x0000, 0x00eb, CRC(39b47212) SHA1(432b47aee5ecbf08a8a6dc2f8379c816feb86328) ) // PLS153
@@ -9746,12 +9709,6 @@ void segas16b_state::init_aliensyn7_5358_small()
 	downcast<mc8123_device &>(*m_soundcpu).decode(memregion("soundcpu")->base(), m_sound_decrypted_opcodes, 0x8000);
 }
 
-void segas16b_state::init_altbeasj_5521()
-{
-	init_generic_5521();
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
-}
-
 void segas16b_state::init_altbeas4_5521()
 {
 	init_generic_5521();
@@ -9884,7 +9841,7 @@ GAME( 1986, afighterg,  afighter, system16b_fd1089b,     afighter, segas16b_stat
 GAME( 1986, afighterh,  afighter, system16b_fd1089a,     afighter, segas16b_state, init_generic_5358_small, ROT270, "Sega", "Action Fighter (System 16B, FD1089A 317-0018)", 0 ) // same rev as afighterg
 
 GAME( 1988, altbeast,   0,        system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 8) (8751 317-0078)", 0 )
-GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_altbeasj_5521,      ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
+GAME( 1988, altbeastj,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Juuouki (set 7, Japan) (8751 317-0077)", 0 )
 GAME( 1988, altbeast6,  altbeast, system16b_i8751,       altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 6) (8751 317-0076)", 0 )
 GAME( 1988, altbeast5,  altbeast, system16b_fd1094,      altbeast, segas16b_state, init_generic_5521,       ROT0,   "Sega", "Altered Beast (set 5) (FD1094 317-0069)", 0 )
 GAME( 1988, altbeast4,  altbeast, system16b_mc8123,      altbeast, segas16b_state, init_altbeas4_5521,      ROT0,   "Sega", "Altered Beast (set 4) (MC-8123B 317-0066)", 0 )
@@ -10067,16 +10024,16 @@ GAME( 1989, wrestwar2d, wrestwar, system16b,             wrestwar, segas16b_stat
 GAME( 1989, wrestwar1d, wrestwar, system16b,             wrestwar, segas16b_state, init_generic_5704,       ROT270, "bootleg", "Wrestle War (set 1, Japan) (bootleg of FD1094 317-0090 set)", 0 )
 
 // bootlegs with split code/data, no memory mapper
-GAME( 1987, sdibl2,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
-GAME( 1987, sdibl3,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
-GAME( 1987, sdibl4,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
-GAME( 1987, sdibl5,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
-GAME( 1987, sdibl6,      sdi,       system16b_split,     sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
+GAME( 1987, sdibl2,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 1)", 0 ) // 0x5230
+GAME( 1987, sdibl3,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 2)", 0 ) // ^
+GAME( 1987, sdibl4,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 3)", 0 ) // ^
+GAME( 1987, sdibl5,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 4)", 0 )
+GAME( 1987, sdibl6,      sdi,     system16b_split,       sdi,      segas16b_state, init_sdi_5358_small,     ROT0,   "bootleg", "SDI - Strategic Defense Initiative (bootleg, set 5)", 0 )
 
 // bootlegs with modified hardware
-GAME( 1989, fpointbl,    fpoint,    fpointbl,            fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
-GAME( 1989, fpointbj,    fpoint,    fpointbl,            fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
-GAME( 1989, fpointbla,   fpoint,    fpointbla,           fpointbl, segas16b_state, init_fpointbla,          ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
+GAME( 1989, fpointbl,    fpoint,  fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (World, bootleg)", 0 )
+GAME( 1989, fpointbj,    fpoint,  fpointbl,              fpointbl, segas16b_state, init_generic_bootleg,    ROT0,   "bootleg (Datsu)", "Flash Point (Japan, bootleg set 1)", 0 )
+GAME( 1989, fpointbla,   fpoint,  fpointbla,             fpointbl, segas16b_state, init_fpointbla,          ROT0,   "bootleg",         "Flash Point (Japan, bootleg set 2)", MACHINE_NOT_WORKING )
 
 
 

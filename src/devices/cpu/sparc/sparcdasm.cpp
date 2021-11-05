@@ -759,7 +759,7 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 		return 4 | SUPPORTED;
 	case 1:
 		util::stream_format(stream, "%-*s%%pc%c0x%08x ! 0x%08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
-		return 4 | SUPPORTED;
+		return 4 | STEP_OVER | step_over_extra(1) | SUPPORTED;
 	case 2:
 		switch (OP3)
 		{
@@ -1025,8 +1025,8 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 			{
 				switch (RD)
 				{
-				case 0: util::stream_format(stream, "done"); return 4 | SUPPORTED;
-				case 1: util::stream_format(stream, "retry"); return 4 | SUPPORTED;
+				case 0: util::stream_format(stream, "done"); return 4 | STEP_OUT | SUPPORTED;
+				case 1: util::stream_format(stream, "retry"); return 4 | STEP_OUT | SUPPORTED;
 				}
 			}
 			break;
@@ -1396,6 +1396,7 @@ offs_t sparc_disassembler::dasm_jmpl(std::ostream &stream, offs_t pc, uint32_t o
 	if (USEIMM && (RD == 0) && ((RS1 == 15) || (RS1 == 31)) && (SIMM13 == 8))
 	{
 		util::stream_format(stream, (RS1 == 31) ? "ret" : "retl");
+		return 4 | STEP_OUT | step_over_extra(1) | SUPPORTED;
 	}
 	else
 	{
@@ -1403,8 +1404,11 @@ offs_t sparc_disassembler::dasm_jmpl(std::ostream &stream, offs_t pc, uint32_t o
 		dasm_address(stream, op);
 		if ((RD != 0) && (RD != 15))
 			util::stream_format(stream, ",%s", REG_NAMES[RD]);
+		if (RD != 0)
+			return 4 | STEP_OVER | step_over_extra(1) | SUPPORTED;
+		else
+			return 4 | SUPPORTED;
 	}
-	return 4 | SUPPORTED;
 }
 
 
@@ -1412,7 +1416,7 @@ offs_t sparc_disassembler::dasm_return(std::ostream &stream, offs_t pc, uint32_t
 {
 	util::stream_format(stream, "%-*s", m_op_field_width, (m_version >= 9) ? "return" : "rett");
 	dasm_address(stream, op);
-	return 4 | SUPPORTED;
+	return 4 | STEP_OUT | step_over_extra(1) | SUPPORTED;
 }
 
 
@@ -1445,7 +1449,7 @@ offs_t sparc_disassembler::dasm_tcc(std::ostream &stream, offs_t pc, uint32_t op
 		else if (RS2 == 0)  util::stream_format(stream, "%s", REG_NAMES[RS1]);
 		else                util::stream_format(stream, "%s,%s", REG_NAMES[RS1], REG_NAMES[RS2]);
 	}
-	return 4 | SUPPORTED;
+	return 4 | STEP_OVER | SUPPORTED;
 }
 
 

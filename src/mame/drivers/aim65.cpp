@@ -184,7 +184,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 
 	if (size > 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 
@@ -193,7 +193,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 		std::string errmsg = string_format(
 				"Attempted to load file with wrong extension\nSocket '%s' only accepts files with '.%s' extension",
 				slot_tag, slot_tag);
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, errmsg.c_str());
+		image.seterror(image_error::INVALIDIMAGE, errmsg.c_str());
 		return image_init_result::FAIL;
 	}
 

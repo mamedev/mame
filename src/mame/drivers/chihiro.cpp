@@ -661,9 +661,9 @@ private:
 	void chihiro_map_io(address_map &map);
 
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
-	void jamtable_disasm_command(int ref, const std::vector<std::string> &params);
-	void chihiro_help_command(int ref, const std::vector<std::string> &params);
-	void debug_commands(int ref, const std::vector<std::string> &params);
+	void jamtable_disasm_command(const std::vector<std::string> &params);
+	void chihiro_help_command(const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -778,7 +778,7 @@ void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint
 	}
 }
 
-void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::jamtable_disasm_command(const std::vector<std::string> &params)
 {
 	address_space &space = m_maincpu->space();
 	uint64_t  addr, size;
@@ -792,7 +792,7 @@ void chihiro_state::jamtable_disasm_command(int ref, const std::vector<std::stri
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string> &params)
+void chihiro_state::chihiro_help_command(const std::vector<std::string> &params)
 {
 	debugger_console &con = machine().debugger().console();
 
@@ -801,14 +801,14 @@ void chihiro_state::chihiro_help_command(int ref, const std::vector<std::string>
 	con.printf("  chihiro help -- this list\n");
 }
 
-void chihiro_state::debug_commands(int ref, const std::vector<std::string> &params)
+void chihiro_state::debug_commands(const std::vector<std::string> &params)
 {
 	if (params.size() < 1)
 		return;
 	if (params[0] == "jamdis")
-		jamtable_disasm_command(ref, params);
+		jamtable_disasm_command(params);
 	else
-		chihiro_help_command(ref, params);
+		chihiro_help_command(params);
 }
 
 void chihiro_state::hack_eeprom()
@@ -1839,7 +1839,7 @@ void chihiro_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2));
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1));
 	}
 	m_hack_index = -1;
 	for (int a = 1; a < HACK_ITEMS; a++)

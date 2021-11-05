@@ -492,7 +492,16 @@ void segag80v_state::main_portmap(address_map &map)
 	map(0xfc, 0xfc).portr("FC");
 }
 
+// not derived from schematics
+void segag80v_state::spacfurybl_speech_prg_map(address_map &map) // TODO: everything
+{
+	map(0x0000, 0x03ff).rom();
+}
 
+void segag80v_state::spacfurybl_speech_io_map(address_map &map) // TODO: everything
+{
+	map.global_mask(0xff);
+}
 
 /*************************************
  *
@@ -933,6 +942,19 @@ void segag80v_state::spacfury(machine_config &config)
 	SEGA_SPEECH_BOARD(config, "speech", 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
+void segag80v_state::spacfurybl(machine_config &config)
+{
+	g80v_base(config);
+
+	z80_device &speechcpu(Z80(config, "speechcpu", 4000000)); // clock not verified
+	speechcpu.set_addrmap(AS_PROGRAM, &segag80v_state::spacfurybl_speech_prg_map);
+	speechcpu.set_addrmap(AS_IO, &segag80v_state::spacfurybl_speech_io_map);
+
+	TMS5100(config, "tms5100", 640000).add_route(ALL_OUTPUTS, "speaker", 0.5); // clock not verified TODO: hook up
+
+	SPACE_FURY_AUDIO(config, m_g80_audio, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
+
 void segag80v_state::zektor(machine_config &config)
 {
 	g80v_base(config);
@@ -1161,6 +1183,48 @@ ROM_START( spacfuryb ) // Revision B
 	ROM_LOAD( "pr-82.cpu-u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
 ROM_END
 
+/*
+A very unusual bootleg of Sega Space Fury made in Italy. There are 6 pcbs in the cage
+very similarly copying the normal Sega G80 arrangement.
+
+These pcbs may not be in the 'right' or normal order, but i'm documenting them as i found them.
+
+Laying the cage with metal side down, components all facing upwards, numbering from TOP to BOTTOM they are as follows :
+
+
+1- (TOP pcb): etched : 1038-B - connected to pcb 2 with 24-pin DIP ribbon cable. masking tap label says XY Control. Contains 8K of 1k*4 RAM. No roms.
+
+2- 1039-B - connected to PCB 1 with 24-pin DIP cable, contains the AD561 DACs, contains one 2708 EPROM at location U39
+
+3- etched 1037-B, masking tape says 'sound board'. No roms.
+
+4- etched 1024-B, masking tape says 'eprom board' contains 5 eproms
+
+5- etched 1023-B, masking tape says 'cpu board' contains 1 eprom, 1 PROM, 2k of 1k*4 ram.
+
+6- etched 1047-B, masking tape says 'speech board' contains 3 eproms TMS5100 and z80
+*/
+ROM_START( spacfurybl )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "pcb5.u25", 0x0000, 0x0800, CRC(abad45c2) SHA1(d7999e9320189b217e6e8a220dcf7c4f39b9c8e4) )
+	ROM_LOAD( "pcb4.u17", 0x0800, 0x0800, CRC(a757a577) SHA1(abc630107e69e4a6d6a935928f4be7da7fa10b04) )
+	ROM_LOAD( "pcb4.u2",  0x1000, 0x1000, CRC(1fa35e34) SHA1(7c817d67114190f893a5b89340afd9e3b5fd0661) )
+	ROM_LOAD( "pcb4.u1",  0x2000, 0x1000, CRC(264a8ce9) SHA1(b076bbc28d8fca62da3c5d7c4dd41a458f582262) )
+	ROM_LOAD( "pcb4.u3",  0x3000, 0x1000, CRC(223f191e) SHA1(8504bccc94932eb82eeee81f52284977e5dc3572) )
+	ROM_LOAD( "pcb4.u4",  0x4000, 0x1000, CRC(78981cf5) SHA1(0d73a4608411230ebb12aef6418f13583101d6aa) )
+
+	ROM_REGION( 0x400, "speechcpu", 0 )
+	ROM_LOAD( "pcb6cpu.1", 0x0000, 0x0400, CRC(cb4f9737) SHA1(4ad61b1611560479308b602342279aee34cd7d09) )
+
+	ROM_REGION( 0x1000, "tms5100", 0 )
+	ROM_LOAD( "pcb6.2", 0x0000, 0x0800, CRC(2a4d4fcd) SHA1(905299874843514f671f7dc7d0677a142608cf21) )
+	ROM_LOAD( "pcb6.3", 0x0800, 0x0800, CRC(44a54f89) SHA1(0c36e573d6f42236fcacd3f729522b1994f21aa4) )
+
+	ROM_REGION( 0x0420, "proms", 0 )
+	ROM_LOAD( "pcb2.u39",   0x0000, 0x0400, CRC(56484d19) SHA1(61f43126fdcfc230638ed47085ae037a098e6781) ) // sine table
+	ROM_LOAD( "pcb5.u15",   0x0400, 0x0020, CRC(c609b79e) SHA1(49dbcbb607079a182d7eb396c0da097166ea91c9) ) // CPU board addressing
+ROM_END
+
 
 ROM_START( zektor )
 	ROM_REGION( 0xc000, "maincpu", 0 )
@@ -1358,6 +1422,16 @@ void segag80v_state::init_spacfury()
 	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(spacfury_audio_device::write)));
 }
 
+void segag80v_state::init_spacfurybl()
+{
+	init_waitstates();
+
+	// no security
+	m_decrypt = segag80_security(0);
+
+	address_space &iospace = m_maincpu->space(AS_IO);
+	iospace.install_write_handler(0x3e, 0x3f, write8sm_delegate(*m_g80_audio, FUNC(spacfury_audio_device::write)));
+}
 
 void segag80v_state::init_zektor()
 {
@@ -1432,15 +1506,16 @@ void segag80v_state::init_startrek()
  *
  *************************************/
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE           INIT,          MONITOR,                     COMPANY,   FULLNAME,FLAGS
-GAME( 1981, elim2,     0,        elim2,    elim2,    segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)", 0 )
-GAME( 1981, elim2a,    elim2,    elim2,    elim2,    segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)", 0 )
-GAME( 1981, elim2c,    elim2,    elim2,    elim2c,   segag80v_state, init_elim2,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)", 0 )
-GAME( 1981, elim4,     elim2,    elim2,    elim4,    segag80v_state, init_elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)", 0 )
-GAME( 1981, elim4p,    elim2,    elim2,    elim4,    segag80v_state, init_elim4,    ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", 0 )
-GAME( 1981, spacfury,  0,        spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)", 0 )
-GAME( 1981, spacfurya, spacfury, spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)", 0 )
-GAME( 1981, spacfuryb, spacfury, spacfury, spacfury, segag80v_state, init_spacfury, ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)", 0 )
-GAME( 1982, zektor,    0,        zektor,   zektor,   segag80v_state, init_zektor,   ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)", 0 )
-GAME( 1982, tacscan,   0,        tacscan,  tacscan,  segag80v_state, init_tacscan,  ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan", 0 )
-GAME( 1982, startrek,  0,        startrek, startrek, segag80v_state, init_startrek, ORIENTATION_FLIP_Y,          "Sega",    "Star Trek", 0 )
+//    YEAR, NAME,       PARENT,   MACHINE,    INPUT,    STATE           INIT,            MONITOR,                     COMPANY,   FULLNAME,FLAGS
+GAME( 1981, elim2,      0,        elim2,      elim2,    segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 1)", 0 )
+GAME( 1981, elim2a,     elim2,    elim2,      elim2,    segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, set 2)", 0 )
+GAME( 1981, elim2c,     elim2,    elim2,      elim2c,   segag80v_state, init_elim2,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (2 Players, cocktail)", 0 )
+GAME( 1981, elim4,      elim2,    elim2,      elim4,    segag80v_state, init_elim4,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players)", 0 )
+GAME( 1981, elim4p,     elim2,    elim2,      elim4,    segag80v_state, init_elim4,      ORIENTATION_FLIP_Y,          "Gremlin", "Eliminator (4 Players, prototype)", 0 )
+GAME( 1981, spacfury,   0,        spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision C)", 0 )
+GAME( 1981, spacfurya,  spacfury, spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision A)", 0 )
+GAME( 1981, spacfuryb,  spacfury, spacfury,   spacfury, segag80v_state, init_spacfury,   ORIENTATION_FLIP_Y,          "Sega",    "Space Fury (revision B)", 0 )
+GAME( 1981, spacfurybl, spacfury, spacfurybl, spacfury, segag80v_state, init_spacfurybl, ORIENTATION_FLIP_Y,          "bootleg", "Advisor (Italian bootleg of Space Fury)", MACHINE_IMPERFECT_SOUND ) // TODO: hook up TMS5100 speech
+GAME( 1982, zektor,     0,        zektor,     zektor,   segag80v_state, init_zektor,     ORIENTATION_FLIP_Y,          "Sega",    "Zektor (revision B)", 0 )
+GAME( 1982, tacscan,    0,        tacscan,    tacscan,  segag80v_state, init_tacscan,    ORIENTATION_FLIP_X ^ ROT270, "Sega",    "Tac/Scan", 0 )
+GAME( 1982, startrek,   0,        startrek,   startrek, segag80v_state, init_startrek,   ORIENTATION_FLIP_Y,          "Sega",    "Star Trek", 0 )

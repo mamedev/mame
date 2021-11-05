@@ -90,7 +90,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 		osd_printf_verbose("Searching font %s in -%s path/s\n", family, font_path);
 		//emu_file file(options().font_path(), OPEN_FLAG_READ);
 		emu_file file(font_path, OPEN_FLAG_READ);
-		if (file.open(family) == osd_file::error::NONE)
+		if (!file.open(family))
 		{
 			std::string full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE, 0);
@@ -193,7 +193,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &name, int fsize, long index)
 {
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open(name) == osd_file::error::NONE)
+	if (!file.open(name))
 	{
 		unsigned char const ttf_magic[] = { 0x00, 0x01, 0x00, 0x00, 0x00 };
 		unsigned char const ttc1_magic[] = { 0x74, 0x74, 0x63, 0x66, 0x00, 0x01, 0x00, 0x00 };
@@ -214,7 +214,7 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &n
 bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
 {
 	emu_file file(OPEN_FLAG_READ);
-	if (file.open(name) == osd_file::error::NONE)
+	if (!file.open(name))
 	{
 		unsigned char const magic[] = { 'S', 'T', 'A', 'R', 'T', 'F', 'O', 'N', 'T' };
 		unsigned char buffer[sizeof(magic)];

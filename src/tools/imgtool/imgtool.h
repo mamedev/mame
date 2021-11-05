@@ -11,17 +11,14 @@
 #ifndef IMGTOOL_H
 #define IMGTOOL_H
 
-#include <cstdlib>
-#include <cstdio>
-#include <cassert>
-#include <functional>
-
-#include "corestr.h"
-#include "formats/flopimg.h"
-#include "opresolv.h"
 #include "library.h"
-#include "filter.h"
+#include "stream.h"
+
 #include "osdcomm.h"
+
+#include <cassert>
+#include <cstdlib>
+#include <functional>
 
 /* ----------------------------------------------------------------------- */
 

@@ -2,7 +2,9 @@
 // copyright-holders:David Haywood, Luca Elia, MetalliC
 /*
 
-U2 flash rom note
+Cave CV1000 hardware
+
+U2 flash rom note:
 
 Cave often programmed the u2 roms onto defective flash chips, programming around the bad blocks.
 As a result these are highly susceptible to failure, blocks around the known bad blocks appear to
@@ -14,32 +16,38 @@ The flash roms do contain a 'bad block' table, so it should be possible to rebui
 flash ROM for each game by comparing multiple dumps of each game and ensuring no other data has
 decayed.  Naturally this is not an ideal situation for the less common games!
 
-----
-
-Cave CV1000 hardware
+--------------------------------------------------------------------------------
 
 Games by Cave ID number:
+ID is labeled on U13 chip, not always
+Serial is on a sticker on PCB, eg. "CAVE DS-10104"
 
-CA011  Mushihime-Sama
-CA012  Ibara
-CA012B Ibara Kuro Black Label
-CA013  Espgaluda II
-CA014  Pink Sweets: Ibara Sorekara
-CA015  Mushihime-Sama Futari
-CA015B Mushihime-Sama Futari Black Label
-CA016  Muchi Muchi Pork!
-CA017  Deathsmiles
-CA017B Deathsmiles Black Label
-CA019  Do-Don-Pachi Dai-Fukkatsu
-CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
-CA021  Akai Katana
+ID     Serial   PCB  Title
+-------------------------------------
+CA011  -        B    Mushihime-Sama
+CA???  MHN      B    Mushihime-Sama Cave Matsuri 1.5
+CA012  -        B    Ibara
+CA012B IB       B    Ibara Kuro Black Label
+CA013  E        B    Espgaluda II
+CA???  M        B    Puzzle! Mushihime-Tama
+CA014  CA       B    Pink Sweets: Ibara Sorekara
+CA015  CA       B    Mushihime-Sama Futari
+CA015B MFBA/MMB B    Mushihime-Sama Futari Black Label
+CA016  MP       B    Muchi Muchi Pork!
+CA017  DS       B    Deathsmiles
+CA017B DSB      D    Deathsmiles Black Label
+CA019  DD       D    DoDonPachi DaiFukkatsu
+CA019B DDB      D    DoDonPachi DaiFukkatsu Black Label
+CA021  AK       D    Akai Katana
+CA???  SDO      D    DoDonPachi SaiDaiOuJou
 
-CMDL01 Medal Mahjong Moukari Bancho
-       Pirates of Gappori http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
-       Oooku http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
+CMDL01 - Medal Mahjong Moukari Bancho
+?????? - Pirates of Gappori: http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
+?????? - Uhauha Ooku: http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
 
 Note: CA018 - Deathsmiles II: Makai no Merry Christmas on unknown custom platform
-      CA020 - Do-Don-Pachi Dai-ou-jou Tamashii on PGM2 platform
+      CA020 - DoDonPachi DaiOuJou Tamashii on PGM2 platform
+
 
 PCB CV1000-B / CV1000-D
 +--------------------------------------------+
@@ -131,8 +139,8 @@ Misc:
 
 Note: * The Altera EPM7032 usually stamped / labeled with the Cave game ID number as listed above.
       * Actual flash ROMs will vary by manufacturer but will be compatible with flash ROM listed.
-      * There are two known CV1000-B PCB revisions. The newer one uses an updated FPGA firmware
-        and has some minor hardware differences.
+      * There are two known CV1000-B PCB revisions. The newer one has some minor hardware differences
+        and uses an updated FPGA firmware, they are not compatible with eachother.
       * The CV1000-D revision PCB has double the RAM at U1, double the ROM at U4 and no battery.
         The CV1000-D is used for Dodonpachi Daifukkatsu and later games. Commonly referred to as SH3B PCB.
 
@@ -140,11 +148,15 @@ Information by The Sheep, rtw, Ex-Cyber, BrianT & Guru
 
 ------------------------------------------------------
 
- To enter service mode in most cases hold down Service (F2) for a few seconds
-  (I believe it's the test button on the PCB)
- Some games also use the test dipswitch as an alternative method.
+To enter service mode in most cases hold down Service (F2) for a few seconds
+ (I believe it's the test button on the PCB)
+Some games also use the test dipswitch as an alternative method.
 
-ToDo:
+Common game codes:
+ - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
+ - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
+
+TODO:
 
 Improve Blending precision?
  - I'm not sure what precision the original HW mixes with, source data is 555 RGB with 1 bit transparency (16-bits)
@@ -166,9 +178,6 @@ Blitter Timing
  - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
  - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
-Common game codes:
- - During boot hold P1 Right+A+B+C and P2 Left+A+B+C - Forcibly initialise non-volatile data (EEPROM or NAND settings area)
- - During boot hold P1 A and P2 A - Reset random numbers generator at each game start. Probably was used during testing or/and competition events.
 */
 
 #include "emu.h"
@@ -184,7 +193,7 @@ Common game codes:
 #include "screen.h"
 #include "speaker.h"
 
-
+namespace {
 
 class cv1k_state : public driver_device
 {
@@ -203,6 +212,21 @@ public:
 		m_idlepc(0)
 	{ }
 
+	void cv1k(machine_config &config);
+	void cv1k_d(machine_config &config);
+
+	void init_mushisam();
+	void init_ibara();
+	void init_espgal2();
+	void init_mushitam();
+	void init_pinkswts();
+	void init_deathsml();
+	void init_ddpdfk();
+
+protected:
+	virtual void machine_reset() override;
+
+private:
 	required_device<sh34_base_device> m_maincpu;
 	required_device<epic12_device> m_blitter;
 	required_device<serflash_device> m_serflash;
@@ -219,26 +243,15 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	virtual void machine_reset() override;
-
-	/* game specific */
-	uint64_t speedup_r();
-	void init_mushisam();
-	void init_ibara();
-	void init_espgal2();
-	void init_mushitam();
-	void init_pinkswts();
-	void init_deathsml();
-	void init_dpddfk();
-
 	required_ioport m_blitrate;
 	required_ioport m_eepromout;
 
 	uint32_t m_idleramoffs;
 	uint32_t m_idlepc;
+
+	uint64_t speedup_r();
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
-	void cv1k_d(machine_config &config);
-	void cv1k(machine_config &config);
+
 	void cv1k_d_map(address_map &map);
 	void cv1k_map(address_map &map);
 	void cv1k_port(address_map &map);
@@ -276,8 +289,7 @@ uint8_t cv1k_state::flash_io_r(offs_t offset)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-
-		//  logerror("flash_io_r offset %04x\n", offset);
+			// logerror("flash_io_r offset %04x\n", offset);
 			return 0xff;
 
 		case 0x00:
@@ -307,7 +319,6 @@ void cv1k_state::flash_io_w(offs_t offset, uint8_t data)
 			break;
 	}
 }
-
 
 
 // ibarablk uses the rtc to render the clock in the first attract demo
@@ -348,7 +359,7 @@ void cv1k_state::cv1k_map(address_map &map)
 	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -359,7 +370,7 @@ void cv1k_state::cv1k_d_map(address_map &map)
 	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10C00000, 0x10C00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
+	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
 }
@@ -460,8 +471,8 @@ void cv1k_state::cv1k(machine_config &config)
 {
 	/* basic machine hardware */
 	SH3BE(config, m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_md(0, 0);  // none of this is verified
-	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
+	m_maincpu->set_md(0, 0); // none of this is verified
+	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
 	m_maincpu->set_md(2, 0);
 	m_maincpu->set_md(3, 0);
 	m_maincpu->set_md(4, 0);
@@ -502,8 +513,8 @@ void cv1k_state::cv1k_d(machine_config &config)
 
 	/* basic machine hardware */
 	SH3BE(config.replace(), m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
-	m_maincpu->set_md(0, 0);  // none of this is verified
-	m_maincpu->set_md(1, 0);  // (the sh3 is different to the sh4 anyway, should be changed)
+	m_maincpu->set_md(0, 0); // none of this is verified
+	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
 	m_maincpu->set_md(2, 0);
 	m_maincpu->set_md(3, 0);
 	m_maincpu->set_md(4, 0);
@@ -915,10 +926,10 @@ void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_
 
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64smo_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
-	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true,  m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true, m_rombase);
 
-	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false,  m_ram);
-	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false,  m_ram + ((m_idleramoffs+8)/8));
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false, m_ram);
+	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false, m_ram + ((m_idleramoffs+8)/8));
 }
 
 
@@ -952,10 +963,13 @@ void cv1k_state::init_deathsml()
 	install_speedups(0x02310, 0xc0519a2, false);
 }
 
-void cv1k_state::init_dpddfk()
+void cv1k_state::init_ddpdfk()
 {
 	install_speedups(0x02310, 0xc1d1346, true);
 }
+
+
+} // anonymous namespace
 
 
 // The black label versions are intentionally not set as clones, they were re-releases with different game codes, not bugfixes.
@@ -1003,17 +1017,17 @@ GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT27
 GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)", "Deathsmiles (2007/10/09 MASTER VER)",                             MACHINE_IMPERFECT_TIMING )
 
 // CA017B Deathsmiles Black Label
-GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT0,   "Cave (AMI license)", "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",    MACHINE_IMPERFECT_TIMING )
+GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave (AMI license)", "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",    MACHINE_IMPERFECT_TIMING )
 
 // CA019  Do-Don-Pachi Dai-Fukkatsu
-GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",     MACHINE_IMPERFECT_TIMING )
-GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",         MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",     MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",         MACHINE_IMPERFECT_TIMING )
 
 // CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
-GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT270, "Cave (AMI license)", "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     MACHINE_IMPERFECT_TIMING )
+GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     MACHINE_IMPERFECT_TIMING )
 
 // CA021  Akai Katana
-GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_dpddfk,   ROT0,   "Cave (AMI license)", "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
+GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
 GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",           MACHINE_NOT_WORKING )

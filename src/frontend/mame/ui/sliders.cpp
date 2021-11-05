@@ -9,14 +9,16 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "ui/sliders.h"
+
+#include "ui/slider.h"
+#include "ui/ui.h"
 
 #include "osdepend.h"
 
-#include "ui/ui.h"
-#include "ui/sliders.h"
-#include "ui/slider.h"
 
 namespace ui {
+
 menu_sliders::menu_sliders(mame_ui_manager &mui, render_container &container, bool menuless_mode) : menu(mui, container)
 {
 	m_menuless_mode = m_hidden = menuless_mode;
@@ -244,8 +246,12 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		y1 += ui().box_tb_border();
 
 		// determine the text height
-		ui().draw_text_full(container(), tempstring, 0, 0, x2 - x1 - 2.0f * lr_border,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);
+		ui().draw_text_full(
+				container(),
+				tempstring,
+				0, 0, x2 - x1 - 2.0f * lr_border,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE,
+				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);
 
 		// draw the thermometer
 		bar_left = x1 + lr_border;
@@ -271,8 +277,12 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 		container().add_line(default_x, bar_bottom, default_x, bar_area_top + bar_area_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// draw the actual text
-		ui().draw_text_full(container(), tempstring, x1 + lr_border, y1 + line_height, x2 - x1 - 2.0f * lr_border,
-					ui::text_layout::CENTER, ui::text_layout::WORD, mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
+		ui().draw_text_full(
+				container(),
+				tempstring,
+				x1 + lr_border, y1 + line_height, x2 - x1 - 2.0f * lr_border,
+				text_layout::text_justify::CENTER, text_layout::word_wrapping::WORD,
+				mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
 	}
 }
 

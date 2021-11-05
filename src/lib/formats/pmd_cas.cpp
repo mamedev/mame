@@ -12,8 +12,6 @@
 
 #include "pmd_cas.h"
 
-#include <cassert>
-
 #define WAVEENTRY_LOW  -32768
 #define WAVEENTRY_HIGH  32767
 

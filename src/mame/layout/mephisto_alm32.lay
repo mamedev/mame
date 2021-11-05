@@ -343,15 +343,6 @@ license:CC0
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0400"><bounds x="5" y="39" width="4" height="4" /><color alpha="0.25" /></element>
 		<element ref="hlub" inputtag="board:board:SPAWN" inputmask="0x0800"><bounds x="5" y="43" width="4" height="4" /><color alpha="0.25" /></element>
 
-		<!-- hand -->
-		<element ref="text_uih1"><bounds x="0" y="54" width="10" height="2" /></element>
-		<element ref="cblack"><bounds x="1" y="56.5" width="8" height="6" /></element>
-		<element name="piece_ui0" ref="piece"><bounds x="2" y="56.5" width="6" height="6" /></element>
-
-		<element ref="cwhite"><bounds x="1" y="63.5" width="8" height="2.5" /></element>
-		<element ref="text_uih2"><bounds x="1.5" y="63.75" width="7" height="2" /></element>
-		<element ref="hlub" inputtag="board:board:UI" inputmask="0x08"><bounds x="1" y="63.5" width="8" height="2.5" /><color alpha="0.25" /></element>
-
 		<element ref="cwhite"><bounds x="1" y="48" width="8" height="4" /></element>
 		<element name="piece_ui13" ref="piece"><bounds x="1" y="48" width="4" height="4" /></element>
 		<element name="piece_ui14" ref="piece"><bounds x="5" y="48" width="4" height="4" /></element>
@@ -360,6 +351,15 @@ license:CC0
 		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="yes"><bounds x="1" y="48" width="4" height="4" /></element>
 		<element ref="wmask1" inputtag="FAKE" inputmask="1" inputraw="yes"><bounds x="5" y="48" width="4" height="4" /></element>
 		<element ref="wmask2" blend="multiply"><bounds x="1" y="48" width="8" height="4" /></element>
+
+		<!-- hand -->
+		<element ref="text_uih1"><bounds x="0" y="54" width="10" height="2" /></element>
+		<element ref="cblack"><bounds x="1" y="56.5" width="8" height="6" /></element>
+		<element name="piece_ui0" ref="piece"><bounds x="2" y="56.5" width="6" height="6" /></element>
+
+		<element ref="cwhite"><bounds x="1" y="63.5" width="8" height="2.5" /></element>
+		<element ref="text_uih2"><bounds x="1.5" y="63.75" width="7" height="2" /></element>
+		<element ref="hlub" inputtag="board:board:UI" inputmask="0x08"><bounds x="1" y="63.5" width="8" height="2.5" /><color alpha="0.25" /></element>
 
 		<!-- undo -->
 		<element ref="text_uiu1"><bounds x="0" y="68" width="10" height="2" /></element>

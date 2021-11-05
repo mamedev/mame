@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/ppg_dsk.h"
 
 ppg_format::ppg_format() : wd177x_format(formats)

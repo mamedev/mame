@@ -1,0 +1,140 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert, Devin Acker
+
+10000 reset
+10001 irq
+
+0000         ffff         0 nop      -        -
+0100         ffff         0 sleep    -        -
+0240         fff0         0 stc      ccr      r8l
+0340         fff0         0 ldc      r8l      ccr
+
+0380         fff0         0 ldbank   r8l      bankh    g
+	TMP1 = r8_r(IR[0]);
+	m_banknum = (TMP1 << 2) | (m_banknum & 0x3);
+	m_bank->set_entry(m_banknum);
+	prefetch();
+
+03c0         fff0         0 ldbank   r8l      bankl    g
+	TMP1 = r8_r(IR[0]);
+	m_banknum = (m_banknum & 0xfffc) | (TMP1 & 0x3);
+	m_bank->set_entry(m_banknum);
+	prefetch();
+
+0400         ff00         0 orc      imm8     ccr
+0500         ff00         0 xorc     imm8     ccr
+0600         ff00         0 andc     imm8     ccr
+
+0780         fff0         0 ldbank   imm4l    bankh    g
+	m_banknum = ((IR[0] & 0xf) << 2) | (m_banknum & 0x3);
+	m_bank->set_entry(m_banknum);
+	prefetch();
+
+07c0         fff0         0 ldbank   imm2l    bankl    g
+	m_banknum = (m_banknum & 0xfffc) | (IR[0] & 0x3);
+	m_bank->set_entry(m_banknum);
+	prefetch();
+
+0800         ff00         0 add.b    r8h      r8l
+0900         ff00         0 add.w    r16h     r16l
+0a00         fff0         0 inc.b    one      r8l
+0b00         fff8         0 adds.l   one      r16l
+0b80         fff8         0 adds.l   two      r16l
+0c00         ff00         0 mov.b    r8h      r8l
+0d00         ff00         0 mov.w    r16h     r16l
+0e00         ff00         0 addx.b   r8h      r8l
+0f00         ff00         0 mulxu.b  r8h      r16l
+
+1000         fff0         0 shll.b   r8l      -
+1080         fff0         0 shal.b   r8l      -
+1100         fff0         0 shlr.b   r8l      -
+1180         fff0         0 shar.b   r8l      -
+1200         fff0         0 rotxl.b  r8l      -
+1280         fff0         0 rotl.b   r8l      -
+1300         fff0         0 rotxr.b  r8l      -
+1380         fff0         0 rotr.b   r8l      -
+1400         ff00         0 or.b     r8h      r8l
+1500         ff00         0 xor.b    r8h      r8l
+1600         ff00         0 and.b    r8h      r8l
+1700         fff0         0 not.b    r8l      -
+1780         fff0         0 neg.b    r8l      -
+1800         ff00         0 sub.b    r8h      r8l
+1900         ff00         0 sub.w    r16h     r16l
+1a00         fff0         0 dec.b    one      r8l
+# yes, this is the correct order for subs.l - one and two are swapped for some reason
+1b00         fff8         0 subs.l   two      r16l
+1b80         fff8         0 subs.l   one      r16l
+1c00         ff00         0 cmp.b    r8h      r8l
+1d00         ff00         0 cmp.w    r16h     r16l
+1e00         ff00         0 subx.b   r8h      r8l
+1f00         ff00         0 divxu.b  r8h      r16l
+
+2000         f000         0 mov.b    abs8     r8u
+3000         f000         0 mov.b    r8u      abs8
+
+4000         ff00         0 bt       rel8     -
+4100         ff00         0 bf       rel8     -
+4200         ff00         0 bhi      rel8     -
+4300         ff00         0 bls      rel8     -
+4400         ff00         0 bcc      rel8     -
+4500         ff00         0 bcs      rel8     -
+4600         ff00         0 bne      rel8     -
+4700         ff00         0 beq      rel8     -
+4800         ff00         0 bvc      rel8     -
+4900         ff00         0 bvs      rel8     -
+4a00         ff00         0 bpl      rel8     -
+4b00         ff00         0 bmi      rel8     -
+4c00         ff00         0 bge      rel8     -
+4d00         ff00         0 blt      rel8     -
+4e00         ff00         0 bgt      rel8     -
+4f00         ff00         0 ble      rel8     -
+
+5000         ff80         0 bset     imm3     r8l
+5100         ff00         0 bset     r8h      r8l
+5200         ff80         0 bclr     imm3     r8l
+5300         ff00         0 bclr     r8h      r8l
+5400         ff80         0 bnot     imm3     r8l
+5500         ff00         0 bnot     r8h      r8l
+5600         ff80         0 btst     imm3     r8l
+5700         ff00         0 btst     r8h      r8l
+5800         ffff         0 rts      -        -
+5980         ffff         0 rte      -        -
+5a00         ff8f         0 jmp      r16h     -
+5a80         ffff         0 jmp      abs16e   -
+5b00         ff00         0 jmp      abs8i    -
+5c00         ff8f         0 jsr      r16h     -
+5c80         ffff         0 jsr      abs16e   -
+5e00         ff00         0 bsr      rel8     -
+5f00         fff0         0 mov.w    imm16    r16l
+
+66000000     ff00ff8f     0 btst     imm3     abs8
+
+6800         ff80         0 mov.b    r16ih    r8l
+6900         ff88         0 mov.w    r16ih    r16l
+6a00         ff80         0 mov.b    r16ph    r8l
+6b00         ff88         0 mov.w    r16ph    r16l
+6c00         fff0         0 mov.b    abs16    r8l
+6d00         fff0         0 mov.w    abs16    r16l
+6e00         ff80         0 mov.b    r16d16h  r8l
+6f00         ff80         0 mov.w    r16d16h  r16l
+
+70000000     ff00ff8f     0 bset     imm3     abs8
+72000000     ff00ff8f     0 bclr     imm3     abs8
+
+7800         ff80         0 mov.b    r8l      r16ih
+7900         ff88         0 mov.w    r16l     r16ih
+7a00         ff80         0 mov.b    r8l      pr16h
+7b00         ff88         0 mov.w    r16l     pr16h
+7c00         fff0         0 mov.b    r8l      abs16
+7d00         fff0         0 mov.w    r16l     abs16
+7e00         ff80         0 mov.b    r8l      r16d16h
+7f00         ff80         0 mov.w    r16l     r16d16h
+
+8000         f000         0 add.b    imm8     r8u
+9000         f000         0 addx.b   imm8     r8u
+a000         f000         0 cmp.b    imm8     r8u
+b000         f000         0 subx.b   imm8     r8u
+c000         f000         0 or.b     imm8     r8u
+d000         f000         0 xor.b    imm8     r8u
+e000         f000         0 and.b    imm8     r8u
+f000         f000         0 mov.b    imm8     r8u

@@ -30,8 +30,10 @@ uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	/* graphics */
-	m_hgdc2->screen_update(screen, bitmap, cliprect);
-	m_hgdc1->screen_update(screen, bitmap, cliprect);
+	if(m_video_ff[DISPLAY_REG] != 0)
+		m_hgdc[1]->screen_update(screen, bitmap, cliprect);
+	m_hgdc[0]->screen_update(screen, bitmap, cliprect);
+
 	return 0;
 }
 
@@ -46,39 +48,21 @@ UPD7220_DISPLAY_PIXELS_MEMBER( pc9801_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	if(m_video_ff[DISPLAY_REG] == 0) //screen is off
-		return;
-
 	uint8_t colors16_mode = (m_ex_video_ff[ANALOG_16_MODE]) ? 16 : 8;
 
-	if(m_ex_video_ff[ANALOG_256_MODE])
+	for(int xi=0;xi<16;xi++)
 	{
-		uint8_t *ext_gvram = (uint8_t *)m_ext_gvram.target();
-		for(int xi=0;xi<16;xi++)
-		{
-			int res_x = x + xi;
-			int res_y = y;
+		int res_x = x + xi;
+		int res_y = y;
 
-			uint8_t pen = ext_gvram[(address)*16+xi+(m_vram_disp*0x40000)];
+		uint8_t pen;
 
-			bitmap.pix(res_y, res_x) = palette[pen + 0x20];
-		}
-	}
-	else
-	{
-		for(int xi=0;xi<16;xi++)
-		{
-			int res_x = x + xi;
-			int res_y = y;
-
-			uint8_t pen;
-			pen = ((m_video_ram_2[((address & 0x3fff) + (0x4000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 1 : 0;
-			pen|= ((m_video_ram_2[((address & 0x3fff) + (0x8000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 2 : 0;
-			pen|= ((m_video_ram_2[((address & 0x3fff) + (0xc000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 4 : 0;
-			if(m_ex_video_ff[ANALOG_16_MODE])
-				pen|= ((m_video_ram_2[((address & 0x3fff) + (0) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 8 : 0;
-			bitmap.pix(res_y, res_x) = palette[pen + colors16_mode];
-		}
+		pen = ((m_video_ram[1][((address & 0x3fff) + (0x4000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 1 : 0;
+		pen|= ((m_video_ram[1][((address & 0x3fff) + (0x8000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 2 : 0;
+		pen|= ((m_video_ram[1][((address & 0x3fff) + (0xc000) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 4 : 0;
+		if(m_ex_video_ff[ANALOG_16_MODE])
+			pen|= ((m_video_ram[1][((address & 0x3fff) + (0) + ((m_vram_disp*0x20000)>>1))] >> xi) & 1) ? 8 : 0;
+		bitmap.pix(res_y, res_x) = palette[pen + colors16_mode];
 	}
 }
 
@@ -107,8 +91,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 		uint8_t kanji_sel = 0;
 		uint8_t kanji_lr = 0;
 
-		uint16_t tile = m_video_ram_1[tile_addr & 0xfff] & 0xff;
-		uint8_t knj_tile = m_video_ram_1[tile_addr & 0xfff] >> 8;
+		uint16_t tile = m_video_ram[0][tile_addr & 0xfff] & 0xff;
+		uint8_t knj_tile = m_video_ram[0][tile_addr & 0xfff] >> 8;
 		if(knj_tile)
 		{
 			/* Note: bit 7 doesn't really count, if a kanji is enabled then the successive tile is always the second part of it.
@@ -135,7 +119,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( pc9801_state::hgdc_draw_text )
 		{
 			/* Rori Rori Rolling definitely uses different colors for brake stop PCG elements,
 			   assume that all attributes are recalculated on different strips */
-			uint8_t attr = (m_video_ram_1[((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
+			uint8_t attr = (m_video_ram[0][((tile_addr+kanji_lr) & 0xfff) | 0x1000] & 0xff);
 
 			uint8_t secret = (attr & 1) ^ 1;
 			uint8_t blink = attr & 2;
@@ -310,7 +294,7 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 		{
 			case 0x00:
 			case 0x02:
-				return m_hgdc2->read((offset & 2) >> 1);
+				return m_hgdc[1]->read((offset & 2) >> 1);
 			/* TODO: double check these two */
 			case 0x04:
 				return m_vram_disp & 1;
@@ -355,7 +339,7 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 		{
 			case 0x00:
 			case 0x02:
-				m_hgdc2->write((offset & 2) >> 1,data);
+				m_hgdc[1]->write((offset & 2) >> 1,data);
 				return;
 			case 0x04:
 				m_vram_disp = data & 1;
@@ -452,7 +436,7 @@ void pc9801_state::tvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	else if(m_video_ff[MEMSW_REG] && ACCESSING_BITS_0_7)
 		m_memsw->write(offset & 0x0f, data & 0xff);
 
-	COMBINE_DATA(&m_video_ram_1[offset]); //TODO: check me
+	COMBINE_DATA(&m_video_ram[0][offset]); //TODO: check me
 }
 
 /*************************************************
@@ -464,15 +448,15 @@ void pc9801_state::tvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 /* +0x8000 is trusted (bank 0 is actually used by 16 colors mode) */
 uint8_t pc9801_state::gvram_r(offs_t offset)
 {
-	return bitswap<8>(m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] >> ((offset & 1) << 3),0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_video_ram[1][(offset>>1)+0x04000+m_vram_bank*0x10000] >> ((offset & 1) << 3),0,1,2,3,4,5,6,7);
 }
 
 void pc9801_state::gvram_w(offs_t offset, uint8_t data)
 {
-	uint16_t ram = m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000];
+	uint16_t ram = m_video_ram[1][(offset>>1)+0x04000+m_vram_bank*0x10000];
 	int mask = (offset & 1) << 3;
 	data = bitswap<8>(data,0,1,2,3,4,5,6,7);
-	m_video_ram_2[(offset>>1)+0x04000+m_vram_bank*0x10000] = (ram & (0xff00 >> mask)) | (data << mask);
+	m_video_ram[1][(offset>>1)+0x04000+m_vram_bank*0x10000] = (ram & (0xff00 >> mask)) | (data << mask);
 }
 
 /*************************************************
@@ -481,12 +465,12 @@ void pc9801_state::gvram_w(offs_t offset, uint8_t data)
  *
  ************************************************/
 
-uint16_t pc9801_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t res = 0;
 
 	if(!(m_grcg.mode & 0x80) || machine().side_effects_disabled())
-		res = m_video_ram_2[offset];
+		res = m_video_ram[1][offset];
 	else if(m_ex_video_ff[2])
 		res = egc_blit_r(offset, mem_mask);
 	else if(!(m_grcg.mode & 0x40))
@@ -499,7 +483,7 @@ uint16_t pc9801_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 		{
 			if((m_grcg.mode & (1 << i)) == 0)
 			{
-				res |= m_video_ram_2[offset | (((i + 1) & 3) * 0x4000)] ^ (m_grcg.tile[i] | m_grcg.tile[i] << 8);
+				res |= m_video_ram[1][offset | (((i + 1) & 3) * 0x4000)] ^ (m_grcg.tile[i] | m_grcg.tile[i] << 8);
 			}
 		}
 
@@ -509,16 +493,16 @@ uint16_t pc9801_state::upd7220_grcg_r(offs_t offset, uint16_t mem_mask)
 	return res;
 }
 
-void pc9801_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(!(m_grcg.mode & 0x80))
-		COMBINE_DATA(&m_video_ram_2[offset]);
+		COMBINE_DATA(&m_video_ram[1][offset]);
 	else if(m_ex_video_ff[2])
 		egc_blit_w(offset, data, mem_mask);
 	else
 	{
 		int i;
-		uint8_t *vram = (uint8_t *)m_video_ram_2.target();
+		uint8_t *vram = (uint8_t *)m_video_ram[1].target();
 		offset = (offset << 1) & 0x27fff;
 
 		if(m_grcg.mode & 0x40) // RMW
@@ -563,7 +547,7 @@ void pc9801_state::upd7220_grcg_w(offs_t offset, uint16_t data, uint16_t mem_mas
  *
  ************************************************/
 
-uint16_t pc9801_state::egc_color_pat(int plane) const
+uint16_t pc9801vm_state::egc_color_pat(int plane) const
 {
 	uint8_t color = 0;
 	switch((m_egc.regs[1] >> 13) & 3)
@@ -582,7 +566,7 @@ uint16_t pc9801_state::egc_color_pat(int plane) const
 	return BIT(color, plane) ? 0xffff : 0;
 }
 
-uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
+uint16_t pc9801vm_state::egc_shift(int plane, uint16_t val)
 {
 	int src_off = m_egc.regs[6] & 0xf, dst_off = (m_egc.regs[6] >> 4) & 0xf;
 	int left = src_off - dst_off, right = dst_off - src_off;
@@ -616,7 +600,7 @@ uint16_t pc9801_state::egc_shift(int plane, uint16_t val)
 	return out;
 }
 
-uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const
+uint16_t pc9801vm_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, uint16_t dst) const
 {
 	uint16_t out = 0;
 
@@ -631,7 +615,7 @@ uint16_t pc9801_state::egc_do_partial_op(int plane, uint16_t src, uint16_t pat, 
 	return out;
 }
 
-void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
+void pc9801vm_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint16_t mask = m_egc.regs[4] & mem_mask, out = 0;
 	bool dir = !(m_egc.regs[6] & 0x1000);
@@ -684,7 +668,7 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 				src = egc_shift(i, data);
 
 			if((m_egc.regs[2] & 0x300) == 0x200)
-				pat = m_video_ram_2[offset + (((i + 1) & 3) * 0x4000)];
+				pat = m_video_ram[1][offset + (((i + 1) & 3) * 0x4000)];
 
 			switch((m_egc.regs[2] >> 11) & 3)
 			{
@@ -692,7 +676,7 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 					out = data;
 					break;
 				case 1:
-					out = egc_do_partial_op(i, src, pat, m_video_ram_2[offset + (((i + 1) & 3) * 0x4000)]);
+					out = egc_do_partial_op(i, src, pat, m_video_ram[1][offset + (((i + 1) & 3) * 0x4000)]);
 					break;
 				case 2:
 					out = pat;
@@ -702,8 +686,8 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 					return;
 			}
 
-			m_video_ram_2[offset + (((i + 1) & 3) * 0x4000)] &= ~mask;
-			m_video_ram_2[offset + (((i + 1) & 3) * 0x4000)] |= out & mask;
+			m_video_ram[1][offset + (((i + 1) & 3) * 0x4000)] &= ~mask;
+			m_video_ram[1][offset + (((i + 1) & 3) * 0x4000)] |= out & mask;
 		}
 	}
 	if(mem_mask != 0xffff)
@@ -731,15 +715,15 @@ void pc9801_state::egc_blit_w(uint32_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-uint16_t pc9801_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
+uint16_t pc9801vm_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 {
 	uint32_t plane_off = offset & 0x13fff;
 	if((m_egc.regs[2] & 0x300) == 0x100)
 	{
-		m_egc.pat[0] = m_video_ram_2[plane_off + 0x4000];
-		m_egc.pat[1] = m_video_ram_2[plane_off + (0x4000 * 2)];
-		m_egc.pat[2] = m_video_ram_2[plane_off + (0x4000 * 3)];
-		m_egc.pat[3] = m_video_ram_2[plane_off];
+		m_egc.pat[0] = m_video_ram[1][plane_off + 0x4000];
+		m_egc.pat[1] = m_video_ram[1][plane_off + (0x4000 * 2)];
+		m_egc.pat[2] = m_video_ram[1][plane_off + (0x4000 * 3)];
+		m_egc.pat[3] = m_video_ram[1][plane_off];
 	}
 	//TODO: this needs another look
 	/*if(m_egc.first && !m_egc.init)
@@ -750,17 +734,17 @@ uint16_t pc9801_state::egc_blit_r(uint32_t offset, uint16_t mem_mask)
 	}*/
 	m_egc.init = true;
 	for(int i = 0; i < 4; i++)
-		m_egc.src[i] = egc_shift(i, m_video_ram_2[plane_off + (((i + 1) & 3) * 0x4000)]);
+		m_egc.src[i] = egc_shift(i, m_video_ram[1][plane_off + (((i + 1) & 3) * 0x4000)]);
 
 	if(BIT(m_egc.regs[2], 13))
 	{
 		uint16_t ret;
 		// docs say vram is compared to the foreground color register but 4a2 13-14 must be 2
 		// guess that the other values probably work too
-		ret =  ~(egc_color_pat(0) ^ m_video_ram_2[plane_off + 0x4000]);
-		ret &= ~(egc_color_pat(1) ^ m_video_ram_2[plane_off + (0x4000 * 2)]);
-		ret &= ~(egc_color_pat(2) ^ m_video_ram_2[plane_off + (0x4000 * 3)]);
-		ret &= ~(egc_color_pat(3) ^ m_video_ram_2[plane_off]);
+		ret =  ~(egc_color_pat(0) ^ m_video_ram[1][plane_off + 0x4000]);
+		ret &= ~(egc_color_pat(1) ^ m_video_ram[1][plane_off + (0x4000 * 2)]);
+		ret &= ~(egc_color_pat(2) ^ m_video_ram[1][plane_off + (0x4000 * 3)]);
+		ret &= ~(egc_color_pat(3) ^ m_video_ram[1][plane_off]);
 		return ret;
 	}
 	else

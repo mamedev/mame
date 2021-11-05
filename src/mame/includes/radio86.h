@@ -10,12 +10,13 @@
 
 #pragma once
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
-#include "imagedev/cassette.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 #include "emupal.h"
 
 
@@ -52,8 +53,6 @@ public:
 	void init_radio86();
 
 protected:
-
-
 	void machine_reset() override;
 	void machine_start() override;
 

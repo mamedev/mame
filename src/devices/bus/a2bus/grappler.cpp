@@ -3,6 +3,9 @@
 #include "emu.h"
 #include "grappler.h"
 
+#include "bus/centronics/ctronics.h"
+#include "cpu/mcs48/mcs48.h"
+
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
@@ -48,47 +51,54 @@ ROM_START(bufgrapplerplus)
 ROM_END
 
 
-INPUT_PORTS_START(grapplerplus)
-	PORT_START("S1")
-	PORT_DIPNAME(0x07, 0x00, "Printer Type")                    PORT_DIPLOCATION("S1:4,3,2")
-	PORT_DIPSETTING(   0x00, "Epson Series")
-	PORT_DIPSETTING(   0x01, "NEC 8023/C. Itoh 8510/DMP 85")
-	PORT_DIPSETTING(   0x02, "Star Gemini")
-	PORT_DIPSETTING(   0x03, "Anadex Printers")
-	PORT_DIPSETTING(   0x04, "Okidata 82A, 83A, 92, 93, 84")
-	PORT_DIPSETTING(   0x06, "Okidata 84 w/o Step II Graphics")
-	PORT_DIPSETTING(   0x05, "Apple Dot Matrix")
-	PORT_DIPSETTING(   0x07, "invalid")
-	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_grapplerplus_device_base, sw_msb, 0)
-	PORT_DIPSETTING(   0x08, "Software Control")
-	PORT_DIPSETTING(   0x00, "Not Transmitted")
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START(bufgrapplerplus)
-	PORT_INCLUDE(grapplerplus)
-
-	PORT_START("CNF")
-	PORT_CONFNAME(0xff, 0x00, "RAM Size")
-	PORT_CONFSETTING(   0xfc, "16K (2 chips)")
-	PORT_CONFSETTING(   0xf0, "32K (4 chips)")
-	PORT_CONFSETTING(   0x00, "64K (8 chips)")
-INPUT_PORTS_END
-
-} // anonymous namespace
-
-
-
-DEFINE_DEVICE_TYPE(A2BUS_GRAPPLER, a2bus_grappler_device, "a2grappler", "Orange Micro Grappler Printer Interface")
-DEFINE_DEVICE_TYPE(A2BUS_GRAPPLERPLUS, a2bus_grapplerplus_device, "a2grapplerplus", "Orange Micro Grappler+ Printer Interface")
-DEFINE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUS, a2bus_buf_grapplerplus_device, "a2bufgrapplerplus", "Orange Micro Buffered Grappler+ Printer Interface")
-DEFINE_DEVICE_TYPE(A2BUS_BUFGRAPPLERPLUSA, a2bus_buf_grapplerplus_reva_device, "a2bufgrapplerplusa", "Orange Micro Buffered Grappler+ (rev A) Printer Interface")
-
-
 
 //==============================================================
 //  Grappler base
 //==============================================================
+
+class a2bus_grappler_device_base : public device_t, public device_a2bus_card_interface
+{
+public:
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c800(u16 offset) override;
+
+protected:
+	a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	// signal state
+	u8 busy_in() const { return m_busy_in; }
+	u8 pe_in() const { return m_pe_in; }
+	u8 slct_in() const { return m_slct_in; }
+
+	required_device<centronics_device>      m_printer_conn;
+	required_device<output_latch_device>    m_printer_out;
+	required_region_ptr<u8>                 m_rom;
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+
+	// helpers
+	void set_rom_bank(u16 rom_bank);
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	DECLARE_WRITE_LINE_MEMBER(pe_w);
+	DECLARE_WRITE_LINE_MEMBER(slct_w);
+
+	// synchronised printer status inputs
+	void set_busy_in(void *ptr, s32 param);
+	void set_pe_in(void *ptr, s32 param);
+	void set_slct_in(void *ptr, s32 param);
+
+	u16 m_rom_bank;     // U2D (pin 13)
+	u8  m_busy_in;      // printer connector pin 21 (synchronised)
+	u8  m_pe_in;        // printer connector pin 23 (synchronised)
+	u8  m_slct_in;      // printer connector pin 25 (synchronised)
+};
+
 
 a2bus_grappler_device_base::a2bus_grappler_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -217,6 +227,39 @@ void a2bus_grappler_device_base::set_slct_in(void *ptr, s32 param)
 //  Grappler implementation
 //==============================================================
 
+class a2bus_grappler_device : public a2bus_grappler_device_base
+{
+public:
+	a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual void write_cnxx(u8 offset, u8 data) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(grappler); }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+
+	// synchronised signals
+	void set_data(void *ptr, s32 param);
+	void set_strobe(void *ptr, s32 param);
+	void set_ack_in(void *ptr, s32 param);
+
+	u8  m_strobe;       // U3 (pin 4)
+	u8  m_ack_latch;    // U3 (pin 13)
+	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+};
+
+
 a2bus_grappler_device::a2bus_grappler_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	a2bus_grappler_device_base(mconfig, A2BUS_GRAPPLER, tag, owner, clock),
 	m_strobe(1U),
@@ -289,12 +332,6 @@ void a2bus_grappler_device::write_cnxx(u8 offset, u8 data)
 //--------------------------------------------------
 //  device_t implementation
 //--------------------------------------------------
-
-tiny_rom_entry const *a2bus_grappler_device::device_rom_region() const
-{
-	return ROM_NAME(grappler);
-}
-
 
 void a2bus_grappler_device::device_add_mconfig(machine_config &config)
 {
@@ -394,6 +431,47 @@ void a2bus_grappler_device::set_ack_in(void *ptr, s32 param)
 //  Grappler+ base
 //==============================================================
 
+class a2bus_grapplerplus_device_base : public a2bus_grappler_device_base
+{
+public:
+	// DIP switch handlers
+	virtual DECLARE_INPUT_CHANGED_MEMBER(sw_msb) { }
+
+	// device_a2bus_card_interface implementation
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual void write_cnxx(u8 offset, u8 data) override;
+
+protected:
+	a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// ACK latch set input
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+
+	// signal state
+	u8 ack_latch() const { return m_ack_latch; }
+
+	required_ioport m_s1;
+
+private:
+	// synchronised printer status inputs
+	void set_ack_in(void *ptr, s32 param);
+
+	// for derived devices to implement
+	virtual void data_latched(u8 data) = 0;
+	virtual void ack_latch_set() { }
+	virtual void ack_latch_cleared() { }
+
+	u8  m_ack_latch;    // U2C (pin 9)
+	u8  m_ack_in;       // printer connector pin 19 (synchronised)
+};
+
+
 a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
 	a2bus_grappler_device_base(mconfig, type, tag, owner, clock),
 	m_s1(*this, "S1"),
@@ -407,6 +485,23 @@ a2bus_grapplerplus_device_base::a2bus_grapplerplus_device_base(machine_config co
 //--------------------------------------------------
 //  device_t implementation
 //--------------------------------------------------
+
+INPUT_PORTS_START(grapplerplus)
+	PORT_START("S1")
+	PORT_DIPNAME(0x07, 0x00, "Printer Type")                    PORT_DIPLOCATION("S1:4,3,2")
+	PORT_DIPSETTING(   0x00, "Epson Series")
+	PORT_DIPSETTING(   0x01, "NEC 8023/C. Itoh 8510/DMP 85")
+	PORT_DIPSETTING(   0x02, "Star Gemini")
+	PORT_DIPSETTING(   0x03, "Anadex Printers")
+	PORT_DIPSETTING(   0x04, "Okidata 82A, 83A, 92, 93, 84")
+	PORT_DIPSETTING(   0x06, "Okidata 84 w/o Step II Graphics")
+	PORT_DIPSETTING(   0x05, "Apple Dot Matrix")
+	PORT_DIPSETTING(   0x07, "invalid")
+	PORT_DIPNAME(0x08, 0x08, "Most Significant Bit")            PORT_DIPLOCATION("S1:1")        PORT_CHANGED_MEMBER(DEVICE_SELF, a2bus_grapplerplus_device_base, sw_msb, 0)
+	PORT_DIPSETTING(   0x08, "Software Control")
+	PORT_DIPSETTING(   0x00, "Not Transmitted")
+INPUT_PORTS_END
+
 
 ioport_constructor a2bus_grapplerplus_device_base::device_input_ports() const
 {
@@ -521,6 +616,43 @@ void a2bus_grapplerplus_device_base::set_ack_in(void *ptr, s32 param)
 //  Grappler+ implementation
 //==============================================================
 
+class a2bus_grapplerplus_device : public a2bus_grapplerplus_device_base
+{
+public:
+	a2bus_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// DIP switch handlers
+	virtual DECLARE_INPUT_CHANGED_MEMBER(sw_msb) override;
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(grapplerplus); }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	// a2bus_grapplerplus_device_base implementation
+	virtual void data_latched(u8 data) override;
+	virtual void ack_latch_set() override;
+	virtual void ack_latch_cleared() override;
+
+	// timer handlers
+	TIMER_CALLBACK_MEMBER(update_strobe);
+
+	emu_timer * m_strobe_timer;
+
+	u8  m_data_latch;   // U10
+	u8  m_irq_disable;  // U2A (pin 4)
+	u8  m_irq;          // U3D (pin 13)
+	u8  m_next_strobe;  // U5A (pin 5)
+};
+
+
 a2bus_grapplerplus_device::a2bus_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	a2bus_grapplerplus_device_base(mconfig, A2BUS_GRAPPLERPLUS, tag, owner, clock),
 	m_strobe_timer(nullptr),
@@ -601,12 +733,6 @@ void a2bus_grapplerplus_device::write_c0nx(u8 offset, u8 data)
 //--------------------------------------------------
 //  device_t implementation
 //--------------------------------------------------
-
-tiny_rom_entry const *a2bus_grapplerplus_device::device_rom_region() const
-{
-	return ROM_NAME(grapplerplus);
-}
-
 
 void a2bus_grapplerplus_device::device_add_mconfig(machine_config &config)
 {
@@ -713,10 +839,60 @@ TIMER_CALLBACK_MEMBER(a2bus_grapplerplus_device::update_strobe)
 //  Buffered Grappler+ implementation
 //==============================================================
 
-a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock)
+class a2bus_buf_grapplerplus_device : public a2bus_grapplerplus_device_base
 {
-}
+public:
+	a2bus_buf_grapplerplus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUS, tag, owner, clock)
+	{
+	}
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+
+protected:
+	a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override { return ROM_NAME(bufgrapplerplus); }
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// helpers
+	template <typename T> void device_add_mconfig(machine_config &config, T &&mcu_clock);
+
+private:
+	// a2bus_grapplerplus_device_base implementation
+	virtual void data_latched(u8 data) override;
+
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(buf_ack_w);
+
+	// MCU I/O handlers
+	void mcu_io(address_map &map);
+	void mcu_p2_w(u8 data);
+	u8 mcu_bus_r();
+	void mcu_bus_w(u8 data);
+
+	// synchronised signals
+	void set_buf_data(void *ptr, s32 param);
+	void set_buf_ack_in(void *ptr, s32 param);
+	void clear_ibusy(void *ptr, s32 param);
+
+	required_device<mcs48_cpu_device>   m_mcu;
+	std::unique_ptr<u8 []>              m_ram;
+
+	u16 m_ram_row;          // U1-U8
+	u8  m_ram_mask;         // mask out chips that are not installed
+	u8  m_mcu_p2;           // U10
+	u8  m_data_latch;       // U14 (synchronised)
+	u8  m_ibusy;            // U12
+	u8  m_buf_ack_latch;    // U12
+	u8  m_buf_ack_in;       // printer connector pin 19 (synchronised)
+};
+
 
 
 a2bus_buf_grapplerplus_device::a2bus_buf_grapplerplus_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock) :
@@ -755,10 +931,15 @@ u8 a2bus_buf_grapplerplus_device::read_c0nx(u8 offset)
 //  device_t implementation
 //--------------------------------------------------
 
-tiny_rom_entry const *a2bus_buf_grapplerplus_device::device_rom_region() const
-{
-	return ROM_NAME(bufgrapplerplus);
-}
+INPUT_PORTS_START(bufgrapplerplus)
+	PORT_INCLUDE(grapplerplus)
+
+	PORT_START("CNF")
+	PORT_CONFNAME(0xff, 0x00, "RAM Size")
+	PORT_CONFSETTING(   0xfc, "16K (2 chips)")
+	PORT_CONFSETTING(   0xf0, "32K (4 chips)")
+	PORT_CONFSETTING(   0x00, "64K (8 chips)")
+INPUT_PORTS_END
 
 
 void a2bus_buf_grapplerplus_device::device_add_mconfig(machine_config &config)
@@ -1039,22 +1220,33 @@ void a2bus_buf_grapplerplus_device::clear_ibusy(void *ptr, s32 param)
 //  Buffered Grappler+ rev A implementation
 //==============================================================
 
-a2bus_buf_grapplerplus_reva_device::a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUSA, tag, owner, clock)
+class a2bus_buf_grapplerplus_reva_device : public a2bus_buf_grapplerplus_device
 {
-}
+public:
+	a2bus_buf_grapplerplus_reva_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+		a2bus_buf_grapplerplus_device(mconfig, A2BUS_BUFGRAPPLERPLUSA, tag, owner, clock)
+	{
+	}
+
+	static auto parent_rom_device_type() { return &A2BUS_BUFGRAPPLERPLUS; }
+
+protected:
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override
+	{
+		// boards with 6 MHz clock crystal for MCU have been seen with both UVEPROM and mask ROM parts
+		// ORANGE MICRO INC., 1983
+		// ASSY NO, 72 BGP 00001 REV A
+		// PART NO. 95PCB00003
+		a2bus_buf_grapplerplus_device::device_add_mconfig(config, 6_MHz_XTAL);
+	}
+};
+
+} // anonymous namespace
 
 
 
-//--------------------------------------------------
-//  device_t implementation
-//--------------------------------------------------
-
-void a2bus_buf_grapplerplus_reva_device::device_add_mconfig(machine_config &config)
-{
-	// boards with 6 MHz clock crystal for MCU have been seen with both UVEPROM and mask ROM parts
-	// ORANGE MICRO INC., 1983
-	// ASSY NO, 72 BGP 00001 REV A
-	// PART NO. 95PCB00003
-	a2bus_buf_grapplerplus_device::device_add_mconfig(config, 6_MHz_XTAL);
-}
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_GRAPPLER, device_a2bus_card_interface, a2bus_grappler_device, "a2grappler", "Orange Micro Grappler Printer Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_GRAPPLERPLUS, device_a2bus_card_interface, a2bus_grapplerplus_device, "a2grapplerplus", "Orange Micro Grappler+ Printer Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_BUFGRAPPLERPLUS, device_a2bus_card_interface, a2bus_buf_grapplerplus_device, "a2bufgrapplerplus", "Orange Micro Buffered Grappler+ Printer Interface")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_BUFGRAPPLERPLUSA, device_a2bus_card_interface, a2bus_buf_grapplerplus_reva_device, "a2bufgrapplerplusa", "Orange Micro Buffered Grappler+ (rev A) Printer Interface")

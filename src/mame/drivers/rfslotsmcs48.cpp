@@ -109,8 +109,8 @@ ROM_END
 
 /* It's an upgrade from "babyfrts25" for accepting 100 pts coins instead of just 25 pts ones.
    Standard RF-3115 PCB but:
-   -Two S5101 static RAM chips (instead of 4, one empty socket in the middle)
-   -Four NEC D8243C (instead of 5, two empty sockets).
+   -Two S5101 static RAM chips (instead of 4, two empty sockets)
+   -Four NEC D8243C (instead of 5, one empty socket in the middle).
    -No D8748 (the socket is empty), uses an external PCB (RF 53/3131) for sound with this layout:
       ___________________________________
      |     __________________________   |
@@ -158,4 +158,4 @@ ROM_END
 //    YEAR  NAME        PARENT    MACHINE   INPUT    CLASS               INIT        ROT   COMPANY               FULLNAME                         FLAGS
 GAME( 1981, ajofrin,    0,        ajofrin,  ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Ajofrin City",                  MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 198?, babyfrts,   0,        babyfrts, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Baby Fruits (100 pts version)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 198?, babyfrts25, babyfrts, babyfrts, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Baby Fruits (25 pts version)",  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, babyfrts25, babyfrts, babyfrts, ajofrin, rfslotsmcs48_state, empty_init, ROT0, "Recreativos Franco", "Baby Fruits (25 pts version)",  MACHINE_IS_SKELETON_MECHANICAL )

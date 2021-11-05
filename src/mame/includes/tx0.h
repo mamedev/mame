@@ -145,6 +145,7 @@ public:
 	{ }
 
 	void tx0_64kw(machine_config &config);
+	void tx0_8kwo(machine_config &config);
 	void tx0_8kw(machine_config &config);
 
 	void init_tx0();

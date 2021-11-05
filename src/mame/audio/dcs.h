@@ -44,8 +44,8 @@ public:
 	uint32_t dsio_idma_data_r();
 	void dmovlay_remap_memory();
 	void dmovlay_callback(uint32_t data);
-	void denver_postload(void);
-	void install_speedup(void);
+	void denver_postload();
+	void install_speedup();
 
 	// non public
 	void dcs_boot();
@@ -63,7 +63,7 @@ public:
 	void dsio_reset();
 	uint16_t dsio_r(offs_t offset);
 	void dsio_w(offs_t offset, uint16_t data);
-	void denver_alloc_dmadac(void);
+	void denver_alloc_dmadac();
 	void denver_reset();
 	uint16_t denver_r(offs_t offset);
 	void denver_w(offs_t offset, uint16_t data);
@@ -181,9 +181,9 @@ protected:
 	uint16_t      m_size;
 	uint16_t      m_incs;
 	dmadac_sound_device *m_dmadac[6];
-	timer_device *m_reg_timer;
-	timer_device *m_sport0_timer;
-	timer_device *m_internal_timer;
+	required_device<timer_device> m_reg_timer;
+	optional_device<timer_device> m_sport0_timer;
+	required_device<timer_device> m_internal_timer;
 	int32_t       m_ireg;
 	uint16_t      m_ireg_base;
 	uint16_t      m_control_regs[32];

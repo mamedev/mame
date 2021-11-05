@@ -425,6 +425,8 @@ class m68705u3_device : public m68705u_device
 public:
 	m68705u3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
+	static auto parent_rom_device_type() { return &M68705R3; }
+
 protected:
 	virtual tiny_rom_entry const *device_rom_region() const override;
 

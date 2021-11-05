@@ -112,9 +112,14 @@
  */
 
 #include "imgtool.h"
+#include "filter.h"
 #include "iflopimg.h"
-#include "formats/imageutl.h"
 
+#include "formats/imageutl.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cstdio>
 #include <ctime>
 
 

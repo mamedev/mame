@@ -152,7 +152,7 @@ void mame_machine_manager::start_luaengine()
 			// parse the file
 			// attempt to open the output file
 			emu_file file(options().ini_path(), OPEN_FLAG_READ);
-			if (file.open("plugin.ini") == osd_file::error::NONE)
+			if (!file.open("plugin.ini"))
 			{
 				try
 				{
@@ -198,8 +198,8 @@ void mame_machine_manager::start_luaengine()
 
 	{
 		emu_file file(options().plugins_path(), OPEN_FLAG_READ);
-		osd_file::error filerr = file.open("boot.lua");
-		if (filerr == osd_file::error::NONE)
+		std::error_condition const filerr = file.open("boot.lua");
+		if (!filerr)
 		{
 			std::string exppath;
 			osd_subst_env(exppath, std::string(file.fullpath()));

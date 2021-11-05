@@ -23,7 +23,7 @@
 #define VERBOSE ( LOG_GENERAL )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(V9938_BUSMOUSE, bus::ti99::colorbus, v9938_busmouse_device, "v9938_busmouse", "V9938 Bus Mouse")
+DEFINE_DEVICE_TYPE(V9938_BUSMOUSE, bus::ti99::colorbus::v9938_busmouse_device, "v9938_busmouse", "V9938 Bus Mouse")
 
 namespace bus::ti99::colorbus {
 

@@ -37,8 +37,8 @@ const options_entry emu_options::s_option_entries[] =
 	// search path options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
 
-	{ OPTION_HOMEPATH,                                   "system/mame",         OPTION_STRING,     "path to home directory (read/write) location" },
-	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "content/mame",      OPTION_STRING,     "path to ROMsets and hard disk images" },
+	{ OPTION_PLUGINDATAPATH,                             "system/mame",           OPTION_STRING,     "path to home directory (read/write) location" },
+	{ OPTION_MEDIAPATH ";rp;biospath;bp",                "content/mame",          OPTION_STRING,     "path to ROMsets and hard disk images" },
 	{ OPTION_HASHPATH ";hash_directory;hash",            "system/mame/hash",      OPTION_STRING,     "path to hash files" },
 	{ OPTION_SAMPLEPATH ";sp",                           "system/mame/samples",   OPTION_STRING,     "path to samplesets" },
 	{ OPTION_ARTPATH,                                    "system/mame/artwork",   OPTION_STRING,     "path to artwork files" },
@@ -142,7 +142,8 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_SAMPLERATE ";sr(1000-1000000)",             "48000",     OPTION_INTEGER,    "set sound output sample rate" },
 	{ OPTION_SAMPLES,                                    "1",         OPTION_BOOLEAN,    "enable the use of external samples if available" },
 	{ OPTION_VOLUME ";vol",                              "0",         OPTION_INTEGER,    "sound volume in decibels (-32 min, 0 max)" },
-	{ OPTION_SPEAKER_REPORT,                             "0",         OPTION_INTEGER,    "print report of speaker ouput maxima (0=none, or 1-4 for more detail)" },
+	{ OPTION_COMPRESSOR,                                 "1",         OPTION_BOOLEAN,    "enable compressor for sound" },
+	{ OPTION_SPEAKER_REPORT "(0-4)",                     "0",         OPTION_INTEGER,    "print report of speaker ouput maxima (0=none, or 1-4 for more detail)" },
 
 	// input options
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "CORE INPUT OPTIONS" },
@@ -951,7 +952,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 						//      ...
 						//      <sharedfeat name = "ctrl1_default" value = "paddle" />
 						//  </software>
-						for (const feature_list_item &fi : swinfo->shared_info())
+						for (const software_info_item &fi : swinfo->shared_features())
 						{
 							const std::string default_suffix = "_default";
 							if (fi.name().size() > default_suffix.size()

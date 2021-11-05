@@ -316,8 +316,8 @@ void menu_file_selector::select_item(const file_selector_entry &entry)
 		{
 			// drive/directory - first check the path
 			util::zippath_directory::ptr dir;
-			osd_file::error const err = util::zippath_directory::open(entry.fullpath, dir);
-			if (err != osd_file::error::NONE)
+			std::error_condition const err = util::zippath_directory::open(entry.fullpath, dir);
+			if (err)
 			{
 				// this path is problematic; present the user with an error and bail
 				ui().popup_time(1, _("Error accessing %s"), entry.fullpath);
@@ -347,7 +347,7 @@ void menu_file_selector::type_search_char(char32_t ch)
 	std::string const current(m_filename);
 	if (input_character(m_filename, ch, uchar_is_printable))
 	{
-		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
+		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
 
 		file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
 
@@ -393,20 +393,19 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 {
 	const file_selector_entry *selected_entry = nullptr;
 
-
 	// clear out the menu entries
 	m_entrylist.clear();
 
 	// open the directory
 	util::zippath_directory::ptr directory;
-	osd_file::error const err = util::zippath_directory::open(m_current_directory, directory);
+	std::error_condition const err = util::zippath_directory::open(m_current_directory, directory);
 
 	// add the "[empty slot]" entry if available
 	if (m_has_empty)
 		append_entry(SELECTOR_ENTRY_TYPE_EMPTY, "", "");
 
 	// add the "[create]" entry
-	if (m_has_create && !directory->is_archive())
+	if (m_has_create && directory && !directory->is_archive())
 		append_entry(SELECTOR_ENTRY_TYPE_CREATE, "", "");
 
 	// add and select the "[software list]" entry if available
@@ -421,9 +420,11 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	std::size_t const first = m_entrylist.size() + 1;
 
 	// build the menu for each item
-	if (osd_file::error::NONE != err)
+	if (err)
 	{
-		osd_printf_verbose("menu_file_selector::populate: error opening directory '%s' (%d)\n", m_current_directory, int(err));
+		osd_printf_verbose(
+				"menu_file_selector::populate: error opening directory '%s' (%s:%d %s)\n",
+				m_current_directory, err.category().name(), err.value(), err.message());
 	}
 	else
 	{
@@ -445,17 +446,20 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	}
 	directory.reset();
 
-	// sort the menu entries
-	const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
-	std::sort(
-			m_entrylist.begin() + first,
-			m_entrylist.end(),
-			[&coll] (file_selector_entry const &x, file_selector_entry const &y)
-			{
-				std::wstring const xstr = wstring_from_utf8(x.basename);
-				std::wstring const ystr = wstring_from_utf8(y.basename);
-				return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
-			});
+	if (m_entrylist.size() > first)
+	{
+		// sort the menu entries
+		const std::collate<wchar_t> &coll = std::use_facet<std::collate<wchar_t>>(std::locale());
+		std::sort(
+				m_entrylist.begin() + first,
+				m_entrylist.end(),
+				[&coll] (file_selector_entry const &x, file_selector_entry const &y)
+				{
+					std::wstring const xstr = wstring_from_utf8(x.basename);
+					std::wstring const ystr = wstring_from_utf8(y.basename);
+					return coll.compare(xstr.data(), xstr.data()+xstr.size(), ystr.data(), ystr.data()+ystr.size()) < 0;
+				});
+	}
 
 	// append all of the menu entries
 	for (file_selector_entry const &entry : m_entrylist)
@@ -478,17 +482,9 @@ void menu_file_selector::handle()
 {
 	// process the menu
 	event const *const event = process(0);
-	if (event && event->itemref)
+	if (event)
 	{
-		// handle selections
-		if (event->iptkey == IPT_UI_SELECT)
-		{
-			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
-
-			// reset the char buffer when pressing IPT_UI_SELECT
-			m_filename.clear();
-		}
-		else if (event->iptkey == IPT_SPECIAL)
+		if (event->iptkey == IPT_SPECIAL)
 		{
 			// if it's any other key and we're not maxed out, update
 			type_search_char(event->unichar);
@@ -496,6 +492,18 @@ void menu_file_selector::handle()
 		else if (event->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
+			if (!m_filename.empty())
+			{
+				m_filename.clear();
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+			}
+		}
+		else if (event->itemref && (event->iptkey == IPT_UI_SELECT))
+		{
+			// handle selections
+			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
+
+			// reset the char buffer when pressing IPT_UI_SELECT
 			m_filename.clear();
 		}
 	}

@@ -134,12 +134,16 @@
 
 ****************************************************************************/
 
-#include <ctime>
-#include <cctype>
-#include "imgtool.h"
-#include "formats/imageutl.h"
-#include "unicode.h"
 #include "fat.h"
+
+#include "formats/imageutl.h"
+
+#include "corestr.h"
+#include "unicode.h"
+
+#include <cctype>
+#include <cstdio>
+#include <ctime>
 
 #define FAT_DIRENT_SIZE         32
 #define FAT_SECLEN              512

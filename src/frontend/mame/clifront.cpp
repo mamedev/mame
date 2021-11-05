@@ -1084,16 +1084,18 @@ const char cli_frontend::s_softlist_xml_dtd[] =
 				"<?xml version=\"1.0\"?>\n" \
 				"<!DOCTYPE softwarelists [\n" \
 				"<!ELEMENT softwarelists (softwarelist*)>\n" \
-				"\t<!ELEMENT softwarelist (software+)>\n" \
+				"\t<!ELEMENT softwarelist (notes?, software+)>\n" \
 				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
 				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n" \
-				"\t\t<!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>\n" \
+				"\t\t<!ELEMENT notes (#PCDATA)>\n" \
+				"\t\t<!ELEMENT software (description, year, publisher, notes?, info*, sharedfeat*, part*)>\n" \
 				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n" \
 				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n" \
 				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n" \
 				"\t\t\t<!ELEMENT description (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT year (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n" \
+				"\t\t\t<!ELEMENT notes (#PCDATA)>\n" \
 				"\t\t\t<!ELEMENT info EMPTY>\n" \
 				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n" \
 				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n" \
@@ -1155,8 +1157,11 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 		util::stream_format(out, "\t\t\t<year>%s</year>\n", util::xml::normalize_string(swinfo.year().c_str()));
 		util::stream_format(out, "\t\t\t<publisher>%s</publisher>\n", util::xml::normalize_string(swinfo.publisher().c_str()));
 
-		for (const feature_list_item &flist : swinfo.other_info())
+		for (const auto &flist : swinfo.info())
 			util::stream_format(out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
+
+		for (const auto &flist : swinfo.shared_features())
+			util::stream_format(out, "\t\t\t<sharedfeat name=\"%s\" value=\"%s\"/>\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 		for (const software_part &part : swinfo.parts())
 		{
@@ -1166,7 +1171,7 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 
 			out << ">\n";
 
-			for (const feature_list_item &flist : part.featurelist())
+			for (const auto &flist : part.features())
 				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), util::xml::normalize_string(flist.value().c_str()));
 
 			// TODO: display ROM region information
@@ -1706,7 +1711,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 	{
 		// attempt to open the output file
 		emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file.open(std::string(emulator_info::get_configname()) + ".ini") != osd_file::error::NONE)
+		if (file.open(std::string(emulator_info::get_configname()) + ".ini"))
 			throw emu_fatalerror("Unable to create file %s.ini\n",emulator_info::get_configname());
 
 		// generate the updated INI
@@ -1714,7 +1719,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 
 		ui_options ui_opts;
 		emu_file file_ui(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_ui.open("ui.ini") != osd_file::error::NONE)
+		if (file_ui.open("ui.ini"))
 			throw emu_fatalerror("Unable to create file ui.ini\n");
 
 		// generate the updated INI
@@ -1729,7 +1734,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 			plugin_opts.scan_directory(pluginpath, true);
 		}
 		emu_file file_plugin(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		if (file_plugin.open("plugin.ini") != osd_file::error::NONE)
+		if (file_plugin.open("plugin.ini"))
 			throw emu_fatalerror("Unable to create file plugin.ini\n");
 
 		// generate the updated INI

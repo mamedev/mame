@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER(amiga_state::fdc_dskblk_w)
 
 WRITE_LINE_MEMBER(amiga_state::fdc_dsksyn_w)
 {
-	set_interrupt(INTENA_SETCLR | INTENA_DSKSYN);
+	set_interrupt((state ? INTENA_SETCLR : 0) | INTENA_DSKSYN);
 }
 
 WRITE_LINE_MEMBER( amiga_state::kbreset_w )
@@ -387,9 +387,9 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
 	m_irq_timer->reset();
 }
 
-WRITE_LINE_MEMBER( amiga_state::paula_int_w )
+void amiga_state::paula_int_w (offs_t channel, u8 state)
 {
-	set_interrupt(INTENA_SETCLR | (0x80 << state));
+	set_interrupt(INTENA_SETCLR | (0x80 << channel));
 }
 
 
@@ -922,7 +922,7 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	// signal an interrupt
-	set_interrupt(0x8000 | INTENA_BLIT);
+	set_interrupt(INTENA_SETCLR | INTENA_BLIT);
 
 	/* reset the blitter timer */
 	m_blitter_timer->reset();
@@ -1443,7 +1443,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 			data = (data & INTENA_SETCLR) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			CUSTOM_REG(offset) = data;
-
 			if (temp & INTENA_SETCLR)
 				// if we're enabling irq's, delay a bit
 				m_irq_timer->adjust(m_maincpu->cycles_to_attotime(AMIGA_IRQ_DELAY_CYCLES));
@@ -1495,6 +1494,13 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 				data &= ~BPLCON0_BPU0;
 			}
 			CUSTOM_REG(offset) = data;
+			break;
+
+		case REG_BPL1MOD:   case REG_BPL2MOD:
+			// bit 0 is implicitly ignored on writes,
+			// and wouldn't otherwise make sense with 68k inability of word reading with odd addresses.
+			// hpoker/hpokera would otherwise draw misaligned bottom GFX area without this (writes 0x27)
+			data &= ~1;
 			break;
 
 		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:

@@ -63,214 +63,339 @@
 
         ROM [0xc0050000] 0x10000 floats copied to [0x40180000]
 
+        ROM [0xff800000 - 0xff80171f] sound data headers, 32 bytes each
+            Word 0: sound data pointer (offset from 0xff800000)
+            Word 1: uncompressed length?
+            Word 2: ?
+            Word 3: same as word 1?
+            Word 4: ?
+            Word 5: ?
+            Word 6: ?
+            Word 7: 0
+
+        ROM [0xff801720 -> ] compressed audio data
+
+        [0x0000100c] bitmask of active sound channels (max 16 channels?)
+        [0x00001018 -> ] sound channel data, 64 bytes each
+            +0x00: sound data pointer in ROM
+            +0x04: 0
+            +0x08: uncompressed length
+            +0x0c: uncompressed length
+            +0x10: 0?
+            +0x14: 0 - sample rate?
+            +0x18: 0?
+            +0x1c: sample rate? (halfword)
+            +0x1e: ?? (halfword)
+            +0x20: ?
+            +0x24: ?
+            +0x28: ?
+            +0x2c: ?
+            +0x30: ?
+            +0x34: ?
+            +0x36: ? (halfword)
+            +0x38: ?
+            +0x3c: ?
+
+
 
     Texture ROM decode:
 
       {ic45}     {ic47}     {ic58}     {ic60}
     [2,0][0,0] [2,1][0,1] [3,0][1,0] [3,1][1,1]
 
+
+
+    TODO:
+
+    - TMS320C82 parallel processors are not emulated
+      * PP0 transfers polygon data from a software FIFO to the graphics processor. This is currently HLE'd.
+      * PP1 most likely does sound mixing. This is currently not emulated.
+    - Alpha blending (probably based on palette index like on gaelco3d)
+    - Minor Z-buffer issues
+    - Wrong textures in a few places (could be a CPU core bug)
+    - Networking
+
 */
 
 #include "emu.h"
 #include "cpu/tms32082/tms32082.h"
 #include "video/poly.h"
+#include "video/rgbutil.h"
+#include "machine/eepromser.h"
 #include "screen.h"
+
+#define BILINEAR 1
 
 struct rollext_polydata
 {
-	uint32_t tex_bottom;
-	uint32_t tex_left;
+	uint32_t tex_origin_y;
+	uint32_t tex_origin_x;
 	uint32_t pal;
+	float uoz_dx;
+	float uoz_dy;
+	float voz_dx;
+	float voz_dy;
+	float ooz_dx;
+	float ooz_dy;
+	float baseu;
+	float basev;
+	float basez;
+	uint32_t zmul;
 };
 
 class rollext_renderer : public poly_manager<float, rollext_polydata, 4>
 {
+	friend class rollext_state;
+
 public:
 	rollext_renderer(screen_device &screen)
 		: poly_manager<float, rollext_polydata, 4>(screen.machine())
 	{
-		m_fb = std::make_unique<bitmap_rgb32>(1024, 1024);
+		m_fb[0] = std::make_unique<bitmap_rgb32>(1024, 1024);
+		m_fb[1] = std::make_unique<bitmap_rgb32>(1024, 1024);
+
+		m_zb = std::make_unique<bitmap_ind32>(1024, 1024);
+
+
+		m_palette = std::make_unique<rgb_t[]>(32768);
+		m_texture_mask = std::make_unique<uint8_t[]>(2048 * 16384);
+
+		m_fb_current = 0;
 	}
 
+	template<bool UseZ>
 	void render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid);
 
-	void set_texture_ram(uint8_t* texture_ram);
-	void set_palette_ram(uint16_t* palette_ram);
+	void set_texture_ram(uint8_t* texture_ram) { m_texture_ram = texture_ram; }
 	void process_display_list(screen_device &screen, uint32_t* dispram);
+
+	void palette_write(int index, uint16_t data);
+	void texture_mask_write(int index, uint8_t data);
 
 	void clear_fb();
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 private:
-	std::unique_ptr<bitmap_rgb32> m_fb;
+	std::unique_ptr<bitmap_rgb32> m_fb[2];
+	std::unique_ptr<rgb_t[]> m_palette;
+	std::unique_ptr<uint8_t[]> m_texture_mask;
+
+	std::unique_ptr<bitmap_ind32> m_zb;
+
+	int m_fb_current;
 
 	uint8_t *m_texture_ram;
-	uint16_t *m_palette_ram;
 };
 
-void rollext_renderer::set_texture_ram(uint8_t* texture_ram)
-{
-	m_texture_ram = texture_ram;
-}
-
-void rollext_renderer::set_palette_ram(uint16_t* palette_ram)
-{
-	m_palette_ram = palette_ram;
-}
-
+template<bool UseZ>
 void rollext_renderer::render_texture_scan(int32_t scanline, const extent_t &extent, const rollext_polydata &extradata, int threadid)
 {
-	float u = extent.param[0].start;
-	float v = extent.param[1].start;
-	float du = extent.param[0].dpdx;
-	float dv = extent.param[1].dpdx;
+	uint32_t *fb = &m_fb[m_fb_current]->pix(scanline);
+	uint32_t* const zb = &m_zb->pix(scanline);
 
-	uint32_t *fb = &m_fb->pix(scanline);
+	uint32_t tex_origin_y = extradata.tex_origin_y;
+	uint32_t tex_origin_x = extradata.tex_origin_x;
 
-	uint32_t texbot = extradata.tex_bottom;
-	uint32_t texleft = extradata.tex_left;
+	float baseu = extradata.baseu;
+	float basev = extradata.basev;
+	float basez = extradata.basez;
+	float uoz_dx = extradata.uoz_dx;
+	float uoz_dy = extradata.uoz_dy;
+	float voz_dx = extradata.voz_dx;
+	float voz_dy = extradata.voz_dy;
+	float ooz_dx = extradata.ooz_dx;
+	float ooz_dy = extradata.ooz_dy;
 
-	int palnum = extradata.pal;
+	uint32_t zmul = extradata.zmul;
+
+	int palnum = extradata.pal << 8;
+
+	float uoz = baseu + (uoz_dx * (extent.startx - 256)) + (-uoz_dy * (scanline - 192));
+	float voz = basev + (voz_dx * (extent.startx - 256)) + (-voz_dy * (scanline - 192));
+	float ooz = basez + (ooz_dx * (extent.startx - 256)) + (-ooz_dy * (scanline - 192));
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
-		int iu = (int)(u * 29.0f);
-		int iv = (int)(v * 29.0f);
+		float z = recip_approx(ooz);
+		uint32_t zbufval = (int)(z * zmul);
 
-		uint8_t p = m_texture_ram[((texbot - iv) * 2048) + texleft + iu];
+		if (zbufval <= zb[x] || !UseZ)
+		{
+			float u = uoz * z;
+			float v = voz * z;
 
-		uint16_t texel = m_palette_ram[(palnum * 256) + BYTE_XOR_BE(p)];
-		int r = ((texel >> 10) & 0x1f) << 3;
-		int g = ((texel >> 5) & 0x1f) << 3;
-		int b = (texel & 0x1f) << 3;
+			int tx = tex_origin_x + (int)(u);
+			int ty = tex_origin_y + (int)(v);
 
-		fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
 
-		u += du;
-		v += dv;
+#if BILINEAR
+			float intu, intv;
+
+			int fracu = modff(u, &intu) * 255.0f;
+			int fracv = modff(v, &intv) * 255.0f;
+
+			uint32_t mask00 = m_texture_mask[((ty & 0x3fff) * 2048) + (tx & 0x7ff)];
+			uint32_t mask01 = m_texture_mask[((ty & 0x3fff) * 2048) + ((tx+1) & 0x7ff)];
+			uint32_t mask10 = m_texture_mask[(((ty+1) & 0x3fff) * 2048) + (tx & 0x7ff)];
+			uint32_t mask11 = m_texture_mask[(((ty+1) & 0x3fff) * 2048) + ((tx+1) & 0x7ff)];
+			const uint32_t mask_level = rgbaint_t::bilinear_filter(mask00, mask01, mask10, mask11, fracu, fracv);
+
+			if (mask_level < 0xff)
+			{
+				uint32_t tex00 = m_palette[palnum + BYTE_XOR_BE(m_texture_ram[((ty) & 0x3fff) * 2048 + ((tx) & 0x7ff)])];
+				uint32_t tex01 = m_palette[palnum + BYTE_XOR_BE(m_texture_ram[((ty) & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)])];
+				uint32_t tex10 = m_palette[palnum + BYTE_XOR_BE(m_texture_ram[((ty + 1) & 0x3fff) * 2048 + ((tx) & 0x7ff)])];
+				uint32_t tex11 = m_palette[palnum + BYTE_XOR_BE(m_texture_ram[((ty + 1) & 0x3fff) * 2048 + ((tx + 1) & 0x7ff)])];
+
+				const uint32_t texsam = rgbaint_t::bilinear_filter(tex00, tex01, tex10, tex11, fracu, fracv);
+
+				rgbaint_t texel_color(texsam);
+				rgbaint_t fb_color(fb[x]);
+				texel_color.blend(fb_color, 255-mask_level);
+
+				fb[x] = texel_color.to_rgba_clamp();
+				if (UseZ)
+					zb[x] = zbufval;
+			}
+#else
+			uint8_t mask = m_texture_mask[((ty & 0x3fff) * 2048) + (tx & 0x7ff)];
+			if (mask == 0)
+			{
+				uint8_t pen = m_texture_ram[((ty & 0x3fff) * 2048) + (tx & 0x7ff)];
+				uint32_t texel = m_palette[palnum + BYTE_XOR_BE(pen)];
+				fb[x] = texel;
+				if (UseZ)
+					zb[x] = zbufval;
+			}
+#endif
+		}
+
+		uoz += uoz_dx;
+		voz += voz_dx;
+		ooz += ooz_dx;
 	}
 }
 
 void rollext_renderer::process_display_list(screen_device &screen, uint32_t* disp_ram)
 {
-	const rectangle& visarea = screen.visible_area();
-
-	render_delegate rd = render_delegate(&rollext_renderer::render_texture_scan, this);
+	rectangle visarea = rectangle(0, 511, 0, 383);
 
 	int num = disp_ram[0xffffc/4];
 
 	for (int i=0; i < num; i++)
 	{
-		int ii = i * 0x60;
+		int ii = i * 0x18;
 
-		vertex_t vert[4];
-
-		//int x[4];
-		//int y[4];
+		vertex_t vert[5];
 
 		// Poly data:
-		// Word 0:   xxxxxxxx -------- -------- --------   Command? 0xFC for quads
-		//           -------- -------- xxxxxxxx --------   Palette?
-		//           -------- -------- -------- xxxxxxxx   Number of verts? (4 for quads)
-
-		// Word 1:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 1 X
-
+		// Word 0:   x------- -------- -------- --------   ?
+		//           -x------ -------- -------- --------   ? set to 1 for polygons, 0 on command 0x9c (viewport setup command?)
+		//           --x----- -------- -------- --------   ? set to 1 for no perspective
+		//           ---x---- -------- -------- --------   ? always 1?
+		//           ----x--- -------- -------- --------   ? always 1?
+		//           -----x-- -------- -------- --------   the PP transfer code checks for 1
+		//           ------x- -------- -------- --------   always 0?
+		//           -------x -------- -------- --------   Texture page
+		//           -------- -------- -xxxxxxx --------   Palette
+		//           -------- -------- -------- -----xxx   Number of verts (3,4,5 used)
+		// Word 1:   (float) Vertex 1 X
 		// Word 2:   xxxxxxxx xxxxx--- -------- --------   Texture Origin Bottom
 		//           -------- -----xxx xxxxxxxx --------   Texture Origin Left
+		// Word 3:   (float) Vertex 1 Y
+		// Word 4:   xxxxxxxx xxxxxxxx xxxxxxxx x-------   Z buffer multiplier (int)
+		// Word 5:   (float) Vertex 2 X
+		// Word 6:   (float) U/Z per X pixel increment
+		// Word 7:   (float) Vertex 2 Y
+		// Word 8:   (float) U/Z per Y pixel increment
+		// Word 9:   (float) Vertex 3 X
+		// Word 10:  (float) 1/Z per X pixel increment
+		// Word 11:  (float) Vertex 3 Y
+		// Word 12:  (float) 1/Z per Y pixel increment
+		// Word 13:  (float) Vertex 4 X (if quad)
+		// Word 14:  (float) V/Z per X pixel increment
+		// Word 15:  (float) Vertex 4 Y (if quad)
+		// Word 16:  (float) V/Z per Y pixel increment
+		// Word 17:  (float) Vertex 5 X (if 5 verts)
+		// Word 18:  (float) Base U coordinate
+		// Word 19:  (float) Vertex 5 Y (if 5 verts)
+		// Word 20:  (float) Base Z coordinate
+		// Word 21:  (float) Unused? PP code checks for 0 (validity check?)
+		// Word 22:  (float) Base V coordinate
+		// Word 23:  (float) ? Seems to be a copy of the last X coordinate
 
-		// Word 3:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 1 Y
-
-		// Word 4:   -------- -------- xxxxxxxx xxxxxxxx   ?
-
-		// Word 5:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 2 X
-
-		// Word 6:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
-
-		// Word 7:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 2 Y
-
-		// Word 8:   -------- -------- -------- --------   ?
-
-		// Word 9:   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 3 X
-
-		// Word 10:  -------- -------- -------- --------   ?
-
-		// Word 11:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 3 Y
-
-		// Word 12:  -------- -------- -------- --------   ?
-
-		// Word 13:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 4 X
-
-		// Word 14:  -------- -------- -------- --------   ?
-
-		// Word 15:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Vertex 4 Y
-
-		// Word 16:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
-
-		// Word 17:  -------- -------- -------- --------   ?
-
-		// Word 18:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
-
-		// Word 19:  -------- -------- -------- --------   ?
-
-		// Word 20:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
-
-		// Word 21:  -------- -------- -------- --------   ?
-
-		// Word 22:  xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx   Unknown float
-
-		// Word 23:  -------- -------- -------- --------   ?
-
-		for (int j=0; j < 4; j++)
+		for (int j=0; j < 5; j++)
 		{
-			uint32_t ix = disp_ram[(ii + (j*0x10) + 0x4) / 4];
-			uint32_t iy = disp_ram[(ii + (j*0x10) + 0xc) / 4];
+			float fx = u2f(disp_ram[ii + (j * 4) + 1]);
+			float fy = u2f(disp_ram[ii + (j * 4) + 3]);
 
-			vert[j].x = (int)((u2f(ix) / 2.0f) + 256.0f);
-			vert[j].y = (int)((u2f(iy) / 2.0f) + 192.0f);
+			vert[j].x = (int)(fx + 256.0f);
+			vert[j].y = (int)(-fy + 192.0f);
 		}
 
-		vert[0].p[0] = 0.0f;        vert[0].p[1] = 1.0f;
-		vert[1].p[0] = 0.0f;        vert[1].p[1] = 0.0f;
-		vert[2].p[0] = 1.0f;        vert[2].p[1] = 0.0f;
-		vert[3].p[0] = 1.0f;        vert[3].p[1] = 1.0f;
+		rollext_polydata& extra = object_data().next();
 
-		rollext_polydata &extra = object_data_alloc();
+		extra.tex_origin_y = (disp_ram[ii + 2] >> 19) & 0x1fff;
+		extra.tex_origin_x = (disp_ram[ii + 2] >> 8) & 0x7ff;
+		extra.pal = (disp_ram[ii + 0] >> 8) & 0x7f;
 
-		extra.tex_bottom = (disp_ram[(ii + 8) / 4] >> 19) & 0x1fff;
-		extra.tex_left = (disp_ram[(ii + 8) / 4] >> 8) & 0x7ff;
-		extra.pal = (disp_ram[(ii + 0) / 4] >> 8) & 0x1f;
+		extra.tex_origin_y |= (disp_ram[ii + 0] & 0x01000000) ? 0x2000 : 0;
 
-#if 0
-		printf("P%d\n", i);
-		for (int j=0; j < 6; j++)
+		extra.uoz_dx = u2f(disp_ram[ii + 6]);
+		extra.uoz_dy = u2f(disp_ram[ii + 8]);
+		extra.voz_dx = u2f(disp_ram[ii + 14]);
+		extra.voz_dy = u2f(disp_ram[ii + 16]);
+		extra.ooz_dx = u2f(disp_ram[ii + 10]);
+		extra.ooz_dy = u2f(disp_ram[ii + 12]);
+		extra.baseu = u2f(disp_ram[ii + 18]);
+		extra.basev = u2f(disp_ram[ii + 22]);
+		extra.basez = u2f(disp_ram[ii + 20]);
+
+		extra.zmul = (uint32_t)(disp_ram[ii + 4]) >> 7;
+
+		int num_verts = (disp_ram[ii + 0] & 0x7);
+
+		if (disp_ram[ii + 0] & 0x40000000)
 		{
-			printf("   %08X %08X %08X %08X", disp_ram[(ii + (j*0x10) + 0) / 4], disp_ram[(ii + (j*0x10) + 4) / 4], disp_ram[(ii + (j*0x10) + 8) / 4], disp_ram[(ii + (j*0x10) + 12) / 4]);
-			printf("   %f %f %f %f\n", u2f(disp_ram[(ii + (j*0x10) + 0) / 4]), u2f(disp_ram[(ii + (j*0x10) + 4) / 4]), u2f(disp_ram[(ii + (j*0x10) + 8) / 4]), u2f(disp_ram[(ii + (j*0x10) + 12) / 4]));
+			if (num_verts == 4)
+				render_polygon<4, 0>(visarea, render_delegate(&rollext_renderer::render_texture_scan<true>, this), vert);
+			else if (num_verts == 3)
+				render_triangle<0>(visarea, render_delegate(&rollext_renderer::render_texture_scan<true>, this), vert[0], vert[1], vert[2]);
+			else if (num_verts == 5)
+				render_polygon<5, 0>(visarea, render_delegate(&rollext_renderer::render_texture_scan<true>, this), vert);
 		}
-#endif
-
-		render_triangle<4>(visarea, rd, vert[0], vert[1], vert[2]);
-		render_triangle<4>(visarea, rd, vert[0], vert[2], vert[3]);
 
 	}
-
-	wait();
 }
 
 void rollext_renderer::clear_fb()
 {
-	rectangle visarea;
-	visarea.min_x = 0;
-	visarea.max_x = 511;
-	visarea.min_y = 0;
-	visarea.max_y = 383;
+	rectangle visarea(0, 511, 0, 383);
 
-	m_fb->fill(0xff000000, visarea);
+	m_zb->fill(0xffffffff, visarea);
+	m_fb[m_fb_current]->fill(0xff000000, visarea);
+}
 
+void rollext_renderer::palette_write(int index, uint16_t data)
+{
+	m_palette[index] = rgb_t(0xff, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data));
+}
+
+void rollext_renderer::texture_mask_write(int index, uint8_t data)
+{
+	int x = index & 0xff;
+	int y = index >> 8;
+
+	// expand to bytes for easier access
+	for (auto j = 0; j < 8; j++)
+	{
+		m_texture_mask[(y * 2048) + (x * 8) + j] = (data & (1 << j)) ? 0xff : 0x00;
+	}
 }
 
 void rollext_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 {
-	copybitmap_trans(*bitmap, *m_fb, 0, 0, 0, 0, cliprect, 0);
+	wait();
+	copybitmap_trans(*bitmap, *m_fb[m_fb_current], 0, 0, 0, 0, cliprect, 0);
 }
 
 
@@ -283,10 +408,12 @@ public:
 	rollext_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette_ram(*this, "palette_ram"),
-		m_texture_mask(*this, "texture_mask"),
 		m_disp_ram(*this, "disp_ram"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_in(*this, "INPUTS%u", 1U),
+		m_analog(*this, "ANALOG%u", 1U),
+		m_eeprom_in(*this, "EEPROMIN"),
+		m_eeprom_out(*this, "EEPROMOUT")
 	{
 	}
 
@@ -296,19 +423,34 @@ public:
 
 private:
 	required_device<tms32082_mp_device> m_maincpu;
-	required_shared_ptr<uint32_t> m_palette_ram;
-	required_shared_ptr<uint32_t> m_texture_mask;
 	required_shared_ptr<uint32_t> m_disp_ram;
 	required_device<screen_device> m_screen;
 
-	uint32_t a0000000_r(offs_t offset);
-	void a0000000_w(uint32_t data);
+	uint32_t a0000000_r(offs_t offset, uint32_t mem_mask = ~0);
+	void a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t b0000000_r(offs_t offset);
+
+	void palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void texture_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void cmd_callback(address_space &space, uint32_t data);
 
+	uint32_t fifo_ptr_r(offs_t offset, uint32_t mem_mask = ~0);
+	void fifo_ptr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<rollext_renderer> m_renderer;
+
+	uint32_t m_fifo_ptr;
+
+	uint8_t m_adc_reg;
+	uint8_t m_adc_input;
+	uint8_t m_adc_readbit;
+
+	required_ioport_array<3> m_in;
+	required_ioport_array<1> m_analog;
+	required_ioport m_eeprom_in;
+	required_ioport m_eeprom_out;
 
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
 	virtual void machine_start() override;
@@ -347,72 +489,84 @@ void rollext_state::video_start()
 
 	m_renderer = std::make_unique<rollext_renderer>(*m_screen);
 	m_renderer->set_texture_ram(m_texture.get());
-	m_renderer->set_palette_ram((uint16_t*)&m_palette_ram[0]);
 }
 
 uint32_t rollext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-#if 0
-	uint16_t *pal = (uint16_t*)&m_palette_ram[0];
-
-	int palnum = 31;
-	// 24,25,31 for basic font
-	// 29 = trees
-
-	int ii=0;
-	for (int j=0; j < 384; j++)
-	{
-		uint32_t *fb = &bitmap.pix(j);
-		for (int i=0; i < 512; i++)
-		{
-			uint8_t p = m_texture[ii++];
-
-			uint16_t rgb = pal[(palnum * 256) + BYTE_XOR_BE(p)];
-			int r = ((rgb >> 10) & 0x1f) << 3;
-			int g = ((rgb >> 5) & 0x1f) << 3;
-			int b = (rgb & 0x1f) << 3;
-
-			fb[i] = 0xff000000 | (r << 16) | (g << 8) | b;
-		}
-		ii += 1536;
-	}
-#endif
-
 	m_renderer->display(&bitmap, cliprect);
-
-	//m_renderer->clear_fb();
-
-	//m_disp_ram[0xffffc/4] = 0;
-
-
 	return 0;
 }
 
 
-uint32_t rollext_state::a0000000_r(offs_t offset)
+uint32_t rollext_state::a0000000_r(offs_t offset, uint32_t mem_mask)
 {
 	switch (offset)
 	{
-		case 0:         // ??
+		case 0:         // inputs
 		{
-			uint32_t data = 0x20200;
+			uint32_t data = 0;
 
-			//data |= ioport("INPUTS1")->read();
-			//data |= 0xfff7fff7;
+			if (ACCESSING_BITS_16_23)
+			{
+				// -------- ---x---- -------- -------- ADC channel 0
+				// -------- --x----- -------- -------- ADC channel 1?
+				// -------- -x------ -------- -------- ADC channel 2?
+				// -------- x------- -------- -------- ADC channel 3?
+
+				data |= (m_adc_readbit & 1) ? 0x100000 : 0;
+
+				data |= m_in[0]->read() << 16;
+			}
+			if (ACCESSING_BITS_8_15)
+			{
+				data |= 0x200;      // 0 causes inf loop
+				data |= m_eeprom_in->read() << 8;
+			}
+			if (ACCESSING_BITS_0_7)
+			{
+				data |= m_in[1]->read();
+			}
 
 			return data;
 		}
 
 		case 1:
-			return 0xffffffff;
+			uint32_t data = 0;
+			data |= m_in[2]->read();
+			return data;
 	}
 
 	return 0xffffffff;
 }
 
-void rollext_state::a0000000_w(uint32_t data)
+void rollext_state::a0000000_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	// FPGA interface?
+	if (offset == 0)
+	{
+		if (ACCESSING_BITS_8_15)
+		{
+			m_eeprom_out->write(data >> 8, 0xff);
+		}
+	}
+	else if (offset == 1)
+	{
+		if (ACCESSING_BITS_16_23)
+		{
+			uint8_t newdata = data >> 16;
+			if ((newdata & 0x20) == 0 && (m_adc_reg & 0x20) != 0)
+			{
+				m_adc_input = m_analog[0]->read();
+			}
+
+			if (newdata & 0x10)
+			{
+				m_adc_readbit = (m_adc_input >> 7) & 1;
+				m_adc_input <<= 1;
+			}
+
+			m_adc_reg = newdata;
+		}
+	}
 }
 
 uint32_t rollext_state::b0000000_r(offs_t offset)
@@ -425,7 +579,7 @@ uint32_t rollext_state::b0000000_r(offs_t offset)
 			return 0;
 	}
 
-	return 0;
+	return 0xffffffff;
 }
 
 void rollext_state::cmd_callback(address_space &space, uint32_t data)
@@ -440,64 +594,11 @@ void rollext_state::cmd_callback(address_space &space, uint32_t data)
 			// simulate PP behavior for now...
 			space.write_dword(0x00000084, 3);
 
-			uint32_t num = space.read_dword(0x90);
-
-			int consume_num = num;
-			if (consume_num > 32)
-				consume_num = 32;
-
-			printf("PP num %d\n", num);
-			printf("0x00000084 = %08X\n", space.read_dword(0x84));
-
-
-			uint32_t ra = 0x1000280;
-
-			/*
-			printf("FIFO push:\n");
-
-			for (int i=0; i < consume_num; i++)
-			{
-			    printf("Entry %d:\n", i);
-			    for (int k=0; k < 6; k++)
-			    {
-			        for (int l=0; l < 4; l++)
-			        {
-			            uint32_t dd = m_program->read_dword(ra);
-			            ra += 4;
-
-			            printf("%08X(%f) ", dd, u2f(dd));
-			        }
-			        printf("\n");
-			    }
-			    printf("\n");
-			}
-			*/
-
-			ra = 0x1000280;
-
-			int oldnum = space.read_dword(0x600ffffc);
-			uint32_t rb = 0x60000000 + (oldnum * 0x60);
-
-			for (int i=0; i < consume_num; i++)
-			{
-				for (int k=0; k < 24; k++)
-				{
-					uint32_t dd = space.read_dword(ra);
-					ra += 4;
-
-					space.write_dword(rb, dd);
-					rb += 4;
-				}
-			}
-			space.write_dword(0x600ffffc, oldnum+consume_num);
+			m_renderer->m_fb_current ^= 1;
+			m_renderer->clear_fb();
 
 			m_renderer->process_display_list(*m_screen, m_disp_ram);
-
-			space.write_dword(0x600ffffc, 0);
-
-			space.write_dword(0x00000090, 0);
-			space.write_dword(0x00000094, 0);
-
+			m_maincpu->space().write_dword(0x600ffffc, 0);
 		}
 	}
 	// PP1
@@ -511,14 +612,48 @@ void rollext_state::cmd_callback(address_space &space, uint32_t data)
 	}
 }
 
+void rollext_state::palette_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		m_renderer->palette_write((offset * 2) + 1, data >> 16);
+	}
+	if (ACCESSING_BITS_0_15)
+	{
+		m_renderer->palette_write(offset * 2, data & 0xffff);
+	}
+}
+
+void rollext_state::texture_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (ACCESSING_BITS_24_31)
+	{
+		m_renderer->texture_mask_write((offset * 4) + 1, data >> 24);
+	}
+	if (ACCESSING_BITS_16_23)
+	{
+		m_renderer->texture_mask_write((offset * 4) + 0, data >> 16);
+	}
+	if (ACCESSING_BITS_8_15)
+	{
+		m_renderer->texture_mask_write((offset * 4) + 3, data >> 8);
+	}
+	if (ACCESSING_BITS_0_7)
+	{
+		m_renderer->texture_mask_write((offset * 4) + 2, data & 0xff);
+	}
+}
+
+
+
 
 // Master Processor memory map
 void rollext_state::memmap(address_map &map)
 {
 	map(0x40000000, 0x40ffffff).ram().share("main_ram");
 	map(0x60000000, 0x600fffff).ram().share("disp_ram");
-	map(0x80000000, 0x8000ffff).ram().share("palette_ram");
-	map(0x90000000, 0x9007ffff).ram().share("texture_mask");
+	map(0x80000000, 0x8000ffff).w(FUNC(rollext_state::palette_w));
+	map(0x90000000, 0x9007ffff).w(FUNC(rollext_state::texture_mask_w));
 	map(0xa0000000, 0xa00000ff).rw(FUNC(rollext_state::a0000000_r), FUNC(rollext_state::a0000000_w));
 	map(0xb0000000, 0xb0000007).r(FUNC(rollext_state::b0000000_r));
 	map(0xc0000000, 0xc03fffff).rom().region("rom1", 0);
@@ -527,12 +662,77 @@ void rollext_state::memmap(address_map &map)
 
 
 static INPUT_PORTS_START(rollext)
-
 	PORT_START("INPUTS1")
-	PORT_BIT( 0xfff7fff7, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x00080008, IP_ACTIVE_LOW) /* Test Button */
+	PORT_SERVICE_NO_TOGGLE(0x8, IP_ACTIVE_LOW)      // test button
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_VOLUME_DOWN)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_SERVICE1)
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_VOLUME_UP)
 
+	PORT_START("INPUTS2")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("View Change")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Right Brake")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Left Brake")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Left Smash")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Right Smash")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUTS3")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
+
+	PORT_START("EEPROMIN")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
+
+	PORT_START("EEPROMOUT")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
+
+	PORT_START("ANALOG1")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_NAME("Seat Tilt")
 INPUT_PORTS_END
+
+
+uint32_t rollext_state::fifo_ptr_r(offs_t offset, uint32_t mem_mask)
+{
+	return m_fifo_ptr;
+}
+
+void rollext_state::fifo_ptr_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_fifo_ptr = data;
+	if (m_fifo_ptr > 0)
+	{
+		// simulate PP behavior for now...
+		uint32_t num = m_fifo_ptr;
+
+		int consume_num = num;
+		if (consume_num > 32)
+			consume_num = 32;
+
+		uint32_t ra = 0x1000280;
+
+		int oldnum = m_maincpu->space().read_dword(0x600ffffc);
+		uint32_t rb = 0x60000000 + (oldnum * 0x60);
+
+		for (int i = 0; i < consume_num; i++)
+		{
+			for (int k = 0; k < 24; k++)
+			{
+				uint32_t dd = m_maincpu->space().read_dword(ra);
+				ra += 4;
+
+				m_maincpu->space().write_dword(rb, dd);
+				rb += 4;
+			}
+		}
+		m_maincpu->space().write_dword(0x600ffffc, oldnum + consume_num);
+		m_maincpu->space().write_dword(0x00000090, 0);
+	}
+}
+
 
 
 void rollext_state::machine_reset()
@@ -541,6 +741,8 @@ void rollext_state::machine_reset()
 
 void rollext_state::machine_start()
 {
+	// hook to fifo pointer for simulating PP0
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x90, 0x93, read32s_delegate(*this, FUNC(rollext_state::fifo_ptr_r)), write32s_delegate(*this, FUNC(rollext_state::fifo_ptr_w)));
 }
 
 
@@ -548,14 +750,15 @@ void rollext_state::rollext(machine_config &config)
 {
 	TMS32082_MP(config, m_maincpu, 60000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollext_state::memmap);
-	//m_maincpu->set_vblank_int("screen", FUNC(rollext_state::vblank_interrupt));
-	m_maincpu->set_periodic_int(FUNC(rollext_state::irq1_line_assert), attotime::from_hz(60));
+	m_maincpu->set_vblank_int("screen", FUNC(rollext_state::vblank_interrupt));
 	//m_maincpu->set_periodic_int(FUNC(rollext_state::irq3_line_assert), attotime::from_hz(500));
 
 	tms32082_pp_device &pp0(TMS32082_PP(config, "pp0", 60000000));
 	pp0.set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 
 	config.set_maximum_quantum(attotime::from_hz(100));
+
+	EEPROM_93C66_16BIT(config, "eeprom");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -593,4 +796,4 @@ ROM_START(rollext)
 ROM_END
 
 
-GAME( 1999, rollext, 0, rollext, rollext, rollext_state, init_rollext, ROT0, "Gaelco", "ROLLing eX.tre.me", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, rollext, 0, rollext, rollext, rollext_state, init_rollext, ROT0, "Gaelco (Namco America license)", "ROLLing eX.tre.me (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

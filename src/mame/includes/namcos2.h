@@ -106,7 +106,6 @@ public:
 	void init_finehour();
 	void init_finallap();
 	void init_dirtfoxj();
-	void init_marvlanj();
 	void init_sws92();
 	void init_dsaber();
 	void init_assault();

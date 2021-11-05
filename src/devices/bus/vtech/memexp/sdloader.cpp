@@ -6,14 +6,25 @@
 
     Notes:
     - Also works for VZ200
+    - The loader can't format the SD card, so you need to do that yourself
+      Instructions for Linux:
+      * dd if=/dev/zero of=vz300.img count=2048 bs=1M
+      * mkfs.vfat vz300.img
+      * mount image and copy .vz files to it
+      * chdman createhd -o vz300.chd -i vz300.img -c none
 
     TODO:
-    - No SD card emulation, so only the memory expansion part works
+    - SPI clock needed too fast
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "sdloader.h"
+
+#define LOG_GENERAL (1U << 0)
+#define LOG_SPI     (1U << 1)
+#define VERBOSE (LOG_GENERAL)
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -68,6 +79,18 @@ const tiny_rom_entry *vtech_sdloader_device::device_rom_region() const
 	return ROM_NAME( sdloader );
 }
 
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void vtech_sdloader_device::device_add_mconfig(machine_config &config)
+{
+	vtech_memexp_device::device_add_mconfig(config);
+
+	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->spi_miso_callback().set(FUNC(vtech_sdloader_device::spi_miso_w));
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -79,9 +102,12 @@ const tiny_rom_entry *vtech_sdloader_device::device_rom_region() const
 
 vtech_sdloader_device::vtech_sdloader_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	vtech_memexp_device(mconfig, VTECH_SDLOADER, tag, owner, clock),
+	m_sdcard(*this, "sdcard"),
 	m_dosbank(*this, "dosbank"),
 	m_dosview(*this, "dosview"),
 	m_expbank(*this, "expbank"),
+	m_spi_clock_state(false),
+	m_spi_clock_cycles(0),
 	m_vz300_mode(false)
 {
 }
@@ -103,7 +129,16 @@ void vtech_sdloader_device::device_start()
 	m_expbank->configure_entry(0, m_ram.get() + 0x10000);
 	m_expbank->configure_entry(1, m_ram.get() + 0x18000);
 
+	// allocate timer for sdcard
+	m_spi_clock = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vtech_sdloader_device::spi_clock), this));
+
 	// register for savestates
+	save_item(NAME(m_spi_clock_state));
+	save_item(NAME(m_spi_clock_sysclk));
+	save_item(NAME(m_spi_clock_cycles));
+	save_item(NAME(m_in_bit));
+	save_item(NAME(m_in_latch));
+	save_item(NAME(m_out_latch));
 	save_item(NAME(m_vz300_mode));
 	save_pointer(NAME(m_ram), 0x20000);
 }
@@ -119,12 +154,58 @@ void vtech_sdloader_device::device_reset()
 
 	// rom enabled
 	m_dosview.select(0);
+
+	m_spi_clock->adjust(attotime::never);
+	m_spi_clock_cycles = 0;
+	m_spi_clock_state = false;
 }
 
 
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
+
+TIMER_CALLBACK_MEMBER(vtech_sdloader_device::spi_clock)
+{
+	if (m_spi_clock_cycles > 0)
+	{
+		if (m_spi_clock_state)
+		{
+			m_in_latch <<= 1;
+			m_in_latch &= ~0x01;
+			m_in_latch |= m_in_bit;
+
+			m_sdcard->spi_clock_w(1);
+
+			m_spi_clock_cycles--;
+		}
+		else
+		{
+			if (m_spi_clock_cycles == 8)
+				LOGMASKED(LOG_SPI, "SPI transfer start\n");
+
+			m_sdcard->spi_mosi_w(BIT(m_out_latch, 7));
+			m_sdcard->spi_clock_w(0);
+
+			m_out_latch <<= 1;
+		}
+
+		m_spi_clock_state = !m_spi_clock_state;
+	}
+	else
+	{
+		LOGMASKED(LOG_SPI, "SPI transfer done\n");
+		m_spi_clock_state = false;
+		m_spi_clock->adjust(attotime::never);
+	}
+}
+
+void vtech_sdloader_device::spi_miso_w(int state)
+{
+	LOGMASKED(LOG_SPI, "spi_miso_w: %d\n", state);
+
+	m_in_bit = state;
+}
 
 void vtech_sdloader_device::mapper_w(uint8_t data)
 {
@@ -141,23 +222,44 @@ void vtech_sdloader_device::mapper_w(uint8_t data)
 
 void vtech_sdloader_device::sdcfg_w(uint8_t data)
 {
-	logerror("sdcfg_w: %02x\n", data);
+	// 765432--  not used
+	// ------1-  sd card cs
+	// -------0  clock speed
+
+	LOGMASKED(LOG_SPI, "sdcfg_w: %02x\n", data);
+
+	m_sdcard->spi_ss_w(BIT(data, 1));
+	m_spi_clock_sysclk = bool(BIT(data, 0));
+
+	m_spi_clock_state = false;
+	m_spi_clock->adjust(attotime::never);
 }
 
 uint8_t vtech_sdloader_device::sdio_r()
 {
-	logerror("sdio_r\n");
-	return 0xff;
+	LOGMASKED(LOG_SPI, "sdio_r: %02x\n", m_in_latch);
+
+	return m_in_latch;
 }
 
 void vtech_sdloader_device::sdio_w(uint8_t data)
 {
-	logerror("sdio_w: %02x\n", data);
+	LOGMASKED(LOG_SPI, "sdio_w: %02x\n", data);
+
+	m_out_latch = data;
+	m_spi_clock_cycles = 8;
+
+	// TODO: too fast, also slightly different on vz200
+	// code only waits for a single NOP before sending the next byte
+	if (m_spi_clock_sysclk)
+		m_spi_clock->adjust(attotime::from_hz(17.734470_MHz_XTAL / 1.5), 0, attotime::from_hz(17.734470_MHz_XTAL / 1.5));
+	else
+		m_spi_clock->adjust(attotime::from_hz(100_kHz_XTAL), 0, attotime::from_hz(100_kHz_XTAL));
 }
 
 void vtech_sdloader_device::mode_w(uint8_t data)
 {
-	logerror("Switching to %s mode\n", BIT(data, 0) ? "VZ-300" : "VZ-200");
+	LOG("Switching to %s mode\n", BIT(data, 0) ? "VZ-300" : "VZ-200");
 	m_vz300_mode = bool(BIT(data, 0));
 }
 

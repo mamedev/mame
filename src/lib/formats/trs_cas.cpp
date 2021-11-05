@@ -14,9 +14,8 @@ The Model 3 and 4 can load either Level II tapes (by answering L
 to the Cass? prompt), or the fast format by hitting enter at Cass?
 
 ********************************************************************/
-#include "formats/trs_cas.h"
 
-#include <cassert>
+#include "formats/trs_cas.h"
 
 
 #define SILENCE 0

@@ -24,6 +24,10 @@
 
 #include "imgtool.h"
 
+#include "opresolv.h"
+
+#include <cstdio>
+
 #define MAXFILES 256
 
 struct psion_file

@@ -398,7 +398,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cm32p_state::card_load)
 	uint32_t size = pcmcard->common_get_size("rom");
 	if (size > 0x080000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only up to 512K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only up to 512K is supported");
 		return image_init_result::FAIL;
 	}
 

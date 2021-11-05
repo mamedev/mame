@@ -207,7 +207,7 @@ DEVICE_IMAGE_LOAD_MEMBER( sv8000_state::cart_load )
 
 	if (size != 0x1000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Incorrect or not support cartridge size");
 		return image_init_result::FAIL;
 	}
 

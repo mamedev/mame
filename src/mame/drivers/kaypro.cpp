@@ -67,8 +67,8 @@ u8 kaypro_state::kaypro484_87_r() { return 0x7f; }    /* to bypass unemulated HD
 
 void kaypro_state::kaypro_map(address_map &map)
 {
-	map(0x0000, 0x2fff).bankr("bankr").bankw("bankw");
-	map(0x3000, 0x3fff).bankrw("bank3");
+	map(0x0000, 0x2fff).bankr(m_bankr).bankw(m_bankw);
+	map(0x3000, 0x3fff).bankrw(m_bank3);
 	map(0x4000, 0xffff).ram();
 }
 

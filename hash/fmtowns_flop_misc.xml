@@ -299,9 +299,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
-	<software name="dpssg2" supported="partial">
-		<description>D.P.S SG 2 - Dream Program System SG Set 2</description>
+	<!--
+	    Runs too fast.
+	    Unknown origin, differs from the original disk only in the contents of the VERSION.ALS file.
+	-->
+	<software name="dpssg2a" supported="partial">
+		<description>D.P.S SG 2 - Dream Program System SG Set 2 (alt. system disk)</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199104xx" />
@@ -332,9 +335,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Runs too fast -->
-	<software name="dpssg3" supported="partial">
-		<description>D.P.S SG 3 - Dream Program System SG Set 3</description>
+	<!--
+	    Runs too fast.
+	    Unknown origin, differs from the original disk in 6 bytes of the file BCG.DAT on disk 2.
+	-->
+	<software name="dpssg3a" supported="partial">
+		<description>D.P.S SG 3 - Dream Program System SG Set 3 (alt. disk 2)</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199111xx" />
@@ -361,26 +367,6 @@ license:CC0
 			<feature name="part_id" value="Shinkonsan Monogatari" />
 			<dataarea name="flop" size="1261568">
 				<rom name="dream program system sg set 3 (disk 4 - shinkonsan monogatari).hdm" size="1261568" crc="868fe008" sha1="0f3a452e4614cf5f1c72ee5a31fa678b3f059a84"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- For some reason, it needs to have a CD inserted in the drive (any CD with a data track will work), or it will hang -->
-	<software name="drstop">
-		<description>Dr. Stop!</description>
-		<year>1990</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="release" value="199204xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dr. stop (disk a).hdm" size="1261568" crc="622bc757" sha1="7b0e12a71c8b531ac355d733239d72a4223a5bd6"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1261568">
-				<rom name="dr. stop (disk b).hdm" size="1261568" crc="faf6169c" sha1="c1cf3ecbcda6da2e581b0b00f481abef33c0c626"/>
 			</dataarea>
 		</part>
 	</software>
@@ -535,11 +521,12 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hhunt01">
-		<description>Houma Hunter Lime Vol. 01</description>
+	<!-- These Houma Hunter Lime images have a different boot sector and file ordering from the originals that have been dumped. Their origin is unknown. -->
+	<software name="hhunt01a">
+		<description>Houma Hunter Lime Dai-1-wa (alt)</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 01" />
+		<info name="alt_title" value="宝魔ハンターライム　第１話" />
 		<info name="release" value="199305xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -554,11 +541,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hhunt02">
-		<description>Houma Hunter Lime Vol. 02</description>
+	<software name="hhunt02a">
+		<description>Houma Hunter Lime Dai-2-wa (alt)</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 02" />
+		<info name="alt_title" value="宝魔ハンターライム　第２話" />
 		<info name="release" value="199306xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -573,11 +560,11 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="hhunt03">
-		<description>Houma Hunter Lime Vol. 03</description>
+	<software name="hhunt03a">
+		<description>Houma Hunter Lime Dai-3-wa (alt)</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 03" />
+		<info name="alt_title" value="宝魔ハンターライム　第３話" />
 		<info name="release" value="199308xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -593,10 +580,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt04">
-		<description>Houma Hunter Lime Vol. 04</description>
+		<description>Houma Hunter Lime Dai-4-wa</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 04" />
+		<info name="alt_title" value="宝魔ハンターライム　第４話" />
 		<info name="release" value="199309xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -612,10 +599,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt05">
-		<description>Houma Hunter Lime Vol. 05</description>
+		<description>Houma Hunter Lime Dai-5-wa</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 05" />
+		<info name="alt_title" value="宝魔ハンターライム　第５話" />
 		<info name="release" value="199310xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -631,10 +618,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt06">
-		<description>Houma Hunter Lime Vol. 06</description>
+		<description>Houma Hunter Lime Dai-6-wa</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 06" />
+		<info name="alt_title" value="宝魔ハンターライム　第６話" />
 		<info name="release" value="199311xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -650,10 +637,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt07">
-		<description>Houma Hunter Lime Vol. 07</description>
+		<description>Houma Hunter Lime Dai-7-wa</description>
 		<year>1993</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 07" />
+		<info name="alt_title" value="宝魔ハンターライム　第７話" />
 		<info name="release" value="199312xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -674,10 +661,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt08">
-		<description>Houma Hunter Lime Vol. 08</description>
+		<description>Houma Hunter Lime Dai-8-wa</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 08" />
+		<info name="alt_title" value="宝魔ハンターライム　第８話" />
 		<info name="release" value="199401xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -698,10 +685,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt09">
-		<description>Houma Hunter Lime Vol. 09</description>
+		<description>Houma Hunter Lime Dai-9-wa</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 09" />
+		<info name="alt_title" value="宝魔ハンターライム　第９話" />
 		<info name="release" value="199402xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -722,10 +709,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt10">
-		<description>Houma Hunter Lime Vol. 10</description>
+		<description>Houma Hunter Lime Dai-10-wa</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 10" />
+		<info name="alt_title" value="宝魔ハンターライム　第１０話" />
 		<info name="release" value="199403xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -746,10 +733,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt11">
-		<description>Houma Hunter Lime Vol. 11</description>
+		<description>Houma Hunter Lime Dai-11-wa</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 11" />
+		<info name="alt_title" value="宝魔ハンターライム　第１１話" />
 		<info name="release" value="199404xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -770,10 +757,10 @@ license:CC0
 	</software>
 
 	<software name="hhunt12">
-		<description>Houma Hunter Lime Vol. 12</description>
+		<description>Houma Hunter Lime Dai-12-wa</description>
 		<year>1994</year>
 		<publisher>タケル (Takeru)</publisher>
-		<info name="alt_title" value="宝魔ハンターライム Vol. 12" />
+		<info name="alt_title" value="宝魔ハンターライム　第１２話" />
 		<info name="release" value="199405xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
@@ -955,81 +942,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="rance">
-		<description>Rance - Hikari o Motomete</description>
-		<year>1990</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="ランス 光をもとめて" />
-		<info name="release" value="199003xx" />
-		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 1).hdm" size="1261568" crc="fc54292a" sha1="a6dde9bfc776bdaa703be54a5fe68cee3c5a3b13"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 2).hdm" size="1261568" crc="775b7c12" sha1="f5f5487207b156459cce136a09ca4f3e92309046"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 3).hdm" size="1261568" crc="38e84c46" sha1="2ade9200c6aed67b6e895e144226d36ca3376145"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="rance - hikari o motomete (disk 4).hdm" size="1261568" crc="ec2cb963" sha1="eb23dd3f8ba77c3922651eb7e32f09a73d7bf717"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="rance2">
-		<description>Rance 2 - Hangyaku no Shoujo-tachi</description>
-		<year>1990</year>
-		<publisher>アリスソフト (AliceSoft)</publisher>
-		<info name="alt_title" value="ランス２ 反逆の少女たち" />
-		<info name="release" value="199006xx" />
-		<info name="usage" value="Requires 2 MB RAM. Mouse must not be connected to port 2."/>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk A" />
-			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk a).hdm" size="1261568" crc="8d06cd43" sha1="1c8dcee98e01e5ec34bd3b2caabf90fccf800011"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk B" />
-			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk b).hdm" size="1261568" crc="116f4cd2" sha1="5d1acf08309a3c33b2578d1d608d73122c2029d0"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk C" />
-			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk c).hdm" size="1261568" crc="18c701c0" sha1="5379383e7acebc189712e3cb4cfc8a5dfda37f4c"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk D" />
-			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk d).hdm" size="1261568" crc="4657f014" sha1="ff5ae040d04383a8c5f19cc2d665877056f4fed0"/>
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk E" />
-			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk e).hdm" size="1261568" crc="446c28e8" sha1="cdcb1c27b7a6dcaa091176e0522a28daa188b222"/>
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk F" />
-			<dataarea name="flop" size="1261568">
-				<rom name="rance 2 - hangyaku no shoujotachi (disk f).hdm" size="1261568" crc="c5b0b6bd" sha1="76eec3eec751007c690e36045b6bcf390acb99c7"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- It seems iompossible to make this work, even on real hardware. Could it be a bad dump? -->
+	<!-- It seems impossible to make this work, even on real hardware. Could it be a bad dump? -->
 	<software name="shogisei" supported="no">
 		<description>Shougi Seiten</description>
 		<year>1992</year>
@@ -1083,8 +996,12 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="superdps">
-		<description>Super D.P.S.</description>
+	<!--
+	    Runs too fast.
+	    Unknown origin, differs from the original disks in the contents of the file BCG.DAT on disk 5.
+	-->
+	<software name="superdpsa">
+		<description>Super D.P.S. (alt. disk 5)</description>
 		<year>1992</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199209xx" />

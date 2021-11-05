@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench
 /* Toaplan Sprite Controller 'SCU'
- used by video/twincobr.c (including wardner)
- and rallybik in toaplan1.c
+ used by video/twincobr.cpp (including wardner)
+ and rallybik in toaplan1.cpp
 */
 
 
@@ -32,31 +32,28 @@ GFXDECODE_END
 toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TOAPLAN_SCU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
+	, device_video_interface(mconfig, *this)
+	, m_pri_cb(*this)
 {
 }
 
 void toaplan_scu_device::device_start()
 {
+	m_pri_cb.resolve();
 }
 
 void toaplan_scu_device::device_reset()
 {
 }
 
-void toaplan_scu_device::alloc_sprite_bitmap(screen_device &screen)
-{
-	screen.register_screen_bitmap(m_temp_spritebitmap);
-}
-
 /***************************************************************************
     Sprite Handlers
 ***************************************************************************/
 
-void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u16* spriteram, u32 bytes)
+template<class BitmapClass>
+void toaplan_scu_device::draw_sprites_common(BitmapClass &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes)
 {
-	m_temp_spritebitmap.fill(0, cliprect);
-
-	for (int offs = 0; offs < bytes / 2; offs += 4)
+	for (int offs = (bytes / 2) - 4; offs >= 0; offs -= 4)
 	{
 		const u16 attribute = spriteram[offs + 1];
 		const int priority  = (attribute & 0x0c00) >> 10;
@@ -69,49 +66,34 @@ void toaplan_scu_device::draw_sprites_to_tempbitmap(const rectangle &cliprect, u
 		{
 			const u32 sprite = spriteram[offs] & 0x7ff;
 			u32 color        = attribute & 0x3f;
-			color |= priority << 6; // encode colour
+			u32 pri_mask     = 0; // priority mask
+			if (!m_pri_cb.isnull())
+				m_pri_cb(priority, pri_mask);
 
 			int sx          = spriteram[offs + 2] >> 7;
 			const int flipx = attribute & 0x100;
 			if (flipx) sx  -= m_xoffs_flipped;
 
 			const int flipy = attribute & 0x200;
-			gfx(0)->transpen_raw(m_temp_spritebitmap, cliprect,
+			gfx(0)->prio_transpen(bitmap, cliprect,
 				sprite,
-				color << 4 /* << 4 because using _raw */ ,
+				color,
 				flipx, flipy,
-				sx - m_xoffs, sy - 16, 0);
+				sx - m_xoffs, sy - 16, screen().priority(), pri_mask, 0);
 		}
 	}
-
 }
 
 
-/***************************************************************************
-    Draw the game screen in the given bitmap.
-***************************************************************************/
-
-void toaplan_scu_device::copy_sprites_from_tempbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority)
+void toaplan_scu_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes)
 {
-	pen_t const *const pens = &palette().pen(gfx(0)->colorbase());
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		u16 const *const srcline = &m_temp_spritebitmap.pix(y);
-		u32 *const dstline = &bitmap.pix(y);
-
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-		{
-			const u16 pix = srcline[x];
-
-			if ((pix >> (4 + 6)) == priority)
-			{
-				if (pix & 0xf)
-				{
-					dstline[x] = pens[pix & 0x3ff];
-				}
-			}
-		}
-
-	}
+	draw_sprites_common(bitmap, cliprect, spriteram, bytes);
 }
+
+
+void toaplan_scu_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes)
+{
+	draw_sprites_common(bitmap, cliprect, spriteram, bytes);
+}
+
+
