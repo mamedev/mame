@@ -23,7 +23,7 @@ end
 function hiscore.startplugin()
 
 	local function get_data_path()
-		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/hiscore/'
+		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/hiscore'
 	end
 
 	-- configuration
@@ -35,7 +35,7 @@ function hiscore.startplugin()
 		if config_read then
 			return true
 		end
-		local filename = get_data_path() .. 'plugin.cfg'
+		local filename = get_data_path() .. '/plugin.cfg'
 		local file = io.open(filename, 'r')
 		if file then
 			local json = require('json')
@@ -67,7 +67,7 @@ function hiscore.startplugin()
 		end
 		local settings = { only_save_at_exit = not timed_save }
 		-- TODO: other settings?
-		local filename = path .. 'plugin.cfg'
+		local filename = path .. '/plugin.cfg'
 		local json = require('json')
 		local data = json.stringify(settings, { indent = true })
 		local file = io.open(filename, 'w')
@@ -210,9 +210,9 @@ function hiscore.startplugin()
 	  local r;
 	  if emu.softname() ~= "" then
 		local soft = emu.softname():match("([^:]*)$")
-		r = get_data_path() .. emu.romname() .. "_" .. soft .. ".hi";
+		r = get_data_path() .. '/' .. emu.romname() .. "_" .. soft .. ".hi";
 	  else
-		r = get_data_path() .. emu.romname() .. ".hi";
+		r = get_data_path() .. '/' .. emu.romname() .. ".hi";
 	  end
 	  return r;
 	end
@@ -223,7 +223,7 @@ function hiscore.startplugin()
 	  local output = io.open(get_file_name(), "wb");
 	  if not output then
 		-- attempt to create the directory, and try again
-		lfs.mkdir( get_data_path() );
+		lfs.mkdir(get_data_path());
 		output = io.open(get_file_name(), "wb");
 	  end
 	  emu.print_verbose("hiscore: write_scores output")

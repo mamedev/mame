@@ -1,7 +1,7 @@
 local lib = {}
 
 local function get_settings_path()
-	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/autofire/'
+	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/autofire'
 end
 
 local function get_settings_filename()
@@ -52,7 +52,7 @@ end
 function lib:load_settings()
 	local buttons = {}
 	local json = require('json')
-	local filename = get_settings_path() .. get_settings_filename()
+	local filename = get_settings_path() .. '/' .. get_settings_filename()
 	local file = io.open(filename, 'r')
 	if not file then
 		return buttons
@@ -81,14 +81,14 @@ function lib:save_settings(buttons)
 		emu.print_error(string.format('Error saving autofire settings: "%s" is not a directory', path))
 		return
 	end
+	local filename = path .. '/' .. get_settings_filename()
 	if #buttons == 0 then
-		os.remove(path .. get_settings_filename())
+		os.remove(filename)
 		return
 	end
 	local json = require('json')
 	local settings = serialize_settings(buttons)
 	local data = json.stringify(settings, {indent = true})
-	local filename = path .. get_settings_filename()
 	local file = io.open(filename, 'w')
 	if not file then
 		emu.print_error(string.format('Error saving autofire settings: error opening file "%s" for writing', filename))

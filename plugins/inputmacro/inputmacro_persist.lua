@@ -5,7 +5,7 @@
 -- Helpers
 
 local function settings_path()
-	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/inputmacro/'
+	return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/inputmacro'
 end
 
 local function settings_filename()
@@ -101,7 +101,7 @@ end
 local lib = { }
 
 function lib:load_settings()
-	filename = settings_path() .. settings_filename()
+	filename = settings_path() .. '/' .. settings_filename()
 	local file = io.open(filename, 'r')
 	if not file then
 		return { }
@@ -133,7 +133,7 @@ function lib:save_settings(macros)
 		emu.print_error(string.format('Error saving input macros: "%s" is not a directory', path))
 		return
 	end
-	filename = path .. settings_filename()
+	filename = path .. '/' .. settings_filename()
 
 	if #macros == 0 then
 		os.remove(filename)
