@@ -1247,7 +1247,7 @@ attotime floppy_image_device::get_next_transition(const attotime &from_when)
 			if(test & 1)
 				return weak_time;
 		}
-		weak_time += attotime::from_usec(4);
+		weak_time += attotime::from_usec(1);
 		interval_index ++;
 	}
 }
