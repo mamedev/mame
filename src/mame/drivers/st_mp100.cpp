@@ -968,7 +968,7 @@ ROM_END
 / Black Sheep Squadron (Astro game #314)
 /---------------------------------*/
 ROM_START(blkshpsq)
-	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "cpu_u2.716", 0x0000, 0x0800, CRC(23d6cd54) SHA1(301ba10f3f333109630dd8abd13a6b4063f805a9))
 	ROM_LOAD( "cpu_u6.716", 0x0800, 0x0800, CRC(ea68b9f7) SHA1(ebb69f4faadf457454939e47d8ae6e79eb0e1a11))
 ROM_END
