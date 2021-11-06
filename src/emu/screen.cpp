@@ -79,6 +79,7 @@ private:
 	int m_sx, m_sy;
 	double m_scale;
 	std::vector<u32> m_background;
+	bool m_has_changed_since_last_update;
 
 	std::vector<cached_bitmap> m_cache;
 
@@ -197,6 +198,10 @@ int screen_device::svg_renderer::render(screen_device &screen, bitmap_rgb32 &bit
 		rebuild_cache();
 	}
 
+	if (!m_has_changed_since_last_update)
+		return UPDATE_HAS_NOT_CHANGED;
+	m_has_changed_since_last_update = false;
+
 	for(unsigned int y = 0; y < m_sy; y++)
 		memcpy(bitmap.raw_pixptr(y, 0), &m_background[y * m_sx], m_sx * 4);
 
@@ -227,6 +232,10 @@ void screen_device::svg_renderer::output_change(const char *outname, s32 value)
 	auto l = m_key_ids.find(outname);
 	if (l == m_key_ids.end())
 		return;
+
+	if (m_key_state[l->second] != value)
+		m_has_changed_since_last_update = true;
+
 	m_key_state[l->second] = value;
 }
 
@@ -515,6 +524,8 @@ void screen_device::svg_renderer::rebuild_cache()
 		spos = epos;
 		epos = ckey;
 	}
+
+	m_has_changed_since_last_update = true;
 }
 
 //**************************************************************************
