@@ -40,7 +40,11 @@ class axis_code_poller : public input_code_poller
 public:
 	axis_code_poller(input_manager &manager) noexcept;
 
+	virtual void reset() override;
 	virtual input_code poll() override;
+
+private:
+	std::vector<bool> m_axis_active;
 };
 
 

@@ -82,21 +82,44 @@ bool input_code_poller::code_pressed_once(input_code code, bool moved)
 
 
 axis_code_poller::axis_code_poller(input_manager &manager) noexcept :
-	input_code_poller(manager)
+	input_code_poller(manager),
+	m_axis_active()
 {
+}
+
+
+void axis_code_poller::reset()
+{
+	input_code_poller::reset();
+	m_axis_active.clear();
+	m_axis_active.resize(m_axis_memory.size(), false);
 }
 
 
 input_code axis_code_poller::poll()
 {
 	// iterate over the axis items we found
-	for (auto memory = m_axis_memory.begin(); m_axis_memory.end() != memory; ++memory)
+	for (std::size_t i = 0; m_axis_memory.size() > i; ++i)
 	{
-		input_code code = memory->first->code();
-		if (memory->first->check_axis(code.item_modifier(), memory->second))
+		auto &memory = m_axis_memory[i];
+		input_code code = memory.first->code();
+		if (!memory.first->check_axis(code.item_modifier(), memory.second))
 		{
-			m_axis_memory.erase(memory);
-			if (!m_manager.device_class(memory->first->device().devclass()).multi())
+			m_axis_active[i] = false;
+		}
+		else if (!m_axis_active[i])
+		{
+			if (code.item_class() == ITEM_CLASS_ABSOLUTE)
+			{
+				m_axis_active[i] = true;
+			}
+			else
+			{
+				// can only cycle modifiers on a relative item with append
+				m_axis_memory.erase(m_axis_memory.begin() + i);
+				m_axis_active.erase(m_axis_active.begin() + i);
+			}
+			if (!m_manager.device_class(memory.first->device().devclass()).multi())
 				code.set_device_index(0);
 			return code;
 		}
