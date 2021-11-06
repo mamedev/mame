@@ -3176,7 +3176,7 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 					sy = 256 - sy;
 				}
 
-				int cnt = ((screen.frame_number() / 16 ) % ((col & 0x80) ? 15 : 16));
+				int cnt = (screen.frame_number() / 16) % ((col & 0x80) ? 15 : 16);
 				col = ((col & 0xe0) >> 1) + cnt;
 
 				if (cliprect.contains(sx, sy))
@@ -3202,7 +3202,7 @@ void cps_state::cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, 
 					sy = 256 - sy;
 				}
 
-				int cnt = ((screen.frame_number() / 16 ) % ((col & 0x80) ? 15 : 16));
+				int cnt = (screen.frame_number() / 16) % ((col & 0x80) ? 15 : 16);
 				col = ((col & 0xe0) >> 1) + cnt;
 
 				if (cliprect.contains(sx, sy))
