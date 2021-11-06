@@ -89,15 +89,12 @@ menu_load_save_state_base::menu_load_save_state_base(
 		std::string_view footer,
 		bool must_exist,
 		bool one_shot)
-	: menu(mui, container)
+	: autopause_menu<>(mui, container)
 	, m_switch_poller(machine().input())
 	, m_header(header)
 	, m_footer(footer)
 	, m_confirm_delete(nullptr)
 	, m_must_exist(must_exist)
-	, m_one_shot(one_shot)
-	, m_first_time(true)
-	, m_was_paused(false)
 	, m_keys_released(false)
 {
 	set_one_shot(one_shot);
@@ -111,10 +108,6 @@ menu_load_save_state_base::menu_load_save_state_base(
 
 menu_load_save_state_base::~menu_load_save_state_base()
 {
-	// resume if appropriate (is the destructor really the right place
-	// to do this sort of activity?)
-	if (!m_was_paused)
-		machine().resume();
 }
 
 
@@ -225,24 +218,15 @@ void menu_load_save_state_base::populate(float &customtop, float &custombottom)
 		set_selection(nullptr);
 	}
 	item_append(menu_item_type::SEPARATOR);
-	if (m_one_shot)
+	if (is_one_shot())
 		item_append(_("Cancel"), 0, nullptr);
 
 	// set up custom render proc
 	customtop = ui().get_line_height() + (3.0f * ui().box_tb_border());
 	custombottom = (2.0f * ui().get_line_height()) + (3.0f * ui().box_tb_border());
 
-	// pause if appropriate
-	if (m_first_time)
-	{
-		m_was_paused = machine().paused();
-		if (!m_was_paused)
-			machine().pause();
-	}
-
 	// get ready to poll inputs
 	m_switch_poller.reset();
-	m_first_time = false;
 	m_keys_released = false;
 }
 

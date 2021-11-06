@@ -266,8 +266,6 @@ private:
 
 	// UI handlers
 	uint32_t handler_ingame(render_container &container);
-	uint32_t handler_load_save(render_container &container, uint32_t state);
-	uint32_t handler_confirm_quit(render_container &container);
 
 	// private methods
 	void set_handler(ui_callback_type callback_type, handler_callback_func &&callback);

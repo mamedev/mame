@@ -438,7 +438,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		skip_main_items = 3;
 	}
 	else
+	{
 		skip_main_items = 0;
+	}
 
 	// configure the custom rendering
 	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
@@ -569,14 +571,9 @@ void menu_select_game::build_available_list()
 
 void menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
 {
-	// reset the menu stack
+	// drop any existing menus and start the system selection menu
 	menu::stack_reset(mui);
-
-	// add the quit entry followed by the game select entry
-	menu::stack_push_special_main<menu_quit_game>(mui, container);
-	menu::stack_push<menu_select_game>(mui, container, nullptr);
-
-	// force the menus on
+	menu::stack_push_special_main<menu_select_game>(mui, container, nullptr);
 	mui.show_menu();
 
 	// make sure MAME is paused

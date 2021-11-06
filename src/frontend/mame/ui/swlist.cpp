@@ -148,6 +148,7 @@ void menu_software_parts::handle(event const *ev)
 menu_software_list::menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result)
 	: menu(mui, container), m_result(result)
 {
+	set_process_flags(PROCESS_IGNOREPAUSE);
 	m_swlist = swlist;
 	m_interface = interface;
 	m_ordered_by_shortname = false;

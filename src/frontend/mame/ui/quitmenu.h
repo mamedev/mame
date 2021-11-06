@@ -1,15 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
-    ui/sliders.h
+    ui/quitmenu.h
 
-    Internal MAME menus for the user interface.
+    Menus involved in quitting MAME.
 
 ***************************************************************************/
-
-#ifndef MAME_FRONTEND_UI_SLIDERS_H
-#define MAME_FRONTEND_UI_SLIDERS_H
+#ifndef MAME_FRONTEND_UI_QUITMENU_H
+#define MAME_FRONTEND_UI_QUITMENU_H
 
 #pragma once
 
@@ -18,11 +17,11 @@
 
 namespace ui {
 
-class menu_sliders : public menu
+class menu_confirm_quit : public autopause_menu<>
 {
 public:
-	menu_sliders(mame_ui_manager &mui, render_container &container, bool menuless_mode = false);
-	virtual ~menu_sliders() override;
+	menu_confirm_quit(mame_ui_manager &mui, render_container &container);
+	virtual ~menu_confirm_quit();
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -30,11 +29,8 @@ protected:
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
-
-	bool const m_menuless_mode;
-	bool m_hidden;
 };
 
 } // namespace ui
 
-#endif // MAME_FRONTEND_UI_SLIDERS_H
+#endif // MAME_FRONTEND_UI_QUITMENU_H

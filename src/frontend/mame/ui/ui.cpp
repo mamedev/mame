@@ -19,6 +19,7 @@
 #include "ui/info.h"
 #include "ui/mainmenu.h"
 #include "ui/menu.h"
+#include "ui/quitmenu.h"
 #include "ui/sliders.h"
 #include "ui/state.h"
 #include "ui/systemlist.h"
@@ -594,7 +595,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// if we're the empty driver, force the menus on
 	if (ui::menu::stack_has_special_main_menu(*this))
+	{
 		show_menu();
+	}
 	else if (config_menu)
 	{
 		show_menu();
@@ -1417,50 +1420,14 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 void mame_ui_manager::request_quit()
 {
 	if (!machine().options().confirm_quit())
-		machine().schedule_exit();
-	else
-		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_confirm_quit, this));
-}
-
-
-//-------------------------------------------------
-//  handler_confirm_quit - leads the user through
-//  confirming quit emulation
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
-{
-	uint32_t state = 0;
-
-	// get the text for 'UI Select'
-	std::string ui_select_text = get_general_input_setting(IPT_UI_SELECT);
-
-	// get the text for 'UI Cancel'
-	std::string ui_cancel_text = get_general_input_setting(IPT_UI_CANCEL);
-
-	// assemble the quit message
-	std::string quit_message = string_format(
-			_("Are you sure you want to quit?\n\n"
-			"Press ''%1$s'' to quit,\n"
-			"Press ''%2$s'' to return to emulation."),
-			ui_select_text,
-			ui_cancel_text);
-
-	draw_text_box(container, quit_message, ui::text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
-	machine().pause();
-
-	// if the user press ENTER, quit the game
-	if (machine().ui_input().pressed(IPT_UI_SELECT))
-		machine().schedule_exit();
-
-	// if the user press ESC, just continue
-	else if (machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
-		machine().resume();
-		state = UI_HANDLER_CANCEL;
+		machine().schedule_exit();
 	}
-
-	return state;
+	else
+	{
+		show_menu();
+		ui::menu::stack_push<ui::menu_confirm_quit>(*this, machine().render().ui_container());
+	}
 }
 
 

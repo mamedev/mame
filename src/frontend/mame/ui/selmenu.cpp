@@ -1441,6 +1441,8 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			// otherwise pop the stack
 			stack_pop();
+			if (is_special_main_menu())
+				machine().schedule_exit();
 		}
 		return;
 	}
@@ -1761,6 +1763,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				{
 					ev.iptkey = IPT_UI_CANCEL;
 					stack_pop();
+					if (is_special_main_menu())
+						machine().schedule_exit();
 					stop = true;
 				}
 				else if (hover() >= HOVER_RP_FIRST && hover() <= HOVER_RP_LAST)
