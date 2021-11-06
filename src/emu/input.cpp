@@ -1086,6 +1086,8 @@ s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemcl
 				if (enable)
 					enable = code_pressed(code) ^ invert;
 				// FIXME: need to clear current group value if enable became false
+				// you can't create a sequence where this matters using the internal UI,
+				// but you can by editing a CFG file (or controller config file)
 			}
 			else
 			{

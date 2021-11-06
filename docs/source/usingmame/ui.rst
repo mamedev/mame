@@ -210,8 +210,8 @@ input or a combination of inputs for a logical **and** operation:
   the **and** operation.  Pressing the same key or button or moving the same
   analog control additional times toggles the **not** on and off.
 * Pressing **UI Cancel** (**Escape** by default) *before* activating any other
-  inputs clears the setting or restores the default assignment.
-* Pressing **UI Cancel** *after* activating another input leaves the setting
+  controls clears the setting or restores the default assignment.
+* Pressing **UI Cancel** *after* activating another control leaves the setting
   unchanged.
 * The new setting is shown below the menu.  Wait one second after activating an
   input to accept the new setting.
@@ -333,12 +333,12 @@ When you select an axis setting, MAME will wait for you to enter an input:
   direction of the control on or off.
 * When appending to a setting, move an analog control other than the last
   assigned control or press a key or button to add an **or** operation.
-* Pressing **UI Cancel** (**Escape** by default) *before* activating an analog
-  axis input clears the setting or restores the default assignment.
-* Pressing **UI Cancel** *after* activating analog axis input leaves the setting
+* Pressing **UI Cancel** (**Escape** by default) *before* activating any other
+  controls clears the setting or restores the default assignment.
+* Pressing **UI Cancel** *after* activating another control leaves the setting
   unchanged.
-* The new setting is shown below the menu.  Wait one second after activating an
-  input to accept the new setting.
+* The new setting is shown below the menu.  Wait one second after moving an
+  analog control to accept the new setting.
 
 To adjust sensitivity, auto-centring speed and inversion settings for emulated
 analog inputs, or to see how they respond to your settings, select **Analog
