@@ -9160,7 +9160,7 @@ INPUT_PORTS_END
 
 void trshutvoy_state::trshutvoy(machine_config &config)
 {
-	sm510_common(config, 1496, 1080); // R mask options confirmed
+	sm510_common(config, 1496, 1080); // R mask option confirmed
 }
 
 void trshutvoy_state::tigarden(machine_config &config)
@@ -9238,12 +9238,12 @@ INPUT_PORTS_END
 
 void trsrescue_state::trsrescue(machine_config &config)
 {
-	sm510_common(config, 1533, 1080); // R mask options confirmed
+	sm510_common(config, 1533, 1080); // R mask option confirmed
 }
 
 void trsrescue_state::trthuball(machine_config &config)
 {
-	sm510_common(config, 1599, 1080); // R mask options confirmed
+	sm510_common(config, 1599, 1080); // R mask option confirmed
 }
 
 // roms

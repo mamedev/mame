@@ -304,6 +304,7 @@ exelv.cpp
 exorciser.cpp
 exorterm.cpp
 exp85.cpp
+f387x.cpp
 facit4440.cpp
 falco5220.cpp
 falcots.cpp

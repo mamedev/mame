@@ -49,6 +49,7 @@ ToDo:
 
 #include "g627.lh"
 
+namespace {
 
 class g627_state : public genpin_class
 {
@@ -389,6 +390,8 @@ ROM_START(rota_101)
 	ROM_LOAD("v101-b.bin", 0x0800, 0x0800, CRC(0690670b) SHA1(6399a7df707d644d0b7fe7b4fea6fb5091a9883d))
 	ROM_LOAD("v101-c.bin", 0x1000, 0x0800, CRC(c7e85638) SHA1(b59805d8b558ab8f5ea5b4b9261e862afca4b9d3))
 ROM_END
+
+} // anonymous namespace
 
 GAME( 1978, rotation, 0,        g627, g627, g627_state, init_v117,  ROT0, "Midway", "Rotation VIII (v. 1.17)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
 GAME( 1978, rota_115, rotation, g627, g627, g627_state, empty_init, ROT0, "Midway", "Rotation VIII (v. 1.15)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

@@ -840,13 +840,20 @@ input_device_relative_item::input_device_relative_item(input_device &device, std
 s32 input_device_relative_item::read_as_switch(input_item_modifier modifier)
 {
 	// process according to modifiers
-	if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
-		return (update_value() > 0);
-	else if (modifier == ITEM_MODIFIER_NEG || modifier == ITEM_MODIFIER_LEFT || modifier == ITEM_MODIFIER_UP)
-		return (update_value() < 0);
-
+	switch (modifier)
+	{
+	case ITEM_MODIFIER_POS:
+	case ITEM_MODIFIER_RIGHT:
+	case ITEM_MODIFIER_DOWN:
+		return update_value() > 0;
+	case ITEM_MODIFIER_NEG:
+	case ITEM_MODIFIER_LEFT:
+	case ITEM_MODIFIER_UP:
+		return update_value() < 0;
 	// all other cases just return 0
-	return 0;
+	default:
+		return 0;
+	}
 }
 
 
@@ -858,7 +865,10 @@ s32 input_device_relative_item::read_as_switch(input_item_modifier modifier)
 s32 input_device_relative_item::read_as_relative(input_item_modifier modifier)
 {
 	// just return directly
-	return update_value();
+	if (ITEM_MODIFIER_REVERSE == modifier)
+		return -update_value();
+	else
+		return update_value();
 }
 
 
@@ -979,9 +989,11 @@ s32 input_device_absolute_item::read_as_absolute(input_item_modifier modifier)
 	}
 
 	// positive/negative: scale to full axis
-	if (modifier == ITEM_MODIFIER_POS)
+	if (modifier == ITEM_MODIFIER_REVERSE)
+		result = -result;
+	else if (modifier == ITEM_MODIFIER_POS)
 		result = std::max(result, 0) * 2 + INPUT_ABSOLUTE_MIN;
-	if (modifier == ITEM_MODIFIER_NEG)
+	else if (modifier == ITEM_MODIFIER_NEG)
 		result = std::max(-result, 0) * 2 + INPUT_ABSOLUTE_MIN;
 	return result;
 }

@@ -29,7 +29,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 };
 
 
@@ -63,6 +63,9 @@ protected:
 	using data_vector = std::vector<input_item_data>;
 
 	menu_input(mame_ui_manager &mui, render_container &container);
+
+	virtual void menu_activated() override;
+
 	void populate_sorted(float &customtop, float &custombottom);
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
@@ -81,7 +84,7 @@ private:
 	input_seq starting_seq;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 	virtual void update_input(input_item_data &seqchangeditem) = 0;
 };
 

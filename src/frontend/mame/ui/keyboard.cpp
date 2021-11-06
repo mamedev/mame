@@ -64,15 +64,14 @@ menu_keyboard_mode::~menu_keyboard_mode()
 {
 }
 
-void menu_keyboard_mode::handle()
+void menu_keyboard_mode::handle(event const *ev)
 {
-	event const *const menu_event(process(0));
-	if (menu_event && uintptr_t(menu_event->itemref))
+	if (ev && uintptr_t(ev->itemref))
 	{
 		natural_keyboard &natkbd(machine().natkeyboard());
-		uintptr_t const ref(uintptr_t(menu_event->itemref));
-		bool const left(IPT_UI_LEFT == menu_event->iptkey);
-		bool const right(IPT_UI_RIGHT == menu_event->iptkey);
+		uintptr_t const ref(uintptr_t(ev->itemref));
+		bool const left(IPT_UI_LEFT == ev->iptkey);
+		bool const right(IPT_UI_RIGHT == ev->iptkey);
 		if (ITEM_KBMODE == ref)
 		{
 			if ((left || right) && (natkbd.in_use() != right))

@@ -150,6 +150,8 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	, m_options(std::move(suboptions))
 	, m_driver(drv)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
+
 	core_options *opts = nullptr;
 	if (m_driver == nullptr)
 		opts = dynamic_cast<core_options *>(&mui.machine().options());
@@ -234,19 +236,16 @@ submenu::~submenu()
 //  handle the options menu
 //-------------------------------------------------
 
-void submenu::handle()
+void submenu::handle(event const *ev)
 {
 	bool changed = false;
 	std::string error_string, tmptxt;
 	float f_cur, f_step;
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr &&
-			(menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT))
+	if (ev && ev->itemref && (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT))
 	{
-		option &sm_option = *reinterpret_cast<option *>(menu_event->itemref);
+		option &sm_option = *reinterpret_cast<option *>(ev->itemref);
 
 		switch (sm_option.type)
 		{
@@ -260,16 +259,16 @@ void submenu::handle()
 				sm_option.options->set_value(sm_option.name, !strcmp(sm_option.entry->value(),"1") ? "0" : "1", OPTION_PRIORITY_CMDLINE);
 				break;
 			case OPTION_INTEGER:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
 					int i_cur = atoi(sm_option.entry->value());
-					(menu_event->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
+					(ev->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
 					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			case OPTION_FLOAT:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
 					f_cur = atof(sm_option.entry->value());
@@ -291,7 +290,7 @@ void submenu::handle()
 						tmptxt = '1' + std::string(precision, '0');
 						f_step = 1 / atof(tmptxt.c_str());
 					}
-					if (menu_event->iptkey == IPT_UI_LEFT)
+					if (ev->iptkey == IPT_UI_LEFT)
 						f_cur -= f_step;
 					else
 						f_cur += f_step;
@@ -300,12 +299,12 @@ void submenu::handle()
 				}
 				break;
 			case OPTION_STRING:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
 					std::string v_cur(sm_option.entry->value());
 					int cur_value = std::distance(sm_option.value.begin(), std::find(sm_option.value.begin(), sm_option.value.end(), v_cur));
-					if (menu_event->iptkey == IPT_UI_LEFT)
+					if (ev->iptkey == IPT_UI_LEFT)
 						v_cur = sm_option.value[--cur_value];
 					else
 						v_cur = sm_option.value[++cur_value];

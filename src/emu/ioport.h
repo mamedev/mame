@@ -337,7 +337,6 @@ enum ioport_type
 		IPT_UI_FAST_FORWARD,
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
-		IPT_UI_TIMECODE,
 		IPT_UI_RECORD_MNG,
 		IPT_UI_RECORD_AVI,
 		IPT_UI_TOGGLE_CHEAT,
@@ -803,22 +802,25 @@ public:
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) noexcept { return m_defseq[seqtype]; }
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_seq[seqtype]; }
+	const std::string &cfg(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_cfg[seqtype]; }
 
 	// setters
 	void restore_default_seq() noexcept;
 	void set_seq(input_seq_type seqtype, const input_seq &seq) noexcept { m_seq[seqtype] = seq; }
+	template <typename... T> void set_cfg(input_seq_type seqtype, T &&... cfg) { m_cfg[seqtype].assign(std::forward<T>(cfg)...); }
 	void replace_code(input_code oldcode, input_code newcode) noexcept;
 	void configure_osd(const char *token, const char *name) noexcept;
 
 private:
 	// internal state
-	ioport_type         m_type;             // IPT_* for this entry
-	ioport_group        m_group;            // which group the port belongs to
-	u8                  m_player;           // player number (0 is player 1)
-	const char *        m_token;            // token used to store settings
-	const char *        m_name;             // user-friendly name
-	std::array<input_seq, SEQ_TYPE_TOTAL> m_defseq; // default input sequence
-	std::array<input_seq, SEQ_TYPE_TOTAL> m_seq; // currently configured sequences
+	ioport_type                             m_type;     // IPT_* for this entry
+	ioport_group                            m_group;    // which group the port belongs to
+	u8                                      m_player;   // player number (0 is player 1)
+	const char *                            m_token;    // token used to store settings
+	const char *                            m_name;     // user-friendly name
+	std::array<input_seq, SEQ_TYPE_TOTAL>   m_defseq;   // default input sequence
+	std::array<input_seq, SEQ_TYPE_TOTAL>   m_seq;      // currently configured sequences
+	std::array<std::string, SEQ_TYPE_TOTAL> m_cfg;      // configuration strings
 };
 
 
@@ -1088,14 +1090,15 @@ public:
 	{
 		ioport_value    value = 0;              // for DIP switches
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
+		std::string     cfg[SEQ_TYPE_TOTAL];    // configuration strings of all types
 		s32             sensitivity = 0;        // for analog controls
 		s32             delta = 0;              // for analog controls
 		s32             centerdelta = 0;        // for analog controls
 		bool            reverse = false;        // for analog controls
 		bool            toggle = false;         // for non-analog controls
 	};
-	void get_user_settings(user_settings &settings) const noexcept;
-	void set_user_settings(const user_settings &settings) noexcept;
+	void get_user_settings(user_settings &settings) const;
+	void set_user_settings(const user_settings &settings);
 
 private:
 	void expand_diplocation(const char *location, std::string &errorbuf);
@@ -1164,6 +1167,7 @@ struct ioport_field_live
 	digital_joystick::direction_t joydir;       // digital joystick direction index
 	bool                    lockout;            // user lockout
 	std::string             name;               // overridden name
+	std::string             cfg[SEQ_TYPE_TOTAL];// configuration strings
 };
 
 
@@ -1238,7 +1242,7 @@ private:
 class analog_field
 {
 	friend class ioport_manager;
-	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings) noexcept;
+	friend void ioport_field::set_user_settings(const ioport_field::user_settings &settings);
 
 public:
 	// construction/destruction
@@ -1406,12 +1410,11 @@ private:
 
 	void load_config(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void load_remap_table(util::xml::data_node const &parentnode);
-	bool load_default_config(int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
-	bool load_controller_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
-	void load_system_config(util::xml::data_node const &portnode, int type, int player, const input_seq (&newseq)[SEQ_TYPE_TOTAL]);
+	bool load_default_config(int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
+	bool load_controller_config(util::xml::data_node const &portnode, int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
+	void load_system_config(util::xml::data_node const &portnode, int type, int player, const std::pair<input_seq, char const *> (&newseq)[SEQ_TYPE_TOTAL]);
 
 	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
-	void save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
 	void save_default_inputs(util::xml::data_node &parentnode);
 	void save_game_inputs(util::xml::data_node &parentnode);
@@ -1427,10 +1430,6 @@ private:
 	void record_end(const char *message = nullptr);
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
-
-	template<typename Type> void timecode_write(Type value);
-	void timecode_init();
-	void timecode_end(const char *message = nullptr);
 
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
@@ -1455,9 +1454,6 @@ private:
 	util::read_stream::ptr  m_playback_stream;      // playback stream (nullptr if not recording)
 	u64                     m_playback_accumulated_speed; // accumulated speed during playback
 	u32                     m_playback_accumulated_frames; // accumulated frames during playback
-	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
-	int                     m_timecode_count;
-	attotime                m_timecode_last_time;
 
 	// storage for inactive configuration
 	std::unique_ptr<util::xml::file> m_deselected_card_config;

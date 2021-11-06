@@ -72,7 +72,7 @@ function console.startplugin()
 	-- Main completion function. It evaluates the current sub-expression
 	-- to determine its type. Currently supports tables fields, global
 	-- variables and function prototype completion.
-	local function contextual_list(expr, sep, str, word)
+	local function contextual_list(expr, sep, str, word, strs)
 		local function add(value)
 			value = tostring(value)
 			if value:match("^" .. word) then
@@ -92,7 +92,7 @@ function console.startplugin()
 		end
 
 		if expr and expr ~= "" then
-			local v = load("return " .. expr)
+			local v = load("local STRING = {'" .. table.concat(strs,"','") .. "'} return " .. expr)
 			if v then
 				err, v = pcall(v)
 				if (not err) or (not v) then
@@ -158,6 +158,7 @@ function console.startplugin()
 	-- separator item ( '.', ':', '[', '(' ) and the current string in case
 	-- of an unfinished string literal.
 	local function simplify_expression(expr, word)
+		local strs = {}
 		-- Replace annoying sequences \' and \" inside literal strings
 		expr = expr:gsub("\\(['\"])", function (c)
 				return string.format("\\%03d", string.byte(c))
@@ -177,7 +178,10 @@ function console.startplugin()
 				idx, startpat, endpat = idx2, sign, sign
 			end
 			if expr:sub(idx):find("^" .. startpat .. ".-" .. endpat) then
-				expr = expr:gsub(startpat .. "(.-)" .. endpat, " STRING ")
+				expr = expr:gsub(startpat .. "(.-)" .. endpat, function (str)
+						strs[#strs + 1] = str
+						return " STRING[" .. #strs .. "] "
+					end)
 			else
 				expr = expr:gsub(startpat .. "(.*)", function (str)
 						curstring = str
@@ -194,7 +198,7 @@ function console.startplugin()
 		expr = expr:gsub("(%w)%s+(%w)","%1|%2")
 		expr = expr:gsub("%s+", "") -- Remove now useless spaces
 		-- This main regular expression looks for table indexes and function calls.
-		return curstring, expr:match("([%.:%w%(%)%[%]_]-)([:%.%[%(])" .. word .. "$")
+		return curstring, strs, expr:match("([%.:%w%(%)%[%]_]-)([:%.%[%(])" .. word .. "$")
 	end
 
 	local function get_completions(line, endpos)
@@ -210,8 +214,8 @@ function console.startplugin()
 			word = word or ""
 		end
 
-		local str, expr, sep = simplify_expression(line, word)
-		contextual_list(expr, sep, str, word)
+		local str, strs, expr, sep = simplify_expression(line, word)
+		contextual_list(expr, sep, str, word, strs)
 		if #matches > 1 then
 			print("\n")
 			for k, v in pairs(matches) do

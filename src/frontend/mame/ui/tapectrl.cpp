@@ -38,6 +38,7 @@ namespace ui {
 menu_tape_control::menu_tape_control(mame_ui_manager &mui, render_container &container, cassette_image_device *device)
 	: menu_device_control<cassette_image_device>(mui, container, device)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 
@@ -116,40 +117,39 @@ void menu_tape_control::populate(float &customtop, float &custombottom)
 //  handle - main tape control menu
 //-------------------------------------------------
 
-void menu_tape_control::handle()
+void menu_tape_control::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(PROCESS_LR_REPEAT);
-	if (event != nullptr)
+	if (ev)
 	{
-		switch (event->iptkey)
+		switch (ev->iptkey)
 		{
 		case IPT_UI_LEFT:
-			if (event->itemref == TAPECMD_SLIDER)
+			if (ev->itemref == TAPECMD_SLIDER)
 				current_device()->seek(-1, SEEK_CUR);
-			else if (event->itemref == TAPECMD_SELECT)
+			else if (ev->itemref == TAPECMD_SELECT)
 				previous();
 			break;
 
 		case IPT_UI_RIGHT:
-			if (event->itemref == TAPECMD_SLIDER)
+			if (ev->itemref == TAPECMD_SLIDER)
 				current_device()->seek(+1, SEEK_CUR);
-			else if (event->itemref == TAPECMD_SELECT)
+			else if (ev->itemref == TAPECMD_SELECT)
 				next();
 			break;
 
 		case IPT_UI_SELECT:
-			if (event->itemref == TAPECMD_STOP)
+			if (ev->itemref == TAPECMD_STOP)
 				current_device()->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
-			else if (event->itemref == TAPECMD_PLAY)
+			else if (ev->itemref == TAPECMD_PLAY)
 				current_device()->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
-			else if (event->itemref == TAPECMD_RECORD)
+			else if (ev->itemref == TAPECMD_RECORD)
 				current_device()->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
-			else if (event->itemref == TAPECMD_REWIND)
+			else if (ev->itemref == TAPECMD_REWIND)
 				current_device()->seek(-30, SEEK_CUR);
-			else if (event->itemref == TAPECMD_FAST_FORWARD)
+			else if (ev->itemref == TAPECMD_FAST_FORWARD)
 				current_device()->seek(30, SEEK_CUR);
-			else if (event->itemref == TAPECMD_SLIDER)
+			else if (ev->itemref == TAPECMD_SLIDER)
 				current_device()->seek(0, SEEK_SET);
 			break;
 		}

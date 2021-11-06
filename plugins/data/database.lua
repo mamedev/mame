@@ -4,7 +4,7 @@ local db
 
 local function check_db(msg)
 	if db:errcode() > sql.OK then
-		emu.print_error(string.format("Error: %s (%s - %s)\n", msg, db:errcode(), db:errmsg()))
+		emu.print_error(string.format("Error: %s (%s - %s)", msg, db:errcode(), db:errmsg()))
 	end
 end
 
@@ -15,7 +15,7 @@ do
 		lfs.mkdir(dbpath)
 		db = sql.open(dbpath .. "/history.db")
 		if not db then
-			emu.print_error("Unable to create history.db\n")
+			emu.print_error("Unable to create history.db")
 			return false
 		end
 		check_db("opening database")

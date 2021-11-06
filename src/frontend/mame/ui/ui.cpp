@@ -19,6 +19,7 @@
 #include "ui/info.h"
 #include "ui/mainmenu.h"
 #include "ui/menu.h"
+#include "ui/quitmenu.h"
 #include "ui/sliders.h"
 #include "ui/state.h"
 #include "ui/systemlist.h"
@@ -42,6 +43,7 @@
 #include "../osd/modules/lib/osdobj_common.h"
 
 #include <chrono>
+#include <functional>
 #include <type_traits>
 
 
@@ -166,7 +168,7 @@ static uint32_t const mouse_bitmap[32*32] =
 mame_ui_manager::mame_ui_manager(running_machine &machine)
 	: ui_manager(machine)
 	, m_font()
-	, m_handler_callback(nullptr)
+	, m_handler_callback()
 	, m_handler_callback_type(ui_callback_type::GENERAL)
 	, m_handler_param(0)
 	, m_single_step(false)
@@ -199,7 +201,6 @@ void mame_ui_manager::init()
 	ui::system_list::instance().cache_data(options());
 
 	// initialize the other UI bits
-	ui::menu::init(machine(), options());
 	ui_gfx_init(machine());
 
 	m_ui_colors.refresh(options());
@@ -210,11 +211,12 @@ void mame_ui_manager::init()
 	// more initialization
 	set_handler(
 			ui_callback_type::GENERAL,
-			[this] (render_container &container) -> uint32_t
-			{
-				draw_text_box(container, messagebox_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
-				return 0;
-			});
+			handler_callback_func(
+				[this] (render_container &container) -> uint32_t
+				{
+					draw_text_box(container, messagebox_text, ui::text_layout::text_justify::LEFT, 0.5f, 0.5f, colors().background_color());
+					return 0;
+				}));
 	m_non_char_keys_down = std::make_unique<uint8_t[]>((std::size(non_char_keys) + 7) / 8);
 	m_mouse_show = machine().system().flags & machine_flags::CLICKABLE_ARTWORK ? true : false;
 
@@ -376,7 +378,7 @@ void mame_ui_manager::initialize(running_machine &machine)
 //  pair for the current UI handler
 //-------------------------------------------------
 
-void mame_ui_manager::set_handler(ui_callback_type callback_type, const std::function<uint32_t (render_container &)> &&callback)
+void mame_ui_manager::set_handler(ui_callback_type callback_type, handler_callback_func &&callback)
 {
 	m_handler_callback = std::move(callback);
 	m_handler_callback_type = callback_type;
@@ -427,7 +429,6 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 #endif
 
 	// set up event handlers
-	using namespace std::placeholders;
 	switch_code_poller poller(machine().input());
 	std::string warning_text;
 	rgb_t warning_color;
@@ -457,10 +458,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 			return 0;
 		};
-	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
+	set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
 
 	// loop over states
-	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()); state++)
+	for (int state = 0; state < maxstate && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this); state++)
 	{
 		// default to standard colors
 		warning_color = colors().background_color();
@@ -475,7 +476,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			if (!warning_text.empty())
 			{
 				warning_text.append(_("\n\nPress any key to continue"));
-				set_handler(ui_callback_type::MODAL, handler_messagebox_anykey);
+				set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
 			}
 			break;
 
@@ -548,7 +549,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				if (need_warning)
 				{
 					warning_text.append(_("\n\nPress any key to continue"));
-					set_handler(ui_callback_type::MODAL, handler_messagebox_anykey);
+					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
 					warning_color = machine_info().warnings_color();
 				}
 			}
@@ -579,12 +580,12 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			config_menu = false;
 
 			// loop while we have a handler
-			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(machine()))
+			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this))
 				machine().video().frame_update();
 		}
 
 		// clear the handler and force an update
-		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
+		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
 		machine().video().frame_update();
 	}
 
@@ -593,8 +594,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		m_last_launch_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	// if we're the empty driver, force the menus on
-	if (ui::menu::stack_has_special_main_menu(machine()))
+	if (ui::menu::stack_has_special_main_menu(*this))
+	{
 		show_menu();
+	}
 	else if (config_menu)
 	{
 		show_menu();
@@ -642,7 +645,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	if (machine().phase() >= machine_phase::RESET && (single_step() || machine().paused()))
 	{
 		int alpha = (1.0f - machine().options().pause_brightness()) * 255.0f;
-		if (ui::menu::stack_has_special_main_menu(machine()))
+		if (ui::menu::stack_has_special_main_menu(*this))
 			alpha = 255;
 		if (alpha > 255)
 			alpha = 255;
@@ -698,8 +701,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 	// cancel takes us back to the ingame handler
 	if (m_handler_param == UI_HANDLER_CANCEL)
 	{
-		using namespace std::placeholders;
-		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
+		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
 	}
 }
 
@@ -994,8 +996,7 @@ bool mame_ui_manager::show_profiler() const
 
 void mame_ui_manager::show_menu()
 {
-	using namespace std::placeholders;
-	set_handler(ui_callback_type::MENU, std::bind(&ui::menu::ui_handler, _1, std::ref(*this)));
+	set_handler(ui_callback_type::MENU, ui::menu::get_ui_handler(*this));
 }
 
 
@@ -1135,38 +1136,6 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 
 
 //-------------------------------------------------
-//  draw_timecode_counter
-//-------------------------------------------------
-
-void mame_ui_manager::draw_timecode_counter(render_container &container)
-{
-	std::string tempstring;
-	draw_text_full(
-			container,
-			machine().video().timecode_text(tempstring),
-			0.0f, 0.0f, 1.0f,
-			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t(0xf0, 0xf0, 0x10, 0x10), rgb_t::black(), nullptr, nullptr);
-}
-
-
-//-------------------------------------------------
-//  draw_timecode_total
-//-------------------------------------------------
-
-void mame_ui_manager::draw_timecode_total(render_container &container)
-{
-	std::string tempstring;
-	draw_text_full(
-			container,
-			machine().video().timecode_total_text(tempstring),
-			0.0f, 0.0f, 1.0f,
-			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t(0xf0, 0x10, 0xf0, 0x10), rgb_t::black(), nullptr, nullptr);
-}
-
-
-//-------------------------------------------------
 //  draw_profiler
 //-------------------------------------------------
 
@@ -1188,9 +1157,8 @@ void mame_ui_manager::draw_profiler(render_container &container)
 
 void mame_ui_manager::start_save_state()
 {
-	ui::menu::stack_reset(machine());
 	show_menu();
-	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container());
+	ui::menu::stack_push<ui::menu_save_state>(*this, machine().render().ui_container(), true);
 }
 
 
@@ -1200,9 +1168,8 @@ void mame_ui_manager::start_save_state()
 
 void mame_ui_manager::start_load_state()
 {
-	ui::menu::stack_reset(machine());
 	show_menu();
-	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container());
+	ui::menu::stack_push<ui::menu_load_state>(*this, machine().render().ui_container(), true);
 }
 
 
@@ -1252,14 +1219,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	if (show_fps_counter())
 		draw_fps_counter(container);
 
-	// Show the duration of current part (intro or gameplay or extra)
-	if (show_timecode_counter())
-		draw_timecode_counter(container);
-
-	// Show the total time elapsed for the video preview (all parts intro, gameplay, extras)
-	if (show_timecode_total())
-		draw_timecode_total(container);
-
 	// draw the profiler if visible
 	if (show_profiler())
 		draw_profiler(container);
@@ -1306,10 +1265,6 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 	image_handler_ingame();
 
-	// handle a save input timecode request
-	if (machine().ui_input().pressed(IPT_UI_TIMECODE))
-		machine().video().save_input_timecode();
-
 	if (ui_disabled)
 		return ui_disabled;
 
@@ -1327,10 +1282,10 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0 && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
+	if (!(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
-		using namespace std::placeholders;
-		set_handler(ui_callback_type::MENU, std::bind(&ui::menu_sliders::ui_handler, _1, std::ref(*this)));
+		ui::menu::stack_push<ui::menu_sliders>(*this, machine().render().ui_container(), true);
+		set_handler(ui_callback_type::MENU, ui::menu::get_ui_handler(*this));
 		return 1;
 	}
 
@@ -1346,7 +1301,13 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 		if (!is_paused)
 			machine().pause();
 		using namespace std::placeholders;
-		set_handler(ui_callback_type::VIEWER, std::bind(&ui_gfx_ui_handler, _1, std::ref(*this), is_paused));
+		set_handler(
+				ui_callback_type::VIEWER,
+				handler_callback_func(
+					[this, is_paused] (render_container &container) -> uint32_t
+					{
+						return ui_gfx_ui_handler(container, *this, is_paused);
+					}));
 		return is_paused ? 1 : 0;
 	}
 
@@ -1458,52 +1419,15 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 
 void mame_ui_manager::request_quit()
 {
-	using namespace std::placeholders;
 	if (!machine().options().confirm_quit())
-		machine().schedule_exit();
-	else
-		set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_confirm_quit, this, _1));
-}
-
-
-//-------------------------------------------------
-//  handler_confirm_quit - leads the user through
-//  confirming quit emulation
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
-{
-	uint32_t state = 0;
-
-	// get the text for 'UI Select'
-	std::string ui_select_text = get_general_input_setting(IPT_UI_SELECT);
-
-	// get the text for 'UI Cancel'
-	std::string ui_cancel_text = get_general_input_setting(IPT_UI_CANCEL);
-
-	// assemble the quit message
-	std::string quit_message = string_format(
-			_("Are you sure you want to quit?\n\n"
-			"Press ''%1$s'' to quit,\n"
-			"Press ''%2$s'' to return to emulation."),
-			ui_select_text,
-			ui_cancel_text);
-
-	draw_text_box(container, quit_message, ui::text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
-	machine().pause();
-
-	// if the user press ENTER, quit the game
-	if (machine().ui_input().pressed(IPT_UI_SELECT))
-		machine().schedule_exit();
-
-	// if the user press ESC, just continue
-	else if (machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
-		machine().resume();
-		state = UI_HANDLER_CANCEL;
+		machine().schedule_exit();
 	}
-
-	return state;
+	else
+	{
+		show_menu();
+		ui::menu::stack_push<ui::menu_confirm_quit>(*this, machine().render().ui_container());
+	}
 }
 
 
@@ -2256,7 +2180,7 @@ void mame_ui_manager::save_main_option()
 
 void mame_ui_manager::menu_reset()
 {
-	ui::menu::stack_reset(machine());
+	ui::menu::stack_reset(*this);
 }
 
 
