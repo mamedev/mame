@@ -341,6 +341,11 @@ void coco3_state::coco3(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
 }
 
+void coco3_state::coco3ms(machine_config &config)
+{
+	coco3(config);
+}
+
 void coco3_state::coco3p(machine_config &config)
 {
 	coco3(config);
@@ -386,6 +391,11 @@ ROM_START(coco3p)
 	ROM_LOAD("coco3p.rom",  0x0000, 0x8000, CRC(ff050d80) SHA1(631e383068b1f52a8f419f4114b69501b21cf379))
 ROM_END
 
+ROM_START(coco3ms)
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("coco3ms.rom", 0x0000, 0x8000, CRC(26d67890) SHA1(271fd39b3eb3f521aa5484ae7ce3956ab9ef782c))
+ROM_END
+
 #define rom_coco3h  rom_coco3
 #define rom_coco3dw1 rom_coco3
 
@@ -394,6 +404,7 @@ ROM_END
 //**************************************************************************
 
 COMP( 1986, coco3,    coco, 0, coco3,    coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC)",          0 )
+COMP( 1986, coco3ms,  coco, 0, coco3ms,  coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; Microsep ROM)",          0 )
 COMP( 1986, coco3p,   coco, 0, coco3p,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (PAL)",           0 )
 COMP( 19??, coco3h,   coco, 0, coco3h,   coco3, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HD6309)",  MACHINE_UNOFFICIAL )
 COMP( 19??, coco3dw1, coco, 0, coco3dw1, coco3dw, coco3_state, empty_init, "Tandy Radio Shack", "Color Computer 3 (NTSC; HDB-DOS)", MACHINE_UNOFFICIAL )
