@@ -68,7 +68,8 @@ f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, dev
 	cpu_device(mconfig, F8, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 	m_regs_config("register", ENDIANNESS_BIG, 8, 6, 0, address_map_constructor(FUNC(f8_cpu_device::regs_map), this)),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
+	m_romc08_callback(*this)
 { }
 
 void f8_cpu_device::regs_map(address_map &map)
@@ -104,6 +105,11 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 					m_w & 0x01 ? 'S':'.');
 			break;
 	}
+}
+
+void f8_cpu_device::device_resolve_objects()
+{
+	m_romc08_callback.resolve_safe(0);
 }
 
 void f8_cpu_device::device_start()
@@ -370,7 +376,7 @@ void f8_cpu_device::ROMC_08()
 	 */
 	m_pc1 = m_pc0;
 	m_dbus = 0;
-	m_pc0 = 0;
+	m_pc0 = m_romc08_callback() * 0x0101;
 	m_icount -= cL;
 }
 

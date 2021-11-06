@@ -16,6 +16,10 @@ To set the folders where the data plugin looks for supported files, choose
 **Configure Directories**, and then choose **DATs**.  You can also set the
 ``historypath`` option in your **ui.ini** file.
 
+Loading large data files like **history.xml** can take quite a while, so please
+be patient the first time you start MAME after updating or adding new data
+files.
+
 The following files are supported:
 
 history.xml

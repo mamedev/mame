@@ -133,7 +133,7 @@ function dat.check(set, softlist)
 		info = "#j2\n" .. stmt:get_value(0)
 	end
 	stmt:finalize()
-	return info and _("MARPScore") or nil
+	return info and _p("plugin-data", "MARPScore") or nil
 end
 
 function dat.get()

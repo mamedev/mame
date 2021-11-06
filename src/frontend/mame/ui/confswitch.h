@@ -56,6 +56,7 @@ protected:
 
 	menu_confswitch(mame_ui_manager &mui, render_container &container, uint32_t type);
 
+	virtual void menu_activated() override;
 	virtual void populate(float &customtop, float &custombottom) override;
 
 	field_vector const &fields() { return m_fields; }
@@ -63,7 +64,7 @@ protected:
 	unsigned active_switch_groups() const { return m_active_switch_groups; }
 
 private:
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void find_fields();
 

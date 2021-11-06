@@ -3,7 +3,7 @@
 //  testkeys.cpp - A small utility to analyze SDL keycodes
 //
 //  Copyright (c) 1996-2021, Nicola Salmoria and the MAME Team.
-//  Visit http://mamedev.org for licensing and usage restrictions.
+//  Visit https://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //  testkeys by couriersud

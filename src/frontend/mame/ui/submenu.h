@@ -64,7 +64,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	std::vector<option> m_options;
 	game_driver const   *m_driver;

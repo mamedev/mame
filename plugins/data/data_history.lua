@@ -169,7 +169,7 @@ function dat.check(set, softlist)
 		info = stmt:get_value(0)
 	end
 	stmt:finalize()
-	return info and _("History") or nil
+	return info and _p("plugin-data", "History") or nil
 end
 
 function dat.get()

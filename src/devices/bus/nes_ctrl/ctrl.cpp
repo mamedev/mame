@@ -46,8 +46,8 @@
 #include "4score.h"
 #include "arkpaddle.h"
 #include "bcbattle.h"
-#include "ftrainer.h"
 #include "fckeybrd.h"
+#include "fcmat.h"
 #include "hori.h"
 #include "joypad.h"
 #include "konamihs.h"
@@ -211,4 +211,5 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("hori_4p", NES_HORI4P);
 	device.option_add("barcode_battler", NES_BARCODE_BATTLER);
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
+	device.option_add("taptapmat", NES_TAPTAPMAT);
 }

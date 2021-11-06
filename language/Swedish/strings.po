@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-17 07:08+1100\n"
+"POT-Creation-Date: 2021-10-31 10:10+1100\n"
 "PO-Revision-Date: 2016-02-20 18:03+0100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
@@ -32,21 +32,21 @@ msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
 "Den här emuleringen kräver att avbildningar laddas i följande apparat(er): "
 
-#: src/frontend/mame/ui/ui.cpp:1290
+#: src/frontend/mame/ui/ui.cpp:1286
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1292
+#: src/frontend/mame/ui/ui.cpp:1288
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1486
+#: src/frontend/mame/ui/ui.cpp:1487
 #, c-format
 msgid ""
 "Are you sure you want to quit?\n"
@@ -59,185 +59,185 @@ msgstr ""
 "Tryck ''%1$s'' för att avsluta,\n"
 "Tryck ''%2$s'' för att återgå till emuleringen."
 
-#: src/frontend/mame/ui/ui.cpp:1536
+#: src/frontend/mame/ui/ui.cpp:1537
 msgid "Master Volume"
 msgstr "Huvud Volym"
 
-#: src/frontend/mame/ui/ui.cpp:1545
+#: src/frontend/mame/ui/ui.cpp:1546
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s Volym"
 
-#: src/frontend/mame/ui/ui.cpp:1567
+#: src/frontend/mame/ui/ui.cpp:1568
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Överklocka CPU %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1575
+#: src/frontend/mame/ui/ui.cpp:1576
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr "Överklocka %1$s ljud"
 
-#: src/frontend/mame/ui/ui.cpp:1594
+#: src/frontend/mame/ui/ui.cpp:1595
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s Uppdateringsfrekvens"
 
-#: src/frontend/mame/ui/ui.cpp:1599
+#: src/frontend/mame/ui/ui.cpp:1600
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s Ljusstyrka"
 
-#: src/frontend/mame/ui/ui.cpp:1601
+#: src/frontend/mame/ui/ui.cpp:1602
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s Kontrast"
 
-#: src/frontend/mame/ui/ui.cpp:1603
+#: src/frontend/mame/ui/ui.cpp:1604
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s Gamma"
 
-#: src/frontend/mame/ui/ui.cpp:1607
+#: src/frontend/mame/ui/ui.cpp:1608
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s Horisontell utsträckning"
 
-#: src/frontend/mame/ui/ui.cpp:1609
+#: src/frontend/mame/ui/ui.cpp:1610
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s Horisontell Position"
 
-#: src/frontend/mame/ui/ui.cpp:1611
+#: src/frontend/mame/ui/ui.cpp:1612
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s Vertikal utsträckning"
 
-#: src/frontend/mame/ui/ui.cpp:1613
+#: src/frontend/mame/ui/ui.cpp:1614
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s Vertikal Position"
 
-#: src/frontend/mame/ui/ui.cpp:1629
+#: src/frontend/mame/ui/ui.cpp:1630
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisk '%1$s' Horisontell utsträckning"
 
-#: src/frontend/mame/ui/ui.cpp:1632
+#: src/frontend/mame/ui/ui.cpp:1633
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisk '%1$s' Horisontell Position"
 
-#: src/frontend/mame/ui/ui.cpp:1634
+#: src/frontend/mame/ui/ui.cpp:1635
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdisk '%1$s' Vertikal utsträckning"
 
-#: src/frontend/mame/ui/ui.cpp:1637
+#: src/frontend/mame/ui/ui.cpp:1638
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisk '%1$s' Vertikal Position"
 
-#: src/frontend/mame/ui/ui.cpp:1647
+#: src/frontend/mame/ui/ui.cpp:1648
 msgid "Vector Flicker"
 msgstr "Vektor Flimmer"
 
-#: src/frontend/mame/ui/ui.cpp:1648
+#: src/frontend/mame/ui/ui.cpp:1649
 msgid "Beam Width Minimum"
 msgstr "Stråle Bredd Minimum"
 
-#: src/frontend/mame/ui/ui.cpp:1649
+#: src/frontend/mame/ui/ui.cpp:1650
 msgid "Beam Width Maximum"
 msgstr "Elektronstråle Bredd Maximum"
 
-#: src/frontend/mame/ui/ui.cpp:1650
+#: src/frontend/mame/ui/ui.cpp:1651
 msgid "Beam Dot Size"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1651
+#: src/frontend/mame/ui/ui.cpp:1652
 msgid "Beam Intensity Weight"
 msgstr "Elektronstråle Intensitet"
 
-#: src/frontend/mame/ui/ui.cpp:1664
+#: src/frontend/mame/ui/ui.cpp:1665
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Hårkors Skala %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1664 src/frontend/mame/ui/ui.cpp:1666
+#: src/frontend/mame/ui/ui.cpp:1665 src/frontend/mame/ui/ui.cpp:1667
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1664 src/frontend/mame/ui/ui.cpp:1666
+#: src/frontend/mame/ui/ui.cpp:1665 src/frontend/mame/ui/ui.cpp:1667
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1666
+#: src/frontend/mame/ui/ui.cpp:1667
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Hårkors Offset %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1698
+#: src/frontend/mame/ui/ui.cpp:1699
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1741
+#: src/frontend/mame/ui/ui.cpp:1742
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1756
+#: src/frontend/mame/ui/ui.cpp:1757
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1779 src/frontend/mame/ui/ui.cpp:1799
-#: src/frontend/mame/ui/ui.cpp:1818 src/frontend/mame/ui/ui.cpp:1836
-#: src/frontend/mame/ui/ui.cpp:1855 src/frontend/mame/ui/ui.cpp:1874
-#: src/frontend/mame/ui/ui.cpp:1893 src/frontend/mame/ui/ui.cpp:1912
-#: src/frontend/mame/ui/ui.cpp:1933 src/frontend/mame/ui/ui.cpp:1954
-#: src/frontend/mame/ui/ui.cpp:1975 src/frontend/mame/ui/ui.cpp:1996
+#: src/frontend/mame/ui/ui.cpp:1780 src/frontend/mame/ui/ui.cpp:1800
+#: src/frontend/mame/ui/ui.cpp:1819 src/frontend/mame/ui/ui.cpp:1837
+#: src/frontend/mame/ui/ui.cpp:1856 src/frontend/mame/ui/ui.cpp:1875
+#: src/frontend/mame/ui/ui.cpp:1894 src/frontend/mame/ui/ui.cpp:1913
+#: src/frontend/mame/ui/ui.cpp:1934 src/frontend/mame/ui/ui.cpp:1955
+#: src/frontend/mame/ui/ui.cpp:1976 src/frontend/mame/ui/ui.cpp:1997
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2011 src/frontend/mame/ui/ui.cpp:2026
-#: src/frontend/mame/ui/ui.cpp:2041 src/frontend/mame/ui/ui.cpp:2056
-#: src/frontend/mame/ui/ui.cpp:2071
+#: src/frontend/mame/ui/ui.cpp:2012 src/frontend/mame/ui/ui.cpp:2027
+#: src/frontend/mame/ui/ui.cpp:2042 src/frontend/mame/ui/ui.cpp:2057
+#: src/frontend/mame/ui/ui.cpp:2072
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2087
+#: src/frontend/mame/ui/ui.cpp:2088
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Hårkors Skala X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2087
+#: src/frontend/mame/ui/ui.cpp:2088
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Hårkors Skala Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2104
+#: src/frontend/mame/ui/ui.cpp:2105
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Hårkors Offset X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2104
+#: src/frontend/mame/ui/ui.cpp:2105
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Hårkors Offset Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2191
+#: src/frontend/mame/ui/ui.cpp:2192
 msgid "**Error saving ui.ini**"
 msgstr "**Fel uppstod när ui.ini sparades**"
 
-#: src/frontend/mame/ui/ui.cpp:2250
+#: src/frontend/mame/ui/ui.cpp:2251
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**Fel uppstod när %s.ini sparades**"
 
-#: src/frontend/mame/ui/ui.cpp:2254 src/frontend/mame/ui/miscmenu.cpp:763
+#: src/frontend/mame/ui/ui.cpp:2255 src/frontend/mame/ui/miscmenu.cpp:774
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -247,7 +247,7 @@ msgstr ""
 "    Konfiguration sparad   \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:486 src/frontend/mame/ui/selgame.cpp:302
+#: src/frontend/mame/ui/selsoft.cpp:484 src/frontend/mame/ui/selgame.cpp:306
 #, c-format
 msgid ""
 "%s\n"
@@ -256,8 +256,8 @@ msgstr ""
 "%s\n"
 " tillagd i favoritlistan."
 
-#: src/frontend/mame/ui/selsoft.cpp:491 src/frontend/mame/ui/selgame.cpp:307
-#: src/frontend/mame/ui/selgame.cpp:313
+#: src/frontend/mame/ui/selsoft.cpp:489 src/frontend/mame/ui/selgame.cpp:311
+#: src/frontend/mame/ui/selgame.cpp:317
 #, c-format
 msgid ""
 "%s\n"
@@ -266,40 +266,40 @@ msgstr ""
 "%s\n"
 " borttagen från favoritlistan."
 
-#: src/frontend/mame/ui/selsoft.cpp:525
+#: src/frontend/mame/ui/selsoft.cpp:523
 msgid "[Start empty]"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:525
+#: src/frontend/mame/ui/selsoft.cpp:523
 msgid "[Use file manager]"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:708
+#: src/frontend/mame/ui/selsoft.cpp:706
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr "%1$s %2$s ( %3$d / %4$d mjukvarupaket )"
 
-#: src/frontend/mame/ui/selsoft.cpp:709
+#: src/frontend/mame/ui/selsoft.cpp:707
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "Drivrutin: \"%1$s\" mjukvarulista "
 
-#: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1072
+#: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr "%1$s: %2$s - Sök: %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:716 src/frontend/mame/ui/selgame.cpp:1074
+#: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1078
 #, c-format
 msgid "Search: %1$s_"
 msgstr "Sök: %1$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:723
+#: src/frontend/mame/ui/selsoft.cpp:721
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
 msgstr ""
 
-#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:163
+#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:165
 msgid "Sound Options"
 msgstr "Ljudalternativ"
 
@@ -307,7 +307,7 @@ msgstr "Ljudalternativ"
 msgid "General Inputs"
 msgstr "Generell Indata"
 
-#: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:962
+#: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:971
 msgid "Plugins"
 msgstr "Tillägg"
 
@@ -319,15 +319,15 @@ msgstr "Spara Konfiguration"
 msgid "Settings"
 msgstr "Inställningar"
 
-#: src/frontend/mame/ui/optsmenu.cpp:206
+#: src/frontend/mame/ui/optsmenu.cpp:205
 msgid "Filter"
 msgstr "Filter"
 
-#: src/frontend/mame/ui/optsmenu.cpp:218
+#: src/frontend/mame/ui/optsmenu.cpp:217
 msgid "Customize UI"
 msgstr "Skräddarsy UI"
 
-#: src/frontend/mame/ui/optsmenu.cpp:219
+#: src/frontend/mame/ui/optsmenu.cpp:218
 msgid "Configure Directories"
 msgstr "Konfigurera Kataloger"
 
@@ -349,23 +349,23 @@ msgstr "[mjukvarulista]"
 msgid "Error accessing %s"
 msgstr ""
 
-#: src/frontend/mame/ui/filesel.cpp:546
+#: src/frontend/mame/ui/filesel.cpp:545
 msgid "Select access mode"
 msgstr "Välj accesstyp"
 
-#: src/frontend/mame/ui/filesel.cpp:547
+#: src/frontend/mame/ui/filesel.cpp:546
 msgid "Read-only"
 msgstr "Enbart läsa"
 
-#: src/frontend/mame/ui/filesel.cpp:549
+#: src/frontend/mame/ui/filesel.cpp:548
 msgid "Read-write"
 msgstr "Läsa och skriva"
 
-#: src/frontend/mame/ui/filesel.cpp:550
+#: src/frontend/mame/ui/filesel.cpp:549
 msgid "Read this image, write to another image"
 msgstr "Läs denna skivavbildning, skriv kopia till en annan"
 
-#: src/frontend/mame/ui/filesel.cpp:551
+#: src/frontend/mame/ui/filesel.cpp:550
 msgid "Read this image, write to diff"
 msgstr "Läs denna skivavbildning, skriv skillnader till en annan"
 
@@ -469,7 +469,7 @@ msgstr ""
 msgid "Rotation Options"
 msgstr "Rotationsalternativ"
 
-#: src/frontend/mame/ui/submenu.cpp:62 src/frontend/mame/ui/videoopt.cpp:180
+#: src/frontend/mame/ui/submenu.cpp:62 src/frontend/mame/ui/videoopt.cpp:179
 msgid "Rotate"
 msgstr "Rotera"
 
@@ -625,7 +625,7 @@ msgstr "Positionsenhetstilldelning"
 msgid "Mouse Device Assignment"
 msgstr "Musenhetstilldelning"
 
-#: src/frontend/mame/ui/submenu.cpp:114 src/frontend/mame/ui/mainmenu.cpp:151
+#: src/frontend/mame/ui/submenu.cpp:114 src/frontend/mame/ui/mainmenu.cpp:172
 msgid "Video Options"
 msgstr "Videoalternativ"
 
@@ -677,58 +677,69 @@ msgstr "Synkroniserad Uppdatering"
 msgid "Wait Vertical Sync"
 msgstr "Vänta på Vertikal Synkronisering"
 
-#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:687
-#: src/frontend/mame/ui/videoopt.cpp:192 plugins/cheatfind/init.lua:766
-#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
+#: src/frontend/mame/ui/menu.cpp:367 src/frontend/mame/ui/menu.cpp:695
+#: src/frontend/mame/ui/videoopt.cpp:191 plugins/cheatfind/init.lua:766
+#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:666
 msgid "On"
 msgstr "På"
 
-#: src/frontend/mame/ui/menu.cpp:368 src/frontend/mame/ui/menu.cpp:690
-#: src/frontend/mame/ui/videoopt.cpp:208 plugins/cheatfind/init.lua:763
-#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
-#: plugins/cheat/init.lua:680
+#: src/frontend/mame/ui/menu.cpp:367 src/frontend/mame/ui/menu.cpp:698
+#: src/frontend/mame/ui/videoopt.cpp:207 plugins/cheatfind/init.lua:763
+#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:669
+#: plugins/cheat/init.lua:678
 msgid "Off"
 msgstr "Av"
 
-#: src/frontend/mame/ui/menu.cpp:693
+#: src/frontend/mame/ui/menu.cpp:701
 msgid "Auto"
 msgstr "Automatisk"
 
-#: src/frontend/mame/ui/menu.cpp:1256
-#: src/frontend/mame/ui/simpleselgame.cpp:289
+#: src/frontend/mame/ui/menu.cpp:1199
+#: src/frontend/mame/ui/simpleselgame.cpp:278
+#: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Return to Previous Menu"
 msgstr "Tillbaka till Föregående Meny"
+
+#: src/frontend/mame/ui/filemngr.cpp:141 src/frontend/mame/ui/inputmap.cpp:541
+#, c-format
+msgid "[root%1$s]"
+msgstr ""
+
+#: src/frontend/mame/ui/filemngr.cpp:154
+#: src/frontend/mame/ui/confswitch.cpp:172 src/frontend/mame/ui/slotopt.cpp:203
+msgid "Reset Machine"
+msgstr ""
 
 #: src/frontend/mame/ui/videoopt.cpp:57
 #, c-format
 msgid "Screen #%d"
 msgstr "Skärm #%d"
 
-#: src/frontend/mame/ui/videoopt.cpp:184
+#: src/frontend/mame/ui/videoopt.cpp:183
 msgid "Zoom to Screen Area"
 msgstr ""
 
-#: src/frontend/mame/ui/videoopt.cpp:196
+#: src/frontend/mame/ui/videoopt.cpp:195
 msgid "X Only"
 msgstr ""
 
-#: src/frontend/mame/ui/videoopt.cpp:200
+#: src/frontend/mame/ui/videoopt.cpp:199
 msgid "Y Only"
 msgstr ""
 
-#: src/frontend/mame/ui/videoopt.cpp:204
+#: src/frontend/mame/ui/videoopt.cpp:203
 msgid "X or Y (Auto)"
 msgstr ""
 
-#: src/frontend/mame/ui/videoopt.cpp:211
+#: src/frontend/mame/ui/videoopt.cpp:210
 msgid "Non-Integer Scaling"
 msgstr ""
 
-#: src/frontend/mame/ui/videoopt.cpp:214
+#: src/frontend/mame/ui/videoopt.cpp:213
 msgid "Maintain Aspect Ratio"
 msgstr ""
 
-#: src/frontend/mame/ui/videoopt.cpp:228
+#: src/frontend/mame/ui/videoopt.cpp:227
 msgid "Cannot change options while recording!"
 msgstr ""
 
@@ -951,22 +962,22 @@ msgstr ""
 "CPU:\n"
 
 #: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
 msgid "GHz"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
 msgid "MHz"
 msgstr "MHz"
 
 #: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
 msgid "kHz"
 msgstr "kHz"
 
 #: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:90 src/frontend/mame/ui/devopt.cpp:163
+#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
 msgid "Hz"
 msgstr ""
 
@@ -1012,15 +1023,15 @@ msgstr "Skärm '%1$s'"
 msgid "Screen"
 msgstr "Skärm"
 
-#: src/frontend/mame/ui/info.cpp:582
+#: src/frontend/mame/ui/info.cpp:607
 msgid "Not supported"
 msgstr "Stöds Ej"
 
-#: src/frontend/mame/ui/info.cpp:585
+#: src/frontend/mame/ui/info.cpp:610
 msgid "Partially supported"
 msgstr "Stöds Delvis"
 
-#: src/frontend/mame/ui/info.cpp:594
+#: src/frontend/mame/ui/info.cpp:619
 msgid "[empty]"
 msgstr "[tom]"
 
@@ -1028,60 +1039,59 @@ msgstr "[tom]"
 msgid "[file manager]"
 msgstr "[filhanterare]"
 
-#: src/frontend/mame/ui/swlist.cpp:228
+#: src/frontend/mame/ui/swlist.cpp:226
 msgid "Switch Item Ordering"
 msgstr "Byt Sortering"
 
-#: src/frontend/mame/ui/swlist.cpp:262
+#: src/frontend/mame/ui/swlist.cpp:258
 msgid "Switched Order: entries now ordered by shortname"
 msgstr "Bytt Sortering: poster sorteras på kortnamn"
 
-#: src/frontend/mame/ui/swlist.cpp:263
+#: src/frontend/mame/ui/swlist.cpp:259
 msgid "Switched Order: entries now ordered by description"
 msgstr "Bytt Sortering: poster sorteras på beskrivning"
 
-#: src/frontend/mame/ui/swlist.cpp:399
+#: src/frontend/mame/ui/swlist.cpp:395
 msgid "[compatible lists]"
 msgstr "[kompatibla listor]"
 
-#: src/frontend/mame/ui/filecreate.cpp:79
+#: src/frontend/mame/ui/filecreate.cpp:78
 msgid "File Already Exists - Override?"
 msgstr "Fil Finns Redan - Skriv Över?"
 
-#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1089
+#: src/frontend/mame/ui/filecreate.cpp:80 src/frontend/mame/ui/utils.cpp:1090
 msgid "No"
 msgstr "Nej"
 
-#: src/frontend/mame/ui/filecreate.cpp:82 src/frontend/mame/ui/utils.cpp:1089
+#: src/frontend/mame/ui/filecreate.cpp:81 src/frontend/mame/ui/utils.cpp:1090
 msgid "Yes"
 msgstr "Ja"
 
-#: src/frontend/mame/ui/filecreate.cpp:171
+#: src/frontend/mame/ui/filecreate.cpp:167
 msgid "New Image Name:"
 msgstr "Nytt Namn på Avbildning:"
 
-#: src/frontend/mame/ui/filecreate.cpp:177
+#: src/frontend/mame/ui/filecreate.cpp:173
 msgid "Image Format:"
 msgstr "Avbildningsformat:"
 
-#: src/frontend/mame/ui/filecreate.cpp:183
-#: plugins/autofire/autofire_menu.lua:213
+#: src/frontend/mame/ui/filecreate.cpp:179
 msgid "Create"
 msgstr "Skapa"
 
-#: src/frontend/mame/ui/filecreate.cpp:214
+#: src/frontend/mame/ui/filecreate.cpp:207
 msgid "Please enter a file extension too"
 msgstr "Skriv in en filändelse också"
 
-#: src/frontend/mame/ui/filecreate.cpp:265
+#: src/frontend/mame/ui/filecreate.cpp:258
 msgid "Select image format"
 msgstr "Välj avbildningsformat"
 
-#: src/frontend/mame/ui/filecreate.cpp:325
+#: src/frontend/mame/ui/filecreate.cpp:317
 msgid "Select initial contents"
 msgstr ""
 
-#: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:147
+#: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:168
 msgid "Keyboard Mode"
 msgstr "Tangenbordsläge"
 
@@ -1093,7 +1103,7 @@ msgstr "Naturligt"
 msgid "Emulated"
 msgstr "Emulerat"
 
-#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:484
+#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:539
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
@@ -1399,52 +1409,52 @@ msgstr "Eget filter"
 msgid "<set up filters>"
 msgstr "<skapa filter>"
 
-#: src/frontend/mame/ui/utils.cpp:395
+#: src/frontend/mame/ui/utils.cpp:396
 msgid "Select custom filters:"
 msgstr "Välj eget filter"
 
-#: src/frontend/mame/ui/utils.cpp:546
+#: src/frontend/mame/ui/utils.cpp:547
 #, c-format
 msgid "Filter %1$u"
 msgstr "Filter %1$u"
 
-#: src/frontend/mame/ui/utils.cpp:560
+#: src/frontend/mame/ui/utils.cpp:561
 msgid "Remove last filter"
 msgstr "Ta bort senaste filtret"
 
-#: src/frontend/mame/ui/utils.cpp:562
+#: src/frontend/mame/ui/utils.cpp:563
 msgid "Add filter"
 msgstr "Lägg till filter"
 
-#: src/frontend/mame/ui/utils.cpp:1001
+#: src/frontend/mame/ui/utils.cpp:1002
 msgid "Select category:"
 msgstr "Välj kategori:"
 
-#: src/frontend/mame/ui/utils.cpp:1032
+#: src/frontend/mame/ui/utils.cpp:1033
 msgid "[no category INI files]"
 msgstr "[ingen kategori INI filer]"
 
-#: src/frontend/mame/ui/utils.cpp:1040
+#: src/frontend/mame/ui/utils.cpp:1041
 msgid "[no groups in INI file]"
 msgstr "[inga grupper i INI fil]"
 
-#: src/frontend/mame/ui/utils.cpp:1074
+#: src/frontend/mame/ui/utils.cpp:1075
 msgid "No category INI files found"
 msgstr "Inga kategorier INI filer funna"
 
-#: src/frontend/mame/ui/utils.cpp:1079
+#: src/frontend/mame/ui/utils.cpp:1080
 msgid "File"
 msgstr "Fil"
 
-#: src/frontend/mame/ui/utils.cpp:1083
+#: src/frontend/mame/ui/utils.cpp:1084
 msgid "No groups found in category file"
 msgstr "Inga grupper funna i kategorifil"
 
-#: src/frontend/mame/ui/utils.cpp:1088
+#: src/frontend/mame/ui/utils.cpp:1089
 msgid "Group"
 msgstr "Grupp"
 
-#: src/frontend/mame/ui/utils.cpp:1089
+#: src/frontend/mame/ui/utils.cpp:1090
 msgid "Include clones"
 msgstr "Inkludera kloner"
 
@@ -1453,21 +1463,20 @@ msgctxt "swlist-info"
 msgid "Software list/item"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:87 src/frontend/mame/ui/selmenu.cpp:2709
+#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2692
 msgid "Software List Info"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:474
+#: src/frontend/mame/ui/datmenu.cpp:316
 #, c-format
 msgid "Revision: %1$s"
 msgstr "Revision: %1$s"
 
-#: src/frontend/mame/ui/miscmenu.cpp:78 src/frontend/mame/ui/confswitch.cpp:165
-#: src/frontend/mame/ui/slotopt.cpp:203
+#: src/frontend/mame/ui/miscmenu.cpp:78
 msgid "Reset"
 msgstr "Återställ"
 
-#: src/frontend/mame/ui/miscmenu.cpp:236
+#: src/frontend/mame/ui/miscmenu.cpp:233
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
@@ -1476,7 +1485,7 @@ msgstr ""
 "Drifttid: %1$d:%2$02d:%3$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:238
+#: src/frontend/mame/ui/miscmenu.cpp:235
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d\n"
@@ -1485,7 +1494,7 @@ msgstr ""
 "Drifttid: %1$d:%2$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:242
+#: src/frontend/mame/ui/miscmenu.cpp:240
 #, c-format
 msgid ""
 "Tickets dispensed: %1$d\n"
@@ -1507,83 +1516,83 @@ msgstr "Mynt %1$c: %2$d%3$s\n"
 msgid " (locked)"
 msgstr " (låst)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:456
+#: src/frontend/mame/ui/miscmenu.cpp:473
 #, c-format
 msgid "P%d Visibility"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:510
+#: src/frontend/mame/ui/miscmenu.cpp:527
 #, c-format
 msgid "P%d Crosshair"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:527
+#: src/frontend/mame/ui/miscmenu.cpp:544
 msgid "Visible Delay"
 msgstr "Synlig Fördröjning"
 
-#: src/frontend/mame/ui/miscmenu.cpp:639
+#: src/frontend/mame/ui/miscmenu.cpp:654
 #, c-format
 msgid "%s.xml saved in UI settings folder."
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:665
+#: src/frontend/mame/ui/miscmenu.cpp:680
 msgid "Name:             Description:\n"
 msgstr "Namn:             Beskrivning:\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:676
+#: src/frontend/mame/ui/miscmenu.cpp:691
 #, c-format
 msgid "%s.txt saved in UI settings folder."
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:693
+#: src/frontend/mame/ui/miscmenu.cpp:708
 msgid "Export list in XML format (like -listxml)"
 msgstr "Exportlista i XML format (som -listxml)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:694
+#: src/frontend/mame/ui/miscmenu.cpp:709
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr "Exportlista i XML format (som -listxml, men utan enheter)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:695
+#: src/frontend/mame/ui/miscmenu.cpp:710
 msgid "Export list in TXT format (like -listfull)"
 msgstr "Exportera lista i TXT format (som -listfull)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:807
+#: src/frontend/mame/ui/miscmenu.cpp:818
 msgid "BIOS"
 msgstr "BIOS"
 
-#: src/frontend/mame/ui/miscmenu.cpp:811
+#: src/frontend/mame/ui/miscmenu.cpp:822
 msgid "Driver"
 msgstr "Drivrutin"
 
-#: src/frontend/mame/ui/miscmenu.cpp:814
+#: src/frontend/mame/ui/miscmenu.cpp:825
 msgid "This machine has no BIOS."
 msgstr "Den här maskinen saknar BIOS."
 
-#: src/frontend/mame/ui/miscmenu.cpp:823 src/frontend/mame/ui/mainmenu.cpp:168
+#: src/frontend/mame/ui/miscmenu.cpp:834 src/frontend/mame/ui/mainmenu.cpp:192
 msgid "Add To Favorites"
 msgstr "Lägg Till Favoriter"
 
-#: src/frontend/mame/ui/miscmenu.cpp:825 src/frontend/mame/ui/mainmenu.cpp:170
+#: src/frontend/mame/ui/miscmenu.cpp:836 src/frontend/mame/ui/mainmenu.cpp:194
 msgid "Remove From Favorites"
 msgstr "Tabort Från Favoriter"
 
-#: src/frontend/mame/ui/miscmenu.cpp:828
+#: src/frontend/mame/ui/miscmenu.cpp:839
 msgid "Save Machine Configuration"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:839
+#: src/frontend/mame/ui/miscmenu.cpp:850
 msgid "Configure Machine:"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:873 src/frontend/mame/ui/selmenu.cpp:2649
+#: src/frontend/mame/ui/miscmenu.cpp:884 src/frontend/mame/ui/selmenu.cpp:2632
 msgid " (default)"
 msgstr " (standard)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:951
+#: src/frontend/mame/ui/miscmenu.cpp:960
 msgid "No plugins found"
 msgstr ""
 
-#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:132
+#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:153
 msgid "Pseudo terminals"
 msgstr "Låtsasterminaler"
 
@@ -1591,11 +1600,15 @@ msgstr "Låtsasterminaler"
 msgid "[failed]"
 msgstr "[misslyckad]"
 
-#: src/frontend/mame/ui/state.cpp:215
-msgid "No save states found"
+#: src/frontend/mame/ui/state.cpp:224
+msgid "[no saved states found]"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:265
+#: src/frontend/mame/ui/state.cpp:229 plugins/cheatfind/init.lua:492
+msgid "Cancel"
+msgstr ""
+
+#: src/frontend/mame/ui/state.cpp:277
 #, c-format
 msgid ""
 "Delete saved state %1$s?\n"
@@ -1603,29 +1616,29 @@ msgid ""
 "Press %3$s to cancel"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:378
+#: src/frontend/mame/ui/state.cpp:390
 #, c-format
 msgid "Error removing saved state file %1$s"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:424
+#: src/frontend/mame/ui/state.cpp:442
 #, c-format
 msgid "Press %1$s to delete"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:497
+#: src/frontend/mame/ui/state.cpp:515
 msgid "Load State"
 msgstr "Ladda läge"
 
-#: src/frontend/mame/ui/state.cpp:497
+#: src/frontend/mame/ui/state.cpp:515
 msgid "Select state to load"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:521
+#: src/frontend/mame/ui/state.cpp:539
 msgid "Save State"
 msgstr "Spara läge"
 
-#: src/frontend/mame/ui/state.cpp:521
+#: src/frontend/mame/ui/state.cpp:539
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
 
@@ -1647,81 +1660,93 @@ msgstr ""
 msgid "Other Controls"
 msgstr "Andra kontroller"
 
-#: src/frontend/mame/ui/inputmap.cpp:227
+#: src/frontend/mame/ui/inputmap.cpp:226
 msgid "This machine has no configurable inputs."
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:310
+#: src/frontend/mame/ui/inputmap.cpp:318
 msgid "Pressed"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:379 plugins/autofire/autofire_menu.lua:123
-#: plugins/cheat/init.lua:626
+#: src/frontend/mame/ui/inputmap.cpp:388
 msgid "Invalid sequence entered"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:486
+#: src/frontend/mame/ui/inputmap.cpp:524
 #, c-format
-msgid "[root%1$s]"
+msgctxt "input-name"
+msgid "%1$s Analog"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:513
+#: src/frontend/mame/ui/inputmap.cpp:525
+#, c-format
+msgctxt "input-name"
+msgid "%1$s Analog Inc"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:526
+#, c-format
+msgctxt "input-name"
+msgid "%1$s Analog Dec"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:568
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:514
+#: src/frontend/mame/ui/inputmap.cpp:569
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:515
+#: src/frontend/mame/ui/inputmap.cpp:570
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:516
+#: src/frontend/mame/ui/inputmap.cpp:571
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr ""
 
-#: src/frontend/mame/ui/tapectrl.cpp:85
+#: src/frontend/mame/ui/tapectrl.cpp:86
 msgid "stopped"
 msgstr "stoppad"
 
-#: src/frontend/mame/ui/tapectrl.cpp:87
+#: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "playing"
 msgstr "spelar upp"
 
-#: src/frontend/mame/ui/tapectrl.cpp:87
+#: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(playing)"
 msgstr "(spelar upp)"
 
-#: src/frontend/mame/ui/tapectrl.cpp:88
+#: src/frontend/mame/ui/tapectrl.cpp:89
 msgid "recording"
 msgstr "spelar in"
 
-#: src/frontend/mame/ui/tapectrl.cpp:88
+#: src/frontend/mame/ui/tapectrl.cpp:89
 msgid "(recording)"
 msgstr "(spelar in)"
 
-#: src/frontend/mame/ui/tapectrl.cpp:95
+#: src/frontend/mame/ui/tapectrl.cpp:96
 msgid "Pause/Stop"
 msgstr "Paus/Stopp"
 
-#: src/frontend/mame/ui/tapectrl.cpp:98
+#: src/frontend/mame/ui/tapectrl.cpp:99
 msgid "Play"
 msgstr "Spela"
 
-#: src/frontend/mame/ui/tapectrl.cpp:101
+#: src/frontend/mame/ui/tapectrl.cpp:102
 msgid "Record"
 msgstr "Spela in"
 
-#: src/frontend/mame/ui/tapectrl.cpp:104
+#: src/frontend/mame/ui/tapectrl.cpp:105
 msgid "Rewind"
 msgstr "Spola tillbaka"
 
-#: src/frontend/mame/ui/tapectrl.cpp:107
+#: src/frontend/mame/ui/tapectrl.cpp:108
 msgid "Fast Forward"
 msgstr "Snabbspola framåt"
 
@@ -1735,7 +1760,7 @@ msgid ""
 "Please acquire the correct files or select a different one."
 msgstr ""
 
-#: src/frontend/mame/ui/simpleselgame.cpp:150
+#: src/frontend/mame/ui/simpleselgame.cpp:147
 msgid ""
 "The selected game is missing one or more required ROM or CHD images. Please "
 "select a different game.\n"
@@ -1747,7 +1772,17 @@ msgstr ""
 "\n"
 "Tryck på valfri tangent för att fortsätta."
 
-#: src/frontend/mame/ui/simpleselgame.cpp:249
+#: src/frontend/mame/ui/simpleselgame.cpp:273
+#: src/frontend/mame/ui/selgame.cpp:443
+msgid "Configure Options"
+msgstr "Konfigurationsalternativ"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:274
+#: src/frontend/mame/ui/selmenu.cpp:1280
+msgid "Exit"
+msgstr "Hoppa ur"
+
+#: src/frontend/mame/ui/simpleselgame.cpp:299
 #, c-format
 msgid ""
 "No machines found. Please check the rompath specified in the %1$s.ini file.\n"
@@ -1760,92 +1795,81 @@ msgstr ""
 "Om det här är första gången du använder %2$s, läs config.txt filen i docs "
 "katalogen för information hur man konfigurerar %2$s."
 
-#: src/frontend/mame/ui/simpleselgame.cpp:283
-#: src/frontend/mame/ui/selgame.cpp:439
-msgid "Configure Options"
-msgstr "Konfigurationsalternativ"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:284
-#: src/frontend/mame/ui/selmenu.cpp:1288
-msgid "Exit"
-msgstr "Hoppa ur"
-
-#: src/frontend/mame/ui/simpleselgame.cpp:309
+#: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "Type name or select: %1$s_"
 msgstr "Knappa in namn eller välj; %1$s_"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:311
+#: src/frontend/mame/ui/simpleselgame.cpp:317
 msgid "Type name or select: (random)"
 msgstr "Knappa in namn eller välj: (slumpmässig)"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:325
+#: src/frontend/mame/ui/simpleselgame.cpp:331
 #, c-format
 msgid "%1$-.100s"
 msgstr "%1$-.100s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:328
-#: src/frontend/mame/ui/selmenu.cpp:678 src/frontend/mame/ui/selmenu.cpp:709
+#: src/frontend/mame/ui/simpleselgame.cpp:334
 #, c-format
 msgid "%1$s, %2$-.100s"
 msgstr "%1$s, %2$-.100s"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:331
+#: src/frontend/mame/ui/simpleselgame.cpp:337
 #, c-format
-msgid "Driver: %1$-.100s"
+msgid "Driver: %1$s"
 msgstr ""
 
-#: src/frontend/mame/ui/simpleselgame.cpp:347
-#: src/frontend/mame/ui/selmenu.cpp:724
+#: src/frontend/mame/ui/simpleselgame.cpp:353
+#: src/frontend/mame/ui/selmenu.cpp:723
 msgid "Overall: NOT WORKING"
 msgstr "Status: FUNGERAR EJ"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:349
-#: src/frontend/mame/ui/selmenu.cpp:726
+#: src/frontend/mame/ui/simpleselgame.cpp:355
+#: src/frontend/mame/ui/selmenu.cpp:725
 msgid "Overall: Unemulated Protection"
 msgstr "Status: Oemulerad skyddsmekanism"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:351
-#: src/frontend/mame/ui/selmenu.cpp:728
+#: src/frontend/mame/ui/simpleselgame.cpp:357
+#: src/frontend/mame/ui/selmenu.cpp:727
 msgid "Overall: Working"
 msgstr "Status: Fungerar"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:355
-#: src/frontend/mame/ui/selmenu.cpp:732
+#: src/frontend/mame/ui/simpleselgame.cpp:361
+#: src/frontend/mame/ui/selmenu.cpp:731
 msgid "Graphics: Unimplemented, "
 msgstr "Grafik: Ej implementerad, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:357
-#: src/frontend/mame/ui/selmenu.cpp:734
+#: src/frontend/mame/ui/simpleselgame.cpp:363
+#: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Graphics: Imperfect, "
 msgstr "Grafik: Bristfällig, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:359
-#: src/frontend/mame/ui/selmenu.cpp:736
+#: src/frontend/mame/ui/simpleselgame.cpp:365
+#: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Graphics: OK, "
 msgstr "Grafik: OK, "
 
-#: src/frontend/mame/ui/simpleselgame.cpp:362
-#: src/frontend/mame/ui/selmenu.cpp:739
+#: src/frontend/mame/ui/simpleselgame.cpp:368
+#: src/frontend/mame/ui/selmenu.cpp:738
 msgid "Sound: None"
 msgstr "Ljud: Inget"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:364
-#: src/frontend/mame/ui/selmenu.cpp:741
+#: src/frontend/mame/ui/simpleselgame.cpp:370
+#: src/frontend/mame/ui/selmenu.cpp:740
 msgid "Sound: Unimplemented"
 msgstr "Ljud: Ej implementerat"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:366
-#: src/frontend/mame/ui/selmenu.cpp:743
+#: src/frontend/mame/ui/simpleselgame.cpp:372
+#: src/frontend/mame/ui/selmenu.cpp:742
 msgid "Sound: Imperfect"
 msgstr "Ljud: Bristfälligt"
 
-#: src/frontend/mame/ui/simpleselgame.cpp:368
-#: src/frontend/mame/ui/selmenu.cpp:745
+#: src/frontend/mame/ui/simpleselgame.cpp:374
+#: src/frontend/mame/ui/selmenu.cpp:744
 msgid "Sound: OK"
 msgstr "Ljud: OK"
 
-#: src/frontend/mame/ui/cheatopt.cpp:87 plugins/cheat/init.lua:751
+#: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:749
 #, c-format, lua-format
 msgid ""
 "Cheat Comment:\n"
@@ -1854,15 +1878,15 @@ msgstr ""
 "Fusk Kommentar:\n"
 "%s"
 
-#: src/frontend/mame/ui/cheatopt.cpp:100
+#: src/frontend/mame/ui/cheatopt.cpp:95
 msgid "All cheats reloaded"
 msgstr "Alla fusk uppdaterade"
 
-#: src/frontend/mame/ui/cheatopt.cpp:140 plugins/cheat/init.lua:698
+#: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:696
 msgid "Reset All"
 msgstr "Återställ Alla"
 
-#: src/frontend/mame/ui/cheatopt.cpp:143 plugins/cheat/init.lua:699
+#: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:697
 msgid "Reload All"
 msgstr "Ladda Om Alla"
 
@@ -2021,42 +2045,42 @@ msgctxt "path-option"
 msgid "Covers"
 msgstr "Omslagsbilder"
 
-#: src/frontend/mame/ui/dirmenu.cpp:121
+#: src/frontend/mame/ui/dirmenu.cpp:119
 msgid "Folders Setup"
 msgstr "Katalogkonfiguration"
 
-#: src/frontend/mame/ui/dirmenu.cpp:172
+#: src/frontend/mame/ui/dirmenu.cpp:169
 #, c-format
 msgid "Current %1$s Folders"
 msgstr "Nuvarande %1$s Kataloger"
 
-#: src/frontend/mame/ui/dirmenu.cpp:184
+#: src/frontend/mame/ui/dirmenu.cpp:181
 msgid "Change Folder"
 msgstr "Ändra Katalog"
 
-#: src/frontend/mame/ui/dirmenu.cpp:184
+#: src/frontend/mame/ui/dirmenu.cpp:181
 msgid "Add Folder"
 msgstr "Lägg Till Katalog"
 
-#: src/frontend/mame/ui/dirmenu.cpp:187
+#: src/frontend/mame/ui/dirmenu.cpp:184
 msgid "Remove Folder"
 msgstr "Tabort Katalog"
 
-#: src/frontend/mame/ui/dirmenu.cpp:422
+#: src/frontend/mame/ui/dirmenu.cpp:417
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
 msgstr "Ändra %1$s Katalog - Sök: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:422
+#: src/frontend/mame/ui/dirmenu.cpp:417
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
 msgstr "Lägg till %1$s Katalog - Sök: %2$s_"
 
-#: src/frontend/mame/ui/dirmenu.cpp:433
+#: src/frontend/mame/ui/dirmenu.cpp:428
 msgid "Press TAB to set"
 msgstr "Tryck TAB för att välja"
 
-#: src/frontend/mame/ui/dirmenu.cpp:517
+#: src/frontend/mame/ui/dirmenu.cpp:511
 #, c-format
 msgid "Remove %1$s Folder"
 msgstr "Tabort %1$s Katalog"
@@ -2083,35 +2107,35 @@ msgstr ""
 msgid "Expand to fit"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:440
+#: src/frontend/mame/ui/selgame.cpp:444
 msgid "Configure Machine"
 msgstr "Maskinkonfiguration"
 
-#: src/frontend/mame/ui/selgame.cpp:1056
+#: src/frontend/mame/ui/selgame.cpp:1060
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d maskiner (%5$d BIOS) )"
 
-#: src/frontend/mame/ui/selgame.cpp:1084
+#: src/frontend/mame/ui/selgame.cpp:1088
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "System: %1$-.100s"
 
-#: src/frontend/mame/ui/selector.cpp:118
+#: src/frontend/mame/ui/selector.cpp:116
 msgid "Selection List - Search: "
 msgstr "Urvalslista - Sök: "
 
-#: src/frontend/mame/ui/selector.cpp:126
+#: src/frontend/mame/ui/selector.cpp:124
 #, c-format
 msgid "Double-click or press %1$s to select"
 msgstr "Dubbelklicka eller tryck %1$s för att välja"
 
-#: src/frontend/mame/ui/auditmenu.cpp:59
+#: src/frontend/mame/ui/auditmenu.cpp:60
 #, c-format
 msgid "Results will be saved to %1$s"
 msgstr "Resultat kommer att sparas som %1$s"
 
-#: src/frontend/mame/ui/auditmenu.cpp:97
+#: src/frontend/mame/ui/auditmenu.cpp:98
 #, c-format
 msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
@@ -2120,7 +2144,7 @@ msgstr ""
 "Granskning av ROMs för maskin %2$u av %3$u...\n"
 "%1$s"
 
-#: src/frontend/mame/ui/auditmenu.cpp:115
+#: src/frontend/mame/ui/auditmenu.cpp:116
 #, c-format
 msgid ""
 "Cancel audit?\n"
@@ -2129,12 +2153,12 @@ msgid ""
 "Press %2$s to continue"
 msgstr ""
 
-#: src/frontend/mame/ui/auditmenu.cpp:135
+#: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable"
 msgstr ""
 
-#: src/frontend/mame/ui/auditmenu.cpp:136
+#: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit ROMs for all %1$u machines"
 msgstr ""
@@ -2160,280 +2184,293 @@ msgstr "Göm Info/Bild"
 msgid "Hide Both"
 msgstr "Göm Båda"
 
-#: src/frontend/mame/ui/custui.cpp:176
+#: src/frontend/mame/ui/custui.cpp:175
 msgid "Fonts"
 msgstr "Typsnitt"
 
-#: src/frontend/mame/ui/custui.cpp:177
+#: src/frontend/mame/ui/custui.cpp:176
 msgid "Colors"
 msgstr "Färger"
 
-#: src/frontend/mame/ui/custui.cpp:180
+#: src/frontend/mame/ui/custui.cpp:179
 msgid "Language"
 msgstr "Språk"
 
-#: src/frontend/mame/ui/custui.cpp:183
+#: src/frontend/mame/ui/custui.cpp:182
 msgid "System Names"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:186
+#: src/frontend/mame/ui/custui.cpp:185
 msgid "Show side panels"
 msgstr "Visa sidopaneler"
 
-#: src/frontend/mame/ui/custui.cpp:198
+#: src/frontend/mame/ui/custui.cpp:197
 msgid "UI Customization Settings"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:212 src/frontend/mame/ui/custui.cpp:256
+#: src/frontend/mame/ui/custui.cpp:211 src/frontend/mame/ui/custui.cpp:255
 msgid "[built-in]"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:338
+#: src/frontend/mame/ui/custui.cpp:339
 msgid "default"
 msgstr "standard"
 
-#: src/frontend/mame/ui/custui.cpp:459
+#: src/frontend/mame/ui/custui.cpp:458
 msgid "UI Font"
 msgstr "UI Typsnitt"
 
-#: src/frontend/mame/ui/custui.cpp:464
+#: src/frontend/mame/ui/custui.cpp:463
 msgid "Bold"
 msgstr "Fet"
 
-#: src/frontend/mame/ui/custui.cpp:465
+#: src/frontend/mame/ui/custui.cpp:464
 msgid "Italic"
 msgstr "Kursiv"
 
-#: src/frontend/mame/ui/custui.cpp:470
+#: src/frontend/mame/ui/custui.cpp:469
 msgid "Lines"
 msgstr "Linjer"
 
-#: src/frontend/mame/ui/custui.cpp:476
+#: src/frontend/mame/ui/custui.cpp:475
 msgid "Infos text size"
 msgstr "Info Textstorlek"
 
-#: src/frontend/mame/ui/custui.cpp:490
+#: src/frontend/mame/ui/custui.cpp:489
 msgid "UI Fonts Settings"
 msgstr "UI Typsnitts Inställningar"
 
-#: src/frontend/mame/ui/custui.cpp:499
+#: src/frontend/mame/ui/custui.cpp:498
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr "Provtext - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-#: src/frontend/mame/ui/custui.cpp:582
+#: src/frontend/mame/ui/custui.cpp:581
 msgctxt "color-option"
 msgid "Normal text"
 msgstr "Normal text"
 
-#: src/frontend/mame/ui/custui.cpp:583
+#: src/frontend/mame/ui/custui.cpp:582
 msgctxt "color-option"
 msgid "Selected color"
 msgstr "Vald färg"
 
-#: src/frontend/mame/ui/custui.cpp:584
+#: src/frontend/mame/ui/custui.cpp:583
 msgctxt "color-option"
 msgid "Normal text background"
 msgstr "Normal textbakgrund"
 
-#: src/frontend/mame/ui/custui.cpp:585
+#: src/frontend/mame/ui/custui.cpp:584
 msgctxt "color-option"
 msgid "Selected background color"
 msgstr "Vald backgrundsfärg"
 
-#: src/frontend/mame/ui/custui.cpp:586
+#: src/frontend/mame/ui/custui.cpp:585
 msgctxt "color-option"
 msgid "Subitem color"
 msgstr "Delpost färg"
 
-#: src/frontend/mame/ui/custui.cpp:587
+#: src/frontend/mame/ui/custui.cpp:586
 msgctxt "color-option"
 msgid "Clone"
 msgstr "Klon"
 
-#: src/frontend/mame/ui/custui.cpp:588
+#: src/frontend/mame/ui/custui.cpp:587
 msgctxt "color-option"
 msgid "Border"
 msgstr "Kant"
 
-#: src/frontend/mame/ui/custui.cpp:589
+#: src/frontend/mame/ui/custui.cpp:588
 msgctxt "color-option"
 msgid "Background"
 msgstr "Bakgrund"
 
-#: src/frontend/mame/ui/custui.cpp:590
+#: src/frontend/mame/ui/custui.cpp:589
 msgctxt "color-option"
 msgid "DIP switch"
 msgstr "DIP switch"
 
-#: src/frontend/mame/ui/custui.cpp:591
+#: src/frontend/mame/ui/custui.cpp:590
 msgctxt "color-option"
 msgid "Unavailable color"
 msgstr "Ej tillgänglig färg"
 
-#: src/frontend/mame/ui/custui.cpp:592
+#: src/frontend/mame/ui/custui.cpp:591
 msgctxt "color-option"
 msgid "Slider color"
 msgstr "Reglage färg"
 
-#: src/frontend/mame/ui/custui.cpp:593
+#: src/frontend/mame/ui/custui.cpp:592
 msgctxt "color-option"
 msgid "Graphics viewer background"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:594
+#: src/frontend/mame/ui/custui.cpp:593
 msgctxt "color-option"
 msgid "Mouse over color"
 msgstr "Mouse over färg"
 
-#: src/frontend/mame/ui/custui.cpp:595
+#: src/frontend/mame/ui/custui.cpp:594
 msgctxt "color-option"
 msgid "Mouse over background color"
 msgstr "Mouse over bakgrunds färg"
 
-#: src/frontend/mame/ui/custui.cpp:596
+#: src/frontend/mame/ui/custui.cpp:595
 msgctxt "color-option"
 msgid "Mouse down color"
 msgstr "Mouse down färg"
 
-#: src/frontend/mame/ui/custui.cpp:597
+#: src/frontend/mame/ui/custui.cpp:596
 msgctxt "color-option"
 msgid "Mouse down background color"
 msgstr "Mouse down bakgrundsfärg"
 
-#: src/frontend/mame/ui/custui.cpp:600
+#: src/frontend/mame/ui/custui.cpp:599
 msgid "Restore default colors"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:612
+#: src/frontend/mame/ui/custui.cpp:611
 msgid "UI Color Settings"
 msgstr "UI färginställningar"
 
-#: src/frontend/mame/ui/custui.cpp:621
+#: src/frontend/mame/ui/custui.cpp:620
 #, c-format
 msgid "Double-click or press %1$s to change color"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:629
+#: src/frontend/mame/ui/custui.cpp:628
 msgid "Menu Preview"
 msgstr "Förhandsvisning Meny"
 
-#: src/frontend/mame/ui/custui.cpp:643
+#: src/frontend/mame/ui/custui.cpp:642
 msgctxt "color-sample"
 msgid "Normal"
 msgstr "Normal"
 
-#: src/frontend/mame/ui/custui.cpp:644
+#: src/frontend/mame/ui/custui.cpp:643
 msgctxt "color-sample"
 msgid "Subitem"
 msgstr "Delpost"
 
-#: src/frontend/mame/ui/custui.cpp:645
+#: src/frontend/mame/ui/custui.cpp:644
 msgctxt "color-sample"
 msgid "Selected"
 msgstr "Vald"
 
-#: src/frontend/mame/ui/custui.cpp:646
+#: src/frontend/mame/ui/custui.cpp:645
 msgctxt "color-sample"
 msgid "Mouse Over"
 msgstr "Mouse Over"
 
-#: src/frontend/mame/ui/custui.cpp:647
+#: src/frontend/mame/ui/custui.cpp:646
 msgctxt "color-sample"
 msgid "Clone"
 msgstr "Klon"
 
-#: src/frontend/mame/ui/custui.cpp:875
+#: src/frontend/mame/ui/custui.cpp:868
 msgid "ARGB Settings"
 msgstr "ARGB inställningar"
 
-#: src/frontend/mame/ui/custui.cpp:880 src/frontend/mame/ui/custui.cpp:883
+#: src/frontend/mame/ui/custui.cpp:873 src/frontend/mame/ui/custui.cpp:876
 msgctxt "color-channel"
 msgid "Alpha"
 msgstr "Alfa"
 
-#: src/frontend/mame/ui/custui.cpp:888 src/frontend/mame/ui/custui.cpp:891
+#: src/frontend/mame/ui/custui.cpp:881 src/frontend/mame/ui/custui.cpp:884
 msgctxt "color-channel"
 msgid "Red"
 msgstr "Röd"
 
-#: src/frontend/mame/ui/custui.cpp:896 src/frontend/mame/ui/custui.cpp:899
+#: src/frontend/mame/ui/custui.cpp:889 src/frontend/mame/ui/custui.cpp:892
 msgctxt "color-channel"
 msgid "Green"
 msgstr "Grön"
 
-#: src/frontend/mame/ui/custui.cpp:904 src/frontend/mame/ui/custui.cpp:907
+#: src/frontend/mame/ui/custui.cpp:897 src/frontend/mame/ui/custui.cpp:900
 msgctxt "color-channel"
 msgid "Blue"
 msgstr "Blå"
 
-#: src/frontend/mame/ui/custui.cpp:910
+#: src/frontend/mame/ui/custui.cpp:903
 msgid "Choose from palette"
 msgstr "Välj från palette"
 
-#: src/frontend/mame/ui/custui.cpp:957
+#: src/frontend/mame/ui/custui.cpp:950
 msgid "Color preview:"
 msgstr "Förhandsvisning Färg:"
 
-#: src/frontend/mame/ui/custui.cpp:1049
+#: src/frontend/mame/ui/custui.cpp:1043
 msgctxt "color-preset"
 msgid "White"
 msgstr "Vit"
 
-#: src/frontend/mame/ui/custui.cpp:1050
+#: src/frontend/mame/ui/custui.cpp:1044
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "Silver"
 
-#: src/frontend/mame/ui/custui.cpp:1051
+#: src/frontend/mame/ui/custui.cpp:1045
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "Grå"
 
-#: src/frontend/mame/ui/custui.cpp:1052
+#: src/frontend/mame/ui/custui.cpp:1046
 msgctxt "color-preset"
 msgid "Black"
 msgstr "Svart"
 
-#: src/frontend/mame/ui/custui.cpp:1053
+#: src/frontend/mame/ui/custui.cpp:1047
 msgctxt "color-preset"
 msgid "Red"
 msgstr "Röd"
 
-#: src/frontend/mame/ui/custui.cpp:1054
+#: src/frontend/mame/ui/custui.cpp:1048
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "Orange"
 
-#: src/frontend/mame/ui/custui.cpp:1055
+#: src/frontend/mame/ui/custui.cpp:1049
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Gul"
 
-#: src/frontend/mame/ui/custui.cpp:1056
+#: src/frontend/mame/ui/custui.cpp:1050
 msgctxt "color-preset"
 msgid "Green"
 msgstr "Grön"
 
-#: src/frontend/mame/ui/custui.cpp:1057
+#: src/frontend/mame/ui/custui.cpp:1051
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "Blå"
 
-#: src/frontend/mame/ui/custui.cpp:1058
+#: src/frontend/mame/ui/custui.cpp:1052
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "Lila"
 
-#: src/frontend/mame/ui/about.cpp:60 src/frontend/mame/ui/selmenu.cpp:755
+#: src/frontend/mame/ui/about.cpp:42
 #, c-format
-msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
+msgctxt "about-header"
+msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
+msgstr ""
 
-#: src/frontend/mame/ui/barcode.cpp:74
+#: src/frontend/mame/ui/about.cpp:44
+#, c-format
+msgctxt "about-header"
+msgid "%1$s %2$s (%3$s%4$sP%5$s)"
+msgstr ""
+
+#: src/frontend/mame/ui/about.cpp:51
+#, c-format
+msgctxt "about-header"
+msgid "Revision: %1$s"
+msgstr "Revision: %1$s"
+
+#: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
 msgstr "Ny streckkod"
 
-#: src/frontend/mame/ui/barcode.cpp:77
+#: src/frontend/mame/ui/barcode.cpp:80
 msgid "Enter Code"
 msgstr "Ange kod"
 
@@ -2441,100 +2478,100 @@ msgstr "Ange kod"
 msgid "Barcode length invalid!"
 msgstr "Streckkodens längd är felaktig!"
 
-#: src/frontend/mame/ui/mainmenu.cpp:98
+#: src/frontend/mame/ui/mainmenu.cpp:119
 msgid "Input (general)"
 msgstr "Input (generell)"
 
-#: src/frontend/mame/ui/mainmenu.cpp:100
+#: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Input (this Machine)"
 msgstr "Input (denna Maskin)"
 
-#: src/frontend/mame/ui/mainmenu.cpp:103
+#: src/frontend/mame/ui/mainmenu.cpp:124
 msgid "Analog Controls"
 msgstr "Analog Kontroller"
 
-#: src/frontend/mame/ui/mainmenu.cpp:105
+#: src/frontend/mame/ui/mainmenu.cpp:126
 msgid "DIP Switches"
 msgstr "DIP Switchar"
 
-#: src/frontend/mame/ui/mainmenu.cpp:107
+#: src/frontend/mame/ui/mainmenu.cpp:128
 msgid "Machine Configuration"
 msgstr "Maskin Konfiguration"
 
-#: src/frontend/mame/ui/mainmenu.cpp:109
+#: src/frontend/mame/ui/mainmenu.cpp:130
 msgid "Bookkeeping Info"
 msgstr "Bokföringsstatus"
 
-#: src/frontend/mame/ui/mainmenu.cpp:111
+#: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Machine Information"
 msgstr "Maskininformation"
 
-#: src/frontend/mame/ui/mainmenu.cpp:114
+#: src/frontend/mame/ui/mainmenu.cpp:135
 msgid "Warning Information"
 msgstr ""
 
-#: src/frontend/mame/ui/mainmenu.cpp:120
+#: src/frontend/mame/ui/mainmenu.cpp:141
 msgid "Image Information"
 msgstr "Avbildningsinformation"
 
-#: src/frontend/mame/ui/mainmenu.cpp:122
+#: src/frontend/mame/ui/mainmenu.cpp:143
 msgid "File Manager"
 msgstr "Filhanterare"
 
-#: src/frontend/mame/ui/mainmenu.cpp:129
+#: src/frontend/mame/ui/mainmenu.cpp:150
 msgid "Tape Control"
 msgstr "Bandkontroll"
 
-#: src/frontend/mame/ui/mainmenu.cpp:135
+#: src/frontend/mame/ui/mainmenu.cpp:156
 msgid "BIOS Selection"
 msgstr "BIOS val"
 
-#: src/frontend/mame/ui/mainmenu.cpp:138
+#: src/frontend/mame/ui/mainmenu.cpp:159
 msgid "Slot Devices"
 msgstr "Slitsenheter"
 
-#: src/frontend/mame/ui/mainmenu.cpp:141
+#: src/frontend/mame/ui/mainmenu.cpp:162
 msgid "Barcode Reader"
 msgstr "Streckkodsläsare"
 
-#: src/frontend/mame/ui/mainmenu.cpp:144
+#: src/frontend/mame/ui/mainmenu.cpp:165
 msgid "Network Devices"
 msgstr "Nätverksenheter"
 
-#: src/frontend/mame/ui/mainmenu.cpp:149
+#: src/frontend/mame/ui/mainmenu.cpp:170
 msgid "Slider Controls"
 msgstr "Reglage Kontroller"
 
-#: src/frontend/mame/ui/mainmenu.cpp:154
+#: src/frontend/mame/ui/mainmenu.cpp:175
 msgid "Crosshair Options"
 msgstr "Hårkorsalternativ"
 
-#: src/frontend/mame/ui/mainmenu.cpp:157 plugins/cheat/init.lua:799
+#: src/frontend/mame/ui/mainmenu.cpp:178 plugins/cheat/init.lua:797
 msgid "Cheat"
 msgstr "Fusk"
 
-#: src/frontend/mame/ui/mainmenu.cpp:160
+#: src/frontend/mame/ui/mainmenu.cpp:183
 msgid "Plugin Options"
 msgstr "Pluginalternativ"
 
-#: src/frontend/mame/ui/mainmenu.cpp:163
+#: src/frontend/mame/ui/mainmenu.cpp:186
 msgid "External DAT View"
 msgstr "Extern DAT vy"
 
-#: src/frontend/mame/ui/mainmenu.cpp:174
+#: src/frontend/mame/ui/mainmenu.cpp:198
 #, c-format
 msgid "About %s"
 msgstr ""
 
-#: src/frontend/mame/ui/mainmenu.cpp:182
+#: src/frontend/mame/ui/mainmenu.cpp:206
 msgid "Start Machine"
 msgstr ""
 
-#: src/frontend/mame/ui/mainmenu.cpp:186
+#: src/frontend/mame/ui/mainmenu.cpp:210
 msgid "Select New Machine"
 msgstr "Välj Ny Maskin"
 
-#: src/frontend/mame/ui/mainmenu.cpp:187
+#: src/frontend/mame/ui/mainmenu.cpp:211
 msgid "Return to Machine"
 msgstr "Tillbaka till Emuleringen"
 
@@ -2639,419 +2676,425 @@ msgstr ""
 msgid "Show DATs view"
 msgstr "Visa DATs vy"
 
-#: src/frontend/mame/ui/selmenu.cpp:320
+#: src/frontend/mame/ui/selmenu.cpp:319
 msgid "Software part selection:"
 msgstr "Val av mjukvarudel:"
 
-#: src/frontend/mame/ui/selmenu.cpp:426
+#: src/frontend/mame/ui/selmenu.cpp:424
 msgid "BIOS selection:"
 msgstr "BIOS val:"
 
-#: src/frontend/mame/ui/selmenu.cpp:682
+#: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
 #, c-format
-msgid "Software is clone of: %1$-.100s"
-msgstr "Mjukvaran är klonad från: %1$-.100s"
+msgid "%1$s, %2$s"
+msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:684
+#: src/frontend/mame/ui/selmenu.cpp:681
+#, c-format
+msgid "Software is clone of: %1$s"
+msgstr "Mjukvaran är klonad från: %1$s"
+
+#: src/frontend/mame/ui/selmenu.cpp:683
 msgid "Software is parent"
 msgstr "Mjukvaran har kloner"
 
-#: src/frontend/mame/ui/selmenu.cpp:689
+#: src/frontend/mame/ui/selmenu.cpp:688
 msgid "Supported: No"
 msgstr "Stöd: Nej"
 
-#: src/frontend/mame/ui/selmenu.cpp:694
+#: src/frontend/mame/ui/selmenu.cpp:693
 msgid "Supported: Partial"
 msgstr "Stöd: Delvis"
 
-#: src/frontend/mame/ui/selmenu.cpp:699
+#: src/frontend/mame/ui/selmenu.cpp:698
 msgid "Supported: Yes"
 msgstr "Stöd: Ja"
 
-#: src/frontend/mame/ui/selmenu.cpp:715
+#: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Driver is parent"
 msgstr "Drivrutinen har kloner"
 
-#: src/frontend/mame/ui/selmenu.cpp:717 src/frontend/mame/ui/selmenu.cpp:719
+#: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
 #, c-format
-msgid "Driver is clone of: %1$-.100s"
-msgstr "Drivrutinen är klon av: %1$-.100s"
+msgid "Driver is clone of: %1$s"
+msgstr "Drivrutinen är klon av: %1$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:1288
-msgid "Return to previous menu"
-msgstr ""
+#: src/frontend/mame/ui/selmenu.cpp:754
+#, c-format
+msgid "%1$s %2$s"
+msgstr "%1$s %2$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:2246
+#: src/frontend/mame/ui/selmenu.cpp:2229
 msgid "Images"
 msgstr "Bilder"
 
-#: src/frontend/mame/ui/selmenu.cpp:2247
+#: src/frontend/mame/ui/selmenu.cpp:2230
 msgid "Infos"
 msgstr "Information"
 
-#: src/frontend/mame/ui/selmenu.cpp:2562
+#: src/frontend/mame/ui/selmenu.cpp:2545
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2578
+#: src/frontend/mame/ui/selmenu.cpp:2561
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2594
+#: src/frontend/mame/ui/selmenu.cpp:2577
 msgid "incorrect checksum"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2597
+#: src/frontend/mame/ui/selmenu.cpp:2580
 msgid "incorrect length"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2600
+#: src/frontend/mame/ui/selmenu.cpp:2583
 msgid "not found"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2611
+#: src/frontend/mame/ui/selmenu.cpp:2594
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2613
+#: src/frontend/mame/ui/selmenu.cpp:2596
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2617
+#: src/frontend/mame/ui/selmenu.cpp:2600
 msgid "Press any key to continue."
 msgstr "Tryck på valfri tangent för att fortsätta."
 
-#: src/frontend/mame/ui/selmenu.cpp:2746
+#: src/frontend/mame/ui/selmenu.cpp:2729
 msgid "General Info"
 msgstr "Generell Information"
 
-#: src/frontend/mame/ui/selmenu.cpp:2898
+#: src/frontend/mame/ui/selmenu.cpp:2881
 #, c-format
 msgid "Romset\t%1$s\n"
 msgstr "Romdistribution\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2899
+#: src/frontend/mame/ui/selmenu.cpp:2882
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "År\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2900
+#: src/frontend/mame/ui/selmenu.cpp:2883
 #, c-format
 msgid "Manufacturer\t%1$s\n"
 msgstr "Tillverkare\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2907
+#: src/frontend/mame/ui/selmenu.cpp:2890
 #, c-format
 msgid "Driver is Clone of\t%1$s\n"
 msgstr "Drivrutinen är klon av\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2912
+#: src/frontend/mame/ui/selmenu.cpp:2895
 msgid "Driver is Parent\t\n"
 msgstr "Drivrutinen är oberoende\t\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2916
+#: src/frontend/mame/ui/selmenu.cpp:2899
 msgid "Analog Controls\tYes\n"
 msgstr "Analoga kontroller\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2918
+#: src/frontend/mame/ui/selmenu.cpp:2901
 msgid "Keyboard Inputs\tYes\n"
 msgstr "Tangentbord\tJa\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2921
+#: src/frontend/mame/ui/selmenu.cpp:2904
 msgid "Overall\tNOT WORKING\n"
 msgstr "Status\tFUNGERAR EJ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2923
+#: src/frontend/mame/ui/selmenu.cpp:2906
 msgid "Overall\tUnemulated Protection\n"
 msgstr "Status\tOemulerad skyddsmekanism\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2925
+#: src/frontend/mame/ui/selmenu.cpp:2908
 msgid "Overall\tWorking\n"
 msgstr "Status\tFungerar\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2928
+#: src/frontend/mame/ui/selmenu.cpp:2911
 msgid "Graphics\tUnimplemented\n"
 msgstr "Grafik\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2930
+#: src/frontend/mame/ui/selmenu.cpp:2913
 msgid "Graphics\tWrong Colors\n"
 msgstr "Grafik\tFel Färger\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2932
+#: src/frontend/mame/ui/selmenu.cpp:2915
 msgid "Graphics\tImperfect Colors\n"
 msgstr "Grafik\tBristfälliga färger\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2934
+#: src/frontend/mame/ui/selmenu.cpp:2917
 msgid "Graphics\tImperfect\n"
 msgstr "Grafik\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2936
+#: src/frontend/mame/ui/selmenu.cpp:2919
 msgid "Graphics\tOK\n"
 msgstr "Grafik\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2939
+#: src/frontend/mame/ui/selmenu.cpp:2922
 msgid "Sound\tNone\n"
 msgstr "Ljud\tInget\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2941
+#: src/frontend/mame/ui/selmenu.cpp:2924
 msgid "Sound\tUnimplemented\n"
 msgstr "Ljud\tEj implementerat\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2943
+#: src/frontend/mame/ui/selmenu.cpp:2926
 msgid "Sound\tImperfect\n"
 msgstr "Ljud\tBristfälligt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2945
+#: src/frontend/mame/ui/selmenu.cpp:2928
 msgid "Sound\tOK\n"
 msgstr "Ljud\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2948
+#: src/frontend/mame/ui/selmenu.cpp:2931
 msgid "Capture\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2950
+#: src/frontend/mame/ui/selmenu.cpp:2933
 msgid "Capture\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2953
+#: src/frontend/mame/ui/selmenu.cpp:2936
 msgid "Camera\tUnimplemented\n"
 msgstr "Kamera\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2955
+#: src/frontend/mame/ui/selmenu.cpp:2938
 msgid "Camera\tImperfect\n"
 msgstr "Kamera\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2958
+#: src/frontend/mame/ui/selmenu.cpp:2941
 msgid "Microphone\tUnimplemented\n"
 msgstr "Mikrofon\tEj implememterad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2960
+#: src/frontend/mame/ui/selmenu.cpp:2943
 msgid "Microphone\tImperfect\n"
 msgstr "Mikrofon\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2963
+#: src/frontend/mame/ui/selmenu.cpp:2946
 msgid "Controls\tUnimplemented\n"
 msgstr "Kontroller\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2965
+#: src/frontend/mame/ui/selmenu.cpp:2948
 msgid "Controls\tImperfect\n"
 msgstr "Kontroller\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2968
+#: src/frontend/mame/ui/selmenu.cpp:2951
 msgid "Keyboard\tUnimplemented\n"
 msgstr "Tangentbord\tEj implementerat\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2970
+#: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Keyboard\tImperfect\n"
 msgstr "Tangentbord\tBristfälligt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2973
+#: src/frontend/mame/ui/selmenu.cpp:2956
 msgid "Mouse\tUnimplemented\n"
 msgstr "Mus\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2975
+#: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Mouse\tImperfect\n"
 msgstr "Mus\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2978
+#: src/frontend/mame/ui/selmenu.cpp:2961
 msgid "Media\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2980
+#: src/frontend/mame/ui/selmenu.cpp:2963
 msgid "Media\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2983
+#: src/frontend/mame/ui/selmenu.cpp:2966
 msgid "Disk\tUnimplemented\n"
 msgstr "Disk\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2985
+#: src/frontend/mame/ui/selmenu.cpp:2968
 msgid "Disk\tImperfect\n"
 msgstr "Disk\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2988
+#: src/frontend/mame/ui/selmenu.cpp:2971
 msgid "Printer\tUnimplemented\n"
 msgstr "Printer\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2990
+#: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Printer\tImperfect\n"
 msgstr "Printer\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2993
+#: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2995
+#: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Mag. Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2998
+#: src/frontend/mame/ui/selmenu.cpp:2981
 msgid "Punch Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3000
+#: src/frontend/mame/ui/selmenu.cpp:2983
 msgid "Punch Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3003
+#: src/frontend/mame/ui/selmenu.cpp:2986
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3005
+#: src/frontend/mame/ui/selmenu.cpp:2988
 msgid "Mag. Drum\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3008
+#: src/frontend/mame/ui/selmenu.cpp:2991
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3010
+#: src/frontend/mame/ui/selmenu.cpp:2993
 msgid "(EP)ROM\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3013
+#: src/frontend/mame/ui/selmenu.cpp:2996
 msgid "Communications\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Communications\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3018
+#: src/frontend/mame/ui/selmenu.cpp:3001
 msgid "LAN\tUnimplemented\n"
 msgstr "LAN\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3020
+#: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "LAN\tImperfect\n"
 msgstr "LAN\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3023
+#: src/frontend/mame/ui/selmenu.cpp:3006
 msgid "WAN\tUnimplemented\n"
 msgstr "WAN\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3008
 msgid "WAN\tImperfect\n"
 msgstr "WAN\tBristfälligt\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3028
+#: src/frontend/mame/ui/selmenu.cpp:3011
 msgid "Timing\tUnimplemented\n"
 msgstr "Timing\tEj implementerad\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3030
+#: src/frontend/mame/ui/selmenu.cpp:3013
 msgid "Timing\tImperfect\n"
 msgstr "Timing\tBristfällig\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3032
+#: src/frontend/mame/ui/selmenu.cpp:3015
 msgid "Mechanical Machine\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3032
+#: src/frontend/mame/ui/selmenu.cpp:3015
 msgid "Mechanical Machine\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3033
+#: src/frontend/mame/ui/selmenu.cpp:3016
 msgid "Requires Artwork\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3033
+#: src/frontend/mame/ui/selmenu.cpp:3016
 msgid "Requires Artwork\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3034
+#: src/frontend/mame/ui/selmenu.cpp:3017
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3034
+#: src/frontend/mame/ui/selmenu.cpp:3017
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3036
+#: src/frontend/mame/ui/selmenu.cpp:3019
 msgid "Support Cocktail\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3037
+#: src/frontend/mame/ui/selmenu.cpp:3020
 msgid "Driver is BIOS\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3037
+#: src/frontend/mame/ui/selmenu.cpp:3020
 msgid "Driver is BIOS\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "Support Save\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "Support Save\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3039
+#: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Screen Orientation\tVertical\n"
 msgstr "Skärm Orientering\tVertikal\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3039
+#: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "Skärm Orientering\tHorisontal\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3049
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires CHD\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3049
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires CHD\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3062
+#: src/frontend/mame/ui/selmenu.cpp:3045
 msgid "ROM Audit Result\tOK\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3064
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "ROM Audit Result\tBAD\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3067
+#: src/frontend/mame/ui/selmenu.cpp:3050
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3069
+#: src/frontend/mame/ui/selmenu.cpp:3052
 msgid "Samples Audit Result\tOK\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3071
+#: src/frontend/mame/ui/selmenu.cpp:3054
 msgid "Samples Audit Result\tBAD\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3075
+#: src/frontend/mame/ui/selmenu.cpp:3058
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
 
-#: src/frontend/mame/ui/sndmenu.cpp:148
+#: src/frontend/mame/ui/sndmenu.cpp:150
 msgid "Sound"
 msgstr "Ljud"
 
-#: src/frontend/mame/ui/sndmenu.cpp:149
+#: src/frontend/mame/ui/sndmenu.cpp:151
 msgid "Compressor"
 msgstr ""
 
-#: src/frontend/mame/ui/sndmenu.cpp:150
+#: src/frontend/mame/ui/sndmenu.cpp:152
 msgid "Sample Rate"
 msgstr "Samplingshastighet"
 
-#: src/frontend/mame/ui/sndmenu.cpp:151
+#: src/frontend/mame/ui/sndmenu.cpp:153
 msgid "Use External Samples"
 msgstr "Använd Externa Samplingar"
 
-#: src/frontend/mame/ui/devopt.cpp:45
+#: src/frontend/mame/ui/devopt.cpp:57
 #, c-format
 msgid ""
 "[This option is currently mounted in the running system]\n"
@@ -3062,7 +3105,7 @@ msgid ""
 "The selected option enables the following items:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:46
+#: src/frontend/mame/ui/devopt.cpp:58
 #, c-format
 msgid ""
 "[This option is NOT currently mounted in the running system]\n"
@@ -3073,3478 +3116,3601 @@ msgid ""
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:54
+#: src/frontend/mame/ui/devopt.cpp:67
 msgid "* CPU:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:98
+#: src/frontend/mame/ui/devopt.cpp:113
 msgid "* Video:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:103
+#: src/frontend/mame/ui/devopt.cpp:118
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:116
+#: src/frontend/mame/ui/devopt.cpp:131
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:117
+#: src/frontend/mame/ui/devopt.cpp:132
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:130
+#: src/frontend/mame/ui/devopt.cpp:146
 msgid "* Sound:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:189
+#: src/frontend/mame/ui/devopt.cpp:210
 #, c-format
 msgid ""
 "* BIOS settings:\n"
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:229 src/frontend/mame/ui/devopt.cpp:245
-#: src/frontend/mame/ui/devopt.cpp:290
+#: src/frontend/mame/ui/devopt.cpp:254 src/frontend/mame/ui/devopt.cpp:270
+#: src/frontend/mame/ui/devopt.cpp:331
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:234 src/frontend/mame/ui/devopt.cpp:250
+#: src/frontend/mame/ui/devopt.cpp:259 src/frontend/mame/ui/devopt.cpp:275
 #, c-format
 msgid "  %1$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:255
+#: src/frontend/mame/ui/devopt.cpp:281
 msgid "* DIP switch settings:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:257
+#: src/frontend/mame/ui/devopt.cpp:286
 msgid "* Configuration settings:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:259
+#: src/frontend/mame/ui/devopt.cpp:290
 msgid "* Input device(s):\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:261
+#: src/frontend/mame/ui/devopt.cpp:292
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:263
+#: src/frontend/mame/ui/devopt.cpp:294
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:265
+#: src/frontend/mame/ui/devopt.cpp:296
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:267
+#: src/frontend/mame/ui/devopt.cpp:298
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:269
+#: src/frontend/mame/ui/devopt.cpp:300
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:271
+#: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:273
+#: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:275
+#: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:280
+#: src/frontend/mame/ui/devopt.cpp:311
 msgid "* Media Options:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:282
+#: src/frontend/mame/ui/devopt.cpp:316
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:288
+#: src/frontend/mame/ui/devopt.cpp:326
 msgid "* Slot Options:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:295
+#: src/frontend/mame/ui/devopt.cpp:340
 msgid "[None]\n"
 msgstr ""
 
-#: src/emu/inpttype.ipp:26
+#: src/emu/render.cpp:1847
+#, c-format
+msgctxt "view-name"
+msgid "Screen %1$u Standard (%2$u:%3$u)"
+msgstr ""
+
+#: src/emu/render.cpp:1873
+#, c-format
+msgctxt "view-name"
+msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
+msgstr ""
+
+#: src/emu/render.cpp:1895 src/emu/render.cpp:2030
+msgctxt "view-name"
+msgid "Cocktail"
+msgstr ""
+
+#: src/emu/render.cpp:2015
+msgctxt "view-name"
+msgid "Left-to-Right"
+msgstr ""
+
+#: src/emu/render.cpp:2016
+msgctxt "view-name"
+msgid "Left-to-Right (Gapless)"
+msgstr ""
+
+#: src/emu/render.cpp:2017
+msgctxt "view-name"
+msgid "Top-to-Bottom"
+msgstr ""
+
+#: src/emu/render.cpp:2018
+msgctxt "view-name"
+msgid "Top-to-Bottom (Gapless)"
+msgstr ""
+
+#: src/emu/render.cpp:2069
+#, c-format
+msgctxt "view-name"
+msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
+msgstr ""
+
+#: src/emu/render.cpp:2078
+#, c-format
+msgctxt "view-name"
+msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
+msgstr ""
+
+#: src/emu/render.cpp:2087
+#, c-format
+msgctxt "view-name"
+msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
+msgstr ""
+
+#: src/emu/render.cpp:2096
+#, c-format
+msgctxt "view-name"
+msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
+msgstr ""
+
+#: src/emu/inpttype.ipp:22
 msgctxt "input-name"
 msgid "P1 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:27
+#: src/emu/inpttype.ipp:23
 msgctxt "input-name"
 msgid "P1 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:28
+#: src/emu/inpttype.ipp:24
 msgctxt "input-name"
 msgid "P1 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:29
+#: src/emu/inpttype.ipp:25
 msgctxt "input-name"
 msgid "P1 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:30
+#: src/emu/inpttype.ipp:26
 msgctxt "input-name"
 msgid "P1 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:31
+#: src/emu/inpttype.ipp:27
 msgctxt "input-name"
 msgid "P1 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:32
+#: src/emu/inpttype.ipp:28
 msgctxt "input-name"
 msgid "P1 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:33
+#: src/emu/inpttype.ipp:29
 msgctxt "input-name"
 msgid "P1 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:34
+#: src/emu/inpttype.ipp:30
 msgctxt "input-name"
 msgid "P1 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:35
+#: src/emu/inpttype.ipp:31
 msgctxt "input-name"
 msgid "P1 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:36
+#: src/emu/inpttype.ipp:32
 msgctxt "input-name"
 msgid "P1 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:37
+#: src/emu/inpttype.ipp:33
 msgctxt "input-name"
 msgid "P1 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:38
+#: src/emu/inpttype.ipp:34
 msgctxt "input-name"
 msgid "P1 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:39
+#: src/emu/inpttype.ipp:35
 msgctxt "input-name"
 msgid "P1 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:40
+#: src/emu/inpttype.ipp:36
 msgctxt "input-name"
 msgid "P1 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:41
+#: src/emu/inpttype.ipp:37
 msgctxt "input-name"
 msgid "P1 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:42
+#: src/emu/inpttype.ipp:38
 msgctxt "input-name"
 msgid "P1 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:43
+#: src/emu/inpttype.ipp:39
 msgctxt "input-name"
 msgid "P1 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:44
+#: src/emu/inpttype.ipp:40
 msgctxt "input-name"
 msgid "P1 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:45
+#: src/emu/inpttype.ipp:41
 msgctxt "input-name"
 msgid "P1 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:46
+#: src/emu/inpttype.ipp:42
 msgctxt "input-name"
 msgid "P1 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:47
+#: src/emu/inpttype.ipp:43
 msgctxt "input-name"
 msgid "P1 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:48
+#: src/emu/inpttype.ipp:44
 msgctxt "input-name"
 msgid "P1 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:49
+#: src/emu/inpttype.ipp:45
 msgctxt "input-name"
 msgid "P1 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:50
+#: src/emu/inpttype.ipp:46
 msgctxt "input-name"
 msgid "P1 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:51
+#: src/emu/inpttype.ipp:47
 msgctxt "input-name"
 msgid "P1 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:52
+#: src/emu/inpttype.ipp:48
 msgctxt "input-name"
 msgid "P1 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:53
+#: src/emu/inpttype.ipp:49
 msgctxt "input-name"
 msgid "P1 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:54
+#: src/emu/inpttype.ipp:50
 msgctxt "input-name"
 msgid "P1 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:55
+#: src/emu/inpttype.ipp:51
 msgctxt "input-name"
 msgid "P1 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:60
+#: src/emu/inpttype.ipp:56
 msgctxt "input-name"
 msgid "P1 Mahjong A"
 msgstr ""
 
-#: src/emu/inpttype.ipp:61
+#: src/emu/inpttype.ipp:57
 msgctxt "input-name"
 msgid "P1 Mahjong B"
 msgstr ""
 
-#: src/emu/inpttype.ipp:62
+#: src/emu/inpttype.ipp:58
 msgctxt "input-name"
 msgid "P1 Mahjong C"
 msgstr ""
 
-#: src/emu/inpttype.ipp:63
+#: src/emu/inpttype.ipp:59
 msgctxt "input-name"
 msgid "P1 Mahjong D"
 msgstr ""
 
-#: src/emu/inpttype.ipp:64
+#: src/emu/inpttype.ipp:60
 msgctxt "input-name"
 msgid "P1 Mahjong E"
 msgstr ""
 
-#: src/emu/inpttype.ipp:65
+#: src/emu/inpttype.ipp:61
 msgctxt "input-name"
 msgid "P1 Mahjong F"
 msgstr ""
 
-#: src/emu/inpttype.ipp:66
+#: src/emu/inpttype.ipp:62
 msgctxt "input-name"
 msgid "P1 Mahjong G"
 msgstr ""
 
-#: src/emu/inpttype.ipp:67
+#: src/emu/inpttype.ipp:63
 msgctxt "input-name"
 msgid "P1 Mahjong H"
 msgstr ""
 
-#: src/emu/inpttype.ipp:68
+#: src/emu/inpttype.ipp:64
 msgctxt "input-name"
 msgid "P1 Mahjong I"
 msgstr ""
 
-#: src/emu/inpttype.ipp:69
+#: src/emu/inpttype.ipp:65
 msgctxt "input-name"
 msgid "P1 Mahjong J"
 msgstr ""
 
-#: src/emu/inpttype.ipp:70
+#: src/emu/inpttype.ipp:66
 msgctxt "input-name"
 msgid "P1 Mahjong K"
 msgstr ""
 
-#: src/emu/inpttype.ipp:71
+#: src/emu/inpttype.ipp:67
 msgctxt "input-name"
 msgid "P1 Mahjong L"
 msgstr ""
 
-#: src/emu/inpttype.ipp:72
+#: src/emu/inpttype.ipp:68
 msgctxt "input-name"
 msgid "P1 Mahjong M"
 msgstr ""
 
-#: src/emu/inpttype.ipp:73
+#: src/emu/inpttype.ipp:69
 msgctxt "input-name"
 msgid "P1 Mahjong N"
 msgstr ""
 
-#: src/emu/inpttype.ipp:74
+#: src/emu/inpttype.ipp:70
 msgctxt "input-name"
 msgid "P1 Mahjong O"
 msgstr ""
 
-#: src/emu/inpttype.ipp:75
+#: src/emu/inpttype.ipp:71
 msgctxt "input-name"
 msgid "P1 Mahjong P"
 msgstr ""
 
-#: src/emu/inpttype.ipp:76
+#: src/emu/inpttype.ipp:72
 msgctxt "input-name"
 msgid "P1 Mahjong Q"
 msgstr ""
 
-#: src/emu/inpttype.ipp:77
+#: src/emu/inpttype.ipp:73
 msgctxt "input-name"
 msgid "P1 Mahjong Kan"
 msgstr ""
 
-#: src/emu/inpttype.ipp:78
+#: src/emu/inpttype.ipp:74
 msgctxt "input-name"
 msgid "P1 Mahjong Pon"
 msgstr ""
 
-#: src/emu/inpttype.ipp:79
+#: src/emu/inpttype.ipp:75
 msgctxt "input-name"
 msgid "P1 Mahjong Chi"
 msgstr ""
 
-#: src/emu/inpttype.ipp:80
+#: src/emu/inpttype.ipp:76
 msgctxt "input-name"
 msgid "P1 Mahjong Reach"
 msgstr ""
 
-#: src/emu/inpttype.ipp:81
+#: src/emu/inpttype.ipp:77
 msgctxt "input-name"
 msgid "P1 Mahjong Ron"
 msgstr ""
 
-#: src/emu/inpttype.ipp:82
+#: src/emu/inpttype.ipp:78
 msgctxt "input-name"
 msgid "P1 Mahjong Flip Flop"
 msgstr ""
 
-#: src/emu/inpttype.ipp:83
+#: src/emu/inpttype.ipp:79
 msgctxt "input-name"
 msgid "P1 Mahjong Bet"
 msgstr ""
 
-#: src/emu/inpttype.ipp:84
+#: src/emu/inpttype.ipp:80
 msgctxt "input-name"
 msgid "P1 Mahjong Take Score"
 msgstr ""
 
-#: src/emu/inpttype.ipp:85
+#: src/emu/inpttype.ipp:81
 msgctxt "input-name"
 msgid "P1 Mahjong Double Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:86
+#: src/emu/inpttype.ipp:82
 msgctxt "input-name"
 msgid "P1 Mahjong Big"
 msgstr ""
 
-#: src/emu/inpttype.ipp:87
+#: src/emu/inpttype.ipp:83
 msgctxt "input-name"
 msgid "P1 Mahjong Small"
 msgstr ""
 
-#: src/emu/inpttype.ipp:88
+#: src/emu/inpttype.ipp:84
 msgctxt "input-name"
 msgid "P1 Mahjong Last Chance"
 msgstr ""
 
-#: src/emu/inpttype.ipp:93
+#: src/emu/inpttype.ipp:89
 msgctxt "input-name"
 msgid "P1 Hanafuda A/1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:94
+#: src/emu/inpttype.ipp:90
 msgctxt "input-name"
 msgid "P1 Hanafuda B/2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:95
+#: src/emu/inpttype.ipp:91
 msgctxt "input-name"
 msgid "P1 Hanafuda C/3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:96
+#: src/emu/inpttype.ipp:92
 msgctxt "input-name"
 msgid "P1 Hanafuda D/4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:97
+#: src/emu/inpttype.ipp:93
 msgctxt "input-name"
 msgid "P1 Hanafuda E/5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:98
+#: src/emu/inpttype.ipp:94
 msgctxt "input-name"
 msgid "P1 Hanafuda F/6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:99
+#: src/emu/inpttype.ipp:95
 msgctxt "input-name"
 msgid "P1 Hanafuda G/7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:100
+#: src/emu/inpttype.ipp:96
 msgctxt "input-name"
 msgid "P1 Hanafuda H/8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:101
+#: src/emu/inpttype.ipp:97
 msgctxt "input-name"
 msgid "P1 Hanafuda Yes"
 msgstr ""
 
-#: src/emu/inpttype.ipp:102
+#: src/emu/inpttype.ipp:98
 msgctxt "input-name"
 msgid "P1 Hanafuda No"
 msgstr ""
 
-#: src/emu/inpttype.ipp:107
+#: src/emu/inpttype.ipp:103
 msgctxt "input-name"
 msgid "Key In"
 msgstr ""
 
-#: src/emu/inpttype.ipp:108
+#: src/emu/inpttype.ipp:104
 msgctxt "input-name"
 msgid "Key Out"
 msgstr ""
 
-#: src/emu/inpttype.ipp:109 src/emu/inpttype.ipp:544
+#: src/emu/inpttype.ipp:105 src/emu/inpttype.ipp:540
 msgctxt "input-name"
 msgid "Service"
 msgstr ""
 
-#: src/emu/inpttype.ipp:110
+#: src/emu/inpttype.ipp:106
 msgctxt "input-name"
 msgid "Book-Keeping"
 msgstr ""
 
-#: src/emu/inpttype.ipp:111
+#: src/emu/inpttype.ipp:107
 msgctxt "input-name"
 msgid "Door"
 msgstr ""
 
-#: src/emu/inpttype.ipp:112
+#: src/emu/inpttype.ipp:108
 msgctxt "input-name"
 msgid "Payout"
 msgstr ""
 
-#: src/emu/inpttype.ipp:113
+#: src/emu/inpttype.ipp:109
 msgctxt "input-name"
 msgid "Bet"
 msgstr ""
 
-#: src/emu/inpttype.ipp:114
+#: src/emu/inpttype.ipp:110
 msgctxt "input-name"
 msgid "Deal"
 msgstr ""
 
-#: src/emu/inpttype.ipp:115
+#: src/emu/inpttype.ipp:111
 msgctxt "input-name"
 msgid "Stand"
 msgstr ""
 
-#: src/emu/inpttype.ipp:116
+#: src/emu/inpttype.ipp:112
 msgctxt "input-name"
 msgid "Take Score"
 msgstr ""
 
-#: src/emu/inpttype.ipp:117
+#: src/emu/inpttype.ipp:113
 msgctxt "input-name"
 msgid "Double Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:118
+#: src/emu/inpttype.ipp:114
 msgctxt "input-name"
 msgid "Half Gamble"
 msgstr ""
 
-#: src/emu/inpttype.ipp:119
+#: src/emu/inpttype.ipp:115
 msgctxt "input-name"
 msgid "High"
 msgstr ""
 
-#: src/emu/inpttype.ipp:120
+#: src/emu/inpttype.ipp:116
 msgctxt "input-name"
 msgid "Low"
 msgstr ""
 
-#: src/emu/inpttype.ipp:125
+#: src/emu/inpttype.ipp:121
 msgctxt "input-name"
 msgid "Hold 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:126
+#: src/emu/inpttype.ipp:122
 msgctxt "input-name"
 msgid "Hold 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:127
+#: src/emu/inpttype.ipp:123
 msgctxt "input-name"
 msgid "Hold 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:128
+#: src/emu/inpttype.ipp:124
 msgctxt "input-name"
 msgid "Hold 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:129
+#: src/emu/inpttype.ipp:125
 msgctxt "input-name"
 msgid "Hold 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:130
+#: src/emu/inpttype.ipp:126
 msgctxt "input-name"
 msgid "Cancel"
 msgstr ""
 
-#: src/emu/inpttype.ipp:135
+#: src/emu/inpttype.ipp:131
 msgctxt "input-name"
 msgid "Stop Reel 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:136
+#: src/emu/inpttype.ipp:132
 msgctxt "input-name"
 msgid "Stop Reel 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:137
+#: src/emu/inpttype.ipp:133
 msgctxt "input-name"
 msgid "Stop Reel 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:138
+#: src/emu/inpttype.ipp:134
 msgctxt "input-name"
 msgid "Stop Reel 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:139
+#: src/emu/inpttype.ipp:135
 msgctxt "input-name"
 msgid "Stop All Reels"
 msgstr ""
 
-#: src/emu/inpttype.ipp:144
+#: src/emu/inpttype.ipp:140
 msgctxt "input-name"
 msgid "P2 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:145
+#: src/emu/inpttype.ipp:141
 msgctxt "input-name"
 msgid "P2 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:146
+#: src/emu/inpttype.ipp:142
 msgctxt "input-name"
 msgid "P2 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:147
+#: src/emu/inpttype.ipp:143
 msgctxt "input-name"
 msgid "P2 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:148
+#: src/emu/inpttype.ipp:144
 msgctxt "input-name"
 msgid "P2 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:149
+#: src/emu/inpttype.ipp:145
 msgctxt "input-name"
 msgid "P2 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:150
+#: src/emu/inpttype.ipp:146
 msgctxt "input-name"
 msgid "P2 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:151
+#: src/emu/inpttype.ipp:147
 msgctxt "input-name"
 msgid "P2 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:152
+#: src/emu/inpttype.ipp:148
 msgctxt "input-name"
 msgid "P2 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:153
+#: src/emu/inpttype.ipp:149
 msgctxt "input-name"
 msgid "P2 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:154
+#: src/emu/inpttype.ipp:150
 msgctxt "input-name"
 msgid "P2 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:155
+#: src/emu/inpttype.ipp:151
 msgctxt "input-name"
 msgid "P2 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:156
+#: src/emu/inpttype.ipp:152
 msgctxt "input-name"
 msgid "P2 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:157
+#: src/emu/inpttype.ipp:153
 msgctxt "input-name"
 msgid "P2 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:158
+#: src/emu/inpttype.ipp:154
 msgctxt "input-name"
 msgid "P2 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:159
+#: src/emu/inpttype.ipp:155
 msgctxt "input-name"
 msgid "P2 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:160
+#: src/emu/inpttype.ipp:156
 msgctxt "input-name"
 msgid "P2 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:161
+#: src/emu/inpttype.ipp:157
 msgctxt "input-name"
 msgid "P2 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:162
+#: src/emu/inpttype.ipp:158
 msgctxt "input-name"
 msgid "P2 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:163
+#: src/emu/inpttype.ipp:159
 msgctxt "input-name"
 msgid "P2 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:164
+#: src/emu/inpttype.ipp:160
 msgctxt "input-name"
 msgid "P2 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:165
+#: src/emu/inpttype.ipp:161
 msgctxt "input-name"
 msgid "P2 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:166
+#: src/emu/inpttype.ipp:162
 msgctxt "input-name"
 msgid "P2 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:167
+#: src/emu/inpttype.ipp:163
 msgctxt "input-name"
 msgid "P2 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:168
+#: src/emu/inpttype.ipp:164
 msgctxt "input-name"
 msgid "P2 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:169
+#: src/emu/inpttype.ipp:165
 msgctxt "input-name"
 msgid "P2 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:170
+#: src/emu/inpttype.ipp:166
 msgctxt "input-name"
 msgid "P2 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:171
+#: src/emu/inpttype.ipp:167
 msgctxt "input-name"
 msgid "P2 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:172
+#: src/emu/inpttype.ipp:168
 msgctxt "input-name"
 msgid "P2 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:173
+#: src/emu/inpttype.ipp:169
 msgctxt "input-name"
 msgid "P2 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:178
+#: src/emu/inpttype.ipp:174
 msgctxt "input-name"
 msgid "P2 Mahjong A"
 msgstr ""
 
-#: src/emu/inpttype.ipp:179
+#: src/emu/inpttype.ipp:175
 msgctxt "input-name"
 msgid "P2 Mahjong B"
 msgstr ""
 
-#: src/emu/inpttype.ipp:180
+#: src/emu/inpttype.ipp:176
 msgctxt "input-name"
 msgid "P2 Mahjong C"
 msgstr ""
 
-#: src/emu/inpttype.ipp:181
+#: src/emu/inpttype.ipp:177
 msgctxt "input-name"
 msgid "P2 Mahjong D"
 msgstr ""
 
-#: src/emu/inpttype.ipp:182
+#: src/emu/inpttype.ipp:178
 msgctxt "input-name"
 msgid "P2 Mahjong E"
 msgstr ""
 
-#: src/emu/inpttype.ipp:183
+#: src/emu/inpttype.ipp:179
 msgctxt "input-name"
 msgid "P2 Mahjong F"
 msgstr ""
 
-#: src/emu/inpttype.ipp:184
+#: src/emu/inpttype.ipp:180
 msgctxt "input-name"
 msgid "P2 Mahjong G"
 msgstr ""
 
-#: src/emu/inpttype.ipp:185
+#: src/emu/inpttype.ipp:181
 msgctxt "input-name"
 msgid "P2 Mahjong H"
 msgstr ""
 
-#: src/emu/inpttype.ipp:186
+#: src/emu/inpttype.ipp:182
 msgctxt "input-name"
 msgid "P2 Mahjong I"
 msgstr ""
 
-#: src/emu/inpttype.ipp:187
+#: src/emu/inpttype.ipp:183
 msgctxt "input-name"
 msgid "P2 Mahjong J"
 msgstr ""
 
-#: src/emu/inpttype.ipp:188
+#: src/emu/inpttype.ipp:184
 msgctxt "input-name"
 msgid "P2 Mahjong K"
 msgstr ""
 
-#: src/emu/inpttype.ipp:189
+#: src/emu/inpttype.ipp:185
 msgctxt "input-name"
 msgid "P2 Mahjong L"
 msgstr ""
 
-#: src/emu/inpttype.ipp:190
+#: src/emu/inpttype.ipp:186
 msgctxt "input-name"
 msgid "P2 Mahjong M"
 msgstr ""
 
-#: src/emu/inpttype.ipp:191
+#: src/emu/inpttype.ipp:187
 msgctxt "input-name"
 msgid "P2 Mahjong N"
 msgstr ""
 
-#: src/emu/inpttype.ipp:192
+#: src/emu/inpttype.ipp:188
 msgctxt "input-name"
 msgid "P2 Mahjong O"
 msgstr ""
 
-#: src/emu/inpttype.ipp:193
+#: src/emu/inpttype.ipp:189
 msgctxt "input-name"
 msgid "P2 Mahjong P"
 msgstr ""
 
-#: src/emu/inpttype.ipp:194
+#: src/emu/inpttype.ipp:190
 msgctxt "input-name"
 msgid "P2 Mahjong Q"
 msgstr ""
 
-#: src/emu/inpttype.ipp:195
+#: src/emu/inpttype.ipp:191
 msgctxt "input-name"
 msgid "P2 Mahjong Kan"
 msgstr ""
 
-#: src/emu/inpttype.ipp:196
+#: src/emu/inpttype.ipp:192
 msgctxt "input-name"
 msgid "P2 Mahjong Pon"
 msgstr ""
 
-#: src/emu/inpttype.ipp:197
+#: src/emu/inpttype.ipp:193
 msgctxt "input-name"
 msgid "P2 Mahjong Chi"
 msgstr ""
 
-#: src/emu/inpttype.ipp:198
+#: src/emu/inpttype.ipp:194
 msgctxt "input-name"
 msgid "P2 Mahjong Reach"
 msgstr ""
 
-#: src/emu/inpttype.ipp:199
+#: src/emu/inpttype.ipp:195
 msgctxt "input-name"
 msgid "P2 Mahjong Ron"
 msgstr ""
 
-#: src/emu/inpttype.ipp:200
+#: src/emu/inpttype.ipp:196
 msgctxt "input-name"
 msgid "P2 Mahjong Bet"
 msgstr ""
 
-#: src/emu/inpttype.ipp:201
+#: src/emu/inpttype.ipp:197
 msgctxt "input-name"
 msgid "P2 Mahjong Last Chance"
 msgstr ""
 
-#: src/emu/inpttype.ipp:202
+#: src/emu/inpttype.ipp:198
 msgctxt "input-name"
 msgid "P2 Mahjong Take Score"
 msgstr ""
 
-#: src/emu/inpttype.ipp:203
+#: src/emu/inpttype.ipp:199
 msgctxt "input-name"
 msgid "P2 Mahjong Double Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:204
+#: src/emu/inpttype.ipp:200
 msgctxt "input-name"
 msgid "P2 Mahjong Flip Flop"
 msgstr ""
 
-#: src/emu/inpttype.ipp:205
+#: src/emu/inpttype.ipp:201
 msgctxt "input-name"
 msgid "P2 Mahjong Big"
 msgstr ""
 
-#: src/emu/inpttype.ipp:206
+#: src/emu/inpttype.ipp:202
 msgctxt "input-name"
 msgid "P2 Mahjong Small"
 msgstr ""
 
-#: src/emu/inpttype.ipp:211
+#: src/emu/inpttype.ipp:207
 msgctxt "input-name"
 msgid "P2 Hanafuda A/1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:212
+#: src/emu/inpttype.ipp:208
 msgctxt "input-name"
 msgid "P2 Hanafuda B/2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:213
+#: src/emu/inpttype.ipp:209
 msgctxt "input-name"
 msgid "P2 Hanafuda C/3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:214
+#: src/emu/inpttype.ipp:210
 msgctxt "input-name"
 msgid "P2 Hanafuda D/4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:215
+#: src/emu/inpttype.ipp:211
 msgctxt "input-name"
 msgid "P2 Hanafuda E/5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:216
+#: src/emu/inpttype.ipp:212
 msgctxt "input-name"
 msgid "P2 Hanafuda F/6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:217
+#: src/emu/inpttype.ipp:213
 msgctxt "input-name"
 msgid "P2 Hanafuda G/7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:218
+#: src/emu/inpttype.ipp:214
 msgctxt "input-name"
 msgid "P2 Hanafuda H/8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:219
+#: src/emu/inpttype.ipp:215
 msgctxt "input-name"
 msgid "P2 Hanafuda Yes"
 msgstr ""
 
-#: src/emu/inpttype.ipp:220
+#: src/emu/inpttype.ipp:216
 msgctxt "input-name"
 msgid "P2 Hanafuda No"
 msgstr ""
 
-#: src/emu/inpttype.ipp:225
+#: src/emu/inpttype.ipp:221
 msgctxt "input-name"
 msgid "P3 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:226
+#: src/emu/inpttype.ipp:222
 msgctxt "input-name"
 msgid "P3 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:227
+#: src/emu/inpttype.ipp:223
 msgctxt "input-name"
 msgid "P3 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:228
+#: src/emu/inpttype.ipp:224
 msgctxt "input-name"
 msgid "P3 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:229
+#: src/emu/inpttype.ipp:225
 msgctxt "input-name"
 msgid "P3 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:230
+#: src/emu/inpttype.ipp:226
 msgctxt "input-name"
 msgid "P3 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:231
+#: src/emu/inpttype.ipp:227
 msgctxt "input-name"
 msgid "P3 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:232
+#: src/emu/inpttype.ipp:228
 msgctxt "input-name"
 msgid "P3 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:233
+#: src/emu/inpttype.ipp:229
 msgctxt "input-name"
 msgid "P3 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:234
+#: src/emu/inpttype.ipp:230
 msgctxt "input-name"
 msgid "P3 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:235
+#: src/emu/inpttype.ipp:231
 msgctxt "input-name"
 msgid "P3 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:236
+#: src/emu/inpttype.ipp:232
 msgctxt "input-name"
 msgid "P3 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:237
+#: src/emu/inpttype.ipp:233
 msgctxt "input-name"
 msgid "P3 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:238
+#: src/emu/inpttype.ipp:234
 msgctxt "input-name"
 msgid "P3 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:239
+#: src/emu/inpttype.ipp:235
 msgctxt "input-name"
 msgid "P3 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:240
+#: src/emu/inpttype.ipp:236
 msgctxt "input-name"
 msgid "P3 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:241
+#: src/emu/inpttype.ipp:237
 msgctxt "input-name"
 msgid "P3 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:242
+#: src/emu/inpttype.ipp:238
 msgctxt "input-name"
 msgid "P3 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:243
+#: src/emu/inpttype.ipp:239
 msgctxt "input-name"
 msgid "P3 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:244
+#: src/emu/inpttype.ipp:240
 msgctxt "input-name"
 msgid "P3 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:245
+#: src/emu/inpttype.ipp:241
 msgctxt "input-name"
 msgid "P3 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:246
+#: src/emu/inpttype.ipp:242
 msgctxt "input-name"
 msgid "P3 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:247
+#: src/emu/inpttype.ipp:243
 msgctxt "input-name"
 msgid "P3 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:248
+#: src/emu/inpttype.ipp:244
 msgctxt "input-name"
 msgid "P3 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:249
+#: src/emu/inpttype.ipp:245
 msgctxt "input-name"
 msgid "P3 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:250
+#: src/emu/inpttype.ipp:246
 msgctxt "input-name"
 msgid "P3 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:251
+#: src/emu/inpttype.ipp:247
 msgctxt "input-name"
 msgid "P3 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:252
+#: src/emu/inpttype.ipp:248
 msgctxt "input-name"
 msgid "P3 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:253
+#: src/emu/inpttype.ipp:249
 msgctxt "input-name"
 msgid "P3 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:254
+#: src/emu/inpttype.ipp:250
 msgctxt "input-name"
 msgid "P3 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:259
+#: src/emu/inpttype.ipp:255
 msgctxt "input-name"
 msgid "P4 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:260
+#: src/emu/inpttype.ipp:256
 msgctxt "input-name"
 msgid "P4 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:261
+#: src/emu/inpttype.ipp:257
 msgctxt "input-name"
 msgid "P4 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:262
+#: src/emu/inpttype.ipp:258
 msgctxt "input-name"
 msgid "P4 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:263
+#: src/emu/inpttype.ipp:259
 msgctxt "input-name"
 msgid "P4 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:264
+#: src/emu/inpttype.ipp:260
 msgctxt "input-name"
 msgid "P4 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:265
+#: src/emu/inpttype.ipp:261
 msgctxt "input-name"
 msgid "P4 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:266
+#: src/emu/inpttype.ipp:262
 msgctxt "input-name"
 msgid "P4 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:267
+#: src/emu/inpttype.ipp:263
 msgctxt "input-name"
 msgid "P4 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:268
+#: src/emu/inpttype.ipp:264
 msgctxt "input-name"
 msgid "P4 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:269
+#: src/emu/inpttype.ipp:265
 msgctxt "input-name"
 msgid "P4 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:270
+#: src/emu/inpttype.ipp:266
 msgctxt "input-name"
 msgid "P4 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:271
+#: src/emu/inpttype.ipp:267
 msgctxt "input-name"
 msgid "P4 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:272
+#: src/emu/inpttype.ipp:268
 msgctxt "input-name"
 msgid "P4 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:273
+#: src/emu/inpttype.ipp:269
 msgctxt "input-name"
 msgid "P4 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:274
+#: src/emu/inpttype.ipp:270
 msgctxt "input-name"
 msgid "P4 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:275
+#: src/emu/inpttype.ipp:271
 msgctxt "input-name"
 msgid "P4 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:276
+#: src/emu/inpttype.ipp:272
 msgctxt "input-name"
 msgid "P4 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:277
+#: src/emu/inpttype.ipp:273
 msgctxt "input-name"
 msgid "P4 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:278
+#: src/emu/inpttype.ipp:274
 msgctxt "input-name"
 msgid "P4 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:279
+#: src/emu/inpttype.ipp:275
 msgctxt "input-name"
 msgid "P4 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:280
+#: src/emu/inpttype.ipp:276
 msgctxt "input-name"
 msgid "P4 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:281
+#: src/emu/inpttype.ipp:277
 msgctxt "input-name"
 msgid "P4 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:282
+#: src/emu/inpttype.ipp:278
 msgctxt "input-name"
 msgid "P4 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:283
+#: src/emu/inpttype.ipp:279
 msgctxt "input-name"
 msgid "P4 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:284
+#: src/emu/inpttype.ipp:280
 msgctxt "input-name"
 msgid "P4 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:285
+#: src/emu/inpttype.ipp:281
 msgctxt "input-name"
 msgid "P4 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:286
+#: src/emu/inpttype.ipp:282
 msgctxt "input-name"
 msgid "P4 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:287
+#: src/emu/inpttype.ipp:283
 msgctxt "input-name"
 msgid "P4 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:288
+#: src/emu/inpttype.ipp:284
 msgctxt "input-name"
 msgid "P4 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:293
+#: src/emu/inpttype.ipp:289
 msgctxt "input-name"
 msgid "P5 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:294
+#: src/emu/inpttype.ipp:290
 msgctxt "input-name"
 msgid "P5 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:295
+#: src/emu/inpttype.ipp:291
 msgctxt "input-name"
 msgid "P5 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:296
+#: src/emu/inpttype.ipp:292
 msgctxt "input-name"
 msgid "P5 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:297
+#: src/emu/inpttype.ipp:293
 msgctxt "input-name"
 msgid "P5 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:298
+#: src/emu/inpttype.ipp:294
 msgctxt "input-name"
 msgid "P5 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:299
+#: src/emu/inpttype.ipp:295
 msgctxt "input-name"
 msgid "P5 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:300
+#: src/emu/inpttype.ipp:296
 msgctxt "input-name"
 msgid "P5 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:301
+#: src/emu/inpttype.ipp:297
 msgctxt "input-name"
 msgid "P5 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:302
+#: src/emu/inpttype.ipp:298
 msgctxt "input-name"
 msgid "P5 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:303
+#: src/emu/inpttype.ipp:299
 msgctxt "input-name"
 msgid "P5 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:304
+#: src/emu/inpttype.ipp:300
 msgctxt "input-name"
 msgid "P5 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:305
+#: src/emu/inpttype.ipp:301
 msgctxt "input-name"
 msgid "P5 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:306
+#: src/emu/inpttype.ipp:302
 msgctxt "input-name"
 msgid "P5 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:307
+#: src/emu/inpttype.ipp:303
 msgctxt "input-name"
 msgid "P5 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:308
+#: src/emu/inpttype.ipp:304
 msgctxt "input-name"
 msgid "P5 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:309
+#: src/emu/inpttype.ipp:305
 msgctxt "input-name"
 msgid "P5 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:310
+#: src/emu/inpttype.ipp:306
 msgctxt "input-name"
 msgid "P5 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:311
+#: src/emu/inpttype.ipp:307
 msgctxt "input-name"
 msgid "P5 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:312
+#: src/emu/inpttype.ipp:308
 msgctxt "input-name"
 msgid "P5 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:313
+#: src/emu/inpttype.ipp:309
 msgctxt "input-name"
 msgid "P5 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:314
+#: src/emu/inpttype.ipp:310
 msgctxt "input-name"
 msgid "P5 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:315
+#: src/emu/inpttype.ipp:311
 msgctxt "input-name"
 msgid "P5 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:316
+#: src/emu/inpttype.ipp:312
 msgctxt "input-name"
 msgid "P5 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:317
+#: src/emu/inpttype.ipp:313
 msgctxt "input-name"
 msgid "P5 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:318
+#: src/emu/inpttype.ipp:314
 msgctxt "input-name"
 msgid "P5 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:319
+#: src/emu/inpttype.ipp:315
 msgctxt "input-name"
 msgid "P5 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:320
+#: src/emu/inpttype.ipp:316
 msgctxt "input-name"
 msgid "P5 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:321
+#: src/emu/inpttype.ipp:317
 msgctxt "input-name"
 msgid "P5 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:322
+#: src/emu/inpttype.ipp:318
 msgctxt "input-name"
 msgid "P5 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:327
+#: src/emu/inpttype.ipp:323
 msgctxt "input-name"
 msgid "P6 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:328
+#: src/emu/inpttype.ipp:324
 msgctxt "input-name"
 msgid "P6 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:329
+#: src/emu/inpttype.ipp:325
 msgctxt "input-name"
 msgid "P6 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:330
+#: src/emu/inpttype.ipp:326
 msgctxt "input-name"
 msgid "P6 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:331
+#: src/emu/inpttype.ipp:327
 msgctxt "input-name"
 msgid "P6 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:332
+#: src/emu/inpttype.ipp:328
 msgctxt "input-name"
 msgid "P6 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:333
+#: src/emu/inpttype.ipp:329
 msgctxt "input-name"
 msgid "P6 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:334
+#: src/emu/inpttype.ipp:330
 msgctxt "input-name"
 msgid "P6 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:335
+#: src/emu/inpttype.ipp:331
 msgctxt "input-name"
 msgid "P6 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:336
+#: src/emu/inpttype.ipp:332
 msgctxt "input-name"
 msgid "P6 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:337
+#: src/emu/inpttype.ipp:333
 msgctxt "input-name"
 msgid "P6 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:338
+#: src/emu/inpttype.ipp:334
 msgctxt "input-name"
 msgid "P6 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:339
+#: src/emu/inpttype.ipp:335
 msgctxt "input-name"
 msgid "P6 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:340
+#: src/emu/inpttype.ipp:336
 msgctxt "input-name"
 msgid "P6 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:341
+#: src/emu/inpttype.ipp:337
 msgctxt "input-name"
 msgid "P6 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:342
+#: src/emu/inpttype.ipp:338
 msgctxt "input-name"
 msgid "P6 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:343
+#: src/emu/inpttype.ipp:339
 msgctxt "input-name"
 msgid "P6 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:344
+#: src/emu/inpttype.ipp:340
 msgctxt "input-name"
 msgid "P6 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:345
+#: src/emu/inpttype.ipp:341
 msgctxt "input-name"
 msgid "P6 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:346
+#: src/emu/inpttype.ipp:342
 msgctxt "input-name"
 msgid "P6 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:347
+#: src/emu/inpttype.ipp:343
 msgctxt "input-name"
 msgid "P6 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:348
+#: src/emu/inpttype.ipp:344
 msgctxt "input-name"
 msgid "P6 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:349
+#: src/emu/inpttype.ipp:345
 msgctxt "input-name"
 msgid "P6 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:350
+#: src/emu/inpttype.ipp:346
 msgctxt "input-name"
 msgid "P6 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:351
+#: src/emu/inpttype.ipp:347
 msgctxt "input-name"
 msgid "P6 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:352
+#: src/emu/inpttype.ipp:348
 msgctxt "input-name"
 msgid "P6 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:353
+#: src/emu/inpttype.ipp:349
 msgctxt "input-name"
 msgid "P6 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:354
+#: src/emu/inpttype.ipp:350
 msgctxt "input-name"
 msgid "P6 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:355
+#: src/emu/inpttype.ipp:351
 msgctxt "input-name"
 msgid "P6 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:356
+#: src/emu/inpttype.ipp:352
 msgctxt "input-name"
 msgid "P6 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:361
+#: src/emu/inpttype.ipp:357
 msgctxt "input-name"
 msgid "P7 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:362
+#: src/emu/inpttype.ipp:358
 msgctxt "input-name"
 msgid "P7 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:363
+#: src/emu/inpttype.ipp:359
 msgctxt "input-name"
 msgid "P7 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:364
+#: src/emu/inpttype.ipp:360
 msgctxt "input-name"
 msgid "P7 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:365
+#: src/emu/inpttype.ipp:361
 msgctxt "input-name"
 msgid "P7 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:366
+#: src/emu/inpttype.ipp:362
 msgctxt "input-name"
 msgid "P7 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:367
+#: src/emu/inpttype.ipp:363
 msgctxt "input-name"
 msgid "P7 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:368
+#: src/emu/inpttype.ipp:364
 msgctxt "input-name"
 msgid "P7 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:369
+#: src/emu/inpttype.ipp:365
 msgctxt "input-name"
 msgid "P7 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:370
+#: src/emu/inpttype.ipp:366
 msgctxt "input-name"
 msgid "P7 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:371
+#: src/emu/inpttype.ipp:367
 msgctxt "input-name"
 msgid "P7 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:372
+#: src/emu/inpttype.ipp:368
 msgctxt "input-name"
 msgid "P7 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:373
+#: src/emu/inpttype.ipp:369
 msgctxt "input-name"
 msgid "P7 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:374
+#: src/emu/inpttype.ipp:370
 msgctxt "input-name"
 msgid "P7 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:375
+#: src/emu/inpttype.ipp:371
 msgctxt "input-name"
 msgid "P7 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:376
+#: src/emu/inpttype.ipp:372
 msgctxt "input-name"
 msgid "P7 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:377
+#: src/emu/inpttype.ipp:373
 msgctxt "input-name"
 msgid "P7 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:378
+#: src/emu/inpttype.ipp:374
 msgctxt "input-name"
 msgid "P7 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:379
+#: src/emu/inpttype.ipp:375
 msgctxt "input-name"
 msgid "P7 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:380
+#: src/emu/inpttype.ipp:376
 msgctxt "input-name"
 msgid "P7 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:381
+#: src/emu/inpttype.ipp:377
 msgctxt "input-name"
 msgid "P7 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:382
+#: src/emu/inpttype.ipp:378
 msgctxt "input-name"
 msgid "P7 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:383
+#: src/emu/inpttype.ipp:379
 msgctxt "input-name"
 msgid "P7 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:384
+#: src/emu/inpttype.ipp:380
 msgctxt "input-name"
 msgid "P7 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:385
+#: src/emu/inpttype.ipp:381
 msgctxt "input-name"
 msgid "P7 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:386
+#: src/emu/inpttype.ipp:382
 msgctxt "input-name"
 msgid "P7 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:387
+#: src/emu/inpttype.ipp:383
 msgctxt "input-name"
 msgid "P7 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:388
+#: src/emu/inpttype.ipp:384
 msgctxt "input-name"
 msgid "P7 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:389
+#: src/emu/inpttype.ipp:385
 msgctxt "input-name"
 msgid "P7 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:390
+#: src/emu/inpttype.ipp:386
 msgctxt "input-name"
 msgid "P7 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:395
+#: src/emu/inpttype.ipp:391
 msgctxt "input-name"
 msgid "P8 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:396
+#: src/emu/inpttype.ipp:392
 msgctxt "input-name"
 msgid "P8 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:397
+#: src/emu/inpttype.ipp:393
 msgctxt "input-name"
 msgid "P8 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:398
+#: src/emu/inpttype.ipp:394
 msgctxt "input-name"
 msgid "P8 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:399
+#: src/emu/inpttype.ipp:395
 msgctxt "input-name"
 msgid "P8 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:400
+#: src/emu/inpttype.ipp:396
 msgctxt "input-name"
 msgid "P8 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:401
+#: src/emu/inpttype.ipp:397
 msgctxt "input-name"
 msgid "P8 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:402
+#: src/emu/inpttype.ipp:398
 msgctxt "input-name"
 msgid "P8 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:403
+#: src/emu/inpttype.ipp:399
 msgctxt "input-name"
 msgid "P8 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:404
+#: src/emu/inpttype.ipp:400
 msgctxt "input-name"
 msgid "P8 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:405
+#: src/emu/inpttype.ipp:401
 msgctxt "input-name"
 msgid "P8 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:406
+#: src/emu/inpttype.ipp:402
 msgctxt "input-name"
 msgid "P8 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:407
+#: src/emu/inpttype.ipp:403
 msgctxt "input-name"
 msgid "P8 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:408
+#: src/emu/inpttype.ipp:404
 msgctxt "input-name"
 msgid "P8 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:409
+#: src/emu/inpttype.ipp:405
 msgctxt "input-name"
 msgid "P8 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:410
+#: src/emu/inpttype.ipp:406
 msgctxt "input-name"
 msgid "P8 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:411
+#: src/emu/inpttype.ipp:407
 msgctxt "input-name"
 msgid "P8 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:412
+#: src/emu/inpttype.ipp:408
 msgctxt "input-name"
 msgid "P8 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:413
+#: src/emu/inpttype.ipp:409
 msgctxt "input-name"
 msgid "P8 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:414
+#: src/emu/inpttype.ipp:410
 msgctxt "input-name"
 msgid "P8 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:415
+#: src/emu/inpttype.ipp:411
 msgctxt "input-name"
 msgid "P8 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:416
+#: src/emu/inpttype.ipp:412
 msgctxt "input-name"
 msgid "P8 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:417
+#: src/emu/inpttype.ipp:413
 msgctxt "input-name"
 msgid "P8 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:418
+#: src/emu/inpttype.ipp:414
 msgctxt "input-name"
 msgid "P8 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:419
+#: src/emu/inpttype.ipp:415
 msgctxt "input-name"
 msgid "P8 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:420
+#: src/emu/inpttype.ipp:416
 msgctxt "input-name"
 msgid "P8 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:421
+#: src/emu/inpttype.ipp:417
 msgctxt "input-name"
 msgid "P8 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:422
+#: src/emu/inpttype.ipp:418
 msgctxt "input-name"
 msgid "P8 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:423
+#: src/emu/inpttype.ipp:419
 msgctxt "input-name"
 msgid "P8 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:424
+#: src/emu/inpttype.ipp:420
 msgctxt "input-name"
 msgid "P8 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:429
+#: src/emu/inpttype.ipp:425
 msgctxt "input-name"
 msgid "P9 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:430
+#: src/emu/inpttype.ipp:426
 msgctxt "input-name"
 msgid "P9 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:431
+#: src/emu/inpttype.ipp:427
 msgctxt "input-name"
 msgid "P9 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:432
+#: src/emu/inpttype.ipp:428
 msgctxt "input-name"
 msgid "P9 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:433
+#: src/emu/inpttype.ipp:429
 msgctxt "input-name"
 msgid "P9 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:434
+#: src/emu/inpttype.ipp:430
 msgctxt "input-name"
 msgid "P9 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:435
+#: src/emu/inpttype.ipp:431
 msgctxt "input-name"
 msgid "P9 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:436
+#: src/emu/inpttype.ipp:432
 msgctxt "input-name"
 msgid "P9 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:437
+#: src/emu/inpttype.ipp:433
 msgctxt "input-name"
 msgid "P9 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:438
+#: src/emu/inpttype.ipp:434
 msgctxt "input-name"
 msgid "P9 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:439
+#: src/emu/inpttype.ipp:435
 msgctxt "input-name"
 msgid "P9 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:440
+#: src/emu/inpttype.ipp:436
 msgctxt "input-name"
 msgid "P9 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:441
+#: src/emu/inpttype.ipp:437
 msgctxt "input-name"
 msgid "P9 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:442
+#: src/emu/inpttype.ipp:438
 msgctxt "input-name"
 msgid "P9 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:443
+#: src/emu/inpttype.ipp:439
 msgctxt "input-name"
 msgid "P9 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:444
+#: src/emu/inpttype.ipp:440
 msgctxt "input-name"
 msgid "P9 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:445
+#: src/emu/inpttype.ipp:441
 msgctxt "input-name"
 msgid "P9 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:446
+#: src/emu/inpttype.ipp:442
 msgctxt "input-name"
 msgid "P9 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:447
+#: src/emu/inpttype.ipp:443
 msgctxt "input-name"
 msgid "P9 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:448
+#: src/emu/inpttype.ipp:444
 msgctxt "input-name"
 msgid "P9 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:449
+#: src/emu/inpttype.ipp:445
 msgctxt "input-name"
 msgid "P9 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:450
+#: src/emu/inpttype.ipp:446
 msgctxt "input-name"
 msgid "P9 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:451
+#: src/emu/inpttype.ipp:447
 msgctxt "input-name"
 msgid "P9 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:452
+#: src/emu/inpttype.ipp:448
 msgctxt "input-name"
 msgid "P9 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:453
+#: src/emu/inpttype.ipp:449
 msgctxt "input-name"
 msgid "P9 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:454
+#: src/emu/inpttype.ipp:450
 msgctxt "input-name"
 msgid "P9 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:455
+#: src/emu/inpttype.ipp:451
 msgctxt "input-name"
 msgid "P9 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:456
+#: src/emu/inpttype.ipp:452
 msgctxt "input-name"
 msgid "P9 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:457
+#: src/emu/inpttype.ipp:453
 msgctxt "input-name"
 msgid "P9 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:458
+#: src/emu/inpttype.ipp:454
 msgctxt "input-name"
 msgid "P9 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:463
+#: src/emu/inpttype.ipp:459
 msgctxt "input-name"
 msgid "P10 Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:464
+#: src/emu/inpttype.ipp:460
 msgctxt "input-name"
 msgid "P10 Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:465
+#: src/emu/inpttype.ipp:461
 msgctxt "input-name"
 msgid "P10 Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:466
+#: src/emu/inpttype.ipp:462
 msgctxt "input-name"
 msgid "P10 Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:467
+#: src/emu/inpttype.ipp:463
 msgctxt "input-name"
 msgid "P10 Right Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:468
+#: src/emu/inpttype.ipp:464
 msgctxt "input-name"
 msgid "P10 Right Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:469
+#: src/emu/inpttype.ipp:465
 msgctxt "input-name"
 msgid "P10 Right Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:470
+#: src/emu/inpttype.ipp:466
 msgctxt "input-name"
 msgid "P10 Right Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:471
+#: src/emu/inpttype.ipp:467
 msgctxt "input-name"
 msgid "P10 Left Stick/Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:472
+#: src/emu/inpttype.ipp:468
 msgctxt "input-name"
 msgid "P10 Left Stick/Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:473
+#: src/emu/inpttype.ipp:469
 msgctxt "input-name"
 msgid "P10 Left Stick/Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:474
+#: src/emu/inpttype.ipp:470
 msgctxt "input-name"
 msgid "P10 Left Stick/Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:475
+#: src/emu/inpttype.ipp:471
 msgctxt "input-name"
 msgid "P10 Button 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:476
+#: src/emu/inpttype.ipp:472
 msgctxt "input-name"
 msgid "P10 Button 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:477
+#: src/emu/inpttype.ipp:473
 msgctxt "input-name"
 msgid "P10 Button 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:478
+#: src/emu/inpttype.ipp:474
 msgctxt "input-name"
 msgid "P10 Button 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:479
+#: src/emu/inpttype.ipp:475
 msgctxt "input-name"
 msgid "P10 Button 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:480
+#: src/emu/inpttype.ipp:476
 msgctxt "input-name"
 msgid "P10 Button 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:481
+#: src/emu/inpttype.ipp:477
 msgctxt "input-name"
 msgid "P10 Button 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:482
+#: src/emu/inpttype.ipp:478
 msgctxt "input-name"
 msgid "P10 Button 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:483
+#: src/emu/inpttype.ipp:479
 msgctxt "input-name"
 msgid "P10 Button 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:484
+#: src/emu/inpttype.ipp:480
 msgctxt "input-name"
 msgid "P10 Button 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:485
+#: src/emu/inpttype.ipp:481
 msgctxt "input-name"
 msgid "P10 Button 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:486
+#: src/emu/inpttype.ipp:482
 msgctxt "input-name"
 msgid "P10 Button 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:487
+#: src/emu/inpttype.ipp:483
 msgctxt "input-name"
 msgid "P10 Button 13"
 msgstr ""
 
-#: src/emu/inpttype.ipp:488
+#: src/emu/inpttype.ipp:484
 msgctxt "input-name"
 msgid "P10 Button 14"
 msgstr ""
 
-#: src/emu/inpttype.ipp:489
+#: src/emu/inpttype.ipp:485
 msgctxt "input-name"
 msgid "P10 Button 15"
 msgstr ""
 
-#: src/emu/inpttype.ipp:490
+#: src/emu/inpttype.ipp:486
 msgctxt "input-name"
 msgid "P10 Button 16"
 msgstr ""
 
-#: src/emu/inpttype.ipp:491
+#: src/emu/inpttype.ipp:487
 msgctxt "input-name"
 msgid "P10 Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:492
+#: src/emu/inpttype.ipp:488
 msgctxt "input-name"
 msgid "P10 Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:497
+#: src/emu/inpttype.ipp:493
 msgctxt "input-name"
 msgid "1 Player Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:498
+#: src/emu/inpttype.ipp:494
 msgctxt "input-name"
 msgid "2 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:499
+#: src/emu/inpttype.ipp:495
 msgctxt "input-name"
 msgid "3 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:500
+#: src/emu/inpttype.ipp:496
 msgctxt "input-name"
 msgid "4 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:501
+#: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "5 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:502
+#: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "6 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:503
+#: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "7 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:504
+#: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "8 Players Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:509
+#: src/emu/inpttype.ipp:505
 msgctxt "input-name"
 msgid "Coin 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:510
+#: src/emu/inpttype.ipp:506
 msgctxt "input-name"
 msgid "Coin 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:511
+#: src/emu/inpttype.ipp:507
 msgctxt "input-name"
 msgid "Coin 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:512
+#: src/emu/inpttype.ipp:508
 msgctxt "input-name"
 msgid "Coin 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:513
+#: src/emu/inpttype.ipp:509
 msgctxt "input-name"
 msgid "Coin 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:514
+#: src/emu/inpttype.ipp:510
 msgctxt "input-name"
 msgid "Coin 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:515
+#: src/emu/inpttype.ipp:511
 msgctxt "input-name"
 msgid "Coin 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:516
+#: src/emu/inpttype.ipp:512
 msgctxt "input-name"
 msgid "Coin 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:517
+#: src/emu/inpttype.ipp:513
 msgctxt "input-name"
 msgid "Coin 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:518
+#: src/emu/inpttype.ipp:514
 msgctxt "input-name"
 msgid "Coin 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:519
+#: src/emu/inpttype.ipp:515
 msgctxt "input-name"
 msgid "Coin 11"
 msgstr ""
 
-#: src/emu/inpttype.ipp:520
+#: src/emu/inpttype.ipp:516
 msgctxt "input-name"
 msgid "Coin 12"
 msgstr ""
 
-#: src/emu/inpttype.ipp:521
+#: src/emu/inpttype.ipp:517
 msgctxt "input-name"
 msgid "Bill 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:526
+#: src/emu/inpttype.ipp:522
 msgctxt "input-name"
 msgid "Service 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:527
+#: src/emu/inpttype.ipp:523
 msgctxt "input-name"
 msgid "Service 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:528
+#: src/emu/inpttype.ipp:524
 msgctxt "input-name"
 msgid "Service 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:529
+#: src/emu/inpttype.ipp:525
 msgctxt "input-name"
 msgid "Service 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:534
+#: src/emu/inpttype.ipp:530
 msgctxt "input-name"
 msgid "Tilt 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:535
+#: src/emu/inpttype.ipp:531
 msgctxt "input-name"
 msgid "Tilt 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:536
+#: src/emu/inpttype.ipp:532
 msgctxt "input-name"
 msgid "Tilt 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:537
+#: src/emu/inpttype.ipp:533
 msgctxt "input-name"
 msgid "Tilt 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:542
+#: src/emu/inpttype.ipp:538
 msgctxt "input-name"
 msgid "Power On"
 msgstr ""
 
-#: src/emu/inpttype.ipp:543
+#: src/emu/inpttype.ipp:539
 msgctxt "input-name"
 msgid "Power Off"
 msgstr ""
 
-#: src/emu/inpttype.ipp:545
+#: src/emu/inpttype.ipp:541
 msgctxt "input-name"
 msgid "Tilt"
 msgstr ""
 
-#: src/emu/inpttype.ipp:546
+#: src/emu/inpttype.ipp:542
 msgctxt "input-name"
 msgid "Door Interlock"
 msgstr ""
 
-#: src/emu/inpttype.ipp:547
+#: src/emu/inpttype.ipp:543
 msgctxt "input-name"
 msgid "Memory Reset"
 msgstr ""
 
-#: src/emu/inpttype.ipp:548
+#: src/emu/inpttype.ipp:544
 msgctxt "input-name"
 msgid "Volume Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:549
+#: src/emu/inpttype.ipp:545
 msgctxt "input-name"
 msgid "Volume Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:554
+#: src/emu/inpttype.ipp:550
 msgctxt "input-name"
 msgid "P1 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:555
+#: src/emu/inpttype.ipp:551
 msgctxt "input-name"
 msgid "P2 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:556
+#: src/emu/inpttype.ipp:552
 msgctxt "input-name"
 msgid "P3 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:557
+#: src/emu/inpttype.ipp:553
 msgctxt "input-name"
 msgid "P4 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:558
+#: src/emu/inpttype.ipp:554
 msgctxt "input-name"
 msgid "P5 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:559
+#: src/emu/inpttype.ipp:555
 msgctxt "input-name"
 msgid "P6 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:560
+#: src/emu/inpttype.ipp:556
 msgctxt "input-name"
 msgid "P7 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:561
+#: src/emu/inpttype.ipp:557
 msgctxt "input-name"
 msgid "P8 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:562
+#: src/emu/inpttype.ipp:558
 msgctxt "input-name"
 msgid "P9 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:563
+#: src/emu/inpttype.ipp:559
 msgctxt "input-name"
 msgid "P10 Pedal 1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:568
+#: src/emu/inpttype.ipp:564
 msgctxt "input-name"
 msgid "P1 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:569
+#: src/emu/inpttype.ipp:565
 msgctxt "input-name"
 msgid "P2 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:570
+#: src/emu/inpttype.ipp:566
 msgctxt "input-name"
 msgid "P3 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:571
+#: src/emu/inpttype.ipp:567
 msgctxt "input-name"
 msgid "P4 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:572
+#: src/emu/inpttype.ipp:568
 msgctxt "input-name"
 msgid "P5 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:573
+#: src/emu/inpttype.ipp:569
 msgctxt "input-name"
 msgid "P6 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:574
+#: src/emu/inpttype.ipp:570
 msgctxt "input-name"
 msgid "P7 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:575
+#: src/emu/inpttype.ipp:571
 msgctxt "input-name"
 msgid "P8 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:576
+#: src/emu/inpttype.ipp:572
 msgctxt "input-name"
 msgid "P9 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:577
+#: src/emu/inpttype.ipp:573
 msgctxt "input-name"
 msgid "P10 Pedal 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:582
+#: src/emu/inpttype.ipp:578
 msgctxt "input-name"
 msgid "P1 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:583
+#: src/emu/inpttype.ipp:579
 msgctxt "input-name"
 msgid "P2 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:584
+#: src/emu/inpttype.ipp:580
 msgctxt "input-name"
 msgid "P3 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:585
+#: src/emu/inpttype.ipp:581
 msgctxt "input-name"
 msgid "P4 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:586
+#: src/emu/inpttype.ipp:582
 msgctxt "input-name"
 msgid "P5 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:587
+#: src/emu/inpttype.ipp:583
 msgctxt "input-name"
 msgid "P6 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:588
+#: src/emu/inpttype.ipp:584
 msgctxt "input-name"
 msgid "P7 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:589
+#: src/emu/inpttype.ipp:585
 msgctxt "input-name"
 msgid "P8 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:590
+#: src/emu/inpttype.ipp:586
 msgctxt "input-name"
 msgid "P9 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:591
+#: src/emu/inpttype.ipp:587
 msgctxt "input-name"
 msgid "P10 Pedal 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:596
+#: src/emu/inpttype.ipp:592
 msgctxt "input-name"
 msgid "Paddle"
 msgstr ""
 
-#: src/emu/inpttype.ipp:597
+#: src/emu/inpttype.ipp:593
 msgctxt "input-name"
 msgid "Paddle 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:598
+#: src/emu/inpttype.ipp:594
 msgctxt "input-name"
 msgid "Paddle 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:599
+#: src/emu/inpttype.ipp:595
 msgctxt "input-name"
 msgid "Paddle 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:600
+#: src/emu/inpttype.ipp:596
 msgctxt "input-name"
 msgid "Paddle 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:601
+#: src/emu/inpttype.ipp:597
 msgctxt "input-name"
 msgid "Paddle 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:602
+#: src/emu/inpttype.ipp:598
 msgctxt "input-name"
 msgid "Paddle 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:603
+#: src/emu/inpttype.ipp:599
 msgctxt "input-name"
 msgid "Paddle 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:604
+#: src/emu/inpttype.ipp:600
 msgctxt "input-name"
 msgid "Paddle 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:605
+#: src/emu/inpttype.ipp:601
 msgctxt "input-name"
 msgid "Paddle 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:610
+#: src/emu/inpttype.ipp:606
 msgctxt "input-name"
 msgid "Paddle V"
 msgstr ""
 
-#: src/emu/inpttype.ipp:611
+#: src/emu/inpttype.ipp:607
 msgctxt "input-name"
 msgid "Paddle V 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:612
+#: src/emu/inpttype.ipp:608
 msgctxt "input-name"
 msgid "Paddle V 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:613
+#: src/emu/inpttype.ipp:609
 msgctxt "input-name"
 msgid "Paddle V 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:614
+#: src/emu/inpttype.ipp:610
 msgctxt "input-name"
 msgid "Paddle V 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:615
+#: src/emu/inpttype.ipp:611
 msgctxt "input-name"
 msgid "Paddle V 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:616
+#: src/emu/inpttype.ipp:612
 msgctxt "input-name"
 msgid "Paddle V 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:617
+#: src/emu/inpttype.ipp:613
 msgctxt "input-name"
 msgid "Paddle V 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:618
+#: src/emu/inpttype.ipp:614
 msgctxt "input-name"
 msgid "Paddle V 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:619
+#: src/emu/inpttype.ipp:615
 msgctxt "input-name"
 msgid "Paddle V 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:624
+#: src/emu/inpttype.ipp:620
 msgctxt "input-name"
 msgid "Positional"
 msgstr ""
 
-#: src/emu/inpttype.ipp:625
+#: src/emu/inpttype.ipp:621
 msgctxt "input-name"
 msgid "Positional 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:626
+#: src/emu/inpttype.ipp:622
 msgctxt "input-name"
 msgid "Positional 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:627
+#: src/emu/inpttype.ipp:623
 msgctxt "input-name"
 msgid "Positional 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:628
+#: src/emu/inpttype.ipp:624
 msgctxt "input-name"
 msgid "Positional 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:629
+#: src/emu/inpttype.ipp:625
 msgctxt "input-name"
 msgid "Positional 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:630
+#: src/emu/inpttype.ipp:626
 msgctxt "input-name"
 msgid "Positional 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:631
+#: src/emu/inpttype.ipp:627
 msgctxt "input-name"
 msgid "Positional 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:632
+#: src/emu/inpttype.ipp:628
 msgctxt "input-name"
 msgid "Positional 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:633
+#: src/emu/inpttype.ipp:629
 msgctxt "input-name"
 msgid "Positional 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:638
+#: src/emu/inpttype.ipp:634
 msgctxt "input-name"
 msgid "Positional V"
 msgstr ""
 
-#: src/emu/inpttype.ipp:639
+#: src/emu/inpttype.ipp:635
 msgctxt "input-name"
 msgid "Positional V 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:640
+#: src/emu/inpttype.ipp:636
 msgctxt "input-name"
 msgid "Positional V 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:641
+#: src/emu/inpttype.ipp:637
 msgctxt "input-name"
 msgid "Positional V 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:642
+#: src/emu/inpttype.ipp:638
 msgctxt "input-name"
 msgid "Positional V 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:643
+#: src/emu/inpttype.ipp:639
 msgctxt "input-name"
 msgid "Positional V 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:644
+#: src/emu/inpttype.ipp:640
 msgctxt "input-name"
 msgid "Positional V 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:645
+#: src/emu/inpttype.ipp:641
 msgctxt "input-name"
 msgid "Positional V 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:646
+#: src/emu/inpttype.ipp:642
 msgctxt "input-name"
 msgid "Positional V 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:647
+#: src/emu/inpttype.ipp:643
 msgctxt "input-name"
 msgid "Positional V 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:652
+#: src/emu/inpttype.ipp:648
 msgctxt "input-name"
 msgid "Dial"
 msgstr ""
 
-#: src/emu/inpttype.ipp:653
+#: src/emu/inpttype.ipp:649
 msgctxt "input-name"
 msgid "Dial 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:654
+#: src/emu/inpttype.ipp:650
 msgctxt "input-name"
 msgid "Dial 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:655
+#: src/emu/inpttype.ipp:651
 msgctxt "input-name"
 msgid "Dial 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:656
+#: src/emu/inpttype.ipp:652
 msgctxt "input-name"
 msgid "Dial 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:657
+#: src/emu/inpttype.ipp:653
 msgctxt "input-name"
 msgid "Dial 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:658
+#: src/emu/inpttype.ipp:654
 msgctxt "input-name"
 msgid "Dial 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:659
+#: src/emu/inpttype.ipp:655
 msgctxt "input-name"
 msgid "Dial 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:660
+#: src/emu/inpttype.ipp:656
 msgctxt "input-name"
 msgid "Dial 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:661
+#: src/emu/inpttype.ipp:657
 msgctxt "input-name"
 msgid "Dial 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:666
+#: src/emu/inpttype.ipp:662
 msgctxt "input-name"
 msgid "Dial V"
 msgstr ""
 
-#: src/emu/inpttype.ipp:667
+#: src/emu/inpttype.ipp:663
 msgctxt "input-name"
 msgid "Dial V 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:668
+#: src/emu/inpttype.ipp:664
 msgctxt "input-name"
 msgid "Dial V 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:669
+#: src/emu/inpttype.ipp:665
 msgctxt "input-name"
 msgid "Dial V 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:670
+#: src/emu/inpttype.ipp:666
 msgctxt "input-name"
 msgid "Dial V 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:671
+#: src/emu/inpttype.ipp:667
 msgctxt "input-name"
 msgid "Dial V 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:672
+#: src/emu/inpttype.ipp:668
 msgctxt "input-name"
 msgid "Dial V 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:673
+#: src/emu/inpttype.ipp:669
 msgctxt "input-name"
 msgid "Dial V 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:674
+#: src/emu/inpttype.ipp:670
 msgctxt "input-name"
 msgid "Dial V 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:675
+#: src/emu/inpttype.ipp:671
 msgctxt "input-name"
 msgid "Dial V 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:680
+#: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Track X"
 msgstr ""
 
-#: src/emu/inpttype.ipp:681
+#: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Track X 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:682
+#: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Track X 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:683
+#: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Track X 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:684
+#: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Track X 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:685
+#: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Track X 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:686
+#: src/emu/inpttype.ipp:682
 msgctxt "input-name"
 msgid "Track X 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:687
+#: src/emu/inpttype.ipp:683
 msgctxt "input-name"
 msgid "Track X 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:688
+#: src/emu/inpttype.ipp:684
 msgctxt "input-name"
 msgid "Track X 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:689
+#: src/emu/inpttype.ipp:685
 msgctxt "input-name"
 msgid "Track X 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:694
+#: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Track Y"
 msgstr ""
 
-#: src/emu/inpttype.ipp:695
+#: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Track Y 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:696
+#: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Track Y 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:697
+#: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Track Y 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:698
+#: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Track Y 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:699
+#: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Track Y 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:700
+#: src/emu/inpttype.ipp:696
 msgctxt "input-name"
 msgid "Track Y 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:701
+#: src/emu/inpttype.ipp:697
 msgctxt "input-name"
 msgid "Track Y 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:702
+#: src/emu/inpttype.ipp:698
 msgctxt "input-name"
 msgid "Track Y 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:703
+#: src/emu/inpttype.ipp:699
 msgctxt "input-name"
 msgid "Track Y 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:708
+#: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "AD Stick X"
 msgstr ""
 
-#: src/emu/inpttype.ipp:709
+#: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "AD Stick X 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:710
+#: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "AD Stick X 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:711
+#: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "AD Stick X 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:712
+#: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "AD Stick X 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:713
+#: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "AD Stick X 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:714
+#: src/emu/inpttype.ipp:710
 msgctxt "input-name"
 msgid "AD Stick X 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:715
+#: src/emu/inpttype.ipp:711
 msgctxt "input-name"
 msgid "AD Stick X 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:716
+#: src/emu/inpttype.ipp:712
 msgctxt "input-name"
 msgid "AD Stick X 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:717
+#: src/emu/inpttype.ipp:713
 msgctxt "input-name"
 msgid "AD Stick X 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:722
+#: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "AD Stick Y"
 msgstr ""
 
-#: src/emu/inpttype.ipp:723
+#: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "AD Stick Y 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:724
+#: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "AD Stick Y 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:725
+#: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "AD Stick Y 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:726
+#: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "AD Stick Y 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:727
+#: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "AD Stick Y 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:728
+#: src/emu/inpttype.ipp:724
 msgctxt "input-name"
 msgid "AD Stick Y 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:729
+#: src/emu/inpttype.ipp:725
 msgctxt "input-name"
 msgid "AD Stick Y 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:730
+#: src/emu/inpttype.ipp:726
 msgctxt "input-name"
 msgid "AD Stick Y 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:731
+#: src/emu/inpttype.ipp:727
 msgctxt "input-name"
 msgid "AD Stick Y 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:736
+#: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "AD Stick Z"
 msgstr ""
 
-#: src/emu/inpttype.ipp:737
+#: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "AD Stick Z 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:738
+#: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "AD Stick Z 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:739
+#: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "AD Stick Z 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:740
+#: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "AD Stick Z 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:741
+#: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "AD Stick Z 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:742
+#: src/emu/inpttype.ipp:738
 msgctxt "input-name"
 msgid "AD Stick Z 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:743
+#: src/emu/inpttype.ipp:739
 msgctxt "input-name"
 msgid "AD Stick Z 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:744
+#: src/emu/inpttype.ipp:740
 msgctxt "input-name"
 msgid "AD Stick Z 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:745
+#: src/emu/inpttype.ipp:741
 msgctxt "input-name"
 msgid "AD Stick Z 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:750
+#: src/emu/inpttype.ipp:746
 msgctxt "input-name"
 msgid "Lightgun X"
 msgstr ""
 
-#: src/emu/inpttype.ipp:751
+#: src/emu/inpttype.ipp:747
 msgctxt "input-name"
 msgid "Lightgun X 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:752
+#: src/emu/inpttype.ipp:748
 msgctxt "input-name"
 msgid "Lightgun X 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:753
+#: src/emu/inpttype.ipp:749
 msgctxt "input-name"
 msgid "Lightgun X 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:754
+#: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Lightgun X 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:755
+#: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Lightgun X 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:756
+#: src/emu/inpttype.ipp:752
 msgctxt "input-name"
 msgid "Lightgun X 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:757
+#: src/emu/inpttype.ipp:753
 msgctxt "input-name"
 msgid "Lightgun X 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:758
+#: src/emu/inpttype.ipp:754
 msgctxt "input-name"
 msgid "Lightgun X 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:759
+#: src/emu/inpttype.ipp:755
 msgctxt "input-name"
 msgid "Lightgun X 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:764
+#: src/emu/inpttype.ipp:760
 msgctxt "input-name"
 msgid "Lightgun Y"
 msgstr ""
 
-#: src/emu/inpttype.ipp:765
+#: src/emu/inpttype.ipp:761
 msgctxt "input-name"
 msgid "Lightgun Y 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:766
+#: src/emu/inpttype.ipp:762
 msgctxt "input-name"
 msgid "Lightgun Y 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:767
+#: src/emu/inpttype.ipp:763
 msgctxt "input-name"
 msgid "Lightgun Y 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:768
+#: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Lightgun Y 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:769
+#: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Lightgun Y 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:770
+#: src/emu/inpttype.ipp:766
 msgctxt "input-name"
 msgid "Lightgun Y 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:771
+#: src/emu/inpttype.ipp:767
 msgctxt "input-name"
 msgid "Lightgun Y 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:772
+#: src/emu/inpttype.ipp:768
 msgctxt "input-name"
 msgid "Lightgun Y 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:773
+#: src/emu/inpttype.ipp:769
 msgctxt "input-name"
 msgid "Lightgun Y 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:778
+#: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "Mouse X"
 msgstr ""
 
-#: src/emu/inpttype.ipp:779
+#: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "Mouse X 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:780
+#: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "Mouse X 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:781
+#: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "Mouse X 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:782
+#: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "Mouse X 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:783
+#: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "Mouse X 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:784
+#: src/emu/inpttype.ipp:780
 msgctxt "input-name"
 msgid "Mouse X 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:785
+#: src/emu/inpttype.ipp:781
 msgctxt "input-name"
 msgid "Mouse X 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:786
+#: src/emu/inpttype.ipp:782
 msgctxt "input-name"
 msgid "Mouse X 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:787
+#: src/emu/inpttype.ipp:783
 msgctxt "input-name"
 msgid "Mouse X 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:792
+#: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "Mouse Y"
 msgstr ""
 
-#: src/emu/inpttype.ipp:793
+#: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "Mouse Y 2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:794
+#: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "Mouse Y 3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:795
+#: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "Mouse Y 4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:796
+#: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "Mouse Y 5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:797
+#: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "Mouse Y 6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:798
+#: src/emu/inpttype.ipp:794
 msgctxt "input-name"
 msgid "Mouse Y 7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:799
+#: src/emu/inpttype.ipp:795
 msgctxt "input-name"
 msgid "Mouse Y 8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:800
+#: src/emu/inpttype.ipp:796
 msgctxt "input-name"
 msgid "Mouse Y 9"
 msgstr ""
 
-#: src/emu/inpttype.ipp:801
+#: src/emu/inpttype.ipp:797
 msgctxt "input-name"
 msgid "Mouse Y 10"
 msgstr ""
 
-#: src/emu/inpttype.ipp:806
+#: src/emu/inpttype.ipp:802
 msgctxt "input-name"
 msgid "Keypad"
 msgstr ""
 
-#: src/emu/inpttype.ipp:807
+#: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "Keyboard"
 msgstr ""
 
-#: src/emu/inpttype.ipp:812
+#: src/emu/inpttype.ipp:808
 msgctxt "input-name"
 msgid "On Screen Display"
 msgstr ""
 
-#: src/emu/inpttype.ipp:813
+#: src/emu/inpttype.ipp:809
 msgctxt "input-name"
 msgid "Break in Debugger"
 msgstr ""
 
-#: src/emu/inpttype.ipp:814
+#: src/emu/inpttype.ipp:810
 msgctxt "input-name"
 msgid "Config Menu"
 msgstr ""
 
-#: src/emu/inpttype.ipp:815
+#: src/emu/inpttype.ipp:811
 msgctxt "input-name"
 msgid "Pause"
 msgstr ""
 
-#: src/emu/inpttype.ipp:816
+#: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "Pause - Single Step"
 msgstr ""
 
-#: src/emu/inpttype.ipp:817
+#: src/emu/inpttype.ipp:813
 msgctxt "input-name"
 msgid "Rewind - Single Step"
 msgstr ""
 
-#: src/emu/inpttype.ipp:818
+#: src/emu/inpttype.ipp:814
 msgctxt "input-name"
 msgid "Reset Machine"
 msgstr ""
 
-#: src/emu/inpttype.ipp:819
+#: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Soft Reset"
 msgstr ""
 
-#: src/emu/inpttype.ipp:820
+#: src/emu/inpttype.ipp:816
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
 msgstr ""
 
-#: src/emu/inpttype.ipp:821
+#: src/emu/inpttype.ipp:817
 msgctxt "input-name"
 msgid "Frameskip Dec"
 msgstr ""
 
-#: src/emu/inpttype.ipp:822
+#: src/emu/inpttype.ipp:818
 msgctxt "input-name"
 msgid "Frameskip Inc"
 msgstr ""
 
-#: src/emu/inpttype.ipp:823
+#: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Throttle"
 msgstr ""
 
-#: src/emu/inpttype.ipp:824
+#: src/emu/inpttype.ipp:820
 msgctxt "input-name"
 msgid "Fast Forward"
 msgstr ""
 
-#: src/emu/inpttype.ipp:825
+#: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Show FPS"
 msgstr ""
 
-#: src/emu/inpttype.ipp:826
+#: src/emu/inpttype.ipp:822
 msgctxt "input-name"
 msgid "Save Snapshot"
 msgstr ""
 
-#: src/emu/inpttype.ipp:827
+#: src/emu/inpttype.ipp:823
 msgctxt "input-name"
 msgid "Write current timecode"
 msgstr ""
 
-#: src/emu/inpttype.ipp:828
+#: src/emu/inpttype.ipp:824
 msgctxt "input-name"
 msgid "Record MNG"
 msgstr ""
 
-#: src/emu/inpttype.ipp:829
+#: src/emu/inpttype.ipp:825
 msgctxt "input-name"
 msgid "Record AVI"
 msgstr ""
 
-#: src/emu/inpttype.ipp:830
+#: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "Toggle Cheat"
 msgstr ""
 
-#: src/emu/inpttype.ipp:831
+#: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "UI Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:832
+#: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "UI Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:833
+#: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "UI Left"
 msgstr ""
 
-#: src/emu/inpttype.ipp:834
+#: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "UI Right"
 msgstr ""
 
-#: src/emu/inpttype.ipp:835
+#: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "UI Home"
 msgstr ""
 
-#: src/emu/inpttype.ipp:836
+#: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "UI End"
 msgstr ""
 
-#: src/emu/inpttype.ipp:837
+#: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "UI Page Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:838
+#: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "UI Page Down"
 msgstr ""
 
-#: src/emu/inpttype.ipp:839
+#: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "UI Focus Next"
 msgstr ""
 
-#: src/emu/inpttype.ipp:840
+#: src/emu/inpttype.ipp:836
 msgctxt "input-name"
 msgid "UI Focus Previous"
 msgstr ""
 
-#: src/emu/inpttype.ipp:841
+#: src/emu/inpttype.ipp:837
 msgctxt "input-name"
 msgid "UI Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:842
+#: src/emu/inpttype.ipp:838
 msgctxt "input-name"
 msgid "UI Cancel"
 msgstr ""
 
-#: src/emu/inpttype.ipp:843
+#: src/emu/inpttype.ipp:839
 msgctxt "input-name"
 msgid "UI Display Comment"
 msgstr ""
 
-#: src/emu/inpttype.ipp:844
+#: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "UI Clear"
 msgstr ""
 
-#: src/emu/inpttype.ipp:845
+#: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "UI Zoom In"
 msgstr ""
 
-#: src/emu/inpttype.ipp:846
+#: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "UI Zoom Out"
 msgstr ""
 
-#: src/emu/inpttype.ipp:847
+#: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "UI Default Zoom"
 msgstr ""
 
-#: src/emu/inpttype.ipp:848
+#: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "UI Previous Group"
 msgstr ""
 
-#: src/emu/inpttype.ipp:849
+#: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "UI Next Group"
 msgstr ""
 
-#: src/emu/inpttype.ipp:850
+#: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "UI Rotate"
 msgstr ""
 
-#: src/emu/inpttype.ipp:851
+#: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "Show Profiler"
 msgstr ""
 
-#: src/emu/inpttype.ipp:852
+#: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "UI Toggle"
 msgstr ""
 
-#: src/emu/inpttype.ipp:853
+#: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "UI Release Pointer"
 msgstr ""
 
-#: src/emu/inpttype.ipp:854
+#: src/emu/inpttype.ipp:850
 msgctxt "input-name"
 msgid "UI Paste Text"
 msgstr ""
 
-#: src/emu/inpttype.ipp:855
+#: src/emu/inpttype.ipp:851
 msgctxt "input-name"
 msgid "Save State"
 msgstr ""
 
-#: src/emu/inpttype.ipp:856
+#: src/emu/inpttype.ipp:852
 msgctxt "input-name"
 msgid "Load State"
 msgstr ""
 
-#: src/emu/inpttype.ipp:857
+#: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:858
+#: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
 msgstr ""
 
-#: src/emu/inpttype.ipp:859
+#: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "UI External DAT View"
 msgstr ""
 
-#: src/emu/inpttype.ipp:860
+#: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "UI Add/Remove favorite"
 msgstr ""
 
-#: src/emu/inpttype.ipp:861
+#: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "UI Export List"
 msgstr ""
 
-#: src/emu/inpttype.ipp:862
+#: src/emu/inpttype.ipp:858
 msgctxt "input-name"
 msgid "UI Audit Media"
+msgstr ""
+
+#: src/osd/modules/input/input_windows.cpp:111
+#: src/osd/modules/input/input_sdlcommon.cpp:175
+msgctxt "input-name"
+msgid "Toggle Fullscreen"
+msgstr ""
+
+#: src/osd/modules/input/input_windows.cpp:117
+msgctxt "input-name"
+msgid "Take Rendered Snapshot"
+msgstr ""
+
+#: src/osd/modules/input/input_windows.cpp:128
+#: src/osd/modules/input/input_sdlcommon.cpp:223
+msgctxt "input-name"
+msgid "Record Rendered Video"
+msgstr ""
+
+#: src/osd/modules/input/input_windows.cpp:149
+msgctxt "input-name"
+msgid "Toggle Post-Processing"
+msgstr ""
+
+#: src/osd/modules/input/input_sdlcommon.cpp:201
+msgctxt "input-name"
+msgid "Toggle Filter"
+msgstr ""
+
+#: src/osd/modules/input/input_sdlcommon.cpp:207
+msgctxt "input-name"
+msgid "Decrease Prescaling"
+msgstr ""
+
+#: src/osd/modules/input/input_sdlcommon.cpp:217
+msgctxt "input-name"
+msgid "Increase Prescaling"
+msgstr ""
+
+#: plugins/hiscore/init.lua:85
+msgctxt "plugin-hiscore"
+msgid "When updated"
+msgstr ""
+
+#: plugins/hiscore/init.lua:85
+msgctxt "plugin-hiscore"
+msgid "On exit"
+msgstr ""
+
+#: plugins/hiscore/init.lua:86
+msgctxt "plugin-hiscore"
+msgid "Hiscore Support Options"
+msgstr ""
+
+#: plugins/hiscore/init.lua:88
+msgctxt "plugin-hiscore"
+msgid "Save scores"
+msgstr ""
+
+#: plugins/hiscore/init.lua:372
+msgctxt "plugin-hiscore"
+msgid "Hiscore Support"
 msgstr ""
 
 #: plugins/cheatfind/init.lua:387
@@ -6609,11 +6775,6 @@ msgstr ""
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
-msgstr ""
-
-#: plugins/cheatfind/init.lua:492 plugins/autofire/autofire_menu.lua:215
-#: plugins/autofire/autofire_menu.lua:261
-msgid "Cancel"
 msgstr ""
 
 #: plugins/cheatfind/init.lua:497
@@ -6845,167 +7006,369 @@ msgid "Input ports"
 msgstr ""
 
 #: plugins/autofire/init.lua:103
+msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
 msgstr ""
 
 #: plugins/autofire/init.lua:110
+msgctxt "plugin-autofire"
 msgid "Autofire"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:58
+#: plugins/autofire/autofire_menu.lua:74
+msgctxt "plugin-autofire"
 msgid "Autofire buttons"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:59
+#: plugins/autofire/autofire_menu.lua:75
 #, lua-format
+msgctxt "plugin-autofire"
 msgid "Press %s to delete"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:68
+#: plugins/autofire/autofire_menu.lua:91
 #, lua-format
-msgid "%s [%d Hz]"
+msgctxt "plugin-autofire"
+msgid "%s [%g Hz]"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:75 plugins/autofire/autofire_menu.lua:204
-msgid "Add autofire button"
-msgstr ""
-
-#: plugins/autofire/autofire_menu.lua:103
-#: plugins/autofire/autofire_menu.lua:104
-msgid "NOT SET"
+#: plugins/autofire/autofire_menu.lua:99
+msgctxt "plugin-autofire"
+msgid "[no autofire buttons]"
 msgstr ""
 
 #: plugins/autofire/autofire_menu.lua:105
+#: plugins/autofire/autofire_menu.lua:251
+msgctxt "plugin-autofire"
+msgid "Add autofire button"
+msgstr ""
+
+#: plugins/autofire/autofire_menu.lua:142
+#: plugins/autofire/autofire_menu.lua:143
+msgctxt "plugin-autofire"
+msgid "[not set]"
+msgstr ""
+
+#: plugins/autofire/autofire_menu.lua:144
+msgctxt "plugin-autofire"
 msgid "Input"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:106
+#: plugins/autofire/autofire_menu.lua:148
+msgctxt "plugin-autofire"
 msgid "Hotkey"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:107
+#: plugins/autofire/autofire_menu.lua:149
+msgctxt "plugin-autofire"
 msgid "On frames"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:108
+#: plugins/autofire/autofire_menu.lua:150
+msgctxt "plugin-autofire"
 msgid "Off frames"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:115 plugins/cheat/init.lua:618
-msgid "Press button for hotkey or wait to leave unchanged"
-msgstr ""
-
-#: plugins/autofire/autofire_menu.lua:155
+#: plugins/autofire/autofire_menu.lua:188
+msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:165
+#: plugins/autofire/autofire_menu.lua:201
+msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:179
+#: plugins/autofire/autofire_menu.lua:218
+msgctxt "plugin-autofire"
 msgid "Edit autofire button"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:187 plugins/cheat/init.lua:650
+#: plugins/autofire/autofire_menu.lua:226
+msgctxt "plugin-autofire"
 msgid "Done"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:239
+#: plugins/autofire/autofire_menu.lua:260
+msgctxt "plugin-autofire"
+msgid "Create"
+msgstr "Skapa"
+
+#: plugins/autofire/autofire_menu.lua:262
+msgctxt "plugin-autofire"
+msgid "Cancel"
+msgstr ""
+
+#: plugins/autofire/autofire_menu.lua:312
+msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
 msgstr ""
 
-#: plugins/timer/init.lua:94
-msgid "Current time"
+#: plugins/inputmacro/init.lua:130 plugins/inputmacro/inputmacro_menu.lua:520
+msgctxt "plugin-inputmacro"
+msgid "Input Macros"
 msgstr ""
 
-#: plugins/timer/init.lua:96
-msgid "Total time"
+#: plugins/inputmacro/inputmacro_menu.lua:31
+msgctxt "plugin-inputmacro"
+msgid "New macro"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:35
+#, lua-format
+msgctxt "plugin-inputmacro"
+msgid "New macro %d"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:81
+msgctxt "plugin-inputmacro"
+msgid "Set Input"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:319
+msgctxt "plugin-inputmacro"
+msgid "Name"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:327
+#: plugins/inputmacro/inputmacro_menu.lua:363
+msgctxt "plugin-inputmacro"
+msgid "[not set]"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:328
+msgctxt "plugin-inputmacro"
+msgid "Activation sequence"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:331
+msgctxt "plugin-inputmacro"
+msgid "Stop immediately"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:331
+msgctxt "plugin-inputmacro"
+msgid "Complete macro"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:332
+msgctxt "plugin-inputmacro"
+msgid "On release"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:338
+msgctxt "plugin-inputmacro"
+msgid "Release"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:341
+#, lua-format
+msgctxt "plugin-inputmacro"
+msgid "Loop to step %d"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:346
+#, lua-format
+msgctxt "plugin-inputmacro"
+msgid "Prolong step %d"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:348
+msgctxt "plugin-inputmacro"
+msgid "When held"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:352
+#, lua-format
+msgctxt "plugin-inputmacro"
+msgid "Step %d"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:353
+msgctxt "plugin-inputmacro"
+msgid "Delay (frames)"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:359
+msgctxt "plugin-inputmacro"
+msgid "Duration (frames)"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:364
+#, lua-format
+msgctxt "plugin-inputmacro"
+msgid "Input %d"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:369
+msgctxt "plugin-inputmacro"
+msgid "Add input"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:374
+msgctxt "plugin-inputmacro"
+msgid "Delete step"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:390
+msgctxt "plugin-inputmacro"
+msgid "Add step at position"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:434
+msgctxt "plugin-inputmacro"
+msgid "Add Input Macro"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:441
+msgctxt "plugin-inputmacro"
+msgid "Create"
+msgstr "Skapa"
+
+#: plugins/inputmacro/inputmacro_menu.lua:443
+msgctxt "plugin-inputmacro"
+msgid "Cancel"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:459
+msgctxt "plugin-inputmacro"
+msgid "Edit Input Macro"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:465
+msgctxt "plugin-inputmacro"
+msgid "Done"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:521
+#, lua-format
+msgctxt "plugin-inputmacro"
+msgid "Press %s to delete"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:533
+msgctxt "plugin-inputmacro"
+msgid "[no macros]"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:538
+msgctxt "plugin-inputmacro"
+msgid "Add macro"
+msgstr ""
+
+#: plugins/timer/init.lua:89
+#, lua-format
+msgctxt "plugin-timer"
+msgid "%03d:%02d:%02d"
 msgstr ""
 
 #: plugins/timer/init.lua:98
+msgctxt "plugin-timer"
+msgid "Current time"
+msgstr ""
+
+#: plugins/timer/init.lua:99
+msgctxt "plugin-timer"
+msgid "Total time"
+msgstr ""
+
+#: plugins/timer/init.lua:100
+msgctxt "plugin-timer"
 msgid "Play Count"
 msgstr ""
 
-#: plugins/timer/init.lua:106
+#: plugins/timer/init.lua:109
+msgctxt "plugin-timer"
 msgid "Timer"
 msgstr ""
 
-#: plugins/cheat/init.lua:606
+#: plugins/cheat/init.lua:609
 msgid "Select cheat to set hotkey"
 msgstr ""
 
-#: plugins/cheat/init.lua:607
+#: plugins/cheat/init.lua:610
 #, lua-format
 msgid "Press %s to clear hotkey"
 msgstr ""
 
-#: plugins/cheat/init.lua:645
+#: plugins/cheat/init.lua:638
 msgid "None"
 msgstr "Ingen"
 
-#: plugins/cheat/init.lua:664 plugins/cheat/init.lua:678
+#: plugins/cheat/init.lua:644
+msgid "Done"
+msgstr ""
+
+#: plugins/cheat/init.lua:662 plugins/cheat/init.lua:676
 msgid "Set"
 msgstr ""
 
-#: plugins/cheat/init.lua:697
+#: plugins/cheat/init.lua:695
 msgid "Set hotkeys"
 msgstr ""
 
-#: plugins/cheat/init.lua:785
+#: plugins/cheat/init.lua:783
 #, lua-format
 msgid "Activated: %s = %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:787 plugins/cheat/init.lua:845
+#: plugins/cheat/init.lua:785 plugins/cheat/init.lua:843
 #, lua-format
 msgid "Activated: %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:849
+#: plugins/cheat/init.lua:847
 #, lua-format
 msgid "Enabled: %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:854
+#: plugins/cheat/init.lua:852
 #, lua-format
 msgid "Disabled: %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:913
+#: plugins/cheat/init.lua:911
 #, lua-format
 msgid "%s added"
 msgstr ""
 
-#: plugins/data/data_command.lua:23
+#: plugins/data/data_command.lua:22
+msgctxt "plugin-data"
 msgid "Command"
 msgstr "Kommando"
 
 #: plugins/data/data_story.lua:22
+msgctxt "plugin-data"
 msgid "Mamescore"
 msgstr "Mamescore"
 
 #: plugins/data/data_sysinfo.lua:15
+msgctxt "plugin-data"
 msgid "Sysinfo"
 msgstr "Systeminfo"
 
 #: plugins/data/data_hiscore.lua:1220 plugins/data/data_hiscore.lua:1268
+msgctxt "plugin-data"
 msgid "High Scores"
 msgstr "Ranking"
 
 #: plugins/data/data_marp.lua:136
+msgctxt "plugin-data"
 msgid "MARPScore"
 msgstr "MARPScore"
 
 #: plugins/data/data_gameinit.lua:16
+msgctxt "plugin-data"
 msgid "Gameinit"
 msgstr "Spelstart"
 
 #: plugins/data/data_history.lua:172
+msgctxt "plugin-data"
 msgid "History"
 msgstr "Historia"
 
 #: plugins/data/data_messinfo.lua:19 plugins/data/data_mameinfo.lua:18
+msgctxt "plugin-data"
 msgid ""
 "\n"
 "\n"
@@ -7014,12 +7377,44 @@ msgid ""
 msgstr ""
 
 #: plugins/data/data_messinfo.lua:21
+msgctxt "plugin-data"
 msgid "MESSinfo"
 msgstr "MESSinfo"
 
 #: plugins/data/data_mameinfo.lua:20
+msgctxt "plugin-data"
 msgid "MAMEinfo"
 msgstr "MAMEinfo"
+
+#: plugins/commonui/init.lua:93
+#, lua-format
+msgctxt "plugin-commonui"
+msgid "%s [root%s]"
+msgstr ""
+
+#: plugins/commonui/init.lua:95
+#, lua-format
+msgctxt "plugin-commonui"
+msgid "[root%s]"
+msgstr ""
+
+#: plugins/commonui/init.lua:101
+msgctxt "plugin-commonui"
+msgid "Cancel"
+msgstr ""
+
+#: plugins/commonui/init.lua:197
+msgctxt "plugin-commonui"
+msgid "Invalid sequence entered"
+msgstr ""
+
+#: plugins/commonui/init.lua:203
+#, lua-format
+msgctxt "plugin-commonui"
+msgid ""
+"Enter sequence or press %s to cancel\n"
+"%s"
+msgstr ""
 
 #, c-format
 #~ msgid "%s.xml saved under ui folder."

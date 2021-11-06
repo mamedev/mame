@@ -207,6 +207,7 @@ crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
+ctk2000.cpp
 ctk551.cpp
 cvicny.cpp
 cxg_ch2001.cpp
@@ -303,6 +304,7 @@ exelv.cpp
 exorciser.cpp
 exorterm.cpp
 exp85.cpp
+f387x.cpp
 facit4440.cpp
 falco5220.cpp
 falcots.cpp

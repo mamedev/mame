@@ -19,6 +19,7 @@
 #include <vector>
 
 namespace ui {
+
 //-------------------------------------------------
 //  class directory menu
 //-------------------------------------------------
@@ -34,7 +35,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 };
 
 //-------------------------------------------------
@@ -58,7 +59,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	std::string              m_heading[1], m_searchpath;
 	std::vector<std::string> m_folders;
@@ -80,7 +81,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	std::string  m_searchpath;
 	int          m_ref;
@@ -104,7 +105,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	int          m_ref;
 	std::string  m_current_path;
@@ -115,4 +116,4 @@ private:
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_DIRMENU_H */
+#endif // MAME_FRONTEND_UI_DIRMENU_H

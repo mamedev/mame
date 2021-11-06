@@ -66,13 +66,16 @@ private:
 	using field_data_vector = std::vector<field_data>;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void find_fields();
 
 	item_data_vector m_item_data;
 	field_data_vector m_field_data;
+	std::string m_prompt;
 	unsigned m_visible_fields;
+	int m_top_field;
+	bool m_hide_menu;
 };
 
 } // namespace ui

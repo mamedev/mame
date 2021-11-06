@@ -448,31 +448,26 @@ template <typename T, size_t SIZE>
 class lua_engine::enum_parser
 {
 public:
-	constexpr enum_parser(std::initializer_list<std::pair<const char *, T>> values)
+	constexpr enum_parser(std::initializer_list<std::pair<std::string_view, T> > values)
 	{
 		if (values.size() != SIZE)
 			throw false && "size template argument incorrectly specified";
 		std::copy(values.begin(), values.end(), m_map.begin());
 	}
 
-	T operator()(const char *text) const
+	T operator()(std::string_view text) const
 	{
 		auto iter = std::find_if(
-			m_map.begin() + 1,
-			m_map.end(),
-			[text](const auto &x) { return !strcmp(text, x.first); });
+				m_map.begin() + 1,
+				m_map.end(),
+				[&text] (const auto &x) { return text == x.first; });
 		if (iter == m_map.end())
 			iter = m_map.begin();
 		return iter->second;
 	}
 
-	T operator()(const std::string &text) const
-	{
-		return (*this)(text.c_str());
-	}
-
 private:
-	std::array<std::pair<const char *, T>, SIZE> m_map;
+	std::array<std::pair<std::string_view, T>, SIZE> m_map;
 };
 
 

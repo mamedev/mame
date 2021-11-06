@@ -3276,6 +3276,7 @@ cshift                          // (c) 1984
 gghost                          // (c) 1984
 gimeabrk                        // (c) 1985
 grudge                          // prototype - Bally/Midway
+grudgei                         //
 grudgep                         //
 hattrick                        // (c) 1984
 teamht                          //
@@ -11356,6 +11357,7 @@ ssf2tu                          // 23/03/1994 (c) 1994 (USA)
 ssf2tur1                        // 23/02/1994 (c) 1994 (USA)
 ssf2u                           // 11/09/1993 (c) 1993 (USA)
 ssf2ud                          //
+ssf2us2                         // bootleg of 11/09/1993 (c) 1993 (USA)
 ssf2xj                          // 11/03/1994 (c) 1994 (Japan)
 ssf2xjr1                        // 23/02/1994 (c) 1994 (Japan)
 ssf2xjr1d                       //
@@ -11573,6 +11575,9 @@ ct486                           // 1993? 486 with CS4031
 
 @source:ctk551.cpp
 ctk551                          //
+
+@source:ctk2000.cpp
+ctk2100                         //
 
 @source:cubeqst.cpp
 cubeqst                         // (c) 1983 Simutrek Inc.
@@ -12034,6 +12039,7 @@ tftc_200                        //
 tftc_300                        //
 tftc_302                        //
 tftc_303                        //
+tmnt_101                        //
 tmnt_103                        //
 tmnt_104                        //
 tmnt_104g                       //
@@ -12405,7 +12411,8 @@ bmdct                           // GX995 (c) 2000 (Japan)
 bmfinal                         // GXC01 (c) 2002 (Japan)
 hmcompm2                        // GX988 (c) 2000
 hmcompmx                        // GX858 (c) 1999
-popn1                           // GX803 (c) 1998 (Asia)
+popn1                           // GX803 (c) 1998 (Export)
+popn1a                          // GX803 (c) 1998 (Asia)
 popn1k                          // GX803 (c) 1998 (Korea)
 popn1j                          // GX803 (c) 1998 (Japan)
 popn2                           // GX831 (c) 1998 (Japan)
@@ -13701,6 +13708,9 @@ f1gpb                           // bootleg
 @source:f-32.cpp
 mosaicf2                        // (c) 1999 F2 System
 royalpk2                        //
+
+@source:f387x.cpp
+f387x                           // (c) 1979 Fairchild
 
 @source:facit4440.cpp
 facit4440                       // 1984
@@ -20103,6 +20113,7 @@ hhotel                          //
 hustlerp                        //
 kkongltd                        //
 pecmen                          //
+spcpoker                        //
 tmacltd2                        //
 tmacltd4                        //
 tricksht                        //
@@ -32088,6 +32099,7 @@ mushi2k62                       // 2006.?? MushiKing The King Of Beetles 2006 Se
 mushike                         // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.003-, World)
 mushikeo                        // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.002-, World)
 mushikep                        // 2004.?? MushiKing The King Of Beetle (Prototype)
+mushikc                         // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.000-, China)
 mushikk                         // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.000-, Korea)
 mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
 mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)

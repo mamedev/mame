@@ -233,21 +233,6 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Recreated protection by hand -->
-	<software name="columns">
-		<description>Columns</description>
-		<year>1990</year>
-		<publisher>日本テレネット (Nihon Telenet)</publisher>
-		<info name="alt_title" value="コラムス" />
-		<info name="release" value="199012xx" />
-		<info name="usage" value="Requires 2 MB RAM"/>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1282512">
-				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dps">
 		<description>D.P.S - Dream Program System</description>
 		<year>1990</year>
@@ -391,132 +376,6 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="fb86compiler.hdm" size="1261568" crc="6d57f1f7" sha1="0d0e6a0500e0210724c758b7c55999f61e6934c6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1992)" magazine. -->
-	<software name="futoph02">
-		<description>Futoppara FD Heisei 2-gou</description>
-		<year>1992</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成2号" />
-		<info name="release" value="199204xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #02.hdm" size="1261568" crc="cca4f1ae" sha1="7d73d7e2f6174f09273c7b38218294ce32380fb9"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Natsu no Tokubetsu-gou (1992)" magazine. -->
-	<software name="futoph03">
-		<description>Futoppara FD Heisei 3-gou</description>
-		<year>1992</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成3号" />
-		<info name="release" value="199208xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #03.hdm" size="1261568" crc="1009e7c2" sha1="2f3af3115de077a0a69dc045085851d9001814a8"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Fuyu no Tokubetsu-gou (1992)" magazine. -->
-	<software name="futoph04">
-		<description>Futoppara FD Heisei 4-gou</description>
-		<year>1992</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成4号" />
-		<info name="release" value="199212xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #04.hdm" size="1261568" crc="75ceb8be" sha1="0650754491576875b02e07b573c4a5a06e275ba5"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1993)" magazine. -->
-	<software name="futoph05">
-		<description>Futoppara FD Heisei 5-gou</description>
-		<year>1993</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成5号" />
-		<info name="release" value="199303xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #05.hdm" size="1261568" crc="bb41215a" sha1="655f955ad7ee44dc1035c238f8e17b91a34b6bc6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Natsu no Tokubetsu-gou (1993)" magazine. -->
-	<software name="futoph06">
-		<description>Futoppara FD Heisei 6-gou</description>
-		<year>1993</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成6号" />
-		<info name="release" value="199308xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #06.hdm" size="1261568" crc="14bdb0d5" sha1="d6f32df1be6fa3aaa54ec3209af84d4a430ff5cb"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Aki no Tokubetsu-gou (1993)" magazine. -->
-	<software name="futoph07">
-		<description>Futoppara FD Heisei 7-gou</description>
-		<year>1993</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成7号" />
-		<info name="release" value="199311xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #07.hdm" size="1261568" crc="91d8bc3f" sha1="54eef9754dec15b4ede6a4f16fe2c15eb101255c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1994)" magazine. -->
-	<software name="futoph08">
-		<description>Futoppara FD Heisei 8-gou</description>
-		<year>1994</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成8号" />
-		<info name="release" value="199403xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #08.hdm" size="1261568" crc="f8061488" sha1="fbe9fa3a916b38154ddae4576993855354120ee6"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns Shoka no Tokubetsu-gou (1994)" magazine. -->
-	<software name="futoph09">
-		<description>Futoppara FD Heisei 9-gou</description>
-		<year>1994</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成9号" />
-		<info name="release" value="199406xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #09.hdm" size="1261568" crc="8d917956" sha1="10560f07227a6ce945b27deac9a86df96fef0edd"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Bundled with "Oh! FM Towns" magazine, March 1995 issue. -->
-	<software name="futoph10">
-		<description>Futoppara FD Heisei 10-gou</description>
-		<year>1995</year>
-		<publisher>SoftBank</publisher>
-		<info name="alt_title" value="太っ腹FD平成10号" />
-		<info name="release" value="199503xx" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="futoppara fd heisei #10.hdm" size="1261568" crc="ae02ab66" sha1="39a2921484d1f6b141fe43af046003593b07cf0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -931,7 +790,7 @@ license:CC0
 	</software>
 
 	<software name="musicproo">
-		<description>Music Pro-Towns (1989-08-28)</description>
+		<description>Music Pro-Towns v1.0 (1989-08-28)</description>
 		<year>1989</year>
 		<publisher>Musical Plan</publisher>
 		<info name="usage" value="This is a master disk that can be turned into a System, Data or Demo disk. Make a copy of this disk, boot TownsOS V1.1, run the icon for the type of disk you want, and wait until it returns to the TownsOS GUI." />

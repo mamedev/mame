@@ -14,8 +14,8 @@
 
 #pragma once
 
-#include "ui/menu.h"
 #include "ui/text.h"
+#include "ui/textbox.h"
 
 #include <optional>
 #include <string>
@@ -33,7 +33,7 @@ namespace ui {
 //  class dats menu
 //-------------------------------------------------
 
-class menu_dats_view : public menu
+class menu_dats_view : public menu_textbox
 {
 public:
 	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info &swinfo);
@@ -46,6 +46,8 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual bool custom_mouse_down() override;
 
+	virtual void populate_text(std::optional<text_layout> &layout, float &width, int &lines) override;
+
 private:
 	struct list_items
 	{
@@ -56,11 +58,8 @@ private:
 		std::string revision;
 	};
 
-	// draw dats menu
-	virtual void draw(uint32_t flags) override;
-
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void get_data(std::string &buffer);
 	void get_data_sw(std::string &buffer);
@@ -68,7 +67,6 @@ private:
 	ui_system_info const *const m_system;
 	ui_software_info const *const m_swinfo;
 	bool const m_issoft;
-	std::optional<text_layout> m_layout;
 	int m_actual;
 	std::string m_list, m_short, m_long, m_parent;
 	std::vector<list_items> m_items_list;

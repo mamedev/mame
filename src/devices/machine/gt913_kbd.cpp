@@ -28,15 +28,15 @@ DEFINE_DEVICE_TYPE(GT913_KBD_HLE, gt913_kbd_hle_device, "gt913_kbd_hle", "Casio 
 
 gt913_kbd_hle_device::gt913_kbd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, GT913_KBD_HLE, tag, owner, clock),
-	device_matrix_keyboard_interface(mconfig, *this, "KO0", "KO1", "KO2", "KO3", "KO4", "KO5", "KO6", "KO7", "KO8", "KO9", "KO10", "KO11", "KO12"),
-	m_intc(nullptr), m_intc_tag(nullptr), m_irq(0),
-	m_velocity(*this, "VELOCITY")
+	device_matrix_keyboard_interface(mconfig, *this, "FI0", "FI1", "FI2", "FI3", "FI4", "FI5", "FI6", "FI7", "FI8", "FI9", "FI10", "KI0", "KI1", "KI2"),
+	m_velocity(*this, "VELOCITY"),
+	m_irq_cb(*this)
 {
 }
 
 void gt913_kbd_hle_device::device_start()
 {
-	m_intc = siblingdevice<h8_intc_device>(m_intc_tag);
+	m_irq_cb.resolve_safe();
 
 	save_item(NAME(m_status));
 	save_item(NAME(m_fifo));
@@ -51,7 +51,7 @@ void gt913_kbd_hle_device::device_reset()
 	m_fifo_read = m_fifo_write = 0;
 
 	reset_key_state();
-	start_processing(attotime::from_hz(1200));
+	start_processing(attotime::from_hz(9600));
 }
 
 void gt913_kbd_hle_device::key_add(uint8_t row, uint8_t column, int state)
@@ -75,7 +75,9 @@ void gt913_kbd_hle_device::update_status()
 		m_status |= 0x8000;
 
 	if (BIT(m_status, 15) && BIT(m_status, 14))
-		m_intc->internal_interrupt(m_irq);
+		m_irq_cb(1);
+	else
+		m_irq_cb(0);
 }
 
 uint16_t gt913_kbd_hle_device::read()

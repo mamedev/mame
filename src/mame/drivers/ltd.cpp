@@ -640,7 +640,11 @@ ROM_END
 / Space Poker
 /-------------------------------------------------------------------*/
 
-// No good dump available
+ROM_START(spcpoker)
+	ROM_REGION(0x1000, "roms", 0)
+	ROM_LOAD( "spoker.bin",   0x0000, 0x0800, CRC(98918b19) SHA1(b1bb3f408dae9fc77d396894c3c4ef08bce8c345) )
+	ROM_RELOAD(0x0800, 0x0800)
+ROM_END
 
 /*-------------------------------------------------------------------
 / Black Hole
@@ -750,13 +754,14 @@ ROM_END
 
 // system 3
 GAME(1981, arizona,  0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, discodan, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, force,    0,        ltd3, ltd3, ltd_state, init_atla_ltd, ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd_state, init_bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd_state, init_bhol_ltd, ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd_state, init_bhol_ltd, ROT0, "LTD", "Space Poker",                       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, cowboy,   0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Cowboy Eight Ball",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, zephy,    0,        ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd_state, init_zephy,    ROT0, "LTD", "Zephy (alternate set)",             MACHINE_IS_SKELETON_MECHANICAL)

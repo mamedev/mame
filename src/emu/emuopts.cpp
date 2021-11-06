@@ -69,7 +69,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_REWIND_CAPACITY "(1-2048)",                 "100",       OPTION_INTEGER,    "rewind buffer size in megabytes" },
 	{ OPTION_PLAYBACK ";pb",                             nullptr,     OPTION_STRING,     "playback an input file" },
 	{ OPTION_RECORD ";rec",                              nullptr,     OPTION_STRING,     "record an input file" },
-	{ OPTION_RECORD_TIMECODE,                            "0",         OPTION_BOOLEAN,    "record an input timecode file (requires -record option)" },
 	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",         OPTION_BOOLEAN,    "close the program at the end of playback" },
 
 	{ OPTION_MNGWRITE,                                   nullptr,     OPTION_STRING,     "optional filename to write a MNG movie of the current session" },

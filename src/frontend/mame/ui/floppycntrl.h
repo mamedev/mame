@@ -26,6 +26,9 @@ public:
 	menu_control_floppy_image(mame_ui_manager &ui, render_container &container, device_image_interface &image);
 	virtual ~menu_control_floppy_image() override;
 
+protected:
+	virtual void menu_activated() override;
+
 private:
 	enum { SELECT_FORMAT = LAST_ID, SELECT_MEDIA, SELECT_INIT, SELECT_RW };
 
@@ -34,12 +37,10 @@ private:
 	const floppy_image_device::fs_info *create_fs;
 	std::string input_filename, output_filename;
 
-	virtual void handle() override;
-
 	void do_load_create();
 	virtual void hook_load(const std::string &filename) override;
 };
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_FLOPPYCNTRL_H */
+#endif // MAME_FRONTEND_UI_FLOPPYCNTRL_H
