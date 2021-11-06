@@ -73,7 +73,6 @@ private:
 	std::string                                     m_confirm_prompt;
 	file_entry const *                              m_confirm_delete;
 	bool const                                      m_must_exist;
-	bool                                            m_first_time;
 	bool                                            m_keys_released;
 
 	static void *itemref_from_file_entry(const file_entry &entry);
