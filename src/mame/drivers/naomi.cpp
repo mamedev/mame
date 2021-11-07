@@ -7092,6 +7092,21 @@ ROM_START( mushik2e )
 	ROM_PARAMETER( ":rom_board:id", "5582" )
 ROM_END
 
+// require rev.H Korea BIOS, not dumped
+ROM_START( mushik2k )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24355.ic8", 0x0000000, 0x4000000, CRC(8bd89229) SHA1(912fd2707573cefbbaa41e586a394d124f5afeba) )
+	ROM_LOAD( "fpr-24356.ic9", 0x4000000, 0x4000000, CRC(ed649c81) SHA1(79a489728dbe16eb01080d1dcc6cfa2594c81318) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, CRC(3b6fcee8) SHA1(65fbdd3b8c61a4b5ccb6389b25483a7ecdc0794d) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
+ROM_END
+
 // change game version (4/5/6): in BACKUP DATA CLEAR menu hold P1 and P2 buttons 1 for 3 seconds, then change version number in appeared menu and select YES(CLEAR)
 ROM_START( mushik4e )
 	NAOMI_BIOS
@@ -11854,7 +11869,7 @@ ROM_END
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
 /* 0167    */ GAME( 2006, mushi2k61, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 First (Japan)", GAME_FLAGS )
-// 0168 Mushiking II (Korea)
+/* 0168    */ GAME( 2005, mushik2k,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.000-) (Korea)", GAME_FLAGS )
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 /* 0171    */ GAME( 2006, mushi2k62, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 Second (Japan)", GAME_FLAGS )
