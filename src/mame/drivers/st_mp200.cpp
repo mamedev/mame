@@ -112,7 +112,7 @@ private:
 	u8 m_stored_lamp = 0xff;
 	u8 m_digit = 0;
 	u8 m_counter = 0;
-	u8 m_segment[5];
+	u8 m_segment[5]{};
 	u8 m_last_solenoid = 31;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
