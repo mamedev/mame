@@ -53,8 +53,7 @@ namespace
 	// This is a VME chassis so any ROMs are contained in the cards.
 	ROM_START(sys1121) 
 	ROM_END
-
-	}
+}
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME    FLAGS
 COMP( 1984, sys1121, 0,       0,      sys1121, sys1121, sys1121_state, empty_init, "Motorola", "SYS1121",  MACHINE_IS_SKELETON )
