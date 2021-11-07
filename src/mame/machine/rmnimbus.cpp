@@ -216,7 +216,7 @@ void rmnimbus_state::machine_reset()
 void rmnimbus_state::machine_start()
 {
 	m_nimbus_mouse.m_mouse_timer=timer_alloc(TIMER_MOUSE);
-
+	
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -229,7 +229,9 @@ void rmnimbus_state::machine_start()
 
 	m_debug_machine=DEBUG_NONE;
 	m_debug_trap=0;
+	m_voice_enabled=false;
 	m_fdc->dden_w(0);
+	//m_fdc->overide_delays(64,m_fdc->get_cmd_delay()); 
 }
 
 void rmnimbus_state::debug_command(const std::vector<std::string> &params)
@@ -1367,6 +1369,14 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 	check_scsi_irq();
 }
 
+void rmnimbus_state::nimbus_voice_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0xB0) 
+		m_voice_enabled = true;
+	else if (offset == 0xB2)
+		m_voice_enabled = false;
+}
+
 /* 8031/8051 Peripheral controller 80186 side */
 
 void rmnimbus_state::pc8031_reset()
@@ -1592,6 +1602,20 @@ void rmnimbus_state::iou_reset()
 	m_eeprom_state = 0;
 }
 
+/* Rompacks, not completely implemented */
+
+uint8_t rmnimbus_state::nimbus_rompack_r(offs_t offset)
+{
+	logerror("Rompack read offset %02X, rompack address=%04X\n",offset,(m_ay8910_b*256)+m_ay8910_a);
+	
+	return 0;
+}
+
+void rmnimbus_state::nimbus_rompack_w(offs_t offset, uint8_t data)
+{
+	logerror("Rompack write offset %02X, data=%02X, rompack address=%04X\n",offset,data,(m_ay8910_b*256)+m_ay8910_a);
+}
+
 /*
     Sound hardware : AY8910
 
@@ -1614,6 +1638,7 @@ void rmnimbus_state::rmni_sound_reset()
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;
+	m_ay8910_b=0;
 }
 
 void rmnimbus_state::nimbus_sound_ay8910_porta_w(uint8_t data)
@@ -1621,16 +1646,21 @@ void rmnimbus_state::nimbus_sound_ay8910_porta_w(uint8_t data)
 	m_msm->data_w(data);
 
 	// Mouse code needs a copy of this.
+	// ROMpack lower address lines
 	m_ay8910_a=data;
 }
 
 void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 {
-	if ((data & 0x07) != m_last_playmode)
+	// Only update msm5205 if voice is enabled.....
+	if (m_voice_enabled  && ((data & 0x07) != m_last_playmode))
 	{
 		m_last_playmode = (data & 0x07);
 		m_msm->playmode_w(m_last_playmode);
 	}
+	
+	// ROMpack upper address lines
+	m_ay8910_b=data;
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
@@ -1639,24 +1669,18 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
+void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case TIMER_MOUSE	: do_mouse(); break;
+	}
+}
+
 static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
 static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
-void rmnimbus_state::mouse_js_reset()
-{
-	m_nimbus_mouse.m_mouse_x=128;
-	m_nimbus_mouse.m_mouse_y=128;
-	m_nimbus_mouse.m_mouse_pcx=0;
-	m_nimbus_mouse.m_mouse_pcy=0;
-	m_nimbus_mouse.m_intstate_x=0;
-	m_nimbus_mouse.m_intstate_y=0;
-	m_nimbus_mouse.m_reg0a4=0xC0;
-
-	// Setup timer to poll the mouse
-	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
-}
-
-void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+void rmnimbus_state::do_mouse()
 {
 	int   mouse_x 	= 0;	// Current mouse X and Y
 	int   mouse_y 	= 0;
@@ -1753,6 +1777,20 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	// and interrupt state
 	m_nimbus_mouse.m_intstate_x=intstate_x;
 	m_nimbus_mouse.m_intstate_y=intstate_y;
+}
+
+void rmnimbus_state::mouse_js_reset()
+{
+	m_nimbus_mouse.m_mouse_x=128;
+	m_nimbus_mouse.m_mouse_y=128;
+	m_nimbus_mouse.m_mouse_pcx=0;
+	m_nimbus_mouse.m_mouse_pcy=0;
+	m_nimbus_mouse.m_intstate_x=0;
+	m_nimbus_mouse.m_intstate_y=0;
+	m_nimbus_mouse.m_reg0a4=0xC0;
+
+	// Setup timer to poll the mouse
+	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
 }
 
 uint8_t rmnimbus_state::nimbus_mouse_js_r()

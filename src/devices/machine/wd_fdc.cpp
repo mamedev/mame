@@ -25,7 +25,7 @@
 #define LOG_CRC		(1U << 15) // CRC errors
 
 #define VERBOSE (LOG_DESC)
-//#define VERBOSE (LOG_DESC | LOG_COMMAND | LOG_MATCH | LOG_WRITE | LOG_STATE | LOG_LINES | LOG_COMP | LOG_CRC)
+//#define VERBOSE (LOG_DESC | LOG_COMMAND | LOG_MATCH | LOG_WRITE | LOG_STATE | LOG_LINES | LOG_COMP | LOG_CRC )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -81,6 +81,58 @@ DEFINE_DEVICE_TYPE(WD2797,     wd2797_device,     "wd2797",     "Western Digital
 DEFINE_DEVICE_TYPE(WD1770,     wd1770_device,     "wd1770",     "Western Digital WD1770 FDC")
 DEFINE_DEVICE_TYPE(WD1772,     wd1772_device,     "wd1772",     "Western Digital WD1772 FDC")
 DEFINE_DEVICE_TYPE(WD1773,     wd1773_device,     "wd1773",     "Western Digital WD1773 FDC")
+
+static std::string states[] = 
+{
+	"IDLE",						
+	"RESTORE",					
+	"SEEK",						
+	"STEP",
+	"READ_SECTOR",
+	"READ_TRACK",
+	"READ_ID",
+	"WRITE_TRACK",
+	"WRITE_SECTOR",
+	"SPINUP",
+	"SPINUP_WAIT",
+	"SPINUP_DONE",
+	"SETTLE_WAIT",
+	"SETTLE_DONE",
+	"DATA_LOAD_WAIT",
+	"DATA_LOAD_WAIT_DONE",
+	"SEEK_MOVE",
+	"SEEK_WAIT_STEP_TIME",
+	"SEEK_WAIT_STEP_TIME_DONE",
+	"SEEK_WAIT_STABILIZATION_TIME",
+	"SEEK_WAIT_STABILIZATION_TIME_DONE",
+	"SEEK_DONE",
+	"WAIT_INDEX",
+	"WAIT_INDEX_DONE",
+	"SCAN_ID",
+	"SCAN_ID_FAILED",
+	"SECTOR_READ",
+	"SECTOR_WRITE",
+	"TRACK_DONE",
+	"INITIAL_RESTORE",
+	"DUMMY",
+	"SEARCH_ADDRESS_MARK_HEADER",
+	"READ_HEADER_BLOCK_HEADER",
+	"READ_DATA_BLOCK_HEADER",
+	"READ_ID_BLOCK_TO_LOCAL",
+	"READ_ID_BLOCK_TO_DMA",
+	"READ_ID_BLOCK_TO_DMA_BYTE",
+	"SEARCH_ADDRESS_MARK_DATA",
+	"SEARCH_ADDRESS_MARK_DATA_FAILED",
+	"READ_SECTOR_DATA",
+	"READ_SECTOR_DATA_BYTE",
+	"READ_TRACK_DATA",
+	"READ_TRACK_DATA_BYTE",
+	"WRITE_TRACK_DATA",
+	"WRITE_BYTE",
+	"WRITE_BYTE_DONE",
+	"WRITE_SECTOR_PRE",
+	"WRITE_SECTOR_PRE_BYTE"
+};
 
 wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
@@ -982,6 +1034,8 @@ void wd_fdc_device_base::interrupt_start()
 	{
 		delay_int = false;
 	}
+
+	//logerror("main_state=%s, cur_live.state=%s\n",states[main_state],states[cur_live.state]);
 
 	if(status & S_BUSY) {
 		main_state = sub_state = cur_live.state = IDLE;
@@ -2107,12 +2161,6 @@ void wd_fdc_device_base::live_run(attotime limit)
 			break;
 
 		case WRITE_BYTE_DONE:
-			// Act on delayed interrupt if set.
-			if (delay_int)
-			{
-				interrupt_start();
-				return;
-			}
 			switch(sub_state) {
 			case TRACK_DONE:
 				if(cur_live.previous_type == live_info::PT_CRC_1) {
@@ -2159,6 +2207,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+
+						// Act on delayed interrupt if set.
+						if (delay_int)
+						{
+							interrupt_start();
+							return;
+						}
 						return;
 					}
 
@@ -2192,6 +2247,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
+			
+						// Act on delayed interrupt if set.
+						if (delay_int)
+						{
+							interrupt_start();
+							return;
+						}
 						return;
 					}
 				}
@@ -2356,23 +2418,6 @@ int wd_fdc_device_base::calc_sector_size(uint8_t size, uint8_t command) const
 int wd_fdc_device_base::settle_time() const
 {
 	return 60000;
-}
-
-// Allow adjustment of command / reg delays, currently only used by RM Nimbus -- PHS.
-void wd_fdc_device_base::overide_delays(int reg_delay, int cmd_delay)
-{
-	delay_register_commit = reg_delay;
-	delay_command_commit = cmd_delay;
-}
-
-int wd_fdc_device_base::get_reg_delay()
-{
-	return delay_register_commit;
-}
-
-int wd_fdc_device_base::get_cmd_delay()
-{
-	return delay_command_commit;
 }
 
 wd_fdc_analog_device_base::wd_fdc_analog_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :

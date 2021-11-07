@@ -122,6 +122,7 @@ private:
 	uint8_t m_iou_reg092;
 	uint8_t m_last_playmode;
 	uint8_t m_ay8910_a;
+	uint8_t m_ay8910_b;
 	uint16_t m_x, m_y, m_yline;
 	uint8_t m_colours, m_mode, m_upmode;
 	uint32_t m_debug_video;
@@ -133,7 +134,10 @@ private:
 	void nimbus_mcu_w(uint8_t data);
 	uint8_t scsi_r(offs_t offset);
 	void scsi_w(offs_t offset, uint8_t data);
+	uint8_t fdc_reg_r(offs_t offset);
+	void fdc_reg_w(offs_t offset, uint8_t data);
 	void fdc_ctl_w(uint8_t data);
+	void nimbus_voice_w(offs_t offset, uint8_t data);
 	uint8_t nimbus_pc8031_r(offs_t offset);
 	void nimbus_pc8031_w(offs_t offset, uint8_t data);
 	uint8_t nimbus_pc8031_iou_r(offs_t offset);
@@ -144,6 +148,9 @@ private:
 	void nimbus_pc8031_port3_w(uint8_t data);
 	uint8_t nimbus_iou_r(offs_t offset);
 	void nimbus_iou_w(offs_t offset, uint8_t data);
+	
+	uint8_t nimbus_rompack_r(offs_t offset);
+	void nimbus_rompack_w(offs_t offset, uint8_t data);
 	void nimbus_sound_ay8910_porta_w(uint8_t data);
 	void nimbus_sound_ay8910_portb_w(uint8_t data);
 	uint8_t nimbus_mouse_js_r();
@@ -231,16 +238,18 @@ private:
 		int8_t		m_mouse_x;
 		int8_t   	m_mouse_y;
 
-		uint8_t   m_mouse_pcx;
-		uint8_t   m_mouse_pcy;
+		uint8_t   	m_mouse_pcx;
+		uint8_t   	m_mouse_pcy;
 
-		uint8_t   m_intstate_x;
-		uint8_t   m_intstate_y;
+		uint8_t   	m_intstate_x;
+		uint8_t   	m_intstate_y;
 
-		uint8_t   m_reg0a4;
+		uint8_t   	m_reg0a4;
 
 		emu_timer   *m_mouse_timer;
 	} m_nimbus_mouse;
+	
+	bool m_voice_enabled;
 
 	void nimbus_io(address_map &map);
 	void nimbus_iocpu_io(address_map &map);
@@ -259,6 +268,7 @@ private:
 	void video_debug(const std::vector<std::string> &params);
 	offs_t dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
+	void do_mouse();
 };
 
 #endif // MAME_INCLUDES_RMNIMBUS_H

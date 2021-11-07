@@ -91,11 +91,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(mr_w);
 
-	void index_callback(floppy_image_device *floppy, int state);
-	
-	void overide_delays(int reg_delay, int cmd_delay);
-	int get_reg_delay();
-	int get_cmd_delay();
+	void index_callback(floppy_image_device *floppy, int state);	
 protected:
 	wd_fdc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -180,11 +176,11 @@ private:
 
 	enum {
 		// General "doing nothing" state
-		IDLE,
+		IDLE,						
 
 		// Main states - the commands
-		RESTORE,
-		SEEK,
+		RESTORE,					
+		SEEK,						
 		STEP,
 		READ_SECTOR,
 		READ_TRACK,
@@ -244,6 +240,8 @@ private:
 		WRITE_SECTOR_PRE,
 		WRITE_SECTOR_PRE_BYTE
 	};
+
+    
 
 	struct live_info {
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };

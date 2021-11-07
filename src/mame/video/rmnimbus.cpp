@@ -22,10 +22,10 @@
     operation by disassembling the Nimbus bios and by writing experemental
     code on the real machine.
 
-    2021-09-29, P.Harvey-Smith.
-
-    I now have access to the service manual for the Nimbus, this documents to facilities provided
-    by the video chip, which will hopefully allow a much more accurate implementation.
+	2021-09-29, P.Harvey-Smith.
+	
+	I now have access to the service manual for the Nimbus, this documents to facilities provided 
+	by the video chip, which will hopefully allow a much more accurate implementation.
 */
 
 #include "emu.h"
@@ -36,92 +36,92 @@
 
 #include <functional>
 
-/*
-    Acording to the service manual the Nimbus should be capable of the following modes :
+/* 
+	Acording to the service manual the Nimbus should be capable of the following modes :
+	
+	320 x 200 4bpp
+	640 x 200 2bpp
+	400 x 200 4bpp
+	800 x 200 2bpp
+	320 x 250 4bpp
+	640 x 250 2bpp
+	400 x 250 4bpp
+	800 x 250 2bpp
+*/	
 
-    320 x 200 4bpp
-    640 x 200 2bpp
-    400 x 200 4bpp
-    800 x 200 2bpp
-    320 x 250 4bpp
-    640 x 250 2bpp
-    400 x 250 4bpp
-    800 x 250 2bpp
-*/
-
-/*
-    From the service manual the registers are defined as follows :
-
+/* 
+	From the service manual the registers are defined as follows :
+	
 Ports 0x00-0x1E are the registers used to update the display RAM thus :
 
-Addr    m_x     m_y     Update memory on write?
-0x00    nop     nop     no
-0x02    load    nop     no
-0x04    nop     inc     no
-0x06    load    inc     no
-0x08    nop     nop     no
-0x0A    inc     nop     no
-0x0C    nop     load    no
-0x0E    inc     load    no
-0x10    nop     nop     yes
-0x12    load    nop     yes
-0x14    nop     inc     yes
-0x16    load    inc     yes
-0x18    nop     nop     yes
-0x1A    inc     nop     yes
-0x1C    nop     load    yes
-0x1E    inc     load    yes
+Addr	m_x		m_y		Update memory on write?
+0x00	nop		nop		no
+0x02	load	nop		no	
+0x04	nop		inc 	no
+0x06	load	inc 	no
+0x08	nop		nop		no
+0x0A	inc 	nop		no	
+0x0C	nop		load	no
+0x0E	inc 	load	no
+0x10	nop		nop		yes
+0x12	load	nop		yes
+0x14	nop		inc 	yes
+0x16	load	inc 	yes
+0x18	nop		nop		yes
+0x1A	inc 	nop		yes
+0x1C	nop		load	yes
+0x1E	inc 	load	yes
 
-0x20    scroll port, contains 8 bit scroll address
+0x20	scroll port, contains 8 bit scroll address
 
-0x22    Update mode control port (up_mode), controls how data is written to display ram.
-        see UPMODE_ constants below
-
-0x24h   Intensity port, provides current logical intensities for update operations
-        bits 0..3 Foreground
-        bits 4..7 Background
-
-0x26    Display mode (m_mode) current display mode and border colour.
-        see MODE_ constants below
+0x22	Update mode control port (up_mode), controls how data is written to display ram.	
+		see UPMODE_ constants below
+		
+0x24h	Intensity port, provides current logical intensities for update operations
+		bits 0..3 Foreground
+		bits 4..7 Background
+		
+0x26	Display mode (m_mode) current display mode and border colour.
+		see MODE_ constants below
 
 For READ.
 Ports 0x28, 0x2A, 0x2C and 0x2E have different read and write functions :
 
-0x28    Timing / status, all bits active high
-        bit 0   line blank
-        bit 1   line display
-        bit 2   frame blank
-        bit 3   frame display
+0x28	Timing / status, all bits active high
+		bit 0	line blank 
+		bit 1	line display
+		bit 2	frame blank
+		bit 3	frame display
+		
+0x2A	X address status, returns current value of X counter (m_x)
 
-0x2A    X address status, returns current value of X counter (m_x)
-
-0x2C    Y address status, returns current value of Y counter (m_y)
+0x2C	Y address status, returns current value of Y counter (m_y)
 
 For Write
 
 0x28, 0x2A, 0x2C, 0x2E Colour look up table :
 
-                Logic colour
-Port    Bits    Low res     High Res
-0x28    0..3    0           0
-0x28    4..7    1           0
-0x28    8..11   2           0
-0x28    12..15  3           0
+				Logic colour
+Port	Bits	Low res		High Res
+0x28	0..3	0			0		
+0x28	4..7	1			0
+0x28	8..11	2			0
+0x28	12..15	3			0
 
-0x2A    0..3    3           1
-0x2A    4..7    5           1
-0x2A    8..11   6           1
-0x2A    12..15  7           1
+0x2A	0..3	3			1	
+0x2A	4..7	5			1
+0x2A	8..11	6			1
+0x2A	12..15	7			1
 
-0x2C    0..3    8           2
-0x2C    4..7    9           2
-0x2C    8..11   10          2
-0x2C    12..15  11          2
+0x2C	0..3	8			2	
+0x2C	4..7	9			2
+0x2C	8..11	10			2
+0x2C	12..15	11			2
 
-0x2E    0..3    12          3
-0x2E    4..7    13          3
-0x2E    8..11   14          3
-0x2E    12..15  15          3
+0x2E	0..3	12			3	
+0x2E	4..7	13			3
+0x2E	8..11	14			3
+0x2E	12..15	15			3
 
 
 */
@@ -129,47 +129,47 @@ Port    Bits    Low res     High Res
 // In following definitions ports are the WORD offset, the RM manual
 // lists them by the byte offset so they are 2* the value
 
-#define P_SCROLL        0x10
-#define P_UPDATE_MODE   0x11
-#define P_INTENSITY     0x12
-#define P_MODE          0x13
-#define P_STATUS        0x14
-#define P_X_COUNT       0x15
-#define P_Y_COUNT       0x16
+#define P_SCROLL		0x10
+#define P_UPDATE_MODE	0x11
+#define P_INTENSITY		0x12
+#define P_MODE			0x13
+#define P_STATUS		0x14
+#define P_X_COUNT		0x15
+#define P_Y_COUNT		0x16
 
-#define P_COLOUR03      0x14
-#define P_COLOUR47      0x15
-#define P_COLOUR8B      0x16
-#define P_COLOURCF      0x17
+#define P_COLOUR03		0x14
+#define P_COLOUR47		0x15
+#define P_COLOUR8B		0x16
+#define P_COLOURCF		0x17
 
 // From the service manual, Reg022  update mode constants :
 // The first 8 are NON XOR writes
-#define UPMODE_40_TEXT      0x00        // 40 character text
-#define UPMODE_80_TEXT      0x01        // 80 character text
-#define UPMODE_LO_PIXEL     0x02        // Low res pixel
-#define UPMODE_HI_PIXEL     0x03        // Hi res pixel
-#define UPMODE_ANIMATION    0x04        // Animation (mask + data)
-#define UPMODE_SCROLL       0x05        // Scroll mode
-#define UPMODE_DIRECT       0x06        // Direct write to video ram
-#define UPMODE_ILLEGAL7     0x07
+#define UPMODE_40_TEXT		0x00		// 40 character text
+#define UPMODE_80_TEXT		0x01		// 80 character text
+#define UPMODE_LO_PIXEL		0x02		// Low res pixel
+#define UPMODE_HI_PIXEL		0x03		// Hi res pixel
+#define UPMODE_ANIMATION	0x04		// Animation (mask + data)
+#define UPMODE_SCROLL		0x05		// Scroll mode
+#define UPMODE_DIRECT		0x06		// Direct write to video ram
+#define UPMODE_ILLEGAL7		0x07
 
 // The second 8 are XOR writes
-#define UPMODE_40_TEXT_X    0x08
-#define UPMODE_80_TEXT_X    0x09
-#define UPMODE_LO_PIXEL_X   0x0A
-#define UPMODE_HI_PIXEL_X   0x0B
-#define UPMODE_ANIMATION_X  0x0C
-#define UPMODE_SCROLL_X     0x0D
-#define UPMODE_DIRECT_X     0x0E
-#define UPMODE_ILLEGALF     0x0F
+#define UPMODE_40_TEXT_X	0x08
+#define UPMODE_80_TEXT_X	0x09
+#define UPMODE_LO_PIXEL_X	0x0A
+#define UPMODE_HI_PIXEL_X	0x0B
+#define UPMODE_ANIMATION_X	0x0C
+#define UPMODE_SCROLL_X		0x0D
+#define UPMODE_DIRECT_X		0x0E
+#define UPMODE_ILLEGALF		0x0F
 
-#define UP_XOR_MASK         0x08
+#define UP_XOR_MASK			0x08
 
 // port 026, display mode (m_mode)
-#define MODE_BORDER         0x0F        // bits 0..3, Border colour number
-#define MODE_RESOLUTION     0x10        // bit 4, 0=low res (40 col), high = high res (80 col)
-#define MODE_WIDTH          0x20        // bit 5, 0=narrow, 1=wide
-#define MODE_HEIGHT         0x40        // bit 6, 0=625 lines, 1=562
+#define MODE_BORDER	 		0x0F		// bits 0..3, Border colour number 
+#define MODE_RESOLUTION		0x10		// bit 4, 0=low res (40 col), high = high res (80 col)
+#define MODE_WIDTH			0x20		// bit 5, 0=narrow, 1=wide
+#define	MODE_HEIGHT			0x40		// bit 6, 0=625 lines, 1=562
 
 #define WIDTH_MASK      0x07
 
@@ -424,6 +424,10 @@ void rmnimbus_state::nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t me
 			change_palette(offset - P_COLOUR03, data);
 			return;
 
+// This register doesn't appear to be documented, but is written regually in setpc ibm mode
+		case 0x18 :
+			break;
+			
 		default:
 			logerror("nimbus: unknown video reg write %02x %04x\n", offset, data);
 			return;
@@ -604,7 +608,7 @@ void rmnimbus_state::write_pixel_data(uint16_t x, uint16_t y, uint16_t    data)
 // Colours are encoded as follows :
 // Each nibble contains a colour encoded as igrb
 // so we shift through the specified colours and extract the bits, to set the palette.
-//
+// 
 void rmnimbus_state::change_palette(uint8_t bank, uint16_t colours)
 {
 	// loop over changing colours
