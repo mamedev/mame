@@ -128,9 +128,9 @@ ioport_constructor vme_mvme120_device::device_input_ports() const
 vme_mvme120_device::vme_mvme120_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mvme12x_variant board_id) :
 	device_t(mconfig, type, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
-	, m_maincpu (*this, "maincpu")
-	, m_mfp (*this, "mfp")
-	, m_rs232 (*this, "rs232")
+	, m_maincpu(*this, "maincpu")
+	, m_mfp(*this, "mfp")
+	, m_rs232(*this, "rs232")
 	, m_input_s3(*this, "S3")
 	, m_sysrom(*this, "maincpu")
 	, m_localram(*this, "localram")
@@ -245,7 +245,7 @@ void vme_mvme120_device::device_reset()
 
 uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
 {
-	if ((!machine().side_effects_disabled()) && (m_memory_read_count >= 3))
+	if((!machine().side_effects_disabled()) && (m_memory_read_count >= 3))
 	{
 		// delete this tap
 		m_rom_shadow_tap->remove();
@@ -261,7 +261,8 @@ uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_ma
 //
 WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
 {
-	if (state) {
+	if(state)
+	{
 		LOG("%s: MFP watchdog reset\n", FUNCNAME);
 		machine().schedule_soft_reset();
 	}
@@ -295,7 +296,10 @@ void vme_mvme120_device::vme_bus_timeout()
 // Dummy VMEbus access
 uint16_t vme_mvme120_device::vme_a24_r()
 {
-	vme_bus_timeout();
+	if(!machine().side_effects_disabled())
+	{
+		vme_bus_timeout();
+	}
 	return 0;
 }
 
@@ -306,7 +310,10 @@ void vme_mvme120_device::vme_a24_w(uint16_t data)
 
 uint16_t vme_mvme120_device::vme_a16_r()
 {
-	vme_bus_timeout();
+	if(!machine().side_effects_disabled())
+	{
+		vme_bus_timeout();
+	}
 	return 0;
 }
 
@@ -447,7 +454,7 @@ INPUT_CHANGED_MEMBER(vme_mvme120_device::s3_baudrate)
 }
 
 // ROM definitions
-ROM_START (mvme120)
+ROM_START(mvme120)
 	ROM_REGION16_BE(0x20000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("12xbug-v2.0")
 

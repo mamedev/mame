@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "bus/vme/vme.h"
 #include "bus/rs232/rs232.h"
@@ -24,7 +23,8 @@ class vme_mvme120_device :  public device_t, public device_vme_card_interface
 {
 public:
 	/* Board types */
-	enum mvme12x_variant {
+	enum mvme12x_variant 
+	{
 		mvme120_board,
 		mvme121_board,
 		mvme122_board,
@@ -45,8 +45,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 	
-	virtual void device_start () override;
-	virtual void device_reset () override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
 	
 	void mvme12x_base_mem(address_map &map);
 	void mvme120_mem(address_map &map);
@@ -95,7 +95,7 @@ protected:
 
 class vme_mvme120_card_device : public vme_mvme120_device
 {
-public :
+public:
 	vme_mvme120_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -109,7 +109,7 @@ protected:
 
 class vme_mvme121_card_device : public vme_mvme120_device
 {
-public :
+public:
 	vme_mvme121_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -124,7 +124,7 @@ protected:
 
 class vme_mvme122_card_device : public vme_mvme120_device
 {
-public :
+public:
 	vme_mvme122_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -139,7 +139,7 @@ protected:
 
 class vme_mvme123_card_device : public vme_mvme120_device
 {
-public :
+public:
 	vme_mvme123_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -150,6 +150,5 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 };
-
 
 #endif // MAME_BUS_VME_VME_MVME120_H
