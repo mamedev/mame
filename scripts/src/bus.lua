@@ -2998,6 +2998,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/fcmat.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/hori.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/hori.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/konamibag.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/konamibag.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/konamihs.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/konamihs.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/miracle.cpp",
