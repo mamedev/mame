@@ -1422,7 +1422,7 @@ void towns_state::render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t
 				temp |= ((colour & 0x0f) << 4);
 			if(data & (1<<(b+1)))
 				temp |= (colour & 0x0f);
-			//m_towns_gfxvram[0x40000+vram_addr+(b/2)] = temp;
+			m_towns_gfxvram[0x40000+vram_addr+(b/2)] = temp;
 		}
 
 		vram_addr += linesize;
