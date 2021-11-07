@@ -258,7 +258,6 @@ uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_ma
 	return data;
 }
 
-//
 WRITE_LINE_MEMBER(vme_mvme120_device::watchdog_reset)
 {
 	if(state)
