@@ -50091,9 +50091,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- The Bandai Hyper Shot controller/zapper for Space Shadow is not emulated -->
-	<software name="spaceshd" supported="no">
-		<description>Space Shadow (Jpn)</description>
+	<software name="spaceshd">
+		<description>Space Shadow (Japan)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-HYPER"/>
@@ -50103,6 +50102,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="pcb_controlled" />
+			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="chr" size="131072">
 				<rom name="space shadow (japan).chr" size="131072" crc="6690e5c1" sha1="f05cc0478786a5e6d153c2f85c00c14afa0e61b0" offset="00000" status="baddump" />
 			</dataarea>
