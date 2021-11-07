@@ -1641,6 +1641,45 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="dev_6_5_fnd_1_2">
+		<description>IRIX Development Foundation 1.2 for IRIX 6.5</description>
+		<year>1999</year> <!-- 05/99 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0757-003"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_development_foundation_1_2_for_irix_6_5" sha1="aa070e5f09ff382eff20a0b2ca5188d5f284c2df" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dev_6_5_fnd_1_3">
+		<description>IRIX Development Foundation 1.3 for IRIX 6.5</description>
+		<year>2002</year> <!-- 11/02 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0757-004"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_development_foundation_1_3_for_irix_6_5" sha1="b50988113150a8aca8c4dc6497a66ccd6c207d38" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dev_6_5_libs">
+		<description>IRIX 6.5 Development Libraries</description>
+		<year>2002</year> <!-- 02/02 -->
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0766-003"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_development_libraries" sha1="2893833519e16d35dcdb3c428ca2af3919dedcfd" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="dev_toolbox_42">
 		<description>Developer Toolbox 4.2</description>
 		<year>1994</year> <!-- 08/94 -->
@@ -3389,6 +3428,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="varsity_up_08_98">
+		<description>Varsity Update August 1998 for IRIX 6.2, 6.3, 6.4 and 6.5</description>
+		<year>1998</year>
+		<publisher>Silicon Graphics</publisher>
+		<part name="cdrom" interface="cdrom">
+			<feature name="part_number" value="812-0825-001"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="varsity_update_aug1998" sha1="daaed02460b34fdeaff43b69660e9ab54d86a0d0" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- IRIX Operating System images (with bundled CDs, like freeware, applications, patches, NFS, documentation, etc.) -->
 
 	<software name="irix_4_0_1">
@@ -3917,6 +3969,14 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom7" interface="cdrom">
+			<feature name="part_number" value="812-0751-001"/>
+			<feature name="part_id" value="IRIX 6.5 Beta Base Documentation"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_beta_base_documentation" sha1="37fd308d630aa02fa8db2eeff985eed2a1e579cd" />
+			</diskarea>
+		</part>
+		<part name="cdrom8" interface="cdrom">
 			<feature name="part_number" value="812-0752-001"/>
 			<feature name="part_id" value="IRIX 6.5 Beta OCTANE Demos"/>
 			<!-- Origin: jrra.zone -->
@@ -3924,7 +3984,7 @@ license:CC0
 				<disk name="irix_6_5_beta_octane_demos" sha1="36e73c26249bb816cb156a10dbd3118d589428ca" />
 			</diskarea>
 		</part>
-		<part name="cdrom8" interface="cdrom">
+		<part name="cdrom9" interface="cdrom">
 			<feature name="part_number" value="812-0753-001"/>
 			<feature name="part_id" value="IRIX 6.5 Beta O2 Demos"/>
 			<!-- Origin: jrra.zone -->
@@ -4154,12 +4214,20 @@ license:CC0
 				<disk name="irix_6_5_4_applications_may_1999" sha1="5823291ca9caa171133efd4b0a6d62bf5041b045" />
 			</diskarea>
 		</part>
-		<part name="cdrom" interface="cdrom">
+		<part name="cdrom4" interface="cdrom">
 			<feature name="part_number" value="812-0773-004"/>
 			<feature name="part_id" value="Freeware May 1999"/>
 			<!-- Origin: BitSavers -->
 			<diskarea name="cdrom">
 				<disk name="freeware_may_1999" sha1="7f3a6050ea5a2079349798b3caaab449ecc98d87" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_number" value="812-0790-003"/>
+			<feature name="part_id" value="WorldView Japanese 6.5.4"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="worldview_japanese_6_5_4" sha1="24c590192217a3e87a4e48e4cfcc583f8f186425" />
 			</diskarea>
 		</part>
 	</software>
@@ -4363,6 +4431,14 @@ license:CC0
 				<disk name="freeware_part_2_of_2_may_2000" sha1="76a0246639f4f982508dee19dbd2e44172878e39" />
 			</diskarea>
 		</part>
+		<part name="cdrom7" interface="cdrom">
+			<feature name="part_number" value="812-0790-005"/>
+			<feature name="part_id" value="WorldView Japanese 6.5.8"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="worldview_japanese_6_5_8" sha1="bacaead2cbfd2a0795c5ddfcb04b6b836cd57991" />
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="irix_6_5_9">
@@ -4461,6 +4537,14 @@ license:CC0
 			<!-- Origin: pixelbart.net -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_10_apps" sha1="4c31286dacf204555156968e1bb5d9150ed9d90d" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
+			<feature name="part_number" value="812-0790-006"/>
+			<feature name="part_id" value="WorldView Japanese 6.5.10"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="worldview_japanese_6_5_10" sha1="4fcdc9a553812569c016e641103ac732a2f36282" />
 			</diskarea>
 		</part>
 	</software>
@@ -4569,6 +4653,14 @@ license:CC0
 			<!-- Origin: pixelbart.net -->
 			<diskarea name="cdrom">
 				<disk name="irix_6_5_12_freeware3" sha1="92430c4dc20149017311dec019cd889754593e96" />
+			</diskarea>
+		</part>
+		<part name="cdrom9" interface="cdrom">
+			<feature name="part_number" value="812-0790-007"/>
+			<feature name="part_id" value="WorldView Japanese 6.5.12"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="worldview_japanese_6_5_12" sha1="5ab5acb9b85c4380623f6668e71bb3893451bce9" />
 			</diskarea>
 		</part>
 	</software>
@@ -5456,6 +5548,14 @@ license:CC0
 			</diskarea>
 		</part>
 		<part name="cdrom4" interface="cdrom">
+			<feature name="part_number" value="812-0779-028"/>
+			<feature name="part_id" value="IRIX 6.5.28 Base Documentation August 2005"/>
+			<!-- Origin: jrra.zone -->
+			<diskarea name="cdrom">
+				<disk name="irix_6_5_28_doc" sha1="9e1c66e277c56be1181a3fdf789a808f19110069" />
+			</diskarea>
+		</part>
+		<part name="cdrom5" interface="cdrom">
 			<feature name="part_number" value="812-0877-028"/>
 			<feature name="part_id" value="IRIX 6.5 Applications August 2005"/>
 			<!-- Origin: pixelbart.net -->
@@ -5463,7 +5563,7 @@ license:CC0
 				<disk name="irix_6_5_28_apps" sha1="c1ca6cab605ed0b86e04685b4d63a0c35ede2e7e" />
 			</diskarea>
 		</part>
-		<part name="cdrom5" interface="cdrom">
+		<part name="cdrom6" interface="cdrom">
 			<feature name="part_number" value="812-1180-028"/>
 			<feature name="part_id" value="IRIX 6.5 Complementary Applications August 2005"/>
 			<!-- Origin: pixelbart.net -->
