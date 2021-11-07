@@ -54,6 +54,7 @@ private:
 	attotime prevtime;
 };
 
+
 class menu_crosshair : public menu
 {
 public:
@@ -87,16 +88,6 @@ private:
 	std::vector<std::string> m_pics;
 };
 
-class menu_quit_game : public menu
-{
-public:
-	menu_quit_game(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_quit_game();
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle(event const *ev) override;
-};
 
 class menu_bios_selection : public menu
 {
@@ -126,6 +117,7 @@ private:
 
 	std::vector<const game_driver*> m_list;
 };
+
 
 //-------------------------------------------------
 //  machine configure menu
@@ -172,6 +164,7 @@ private:
 	bool const m_was_favorite;
 	bool m_want_favorite;
 };
+
 
 //-------------------------------------------------
 //  plugins configure menu

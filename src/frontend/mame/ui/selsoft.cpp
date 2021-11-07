@@ -508,7 +508,6 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 	for (auto &icon : m_data->icons()) // TODO: why is this here?  maybe better on resize or setting change?
 		icon.second.texture.reset();
 
-	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	int old_software = -1;
 
 	// start with an empty list
@@ -521,7 +520,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 		// add an item to start empty or let the user use the file manager
 		item_append(
 				m_data->has_empty_start() ? _("[Start empty]") : _("[Use file manager]"),
-				flags_ui,
+				0,
 				(void *)&m_data->swinfo()[0]);
 
 		if (!flt)
@@ -561,7 +560,7 @@ void menu_select_software::populate(float &customtop, float &custombottom)
 
 		item_append(
 				m_displaylist[curitem].get().longname, m_displaylist[curitem].get().devicetype,
-				m_displaylist[curitem].get().parentname.empty() ? flags_ui : (FLAG_INVERT | flags_ui), (void *)&m_displaylist[curitem].get());
+				m_displaylist[curitem].get().parentname.empty() ? 0 : FLAG_INVERT, (void *)&m_displaylist[curitem].get());
 	}
 
 	// configure the custom rendering

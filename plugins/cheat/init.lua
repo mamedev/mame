@@ -522,7 +522,9 @@ function cheat.startplugin()
 		if cheat.screen then
 			for name, screen in pairs(cheat.screen) do
 				local scr = manager.machine.screens[screen]
-				if not scr then
+				if screen == "ui" then
+					scr = manager.machine.render.ui_container
+				elseif not scr then
 					local tag
 					local nxt, coll = manager.machine.screens:pairs()
 					tag, scr = nxt(coll) -- get any screen
@@ -660,7 +662,7 @@ function cheat.startplugin()
 					menu[num][3] = "off"
 				elseif cheat.is_oneshot then
 					menu[num][2] = _("Set")
-					menu[num][3] = 0
+					menu[num][3] = ""
 				else
 					if cheat.enabled then
 						menu[num][2] = _("On")
@@ -691,10 +693,10 @@ function cheat.startplugin()
 				end
 			end
 		end
-		menu[#menu + 1] = {"---", "", 0}
-		menu[#menu + 1] = {_("Set hotkeys"), "", 0}
-		menu[#menu + 1] = {_("Reset All"), "", 0}
-		menu[#menu + 1] = {_("Reload All"), "", 0}
+		menu[#menu + 1] = {"---", "", ""}
+		menu[#menu + 1] = {_("Set hotkeys"), "", ""}
+		menu[#menu + 1] = {_("Reset All"), "", ""}
+		menu[#menu + 1] = {_("Reload All"), "", ""}
 		return menu
 	end
 

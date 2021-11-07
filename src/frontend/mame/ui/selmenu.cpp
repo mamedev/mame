@@ -1441,6 +1441,8 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			// otherwise pop the stack
 			stack_pop();
+			if (is_special_main_menu())
+				machine().schedule_exit();
 		}
 		return;
 	}
@@ -1449,26 +1451,36 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool const ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
-	bool const ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
 	bool const leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
 	bool const rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
 	// accept left/right keys as-is with repeat
-	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
+	if (exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		// Swap the right panel
 		if (m_focus == focused_menu::RIGHTTOP)
+		{
+			// Swap the right panel and swallow it
 			ui_globals::rpanel = RP_IMAGES;
-		return;
+			iptkey = IPT_INVALID;
+		}
+		else
+		{
+			return;
+		}
 	}
 
-	if (!ignoreright && exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
+	if (exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 	{
-		// Swap the right panel
 		if (m_focus == focused_menu::RIGHTTOP)
+		{
+			// Swap the right panel and swallow it
 			ui_globals::rpanel = RP_INFOS;
-		return;
+			iptkey = IPT_INVALID;
+		}
+		else
+		{
+			return;
+		}
 	}
 
 	// up backs up by one item
@@ -1478,7 +1490,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			return;
 		}
-		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && ((m_focus == focused_menu::RIGHTTOP) || (m_focus == focused_menu::RIGHTBOTTOM)))
 		{
 			m_topline_datsview--;
 			return;
@@ -1501,7 +1513,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			return;
 		}
-		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && ((m_focus == focused_menu::RIGHTTOP) || (m_focus == focused_menu::RIGHTBOTTOM)))
 		{
 			m_topline_datsview++;
 			return;
@@ -1520,7 +1532,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_UP, 6))
 	{
 		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		if (!rightclose && ((m_focus == focused_menu::RIGHTTOP) || (m_focus == focused_menu::RIGHTBOTTOM)))
 		{
 			m_topline_datsview -= m_right_visible_lines - 3;
 			return;
@@ -1538,7 +1550,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_DOWN, 6))
 	{
 		// Infos
-		if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		if (!rightclose && ((m_focus == focused_menu::RIGHTTOP) || (m_focus == focused_menu::RIGHTBOTTOM)))
 		{
 			m_topline_datsview += m_right_visible_lines - 3;
 			return;
@@ -1559,7 +1571,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			return;
 		}
-		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && ((m_focus == focused_menu::RIGHTTOP) || (m_focus == focused_menu::RIGHTBOTTOM)))
 		{
 			m_topline_datsview = 0;
 			return;
@@ -1576,7 +1588,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		{
 			return;
 		}
-		else if (!rightclose && m_focus == focused_menu::RIGHTBOTTOM)
+		else if (!rightclose && ((m_focus == focused_menu::RIGHTTOP) || (m_focus == focused_menu::RIGHTBOTTOM)))
 		{
 			m_topline_datsview = m_total_lines;
 			return;
@@ -1618,14 +1630,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 			case IPT_UI_FOCUS_PREV:
 			case IPT_UI_PAUSE:
 				continue;
-			case IPT_UI_LEFT:
-				if (ignoreleft)
-					continue;
-				break;
-			case IPT_UI_RIGHT:
-				if (ignoreright)
-					continue;
-				break;
 			}
 
 			if (exclusive_input_pressed(iptkey, code, 0))
@@ -1759,6 +1763,8 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				{
 					ev.iptkey = IPT_UI_CANCEL;
 					stack_pop();
+					if (is_special_main_menu())
+						machine().schedule_exit();
 					stop = true;
 				}
 				else if (hover() >= HOVER_RP_FIRST && hover() <= HOVER_RP_LAST)

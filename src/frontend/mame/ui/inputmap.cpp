@@ -120,6 +120,7 @@ void menu_input_general::update_input(input_item_data &seqchangeditem)
 {
 	const input_type_entry &entry = *reinterpret_cast<const input_type_entry *>(seqchangeditem.ref);
 	machine().ioport().set_type_seq(entry.type(), entry.player(), seqchangeditem.seqtype, seqchangeditem.seq);
+	seqchangeditem.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqchangeditem.seqtype);
 }
 
 
@@ -233,9 +234,17 @@ void menu_input_specific::update_input(input_item_data &seqchangeditem)
 	ioport_field::user_settings settings;
 
 	// yeah, the const_cast is naughty, but we know we stored a non-const reference in it
-	reinterpret_cast<const ioport_field *>(seqchangeditem.ref)->get_user_settings(settings);
+	ioport_field const &field(*reinterpret_cast<ioport_field const *>(seqchangeditem.ref));
+	field.get_user_settings(settings);
 	settings.seq[seqchangeditem.seqtype] = seqchangeditem.seq;
-	reinterpret_cast<ioport_field *>(const_cast<void *>(seqchangeditem.ref))->set_user_settings(settings);
+	if (seqchangeditem.seq.is_default())
+		settings.cfg[seqchangeditem.seqtype].clear();
+	else if (!seqchangeditem.seq.length())
+		settings.cfg[seqchangeditem.seqtype] = "NONE";
+	else
+		settings.cfg[seqchangeditem.seqtype] = machine().input().seq_to_tokens(seqchangeditem.seq);
+	const_cast<ioport_field &>(field).set_user_settings(settings);
+	seqchangeditem.seq = field.seq(seqchangeditem.seqtype);
 }
 
 
@@ -276,7 +285,7 @@ void menu_input::menu_activated()
 void menu_input::toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq)
 {
 	if (original_seq.empty()) // if we used to be "none", toggle to the default value
-		selected_seq = selected_defseq;
+		selected_seq.set_default();
 	else // otherwise, toggle to "none"
 		selected_seq.reset();
 }
@@ -425,12 +434,6 @@ void menu_input::handle(event const *ev)
 			seqchangeditem = &item;
 			break;
 
-		case IPT_UI_LEFT: // flip between set and append
-		case IPT_UI_RIGHT: // not very discoverable, but with the prompt it isn't completely opaque
-			if (record_next || !item.seq.empty())
-				record_next = !record_next;
-			break;
-
 		case IPT_UI_PREV_GROUP:
 			{
 				auto current = std::distance(data.data(), &item);
@@ -491,6 +494,21 @@ void menu_input::handle(event const *ev)
 			}
 			record_next = false;
 			lastitem = &item;
+		}
+
+		// flip between set and append
+		// not very discoverable, but with the prompt it isn't completely opaque
+		if ((IPT_UI_LEFT == ev->iptkey) || (IPT_UI_RIGHT == ev->iptkey))
+		{
+			if (erroritem)
+			{
+				errormsg.clear();
+				erroritem = nullptr;
+			}
+			else if (record_next || !item.seq.empty())
+			{
+				record_next = !record_next;
+			}
 		}
 	}
 

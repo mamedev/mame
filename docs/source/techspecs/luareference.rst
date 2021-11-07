@@ -63,6 +63,86 @@ Core classes
 Many of MAME’s core classes used to implement an emulation session are available
 to Lua scripts.
 
+.. _luareference-core-attotime:
+
+Attotime
+~~~~~~~~
+
+Wraps MAME’s ``attotime`` class, which represents a high-precision time
+interval.  Attotime values support addition and subtraction with other attotime
+values, and multiplication and division by integers.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.attotime()
+    Creates an attotime value representing zero (i.e. no elapsed time).
+emu.attotime(seconds, attoseconds)
+    Creates an attotime with the specified whole and fractional parts.
+emu.attotime(attotime)
+    Creates a copy of an existing attotime value.
+emu.attotime.from_double(seconds)
+    Creates an attotime value representing the specified number of seconds.
+emu.attotime.from_ticks(periods, frequency)
+    Creates an attotime representing the specified number of periods of the
+    specified frequency in Hertz.
+emu.attotime.from_seconds(seconds)
+    Creates an attotime value representing the specified whole number of
+    seconds.
+emu.attotime.from_msec(milliseconds)
+    Creates an attotime value representing the specified whole number of
+    milliseconds.
+emu.attotime.from_usec(microseconds)
+    Creates an attotime value representing the specified whole number of
+    microseconds.
+emu.attotime.from_nsec(nanoseconds)
+    Creates an attotime value representing the specified whole number of
+    nanoseconds.
+
+Methods
+^^^^^^^
+
+t:as_double()
+    Returns the time interval in seconds as a floating-point value.
+t:as_hz()
+    Interprets the interval as a period and returns the corresponding frequency
+    in Hertz as a floating-point value.  Returns zero if ``t.is_never`` is true.
+    The interval must not be zero.
+t:as_khz()
+    Interprets the interval as a period and returns the corresponding frequency
+    kilohertz as a floating-point value.  Returns zero if ``t.is_never`` is
+    true.  The interval must not be zero.
+t:as_mhz()
+    Interprets the interval as a period and returns the corresponding frequency
+    megahertz as a floating-point value.  Returns zero if ``t.is_never`` is
+    true.  The interval must not be zero.
+t:as_ticks(frequency)
+    Returns the interval as a whole number of periods at the specified
+    frequency.  The frequency is specified in Hertz.
+
+Properties
+^^^^^^^^^^
+
+t.is_zero (read-only)
+    A Boolean indicating whether the value represents no elapsed time.
+t.is_never (read-only)
+    A Boolean indicating whether the value is greater than the maximum number of
+    whole seconds that can be represented (treated as an unreachable time in the
+    future or overflow).
+t.attoseconds (read-only)
+    The fraction seconds portion of the interval in attoseconds.
+t.seconds (read-only)
+    The number of whole seconds in the interval.
+t.msec (read-only)
+    The number of whole milliseconds in the fractional seconds portion of the
+    interval.
+t.usec (read-only)
+    The number of whole microseconds in the fractional seconds portion of the
+    interval.
+t.nsec (read-only)
+    The number of whole nanoseconds in the fractional seconds portion of the
+    interval.
+
 .. _luareference-core-mameman:
 
 MAME machine manager
@@ -147,6 +227,9 @@ machine:logerror(msg)
 Properties
 ^^^^^^^^^^
 
+machine.time (read-only)
+    The elapsed emulated time for the current session as an
+    :ref:`attotime <luareference-core-attotime>`.
 machine.system (read-only)
     The :ref:`driver metadata <luareference-core-driver>` for the current
     system.
@@ -437,7 +520,8 @@ ui:set_aggressive_input_focus(enable)
     On some platforms, this controls whether MAME should accept input focus in
     more situations than when its windows have UI focus.
 ui:get_general_input_setting(type, [player])
-    Gets a description of the configured input sequence for the specified input
+    Gets a description of the configured
+    :ref:`input sequence <luareference-input-iptseq>` for the specified input
     type and player suitable for using in prompts.  The input type is an
     enumerated value.  The player number is a zero-based index.  If the player
     number is not supplied, it is assumed to be zero.
@@ -804,12 +888,12 @@ screen:pixels()
 screen:draw_box(left, top, right, bottom, [line], [fill])
     Draws an outlined rectangle with edges at the specified positions.
 
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
+    Coordinates are floating-point numbers in units of emulated screen pixels,
+    with the origin at (0, 0).  Note that emulated screen pixels often aren’t
+    square.  The coordinate system is rotated if the screen is rotated, which is
+    usually the case for vertical-format screens.  Before rotation, the origin
+    is at the top left, and coordinates increase to the right and downwards.
+    Coordinates are limited to the screen area.
 
     The fill and line colours are in alpha/red/green/blue (ARGB) format.
     Channel values are in the range 0 (transparent or off) to 255 (opaque or
@@ -819,15 +903,15 @@ screen:draw_box(left, top, right, bottom, [line], [fill])
     most-significant to least-significant byte.  If the line colour is not
     provided, the UI text colour is used; if the fill colour is not provided,
     the UI background colour is used.
-screen:draw_line(x1, y1, x2, y2, bottom, [color])
+screen:draw_line(x1, y1, x2, y2, [color])
     Draws a line from (x1, y1) to (x2, y2).
 
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
+    Coordinates are floating-point numbers in units of emulated screen pixels,
+    with the origin at (0, 0).  Note that emulated screen pixels often aren’t
+    square.  The coordinate system is rotated if the screen is rotated, which is
+    usually the case for vertical-format screens.  Before rotation, the origin
+    is at the top left, and coordinates increase to the right and downwards.
+    Coordinates are limited to the screen area.
 
     The line colour is in alpha/red/green/blue (ARGB) format.  Channel values
     are in the range 0 (transparent or off) to 255 (opaque or full intensity),
@@ -847,21 +931,21 @@ screen:draw_text(x|justify, y, text, [foreground], [background])
     right-aligned at the right edge of the screen, respectively.  The second
     argument specifies the Y coordinate of the maximum ascent of the text.
 
-    Coordinates are floating-point numbers in units of screen pixels, with the
-    origin at (0, 0).  Note that screen pixels often aren’t square.  The
-    coordinate system is rotated if the screen is rotated, which is usually the
-    case for vertical-format screens.  Before rotation, the origin is at the top
-    left, and coordinates increase to the right and downwards.  Coordinates are
-    limited to the screen area.
+    Coordinates are floating-point numbers in units of emulated screen pixels,
+    with the origin at (0, 0).  Note that emulated screen pixels often aren’t
+    square.  The coordinate system is rotated if the screen is rotated, which is
+    usually the case for vertical-format screens.  Before rotation, the origin
+    is at the top left, and coordinates increase to the right and downwards.
+    Coordinates are limited to the screen area.
 
-    The foreground and background colours is in alpha/red/green/blue (ARGB)
-    format.  Channel values are in the range 0 (transparent or off) to 255 (opaque or full intensity),
-    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
-    The channel values must be packed into the bytes of a 32-bit unsigned
-    integer, in the order alpha, red, green, blue from most-significant to
-    least-significant byte.  If the foreground colour is not provided, the UI
-    text colour is used; if the background colour is not provided, the UI
-    background colour is used.
+    The foreground and background colours are in alpha/red/green/blue (ARGB)
+    format.  Channel values are in the range 0 (transparent or off) to 255
+    (opaque or full intensity), inclusive.  Colour channel values are not
+    pre-multiplied by the alpha value.  The channel values must be packed into
+    the bytes of a 32-bit unsigned integer, in the order alpha, red, green, blue
+    from most-significant to least-significant byte.  If the foreground colour
+    is not provided, the UI text colour is used; if the background colour is not
+    provided, it is fully transparent.
 
 Properties
 ^^^^^^^^^^
@@ -1580,14 +1664,21 @@ ioport:type_group(type, player)
     This should be called with values obtained from I/O port fields to provide
     canonical grouping in an input configuration UI.
 ioport:type_seq(type, [player], [seqtype])
-    Get the configured input sequence for the specified input type, player
-    number and sequence type.  The input type is an enumerated value.  The
-    player number is a zero-based index.  If the player number is not supplied,
-    it is assumed to be zero.  If the sequence type is supplied, it must be
-    ``"standard"``, ``"increment"`` or ``"decrement"``; if it is not supplied,
-    it is assumed to be ``"standard"``.
+    Get the configured :ref:`input sequence <luareference-input-iptseq>` for the
+    specified input type, player number and sequence type.  The input type is an
+    enumerated value.  The player number is a zero-based index.  If the player
+    number is not supplied, it is assumed to be zero.  If the sequence type is
+    supplied, it must be ``"standard"``, ``"increment"`` or ``"decrement"``; if
+    it is not supplied, it is assumed to be ``"standard"``.
 
     This provides access to general input configuration.
+ioport:set_type_seq(type, player, seqtype, seq)
+    Set the configured :ref:`input sequence <luareference-input-iptseq>` for the
+    specified input type, player number and sequence type.  The input type is an
+    enumerated value.  The player number is a zero-based index.  The sequence
+    type must be ``"standard"``, ``"increment"`` or ``"decrement"``.
+
+    This allows general input configuration to be set.
 ioport:token_to_input_type(string)
     Returns the input type and player number for the specified input type token.
 ioport:input_type_to_token(type, [player])
@@ -1772,21 +1863,24 @@ field:set_value(value)
     compared to zero to determine whether the field should be active; for
     analog fields, the value must be right-aligned and in the correct range.
 field:set_input_seq(seqtype, seq)
-    Set the input sequence for the specified sequence type.  This is used to
-    configure per-machine input settings.  The sequence type must be
-    ``"standard"``, ``"increment"`` or ``"decrement"``.
+    Set the :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  This is used to configure per-machine input
+    settings.  The sequence type must be ``"standard"``, ``"increment"`` or
+    ``"decrement"``.
 field:input_seq(seq_type)
-    Get the configured input sequence for the specified sequence type.  This
-    gets per-machine input settings.  The sequence type must be ``"standard"``,
-    ``"increment"`` or ``"decrement"``.
+    Get the configured :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  This gets per-machine input assignments.  The
+    sequence type must be ``"standard"``, ``"increment"`` or ``"decrement"``.
 field:set_default_input_seq(seq_type, seq)
-    Set the default input sequence for the specified sequence type.  This is
-    used to configure general input settings.  The sequence type must be
-    ``"standard"``, ``"increment"`` or ``"decrement"``.
+    Set the default :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  This overrides the default input assignment for a
+    specific input.  The sequence type must be ``"standard"``, ``"increment"``
+    or ``"decrement"``.
 field:default_input_seq(seq_type)
-    Gets the default input sequence for the specified sequence type.  This is
-    gets general input settings.  The sequence type must be ``"standard"``,
-    ``"increment"`` or ``"decrement"``.
+    Gets the default :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  If the default assignment is not overridden, this
+    gets the general input assignment.  The sequence type must be
+    ``"standard"``, ``"increment"`` or ``"decrement"``.
 field:keyboard_codes(shift)
     Gets a table of characters corresponding to the field for the specified
     shift state.  The shift state is a bit mask of active shift keys.
@@ -1929,18 +2023,20 @@ input:code_from_token(token)
     Convert a token string to an input code.  Returns the invalid input code if
     the token is not valid or belongs to an input device that is not present.
 input:seq_pressed(seq)
-    Returns a Boolen indicating whether the supplied input sequence is currently
-    pressed.
+    Returns a Boolean indicating whether the supplied
+    :ref:`input sequence <luareference-input-iptseq>` is currently pressed.
 input:seq_clean(seq)
-    Remove invalid elements from the supplied input sequence.  Returns the new,
-    cleaned input sequence.
+    Remove invalid elements from the supplied
+    :ref:`input sequence <luareference-input-iptseq>`.  Returns the new, cleaned
+    input sequence.
 input:seq_name(seq)
-    Get display text for an inptu sequence.
+    Get display text for an :ref:`input sequence <luareference-input-iptseq>`.
 input:seq_to_tokens(seq)
-    Convert an input sequence to a token string.  This should be used when
-    saving configuration.
+    Convert an :ref:`input sequence <luareference-input-iptseq>` to a token
+    string.  This should be used when saving configuration.
 input:seq_from_tokens(tokens)
-    Convert a token string to an input sequence.  This should be used when
+    Convert a token string to an
+    :ref:`input sequence <luareference-input-iptseq>`.  This should be used when
     loading configuration.
 input:axis_code_poller()
     Returns an :ref:`input code poller <luareference-input-codepoll>` for
@@ -1954,10 +2050,12 @@ input:keyboard_code_poller()
     devices.
 input:axis_sequence_poller()
     Returns an :ref:`input sequence poller <luareference-input-seqpoll>` for
-    obtaining an input sequence for configuring an analog input.
+    obtaining an :ref:`input sequence <luareference-input-iptseq>` for
+    configuring an analog input.
 input:axis_sequence_poller()
     Returns an :ref:`input sequence poller <luareference-input-seqpoll>` for
-    obtaining an input sequence for configuring a digital input.
+    obtaining an :ref:`input sequence <luareference-input-iptseq>` for
+    configuring a digital input.
 
 Properties
 ^^^^^^^^^^
@@ -2032,13 +2130,59 @@ Properties
 ^^^^^^^^^^
 
 poller.sequence (read-only)
-    The current input sequence.  This is updated while polling.  It is possible
-    for the sequence to become invalid.
+    The current :ref:`input sequence <luareference-input-iptseq>`.  This is
+    updated while polling.  It is possible for the sequence to become invalid.
 poller.valid (read-only)
     A Boolean indicating whether the current input sequence is valid.
 poller.modified (read-only)
     A Boolean indicating whether the sequence was changed by any user input
     since starting polling.
+
+.. _luareference-input-iptseq:
+
+Input sequence
+~~~~~~~~~~~~~~
+
+Wraps MAME’s ``input_seq`` class, representing a combination of host inputs that
+can be read or assigned to an emulated input.  Input sequences can be
+manipulated using :ref:`input manager <luareference-input-inputman>` methods.
+Use an :ref:`input sequence poller <luareference-input-seqpoll>` to obtain an
+input sequence from the user.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.input_seq()
+    Creates an empty input sequence.
+emu.input_seq(seq)
+    Creates a copy of an existing input sequence.
+
+Methods
+^^^^^^^
+
+seq:reset()
+    Clears the input sequence, removing all items.
+seq:set_default()
+    Sets the input sequence to a single item containing the metavalue specifying
+    that the default setting should be used.
+
+Properties
+^^^^^^^^^^
+
+seq.empty (read-only)
+    A Boolean indicating whether the input sequence is empty (contains no items,
+    indicating an unassigned input).
+seq.length (read-only)
+    The number of items in the input sequence.
+seq.is_valid (read-only)
+    A Boolean indicating whether the input sequence is a valid.  To be valid, it
+    must contain at least one item, all items must be valid codes, all product
+    groups must contain at least one item that is not negated, and items
+    referring to absolute and relative axes must not be mixed within a product
+    group.
+seq.is_default (read-only)
+    A Boolean indicating whether the input sequence specifies that the default
+    setting should be used.
 
 .. _luareference-input-devclass:
 
@@ -2411,6 +2555,73 @@ manager.machine.render.ui_container
     sliders and pop-up messages.
 manager.machine.screens[tag].container
     Gets the render container used to draw a given screen.
+
+Methods
+^^^^^^^
+
+container:draw_box(left, top, right, bottom, [line], [fill])
+    Draws an outlined rectangle with edges at the specified positions.
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    screen that showss the user interface.  Note that the aspect ratio is
+    usually not square.  Coordinates are limited to the window or screen area.
+
+    The fill and line colours are in alpha/red/green/blue (ARGB) format.
+    Channel values are in the range 0 (transparent or off) to 255 (opaque or
+    full intensity), inclusive.  Colour channel values are not pre-multiplied by
+    the alpha value.  The channel values must be packed into the bytes of a
+    32-bit unsigned integer, in the order alpha, red, green, blue from
+    most-significant to least-significant byte.  If the line colour is not
+    provided, the UI text colour is used; if the fill colour is not provided,
+    the UI background colour is used.
+container:draw_line(x1, y1, x2, y2, [color])
+    Draws a line from (x1, y1) to (x2, y2).
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    screen that showss the user interface.  Note that the aspect ratio is
+    usually not square.  Coordinates are limited to the window or screen area.
+
+    Coordinates are floating-point numbers in units of screen pixels, with the
+    origin at (0, 0).  Note that screen pixels often aren’t square.  The
+    coordinate system is rotated if the screen is rotated, which is usually the
+    case for vertical-format screens.  Before rotation, the origin is at the top
+    left, and coordinates increase to the right and downwards.  Coordinates are
+    limited to the screen area.
+
+    The line colour is in alpha/red/green/blue (ARGB) format.  Channel values
+    are in the range 0 (transparent or off) to 255 (opaque or full intensity),
+    inclusive.  Colour channel values are not pre-multiplied by the alpha value.
+    The channel values must be packed into the bytes of a 32-bit unsigned
+    integer, in the order alpha, red, green, blue from most-significant to
+    least-significant byte.  If the line colour is not provided, the UI text
+    colour is used.
+container:draw_text(x|justify, y, text, [foreground], [background])
+    Draws text at the specified position.  If the screen is rotated the text
+    will be rotated.
+
+    If the first argument is a number, the text will be left-aligned at this X
+    coordinate.  If the first argument is a string, it must be ``"left"``,
+    ``"center"`` or ``"right"`` to draw the text left-aligned at the
+    left edge of the window or screen, horizontally centred in the window or
+    screen, or right-aligned at the right edge of the window or screen,
+    respectively.  The second argument specifies the Y coordinate of the maximum
+    ascent of the text.
+
+    Coordinates are floating-point numbers in the range of 0 (zero) to 1 (one),
+    with (0, 0) at the top left and (1, 1) at the bottom right of the window or
+    screen that showss the user interface.  Note that the aspect ratio is
+    usually not square.  Coordinates are limited to the window or screen area.
+
+    The foreground and background colours are in alpha/red/green/blue (ARGB)
+    format.  Channel values are in the range 0 (transparent or off) to 255
+    (opaque or full intensity), inclusive.  Colour channel values are not
+    pre-multiplied by the alpha value.  The channel values must be packed into
+    the bytes of a 32-bit unsigned integer, in the order alpha, red, green, blue
+    from most-significant to least-significant byte.  If the foreground colour
+    is not provided, the UI text colour is used; if the background colour is not
+    provided, it is fully transparent.
 
 Properties
 ^^^^^^^^^^

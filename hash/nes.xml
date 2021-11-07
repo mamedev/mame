@@ -12167,7 +12167,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw" cloneof="athlwrld" supported="partial">
+	<software name="train1aw" cloneof="athlwrld">
 		<description>Family Trainer 1 - Athletic World (Jpn, v1.1)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -12188,7 +12188,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw1" cloneof="athlwrld" supported="partial">
+	<software name="train1aw1" cloneof="athlwrld">
 		<description>Family Trainer 1 - Athletic World (Jpn)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -12255,7 +12255,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train4jr" supported="partial">
+	<software name="train4jr">
 		<description>Family Trainer 4 - Jogging Race (Jpn)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -37030,18 +37030,18 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This game uses an unemulated whack-a-mole pad -->
-	<software name="supermog" supported="no">
+	<software name="supermog">
 		<description>Super Mogura Tataki!! Pokkun Moguraa (Japan)</description>
 		<year>1989</year>
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-X1"/>
 		<info name="release" value="19891208"/>
-		<info name="alt_title" value="ぽっくんモグラー"/>
+		<info name="alt_title" value="スーパーモグラたたき‼︎ぽっくんモグラー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="taptapmat" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="36a9c087" sha1="0f46f52d3995234e933933e3b525ba76fe3aa7d2" offset="00000" />
 			</dataarea>
@@ -46607,6 +46607,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="32768">
 				<rom name="family trainer 10 - rairai kyonsees (japan) (beta).chr" size="32768" crc="c688741a" sha1="ab747dc1d1007f46de07d2c44a7cacdacd691fb9" offset="00000" status="baddump" />
 			</dataarea>
@@ -46627,6 +46628,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="32768">
 				<rom name="family trainer 10 - rairai kyonsees (japan).chr" size="32768" crc="ecb80045" sha1="6ef04bcc4fd32949a6f7460b3ab7f5d00f55218d" offset="00000" status="baddump" />
 			</dataarea>
@@ -46647,6 +46649,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="131072">
 				<rom name="family trainer 6 - manhattan police (japan).chr" size="131072" crc="b40d4a42" sha1="595f4f58ce13686a872299225232bd360752e25f" offset="00000" status="baddump" />
 			</dataarea>
@@ -48310,6 +48313,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman2u30" cloneof="megaman2" supported="no">
+		<description>Mega Man 2 - 30th Anniversary Classic Cartridge</description>
+		<year>2018</year>
+		<publisher>Capcom / iam8bit</publisher>
+		<info name="serial" value="8BIT-LCC-002"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="pcb_model" value="INL-D-RAM" />
+			<feature name="mirroring" value="4screen" />
+			<dataarea name="prg" size="262144">
+				<rom name="mega man 2 (iam8bit 30th anniversary).prg" size="262144" crc="891c14bc" sha1="80d61ba914ee2e9e68899afebb30ed29a54dc66a" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -78568,7 +78589,25 @@ be better to redump them properly. -->
 			<dataarea name="prg" size="1048576">
 				<rom name="2a03puritans.prg" size="1048576" crc="5baee143" sha1="5024cf5f53995119892067603bed3e23c3655e9e" status="baddump" />
 			</dataarea>
-			<!-- 8 VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This release is nearly identical to the prototype 1 set but with rebranding -->
+	<software name="airballr" cloneof="airball">
+		<description>Airball (RetroZone)</description>
+		<year>2007</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-AB-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="airball (retrousb) (2007).prg" size="131072" crc="3e9d567b" sha1="76c9d4a9b9c1a4b587dd15661e39c68f125628c4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -78579,13 +78618,14 @@ be better to redump them properly. -->
 		<description>E.T.</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="serial" value="KHG-ET-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="et.prg" size="131072" crc="9e8eca2c" sha1="fa88ca7cadca763eb68e606c97ebf9a4302eedfd" status="baddump" />
 			</dataarea>
-			<!-- 8 VRAM on cartridge? -->
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -78595,6 +78635,7 @@ be better to redump them properly. -->
 		<description>Glider</description>
 		<year>2008</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-GL-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cufrom" />
 			<feature name="mirroring" value="vertical" />
@@ -78606,6 +78647,107 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="larrylov" supported="partial"> <!-- Save/Continue not yet supported -->
+		<description>Larry and the Long Look for a Luscious Lover</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="KHG-LL-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="larry and the long look for a luscious lover (khan games) (2014).prg" size="524288" crc="8bc0340c" sha1="c21f74fcac66f74a248c831eda1b84c0bdf5a3e0" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legowlia">
+		<description>The Legends of Owlia</description>
+		<year>2016</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="legends of owlia (gradual games) (2016).prg" size="524288" crc="95dfc71c" sha1="1680c45e7bb1a67d754b4fef5046c6ecf16d3da4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madwiz">
+		<description>The Mad Wizard - A Candelabra Chronicle</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="SDS-MW-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="the mad wizard - a candelabra chronicle.prg" size="131072" crc="b4a7b014" sha1="c3b49ba3dd16ac203af6a43b29a8b61add21c118" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mysticpi">
+		<description>Mystic Pillars</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="SIV-MP-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="65536">
+				<rom name="mystic pillars (sivak games) (2008).prg" size="65536" crc="318c0a59" sha1="21a75108278a6d311f652c34430e30f3522cf742" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nomolos">
+		<description>Nomolos - Storming the Catsle</description>
+		<year>2014</year>
+		<publisher>RetroZone</publisher> <!-- also re-released by Infinite NES Lives -->
+		<info name="serial" value="GRD-NM-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="nomolos - storming the catsle (gradual games) (2012).prg" size="524288" crc="222b13a0" sha1="e0c33747107ba715bf3689429fbdb3b0caedac64" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amondus">
+		<description>The Rise of Amondus</description>
+		<year>2015</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="SDS-RA-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="the rise of amondus.prg" size="131072" crc="825313ca" sha1="f796b7d700bd2aca18b17036e7146ef955395e4f" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78641,6 +78783,24 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="dpcm" size="8388608">
 				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Audio pops on NTSC. Game also incorrectly detects PAL mode when soft reset. -->
+	<software name="ultfrogc" supported="partial">
+		<description>Ultimate Frogger Championship</description>
+		<year>2009</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="KHG-UF-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="ultimate frogger champion.prg" size="32768" crc="c9c408cf" sha1="89cbc3856737967849278c0f60aa7b25d01cef4f" status="baddump" /> <!-- this is from the .nes file distributed by the author, KHAN Games -->
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="ultimate frogger champion.chr" size="16384" crc="96a3389f" sha1="5662ac095f8d6fad77c79fd356ccea41baef9944" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

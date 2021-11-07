@@ -13,7 +13,6 @@
 #include "ui/simpleselgame.h"
 
 #include "ui/info.h"
-#include "ui/miscmenu.h"
 #include "ui/optsmenu.h"
 #include "ui/ui.h"
 #include "ui/utils.h"
@@ -205,6 +204,7 @@ void simple_menu_select_game::inkey_cancel()
 	if (!m_search.empty())
 	{
 		m_search.clear();
+		m_rerandomize = true;
 		reset(reset_options::SELECT_FIRST);
 	}
 }
@@ -417,13 +417,10 @@ void simple_menu_select_game::force_game_select(mame_ui_manager &mui, render_con
 	char *gamename = (char *)mui.machine().options().system_name();
 
 	// reset the menu stack
+
+	// drop any existing menus and start the system selection menu
 	menu::stack_reset(mui);
-
-	// add the quit entry followed by the game select entry
-	menu::stack_push_special_main<menu_quit_game>(mui, container);
-	menu::stack_push<simple_menu_select_game>(mui, container, gamename);
-
-	// force the menus on
+	menu::stack_push_special_main<simple_menu_select_game>(mui, container, gamename);
 	mui.show_menu();
 
 	// make sure MAME is paused

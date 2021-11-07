@@ -62,11 +62,15 @@ r = revision of the VFD
 c = custom display
 s = unique display part number
 
+============================================================================
 
 ROM source notes when dumped from another publisher, but confident it's the same:
 - astrocmd: Tandy Astro Command
 - caveman: Tandy Caveman
 - grobot9: Mego Fabulous Fred
+
+TODO:
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 

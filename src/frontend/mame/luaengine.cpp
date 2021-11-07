@@ -59,63 +59,6 @@ struct lua_engine::devenum
 
 namespace {
 
-void do_draw_box(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
-	mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
-}
-
-void do_draw_line(screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-	y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-	x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-	y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
-	sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-}
-
-void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y, const char *msg, rgb_t fgcolor, rgb_t bgcolor)
-{
-	float const sc_width(sdev.visible_area().width());
-	float const sc_height(sdev.visible_area().height());
-	auto justify = ui::text_layout::text_justify::LEFT;
-	float x = 0;
-	if (xobj.is<float>())
-	{
-		x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
-	}
-	else if (xobj.is<char const *>())
-	{
-		char const *const justifystr(xobj.as<char const *>());
-		if (!strcmp(justifystr, "left"))
-			justify = ui::text_layout::text_justify::LEFT;
-		else if (!strcmp(justifystr, "right"))
-			justify = ui::text_layout::text_justify::RIGHT;
-		else if (!strcmp(justifystr, "center"))
-			justify = ui::text_layout::text_justify::CENTER;
-	}
-	else
-	{
-		luaL_error(L, "Error in param 1 to draw_text");
-		return;
-	}
-	y = std::clamp(y, 0.0f, sc_height) / sc_height;
-	mame_machine_manager::instance()->ui().draw_text_full(
-			sdev.container(),
-			msg,
-			x, y, (1.0f - x),
-			justify, ui::text_layout::word_wrapping::WORD,
-			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
-}
-
-
 struct image_interface_formats
 {
 	image_interface_formats(device_image_interface &i) : image(i) { }
@@ -797,6 +740,34 @@ void lua_engine::initialize()
 			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
 
 
+	auto attotime_type = emu.new_usertype<attotime>(
+			"attotime",
+			sol::call_constructor, sol::constructors<attotime(), attotime(seconds_t, attoseconds_t), attotime(attotime const &)>());
+	attotime_type["from_double"] = &attotime::from_double;
+	attotime_type["from_ticks"] = static_cast<attotime (*)(u64, u32)>(&attotime::from_ticks);
+	attotime_type["from_seconds"] = &attotime::from_seconds;
+	attotime_type["from_msec"] = &attotime::from_msec;
+	attotime_type["from_usec"] = &attotime::from_usec;
+	attotime_type["from_nsec"] = &attotime::from_nsec;
+	attotime_type["as_double"] = &attotime::as_double;
+	attotime_type["as_hz"] = &attotime::as_hz;
+	attotime_type["as_khz"] = &attotime::as_khz;
+	attotime_type["as_mhz"] = &attotime::as_mhz;
+	attotime_type["as_ticks"] = static_cast<u64 (attotime::*)(u32) const>(&attotime::as_ticks);
+	attotime_type["is_zero"] = sol::property(&attotime::is_zero);
+	attotime_type["is_never"] = sol::property(&attotime::is_never);
+	attotime_type["attoseconds"] = sol::property(&attotime::attoseconds);
+	attotime_type["seconds"] = sol::property(&attotime::seconds);
+	attotime_type["msec"] = sol::property([] (attotime const &t) { return t.attoseconds() / ATTOSECONDS_PER_MILLISECOND; });
+	attotime_type["usec"] = sol::property([] (attotime const &t) { return t.attoseconds() / ATTOSECONDS_PER_MICROSECOND; });
+	attotime_type["nsec"] = sol::property([] (attotime const &t) { return t.attoseconds() / ATTOSECONDS_PER_NANOSECOND; });
+	attotime_type[sol::meta_function::to_string] = &attotime::to_string;
+	attotime_type[sol::meta_function::addition] = static_cast<attotime (*)(attotime const &, attotime const &)>(&operator+);
+	attotime_type[sol::meta_function::subtraction] = static_cast<attotime (*)(attotime const &, attotime const &)>(&operator-);
+	attotime_type[sol::meta_function::multiplication] = static_cast<attotime (*)(attotime const &, u32)>(&operator*);
+	attotime_type[sol::meta_function::division] = static_cast<attotime (*)(attotime const &, u32)>(&operator/);
+
+
 /* emu_file library
  *
  * emu.file([opt] searchpath, flags) - flags can be as in osdcore "OPEN_FLAG_*" or lua style
@@ -858,8 +829,10 @@ void lua_engine::initialize()
 				}));
 	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
+	file_type.set("puts", &emu_file::puts);
 	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
 	file_type.set("open_next", &emu_file::open_next);
+	file_type.set("close", &emu_file::close);
 	file_type.set("seek", sol::overload(
 			[](emu_file &file) { return file.tell(); },
 			[this] (emu_file &file, s64 offset, int whence) -> sol::object {
@@ -1255,17 +1228,18 @@ void lua_engine::initialize()
 				m.popmessage();
 		};
 	machine_type["logerror"]  = [] (running_machine &m, std::string const *str) { m.logerror("[luaengine] %s\n", str); };
+	machine_type["time"] = sol::property(&running_machine::time);
 	machine_type["system"] = sol::property(&running_machine::system);
+	machine_type["parameters"] = sol::property(&running_machine::parameters);
 	machine_type["video"] = sol::property(&running_machine::video);
 	machine_type["sound"] = sol::property(&running_machine::sound);
-	machine_type["render"] = sol::property(&running_machine::render);
-	machine_type["ioport"] = sol::property(&running_machine::ioport);
-	machine_type["parameters"] = sol::property(&running_machine::parameters);
-	machine_type["memory"] = sol::property(&running_machine::memory);
-	machine_type["options"] = sol::property(&running_machine::options);
 	machine_type["output"] = sol::property(&running_machine::output);
+	machine_type["memory"] = sol::property(&running_machine::memory);
+	machine_type["ioport"] = sol::property(&running_machine::ioport);
 	machine_type["input"] = sol::property(&running_machine::input);
+	machine_type["natkeyboard"] = sol::property(&running_machine::natkeyboard);
 	machine_type["uiinput"] = sol::property(&running_machine::ui_input);
+	machine_type["render"] = sol::property(&running_machine::render);
 	machine_type["debugger"] = sol::property(
 			[] (running_machine &m, sol::this_state s) -> sol::object
 			{
@@ -1274,9 +1248,9 @@ void lua_engine::initialize()
 				else
 					return sol::lua_nil;
 			});
-	machine_type["natkeyboard"] = sol::property(&running_machine::natkeyboard);
-	machine_type["paused"] = sol::property(&running_machine::paused);
+	machine_type["options"] = sol::property(&running_machine::options);
 	machine_type["samplerate"] = sol::property(&running_machine::sample_rate);
+	machine_type["paused"] = sol::property(&running_machine::paused);
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
@@ -1444,24 +1418,74 @@ void lua_engine::initialize()
 			"screen_dev",
 			sol::no_constructor,
 			sol::base_classes, sol::bases<device_t>());
-	screen_dev_type["draw_box"] = sol::overload(
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor, uint32_t bgcolor)
-			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, bgcolor); },
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t fgcolor)
-			{ do_draw_box(sdev, x1, y1, x2, y2, fgcolor, mame_machine_manager::instance()->ui().colors().background_color()); },
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
-			{ auto const &colors(mame_machine_manager::instance()->ui().colors()); do_draw_box(sdev, x1, y1, x2, y2, colors.text_color(), colors.background_color()); });
-	screen_dev_type["draw_line"] = sol::overload(
-			&do_draw_line,
-			[] (screen_device &sdev, float x1, float y1, float x2, float y2)
-			{ do_draw_line(sdev, x1, y1, x2, y2, mame_machine_manager::instance()->ui().colors().text_color()); });
-	screen_dev_type["draw_text"] = sol::overload(
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor, uint32_t bgcolor)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, bgcolor); },
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg, uint32_t fgcolor)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, fgcolor, 0); },
-			[this] (screen_device &sdev, sol::object xobj, float y, const char *msg)
-			{ do_draw_text(m_lua_state, sdev, xobj, y, msg, mame_machine_manager::instance()->ui().colors().text_color(), 0); });
+	screen_dev_type["draw_box"] =
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = ui.colors().background_color();
+				ui.draw_outlined_box(sdev.container(), x1, y1, x2, y2, *fgcolor, *bgcolor);
+			};
+	screen_dev_type["draw_line"] =
+			[] (screen_device &sdev, float x1, float y1, float x2, float y2, std::optional<uint32_t> color)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				if (!color)
+					color = mame_machine_manager::instance()->ui().colors().text_color();
+				sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			};
+	screen_dev_type["draw_text"] =
+			[this] (screen_device &sdev, sol::object xobj, float y, char const *msg, std::optional<uint32_t> fgcolor, std::optional<uint32_t> bgcolor)
+			{
+				float const sc_width(sdev.visible_area().width());
+				float const sc_height(sdev.visible_area().height());
+				auto justify = ui::text_layout::text_justify::LEFT;
+				float x = 0;
+				if (xobj.is<float>())
+				{
+					x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
+				}
+				else if (xobj.is<char const *>())
+				{
+					char const *const justifystr(xobj.as<char const *>());
+					if (!strcmp(justifystr, "left"))
+						justify = ui::text_layout::text_justify::LEFT;
+					else if (!strcmp(justifystr, "right"))
+						justify = ui::text_layout::text_justify::RIGHT;
+					else if (!strcmp(justifystr, "center"))
+						justify = ui::text_layout::text_justify::CENTER;
+				}
+				else
+				{
+					luaL_error(m_lua_state, "Error in param 1 to draw_text");
+					return;
+				}
+				y = std::clamp(y, 0.0f, sc_height) / sc_height;
+				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
+				if (!fgcolor)
+					fgcolor = ui.colors().text_color();
+				if (!bgcolor)
+					bgcolor = 0;
+				ui.draw_text_full(
+						sdev.container(),
+						msg,
+						x, y, (1.0f - x),
+						justify, ui::text_layout::word_wrapping::WORD,
+						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
+			};
 	screen_dev_type["orientation"] =
 		[] (screen_device &sdev)
 		{
@@ -1568,7 +1592,7 @@ void lua_engine::initialize()
 	cass_type["length"] = sol::property([] (cassette_image_device &c) { return c.exists() ? c.get_length() : 0.0; });
 
 
-	auto image_type = sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor);
+	auto image_type = sol().registry().new_usertype<device_image_interface>("image", sol::no_constructor);
 	image_type["load"] = &device_image_interface::load;
 	image_type["load_software"] = static_cast<image_init_result (device_image_interface::*)(std::string_view)>(&device_image_interface::load_software);
 	image_type["unload"] = &device_image_interface::unload;

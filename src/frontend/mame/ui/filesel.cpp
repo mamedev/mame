@@ -59,6 +59,7 @@ menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &c
 	, m_result(result)
 {
 	(void)m_image;
+	set_process_flags(PROCESS_IGNOREPAUSE);
 }
 
 

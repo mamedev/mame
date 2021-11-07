@@ -112,7 +112,7 @@ menu::global_state::~global_state()
 
 void menu::global_state::stack_push(std::unique_ptr<menu> &&menu)
 {
-	if (m_stack && m_stack->m_active)
+	if (m_stack && m_stack->is_active())
 	{
 		m_stack->m_active = false;
 		m_stack->menu_deactivated();
@@ -127,8 +127,13 @@ void menu::global_state::stack_pop()
 {
 	if (m_stack)
 	{
-		if (m_stack->m_one_shot)
+		if (m_stack->is_one_shot())
 			m_hide = true;
+		if (m_stack->is_active())
+		{
+			m_stack->m_active = false;
+			m_stack->menu_deactivated();
+		}
 		m_stack->menu_dismissed();
 		std::unique_ptr<menu> menu(std::move(m_stack));
 		m_stack = std::move(menu->m_parent);
@@ -177,10 +182,10 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 {
 	// if we have no menus stacked up, start with the main menu
 	if (!m_stack)
-		stack_push(std::unique_ptr<menu>(make_unique_clear<menu_main>(m_ui, container)));
+		stack_push(std::make_unique<menu_main>(m_ui, container));
 
 	// ensure topmost menu is active - need a loop because it could push another menu
-	while (m_stack && !m_stack->m_active)
+	while (m_stack && !m_stack->is_active())
 	{
 		m_stack->m_active = true;
 		m_stack->menu_activated();
@@ -199,11 +204,11 @@ uint32_t menu::global_state::ui_handler(render_container &container)
 	{
 		if (m_stack)
 		{
-			if (m_stack->m_one_shot)
+			if (m_stack->is_one_shot())
 			{
 				stack_pop();
 			}
-			else if (m_stack->m_active)
+			else if (m_stack->is_active())
 			{
 				m_stack->m_active = false;
 				m_stack->menu_deactivated();
@@ -283,17 +288,6 @@ void menu::reset(reset_options options)
 	m_items.clear();
 	m_visible_items = 0;
 	m_selected = 0;
-}
-
-
-//-------------------------------------------------
-//  is_special_main_menu - returns whether the
-//  menu has special needs
-//-------------------------------------------------
-
-bool menu::is_special_main_menu() const
-{
-	return m_special_main_menu;
 }
 
 
@@ -504,8 +498,7 @@ void menu::draw(uint32_t flags)
 	visible_main_menu_height += 0.01f;
 
 	// if we are too wide or too tall, clamp it down
-	if (visible_width + 2.0f * lr_border > 1.0f)
-		visible_width = 1.0f - 2.0f * lr_border;
+	visible_width = std::min(visible_width, 1.0f - ((lr_border + (aspect * UI_LINE_WIDTH)) * 2.0f));
 
 	// if the menu and extra menu won't fit, take away part of the regular menu, it will scroll
 	if (visible_main_menu_height + visible_extra_menu_height + 2.0f * ui().box_tb_border() > 1.0f)
@@ -898,6 +891,8 @@ void menu::handle_events(uint32_t flags, event &ev)
 				{
 					ev.iptkey = IPT_UI_CANCEL;
 					stack_pop();
+					if (is_special_main_menu())
+						machine().schedule_exit();
 				}
 				stop = true;
 			}
@@ -975,6 +970,8 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 		{
 			iptkey = IPT_UI_CANCEL;
 			stack_pop();
+			if (is_special_main_menu())
+				machine().schedule_exit();
 		}
 		return;
 	}
@@ -982,7 +979,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	// UI configure hides the menus
 	if (!(flags & PROCESS_NOKEYS) && exclusive_input_pressed(iptkey, IPT_UI_CONFIGURE, 0) && !m_global_state.stack_has_special_main_menu())
 	{
-		if (m_one_shot)
+		if (is_one_shot())
 			stack_pop();
 		else
 			m_global_state.hide_menu();
@@ -997,7 +994,11 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	if (exclusive_input_pressed(iptkey, IPT_UI_CANCEL, 0))
 	{
 		if (!custom_ui_cancel())
+		{
 			stack_pop();
+			if (is_special_main_menu())
+				machine().schedule_exit();
+		}
 		return;
 	}
 
@@ -1012,10 +1013,6 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
 		return;
 	if (!ignoreright && exclusive_input_pressed(iptkey, IPT_UI_RIGHT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))
-		return;
-	if (exclusive_input_pressed(iptkey, IPT_UI_PREV_GROUP, 0))
-		return;
-	if (exclusive_input_pressed(iptkey, IPT_UI_NEXT_GROUP, 0))
 		return;
 
 	// up backs up by one item

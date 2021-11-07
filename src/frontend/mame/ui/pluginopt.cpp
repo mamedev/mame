@@ -162,6 +162,8 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 				item_flags_or |= FLAG_INVERT;
 			else if (flag == "heading")
 				item_flags_or |= FLAG_DISABLE | FLAG_UI_HEADING;
+			else
+				osd_printf_info("menu_plugin_opt: unknown flag '%s' for item %d (%s)\n", flag, i, text);
 		}
 
 		if (text == "---")
@@ -189,16 +191,20 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 			mflags.remove_prefix(flag.length());
 			flag_start = mflags.find_first_not_of(' ');
 
-			if (flag == "lralways")
+			if (flag == "nokeys")
+				process_flags |= PROCESS_NOKEYS;
+			else if (flag == "lralways")
 				process_flags |= PROCESS_LR_ALWAYS;
 			else if (flag == "lrrepeat")
 				process_flags |= PROCESS_LR_REPEAT;
 			else if (flag == "customnav")
 				process_flags |= PROCESS_CUSTOM_NAV;
+			else if (flag == "ignorepause")
+				process_flags |= PROCESS_IGNOREPAUSE;
 			else if (flag == "idle")
 				m_need_idle = true;
-			else if (flag == "nokeys")
-				process_flags |= PROCESS_NOKEYS;
+			else
+				osd_printf_info("menu_plugin_opt: unknown processing flag '%s'\n", flag);
 		}
 		if (process_flags & PROCESS_NOKEYS)
 			m_need_idle = true;

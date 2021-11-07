@@ -65,12 +65,12 @@ public:
 	template <typename T, typename... Params>
 	static void stack_push(Params &&... args)
 	{
-		stack_push(std::unique_ptr<menu>(make_unique_clear<T>(std::forward<Params>(args)...)));
+		stack_push(std::make_unique<T>(std::forward<Params>(args)...));
 	}
 	template <typename T, typename... Params>
 	static void stack_push_special_main(Params &&... args)
 	{
-		std::unique_ptr<menu> ptr(make_unique_clear<T>(std::forward<Params>(args)...));
+		std::unique_ptr<menu> ptr(std::make_unique<T>(std::forward<Params>(args)...));
 		ptr->set_special_main_menu(true);
 		stack_push(std::move(ptr));
 	}
@@ -129,6 +129,10 @@ protected:
 	mame_ui_manager &ui() const { return m_ui; }
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
+
+	bool is_special_main_menu() const { return m_special_main_menu; }
+	bool is_one_shot() const { return m_one_shot; }
+	bool is_active() const { return m_active; }
 
 	void set_one_shot(bool oneshot) { m_one_shot = oneshot; }
 	void set_needs_prev_menu_item(bool needs) { m_needs_prev_menu_item = needs; }
@@ -338,7 +342,6 @@ private:
 	virtual void draw(uint32_t flags);
 
 	// request the specific handling of the game selection main menu
-	bool is_special_main_menu() const;
 	void set_special_main_menu(bool disable);
 
 	// to be implemented in derived classes
@@ -391,6 +394,37 @@ private:
 	float                   m_mouse_x;
 	float                   m_mouse_y;
 };
+
+
+template <typename Base = menu>
+class autopause_menu : public Base
+{
+protected:
+	using Base::Base;
+
+	virtual void menu_activated() override
+	{
+		m_was_paused = this->machine().paused();
+		if (m_was_paused)
+			m_unpaused = false;
+		else if (!m_unpaused)
+			this->machine().pause();
+		Base::menu_activated();
+	}
+
+	virtual void menu_deactivated() override
+	{
+		m_unpaused = !this->machine().paused();
+		if (!m_was_paused && !m_unpaused)
+			this->machine().resume();
+		Base::menu_deactivated();
+	}
+
+private:
+	bool m_was_paused = false;
+	bool m_unpaused = false;
+};
+
 
 } // namespace ui
 

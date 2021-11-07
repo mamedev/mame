@@ -547,7 +547,7 @@ function env.basechar(bytes, base)
 		end
 		return newbytes
 	end
-	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented\n")
+	emu.print_verbose("data_hiscore: basechar " .. base .. " unimplemented")
 	return bytes
 end
 
@@ -566,7 +566,7 @@ function env.charset_conv(bytes, charset, aoffset)
 			end
 			return bytes
 		end
-		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented\n")
+		emu.print_verbose("data_hiscore: charset " .. chartype .. " unimplemented")
 		return bytes
 	end
 	for num, char in ipairs(bytes) do

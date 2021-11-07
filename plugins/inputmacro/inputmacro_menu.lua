@@ -37,6 +37,7 @@ local function new_macro()
 	return {
 		name = name,
 		binding = nil,
+		bindingcfg = '',
 		earlycancel = true,
 		loop = -1,
 		steps = {
@@ -44,6 +45,8 @@ local function new_macro()
 				inputs = {
 					{
 						port = nil,
+						mask = nil,
+						type = nil,
 						field = nil } },
 				delay = 0,
 				duration = 1 } } }
@@ -83,11 +86,11 @@ function start_input_menu(handler, start_field)
 	table.insert(menu_stack, MENU_TYPES.INPUT)
 end
 
-function handle_input(index, action)
+local function handle_input(index, action)
 	return input_menu:handle(index, action)
 end
 
-function populate_input()
+local function populate_input()
 	return input_menu:populate(input_start_field)
 end
 
@@ -120,6 +123,7 @@ local function handle_edit_items(index, event)
 		if edit_switch_poller:poll() then
 			if edit_switch_poller.sequence then
 				edit_current_macro.binding = edit_switch_poller.sequence
+				edit_current_macro.bindingcfg = manager.machine.input:seq_to_tokens(edit_switch_poller.sequence)
 			end
 			edit_switch_poller = nil
 			return true
@@ -233,11 +237,12 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'input' then
 		local inputs = edit_current_macro.steps[command.step].inputs
 		if event == 'select' then
-			local hanlder =
-				function(field)
-					inputs[command.input].port = field.port
-					inputs[command.input].field = field
-				end
+			local function hanlder(field)
+				inputs[command.input].port = field.port.tag
+				inputs[command.input].mask = field.mask
+				inputs[command.input].type = field.type
+				inputs[command.input].field = field
+			end
 			start_input_menu(hanlder, inputs[command.input].field)
 			edit_start_selection = index
 			return true
@@ -250,12 +255,14 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'addinput' then
 		if event == 'select' then
 			local inputs = edit_current_macro.steps[command.step].inputs
-			local handler =
-				function(field)
-					inputs[#inputs + 1] = {
-						port = field.port,
-						field = field }
-				end
+			local function handler(field)
+				local newinput = {
+					port = field.port.tag,
+					mask = field.mask,
+					type = field.type,
+					field = field }
+				table.insert(inputs, newinput)
+			end
 			start_input_menu(handler)
 			edit_start_selection = index
 			return true
@@ -280,22 +287,23 @@ local function handle_edit_items(index, event)
 	elseif command.action == 'addstep' then
 		if event == 'select' then
 			local steps = edit_current_macro.steps
-			local handler =
-				function(field)
-					local newstep = {
-						inputs = {
-							{
-								port = field.port,
-								field = field } },
-						delay = 0,
-						duration = 1 }
-					table.insert(steps, edit_insert_position, newstep)
-					if edit_current_macro.loop >= edit_insert_position then
-						edit_current_macro.loop = edit_current_macro.loop + 1
-					end
-					edit_start_step = edit_insert_position
-					edit_insert_position = edit_insert_position + 1
+			local function handler(field)
+				local newstep = {
+					inputs = {
+						{
+							port = field.port.tag,
+							mask = field.mask,
+							type = field.type,
+							field = field } },
+					delay = 0,
+					duration = 1 }
+				table.insert(steps, edit_insert_position, newstep)
+				if edit_current_macro.loop >= edit_insert_position then
+					edit_current_macro.loop = edit_current_macro.loop + 1
 				end
+				edit_start_step = edit_insert_position
+				edit_insert_position = edit_insert_position + 1
+			end
 			start_input_menu(handler)
 			edit_start_selection = index
 			return true
@@ -308,7 +316,30 @@ local function handle_edit_items(index, event)
 		end
 	end
 
-	return namecancel
+	local selection
+	if command.step then
+		if event == 'prevgroup' then
+			if command.step > 1 then
+				local found_break = false
+				selection = index - 1
+				while (not edit_items[selection]) or (edit_items[selection].step == command.step) do
+					selection = selection - 1
+				end
+				local step = edit_items[selection].step
+				while edit_items[selection - 1] and (edit_items[selection - 1].step == step) do
+					selection = selection - 1
+				end
+			end
+		elseif event == 'nextgroup' then
+			if command.step < #edit_current_macro.steps then
+				selection = index + 1
+				while (not edit_items[selection]) or (edit_items[selection].step == command.step) do
+					selection = selection + 1
+				end
+			end
+		end
+	end
+	return namecancel, selection
 end
 
 local function add_edit_items(items)
@@ -360,7 +391,14 @@ local function add_edit_items(items)
 		edit_items[#items] = { action = 'duration', step = i }
 
 		for j, input in ipairs(step.inputs) do
-			local inputname = input.field and _p('input-name', input.field.name) or _p('plugin-inputmacro', '[not set]')
+			local inputname
+			if input.field then
+				inputname = _p('input-name', input.field.name)
+			elseif input.port then
+				inputname = _p('plugin-inputmacro', 'n/a')
+			else
+				inputname = _p('plugin-inputmacro', '[not set]')
+			end
 			items[#items + 1] = { string.format(_p('plugin-inputmacro', 'Input %d'), j), inputname, '' }
 			edit_items[#items] = { action = 'input', step = i, input = j }
 		end
@@ -393,14 +431,15 @@ local function add_edit_items(items)
 end
 
 local function handle_add(index, event)
-	if handle_edit_items(index, event) then
-		return true
+	local handled, selection = handle_edit_items(index, event)
+	if handled then
+		return true, selection
 	elseif event == 'cancel' then
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
 		table.remove(menu_stack)
-		return true
+		return true, selection
 	elseif (index == edit_item_exit) and (event == 'select') then
 		if current_macro_complete() then
 			table.insert(macros, edit_current_macro)
@@ -410,37 +449,38 @@ local function handle_add(index, event)
 		edit_current_macro = nil
 		edit_items = nil
 		table.remove(menu_stack)
-		return true
+		return true, selection
 	end
-	return false
+	return false, selection
 end
 
 local function handle_edit(index, event)
-	if handle_edit_items(index, event) then
-		return true
+	local handled, selection = handle_edit_items(index, event)
+	if handled then
+		return true, selection
 	elseif (event == 'cancel') or ((index == edit_item_exit) and (event == 'select')) then
 		edit_current_macro = nil
 		edit_menu_active = false
 		edit_items = nil
 		table.remove(menu_stack)
-		return true
+		return true, selection
 	end
-	return false
+	return false, selection
 end
 
 local function populate_add()
 	local items = { }
 
-	items[#items + 1] = { _p('plugin-inputmacro', 'Add Input Macro'), '', 'off' }
-	items[#items + 1] = { '---', '', '' }
+	table.insert(items, { _p('plugin-inputmacro', 'Add Input Macro'), '', 'off' })
+	table.insert(items, { '---', '', '' })
 
 	add_edit_items(items)
 
-	items[#items + 1] = { '---', '', '' }
+	table.insert(items, { '---', '', '' })
 	if current_macro_complete() then
-		items[#items + 1] = { _p('plugin-inputmacro', 'Create'), '', '' }
+		table.insert(items, { _p('plugin-inputmacro', 'Create'), '', '' })
 	else
-		items[#items + 1] = { _p('plugin-inputmacro', 'Cancel'), '', '' }
+		table.insert(items, { _p('plugin-inputmacro', 'Cancel'), '', '' })
 	end
 	edit_item_exit = #items
 
@@ -449,20 +489,20 @@ local function populate_add()
 	if edit_switch_poller then
 		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
 	else
-		return items, selection, 'lrrepeat'
+		return items, selection, 'lrrepeat' .. (edit_name_buffer and ' ignorepause' or '')
 	end
 end
 
 local function populate_edit()
 	local items = { }
 
-	items[#items + 1] = { _p('plugin-inputmacro', 'Edit Input Macro'), '', 'off' }
-	items[#items + 1] = { '---', '', '' }
+	table.insert(items, { _p('plugin-inputmacro', 'Edit Input Macro'), '', 'off' })
+	table.insert(items, { '---', '', '' })
 
 	add_edit_items(items)
 
-	items[#items + 1] = { '---', '', '' }
-	items[#items + 1] = { _p('plugin-inputmacro', 'Done'), '', '' }
+	table.insert(items, { '---', '', '' })
+	table.insert(items, { _p('plugin-inputmacro', 'Done'), '', '' })
 	edit_item_exit = #items
 
 	local selection = edit_start_selection
@@ -470,7 +510,7 @@ local function populate_edit()
 	if edit_switch_poller then
 		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
 	else
-		return items, selection, 'lrrepeat'
+		return items, selection, 'lrrepeat' .. (edit_name_buffer and ' ignorepause' or '')
 	end
 end
 
@@ -517,25 +557,25 @@ function populate_macros()
 	local ioport = manager.machine.ioport
 	local items = { }
 
-	items[#items + 1] = { _p('plugin-inputmacro', 'Input Macros'), '', 'off' }
-	items[#items + 1] = { string.format(_p('plugin-inputmacro', 'Press %s to delete'), manager.ui:get_general_input_setting(ioport:token_to_input_type('UI_CLEAR'))), '', 'off' }
-	items[#items + 1] = { '---', '', '' }
+	table.insert(items, { _p('plugin-inputmacro', 'Input Macros'), '', 'off' })
+	table.insert(items, { string.format(_p('plugin-inputmacro', 'Press %s to delete'), manager.ui:get_general_input_setting(ioport:token_to_input_type('UI_CLEAR'))), '', 'off' })
+	table.insert(items, { '---', '', '' })
 
 	macros_item_first_macro = #items + 1
 	if #macros > 0 then
 		for index, macro in ipairs(macros) do
-			items[#items + 1] = { macro.name, input:seq_name(macro.binding), '' }
+			table.insert(items, { macro.name, input:seq_name(macro.binding), '' })
 			if macros_start_macro == index then
 				macros_selection_save = #items
 			end
 		end
 	else
-		items[#items + 1] = { _p('plugin-inputmacro', '[no macros]'), '', 'off' }
+		table.insert(items, { _p('plugin-inputmacro', '[no macros]'), '', 'off' })
 	end
 	macros_start_macro = nil
 
-	items[#items + 1] = { '---', '', '' }
-	items[#items + 1] = { _p('plugin-inputmacro', 'Add macro'), '', '' }
+	table.insert(items, { '---', '', '' })
+	table.insert(items, { _p('plugin-inputmacro', 'Add macro'), '', '' })
 	macros_item_add = #items
 
 	local selection = macros_selection_save
