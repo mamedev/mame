@@ -38863,6 +38863,9 @@ vreader                         // (c) 2011 V.Tech
 vreadercaen                     // (c) 2011 V.Tech
 vreadercafr                     // (c) 2011 V.Tech
 
+@source:stop.cpp
+stop
+
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
 
