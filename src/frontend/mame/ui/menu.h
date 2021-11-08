@@ -203,7 +203,8 @@ protected:
 	{
 		// size up the text
 		float const lrborder(ui().box_lr_border() * machine().render().ui_aspect(&container()));
-		float maxwidth(origx2 - origx1);
+		float const origwidth(origx2 - origx1 - (2.0f * lrborder));
+		float maxwidth(origwidth);
 		for (Iter it = begin; it != end; ++it)
 		{
 			float width;
@@ -212,30 +213,27 @@ protected:
 					0.0f, 0.0f, 1.0f, justify, wrap,
 					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
 					&width, nullptr, text_size);
-			width += 2.0f * lrborder;
 			maxwidth = (std::max)(maxwidth, width);
 		}
-		if (scale && ((origx2 - origx1) < maxwidth))
+		if (scale && (origwidth < maxwidth))
 		{
-			text_size *= ((origx2 - origx1) / maxwidth);
-			maxwidth = origx2 - origx1;
+			text_size *= origwidth / maxwidth;
+			maxwidth = origwidth;
 		}
 
 		// draw containing box
-		float x1(0.5f * (1.0f - maxwidth));
-		float x2(x1 + maxwidth);
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
+		float const boxleft(0.5f - (maxwidth * 0.5f) - lrborder);
+		float boxright(0.5f + (maxwidth * 0.5f) + lrborder);
+		ui().draw_outlined_box(container(), boxleft, y1, boxright, y2, bgcolor);
 
 		// inset box and draw content
-		x1 += lrborder;
-		x2 -= lrborder;
+		float const textleft(0.5f - (maxwidth * 0.5f));
 		y1 += ui().box_tb_border();
-		y2 -= ui().box_tb_border();
 		for (Iter it = begin; it != end; ++it)
 		{
 			ui().draw_text_full(
 					container(), std::string_view(*it),
-					x1, y1, x2 - x1, justify, wrap,
+					textleft, y1, maxwidth, justify, wrap,
 					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
 			y1 += ui().get_line_height();
