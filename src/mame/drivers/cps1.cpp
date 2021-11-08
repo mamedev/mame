@@ -1971,12 +1971,12 @@ static INPUT_PORTS_START( sf2j )
 	PORT_DIPSETTING(    0x00, "2 Credits/Winner Continue" ) //Winner stays, loser pays, in other words.
 INPUT_PORTS_END
 
-/* Same as sf2j but option are inverted. Default position here is 2 Credits for versus play */
+/* Same as sf2j but options are inverted. Default position here is 2 Credits for versus play */
 static INPUT_PORTS_START( sf2cej )
 	PORT_INCLUDE( sf2 )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )                    PORT_DIPLOCATION("SW(B):4")
+	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" )                    PORT_DIPLOCATION("SW(B):4")
 	PORT_DIPSETTING(    0x08, "2 Credits/Winner Continue" ) //Winner stays, loser pays, in other words.
 	PORT_DIPSETTING(    0x00, "1 Credit/No Continue" )  // 1 Credit for versus play, and "Here comes a new challenger" option is disabled
 INPUT_PORTS_END
