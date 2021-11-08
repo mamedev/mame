@@ -101,6 +101,7 @@ void nes_zapper_device::device_start()
 
 void nes_bandaihs_device::device_start()
 {
+	nes_zapper_device::device_start();
 	save_item(NAME(m_latch));
 	save_item(NAME(m_strobe));
 }
@@ -116,6 +117,7 @@ void nes_zapper_device::device_reset()
 
 void nes_bandaihs_device::device_reset()
 {
+	nes_zapper_device::device_reset();
 	m_latch = 0xff;
 	m_strobe = 0xff;
 }
