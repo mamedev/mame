@@ -625,8 +625,8 @@ static INPUT_PORTS_START( midnrun )
 	PORT_DIPSETTING( 0x04, "3" )
 	PORT_DIPSETTING( 0x00, "4" )
 	PORT_DIPNAME( 0x02, 0x02, "Transmission Type" ) PORT_DIPLOCATION("SW:2")
-	PORT_DIPSETTING( 0x02, "Button" )
-	PORT_DIPSETTING( 0x00, "'T'Gate" ) //unused
+	PORT_DIPSETTING( 0x02, "'T'Gate" )
+	PORT_DIPSETTING( 0x00, "'Button" ) //unused
 	PORT_DIPNAME( 0x01, 0x01, "CG Board Type" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x01, "Single" )
 	PORT_DIPSETTING( 0x00, "Twin" ) //unused
