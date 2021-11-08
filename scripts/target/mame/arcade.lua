@@ -5123,6 +5123,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/sstrangr.cpp",
 	MAME_DIR .. "src/mame/drivers/startouch.cpp",
 	MAME_DIR .. "src/mame/drivers/statriv2.cpp",
+	MAME_DIR .. "src/mame/drivers/stop.cpp",
 	MAME_DIR .. "src/mame/drivers/strkzn.cpp",
 	MAME_DIR .. "src/mame/drivers/stuntair.cpp",
 	MAME_DIR .. "src/mame/drivers/su2000.cpp",

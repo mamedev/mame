@@ -129,7 +129,7 @@ private:
 	coco_cartridge_line         m_nmi_line;
 	coco_cartridge_line         m_halt_line;
 public:
-	devcb_write_line        m_cart_callback;
+	devcb_write_line            m_cart_callback;
 	devcb_write_line            m_nmi_callback;
 	devcb_write_line            m_halt_callback;
 private:

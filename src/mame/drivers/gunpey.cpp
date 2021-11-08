@@ -880,7 +880,7 @@ bool gunpey_state::decompress_sprite(unsigned char *buf, int ix, int iy, int ow,
 	s.ox = 0;
 	s.oy = 0;
 
-	int temp;
+	[[maybe_unused]] int temp;
 	temp = get_next_bit(&s);
 	temp |= get_next_bit(&s) << 1;
 	temp |= get_next_bit(&s) << 2;
