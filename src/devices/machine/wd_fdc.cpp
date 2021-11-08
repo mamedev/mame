@@ -82,7 +82,7 @@ DEFINE_DEVICE_TYPE(WD1770,     wd1770_device,     "wd1770",     "Western Digital
 DEFINE_DEVICE_TYPE(WD1772,     wd1772_device,     "wd1772",     "Western Digital WD1772 FDC")
 DEFINE_DEVICE_TYPE(WD1773,     wd1773_device,     "wd1773",     "Western Digital WD1773 FDC")
 
-static std::string states[] = 
+static const char *const states[] = 
 {
 	"IDLE",						
 	"RESTORE",					
