@@ -3118,7 +3118,7 @@ pc8477a_device::pc8477a_device(const machine_config &mconfig, const char *tag, d
 	recalibrate_steps = 85; // TODO: may also be programmed as 255, 3925 or 4095 by (unemulated) mode command
 }
 
-pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477A, tag, owner, clock)
+pc8477b_device::pc8477b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : ps2_fdc_device(mconfig, PC8477B, tag, owner, clock)
 {
 	ready_polled = true;
 	ready_connected = false;
