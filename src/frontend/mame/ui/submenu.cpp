@@ -9,16 +9,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
 #include "ui/submenu.h"
-#include "ui/utils.h"
+
 #include "ui/menuitem.h"
+#include "ui/ui.h"
+#include "ui/utils.h"
 
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
 #include "../osd/windows/winmain.h"
 #else
 #include "../osd/modules/lib/osdobj_common.h"
 #endif
+#include "../osd/modules/input/input_module.h"
 
 #include <limits>
 
@@ -97,7 +99,7 @@ std::vector<submenu::option> submenu::advanced_options()
 std::vector<submenu::option> submenu::control_options()
 {
 	return std::vector<option>{
-			{ option_type::HEAD, N_("Device Mapping") },
+			{ option_type::HEAD, N_("Input Device Options") },
 			{ option_type::EMU,  N_("Lightgun Device Assignment"),              OPTION_LIGHTGUN_DEVICE },
 			{ option_type::EMU,  N_("Trackball Device Assignment"),             OPTION_TRACKBALL_DEVICE },
 			{ option_type::EMU,  N_("Pedal Device Assignment"),                 OPTION_PEDAL_DEVICE },
@@ -105,7 +107,12 @@ std::vector<submenu::option> submenu::control_options()
 			{ option_type::EMU,  N_("Paddle Device Assignment"),                OPTION_PADDLE_DEVICE },
 			{ option_type::EMU,  N_("Dial Device Assignment"),                  OPTION_DIAL_DEVICE },
 			{ option_type::EMU,  N_("Positional Device Assignment"),            OPTION_POSITIONAL_DEVICE },
-			{ option_type::EMU,  N_("Mouse Device Assignment"),                 OPTION_MOUSE_DEVICE } };
+			{ option_type::EMU,  N_("Mouse Device Assignment"),                 OPTION_MOUSE_DEVICE },
+			{ option_type::SEP },
+			{ option_type::OSD,  N_("Keyboard Input Provider"),                 OSD_KEYBOARDINPUT_PROVIDER },
+			{ option_type::OSD,  N_("Mouse Input Provider"),                    OSD_MOUSEINPUT_PROVIDER },
+			{ option_type::OSD,  N_("Lightgun Input Provider"),                 OSD_LIGHTGUNINPUT_PROVIDER },
+			{ option_type::OSD,  N_("Joystick Input Provider"),                 OSD_JOYSTICKINPUT_PROVIDER } };
 }
 
 std::vector<submenu::option> submenu::video_options()
@@ -158,7 +165,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	else
 		opts = dynamic_cast<core_options *>(options);
 
-	for (option & sm_option : m_options)
+	for (option &sm_option : m_options)
 	{
 		switch (sm_option.type)
 		{
@@ -192,7 +199,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 			if (sm_option.entry->type() == OPTION_STRING)
 			{
 				sm_option.value.clear();
-				std::string descr(sm_option.entry->description()), delim(", ");
+				std::string descr(machine().options().get_entry(sm_option.name)->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
 
 				std::string default_value(sm_option.entry->default_value());
@@ -348,7 +355,7 @@ void submenu::populate(float &customtop, float &custombottom)
 			item_append(menu_item_type::SEPARATOR);
 			break;
 		case option_type::CMD:
-			item_append(_(sm_option->description), 0, static_cast<void*>(&(*sm_option)));
+			item_append(_(sm_option->description), 0, reinterpret_cast<void *>(&*sm_option));
 			break;
 		case option_type::EMU:
 		case option_type::UI:
@@ -356,7 +363,8 @@ void submenu::populate(float &customtop, float &custombottom)
 			switch (sm_option->entry->type())
 			{
 			case OPTION_BOOLEAN:
-				item_append_on_off(_(sm_option->description),
+				item_append_on_off(
+						_(sm_option->description),
 						sm_option->options->bool_value(sm_option->name),
 						0,
 						static_cast<void*>(&(*sm_option)));
@@ -376,10 +384,11 @@ void submenu::populate(float &customtop, float &custombottom)
 						i_max = std::numeric_limits<int>::max();
 					}
 					arrow_flags = get_arrow_flags(i_min, i_max, i_cur);
-					item_append(_(sm_option->description),
+					item_append(
+							_(sm_option->description),
 							sm_option->entry->value(),
 							arrow_flags,
-							static_cast<void*>(&(*sm_option)));
+							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
 			case OPTION_FLOAT:
@@ -398,10 +407,11 @@ void submenu::populate(float &customtop, float &custombottom)
 					}
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
 					std::string tmptxt = string_format("%g", f_cur);
-					item_append(_(sm_option->description),
+					item_append(
+							_(sm_option->description),
 							tmptxt,
 							arrow_flags,
-							static_cast<void*>(&(*sm_option)));
+							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
 			case OPTION_STRING:
@@ -409,16 +419,20 @@ void submenu::populate(float &customtop, float &custombottom)
 					std::string v_cur(sm_option->entry->value());
 					int const cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
 					arrow_flags = get_arrow_flags(0, int(unsigned(sm_option->value.size() - 1)), cur_value);
-					item_append(_(sm_option->description),
+					item_append(
+							_(sm_option->description),
 							sm_option->options->value(sm_option->name),
-							arrow_flags, static_cast<void*>(&(*sm_option)));
+							arrow_flags,
+							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
 			default:
 				arrow_flags = FLAG_RIGHT_ARROW;
-				item_append(_(sm_option->description),
+				item_append(
+						_(sm_option->description),
 						sm_option->options->value(sm_option->name),
-						arrow_flags, static_cast<void*>(&(*sm_option)));
+						arrow_flags,
+						reinterpret_cast<void *>(&*sm_option));
 				break;
 			}
 			break;

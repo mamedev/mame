@@ -835,7 +835,14 @@ void mame_ui_manager::draw_text(render_container &container, std::string_view bu
 //  and full size computation
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
+void mame_ui_manager::draw_text_full(
+		render_container &container,
+		std::string_view origs,
+		float x, float y, float origwrapwidth,
+		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
+		draw_mode draw, rgb_t fgcolor, rgb_t bgcolor,
+		float *totalwidth, float *totalheight,
+		float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, justify, wrap);
@@ -844,7 +851,7 @@ void mame_ui_manager::draw_text_full(render_container &container, std::string_vi
 	layout.add_text(
 			origs,
 			fgcolor,
-			draw == OPAQUE_ ? bgcolor : rgb_t::transparent(),
+			(draw == OPAQUE_) ? bgcolor : rgb_t::transparent(),
 			text_size);
 
 	// and emit it (if we are asked to do so)
@@ -867,7 +874,7 @@ void mame_ui_manager::draw_text_full(render_container &container, std::string_vi
 void mame_ui_manager::draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
-	float maximum_width = 1.0f - box_lr_border() * 2;
+	float maximum_width = 1.0f - (box_lr_border() * machine().render().ui_aspect(&container) * 2.0f);
 
 	// create a layout
 	ui::text_layout layout = create_layout(container, maximum_width, justify);
@@ -888,17 +895,18 @@ void mame_ui_manager::draw_text_box(render_container &container, std::string_vie
 void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
 {
 	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
-	auto actual_left = layout.actual_left();
-	auto actual_width = layout.actual_width();
-	auto actual_height = layout.actual_height();
-	auto x = std::clamp(xpos - actual_width / 2, box_lr_border(), 1.0f - actual_width - box_lr_border());
-	auto y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
+	auto const lrborder = box_lr_border() * machine().render().ui_aspect(&container);
+	auto const actual_left = layout.actual_left();
+	auto const actual_width = layout.actual_width();
+	auto const actual_height = layout.actual_height();
+	auto const x = std::clamp(xpos - actual_width / 2, lrborder, 1.0f - actual_width - lrborder);
+	auto const y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
 
 	// add a box around that
 	draw_outlined_box(
 			container,
-			x - box_lr_border(), y - box_tb_border(),
-			x + actual_width + box_lr_border(), y + actual_height + box_tb_border(),
+			x - lrborder, y - box_tb_border(),
+			x + actual_width + lrborder, y + actual_height + box_tb_border(),
 			backcolor);
 
 	// emit the text

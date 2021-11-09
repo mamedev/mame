@@ -3097,7 +3097,7 @@ void nemesis_state::bubsys_twinbeeb_init()
 
 	for (int i = 0; i < 0x806; i++)
 	{
-		uint16_t crc = 0;
+		[[maybe_unused]] uint16_t crc = 0;
 
 		int sourcebase = i * 0x80;
 		int destbase = i * 0x90;
