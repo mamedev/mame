@@ -74,10 +74,18 @@ namespace webpp {
 
 		public:
 			virtual ~Connection() {}
+#if ASIO_VERSION >= 101400
+			explicit Connection(const std::shared_ptr<socket_type> &socket) : super(0), socket(socket), strand(static_cast<asio::io_context&>(socket->get_executor().context())), closed(false) { }
+#else
 			explicit Connection(const std::shared_ptr<socket_type> &socket) : super(0), socket(socket), strand(socket->get_io_service()), closed(false) { }
+#endif
 
 		private:
+#if ASIO_VERSION >= 101400
+			explicit Connection(socket_type *socket): super(0), socket(socket), strand(static_cast<asio::io_context&>(socket->get_executor().context())), closed(false) { }
+#else
 			explicit Connection(socket_type *socket): super(0), socket(socket), strand(socket->get_io_service()), closed(false) { }
+#endif
 
 			class SendData {
 			public:
@@ -361,7 +369,11 @@ namespace webpp {
 		std::shared_ptr<asio::system_timer> get_timeout_timer(const std::shared_ptr<Connection> &connection, size_t seconds) {
 			if (seconds == 0)
 				return nullptr;
+#if ASIO_VERSION >= 101400
+			auto timer = std::make_shared<asio::system_timer>(connection->socket->get_executor());
+#else
 			auto timer = std::make_shared<asio::system_timer>(connection->socket->get_io_service());
+#endif
 			timer->expires_at(std::chrono::system_clock::now() + std::chrono::seconds(static_cast<long>(seconds)));
 			timer->async_wait([connection](const std::error_code& ec){
 				if(!ec) {
@@ -652,7 +664,11 @@ namespace webpp {
 
 		void timer_idle_init(const std::shared_ptr<Connection> &connection) {
 			if(config.timeout_idle>0) {
+#if ASIO_VERSION >= 101400
+				connection->timer_idle= std::make_unique<asio::system_timer>(connection->socket->get_executor());
+#else
 				connection->timer_idle= std::make_unique<asio::system_timer>(connection->socket->get_io_service());
+#endif
 				connection->timer_idle->expires_from_now(std::chrono::seconds(static_cast<unsigned long>(config.timeout_idle)));
 				timer_idle_expired_function(connection);
 			}
