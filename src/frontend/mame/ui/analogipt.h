@@ -45,9 +45,9 @@ private:
 
 		std::reference_wrapper<ioport_field> field;
 		int type;
+		int defvalue;
 		int min, max;
 		int cur;
-		int defvalue;
 	};
 
 	struct field_data

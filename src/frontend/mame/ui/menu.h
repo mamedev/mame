@@ -207,13 +207,13 @@ protected:
 		float maxwidth(origwidth);
 		for (Iter it = begin; it != end; ++it)
 		{
-			float width;
-			ui().draw_text_full(
-					container(), std::string_view(*it),
-					0.0f, 0.0f, 1.0f, justify, wrap,
-					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
-					&width, nullptr, text_size);
-			maxwidth = (std::max)(maxwidth, width);
+			std::string_view const &line(*it);
+			if (!line.empty())
+			{
+				auto layout = ui().create_layout(container(), 1.0f, justify, wrap);
+				layout.add_text(std::string_view(*it), rgb_t::white(), rgb_t::black(), text_size);
+				maxwidth = (std::max)(layout.actual_width(), maxwidth);
+			}
 		}
 		if (scale && (origwidth < maxwidth))
 		{

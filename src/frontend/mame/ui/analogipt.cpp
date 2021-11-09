@@ -22,15 +22,15 @@ namespace ui {
 inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 	: field(f)
 	, type(t)
-	, min((ANALOG_ITEM_SENSITIVITY == t) ? 1 : 0)
-	, max((ANALOG_ITEM_REVERSE == t) ? 1 : 255)
-	, cur(-1)
 	, defvalue(
 			(ANALOG_ITEM_KEYSPEED == t) ? f.delta() :
 			(ANALOG_ITEM_CENTERSPEED == t) ? f.centerdelta() :
 			(ANALOG_ITEM_REVERSE == t) ? f.analog_reverse() :
 			(ANALOG_ITEM_SENSITIVITY == t) ? f.sensitivity() :
 			-1)
+	, min((ANALOG_ITEM_SENSITIVITY == t) ? 1 : 0)
+	, max((ANALOG_ITEM_REVERSE == t) ? 1 : std::max(defvalue * 4, 255))
+	, cur(-1)
 {
 }
 
@@ -296,10 +296,7 @@ void menu_analog::handle(event const *ev)
 			}
 
 			// clamp to range
-			if (newval < data.min)
-				newval = data.min;
-			if (newval > data.max)
-				newval = data.max;
+			newval = std::clamp(newval, data.min, data.max);
 
 			// if things changed, update
 			if (newval != data.cur)
