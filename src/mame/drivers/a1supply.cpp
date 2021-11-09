@@ -60,7 +60,7 @@ void a1supply_state::rom_map(address_map &map)
 void a1supply_state::a1supply(machine_config &config)
 {
 	// basic machine hardware
-	i4040_cpu_device &cpu(I4040(config, "maincpu", 4_MHz_XTAL / 4)); // divider not verified
+	i4040_cpu_device &cpu(I4040(config, "maincpu", 4_MHz_XTAL / 7)); // P4201A divides the incoming clock by seven to get the multi-phase clock
 	cpu.set_rom_map(&a1supply_state::rom_map);
 
 	// video hardware
