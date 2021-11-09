@@ -92,77 +92,47 @@ ROM_START( rbowlorama )
 	DISK_IMAGE( "namco_bowling", 0, BAD_DUMP SHA1(138971fa22ba5a4f0e78daad989d444ebb072213) ) // v2.1.1. May contain operator and players data
 
 /*
-PROCEDURE FOR UPDATING GAMES
+  Game Updates
 
-Determining the Need for This Update
-
-Take these steps to determine if your game needs this update:
-
-    1. open the coin door and press TEST
-    2. from the test menu, select "system info"
-    3. if the software revision (the second line) is less than 2.1.1 then this update is necessary
-
-Update Process
-
-The process can be broken into three steps (step I is only necessary for machines with version 0.1.14 code):
-
-    I. create the update directory (skip this step if current version is later than 0.1.14)
-
-    Very early Rockin' Bowl-O-Rama games (version 0.1.14) have a problem which prevents the software update process from working correctly. The following step corrects the problem so that future updates are simpler and work correctly.
-       1. Turn the game off
-       2. Open the back door
-       3. Plug a PS/2 keyboard into the keyboard (purple) connector on the game's motherboard
-       4. Turn the game on
-       5. After the game starts up, press "ALT-F1" on the keyboard (press F1 while holding the ALT key)
-       6. A pulldown menu should appear. Use the down arrow to move down to "System Tools"
-       7. Use the right arrow to move into the "System Tools" submenu
-       8. Use the down arrow to move down to "Terminal"
-       9  Press "Enter" to launch a terminal
-      10. In the terminal, type the following commands:
+  Versions 0.1.14 and older cannot be updated unless you create a folder on the game directory. Since the game is mounted as
+  read only, you need first to remount it as read-write (and remount it back to read only once the update folder is created).
+  To do it you must:
+   1.- Plug a keyboard to the PC motherboard.
+   2.- Once the game is started, press ALT+F1 to enter the system menu. Select "System Tools" -> "Terminal" to launch a terminal.
+   3.- Create the folder and exit terminal (su password is b0wl1n6* (lower case 'B', number zero, lower case 'W', lower case 'L', number one, lower case 'N', number six, asterisk):
                 sudo mount -o remount -o rw /bowl
                 mkdir /bowl/update
                 sudo mount -o remount -o ro /bowl
                 exit
-          After entering the first command the machine will prompt for a password. 
-          Enter this password: b0wl1n6* (lower case 'B', number zero, lower case 'W', lower case 'L', number one, lower case 'N', number six, asterisk).
-          Watch carefully as you type. Since the game is consuming most of the machine's processing power it tends to misread or double-read the keyboard.
-      11. Unplug the keyboard.
-
-   II. create the update USB flash drive
-       The update is applied to the machine using a USB flash drive. Be sure the flash drive is large enough and has sufficient free space.
-       The flash drive can be set up using a PC or a Mac. If your current software is older than 2.0.5 then you must apply both the 2.0.5 update then the current update.
-       First follow these steps:
-         1. Download the update: bor-2.0.5.zip
-         2. Unzip the update by double clicking on it. Your browser may have done this automatically. The update contains two files, bor-2.0.5.00000.upd and bor-2.0.5.pak.
-         3. Plug the USB flash drive into a USB socket on your computer. It should mount automatically.
-         4. Create a directory called "update" (all lower case) at the top level of the USB flash drive
-         5. Copy the two update files into this directory on the USB flash drive
-         6. Unmount (eject) the USB flash drive, then unplug it
-
-       Follow these steps to get the current update:
-         1. Download the update: bor-2.1.1.00000.xpk
-         2. Plug the USB flash drive into a USB socket on your computer. It should mount automatically.
-         3. Copy the file anywhere onto the USB flash drive. Be sure the file name hasn't been modified by your computer. It should be bor-2.1.1.00000.xpk.
-         4. Unmount (eject) the USB flash drive, then unplug it
-
-  III. apply the update
-       This step reads the update from the USB flash drive and installs it into the game. 
-       When it is complete the game will quit, leaving a blank screen for a few seconds, then it will restart. Once it has restarted it will be running the updated version of the game.
-         1. if it's not already on, turn the game on and wait for it to start running
-         2. open the coin door and the back door of the game
-         3. plug the USB flash drive into any available USB socket on the motherboard
-         4. press the TEST button inside the coin door
-         5. from the test menu select "software update"
-         6. from the software update menu select the current update (if your current version is less than 2.0.5 select the 2.0.5 update first, then repeat this process for the current update)
-         7. read the installation instructions
-         8. press START to install the update
-         9. once the installation completes the game will quit and restart
-        10. remove the USB flash drive and close the coin door and back door
 */
-	ROM_REGION(0xb07d5ea, "update211", 0)
+
+/*
+  Procedure for updating to 2.0.5:
+   1.- Create a top level directory on a USB drive called "update", and copy the files "bor-2.0.5.00000.upd" and "bor-2.0.5.pak" into it.
+   2.- Open both the coin door and the back door of the game.
+   3.- Plug the USB drive on any availabe port on the machine motherboard and press the test button inside the coin door.
+   4.- From the test menu select "software update" and then select the current update.
+   5.- Read the installation instructions and press START to install the update.
+   6.- Once the installation completes the game will quit and restart.
+   7.- Remove the USB flash drive and close the coin door and back door.
+*/
+	ROM_REGION(0x80ad5ea, "update205", 0)
 	ROM_LOAD("bor-2.0.5.00000.upd", 0x00000, 0x0000498, CRC(197aa4ee) SHA1(dcd3cfc34613909de85c980e83c8af3e9868b66a))
-	ROM_LOAD("bor-2.0.5.pak",       0x00000, 0x80ad152, CRC(c7445c37) SHA1(f5634876302f1d8619e2e3aedfe56edf83e65cfd))
+	ROM_LOAD("bor-2.0.5.pak",       0x00498, 0x80ad152, CRC(c7445c37) SHA1(f5634876302f1d8619e2e3aedfe56edf83e65cfd))
+
+/*
+  Procedure for updating to 2.1.1 (if the current version is less than 2.0.5, update first to 2.0.5):
+   1.- Copy the file "bor-2.1.1.00000.xpk" into the top level folder of an USB drive.
+   2.- Open both the coin door and the back door of the game.
+   3.- Plug the USB drive on any availabe port on the machine motherboard and press the test button inside the coin door.
+   4.- From the test menu select "software update" and then select the current update.
+   5.- Read the installation instructions and press START to install the update.
+   6.- Once the installation completes the game will quit and restart.
+   7.- Remove the USB flash drive and close the coin door and back door.
+*/
+	ROM_REGION(0x2fd0000, "update211", 0)
 	ROM_LOAD("bor-2.1.1.00000.xpk", 0x00000, 0x2fd0000, CRC(eac46f62) SHA1(3b00baad15ab7662b3d4cd69c4d589f722f2e1f7))
+
 
 	DISK_REGION( "recovery211" )
 	DISK_IMAGE_READONLY( "bor2_2_1", 0, SHA1(2c9341b81e1cda94231fb8173b506178bf163f9c) ) // 2.1.1 recovery ISO image
