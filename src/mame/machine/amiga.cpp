@@ -1191,6 +1191,8 @@ u16 amiga_state::vposr_r()
 
 void amiga_state::vposw_w(u16 data)
 {
+	// TODO: data actually resync the screen?
+	// TODO: ECS always resets the LOF no matter the setting
 	CUSTOM_REG(REG_VPOSR) = (data & VPOSR_LOF) | (data & 7);
 	// TODO: high bits of screen height
 //	if (data & 7)

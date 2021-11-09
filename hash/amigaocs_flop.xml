@@ -14,11 +14,16 @@ license:CC0
     ATK test notes refers to Amiga Test Kit v1.18:
     https://github.com/keirf/Amiga-Stuff
     Specifically the Floppy Drive Test Read Item, the test note refers
-    to the flop1 been tested from DF1 up with a -bench 90:
+    to the flop1 been tested from DF1: up with a -bench 90:
     - OK means that all tracks have been reported good;
     - a generic "failed" means that most if not all tracks reports as bad (test didn't complete);
     - C refers to the Track number(s), H is the (U)pper, (L)ower head (if not omitted),
       "1 Sector Bad" reports as one sector being bad, otherwise "Bad" [Track];
+
+	Note that disk swaps are known to be quite fussy on Amiga.
+	As a rule of thumb it's really advised to not try a "live swap" of disks,
+	but instead unmount (empty) the disk buffer first then mount whatever the SW asks to.
+	This holds particularly true for anything that don't explictly asks for the user to press any key on devices.
 
     todo (SPS):
     - see if it's possible to better verify these images, the SPS dat only lists the (highly insecure) CRC32s so we're relying on trust here
@@ -12636,7 +12641,7 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Asks to disc swap with disc 1, which is already in, [FDC] dsksync -->
+	<!-- Asks to disc swap with disc 1 which is already in, [FDC] dsksync -->
 	<!-- Mouse input doesn't work (TODO: recheck) -->
 	<!-- ATK test: OK -->
 	<software name="dstrike" supported="no">
@@ -22026,14 +22031,16 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="hugo" supported="no">
+	<software name="hugo" supported="yes">
 		<!-- SPS (CAPS) release 685 -->
 		<description>Hugo (Ger)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1992</year>
 		<publisher>ITE</publisher>
+		<info name="usage" value="Sports color sheet copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">

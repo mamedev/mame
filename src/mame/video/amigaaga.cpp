@@ -732,6 +732,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 				CUSTOM_REG(REG_CLXDAT) |= (sprpix >> 1) & 0x1e0;
 			if ((collide & (ecolmask | ocolmask)) == 0)
 				CUSTOM_REG(REG_CLXDAT) |= 0x001;
+			// TODO: CLXCON2
 
 			/* if we are within the display region, render */
 			if (dst != nullptr && x >= m_diw.left() && x < m_diw.right())
