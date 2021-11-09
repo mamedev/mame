@@ -360,7 +360,10 @@ public:
 	/* chip RAM access */
 	uint16_t read_chip_ram(offs_t byteoffs)
 	{
-		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : 0xffff;
+		// We use rand() here so that an attempt to go beyond the allocated chip RAM 
+		// (hopefully) doesn't go unnoticed.
+		// FIXME: most likely open bus instead.
+		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : machine().rand();
 	}
 
 	void write_chip_ram(offs_t byteoffs, uint16_t data)

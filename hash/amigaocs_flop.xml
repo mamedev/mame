@@ -41376,27 +41376,27 @@ license:CC0
 		<year>1993</year>
 		<publisher>Krisalis</publisher>
 		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Program Disk" />
+			<dataarea name="flop" size="1049612">
+				<rom name="(sps1129)soccerkid_programdisk.ipf" size="1049612" crc="a8b1aef9" sha1="f6053a93e9b1e4da7e1262b04561cb79a4193dce"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1129)soccerkid_datadisk1.ipf" size="1049612" crc="17587bf7" sha1="12e8327ad4a6bd279fffca56768db863a7264b7f"/>
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_3_5">
+		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1129)soccerkid_datadisk2.ipf" size="1049612" crc="20ecd211" sha1="99ac25ad822bf4af9383c9cef3c08f84fbbf54a8"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop4" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1129)soccerkid_datadisk3.ipf" size="1049612" crc="fd96ad37" sha1="73380a4ef7b1fd331c94126762936a8247a070d8"/>
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Program Disk" />
-			<dataarea name="flop" size="1049612">
-				<rom name="(sps1129)soccerkid_programdisk.ipf" size="1049612" crc="a8b1aef9" sha1="f6053a93e9b1e4da7e1262b04561cb79a4193dce"/>
 			</dataarea>
 		</part>
 	</software>

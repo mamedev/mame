@@ -1450,6 +1450,13 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			}
 			break;
 
+		// OCS and AGA versions of Soccer Kid explicitly writes blitter addresses way beyond chip RAM
+		// This is clearly deterministic: it draws an individual empty tile scattered across playfield
+		// (which also collides on top of it)
+		case REG_BLTAPTH:   case REG_BLTBPTH:   case REG_BLTCPTH:   case REG_BLTDPTH:
+			data &= ( m_chip_ram_mask >> 16 );
+			break;
+
 		case REG_SPR0PTH:   case REG_SPR1PTH:   case REG_SPR2PTH:   case REG_SPR3PTH:
 		case REG_SPR4PTH:   case REG_SPR5PTH:   case REG_SPR6PTH:   case REG_SPR7PTH:
 			data &= ( m_chip_ram_mask >> 16 );

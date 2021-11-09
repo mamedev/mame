@@ -113,7 +113,7 @@ Boots to a purple and blue flickering screen, [FDC] dsksync
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-GFX pitch corruption and offset for backgrounds during gameplay
+[Lisa] GFX pitch corruption and offset for backgrounds during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -140,7 +140,7 @@ GFX pitch corruption and offset for backgrounds during gameplay
 		<notes><![CDATA[
 Guru Meditation at boot, [FDC] dsksync
 Seldomly crashes at stage intro screen
-Offset GFX scroll during gameplay
+Offset [Lisa] GFX scroll during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -171,9 +171,9 @@ Offset GFX scroll during gameplay
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-GFX pitch issue on level intro text
+[Lisa] GFX pitch issue on level intro text
 Has wrong colors for gameplay status bar, [Copper] timings
-Has wrong GFX window size for gameplay, and no side GFX frame
+Has wrong [Lisa] GFX window size for gameplay, and no side GFX frame
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports CodeBook copy protection. Use disk 2 for HDD install" />
 		<part name="flop1" interface="floppy_3_5">
@@ -238,7 +238,7 @@ Has wrong GFX window size for gameplay, and no side GFX frame
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
-GFX pitch corruption during gameplay
+[Lisa] GFX pitch corruption during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 
@@ -315,7 +315,7 @@ Hangs after language selection, [FDC] copy protection
 		<publisher>Magic Bytes</publisher>
 		<notes><![CDATA[
 Slight offset screen on Space Invaders game during install and on intros
-Has GFX pitch scrolling issue during the intro
+Has [Lisa] GFX pitch scrolling issue during the intro
 Returns to Workbench with a fatal error after the credits intro with a "Speicherfehler" (Memory Error) on a1200. Expects FastRAM installed?
 ]]></notes>
 		<info name="usage" value="Requires AGA, requires HDD install" />
@@ -529,7 +529,7 @@ Program Error #80000006 on intro screen after avater becomes vampire
 		<publisher>Team 17</publisher>
 		<notes><![CDATA[
 Guru Meditation, [FDC] dsksync
-GFX pitch corruption during gameplay, and no status bars
+[Lisa] GFX pitch corruption during gameplay, and no status bars
 Runs too fast
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -619,7 +619,7 @@ Copy protection code never changes on fails (may be btanb)
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
 Corrupt tiles if you switch languages in language select menu
-GFX pitch corruption on gameplay
+[Lisa] GFX pitch corruption on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -650,7 +650,7 @@ GFX pitch corruption on gameplay
 		<year>1993</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
-Has GFX pitch corruption on gameplay
+Has [Lisa] GFX pitch corruption on gameplay
 Gameplay is too fast
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -683,7 +683,7 @@ Gameplay is too fast
 		<publisher>Audiogenic</publisher>
 		<notes><![CDATA[
 Hangs at copyright screen, [FDC] copy protection check at PC=437f2 (enables 68k trace mode)
-Wrong GFX colors for options menu and level intro text
+Wrong [Lisa] GFX colors for options menu and level intro text
 Wrong pitch during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -1020,8 +1020,8 @@ Mongols encounter caused wrong colors and Guru Meditation (TODO: verify)
 		<year>1994</year>
 		<publisher>Rasputin</publisher>
 		<notes><![CDATA[
-Has GFX garbage on bottom of white layer on intro
-Has GFX pitch garbage on gameplay
+Has [Lisa] GFX garbage on bottom of white layer on intro
+Has [Lisa] GFX pitch garbage on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports sheet copy protection (load-up matrix), load disk 2 to skip intro" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1046,7 +1046,7 @@ Has GFX pitch garbage on gameplay
 		<year>1994</year>
 		<publisher>Max Design</publisher>
 		<notes><![CDATA[
-Offset [ddfstrt] screens
+Offset [Lisa] DDFSTRT screens
 Not extensively tested otherwise (German language)
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -1276,9 +1276,9 @@ boot OK (tested up to terminal use)
 		<year>1995</year>
 		<publisher>Softgold</publisher>
 		<notes><![CDATA[
-Offset GFX text for disk swaps
+Offset [Lisa] GFX text for disk swaps
 Portraits sub-screen is offset and has wrong colors
-VGA mode shows completely broken GFXs, [ddfstrt] and [ddfstop]
+VGA mode shows completely broken [Lisa] GFXs DDFSTRT and DDFSTOP
 ]]></notes>
 		<info name="usage" value="Requires AGA. Run Install Disk and select Spiel starten then ignore the Original Disk warning by selecting Starten. Or just install to HDD." />
 		<part name="flop1" interface="floppy_3_5">
@@ -1408,7 +1408,7 @@ Expects a flag set to $3fe after disk swap, missing irq?
 		<year>1994</year>
 		<publisher>Black Legend</publisher>
 		<notes><![CDATA[
-Has GFX pitch issues on intro and gameplay
+Has [Lisa] GFX pitch issues on intro and gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1473,7 +1473,7 @@ Omake: hold port 1 button 1 during boot to show CPU, chipset and RAM detection
 		<publisher>Black Legend</publisher>
 		<notes><![CDATA[
 offset screen on main menu
-Draws GFX pitch garbage during gameplay
+Draws [Lisa] GFX pitch garbage during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
 
@@ -1505,7 +1505,7 @@ Draws GFX pitch garbage during gameplay
 		<year>1995</year>
 		<publisher>Guildhall</publisher>
 		<notes><![CDATA[
-Cutoff [ddfstop] portion on intermission screens
+Cutoff [Lisa] DDFSTOP portion on intermission screens
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1530,7 +1530,7 @@ Cutoff [ddfstop] portion on intermission screens
 		<year>1994</year>
 		<publisher>Acid</publisher>
 		<notes><![CDATA[
-Hangs after disk swap with Data Disk (with GFX glitch), does [FDC] in-flight DMA
+Hangs after disk swap with Data Disk (with [Lisa] GFX glitch), does [FDC] in-flight DMA
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1722,7 +1722,7 @@ TODO: verify if it has horizontal stages
 		<year>1994</year>
 		<publisher>Microprose</publisher>
 		<notes><![CDATA[
-Serious GFX pitch corruption when scrolling left or right
+Serious [Lisa] GFX pitch corruption when scrolling left or right
 Classic IM works ok
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -1847,9 +1847,9 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 		<year>1994</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
-Cuts off right portion of screen, [ddfstop]
+Cuts off right portion of screen, [Lisa] DDFSTOP
 Status bar has wrong colors, [Copper]
-GFX pitch corruption during gameplay
+[Lisa] GFX pitch corruption during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -1880,8 +1880,8 @@ GFX pitch corruption during gameplay
 		<year>1993</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
-Offset [ddfstrt] screens
-GFX pitch corruption on gameplay
+Offset [Lisa] DDFSTRT screens
+[Lisa] GFX pitch corruption on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2027,8 +2027,8 @@ Black screen when selecting any game option, tests [CIA] for specific time range
 		<year>1996</year>
 		<publisher>Manyk</publisher>
 		<notes><![CDATA[
-Disk swap GFX messages are barely decipherable due of GFX pitch
-Has GFX pitch corruption on gameplay
+Disk swap GFX messages are barely decipherable due of [Lisa] GFX pitch
+Has [Lisa] GFX pitch corruption on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2079,7 +2079,7 @@ Has GFX pitch corruption on gameplay
 		<notes><![CDATA[
 Red screen then Guru Meditation at boot, [FDC] dsksync
 Options menu text cuts off, draws transparent for bottom part
-GFX pitch on gameplay horizontal scroll
+[Lisa] GFX pitch on gameplay horizontal scroll
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2155,7 +2155,7 @@ Crashes with black screen after few disk swaps
 		<notes><![CDATA[
 No sound [Paula]
 Doesn't accept fire buttons on main menu
-Attract mode shows GFX pitch corruption
+Attract mode shows [Lisa] GFX pitch corruption
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2218,7 +2218,7 @@ Doesn't draw gameplay screen, status bar is offset
 		<publisher>Interactivision</publisher>
 		<notes><![CDATA[
 Doesn't accept input at copy protection screen, expects PORTS irq
-Player GFX sprite is half corrupt when moving between rooms, leaves a stuck shadow under invicibility state
+Player [Lisa] GFX sprite is half corrupt when moving between rooms, leaves a stuck shadow under invicibility state
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports sheet copy protection (monster names)" />
 		<part name="flop1" interface="floppy_3_5">
@@ -2261,7 +2261,7 @@ Sideway board textures doesn't display properly when they are zoomed out
 		<year>1994</year>
 		<publisher>Sports</publisher>
 		<notes><![CDATA[
-Sports cutoff GFX [ddfstop] on the right on install screen
+Sports cutoff [Lisa] GFX DDFSTOP on the right on install screen
 TODO: untested after copy-protection
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection, requires HDD install" />
@@ -2299,7 +2299,7 @@ TODO: untested after copy-protection
 		<year>1994</year>
 		<publisher>Sports</publisher>
 		<notes><![CDATA[
-Sports cutoff GFX [ddfstop] on the right on intro screen
+Sports cutoff [Lisa] GFX DDFSTOP on the right on intro screen
 TODO: untested after copy-protection
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection, requires HDD install" />
@@ -2374,7 +2374,7 @@ Black screen, [FDC] dsksync
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-GFX pitch garbage for status bar on gameplay
+[Lisa] GFX pitch garbage for status bar on gameplay
 Map screen is offset
 Player ship seems offset compared to the other sprites during gameplay (cfr. humans rescue)
 Doesn't mask left-right edges properly during gameplay (bitplanes cuts off in a zigzag pattern)
@@ -2452,7 +2452,7 @@ Red screen when "Out to lunch is loading" displays, [FDC]
 		<year>1993</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-GFX strip when ball goes down the drain.
+[Lisa] GFX strip when ball goes down the drain.
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
 
@@ -2625,7 +2625,7 @@ boot OK
 		<notes><![CDATA[
 Throws "Not an AGA chipset Amiga", checks blitter speed with VPOSR vertical beam == 0x10 at jsr=0xdfba, expects the sub-routine to return D0 bit 1 high, missing sync with VPOSW regs?
 Draws effigy software logo then punts to Workbench, [FDC] dsksync
-Offset screen to the left, DDFSTRT
+Offset screen to the left, [Lisa] DDFSTRT
 Text layer has last 4 chars with wrong violet color, i.e. last 3 digit of score and final number separator
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -2696,7 +2696,7 @@ Mouse cursor is uncontrollable, [joytest] reset counter
 		<publisher>Grandslam</publisher>
 		<notes><![CDATA[
 Boot to a CLI if Main Disk is booted stand-alone, correct behaviour?
-Character select and gameplay screens cuts off at bottom, [ddfstop]
+Character select and gameplay screens cuts off at bottom, [Lisa] DDFSTOP
 Not extensively tested otherwise (German language)
 ]]></notes>
 		<info name="usage" value="Requires AGA, requires HDD install via Main Disk" />
@@ -3224,7 +3224,7 @@ Black screen, [FDC] DMA never finds the requested block
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
-Slightly offset [ddfstrt] on gameplay
+Slightly offset [Lisa] DDFSTRT on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, requires HDD install or a pre-formatted floppy with a boot from Disk 1" />
 		<part name="flop1" interface="floppy_3_5">
@@ -3528,7 +3528,7 @@ boot OK
 Drawer doesn't show up by default once installed, requires to Snapshot All to show
 Moans about chipset memory being too low, dumps to Workbench after some time in intro
 Hangs with QuickStart (skip intro), expects [Paula] INTREQ audio ch 3 irq status to be on
-Very offset GFX gameplay
+Very offset [Lisa] GFX gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, requires HDD install" />
 		<part name="flop1" interface="floppy_3_5">
@@ -3750,7 +3750,6 @@ Asks to disc swap with disc 1 which is already in, [FDC] dsksync
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
 Erratic delay scrolls
-Has solid green squares drawn across the foreground, which collides too
 Wrong playfield-sprite priority when info box is smashed with ball
 Status bar is offset
 ]]></notes>
@@ -4135,7 +4134,7 @@ Incorrect priority for mouse pointer arm, [Copper] disable?
 		<year>1994</year>
 		<publisher>Team 17</publisher>
 		<notes><![CDATA[
-Wrong GFX pitch on intro
+Wrong [Lisa] GFX pitch on intro
 Accepts live disk swaps only (tries to load if disk drive is empty?), enables GCR precomp [FDC]
 Crashes after few seconds of gameplay
 ]]></notes>
@@ -4184,7 +4183,7 @@ Install is fussy (keeps opening IconX for file overrides)
 Shows no text on main menu if the intro isn't skipped
 Joystick input doesn't work on character select
 Has no cursor on character select
-Heavy GFX pitch corruption on gameplay
+Heavy [Lisa] GFX pitch corruption on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, requires an HDD install, cfr. ReadMe.First in disk 1" />
 		<part name="flop1" interface="floppy_3_5">
@@ -4418,7 +4417,7 @@ boot OK
 		<year>1995</year>
 		<publisher>Black Legend</publisher>
 		<notes><![CDATA[
-Erratic background scrolling, and status bar glitches out, GFX pitch with FMODE
+Erratic background scrolling, and status bar glitches out, [Lisa] GFX pitch with FMODE
 Cannot exit from inventory menu?
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
@@ -4464,7 +4463,7 @@ Cannot exit from inventory menu?
 		<publisher>Flair Software</publisher>
 		<notes><![CDATA[
 Guru Meditation, [FDC] dsksync
-Partly draws title screen, i.e. without the "Trolls" GFXs
+Partly draws title screen, i.e. without the "Trolls" [Lisa] GFXs
 Doesn't read keyboard scancodes properly on copy-protection screen
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -4515,8 +4514,8 @@ Guru Meditation, [FDC] dsksync
 		<year>1995</year>
 		<publisher>Phelios Development</publisher>
 		<notes><![CDATA[
-Sports cutoff GFX [ddfstop] on the right side
-Has GFX pitch corruption during gameplay
+Sports cutoff [Lisa] GFX DDFSTOP on the right side
+Has [Lisa] GFX pitch corruption during gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<!-- TODO: game refers these as Disk 1, 2, 3. Checkout floppy markings -->
@@ -4586,7 +4585,7 @@ Cannot be installed to HDD, needs blank disk formatting
 		<year>1995</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
-GFX pitch corruption on first screens
+[Lisa] GFX pitch corruption on first screens
 ]]></notes>
 		<!-- baddump: flush the registration code in floppy -->
 		<info name="usage" value="Requires AGA, sports code registration" />
@@ -4619,7 +4618,7 @@ GFX pitch corruption on first screens
 		<publisher>OTM</publisher>
 		<notes><![CDATA[
 Accesses [FDC] DSKDATR after boot
-Offset vertical screen, cuts off GFX at bottom
+Offset vertical screen, cuts off [Lisa] GFX at bottom
 Gameplay has wrong pitch draw, uses [Lisa] FMODE=$400f BSCAN2 and SHRES
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -4645,8 +4644,8 @@ Gameplay has wrong pitch draw, uses [Lisa] FMODE=$400f BSCAN2 and SHRES
 		<year>1996</year>
 		<publisher>OTM</publisher>
 		<notes><![CDATA[
-A few GFX corrupted lines at bottom on title screen
-Has severe GFX pitch corruption depending on current horizontal position during gameplay
+A few [Lisa] GFX corrupted lines at bottom on title screen
+Has severe [Lisa] GFX pitch corruption depending on current horizontal position during gameplay
 ]]></notes>
 		<!-- PC+=4 after "COMPUTER JAMMED" screen appears -->
 		<info name="usage" value="Requires AGA, sports manual copy-protection" />
@@ -4776,7 +4775,7 @@ Doesn't surpass the initial Whizz logo, [FDC] dsksync
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
 Hangs on main menu, expects [Paula] INTREQ audio ch 0 irq status to be on
-Has serious GFX scroll offsets and color issues on gameplay
+Has serious [Lisa] GFX scroll offsets and color issues on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -4864,7 +4863,7 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
-GFX pitch corruption on gameplay
+[Lisa] GFX pitch corruption on gameplay
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports code wheel copy-protection" />
 		<part name="flop1" interface="floppy_3_5">
@@ -4912,7 +4911,7 @@ GFX pitch corruption on gameplay
 		<year>1993</year>
 		<publisher>21st Century Entertainment</publisher>
 		<notes><![CDATA[
-GFX strip when ball goes down the drain.
+[Lisa] GFX strip when ball goes down the drain.
 ]]></notes>
 		<info name="usage" value="Requires AGA, press mouse b1 to skip intro" />
 
@@ -4967,7 +4966,7 @@ boot OK
 		<year>1997</year>
 		<publisher>Edgar Vigdal</publisher>
 		<notes><![CDATA[
-Has minor GFX cutoff at the bottom
+Has minor [Lisa] GFX cutoff at the bottom
 Pressing TAB key will switch to NTSC mode (?), which cuts off bottom of screen
 "Press any key" after life loss, but only aforementioned TAB key works!?
 ]]></notes>
