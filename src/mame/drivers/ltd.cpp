@@ -59,6 +59,7 @@ ToDo:
 
 #include "ltd.lh"
 
+namespace {
 
 class ltd_state : public genpin_class
 {
@@ -757,6 +758,8 @@ ROM_START(tricksht)
 	ROM_LOAD("tricks-l.bin", 0x0000, 0x1000, CRC(951413ff) SHA1(f4a28f7b41cb077377433dc7bfb6647e5d392481))
 	ROM_LOAD("tricks-h.bin", 0x1000, 0x1000, CRC(2e4efb51) SHA1(3dd20addecf4b47bd68b05d557c378d1dbbbd892))
 ROM_END
+
+} // Anonymous namespace
 
 // system 3, 2-player, with beep sounds, playable
 GAME(1981, arizona,  0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
