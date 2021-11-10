@@ -67,15 +67,35 @@ public:
 	ltd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_irq_pulse(*this, "irq_pulse")
-		, m_snd_pulse(*this, "snd_pulse")
-		, m_monotone(*this, "monotone")
 		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
-	void ltd4(machine_config &config);
+	DECLARE_INPUT_CHANGED_MEMBER(ficha);
+
+protected:
+
+	u8 m_digit = 0;
+	void mr_common();
+	void ms_common();
+	required_device<cpu_device> m_maincpu;
+	required_ioport_array<8> m_io_keyboard;
+	output_finder<60> m_digits;
+	output_finder<72> m_io_outputs;   // 56 lamps + 8 solenoids + 8 mystery
+};
+
+class ltd3_state : public ltd_state
+{
+public:
+	ltd3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ltd_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_irq_pulse(*this, "irq_pulse")
+		, m_snd_pulse(*this, "snd_pulse")
+		, m_monotone(*this, "monotone")
+	{ }
+
 	void ltd3(machine_config &config);
 
 	void init_0() { m_game = 0; }
@@ -83,43 +103,51 @@ public:
 	void init_2() { m_game = 2; }
 	void init_3() { m_game = 3; }
 
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
-
 private:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 	u8 ram_r(offs_t);
 	void ram_w(offs_t, u8);
 	u8 sw_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void ltd3_map(address_map &map);
+	u8 m_game = 0;
+	u8 m_ram[0x80]{};
+	u8 m_segment = 0;
+	required_device<m6802_cpu_device> m_maincpu;
+	optional_device<ttl74123_device> m_irq_pulse;
+	optional_device<ttl74123_device> m_snd_pulse;
+	optional_device<clock_device> m_monotone;
+};
+
+class ltd4_state : public ltd_state
+{
+public:
+	ltd4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ltd_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
+
+	void ltd4(machine_config &config);
+
+private:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	void ltd4_map(address_map &map);
 	u8 port1_r();
 	void port1_w(u8 data);
 	u8 port2_r();
 	void port2_w(u8 data);
 	void ay0a_w(u8);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	void ltd3_map(address_map &map);
-	void ltd4_map(address_map &map);
-
-	u8 m_counter = 0;
-	u8 m_digit = 0;
-	u8 m_game = 0;
 	u8 m_port2 = 0;
-	u8 m_ram[0x80]{};
-	u8 m_segment = 0;
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	required_device<cpu_device> m_maincpu;
-	optional_device<ttl74123_device> m_irq_pulse;
-	optional_device<ttl74123_device> m_snd_pulse;
-	optional_device<clock_device> m_monotone;
-	required_ioport_array<8> m_io_keyboard;
-	output_finder<60> m_digits;
-	output_finder<72> m_io_outputs;   // 56 lamps + 8 solenoids + 8 mystery
+	u8 m_counter = 0;
+	required_device<m6803_cpu_device> m_maincpu;
 };
 
-
-void ltd_state::ltd3_map(address_map &map)
+void ltd3_state::ltd3_map(address_map &map)
 {
-	map(0x0000, 0x007f).rw(FUNC(ltd_state::ram_r),FUNC(ltd_state::ram_w)); // internal to the cpu
-	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd_state::sw_r));
+	map(0x0000, 0x007f).rw(FUNC(ltd3_state::ram_r),FUNC(ltd3_state::ram_w)); // internal to the cpu
+	map(0x0080, 0x0087).mirror(0x78).r(FUNC(ltd3_state::sw_r));
 	map(0x0800, 0x0bff).w("ay0", FUNC(ay8910_device::data_w));
 	map(0x0c00, 0x0fff).w("ay0", FUNC(ay8910_device::address_w));
 	map(0x1800, 0x1bff).w("ay1", FUNC(ay8910_device::data_w));
@@ -130,7 +158,7 @@ void ltd_state::ltd3_map(address_map &map)
 	map(0xc000, 0xcfff).rom().mirror(0x3000).region("roms", 0);
 }
 
-void ltd_state::ltd4_map(address_map &map)
+void ltd4_state::ltd4_map(address_map &map)
 {
 	map(0x0100, 0x01ff).ram().share("nvram");
 	map(0x0800, 0x0bff).w("ay0", FUNC(ay8910_device::address_w));
@@ -304,12 +332,12 @@ INPUT_CHANGED_MEMBER( ltd_state::ficha )
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-u8 ltd_state::ram_r(offs_t offset)
+u8 ltd3_state::ram_r(offs_t offset)
 {
 	return m_ram[offset];
 }
 
-void ltd_state::ram_w(offs_t offset, u8 data)
+void ltd3_state::ram_w(offs_t offset, u8 data)
 {
 	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7447
 	u8 laydigits[4][32]{
@@ -368,12 +396,12 @@ void ltd_state::ram_w(offs_t offset, u8 data)
 }
 
 // switches
-u8 ltd_state::sw_r(offs_t offset)
+u8 ltd3_state::sw_r(offs_t offset)
 {
 	return m_io_keyboard[offset]->read();
 }
 
-u8 ltd_state:: port1_r()
+u8 ltd4_state:: port1_r()
 {
 	u8 row = m_digit >> 4;
 	if (row < 8 && !BIT(m_port2, 4))
@@ -382,7 +410,7 @@ u8 ltd_state:: port1_r()
 		return 0xff;
 }
 
-void ltd_state::port1_w(u8 data)
+void ltd4_state::port1_w(u8 data)
 {
 	if (m_port2 & 0x10)
 	{
@@ -434,12 +462,12 @@ void ltd_state::port1_w(u8 data)
 	}
 }
 
-u8 ltd_state:: port2_r()
+u8 ltd4_state:: port2_r()
 {
 	return m_port2;
 }
 
-void ltd_state::port2_w(u8 data)
+void ltd4_state::port2_w(u8 data)
 {
 	if (((m_port2 & 0x10) == 0) && ((data & 0x10) == 0x10))
 		m_counter++;
@@ -452,32 +480,46 @@ void ltd_state::port2_w(u8 data)
 
 // Unknown outputs used by pecmen, alcapone, cowboy2
 // Added to lamp outputs for now
-void ltd_state::ay0a_w(u8 data)
+void ltd4_state::ay0a_w(u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[64+i] = BIT(data, i);
 }
 
-void ltd_state::machine_start()
+void ltd_state::ms_common()
 {
 	genpin_class::machine_start();
 
 	m_digits.resolve();
 	m_io_outputs.resolve();
-
-	save_item(NAME(m_counter));
 	save_item(NAME(m_digit));
+}
+
+void ltd3_state::machine_start()
+{
+	ms_common();
 	save_item(NAME(m_game));
-	save_item(NAME(m_port2));
 	save_item(NAME(m_ram));
 	save_item(NAME(m_segment));
 }
 
-void ltd_state::machine_reset()
+void ltd4_state::machine_start()
+{
+	ms_common();
+	save_item(NAME(m_counter));
+	save_item(NAME(m_port2));
+}
+
+void ltd_state::mr_common()
 {
 	genpin_class::machine_reset();
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
+}
+
+void ltd3_state::machine_reset()
+{
+	mr_common();
 	if (m_game == 0)
 	{
 		m_digits[0] = 0x3f;
@@ -485,18 +527,23 @@ void ltd_state::machine_reset()
 	}
 }
 
-WRITE_LINE_MEMBER( ltd_state::irq_w )
+void ltd4_state::machine_reset()
+{
+	mr_common();
+}
+
+WRITE_LINE_MEMBER( ltd3_state::irq_w )
 {
 	// Using /Q output
 	m_maincpu->set_input_line(M6802_IRQ_LINE, !state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-void ltd_state::ltd3(machine_config &config)
+void ltd3_state::ltd3(machine_config &config)
 {
 	/* basic machine hardware */
 	m6802_cpu_device &maincpu(M6802(config, m_maincpu, XTAL(3'579'545)));
 	maincpu.set_ram_enable(false);
-	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd3_map);
+	maincpu.set_addrmap(AS_PROGRAM, &ltd3_state::ltd3_map);
 
 	/* Video */
 	config.set_default_layout(layout_ltd);
@@ -508,7 +555,7 @@ void ltd_state::ltd3(machine_config &config)
 	m_irq_pulse->set_a_pin_value(0);
 	m_irq_pulse->set_b_pin_value(1);  // nc
 	m_irq_pulse->set_clear_pin_value(1);  // nc
-	m_irq_pulse->out_cb().set(FUNC(ltd_state::irq_w));
+	m_irq_pulse->out_cb().set(FUNC(ltd3_state::irq_w));
 
 	/* Sound */
 	genpin_audio(config);
@@ -533,15 +580,15 @@ void ltd_state::ltd3(machine_config &config)
 	INPUT_MERGER_ALL_HIGH(config, "snd").output_handler().set("speaker", FUNC(speaker_sound_device::level_w));
 }
 
-void ltd_state::ltd4(machine_config &config)
+void ltd4_state::ltd4(machine_config &config)
 {
 	/* basic machine hardware */
 	m6803_cpu_device &maincpu(M6803(config, m_maincpu, XTAL(3'579'545))); // guess, no details available
-	maincpu.set_addrmap(AS_PROGRAM, &ltd_state::ltd4_map);
-	maincpu.in_p1_cb().set(FUNC(ltd_state::port1_r));
-	maincpu.out_p1_cb().set(FUNC(ltd_state::port1_w));
-	maincpu.in_p2_cb().set(FUNC(ltd_state::port2_r));
-	maincpu.out_p2_cb().set(FUNC(ltd_state::port2_w));
+	maincpu.set_addrmap(AS_PROGRAM, &ltd4_state::ltd4_map);
+	maincpu.in_p1_cb().set(FUNC(ltd4_state::port1_r));
+	maincpu.out_p1_cb().set(FUNC(ltd4_state::port1_w));
+	maincpu.in_p2_cb().set(FUNC(ltd4_state::port2_r));
+	maincpu.out_p2_cb().set(FUNC(ltd4_state::port2_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -554,7 +601,7 @@ void ltd_state::ltd4(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &ay0(AY8910(config, "ay0", XTAL(3'579'545)/2));
 	ay0.add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
-	ay0.port_a_write_callback().set(FUNC(ltd_state::ay0a_w));
+	ay0.port_a_write_callback().set(FUNC(ltd4_state::ay0a_w));
 	AY8910(config, "ay1", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
 	AY8910(config, "ay2", XTAL(3'579'545)/2).add_route(ALL_OUTPUTS, "mono", 0.75); /* guess */
 }
@@ -762,31 +809,31 @@ ROM_END
 } // Anonymous namespace
 
 // system 3, 2-player, with beep sounds, playable
-GAME(1981, arizona,  0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, discodan, 0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, marqueen, 0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Martian Queen",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd_state, init_0,   ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, arizona,  0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Arizona",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, atla_ltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Atlantis (LTD)",                    MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, discodan, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Disco Dancing",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hustlerp, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Hustler",                           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, marqueen, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Martian Queen",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, kkongltd, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "King Kong",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?, vikngkng, 0,        ltd3, ltd3, ltd3_state, init_0,   ROT0, "LTD", "Viking King",                       MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 3, 2-player, unknown sound system, playable
-GAME(1981, force,    0,        ltd3, ltd3, ltd_state, init_1,   ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd_state, init_2,   ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd_state, init_2,   ROT0, "LTD", "Space Poker",                       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, force,    0,        ltd3, ltd3, ltd3_state, init_1,   ROT0, "LTD", "Force",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, bhol_ltd, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Black Hole (LTD)",                  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, spcpoker, 0,        ltd3, ltd3, ltd3_state, init_2,   ROT0, "LTD", "Space Poker",                       MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 3, 3-player, ay sounds, unplayable
-GAME(1981, cowboy,   0,        ltd3, ltd3, ltd_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 1)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, cowboya,  cowboy,   ltd3, ltd3, ltd_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 2)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephy,    0,        ltd3, ltd3, ltd_state, init_3,   ROT0, "LTD", "Zephy (set 1)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd_state, init_3,   ROT0, "LTD", "Zephy (set 2)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, cowboy,   0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 1)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, cowboya,  cowboy,   ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Cowboy Eight Ball (set 2)",         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephy,    0,        ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 1)",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, zephya,   zephy,    ltd3, ltd3, ltd3_state, init_3,   ROT0, "LTD", "Zephy (set 2)",                     MACHINE_IS_SKELETON_MECHANICAL)
 
 // system 4, mostly 4-player, ay sounds, unplayable
-GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, hhotel,   0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, pecmen,   0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, alcapone, 0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, columbia, 0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1982, tricksht, 0,        ltd4, ltd4, ltd_state, empty_init, ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, cowboy2,  0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Cowboy Eight Ball 2",               MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, hhotel,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Haunted Hotel",                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, pecmen,   0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Mr. & Mrs. Pec-Men",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, alcapone, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Al Capone",                         MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, columbia, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Columbia",                          MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd4, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 4 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981, tmacltd2, tmacltd4, ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Time Machine (LTD, 2 players)",     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1982, tricksht, 0,        ltd4, ltd4, ltd4_state, empty_init, ROT0, "LTD", "Trick Shooter",                     MACHINE_IS_SKELETON_MECHANICAL)
