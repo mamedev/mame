@@ -245,16 +245,19 @@ void vme_mvme120_device::device_reset()
 
 uint16_t vme_mvme120_device::rom_shadow_tap(offs_t address, u16 data, u16 mem_mask)
 {
-	if((!machine().side_effects_disabled()) && (m_memory_read_count >= 3))
+	if(!machine().side_effects_disabled())
 	{
-		// delete this tap
-		m_rom_shadow_tap->remove();
+		if(m_memory_read_count >= 3)
+		{
+			// delete this tap
+			m_rom_shadow_tap->remove();
 
-		// reinstall ram over the rom shadow
-		m_maincpu->space(AS_PROGRAM).install_ram(0x000000, 0x000007, m_localram);
-	}
-	
-	m_memory_read_count++;
+			// reinstall ram over the rom shadow
+			m_maincpu->space(AS_PROGRAM).install_ram(0x000000, 0x000007, m_localram);
+		}
+		m_memory_read_count++;
+	}	
+
 	return data;
 }
 
