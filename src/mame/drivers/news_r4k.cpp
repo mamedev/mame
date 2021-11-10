@@ -663,7 +663,7 @@ void news_r4k_state::cpu_map(address_map &map)
 
 	// TODO: Floppy aux registers
 	map(0x1ed60200, 0x1ed60207).noprw();
-	map(0x1ed60200, 0x1ed60207).lr8(NAME([this](offs_t offset)
+	map(0x1ed60200, 0x1ed60207).lr8(NAME([](offs_t offset)
 										 { return 0x1; }));
 
 	// Map FDCAUX interrupt read (TODO: still need to implement button interrupt mask from 208-20b)
@@ -675,7 +675,7 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1ed80000, 0x1ed9ffff).m(m_fifo0, FUNC(cxd8442q_device::map_fifo_ram));
 
 	// TODO: DSC-39 xb framebuffer/video card (0x14900000)
-	map(0x14900000, 0x149fffff).lr8(NAME([this](offs_t offset)
+	map(0x14900000, 0x149fffff).lr8(NAME([](offs_t offset)
 										 { return 0xff; }));
 
 	// TODO: sb sound subsystem (0x1ed00000)
@@ -702,11 +702,11 @@ void news_r4k_state::cpu_map_main_memory(address_map &map)
 	// Not 100% sure where the below lives on the system. This seems to be related to memory and perhaps APbus init.
 	// This was all developed by inspecting a real NWS-5000X.
 	// Hopefully, we will be able to determine more about this over time.
-	map(0x14400000, 0x14400003).lr32(NAME([this](offs_t offset)
+	map(0x14400000, 0x14400003).lr32(NAME([](offs_t offset)
 										  { return 0x0; }));
-	map(0x14400004, 0x14400007).lr32(NAME([this](offs_t offset)
+	map(0x14400004, 0x14400007).lr32(NAME([](offs_t offset)
 										  { return 0x3ff17; }));
-	map(0x14400024, 0x14400027).lr32(NAME([this](offs_t offset)
+	map(0x14400024, 0x14400027).lr32(NAME([](offs_t offset)
 										  { return 0x600a4; }));
 	map(0x1440003c, 0x1440003f)
 		.lw32(NAME([this](offs_t offset, uint32_t data)
@@ -735,7 +735,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 {
 	// APbus WBFLUSH + unknown
 	map(0x1f520000, 0x1f520017).nopw();
-	map(0x1f520000, 0x1f520017).lr8(NAME([this](offs_t offset)
+	map(0x1f520000, 0x1f520017).lr8(NAME([](offs_t offset)
 										 {
 											 uint8_t value = 0x0;
 											 if (offset == 7)
@@ -760,7 +760,7 @@ void news_r4k_state::cpu_map_debug(address_map &map)
 
 	// More onboard devices that needs to be mapped for the platform to boot
 	map(0x1fe00000, 0x1fe03fff).ram().mirror(0x1fc000);
-	map(0x1f3e0000, 0x1f3effff).lr8(NAME([this](offs_t offset)
+	map(0x1f3e0000, 0x1f3effff).lr8(NAME([](offs_t offset)
 										 {
 											 uint8_t value = 0x0;
 											 if (offset % 4 == 2)

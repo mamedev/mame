@@ -81,7 +81,7 @@ void news_hid_hle_device::map_apbus(address_map &map)
 	// 28-2b kb buzzf
 	// 2c-2f kb buzz
 	// 30-33 kb tx data
-	map(0x34, 0x37).lr32(NAME([this](offs_t offset) { return 0x1; })); // kb tx stat (pretend to accept anything, AFAICT)
+	map(0x34, 0x37).lr32(NAME([](offs_t offset) { return 0x1; })); // kb tx stat (pretend to accept anything, AFAICT)
 	// 38-3b kb tx init
 	// 3c-3f kb tx reset
 	// 40-43 kb tx speed
