@@ -12,8 +12,8 @@ TARGET ?= mame
 PYTHON_EXECUTABLE ?= python
 REGENIE ?= 1
 GITHUB_REPO ?= https://github.com/libretro/mame/
-#platform ?=android-arm64
-platform ?=android-arm
+platform ?=android-arm64
+#platform ?=android-arm
 
 DEBUG ?= 0
 
@@ -114,9 +114,9 @@ ifneq ($(findstring win,$(platform)),)
 endif
 
 ifeq ($(platform),android-arm)
-	ANDROID_NDK_LLVM ?= /home/blue/Documents/android-ndk-r21e/toolchains/llvm/prebuilt/linux-x86_64
-	ANDROID_NDK_ARM  ?= /home/blue/Documents/android-ndk-r21e/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
-	ANDROID_NDK_ROOT ?= /home/blue/Documents/android-ndk-r21e
+	ANDROID_NDK_LLVM ?= /cygdrive/d/android-ndk-r22b/toolchains/llvm/prebuilt/windows-x86_64
+	ANDROID_NDK_ARM  ?= /cygdrive/d/android-ndk-r22b/toolchains/arm-linux-androideabi-4.9/prebuilt/windows-x86_64
+	ANDROID_NDK_ROOT ?= /cygdrive/d/android-ndk-r22b
 	PLATFLAGS += TARGETOS="android-arm" gcc="android-arm"
 	PLATFLAGS +=  ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
 	PLATFLAGS +=  ANDROID_NDK_ARM="$(ANDROID_NDK_ARM)"
@@ -127,9 +127,9 @@ ifeq ($(platform),android-arm)
 	PTR64 := 
 endif
 ifeq ($(platform),android-arm64)
-	ANDROID_NDK_LLVM  ?= /home/blue/Documents/android-ndk-r21e/toolchains/llvm/prebuilt/linux-x86_64
-	ANDROID_NDK_ARM64 ?= /home/blue/Documents/android-ndk-r21e/toolchains/aarch64-linux-android-4.9/prebuilt/linux-x86_64
-	ANDROID_NDK_ROOT  ?= /home/blue/Documents/android-ndk-r21e
+	ANDROID_NDK_LLVM  ?=/cygdrive/d/android-ndk-r22b/toolchains/llvm/prebuilt/windows-x86_64
+	ANDROID_NDK_ARM64 ?=/cygdrive/d/android-ndk-r22b/toolchains/aarch64-linux-android-4.9/prebuilt/windows-x86_64
+	ANDROID_NDK_ROOT  ?= /cygdrive/d/android-ndk-r22b
 	PLATFLAGS += TARGETOS="android-arm64" gcc="android-arm64"
 	PLATFLAGS += ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
 	PLATFLAGS += ANDROID_NDK_ARM64="$(ANDROID_NDK_ARM64)"
@@ -141,9 +141,9 @@ ifeq ($(platform),android-arm64)
 	PTR64 :=
 endif
 ifeq ($(platform),android-x86_64)
-	ANDROID_NDK_LLVM  ?= /home/blue/Documents/android-ndk-r21e/toolchains/llvm/prebuilt/linux-x86_64
-	ANDROID_NDK_X64 ?= /home/blue/Documents/android-ndk-r21e/toolchains/x86_64-4.9/prebuilt/linux-x86_64
-	ANDROID_NDK_ROOT  ?= /home/blue/Documents/android-ndk-r21e
+	ANDROID_NDK_LLVM  ?= /cygdrive/d/android-ndk-r22b/toolchains/llvm/prebuilt/windows-x86_64
+	ANDROID_NDK_X64 ?= /cygdrive/d/android-ndk-r22b/toolchains/x86_64-4.9/prebuilt/windows-x86_64
+	ANDROID_NDK_ROOT  ?=/cygdrive/d/android-ndk-r22b
 	PLATFLAGS += TARGETOS="android-x64" gcc="android-x64"
 	PLATFLAGS += ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
 	PLATFLAGS += ANDROID_NDK_X64="$(ANDROID_NDK_X64)"

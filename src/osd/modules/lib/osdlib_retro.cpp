@@ -106,7 +106,7 @@ void osd_free_executable(void *ptr, size_t size)
 //============================================================
 //  osd_break_into_debugger
 //============================================================
-
+#if defined(__LIBRETRO__)
 void osd_break_into_debugger(const char *message)
 {
 	#ifdef MAME_DEBUG
@@ -117,7 +117,7 @@ void osd_break_into_debugger(const char *message)
 	printf("Ignoring MAME exception: %s\n", message);
 	#endif
 }
-
+#endif
 //============================================================
 //  osd_get_clipboard_text
 //============================================================

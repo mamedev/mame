@@ -799,6 +799,8 @@ void *find_mame_bank_base(offs_t start, address_space &space)
 			return bank.second->base() ;
 	return NULL;
 }
+
+
 void *retro_get_memory_data(unsigned type)
 {
 	void *best_match1 = NULL ;
@@ -834,6 +836,10 @@ void *retro_get_memory_data(unsigned type)
 	}
 	return ( best_match1 != NULL ? best_match1 : ( best_match2 != NULL ? best_match2 : best_match3 ) );
 }
+
+
+
+
 size_t retro_get_memory_size(unsigned type)
 {
 	size_t best_match1 = 0 ;
