@@ -3346,6 +3346,24 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="paranasalibm">
+		<!--
+		Origin: Gaming Alexandria
+		<rom name="Paranasal Sinuses & Anterior Skull Base.bin" size="725312112" crc="ddeb9c15" md5="883b0e0122e688d067ae6f96001bdc73"/>
+		<rom name="Paranasal Sinuses & Anterior Skull Base.cue" size="128" crc="6dbd3a2c" md5="8de5a6d9098ba9629e0f14a673f63aa2"/>
+
+		This disc was sold in a package with the CD-i version. This requires Windows 3.1 and Video for Windows to be installed.
+		-->
+		<description>Paranasal Sinuses &amp; Anterior Skull Base</description>
+		<year>1993</year>
+		<publisher>Elsevier Science B.V.</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="paranasal sinuses &amp; anterior skull base (1993)(elsevier science b.v.)(windows 3.1 disc)" sha1="fddedb4f78bc5687d65f11fd4e18463e1fc4edda"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pcdos7">
 		<description>PC DOS 7</description>
 		<year>1995</year>

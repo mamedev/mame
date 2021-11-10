@@ -62,16 +62,21 @@
 */
 
 #include "emu.h"
-#include "cpu/powerpc/ppc.h"
-#include "cpu/h8/h83006.h"
-#include "machine/eepromser.h"
-#include "machine/nvram.h"
-#include "machine/msm6242.h"
-#include "sound/ymz280b.h"
 #include "video/k057714.h"
+
+#include "cpu/h8/h83006.h"
+#include "cpu/powerpc/ppc.h"
+#include "machine/eepromser.h"
+#include "machine/msm6242.h"
+#include "machine/nvram.h"
+#include "sound/ymz280b.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
 
 class konendev_state : public driver_device
 {
@@ -99,10 +104,6 @@ public:
 private:
 	uint32_t mcu2_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t ifu2_r(offs_t offset, uint32_t mem_mask = ~0);
-	uint32_t ctrl0_r();
-	uint32_t ctrl1_r();
-	uint32_t ctrl2_r();
-	uint32_t ctrl3_r();
 	void eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t sound_data_r();
 	void sound_data_w(uint32_t data);
@@ -177,26 +178,6 @@ uint32_t konendev_state::ifu2_r(offs_t offset, uint32_t mem_mask)
 	return r;
 }
 
-uint32_t konendev_state::ctrl0_r() // doors, switches
-{
-	return ioport("IN1")->read();
-}
-
-uint32_t konendev_state::ctrl1_r() // hard meter access, hopper
-{
-	return ioport("IN2")->read();
-}
-
-uint32_t konendev_state::ctrl2_r() // main door optic
-{
-	return ioport("IN3")->read();
-}
-
-uint32_t konendev_state::ctrl3_r() // buttons
-{
-	return ioport("IN0")->read();
-}
-
 void konendev_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
@@ -224,11 +205,11 @@ void konendev_state::konendev_map(address_map &map)
 	map(0x780c0000, 0x780c0003).rw(FUNC(konendev_state::sound_data_r), FUNC(konendev_state::sound_data_w));
 	map(0x78100000, 0x78100003).w(FUNC(konendev_state::eeprom_w));
 	map(0x78800000, 0x78800003).r(FUNC(konendev_state::ifu2_r));
-	map(0x78800004, 0x78800007).r(FUNC(konendev_state::ctrl0_r));
-	map(0x78a00000, 0x78a00003).r(FUNC(konendev_state::ctrl1_r));
-	map(0x78a00004, 0x78a00007).r(FUNC(konendev_state::ctrl2_r));
+	map(0x78800004, 0x78800007).portr("IN1"); // doors, switches
+	map(0x78a00000, 0x78a00003).portr("IN2"); // hard meter access, hopper
+	map(0x78a00004, 0x78a00007).portr("IN3"); // main door optic
 	map(0x78c00000, 0x78c003ff).ram().share("dpram");
-	map(0x78e00000, 0x78e00003).r(FUNC(konendev_state::ctrl3_r));
+	map(0x78e00000, 0x78e00003).portr("IN0"); // buttons
 	map(0x79000000, 0x79000003).w(m_gcu, FUNC(k057714_device::fifo_w));
 	map(0x79800000, 0x798000ff).rw(m_gcu, FUNC(k057714_device::read), FUNC(k057714_device::write));
 	map(0x7a000000, 0x7a01ffff).ram().share("nvram0");
@@ -701,6 +682,9 @@ void konendev_state::init_enchlamp()
 
 	rom[0] = 0x5782b930;                    // new checksum for program rom
 }
+
+} // anonymous namespace
+
 
 // BIOS
 GAME( 200?, konendev, 0,        konendev, konendev, konendev_state, init_enchlamp, ROT0,  "Konami", "Konami Endeavour BIOS", MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )

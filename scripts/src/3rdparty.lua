@@ -1390,6 +1390,7 @@ end
 				"-Wno-unknown-attributes",
 				"-Wno-missing-braces",
 				"-Wno-int-to-pointer-cast",
+				"-Wno-ignored-attributes", -- many instances in ImGui
 			}
 		end
 	end
@@ -1444,6 +1445,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_agc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
@@ -2207,7 +2209,7 @@ project "utf8proc"
 	kind "StaticLib"
 
 	defines {
-		"UTF8PROC_DLLEXPORT="
+		"UTF8PROC_STATIC",
 	}
 
 	configuration "Debug"
@@ -2221,9 +2223,6 @@ project "utf8proc"
 		}
 
 	configuration { }
-		defines {
-			"ZLIB_CONST",
-		}
 
 	files {
 		MAME_DIR .. "3rdparty/utf8proc/utf8proc.c"

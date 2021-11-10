@@ -356,13 +356,13 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 	quick_length = image.length();
 	if (quick_length < 0x0100)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too short");
+		image.seterror(image_error::INVALIDIMAGE, "File too short");
 		image.message(" File too short");
 	}
 	else
 	if (quick_length > 0x8000)
 	{
-		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "File too long");
+		image.seterror(image_error::INVALIDIMAGE, "File too long");
 		image.message(" File too long");
 	}
 	else
@@ -371,12 +371,12 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 		read_ = image.fread( &quick_data[0], quick_length);
 		if (read_ != quick_length)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Cannot read the file");
+			image.seterror(image_error::INVALIDIMAGE, "Cannot read the file");
 			image.message(" Cannot read the file");
 		}
 		else if (quick_data[0] != 0xc5)
 		{
-			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Invalid header");
+			image.seterror(image_error::INVALIDIMAGE, "Invalid header");
 			image.message(" Invalid header");
 		}
 		else
@@ -385,7 +385,7 @@ QUICKLOAD_LOAD_MEMBER(instruct_state::quickload_cb)
 
 			if (exec_addr >= quick_length)
 			{
-				image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Exec address beyond end of file");
+				image.seterror(image_error::INVALIDIMAGE, "Exec address beyond end of file");
 				image.message(" Exec address beyond end of file");
 			}
 			else

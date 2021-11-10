@@ -75,11 +75,13 @@ void nes_state::machine_start()
 			AVE_MAXI15,
 			BANDAI_DATACH,
 			BANDAI_KARAOKE,
+			BATMAP_SRRX,
 			BMC_70IN1,
 			BMC_800IN1,
 			BMC_8157,
-			BMC_G63IN1,
+			BMC_970630C,
 			BMC_GOLD150,
+			BMC_TELETUBBIES,
 			BMC_VT5201,
 			BTL_PALTHENA,
 			CAMERICA_ALADDIN,
@@ -91,6 +93,7 @@ void nes_state::machine_start()
 			KAISER_KS7037,
 			KAISER_KS7057,
 			SACHEN_3013,
+			SACHEN_3014,
 			STD_DISKSYS,
 			STD_EXROM,
 			STD_NROM368,
@@ -106,6 +109,7 @@ void nes_state::machine_start()
 
 		static const int w_ex_pcbs[] =
 		{
+			BMC_N32_4IN1,
 			BTL_SMB2JB,
 			BTL_YUNG08,
 			UNL_AC08,

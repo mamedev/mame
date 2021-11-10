@@ -38,6 +38,7 @@
 #define OPTION_UI_PATH                "ui_path"
 
 // core misc options
+#define OPTION_SYSTEM_NAMES           "system_names"
 #define OPTION_SKIP_WARNINGS          "skip_warnings"
 #define OPTION_REMEMBER_LAST          "remember_last"
 #define OPTION_ENLARGE_SNAPS          "enlarge_snaps"
@@ -104,6 +105,7 @@ public:
 	const char *ui_path() const { return value(OPTION_UI_PATH); }
 
 	// Misc options
+	const char *system_names() const { return value(OPTION_SYSTEM_NAMES); }
 	bool skip_warnings() const { return bool_value(OPTION_SKIP_WARNINGS); }
 	bool remember_last() const { return bool_value(OPTION_REMEMBER_LAST); }
 	bool enlarge_snaps() const { return bool_value(OPTION_ENLARGE_SNAPS); }

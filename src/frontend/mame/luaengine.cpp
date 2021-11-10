@@ -85,7 +85,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 {
 	float const sc_width(sdev.visible_area().width());
 	float const sc_height(sdev.visible_area().height());
-	auto justify = ui::text_layout::LEFT;
+	auto justify = ui::text_layout::text_justify::LEFT;
 	float x = 0;
 	if (xobj.is<float>())
 	{
@@ -95,11 +95,11 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 	{
 		char const *const justifystr(xobj.as<char const *>());
 		if (!strcmp(justifystr, "left"))
-			justify = ui::text_layout::LEFT;
+			justify = ui::text_layout::text_justify::LEFT;
 		else if (!strcmp(justifystr, "right"))
-			justify = ui::text_layout::RIGHT;
+			justify = ui::text_layout::text_justify::RIGHT;
 		else if (!strcmp(justifystr, "center"))
-			justify = ui::text_layout::CENTER;
+			justify = ui::text_layout::text_justify::CENTER;
 	}
 	else
 	{
@@ -111,7 +111,7 @@ void do_draw_text(lua_State *L, screen_device &sdev, sol::object &xobj, float y,
 			sdev.container(),
 			msg,
 			x, y, (1.0f - x),
-			justify, ui::text_layout::WORD,
+			justify, ui::text_layout::word_wrapping::WORD,
 			mame_ui_manager::OPAQUE_, fgcolor, bgcolor);
 }
 
@@ -322,48 +322,12 @@ public:
 } // namespace sol
 
 
-int sol_lua_push(sol::types<osd_file::error>, lua_State *L, osd_file::error &&value)
+int sol_lua_push(sol::types<std::error_condition>, lua_State *L, std::error_condition &&value)
 {
-	const char *strerror;
-	switch(value)
-	{
-		case osd_file::error::NONE:
-			return sol::stack::push(L, sol::lua_nil);
-		case osd_file::error::FAILURE:
-			strerror = "failure";
-			break;
-		case osd_file::error::OUT_OF_MEMORY:
-			strerror = "out_of_memory";
-			break;
-		case osd_file::error::NOT_FOUND:
-			strerror = "not_found";
-			break;
-		case osd_file::error::ACCESS_DENIED:
-			strerror = "access_denied";
-			break;
-		case osd_file::error::ALREADY_OPEN:
-			strerror = "already_open";
-			break;
-		case osd_file::error::TOO_MANY_FILES:
-			strerror = "too_many_files";
-			break;
-		case osd_file::error::INVALID_DATA:
-			strerror = "invalid_data";
-			break;
-		case osd_file::error::INVALID_ACCESS:
-			strerror = "invalid_access";
-			break;
-		default:
-			strerror = "unknown_error";
-			break;
-	}
-	return sol::stack::push(L, strerror);
-}
-
-template <typename Handler>
-bool sol_lua_check(sol::types<osd_file::error>, lua_State *L, int index, Handler &&handler, sol::stack::record &tracking)
-{
-	return sol::stack::check<int>(L, index, std::forward<Handler>(handler));
+	if (!value)
+		return sol::stack::push(L, sol::lua_nil);
+	else
+		return sol::stack::push(L, value.message());
 }
 
 
@@ -468,48 +432,54 @@ sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 	return sol::lua_nil;
 }
 
-void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
+std::optional<long> lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string> > &menu_list, std::string &flags)
 {
 	std::string field = "menu_pop_" + menu;
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>());
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_populate: %s\n", err.what());
 		}
 		else
 		{
-			sol::table table = res;
-			for(auto &entry : table)
+			std::tuple<sol::table, std::optional<long>, std::string> table = res;
+			for (auto &entry : std::get<0>(table))
 			{
-				if(entry.second.is<sol::table>())
+				if (entry.second.is<sol::table>())
 				{
 					sol::table enttable = entry.second.as<sol::table>();
 					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
+			flags = std::get<2>(table);
+			return std::get<1>(table);
 		}
 	}
+	flags.clear();
+	return std::nullopt;
 }
 
-bool lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
+std::pair<bool, std::optional<long> > lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
-	bool ret = false;
+	std::pair<bool, std::optional<long> > ret(false, std::nullopt);
 	sol::object obj = sol().registry()[field];
-	if(obj.is<sol::protected_function>())
+	if (obj.is<sol::protected_function>())
 	{
 		auto res = invoke(obj.as<sol::protected_function>(), index, event);
-		if(!res.valid())
+		if (!res.valid())
 		{
 			sol::error err = res;
 			osd_printf_error("[LUA ERROR] in menu_callback: %s\n", err.what());
 		}
 		else
+		{
 			ret = res;
+		}
 	}
 	return ret;
 }
@@ -797,7 +767,9 @@ void lua_engine::initialize()
 				engine->machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), engine), ref, nullptr);
 				return lua_yield(L, 0);
 			});
-	emu["lang_translate"] = &lang_translate;
+	emu["lang_translate"] = sol::overload(
+			static_cast<char const *(*)(char const *)>(&lang_translate),
+			static_cast<char const *(*)(char const *, char const *)>(&lang_translate));
 	emu["pid"] = &osd_getpid;
 	emu["subst_env"] =
 		[] (const std::string &str)
@@ -884,7 +856,7 @@ void lua_engine::initialize()
 				}));
 	file_type.set("read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; });
 	file_type.set("write", [](emu_file &file, const std::string &data) { return file.write(data.data(), data.size()); });
-	file_type.set("open", static_cast<osd_file::error (emu_file::*)(std::string_view)>(&emu_file::open));
+	file_type.set("open", static_cast<std::error_condition (emu_file::*)(std::string_view)>(&emu_file::open));
 	file_type.set("open_next", &emu_file::open_next);
 	file_type.set("seek", sol::overload(
 			[](emu_file &file) { return file.tell(); },
@@ -1534,12 +1506,12 @@ void lua_engine::initialize()
 
 			// open the file
 			emu_file file(is_absolute_path ? "" : machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr;
+			std::error_condition filerr;
 			if (!snapstr.empty())
 				filerr = file.open(snapstr);
 			else
 				filerr = machine().video().open_next(file, "png");
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 				return sol::make_object(sol(), filerr);
 
 			// and save the snapshot

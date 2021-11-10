@@ -605,26 +605,28 @@ bool samples_device::load_samples()
 
 	// load the samples
 	int index = 0;
-	for (const char *samplename = iter.first(); samplename != nullptr; index++, samplename = iter.next())
+	for (const char *samplename = iter.first(); samplename; index++, samplename = iter.next())
 	{
 		// attempt to open as FLAC first
 		emu_file file(machine().options().sample_path(), OPEN_FLAG_READ);
-		osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.flac", basename, samplename));
-		if (filerr != osd_file::error::NONE && altbasename != nullptr)
+		std::error_condition filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.flac", basename, samplename));
+		if (filerr && altbasename)
 			filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.flac", altbasename, samplename));
 
 		// if not, try as WAV
-		if (filerr != osd_file::error::NONE)
+		if (filerr)
 			filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.wav", basename, samplename));
-		if (filerr != osd_file::error::NONE && altbasename != nullptr)
+		if (filerr && altbasename)
 			filerr = file.open(util::string_format("%s" PATH_SEPARATOR "%s.wav", altbasename, samplename));
 
 		// if opened, read it
-		if (filerr == osd_file::error::NONE)
-			read_sample(file, m_sample[index]);
-		else if (filerr == osd_file::error::NOT_FOUND)
+		if (!filerr)
 		{
-			logerror("%s: Sample '%s' NOT FOUND\n", tag(), samplename);
+			read_sample(file, m_sample[index]);
+		}
+		else
+		{
+			logerror("Error opening sample '%s' (%s:%d %s)\n", samplename, filerr.category().name(), filerr.value(), filerr.message());
 			ok = false;
 		}
 	}

@@ -875,6 +875,69 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<software name="hhunt01">
+		<description>Houma Hunter Lime Dai-1-wa</description>
+		<year>1993</year>
+		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム　第１話" />
+		<info name="release" value="199305xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="houma_hunter_lime_vol_1_system_disk.hdm" size="1261568" crc="833271c4" sha1="387dd004264a32ea92b301406d8b6e1ebb5c397c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="houma_hunter_lime_vol_1_data_disk.hdm" size="1261568" crc="9d8e0b38" sha1="54cd9d1f6fefecc6dbb7904bbea45a234a5039f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhunt02">
+		<description>Houma Hunter Lime Dai-2-wa</description>
+		<year>1993</year>
+		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム　第２話" />
+		<info name="release" value="199306xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="houma_hunter_lime_vol_2_system_disk.hdm" size="1261568" crc="a2d64ff4" sha1="6151e3a2ac8d270d334dcd5c28b6fe9918109fa9"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="houma_hunter_lime_vol_2_data_disk.hdm" size="1261568" crc="d62d6145" sha1="ced6035d7b6fc90de8d4f7f4c13128ce89bf2d13"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hhunt03">
+		<description>Houma Hunter Lime Dai-3-wa</description>
+		<year>1993</year>
+		<publisher>タケル (Takeru)</publisher>
+		<info name="alt_title" value="宝魔ハンターライム　第３話" />
+		<info name="release" value="199308xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="System Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="houma_hunter_lime_vol_3_system_disk.hdm" size="1261568" crc="1f162fd7" sha1="f95d0fbec2bac346a5551c34d84d00f7de76990f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size="1261568">
+				<rom name="houma_hunter_lime_vol_3_data_disk.hdm" size="1261568" crc="18719a36" sha1="200fdc928c15ae0d04ec8a41e7929ece01026e6f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kakefuku">
 		<description>Kakeibo + Fukubukuro - Wagaya no Benrichou Vol. 1</description>
 		<year>1989</year>
@@ -932,6 +995,18 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 			<feature name="part_id" value="Disk E" />
 			<dataarea name="flop" size="1261568">
 				<rom name="kawarazaki-ke no ichizoku (disk e).hdm" size="1261568" crc="7999334a" sha1="c4e1abf0be91e679867709319fb876f6c6789aa4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kittyw2">
+		<description>Kitty World 2</description>
+		<year>1994</year>
+		<publisher>タケル (Takeru)</publisher>
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1, then run the icon on floppy drive A:"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="kitty_world_2.hdm" size="1261568" crc="31710048" sha1="ca8b9c6ff8c447e96cb6aad90a57a1b590e46fb7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1123,6 +1198,26 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 			<feature name="part_id" value="Disk C" />
 			<dataarea name="flop" size="1261568">
 				<rom name="maririndx_diskc.hdm" size="1261568" crc="d4f2fc7d" sha1="2efc64d48f990691420eb51fb284ab585b5cf419"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metaleyesp">
+		<description>Metal Eye Special Disk</description>
+		<year>1993</year>
+		<publisher>エルフ (Elf)</publisher>
+		<info name="alt_title" value="メタルアイ　スペシャルディスク" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L20 or later, insert the Metal Eye CD, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="1261568">
+				<rom name="metaleye_specialdisk_a.hdm" size="1261568" crc="eb9d07a3" sha1="f76dd0b4d6afb5f5c5322a67086d1929d5abace3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="1261568">
+				<rom name="metaleye_specialdisk_b.hdm" size="1261568" crc="39f2a43d" sha1="74aa7df1c78c805f16959d7a2abaf3960058824f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2101,6 +2196,37 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sa2.hdm" size="1261568" crc="3e3eb153" sha1="71278cfd2f11a879cfe00c267a7de8a4a75f0100"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC-9801 / X68000 / FM Towns hybrid -->
+	<software name="sgamers3">
+		<description>Sadistic Gamers Part-3 - Telephone Play</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="サディスティック・ゲーマーズ　Ｐａｒｔ―３ ～テレフォンプレイ～" />
+		<info name="developer" value="シクスティーンズ (16s)" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run the icon on floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sadistic_gamers_part-3.hdm" size="1261568" crc="d1a470a8" sha1="6610289d5b48aa222ed8af398f7881ea14e48561"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC-9801 / X68000 / FM Towns hybrid -->
+	<!-- The TownsOS icon is supposed to launch the game, but it's incorrectly configured and doesn't work. It's unclear if the disk was mastered like this or if it was modified later. -->
+	<software name="sgamers5">
+		<description>Sadistic Gamers Part-5 - Burusera Play</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="サディスティック・ゲーマーズ　Ｐａｒｔ―５ ～ブルセラ・プレイ～" />
+		<info name="developer" value="シクスティーンズ (16s)" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V2.1L10 or later, then run SADESFM P5 from the command line on drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="sadistic_gamers_part-5.hdm" size="1261568" crc="a783f0a9" sha1="33d609c14afa750daa1eca3020586db14b14c7ac"/>
 			</dataarea>
 		</part>
 	</software>

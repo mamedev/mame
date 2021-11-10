@@ -938,7 +938,7 @@ void debug_imgui::mount_image()
 {
 	if(m_selected_file != nullptr)
 	{
-		osd_file::error err;
+		std::error_condition err;
 		switch(m_selected_file->type)
 		{
 			case file_entry_type::DRIVE:
@@ -947,7 +947,7 @@ void debug_imgui::mount_image()
 					util::zippath_directory::ptr dir;
 					err = util::zippath_directory::open(m_selected_file->fullpath, dir);
 				}
-				if(err == osd_file::error::NONE)
+				if(!err)
 				{
 					m_filelist_refresh = true;
 					strcpy(m_path,m_selected_file->fullpath.c_str());
@@ -989,8 +989,8 @@ void debug_imgui::refresh_filelist()
 	m_filelist_refresh = false;
 
 	util::zippath_directory::ptr dir;
-	osd_file::error const err = util::zippath_directory::open(m_path,dir);
-	if(err == osd_file::error::NONE)
+	std::error_condition const err = util::zippath_directory::open(m_path,dir);
+	if(!err)
 	{
 		int x = 0;
 		// add drives

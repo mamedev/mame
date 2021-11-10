@@ -100,7 +100,7 @@ macro jsr32 %opc %spreg
 	prefetch_done();
 
 10000 reset
-	CCR |= F_I;
+	CCR |= (has_hc ? F_I : F_H);
 	EXR = EXR_I | EXR_NC;
 	if(mode_advanced) {
 		IR[0] = read16i(0);
@@ -1007,7 +1007,7 @@ macro jsr32 %opc %spreg
 	TMP1 = r8_r(IR[0]);
 	TMP2 = 0;
 	if(CCR & F_C) {
-		if(CCR & F_H) {
+		if(has_hc && (CCR & F_H)) {
 			if((TMP1 & 0xf0) <= 0x30 && (TMP1 & 0x0f) <= 3)
 				TMP2 = 0x66;
 		} else {
@@ -1015,7 +1015,7 @@ macro jsr32 %opc %spreg
 				TMP2 = (TMP1 & 0x0f) <= 9 ? 0x60 : 0x66;
 		}
 	} else {
-		if(CCR & F_H) {
+		if(has_hc && (CCR & F_H)) {
 			if((TMP1 & 0x0f) <= 3)
 				TMP2 = (TMP1 & 0xf0) <= 0x90 ? 0x06 : 0x66;
 		} else {
@@ -1378,7 +1378,7 @@ macro jsr32 %opc %spreg
 	TMP1 = r8_r(IR[0]);
 	TMP2 = 0;
 	if(CCR & F_C) {
-		if(CCR & F_H) {
+		if(has_hc && (CCR & F_H)) {
 			if((TMP1 & 0xf0) >= 0x60 && (TMP1 & 0x0f) >= 6)
 				TMP2 = 0x9a;
 		} else {
@@ -1386,7 +1386,7 @@ macro jsr32 %opc %spreg
 				TMP2 = 0xa0;
 		}
 	} else {
-		if(CCR & F_H) {
+		if(has_hc && (CCR & F_H)) {
 			if((TMP1 & 0xf0) <= 0x80 && (TMP1 & 0x0f) >= 6)
 				TMP2 = 0xfa;
 		}
@@ -1646,6 +1646,11 @@ macro jsr32 %opc %spreg
 
 58f0         ffff         0 ble      rel16    -        h
 	bxx_16 (CCR & F_Z) || (CCR & (F_N|F_V)) == F_N || (CCR & (F_N|F_V)) == F_V
+
+5900         ff8f         0 jmp      r16h     -        o
+	fetch();
+	PC = r16_r(IR[0] >> 4);
+	prefetch();
 
 5900         ff8f         0 jmp      r32h     -        h
 	fetch();

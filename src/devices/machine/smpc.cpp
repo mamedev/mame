@@ -594,11 +594,17 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					// ...
 					m_command_in_progress = false;
 					m_oreg[31] = m_comreg;
-					sf_ack(true); //clear hand-shake flag (TODO: diagnostic wants this to have bit 3 high)
+					// TODO: diagnostic also wants this to have bit 3 high
+					sf_ack(true); //set hand-shake flag
 					return;
 
-//              case 0x0a: // NETLINKON
-//              case 0x0b: // NETLINKOFF
+				case 0x0a: // NETLINKON
+					// TODO: understand where NetLink actually lies and implement delegation accordingly
+					// (is it really an SH1 device like suggested by the space access or it overlays on CS2 bus?)
+					popmessage("%s: NetLink enabled", this->tag());
+					 [[fallthrough]];
+				case 0x0b: // NETLINKOFF
+					break;
 
 				case 0x0d: // SYSRES
 					// send a 1 -> 0 to device reset lines
@@ -614,10 +620,6 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				case 0x0f: // CKCHG320
 					m_dotsel(m_comreg & 1);
 
-					// send a NMI to Master SH2 if enabled
-					if(m_NMI_reset == false)
-						master_sh2_nmi();
-
 					// assert Slave SH2 line
 					m_sshres(1);
 					// clear PLL system halt
@@ -625,6 +627,12 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 					// setup the new dot select
 					m_cur_dotsel = (m_comreg & 1) ^ 1;
+
+					// send a NMI to Master SH2 if enabled
+					// it is unconditionally requested:
+					// bigichig, capgen1, capgen4 and capgen5 triggers a SLEEP opcode from BIOS call and expects this to wake them up.
+					//if(m_NMI_reset == false)
+					master_sh2_nmi();
 					break;
 
 				case 0x10: // INTBACK
@@ -659,7 +667,7 @@ void smpc_hle_device::device_timer(emu_timer &timer, device_timer_id id, int par
 					break;
 
 				default:
-					logerror("%s unemulated %02x command\n",this->tag(),m_comreg);
+					logerror("%s: unemulated %02x command\n",this->tag(),m_comreg);
 					return;
 			}
 

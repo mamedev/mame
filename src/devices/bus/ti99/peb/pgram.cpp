@@ -141,7 +141,7 @@
 #define COUNT2_TAG "u12_counter"
 #define COUNT3_TAG "u10_counter"
 
-DEFINE_DEVICE_TYPE_NS(TI99_PGRAM, bus::ti99::peb, pgram_device, "ti99_pgram", "PGRAM(+) memory card")
+DEFINE_DEVICE_TYPE(TI99_PGRAM, bus::ti99::peb::pgram_device, "ti99_pgram", "PGRAM(+) memory card")
 
 namespace bus::ti99::peb {
 

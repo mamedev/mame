@@ -70,21 +70,147 @@
 #define LOGSCAN(...)    LOGMASKED(LOG_SCAN, __VA_ARGS__)
 
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_US, bus::amiga::keyboard, a2000_kbd_g80_us_device, "a2000kbd_g80_us", "Amiga 2000 Keyboard (Cherry - U.S./Canada)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_DE, bus::amiga::keyboard, a2000_kbd_g80_de_device, "a2000kbd_g80_de", "Amiga 2000 Keyboard (Cherry - Germany/Austria)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_SE, bus::amiga::keyboard, a2000_kbd_g80_se_device, "a2000kbd_g80_se", "Amiga 2000 Keyboard (Cherry - Sweden/Finland)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_DK, bus::amiga::keyboard, a2000_kbd_g80_dk_device, "a2000kbd_g80_dk", "Amiga 2000 Keyboard (Cherry - Denmark)")
-DEFINE_DEVICE_TYPE_NS(A2000_KBD_G80_GB, bus::amiga::keyboard, a2000_kbd_g80_gb_device, "a2000kbd_g80_gb", "Amiga 2000 Keyboard (Cherry - UK)")
-
-
-
-namespace bus::amiga::keyboard {
-
 namespace {
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
+
+ROM_START(a2000kbd)
+	ROM_REGION(0x0800, "mcu", 0)
+	ROM_LOAD("467.u4", 0x0000, 0x0800, CRC(fb92a773) SHA1(e787dc05de227f30a47ac5b9ee7a355c2e9e693b))
+ROM_END
+
+
+//**************************************************************************
+//  KEYBOARD BASE CLASSES
+//**************************************************************************
+
+class a2000_kbd_g80_device : public device_t, public device_amiga_keyboard_interface
+{
+public:
+	// from host
+	virtual DECLARE_WRITE_LINE_MEMBER(kdat_w) override
+	{
+		if (bool(state) != m_host_kdat)
+		{
+			LOGCOMM("host DATA %u -> %u\n", m_host_kdat ? 1 : 0, state ? 1 : 0);
+			m_host_kdat = bool(state);
+			if (m_mcu_kdat)
+				m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
+		}
+	}
+
+protected:
+	// construction/destruction
+	a2000_kbd_g80_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+		, device_amiga_keyboard_interface(mconfig, *this)
+		, m_rows(*this, "ROW%u", 0U)
+		, m_mcu(*this, "u1")
+		, m_led_kbd_caps(*this, "led_kbd_caps")
+	{
+	}
+
+	// MCU I/O
+	u8 mcu_bus_r(offs_t offset)
+	{
+		// when jumpered for external ROM, offset latched by U2 is 0x60 + (row << 1)
+		uint8_t result(0U);
+		for (unsigned i = 0U; m_rows.size() > i; ++i)
+		{
+			if (BIT(m_row_drive, i))
+				result |= uint8_t(m_rows[i]->read());
+		}
+		LOGSCAN("read bus: offset = %02X, row drive = %04X\n, result = %02X", offset, m_row_drive, result);
+		return result;
+	}
+
+	void mcu_p1_w(u8 data)
+	{
+		m_row_drive = (m_row_drive & 0x1f00U) | uint16_t(data);
+	}
+
+	void mcu_p2_w(u8 data)
+	{
+		m_row_drive = (m_row_drive & 0x00ffU) | (uint16_t(data & 0x1fU) << 8);
+
+		m_led_kbd_caps = BIT(~data, 5);
+
+		if (bool(BIT(data, 6) != m_mcu_kdat))
+		{
+			m_mcu_kdat = BIT(data, 6);
+			LOGCOMM("keyboard DATA %u -> %u\n", m_mcu_kdat ? 0U : 1U, m_mcu_kdat ? 1U : 0U);
+			m_host->kdat_w(m_mcu_kdat ? 1 : 0);
+			if (m_host_kdat)
+				m_mcu->set_input_line(MCS48_INPUT_IRQ, m_mcu_kdat ? CLEAR_LINE : ASSERT_LINE);
+		}
+
+		if (bool(BIT(data, 7) != m_mcu_kclk))
+		{
+			m_mcu_kclk = BIT(data, 7);
+			LOGCOMM("keyboard CLOCK %u -> %u\n", m_mcu_kclk ? 0U : 1U, m_mcu_kclk ? 1U : 0U);
+			m_host->kclk_w(m_mcu_kclk ? 1 : 0);
+		}
+	}
+
+	virtual const tiny_rom_entry *device_rom_region() const override
+	{
+		return ROM_NAME(a2000kbd);
+	}
+
+	virtual void device_add_mconfig(machine_config &config) override
+	{
+		auto &mcu(I8039(config, "u1", 6_MHz_XTAL));
+		mcu.set_addrmap(AS_PROGRAM, &a2000_kbd_g80_device::program_map);
+		mcu.set_addrmap(AS_IO, &a2000_kbd_g80_device::ext_map);
+		mcu.p1_out_cb().set(FUNC(a2000_kbd_g80_device::mcu_p1_w));
+		mcu.p2_out_cb().set(FUNC(a2000_kbd_g80_device::mcu_p2_w));
+		mcu.bus_in_cb().set(FUNC(a2000_kbd_g80_device::mcu_bus_r));
+		mcu.t0_in_cb().set_constant(1);
+		mcu.t1_in_cb().set([this] () { return m_mcu_kclk ? 1 : 0; });
+	}
+
+	virtual void device_start() override
+	{
+		m_led_kbd_caps.resolve();
+
+		save_item(NAME(m_row_drive));
+		save_item(NAME(m_host_kdat));
+		save_item(NAME(m_mcu_kdat));
+		save_item(NAME(m_mcu_kclk));
+
+		m_row_drive = 0U;
+		m_host_kdat = true;
+		m_mcu_kdat = true;
+		m_mcu_kclk = true;
+	}
+
+	void program_map(address_map &map)
+	{
+		map.global_mask(0x07ff);
+		map(0x0000, 0x07ff).rom().region("mcu", 0);
+	}
+
+	void ext_map(address_map &map)
+	{
+		map.global_mask(0x00ff);
+		map(0x0000, 0x00ff).r(FUNC(a2000_kbd_g80_device::mcu_bus_r));
+	}
+
+private:
+	required_ioport_array<13>   m_rows;
+	required_device<cpu_device> m_mcu;
+	output_finder<>             m_led_kbd_caps;
+
+	uint16_t                    m_row_drive = 0U;
+	bool                        m_host_kdat = true, m_mcu_kdat = true, m_mcu_kclk = true;
+};
+
+
+//**************************************************************************
+//  COMMON PORT DEFINITIONS
+//**************************************************************************
 
 INPUT_PORTS_START(a2000_common_keyboard)
 	PORT_START("ROW0")
@@ -168,6 +294,11 @@ INPUT_PORTS_START(a2000_common_keyboard)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_LEFT)        PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DOWN)        PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 INPUT_PORTS_END
+
+
+//**************************************************************************
+//  SPECIFIC KEYBOARD PORT DEFINITIONS
+//**************************************************************************
 
 INPUT_PORTS_START(a2000_us_keyboard)
 	PORT_INCLUDE(a2000_common_keyboard)
@@ -476,197 +607,107 @@ INPUT_PORTS_START(a2000_gb_keyboard)
 INPUT_PORTS_END
 
 
-ROM_START(a2000kbd)
-	ROM_REGION(0x0800, "mcu", 0)
-	ROM_LOAD("467.u4", 0x0000, 0x0800, CRC(fb92a773) SHA1(e787dc05de227f30a47ac5b9ee7a355c2e9e693b))
-ROM_END
+//**************************************************************************
+//  SPECIFIC KEYBOARD CLASSES
+//**************************************************************************
+
+class a2000_kbd_g80_us_device : public a2000_kbd_g80_device
+{
+public:
+	a2000_kbd_g80_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_US, tag, owner, clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(a2000_us_keyboard);
+	}
+};
+
+
+class a2000_kbd_g80_de_device : public a2000_kbd_g80_device
+{
+public:
+	a2000_kbd_g80_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DE, tag, owner, clock)
+	{
+	}
+
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(a2000_de_keyboard);
+	}
+};
+
+
+class a2000_kbd_g80_se_device : public a2000_kbd_g80_device
+{
+public:
+	a2000_kbd_g80_se_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_SE, tag, owner, clock)
+	{
+	}
+
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(a2000_se_keyboard);
+	}
+};
+
+
+class a2000_kbd_g80_dk_device : public a2000_kbd_g80_device
+{
+public:
+	a2000_kbd_g80_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DK, tag, owner, clock)
+	{
+	}
+
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(a2000_dk_keyboard);
+	}
+};
+
+
+class a2000_kbd_g80_gb_device : public a2000_kbd_g80_device
+{
+public:
+	a2000_kbd_g80_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+		: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_GB, tag, owner, clock)
+	{
+	}
+
+	static auto parent_rom_device_type() { return &A2000_KBD_G80_US; }
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(a2000_gb_keyboard);
+	}
+};
 
 } // anonymous namespace
 
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  GLOBAL VARIABLES
 //**************************************************************************
 
-// ======================> a2000_kbd_g80_device
-
-a2000_kbd_g80_device::a2000_kbd_g80_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_amiga_keyboard_interface(mconfig, *this)
-	, m_rows(*this, "ROW%u", 0U)
-	, m_mcu(*this, "u1")
-	, m_led_kbd_caps(*this, "led_kbd_caps")
-	, m_row_drive(0U)
-	, m_host_kdat(true)
-	, m_mcu_kdat(true)
-	, m_mcu_kclk(true)
-{
-}
-
-WRITE_LINE_MEMBER(a2000_kbd_g80_device::kdat_w)
-{
-	if (bool(state) != m_host_kdat)
-	{
-		LOGCOMM("host DATA %u -> %u\n", m_host_kdat ? 1 : 0, state ? 1 : 0);
-		m_host_kdat = bool(state);
-		if (m_mcu_kdat)
-			m_mcu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
-	}
-}
-
-u8 a2000_kbd_g80_device::mcu_bus_r(offs_t offset)
-{
-	// when jumpered for external ROM, offset latched by U2 is 0x60 + (row << 1)
-	uint8_t result(0U);
-	for (unsigned i = 0U; m_rows.size() > i; ++i)
-	{
-		if (BIT(m_row_drive, i))
-			result |= uint8_t(m_rows[i]->read());
-	}
-	LOGSCAN("read bus: offset = %02X, row drive = %04X\n, result = %02X", offset, m_row_drive, result);
-	return result;
-}
-
-void a2000_kbd_g80_device::mcu_p1_w(u8 data)
-{
-	m_row_drive = (m_row_drive & 0x1f00U) | uint16_t(data);
-}
-
-void a2000_kbd_g80_device::mcu_p2_w(u8 data)
-{
-	m_row_drive = (m_row_drive & 0x00ffU) | (uint16_t(data & 0x1fU) << 8);
-
-	m_led_kbd_caps = BIT(~data, 5);
-
-	if (bool(BIT(data, 6) != m_mcu_kdat))
-	{
-		m_mcu_kdat = BIT(data, 6);
-		LOGCOMM("keyboard DATA %u -> %u\n", m_mcu_kdat ? 0U : 1U, m_mcu_kdat ? 1U : 0U);
-		m_host->kdat_w(m_mcu_kdat ? 1 : 0);
-		if (m_host_kdat)
-			m_mcu->set_input_line(MCS48_INPUT_IRQ, m_mcu_kdat ? CLEAR_LINE : ASSERT_LINE);
-	}
-
-	if (bool(BIT(data, 7) != m_mcu_kclk))
-	{
-		m_mcu_kclk = BIT(data, 7);
-		LOGCOMM("keyboard CLOCK %u -> %u\n", m_mcu_kclk ? 0U : 1U, m_mcu_kclk ? 1U : 0U);
-		m_host->kclk_w(m_mcu_kclk ? 1 : 0);
-	}
-}
-
-tiny_rom_entry const *a2000_kbd_g80_device::device_rom_region() const
-{
-	return ROM_NAME(a2000kbd);
-}
-
-void a2000_kbd_g80_device::device_add_mconfig(machine_config &config)
-{
-	auto &mcu(I8039(config, "u1", 6_MHz_XTAL));
-	mcu.set_addrmap(AS_PROGRAM, &a2000_kbd_g80_device::program_map);
-	mcu.set_addrmap(AS_IO, &a2000_kbd_g80_device::ext_map);
-	mcu.p1_out_cb().set(FUNC(a2000_kbd_g80_device::mcu_p1_w));
-	mcu.p2_out_cb().set(FUNC(a2000_kbd_g80_device::mcu_p2_w));
-	mcu.bus_in_cb().set(FUNC(a2000_kbd_g80_device::mcu_bus_r));
-	mcu.t0_in_cb().set_constant(1);
-	mcu.t1_in_cb().set([this] () { return m_mcu_kclk ? 1 : 0; });
-}
-
-void a2000_kbd_g80_device::device_start()
-{
-	m_led_kbd_caps.resolve();
-
-	save_item(NAME(m_row_drive));
-	save_item(NAME(m_host_kdat));
-	save_item(NAME(m_mcu_kdat));
-	save_item(NAME(m_mcu_kclk));
-
-	m_row_drive = 0U;
-	m_host_kdat = true;
-	m_mcu_kdat = true;
-	m_mcu_kclk = true;
-}
-
-void a2000_kbd_g80_device::device_reset()
-{
-}
-
-void a2000_kbd_g80_device::program_map(address_map &map)
-{
-	map.global_mask(0x07ff);
-	map(0x0000, 0x07ff).rom().region("mcu", 0);
-}
-
-void a2000_kbd_g80_device::ext_map(address_map &map)
-{
-	map.global_mask(0x00ff);
-	map(0x0000, 0x00ff).r(FUNC(a2000_kbd_g80_device::mcu_bus_r));
-}
-
-
-// ======================> a2000_kbd_g80_us_device
-
-a2000_kbd_g80_us_device::a2000_kbd_g80_us_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_US, tag, owner, clock)
-{
-}
-
-ioport_constructor a2000_kbd_g80_us_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(a2000_us_keyboard);
-}
-
-
-// ======================> a2000_kbd_g80_de_device
-
-a2000_kbd_g80_de_device::a2000_kbd_g80_de_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DE, tag, owner, clock)
-{
-}
-
-ioport_constructor a2000_kbd_g80_de_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(a2000_de_keyboard);
-}
-
-
-// ======================> a2000_kbd_g80_se_device
-
-a2000_kbd_g80_se_device::a2000_kbd_g80_se_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_SE, tag, owner, clock)
-{
-}
-
-ioport_constructor a2000_kbd_g80_se_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(a2000_se_keyboard);
-}
-
-
-// ======================> a2000_kbd_g80_dk_device
-
-a2000_kbd_g80_dk_device::a2000_kbd_g80_dk_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_DK, tag, owner, clock)
-{
-}
-
-ioport_constructor a2000_kbd_g80_dk_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(a2000_dk_keyboard);
-}
-
-
-// ======================> a2000_kbd_g80_gb_device
-
-a2000_kbd_g80_gb_device::a2000_kbd_g80_gb_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
-	: a2000_kbd_g80_device(mconfig, A2000_KBD_G80_GB, tag, owner, clock)
-{
-}
-
-ioport_constructor a2000_kbd_g80_gb_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(a2000_gb_keyboard);
-}
-
-} // namespace bus::amiga::keyboard
+DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_G80_US, device_amiga_keyboard_interface, a2000_kbd_g80_us_device, "a2000kbd_g80_us", "Amiga 2000 Keyboard (Cherry - U.S./Canada)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_G80_DE, device_amiga_keyboard_interface, a2000_kbd_g80_de_device, "a2000kbd_g80_de", "Amiga 2000 Keyboard (Cherry - Germany/Austria)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_G80_SE, device_amiga_keyboard_interface, a2000_kbd_g80_se_device, "a2000kbd_g80_se", "Amiga 2000 Keyboard (Cherry - Sweden/Finland)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_G80_DK, device_amiga_keyboard_interface, a2000_kbd_g80_dk_device, "a2000kbd_g80_dk", "Amiga 2000 Keyboard (Cherry - Denmark)")
+DEFINE_DEVICE_TYPE_PRIVATE(A2000_KBD_G80_GB, device_amiga_keyboard_interface, a2000_kbd_g80_gb_device, "a2000kbd_g80_gb", "Amiga 2000 Keyboard (Cherry - UK)")

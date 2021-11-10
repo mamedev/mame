@@ -92,7 +92,7 @@ desired 300 Baud:
 6MHz / 15 / 32 / (0x100 - 0xfe) / 21 = 297.62 Baud
 
 This scheme allows only 64 machine cycles between interrupts, and more
-than half of thse are consumed by the timer service routine itself.
+than half of these are consumed by the timer service routine itself.
 
 The program ROM checksum routine is supposed to compute the sum of all
 program ROM bytes modulo 256 and the XOR of all program ROM bytes, but

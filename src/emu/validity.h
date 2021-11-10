@@ -60,7 +60,6 @@ private:
 	using string_set = std::unordered_set<std::string>;
 
 	// internal helpers
-	const char *ioport_string_from_index(u32 index);
 	int get_defstr_index(const char *string, bool suppress_error = false);
 
 	// core helpers
@@ -69,9 +68,6 @@ private:
 	void validate_one(const game_driver &driver);
 
 	// internal sub-checks
-	void validate_core();
-	void validate_inlines();
-	void validate_rgb();
 	void validate_driver(device_t &root);
 	void validate_roms(device_t &root);
 	void validate_analog_input_field(const ioport_field &field);
@@ -85,12 +81,6 @@ private:
 	void build_output_prefix(std::ostream &str) const;
 	template <typename Format, typename... Params> void output_via_delegate(osd_output_channel channel, Format &&fmt, Params &&...args);
 	void output_indented_errors(std::string &text, const char *header);
-
-	// random number generation
-	s32 random_i32();
-	u32 random_u32();
-	s64 random_i64();
-	u64 random_u64();
 
 	// internal driver list
 	driver_enumerator       m_drivlist;

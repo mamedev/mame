@@ -2535,7 +2535,7 @@ license:CC0
 	<software name="mathnme">
 		<description>Math and Me (Version 1.0 08/01/88)</description>
 		<year>1988</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="release" value="2021-06-16"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs. -->
@@ -3400,11 +3400,11 @@ license:CC0
 	<software name="readnme">
 		<description>Reading and Me (Version 1.0)</description>
 		<year>1988</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="release" value="2021-07-25"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- It requires a 512K Apple IIgs. -->
-		<!--"Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson and Associates. This is version 1.0. It requires a 512K Apple IIgs.-->
+		<!--"Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson &amp; Associates. This is version 1.0. It requires a 512K Apple IIgs.-->
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program disk"/>
@@ -3416,6 +3416,45 @@ license:CC0
 			<feature name="part_id" value="Disk 2 - Data disk"/>
 			<dataarea name="flop" size="1312556">
 				<rom name="reading and me iigs - disk 2 - data.woz" size="1312556" crc="8c0d3e1f" sha1="ba53651eed2bd0393b8d83390555825302b9bba5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kquest2">
+		<description>King's Quest II (Version 2.0A)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-09-28"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"King's Quest II: Romancing The Throne" is a 1987 adventure game developed by Roberta Williams, Jeff Stephenson, Chris Iden, Robert Heitman, Ken Williams, Sol Ackerman, Scott Murphy, Doug MacNeill, Mark Crowe, and Al Lowe, and distributed by Sierra On-Line. This is version 2.0A. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1312707">
+				<rom name="king's quest ii iigs - disk 1.woz" size="1312707" crc="df46df6b" sha1="bc29f617b36e77f064f13b371db1a0ed6e8cc1de"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1312707">
+				<rom name="king's quest ii iigs - disk 2.woz" size="1312707" crc="23294f32" sha1="e0e383b140d7eafd3b94faeb12074564a8d0a24b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sltroyal">
+		<description>Solitaire Royale (Version 1.0)</description>
+		<year>1989</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="release" value="2021-08-26"/>
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- It requires a 512K Apple IIgs. -->
+		<!--"Solitaire Royale" is a 1989 card game developed by Jake Hoelter, Jody Sather, Ilan "The Zipper" Zipkin, and Brad Fregger, and distributed by Spectrum Holobyte. This is version 1.0. It requires a 512K Apple IIgs.-->
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1361746">
+				<rom name="solitaire royale iigs.woz" size="1361746" crc="0a8a99ba" sha1="e3693a5d5f3534b4eb1a7ccc6ab8e96463fa0a28"/>
 			</dataarea>
 		</part>
 	</software>

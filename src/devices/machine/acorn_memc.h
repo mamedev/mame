@@ -60,7 +60,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 private:
-	void memc_map_debug_commands(int ref, const std::vector<std::string> &params);
+	void memc_map_debug_commands(const std::vector<std::string> &params);
 	uint32_t dram_address(uint32_t address);
 	bool is_valid_access(int page, bool write);
 	uint32_t invalid_access(bool is_write, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

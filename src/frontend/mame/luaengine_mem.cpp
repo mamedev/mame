@@ -179,17 +179,7 @@ int sol_lua_push(sol::types<map_handler_type>, lua_State *L, map_handler_type &&
 
 int sol_lua_push(sol::types<endianness_t>, lua_State *L, endianness_t &&value)
 {
-	char const *endianness = "unknown";
-	switch (value)
-	{
-	case endianness_t::ENDIANNESS_BIG:
-		endianness = "big";
-		break;
-	case endianness_t::ENDIANNESS_LITTLE:
-		endianness = "little";
-		break;
-	}
-	return sol::stack::push(L, endianness);
+	return sol::stack::push(L, util::endian_to_string_view(value));
 }
 
 

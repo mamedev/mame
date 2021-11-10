@@ -608,12 +608,12 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 		if (size % 0x2000 != 9)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
+			image.seterror(image_error::INVALIDIMAGE, "File corrupted");
 			return image_init_result::FAIL;
 		}
 		if (!image.loaded_through_softlist())
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
+			image.seterror(image_error::UNSUPPORTED, "Loading from softlist is not supported yet");
 			return image_init_result::FAIL;
 		}
 
@@ -628,7 +628,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 
 		if (chunks_in_file * 0x2000 + 0x09 != size)
 		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
+			image.seterror(image_error::INVALIDIMAGE, "File corrupted");
 			return image_init_result::FAIL;
 		}
 
@@ -652,7 +652,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 				break;
 
 			default:
-				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cart type not supported");
+				image.seterror(image_error::INVALIDIMAGE, "Cart type not supported");
 				return image_init_result::FAIL;
 		}
 

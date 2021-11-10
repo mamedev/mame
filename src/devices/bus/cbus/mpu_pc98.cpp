@@ -38,7 +38,7 @@ WRITE_LINE_MEMBER( mpu_pc98_device::mpu_irq_out )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(MPU_PC98, mpu_pc98_device, "mpu_pc98", "Roland MPU-401 MIDI Interface (CBUS)")
+DEFINE_DEVICE_TYPE(MPU_PC98, mpu_pc98_device, "mpu_pc98", "Roland MPU-401 MIDI Interface (C-bus)")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration

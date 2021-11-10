@@ -415,7 +415,7 @@ void bitmap_t::set_palette(palette_t *palette)
  *          -------------------------------------------------.
  *
  * @param   color       The color.
- * @param   cliprect    The cliprect.
+ * @param   bounds      The bounds.
  */
 
 void bitmap_t::fill(uint64_t color, const rectangle &bounds)

@@ -6790,9 +6790,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="daiva4">
-		<description>Daiva Story 4 - Asura's Bloodfeud (Jpn)</description>
+		<description>Daiva Story 4: Asura's Bloodfeud (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー4·アスラの血流" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 4 - asura's bloodfeud (1987)(t&amp;e soft)(jp).dsk" size="737280" crc="bce30044" sha1="8a772f4be8258746655b9502df0d0e08a15279ea" offset="0" />
@@ -6801,9 +6802,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="daiva4b" cloneof="daiva4">
-		<description>Daiva Story 4 - Asura's Bloodfeud (Jpn, Alt 2)</description>
+		<description>Daiva Story 4: Asura's Bloodfeud (Jpn, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー4·アスラの血流" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 4 - asura's bloodfeud (1987)(t&amp;e soft)(jp)[a2].dsk" size="737280" crc="a4af31f2" sha1="805d2d7e924604414bbebcda74d4e94701a24b38" offset="0" />
@@ -6812,9 +6814,10 @@ The following floppies came with the machines.
 	</software>
 
 	<software name="daiva4a" cloneof="daiva4">
-		<description>Daiva Story 4 - Asura's Bloodfeud (Jpn, Alt)</description>
+		<description>Daiva Story 4: Asura's Bloodfeud (Jpn, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;cart2disk hack&gt;</publisher>
+		<info name="alt_title" value="ディーヴァ ストーリー4·アスラの血流" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="daiva story 4 - asura's bloodfeud (1987)(t&amp;e soft)(jp)[a].dsk" size="737280" crc="f6007ab5" sha1="e717247b6558f1d7cd450cef138af736811fe45d" offset="0" />

@@ -6,7 +6,7 @@
 #include "machine/keyboard.ipp"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE_NS(SGI_HLE_KEYBOARD, bus::sgikbd, hle_device, "hlekbd", "SGI Indigo Keyboard (HLE)")
+DEFINE_DEVICE_TYPE(SGI_HLE_KEYBOARD, bus::sgikbd::hle_device, "hlekbd", "SGI Indigo Keyboard (HLE)")
 
 namespace bus::sgikbd {
 

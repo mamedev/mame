@@ -34,6 +34,9 @@ Test Paste:
 #include "video/pwm.h"
 #include "cvicny.lh"
 
+
+namespace {
+
 class cvicny_state : public driver_device
 {
 public:
@@ -42,16 +45,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_display(*this, "display")
 		, m_io_keyboard(*this, "X%u", 0U)
-		{ }
+	{ }
 
 	void cvicny(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void cvicny_mem(address_map &map);
-	virtual void machine_start() override;
 	u8 key_r();
 	void digit_w(u8 data);
 	void segment_w(u8 data);
+
 	u8 m_digit;
 	u8 m_seg;
 	required_device<cpu_device> m_maincpu;
@@ -154,6 +160,9 @@ ROM_START( cvicny )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD("cvicny8080.bin", 0x0000, 0x05ea, CRC(e6119052) SHA1(d03c2cbfd047f0d090a787fbbde6353593cc2dd8) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

@@ -347,7 +347,7 @@ u8 m68hc05_device::ocr_r(offs_t offset)
 
 void m68hc05_device::ocr_w(offs_t offset, u8 data)
 {
-	// writing ORCH inhibits compare until OCRL is written
+	// writing OCRH inhibits compare until OCRL is written
 	// writing OCRL after reading TCR with OCF set clears OCF
 
 	u8 const low(BIT(offset, 0));

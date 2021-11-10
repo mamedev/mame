@@ -152,7 +152,7 @@ image_init_result apf_cart_slot_device::call_load()
 
 		if (size > 0x3800)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an APF cart");
+			seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an APF cart");
 			return image_init_result::FAIL;
 		}
 
@@ -202,17 +202,17 @@ std::string apf_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t size = hook.image_file()->size();
-		int type = APF_STD;
+		uint64_t size;
+		hook.image_file()->length(size); // FIXME: check error return
 
 		// attempt to identify Space Destroyer, which needs 1K of additional RAM
+		int type = APF_STD;
 		if (size == 0x1800)
 			type = APF_SPACEDST;
 		if (size > 0x2000)
 			type = APF_BASIC;
 
-		slot_string = apf_get_slot(type);
+		char const *const slot_string = apf_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

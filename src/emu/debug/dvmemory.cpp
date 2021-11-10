@@ -70,7 +70,7 @@ debug_view_memory_source::debug_view_memory_source(std::string &&name, memory_re
 	, m_blocklength(region.bytes())
 	, m_numblocks(1)
 	, m_blockstride(0)
-	, m_offsetxor(ENDIAN_VALUE_NE_NNE(region.endianness(), 0, region.bytewidth() - 1))
+	, m_offsetxor(region.endianness() == ENDIANNESS_NATIVE ? 0 : region.bytewidth() - 1)
 	, m_endianness(region.endianness())
 	, m_prefsize(std::min<u8>(region.bytewidth(), 8))
 {
@@ -940,15 +940,6 @@ void debug_view_memory::write(u8 size, offs_t offs, u64 data)
 	if (offs >= (source.m_blocklength * source.m_numblocks))
 		return;
 	*(reinterpret_cast<u8 *>(source.m_base) + (offs / source.m_blocklength * source.m_blockstride) + (offs % source.m_blocklength)) = data;
-
-// hack for FD1094 editing
-#ifdef FD1094_HACK
-	if (source.m_base == machine().root_device().memregion("user2"))
-	{
-		extern void fd1094_regenerate_key(running_machine &machine);
-		fd1094_regenerate_key(machine());
-	}
-#endif
 }
 
 

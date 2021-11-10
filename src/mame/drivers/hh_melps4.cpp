@@ -116,6 +116,8 @@ namespace {
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
+  There's also a Gakken version that appears to be the same game underneath.
+
 ***************************************************************************/
 
 class cfrogger_state : public hh_melps4_state

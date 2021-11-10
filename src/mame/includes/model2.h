@@ -246,10 +246,10 @@ protected:
 	void scsp_map(address_map &map);
 
 	void debug_init();
-	void debug_commands( int ref, const std::vector<std::string> &params );
-	void debug_geo_dasm_command(int ref, const std::vector<std::string> &params);
-	void debug_tri_dump_command(int ref, const std::vector<std::string> &params);
-	void debug_help_command(int ref, const std::vector<std::string> &params);
+	void debug_commands(const std::vector<std::string> &params);
+	void debug_geo_dasm_command(const std::vector<std::string> &params);
+	void debug_tri_dump_command(const std::vector<std::string> &params);
+	void debug_help_command(const std::vector<std::string> &params);
 
 	virtual void video_start() override;
 

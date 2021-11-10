@@ -269,14 +269,19 @@ Apple macOS
 
 You’ll need a few prerequisites to get started. Make sure you’re on OS X 10.14
 Mojave or later for Intel Macs or macOS 11.0 Big Sur for Apple Silicon. You will
-need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.
+need SDL2 2.0.4 or later for Intel or SDL2 2.0.14 on Apple Silicon.  You’ll also
+need to install Python 3.
 
-* Install **Xcode** from the Mac App Store or `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
-* To find the corresponding Xcode for your MacOS release please visit `xcodereleases.com <https://xcodereleases.com>`_ to find the latest version of Xcode available to you.
+* Install **Xcode** from the Mac App Store or
+  `ADC <https://developer.apple.com/download/more/>`_ (AppleID required).
+* To find the corresponding Xcode for your MacOS release please visit
+  `xcodereleases.com <https://xcodereleases.com>`_ to find the latest version of
+  Xcode available to you.
 * Launch **Xcode**. It will download a few additional prerequisites.  Let this
   run through before proceeding.
-* Once that’s done, quit **Xcode** and open a **Terminal** window
-* Type **xcode-select --install** to install additional tools necessary for MAME (also available as a package on ADC).
+* Once that’s done, quit **Xcode** and open a **Terminal** window.
+* Type **xcode-select --install** to install additional tools necessary for MAME
+  (also available as a package on ADC).
 
 Next you’ll need to get SDL2 installed.
 
@@ -288,7 +293,18 @@ Next you’ll need to get SDL2 installed.
   **SDL2.framework** folder from the SDL disk image into the **Frameworks**
   folder. You will have to authenticate with your user password.
 
-Lastly to begin compiling, use Terminal to navigate to where you have the MAME
+Now get Python 3 set up:
+
+* Go to the `official Python site <https://www.python.org/>`_ and click the link
+  to the download page for the current version (this was
+  `Python 3.10.0 <https://www.python.org/downloads/release/python-3100/>`_ at
+  the time of writing).
+* Scroll down to the “Files” section, and download the macOS version (called
+  “macOS 64-bit universal2 installer” or similar).
+* Once the package downloads, open it and follow the standard installation
+  process.
+
+Finally to begin compiling, use Terminal to navigate to where you have the MAME
 source tree (*cd* command) and follow the normal compilation instructions from
 above in All Platforms.
 
@@ -405,15 +421,6 @@ and the **python3-pip/python-pip** packages:
     sudo apt-get install python3-sphinx python3-pip
     pip3 install sphinxcontrib-svg2pdfconverter
 
-or
-
-.. code-block:: bash
-
-    sudo apt-get install python-sphinx python-pip
-    pip install sphinxcontrib-svg2pdfconverter
-
-depending on whether you’re using Python 3 or Python 2.
-
 On Debian, you’ll need to install the **librsvg2-bin** package:
 
 .. code-block:: bash
@@ -480,7 +487,7 @@ OVERRIDE_LD
    or C++ compiler command is used to invoke the linker.  (This sets the target
    linker command when cross-compiling.)
 PYTHON_EXECUTABLE
-   Set the Python interpreter command.  You need Python 2.7 or Python 3 to build
+   Set the Python interpreter command.  You need Python 3.2 or later to build
    MAME.
 CROSS_BUILD
    Set to **1** to use separate host and target compilers and linkers, as

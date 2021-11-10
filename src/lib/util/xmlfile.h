@@ -223,7 +223,7 @@ public:
 	static ptr create();
 
 	// parse an XML file into its nodes
-	static ptr read(util::core_file &file, parse_options const *opts);
+	static ptr read(read_stream &file, parse_options const *opts);
 
 	// parse an XML string into its nodes
 	static ptr string_read(const char *string, parse_options const *opts);

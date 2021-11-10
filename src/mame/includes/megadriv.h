@@ -73,7 +73,6 @@ struct genesis_z80_vars
 	genesis_z80_vars m_genz80;
 	int m_version_hi_nibble;
 
-	void init_megadriv_c2();
 	void init_megadrie();
 	void init_megadriv();
 	void init_megadrij();

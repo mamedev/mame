@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "emupal.h"
@@ -36,6 +37,7 @@ public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_ppi(*this, "ppi"),
 		m_speaker(*this, "speaker"),
 		m_spectrum_video_ram(*this, "spectrum_vram")
 	{ }
@@ -48,6 +50,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<i8255_device> m_ppi;
 	required_device<speaker_sound_device> m_speaker;
 
 	required_shared_ptr<uint8_t> m_spectrum_video_ram;
@@ -272,12 +275,12 @@ void photon2_state::spectrum_mem(address_map &map)
 void photon2_state::spectrum_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x1f, 0x1f).portr("JOY");
-	map(0x5b, 0x5b).portr("COIN").w(FUNC(photon2_state::misc_w));
-	map(0x7a, 0x7a).w(FUNC(photon2_state::membank_w));
-	map(0x7b, 0x7b).nopw(); // unknown write
-	map(0x7e, 0x7e).w(FUNC(photon2_state::membank_w));
-	map(0xfe, 0xfe).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
+	map(0x00, 0x00).mirror(0x7e).w(FUNC(photon2_state::membank_w));
+	map(0x01, 0x01).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(0); }), NAME([this](u8 data) { m_ppi->write(0, data); }));
+	map(0x21, 0x21).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(1); }), NAME([this](u8 data) { m_ppi->write(1, data); }));
+	map(0x41, 0x41).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(2); }), NAME([this](u8 data) { m_ppi->write(2, data); }));
+	map(0x61, 0x61).mirror(0x1e).lrw8(NAME([this]() { return m_ppi->read(3); }), NAME([this](u8 data) { m_ppi->write(3, data); }));
+	map(0x80, 0x80).mirror(0x7e).rw(FUNC(photon2_state::fe_r), FUNC(photon2_state::fe_w));
 }
 
 /*************************************
@@ -362,7 +365,13 @@ void photon2_state::photon2(machine_config &config)
 	Z80(config, m_maincpu, 3500000);        /* 3.5 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &photon2_state::spectrum_mem);
 	m_maincpu->set_addrmap(AS_IO, &photon2_state::spectrum_io);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(photon2_state::spec_interrupt_hack), "screen", 0, 1);
+
+	I8255(config, m_ppi, 0);
+	m_ppi->in_pa_callback().set_ioport("JOY");
+	m_ppi->in_pc_callback().set_ioport("COIN");
+	m_ppi->out_pc_callback().set(FUNC(photon2_state::misc_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -417,4 +426,4 @@ ROM_END
 
 GAME( 19??,  kok,   0,      photon2, photon2, photon2_state, empty_init, ROT0, "bootleg", "Povar / Sobrat' Buran / Agroprom (Arcade multi-game bootleg of ZX Spectrum 'Cookie', 'Jetpac' & 'Pssst')", MACHINE_SUPPORTS_SAVE ) // originals (c)1983 ACG / Ultimate
 GAME( 19??,  black, 0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Czernyj Korabl (Arcade bootleg of ZX Spectrum 'Blackbeard')",                                              MACHINE_SUPPORTS_SAVE ) // original (c)1988 Toposoft
-GAME( 19??,  brod,  0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software
+GAME( 19??,  brod,  0,      photon2, black,   photon2_state, empty_init, ROT0, "bootleg", "Brodjaga (Arcade bootleg of ZX Spectrum 'Inspector Gadget and the Circus of Fear')",                       MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE ) // original (c)1987 BEAM software

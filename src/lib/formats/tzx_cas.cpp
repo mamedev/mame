@@ -30,7 +30,6 @@ TODO:
 #include "tzx_cas.h"
 #include "imageutl.h"
 
-#include <cassert>
 #include <cmath>
 
 

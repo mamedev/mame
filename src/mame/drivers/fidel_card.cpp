@@ -584,7 +584,7 @@ void card_state::brc_base(machine_config &config)
 	m_mcu->t0_in_cb().set(FUNC(card_state::mcu_t0_r));
 
 	// MCU T1 tied to master clock / 4
-	CLOCK(config, "t1_clock", 5_MHz_XTAL/4).signal_handler().set_nop();
+	CLOCK(config, "t1_clock", 5_MHz_XTAL/4);
 	m_mcu->t1_in_cb().set("t1_clock", FUNC(clock_device::signal_r)).invert();
 
 	I8243(config, m_i8243);

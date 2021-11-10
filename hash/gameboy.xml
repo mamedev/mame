@@ -7960,7 +7960,7 @@ license:CC0
 	</software>
 
 	<software name="gbskjtatie">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, Alt)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Kanji no Tatsujin (Japan, alt)</description>
 		<year>2003</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BQ2J-JPN?" />
@@ -7999,7 +7999,7 @@ license:CC0
 	</software>
 
 	<software name="gbskstatie">
-		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Keisan no Tatsujin (Japan, Alt)</description>
+		<description>Goukaku Boy GOLD - Shikakui Atama o Maruku Suru - Keisan no Tatsujin (Japan, alt)</description>
 		<year>2003</year>
 		<publisher>IE Institute</publisher>
 		<info name="serial" value="DMG-BC6J-JPN?" />
@@ -20202,6 +20202,18 @@ license:CC0
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="dmg-ag7j-0.u1" size="262144" crc="0d4c02a7" sha1="0d12280e689eb320df06ceb469c629d93860dc2e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sarakon">
+		<description>Sarakon (prototype)</description>
+		<year>1992</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc1" />
+			<dataarea name="rom" size="131072">
+				<rom name="sarakon (prototype).bin" size="131072" crc="c8c5f76f" sha1="09c0795e45b84e9d8d017d7d38f4806422d6ea23" />
 			</dataarea>
 		</part>
 	</software>

@@ -1885,7 +1885,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			if(cur_live.crc) {
 				fi.st0 |= ST0_FAIL;
 				st1 |= ST1_DE;
-				st2 |= ST2_CM;
+				st2 |= ST2_DD;
 				fi.sub_state = COMMAND_DONE;
 				break;
 			}
@@ -2213,7 +2213,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			else
 				st1 &= ~ST1_ND;
 
-			sector_size = calc_sector_size(cur_live.idbuf[3]);
+			sector_size = calc_sector_size(command[5]);
 			fifo_expect(sector_size, false);
 			fi.sub_state = SECTOR_READ;
 			LOGSTATE("SEARCH_ADDRESS_MARK_DATA\n");
@@ -2236,7 +2236,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			}
 			if(cur_live.crc) {
 				st1 |= ST1_DE;
-				st2 |= ST2_CM;
+				st2 |= ST2_DD;
 			}
 			bool done = tc_done;
 			sectors_read++;

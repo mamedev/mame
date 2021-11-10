@@ -135,6 +135,10 @@ void stvcd_device::io_regs(address_map &map)
 	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(stvcd_device::cr2_r), FUNC(stvcd_device::cr2_w)).umask32(0xffffffff);
 	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(stvcd_device::cr3_r), FUNC(stvcd_device::cr3_w)).umask32(0xffffffff);
 	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
+
+	// NetLink access
+	// dragndrm expects this value, most likely for status
+	map(0x8502a, 0x8502a).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 
 u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)
@@ -221,14 +225,14 @@ inline u32 stvcd_device::dataxfer_long_r()
 					transpart->size -= xferdnum;
 					transpart->numblks -= xfersectnum;
 
-					/* TODO: is this correct? */
+					// TODO: is this correct?
 					xfertype32 = XFERTYPE32_INVALID;
 				}
 			}
 			break;
 
 		default:
-			osd_printf_error("CD: unhandled 32-bit transfer type\n");
+			osd_printf_error("CD: unhandled 32-bit transfer type %d\n", (int)xfertype32);
 			break;
 	}
 
@@ -269,7 +273,7 @@ inline void stvcd_device::dataxfer_long_w(u32 data)
 			break;
 
 		default:
-			printf("CD: unhandled 32-bit transfer type write\n");
+			printf("CD: unhandled 32-bit transfer type write %d\n", (int)xfertype32);
 			break;
 	}
 }
@@ -462,7 +466,9 @@ void stvcd_device::stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
  */
 int stvcd_device::get_timing_command(void)
 {
-	/* TODO: calculate timings based off command params */
+	// TODO: calculate timings based off command params
+	// given the CMOK returns it looks like SH2 expects way slower responses
+	// (loops for 0x7xx times at most, max number of iterations is 0x240000)
 	return 16667;
 }
 
@@ -769,7 +775,7 @@ void stvcd_device::cmd_play_disc()
 			}
 			else
 			{
-				/* TODO: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now. */
+				// FIXME: Waku Waku 7 sets up track 0, that basically doesn't make any sense. Just skip it for now.
 				popmessage("Warning: track mode == 0, contact MAMEdev");
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK);
@@ -814,9 +820,12 @@ void stvcd_device::cmd_play_disc()
 		else
 		{
 			/* resume from a pause state */
-			/* TODO: Galaxy Fight calls 10ff ffff ffff ffff, but then it calls 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
-			   (and current implementation nukes start/end FAD addresses at 0x04). I'm sure that this doesn't work like this, but there could
-			   be countless possible combinations ... */
+			// FIXME: verify implementation with Galaxy Fight
+			// it calls 10ff ffff ffff ffff, but then it follows up with
+			// 0x04->0x02->0x06->0x11->0x04->0x02->0x06 command sequence
+			// (and current implementation nukes start/end FAD addresses at 0x04).
+			// I'm sure that this doesn't work like this, but there could
+			// be countless possible combinations ...
 			if(fadstoplay == 0)
 			{
 				cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
@@ -1130,7 +1139,8 @@ void stvcd_device::cmd_get_filter_mode()
 void stvcd_device::cmd_set_filter_connection()
 {
 	// Set Filter Connection
-	/* TODO: maybe condition false is cr3 low? */
+	// FIXME: verify usage of cr3 LSB
+	// (false condition?)
 	uint8_t fnum = (cr3>>8)&0xff;
 
 	LOG("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
@@ -1181,7 +1191,7 @@ void stvcd_device::cmd_reset_selector()
 	}
 
 	/* reset false filter output conditions */
-	/* TODO: check these two. */
+	/// TODO: verify default value for these two
 	if(cr1 & 0x80)
 	{
 		for(i=0;i<MAX_FILTERS;i++)
@@ -1396,8 +1406,9 @@ void stvcd_device::cmd_get_sector_data()
 
 	if (bufnum >= MAX_FILTERS)
 	{
+		// TODO: find actual SW that does this
+		// (may conceal a bigger issue)
 		osd_printf_error("CD: invalid buffer number\n");
-		/* TODO: why this is happening? */
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
@@ -1439,14 +1450,15 @@ void stvcd_device::cmd_delete_sector_data()
 
 	if (bufnum >= MAX_FILTERS)
 	{
+		// TODO: mustn't happen
 		osd_printf_error("CD: invalid buffer number\n");
-		/* TODO: why this is happening? */
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
 	}
 
-	/* TODO: Phantasy Star 2 throws this one. */
+	// pstarcol PS2 does this
+	// TODO: verify if implementation is correct
 	if (partitions[bufnum].numblks == 0)
 	{
 		osd_printf_error("CD: buffer is already empty\n");
@@ -1459,10 +1471,15 @@ void stvcd_device::cmd_delete_sector_data()
 
 	for (i = sectofs; i < (sectofs + sectnum); i++)
 	{
-		partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
-		cd_free_block(partitions[bufnum].blocks[i]);
-		partitions[bufnum].blocks[i] = (blockT *)nullptr;
-		partitions[bufnum].bnum[i] = 0xff;
+		// pstarcol PS2 tries to delete partial partitions,
+		// need to guard against it (otherwise it would crash after first attract cycle)
+		if (partitions[bufnum].size > 0)
+		{
+			partitions[bufnum].size -= partitions[bufnum].blocks[i]->size;
+			cd_free_block(partitions[bufnum].blocks[i]);
+			partitions[bufnum].blocks[i] = (blockT *)nullptr;
+			partitions[bufnum].bnum[i] = 0xff;
+		}
 	}
 
 	cd_defragblocks(&partitions[bufnum]);
@@ -1492,14 +1509,15 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 
 	if (bufnum >= MAX_FILTERS)
 	{
+		// TODO: mustn't happen
 		osd_printf_error("CD: invalid buffer number\n");
-		/* TODO: why this is happening? */
 		cr_standard_return(CD_STAT_REJECT);
 		hirqreg |= (CMOK|EHST);
 		return;
 	}
 
 	/* Yoshimoto Mahjong uses the REJECT status to verify when the data is ready. */
+	// TODO: verify again if it's really REJECT or something else
 	if (partitions[bufnum].numblks < sectnum)
 	{
 		osd_printf_error("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
@@ -1708,7 +1726,11 @@ void stvcd_device::cmd_get_target_file_info()
 		cr3 = 0;
 		cr4 = 0;
 
-		printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
+		// TODO: chaossd and sengblad does this
+		// (iso9660 parsing doesn't read beyond the first sector)
+		if (curdir[temp].firstfad == 0 || curdir[temp].length == 0)
+			throw emu_fatalerror("File ID not found in XFERTYPE_FILEINFO_1");
+//      printf("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
 		// first 4 bytes = FAD
 		finfbuf[0] = (curdir[temp].firstfad>>24)&0xff;
 		finfbuf[1] = (curdir[temp].firstfad>>16)&0xff;
@@ -1723,6 +1745,7 @@ void stvcd_device::cmd_get_target_file_info()
 		finfbuf[9] = curdir[temp].file_unit_size;
 		finfbuf[10] = temp;
 		finfbuf[11] = curdir[temp].flags;
+
 
 		xfertype = XFERTYPE_FILEINFO_1;
 		xfercount = 0;
@@ -1988,8 +2011,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 	else
 		m_sector_timer->adjust(attotime::from_hz(75*cd_speed));   // 75 / 150 sectors / second = 150 / 300kBytes/second
 
-	/* TODO: doesn't boot if a disk isn't in? */
-	/* TODO: Check out when this really happens. (Daytona USA original version definitely wants it to be on).*/
+	// TODO: Saturn refuses to boot with this if a disk isn't in and condition is applied!?
+	// TODO: Check out actual timing of SCDQ acquisition.
+	// (Daytona USA original version definitely wants it to be on).
 	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 	hirqreg |= SCDQ;
 

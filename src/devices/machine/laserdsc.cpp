@@ -10,11 +10,11 @@
 
 #include "emu.h"
 #include "laserdsc.h"
-#include "avhuff.h"
-#include "vbiparse.h"
+
 #include "config.h"
 #include "render.h"
 #include "romload.h"
+
 #include "chd.h"
 
 
@@ -73,7 +73,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_height(0),
 		m_fps_times_1million(0),
 		m_samplerate(0),
-		m_readresult(CHDERR_NONE),
+		m_readresult(),
 		m_chdtracks(0),
 		m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO)),
 		m_audiosquelch(0),
@@ -661,8 +661,9 @@ void laserdisc_device::init_disc()
 
 		// read the metadata
 		std::string metadata;
-		chd_error err = m_disc->read_metadata(AV_METADATA_TAG, 0, metadata);
-		if (err != CHDERR_NONE)
+		std::error_condition err;
+		err = m_disc->read_metadata(AV_METADATA_TAG, 0, metadata);
+		if (err)
 			throw emu_fatalerror("Non-A/V CHD file specified");
 
 		// extract the metadata
@@ -682,7 +683,7 @@ void laserdisc_device::init_disc()
 
 		// allocate memory for the precomputed per-frame metadata
 		err = m_disc->read_metadata(AV_LD_METADATA_TAG, 0, m_vbidata);
-		if (err != CHDERR_NONE || m_vbidata.size() != totalhunks * VBI_PACKED_BYTES)
+		if (err || (m_vbidata.size() != totalhunks * VBI_PACKED_BYTES))
 			throw emu_fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}
 	m_maxtrack = std::max(m_maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + m_chdtracks);
@@ -959,14 +960,14 @@ void laserdisc_device::read_track_data()
 	}
 
 	// configure the codec and then read
-	m_readresult = CHDERR_FILE_NOT_FOUND;
-	if (m_disc != nullptr && !m_videosquelch)
+	m_readresult = std::errc::no_such_file_or_directory;
+	if (m_disc && !m_videosquelch)
 	{
 		m_readresult = m_disc->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &m_avhuff_config);
-		if (m_readresult == CHDERR_NONE)
+		if (!m_readresult)
 		{
 			m_queued_hunknum = readhunk;
-			m_readresult = CHDERR_OPERATION_PENDING;
+			m_readresult = chd_file::error::OPERATION_PENDING;
 			osd_work_item_queue(m_work_queue, read_async_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
 		}
 	}
@@ -994,12 +995,12 @@ void *laserdisc_device::read_async_static(void *param, int threadid)
 void laserdisc_device::process_track_data()
 {
 	// wait for the async operation to complete
-	if (m_readresult == CHDERR_OPERATION_PENDING)
+	if (m_readresult == chd_file::error::OPERATION_PENDING)
 		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
-	assert(m_readresult != CHDERR_OPERATION_PENDING);
+	assert(m_readresult != chd_file::error::OPERATION_PENDING);
 
 	// remove the video if we had an error
-	if (m_readresult != CHDERR_NONE)
+	if (m_readresult)
 		m_avhuff_video.reset();
 
 	// count the field as read if we are successful

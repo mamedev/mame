@@ -17,11 +17,14 @@
 #ifndef MAME_EMU_IOPORT_H
 #define MAME_EMU_IOPORT_H
 
+#include "ioprocs.h"
+
 #include <array>
 #include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <list>
+#include <memory>
 #include <vector>
 
 
@@ -355,13 +358,13 @@ enum ioport_type
 		IPT_UI_CLEAR,
 		IPT_UI_ZOOM_IN,
 		IPT_UI_ZOOM_OUT,
+		IPT_UI_ZOOM_DEFAULT,
 		IPT_UI_PREV_GROUP,
 		IPT_UI_NEXT_GROUP,
 		IPT_UI_ROTATE,
 		IPT_UI_SHOW_PROFILER,
 		IPT_UI_TOGGLE_UI,
 		IPT_UI_RELEASE_POINTER,
-		IPT_UI_TOGGLE_DEBUG,
 		IPT_UI_PASTE,
 		IPT_UI_SAVE_STATE,
 		IPT_UI_LOAD_STATE,
@@ -370,8 +373,7 @@ enum ioport_type
 		IPT_UI_DATS,
 		IPT_UI_FAVORITES,
 		IPT_UI_EXPORT,
-		IPT_UI_AUDIT_FAST,
-		IPT_UI_AUDIT_ALL,
+		IPT_UI_AUDIT,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -1448,8 +1450,10 @@ private:
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (nullptr if not recording)
-	emu_file                m_playback_file;        // playback file (nullptr if not recording)
+	emu_file                m_record_file;          // recording file (closed if not recording)
+	emu_file                m_playback_file;        // playback file (closed if not recording)
+	util::write_stream::ptr m_record_stream;        // recording stream (nullptr if not recording)
+	util::read_stream::ptr  m_playback_stream;      // playback stream (nullptr if not recording)
 	u64                     m_playback_accumulated_speed; // accumulated speed during playback
 	u32                     m_playback_accumulated_frames; // accumulated frames during playback
 	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
@@ -1457,7 +1461,7 @@ private:
 	attotime                m_timecode_last_time;
 
 	// storage for inactive configuration
-	util::xml::file *       m_deselected_card_config; // using smart pointer would pull xmlfile.h into emu.h
+	std::unique_ptr<util::xml::file> m_deselected_card_config;
 };
 
 

@@ -52,34 +52,34 @@ void memory_array::set(void *base, u32 bytes, int membits, endianness_t endianne
 	m_bytes_per_entry = bpe;
 
 	// derive data
-	switch (bpe*1000 + membits*10 + endianness)
+	switch (bpe*1000 + membits*10 + (endianness == ENDIANNESS_LITTLE ? 0 : 1))
 	{
-		case 1*1000 + 8*10 + ENDIANNESS_LITTLE:     m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
-		case 1*1000 + 8*10 + ENDIANNESS_BIG:        m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
-		case 1*1000 + 16*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read8_from_16le;    m_write_entry = &memory_array::write8_to_16le;     break;
-		case 1*1000 + 16*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read8_from_16be;    m_write_entry = &memory_array::write8_to_16be;     break;
-		case 1*1000 + 32*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read8_from_32le;    m_write_entry = &memory_array::write8_to_32le;     break;
-		case 1*1000 + 32*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read8_from_32be;    m_write_entry = &memory_array::write8_to_32be;     break;
-		case 1*1000 + 64*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read8_from_64le;    m_write_entry = &memory_array::write8_to_64le;     break;
-		case 1*1000 + 64*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read8_from_64be;    m_write_entry = &memory_array::write8_to_64be;     break;
+		case 1*1000 + 8*10 + 0:     m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
+		case 1*1000 + 8*10 + 1:     m_read_entry = &memory_array::read8_from_8;       m_write_entry = &memory_array::write8_to_8;        break;
+		case 1*1000 + 16*10 + 0:    m_read_entry = &memory_array::read8_from_16le;    m_write_entry = &memory_array::write8_to_16le;     break;
+		case 1*1000 + 16*10 + 1:    m_read_entry = &memory_array::read8_from_16be;    m_write_entry = &memory_array::write8_to_16be;     break;
+		case 1*1000 + 32*10 + 0:    m_read_entry = &memory_array::read8_from_32le;    m_write_entry = &memory_array::write8_to_32le;     break;
+		case 1*1000 + 32*10 + 1:    m_read_entry = &memory_array::read8_from_32be;    m_write_entry = &memory_array::write8_to_32be;     break;
+		case 1*1000 + 64*10 + 0:    m_read_entry = &memory_array::read8_from_64le;    m_write_entry = &memory_array::write8_to_64le;     break;
+		case 1*1000 + 64*10 + 1:    m_read_entry = &memory_array::read8_from_64be;    m_write_entry = &memory_array::write8_to_64be;     break;
 
-		case 2*1000 + 8*10 + ENDIANNESS_LITTLE:     m_read_entry = &memory_array::read16_from_8le;    m_write_entry = &memory_array::write16_to_8le;     break;
-		case 2*1000 + 8*10 + ENDIANNESS_BIG:        m_read_entry = &memory_array::read16_from_8be;    m_write_entry = &memory_array::write16_to_8be;     break;
-		case 2*1000 + 16*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read16_from_16;     m_write_entry = &memory_array::write16_to_16;      break;
-		case 2*1000 + 16*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read16_from_16;     m_write_entry = &memory_array::write16_to_16;      break;
-		case 2*1000 + 32*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read16_from_32le;   m_write_entry = &memory_array::write16_to_32le;    break;
-		case 2*1000 + 32*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read16_from_32be;   m_write_entry = &memory_array::write16_to_32be;    break;
-		case 2*1000 + 64*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read16_from_64le;   m_write_entry = &memory_array::write16_to_64le;    break;
-		case 2*1000 + 64*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read16_from_64be;   m_write_entry = &memory_array::write16_to_64be;    break;
+		case 2*1000 + 8*10 + 0:     m_read_entry = &memory_array::read16_from_8le;    m_write_entry = &memory_array::write16_to_8le;     break;
+		case 2*1000 + 8*10 + 1:     m_read_entry = &memory_array::read16_from_8be;    m_write_entry = &memory_array::write16_to_8be;     break;
+		case 2*1000 + 16*10 + 0:    m_read_entry = &memory_array::read16_from_16;     m_write_entry = &memory_array::write16_to_16;      break;
+		case 2*1000 + 16*10 + 1:    m_read_entry = &memory_array::read16_from_16;     m_write_entry = &memory_array::write16_to_16;      break;
+		case 2*1000 + 32*10 + 0:    m_read_entry = &memory_array::read16_from_32le;   m_write_entry = &memory_array::write16_to_32le;    break;
+		case 2*1000 + 32*10 + 1:    m_read_entry = &memory_array::read16_from_32be;   m_write_entry = &memory_array::write16_to_32be;    break;
+		case 2*1000 + 64*10 + 0:    m_read_entry = &memory_array::read16_from_64le;   m_write_entry = &memory_array::write16_to_64le;    break;
+		case 2*1000 + 64*10 + 1:    m_read_entry = &memory_array::read16_from_64be;   m_write_entry = &memory_array::write16_to_64be;    break;
 
-		case 4*1000 + 8*10 + ENDIANNESS_LITTLE:     m_read_entry = &memory_array::read32_from_8le;    m_write_entry = &memory_array::write32_to_8le;     break;
-		case 4*1000 + 8*10 + ENDIANNESS_BIG:        m_read_entry = &memory_array::read32_from_8be;    m_write_entry = &memory_array::write32_to_8be;     break;
-		case 4*1000 + 16*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read32_from_16le;   m_write_entry = &memory_array::write32_to_16le;    break;
-		case 4*1000 + 16*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read32_from_16be;   m_write_entry = &memory_array::write32_to_16be;    break;
-		case 4*1000 + 32*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read32_from_32;     m_write_entry = &memory_array::write32_to_32;      break;
-		case 4*1000 + 32*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read32_from_32;     m_write_entry = &memory_array::write32_to_32;      break;
-		case 4*1000 + 64*10 + ENDIANNESS_LITTLE:    m_read_entry = &memory_array::read32_from_64le;   m_write_entry = &memory_array::write32_to_64le;    break;
-		case 4*1000 + 64*10 + ENDIANNESS_BIG:       m_read_entry = &memory_array::read32_from_64be;   m_write_entry = &memory_array::write32_to_64be;    break;
+		case 4*1000 + 8*10 + 0:     m_read_entry = &memory_array::read32_from_8le;    m_write_entry = &memory_array::write32_to_8le;     break;
+		case 4*1000 + 8*10 + 1:     m_read_entry = &memory_array::read32_from_8be;    m_write_entry = &memory_array::write32_to_8be;     break;
+		case 4*1000 + 16*10 + 0:    m_read_entry = &memory_array::read32_from_16le;   m_write_entry = &memory_array::write32_to_16le;    break;
+		case 4*1000 + 16*10 + 1:    m_read_entry = &memory_array::read32_from_16be;   m_write_entry = &memory_array::write32_to_16be;    break;
+		case 4*1000 + 32*10 + 0:    m_read_entry = &memory_array::read32_from_32;     m_write_entry = &memory_array::write32_to_32;      break;
+		case 4*1000 + 32*10 + 1:    m_read_entry = &memory_array::read32_from_32;     m_write_entry = &memory_array::write32_to_32;      break;
+		case 4*1000 + 64*10 + 0:    m_read_entry = &memory_array::read32_from_64le;   m_write_entry = &memory_array::write32_to_64le;    break;
+		case 4*1000 + 64*10 + 1:    m_read_entry = &memory_array::read32_from_64be;   m_write_entry = &memory_array::write32_to_64be;    break;
 
 		default:    throw emu_fatalerror("Illegal memory bits/bus width combo in memory_array");
 	}

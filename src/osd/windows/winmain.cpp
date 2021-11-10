@@ -22,6 +22,7 @@
 
 // standard C headers
 #include <cctype>
+#include <clocale>
 #include <cstdarg>
 #include <cstdio>
 
@@ -286,6 +287,7 @@ const options_entry windows_options::s_option_entries[] =
 
 int main(int argc, char *argv[])
 {
+	std::setlocale(LC_ALL, "");
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
 
 	// use small output buffers on non-TTYs (i.e. pipes)

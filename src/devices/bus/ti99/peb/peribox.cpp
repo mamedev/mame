@@ -211,22 +211,22 @@ CRUCLK*  51||52  DBIN
 // Peripheral box that is attached to the TI console (also TI with EVPC)
 // and has the Flex Cable Interface in slot 1
 // This is a device that plugs into the slot "ioport" of the console
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device,      "peribox",      "Peripheral expansion box")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX,      bus::ti99::peb::peribox_device,      "peribox",      "Peripheral expansion box")
 
 // Peripheral box which has a EVPC card in slot 2 (for use with the ti99_4ev)
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_EV,   bus::ti99::peb, peribox_ev_device,   "peribox_ev",   "Peripheral expansion box with EVPC")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_EV,   bus::ti99::peb::peribox_ev_device,   "peribox_ev",   "Peripheral expansion box with EVPC")
 
 // Peripheral box which hosts the SGCPU card in slot 1
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_SG,   bus::ti99::peb, peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_SG,   bus::ti99::peb::peribox_sg_device,   "peribox_sg",   "Peripheral expansion box SGCPU")
 
 // Peripheral box which hosts the Geneve 9640 in slot 1
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device,  "peribox_gen",  "Peripheral expansion box Geneve")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_GEN,  bus::ti99::peb::peribox_gen_device,  "peribox_gen",  "Peripheral expansion box Geneve")
 
 // Peripheral box which hosts the Geneve 9640 in slot 1 with Genmod
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_GENMOD,  bus::ti99::peb, peribox_genmod_device,  "peribox_genmod",  "Peripheral expansion box Genmod")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_GENMOD,  bus::ti99::peb::peribox_genmod_device,  "peribox_genmod",  "Peripheral expansion box Genmod")
 
 // Single slot of the PEB
-DEFINE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device, "peribox_slot", "TI P-Box slot")
+DEFINE_DEVICE_TYPE(TI99_PERIBOX_SLOT, bus::ti99::peb::peribox_slot_device, "peribox_slot", "TI P-Box slot")
 
 namespace bus::ti99::peb {
 

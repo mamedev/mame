@@ -4,6 +4,80 @@
 
     MIT TX-0 disassembler
 
+    Mnemonics and relative timing of operate class micro-instructions
+    until mid-1960 (as given in M-5001-27):
+
+    0.8 | 700000 (CLL) Clear left 9 bits of AC
+    0.8 | 640000 (CLR) Clear right 9 bits of AC
+    ----+--------------------------------------------------------
+    IOS | 610000 (EX0) Operate external equipment 0
+    IOS | 611000 (EX1) Operate external equipment 1
+    IOS | 612000 (EX2) Operate external equipment 2
+    IOS | 613000 (EX3) Operate external equipment 3
+    IOS | 614000 (EX4) Operate external equipment 4
+    IOS | 615000 (EX5) Operate external equipment 5
+    IOS | 616000 (EX6) Operate external equipment 6
+    IOS | 617000 (EX7) Operate external equipment 7
+    IOS | 621000 (R1L) Read one line of tape from PETR into AC
+    IOS | 622000 (DIS) Display point on scope (coordinates in AC)
+    IOS | 623000 (R3L) Read three lines of tape from PETR into AC
+    IOS | 624000 (PRT) Print character on Flexowriter
+    IOS | 626000 (P6H) Punch six holes (as specified by AC)
+    IOS | 627000 (P7H) Punch seven holes (as specified by AC)
+    ----+--------------------------------------------------------
+    1.1 |              Clear MBR
+    1.1 | 600100 (PEN) Set AC bits 0 and 1 from LP0 and LP1
+    1.1 | 600004 (TAC) Transfer (inclusive or) TAC to AC
+    1.2 | 600001 (AMB) Transfer AC to MBR (executed before COM)
+    1.2 | 600040 (COM) Complement AC
+    1.2 | 600003 (TBR) Transfer (inclusive or) TBR to MBR
+    1.3 | 600200 (MLR) Transfer MBR to LR
+    1.3 | 600002 (LMB) Transfer LR to MBR
+    1.3 | 600104 (ORL) Inclusive or MBR into LR
+    1.3 | 600304 (ANL) And MBR into LR
+    1.4 | 600020 (PAD) Partial add (exclusive or) MBR to AC
+    1.4 | 600400 (SHR) Shift AC right once
+    1.4 | 600600 (CYR) Cycle AC right once
+    1.7 | 600010 (CRY) Add carry digits to AC (according to MBR)
+    1.8 | 603000 (HLT) Halt computer
+
+    ANL and ORL were added in the first half of 1959 (M-5001-6).
+
+    Mnemonics and relative timing of operate class micro-instructions
+    after 1960 (as given in M-5001-27-3 and M-5001-27-4):
+
+    0.6 | 631000 (CLL) Clear left 9 bits of AC
+    0.6 | 632000 (CLR) Clear right 9 bits of AC
+    0.7 | 640000 (AMB) Transfer AC to MBR
+    0.8 | 700000 (CLA) Clear AC
+    ----+------------------------------------------------------------
+    **  | 604000 (SEL) Select magnetic tape device
+        | 6x4x00       Backspace tape
+        | 6x4x04       Read select tape
+        | 6x4x10       Rewind tape
+        | 6x4x14       Write select tape
+    **  | 620000 (CPY) Synchronize with copy (transfer to or from LR)
+    ----+------------------------------------------------------------
+    1.1 | 601000 (TAC) Transfer (inclusive or) TAC to AC
+    1.1 | 603000 (PEN) Set AC bits 0 and 1 from LP0 and LP1
+    1.2 | 600100 (XMB) Transfer XR to MBR (with sign extension)
+    1.2 | 600040 (COM) Complement AC
+    1.2 | 602000 (TBR) Transfer (inclusive or) TBR to MBR
+    1.2 | 606000 (RPF) Read (inclusive or) PFR into MBR
+    1.3 | 600005 (ORB) Inclusive or LR into MBR
+    1.3 | 600007 (ANB) And LR into MBR
+    1.4 | 600200 (MBL) Transfer MBR to LR
+    1.4 | 600002 (LMB) Transfer LR to MBR
+    1.5 | 600020 (PAD) Partial add (exclusive or) MBR to AC
+    1.6 | 600400 (SHR) Shift AC right once
+    1.6 | 600600 (CYR) Cycle AC right once
+    1.6 | 607000 (SPF) Set PFR from MBR
+    1.7 | 600010 (CRY) Add carry digits to AC (according to MBR)
+    1.8 | 600001 (MBX) Transfer MBR to XR
+    1.8 | 603000 (HLT) Halt computer
+
+    Previously supported Input-Output Stop group codes were unchanged.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -45,7 +119,15 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		// Addressable instructions (only 3 in this version)
 		util::stream_format(stream, "%s %06o", s_addressable_insts[(inst & 0600000) >> 13], inst & 0177777);
 	}
-	else switch (inst)
+	else
+		dasm_opr(stream, inst);
+
+	return 1 | SUPPORTED;
+}
+
+void tx0_64kw_disassembler::dasm_opr(std::ostream &stream, u32 inst)
+{
+switch (inst)
 	{
 	case 0600012:
 		stream << "cry";
@@ -171,6 +253,10 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 		stream << "clc";
 		break;
 
+	case 0740062:
+		stream << "lcc";
+		break;
+
 	case 0740200:
 		stream << "cal";
 		break;
@@ -200,6 +286,46 @@ offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 			util::stream_format(stream, "ios %o", inst & 017777);
 		else
 			util::stream_format(stream, "opr %o", inst & 0177777);
+		break;
+	}
+}
+
+offs_t tx0_8kwo_disassembler::disassemble(std::ostream &stream, offs_t pc, const tx0_8kwo_disassembler::data_buffer &opcodes, const tx0_8kwo_disassembler::data_buffer &params)
+{
+	u32 inst = opcodes.r32(pc) & 0777777;
+
+	if (inst < 0600000)
+	{
+		// Addressable instructions (only 6 in this version)
+		if ((inst & 060000) != 0)
+			util::stream_format(stream, "%06o", inst);
+		else
+			util::stream_format(stream, "%s %05o", s_addressable_insts[(inst & 0700000) >> 13], inst & 017777);
+	}
+	else switch (inst)
+	{
+	case 0600105:
+		stream << "orl";
+		break;
+
+	case 0600125:
+		stream << "ora";
+		break;
+
+	case 0600305:
+		stream << "anl";
+		break;
+
+	case 0600325:
+		stream << "ana";
+		break;
+
+	case 0610000: case 0611000: case 0612000: case 0613000: case 0614000: case 0615000: case 0616000: case 0617000:
+		util::stream_format(stream, "ex%d", BIT(inst, 9, 3));
+		break;
+
+	default:
+		dasm_opr(stream, inst);
 		break;
 	}
 
@@ -235,10 +361,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	}
 	else
 	{
-		if ((inst & 037000) == 02000)
+		if ((inst & 0137020) == 0102020)
 		{
 			stream << "tbr";
-			if ((inst & 0100757) == 0)
+			if ((inst & 000757) == 0)
 				return 1 | SUPPORTED;
 			stream << 'U';
 		}
@@ -568,6 +694,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "alo";
 			break;
 
+		case 040227:
+			stream << "anl 20"; // no consistent mnemonic used in program macros
+			break;
+
 		case 040230:
 			stream << "all";
 			break;
@@ -586,6 +716,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 040247:
 			stream << "anlUcom";
+			break;
+
+		case 040250:
+			stream << "alrUamz";
 			break;
 
 		case 040260:
@@ -620,6 +754,10 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			stream << "clc";
 			break;
 
+		case 0100041:
+			stream << "clcUxro";
+			break;
+
 		case 0100062:
 			stream << "lcc";
 			break;
@@ -642,6 +780,18 @@ offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 		case 0100200:
 			stream << "cal";
+			break;
+
+		case 0100201:
+			stream << "calUxro";
+			break;
+
+		case 0100212:
+			stream << "lalUlro";
+			break;
+
+		case 0100222:
+			stream << "lacUlro";
 			break;
 
 		case 0100240:

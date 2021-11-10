@@ -13,7 +13,6 @@
 #include "emu.h"
 #include "audio/gottlieb.h"
 
-#include "sound/dac.h"
 #include "machine/input_merger.h"
 
 
@@ -68,13 +67,13 @@ uint8_t gottlieb_sound_r0_device::r6530b_r()
 //  write - handle an external command write
 //-------------------------------------------------
 
-void gottlieb_sound_r0_device::write(offs_t offset, uint8_t data)
+void gottlieb_sound_r0_device::write(uint8_t data)
 {
 	// write the command data to the low 4 bits
-	uint8_t pb0_3 = data ^ 15;
+	uint8_t pb0_3 = data ^ 15; // U7
 	uint8_t pb4_7 = ioport("SB0")->read() & 0x90;
 	m_sndcmd = pb0_3 | pb4_7;
-	m_r6530->write(offset, m_sndcmd);
+	m_r6530->write(2, m_sndcmd);    // push to portB, but doesn't seem to be needed
 }
 
 
@@ -85,8 +84,9 @@ void gottlieb_sound_r0_device::write(offs_t offset, uint8_t data)
 void gottlieb_sound_r0_device::gottlieb_sound_r0_map(address_map &map)
 {
 	map.global_mask(0x0fff);
-	map(0x0000, 0x003f).ram().mirror(0x1c0);
-	map(0x0200, 0x020f).rw(m_r6530, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
+	map.unmap_value_high();
+	map(0x0000, 0x017f).ram();
+	map(0x0200, 0x03ff).rw(m_r6530, FUNC(mos6530_device::read), FUNC(mos6530_device::write));
 	map(0x0400, 0x0fff).rom();
 }
 
@@ -97,11 +97,16 @@ void gottlieb_sound_r0_device::gottlieb_sound_r0_map(address_map &map)
 
 INPUT_PORTS_START( gottlieb_sound_r0 )
 	PORT_START("SB0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Audio Diag") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_r0_device, audio_nmi, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Attract") PORT_CODE(KEYCODE_F1) PORT_TOGGLE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Music") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Sound Test") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, gottlieb_sound_r0_device, audio_nmi, 0)
+	PORT_DIPNAME( 0x10, 0x00, "Sound during game" )
+	PORT_DIPSETTING(    0x10, "Continuous" )
+	PORT_DIPSETTING(    0x00, "Scoring only" )
+	PORT_DIPNAME( 0x40, 0x00, "Attract Sound" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )  // Makes a sound every 6 minutes
 INPUT_PORTS_END
 
+// The sound test will only work if the 2 above dips are in opposing directions (one off and one on)
 INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
 {
 	// Diagnostic button sends a pulse to NMI pin
@@ -147,6 +152,7 @@ ioport_constructor gottlieb_sound_r0_device::device_input_ports() const
 
 void gottlieb_sound_r0_device::device_start()
 {
+	save_item(NAME(m_sndcmd));
 }
 
 
@@ -171,6 +177,7 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(
 		uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
+	, m_dac(*this, "dac")
 	, m_riot(*this, "riot")
 {
 }
@@ -256,7 +263,7 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 	m_riot->irq_callback().set_inputline("audiocpu", M6502_IRQ_LINE);
 
 	// sound devices
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 0.25); // unknown DAC
 }
 
 
@@ -306,10 +313,13 @@ void gottlieb_sound_r1_with_votrax_device::device_add_mconfig(machine_config &co
 {
 	gottlieb_sound_r1_device::device_add_mconfig(config);
 
+	m_dac->reset_routes();
+	m_dac->add_route(ALL_OUTPUTS, *this, 0.20);
+
 	// add the VOTRAX
 	VOTRAX_SC01(config, m_votrax, 720000);
 	m_votrax->ar_callback().set("nmi", FUNC(input_merger_device::in_w<1>));
-	m_votrax->add_route(ALL_OUTPUTS, *this, 0.5);
+	m_votrax->add_route(ALL_OUTPUTS, *this, 0.80);
 }
 
 

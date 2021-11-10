@@ -463,18 +463,43 @@ public:
 	void saturnjp(machine_config &config);
 	void saturneu(machine_config &config);
 	void saturnus(machine_config &config);
+	void saturnkr(machine_config &config);
 
-	void init_saturnus();
-	void init_saturneu();
-	void init_saturnjp();
+	template <bool is_pal> void init_saturn();
 
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
 
 private:
-
 	DECLARE_MACHINE_START(saturn);
 	DECLARE_MACHINE_RESET(saturn);
+
+	// SMPC region codes, hardwired via jumper setting.
+	// - Given the scheme bit 3 should determine if the region is PAL or NTSC.
+	// - 0 and F are "prohibited", others are "Sega reserved".
+	// - Documentation states that 2 is "TAIWAN" and 6 is "KOREA",
+	//   but games on latter definitely wants 2 rather than 6.
+	//   We currently swap, former actual slot needs to be confirmed.
+	enum {
+		REGION_NTSC_0 = 0,
+		REGION_NTSC_JAPAN,
+//      REGION_NTSC_TAIWAN,
+		REGION_NTSC_KOREA,
+		REGION_NTSC_3,
+		REGION_NTSC_USA, // & Canada, Mexico
+		REGION_NTSC_BRAZIL,
+//      REGION_NTSC_KOREA,
+		REGION_NTSC_TAIWAN, // & Philippines
+		REGION_NTSC_7,
+		REGION_PAL_8,
+		REGION_PAL_9,
+		REGION_PAL_ASIA, // China, Middle East, East Asia not covered above
+		REGION_PAL_B,
+		REGION_PAL_EUROPE, // Australia, South Africa
+		REGION_PAL_AMERICA, // Non-NTSC Central/South America
+		REGION_PAL_E,
+		REGION_PAL_F
+	};
 
 	uint8_t saturn_cart_type_r();
 	uint32_t abus_dummy_r(offs_t offset);
@@ -482,7 +507,6 @@ private:
 	uint32_t saturn_null_ram_r();
 	void saturn_null_ram_w(uint32_t data);
 
-	void saturn_init_driver(int rgn);
 	uint8_t saturn_pdr1_direct_r();
 	uint8_t saturn_pdr2_direct_r();
 	void saturn_pdr1_direct_w(uint8_t data);
@@ -548,7 +572,7 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
 	map(0x05fe0000, 0x05fe00cf).m(m_scu, FUNC(sega_scu_device::regs_map)); //rw(FUNC(sat_console_state::saturn_scu_r), FUNC(sat_console_state::saturn_scu_w));
 	map(0x06000000, 0x060fffff).ram().mirror(0x21f00000).share("workram_h");
-	map(0x45000000, 0x46ffffff).nopw();
+	map(0x40000000, 0x46ffffff).nopw(); // associative purge page
 	map(0x60000000, 0x600003ff).nopw(); // cache address array
 	map(0xc0000000, 0xc0000fff).ram(); // cache data array, Dragon Ball Z sprites relies on this
 }
@@ -884,7 +908,7 @@ void sat_console_state::saturnus(machine_config &config)
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
 
-	m_smpc_hle->set_region_code(4);
+	m_smpc_hle->set_region_code(REGION_NTSC_USA);
 }
 
 void sat_console_state::saturneu(machine_config &config)
@@ -897,7 +921,7 @@ void sat_console_state::saturneu(machine_config &config)
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
 
-	m_smpc_hle->set_region_code(12);
+	m_smpc_hle->set_region_code(REGION_PAL_EUROPE);
 }
 
 void sat_console_state::saturnjp(machine_config &config)
@@ -910,13 +934,27 @@ void sat_console_state::saturnjp(machine_config &config)
 	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
 
-	m_smpc_hle->set_region_code(1);
+	m_smpc_hle->set_region_code(REGION_NTSC_JAPAN);
+}
+
+void sat_console_state::saturnkr(machine_config &config)
+{
+	saturn(config);
+	SATURN_CDB(config, "saturn_cdb", 16000000);
+
+	SOFTWARE_LIST(config, "cd_list").set_original("saturn").set_filter("NTSC-K");
+
+	SATURN_CART_SLOT(config, "exp", saturn_cart, nullptr);
+	SOFTWARE_LIST(config, "cart_list").set_original("sat_cart");
+
+	m_smpc_hle->set_region_code(REGION_NTSC_KOREA);
 }
 
 
-void sat_console_state::saturn_init_driver(int rgn)
+template <bool is_pal> void sat_console_state::init_saturn()
 {
-	m_vdp2.pal = (rgn == 12) ? 1 : 0;
+	// TODO: setter for (missing) VDP2 device
+	m_vdp2.pal = is_pal;
 
 	// set compatible options
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
@@ -939,25 +977,8 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
-void sat_console_state::init_saturnus()
-{
-	saturn_init_driver(4);
-}
-
-void sat_console_state::init_saturneu()
-{
-	saturn_init_driver(12);
-}
-
-void sat_console_state::init_saturnjp()
-{
-	saturn_init_driver(1);
-}
-
-
-/* Japanese Saturn */
-ROM_START(saturnjp)
-	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
+ROM_START( saturnjp )
+	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "101", "Japan v1.01 (941228)")
 	ROMX_LOAD("sega_101.bin", 0x00000000, 0x00080000, CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "1003", "Japan v1.003 (941012)")
@@ -966,9 +987,8 @@ ROM_START(saturnjp)
 	ROMX_LOAD("sega_100.bin", 0x00000000, 0x00080000, CRC(2aba43c2) SHA1(2b8cb4f87580683eb4d760e4ed210813d667f0a2), ROM_BIOS(2))
 ROM_END
 
-/* Overseas Saturn */
-ROM_START(saturn)
-	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
+ROM_START( saturn )
+	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	/* Confirmed by ElBarto */
 	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(0))
@@ -976,8 +996,8 @@ ROM_START(saturn)
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(1))
 ROM_END
 
-ROM_START(saturneu)
-	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
+ROM_START( saturneu )
+	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "101a", "Overseas v1.01a (941115)")
 	/* Confirmed by ElBarto */
 	ROMX_LOAD("mpr-17933.bin", 0x00000000, 0x00080000, CRC(4afcf0fa) SHA1(faa8ea183a6d7bbe5d4e03bb1332519800d3fbc3), ROM_BIOS(0))
@@ -985,13 +1005,20 @@ ROM_START(saturneu)
 	ROMX_LOAD("sega_100a.bin", 0x00000000, 0x00080000, CRC(f90f0089) SHA1(3bb41feb82838ab9a35601ac666de5aacfd17a58), ROM_BIOS(1))
 ROM_END
 
-ROM_START(vsaturn)
-	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
+ROM_START( saturnkr )
+	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF )
+	// undumped, uses Japanese VA1 motherboard with v1.02a BIOS rev,
+	// with extra checks for region jumpers that disables Japanese language if setting matches '2' (no Korea option tho)
+	ROM_LOAD("sega_101.bin", 0x00000000, 0x00080000, BAD_DUMP CRC(224b752c) SHA1(df94c5b4d47eb3cc404d88b33a8fda237eaf4720) )
+ROM_END
+
+ROM_START( vsaturn )
+	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD("vsaturn.bin", 0x00000000, 0x00080000, CRC(e4d61811) SHA1(4154e11959f3d5639b11d7902b3a393a99fb5776))
 ROM_END
 
-ROM_START(hisaturn)
-	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF ) /* SH2 code */
+ROM_START( hisaturn )
+	ROM_REGION32_BE( 0x80000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "102", "v1.02 (950519)")
 	ROMX_LOAD("mpr-18100.bin", 0x000000, 0x080000, CRC(3408dbf4) SHA1(8a22710e09ce75f39625894366cafe503ed1942d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "101", "v1.01 (950130)")
@@ -999,8 +1026,9 @@ ROM_START(hisaturn)
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS              INIT           COMPANY    FULLNAME            FLAGS */
-CONS( 1994, saturn,   0,      0,      saturnus, saturn, sat_console_state, init_saturnus, "Sega",    "Saturn (USA)",     MACHINE_NOT_WORKING )
-CONS( 1994, saturnjp, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "Sega",    "Saturn (Japan)",   MACHINE_NOT_WORKING )
-CONS( 1994, saturneu, saturn, 0,      saturneu, saturn, sat_console_state, init_saturneu, "Sega",    "Saturn (PAL)",     MACHINE_NOT_WORKING )
-CONS( 1995, vsaturn,  saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "JVC",     "V-Saturn",         MACHINE_NOT_WORKING )
-CONS( 1995, hisaturn, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturnjp, "Hitachi", "HiSaturn",         MACHINE_NOT_WORKING )
+CONS( 1994, saturn,   0,      0,      saturnus, saturn, sat_console_state, init_saturn<false>, "Sega",    "Saturn (USA)",     MACHINE_NOT_WORKING )
+CONS( 1994, saturnjp, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn<false>, "Sega",    "Saturn (Japan)",   MACHINE_NOT_WORKING )
+CONS( 1994, saturneu, saturn, 0,      saturneu, saturn, sat_console_state, init_saturn<true>,  "Sega",    "Saturn (PAL)",     MACHINE_NOT_WORKING )
+CONS( 1995, saturnkr, saturn, 0,      saturnkr, saturn, sat_console_state, init_saturn<false>, "Samsung", "Saturn (Korea)",   MACHINE_NOT_WORKING )
+CONS( 1995, vsaturn,  saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn<false>, "JVC",     "V-Saturn",         MACHINE_NOT_WORKING )
+CONS( 1995, hisaturn, saturn, 0,      saturnjp, saturn, sat_console_state, init_saturn<false>, "Hitachi", "HiSaturn",         MACHINE_NOT_WORKING )

@@ -255,7 +255,7 @@ void ch376_device::write(offs_t offset, u8 data)
 						tmpPath.append(m_file_name);
 					}
 
-					if (osd_file::open(tmpPath, OPEN_FLAG_READ|OPEN_FLAG_WRITE, m_file, size) == osd_file::error::NONE)
+					if (!osd_file::open(tmpPath, OPEN_FLAG_READ|OPEN_FLAG_WRITE, m_file, size))
 					{
 						m_int_status = STATUS_USB_INT_SUCCESS;
 						m_cur_file_size = size & 0xffffffff;

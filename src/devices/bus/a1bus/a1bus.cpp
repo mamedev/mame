@@ -16,6 +16,10 @@
 
 DEFINE_DEVICE_TYPE(A1BUS_SLOT, a1bus_slot_device, "a1bus_slot", "Apple I Slot")
 
+template class device_finder<device_a1bus_card_interface, false>;
+template class device_finder<device_a1bus_card_interface, true>;
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
