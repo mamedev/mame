@@ -27,7 +27,7 @@
  ||_|  SN74HC373N                          |CD4069UBCN |__________| |74HC4053N |74HC4053N |_||
  |__    _________   _________  ___________                                                __ |
  ||·|  SN74HC373N  SN74HC245N |ST62E65BF1|  _________    _________   _________            |·||
- ||_|                         |__________| SN74HC373N   M74HC14881  |________|            |_||
+ ||_|                         |__________| SN74HC373N   M74HC14881  |_L293B__|            |_||
  |                                           ______  _____  ______  _________________        |
  |                                          |·····| |····| |·····| |················|        |
  |___________________________________________________________________________________________|
@@ -86,8 +86,8 @@ ROM_START(houseball)
 	ROM_LOAD("sonido02_isd2590p.u14", 0x1000, 0x1000, NO_DUMP) // Internal ROM size unknown
 
 	// On a separate PCB for dispenser control
-	ROM_REGION(0x2000, "pld", 0)
-	ROM_LOAD("tibpal16l8.u4", 0x0000, 0x1000, NO_DUMP)
+	ROM_REGION(0x104, "pld", 0)
+	ROM_LOAD("tibpal16l8.u4", 0x000, 0x104, CRC(5d0024d4) SHA1(8e0425ca1f47c8a2e3376f0c78b3692bce3e0341))
 ROM_END
 
 } // anonymous namespace
