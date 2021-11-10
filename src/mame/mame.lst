@@ -12512,7 +12512,7 @@ dm5620                          //
 dm7000                          //
 
 @source:dmainevent.cpp
-dmainevent.cpp                  // (c) 1983 Destron
+dmainevent                      // (c) 1983 Destron
 
 @source:dmax8000.cpp
 dmax8000                        //
