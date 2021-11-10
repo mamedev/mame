@@ -2,7 +2,7 @@
 // copyright-holders:
 /***************************************************************************
 
-    Skeleton driver for "Main Event" (electromechanic machine from Destron).
+    Skeleton driver for "Main Event" (electromechanical machine from Destron).
  _______________________________________________________________________________
 |      ________________                                                        |
 |     |_DSWx8_|_DSWx8_|     ___________      Xtal     ___________________      |
