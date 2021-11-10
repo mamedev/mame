@@ -41367,8 +41367,9 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- boot OK -->
 	<!-- ATK test: OK -->
-	<software name="soccerkd" supported="no">
+	<software name="soccerkd" supported="yes">
 		<!-- SPS (CAPS) release 1129 -->
 		<description>Soccer Kid (Euro)</description>
 		<!-- retail, standalone -->

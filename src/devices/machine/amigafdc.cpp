@@ -363,9 +363,9 @@ void amiga_fdc_device::dma_check()
 	bool was_writing = dskbyt & 0x2000;
 	dskbyt &= 0x9fff;
 	if(dma_enabled()) {
-		LOGDMA("%s: DMA start dskpt=%08x dsklen=%04x dir=%s adkcon=%04x dsksync=%04x\n",
+		LOGDMA("%s: DMA start dskpt=%08x dsklen=%04x dir=%s adkcon=%04x dsksync=%04x state=%d\n",
 			machine().describe_context(),
-			dskpt, dsklen & 0x3fff, BIT(dsklen, 14) ? "RAM->disk" : "disk->RAM", adkcon, dsksync
+			dskpt, dsklen & 0x3fff, BIT(dsklen, 14) ? "RAM->disk" : "disk->RAM", adkcon, dsksync, dma_state
 		);
 
 		if(dma_state == IDLE) {

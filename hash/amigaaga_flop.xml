@@ -1409,6 +1409,7 @@ Expects a flag set to $3fe after disk swap, missing irq?
 		<publisher>Black Legend</publisher>
 		<notes><![CDATA[
 Has [Lisa] GFX pitch issues on intro and gameplay
+Doesn't show cursor on main menu [Lisa]
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
@@ -4727,7 +4728,7 @@ boot OK, not extensively tested (German language)
 		<year>1995</year>
 		<publisher>Flair Software</publisher>
 		<notes><![CDATA[
-Doesn't surpass the initial Whizz logo, [FDC] dsksync
+Doesn't surpass the initial Whizz logo screen, [FDC] dsksync
 ]]></notes>
 		<info name="usage" value="Requires AGA" />
 		<part name="flop1" interface="floppy_3_5">
