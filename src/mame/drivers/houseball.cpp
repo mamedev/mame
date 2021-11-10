@@ -2,7 +2,7 @@
 // copyright-holders:
 /***************************************************************************
 
-    Skeleton driver for "House Ball", a electromechanic machine from the
+    Skeleton driver for "House Ball", a electromechanical machine from the
     Spanish company Olakoa with the same game mechanics as Taito's Ice Cold
     Beer (but with different hardware). Gives bubble gums as prices.
     There are two different versions, one with a river on the background
