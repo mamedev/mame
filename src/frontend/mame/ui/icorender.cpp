@@ -44,6 +44,13 @@ namespace {
 // ICO file header
 struct icon_dir_t
 {
+	void byteswap()
+	{
+		reserved = little_endianize_int16(reserved);
+		type = little_endianize_int16(type);
+		count = little_endianize_int16(count);
+	}
+
 	uint16_t    reserved;   // must be 0
 	uint16_t    type;       // 1 for icon or 2 for cursor
 	uint16_t    count;      // number of images in the file
@@ -179,7 +186,7 @@ bool load_ico_image(util::core_file &fp, unsigned count, unsigned index, bitmap_
 {
 	// read the directory entry
 	std::error_condition err;
-	size_t actual;
+	size_t actual = 0;
 	icon_dir_entry_t dir;
 	err = fp.seek(sizeof(icon_dir_t) + (sizeof(icon_dir_entry_t) * index), SEEK_SET);
 	if (!err)
@@ -212,7 +219,7 @@ int images_in_ico(util::core_file &fp)
 {
 	// read and check the icon file header
 	std::error_condition err;
-	size_t actual;
+	size_t actual = 0;
 	icon_dir_t header;
 	err = fp.seek(0, SEEK_SET);
 	if (!err)
@@ -222,9 +229,7 @@ int images_in_ico(util::core_file &fp)
 		LOG("Failed to read ICO file header\n");
 		return -1;
 	}
-	header.reserved = little_endianize_int16(header.reserved);
-	header.type = little_endianize_int16(header.type);
-	header.count = little_endianize_int16(header.count);
+	header.byteswap();
 	if (0U != header.reserved)
 	{
 		LOG("Invalid ICO file header reserved field %u (expected 0)\n", header.reserved);
