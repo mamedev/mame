@@ -2644,7 +2644,8 @@ ATK test: C:0 H:U Bad
 		<year>1992</year>
 		<publisher>Play Byte</publisher>
 		<notes><![CDATA[
-boot OK but has serious GFX pitch issues on every other frame
+boot OK
+Power-up bar doesn't color the currently active bonus
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -5158,7 +5159,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="batashes" supported="no">
 		<!-- SPS (CAPS) release 2526 -->
 		<description>Battle for the Ashes (Euro)</description>
@@ -5166,6 +5166,10 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1048746">
 				<rom name="(sps2526)battlefortheashes.ipf" size="1048746" crc="0f1adf3e" sha1="31cc5ea06c94501e544c5db56baf0641630d31f1"/>
@@ -7309,7 +7313,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="bombrbob" supported="no">
+	<software name="bombrbob" supported="yes">
 		<!-- SPS (CAPS) release 1628 -->
 		<description>Bomber Bob (Euro)</description>
 		<!-- retail, standalone -->
@@ -7317,7 +7321,7 @@ ATK test: failed
 		<year>1990</year>
 		<publisher>Idea Software</publisher>
 		<notes><![CDATA[
-boot OK, has GFX pitch issues when the big ship appears on level 1-B
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7720,7 +7724,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="brianlar" supported="no">
 		<!-- SPS (CAPS) release 1225 -->
 		<description>Brian Lara's Cricket (Euro)</description>
@@ -7728,6 +7731,10 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1048746">
 				<rom name="(sps1225)brianlarascricket.ipf" size="1048746" crc="bc5979dd" sha1="e7df31c9829799dd83e62c6ec85700a162adaeb5"/>
@@ -13637,7 +13644,6 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1986</year>
 		<publisher>Cinemaware</publisher>
 		<notes><![CDATA[
-a500n: wrong GFX pitch on workbench
 a1200n: hangs when attempting to raid a castle
 ATK test: OK
 ]]></notes>
@@ -14953,8 +14959,9 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Visionary</publisher>
 		<notes><![CDATA[
-boot OK, starting a level has background with GFX pitch issue, repeating sample on every correct move
-Update: hangs when loading a game, regression?
+boot OK
+Slight update desync on background when starting a new life, [Copper]?
+a500p: hangs when loading a new life (btanb?)
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Sports manual copy-protection (Shields)" />
@@ -15041,7 +15048,6 @@ ATK test: OK
 		<publisher>ReadySoft</publisher>
 		<notes><![CDATA[
 Hangs at VDT logo [FDC] dsksync
-(Checks specific value in the loaded buffer, offset by 2)
 Hangs at "Randy Linden production", tries to check [FDC] with dsksync == 0
 ATK test: failed
 ]]></notes>
@@ -17476,7 +17482,7 @@ ATK test: OK
 		<publisher>Audiogenic</publisher>
 		<notes><![CDATA[
 Keeps loading on a green-black screen fade transition [FDC] dsksync
-Gameplay GFXs are pitch skewed
+Gameplay GFXs are slightly pitch skewed, [Copper] timings
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -21944,7 +21950,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="goochwcc" supported="no">
 		<!-- SPS (CAPS) release 1248 -->
 		<description>Graham Gooch World Class Cricket (Euro)</description>
@@ -21952,6 +21957,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1048314">
 				<rom name="(sps1248)grahamgoochworldclasscricket.ipf" size="1048314" crc="2324da8a" sha1="30e60dd495cbd4d7e40ef0d803ca359eddffe790"/>
@@ -23816,7 +23824,8 @@ ATK test: OK
 		<year>1987</year>
 		<publisher>Diamond</publisher>
 		<notes><![CDATA[
-Doesn't load on a500p (with wrong GFX pitch too, btanb?)
+a500p: throws a holly "Program Failed #80000003" (btanb?)
+boot OK otherwise
 ATK test: OK
 ]]></notes>
 		<!-- Up + fire to change cards after selection -->
@@ -24625,7 +24634,7 @@ ATK test: OK
 		<publisher>Discovery</publisher>
 		<notes><![CDATA[
 Grey screen [FDC] dsksync
-Has slight GFX shifted text (attribute color on pilot select, lives counter)
+Has slight GFX shifted text (attribute color on main menu pilot select, lives counter)
 GFX garbage strips pops in from time to time during gameplay
 ATK test: failed
 ]]></notes>
@@ -28895,7 +28904,8 @@ ATK test: OK
 		<publisher>Elite</publisher>
 		<notes><![CDATA[
 Hangs at a rainbow colored screen [FDC] dsksync
-Has serious GFX pitch corruption when scrolls during gameplay
+boot OK 
+(TODO: recheck gameplay differences compared to MD, cfr. Kenshiro doesn't strip off after reaching power level threshold)
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -30939,7 +30949,7 @@ ATK test: OK
 		<publisher>Interplay</publisher>
 		<notes><![CDATA[
 Guru Meditation after selecting new game [FDC] dsksync
-Crashes with wrong GFX colors if player gives up a stage (recheck)
+Crashes with wrong GFX colors if player gives up a stage (TODO: recheck)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -35366,7 +35376,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="odyssey" supported="no">
 		<!-- SPS (CAPS) release 2854 -->
 		<description>Odyssey (Euro, aud304312c 19970206)</description>
@@ -35374,6 +35383,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048314">
@@ -35388,7 +35400,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="odysseya" cloneof="odyssey" supported="no">
 		<!-- SPS (CAPS) release 195 -->
 		<description>Odyssey (Euro, aud304312b 19960201)</description>
@@ -35396,6 +35407,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048314">
@@ -35410,7 +35424,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="odysseyb" cloneof="odyssey" supported="no">
 		<!-- SPS (CAPS) release 897 -->
 		<description>Odyssey (Euro, aud304312a 19950523)</description>
@@ -35418,6 +35431,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1048314">
@@ -36491,9 +36507,10 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Merit</publisher>
 		<notes><![CDATA[
-boot OK, has a stripe of garbage on bottom (especially noticeable on game end screen)
-Has GFX pitch issues on PAL machines (btanb?)
-Has optional Genias or Standard 4-players interface (unsupported)
+boot OK
+a500: has a stripe of garbage on bottom (especially noticeable on game end screen, btanb?)
+a500: CPU vs CPU acts oddly, like missing easy receivers (doesn't occur in a500n, btanb?)
+Unsupported Genias or Standard 4-players interface
 ATK test: OK
 ]]></notes>
 		<!-- Developer: Genias -->
@@ -42791,9 +42808,11 @@ ATK test: OK
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
 black screen, [FDC] dsksync
-Does not boot on a500, accesses autoconfig RAM banks at $300000 and $c00000
-very offset title GFXs
-Offset background layer(s) during gameplay
+[FDC] accesses DSKDATR
+a500: Does not boot aftewards, accesses autoconfig RAM banks at $300000 and $c00000
+a500p: draws no player heli sprite, main menu has no text and there's garbled text OSD during gameplay
+a1200: very offset title GFXs
+Offset background layer(s) during gameplay, [Copper] timings?
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45278,7 +45297,8 @@ ATK test: C:0 H:U Bad
 		<publisher>Microdeal</publisher>
 		<notes><![CDATA[
 Locks up after title screen by pressing fire on joystick [FDC] dsksync
-Player GFX sprite is black filled
+Player GFX sprite is black filled (fixed?)
+a500p: black screen with red mouse pointer on initial loading (btanb?)
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48170,7 +48190,7 @@ ATK test: failed
 		<publisher>Alternative</publisher>
 		<notes><![CDATA[
 black screen, [FDC] dsksync
-Has GFX pitch issues on gameplay
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48563,7 +48583,10 @@ ATK test: OK
 		<year>1995</year>
 		<publisher>Acid</publisher>
 		<notes><![CDATA[
-Serious GFX pitch issues when boots
+Extremely offset [Denise] DDFSTRT and DDFSTOP on main menu
+"Header Loader Failed" when selecting a track for "Start Match Race" menu, [FDC]
+Disk swap detects "Car Disk 2" when Program is in, very fussy disk swap (reportedly don't recognize disk change), [FDC]
+a500: No sprites and very offset bitplane drawings in "Championship" mode
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48744,8 +48767,10 @@ ATK test: OK
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-Has GFX pitch issues on intro
-Guru Meditation after intro
+a500: black screen, a500p: Guru Meditation after intro [FDC] dsksync
+Offset backgrounds during gameplay, [Copper]
+Some minor color glitches (cfr. first bonus stage "perfect" word, some hit confirms), [Copper]?
+Hangs while asking for disk 2 already in after beating M. Bison (tested Sagat, TODO: recheck)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48780,7 +48805,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- Fatal errors in ipf_decode::generate_timings type 4 -->
 	<software name="tennisch" supported="no">
 		<!-- SPS (CAPS) release 1153 -->
 		<description>Super Tennis Champs (Euro)</description>
@@ -48788,6 +48812,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1995</year>
 		<publisher>Audiogenic</publisher>
+		<notes><![CDATA[
+Fatal errors in ipf_decode::generate_timings type 4
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1048314">
 				<rom name="(sps1153)supertennischamps.ipf" size="1048314" crc="ba2c7cd8" sha1="779cbe446fd9bf9a45a9c9273a9cae797913d32c"/>
@@ -48856,7 +48883,7 @@ ATK test: OK
 		<publisher>Team 17</publisher>
 		<notes><![CDATA[
 black screen [FDC] dsksync
-Has serious GFX pitch issues on gameplay, no sprites with a500p
+Has serious GFX pitch issues on gameplay, no sprites with a500p (update: regressed with a500 too, [Copper]?)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -49158,7 +49185,9 @@ ATK test: OK
 		<publisher>Discovery</publisher>
 		<notes><![CDATA[
 black screen [FDC] dsksync
-Hangs at title screen with no BGM
+Has sprite GFX vertical strip on map screen
+GFX pitch corruption on gameplay, [Denise] DDFSTOP == 0xd6
+Has incorrect transparent pixels during gameplay (cfr. player sprite left boot)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -49339,7 +49368,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Starbyte</publisher>
 		<notes><![CDATA[
-Has GFX wrong colors on initial training setup screen, "fixed" by blitter ball layer copies
+Has GFX wrong colors on initial training setup screen, "fixed" on-the-fly by [Blitter] ball layer copies
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -49656,10 +49685,10 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Ultra Games</publisher>
 		<notes><![CDATA[
-bad GFX pitch
+Crashes after first screen completed with [Serial] polling of RBF (TODO: recheck)
 ATK test: OK
 ]]></notes>
-		<info name="usage" value="Requires second disc drive" />
+		<info name="usage" value="Requires second disc drive, has codesheet copy-protection" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -51361,7 +51390,7 @@ ATK test: failed
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
 boot OK, has slight garbage GFX stripe on bottom of screen
-Accesses [FDC] dskdatr during loading, no noticeable effect?
+Accesses [FDC] DSKDATR during initial loading
 TODO: how to create data disk?
 ATK test: OK
 ]]></notes>
@@ -52186,7 +52215,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="triplex" supported="no">
+	<software name="triplex" supported="partial">
 		<!-- SPS (CAPS) release 2048 -->
 		<description>Triple X (Euro, Amiga Star Collection)</description>
 		<!-- retail, standalone -->
@@ -52194,7 +52223,8 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Axxiom</publisher>
 		<notes><![CDATA[
-bad GFX pitch
+boot OK
+Has sprite vertical strip during gameplay transitions
 ATK test: OK
 ]]></notes>
 		<!-- As in title screen -->
@@ -52439,7 +52469,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="turricn3" supported="no">
+	<software name="turricn3" supported="partial">
 		<!-- SPS (CAPS) release 2633 -->
 		<description>Turrican 3 (Euro)</description>
 		<!-- retail, standalone -->
@@ -52447,7 +52477,9 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Renegade</publisher>
 		<notes><![CDATA[
-intro has glitches, crashes with wrong GFX pitch on gameplay
+intro has glitches, [Copper]?
+Has vertical sprite glitch stripe when player turns into ball shape
+Slight sprite glitch when player goes above top margin
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -54321,7 +54353,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="waxworks" supported="no">
+	<software name="waxworks" supported="partial">
 		<!-- SPS (CAPS) release 2274 -->
 		<description>Waxworks (Euro)</description>
 		<!-- retail, standalone -->
@@ -54329,7 +54361,8 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
-GFX garbage spawns on bottom (repeats bitplane layers from above)
+a500p: GFX garbage spawns on bottom (repeats bitplane layers from above)
+boot OK, not extensively tested
 ATK test: OK
 ]]></notes>
 		<info name="usage" value="Sports code wheel copy-protection" />

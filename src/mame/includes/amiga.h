@@ -94,7 +94,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define REG_BLTCDAT     (0x070/2)   /* W  A      Blitter source C data register */
 #define REG_BLTBDAT     (0x072/2)   /* W  A      Blitter source B data reglster */
 #define REG_BLTADAT     (0x074/2)   /* W  A      Blitter source A data register */
-#define REG_DENISEID    (0x07C/2)   /* R    D    Denise ID: OCS = 0xFF, ECS = 0xFC, AGA = 0xF8 */
+#define REG_DENISEID    (0x07C/2)   /* R    D    Denise ID: OCS = <open bus>, ECS = 0xFC, AGA = 0xF8 */
 #define REG_DSKSYNC     (0x07E/2)   /* W      P  Disk sync pattern register for disk read */
 #define REG_COP1LCH     (0x080/2)   /* W  A      Coprocessor first location register (high 3 bits) */
 #define REG_COP1LCL     (0x082/2)   /* W  A      Coprocessor first location register (low 15 bits) */

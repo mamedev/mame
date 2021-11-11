@@ -739,8 +739,11 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
-	next_copper_x = 0;
-	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2; x++)
+	next_copper_x = 0;	
+	// FIXME: without the add this increment will skip bitplane ops
+	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
+	// (*) because there's a comparison with <= in the bitplane code ...
+	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2 + 10; x++)
 	{
 		int sprpix;
 
@@ -763,10 +766,13 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			/* compute the pixel fetch parameters */
 			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
 			ddf_start_pixel += hires ? 9 : 17;
+			// FIXME: swordsod uses 0xd6 in lores mode, causing GFX pitch corruption
 			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
 			ddf_stop_pixel += hires ? (9 + defbitoffs) : (17 + defbitoffs);
 
-			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
+			// TODO: verify this one
+			// lastbtle definitely don't need this (enables bit 2 of ddfstrt while in lores mode)
+			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 && hires )
 				ddf_stop_pixel += 8;
 
 			// display window

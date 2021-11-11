@@ -1496,14 +1496,20 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			/* impose hardware limits ( HRM, page 75 ) */
 			data &= 0xfe;
 			if (data < 0x18)
+			{
+				logerror("%s: Attempt to write to DDFSTRT with %04x\n", machine().describe_context(), data);
 				data = 0x18;
+			}
 			break;
 
 		case REG_DDFSTOP:
 			/* impose hardware limits ( HRM, page 75 ) */
 			data &= 0xfe;
 			if (data > 0xd8)
+			{
+				logerror("%s: Attempt to write to DDFSTRT with %04x\n", machine().describe_context(), data);
 				data = 0xd8;
+			}
 			break;
 
 		case REG_DMACON:
@@ -1635,6 +1641,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			break;
 	}
 
+	// FIXME: no ECS?
 	if (IS_AGA())
 		CUSTOM_REG(offset) = data;
 	else
