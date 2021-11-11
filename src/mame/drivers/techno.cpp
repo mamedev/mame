@@ -24,7 +24,6 @@ ToDo:
 - Schematic shows sound rom banking, but no machine has those roms, so not coded.
 - xforce: sound rom is missing
 - spcteam: Bad display - can't tell if keys are doing anything.
-- spcteam: randomly, lots of unmapped reads by the audiocpu from 0x20D8,9.
 
 ***********************************************************************************/
 
