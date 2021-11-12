@@ -253,7 +253,7 @@ void menu_add_change_folder::handle(event const *ev)
 			const menu_item &pitem = item(index);
 
 			// go up to the parent path
-			if (pitem.text == "..")
+			if (pitem.text() == "..")
 			{
 				size_t first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
 				size_t last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
@@ -263,15 +263,15 @@ void menu_add_change_folder::handle(event const *ev)
 			else
 			{
 				// if isn't a drive, appends the directory
-				if (pitem.subtext != "[DRIVE]")
+				if (pitem.subtext() != "[DRIVE]")
 				{
 					if (m_current_path[m_current_path.length() - 1] == PATH_SEPARATOR[0])
-						m_current_path.append(pitem.text);
+						m_current_path.append(pitem.text());
 					else
-						m_current_path.append(PATH_SEPARATOR).append(pitem.text);
+						m_current_path.append(PATH_SEPARATOR).append(pitem.text());
 				}
 				else
-					m_current_path = pitem.text;
+					m_current_path = pitem.text();
 			}
 
 			// reset the char buffer also in this case
@@ -331,12 +331,12 @@ void menu_add_change_folder::handle(event const *ev)
 
 				// from current item to the end
 				for (entry = cur_selected; entry < item_count(); entry++)
-					if (item(entry).ref != nullptr && !m_search.empty())
+					if (item(entry).ref() && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
@@ -350,12 +350,12 @@ void menu_add_change_folder::handle(event const *ev)
 				// and from the first item to current one
 				for (entry = 0; entry < cur_selected; entry++)
 				{
-					if (item(entry).ref != nullptr && !m_search.empty())
+					if (item(entry).ref() && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 

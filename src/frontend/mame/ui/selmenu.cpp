@@ -1980,7 +1980,7 @@ void menu_select_launch::draw(uint32_t flags)
 		float line_y = visible_top + (float(linenum) * line_height);
 		int itemnum = top_line + linenum;
 		const menu_item &pitem = item(itemnum);
-		const std::string_view itemtext = pitem.text;
+		const std::string_view itemtext = pitem.text();
 		rgb_t fgcolor = ui().colors().text_color();
 		rgb_t bgcolor = ui().colors().text_bg_color();
 		rgb_t fgcolor3 = ui().colors().clone_color();
@@ -2012,7 +2012,7 @@ void menu_select_launch::draw(uint32_t flags)
 			bgcolor = ui().colors().mouseover_bg_color();
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
-		else if (pitem.ref == m_prev_selected)
+		else if (pitem.ref() == m_prev_selected)
 		{
 			fgcolor = fgcolor3 = ui().options().mouseover_color();
 			bgcolor = ui().colors().mouseover_bg_color();
@@ -2038,18 +2038,18 @@ void menu_select_launch::draw(uint32_t flags)
 			if (hover() == itemnum)
 				set_hover(HOVER_ARROW_DOWN);
 		}
-		else if (pitem.type == menu_item_type::SEPARATOR)
+		else if (pitem.type() == menu_item_type::SEPARATOR)
 		{
 			// if we're just a divider, draw a line
 			container().add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height,
 					UI_LINE_WIDTH, ui().colors().text_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		}
-		else if (pitem.subtext.empty())
+		else if (pitem.subtext().empty())
 		{
 			// draw the item centered
-			int const item_invert = pitem.flags & FLAG_INVERT;
+			int const item_invert = pitem.flags() & FLAG_INVERT;
 			if (m_has_icons)
-				draw_icon(linenum, item(itemnum).ref, effective_left, line_y);
+				draw_icon(linenum, item(itemnum).ref(), effective_left, line_y);
 			ui().draw_text_full(
 					container(),
 					itemtext,
@@ -2060,15 +2060,15 @@ void menu_select_launch::draw(uint32_t flags)
 		}
 		else
 		{
-			int const item_invert = pitem.flags & FLAG_INVERT;
-			std::string_view const subitem_text = pitem.subtext;
+			int const item_invert = pitem.flags() & FLAG_INVERT;
+			std::string_view const subitem_text = pitem.subtext();
 			float item_width, subitem_width;
 
 			// compute right space for subitem
 			ui().draw_text_full(
 					container(),
 					subitem_text,
-					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext),
+					effective_left + icon_offset, line_y, ui().get_string_width(pitem.subtext()),
 					text_layout::text_justify::RIGHT, text_layout::word_wrapping::NEVER,
 					mame_ui_manager::NONE, item_invert ? fgcolor3 : fgcolor, bgcolor,
 					&subitem_width, nullptr);
@@ -2076,7 +2076,7 @@ void menu_select_launch::draw(uint32_t flags)
 
 			// draw the item left-justified
 			if (m_has_icons)
-				draw_icon(linenum, item(itemnum).ref, effective_left, line_y);
+				draw_icon(linenum, item(itemnum).ref(), effective_left, line_y);
 			ui().draw_text_full(
 					container(),
 					itemtext,
@@ -2099,7 +2099,7 @@ void menu_select_launch::draw(uint32_t flags)
 	for (size_t count = m_available_items; count < item_count(); count++)
 	{
 		const menu_item &pitem = item(count);
-		const std::string_view itemtext = pitem.text;
+		const std::string_view itemtext = pitem.text();
 		float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
 		float line_y0 = line;
 		float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
@@ -2126,7 +2126,7 @@ void menu_select_launch::draw(uint32_t flags)
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 		}
 
-		if (pitem.type == menu_item_type::SEPARATOR)
+		if (pitem.type() == menu_item_type::SEPARATOR)
 		{
 			container().add_line(
 					visible_left, line + 0.5f * line_height,

@@ -321,12 +321,9 @@ void menu::item_append(menu_item_type type, uint32_t flags)
 void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
 {
 	// allocate a new item and populate it
-	menu_item pitem;
-	pitem.text = std::move(text);
-	pitem.subtext = std::move(subtext);
-	pitem.flags = flags;
-	pitem.ref = ref;
-	pitem.type = type;
+	menu_item pitem(type, ref, flags);
+	pitem.set_text(std::move(text));
+	pitem.set_subtext(std::move(subtext));
 
 	// append to array
 	auto index = m_items.size();
@@ -336,10 +333,12 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 		--index;
 	}
 	else
+	{
 		m_items.emplace_back(std::move(pitem));
+	}
 
 	// update the selection if we need to
-	if (m_resetpos == index || (m_resetref != nullptr && m_resetref == ref))
+	if ((m_resetpos == index) || (m_resetref && (m_resetref == ref)))
 		m_selected = index;
 	if (m_resetpos == (m_items.size() - 1))
 		m_selected = m_items.size() - 1;
@@ -406,7 +405,7 @@ const menu::event *menu::process()
 	if ((m_event.iptkey != IPT_INVALID) && selection_valid())
 	{
 		m_event.itemref = get_selection_ref();
-		m_event.type = m_items[m_selected].type;
+		m_event.type = m_items[m_selected].type();
 		return &m_event;
 	}
 	else
@@ -426,7 +425,7 @@ void menu::set_selection(void *selected_itemref)
 	m_selected = -1;
 	for (int itemnum = 0; itemnum < m_items.size(); itemnum++)
 	{
-		if (m_items[itemnum].ref == selected_itemref)
+		if (m_items[itemnum].ref() == selected_itemref)
 		{
 			m_selected = itemnum;
 			break;
@@ -476,11 +475,11 @@ void menu::draw(uint32_t flags)
 	for (auto const &pitem : m_items)
 	{
 		// compute width of left hand side
-		float total_width = gutter_width + ui().get_string_width(pitem.text) + gutter_width;
+		float total_width = gutter_width + ui().get_string_width(pitem.text()) + gutter_width;
 
 		// add in width of right hand side
-		if (!pitem.subtext.empty())
-			total_width += 2.0f * gutter_width + ui().get_string_width(pitem.subtext);
+		if (!pitem.subtext().empty())
+			total_width += 2.0f * gutter_width + ui().get_string_width(pitem.subtext());
 
 		// track the maximum
 		if (total_width > visible_width)
@@ -556,7 +555,7 @@ void menu::draw(uint32_t flags)
 		{
 			auto const itemnum = top_line + linenum;
 			menu_item const &pitem = m_items[itemnum];
-			std::string_view const itemtext = pitem.text;
+			std::string_view const itemtext = pitem.text();
 			rgb_t fgcolor = ui().colors().text_color();
 			rgb_t bgcolor = ui().colors().text_bg_color();
 			rgb_t fgcolor2 = ui().colors().subitem_color();
@@ -601,33 +600,33 @@ void menu::draw(uint32_t flags)
 			{
 				// if we're on the top line, display the up arrow
 				draw_arrow(
-							0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-							line_y0 + 0.25f * line_height,
-							0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-							line_y0 + 0.75f * line_height,
-							fgcolor,
-							ROT0);
+						0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+						line_y0 + 0.25f * line_height,
+						0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+						line_y0 + 0.75f * line_height,
+						fgcolor,
+						ROT0);
 			}
 			else if (downarrow)
 			{
 				// if we're on the bottom line, display the down arrow
 				draw_arrow(
-							0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-							line_y0 + 0.25f * line_height,
-							0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-							line_y0 + 0.75f * line_height,
-							fgcolor,
-							ROT0 ^ ORIENTATION_FLIP_Y);
+						0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+						line_y0 + 0.25f * line_height,
+						0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+						line_y0 + 0.75f * line_height,
+						fgcolor,
+						ROT0 ^ ORIENTATION_FLIP_Y);
 			}
-			else if (pitem.type == menu_item_type::SEPARATOR)
+			else if (pitem.type() == menu_item_type::SEPARATOR)
 			{
 				// if we're just a divider, draw a line
 				container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + visible_width, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
-			else if (pitem.subtext.empty())
+			else if (pitem.subtext().empty())
 			{
 				// if we don't have a subitem, just draw the string centered
-				if (pitem.flags & FLAG_UI_HEADING)
+				if (pitem.flags() & FLAG_UI_HEADING)
 				{
 					float heading_width = ui().get_string_width(itemtext);
 					container().add_line(visible_left, line_y0 + 0.5f * line_height, visible_left + ((visible_width - heading_width) / 2) - lr_border, line_y0 + 0.5f * line_height, UI_LINE_WIDTH, ui().colors().border_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -644,7 +643,7 @@ void menu::draw(uint32_t flags)
 			else
 			{
 				// otherwise, draw the item on the left and the subitem text on the right
-				bool const subitem_invert(pitem.flags & FLAG_INVERT);
+				bool const subitem_invert(pitem.flags() & FLAG_INVERT);
 				float item_width, subitem_width;
 
 				// draw the left-side text
@@ -656,9 +655,9 @@ void menu::draw(uint32_t flags)
 						mame_ui_manager::NORMAL, fgcolor, bgcolor,
 						&item_width, nullptr);
 
-				if (pitem.flags & FLAG_COLOR_BOX)
+				if (pitem.flags() & FLAG_COLOR_BOX)
 				{
-					rgb_t color = rgb_t((uint32_t)strtoul(pitem.subtext.c_str(), nullptr, 16));
+					rgb_t color = rgb_t((uint32_t)strtoul(pitem.subtext().c_str(), nullptr, 16));
 
 					// give 2 spaces worth of padding
 					subitem_width = ui().get_string_width("FF00FF00");
@@ -671,7 +670,7 @@ void menu::draw(uint32_t flags)
 				}
 				else
 				{
-					std::string_view subitem_text(pitem.subtext);
+					std::string_view subitem_text(pitem.subtext());
 
 					// give 2 spaces worth of padding
 					item_width += 2.0f * gutter_width;
@@ -685,13 +684,13 @@ void menu::draw(uint32_t flags)
 					}
 
 					// customize subitem text color
-					if (!core_stricmp(pitem.subtext.c_str(), _("On")))
+					if (!core_stricmp(pitem.subtext().c_str(), _("On")))
 						fgcolor2 = rgb_t(0x00,0xff,0x00);
 
-					if (!core_stricmp(pitem.subtext.c_str(), _("Off")))
+					if (!core_stricmp(pitem.subtext().c_str(), _("Off")))
 						fgcolor2 = rgb_t(0xff,0x00,0x00);
 
-					if (!core_stricmp(pitem.subtext.c_str(), _("Auto")))
+					if (!core_stricmp(pitem.subtext().c_str(), _("Auto")))
 						fgcolor2 = rgb_t(0xff,0xff,0x00);
 
 					// draw the subitem right-justified
@@ -705,7 +704,7 @@ void menu::draw(uint32_t flags)
 				}
 
 				// apply arrows
-				if (is_selected(itemnum) && (pitem.flags & FLAG_LEFT_ARROW))
+				if (is_selected(itemnum) && (pitem.flags() & FLAG_LEFT_ARROW))
 				{
 					float const l = effective_left + effective_width - subitem_width - gutter_width;
 					float const r = l + lr_arrow_width;
@@ -716,14 +715,14 @@ void menu::draw(uint32_t flags)
 					if (mouse_in_rect(l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height))
 						m_hover = HOVER_UI_LEFT;
 				}
-				if (is_selected(itemnum) && (pitem.flags & FLAG_RIGHT_ARROW))
+				if (is_selected(itemnum) && (pitem.flags() & FLAG_RIGHT_ARROW))
 				{
 					float const r = effective_left + effective_width + gutter_width;
 					float const l = r - lr_arrow_width;
 					draw_arrow(
-								l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height,
-								fgcolor,
-								ROT90);
+							l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height,
+							fgcolor,
+							ROT90);
 					if (mouse_in_rect(l, line_y0 + 0.1f * line_height, r, line_y0 + 0.9f * line_height))
 						m_hover = HOVER_UI_RIGHT;
 				}
@@ -735,7 +734,7 @@ void menu::draw(uint32_t flags)
 	if (selected_subitem_too_big)
 	{
 		menu_item const &pitem = selected_item();
-		bool const subitem_invert(pitem.flags & FLAG_INVERT);
+		bool const subitem_invert(pitem.flags() & FLAG_INVERT);
 		auto const linenum = m_selected - top_line;
 		float const line_y = visible_top + (float)linenum * line_height;
 		float target_width, target_height;
@@ -743,7 +742,7 @@ void menu::draw(uint32_t flags)
 		// compute the multi-line target width/height
 		ui().draw_text_full(
 				container(),
-				pitem.subtext,
+				pitem.subtext(),
 				0, 0, visible_width * 0.75f,
 				text_layout::text_justify::RIGHT, text_layout::word_wrapping::WORD,
 				mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(),
@@ -764,7 +763,7 @@ void menu::draw(uint32_t flags)
 
 		ui().draw_text_full(
 				container(),
-				pitem.subtext,
+				pitem.subtext(),
 				target_x, target_y, target_width,
 				text_layout::text_justify::RIGHT, text_layout::word_wrapping::WORD,
 				mame_ui_manager::NORMAL, ui().colors().selected_color(), ui().colors().selected_bg_color(),
@@ -1006,8 +1005,8 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool const ignoreleft = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_LEFT_ARROW);
-	bool const ignoreright = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags & FLAG_RIGHT_ARROW);
+	bool const ignoreleft = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags() & FLAG_LEFT_ARROW);
+	bool const ignoreright = !(flags & PROCESS_LR_ALWAYS) && !(selected_item().flags() & FLAG_RIGHT_ARROW);
 
 	// accept left/right/prev/next keys as-is with repeat if appropriate
 	if (!ignoreleft && exclusive_input_pressed(iptkey, IPT_UI_LEFT, (flags & PROCESS_LR_REPEAT) ? 6 : 0))

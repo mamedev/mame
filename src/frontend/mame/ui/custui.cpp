@@ -559,7 +559,7 @@ void menu_colors_ui::handle(event const *ev)
 	{
 		if ((uintptr_t)ev->itemref != MUI_RESTORE)
 		{
-			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)ev->itemref].color, selected_item().text);
+			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)ev->itemref].color, selected_item().text());
 		}
 		else
 		{
@@ -1080,7 +1080,7 @@ void menu_palette_sel::handle(event const *ev)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)
 		{
-			m_original = rgb_t(uint32_t(strtoul(selected_item().subtext.c_str(), nullptr, 16)));
+			m_original = rgb_t(uint32_t(strtoul(selected_item().subtext().c_str(), nullptr, 16)));
 			reset_parent(reset_options::SELECT_FIRST);
 			stack_pop();
 		}

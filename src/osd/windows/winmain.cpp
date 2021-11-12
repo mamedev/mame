@@ -64,7 +64,6 @@ private:
 	{
 		~ui_state()
 		{
-			std::lock_guard guard(mutex);
 			if (thread)
 				thread->join();
 		}

@@ -117,7 +117,6 @@ std::string mame_ui_manager::messagebox_poptext;
 
 // slider info
 std::vector<ui::menu_item> mame_ui_manager::slider_list;
-slider_state *mame_ui_manager::slider_current;
 
 
 /***************************************************************************
@@ -345,14 +344,6 @@ void mame_ui_manager::initialize(running_machine &machine)
 
 	// initialize the on-screen display system
 	slider_list = slider_init(machine);
-	if (slider_list.size() > 0)
-	{
-		slider_current = reinterpret_cast<slider_state *>(slider_list[0].ref);
-	}
-	else
-	{
-		slider_current = nullptr;
-	}
 
 	// if no test switch found, assign its input sequence to a service mode DIP
 	if (!m_machine_info->has_test_switch() && m_machine_info->has_dips())
@@ -1605,13 +1596,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	std::vector<ui::menu_item> items;
 	for (auto &slider : m_sliders)
 	{
-		ui::menu_item item;
-		item.text = slider->description;
-		item.subtext = "";
-		item.flags = 0;
-		item.ref = slider.get();
-		item.type = ui::menu_item_type::SLIDER;
-		items.push_back(item);
+		ui::menu_item item(ui::menu_item_type::SLIDER, slider.get());
+		item.set_text(slider->description);
+		items.emplace_back(std::move(item));
 	}
 
 	return items;

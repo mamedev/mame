@@ -75,7 +75,7 @@ void menu_video_targets::handle(event const *ev)
 		menu::stack_push<menu_video_options>(
 				ui(),
 				container(),
-				std::string(selected_item().text),
+				std::string(selected_item().text()),
 				*target,
 				&machine().video().snapshot_target() == target);
 	}
