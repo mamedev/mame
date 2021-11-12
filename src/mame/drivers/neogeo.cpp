@@ -2419,6 +2419,36 @@ ROM_START( aes )
 	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
 ROM_END
 
+/* 
+AES console modified to work with a standard JAMMA interface (with an an external JAMMA I/O adapter).
+No CPU/MCU on that JAMMA adapter PCB.
+
+Modifications seen on the AES console:
+ An extra SN74245N piggybacked onto the HCT245 at F10 and with wires to PRO-C0 at E7, to the resistors at K1, 
+ and to the additional JAMMA I/O adapter. A wire from CXA1145P to the additional JAMMA I/O adapter, wires from
+ the resistors at K1 directly to the additional JAMMA I/O adapter, modifications at the controllers ports
+ capacitors, and a wire from the diode at A2 to the additional JAMMA I/O adapter.
+
+The BIOS ROM contains the string: "NEO-GEO SYSTEM PROGRAM VERSION 0 COPYRIGHT BY SNK CORPORATION REVISED BY X
+ INTERNATIONAL COMPUTER CO. 1990"
+*/
+ROM_START( aesjamma )
+	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
+	ROM_SYSTEM_BIOS( 0, "jamma", "X International Computer Co." )
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "aesjamma.bin",  0x00000, 0x020000, CRC(05e105fa) SHA1(81fc763fd0b80d1d1ace95a98f2acf7325e377ad) )
+
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x90000, "audiocpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x20000, "spritegen:zoomy", 0 )
+	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
+
+	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
+ROM_END
+
 
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT        CLASS             INIT
@@ -2430,7 +2460,9 @@ CONS( 1990, ng_mv1f,  ng_mv1,  0,      mv1f,     neogeo,      mvs_led_state,    
 CONS( 1990, ng_mv1fz, ng_mv1,  0,      mv1fz,    neogeo,      mvs_state,        empty_init, "SNK", "Neo-Geo MV-1FZ",     MACHINE_SUPPORTS_SAVE )
 CONS( 1990, aes,      0,       0,      aes_ntsc, aes,         aes_state,        empty_init, "SNK", "Neo-Geo AES (NTSC)", MACHINE_SUPPORTS_SAVE )
 
-
+/* AES console modified to work with a standard JAMMA interface (with an an external JAMMA I/O adapter).
+   Marked as MNW because the exact modifications are not fully documented. */
+CONS( 1990, aesjamma, 0,       0,      aes_ntsc, aes,         aes_state,        empty_init, "SNK", "Neo-Geo AES mofified for use with JAMMA interface", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 
 // non-configurable slot (to be used for non-softlist sets, until we introduce some 'template' concept)
