@@ -3,6 +3,7 @@
 /**********************************************************************
 
     Nintendo Family Computer & Entertainment System Zapper Lightgun
+    Nintendo Family Computer Bandai Hyper Shot Lightgun
 
 **********************************************************************/
 
@@ -14,7 +15,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device, "nes_zapper", "Nintendo Zapper Lightgun")
+DEFINE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device,   "nes_zapper",   "Nintendo Zapper Lightgun")
+DEFINE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device, "nes_bandaihs", "Bandai Hyper Shot Lightgun")
 
 
 static INPUT_PORTS_START( nes_zapper )
@@ -27,6 +29,21 @@ static INPUT_PORTS_START( nes_zapper )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( nes_bandaihs )
+	PORT_INCLUDE( nes_zapper )
+
+	PORT_START("JOYPAD")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )  // has complete joypad inputs except button A
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+INPUT_PORTS_END
+
+
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
@@ -36,6 +53,11 @@ ioport_constructor nes_zapper_device::device_input_ports() const
 	return INPUT_PORTS_NAME( nes_zapper );
 }
 
+ioport_constructor nes_bandaihs_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( nes_bandaihs );
+}
+
 
 
 //**************************************************************************
@@ -43,15 +65,28 @@ ioport_constructor nes_zapper_device::device_input_ports() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  nes_zapper_device - constructor
+//  constructor
 //-------------------------------------------------
 
-nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NES_ZAPPER, tag, owner, clock),
-	device_nes_control_port_interface(mconfig, *this),
-	m_lightx(*this, "ZAPPER_X"),
-	m_lighty(*this, "ZAPPER_Y"),
-	m_trigger(*this, "ZAPPER_T")
+nes_zapper_device::nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nes_control_port_interface(mconfig, *this)
+	, m_lightx(*this, "ZAPPER_X")
+	, m_lighty(*this, "ZAPPER_Y")
+	, m_trigger(*this, "ZAPPER_T")
+{
+}
+
+nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_zapper_device(mconfig, NES_ZAPPER, tag, owner, clock)
+{
+}
+
+nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_zapper_device(mconfig, NES_BANDAIHS, tag, owner, clock)
+	, m_joypad(*this, "JOYPAD")
+	, m_latch(0)
+	, m_strobe(0)
 {
 }
 
@@ -62,6 +97,13 @@ nes_zapper_device::nes_zapper_device(const machine_config &mconfig, const char *
 
 void nes_zapper_device::device_start()
 {
+}
+
+void nes_bandaihs_device::device_start()
+{
+	nes_zapper_device::device_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_strobe));
 }
 
 
@@ -78,9 +120,9 @@ void nes_zapper_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_zapper_device::read_bit34()
+u8 nes_zapper_device::read_bit34()
 {
-	uint8_t ret = m_trigger->read();
+	u8 ret = m_trigger->read();
 	int x = m_lightx->read();
 	int y = m_lighty->read();
 
@@ -107,10 +149,35 @@ uint8_t nes_zapper_device::read_bit34()
 	return ret;
 }
 
-uint8_t nes_zapper_device::read_exp(offs_t offset)
+u8 nes_zapper_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 	if (offset == 1)    // $4017
 		ret |= nes_zapper_device::read_bit34();
 	return ret;
+}
+
+u8 nes_bandaihs_device::read_bit0()
+{
+	if (m_strobe & 1)
+		m_latch = m_joypad->read();
+
+	u8 ret = m_latch & 1;
+	m_latch = (m_latch >> 1) | 0x80;
+
+	return ret;
+}
+
+// In addition to bit 0 used here the real Bandai Hyper Shot also responds to
+// bits 1 and 2, neither emulated here. Bit 1 turns on and off a motor, which
+// causes the machine gun to shake as if to simulate recoil. Bit 2 turns on and
+// off an internal speaker in the gun. Videos demostrate that the speaker plays
+// the same audio as the Famicom itself. The analog audio signal of the FC is
+// carried on expansion port pin 2, so there's likely nothing more going on.
+void nes_bandaihs_device::write(u8 data)
+{
+	if (m_strobe & 1)
+		m_latch = m_joypad->read();
+
+	m_strobe = data;
 }
