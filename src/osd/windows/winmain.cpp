@@ -119,8 +119,10 @@ public:
 									}
 									state.buffer.str(std::string());
 								}
-								// don't hold any locks lock while calling MessageBox
-								win_message_box_utf8(parent, message.c_str(), emulator_info::get_appname(), MB_OK);
+								// Don't hold any locks lock while calling MessageBox.
+								// Parent window isn't set because MAME could destroy
+								// the window out from under us on a fatal error.
+								win_message_box_utf8(nullptr, message.c_str(), emulator_info::get_appname(), MB_OK);
 							}
 						});
 				state.active = true;
