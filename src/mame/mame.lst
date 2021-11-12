@@ -32485,6 +32485,7 @@ ng_mv1                          // NeoGeo MV-1
 ng_mv1f                         // NeoGeo MV-1F
 ng_mv1fz                        // NeoGeo MV-1FZ
 aes                             // NeoGeo AES
+aesjamma                        // bootleg for use with JAMMA interface
 2020bb                          // 0030 (c) 1991 SNK / Pallas
 2020bba                         // 0030 (c) 1991 SNK / Pallas
 2020bbh                         // 0030 (c) 1991 SNK / Pallas
