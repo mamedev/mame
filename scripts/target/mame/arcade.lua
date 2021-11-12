@@ -5083,6 +5083,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
 	MAME_DIR .. "src/mame/drivers/radikaldarts.cpp",
+	MAME_DIR .. "src/mame/drivers/rawthrillspc.cpp",
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
 	MAME_DIR .. "src/mame/drivers/rcorsair.cpp",
 	MAME_DIR .. "src/mame/drivers/re900.cpp",
