@@ -2462,7 +2462,7 @@ CONS( 1990, aes,      0,       0,      aes_ntsc, aes,         aes_state,        
 
 /* AES console modified to work with a standard JAMMA interface (with an an external JAMMA I/O adapter).
    Marked as MNW because the exact modifications are not fully documented. */
-CONS( 1990, aesjamma, 0,       0,      aes_ntsc, aes,         aes_state,        empty_init, "SNK", "Neo-Geo AES mofified for use with JAMMA interface", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1990, aesjamma, 0,       0,      aes_ntsc, aes,         aes_state,        empty_init, "SNK", "Neo-Geo AES modified for use with JAMMA interface", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 
 // non-configurable slot (to be used for non-softlist sets, until we introduce some 'template' concept)
