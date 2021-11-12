@@ -115,13 +115,6 @@ void nes_zapper_device::device_reset()
 {
 }
 
-void nes_bandaihs_device::device_reset()
-{
-	nes_zapper_device::device_reset();
-	m_latch = 0xff;
-	m_strobe = 0xff;
-}
-
 
 //-------------------------------------------------
 //  read
