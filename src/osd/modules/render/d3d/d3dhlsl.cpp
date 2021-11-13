@@ -2371,14 +2371,10 @@ void shaders::init_slider_list()
 
 				std::unique_ptr<slider_state> core_slider = slider_alloc(std::move(name), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
-				ui::menu_item item;
-				item.text = core_slider->description;
-				item.subtext = "";
-				item.flags = 0;
-				item.ref = core_slider.get();
-				item.type = ui::menu_item_type::SLIDER;
-				m_sliders.push_back(item);
-				m_core_sliders.push_back(std::move(core_slider));
+				ui::menu_item item(ui::menu_item_type::SLIDER, core_slider.get());
+				item.set_text(core_slider->description);
+				m_sliders.emplace_back(item);
+				m_core_sliders.emplace_back(std::move(core_slider));
 			}
 		}
 	}

@@ -99,6 +99,9 @@ public:
 
 	template <unsigned Channel> void dack_w(int state) { if (!state) m_adc = Channel; }
 
+	// HACK: temporary workaround for eop handling
+	unsigned adc_r() { return m_adc; }
+
 protected:
 	// device_t overrides
 	virtual void device_start() override;
@@ -133,6 +136,9 @@ protected:
 				// FIXME: get size from isa bus
 				return 1;
 		}
+		else if (address == 0xf000'80e0U)
+			// exception for i/o delay register
+			return 4;
 		else if (address == 0xf000'8400U)
 			// exception for kls
 			return 2;

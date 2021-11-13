@@ -102,33 +102,33 @@ offsets:
 
 uint8_t stv_state::stv_ioga_r(offs_t offset)
 {
-	const char *const portg[] = { "PORTG.0", "PORTG.1", "PORTG.2", "PORTG.3" };
-
 	uint8_t res;
 
 	res = 0xff;
 	if(offset & 0x10 && !machine().side_effects_disabled())
-		printf("Reading from mirror %08x?\n",offset * 2 + 1);
+		logerror("Reading from mirror %08x?\n",offset * 2 + 1);
 
 	offset &= 0x0f; // mirror?
 
-	switch(offset * 2 + 1)
+	switch((offset * 2) + 1)
 	{
-		case 0x01: res = ioport("PORTA")->read(); break; // P1
-		case 0x03: res = ioport("PORTB")->read(); break; // P2
-		case 0x05: res = ioport("PORTC")->read(); break; // SYSTEM
-		case 0x07: res = m_system_output; break; // port D, read-backs value written
-		case 0x09: res = ioport("PORTE")->read(); break; // P3
-		case 0x0b: res = ioport("PORTF")->read(); break; // P4
 		case 0x0d:
 			if (m_ioga_mode & 0x80) // PORT-G in counter mode
 			{
-				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);
-				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 7); // counter# is auto-incremented then read
+				uint8_t const sel = (m_ioga_portg >> 1) & 0x03;
+				res = ((m_ioga_counters[sel]->read() - m_ioga_count[sel]) >> ((~m_ioga_portg & 1) * 8) & 0xff);
+				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 0x07); // counter# is auto-incremented on read
+				break;
 			}
-			else
-				res = ioport("PORTG")->read();
+			[[fallthrough]];
+		case 0x01: // P1
+		case 0x03: // P2
+		case 0x05: // SYSTEM
+		case 0x09: // P3
+		case 0x0b: // P4
+			res = m_ioga_ports[offset]->read();
 			break;
+		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x1b: res = 0; break; // Serial COM READ status
 		case 0x1d: res = m_ioga_mode; break;
 	}
@@ -139,7 +139,7 @@ uint8_t stv_state::stv_ioga_r(offs_t offset)
 void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 {
 	if(offset & 0x10 && !machine().side_effects_disabled())
-		printf("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
+		logerror("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
 
 	offset &= 0x0f; // mirror?
 
@@ -159,7 +159,11 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 			m_billboard->write(data);
 			break;
 		case 0x0d:
-			// then bit 7==0 - reset counters, currently this is unhandled, instead counters reset after each read (PORT_RESET used)
+			if(!BIT(data, 7)) // when bit 7==0 reset counters
+			{
+				for(unsigned i = 0; m_ioga_counters.size() > i; ++i)
+					m_ioga_count[i] = m_ioga_counters[i]->read();
+			}
 			m_ioga_portg = data;
 			break;
 		case 0x1d:
@@ -170,10 +174,9 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 
 uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 {
-	uint8_t res;
 	const char *const lgnames[] = { "LIGHTX", "LIGHTY" };
 
-	res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(offset * 2 + 1)
 	{
@@ -183,7 +186,9 @@ uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 			res = bitswap<8>(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
 			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
-		default: res = stv_ioga_r(offset); break;
+		default:
+			res = stv_ioga_r(offset);
+			break;
 	}
 
 	return res;
@@ -238,27 +243,22 @@ void stv_state::magzun_ioga_w(offs_t offset, uint8_t data)
 
 uint8_t stv_state::stvmp_ioga_r(offs_t offset)
 {
-	const char *const mpnames[2][5] = {
-		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
-		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
-	uint8_t res;
-
-	res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(offset * 2 + 1)
 	{
 		case 0x01:
 		case 0x03:
-			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only select PORTE direction
+			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only selects PORTE direction
+			{
 				res = stv_ioga_r(offset);
+			}
 			else // mahjong panel select
 			{
-				int i;
-
-				for(i=0;i<5;i++)
+				for(unsigned i = 0; m_ioga_mahjong[i].size() > i; i++)
 				{
-					if(m_mux_data & 1 << i)
-						res = ioport(mpnames[offset][i])->read();
+					if(BIT(m_mux_data, i))
+						res &= m_ioga_mahjong[offset][i]->read();
 				}
 			}
 			break;
@@ -1081,13 +1081,13 @@ void stv_state::stv_select_game(int gameno)
 
 uint8_t stv_state::pdr1_input_r()
 {
-	return (ioport("PDR1")->read() & 0x40) | 0x3f;
+	return (m_pdr[0]->read() & 0x40) | 0x3f;
 }
 
 
 uint8_t stv_state::pdr2_input_r()
 {
-	return (ioport("PDR2")->read() & ~0x19) | 0x18 | (m_eeprom->do_read()<<0);
+	return (m_pdr[1]->read() & ~0x19) | 0x18 | (m_eeprom->do_read() << 0);
 }
 
 
@@ -1242,7 +1242,7 @@ void stv_state::batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t me
 	if(ACCESSING_BITS_16_31)
 		m_rax->data_w(data >> 16);
 	if(ACCESSING_BITS_0_15)
-		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
+		logerror("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }
 
 
@@ -1825,9 +1825,9 @@ static INPUT_PORTS_START( patocar )
 
 	// TODO: sense/delta values seems wrong
 	PORT_MODIFY("PORTG.0")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(500) PORT_KEYDELTA(100) PORT_PLAYER(1)
 	PORT_MODIFY("PORTG.1")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(500) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_MODIFY("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1)    PORT_NAME("10Yen")

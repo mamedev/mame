@@ -82,7 +82,7 @@ private:
 	void mem_map(address_map &map);
 	u8 m_u14 = 0;
 	u8 m_digit = 0;
-	u8 m_segment[16];
+	u8 m_segment[16]{};
 	u8 m_last_solenoid = 15;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

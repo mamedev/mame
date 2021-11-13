@@ -264,6 +264,9 @@ void coco_t4426_device::device_start()
 {
 	LOG("%s()\n", FUNCNAME );
 	m_cart = dynamic_cast<device_image_interface *>(owner());
+
+	// save state support
+	save_item(NAME(m_select));
 }
 
 

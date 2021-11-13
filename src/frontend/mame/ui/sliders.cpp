@@ -160,9 +160,9 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 	std::vector<menu_item> ui_sliders = ui().get_slider_list();
 	for (const menu_item &item : ui_sliders)
 	{
-		if (item.type == menu_item_type::SLIDER)
+		if (item.type() == menu_item_type::SLIDER)
 		{
-			slider_state *const slider = reinterpret_cast<slider_state *>(item.ref);
+			slider_state *const slider = reinterpret_cast<slider_state *>(item.ref());
 			bool display(true);
 #if 0
 			// FIXME: this test should be reimplemented in a dedicated menu
@@ -192,9 +192,9 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 	std::vector<menu_item> osd_sliders = machine().osd().get_slider_list();
 	for (const menu_item &item : osd_sliders)
 	{
-		if (item.type == menu_item_type::SLIDER)
+		if (item.type() == menu_item_type::SLIDER)
 		{
-			slider_state* slider = reinterpret_cast<slider_state *>(item.ref);
+			slider_state* slider = reinterpret_cast<slider_state *>(item.ref());
 			int32_t curval = slider->update(&tempstring, SLIDER_NOCHANGE);
 			uint32_t flags = 0;
 			if (curval > slider->minval)

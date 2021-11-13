@@ -17,6 +17,7 @@ function timer.startplugin()
 
 	local reference = 0
 	local lastupdate
+	local highlight -- hacky - workaround for the menu not remembering the selected item if its ref is nullptr
 
 
 	local function sectohms(time)
@@ -38,7 +39,7 @@ function timer.startplugin()
 				{ _p("plugin-timer", "Current time"), sectohms(time), "off" },
 				{ _p("plugin-timer", "Total time"), sectohms(total), "off" },
 				{ _p("plugin-timer", "Play Count"), play_count, "off" } },
-			nil,
+			highlight,
 			"idle"
 	end
 
@@ -47,6 +48,7 @@ function timer.startplugin()
 			reference = reference ~ 1
 			return true
 		end
+		highlight = index
 		return os.time() > lastupdate
 	end
 

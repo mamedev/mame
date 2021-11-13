@@ -133,10 +133,11 @@ void rmnimbus_state::nimbus(machine_config &config)
 	PALETTE(config, m_palette).set_entries(16);
 
 	/* Backing storage */
-	WD2793(config, m_fdc, 1000000);
+	WD2793(config, m_fdc, 2000000);
 	m_fdc->set_force_ready(true);
 	m_fdc->intrq_wr_callback().set(FUNC(rmnimbus_state::nimbus_fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(rmnimbus_state::nimbus_fdc_drq_w));
+	m_fdc->enmf_rd_callback().set(FUNC(rmnimbus_state::nimbus_fdc_enmf_r));
 	FLOPPY_CONNECTOR(config, FDC_TAG":0", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC_TAG":1", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats);
 
@@ -210,6 +211,8 @@ void rmnimbus_state::nimbus(machine_config &config)
 	msm5205.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("nimbus");
+	
+	m_maincpu->set_dasm_override(FUNC(rmnimbus_state::dasm_override));
 }
 
 /*

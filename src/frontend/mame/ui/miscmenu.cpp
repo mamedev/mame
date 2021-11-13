@@ -730,7 +730,6 @@ menu_machine_configure::~menu_machine_configure()
 void menu_machine_configure::handle(event const *ev)
 {
 	// process the menu
-	//process_parent(); FIXME: drawn in the wrong order, can't see menu
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)

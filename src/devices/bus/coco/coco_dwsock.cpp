@@ -94,6 +94,12 @@ void beckerport_device::device_start()
 	}
 
 	osd_printf_verbose("Connected!\n");
+
+	// save state support
+	save_item(NAME(m_rx_pending));
+	save_item(NAME(m_head));
+	save_item(NAME(m_buf));
+
 }
 
 /*-------------------------------------------------
