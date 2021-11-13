@@ -273,7 +273,7 @@ menu_input::~menu_input()
 void menu_input::menu_activated()
 {
 	// scripts can change settings out from under us
-	reset(reset_options::REMEMBER_REF);
+	reset(reset_options::REMEMBER_POSITION);
 }
 
 
