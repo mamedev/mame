@@ -443,7 +443,6 @@ uint32_t amiga_state::blit_ascending()
 			/* fetch data for A */
 			if (CUSTOM_REG(REG_BLTCON0) & 0x0800)
 			{
-				//CUSTOM_REG(REG_BLTADAT) = m_maincpu->space(AS_PROGRAM).read_word(CUSTOM_REG_LONG(REG_BLTAPTH));
 				CUSTOM_REG(REG_BLTADAT) = read_chip_ram(CUSTOM_REG_LONG(REG_BLTAPTH));
 				CUSTOM_REG_LONG(REG_BLTAPTH) += 2;
 			}
@@ -916,6 +915,8 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 	/* clear the zero flag if we actually wrote data */
 	if (blitsum)
 		CUSTOM_REG(REG_DMACON) &= ~0x2000;
+	if (LOG_BLITS)
+		logerror("%04x ZF=%d\n", blitsum, bool(BIT(CUSTOM_REG(REG_DMACON), 13)));
 
 	/* no longer busy */
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;

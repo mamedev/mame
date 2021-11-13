@@ -958,6 +958,8 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 10);
 
 					/* sprite has priority */
+					// TODO: verify if PF2Px priority applies to HAM too 
+					// (technically it's a non-dual too?)
 					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
@@ -1016,7 +1018,10 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					pri = (sprpix >> 10);
 
 					/* sprite has priority */
-					if (sprpix && pf1pri > pri)
+					// alfred OCS won't draw player sprite if PF1Px is used here 
+					// (writes $0038 to bplcon2)
+					// According to HRM PF2Px is used there for non-dual playfield
+					if (sprpix && pf2pri > pri)
 					{
 						dst[x*2+0] =
 						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pix));
