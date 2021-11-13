@@ -1030,6 +1030,9 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 					/* playfield has priority */
 					else
 					{
+						// TODO: fix SWIV wrong colors for text layer
+						// Abuses of an undocumented OCS/ECS HW bug where priority >= 5 (7 in the specific case)
+						// makes the bitplanes to only output bit 4 discarding the other pixels
 						dst[x*2+0] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pfpix0));
 						dst[x*2+1] = m_palette->pen(CUSTOM_REG(REG_COLOR00 + pfpix1));
 					}

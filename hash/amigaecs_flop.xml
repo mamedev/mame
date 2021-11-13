@@ -127,7 +127,7 @@ Flashing "IO Error: 4; Disk May Be Corrupt" at initial boot, [FDC] dsksync
 		</part>
 	</software>
 
-	<software name="fatman" supported="no">
+	<software name="fatman" supported="partial">
 		<!-- SPS (CAPS) release 943 -->
 		<description>Fatman - The Caped Consumer (Euro)</description>
 		<!-- retail, standalone -->
@@ -135,7 +135,6 @@ Flashing "IO Error: 4; Disk May Be Corrupt" at initial boot, [FDC] dsksync
 		<year>1994</year>
 		<publisher>Black Legend</publisher>
 		<notes><![CDATA[
-Has [Denise] GFX pitch issues on gameplay
 Grandslam logo has wrong [Denise] colors (a600)
 Doesn't show cursor on main menu [Lisa]
 ]]></notes>

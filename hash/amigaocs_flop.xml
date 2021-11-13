@@ -1608,6 +1608,7 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
+Crashes on initial loading, [FDC] dsksync
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -2898,9 +2899,11 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Logotron</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: failed
 ]]></notes>
 		<info name="usage" value="Sports manual copy-protection"/>
+		<!-- Omake: After beating Archipelago 2 try to change archipelago with "8421" for a level select (source TCRF) -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="376986">
@@ -4493,7 +4496,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="bandking" supported="no">
+	<software name="bandking" supported="partial">
 		<!-- SPS (CAPS) release 2794 -->
 		<description>Bandit Kings of Ancient China (Euro)</description>
 		<!-- retail, standalone -->
@@ -4501,6 +4504,8 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<notes><![CDATA[
+boot OK
+Needs optional Save Disk to save, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7555,7 +7560,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="bdashck" supported="no">
+	<software name="bdashck" supported="yes">
 		<!-- SPS (CAPS) release 464 -->
 		<description>Boulder Dash Construction Kit (Euro)</description>
 		<!-- retail, standalone -->
@@ -7563,6 +7568,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		<year>1989</year>
 		<publisher>Wicked</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -11546,7 +11552,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="coolcroc" supported="no">
+	<software name="coolcroc" supported="partial">
 		<!-- SPS (CAPS) release 920 -->
 		<description>Cool Croc Twins (Euro)</description>
 		<!-- retail, standalone -->
@@ -11554,8 +11560,11 @@ ATK test: C:0 H:U Bad
 		<year>1992</year>
 		<publisher>Arcade Masters</publisher>
 		<notes><![CDATA[
+boot OK
+Optional Hi-Score Disk load/save [FDC] format
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports codesheet copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps920)coolcroctwins.ipf" size="1049180" crc="3041f0d7" sha1="e7e41b3dced5531971925f56683b43f8f9371a52"/>
@@ -12777,7 +12786,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="dailydhh" supported="no">
+	<software name="dailydhh" supported="partial">
 		<!-- SPS (CAPS) release 284 -->
 		<description>Daily Double Horse Racing (Euro)</description>
 		<!-- retail, standalone -->
@@ -12785,8 +12794,11 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>CDS</publisher>
 		<notes><![CDATA[
+boot OK
+Optional Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (racing form)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps284)dailydoublehorseracing.ipf" size="1049612" crc="9181037b" sha1="52850bc785a2ac94524834f9aff47a88b2e00922"/>
@@ -13761,8 +13773,10 @@ ATK test: failed
 		<year>1987</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
+Black screen after title screen, [FDC] dsksync
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Insert ABUSS when prompted for secret code"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps2712)demolition.ipf" size="1049304" crc="41d05c8a" sha1="9559fa848758b2d2df54acc49dbae2305bddc06d"/>
@@ -16294,6 +16308,7 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>MicroIllusion</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -18599,7 +18614,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="feud" supported="no">
+	<software name="feud" supported="yes">
 		<!-- SPS (CAPS) release 762 -->
 		<description>Feud (Euro)</description>
 		<!-- retail, standalone -->
@@ -18607,6 +18622,7 @@ ATK test: OK
 		<year>1987</year>
 		<publisher>Mastertronic</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -23472,6 +23488,7 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Software 2000</publisher>
 		<notes><![CDATA[
+Random hangs during gameplay with offsetted playfield
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -28579,8 +28596,15 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>MicroProse</publisher>
 		<notes><![CDATA[
+Randomly fails to load with a black screen (TODO: related to RAM config?)
+Has invalid polygon draws
+Optional [FDC] format option for Hi-Score saves
+Optional unemulated analog joystick
+Optional unemulated modem support
 ATK test: OK
 ]]></notes>
+		<!-- TODO: pinpoint exact minimum RAM required -->
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -33772,6 +33796,7 @@ ATK test: C:0 H:U Bad
 		<year>1993</year>
 		<publisher>Millennium</publisher>
 		<notes><![CDATA[
+Hangs at a red screen, [FDC] dsksync
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -36580,6 +36605,9 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Global</publisher>
 		<notes><![CDATA[
+Hangs at now loading logo, [FDC] dsksync
+Has scrolling glitches during gameplay, [Copper]
+Sprite is cutoff when using the pneumatic drill
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -36589,7 +36617,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="pacland" supported="no">
+	<software name="pacland" supported="yes">
 		<!-- SPS (CAPS) release 23 -->
 		<description>Pac-Land (Euro)</description>
 		<!-- retail, standalone -->
@@ -36597,6 +36625,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Grandslam</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37260,7 +37289,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="pga" supported="no">
+	<software name="pga" supported="yes">
 		<!-- SPS (CAPS) release 891 -->
 		<description>PGA Tour Golf (Euro)</description>
 		<!-- retail, standalone -->
@@ -37268,18 +37297,20 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (course yardage information)"/>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Course Disk" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps891)pgatourgolf_coursesdisk.ipf" size="1049180" crc="dcd06580" sha1="28d8d34083050212b4a018eb8c8cf83729cca7e1"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps891)pgatourgolf_programdisk.ipf" size="1049180" crc="9051a777" sha1="6624a5229c8a40f3c4770894f5aef6433b4ee576"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Course Disk" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps891)pgatourgolf_coursesdisk.ipf" size="1049180" crc="dcd06580" sha1="28d8d34083050212b4a018eb8c8cf83729cca7e1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -38448,6 +38479,7 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
+Doesn't accept keyboard input when prompted to insert name
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -39836,6 +39868,8 @@ ATK test: failed
 		<year>1988</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
+Asks for a Character Disk, which needs to be formatted beforehand [FDC] format
+Demo works ok
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -40965,8 +40999,11 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Melbourne House</publisher>
 		<notes><![CDATA[
+Corrupted main menu GFXs
+Eventually throws Guru Meditation before gameplay
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Requires Fast RAM installed"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1716)rickdavissworldtrophysoccer.ipf" size="1049612" crc="0c57d3be" sha1="e55e492436743aa7208f1610f0414b647d34d728"/>
@@ -44063,6 +44100,7 @@ ATK test: C:0 H:U Bad
 		<year>1991</year>
 		<publisher>MicroProse</publisher>
 		<notes><![CDATA[
+Prompts user to copy disks at boot, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -46702,6 +46740,8 @@ ATK test: C:0 H:U Bad
 		<year>1988</year>
 		<publisher>Axxiom</publisher>
 		<notes><![CDATA[
+Doesn't draw background and enemies during gameplay, uses [Blitter] nasty
+a500p: doesn't boot, illegal [Copper] writes, reads to open bus area
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -46719,6 +46759,8 @@ ATK test: OK
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
+Spinworld: doesn't draw background and enemies during gameplay, uses [Blitter] nasty, behaves differently depending on base machine (a500, a500p, a1200)
+The Way of the Little Dragon: works more or less like the stand-alone version
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -46814,6 +46856,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Leisure Genius</publisher>
 		<notes><![CDATA[
+Randomly either hangs at the green screen loading, throw a Guru Meditation or just boots, [FDC] with adkcon=1100
 ATK test: OK
 ]]></notes>
 		<info name="alt_title" value="Spot - The Computer Game! (Box)" />
@@ -48988,7 +49031,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="suspect" supported="no">
+	<software name="suspect" supported="yes">
 		<!-- SPS (CAPS) release 2868 -->
 		<description>Suspect (USA, r14)</description>
 		<!-- retail, standalone -->
@@ -48996,8 +49039,10 @@ ATK test: failed
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch Suspect from Workbench"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2868)suspect.ipf" size="1049612" crc="6b7cdae5" sha1="ce8e0e8b0e62943e2069a7da96eba494a98b340b"/>
@@ -49105,7 +49150,8 @@ ATK test: failed
 		<year>1991</year>
 		<publisher>Storm</publisher>
 		<notes><![CDATA[
-Hangs at kernel "please wait" message
+Hangs at kernel "please wait" message, [FDC] dsksync
+Wrong text colors unless nothing is drawn below, known to abuse of a [Denise] bug with priority
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -49186,10 +49232,14 @@ ATK test: OK
 		<notes><![CDATA[
 black screen [FDC] dsksync
 Has sprite GFX vertical strip on map screen
-GFX pitch corruption on gameplay, [Denise] DDFSTOP == 0xd6
-Has incorrect transparent pixels during gameplay (cfr. player sprite left boot)
+Has incorrect transparent pixels across gameplay (cfr. player sprite left boot, spears in stage 2, barrels in stage 3)
+Game Over screen has [Denise] GFX glitch
+TODO: verify collision detection (cfr. attack doesn't trigger when extremely near enemies, pickups)
+TODO: verify this with a500p once [FDC] dsksync bug is actually fixed
+TODO: verify other misc UX tidbits (needs to press fire to start a stage?)
 ATK test: failed
 ]]></notes>
+		<!-- Omake: Various keyboard inputs are given, 'C', 'P', 'Help' keys throws easter eggs, other keys? -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1030536">
@@ -51581,13 +51631,13 @@ ATK test: C:0 H:U Bad
 
 	<software name="tomjerry" cloneof="tomjer2" supported="no">
 		<!-- SPS (CAPS) release 1306 -->
+		<!-- According to HOL, Tom &amp; Jerry was the US title of European Tom &amp; Jerry 2 (due to Hunting High and Low not being released there?) -->
 		<description>Tom &amp; Jerry (Euro?)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Magic Bytes</publisher>
 		<notes><![CDATA[
-According to HOL, Tom &amp; Jerry was the US title of European Tom &amp; Jerry 2 (due to Hunting High and Low not being released there?)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -55795,6 +55845,8 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Zeppelin Platinum</publisher>
 		<notes><![CDATA[
+Black screen, [FDC] dsksync
+Crashes after title screen display
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
