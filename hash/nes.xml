@@ -12230,8 +12230,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train3as" cloneof="dancaero" supported="partial">
-		<description>Family Trainer 3 - Aerobics Studio (Jpn)</description>
+	<software name="train3as" cloneof="dancaero">
+		<description>Family Trainer 3 - Aerobics Studio (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-03"/>
