@@ -158,6 +158,12 @@ VIDEO_START_MEMBER( amiga_state, amiga )
  *
  *************************************/
 
+// TODO: sync writes (VPOSW, VHPOSW), strobe beams (STR* class regs at 0x38-0x3e), ECS/AGA BEAMCON0
+// A good chunk of copy protected games uses this timing as RNG seed,
+// optionally syncing the beam to a known state (TBD find examples of this).
+// In case of pbprel_a (AGA), it uses this to check if system has AGA equipped chipset.
+// We may also need a "temporary" screen beam disable until a VBLANK occurs:
+// for instance is dubious that beams are in a known state if a strobe happens ...
 uint32_t amiga_state::amiga_gethvpos()
 {
 	uint32_t hvpos = (m_last_scanline << 8) | (m_screen->hpos() >> 2);
@@ -168,7 +174,7 @@ uint32_t amiga_state::amiga_gethvpos()
 	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (m_last_scanline >= 20 && hvpos < latchedpos))
 		return hvpos;
 
-	/* otherwise, return the latched position */
+	/* otherwise, return the latched position (cfr. lightgun input in alg.cpp, lightpen) */
 	return latchedpos;
 }
 
@@ -742,8 +748,12 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	next_copper_x = 0;	
 	// FIXME: without the add this increment will skip bitplane ops
 	// ddf_stop_pixel_max = 0xd8 * 2 = 432 + 17 + 15 + 1(*) = 465 > width / 2 (455)
-	// (*) because there's a comparison with <= in the bitplane code ...
-	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2 + 10; x++)
+	// (*) because there's a comparison with <= in the bitplane code.
+	// There are various root causes about why this happens:
+	// - no separation of video and logic models;
+	// - the offsets we are applying to DDFSTRT and DDFSTOP, they mustn't be right (copper timings?);
+	// - ditto for DIW related values, they are offset in far too many places;
+	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2) + 10; x++)
 	{
 		int sprpix;
 
@@ -764,13 +774,17 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
 
 			/* compute the pixel fetch parameters */
-			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
+			// lastbtle sets 0x34-0xd0, lores
+			// swordsod sets 0x38-0xd6 (on gameplay), lores
+			// TODO: verify hires, fix mask for ECS (which can set bit 1 too)
+//			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & (hires ? 0xfc : 0xf8)) * 2;
+			ddf_start_pixel = (CUSTOM_REG(REG_DDFSTRT) & 0xfc) * 2;
 			ddf_start_pixel += hires ? 9 : 17;
-			// FIXME: swordsod uses 0xd6 in lores mode, causing GFX pitch corruption
-			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
+//			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & (hires ? 0xfc : 0xf8)) * 2;
+			ddf_stop_pixel = (CUSTOM_REG(REG_DDFSTOP) & 0xfc) * 2;
 			ddf_stop_pixel += hires ? (9 + defbitoffs) : (17 + defbitoffs);
 
-			// TODO: verify this one
+			// TODO: verify this one on actual hires mode
 			// lastbtle definitely don't need this (enables bit 2 of ddfstrt while in lores mode)
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 && hires )
 				ddf_stop_pixel += 8;

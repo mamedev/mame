@@ -527,8 +527,13 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		CUSTOM_REG(REG_COLOR00) = m_genlock_color;
 
 	/* loop over the line */
-	next_copper_x = 2;  /* copper runs on odd timeslots */
-	for (int x = 0; x < amiga_state::SCREEN_WIDTH / 2; x++)
+	/* copper runs on odd timeslots */
+	next_copper_x = 2;
+	// TODO: verify where we're missing pixels here for the GFX pitch bitplane failures
+	// i.e. wbenc30 scrolling in lores mode, sockid_a gameplay
+	// NB: latter now gives specific corrupt bitplanes on arbitrary add due of the delays,
+	// it also draws the status bar slightly offset (doesn't happen on the OCS version of the game)
+	for (int x = 0; x < (amiga_state::SCREEN_WIDTH / 2); x++)
 	{
 		int sprpix;
 
@@ -544,12 +549,20 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 			/* compute update-related register values */
 			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
+			// TODO: verify number of planes that doesn't go beyond 8
 			if ( CUSTOM_REG(REG_BPLCON0) & BPLCON0_BPU3 )
 				planes |= 8;
 
 			hires = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HIRES;
 			ham = CUSTOM_REG(REG_BPLCON0) & BPLCON0_HOMOD;
 			dualpf = CUSTOM_REG(REG_BPLCON0) & BPLCON0_DBLPF;
+			// TODO: emulate SHRES mode
+			// cfr. a1200 -bios logica2,
+			// press any key when prompted, select A1200 (5) -> Display Menu (9) -> Super HIRES HAM mode (8)
+			// In theory it's simple: maps bitplanes in 35ns resolution, offsetting where needed.
+			// In practice we need to separate bitplane delays & drawing first.
+			//shres = CUSTOM_REG(REG_BPLCON0) & 0x0040;
+			
 			// In AGA Extra Half-Brite applies if this condition is satisfied
 			// (bit 9 of BPLCON2 is KILLEHB)
 			// cfr. bblow_a main menu
@@ -567,11 +580,13 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			}
 
 			/* compute the pixel fetch parameters */
-			// TODO: does ddf_start_pixel offsets with fmode != 0?
+			// FIXME: offsets applied are definitely not right
+			// does ddf_start_pixel offsets with fmode != 0?
 			// wbenc30 expects a +8 to align the screen with fmode == 3, which may or may not be right
 			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
 			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs - ((defbitoffs >= 31) ? 16 : 0)) : (17 + defbitoffs));
 
+			// FIXME: as like OCS/ECS Amiga verify this one
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
 				ddf_stop_pixel += 8;
 

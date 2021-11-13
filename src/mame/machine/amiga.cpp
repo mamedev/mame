@@ -1494,20 +1494,20 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_DDFSTRT:
 			/* impose hardware limits ( HRM, page 75 ) */
-			data &= 0xfe;
+			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
 			if (data < 0x18)
 			{
-				logerror("%s: Attempt to write to DDFSTRT with %04x\n", machine().describe_context(), data);
+				logerror("%s: Attempt to underrun DDFSTRT with %04x\n", machine().describe_context(), data);
 				data = 0x18;
 			}
 			break;
 
 		case REG_DDFSTOP:
 			/* impose hardware limits ( HRM, page 75 ) */
-			data &= 0xfe;
+			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
 			if (data > 0xd8)
 			{
-				logerror("%s: Attempt to write to DDFSTRT with %04x\n", machine().describe_context(), data);
+				logerror("%s: Attempt to overrun DDFSTOP with %04x\n", machine().describe_context(), data);
 				data = 0xd8;
 			}
 			break;

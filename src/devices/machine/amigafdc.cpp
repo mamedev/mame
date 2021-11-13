@@ -317,11 +317,10 @@ void amiga_fdc_device::live_run(const attotime &limit)
 						dma_state = DMA_RUNNING_BYTE_1;
 						break;
 
-					case DMA_RUNNING_BYTE_1: {
+					case DMA_RUNNING_BYTE_1:
 						dma_value |= cur_live.shift_reg & 0xff;
 						dma_write(dma_value);
 						break;
-					}
 					}
 				}
 			} else {
