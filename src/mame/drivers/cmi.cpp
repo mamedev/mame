@@ -160,7 +160,7 @@
 
 static const int ch_int_levels[8] =
 {
-	12 ^ 7, 8 ^ 7, 13 ^ 7, 9 ^ 7, 14 ^ 7, 10 ^ 7, 15 ^ 7, 11  ^ 7
+	12 xor 7, 8 xor 7, 13 xor 7, 9 xor 7, 14 xor 7, 10 xor 7, 15 xor 7, 11  xor 7
 };
 
 #define IRQ_PERRINT_LEVEL       (0 ^ 7)
