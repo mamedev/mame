@@ -316,6 +316,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/archimedes/econet/slot.h,BUSES["ARCHIMEDES_ECONET"] = true
+---------------------------------------------------
+
+if (BUSES["ARCHIMEDES_ECONET"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/archimedes/econet/slot.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/slot.h",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/econet.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/econet.h",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/rtfmjoy.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/econet/rtfmjoy.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/astrocde/slot.h,BUSES["ASTROCADE"] = true
 ---------------------------------------------------
 
