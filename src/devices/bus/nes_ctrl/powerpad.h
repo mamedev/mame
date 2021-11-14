@@ -37,8 +37,7 @@ protected:
 	virtual void write(u8 data) override;
 
 private:
-	required_ioport m_ipt1;
-	required_ioport m_ipt2;
+	required_ioport_array<2> m_ipt;
 	u8 m_latch[2];
 	u8 m_strobe;
 };
