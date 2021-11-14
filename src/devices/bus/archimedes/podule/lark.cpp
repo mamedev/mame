@@ -74,7 +74,7 @@ private:
 void arc_lark_device::ioc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 11) & 0x1f800)]; })).umask32(0x000000ff);
-	map(0x0000, 0x0000).lw8(NAME([this](u8 data) { })); // XC3030 FPGA
+	map(0x0000, 0x0000).lw8(NAME([](u8 data) { })); // XC3030 FPGA
 	map(0x2000, 0x2000).lw8(NAME([this](u8 data) { m_rom_page = data; }));
 	map(0x3000, 0x3000).rw(FUNC(arc_lark_device::status_r), FUNC(arc_lark_device::control_w));
 	map(0x3400, 0x341f).rw("uart", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w)).umask32(0x000000ff);
