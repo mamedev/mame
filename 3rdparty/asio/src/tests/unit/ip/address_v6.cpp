@@ -2,7 +2,7 @@
 // address_v6.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -144,15 +144,15 @@ void test()
     addr1 = ip::make_address_v6("0::0", ec);
     addr1 = ip::make_address_v6(string_value);
     addr1 = ip::make_address_v6(string_value, ec);
-#if defined(ASIO_HAS_STD_STRING_VIEW)
-# if defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-    std::experimental::string_view string_view_value("0::0");
-# else // defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+#if defined(ASIO_HAS_STRING_VIEW)
+# if defined(ASIO_HAS_STD_STRING_VIEW)
     std::string_view string_view_value("0::0");
+# else // defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+    std::experimental::string_view string_view_value("0::0");
 # endif // defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
     addr1 = ip::make_address_v6(string_view_value);
     addr1 = ip::make_address_v6(string_view_value, ec);
-#endif // defined(ASIO_HAS_STD_STRING_VIEW)
+#endif // defined(ASIO_HAS_STRING_VIEW)
 
     // address_v6 IPv4-mapped conversion.
 #if defined(ASIO_NO_DEPRECATED)
@@ -170,6 +170,11 @@ void test()
     std::wostringstream wos;
     wos << addr1;
 #endif // !defined(BOOST_NO_STD_WSTREAMBUF)
+
+#if defined(ASIO_HAS_STD_HASH)
+    std::size_t hash1 = std::hash<ip::address_v6>()(addr1);
+    (void)hash1;
+#endif // defined(ASIO_HAS_STD_HASH)
   }
   catch (std::exception&)
   {

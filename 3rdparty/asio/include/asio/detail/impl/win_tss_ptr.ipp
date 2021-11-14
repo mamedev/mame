@@ -2,7 +2,7 @@
 // detail/impl/win_tss_ptr.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,9 +31,9 @@ namespace detail {
 DWORD win_tss_ptr_create()
 {
 #if defined(UNDER_CE)
-  enum { out_of_indexes = 0xFFFFFFFF };
+  const DWORD out_of_indexes = 0xFFFFFFFF;
 #else
-  enum { out_of_indexes = TLS_OUT_OF_INDEXES };
+  const DWORD out_of_indexes = TLS_OUT_OF_INDEXES;
 #endif
 
   DWORD tss_key = ::TlsAlloc();
