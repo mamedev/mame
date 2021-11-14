@@ -331,7 +331,7 @@ http_manager::http_manager(bool active, short port, const char *root)
 	};
 
 	m_server->on_upgrade = [this](auto socket, auto request) {
-		auto connection = std::make_shared<webpp::ws_server::Connection>(socket);
+		auto connection = std::make_shared<webpp::ws_server::Connection>(*m_io_context, socket);
 		connection->method = std::move(request->method);
 		connection->path = std::move(request->path);
 		connection->http_version = std::move(request->http_version);
