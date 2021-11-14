@@ -287,14 +287,21 @@ a7800                           // Atari 7800 NTSC
 a7800p                          // Atari 7800 PAL
 
 @source:aa310.cpp
+aa500                           // 1986 Acorn A500
+aa500d                          // 1987 Acorn A500 Domesday
 aa305                           // 1987 Acorn Archimedes 305
 aa310                           // 1987 Acorn Archimedes 310
 aa440                           // 1987 Acorn Archimedes 440
+am4                             // 1987 Acorn M4
+aa680                           // 1988 Acorn A680
+ar140                           // 1988 Acorn R140
 aa3000                          // 1989 Acorn Archimedes 3000
 aa4101                          // 1989 Acorn Archimedes 410/1
 aa4201                          // 1989 Acorn Archimedes 420/1
 aa4401                          // 1989 Acorn Archimedes 440/1
 aa540                           // 1990 Acorn Archimedes 540
+ar225                           // 1990 Acorn R225
+ar260                           // 1990 Acorn R260
 aa5000                          // 1991 Acorn A5000
 aa4                             // 1992 Acorn A4
 aa3010                          // 1992 Acorn A3010
