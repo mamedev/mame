@@ -37346,7 +37346,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="steamg" supported="no">
+	<software name="steamg">
 		<description>Super Team Games (USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -37356,7 +37356,7 @@ license:CC0
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="4p_adapter" />
+			<feature name="peripheral" value="powerpad" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-un-0 prg" size="32768" crc="f210e68f" sha1="1f706ae232ffb5f54ff1918b624dcdae4fa27a15" offset="00000" />
 			</dataarea>
