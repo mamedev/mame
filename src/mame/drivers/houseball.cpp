@@ -80,7 +80,7 @@ ROM_START(houseball)
 	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD("g.r.61156_st62e65b.u10", 0x0000, 0x1000, CRC(becdf495) SHA1(2b57f10bb7accea559c2c44d53d9a6f58aac20a9))
 
-	// The sound is known to contain samples from Julio Iglesias
+	// The sound is known to contain samples from Carlos Vives (La Gota Fría), probably without license
 	ROM_REGION(0x2000, "samples", 0)
 	ROM_LOAD("sonido01_isd2590p.u15", 0x0000, 0x1000, NO_DUMP) // Internal ROM size unknown
 	ROM_LOAD("sonido02_isd2590p.u14", 0x1000, 0x1000, NO_DUMP) // Internal ROM size unknown
