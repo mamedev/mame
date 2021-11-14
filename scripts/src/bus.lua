@@ -333,6 +333,59 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/archimedes/podule/slot.h,BUSES["ARCHIMEDES_PODULE"] = true
+---------------------------------------------------
+
+if (BUSES["ARCHIMEDES_PODULE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/archimedes/podule/slot.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/slot.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/a448.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/a448.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/armadeus.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/armadeus.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/ether1.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/ether1.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/etherd.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/etherd.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/etherr.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/etherr.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/faxpack.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/faxpack.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/ide_rdev.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/ide_rdev.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io_hccs.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io_hccs.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io_morley.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io_morley.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io_we.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/io_we.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/lark.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/lark.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/laserd.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/midimax.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/rom.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/rom.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/rs423.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/rs423.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/scanlight.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/scanlight.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/scsi_vti.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/scsi_vti.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/serial.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/serial.h",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/tube.cpp",
+		MAME_DIR .. "src/devices/bus/archimedes/podule/tube.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/astrocde/slot.h,BUSES["ASTROCADE"] = true
 ---------------------------------------------------
 
