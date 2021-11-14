@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(ARC_ECONET, arc_econet_device, "arc_econet", "Acorn ADF10/AEH
 void arc_econet_device::device_add_mconfig(machine_config &config)
 {
 	MC6854(config, m_adlc);
-	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::data_w));
+	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(DEVICE_SELF_OWNER, FUNC(archimedes_econet_slot_device::efiq_w));
 
 	econet_device &econet(ECONET(config, "econet", 0));

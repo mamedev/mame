@@ -405,7 +405,7 @@ void aabase_state::init_flop()
 
 void aabase_state::init_hd()
 {
-	u8 *cmos = memregion("i2cmem")->base();
+	//u8 *cmos = memregion("i2cmem")->base();
 
 	//cmos[0x0b] = 0x04; // *Configure Drive 4
 	//cmos[0xc7] = 0x09; // *Configure HardDiscs 1
@@ -1114,7 +1114,7 @@ void aa500_state::aa500(machine_config &config)
 	m_centronics->set_output_latch(*m_cent_data_out);
 
 	MC6854(config, m_adlc);
-	m_adlc->out_txd_cb().set("network", FUNC(econet_device::data_w));
+	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(m_ioc, FUNC(acorn_ioc_device::fl_w));
 	//m_adlc->out_rts_cb().
 
