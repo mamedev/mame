@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-31 10:10+1100\n"
-"PO-Revision-Date: 2021-10-22 17:00+0300\n"
+"PO-Revision-Date: 2021-11-14 21:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -1611,7 +1611,7 @@ msgstr "[απέτυχε]"
 
 #: src/frontend/mame/ui/state.cpp:224
 msgid "[no saved states found]"
-msgstr ""
+msgstr "[Δε βρέθηκαν αποθηκευμένες καταστάσεις]"
 
 #: src/frontend/mame/ui/state.cpp:229 plugins/cheatfind/init.lua:492
 msgid "Cancel"
@@ -1689,19 +1689,19 @@ msgstr "Έγινε εισαγωγή μη έγκυρης ακολουθίας"
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
-msgstr ""
+msgstr "%1$s Αναλογικό"
 
 #: src/frontend/mame/ui/inputmap.cpp:525
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr ""
+msgstr "%1$s Αναλογικό Άυξηση "
 
 #: src/frontend/mame/ui/inputmap.cpp:526
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr ""
+msgstr "%1$s Αναλογικό Μείωση"
 
 #: src/frontend/mame/ui/inputmap.cpp:568
 #, c-format
@@ -2474,19 +2474,19 @@ msgstr "Βιολετί"
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, debug)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s)"
 
 #: src/frontend/mame/ui/about.cpp:51
 #, c-format
 msgctxt "about-header"
 msgid "Revision: %1$s"
-msgstr ""
+msgstr "Αναθεώρηση: %1$s"
 
 #: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
@@ -2709,7 +2709,7 @@ msgstr "Επιλογή BIOS:"
 #: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
 #, c-format
 msgid "%1$s, %2$s"
-msgstr ""
+msgstr "%1$s, %2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 #, c-format
@@ -3281,62 +3281,62 @@ msgstr "[Καμία]\n"
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "Οθόνη %1$u Κανονική (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1873
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "Οθόνη %1$u Άποψη Πίξελ (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1895 src/emu/render.cpp:2030
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
+msgstr "Κοκτέιλ"
 
 #: src/emu/render.cpp:2015
 msgctxt "view-name"
 msgid "Left-to-Right"
-msgstr ""
+msgstr "Αριστερά-προς-Δεξιά"
 
 #: src/emu/render.cpp:2016
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgstr "Αριστερά-προς-Δεξιά (Χωρίς κενό)"
 
 #: src/emu/render.cpp:2017
 msgctxt "view-name"
 msgid "Top-to-Bottom"
-msgstr ""
+msgstr "Κορυφή-προς-Βάση"
 
 #: src/emu/render.cpp:2018
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "Κορυφή-προς-Βάση (Χωρίς κενό)"
 
 #: src/emu/render.cpp:2069
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u×%2$u Αριστερά-προς-Δεξιά, Κορυφή-προς-Βάση"
 
 #: src/emu/render.cpp:2078
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u Αριστερά-προς-Δεξιά, Κορυφή-προς-Βάση (Χωρίς Κενό)"
 
 #: src/emu/render.cpp:2087
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u×%2$u Κορυφή-προς-Βάση, Αριστερά-προς-Δεξιά"
 
 #: src/emu/render.cpp:2096
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u Κορυφή-προς-Βάση, Αριστερά-προς-Δεξιά (Χωρίς Κενό)"
 
 #: src/emu/inpttype.ipp:22
 msgctxt "input-name"
@@ -6702,63 +6702,63 @@ msgstr "UI Έλεγχος Μέσων"
 #: src/osd/modules/input/input_sdlcommon.cpp:175
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "Εναλλαγή πλήρους οθόνης"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "Λήψη αποδομένου στιγμιότυπου"
 
 #: src/osd/modules/input/input_windows.cpp:128
 #: src/osd/modules/input/input_sdlcommon.cpp:223
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "Εγγραφή Αποδομένου Βίντεο"
 
 #: src/osd/modules/input/input_windows.cpp:149
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "Εναλλαγή Post-Processing"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:201
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "Εναλλαγή φίλτρου"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:207
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "Μείωση Prescaling"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:217
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "Άυξηση Prescaling"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "Όταν ενημερωθεί"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "Κατά την έξοδο"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "Επιλογές υποστήριξης Hiscore"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "Αποθήκευση Σκορ"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "Υποστήριξη Hiscore"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
@@ -7091,7 +7091,7 @@ msgstr "%s [%d Hz]"
 #: plugins/autofire/autofire_menu.lua:99
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "[Χωρίς πλήκτρα autofire]"
 
 #: plugins/autofire/autofire_menu.lua:105
 #: plugins/autofire/autofire_menu.lua:251
@@ -7163,23 +7163,23 @@ msgstr "Επιλέξτε μια είσαγωγή για autofire"
 #: plugins/inputmacro/init.lua:130 plugins/inputmacro/inputmacro_menu.lua:520
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr ""
+msgstr "Μακροεντολές εισαγωγής"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "Νέα μακροεντολή"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "Νέα μακροεντολή %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:81
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "Ορισμός Εισαγωγής"
 
 #: plugins/inputmacro/inputmacro_menu.lua:319
 msgctxt "plugin-inputmacro"
@@ -7195,86 +7195,86 @@ msgstr "[δεν ρυθμιστηκε]"
 #: plugins/inputmacro/inputmacro_menu.lua:328
 msgctxt "plugin-inputmacro"
 msgid "Activation sequence"
-msgstr ""
+msgstr "Ακολουθία ενεργοποίησης"
 
 #: plugins/inputmacro/inputmacro_menu.lua:331
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "Άμεση διακοπή"
 
 #: plugins/inputmacro/inputmacro_menu.lua:331
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "Ολοκλήρωση μακροεντολής"
 
 #: plugins/inputmacro/inputmacro_menu.lua:332
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "Κατά την απελευθέρωση"
 
 #: plugins/inputmacro/inputmacro_menu.lua:338
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "Απελευθέρωση"
 
 #: plugins/inputmacro/inputmacro_menu.lua:341
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "Βρόγχος στο βήμα %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:346
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "Επέκταση βήματος %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:348
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "Όταν κρατείται"
 
 #: plugins/inputmacro/inputmacro_menu.lua:352
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "Βήμα %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:353
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "Καθυστέρηση (καρέ)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "Διάρκεια (καρέ)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:364
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "Εισαγωγή %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "Προσθήκη εισαγωγής"
 
 #: plugins/inputmacro/inputmacro_menu.lua:374
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "Διαγραφή βήματος"
 
 #: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "Προσθήκη βήματος στη θέση"
 
 #: plugins/inputmacro/inputmacro_menu.lua:434
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "Προσθήκη Μακροεντολής Εισαγωγής"
 
 #: plugins/inputmacro/inputmacro_menu.lua:441
 msgctxt "plugin-inputmacro"
@@ -7289,7 +7289,7 @@ msgstr "Ακύρωση"
 #: plugins/inputmacro/inputmacro_menu.lua:459
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "Επεξεργασία Μακροεντολής Εισαγωγής"
 
 #: plugins/inputmacro/inputmacro_menu.lua:465
 msgctxt "plugin-inputmacro"
@@ -7305,18 +7305,18 @@ msgstr "Πατήστε %s για διαγραφή"
 #: plugins/inputmacro/inputmacro_menu.lua:533
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "[χωρίς μακροεντολές]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:538
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "Προσθήκη μακροεντολής"
 
 #: plugins/timer/init.lua:89
 #, lua-format
 msgctxt "plugin-timer"
 msgid "%03d:%02d:%02d"
-msgstr ""
+msgstr "%03d:%02d:%02d"
 
 #: plugins/timer/init.lua:98
 msgctxt "plugin-timer"
@@ -7475,6 +7475,8 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
+"Δώστε ακολουθία ή πατήστε %s για ακύρωση\n"
+"%s"
 
 #~ msgid "No save states found"
 #~ msgstr "Δε βρέθηκαν αποθηκευμένες καταστάσεις"
