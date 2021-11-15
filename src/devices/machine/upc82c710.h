@@ -85,19 +85,18 @@ private:
 
 	void write_cfg(int index, u8 data);
 
-	enum LogicalDevice
+	enum
 	{
-		CFG = 0,
-		FDC,
-		IDE,
-		LPT,
-		SER,
-
-		LogicalDeviceEnd
+		DEVICE_CFG = 0,
+		DEVICE_FDC,
+		DEVICE_IDE,
+		DEVICE_LPT,
+		DEVICE_SER,
+		DEVICE_TOTAL
 	};
 
-	bool device_enabled[LogicalDevice::LogicalDeviceEnd];
-	u16 device_address[LogicalDevice::LogicalDeviceEnd];
+	bool device_enabled[DEVICE_TOTAL];
+	u16 device_address[DEVICE_TOTAL];
 
 	int m_cfg_mode;
 	u8 m_cfg_regs[16];

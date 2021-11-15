@@ -84,11 +84,11 @@ void upc82c710_device::device_start()
 	m_rts_callback.resolve_safe();
 
 	// default addresses
-	device_address[LogicalDevice::CFG] = 0x390;
-	device_address[LogicalDevice::IDE] = 0x1f0;
-	device_address[LogicalDevice::FDC] = 0x3f0;
-	device_address[LogicalDevice::LPT] = 0x278;
-	device_address[LogicalDevice::SER] = 0x3f8;
+	device_address[DEVICE_CFG] = 0x390;
+	device_address[DEVICE_IDE] = 0x1f0;
+	device_address[DEVICE_FDC] = 0x3f0;
+	device_address[DEVICE_LPT] = 0x278;
+	device_address[DEVICE_SER] = 0x3f8;
 
 	const u8 cfg_regs_defaults[] = { 0x0e, 0x00, 0x08, 0x00, 0xfe, 0xbe, 0x9e, 0x00, 0xec, 0xb0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
@@ -123,19 +123,19 @@ u16 upc82c710_device::io_r(offs_t offset, u16 mem_mask)
 	}
 
 	// ide
-	if (device_enabled[LogicalDevice::IDE] && (offset & ~7) == 0x1f0)
+	if (device_enabled[DEVICE_IDE] && (offset & ~7) == 0x1f0)
 	{
 		data = m_ide->cs0_r(offset & 7);
 		LOGMASKED(LOG_IDE, "IDE read %04x -> %04x\n", offset, data);
 	}
-	if (device_enabled[LogicalDevice::IDE] && offset == 0x3f6)
+	if (device_enabled[DEVICE_IDE] && offset == 0x3f6)
 	{
 		data = m_ide->cs1_r(offset & 7);
 		LOGMASKED(LOG_IDE, "IDE read %04x -> %04x\n", offset, data);
 	}
 
 	// fdc
-	if (device_enabled[LogicalDevice::FDC] && (offset & ~7) == 0x3f0 && offset != 0x3f0 && offset != 0x3f1 && offset != 0x3f6)
+	if (device_enabled[DEVICE_FDC] && (offset & ~7) == 0x3f0 && offset != 0x3f0 && offset != 0x3f1 && offset != 0x3f6)
 	{
 		switch (offset & 7)
 		{
@@ -156,14 +156,14 @@ u16 upc82c710_device::io_r(offs_t offset, u16 mem_mask)
 	}
 
 	// parallel
-	if (device_enabled[LogicalDevice::LPT] && (offset & ~3) == device_address[LogicalDevice::LPT])
+	if (device_enabled[DEVICE_LPT] && (offset & ~3) == device_address[DEVICE_LPT])
 	{
 		data = m_lpt->read(offset & 3);
 		LOGMASKED(LOG_LPT, "LPT read %04x -> %02x\n", offset, data);
 	}
 
 	// serial
-	if (device_enabled[LogicalDevice::SER] && (offset & ~7) == device_address[LogicalDevice::SER])
+	if (device_enabled[DEVICE_SER] && (offset & ~7) == device_address[DEVICE_SER])
 	{
 		data = m_serial->ins8250_r(offset & 7);
 		LOGMASKED(LOG_SER, "SER read %04x -> %02x\n", offset, data);
@@ -203,8 +203,8 @@ void upc82c710_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 			m_cfg_mode++;
 			LOGMASKED(LOG_CFG, "CFG step %d write %04x <- %02x\n", m_cfg_mode, offset, data);
 			m_cfg_regs[0x0f] = data;
-			device_address[LogicalDevice::CFG] = data << 2;
-			LOGMASKED(LOG_CFG, "CFG address %04x\n", device_address[LogicalDevice::CFG]);
+			device_address[DEVICE_CFG] = data << 2;
+			LOGMASKED(LOG_CFG, "CFG address %04x\n", device_address[DEVICE_CFG]);
 		}
 		break;
 	case 4:
@@ -219,7 +219,7 @@ void upc82c710_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	// configuration
-	if (offset == device_address[LogicalDevice::CFG])
+	if (offset == device_address[DEVICE_CFG])
 	{
 		LOGMASKED(LOG_CFG, "CFG write %04x <- %02x\n", offset, data);
 		if (m_cfg_mode == 5)
@@ -231,7 +231,7 @@ void upc82c710_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 			m_cfg_mode = 0;
 		}
 	}
-	else if (offset == device_address[LogicalDevice::CFG] + 1)
+	else if (offset == device_address[DEVICE_CFG] + 1)
 	{
 		LOGMASKED(LOG_CFG, "CFG write %04x <- %02x\n", offset, data);
 		if (m_cfg_mode == 5)
@@ -245,19 +245,19 @@ void upc82c710_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	// ide
-	if (device_enabled[LogicalDevice::IDE] && (offset & ~7) == 0x1f0)
+	if (device_enabled[DEVICE_IDE] && (offset & ~7) == 0x1f0)
 	{
 		m_ide->cs0_w(offset & 7, data);
 		LOGMASKED(LOG_IDE, "IDE write %04x <- %04x\n", offset, data);
 	}
-	if (device_enabled[LogicalDevice::IDE] && offset == 0x3f6)
+	if (device_enabled[DEVICE_IDE] && offset == 0x3f6)
 	{
 		m_ide->cs1_w(offset & 7, data);
 		LOGMASKED(LOG_IDE, "IDE write %04x <- %04x\n", offset, data);
 	}
 
 	// fdc
-	if (device_enabled[LogicalDevice::FDC] && (offset & ~7) == 0x3f0 && offset != 0x3f0 && offset != 0x3f1 && offset != 0x3f6)
+	if (device_enabled[DEVICE_FDC] && (offset & ~7) == 0x3f0 && offset != 0x3f0 && offset != 0x3f1 && offset != 0x3f6)
 	{
 		switch (offset & 7)
 		{
@@ -275,14 +275,14 @@ void upc82c710_device::io_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	// parallel
-	if (device_enabled[LogicalDevice::LPT] && (offset & ~3) == device_address[LogicalDevice::LPT])
+	if (device_enabled[DEVICE_LPT] && (offset & ~3) == device_address[DEVICE_LPT])
 	{
 		m_lpt->write(offset & 3, data);
 		LOGMASKED(LOG_LPT, "LPT write %04x <- %02x\n", offset, data);
 	}
 
 	// serial
-	if (device_enabled[LogicalDevice::SER] && (offset & ~7) == device_address[LogicalDevice::SER])
+	if (device_enabled[DEVICE_SER] && (offset & ~7) == device_address[DEVICE_SER])
 	{
 		m_serial->ins8250_w(offset & 7, data);
 		LOGMASKED(LOG_SER, "SER write %04x <- %02x\n", offset, data);
@@ -362,27 +362,27 @@ void upc82c710_device::write_cfg(int index, u8 data)
 	switch (index)
 	{
 	case 0x00: // Chip Selects and Enable
-		device_enabled[LogicalDevice::LPT]= BIT(m_cfg_regs[index], 3);
-		device_enabled[LogicalDevice::SER]= BIT(m_cfg_regs[index], 2);
-		LOGMASKED(LOG_CFG, "LPT %s\n", device_enabled[LogicalDevice::LPT] ? "enabled" : "disabled");
-		LOGMASKED(LOG_CFG, "SER %s\n", device_enabled[LogicalDevice::SER] ? "enabled" : "disabled");
+		device_enabled[DEVICE_LPT]= BIT(m_cfg_regs[index], 3);
+		device_enabled[DEVICE_SER]= BIT(m_cfg_regs[index], 2);
+		LOGMASKED(LOG_CFG, "LPT %s\n", device_enabled[DEVICE_LPT] ? "enabled" : "disabled");
+		LOGMASKED(LOG_CFG, "SER %s\n", device_enabled[DEVICE_SER] ? "enabled" : "disabled");
 		break;
 
 	case 0x04: // Serial Port Address
-		device_address[LogicalDevice::SER] = (data & 0xfe) << 2;
-		LOGMASKED(LOG_CFG, "SER address %04x\n", device_address[LogicalDevice::SER]);
+		device_address[DEVICE_SER] = (data & 0xfe) << 2;
+		LOGMASKED(LOG_CFG, "SER address %04x\n", device_address[DEVICE_SER]);
 		break;
 
 	case 0x06: // Parallel Port Address
-		device_address[LogicalDevice::LPT] = data << 2;
-		LOGMASKED(LOG_CFG, "LPT address %04x\n", device_address[LogicalDevice::LPT]);
+		device_address[DEVICE_LPT] = data << 2;
+		LOGMASKED(LOG_CFG, "LPT address %04x\n", device_address[DEVICE_LPT]);
 		break;
 
 	case 0x0c:
-		device_enabled[LogicalDevice::IDE] = BIT(m_cfg_regs[index], 7);
-		device_enabled[LogicalDevice::FDC] = BIT(m_cfg_regs[index], 5);
-		LOGMASKED(LOG_CFG, "IDE %s\n", device_enabled[LogicalDevice::IDE] ? "enabled" : "disabled");
-		LOGMASKED(LOG_CFG, "FDC %s\n", device_enabled[LogicalDevice::FDC] ? "enabled" : "disabled");
+		device_enabled[DEVICE_IDE] = BIT(m_cfg_regs[index], 7);
+		device_enabled[DEVICE_FDC] = BIT(m_cfg_regs[index], 5);
+		LOGMASKED(LOG_CFG, "IDE %s\n", device_enabled[DEVICE_IDE] ? "enabled" : "disabled");
+		LOGMASKED(LOG_CFG, "FDC %s\n", device_enabled[DEVICE_FDC] ? "enabled" : "disabled");
 		break;
 
 	case 0x0f:
