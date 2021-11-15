@@ -2174,7 +2174,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="athlwrldu" cloneof="athlwrld" supported="partial">
+	<software name="athlwrldu" cloneof="athlwrld">
 		<description>Athletic World (USA)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -2194,7 +2194,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="athlwrld" supported="partial">
+	<software name="athlwrld">
 		<description>Athletic World (Euro)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -7886,7 +7886,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dancaero" supported="partial">
+	<software name="dancaero">
 		<description>Dance Aerobics (USA)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -12209,7 +12209,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train2rs" cloneof="stadevnt">
+	<software name="train2rs" cloneof="wctmeet">
 		<description>Family Trainer 2 - Running Stadium (Japan)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
@@ -33944,7 +33944,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="eggsplod" supported="partial">
+	<software name="eggsplod">
 		<description>Short Order / Eggsplode! (USA)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -35644,7 +35644,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stadevntu" cloneof="stadevnt" supported="partial">
+	<software name="stadevntu" cloneof="wctmeet">
 		<description>Stadium Events (USA)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -35664,9 +35664,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stadevnt" supported="partial">
+	<software name="stadevnt" cloneof="wctmeet">
 		<description>Stadium Events (Euro)</description>
-		<year>1990</year>
+		<year>1988?</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-SD-EEC"/>
 		<info name="release" value="19900223"/>
@@ -36731,8 +36731,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This is marked as partially supported due to lack of powerpad emulation! -->
-	<software name="smbdhwca" cloneof="smbdhwc" supported="partial">
+	<software name="smbdhwca" cloneof="smbdhwc">
 		<description>Super Mario Bros. / Duck Hunt / World Class Track Meet (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -36751,8 +36750,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This is marked as partially supported due to lack of powerpad emulation! -->
-	<software name="smbdhwc" supported="partial">
+	<software name="smbdhwc">
 		<description>Super Mario Bros. / Duck Hunt / World Class Track Meet (USA, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -37348,7 +37346,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="steamg" supported="no">
+	<software name="steamg">
 		<description>Super Team Games (USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -37358,7 +37356,7 @@ license:CC0
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="4p_adapter" />
+			<feature name="peripheral" value="powerpad" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-un-0 prg" size="32768" crc="f210e68f" sha1="1f706ae232ffb5f54ff1918b624dcdae4fa27a15" offset="00000" />
 			</dataarea>
@@ -43057,7 +43055,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wctmeeta" cloneof="wctmeet" supported="partial">
+	<software name="wctmeeta" cloneof="wctmeet">
 		<description>World Class Track Meet (USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -43077,7 +43075,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wctmeet" supported="partial">
+	<software name="wctmeet">
 		<description>World Class Track Meet (USA, Rev. A)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
