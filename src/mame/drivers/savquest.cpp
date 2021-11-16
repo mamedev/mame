@@ -877,10 +877,11 @@ void savquest_state::savquest(machine_config &config)
 	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
 	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
+
+	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", "cdrom", true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
-	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
+	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, "hdd", nullptr, true));
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	/* printer */
@@ -918,6 +919,13 @@ ROM_START( savquest )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
+	DISK_REGION( "ide:1:cdrom:image" )
+	// doesn't mount rom when available probably due to IRQ conflicts
+	// DISK_IMAGE_READONLY( "hostinv", 0, SHA1(3cb86c62e80be98a717172b717f7276a0e5f6830) )
+	DISK_REGION( "ide2:0:hdd:image" ) // requires mapping to be detectable
+	DISK_IMAGE_READONLY( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
+	// mountable and readable rom on IRQ7 if made available in savquest CHD folder
+	// DISK_IMAGE( "calchase", 0, SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
 } // Anonymous namespace
