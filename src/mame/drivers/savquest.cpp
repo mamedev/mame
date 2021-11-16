@@ -111,7 +111,7 @@ private:
 
 	uint8_t m_mtxc_config_reg[256];
 	uint8_t m_piix4_config_reg[8][256];
-	uint32_t m_pci_3dfx_regs[0x40];
+	uint32_t m_pci_3dfx_regs[0xff]; // provide 256 bytes of configuration registers
 
 	void bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -353,37 +353,74 @@ void savquest_state::intel82371ab_pci_w(int function, int reg, uint32_t data, ui
 
 void savquest_state::vid_3dfx_init()
 {
-	m_pci_3dfx_regs[0x00 / 4] = 0x0002121a; // 3dfx Multimedia device
-	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
-	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
-	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
-	m_voodoo->set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
+	// This might be a bug, card does not get detected unless standard PCI header model + vendor is used
+	m_pci_3dfx_regs[0x00] = 0x0002 << 16 | 0x121a; // Voodoo2 device | 3Dfx Interactive, Inc. vendor
+
+	// Custom 3Dfx Voodoo2 PCI Header Specification (see 3Dfx Voodoo2 spec)
+
+	// This is the specified value for register 0x00 but doesn't work without device added
+	//m_pci_3dfx_regs[0x00] = 0x121a; // 3Dfx Interactive, Inc. vendor ro
+	m_pci_3dfx_regs[0x02] = 0x02;   // Voodoo2 device ro
+	m_pci_3dfx_regs[0x04] = 0x00;   // command rw bit 1
+	m_pci_3dfx_regs[0x06] = 0x150;	// status register (medium timing, fast back-to-back) ro
+	m_pci_3dfx_regs[0x08] = 0x02;   // revision ID ro
+	m_pci_3dfx_regs[0x09] = 0x38000;	 // class code (display controller, non vga compatible) ro
+	//m_pci_3dfx_regs[0x09] = 0x40000;	 // class code (videon multimedia device) ro
+	m_pci_3dfx_regs[0x0c] = 0x00;	// cache line size ro
+	m_pci_3dfx_regs[0x0d] = 0x00;	// latency timer ro
+	m_pci_3dfx_regs[0x0e] = 0x00;	// header type (other) ro
+	m_pci_3dfx_regs[0x0f] = 0x00;	// BIST ro
+	m_pci_3dfx_regs[0x10] = 0xff000008;  // memory base address 31:24 rw
+    //m_pci_3dfx_regs[0x10] = 0x10000008;// memory base address 31:24 rw
+	m_pci_3dfx_regs[0x3c] = 0x00;   // interrupt mapping IRQ 0-15 rw
+	m_pci_3dfx_regs[0x3d] = 0x01;   // external interrupt connection ro
+	m_pci_3dfx_regs[0x3e] = 0x00;   // bus master minimum grand time ro
+	m_pci_3dfx_regs[0x3f] = 0x00;   // bus master minimum latency ro
+	m_pci_3dfx_regs[0x40] = 0x6000; // init enable 12-16 ro
+	m_pci_3dfx_regs[0x44] = 0x00;   // chuck bus snooping address 1 wo
+	m_pci_3dfx_regs[0x48] = 0x00;   // chuck bus snooping address 0 wo
+	m_pci_3dfx_regs[0x4c] = 0x00;   // aliased memory-mapped status register (returns 0x06 register)
+	m_pci_3dfx_regs[0x50] = 0x00;   // scratchpad register rw
+	// Osc Force On, Osc Ring Sel, Osc Count Reset, 12 bit PCI Counter, 16 bit Oscillator Counter
+	m_pci_3dfx_regs[0x54] = 0x6002; // silicon process monitor register ro
 }
 
 uint32_t savquest_state::pci_3dfx_r(int function, int reg, uint32_t mem_mask)
 {
-//osd_printf_warning("PCI read: %x\n", reg);
-	return m_pci_3dfx_regs[reg / 4];
+	switch (reg)
+	{
+		case 0x44:
+		case 0x48:
+			return 0x00; // wo registers
+		case 0x4c:
+			return m_pci_3dfx_regs[0x06]; // alias status
+	}
+	return m_pci_3dfx_regs[reg];
 }
 
 void savquest_state::pci_3dfx_w(int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-osd_printf_warning("PCI write: %x %x\n", reg, data);
-
-	if (reg == 0x10)
+	switch (reg)
 	{
-		data &= 0xff000000;
+		case 0x04: // bit 1 rw
+			m_pci_3dfx_regs[reg] = (m_pci_3dfx_regs[reg] & ~0x01) | (data & 0x01);
+		break;
+		case 0x10: // bit 24-31 rw
+			m_pci_3dfx_regs[reg] = (m_pci_3dfx_regs[reg] & ~0xff000000) | (data & 0xff000000);
+		break;
+		case 0x40: // 12-16 ro
+			// osd_printf_warning("Reg 0x40 init enable\n");
+			m_pci_3dfx_regs[reg] = (m_pci_3dfx_regs[reg] & ~0xfffe0fff) | (data & 0xfffe0fff);
+			m_voodoo->set_init_enable(m_pci_3dfx_regs[reg]);
+		break;
+		case 0x3c:
+		case 0x44:
+		case 0x48:
+		case 0x50:
+			m_pci_3dfx_regs[reg] = data;
+		break;
+		// All remaining registers are read only
 	}
-	else if (reg == 0x40)
-	{
-		m_voodoo->set_init_enable(data);
-	}
-	else if (reg == 0x54)
-	{
-		data &= 0xf000ffff; /* bits 16-27 are read-only */
-	}
-
-	m_pci_3dfx_regs[reg / 4] = data;
 }
 
 void savquest_state::bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -754,7 +791,7 @@ void savquest_state::savquest_map(address_map &map)
 	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
 	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
 	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
-	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
+	map(0xe0000000, 0xe0ffffff).m(m_voodoo, FUNC(voodoo_2_device::core_map));
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
