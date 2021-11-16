@@ -296,10 +296,15 @@ uint8_t savquest_state::piix4_config_r(int function, int reg)
 	if((reg & 0xfe) == 2)
 	{
 		/* TODO: it isn't detected properly (i.e. PCI writes always goes to function == 0) */
+		// printf("TODO: Properly identify 82371AB PIIX4: read %d, %02X\n", function, reg);
+		if(function == 0)
+			return (reg & 1) ? 0x71 : 0x10; // Device ID, 82371AB PCI to ISA Bridge
 		if(function == 1)
 			return (reg & 1) ? 0x71 : 0x11; // Device ID, 82371AB IDE Controller
 		if(function == 2)
-			return (reg & 1) ? 0x71 : 0x12; // Device ID, 82371AB Serial Bus Controller
+			return (reg & 1) ? 0x71 : 0x12; // Device ID, 82371AB Universal Serial Bus Controller
+		if(function == 3)
+			return (reg & 1) ? 0x71 : 0x1; // Device ID, 82371AB System Management Bus and Power
 	}
 
 	return m_piix4_config_reg[function][reg];
