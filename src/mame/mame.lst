@@ -12518,6 +12518,9 @@ dm500                           //
 dm5620                          //
 dm7000                          //
 
+@source:dmainevent.cpp
+dmainevent                      // (c) 1983 Destron
+
 @source:dmax8000.cpp
 dmax8000                        //
 

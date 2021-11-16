@@ -4886,6 +4886,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/dgpix.cpp",
 	MAME_DIR .. "src/mame/drivers/diamondking.cpp",
 	MAME_DIR .. "src/mame/drivers/discoboy.cpp",
+	MAME_DIR .. "src/mame/drivers/dmainevent.cpp",
 	MAME_DIR .. "src/mame/drivers/dominob.cpp",
 	MAME_DIR .. "src/mame/drivers/dorachan.cpp",
 	MAME_DIR .. "src/mame/drivers/drdmania.cpp",

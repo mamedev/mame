@@ -344,6 +344,7 @@ dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp
+dmainevent.cpp
 dmndrby.cpp
 docastle.cpp
 dogfgt.cpp
