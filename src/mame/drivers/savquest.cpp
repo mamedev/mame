@@ -872,7 +872,7 @@ void savquest_state::savquest(machine_config &config)
 	pcat_common(config);
 	DS12885(config.replace(), "rtc");
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 34_MHz_XTAL, 0)); // PII PCI bus clock 33/34/37/40.1 MHz
 	pcibus.set_device( 0, FUNC(savquest_state::intel82439tx_pci_r), FUNC(savquest_state::intel82439tx_pci_w));
 	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
 	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
@@ -887,9 +887,11 @@ void savquest_state::savquest(machine_config &config)
 	PC_LPT(config, m_lpt);
 	m_lpt->irq_handler().set("pic8259_2", FUNC(pic8259_device::ir4_w));
 
-	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
+	/* sound hardware */
+	isa16_device &isa(ISA16(config, "isa", 9_MHz_XTAL)); // PII ISA bus clock 8.33~9.35 MHz
 	isa.set_memspace("maincpu", AS_PROGRAM);
 	isa.set_iospace("maincpu", AS_IO);
+	isa.irq5_callback().set("pic8259_2", FUNC(pic8259_device::ir5_w));
 	ISA16_SLOT(config, "isa1", 0, "isa", savquest_isa16_cards, "sb16", false);
 
 	/* video hardware */
