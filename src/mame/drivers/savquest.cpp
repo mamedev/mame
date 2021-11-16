@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Peter Ferrie
+// copyright-holders:R. Belmont, Peter Ferrie, Nick Lombard
 /***************************************************************************
 
     savquest.cpp
@@ -14,6 +14,40 @@
       Other components are labeled "v0.5", but the game doesn't boot far enough to see if
       any graphics have version information. There appears to also be a "Savage Quest 2.1" which
       is undumped.
+
+	- Update: Machine boots now, with voodoo card detected, and gives you command prompt after
+	  failing to retrieve HASP key from the dongle. Still can't run SQ05 as the binary is SRM
+	  enveloped and only prompts "HASP key not found". The SQ05 directory structure is also
+	  impaired to a degree refusing to copy files or list files with dir, however tree works.
+
+	  Voodoo custom PCI Headers are properly implemented now, allows for voodoo card to be
+	  detected, see references for specification. This should probably be ported to library
+	  video/voodoo_2 implementation. The card is initialized on boot but renders incorrectly,
+	  perhaps the actual opengl translation from 3Dfx implementation is missing still.
+	  To reset the display back to vga pass-through after boot run \sb16\diagnose
+
+	  Without lpt controller added the boot script will go into a loop querying the lpt read and
+	  write. Not convinced that does as advertised leaving it running for 24 hours still had no
+	  HASP key. Adding the lpt controller the boot script detects the missing dongle and aborts,
+	  giving access to the dos prompt.
+
+	  82371AB not correctly emulated yet, as per previous dev's TODO comment on identification.
+	  This is causing the IRQs to conflict as they are not properly allocated with no allocations
+	  beyond IRQ 7, which appears to be the only usable channel. Tried to use the machine/i2371SB
+	  implementation but at closer inspection noticed that SB is PIIX3 whereas AB is PIIX4 and these
+	  specifications are different, see references.
+
+	  The primary slave, cdrom, and secondary IDE drives are now detected. Secondary drive mounts the
+	  same image as the primary master but read only, requires a mapped image to be detectable, and
+	  is accessible but only on IRQ7 probably due to incomplete 82371AB emulation. Could not manage to
+	  mount cdrom with any image to be usable, might be IRQ conflicts but could be incompatible with
+	  the ATAPI driver.
+
+	  Added timings for ISA and PCI bus as per PII Motherboard specification, see references.
+
+	  Changed driver game flags to only prompt protection not implemented as this will ultimately be
+	  the deciding impediment to playing the game even after the mentioned emulations are completed.
+	  At least this will give us a working PIIX4 implementation booting into DOS6.11 to work from.
 
     PCI list:
     Bus no. Device No. Func No. Vendor ID Device ID Device Class          IRQ
@@ -77,9 +111,6 @@ public:
 	void savquest(machine_config &config);
 
 protected:
-	// driver_device overrides
-//  virtual void video_start();
-
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -285,7 +316,6 @@ void savquest_state::intel82439tx_pci_w(int function, int reg, uint32_t data, ui
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-
 uint8_t savquest_state::piix4_config_r(int function, int reg)
 {
 //  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
@@ -432,7 +462,6 @@ void savquest_state::pci_3dfx_w(int function, int reg, uint32_t data, uint32_t m
 
 void savquest_state::bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//if (m_mtxc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
 	if (m_mtxc_config_reg[0x59] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -443,7 +472,6 @@ void savquest_state::bios_f0000_ram_w(offs_t offset, uint32_t data, uint32_t mem
 
 void savquest_state::bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//if (m_mtxc_config_reg[0x5e] & 2)       // write to RAM if this region is write-enabled
 	#if 1
 	if (m_mtxc_config_reg[0x5e] & 2)        // write to RAM if this region is write-enabled
 	{
@@ -454,7 +482,6 @@ void savquest_state::bios_e0000_ram_w(offs_t offset, uint32_t data, uint32_t mem
 
 void savquest_state::bios_e4000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//if (m_mtxc_config_reg[0x5e] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
 	if (m_mtxc_config_reg[0x5e] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -465,7 +492,6 @@ void savquest_state::bios_e4000_ram_w(offs_t offset, uint32_t data, uint32_t mem
 
 void savquest_state::bios_e8000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//if (m_mtxc_config_reg[0x5f] & 2)       // write to RAM if this region is write-enabled
 	#if 1
 	if (m_mtxc_config_reg[0x5f] & 2)        // write to RAM if this region is write-enabled
 	{
@@ -476,7 +502,6 @@ void savquest_state::bios_e8000_ram_w(offs_t offset, uint32_t data, uint32_t mem
 
 void savquest_state::bios_ec000_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//if (m_mtxc_config_reg[0x5f] & 0x20)       // write to RAM if this region is write-enabled
 	#if 1
 	if (m_mtxc_config_reg[0x5f] & 0x20)     // write to RAM if this region is write-enabled
 	{
@@ -493,6 +518,8 @@ static const uint8_t m_hasp_prodinfo[] = {0x51, 0x4c, 0x52, 0x4d, 0x53, 0x4e, 0x
 
 uint8_t savquest_state::parallel_port_r(offs_t offset)
 {
+	// osd_printf_debug("\n##########\nReading here %x\n##########\n", offset);
+	// printf("\n##########\nReading here %x\n##########\n", offset);
 	if (offset == 1)
 	{
 		if ((m_haspstate == HASPSTATE_READ)
@@ -549,6 +576,9 @@ uint8_t savquest_state::parallel_port_r(offs_t offset)
 
 void savquest_state::parallel_port_w(offs_t offset, uint8_t data)
 {
+	// osd_printf_debug("\n##########\nWriting here %x %x\n##########\n", offset, data);
+	// printf("\n##########\nWriting here %x %x\n##########\n", offset, data);
+
 	if (!offset)
 	{
 		uint8_t data8 = (uint8_t) (data & 0xff);
