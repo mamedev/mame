@@ -47,12 +47,12 @@
 
 ***************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/lpci.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
+#include "machine/pc_lpt.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
 #include "video/voodoo_2.h"
@@ -66,9 +66,10 @@ class savquest_state : public pcat_base_state
 {
 public:
 	savquest_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-		m_vga(*this, "vga"),
-		m_voodoo(*this, "voodoo")
+		: pcat_base_state(mconfig, type, tag)
+		, m_vga(*this, "vga")
+	    , m_voodoo(*this, "voodoo")
+		, m_lpt(*this, "lpt")
 	{
 		std::fill(std::begin(m_mtxc_config_reg), std::end(m_mtxc_config_reg), 0);
 	}
@@ -93,6 +94,7 @@ private:
 
 	required_device<s3_vga_device> m_vga;
 	required_device<voodoo_2_device> m_voodoo;
+	required_device<pc_lpt_device> m_lpt;
 
 	int m_haspind;
 	int m_haspstate;
@@ -804,16 +806,18 @@ void savquest_state::savquest_io(address_map &map)
 
 	map(0x0170, 0x0177).rw("ide2", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
+
 	map(0x0378, 0x037b).rw(FUNC(savquest_state::parallel_port_r), FUNC(savquest_state::parallel_port_w));
+    map(0x0378, 0x037b).rw(m_lpt, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
+
 	map(0x03b0, 0x03bf).rw(m_vga, FUNC(vga_device::port_03b0_r), FUNC(vga_device::port_03b0_w));
 	map(0x03c0, 0x03cf).rw(m_vga, FUNC(vga_device::port_03c0_r), FUNC(vga_device::port_03c0_w));
 	map(0x03d0, 0x03df).rw(m_vga, FUNC(vga_device::port_03d0_r), FUNC(vga_device::port_03d0_w));
+
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 
 	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
-
-//  map(0x5000, 0x5007) // routes to port $eb
 }
 
 #define AT_KEYB_HELPER(bit, text, key1) \
@@ -879,7 +883,9 @@ void savquest_state::savquest(machine_config &config)
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, nullptr, nullptr, true));
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
-	/* sound hardware */
+	/* printer */
+	PC_LPT(config, m_lpt);
+	m_lpt->irq_handler().set("pic8259_2", FUNC(pic8259_device::ir4_w));
 
 	isa16_device &isa(ISA16(config, "isa", 0)); // FIXME: determine ISA bus clock
 	isa.set_memspace("maincpu", AS_PROGRAM);
