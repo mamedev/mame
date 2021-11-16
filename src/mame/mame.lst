@@ -16810,6 +16810,9 @@ hotblockb                       // (c) 1993 Nics? / NIX?
 @source:hotstuff.cpp
 hotstuff                        //
 
+@source:houseball.cpp
+houseball                       // (c) 1989 Olakoa
+
 @source:hp_ipc.cpp
 hp_ipc                          //
 hp9808a
