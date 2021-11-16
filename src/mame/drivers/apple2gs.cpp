@@ -492,7 +492,9 @@ private:
 	void adbmicro_p1_out(u8 data);
 	void adbmicro_p2_out(u8 data);
 	void adbmicro_p3_out(u8 data);
+#if ADB_HLE
 	void set_adb_line(int linestate);
+#endif
 
 	offs_t dasm_trampoline(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 	void wdm_trampoline(offs_t offset, u8 data) { }; //m_a2host->wdm_w(space, offset, data); }
@@ -4297,12 +4299,12 @@ void apple2gs_state::adbmicro_p3_out(u8 data)
 #endif
 	}
 }
-
+#if ADB_HLE
 void apple2gs_state::set_adb_line(int linestate)
 {
 	m_adb_line = (linestate == CLEAR_LINE);
 }
-
+#endif
 u8 apple2gs_state::keyglu_mcu_read(u8 offset)
 {
 	u8 rv = m_glu_regs[offset];
