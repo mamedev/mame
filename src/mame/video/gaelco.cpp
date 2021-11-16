@@ -145,7 +145,10 @@ void gaelco_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 
 		   The most logical conclusion is if this specific value in the first
 		   word acts as a disable, but that would stop you putting 8x8 sprites
-		   on the lowest line in other cases */
+		   on the lowest line in other cases.  This does cause the 'X'
+		   co-ordinate display to vanish in one of the test mode features, but
+		   that feature does not appear to be functional anyway so also needs
+		   to be verified on hardware. */
 		if (m_use_squash_sprite_disable)
 			if (m_spriteram[i] == 0x0800)
 				continue;
