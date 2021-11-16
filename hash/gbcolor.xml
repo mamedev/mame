@@ -1576,7 +1576,7 @@ license:CC0
 	</software>
 
 	<software name="barcodea" cloneof="barcode">
-		<description>Barcode Taisen Bardigun (Japan, Rev 1)</description>
+		<description>Barcode Taisen Bardigun (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Tamsoft</publisher>
 		<info name="serial" value="DMG-ABEJ-JPN-1"/>
@@ -2223,7 +2223,7 @@ license:CC0
 
 	<software name="bokujom3a" cloneof="harvmon3">
 		<!-- Notes: GBC only -->
-		<description>Bokujou Monogatari GB3 - Boy Meets Girl (Japan, Rev 1)</description>
+		<description>Bokujou Monogatari GB3 - Boy Meets Girl (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-BWAJ-JPN"/>
@@ -2785,7 +2785,7 @@ license:CC0
 
 	<software name="cardshrk">
 		<!-- Notes: GBC only -->
-		<description>Card Sharks (USA, Prototype)</description>
+		<description>Card Sharks (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Bonsai Entertainment</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -2797,7 +2797,7 @@ license:CC0
 	</software>
 
 	<software name="ccsakuit">
-		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Japan, Rev 2)</description>
+		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Japan, rev 2)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-AM7J-JPN"/>
@@ -2821,7 +2821,7 @@ license:CC0
 	</software>
 
 	<software name="ccsakuita" cloneof="ccsakuit">
-		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Japan, Rev 1)</description>
+		<description>Cardcaptor Sakura - Itsumo Sakura-chan to Issho (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-AM7J-JPN"/>
@@ -3728,7 +3728,7 @@ license:CC0
 
 	<software name="daikatanp" cloneof="daikatan">
 		<!-- Notes: GBC only -->
-		<description>Daikatana (Prototype 20000419)</description>
+		<description>Daikatana (prototype 20000419)</description>
 		<year>2000</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -4209,7 +4209,7 @@ license:CC0
 
 	<software name="dinosaurup" cloneof="dinosaur">
 		<!-- Notes: GBC only -->
-		<description>Dinosaur (USA, Prototype 20000318)</description>
+		<description>Dinosaur (USA, prototype 20000318)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -4615,7 +4615,7 @@ license:CC0
 
 	<software name="doraqzb">
 		<!-- Notes: GBC only -->
-		<description>Doraemon no Quiz Boy (Japan, Rev 1)</description>
+		<description>Doraemon no Quiz Boy (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Shogakukan</publisher>
 		<info name="serial" value="CGB-BQBJ-JPN"/>
@@ -5035,7 +5035,7 @@ license:CC0
 	</software>
 
 	<software name="dqm" cloneof="dwm">
-		<description>Dragon Quest Monsters - Terry no Wonderland (Japan, Rev 1)</description>
+		<description>Dragon Quest Monsters - Terry no Wonderland (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-ADQJ-JPN"/>
@@ -5140,7 +5140,7 @@ license:CC0
 	</software>
 
 	<software name="dqm2ra" cloneof="dwm2c">
-		<description>Dragon Quest Monsters 2 - Maruta no Fushigi na Kagi - Ruka no Tabidachi (Japan, Rev 1)</description>
+		<description>Dragon Quest Monsters 2 - Maruta no Fushigi na Kagi - Ruka no Tabidachi (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Enix</publisher>
 		<info name="serial" value="DMG-BQLJ-JPN"/>
@@ -5497,7 +5497,7 @@ license:CC0
 
 	<software name="dynamike">
 		<!-- Notes: GBC only -->
-		<description>DynaMike (Europe, Prototype)</description>
+		<description>DynaMike (Europe, prototype)</description>
 		<year>19??</year>
 		<publisher>Engine Software</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -6014,7 +6014,7 @@ license:CC0
 
 	<software name="f1racingp" cloneof="f1racing">
 		<!-- Notes: GBC only -->
-		<description>F1 Racing Championship (Europe, Prototype)</description>
+		<description>F1 Racing Championship (Europe, prototype)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -6102,7 +6102,7 @@ license:CC0
 
 	<software name="fairykit">
 		<!-- Also released by NP in 2000-03 -->
-		<description>Fairy Kitty no Kaiun Jiten - Yousei no Kuni no Uranai Shugyou (Japan, Rev 1)</description>
+		<description>Fairy Kitty no Kaiun Jiten - Yousei no Kuni no Uranai Shugyou (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-AFUJ-JPN"/>
@@ -6220,7 +6220,7 @@ license:CC0
 		<!-- Notes: GBC only -->
 		<!--    Old dump of unknown origin  -->
 		<!--    Possible prototype? -->
-		<description>The Flintstones - Burgertime in Bedrock (Europe, Prototype?)</description>
+		<description>The Flintstones - Burgertime in Bedrock (Europe, prototype?)</description>
 		<year>2001</year>
 		<publisher>Swing! Entertainment Media</publisher>
 		<info name="serial" value="CGB-BFSP-EUR"/>
@@ -6318,7 +6318,7 @@ license:CC0
 	</software>
 
 	<software name="froggeru" cloneof="frogger">
-		<description>Frogger (USA, Rev 2)</description>
+		<description>Frogger (USA, rev 2)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AFRE-USA-3"/>
@@ -6334,7 +6334,7 @@ license:CC0
 	</software>
 
 	<software name="froggerua" cloneof="frogger">
-		<description>Frogger (USA, Rev 1)</description>
+		<description>Frogger (USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="DMG-AFRE-USA-2"/>
@@ -6377,7 +6377,7 @@ license:CC0
 
 	<software name="frogger2a" cloneof="frogger2">
 		<!-- Notes: GBC only -->
-		<description>Frogger 2 (USA, Rev 1)</description>
+		<description>Frogger 2 (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Majesco</publisher>
 		<info name="serial" value="CGB-BH2E-USA"/>
@@ -6416,7 +6416,7 @@ license:CC0
 	</software>
 
 	<software name="onepyume">
-		<description>From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Japan, Rev 1)</description>
+		<description>From TV Animation One Piece - Yume no Luffy Kaizokudan Tanjou! (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Banpresto</publisher>
 		<info name="serial" value="DMG-BLUJ-JPN"/>
@@ -6534,7 +6534,7 @@ license:CC0
 	</software>
 
 	<software name="gakkyama">
-		<description>Gakkyuu Ou Yamazaki (Japan, Rev 1)</description>
+		<description>Gakkyuu Ou Yamazaki (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Koei</publisher>
 		<info name="serial" value="DMG-AYMJ-JPN"/>
@@ -6607,7 +6607,7 @@ license:CC0
 
 	<software name="gamblerta" cloneof="gamblert">
 		<!-- Notes: GBC only -->
-		<description>Gambler Densetsu Tetsuya - Shinjuku Tenun Hen (Japan, Rev 1)</description>
+		<description>Gambler Densetsu Tetsuya - Shinjuku Tenun Hen (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Athena</publisher>
 		<info name="serial" value="CGB-BGYJ-JPN"/>
@@ -7468,7 +7468,7 @@ license:CC0
 	</software>
 
 	<software name="gremlinsp" cloneof="gremlins">
-		<description>Gremlins Unleashed (Europe, Prototype)</description>
+		<description>Gremlins Unleashed (Europe, prototype)</description>
 		<year>2001</year>
 		<publisher>L.S.P.</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -7732,7 +7732,7 @@ license:CC0
 
 	<software name="hamstpa2">
 		<!-- Notes: GBC only -->
-		<description>Hamster Paradise 2 (Japan, Rev 1)</description>
+		<description>Hamster Paradise 2 (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="CGB-BHMJ-JPN"/>
@@ -9134,7 +9134,7 @@ license:CC0
 
 	<software name="jissen">
 		<!-- Notes: GBC only -->
-		<description>Jissen ni Yakudatsu Tsumego (Japan, Rev 1)</description>
+		<description>Jissen ni Yakudatsu Tsumego (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="CGB-BJTJ-JPN (PCPE-10004)"/>
@@ -9580,7 +9580,7 @@ license:CC0
 	</software>
 
 	<software name="kawaipt2">
-		<description>Kawaii Pet Shop Monogatari 2 (Japan, Rev 1)</description>
+		<description>Kawaii Pet Shop Monogatari 2 (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="DMG-BMNJ-JPN"/>
@@ -9883,7 +9883,7 @@ license:CC0
 
 	<software name="kisekae2">
 		<!-- Notes: GBC only -->
-		<description>Kisekae Series 2 - Oshare Nikki (Japan, Rev 1)</description>
+		<description>Kisekae Series 2 - Oshare Nikki (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Victor Interactive Software</publisher>
 		<info name="serial" value="CGB-B23J-JPN"/>
@@ -10254,7 +10254,7 @@ license:CC0
 	<software name="lauraunk" cloneof="laura">
 		<!-- Notes: GBC only -->
 		<!--    Old dump of unknown origin  -->
-		<description>Laura (Europe, Prototype?)</description>
+		<description>Laura (Europe, prototype?)</description>
 		<year>2000</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="serial" value="CGB-BLDP-EUR"/>
@@ -10375,7 +10375,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Europe, Australia, USA, Rev 2)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Europe, Australia, USA, rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLE-USA, DMG-AZLP-(EUR/AUS)"/>
@@ -10390,7 +10390,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaldxa" cloneof="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Europe, USA, Rev 1)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Europe, USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLE-USA, DMG-AZLP-EUR"/>
@@ -10427,7 +10427,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaldxf" cloneof="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (France, Rev 1)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (France, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLF-FRA"/>
@@ -10469,7 +10469,7 @@ license:CC0
 	</software>
 
 	<software name="zeldaldxg" cloneof="zeldaldx">
-		<description>The Legend of Zelda - Link's Awakening DX (Germany, Rev 1)</description>
+		<description>The Legend of Zelda - Link's Awakening DX (Germany, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLD-NOE"/>
@@ -10790,7 +10790,7 @@ license:CC0
 
 	<software name="lionkingfa" cloneof="lionking">
 		<!-- Notes: GBC only -->
-		<description>Les Roi Lion - Les Adventures de Simba (France, Rev 1)</description>
+		<description>Les Roi Lion - Les Adventures de Simba (France, rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BLKF-FRA"/>
@@ -11136,7 +11136,7 @@ license:CC0
 
 	<software name="hirapzl2">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-2-gou (Japan, Rev 1, NP)</description>
+		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-2-gou (Japan, rev 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B52J-JPN"/>
@@ -11174,7 +11174,7 @@ license:CC0
 
 	<software name="hirapzl3">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-3-gou (Japan, Rev 1, NP)</description>
+		<description>Loppi Puzzle Magazine - Hirameku Puzzle Dai-3-gou (Japan, rev 1, NP)</description>
 		<year>2002</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B53J-JPN"/>
@@ -11212,7 +11212,7 @@ license:CC0
 
 	<software name="hirapzls">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Hirameku Puzzle Soukangou (Japan, Rev 1, NP)</description>
+		<description>Loppi Puzzle Magazine - Hirameku Puzzle Soukangou (Japan, rev 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B51J-JPN"/>
@@ -11250,7 +11250,7 @@ license:CC0
 
 	<software name="kangpzl2">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Japan, Rev 1, NP)</description>
+		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-2-gou (Japan, rev 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B62J-JPN"/>
@@ -11288,7 +11288,7 @@ license:CC0
 
 	<software name="kangpzl3">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Japan, Rev 1, NP)</description>
+		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Dai-3-gou (Japan, rev 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B63J-JPN"/>
@@ -11326,7 +11326,7 @@ license:CC0
 
 	<software name="kangpzls">
 		<!-- NP only -->
-		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Japan, Rev 1, NP)</description>
+		<description>Loppi Puzzle Magazine - Kangaeru Puzzle Soukangou (Japan, rev 1, NP)</description>
 		<year>2001</year>
 		<publisher>Success</publisher>
 		<info name="serial" value="DMG-B61J-JPN"/>
@@ -11406,7 +11406,7 @@ license:CC0
 
 	<software name="lovehinaa" cloneof="lovehina">
 		<!-- Notes: GBC only -->
-		<description>Love Hina Pocket (Japan, Rev 1)</description>
+		<description>Love Hina Pocket (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Marvelous Entertainment</publisher>
 		<info name="serial" value="CGB-BPHJ-JPN"/>
@@ -11700,7 +11700,7 @@ license:CC0
 
 	<software name="mtetrisc">
 		<!-- Notes: GBC only -->
-		<description>Magical Tetris Challenge (Europe, Rev 1)</description>
+		<description>Magical Tetris Challenge (Europe, rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-AXCP-EUR"/>
@@ -11783,7 +11783,7 @@ license:CC0
 	</software>
 
 	<software name="majomari">
-		<description>Majokko Mari-chan no Kisekae Monogatari (Japan, Rev 1)</description>
+		<description>Majokko Mari-chan no Kisekae Monogatari (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Pack In Soft</publisher>
 		<info name="serial" value="DMG-A23J-JPN-1"/>
@@ -12983,7 +12983,7 @@ license:CC0
 	</software>
 
 	<software name="minnashga" cloneof="minnashg">
-		<description>Minna no Shougi - Shokyuu Hen (Japan, Rev 1)</description>
+		<description>Minna no Shougi - Shokyuu Hen (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<info name="serial" value="DMG-A7YJ-JPN"/>
@@ -13077,7 +13077,7 @@ license:CC0
 
 	<software name="missimpa" cloneof="missimp">
 		<!-- Notes: GBC only -->
-		<description>Mission Impossible (Europe, Rev 1)</description>
+		<description>Mission Impossible (Europe, rev 1)</description>
 		<year>2000</year>
 		<publisher>Infogrames</publisher>
 		<info name="serial" value="CGB-AIMP-?"/>
@@ -13324,7 +13324,7 @@ license:CC0
 
 	<software name="monstrvl">
 		<!-- Notes: GBC only -->
-		<description>Monster Traveler (Japan, Rev 1)</description>
+		<description>Monster Traveler (Japan, rev 1)</description>
 		<year>2002</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="CGB-BFVJ-JPN"/>
@@ -13359,7 +13359,7 @@ license:CC0
 
 	<software name="monstinc">
 		<!-- Notes: GBC only -->
-		<description>Monsters, Inc. (Europe, Rev 1)</description>
+		<description>Monsters, Inc. (Europe, rev 1)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
 		<info name="serial" value="CGB-B4QP-UKV"/>
@@ -14237,7 +14237,7 @@ license:CC0
 	</software>
 
 	<software name="nbazonea" cloneof="nbapro99">
-		<description>NBA In the Zone (USA, Rev 1)</description>
+		<description>NBA In the Zone (USA, rev 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-ANZE-USA"/>
@@ -14492,7 +14492,7 @@ license:CC0
 	</software>
 
 	<software name="blitz">
-		<description>NFL Blitz (Europe, USA, Rev 1)</description>
+		<description>NFL Blitz (Europe, USA, rev 1)</description>
 		<year>1998</year>
 		<publisher>Midway</publisher>
 		<info name="serial" value="DMG-ABZE-USA, DMG-ABZP-EUU"/>
@@ -15476,7 +15476,7 @@ license:CC0
 	</software>
 
 	<software name="pockgtp" cloneof="pockrace">
-		<description>Pocket GT (Europe, Prototype?)</description>
+		<description>Pocket GT (Europe, prototype?)</description>
 		<year>1999</year>
 		<publisher>MTO</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -15575,7 +15575,7 @@ license:CC0
 	</software>
 
 	<software name="pokegin" cloneof="pokesilv">
-		<description>Pocket Monsters Gin (Japan, Rev 1)</description>
+		<description>Pocket Monsters Gin (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAXJ-JPN"/>
@@ -15619,7 +15619,7 @@ license:CC0
 	</software>
 
 	<software name="pokekin" cloneof="pokegold">
-		<description>Pocket Monsters Kin (Japan, Rev 1)</description>
+		<description>Pocket Monsters Kin (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AAUJ-JPN"/>
@@ -15699,7 +15699,7 @@ license:CC0
 
 	<software name="pocknaka">
 		<!-- Notes: GBC only -->
-		<description>Pocket no Naka no Ookoku (Japan, Prototype)</description>
+		<description>Pocket no Naka no Ookoku (Japan, prototype)</description>
 		<year>2000</year>   <!-- scheduled to be released January 2001 (3/11/2000 Famitsu) -->
 		<publisher>Hector</publisher>
 		<info name="alt_title" value="ポケットの中の王国"/>
@@ -15785,7 +15785,7 @@ license:CC0
 
 	<software name="poktpuyna" cloneof="poktpuyn">
 		<!-- Notes: GBC only -->
-		<description>Pocket Puyo Puyo-n (Japan, Rev 1)</description>
+		<description>Pocket Puyo Puyo-n (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="CGB-BPYJ-JPN"/>
@@ -15802,7 +15802,7 @@ license:CC0
 
 	<software name="poktpuynb" cloneof="poktpuyn">
 		<!-- Notes: GBC only -->
-		<description>Pocket Puyo Puyo-n (Japan, Rev 2)</description>
+		<description>Pocket Puyo Puyo-n (Japan, rev 2)</description>
 		<year>2000</year>
 		<publisher>Compile</publisher>
 		<info name="serial" value="CGB-BPYJ-JPN"/>
@@ -15852,7 +15852,7 @@ license:CC0
 	<software name="pokecrys">
 		<!-- Notes: GBC only -->
 		<!--    European version 0 does not exist   -->
-		<description>Pokémon - Crystal Version (Europe, USA, Rev 1)</description>
+		<description>Pokémon - Crystal Version (Europe, USA, rev 1)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-BYTE-USA, CGB-BYTP-EUR"/>
@@ -16316,7 +16316,7 @@ license:CC0
 	</software>
 
 	<software name="pokecard">
-		<description>Pokémon Trading Card Game (Europe, English / Spanish / Italian, Rev 1)</description>
+		<description>Pokémon Trading Card Game (Europe, English / Spanish / Italian, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AXQX-EUR-1"/>
@@ -16370,7 +16370,7 @@ license:CC0
 	</software>
 
 	<software name="pokecardaa" cloneof="pokecard">
-		<description>Pokémon Trading Card Game (Europe, English / French / German, Rev 1)</description>
+		<description>Pokémon Trading Card Game (Europe, English / French / German, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AXQP-NOE?"/>
@@ -16558,7 +16558,7 @@ license:CC0
 	</software>
 
 	<software name="powrpkp">
-		<description>Power Pro Kun Pocket (Japan, Rev 1)</description>
+		<description>Power Pro Kun Pocket (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="DMG-AVVJ-JPN (RK178-J1)"/>
@@ -16762,7 +16762,7 @@ license:CC0
 
 	<software name="powrpfbmu" cloneof="powrpfbm">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev 2)</description>
+		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, rev 2)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BJJE-USA-2"/>
@@ -16780,7 +16780,7 @@ license:CC0
 
 	<software name="powrpfbmua" cloneof="powrpfbm">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, Rev 1)</description>
+		<description>The Powerpuff Girls - Bad Mojo Jojo (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BJJE-USA-1"/>
@@ -16884,7 +16884,7 @@ license:CC0
 
 	<software name="powrpfbhu" cloneof="powrpfbh">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Battle Him (USA, Rev 1)</description>
+		<description>The Powerpuff Girls - Battle Him (USA, rev 1)</description>
 		<year>2001</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BBHE-USA-1"/>
@@ -16983,7 +16983,7 @@ license:CC0
 
 	<software name="powrpfpnu" cloneof="powrpfpn">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev 2)</description>
+		<description>The Powerpuff Girls - Paint the Townsville Green (USA, rev 2)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BPTE-USA-2?"/>
@@ -16997,7 +16997,7 @@ license:CC0
 
 	<software name="powrpfpnua" cloneof="powrpfpn">
 		<!-- Notes: GBC only -->
-		<description>The Powerpuff Girls - Paint the Townsville Green (USA, Rev 1)</description>
+		<description>The Powerpuff Girls - Paint the Townsville Green (USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>BAM! Entertainment</publisher>
 		<info name="serial" value="CGB-BPTE-USA-1"/>
@@ -17220,7 +17220,7 @@ license:CC0
 	<software name="propooluunk" cloneof="propool">
 		<!-- Notes: GBC only -->
 		<!--    Old dump of unknown origin  -->
-		<description>Pro Pool (USA, Prototype?)</description>
+		<description>Pro Pool (USA, prototype?)</description>
 		<year>2002</year>
 		<publisher>Codemasters</publisher>
 		<info name="serial" value="CGB-BPLE-USA"/>
@@ -17614,7 +17614,7 @@ license:CC0
 
 	<software name="radikal">
 		<!-- Notes: GBC only -->
-		<description>Radikal Bikers (Europe, Prototype)</description>
+		<description>Radikal Bikers (Europe, prototype)</description>
 		<year>1998?</year>
 		<publisher>Bit Managers</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -17967,7 +17967,7 @@ license:CC0
 
 	<software name="revil">
 		<!-- Notes: GBC only -->
-		<description>Resident Evil (Prototype)</description>
+		<description>Resident Evil (prototype)</description>
 		<year>2000?</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -17982,7 +17982,7 @@ license:CC0
 
 	<software name="revila" cloneof="revil">
 		<!-- Notes: GBC only -->
-		<description>Resident Evil (Prototype, Older)</description>
+		<description>Resident Evil (prototype, older)</description>
 		<year>2000?</year>
 		<publisher>Capcom</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -18132,7 +18132,7 @@ license:CC0
 	</software>
 
 	<software name="roadst98">
-		<description>Roadsters '98 (USA, Prototype)</description>
+		<description>Roadsters '98 (USA, prototype)</description>
 		<year>1998</year>
 		<publisher>Titus</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -18907,7 +18907,7 @@ license:CC0
 	</software>
 
 	<software name="sanriotka" cloneof="sanriotk">
-		<description>Sanrio Timenet - Kako Hen (Japan, Rev 1)</description>
+		<description>Sanrio Timenet - Kako Hen (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-ATPJ-JPN"/>
@@ -18944,7 +18944,7 @@ license:CC0
 	</software>
 
 	<software name="sanriotma" cloneof="sanriotm">
-		<description>Sanrio Timenet - Mirai Hen (Japan, Rev 1)</description>
+		<description>Sanrio Timenet - Mirai Hen (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Imagineer</publisher>
 		<info name="serial" value="DMG-ATFJ-JPN"/>
@@ -19161,7 +19161,7 @@ license:CC0
 	</software>
 
 	<software name="shadgate">
-		<description>Shadowgate Classic (Europe, USA, Rev 1)</description>
+		<description>Shadowgate Classic (Europe, USA, rev 1)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<info name="serial" value="DMG-ASWE-USA, DMG-ASWP-EUR"/>
@@ -19272,7 +19272,7 @@ license:CC0
 	</software>
 
 	<software name="shanghai">
-		<description>Shanghai Pocket (Europe, Rev 1)</description>
+		<description>Shanghai Pocket (Europe, rev 1)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="DMG-AHPP-(EUR/EUU)?"/>
@@ -19342,7 +19342,7 @@ license:CC0
 	</software>
 
 	<software name="shinmta">
-		<description>Shin Megami Tensei Devil Children - Aka no Sho (Japan, Rev 1)</description>
+		<description>Shin Megami Tensei Devil Children - Aka no Sho (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-BHNJ-JPN"/>
@@ -19384,7 +19384,7 @@ license:CC0
 	</software>
 
 	<software name="shinmtk">
-		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Japan, Rev 1)</description>
+		<description>Shin Megami Tensei Devil Children - Kuro no Sho (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Atlus</publisher>
 		<info name="serial" value="DMG-BHEJ-JPN"/>
@@ -20101,7 +20101,7 @@ license:CC0
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
 		<!--    Planned for physical release?   -->
-		<description>Spy vs. Spy (Japan, Rev 1, NP)</description>
+		<description>Spy vs. Spy (Japan, rev 1, NP)</description>
 		<year>1999</year>
 		<publisher>Kemco</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -20477,7 +20477,7 @@ license:CC0
 		<!-- Notes: GBC only -->
 		<!-- NP only -->
 		<!--    Planned for physical release?   -->
-		<description>Super Mario Bros. Deluxe (Japan, NP, Rev 1)</description>
+		<description>Super Mario Bros. Deluxe (Japan, NP, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AHYJ-JPN"/>
@@ -20496,7 +20496,7 @@ license:CC0
 	<software name="smbdx">
 		<!-- Notes: GBC only -->
 		<!--    Retail cartridge of USA version not yet secured, might be unreleased    -->
-		<description>Super Mario Bros. Deluxe (Europe, USA, Rev 2)</description>
+		<description>Super Mario Bros. Deluxe (Europe, USA, rev 2)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AHYE-USA, CGB-AHYP-EUR"/>
@@ -20512,7 +20512,7 @@ license:CC0
 
 	<software name="smbdxa" cloneof="smbdx">
 		<!-- Notes: GBC only -->
-		<description>Super Mario Bros. Deluxe (Europe, USA, Rev 1)</description>
+		<description>Super Mario Bros. Deluxe (Europe, USA, rev 1)</description>
 		<year>1999</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="CGB-AHYE-USA, CGB-AHYP-EUR"/>
@@ -21233,7 +21233,7 @@ license:CC0
 
 	<software name="tetrisada" cloneof="mtetrisc">
 		<!-- Notes: GBC only -->
-		<description>Tetris Adventure - Susume Mickey to Nakama-tachi (Japan, Rev 1)</description>
+		<description>Tetris Adventure - Susume Mickey to Nakama-tachi (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Capcom</publisher>
 		<info name="serial" value="CGB-AT7J-JPN?"/>
@@ -21583,7 +21583,7 @@ license:CC0
 
 	<software name="tomjermha" cloneof="tomjermh">
 		<!-- Notes: GBC only -->
-		<description>Tom and Jerry - Mousehunt (Europe, Rev 1)</description>
+		<description>Tom and Jerry - Mousehunt (Europe, rev 1)</description>
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
 		<info name="serial" value="CGB-BTJP-EUR"/>
@@ -21611,7 +21611,7 @@ license:CC0
 
 	<software name="tomjermhua" cloneof="tomjermh">
 		<!-- Notes: GBC only -->
-		<description>Tom and Jerry - Mousehunt (USA, Rev 1)</description>
+		<description>Tom and Jerry - Mousehunt (USA, rev 1)</description>
 		<year>2001</year>
 		<publisher>Conspiracy Entertainment</publisher>
 		<info name="serial" value="CGB-BTJE-USA?"/>
@@ -21697,7 +21697,7 @@ license:CC0
 	</software>
 
 	<software name="traidp" cloneof="traid">
-		<description>Tomb Raider (Europe, USA, Prototype)</description>
+		<description>Tomb Raider (Europe, USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Eidos</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -22080,7 +22080,7 @@ license:CC0
 
 	<software name="tottokh">
 		<!-- Notes: GBC only -->
-		<description>Tottoko Hamutarou - Tomodachi Daisakusen Dechu (Japan, Rev 1)</description>
+		<description>Tottoko Hamutarou - Tomodachi Daisakusen Dechu (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-BHTJ-JPN"/>
@@ -22206,7 +22206,7 @@ license:CC0
 	<software name="tradebat">
 		<!--    Only released on the 3DS Virtual Console?   -->
 		<!--    Planned for physical release?   -->
-		<description>Trade &amp; Battle Card Hero (Japan, Rev 1)</description>
+		<description>Trade &amp; Battle Card Hero (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AHHJ-JPN"/>
@@ -22342,7 +22342,7 @@ license:CC0
 	</software>
 
 	<software name="tsurisn2a" cloneof="tsurisn2">
-		<description>Tsuri Sensei 2 (Japan, Rev 1)</description>
+		<description>Tsuri Sensei 2 (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>J-Wing</publisher>
 		<info name="serial" value="DMG-AF2J-JPN?"/>
@@ -22553,7 +22553,7 @@ license:CC0
 
 	<!-- developed by Slitherine Software -->
 	<software name="ttex" supported="no">
-		<description>Tyrannosaurus Tex (Prototype)</description>
+		<description>Tyrannosaurus Tex (prototype)</description>
 		<year>2000</year><!-- 2000-03-21 on label -->
 		<publisher>Eidos Interactive</publisher>
 		<info name="alt_title" value="T-TEX-EIDOS CGB (label)"/>
@@ -22568,7 +22568,7 @@ license:CC0
 
 	<software name="tyrian2k">
 		<!-- Notes: GBC only -->
-		<description>Tyrian 2000 (USA, Prototype)</description>
+		<description>Tyrian 2000 (USA, prototype)</description>
 		<year>2000</year>
 		<publisher>Symmetry Entertainment</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -23071,7 +23071,7 @@ license:CC0
 
 	<software name="watashik">
 		<!-- Notes: GBC only -->
-		<description>Watashi no Kitchen (Japan, Rev 1)</description>
+		<description>Watashi no Kitchen (Japan, rev 1)</description>
 		<year>2001</year>
 		<publisher>Kirat</publisher>
 		<info name="serial" value="CGB-BKRJ-JPN"/>
@@ -23296,7 +23296,7 @@ license:CC0
 
 	<software name="wizardem">
 		<!-- Notes: GBC only -->
-		<description>Wizardry Empire (Japan, Rev 1)</description>
+		<description>Wizardry Empire (Japan, rev 1)</description>
 		<year>1999</year>
 		<publisher>Starfish</publisher>
 		<info name="serial" value="CGB-AEWJ-JPN"/>
@@ -23619,7 +23619,7 @@ license:CC0
 
 	<software name="xmenma">
 		<!-- Notes: GBC only -->
-		<description>X-Men - Mutant Academy (Europe, USA, Rev 1)</description>
+		<description>X-Men - Mutant Academy (Europe, USA, rev 1)</description>
 		<year>2000</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="CGB-BXAE-USA, CGB-BXAP-NOE"/>
@@ -24174,7 +24174,7 @@ license:CC0
 
 	<software name="zeldaldxj" cloneof="zeldaldx">
 		<!-- Also released by NP in 2000-03 -->
-		<description>Zelda no Densetsu - Yume o Miru Shima DX (Japan, Rev 2)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima DX (Japan, rev 2)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLJ-JPN"/>
@@ -24199,7 +24199,7 @@ license:CC0
 
 	<software name="zeldaldxja" cloneof="zeldaldx">
 		<!-- Also released by NP in 2000-03 -->
-		<description>Zelda no Densetsu - Yume o Miru Shima DX (Japan, Rev 1)</description>
+		<description>Zelda no Densetsu - Yume o Miru Shima DX (Japan, rev 1)</description>
 		<year>1998</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="DMG-AZLJ-JPN"/>
@@ -24284,7 +24284,7 @@ license:CC0
 	</software>
 
 	<software name="zoidsjas">
-		<description>Zoids - Jashin Fukkatsu! Genobreaker Hen (Japan, Rev 1)</description>
+		<description>Zoids - Jashin Fukkatsu! Genobreaker Hen (Japan, rev 1)</description>
 		<year>2000</year>
 		<publisher>Tomy</publisher>
 		<info name="serial" value="DMG-BGZJ-JPN"/>
@@ -24400,7 +24400,7 @@ license:CC0
 
 	<software name="atvrackja" cloneof="atvrackj" supported="partial">
 		<!-- Notes: GBC only -->
-		<description>ATV Racing &amp; Karate Joe (Europe, Alt)</description>
+		<description>ATV Racing &amp; Karate Joe (Europe, alt)</description>
 		<year>200?</year>
 		<publisher>Rocket Games</publisher>
 		<info name="usage" value="Enable 'Skip BIOS check' configuration setting to boot"/>
@@ -26108,7 +26108,7 @@ license:CC0
 
 	<software name="cjjqx1" cloneof="cjjqx">
 	<!-- 4MB rom with crc 0cea6b33 is taizou's cracked version running on base MBC5 -->
-		<description>Chao Ji Ji Qi Ren Da Zhan X (China, Alt)</description>
+		<description>Chao Ji Ji Qi Ren Da Zhan X (China, alt)</description>
 		<year>200?</year>
 		<publisher>Sintax</publisher>
 		<info name="alt_title" value="超級機器人大戰X, Super Robot War X (Cart)"/>
@@ -26453,7 +26453,7 @@ license:CC0
 	</software>
 
 	<software name="crzyric2a" cloneof="crzyric2">
-		<description>Crazy Richman 2 - Bai Wang Da Fu Weng (China, Alt)</description>
+		<description>Crazy Richman 2 - Bai Wang Da Fu Weng (China, alt)</description>
 		<year>20??</year>
 		<publisher>V.Fame ~ Guangzhou Li Cheng</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -26497,7 +26497,7 @@ license:CC0
 	</software>
 
 	<software name="rockmnx3a" cloneof="rockmnx3">
-		<description>Rockman X3 (China, Alt)</description>
+		<description>Rockman X3 (China, alt)</description>
 		<year>20??</year>
 		<publisher>V.Fame ~ Guangzhou Li Cheng</publisher>
 		<info name="alt_title" value="Rockman DX3 (Box)"/>
@@ -26684,7 +26684,7 @@ license:CC0
 	</software>
 
 	<software name="shuihussa" cloneof="shuihuss">
-		<description>Shui Hu Shen Shou (China, Alt)</description>
+		<description>Shui Hu Shen Shou (China, alt)</description>
 		<year>2001</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="水滸神獸"/>
@@ -26746,7 +26746,7 @@ license:CC0
 	</software>
 
 	<software name="srobotf1a" cloneof="srobotf1">
-		<description>Super Robot Taisen Final Vol.1 (China, Alt)</description>
+		<description>Super Robot Taisen Final Vol.1 (China, alt)</description>
 		<year>20??</year>
 		<publisher>SKOB</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -26776,7 +26776,7 @@ license:CC0
 	</software>
 
 	<software name="sanguoasa" cloneof="sanguoas">
-		<description>San Guo Zhi - Ao Shi Tian Jia (China, Alt)</description>
+		<description>San Guo Zhi - Ao Shi Tian Jia (China, alt)</description>
 		<year>20??</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box)"/>
@@ -26792,7 +26792,7 @@ license:CC0
 
 	<software name="sanguoasb" cloneof="sanguoas">
 	<!-- This has the 1st half identical to the second, but it's slightly different from the dumps above... -->
-		<description>San Guo Zhi - Ao Shi Tian Jia (China, Alt Bad?)</description>
+		<description>San Guo Zhi - Ao Shi Tian Jia (China, alt bad?)</description>
 		<year>20??</year>
 		<publisher>V.Fame</publisher>
 		<info name="alt_title" value="三國志 - 傲視天下 (title), 三國志 - 傲視天下 (San Guo Zhi- Lie Chuan) (Box)"/>
@@ -27013,7 +27013,7 @@ license:CC0
 	</software>
 
 	<software name="dkong5">
-		<description>Donkey Kong 5 (China, Bad?)</description>
+		<description>Donkey Kong 5 (China, bad?)</description>
 		<year>2000</year>
 		<publisher>Yong Yong</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -27197,7 +27197,7 @@ license:CC0
 
 	<software name="mslug2k1a" cloneof="mslug2k1">
 		<!-- probably developed by BDD -->
-		<description>Metal Slug 2001 (China, Alt 1)</description>
+		<description>Metal Slug 2001 (China, alt 1)</description>
 		<year>20??</year>
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -27212,7 +27212,7 @@ license:CC0
 
 	<software name="mslug2k1b" cloneof="mslug2k1">
 		<!-- probably developed by BDD -->
-		<description>Metal Slug 2001 (China, Alt 2)</description>
+		<description>Metal Slug 2001 (China, alt 2)</description>
 		<year>20??</year>
 		<publisher>Sintax</publisher>
 		<part name="cart" interface="gameboy_cart">
