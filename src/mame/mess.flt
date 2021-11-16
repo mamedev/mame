@@ -1025,6 +1025,7 @@ sx1000.cpp
 sym1.cpp
 symbolics.cpp
 synthex.cpp
+sys1121.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp
