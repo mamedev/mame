@@ -47,7 +47,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_dac(*this, "dac")
-		, m_io_keyboard(*this, "X%u", 0)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_io_outputs(*this, "out%u", 0U)
 	{ }
