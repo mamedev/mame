@@ -233,7 +233,9 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_BIT( 0x10,     0x10, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x01, EQUALS, 0x00) // "Invulnerability Cheat" - see Fake DIP Switch
+	PORT_DIPNAME( 0x10, 0x10, "Invulnerability Cheat" ) // DIP switch 1 of 2
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
@@ -273,12 +275,7 @@ static INPUT_PORTS_START( cop01 )
 	PORT_DIPSETTING(    0x20, "30k 80k 50k+" )
 	PORT_DIPSETTING(    0x40, "30k 130k 100k+" )
 	PORT_DIPSETTING(    0x00, "30k 180k 150k+" )
-	PORT_BIT( 0x80,     0x80, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x01, EQUALS, 0x00) // "Invulnerability Cheat" - see Fake DIP Switch
-
-	PORT_START("FAKE") // Undocumented invulnerability cheat
-	PORT_DIPNAME( 0x01, 0x00, "Invulnerability Cheat" )
-	PORT_DIPSETTING(    0x00, "Off" )
-	PORT_DIPSETTING(    0x01, "On" )
+	PORT_BIT( 0x80,     0x80, IPT_CUSTOM ) PORT_CONDITION("DSW1", 0x10, NOTEQUALS, 0x00) // "Invulnerability Cheat" DIP switch 2 of 2
 INPUT_PORTS_END
 
 /* There is an ingame bug at 0x00e4 to 0x00e6 that performs 3 times 'rrca' instead of 'rlca'
