@@ -682,9 +682,24 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		<part name="cart" interface="vsmile_cart">
 			<feature name="slot" value="vsmile_rom" />
 			<feature name="cart_type" value="lilac" />
-			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
+			<feature name="u1" value="U1" />
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile92000-2.bin" size="8388608" crc="e432b85e" sha1="b11e6eb1c20f9db01df28e7169590ddfb95fee43" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprkr101a" cloneof="alphaprkr101">
+		<description>Alphabet Park Adventure (USA, rev. 101, alt)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092000-101(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Alphabet Park Adventure 52-092000-101(US) [ALT].bin" size="8388608" crc="d8583aa2" sha1="5b83f4c7fed4f86182ae3cd2b25ec403d129b81b" />
 			</dataarea>
 		</part>
 	</software>
@@ -738,6 +753,23 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="U1" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="vsmile92000.bin" size="8388608" crc="e491b4fc" sha1="511d7807df753e8d89547040af2019629f056371" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphaprka2" cloneof="alphaprkr101">
+		<description>Alphabet Park Adventure (USA, alt 2, two chips)</description>
+		<year>200?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092000(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="U1" />
+			<feature name="u2" value="U2" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] LOW.bin" size="0x400000" crc="402681b7" sha1="5ff1ba9a016d10e09408b5638aaf759cac2cc97a" offset="0x000000" />
+				<rom name="Alphabet Park Adventure 92000(US) [TWO CHIP] HIGH.bin" size="0x200000" crc="2feee80a" sha1="d1ca700602c3b2bce2a8920f017370cb0ef322de" offset="0x400000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1336,6 +1368,36 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="092660.u1" size="8388608" crc="ff65d967" sha1="27b229b6e308dfc0cea7e594c7b006f27961c05f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsa" cloneof="carsr201">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, alt)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092660(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars - Rev It Up in Radiator Springs 092660(US) [ALT].bin" size="8388608" crc="31c1df9c" sha1="14b028e5911d26eec8644ee19da8825d8386244c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carsa2" cloneof="carsr201">
+		<description>Disney/Pixar Cars - Rev It Up in Radiator Springs (USA, alt 2)</description>
+		<year>2006?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092660(US)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="Cars - Rev It Up in Radiator Springs 092660(US).bin" size="8388608" crc="ed8ee40a" sha1="e111f257447d64ded47a57d80174ced1bca0cb14" />
 			</dataarea>
 		</part>
 	</software>

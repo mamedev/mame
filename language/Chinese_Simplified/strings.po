@@ -1,15 +1,15 @@
-# Chinese Simplified translations for PACKAGE package
-# PACKAGE 套件的简体中文翻译
-# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2016.
+# Chinese Simplified translations for MAME package
+# MAME 套件的简体中文翻译
+# Copyright (C) 1997-2021 MAMEdev and contributors
+# This file is distributed under the same license as the MAME package.
+# Automatically generated, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-31 10:10+1100\n"
-"PO-Revision-Date: 2021-10-16 12:57+0800\n"
+"PO-Revision-Date: 2021-11-07 00:45+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -732,7 +732,7 @@ msgstr "仅 Y 轴"
 
 #: src/frontend/mame/ui/videoopt.cpp:203
 msgid "X or Y (Auto)"
-msgstr "X 轴或 Y 周（自动）"
+msgstr "X 轴或 Y 轴（自动）"
 
 #: src/frontend/mame/ui/videoopt.cpp:210
 msgid "Non-Integer Scaling"
@@ -1440,7 +1440,7 @@ msgstr "没有发现群组 INI 档案"
 
 #: src/frontend/mame/ui/utils.cpp:1080
 msgid "File"
-msgstr "档案"
+msgstr "文件"
 
 #: src/frontend/mame/ui/utils.cpp:1084
 msgid "No groups found in category file"
@@ -1598,7 +1598,7 @@ msgstr "[ 错误 ]"
 
 #: src/frontend/mame/ui/state.cpp:224
 msgid "[no saved states found]"
-msgstr ""
+msgstr "[未找到已保存的状态]"
 
 #: src/frontend/mame/ui/state.cpp:229 plugins/cheatfind/init.lua:492
 msgid "Cancel"
@@ -1675,19 +1675,19 @@ msgstr "输入了无效序列"
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
-msgstr ""
+msgstr "%1$s 类比"
 
 #: src/frontend/mame/ui/inputmap.cpp:525
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr ""
+msgstr "%1$s 类比增加"
 
 #: src/frontend/mame/ui/inputmap.cpp:526
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr ""
+msgstr "%1$s 类比减少"
 
 #: src/frontend/mame/ui/inputmap.cpp:568
 #, c-format
@@ -2455,13 +2455,13 @@ msgstr "紫"
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, 除错)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s)"
 
 #: src/frontend/mame/ui/about.cpp:51
 #, c-format
@@ -2690,7 +2690,7 @@ msgstr "选择 BIOS："
 #: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
 #, c-format
 msgid "%1$s, %2$s"
-msgstr ""
+msgstr "%1$s, %2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 #, c-format
@@ -3196,7 +3196,7 @@ msgstr "* 配置设定：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:290
 msgid "* Input device(s):\n"
-msgstr "* 输入装置："
+msgstr "* 输入装置：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:292
 #, c-format
@@ -3259,62 +3259,62 @@ msgstr "[ 无 ]\n"
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "画面  %1$u 标准  (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1873
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "画面 %1$u 像素比例 (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1895 src/emu/render.cpp:2030
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
+msgstr "台面型"
 
 #: src/emu/render.cpp:2015
 msgctxt "view-name"
 msgid "Left-to-Right"
-msgstr ""
+msgstr "左至右"
 
 #: src/emu/render.cpp:2016
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgstr "左至右 (无边)"
 
 #: src/emu/render.cpp:2017
 msgctxt "view-name"
 msgid "Top-to-Bottom"
-msgstr ""
+msgstr "上到下"
 
 #: src/emu/render.cpp:2018
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "上到下 (无边)"
 
 #: src/emu/render.cpp:2069
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u×%2$u 左至右, 上到下"
 
 #: src/emu/render.cpp:2078
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 左至右, 上到下 (无边)"
 
 #: src/emu/render.cpp:2087
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u×%2$u 上到下, 左至右"
 
 #: src/emu/render.cpp:2096
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 上到下, 左至右 (无边)"
 
 #: src/emu/inpttype.ipp:22
 msgctxt "input-name"
@@ -6680,63 +6680,63 @@ msgstr "菜单 校验媒体"
 #: src/osd/modules/input/input_sdlcommon.cpp:175
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "切换全萤幕"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "拍摄描绘的撷图"
 
 #: src/osd/modules/input/input_windows.cpp:128
 #: src/osd/modules/input/input_sdlcommon.cpp:223
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "拍摄描绘的视频"
 
 #: src/osd/modules/input/input_windows.cpp:149
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "切换后处理"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:201
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "切换过滤"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:207
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "减少预先缩放"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:217
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "增加预先缩放"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "当更新时"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "结束时"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "高分档支援选项"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "储存得分"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "高分档支援"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
@@ -7062,7 +7062,7 @@ msgstr "%s [%d Hz]"
 #: plugins/autofire/autofire_menu.lua:99
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "[无连发按钮]"
 
 #: plugins/autofire/autofire_menu.lua:105
 #: plugins/autofire/autofire_menu.lua:251
@@ -7134,28 +7134,28 @@ msgstr "选择供连发用的按键"
 #: plugins/inputmacro/init.lua:130 plugins/inputmacro/inputmacro_menu.lua:520
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr ""
+msgstr "输入宏"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "新宏"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "新宏 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:81
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "设定输入"
 
 #: plugins/inputmacro/inputmacro_menu.lua:319
 msgctxt "plugin-inputmacro"
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #: plugins/inputmacro/inputmacro_menu.lua:327
 #: plugins/inputmacro/inputmacro_menu.lua:363
@@ -7166,86 +7166,86 @@ msgstr "[未设定]"
 #: plugins/inputmacro/inputmacro_menu.lua:328
 msgctxt "plugin-inputmacro"
 msgid "Activation sequence"
-msgstr ""
+msgstr "激活序列"
 
 #: plugins/inputmacro/inputmacro_menu.lua:331
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "立即停止"
 
 #: plugins/inputmacro/inputmacro_menu.lua:331
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "完成宏"
 
 #: plugins/inputmacro/inputmacro_menu.lua:332
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "放开时启用"
 
 #: plugins/inputmacro/inputmacro_menu.lua:338
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "放开"
 
 #: plugins/inputmacro/inputmacro_menu.lua:341
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "循环至第 %d 步"
 
 #: plugins/inputmacro/inputmacro_menu.lua:346
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "延长第 %d 步"
 
 #: plugins/inputmacro/inputmacro_menu.lua:348
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "当按住"
 
 #: plugins/inputmacro/inputmacro_menu.lua:352
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "第 %d 步"
 
 #: plugins/inputmacro/inputmacro_menu.lua:353
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "延迟 (画格)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "持续 (画格)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:364
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "输入 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "新增输入"
 
 #: plugins/inputmacro/inputmacro_menu.lua:374
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "删除步骤"
 
 #: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "在位置新增步骤"
 
 #: plugins/inputmacro/inputmacro_menu.lua:434
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "新增输入宏"
 
 #: plugins/inputmacro/inputmacro_menu.lua:441
 msgctxt "plugin-inputmacro"
@@ -7260,7 +7260,7 @@ msgstr "取消"
 #: plugins/inputmacro/inputmacro_menu.lua:459
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "编辑输入宏"
 
 #: plugins/inputmacro/inputmacro_menu.lua:465
 msgctxt "plugin-inputmacro"
@@ -7276,18 +7276,18 @@ msgstr "按下 %s 删除"
 #: plugins/inputmacro/inputmacro_menu.lua:533
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "[无宏]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:538
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "新增宏"
 
 #: plugins/timer/init.lua:89
 #, lua-format
 msgctxt "plugin-timer"
 msgid "%03d:%02d:%02d"
-msgstr ""
+msgstr "%03d:%02d:%02d"
 
 #: plugins/timer/init.lua:98
 msgctxt "plugin-timer"
@@ -7446,9 +7446,5 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
-
-#~ msgid "No save states found"
-#~ msgstr "未找到已保存的状态"
-
-#~ msgid "Press button for hotkey or wait to leave unchanged"
-#~ msgstr "按下热键按键或稍后保持不变"
+"输入序列或按下 %s 取消\n"
+"%s"

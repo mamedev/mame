@@ -1,15 +1,15 @@
-# Chinese Traditional translations for PACKAGE package
-# PACKAGE 套件的正體中文翻譯
-# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2016.
+# Chinese Traditional translations for MAME package
+# MAME 套件的正體中文翻譯
+# Copyright (C) 1997-2021 MAMEdev and contributors
+# This file is distributed under the same license as the MAME package.
+# Automatically generated, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-31 10:10+1100\n"
-"PO-Revision-Date: 2021-10-16 12:55+0800\n"
+"PO-Revision-Date: 2021-11-06 23:05+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -59,7 +59,7 @@ msgid ""
 msgstr ""
 "確定要退出嗎？\n"
 "\n"
-"按『%1$s』退出，\n"
+"按『%1$s』退出, \n"
 "按『%2$s』繼續模擬。"
 
 #: src/frontend/mame/ui/ui.cpp:1537
@@ -366,11 +366,11 @@ msgstr "讀寫"
 
 #: src/frontend/mame/ui/filesel.cpp:549
 msgid "Read this image, write to another image"
-msgstr "讀取此映像檔，寫入至其他映像檔"
+msgstr "讀取此映像檔, 寫入至其他映像檔"
 
 #: src/frontend/mame/ui/filesel.cpp:550
 msgid "Read this image, write to diff"
-msgstr "讀取此映像檔，寫入差異檔"
+msgstr "讀取此映像檔, 寫入差異檔"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Miscellaneous Options"
@@ -526,7 +526,7 @@ msgstr "倒帶容量"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Bilinear filtering for snapshots"
-msgstr "供截圖使用的雙線過濾"
+msgstr "供擷圖使用的雙線過濾"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Burn-in"
@@ -732,7 +732,7 @@ msgstr "僅 Y 軸"
 
 #: src/frontend/mame/ui/videoopt.cpp:203
 msgid "X or Y (Auto)"
-msgstr "X 軸或 Y 週（自動）"
+msgstr "X 軸或 Y 軸（自動）"
 
 #: src/frontend/mame/ui/videoopt.cpp:210
 msgid "Non-Integer Scaling"
@@ -901,13 +901,13 @@ msgstr "此機台需要額外的裝飾圖檔"
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
-msgstr "本機台無法完成，並非模擬時的錯誤而可能呈現怪異的行為或缺少元件。\n"
+msgstr "本機台無法完成, 並非模擬時的錯誤而可能呈現怪異的行為或缺少元件。\n"
 
 #: src/frontend/mame/ui/info.cpp:288
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
-msgstr "本機台無聲音硬體，故 MAME 將不會產生聲音，這是可預期的行為。\n"
+msgstr "本機台無聲音硬體, 故 MAME 將不會產生聲音, 這是可預期的行為。\n"
 
 #: src/frontend/mame/ui/info.cpp:292
 msgid ""
@@ -917,8 +917,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"此機台無法執行，機台的模擬還不完全。除了等待開發人員改良模擬之外，沒有方法可"
-"以解決這個問題。\n"
+"此機台無法執行, 機台的模擬還不完全。 除了等待開發人員改良模擬之外, 沒有方法"
+"可以解決這個問題。\n"
 
 #: src/frontend/mame/ui/info.cpp:294
 msgid ""
@@ -928,7 +928,7 @@ msgid ""
 "experience this machine.\n"
 msgstr ""
 "\n"
-"此機台的部分元件無法模擬，因其需要實際活動的互動或機械裝置的組合。 故無法達成"
+"此機台的部分元件無法模擬, 因其需要實際活動的互動或機械裝置的組合。 故無法達成"
 "此機台的完整體驗。\n"
 
 #: src/frontend/mame/ui/info.cpp:316
@@ -1515,7 +1515,7 @@ msgstr " （已鎖定）"
 #: src/frontend/mame/ui/miscmenu.cpp:473
 #, c-format
 msgid "P%d Visibility"
-msgstr "P$d 可見度"
+msgstr "P%d 可見度"
 
 #: src/frontend/mame/ui/miscmenu.cpp:527
 #, c-format
@@ -1546,7 +1546,7 @@ msgstr "匯出 XML 格式清單 （同 -listxml）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:709
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr "匯出 TXT 格式清單 （同 -listxml，但不包含裝置）"
+msgstr "匯出 TXT 格式清單 （同 -listxml, 但不含裝置）"
 
 #: src/frontend/mame/ui/miscmenu.cpp:710
 msgid "Export list in TXT format (like -listfull)"
@@ -1598,7 +1598,7 @@ msgstr "[ 錯誤 ]"
 
 #: src/frontend/mame/ui/state.cpp:224
 msgid "[no saved states found]"
-msgstr ""
+msgstr "[未找到已儲存的狀態]"
 
 #: src/frontend/mame/ui/state.cpp:229 plugins/cheatfind/init.lua:492
 msgid "Cancel"
@@ -1675,19 +1675,19 @@ msgstr "輸入了無效序列"
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
-msgstr ""
+msgstr "%1$s 類比"
 
 #: src/frontend/mame/ui/inputmap.cpp:525
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
-msgstr ""
+msgstr "%1$s 類比增加"
 
 #: src/frontend/mame/ui/inputmap.cpp:526
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
-msgstr ""
+msgstr "%1$s 類比減少"
 
 #: src/frontend/mame/ui/inputmap.cpp:568
 #, c-format
@@ -1768,7 +1768,7 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
-"選定的遊戲缺少一個至多個必要的 ROM 或 CHD 映像檔，請選擇其他遊戲。\n"
+"選定的遊戲缺少一個至多個必要的 ROM 或 CHD 映像檔, 請選擇其他遊戲。\n"
 "按任意鍵繼續。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:273
@@ -1789,9 +1789,9 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"找不到機台，請檢查 %1$s.ini 的 ROM 目錄設定\n"
+"找不到機台, 請檢查 %1$s.ini 的 ROM 目錄設定\n"
 "\n"
-"如果是首次使用 %2$s，請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
+"如果是首次使用 %2$s, 請參閱 docs 目錄中的 config.txt 以取得設定 %2$s 的相關資"
 "訊。"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:315
@@ -1836,17 +1836,17 @@ msgstr "整體： 可以執行"
 #: src/frontend/mame/ui/simpleselgame.cpp:361
 #: src/frontend/mame/ui/selmenu.cpp:731
 msgid "Graphics: Unimplemented, "
-msgstr "圖形： 不完整，"
+msgstr "圖形： 不完整, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:363
 #: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Graphics: Imperfect, "
-msgstr "圖形： 不完美， "
+msgstr "圖形： 不完美,  "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:365
 #: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Graphics: OK, "
-msgstr "圖形： OK， "
+msgstr "圖形： OK, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:368
 #: src/frontend/mame/ui/selmenu.cpp:738
@@ -2118,7 +2118,7 @@ msgstr "%1$s %2$s （ %3$d / %4$d 機台 (%5$d BIOS) ）"
 #: src/frontend/mame/ui/selgame.cpp:1088
 #, c-format
 msgid "System: %1$-.100s"
-msgstr "系統： %1$-.100s"
+msgstr "系統: %1$-.100s"
 
 #: src/frontend/mame/ui/selector.cpp:116
 msgid "Selection List - Search: "
@@ -2245,7 +2245,7 @@ msgstr "UI 字體設定"
 
 #: src/frontend/mame/ui/custui.cpp:498
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-msgstr "文字樣本～永東國酬愛鬱靈鷹袋、南去經三國，東來過五湖。"
+msgstr "文字樣本～永東國酬愛鬱靈鷹袋、南去經三國, 東來過五湖。"
 
 #: src/frontend/mame/ui/custui.cpp:581
 msgctxt "color-option"
@@ -2455,13 +2455,13 @@ msgstr "紫"
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s, debug)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s, 除錯)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s)"
-msgstr ""
+msgstr "%1$s %2$s (%3$s%4$sP%5$s)"
 
 #: src/frontend/mame/ui/about.cpp:51
 #, c-format
@@ -2690,7 +2690,7 @@ msgstr "選擇 BIOS："
 #: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
 #, c-format
 msgid "%1$s, %2$s"
-msgstr ""
+msgstr "%1$s, %2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 #, c-format
@@ -3137,7 +3137,7 @@ msgstr ""
 "選項： %1$s\n"
 "裝置： %2$s\n"
 "\n"
-"如選用此選項，下列項目將啟用：\n"
+"如選用此選項, 下列項目將啟用：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:67
 msgid "* CPU:\n"
@@ -3155,7 +3155,7 @@ msgstr "  畫面 '%1$s'： 向量\n"
 #: src/frontend/mame/ui/devopt.cpp:131
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr "  畫面 '%1$s'： %2$d × %3$d (V) %4$s Hz\n"
+msgstr "  畫面 '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 
 #: src/frontend/mame/ui/devopt.cpp:132
 #, c-format
@@ -3196,7 +3196,7 @@ msgstr "* 配置設定：\n"
 
 #: src/frontend/mame/ui/devopt.cpp:290
 msgid "* Input device(s):\n"
-msgstr "* 輸入裝置："
+msgstr "* 輸入裝置:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:292
 #, c-format
@@ -3240,12 +3240,12 @@ msgstr "  鍵盤輸入    [%1$d 輸入]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:311
 msgid "* Media Options:\n"
-msgstr "* 媒體選項：\n"
+msgstr "* 媒體選項:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:316
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
-msgstr "  %1$s    [標籤： %2$s]\n"
+msgstr "  %1$s    [標籤: %2$s]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:326
 msgid "* Slot Options:\n"
@@ -3259,62 +3259,62 @@ msgstr "[ 無 ]\n"
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "畫面  %1$u 標準  (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1873
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "畫面 %1$u 像素比例 (%2$u:%3$u)"
 
 #: src/emu/render.cpp:1895 src/emu/render.cpp:2030
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
+msgstr "檯面型"
 
 #: src/emu/render.cpp:2015
 msgctxt "view-name"
 msgid "Left-to-Right"
-msgstr ""
+msgstr "左至右"
 
 #: src/emu/render.cpp:2016
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgstr "左至右 (無邊)"
 
 #: src/emu/render.cpp:2017
 msgctxt "view-name"
 msgid "Top-to-Bottom"
-msgstr ""
+msgstr "上到下"
 
 #: src/emu/render.cpp:2018
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "上到下 (無邊)"
 
 #: src/emu/render.cpp:2069
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u×%2$u 左至右, 上到下"
 
 #: src/emu/render.cpp:2078
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 左至右, 上到下 (無邊)"
 
 #: src/emu/render.cpp:2087
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u×%2$u 上到下, 左至右"
 
 #: src/emu/render.cpp:2096
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u 上到下, 左至右 (無邊)"
 
 #: src/emu/inpttype.ipp:22
 msgctxt "input-name"
@@ -6680,63 +6680,63 @@ msgstr "選單 驗證媒體"
 #: src/osd/modules/input/input_sdlcommon.cpp:175
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "切換全螢幕"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "拍攝描繪的擷圖"
 
 #: src/osd/modules/input/input_windows.cpp:128
 #: src/osd/modules/input/input_sdlcommon.cpp:223
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "拍攝描繪的影片"
 
 #: src/osd/modules/input/input_windows.cpp:149
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "切換後處理"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:201
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "切換篩選"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:207
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "減少預先縮放"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:217
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "增加預先縮放"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "當更新時"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "結束時"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "高分檔支援選項"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "儲存得分"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "高分檔支援"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
@@ -6952,18 +6952,18 @@ msgstr "測試/寫入塞入值"
 msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
-msgstr "如果你想塞入插槽 1 的值（如你開始某事但忘了），用這個"
+msgstr "如果你想塞入插槽 1 的值（如你開始某事但忘了）, 用這個"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
-msgstr "如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了），用這個"
+msgstr "如果你想塞入最後的插槽值（如你開始時忘了某項但終於找到了）, 用這個"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr "如果你想塞入 %s，用這個"
+msgstr "如果你想塞入 %s, 用這個"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
@@ -7057,12 +7057,12 @@ msgstr "按下 %s 刪除"
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "%s [%g Hz]"
-msgstr "%s [%d Hz]"
+msgstr "%s [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:99
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "[無連射按鈕]"
 
 #: plugins/autofire/autofire_menu.lua:105
 #: plugins/autofire/autofire_menu.lua:251
@@ -7134,118 +7134,118 @@ msgstr "選擇供連射用的按鍵"
 #: plugins/inputmacro/init.lua:130 plugins/inputmacro/inputmacro_menu.lua:520
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr ""
+msgstr "輸入巨集"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "新巨集"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "新巨集 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:81
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "設定輸入"
 
 #: plugins/inputmacro/inputmacro_menu.lua:319
 msgctxt "plugin-inputmacro"
 msgid "Name"
-msgstr ""
+msgstr "名稱"
 
 #: plugins/inputmacro/inputmacro_menu.lua:327
 #: plugins/inputmacro/inputmacro_menu.lua:363
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
-msgstr ""
+msgstr "[未設定]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:328
 msgctxt "plugin-inputmacro"
 msgid "Activation sequence"
-msgstr ""
+msgstr "啟動序列"
 
 #: plugins/inputmacro/inputmacro_menu.lua:331
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "立即停止"
 
 #: plugins/inputmacro/inputmacro_menu.lua:331
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "完成巨集"
 
 #: plugins/inputmacro/inputmacro_menu.lua:332
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "放開時啟用"
 
 #: plugins/inputmacro/inputmacro_menu.lua:338
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "放開"
 
 #: plugins/inputmacro/inputmacro_menu.lua:341
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "循環至第 %d 步"
 
 #: plugins/inputmacro/inputmacro_menu.lua:346
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "延長第 %d 步"
 
 #: plugins/inputmacro/inputmacro_menu.lua:348
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "當按住"
 
 #: plugins/inputmacro/inputmacro_menu.lua:352
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "第 %d 步"
 
 #: plugins/inputmacro/inputmacro_menu.lua:353
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "延遲 (畫格)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "持續 (畫格)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:364
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "輸入 %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "新增輸入"
 
 #: plugins/inputmacro/inputmacro_menu.lua:374
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "刪除步驟"
 
 #: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "在位置新增步驟"
 
 #: plugins/inputmacro/inputmacro_menu.lua:434
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "新增輸入巨集"
 
 #: plugins/inputmacro/inputmacro_menu.lua:441
 msgctxt "plugin-inputmacro"
@@ -7260,7 +7260,7 @@ msgstr "取消"
 #: plugins/inputmacro/inputmacro_menu.lua:459
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "編輯輸入巨集"
 
 #: plugins/inputmacro/inputmacro_menu.lua:465
 msgctxt "plugin-inputmacro"
@@ -7276,18 +7276,18 @@ msgstr "按下 %s 刪除"
 #: plugins/inputmacro/inputmacro_menu.lua:533
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "[無巨集]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:538
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "新增巨集"
 
 #: plugins/timer/init.lua:89
 #, lua-format
 msgctxt "plugin-timer"
 msgid "%03d:%02d:%02d"
-msgstr ""
+msgstr "%03d:%02d:%02d"
 
 #: plugins/timer/init.lua:98
 msgctxt "plugin-timer"
@@ -7446,9 +7446,5 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
-
-#~ msgid "No save states found"
-#~ msgstr "未找到已儲存的狀態"
-
-#~ msgid "Press button for hotkey or wait to leave unchanged"
-#~ msgstr "按下熱鍵按鍵或稍後保持不變"
+"輸入序列或按下 %s 取消\n"
+"%s"

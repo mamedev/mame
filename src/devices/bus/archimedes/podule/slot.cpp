@@ -244,7 +244,7 @@ void device_archimedes_podule_interface::interface_post_start()
 //#include "discbuffer.h"
 //#include "colourcard.h"
 //#include "digitiser_we.h"
-//#include "eaglem2.h"
+#include "eaglem2.h"
 #include "ether1.h"
 //#include "ether2.h"
 //#include "ether3.h"
@@ -258,7 +258,7 @@ void device_archimedes_podule_interface::interface_post_start()
 //#include "hdisc.h"
 //#include "hdisc_cw.h"
 //#include "hdisc_we.h"
-//#include "ide_be.h"
+#include "ide_be.h"
 //#include "ide_castle.h"
 //#include "ide_hccs.h"
 //#include "ide_ics.h"
@@ -271,7 +271,7 @@ void device_archimedes_podule_interface::interface_post_start()
 #include "lark.h"
 #include "laserd.h"
 #include "midimax.h"
-//#include "nexus.h"
+#include "nexus.h"
 //#include "prisma3.h"
 #include "rom.h"
 //#include "rom_cc.h"
@@ -302,7 +302,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("cc", ARC_CC);                      // Wild Vision/Computer Concepts Colour Card
 	//device.option_add("ccgold", ARC_CCGOLD);              // Wild Vision/Computer Concepts Colour Card Gold
 	//device.option_add("digitiser_we", ARC_DIGITISER_WE);  // Watford Electronics Archimedes Video Digitiser
-	//device.option_add("eaglem2", ARC_EAGLEM2);            // Wild Vision/Computer Concepts Eagle M2
+	device.option_add("eaglem2", ARC_EAGLEM2);            // Wild Vision/Computer Concepts Eagle M2
 	device.option_add("ether1", ARC_ETHER1_AKA25);        // Acorn AKA25 Ethernet
 	//device.option_add("ether2", ARC_ETHER2_AEH50);        // Acorn AEH50 Ethernet II
 	//device.option_add("ether3_aeh54", ARC_ETHER3_AEH54);  // Acorn AEH54 10Base2 Ethernet Podule
@@ -314,7 +314,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("hdisc_akd52", ARC_HDISC_AKD52);    // Acorn AKD52 Hard Disc Podule
 	//device.option_add("hdisc_cw", ARC_HDISC_CW);          // Computerware Hard Disk Podule
 	//device.option_add("hdisc_we", ARC_HDISC_WE);          // Watford Electronics Archimedes Hard Disk Podule
-	//device.option_add("ide_be", ARC_IDE_BE);              // Baildon Electronics IDE HD Interface
+	device.option_add("ide_be", ARC_IDE_BE);              // Baildon Electronics IDE HD Interface
 	//device.option_add("ide_hccs", ARC_IDE_HCCS);          // HCCS IDE Interface
 	device.option_add("ide_rdev", ARC_IDE_RDEV);          // RISC Developments IDE Hard Disc System
 	//device.option_add("ide1v4_ics", ARC_IDE1V4_ICS);      // ICS ideA Hard Disc System
@@ -323,7 +323,7 @@ void archimedes_exp_devices(device_slot_interface &device)
 	device.option_add("lbp4", ARC_LBP4);                  // Computer Concepts LaserDirect LBP-4
 	device.option_add("midi_aka16", ARC_MIDI_AKA16);      // Acorn AKA16 MIDI Podule
 	device.option_add("midimax", ARC_MIDIMAX);            // Wild Vision MidiMax
-	//device.option_add("nexus_a500", ARC_NEXUS_A500);      // SJ Research Nexus Interface (A500)
+	device.option_add("nexus_a500", ARC_NEXUS_A500);      // SJ Research Nexus Interface (A500)
 	//device.option_add("prisma3", ARC_PRISMA3);            // Millipede PRISMA-3 Podule
 	//device.option_add("prisma3p", ARC_PRISMA3P);          // Millipede PRISMA-3 Plus Podule
 	device.option_add("rom_aka05", ARC_ROM_AKA05);        // Acorn AKA05 ROM Podule

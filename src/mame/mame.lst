@@ -12518,6 +12518,9 @@ dm500                           //
 dm5620                          //
 dm7000                          //
 
+@source:dmainevent.cpp
+dmainevent                      // (c) 1983 Destron
+
 @source:dmax8000.cpp
 dmax8000                        //
 
@@ -16397,6 +16400,7 @@ smastmind                       // Invicta
 auslalom                        // Elektronika
 bassmate                        // Telko
 exospace                        // Elektronika
+fowling                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -16806,6 +16810,9 @@ hotblockb                       // (c) 1993 Nics? / NIX?
 
 @source:hotstuff.cpp
 hotstuff                        //
+
+@source:houseball.cpp
+houseball                       // (c) 1989 Olakoa
 
 @source:hp_ipc.cpp
 hp_ipc                          //
@@ -36069,6 +36076,10 @@ rotra                           // 1994
 ravens                          //
 ravens2                         //
 
+@source:rawthrillspc.cpp
+fnf                             // (c) 2014 Raw Thrills
+guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
+
 @source:rbisland.cpp
 jumping                         // bootleg
 jumpinga                        // bootleg (Seyutu)
@@ -36080,6 +36091,9 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 @source:rbmk.cpp
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
+
+@source:rbowlorama.cpp
+rbowlorama                      // (c) 2008 Cosmodog / Namco
 
 @source:rc702.cpp
 rc702                           // 1979 RC702
@@ -38786,6 +38800,7 @@ crystalca                       // 1998 JCD srl
 
 @source:snowbros.cpp
 3in1semi                        // (c) 1998 SemiCom
+3in1semia                       // (c) 1998 SemiCom
 4in1boot                        // (c) 2002 KISoft (includes hacks of Semicom games + Snowbros)
 ballboy                         // bootleg
 ballboy3p                       // bootleg
@@ -39985,6 +40000,9 @@ s3670                           //
 
 @source:synthex.cpp
 synthex                         //
+
+@source:sys1121.cpp
+sys1121							// (c) 1984 Motorola
 
 @source:sys2900.cpp
 sys2900                         //
