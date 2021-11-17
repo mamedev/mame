@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: MAME\n"
+"Project-Id-Version: MAME 0.237\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-10-31 10:10+1100\n"
-"PO-Revision-Date: 2021-11-15 12:43-0300\n"
+"PO-Revision-Date: 2021-11-17 12:27-0300\n"
 "Last-Translator: Felipe <felipefplzx@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: pt_BR\n"
@@ -1022,7 +1022,6 @@ msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
 #: src/frontend/mame/ui/info.cpp:456
-#, qt-format
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
@@ -1121,7 +1120,6 @@ msgid "%1$s [root%2$s]"
 msgstr "%1$s [root%2$s]"
 
 #: src/frontend/mame/ui/keyboard.cpp:53
-#, qt-format
 msgid "[root%2$s]"
 msgstr "[root%2$s]"
 
@@ -1517,7 +1515,6 @@ msgstr ""
 "\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:253
-#, qt-format
 msgid "Coin %1$c: NA%3$s\n"
 msgstr "Ficha %1$c: NA%3$s\n"
 
@@ -2484,7 +2481,6 @@ msgstr "%1$s %2$s (%3$s%4$sP%5$s, debug)"
 
 #: src/frontend/mame/ui/about.cpp:44
 #, c-format
-#| msgid "%1$s (%2$s) - %3$s\n"
 msgctxt "about-header"
 msgid "%1$s %2$s (%3$s%4$sP%5$s)"
 msgstr "%1$s %2$s (%3$s%4$sP%5$s)"
@@ -6245,235 +6241,196 @@ msgid "Lightgun X"
 msgstr "Lightgun X"
 
 #: src/emu/inpttype.ipp:747
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 2"
 msgstr "Lightgun X 2"
 
 #: src/emu/inpttype.ipp:748
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 3"
 msgstr "Lightgun X 3"
 
 #: src/emu/inpttype.ipp:749
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 4"
 msgstr "Lightgun X 4"
 
 #: src/emu/inpttype.ipp:750
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 5"
 msgstr "Lightgun X 5"
 
 #: src/emu/inpttype.ipp:751
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 6"
 msgstr "Lightgun X 6"
 
 #: src/emu/inpttype.ipp:752
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 7"
 msgstr "Lightgun X 7"
 
 #: src/emu/inpttype.ipp:753
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 8"
 msgstr "Lightgun X 8"
 
 #: src/emu/inpttype.ipp:754
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 9"
 msgstr "Lightgun X 9"
 
 #: src/emu/inpttype.ipp:755
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun X 10"
 msgstr "Lightgun X 10"
 
 #: src/emu/inpttype.ipp:760
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y"
 msgstr "Lightgun Y"
 
 #: src/emu/inpttype.ipp:761
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 2"
 msgstr "Lightgun Y 2"
 
 #: src/emu/inpttype.ipp:762
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 3"
 msgstr "Lightgun Y 3"
 
 #: src/emu/inpttype.ipp:763
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 4"
 msgstr "Lightgun Y 4"
 
 #: src/emu/inpttype.ipp:764
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 5"
 msgstr "Lightgun Y 5"
 
 #: src/emu/inpttype.ipp:765
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 6"
 msgstr "Lightgun Y 6"
 
 #: src/emu/inpttype.ipp:766
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 7"
 msgstr "Lightgun Y 7"
 
 #: src/emu/inpttype.ipp:767
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 8"
 msgstr "Lightgun Y 8"
 
 #: src/emu/inpttype.ipp:768
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 9"
 msgstr "Lightgun Y 9"
 
 #: src/emu/inpttype.ipp:769
-#| msgid "Lightgun"
 msgctxt "input-name"
 msgid "Lightgun Y 10"
 msgstr "Lightgun Y 10"
 
 #: src/emu/inpttype.ipp:774
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X"
 msgstr "Mouse X"
 
 #: src/emu/inpttype.ipp:775
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 2"
 msgstr "Mouse X 2"
 
 #: src/emu/inpttype.ipp:776
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 3"
 msgstr "Mouse X 3"
 
 #: src/emu/inpttype.ipp:777
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 4"
 msgstr "Mouse X 4"
 
 #: src/emu/inpttype.ipp:778
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 5"
 msgstr "Mouse X 5"
 
 #: src/emu/inpttype.ipp:779
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 6"
 msgstr "Mouse X 6"
 
 #: src/emu/inpttype.ipp:780
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 7"
 msgstr "Mouse X 7"
 
 #: src/emu/inpttype.ipp:781
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 8"
 msgstr "Mouse X 8"
 
 #: src/emu/inpttype.ipp:782
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 9"
 msgstr "Mouse X 9"
 
 #: src/emu/inpttype.ipp:783
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse X 10"
 msgstr "Mouse X 10"
 
 #: src/emu/inpttype.ipp:788
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y"
 msgstr "Mouse Y"
 
 #: src/emu/inpttype.ipp:789
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 2"
 msgstr "Mouse Y 2"
 
 #: src/emu/inpttype.ipp:790
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 3"
 msgstr "Mouse Y 3"
 
 #: src/emu/inpttype.ipp:791
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 4"
 msgstr "Mouse Y 4"
 
 #: src/emu/inpttype.ipp:792
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 5"
 msgstr "Mouse Y 5"
 
 #: src/emu/inpttype.ipp:793
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 6"
 msgstr "Mouse Y 6"
 
 #: src/emu/inpttype.ipp:794
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 7"
 msgstr "Mouse Y 7"
 
 #: src/emu/inpttype.ipp:795
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 8"
 msgstr "Mouse Y 8"
 
 #: src/emu/inpttype.ipp:796
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 9"
 msgstr "Mouse Y 9"
 
 #: src/emu/inpttype.ipp:797
-#| msgid "Mouse"
 msgctxt "input-name"
 msgid "Mouse Y 10"
 msgstr "Mouse Y 10"
