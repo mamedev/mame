@@ -2475,7 +2475,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		case 0x25:  // KEYMODREG
 			ret = 0;
 			{
-				u8 temp = 0; //m_kbspecial->read();
+				u8 temp = m_kbspecial->read();
 				if (temp & 1)   // capslock
 				{
 					ret |= 4;
