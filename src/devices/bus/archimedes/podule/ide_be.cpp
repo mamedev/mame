@@ -57,7 +57,7 @@ void arc_ide_be_device::ioc_map(address_map &map)
 //-------------------------------------------------
 
 ROM_START( ide_be ) // if0
-	ROM_REGION(0x2000, "podule_rom", 0)
+	ROM_REGION(0x2000, "podule_rom", ROMREGION_ERASE00)
 	ROM_SYSTEM_BIOS(0, "be202", "BE IDEFS 2.02 (14 Jan 1991)")
 	ROMX_LOAD("ide1_be_2.02.rom", 0x0000, 0x2000, CRC(36d76e00) SHA1(25547b793d935ee44109ff9ac6ff4be010cdc33d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "sfps114", "SF & PS IDEFS 1.14 (23 Apr 1991)")
@@ -65,7 +65,7 @@ ROM_START( ide_be ) // if0
 	ROM_SYSTEM_BIOS(2, "sfps113", "SF & PS IDEFS 1.13 (22 Oct 1990)")
 	ROMX_LOAD("ide1_sfps_1.13.rom", 0x0000, 0x2000, CRC(ef1dddff) SHA1(430432e6611b22da9c4fc1b03a986b08a120808b), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(3, "zidefs", "ZIDEFS 1.10 (13 May 2018)") // FIXME: not working ??
-	ROMX_LOAD("ide1_zidefs_1.10.rom", 0x0000, 0x2000, CRC(581fa41c) SHA1(f7d13fce76dbe7ac9a27fc7e4a859161bb98a9b5), ROM_BIOS(3))
+	ROMX_LOAD("ide1_zidefs_1.10.rom", 0x0000, 0x1fe8, CRC(581fa41c) SHA1(f7d13fce76dbe7ac9a27fc7e4a859161bb98a9b5), ROM_BIOS(3))
 ROM_END
 
 const tiny_rom_entry *arc_ide_be_device::device_rom_region() const
