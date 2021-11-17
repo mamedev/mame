@@ -7139,7 +7139,7 @@ msgstr "输入宏"
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "新宏"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
