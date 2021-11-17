@@ -319,6 +319,7 @@ static const nes_pcb pcb_list[] =
 	{ "resetsxrom",       BMC_RESETSXROM },
 	{ "resettxrom",       BMC_RESETTXROM },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "smd133",           SMD133_BOARD },
 	{ "tech9in1",         BMC_TECHLINE9IN1 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
@@ -395,7 +396,6 @@ static const nes_pcb pcb_list[] =
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
-	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
@@ -676,6 +676,17 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("n163-vol"))
 			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
+	}
+
+	// get address of SMD133 chip on boards that use it
+	if (m_pcb_id == SMD133_BOARD)
+	{
+		const char *addr = get_feature("smd133-addr");
+		int val = 6;
+
+		if (addr == nullptr || sscanf(addr, "%u%*c", &val) != 1 || val < 5 || val > 6)
+			logerror("Unexpected smd133-addr: %s\n", addr ? addr : "(nullptr)");
+		m_cart->set_smd133_addr(val * 0x1000);
 	}
 
 	// get outer PRG bank size for multicart boards that use this feature
