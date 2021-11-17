@@ -590,7 +590,7 @@ private:
 	bool load_layout_file(const char *dirname, const internal_layout &layout_data, device_t *device = nullptr);
 	bool load_layout_file(device_t &device, util::xml::data_node const &rootnode, const char *searchpath, const char *dirname);
 	void add_container_primitives(render_primitive_list &list, const object_transform &root_xform, const object_transform &xform, render_container &container, int blendmode);
-	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
+	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_view_item &item);
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
 
 	// config callbacks
