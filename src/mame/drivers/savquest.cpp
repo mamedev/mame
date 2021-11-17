@@ -78,6 +78,17 @@
 
 - HASP emulator by Peter Ferrie
 
+References:
+Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
+http://web.archive.org/web/20210806094059/https://www.intel.com/Assets/PDF/specupdate/297738.pdf
+Intel 82371AB PCI-TO-ISA / IDE XCELERATOR (PIIX4)
+https://web.archive.org/web/20211110080535/https://www.intel.com/Assets/PDF/datasheet/290562.pdf
+Intel 82371AB (PIIX4) PCI ISA IDE XCELERATOR TIMING SPECIFICATIONS
+https://web.archive.org/web/20210429213149/https://www.intel.com/Assets/PDF/datasheet/290548.pdf
+Intel Pentium II Mainboard
+https://web.archive.org/web/20120630212356/http://www.motherboards.org/files/manuals/42/MB-P6F91i.pdf
+3Dfx VOODOO2 Graphics Specification
+https://web.archive.org/web/20210803204742/https://www.voodooalert.de/de/files/whitepaper/voodoo2.pdf
 
 ***************************************************************************/
 
