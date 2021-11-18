@@ -1196,6 +1196,11 @@ project "bimg"
 		end
 	end
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
+
 	defines {
 		"__STDC_LIMIT_MACROS",
 		"__STDC_FORMAT_MACROS",
@@ -2219,6 +2224,11 @@ project "asmjit"
 			}
 		end
 	end
+
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
 
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/asmjit.h",

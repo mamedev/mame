@@ -42,10 +42,10 @@ public:
 	struct option
 	{
 		option_type type;
-		const char  *description;
-		const char  *name;
+		const char *description = nullptr;
+		const char *name = nullptr;
 		core_options::entry::shared_ptr entry;
-		core_options *options;
+		core_options *options = nullptr;
 		std::vector<std::string> value;
 	};
 
@@ -67,7 +67,7 @@ private:
 	virtual void handle(event const *ev) override;
 
 	std::vector<option> m_options;
-	game_driver const   *m_driver;
+	game_driver const *const m_driver;
 };
 
 } // namespace ui

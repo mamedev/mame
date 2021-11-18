@@ -1860,19 +1860,27 @@ void m68000_base_device::fmovem(u16 w2)
 				int di_mode = imode == 5;
 				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
 
-				for (i=0; i < 8; i++)
+				if (reglist)
 				{
-					if (reglist & (1 << i))
+					for (i=0; i < 8; i++)
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[i], di_mode_ea);
-						if (di_mode)
+						if (reglist & (1 << i))
 						{
-							di_mode_ea += 12;
-						}
+							WRITE_EA_FPE(imode, reg, m_fpr[i], di_mode_ea);
+							if (di_mode)
+							{
+								di_mode_ea += 12;
+							}
 
-						m_icount -= 2;
+							m_icount -= 2;
+						}
 					}
 				}
+				else if (imode == 6)
+					// advance PC if the register list is empty
+					EA_AY_IX_32();
+				else if (imode == 7)
+					fatalerror("m68881: fmovem addressing mode %d unimplemented at 0x%08x\n", imode, m_pc - 4);
 				break;
 			}
 
@@ -1887,19 +1895,27 @@ void m68000_base_device::fmovem(u16 w2)
 				int di_mode = (imode == 5);
 				uint32 di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
 
-				for (i=0; i < 8; i++)
+				if (reglist)
 				{
-					if (reglist & (1 << i))
+					for (i=0; i < 8; i++)
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], di_mode_ea);
-						if (di_mode)
+						if (reglist & (1 << i))
 						{
-							di_mode_ea += 12;
-						}
+							WRITE_EA_FPE(imode, reg, m_fpr[7 - i], di_mode_ea);
+							if (di_mode)
+							{
+								di_mode_ea += 12;
+							}
 
-						m_icount -= 2;
+							m_icount -= 2;
+						}
 					}
 				}
+				else if (imode == 6)
+					// advance PC if the register list is empty
+					EA_AY_IX_32();
+				else if (imode == 7)
+					fatalerror("m68881: fmovem addressing mode %d unimplemented at 0x%08x\n", imode, m_pc - 4);
 				break;
 			}
 

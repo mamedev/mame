@@ -29,6 +29,7 @@ ToDo:
 #include "emupal.h"
 #include "screen.h"
 
+namespace {
 
 class gts3a_state : public genpin_class
 {
@@ -1335,6 +1336,8 @@ ROM_START(wcsoccerd2)
 	ROM_REGION(0x10000, "cpu3", 0)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(8b2795b0) SHA1(b838d4e410c815421099c65b0d3b22227dae17c6))
 ROM_END
+
+} // anonymous namespace
 
 GAME(1992,  smb,        0,        gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers",                      MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  smb1,       smb,      gts3a, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (rev.1)",              MACHINE_IS_SKELETON_MECHANICAL)

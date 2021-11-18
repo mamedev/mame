@@ -287,14 +287,21 @@ a7800                           // Atari 7800 NTSC
 a7800p                          // Atari 7800 PAL
 
 @source:aa310.cpp
+aa500                           // 1986 Acorn A500
+aa500d                          // 1987 Acorn A500 Domesday
 aa305                           // 1987 Acorn Archimedes 305
 aa310                           // 1987 Acorn Archimedes 310
 aa440                           // 1987 Acorn Archimedes 440
+am4                             // 1987 Acorn M4
+aa680                           // 1988 Acorn A680
+ar140                           // 1988 Acorn R140
 aa3000                          // 1989 Acorn Archimedes 3000
 aa4101                          // 1989 Acorn Archimedes 410/1
 aa4201                          // 1989 Acorn Archimedes 420/1
 aa4401                          // 1989 Acorn Archimedes 440/1
 aa540                           // 1990 Acorn Archimedes 540
+ar225                           // 1990 Acorn R225
+ar260                           // 1990 Acorn R260
 aa5000                          // 1991 Acorn A5000
 aa4                             // 1992 Acorn A4
 aa3010                          // 1992 Acorn A3010
@@ -12511,6 +12518,9 @@ dm500                           //
 dm5620                          //
 dm7000                          //
 
+@source:dmainevent.cpp
+dmainevent                      // (c) 1983 Destron
+
 @source:dmax8000.cpp
 dmax8000                        //
 
@@ -16390,6 +16400,7 @@ smastmind                       // Invicta
 auslalom                        // Elektronika
 bassmate                        // Telko
 exospace                        // Elektronika
+fowling                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -16799,6 +16810,9 @@ hotblockb                       // (c) 1993 Nics? / NIX?
 
 @source:hotstuff.cpp
 hotstuff                        //
+
+@source:houseball.cpp
+houseball                       // (c) 1989 Olakoa
 
 @source:hp_ipc.cpp
 hp_ipc                          //
@@ -20107,12 +20121,15 @@ bhol_ltd                        //
 columbia                        //
 cowboy                          //
 cowboy2                         //
+cowboya                         //
 discodan                        //
 force                           //
 hhotel                          //
 hustlerp                        //
 kkongltd                        //
+marqueen                        //
 pecmen                          //
+spcpoker                        //
 tmacltd2                        //
 tmacltd4                        //
 tricksht                        //
@@ -32102,6 +32119,7 @@ mushikc                         // 2004.?? MushiKing The King Of Beetle (2K3 2ND
 mushikk                         // 2004.?? MushiKing The King Of Beetle (2K3 2ND Ver. 1.000-, Korea)
 mushi2eo                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.001) (World)
 mushik2e                        // 2005.?? Mushiking The King Of Beetles II / III / III+ (Ver. 2.001) (World)
+mushik2k                        // 2006.?? Mushiking The King Of Beetles II / III / III+ (Ver. 1.000-) (Korea)
 mushik4e                        // 2007.?? Mushiking The King Of Beetles IV / V / VI (World)
 mvsc2                           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Export, Korea) (Rev A)
 mvsc2u                          // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (USA) (Rev A)
@@ -36058,6 +36076,10 @@ rotra                           // 1994
 ravens                          //
 ravens2                         //
 
+@source:rawthrillspc.cpp
+fnf                             // (c) 2014 Raw Thrills
+guitarheroac                    // (c) 2008 Raw Thrills / Activision / Konami
+
 @source:rbisland.cpp
 jumping                         // bootleg
 jumpinga                        // bootleg (Seyutu)
@@ -36069,6 +36091,9 @@ rbislande                       // B39 (c) 1988 Taito Corporation
 @source:rbmk.cpp
 rbmk                            // (c) 1998 GMS
 rbspm                           // (c) 1998 GMS
+
+@source:rbowlorama.cpp
+rbowlorama                      // (c) 2008 Cosmodog / Namco
 
 @source:rc702.cpp
 rc702                           // 1979 RC702
@@ -38775,6 +38800,7 @@ crystalca                       // 1998 JCD srl
 
 @source:snowbros.cpp
 3in1semi                        // (c) 1998 SemiCom
+3in1semia                       // (c) 1998 SemiCom
 4in1boot                        // (c) 2002 KISoft (includes hacks of Semicom games + Snowbros)
 ballboy                         // bootleg
 ballboy3p                       // bootleg
@@ -38858,6 +38884,9 @@ storionl                        // (c) 2011 V.Tech
 vreader                         // (c) 2011 V.Tech
 vreadercaen                     // (c) 2011 V.Tech
 vreadercafr                     // (c) 2011 V.Tech
+
+@source:stop.cpp
+stop
 
 @source:sothello.cpp
 sothello                        // (c) 1986 Success / Fujiwara.
@@ -39971,6 +40000,9 @@ s3670                           //
 
 @source:synthex.cpp
 synthex                         //
+
+@source:sys1121.cpp
+sys1121							// (c) 1984 Motorola
 
 @source:sys2900.cpp
 sys2900                         //

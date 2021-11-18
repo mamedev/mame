@@ -1,110 +1,74 @@
 -- license:BSD-3-Clause
--- copyright-holders:Carl
-require('lfs')
-local sqlite3 = require('lsqlite3')
-local exports = {}
-exports.name = "timer"
-exports.version = "0.0.2"
-exports.description = "Game play timer"
-exports.license = "BSD-3-Clause"
-exports.author = { name = "Carl" }
+-- copyright-holders:Vas Crabb
+local exports = {
+	name = 'timer',
+	version = '0.0.3',
+	description = 'Game play timer',
+	license = 'BSD-3-Clause',
+	author = { name = 'Vas Crabb' } }
 
 local timer = exports
 
 function timer.startplugin()
-	local dir = emu.subst_env(manager.options.entries.homepath:value())
-	local timer_db = dir .. "/timer/timer.db"
-	local timer_started = false
 	local total_time = 0
 	local start_time = 0
 	local play_count = 0
+	local emu_total = emu.attotime()
 
-	local function save()
-		total_time = total_time + (os.time() - start_time)
+	local reference = 0
+	local lastupdate
+	local highlight -- hacky - workaround for the menu not remembering the selected item if its ref is nullptr
 
-		local db = assert(sqlite3.open(timer_db))
-
-		local insert_stmt = assert( db:prepare("INSERT OR IGNORE INTO timer VALUES (?, ?, 0, 0)") )
-		insert_stmt:bind_values(emu.romname(), emu.softname())
-		insert_stmt:step()
-		insert_stmt:reset()
-
-		local update_stmt = assert( db:prepare("UPDATE timer SET total_time=?, play_count=? WHERE driver=? AND software=?") )
-		update_stmt:bind_values(total_time, play_count,emu.romname(), emu.softname())
-		update_stmt:step()
-		update_stmt:reset()
-
-		assert(db:close() == sqlite3.OK)
-	end
-
-
-	emu.register_start(function()
-		local file
-		if timer_started then
-			save()
-		end
-		timer_started = true
-		lfs.mkdir(dir .. '/timer')
-		local db = assert(sqlite3.open(timer_db))
-		local found=false
-		db:exec([[select * from sqlite_master where name='timer';]], function(...) found=true return 0 end)
-		if not found then
-			db:exec[[  CREATE TABLE timer (
-						driver      VARCHAR(32) PRIMARY KEY,
-						software    VARCHAR(40),
-						total_time  INTEGER NOT NULL,
-						play_count  INTEGER NOT NULL
-					  ); ]]
-		end
-
-		local stmt, row
-		stmt = db:prepare("SELECT total_time, play_count FROM timer WHERE driver = ? AND software = ?")
-		stmt:bind_values(emu.romname(), emu.softname())
-		if (stmt:step() == sqlite3.ROW) then
-			row = stmt:get_named_values()
-			play_count = row.play_count
-			total_time = row.total_time
-		else
-			play_count = 0
-			total_time = 0
-		end
-
-		assert(db:close() == sqlite3.OK)
-
-		start_time = os.time()
-		play_count = play_count + 1
-	end)
-
-	emu.register_stop(function()
-		timer_started = false
-		save()
-		total_time = 0
-		play_count = 0
-	end)
 
 	local function sectohms(time)
-		local hrs = math.floor(time / 3600)
-		local min = math.floor((time % 3600) / 60)
+		local hrs = time // 3600
+		local min = (time % 3600) // 60
 		local sec = time % 60
-		return string.format(_p("plugin-timer", "%03d:%02d:%02d"), hrs, min, sec)
+		return string.format(_p('plugin-timer', '%03d:%02d:%02d'), hrs, min, sec)
 	end
-
-	local lastupdate
 
 	local function menu_populate()
 		lastupdate = os.time()
-		local time = lastupdate - start_time
+		local refname = (reference == 0) and _p('plugin-timer', 'Wall clock') or _p('plugin-timer', 'Emulated time')
+		local time = (reference == 0) and (lastupdate - start_time) or manager.machine.time.seconds
+		local total = (reference == 0) and (total_time + time) or (manager.machine.time + emu_total).seconds
 		return
-			{{ _p("plugin-timer", "Current time"), sectohms(time), "off" },
-			 { _p("plugin-timer", "Total time"), sectohms(total_time + time), "off" },
-			 { _p("plugin-timer", "Play Count"), play_count, "off" }},
-			nil,
+			{
+				{ _p("plugin-timer", "Reference"), refname, (reference == 0) and 'r' or 'l' },
+				{ '---', '', '' },
+				{ _p("plugin-timer", "Current time"), sectohms(time), "off" },
+				{ _p("plugin-timer", "Total time"), sectohms(total), "off" },
+				{ _p("plugin-timer", "Play Count"), play_count, "off" } },
+			highlight,
 			"idle"
 	end
 
 	local function menu_callback(index, event)
+		if (index == 1) and ((event == 'left') or (event == 'right') or (event == 'select')) then
+			reference = reference ~ 1
+			return true
+		end
+		highlight = index
 		return os.time() > lastupdate
 	end
+
+
+	emu.register_start(
+		function()
+			if emu.romname() ~= '___empty' then
+				start_time = os.time()
+				local persister = require('timer/timer_persist')
+				total_time, play_count, emu_total = persister:start_session()
+			end
+		end)
+
+	emu.register_stop(
+		function()
+			if emu.romname() ~= '___empty' then
+				local persister = require('timer/timer_persist')
+				persister:update_totals(start_time)
+			end
+		end)
 
 	emu.register_menu(menu_callback, menu_populate, _p("plugin-timer", "Timer"))
 end

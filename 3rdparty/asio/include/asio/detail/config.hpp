@@ -2,7 +2,7 @@
 // detail/config.hpp
 // ~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -11,7 +11,22 @@
 #ifndef ASIO_DETAIL_CONFIG_HPP
 #define ASIO_DETAIL_CONFIG_HPP
 
+// boostify: non-boost code starts here
+#if !defined(ASIO_STANDALONE)
+# if !defined(ASIO_ENABLE_BOOST)
+#  if (__cplusplus >= 201103)
+#   define ASIO_STANDALONE 1
+#  elif defined(_MSC_VER) && defined(_MSVC_LANG)
+#   if (_MSC_VER >= 1900) && (_MSVC_LANG >= 201103)
+#    define ASIO_STANDALONE 1
+#   endif // (_MSC_VER >= 1900) && (_MSVC_LANG >= 201103)
+#  endif // defined(_MSC_VER) && defined(_MSVC_LANG)
+# endif // !defined(ASIO_ENABLE_BOOST)
+#endif // !defined(ASIO_STANDALONE)
+
+// boostify: non-boost code ends here
 #if defined(ASIO_STANDALONE)
+# define ASIO_DISABLE_BOOST_ALIGN 1
 # define ASIO_DISABLE_BOOST_ARRAY 1
 # define ASIO_DISABLE_BOOST_ASSERT 1
 # define ASIO_DISABLE_BOOST_BIND 1
@@ -61,6 +76,9 @@
 # define ASIO_DECL
 #endif // !defined(ASIO_DECL)
 
+// Helper macro for documentation.
+#define ASIO_UNSPECIFIED(e) e
+
 // Microsoft Visual C++ detection.
 #if !defined(ASIO_MSVC)
 # if defined(ASIO_HAS_BOOST_CONFIG) && defined(BOOST_MSVC)
@@ -69,7 +87,7 @@
       || (!defined(__MWERKS__) && !defined(__EDG_VERSION__)))
 #  define ASIO_MSVC _MSC_VER
 # endif // defined(ASIO_HAS_BOOST_CONFIG) && defined(BOOST_MSVC)
-#endif // defined(ASIO_MSVC)
+#endif // !defined(ASIO_MSVC)
 
 // Clang / libc++ detection.
 #if defined(__clang__)
@@ -83,6 +101,11 @@
 # endif // (__cplusplus >= 201103)
 #endif // defined(__clang__)
 
+// Android platform detection.
+#if defined(__ANDROID__)
+# include <android/api-level.h>
+#endif // defined(__ANDROID__)
+
 // Support move construction and assignment on compilers known to allow it.
 #if !defined(ASIO_HAS_MOVE)
 # if !defined(ASIO_DISABLE_MOVE)
@@ -90,30 +113,42 @@
 #   if __has_feature(__cxx_rvalue_references__)
 #    define ASIO_HAS_MOVE 1
 #   endif // __has_feature(__cxx_rvalue_references__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_MOVE 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
 #   if (_MSC_VER >= 1700)
 #    define ASIO_HAS_MOVE 1
 #   endif // (_MSC_VER >= 1700)
 #  endif // defined(ASIO_MSVC)
+#  if defined(__INTEL_CXX11_MODE__)
+#    if defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1500)
+#      define ASIO_HAS_MOVE 1
+#    endif // defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 1500)
+#    if defined(__ICL) && (__ICL >= 1500)
+#      define ASIO_HAS_MOVE 1
+#    endif // defined(__ICL) && (__ICL >= 1500)
+#  endif // defined(__INTEL_CXX11_MODE__)
 # endif // !defined(ASIO_DISABLE_MOVE)
 #endif // !defined(ASIO_HAS_MOVE)
 
 // If ASIO_MOVE_CAST isn't defined, and move support is available, define
-// ASIO_MOVE_ARG and ASIO_MOVE_CAST to take advantage of rvalue
-// references and perfect forwarding.
+// * ASIO_MOVE_ARG,
+// * ASIO_NONDEDUCED_MOVE_ARG, and
+// * ASIO_MOVE_CAST
+// to take advantage of rvalue references and perfect forwarding.
 #if defined(ASIO_HAS_MOVE) && !defined(ASIO_MOVE_CAST)
 # define ASIO_MOVE_ARG(type) type&&
 # define ASIO_MOVE_ARG2(type1, type2) type1, type2&&
+# define ASIO_NONDEDUCED_MOVE_ARG(type) type&
 # define ASIO_MOVE_CAST(type) static_cast<type&&>
 # define ASIO_MOVE_CAST2(type1, type2) static_cast<type1, type2&&>
+# define ASIO_MOVE_OR_LVALUE(type) static_cast<type&&>
+# define ASIO_MOVE_OR_LVALUE_TYPE(type) type
 #endif // defined(ASIO_HAS_MOVE) && !defined(ASIO_MOVE_CAST)
 
 // If ASIO_MOVE_CAST still isn't defined, default to a C++03-compatible
@@ -137,8 +172,11 @@
 # else
 #  define ASIO_MOVE_ARG(type) type
 # endif
+# define ASIO_NONDEDUCED_MOVE_ARG(type) const type&
 # define ASIO_MOVE_CAST(type) static_cast<const type&>
 # define ASIO_MOVE_CAST2(type1, type2) static_cast<const type1, type2&>
+# define ASIO_MOVE_OR_LVALUE(type)
+# define ASIO_MOVE_OR_LVALUE_TYPE(type) type&
 #endif // !defined(ASIO_MOVE_CAST)
 
 // Support variadic templates on compilers known to allow it.
@@ -148,31 +186,46 @@
 #   if __has_feature(__cxx_variadic_templates__)
 #    define ASIO_HAS_VARIADIC_TEMPLATES 1
 #   endif // __has_feature(__cxx_variadic_templates__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_VARIADIC_TEMPLATES 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define ASIO_HAS_VARIADIC_TEMPLATES 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(ASIO_MSVC)
 # endif // !defined(ASIO_DISABLE_VARIADIC_TEMPLATES)
 #endif // !defined(ASIO_HAS_VARIADIC_TEMPLATES)
+#if !defined(ASIO_ELLIPSIS)
+# if defined(ASIO_HAS_VARIADIC_TEMPLATES)
+#  define ASIO_ELLIPSIS ...
+# else // defined(ASIO_HAS_VARIADIC_TEMPLATES)
+#  define ASIO_ELLIPSIS
+# endif // defined(ASIO_HAS_VARIADIC_TEMPLATES)
+#endif // !defined(ASIO_ELLIPSIS)
 
 // Support deleted functions on compilers known to allow it.
 #if !defined(ASIO_DELETED)
-# if defined(__GNUC__)
-#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
-#    define ASIO_DELETED = delete
-#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-# endif // defined(__GNUC__)
 # if defined(__clang__)
 #  if __has_feature(__cxx_deleted_functions__)
 #   define ASIO_DELETED = delete
 #  endif // __has_feature(__cxx_deleted_functions__)
-# endif // defined(__clang__)
+# elif defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#   if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    define ASIO_DELETED = delete
+#   endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+# endif // defined(__GNUC__)
+# if defined(ASIO_MSVC)
+#  if (_MSC_VER >= 1900)
+#   define ASIO_DELETED = delete
+#  endif // (_MSC_VER >= 1900)
+# endif // defined(ASIO_MSVC)
 # if !defined(ASIO_DELETED)
 #  define ASIO_DELETED
 # endif // !defined(ASIO_DELETED)
@@ -184,15 +237,19 @@
 #  if defined(__clang__)
 #   if __has_feature(__cxx_constexpr__)
 #    define ASIO_HAS_CONSTEXPR 1
-#   endif // __has_feature(__cxx_constexr__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // __has_feature(__cxx_constexpr__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_CONSTEXPR 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define ASIO_HAS_CONSTEXPR 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(ASIO_MSVC)
 # endif // !defined(ASIO_DISABLE_CONSTEXPR)
 #endif // !defined(ASIO_HAS_CONSTEXPR)
 #if !defined(ASIO_CONSTEXPR)
@@ -202,39 +259,109 @@
 #  define ASIO_CONSTEXPR
 # endif // defined(ASIO_HAS_CONSTEXPR)
 #endif // !defined(ASIO_CONSTEXPR)
+#if !defined(ASIO_STATIC_CONSTEXPR)
+# if defined(ASIO_HAS_CONSTEXPR)
+#  define ASIO_STATIC_CONSTEXPR(type, assignment) \
+    static constexpr type assignment
+# else // defined(ASIO_HAS_CONSTEXPR)
+#  define ASIO_STATIC_CONSTEXPR(type, assignment) \
+    static const type assignment
+# endif // defined(ASIO_HAS_CONSTEXPR)
+#endif // !defined(ASIO_STATIC_CONSTEXPR)
+#if !defined(ASIO_STATIC_CONSTEXPR_DEFAULT_INIT)
+# if defined(ASIO_HAS_CONSTEXPR)
+#  if defined(__GNUC__)
+#   if (__GNUC__ >= 8)
+#    define ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+      static constexpr const type name{}
+#   else // (__GNUC__ >= 8)
+#    define ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+      static const type name
+#   endif // (__GNUC__ >= 8)
+#  elif defined(ASIO_MSVC)
+#   define ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+     static const type name
+#  else // defined(ASIO_MSVC)
+#   define ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+     static constexpr const type name{}
+#  endif // defined(ASIO_MSVC)
+# else // defined(ASIO_HAS_CONSTEXPR)
+#  define ASIO_STATIC_CONSTEXPR_DEFAULT_INIT(type, name) \
+    static const type name
+# endif // defined(ASIO_HAS_CONSTEXPR)
+#endif // !defined(ASIO_STATIC_CONSTEXPR_DEFAULT_INIT)
 
 // Support noexcept on compilers known to allow it.
-#if !defined(ASIO_NOEXCEPT)
+#if !defined(ASIO_HAS_NOEXCEPT)
 # if !defined(ASIO_DISABLE_NOEXCEPT)
-#  if (BOOST_VERSION >= 105300)
+#  if defined(ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105300)
+#   if !defined(BOOST_NO_NOEXCEPT)
+#    define ASIO_HAS_NOEXCEPT 1
+#   endif // !defined(BOOST_NO_NOEXCEPT)
 #   define ASIO_NOEXCEPT BOOST_NOEXCEPT
 #   define ASIO_NOEXCEPT_OR_NOTHROW BOOST_NOEXCEPT_OR_NOTHROW
+#   define ASIO_NOEXCEPT_IF(c) BOOST_NOEXCEPT_IF(c)
 #  elif defined(__clang__)
 #   if __has_feature(__cxx_noexcept__)
-#    define ASIO_NOEXCEPT noexcept(true)
-#    define ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+#    define ASIO_HAS_NOEXCEPT 1
 #   endif // __has_feature(__cxx_noexcept__)
 #  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
-#      define ASIO_NOEXCEPT noexcept(true)
-#      define ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#      define ASIO_HAS_NOEXCEPT 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  elif defined(ASIO_MSVC)
 #   if (_MSC_VER >= 1900)
-#    define ASIO_NOEXCEPT noexcept(true)
-#    define ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+#    define ASIO_HAS_NOEXCEPT 1
 #   endif // (_MSC_VER >= 1900)
 #  endif // defined(ASIO_MSVC)
 # endif // !defined(ASIO_DISABLE_NOEXCEPT)
 # if !defined(ASIO_NOEXCEPT)
-#  define ASIO_NOEXCEPT
 # endif // !defined(ASIO_NOEXCEPT)
 # if !defined(ASIO_NOEXCEPT_OR_NOTHROW)
-#  define ASIO_NOEXCEPT_OR_NOTHROW throw()
 # endif // !defined(ASIO_NOEXCEPT_OR_NOTHROW)
+#endif // !defined(ASIO_HAS_NOEXCEPT)
+#if !defined(ASIO_NOEXCEPT)
+# if defined(ASIO_HAS_NOEXCEPT)
+#  define ASIO_NOEXCEPT noexcept(true)
+# else // defined(ASIO_HAS_NOEXCEPT)
+#  define ASIO_NOEXCEPT
+# endif // defined(ASIO_HAS_NOEXCEPT)
 #endif // !defined(ASIO_NOEXCEPT)
+#if !defined(ASIO_NOEXCEPT_OR_NOTHROW)
+# if defined(ASIO_HAS_NOEXCEPT)
+#  define ASIO_NOEXCEPT_OR_NOTHROW noexcept(true)
+# else // defined(ASIO_HAS_NOEXCEPT)
+#  define ASIO_NOEXCEPT_OR_NOTHROW throw()
+# endif // defined(ASIO_HAS_NOEXCEPT)
+#endif // !defined(ASIO_NOEXCEPT_OR_NOTHROW)
+#if !defined(ASIO_NOEXCEPT_IF)
+# if defined(ASIO_HAS_NOEXCEPT)
+#  define ASIO_NOEXCEPT_IF(c) noexcept(c)
+# else // defined(ASIO_HAS_NOEXCEPT)
+#  define ASIO_NOEXCEPT_IF(c)
+# endif // defined(ASIO_HAS_NOEXCEPT)
+#endif // !defined(ASIO_NOEXCEPT_IF)
+
+// Support noexcept on function types on compilers known to allow it.
+#if !defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
+# if !defined(ASIO_DISABLE_NOEXCEPT_FUNCTION_TYPE)
+#  if defined(__clang__)
+#   if (__cplusplus >= 202002)
+#    define ASIO_HAS_NOEXCEPT_FUNCTION_TYPE 1
+#   endif // (__cplusplus >= 202002)
+#  elif defined(__GNUC__)
+#   if (__cplusplus >= 202002)
+#    define ASIO_HAS_NOEXCEPT_FUNCTION_TYPE 1
+#   endif // (__cplusplus >= 202002)
+#  elif defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900 && _MSVC_LANG >= 202002)
+#    define ASIO_HAS_NOEXCEPT_FUNCTION_TYPE 1
+#   endif // (_MSC_VER >= 1900 && _MSVC_LANG >= 202002)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_NOEXCEPT_FUNCTION_TYPE)
+#endif // !defined(ASIO_HAS_NOEXCEPT_FUNCTION_TYPE)
 
 // Support automatic type deduction on compilers known to support it.
 #if !defined(ASIO_HAS_DECLTYPE)
@@ -243,21 +370,267 @@
 #   if __has_feature(__cxx_decltype__)
 #    define ASIO_HAS_DECLTYPE 1
 #   endif // __has_feature(__cxx_decltype__)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_DECLTYPE 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
-#   if (_MSC_VER >= 1700)
+#   if (_MSC_VER >= 1800)
 #    define ASIO_HAS_DECLTYPE 1
-#   endif // (_MSC_VER >= 1700)
+#   endif // (_MSC_VER >= 1800)
 #  endif // defined(ASIO_MSVC)
 # endif // !defined(ASIO_DISABLE_DECLTYPE)
 #endif // !defined(ASIO_HAS_DECLTYPE)
+
+// Support alias templates on compilers known to allow it.
+#if !defined(ASIO_HAS_ALIAS_TEMPLATES)
+# if !defined(ASIO_DISABLE_ALIAS_TEMPLATES)
+#  if defined(__clang__)
+#   if __has_feature(__cxx_alias_templates__)
+#    define ASIO_HAS_ALIAS_TEMPLATES 1
+#   endif // __has_feature(__cxx_alias_templates__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_ALIAS_TEMPLATES 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define ASIO_HAS_ALIAS_TEMPLATES 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_ALIAS_TEMPLATES)
+#endif // !defined(ASIO_HAS_ALIAS_TEMPLATES)
+
+// Support return type deduction on compilers known to allow it.
+#if !defined(ASIO_HAS_RETURN_TYPE_DEDUCTION)
+# if !defined(ASIO_DISABLE_RETURN_TYPE_DEDUCTION)
+#  if defined(__clang__)
+#   if __has_feature(__cxx_return_type_deduction__)
+#    define ASIO_HAS_RETURN_TYPE_DEDUCTION 1
+#   endif // __has_feature(__cxx_return_type_deduction__)
+#  elif (__cplusplus >= 201402)
+#   define ASIO_HAS_RETURN_TYPE_DEDUCTION 1
+#  elif defined(__cpp_return_type_deduction)
+#   if (__cpp_return_type_deduction >= 201304)
+#    define ASIO_HAS_RETURN_TYPE_DEDUCTION 1
+#   endif // (__cpp_return_type_deduction >= 201304)
+#  endif // defined(__cpp_return_type_deduction)
+# endif // !defined(ASIO_DISABLE_RETURN_TYPE_DEDUCTION)
+#endif // !defined(ASIO_HAS_RETURN_TYPE_DEDUCTION)
+
+// Support default function template arguments on compilers known to allow it.
+#if !defined(ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+# if !defined(ASIO_DISABLE_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+#  if (__cplusplus >= 201103)
+#   define ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS 1
+#  elif defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#    define ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS 1
+#   endif // (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+#endif // !defined(ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+
+// Support enum classes on compilers known to allow them.
+#if !defined(ASIO_HAS_ENUM_CLASS)
+# if !defined(ASIO_DISABLE_ENUM_CLASS)
+#  if (__cplusplus >= 201103)
+#   define ASIO_HAS_ENUM_CLASS 1
+#  elif defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#    define ASIO_HAS_ENUM_CLASS 1
+#   endif // (_MSC_VER >= 1900 && _MSVC_LANG >= 201103)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_ENUM_CLASS)
+#endif // !defined(ASIO_HAS_ENUM_CLASS)
+
+// Support concepts on compilers known to allow them.
+#if !defined(ASIO_HAS_CONCEPTS)
+# if !defined(ASIO_DISABLE_CONCEPTS)
+#  if defined(__cpp_concepts)
+#   define ASIO_HAS_CONCEPTS 1
+#   if (__cpp_concepts >= 201707)
+#    define ASIO_CONCEPT concept
+#   else // (__cpp_concepts >= 201707)
+#    define ASIO_CONCEPT concept bool
+#   endif // (__cpp_concepts >= 201707)
+#  endif // defined(__cpp_concepts)
+# endif // !defined(ASIO_DISABLE_CONCEPTS)
+#endif // !defined(ASIO_HAS_CONCEPTS)
+
+// Support template variables on compilers known to allow it.
+#if !defined(ASIO_HAS_VARIABLE_TEMPLATES)
+# if !defined(ASIO_DISABLE_VARIABLE_TEMPLATES)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201402)
+#    if __has_feature(__cxx_variable_templates__)
+#     define ASIO_HAS_VARIABLE_TEMPLATES 1
+#    endif // __has_feature(__cxx_variable_templates__)
+#   endif // (__cplusplus >= 201402)
+#  elif defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   if (__GNUC__ >= 6)
+#    if (__cplusplus >= 201402)
+#     define ASIO_HAS_VARIABLE_TEMPLATES 1
+#    endif // (__cplusplus >= 201402)
+#   endif // (__GNUC__ >= 6)
+#  endif // defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1901)
+#    define ASIO_HAS_VARIABLE_TEMPLATES 1
+#   endif // (_MSC_VER >= 1901)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_VARIABLE_TEMPLATES)
+
+// Support SFINAEd template variables on compilers known to allow it.
+#if !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+# if !defined(ASIO_DISABLE_SFINAE_VARIABLE_TEMPLATES)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_feature(__cxx_variable_templates__)
+#     define ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+#    endif // __has_feature(__cxx_variable_templates__)
+#   endif // (__cplusplus >= 201703)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 8) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 8)
+#    if (__cplusplus >= 201402)
+#     define ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+#    endif // (__cplusplus >= 201402)
+#   endif // ((__GNUC__ == 8) && (__GNUC_MINOR__ >= 4)) || (__GNUC__ > 8)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1901)
+#    define ASIO_HAS_SFINAE_VARIABLE_TEMPLATES 1
+#   endif // (_MSC_VER >= 1901)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_SFINAE_VARIABLE_TEMPLATES)
+#endif // !defined(ASIO_HAS_SFINAE_VARIABLE_TEMPLATES)
+
+// Support SFINAE use of constant expressions on compilers known to allow it.
+#if !defined(ASIO_HAS_CONSTANT_EXPRESSION_SFINAE)
+# if !defined(ASIO_DISABLE_CONSTANT_EXPRESSION_SFINAE)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201402)
+#    define ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+#   endif // (__cplusplus >= 201402)
+#  elif defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201402)
+#     define ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+#    endif // (__cplusplus >= 201402)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__) && !defined(__INTEL_COMPILER)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1901)
+#    define ASIO_HAS_CONSTANT_EXPRESSION_SFINAE 1
+#   endif // (_MSC_VER >= 1901)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_CONSTANT_EXPRESSION_SFINAE)
+#endif // !defined(ASIO_HAS_CONSTANT_EXPRESSION_SFINAE)
+
+// Enable workarounds for lack of working expression SFINAE.
+#if !defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+# if !defined(ASIO_DISABLE_WORKING_EXPRESSION_SFINAE)
+#  if !defined(ASIO_MSVC) && !defined(__INTEL_COMPILER)
+#   if (__cplusplus >= 201103)
+#    define ASIO_HAS_WORKING_EXPRESSION_SFINAE 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(ASIO_MSVC) && (_MSC_VER >= 1929)
+#   if (_MSVC_LANG >= 202000)
+#    define ASIO_HAS_WORKING_EXPRESSION_SFINAE 1
+#   endif // (_MSVC_LANG >= 202000)
+#  endif // defined(ASIO_MSVC) && (_MSC_VER >= 1929)
+# endif // !defined(ASIO_DISABLE_WORKING_EXPRESSION_SFINAE)
+#endif // !defined(ASIO_HAS_WORKING_EXPRESSION_SFINAE)
+
+// Support ref-qualified functions on compilers known to allow it.
+#if !defined(ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+# if !defined(ASIO_DISABLE_REF_QUALIFIED_FUNCTIONS)
+#  if defined(__clang__)
+#   if __has_feature(__cxx_reference_qualified_functions__)
+#    define ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+#   endif // __has_feature(__cxx_reference_qualified_functions__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define ASIO_HAS_REF_QUALIFIED_FUNCTIONS 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_REF_QUALIFIED_FUNCTIONS)
+#endif // !defined(ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+#if defined(ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+# if !defined(ASIO_LVALUE_REF_QUAL)
+#  define ASIO_LVALUE_REF_QUAL &
+# endif // !defined(ASIO_LVALUE_REF_QUAL)
+# if !defined(ASIO_RVALUE_REF_QUAL)
+#  define ASIO_RVALUE_REF_QUAL &&
+# endif // !defined(ASIO_RVALUE_REF_QUAL)
+#else // defined(ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+# if !defined(ASIO_LVALUE_REF_QUAL)
+#  define ASIO_LVALUE_REF_QUAL
+# endif // !defined(ASIO_LVALUE_REF_QUAL)
+# if !defined(ASIO_RVALUE_REF_QUAL)
+#  define ASIO_RVALUE_REF_QUAL
+# endif // !defined(ASIO_RVALUE_REF_QUAL)
+#endif // defined(ASIO_HAS_REF_QUALIFIED_FUNCTIONS)
+
+// Support for the alignof operator.
+#if !defined(ASIO_HAS_ALIGNOF)
+# if !defined(ASIO_DISABLE_ALIGNOF)
+#  if (__cplusplus >= 201103)
+#   define ASIO_HAS_ALIGNOF 1
+#  endif // (__cplusplus >= 201103)
+# endif // !defined(ASIO_DISABLE_ALIGNOF)
+#endif // !defined(ASIO_HAS_ALIGNOF)
+
+#if defined(ASIO_HAS_ALIGNOF)
+# define ASIO_ALIGNOF(T) alignof(T)
+# if defined(__GNUC__)
+#  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#   define ASIO_DEFAULT_ALIGN alignof(std::max_align_t)
+#  else // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#   define ASIO_DEFAULT_ALIGN alignof(max_align_t)
+#  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+# else // defined(__GNUC__)
+#  define ASIO_DEFAULT_ALIGN alignof(std::max_align_t)
+# endif // defined(__GNUC__)
+#else // defined(ASIO_HAS_ALIGNOF)
+# define ASIO_ALIGNOF(T) 1
+# define ASIO_DEFAULT_ALIGN 1
+#endif // defined(ASIO_HAS_ALIGNOF)
+
+// Standard library support for aligned allocation.
+#if !defined(ASIO_HAS_STD_ALIGNED_ALLOC)
+# if !defined(ASIO_DISABLE_STD_ALIGNED_ALLOC)
+#  if (__cplusplus >= 201703)
+#   if defined(__clang__)
+#    if defined(ASIO_HAS_CLANG_LIBCXX)
+#     if (_LIBCPP_STD_VER > 14) && defined(_LIBCPP_HAS_ALIGNED_ALLOC)
+#      define ASIO_HAS_STD_ALIGNED_ALLOC 1
+#     endif // (_LIBCPP_STD_VER > 14) && defined(_LIBCPP_HAS_ALIGNED_ALLOC)
+#    elif defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#     define ASIO_HAS_STD_ALIGNED_ALLOC 1
+#    endif // defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#   elif defined(__GNUC__)
+#    if defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#     define ASIO_HAS_STD_ALIGNED_ALLOC 1
+#    endif // defined(_GLIBCXX_HAVE_ALIGNED_ALLOC)
+#   endif // defined(__GNUC__)
+#  endif // (__cplusplus >= 201703)
+# endif // !defined(ASIO_DISABLE_STD_ALIGNED_ALLOC)
+#endif // !defined(ASIO_HAS_STD_ALIGNED_ALLOC)
 
 // Standard library support for system errors.
 #if !defined(ASIO_HAS_STD_SYSTEM_ERROR)
@@ -270,12 +643,11 @@
 #     define ASIO_HAS_STD_SYSTEM_ERROR 1
 #    endif // __has_include(<system_error>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_SYSTEM_ERROR 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -288,7 +660,7 @@
 
 // Compliant C++11 compilers put noexcept specifiers on error_category members.
 #if !defined(ASIO_ERROR_CATEGORY_NOEXCEPT)
-# if (BOOST_VERSION >= 105300)
+# if defined(ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105300)
 #  define ASIO_ERROR_CATEGORY_NOEXCEPT BOOST_NOEXCEPT
 # elif defined(__clang__)
 #  if __has_feature(__cxx_noexcept__)
@@ -296,9 +668,9 @@
 #  endif // __has_feature(__cxx_noexcept__)
 # elif defined(__GNUC__)
 #  if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#   if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
-#   endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #  endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 # elif defined(ASIO_MSVC)
 #  if (_MSC_VER >= 1900)
@@ -321,12 +693,11 @@
 #     define ASIO_HAS_STD_ARRAY 1
 #    endif // __has_include(<array>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_ARRAY 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -346,12 +717,11 @@
 #   elif (__cplusplus >= 201103)
 #    define ASIO_HAS_STD_SHARED_PTR 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_SHARED_PTR 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 3)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -371,12 +741,11 @@
 #   elif (__cplusplus >= 201103)
 #    define ASIO_HAS_STD_ALLOCATOR_ARG 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_ALLOCATOR_ARG 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -397,14 +766,19 @@
 #    if __has_include(<atomic>)
 #     define ASIO_HAS_STD_ATOMIC 1
 #    endif // __has_include(<atomic>)
-#   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   elif defined(__apple_build_version__) && defined(_LIBCPP_VERSION)
+#    if (__clang_major__ >= 10)
+#     if __has_include(<atomic>)
+#      define ASIO_HAS_STD_ATOMIC 1
+#     endif // __has_include(<atomic>)
+#    endif // (__clang_major__ >= 10)
+#   endif // defined(__apple_build_version__) && defined(_LIBCPP_VERSION)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_ATOMIC 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
 #   if (_MSC_VER >= 1700)
@@ -427,15 +801,14 @@
 #     define ASIO_HAS_STD_CHRONO 1
 #    endif // __has_include(<chrono>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_CHRONO 1
 #     if ((__GNUC__ == 4) && (__GNUC_MINOR__ == 6))
 #      define ASIO_HAS_STD_CHRONO_MONOTONIC_CLOCK 1
 #     endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ == 6))
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -449,9 +822,9 @@
 // Boost support for chrono.
 #if !defined(ASIO_HAS_BOOST_CHRONO)
 # if !defined(ASIO_DISABLE_BOOST_CHRONO)
-#  if (BOOST_VERSION >= 104700)
+#  if defined(ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 104700)
 #   define ASIO_HAS_BOOST_CHRONO 1
-#  endif // (BOOST_VERSION >= 104700)
+#  endif // defined(ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 104700)
 # endif // !defined(ASIO_DISABLE_BOOST_CHRONO)
 #endif // !defined(ASIO_HAS_BOOST_CHRONO)
 
@@ -480,12 +853,11 @@
 #   elif (__cplusplus >= 201103)
 #    define ASIO_HAS_STD_ADDRESSOF 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_ADDRESSOF 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -505,12 +877,11 @@
 #   elif (__cplusplus >= 201103)
 #    define ASIO_HAS_STD_FUNCTION 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_FUNCTION 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -520,6 +891,30 @@
 #  endif // defined(ASIO_MSVC)
 # endif // !defined(ASIO_DISABLE_STD_FUNCTION)
 #endif // !defined(ASIO_HAS_STD_FUNCTION)
+
+// Standard library support for the reference_wrapper class.
+#if !defined(ASIO_HAS_STD_REFERENCE_WRAPPER)
+# if !defined(ASIO_DISABLE_STD_REFERENCE_WRAPPER)
+#  if defined(__clang__)
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    define ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#   elif (__cplusplus >= 201103)
+#    define ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1700)
+#    define ASIO_HAS_STD_REFERENCE_WRAPPER 1
+#   endif // (_MSC_VER >= 1700)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_REFERENCE_WRAPPER)
+#endif // !defined(ASIO_HAS_STD_REFERENCE_WRAPPER)
 
 // Standard library support for type traits.
 #if !defined(ASIO_HAS_STD_TYPE_TRAITS)
@@ -532,13 +927,12 @@
 #     define ASIO_HAS_STD_TYPE_TRAITS 1
 #    endif // __has_include(<type_traits>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_TYPE_TRAITS 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
 #   if (_MSC_VER >= 1700)
@@ -554,12 +948,12 @@
 #  if defined(__clang__)
 #   if __has_feature(__cxx_nullptr__)
 #    define ASIO_HAS_NULLPTR 1
-#   endif // __has_feature(__cxx_rvalue_references__)
+#   endif // __has_feature(__cxx_nullptr__)
 #  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_NULLPTR 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -570,6 +964,30 @@
 # endif // !defined(ASIO_DISABLE_NULLPTR)
 #endif // !defined(ASIO_HAS_NULLPTR)
 
+// Standard library support for the C++11 allocator additions.
+#if !defined(ASIO_HAS_CXX11_ALLOCATORS)
+# if !defined(ASIO_DISABLE_CXX11_ALLOCATORS)
+#  if defined(__clang__)
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    define ASIO_HAS_CXX11_ALLOCATORS 1
+#   elif (__cplusplus >= 201103)
+#    define ASIO_HAS_CXX11_ALLOCATORS 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_CXX11_ALLOCATORS 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1800)
+#    define ASIO_HAS_CXX11_ALLOCATORS 1
+#   endif // (_MSC_VER >= 1800)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_CXX11_ALLOCATORS)
+#endif // !defined(ASIO_HAS_CXX11_ALLOCATORS)
+
 // Standard library support for the cstdint header.
 #if !defined(ASIO_HAS_CSTDINT)
 # if !defined(ASIO_DISABLE_CSTDINT)
@@ -579,12 +997,11 @@
 #   elif (__cplusplus >= 201103)
 #    define ASIO_HAS_CSTDINT 1
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_CSTDINT 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 5)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -606,12 +1023,11 @@
 #     define ASIO_HAS_STD_THREAD 1
 #    endif // __has_include(<thread>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_THREAD 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -633,12 +1049,11 @@
 #     define ASIO_HAS_STD_MUTEX_AND_CONDVAR 1
 #    endif // __has_include(<mutex>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_MUTEX_AND_CONDVAR 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -660,12 +1075,11 @@
 #     define ASIO_HAS_STD_CALL_ONCE 1
 #    endif // __has_include(<mutex>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_CALL_ONCE 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -685,14 +1099,13 @@
 #   elif (__cplusplus >= 201103)
 #    if __has_include(<future>)
 #     define ASIO_HAS_STD_FUTURE 1
-#    endif // __has_include(<mutex>)
+#    endif // __has_include(<future>)
 #   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
+#  elif defined(__GNUC__)
 #   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#    if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #     define ASIO_HAS_STD_FUTURE 1
-#    endif // defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
 #   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
 #  endif // defined(__GNUC__)
 #  if defined(ASIO_MSVC)
@@ -703,44 +1116,215 @@
 # endif // !defined(ASIO_DISABLE_STD_FUTURE)
 #endif // !defined(ASIO_HAS_STD_FUTURE)
 
-// Standard library support for experimental::string_view.
+// Standard library support for std::string_view.
 #if !defined(ASIO_HAS_STD_STRING_VIEW)
 # if !defined(ASIO_DISABLE_STD_STRING_VIEW)
 #  if defined(__clang__)
-#   if (__cplusplus >= 201103)
-#    ifdef _LIBCPP_VERSION
-#     if _LIBCPP_VERSION >= 8000
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    if (__cplusplus >= 201402)
+#     if __has_include(<string_view>)
 #      define ASIO_HAS_STD_STRING_VIEW 1
-#     endif
-#    endif
-#    if !defined(ASIO_HAS_STD_STRING_VIEW) && __has_include(<experimental/string_view>)
+#     endif // __has_include(<string_view>)
+#    endif // (__cplusplus >= 201402)
+#   else // defined(ASIO_HAS_CLANG_LIBCXX)
+#    if (__cplusplus >= 201703)
+#     if __has_include(<string_view>)
+#      define ASIO_HAS_STD_STRING_VIEW 1
+#     endif // __has_include(<string_view>)
+#    endif // (__cplusplus >= 201703)
+#   endif // defined(ASIO_HAS_CLANG_LIBCXX)
+#  elif defined(__GNUC__)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201703)
 #     define ASIO_HAS_STD_STRING_VIEW 1
-#     if defined(__APPLE__)
-#      if ((__clang_major__ < 10) || ((__clang_major__ == 10) && (__clang_minor__ == 0) && (__clang_patchlevel__ < 1)))
-#        define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
-#       endif // clang < 10.0.1
-#      else // for non-Xcode Clang
-#        define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
-#      endif
-#    endif // __has_include(<experimental/string_view>)
-#   endif // (__cplusplus >= 201103)
-#  endif // defined(__clang__)
-#  if defined(__GNUC__)
-#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
-#    if (__cplusplus >= 201300)
-#     define ASIO_HAS_STD_STRING_VIEW 1
-#     define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
-#    endif // (__cplusplus >= 201300)
-#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
-#  endif // defined(__GNUC__)
+#    endif // (__cplusplus >= 201703)
+#   endif // (__GNUC__ >= 7)
+#  elif defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
+#    define ASIO_HAS_STD_STRING_VIEW 1
+#   endif // (_MSC_VER >= 1910 && _MSVC_LANG >= 201703)
+#  endif // defined(ASIO_MSVC)
 # endif // !defined(ASIO_DISABLE_STD_STRING_VIEW)
 #endif // !defined(ASIO_HAS_STD_STRING_VIEW)
+
+// Standard library support for std::experimental::string_view.
+#if !defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+# if !defined(ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
+#  if defined(__clang__)
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    if (_LIBCPP_VERSION < 7000)
+#     if (__cplusplus >= 201402)
+#      if __has_include(<experimental/string_view>)
+#       define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
+#      endif // __has_include(<experimental/string_view>)
+#     endif // (__cplusplus >= 201402)
+#    endif // (_LIBCPP_VERSION < 7000)
+#   else // defined(ASIO_HAS_CLANG_LIBCXX)
+#    if (__cplusplus >= 201402)
+#     if __has_include(<experimental/string_view>)
+#      define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
+#     endif // __has_include(<experimental/string_view>)
+#    endif // (__cplusplus >= 201402)
+#   endif // // defined(ASIO_HAS_CLANG_LIBCXX)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201402)
+#     define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
+#    endif // (__cplusplus >= 201402)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 9)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+# endif // !defined(ASIO_DISABLE_STD_EXPERIMENTAL_STRING_VIEW)
+#endif // !defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+
+// Standard library has a string_view that we can use.
+#if !defined(ASIO_HAS_STRING_VIEW)
+# if !defined(ASIO_DISABLE_STRING_VIEW)
+#  if defined(ASIO_HAS_STD_STRING_VIEW)
+#   define ASIO_HAS_STRING_VIEW 1
+#  elif defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+#   define ASIO_HAS_STRING_VIEW 1
+#  endif // defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+# endif // !defined(ASIO_DISABLE_STRING_VIEW)
+#endif // !defined(ASIO_HAS_STRING_VIEW)
+
+// Standard library support for iostream move construction and assignment.
+#if !defined(ASIO_HAS_STD_IOSTREAM_MOVE)
+# if !defined(ASIO_DISABLE_STD_IOSTREAM_MOVE)
+#  if defined(__GNUC__)
+#   if (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_STD_IOSTREAM_MOVE 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1700)
+#    define ASIO_HAS_STD_IOSTREAM_MOVE 1
+#   endif // (_MSC_VER >= 1700)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_IOSTREAM_MOVE)
+#endif // !defined(ASIO_HAS_STD_IOSTREAM_MOVE)
+
+// Standard library has invoke_result (which supersedes result_of).
+#if !defined(ASIO_HAS_STD_INVOKE_RESULT)
+# if !defined(ASIO_DISABLE_STD_INVOKE_RESULT)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1911 && _MSVC_LANG >= 201703)
+#    define ASIO_HAS_STD_INVOKE_RESULT 1
+#   endif // (_MSC_VER >= 1911 && _MSVC_LANG >= 201703)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_INVOKE_RESULT)
+#endif // !defined(ASIO_HAS_STD_INVOKE_RESULT)
+
+// Standard library support for std::exception_ptr and std::current_exception.
+#if !defined(ASIO_HAS_STD_EXCEPTION_PTR)
+# if !defined(ASIO_DISABLE_STD_EXCEPTION_PTR)
+#  if defined(__clang__)
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    define ASIO_HAS_STD_EXCEPTION_PTR 1
+#   elif (__cplusplus >= 201103)
+#    define ASIO_HAS_STD_EXCEPTION_PTR 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_STD_EXCEPTION_PTR 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1800)
+#    define ASIO_HAS_STD_EXCEPTION_PTR 1
+#   endif // (_MSC_VER >= 1800)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_EXCEPTION_PTR)
+#endif // !defined(ASIO_HAS_STD_EXCEPTION_PTR)
+
+// Standard library support for std::nested_exception.
+#if !defined(ASIO_HAS_STD_NESTED_EXCEPTION)
+# if !defined(ASIO_DISABLE_STD_NESTED_EXCEPTION)
+#  if defined(__clang__)
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    define ASIO_HAS_STD_NESTED_EXCEPTION 1
+#   elif (__cplusplus >= 201103)
+#    define ASIO_HAS_STD_NESTED_EXCEPTION 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_STD_NESTED_EXCEPTION 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1900)
+#    define ASIO_HAS_STD_NESTED_EXCEPTION 1
+#   endif // (_MSC_VER >= 1900)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_NESTED_EXCEPTION)
+#endif // !defined(ASIO_HAS_STD_NESTED_EXCEPTION)
+
+// Standard library support for std::any.
+#if !defined(ASIO_HAS_STD_ANY)
+# if !defined(ASIO_DISABLE_STD_ANY)
+#  if defined(__clang__)
+#   if (__cplusplus >= 201703)
+#    if __has_include(<any>)
+#     define ASIO_HAS_STD_ANY 1
+#    endif // __has_include(<any>)
+#   endif // (__cplusplus >= 201703)
+#  elif defined(__GNUC__)
+#   if (__GNUC__ >= 7)
+#    if (__cplusplus >= 201703)
+#     define ASIO_HAS_STD_ANY 1
+#    endif // (__cplusplus >= 201703)
+#   endif // (__GNUC__ >= 7)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1910) && (_MSVC_LANG >= 201703)
+#    define ASIO_HAS_STD_ANY 1
+#   endif // (_MSC_VER >= 1910) && (_MSVC_LANG >= 201703)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_ANY)
+#endif // !defined(ASIO_HAS_STD_ANY)
+
+// Standard library support for std::source_location.
+#if !defined(ASIO_HAS_STD_SOURCE_LOCATION)
+# if !defined(ASIO_DISABLE_STD_SOURCE_LOCATION)
+// ...
+# endif // !defined(ASIO_DISABLE_STD_SOURCE_LOCATION)
+#endif // !defined(ASIO_HAS_STD_SOURCE_LOCATION)
+
+// Standard library support for std::experimental::source_location.
+#if !defined(ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+# if !defined(ASIO_DISABLE_STD_EXPERIMENTAL_SOURCE_LOCATION)
+#  if defined(__GNUC__)
+#   if (__cplusplus >= 201709)
+#    if __has_include(<experimental/source_location>)
+#     define ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION 1
+#    endif // __has_include(<experimental/source_location>)
+#   endif // (__cplusplus >= 201709)
+#  endif // defined(__GNUC__)
+# endif // !defined(ASIO_DISABLE_STD_EXPERIMENTAL_SOURCE_LOCATION)
+#endif // !defined(ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+
+// Standard library has a source_location that we can use.
+#if !defined(ASIO_HAS_SOURCE_LOCATION)
+# if !defined(ASIO_DISABLE_SOURCE_LOCATION)
+#  if defined(ASIO_HAS_STD_SOURCE_LOCATION)
+#   define ASIO_HAS_SOURCE_LOCATION 1
+#  elif defined(ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+#   define ASIO_HAS_SOURCE_LOCATION 1
+#  endif // defined(ASIO_HAS_STD_EXPERIMENTAL_SOURCE_LOCATION)
+# endif // !defined(ASIO_DISABLE_SOURCE_LOCATION)
+#endif // !defined(ASIO_HAS_SOURCE_LOCATION)
 
 // Windows App target. Windows but with a limited API.
 #if !defined(ASIO_WINDOWS_APP)
 # if defined(_WIN32_WINNT) && (_WIN32_WINNT >= 0x0603)
 #  include <winapifamily.h>
-#  if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) \
+#  if (WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP) \
+       || WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_TV_TITLE)) \
    && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #   define ASIO_WINDOWS_APP 1
 #  endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_APP)
@@ -778,18 +1362,18 @@
 // Windows: target OS version.
 #if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
 # if !defined(_WIN32_WINNT) && !defined(_WIN32_WINDOWS)
-#  if defined(_MSC_VER) || defined(__BORLANDC__)
+#  if defined(_MSC_VER) || (defined(__BORLANDC__) && !defined(__clang__))
 #   pragma message( \
   "Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:\n"\
-  "- add -D_WIN32_WINNT=0x0501 to the compiler command line; or\n"\
-  "- add _WIN32_WINNT=0x0501 to your project's Preprocessor Definitions.\n"\
-  "Assuming _WIN32_WINNT=0x0501 (i.e. Windows XP target).")
-#  else // defined(_MSC_VER) || defined(__BORLANDC__)
+  "- add -D_WIN32_WINNT=0x0601 to the compiler command line; or\n"\
+  "- add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.\n"\
+  "Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).")
+#  else // defined(_MSC_VER) || (defined(__BORLANDC__) && !defined(__clang__))
 #   warning Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately.
-#   warning For example, add -D_WIN32_WINNT=0x0501 to the compiler command line.
-#   warning Assuming _WIN32_WINNT=0x0501 (i.e. Windows XP target).
-#  endif // defined(_MSC_VER) || defined(__BORLANDC__)
-#  define _WIN32_WINNT 0x0501
+#   warning For example, add -D_WIN32_WINNT=0x0601 to the compiler command line.
+#   warning Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
+#  endif // defined(_MSC_VER) || (defined(__BORLANDC__) && !defined(__clang__))
+#  define _WIN32_WINNT 0x0601
 # endif // !defined(_WIN32_WINNT) && !defined(_WIN32_WINDOWS)
 # if defined(_MSC_VER)
 #  if defined(_WIN32) && !defined(WIN32)
@@ -860,7 +1444,8 @@
    || defined(__FreeBSD__) \
    || defined(__NetBSD__) \
    || defined(__OpenBSD__) \
-   || defined(__linux__)
+   || defined(__linux__) \
+   || defined(__HAIKU__)
 #   define ASIO_HAS_UNISTD_H 1
 #  endif
 # endif // !defined(ASIO_HAS_BOOST_CONFIG)
@@ -990,13 +1575,9 @@
 // UNIX domain sockets.
 #if !defined(ASIO_HAS_LOCAL_SOCKETS)
 # if !defined(ASIO_DISABLE_LOCAL_SOCKETS)
-#  if !defined(ASIO_WINDOWS) \
-  && !defined(ASIO_WINDOWS_RUNTIME) \
-  && !defined(__CYGWIN__)
+#  if !defined(ASIO_WINDOWS_RUNTIME)
 #   define ASIO_HAS_LOCAL_SOCKETS 1
-#  endif // !defined(ASIO_WINDOWS)
-         //   && !defined(ASIO_WINDOWS_RUNTIME)
-         //   && !defined(__CYGWIN__)
+#  endif // !defined(ASIO_WINDOWS_RUNTIME)
 # endif // !defined(ASIO_DISABLE_LOCAL_SOCKETS)
 #endif // !defined(ASIO_HAS_LOCAL_SOCKETS)
 
@@ -1080,6 +1661,8 @@
 #   define ASIO_HAS_THREADS 1
 #  elif defined(__APPLE__)
 #   define ASIO_HAS_THREADS 1
+#  elif defined(__HAIKU__)
+#   define ASIO_HAS_THREADS 1
 #  elif defined(_POSIX_THREADS) && (_POSIX_THREADS + 0 >= 0)
 #   define ASIO_HAS_THREADS 1
 #  elif defined(_PTHREADS)
@@ -1094,6 +1677,8 @@
 #  if defined(ASIO_HAS_BOOST_CONFIG) && defined(BOOST_HAS_PTHREADS)
 #   define ASIO_HAS_PTHREADS 1
 #  elif defined(_POSIX_THREADS) && (_POSIX_THREADS + 0 >= 0)
+#   define ASIO_HAS_PTHREADS 1
+#  elif defined(__HAIKU__)
 #   define ASIO_HAS_PTHREADS 1
 #  endif // defined(ASIO_HAS_BOOST_CONFIG) && defined(BOOST_HAS_PTHREADS)
 # endif // defined(ASIO_HAS_THREADS)
@@ -1112,6 +1697,15 @@
     static const type assignment
 # endif // !defined(ASIO_DISABLE_BOOST_STATIC_CONSTANT)
 #endif // !defined(ASIO_STATIC_CONSTANT)
+
+// Boost align library.
+#if !defined(ASIO_HAS_BOOST_ALIGN)
+# if !defined(ASIO_DISABLE_BOOST_ALIGN)
+#  if defined(ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105600)
+#   define ASIO_HAS_BOOST_ALIGN 1
+#  endif // defined(ASIO_HAS_BOOST_CONFIG) && (BOOST_VERSION >= 105600)
+# endif // !defined(ASIO_DISABLE_BOOST_ALIGN)
+#endif // !defined(ASIO_HAS_BOOST_ALIGN)
 
 // Boost array library.
 #if !defined(ASIO_HAS_BOOST_ARRAY)
@@ -1182,9 +1776,9 @@
 #   if (__GNUC__ >= 3)
 #    define ASIO_HAS_HANDLER_HOOKS 1
 #   endif // (__GNUC__ >= 3)
-#  elif !defined(__BORLANDC__)
+#  elif !defined(__BORLANDC__) || defined(__clang__)
 #   define ASIO_HAS_HANDLER_HOOKS 1
-#  endif // !defined(__BORLANDC__)
+#  endif // !defined(__BORLANDC__) || defined(__clang__)
 # endif // !defined(ASIO_DISABLE_HANDLER_HOOKS)
 #endif // !defined(ASIO_HAS_HANDLER_HOOKS)
 
@@ -1224,33 +1818,6 @@
         //   || (defined(__MACH__) && defined(__APPLE__))
 #endif // !defined(ASIO_DISABLE_SSIZE_T)
 
-// Helper macros to manage the transition away from the old services-based API.
-#if defined(ASIO_ENABLE_OLD_SERVICES)
-# define ASIO_SVC_TPARAM , typename Service
-# define ASIO_SVC_TPARAM_DEF1(d1) , typename Service d1
-# define ASIO_SVC_TPARAM_DEF2(d1, d2) , typename Service d1, d2
-# define ASIO_SVC_TARG , Service
-# define ASIO_SVC_T Service
-# define ASIO_SVC_TPARAM1 , typename Service1
-# define ASIO_SVC_TPARAM1_DEF1(d1) , typename Service1 d1
-# define ASIO_SVC_TPARAM1_DEF2(d1, d2) , typename Service1 d1, d2
-# define ASIO_SVC_TARG1 , Service1
-# define ASIO_SVC_T1 Service1
-# define ASIO_SVC_ACCESS public
-#else // defined(ASIO_ENABLE_OLD_SERVICES)
-# define ASIO_SVC_TPARAM
-# define ASIO_SVC_TPARAM_DEF1(d1)
-# define ASIO_SVC_TPARAM_DEF2(d1, d2)
-# define ASIO_SVC_TARG
-// ASIO_SVC_T is defined at each point of use.
-# define ASIO_SVC_TPARAM1
-# define ASIO_SVC_TPARAM1_DEF1(d1)
-# define ASIO_SVC_TPARAM1_DEF2(d1, d2)
-# define ASIO_SVC_TARG1
-// ASIO_SVC_T1 is defined at each point of use.
-# define ASIO_SVC_ACCESS protected
-#endif // defined(ASIO_ENABLE_OLD_SERVICES)
-
 // Helper macros to manage transition away from error_code return values.
 #if defined(ASIO_NO_DEPRECATED)
 # define ASIO_SYNC_OP_VOID void
@@ -1259,5 +1826,129 @@
 # define ASIO_SYNC_OP_VOID asio::error_code
 # define ASIO_SYNC_OP_VOID_RETURN(e) return e
 #endif // defined(ASIO_NO_DEPRECATED)
+
+// Newer gcc, clang need special treatment to suppress unused typedef warnings.
+#if defined(__clang__)
+# if defined(__apple_build_version__)
+#  if (__clang_major__ >= 7)
+#   define ASIO_UNUSED_TYPEDEF __attribute__((__unused__))
+#  endif // (__clang_major__ >= 7)
+# elif ((__clang_major__ == 3) && (__clang_minor__ >= 6)) \
+    || (__clang_major__ > 3)
+#  define ASIO_UNUSED_TYPEDEF __attribute__((__unused__))
+# endif // ((__clang_major__ == 3) && (__clang_minor__ >= 6))
+        //   || (__clang_major__ > 3)
+#elif defined(__GNUC__)
+# if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#  define ASIO_UNUSED_TYPEDEF __attribute__((__unused__))
+# endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)) || (__GNUC__ > 4)
+#endif // defined(__GNUC__)
+#if !defined(ASIO_UNUSED_TYPEDEF)
+# define ASIO_UNUSED_TYPEDEF
+#endif // !defined(ASIO_UNUSED_TYPEDEF)
+
+// Some versions of gcc generate spurious warnings about unused variables.
+#if defined(__GNUC__)
+# if (__GNUC__ >= 4)
+#  define ASIO_UNUSED_VARIABLE __attribute__((__unused__))
+# endif // (__GNUC__ >= 4)
+#endif // defined(__GNUC__)
+#if !defined(ASIO_UNUSED_VARIABLE)
+# define ASIO_UNUSED_VARIABLE
+#endif // !defined(ASIO_UNUSED_VARIABLE)
+
+// Support the co_await keyword on compilers known to allow it.
+#if !defined(ASIO_HAS_CO_AWAIT)
+# if !defined(ASIO_DISABLE_CO_AWAIT)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1928) && (_MSVC_LANG >= 201705) && !defined(__clang__)
+#    define ASIO_HAS_CO_AWAIT 1
+#   elif (_MSC_FULL_VER >= 190023506)
+#    if defined(_RESUMABLE_FUNCTIONS_SUPPORTED)
+#     define ASIO_HAS_CO_AWAIT 1
+#    endif // defined(_RESUMABLE_FUNCTIONS_SUPPORTED)
+#   endif // (_MSC_FULL_VER >= 190023506)
+#  elif defined(__clang__)
+#   if (__cplusplus >= 201703) && defined(__cpp_coroutines) && (__cpp_coroutines >= 201703)
+#    if __has_include(<experimental/coroutine>)
+#     define ASIO_HAS_CO_AWAIT 1
+#    endif // __has_include(<experimental/coroutine>)
+#   endif // (__cplusplus >= 201703) && (__cpp_coroutines >= 201703)
+#  elif defined(__GNUC__)
+#   if (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#    if __has_include(<coroutine>)
+#     define ASIO_HAS_CO_AWAIT 1
+#    endif // __has_include(<coroutine>)
+#   endif // (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#  endif // defined(__GNUC__)
+# endif // !defined(ASIO_DISABLE_CO_AWAIT)
+#endif // !defined(ASIO_HAS_CO_AWAIT)
+
+// Standard library support for coroutines.
+#if !defined(ASIO_HAS_STD_COROUTINE)
+# if !defined(ASIO_DISABLE_STD_COROUTINE)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1928) && (_MSVC_LANG >= 201705)
+#    define ASIO_HAS_STD_COROUTINE 1
+#   endif // (_MSC_VER >= 1928) && (_MSVC_LANG >= 201705)
+#  endif // defined(ASIO_MSVC)
+#  if defined(__GNUC__)
+#   if (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#    if __has_include(<coroutine>)
+#     define ASIO_HAS_STD_COROUTINE 1
+#    endif // __has_include(<coroutine>)
+#   endif // (__cplusplus >= 201709) && (__cpp_impl_coroutine >= 201902)
+#  endif // defined(__GNUC__)
+# endif // !defined(ASIO_DISABLE_STD_COROUTINE)
+#endif // !defined(ASIO_HAS_STD_COROUTINE)
+
+// Compiler support for the the [[nodiscard]] attribute.
+#if !defined(ASIO_NODISCARD)
+# if defined(__has_cpp_attribute)
+#  if __has_cpp_attribute(nodiscard)
+#   if (__cplusplus >= 201703)
+#    define ASIO_NODISCARD [[nodiscard]]
+#   endif // (__cplusplus >= 201703)
+#  endif // __has_cpp_attribute(nodiscard)
+# endif // defined(__has_cpp_attribute)
+#endif // !defined(ASIO_NODISCARD)
+#if !defined(ASIO_NODISCARD)
+# define ASIO_NODISCARD
+#endif // !defined(ASIO_NODISCARD)
+
+// Kernel support for MSG_NOSIGNAL.
+#if !defined(ASIO_HAS_MSG_NOSIGNAL)
+# if defined(__linux__)
+#  define ASIO_HAS_MSG_NOSIGNAL 1
+# elif defined(_POSIX_VERSION)
+#  if (_POSIX_VERSION >= 200809L)
+#   define ASIO_HAS_MSG_NOSIGNAL 1
+#  endif // _POSIX_VERSION >= 200809L
+# endif // defined(_POSIX_VERSION)
+#endif // !defined(ASIO_HAS_MSG_NOSIGNAL)
+
+// Standard library support for std::hash.
+#if !defined(ASIO_HAS_STD_HASH)
+# if !defined(ASIO_DISABLE_STD_HASH)
+#  if defined(__clang__)
+#   if defined(ASIO_HAS_CLANG_LIBCXX)
+#    define ASIO_HAS_STD_HASH 1
+#   elif (__cplusplus >= 201103)
+#    define ASIO_HAS_STD_HASH 1
+#   endif // (__cplusplus >= 201103)
+#  elif defined(__GNUC__)
+#   if ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#    if (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#     define ASIO_HAS_STD_HASH 1
+#    endif // (__cplusplus >= 201103) || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#   endif // ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)) || (__GNUC__ > 4)
+#  endif // defined(__GNUC__)
+#  if defined(ASIO_MSVC)
+#   if (_MSC_VER >= 1700)
+#    define ASIO_HAS_STD_HASH 1
+#   endif // (_MSC_VER >= 1700)
+#  endif // defined(ASIO_MSVC)
+# endif // !defined(ASIO_DISABLE_STD_HASH)
+#endif // !defined(ASIO_HAS_STD_HASH)
 
 #endif // ASIO_DETAIL_CONFIG_HPP

@@ -560,32 +560,6 @@ menu_crosshair::~menu_crosshair()
 {
 }
 
-/*-------------------------------------------------
-    menu_quit_game - handle the "menu" for
-    quitting the game
--------------------------------------------------*/
-
-menu_quit_game::menu_quit_game(mame_ui_manager &mui, render_container &container) : menu(mui, container)
-{
-}
-
-menu_quit_game::~menu_quit_game()
-{
-}
-
-void menu_quit_game::populate(float &customtop, float &custombottom)
-{
-}
-
-void menu_quit_game::handle(event const *ev)
-{
-	// request a reset
-	machine().schedule_exit();
-
-	// reset the menu stack
-	stack_reset();
-}
-
 //-------------------------------------------------
 //  ctor / dtor
 //-------------------------------------------------
@@ -756,7 +730,6 @@ menu_machine_configure::~menu_machine_configure()
 void menu_machine_configure::handle(event const *ev)
 {
 	// process the menu
-	//process_parent(); FIXME: drawn in the wrong order, can't see menu
 	if (ev && ev->itemref)
 	{
 		if (ev->iptkey == IPT_UI_SELECT)

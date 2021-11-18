@@ -106,13 +106,16 @@ t:as_double()
     Returns the time interval in seconds as a floating-point value.
 t:as_hz()
     Interprets the interval as a period and returns the corresponding frequency
-    in Hertz as a floating-point value.
+    in Hertz as a floating-point value.  Returns zero if ``t.is_never`` is true.
+    The interval must not be zero.
 t:as_khz()
     Interprets the interval as a period and returns the corresponding frequency
-    kilohertz as a floating-point value.
+    kilohertz as a floating-point value.  Returns zero if ``t.is_never`` is
+    true.  The interval must not be zero.
 t:as_mhz()
     Interprets the interval as a period and returns the corresponding frequency
-    megahertz as a floating-point value.
+    megahertz as a floating-point value.  Returns zero if ``t.is_never`` is
+    true.  The interval must not be zero.
 t:as_ticks(frequency)
     Returns the interval as a whole number of periods at the specified
     frequency.  The frequency is specified in Hertz.
@@ -121,11 +124,11 @@ Properties
 ^^^^^^^^^^
 
 t.is_zero (read-only)
-    Whether the value represents no elapsed time.
+    A Boolean indicating whether the value represents no elapsed time.
 t.is_never (read-only)
-    Whether the value is greater than the maximum number of whole seconds that
-    can be represented (treated as an unreachable time in the future or
-    overflow).
+    A Boolean indicating whether the value is greater than the maximum number of
+    whole seconds that can be represented (treated as an unreachable time in the
+    future or overflow).
 t.attoseconds (read-only)
     The fraction seconds portion of the interval in attoseconds.
 t.seconds (read-only)
@@ -517,7 +520,8 @@ ui:set_aggressive_input_focus(enable)
     On some platforms, this controls whether MAME should accept input focus in
     more situations than when its windows have UI focus.
 ui:get_general_input_setting(type, [player])
-    Gets a description of the configured input sequence for the specified input
+    Gets a description of the configured
+    :ref:`input sequence <luareference-input-iptseq>` for the specified input
     type and player suitable for using in prompts.  The input type is an
     enumerated value.  The player number is a zero-based index.  If the player
     number is not supplied, it is assumed to be zero.
@@ -1660,14 +1664,21 @@ ioport:type_group(type, player)
     This should be called with values obtained from I/O port fields to provide
     canonical grouping in an input configuration UI.
 ioport:type_seq(type, [player], [seqtype])
-    Get the configured input sequence for the specified input type, player
-    number and sequence type.  The input type is an enumerated value.  The
-    player number is a zero-based index.  If the player number is not supplied,
-    it is assumed to be zero.  If the sequence type is supplied, it must be
-    ``"standard"``, ``"increment"`` or ``"decrement"``; if it is not supplied,
-    it is assumed to be ``"standard"``.
+    Get the configured :ref:`input sequence <luareference-input-iptseq>` for the
+    specified input type, player number and sequence type.  The input type is an
+    enumerated value.  The player number is a zero-based index.  If the player
+    number is not supplied, it is assumed to be zero.  If the sequence type is
+    supplied, it must be ``"standard"``, ``"increment"`` or ``"decrement"``; if
+    it is not supplied, it is assumed to be ``"standard"``.
 
     This provides access to general input configuration.
+ioport:set_type_seq(type, player, seqtype, seq)
+    Set the configured :ref:`input sequence <luareference-input-iptseq>` for the
+    specified input type, player number and sequence type.  The input type is an
+    enumerated value.  The player number is a zero-based index.  The sequence
+    type must be ``"standard"``, ``"increment"`` or ``"decrement"``.
+
+    This allows general input configuration to be set.
 ioport:token_to_input_type(string)
     Returns the input type and player number for the specified input type token.
 ioport:input_type_to_token(type, [player])
@@ -1852,21 +1863,24 @@ field:set_value(value)
     compared to zero to determine whether the field should be active; for
     analog fields, the value must be right-aligned and in the correct range.
 field:set_input_seq(seqtype, seq)
-    Set the input sequence for the specified sequence type.  This is used to
-    configure per-machine input settings.  The sequence type must be
-    ``"standard"``, ``"increment"`` or ``"decrement"``.
+    Set the :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  This is used to configure per-machine input
+    settings.  The sequence type must be ``"standard"``, ``"increment"`` or
+    ``"decrement"``.
 field:input_seq(seq_type)
-    Get the configured input sequence for the specified sequence type.  This
-    gets per-machine input settings.  The sequence type must be ``"standard"``,
-    ``"increment"`` or ``"decrement"``.
+    Get the configured :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  This gets per-machine input assignments.  The
+    sequence type must be ``"standard"``, ``"increment"`` or ``"decrement"``.
 field:set_default_input_seq(seq_type, seq)
-    Set the default input sequence for the specified sequence type.  This is
-    used to configure general input settings.  The sequence type must be
-    ``"standard"``, ``"increment"`` or ``"decrement"``.
+    Set the default :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  This overrides the default input assignment for a
+    specific input.  The sequence type must be ``"standard"``, ``"increment"``
+    or ``"decrement"``.
 field:default_input_seq(seq_type)
-    Gets the default input sequence for the specified sequence type.  This is
-    gets general input settings.  The sequence type must be ``"standard"``,
-    ``"increment"`` or ``"decrement"``.
+    Gets the default :ref:`input sequence <luareference-input-iptseq>` for the
+    specified sequence type.  If the default assignment is not overridden, this
+    gets the general input assignment.  The sequence type must be
+    ``"standard"``, ``"increment"`` or ``"decrement"``.
 field:keyboard_codes(shift)
     Gets a table of characters corresponding to the field for the specified
     shift state.  The shift state is a bit mask of active shift keys.
@@ -2009,18 +2023,20 @@ input:code_from_token(token)
     Convert a token string to an input code.  Returns the invalid input code if
     the token is not valid or belongs to an input device that is not present.
 input:seq_pressed(seq)
-    Returns a Boolen indicating whether the supplied input sequence is currently
-    pressed.
+    Returns a Boolean indicating whether the supplied
+    :ref:`input sequence <luareference-input-iptseq>` is currently pressed.
 input:seq_clean(seq)
-    Remove invalid elements from the supplied input sequence.  Returns the new,
-    cleaned input sequence.
+    Remove invalid elements from the supplied
+    :ref:`input sequence <luareference-input-iptseq>`.  Returns the new, cleaned
+    input sequence.
 input:seq_name(seq)
-    Get display text for an inptu sequence.
+    Get display text for an :ref:`input sequence <luareference-input-iptseq>`.
 input:seq_to_tokens(seq)
-    Convert an input sequence to a token string.  This should be used when
-    saving configuration.
+    Convert an :ref:`input sequence <luareference-input-iptseq>` to a token
+    string.  This should be used when saving configuration.
 input:seq_from_tokens(tokens)
-    Convert a token string to an input sequence.  This should be used when
+    Convert a token string to an
+    :ref:`input sequence <luareference-input-iptseq>`.  This should be used when
     loading configuration.
 input:axis_code_poller()
     Returns an :ref:`input code poller <luareference-input-codepoll>` for
@@ -2034,10 +2050,12 @@ input:keyboard_code_poller()
     devices.
 input:axis_sequence_poller()
     Returns an :ref:`input sequence poller <luareference-input-seqpoll>` for
-    obtaining an input sequence for configuring an analog input.
+    obtaining an :ref:`input sequence <luareference-input-iptseq>` for
+    configuring an analog input.
 input:axis_sequence_poller()
     Returns an :ref:`input sequence poller <luareference-input-seqpoll>` for
-    obtaining an input sequence for configuring a digital input.
+    obtaining an :ref:`input sequence <luareference-input-iptseq>` for
+    configuring a digital input.
 
 Properties
 ^^^^^^^^^^
@@ -2112,13 +2130,59 @@ Properties
 ^^^^^^^^^^
 
 poller.sequence (read-only)
-    The current input sequence.  This is updated while polling.  It is possible
-    for the sequence to become invalid.
+    The current :ref:`input sequence <luareference-input-iptseq>`.  This is
+    updated while polling.  It is possible for the sequence to become invalid.
 poller.valid (read-only)
     A Boolean indicating whether the current input sequence is valid.
 poller.modified (read-only)
     A Boolean indicating whether the sequence was changed by any user input
     since starting polling.
+
+.. _luareference-input-iptseq:
+
+Input sequence
+~~~~~~~~~~~~~~
+
+Wraps MAME’s ``input_seq`` class, representing a combination of host inputs that
+can be read or assigned to an emulated input.  Input sequences can be
+manipulated using :ref:`input manager <luareference-input-inputman>` methods.
+Use an :ref:`input sequence poller <luareference-input-seqpoll>` to obtain an
+input sequence from the user.
+
+Instantiation
+^^^^^^^^^^^^^
+
+emu.input_seq()
+    Creates an empty input sequence.
+emu.input_seq(seq)
+    Creates a copy of an existing input sequence.
+
+Methods
+^^^^^^^
+
+seq:reset()
+    Clears the input sequence, removing all items.
+seq:set_default()
+    Sets the input sequence to a single item containing the metavalue specifying
+    that the default setting should be used.
+
+Properties
+^^^^^^^^^^
+
+seq.empty (read-only)
+    A Boolean indicating whether the input sequence is empty (contains no items,
+    indicating an unassigned input).
+seq.length (read-only)
+    The number of items in the input sequence.
+seq.is_valid (read-only)
+    A Boolean indicating whether the input sequence is a valid.  To be valid, it
+    must contain at least one item, all items must be valid codes, all product
+    groups must contain at least one item that is not negated, and items
+    referring to absolute and relative axes must not be mixed within a product
+    group.
+seq.is_default (read-only)
+    A Boolean indicating whether the input sequence specifies that the default
+    setting should be used.
 
 .. _luareference-input-devclass:
 
@@ -2751,7 +2815,7 @@ view.has_art
 Layout view item
 ~~~~~~~~~~~~~~~~
 
-Wraps MAME’s ``layout_view::item`` class, representing an item in a view.  An
+Wraps MAME’s ``layout_view_item`` class, representing an item in a view.  An
 item is drawn as a rectangular textured surface.  The texture is supplied by an
 emulated screen or a layout element.
 
@@ -2768,7 +2832,7 @@ Methods
 item:set_state(state)
     Set the value used as the element state and animation state in the absence
     of bindings.  The argument must be an integer.
-item.set_element_state_callback(cb)
+item:set_element_state_callback(cb)
     Set a function to call to obtain the element state for the item.  The
     function must accept no arguments and return an integer.  Call with ``nil``
     to restore the default element state callback (based on bindings in the XML
@@ -2780,7 +2844,7 @@ item.set_element_state_callback(cb)
     This callback will not be used to obtain the animation state for the item,
     even if the item lacks explicit animation state bindings in the XML layout
     file.
-item.set_animation_state_callback(cb)
+item:set_animation_state_callback(cb)
     Set a function to call to obtain the animation state for the item.  The
     function must accept no arguments and return an integer.  Call with ``nil``
     to restore the default animation state callback (based on bindings in the
@@ -2788,7 +2852,7 @@ item.set_animation_state_callback(cb)
 
     Note that the function must not access the item’s ``animation_state``
     property, as this will result in infinite recursion.
-item.set_bounds_callback(cb)
+item:set_bounds_callback(cb)
     Set a function to call to obtain the bounds for the item.  The function must
     accept no arguments and return a
     :ref:`render bounds <luareference-render-bounds>` object in render target
@@ -2798,7 +2862,7 @@ item.set_bounds_callback(cb)
 
     Note that the function must not access the item’s ``bounds`` property, as
     this will result in infinite recursion.
-item.set_color_callback(cb)
+item:set_color_callback(cb)
     Set a function to call to obtain the multiplier colour for the item.  The
     function must accept no arguments and return a
     :ref:`render colour <luareference-render-color>` object.  Call with ``nil``
@@ -2807,6 +2871,50 @@ item.set_color_callback(cb)
 
     Note that the function must not access the item’s ``color`` property, as
     this will result in infinite recursion.
+item:set_scroll_size_x_callback(cb)
+    Set a function to call to obtain the size of the horizontal scroll window as
+    a proportion of the associated element’s width.  The function must accept no
+    arguments and return a floating-point value.  Call with ``nil`` to restore
+    the default horizontal scroll window size callback (based on the ``xscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_size_x``
+    property, as this will result in infinite recursion.
+item:set_scroll_size_y_callback(cb)
+    Set a function to call to obtain the size of the vertical scroll window as a
+    proportion of the associated element’s height.  The function must accept no
+    arguments and return a floating-point value.  Call with ``nil`` to restore
+    the default vertical scroll window size callback (based on the ``yscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_size_y``
+    property, as this will result in infinite recursion.
+item:set_scroll_pos_x_callback(cb)
+    Set a function to call to obtain the horizontal scroll position.  A value of
+    zero places the horizontal scroll window at the left edge of the associated
+    element.  If the item does not wrap horizontally, a value of 1.0 places the
+    horizontal scroll window at the right edge of the associated element; if the
+    item wraps horizontally, a value of 1.0 corresponds to wrapping back to the
+    left edge of the associated element.  The function must accept no arguments
+    and return a floating-point value.  Call with ``nil`` to restore the default
+    horizontal scroll position callback (based on bindings in the ``xscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_pos_x`` property,
+    as this will result in infinite recursion.
+item:set_scroll_pos_y_callback(cb)
+    Set a function to call to obtain the vertical scroll position.  A value of
+    zero places the vertical scroll window at the top edge of the associated
+    element.  If the item does not wrap vertically, a value of 1.0 places the
+    vertical scroll window at the bottom edge of the associated element; if the
+    item wraps vertically, a value of 1.0 corresponds to wrapping back to the
+    left edge of the associated element.  The function must accept no arguments
+    and return a floating-point value.  Call with ``nil`` to restore the default
+    vertical scroll position callback (based on bindings in the ``yscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_pos_y`` property,
+    as this will result in infinite recursion.
 
 Properties
 ^^^^^^^^^^
@@ -2828,6 +2936,28 @@ item.color (read-only)
     The item’s colour for the current state.  The colour of the screen or
     element texture is multiplied by this colour.  This is a
     :ref:`render colour <luareference-render-color>` object.
+item.scroll_wrap_x (read-only)
+    A Boolean indicating whether the item wraps horizontally.
+item.scroll_wrap_y (read-only)
+    A Boolean indicating whether the item wraps vertically.
+item.scroll_size_x (read/write)
+    Get the item’s horizontal scroll window size for the current state, or set
+    the horizontal scroll window size to use in the absence of bindings.  This
+    is a floating-point value representing a proportion of the associated
+    element’s width.
+item.scroll_size_y (read/write)
+    Get the item’s vertical scroll window size for the current state, or set the
+    vertical scroll window size to use in the absence of bindings.  This is a
+    floating-point value representing a proportion of the associated element’s
+    height.
+item.scroll_pos_x (read/write)
+    Get the item’s horizontal scroll position for the current state, or set the
+    horizontal scroll position size to use in the absence of bindings.  This is
+    a floating-point value.
+item.scroll_pos_y (read/write)
+    Get the item’s vertical scroll position for the current state, or set the
+    vertical position size to use in the absence of bindings.  This is a
+    floating-point value.
 item.blend_mode (read-only)
     Get the item’s blend mode.  This is an integer value, where 0 means no
     blending, 1 means alpha blending, 2 means RGB multiplication, 3 means

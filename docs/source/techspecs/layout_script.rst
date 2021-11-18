@@ -259,7 +259,7 @@ Here’s our layout file:
                 <bounds x="0" y="0" width="0.1" height="0.1" />
                 <color alpha="0" />
             </rect>
-            <!-- draw the outlined of a square -->
+            <!-- draw the outline of a square -->
             <rect><bounds x="0.02" y="0.02" width="0.06" height="0.01" /></rect>
             <rect><bounds x="0.02" y="0.07" width="0.06" height="0.01" /></rect>
             <rect><bounds x="0.02" y="0.02" width="0.01" height="0.06" /></rect>
@@ -289,7 +289,7 @@ Here’s our layout file:
             <element id="vertical" ref="line">
                 <!-- element draws a vertical line, no need to rotate it -->
                 <orientation rotate="0" />
-                <!-- centre it in the square horizotnally, using the full height -->
+                <!-- centre it in the square horizontally, using the full height -->
                 <bounds x="4.55" y="1.9" width="0.1" height="1" />
             </element>
 
@@ -301,7 +301,7 @@ Here’s our layout file:
                 <bounds x="4.1" y="2.35" width="1" height="0.1" />
             </element>
 
-            <!-- draw a small box at the intersection of the vertical and horiztonal lines -->
+            <!-- draw a small box at the intersection of the vertical and horizontal lines -->
             <element id="box" ref="box">
                 <bounds x="4.55" y="2.35" width="0.1" height="0.1" />
             </element>
@@ -595,7 +595,7 @@ Get item bounds
     argument to restore the default bounds handler (based on the item’s
     animation state and ``bounds`` child elements).
 Get item colour
-    ``item::set_color_callback(cb)``
+    ``item:set_color_callback(cb)``
 
     Set callback for getting the item’s colour (the element texture’s colours
     multiplied by this colour).  Do not attempt to access the item’s ``color``
@@ -605,3 +605,59 @@ Get item colour
     ARGB colour (usually created by calling ``emu.render_color``), and takes no
     parameters.  Call with ``nil`` as the argument to restore the default colour
     handler (based on the item’s animation state and ``color`` child elements).
+Get item horizontal scroll window size
+    ``item:set_scroll_size_x_callback(cb)``
+
+    Set callback for getting the item’s horizontal scroll window size.  This
+    allows the script to control how much of the element is displayed by the
+    item.  Do not attempt to access the item’s ``scroll_size_x`` property from
+    the callback, as it will result in infinite recursion.
+
+    The callback function must return a floating-point number representing the
+    horizontal window size as a proportion of the associated element’s width,
+    and takes no parameters.  A value of 1.0 will display the entire width of
+    the element; smaller values will display proportionally smaller parts of the
+    element.  Call with ``nil`` as the argument to to restore the default
+    horizontal scroll window size handler (based on the ``xscroll`` child
+    element).
+Get item vertical scroll window size
+    ``item:set_scroll_size_y_callback(cb)``
+
+    Set callback for getting the item’s vertical scroll window size.  This
+    allows the script to control how much of the element is displayed by the
+    item.  Do not attempt to access the item’s ``scroll_size_y`` property from
+    the callback, as it will result in infinite recursion.
+
+    The callback function must return a floating-point number representing the
+    vertical window size as a proportion of the associated element’s height, and
+    takes no parameters.  A value of 1.0 will display the entire height of the
+    element; smaller values will display proportionally smaller parts of the
+    element.  Call with ``nil`` as the argument to to restore the default
+    vertical scroll window size handler (based on the ``xscroll`` child
+    element).
+Get item horizontal scroll position
+    ``item:set_scroll_pos_x_callback(cb)``
+
+    Set callback for getting the item’s horizontal scroll position.  This allows
+    the script to control which part of the element is displayed by the item.
+    Do not attempt to access the item’s ``scroll_pos_x`` property from the
+    callback, as this will result in infinite recursion.
+
+    The callback must return a floating-point number, and takes no parameters.
+    A value of 0.0 aligns the left edge of the element with the left edge of the
+    item; larger values pan right.  Call with ``nil`` as the argument to restore
+    the default horizontal scroll position handler (based on bindings in the
+    ``xscroll`` child element).
+Get item vertical scroll position
+    ``item:set_scroll_pos_y_callback(cb)``
+
+    Set callback for getting the item’s vertical scroll position.  This allows
+    the script to control which part of the element is displayed by the item.
+    Do not attempt to access the item’s ``scroll_pos_y`` property from the
+    callback, as this will result in infinite recursion.
+
+    The callback must return a floating-point number, and takes no parameters.
+    A value of 0.0 aligns the top edge of the element with the top edge of the
+    item; larger values pan down.  Call with ``nil`` as the argument to restore
+    the default vertical scroll position handler (based on bindings in the
+    ``yscroll`` child element).

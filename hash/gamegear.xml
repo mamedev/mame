@@ -8825,6 +8825,18 @@ a certain item) -->
 		</part>
 	</software>
 
+	<software name="sor2p" cloneof="sor2">
+		<description>Streets of Rage II ~ Bare Knuckle II - Shitou e no Chingonka (prototype)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<info name="alt_title" value="ベア・ナックルII 死闘への鎮魂歌"/>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="streets of rage ii [proto].bin" size="524288" crc="6c395a69" sha1="15589214eb8570c9b2bf2ede14803d08c77c29f8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="strider">
 		<description>Strider (Tw, SMS mode)</description>
 		<year>199?</year>

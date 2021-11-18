@@ -33,16 +33,13 @@ namespace ui {
 //  ctor
 //-------------------------------------------------
 
-menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings) : menu(mui, container), selected_device(nullptr)
+menu_file_manager::menu_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
+	: menu(mui, container)
+	, selected_device(nullptr)
+	, m_warnings(warnings ? warnings : "")
 {
-	// This warning string is used when accessing from the force_file_manager call, i.e.
+	// The warning string is used when accessing from the force_file_manager call, i.e.
 	// when the file manager is loaded top front in the case of mandatory image devices
-	if (warnings)
-		m_warnings.assign(warnings);
-	else
-		m_warnings.clear();
-
-	m_curr_selected = false;
 }
 
 
@@ -108,12 +105,10 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	std::string tmp_inst, tmp_name;
 
 	if (!m_warnings.empty())
-	{
 		item_append(m_warnings, FLAG_DISABLE, nullptr);
-		item_append(std::string(), FLAG_DISABLE, nullptr);
-	}
 
 	// cycle through all devices for this system
+	bool missing_mandatory = false;
 	std::unordered_set<std::string> devtags;
 	for (device_t &dev : device_enumerator(machine().root_device()))
 	{
@@ -135,12 +130,16 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 				if (strcmp(scan.device().owner()->tag(), dev.tag()) == 0)
 					if (devtags.insert(scan.device().tag()).second)
 					{
+						if (!scan.basename() && scan.must_be_loaded())
+							missing_mandatory = true;
+
 						// check whether we already had some devices with the same owner: if not, output the owner tag!
 						if (!tag_appended)
 						{
 							item_append(string_format(_("[root%1$s]"), dev.tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 							tag_appended = true;
 						}
+
 						// finally, append the image interface to the menu
 						fill_image_line(&scan, tmp_inst, tmp_name);
 						item_append(tmp_inst, tmp_name, 0, (void *)&scan);
@@ -150,8 +149,8 @@ void menu_file_manager::populate(float &customtop, float &custombottom)
 	}
 	item_append(menu_item_type::SEPARATOR);
 
-	if (m_warnings.empty() || m_curr_selected)
-		item_append(_("Reset Machine"), 0, (void *)1);
+	if (m_warnings.empty() || !missing_mandatory)
+		item_append(m_warnings.empty() ? _("Reset Machine") : _("Start Machine"), 0, (void *)1);
 
 	custombottom = ui().get_line_height() + 3.0f * ui().box_tb_border();
 }
@@ -175,7 +174,6 @@ void menu_file_manager::handle(event const *ev)
 			selected_device = (device_image_interface *) ev->itemref;
 			if (selected_device)
 			{
-				m_curr_selected = true;
 				floppy_image_device *floppy_device = dynamic_cast<floppy_image_device *>(selected_device);
 				if (floppy_device)
 					menu::stack_push<menu_control_floppy_image>(ui(), container(), *floppy_device);
@@ -192,14 +190,9 @@ void menu_file_manager::handle(event const *ev)
 // force file manager menu
 void menu_file_manager::force_file_manager(mame_ui_manager &mui, render_container &container, const char *warnings)
 {
-	// reset the menu stack
+	// drop any existing menus and start the file manager
 	menu::stack_reset(mui);
-
-	// add the quit entry followed by the game select entry
-	menu::stack_push_special_main<menu_quit_game>(mui, container);
-	menu::stack_push<menu_file_manager>(mui, container, warnings);
-
-	// force the menus on
+	menu::stack_push_special_main<menu_file_manager>(mui, container, warnings);
 	mui.show_menu();
 
 	// make sure MAME is paused

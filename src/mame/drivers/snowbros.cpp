@@ -2571,6 +2571,32 @@ ROM_START( 3in1semi ) /* SemiCom Ser-4331-4 PCB */
 	ROM_LOAD( "u78", 0x180000, 0x80000, CRC(af596afc) SHA1(875d7a51ff5c741cae4483d8da33df9cae8de52a) )
 ROM_END
 
+ROM_START( 3in1semia ) // SemiCom Ser-4331-4 PCB
+	ROM_REGION( 0x100000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "u52.bin",  0x00001, 0x40000, CRC(388334a8) SHA1(93823917682f1658a443d23ceb58eafa530d1854) )
+	ROM_LOAD16_BYTE( "u74.bin",  0x00000, 0x40000, CRC(555ae716) SHA1(9a3d7d81d7c6fb8443d263087bb7dca7bc3918b6) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 ) // Z80 Code
+	ROM_LOAD( "u35.bin", 0x00000, 0x10000 , CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 ) // Intel 87C52 MCU Code
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP )
+
+	ROM_REGION16_BE( 0x200, "user1", 0 ) // Data from Shared RAM
+	/* this is not a real rom but instead the data extracted from
+	   shared ram, the MCU puts it there */
+	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(85deba7c) SHA1(44c6d9306b4f8e47182f4740a18971c49a8df8db) )
+
+	ROM_REGION( 0x040000, "oki", 0 ) // Samples
+	ROM_LOAD( "u14.bin", 0x00000, 0x40000, CRC(c83c11be) SHA1(c05d96d61e5b8245232c85cbbcb7cc1e4e066492) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) // Sprites
+	ROM_LOAD( "u75.bin", 0x000000, 0x80000, CRC(9d705249) SHA1(99e0adca1f3f285692bf15c988b25d87f6b1dd90) )
+	ROM_LOAD( "u76.bin", 0x080000, 0x80000, CRC(b65f5d79) SHA1(a9f19cf54f5ecdeca58f853f3053a686b89fea63) )
+	ROM_LOAD( "u77.bin", 0x100000, 0x80000, CRC(b9728be9) SHA1(4ea7940f9d1d7c01cfcab92184b6513e4b0a83d7) )
+	ROM_LOAD( "u78.bin", 0x180000, 0x20000, BAD_DUMP CRC(aefad49e) SHA1(246ea713eaaa6a01290eded36377437cb7e79fa8) ) // ROM damaged (MX26C1000APC)
+ROM_END
+
 /*
 
 Ma Cheon Ru
@@ -3057,7 +3083,8 @@ GAME( 1997, pzlbreaka,  pzlbreak, semiprot,    pzlbreak, snowbros_state, init_pz
 GAME( 1997, suhosong,   0,        semiprot,    suhosong, snowbros_state, empty_init,    ROT0, "SemiCom",              "Su Ho Seong", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, twinkle,    0,        semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, twinklea,   twinkle,  semiprot,    twinkle,  snowbros_state, empty_init,    ROT0, "SemiCom / Tirano",     "Twinkle (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3in1semi,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan) (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, 3in1semia,  3in1semi, semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / XESS",       "New HyperMan (3-in-1 with Cookie & Bibi & HyperMan) (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mcheonru,   0,        semiprot,    mcheonru, snowbros_state, init_3in1semi, ROT0, "SemiCom / AceVer",     "Ma Cheon Ru", MACHINE_SUPPORTS_SAVE ) // a flyer exists for an English version called Arirang, AceVer team logo is displayed on it
 GAME( 1999, moremore,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, moremorp,   0,        semiprot,    moremore, snowbros_state, init_3in1semi, ROT0, "SemiCom / Exit",       "More More Plus", MACHINE_SUPPORTS_SAVE )

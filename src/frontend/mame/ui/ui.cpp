@@ -19,6 +19,7 @@
 #include "ui/info.h"
 #include "ui/mainmenu.h"
 #include "ui/menu.h"
+#include "ui/quitmenu.h"
 #include "ui/sliders.h"
 #include "ui/state.h"
 #include "ui/systemlist.h"
@@ -116,7 +117,6 @@ std::string mame_ui_manager::messagebox_poptext;
 
 // slider info
 std::vector<ui::menu_item> mame_ui_manager::slider_list;
-slider_state *mame_ui_manager::slider_current;
 
 
 /***************************************************************************
@@ -344,14 +344,6 @@ void mame_ui_manager::initialize(running_machine &machine)
 
 	// initialize the on-screen display system
 	slider_list = slider_init(machine);
-	if (slider_list.size() > 0)
-	{
-		slider_current = reinterpret_cast<slider_state *>(slider_list[0].ref);
-	}
-	else
-	{
-		slider_current = nullptr;
-	}
 
 	// if no test switch found, assign its input sequence to a service mode DIP
 	if (!m_machine_info->has_test_switch() && m_machine_info->has_dips())
@@ -594,7 +586,9 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 	// if we're the empty driver, force the menus on
 	if (ui::menu::stack_has_special_main_menu(*this))
+	{
 		show_menu();
+	}
 	else if (config_menu)
 	{
 		show_menu();
@@ -832,7 +826,14 @@ void mame_ui_manager::draw_text(render_container &container, std::string_view bu
 //  and full size computation
 //-------------------------------------------------
 
-void mame_ui_manager::draw_text_full(render_container &container, std::string_view origs, float x, float y, float origwrapwidth, ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, draw_mode draw, rgb_t fgcolor, rgb_t bgcolor, float *totalwidth, float *totalheight, float text_size)
+void mame_ui_manager::draw_text_full(
+		render_container &container,
+		std::string_view origs,
+		float x, float y, float origwrapwidth,
+		ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap,
+		draw_mode draw, rgb_t fgcolor, rgb_t bgcolor,
+		float *totalwidth, float *totalheight,
+		float text_size)
 {
 	// create the layout
 	auto layout = create_layout(container, origwrapwidth, justify, wrap);
@@ -841,7 +842,7 @@ void mame_ui_manager::draw_text_full(render_container &container, std::string_vi
 	layout.add_text(
 			origs,
 			fgcolor,
-			draw == OPAQUE_ ? bgcolor : rgb_t::transparent(),
+			(draw == OPAQUE_) ? bgcolor : rgb_t::transparent(),
 			text_size);
 
 	// and emit it (if we are asked to do so)
@@ -864,7 +865,7 @@ void mame_ui_manager::draw_text_full(render_container &container, std::string_vi
 void mame_ui_manager::draw_text_box(render_container &container, std::string_view text, ui::text_layout::text_justify justify, float xpos, float ypos, rgb_t backcolor)
 {
 	// cap the maximum width
-	float maximum_width = 1.0f - box_lr_border() * 2;
+	float maximum_width = 1.0f - (box_lr_border() * machine().render().ui_aspect(&container) * 2.0f);
 
 	// create a layout
 	ui::text_layout layout = create_layout(container, maximum_width, justify);
@@ -885,17 +886,18 @@ void mame_ui_manager::draw_text_box(render_container &container, std::string_vie
 void mame_ui_manager::draw_text_box(render_container &container, ui::text_layout &layout, float xpos, float ypos, rgb_t backcolor)
 {
 	// xpos and ypos are where we want to "pin" the layout, but we need to adjust for the actual size of the payload
-	auto actual_left = layout.actual_left();
-	auto actual_width = layout.actual_width();
-	auto actual_height = layout.actual_height();
-	auto x = std::clamp(xpos - actual_width / 2, box_lr_border(), 1.0f - actual_width - box_lr_border());
-	auto y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
+	auto const lrborder = box_lr_border() * machine().render().ui_aspect(&container);
+	auto const actual_left = layout.actual_left();
+	auto const actual_width = layout.actual_width();
+	auto const actual_height = layout.actual_height();
+	auto const x = std::clamp(xpos - actual_width / 2, lrborder, 1.0f - actual_width - lrborder);
+	auto const y = std::clamp(ypos - actual_height / 2, box_tb_border(), 1.0f - actual_height - box_tb_border());
 
 	// add a box around that
 	draw_outlined_box(
 			container,
-			x - box_lr_border(), y - box_tb_border(),
-			x + actual_width + box_lr_border(), y + actual_height + box_tb_border(),
+			x - lrborder, y - box_tb_border(),
+			x + actual_width + lrborder, y + actual_height + box_tb_border(),
 			backcolor);
 
 	// emit the text
@@ -1417,50 +1419,14 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 void mame_ui_manager::request_quit()
 {
 	if (!machine().options().confirm_quit())
-		machine().schedule_exit();
-	else
-		set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_confirm_quit, this));
-}
-
-
-//-------------------------------------------------
-//  handler_confirm_quit - leads the user through
-//  confirming quit emulation
-//-------------------------------------------------
-
-uint32_t mame_ui_manager::handler_confirm_quit(render_container &container)
-{
-	uint32_t state = 0;
-
-	// get the text for 'UI Select'
-	std::string ui_select_text = get_general_input_setting(IPT_UI_SELECT);
-
-	// get the text for 'UI Cancel'
-	std::string ui_cancel_text = get_general_input_setting(IPT_UI_CANCEL);
-
-	// assemble the quit message
-	std::string quit_message = string_format(
-			_("Are you sure you want to quit?\n\n"
-			"Press ''%1$s'' to quit,\n"
-			"Press ''%2$s'' to return to emulation."),
-			ui_select_text,
-			ui_cancel_text);
-
-	draw_text_box(container, quit_message, ui::text_layout::text_justify::CENTER, 0.5f, 0.5f, UI_RED_COLOR);
-	machine().pause();
-
-	// if the user press ENTER, quit the game
-	if (machine().ui_input().pressed(IPT_UI_SELECT))
-		machine().schedule_exit();
-
-	// if the user press ESC, just continue
-	else if (machine().ui_input().pressed(IPT_UI_CANCEL))
 	{
-		machine().resume();
-		state = UI_HANDLER_CANCEL;
+		machine().schedule_exit();
 	}
-
-	return state;
+	else
+	{
+		show_menu();
+		ui::menu::stack_push<ui::menu_confirm_quit>(*this, machine().render().ui_container());
+	}
 }
 
 
@@ -1630,13 +1596,9 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	std::vector<ui::menu_item> items;
 	for (auto &slider : m_sliders)
 	{
-		ui::menu_item item;
-		item.text = slider->description;
-		item.subtext = "";
-		item.flags = 0;
-		item.ref = slider.get();
-		item.type = ui::menu_item_type::SLIDER;
-		items.push_back(item);
+		ui::menu_item item(ui::menu_item_type::SLIDER, slider.get());
+		item.set_text(slider->description);
+		items.emplace_back(std::move(item));
 	}
 
 	return items;

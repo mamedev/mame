@@ -109,16 +109,16 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define MOUSE_NONE      0x00
-#define MOUSE_LEFT      0x01
-#define MOUSE_RIGHT     0x02
-#define MOUSE_DOWN      0x04
-#define MOUSE_UP        0x08
-#define MOUSE_LBUTTON   0x10
-#define MOUSE_RBUTTON   0x20
+#define MOUSE_NONE		0x00
+#define MOUSE_LEFT		0x01
+#define MOUSE_RIGHT		0x02
+#define MOUSE_DOWN		0x04
+#define MOUSE_UP		0x08
+#define MOUSE_LBUTTON	0x10
+#define MOUSE_RBUTTON	0x20
 
 // Frequency in Hz to poll for mouse movement.
-#define MOUSE_POLL_FREQUENCY    5000
+#define MOUSE_POLL_FREQUENCY	500
 
 #define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
@@ -137,8 +137,8 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 /* Debugging */
 
-#define DEBUG_SET(flags)    ((m_debug_machine & (flags))==(flags))
-#define DEBUG_SET_STATE(flags)    ((state->m_debug_machine & (flags))==(flags))
+#define DEBUG_SET(flags)  		((m_debug_machine & (flags))==(flags))
+#define DEBUG_SET_STATE(flags)  ((state->m_debug_machine & (flags))==(flags))
 
 #define DEBUG_NONE          0x0000000
 #define DECODE_BIOS         0x0000002
@@ -216,7 +216,7 @@ void rmnimbus_state::machine_reset()
 void rmnimbus_state::machine_start()
 {
 	m_nimbus_mouse.m_mouse_timer=timer_alloc(TIMER_MOUSE);
-
+	
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -228,7 +228,10 @@ void rmnimbus_state::machine_start()
 	}
 
 	m_debug_machine=DEBUG_NONE;
+	m_debug_trap=0;
+	m_voice_enabled=false;
 	m_fdc->dden_w(0);
+	//m_fdc->overide_delays(64,m_fdc->get_cmd_delay()); 
 }
 
 void rmnimbus_state::debug_command(const std::vector<std::string> &params)
@@ -254,38 +257,59 @@ static int instruction_hook(device_t &device, offs_t curpc)
 {
 	rmnimbus_state  *state = device.machine().driver_data<rmnimbus_state>();
 	address_space   &space = device.memory().space(AS_PROGRAM);
-	uint8_t           *addr_ptr;
-
+	uint8_t         *addr_ptr;
+	uint8_t			first;
+	
 	addr_ptr = (uint8_t*)space.get_read_ptr(curpc);
 
-	if ((addr_ptr !=nullptr) && (addr_ptr[0]==0xCD))
-	{
-		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[1]==0xF0))
-		{
-			if(DEBUG_SET_STATE(DECODE_BIOS_RAW))
-				state->decode_subbios(&device,curpc,1);
-			else
-				state->decode_subbios(&device,curpc,0);
-		}
+	first = (curpc & 0x01) ? 1 : 0;
 
-		if(DEBUG_SET_STATE(DECODE_DOS21) && (addr_ptr[1]==0x21))
+	if(DEBUG_SET_STATE(DECODE_BIOS) && (curpc == state->m_debug_trap) && (0 != state->m_debug_trap))
+	{
+		state->decode_subbios_return(&device,curpc);
+	}
+
+	if ((addr_ptr !=nullptr) && (addr_ptr[first]==0xCD))
+	{
+		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[first+1]==0xF0))
+			state->decode_subbios(&device,curpc);
+		
+		if(DEBUG_SET_STATE(DECODE_DOS21) && (addr_ptr[first+1]==0x21))
 			state->decode_dos21(&device,curpc);
 	}
 
 	return 0;
 }
 
+void rmnimbus_state::decode_subbios_return(device_t *device, offs_t pc)
+{
+	uint16_t  ax = m_maincpu->state_int(I8086_AX);
+	uint16_t  ds = m_maincpu->state_int(I8086_DS);
+	uint16_t  si = m_maincpu->state_int(I8086_SI);
+
+	if(!DEBUG_SET(DECODE_BIOS_RAW))
+	{
+		logerror("at %05X sub-bios return code : %04X\n",pc,ax);
+		decode_dssi_generic(ds,si);
+		logerror("=======================================================================\n");
+	}
+	else
+		logerror("%05X :: %04X\n",pc,ax);
+
+	m_debug_trap=0;
+}
+
 #define set_type(type_name)     sprintf(type_str,type_name)
 #define set_drv(drv_name)       sprintf(drv_str,drv_name)
 #define set_func(func_name)     sprintf(func_str,func_name)
 
-void rmnimbus_state::decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag)
+void rmnimbus_state::decode_subbios(device_t *device,offs_t pc)
 {
 	char    type_str[80];
 	char    drv_str[80];
 	char    func_str[80];
 
-	void (rmnimbus_state::*dump_dssi)(uint16_t, uint16_t, uint8_t) = &rmnimbus_state::decode_dssi_none;
+	void (rmnimbus_state::*dump_dssi)(uint16_t, uint16_t) = &rmnimbus_state::decode_dssi_none;
 
 	uint16_t  ax = m_maincpu->state_int(I8086_AX);
 	uint16_t  bx = m_maincpu->state_int(I8086_BX);
@@ -293,12 +317,15 @@ void rmnimbus_state::decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag
 	uint16_t  ds = m_maincpu->state_int(I8086_DS);
 	uint16_t  si = m_maincpu->state_int(I8086_SI);
 
+	// Set the address to trap after the sub-bios call.
+	m_debug_trap=pc+2;
+
 	// *** TEMP Don't show f_enquire_display_line calls !
 	if((cx==6) && (ax==43))
 		return;
 	// *** END TEMP
 
-	if(!raw_flag)
+	if(!DEBUG_SET(DECODE_BIOS_RAW))
 	{
 		logerror("=======================================================================\n");
 		logerror("Sub-bios call at %08X, AX=%04X, BX=%04X, CX=%04X, DS:SI=%04X:%04X\n",pc,ax,bx,cx,ds,si);
@@ -360,6 +387,8 @@ void rmnimbus_state::decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag
 				case 4  : set_drv("d_eeprom"); break;
 			}
 
+			dump_dssi = &rmnimbus_state::decode_dssi_generic;
+
 			switch(ax)
 			{
 				case 0  : set_func("f_get_version_number"); break;
@@ -368,12 +397,11 @@ void rmnimbus_state::decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag
 				case 3  : set_func("f_get_device_status"); break;
 				case 4  : set_func("f_read_n_sectors"); dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors; break;
 				case 5  : set_func("f_write_n_sectors"); dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors; break;
-				case 6  : set_func("f_verify_n_sectors"); break;
+				case 6  : set_func("f_verify_n_sectors"); dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors; break;
 				case 7  : set_func("f_media_check"); break;
 				case 8  : set_func("f_recalibrate"); break;
 				case 9  : set_func("f_motors_off"); break;
 			}
-			dump_dssi = &rmnimbus_state::decode_dssi_f_rw_sectors;
 
 		}; break;
 
@@ -602,43 +630,42 @@ void rmnimbus_state::decode_subbios(device_t *device,offs_t pc, uint8_t raw_flag
 		}; break;
 	}
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 	{
-		(this->*dump_dssi)(ds, si, raw_flag);
+		(this->*dump_dssi)(ds, si);
 	}
 	else
 	{
 		logerror("Type=%s, Driver=%s, Function=%s\n",type_str,drv_str,func_str);
 
-		(this->*dump_dssi)(ds, si, raw_flag);
+		(this->*dump_dssi)(ds, si);
 		logerror("=======================================================================\n");
 	}
 }
 
-static inline void *get_dssi_ptr(address_space &space, uint16_t   ds, uint16_t si)
+static inline void *get_regpair_ptr(address_space &space, uint16_t   segment, uint16_t offset)
 {
 	int             addr;
 
-	addr=((ds<<4)+si);
-//    OUTPUT_SEGOFS("DS:SI",ds,si);
+	addr=((segment<<4)+offset);
 
 	return space.get_read_ptr(addr);
 }
 
-void rmnimbus_state::decode_dssi_none(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_none(uint16_t ds, uint16_t si)
 {
 }
 
-void rmnimbus_state::decode_dssi_generic(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_generic(uint16_t ds, uint16_t si)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t  *params;
 	int     count;
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 		return;
 
-	params=(uint16_t  *)get_dssi_ptr(space,ds,si);
+	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
 
 	for(count=0; count<10; count++)
 		logerror("%04X ",params[count]);
@@ -647,7 +674,7 @@ void rmnimbus_state::decode_dssi_generic(uint16_t ds, uint16_t si, uint8_t raw_f
 }
 
 
-void rmnimbus_state::decode_dssi_f_fill_area(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_f_fill_area(uint16_t ds, uint16_t si)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -656,14 +683,14 @@ void rmnimbus_state::decode_dssi_f_fill_area(uint16_t ds, uint16_t si, uint8_t r
 	t_nimbus_brush  *brush;
 	int             cocount;
 
-	area_params = (t_area_params   *)get_dssi_ptr(space,ds,si);
+	area_params = (t_area_params   *)get_regpair_ptr(space,ds,si);
 
-	if (!raw_flag)
+	if (!DEBUG_SET(DECODE_BIOS_RAW))
 		OUTPUT_SEGOFS("SegBrush:OfsBrush",area_params->seg_brush,area_params->ofs_brush);
 
 	brush=(t_nimbus_brush  *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_brush,area_params->ofs_brush));
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 	{
 		logerror("\tdw\t%04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, %04X, ",
 					brush->style,brush->style_index,brush->colour1,brush->colour2,
@@ -685,7 +712,7 @@ void rmnimbus_state::decode_dssi_f_fill_area(uint16_t ds, uint16_t si, uint8_t r
 	addr_ptr = (uint16_t *)space.get_read_ptr(LINEAR_ADDR(area_params->seg_data,area_params->ofs_data));
 	for(cocount=0; cocount < area_params->count; cocount++)
 	{
-		if(raw_flag)
+		if(DEBUG_SET(DECODE_BIOS_RAW))
 		{
 			if(cocount!=(area_params->count-1))
 				logerror("%04X, %04X, ",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
@@ -696,11 +723,11 @@ void rmnimbus_state::decode_dssi_f_fill_area(uint16_t ds, uint16_t si, uint8_t r
 			logerror("x=%d y=%d\n",addr_ptr[cocount*2],addr_ptr[(cocount*2)+1]);
 	}
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 		logerror("\n");
 }
 
-void rmnimbus_state::decode_dssi_f_plot_character_string(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_f_plot_character_string(uint16_t ds, uint16_t si)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -708,10 +735,10 @@ void rmnimbus_state::decode_dssi_f_plot_character_string(uint16_t ds, uint16_t s
 	t_plot_string_params    *plot_string_params;
 	int                     charno;
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 		return;
 
-	plot_string_params=(t_plot_string_params   *)get_dssi_ptr(space,ds,si);
+	plot_string_params=(t_plot_string_params   *)get_regpair_ptr(space,ds,si);
 
 	OUTPUT_SEGOFS("SegFont:OfsFont",plot_string_params->seg_font,plot_string_params->ofs_font);
 	OUTPUT_SEGOFS("SegData:OfsData",plot_string_params->seg_data,plot_string_params->ofs_data);
@@ -729,14 +756,14 @@ void rmnimbus_state::decode_dssi_f_plot_character_string(uint16_t ds, uint16_t s
 	logerror("\n");
 }
 
-void rmnimbus_state::decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t  *new_colours;
 	int     colour;
-	new_colours=(uint16_t  *)get_dssi_ptr(space,ds,si);
+	new_colours=(uint16_t  *)get_regpair_ptr(space,ds,si);
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 		return;
 
 	OUTPUT_SEGOFS("SegColours:OfsColours",ds,si);
@@ -746,13 +773,13 @@ void rmnimbus_state::decode_dssi_f_set_new_clt(uint16_t ds, uint16_t si, uint8_t
 
 }
 
-void rmnimbus_state::decode_dssi_f_plonk_char(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_f_plonk_char(uint16_t ds, uint16_t si)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t  *params;
-	params=(uint16_t  *)get_dssi_ptr(space,ds,si);
+	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 		return;
 
 	OUTPUT_SEGOFS("SegParams:OfsParams",ds,si);
@@ -760,17 +787,25 @@ void rmnimbus_state::decode_dssi_f_plonk_char(uint16_t ds, uint16_t si, uint8_t 
 	logerror("plonked_char=%c\n",params[0]);
 }
 
-void rmnimbus_state::decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si, uint8_t raw_flag)
+void rmnimbus_state::decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t  *params;
 	int     param_no;
 
-	if(raw_flag)
+	if(DEBUG_SET(DECODE_BIOS_RAW))
 		return;
 
-	params=(uint16_t  *)get_dssi_ptr(space,ds,si);
+	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
 
+	logerror("unitno=%04X, count=%02X, first_sector=%08X buffer=%04X:%04X (%05X)\n",
+		     params[0],
+			 params[1],
+			 ((params[3] * 65536)+params[2]),
+			 params[5],params[4],
+			 ((params[5]*16)+params[4])
+			 );
+ 
 	for(param_no=0;param_no<16;param_no++)
 		logerror("%04X ",params[param_no]);
 
@@ -779,6 +814,10 @@ void rmnimbus_state::decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si, uint8_t 
 
 void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	//uint16_t  *params;
+	char	*path;
+	
 	uint16_t  ax = m_maincpu->state_int(I8086_AX);
 	uint16_t  bx = m_maincpu->state_int(I8086_BX);
 	uint16_t  cx = m_maincpu->state_int(I8086_CX);
@@ -791,6 +830,8 @@ void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 	uint16_t  si = m_maincpu->state_int(I8086_SI);
 	uint16_t  di = m_maincpu->state_int(I8086_DI);
 	uint16_t  bp = m_maincpu->state_int(I8086_BP);
+	
+	uint8_t	dosfn = ax >> 8;	// Dos function is AH, upper half of AX.
 
 	logerror("=======================================================================\n");
 	logerror("DOS Int 0x21 call at %05X\n",pc);
@@ -798,8 +839,71 @@ void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
 	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
 	logerror("=======================================================================\n");
+	
+	if (((dosfn >= 0x39)  && (dosfn <= 0x3d)) 
+		|| (0x43 == dosfn) 
+		|| (0x4e == dosfn) 
+		|| (0x56 == dosfn)
+	    || ((dosfn >= 0x5a) && (dosfn <= 0x5b)) )
+	{
+		path=(char *)get_regpair_ptr(space,ds,dx);
+		logerror("Path at DS:DX=%s\n",path);
+		
+		if (0x56 == dosfn)
+		{
+			path=(char *)get_regpair_ptr(space,es,di);
+			logerror("Path at ES:DI=%s\n",path);
+		}
+		logerror("=======================================================================\n");
+	}
 }
 
+#define CBUFLEN	32
+
+offs_t rmnimbus_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
+{
+	unsigned call;
+	char	callname[CBUFLEN];
+	offs_t result = 0;
+
+	// decode and document (some) INT XX calls
+	if (opcodes.r8(pc) == 0xCD)
+	{
+		call = opcodes.r8(pc+1);
+		switch (call) 
+		{
+			case 0x20 :
+				strcpy(callname, "(dos terminate)"); 
+				break;
+				
+			case 0x21 :
+				strcpy(callname, "(dos function)"); 
+				break;
+				
+			case 0xf0 :
+				strcpy(callname, "(sub_bios)"); 
+				break;
+				
+			case 0xf3 :
+				strcpy(callname, "(dispatch handler)"); 
+				break;
+				
+			case 0xf5 :
+				strcpy(callname, "(event handler)"); 
+				break;
+
+			case 0xf6 :
+				strcpy(callname, "(resource message)"); 
+				break;
+				
+			default :
+				strcpy(callname, "");
+		}
+		util::stream_format(stream, "int   %02xh %s",call,callname);
+		result = 2;
+	}
+	return result;
+}
 
 /*
     The Nimbus has 3 banks of memory each of which can be either 16x4164 or 16x41256 giving
@@ -1021,6 +1125,11 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_fdc_drq_w)
 	m_maincpu->drq1_w(state && FDC_DRQ_ENABLED());
 }
 
+READ_LINE_MEMBER(rmnimbus_state::nimbus_fdc_enmf_r)
+{
+	return false;
+}
+
 uint8_t rmnimbus_state::fdc_driveno(uint8_t drivesel)
 {
 	switch (drivesel)
@@ -1073,7 +1182,7 @@ uint8_t rmnimbus_state::scsi_r(offs_t offset)
 			{
 				result |= FDC_MOTOR() << 2;
 				result |= (!floppy->idx_r()) << 1;
-				result |= floppy->ready_r() << 0;
+				result |= (floppy->dskchg_r()) << 0;
 			}
 			break;
 		case 0x08 :
@@ -1107,7 +1216,7 @@ void rmnimbus_state::fdc_ctl_w(uint8_t data)
 	uint8_t old_drq = m_nimbus_drives.reg400 & HDC_DRQ_MASK;
 	char drive[5];
 	floppy_image_device *floppy;
-
+	
 	m_nimbus_drives.reg400 = data;
 
 	sprintf(drive, "%d", FDC_DRIVE());
@@ -1163,14 +1272,14 @@ void rmnimbus_state::hdc_reset()
 	m_scsi_req = 0;
 
 	// Latched req, IC11b
-	m_scsi_reqlat = 0;
+	m_scsi_reqlat = 0; 
 }
 
-/*
-    The SCSI code outputs a 1 to indicate an active line, even though it is active low
-    The inputs on the RM schematic are fed through inverters, but because of the above
-    we don't need to invert them, unless the schematic uses the signal directly
-    For consistency we will invert msg before latching.
+/* 
+	The SCSI code outputs a 1 to indicate an active line, even though it is active low
+	The inputs on the RM schematic are fed through inverters, but because of the above
+	we don't need to invert them, unless the schematic uses the signal directly
+	For consistency we will invert msg before latching.
 */
 
 void rmnimbus_state::check_scsi_irq()
@@ -1185,13 +1294,13 @@ WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 }
 
 // This emulates the 74LS74 latched version of req
-void rmnimbus_state::set_scsi_drqlat(bool   clock, bool clear)
-{
+void rmnimbus_state::set_scsi_drqlat(bool	clock, bool clear)
+{ 
 	if (clear)
 		m_scsi_reqlat = 0;
 	else if (clock)
 		m_scsi_reqlat = 1;
-
+		
 	if(m_scsi_reqlat)
 		hdc_drq(true);
 	else
@@ -1202,9 +1311,9 @@ void rmnimbus_state::hdc_post_rw()
 {
 	if(m_scsi_req)
 		m_scsibus->write_ack(1);
-
+		
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
-	set_scsi_drqlat(false, true);
+	set_scsi_drqlat(false, true);		
 }
 
 void rmnimbus_state::hdc_drq(bool state)
@@ -1220,10 +1329,10 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 {
 	m_scsi_cd = state;
-
+	
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
 	set_scsi_drqlat(false, !m_scsi_cd);
-
+	
 	check_scsi_irq();
 }
 
@@ -1247,17 +1356,25 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 {
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
-
+	
 	// This is the state of the actual line from the SCSI
 	m_scsi_req = state;
-
+	
 	// Latched req, is forced low by C/D being set to command
 	set_scsi_drqlat(rising, m_scsi_cd);
-
+	
 	if (!m_scsi_reqlat)
 		m_scsibus->write_ack(0);
-
+	
 	check_scsi_irq();
+}
+
+void rmnimbus_state::nimbus_voice_w(offs_t offset, uint8_t data)
+{
+	if (offset == 0xB0) 
+		m_voice_enabled = true;
+	else if (offset == 0xB2)
+		m_voice_enabled = false;
 }
 
 /* 8031/8051 Peripheral controller 80186 side */
@@ -1485,6 +1602,20 @@ void rmnimbus_state::iou_reset()
 	m_eeprom_state = 0;
 }
 
+/* Rompacks, not completely implemented */
+
+uint8_t rmnimbus_state::nimbus_rompack_r(offs_t offset)
+{
+	logerror("Rompack read offset %02X, rompack address=%04X\n",offset,(m_ay8910_b*256)+m_ay8910_a);
+	
+	return 0;
+}
+
+void rmnimbus_state::nimbus_rompack_w(offs_t offset, uint8_t data)
+{
+	logerror("Rompack write offset %02X, data=%02X, rompack address=%04X\n",offset,data,(m_ay8910_b*256)+m_ay8910_a);
+}
+
 /*
     Sound hardware : AY8910
 
@@ -1507,6 +1638,7 @@ void rmnimbus_state::rmni_sound_reset()
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;
+	m_ay8910_b=0;
 }
 
 void rmnimbus_state::nimbus_sound_ay8910_porta_w(uint8_t data)
@@ -1514,16 +1646,21 @@ void rmnimbus_state::nimbus_sound_ay8910_porta_w(uint8_t data)
 	m_msm->data_w(data);
 
 	// Mouse code needs a copy of this.
+	// ROMpack lower address lines
 	m_ay8910_a=data;
 }
 
 void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 {
-	if ((data & 0x07) != m_last_playmode)
+	// Only update msm5205 if voice is enabled.....
+	if (m_voice_enabled  && ((data & 0x07) != m_last_playmode))
 	{
 		m_last_playmode = (data & 0x07);
 		m_msm->playmode_w(m_last_playmode);
 	}
+	
+	// ROMpack upper address lines
+	m_ay8910_b=data;
 }
 
 WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
@@ -1532,60 +1669,54 @@ WRITE_LINE_MEMBER(rmnimbus_state::nimbus_msm5205_vck)
 		external_int(EXTERNAL_INT_MSM5205,state);
 }
 
+void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case TIMER_MOUSE	: do_mouse(); break;
+	}
+}
+
 static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
 static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
-void rmnimbus_state::mouse_js_reset()
+void rmnimbus_state::do_mouse()
 {
-	m_nimbus_mouse.m_mouse_x=128;
-	m_nimbus_mouse.m_mouse_y=128;
-	m_nimbus_mouse.m_mouse_pcx=0;
-	m_nimbus_mouse.m_mouse_pcy=0;
-	m_nimbus_mouse.m_intstate_x=0;
-	m_nimbus_mouse.m_intstate_y=0;
-	m_nimbus_mouse.m_reg0a4=0xC0;
-
-	// Setup timer to poll the mouse
-	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
-}
-
-void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	int   mouse_x   = 0;    // Current mouse X and Y
-	int   mouse_y   = 0;
-	int   xdiff     = 0;    // Difference from previous X and Y
-	int   ydiff     = 0;
-
-	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
-	uint8_t intstate_y;
-	int     xint;           // X and Y interrupts to trigger
+	int   mouse_x 	= 0;	// Current mouse X and Y
+	int   mouse_y 	= 0;
+	int   xdiff 	= 0;	// Difference from previous X and Y
+	int   ydiff 	= 0;
+	
+	uint8_t	intstate_x;		// Used to calculate if we should trigger interrupt
+	uint8_t	intstate_y;
+	int     xint;			// X and Y interrupts to trigger
 	int     yint;
 
-	uint8_t   mxa;          // Values of quadrature encoders for X and Y
+	uint8_t   mxa;			// Values of quadrature encoders for X and Y
 	uint8_t   mxb;
 	uint8_t   mya;
 	uint8_t   myb;
 
 	// Read mouse buttons
 	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
-
+	
 	// Read mose positions and calculate difference from previous value
 	mouse_x = m_io_mousex->read();
 	mouse_y = m_io_mousey->read();
 
 	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
 	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
-
+	
 	// check and compensate for wrap.....
-	if (xdiff > 0x80)
+	if (xdiff > 0x80) 
 		xdiff -= 0x100;
 	else if (xdiff < -0x80)
 		xdiff += 0x100;
 
-	if (ydiff > 0x80)
+	if (ydiff > 0x80) 
 		ydiff -= 0x100;
 	else if (ydiff < -0x80)
-		ydiff += 0x100;
+		ydiff += 0x100;	
 
 	// convert movement into emulated movement of quadrature encoder in mouse.
 	if (xdiff < 0)
@@ -1597,7 +1728,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nimbus_mouse.m_mouse_pcy++;
 	else if (ydiff > 0)
 		m_nimbus_mouse.m_mouse_pcy--;
-
+	
 	// Compensate for quadrature wrap.
 	m_nimbus_mouse.m_mouse_pcx &= 0x03;
 	m_nimbus_mouse.m_mouse_pcy &= 0x03;
@@ -1646,6 +1777,20 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	// and interrupt state
 	m_nimbus_mouse.m_intstate_x=intstate_x;
 	m_nimbus_mouse.m_intstate_y=intstate_y;
+}
+
+void rmnimbus_state::mouse_js_reset()
+{
+	m_nimbus_mouse.m_mouse_x=128;
+	m_nimbus_mouse.m_mouse_y=128;
+	m_nimbus_mouse.m_mouse_pcx=0;
+	m_nimbus_mouse.m_mouse_pcy=0;
+	m_nimbus_mouse.m_intstate_x=0;
+	m_nimbus_mouse.m_intstate_y=0;
+	m_nimbus_mouse.m_reg0a4=0xC0;
+
+	// Setup timer to poll the mouse
+	m_nimbus_mouse.m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(MOUSE_POLL_FREQUENCY));
 }
 
 uint8_t rmnimbus_state::nimbus_mouse_js_r()

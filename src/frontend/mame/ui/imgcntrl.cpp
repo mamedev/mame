@@ -164,6 +164,7 @@ void menu_control_device_image::load_software_part()
 	{
 		machine().popmessage(_("The software selected is missing one or more required ROM or CHD images.\nPlease acquire the correct files or select a different one."));
 		m_state = SELECT_SOFTLIST;
+		menu_activated();
 	}
 }
 
@@ -229,17 +230,22 @@ void menu_control_device_image::menu_activated()
 		if (!m_sld)
 		{
 			stack_pop();
-			break;
 		}
-		m_software_info_name.clear();
-		menu::stack_push_special_main<menu_software_list>(ui(), container(), m_sld, m_image.image_interface(), m_software_info_name);
-		m_state = SELECT_PARTLIST;
+		else
+		{
+			m_software_info_name.clear();
+			menu::stack_push<menu_software_list>(ui(), container(), m_sld, m_image.image_interface(), m_software_info_name);
+			m_state = SELECT_PARTLIST;
+		}
 		break;
 
 	case SELECT_PARTLIST:
 		m_swi = m_sld->find(m_software_info_name);
 		if (!m_swi)
+		{
 			m_state = START_SOFTLIST;
+			menu_activated();
+		}
 		else if (m_swi->has_multiple_parts(m_image.image_interface()))
 		{
 			m_submenu_result.swparts = menu_software_parts::result::INVALID;
@@ -263,6 +269,7 @@ void menu_control_device_image::menu_activated()
 
 		default: // return to list
 			m_state = SELECT_SOFTLIST;
+			menu_activated();
 			break;
 		}
 		break;

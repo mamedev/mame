@@ -34,7 +34,7 @@ function timecode.startplugin()
 
 
 	local function get_settings_path()
-		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/timecode/'
+		return emu.subst_env(manager.machine.options.entries.homepath:value():match('([^;]+)')) .. '/timecode'
 	end
 
 
@@ -50,7 +50,7 @@ function timecode.startplugin()
 		set_default_hotkey()
 
 		-- try to open configuration file
-		local cfgname = get_settings_path() .. 'plugin.cfg'
+		local cfgname = get_settings_path() .. '/plugin.cfg'
 		local cfgfile = io.open(cfgname, 'r')
 		if not cfgfile then
 			return -- probably harmless, configuration just doesn't exist yet
@@ -97,7 +97,7 @@ function timecode.startplugin()
 			settings.hotkey = hotkey_cfg
 		end
 		local data = json.stringify(settings, { indent = true })
-		local cfgname = path .. 'plugin.cfg'
+		local cfgname = path .. '/plugin.cfg'
 		local cfgfile = io.open(cfgname, 'w')
 		if not cfgfile then
 			emu.print_error(string.format('Error saving timecode recorder settings: error opening file "%s" for writing', cfgname))

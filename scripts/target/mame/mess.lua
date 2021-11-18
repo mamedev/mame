@@ -304,7 +304,7 @@ SOUNDS["VRC6"] = true
 --SOUNDS["AC97"] = true
 --SOUNDS["ES1373"] = true
 SOUNDS["L7A1045"] = true
---SOUNDS["AD1848"] = true
+SOUNDS["AD1848"] = true
 SOUNDS["UPD1771"] = true
 SOUNDS["GB_SOUND"] = true
 SOUNDS["PCD3311"] = true
@@ -460,7 +460,9 @@ MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
 MACHINES["8530SCC"] = true
 MACHINES["ACIA6850"] = true
+MACHINES["ACORN_BMU"] = true
 MACHINES["ACORN_IOC"] = true
+MACHINES["ACORN_LC"] = true
 MACHINES["ACORN_MEMC"] = true
 MACHINES["ACORN_VIDC"] = true
 MACHINES["ADC0804"] = true
@@ -730,6 +732,8 @@ MACHINES["TTL74543"] = true
 MACHINES["TTL7474"] = true
 MACHINES["TUBE"] = true
 MACHINES["UCB1200"] = true
+MACHINES["UPC82C710"] = true
+MACHINES["UPC82C711"] = true
 MACHINES["UPD1990A"] = true
 MACHINES["UPD4991A"] = true
 --MACHINES["UPD4992"] = true
@@ -844,6 +848,8 @@ BUSES["APRICOT_KEYBOARD"] = true
 BUSES["APRICOT_VIDEO"] = true
 BUSES["AQUARIUS"] = true
 BUSES["ARCADIA"] = true
+BUSES["ARCHIMEDES_ECONET"] = true
+BUSES["ARCHIMEDES_PODULE"] = true
 BUSES["ASTROCADE"] = true
 BUSES["ATA"] = true
 BUSES["BBC_1MHZBUS"] = true
@@ -3048,6 +3054,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mekd5.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme147.cpp",
 	MAME_DIR .. "src/mame/drivers/mvme162.cpp",
+	MAME_DIR .. "src/mame/drivers/sys1121.cpp",
 	MAME_DIR .. "src/mame/drivers/uchroma68.cpp",
 }
 

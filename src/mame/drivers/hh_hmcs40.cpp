@@ -93,6 +93,8 @@ known chips:
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+============================================================================
+
 ROM source notes when dumped from another publisher, but confident it's the same:
 - gckong: CGL Super Kong
 - ghalien: CGL Earth Invaders
@@ -114,6 +116,7 @@ TODO:
   eg. cgalaxn when a ship explodes.
 - bzaxxon 3D effect is difficult to simulate
 - improve/redo SVGs of: bzaxxon, bbtime
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 

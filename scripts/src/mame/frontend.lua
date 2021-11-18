@@ -143,6 +143,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/optsmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/pluginopt.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/pluginopt.h",
+	MAME_DIR .. "src/frontend/mame/ui/quitmenu.cpp",
+	MAME_DIR .. "src/frontend/mame/ui/quitmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/selector.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/selector.h",
 	MAME_DIR .. "src/frontend/mame/ui/selgame.cpp",

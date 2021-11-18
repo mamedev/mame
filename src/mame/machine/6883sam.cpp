@@ -149,6 +149,8 @@ void sam6883_device::device_start()
 
 	// save state support
 	save_item(NAME(m_sam_state));
+	save_item(NAME(m_divider));
+	save_item(NAME(m_counter_mask));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_counter_xdiv));
 	save_item(NAME(m_counter_ydiv));

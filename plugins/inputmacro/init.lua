@@ -15,11 +15,14 @@ function inputmacro.startplugin()
 	  Configuration data:
 	  * name: display name (string)
 	  * binding: activation sequence (input sequence)
+	  * bindingcfg: activation sequence configuration (string)
 	  * earlycancel: cancel or complete on release (Boolean)
-	  * loop: -1 = release, 0 = prolong, >0 = loop to step on hold (int)
+	  * loop: -1 = release, 0 = prolong, >0 = loop to step on hold (integer)
 	  * steps:
 	    * inputs:
-	      * port: port (I/O port)
+	      * port: port tag (string)
+	      * mask: port field mask (integer)
+	      * type: port field type (integer)
 	      * field: field (I/O port field)
 	    * delay: delay before activating inputs in frames (integer)
 	    * duration: duration to activate inputs for (integer)
@@ -30,18 +33,19 @@ function inputmacro.startplugin()
 	]]
 	local macros = { }
 	local active_inputs = { }
-	local shortname
 	local menu
 	local input
 
 	local function activate_inputs(inputs)
 		for index, input in ipairs(inputs) do
-			active_inputs[string.format('%s.%d.%d', input.port.tag, input.field.mask, input.field.type)] = input.field
+			if input.field then
+				active_inputs[string.format('%s.%d.%d', input.port, input.mask, input.type)] = input.field
+			end
 		end
 	end
 
 	local function process_frame()
-		previous_inputs = active_inputs
+		local previous_inputs = active_inputs
 		active_inputs = { }
 
 		for index, macro in ipairs(macros) do
@@ -100,16 +104,17 @@ function inputmacro.startplugin()
 
 	local function start()
 		input = manager.machine.input
-		if shortname ~= emu.romname() then
-			local persister = require('inputmacro/inputmacro_persist')
-			macros = persister.load_settings()
-			shortname = emu.romname()
-		end
+		local persister = require('inputmacro/inputmacro_persist')
+		macros = persister.load_settings()
 	end
 
 	local function stop()
 		local persister = require('inputmacro/inputmacro_persist')
 		persister:save_settings(macros)
+
+		macros = { }
+		active_inputs = { }
+		menu = nil
 	end
 
 	local function menu_callback(index, event)
@@ -124,8 +129,8 @@ function inputmacro.startplugin()
 		return menu:populate()
 	end
 
-	emu.register_frame_done(process_frame)
-	emu.register_start(start)
+	emu.register_frame(process_frame)
+	emu.register_prestart(start)
 	emu.register_stop(stop)
 	emu.register_menu(menu_callback, menu_populate, _p('plugin-inputmacro', 'Input Macros'))
 end

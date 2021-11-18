@@ -22,7 +22,7 @@
 
 namespace ui {
 
-class menu_load_save_state_base : public menu
+class menu_load_save_state_base : public autopause_menu<>
 {
 public:
 	virtual ~menu_load_save_state_base() override;
@@ -73,9 +73,6 @@ private:
 	std::string                                     m_confirm_prompt;
 	file_entry const *                              m_confirm_delete;
 	bool const                                      m_must_exist;
-	bool const                                      m_one_shot;
-	bool                                            m_first_time;
-	bool                                            m_was_paused;
 	bool                                            m_keys_released;
 
 	static void *itemref_from_file_entry(const file_entry &entry);

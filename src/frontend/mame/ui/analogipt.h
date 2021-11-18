@@ -28,6 +28,7 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_activated() override;
 
 private:
 	enum
@@ -45,9 +46,9 @@ private:
 
 		std::reference_wrapper<ioport_field> field;
 		int type;
+		int defvalue;
 		int min, max;
 		int cur;
-		int defvalue;
 	};
 
 	struct field_data
@@ -69,6 +70,8 @@ private:
 	virtual void handle(event const *ev) override;
 
 	void find_fields();
+
+	static std::string item_text(int type, int value);
 
 	item_data_vector m_item_data;
 	field_data_vector m_field_data;

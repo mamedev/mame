@@ -3,7 +3,7 @@
 <!--
 license:CC0
 -->
-<softwarelist name="amiga_hdd" description="Amiga hard disk images">
+<softwarelist name="amiga_hdd" description="Commodore Amiga hard disk images">
 	<!--
 	Unless otherwise specified, all images are based on default installs of the
 	corresponding amiga_workbench sets.

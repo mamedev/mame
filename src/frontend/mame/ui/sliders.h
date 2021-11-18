@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
 /***************************************************************************
 
-    ui/miscmenu.h
+    ui/sliders.h
 
     Internal MAME menus for the user interface.
 
@@ -26,6 +26,8 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_activated() override;
+	virtual void menu_deactivated() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;

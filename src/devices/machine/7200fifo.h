@@ -88,6 +88,7 @@ protected:
 private:
 	void fifo_write(uint16_t data);
 	uint16_t fifo_read();
+	int fifo_used();
 
 	std::vector<uint16_t> m_buffer;
 	const int m_ram_size;

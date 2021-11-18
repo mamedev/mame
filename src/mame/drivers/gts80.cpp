@@ -82,7 +82,7 @@ private:
 	u8 m_lamprow = 0;
 	u8 m_swrow = 0;
 	u8 m_soundex = 0;
-	u8 m_sol_state[9][2];
+	u8 m_sol_state[9][2]{};
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m6502_device> m_maincpu;

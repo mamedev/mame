@@ -210,8 +210,8 @@ input or a combination of inputs for a logical **and** operation:
   the **and** operation.  Pressing the same key or button or moving the same
   analog control additional times toggles the **not** on and off.
 * Pressing **UI Cancel** (**Escape** by default) *before* activating any other
-  inputs clears the setting or restores the default assignment.
-* Pressing **UI Cancel** *after* activating another input leaves the setting
+  controls clears the setting or restores the default assignment.
+* Pressing **UI Cancel** *after* activating another control leaves the setting
   unchanged.
 * The new setting is shown below the menu.  Wait one second after activating an
   input to accept the new setting.
@@ -222,8 +222,9 @@ Kbd 1
     Press the **1** key on the keyboard once, then wait one second to accept the
     setting.
 Kbd F12 Kbd Shift Keyboard Alt
-    Press the **P** key on the keyboard once, press the left **Shift** key once,
-    press the left **Alt** key once, then wait one second to accept the setting.
+    Press the **F12** key on the keyboard once, press the left **Shift** key
+    once, press the left **Alt** key once, then wait one second to accept the
+    setting.
 Kbd P not Kbd Shift not Kbd Right Shift
     Press the **P** key on the keyboard once, press the left **Shift** key
     twice, press the right **Shift** key twice, then wait one second to accept
@@ -267,6 +268,78 @@ axis of the left analog stick on your controller, you *should not* assign either
 the **Steering Wheel Analog Inc** or **Steering Wheel Analog Dec** setting to
 the X axis of the same analog stick.
 
+You can assign one or more analog axes to the axis setting for an emulated
+analog input.  When multiple axes are assigned to an axis setting, they will be
+added together, but absolute position controls will override relative position
+controls.  For example suppose for Arkanoid you assign the **Dial Analog** axis
+setting to **Mouse X or Joy 1 LSX or Joy 1 RSX** on a mouse Xbox-style
+controller.  You will be able to control the paddle with the mouse or either
+analog stick, but the mouse will only take effect if both analog sticks are in
+the neutral position (centred) on the X axis.  If either analog stick is *not*
+centred on the X axis, the mouse will have no effect, because a mouse is a
+relative position control while a joystick is an absolute position control.
+
+For absolute position controls like joysticks and pedals, MAME allows you to
+assign either the full range of an axis or the range on one side of the neutral
+position (a *half axis*) to an axis setting.  Assigning a half axis is usually
+used for pedals or other absolute inputs where the neutral position is at one
+end of the input range.  For example suppose for **Ridge Racer** you assign the
+**Brake Pedal Analog** setting to the portion of a vertical joystick axis below
+the neutral position.  If the joystick is at or above the neutral position
+vertically, the brake pedal will be released; if the joystick is below the
+neutral position vertically, the brake pedal will be applied proportionally.
+Half axes are displayed as the name of the axis followed by a plus or minus sign
+(**+** or **-**).  Plus refers to the portion of the axis below or to the right
+of the neutral position; minus refers to the portion of the axis above or to the
+left of the neutral position.  For pedal or analog trigger controls, the active
+range is treated as being above the neutral position (the half axis indicated by
+a minus sign).
+
+When keys or buttons are assigned to an axis setting, they conditionally enable
+analog controls assigned to the setting.  This can be used in conjunction with
+an absolute position control to create a “sticky” control.
+
+Here are some examples of some possible axis setting assignments, assuming an
+Xbox-style controller and a mouse are used:
+
+Joy 1 RSY
+    Use vertical movement of the right analog stick to control the emulated
+    input.
+Mouse X or Joy 1 LT or Joy 1 RT Reverse
+    Use horizontal mouse movement, or the left and right triggers to control the
+    emulated input.  The right trigger is reversed so it acts in the opposite
+    direction to the left trigger.
+Joy 1 LB Joy 1 LSX
+    Use horizontal movement of the left analog stick to control the emulated
+    input, but *only* while holding the left shoulder button.  If the right
+    shoulder button is released while the left analog stick is not centred
+    horizontally, the emulated input will hold its value until the right
+    shoulder button is pressed again (a “sticky” control).
+not Joy 1 RB Joy 1 RSX or Joy 1 RB Joy 1 RSX Reverse
+    Use horizontal movement of the right analog stick to control the emulated
+    input, but invert the control if the right shoulder button is held.
+
+When you select an axis setting, MAME will wait for you to enter an input:
+
+* Move an analog control to assign it to the axis setting.
+* Press a key or button (or a combination of keys or buttons) *before* moving an
+  analog control to conditionally enable the analog control.
+* When appending to a setting, if the last assigned control is an absolute
+  position control, move the same control again to cycle between the full range
+  of the axis, the portion of the axis on either side of the neutral position,
+  and the full range of the axis reversed.
+* When appending to a setting, if the last assigned control is a relative
+  position control, move the same control again to toggle reversing the
+  direction of the control on or off.
+* When appending to a setting, move an analog control other than the last
+  assigned control or press a key or button to add an **or** operation.
+* Pressing **UI Cancel** (**Escape** by default) *before* activating any other
+  controls clears the setting or restores the default assignment.
+* Pressing **UI Cancel** *after* activating another control leaves the setting
+  unchanged.
+* The new setting is shown below the menu.  Wait one second after moving an
+  analog control to accept the new setting.
+
 To adjust sensitivity, auto-centring speed and inversion settings for emulated
 analog inputs, or to see how they respond to your settings, select **Analog
 Controls** from the main menu during emulation.  Settings for emulated analog
@@ -285,8 +358,9 @@ Each emulated input has four settings on the **Analog Controls** menu:
   increment/decrement settings.
 * The *auto-centering speed* setting controls how fast the input value returns
   to the neutral state when the controls assigned to the increment/decrement
-  settings are released.
-* The **reverse** setting allows the direction of the emulated input’s response
+  settings are released.  Setting it to zero (**0**) will result in the value
+  not automatically returning to the neutral position.
+* The *reverse* setting allows the direction of the emulated input’s response
   to controls to be inverted.  This applies to controls assigned to the axis
   setting *and* the increment/decrement settings.
 * The *sensitivity* setting adjusts the input value’s response to the control
