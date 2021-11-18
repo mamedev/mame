@@ -697,8 +697,6 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<description>Metal Slug - 1st Mission (prototype)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
-		<info name="serial" value="NeoP00210" />
-		<info name="release" value="19990527 (JPN)" />
 		<info name="alt_title" value="メタルスラッグ ファーストミッション" />
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
