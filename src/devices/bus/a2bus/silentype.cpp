@@ -149,7 +149,7 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 
 // read bits @ c092
 #define SERIAL_DATA_Q15               (7)  // shift register Q15 output
-#define SHIFT_CLOCK_STATUS           (6)  // current shift clock output or shift clock from printer, read on A01
+#define SHIFT_CLOCK_STATUS            (6)  // current shift clock output or shift clock from printer, read on A01
 
 
 /***************************************************************************
@@ -281,7 +281,9 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 		{
 			u8 databit = BIT(data, SILENTYPE_DATAWRITEENABLE) ? BIT(data, SILENTYPE_DATA) : 0;
 			LOG("Silentype Shift Bit = %x\n", databit);
-			m_shift_reg = (m_shift_reg << 1) | databit;
+			m_shift_reg = 
+				(m_shift_reg << 1) | 
+				(BIT(m_parallel_reg, 8) ? BIT(m_shift_reg, 15) : databit );
 		}
 
 		if (
@@ -291,10 +293,12 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 			)
 		{
 			LOG("Silentype Clear Parallel Register\n");
-			m_parallel_reg = 0;
 
-			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
-			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+			m_parallel_reg = 0;
+			printf("Silentype Clear Parallel Register = %4x   time=%f\n", m_parallel_reg,machine().time().as_double());
+
+			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4) ^ 0xf);  // inverted by ULN2003
+			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4) ^ 0xf);  // inverted by ULN2003
 			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
 
 		}
@@ -306,6 +310,14 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_parallel_reg = m_shift_reg;
 
 			LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
+
+			printf("Silentype Store Parallel Register = %4x   time=%f\n", m_parallel_reg,machine().time().as_double());
+static double timeon = 0.0;
+			if (BIT(m_parallel_reg, 9, 7) && (timeon == 0.0)) timeon = machine().time().as_double();
+			else if (BIT(m_parallel_reg, 9, 7)) {printf("STILL ON = %f\n", machine().time().as_double() - timeon);}
+			else {printf("NOW OFF TIME SINCE ON = %f\n", machine().time().as_double() - timeon); timeon=0.0; }
+
+
 
 			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
 			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));

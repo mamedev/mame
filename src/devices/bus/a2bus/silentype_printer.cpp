@@ -108,7 +108,7 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
-	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT));
+	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 60, 60));
 
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
@@ -257,9 +257,32 @@ int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uin
 //    Update Paper Feed Stepper
 //-------------------------------------------------
 
+
+
+
 void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 {
 	int delta = update_stepper_delta(m_pf_stepper, vstepper);
+
+	if (delta > 0)
+	{
+		m_ypos += delta; // move down
+		update_head_pos();  // updates head position (update before you call check_ypos)
+
+		if (m_bitmap_printer->check_ypos()) // checks ypos, true if we should reset ypos, will save page if necessary
+		{
+			m_ypos = 0;
+			update_head_pos();
+		}
+	}
+	else if (delta < 0) // we are moving up the page
+	{
+		m_ypos += delta;
+		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
+		update_head_pos();
+	}
+
+/*
 
 	if (delta > 0)
 	{
@@ -304,6 +327,7 @@ void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
 	}
 
 	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
+*/
 }
 
 //-------------------------------------------------

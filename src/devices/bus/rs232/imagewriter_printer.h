@@ -7,7 +7,7 @@
 
 #include "rs232.h"
 #include "cpu/i8085/i8085.h"
-#include "bus/a2bus/bitmap_printer.h"
+#include "machine/bitmap_printer.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "machine/steppers.h"

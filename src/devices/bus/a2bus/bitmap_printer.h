@@ -168,24 +168,15 @@ public:
 				if ((i % vdpi) == 0)
 				{
 					double pct = (double) i / (vdpi * 11.0);
-/*
-					if (drawmarks & 2)  // draw position tick
-					{
-						int marksize = 3;
-						int barheight = 4;
-						if (adj_i < bitmap.height() - 1 - barheight)
-							// little bar to show paper position
-							bitmap.plot_box( bitmap.width() - 1 - barwidth +  pct * barwidth - marksize, adj_i, marksize, barheight, 0x000000);
-					}
-*/
-					if (drawmarks & 4)  // draw position bar
+
+					if (drawmarks & 2)  // draw position bar
 					{
 						int barheight = 3;
 						if (adj_i < bitmap.height() - 1 - barheight)
-							// little dot to show paper position
+							// little mark to show paper position
 							bitmap.plot_box( bitmap.width() - 1 - barwidth , adj_i, pct * barwidth, barheight, 0x000000);
 					}
-					if (drawmarks & 8)
+					if (drawmarks & 4)
 						draw_number(i / vdpi, bitmap.width(), adj_i, bitmap);
 				}
 

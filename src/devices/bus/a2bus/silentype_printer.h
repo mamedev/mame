@@ -4,7 +4,7 @@
  *  silentype printer
  *
  */
-#include "bitmap_printer.h"
+#include "machine/bitmap_printer.h"
 #include "machine/steppers.h"
 
 #ifndef MAME_MACHINE_SILENTYPE_PRINTER_H
@@ -70,8 +70,6 @@ private:
 	int heattime = 3000;   // time in usec to hit max temp  (smaller numbers mean faster)
 	int decaytime = 1000;  // time in usec to cool off
 
-//	int hstepperlast = 0;
-//	int vstepperlast = 0;
 	int lastheadbits = 0;
 	int xdirection = 0;
 	int newpageflag = 0;
@@ -80,13 +78,17 @@ private:
 
 	double last_update_time = 0.0;  // strange behavior if we don't initialize
 
- private:
-
 	void adjust_headtemp(u8 pin_status, double time_elapsed,  double& temp);
 	void darken_pixel(double headtemp, unsigned int& pixel);
 	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern);
 	s32 x_pixel_coord(s32 xpos) { return xpos / 2; }  // x position in half steps
 	s32 y_pixel_coord(s32 ypos) { return ypos * 7 / 4 / 2; }  // y position given in half steps, full step is 7/4 pixels
+	void update_head_pos() 
+	{
+		m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
+	}
+
+
 };
 
 DECLARE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device)

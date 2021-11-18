@@ -4781,3 +4781,25 @@ if (MACHINES["NS32082"]~=null) then
 		MAME_DIR .. "src/devices/machine/ns32082.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/bitmap_printer.h,MACHINES["BITMAP_PRINTER"] = true
+---------------------------------------------------
+if (MACHINES["BITMAP_PRINTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bitmap_printer.cpp",
+		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/session_time.h,MACHINES["SESSION_TIME"] = true
+---------------------------------------------------
+if (MACHINES["SESSION_TIME"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/session_time.cpp",
+		MAME_DIR .. "src/devices/machine/session_time.h",
+	}
+end

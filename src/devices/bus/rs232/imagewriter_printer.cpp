@@ -171,7 +171,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_uart->txd_handler().set(FUNC(apple_imagewriter_printer_device::txd_handler));
 	m_uart->write_cts(0);
 
-	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT);
+	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 144, 160);
 
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
@@ -252,11 +252,11 @@ const tiny_rom_entry *apple_imagewriter_printer_device::device_rom_region() cons
 static INPUT_PORTS_START( apple_imagewriter )
 
 	PORT_START("TOPMARGIN")
-	PORT_ADJUSTER_16MASK(18, "Top Margin")
+	PORT_ADJUSTER_16MASK(18, "Printer Top Margin")
 	PORT_MINMAX(0,500)
 
 	PORT_START("BOTTOMMARGIN")
-	PORT_ADJUSTER_16MASK(18, "Bottom Margin")
+	PORT_ADJUSTER_16MASK(18, "Printer Bottom Margin")
 	PORT_MINMAX(0,500)
 
 	PORT_START("RESET")
@@ -824,6 +824,27 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 	if (delta > 0)
 	{
 		m_ypos += delta; // move down
+		update_head_pos();  // updates head position (update before you call check_ypos)
+
+//		if (m_bitmap_printer->check_ypos()) // checks ypos, true if we should reset ypos, will save page if necessary
+		if (m_bitmap_printer->check_new_page()) // checks ypos, true if we should reset ypos, will save page if necessary
+		{
+			m_ypos = 0;
+			update_head_pos();
+		}
+	}
+	else if (delta < 0) // we are moving up the page
+	{
+		m_ypos += delta;
+		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
+		update_head_pos();
+	}
+}
+
+/*
+	if (delta > 0)
+	{
+		m_ypos += delta; // move down
 
 		if (newpageflag == 1)
 		{
@@ -846,7 +867,7 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 						std::string("imagewriter_") +
 						m_bitmap_printer->get_session_time_device()->getprintername() +
 						"_page_" +
-						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) +
+						m_bitmap_printer->padzeroes(std::to_string(m_bitmap_printer->get_session_time_device()->page_count++),3) +
 						".png");
 
 			newpageflag = 1;
@@ -866,7 +887,11 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
 		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
 	}
 	update_head_pos();
+
 }
+*/
+
+
 
 //-------------------------------------------------
 //    Update Carriage Stepper

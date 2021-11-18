@@ -40,11 +40,9 @@ INPUT_PORTS_START(bitmap_printer)
 	PORT_CONFNAME(0xf, 0x0c, "Draw Inch Marks")
 	PORT_CONFSETTING(0x0, "Off")
 	PORT_CONFSETTING(0x1, "with marks")
-//	PORT_CONFSETTING(0x2, "with position tick")
-	PORT_CONFSETTING(0x4, "with position bar")
-	PORT_CONFSETTING(0x8, "with numbers")
-	PORT_CONFSETTING(0xc, "with numbers and bar")
-
+	PORT_CONFSETTING(0x2, "with position bar")
+	PORT_CONFSETTING(0x4, "with numbers")
+	PORT_CONFSETTING(0x6, "with numbers and bar")
 INPUT_PORTS_END
 
 
@@ -71,7 +69,7 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 	screen.set_visarea(0, m_paperwidth - 1, 0, PAPER_SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(bitmap_printer_device::screen_update_bitmap));
 
-	SESSION_TIME(config, m_session_time, 3);  // skip 3 levels
+	SESSION_TIME(config, m_session_time, 3);  // skip 3 levels to get to device so we don't include bitmap_printer and session_time
 }
 
 //**************************************************************************
