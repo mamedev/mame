@@ -2291,18 +2291,6 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="tdown">
-		<description>Touchdown Football</description>
-		<year>1984</year>
-		<publisher>Imagic</publisher>
-		<info name="usage" value="PC Booter" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="327680">
-				<rom name="touchdown football.img" size="327680" crc="0fbaedb6" sha1="c42650559b2b4eb4b789fd2fa22bc5c8c0589e45"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tracer">
 		<description>The Tracer Sanction</description>
 		<year>1984</year>
