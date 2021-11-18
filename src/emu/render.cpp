@@ -2554,8 +2554,8 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		// get the scaled texture and append it
 		float const xsize(item.scroll_size_x());
 		float const ysize(item.scroll_size_y());
-		s32 texwidth = render_round_nearest(((xform.orientation & ORIENTATION_SWAP_XY) ? primwidth : primheight) / xsize);
-		s32 texheight = render_round_nearest(((xform.orientation & ORIENTATION_SWAP_XY) ? primheight : primwidth) / ysize);
+		s32 texwidth = render_round_nearest(((xform.orientation & ORIENTATION_SWAP_XY) ? primheight : primwidth) / xsize);
+		s32 texheight = render_round_nearest(((xform.orientation & ORIENTATION_SWAP_XY) ? primwidth : primheight) / ysize);
 		texwidth = (std::min)(texwidth, m_maxtexwidth);
 		texheight = (std::min)(texheight, m_maxtexheight);
 		texture->get_scaled(texwidth, texheight, prim->texture, list, prim->flags);
@@ -2564,8 +2564,8 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 		render_bounds cliprect = prim->bounds & m_bounds;
 
 		// determine UV coordinates and apply clipping
-		float const xwindow((xform.orientation & ORIENTATION_SWAP_XY) ? primwidth : primheight);
-		float const ywindow((xform.orientation & ORIENTATION_SWAP_XY) ? primheight : primwidth);
+		float const xwindow((xform.orientation & ORIENTATION_SWAP_XY) ? primheight : primwidth);
+		float const ywindow((xform.orientation & ORIENTATION_SWAP_XY) ? primwidth : primheight);
 		float const xrange(float(texwidth) - (item.scroll_wrap_x() ? 0.0f : xwindow));
 		float const yrange(float(texheight) - (item.scroll_wrap_y() ? 0.0f : ywindow));
 		float const xoffset(render_round_nearest(item.scroll_pos_x() * xrange) / float(texwidth));
