@@ -19,8 +19,8 @@ DEFINE_DEVICE_TYPE(NES_KONAMIBAG, nes_konamibag_device, "nes_konamibag", "Konami
 static INPUT_PORTS_START( nes_konamibag )
 	PORT_START("BAG.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Left Hook")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Move Right")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Move Left")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) // opponent dodges right, unclear how this is triggered
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) // opponent dodges left, unclear how this is triggered
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Right Hook")
 
 	PORT_START("BAG.1")

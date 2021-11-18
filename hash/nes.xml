@@ -11312,7 +11312,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="exboxing">
+	<software name="exboxing" supported="partial">
 		<description>Exciting Boxing (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>

@@ -25,6 +25,8 @@ class nes_konamibag_device :
 	public device_nes_control_port_interface
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::CONTROLS; }
+
 	// construction/destruction
 	nes_konamibag_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
