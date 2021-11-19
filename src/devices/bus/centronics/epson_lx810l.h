@@ -13,6 +13,7 @@
 #include "cpu/upd7810/upd7810.h"
 #include "machine/e05a30.h"
 #include "machine/eepromser.h"
+#include "machine/bitmap_printer.h"
 #include "machine/steppers.h"
 #include "sound/dac.h"
 #include "screen.h"
@@ -102,16 +103,17 @@ private:
 	void lx810l_mem(address_map &map);
 
 	/* Video hardware (simulates paper) */
-	uint32_t screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//	uint32_t screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	unsigned int bitmap_line(int i) { return ((std::abs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
+//	unsigned int bitmap_line(int i) { return ((std::abs(m_pf_pos_abs) / 6) + i) % m_bitmap.height(); }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<stepper_device> m_pf_stepper;
-	required_device<stepper_device> m_cr_stepper;
+	required_device<bitmap_printer_device> m_bitmap_printer;
+//	required_device<stepper_device> m_pf_stepper;
+//	required_device<stepper_device> m_cr_stepper;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<e05a30_device> m_e05a30;
-	required_device<screen_device> m_screen;
+//	required_device<screen_device> m_screen;
 
 	output_finder<> m_online_led;
 
@@ -124,7 +126,7 @@ private:
 	int m_real_cr_steps;
 	int m_real_cr_dir; /* 1 is going right, -1 is going left */
 	uint8_t m_fakemem;
-	bitmap_rgb32 m_bitmap;
+//	bitmap_rgb32 m_bitmap;
 
 	enum {
 		TIMER_CR

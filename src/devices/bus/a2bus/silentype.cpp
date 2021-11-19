@@ -297,8 +297,8 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 			m_parallel_reg = 0;
 			printf("Silentype Clear Parallel Register = %4x   time=%f\n", m_parallel_reg,machine().time().as_double());
 
-			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4) ^ 0xf);  // inverted by ULN2003
-			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4) ^ 0xf);  // inverted by ULN2003
+			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));  // inverted by ULN2003
+			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));  // inverted by ULN2003
 			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
 
 		}
@@ -317,10 +317,11 @@ static double timeon = 0.0;
 			else if (BIT(m_parallel_reg, 9, 7)) {printf("STILL ON = %f\n", machine().time().as_double() - timeon);}
 			else {printf("NOW OFF TIME SINCE ON = %f\n", machine().time().as_double() - timeon); timeon=0.0; }
 
-
-
+//			m_silentype_printer->update_cr_stepper(bitswap<4>(BIT(m_parallel_reg, 0, 4), 3, 1, 2, 0));
+//			m_silentype_printer->update_pf_stepper(bitswap<4>(BIT(m_parallel_reg, 4, 4), 3, 1, 2, 0));
 			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
 			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+
 			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
 
 		}

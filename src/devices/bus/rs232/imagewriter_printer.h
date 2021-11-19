@@ -49,8 +49,6 @@ private:
 	required_device<ttl74123_device> m_pulse2;
 
 	required_device<bitmap_printer_device> m_bitmap_printer;
-	required_device<stepper_device> m_pf_stepper;
-	required_device<stepper_device> m_cr_stepper;
 
 	required_device<timer_device> m_timer_rxclock;
 

@@ -20,7 +20,7 @@ protected:
 	silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 public:
-	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_xpos <= 0); }
+	DECLARE_READ_LINE_MEMBER( margin_switch_input ) { return (m_bitmap_printer->m_xpos <= 0); }
 	DECLARE_READ_LINE_MEMBER( serial_data ) { return 0; } // should return shift register on read (unimplemented)
 
 	void update_printhead(uint8_t data);
@@ -48,8 +48,8 @@ private:
 	int m_ypos = 0;
 
 	required_device<bitmap_printer_device> m_bitmap_printer;
-	required_device<stepper_device> m_pf_stepper;
-	required_device<stepper_device> m_cr_stepper;
+//	required_device<stepper_device> m_pf_stepper;
+//	required_device<stepper_device> m_cr_stepper;
 
 	int right_offset = 0;
 	int left_offset = 3;

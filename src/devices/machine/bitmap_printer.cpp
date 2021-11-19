@@ -81,6 +81,9 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 	screen.set_screen_update(FUNC(bitmap_printer_device::screen_update_bitmap));
 
 	SESSION_TIME(config, m_session_time, 3);  // skip 3 levels so we don't include the printer tag, bitmap_printer and session_time
+
+	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
+	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 }
 
 //**************************************************************************
@@ -90,7 +93,9 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, type, tag, owner, clock),
 		m_screen(*this, "screen"),
-		m_session_time(*this, "session_time")
+		m_session_time(*this, "session_time"),
+		m_pf_stepper(*this, "pf_stepper"),
+		m_cr_stepper(*this, "cr_stepper")
 {
 }
 
@@ -135,7 +140,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
 
-	drawprinthead(bitmap, m_xpos, bitmap.height() - m_distfrombottom);
+	drawprinthead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
 
 	draw_inch_marks(bitmap);
 
@@ -314,7 +319,9 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 	// if this routine returns true, means there's a new page and you should clear the yposition
 	if (newpageflag == 1)
 	{
+		// if you change m_ypos you have to change the stepper abs position too
 		m_ypos = get_top_margin();  // lock to the top of page until we seek horizontally
+		m_pf_stepper->set_absolute_position(get_top_margin() / m_pf_stepper_ratio0 * m_pf_stepper_ratio1);
 	}	
 	if (m_ypos > get_bitmap().height() - 1 - get_bottom_margin())  
 			// If we are at the bottom of the page we will
@@ -341,107 +348,11 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 //			bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
 			m_ypos = get_top_margin();  // lock to the top of page until we seek horizontally
+			m_pf_stepper->set_absolute_position(get_top_margin() / m_pf_stepper_ratio0 * m_pf_stepper_ratio1);
 			retval = true;
 		}
 		else { clear_to_pos ( m_ypos + m_distfrombottom); }
 		return retval;
 		
-/*	int delta = update_stepper_delta(m_pf_stepper, vstepper);
-
-	if (delta > 0)
-	{
-		m_ypos += delta; // move down
-
-		if (newpageflag == 1)
-		{
-			m_ypos = 10;  // lock to the top of page until we seek horizontally
-		}
-		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
-			// if we are within 50 pixels of the bottom of the page we will
-			// write the page to a file, then erase the top part of the page
-			// so we can still see the last page printed.
-		{
-			// clear paper to bottom from current position
-			m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
-
-			// save a snapshot with the slot and page as part of the filename
-			m_bitmap_printer->write_snapshot_to_file(
-						std::string("silentype"),
-						std::string("silentype_") +
-//                      m_bitmap_printer->getprintername() +
-						m_bitmap_printer->get_session_time_device()->getprintername() +
-						"_page_" +
-						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) +
-						".png");
-
-			newpageflag = 1;
-			// clear page down to visible area, starting from the top of page
-			m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
-
-			m_ypos = 10;
-		}
-		// clear page down to visible area
-		m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + distfrombottom, std::min(y_pixel_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
-
-	}
-	else if (delta < 0) // we are moving up the page
-	{
-		m_ypos += delta;
-		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-	}
-
-	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
-*/
-
-/*
-
-	int delta = update_stepper_delta(m_pf_stepper, vstepper, "PF", -1);
-
-	if (delta > 0)
-	{
-		m_ypos += delta; // move down
-
-		if (newpageflag == 1)
-		{
-//			m_ypos = 10;  // lock to the top of page until we seek horizontally
-			m_ypos = ioport("TOPMARGIN")->read();  // lock to the top of page until we seek horizontally
-
-		}
-//		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
-		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 1 - ioport("BOTTOMMARGIN")->read())  // i see why it's failing
-			// if we are within 50 pixels of the bottom of the page we will
-			// write the page to a file, then erase the top part of the page
-			// so we can still see the last page printed.
-		{
-			// clear paper to bottom from current position
-			m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
-
-			// save a snapshot with the slot and page as part of the filename
-			m_bitmap_printer->write_snapshot_to_file(
-						std::string("imagewriter"),
-						std::string("imagewriter_") +
-						m_bitmap_printer->get_session_time_device()->getprintername() +
-						"_page_" +
-						m_bitmap_printer->padzeroes(std::to_string(m_bitmap_printer->get_session_time_device()->page_count++),3) +
-						".png");
-
-			newpageflag = 1;
-			// clear page down to visible area, starting from the top of page
-			m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
-
-//			m_ypos = 10;
-			m_ypos = ioport("TOPMARGIN")->read();  // lock to the top of page until we seek horizontally
-		}
-		// clear page down to visible area
-		m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + distfrombottom, std::min(y_pixel_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
-
-	}
-	else if (delta < 0) // we are moving up the page
-	{
-		m_ypos += delta;
-		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-	}
-	update_head_pos();
-	*/
 }
 

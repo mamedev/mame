@@ -111,8 +111,8 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 	m_pulse1(*this, "pulse1"),
 	m_pulse2(*this, "pulse2"),
 	m_bitmap_printer(*this, "bitmap_printer"),
-	m_pf_stepper(*this, "pf_stepper"),
-	m_cr_stepper(*this, "cr_stepper"),
+//	m_pf_stepper(*this, "pf_stepper"),
+//	m_cr_stepper(*this, "cr_stepper"),
 	m_timer_rxclock(*this, "rx_clock_8251"),
 	m_power_led(*this, "power_led"),
 	m_paper_error_led(*this, "paper_error_led"),
@@ -172,9 +172,11 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_uart->write_cts(0);
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 144, 160);
-
-	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
-	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
+	m_bitmap_printer->set_pf_stepper_ratio(1,1);
+	m_bitmap_printer->set_cr_stepper_ratio(1,1);
+	
+//	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
+//	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
 
 	TIMER(config, m_timer_rxclock, 0);
 
@@ -291,26 +293,11 @@ static INPUT_PORTS_START( apple_imagewriter )
 	PORT_CONFSETTING(0x0, "Normal")
 	PORT_CONFSETTING(0x1, "Invert")
 
-	PORT_START("LONGLINEKICKDOWNHACK")
-	PORT_CONFNAME(0x1, 0x00, "Long Line Kickdown Hack")
-	PORT_CONFSETTING(0x0, "Normal")
-	PORT_CONFSETTING(0x1, "Kick Down")
-
-
-
 	PORT_START("DCD")
 	PORT_CONFNAME(0x1, 0x01, "DCD Output")
 	PORT_CONFSETTING(0x0, "0")
 	PORT_CONFSETTING(0x1, "1")
 	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, dcd_changed, 0)
-
-/*
-	PORT_START("WIDTH")
-	PORT_CONFNAME(0x1, 0x01, "Printer Width")
-	PORT_CONFSETTING(0x0, "15 Inches")
-	PORT_CONFSETTING(0x1, "8 Inches")
-	PORT_CHANGED_MEMBER(DEVICE_SELF, apple_imagewriter_printer_device, paper_width_changed, 0)
-*/
 
 	PORT_START("DARKPIXEL")
 	PORT_CONFNAME(0x7, 0x00, "Print Darkness")
@@ -409,33 +396,6 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::dcd_changed)
 	output_dcd(ioportsaferead("DCD"));
 }
 
-
-/*
-
-//-------------------------------------------------
-//    Input Changed Member Paper Width Changed
-//-------------------------------------------------
-
-
-INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::paper_width_changed)
-{
-	PAPER_WIDTH_INCHES = ioportsaferead("WIDTH") ? 8.5 : 15.0;
-	PAPER_WIDTH = PAPER_WIDTH_INCHES * dpi * xscale;
-	m_right_edge = (PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1;
-}
-*/
-
-//-------------------------------------------------
-//    Input Changed Member Paper Width
-//-------------------------------------------------
-
-
-INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
-{
-	if (newval == 0) m_maincpu->reset();
-}
-
-
 //-------------------------------------------------
 //    Input Changed Member Select Switch
 //-------------------------------------------------
@@ -447,6 +407,15 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::select_sw)
 	{
 		m_ic17_flipflop_select_status = !m_ic17_flipflop_select_status;
 	}
+}
+
+//-------------------------------------------------
+//    Input Changed Member Reset Switch
+//-------------------------------------------------
+
+INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
+{
+       if (newval == 0) m_maincpu->reset();
 }
 
 //-------------------------------------------------
@@ -599,10 +568,12 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
 	u8 data =
-			(!(x_pixel_coord(m_xpos) <= m_left_edge)  << 0) | // m4 home detector
+//			(!(x_pixel_coord(m_xpos) <= m_left_edge)  << 0) | // m4 home detector
+			(!((m_bitmap_printer->m_xpos) <= m_left_edge)  << 0) | // m4 home detector
 			(ioport("PAPEREND")->read()               << 1) | // simulate a paper out error
 			(ioport("COVER")->read()                  << 2) | //
-			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
+//			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
+			(!((m_bitmap_printer->m_xpos) >  m_right_edge) << 3) | // return switch
 			(m_ic17_flipflop_select_status            << 4) | // select status flip flop
 			(ioport("FORMFEED")->read()               << 5) | //
 			(ioport("LINEFEED")->read()               << 6) | //
@@ -775,8 +746,13 @@ void apple_imagewriter_printer_device::update_printhead()
 
 	for (int i = 0; i < numdots; i++)
 	{
-		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment
-		int ypixel = y_pixel_coord(m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
+
+		int xdirection = m_bitmap_printer->m_cr_direction;
+		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment
+		int ypixel = (m_bitmap_printer->m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
+	
+//		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment
+//		int ypixel = y_pixel_coord(m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
@@ -792,143 +768,41 @@ void apple_imagewriter_printer_device::update_printhead()
 }
 
 //-------------------------------------------------
-//    Update Stepper and return delta
-//-------------------------------------------------
-
-int apple_imagewriter_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern, const char * name, int direction)
-{
-	int lastpos = stepper->get_absolute_position();
-	stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
-	int delta = stepper->get_absolute_position() - lastpos;
-	return delta * direction;
-}
-
-//-------------------------------------------------
-//    Update Head Position
-//-------------------------------------------------
-
-void apple_imagewriter_printer_device::update_head_pos()
-{
-	m_bitmap_printer->setheadpos( std::max(0, x_pixel_coord(m_xpos)), // keep printhead visible on left of screen
-									y_pixel_coord(m_ypos));
-}
-
-//-------------------------------------------------
 //    Update Paper Feed Stepper
 //-------------------------------------------------
-
-void apple_imagewriter_printer_device::update_pf_stepper(uint8_t vstepper)
-{
-	int delta = update_stepper_delta(m_pf_stepper, vstepper, "PF", -1);
-
-	if (delta > 0)
-	{
-		m_ypos += delta; // move down
-		update_head_pos();  // updates head position (update before you call check_ypos)
-
-//		if (m_bitmap_printer->check_ypos()) // checks ypos, true if we should reset ypos, will save page if necessary
-		if (m_bitmap_printer->check_new_page()) // checks ypos, true if we should reset ypos, will save page if necessary
-		{
-			m_ypos = 0;
-			update_head_pos();
-		}
-	}
-	else if (delta < 0) // we are moving up the page
-	{
-		m_ypos += delta;
-		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-		update_head_pos();
-	}
-}
-
 /*
-	if (delta > 0)
-	{
-		m_ypos += delta; // move down
-
-		if (newpageflag == 1)
-		{
-//			m_ypos = 10;  // lock to the top of page until we seek horizontally
-			m_ypos = ioport("TOPMARGIN")->read();  // lock to the top of page until we seek horizontally
-
-		}
-//		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
-		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 1 - ioport("BOTTOMMARGIN")->read())  // i see why it's failing
-			// if we are within 50 pixels of the bottom of the page we will
-			// write the page to a file, then erase the top part of the page
-			// so we can still see the last page printed.
-		{
-			// clear paper to bottom from current position
-			m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
-
-			// save a snapshot with the slot and page as part of the filename
-			m_bitmap_printer->write_snapshot_to_file(
-						std::string("imagewriter"),
-						std::string("imagewriter_") +
-						m_bitmap_printer->get_session_time_device()->getprintername() +
-						"_page_" +
-						m_bitmap_printer->padzeroes(std::to_string(m_bitmap_printer->get_session_time_device()->page_count++),3) +
-						".png");
-
-			newpageflag = 1;
-			// clear page down to visible area, starting from the top of page
-			m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
-
-//			m_ypos = 10;
-			m_ypos = ioport("TOPMARGIN")->read();  // lock to the top of page until we seek horizontally
-		}
-		// clear page down to visible area
-		m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + distfrombottom, std::min(y_pixel_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
-
-	}
-	else if (delta < 0) // we are moving up the page
-	{
-		m_ypos += delta;
-		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-	}
-	update_head_pos();
-
+void silentype_printer_device::update_pf_stepper(uint8_t pattern)
+{
+	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
 }
 */
+//-------------------------------------------------
+//    Update Carriage Stepper
+//-------------------------------------------------
 
+
+/*void silentype_printer_device::update_cr_stepper(uint8_t pattern)
+{
+	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
+}
+*/
+void apple_imagewriter_printer_device::update_pf_stepper(uint8_t pattern)
+{
+//	stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
+ 	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0)); // backwards
+//	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 0, 2, 1, 3));
+}
 
 
 //-------------------------------------------------
 //    Update Carriage Stepper
 //-------------------------------------------------
 
-void apple_imagewriter_printer_device::update_cr_stepper(uint8_t hstepper)
+void apple_imagewriter_printer_device::update_cr_stepper(uint8_t pattern)
 {
-	int delta = update_stepper_delta(m_cr_stepper, hstepper, "CR", 1);
-
-	if (delta != 0)
-	{
-		newpageflag = 0;
-
-		if (delta > 0)
-		{
-			m_xpos += delta; xdirection = 1;
-		}
-		else if (delta < 0)
-		{
-			m_xpos += delta; xdirection = -1;
-		}
-	}
-	update_head_pos();
-
-	if (ioport("LONGLINEKICKDOWNHACK")->read())
-	{
-		static int flag = 0;
-		// auto kickdown for coco line lines printout
-		if (m_xpos > m_right_edge - 80 && !flag)
-		{   flag = 1;
-			m_ypos += 16;
-		}
-		if (m_xpos < m_right_edge -90)
-		{
-			flag = 0;
-		}
-	}
+//	stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
+//	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
+	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 0, 2, 1, 3));
 }
 
 //-------------------------------------------------

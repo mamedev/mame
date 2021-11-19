@@ -109,9 +109,8 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
 	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 60, 60));
-
-	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
-	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
+	m_bitmap_printer->set_pf_stepper_ratio(7,8);  // 7 / 4 / 2 = 7 / 8
+	m_bitmap_printer->set_cr_stepper_ratio(1,2);  // half steps = 1 / 2
 }
 
 //**************************************************************************
@@ -119,15 +118,13 @@ void silentype_printer_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 silentype_printer_device::silentype_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		m_bitmap_printer(*this, "bitmap_printer"),
-		m_pf_stepper(*this, "pf_stepper"),
-		m_cr_stepper(*this, "cr_stepper")
+	device_t(mconfig, type, tag, owner, clock),
+	m_bitmap_printer(*this, "bitmap_printer")
 {
 }
 
 silentype_printer_device::silentype_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		silentype_printer_device(mconfig, SILENTYPE_PRINTER, tag, owner, clock)
+	silentype_printer_device(mconfig, SILENTYPE_PRINTER, tag, owner, clock)
 {
 }
 
@@ -219,6 +216,7 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	double current_time = machine().time().as_double();
 	double time_elapsed = current_time - last_update_time;
 	last_update_time = current_time;
+	int xdirection = m_bitmap_printer->m_cr_direction;
 
 	LOG("PRINTHEAD %x\n",headbits);
 	LOG("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",
@@ -228,8 +226,12 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	{
 		adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
 
-		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
-		int ypixel = y_pixel_coord(m_ypos) + (6 - i);
+//		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
+//		int ypixel = y_pixel_coord(m_ypos) + (6 - i);
+
+		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
+		int ypixel = (m_bitmap_printer->m_ypos) + (6 - i);
+
 
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
@@ -239,122 +241,21 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	lastheadbits = headbits;
 }
 
-
-
-//-------------------------------------------------
-//    Update Stepper and return delta
-//-------------------------------------------------
-
-int silentype_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
-{
-	int lastpos = stepper->get_absolute_position();
-	stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
-	int delta = stepper->get_absolute_position() - lastpos;
-	return delta;
-}
-
 //-------------------------------------------------
 //    Update Paper Feed Stepper
 //-------------------------------------------------
 
-
-
-
-void silentype_printer_device::update_pf_stepper(uint8_t vstepper)
+void silentype_printer_device::update_pf_stepper(uint8_t pattern)
 {
-	int delta = update_stepper_delta(m_pf_stepper, vstepper);
-
-	if (delta > 0)
-	{
-		m_ypos += delta; // move down
-		update_head_pos();  // updates head position (update before you call check_ypos)
-
-		if (m_bitmap_printer->check_ypos()) // checks ypos, true if we should reset ypos, will save page if necessary
-		{
-			m_ypos = 0;
-			update_head_pos();
-		}
-	}
-	else if (delta < 0) // we are moving up the page
-	{
-		m_ypos += delta;
-		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-		update_head_pos();
-	}
-
-/*
-
-	if (delta > 0)
-	{
-		m_ypos += delta; // move down
-
-		if (newpageflag == 1)
-		{
-			m_ypos = 10;  // lock to the top of page until we seek horizontally
-		}
-		if (y_pixel_coord(m_ypos) > m_bitmap_printer->get_bitmap().height() - 50)  // i see why it's failing
-			// if we are within 50 pixels of the bottom of the page we will
-			// write the page to a file, then erase the top part of the page
-			// so we can still see the last page printed.
-		{
-			// clear paper to bottom from current position
-			m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + 7, PAPER_HEIGHT - 1, rgb_t::white());
-
-			// save a snapshot with the slot and page as part of the filename
-			m_bitmap_printer->write_snapshot_to_file(
-						std::string("silentype"),
-						std::string("silentype_") +
-//                      m_bitmap_printer->getprintername() +
-						m_bitmap_printer->get_session_time_device()->getprintername() +
-						"_page_" +
-						m_bitmap_printer->padzeroes(std::to_string(page_count++),3) +
-						".png");
-
-			newpageflag = 1;
-			// clear page down to visible area, starting from the top of page
-			m_bitmap_printer->bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
-
-			m_ypos = 10;
-		}
-		// clear page down to visible area
-		m_bitmap_printer->bitmap_clear_band(y_pixel_coord(m_ypos) + distfrombottom, std::min(y_pixel_coord(m_ypos) + distfrombottom+30, PAPER_HEIGHT - 1), rgb_t::white());
-
-	}
-	else if (delta < 0) // we are moving up the page
-	{
-		m_ypos += delta;
-		if (m_ypos < 0) m_ypos = 0;  // don't go backwards past top of page
-	}
-
-	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
-*/
+	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
 }
 
 //-------------------------------------------------
 //    Update Carriage Stepper
 //-------------------------------------------------
 
-void silentype_printer_device::update_cr_stepper(uint8_t hstepper)
+void silentype_printer_device::update_cr_stepper(uint8_t pattern)
 {
-	int delta = update_stepper_delta(m_cr_stepper, hstepper);
-
-//  printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
-
-	if (delta != 0)
-	{
-		newpageflag = 0;
-
-		if (delta > 0)
-		{
-			m_xpos += delta; xdirection = 1;
-		}
-		else if (delta < 0)
-		{
-			m_xpos += delta; xdirection = -1;
-			//if (m_xpos < 0) m_xpos = 0;
-		}
-	}
-
-	m_bitmap_printer->setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
+	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
 }
 

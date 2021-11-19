@@ -11,6 +11,7 @@
  */
 #include "screen.h"
 #include "machine/session_time.h"
+#include "machine/steppers.h"
 
 #ifndef MAME_MACHINE_BITMAP_PRINTER_H
 #define MAME_MACHINE_BITMAP_PRINTER_H
@@ -45,13 +46,25 @@ private:
 
 	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
 	const int m_distfrombottom = 50;  // print position from bottom of screen
-
+public:
 	int m_xpos = 0;
 	int m_ypos = 0;
-
+private:
 	required_device<screen_device> m_screen;
 	required_device<session_time_device> m_session_time;
+public:
+	required_device<stepper_device> m_pf_stepper;
+	required_device<stepper_device> m_cr_stepper;
+	
+	int m_cr_direction = 1; // last direction of carriage
+	int m_pf_stepper_ratio0 = 1;
+	int m_pf_stepper_ratio1 = 1;
+	int m_cr_stepper_ratio0 = 1;
+	int m_cr_stepper_ratio1 = 1;
 
+	void set_pf_stepper_ratio(int ratio0, int ratio1) { m_pf_stepper_ratio0 = ratio0; m_pf_stepper_ratio1 = ratio1;}
+	void set_cr_stepper_ratio(int ratio0, int ratio1) { m_cr_stepper_ratio0 = ratio0; m_cr_stepper_ratio1 = ratio1;}
+private:	
 	bitmap_rgb32  m_internal_bitmap;  // internal bitmap
 	bitmap_rgb32* m_bitmap = &m_internal_bitmap;  // pointer to bitmap, use internal bitmap by default
 
@@ -104,8 +117,65 @@ private:
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap);
 	void draw_inch_marks(bitmap_rgb32& bitmap);
 
+
+	int update_stepper_delta(stepper_device * stepper, uint8_t pattern)
+	{
+		int lastpos = stepper->get_absolute_position();
+		stepper->update(pattern);
+//		stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
+		int delta = stepper->get_absolute_position() - lastpos;
+		return delta;
+	}
+
+public:
+	void update_cr_stepper(uint8_t pattern) {
+
+		int delta = update_stepper_delta(m_cr_stepper, pattern);
+
+	//  printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
+
+		if (delta != 0)
+		{
+			newpageflag = 0;
+
+			if (delta > 0)
+			{
+				//m_xpos += delta; 
+				m_cr_direction = 1;
+			}
+			else if (delta < 0)
+			{
+				//m_xpos += delta; 
+				m_cr_direction = -1;
+			}
+		}
+
+	m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
+
+	//	setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
+}
+	void update_pf_stepper(int pattern) 
+	{	[[maybe_unused]]	int delta = update_stepper_delta(m_pf_stepper, pattern);
+	
+			if (delta != 0)
+		{
+
+			if (delta > 0)
+			{
+				//m_ypos += delta;
+			}
+			else if (delta < 0)
+			{
+				//m_ypos += delta; 
+			}
+		}
+		m_ypos = m_pf_stepper->get_absolute_position() * m_pf_stepper_ratio0 / m_pf_stepper_ratio1;
+		check_new_page();
+	}
+
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)
+
 
 #endif // MAME_MACHINE_BITMAP_PRINTER_H
