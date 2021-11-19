@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-19 02:50+1100\n"
-"PO-Revision-Date: 2021-11-07 00:45+0800\n"
+"PO-Revision-Date: 2021-11-19 09:46+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_CN\n"
@@ -581,7 +581,7 @@ msgstr "投币脉冲"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Input Device Options"
-msgstr ""
+msgstr "输入装置选项"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Lightgun Device Assignment"
@@ -617,19 +617,19 @@ msgstr "分配鼠标装置"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Keyboard Input Provider"
-msgstr ""
+msgstr "键盘输入供应"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Mouse Input Provider"
-msgstr ""
+msgstr "鼠标输入供应"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Lightgun Input Provider"
-msgstr ""
+msgstr "光枪输入供应"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Joystick Input Provider"
-msgstr ""
+msgstr "摇杆输入供应"
 
 #: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/mainmenu.cpp:174
 msgid "Video Options"
@@ -928,8 +928,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"此机械无法执行，机械的模拟还不完全。除了等待开发人员改良模拟之外，没有方法可"
-"以解决这个问题。\n"
+"此机械无法执行，机械的模拟还不完全。\n"
+"除了等待开发人员改良模拟之外，没有方法可以解决这个问题。\n"
 
 #: src/frontend/mame/ui/info.cpp:141
 msgid ""
@@ -1033,7 +1033,7 @@ msgstr "画面"
 #: src/frontend/mame/ui/info.cpp:570 src/frontend/mame/ui/info.cpp:581
 #, c-format
 msgid "%1$s:\n"
-msgstr ""
+msgstr "%1$s:\n"
 
 #: src/frontend/mame/ui/info.cpp:662
 msgid "Not supported"
@@ -2502,27 +2502,27 @@ msgstr "修订： %1$s"
 #: src/frontend/mame/ui/analogipt.cpp:91
 #, c-format
 msgid "Press %s to show menu"
-msgstr ""
+msgstr "按下 %s 显示菜单"
 
 #: src/frontend/mame/ui/analogipt.cpp:369
 #, c-format
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s 以增加/减少速度"
 
 #: src/frontend/mame/ui/analogipt.cpp:374
 #, c-format
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s 自动置中速度"
 
 #: src/frontend/mame/ui/analogipt.cpp:379
 #, c-format
 msgid "%1$s Reverse"
-msgstr ""
+msgstr "%1$s 反向"
 
 #: src/frontend/mame/ui/analogipt.cpp:384
 #, c-format
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s 敏感度"
 
 #: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
@@ -2792,8 +2792,8 @@ msgid ""
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
-"选定系统所需要的 ROM / 磁碟映像档为缺少或不正确。 请取得正确的档案或选择不同"
-"的系统。\n"
+"选定系统所需要的 ROM / 磁碟映像档为缺少或不正确。\n"
+"请取得正确的档案或选择不同的系统。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2567
@@ -2802,8 +2802,8 @@ msgid ""
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
-"选定软体所需要的 ROM / 磁碟映像档为缺少或不正确。 请取得正确的档案或选择不同"
-"的软体项目。\n"
+"选定软体所需要的 ROM / 磁碟映像档为缺少或不正确。\n"
+"请取得正确的档案或选择不同的软体项目。\n"
 "\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2583
@@ -7109,7 +7109,7 @@ msgstr "%s [%d Hz]"
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "n/a [%g Hz]"
-msgstr ""
+msgstr "不可用 [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
@@ -7125,7 +7125,7 @@ msgstr "新增连发按钮"
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
 msgid "n/a"
-msgstr ""
+msgstr "不可用"
 
 #: plugins/autofire/autofire_menu.lua:152
 #: plugins/autofire/autofire_menu.lua:154
@@ -7192,80 +7192,80 @@ msgstr "选择供连发用的按键"
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "时间码：序章开始于 %s"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "时间码：序章持续 %s"
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "时间码：游戏过程开始于 %s"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "时间码：游戏过程持续 %s"
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "时间码：额外的 %d 开始于 %s"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "时间码：额外的 %d 持续 %s"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr " %s%s%02d:%02d [已暂停] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d "
-msgstr ""
+msgstr " %s%s%02d:%02d "
 
 #: plugins/timecode/init.lua:217
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "总计 %02d:%02d "
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
 msgid "Timecode Recorder"
-msgstr ""
+msgstr "时间码纪录"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugin-timecode"
 msgid "Assume 60 Hz"
-msgstr ""
+msgstr "采用 60 Hz"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugins-timecode"
 msgid "Count emulated frames"
-msgstr ""
+msgstr "计算已模拟画格"
 
 #: plugins/timecode/init.lua:327
 msgctxt "plugin-timecode"
 msgid "Frame numbers"
-msgstr ""
+msgstr "画格数"
 
 #: plugins/timecode/init.lua:330
 msgctxt "plugin-timecode"
 msgid "Hotkey"
-msgstr ""
+msgstr "热键"
 
 #: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
 msgctxt "plugin-inputmacro"
@@ -7360,7 +7360,7 @@ msgstr "持续 (画格)"
 #: plugins/inputmacro/inputmacro_menu.lua:398
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "不可用"
 
 #: plugins/inputmacro/inputmacro_menu.lua:402
 #, lua-format
@@ -7433,17 +7433,17 @@ msgstr "%03d:%02d:%02d"
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "挂钟"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "已模拟时间"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "变数"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
@@ -7604,10 +7604,3 @@ msgid ""
 msgstr ""
 "输入序列或按下 %s 取消\n"
 "%s"
-
-#~ msgid "Device Mapping"
-#~ msgstr "装置映对"
-
-#~ msgctxt "input-name"
-#~ msgid "Write current timecode"
-#~ msgstr "写入目前的时间码"
