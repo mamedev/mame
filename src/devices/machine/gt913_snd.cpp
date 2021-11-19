@@ -114,8 +114,6 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 				mix_sample(voice, left, right);
 		}
 
-	//	logerror("left/right %d/%d, with gain %d/%d\n", left, right, left * m_gain, right * m_gain);
-
 		outputs[0].put_int(i, left * m_gain, INT_MAX);
 		outputs[1].put_int(i, right * m_gain, INT_MAX);
 	}
@@ -148,12 +146,19 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 	}
 
 	// mix sample into output
-	left += (s32)voice.m_sample * (voice.m_volume_current >> 8) * voice.m_balance[0];
-	right += (s32)voice.m_sample * (voice.m_volume_current >> 8) * voice.m_balance[1];
+	left += (s32)voice.m_sample * (voice.m_volume_current >> 12) * voice.m_balance[0];
+	right += (s32)voice.m_sample * (voice.m_volume_current >> 12) * voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
 {
+	if (voice.m_addr_current == voice.m_addr_loop)
+	{
+	//	logerror("at loop start - sample %d exp %u\n", voice.m_sample, voice.m_exp);
+		voice.m_sample_at_loop = voice.m_sample;
+		voice.m_exp_at_loop = voice.m_exp;
+	}
+
 	u16 word = m_cache.read_word(voice.m_addr_current & ~1U);
 	s16 delta = 0;
 	
@@ -168,7 +173,7 @@ void gt913_sound_device::update_sample(voice_t& voice)
 		delta = sample_7_to_8[word >> 9];
 	}
 
-	voice.m_sample += delta * (1 << voice.m_exp); // *voice.m_gain; // TODO: make sure this is actually the gain value and not something else
+	voice.m_sample += (delta * (1 << voice.m_exp) * voice.m_gain) >> 4;
 
 	voice.m_addr_current++;
 	if (voice.m_addr_current == voice.m_addr_end)
@@ -184,12 +189,6 @@ void gt913_sound_device::update_sample(voice_t& voice)
 			voice.m_exp = voice.m_exp_at_loop;
 			voice.m_addr_current = voice.m_addr_loop;
 		}
-	}
-	else if (voice.m_addr_current == voice.m_addr_loop)
-	{
-	//	logerror("at loop start - sample %d exp %u\n", voice.m_sample, voice.m_exp);
-		voice.m_sample_at_loop = voice.m_sample;
-		voice.m_exp_at_loop = voice.m_exp;
 	}
 }
 
@@ -249,7 +248,6 @@ void gt913_sound_device::command_w(u16 data)
 			voice.m_addr_current = voice.m_addr_start;
 			voice.m_addr_frac = 0;
 			voice.m_sample = 0;
-			voice.m_volume_current = 0;
 		}
 
 		voice.m_enable = enable;
@@ -265,12 +263,25 @@ void gt913_sound_device::command_w(u16 data)
 	}
 	else if (voicecmd == 0x6006)
 	{
-		voice.m_gain = m_data[1] & 0x7f; // TODO: verify this
+		/* per-voice gain used for normalizing samples
+			currently treated such that the lower 4 bits are fractional */
+		voice.m_gain = m_data[1] & 0xff;
 	}
 	else if (voicecmd == 0x6007)
 	{
-		voice.m_volume_target = m_data[0] & 0x7f00;
-		voice.m_volume_rate = m_data[0] & 0xff;
+		logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
+		if (BIT(m_data[0], 15))
+		{
+			voice.m_volume_current = voice.m_volume_target = 0;
+		}
+		else
+		{
+			voice.m_volume_target = (m_data[0] & 0x7f00) << 4;
+			if (BIT(m_data[0], 7))
+				voice.m_volume_current = voice.m_volume_target;
+			else
+				voice.m_volume_rate = m_data[0] & 0x7f;
+		}
 	}
 	else if (voicecmd == 0x2028)
 	{
@@ -279,7 +290,7 @@ void gt913_sound_device::command_w(u16 data)
 		to determine if it's time to start the next part of the volume envelope or not.
 		(TODO: also figure out what it expects to be returned in data1)
 		*/
-		m_data[0] = voice.m_enable ? voice.m_volume_current : 0;
+		m_data[0] = voice.m_enable ? (voice.m_volume_current >> 4) : 0;
 		m_data[1] = 0;
 	}
 	else

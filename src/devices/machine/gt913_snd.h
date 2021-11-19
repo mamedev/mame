@@ -65,7 +65,7 @@ private:
 		s16 m_sample, m_sample_at_loop;
 		u8 m_exp, m_exp_at_loop;
 
-		u16 m_volume_current, m_volume_target;
+		u32 m_volume_current, m_volume_target;
 		u8 m_volume_rate;
 
 		u8 m_balance[2];
