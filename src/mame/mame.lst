@@ -31830,6 +31830,7 @@ marvlandup                      // (c) 1989 (US)
 metlhawk                        // (c) 1988
 metlhawkj                       // (c) 1988
 mirninja                        // (c) 1988 (Japan)
+mirninjaa                       // (c) 1988 (Japan)
 ordyne                          // (c) 1988
 ordynej                         // (c) 1988
 ordyneje                        // (c) 1988
@@ -40002,7 +40003,7 @@ s3670                           //
 synthex                         //
 
 @source:sys1121.cpp
-sys1121							// (c) 1984 Motorola
+sys1121                         // (c) 1984 Motorola
 
 @source:sys2900.cpp
 sys2900                         //
