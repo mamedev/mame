@@ -11,7 +11,7 @@
 
 Main xtal is 8MHz
 AY-3-8910 and i8253 clock is running at 2 MHz (xtal/4)
-Z80A is runing at 4MHz (xtal/2)
+Z80A is running at 4MHz (xtal/2)
 clock dividers also generate the system reset signals for the 8251 and and a periodic IRQ at 122Hz (xtal/65536)
 
 I8253:
@@ -375,6 +375,9 @@ BUT, at least on the revision C 1872 CPU pcb, they are both tied directly to VCC
 #include "machine/terminal.h"
 #include "speaker.h"
 
+
+namespace {
+
 class votrpss_state : public driver_device
 {
 public:
@@ -386,6 +389,9 @@ public:
 	{ }
 
 	void votrpss(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	void kbd_put(u8 data);
@@ -406,7 +412,7 @@ private:
 	uint8_t m_porta;
 	uint8_t m_portb;
 	uint8_t m_portc;
-	virtual void machine_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<i8255_device> m_ppi;
@@ -477,6 +483,11 @@ void votrpss_state::machine_start()
 	save_item(NAME(m_porta));
 	save_item(NAME(m_portb));
 	save_item(NAME(m_portc));
+
+	m_term_data = 0;
+	m_porta = 0;
+	m_portb = 0;
+	m_portc = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( votrpss_state::irq_timer )
@@ -618,6 +629,7 @@ ROM_START(votrpss)
 
 ROM_END
 
+} // Anonymous namespace
 
 
 /******************************************************************************

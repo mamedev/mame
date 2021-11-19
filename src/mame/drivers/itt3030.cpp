@@ -4,6 +4,8 @@
 
     ITT 3030
 
+    When the machine is started you get a black screen.
+    Hold down B until the cursor appears. It will then boot from the floppy.
 
     ToDo:
     - Check Beeper
@@ -252,7 +254,7 @@ private:
 	void fdc_w(offs_t offset, uint8_t data);
 	uint8_t fdc_stat_r();
 	void fdc_cmd_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
+	static void itt3030_floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
@@ -658,9 +660,11 @@ void itt3030_state::fdc_cmd_w(uint8_t data)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-FLOPPY_FORMATS_MEMBER( itt3030_state::itt3030_floppy_formats )
-	FLOPPY_ITT3030_FORMAT
-FLOPPY_FORMATS_END
+void itt3030_state::itt3030_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ITT3030_FORMAT);
+}
 
 
 static void itt3030_floppies(device_slot_interface &device)

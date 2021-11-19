@@ -327,14 +327,14 @@ void p8k_state::init_p8k()
 
 void p8k_state::p8k_16_memmap(address_map &map)
 {
-	map(0x00000, 0x03fff).rom().share("share0");
+	map(0x00000, 0x03fff).rom().region("maincpu",0);
 	map(0x04000, 0x07fff).ram().share("share1");
 	map(0x08000, 0xfffff).ram().share("share2");
 }
 
 void p8k_state::p8k_16_datamap(address_map &map)
 {
-	map(0x00000, 0x03fff).rom().share("share0");
+	map(0x00000, 0x03fff).rom().region("maincpu",0);
 	map(0x04000, 0x07fff).ram().share("share1");
 	map(0x08000, 0xfffff).ram().share("share2");
 }
@@ -475,8 +475,8 @@ void p8k_state::p8k(machine_config &config)
 
 	I8272A(config, m_i8272, 16_MHz_XTAL / 2, true);
 	m_i8272->drq_wr_callback().set("dma", FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "i8272:0", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "i8272:1", p8k_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:0", p8k_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "i8272:1", p8k_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

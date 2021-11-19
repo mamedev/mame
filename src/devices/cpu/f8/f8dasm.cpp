@@ -254,6 +254,8 @@ offs_t f8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_
 		break;
 
 	case 0x70: /* 0111 0000 */
+		util::stream_format(stream, "CLR");
+		break;
 	case 0x71: /* 0111 0001 */
 	case 0x72: /* 0111 0010 */
 	case 0x73: /* 0111 0011 */

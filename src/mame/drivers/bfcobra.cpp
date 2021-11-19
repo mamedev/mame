@@ -115,7 +115,7 @@
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/upd7759.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 
 #include "emupal.h"

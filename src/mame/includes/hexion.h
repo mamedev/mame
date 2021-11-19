@@ -24,6 +24,9 @@ public:
 	void hexion(machine_config &config);
 	void hexionb(machine_config &config);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<k053252_device> m_k053252;
@@ -54,8 +57,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-
-	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void get_tile_info(tile_data &tileinfo,int tile_index,uint8_t *ram);

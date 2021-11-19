@@ -245,6 +245,7 @@ void el2_3c503_device::el2_3c503_hiport_w(offs_t offset, uint8_t data) {
 		default:
 			logerror("3c503: trying to set multiple drqs %X\n", data);
 		}
+		break;
 	case 9:
 		if(m_regs.ctrl & 0x80) logerror("3c503: changing dma address during dma is undefined\n");
 		m_regs.da = (data << 8) | (m_regs.da & 0xff);

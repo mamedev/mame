@@ -251,6 +251,7 @@ void vectrex_base_state::video_start()
 	m_ramp = 0;
 	std::fill(std::begin(m_analog), std::end(m_analog), 0);
 	m_point_index = 0;
+	m_lightpen_down = 0;
 }
 
 void vectrex_state::video_start()

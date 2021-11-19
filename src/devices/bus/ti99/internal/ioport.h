@@ -11,7 +11,7 @@
 
 #define TI99_IOPORT_TAG      "ioport"
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 extern const device_type IOPORT;
 
@@ -96,7 +96,8 @@ protected:
 private:
 	ioport_attached_device*    m_connected;
 };
-}   }  } // end namespace bus::ti99::internal
+
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_IOPORT, bus::ti99::internal, ioport_device)
 

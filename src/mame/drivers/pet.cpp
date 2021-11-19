@@ -202,7 +202,7 @@ public:
 		m_palette(*this, "palette"),
 		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 		m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
-		m_exp(*this, PET_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_user(*this, PET_USER_PORT_TAG),
 		m_speaker(*this, "speaker"),
 		m_cart_9000(*this, "cart_9000"),
@@ -469,7 +469,7 @@ static void cbm_pet_quick_sethiaddress( address_space &space, uint16_t hiaddress
 
 QUICKLOAD_LOAD_MEMBER(pet_state::quickload_pet)
 {
-	return general_cbm_loadsnap(image, file_type, quickload_size, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
+	return general_cbm_loadsnap(image, m_maincpu->space(AS_PROGRAM), 0, cbm_pet_quick_sethiaddress);
 }
 
 
@@ -1663,7 +1663,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	VIA6522(config, m_via, XTAL(16'000'000)/16);
+	MOS6522(config, m_via, XTAL(16'000'000)/16);
 	m_via->readpb_handler().set(FUNC(pet_state::via_pb_r));
 	m_via->writepa_handler().set(FUNC(pet_state::via_pa_w));
 	m_via->writepb_handler().set(FUNC(pet_state::via_pb_w));

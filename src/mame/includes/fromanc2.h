@@ -39,6 +39,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(sndcpu_nmi_r);
 	DECLARE_READ_LINE_MEMBER(subcpu_nmi_r);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	/* memory pointers */
 	std::unique_ptr<uint16_t[]>   m_videoram[2][4];
@@ -108,7 +111,6 @@ private:
 
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromanc2_get_tile_info);
 	template<int VRAM, int Layer> TILE_GET_INFO_MEMBER(fromancr_get_tile_info);
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(fromanc2);
 	DECLARE_VIDEO_START(fromanc2);
 	DECLARE_VIDEO_START(fromancr);

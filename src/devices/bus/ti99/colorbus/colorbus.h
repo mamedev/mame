@@ -21,7 +21,7 @@
 #define TIGEN_V9938_TAG   "vdp"
 #define COLORBUS_TAG     "colorbus"
 
-namespace bus { namespace ti99 { namespace colorbus {
+namespace bus::ti99::colorbus {
 
 class v9938_colorbus_device;
 
@@ -72,7 +72,7 @@ private:
 	devcb_write_line   m_extra_button;
 };
 
-} } } // end namespace bus::ti99::colorbus
+} // end namespace bus::ti99::colorbus
 
 DECLARE_DEVICE_TYPE_NS(V9938_COLORBUS, bus::ti99::colorbus, v9938_colorbus_device)
 

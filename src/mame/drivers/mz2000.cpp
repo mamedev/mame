@@ -79,7 +79,7 @@ public:
 	void mz80b(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<cassette_image_device> m_cass;
 
@@ -865,9 +865,11 @@ uint8_t mz2000_state::mz2000_pio1_porta_r()
 }
 
 
-FLOPPY_FORMATS_MEMBER( mz2000_state::floppy_formats )
-	FLOPPY_2D_FORMAT
-FLOPPY_FORMATS_END
+void mz2000_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_2D_FORMAT);
+}
 
 static void mz2000_floppies(device_slot_interface &device)
 {
@@ -951,8 +953,6 @@ ROM_START( mz80b )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
-	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 
@@ -969,8 +969,6 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
-	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 
@@ -990,8 +988,6 @@ ROM_START( mz2200 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-	//ROM_LOAD( "vosque2000.mzt",0x0000, 0x80, CRC(1) SHA1(1))
-	//ROM_CONTINUE( 0x0000, 0x7f80 )
 
 	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
 

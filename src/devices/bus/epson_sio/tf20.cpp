@@ -107,7 +107,7 @@ void epson_tf20_device::device_add_mconfig(machine_config &config)
 
 	// floppy drives
 	for (auto &fd : m_fd)
-		FLOPPY_CONNECTOR(config, fd, tf20_floppies, "sd320", floppy_image_device::default_floppy_formats);
+		FLOPPY_CONNECTOR(config, fd, tf20_floppies, "sd320", floppy_image_device::default_mfm_floppy_formats);
 
 	// serial interface to another device
 	EPSON_SIO(config, m_sio_output, nullptr);

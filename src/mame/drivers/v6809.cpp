@@ -46,6 +46,7 @@ ToDo:
 *******************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6809/m6809.h"
 #include "imagedev/floppy.h"
 #include "machine/6821pia.h"
@@ -57,10 +58,13 @@ ToDo:
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
 
 class v6809_state : public driver_device
 {
@@ -81,10 +85,11 @@ public:
 
 	void v6809(machine_config &config);
 
-private:
-	virtual void machine_reset() override;
+protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+private:
 	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	u8 pb_r();
@@ -351,8 +356,8 @@ void v6809_state::v6809(machine_config &config)
 	//rtc.irq_handler().set(m_pia0, FUNC(pia6821_device::cb2_w));   // unsupported by RTC emulation
 
 	MB8876(config, m_fdc, 16_MHz_XTAL / 16);
-	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", v6809_floppies, "525dd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", v6809_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", v6809_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 /* ROM definition */
@@ -367,6 +372,9 @@ ROM_START( v6809 )
 	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, BAD_DUMP CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

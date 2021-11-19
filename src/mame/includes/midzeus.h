@@ -42,7 +42,7 @@ struct mz_poly_extra_data
 
 class midzeus_state;
 
-class midzeus_renderer : public poly_manager<float, mz_poly_extra_data, 4, 10000>
+class midzeus_renderer : public poly_manager<float, mz_poly_extra_data, 4>
 {
 public:
 	midzeus_renderer(midzeus_state &state);
@@ -86,6 +86,9 @@ public:
 		m_io_keypad(*this, "KEYPAD"),
 		m_digits(*this, "digit%u", 0U)
 	{ }
+
+	// turn on for hardcoded video debugging inputs
+	static constexpr bool DEBUG_KEYS = false;
 
 	//static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
 	static constexpr int BEAM_DY = 3;

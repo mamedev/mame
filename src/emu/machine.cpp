@@ -84,7 +84,9 @@
 #include "network.h"
 #include "romload.h"
 #include "tilemap.h"
+#include "natkeyboard.h"
 #include "ui/uimain.h"
+#include "corestr.h"
 #include <ctime>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
@@ -131,16 +133,12 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_memory(*this),
 		m_ioport(*this),
 		m_parameters(*this),
-		m_scheduler(*this),
-		m_dummy_space(_config, "dummy_space", &root_device(), 0)
+		m_scheduler(*this)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
-	m_dummy_space.set_machine(*this);
-	m_dummy_space.config_complete();
-
 	// set the machine on all devices
-	device_iterator iter(root_device());
+	device_enumerator iter(root_device());
 	for (device_t &device : iter)
 		device.set_machine(*this);
 
@@ -218,11 +216,14 @@ void running_machine::start()
 	if (newbase != 0)
 		m_base_time = newbase;
 
+	// initialize natural keyboard support after ports have been initialized
+	m_natkeyboard = std::make_unique<natural_keyboard>(*this);
+
 	// initialize the streams engine before the sound devices start
 	m_sound = std::make_unique<sound_manager>(*this);
 
 	// resolve objects that can be used by memory maps
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.resolve_pre_map();
 
 	// configure the address spaces, load ROMs (which needs
@@ -252,7 +253,7 @@ void running_machine::start()
 	manager().create_custom(*this);
 
 	// resolve objects that are created by memory maps
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.resolve_post_map();
 
 	// register callbacks for the devices, then start them
@@ -312,8 +313,8 @@ int running_machine::run(bool quiet)
 		if (options().log() && !quiet)
 		{
 			m_logfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = m_logfile->open("error.log");
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = m_logfile->open("error.log");
+			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open error.log file");
 
 			using namespace std::placeholders;
@@ -323,8 +324,8 @@ int running_machine::run(bool quiet)
 		if (options().debug() && options().debuglog())
 		{
 			m_debuglogfile = std::make_unique<emu_file>(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			osd_file::error filerr = m_debuglogfile->open("debug.log");
-			if (filerr != osd_file::error::NONE)
+			std::error_condition const filerr = m_debuglogfile->open("debug.log");
+			if (filerr)
 				throw emu_fatalerror("running_machine::run: unable to open debug.log file");
 		}
 
@@ -350,6 +351,8 @@ int running_machine::run(bool quiet)
 		if (!quiet)
 			sound().start_recording();
 
+		m_hard_reset_pending = false;
+
 		// initialize ui lists
 		// display the startup screens
 		manager().ui_initialize(*this);
@@ -362,8 +365,6 @@ int running_machine::run(bool quiet)
 			handle_saveload();
 
 		export_http_api();
-
-		m_hard_reset_pending = false;
 
 #if defined(__EMSCRIPTEN__)
 		// break out to our async javascript loop and halt
@@ -413,7 +414,7 @@ int running_machine::run(bool quiet)
 	}
 	catch (binding_type_exception &btex)
 	{
-		osd_printf_error("Error performing a late bind of type %s to %s\n", btex.m_actual_type.name(), btex.m_target_type.name());
+		osd_printf_error("Error performing a late bind of function expecting type %s to instance of type %s\n", btex.target_type().name(), btex.actual_type().name());
 		error = EMU_ERR_FATALERROR;
 	}
 	catch (tag_add_exception &aex)
@@ -529,21 +530,10 @@ std::string running_machine::get_statename(const char *option) const
 			int name_found = 0;
 
 			// find length of the device name
-			int end1 = statename_str.find('/', pos + 3);
-			int end2 = statename_str.find('%', pos + 3);
-			int end;
-
-			if ((end1 != -1) && (end2 != -1))
-				end = std::min(end1, end2);
-			else if (end1 != -1)
-				end = end1;
-			else if (end2 != -1)
-				end = end2;
-			else
+			int end = statename_str.find_first_not_of("abcdefghijklmnopqrstuvwxyz1234567890", pos + 3);
+			if (end == -1)
 				end = statename_str.length();
 
-			if (end - pos < 3)
-				fatalerror("Something very wrong is going on!!!\n");
 
 			// copy the device name to an std::string
 			std::string devname_str;
@@ -551,7 +541,7 @@ std::string running_machine::get_statename(const char *option) const
 			//printf("check template: %s\n", devname_str.c_str());
 
 			// verify that there is such a device for this system
-			for (device_image_interface &image : image_interface_iterator(root_device()))
+			for (device_image_interface &image : image_interface_enumerator(root_device()))
 			{
 				// get the device name
 				std::string tempdevname(image.brief_instance_name());
@@ -878,7 +868,7 @@ void running_machine::current_datetime(system_time &systime)
 
 void running_machine::set_rtc_datetime(const system_time &systime)
 {
-	for (device_rtc_interface &rtc : rtc_interface_iterator(root_device()))
+	for (device_rtc_interface &rtc : rtc_interface_enumerator(root_device()))
 		if (rtc.has_battery())
 			rtc.set_current_time(systime);
 }
@@ -941,7 +931,7 @@ void running_machine::handle_saveload()
 			// open the file
 			emu_file file(m_saveload_searchpath ? m_saveload_searchpath : "", openflags);
 			auto const filerr = file.open(m_saveload_pending_file);
-			if (filerr == osd_file::error::NONE)
+			if (!filerr)
 			{
 				const char *const opnamed = (m_saveload_schedule == saveload_schedule::LOAD) ? "loaded" : "saved";
 
@@ -983,11 +973,15 @@ void running_machine::handle_saveload()
 				if (saverr != STATERR_NONE && m_saveload_schedule == saveload_schedule::SAVE)
 					file.remove_on_close();
 			}
-			else if (openflags == OPEN_FLAG_READ && filerr == osd_file::error::NOT_FOUND)
+			else if ((openflags == OPEN_FLAG_READ) && (std::errc::no_such_file_or_directory == filerr))
+			{
 				// attempt to load a non-existent savestate, report empty slot
 				popmessage("Error: No savestate file to load.", opname);
+			}
 			else
+			{
 				popmessage("Error: Failed to open file for %s operation.", opname);
+			}
 		}
 	}
 
@@ -1039,44 +1033,40 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
-	m_dummy_space.start();
-
 	// iterate through the devices
 	int last_failed_starts = -1;
-	while (last_failed_starts != 0)
+	do
 	{
 		// iterate over all devices
 		int failed_starts = 0;
-		for (device_t &device : device_iterator(root_device()))
+		for (device_t &device : device_enumerator(root_device()))
 			if (!device.started())
 			{
 				// attempt to start the device, catching any expected exceptions
 				try
 				{
 					// if the device doesn't have a machine yet, set it first
-					if (device.m_machine == nullptr)
+					if (!device.m_machine)
 						device.set_machine(*this);
 
 					// now start the device
 					osd_printf_verbose("Starting %s '%s'\n", device.name(), device.tag());
 					device.start();
 				}
-
-				// handle missing dependencies by moving the device to the end
-				catch (device_missing_dependencies &)
+				catch (device_missing_dependencies const &)
 				{
-					// if we're the end, fail
+					// handle missing dependencies by moving the device to the end
 					osd_printf_verbose("  (missing dependencies; rescheduling)\n");
 					failed_starts++;
 				}
 			}
 
-		// each iteration should reduce the number of failed starts; error if
-		// this doesn't happen
+		// each iteration should reduce the number of failed starts; error if this doesn't happen
 		if (failed_starts == last_failed_starts)
 			throw emu_fatalerror("Circular dependency in device startup!");
 		last_failed_starts = failed_starts;
 	}
+	while (last_failed_starts);
 }
 
 
@@ -1104,7 +1094,7 @@ void running_machine::stop_all_devices()
 		debugger().cpu().comment_save();
 
 	// iterate over devices and stop them
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.stop();
 }
 
@@ -1116,7 +1106,7 @@ void running_machine::stop_all_devices()
 
 void running_machine::presave_all_devices()
 {
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.pre_save();
 }
 
@@ -1128,7 +1118,7 @@ void running_machine::presave_all_devices()
 
 void running_machine::postload_all_devices()
 {
-	for (device_t &device : device_iterator(root_device()))
+	for (device_t &device : device_enumerator(root_device()))
 		device.post_load();
 }
 
@@ -1181,10 +1171,10 @@ std::string running_machine::nvram_filename(device_t &device) const
 
 void running_machine::nvram_load()
 {
-	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		emu_file file(options().nvram_directory(), OPEN_FLAG_READ);
-		if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+		if (!file.open(nvram_filename(nvram.device())))
 		{
 			nvram.nvram_load(file);
 			file.close();
@@ -1201,12 +1191,12 @@ void running_machine::nvram_load()
 
 void running_machine::nvram_save()
 {
-	for (device_nvram_interface &nvram : nvram_interface_iterator(root_device()))
+	for (device_nvram_interface &nvram : nvram_interface_enumerator(root_device()))
 	{
 		if (nvram.nvram_can_save())
 		{
 			emu_file file(options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			if (file.open(nvram_filename(nvram.device())) == osd_file::error::NONE)
+			if (!file.open(nvram_filename(nvram.device())))
 			{
 				nvram.nvram_save(file);
 				file.close();
@@ -1269,7 +1259,7 @@ void running_machine::export_http_api()
 			writer.Key("devices");
 			writer.StartArray();
 
-			device_iterator iter(this->root_device());
+			device_enumerator iter(this->root_device());
 			for (device_t &device : iter)
 				writer.String(device.tag());
 
@@ -1333,51 +1323,6 @@ void system_time::full_time::set(struct tm &t)
 	is_dst  = t.tm_isdst;
 }
 
-
-
-//**************************************************************************
-//  DUMMY ADDRESS SPACE
-//**************************************************************************
-
-u8 dummy_space_device::read(offs_t offset)
-{
-	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
-}
-
-void dummy_space_device::write(offs_t offset, u8 data)
-{
-	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
-}
-
-void dummy_space_device::dummy(address_map &map)
-{
-	map(0x00000000, 0xffffffff).rw(FUNC(dummy_space_device::read), FUNC(dummy_space_device::write));
-}
-
-DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space")
-
-dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(FUNC(dummy_space_device::dummy), this))
-{
-}
-
-void dummy_space_device::device_start()
-{
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector dummy_space_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
 
 
 //**************************************************************************

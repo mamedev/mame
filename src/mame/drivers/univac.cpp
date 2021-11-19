@@ -120,6 +120,8 @@ After entering the characters, press FCTN and CTRL PAGE keys again to save the s
 #define LOGNVRAM(...)   LOGMASKED(LOG_NVRAM, __VA_ARGS__)
 
 
+namespace {
+
 class univac_state : public driver_device
 {
 public:
@@ -158,6 +160,9 @@ public:
 	void uts10(machine_config &config);
 	void uts20(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	u8 ram_r(offs_t offset);
 	u8 bank_r(offs_t offset);
@@ -187,7 +192,6 @@ private:
 	void mem_map(address_map &map);
 	void uts10_io_map(address_map &map);
 	void uts10_map(address_map &map);
-	virtual void machine_start() override;
 
 	required_device<z80_device>     m_maincpu;
 	required_device<nvram_device>   m_nvram;
@@ -482,6 +486,8 @@ void univac_state::machine_start()
 	save_item(NAME(m_aux_dsr));
 	save_item(NAME(m_sio_wrdyb));
 	save_item(NAME(m_disp_mask));
+
+	m_disp_mask = 0;
 }
 
 uint32_t univac_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -671,6 +677,8 @@ ROM_START( uts20 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "chr_5565.bin", 0x0000, 0x0800, BAD_DUMP CRC(7d99744f) SHA1(2db330ca94a91f7b2ac2ac088ae9255f5bb0a7b4) )
 ROM_END
+
+} // Anonymous namespace
 
 /* Driver */
 

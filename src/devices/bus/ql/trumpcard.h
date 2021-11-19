@@ -47,7 +47,7 @@ protected:
 
 private:
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1772_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

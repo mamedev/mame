@@ -11,8 +11,8 @@ Chips: INS8250N-B, Z80A, uPD2716D, 82S129. Crystals: 16 MHz, 1.8432MHz
 
 SYSTEM OPERATION:
 Press Enter up to three times to start the system.
-Supported baud rates include 110, 150, 300, 600, 1200, 2400, 9600, 14400,
-38400, 57600 and 115200.
+Supported baud rates include 50, 75, 110, 134.5, 150, 200, 300, 600, 1200,
+1800, 2000, 2400, 3600, 7200, 9600, 14400, 38400, 57600 and 115200.
 All commands are in uppercase.
 
 A    Assign logical device
@@ -99,6 +99,8 @@ ToDo:
 #include "machine/z80sio.h"
 
 
+namespace {
+
 class ccs_state : public driver_device
 {
 public:
@@ -121,6 +123,9 @@ public:
 	void ccs2422(machine_config &config);
 
 protected:
+	void machine_start() override;
+	void machine_reset() override;
+
 	u8 port04_r();
 	u8 port34_r();
 	void port04_w(u8 data);
@@ -150,9 +155,6 @@ private:
 	u8 io_read(offs_t offset);
 	void io_write(offs_t offset, u8 data);
 
-	void machine_start() override;
-	void machine_reset() override;
-
 	void port40_w(u8 data);
 
 	void ccs2422_io(address_map &map);
@@ -173,9 +175,11 @@ public:
 
 	void ccs300(machine_config &config);
 
-private:
+protected:
 	void machine_start() override;
 	void machine_reset() override;
+
+private:
 	void ccs300_io(address_map &map);
 	void ccs300_mem(address_map &map);
 	void port40_w(u8 data);
@@ -978,6 +982,7 @@ void ccs300_state::machine_start()
 {
 	m_bank1->configure_entry(0, m_ram1);
 	m_bank1->configure_entry(1, m_rom);
+
 	save_item(NAME(m_ss));
 	save_item(NAME(m_dden));
 	save_item(NAME(m_dsize));
@@ -1002,7 +1007,6 @@ static const z80_daisy_config daisy_chain[] =
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -1063,7 +1067,7 @@ void ccs_state::ccs2422(machine_config &config)
 	rs232.cts_handler().set(m_ins8250, FUNC(ins8250_device::cts_w));
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
-	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 void ccs300_state::ccs300(machine_config & config)
@@ -1112,7 +1116,7 @@ void ccs300_state::ccs300(machine_config & config)
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	MB8877(config, m_fdc, 16_MHz_XTAL / 8); // UB1793 or MB8877
-	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 }
 
 
@@ -1140,9 +1144,12 @@ ROM_START( ccs300 )
 	ROM_LOAD( "ccs300.rom", 0x0000, 0x0800, CRC(6cf22e31) SHA1(9aa3327cd8c23d0eab82cb6519891aff13ebe1d0))
 ROM_END
 
+} // anonymous namespace
+
+
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT          COMPANY                        FULLNAME                    FLAGS */
+//    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT    CLASS         INIT        COMPANY                        FULLNAME                    FLAGS
 COMP( 1980, ccs2810, 0,       0,      ccs2810,  ccs2810, ccs_state,    empty_init, "California Computer Systems", "CCS Model 2810 CPU card",  MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
 COMP( 1980, ccs2422, ccs2810, 0,      ccs2422,  ccs2810, ccs_state,    empty_init, "California Computer Systems", "CCS Model 2422B FDC card", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, ccs300,  ccs2810, 0,      ccs300,   ccs300,  ccs300_state, empty_init, "California Computer Systems", "CCS Model 300", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, ccs300,  ccs2810, 0,      ccs300,   ccs300,  ccs300_state, empty_init, "California Computer Systems", "CCS Model 300",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

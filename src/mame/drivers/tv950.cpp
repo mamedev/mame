@@ -304,7 +304,7 @@ void tv950_state::tv950(machine_config &config)
 	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
 	m_crtc->set_screen(nullptr);
 
-	VIA6522(config, m_via, MASTER_CLOCK/14);
+	MOS6522(config, m_via, MASTER_CLOCK/14);
 	//m_via->irq_handler().set_inputline(m_maincpu, M6502_NMI_LINE);
 	m_via->writepa_handler().set(FUNC(tv950_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(tv950_state::via_b_w));

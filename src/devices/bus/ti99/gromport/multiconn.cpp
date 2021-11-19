@@ -49,9 +49,9 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_MULTI,  bus::ti99::gromport, ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT_MULTI,  bus::ti99::gromport::ti99_multi_cart_conn_device,  "ti99_mcartconn", "TI-99 Multi-cartridge extender")
 
-namespace bus { namespace ti99 { namespace gromport {
+namespace bus::ti99::gromport {
 
 #define AUTO -1
 
@@ -330,5 +330,5 @@ ioport_constructor ti99_multi_cart_conn_device::device_input_ports() const
 	return INPUT_PORTS_NAME(multi_slot);
 }
 
-} } } // end namespace bus::ti99::gromport
+} // end namespace bus::ti99::gromport
 

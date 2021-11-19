@@ -8,11 +8,11 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "includes/radio86.h"
 #include "includes/partner.h"
+
+#include "cpu/i8085/i8085.h"
+
 
 /* Driver initialization */
 void partner_state::init_partner()
@@ -311,7 +311,7 @@ void partner_state::bank_switch()
 		m_bank[11]->set_base(rom);
 	else
 		//window 1
-		window_1(12, 0, rom);
+		window_1(11, 0, rom);
 
 	// BANK 13 (0xe800 - 0xffff)
 	switch (m_mem_page)
@@ -355,7 +355,7 @@ I8275_DRAW_CHARACTER_MEMBER(partner_state::display_pixels)
 	if (rvv)
 		pixels ^= 0xff;
 
-	for(int i=0;i<6;i++)
+	for (int i=0;i<6;i++)
 		bitmap.pix(y, x + i) = palette[(pixels >> (5-i)) & 1];
 }
 

@@ -64,6 +64,10 @@ void nova2001_state::paletteram_w(offs_t offset, u8 data)
 	}
 }
 
+u8 nova2001_state::paletteram_r(offs_t offset)
+{
+	return m_paletteram[offset];
+}
 
 
 /*************************************

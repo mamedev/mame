@@ -497,10 +497,9 @@ static void isbc202_floppies(device_slot_interface &device)
 	device.option_add("8ssdd" , FLOPPY_8_SSDD);
 }
 
-static const floppy_format_type isbc202_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_IMG_FORMAT,
-	nullptr
+static void isbc202_floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_IMG_FORMAT);
 };
 
 void isbc202_device::device_add_mconfig(machine_config &config)

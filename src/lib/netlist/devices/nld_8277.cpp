@@ -20,10 +20,8 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(8277_shifter)
 	{
 		NETLIB_CONSTRUCTOR(8277_shifter)
@@ -165,5 +163,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(8277,     "TTL_8277",     "+RESET,+CLK,+CLKA,+D0A,+D1A,+DSA,+CLKB,+D0B,+D1B,+DSB,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

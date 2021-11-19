@@ -223,7 +223,6 @@ private:
 	uint8_t m_tranqgun_prot_return;
 };
 
-
 class nsub_state : public vicdual_state
 {
 public:
@@ -270,7 +269,6 @@ public:
 
 	void carnival(machine_config &config);
 	void carnivalb(machine_config &config);
-	void carnivalh(machine_config &config);
 
 	void carnivala_audio(machine_config &config);
 	void carnivalb_audio(machine_config &config);
@@ -300,6 +298,28 @@ protected:
 	void carnival_psg_latch();
 	void carnivalb_music_port_1_w(uint8_t data);
 	void carnivalb_music_port_2_w(uint8_t data);
+};
+
+class carnivalh_state : public carnival_state
+{
+public:
+	carnivalh_state(const machine_config &mconfig, device_type type, const char *tag) :
+		carnival_state(mconfig, type, tag)
+	{ }
+
+	void carnivalh(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	uint8_t carnivalh_prot_r(offs_t offset);
+	void carnivalh_prot_w(offs_t offset, uint8_t data);
+
+	void carnivalh_dualgame_map(address_map &map);
+
+	uint16_t m_previousaddress;
+	uint8_t m_previousvalue;
 };
 
 class headonsa_state : public vicdual_state

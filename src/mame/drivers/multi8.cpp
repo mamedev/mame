@@ -25,8 +25,9 @@
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "imagedev/cassette.h"
-#include "sound/2203intf.h"
+#include "sound/ay8910.h"
 #include "sound/beep.h"
+#include "sound/ymopn.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -667,7 +668,7 @@ void multi8_state::multi8(machine_config &config)
 	PIC8259(config, "pic", 0);
 
 	//UPD765A(config, "fdc", false, true);
-	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_floppy_formats);
+	//FLOPPY_CONNECTOR(config, "fdc:0", multi8_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 /* ROM definition */

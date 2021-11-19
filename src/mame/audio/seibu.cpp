@@ -82,8 +82,10 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 		m_rom_bank(*this, finder_base::DUMMY_TAG),
 		m_main2sub_pending(0),
 		m_sub2main_pending(0),
-		m_rst10_irq(0xff),
-		m_rst18_irq(0xff)
+		m_rst10_irq(false),
+		m_rst18_irq(false),
+		m_rst10_service(false),
+		m_rst18_service(false)
 {
 }
 
@@ -118,6 +120,8 @@ void seibu_sound_device::device_start()
 	save_item(NAME(m_sub2main_pending));
 	save_item(NAME(m_rst10_irq));
 	save_item(NAME(m_rst18_irq));
+	save_item(NAME(m_rst10_service));
+	save_item(NAME(m_rst18_service));
 }
 
 //-------------------------------------------------
@@ -136,37 +140,63 @@ void seibu_sound_device::update_irq_lines(int param)
 
 TIMER_CALLBACK_MEMBER(seibu_sound_device::update_irq_synced)
 {
-	// note: we use 0xff here for inactive irqline
-
 	switch (param)
 	{
-		case VECTOR_INIT:
-			m_rst10_irq = m_rst18_irq = 0xff;
-			break;
+	case VECTOR_INIT:
+		m_rst10_irq = m_rst18_irq = false;
+		m_rst10_service = m_rst18_service = false;
+		break;
 
-		case RST10_ASSERT:
-			m_rst10_irq = 0xd7;
-			break;
+	case RST10_ASSERT:
+		m_rst10_irq = true;
+		break;
 
-		case RST10_CLEAR:
-			m_rst10_irq = 0xff;
-			break;
+	case RST10_CLEAR:
+		m_rst10_irq = false;
+		break;
 
-		case RST18_ASSERT:
-			m_rst18_irq = 0xdf;
-			break;
+	case RST10_ACKNOWLEDGE:
+		m_rst10_service = true;
+		break;
 
-		case RST18_CLEAR:
-			m_rst18_irq = 0xff;
-			break;
+	case RST10_EOI:
+		m_rst10_service = false;
+		break;
+
+	case RST18_ASSERT:
+		m_rst18_irq = true;
+		break;
+
+	case RST18_ACKNOWLEDGE:
+		m_rst18_service = true;
+		m_rst18_irq = false;
+		break;
+
+	case RST18_EOI:
+		m_rst18_service = false;
+		break;
 	}
 
-	m_int_cb((m_rst10_irq & m_rst18_irq) == 0xff ? CLEAR_LINE : ASSERT_LINE);
+	m_int_cb((m_rst10_irq && !m_rst10_service) || (m_rst18_irq && !m_rst18_service) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(seibu_sound_device::im0_vector_cb)
 {
-	return m_rst10_irq & m_rst18_irq;
+	if (m_rst18_irq && !m_rst18_service)
+	{
+		update_irq_lines(RST18_ACKNOWLEDGE);
+		return 0xdf;
+	}
+	else if (m_rst10_irq && !m_rst10_service)
+	{
+		update_irq_lines(RST10_ACKNOWLEDGE);
+		return 0xd7;
+	}
+	else
+	{
+		logerror("Spurious interrupt taken\n");
+		return 0x00;
+	}
 }
 
 
@@ -174,16 +204,18 @@ void seibu_sound_device::irq_clear_w(u8)
 {
 	/* Denjin Makai and SD Gundam doesn't like this, it's tied to the rst18 ack ONLY so it could be related to it. */
 	//update_irq_lines(VECTOR_INIT);
+
+	update_irq_lines(RST18_EOI);
 }
 
 void seibu_sound_device::rst10_ack_w(u8)
 {
-	/* Unused for now */
+	update_irq_lines(RST10_EOI);
 }
 
 void seibu_sound_device::rst18_ack_w(u8)
 {
-	update_irq_lines(RST18_CLEAR);
+	update_irq_lines(RST18_EOI);
 }
 
 WRITE_LINE_MEMBER( seibu_sound_device::fm_irqhandler )
@@ -360,21 +392,18 @@ u8 sei80bu_device::opcode_r(offs_t offset)
 /***************************************************************************
     Seibu ADPCM device
     (MSM5205 with interface to sample ROM provided by YM3931)
-
-    FIXME: hook up an actual MSM5205 in place of this custom implementation
 ***************************************************************************/
 
-DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM (MSM5205)")
+DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM interface")
 
 seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_stream(nullptr),
-		m_current(0),
-		m_end(0),
-		m_nibble(0),
-		m_playing(0),
-		m_base(*this, DEVICE_SELF)
+	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock)
+	, m_msm(*this, finder_base::DUMMY_TAG)
+	, m_current(0)
+	, m_end(0)
+	, m_nibble(0)
+	, m_playing(0)
+	, m_base(*this, DEVICE_SELF)
 {
 }
 
@@ -384,14 +413,16 @@ seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char
 
 void seibu_adpcm_device::device_start()
 {
-	m_playing = 0;
-	m_stream = stream_alloc(0, 1, clock());
-	m_adpcm.reset();
-
 	save_item(NAME(m_current));
 	save_item(NAME(m_end));
 	save_item(NAME(m_nibble));
 	save_item(NAME(m_playing));
+}
+
+void seibu_adpcm_device::device_reset()
+{
+	m_playing = 0;
+	m_msm->reset_w(1);
 }
 
 // "decrypt" is a bit flowery here, as it's probably just line-swapping to
@@ -408,9 +439,6 @@ void seibu_adpcm_device::decrypt()
 
 void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
 {
-	if (m_stream)
-		m_stream->update();
-
 	if (offset)
 	{
 		m_end = data<<8;
@@ -425,45 +453,37 @@ void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
 void seibu_adpcm_device::ctl_w(u8 data)
 {
 	// sequence is 00 02 01 each time.
-	if (m_stream)
-		m_stream->update();
-
 	switch (data)
 	{
 		case 0:
+			m_msm->reset_w(1);
 			m_playing = 0;
 			break;
 		case 2:
 			break;
 		case 1:
+			m_msm->reset_w(0);
 			m_playing = 1;
 			break;
 	}
 }
 
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void seibu_adpcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void seibu_adpcm_device::msm_int(int state)
 {
-	auto &dest = outputs[0];
+	if (!state || !m_playing)
+		return;
 
-	int sampindex;
-	for (sampindex = 0; m_playing && sampindex < dest.samples(); sampindex++)
+	int val = (m_base[m_current] >> m_nibble) & 15;
+	m_msm->data_w(val);
+
+	m_nibble ^= 4;
+	if (m_nibble == 4)
 	{
-		int val = (m_base[m_current] >> m_nibble) & 15;
-
-		m_nibble ^= 4;
-		if (m_nibble == 4)
+		m_current++;
+		if (m_current >= m_end)
 		{
-			m_current++;
-			if (m_current >= m_end)
-				m_playing = 0;
+			m_msm->reset_w(1);
+			m_playing = 0;
 		}
-
-		dest.put_int(sampindex, m_adpcm.clock(val), 32768 >> 4);
 	}
-	dest.fill(0, sampindex);
 }

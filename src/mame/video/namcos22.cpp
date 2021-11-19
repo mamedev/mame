@@ -12,7 +12,7 @@
 
 // poly constructor
 namcos22_renderer::namcos22_renderer(namcos22_state &state)
-	: poly_manager<float, namcos22_object_data, 4, 8000>(state.machine()),
+	: poly_manager<float, namcos22_object_data, 4>(state.machine()),
 		m_state(state)
 	{
 		init();
@@ -260,8 +260,8 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 			v[vertnum].p[3] = node->data.quad.v[vertnum].bri;
 		}
 
-		clipverts = zclip_if_less(4, v, clipv, 4, 10.0f);
-		assert(clipverts <= ARRAY_LENGTH(clipv));
+		clipverts = zclip_if_less<4>(4, v, clipv, 10.0f);
+		assert(clipverts <= std::size(clipv));
 		if (clipverts < 3)
 			return;
 
@@ -293,7 +293,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	namcos22_object_data &extra = object_data_alloc();
+	namcos22_object_data &extra = object_data().next();
 	int flags = node->data.quad.flags;
 	int color = node->data.quad.color;
 	int cz_adjust = node->data.quad.cz_adjust;
@@ -390,7 +390,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	render_triangle_fan(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), 4, clipverts, clipv);
+	render_triangle_fan<4>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), clipverts, clipv);
 }
 
 
@@ -420,7 +420,7 @@ void namcos22_renderer::poly3d_drawsprite(
 		float fsw = sprite_screen_width;
 		float fsh = sprite_screen_height;
 
-		namcos22_object_data &extra = object_data_alloc();
+		namcos22_object_data &extra = object_data().next();
 		vertex_t vert[4];
 
 		extra.fadefactor = 0;
@@ -468,7 +468,7 @@ void namcos22_renderer::poly3d_drawsprite(
 			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
 
-		render_triangle_fan(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 2, 4, vert);
+		render_triangle_fan<2>(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 4, vert);
 	}
 }
 
@@ -530,7 +530,7 @@ struct namcos22_scenenode *namcos22_renderer::alloc_scenenode(running_machine &m
 	}
 	else
 	{
-		node = auto_alloc(machine, struct namcos22_scenenode);
+		node = &m_scenenode_alloc.emplace_back();
 	}
 	memset(node, 0, sizeof(*node));
 	return node;
@@ -1213,8 +1213,8 @@ void namcos22_state::slavesim_handle_bb0003(const s32 *src)
 	m_camera_vx = (s16)(src[0x5] >> 16);
 	m_camera_vy = (s16)(src[0x5] & 0xffff);
 	m_camera_zoom = dspfloat_to_nativefloat(src[0x6]);
-	m_camera_vl = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
-	m_camera_vr = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
+	m_camera_vr = dspfloat_to_nativefloat(src[0x7]) * m_camera_zoom + 0.5f;
+	m_camera_vl = dspfloat_to_nativefloat(src[0x8]) * m_camera_zoom + 0.5f;
 	m_camera_vu = dspfloat_to_nativefloat(src[0x9]) * m_camera_zoom + 0.5f;
 	m_camera_vd = dspfloat_to_nativefloat(src[0xa]) * m_camera_zoom + 0.5f;
 
@@ -2580,5 +2580,5 @@ void namcos22_state::video_start()
 
 	m_gfxdecode->gfx(0)->set_source((u8 *)m_cgram.target());
 
-	m_poly = auto_alloc(machine(), namcos22_renderer(*this));
+	m_poly = std::make_unique<namcos22_renderer>(*this);
 }

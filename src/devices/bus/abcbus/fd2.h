@@ -60,7 +60,7 @@ private:
 
 	void status_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void abc_fd2_io(address_map &map);
 	void abc_fd2_mem(address_map &map);

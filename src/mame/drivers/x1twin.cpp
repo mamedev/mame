@@ -18,7 +18,7 @@
 #include "includes/x1.h"
 #include "includes/pce.h"
 
-#include "rendlay.h"
+#include "layout/generic.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"

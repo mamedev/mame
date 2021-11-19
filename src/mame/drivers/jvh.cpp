@@ -131,7 +131,7 @@ void jvh_state::common(machine_config &config)
 	m6802_cpu_device &soundcpu(M6802(config, "soundcpu", XTAL(4'000'000)));
 	soundcpu.set_addrmap(AS_PROGRAM, &jvh_state::jvh_sub_map);
 
-	via6522_device &via(VIA6522(config, "via", XTAL(4'000'000) / 4)); // MC6802 E clock
+	via6522_device &via(MOS6522(config, "via", XTAL(4'000'000) / 4)); // MC6802 E clock
 	via.irq_handler().set_inputline("soundcpu", M6802_IRQ_LINE);
 }
 

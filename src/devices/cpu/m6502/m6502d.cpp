@@ -192,7 +192,7 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 
 	case DASM_bar:
-		util::stream_format(stream, " %d, a, $%04x", (opcodes.r8(pc) >> 5) & 7, (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(params.r8(pc+1))));
+		util::stream_format(stream, " %d, a, $%04x", (opcodes.r8(pc) >> 5) & 7, (pc & 0xf0000) | uint16_t(pc + 2 + int8_t(params.r8(pc+1))));
 		flags |= 2;
 		break;
 

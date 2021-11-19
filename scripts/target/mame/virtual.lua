@@ -13,13 +13,14 @@
 -- specify available CPU cores
 --------------------------------------------------
 
-CPUS["M6502"] = true
+CPUS["DSP16"] = true -- for qsound
 CPUS["H6280"] = true
+CPUS["KS0164"] = true
+CPUS["M6502"] = true
 CPUS["M680X0"] = true
 CPUS["MCS48"] = true
 CPUS["SH"] = true
 CPUS["Z80"] = true
-CPUS["DSP16"] = true -- for qsound
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -37,6 +38,7 @@ SOUNDS["IREMGA20"] = true
 SOUNDS["K051649"] = true
 SOUNDS["K053260"] = true
 SOUNDS["K054539"] = true
+SOUNDS["KS0164"] = true
 SOUNDS["MULTIPCM"] = true
 SOUNDS["NES_APU"] = true
 SOUNDS["OKIM6258"] = true
@@ -54,7 +56,10 @@ SOUNDS["VGMVIZ"] = true
 SOUNDS["WAVE"] = true
 SOUNDS["X1_010"] = true
 SOUNDS["Y8950"] = true
+SOUNDS["YM2154"] = true
 SOUNDS["YM2151"] = true
+SOUNDS["YM2414"] = true
+SOUNDS["YM3806"] = true
 SOUNDS["YM2203"] = true
 SOUNDS["YM2413"] = true
 SOUNDS["YM2608"] = true
@@ -83,6 +88,7 @@ MACHINES["Z80DAISY"] = true
 --------------------------------------------------
 -- specify available bus cores
 --------------------------------------------------
+BUSES["MIDI"] = true
 
 
 --------------------------------------------------

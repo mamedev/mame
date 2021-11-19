@@ -153,10 +153,10 @@ void rtpc_kbd_device::p1_w(u8 data)
 	}
 
 	if (BIT(m_p1 ^ data, 7))
-		data_w(BIT(data, 7));
+		m_port->data_write_from_kb(BIT(data, 7));
 
 	if (BIT(m_p1 ^ data, 6))
-		clock_w(BIT(data, 6));
+		m_port->clock_write_from_kb(BIT(data, 6));
 
 	// test key down
 	// TODO: not sure exactly how bits 0..2 gate or enable the sample

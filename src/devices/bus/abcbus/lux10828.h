@@ -88,7 +88,7 @@ private:
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void luxor_55_10828_io(address_map &map);
 	void luxor_55_10828_mem(address_map &map);

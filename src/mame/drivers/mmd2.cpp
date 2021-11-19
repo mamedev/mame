@@ -113,7 +113,6 @@ public:
 		, m_p(*this, "p%u_%u", 0U, 0U)
 		, m_led_halt(*this, "led_halt")
 		, m_led_hold(*this, "led_hold")
-		, m_led_inte(*this, "led_inte")
 	{ }
 
 	void mmd2(machine_config &config);
@@ -122,9 +121,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	void round_leds_w(offs_t, u8);
 	void port05_w(u8 data);
 	u8 port01_r();
@@ -134,7 +135,6 @@ private:
 	void scanlines_w(u8 data);
 	void digit_w(u8 data);
 	void status_callback(u8 data);
-	DECLARE_WRITE_LINE_MEMBER(inte_callback);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -151,14 +151,13 @@ private:
 	output_finder<3, 8> m_p;
 	output_finder<> m_led_halt;
 	output_finder<> m_led_hold;
-	output_finder<> m_led_inte;
 };
 
 
 void mmd2_state::round_leds_w(offs_t offset, u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
-		m_p[offset][i] = BIT(data, i) ? 0 : 1;
+		m_p[offset][i] = BIT(~data, i);
 }
 
 void mmd2_state::mem_map(address_map &map)
@@ -300,16 +299,10 @@ u8 mmd2_state::keyboard_r()
 void mmd2_state::status_callback(u8 data)
 {
 	// operate the HALT LED
-	m_led_halt = ~data & i8080_cpu_device::STATUS_HLTA;
+	m_led_halt = (~data & i8080_cpu_device::STATUS_HLTA) ? 1 : 0;
 	// operate the HOLD LED - this should connect to the HLDA pin,
 	// but it isn't emulated, using WO instead (whatever that does).
-	m_led_hold = data & i8080_cpu_device::STATUS_WO;
-}
-
-WRITE_LINE_MEMBER( mmd2_state::inte_callback )
-{
-	// operate the INTE LED
-	m_led_inte = state;
+	m_led_hold = (data & i8080_cpu_device::STATUS_WO) ? 1 : 0;
 }
 
 void mmd2_state::machine_start()
@@ -318,7 +311,7 @@ void mmd2_state::machine_start()
 	m_p.resolve();
 	m_led_halt.resolve();
 	m_led_hold.resolve();
-	m_led_inte.resolve();
+
 	save_pointer(NAME(m_ram), 0x1400);
 	save_item(NAME(m_digit));
 }
@@ -374,17 +367,17 @@ void mmd2_state::mmd2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmd2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mmd2_state::io_map);
 	m_maincpu->out_status_func().set(FUNC(mmd2_state::status_callback));
-	m_maincpu->out_inte_func().set(FUNC(mmd2_state::inte_callback));
+	m_maincpu->out_inte_func().set_output("led_inte");         // operate the INTE LED
 
 	/* video hardware */
 	config.set_default_layout(layout_mmd2);
 
 	/* Devices */
-	i8279_device &kbdc(I8279(config, "i8279", 400000));             // based on divider
+	i8279_device &kbdc(I8279(config, "i8279", 400000));        // based on divider
 	kbdc.out_sl_callback().set(FUNC(mmd2_state::scanlines_w)); // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(mmd2_state::digit_w));   // display A&B
-	kbdc.in_rl_callback().set(FUNC(mmd2_state::keyboard_r));        // kbd RL lines
-	kbdc.in_shift_callback().set_constant(1);                       // Shift key
+	kbdc.in_rl_callback().set(FUNC(mmd2_state::keyboard_r));   // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                  // Shift key
 	kbdc.in_ctrl_callback().set_constant(1);
 
 	// Cassette

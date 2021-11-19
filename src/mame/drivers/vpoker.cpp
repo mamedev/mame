@@ -106,6 +106,8 @@
 #include "speaker.h"
 
 
+namespace {
+
 class vpoker_state : public driver_device
 {
 public:
@@ -113,10 +115,14 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_in0(*this, "IN0")
 	{ }
 
 	void vpoker(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -124,11 +130,11 @@ private:
 	uint8_t blitter_r(offs_t offset);
 	void blitter_w(offs_t offset, uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	virtual void video_start() override;
 	uint32_t screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_ioport m_in0;
 	void main_map(address_map &map);
 };
 
@@ -136,6 +142,7 @@ private:
 void vpoker_state::video_start()
 {
 	m_videoram = std::make_unique<uint8_t[]>(0x200);
+	std::fill(std::begin(m_blit_ram), std::end(m_blit_ram), 0);
 }
 
 uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -144,11 +151,9 @@ uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count = 0x0000;
 
-	int y,x;
-
-	for (y=0;y<0x10;y++)
+	for (int y=0;y<0x10;y++)
 	{
-		for (x=0;x<0x20;x++)
+		for (int x=0;x<0x20;x++)
 		{
 			int tile = videoram[count];
 			//int colour = tile>>12;
@@ -164,7 +169,7 @@ uint32_t vpoker_state::screen_update_vpoker(screen_device &screen, bitmap_ind16 
 uint8_t vpoker_state::blitter_r(offs_t offset)
 {
 	if(offset == 6)
-		return ioport("IN0")->read();
+		return m_in0->read();
 
 	return 0;
 }
@@ -706,6 +711,8 @@ ROM_START( 5acespkr )
 	ROM_LOAD16_BYTE( "bjok2.bin",  0x2000, 0x1000, CRC(d845f8a1) SHA1(fb050e72164662c2f5670f59a8ad43d19c0485ea) )
 	ROM_LOAD16_BYTE( "bjok1.bin",  0x2001, 0x1000, CRC(20cdda67) SHA1(6c631b09e3da5f6660aa1c018fc0ff3004f7fe85) )
 ROM_END
+
+} // Anonymous namespace
 
 
 //    YEAR  NAME      PARENT  MACHINE  INPUT     STATE         INIT        ROT   COMPANY               FULLNAME                   FLAGS

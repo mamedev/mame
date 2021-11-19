@@ -390,7 +390,7 @@ void e0c6s46_device::clock_watchdog()
 	// initial reset after 3 to 4 seconds
 	if (++m_watchdog_count == 4)
 	{
-		logerror("%s watchdog reset\n", tag());
+		logerror("watchdog reset\n");
 		m_watchdog_count = 0;
 		device_reset();
 	}
@@ -690,7 +690,7 @@ u8 e0c6s46_device::io_r(offs_t offset)
 
 		default:
 			if (!machine().side_effects_disabled())
-				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag(), offset, m_prev_pc);
+				logerror("unknown io_r from $0F%02X at $%04X\n", offset, m_prev_pc);
 			break;
 	}
 
@@ -758,7 +758,7 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 			// d2: OSC3 on (high freq)
 			// d3: clock source OSC1 or OSC3
 			if (data & 8)
-				logerror("%s io_w selected OSC3! PC=$%04X\n", tag(), m_prev_pc);
+				logerror("io_w selected OSC3! PC=$%04X\n", m_prev_pc);
 			m_osc = data;
 			break;
 
@@ -861,7 +861,7 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 			// d2: reset envelope
 			// d3: trigger one-shot buzzer
 			if (data & 1)
-				logerror("%s io_w enabled envelope, PC=$%04X\n", tag(), m_prev_pc);
+				logerror("io_w enabled envelope, PC=$%04X\n", m_prev_pc);
 			m_bz_envelope = data & 3;
 			m_bz_1shot_on |= data & 8;
 			break;
@@ -874,7 +874,7 @@ void e0c6s46_device::io_w(offs_t offset, u8 data)
 
 		default:
 			if (machine().phase() > machine_phase::RESET)
-				logerror("%s unknown io_w $%X to $0F%02X at $%04X\n", tag(), data, offset, m_prev_pc);
+				logerror("unknown io_w $%X to $0F%02X at $%04X\n", data, offset, m_prev_pc);
 			break;
 	}
 }

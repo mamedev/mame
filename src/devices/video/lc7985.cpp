@@ -136,12 +136,12 @@ void lc7985_device::ir_w(u8 data)
 		// Set CGRAM address
 		m_cgac = data & 0x3f;
 		m_access_ddram = false;
-		busy(attotime::from_usec(40));		
+		busy(attotime::from_usec(40));
 
 	} else if(data & 0x20) {
 		// Set Function
 		m_function = data;
-		busy(attotime::from_usec(40));		
+		busy(attotime::from_usec(40));
 
 	} else if(data & 0x10) {
 		// Cursor/Display Shift
@@ -153,24 +153,24 @@ void lc7985_device::ir_w(u8 data)
 		case 3: shift_right(); break;
 		}
 
-		busy(attotime::from_usec(40));		
+		busy(attotime::from_usec(40));
 
 	} else if(data & 0x08) {
 		// Display On/Off
 		m_display = data;
-		busy(attotime::from_usec(40));		
+		busy(attotime::from_usec(40));
 
 	} else if(data & 0x04) {
 		// Set Entry Mode
 		m_entry = data;
-		busy(attotime::from_usec(40));		
+		busy(attotime::from_usec(40));
 
 	} else if(data & 0x02) {
 		// Cursor home
 		m_ddac = 0;
 		m_shift = 0;
 		m_access_ddram = true;
-		busy(attotime::from_usec(16400));		
+		busy(attotime::from_usec(16400));
 
 	} else if(data & 0x01) {
 		// Display clear

@@ -938,6 +938,7 @@ void gameplan_state::machine_start()
 	save_item(NAME(m_video_y));
 	save_item(NAME(m_video_command));
 	save_item(NAME(m_video_data));
+	save_item(NAME(m_video_previous));
 }
 
 
@@ -948,6 +949,7 @@ void gameplan_state::machine_reset()
 	m_video_y = 0;
 	m_video_command = 0;
 	m_video_data = 0;
+	m_video_previous = 0;
 }
 
 void gameplan_state::gameplan(machine_config &config)
@@ -976,18 +978,18 @@ void gameplan_state::gameplan(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.33);
 
 	/* via */
-	VIA6522(config, m_via_0, GAMEPLAN_MAIN_CPU_CLOCK);
+	MOS6522(config, m_via_0, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_0->writepa_handler().set(FUNC(gameplan_state::video_data_w));
 	m_via_0->writepb_handler().set(FUNC(gameplan_state::gameplan_video_command_w));
 	m_via_0->ca2_handler().set(FUNC(gameplan_state::video_command_trigger_w));
 	m_via_0->irq_handler().set(FUNC(gameplan_state::via_irq));
 
-	VIA6522(config, m_via_1, GAMEPLAN_MAIN_CPU_CLOCK);
+	MOS6522(config, m_via_1, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_1->readpa_handler().set(FUNC(gameplan_state::io_port_r));
 	m_via_1->writepb_handler().set(FUNC(gameplan_state::io_select_w));
 	m_via_1->cb2_handler().set(FUNC(gameplan_state::coin_w));
 
-	VIA6522(config, m_via_2, GAMEPLAN_MAIN_CPU_CLOCK);
+	MOS6522(config, m_via_2, GAMEPLAN_MAIN_CPU_CLOCK);
 	m_via_2->readpb_handler().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_via_2->writepa_handler().set(FUNC(gameplan_state::audio_cmd_w));
 	m_via_2->ca2_handler().set(FUNC(gameplan_state::audio_trigger_w));
@@ -998,6 +1000,9 @@ void gameplan_state::leprechn(machine_config &config)
 {
 	gameplan(config);
 	m_maincpu->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	m_via_0->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	m_via_1->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
+	m_via_2->set_clock(LEPRECHAUN_MAIN_CPU_CLOCK);
 
 	/* basic machine hardware */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gameplan_state::leprechn_audio_map);

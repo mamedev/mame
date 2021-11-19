@@ -102,7 +102,7 @@ DECLARE_DEVICE_TYPE(TMC600_EUROBUS_SLOT, tmc600_eurobus_slot_device)
 void tmc600_eurobus_cards(device_slot_interface &device);
 
 
-typedef device_type_iterator<tmc600_eurobus_slot_device> tmc600_eurobus_slot_iterator;
+typedef device_type_enumerator<tmc600_eurobus_slot_device> tmc600_eurobus_slot_enumerator;
 
 
 #endif // MAME_DEVICES_TMC600_EURO_H

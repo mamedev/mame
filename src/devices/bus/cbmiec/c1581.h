@@ -76,7 +76,7 @@ private:
 
 	void c1581_mem(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6526_device> m_cia;

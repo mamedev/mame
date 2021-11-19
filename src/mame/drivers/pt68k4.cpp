@@ -80,12 +80,13 @@ TODO: 68230 device
 #include "formats/imd_dsk.h"
 
 
+namespace {
+
 #define M68K_TAG "maincpu"
 #define DUART1_TAG  "duart1"
 #define DUART2_TAG  "duart2"
 #define TIMEKEEPER_TAG  "timekpr"
 #define ISABUS_TAG "isa"
-#define KBDC_TAG "pc_kbdc"
 #define SPEAKER_TAG "speaker"
 #define WDFDC_TAG   "wdfdc"
 
@@ -107,6 +108,10 @@ public:
 	void pt68k2(machine_config &config);
 	void pt68k4(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint8_t hiram_r(offs_t offset);
 	void hiram_w(offs_t offset, uint8_t data);
@@ -119,20 +124,18 @@ private:
 	void fdc_select_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(duart1_irq);
-	DECLARE_WRITE_LINE_MEMBER(duart2_irq);
+	[[maybe_unused]] DECLARE_WRITE_LINE_MEMBER(duart2_irq);
 
 	DECLARE_WRITE_LINE_MEMBER(irq5_w);
 
 	DECLARE_WRITE_LINE_MEMBER(keyboard_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(keyboard_data_w);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void pt68k2_mem(address_map &map);
 	void pt68k4_mem(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart1;
@@ -155,9 +158,11 @@ private:
 	bool m_irq5_duart1, m_irq5_isa;
 };
 
-FLOPPY_FORMATS_MEMBER( pt68k4_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void pt68k4_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 static void pt68k_floppies(device_slot_interface &device)
 {
@@ -240,11 +245,13 @@ void pt68k4_state::fdc_select_w(uint8_t data)
 	switch (drive)
 	{
 		case 0:
-			floppy->ss_w((data & 0x40) ? 1 : 0);
+			if (floppy)
+				floppy->ss_w((data & 0x40) ? 1 : 0);
 			break;
 
 		case 1:
-			floppy2->ss_w((data & 0x40) ? 1 : 0);
+			if (floppy2)
+				floppy2->ss_w((data & 0x40) ? 1 : 0);
 			break;
 
 		default:
@@ -330,6 +337,8 @@ void pt68k4_state::machine_start()
 	save_item(NAME(m_lastdrive));
 	save_item(NAME(m_irq5_duart1));
 	save_item(NAME(m_irq5_isa));
+
+	m_irq5_isa = false;
 }
 
 void pt68k4_state::machine_reset()
@@ -352,7 +361,9 @@ void pt68k4_state::machine_reset()
 		floppy_image_device *floppy = m_floppy_connector[0] ? m_floppy_connector[0]->get_device() : nullptr;
 
 		m_wdfdc->set_floppy(floppy);
-		floppy->ss_w(0);
+
+		if (floppy)
+			floppy->ss_w(0);
 
 		m_lastdrive = 0;
 	}
@@ -412,10 +423,9 @@ void pt68k4_state::pt68k2(machine_config &config)
 
 	MC68681(config, m_duart2, 3.6864_MHz_XTAL);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(&pc_kbdc);
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
@@ -453,10 +463,9 @@ void pt68k4_state::pt68k4(machine_config &config)
 
 	MC68681(config, m_duart2, XTAL(16'000'000) / 4);
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, KBDC_TAG, 0));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83));
 	pc_kbdc.out_clock_cb().set(FUNC(pt68k4_state::keyboard_clock_w));
 	pc_kbdc.out_data_cb().set(FUNC(pt68k4_state::keyboard_data_w));
-	PC_KBDC_SLOT(config, "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83).set_pc_kbdc_slot(&pc_kbdc);
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
@@ -505,6 +514,9 @@ ROM_START( pt68k4 )
 	ROM_LOAD_OPTIONAL( "22v10.u40",   0x0400, 0x0002e1, CRC(24df92e4) SHA1(c183113956bb0db132b6f37b239ca0bb7fac2d82) )
 	ROM_LOAD_OPTIONAL( "16l8.u11",    0x0700, 0x000109, CRC(397a1363) SHA1(aca2a02e1bf1f7cdb9b0ca24ebecb0b01ae472e8) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                  FULLNAME  FLAGS

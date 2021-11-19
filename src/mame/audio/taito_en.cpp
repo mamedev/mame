@@ -44,6 +44,9 @@ taito_en_device::taito_en_device(const machine_config &mconfig, const char *tag,
 
 void taito_en_device::device_start()
 {
+	// assumes it can make an address mask with .length() - 1
+	assert(!(m_otisrom.length() & (m_otisrom.length() - 1)));
+
 	// tell the pump about the ESP chips
 	uint8_t *ROM = m_osrom->base();
 	uint32_t max = (m_osrom->bytes() - 0x100000) / 0x20000;
@@ -132,7 +135,7 @@ void taito_en_device::fc7_map(address_map &map)
 void taito_en_device::en_otis_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).lr16(
-		[this](offs_t offset) -> u16 { return m_otisrom[(m_calculated_otisbank[m_ensoniq->get_voice_index()] + offset) & m_otisrom.mask()]; }, "banked_otisrom");
+		[this](offs_t offset) -> u16 { return m_otisrom[(m_calculated_otisbank[m_ensoniq->get_voice_index()] + offset) & (m_otisrom.length() - 1)]; }, "banked_otisrom");
 }
 
 

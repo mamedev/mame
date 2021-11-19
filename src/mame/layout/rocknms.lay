@@ -5,10 +5,10 @@ license:CC0
 <mamelayout version="2">
 
 	<view name="Rockn Megasession Custom">
-		<screen tag="lscreen">
+		<screen tag="screen">
 			<bounds x="0" y="0" width="12" height="9" />
 		</screen>
-		<screen tag="rscreen">
+		<screen tag="sub_screen">
 			<bounds x="0" y="9" width="12" height="16" />
 		</screen>
 	</view>

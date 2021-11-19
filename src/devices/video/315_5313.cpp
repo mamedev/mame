@@ -1,6 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* Sega 315-5313 - Megadrive VDP */
+/*
+    Sega 315-5313 VDP emulation, used by Mega Drive/Genesis
+
+    TODO:
+    - Video, DMA timing and HV counter seem incorrect,
+      they need verification on real hardware.
+    - Support 128KB VRAM configuration, did any hardware use it?
+    - Is border area displayable?
+    - 32X overlay with H32 mode, did all known software use this?
+*/
 
 #include "emu.h"
 #include "video/315_5313.h"
@@ -159,7 +168,7 @@ static const unsigned hres_mul[4] = { 5, 5, 4, 4 };
 inline u8 sega315_5313_device::get_hres() { return (MEGADRIVE_REG0C_RS0 | (MEGADRIVE_REG0C_RS1 << 1)) & 3; }
 int sega315_5313_device::screen_hpos() { return screen().hpos() / (m_lcm_scaling ? hres_mul[get_hres()] : 1); }
 
-#define MAX_HPOSITION 480
+#define MAX_HPOSITION 480 // TODO: 342(H32) or 427.5(H40), each scanline used 3420 cycle
 
 
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
@@ -2321,7 +2330,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 	if (MEGADRIVE_REG01_240_LINE)
 	{
-		/* this is invalid in PAL! */
+		/* this is invalid in NTSC! */
 		m_total_scanlines = m_base_total_scanlines;
 		m_visible_scanlines = 240;
 		m_irq6_scanline = 240;

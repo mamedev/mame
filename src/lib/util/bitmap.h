@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "osdcore.h"
 #include "palette.h"
 
 #include <algorithm>
@@ -74,6 +73,20 @@ public:
 		if (src.min_y < min_y) min_y = src.min_y;
 		if (src.max_y > max_y) max_y = src.max_y;
 		return *this;
+	}
+
+	rectangle operator&(const rectangle &b)
+	{
+		rectangle a(*this);
+		a &= b;
+		return a;
+	}
+
+	rectangle operator|(const rectangle &b)
+	{
+		rectangle a(*this);
+		a |= b;
+		return a;
 	}
 
 	// comparisons

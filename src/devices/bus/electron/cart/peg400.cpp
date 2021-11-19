@@ -25,11 +25,13 @@ DEFINE_DEVICE_TYPE(ELECTRON_PEG400, electron_peg400_device, "electron_peg400", "
 //  FLOPPY_FORMATS( peg400 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(electron_peg400_device::floppy_formats)
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END
+void electron_peg400_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+}
 
 void peg400_floppies(device_slot_interface &device)
 {

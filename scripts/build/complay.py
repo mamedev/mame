@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 ##
 ## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
@@ -10,11 +10,6 @@ import sys
 import xml.sax
 import xml.sax.saxutils
 import zlib
-
-
-# workaround for version incompatibility
-if sys.version_info > (3, ):
-    long = int
 
 
 class ErrorHandler(object):
@@ -258,7 +253,7 @@ class LayoutChecker(Minifyer):
         if self.checkIntAttribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
             self.handleError('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
         for name in ('swapxy', 'flipx', 'flipy'):
-            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['yesno'])):
+            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs[name])):
                 self.handleError('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
 
     def checkColor(self, attrs):
@@ -299,6 +294,16 @@ class LayoutChecker(Minifyer):
         self.have_color.append({ })
 
     def checkViewItem(self, name, attrs):
+        if 'id' in attrs:
+            if not attrs['id']:
+                self.handleError('Element %s attribute id is empty' % (name, ))
+            elif not self.VARPATTERN.match(attrs['id']):
+                if attrs['id'] in self.item_ids:
+                    self.handleError('Element %s has duplicate id "%s" (previous %s)' % (name, attrs['id'], self.item_ids[attrs['id']]))
+                else:
+                    self.item_ids[attrs['id']] = self.formatLocation()
+                if self.repeat_depth[-1]:
+                    self.handleError('Element %s attribute id "%s" in repeat contains no parameter references' % (name, attrs['id']))
         if ('blend' in attrs) and (attrs['blend'] not in self.BLENDMODES) and not self.VARPATTERN.match(attrs['blend']):
             self.handleError('Element %s attribute blend "%s" is unsupported' % (name, attrs['blend']))
         if 'inputtag' in attrs:
@@ -327,6 +332,8 @@ class LayoutChecker(Minifyer):
         self.have_bounds.append(None if 'group' == name else { })
         self.have_orientation.append(False)
         self.have_color.append(None if 'group' == name else { })
+        self.have_xscroll.append(None if ('group' == name) or ('screen' == name) else False)
+        self.have_yscroll.append(None if ('group' == name) or ('screen' == name) else False)
 
     def rootStartHandler(self, name, attrs):
         if 'mamelayout' != name:
@@ -337,9 +344,10 @@ class LayoutChecker(Minifyer):
                 self.handleError('Element mamelayout missing attribute version')
             else:
                 try:
-                    long(attrs['version'])
+                    int(attrs['version'])
                 except:
                     self.handleError('Element mamelayout attribute version "%s" is not an integer' % (attrs['version'], ))
+            self.have_script = None
             self.variable_scopes.append({ })
             self.repeat_depth.append(0)
             self.handlers.append((self.layoutStartHandler, self.layoutEndHandler))
@@ -379,6 +387,7 @@ class LayoutChecker(Minifyer):
                     self.handleError('Element group has duplicate name (previous %s)' % (self.groups[attrs['name']], ))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
+            self.item_ids = { }
             self.repeat_depth.append(0)
             self.have_bounds.append(None)
         elif ('view' == name) and (not self.repeat_depth[-1]):
@@ -389,9 +398,10 @@ class LayoutChecker(Minifyer):
                 if attrs['name'] not in self.views:
                     self.views[attrs['name']] = self.formatLocation()
                 elif not self.VARPATTERN.match(attrs['name']):
-                    self.handleError('Element view has duplicate name (previous %s)' % (self.views[attrs['name']], ))
+                    self.handleError('Element view has duplicate name "%s" (previous %s)' % (attrs['name'], self.views[attrs['name']]))
             self.handlers.append((self.groupViewStartHandler, self.groupViewEndHandler))
             self.variable_scopes.append({ })
+            self.item_ids = { }
             self.repeat_depth.append(0)
             self.have_bounds.append(None)
         elif 'repeat' == name:
@@ -407,6 +417,10 @@ class LayoutChecker(Minifyer):
             self.checkParameter(attrs)
             self.ignored_depth = 1
         elif ('script' == name) and (not self.repeat_depth[-1]):
+            if self.have_script is None:
+                self.have_script = self.formatLocation()
+            else:
+                self.handleError('Duplicate script element (previous %s)' % (self.have_script, ))
             self.ignored_depth = 1
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
@@ -427,6 +441,7 @@ class LayoutChecker(Minifyer):
                         self.handleError('Group "%s" not found (first referenced at %s)' % (group, self.referenced_groups[group]))
             if not self.views:
                 self.handleError('No view elements found')
+            del self.have_script
             self.handlers.pop()
 
     def elementStartHandler(self, name, attrs):
@@ -602,6 +617,7 @@ class LayoutChecker(Minifyer):
         elif self.repeat_depth[-1]:
             self.repeat_depth[-1] -= 1
         else:
+            del self.item_ids
             self.current_collections = None
             self.repeat_depth.pop()
             self.have_bounds.pop()
@@ -651,6 +667,24 @@ class LayoutChecker(Minifyer):
             else:
                 self.handleError('Duplicate element color (previous %s)' % (self.have_color[-1], ))
             self.checkColor(attrs)
+        elif ('xscroll' == name) or ('yscroll' == name):
+            have_scroll = self.have_xscroll if 'xscroll' == name else self.have_yscroll
+            if have_scroll[-1] is None:
+                self.handleError('Encountered unexpected element %s' % (name, ))
+            elif have_scroll[-1]:
+                self.handleError('Duplicate element %s' % (name, ))
+            else:
+                have_scroll[-1] = self.formatLocation()
+                self.checkFloatAttribute(name, attrs, 'size', 1.0)
+                if (attrs.get('wrap', 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['wrap'])):
+                    self.handleError('Element %s attribute wrap "%s" is not "yes" or "no"' % (name, attrs['wrap']))
+                if 'inputtag' in attrs:
+                    if 'name' in attrs:
+                        self.handleError('Element %s has both attribute inputtag and attribute name' % (name, ))
+                    self.checkTag(attrs['inputtag'], name, 'inputtag')
+                self.checkIntAttribute(name, attrs, 'mask', None)
+                self.checkIntAttribute(name, attrs, 'min', None)
+                self.checkIntAttribute(name, attrs, 'max', None)
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
         self.ignored_depth = 1
@@ -659,6 +693,8 @@ class LayoutChecker(Minifyer):
         self.have_bounds.pop()
         self.have_orientation.pop()
         self.have_color.pop()
+        self.have_xscroll.pop()
+        self.have_yscroll.pop()
         self.handlers.pop()
 
     def setDocumentLocator(self, locator):
@@ -674,6 +710,8 @@ class LayoutChecker(Minifyer):
         self.have_bounds = [ ]
         self.have_orientation = [ ]
         self.have_color = [ ]
+        self.have_xscroll = [ ]
+        self.have_yscroll = [ ]
         self.generated_element_names = False
         self.generated_group_names = False
         super(LayoutChecker, self).startDocument()
@@ -695,6 +733,8 @@ class LayoutChecker(Minifyer):
         del self.have_bounds
         del self.have_orientation
         del self.have_color
+        del self.have_xscroll
+        del self.have_yscroll
         del self.generated_element_names
         del self.generated_group_names
         super(LayoutChecker, self).endDocument()

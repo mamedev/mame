@@ -601,8 +601,8 @@ void osbexec_state::osbexec(machine_config &config)
 
 	MB8877(config, m_mb8877, MAIN_CLOCK/24);
 	m_mb8877->intrq_wr_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
-	FLOPPY_CONNECTOR(config, "mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("136K"); /* 128KB Main RAM + RAM in ROM bank (8) */

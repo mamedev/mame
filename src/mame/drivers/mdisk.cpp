@@ -242,8 +242,8 @@ void mdisk_state::mdisk(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(mdisk_state::fdc_irq_w));
 	m_fdc->drq_wr_callback().set_inputline(m_cpu, INPUT_LINE_NMI);
 	m_fdc->hdl_wr_callback().set(FUNC(mdisk_state::fdc_motor_w));
-	FLOPPY_CONNECTOR(config, m_floppy[0], mdisk_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], mdisk_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], mdisk_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], mdisk_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 

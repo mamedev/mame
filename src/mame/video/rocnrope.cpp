@@ -2,7 +2,7 @@
 // copyright-holders:Chris Hardy
 /***************************************************************************
 
-  video.c
+  rocnrope.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-void rocnrope_state::rocnrope_palette(palette_device &palette) const
+void rocnrope_state::palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static constexpr int resistances_rg[3] = { 1000, 470, 220 };
@@ -80,13 +80,13 @@ void rocnrope_state::rocnrope_palette(palette_device &palette) const
 	}
 }
 
-void rocnrope_state::rocnrope_videoram_w(offs_t offset, uint8_t data)
+void rocnrope_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void rocnrope_state::rocnrope_colorram_w(offs_t offset, uint8_t data)
+void rocnrope_state::colorram_w(offs_t offset, uint8_t data)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -114,24 +114,20 @@ void rocnrope_state::video_start()
 
 void rocnrope_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	uint8_t *spriteram_2 = m_spriteram2;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 2;offs >= 0;offs -= 2)
+	for (int offs = m_spriteram[0].bytes() - 2;offs >= 0;offs -= 2)
 	{
-		int color = spriteram_2[offs] & 0x0f;
+		int color = m_spriteram[1][offs] & 0x0f;
 
 		m_gfxdecode->gfx(0)->transmask(bitmap,cliprect,
-				spriteram[offs + 1],
+				m_spriteram[0][offs + 1],
 				color,
-				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
-				240 - spriteram[offs], spriteram_2[offs + 1],
+				m_spriteram[1][offs] & 0x40, ~m_spriteram[1][offs] & 0x80,
+				240 - m_spriteram[0][offs], m_spriteram[1][offs + 1],
 				m_palette->transpen_mask(*m_gfxdecode->gfx(0), color, 0));
 	}
 }
 
-uint32_t rocnrope_state::screen_update_rocnrope(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rocnrope_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect);

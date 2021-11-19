@@ -126,6 +126,7 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 
 #include "emu.h"
 #include "includes/wrally.h"
+#include "includes/gaelcrpt.h"
 
 #include "machine/gaelco_ds5002fp.h"
 
@@ -136,6 +137,98 @@ The PCB has a layout that can either use the 4 rom set of I7, I9, I11 & I13 or l
 
 #include "screen.h"
 #include "speaker.h"
+
+
+
+void wrally_state::machine_start()
+{
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+
+	save_item(NAME(m_analog_ports));
+}
+
+/***************************************************************************
+
+    World Rally memory handlers
+
+***************************************************************************/
+
+void wrally_state::shareram_w(offs_t offset, uint8_t data)
+{
+	// why isn't there address map functionality for this?
+	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+}
+
+uint8_t wrally_state::shareram_r(offs_t offset)
+{
+	// why isn't there address map functionality for this?
+	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+}
+
+void wrally_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	data = gaelco_decrypt(*m_maincpu, offset, data, 0x1f, 0x522a);
+	COMBINE_DATA(&m_videoram[offset]);
+
+	m_tilemap[(offset & 0x1fff) >> 12]->mark_tile_dirty(((offset << 1) & 0x1fff) >> 2);
+}
+
+WRITE_LINE_MEMBER(wrally_state::flipscreen_w)
+{
+	flip_screen_set(state);
+}
+
+void wrally_state::okim6295_bankswitch_w(uint8_t data)
+{
+	m_okibank->set_entry(data & 0x0f);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin1_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin2_counter_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin1_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, !state);
+}
+
+WRITE_LINE_MEMBER(wrally_state::coin2_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(1, !state);
+}
+
+// the following methods have been pilfered from gaelco2.cpp (wrally2). They seem to work fine for wrally, too
+template <int N>
+READ_LINE_MEMBER(wrally_state::analog_bit_r)
+{
+	return (m_analog_ports[N] >> 7) & 0x01;
+}
+
+WRITE_LINE_MEMBER(wrally_state::adc_clk)
+{
+	// a zero/one combo is written here to clock the next analog port bit
+	if (!state)
+	{
+		m_analog_ports[0] <<= 1;
+		m_analog_ports[1] <<= 1;
+	}
+}
+
+WRITE_LINE_MEMBER(wrally_state::adc_en)
+{
+	// a zero is written here to read the analog ports, and a one is written when finished
+	if (!state)
+	{
+		m_analog_ports[0] = m_analog[0]->read();
+		m_analog_ports[1] = m_analog[1]->read();
+	}
+}
 
 
 void wrally_state::mcu_hostmem_map(address_map &map)
@@ -160,9 +253,10 @@ void wrally_state::wrally_map(address_map &map)
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(wrally_state::okim6295_bankswitch_w));                         // OKI6295 bankswitch
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status/data register
+	map(0x70006a, 0x70006b).nopr();
+	map(0x70007a, 0x70007b).nopr();
 	map(0xfec000, 0xfeffff).ram().share("shareram");                                              // Work RAM (shared with DS5002FP)
 }
-
 
 
 void wrally_state::oki_map(address_map &map)
@@ -170,6 +264,7 @@ void wrally_state::oki_map(address_map &map)
 	map(0x00000, 0x2ffff).rom();
 	map(0x30000, 0x3ffff).bankr("okibank");
 }
+
 
 static INPUT_PORTS_START( wrally )
 	PORT_START("DSW")
@@ -219,31 +314,39 @@ static INPUT_PORTS_START( wrally )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Gear Shift") PORT_TOGGLE PORT_REVERSE
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0018)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
 	PORT_START("WHEEL")
-	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_RIGHT) PORT_CODE_INC(KEYCODE_LEFT) PORT_REVERSE
+	PORT_BIT( 0xff00, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_RIGHT) PORT_CODE_INC(KEYCODE_LEFT) PORT_REVERSE PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0000)
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ANALOG0")   // pot wheel player 1
+	PORT_BIT( 0xff, 0x8A, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P1 Pot Wheel") PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0010)
+
+	PORT_START("ANALOG1")   // pot wheel player 2
+	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Pot Wheel") PORT_CONDITION("DSW", 0x0018, EQUALS, 0x0010)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) // Go to test mode NOW
-	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(wrally_state, analog_bit_r<0>)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(wrally_state, analog_bit_r<1>)
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static const gfx_layout wrally_tilelayout16 =
@@ -296,8 +399,8 @@ void wrally_state::wrally(machine_config &config)
 	m_outlatch->q_out_cb<3>().set(FUNC(wrally_state::coin2_counter_w));
 	m_outlatch->q_out_cb<4>().set_nop();                                // Sound muting
 	m_outlatch->q_out_cb<5>().set(FUNC(wrally_state::flipscreen_w));    // Flip screen
-	m_outlatch->q_out_cb<6>().set_nop();                                // ???
-	m_outlatch->q_out_cb<7>().set_nop();                                // ???
+	m_outlatch->q_out_cb<6>().set(FUNC(wrally_state::adc_en));  // ENA/D, for pot wheel
+	m_outlatch->q_out_cb<7>().set(FUNC(wrally_state::adc_clk)); // CKA/D,      "
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -403,6 +506,39 @@ ROM_START( wrallyb )
 	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
 ROM_END
 
+ROM_START( wrallyc )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "rally c23.c23", 0x000000, 0x080000, CRC(fbd57c94) SHA1(05036f076e6d8e765c04515e9d822c6006c1a378) )
+	ROM_LOAD16_BYTE( "rally c22.c22", 0x000001, 0x080000, CRC(db73e0af) SHA1(6c1a6ee3d5dda76c3491159087ab9f7d49fa7dad) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "wrdallas.bin", 0x00000, 0x8000, CRC(547d1768) SHA1(c58d1edd072d796be0663fb265f4739ec006b688) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// These are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x88 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rally i13.i13", 0x000000, 0x080000, CRC(b7fddb12) SHA1(619a75daac8cbba7e85c97ca19733e2196d66d5c) )
+	ROM_LOAD16_BYTE( "rally i11.i11", 0x000001, 0x080000, CRC(58b2809a) SHA1(8741ec544c54e2a2f5d17ac2f8400ee2ce382e83) )
+	ROM_LOAD16_BYTE( "rally i9.i9",   0x100000, 0x080000, CRC(018b35bb) SHA1(ca789e23d18cc7d7e48b6858e6b61e03bf88b475) )
+	ROM_LOAD16_BYTE( "rally i7.i7",   0x100001, 0x080000, CRC(b37c807e) SHA1(9e6155a2b5206c0d4dca669d24d9fe9830027651) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "rally c1.c1",   0x000000, 0x080000, CRC(e931c2ee) SHA1(ea1cf8ad52713e5136a370e289567eea9e6403d6) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+	ROM_LOAD( "rally c3.c3",   0x080000, 0x080000, CRC(11f0fe2c) SHA1(96c2a04874fa036576b7cfc5559bb0e33582ffd2) )
+
+	ROM_REGION( 0x0514, "plds", 0 ) // PALs and GALs
+	ROM_LOAD( "tibpal20l8-25cnt.b23", 0x0000, 0x02e5, BAD_DUMP CRC(a1c780ed) SHA1(91dc230d94c992c4c4516554c0faeced41e1e34e) ) // Bruteforced but verified (as GAL22V10)
+	ROM_LOAD( "gal16v8-25lnc.h21",    0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "tibpal20l8-25cnt.h15", 0x0000, 0x02e5, BAD_DUMP CRC(a39efdc6) SHA1(bf86f764665531639076dfcc72583457f1cbf806) ) // Bruteforced but verified (as GAL22V10)
+	ROM_LOAD( "pal16r4-e2.bin",       0x0000, 0x0104, CRC(15fee75c) SHA1(b9ee5121dd41f2535d9abd78ff5fcfeaa1ac6b62) )
+	ROM_LOAD( "pal16r8-b15.bin",      0x0000, 0x0104, CRC(b50337a6) SHA1(1f922753cb9982cad9a3c9246894ecd38273236e) )
+ROM_END
+
 ROM_START( wrallyat ) // Board Marked 930217, Atari License
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "rally.c23", 0x000000, 0x080000, CRC(366595ad) SHA1(e16341ed9eacf9b729c28184268150ea9b62f185) ) // North & South America only...
@@ -436,4 +572,5 @@ ROM_END
 GAME( 1993, wrally,   0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 0E56)", MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Tension baja"
 GAME( 1993, wrallya,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 3873)", MACHINE_SUPPORTS_SAVE ) // Dallas DS5002FP power failure shows as: "Power Failure"
 GAME( 1993, wrallyb,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyc,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco",                 "World Rally (Version 1.0, Checksum E586)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wrallyat, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)",                 MACHINE_SUPPORTS_SAVE )

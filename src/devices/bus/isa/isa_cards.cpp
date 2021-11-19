@@ -50,6 +50,7 @@
 #include "tekram_dc820.h"
 #include "asc88.h"
 #include "omti8621.h"
+#include "lrk330.h"
 
 // sound
 #include "adlib.h"
@@ -72,6 +73,7 @@
 #include "eis_sad8852.h"
 #include "eis_twib.h"
 #include "np600.h"
+#include "3xtwin.h"
 
 // communication ports
 #include "lpt.h"
@@ -138,6 +140,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
+	device.option_add("3xtwin", ISA8_3XTWIN);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -183,6 +186,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("epc_twib", ISA8_EIS_TWIB);
 	device.option_add("babyblue2", ISA8_BABYBLUE2);
 	device.option_add("acb2072", ACB2072);
+	device.option_add("3xtwin", ISA8_3XTWIN);
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);
 	device.option_add("ne2000", NE2000);
@@ -227,4 +231,5 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("dc820", TEKRAM_DC820); // actually an EISA card
 	device.option_add("dc820b", TEKRAM_DC820B); // actually an EISA card
 	device.option_add("omti8621", ISA16_OMTI8621);
+	device.option_add("lrk331", LRK331);
 }

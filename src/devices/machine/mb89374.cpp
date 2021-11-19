@@ -326,6 +326,7 @@ void mb89374_device::write(offs_t offset, uint8_t data)
 
 		case REGISTER_RXIER:
 			m_rxier = data;
+			break;
 
 		case REGISTER_TXSR:
 			m_txsr = data | TXSR_MASK;

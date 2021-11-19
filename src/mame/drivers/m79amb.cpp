@@ -59,7 +59,6 @@ and two large (paddles pretending to be) guns.
 #include "emu.h"
 #include "includes/m79amb.h"
 
-#include "cpu/i8085/i8085.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -185,25 +184,26 @@ static INPUT_PORTS_START( m79amb )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
+uint8_t m79amb_state::inta_r()
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* Z80 - RST 08h */
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	// Vector is RST 1
+	return 0xcf;
 }
 
 void m79amb_state::m79amb(machine_config &config)
 {
 	/* basic machine hardware */
-	I8080(config, m_maincpu, XTAL(19'660'800) / 10);
+	I8080(config, m_maincpu, 19.6608_MHz_XTAL / 10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m79amb_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(m79amb_state::m79amb_interrupt));
+	m_maincpu->in_inta_func().set(FUNC(m79amb_state::inta_r));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 4*8, 32*8-1);
+	screen.set_raw(19.6608_MHz_XTAL / 4, 320, 0, 256, 262, 32, 256);
 	screen.set_screen_update(FUNC(m79amb_state::screen_update_ramtek));
+	screen.screen_vblank().set_inputline(m_maincpu, 0, ASSERT_LINE);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -214,7 +214,7 @@ void m79amb_state::m79amb(machine_config &config)
 
 
 ROM_START( m79amb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD( "m79.10t",      0x0000, 0x0200, CRC(ccf30b1e) SHA1(c1a77f8dc81c491928f81121ca5c9b7f8753794f) )
 	ROM_LOAD( "m79.9t",       0x0200, 0x0200, CRC(daf807dd) SHA1(16cd9d553bfb111c8380966cbde39dbddd5fe58c) )
 	ROM_LOAD( "m79.8t",       0x0400, 0x0200, CRC(79fafa02) SHA1(440620f5be44febdd7c64014739dc71fb570cc92) )

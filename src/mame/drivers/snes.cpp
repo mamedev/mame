@@ -200,7 +200,7 @@ void snes_console_state::snes20_hi_w(address_space &space, offs_t offset, uint8_
 	{ m_cartslot->chip_write(offset, data); return; }
 	else if (m_cartslot->get_type() == SNES_CX4
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
-	{ CX4_write(machine(), (offset & 0xffff) - 0x6000, data); return; }
+	{ CX4_write(space, (offset & 0xffff) - 0x6000, data); return; }
 	else if (m_type == SNES_SUFAMITURBO
 				&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_cartslot->write_h(offset, data); return; }
@@ -1355,7 +1355,7 @@ void snes_console_state::snes(machine_config &config)
 	m_s_dsp->add_route(1, "rspeaker", 1.00);
 
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
-	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ);
+	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ); // FIXME: conflict with video interrupt, it should be ORed
 	m_cartslot->open_bus_callback().set(FUNC(snes_console_state::snes_open_bus_r));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snes");

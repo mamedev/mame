@@ -521,7 +521,7 @@ void avr8_device::populate_add_flag_cache()
 			const uint8_t res = rd + rr;
 			uint8_t flags = 0;
 			flags |= (((rd & 8) && (rr & 8)) || ((rr & 8) && !(res & 8)) || (!(res & 8) && (rd & 8))) ? AVR8_SREG_MASK_H : 0;
-			flags |= (((rd & 0x80) && (rr & 0x80) && !(res & 0x80)) | (!(rd & 0x80) & !(rr & 0x80) & (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
+			flags |= (((rd & 0x80) && (rr & 0x80) && !(res & 0x80)) || (!(rd & 0x80) && !(rr & 0x80) && (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
 			flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
 			flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 			flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;
@@ -542,7 +542,7 @@ void avr8_device::populate_adc_flag_cache()
 				const uint8_t res = rd + rr + c;
 				uint8_t flags = 0;
 				flags |= (((rd & 8) && (rr & 8)) || ((rr & 8) && !(res & 8)) || (!(res & 8) && (rd & 8))) ? AVR8_SREG_MASK_H : 0;
-				flags |= (((rd & 0x80) && (rr & 0x80) && !(res & 0x80)) | (!(rd & 0x80) & !(rr & 0x80) & (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
+				flags |= (((rd & 0x80) && (rr & 0x80) && !(res & 0x80)) || (!(rd & 0x80) && !(rr & 0x80) && (res & 0x80))) ? AVR8_SREG_MASK_V : 0;
 				flags |= (res & 0x80) ? AVR8_SREG_MASK_N : 0;
 				flags |= (bool(flags & AVR8_SREG_MASK_N) != bool(flags & AVR8_SREG_MASK_V)) ? AVR8_SREG_MASK_S : 0;
 				flags |= (res == 0) ? AVR8_SREG_MASK_Z : 0;

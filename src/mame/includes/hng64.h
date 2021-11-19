@@ -5,37 +5,18 @@
 
 #pragma once
 
-#include "machine/msm6242.h"
-#include "machine/timer.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/nec/v5x.h"
-#include "sound/l7a1045_l6028_dsp_a.h"
-#include "video/poly.h"
 #include "cpu/tlcs870/tlcs870.h"
 #include "machine/mb8421.h"
+#include "machine/msm6242.h"
+#include "machine/timer.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
+#include "video/poly.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
-
-enum hng64trans_t
-{
-	HNG64_TILEMAP_NORMAL = 1,
-	HNG64_TILEMAP_ADDITIVE,
-	HNG64_TILEMAP_ALPHA
-};
-
-struct blit_parameters
-{
-	bitmap_rgb32 *      bitmap;
-	rectangle           cliprect;
-	uint32_t              tilemap_priority_code;
-	uint8_t               mask;
-	uint8_t               value;
-	uint8_t               alpha;
-	hng64trans_t        drawformat;
-};
-
-#define HNG64_MASTER_CLOCK 50000000
 
 
 /////////////////
@@ -52,6 +33,8 @@ struct polyVert
 	float clipCoords[4];    // Homogeneous screen space coordinates (X Y Z W)
 
 	float light[3];         // The intensity of the illumination at this point
+
+	uint16_t colorIndex;    // Flat shaded polygons, no texture, no lighting
 };
 
 struct polygon
@@ -60,7 +43,8 @@ struct polygon
 	polyVert vert[10];          // Vertices (maximum number per polygon is 10 -> 3+6)
 
 	float faceNormal[4];        // Normal of the face overall - for calculating visibility and flat-shading...
-	int visible;                // Polygon visibility in scene
+	bool visible;                // Polygon visibility in scene
+	bool flatShade;              // Flat shaded polygon, no texture, no lighting
 
 	uint8_t texIndex;             // Which texture to draw from (0x00-0x0f)
 	uint8_t texType;              // How to index into the texture
@@ -110,13 +94,14 @@ struct hng64_poly_data
 
 class hng64_state;
 
-class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7, HNG64_MAX_POLYGONS>
+class hng64_poly_renderer : public poly_manager<float, hng64_poly_data, 7>
 {
 public:
 	hng64_poly_renderer(hng64_state& state);
 
 	void drawShaded(polygon *p);
-	void render_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_texture_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
+	void render_flat_scanline(int32_t scanline, const extent_t& extent, const hng64_poly_data& renderData, int threadid);
 
 	hng64_state& state() { return m_state; }
 	bitmap_rgb32& colorBuffer3d() { return m_colorBuffer3d; }
@@ -137,14 +122,7 @@ class hng64_lamps_device : public device_t
 public:
 	hng64_lamps_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto lamps0_out_cb() { return m_lamps_out_cb[0].bind(); }
-	auto lamps1_out_cb() { return m_lamps_out_cb[1].bind(); }
-	auto lamps2_out_cb() { return m_lamps_out_cb[2].bind(); }
-	auto lamps3_out_cb() { return m_lamps_out_cb[3].bind(); }
-	auto lamps4_out_cb() { return m_lamps_out_cb[4].bind(); }
-	auto lamps5_out_cb() { return m_lamps_out_cb[5].bind(); }
-	auto lamps6_out_cb() { return m_lamps_out_cb[6].bind(); }
-	auto lamps7_out_cb() { return m_lamps_out_cb[7].bind(); }
+	template <unsigned N> auto lamps_out_cb() { return m_lamps_out_cb[N].bind(); }
 
 	void lamps_w(offs_t offset, uint8_t data) { m_lamps_out_cb[offset](data); }
 
@@ -187,7 +165,6 @@ public:
 		m_idt7133_dpram(*this, "com_ram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
-		m_an_in(*this, "AN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0)
 	{ }
@@ -210,17 +187,36 @@ public:
 	required_device<palette_device> m_palette;
 
 private:
+	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
+
 	/* TODO: NOT measured! */
-	const int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
+	static constexpr int PIXEL_CLOCK = (HNG64_MASTER_CLOCK*2)/4; // x 2 is due to the interlaced screen ...
 
-	const int HTOTAL = 0x200+0x100;
-	const int HBEND = 0;
-	const int HBSTART = 0x200;
+	static constexpr int HTOTAL = 0x200+0x100;
+	static constexpr int HBEND = 0;
+	static constexpr int HBSTART = 0x200;
 
-	const int VTOTAL = 264*2;
-	const int VBEND = 0;
-	const int VBSTART = 224*2;
+	static constexpr int VTOTAL = 264*2;
+	static constexpr int VBEND = 0;
+	static constexpr int VBSTART = 224*2;
 
+	enum hng64trans_t
+	{
+		HNG64_TILEMAP_NORMAL = 1,
+		HNG64_TILEMAP_ADDITIVE,
+		HNG64_TILEMAP_ALPHA
+	};
+
+	struct blit_parameters
+	{
+		bitmap_rgb32 *      bitmap;
+		rectangle           cliprect;
+		uint32_t            tilemap_priority_code;
+		uint8_t             mask;
+		uint8_t             value;
+		uint8_t             alpha;
+		hng64trans_t        drawformat;
+	};
 
 	required_device<mips3_device> m_maincpu;
 	required_device<v53a_device> m_audiocpu;
@@ -253,17 +249,8 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_ioport_array<8> m_in;
-	required_ioport_array<8> m_an_in;
 
-
-	void hng64_default_lamps0_w(uint8_t data) { logerror("lamps0 %02x\n", data); }
-	void hng64_default_lamps1_w(uint8_t data) { logerror("lamps1 %02x\n", data); }
-	void hng64_default_lamps2_w(uint8_t data) { logerror("lamps2 %02x\n", data); }
-	void hng64_default_lamps3_w(uint8_t data) { logerror("lamps3 %02x\n", data); }
-	void hng64_default_lamps4_w(uint8_t data) { logerror("lamps4 %02x\n", data); }
-	void hng64_default_lamps5_w(uint8_t data) { logerror("lamps5 %02x\n", data); }
-	void hng64_default_lamps6_w(uint8_t data) { logerror("lamps6 %02x\n", data); }
-	void hng64_default_lamps7_w(uint8_t data) { logerror("lamps7 %02x\n", data); }
+	template <unsigned N> void hng64_default_lamps_w(uint8_t data) { logerror("lamps%u %02x\n", N, data); }
 
 	void hng64_drive_lamps7_w(uint8_t data);
 	void hng64_drive_lamps6_w(uint8_t data);
@@ -301,6 +288,8 @@ private:
 
 	//uint32_t *q2;
 
+	std::vector< std::pair <int, uint32_t *> > m_spritelist;
+
 	uint8_t m_screen_dis;
 
 	struct hng64_tilemap {
@@ -326,7 +315,7 @@ private:
 	float m_lightStrength;
 	float m_lightVector[3];
 
-	uint32_t hng64_com_r(offs_t offset);
+	uint32_t hng64_com_r(offs_t offset, uint32_t mem_mask = ~0);
 	void hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void hng64_com_share_w(offs_t offset, uint8_t data);
 	uint8_t hng64_com_share_r(offs_t offset);
@@ -399,16 +388,6 @@ private:
 	// unknown access
 	void ioport4_w(uint8_t data);
 
-	// analog input access
-	uint8_t anport0_r();
-	uint8_t anport1_r();
-	uint8_t anport2_r();
-	uint8_t anport3_r();
-	uint8_t anport4_r();
-	uint8_t anport5_r();
-	uint8_t anport6_r();
-	uint8_t anport7_r();
-
 	DECLARE_WRITE_LINE_MEMBER( sio0_w );
 
 	uint8_t m_port7;
@@ -464,6 +443,7 @@ private:
 		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
 		int wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
 
+	static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat);
 
 
 

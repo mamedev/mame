@@ -71,8 +71,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(baud_rate_high_change);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_flex_formats);
-	DECLARE_FLOPPY_FORMATS(floppy_uniflex_formats);
+	static void floppy_flex_formats(format_registration &fr);
+	static void floppy_uniflex_formats(format_registration &fr);
 
 	uint8_t pia0_a_r();
 	uint8_t pia0_ca1_r();

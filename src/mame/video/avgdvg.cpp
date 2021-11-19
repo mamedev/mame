@@ -16,7 +16,9 @@
 
 #include "emu.h"
 #include "avgdvg.h"
+
 #include "screen.h"
+
 
 /*************************************
  *
@@ -130,18 +132,11 @@ void avgdvg_device_base::vg_flush()
 			cy0 = m_vectbuf[i].y;
 			cx1 = m_vectbuf[i].arg1;
 			cy1 = m_vectbuf[i].arg2;
+			using std::swap;
 			if (cx0 > cx1)
-			{
-				const int t = cx1;
-				cx1 = cx0;
-				cx0 = t;
-			}
-			if (cy0 > cx1)
-			{
-				const int t = cy1;
-				cy1 = cy0;
-				cy0 = t;
-			}
+				swap(cx0, cx1);
+			if (cy0 > cy1)
+				swap(cy0, cy1);
 		}
 	}
 
@@ -824,9 +819,13 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 				const u8 g = bit1 * 0xcb;
 				const u8 b = bit0 * 0xcb;
 
+				int x = m_xpos;
+				int y = m_ypos;
+				apply_flipping(x, y);
+
 				vg_add_point_buf(
-						m_xpos,
-						m_ypos,
+						x,
+						y,
 						rgb_t(r, g, b),
 						(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 				m_spkl_shift = (BIT(m_spkl_shift, 6) ^ BIT(m_spkl_shift, 5) ^ 1) | (m_spkl_shift << 1);
@@ -849,9 +848,13 @@ int avg_mhavoc_device::handler_7()  // mhavoc_strobe3
 			const u8 g = bit1 * 0xcb;
 			const u8 b = bit0 * 0xcb;
 
+			int x = m_xpos;
+			int y = m_ypos;
+			apply_flipping(x, y);
+
 			vg_add_point_buf(
-					m_xpos,
-					m_ypos,
+					x,
+					y,
 					rgb_t(r, g, b),
 					(((m_int_latch >> 1) == 1) ? m_intensity : m_int_latch & 0xe) << 4);
 		}
@@ -892,6 +895,9 @@ void avg_mhavoc_device::vgrst() // mhavoc_vgrst
 
 void avg_starwars_device::update_databus() // starwars_data
 {
+	// Avoid interfering with the slapstic
+	auto dis = machine().disable_side_effects();
+
 	m_data = m_memspace->read_byte(m_membase + m_pc);
 }
 

@@ -20,10 +20,7 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	// FIXME: m_E should activate deactivate m_A
 
@@ -66,5 +63,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(9321, "TTL_9321", "+E,+A0,+A1")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

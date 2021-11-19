@@ -33,7 +33,7 @@ void electron_ap5_device::device_add_mconfig(machine_config &config)
 	m_romslot[1]->set_device_load(FUNC(electron_ap5_device::rom2_load));
 
 	/* via */
-	VIA6522(config, m_via, DERIVED_CLOCK(1, 16));
+	MOS6522(config, m_via, DERIVED_CLOCK(1, 16));
 	m_via->readpb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_r));
 	m_via->writepb_handler().set(m_userport, FUNC(bbc_userport_slot_device::pb_w));
 	m_via->cb1_handler().set(m_userport, FUNC(bbc_userport_slot_device::write_cb1));
@@ -161,7 +161,7 @@ image_init_result electron_ap5_device::load_rom(device_image_interface &image, g
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
 		return image_init_result::FAIL;
 	}
 

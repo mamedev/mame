@@ -136,7 +136,7 @@ void sm500_device::clock_melody()
 	// output to R pins
 	if (out != m_r_out)
 	{
-		m_write_r(0, out, 0xff);
+		m_write_r(out);
 		m_r_out = out;
 	}
 }

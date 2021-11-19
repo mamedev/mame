@@ -38,6 +38,7 @@ public:
 		m_palette(*this, "palette"),
 		m_latch(*this, "latch%u", 1U)
 	{
+		m_bg_split = 0;
 	}
 
 	void rougien(machine_config &config);
@@ -57,11 +58,15 @@ private:
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_helper;
 	bitmap_ind16 m_helper2;
+	bitmap_ind16 m_helper_mask;
 	int m_coll_bit0;
 	int m_coll_bit1;
 	int m_coll_bit2;
 	int m_coll_bit3;
 	int m_coll_bit6;
+	int m_bg_split;
+	int m_bg_mask;
+	int m_bg_bank;
 	int m_rougien_gfxbank1;
 	int m_rougien_gfxbank2;
 
@@ -99,6 +104,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	void mermaid_bg_scroll_w(offs_t offset, uint8_t data);
 	void mermaid_fg_scroll_w(offs_t offset, uint8_t data);
+	DECLARE_WRITE_LINE_MEMBER(bg_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(bg_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch1_w);
 	DECLARE_WRITE_LINE_MEMBER(rougien_gfxbankswitch2_w);
 	uint8_t mermaid_collision_r();

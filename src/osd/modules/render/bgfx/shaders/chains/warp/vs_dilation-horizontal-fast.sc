@@ -6,7 +6,7 @@ $output v_texcoord0, v_texcoord1, v_color0
 
 /*
    Hyllian's dilation-horizontal-fast Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -41,9 +41,9 @@ void main()
 	vec2 ps = 1.0 / u_tex_size0.xy;
 	float dx = ps.x;
 	float dy = ps.y;
-	//        B      
-	//     D  E  F   
-	//        H      
+	//        B
+	//     D  E  F
+	//        H
 
  	v_texcoord1 = vec4(1.0 / u_tex_size0.xy, 0.0, 0.0); // F H
 

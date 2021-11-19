@@ -176,8 +176,8 @@ void tulip1_state::tulip1(machine_config &config)
 	WD2793(config, m_fdc, 1000000); // unknown clock
 
 	// floppy drives
-	FLOPPY_CONNECTOR(config, "fdc:0", tulip1_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", tulip1_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", tulip1_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", tulip1_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 }
 
 ROM_START( tulip1 )

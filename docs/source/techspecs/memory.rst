@@ -64,6 +64,20 @@ Memory regions are read-only memory zones in which ROMs are loaded.
 
 All of these have names allowing to access them.
 
+2.4 Views
+~~~~~~~~~
+
+Views are a way to multiplex different submaps over a memory range
+with fast switching.  It is to be used when multiple devices map at
+the same addresses and are switched in externally.  They must be
+created as an object of the device and then setup either statically in
+a memory map or dynamically through ``install_*`` calls.
+
+Switchable submaps, aka variants, are named through an integer.  An
+internal indirection through a map ensures that any integer value can
+be used.
+
+
 3. Memory objects
 -----------------
 
@@ -223,6 +237,37 @@ retrieved by building one of these four finders.
 
 The ``memregion`` device method retrieves a memory region by name.
 Beware that the lookup can be expensive, prefer finders instead.
+
+
+3.4 Views - memory_view
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: C++
+
+    class memory_view {
+        memory_view(device_t &device, std::string name);
+        memory_view_entry &operator[](int slot);
+
+        void select(int entry);
+        void disable();
+
+        const std::string &name() const;
+    }
+
+A view allows to switch part of a memory map between multiple
+possibilities, or even disable it entirely to see what was there
+before.  It is created as an object of the device.
+
+.. code-block:: C++
+
+    memory_view m_view;
+
+    [device constructor] m_view(*this, "name"),
+
+It is then setup through the address map API or dynamically.  At
+runtime, a numbered variant can be selected using the ``select`` method,
+or the view can be disabled using the ``disable`` method.  A disabled
+view can be re-enabled at any time.
 
 
 4. Address maps API
@@ -477,7 +522,7 @@ or banks.
     (...).mirror(mask)
 
 Duplicate the range on the addresses reachable by setting any of the 1
-bits present in mask.  For instance, a range 0-0x1f with mask 0x300
+bits present in mask.  For instance, a range 0-0x1f with mirror 0x300
 will be present on 0-0x1f, 0x100-0x11f, 0x200-0x21f and 0x300-0x31f.
 The addresses passed in to the handler stay in the 0-0x1f range, the
 mirror bits are not seen by the handler.
@@ -541,6 +586,40 @@ actually accessed.  In some cases, very often byte access on a 68000
 if the correct byte is accessed.  ``cswidth`` tells the memory system to
 trigger the handler if a wider part of the bus is accessed.  The
 parameter is that trigger width (would be 16 in the 68000 case).
+
+
+4.5 View setup
+~~~~~~~~~~~~~~
+
+.. code-block:: C++
+
+    map(start, end).view(m_view);
+    m_view[0](start1, end1).[...];
+
+A view is setup in a address map with the view method.  The only
+qualifier accepted is mirror.  The “disabled” version of the view will
+include what was in the range prior to the view setup.
+
+The different variants are setup by indexing the view with the variant
+number and setting up an entry in the usual way.  The entries within a
+variant must of course stay within the range.  There are no other
+additional constraints.  The contents of a variant, by default, are
+what was there before, i.e. the contents of the disabled view, and
+setting it up allows part or all of it to be overridden.
+
+Variants can only be setup once the view itself has been setup with
+the ``view`` method.
+
+A view can only be put in one address map and in only one position.
+If multiple views have identical or similar contents, remember that
+setting up a map is nothing more than a method call, and creating a
+second method to setup a view is perfectly reasonable.  A view is of
+type ``memory_view`` and an indexed entry (e.g. a variant to setup) is
+of type ``memory_view::memory_view_entry &``.
+
+A view can be installed in another view, but don’t forget that a view
+can be installed only once.  A view can also be part of “what was there
+before”.
 
 
 5. Address space dynamic mapping API
@@ -695,3 +774,21 @@ with an optional mirror.
 
 Install a device address with an address map in a space.  The
 ``unitmask`` and ``cswidth`` arguments are optional.
+
+5.9 View installation
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: C++
+
+    space.install_view(addrstart, addrend, view)
+    space.install_view(addrstart, addrend, addrmirror, view)
+
+    view[0].install...
+
+Installs a view in a space.  This can be only done once and in only
+one space, and the view must not have been setup through the address
+map API before.  Once the view is installed, variants can be selected
+by indexing to call a dynamic mapping method on it.
+
+A view can be installed into a variant of another view without issues,
+with only the usual constraint of single installation.

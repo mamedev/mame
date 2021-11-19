@@ -149,7 +149,7 @@ void pcvideo_pcjr_device::device_add_mconfig(machine_config &config)
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
 	m_mc6845->set_update_row_callback(FUNC(pcvideo_pcjr_device::crtc_update_row));
-	m_mc6845->out_de_callback().set(FUNC(pc_t1t_device::t1000_de_changed));
+	m_mc6845->out_de_callback().set(FUNC(pcvideo_pcjr_device::de_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(pcvideo_pcjr_device::pcjr_vsync_changed));
 
 	ADDRESS_MAP_BANK(config, m_vram).set_map(&pc_t1t_device::vram_map).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
@@ -988,6 +988,12 @@ uint8_t pc_t1t_device::read(offs_t offset)
 }
 
 WRITE_LINE_MEMBER( pc_t1t_device::t1000_de_changed )
+{
+	m_display_enable = state ? 0 : 1;
+}
+
+
+WRITE_LINE_MEMBER( pcvideo_pcjr_device::de_changed )
 {
 	m_display_enable = state ? 1 : 0;
 }

@@ -9,7 +9,7 @@ Standard cartridges emulation, optionally bankswitched up to 8KB.
 #include "emu.h"
 #include "rom.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_STD, o2_rom_device, "o2_rom", "Odyssey 2 Standard Carts")
+DEFINE_DEVICE_TYPE(O2_ROM_STD, o2_rom_device, "o2_rom", "Odyssey 2 Standard Cartridge")
 
 
 //-------------------------------------------------
@@ -28,7 +28,7 @@ void o2_rom_device::device_start()
 
 void o2_rom_device::cart_init()
 {
-	m_cart_mask = (1 << (31 - count_leading_zeros(m_rom_size))) - 1;
+	m_cart_mask = (1 << (31 - count_leading_zeros_32(m_rom_size))) - 1;
 }
 
 

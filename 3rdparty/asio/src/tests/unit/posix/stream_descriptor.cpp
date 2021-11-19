@@ -2,7 +2,7 @@
 // stream_descriptor.cpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -51,6 +51,7 @@ void test()
   try
   {
     io_context ioc;
+    const io_context::executor_type ioc_ex = ioc.get_executor();
     char mutable_char_buffer[128] = "";
     const char const_char_buffer[128] = "";
     posix::descriptor_base::bytes_readable io_control_command;
@@ -60,11 +61,13 @@ void test()
     // basic_stream_descriptor constructors.
 
     posix::stream_descriptor descriptor1(ioc);
+    posix::stream_descriptor descriptor2(ioc_ex);
     int native_descriptor1 = -1;
-    posix::stream_descriptor descriptor2(ioc, native_descriptor1);
+    posix::stream_descriptor descriptor3(ioc, native_descriptor1);
+    posix::stream_descriptor descriptor4(ioc_ex, native_descriptor1);
 
 #if defined(ASIO_HAS_MOVE)
-    posix::stream_descriptor descriptor3(std::move(descriptor2));
+    posix::stream_descriptor descriptor5(std::move(descriptor2));
 #endif // defined(ASIO_HAS_MOVE)
 
     // basic_stream_descriptor operators.
@@ -76,11 +79,6 @@ void test()
 
     // basic_io_object functions.
 
-#if !defined(ASIO_NO_DEPRECATED)
-    io_context& ioc_ref = descriptor1.get_io_context();
-    (void)ioc_ref;
-#endif // !defined(ASIO_NO_DEPRECATED)
-
     posix::stream_descriptor::executor_type ex = descriptor1.get_executor();
     (void)ex;
 
@@ -90,9 +88,9 @@ void test()
       = descriptor1.lowest_layer();
     (void)lowest_layer;
 
-    const posix::stream_descriptor& descriptor4 = descriptor1;
+    const posix::stream_descriptor& descriptor6 = descriptor1;
     const posix::stream_descriptor::lowest_layer_type& lowest_layer2
-      = descriptor4.lowest_layer();
+      = descriptor6.lowest_layer();
     (void)lowest_layer2;
 
     int native_descriptor2 = -1;

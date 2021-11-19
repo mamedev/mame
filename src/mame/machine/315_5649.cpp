@@ -100,6 +100,7 @@ uint8_t sega_315_5649_device::read(offs_t offset)
 				m_port_value[6] = (m_port_value[6] & 0xf8) | ((m_port_value[6] + 1) & 7);
 			break;
 		}
+		[[fallthrough]];
 	case 0x00:
 	case 0x01:
 	case 0x02:

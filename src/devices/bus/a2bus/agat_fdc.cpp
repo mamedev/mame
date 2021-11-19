@@ -63,10 +63,11 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( a2bus_agat_fdc_device::floppy_formats )
-	FLOPPY_DS9_FORMAT,
-	FLOPPY_AIM_FORMAT
-FLOPPY_FORMATS_END
+void a2bus_agat_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_DS9_FORMAT);
+	fr.add(FLOPPY_AIM_FORMAT);
+}
 
 static void agat_floppies(device_slot_interface &device)
 {

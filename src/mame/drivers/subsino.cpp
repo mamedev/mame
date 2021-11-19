@@ -229,8 +229,7 @@ To Do:
 #include "machine/subsino.h"
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
-#include "sound/3812intf.h"
+#include "sound/ymopl.h"
 #include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
@@ -246,6 +245,9 @@ To Do:
 #include "tisub.lh"
 #include "stisub.lh"
 
+
+namespace {
+
 class subsino_state : public driver_device
 {
 public:
@@ -253,7 +255,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
-		m_reel_scroll(*this, "reel_scroll.%u", 0U),
+		m_reel_scroll(*this, "reel_scroll.%u", 0U, 0x40U, ENDIANNESS_LITTLE),
 		m_reel_ram(*this, "reel_ram.%u", 0U),
 		m_stbsub_out_c(*this, "stbsub_out_c"),
 		m_maincpu(*this, "maincpu"),
@@ -276,6 +278,7 @@ public:
 	void init_stisub();
 	void init_tesorone();
 	void init_tesorone230();
+	void init_smoto13();
 	void init_smoto20();
 	void init_sharkpy();
 	void init_smoto16();
@@ -293,7 +296,7 @@ protected:
 private:
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
-	optional_shared_ptr_array<uint8_t, 3> m_reel_scroll;
+	memory_share_array_creator<uint8_t, 3> m_reel_scroll;
 	optional_shared_ptr_array<uint8_t, 3> m_reel_ram;
 	optional_shared_ptr<uint8_t> m_stbsub_out_c;
 	required_device<cpu_device> m_maincpu;
@@ -3569,6 +3572,28 @@ ROM_START( smoto20 )
 	ROM_LOAD( "82s129.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
 ROM_END
 
+ROM_START( smoto13 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rider out_1 ver1.3.u18", 0x00000, 0x10000, CRC(45a9ebb2) SHA1(216be0d93a9787593578343277fa82f2d8a2e75c) )
+
+	ROM_REGION( 0x40000, "tilemap", 0 )
+	ROM_LOAD( "rider rom_3 ver1.0.u16", 0x00000, 0x08000, CRC(511cccaa) SHA1(6d47f3d90049c141202c864a8ef6ed7d5a9077a4) )
+	ROM_CONTINUE(      0x10000, 0x08000 )
+	ROM_CONTINUE(      0x08000, 0x08000 )
+	ROM_CONTINUE(      0x18000, 0x08000 )
+	ROM_LOAD( "rider rom_2 ver1.0.u17", 0x20000, 0x08000, CRC(b0d3ec58) SHA1(c10008993c0b9368164e537386d14cb5e9aaf761) )
+	ROM_CONTINUE(      0x30000, 0x08000 )
+	ROM_CONTINUE(      0x28000, 0x08000 )
+	ROM_CONTINUE(      0x38000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "rider rom_4 ver1.0.u54", 0x00000, 0x20000, CRC(df828563) SHA1(f39324c5c37486ed9512e0ff934394556dd182ae) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "82s129.u11", 0x000, 0x100, CRC(e17730a6) SHA1(50c730b24e1d3d205c70f9381e4136e2ba6e499a) )
+	ROM_LOAD( "82s129.u12", 0x100, 0x100, CRC(df848861) SHA1(f7e382f8b56d6b9f2af6c7a48a19e3631a64bb6d) )
+	ROM_LOAD( "82s129.u13", 0x200, 0x100, CRC(9cb4a5c0) SHA1(0e0a368329c6d1cb685ed655d699a4894988fdb1) )
+ROM_END
 
 /***************************************************************************
 
@@ -3737,6 +3762,10 @@ void subsino_state::init_victor5()
 {
 	subsino_decrypt(machine(), victor5_bitswaps, victor5_xors, 0xc000);
 
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
+
 	save_item(NAME(m_flash_packet));
 	save_item(NAME(m_flash_packet_start));
 	save_item(NAME(m_flash_val));
@@ -3750,6 +3779,10 @@ void subsino_state::init_victor21()
 void subsino_state::init_crsbingo()
 {
 	subsino_decrypt(machine(), crsbingo_bitswaps, crsbingo_xors, 0xc000);
+
+	m_flash_packet = 0;
+	m_flash_packet_start = 0;
+	m_flash_val = 0;
 
 	save_item(NAME(m_flash_packet));
 	save_item(NAME(m_flash_packet_start));
@@ -3770,6 +3803,12 @@ void subsino_state::init_smoto20()
 {
 	uint8_t *rom = memregion( "maincpu" )->base();
 	rom[0x12e1] = 0x20; // "ERROR 951010"
+}
+
+void subsino_state::init_smoto13()
+{
+	uint8_t *rom = memregion( "maincpu" )->base();
+	rom[0x1308] = 0x20; // "ERROR 951010"
 }
 
 void subsino_state::init_tisub()
@@ -3880,6 +3919,9 @@ void subsino_state::init_mtrainnv()
 	}
 }
 
+} // Anonymous namespace
+
+
 /***************************************************************************
 *                               Game Drivers                               *
 ***************************************************************************/
@@ -3911,5 +3953,6 @@ GAMEL( 1995, victor6b,    victor6, sharkpy,  victor6b, subsino_state, init_shark
 
 GAMEL( 1996, smoto20,     0,       srider,   smoto20,  subsino_state, init_smoto20,     ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,               layout_smoto    )
 GAMEL( 1996, smoto16,     smoto20, srider,   smoto16,  subsino_state, init_smoto16,     ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,               layout_smoto    )
+GAMEL( 1996, smoto13,     smoto20, srider,   smoto16,  subsino_state, init_smoto13,     ROT0, "Subsino",         "Super Rider (v1.3)",                   0,               layout_smoto    )
 
 GAME(  1996, mtrainnv,    mtrain,  mtrainnv, stbsub,   subsino_state, init_mtrainnv,    ROT0, "Subsino",         "Magic Train (Clear NVRAM ROM?)",       MACHINE_NOT_WORKING )

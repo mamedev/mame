@@ -26,7 +26,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_pandora(*this, "pandora"),
 		m_hyperpac_ram(*this, "hyperpac_ram"),
-		m_bootleg_spriteram16(*this, "spriteram16b")
+		m_bootleg_spriteram16(*this, "spriteram16b"),
+		m_semicom_prot_base(0)
 	{ }
 
 	void _4in1(machine_config &config);
@@ -43,6 +44,7 @@ public:
 
 	void init_pzlbreak();
 	void init_snowbro3();
+	void init_ballboy3p();
 	void init_cookbib3();
 	void init_4in1boot();
 	void init_3in1semi();
@@ -67,6 +69,7 @@ private:
 	int m_sb3_music_is_playing;
 	int m_sb3_music;
 	uint8_t m_semicom_prot_offset;
+	uint16_t m_semicom_prot_base;
 	uint16_t m_yutnori_prot_val;
 
 	void snowbros_flipscreen_w(uint8_t data);

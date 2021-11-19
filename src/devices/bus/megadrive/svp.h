@@ -27,6 +27,8 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
+	virtual tiny_rom_entry const *device_rom_region() const override;
+
 	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) override;
 
 	// reading and writing

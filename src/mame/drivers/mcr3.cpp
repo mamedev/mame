@@ -1124,8 +1124,8 @@ void mcr3_state::mono_tcs(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 0.8);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 0.8);
 }
 
 void maxrpm_state::maxrpm(machine_config &config)
@@ -1147,8 +1147,8 @@ void mcr3_state::mono_sg(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_SOUNDS_GOOD(config, m_sounds_good);
-	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
 }
 
 
@@ -1186,8 +1186,8 @@ void mcrsc_csd_state::mcrsc_csd(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_CHEAP_SQUEAK_DELUXE(config, m_cheap_squeak_deluxe);
-	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 0.8);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 0.8);
 
 	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
 	m_lamplatch->q_out_cb<0>().set_output("lamp0");
@@ -1309,7 +1309,7 @@ ROM_START( rampage )
 	ROM_LOAD( "fg-3_4e_6-30-86.4e",   0x30000, 0x10000, CRC(81e1de40) SHA1(7e7818792845ec3687b3202eeade60a298ef513e) )
 
 	ROM_REGION( 0x0001, "sg:pal", 0 ) /* Sounds Good board pal */
-	ROM_LOAD( "e36a31axnaxqd.u15.bin", 0x0000, 0x0001, NO_DUMP) /* PAL20L10CNS */
+	ROM_LOAD( "e36a31axnaxqd.u15.bin", 0x0000, 0x0001, NO_DUMP) /* PAL20L10CNS, called "SG01R0 PAL" with part number "E36-00803-0009" on the schematics */
 ROM_END
 
 
@@ -1336,7 +1336,7 @@ ROM_START( rampage2 )
 	ROM_LOAD( "fg-3_4e_6-30-86.4e",   0x30000, 0x10000, CRC(81e1de40) SHA1(7e7818792845ec3687b3202eeade60a298ef513e) )
 
 	ROM_REGION( 0x0001, "sg:pal", 0 ) /* Sounds Good board pal */
-	ROM_LOAD( "e36a31axnaxqd.u15.bin", 0x0000, 0x0001, NO_DUMP) /* PAL20L10CNS */
+	ROM_LOAD( "e36a31axnaxqd.u15.bin", 0x0000, 0x0001, NO_DUMP) /* PAL20L10CNS, called "SG01R0 PAL" with part number "E36-00803-0009" on the schematics */
 ROM_END
 
 

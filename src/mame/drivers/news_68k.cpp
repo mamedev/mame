@@ -26,7 +26,7 @@
 #include "machine/upd765.h"
 #include "machine/dmac_0266.h"
 #include "machine/news_hid.h"
-#include "machine/ncr5380n.h"
+#include "machine/ncr5380.h"
 
 // video
 #include "screen.h"
@@ -116,8 +116,6 @@ protected:
 #endif
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	// devices
 	required_device<m68030_device> m_cpu;
 	required_device<ram_device> m_ram;
@@ -189,7 +187,7 @@ void news_68k_state::cpu_map(address_map &map)
 	// 0xe0c40000 // centronics
 	map(0xe0c80000, 0xe0c80003).m(m_fdc, FUNC(upd72067_device::map));
 	map(0xe0c80100, 0xe0c80100).rw(m_fdc, FUNC(upd72067_device::dma_r), FUNC(upd72067_device::dma_w));
-	map(0xe0cc0000, 0xe0cc0007).m(m_scsi, FUNC(ncr5380n_device::map));
+	map(0xe0cc0000, 0xe0cc0007).m(m_scsi, FUNC(ncr5380_device::map));
 
 	map(0xe0d00000, 0xe0d00007).m(m_hid, FUNC(news_hid_hle_device::map_68k));
 	map(0xe0d40000, 0xe0d40003).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w));
@@ -277,7 +275,7 @@ void news_68k_state::int_check()
 	static int const int_line[] = { INPUT_LINE_IRQ3, INPUT_LINE_IRQ4 };
 	static u8 const int_mask[] = { 0x71, 0x8e };
 
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_int_state); i++)
+	for (unsigned i = 0; i < std::size(m_int_state); i++)
 	{
 		bool const int_state = m_intst & int_mask[i];
 
@@ -375,7 +373,7 @@ void news_68k_state::common(machine_config &config)
 	UPD72067(config, m_fdc, 16_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(FUNC(news_68k_state::irq_w<FDC>));
 	m_fdc->drq_wr_callback().set(m_irq7, FUNC(input_merger_device::in_w<0>));
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// scsi bus and devices
 	NSCSI_BUS(config, "scsi");
@@ -433,10 +431,6 @@ void news_68k_state::nws1580(machine_config &config)
 {
 	common(config);
 }
-
-FLOPPY_FORMATS_MEMBER(news_68k_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
 
 static INPUT_PORTS_START(nws15x0)
 	PORT_START("SW1")

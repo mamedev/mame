@@ -31,6 +31,7 @@ public:
 		, m_okibank(*this, "okibank")
 		, m_screen(*this, "screen")
 		, m_sprites(*this, "sprites")
+		, m_shinobl_kludge(0)
 		, m_maincpu(*this, "maincpu")
 		, m_soundcpu(*this, "soundcpu")
 		, m_msm(*this, "5205")
@@ -56,8 +57,6 @@ public:
 	void eswatbl2(machine_config &config);
 	void ddcrewbl(machine_config &config);
 	void shdancbla(machine_config &config);
-	void astormbl(machine_config &config);
-	void astormb2(machine_config &config);
 	void passsht4b(machine_config &config);
 	void wb3bb(machine_config &config);
 	void wb3bble(machine_config &config);
@@ -77,7 +76,6 @@ public:
 	void init_wb3bble();
 	void init_fpointbl();
 	void init_eswatbl();
-	void init_astormbl();
 	void init_sys18bl_oki();
 	void init_astormb2();
 	void init_shdancbl();
@@ -175,7 +173,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
 
-	void astormbl_map(address_map &map);
 	void bayrouteb1_map(address_map &map);
 	void bayrouteb2_map(address_map &map);
 	void beautyb_map(address_map &map);
@@ -239,7 +236,7 @@ private:
 
 	int m_beautyb_unkx;
 
-	int m_shinobl_kludge;
+	int m_shinobl_kludge; // TODO: this never gets set, causing unreachable code in get_text_tile_info
 
 	int m_eswat_tilebank0;
 

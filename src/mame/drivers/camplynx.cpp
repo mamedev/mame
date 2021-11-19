@@ -214,7 +214,7 @@ private:
 	void port84_w(u8 data); // dac port 48k
 	void machine_start() override;
 	void machine_reset() override;
-	DECLARE_FLOPPY_FORMATS(camplynx_floppy_formats);
+	static void camplynx_floppy_formats(format_registration &fr);
 	MC6845_UPDATE_ROW(lynx48k_update_row);
 	MC6845_UPDATE_ROW(lynx128k_update_row);
 	void lynx128k_io(address_map &map);
@@ -845,9 +845,11 @@ void camplynx_state::machine_start()
 	save_item(NAME(m_is_128k));
 }
 
-FLOPPY_FORMATS_MEMBER( camplynx_state::camplynx_floppy_formats )
-	FLOPPY_CAMPLYNX_FORMAT
-FLOPPY_FORMATS_END
+void camplynx_state::camplynx_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_CAMPLYNX_FORMAT);
+}
 
 static void camplynx_floppies(device_slot_interface &device)
 {

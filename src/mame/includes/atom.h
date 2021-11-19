@@ -97,7 +97,7 @@ protected:
 
 	/* devices */
 	bool m_previous_i8271_int_state;
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_WRITE_LINE_MEMBER(cassette_output_tick);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device &slot);

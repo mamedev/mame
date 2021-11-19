@@ -61,7 +61,7 @@ private:
 
 	void c2031_mem(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via0;

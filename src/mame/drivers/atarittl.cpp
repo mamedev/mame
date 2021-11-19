@@ -50,7 +50,7 @@
 
  TM-0??                   Arcade Driver/Driver 1st Person (Not Produced/Released) (1974-75?)
  TM-018                   Dodgeball/Dodgem (Not Produced/Released) (1975)
- TM-024                   Qwakers (Not Produced/Released) (1974?) (Kee Games clone of Qwak!?)
+ TM-024                   Qwakers (Not Produced/Released) (1975) (Kee Games clone of Qwak!?) - A bare PCB has been found marked QWAKERS A000950 ATARI (c)75
 
  - Information (current as of 27 Mar. 2019) on what logic chips (and some analog parts) are still needed to be emulated in the
    netlist system per-game:
@@ -78,6 +78,8 @@
 #include "video/fixfreq.h"
 #include "screen.h"
 
+
+namespace {
 
 // copied by Pong, not accurate for this driver!
 // start
@@ -582,10 +584,6 @@ ROM_START( pinpong )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START( pongdbl )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-ROM_END
-
 ROM_START( pursuit )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 ROM_END
@@ -615,6 +613,9 @@ ROM_START( coupfran ) // dummy to satisfy game entry
 ROM_END
 
 */
+
+} // Anonymous namespace
+
 
 GAME(1975,  antiairc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Anti-Aircraft [TTL]",    MACHINE_IS_SKELETON)
 GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Crash 'n Score/Stock Car [TTL]",   MACHINE_IS_SKELETON)

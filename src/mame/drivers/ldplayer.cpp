@@ -185,15 +185,15 @@ chd_file *ldplayer_state::get_disc()
 		{
 			// open the file itself via our search path
 			emu_file image_file(machine().options().media_path(), OPEN_FLAG_READ);
-			osd_file::error filerr = image_file.open(dir->name);
-			if (filerr == osd_file::error::NONE)
+			std::error_condition filerr = image_file.open(dir->name);
+			if (!filerr)
 			{
 				std::string fullpath(image_file.fullpath());
 				image_file.close();
 
 				// try to open the CHD
 
-				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
+				if (!machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()))
 				{
 					m_filename.assign(dir->name);
 					found = true;
@@ -204,7 +204,8 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == false) {
+	if (!found)
+	{
 		machine().ui().popup_time(10, "No valid image file found!\n");
 		return nullptr;
 	}
@@ -345,8 +346,8 @@ void ldplayer_state::machine_reset()
 
 void pr8210_state::add_command(uint8_t command)
 {
-	m_command_buffer[m_command_buffer_in++ % ARRAY_LENGTH(m_command_buffer)] = (command & 0x1f) | 0x20;
-	m_command_buffer[m_command_buffer_in++ % ARRAY_LENGTH(m_command_buffer)] = 0x00 | 0x20;
+	m_command_buffer[m_command_buffer_in++ % std::size(m_command_buffer)] = (command & 0x1f) | 0x20;
+	m_command_buffer[m_command_buffer_in++ % std::size(m_command_buffer)] = 0x00 | 0x20;
 }
 
 
@@ -376,7 +377,7 @@ void pr8210_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			// if we're out of bits, queue up the next command
 			else if (bitsleft == 0 && m_command_buffer_in != m_command_buffer_out)
 			{
-				data = m_command_buffer[m_command_buffer_out++ % ARRAY_LENGTH(m_command_buffer)];
+				data = m_command_buffer[m_command_buffer_out++ % std::size(m_command_buffer)];
 				bitsleft = 12;
 			}
 			m_bit_timer->adjust(duration, (bitsleft << 16) | data);
@@ -416,7 +417,7 @@ void pr8210_state::execute_command(int command)
 	{
 		case CMD_SCAN_REVERSE:
 			if (m_command_buffer_in == m_command_buffer_out ||
-				m_command_buffer_in == (m_command_buffer_out + 1) % ARRAY_LENGTH(m_command_buffer))
+				m_command_buffer_in == (m_command_buffer_out + 1) % std::size(m_command_buffer))
 			{
 				add_command(0x1c);
 				m_playing = true;
@@ -435,7 +436,7 @@ void pr8210_state::execute_command(int command)
 
 		case CMD_FAST_REVERSE:
 			if (m_command_buffer_in == m_command_buffer_out ||
-				m_command_buffer_in == (m_command_buffer_out + 1) % ARRAY_LENGTH(m_command_buffer))
+				m_command_buffer_in == (m_command_buffer_out + 1) % std::size(m_command_buffer))
 			{
 				add_command(0x0c);
 				m_playing = true;
@@ -444,7 +445,7 @@ void pr8210_state::execute_command(int command)
 
 		case CMD_SCAN_FORWARD:
 			if (m_command_buffer_in == m_command_buffer_out ||
-				m_command_buffer_in == (m_command_buffer_out + 1) % ARRAY_LENGTH(m_command_buffer))
+				m_command_buffer_in == (m_command_buffer_out + 1) % std::size(m_command_buffer))
 			{
 				add_command(0x08);
 				m_playing = true;
@@ -463,7 +464,7 @@ void pr8210_state::execute_command(int command)
 
 		case CMD_FAST_FORWARD:
 			if (m_command_buffer_in == m_command_buffer_out ||
-				m_command_buffer_in == (m_command_buffer_out + 1) % ARRAY_LENGTH(m_command_buffer))
+				m_command_buffer_in == (m_command_buffer_out + 1) % std::size(m_command_buffer))
 			{
 				add_command(0x10);
 				m_playing = true;

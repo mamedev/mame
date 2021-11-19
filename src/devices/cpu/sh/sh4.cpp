@@ -2260,6 +2260,7 @@ void sh34_base_device::state_import(const device_state_entry &entry)
 	{
 		case STATE_GENPC:
 			m_sh2_state->pc = m_debugger_temp;
+			[[fallthrough]];
 		case SH4_PC:
 			m_sh2_state->m_delay = 0;
 			break;

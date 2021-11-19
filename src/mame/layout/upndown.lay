@@ -73,32 +73,32 @@ license:CC0
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<element name="lamp2" ref="HOLD">
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x01">
 			<bounds x="0.0" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp2" ref="HOLD">
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x02">
 			<bounds x="0.4" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp2" ref="HOLD">
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x04">
 			<bounds x="0.8" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp2" ref="HOLD">
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x08">
 			<bounds x="1.2" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp2" ref="HOLD">
+		<element name="lamp2" ref="HOLD" inputtag="IN0-2" inputmask="0x10">
 			<bounds x="1.6" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp2" ref="CANCEL">
+		<element name="lamp2" ref="CANCEL" inputtag="IN0-0" inputmask="0x10">
 			<bounds x="2.0" y="3.45" width="0.35" height="0.24" />
 		</element>
 
-		<element name="lamp0" ref="BET">
+		<element name="lamp0" ref="BET" inputtag="IN0-0" inputmask="0x01">
 			<bounds x="2.85" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp1" ref="DEAL">
+		<element name="lamp1" ref="DEAL" inputtag="IN0-0" inputmask="0x08">
 			<bounds x="3.25" y="3.45" width="0.35" height="0.24" />
 		</element>
-		<element name="lamp3" ref="TAKE">
+		<element name="lamp3" ref="TAKE" inputtag="IN0-1" inputmask="0x04">
 			<bounds x="3.65" y="3.45" width="0.35" height="0.24" />
 		</element>
 	</view>

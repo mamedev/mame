@@ -67,15 +67,15 @@ void vt82c496_device::device_reset()
 	m_space->install_read_bank(0xf0000,0xfffff,0,m_bios_f0_r);
 	m_space->nop_write(0xc0000,0xfffff);
 	m_bios_c0_r->set_base(m_rom);
-	m_bios_c4_r->set_base(m_rom+0x4000);
-	m_bios_c8_r->set_base(m_rom+0x8000);
-	m_bios_cc_r->set_base(m_rom+0xc000);
-	m_bios_d0_r->set_base(m_rom+0x10000);
-	m_bios_d4_r->set_base(m_rom+0x14000);
-	m_bios_d8_r->set_base(m_rom+0x18000);
-	m_bios_dc_r->set_base(m_rom+0x1c000);
-	m_bios_e0_r->set_base(m_rom+0x20000);
-	m_bios_f0_r->set_base(m_rom+0x30000);
+	m_bios_c4_r->set_base(m_rom+0x4000/4);
+	m_bios_c8_r->set_base(m_rom+0x8000/4);
+	m_bios_cc_r->set_base(m_rom+0xc000/4);
+	m_bios_d0_r->set_base(m_rom+0x10000/4);
+	m_bios_d4_r->set_base(m_rom+0x14000/4);
+	m_bios_d8_r->set_base(m_rom+0x18000/4);
+	m_bios_dc_r->set_base(m_rom+0x1c000/4);
+	m_bios_e0_r->set_base(m_rom+0x20000/4);
+	m_bios_f0_r->set_base(m_rom+0x30000/4);
 }
 
 uint8_t vt82c496_device::read(offs_t offset)

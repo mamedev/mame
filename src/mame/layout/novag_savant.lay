@@ -106,11 +106,11 @@ license:CC0
 		<text string="Set Up"><color red="0.01" green="0.01" blue="0.01" /></text>
 	</element>
 
-	<element name="text_b21a"><image file="chess/bp.png"/></element>
-	<element name="text_b22a"><image file="chess/br.png"/></element>
-	<element name="text_b23a"><image file="chess/bn.png"/></element>
-	<element name="text_b24a"><image file="chess/bb.png"/></element>
-	<element name="text_b25a"><image file="chess/bq.png"/></element>
+	<element name="text_b21a"><image file="chess/bp.svg"/></element>
+	<element name="text_b22a"><image file="chess/br.svg"/></element>
+	<element name="text_b23a"><image file="chess/bn.svg"/></element>
+	<element name="text_b24a"><image file="chess/bb.svg"/></element>
+	<element name="text_b25a"><image file="chess/bq.svg"/></element>
 
 	<element name="text_b21">
 		<rect><color red="0.7" green="0.7" blue="0.74" /></rect>

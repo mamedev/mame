@@ -12,6 +12,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "machine/k007452.h"
 #include "sound/k007232.h"
 #include "video/k007121.h"
 #include "tilemap.h"
@@ -27,6 +28,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121(*this, "k007121"),
 		m_k007232(*this, "k007232"),
+		m_k007452(*this, "k007452"),
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch")
@@ -45,13 +47,13 @@ private:
 
 	/* misc */
 	int        m_irq_enabled;
-	int        m_multiply_reg[2];
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k007121_device> m_k007121;
 	required_device<k007232_device> m_k007232;
+	required_device<k007452_device> m_k007452;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -59,8 +61,6 @@ private:
 	void flkatck_bankswitch_w(uint8_t data);
 	uint8_t flkatck_ls138_r(offs_t offset);
 	void flkatck_ls138_w(offs_t offset, uint8_t data);
-	uint8_t multiply_r();
-	void multiply_w(offs_t offset, uint8_t data);
 	void vram_w(offs_t offset, uint8_t data);
 	void flkatck_k007121_regs_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info_A);

@@ -21,7 +21,7 @@
     offset
 -------------------------------------------------*/
 
-static inline int readbit(const u8 *src, unsigned int bitnum)
+constexpr int readbit(const u8 *src, unsigned int bitnum)
 {
 	return src[bitnum / 8] & (0x80 >> (bitnum % 8));
 }

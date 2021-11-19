@@ -377,13 +377,15 @@ READ_LINE_MEMBER( mm1_state::dsra_r )
 //  upd765_interface fdc_intf
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( mm1_state::floppy_formats )
-	FLOPPY_MM1_FORMAT
-FLOPPY_FORMATS_END
+void mm1_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MM1_FORMAT);
+}
 /*
-FLOPPY_FORMATS_MEMBER( mm2_state::floppy_formats )
+void mm2_state::floppy_formats(format_registration &fr)
     FLOPPY_MM2_FORMAT
-FLOPPY_FORMATS_END
+}
 */
 static void mm1_floppies(device_slot_interface &device)
 {

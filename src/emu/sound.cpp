@@ -68,11 +68,8 @@ stream_buffer::stream_buffer(u32 sample_rate) :
 stream_buffer::~stream_buffer()
 {
 #if (SOUND_DEBUG)
-	if (m_wav_file != nullptr)
-	{
+	if (m_wav_file)
 		flush_wav();
-		close_wav();
-	}
 #endif
 }
 
@@ -108,7 +105,7 @@ void stream_buffer::set_sample_rate(u32 rate, bool resample)
 	// voice when jumping off the edge in Q*Bert; without this extra effort
 	// it is crackly and/or glitchy at times
 	sample_t buffer[64];
-	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(ARRAY_LENGTH(buffer))));
+	int buffered_samples = std::min(m_sample_rate, std::min(rate, u32(std::size(buffer))));
 
 	// if the new rate is lower, downsample into our holding buffer;
 	// otherwise just copy into our holding buffer for later upsampling
@@ -184,7 +181,7 @@ void stream_buffer::open_wav(char const *filename)
 {
 	// always open at 48k so that sound programs can handle it
 	// re-sample as needed
-	m_wav_file = wav_open(filename, 48000, 1);
+	m_wav_file = util::wav_open(filename, 48000, 1);
 }
 #endif
 
@@ -197,7 +194,7 @@ void stream_buffer::open_wav(char const *filename)
 void stream_buffer::flush_wav()
 {
 	// skip if no file
-	if (m_wav_file == nullptr)
+	if (!m_wav_file)
 		return;
 
 	// grab a view of the data from the last-written point
@@ -206,34 +203,20 @@ void stream_buffer::flush_wav()
 
 	// iterate over chunks for conversion
 	s16 buffer[1024];
-	for (int samplebase = 0; samplebase < view.samples(); samplebase += ARRAY_LENGTH(buffer))
+	for (int samplebase = 0; samplebase < view.samples(); samplebase += std::size(buffer))
 	{
 		// clamp to the buffer size
 		int cursamples = view.samples() - samplebase;
-		if (cursamples > ARRAY_LENGTH(buffer))
-			cursamples = ARRAY_LENGTH(buffer);
+		if (cursamples > std::size(buffer))
+			cursamples = std::size(buffer);
 
 		// convert and fill
 		for (int sampindex = 0; sampindex < cursamples; sampindex++)
 			buffer[sampindex] = s16(view.get(samplebase + sampindex) * 32768.0);
 
 		// write to the WAV
-		wav_add_data_16(m_wav_file, buffer, cursamples);
+		util::wav_add_data_16(*m_wav_file, buffer, cursamples);
 	}
-}
-#endif
-
-
-//-------------------------------------------------
-//  close_wav - close the logging WAV file
-//-------------------------------------------------
-
-#if (SOUND_DEBUG)
-void stream_buffer::close_wav()
-{
-	if (m_wav_file != nullptr)
-		wav_close(m_wav_file);
-	m_wav_file = nullptr;
 }
 #endif
 
@@ -833,7 +816,7 @@ void sound_stream::apply_sample_rate_changes(u32 updatenum, u32 downstream_rate)
 #if (SOUND_DEBUG)
 void sound_stream::print_graph_recursive(int indent, int index)
 {
-	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name().c_str(), index + m_output_base, sample_rate());
+	osd_printf_info("%*s%s Ch.%d @ %d\n", indent, "", name(), index + m_output_base, sample_rate());
 	for (int index = 0; index < m_input.size(); index++)
 		if (m_input[index].valid())
 		{
@@ -1085,11 +1068,12 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_rightmix(machine.sample_rate()),
 	m_compressor_scale(1.0),
 	m_compressor_counter(0),
+	m_compressor_enabled(machine.options().compressor()),
 	m_muted(0),
 	m_nosound_mode(machine.osd().no_sound()),
 	m_attenuation(0),
 	m_unique_id(0),
-	m_wavfile(nullptr),
+	m_wavfile(),
 	m_first_reset(true)
 {
 	// get filename for WAV file or AVI file if specified
@@ -1102,12 +1086,15 @@ sound_manager::sound_manager(running_machine &machine) :
 
 	// count the mixers
 #if VERBOSE
-	mixer_interface_iterator iter(machine.root_device());
+	mixer_interface_enumerator iter(machine.root_device());
 	VPRINTF(("total mixers = %d\n", iter.count()));
 #endif
 
 	// register callbacks
-	machine.configuration().config_register("mixer", config_load_delegate(&sound_manager::config_load, this), config_save_delegate(&sound_manager::config_save, this));
+	machine.configuration().config_register(
+			"mixer",
+			configuration_manager::load_delegate(&sound_manager::config_load, this),
+			configuration_manager::save_delegate(&sound_manager::config_save, this));
 	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&sound_manager::pause, this));
 	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&sound_manager::resume, this));
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&sound_manager::reset, this));
@@ -1156,12 +1143,19 @@ sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outp
 //  start_recording - begin audio recording
 //-------------------------------------------------
 
-void sound_manager::start_recording()
+bool sound_manager::start_recording(std::string_view filename)
+{
+	if (m_wavfile)
+		return false;
+	m_wavfile = util::wav_open(filename, machine().sample_rate(), 2);
+	return bool(m_wavfile);
+}
+
+bool sound_manager::start_recording()
 {
 	// open the output WAV file if specified
-	const char *wavfile = machine().options().wav_write();
-	if (wavfile[0] != 0 && m_wavfile == nullptr)
-		m_wavfile = wav_open(wavfile, machine().sample_rate(), 2);
+	char const *const filename = machine().options().wav_write();
+	return *filename ? start_recording(filename) : false;
 }
 
 
@@ -1172,9 +1166,7 @@ void sound_manager::start_recording()
 void sound_manager::stop_recording()
 {
 	// close any open WAV file
-	if (m_wavfile != nullptr)
-		wav_close(m_wavfile);
-	m_wavfile = nullptr;
+	m_wavfile.reset();
 }
 
 
@@ -1199,7 +1191,7 @@ void sound_manager::set_attenuation(float attenuation)
 bool sound_manager::indexed_mixer_input(int index, mixer_input &info) const
 {
 	// scan through the mixers until we find the indexed input
-	for (device_mixer_interface &mixer : mixer_interface_iterator(machine().root_device()))
+	for (device_mixer_interface &mixer : mixer_interface_enumerator(machine().root_device()))
 	{
 		if (index < mixer.inputs())
 		{
@@ -1236,11 +1228,14 @@ void sound_manager::samples(s16 *buffer)
 
 void sound_manager::mute(bool mute, u8 reason)
 {
+	bool old_muted = m_muted;
 	if (mute)
 		m_muted |= reason;
 	else
 		m_muted &= ~reason;
-	set_attenuation(m_attenuation);
+
+	if(old_muted != (m_muted != 0))
+		set_attenuation(m_attenuation);
 }
 
 
@@ -1270,7 +1265,7 @@ void sound_manager::recursive_remove_stream_from_orphan_list(sound_stream *which
 void sound_manager::apply_sample_rate_changes()
 {
 	// update sample rates if they have changed
-	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+	for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 	{
 		int stream_out;
 		sound_stream *stream = speaker.output_to_stream_output(0, stream_out);
@@ -1292,7 +1287,7 @@ void sound_manager::apply_sample_rate_changes()
 void sound_manager::reset()
 {
 	// reset all the sound chips
-	for (device_sound_interface &sound : sound_interface_iterator(machine().root_device()))
+	for (device_sound_interface &sound : sound_interface_enumerator(machine().root_device()))
 		sound.device().reset();
 
 	// apply any sample rate changes now
@@ -1308,17 +1303,19 @@ void sound_manager::reset()
 			m_orphan_stream_list[stream.get()] = 0;
 
 		// then walk the graph like we do on update and remove any we touch
-		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 		{
 			int dummy;
-			sound_stream *output = speaker.output_to_stream_output(0, dummy);
-			if (output != nullptr)
+			sound_stream *const output = speaker.output_to_stream_output(0, dummy);
+			if (output)
 				recursive_remove_stream_from_orphan_list(output);
+
+			m_speakers.emplace_back(speaker);
 		}
 
 #if (SOUND_DEBUG)
 		// dump the sound graph when we start up
-		for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+		for (speaker_device &speaker : speaker_device_enumerator(machine().root_device()))
 		{
 			int index;
 			sound_stream *output = speaker.output_to_stream_output(0, index);
@@ -1363,14 +1360,10 @@ void sound_manager::resume()
 //  configuration file
 //-------------------------------------------------
 
-void sound_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
+void sound_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
-		return;
-
-	// might not have any data
-	if (parentnode == nullptr)
+	// we only care system-specific configuration
+	if ((cfg_type != config_type::SYSTEM) || !parentnode)
 		return;
 
 	// iterate over channel nodes
@@ -1395,29 +1388,28 @@ void sound_manager::config_load(config_type cfg_type, util::xml::data_node const
 
 void sound_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	// we only care about game files
-	if (cfg_type != config_type::GAME)
+	// we only save system-specific configuration
+	if (cfg_type != config_type::SYSTEM)
 		return;
 
 	// iterate over mixer channels
-	if (parentnode != nullptr)
-		for (int mixernum = 0; ; mixernum++)
-		{
-			mixer_input info;
-			if (!indexed_mixer_input(mixernum, info))
-				break;
-			float newvol = info.stream->input(info.inputnum).user_gain();
+	for (int mixernum = 0; ; mixernum++)
+	{
+		mixer_input info;
+		if (!indexed_mixer_input(mixernum, info))
+			break;
 
-			if (newvol != 1.0f)
+		float const newvol = info.stream->input(info.inputnum).user_gain();
+		if (newvol != 1.0f)
+		{
+			util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
+			if (channelnode)
 			{
-				util::xml::data_node *const channelnode = parentnode->add_child("channel", nullptr);
-				if (channelnode != nullptr)
-				{
-					channelnode->set_attribute_int("index", mixernum);
-					channelnode->set_attribute_float("newvol", newvol);
-				}
+				channelnode->set_attribute_int("index", mixernum);
+				channelnode->set_attribute_float("newvol", newvol);
 			}
 		}
+	}
 }
 
 
@@ -1487,7 +1479,7 @@ void sound_manager::update(void *ptr, int param)
 	std::fill_n(&m_rightmix[0], m_samples_this_update, 0);
 
 	// force all the speaker streams to generate the proper number of samples
-	for (speaker_device &speaker : speaker_device_iterator(machine().root_device()))
+	for (speaker_device &speaker : m_speakers)
 		speaker.mix(&m_leftmix[0], &m_rightmix[0], m_last_update, endtime, m_samples_this_update, (m_muted & MUTE_REASON_SYSTEM));
 
 	// determine the maximum in this section
@@ -1552,8 +1544,11 @@ void sound_manager::update(void *ptr, int param)
 		if (lscale != m_compressor_scale && sample != m_finalmix_leftover)
 			lscale = adjust_toward_compressor_scale(lscale, lprev, lsamp);
 
+		lprev = lsamp * lscale;
+		if (m_compressor_enabled)
+			lsamp = lprev;
+
 		// clamp the left side
-		lprev = lsamp *= lscale;
 		if (lsamp > 1.0)
 			lsamp = 1.0;
 		else if (lsamp < -1.0)
@@ -1565,8 +1560,11 @@ void sound_manager::update(void *ptr, int param)
 		if (rscale != m_compressor_scale && sample != m_finalmix_leftover)
 			rscale = adjust_toward_compressor_scale(rscale, rprev, rsamp);
 
-		// clamp the left side
-		rprev = rsamp *= rscale;
+		rprev = rsamp * rscale;
+		if (m_compressor_enabled)
+			rsamp = rprev;
+
+		// clamp the right side
 		if (rsamp > 1.0)
 			rsamp = 1.0;
 		else if (rsamp < -1.0)
@@ -1582,8 +1580,8 @@ void sound_manager::update(void *ptr, int param)
 			machine().osd().update_audio_stream(finalmix, finalmix_offset / 2);
 		machine().osd().add_audio_to_recording(finalmix, finalmix_offset / 2);
 		machine().video().add_sound_to_recording(finalmix, finalmix_offset / 2);
-		if (m_wavfile != nullptr)
-			wav_add_data_16(m_wavfile, finalmix, finalmix_offset);
+		if (m_wavfile)
+			util::wav_add_data_16(*m_wavfile, finalmix, finalmix_offset);
 	}
 
 	// update any orphaned streams so they don't get too far behind

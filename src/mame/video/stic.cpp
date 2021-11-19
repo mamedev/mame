@@ -1190,7 +1190,7 @@ uint16_t stic_device::read(offs_t offset)
 		case STIC_GMR:
 			m_color_stack_mode = 1;
 			//logerror("Setting color stack mode\n");
-			/*** fall through ***/
+			[[fallthrough]];
 		case STIC_DER:
 			return 0x3FFF;
 		case STIC_CSR + CSR0:
@@ -1314,7 +1314,7 @@ void stic_device::write(offs_t offset, uint16_t data)
 			break;
 	}
 
-	if (offset < ARRAY_LENGTH(m_stic_registers))
+	if (offset < std::size(m_stic_registers))
 		m_stic_registers[offset] = data;
 }
 

@@ -32,6 +32,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki%u", 1U),
+		m_ymsnd(*this, "ymsnd"),
 		m_p47b_adpcm(*this, "msm%u", 1U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -96,6 +97,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
+	optional_device<device_t> m_ymsnd;
 	optional_device_array<msm5205_device, 2> m_p47b_adpcm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

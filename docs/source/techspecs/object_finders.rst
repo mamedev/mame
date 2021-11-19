@@ -515,10 +515,10 @@ object finder to access it.  We’ll use the Sega X-board device as an example:
         {
         }
 
-	optional_device<z80_device> m_soundcpu;
-	optional_device<z80_device> m_soundcpu2;
-	required_device<mb3773_device> m_watchdog;
-	required_device<segaic16_video_device> m_segaic16vid;
+        optional_device<z80_device> m_soundcpu;
+        optional_device<z80_device> m_soundcpu2;
+        required_device<mb3773_device> m_watchdog;
+        required_device<segaic16_video_device> m_segaic16vid;
         bool m_adc_reverse[8];
         u8 m_pc_0;
         u8 m_lastsurv_mux;
@@ -564,7 +564,7 @@ otherwise:
         return value;
     }
 
-    uint8_t segaxbd_state::lastsurv_port_r()
+    u8 segaxbd_state::lastsurv_port_r()
     {
         return m_mux_ports[m_lastsurv_mux].read_safe(0xff);
     }
@@ -611,17 +611,17 @@ functions for configuring them:
     public:
         vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0U);
 
-	template <typename T> void set_exp(T &&tag, int no, offs_t base)
+        template <typename T> void set_exp(T &&tag, int no, offs_t base)
         {
             m_exp_space.set_tag(std::forward<T>(tag), no);
             m_exp_base = base;
         }
-	template <typename T> void set_chip(T &&tag, int no, offs_t base)
+        template <typename T> void set_chip(T &&tag, int no, offs_t base)
         {
             m_chip_space.set_tag(std::forward<T>(tag), no);
             m_chip_base = base;
         }
-	template <typename T> void set_rom(T &&tag, int no, offs_t base)
+        template <typename T> void set_rom(T &&tag, int no, offs_t base)
         {
             m_rom_space.set_tag(std::forward<T>(tag), no);
             m_rom_base = base;
@@ -638,7 +638,7 @@ functions for configuring them:
         offs_t m_chip_base;
         offs_t m_rom_base;
 
-	device_vboy_cart_interface *m_cart;
+        device_vboy_cart_interface *m_cart;
     };
 
     DECLARE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device)
@@ -679,4 +679,361 @@ have been configured but aren’t present:
             throw emu_fatalerror("%s: Address space %d of device %s not found (ROM)\n", tag(), m_rom_space.spacenum(), m_rom_space.finder_tag());
 
         m_cart = get_card_device();
+    }
+
+
+Object finder types in more detail
+----------------------------------
+
+All object finders provide configuration functionality:
+
+.. code-block:: C++
+
+    char const *finder_tag() const { return m_tag; }
+    std::pair<device_t &, char const *> finder_target();
+    void set_tag(device_t &base, char const *tag);
+    void set_tag(char const *tag);
+    void set_tag(finder_base const &finder);
+
+The ``finder_tag`` and ``finder_target`` member function provides access to the
+currently configured target.  Note that the tag returned by ``finder`` tag is
+relative to the base device.  It is not sufficient on its own to identify the
+target.
+
+The ``set_tag`` member functions configure the target of the object finder.
+These members must not be called after the object finder is resolved.  The first
+form configures the base device and relative tag.  The second form sets the
+relative tag and also implicitly sets the base device to the device that is
+currently being configured.  This form must only be called from machine
+configuration functions.  The third form sets the base object and relative tag
+to the current target of another object finder.
+
+Note that the ``set_tag`` member functions **do not** copy the relative tag.  It
+is the caller’s responsibility to ensure the C string remains valid until the
+object finder is resolved (or reconfigured with a different tag).  The base
+device must also be valid at resolution time.  This may not be the case if the
+device could be removed or replaced later.
+
+All object finders provide the same interface for accessing the target object:
+
+.. code-block:: C++
+
+   ObjectClass *target() const;
+   operator ObjectClass *() const;
+   ObjectClass *operator->() const;
+
+These members all provide access to the target object.  The ``target`` member
+function and cast-to-pointer operator will return ``nullptr`` if the target has
+not been found.  The pointer member access operator asserts that the target has
+been found.
+
+Optional object finders additionally provide members for testing whether the
+target object has been found:
+
+.. code-block:: C++
+
+   bool found() const;
+   explicit operator bool() const;
+
+These members return ``true`` if the target was found, on the assumption
+that the target pointer will be non-null if the target was found.
+
+Device finders
+~~~~~~~~~~~~~~
+
+Device finders require one template argument for the expected device class.
+This should derive from either ``device_t`` or ``device_interface``.  The target
+device object must either be an instance of this class, an instance of a class
+that derives from it.  A warning message is logged if a matching device is found
+but it is not an instance of the expected class.
+
+Device finders provide an additional ``set_tag`` overload:
+
+.. code-block:: C++
+
+   set_tag(DeviceClass &object);
+
+This is equivalent to calling ``set_tag(object, DEVICE_SELF)``.  Note that the
+device object must not be removed or replaced before the object finder is
+resolved.
+
+Memory system object finders
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The memory system object finders, ``required_memory_region``,
+``optional_memory_region``, ``required_memory_bank``, ``optional_memory_bank``
+and ``memory_bank_creator``, do not have any special functionality.  They are
+often used in place of literal tags when installing memory banks in an address
+space.
+
+Example using memory bank finders in an address map:
+
+.. code-block:: C++
+
+    class qvt70_state : public driver_device
+    {
+    public:
+        qvt70_state(machine_config const &mconfig, device_type type, char const *tag) :
+            driver_device(mconfig, type, tag),
+            m_rombank(*this, "rom"),
+            m_rambank(*this, "ram%d", 0U),
+        { }
+
+    private:
+        required_memory_bank m_rombank;
+        required_memory_bank_array<2> m_rambank;
+
+        void mem_map(address_map &map);
+
+        void rombank_w(u8 data);
+    };
+
+    void qvt70_state::mem_map(address_map &map)
+    {
+        map(0x0000, 0x7fff).bankr(m_rombank);
+        map(0x8000, 0x8000).w(FUNC(qvt70_state::rombank_w));
+        map(0xa000, 0xbfff).ram();
+        map(0xc000, 0xdfff).bankrw(m_rambank[0]);
+        map(0xe000, 0xffff).bankrw(m_rambank[1]);
+    }
+
+Example using a memory bank creator to install a memory bank dynamically:
+
+.. code-block:: C++
+
+    class vegaeo_state : public eolith_state
+    {
+    public:
+        vegaeo_state(machine_config const &mconfig, device_type type, char const *tag) :
+            eolith_state(mconfig, type, tag),
+            m_qs1000_bank(*this, "qs1000_bank")
+        {
+        }
+
+        void init_vegaeo();
+
+    private:
+        memory_bank_creator m_qs1000_bank;
+    };
+
+    void vegaeo_state::init_vegaeo()
+    {
+        // Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
+        m_qs1000->cpu().space(AS_IO).install_read_bank(0x0100, 0xffff, m_qs1000_bank);
+        m_qs1000_bank->configure_entries(0, 8, memregion("qs1000:cpu")->base() + 0x100, 0x10000);
+
+        init_speedup();
+    }
+
+I/O port finders
+~~~~~~~~~~~~~~~~
+
+Optional I/O port finders provide an additional convenience member function:
+
+.. code-block:: C++
+
+    ioport_value read_safe(ioport_value defval);
+
+This will read the port’s value if the target I/O port was found, or return
+``defval`` otherwise.  It is useful in situations where certain input devices
+are not always present.
+
+
+Address space finders
+~~~~~~~~~~~~~~~~~~~~~
+
+Address space finders accept an additional argument for the address space number
+to find.  A required data width can optionally be supplied to the constructor.
+
+.. code-block:: C++
+
+    address_space_finder(device_t &base, char const *tag, int spacenum, u8 width = 0);
+    void set_tag(device_t &base, char const *tag, int spacenum);
+    void set_tag(char const *tag, int spacenum);
+    void set_tag(finder_base const &finder, int spacenum);
+    template <bool R> void set_tag(address_space_finder<R> const &finder);
+
+The base device and tag must identify a device that implements
+``device_memory_interface``.  The address space number is a zero-based index to
+one of the device’s address spaces.
+
+If the width is non-zero, it must match the target address space’s data width in
+bits.  If the target address space exists but has a different data width, a
+warning message will be logged, and it will be treated as not being found.  If
+the width is zero (the default argument value), the target address space’s data
+width won’t be checked.
+
+Member functions are also provided to get the configured address space number
+and set the required data width:
+
+.. code-block:: C++
+
+    int spacenum() const;
+    void set_data_width(u8 width);
+
+Memory pointer finders
+~~~~~~~~~~~~~~~~~~~~~~
+
+The memory pointer finders, ``required_region_ptr``, ``optional_region_ptr``,
+``required_shared_ptr``, ``optional_shared_ptr`` and ``memory_share_creator``,
+all require one template argument for the element type of the memory area.  This
+should usually be an explicitly-sized unsigned integer type (``u8``, ``u16``,
+``u32`` or ``u64``).  The size of this type is compared to the width of the
+memory area.  If it doesn’t match, a warning message is logged and the region or
+share is treated as not being found.
+
+The memory pointer finders provide an array access operator, and members for
+accessing the size of the memory area:
+
+.. code-block:: C++
+
+    PointerType &operator[](int index) const;
+    size_t length() const;
+    size_t bytes() const;
+
+The array access operator returns a non-\ ``const`` reference to an element of
+the memory area.  The index is in units of the element type; it must be
+non-negative and less than the length of the memory area.  The ``length`` member
+returns the number of elements in the memory area.  The ``bytes`` member returns
+the size of the memory area in bytes.  These members should not be called if the
+target region/share has not been found.
+
+The ``memory_share_creator`` requires additional constructor arguments for the
+size and Endianness of the memory share:
+
+.. code-block:: C++
+
+    memory_share_creator(device_t &base, char const *tag, size_t bytes, endianness_t endianness);
+
+The size is specified in bytes.  If an existing memory share is found, it is an
+error if its size does not match the specified size.  If the width is wider than
+eight bits and an existing memory share is found, it is an error if its
+Endianness does not match the specified Endianness.
+
+The ``memory_share_creator`` provides additional members for accessing
+properties of the memory share:
+
+.. code-block:: C++
+
+    endianness_t endianness() const;
+    u8 bitwidth() const;
+    u8 bytewidth() const;
+
+These members return the Endianness, width in bits and width in bytes of the
+memory share, respectively.  They must not be called if the memory share has not
+been found.
+
+
+Output finders
+--------------
+
+Output finders are used for exposing outputs that can be used by the artwork
+system, or by external programs.  A common application using an external program
+is a control panel or cabinet lighting controller.
+
+Output finders are not really object finders, but they’re described here because
+they’re used in a similar way.  There are a number of important differences to
+be aware of:
+
+* Output finders always create outputs if they do not exist.
+* Output finders must be manually resolved, they are not automatically resolved.
+* Output finders cannot have their target changed after construction.
+* Output finders are array-like, and support an arbitrary number of dimensions.
+* Output names are global, the base device has no influence.  (This will change
+  in the future.)
+
+Output finders take a variable number of template arguments corresponding to the
+number of array dimensions you want.  Let’s look at an example that uses zero-,
+one- and two-dimensional output finders:
+
+.. code-block:: C++
+
+    class mmd2_state : public driver_device
+    {
+    public:
+        mmd2_state(machine_config const &mconfig, device_type type, char const *tag) :
+            driver_device(mconfig, type, tag),
+            m_digits(*this, "digit%u", 0U),
+            m_p(*this, "p%u_%u", 0U, 0U),
+            m_led_halt(*this, "led_halt"),
+            m_led_hold(*this, "led_hold")
+        { }
+
+    protected:
+        virtual void machine_start() override;
+
+    private:
+        void round_leds_w(offs_t, u8);
+        void digit_w(u8 data);
+	void status_callback(u8 data);
+
+        u8 m_digit;
+
+        output_finder<9> m_digits;
+        output_finder<3, 8> m_p;
+        output_finder<> m_led_halt;
+        output_finder<> m_led_hold;
+    };
+
+The ``m_led_halt`` and ``m_led_hold`` members are zero-dimensional output
+finders.  They find a single output each.  The ``m_digits`` member is a
+one-dimensional output finder.  It finds nine outputs organised as a
+single-dimensional array.  The ``m_p`` member is a two-dimensional output
+finder.  It finds 24 outputs organised as three rows of eight columns each.
+Larger numbers of dimensions are supported.
+
+The output finder constructor takes a base device reference, a format string,
+and an index offset for each dimension.  In this case, all the offsets are
+zero.  The one-dimensional output finder ``m_digits`` will find outputs
+``digit0``, ``digit1``, ``digit2``, … ``digit8``.  The two-dimensional output
+finder ``m_p`` will find the outputs ``p0_0``, ``p0_1``, … ``p0_7`` for the
+first row, ``p1_0``, ``p1_1``, … ``p1_7`` for the second row, and ``p2_0``,
+``p2_1``, … ``p2_7`` for the third row.
+
+You must call ``resolve`` on each output finder before it can be used.  This
+should be done at start time for the output values to be included in save
+states:
+
+.. code-block:: C++
+
+    void mmd2_state::machine_start()
+    {
+        m_digits.resolve();
+        m_p.resolve();
+        m_led_halt.resolve();
+        m_led_hold.resolve();
+
+        save_item(NAME(m_digit));
+    }
+
+Output finders provide operators allowing them to be assigned from or cast to
+32-bit signed integers.  The assignment operator will send a notification if the
+new value is different to the output’s current value.
+
+.. code-block:: C++
+
+    operator s32() const;
+    s32 operator=(s32 value);
+
+To set output values, assign through the output finders, as you would with an
+array of the same rank:
+
+.. code-block:: C++
+
+    void mmd2_state::round_leds_w(offs_t offset, u8 data)
+    {
+        for (u8 i = 0; i < 8; i++)
+            m_p[offset][i] = BIT(~data, i);
+    }
+
+    void mmd2_state::digit_w(u8 data)
+    {
+        if (m_digit < 9)
+            m_digits[m_digit] = data;
+    }
+
+    void mmd2_state::status_callback(u8 data)
+    {
+        m_led_halt = (~data & i8080_cpu_device::STATUS_HLTA) ? 1 : 0;
+        m_led_hold = (data & i8080_cpu_device::STATUS_WO) ? 1 : 0;
     }

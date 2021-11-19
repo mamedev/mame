@@ -303,19 +303,19 @@ uint8_t kas89_state::mux_r()
 {
 	switch(m_mux_data)
 	{
-		case 0x01: return m_pl[0]->read();
-		case 0x02: return m_pl[1]->read();
-		case 0x04: return m_pl[2]->read();
-		case 0x08: return m_pl[3]->read();
-		case 0x10: return m_pl[4]->read();
-		case 0x20: return m_pl[5]->read();
-		case 0x40:
+	case 0x01: return m_pl[0]->read();
+	case 0x02: return m_pl[1]->read();
+	case 0x04: return m_pl[2]->read();
+	case 0x08: return m_pl[3]->read();
+	case 0x10: return m_pl[4]->read();
+	case 0x20: return m_pl[5]->read();
+	case 0x40:
 		{
 			m_lamps[37] = BIT(~m_svc->read(), 5);  // Operator Key LAMP
 			return m_svc->read();
 		}
-		case 0x80: return m_dsw->read();    // Polled at $162a through NMI routine
-		case 0x3f: return m_unk->read();
+	case 0x80: return m_dsw->read();    // Polled at $162a through NMI routine
+	case 0x3f: return m_unk->read();
 	}
 
 	logerror("Mux_data %02X\n", m_mux_data);
@@ -420,91 +420,66 @@ void kas89_state::led_mux_select_w(uint8_t data)
 
 	m_leds_mux_selector = data;
 
-	uint8_t i;
 	for ( uint8_t i = 0; i < 37; i++ )
 	{
 		m_lamps[i] = 0;    // All LEDs OFF
 	}
 
-	switch(data)
+	if (BIT(data, 0))
 	{
-		case 0x00:
-		{
-			for ( i = 0; i < 37; i++ )
-			{
-				m_lamps[i] = 0;    // All LEDs OFF
-			}
-		}
+		m_lamps[11] = BIT(m_leds_mux_data, 0);  // Number 11 LED
+		m_lamps[36] = BIT(m_leds_mux_data, 1);  // Number 36 LED
+		m_lamps[13] = BIT(m_leds_mux_data, 2);  // Number 13 LED
+		m_lamps[27] = BIT(m_leds_mux_data, 3);  // Number 27 LED
+		m_lamps[ 6] = BIT(m_leds_mux_data, 4);  // Number  6 LED
+		m_lamps[34] = BIT(m_leds_mux_data, 5);  // Number 34 LED
+		m_lamps[17] = BIT(m_leds_mux_data, 6);  // Number 17 LED
+		m_lamps[25] = BIT(m_leds_mux_data, 7);  // Number 25 LED
+	}
 
-		case 0x01:
-		{
-			m_lamps[11] = BIT(m_leds_mux_data, 0);  // Number 11 LED
-			m_lamps[36] = BIT(m_leds_mux_data, 1);  // Number 36 LED
-			m_lamps[13] = BIT(m_leds_mux_data, 2);  // Number 13 LED
-			m_lamps[27] = BIT(m_leds_mux_data, 3);  // Number 27 LED
-			m_lamps[06] = BIT(m_leds_mux_data, 4);  // Number  6 LED
-			m_lamps[34] = BIT(m_leds_mux_data, 5);  // Number 34 LED
-			m_lamps[17] = BIT(m_leds_mux_data, 6);  // Number 17 LED
-			m_lamps[25] = BIT(m_leds_mux_data, 7);  // Number 25 LED
-			break;
-		}
+	if (BIT(data, 1))
+	{
+		m_lamps[ 2] = BIT(m_leds_mux_data, 0);  // Number  2 LED
+		m_lamps[21] = BIT(m_leds_mux_data, 1);  // Number 21 LED
+		m_lamps[ 4] = BIT(m_leds_mux_data, 2);  // Number  4 LED
+		m_lamps[19] = BIT(m_leds_mux_data, 3);  // Number 19 LED
+		m_lamps[15] = BIT(m_leds_mux_data, 4);  // Number 15 LED
+		m_lamps[32] = BIT(m_leds_mux_data, 5);  // Number 32 LED
+		m_lamps[ 0] = BIT(m_leds_mux_data, 6);  // Number  0 LED
+		m_lamps[26] = BIT(m_leds_mux_data, 7);  // Number 26 LED
+	}
 
-		case 0x02:
-		{
-			m_lamps[ 2] = BIT(m_leds_mux_data, 0);  // Number  2 LED
-			m_lamps[21] = BIT(m_leds_mux_data, 1);  // Number 21 LED
-			m_lamps[ 4] = BIT(m_leds_mux_data, 2);  // Number  4 LED
-			m_lamps[19] = BIT(m_leds_mux_data, 3);  // Number 19 LED
-			m_lamps[15] = BIT(m_leds_mux_data, 4);  // Number 15 LED
-			m_lamps[32] = BIT(m_leds_mux_data, 5);  // Number 32 LED
-			m_lamps[ 0] = BIT(m_leds_mux_data, 6);  // Number  0 LED
-			m_lamps[26] = BIT(m_leds_mux_data, 7);  // Number 26 LED
-			break;
-		}
+	if (BIT(data, 2))
+	{
+		m_lamps[ 3] = BIT(m_leds_mux_data, 0);  // Number  3 LED
+		m_lamps[35] = BIT(m_leds_mux_data, 1);  // Number 35 LED
+		m_lamps[12] = BIT(m_leds_mux_data, 2);  // Number 12 LED
+		m_lamps[28] = BIT(m_leds_mux_data, 3);  // Number 28 LED
+		m_lamps[ 7] = BIT(m_leds_mux_data, 4);  // Number  7 LED
+		m_lamps[29] = BIT(m_leds_mux_data, 5);  // Number 29 LED
+		m_lamps[18] = BIT(m_leds_mux_data, 6);  // Number 18 LED
+	}
 
-		case 0x04:
-		{
-			m_lamps[ 3] = BIT(m_leds_mux_data, 0);  // Number  3 LED
-			m_lamps[35] = BIT(m_leds_mux_data, 1);  // Number 35 LED
-			m_lamps[12] = BIT(m_leds_mux_data, 2);  // Number 12 LED
-			m_lamps[28] = BIT(m_leds_mux_data, 3);  // Number 28 LED
-			m_lamps[ 7] = BIT(m_leds_mux_data, 4);  // Number  7 LED
-			m_lamps[29] = BIT(m_leds_mux_data, 5);  // Number 29 LED
-			m_lamps[18] = BIT(m_leds_mux_data, 6);  // Number 18 LED
-			break;
-		}
+	if (BIT(data, 3))
+	{
+		m_lamps[22] = BIT(m_leds_mux_data, 0);  // Number 22 LED
+		m_lamps[ 9] = BIT(m_leds_mux_data, 1);  // Number  9 LED
+		m_lamps[31] = BIT(m_leds_mux_data, 2);  // Number 31 LED
+		m_lamps[14] = BIT(m_leds_mux_data, 3);  // Number 14 LED
+		m_lamps[20] = BIT(m_leds_mux_data, 4);  // Number 20 LED
+		m_lamps[ 1] = BIT(m_leds_mux_data, 5);  // Number  1 LED
+		m_lamps[33] = BIT(m_leds_mux_data, 6);  // Number 33 LED
+	}
 
-		case 0x08:
-		{
-			m_lamps[22] = BIT(m_leds_mux_data, 0);  // Number 22 LED
-			m_lamps[ 9] = BIT(m_leds_mux_data, 1);  // Number  9 LED
-			m_lamps[31] = BIT(m_leds_mux_data, 2);  // Number 31 LED
-			m_lamps[14] = BIT(m_leds_mux_data, 3);  // Number 14 LED
-			m_lamps[20] = BIT(m_leds_mux_data, 4);  // Number 20 LED
-			m_lamps[ 1] = BIT(m_leds_mux_data, 5);  // Number  1 LED
-			m_lamps[33] = BIT(m_leds_mux_data, 6);  // Number 33 LED
-			break;
-		}
-
-		case 0x10:
-		{
-			m_lamps[16] = BIT(m_leds_mux_data, 0);  // Number 16 LED
-			m_lamps[24] = BIT(m_leds_mux_data, 1);  // Number 24 LED
-			m_lamps[ 5] = BIT(m_leds_mux_data, 2);  // Number  5 LED
-			m_lamps[10] = BIT(m_leds_mux_data, 3);  // Number 10 LED
-			m_lamps[23] = BIT(m_leds_mux_data, 4);  // Number 23 LED
-			m_lamps[ 8] = BIT(m_leds_mux_data, 5);  // Number  8 LED
-			m_lamps[30] = BIT(m_leds_mux_data, 6);  // Number 30 LED
-			break;
-		}
-
-		case 0xff:
-		{
-			for ( i = 0; i < 37; i++ )
-			{
-				m_lamps[i] = 1;    // All LEDs ON
-			}
-		}
+	if (BIT(data, 4))
+	{
+		m_lamps[16] = BIT(m_leds_mux_data, 0);  // Number 16 LED
+		m_lamps[24] = BIT(m_leds_mux_data, 1);  // Number 24 LED
+		m_lamps[ 5] = BIT(m_leds_mux_data, 2);  // Number  5 LED
+		m_lamps[10] = BIT(m_leds_mux_data, 3);  // Number 10 LED
+		m_lamps[23] = BIT(m_leds_mux_data, 4);  // Number 23 LED
+		m_lamps[ 8] = BIT(m_leds_mux_data, 5);  // Number  8 LED
+		m_lamps[30] = BIT(m_leds_mux_data, 6);  // Number 30 LED
 	}
 }
 

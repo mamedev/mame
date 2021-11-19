@@ -51,6 +51,8 @@ ToDo:
 #include "s6a.lh"
 
 
+namespace {
+
 class s6a_state : public genpin_class
 {
 public:
@@ -65,15 +67,20 @@ public:
 		, m_pia28(*this, "pia28")
 		, m_pia30(*this, "pia30")
 		, m_digits(*this, "digit%u", 0U)
+		, m_leds(*this, "led%u", 0U)
 		, m_swarray(*this, "SW.%u", 0U)
+		, m_dips(*this, "DS%u", 1U)
+		, m_io_snd(*this, "SND")
 	{ }
 
 	void s6a(machine_config &config);
 
-	void init_s6a();
-
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+
+protected:
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint8_t sound_r();
@@ -86,16 +93,15 @@ private:
 	uint8_t dips_r();
 	uint8_t switch_r();
 	void switch_w(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
+	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { } //ST5
+	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { } //ST-solenoids enable
+	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { } //ST2
+	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { } //ST1
+	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { } //diag leds enable
+	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { } //ST6
+	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { } //ST4
+	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { } //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_MACHINE_RESET(s6a);
 
 	void s6a_audio_map(address_map &map);
 	void s6a_main_map(address_map &map);
@@ -105,9 +111,7 @@ private:
 	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hc55516_device> m_hc55516;
@@ -117,7 +121,10 @@ private:
 	required_device<pia6821_device> m_pia28;
 	required_device<pia6821_device> m_pia30;
 	output_finder<32> m_digits;
+	output_finder<2> m_leds;
 	required_ioport_array<8> m_swarray;
+	required_ioport_array<2> m_dips;
+	required_ioport m_io_snd;
 };
 
 void s6a_state::s6a_main_map(address_map &map)
@@ -252,7 +259,7 @@ void s6a_state::sol0_w(uint8_t data)
 
 void s6a_state::sol1_w(uint8_t data)
 {
-	uint8_t sound_data = ioport("SND")->read();
+	uint8_t sound_data = m_io_snd->read();
 	if (BIT(data, 0))
 		sound_data &= 0xfe;
 
@@ -289,20 +296,9 @@ void s6a_state::lamp1_w(uint8_t data)
 
 uint8_t s6a_state::dips_r()
 {
-	if (BIT(ioport("DIAGS")->read(), 4) )
-	{
-		switch (m_strobe)
-		{
-		case 0:
-			return ioport("DS2")->read();
-		case 1:
-			return ioport("DS2")->read() << 4;
-		case 2:
-			return ioport("DS1")->read();
-		case 3:
-			return ioport("DS1")->read() << 4;
-		}
-	}
+	if (BIT(ioport("DIAGS")->read(), 4))
+		return m_dips[BIT(~m_strobe, 1)]->read() << (BIT(m_strobe, 0) ? 4 : 0);
+
 	return 0xff;
 }
 
@@ -310,8 +306,8 @@ void s6a_state::dig0_w(uint8_t data)
 {
 	m_strobe = data & 15;
 	m_data_ok = true;
-	output().set_value("led0", !BIT(data, 4));
-	output().set_value("led1", !BIT(data, 5));
+	m_leds[0] = !BIT(data, 4);
+	m_leds[1] = !BIT(data, 5);
 }
 
 void s6a_state::dig1_w(uint8_t data)
@@ -364,6 +360,15 @@ WRITE_LINE_MEMBER( s6a_state::pia_irq )
 	}
 }
 
+void s6a_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+
+	m_irq_timer = timer_alloc(TIMER_IRQ);
+	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
+}
+
 void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch(id)
@@ -387,22 +392,11 @@ void s6a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s6a_state, s6a )
-{
-}
-
-void s6a_state::init_s6a()
-{
-	m_irq_timer = timer_alloc(TIMER_IRQ);
-	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
-}
-
 void s6a_state::s6a(machine_config &config)
 {
 	/* basic machine hardware */
 	M6808(config, m_maincpu, 3580000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s6a_state::s6a_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s6a_state, s6a)
 
 	/* Video */
 	config.set_default_layout(layout_s6a);
@@ -463,8 +457,8 @@ void s6a_state::s6a(machine_config &config)
 	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	m_pias->ca2_handler().set("hc55516", FUNC(hc55516_device::digit_w));
 	m_pias->cb2_handler().set("hc55516", FUNC(hc55516_device::clock_w));
-	m_pias->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE); // FIXME: needs an input merger
-	m_pias->irqb_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
+	m_pias->irqa_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE); // FIXME: needs an input merger
+	m_pias->irqb_handler().set_inputline(m_audiocpu, M6802_IRQ_LINE);
 }
 
 
@@ -524,8 +518,10 @@ ROM_START(alpok_f6)
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
+} // anonymous namespace
 
-GAME( 1980, algar_l1, 0,        s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, alpok_l6, 0,        s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, alpok_l2, alpok_l6, s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, alpok_f6, alpok_l6, s6a, s6a, s6a_state, init_s6a, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+
+GAME( 1980, algar_l1, 0,        s6a, s6a, s6a_state, empty_init, ROT0, "Williams", "Algar (L-1)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_l6, 0,        s6a, s6a, s6a_state, empty_init, ROT0, "Williams", "Alien Poker (L-6)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_l2, alpok_l6, s6a, s6a, s6a_state, empty_init, ROT0, "Williams", "Alien Poker (L-2)",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, alpok_f6, alpok_l6, s6a, s6a, s6a_state, empty_init, ROT0, "Williams", "Alien Poker (L-6 French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

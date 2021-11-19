@@ -22,11 +22,13 @@ DEFINE_DEVICE_TYPE(BBC_UDM, bbc_udm_device, "bbc_udm", "United Disk Memories DDF
 //  FLOPPY_FORMATS( udm )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_udm_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_FSD_FORMAT
-FLOPPY_FORMATS_END
+void bbc_udm_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_FSD_FORMAT);
+}
 
 static void bbc_floppies_525(device_slot_interface &device)
 {

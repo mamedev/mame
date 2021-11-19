@@ -61,7 +61,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(f12_button);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t ppi1_portb_r();
 	uint8_t ppi1_portc_r();

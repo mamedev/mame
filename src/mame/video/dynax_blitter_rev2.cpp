@@ -192,13 +192,11 @@ u32 dynax_blitter_rev2_device::blitter_draw(u32 src, int pen, int x, int y)
 		case 0xd:   // Skip X pixels
 			x = sx + read_byte(src++);
 			src &= 0xfffff;
-			/* fall through into next case */
-
+			[[fallthrough]];
 		case 0xc:   // Draw N pixels
 			cmd = read_byte(src++);
 			src &= 0xfffff;
-			/* fall through into next case */
-
+			[[fallthrough]];
 		case 0xb:
 		case 0xa:
 		case 0x9:

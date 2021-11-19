@@ -643,7 +643,7 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void spinb_state::spinb(machine_config &config)
 {
-	/* basic machine hardware */
+	// Basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spinb_state::spinb_map);
 	m_maincpu->set_periodic_int(FUNC(spinb_state::irq0_line_hold), attotime::from_hz(160)); // NE556 adjustable (if faster, then jolypark has a stack problem)
@@ -663,7 +663,7 @@ void spinb_state::spinb(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* Video */
+	// Video
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -674,22 +674,22 @@ void spinb_state::spinb(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(spinb_state::spinb_palette), 3);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 
 	SPEAKER(config, "msmavol").front_center();
 	MSM5205(config, m_msm_a, XTAL(384'000));
 	m_msm_a->vck_callback().set("ic5a", FUNC(ttl7474_device::clock_w));
-	m_msm_a->set_prescaler_selector(msm5205_device::S48_4B); /* 4KHz 4-bit */
+	m_msm_a->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
 	m_msm_a->add_route(ALL_OUTPUTS, "msmavol", 1.0);
 
 	SPEAKER(config, "msmmvol").front_center();
 	MSM5205(config, m_msm_m, XTAL(384'000));
 	m_msm_m->vck_callback().set("ic5m", FUNC(ttl7474_device::clock_w));
-	m_msm_m->set_prescaler_selector(msm5205_device::S48_4B); /* 4KHz 4-bit */
+	m_msm_m->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
 	m_msm_m->add_route(ALL_OUTPUTS, "msmmvol", 1.0);
 
-	/* Devices */
+	// Devices
 	i8255_device &ppi60(I8255A(config, "ppi60"));
 	//ppi60.in_pa_callback().set(FUNC(spinb_state::ppi60a_r));
 	ppi60.out_pa_callback().set(FUNC(spinb_state::ppi60a_w));
@@ -818,6 +818,29 @@ ROM_START(bushidoa)
 	ROM_LOAD("f-musica.bin", 0x80000, 0x80000, CRC(80f3a6df) SHA1(e09ad4660e511779c6e55559fa0c2c0b0c6600c8))
 ROM_END
 
+ROM_START(bushidob)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("inder_sa_m-17_pb-in_a-1954-93_b4_cpu rom_0_06-a.bin", 0x0000, 0x2000, CRC(7c8561f7) SHA1(d81338160f6eb8898a7b779f57e327d2db3f7dab))
+	ROM_LOAD("inder_sa_m-17_pb-in_a-1954-93_b4_cpu rom_1_06-a.bin", 0x2000, 0x2000, CRC(4a41865c) SHA1(f597d5dd42b804ab637408b90d05bdb234559a48))
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
+	ROM_LOAD("g-disply.bin", 0x00000, 0x10000, CRC(9a1df82f) SHA1(4ad6a12ae36ec898b8ac5243da6dec3abcd9dc33))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("a-sonido.bin", 0x0000, 0x2000, CRC(cf7d5399) SHA1(c79145826cfa6be2487e3add477d9b452c553762))
+
+	ROM_REGION(0x180000, "audiorom", 0)
+	ROM_LOAD("b-sonido.bin", 0x00000, 0x80000, CRC(cb4fc885) SHA1(569f389fa8f91f886b58f44f701d2752ef01f3fa))
+	ROM_LOAD("c-sonido.bin", 0x80000, 0x80000, CRC(35a43dd8) SHA1(f2b1994f67f749c65a88c95d970b655990d85b96))
+
+	ROM_REGION(0x2000, "musiccpu", 0)
+	ROM_LOAD("d-musica.bin", 0x0000, 0x2000, CRC(2cb9697c) SHA1(d5c66d616ccd5e299832704e494743429dafd569))
+
+	ROM_REGION(0x180000, "musicrom", 0)
+	ROM_LOAD("e-musica.bin", 0x00000, 0x80000, CRC(1414b921) SHA1(5df9e538ee109df28953ec8f162c60cb8c6e4d96))
+	ROM_LOAD("f-musica.bin", 0x80000, 0x80000, CRC(80f3a6df) SHA1(e09ad4660e511779c6e55559fa0c2c0b0c6600c8))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Mach 2 (1995)
 /-------------------------------------------------------------------*/
@@ -825,6 +848,28 @@ ROM_START(mach2)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("m2cpu0.19", 0x0000, 0x2000, CRC(274c8040) SHA1(6b039b79b7e08f2bf2045bc4f1cbba790c999fed))
 	ROM_LOAD("m2cpu1.19", 0x2000, 0x2000, CRC(c445df0b) SHA1(1f346c1df8df0a3c4e8cb1186280d2f34959b3f8))
+
+	ROM_REGION(0x10000, "dmdcpu", 0)
+	ROM_LOAD("m2dmdf.01", 0x00000, 0x10000, CRC(c45ccc74) SHA1(8362e799a76536a16dd2d5dde500ad3db273180f))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("m2sndd.01", 0x0000, 0x2000, CRC(e789f22d) SHA1(36aa7eac1dd37a02c982d109462dddbd85a305cc))
+
+	ROM_REGION(0x180000, "audiorom", 0)
+	ROM_LOAD("m2snde.01", 0x00000, 0x80000, CRC(f5721119) SHA1(9082198e8d875b67323266c4bf8c2c378b63dfbb))
+
+	ROM_REGION(0x2000, "musiccpu", 0)
+	ROM_LOAD("m2musa.01", 0x0000, 0x2000, CRC(2d92a882) SHA1(cead22e434445e5c25414646b1e9ae2b9457439d))
+
+	ROM_REGION(0x180000, "musicrom", 0)
+	ROM_LOAD("m2musb.01", 0x00000, 0x80000, CRC(6689cd19) SHA1(430092d51704dfda8bd8264875f1c1f4461c56e5))
+	ROM_LOAD("m2musc.01", 0x80000, 0x80000, CRC(88851b82) SHA1(d0c9fa391ca213a69b7c8ae7ca52063503b5656e))
+ROM_END
+
+ROM_START(mach2a)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("mach_cpu_0.bin", 0x0000, 0x2000, CRC(4eee3d63) SHA1(dc7c919dd909a134ec434ce665c421aa03aaa637))
+	ROM_LOAD("mach_cpu_1.bin", 0x2000, 0x2000, CRC(c115b900) SHA1(712ae2a38528c05f28e3743cb49e072fc05bf908))
 
 	ROM_REGION(0x10000, "dmdcpu", 0)
 	ROM_LOAD("m2dmdf.01", 0x00000, 0x10000, CRC(c45ccc74) SHA1(8362e799a76536a16dd2d5dde500ad3db273180f))
@@ -899,8 +944,10 @@ ROM_START(vrnwrld)
 	ROM_LOAD("vws7ic27.rom", 0x100000, 0x80000, CRC(7335b29c) SHA1(4de6de09f069feecbad2e5ef50032e8d381ff9b1))
 ROM_END
 
-GAME(1993, bushido,   0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1993, bushidoa,  bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1995, mach2,     0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, jolypark,  0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1996, vrnwrld,   0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushido,  0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidoa, bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993, bushidob, bushido, spinb,    spinb, spinb_state, init_game0, ROT0, "Inder/Spinball", "Bushido (set 3)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2,    0,       spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 1)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1995, mach2a,   mach2,   spinb,    spinb, spinb_state, init_game0, ROT0, "Spinball",       "Mach 2 (set 2)",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, jolypark, 0,       jolypark, spinb, spinb_state, init_game1, ROT0, "Spinball",       "Jolly Park",      MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1996, vrnwrld,  0,       vrnwrld,  spinb, spinb_state, init_game2, ROT0, "Spinball",       "Verne's World",   MACHINE_IS_SKELETON_MECHANICAL)

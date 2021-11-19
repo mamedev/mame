@@ -83,6 +83,9 @@ void tms57002_device::device_reset()
 	id = 0;
 	ba0 = 0;
 	ba1 = 0;
+	sa = 0;
+	rptc = 0;
+	rptc_next = 0;
 	update_counter_tail = 0;
 	update_counter_head = 0;
 	st0 &= ~(ST0_INCS | ST0_DIRI | ST0_FI | ST0_SIM | ST0_PLRI |

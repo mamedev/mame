@@ -6872,7 +6872,19 @@ This cart features a RTC, currently unemulated
 	</software>
 
 <!--
-This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated
+This cart features two SmartMedia slots to import pictures to manipulate in the game, currently unemulated.
+Known SmartMedia cards:
+Dumped Title                                                Japanese title                          Notes
+  YES  Illust-shuu - Postcard 1                             イラスト集 ポストカード 1
+  YES  Illust-shuu - Omoshiro Accessory 1                   イラスト集 おもしろアクセサリー 1
+  YES  Character-shuu - Yoshi's Story                       キャラクター集 ヨッシーストーリー
+  YES  Character-shuu - Sylvanian Families                  キャラクター集 シルバニアファミリー
+  YES  Character-shuu - Bomberman                           キャラクター集 ボンバーマン
+   NO  Character-shuu - Zelda no Densetsu - Toki no Ocarina キャラクター集 ゼルダの伝説 - 時のオカリナ
+   NO  Character-shuu - Himitsu no Akko-chan                キャラクター集 ひみつのアッコちゃん
+   NO  Character-shuu - Hello Kitty                         キャラクター集 Hello Kitty
+   NO  Character-shuu - Card Captor Sakura                  キャラクター集 カードキャプターさくら
+   NO  Character-shuu - Medarot                             キャラクター集 メダロット                  Unreleased?
 -->
 	<software name="mariopho">
 		<description>Mario no Photopie (Japan)</description>
@@ -14699,6 +14711,20 @@ clips onto the player's ear.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="gameshark pro (usa) (v3.3) (unl).bin" size="262144" crc="7cc07bbc" sha1="3b5046ae8129fd226eb7b02bc2c26cc7548fe6f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Unlicensed cart that allows playing Game Boy games on a Nintendo 64.
+	     Two cart female sockets, one for the Game Boy game and the other for a genuine N64 game cart for bypassing the protection.
+	     Hardware on the cart PCB: Two 29LE010 EEPROMs and a Datel custom LZ9FC17 GAL labeled as "Action Replay" -->
+	<software name="pwrflashe" supported="no">
+		<description>PowerFlash (Europe)</description>
+		<year>19??</year>
+		<publisher>Datel</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="PowerFlash (Europe) (Unl).bin" size="262144" crc="0e15b8a4" sha1="22169ccc5be0d3bf481056f4a004ee6959e0409b" />
 			</dataarea>
 		</part>
 	</software>

@@ -315,12 +315,12 @@ void pc_keyboard_device::device_start()
 	save_item(NAME(m_on));
 	save_item(NAME(m_head));
 	save_item(NAME(m_tail));
-	save_pointer(NAME(m_queue), ARRAY_LENGTH(m_queue));
-	save_pointer(NAME(m_make), ARRAY_LENGTH(m_make));
+	save_item(NAME(m_queue));
+	save_item(NAME(m_make));
 
-	memset(m_make, 0, sizeof(m_make));
+	std::fill(std::begin(m_make), std::end(m_make), 0);
 
-	machine().ioport().natkeyboard().configure(
+	machine().natkeyboard().configure(
 		ioport_queue_chars_delegate(&pc_keyboard_device::queue_chars, this),
 		ioport_accept_char_delegate(&pc_keyboard_device::accept_char, this),
 		ioport_charqueue_empty_delegate(&pc_keyboard_device::charqueue_empty, this));
@@ -383,7 +383,7 @@ void pc_keyboard_device::queue_insert(uint8_t data)
 
 	m_queue[m_head] = data;
 	m_head++;
-	m_head %= ARRAY_LENGTH(m_queue);
+	m_head %= std::size(m_queue);
 }
 
 
@@ -392,7 +392,7 @@ int pc_keyboard_device::queue_size(void)
 	int queue_size;
 	queue_size = m_head - m_tail;
 	if (queue_size < 0)
-		queue_size += ARRAY_LENGTH(m_queue);
+		queue_size += std::size(m_queue);
 	return queue_size;
 }
 
@@ -626,7 +626,7 @@ uint8_t pc_keyboard_device::read()
 		logerror("read(): Keyboard Read 0x%02x\n",data);
 
 	m_tail++;
-	m_tail %= ARRAY_LENGTH(m_queue);
+	m_tail %= std::size(m_queue);
 	return data;
 }
 

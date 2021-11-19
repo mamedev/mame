@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Thacker
+/**********************************************************************
+
+    Simple beeper sound driver
+
+**********************************************************************/
+
 #ifndef MAME_SOUND_BEEP_H
 #define MAME_SOUND_BEEP_H
 

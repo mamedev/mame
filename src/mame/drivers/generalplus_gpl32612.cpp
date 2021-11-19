@@ -24,6 +24,9 @@
 
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "softlist.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -41,17 +44,18 @@ public:
 
 	void nand_init840();
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void arm_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
-
 	required_device<screen_device> m_screen;
 
 	uint32_t screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+private:
 
 	void nand_init(int blocksize, int blocksize_stripped);
 	void copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest);
@@ -64,6 +68,30 @@ private:
 	uint32_t unk_d0900140_r(offs_t offset, uint32_t mem_mask);
 	uint32_t unk_d0900153_r(offs_t offset, uint32_t mem_mask);
 };
+
+
+class generalplus_zippity_game_state : public generalplus_gpl32612_game_state
+{
+public:
+	generalplus_zippity_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		generalplus_gpl32612_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot"),
+		m_cart_region(nullptr)
+	{ }
+
+	void zippity(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
+	required_device<generic_slot_device> m_cart;
+	memory_region *m_cart_region;
+
+
+};
+
 
 uint32_t generalplus_gpl32612_game_state::unk_d000003c_r(offs_t offset, uint32_t mem_mask)
 {
@@ -144,7 +172,7 @@ void generalplus_gpl32612_game_state::bootstrap()
 
 void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 {
-	ARM9(config, m_maincpu, 240000000); // unknown core / frequency, but ARM based
+	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl32612_game_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -156,6 +184,54 @@ void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 }
+
+void generalplus_zippity_game_state::machine_start()
+{
+	generalplus_gpl32612_game_state::machine_start();
+
+	// if there's a cart, override the standard mapping
+	if (m_cart && m_cart->exists())
+	{
+		m_cart_region = memregion(std::string(m_cart->tag()) + GENERIC_ROM_REGION_TAG);
+	}
+}
+
+DEVICE_IMAGE_LOAD_MEMBER(generalplus_zippity_game_state::cart_load)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
+
+void generalplus_zippity_game_state::zippity(machine_config &config)
+{
+	// don't inherit from gpl32612 as in reality this is GPL32300A and could differ
+
+	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
+	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_zippity_game_state::arm_map);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320, 262);
+	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_screen_update(FUNC(generalplus_zippity_game_state::screen_update_gpl32612));
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_zippity_cart");
+	m_cart->set_width(GENERIC_ROM16_WIDTH);
+	m_cart->set_device_load(FUNC(generalplus_zippity_game_state::cart_load));
+
+	SOFTWARE_LIST(config, "cart_list").set_original("leapfrog_zippity_cart");
+}
+
+
 
 // NAND dumps, so there will be a bootloader / boot strap at least
 
@@ -245,6 +321,6 @@ CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gp
 CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_IS_SKELETON )
 
 // Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
-CONS( 201?, zippity,         0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, zippity,         0,       0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // TODO, check if code differs, or just unused areas of the NAND
-CONS( 201?, zippityuk,       zippity, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, zippityuk,       zippity, 0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -571,6 +571,16 @@ WRITE_LINE_MEMBER( saa5050_device::lose_w )
 
 
 //-------------------------------------------------
+//  tlc_r - transmitted large character
+//-------------------------------------------------
+
+READ_LINE_MEMBER( saa5050_device::tlc_r )
+{
+	return !m_double_height_bottom_row;
+}
+
+
+//-------------------------------------------------
 //  write - character data write
 //-------------------------------------------------
 
@@ -636,7 +646,7 @@ uint32_t saa5050_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		lose_w(1);
 		lose_w(0);
 
-		int ssy = m_double_height_bottom_row ? sy - 1 : sy;
+		int ssy = tlc_r() ? sy : sy - 1;
 		offs_t video_ram_addr = ssy * m_size;
 
 		for (int sx = 0; sx < m_cols; sx++)

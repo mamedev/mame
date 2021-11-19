@@ -92,7 +92,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void mem_map(address_map &map);
 
 	uint8_t m_rom_page;
@@ -286,7 +286,7 @@ void pyl601_state::mem_map(address_map &map)
 	map(0xe6d0, 0xe6d1).m(m_fdc, FUNC(upd765a_device::map));
 	map(0xe6f0, 0xe6f0).rw(FUNC(pyl601_state::rom_page_r), FUNC(pyl601_state::rom_page_w));
 	map(0xe700, 0xefff).bankrw("bank4");
-	map(0xf000, 0xffff).bankr("bank5").bankw("bank6");
+	map(0xf000, 0xffff).rom().region("maincpu",0).bankw("bank6");
 }
 
 /* Input ports */
@@ -395,7 +395,6 @@ void pyl601_state::machine_reset()
 	membank("bank2")->set_base(ram + 0xc000);
 	membank("bank3")->set_base(ram + 0xe000);
 	membank("bank4")->set_base(ram + 0xe700);
-	membank("bank5")->set_base(memregion("maincpu")->base());
 	membank("bank6")->set_base(ram + 0xf000);
 
 	m_maincpu->reset();
@@ -504,9 +503,11 @@ INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-FLOPPY_FORMATS_MEMBER( pyl601_state::floppy_formats )
-	FLOPPY_PYLDIN_FORMAT
-FLOPPY_FORMATS_END
+void pyl601_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PYLDIN_FORMAT);
+}
 
 static void pyl601_floppies(device_slot_interface &device)
 {

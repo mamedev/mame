@@ -122,6 +122,32 @@ uint8_t tunhunt_state::dsw2_4r()
 	return (ioport("DSW")->read()&0x1000)?0x80:0x00;
 }
 
+void tunhunt_state::machine_reset()
+{
+	m_mobsc0 = 0;
+	m_mobsc1 = 0;
+	memset(m_lineh, 0, 13);
+	m_shl0st = 0;
+	m_shl1st = 0;
+	m_vstrlo = 0;
+	m_linesh = 0;
+	m_shl0pc = 0;
+	m_shl1pc = 0;
+	memset(m_linec, 0, 13);
+	m_shl0v = 0;
+	m_shl1v = 0;
+	m_mobjh = 0;
+	memset(m_linev, 0, 13);
+	m_shl0vs = 0;
+	m_shl1vs = 0;
+	m_mobvs = 0;
+	memset(m_linevs, 0, 13);
+	m_shel0h = 0;
+	m_mobst = 0;
+	m_shel1h = 0;
+	m_mobjv = 0;
+}
+
 
 
 /*************************************
@@ -134,19 +160,38 @@ void tunhunt_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x03ff).ram().share("workram"); /* Work RAM */
-	map(0x1080, 0x10ff).nopw();
-	map(0x1200, 0x12ff).nopw();
-	map(0x1400, 0x14ff).nopw();
-	map(0x1600, 0x160f).writeonly().share("paletteram");    /* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
-	map(0x1800, 0x1800).nopw();   /* SHEL0H */
-	map(0x1a00, 0x1a00).nopw();   /* SHEL1H */
-	map(0x1c00, 0x1c00).nopw();   /* MOBJV */
+
+	map(0x1080, 0x1080).lw8(NAME([this](uint8_t data) { m_mobsc0 = data; }));  // SCAN ROM START FOR MOBJ (unused?)
+	map(0x1081, 0x1081).lw8(NAME([this](uint8_t data) { m_mobsc1 = data; }));  // (unused?)
+	map(0x1083, 0x108f).lw8(NAME([this](offs_t offset, uint8_t data) { m_lineh[offset] = data; }));   // LINES HORIZ START
+	map(0x1200, 0x1200).lw8(NAME([this](uint8_t data) { m_shl0st = data; }));  // SHELL VSTRETCH (LIKE MST OBJ STRECTH)
+	map(0x1201, 0x1201).lw8(NAME([this](uint8_t data) { m_shl1st = data; }));
+	map(0x1202, 0x1202).lw8(NAME([this](uint8_t data) { m_vstrlo = data; }));  // VERT (SCREEN ON SIDE) STRETCH MOJ OBJ
+	map(0x1203, 0x1203).lw8(NAME([this](uint8_t data) { m_linesh = data; }));  // LINES SLOPE 4 BITS D0-D3 (signed)
+	map(0x1280, 0x1280).lw8(NAME([this](uint8_t data) { m_shl0pc = data; }));  // SHELL PICTURE CODE (D3-D0)
+	map(0x1280, 0x1281).lw8(NAME([this](uint8_t data) { m_shl1pc = data; }));
+	map(0x1283, 0x128f).lw8(NAME([this](offs_t offset, uint8_t data) { m_linec[offset] = data; }));   // LINE COLOR, 4 BITS D0-D3
+	map(0x1400, 0x1400).lw8(NAME([this](uint8_t data) { m_shl0v = data; }));   // SHELL V START(NORMAL SCREEN)
+	map(0x1401, 0x1401).lw8(NAME([this](uint8_t data) { m_shl1v = data; }));
+	map(0x1402, 0x1402).lw8(NAME([this](uint8_t data) { m_mobjh = data; }));   // H POSITON (SCREEN ON SIDE) (VSTART - NORMAL SCREEN)
+	map(0x1403, 0x140f).lw8(NAME([this](offs_t offset, uint8_t data) { m_linev[offset] = data; }));   // LINES VERTICAL START
+	map(0x1480, 0x1480).lw8(NAME([this](uint8_t data) { m_shl0vs = data; }));  // SHELL V STOP (NORMAL SCREEN)
+	map(0x1481, 0x1481).lw8(NAME([this](uint8_t data) { m_shl1vs = data; }));
+	map(0x1482, 0x1482).lw8(NAME([this](uint8_t data) { m_mobvs = data; }));   // V STOP OF MOTION OBJECT (NORMAL SCREEN)
+	map(0x1483, 0x148f).lw8(NAME([this](offs_t offset, uint8_t data) { m_linevs[offset] = data; }));  // LINES VERT STOP
+	map(0x1600, 0x160f).writeonly().share("paletteram");                       // COLRAM (D7-D4 SHADE; D3-D0 COLOR)
+	map(0x1800, 0x1800).lw8(NAME([this](uint8_t data) { m_shel0h = data; }));  // SHELL H POSITON (NORMAL SCREEN)
+	map(0x1802, 0x1802).lw8(NAME([this](uint8_t data) { m_mobst = data; }));   // STARTING LINE FOR RAM SCAN ON MOBJ
+	map(0x1a00, 0x1a00).lw8(NAME([this](uint8_t data) { m_shel1h = data; }));
+	map(0x1c00, 0x1c00).lw8(NAME([this](uint8_t data) { m_mobjv = data; }));   // V POSITION (SCREEN ON SIDE)
 	map(0x1e00, 0x1eff).w(FUNC(tunhunt_state::videoram_w)).share("videoram");  /* ALPHA */
+
 	map(0x2000, 0x2000).nopw();    /* watchdog */
 	map(0x2000, 0x2007).r(FUNC(tunhunt_state::button_r));
 	map(0x2400, 0x2400).nopw();    /* INT ACK */
 	map(0x2800, 0x2800).w(FUNC(tunhunt_state::control_w));
 	map(0x2c00, 0x2fff).writeonly().share("spriteram");
+
 	map(0x3000, 0x300f).rw("pokey1", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x4000, 0x400f).rw("pokey2", FUNC(pokey_device::read), FUNC(pokey_device::write));
 	map(0x5000, 0x7fff).rom();

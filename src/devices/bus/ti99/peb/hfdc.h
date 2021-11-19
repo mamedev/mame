@@ -27,7 +27,7 @@
 #include "machine/hdc92x4.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 /*
     Implementation for modern floppy system.
@@ -62,7 +62,7 @@ private:
 	uint8_t read_buffer();
 	void write_buffer(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// Debug accessors
 	void debug_read(offs_t offset, uint8_t* value);
@@ -110,6 +110,12 @@ private:
 
 	// Currently selected hard drive
 	mfm_harddisk_device*    m_current_harddisk;
+
+	// Currently selected floppy disk index
+	int     m_current_floppy_index;
+
+	// Currently selected hard disk index
+	int     m_current_hd_index;
 
 	// True: Access to DIP switch settings, false: access to line states
 	bool    m_see_switches;
@@ -187,7 +193,7 @@ private:
 	int  m_readyflags;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_HFDC, bus::ti99::peb, myarc_hfdc_device)
 

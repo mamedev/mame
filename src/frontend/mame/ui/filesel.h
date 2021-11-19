@@ -45,6 +45,7 @@ public:
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual bool custom_ui_cancel() override { return !m_filename.empty(); }
 	virtual bool custom_mouse_down() override;
 
 private:
@@ -81,7 +82,7 @@ private:
 	std::string                     m_filename;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
@@ -119,7 +120,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// internal state
 	bool        m_can_in_place;

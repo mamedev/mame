@@ -31,6 +31,8 @@ ToDo:
 #include "s8a.lh"
 
 
+namespace {
+
 class s8a_state : public genpin_class
 {
 public:
@@ -54,6 +56,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
+protected:
+	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	uint8_t sound_r();
 	void dig0_w(uint8_t data);
@@ -72,7 +78,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_MACHINE_RESET(s8a);
 
 	void s8a_audio_map(address_map &map);
 	void s8a_main_map(address_map &map);
@@ -82,9 +87,7 @@ private:
 	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<m6802_cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pias;
@@ -285,10 +288,6 @@ void s8a_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-MACHINE_RESET_MEMBER( s8a_state, s8a )
-{
-}
-
 void s8a_state::init_s8a()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -301,7 +300,6 @@ void s8a_state::s8a(machine_config &config)
 	M6802(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_ram_enable(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s8a_state::s8a_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s8a_state, s8a)
 
 	/* Video */
 	config.set_default_layout(layout_s8a);
@@ -372,5 +370,7 @@ ROM_START(scrzy_l1)
 	// 1st and 2nd halves are identical
 	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
+
+} // Anonymous namespace
 
 GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, init_s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

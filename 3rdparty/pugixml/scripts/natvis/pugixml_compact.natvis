@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="pugi::xml_node">
+    <DisplayString Condition="_root">{_root}</DisplayString>
+    <DisplayString Condition="!_root">none</DisplayString>
+    <Expand>
+      <ExpandedItem Condition="_root">_root</ExpandedItem>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xml_attribute">
+    <DisplayString Condition="_attr">{_attr}</DisplayString>
+    <DisplayString Condition="!_attr">none</DisplayString>
+    <Expand>
+      <ExpandedItem Condition="_attr">_attr</ExpandedItem>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xml_node_struct">
+    <Expand>
+      <Item Name="type">(pugi::xml_node_type)(header._flags &amp; 15)</Item>
+      <Item Name="name" Condition="name._data">name,na</Item>
+      <Item Name="value" Condition="value._data">value,na</Item>
+      
+      <Synthetic Name="attributes" Condition="first_attribute._data">
+        <DisplayString>...</DisplayString>
+        <Expand>
+          <CustomListItems>
+            <Variable Name="attribute_this" InitialValue="(size_t)&amp;first_attribute" />
+            <Variable Name="attribute_data" InitialValue="first_attribute._data" />
+            <Variable Name="attribute_data_copy" InitialValue="attribute_data" />
+            
+            <!-- first_attribute struct template arguments -->
+            <Variable Name="attribute_T1" InitialValue="11" />
+            <Variable Name="attribute_T2" InitialValue="0" />
+
+            <Variable Name="compact_alignment_log2" InitialValue="2" />
+            <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+            
+            <!-- compact_get_page() -->
+            <Variable Name="_page" InitialValue="*(char*)(attribute_this - attribute_T1)" />
+            <Variable Name="page" InitialValue="((attribute_this - attribute_T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(attribute_this - attribute_T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+            <!-- page->allocator->_hash -->
+            <Variable Name="allocator" InitialValue="*(size_t*)page" />
+            <Variable Name="_hash" InitialValue="*(size_t*)(allocator + 2 * sizeof(size_t))" /><!--2 pointer offsetof(allocator, _hash)-->
+            <Variable Name="_items" InitialValue="*(size_t*)_hash" />
+            <Variable Name="_capacity" InitialValue="*((size_t*)_hash + 1)" /><!--1 pointer offsetof(_hash, _capacity)-->
+            <Variable Name="_count" InitialValue="*((size_t*)_hash + 2)" /><!--2 pointer offsetof(_hash, _count)-->
+
+            <!-- find() prolog -->
+            <Variable Name="hashmod" InitialValue="_capacity - 1" />
+
+            <Variable Name="h" InitialValue="(unsigned)attribute_this" />
+            <Variable Name="bucket" InitialValue="0" />
+
+            <Variable Name="probe" InitialValue="0" />
+            <Variable Name="probe_item" InitialValue="(size_t*)0" />
+
+            <Variable Name="attribute_real" InitialValue="(pugi::xml_attribute_struct*)0" />
+
+            <!-- if _data < 255 -->
+            <Variable Name="attribute_short" InitialValue="(pugi::xml_attribute_struct*)(((size_t)attribute_this &amp; ~(compact_alignment - 1)) + (attribute_data - 1 + attribute_T2) * compact_alignment)" />
+
+            <Variable Name="number" InitialValue="0" />
+
+            <!-- Loop over all attributes -->
+            <Loop Condition="attribute_this &amp;&amp; attribute_data">
+              <!-- find() hash -->
+              <Exec>h = h ^ (h >> 16)</Exec>
+              <Exec>h = h * (0x85ebca6bu)</Exec>
+              <Exec>h = h ^ (h >> 13)</Exec>
+              <Exec>h = h * (0xc2b2ae35u)</Exec>
+              <Exec>h = h ^ (h >> 16)</Exec>
+
+              <Exec>bucket = h &amp; hashmod</Exec>
+
+              <!-- find() loop -->
+              <Loop Condition="probe &lt;= hashmod &amp;&amp;_capacity">
+                <Exec>probe_item = (size_t*)_items + bucket * 2</Exec><!--2 pointer sizeof(item_t)-->
+
+                <If Condition="*probe_item == attribute_this || *probe_item == 0">
+                  <Exec>attribute_real = *(pugi::xml_attribute_struct**)(probe_item + 1)</Exec><!--1 pointer offsetof(item_t, value)-->
+                  <Break/>
+                </If>
+
+                <Exec>bucket = (bucket + probe + 1) &amp; hashmod</Exec>
+                <Exec>probe++</Exec>
+              </Loop>
+
+              <Exec>attribute_data_copy = attribute_data</Exec>
+
+              <If Condition="attribute_data_copy &gt;= 255 &amp;&amp; attribute_real">
+                <Item Name="[{number}]">*attribute_real,view(child)</Item>
+                <Exec>attribute_this = (size_t)&amp;(*attribute_real).next_attribute</Exec>
+                <Exec>attribute_data = (*attribute_real).next_attribute._data</Exec>
+              </If>
+              <If Condition="attribute_data_copy &lt; 255 &amp;&amp; attribute_short">
+                <Item Name="[{number}]">*attribute_short,view(child)</Item>
+                <Exec>attribute_this = (size_t)&amp;(*attribute_short).next_attribute</Exec>
+                <Exec>attribute_data = (*attribute_short).next_attribute._data</Exec>
+              </If>
+
+              <!-- next_attribute struct template arguments -->
+              <Exec>attribute_T1 = 7</Exec>
+              <Exec>attribute_T2 = 0</Exec>
+
+              <!-- find() prolog again -->
+              <Exec>h = (unsigned)attribute_this</Exec>
+              <Exec>bucket = 0</Exec>
+
+              <Exec>probe = 0</Exec>
+              <Exec>probe_item = (size_t*)0</Exec>
+
+              <Exec>attribute_real = (pugi::xml_attribute_struct*)0</Exec>
+              <Exec>attribute_short = (pugi::xml_attribute_struct*)(((size_t)attribute_this &amp; ~(compact_alignment - 1)) + (attribute_data - 1 + attribute_T2) * compact_alignment)</Exec>
+
+              <Exec>number++</Exec>
+            </Loop>
+          </CustomListItems>
+        </Expand>
+      </Synthetic>
+      
+      <CustomListItems>
+        <Variable Name="child_this" InitialValue="&amp;first_child" />
+        <Variable Name="child_data" InitialValue="first_child._data" />
+        <Variable Name="child_data_copy" InitialValue="child_data" />
+
+        <!-- first_child struct template arguments -->
+        <Variable Name="child_T1" InitialValue="8" />
+        <Variable Name="child_T2" InitialValue="0" />
+
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+
+        <!-- compact_get_page() -->
+        <Variable Name="_page" InitialValue="*(char*)(child_this - child_T1)" />
+        <Variable Name="page" InitialValue="((child_this - child_T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(child_this - child_T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+        <!-- page->allocator->_hash -->
+        <Variable Name="allocator" InitialValue="*(size_t*)page" />
+        <Variable Name="_hash" InitialValue="*(size_t*)(allocator + 2 * sizeof(size_t))" /><!--2 pointer offsetof(allocator, _hash)-->
+        <Variable Name="_items" InitialValue="*(size_t*)_hash" />
+        <Variable Name="_capacity" InitialValue="*((size_t*)_hash + 1)" /><!--1 pointer offsetof(_hash, _capacity)-->
+        <Variable Name="_count" InitialValue="*((size_t*)_hash + 2)" /><!--2 pointer offsetof(_hash, _count)-->
+
+        <!-- find() prolog -->
+        <Variable Name="hashmod" InitialValue="_capacity - 1" />
+
+        <Variable Name="h" InitialValue="(unsigned)child_this" />
+        <Variable Name="bucket" InitialValue="0" />
+
+        <Variable Name="probe" InitialValue="0" />
+        <Variable Name="probe_item" InitialValue="(size_t*)0" />
+
+        <Variable Name="child_real" InitialValue="(pugi::xml_node_struct*)0" />
+
+        <!-- if _data < 255 -->
+        <Variable Name="child_short" InitialValue="(pugi::xml_node_struct*)(((size_t)child_this &amp; ~(compact_alignment - 1)) + (child_data - 1 + child_T2) * compact_alignment)" />
+
+        <Variable Name="number" InitialValue="0" />
+
+        <Loop Condition="child_this &amp;&amp; child_data">
+          <!-- find() hash -->
+          <Exec>h = h ^ (h >> 16)</Exec>
+          <Exec>h = h * (0x85ebca6bu)</Exec>
+          <Exec>h = h ^ (h >> 13)</Exec>
+          <Exec>h = h * (0xc2b2ae35u)</Exec>
+          <Exec>h = h ^ (h >> 16)</Exec>
+
+          <Exec>bucket = h &amp; hashmod</Exec>
+
+          <!-- find() loop -->
+          <Loop Condition="probe &lt;= hashmod &amp;&amp;_capacity">
+            <Exec>probe_item = (size_t*)_items + bucket * 2</Exec><!--2 pointer sizeof(item_t)-->
+
+            <If Condition="*probe_item == child_this || *probe_item == 0">
+              <Exec>child_real = *(pugi::xml_node_struct**)(probe_item + 1)</Exec><!--1 pointer offsetof(item_t, value)-->
+              <Break/>
+            </If>
+
+            <Exec>bucket = (bucket + probe + 1) &amp; hashmod</Exec>
+            <Exec>probe++</Exec>
+          </Loop>
+
+          <Exec>child_data_copy = child_data</Exec>
+
+          <If Condition="child_data_copy &gt;= 255 &amp;&amp; child_real">
+            <Item Name="[{number}]">*child_real,view(child)</Item>
+            <Exec>child_this = (size_t)&amp;(*child_real).next_sibling</Exec>
+            <Exec>child_data = (*child_real).next_sibling._data</Exec>
+          </If>
+          <If Condition="child_data_copy &lt; 255 &amp;&amp; child_short">
+            <Item Name="[{number}]">*child_short,view(child)</Item>
+            <Exec>child_this = (size_t)&amp;(*child_short).next_sibling</Exec>
+            <Exec>child_data = (*child_short).next_sibling._data</Exec>
+          </If>
+
+          <!-- next_sibling struct template arguments -->
+          <Exec>child_T1 = 10</Exec>
+          <Exec>child_T2 = 0</Exec>
+
+          <!-- find() prolog again -->
+          <Exec>h = (unsigned)child_this</Exec>
+          <Exec>bucket = 0</Exec>
+
+          <Exec>probe = 0</Exec>
+          <Exec>probe_item = (size_t*)0</Exec>
+
+          <Exec>child_real = (pugi::xml_node_struct*)0</Exec>
+          <Exec>child_short = (pugi::xml_node_struct*)(((size_t)child_this &amp; ~(compact_alignment - 1)) + (child_data - 1 + child_T2) * compact_alignment)</Exec>
+
+          <Exec>number++</Exec>
+        </Loop>
+      </CustomListItems>
+      
+      <Item Name="next_sibling" ExcludeView="child">next_sibling</Item>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xml_attribute_struct">
+    <Expand>
+      <Item Name="name">name,na</Item>
+      <Item Name="value">value,na</Item>
+      
+      <CustomListItems ExcludeView="child">
+        <Variable Name="attribute_this" InitialValue="&amp;next_attribute" />
+        <Variable Name="attribute_data" InitialValue="next_attribute._data" />
+
+        <!-- next_attribute struct template arguments -->
+        <Variable Name="attribute_T1" InitialValue="7" />
+        <Variable Name="attribute_T2" InitialValue="0" />
+
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+
+        <!-- compact_get_page() -->
+        <Variable Name="_page" InitialValue="*(char*)(attribute_this - attribute_T1)" />
+        <Variable Name="page" InitialValue="((attribute_this - attribute_T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(attribute_this - attribute_T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+        <!-- page->allocator->_hash -->
+        <Variable Name="allocator" InitialValue="*(size_t*)page" />
+        <Variable Name="_hash" InitialValue="*(size_t*)(allocator + 2 * sizeof(size_t))" /><!--2 pointer offsetof(allocator, _hash)-->
+        <Variable Name="_items" InitialValue="*(size_t*)_hash" />
+        <Variable Name="_capacity" InitialValue="*((size_t*)_hash + 1)" /><!--1 pointer offsetof(_hash, _capacity)-->
+        <Variable Name="_count" InitialValue="*((size_t*)_hash + 2)" /><!--2 pointer offsetof(_hash, _count)-->
+
+        <!-- find() prolog -->
+        <Variable Name="hashmod" InitialValue="_capacity - 1" />
+
+        <Variable Name="h" InitialValue="(unsigned)attribute_this" />
+        <Variable Name="bucket" InitialValue="0" />
+
+        <Variable Name="probe" InitialValue="0" />
+        <Variable Name="probe_item" InitialValue="(size_t*)0" />
+
+        <Variable Name="attribute_real" InitialValue="(pugi::xml_attribute_struct*)0" />
+
+        <!-- if _data < 255 -->
+        <Variable Name="attribute_short" InitialValue="(pugi::xml_attribute_struct*)(((size_t)attribute_this &amp; ~(compact_alignment - 1)) + (attribute_data - 1 + attribute_T2) * compact_alignment)" />
+
+        <!-- find() hash -->
+        <Exec>h = h ^ (h >> 16)</Exec>
+        <Exec>h = h * (0x85ebca6bu)</Exec>
+        <Exec>h = h ^ (h >> 13)</Exec>
+        <Exec>h = h * (0xc2b2ae35u)</Exec>
+        <Exec>h = h ^ (h >> 16)</Exec>
+
+        <Exec>bucket = h &amp; hashmod</Exec>
+
+        <!-- find() loop -->
+        <Loop Condition="probe &lt;= hashmod &amp;&amp;_capacity">
+          <Exec>probe_item = (size_t*)_items + bucket * 2</Exec><!--2 pointer sizeof(item_t)-->
+
+          <If Condition="*probe_item == attribute_this || *probe_item == 0">
+            <Exec>attribute_real = *(pugi::xml_attribute_struct**)(probe_item + 1)</Exec><!--1 pointer offsetof(item_t, value)-->
+            <Break/>
+          </If>
+
+          <Exec>bucket = (bucket + probe + 1) &amp; hashmod</Exec>
+          <Exec>probe++</Exec>
+        </Loop>
+
+        <If Condition="attribute_data &gt;= 255 &amp;&amp; attribute_real">
+          <Item Name="next_attribute">*attribute_real</Item>
+        </If>
+        <If Condition="attribute_data != 0 &amp;&amp; attribute_data &lt; 255 &amp;&amp; attribute_short">
+          <Item Name="next_attribute">*attribute_short</Item>
+        </If>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <Type Name="pugi::impl::`anonymous-namespace'::compact_string&lt;*,*&gt;">
+    <Expand HideRawView="1">
+      <CustomListItems Condition="_data &amp;&amp; _data &lt; 255">
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+        
+        <!-- compact_get_page() -->
+        <Variable Name="_page" InitialValue="*(char*)(this - $T1)" />
+        <Variable Name="page" InitialValue="((this - $T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(this - $T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+        <Variable Name="compact_string_base" InitialValue="*(size_t*)(page + 5 * sizeof(void*))" /><!-- 5 pointer offsetof(page, compact_string_base)-->
+        <Variable Name="base" InitialValue="this - $T2" />
+        <Variable Name="offset" InitialValue="((*(short*)base - 1) &lt;&lt; 7) + (_data - 1)" />
+        
+        <Item Name="value">(pugi::char_t*)(compact_string_base + offset * sizeof(pugi::char_t)),na</Item>
+      </CustomListItems>
+      
+      <CustomListItems Condition="_data &amp;&amp; _data &gt;= 255">
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+        
+        <!-- compact_get_page() -->
+        <Variable Name="_page" InitialValue="*(char*)(this - $T1)" />
+        <Variable Name="page" InitialValue="((this - $T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(this - $T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+        <!-- page->allocator->_hash -->
+        <Variable Name="allocator" InitialValue="*(size_t*)page" />
+        <Variable Name="_hash" InitialValue="*(size_t*)(allocator + 2 * sizeof(size_t))" /><!--2 pointer offsetof(allocator, _hash)-->
+        <Variable Name="_items" InitialValue="*(size_t*)_hash" />
+        <Variable Name="_capacity" InitialValue="*((size_t*)_hash + 1)" /><!--1 pointer offsetof(_hash, _capacity)-->
+        <Variable Name="_count" InitialValue="*((size_t*)_hash + 2)" /><!--2 pointer offsetof(_hash, _count)-->
+
+        <!-- find() prolog -->
+        <Variable Name="hashmod" InitialValue="_capacity - 1" />
+
+        <Variable Name="h" InitialValue="(unsigned)this" />
+        <Variable Name="bucket" InitialValue="0" />
+
+        <Variable Name="probe" InitialValue="0" />
+        <Variable Name="probe_item" InitialValue="(size_t*)0" />
+
+        <!-- find() hash -->
+        <Exec>h = h ^ (h >> 16)</Exec>
+        <Exec>h = h * (0x85ebca6bu)</Exec>
+        <Exec>h = h ^ (h >> 13)</Exec>
+        <Exec>h = h * (0xc2b2ae35u)</Exec>
+        <Exec>h = h ^ (h >> 16)</Exec>
+
+        <Exec>bucket = h &amp; hashmod</Exec>
+
+        <!-- find() loop -->
+        <Loop Condition="probe &lt;= hashmod &amp;&amp;_capacity">
+          <Exec>probe_item = (size_t*)_items + bucket * 2</Exec><!--2 pointer sizeof(item_t)-->
+
+          <If Condition="*probe_item == this || *probe_item == 0">
+            <Item Name="value">*(pugi::char_t**)(probe_item + 1)</Item><!--1 pointer offsetof(item_t, value)-->
+            <Break/>
+          </If>
+
+          <Exec>bucket = (bucket + probe + 1) &amp; hashmod</Exec>
+          <Exec>probe++</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::impl::`anonymous-namespace'::compact_pointer&lt;pugi::xml_node_struct,*,*&gt;">
+    <DisplayString Condition="!_data">nullptr</DisplayString>
+    <DisplayString Condition="_data">...</DisplayString>
+    
+    <Expand HideRawView="1">
+      <CustomListItems Condition="_data &amp;&amp; _data &lt; 255">
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+        
+        <Item Name="value">*(pugi::xml_node_struct*)(((size_t)this &amp; ~(compact_alignment - 1)) + (_data - 1 + $T2) * compact_alignment)</Item>
+      </CustomListItems>
+      
+      <CustomListItems Condition="_data &amp;&amp; _data &gt;= 255">
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+        
+        <!-- compact_get_page() -->
+        <Variable Name="_page" InitialValue="*(char*)(this - $T1)" />
+        <Variable Name="page" InitialValue="((this - $T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(this - $T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+        <!-- page->allocator->_hash -->
+        <Variable Name="allocator" InitialValue="*(size_t*)page" />
+        <Variable Name="_hash" InitialValue="*(size_t*)(allocator + 2 * sizeof(size_t))" /><!--2 pointer offsetof(allocator, _hash)-->
+        <Variable Name="_items" InitialValue="*(size_t*)_hash" />
+        <Variable Name="_capacity" InitialValue="*((size_t*)_hash + 1)" /><!--1 pointer offsetof(_hash, _capacity)-->
+        <Variable Name="_count" InitialValue="*((size_t*)_hash + 2)" /><!--2 pointer offsetof(_hash, _count)-->
+
+        <!-- find() prolog -->
+        <Variable Name="hashmod" InitialValue="_capacity - 1" />
+
+        <Variable Name="h" InitialValue="(unsigned)this" />
+        <Variable Name="bucket" InitialValue="0" />
+
+        <Variable Name="probe" InitialValue="0" />
+        <Variable Name="probe_item" InitialValue="(size_t*)0" />
+
+        <!-- find() hash -->
+        <Exec>h = h ^ (h >> 16)</Exec>
+        <Exec>h = h * (0x85ebca6bu)</Exec>
+        <Exec>h = h ^ (h >> 13)</Exec>
+        <Exec>h = h * (0xc2b2ae35u)</Exec>
+        <Exec>h = h ^ (h >> 16)</Exec>
+
+        <Exec>bucket = h &amp; hashmod</Exec>
+
+        <!-- find() loop -->
+        <Loop Condition="probe &lt;= hashmod &amp;&amp;_capacity">
+          <Exec>probe_item = (size_t*)_items + bucket * 2</Exec><!--2 pointer sizeof(item_t)-->
+
+          <If Condition="*probe_item == this || *probe_item == 0">
+            <Item Name="value">**(pugi::xml_node_struct**)(probe_item + 1)</Item><!--1 pointer offsetof(item_t, value)-->
+            <Break/>
+          </If>
+
+          <Exec>bucket = (bucket + probe + 1) &amp; hashmod</Exec>
+          <Exec>probe++</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <Type Name="pugi::impl::`anonymous-namespace'::compact_pointer&lt;pugi::xml_attribute_struct,*,*&gt;">
+    <DisplayString Condition="!_data">nullptr</DisplayString>
+    <DisplayString Condition="_data">...</DisplayString>
+    
+    <Expand HideRawView="1">
+      <CustomListItems Condition="_data &amp;&amp; _data &lt; 255">
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+        
+        <Item Name="value">*(pugi::xml_attribute_struct*)(((size_t)this &amp; ~(compact_alignment - 1)) + (_data - 1 + $T2) * compact_alignment)</Item>
+      </CustomListItems>
+      
+      <CustomListItems Condition="_data &amp;&amp; _data &gt;= 255">
+        <Variable Name="compact_alignment_log2" InitialValue="2" />
+        <Variable Name="compact_alignment" InitialValue="1 &lt;&lt; compact_alignment_log2" />
+        
+        <!-- compact_get_page() -->
+        <Variable Name="_page" InitialValue="*(char*)(this - $T1)" />
+        <Variable Name="page" InitialValue="((this - $T1 - (_page &lt;&lt; compact_alignment_log2)) - *(unsigned*)(this - $T1 - (_page &lt;&lt; compact_alignment_log2)))" />
+
+        <!-- page->allocator->_hash -->
+        <Variable Name="allocator" InitialValue="*(size_t*)page" />
+        <Variable Name="_hash" InitialValue="*(size_t*)(allocator + 2 * sizeof(size_t))" /><!--2 pointer offsetof(allocator, _hash)-->
+        <Variable Name="_items" InitialValue="*(size_t*)_hash" />
+        <Variable Name="_capacity" InitialValue="*((size_t*)_hash + 1)" /><!--1 pointer offsetof(_hash, _capacity)-->
+        <Variable Name="_count" InitialValue="*((size_t*)_hash + 2)" /><!--2 pointer offsetof(_hash, _count)-->
+
+        <!-- find() prolog -->
+        <Variable Name="hashmod" InitialValue="_capacity - 1" />
+
+        <Variable Name="h" InitialValue="(unsigned)this" />
+        <Variable Name="bucket" InitialValue="0" />
+
+        <Variable Name="probe" InitialValue="0" />
+        <Variable Name="probe_item" InitialValue="(size_t*)0" />
+
+        <!-- find() hash -->
+        <Exec>h = h ^ (h >> 16)</Exec>
+        <Exec>h = h * (0x85ebca6bu)</Exec>
+        <Exec>h = h ^ (h >> 13)</Exec>
+        <Exec>h = h * (0xc2b2ae35u)</Exec>
+        <Exec>h = h ^ (h >> 16)</Exec>
+
+        <Exec>bucket = h &amp; hashmod</Exec>
+
+        <!-- find() loop -->
+        <Loop Condition="probe &lt;= hashmod &amp;&amp;_capacity">
+          <Exec>probe_item = (size_t*)_items + bucket * 2</Exec><!--2 pointer sizeof(item_t)-->
+
+          <If Condition="*probe_item == this || *probe_item == 0">
+            <Item Name="value">**(pugi::xml_attribute_struct**)(probe_item + 1)</Item><!--1 pointer offsetof(item_t, value)-->
+            <Break/>
+          </If>
+
+          <Exec>bucket = (bucket + probe + 1) &amp; hashmod</Exec>
+          <Exec>probe++</Exec>
+        </Loop>
+      </CustomListItems>
+    </Expand>
+  </Type>
+
+  <Type Name="pugi::xpath_node">
+    <DisplayString Condition="_node._root &amp;&amp; _attribute._attr">{_node,na} {_attribute,na}</DisplayString>
+    <DisplayString Condition="_node._root">{_node,na}</DisplayString>
+    <DisplayString Condition="_attribute._attr">{_attribute}</DisplayString>
+    <DisplayString>empty</DisplayString>
+    
+    <Expand HideRawView="1">
+      <ExpandedItem Condition="_node._root &amp;&amp; !_attribute._attr">_node</ExpandedItem>
+      <ExpandedItem Condition="!_node._root &amp;&amp; _attribute._attr">_attribute</ExpandedItem>
+      
+      <Item Name="node" Condition="_node._root &amp;&amp; _attribute._attr">_node,na</Item>
+      <Item Name="attribute" Condition="_node._root &amp;&amp; _attribute._attr">_attribute,na</Item>
+    </Expand>
+  </Type>
+  
+  <Type Name="pugi::xpath_node_set">
+    <Expand>
+      <Item Name="type">_type</Item>
+      <ArrayItems>
+        <Size>_end - _begin</Size>
+        <ValuePointer>_begin</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

@@ -135,9 +135,9 @@ void aim65_40_state::aim65_40(machine_config &config)
 	/* sound hardware */
 
 	/* devices */
-	VIA6522(config, M6522_0_TAG, 1000000);
-	VIA6522(config, M6522_1_TAG, 1000000);
-	VIA6522(config, M6522_2_TAG, 1000000);
+	MOS6522(config, M6522_0_TAG, 1000000);
+	MOS6522(config, M6522_1_TAG, 1000000);
+	MOS6522(config, M6522_2_TAG, 1000000);
 
 	mos6551_device &acia(MOS6551(config, M6551_TAG, 0));
 	acia.set_xtal(1.8432_MHz_XTAL);

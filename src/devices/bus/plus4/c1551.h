@@ -65,7 +65,7 @@ private:
 
 	void c1551_mem(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	enum
 	{

@@ -218,6 +218,7 @@ void pc4_state::machine_start()
 	m_direction = 1;
 	m_disp_shift = 0;
 	m_blink = 0;
+	m_busy_flag = 0;
 }
 
 void pc4_state::pc4(machine_config &config)

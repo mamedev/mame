@@ -25,6 +25,9 @@ public:
 
 	void init_common();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_temp_bitmap;
@@ -36,7 +39,6 @@ private:
 	uint8_t galaxia_collision_clear();
 	TILE_GET_INFO_MEMBER(get_galaxia_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_astrowar_bg_tile_info);
-	DECLARE_VIDEO_START(galaxia);
 	void galaxia_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(astrowar);
 	void astrowar_palette(palette_device &palette) const;

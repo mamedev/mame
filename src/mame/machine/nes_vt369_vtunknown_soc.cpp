@@ -145,7 +145,7 @@ void nes_vt369_soc_device::nes_vt369_map(address_map &map)
 
 	map(0x41b0, 0x41bf).r(FUNC(nes_vt369_soc_device::vt369_41bx_r)).w(FUNC(nes_vt369_soc_device::vt369_41bx_w));
 
-//	map(0x48a0, 0x48af).r(FUNC(nes_vt369_soc_device::vt369_48ax_r)).w(FUNC(nes_vt369_soc_device::vt369_48ax_w));
+//  map(0x48a0, 0x48af).r(FUNC(nes_vt369_soc_device::vt369_48ax_r)).w(FUNC(nes_vt369_soc_device::vt369_48ax_w));
 	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
 
 	map(0x6000, 0x7fff).r(FUNC(nes_vt369_soc_device::vt369_6000_r)).w(FUNC(nes_vt369_soc_device::vt369_6000_w));

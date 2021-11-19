@@ -7,6 +7,11 @@
     connects to other PCBs with various types of slots (USB, SD etc.)
     (ADD FULL DETAILS)
 
+    Specifications (incomplete and unconfirmed):
+    CPU: 450 MHz ATJ227X with intergrated GPU
+    SDRAM: 256MB
+    (source: http://wecmuseum.org/index.php?title=Retro-Bit_Generations)
+
     TODO: everything - emulate the SoC
 
     Presumably has an internal bootstrap (at least) to boot from the NAND
@@ -72,14 +77,14 @@ uint32_t actions_atj2279b_state::screen_update(screen_device &screen, bitmap_rgb
 
 void actions_atj2279b_state::actions_atj2279b(machine_config &config)
 {
-	ARM7_BE(config, m_maincpu, 100'000'000); // unknown ARM type in SoC (are there any documents?) probably much newer than this
+	ARM7_BE(config, m_maincpu, 450'000'000); // Probably ATJ227X 450MHz, but this needs to be checked more closely
 	m_maincpu->set_addrmap(AS_PROGRAM, &actions_atj2279b_state::atj2279b_map);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(640, 480);
-	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_size(1280, 720);
+	screen.set_visarea(0, 1280-1, 0, 720-1); // resolution unconfirmed (possibly 1080p as well, but this is unlikely)
 	screen.set_screen_update(FUNC(actions_atj2279b_state::screen_update));
 
 	SPEAKER(config, "lspeaker").front_left();

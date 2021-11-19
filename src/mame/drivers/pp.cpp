@@ -461,8 +461,8 @@ void pp_state::pp(machine_config &config)
 	m_fdc->drq_wr_callback().set("int7", FUNC(input_merger_device::in_w<0>));
 	m_fdc->hld_wr_callback().set(FUNC(pp_state::hld_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], pp_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], pp_floppies, nullptr, floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], pp_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], pp_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	SCN2672(config, m_pvtc, 13_MHz_XTAL / 8);
 	m_pvtc->set_character_width(8); // 8 or 7 depending on mode

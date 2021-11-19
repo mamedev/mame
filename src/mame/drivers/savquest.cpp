@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Peter Ferrie
 /***************************************************************************
 
-    savquest.c
+    savquest.cpp
 
     "Savage Quest" (c) 1999 Interactive Light, developed by Angel Studios.
     Skeleton by R. Belmont
@@ -55,9 +55,12 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
-#include "video/voodoo.h"
+#include "video/voodoo_2.h"
 #include "machine/ds128x.h"
 #include "bus/isa/sblaster.h"
+
+
+namespace {
 
 class savquest_state : public pcat_base_state
 {
@@ -67,9 +70,17 @@ public:
 		m_vga(*this, "vga"),
 		m_voodoo(*this, "voodoo")
 	{
+		std::fill(std::begin(m_mtxc_config_reg), std::end(m_mtxc_config_reg), 0);
 	}
 
 	void savquest(machine_config &config);
+
+protected:
+	// driver_device overrides
+//  virtual void video_start();
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_f0000_ram;
@@ -119,11 +130,6 @@ private:
 	void savquest_io(address_map &map);
 	void savquest_map(address_map &map);
 
-	// driver_device overrides
-//  virtual void video_start();
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void vid_3dfx_init();
 
@@ -351,7 +357,7 @@ void savquest_state::vid_3dfx_init()
 	m_pci_3dfx_regs[0x08 / 4] = 2; // revision ID
 	m_pci_3dfx_regs[0x10 / 4] = 0xff000000;
 	m_pci_3dfx_regs[0x40 / 4] = 0x4000; //INITEN_SECONDARY_REV_ID
-	m_voodoo->voodoo_set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
+	m_voodoo->set_init_enable(0x4000); //INITEN_SECONDARY_REV_ID
 }
 
 uint32_t savquest_state::pci_3dfx_r(int function, int reg, uint32_t mem_mask)
@@ -370,7 +376,7 @@ osd_printf_warning("PCI write: %x %x\n", reg, data);
 	}
 	else if (reg == 0x40)
 	{
-		m_voodoo->voodoo_set_init_enable(data);
+		m_voodoo->set_init_enable(data);
 	}
 	else if (reg == 0x54)
 	{
@@ -748,7 +754,7 @@ void savquest_state::savquest_map(address_map &map)
 	map(0x000e8000, 0x000ebfff).bankr("bios_e8000").w(FUNC(savquest_state::bios_e8000_ram_w));
 	map(0x000ec000, 0x000effff).bankr("bios_ec000").w(FUNC(savquest_state::bios_ec000_ram_w));
 	map(0x00100000, 0x07ffffff).ram(); // 128MB RAM
-	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(voodoo_device::voodoo_r), FUNC(voodoo_device::voodoo_w));
+	map(0xe0000000, 0xe0fbffff).rw(m_voodoo, FUNC(generic_voodoo_device::read), FUNC(generic_voodoo_device::write));
 	map(0xfffc0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
 }
 
@@ -791,6 +797,9 @@ void savquest_state::machine_start()
 
 	intel82439tx_init();
 	vid_3dfx_init();
+
+	for (int i = 0; i < 8; i++)
+		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
 }
 
 void savquest_state::machine_reset()
@@ -843,11 +852,12 @@ void savquest_state::savquest(machine_config &config)
 	/* video hardware */
 	pcvideo_s3_vga(config);
 
-	VOODOO_2(config, m_voodoo, STD_VOODOO_2_CLOCK);
+	VOODOO_2(config, m_voodoo, voodoo_2_device::NOMINAL_CLOCK);
 	m_voodoo->set_fbmem(4);
 	m_voodoo->set_tmumem(4, 4); /* this is the 12Mb card */
-	m_voodoo->set_screen_tag("screen");
-	m_voodoo->set_cpu_tag(m_maincpu);
+	m_voodoo->set_status_cycles(1000); // optimization to consume extra cycles when polling status
+	m_voodoo->set_screen("screen");
+	m_voodoo->set_cpu(m_maincpu);
 	m_voodoo->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 }
 
@@ -864,6 +874,8 @@ ROM_START( savquest )
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "savquest", 0, SHA1(b7c8901172b66706a7ab5f5c91e6912855153fa9) )
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME(1999, savquest, 0, savquest, savquest, savquest_state, empty_init, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)

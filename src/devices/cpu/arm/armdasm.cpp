@@ -206,6 +206,7 @@ offs_t arm_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			/* look for mov pc,lr */
 			if (((opcode >> 12) & 0x0f) == 15 && ((opcode >> 0) & 0x0f) == 14 && (opcode & 0x02000000) == 0)
 				dasmflags = STEP_OUT;
+			[[fallthrough]];
 		case 0x0f:
 			WriteDataProcessingOperand(stream, opcode, true, false, pc);
 			break;

@@ -111,9 +111,11 @@ DEFINE_DEVICE_TYPE(MSX_CART_FSFD1A,  msx_cart_fsfd1a_device,  "msx_cart_fsfd1a",
 DEFINE_DEVICE_TYPE(MSX_CART_FSCF351, msx_cart_fscf351_device, "msx_cart_fscf351", "MSX Cartridge - FS-CF351")
 
 
-FLOPPY_FORMATS_MEMBER( msx_cart_disk_device::floppy_formats )
-	FLOPPY_MSX_FORMAT
-FLOPPY_FORMATS_END
+void msx_cart_disk_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MSX_FORMAT);
+}
 
 
 static void msx_floppies(device_slot_interface &device)

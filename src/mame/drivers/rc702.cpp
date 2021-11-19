@@ -42,6 +42,7 @@ Issues:
 #include "speaker.h"
 
 
+namespace {
 
 class rc702_state : public driver_device
 {
@@ -65,10 +66,11 @@ public:
 
 	void rc702(machine_config &config);
 
-private:
-	void machine_reset() override;
-	void machine_start() override;
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
+private:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void port14_w(uint8_t data);
@@ -374,7 +376,7 @@ void rc702_state::rc702(machine_config &config)
 	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
 	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -420,6 +422,9 @@ ROM_START( rc702 )
 	ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
 	ROM_LOAD( "roa327.rom", 0x0800, 0x0800, CRC(bed7ddb0) SHA1(201ae9e4ac3812577244b9c9044fadd04fb2b82f) ) // semi_gfx
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

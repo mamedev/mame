@@ -28,7 +28,7 @@
 #include "imagedev/floppy.h"
 #include "tp0370.h"
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 class hx5102_device : public hexbus_chained_device
 {
@@ -46,7 +46,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( clock_out );
 	DECLARE_WRITE_LINE_MEMBER( board_ready );
 	DECLARE_WRITE_LINE_MEMBER( board_reset );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	void device_start() override;
 	void device_reset() override;
@@ -121,7 +121,7 @@ private:
 	uint8_t* m_rom2;
 };
 
-}   } // end namespace bus::hexbus
+} // end namespace bus::hexbus
 
 DECLARE_DEVICE_TYPE_NS(HX5102, bus::hexbus, hx5102_device)
 

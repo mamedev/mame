@@ -202,6 +202,11 @@ ROM_START(ajuno2)
 	ROMX_LOAD("ju-2_2_4.ic24", 0x0000, 0x4000, CRC(bfedda17) SHA1(27eee472befdbc7d7ed0caaf359775d8ff3c836a), ROM_BIOS(2)) // M5M27C128
 ROM_END
 
+ROM_START(hs80)
+	ROM_REGION(0x4000, "program", 0)
+	ROM_LOAD("roland hs-80 v5.0 eprom -dom- - 27128", 0x0000, 0x4000, CRC(94e85807) SHA1(128eec37fb6dcac6ec73d3ca544c28dbf7dbf9b2))
+ROM_END
+
 ROM_START(mks50)
 	ROM_REGION(0x4000, "program", 0)
 	ROM_LOAD("mks-50_v1.02.ic7", 0x0000, 0x4000, CRC(a342f90e) SHA1(8eed986051abfdf55167c179dc7c7f0822a3ba0c))
@@ -210,4 +215,5 @@ ROM_END
 SYST(1985, ajuno1, 0, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "Alpha Juno-1 (JU-1) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 //SYST(1985, hs10, ajuno1, 0, ajuno1, ajuno1, alphajuno_state, empty_init, "Roland", "SynthPlus 10 (HS-10) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1986, ajuno2, 0, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "Alpha Juno-2 (JU-2) Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
+SYST(1986, hs80, ajuno2, 0, ajuno2, ajuno2, alphajuno_state, empty_init, "Roland", "HS-80 Programmable Polyphonic Synthesizer", MACHINE_IS_SKELETON)
 SYST(1987, mks50, 0, 0, mks50, mks50, alphajuno_state, empty_init, "Roland", "MKS-50 Synthesizer Module", MACHINE_IS_SKELETON)

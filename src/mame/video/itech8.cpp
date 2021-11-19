@@ -145,6 +145,7 @@ void itech8_state::video_start()
 
 	/* reset statics */
 	m_page_select = 0xc0;
+	m_blit_in_progress = 0;
 
 	save_item(NAME(m_blitter_data));
 	save_item(NAME(m_blit_in_progress));

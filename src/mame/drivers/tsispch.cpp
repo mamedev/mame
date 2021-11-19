@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Jonathan Gevaryahu
+// thanks-to:Kevin Horton
 /******************************************************************************
 *
 *  Telesensory Systems Inc./Speech Plus
 *  1500 and 2000 series
 *  Prose 2020
-*  Copyright (C) 2011-2013 Jonathan Gevaryahu AKA Lord Nightmare and Kevin 'kevtris' Horton
 *
 *  The Prose 2000 card is an IEEE 796 Multibus card, with additional connectors to facilitate power and serial input other than via multibus.
 *  There are two hardware versions of the card:
@@ -111,42 +111,78 @@
 
 /* Core includes */
 #include "emu.h"
-#include "includes/tsispch.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "cpu/upd7725/upd7725.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/pic8259.h"
 #include "sound/dac.h"
 #include "speaker.h"
 
-
 // defines
-#define DEBUG_PARAM 1
-#undef DEBUG_DSP
-#undef DEBUG_DSP_W
+
+//#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
+#define LOG_PARAM     (1U <<  1)
+#define LOG_DSP       (1U <<  2)
+
+#define VERBOSE (LOG_GENERAL | LOG_PARAM)
+//#define LOG_OUTPUT_FUNC printf
+#include "logmacro.h"
+
+namespace {
+
+#define LOGGEN(...) LOGMASKED(LOG_GENERAL, __VA_ARGS__)
+#define LOGPRM(...) LOGMASKED(LOG_PARAM, __VA_ARGS__)
+#define LOGDSP(...) LOGMASKED(LOG_DSP, __VA_ARGS__)
+
+// class definition
+class tsispch_state : public driver_device
+{
+public:
+	tsispch_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dsp(*this, "dsp")
+		, m_pic(*this, "pic8259")
+		, m_uart(*this, "i8251a_u15")
+	{
+	}
+
+	void prose2k(machine_config &config);
+
+	void init_prose2k();
+
+private:
+	uint8_t dsw_r();
+	void peripheral_w(uint8_t data);
+	uint16_t dsp_data_r();
+	void dsp_data_w(uint16_t data);
+	uint16_t dsp_status_r();
+	void dsp_status_w(uint16_t data);
+	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
+	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
+
+	void dsp_data_map(address_map &map);
+	void dsp_prg_map(address_map &map);
+	void i8086_io(address_map &map);
+	void i8086_mem(address_map &map);
+
+	virtual void machine_reset() override;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<upd7725_device> m_dsp;
+	required_device<pic8259_device> m_pic;
+	required_device<i8251_device> m_uart;
+
+	uint8_t m_paramReg;           // status leds and resets and etc
+};
 
 /*
    Devices and handlers
  */
 
-/*****************************************************************************
- USART 8251 and Terminal stuff
-*****************************************************************************/
-WRITE_LINE_MEMBER(tsispch_state::i8251_rxrdy_int)
-{
-	m_pic->ir1_w(state);
-}
-
-WRITE_LINE_MEMBER(tsispch_state::i8251_txempty_int)
-{
-	m_pic->ir2_w(state);
-}
-
-WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
-{
-	m_pic->ir3_w(state);
-}
 
 /*****************************************************************************
  LED/dipswitch stuff
@@ -172,10 +208,8 @@ void tsispch_state::peripheral_w(uint8_t data)
 	*/
 	m_paramReg = data;
 	m_dsp->set_input_line(INPUT_LINE_RESET, BIT(data,6)?CLEAR_LINE:ASSERT_LINE);
-#ifdef DEBUG_PARAM
-	//fprintf(stderr,"8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
-	logerror("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
-#endif
+	//LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
+	LOGPRM("8086: Parameter Reg written: UNK7: %d, DSPRST6: %d; UNK5: %d; LED4: %d; LED3: %d; LED2: %d; LED1: %d; DSPIRQMASK: %d\n", BIT(data,7), BIT(data,6), BIT(data,5), BIT(data,4), BIT(data,3), BIT(data,2), BIT(data,1), BIT(data,0));
 	popmessage("LEDS: 6/Talking:%d 5:%d 4:%d 3:%d\n", 1-BIT(data,1), 1-BIT(data,2), 1-BIT(data,3), 1-BIT(data,4));
 }
 
@@ -184,49 +218,39 @@ void tsispch_state::peripheral_w(uint8_t data)
 *****************************************************************************/
 uint16_t tsispch_state::dsp_data_r()
 {
-#ifdef DEBUG_DSP
-	uint8_t temp = m_dsp->snesdsp_read(true);
-	fprintf(stderr, "dsp data read: %02x\n", temp);
-	return temp;
-#else
-	return m_dsp->snesdsp_read(true);
-#endif
+	uint8_t r = m_dsp->snesdsp_read(true);
+	LOGDSP("dsp data read: %02x\n", r);
+	return r;
 }
 
 void tsispch_state::dsp_data_w(uint16_t data)
 {
-#ifdef DEBUG_DSP_W
-	fprintf(stderr, "dsp data write: %02x\n", data);
-#endif
+	LOGDSP("dsp data write: %02x\n", data);
 	m_dsp->snesdsp_write(true, data);
 }
 
 uint16_t tsispch_state::dsp_status_r()
 {
-#ifdef DEBUG_DSP
-	uint8_t temp = m_dsp->snesdsp_read(false);
-	fprintf(stderr, "dsp status read: %02x\n", temp);
-	return temp;
-#else
-	return m_dsp->snesdsp_read(false);
-#endif
+	uint8_t r = m_dsp->snesdsp_read(false);
+	LOGDSP("dsp status read: %02x\n", r);
+	return r;
 }
 
 void tsispch_state::dsp_status_w(uint16_t data)
 {
-	fprintf(stderr, "warning: upd772x status register should never be written to!\n");
+	LOGGEN("warning: upd772x status register should never be written to!\n");
 	m_dsp->snesdsp_write(false, data);
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
 {
-	fprintf(stderr, "upd772x changed p0 state to %d!\n",state);
+	LOGGEN("upd772x changed p0 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
 WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 {
-	fprintf(stderr, "upd772x changed p1 state to %d!\n",state);
+	LOGGEN("upd772x changed p1 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
@@ -235,7 +259,7 @@ WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
 *****************************************************************************/
 void tsispch_state::machine_reset()
 {
-	fprintf(stderr,"machine reset\n");
+	LOGGEN("machine reset\n");
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // starts in reset
 }
 
@@ -243,7 +267,7 @@ void tsispch_state::init_prose2k()
 {
 	uint8_t *dspsrc = (uint8_t *)(memregion("dspprgload")->base());
 	uint32_t *dspprg = (uint32_t *)(memregion("dspprg")->base());
-	fprintf(stderr,"driver init\n");
+	LOGGEN("driver init\n");
 	// unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)
 	// source upd7720                  dest upd7725
@@ -307,13 +331,13 @@ void tsispch_state::init_prose2k()
 void tsispch_state::i8086_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000, 0x02FFF).mirror(0x34000).ram(); // verified; 6264*2 SRAM, only first 3/4 used
-	map(0x03000, 0x03003).mirror(0x341FC).rw("i8251a_u15", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-	map(0x03200, 0x03203).mirror(0x341FC).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
-	map(0x03400, 0x03400).mirror(0x341FE).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
-	map(0x03401, 0x03401).mirror(0x341FE).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
-	map(0x03600, 0x03601).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
-	map(0x03602, 0x03603).mirror(0x341FC).rw(FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0x00000, 0x02fff).mirror(0x34000).ram(); // verified; 6264*2 SRAM, only first 3/4 used
+	map(0x03000, 0x03003).mirror(0x341fc).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0x03200, 0x03203).mirror(0x341fc).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
+	map(0x03400, 0x03400).mirror(0x341fe).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
+	map(0x03401, 0x03401).mirror(0x341fe).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
+	map(0x03600, 0x03601).mirror(0x341fc).rw(FUNC(tsispch_state::dsp_data_r), FUNC(tsispch_state::dsp_data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03603).mirror(0x341fc).rw(FUNC(tsispch_state::dsp_status_r), FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
 	map(0xc0000, 0xfffff).rom(); // verified
 }
 
@@ -372,15 +396,15 @@ void tsispch_state::prose2k(machine_config &config)
 {
 	/* basic machine hardware */
 	/* There are two crystals on the board: a 24MHz xtal at Y2 and a 16MHz xtal at Y1 */
-	I8086(config, m_maincpu, 8000000); /* VERIFIED clock, unknown divider */
+	I8086(config, m_maincpu, XTAL(24'000'000)/3); /* VERIFIED clock, (which xtal does this come from? guessed 24MHz) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsispch_state::i8086_mem);
 	m_maincpu->set_addrmap(AS_IO, &tsispch_state::i8086_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback(m_pic, FUNC(pic8259_device::inta_cb));
 
 	/* TODO: the UPD7720 has a 10KHz clock to its INT pin */
 	/* TODO: the UPD7720 has a 2MHz clock to its SCK pin */
 	/* TODO: hook up p0, p1, int */
-	UPD7725(config, m_dsp, 8000000); /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 */
+	UPD7725(config, m_dsp, XTAL(16'000'000)/2); /* VERIFIED clock, unknown divider; correct dsp type is UPD77P20 (which xtal does this come from? guessed 16MHz) */
 	m_dsp->set_addrmap(AS_PROGRAM, &tsispch_state::dsp_prg_map);
 	m_dsp->set_addrmap(AS_DATA, &tsispch_state::dsp_data_map);
 	m_dsp->p0().set(FUNC(tsispch_state::dsp_to_8086_p0_w));
@@ -391,17 +415,17 @@ void tsispch_state::prose2k(machine_config &config)
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
 	/* uarts */
-	i8251_device &u15(I8251(config, "i8251a_u15", 0));
-	u15.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	u15.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
-	u15.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
-	u15.rxrdy_handler().set(FUNC(tsispch_state::i8251_rxrdy_int));
-	u15.txrdy_handler().set(FUNC(tsispch_state::i8251_txrdy_int));
-	u15.txempty_handler().set(FUNC(tsispch_state::i8251_txempty_int));
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	m_uart->rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	m_uart->rxrdy_handler().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_uart->txrdy_handler().set(m_pic, FUNC(pic8259_device::ir3_w));
+	m_uart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir2_w));
 
-	clock_device &clock(CLOCK(config, "baudclock", 153600));
-	clock.signal_handler().set("i8251a_u15", FUNC(i8251_device::write_txc));
-	clock.signal_handler().append("i8251a_u15", FUNC(i8251_device::write_rxc));
+	clock_device &clock(CLOCK(config, "baudclock", 153600)); // this comes from a resonator? or a divider? not sure.
+	clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
@@ -526,7 +550,7 @@ ROM_START( prose2ko )
 	ROMX_LOAD( "v1.1__15__speech__plus__=c=1983.am2764.15.u51", 0xfc001, 0x2000, CRC(beb1fa19) SHA1(72130fe45c3fd3de7cf794936dc68ed2d4193daf),ROM_SKIP(1))
 
 	// TSI/Speech plus DSP firmware v?.? (no sticker, but S140025 printed on chip), unlabeled chip, but clearly a NEC UPD7720C ceramic
-	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is mask ROM and doesn't dump easily
+	// NOT DUMPED YET, using the 3.12 dsp firmware as a placeholder, since the dsp on the older board is mask ROM and an electronic dump method is not yet known
 	ROM_REGION( 0x600, "dspprgload", 0) // packed 24 bit data
 	ROM_LOAD( "s140025__dsp_prog.u29", 0x0000, 0x0600, NO_DUMP)
 	ROM_LOAD( "v3.12__8-9-88__dsp_prog.u29", 0x0000, 0x0600, CRC(9e46425a) SHA1(80a915d731f5b6863aeeb448261149ff15e5b786)) // temp placeholder
@@ -540,6 +564,8 @@ ROM_START( prose2ko )
 	ROM_LOAD( "dm74s288n.whitespot.u79", 0x0020, 0x0020, CRC(7faee6cb) SHA1(b6dd2a6909dac9e89e7317c006a013ff0866382d))
 	// no third PROM in this set, a 74S138 is used instead for e0000-fffff ROM mapping
 	ROM_END
+
+} // anonymous namespace
 
 /******************************************************************************
  Drivers

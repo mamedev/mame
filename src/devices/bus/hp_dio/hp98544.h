@@ -14,8 +14,7 @@
 
 // ======================> dio16_98544_device
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 class dio16_98544_device :
 	public device_t,
@@ -59,7 +58,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98544, bus::hp_dio, dio16_98544_device)

@@ -345,8 +345,6 @@ public:
 
 	u8 nodeid_r(address_space &space, offs_t offset);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 	void ioga(machine_config &config);
 	void interpro_serial(machine_config &config);
 	void interpro(machine_config &config);
@@ -1069,10 +1067,6 @@ void sapphire_state::interpro_82596_map(address_map &map)
 	map(0x00000000, 0xffffffff).rw(m_ioga, FUNC(sapphire_ioga_device::eth_r), FUNC(sapphire_ioga_device::eth_w));
 }
 
-FLOPPY_FORMATS_MEMBER(interpro_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 void interpro_state::interpro_serial(machine_config &config)
 {
 	input_merger_device &scc_int(INPUT_MERGER_ANY_HIGH(config, "scc_int"));
@@ -1249,8 +1243,8 @@ void emerald_state::emerald(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, interpro_state::floppy_formats).enable_sound(false);
-	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	//FLOPPY_CONNECTOR(config, "fdc:2", "525hd", FLOPPY_525_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1315,7 +1309,7 @@ void turquoise_state::turquoise(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:3", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
@@ -1382,7 +1376,7 @@ void sapphire_state::sapphire(machine_config &config)
 	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 1
-	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 
 	// srx arbiter gate array
 	INTERPRO_ARBGA(config, m_arbga, 0);
@@ -1637,9 +1631,10 @@ ROM_START(ip2500)
 	ROM_REGION32_LE(0x80, "idprom", 0)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
+	// FIXME: undumped - probably identical to ip2700 eprom
 	ROM_REGION16_LE(0x20000, "eprom", 0)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
-	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0))
+	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa) BAD_DUMP, ROM_BIOS(0))
 
 	ROM_REGION(0x20000, "flash_lsb", 0)
 	ROM_LOAD_OPTIONAL("y225.u76", 0x00000, 0x20000, CRC(46c0b105) SHA1(7c4a104e4fb3d0e5e8db7c911cdfb3f5c4fb0218))

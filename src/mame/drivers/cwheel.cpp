@@ -20,6 +20,9 @@
 #include "emu.h"
 #include "cpu/st62xx/st62xx.h"
 
+namespace
+{
+
 class cwheel_state : public driver_device
 {
 public:
@@ -48,6 +51,7 @@ ROM_START( cwheel )
 	ROM_LOAD( "u4.bin", 0x0000, 0x2000, CRC(2eaab25d) SHA1(c41ad372ec25435cdb6a063b094fd785b19dafd6) )
 ROM_END
 
+} // anonymous namespace
 
 //    YEAR  NAME    PARENT  MACHINE  INPUT   CLASS         INIT        ROT   COMPANY    FULLNAME           FLAGS
 GAME( 19??, cwheel, 0,      cwheel,  cwheel, cwheel_state, empty_init, ROT0, "Gamebar", "Catherine Wheel", MACHINE_IS_SKELETON )

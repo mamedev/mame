@@ -9,10 +9,6 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-#define MASTER_CLOCK         XTAL(18'432'000)
-#define SOUND_CLOCK          XTAL(3'579'545)
-
-
 
 class jackal_state : public driver_device
 {
@@ -20,8 +16,15 @@ public:
 	jackal_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_videoctrl(*this, "videoctrl"),
+		m_videoram(*this, "videoram%u", 0U),
+		m_scrollram(*this, "scrollram%u", 0U, 0x40U, ENDIANNESS_BIG),
+		m_mainbank(*this, "mainbank"),
+		m_videoview(*this, "videoview"),
+		m_spritebank(*this, "spritebank"),
+		m_spriteram(*this, "spriteram%u", 0U, 0x1000U, ENDIANNESS_BIG),
+		m_scrollbank(*this, "scrollbank"),
 		m_dials(*this, "DIAL%u", 0U),
-		m_mastercpu(*this, "master"),
+		m_maincpu(*this, "maincpu"),
 		m_slavecpu(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -29,47 +32,47 @@ public:
 
 	void jackal(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_videoctrl;
-	uint8_t *  m_scrollram;
+	required_shared_ptr_array<uint8_t, 2> m_videoram;
+	memory_share_array_creator<uint8_t, 2> m_scrollram;
+	required_memory_bank m_mainbank;
+	memory_view m_videoview;
+	required_memory_bank m_spritebank;
+	memory_share_array_creator<uint8_t, 2> m_spriteram;
+	required_memory_bank m_scrollbank;
 
-	/* video-related */
-	tilemap_t  *m_bg_tilemap;
+	// video-related
+	tilemap_t *m_bg_tilemap;
 
-	/* misc */
-	int      m_irq_enable;
-	uint8_t    *m_rambank;
-	uint8_t    *m_spritebank;
+	// misc
+	uint8_t m_irq_enable;
 	optional_ioport_array<2> m_dials;
 
-	/* devices */
-	required_device<cpu_device> m_mastercpu;
+	// devices
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t jackalr_rotary_r(offs_t offset);
-	void jackal_flipscreen_w(uint8_t data);
-	uint8_t jackal_zram_r(offs_t offset);
-	uint8_t jackal_voram_r(offs_t offset);
-	uint8_t jackal_spriteram_r(offs_t offset);
-	void jackal_rambank_w(uint8_t data);
-	void jackal_zram_w(offs_t offset, uint8_t data);
-	void jackal_voram_w(offs_t offset, uint8_t data);
-	void jackal_spriteram_w(offs_t offset, uint8_t data);
+	uint8_t rotary_r(offs_t offset);
+	void flipscreen_w(uint8_t data);
+	void rambank_w(uint8_t data);
+	template <uint8_t Which> void voram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	void jackal_palette(palette_device &palette) const;
-	uint32_t screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	void jackal_mark_tile_dirty( int offset );
-	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void master_map(address_map &map);
+	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void main_map(address_map &map);
 	void slave_map(address_map &map);
 };
 

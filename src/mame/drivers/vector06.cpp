@@ -155,9 +155,11 @@ static INPUT_PORTS_START( vector06 )
 INPUT_PORTS_END
 
 
-FLOPPY_FORMATS_MEMBER( vector06_state::floppy_formats )
-	FLOPPY_VECTOR06_FORMAT
-FLOPPY_FORMATS_END
+void vector06_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VECTOR06_FORMAT);
+}
 
 static void vector06_floppies(device_slot_interface &device)
 {

@@ -843,7 +843,7 @@ int rainbow_video_device::MHFU(int ASK)
 		if (MHFU_FLAG == true)
 			if (MHFU_counter < 254)
 				MHFU_counter++;
-
+		[[fallthrough]];
 	case MHFU_VALUE:
 		return MHFU_counter;
 

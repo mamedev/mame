@@ -850,10 +850,10 @@ void z100_state::z100(machine_config &config)
 
 	FD1797(config, m_fdc, 4_MHz_XTAL / 4);
 
-	FLOPPY_CONNECTOR(config, m_floppies[0], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[1], z100_floppies, "dd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[0], z100_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], z100_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], z100_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], z100_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	SCN2661B(config, m_epci[0], 4.9152_MHz_XTAL); // First 2661-2 serial port (printer)
 	m_epci[0]->txrdy_handler().set("epci0int", FUNC(input_merger_device::in_w<0>));

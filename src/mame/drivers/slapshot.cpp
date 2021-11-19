@@ -138,7 +138,7 @@ Region byte at offset 0x031:
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
 #include "machine/timekpr.h"
-#include "sound/2610intf.h"
+#include "sound/ymopn.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -249,7 +249,7 @@ void slapshot_state::sound_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr("z80bank");
 	map(0xc000, 0xdfff).ram();
-	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
+	map(0xe000, 0xe003).rw("ymsnd", FUNC(ym2610b_device::read), FUNC(ym2610b_device::write));
 	map(0xe200, 0xe200).nopr().w(m_tc0140syt, FUNC(tc0140syt_device::slave_port_w));
 	map(0xe201, 0xe201).rw(m_tc0140syt, FUNC(tc0140syt_device::slave_comm_r), FUNC(tc0140syt_device::slave_comm_w));
 	map(0xe400, 0xe403).nopw(); /* pan */
@@ -551,7 +551,7 @@ ROM_START( slapshot )
 	ROM_REGION( 0x100000, "sprites_hi", 0 )
 	ROM_LOAD       ( "d71-03.25", 0x000000, 0x100000, CRC(dccef9ec) SHA1(ee7a49727b822cf4c1d7acff994b77ea6191c423) )    /* OBJ 2bpp */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d71-06.37", 0x00000, 0x80000, CRC(f3324188) SHA1(70dd724441eae8614218bc7f0f51860bd2462f0c) )
 
 	/* no Delta-T samples */
@@ -584,7 +584,7 @@ ROM_START( slapshotj )
 	ROM_REGION( 0x100000, "sprites_hi", 0 )
 	ROM_LOAD       ( "d71-03.25", 0x000000, 0x100000, CRC(dccef9ec) SHA1(ee7a49727b822cf4c1d7acff994b77ea6191c423) )    /* OBJ 2bpp */
 
-	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 )   /* ADPCM samples */
 	ROM_LOAD( "d71-06.37", 0x00000, 0x80000, CRC(f3324188) SHA1(70dd724441eae8614218bc7f0f51860bd2462f0c) )
 
 	/* no Delta-T samples */
@@ -619,7 +619,7 @@ ROM_START( opwolf3 )
 	ROM_REGION( 0x200000, "sprites_hi", 0 )
 	ROM_LOAD( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) ) /* OBJ 2bpp */
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
@@ -646,7 +646,7 @@ ROM_START( opwolf3u )
 	ROM_REGION( 0x200000, "sprites_hi", 0 )
 	ROM_LOAD( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
@@ -673,7 +673,7 @@ ROM_START( opwolf3j )
 	ROM_REGION( 0x200000, "sprites_hi", 0 )
 	ROM_LOAD( "d74_04.25", 0x000000, 0x200000, CRC(2f385638) SHA1(1ba2ec7d9b1c491e1cc6d7e646e09ef2bc063f25) )
 
-	ROM_REGION( 0x200000, "ymsnd", 0 )  /* ADPCM samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 )  /* ADPCM samples */
 	ROM_LOAD( "d74_01.37", 0x000000, 0x200000, CRC(115313e0) SHA1(51a69e7a26960b1328ccefeaec0fb26bdccc39f2) )
 
 	/* no Delta-T samples */
@@ -687,10 +687,10 @@ void slapshot_state::driver_init()
 	gfx_element *gx1 = m_gfxdecode->gfx(1);
 
 	// allocate memory for the assembled data
-	u8 *srcdata = auto_alloc_array(machine(), u8, gx0->elements() * gx0->width() * gx0->height());
+	m_decoded_gfx = std::make_unique<u8[]>(gx0->elements() * gx0->width() * gx0->height());
 
 	// loop over elements
-	u8 *dest = srcdata;
+	u8 *dest = m_decoded_gfx.get();
 	for (int c = 0; c < gx0->elements(); c++)
 	{
 		const u8 *c0base = gx0->get_data(c);
@@ -712,7 +712,7 @@ void slapshot_state::driver_init()
 		}
 	}
 
-	gx0->set_raw_layout(srcdata, gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
+	gx0->set_raw_layout(m_decoded_gfx.get(), gx0->width(), gx0->height(), gx0->elements(), 8 * gx0->width(), 8 * gx0->width() * gx0->height());
 	gx0->set_colors(4096 / 64);
 	gx0->set_granularity(64);
 	m_gfxdecode->set_gfx(1, nullptr);

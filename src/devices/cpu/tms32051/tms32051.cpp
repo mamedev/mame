@@ -219,6 +219,99 @@ void tms32051_device::device_start()
 	memset(&m_timer, 0, sizeof(m_timer));
 	memset(&m_serial, 0, sizeof(m_serial));
 
+	save_item(NAME(m_pc));
+	save_item(NAME(m_op));
+	save_item(NAME(m_acc));
+	save_item(NAME(m_accb));
+	save_item(NAME(m_preg));
+	save_item(NAME(m_treg0));
+	save_item(NAME(m_treg1));
+	save_item(NAME(m_treg2));
+	save_pointer(NAME(&m_ar[0]), std::size(m_ar));
+	save_item(NAME(m_rptc));
+	save_item(NAME(m_bmar));
+	save_item(NAME(m_brcr));
+	save_item(NAME(m_paer));
+	save_item(NAME(m_pasr));
+	save_item(NAME(m_indx));
+	save_item(NAME(m_dbmr));
+	save_item(NAME(m_arcr));
+
+	save_item(STRUCT_MEMBER(m_st0, dp));
+	save_item(STRUCT_MEMBER(m_st0, intm));
+	save_item(STRUCT_MEMBER(m_st0, ovm));
+	save_item(STRUCT_MEMBER(m_st0, ov));
+	save_item(STRUCT_MEMBER(m_st0, arp));
+
+	save_item(STRUCT_MEMBER(m_st1, arb));
+	save_item(STRUCT_MEMBER(m_st1, cnf));
+	save_item(STRUCT_MEMBER(m_st1, tc));
+	save_item(STRUCT_MEMBER(m_st1, sxm));
+	save_item(STRUCT_MEMBER(m_st1, c));
+	save_item(STRUCT_MEMBER(m_st1, hm));
+	save_item(STRUCT_MEMBER(m_st1, xf));
+	save_item(STRUCT_MEMBER(m_st1, pm));
+
+	save_item(STRUCT_MEMBER(m_pmst, iptr));
+	save_item(STRUCT_MEMBER(m_pmst, avis));
+	save_item(STRUCT_MEMBER(m_pmst, ovly));
+	save_item(STRUCT_MEMBER(m_pmst, ram));
+	save_item(STRUCT_MEMBER(m_pmst, mpmc));
+	save_item(STRUCT_MEMBER(m_pmst, ndx));
+	save_item(STRUCT_MEMBER(m_pmst, trm));
+	save_item(STRUCT_MEMBER(m_pmst, braf));
+
+	save_item(NAME(m_ifr));
+	save_item(NAME(m_imr));
+	save_pointer(NAME(&m_pcstack[0]), std::size(m_pcstack));
+	save_item(NAME(m_pcstack_ptr));
+	save_item(NAME(m_rpt_start));
+	save_item(NAME(m_rpt_end));
+	save_item(NAME(m_cbcr));
+	save_item(NAME(m_cbsr1));
+	save_item(NAME(m_cber1));
+	save_item(NAME(m_cbsr2));
+	save_item(NAME(m_cber2));
+
+	save_item(STRUCT_MEMBER(m_timer, tddr));
+	save_item(STRUCT_MEMBER(m_timer, psc));
+	save_item(STRUCT_MEMBER(m_timer, tim));
+	save_item(STRUCT_MEMBER(m_timer, prd));
+
+	save_item(STRUCT_MEMBER(m_serial, drr));
+	save_item(STRUCT_MEMBER(m_serial, dxr));
+	save_item(STRUCT_MEMBER(m_serial, spc));
+
+	save_item(STRUCT_MEMBER(m_shadow, acc));
+	save_item(STRUCT_MEMBER(m_shadow, accb));
+	save_item(STRUCT_MEMBER(m_shadow, arcr));
+	save_item(STRUCT_MEMBER(m_shadow, indx));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, iptr));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, avis));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, ovly));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, ram));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, mpmc));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, ndx));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, trm));
+	save_item(STRUCT_MEMBER(m_shadow.pmst, braf));
+	save_item(STRUCT_MEMBER(m_shadow.st0, dp));
+	save_item(STRUCT_MEMBER(m_shadow.st0, intm));
+	save_item(STRUCT_MEMBER(m_shadow.st0, ovm));
+	save_item(STRUCT_MEMBER(m_shadow.st0, ov));
+	save_item(STRUCT_MEMBER(m_shadow.st0, arp));
+	save_item(STRUCT_MEMBER(m_shadow.st1, arb));
+	save_item(STRUCT_MEMBER(m_shadow.st1, cnf));
+	save_item(STRUCT_MEMBER(m_shadow.st1, tc));
+	save_item(STRUCT_MEMBER(m_shadow.st1, sxm));
+	save_item(STRUCT_MEMBER(m_shadow.st1, c));
+	save_item(STRUCT_MEMBER(m_shadow.st1, hm));
+	save_item(STRUCT_MEMBER(m_shadow.st1, xf));
+	save_item(STRUCT_MEMBER(m_shadow.st1, pm));
+	save_item(STRUCT_MEMBER(m_shadow, preg));
+	save_item(STRUCT_MEMBER(m_shadow, treg0));
+	save_item(STRUCT_MEMBER(m_shadow, treg1));
+	save_item(STRUCT_MEMBER(m_shadow, treg2));
+
 	state_add( TMS32051_PC,    "PC", m_pc).formatstr("%04X");
 	state_add( TMS32051_ACC,   "ACC", m_acc).formatstr("%08X");
 	state_add( TMS32051_ACCB,  "ACCB", m_accb).formatstr("%08X");

@@ -18,10 +18,10 @@
 #include "machine/wd_fdc.h"
 #include "machine/i8251.h"
 #include "machine/msm58321.h"
-#include "sound/2612intf.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/spkrdev.h"
+#include "sound/ymopn.h"
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
@@ -160,6 +160,9 @@ protected:
 	void ux_mem(address_map &map);
 
 	virtual void driver_start() override;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
@@ -167,7 +170,7 @@ protected:
 	required_device_array<upd71071_device, 2> m_dma;
 	optional_device<fmscsi_device> m_scsi;
 	required_device_array<floppy_connector, 2> m_flop;
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
@@ -276,9 +279,6 @@ private:
 	optional_shared_ptr<uint32_t> m_nvram;
 	optional_shared_ptr<uint16_t> m_nvram16;
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -394,6 +394,7 @@ private:
 	static const device_timer_id TIMER_WAIT = 5;
 	static const device_timer_id TIMER_CDSTATUS = 6;
 	static const device_timer_id TIMER_CDDA = 7;
+	static const device_timer_id TIMER_SPRITES = 8;
 	void freerun_inc();
 	void intervaltimer2_timeout();
 	void poll_keyboard();
@@ -412,19 +413,19 @@ private:
 	u8 m_vram_mask_addr;
 
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
-	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
+	void draw_sprites();
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
 	uint8_t get_slave_ack(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	void towns_sprite_start();
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
 	void towns_update_palette();
 	void render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
 	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
-	void draw_sprites(const rectangle* rect);
 	void towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
 	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int line,int scanline);
 	void towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
@@ -457,8 +458,10 @@ class marty_state : public towns_state
 		: towns_state(mconfig, type, tag)
 	{ }
 
-	virtual void driver_start() override;
 	void marty(machine_config &config);
+
+protected:
+	virtual void driver_start() override;
 };
 
 #endif // MAME_INCLUDES_FMTOWNS_H

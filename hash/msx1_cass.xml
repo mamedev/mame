@@ -6662,7 +6662,7 @@ license:CC0
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="62870">
-				<rom name="harry fox yki no maoh (1985)(micro cabin)(jp)[bload'cas-',r].cas" size="62870" crc="878b3fd2" sha1="3ed7bfc036f1561d789fedc9ab86e5bdc65be01e"/>
+				<rom name="hurry fox yuki no maoh (1985)(micro cabin)(jp)[bload'cas-',r].cas" size="62870" crc="878b3fd2" sha1="3ed7bfc036f1561d789fedc9ab86e5bdc65be01e"/>
 			</dataarea>
 		</part>
 	</software>

@@ -22,7 +22,7 @@
 #include "machine/tms9901.h"
 #include "machine/ram.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ccfdc_dec_pal_device;
 class ccfdc_sel_pal_device;
@@ -68,7 +68,7 @@ protected:
 
 	void common_config(machine_config& config);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// Link to the WD controller on the board.
 	required_device<wd_fdc_device_base>   m_wdc;
@@ -84,7 +84,7 @@ protected:
 	bool ready_trap_active();
 
 	// Deliver the current state of the address bus
-	uint16_t get_address();
+	offs_t get_address();
 
 	// Wait state logic
 	void operate_ready_line();
@@ -240,7 +240,7 @@ private:
 	void device_config_complete() override;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_CCDCC, bus::ti99::peb, corcomp_dcc_device)
 DECLARE_DEVICE_TYPE_NS(TI99_CCFDC, bus::ti99::peb, corcomp_fdca_device)

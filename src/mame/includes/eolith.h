@@ -45,6 +45,7 @@ public:
 	void init_speedup();
 
 protected:
+	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -66,8 +67,6 @@ private:
 	void soundcpu_to_qs1000(uint8_t data);
 
 	DECLARE_MACHINE_RESET(eolith);
-	DECLARE_VIDEO_START(eolith);
-
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

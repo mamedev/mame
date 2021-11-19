@@ -143,8 +143,7 @@ void hnayayoi_state::dynax_blitter_rev1_start_w(uint8_t data)
 					return;
 				}
 				x = sx + rom[m_blit_src++];
-				/* fall through into next case */
-
+				[[fallthrough]];
 			case 0xc:
 				if (m_blit_src >= romlen)
 				{
@@ -152,8 +151,7 @@ void hnayayoi_state::dynax_blitter_rev1_start_w(uint8_t data)
 					return;
 				}
 				cmd = rom[m_blit_src++];
-				/* fall through into next case */
-
+				[[fallthrough]];
 			case 0xb:
 			case 0xa:
 			case 0x9:

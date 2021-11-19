@@ -42,8 +42,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_ram(*this, "ram")
+		m_palette(*this, "palette")
 	{ }
 
 	void tugboat(machine_config &config);
@@ -66,7 +65,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_ram;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
 	uint8_t m_hd46505_0_reg[18];
 	uint8_t m_hd46505_1_reg[18];
@@ -93,6 +92,7 @@ private:
 void tugboat_state::machine_start()
 {
 	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	save_item(NAME(m_hd46505_0_reg));
 	save_item(NAME(m_hd46505_1_reg));
@@ -141,8 +141,8 @@ void tugboat_state::hd46505_1_w(offs_t offset, uint8_t data)
 
 void tugboat_state::score_w(offs_t offset, uint8_t data)
 {
-		if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
-		if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
+	if (offset>=0x8) m_program.write_byte(0x291d + 32*offset + 32*(1-8), data ^ 0x0f);
+	if (offset<0x8 ) m_program.write_byte(0x291d + 32*offset + 32*9,     data ^ 0x0f);
 }
 
 void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect,
@@ -152,8 +152,8 @@ void tugboat_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect
 	{
 		for (int x = 0; x < 32; x++)
 		{
-			int attr = m_ram[addr + 0x400];
-			int code = ((attr & 0x01) << 8) | m_ram[addr];
+			int attr = m_program.read_byte(addr + 0x400);
+			int code = ((attr & 0x01) << 8) | m_program.read_byte(addr);
 			int color = (attr & 0x3c) >> 2;
 
 			int rgn, transpen;
@@ -234,7 +234,7 @@ void tugboat_state::machine_reset()
 void tugboat_state::main_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x01ff).ram().share("ram");
+	map(0x0000, 0x01ff).ram();
 	map(0x1060, 0x1061).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0x10a0, 0x10a1).w(FUNC(tugboat_state::hd46505_0_w));  /* scrolling is performed changing the start_addr register (0C/0D) */
 	map(0x10c0, 0x10c1).w(FUNC(tugboat_state::hd46505_1_w));

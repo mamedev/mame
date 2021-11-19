@@ -27,6 +27,9 @@ public:
 	auto flg() { return m_flg_handler.bind(); }
 	auto sts() { return m_sts_handler.bind(); }
 
+	// Set unit name
+	void set_name(const std::string& name);
+
 	// Register read/write
 	void reg_w(offs_t offset, uint16_t data);
 	uint16_t reg_r(offs_t offset);

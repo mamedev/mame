@@ -39,7 +39,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 
 	{
 		// Add image menu only if image devices exist
-		image_interface_iterator iter(machine().root_device());
+		image_interface_enumerator iter(machine().root_device());
 		if (iter.first() != nullptr)
 		{
 			m_devices_menu = CreatePopupMenu();
@@ -167,7 +167,7 @@ void consolewin_info::update_menu()
 	{
 		// create the image menu
 		uint32_t cnt = 0;
-		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
+		for (device_image_interface &img : image_interface_enumerator(machine().root_device()))
 		{
 			if (!img.user_loadable())
 				continue;
@@ -257,7 +257,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) >= ID_DEVICE_OPTIONS))
 	{
 		uint32_t const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
-		image_interface_iterator iter(machine().root_device());
+		image_interface_enumerator iter(machine().root_device());
 		device_image_interface *const img = iter.byindex(devid);
 		if (img != nullptr)
 		{
@@ -563,14 +563,14 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 	std::string sl_dir, opt_name = img->instance_name();
 
 	// Get the path to suitable software
-	for (software_list_device &swlist : software_list_device_iterator(machine().root_device()))
+	for (software_list_device &swlist : software_list_device_enumerator(machine().root_device()))
 	{
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
 			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
 			{
-				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+				for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 				{
 					if (!image.user_loadable())
 						continue;

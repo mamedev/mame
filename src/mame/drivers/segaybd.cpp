@@ -67,7 +67,7 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 #include "machine/segaic16.h"
 #include "machine/315_5296.h"
 #include "sound/segapcm.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 #include "pdrift.lh"
@@ -147,7 +147,7 @@ void segaybd_state::output2_w(uint8_t data)
 
 	// D7 = /MUTE
 	// D6-D0 = FLT31-25
-	machine().sound().system_enable(data & 0x80);
+	machine().sound().system_mute(!BIT(data, 7));
 }
 
 

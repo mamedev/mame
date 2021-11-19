@@ -442,9 +442,11 @@ void sf7000_state::ppi_pc_w(uint8_t data)
     upd765_interface sf7000_upd765_interface
 -------------------------------------------------*/
 
-FLOPPY_FORMATS_MEMBER( sf7000_state::floppy_formats )
-	FLOPPY_SF7000_FORMAT
-FLOPPY_FORMATS_END
+void sf7000_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_SF7000_FORMAT);
+}
 
 /*-------------------------------------------------
     floppy_interface sf7000_floppy_interface

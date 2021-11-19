@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Ville Linde
 /*
 
-  machine/model3.c: functions emulating various aspects of the Model 3 hardware
+  machine/model3.cpp: functions emulating various aspects of the Model 3 hardware
 
 */
 

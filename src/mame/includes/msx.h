@@ -17,7 +17,7 @@
 #include "bus/centronics/ctronics.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "video/v9938.h"
 #include "video/tms9928a.h"
 #include "imagedev/cassette.h"
@@ -308,7 +308,7 @@ private:
 	void msx_memory_reset();
 	void msx_memory_init();
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	INTERRUPT_GEN_MEMBER(msx_interrupt);
 
@@ -483,6 +483,7 @@ private:
 	void msx2(machine_config &config);
 	void msx2p(machine_config &config);
 	void msx2_pal(machine_config &config);
+	void turbor(machine_config &config);
 
 	void msx2_cartlist(machine_config &config);
 	void msx2_floplist(machine_config &config);

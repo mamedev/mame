@@ -21,7 +21,7 @@ Recreativos Franco used this hardware from 1987 to 1992 on several machines, inc
   -Baby Formula
   -Limon y Baby
   -Limon y Baby 100
-  -Baby Afrojin Dakar 3
+  -Baby Ajofrin Dakar 3
   -El Tren
   -Baby Derby
   Etc.
@@ -37,6 +37,9 @@ Recreativos Franco used this hardware from 1987 to 1992 on several machines, inc
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
+
+namespace
+{
 
 class rfslots8085_state : public driver_device
 {
@@ -89,8 +92,6 @@ void rfslots8085_state::sound_io_map(address_map &map)
 
 static INPUT_PORTS_START(unkrfslt)
 	PORT_START("DSW") // 1 x 6-dips bank
-	PORT_BIT(0x80, 0x80, IPT_UNKNOWN)
-	PORT_BIT(0x40, 0x40, IPT_UNKNOWN)
 	PORT_BIT(0x20, 0x20, IPT_UNKNOWN)
 	PORT_BIT(0x10, 0x10, IPT_UNKNOWN)
 	PORT_BIT(0x08, 0x08, IPT_UNKNOWN)
@@ -183,6 +184,8 @@ ROM_START(unkrfslt)
 	ROM_LOAD( "8a.ic44", 0x0000, 0x1000, CRC(51b564b6) SHA1(8992a5cb4dff8c6b38b77a7e0199a71f2969b496) )
 	ROM_IGNORE(                  0x3000 ) // 0xff filled and it's outside of the 8035's global address mask (fff)
 ROM_END
+
+} // anonymous namespace
 
 // Date "25-05-87" engraved on the PCB
 GAME( 1987?, unkrfslt, 0, unkrfslt, unkrfslt, rfslots8085_state, empty_init, ROT0, "Recreativos Franco", "unknown Recreativos Franco slot machine", MACHINE_IS_SKELETON_MECHANICAL )

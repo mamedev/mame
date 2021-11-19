@@ -258,9 +258,10 @@ static void c1581_floppies(device_slot_interface &device)
 //  FLOPPY_FORMATS( c1581_device::floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( c1581_device::floppy_formats )
-	FLOPPY_D81_FORMAT
-FLOPPY_FORMATS_END
+void c1581_device::floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_D81_FORMAT);
+}
 
 
 //-------------------------------------------------

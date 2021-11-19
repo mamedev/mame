@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+
+Floppies for the TRS-80 Model 1 Level 2, and clones.
+
+Compatibility flags:
+1 = trs80l2 and clones
+3 = trs80m3
+4 = trs80m4
+
+If no flag is specified, it's assumed it works on all of them.
+
+Many boot disks ask for the date. The assumed format is MM/DD/YY. Some require the year to be in the range 80 to 87.
+Many boot disks also ask for the time, but this can usually be bypassed by pressing enter. The format is HH:MM:SS .
+
+Radionic disk reading is unreliable and can often hang doing DIR.
+
+-->
+<softwarelist name="trs80_flop" description="Radio Shack TRS-80 floppies">
+
+	<software name="ldos531">
+		<description>LDOS 5.3.1</description>
+		<year>1991</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Make sure that Floppy is enabled in Machine Configuration" />
+		<sharedfeat name="compatibility" value="1" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x15e00">
+				<rom name="ld1-531.jv1" size="0x15e00" crc="ce54fb23" sha1="373d0887bc4946df010f39842e768bf911cb2813"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lensman">
+		<description>Lensman/DOS</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Make sure that Floppy is enabled in Machine Configuration" />
+		<sharedfeat name="compatibility" value="3,4" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x2f200">
+				<rom name="lensman.jv3" size="0x2f200" crc="700be6cb" sha1="caecf3f9d04860c503c2f9df5bbc9259685ace0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trs621">
+		<description>TRSDOS 6.21</description>
+		<year>1986</year>
+		<publisher>Radio Shack</publisher>
+		<info name="usage" value="Make sure that Floppy is enabled in Machine Configuration" />
+		<sharedfeat name="compatibility" value="4" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x3e810">
+				<rom name="trs621.dmk" size="0x3e810" crc="6e19896e" sha1="e98d0e4509e1e316caf5c50920fd3ddcc715cf49"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm22">
+		<description>CP/M 2.2</description>
+		<year>1982</year>
+		<publisher>Digital Research</publisher>
+		<info name="usage" value="Make sure that Floppy is enabled in Machine Configuration" />
+		<sharedfeat name="compatibility" value="4" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="0x295c6">
+				<rom name="cpm.imd" size="0x295c6" crc="f483e444" sha1="63e814c8679b426515517b2a640db268ef851e60"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

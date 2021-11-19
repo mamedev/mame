@@ -47,7 +47,6 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_upd71059c(*this, "upd71059c"),
-		m_eeprom(*this, "eeprom"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
@@ -86,7 +85,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<pic8259_device> m_upd71059c;
 
-	optional_shared_ptr<uint8_t> m_eeprom;
 	optional_memory_bank m_mainbank;
 
 	emu_timer *m_spritebuffer_timer;
@@ -99,8 +97,6 @@ private:
 	uint8_t m_palette_bank;
 	std::vector<uint16_t> m_paletteram;
 
-	uint16_t eeprom_r(offs_t offset);
-	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void coincounter_w(uint8_t data);
 	void bankswitch_w(uint8_t data);
 	void sound_reset_w(uint16_t data);

@@ -79,6 +79,9 @@ private:
 
 void metlfrzr_state::video_start()
 {
+	// assumes it can make an address mask with m_vram.length() - 1
+	assert(!(m_vram.length() & (m_vram.length() - 1)));
+
 	m_fg_tilebank = 0;
 	m_rowscroll_enable = false;
 
@@ -98,7 +101,7 @@ void metlfrzr_state::video_start()
 void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_fg_tilebank);
-	const uint16_t vram_mask = m_vram.mask() >> 1;
+	const uint16_t vram_mask = (m_vram.length() - 1) >> 1;
 	int count;
 	int x_scroll_base;
 	int x_scroll_shift;
@@ -195,7 +198,7 @@ void metlfrzr_state::metlfrzr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xcfff).ram().share("vram");
+	map(0xc000, 0xcfff).ram().share(m_vram);
 	map(0xd000, 0xd1ff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 	map(0xd200, 0xd3ff).ram().w(m_palette, FUNC(palette_device::write_indirect_ext)).share("palette_ext");
 
@@ -403,8 +406,8 @@ void metlfrzr_state::metlfrzr(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4));    /* 3.579545 MHz */
 	ymsnd.irq_handler().set("t5182", FUNC(t5182_device::ym2151_irq_handler));
-	ymsnd.add_route(0, "mono", 1.0);
-	ymsnd.add_route(1, "mono", 1.0);
+	ymsnd.add_route(0, "mono", 0.5);
+	ymsnd.add_route(1, "mono", 0.5);
 }
 
 

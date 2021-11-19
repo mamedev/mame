@@ -57,11 +57,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(A1200_KBD, bus::amiga::keyboard, a1200_kbd_device, "a1200kbd_rb", "Amiga 1200 Keyboard Rev B")
+DEFINE_DEVICE_TYPE(A1200_KBD, bus::amiga::keyboard::a1200_kbd_device, "a1200kbd_rb", "Amiga 1200 Keyboard Rev B")
 
 
 
-namespace bus { namespace amiga { namespace keyboard {
+namespace bus::amiga::keyboard {
 
 namespace {
 
@@ -211,4 +211,4 @@ void a1200_kbd_device::device_reset_after_children()
 	m_mpu->set_input_line(M68HC05_IRQ_LINE, BIT(ioport("IRQ")->read(), 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-} } } // namespace bus::amiga::keyboard
+} // namespace bus::amiga::keyboard

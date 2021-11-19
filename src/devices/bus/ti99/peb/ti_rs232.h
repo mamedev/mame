@@ -19,7 +19,7 @@
 #include "machine/74259.h"
 #include "machine/tms9902.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ti_pio_attached_device;
 class ti_rs232_attached_device;
@@ -176,7 +176,7 @@ protected:
 	void    call_unload() override;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_RS232,     bus::ti99::peb, ti_rs232_pio_device)
 DECLARE_DEVICE_TYPE_NS(TI99_RS232_DEV, bus::ti99::peb, ti_rs232_attached_device)

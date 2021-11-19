@@ -25,7 +25,6 @@ public:
 		, m_subcpu(*this, "sub")
 		, m_seta001(*this, "spritegen")
 		, m_palette(*this, "palette")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_mainbank(*this, "mainbank")
 		, m_subbank(*this, "subbank")
@@ -52,9 +51,8 @@ protected:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_subcpu;
-	optional_device<seta001_device> m_seta001;
+	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	optional_device<address_map_bank_device> m_mainbank; /* FIXME: optional because of reuse from cchance.cpp */
 	optional_memory_bank m_subbank; /* FIXME: optional because of reuse from cchance.cpp */

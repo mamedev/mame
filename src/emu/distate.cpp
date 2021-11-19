@@ -65,8 +65,6 @@ device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u
 	// override well-known symbols
 	if (index == STATE_GENPCBASE)
 		m_symbol.assign("CURPC");
-	else if (index == STATE_GENSP)
-		m_symbol.assign("CURSP");
 	else if (index == STATE_GENFLAGS)
 		m_symbol.assign("CURFLAGS");
 }
@@ -128,7 +126,7 @@ void device_state_entry::format_from_mask()
 
 	// make up a format based on the mask
 	if (m_datamask == 0)
-		throw emu_fatalerror("%s state entry requires a nonzero mask\n", m_symbol.c_str());
+		throw emu_fatalerror("%s state entry requires a nonzero mask\n", m_symbol);
 	int width = 0;
 	for (u64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
@@ -331,18 +329,18 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 					width--;
 				}
 				// fall through to unsigned case
-
+				[[fallthrough]];
 			// u outputs as unsigned decimal
 			case 'u':
 				if (width == 0)
 					throw emu_fatalerror("Width required for %%u formats\n");
 				hitnonzero = false;
-				while (leadzero && width > ARRAY_LENGTH(k_decimal_divisor))
+				while (leadzero && width > std::size(k_decimal_divisor))
 				{
 					dest.append(" ");
 					width--;
 				}
-				for (int digitnum = ARRAY_LENGTH(k_decimal_divisor) - 1; digitnum >= 0; digitnum--)
+				for (int digitnum = std::size(k_decimal_divisor) - 1; digitnum >= 0; digitnum--)
 				{
 					int digit = (result >= k_decimal_divisor[digitnum]) ? (result / k_decimal_divisor[digitnum]) % 10 : 0;
 					if (digit != 0)
@@ -491,9 +489,6 @@ device_state_interface::device_state_interface(const machine_config &mconfig, de
 	: device_interface(device, "state")
 {
 	memset(m_fast_state, 0, sizeof(m_fast_state));
-
-	// configure the fast accessor
-	device.interfaces().m_state = this;
 }
 
 

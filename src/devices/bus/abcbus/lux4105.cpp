@@ -41,7 +41,14 @@ Notes:
 
     TODO
 
-    - sector length error in read check after format
+    - sector length error in read check after format (breakpoint @ 97ba)
+
+        0C xx               INITIALIZE DRIVE CHARACTERISTICS
+        01 00 00 00 00 02   RECALIBRATE
+        04 00 00 00 05 02   FORMAT UNIT
+        08 00 00 00 11 02   READ
+        ...transfer 8704 (17*512) bytes...
+        error
 
 */
 

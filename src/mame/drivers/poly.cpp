@@ -238,9 +238,11 @@ void poly_state::init_poly()
 }
 
 
-FLOPPY_FORMATS_MEMBER(polydev_state::floppy_formats)
-	FLOPPY_FLEX_FORMAT
-FLOPPY_FORMATS_END
+void polydev_state::floppy_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+}
 
 static void poly_floppies(device_slot_interface &device)
 {

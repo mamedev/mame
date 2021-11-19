@@ -7,13 +7,22 @@
     To Do:
         - Cycle counts
         - STOP, WAIT opcodes
-        - Peripherals
+        - ADC, UART, SPI, Watchdog, Auto-Reload Timer peripherals
+        - Interrupts
 
 **********************************************************************/
 
 #include "emu.h"
 #include "st62xx.h"
 #include "st62xx_dasm.h"
+
+#define LOG_UNIMPL      (1 << 1)
+#define LOG_GPIO        (1 << 2)
+#define LOG_TIMER       (1 << 3)
+#define LOG_ALL         (LOG_UNIMPL | LOG_GPIO | LOG_TIMER)
+
+#define VERBOSE         (LOG_ALL)
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ST6228,   st6228_device,   "st6228",   "STmicro ST6228")
 
@@ -28,26 +37,39 @@ st6228_device::st6228_device(const machine_config &mconfig, const char *tag, dev
 	, m_portb_out(*this)
 	, m_portc_out(*this)
 	, m_portd_out(*this)
+	, m_timer_out(*this)
 	, m_program(nullptr)
 	, m_data(nullptr)
-	, m_rambank(*this, "rambank")
-	, m_program_rombank(*this, "program_rombank")
-	, m_data_rombank(*this, "data_rombank")
+	, m_ram_bank(*this, "rambank")
+	, m_data_bank(*this, "databank")
+	, m_program_rom_bank(*this, "program_rombank")
+	, m_data_rom_bank(*this, "data_rombank")
 	, m_rom(*this, this->tag())
 {
 }
 
 void st6228_device::st6228_program_map(address_map &map)
 {
-	map(0x000, 0x7ff).bankr(m_program_rombank);
+	map(0x000, 0x7ff).bankr(m_program_rom_bank);
 	map(0x800, 0xfff).rom().region(tag(), 0x800);
 }
 
 void st6228_device::st6228_data_map(address_map &map)
 {
-	map(0x00, 0x3f).bankrw(m_rambank);
-	map(0x40, 0x7f).bankr(m_data_rombank);
-	map(0x80, 0xff).rw(FUNC(st6228_device::regs_r), FUNC(st6228_device::regs_w));
+	map(0x00, 0x3f).bankrw(m_ram_bank);
+	map(0x40, 0x7f).bankr(m_data_rom_bank);
+	map(0x80, 0xbf).bankrw(m_data_bank);
+	map(0xc0, 0xff).rw(FUNC(st6228_device::unimplemented_reg_r), FUNC(st6228_device::unimplemented_reg_w));
+	map(0xc0, 0xc3).rw(FUNC(st6228_device::gpio_data_r), FUNC(st6228_device::gpio_data_w));
+	map(0xc4, 0xc7).rw(FUNC(st6228_device::gpio_dir_r), FUNC(st6228_device::gpio_dir_w));
+	map(0xc9, 0xc9).w(FUNC(st6228_device::data_rom_window_w));
+	map(0xca, 0xca).w(FUNC(st6228_device::rom_bank_select_w));
+	map(0xcb, 0xcb).w(FUNC(st6228_device::ram_bank_select_w));
+	map(0xcc, 0xcf).rw(FUNC(st6228_device::gpio_option_r), FUNC(st6228_device::gpio_option_w));
+	map(0xd2, 0xd2).rw(FUNC(st6228_device::timer_prescale_r), FUNC(st6228_device::timer_prescale_w));
+	map(0xd3, 0xd3).rw(FUNC(st6228_device::timer_counter_r), FUNC(st6228_device::timer_counter_w));
+	map(0xd4, 0xd4).rw(FUNC(st6228_device::timer_status_r), FUNC(st6228_device::timer_control_w));
+	map(0xd8, 0xd8).w(FUNC(st6228_device::watchdog_w));
 }
 
 void st6228_device::device_start()
@@ -93,17 +115,24 @@ void st6228_device::device_start()
 	save_item(NAME(m_port_input));
 	save_item(NAME(m_port_irq_enable));
 
+	save_item(NAME(m_timer_divider));
+	save_item(NAME(m_timer_pin));
+	save_item(NAME(m_timer_active));
+
 	// set our instruction counter
 	set_icountptr(m_icount);
 
-	m_rambank->configure_entries(0, 2, m_ram, 0x40);
-	m_program_rombank->configure_entries(0, 4, m_rom->base(), 0x800);
-	m_data_rombank->configure_entries(0, 128, m_rom->base(), 0x40);
+	m_ram_bank->configure_entries(0, 2, m_ram, 0x40);
+	m_program_rom_bank->configure_entries(0, 4, m_rom->base(), 0x800);
+	m_data_rom_bank->configure_entries(0, 128, m_rom->base(), 0x40);
+
+	m_data_bank->set_base(&m_regs[0x80]);
 
 	m_porta_out.resolve_all_safe();
 	m_portb_out.resolve_all_safe();
 	m_portc_out.resolve_all_safe();
 	m_portd_out.resolve_all_safe();
+	m_timer_out.resolve_safe();
 }
 
 void st6228_device::device_reset()
@@ -121,19 +150,23 @@ void st6228_device::device_reset()
 	std::fill(std::begin(m_port_input), std::end(m_port_input), 0);
 	std::fill(std::begin(m_port_irq_enable), std::end(m_port_irq_enable), 0);
 
-	m_pc = m_program->read_word(VEC_RESET);
+	m_pc = VEC_RESET;
 	m_stack_index = 0;
 	m_mode = MODE_NMI;
 	m_prev_mode = MODE_NORMAL;
 
-	m_rambank->set_entry(0);
-	m_program_rombank->set_entry(0);
-	m_data_rombank->set_entry(0);
+	m_ram_bank->set_entry(0);
+	m_program_rom_bank->set_entry(0);
+	m_data_rom_bank->set_entry(0);
 
 	m_regs[REG_TIMER_COUNT] = 0xff;
 	m_regs[REG_TIMER_PRESCALE] = 0x7f;
 	m_regs[REG_WATCHDOG] = 0xfe;
 	m_regs[REG_AD_CONTROL] = 0x40;
+
+	m_timer_divider = 12;
+	m_timer_pin = 0;
+	m_timer_active = false;
 }
 
 device_memory_interface::space_config_vector st6228_device::memory_space_config() const
@@ -190,7 +223,7 @@ WRITE_LINE_MEMBER(st6228_device::portd5_w) { m_port_input[PORT_D] &= ~(1 << 5); 
 WRITE_LINE_MEMBER(st6228_device::portd6_w) { m_port_input[PORT_D] &= ~(1 << 6); m_port_input[PORT_D] |= (state << 6); }
 WRITE_LINE_MEMBER(st6228_device::portd7_w) { m_port_input[PORT_D] &= ~(1 << 7); m_port_input[PORT_D] |= (state << 7); }
 
-void st6228_device::set_port_output_bit(uint8_t index, uint8_t bit, uint8_t state)
+void st6228_device::gpio_set_output_bit(uint8_t index, uint8_t bit, uint8_t state)
 {
 	switch (index)
 	{
@@ -213,7 +246,7 @@ void st6228_device::set_port_output_bit(uint8_t index, uint8_t bit, uint8_t stat
 	}
 }
 
-void st6228_device::update_port_mode(uint8_t index, uint8_t changed)
+void st6228_device::gpio_update_mode(uint8_t index, uint8_t changed)
 {
 	const uint8_t dir = m_port_dir[index];
 	const uint8_t option = m_port_option[index];
@@ -252,182 +285,210 @@ void st6228_device::update_port_mode(uint8_t index, uint8_t changed)
 	}
 }
 
-void st6228_device::regs_w(offs_t offset, uint8_t data)
+void st6228_device::unimplemented_reg_w(offs_t offset, uint8_t data)
 {
-	offset += 0x80;
+	LOGMASKED(LOG_UNIMPL, "%s: unimplemented_reg_w: Unimplemented write: %02x = %02x\n", machine().describe_context(), offset + 0xc0, data);
+}
 
-	if (offset > REG_W && offset < REG_PORTA_DATA)
+uint8_t st6228_device::unimplemented_reg_r(offs_t offset)
+{
+	LOGMASKED(LOG_UNIMPL, "%s: unimplemented_reg_r: Unimplemented read: %02x\n", machine().describe_context(), offset + 0xc0);
+	return 0;
+}
+
+void st6228_device::data_rom_window_w(offs_t offset, uint8_t data)
+{
+	m_regs[REG_DATA_ROM_WINDOW] = data;
+	m_data_rom_bank->set_entry(data & 0x7f);
+}
+
+void st6228_device::rom_bank_select_w(offs_t offset, uint8_t data)
+{
+	m_regs[REG_ROM_BANK_SELECT] = data;
+	m_program_rom_bank->set_entry(data & 3);
+}
+
+void st6228_device::ram_bank_select_w(offs_t offset, uint8_t data)
+{
+	m_regs[REG_RAM_BANK_SELECT] = data;
+	m_ram_bank->set_entry(data & 1);
+}
+
+void st6228_device::gpio_data_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_GPIO, "%s: gpio_data_w: Port %c Data = %02x\n", machine().describe_context(), offset + 'A', data);
+	const uint8_t old_data = m_port_data[offset];
+	const uint8_t changed = old_data ^ data;
+
+	m_port_data[offset] = data;
+	gpio_update_mode(offset, changed);
+
+	if (changed & m_port_dir[offset])
 	{
-		// Data RAM
-		m_regs[offset] = data;
-		return;
-	}
-
-	static char PORT_NAMES[4] = { 'A', 'B', 'C', 'D' };
-
-	switch (offset)
-	{
-		case REG_X:
-		case REG_Y:
-		case REG_V:
-		case REG_W:
-		case REG_A:
-			m_regs[offset] = data;
-			break;
-
-		case REG_DATA_ROM_WINDOW:
-			m_regs[offset] = data;
-			m_data_rombank->set_entry(data & 0x7f);
-			break;
-
-		case REG_ROM_BANK_SELECT:
-			m_regs[offset] = data;
-			m_program_rombank->set_entry(data & 3);
-			break;
-
-		case REG_RAM_BANK_SELECT:
-			m_regs[offset] = data;
-			m_rambank->set_entry(data & 1);
-			break;
-
-		case REG_PORTA_DATA:
-		case REG_PORTB_DATA:
-		case REG_PORTC_DATA:
-		case REG_PORTD_DATA:
+		for (uint8_t bit = 0; bit < 8; bit++)
 		{
-			const uint8_t index = offset - REG_PORTA_DATA;
-			logerror("%s: Port %c data = %02x\n", machine().describe_context(), PORT_NAMES[index], data);
-			const uint8_t old_data = m_port_data[index];
-			const uint8_t changed = old_data ^ data;
-
-			m_port_data[index] = data;
-			update_port_mode(index, changed);
-
-			if (changed & m_port_dir[index])
-			{
-				for (uint8_t bit = 0; bit < 8; bit++)
-				{
-					if (BIT(changed, bit))
-						set_port_output_bit(index, bit, BIT(data, bit));
-				}
-			}
-			break;
+			if (BIT(changed, bit))
+				gpio_set_output_bit(offset, bit, BIT(data, bit));
 		}
-
-		case REG_PORTA_DIR:
-		case REG_PORTB_DIR:
-		case REG_PORTC_DIR:
-		case REG_PORTD_DIR:
-		{
-			const uint8_t index = offset - REG_PORTA_DIR;
-			logerror("%s: Port %c dir = %02x\n", machine().describe_context(), PORT_NAMES[index], data);
-			const uint8_t old_dir = m_port_dir[index];
-			const uint8_t changed = old_dir ^ data;
-
-			m_port_dir[index] = data;
-			update_port_mode(index, changed);
-
-			if (changed)
-			{
-				for (uint8_t bit = 0; bit < 8; bit++)
-				{
-					if (BIT(changed, bit))
-					{
-						set_port_output_bit(index, bit, BIT(m_port_data[index], bit));
-					}
-				}
-			}
-			break;
-		}
-
-		case REG_PORTA_OPTION:
-		case REG_PORTB_OPTION:
-		case REG_PORTC_OPTION:
-		case REG_PORTD_OPTION:
-		{
-			const uint8_t index = offset - REG_PORTA_OPTION;
-			logerror("%s: Port %c option = %02x\n", machine().describe_context(), PORT_NAMES[index], data);
-
-			const uint8_t changed = m_port_option[index] ^ data;
-			m_port_option[index] = data;
-
-			update_port_mode(index, changed);
-			break;
-		}
-
-		case REG_WATCHDOG:
-			// Do nothing for now
-			break;
-
-		default:
-			logerror("%s: Unknown register write: %02x = %02x\n", machine().describe_context(), offset, data);
-			break;
 	}
 }
 
-uint8_t st6228_device::regs_r(offs_t offset)
+void st6228_device::gpio_dir_w(offs_t offset, uint8_t data)
 {
-	uint8_t ret = 0;
-	offset += 0x80;
+	LOGMASKED(LOG_GPIO, "%s: gpio_dir_w: Port %c Direction = %02x\n", machine().describe_context(), offset + 'A', data);
+	const uint8_t old_dir = m_port_dir[offset];
+	const uint8_t changed = old_dir ^ data;
 
-	if (offset > REG_W && offset < REG_PORTA_DATA)
+	m_port_dir[offset] = data;
+	gpio_update_mode(offset, changed);
+
+	if (changed)
 	{
-		// Data RAM
-		return m_regs[offset];
+		for (uint8_t bit = 0; bit < 8; bit++)
+		{
+			if (BIT(changed, bit))
+			{
+				gpio_set_output_bit(offset, bit, BIT(m_port_data[offset], bit));
+			}
+		}
+	}
+}
+
+void st6228_device::gpio_option_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_GPIO, "%s: gpio_option_w: Port %c Option = %02x\n", machine().describe_context(), offset + 'A', data);
+
+	const uint8_t changed = m_port_option[offset] ^ data;
+	m_port_option[offset] = data;
+
+	gpio_update_mode(offset, changed);
+}
+
+void st6228_device::watchdog_w(offs_t offset, uint8_t data)
+{
+	// FIXME: Not yet implemented.
+}
+
+uint8_t st6228_device::gpio_data_r(offs_t offset)
+{
+	const uint8_t data = (m_port_data[offset] & m_port_dir[offset]) |
+						 (m_port_input[offset] & ~m_port_dir[offset]) |
+						 (m_port_pullup[offset] & ~m_port_dir[offset]);
+	LOGMASKED(LOG_GPIO, "%s: gpio_data_r: Port %c Data: %02x\n", machine().describe_context(), offset + 'A', data);
+	return data;
+}
+
+uint8_t st6228_device::gpio_dir_r(offs_t offset)
+{
+	const uint8_t data = m_port_dir[offset];
+	LOGMASKED(LOG_GPIO, "%s: gpio_dir_r: Port %c Direction: %02x\n", machine().describe_context(), offset + 'A', data);
+	return data;
+}
+
+uint8_t st6228_device::gpio_option_r(offs_t offset)
+{
+	const uint8_t data = m_port_option[offset];
+	LOGMASKED(LOG_GPIO, "%s: gpio_option_r: Port %c Option: %02x\n", machine().describe_context(), offset + 'A', data);
+	return data;
+}
+
+WRITE_LINE_MEMBER(st6228_device::timer_w)
+{
+	const int old = m_timer_pin;
+	m_timer_pin = state;
+	if (old != m_timer_pin && m_timer_pin) // Rising Edge
+	{
+		if ((m_regs[REG_TIMER_CONTROL] & TSCR_MODE_MASK) == TSCR_MODE_EVENT) // Event-Counter mode
+		{
+			timer_prescaler_tick();
+		}
+	}
+}
+
+void st6228_device::timer_counter_tick()
+{
+	m_regs[REG_TIMER_COUNT]--;
+	if (m_regs[REG_TIMER_COUNT])
+	{
+		m_regs[REG_TIMER_CONTROL] &= ~(1 << TSCR_TMZ_BIT);
+	}
+	else
+	{
+		m_regs[REG_TIMER_CONTROL] |= (1 << TSCR_TMZ_BIT);
+		const uint8_t control = m_regs[REG_TIMER_CONTROL];
+		if (BIT(control, TSCR_ETI_BIT))
+		{
+			// TODO: Request interrupt
+		}
+
+		if (BIT(control, TSCR_TOUT_BIT))
+			m_timer_out(BIT(control, TSCR_DOUT_BIT));
+	}
+}
+
+void st6228_device::timer_prescaler_tick()
+{
+	const uint8_t old_prescaler = m_regs[REG_TIMER_PRESCALE];
+	m_regs[REG_TIMER_PRESCALE]--;
+	const uint8_t prescaler_rising = ~old_prescaler & m_regs[REG_TIMER_PRESCALE];
+
+	const uint8_t timer_ctrl = m_regs[REG_TIMER_CONTROL];
+
+	const uint8_t prescaler_divider = (timer_ctrl & TSCR_PS_MASK) >> TSCR_PS_BIT;
+	if (prescaler_divider == 0 || BIT(prescaler_rising, prescaler_divider - 1))
+	{
+		timer_counter_tick();
+	}
+}
+
+void st6228_device::timer_prescale_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_TIMER, "%s: timer_prescale_w: Timer Prescale = %02x\n", machine().describe_context(), data);
+	m_regs[REG_TIMER_PRESCALE] = data;
+}
+
+void st6228_device::timer_counter_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_TIMER, "%s: timer_counter_w: Timer Count = %02x\n", machine().describe_context(), data);
+	m_regs[REG_TIMER_COUNT] = data;
+}
+
+void st6228_device::timer_control_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_TIMER, "%s: timer_control_w: Timer Control = %02x\n", machine().describe_context(), data);
+	m_regs[REG_TIMER_CONTROL] = data;
+	if (BIT(data, TSCR_ETI_BIT) && BIT(data, TSCR_TMZ_BIT))
+	{
+		// TODO: Request interrupt
+	}
+	else
+	{
+		// TODO: Clear interrupt
 	}
 
-	static char PORT_NAMES[4] = { 'A', 'B', 'C', 'D' };
+	const bool active_mode = (BIT(data, TSCR_TOUT_BIT) || (BIT(data, TSCR_DOUT_BIT) && m_timer_pin));
+	m_timer_active = BIT(data, TSCR_PSI_BIT) && active_mode;
+}
 
-	switch (offset)
-	{
-		case REG_X:
-		case REG_Y:
-		case REG_V:
-		case REG_W:
-		case REG_A:
-			ret = m_regs[offset];
-			break;
+uint8_t st6228_device::timer_prescale_r(offs_t offset)
+{
+	const uint8_t data = m_regs[REG_TIMER_PRESCALE];
+	LOGMASKED(LOG_TIMER, "%s: timer_prescale_r: Timer Prescale: %02x\n", machine().describe_context(), data);
+	return data;
+}
 
-		case REG_PORTA_DATA:
-		case REG_PORTB_DATA:
-		case REG_PORTC_DATA:
-		case REG_PORTD_DATA:
-		{
-			const uint8_t index = offset - REG_PORTA_DATA;
-			ret = (m_port_data[index] & m_port_dir[index]) |
-				  (m_port_input[index] & ~m_port_dir[index]) |
-				  (m_port_pullup[index] & ~m_port_dir[index]);
-			logerror("%s: Port %c data read (%02x)\n", machine().describe_context(), PORT_NAMES[index], ret);
-			break;
-		}
+uint8_t st6228_device::timer_counter_r(offs_t offset)
+{
+	const uint8_t data = m_regs[REG_TIMER_COUNT];
+	LOGMASKED(LOG_TIMER, "%s: timer_counter_r: Timer Count: %02x\n", machine().describe_context(), data);
+	return data;
+}
 
-		case REG_PORTA_DIR:
-		case REG_PORTB_DIR:
-		case REG_PORTC_DIR:
-		case REG_PORTD_DIR:
-		{
-			const uint8_t index = offset - REG_PORTA_DIR;
-			ret = m_port_dir[index];
-			logerror("%s: Port %c direction read (%02x)\n", machine().describe_context(), PORT_NAMES[index], ret);
-			break;
-		}
-
-		case REG_PORTA_OPTION:
-		case REG_PORTB_OPTION:
-		case REG_PORTC_OPTION:
-		case REG_PORTD_OPTION:
-		{
-			const uint8_t index = offset - REG_PORTA_OPTION;
-			ret = m_port_option[index];
-			logerror("%s: Port %c option read (%02x)\n", machine().describe_context(), PORT_NAMES[index], ret);
-			break;
-		}
-
-		default:
-			logerror("%s: Unknown register read: %02x\n", machine().describe_context(), offset);
-			break;
-	}
-	return ret;
+uint8_t st6228_device::timer_status_r(offs_t offset)
+{
+	const uint8_t data = m_regs[REG_TIMER_CONTROL];
+	LOGMASKED(LOG_TIMER, "%s: timer_status_r: Timer Status: %02x\n", machine().describe_context(), data);
+	return data;
 }
 
 uint32_t st6228_device::execute_min_cycles() const noexcept
@@ -448,10 +509,6 @@ uint32_t st6228_device::execute_input_lines() const noexcept
 void st6228_device::execute_set_input(int inputnum, int state)
 {
 	logerror("%s: Unimplemented: execute_set_input line %d = %d\n", machine().describe_context(), inputnum, state);
-}
-
-void st6228_device::tick_timers(int cycles)
-{
 }
 
 void st6228_device::unimplemented_opcode(uint8_t op)
@@ -695,7 +752,7 @@ void st6228_device::execute_run()
 				}
 				else
 				{
-					fatalerror("Attempted to RETI with nothing on the stack");
+					m_mode = MODE_NORMAL;
 				}
 				break;
 			case 0x5d: // DEC Y
@@ -981,7 +1038,7 @@ void st6228_device::execute_run()
 			{
 				m_regs[REG_A] = m_data->read_byte(m_program->read_byte(m_pc+1));
 
-				if (m_regs[REG_V])
+				if (m_regs[REG_A])
 					m_flags[m_mode] &= ~FLAG_Z;
 				else
 					m_flags[m_mode] |= FLAG_Z;
@@ -1104,7 +1161,7 @@ void st6228_device::execute_run()
 				break;
 			case 0x9f: // LD rr,A
 			{
-				m_regs[REG_A] = m_data->read_byte(m_program->read_byte(m_pc+1));
+				m_data->write_byte(m_program->read_byte(m_pc+1), m_regs[REG_A]);
 
 				if (m_regs[REG_A])
 					m_flags[m_mode] &= ~FLAG_Z;
@@ -1204,7 +1261,15 @@ void st6228_device::execute_run()
 
 		m_pc++;
 
-		tick_timers(cycles);
+		if (m_timer_active)
+		{
+			m_timer_divider -= cycles;
+			if (m_timer_divider <= 0)
+			{
+				m_timer_divider += 12;
+				timer_prescaler_tick();
+			}
+		}
 
 		m_icount -= cycles;
 	}

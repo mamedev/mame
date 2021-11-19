@@ -82,7 +82,7 @@ private:
 	uint8_t rtc_data_r();
 	void rtc_data_w(uint8_t data);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats_afs);
+	static void floppy_formats_afs(format_registration &fr);
 
 	required_device<m65c02_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;

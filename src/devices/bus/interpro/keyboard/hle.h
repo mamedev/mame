@@ -10,7 +10,7 @@
 #include "sound/beep.h"
 #include "diserial.h"
 
-namespace bus { namespace interpro { namespace keyboard {
+namespace bus::interpro::keyboard {
 
 class hle_device_base
 	: public device_t
@@ -113,7 +113,7 @@ public:
 	required_ioport m_modifiers;
 };
 
-} } } // namespace bus::interpro::keyboard
+} // namespace bus::interpro::keyboard
 
 DECLARE_DEVICE_TYPE_NS(INTERPRO_HLE_EN_US_KEYBOARD, bus::interpro::keyboard, hle_en_us_device)
 

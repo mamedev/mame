@@ -9,17 +9,17 @@
 
     TODO:
     - clean this up!
-    - Properly emulate the protection chips, used by several games (check stvprot.cpp for more info)
+    - Properly emulate the protection chips, used by several games
 
     (per-game issues)
     - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
 
-    - smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
-      SH-2 synching or it's actually a m68k comms issue.
+    - smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous set_maximum_quantum() number,
+      might need strict SH-2 synching or it's actually a m68k comms issue.
 
     - groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
 
-    - myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
+    - myfairld: Apparently this game gives a black screen (either test mode and in-game mode), but let it wait for about
       10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
       Likely to not be a bug but an in-game design issue.
 
@@ -27,10 +27,16 @@
 
     - vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
       and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
-      to title screen after losing a match
+      to title screen after losing a match (fixed?)
 
     - vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
       sends the opponent out of the ring from whatever position.
+
+    - critcrsh: has a 2 digits 7-seg LED. The current implementation works in test mode, but during gameplay it's stuck
+      on the day's best score, while according to reports it should update the number of critters you have crushed.
+      At the end of the round it outputs the number of crushed critters. Also needs ticket dispenser hookup (redemption
+      is disabled by the game by default, but can be turned on in test menu).
+      Reference video: https://www.youtube.com/watch?v=O9PyIKdSFnU
 
 ************************************************************************************************************************/
 
@@ -43,7 +49,6 @@
 #include "cpu/sh/sh2.h"
 #include "machine/smpc.h"
 #include "machine/stvcd.h"
-#include "machine/stvprot.h"
 #include "sound/scsp.h"
 
 #include "softlist.h"
@@ -51,6 +56,7 @@
 
 #include "coreutil.h"
 
+#include "critcrsh.lh"
 #include "segabill.lh"
 #include "segabillv.lh"
 
@@ -96,33 +102,33 @@ offsets:
 
 uint8_t stv_state::stv_ioga_r(offs_t offset)
 {
-	const char *const portg[] = { "PORTG.0", "PORTG.1", "PORTG.2", "PORTG.3" };
-
 	uint8_t res;
 
 	res = 0xff;
 	if(offset & 0x10 && !machine().side_effects_disabled())
-		printf("Reading from mirror %08x?\n",offset * 2 + 1);
+		logerror("Reading from mirror %08x?\n",offset * 2 + 1);
 
 	offset &= 0x0f; // mirror?
 
-	switch(offset * 2 + 1)
+	switch((offset * 2) + 1)
 	{
-		case 0x01: res = ioport("PORTA")->read(); break; // P1
-		case 0x03: res = ioport("PORTB")->read(); break; // P2
-		case 0x05: res = ioport("PORTC")->read(); break; // SYSTEM
-		case 0x07: res = m_system_output; break; // port D, read-backs value written
-		case 0x09: res = ioport("PORTE")->read(); break; // P3
-		case 0x0b: res = ioport("PORTF")->read(); break; // P4
 		case 0x0d:
 			if (m_ioga_mode & 0x80) // PORT-G in counter mode
 			{
-				res = (ioport(portg[(m_ioga_portg >> 1) & 3])->read()) >> (((m_ioga_portg & 1) ^ 1) * 8);
-				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 7); // counter# is auto-incremented then read
+				uint8_t const sel = (m_ioga_portg >> 1) & 0x03;
+				res = ((m_ioga_counters[sel]->read() - m_ioga_count[sel]) >> ((~m_ioga_portg & 1) * 8) & 0xff);
+				m_ioga_portg = (m_ioga_portg & 0xf8) | ((m_ioga_portg + 1) & 0x07); // counter# is auto-incremented on read
+				break;
 			}
-			else
-				res = ioport("PORTG")->read();
+			[[fallthrough]];
+		case 0x01: // P1
+		case 0x03: // P2
+		case 0x05: // SYSTEM
+		case 0x09: // P3
+		case 0x0b: // P4
+			res = m_ioga_ports[offset]->read();
 			break;
+		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x1b: res = 0; break; // Serial COM READ status
 		case 0x1d: res = m_ioga_mode; break;
 	}
@@ -133,7 +139,7 @@ uint8_t stv_state::stv_ioga_r(offs_t offset)
 void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 {
 	if(offset & 0x10 && !machine().side_effects_disabled())
-		printf("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
+		logerror("Writing to mirror %08x %02x?\n",offset * 2 + 1,data);
 
 	offset &= 0x0f; // mirror?
 
@@ -143,7 +149,7 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 //          if (data != m_system_output)
 //              logerror("OUT %02x\n", data);
 			m_system_output = data;
-			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
+			/*Why does the BIOS test these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
 			machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
@@ -153,7 +159,11 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 			m_billboard->write(data);
 			break;
 		case 0x0d:
-			// then bit 7==0 - reset counters, currently this is unhandled, instead counters reset after each read (PORT_RESET used)
+			if(!BIT(data, 7)) // when bit 7==0 reset counters
+			{
+				for(unsigned i = 0; m_ioga_counters.size() > i; ++i)
+					m_ioga_count[i] = m_ioga_counters[i]->read();
+			}
 			m_ioga_portg = data;
 			break;
 		case 0x1d:
@@ -164,10 +174,9 @@ void stv_state::stv_ioga_w(offs_t offset, uint8_t data)
 
 uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 {
-	uint8_t res;
 	const char *const lgnames[] = { "LIGHTX", "LIGHTY" };
 
-	res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(offset * 2 + 1)
 	{
@@ -177,10 +186,27 @@ uint8_t stv_state::critcrsh_ioga_r(offs_t offset)
 			res = bitswap<8>(res, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
 			res |= (ioport("PORTC")->read() & 0x10) ? 0x0 : 0x4; // x/y hit latch actually
 			break;
-		default: res = stv_ioga_r(offset); break;
+		default:
+			res = stv_ioga_r(offset);
+			break;
 	}
 
 	return res;
+}
+
+void stv_state::critcrsh_ioga_w(offs_t offset, uint8_t data)
+{
+	static uint8_t const bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x49, 0x78, 0x00 }; // TODO: chip type unknown
+	switch (offset * 2 + 1)
+	{
+		case 0x0b:
+			m_cc_digits[0] = bcd2hex[(data & 0xf0) >> 4];
+			m_cc_digits[1] = bcd2hex[data & 0x0f];
+			break;
+		default:
+			stv_ioga_w(offset, data);
+			break;
+	}
 }
 
 uint8_t stv_state::magzun_ioga_r(offs_t offset)
@@ -217,27 +243,22 @@ void stv_state::magzun_ioga_w(offs_t offset, uint8_t data)
 
 uint8_t stv_state::stvmp_ioga_r(offs_t offset)
 {
-	const char *const mpnames[2][5] = {
-		{"P1_KEY0", "P1_KEY1", "P1_KEY2", "P1_KEY3", "P1_KEY4"},
-		{"P2_KEY0", "P2_KEY1", "P2_KEY2", "P2_KEY3", "P2_KEY4"} };
-	uint8_t res;
-
-	res = 0xff;
+	uint8_t res = 0xff;
 
 	switch(offset * 2 + 1)
 	{
 		case 0x01:
 		case 0x03:
-			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only select PORTE direction
+			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only selects PORTE direction
+			{
 				res = stv_ioga_r(offset);
+			}
 			else // mahjong panel select
 			{
-				int i;
-
-				for(i=0;i<5;i++)
+				for(unsigned i = 0; m_ioga_mahjong[i].size() > i; i++)
 				{
-					if(m_mux_data & 1 << i)
-						res = ioport(mpnames[offset][i])->read();
+					if(BIT(m_mux_data, i))
+						res &= m_ioga_mahjong[offset][i]->read();
 				}
 			}
 			break;
@@ -263,6 +284,93 @@ void stv_state::hop_ioga_w(offs_t offset, uint8_t data)
 		m_hopper->motor_w(data & 0x80);
 	stv_ioga_w(offset, data);
 }
+
+
+// ST-V hookup for 315-5881 encryption/compression chip
+
+/*
+ Known ST-V Games using this kind of protection
+
+ Astra Superstars (text layer gfx transfer)
+ Elandoree (gfx transfer of textures)
+ Final Fight Revenge (boot vectors etc.)
+ Radiant Silvergun (game start protection)
+ Steep Slope Sliders (gfx transfer of character portraits)
+ Tecmo World Cup '98 (Tecmo logo, player movement)
+
+*/
+
+/*************************************
+*
+* Common Handlers
+*
+*************************************/
+
+uint32_t stv_state::common_prot_r(offs_t offset)
+{
+	uint32_t *ROM = (uint32_t *)memregion("abus")->base();
+
+	if(m_abus_protenable & 0x00010000)//protection calculation is activated
+	{
+		if(offset == 3)
+		{
+			uint8_t* base;
+			uint16_t res = m_cryptdevice->do_decrypt(base);
+			uint16_t res2 = m_cryptdevice->do_decrypt(base);
+			res = ((res & 0xff00) >> 8) | ((res & 0x00ff) << 8);
+			res2 = ((res2 & 0xff00) >> 8) | ((res2 & 0x00ff) << 8);
+
+			return res2 | (res << 16);
+		}
+		return m_a_bus[offset];
+	}
+	else
+	{
+		if(m_a_bus[offset] != 0) return m_a_bus[offset];
+		else return ROM[(0x02fffff0/4)+offset];
+	}
+}
+
+
+uint16_t stv_state::crypt_read_callback(uint32_t addr)
+{
+	uint16_t dat= m_maincpu->space().read_word((0x02000000+2*addr));
+	return ((dat&0xff00)>>8)|((dat&0x00ff)<<8);
+}
+
+void stv_state::common_prot_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_a_bus[offset]);
+
+	if (offset == 0)
+	{
+		COMBINE_DATA(&m_abus_protenable);
+	}
+	else if(offset == 2)
+	{
+		if (ACCESSING_BITS_16_31) m_cryptdevice->set_addr_low(data >> 16);
+		if (ACCESSING_BITS_0_15) m_cryptdevice->set_addr_high(data&0xffff);
+
+	}
+	else if(offset == 3)
+	{
+		COMBINE_DATA(&m_abus_protkey);
+
+		m_cryptdevice->set_subkey(m_abus_protkey>>16);
+	}
+}
+
+void stv_state::install_common_protection()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4fffff0, 0x4ffffff, read32sm_delegate(*this, FUNC(stv_state::common_prot_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4fffff0, 0x4ffffff, write32s_delegate(*this, FUNC(stv_state::common_prot_w)));
+}
+
+void stv_state::stv_register_protection_savestates()
+{
+	save_item(NAME(m_a_bus));
+}
+
 
 /*
 
@@ -912,7 +1020,7 @@ void stv_state::stv_mem(address_map &map)
 void stv_state::critcrsh_mem(address_map &map)
 {
 	stv_mem(map);
-	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::critcrsh_ioga_r), FUNC(stv_state::stv_ioga_w)).umask32(0x00ff00ff);
+	map(0x00400000, 0x0040003f).rw(FUNC(stv_state::critcrsh_ioga_r), FUNC(stv_state::critcrsh_ioga_w)).umask32(0x00ff00ff);
 }
 
 void stv_state::magzun_mem(address_map &map)
@@ -973,13 +1081,13 @@ void stv_state::stv_select_game(int gameno)
 
 uint8_t stv_state::pdr1_input_r()
 {
-	return (ioport("PDR1")->read() & 0x40) | 0x3f;
+	return (m_pdr[0]->read() & 0x40) | 0x3f;
 }
 
 
 uint8_t stv_state::pdr2_input_r()
 {
-	return (ioport("PDR2")->read() & ~0x19) | 0x18 | (m_eeprom->do_read()<<0);
+	return (m_pdr[1]->read() & ~0x19) | 0x18 | (m_eeprom->do_read() << 0);
 }
 
 
@@ -1036,9 +1144,6 @@ void stv_state::stv(machine_config &config)
 	m_smpc_hle->system_halt_handler().set(FUNC(saturn_state::system_halt_w));
 	m_smpc_hle->dot_select_handler().set(FUNC(saturn_state::dot_select_w));
 	m_smpc_hle->interrupt_handler().set(m_scu, FUNC(sega_scu_device::smpc_irq_w));
-
-	MCFG_MACHINE_START_OVERRIDE(stv_state,stv)
-	MCFG_MACHINE_RESET_OVERRIDE(stv_state,stv)
 
 	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
@@ -1137,7 +1242,7 @@ void stv_state::batmanfr_sound_comms_w(offs_t offset, uint32_t data, uint32_t me
 	if(ACCESSING_BITS_16_31)
 		m_rax->data_w(data >> 16);
 	if(ACCESSING_BITS_0_15)
-		printf("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
+		logerror("Warning: write %04x & %08x to lo-word sound communication area\n",data,mem_mask);
 }
 
 
@@ -1181,7 +1286,7 @@ void stv_state::hopper(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::hopper_mem);
 }
 
-MACHINE_RESET_MEMBER(stv_state,stv)
+void stv_state::machine_reset()
 {
 	m_scsp_last_line = 0;
 
@@ -1254,8 +1359,10 @@ image_init_result stv_state::load_cart(device_image_interface &image, generic_sl
 }
 
 
-MACHINE_START_MEMBER(stv_state, stv)
+void stv_state::machine_start()
 {
+	m_cc_digits.resolve();
+
 	// save states
 //  save_pointer(NAME(m_scu_regs), 0x100/4);
 	save_item(NAME(m_en_68k));
@@ -1265,7 +1372,7 @@ MACHINE_START_MEMBER(stv_state, stv)
 	save_item(NAME(m_scsp_last_line));
 	save_item(NAME(m_vdp2.odd));
 
-	stv_register_protection_savestates(); // machine/stvprot.c
+	stv_register_protection_savestates();
 
 	m_audiocpu->set_reset_callback(*this, FUNC(stv_state::m68k_reset_callback));
 }
@@ -1718,9 +1825,9 @@ static INPUT_PORTS_START( patocar )
 
 	// TODO: sense/delta values seems wrong
 	PORT_MODIFY("PORTG.0")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(500) PORT_KEYDELTA(100) PORT_PLAYER(1)
 	PORT_MODIFY("PORTG.1")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(500) PORT_KEYDELTA(100) PORT_PLAYER(1)
 
 	PORT_MODIFY("PORTC")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1)    PORT_NAME("10Yen")
@@ -2617,9 +2724,10 @@ ROM_START( vfremix )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
-	ROM_LOAD16_BYTE( "epr17944.13",               0x0000001, 0x0100000, CRC(a5bdc560) SHA1(d3830480a611b7d88760c672ce46a2ea74076487) )
-	ROM_RELOAD_PLAIN( 0x0200000, 0x0100000)
-	ROM_RELOAD_PLAIN( 0x0300000, 0x0100000)
+	ROM_LOAD16_BYTE( "epr17944.13",               0x0000001, 0x0080000, CRC(3304c175) SHA1(6d847efad73d361cac4d7fcb452ccf89efa13e24) ) // 27C040
+	ROM_RELOAD ( 0x0100001, 0x0080000 )
+	ROM_RELOAD_PLAIN( 0x0200000, 0x0080000)
+	ROM_RELOAD_PLAIN( 0x0300000, 0x0080000)
 	ROM_LOAD16_WORD_SWAP( "mpr17946.2",    0x0400000, 0x0400000, CRC(4cb245f7) SHA1(363d9936b27043b5858c956a45736ac05aefc54e) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr17947.3",    0x0800000, 0x0400000, CRC(fef4a9fb) SHA1(1b4bd095962db769da17d3644df10f62d041e914) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr17948.4",    0x0c00000, 0x0400000, CRC(3e2b251a) SHA1(be6191c18727d7cbc6399fd4c1aaae59304af30c) ) // good
@@ -3579,6 +3687,25 @@ ROM_START( sackids )
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
 ROM_END
 
+ROM_START( dfeverg )
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) // SH2 code
+	ROM_LOAD16_WORD_SWAP( "13",    0x0000000, 0x080000, CRC(ecd7ac4b) SHA1(9bb4ae5ac236192bb6e927a3b5b75f84264e36aa) )
+	ROM_LOAD16_WORD_SWAP( "1",     0x0400000, 0x400000, CRC(d72f1640) SHA1(6a2ef0ca2b525d9ef0a817bb1d99275cf954242e) )
+	ROM_LOAD16_WORD_SWAP( "2",     0x0800000, 0x400000, CRC(c2e8aee5) SHA1(f7e404be93f99c8206636dc3391f162fc83abe2f) )
+	ROM_LOAD16_WORD_SWAP( "3",     0x0c00000, 0x400000, CRC(cb5b2744) SHA1(18d42bb6ced01e3e9fa1ed66c07bf91e34811510) )
+	ROM_LOAD16_WORD_SWAP( "4",     0x1000000, 0x400000, CRC(7eca59b2) SHA1(e03d71e1e9a67dadb2b76dde87f01147afe9ce34) )
+	ROM_LOAD16_WORD_SWAP( "5",     0x1400000, 0x400000, CRC(c3450f2b) SHA1(52dbfc8900d569debd92d2dd0d7fc25e133c5fbb) )
+	ROM_LOAD16_WORD_SWAP( "6",     0x1800000, 0x400000, CRC(1ac57ed5) SHA1(a34fb91818b586813d5f7ff5885bc07211189751) )
+	ROM_LOAD16_WORD_SWAP( "8",     0x1c00000, 0x400000, CRC(acc78f10) SHA1(9081d3006cc2f4daac1a8b99b729ac17bd6fed52) )
+	ROM_LOAD16_WORD_SWAP( "9",     0x2000000, 0x400000, CRC(4ffbba8d) SHA1(526b5ba3b874c0ee7ce3fca7631bed1e0b84fea1) )
+	ROM_LOAD16_WORD_SWAP( "10",    0x2400000, 0x400000, CRC(4b2a4397) SHA1(e8499e20939f26009f4678b85d3bfb5f02f4ddcb) )
+	ROM_LOAD16_WORD_SWAP( "11",    0x2800000, 0x400000, CRC(58877b19) SHA1(fff50cc05ae39a3b8313756d606e27ae2e62af26) )
+	// IC12 is tested but wasn't included in the dump. This causes missing backgrounds
+	ROM_LOAD16_WORD_SWAP( "12",    0x2c00000, 0x400000, NO_DUMP )
+ROM_END
+
 ROM_START( skychal )
 	STV_BIOS
 
@@ -3672,8 +3799,8 @@ GAME( 1996, batmanfr,  stvbios, batmanfr, batmanfr, stv_state,   init_batmanfr, 
 GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   init_colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   init_cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   init_cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, critcrsh,  stvbios, critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, tatacot,   critcrsh,critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1995, critcrsh,  stvbios, critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
+GAMEL(1995, tatacot,   critcrsh,critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Tatacot (JA 951128 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
 GAME( 1999, danchih,   stvbios, stvmp,    stvmp,    stv_state,   init_danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, danchiq,   stvbios, stv,      stv,      stv_state,   init_danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
@@ -3781,7 +3908,8 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
-GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2001, dfeverg,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Dancing Fever Gold (J 000821 V2.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
 GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )

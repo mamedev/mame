@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 
 /// \file nl_config.h
@@ -192,8 +192,8 @@ namespace netlist
 		///
 		/// This is the recommended clock to be used in fixed clock applications limited
 		/// to 32 bit clock resolution. The MAME code (netlist.cpp) contains code
-		/// illustrating how to deal with remainders if \ref NETLIST_INTERNAL_RES is
-		/// bigger than NETLIST_CLOCK.
+		/// illustrating how to deal with remainders if \ref INTERNAL_RES is bigger than
+		/// NETLIST_CLOCK.
 		using DEFAULT_CLOCK = std::integral_constant<int, 1'000'000'000>; // NOLINT
 
 		/// \brief Default logic family

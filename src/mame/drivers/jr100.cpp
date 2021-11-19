@@ -397,7 +397,7 @@ void jr100_state::jr100(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_jr100);
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	VIA6522(config, m_via, XTAL(14'318'181) / 16);   // see note in TODO
+	MOS6522(config, m_via, XTAL(14'318'181) / 16);   // see note in TODO
 	m_via->readpb_handler().set(FUNC(jr100_state::pb_r));
 	m_via->writepa_handler().set(FUNC(jr100_state::pa_w));
 	m_via->writepb_handler().set(FUNC(jr100_state::pb_w));

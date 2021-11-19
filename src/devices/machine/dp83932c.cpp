@@ -393,7 +393,7 @@ void dp83932c_device::transmit()
 
 	// transmit data
 	dump_bytes(buf, length);
-	send(buf, length);
+	send(buf, length, 4);
 }
 
 void dp83932c_device::send_complete_cb(int result)

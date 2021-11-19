@@ -22,13 +22,18 @@
     Space Byte also advertised a 16K static RAM board and a 2708/2716
     EPROM programmer for use in this system.
 
-    Getting it to work:
-    1. Slot CRT: choose Terminal
+    Getting it to work with the terminal:
+    1. Slot CRT: choose Terminal. (The VTI should be removed from S100 slot
+       1 or else its keyboard must be disabled later.)
     2. Reboot
-    3. Press E. It will autodetect the baud rate and start up
+    3. Press A (certain other keys may work here). It will autodetect the
+       baud rate and start up. (Only 110, 150, 300, 1200, 2400, 4800 and
+       9600 baud are detected properly.)
     4. Now you can enter commands (such as D000,FFF)
     5. If it says KEYBOARD ERROR it doesn't mean a problem with the
        keyboard, it means you made a mistake.
+
+    To use the monitor with the VTI, start by typing A (in uppercase).
 
 ***************************************************************************/
 
@@ -270,7 +275,6 @@ static void sb8085_s100_devices(device_slot_interface &device)
 static DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_9600)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_9600)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_7)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_EVEN)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)

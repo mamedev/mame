@@ -76,7 +76,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_sso_w );
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	uint8_t m_fdc_status;              // for floppy controller
 	uint8_t m_control_register;
 	uint8_t m_motor_timer_out;
@@ -236,12 +236,13 @@ ioport_constructor ss50_dc5_device::device_input_ports() const
 //  machine configuration
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( ss50_dc5_device::floppy_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_FLEX_FORMAT,
-	FLOPPY_OS9_FORMAT,
-	FLOPPY_UNIFLEX_FORMAT
-FLOPPY_FORMATS_END
+void ss50_dc5_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+	fr.add(FLOPPY_OS9_FORMAT);
+	fr.add(FLOPPY_UNIFLEX_FORMAT);
+}
 
 static void flex_floppies(device_slot_interface &device)
 {

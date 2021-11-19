@@ -24,6 +24,6 @@ void main()
   sum += TEX2D(v_texCoord + vec2(0.0, +4.0 * oney)) * vec3_splat(v_coeffs.w);
 
   float norm = 1.0 / (1.0 + 2.0*(v_coeffs.x+v_coeffs.y+v_coeffs.z+v_coeffs.w));
-  
+
   gl_FragColor = vec4( pow(sum*vec3_splat(norm), vec3_splat(1.0/u_gamma.x)), 1.0 );
 }

@@ -21,7 +21,7 @@
 #include "machine/74259.h"
 #include "machine/tmc0430.h"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class ti_pcode_card_device : public device_t, public device_ti99_peribox_card_interface
 {
@@ -51,7 +51,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pcpage_w);
 	DECLARE_WRITE_LINE_MEMBER(ekrpg_w);
 
-	void debugger_read(uint16_t addr, uint8_t& value);
+	void debugger_read(offs_t addr, uint8_t& value);
 
 	required_device_array<tmc0430_device, 8> m_groms;
 
@@ -73,7 +73,7 @@ private:
 	int m_address;
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_P_CODE,  bus::ti99::peb, ti_pcode_card_device)
 

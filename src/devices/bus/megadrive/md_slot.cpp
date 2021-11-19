@@ -43,7 +43,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "md_slot.h"
 
@@ -271,6 +270,7 @@ static const md_slot slot_list[] =
 	{ SMOUSE, "rom_smouse" },
 	{ SOULBLAD, "rom_soulblad" },
 	{ SQUIRRELK, "rom_squir" },
+	{ SRAM_ARG96, "rom_sram_arg96" },
 	{ TEKKENSP, "rom_tekkesp" },
 	{ TOPFIGHTER, "rom_topf" },
 
@@ -282,7 +282,7 @@ static int md_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -615,6 +615,7 @@ void base_md_cart_slot_device::setup_nvram()
 
 		// These types only come from softlist loading
 		case SEGA_SRAM:
+		case SRAM_ARG96:
 			m_cart->m_nvram_start = 0x200000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
 			m_cart->nvram_alloc(m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
@@ -905,18 +906,17 @@ std::string base_md_cart_slot_device::get_default_card_software(get_default_card
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size(), offset = 0;
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		if (genesis_is_SMD(&rom[0x200], len - 0x200))
-				offset = 0x200;
+		uint32_t const offset = genesis_is_SMD(&rom[0x200], len - 0x200) ? 0x200 : 0;
 
-		type = get_cart_type(&rom[offset], len - offset);
-		slot_string = md_get_slot(type);
+		int const type = get_cart_type(&rom[offset], len - offset);
+		char const *const slot_string = md_get_slot(type);
 
 		return std::string(slot_string);
 	}

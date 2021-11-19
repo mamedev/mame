@@ -30,7 +30,7 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 			{
 				m_pet.input = m_joy2->read();
 			}
-			/* fall through */
+			[[fallthrough]];
 
 		case 0x02: case 0x04: case 0x06: case 0x08:
 		case 0x0a: case 0x0c: case 0x0e:
@@ -449,7 +449,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svision_state::cart_load )
 
 	if (size > 0x80000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -527,7 +527,7 @@ void svision_state::svision(machine_config &config)
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(svision_state::frame_int_w));
 
-	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), ARRAY_LENGTH(svision_pens));
+	PALETTE(config, m_palette, FUNC(svision_state::svision_palette), std::size(svision_pens));
 }
 
 void svision_state::svisions(machine_config &config)

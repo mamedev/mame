@@ -187,9 +187,11 @@ static INPUT_PORTS_START( b2m )
 	PORT_CONFSETTING(   0x00, "B/W")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( b2m_state::b2m_floppy_formats )
-	FLOPPY_SMX_FORMAT
-FLOPPY_FORMATS_END
+void b2m_state::b2m_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_SMX_FORMAT);
+}
 
 static void b2m_floppies(device_slot_interface &device)
 {

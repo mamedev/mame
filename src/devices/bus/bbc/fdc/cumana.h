@@ -26,7 +26,7 @@ class bbc_cumanafdc_device :
 	public device_bbc_fdc_interface
 {
 public:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
@@ -43,8 +43,7 @@ protected:
 	virtual void write(offs_t offset, uint8_t data) override;
 
 	required_device<mb8877_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	optional_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
 	bool m_invert;
 

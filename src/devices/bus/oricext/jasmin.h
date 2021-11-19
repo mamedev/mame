@@ -36,7 +36,7 @@ private:
 
 	void map(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1770_device> m_fdc;
 	required_device<ls259_device> m_fdlatch;

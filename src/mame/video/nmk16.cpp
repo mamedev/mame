@@ -78,6 +78,8 @@ void nmk16_state::video_init()
 	m_spriteram_old2 = make_unique_clear<u16[]>(0x1000/2);
 
 	m_tilerambank = 0;
+	m_bgbank = 0;
+	m_mustang_bg_xscroll = 0;
 
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nmk16_state::dma_callback),this));
 	save_pointer(NAME(m_spriteram_old), 0x1000/2);

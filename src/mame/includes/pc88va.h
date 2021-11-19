@@ -11,7 +11,7 @@
 #ifndef MAME_INCLUDES_PC88VA_H
 #define MAME_INCLUDES_PC88VA_H
 
-#include "cpu/nec/nec.h"
+#include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
@@ -21,7 +21,7 @@
 //#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "machine/bankdev.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -101,7 +101,7 @@ private:
 	required_device<address_map_bank_device> m_sysbank;
 	required_shared_ptr<uint16_t> m_tvram;
 	required_shared_ptr<uint16_t> m_gvram;
-	uint8_t *m_kanjiram;
+	std::unique_ptr<uint8_t[]> m_kanjiram;
 	uint16_t m_bank_reg;
 	uint16_t m_screen_ctrl_reg;
 	uint8_t m_timer3_io_reg;
@@ -182,7 +182,7 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);

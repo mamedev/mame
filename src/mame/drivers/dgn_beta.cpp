@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    drivers/dgn_beta.c
+    drivers/dgn_beta.cpp
 
     Dragon Beta prototype, based on two 68B09E processors, WD2797, 6845.
 
@@ -289,10 +289,12 @@ static GFXDECODE_START( gfx_dgnbeta )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, dgnbeta_charlayout, 0, 8 )
 GFXDECODE_END
 
-FLOPPY_FORMATS_MEMBER(dgn_beta_state::floppy_formats )
-	FLOPPY_VDK_FORMAT,
-	FLOPPY_DMK_FORMAT
-FLOPPY_FORMATS_END
+void dgn_beta_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_VDK_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
+}
 
 static void dgnbeta_floppies(device_slot_interface &device)
 {
@@ -320,7 +322,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_dgnbeta);
-	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), ARRAY_LENGTH(dgnbeta_pens));
+	PALETTE(config, m_palette, FUNC(dgn_beta_state::dgn_beta_palette), std::size(dgnbeta_pens));
 
 	/* PIA 0 at $FC20-$FC23 I46 */
 	PIA6821(config, m_pia_0, 0);
@@ -381,7 +383,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 }
 
 ROM_START(dgnbeta)
-	ROM_REGION(0x4000,MAINCPU_TAG,0)
+	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_SYSTEM_BIOS( 0, "bootrom", "Dragon Beta OS-9 Boot ROM (15.6.84)" )
 	ROMX_LOAD("beta_bt.rom"     ,0x0000 ,0x4000 ,CRC(4c54c1de) SHA1(141d9fcd2d187c305dff83fce2902a30072aed76), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "testrom", "Dragon Beta Test ROM (1984?)" )

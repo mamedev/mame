@@ -28,7 +28,7 @@ class isa8_fdc_device :
 public:
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 protected:
 	// construction/destruction

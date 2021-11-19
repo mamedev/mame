@@ -61,7 +61,7 @@ private:
 	void c8280_fdc_mem(address_map &map);
 	void c8280_main_mem(address_map &map);
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;

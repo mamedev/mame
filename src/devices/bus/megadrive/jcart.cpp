@@ -3,25 +3,20 @@
 /***********************************************************************************************************
 
 
- MegaDrive / Genesis J-Cart (+SEPROM) emulation
+ MegaDrive / Genesis J-Cart + I2C EEPROM emulation
 
 
- Emulation based on earlier researches by ElBarto
+ Emulation based on earlier research by ElBarto and Eke-Eke
 
 
- i2c games mapping table:
+ I2C games mapping table:
 
- game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
- ----------------------------------|------------|------------|------------|----------------|-----------|
- Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
- Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
- Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |
- ----------------------------------|------------|------------|------------|----------------|-----------|
-
- * Notes: check these
-
-
- TODO: proper SEPROM emulation, still not worked on (just hooked up the I2C device)
+ Game Name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK | WORKS |
+ ----------------------------------|------------|------------|------------|----------------|-----------|-------|
+ Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |  Yes  |
+ Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |  Yes  |
+ Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |  Yes  |
+ ----------------------------------|------------|------------|------------|----------------|-----------|-------|
 
 ***********************************************************************************************************/
 
@@ -227,7 +222,7 @@ uint16_t md_seprom_codemast_device::read(offs_t offset)
 
 void md_seprom_codemast_device::write(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	if (offset == 0x380000/2)
+	if (offset == 0x300000/2)
 	{
 		m_i2c_clk = BIT(data, 9);
 		m_i2c_mem = BIT(data, 8);

@@ -132,7 +132,7 @@ u8 intel02_state::input_r()
 {
 	// d0-d3: buttons through a maze of logic gates
 	// basically giving each button its own 4-bit scancode
-	u8 data = count_leading_zeros(m_inputs[0]->read()) - 17;
+	u8 data = count_leading_zeros_32(m_inputs[0]->read()) - 17;
 
 	// d4: Vcc, d5-d7: buttons (direct)
 	return data | (~m_inputs[1]->read() << 4 & 0xf0);

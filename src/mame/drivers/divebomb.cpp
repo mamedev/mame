@@ -428,11 +428,6 @@ void divebomb_state::divebomb(machine_config &config)
 	m_k051316[1]->set_offsets(-88, -16);
 	m_k051316[1]->set_zoom_callback(FUNC(divebomb_state::zoom_callback_2));
 
-	MCFG_MACHINE_START_OVERRIDE(divebomb_state, divebomb)
-	MCFG_MACHINE_RESET_OVERRIDE(divebomb_state, divebomb)
-
-	MCFG_VIDEO_START_OVERRIDE(divebomb_state, divebomb)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -494,7 +489,7 @@ ROM_START( divebomb )
 	ROM_LOAD32_BYTE( "u17.27c100", 0x00002, 0x20000, CRC(f4cbc97f) SHA1(1e13bc18db128575ca8e6998e9dd6f7dc37a99b8) )
 	ROM_LOAD32_BYTE( "u18.27c100", 0x00003, 0x20000, CRC(91ab9d89) SHA1(98454df4638bb831babb1796b095169851e6cf40) )
 
-	ROM_REGION( 0x30000, "k051316_1", ROMREGION_INVERT ) // on sub-board
+	ROM_REGION( 0x40000, "k051316_1", ROMREGION_INVERT | ROMREGION_ERASE00 ) // on sub-board
 	ROM_LOAD( "u1.27512", 0x00000, 0x10000, CRC(99af1e18) SHA1(5d63130313fdd85c58e1d6b59e42b75a15328a6b) )
 	ROM_LOAD( "u2.27512", 0x10000, 0x10000, CRC(99c8d516) SHA1(6205907bd526181542f4d58d442667595aec9730) )
 	ROM_LOAD( "u3.27512", 0x20000, 0x10000, CRC(5ab4af3c) SHA1(ab8632e37a42f2f0db9b22c8577c4f09718ccc7c) )
@@ -538,7 +533,7 @@ ROM_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_start()
 {
 	m_rozbank->configure_entries(0, 16, memregion("rozcpudata")->base(), 0x4000);
 
@@ -547,7 +542,7 @@ MACHINE_START_MEMBER(divebomb_state, divebomb)
 }
 
 
-MACHINE_RESET_MEMBER(divebomb_state, divebomb)
+void divebomb_state::machine_reset()
 {
 	for (int chip = 0; chip < 2; chip++)
 	{

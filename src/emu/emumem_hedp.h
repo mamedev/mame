@@ -1,17 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#ifndef MAME_EMU_EMUMEM_HEDP_H
+#define MAME_EMU_EMUMEM_HEDP_H
+
+#pragma once
 
 // handler_entry_read_delegate/handler_entry_write_delegate
 
 // Executes an access through called a delegate, usually containing a handler or a lambda
 
-template<int Width, int AddrShift, endianness_t Endian, typename READ> class handler_entry_read_delegate : public handler_entry_read_address<Width, AddrShift, Endian>
+template<int Width, int AddrShift, typename READ> class handler_entry_read_delegate : public handler_entry_read_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read_address<Width, AddrShift, Endian>;
 
-	handler_entry_read_delegate(address_space *space, const READ &delegate) : handler_entry_read_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
+	handler_entry_read_delegate(address_space *space, const READ &delegate) : handler_entry_read_address<Width, AddrShift>(space, 0), m_delegate(delegate) {}
 	~handler_entry_read_delegate() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
@@ -64,13 +67,12 @@ private:
 						 uX> read_impl(offs_t offset, uX mem_mask) const;
 };
 
-template<int Width, int AddrShift, endianness_t Endian, typename WRITE> class handler_entry_write_delegate : public handler_entry_write_address<Width, AddrShift, Endian>
+template<int Width, int AddrShift, typename WRITE> class handler_entry_write_delegate : public handler_entry_write_address<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write_address<Width, AddrShift, Endian>;
 
-	handler_entry_write_delegate(address_space *space, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift, Endian>(space, 0), m_delegate(delegate) {}
+	handler_entry_write_delegate(address_space *space, const WRITE &delegate) : handler_entry_write_address<Width, AddrShift>(space, 0), m_delegate(delegate) {}
 	~handler_entry_write_delegate() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
@@ -128,13 +130,12 @@ private:
 
 // Accesses an ioport
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_read_ioport : public handler_entry_read<Width, AddrShift, Endian>
+template<int Width, int AddrShift> class handler_entry_read_ioport : public handler_entry_read<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_read<Width, AddrShift, Endian>;
 
-	handler_entry_read_ioport(address_space *space, ioport_port *port) : handler_entry_read<Width, AddrShift, Endian>(space, 0), m_port(port) {}
+	handler_entry_read_ioport(address_space *space, ioport_port *port) : handler_entry_read<Width, AddrShift>(space, 0), m_port(port) {}
 	~handler_entry_read_ioport() = default;
 
 	uX read(offs_t offset, uX mem_mask) const override;
@@ -145,13 +146,12 @@ private:
 	ioport_port *m_port;
 };
 
-template<int Width, int AddrShift, endianness_t Endian> class handler_entry_write_ioport : public handler_entry_write<Width, AddrShift, Endian>
+template<int Width, int AddrShift> class handler_entry_write_ioport : public handler_entry_write<Width, AddrShift>
 {
 public:
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
-	using inh = handler_entry_write<Width, AddrShift, Endian>;
 
-	handler_entry_write_ioport(address_space *space, ioport_port *port) : handler_entry_write<Width, AddrShift, Endian>(space, 0), m_port(port) {}
+	handler_entry_write_ioport(address_space *space, ioport_port *port) : handler_entry_write<Width, AddrShift>(space, 0), m_port(port) {}
 	~handler_entry_write_ioport() = default;
 
 	void write(offs_t offset, uX data, uX mem_mask) const override;
@@ -161,3 +161,5 @@ public:
 private:
 	ioport_port *m_port;
 };
+
+#endif // MAME_EMU_EMUMEM_HEDP_H

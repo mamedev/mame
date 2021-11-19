@@ -104,9 +104,7 @@ void pci_device::device_start()
 	bank_count = 0;
 	bank_reg_count = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(bank_infos); i++) {
-		save_item(NAME(bank_infos[i].adr), i);
-	}
+	save_item(STRUCT_MEMBER(bank_infos, adr));
 	save_item(NAME(command));
 	save_item(NAME(command_mask));
 	save_item(NAME(status));

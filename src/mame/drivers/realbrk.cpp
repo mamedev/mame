@@ -47,7 +47,7 @@ To Do:
 #include "includes/realbrk.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "sound/ymz280b.h"
 #include "speaker.h"
 
@@ -795,8 +795,8 @@ void realbrk_state::realbrk(machine_config &config)
 	ymz.add_route(1, "rspeaker", 0.50);
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 }
 
 void realbrk_state::pkgnsh(machine_config &config)

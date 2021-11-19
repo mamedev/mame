@@ -22,7 +22,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/bufsprite.h"
 #include "video/kaneko_spr.h"
 #include "video/kaneko_tmap.h"

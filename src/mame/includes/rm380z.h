@@ -68,6 +68,10 @@ public:
 	void init_rm380z34e();
 	void init_rm480z();
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
 	void put_point(int charnum,int x,int y,int col);
 	void init_graphic_chars();
@@ -79,9 +83,6 @@ private:
 	void check_scroll_register();
 
 	int writenum;
-
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
 
 	uint8_t m_port0;
 	uint8_t m_port0_mask;
@@ -122,10 +123,6 @@ private:
 
 	uint8_t videoram_read(offs_t offset);
 	void videoram_write(offs_t offset, uint8_t data);
-
-	uint8_t hiram[0x1000];
-	uint8_t hiram_read(offs_t offset);
-	void hiram_write(offs_t offset, uint8_t data);
 
 	uint8_t rm380z_portlow_r();
 	void rm380z_portlow_w(offs_t offset, uint8_t data);

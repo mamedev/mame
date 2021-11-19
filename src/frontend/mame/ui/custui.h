@@ -34,22 +34,17 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	enum
-	{
-		LANGUAGE_MENU = 1,
-		FONT_MENU,
-		COLORS_MENU,
-		HIDE_MENU
-	};
-
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
-	static const char *const    HIDE_STATUS[];
+	void find_languages();
+	void find_sysnames();
 
 	std::function<void ()>      m_handler;
-	std::vector<std::string>    m_lang;
-	std::uint16_t               m_currlang;
+	std::vector<std::string>    m_languages;
+	std::vector<std::string>    m_sysnames;
+	std::size_t                 m_currlang;
+	std::size_t                 m_currsysnames;
 };
 
 //-------------------------------------------------
@@ -66,31 +61,22 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	enum
-	{
-		INFOS_SIZE = 1,
-		FONT_SIZE,
-		MUI_FNT,
-		MUI_BOLD,
-		MUI_ITALIC
-	};
-
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void list();
 
 	std::function<void (bool)> m_handler;
 	std::vector<std::pair<std::string, std::string> > m_fonts;
-	const int m_font_min, m_font_max;
+	int const m_font_min, m_font_max;
 	int m_font_size;
-	const float m_info_min, m_info_max;
+	float const m_info_min, m_info_max;
 	float m_info_size;
 	bool m_changed;
 
-	std::uint16_t                                       m_actual;
+	std::uint16_t m_actual;
 #ifdef UI_WINDOWS
-	bool                                                m_bold, m_italic;
+	bool m_bold, m_italic;
 #endif
 
 };
@@ -137,7 +123,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	s_color_table m_color_table[MUI_RESTORE];
 	void restore_colors();
@@ -167,7 +153,7 @@ private:
 	};
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	void inkey_special(const event *menu_event);
 
@@ -190,7 +176,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	static std::pair<const char *, const char *> const s_palette[];
 	rgb_t &m_original;

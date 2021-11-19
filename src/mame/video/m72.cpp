@@ -435,7 +435,7 @@ void m72_state::majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip
 {
 	u16 *spriteram16_2 = m_spriteram2;
 
-	for (int offs = 0; offs < m_spriteram2.bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram2.length(); offs += 4)
 	{
 		const int code = spriteram16_2[offs+1];
 		const u32 color = spriteram16_2[offs+2] & 0x0f;

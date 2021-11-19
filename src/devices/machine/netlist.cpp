@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /***************************************************************************
 
@@ -211,7 +211,7 @@ netlist_data_memregions_t::netlist_data_memregions_t(const device_t &dev)
 static bool rom_exists(device_t &root, pstring name)
 {
 	// iterate, starting with the driver's ROMs and continuing with device ROMs
-	for (device_t &device : device_iterator(root))
+	for (device_t &device : device_enumerator(root))
 	{
 		// scan the ROM entries for this device
 		for (tiny_rom_entry const *romp = device.rom_region(); romp && !ROMENTRY_ISEND(romp); ++romp)
@@ -828,7 +828,8 @@ void netlist_mame_stream_output_device::sound_update_fill(write_stream_view &tar
 	int sampindex;
 	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
 		target.put(sampindex, m_buffer[sampindex]);
-	target.fill(m_cur, sampindex);
+	if (sampindex < target.samples())
+		target.fill(m_cur, sampindex);
 }
 
 

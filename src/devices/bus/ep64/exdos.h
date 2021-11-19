@@ -44,7 +44,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;

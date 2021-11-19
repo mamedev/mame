@@ -36,10 +36,12 @@ DEFINE_DEVICE_TYPE(BBC_KENDA, bbc_kenda_device,  "bbc_kenda", "Kenda Professiona
 //  FLOPPY_FORMATS( floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( bbc_kenda_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT
-FLOPPY_FORMATS_END
+void bbc_kenda_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( bbc_floppies_525 )

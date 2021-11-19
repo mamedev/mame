@@ -1345,7 +1345,7 @@ void midzeus2_state::crusnexo(machine_config &config)
 void midzeus2_state::thegrid(machine_config &config)
 {
 	midzeus2(config);
-	PIC16C57(config, "pic", 8000000).disabled();  // unverified clock, not hooked up
+	PIC16C57(config, "pic", 8000000).set_disable();  // unverified clock, not hooked up
 	m_ioasic->set_upper(474/* or 491 */);
 }
 

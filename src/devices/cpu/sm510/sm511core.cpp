@@ -138,7 +138,7 @@ void sm511_device::clock_melody()
 	// output to R pin
 	if (out != m_r_out)
 	{
-		m_write_r(0, out, 0xff);
+		m_write_r(out);
 		m_r_out = out;
 	}
 }
@@ -153,7 +153,7 @@ void sm511_device::init_melody()
 	{
 		u8 data = m_melody_rom[i];
 		if (data & 0xc0 || (data & 0x0f) > 13)
-			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
+			logerror("unknown melody ROM data $%02X at $%02X\n", data, i);
 	}
 }
 

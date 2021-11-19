@@ -33,18 +33,21 @@ public:
 	void mpeg_end_adr_low_w(uint16_t data);
 	uint16_t mpeg_key_1_r();
 	void mpeg_key_1_w(uint16_t data);
+	uint16_t mpeg_ctrl_r();
 	uint16_t mas_i2c_r();
 	void mas_i2c_w(uint16_t data);
-	uint16_t mpeg_ctrl_r();
-	void mpeg_ctrl_w(uint16_t data);
+	uint16_t fpga_ctrl_r();
+	void fpga_ctrl_w(uint16_t data);
 	void ram_write_adr_high_w(uint16_t data);
 	void ram_write_adr_low_w(uint16_t data);
 	uint16_t ram_r();
 	void ram_w(uint16_t data);
 	void ram_read_adr_high_w(uint16_t data);
 	void ram_read_adr_low_w(uint16_t data);
-	uint16_t mp3_frame_count_high_r();
-	uint16_t mp3_frame_count_low_r();
+	uint16_t mp3_counter_high_r();
+	uint16_t mp3_counter_low_r();
+	void mp3_counter_low_w(uint16_t data);
+	uint16_t mp3_counter_diff_r();
 	void output_0_w(uint16_t data);
 	void output_1_w(uint16_t data);
 	void output_7_w(uint16_t data);
@@ -58,7 +61,6 @@ public:
 	void output_4_w(uint16_t data);
 	void output_2_w(uint16_t data);
 	void output_5_w(uint16_t data);
-	uint16_t mp3_unk_r();
 
 protected:
 	virtual void device_start() override;
@@ -68,12 +70,11 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	memory_share_creator<uint16_t> ram;
 	required_device<k573fpga_device> k573fpga;
 	required_device<ds2401_device> digital_id;
-	required_device<mas3507d_device> mas3507d;
 	devcb_write8 output_cb;
 
-	std::unique_ptr<uint16_t[]> ram;
 	uint32_t ram_adr, ram_read_adr;
 	uint8_t output_data[8];
 

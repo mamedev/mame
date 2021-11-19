@@ -7,7 +7,7 @@ $output v_texcoord0, v_texcoord1, v_color0
 /*
 
    Hyllian's xBR MultiLevel4 Shader - Pass4
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 
 /*
    Hyllian's 2xBR v3.7c+ReverseAA (squared) Shader
-   
+
    Copyright (C) 2011/2012 Hyllian/Jararaca - sergiogdb@gmail.com
 */
 
@@ -171,7 +171,7 @@ void main()
     vec3 s  = E.xyz;
     vec3 n3 = H.xyz;
     vec3 n4 = H5.xyz;
-    
+
     vec3 aa = n2 - n1;
     vec3 bb =  s - n2;
     vec3 cc = n3 - s;
@@ -192,7 +192,7 @@ void main()
      s = s1;
     n3 = F.xyz;
     n4 = F4.xyz;
-    
+
     aa = n2 - n1;
     bb =  s - n2;
     cc = n3 - s;

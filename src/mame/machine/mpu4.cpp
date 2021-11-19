@@ -925,7 +925,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 		awp_draw_reel(machine(),"reel3", *m_reel[2]);
 	}
 
-	if (core_stricmp(machine().system().name, "m4gambal") == 0)
+	if (strcmp(machine().system().name, "m4gambal") == 0)
 	{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
 		provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
@@ -963,6 +963,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 					m_aux1_input|= 0xd0;
 					break;
 				}
+				break;
 
 			case 0x01: //Middle row - note switches don't match pattern
 				switch (machine().rand() & 0x3)
@@ -987,6 +988,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 					m_aux1_input|= 0x90;
 					break;
 				}
+				break;
 
 			case 0x02: //Bottom row
 				switch (machine().rand() & 0x3)
@@ -1011,6 +1013,7 @@ void mpu4_state::pia_ic5_porta_w(uint8_t data)
 					m_aux1_input|= 0x30;
 					break;
 				}
+				break;
 			}
 		}
 	}

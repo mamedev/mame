@@ -383,6 +383,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 						m_bootleg_cmd = 0x00;
 					if (m_maincpu->pc() == 0x7c47)
 						m_bootleg_cmd = 0x00;
+					[[fallthrough]]; // FIXME: really?
 				case 0x89:  /* unneeded value : no read back */
 					if (m_maincpu->pc() == 0x67e5)
 						m_bootleg_cmd = 0x00;
@@ -433,6 +434,7 @@ void arkanoid_state::arkanoid_bootleg_d018_w(uint8_t data)
 						m_bootleg_cmd = 0x00;
 					if (m_maincpu->pc() == 0x7c47)
 						m_bootleg_cmd = 0x00;
+					[[fallthrough]]; // FIXME: really?
 				case 0x89:  /* unneeded value : no read back */
 					if (m_maincpu->pc() == 0x67e5)
 						m_bootleg_cmd = 0x00;

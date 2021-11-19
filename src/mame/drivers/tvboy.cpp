@@ -72,7 +72,7 @@ void tvboy_state::tvboy_mem(address_map &map)
 	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
 	map(0x1000, 0x1fff).w(FUNC(tvboy_state::bank_write));
-	map(0x1000, 0x1fff).bankr("crom");
+	map(0x1000, 0x1fff).bankr(m_crom);
 }
 
 #define MASTER_CLOCK_PAL    3546894

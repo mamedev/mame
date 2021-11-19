@@ -331,11 +331,11 @@ void ggconnie_state::ggconnie(machine_config &config)
 
 	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
 	huc6270_0.set_vram_size(0x10000);
-	huc6270_0.irq().set_inputline(m_maincpu, 0);
+	huc6270_0.irq().set_inputline(m_maincpu, 0); // needs input merger?
 
 	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
 	huc6270_1.set_vram_size(0x10000);
-	huc6270_1.irq().set_inputline(m_maincpu, 0);
+	huc6270_1.irq().set_inputline(m_maincpu, 0); // needs input merger?
 
 	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
 	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));

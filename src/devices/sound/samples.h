@@ -119,7 +119,7 @@ protected:
 };
 
 // iterator, since lots of people are interested in these devices
-typedef device_type_iterator<samples_device> samples_device_iterator;
+typedef device_type_enumerator<samples_device> samples_device_enumerator;
 
 
 // ======================> samples_iterator

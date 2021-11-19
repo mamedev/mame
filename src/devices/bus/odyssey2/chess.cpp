@@ -14,7 +14,7 @@ Hardware notes:
 #include "emu.h"
 #include "chess.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Odyssey 2 Videopac C7010")
+DEFINE_DEVICE_TYPE(O2_ROM_CHESS, o2_chess_device, "o2_chess", "Videopac C7010 Cartridge")
 
 
 //-------------------------------------------------

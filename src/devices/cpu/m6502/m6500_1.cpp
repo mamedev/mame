@@ -171,7 +171,7 @@ void m6500_1_device::device_reset()
 
 	m_cr = 0x00U;
 
-	for (unsigned i = 0; ARRAY_LENGTH(m_port_buf) > i; ++i)
+	for (unsigned i = 0; std::size(m_port_buf) > i; ++i)
 	{
 		if (0xffU != m_port_buf[i])
 			m_port_out_cb[i](m_port_buf[i] = 0xffU);

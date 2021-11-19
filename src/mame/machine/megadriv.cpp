@@ -741,7 +741,7 @@ uint8_t md_base_state::megadriv_z80_unmapped_read()
 void md_base_state::megadriv_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
-	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym2612_device::read), FUNC(ym2612_device::write));
+	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 
 	map(0x6000, 0x6000).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
 	map(0x6001, 0x6001).w(FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
@@ -1032,20 +1032,6 @@ void md_base_state::megadriv_init_common()
 	m_megadrive_io_read_data_port_ptr = read8sm_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
 	m_megadrive_io_write_data_port_ptr = write16sm_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 }
-
-void md_base_state::init_megadriv_c2()
-{
-	megadriv_init_common();
-
-	m_vdp->set_use_cram(0); // C2 uses its own palette ram
-	m_vdp->set_vdp_pal(false);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
-
-	m_version_hi_nibble = 0x20; // JPN NTSC no-SCD
-}
-
-
 
 void md_base_state::init_megadriv()
 {

@@ -154,14 +154,14 @@ void lisa_state::lisa(machine_config &config)
 	SOFTWARE_LIST(config, "disk_list").set_original("lisa");
 
 	/* via */
-	VIA6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
+	MOS6522(config, m_via0, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 	m_via0->writepa_handler().set(FUNC(lisa_state::COPS_via_out_a));
 	m_via0->writepb_handler().set(FUNC(lisa_state::COPS_via_out_b));
 	m_via0->ca2_handler().set(FUNC(lisa_state::COPS_via_out_ca2));
 	m_via0->cb2_handler().set(FUNC(lisa_state::COPS_via_out_cb2));
 	m_via0->irq_handler().set(FUNC(lisa_state::COPS_via_irq_func));
 
-	VIA6522(config, m_via1, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
+	MOS6522(config, m_via1, 20.37504_MHz_XTAL / 40); // CPU E clock (nominally 500 kHz)
 
 	SCC8530(config, m_scc, 7833600);
 }

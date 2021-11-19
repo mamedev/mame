@@ -9,7 +9,8 @@ Mihajlo Pupin Institute
 2016/07/14 Fixed display etc [Robbbert]
 
 Notes:
-- Serial terminals appear to need 8 bits, 2 stop bits, odd parity @ 9600
+- CRTC is configured to display 17 rows of 40 characters, but code always blanks the last 3 rows.
+- Serial keyboard appears to need 8 bits, 2 stop bits, odd parity
 - Unable to type anything as it seems uarts want BRKDET activated all the time, which we cannot do.
 - Unable to find any technical info at all, so it's all guesswork.
 
@@ -30,36 +31,46 @@ public:
 	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_charmap(*this, "chargen")
-		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
 		, m_crtc(*this, "crtc")
+		, m_mem(*this, "maincpu", AS_OPCODES)
+		, m_dma_view(*this, "dma_view")
 	{ }
 
 	void tim100(machine_config &config);
 
-private:
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
-
-	void io_map(address_map &map);
-	void mem_map(address_map &map);
-
+protected:
 	virtual void machine_start() override;
 
-	uint16_t m_dma_adr;
+private:
+	u8 dma_r(offs_t offset);
+	DECLARE_WRITE_LINE_MEMBER(sod_w);
+	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
+
+	void mem_map(address_map &map);
+	void mem_xfer_map(address_map &map);
+
 	required_region_ptr<uint8_t> m_charmap;
-	required_shared_ptr<uint8_t> m_p_videoram;
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<i8276_device> m_crtc;
+	required_address_space m_mem;
+	memory_view m_dma_view;
 };
+
+u8 tim100_state::dma_r(offs_t offset)
+{
+	u8 data = m_mem->read_byte(offset);
+	if (!machine().side_effects_disabled())
+		m_crtc->dack_w(data);
+	return data;
+}
 
 void tim100_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom(); // 2764 at U16
+	map(0x0000, 0x1fff).rom().region("maincpu", 0); // 2764 at U16
 	map(0x2000, 0x27ff).ram().share("videoram"); // 2KB static ram CDM6116A at U15
 	map(0x6000, 0x6001).rw("uart_u17", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x8000, 0x8001).rw("uart_u18", FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -67,10 +78,12 @@ void tim100_state::mem_map(address_map &map)
 	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
-void tim100_state::io_map(address_map &map)
+void tim100_state::mem_xfer_map(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
+	mem_map(map);
+	map(0x0000, 0xffff).view(m_dma_view);
+	m_dma_view[0](0x0000, 0xffff).r(FUNC(tim100_state::dma_r));
 }
 
 
@@ -78,12 +91,19 @@ void tim100_state::io_map(address_map &map)
 static INPUT_PORTS_START( tim100 )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( tim100 )
+static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_ODD )
+	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START( terminal )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_9600 )
+	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_7 )
+	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_EVEN )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
@@ -96,7 +116,6 @@ static const rgb_t tim100_palette[3] = {
 void tim100_state::machine_start()
 {
 	m_palette->set_pen_colors(0, tim100_palette);
-	save_item(NAME(m_dma_adr));
 }
 
 const gfx_layout charlayout =
@@ -140,21 +159,12 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 	}
 }
 
-WRITE_LINE_MEMBER( tim100_state::drq_w )
+WRITE_LINE_MEMBER( tim100_state::sod_w )
 {
 	if (state)
-		m_crtc->dack_w(m_p_videoram[m_dma_adr++]);
-}
-
-WRITE_LINE_MEMBER( tim100_state::irq_w )
-{
-	if (state)
-	{
-		m_dma_adr = 2;
-		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
-	}
+		m_dma_view.select(0);
 	else
-		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
+		m_dma_view.disable();
 }
 
 
@@ -162,24 +172,22 @@ void tim100_state::tim100(machine_config &config)
 {
 	/* basic machine hardware */
 	I8085A(config, m_maincpu, XTAL(4'915'200)); // divider unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &tim100_state::mem_map);
-	m_maincpu->set_addrmap(AS_IO, &tim100_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &tim100_state::mem_xfer_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &tim100_state::mem_map);
+	m_maincpu->out_sod_func().set(FUNC(tim100_state::sod_w));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(600, 352);
-	screen.set_visarea(0, 40*12-1, 0, 16*16-1);
+	screen.set_raw(9'600'000, 600, 0, 480, 320, 0, 272);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_tim100);
 
-	I8276(config, m_crtc, XTAL(4'915'200));
+	I8276(config, m_crtc, 800'000);
 	m_crtc->set_character_width(12);
 	m_crtc->set_display_callback(FUNC(tim100_state::crtc_display_pixels));
-	m_crtc->drq_wr_callback().set(FUNC(tim100_state::drq_w));
-	m_crtc->irq_wr_callback().set(FUNC(tim100_state::irq_w));
+	m_crtc->drq_wr_callback().set_inputline(m_maincpu, I8085_RST75_LINE);
+	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_RST65_LINE);
 	m_crtc->set_screen("screen");
 
 	PALETTE(config, m_palette).set_entries(3);
@@ -188,23 +196,25 @@ void tim100_state::tim100(machine_config &config)
 	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	uart_u17.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 	uart_u17.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart_u17.rxrdy_handler().set_inputline(m_maincpu, I8085_INTR_LINE);
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "keyboard"));
 	rs232.rxd_handler().set("uart_u17", FUNC(i8251_device::write_rxd));
 	rs232.dsr_handler().set("uart_u17", FUNC(i8251_device::write_dsr));
 	rs232.cts_handler().set("uart_u17", FUNC(i8251_device::write_cts));
-	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(tim100));
+	rs232.set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(keyboard));
 
 	i8251_device &uart_u18(I8251(config, "uart_u18", 0));
 	uart_u18.txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	uart_u18.dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	uart_u18.rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
+	uart_u18.rxrdy_handler().set_inputline(m_maincpu, I8085_RST55_LINE);
 
-	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal")); //"keyboard"));
+	rs232_port_device &rs232a(RS232_PORT(config, "rs232a", default_rs232_devices, "terminal"));
 	rs232a.rxd_handler().set("uart_u18", FUNC(i8251_device::write_rxd));
 	rs232a.dsr_handler().set("uart_u18", FUNC(i8251_device::write_dsr));
 	rs232a.cts_handler().set("uart_u18", FUNC(i8251_device::write_cts));
-	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(tim100));
+	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153'600));
 	uart_clock.signal_handler().set("uart_u17", FUNC(i8251_device::write_txc));

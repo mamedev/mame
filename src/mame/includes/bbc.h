@@ -111,7 +111,7 @@ public:
 		AMBER
 	};
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t bbc_ram_r(offs_t offset);
 	void bbc_ram_w(offs_t offset, uint8_t data);

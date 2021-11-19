@@ -27,7 +27,7 @@ To Do:
 metlclsh:
 - Clocks are all unknown
 - Text on the title screen has wrong colors the first time around
- (unitialized foreground palette 1, will be initialized shortly)
+  (uninitialized foreground palette 1, will be initialized shortly)
 - The background tilemap ram is bankswitched with other (not understood) ram
 - There are a few unknown writes
 
@@ -37,8 +37,8 @@ metlclsh:
 #include "includes/metlclsh.h"
 
 #include "cpu/m6809/m6809.h"
-#include "sound/2203intf.h"
-#include "sound/3526intf.h"
+#include "sound/ymopn.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -117,7 +117,7 @@ void metlclsh_state::metlclsh_slave_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW");
 	map(0xc0c0, 0xc0c0).w(FUNC(metlclsh_state::metlclsh_cause_nmi2));          // cause nmi on cpu #1
 	map(0xc0c1, 0xc0c1).w(FUNC(metlclsh_state::metlclsh_ack_irq2));            // irq ack
-	map(0xd000, 0xd7ff).bankr("bank1").w(FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
+	map(0xd000, 0xd7ff).bankr("rambank").w(FUNC(metlclsh_state::metlclsh_bgram_w)).share("bgram"); // this is banked
 	map(0xe301, 0xe301).w(FUNC(metlclsh_state::metlclsh_flipscreen_w));        // 0/1
 	map(0xe401, 0xe401).w(FUNC(metlclsh_state::metlclsh_rambank_w));
 	map(0xe402, 0xe403).writeonly().share("scrollx");

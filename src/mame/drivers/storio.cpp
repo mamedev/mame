@@ -50,6 +50,8 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void vtech_storio_base(machine_config &config);
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<cpu_device> m_maincpu;
@@ -94,7 +96,7 @@ static INPUT_PORTS_START( vtech_storio )
 INPUT_PORTS_END
 
 
-void vtech_storio_state::vtech_storio(machine_config &config)
+void vtech_storio_state::vtech_storio_base(machine_config &config)
 {
 	ARM9(config, m_maincpu, 240000000); // ARM926EJ-S CPU core (probably 240MHz, but not sure)
 
@@ -111,6 +113,11 @@ void vtech_storio_state::vtech_storio(machine_config &config)
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(vtech_storio_state::cart_load));
 
+}
+
+void vtech_storio_state::vtech_storio(machine_config &config)
+{
+	vtech_storio_base(config);
 	SOFTWARE_LIST(config, "cart_list").set_original("vtech_storio_cart");
 }
 

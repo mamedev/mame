@@ -105,7 +105,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(write_line_clock);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(irq2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq5_w);
@@ -388,9 +388,11 @@ static INPUT_PORTS_START( ms0515 )
 	PORT_DIPSETTING(0x02, "72 Hz")
 INPUT_PORTS_END
 
-FLOPPY_FORMATS_MEMBER( ms0515_state::floppy_formats )
-	FLOPPY_MS0515_FORMAT
-FLOPPY_FORMATS_END
+void ms0515_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MS0515_FORMAT);
+}
 
 static void ms0515_floppies(device_slot_interface &device)
 {

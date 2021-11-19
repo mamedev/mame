@@ -437,9 +437,11 @@ void hec2hrp_state::hector1(machine_config &config)
 
 // mini disk interface
 
-FLOPPY_FORMATS_MEMBER( hec2hrp_state::minidisc_formats )
-	FLOPPY_HMD_FORMAT
-FLOPPY_FORMATS_END
+void hec2hrp_state::minidisc_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_HMD_FORMAT);
+}
 
 static void minidisc_floppies(device_slot_interface &device)
 {
@@ -502,8 +504,8 @@ void hec2hrp_state::hec2hrx(machine_config &config)
 	m_upd_fdc->intrq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_interrupt));
 	m_upd_fdc->drq_wr_callback().set(FUNC(hec2hrp_state::disc2_fdc_dma_irq));
 
-	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[0], hector_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_upd_connector[1], hector_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	MCFG_MACHINE_RESET_OVERRIDE(hec2hrp_state,hec2hrx)
 	MCFG_MACHINE_START_OVERRIDE(hec2hrp_state,hec2hrx)

@@ -21,7 +21,7 @@
  sound cpu:  Z80
  sound ics: YM2151 + 3012
 
- other ics: 28c16 2kx8 eeprom.Used to store bookeeping,settings etc. like original pcb.
+ other ics: 28c16 2kx8 eeprom. Used to store book-keeping, settings etc. like original pcb.
 
  Osc: 20 Mhz, 28 Mhz
 
@@ -35,7 +35,7 @@
 
  Note
 
- This romset comes from a bootleg pcb produced by Playmark.This pcb was been modified to use as control standard joysticks instead of steering wheels.Game differences are: Copyright string removed.
+ This romset comes from a bootleg pcb produced by Playmark. This pcb was been modified to use as control standard joysticks instead of steering wheels. Game differences are: Copyright string removed.
 
 ***************************************************************************************/
 
@@ -231,8 +231,6 @@ void badlandsbl_state::badlandsb(machine_config &config)
 
 //  config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_MACHINE_START_OVERRIDE(badlands_state,badlands)
-
 	EEPROM_2816(config, "eeprom").lock_after_write(true);
 
 	/* video hardware */
@@ -241,7 +239,7 @@ void badlandsbl_state::badlandsb(machine_config &config)
 	palette.set_format(palette_device::IRGB_1555, 256);
 	palette.set_membits(8);
 
-	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32).set_info_callback(FUNC(badlands_state::get_playfield_tile_info));
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32).set_info_callback(FUNC(badlandsbl_state::get_playfield_tile_info));
 
 //  ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, badlands_state::s_mob_config);
 //  m_mob->set_gfxdecode(m_gfxdecode);
@@ -253,8 +251,6 @@ void badlandsbl_state::badlandsb(machine_config &config)
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(badlandsbl_state::screen_update_badlandsbl));
 	m_screen->set_palette("palette");
-
-	MCFG_VIDEO_START_OVERRIDE(badlands_state,badlands)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

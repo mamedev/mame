@@ -17,11 +17,12 @@
 #include "logmacro.h"
 
 
-FLOPPY_FORMATS_MEMBER( isa8_fdc_device::floppy_formats )
-	FLOPPY_PC_FORMAT,
-	FLOPPY_NASLITE_FORMAT,
-	FLOPPY_IBMXDF_FORMAT
-FLOPPY_FORMATS_END
+void isa8_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_pc_formats();
+	fr.add(FLOPPY_NASLITE_FORMAT);
+	fr.add(FLOPPY_IBMXDF_FORMAT);
+}
 
 static void pc_dd_floppies(device_slot_interface &device)
 {

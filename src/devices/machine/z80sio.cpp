@@ -506,7 +506,7 @@ int z80sio_device::z80daisy_irq_state()
 
 	// loop over all interrupt sources
 	int state = 0;
-	for (int i = 0; ARRAY_LENGTH(m_int_state) > i; ++i)
+	for (int i = 0; std::size(m_int_state) > i; ++i)
 	{
 		// if we're servicing a request, don't indicate more interrupts
 		if (m_int_state[prio[i]] & Z80_DAISY_IEO)
@@ -531,7 +531,7 @@ int z80sio_device::z80daisy_irq_ack()
 
 	// loop over all interrupt sources
 	int const *const prio = interrupt_priorities();
-	for (int i = 0; ARRAY_LENGTH(m_int_state) > i; ++i)
+	for (int i = 0; std::size(m_int_state) > i; ++i)
 	{
 		// find the first channel with an interrupt requested
 		if (m_int_state[prio[i]] & Z80_DAISY_INT)
@@ -597,7 +597,7 @@ int i8274_device::z80daisy_irq_ack()
 	{
 		// loop over all interrupt sources
 		int const *const prio = interrupt_priorities();
-		for (int i = 0; ARRAY_LENGTH(m_int_state) > i; ++i)
+		for (int i = 0; std::size(m_int_state) > i; ++i)
 		{
 			// find the first channel with an interrupt requested
 			if (m_int_state[prio[i]] & Z80_DAISY_INT)
@@ -711,7 +711,7 @@ void z80sio_device::return_from_interrupt()
 {
 	// loop over all interrupt sources
 	int const *const prio = interrupt_priorities();
-	for (int i = 0; ARRAY_LENGTH(m_int_state) > i; ++i)
+	for (int i = 0; std::size(m_int_state) > i; ++i)
 	{
 		// find the first channel with an interrupt requested
 		if (m_int_state[prio[i]] & (Z80_DAISY_IEO))
@@ -741,7 +741,7 @@ uint8_t z80sio_device::read_vector()
 	// modify vector for highest-priority pending interrupt
 	int const *const prio = interrupt_priorities();
 	vec &= 0xf1U;
-	for (int i = 0; ARRAY_LENGTH(m_int_state) > i; ++i)
+	for (int i = 0; std::size(m_int_state) > i; ++i)
 	{
 		if (m_int_state[prio[i]] & Z80_DAISY_INT)
 		{
@@ -797,7 +797,7 @@ uint8_t i8274_device::read_vector()
 
 	// modify vector for highest-priority pending interrupt
 	int const *const prio = interrupt_priorities();
-	for (int i = 0; ARRAY_LENGTH(m_int_state) > i; ++i)
+	for (int i = 0; std::size(m_int_state) > i; ++i)
 	{
 		if (m_int_state[prio[i]] & Z80_DAISY_INT)
 		{

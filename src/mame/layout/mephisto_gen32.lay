@@ -11,7 +11,7 @@ license:CC0
 			<color red="0.20" green="0.0" blue="0.0" />
 		</disk>
 		<disk state="1">
-			<color red="0.95" green="0.0" blue="0.0" />
+			<color red="1" green="0.1" blue="0.1" />
 		</disk>
 	</element>
 
@@ -35,54 +35,54 @@ license:CC0
 	<element name="piece" defstate="0">
 		<text string=" "><bounds x="0" y="0" width="1" height="1" /></text>
 
-		<image file="chess/wp.png" state="1"/>
-		<image file="chess/wn.png" state="2"/>
-		<image file="chess/wb.png" state="3"/>
-		<image file="chess/wr.png" state="4"/>
-		<image file="chess/wq.png" state="5"/>
-		<image file="chess/wk.png" state="6"/>
+		<image file="chess/wp.svg" state="1"/>
+		<image file="chess/wn.svg" state="2"/>
+		<image file="chess/wb.svg" state="3"/>
+		<image file="chess/wr.svg" state="4"/>
+		<image file="chess/wq.svg" state="5"/>
+		<image file="chess/wk.svg" state="6"/>
 
-		<image file="chess/bp.png" state="7"/>
-		<image file="chess/bn.png" state="8"/>
-		<image file="chess/bb.png" state="9"/>
-		<image file="chess/br.png" state="10"/>
-		<image file="chess/bq.png" state="11"/>
-		<image file="chess/bk.png" state="12"/>
+		<image file="chess/bp.svg" state="7"/>
+		<image file="chess/bn.svg" state="8"/>
+		<image file="chess/bb.svg" state="9"/>
+		<image file="chess/br.svg" state="10"/>
+		<image file="chess/bq.svg" state="11"/>
+		<image file="chess/bk.svg" state="12"/>
 
-		<image file="chess/wp.png" state="13"/>
+		<image file="chess/wp.svg" state="13"/>
 		<text string="J" state="13">
 			<color red="0" green="0" blue="0" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
 
-		<image file="chess/bp.png" state="14"/>
+		<image file="chess/bp.svg" state="14"/>
 		<text string="J" state="14">
 			<color red="1" green="1" blue="1" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
 
 		<!-- selected pieces -->
-		<image file="chess/wp.png" state="15"><color alpha="0.5" /></image>
-		<image file="chess/wn.png" state="16"><color alpha="0.5" /></image>
-		<image file="chess/wb.png" state="17"><color alpha="0.5" /></image>
-		<image file="chess/wr.png" state="18"><color alpha="0.5" /></image>
-		<image file="chess/wq.png" state="19"><color alpha="0.5" /></image>
-		<image file="chess/wk.png" state="20"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="15"><color alpha="0.5" /></image>
+		<image file="chess/wn.svg" state="16"><color alpha="0.5" /></image>
+		<image file="chess/wb.svg" state="17"><color alpha="0.5" /></image>
+		<image file="chess/wr.svg" state="18"><color alpha="0.5" /></image>
+		<image file="chess/wq.svg" state="19"><color alpha="0.5" /></image>
+		<image file="chess/wk.svg" state="20"><color alpha="0.5" /></image>
 
-		<image file="chess/bp.png" state="21"><color alpha="0.5" /></image>
-		<image file="chess/bn.png" state="22"><color alpha="0.5" /></image>
-		<image file="chess/bb.png" state="23"><color alpha="0.5" /></image>
-		<image file="chess/br.png" state="24"><color alpha="0.5" /></image>
-		<image file="chess/bq.png" state="25"><color alpha="0.5" /></image>
-		<image file="chess/bk.png" state="26"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="21"><color alpha="0.5" /></image>
+		<image file="chess/bn.svg" state="22"><color alpha="0.5" /></image>
+		<image file="chess/bb.svg" state="23"><color alpha="0.5" /></image>
+		<image file="chess/br.svg" state="24"><color alpha="0.5" /></image>
+		<image file="chess/bq.svg" state="25"><color alpha="0.5" /></image>
+		<image file="chess/bk.svg" state="26"><color alpha="0.5" /></image>
 
-		<image file="chess/wp.png" state="27"><color alpha="0.5" /></image>
+		<image file="chess/wp.svg" state="27"><color alpha="0.5" /></image>
 		<text string="J" state="27">
 			<color red="0.3" green="0.3" blue="0.2" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
 		</text>
 
-		<image file="chess/bp.png" state="28"><color alpha="0.5" /></image>
+		<image file="chess/bp.svg" state="28"><color alpha="0.5" /></image>
 		<text string="J" state="28">
 			<color red="0.7" green="0.7" blue="0.6" />
 			<bounds x="0" y="0.55" width="1" height="0.3" />
@@ -181,7 +181,7 @@ license:CC0
 
 		<!-- chessboard leds -->
 		<repeat count="8">
-			<param name="x" start="8.2" increment="10" />
+			<param name="x" start="8.3" increment="10" />
 			<param name="la" start="0" increment="1" />
 			<param name="lb" start="8" increment="1" />
 			<param name="lc" start="16" increment="1" />
@@ -229,7 +229,7 @@ license:CC0
 
 <!-- sb ui -->
 
-	<element name="wmask1" defstate="1">
+	<element name="wmask1" defstate="0">
 		<rect state="0"><color red="0.84" green="0.75" blue="0.50" /></rect>
 	</element>
 	<element name="wmask2">
@@ -460,7 +460,7 @@ license:CC0
 		<element ref="cblack"><bounds x="13" y="-2" width="89" height="89" /></element>
 		<element ref="cwhite"><bounds x="17" y="2" width="81" height="81" /></element>
 
-		<element ref="text_lcd"><bounds x="47.5" y="89" width="24.5" height="2" /></element>
+		<element ref="text_lcd"><bounds x="47.5" y="89.3" width="24.5" height="1.5" /></element>
 		<group ref="panel"><bounds x="47.5" y="91.8" width="24.5" height="6.5" /></group>
 		<group ref="buttons"><bounds x="77.5" y="88.5" width="13" height="13" /></group>
 

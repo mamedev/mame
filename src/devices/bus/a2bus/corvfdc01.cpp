@@ -27,10 +27,6 @@ DEFINE_DEVICE_TYPE(A2BUS_CORVFDC01, a2bus_corvfdc01_device, "crvfdc01", "Corvus 
 #define FDC01_ROM_REGION    "fdc01_rom"
 #define FDC01_FDC_TAG       "fdc01_fdc"
 
-FLOPPY_FORMATS_MEMBER( a2bus_corvfdc01_device::corv_floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
-
 static void corv_floppies(device_slot_interface &device)
 {
 	device.option_add("8sssd", FLOPPY_8_SSSD);
@@ -88,10 +84,10 @@ void a2bus_corvfdc01_device::device_add_mconfig(machine_config &config)
 	FD1793(config, m_wdfdc, 16_MHz_XTAL / 8);
 	m_wdfdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc01_device::intrq_w));
 	m_wdfdc->drq_wr_callback().set(FUNC(a2bus_corvfdc01_device::drq_w));
-	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
 }
 
 //-------------------------------------------------

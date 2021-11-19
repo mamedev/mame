@@ -21,7 +21,7 @@
 #define TI_PERIBOX_TAG     "peb"
 #define TI99_DSRROM        "dsrrom"
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 class peribox_slot_device;
 class device_ti99_peribox_card_interface;
@@ -261,7 +261,7 @@ private:
 	const char* card_name() { return m_card->device().tag(); }
 };
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb
 
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_EV,   bus::ti99::peb, peribox_ev_device)

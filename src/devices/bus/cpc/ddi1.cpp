@@ -43,7 +43,7 @@ const tiny_rom_entry *cpc_ddi1_device::device_rom_region() const
 void cpc_ddi1_device::device_add_mconfig(machine_config &config)
 {
 	UPD765A(config, m_fdc, DERIVED_CLOCK(1, 1), true, true); // pin 50 clock multiplied to 8 MHz, then divided back down through SMC FDC9229BT
-	FLOPPY_CONNECTOR(config, m_connector, ddi1_floppies, "3ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_connector, ddi1_floppies, "3ssdd", floppy_image_device::default_mfm_floppy_formats);
 	SOFTWARE_LIST(config, "flop_list").set_original("cpc_flop");
 
 	// pass-through

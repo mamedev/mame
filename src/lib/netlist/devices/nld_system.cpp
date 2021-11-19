@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
  * nld_system.cpp
@@ -11,10 +11,7 @@
 
 #include "plib/pstrutil.h"
 
-namespace netlist
-{
-namespace devices
-{
+namespace netlist::devices {
 
 	// -----------------------------------------------------------------------------
 	// extclock
@@ -140,5 +137,4 @@ namespace devices
 	NETLIB_DEVICE_IMPL(logic_input,         "LOGIC_INPUT",            "IN,MODEL")
 	NETLIB_DEVICE_IMPL_ALIAS(logic_input_ttl, logic_input, "TTL_INPUT", "IN")
 
-} // namespace devices
-} // namespace netlist
+} // namespace netlist::devices

@@ -169,7 +169,6 @@ void dspp_device::device_start()
 #if 0
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_core->m_flags).callimport().callexport().formatstr("%6s").noshow();
 	state_add(STATE_GENPCBASE, "GENPCBASE", m_ppc).noshow();
-	state_add(STATE_GENSP,     "GENSP",     m_src2val[REGBASE + 31]).noshow();
 
 	state_add(DSPP_PS,         "PS",        m_core->m_flagsio).callimport().callexport();
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -613,10 +612,11 @@ inline void dspp_device::set_rbase(uint32_t base, uint32_t addr)
 		case 0:
 			m_core->m_rbase[0] = addr;
 			m_core->m_rbase[1] = addr + 4 - base;
+			[[fallthrough]];
 		// Intentional fall-through
 		case 8:
 			m_core->m_rbase[2] = addr + 8 - base;
-
+			[[fallthrough]];
 		case 12:
 			m_core->m_rbase[3] = addr + 12 - base;
 			break;
@@ -1587,7 +1587,7 @@ void dspp_device::update_fifo_dma()
 
 	while (mask != 0)
 	{
-		uint32_t channel = 31 - count_leading_zeros(mask);
+		uint32_t channel = 31 - count_leading_zeros_32(mask);
 
 		const fifo_dma & dma = m_fifo_dma[channel];
 

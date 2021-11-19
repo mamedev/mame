@@ -24,7 +24,7 @@ public:
 	util::core_file::ptr &image_file() { return m_image_file;  }
 
 	// checks to see if image is of the specified "file type" (in practice, file extension)
-	bool is_filetype(const char *candidate_filetype) const { return !core_stricmp(m_file_type.c_str(), candidate_filetype); }
+	bool is_filetype(std::string_view candidate_filetype) const;
 
 	// extra info from hashfile
 	bool hashfile_extrainfo(std::string &extrainfo);
@@ -227,6 +227,6 @@ protected:
 	}
 };
 
-typedef device_interface_iterator<device_slot_interface> slot_interface_iterator;
+typedef device_interface_enumerator<device_slot_interface> slot_interface_enumerator;
 
 #endif // MAME_EMU_DISLOT_H

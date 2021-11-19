@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
 /*
-    video/dgn_beta.c
+    video/dgn_beta.cpp
 
 The Dragon Beta uses a 68B45 for it's display generation, this is used in the
 conventional way with a character generator ROM in the two text modes, which are

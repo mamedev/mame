@@ -47,10 +47,10 @@
 #define WD1772_TAG "wd1772"
 #define PAL_TAG "pal"
 
-DEFINE_DEVICE_TYPE_NS(TI99_DDCC1, bus::ti99::peb, myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
-DEFINE_DEVICE_TYPE_NS(DDCC1_PAL, bus::ti99::peb, ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
+DEFINE_DEVICE_TYPE(TI99_DDCC1, bus::ti99::peb::myarc_fdc_device, "ti99_ddcc1", "Myarc Disk Controller Card")
+DEFINE_DEVICE_TYPE(DDCC1_PAL, bus::ti99::peb::ddcc1_pal_device, PAL_TAG, "Myarc DDCC-1 PAL u1")
 
-namespace bus { namespace ti99 { namespace peb {
+namespace bus::ti99::peb {
 
 // ----------------------------------
 
@@ -84,7 +84,7 @@ bool myarc_fdc_device::card_selected()
 /*
     Provides the current address to the PAL.
 */
-uint16_t myarc_fdc_device::get_address()
+offs_t myarc_fdc_device::get_address()
 {
 	return m_address;
 }
@@ -94,7 +94,7 @@ uint16_t myarc_fdc_device::get_address()
 */
 void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset;
 	if (m_pal->ramsel())
 	{
@@ -104,7 +104,7 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 	if (m_pal->romen())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x1000 : 0;
+		offs_t base = m_banksel? 0x1000 : 0;
 		*value = m_dsrrom[base | (m_address & 0x0fff)];
 	}
 	m_address = addrcopy;
@@ -115,7 +115,7 @@ void myarc_fdc_device::debug_read(offs_t offset, uint8_t* value)
 */
 void myarc_fdc_device::debug_write(offs_t offset, uint8_t data)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset;
 	if (m_pal->ramsel())
 	{
@@ -145,7 +145,7 @@ void myarc_fdc_device::readz(offs_t offset, uint8_t *value)
 	if (m_pal->romen())
 	{
 		// EPROM selected
-		uint16_t base = m_banksel? 0x1000 : 0;
+		offs_t base = m_banksel? 0x1000 : 0;
 		uint8_t* rom = &m_dsrrom[base | (m_address & 0x0fff)];
 		*value = *rom;
 
@@ -196,7 +196,7 @@ void myarc_fdc_device::write(offs_t offset, uint8_t data)
 void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 {
 	const uint8_t dipswitch[] = { 0x00, 0x01, 0x02, 0x04, 0x08 };
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_pal->cs251())
 	{
@@ -229,7 +229,7 @@ void myarc_fdc_device::crureadz(offs_t offset, uint8_t *value)
 */
 void myarc_fdc_device::cruwrite(offs_t offset, uint8_t data)
 {
-	uint16_t addrcopy = m_address;
+	offs_t addrcopy = m_address;
 	m_address = offset; // Copy the CRU address on the address variable
 	if (m_pal->cs259())
 	{
@@ -359,10 +359,12 @@ void myarc_fdc_device::device_config_complete()
 	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
 }
 
-FLOPPY_FORMATS_MEMBER(myarc_fdc_device::floppy_formats)
-	FLOPPY_TI99_SDF_FORMAT,
-	FLOPPY_TI99_TDF_FORMAT
-FLOPPY_FORMATS_END
+void myarc_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TI99_SDF_FORMAT);
+	fr.add(FLOPPY_TI99_TDF_FORMAT);
+}
 
 static void ccfdc_floppies(device_slot_interface &device)
 {
@@ -383,16 +385,16 @@ INPUT_PORTS_START(myarc_ddcc )
 		PORT_DIPSETTING(0x01, DEF_STR( On ))
 
 	PORT_START( "SW1" )
-	PORT_DIPNAME( 0x01, 0x01, "DSK1 head step time" )
+	PORT_DIPNAME( 0x01, 0x00, "DSK1 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")          // 6 ms for 1770
 		PORT_DIPSETTING( 0x01, "20ms/2ms")     // 20 ms for 1770 and 2ms for 1772
-	PORT_DIPNAME( 0x02, 0x02, "DSK2 head step time" )
+	PORT_DIPNAME( 0x02, 0x00, "DSK2 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x02, "20ms/2ms")
-	PORT_DIPNAME( 0x04, 0x04, "DSK3 head step time" )
+	PORT_DIPNAME( 0x04, 0x00, "DSK3 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x04, "20ms/2ms")
-	PORT_DIPNAME( 0x08, 0x08, "DSK4 head step time" )
+	PORT_DIPNAME( 0x08, 0x00, "DSK4 head step time" )
 		PORT_DIPSETTING( 0x00, "6ms")
 		PORT_DIPSETTING( 0x08, "20ms/2ms")
 INPUT_PORTS_END
@@ -494,4 +496,4 @@ void ddcc1_pal_device::device_config_complete()
 	m_board = static_cast<myarc_fdc_device*>(owner());
 }
 
-} } } // end namespace bus::ti99::peb
+} // end namespace bus::ti99::peb

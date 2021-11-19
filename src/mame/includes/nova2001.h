@@ -19,7 +19,8 @@ public:
 		m_palette(*this, "palette"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_bg_videoram(*this, "bg_videoram"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "palette", 768, ENDIANNESS_LITTLE)
 	{ }
 
 	void raiders5(machine_config &config);
@@ -40,6 +41,7 @@ private:
 	optional_shared_ptr<u8> m_fg_videoram;
 	required_shared_ptr<u8> m_bg_videoram;
 	optional_shared_ptr<u8> m_spriteram;
+	memory_share_creator<u8> m_paletteram;
 
 	u8 m_ninjakun_io_a002_ctrl;
 	tilemap_t *m_bg_tilemap;
@@ -48,6 +50,7 @@ private:
 	void ninjakun_cpu1_io_A002_w(u8 data);
 	void ninjakun_cpu2_io_A002_w(u8 data);
 	void paletteram_w(offs_t offset, u8 data);
+	u8 paletteram_r(offs_t offset);
 	void fg_videoram_w(offs_t offset, u8 data);
 	void nova2001_bg_videoram_w(offs_t offset, u8 data);
 	void ninjakun_bg_videoram_w(offs_t offset, u8 data);

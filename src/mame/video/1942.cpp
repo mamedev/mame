@@ -135,6 +135,11 @@ void _1942_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1942_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(0);
+
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 void _1942p_state::video_start()
@@ -143,6 +148,11 @@ void _1942p_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(_1942_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 16);
 
 	m_fg_tilemap->set_transparent_pen(3);
+
+	m_bg_tilemap->set_scrolldx(128, 128);
+	m_bg_tilemap->set_scrolldy(  6,   6);
+	m_fg_tilemap->set_scrolldx(128, 128);
+	m_fg_tilemap->set_scrolldy(  6,   6);
 }
 
 
@@ -225,7 +235,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		const rectangle cliprecty(cliprect.min_x, cliprect.max_x, y, y);
 		uint8_t objdata[4];
-		uint8_t v = flip_screen() ? ~(y - 1) : y - 1;
+		uint8_t v = flip_screen() ? ~(y - 1 - 6) : y - 1 - 6;
 		for (int h = 496; h >= 128; h -= 16)
 		{
 			const bool objcnt4 = BIT(h, 8) != BIT(~h, 7);
@@ -283,7 +293,7 @@ void _1942_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			{
 				do
 				{
-					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
+					m_gfxdecode->gfx(2)->transpen(bitmap, cliprecty, code + i, col, flip_screen(), flip_screen(), sx+128, sy + 6 + 16 * i * dir, 15);
 				} while (i-- > 0);
 			}
 		}
@@ -310,31 +320,16 @@ void _1942p_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		int sx = m_spriteram[offs + 2] - 0x10 * (m_spriteram[offs + 3] & 0x10);
 		int sy = m_spriteram[offs + 1];
 
-		int dir;
 		if (flip_screen())
 		{
 			sx = 240 - sx;
-			dir = -1;
 		}
 		else
 		{
 			sy = 240 - sy;
-			dir = 1;
 		}
 
-		/* handle double / quadruple height */
-		int i = (m_spriteram[offs + 3] & 0xc0) >> 6;
-		if (i == 2)
-			i = 3;
-
-		i = 0;
-
-		do
-		{
-			m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code + i, col, flip_screen(), flip_screen(), sx, sy + 16 * i * dir, 15);
-
-			i--;
-		} while (i >= 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, code, col, flip_screen(), flip_screen(), sx+128, sy+6, 15);
 	}
 
 }

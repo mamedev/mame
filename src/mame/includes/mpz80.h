@@ -39,6 +39,10 @@ public:
 
 	void mpz80(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -46,9 +50,6 @@ private:
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_map_ram;
 	required_ioport m_16c;
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	inline offs_t get_address(offs_t offset);
 	inline offs_t get_io_address(offs_t offset);

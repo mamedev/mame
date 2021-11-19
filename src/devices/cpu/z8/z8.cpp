@@ -702,7 +702,7 @@ void z8_device::t1_trigger()
 	case Z8_TMR_TIN_TRIGGER:
 		if (m_internal_timer[1]->enabled())
 			break;
-
+		[[fallthrough]];
 	case Z8_TMR_TIN_RETRIGGER:
 		if ((m_tmr & Z8_TMR_ENABLE_T1) != 0)
 		{
@@ -1219,7 +1219,6 @@ void z8_device::device_start()
 		state_add(STATE_GENPC,   "GENPC",     m_pc).callimport().noshow();
 		state_add(STATE_GENPCBASE, "CURPC",   m_ppc).callimport().noshow();
 		state_add(Z8_SP,         "SP",        m_sp.w);
-		state_add(STATE_GENSP,   "GENSP",     m_sp.w).noshow();
 		state_add(Z8_RP,         "RP",        m_rp);
 		state_add(STATE_GENFLAGS, "GENFLAGS", m_flags).noshow().formatstr("%6s");
 		state_add(Z8_IMR,        "IMR",       m_imr);

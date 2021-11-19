@@ -1,76 +1,86 @@
 // license:BSD-3-Clause
-// copyright-holders:Tim Schuerewegen, Ryan Holtz
+// copyright-holders:Nigel Barnes
 /*********************************************************************
 
     Philips PCF8583 Clock and Calendar with 240 x 8-bit RAM
 
     TODO:
-        - Alarm mode
-        - Event-counter mode
-        - Clock select
-        - Clock output
-        - Interrupts
+    - Event-counter mode
 
 *********************************************************************/
 
 #include "emu.h"
 #include "pcf8583.h"
 
+#define LOG_DATA (1 << 1)
+#define LOG_LINE (1 << 2)
+
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(PCF8583, pcf8583_device, "pcf8583", "PCF8583 RTC with 240x8 RAM")
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  pcf8583_device - constructor
+//-------------------------------------------------
 
 pcf8583_device::pcf8583_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PCF8583, tag, owner, clock)
 	, device_rtc_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)
-	, m_irq_callback(*this)
+	, m_region(*this, DEVICE_SELF)
+	, m_irq_cb(*this)
+	, m_slave_address(PCF8583_SLAVE_ADDRESS)
+	, m_scl(0)
+	, m_sdaw(0)
+	, m_sdar(1)
+	, m_state(STATE_IDLE)
+	, m_bits(0)
+	, m_shift(0)
+	, m_devsel(0)
+	, m_register(0)
+	, m_timer(nullptr)
 {
 }
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
 void pcf8583_device::device_start()
 {
-	std::fill(std::begin(m_register), std::end(m_register), 0);
-
 	m_timer = timer_alloc(TIMER_TICK);
 	m_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
 
 	save_item(NAME(m_scl));
-	save_item(NAME(m_sda));
-	save_item(NAME(m_inp));
-	save_item(NAME(m_transfer_active));
-	save_item(NAME(m_bit_index));
+	save_item(NAME(m_sdaw));
+	save_item(NAME(m_sdar));
+	save_item(NAME(m_state));
+	save_item(NAME(m_bits));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_devsel));
+	save_item(NAME(m_register));
 	save_item(NAME(m_irq));
-	save_item(NAME(m_data_recv_index));
-	save_item(NAME(m_data_recv));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_pos));
-	save_item(NAME(m_write_address));
-	save_item(NAME(m_read_address));
+	save_item(NAME(m_data));
+	save_item(NAME(m_slave_address));
 
-	m_irq_callback.resolve_safe();
-}
-
-void pcf8583_device::device_reset()
-{
-	m_scl = 1;
-	m_sda = 1;
-	m_transfer_active = false;
-	m_inp = 0;
-	m_mode = RTC_MODE_RECV;
-	m_bit_index = 0;
-	m_irq = false;
-	m_pos = 0;
-	clear_rx_buffer();
-	set_time(true, get_date_year(), get_date_month(), get_date_day(), 0, get_time_hour(), get_time_minute(), get_time_second());
+	m_irq_cb.resolve_safe();
 }
 
 void pcf8583_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	switch(id)
+	switch (id)
 	{
-		case TIMER_TICK:
-			if (!BIT(m_data[REG_CONTROL], CONTROL_STOP_BIT))
-				advance_hundredths();
-			break;
+	case TIMER_TICK:
+		if (!BIT(m_data[REG_CONTROL], CONTROL_STOP_BIT))
+			advance_hundredths();
+		break;
 	}
 }
 
@@ -83,8 +93,8 @@ void pcf8583_device::advance_hundredths()
 		hundredths = 0;
 		advance_seconds();
 		m_irq = !m_irq;
-		printf("Toggling IRQ: %d\n", m_irq ? 1 : 0);
-		m_irq_callback(m_irq);
+
+		m_irq_cb(m_irq);
 	}
 	m_data[REG_HUNDREDTHS] = convert_to_bcd(hundredths);
 }
@@ -98,138 +108,314 @@ void pcf8583_device::rtc_clock_updated(int year, int month, int day, int day_of_
 	set_date_day(day);
 	set_date_month(month);
 	set_date_year(year);
+
+	if (BIT(m_data[REG_HOURS], 7)) // 12h format
+	{
+		// update AM/PM flag
+		m_data[REG_HOURS] = (m_data[REG_HOURS] & 0xbf) | (bcd_to_integer(m_data[REG_HOURS] & 0x3f) >= 12 ? 0x40 : 0x00);
+		// convert from 24h to 12h
+		m_data[REG_HOURS] = (m_data[REG_HOURS] & 0xc0) | convert_to_bcd(bcd_to_integer((m_data[REG_HOURS] & 0x3f) % 12));
+	}
+
+	if (BIT(m_data[REG_CONTROL], 2)) // alarm enabled
+	{
+		switch (m_data[REG_ALARM_CONTROL] & 0x30)
+		{
+		case 0x00: // no alarm
+			break;
+
+		case 0x10: // daily alarm
+			if (m_data[REG_HUNDREDTHS] == m_data[REG_ALARM_HUNDREDTHS] && m_data[REG_SECONDS] == m_data[REG_ALARM_SECONDS] &&
+				m_data[REG_MINUTES] == m_data[REG_ALARM_MINUTES] && m_data[REG_HOURS] == m_data[REG_ALARM_HOURS])
+			{
+				m_data[REG_ALARM_CONTROL] |= 0x80;
+			}
+			break;
+
+		case 0x20: // weekday alarm
+			if (BIT(m_data[REG_ALARM_MONTH], m_data[REG_MONTH_DAY] >> 5)) // weekday enabled
+			{
+				if (m_data[REG_HUNDREDTHS] == m_data[REG_ALARM_HUNDREDTHS] && m_data[REG_SECONDS] == m_data[REG_ALARM_SECONDS] &&
+					m_data[REG_MINUTES] == m_data[REG_ALARM_MINUTES] && m_data[REG_HOURS] == m_data[REG_ALARM_HOURS])
+				{
+					m_data[REG_ALARM_CONTROL] |= 0x80;
+				}
+			}
+			break;
+
+		case 0x30: // dated alarm
+			if (m_data[REG_HUNDREDTHS] == m_data[REG_ALARM_HUNDREDTHS] && m_data[REG_SECONDS] == m_data[REG_ALARM_SECONDS] &&
+				m_data[REG_MINUTES] == m_data[REG_ALARM_MINUTES] && m_data[REG_HOURS] == m_data[REG_ALARM_HOURS] &&
+				(m_data[REG_YEAR_DATE] & 0x3f) == m_data[REG_ALARM_DATE] && (m_data[REG_MONTH_DAY] & 0x1f) == m_data[REG_ALARM_MONTH])
+			{
+				m_data[REG_ALARM_CONTROL] |= 0x80;
+			}
+			break;
+		}
+
+		// alarm interrupt enable
+		m_irq_cb(BIT(m_data[REG_ALARM_CONTROL], 7));
+	}
 }
+
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
 
 void pcf8583_device::nvram_default()
 {
-	std::fill(std::begin(m_data), std::end(m_data), 0);
+	// populate from a memory region if present
+	if (m_region.found())
+	{
+		if (m_region->bytes() != 0x100)
+		{
+			fatalerror("pcf8583 region '%s' wrong size (expected size = 0x100)\n", tag());
+		}
+
+		std::copy_n(m_region->base(), m_region->bytes(), &m_data[0]);
+	}
+	else
+	{
+		std::fill(std::begin(m_data), std::end(m_data), 0);
+	}
 }
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
 
 void pcf8583_device::nvram_read(emu_file &file)
 {
 	file.read(m_data, sizeof(m_data));
 }
 
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
 void pcf8583_device::nvram_write(emu_file &file)
 {
 	file.write(m_data, sizeof(m_data));
 }
 
-void pcf8583_device::write_register(uint8_t offset, uint8_t data)
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+WRITE_LINE_MEMBER(pcf8583_device::a0_w)
 {
-	logerror("%s: write_register: address %02x = %02x\n", machine().describe_context(), offset, data);
-	m_data[offset] = data;
+	state &= 1;
+	if (BIT(m_slave_address, 1) != state)
+	{
+		LOGMASKED(LOG_LINE, "set a0 %d\n", state );
+		m_slave_address = (m_slave_address & 0xfd) | (state << 1);
+	}
 }
 
 WRITE_LINE_MEMBER(pcf8583_device::scl_w)
 {
-	if (m_transfer_active && !m_scl && state)
+	if (m_scl != state)
 	{
-		switch (m_mode)
-		{
-			case RTC_MODE_RECV:
-			{
-				logerror("%s: scl_w: Receiving bit %d in receive mode\n", machine().describe_context(), m_sda ? 1 : 0);
-				if (m_sda)
-					m_data_recv |= (0x80 >> m_bit_index);
-				m_bit_index++;
+		m_scl = state;
+		LOGMASKED(LOG_LINE, "set_scl_line %d\n", m_scl);
 
-				if (m_bit_index > 8) // ignore ACK bit
+		switch (m_state)
+		{
+		case STATE_DEVSEL:
+		case STATE_REGISTER:
+		case STATE_DATAIN:
+			if (m_bits < 8)
+			{
+				if (m_scl)
 				{
-					if (m_data_recv_index == 0)
+					m_shift = ((m_shift << 1) | m_sdaw) & 0xff;
+					m_bits++;
+				}
+			}
+			else
+			{
+				if (m_scl)
+				{
+					switch (m_state)
 					{
-						if (m_data_recv == m_read_address)
+					case STATE_DEVSEL:
+						m_devsel = m_shift;
+
+						if ((m_devsel & 0xfe) != m_slave_address)
 						{
-							logerror("%s: scl_w: Received byte 0 (%02x), matches read address, entering read/send mode\n", machine().describe_context(), m_data_recv);
-							m_mode = RTC_MODE_SEND;
+							LOGMASKED(LOG_DATA, "devsel %02x: not this device\n", m_devsel);
+							m_state = STATE_IDLE;
 						}
-						else if (m_data_recv == m_write_address)
+						else if ((m_devsel & 1) == 0)
 						{
-							logerror("%s: scl_w: Received byte 0 (%02x), matches write address, entering read/send mode\n", machine().describe_context(), m_data_recv);
-							m_mode = RTC_MODE_RECV;
+							LOGMASKED(LOG_DATA, "devsel %02x: write\n", m_devsel);
+							m_state = STATE_REGISTER;
 						}
 						else
 						{
-							logerror("%s: scl_w: Received byte 0 (%02x), unknown address, going idle\n", machine().describe_context(), m_data_recv);
-							m_mode = RTC_MODE_NONE;
+							LOGMASKED(LOG_DATA, "devsel %02x: read\n", m_devsel);
+							m_state = STATE_DATAOUT;
 						}
-					}
-					else if (m_data_recv_index == 1)
-					{
-						logerror("%s: scl_w: Received byte 1 (%02x), setting current read/write pos\n", machine().describe_context(), m_data_recv);
-						m_pos = m_data_recv;
-					}
-					else if (m_data_recv_index >= 2)
-					{
-						logerror("%s: scl_w: Received byte 2+ (%d: %02x), storing to memory\n", machine().describe_context(), m_data_recv_index, m_data_recv);
-						write_register(m_pos, m_data_recv);
-						m_pos++;
+						break;
+
+					case STATE_REGISTER:
+						m_register = m_shift;
+
+						LOGMASKED(LOG_DATA, "register %02x\n", m_register);
+
+						m_state = STATE_DATAIN;
+						break;
+
+					case STATE_DATAIN:
+						LOGMASKED(LOG_DATA, "data[ %02x ] <- %02x\n", m_register, m_shift);
+
+						m_data[m_register] = m_shift;
+
+						switch (m_register)
+						{
+						case REG_CONTROL:
+							if ((m_shift & 0x24) == 0x04)
+								logerror("Timer not implemented");
+							break;
+						case REG_SECONDS:
+							set_clock_register(RTC_SECOND, bcd_to_integer(m_data[REG_SECONDS]));
+							break;
+						case REG_MINUTES:
+							set_clock_register(RTC_MINUTE, bcd_to_integer(m_data[REG_MINUTES]));
+							break;
+						case REG_HOURS:
+							set_clock_register(RTC_HOUR, bcd_to_integer(m_data[REG_HOURS]));
+							break;
+						case REG_YEAR_DATE:
+							set_clock_register(RTC_DAY, bcd_to_integer(m_data[REG_YEAR_DATE] & 0x3f));
+							set_clock_register(RTC_YEAR, bcd_to_integer(m_data[REG_YEAR_DATE] >> 6));
+							break;
+						case REG_MONTH_DAY:
+							set_clock_register(RTC_MONTH, bcd_to_integer(m_data[REG_MONTH_DAY] & 0x1f));
+							set_clock_register(RTC_DAY_OF_WEEK, bcd_to_integer((m_data[REG_MONTH_DAY] >> 5) + 1));
+							break;
+						case REG_ALARM_CONTROL:
+							m_irq_cb(m_data[REG_ALARM_CONTROL] & 0x88 ? 1 : 0);
+							break;
+						}
+
+						m_register++;
+						break;
 					}
 
-					m_bit_index = 0;
-					m_data_recv = 0;
-					m_data_recv_index++;
+					m_bits++;
+				}
+				else
+				{
+					if (m_bits == 8)
+					{
+						m_sdar = 0;
+					}
+					else
+					{
+						m_bits = 0;
+						m_sdar = 1;
+					}
 				}
 			}
 			break;
 
-			case RTC_MODE_SEND:
+		case STATE_DATAOUT:
+			if (m_bits < 8)
 			{
-				if (m_bit_index < 8)
+				if (m_scl)
 				{
-					m_inp = BIT(m_data[m_pos], 7 - m_bit_index);
-					logerror("%s: scl_w: In send mode, reading bit %d from ram[0x%02x]=%02x (%d)\n", machine().describe_context(), m_bit_index, m_pos, m_data[m_pos], m_inp);
-				}
-				m_bit_index++;
+					if (m_bits == 0)
+					{
+						m_shift = m_data[m_register];
 
-				if (m_bit_index > 8)
+						switch (m_register)
+						{
+						case 0x05:
+							if (BIT(m_data[0x00], 3)) // mask flag
+								m_shift &= 0x3f;
+							break;
+						case 0x06:
+							if (BIT(m_data[0x00], 3)) // mask flag
+								m_shift &= 0x1f;
+							break;
+						}
+
+						LOGMASKED(LOG_DATA, "data[ %02x ] -> %02x\n", m_register, m_shift);
+						m_register++;
+					}
+
+					m_sdar = (m_shift >> 7) & 1;
+
+					m_shift = (m_shift << 1) & 0xff;
+					m_bits++;
+				}
+			}
+			else
+			{
+				if (m_scl)
 				{
-					m_bit_index = 0;
-					m_pos++;
+					if (m_sdaw)
+					{
+						LOGMASKED(LOG_DATA, "nack\n");
+						m_state = STATE_IDLE;
+					}
+
+					m_bits++;
+				}
+				else
+				{
+					if (m_bits == 8)
+					{
+						m_sdar = 1;
+					}
+					else
+					{
+						m_bits = 0;
+					}
 				}
 			}
 			break;
 		}
 	}
-
-	m_scl = state;
 }
 
 WRITE_LINE_MEMBER(pcf8583_device::sda_w)
 {
-	if (m_scl)
+	state &= 1;
+	if (m_sdaw != state)
 	{
-		if (!state && m_sda)
+		LOGMASKED(LOG_LINE, "set sda %d\n", state);
+		m_sdaw = state;
+
+		if (m_scl)
 		{
-			// start condition (high to low when clock is high)
-			m_transfer_active = true;
-			m_bit_index = 0;
-			m_data_recv_index = 0;
-			clear_rx_buffer();
-		}
-		else if (state && !m_sda)
-		{
-			// stop condition (low to high when clock is high)
-			m_transfer_active = false;
+			if (m_sdaw)
+			{
+				LOGMASKED(LOG_DATA, "stop\n");
+				m_state = STATE_IDLE;
+			}
+			else
+			{
+				LOGMASKED(LOG_DATA, "start\n");
+				m_state = STATE_DEVSEL;
+				m_bits = 0;
+			}
+
+			m_sdar = 1;
 		}
 	}
-
-	m_sda = state;
 }
 
 READ_LINE_MEMBER(pcf8583_device::sda_r)
 {
-	return m_inp;
-}
+	int res = m_sdar & 1;
 
-void pcf8583_device::clear_rx_buffer()
-{
-	m_data_recv = 0;
-	m_data_recv_index = 0;
-}
+	LOGMASKED(LOG_LINE, "read sda %d\n", res);
 
-void pcf8583_device::set_a0(uint8_t a0)
-{
-	m_read_address = READ_ADDRESS_BASE | (a0 << 1);
-	m_write_address = WRITE_ADDRESS_BASE | (a0 << 1);
+	return res;
 }

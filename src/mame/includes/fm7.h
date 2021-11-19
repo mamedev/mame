@@ -15,8 +15,9 @@
 #include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "sound/ay8910.h"
 #include "sound/beep.h"
-#include "sound/2203intf.h"
+#include "sound/ymopn.h"
 #include "machine/wd_fdc.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
@@ -136,7 +137,7 @@ protected:
 		uint16_t y1;
 		uint8_t busy;
 	};
-	
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 

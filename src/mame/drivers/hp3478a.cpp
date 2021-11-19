@@ -110,6 +110,8 @@ T1 : data in thru isol, from analog CPU (opcodes jt1 / jnt1)
 /**** HP 3478A class **/
 
 
+namespace {
+
 class hp3478a_state : public driver_device
 {
 public:
@@ -132,6 +134,7 @@ protected:
 	virtual void machine_start() override;
 	//virtual void machine_reset() override;    //not needed?
 
+private:
 	uint8_t p1read();
 	void p1write(uint8_t data);
 	void p2write(uint8_t data);
@@ -181,7 +184,7 @@ protected:
 	uint8_t m_lcd_chrbuf[12];   //raw digits (not ASCII)
 	uint8_t m_lcd_text[13]; //mapped to ASCII, only for debug output
 	uint32_t m_lcd_segdata[12];
-	bool m_lcd_annuns[12];	//local copy of annunciators
+	bool m_lcd_annuns[12];  //local copy of annunciators
 	///////////////////////////
 
 
@@ -588,6 +591,9 @@ void hp3478a_state::machine_start()
 
 	m_watchdog->watchdog_enable();
 
+	m_p1_oldstate = 0;
+	m_p2_oldstate = 0;
+
 }
 
 /******************************************************************************
@@ -736,6 +742,9 @@ ROM_START( hp3478a )
 	ROM_REGION( 0x100, "nvram", 0 ) // default data for battery-backed Calibration RAM
 	ROM_LOAD( "calram.bin", 0, 0x100, NO_DUMP)
 ROM_END
+
+} // Anonymous namespace
+
 
 /******************************************************************************
  Drivers

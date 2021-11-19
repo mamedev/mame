@@ -143,9 +143,11 @@ static INPUT_PORTS_START( partner )
 INPUT_PORTS_END
 
 /* Machine driver */
-FLOPPY_FORMATS_MEMBER( partner_state::floppy_formats )
-	FLOPPY_SMX_FORMAT
-FLOPPY_FORMATS_END
+void partner_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_SMX_FORMAT);
+}
 
 /* F4 Character Displayer */
 static const gfx_layout charlayout =

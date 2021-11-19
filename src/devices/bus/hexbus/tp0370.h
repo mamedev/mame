@@ -16,7 +16,7 @@
 
 #pragma once
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 class ibc_device : public device_t
 {
@@ -69,7 +69,7 @@ private:
 	void set_lines(bool bav, bool hsk);
 };
 
-}   }
+} // namespace bus::hexbus
 
 DECLARE_DEVICE_TYPE_NS(IBC, bus::hexbus, ibc_device)
 #endif

@@ -53,6 +53,19 @@ Notes:
                        The chip is pin-compatible with Motorola MC68705U3, Motorola MC6805U2
                        and Hitachi HD6805U1. The 4k MC68705U3 dump in MAME is from a bootleg PCB.
 
+Note from Guru: The bootleg 4k MCU dump was written to a genuine
+Motorola MC68705U3 microcontroller and tested on the original Alpha
+Denshi Kyros no Yakata PCB and works. Since the bootleg PCB is
+visually the same this suggests the bootleggers copied the PCB 1:1
+including the HD6805U1 MCU data then adapted it for the 68705U3 with
+minimal changes.
+*******************************
+romcmp -d *.bin
+Comparing 2 files....
+kyros_68705u3.bin [3/4]      kyros_mcu.bin [1/2]      99.902344%
+kyros_68705u3.bin [4/4]      kyros_mcu.bin [2/2]      88.183594%
+*******************************
+
 Sound Board
 -----------
 
@@ -418,10 +431,10 @@ void alpha68k_N_state::sound_iomap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x11).w("ym1", FUNC(ym2203_device::write));
-	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::write_port_w));
-	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::control_port_w));
-	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::write_port_w));
-	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::control_port_w));
+	map(0x80, 0x80).w("ym2", FUNC(ym2203_device::data_w));
+	map(0x81, 0x81).w("ym2", FUNC(ym2203_device::address_w));
+	map(0x90, 0x90).w("ym3", FUNC(ym2203_device::data_w));
+	map(0x91, 0x91).w("ym3", FUNC(ym2203_device::address_w));
 }
 
 void jongbou_state::sound_map(address_map &map)
@@ -778,15 +791,15 @@ void sstingray_state::sstingry(machine_config &config)
 	/* sound hardware */
 
 	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym2.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym3(YM2203(config, "ym3", 3000000));
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.5);
+	ym3.add_route(ALL_OUTPUTS, "speaker", 0.45);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
 
 void kyros_state::kyros(machine_config &config)
@@ -811,15 +824,15 @@ void kyros_state::kyros(machine_config &config)
 
 	/* sound hardware */
 	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym1.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym2(YM2203(config, "ym2", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym2.add_route(ALL_OUTPUTS, "speaker", 0.35);
+	ym2.add_route(ALL_OUTPUTS, "speaker", 0.30);
 
 	ym2203_device &ym3(YM2203(config, "ym3", 24_MHz_XTAL / 12));    /* Verified on bootleg PCB */
-	ym3.add_route(ALL_OUTPUTS, "speaker", 0.9);
+	ym3.add_route(ALL_OUTPUTS, "speaker", 0.6);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.75); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.50); // unknown DAC
 }
 
 void jongbou_state::jongbou(machine_config &config)

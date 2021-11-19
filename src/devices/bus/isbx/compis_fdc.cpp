@@ -39,9 +39,11 @@ WRITE_LINE_MEMBER( compis_fdc_device::fdc_drq )
 	m_slot->mdrqt_w(state);
 }
 
-FLOPPY_FORMATS_MEMBER( compis_fdc_device::floppy_formats )
-	FLOPPY_CPIS_FORMAT
-FLOPPY_FORMATS_END
+void compis_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_CPIS_FORMAT);
+}
 
 static void compis_floppies(device_slot_interface &device)
 {

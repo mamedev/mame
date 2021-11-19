@@ -73,7 +73,7 @@ public:
 	void apricotxi(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER(i8086_lock_w);
 	void i8089_ca1_w(uint8_t data);
@@ -250,9 +250,12 @@ WRITE_LINE_MEMBER( apricot_state::fdc_intrq_w )
 	m_iop->ext1_w(state);
 }
 
-FLOPPY_FORMATS_MEMBER( apricot_state::floppy_formats )
-	FLOPPY_APRIDISK_FORMAT
-FLOPPY_FORMATS_END
+void apricot_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+
+	fr.add(FLOPPY_APRIDISK_FORMAT);
+}
 
 static void apricot_floppies(device_slot_interface &device)
 {

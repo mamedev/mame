@@ -32,21 +32,21 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define LOG_PORT_A		(1 << 1)
-#define LOG_PORT_B		(1 << 2)
-#define LOG_PORT_C		(1 << 3)
-#define LOG_PORT_D		(1 << 4)
-#define LOG_PORT_E		(1 << 5)
-#define LOG_PORT_F		(1 << 6)
-#define LOG_PORT_G		(1 << 7)
-#define LOG_PORT_H		(1 << 8)
-#define LOG_PORT_J		(1 << 9)
-#define LOG_PORT_K		(1 << 10)
-#define LOG_PORT_L		(1 << 11)
-#define LOG_LCD_CLK		(1 << 12)
-#define LOG_LCD_SHIFT	(1 << 13)
+#define LOG_PORT_A      (1 << 1)
+#define LOG_PORT_B      (1 << 2)
+#define LOG_PORT_C      (1 << 3)
+#define LOG_PORT_D      (1 << 4)
+#define LOG_PORT_E      (1 << 5)
+#define LOG_PORT_F      (1 << 6)
+#define LOG_PORT_G      (1 << 7)
+#define LOG_PORT_H      (1 << 8)
+#define LOG_PORT_J      (1 << 9)
+#define LOG_PORT_K      (1 << 10)
+#define LOG_PORT_L      (1 << 11)
+#define LOG_LCD_CLK     (1 << 12)
+#define LOG_LCD_SHIFT   (1 << 13)
 
-#define VERBOSE			(0)
+#define VERBOSE         (0)
 #include "logmacro.h"
 
 #define MASTER_CLOCK    16000000

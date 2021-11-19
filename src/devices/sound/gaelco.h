@@ -7,13 +7,12 @@
 
 #include "dirom.h"
 
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> gaelco_gae1_device
-
-#include "dirom.h"
 
 class gaelco_gae1_device : public device_t,
 							public device_sound_interface,
@@ -38,6 +37,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_stop() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;

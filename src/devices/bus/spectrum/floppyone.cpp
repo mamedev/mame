@@ -86,9 +86,11 @@ static void flpone_floppies(device_slot_interface &device)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(spectrum_flpone_device::floppy_formats)
-	FLOPPY_FL1_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_flpone_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_FL1_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( flpone )

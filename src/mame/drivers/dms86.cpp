@@ -38,6 +38,8 @@ the monitor and goes straight to "Joining HiNet".
 #include "machine/terminal.h"
 
 
+namespace {
+
 class dms86_state : public driver_device
 {
 public:
@@ -52,6 +54,9 @@ public:
 	void dms86(machine_config &config);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void m1_ack_w(u8 data);
 
@@ -63,7 +68,6 @@ private:
 	void mem_map(address_map &map);
 
 	u8 m_term_data;
-	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device_array<z80sio_device, 2> m_sio;
@@ -131,6 +135,8 @@ INPUT_PORTS_END
 void dms86_state::machine_start()
 {
 	save_item(NAME(m_term_data));
+
+	m_term_data = 0;
 }
 
 void dms86_state::kbd_put(u8 data)
@@ -177,6 +183,9 @@ ROM_START( dms86 )
 	ROM_LOAD16_BYTE( "hns-86_54-8678.bin", 0x0000, 0x1000, CRC(95f58e1c) SHA1(6fc8f087f0c887d8b429612cd035c6c1faab570c))
 	ROM_LOAD16_BYTE( "hns-86_54-8677.bin", 0x0001, 0x1000, CRC(78fad756) SHA1(ddcbff1569ec6975b8489935cdcfa80eba413502))
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

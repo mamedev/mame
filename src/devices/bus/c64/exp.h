@@ -153,6 +153,9 @@ protected:
 	std::unique_ptr<uint8_t[]> m_romx;
 	std::unique_ptr<uint8_t[]> m_nvram;
 
+	size_t m_roml_size;
+	size_t m_romh_size;
+
 	int m_game;
 	int m_exrom;
 

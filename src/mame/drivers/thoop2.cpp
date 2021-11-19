@@ -8,10 +8,6 @@ Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
 updated by Peter Ferrie <peter.ferrie@gmail.com>
 
-There is a priority bug on the title screen (Gaelco logo is hidden by black
-borders)  It seems sprite priority is hacked around on most of the older
-Gaelco drivers.
-
 
 REF.940411
 +-------------------------------------------------+

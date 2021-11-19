@@ -4,6 +4,9 @@
 
 Taito / Midway Super Speed Race driver
 
+TODO:
+- add Japan version(s), it has different graphics
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -308,4 +311,4 @@ ROM_START( sspeedr )
 ROM_END
 
 
-GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Midway", "Super Speed Race", MACHINE_SUPPORTS_SAVE, layout_sspeedr )
+GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, sspeedr_state, empty_init, ROT270, "Taito (Midway license)", "Super Speed Race", MACHINE_SUPPORTS_SAVE, layout_sspeedr )

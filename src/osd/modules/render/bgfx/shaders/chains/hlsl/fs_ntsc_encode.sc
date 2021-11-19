@@ -58,7 +58,7 @@ void main()
 
 	const float PI = 3.1415927;
 	const float PI2 = 6.2831854;
-	
+
 	float W = PI2 * u_cc_value.x * u_scan_time.x;
 	float WoPI = W / PI;
 

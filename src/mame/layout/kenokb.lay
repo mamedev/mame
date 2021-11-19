@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+	<element name="bet" defstate="1">
+		<rect state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.25" green="0.0" blue="0.0" />
+		</rect>
+		<text string="BET">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+		<element name="start" defstate="1">
+		<rect state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.25" green="0.0" blue="0.0" />
+		</rect>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+		<element name="cancel" defstate="1">
+		<rect state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.25" green="0.0" blue="0.0" />
+		</rect>
+		<text string="CANCEL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="exit" defstate="1">
+		<rect state="0">
+			<color red="0.75" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.25" green="0.0" blue="0.0" />
+		</rect>
+		<text string="EXIT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="stand">
+		<rect state="0">
+			<color red="0.40" green="0.40" blue="0.40" />
+		</rect>
+	</element>
+
+	<element name="num" defstate="1">
+		<rect state="0">
+			<color alpha="0.00" />
+		</rect>
+		<rect state="1">
+			<color alpha="0.50" red="1.00" green="0.50" blue="0.50" />
+		</rect>
+	</element>
+
+	<view name="Keyboard Buttons">
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+<!-- 30, 40, 49 -->
+		<element ref="num" inputtag="KB_0" inputmask="0x04"><bounds x="2.50" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_0" inputmask="0x08"><bounds x="2.50" y="0.87065" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_0" inputmask="0x10"><bounds x="2.25" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 20, 19, 29, 28, 38 -->
+		<element ref="num" inputtag="KB_1" inputmask="0x02"><bounds x="2.50" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_1" inputmask="0x04"><bounds x="2.25" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_1" inputmask="0x08"><bounds x="2.25" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_1" inputmask="0x10"><bounds x="2.00" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_1" inputmask="0x20"><bounds x="2.00" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 10, 9, 18, 17, 27, 37 -->
+		<element ref="num" inputtag="KB_2" inputmask="0x01"><bounds x="2.50" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_2" inputmask="0x02"><bounds x="2.25" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_2" inputmask="0x08"><bounds x="2.00" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_2" inputmask="0x10"><bounds x="1.75" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_2" inputmask="0x20"><bounds x="1.75" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_2" inputmask="0x40"><bounds x="1.75" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 8, 7, 6, 16, 26, 36 -->
+		<element ref="num" inputtag="KB_3" inputmask="0x02"><bounds x="2.00" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_3" inputmask="0x04"><bounds x="1.75" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_3" inputmask="0x08"><bounds x="1.50" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_3" inputmask="0x10"><bounds x="1.50" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_3" inputmask="0x20"><bounds x="1.50" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_3" inputmask="0x40"><bounds x="1.50" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 3, 4, 5, 15, 25, 35 -->
+		<element ref="num" inputtag="KB_4" inputmask="0x02"><bounds x="0.75" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_4" inputmask="0x04"><bounds x="1.00" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_4" inputmask="0x08"><bounds x="1.25" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_4" inputmask="0x10"><bounds x="1.25" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_4" inputmask="0x20"><bounds x="1.25" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_4" inputmask="0x40"><bounds x="1.25" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 2, 13, 14, 24, 34 -->
+		<element ref="num" inputtag="KB_5" inputmask="0x01"><bounds x="0.50" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_5" inputmask="0x08"><bounds x="0.75" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_5" inputmask="0x10"><bounds x="1.00" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_5" inputmask="0x20"><bounds x="1.00" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_5" inputmask="0x40"><bounds x="1.00" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 1, 12, 22, 23, 33 -->
+		<element ref="num" inputtag="KB_6" inputmask="0x01"><bounds x="0.25" y="0.29000" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_6" inputmask="0x04"><bounds x="0.50" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_6" inputmask="0x10"><bounds x="0.50" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_6" inputmask="0x20"><bounds x="0.75" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_6" inputmask="0x40"><bounds x="0.75" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 11, 21, 31, 32 -->
+		<element ref="num" inputtag="KB_7" inputmask="0x02"><bounds x="0.25" y="0.48355" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_7" inputmask="0x04"><bounds x="0.25" y="0.67710" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_7" inputmask="0x08"><bounds x="0.25" y="0.87065" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_7" inputmask="0x40"><bounds x="0.50" y="0.87065" width="0.25" height="0.19355" /></element>
+<!-- 72, 73, 74, 75, 65, 55, 45 -->
+		<element ref="num" inputtag="KB_8" inputmask="0x01"><bounds x="0.50" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_8" inputmask="0x02"><bounds x="0.75" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_8" inputmask="0x04"><bounds x="1.00" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_8" inputmask="0x08"><bounds x="1.25" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_8" inputmask="0x10"><bounds x="1.25" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_8" inputmask="0x20"><bounds x="1.25" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_8" inputmask="0x40"><bounds x="1.25" y="1.06420" width="0.25" height="0.19355" /></element>
+<!-- 71, 61, 62, 63, 64, 54, 44 -->
+		<element ref="num" inputtag="KB_9" inputmask="0x01"><bounds x="0.25" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_9" inputmask="0x02"><bounds x="0.25" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_9" inputmask="0x04"><bounds x="0.50" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_9" inputmask="0x08"><bounds x="0.75" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_9" inputmask="0x10"><bounds x="1.00" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_9" inputmask="0x20"><bounds x="1.00" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_9" inputmask="0x40"><bounds x="1.00" y="1.06420" width="0.25" height="0.19355" /></element>
+<!-- 51, 41, 52, 53, 42, 43 -->
+		<element ref="num" inputtag="KB_10" inputmask="0x02"><bounds x="0.25" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_10" inputmask="0x04"><bounds x="0.25" y="1.06420" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_10" inputmask="0x08"><bounds x="0.50" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_10" inputmask="0x10"><bounds x="0.75" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_10" inputmask="0x20"><bounds x="0.50" y="1.06420" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_10" inputmask="0x40"><bounds x="0.75" y="1.06420" width="0.25" height="0.19355" /></element>
+<!-- 60, 50, 49 -->
+		<element ref="num" inputtag="KB_11" inputmask="0x04"><bounds x="2.50" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_11" inputmask="0x08"><bounds x="2.50" y="1.06420" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_11" inputmask="0x10"><bounds x="2.25" y="1.06420" width="0.25" height="0.19355" /></element>
+<!-- 70, 69, 59, 58, 48 -->
+		<element ref="num" inputtag="KB_12" inputmask="0x02"><bounds x="2.50" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_12" inputmask="0x04"><bounds x="2.25" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_12" inputmask="0x08"><bounds x="2.25" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_12" inputmask="0x10"><bounds x="2.00" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_12" inputmask="0x20"><bounds x="2.00" y="1.06420" width="0.25" height="0.19355" /></element>
+<!-- 80, 79, 68, 67, 57, 47 -->
+		<element ref="num" inputtag="KB_13" inputmask="0x01"><bounds x="2.50" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_13" inputmask="0x02"><bounds x="2.25" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_13" inputmask="0x08"><bounds x="2.00" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_13" inputmask="0x10"><bounds x="1.75" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_13" inputmask="0x20"><bounds x="1.75" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_13" inputmask="0x40"><bounds x="1.75" y="1.06420" width="0.25" height="0.19355" /></element>
+<!-- 78, 77, 76, 66, 56, 46 -->
+		<element ref="num" inputtag="KB_14" inputmask="0x02"><bounds x="2.00" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_14" inputmask="0x04"><bounds x="1.75" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_14" inputmask="0x08"><bounds x="1.50" y="1.64485" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_14" inputmask="0x10"><bounds x="1.50" y="1.45130" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_14" inputmask="0x20"><bounds x="1.50" y="1.25775" width="0.25" height="0.19355" /></element>
+		<element ref="num" inputtag="KB_14" inputmask="0x40"><bounds x="1.50" y="1.06420" width="0.25" height="0.19355" /></element>
+
+		<element ref="stand">
+			<bounds x="0" y="3.0" width="4.0" height="0.45" />
+		</element>
+
+		<element ref="bet" inputtag="KB_0" inputmask="0x01">
+			<bounds x="1" y="3.1" width="0.40" height="0.25" />
+		</element>
+
+		<element ref="start" inputtag="KB_0" inputmask="0x02">
+			<bounds x="1.5" y="3.1" width="0.40" height="0.25" />
+		</element>
+
+		<element ref="cancel" inputtag="KB_11" inputmask="0x02">
+			<bounds x="2" y="3.1" width="0.40" height="0.25" />
+		</element>
+
+		<element ref="exit" inputtag="KB_11" inputmask="0x01">
+			<bounds x="2.5" y="3.1" width="0.40" height="0.25" />
+		</element>
+
+	</view>
+</mamelayout>

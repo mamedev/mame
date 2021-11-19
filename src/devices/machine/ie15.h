@@ -76,6 +76,7 @@ private:
 	void ie15core(machine_config &config);
 
 	void kbd_put(uint16_t data);
+	DECLARE_WRITE_LINE_MEMBER(kbd_sdv);
 	void mem_w(uint8_t data);
 	uint8_t mem_r();
 	void mem_addr_lo_w(uint8_t data);
@@ -130,6 +131,7 @@ private:
 	int m_hblank;
 	int m_vpos;
 	int m_marker_scanline;
+	bool m_kbd_sdv;
 
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_videoram;

@@ -17,7 +17,7 @@
 
 #pragma once
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -280,7 +280,7 @@ protected:
 	dio32_device &dio() { assert(m_dio_dev); return downcast<dio32_device &>(*m_dio_dev); }
 };
 
-} } // namespace bus::hp_dio
+} // namespace bus::hp_dio
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)

@@ -4,40 +4,40 @@
 
     Irem M92 system games:
 
-    Gunforce (World)                                 M92-A   (c) 1991 Irem Corp
-    Gunforce (USA)                                   M92-A   (c) 1991 Irem America Corp
-    Gunforce (Japan)                                 M92-A   (c) 1991 Irem Corp
-    Blade Master (World)                             M92-B   (c) 1991 Irem Corp
-    Cross Blades! (Japan)                            M92-D   (c) 1991 Irem Corp
-    Lethal Thunder (World)                                   (c) 1991 Irem Corp
-    Thunder Blaster (Japan)                          M92-C   (c) 1991 Irem Corp
-    Undercover Cops (World)                          M92-E   (c) 1992 Irem Corp
-    Undercover Cops (US)                             M92-E   (c) 1992 Irem America Corp
-    Undercover Cops (Japan)                          M92-E   (c) 1992 Irem Corp
-    Undercover Cops - Alpha Renewal Version (World)  M92-E   (c) 1992 Irem Corp
-    Undercover Cops - Alpha Renewal Version (US)     M92-E   (c) 1992 Irem America Corp
-    Mystic Riders (World)                                    (c) 1992 Irem Corp
-    Mahou Keibitai Gun Hohki (Japan)                         (c) 1992 Irem Corp
-    Major Title 2 (World)                            M92-F   (c) 1992 Irem Corp
-    Major Title 2 (Japan)                            M92-F   (c) 1992 Irem Corp
-    The Irem Skins Game (USA Set 1)                  M92-F   (c) 1992 Irem America Corp
-    The Irem Skins Game (USA Set 2)                  M92-F   (c) 1992 Irem America Corp
-    Hook (World)                                             (c) 1992 Irem Corp
-    Hook (USA)                                               (c) 1992 Irem America Corp
-    Hook (Japan)                                             (c) 1992 Irem Corp
-    R-Type Leo (World)                                       (c) 1992 Irem Corp
-    R-Type Leo (Japan)                                       (c) 1992 Irem Corp
-    In The Hunt (World)                              M92-E   (c) 1993 Irem Corp
-    In The Hunt (USA)                                M92-E   (c) 1993 Irem Corp
-    Kaitei Daisensou (Japan)                         M92-E   (c) 1993 Irem Corp
-    Ninja Baseball Batman (World)                            (c) 1993 Irem Corp
-    Ninja Baseball Batman (USA)                              (c) 1993 Irem America Corp
-    Yakyuu Kakutou League-Man (Japan)                        (c) 1993 Irem Corp
-    Superior Soldiers (US)                           M92-G   (c) 1993 Irem Corp
-    Perfect Soldiers (Japan)                         M92-G   (c) 1993 Irem Corp
-    Dream Soccer '94 (Japan)                         M92-G   (c) 1994 Irem Corp
-    Gun Force II (US)                                M92-G   (c) 1994 Irem Corp
-    Geo Storm (Japan)                                M92-G   (c) 1994 Irem Corp
+    Gunforce (World)                                 M92-B-A   (c) 1991 Irem Corp
+    Gunforce (USA)                                   M92-B-A   (c) 1991 Irem America Corp
+    Gunforce (Japan)                                 M92-B-A   (c) 1991 Irem Corp
+    Blade Master (World)                             M92-B-B   (c) 1991 Irem Corp
+    Cross Blades! (Japan)                            M92-D-A   (c) 1991 Irem Corp
+    Lethal Thunder (World)                           M92-D-A   (c) 1991 Irem Corp
+    Thunder Blaster (Japan)                          M92-C-B   (c) 1991 Irem Corp
+    Undercover Cops (World)                          M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops (US)                             M92-E-B   (c) 1992 Irem America Corp
+    Undercover Cops (Japan)                          M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (World)  M92-E-B   (c) 1992 Irem Corp
+    Undercover Cops - Alpha Renewal Version (US)     M92-E-B   (c) 1992 Irem America Corp
+    Mystic Riders (World)                            M92-B-B   (c) 1992 Irem Corp
+    Mahou Keibitai Gun Hohki (Japan)                 M92-B-B   (c) 1992 Irem Corp
+    Major Title 2 (World)                            M92-B-F   (c) 1992 Irem Corp
+    Major Title 2 (Japan)                            M92-B-F   (c) 1992 Irem Corp
+    The Irem Skins Game (USA Set 1)                  M92-B-F   (c) 1992 Irem America Corp
+    The Irem Skins Game (USA Set 2)                  M92-B-F   (c) 1992 Irem America Corp
+    Hook (World)                                     M92-D-A   (c) 1992 Irem Corp
+    Hook (USA)                                       M92-D-A   (c) 1992 Irem America Corp
+    Hook (Japan)                                     M92-D-A   (c) 1992 Irem Corp
+    R-Type Leo (World)                               M92-C-N   (c) 1992 Irem Corp
+    R-Type Leo (Japan)                               M92-C-N   (c) 1992 Irem Corp
+    In The Hunt (World)                              M92-E-B   (c) 1993 Irem Corp
+    In The Hunt (USA)                                M92-E-B   (c) 1993 Irem Corp
+    Kaitei Daisensou (Japan)                         M92-E-B   (c) 1993 Irem Corp
+    Ninja Baseball Batman (World)                    M92-F-A   (c) 1993 Irem Corp
+    Ninja Baseball Batman (USA)                      M92-F-A   (c) 1993 Irem America Corp
+    Yakyuu Kakutou League-Man (Japan)                M92-F-A   (c) 1993 Irem Corp
+    Superior Soldiers (US)                           M92-B-G   (c) 1993 Irem Corp
+    Perfect Soldiers (Japan)                         M92-B-G   (c) 1993 Irem Corp
+    Dream Soccer '94 (Japan)                         M92-B-G   (c) 1994 Irem Corp
+    Gun Force II (US)                                M92-B-G   (c) 1994 Irem Corp
+    Geo Storm (Japan)                                M92-B-G   (c) 1994 Irem Corp
 
 System notes:
     Each game has an encrypted sound cpu (see irem_cpu.c), the sound cpu and
@@ -64,7 +64,7 @@ Glitch list!
 
     Irem Skins:
         - EEPROM load/save not yet implemented - when done, MT2EEP should
-          be removed from the ROM definition.
+          be removed from the ROM definition. (?)
 
     LeagueMan:
         Raster effects don't work properly (not even cpu time per line?).
@@ -211,11 +211,11 @@ psoldier dip locations still need verification.
 #include "includes/iremipt.h"
 
 #include "cpu/nec/nec.h"
+#include "machine/eeprompar.h"
 #include "machine/gen_latch.h"
 #include "machine/irem_cpu.h"
-#include "machine/nvram.h"
-#include "sound/ym2151.h"
 #include "sound/iremga20.h"
+#include "sound/ymopm.h"
 #include "speaker.h"
 
 
@@ -258,19 +258,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(m92_state::scanline_interrupt)
 
 
 /*****************************************************************************/
-
-uint16_t m92_state::eeprom_r(offs_t offset)
-{
-//  logerror("%05x: EEPROM RE %04x\n",m_maincpu->pc(),offset);
-	return m_eeprom[offset] | 0xff00;
-}
-
-void m92_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-//  logerror("%05x: EEPROM WR %04x\n",m_maincpu->pc(),offset);
-	if (ACCESSING_BITS_0_7)
-		m_eeprom[offset] = data;
-}
 
 void m92_state::coincounter_w(uint8_t data)
 {
@@ -350,7 +337,7 @@ void m92_state::m92_banked_map(address_map &map)
 void m92_state::majtitl2_map(address_map &map)
 {
 	m92_banked_map(map);
-	map(0xf0000, 0xf3fff).rw(FUNC(m92_state::eeprom_r), FUNC(m92_state::eeprom_w)).share("eeprom");
+	map(0xf0000, 0xf3fff).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 }
 
 void m92_state::m92_portmap(address_map &map)
@@ -1012,7 +999,8 @@ void m92_state::majtitl2(machine_config &config)
 {
 	m92_banked(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m92_state::majtitl2_map);
-	NVRAM(config, "eeprom", nvram_device::DEFAULT_ALL_0);
+
+	EEPROM_2864(config, "eeprom"); // D28C64C-20
 
 	m_soundcpu->set_decryption_table(majtitl2_decryption_table);
 }
@@ -1183,8 +1171,8 @@ ROM_START( skingame )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1220,8 +1208,8 @@ ROM_START( majtitl2 )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1258,8 +1246,8 @@ ROM_START( majtitl2b )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1297,8 +1285,8 @@ ROM_START( majtitl2a )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1334,8 +1322,8 @@ ROM_START( majtitl2j )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
@@ -1371,8 +1359,8 @@ ROM_START( skingame2 )
 	ROM_REGION( 0x80000, "irem", 0 )
 	ROM_LOAD( "k0d.ic8", 0x000000, 0x80000, CRC(713b9e9f) SHA1(91384d67d4ba9c7d926fbecb077293c661b8ec83) )
 
-	ROM_REGION( 0x4000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
-	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) )
+	ROM_REGION( 0x2000, "eeprom", 0 )   /* D28C64C-20 EEPROM */
+	ROM_LOAD( "mt2eep",  0x000000, 0x800, CRC(208af971) SHA1(69384cac24b7af35a031f9b60e035131a8b10cb2) BAD_DUMP )
 
 	ROM_REGION( 0x0c00, "plds", 0 )
 	ROM_LOAD( "pal16l8-m92-a-3m.ic11", 0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */

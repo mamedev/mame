@@ -4,7 +4,7 @@
 
     Sony PocketStation
 
-    PocketStation games were dowloaded from PS1 games into flash RAM after
+    PocketStation games were downloaded from PS1 games into flash RAM after
     the unit had been inserted in the memory card slot, and so this should
     be emulated alongside the PS1.  However, as many flash dumps exist, it
     is possible to emulate the PocketStation in the meantime.
@@ -55,6 +55,9 @@
 #define VERBOSE     (0)
 #include "logmacro.h"
 
+
+namespace {
+
 class pockstat_state : public driver_device
 {
 public:
@@ -69,10 +72,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 
-private:
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
 	void mem_map(address_map &map);
 
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -880,6 +884,7 @@ void pockstat_state::machine_start()
 	{
 		m_timers[index].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pockstat_state::timer_tick), this));
 		m_timers[index].timer->adjust(attotime::never, index);
+		m_timers[index].count = 0;
 	}
 
 	m_rtc_regs.time = 0x01000000;
@@ -1012,6 +1017,9 @@ ROM_START( pockstat )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "kernel.bin", 0x0000, 0x4000, CRC(5fb47dd8) SHA1(6ae880493ddde880827d1e9f08e9cb2c38f9f2ec) )
 ROM_END
+
+} // Anonymous namespace
+
 
 /* Driver */
 

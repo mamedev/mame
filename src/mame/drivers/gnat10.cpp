@@ -203,8 +203,8 @@ void gnat10_state::gnat10(machine_config &config)
 	Z80SIO(config, "sio1", 16_MHz_XTAL / 4);
 
 	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
-	FLOPPY_CONNECTOR(config, m_floppy[0], gnat_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[1], gnat_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[0], gnat_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[1], gnat_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
 
 	COM5016_5(config, m_brg, 4.9152_MHz_XTAL); // BR1941-5
 	m_brg->fr_handler().set("sio0", FUNC(z80sio_device::rxca_w));

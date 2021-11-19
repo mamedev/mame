@@ -347,14 +347,25 @@ Basic programs:
 	</software>
 
 	<software name="hamurabi">
-		<description>Hamurabi</description>
+		<description>Hamurabi (Apple)</description>
 		<year>1976</year>
-		<publisher>apple computer inc</publisher>
+		<publisher>Apple Computer Inc</publisher>
 			<!-- P/N A1T005X-->
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="6953140">
 				<rom name="hamurabi.wav" size="6953140" crc="9760bd93" sha1="294b57fc0970ce0844dc615ff017ead11b1ebba1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hamurabicn">
+		<description>Hamurabi (Computerland)</description>
+		<year>197?</year>
+		<publisher>Computerland of Nashua</publisher>
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="1012780">
+				<rom name="k7_computerlandofnashua_hammurabi.wav" size="1012780" crc="9eb266ae" sha1="83c67ba97235443d1e486cf664f2cda0bd990e4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -403,6 +414,17 @@ Basic programs:
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="4098404">
 				<rom name="matrix.wav" size="4098404" crc="6d2221be" sha1="dc4497142f6c7704d1e0325263c087bcd805a5c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nightmare6">
+		<description>Nightmare #6</description>
+		<year>197?</year>
+		<publisher>Computerland of Nashua</publisher>
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="619052">
+				<rom name="k7_computerlandofnashua_nightmare6.wav" size="619052" crc="53252477" sha1="33cbb123d408ed7e171f99c712b8599e3a6b20fb"/>
 			</dataarea>
 		</part>
 	</software>

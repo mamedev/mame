@@ -260,7 +260,8 @@ void unixpc_state::disk_control_w(uint8_t data)
 {
 	logerror("disk_control_w: %02x\n", data);
 
-	// TODO: bits 0-2 = head select
+	// bits 0-2 = head select
+	m_hdc->head_w(BIT(data, 0, 2));
 
 	m_hdc->drdy_w(BIT(data, 3) && m_hdr0->exists());
 
@@ -414,7 +415,7 @@ void unixpc_state::unixpc(machine_config &config)
 	WD2797(config, m_wd2797, 40_MHz_XTAL / 40); // 1PCK (CPU clock) divided by custom DMA chip
 	m_wd2797->intrq_wr_callback().set(FUNC(unixpc_state::wd2797_intrq_w));
 	m_wd2797->drq_wr_callback().set(FUNC(unixpc_state::wd2797_drq_w));
-	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd2797:0", unixpc_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	WD1010(config, m_hdc, 40_MHz_XTAL / 8);
 	m_hdc->out_intrq_callback().set(FUNC(unixpc_state::wd1010_intrq_w));

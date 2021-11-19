@@ -355,12 +355,6 @@ static void hp9122c_floppies(device_slot_interface &device)
 	device.option_add("35hd" , FLOPPY_35_HD);
 }
 
-static const floppy_format_type hp9122c_floppy_formats[] = {
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_TD0_FORMAT,
-	nullptr
-};
-
 const tiny_rom_entry *hp9122c_device::device_rom_region() const
 {
 	return ROM_NAME(hp9122c);
@@ -399,7 +393,7 @@ void hp9122c_device::device_add_mconfig(machine_config &config)
 	m_i8291a->int_write().set(FUNC(hp9122c_device::i8291a_int_w));
 	m_i8291a->dreq_write().set(FUNC(hp9122c_device::i8291a_dreq_w));
 
-	FLOPPY_CONNECTOR(config, "floppy0" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats, true).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "floppy1" , hp9122c_floppies , "35hd" , hp9122c_floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "floppy0" , hp9122c_floppies , "35hd" , nullptr, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "floppy1" , hp9122c_floppies , "35hd" , nullptr, true).enable_sound(true);
 	config.set_default_layout(layout_hp9122c);
 }

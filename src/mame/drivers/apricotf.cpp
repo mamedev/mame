@@ -92,7 +92,7 @@ public:
 	void act_f1(machine_config &config);
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	virtual void machine_start() override;
 
@@ -338,9 +338,12 @@ void f1_state::m1_w(u8 data)
 //  floppy
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( f1_state::floppy_formats )
-	FLOPPY_APRIDISK_FORMAT
-FLOPPY_FORMATS_END
+void f1_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+
+	fr.add(FLOPPY_APRIDISK_FORMAT);
+}
 
 void apricotf_floppies(device_slot_interface &device)
 {

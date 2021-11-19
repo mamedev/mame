@@ -21,8 +21,9 @@
  *
  */
 #include "x1_tap.h"
+#include "imageutl.h"
 
-#include <cassert>
+#include <cstring>
 
 
 #define WAVE_HIGH        0x5a9e

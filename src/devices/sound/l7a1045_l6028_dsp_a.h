@@ -38,7 +38,7 @@ protected:
 private:
 	struct l7a1045_voice
 	{
-		l7a1045_voice() { }
+		constexpr l7a1045_voice() { }
 
 		uint32_t start = 0;
 		uint32_t end = 0;

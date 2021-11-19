@@ -38,25 +38,24 @@ DEFINE_DEVICE_TYPE(REDBARON, redbaron_sound_device, "redbaron_custom", "Red Baro
 //  redbaron_sound_device - constructor
 //-------------------------------------------------
 
-redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, REDBARON, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_vol_lookup(nullptr),
-		m_channel(nullptr),
-		m_latch(0),
-		m_poly_counter(0),
-		m_poly_shift(0),
-		m_filter_counter(0),
-		m_crash_amp(0),
-		m_shot_amp(0),
-		m_shot_amp_counter(0),
-		m_squeal_amp(0),
-		m_squeal_amp_counter(0),
-		m_squeal_off_counter(0),
-		m_squeal_on_counter(0),
-		m_squeal_out(0)
+redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, REDBARON, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_vol_lookup(nullptr),
+	m_channel(nullptr),
+	m_latch(0),
+	m_poly_counter(0),
+	m_poly_shift(0),
+	m_filter_counter(0),
+	m_crash_amp(0),
+	m_shot_amp(0),
+	m_shot_amp_counter(0),
+	m_squeal_amp(0),
+	m_squeal_amp_counter(0),
+	m_squeal_off_counter(0),
+	m_squeal_on_counter(0),
+	m_squeal_out(0)
 {
-	std::fill(std::begin(m_vol_crash), std::end(m_vol_crash), 0);
 }
 
 
@@ -66,13 +65,11 @@ redbaron_sound_device::redbaron_sound_device(const machine_config &mconfig, cons
 
 void redbaron_sound_device::device_start()
 {
-	int i;
-
 	m_vol_lookup = std::make_unique<int16_t[]>(32768);
-	for( i = 0; i < 0x8000; i++ )
-		m_vol_lookup[0x7fff-i] = (int16_t) (0x7fff/exp(1.0*i/4096));
+	for( int i = 0; i < 0x8000; i++ )
+		m_vol_lookup[0x7fff-i] = int16_t(0x7fff/exp(1.0*i/4096));
 
-	for( i = 0; i < 16; i++ )
+	for( int i = 0; i < 16; i++ )
 	{
 		/* r0 = R18 and R24, r1 = open */
 		double r0 = 1.0/(5600 + 680), r1 = 1/6e12;
@@ -103,6 +100,19 @@ void redbaron_sound_device::device_start()
 	}
 
 	m_channel = stream_alloc(0, 1, OUTPUT_RATE);
+
+	save_item(NAME(m_latch));
+	save_item(NAME(m_poly_counter));
+	save_item(NAME(m_poly_shift));
+	save_item(NAME(m_filter_counter));
+	save_item(NAME(m_crash_amp));
+	save_item(NAME(m_shot_amp));
+	save_item(NAME(m_shot_amp_counter));
+	save_item(NAME(m_squeal_amp));
+	save_item(NAME(m_squeal_amp_counter));
+	save_item(NAME(m_squeal_off_counter));
+	save_item(NAME(m_squeal_on_counter));
+	save_item(NAME(m_squeal_out));
 }
 
 
@@ -123,7 +133,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 		while( m_poly_counter <= 0 )
 		{
 			m_poly_counter += OUTPUT_RATE;
-			if( ((m_poly_shift & 0x0001) == 0) == ((m_poly_shift & 0x4000) == 0) )
+			if( BIT(m_poly_shift, 0) == BIT(m_poly_shift, 14) )
 				m_poly_shift = (m_poly_shift << 1) | 1;
 			else
 				m_poly_shift <<= 1;
@@ -142,17 +152,16 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 		/* shot not active: charge C32 (0.1u) */
 		if( (m_latch & 0x04) == 0 )
 			m_shot_amp = 32767;
-		else
-		if( (m_poly_shift & 0x8000) == 0 )
+		else if( (m_poly_shift & 0x8000) == 0 )
 		{
 			if( m_shot_amp > 0 )
 			{
 				/* discharge C32 (0.1u) through R26 (33k) + R27 (15k)
 				 * 0.68 * C32 * (R26 + R27) = 3264us
 				 */
-//              #define C32_DISCHARGE_TIME (int)(32767 / 0.003264);
+//              constexpr int C32_DISCHARGE_TIME = int(32767 / 0.003264);
 				/* I think this is to short. Is C32 really 1u? */
-				#define C32_DISCHARGE_TIME (int)(32767 / 0.03264);
+				constexpr int C32_DISCHARGE_TIME = int(32767 / 0.03264);
 				m_shot_amp_counter -= C32_DISCHARGE_TIME;
 				while( m_shot_amp_counter <= 0 )
 				{
@@ -175,7 +184,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 				/* charge C5 (22u) over R3 (68k) and CR1 (1N914)
 				 * time = 0.68 * C5 * R3 = 1017280us
 				 */
-				#define C5_CHARGE_TIME (int)(32767 / 1.01728);
+				constexpr int C5_CHARGE_TIME = int(32767 / 1.01728);
 				m_squeal_amp_counter -= C5_CHARGE_TIME;
 				while( m_squeal_amp_counter <= 0 )
 				{
@@ -230,10 +239,8 @@ void redbaron_sound_device::sounds_w(uint8_t data)
 }
 
 
-#ifdef UNUSED_FUNCTION
 void redbaron_sound_device::pokey_w(offs_t offset, uint8_t data)
 {
-	if( m_latch & 0x20 )
-		m_pokey->write(offset, data);
+	//if( m_latch & 0x20 )
+		//m_pokey->write(offset, data);
 }
-#endif

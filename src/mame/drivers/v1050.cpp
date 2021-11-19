@@ -1101,10 +1101,10 @@ void v1050_state::v1050(machine_config &config)
 	MB8877(config, m_fdc, 16_MHz_XTAL/16);
 	m_fdc->intrq_wr_callback().set(FUNC(v1050_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(v1050_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":0", v1050_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":1", v1050_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":2", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	// SASI bus
 	SCSI_PORT(config, m_sasibus, 0);

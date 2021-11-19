@@ -61,13 +61,13 @@ ioport_constructor bbc_tube_rc6502_device::device_input_ports() const
 void bbc_tube_rc6502_device::tube_rc6502_bank(address_map &map)
 {
 	// Bank 0: ROM disabled with banked RAM (65C02)
-	map(0x000000, 0x00ffff).ram().share("ram");
+	map(0x000000, 0x07ffff).ram().share("ram");
 	map(0x004000, 0x007fff).bankrw(m_bank1);
 	map(0x008000, 0x00bfff).bankrw(m_bank2);
 	// Bank 1: ROM disabled with linear RAM (65C816)
 	map(0x100000, 0x17ffff).ram().share("ram");
 	// Bank 2: ROM enabled with banked RAM (65C02)
-	map(0x200000, 0x20ffff).ram().share("ram");
+	map(0x200000, 0x27ffff).ram().share("ram");
 	map(0x204000, 0x207fff).bankrw(m_bank1);
 	map(0x208000, 0x20bfff).bankrw(m_bank2);
 	map(0x208000, 0x20ffff).rom().region("maincpu", 0);

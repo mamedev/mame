@@ -267,7 +267,7 @@ QUICKLOAD_LOAD_MEMBER(super80_state::quickload_cb)
 	uint16_t exec_addr, start_addr, end_addr;
 
 	// load the binary into memory
-	if (z80bin_load_file(&image, m_maincpu->space(AS_PROGRAM), file_type, &exec_addr, &start_addr, &end_addr) != image_init_result::PASS)
+	if (z80bin_load_file(image, m_maincpu->space(AS_PROGRAM), exec_addr, start_addr, end_addr) != image_init_result::PASS)
 		return image_init_result::FAIL;
 
 	// is this file executable?

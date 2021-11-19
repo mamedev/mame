@@ -28,6 +28,7 @@ public:
 		m_reel2_scroll(*this, "reel2_scroll"),
 		m_reel3_scroll(*this, "reel3_scroll"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
+		m_bgcolor(0),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -202,10 +203,12 @@ public:
 	void amcoe1(machine_config &config);
 	void chryangl(machine_config &config);
 	void ss2001(machine_config &config);
+	void super7(machine_config &config);
 	void amcoe1_portmap(address_map &map);
 	void amcoe2_portmap(address_map &map);
 	void cm_portmap(address_map &map);
 	void cm97_portmap(address_map &map);
+	void super7_portmap(address_map &map);
 	void chryangl_decrypted_opcodes_map(address_map &map);
 	void ss2001_portmap(address_map &map);
 
@@ -238,6 +241,7 @@ public:
 	void init_flaming7();
 	void init_flam7_tw();
 	void init_luckylad();
+	void init_nd8lines();
 	void init_super972();
 	void init_wcat3();
 
@@ -256,6 +260,7 @@ public:
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
 	void luckylad(machine_config &config);
+	void nd8lines(machine_config &config);
 	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
@@ -267,6 +272,7 @@ public:
 
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
+	virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
 
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
@@ -274,7 +280,9 @@ private:
 	uint8_t m_nmi_enable;
 	uint8_t m_vidreg;
 
-	int m_tile_bank;
+	uint8_t m_tile_bank;
+
+	void nd8lines_map(address_map &map);
 };
 
 
@@ -288,6 +296,7 @@ public:
 
 	void init_cb3();
 	void init_cb3e();
+	void init_cb3f();
 	void init_cherrys();
 	void init_chrygld();
 	void init_chry10();
@@ -308,6 +317,7 @@ protected:
 	void dump_to_file(uint8_t *rom);
 
 	uint8_t cb3_decrypt(uint8_t cipherText, uint16_t address);
+	uint8_t cb3f_decrypt(uint8_t cipherText, uint16_t address);
 	uint8_t chry10_decrypt(uint8_t cipherText);
 };
 

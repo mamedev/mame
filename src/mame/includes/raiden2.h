@@ -94,10 +94,10 @@ protected:
 
 	void tilemap_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tile_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void background_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void foreground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void midground_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void text_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void background_w(offs_t offset, u16 data);
+	void foreground_w(offs_t offset, u16 data);
+	void midground_w(offs_t offset, u16 data);
+	void text_w(offs_t offset, u16 data);
 	void m_videoram_private_w(offs_t offset, uint16_t data);
 
 	void bank_reset(int bgbank, int fgbank, int midbank, int txbank);

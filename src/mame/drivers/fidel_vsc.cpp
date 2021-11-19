@@ -148,13 +148,15 @@ IFP: Impact Printer - also compatible with C64 apparently.
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
 #include "machine/z80pio.h"
-#include "machine/timer.h"
 #include "sound/s14001a.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -169,7 +171,6 @@ public:
 	vsc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_nmi_on(*this, "nmi_on"),
 		m_z80pio(*this, "z80pio"),
 		m_ppi8255(*this, "ppi8255"),
 		m_board(*this, "board"),
@@ -189,7 +190,6 @@ protected:
 private:
 	// devices/pointers
 	required_device<cpu_device> m_maincpu;
-	required_device<timer_device> m_nmi_on;
 	required_device<z80pio_device> m_z80pio;
 	required_device<i8255_device> m_ppi8255;
 	required_device<sensorboard_device> m_board;
@@ -205,10 +205,6 @@ private:
 	u8 main_io_trampoline_r(offs_t offset);
 	void main_io_trampoline_w(offs_t offset, u8 data);
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(nmi_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(nmi_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
 	// I/O handlers
 	void update_display();
 	u8 speech_r(offs_t offset);
@@ -219,24 +215,16 @@ private:
 	u8 pio_portb_r();
 	void pio_portb_w(u8 data);
 
-	u8 m_led_data;
-	u8 m_7seg_data;
-	u8 m_cb_mux;
-	u8 m_kp_mux;
-	bool m_lan_switch;
-	u8 m_speech_bank;
+	u8 m_led_data = 0;
+	u8 m_7seg_data = 0;
+	u8 m_cb_mux = 0;
+	u8 m_kp_mux = 0;
+	bool m_lan_switch = false;
+	u8 m_speech_bank = 0;
 };
 
 void vsc_state::machine_start()
 {
-	// zerofill
-	m_led_data = 0;
-	m_7seg_data = 0;
-	m_cb_mux = 0;
-	m_kp_mux = 0;
-	m_speech_bank = 0;
-	m_lan_switch = false;
-
 	// register for savestates
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
@@ -426,10 +414,9 @@ void vsc_state::vsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &vsc_state::main_io);
 
-	const attotime nmi_period = attotime::from_hz(600); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
-	TIMER(config, m_nmi_on).configure_periodic(FUNC(vsc_state::nmi_on<INPUT_LINE_NMI>), nmi_period);
-	m_nmi_on->set_start_delay(nmi_period - attotime::from_usec(845)); // active for 0.845ms (approx half)
-	TIMER(config, "nmi_off").configure_periodic(FUNC(vsc_state::nmi_off<INPUT_LINE_NMI>), nmi_period);
+	auto &nmi_clock(CLOCK(config, "nmi_clock", 600)); // 555 timer, ideal frequency is 600Hz (measurement was 587Hz)
+	nmi_clock.set_pulse_width(attotime::from_usec(845)); // active for 0.845ms (approx half)
+	nmi_clock.signal_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	I8255(config, m_ppi8255);
 	m_ppi8255->out_pa_callback().set(FUNC(vsc_state::ppi_porta_w));

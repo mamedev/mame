@@ -6,14 +6,21 @@
 
 ****************************************************************************/
 
+#include "corefile.h"
+#include "corestr.h"
+#include "png.h"
+
+#include "osdcomm.h"
+
+#include <cassert>
+#include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <cctype>
 #include <new>
-#include <cassert>
-#include "osdcore.h"
-#include "png.h"
+
+
+using util::string_format;
 
 
 /***************************************************************************
@@ -149,7 +156,7 @@ static summary_file *sort_file_list(void);
 
 /* HTML helpers */
 static util::core_file::ptr create_file_and_output_header(std::string &filename, std::string &templatefile, std::string &title);
-static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &title);
+static void output_footer_and_close_file(util::write_stream::ptr &&file, std::string &templatefile, std::string &title);
 
 /* report generators */
 static void output_report(std::string &dirname, std::string &tempheader, std::string &tempfooter, summary_file *filelist);
@@ -235,7 +242,7 @@ int main(int argc, char *argv[])
 
 	/* read the template file into an astring */
 	std::string tempheader;
-	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
+	if (!util::core_file::load(tempfilename.c_str(), &buffer, bufsize))
 	{
 		tempheader.assign((const char *)buffer, bufsize);
 		free(buffer);
@@ -565,13 +572,14 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
 	util::core_file::ptr file;
 
 	/* create the indexfile */
-	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file) != osd_file::error::NONE)
+	if (util::core_file::open(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, file))
 		return util::core_file::ptr();
 
 	/* print a header */
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title.c_str());
-	file->write(modified.c_str(), modified.length());
+	std::size_t written;
+	file->write(modified.c_str(), modified.length(), written); // FIXME: check for errors
 
 	/* return the file */
 	return file;
@@ -583,11 +591,12 @@ static util::core_file::ptr create_file_and_output_header(std::string &filename,
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(util::core_file::ptr &&file, std::string &templatefile, std::string &title)
+static void output_footer_and_close_file(util::write_stream::ptr &&file, std::string &templatefile, std::string &title)
 {
 	std::string modified(templatefile);
 	strreplace(modified, "<!--TITLE-->", title.c_str());
-	file->write(modified.c_str(), modified.length());
+	std::size_t written;
+	file->write(modified.c_str(), modified.length(), written); // FIXME: check for errors
 	file.reset();
 }
 
@@ -694,7 +703,7 @@ static void output_report(std::string &dirname, std::string &tempheader, std::st
 	}
 
 	/* iterate over buckets and output them */
-	for (bucknum = 0; bucknum < ARRAY_LENGTH(bucket_output_order); bucknum++)
+	for (bucknum = 0; bucknum < std::size(bucket_output_order); bucknum++)
 	{
 		int curbucket = bucket_output_order[bucknum];
 
@@ -726,7 +735,7 @@ static int compare_screenshots(summary_file *curfile)
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
 			std::string fullname;
-			osd_file::error filerr;
+			std::error_condition filerr;
 			util::core_file::ptr file;
 
 			/* get the filename for the image */
@@ -736,7 +745,7 @@ static int compare_screenshots(summary_file *curfile)
 			filerr = util::core_file::open(fullname, OPEN_FLAG_READ, file);
 
 			/* if that failed, look in the old location */
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 			{
 				/* get the filename for the image */
 				fullname = string_format("%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
@@ -746,7 +755,7 @@ static int compare_screenshots(summary_file *curfile)
 			}
 
 			/* if that worked, load the file */
-			if (filerr == osd_file::error::NONE)
+			if (!filerr)
 			{
 				util::png_read_bitmap(*file, bitmaps[listnum]);
 				file.reset();
@@ -834,8 +843,7 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 	int width, height, maxwidth;
 	int bitmapcount = 0;
 	util::core_file::ptr file;
-	osd_file::error filerr;
-	util::png_error pngerr;
+	std::error_condition filerr;
 	int error = -1;
 	int starty;
 
@@ -851,13 +859,13 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 
 			/* open the source image */
 			filerr = util::core_file::open(tempname, OPEN_FLAG_READ, file);
-			if (filerr != osd_file::error::NONE)
+			if (filerr)
 				goto error;
 
 			/* load the source image */
-			pngerr = util::png_read_bitmap(*file, bitmaps[bitmapcount++]);
+			filerr = util::png_read_bitmap(*file, bitmaps[bitmapcount++]);
 			file.reset();
-			if (pngerr != util::png_error::NONE)
+			if (filerr)
 				goto error;
 		}
 
@@ -922,11 +930,11 @@ static int generate_png_diff(const summary_file *curfile, std::string &destdir, 
 
 	/* write the final PNG */
 	filerr = util::core_file::open(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
-	if (filerr != osd_file::error::NONE)
+	if (filerr)
 		goto error;
-	pngerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+	filerr = util::png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
 	file.reset();
-	if (pngerr != util::png_error::NONE)
+	if (filerr)
 		goto error;
 
 	/* if we get here, we are error free */

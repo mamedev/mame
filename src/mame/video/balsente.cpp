@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-  video/balsente.c
+  video/balsente.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -24,6 +24,7 @@ void balsente_state::video_start()
 	m_palettebank_vis = 0;
 	m_sprite_bank[0] = memregion("gfx1")->base();
 	m_sprite_bank[1] = memregion("gfx1")->base() + 0x10000;
+	std::fill(std::begin(m_expanded_videoram), std::end(m_expanded_videoram), 0);
 
 	/* determine sprite size */
 	m_sprite_data = memregion("gfx1")->base();

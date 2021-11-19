@@ -13,7 +13,7 @@
 
 #include "st2xxx.h"
 
-class st2205u_base_device : public st2xxx_device
+class st2205u_base_device : public st2xxx_device, public device_sound_interface
 {
 public:
 	enum {
@@ -36,6 +36,7 @@ public:
 		ST_VOL3,
 		ST_VOLM0,
 		ST_VOLM1,
+		ST_MUL,
 		ST_DMS0,
 		ST_DMS1,
 		ST_DMD0,
@@ -55,10 +56,15 @@ public:
 		ST_LVCTR
 	};
 
+	static constexpr feature_type imperfect_features() { return feature::SOUND; }
+
 protected:
 	st2205u_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram);
 
 	virtual void device_reset() override;
+
+	// sound stream update overrides
+	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 	virtual unsigned st2xxx_bt_divider(int n) const override;
 	virtual u8 st2xxx_prs_mask() const override { return 0xc0; }
@@ -67,6 +73,9 @@ protected:
 	virtual bool st2xxx_has_dma() const override { return true; }
 
 	void base_init(std::unique_ptr<mi_st2xxx> &&intf);
+
+	void push_adpcm_value(int channel, u16 psg_data);
+	void reset_adpcm_value(int channel);
 
 	u8 btc_r();
 	void btc_w(u8 data);
@@ -124,7 +133,14 @@ protected:
 	u8 lvctr_r();
 	void lvctr_w(u8 data);
 
+	u8 mull_r();
+	void mull_w(u8 data);
+	u8 mulh_r();
+	void mulh_w(u8 data);
+
 	void base_map(address_map &map);
+
+	sound_stream *m_stream;
 
 	u8 m_btc;
 	u16 m_tc_12bit[4];
@@ -140,6 +156,7 @@ protected:
 	u8 m_psg_on;
 	u8 m_psg_vol[4];
 	u8 m_psg_volm[2];
+	u16 m_mul;
 	u8 m_usbcon;
 	u8 m_usbien;
 	u16 m_dptr[4];
@@ -149,6 +166,10 @@ protected:
 	u8 m_dmod[2];
 	u8 m_rctr;
 	u8 m_lvctr;
+
+	s16 m_adpcm_level[4];
+	u8 m_psg_amplitude[4];
+	u32 m_psg_freqcntr[4];
 };
 
 class st2205u_device : public st2205u_base_device
@@ -270,6 +291,16 @@ private:
 		u8 dreadc(u16 adr);
 		void dwrite(u16 adr, u8 val);
 	};
+
+	void unk18_w(u8 data);
+	void unk6d_w(u8 data);
+	void unk6e_w(u8 data);
+	u8 unk7b_r();
+	void unk7b_w(u8 data);
+	void unk7c_w(u8 data);
+	void unk7d_w(u8 data);
+	void unk7e_w(u8 data);
+	void unk7f_w(u8 data);
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);

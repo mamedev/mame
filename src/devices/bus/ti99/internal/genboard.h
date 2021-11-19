@@ -22,7 +22,6 @@
 #include "machine/mm58274c.h"
 #include "machine/at29x.h"
 #include "machine/ram.h"
-#include "bus/pc_kbd/pc_kbdc.h"
 
 enum
 {
@@ -43,9 +42,8 @@ enum
 #define GENEVE_MOUSE_TAG      "gmouse"
 #define GENEVE_PFM512_TAG      "pfm512"
 #define GENEVE_PFM512A_TAG     "pfm512a"
-#define GENEVE_KEYBOARD_CONN_TAG "keybconn"
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 /*****************************************************************************/
 
@@ -106,6 +104,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( kbdclk );
 	DECLARE_WRITE_LINE_MEMBER( kbddata );
 	auto kbdint_cb() { return m_keyint.bind(); }
+	auto kbdclk_cb() { return m_keyb_clk.bind(); }
+	auto kbddata_cb() { return m_keyb_data.bind(); }
 
 	// Miscellaneous
 	void set_debug(bool deb) { m_debug = deb; }
@@ -224,6 +224,8 @@ private:
 
 	// Keyboard support
 	devcb_write_line    m_keyint;
+	devcb_write_line    m_keyb_clk;
+	devcb_write_line    m_keyb_data;
 	uint16_t            m_keyboard_shift_reg;
 	line_state          m_keyboard_last_clock;
 	line_state          m_keyboard_data_in;
@@ -233,7 +235,6 @@ private:
 	// Devices
 	required_device<geneve_pal_device>                  m_pal;
 	required_device<bus::ti99::peb::peribox_device>     m_peribox;
-	required_device<pc_kbdc_device>                     m_keyb_conn;
 
 	// Emulation-specific: Is the debugger active?
 	bool    m_debug;
@@ -318,7 +319,7 @@ private:
 	int     m_sndready;
 };
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(GENEVE_GATE_ARRAY,   bus::ti99::internal, geneve_gate_array_device)
 DECLARE_DEVICE_TYPE_NS(GENEVE_PAL,          bus::ti99::internal, geneve_pal_device)

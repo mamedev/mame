@@ -895,9 +895,9 @@ void sn76477_device::open_wav_file()
 	std::string s = tag();
 	std::replace(s.begin(), s.end(), ':', '_');
 
-	const std::string wav_file_name = util::string_format(LOG_WAV_FILE_NAME, s).c_str();
+	const std::string wav_file_name = util::string_format(LOG_WAV_FILE_NAME, s);
 
-	m_file = wav_open(wav_file_name.c_str(), m_our_sample_rate, 2);
+	m_file = util::wav_open(wav_file_name, m_our_sample_rate, 2);
 
 	LOG(1, "SN76477:         Logging output: %s\n", wav_file_name);
 }
@@ -905,13 +905,13 @@ void sn76477_device::open_wav_file()
 
 void sn76477_device::close_wav_file()
 {
-	wav_close(m_file);
+	m_file.reset();
 }
 
 
 void sn76477_device::add_wav_data(int16_t data_l, int16_t data_r)
 {
-	wav_add_data_16lr(m_file, &data_l, &data_r, 1);
+	util::wav_add_data_16lr(*m_file, &data_l, &data_r, 1);
 }
 
 

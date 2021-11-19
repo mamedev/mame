@@ -61,7 +61,7 @@ private:
 	u8 m_control;
 	bool m_motor_active;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 };
 
 DECLARE_DEVICE_TYPE(BETA_DISK, beta_disk_device)

@@ -57,12 +57,12 @@ license:CC0
 	<element name="text_r1"><text string="A|1" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_r0"><text string="|0" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 
-	<element name="text_p1"><image file="chess/wk.png"><color alpha="0.83" /></image></element>
-	<element name="text_p2"><image file="chess/wq.png"><color alpha="0.83" /></image></element>
-	<element name="text_p3"><image file="chess/wr.png"><color alpha="0.83" /></image></element>
-	<element name="text_p4"><image file="chess/wb.png"><color alpha="0.83" /></image></element>
-	<element name="text_p5"><image file="chess/wn.png"><color alpha="0.83" /></image></element>
-	<element name="text_p6"><image file="chess/wp.png"><color alpha="0.83" /></image></element>
+	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.83" /></image></element>
+	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.83" /></image></element>
+	<element name="text_p3"><image file="chess/wr.svg"><color alpha="0.83" /></image></element>
+	<element name="text_p4"><image file="chess/wb.svg"><color alpha="0.83" /></image></element>
+	<element name="text_p5"><image file="chess/wn.svg"><color alpha="0.83" /></image></element>
+	<element name="text_p6"><image file="chess/wp.svg"><color alpha="0.83" /></image></element>
 
 	<element name="text_b01e" defstate="0"><text state="0" string="CE"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_b02e" defstate="0"><text state="0" string="MODE"><color red="0.6" green="0.6" blue="0.59" /></text></element>

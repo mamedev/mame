@@ -102,7 +102,7 @@ void tvc_sound_device::write(offs_t offset, uint8_t data)
 	{
 		case 1:
 			m_enabled = BIT(data, 4);
-			// fall through
+			[[fallthrough]];
 
 		case 0:
 		{

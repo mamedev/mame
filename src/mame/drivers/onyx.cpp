@@ -81,9 +81,9 @@ INPUT_PORTS_END
 
 void onyx_state::c8002_mem(address_map &map)
 {
-	map(0x00000, 0x00fff).rom().share("share0");
-	map(0x01000, 0x07fff).ram().share("share1");
-	map(0x08000, 0x0ffff).ram().share("share2"); // Z8002 has 64k memory
+	map(0x00000, 0x00fff).rom();
+	map(0x01000, 0x07fff).ram();
+	map(0x08000, 0x0ffff).ram(); // Z8002 has 64k memory
 }
 
 void onyx_state::z8002_m1_w(uint8_t data)

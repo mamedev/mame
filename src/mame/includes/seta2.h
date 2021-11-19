@@ -35,9 +35,9 @@ public:
 
 		m_x1_bank(*this, "x1_bank_%u", 1U),
 		m_nvram(*this, "nvram"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", 0x40000, ENDIANNESS_BIG),
 		m_tileram(*this, "tileram"),
-		m_vregs(*this, "vregs"),
+		m_vregs(*this, "vregs", 0x40, ENDIANNESS_BIG),
 		m_leds(*this, "led%u", 0U),
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -85,6 +85,7 @@ protected:
 	void gundamex_eeprom_w(uint16_t data);
 
 	void vregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vregs_r(offs_t offset);
 	uint16_t spriteram_r(offs_t offset);
 	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
@@ -129,9 +130,9 @@ protected:
 
 	optional_memory_bank_array<8> m_x1_bank;
 	optional_shared_ptr<uint16_t> m_nvram;
-	optional_shared_ptr<uint16_t> m_spriteram;
+	memory_share_creator<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_tileram;
-	optional_shared_ptr<uint16_t> m_vregs;
+	memory_share_creator<uint16_t> m_vregs;
 	output_finder<7> m_leds;
 	output_finder<11> m_lamps;
 

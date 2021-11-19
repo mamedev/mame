@@ -174,7 +174,7 @@ void mark5_state::pwm_output_w(offs_t offset, u8 data)
 template<int N>
 void mark5_state::lcd_output_w(u64 data)
 {
-	if (N == 0)
+	if constexpr (N == 0)
 	{
 		// HLCD0538 R pins
 		m_lcd_rowsel = data & 0xff;

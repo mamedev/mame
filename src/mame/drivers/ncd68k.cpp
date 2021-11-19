@@ -92,7 +92,7 @@ public:
 		, m_vram(*this, "vram")
 		, m_duart(*this, "duart")
 		, m_lance(*this, "lance")
-		, m_kbd_con(*this, "kbd_con")
+		, m_kbd_con(*this, "kbd")
 		, m_serial(*this, "serial%u", 0U)
 		, m_eeprom(*this, "eeprom")
 		, m_screen(*this, "screen")
@@ -601,7 +601,7 @@ void ncd68k_state::common(machine_config &config)
 	m_mcu->portb_r().set(FUNC(ncd68k_state::mcu_portb_r));
 
 	// keyboard connector
-	PC_KBDC(config, m_kbd_con, 0);
+	PC_KBDC(config, m_kbd_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
 	m_kbd_con->out_clock_cb().set_inputline(m_mcu, M6805_IRQ_LINE).invert();
 	m_kbd_con->out_data_cb().set(
 			[this] (int state)
@@ -611,10 +611,6 @@ void ncd68k_state::common(machine_config &config)
 				else
 					m_porta_in &= ~0x01;
 			});
-
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(m_kbd_con);
 
 	// mouse and auxiliary ports
 	RS232_PORT(config, m_serial[0],

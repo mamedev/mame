@@ -11,6 +11,29 @@
 
     Written by Mathis Rosenhauer
 
+**********************************************************************
+                            _____   _____
+                   Vss   1 |*    \_/     | 40  CA1
+                   PA0   2 |             | 39  CA2
+                   PA1   3 |             | 38  RS0
+                   PA2   4 |             | 37  RS1
+                   PA3   5 |             | 36  RS2
+                   PA4   6 |             | 35  RS3
+                   PA5   7 |             | 34  _RES
+                   PA6   8 |             | 33  D0
+                   PA7   9 |             | 32  D1
+                   PB0  10 |             | 31  D2
+                   PB1  11 |   MCS6522   | 30  D3
+                   PB2  12 |             | 29  D4
+                   PB3  13 |             | 28  D5
+                   PB4  14 |             | 27  D6
+                   PB5  15 |             | 26  D7
+                   PB6  16 |             | 25  ϕ2
+                   PB7  17 |             | 24  CS1
+                   CB1  18 |             | 23  _CS2
+                   CB2  19 |             | 22  R/_W
+                   Vcc  20 |_____________| 21  _IRQ
+
 **********************************************************************/
 
 #ifndef MAME_MACHINE_6522VIA_H
@@ -47,9 +70,6 @@ public:
 		VIA_IER = 14,
 		VIA_PANH = 15
 	};
-
-	// construction/destruction
-	via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// TODO: REMOVE THESE
 	auto readpa_handler() { return m_in_a_handler.bind(); }
@@ -93,7 +113,13 @@ public:
 	void write_cb1(int state);
 	void write_cb2(int state);
 
+	uint8_t read_pa() const;
+	uint8_t read_pb() const;
+
 protected:
+	// construction/destruction
+	via6522_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -184,9 +210,47 @@ private:
 	uint8_t m_shift_counter;
 };
 
+// ======================> mos6522_device
 
-// device type definition
-DECLARE_DEVICE_TYPE(VIA6522, via6522_device)
+class mos6522_device : public via6522_device
+{
+public:
+	// construction/destruction
+	mos6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
+// ======================> r65c22_device
+
+class r65c22_device : public via6522_device
+{
+public:
+	// construction/destruction
+	r65c22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> r65nc22_device
+
+class r65nc22_device : public via6522_device
+{
+public:
+	// construction/destruction
+	r65nc22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> w65c22s_device
+
+class w65c22s_device : public via6522_device
+{
+public:
+	// construction/destruction
+	w65c22s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+// device type declarations
+DECLARE_DEVICE_TYPE(MOS6522, mos6522_device)
+DECLARE_DEVICE_TYPE(R65C22, r65c22_device)
+DECLARE_DEVICE_TYPE(R65NC22, r65nc22_device)
+DECLARE_DEVICE_TYPE(W65C22S, w65c22s_device)
 
 #endif // MAME_MACHINE_6522VIA_H

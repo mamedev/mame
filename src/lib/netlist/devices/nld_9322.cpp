@@ -20,10 +20,8 @@
 
 #include "nl_base.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	class NETLIB_NAME(9322);
 
 	NETLIB_OBJECT(9322_GATE)
@@ -108,5 +106,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(9322,      "TTL_9322",      "+SELECT,+A1,+B1,+A2,+B2,+A3,+B3,+A4,+B4,+STROBE,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

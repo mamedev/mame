@@ -15,7 +15,7 @@
 
 #pragma once
 
-namespace bus { namespace hexbus {
+namespace bus::hexbus {
 
 enum
 {
@@ -171,7 +171,7 @@ private:
 	hexbus_chained_device*  m_chain_element;
 };
 
-}   }   // end namespace bus::hexbus
+}   // end namespace bus::hexbus
 
 DECLARE_DEVICE_TYPE_NS(HEXBUS, bus::hexbus, hexbus_device)
 

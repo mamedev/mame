@@ -717,8 +717,8 @@ void kdt6_state::psi98(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set("ctc1", FUNC(z80ctc_device::trg0));
 	m_fdc->drq_wr_callback().set(FUNC(kdt6_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", kdt6_floppies, "fd55f", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", kdt6_floppies, "fd55f", floppy_image_device::default_mfm_floppy_formats);
 
 	SOFTWARE_LIST(config, "floppy_list").set_original("psi98");
 

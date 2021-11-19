@@ -85,7 +85,7 @@ protected:
 	uint8_t orion_romdisk_porta_r();
 	void orion_romdisk_portb_w(uint8_t data);
 	void orion_romdisk_portc_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS( orion_floppy_formats );
+	static void orion_floppy_formats(format_registration &fr);
 	void machine_start() override;
 
 	uint8_t m_orion128_video_mode;

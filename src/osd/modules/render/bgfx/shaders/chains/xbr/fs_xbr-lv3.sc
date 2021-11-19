@@ -5,7 +5,7 @@ $input v_texcoord0, v_texcoord1, v_texcoord2, v_texcoord3, v_texcoord4, v_texcoo
 
 /*
    Hyllian's xBR-lv3 Shader
-   
+
    Copyright (C) 2011-2015 Hyllian - sergiogdb@gmail.com
 
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -154,7 +154,7 @@ void main()
 	vec4 Cw = vec4( 5.0, -1.0, -3.0, 3.0 );
 
 	// These inequations define the line below which interpolation occurs.
-	vec4 fx      = (Ao * fp.y + Bo * fp.x); 
+	vec4 fx      = (Ao * fp.y + Bo * fp.x);
 	vec4 fx_left = (Ax * fp.y + Bx * fp.x);
 	vec4 fx_up   = (Ay * fp.y + By * fp.x);
 	vec4 fx3_left= (Az * fp.y + Bz * fp.x);
@@ -189,7 +189,7 @@ void main()
 	vec4 edr      = vec4(lessThan(weighted_distance(e, c, g, i, h5, f4, h, f), weighted_distance( h, d, i5, f, i4, b, e, i))) * interp_restriction_lv1;
 	vec4 edr_left = vec4(lessThanEqual(XBR_LV2_COEFFICIENT.xxxx * df(f,g), df(h,c))) * interp_restriction_lv2_left;
 	vec4 edr_up   = vec4(greaterThanEqual(df(f,g), XBR_LV2_COEFFICIENT.xxxx * df(h,c))) * interp_restriction_lv2_up;
-	
+
 	vec4 edr3_left = interp_restriction_lv3_left;
 	vec4 edr3_up = interp_restriction_lv3_up;
 

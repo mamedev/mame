@@ -96,12 +96,12 @@ private:
 void pc1500_state::pc1500_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//	map(0x0000, 0x3fff).rom();    //module ROM/RAM
+	//  map(0x0000, 0x3fff).rom();    //module ROM/RAM
 	map(0x4000, 0x47ff).ram();    //user RAM
 	map(0x4800, 0x6fff).ram();    //expansion RAM
 	map(0x7000, 0x71ff).ram().mirror(0x0600).share("lcd_data");
 	map(0x7800, 0x7bff).ram().mirror(0x0400);
-	//	map(0xa000, 0xbfff).rom();    //expansion ROM
+	//  map(0xa000, 0xbfff).rom();    //expansion ROM
 	map(0xc000, 0xffff).rom().region("maincpu", 0);    //system ROM
 }
 

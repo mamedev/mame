@@ -635,12 +635,12 @@ void screen_device::allocate_scan_bitmaps()
 					else
 						m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
 				}
-				m_scan_widths.push_back(m_width);
+				m_scan_widths.push_back(effwidth);
 			}
 		}
 		else
 		{
-			for (int i = effheight; i < old_height; i++)
+			for (int i = old_height - 1; i >= effheight; i--)
 			{
 				for (int j = 0; j < 2; j++)
 				{
@@ -794,7 +794,7 @@ void screen_device::device_start()
 		if (!m_svg_region)
 			fatalerror("%s: SVG region \"%s\" does not exist\n", tag(), m_svg_region.finder_tag());
 		m_svg = std::make_unique<svg_renderer>(m_svg_region);
-		machine().output().set_notifier(nullptr, svg_renderer::output_notifier, m_svg.get());
+		machine().output().set_global_notifier(svg_renderer::output_notifier, m_svg.get());
 
 		// don't do this - SVG units are arbitrary and interpreting them as pixels causes bad things to happen
 		// just render at the size/aspect ratio supplied by the driver
@@ -826,8 +826,7 @@ void screen_device::device_start()
 	m_texture[1]->set_id((u64(m_unique_id) << 57) | 1);
 
 	// configure the default cliparea
-	render_container::user_settings settings;
-	m_container->get_user_settings(settings);
+	render_container::user_settings settings = m_container->get_user_settings();
 	settings.m_xoffset = m_xoffset;
 	settings.m_yoffset = m_yoffset;
 	settings.m_xscale = m_xscale;
@@ -890,7 +889,7 @@ void screen_device::device_start()
 	if (m_oldstyle_vblank_supplied)
 		logerror("%s: Deprecated legacy Old Style screen configured (MCFG_SCREEN_VBLANK_TIME), please use MCFG_SCREEN_RAW_PARAMS instead.\n",this->tag());
 
-	m_is_primary_screen = (this == screen_device_iterator(machine().root_device()).first());
+	m_is_primary_screen = (this == screen_device_enumerator(machine().root_device()).first());
 }
 
 
@@ -1912,14 +1911,14 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
-	if (filerr == osd_file::error::NONE)
+	std::error_condition const filerr = file.open(util::string_format("%s" PATH_SEPARATOR "burnin-%s.png", machine().basename(), tag() + 1));
+	if (!filerr)
 	{
 		util::png_info pnginfo;
 
 		// add two text entries describing the image
-		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()).c_str());
-		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()).c_str());
+		pnginfo.add_text("Software", util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
+		pnginfo.add_text("System", util::string_format("%s %s", machine().system().manufacturer, machine().system().type.fullname()));
 
 		// now do the actual work
 		util::png_write_bitmap(file, &pnginfo, finalmap, 0, nullptr);
@@ -1943,7 +1942,7 @@ void screen_device::load_effect_overlay(const char *filename)
 	// load the file
 	m_screen_overlay_bitmap.reset();
 	emu_file file(machine().options().art_path(), OPEN_FLAG_READ);
-	if (file.open(fullname) == osd_file::error::NONE)
+	if (!file.open(fullname))
 	{
 		render_load_png(m_screen_overlay_bitmap, file);
 		file.close();

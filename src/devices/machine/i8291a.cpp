@@ -432,27 +432,27 @@ void i8291a_device::aux_mode_w(uint8_t data)
 			device_reset();
 			break;
 		}
-		case 1:
-			/* preset internal clock counter */
-			break;
-		case 4:
-			LOGMASKED(LOG_REG, "AUXA = %02X\n", data & 0x1f);
-			/* AUXA write */
-			m_auxa = data;
-			break;
-		case 5:
-			LOGMASKED(LOG_REG, "AUXB = %02X\n", data & 0x1f);
-			m_auxb = data;
-			break;
-		case 3:
-			LOGMASKED(LOG_REG, "PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
-			m_lpe = !!!(data & 0x10);
-			m_pp_sense = data & 0x08;
-			m_pp_line = data & 7;
-			break;
-		default:
-			break;
-
+		break;
+	case 1:
+		/* preset internal clock counter */
+		break;
+	case 4:
+		LOGMASKED(LOG_REG, "AUXA = %02X\n", data & 0x1f);
+		/* AUXA write */
+		m_auxa = data;
+		break;
+	case 5:
+		LOGMASKED(LOG_REG, "AUXB = %02X\n", data & 0x1f);
+		m_auxb = data;
+		break;
+	case 3:
+		LOGMASKED(LOG_REG, "PPOLL %s (line %d)\n", (data & 0x10) ? "disable" : "enable", data & 7);
+		m_lpe = !!!(data & 0x10);
+		m_pp_sense = data & 0x08;
+		m_pp_line = data & 7;
+		break;
+	default:
+		break;
 	}
 	run_fsm();
 }

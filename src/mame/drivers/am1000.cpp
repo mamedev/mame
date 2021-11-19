@@ -52,6 +52,9 @@ private:
 
 void am1000_state::machine_start()
 {
+	// assumes it can make an address mask from m_mainprom.length() - 1
+	assert(!(m_mainprom.length() & (m_mainprom.length() - 1)));
+
 	save_item(NAME(m_ram_enabled));
 }
 
@@ -66,7 +69,7 @@ u16 am1000_state::rom_ram_r(offs_t offset, u16 mem_mask)
 	if (m_ram_enabled)
 		return m_mainram[offset];
 	else
-		return m_mainprom[offset & m_mainprom.mask()];
+		return m_mainprom[offset & (m_mainprom.length() - 1)];
 }
 
 void am1000_state::control_w(u8 data)
@@ -77,7 +80,7 @@ void am1000_state::control_w(u8 data)
 
 void am1000_state::main_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).r(FUNC(am1000_state::rom_ram_r)).writeonly().share("mainram"); // TMM41256P-12 x16
+	map(0x000000, 0x07ffff).r(FUNC(am1000_state::rom_ram_r)).writeonly().share(m_mainram); // TMM41256P-12 x16
 	map(0x800000, 0x801fff).rom().region("mainprom", 0);
 	map(0xfffe00, 0xfffe00).w(FUNC(am1000_state::control_w));
 }

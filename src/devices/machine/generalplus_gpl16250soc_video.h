@@ -34,7 +34,7 @@ public:
 	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_alt_tile_addressing(int alt_tile_addressing) { m_alt_tile_addressing = alt_tile_addressing; }
 	void set_alt_extrasprite(int alt_extrasprite_hack) { m_alt_extrasprite_hack = alt_extrasprite_hack; }
-
+	void set_legacy_video_mode() { m_use_legacy_mode = true; }
 
 	void set_video_spaces(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
 
@@ -132,7 +132,7 @@ public:
 	uint16_t spriteram_r(offs_t offset);
 
 	uint16_t video_7051_r();
-	uint16_t video_70e0_r();
+	uint16_t video_70e0_prng_r();
 
 	auto write_video_irq_callback() { return m_video_irq_cb.bind(); };
 
@@ -233,6 +233,7 @@ protected:
 	//int m_pal_back;
 	int m_alt_extrasprite_hack;
 	int m_alt_tile_addressing;
+	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
 
 	required_device<spg_renderer_device> m_renderer;
 

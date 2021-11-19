@@ -359,6 +359,9 @@ Super Missile Attack Board Layout
 #include "screen.h"
 #include "speaker.h"
 
+
+namespace {
+
 class missile_state : public driver_device
 {
 public:
@@ -379,6 +382,8 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
+		, m_mainrom(*this, "maincpu")
+		, m_writeprom(*this, "proms")
 	{ }
 
 	void missileb(machine_config &config);
@@ -390,11 +395,15 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(vblank_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	void missile_w(address_space &space, offs_t offset, uint8_t data);
-	uint8_t missile_r(address_space &space, offs_t offset);
-	void bootleg_w(address_space &space, offs_t offset, uint8_t data);
-	uint8_t bootleg_r(address_space &space, offs_t offset);
+	void missile_w(offs_t offset, uint8_t data);
+	uint8_t missile_r(offs_t offset);
+	void bootleg_w(offs_t offset, uint8_t data);
+	uint8_t bootleg_r(offs_t offset);
 	uint32_t screen_update_missile(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	inline int scanline_to_v(int scanline);
@@ -402,16 +411,13 @@ private:
 	inline void schedule_next_irq(int curv);
 	inline bool get_madsel();
 	inline offs_t get_bit3_addr(offs_t pixaddr);
-	void write_vram(address_space &space, offs_t address, uint8_t data);
-	uint8_t read_vram(address_space &space, offs_t address);
+	void write_vram(offs_t address, uint8_t data);
+	uint8_t read_vram(offs_t address);
 
 	TIMER_CALLBACK_MEMBER(clock_irq);
 	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
 	void bootleg_main_map(address_map &map);
 	void main_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_device<m6502_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -429,8 +435,8 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
 
-	const uint8_t *m_mainrom;
-	const uint8_t *m_writeprom;
+	required_region_ptr<uint8_t> m_mainrom;
+	required_region_ptr<uint8_t> m_writeprom;
 	emu_timer *m_irq_timer;
 	emu_timer *m_cpu_timer;
 	uint8_t m_irq_state;
@@ -541,9 +547,8 @@ void missile_state::machine_start()
 	m_leds.resolve();
 
 	/* initialize globals */
-	m_mainrom = memregion("maincpu")->base();
-	m_writeprom = memregion("proms")->base();
 	m_flipscreen = 0;
+	m_ctrld = 0;
 
 	/* create a timer to speed/slow the CPU */
 	m_cpu_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(missile_state::adjust_cpu_speed),this));
@@ -609,7 +614,7 @@ offs_t missile_state::get_bit3_addr(offs_t pixaddr)
 }
 
 
-void missile_state::write_vram(address_space &space, offs_t address, uint8_t data)
+void missile_state::write_vram(offs_t address, uint8_t data)
 {
 	static const uint8_t data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
@@ -634,12 +639,12 @@ void missile_state::write_vram(address_space &space, offs_t address, uint8_t dat
 		m_videoram[vramaddr] = (m_videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		space.device().execute().adjust_icount(-1);
+		m_maincpu->adjust_icount(-1);
 	}
 }
 
 
-uint8_t missile_state::read_vram(address_space &space, offs_t address)
+uint8_t missile_state::read_vram(offs_t address)
 {
 	offs_t vramaddr;
 	uint8_t vramdata;
@@ -668,7 +673,7 @@ uint8_t missile_state::read_vram(address_space &space, offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		space.device().execute().adjust_icount(-1);
+		m_maincpu->adjust_icount(-1);
 	}
 	return result;
 }
@@ -720,12 +725,12 @@ uint32_t missile_state::screen_update_missile(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-void missile_state::missile_w(address_space &space, offs_t offset, uint8_t data)
+void missile_state::missile_w(offs_t offset, uint8_t data)
 {
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
 	{
-		write_vram(space, offset, data);
+		write_vram(offset, data);
 		return;
 	}
 
@@ -779,13 +784,13 @@ void missile_state::missile_w(address_space &space, offs_t offset, uint8_t data)
 }
 
 
-uint8_t missile_state::missile_r(address_space &space, offs_t offset)
+uint8_t missile_state::missile_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
 	/* if this is a MADSEL cycle, read from video RAM */
 	if (get_madsel())
-		return read_vram(space, offset);
+		return read_vram(offset);
 
 	/* otherwise, strip A15 and handle manually */
 	offset &= 0x7fff;
@@ -840,12 +845,12 @@ uint8_t missile_state::missile_r(address_space &space, offs_t offset)
 }
 
 
-void missile_state::bootleg_w(address_space &space, offs_t offset, uint8_t data)
+void missile_state::bootleg_w(offs_t offset, uint8_t data)
 {
 	/* if this is a MADSEL cycle, write to video RAM */
 	if (get_madsel())
 	{
-		write_vram(space, offset, data);
+		write_vram(offset, data);
 		return;
 	}
 
@@ -892,13 +897,13 @@ void missile_state::bootleg_w(address_space &space, offs_t offset, uint8_t data)
 }
 
 
-uint8_t missile_state::bootleg_r(address_space &space, offs_t offset)
+uint8_t missile_state::bootleg_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
 	/* if this is a MADSEL cycle, read from video RAM */
 	if (get_madsel())
-		return read_vram(space, offset);
+		return read_vram(offset);
 
 	/* otherwise, strip A15 and handle manually */
 	offset &= 0x7fff;
@@ -1490,6 +1495,8 @@ void missile_state::init_missilem()
 		dest[a] = d;
 	}
 }
+
+} // Anonymous namespace
 
 
 /*************************************

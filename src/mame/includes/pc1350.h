@@ -21,7 +21,9 @@ public:
 		: pocketc_state(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_keys(*this, "KEY%u", 0U)
-	{ }
+	{
+		std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	}
 
 	void pc1350(machine_config &config);
 

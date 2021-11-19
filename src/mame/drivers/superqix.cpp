@@ -921,6 +921,8 @@ void superqix_state_base::machine_init_common()
 	// the following are saved in VIDEO_START_MEMBER(superqix_state,superqix):
 	//save_item(NAME(*m_fg_bitmap[0]));
 	//save_item(NAME(*m_fg_bitmap[1]));
+
+	m_z80_has_written = false;
 }
 
 void superqix_state::machine_init_common()

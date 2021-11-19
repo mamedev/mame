@@ -11,6 +11,7 @@
 #include "qbus.h"
 
 // Peripheral boards
+#include "dsd4432.h"
 #include "pc11.h"
 #include "qtx.h"
 
@@ -19,6 +20,7 @@ void qbus_cards(device_slot_interface &device)
 {
 	device.option_add("pc11", DEC_PC11); /* Paper tape reader and punch */
 	device.option_add("qts1", TTI_QTS1);
+	device.option_add("dsd4432", DSD4432);
 }
 
 
@@ -88,7 +90,8 @@ qbus_device::qbus_device(const machine_config &mconfig, const char *tag, device_
 	device_t(mconfig, QBUS, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_z80daisy_interface(mconfig, *this),
-	m_program_config("QBUS A18", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor()),
+	m_program_config("a18", ENDIANNESS_BIG, 16, 16, 0, address_map_constructor()),
+	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_out_birq4_cb(*this),
 	m_out_birq5_cb(*this),
 	m_out_birq6_cb(*this),
@@ -110,8 +113,6 @@ void qbus_device::device_start()
 	m_out_birq6_cb.resolve_safe();
 	m_out_birq7_cb.resolve_safe();
 	m_out_bdmr_cb.resolve_safe();
-
-	m_maincpu = owner()->subdevice<cpu_device>(m_cputag);
 }
 
 
@@ -136,7 +137,7 @@ void qbus_device::add_card(device_qbus_card_interface *card)
 
 void qbus_device::install_device(offs_t start, offs_t end, read16sm_delegate rhandler, write16sm_delegate whandler, uint32_t mask)
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+	m_space->install_readwrite_handler(start, end, rhandler, whandler, mask);
 }
 
 

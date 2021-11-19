@@ -43,7 +43,7 @@ protected:
 
 private:
 	void wd1770_control_w(uint8_t data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<input_merger_device> m_irqs;
 	required_device<bbc_1mhzbus_slot_device> m_1mhzbus;

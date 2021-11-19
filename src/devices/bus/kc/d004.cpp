@@ -52,9 +52,11 @@ void kc_d004_gide_device::kc_d004_gide_io(address_map &map)
 	map(0x00fc, 0x00ff).mirror(0xff00).rw(Z80CTC_TAG, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 }
 
-FLOPPY_FORMATS_MEMBER( kc_d004_device::floppy_formats )
-	FLOPPY_KC85_FORMAT
-FLOPPY_FORMATS_END
+void kc_d004_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_KC85_FORMAT);
+}
 
 static void kc_d004_floppies(device_slot_interface &device)
 {

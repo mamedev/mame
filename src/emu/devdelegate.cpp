@@ -12,7 +12,7 @@
 #include "devdelegate.h"
 
 
-namespace emu { namespace detail {
+namespace emu::detail {
 
 delegate_late_bind &device_delegate_helper::bound_object() const
 {
@@ -31,4 +31,4 @@ void device_delegate_helper::set_tag(char const *tag)
 	m_tag = tag;
 }
 
-} } // namespace emu::detail
+} // namespace emu::detail

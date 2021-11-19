@@ -249,23 +249,38 @@ void saa1099_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			}
 			m_channels[ch].counter -= clock_divider;
 
+			u8 level = 0; // output level (0...2, 0 = off, 1 = 100%, 2 = 50%)
 			// if the noise is enabled
-			u8 level = 0;
+			u8 noise_out = m_noise[ch/3].level & 1; // noise output (noise 0: chan 0-2, noise 1: chan 3-5)
+			u8 tone_out = m_channels[ch].level & 1; // tone output
 			if (m_channels[ch].noise_enable)
 			{
-				// if the noise level is high (noise 0: chan 0-2, noise 1: chan 3-5)
-				level ^= m_noise[ch/3].level & 1;
+				// if both noise and square wave are enabled, output is tone output
+				if (m_channels[ch].freq_enable)
+				{
+					// half amplitude if the noise level is high
+					if (noise_out)
+						level = tone_out << 1;
+					else
+						level = tone_out;
+				}
+				else
+				{
+					// output is noise output
+					level = noise_out;
+				}
 			}
 			// if the square wave is enabled
-			if (m_channels[ch].freq_enable)
+			else if (m_channels[ch].freq_enable)
 			{
-				// if the channel level is high
-				level ^= m_channels[ch].level & 1;
+				// output is tone output
+				level = tone_out;
 			}
-			if (level)
+			// if the output level is high
+			if (level > 0)
 			{
-				output_l += m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16;
-				output_r += m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16;
+				output_l += m_channels[ch].amplitude[ LEFT] * m_channels[ch].envelope[ LEFT] / 16 / level;
+				output_r += m_channels[ch].amplitude[RIGHT] * m_channels[ch].envelope[RIGHT] / 16 / level;
 			}
 		}
 

@@ -40,15 +40,6 @@ pen_t cosmic_state::cosmica_map_color( uint8_t x, uint8_t y )
 	return pen & 0x07;
 }
 
-pen_t cosmic_state::cosmicg_map_color( uint8_t x, uint8_t y )
-{
-	offs_t offs = (m_color_registers[0] << 8) | (m_color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen_t pen = memregion("user1")->base()[offs];
-
-	/* the upper 4 bits are for cocktail mode support */
-	return pen & 0x0f;
-}
-
 pen_t cosmic_state::magspot_map_color( uint8_t x, uint8_t y )
 {
 	offs_t offs = (m_color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
@@ -127,30 +118,6 @@ void cosmic_state::cosmica_palette(palette_device &palette)
 	}
 
 	m_map_color = &cosmic_state::cosmica_map_color;
-}
-
-
-/*
- * Cosmic guerilla table setup
- *
- * Use AA for normal, FF for Full Red
- * Bit 0 = R, bit 1 = G, bit 2 = B, bit 4 = High Red
- *
- * It's possible that the background is dark gray and not black, as the
- * resistor chain would never drop to zero, Anybody know ?
- */
-void cosmic_state::cosmicg_palette(palette_device &palette)
-{
-	for (int i = 0; i < palette.entries(); i++)
-	{
-		int const r = (i > 8) ? 0xff : 0xaa * BIT(i, 0);
-		int const g = 0xaa * BIT(i, 1);
-		int const b = 0xaa * BIT(i, 2);
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-
-	m_map_color = &cosmic_state::cosmicg_map_color;
 }
 
 
@@ -495,14 +462,6 @@ void cosmic_state::nomnlnd_draw_background( screen_device &screen, bitmap_ind16 
 		y++;
 		if (y == 0)  break;
 	}
-}
-
-
-uint32_t cosmic_state::screen_update_cosmicg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-	draw_bitmap(bitmap, cliprect);
-	return 0;
 }
 
 

@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
  * nld_4066.cpp
@@ -25,10 +25,8 @@
 #include "solver/nld_solver.h"
 
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
+
 	NETLIB_OBJECT(CD4066_GATE)
 	{
 		NETLIB_CONSTRUCTOR_MODEL(CD4066_GATE, "CD4XXX")
@@ -81,5 +79,5 @@ namespace netlist
 	};
 
 	NETLIB_DEVICE_IMPL(CD4066_GATE,         "CD4066_GATE",            "")
-	} //namespace devices
-} // namespace netlist
+
+} // namespace netlist::devices

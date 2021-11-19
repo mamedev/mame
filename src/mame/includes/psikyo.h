@@ -24,7 +24,7 @@ class psikyo_state : public driver_device
 public:
 	psikyo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_vram(*this, "vram_%u", 0U)
+		, m_vram(*this, "vram_%u", 0U, 0x2000U, ENDIANNESS_BIG)
 		, m_vregs(*this, "vregs")
 		, m_bootleg_spritebuffer(*this, "boot_spritebuf")
 		, m_spritelut(*this, "spritelut")
@@ -66,7 +66,7 @@ public:
 
 private:
 	/* memory pointers */
-	required_shared_ptr_array<u16, 2> m_vram;
+	memory_share_array_creator<u16, 2> m_vram;
 	required_shared_ptr<u32> m_vregs;
 	optional_shared_ptr<u32> m_bootleg_spritebuffer;
 

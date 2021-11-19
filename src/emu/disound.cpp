@@ -267,7 +267,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 	for (sound_route const &route : routes())
 	{
 		// find a device with the requested tag
-		device_t const *const target = route.m_base.get().subdevice(route.m_target.c_str());
+		device_t const *const target = route.m_base.get().subdevice(route.m_target);
 		if (!target)
 			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route.m_base.get().subtag(route.m_target));
 
@@ -287,13 +287,13 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 void device_sound_interface::interface_pre_start()
 {
 	// scan all the sound devices
-	sound_interface_iterator iter(device().machine().root_device());
+	sound_interface_enumerator iter(device().machine().root_device());
 	for (device_sound_interface const &sound : iter)
 	{
 		// scan each route on the device
 		for (sound_route const &route : sound.routes())
 		{
-			device_t *const target_device = route.m_base.get().subdevice(route.m_target.c_str());
+			device_t *const target_device = route.m_base.get().subdevice(route.m_target);
 			if (target_device == &device())
 			{
 				// see if we are the target of this route; if we are, make sure the source device is started
@@ -313,7 +313,7 @@ void device_sound_interface::interface_pre_start()
 		for (sound_route &route : sound.routes())
 		{
 			// see if we are the target of this route
-			device_t *const target_device = route.m_base.get().subdevice(route.m_target.c_str());
+			device_t *const target_device = route.m_base.get().subdevice(route.m_target);
 			if (target_device == &device() && route.m_input == AUTO_ALLOC_INPUT)
 			{
 				route.m_input = m_auto_allocated_inputs;
@@ -332,13 +332,13 @@ void device_sound_interface::interface_pre_start()
 void device_sound_interface::interface_post_start()
 {
 	// iterate over all the sound devices
-	for (device_sound_interface &sound : sound_interface_iterator(device().machine().root_device()))
+	for (device_sound_interface &sound : sound_interface_enumerator(device().machine().root_device()))
 	{
 		// scan each route on the device
 		for (sound_route const &route : sound.routes())
 		{
 			// if we are the target of this route, hook it up
-			device_t *const target_device = route.m_base.get().subdevice(route.m_target.c_str());
+			device_t *const target_device = route.m_base.get().subdevice(route.m_target);
 			if (target_device == &device())
 			{
 				// iterate over all outputs, matching any that apply
@@ -440,12 +440,12 @@ void device_mixer_interface::interface_pre_start()
 	m_outputmap.resize(m_auto_allocated_inputs);
 
 	// iterate through all routes that point to us and note their mixer output
-	for (device_sound_interface const &sound : sound_interface_iterator(device().machine().root_device()))
+	for (device_sound_interface const &sound : sound_interface_enumerator(device().machine().root_device()))
 	{
 		for (sound_route const &route : sound.routes())
 		{
 			// see if we are the target of this route
-			device_t *const target_device = route.m_base.get().subdevice(route.m_target.c_str());
+			device_t *const target_device = route.m_base.get().subdevice(route.m_target);
 			if (target_device == &device() && route.m_input < m_auto_allocated_inputs)
 			{
 				int const count = (route.m_output == ALL_OUTPUTS) ? sound.outputs() : 1;

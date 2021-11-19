@@ -28,8 +28,8 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(ACORN_VIDC10, acorn_vidc10_device, "acorn_vidc10", "Acorn VIDC10")
-DEFINE_DEVICE_TYPE(ACORN_VIDC10_LCD, acorn_vidc10_lcd_device, "acorn_vidc10_lcd", "Acorn VIDC10 with LCD monitor")
+DEFINE_DEVICE_TYPE(ACORN_VIDC1, acorn_vidc1_device, "acorn_vidc1", "Acorn VIDC1")
+DEFINE_DEVICE_TYPE(ACORN_VIDC1A, acorn_vidc1a_device, "acorn_vidc1a", "Acorn VIDC1a")
 DEFINE_DEVICE_TYPE(ARM_VIDC20, arm_vidc20_device, "arm_vidc20", "ARM VIDC20")
 
 
@@ -52,7 +52,7 @@ void acorn_vidc10_device::regs_map(address_map &map)
 }
 
 
-acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int dac_type)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
@@ -62,6 +62,7 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	, m_sound_frequency_latch(0)
 	, m_sound_mode(false)
 	, m_dac(*this, "dac%u", 0)
+	, m_dac_type(dac_type)
 	, m_lspeaker(*this, "lspeaker")
 	, m_rspeaker(*this, "rspeaker")
 	, m_vblank_cb(*this)
@@ -74,21 +75,19 @@ acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, device_t
 	std::fill(std::begin(m_stereo_image), std::end(m_stereo_image), 0);
 }
 
-acorn_vidc10_device::acorn_vidc10_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: acorn_vidc10_device(mconfig, ACORN_VIDC10, tag, owner, clock)
+acorn_vidc1_device::acorn_vidc1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: acorn_vidc10_device(mconfig, ACORN_VIDC1, tag, owner, clock, 1)
 {
-	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_device::regs_map), this));
+	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc1_device::regs_map), this));
 	m_pal_4bpp_base = 0x100;
 	m_pal_cursor_base = 0x10;
 	m_pal_border_base = 0x110;
 }
 
-
-acorn_vidc10_lcd_device::acorn_vidc10_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: acorn_vidc10_device(mconfig, ACORN_VIDC10_LCD, tag, owner, clock)
+acorn_vidc1a_device::acorn_vidc1a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: acorn_vidc10_device(mconfig, ACORN_VIDC1A, tag, owner, clock, 2)
 {
-	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc10_lcd_device::regs_map), this));
-	// TODO: confirm being identical to raster version
+	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, 0, address_map_constructor(FUNC(acorn_vidc1a_device::regs_map), this));
 	m_pal_4bpp_base = 0x100;
 	m_pal_cursor_base = 0x10;
 	m_pal_border_base = 0x110;
@@ -104,7 +103,7 @@ device_memory_interface::space_config_vector acorn_vidc10_device::memory_space_c
 
 //-------------------------------------------------
 //  device_add_mconfig - device-specific machine
-//  configuration addiitons
+//  configuration additions
 //-------------------------------------------------
 
 void acorn_vidc10_device::device_add_mconfig(machine_config &config)
@@ -116,12 +115,6 @@ void acorn_vidc10_device::device_add_mconfig(machine_config &config)
 		// custom DAC
 		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[i], 0).add_route(0, m_lspeaker, m_sound_input_gain).add_route(0, m_rspeaker, m_sound_input_gain);
 	}
-}
-
-void acorn_vidc10_lcd_device::device_add_mconfig(machine_config &config)
-{
-	acorn_vidc10_device::device_add_mconfig(config);
-	// TODO: verify !Configure with automatic type detection, there must be an ID telling this is a LCD machine.
 }
 
 u32 acorn_vidc10_device::palette_entries() const
@@ -178,12 +171,22 @@ void acorn_vidc10_device::device_start()
 
 	// generate u255 law lookup table
 	// cfr. page 48 of the VIDC20 manual, page 33 of the VIDC manual
-	// TODO: manual mentions a format difference between VIDC10 revisions
 	for (int rawval = 0; rawval < 256; rawval++)
 	{
-		u8 chord = rawval >> 5;
-		u8 point = (rawval & 0x1e) >> 1;
-		bool sign = rawval & 1;
+		u8 chord, point;
+		bool sign;
+		if (m_dac_type == 1)
+		{
+			chord = (rawval & 0x70) >> 4;
+			point = rawval & 0x0f;
+			sign = rawval >> 7;
+		}
+		else
+		{
+			chord = rawval >> 5;
+			point = (rawval & 0x1e) >> 1;
+			sign = rawval & 1;
+		}
 		int16_t result = ((16+point)<<chord)-16;
 
 		if (sign)
@@ -541,7 +544,7 @@ u32 acorn_vidc10_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-READ_LINE_MEMBER(acorn_vidc10_device::flyback_r )
+READ_LINE_MEMBER(acorn_vidc10_device::flyback_r)
 {
 	int vert_pos = screen().vpos();
 	if (vert_pos <= m_crtc_regs[CRTC_VDSR] * (m_crtc_interlace+1))
@@ -568,7 +571,7 @@ void arm_vidc20_device::regs_map(address_map &map)
 }
 
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock)
+	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock, 2)
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));
 	m_pal_4bpp_base = 0x000;

@@ -410,7 +410,7 @@ void nes_disksys_device::disk_flip_side()
 	if (m_fds_current_side == 0)
 		popmessage("No disk inserted.");
 	else
-		popmessage("Disk set to side %d", m_fds_current_side);
+		popmessage("Disk set to side %c", m_fds_current_side+0x40);
 }
 
 

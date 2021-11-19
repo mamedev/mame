@@ -17,10 +17,10 @@
 #include "screen.h"
 #include "tilemap.h"
 
-class ironhors_state : public driver_device
+class ironhors_base_state : public driver_device
 {
 public:
-	ironhors_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ironhors_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -33,14 +33,15 @@ public:
 		m_scroll(*this, "scroll"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
-		m_spriteram2(*this, "spriteram2"),
-		m_spriteram(*this, "spriteram")
+		m_spriteram(*this, "spriteram%u", 1U)
 	{ }
 
-	void farwest(machine_config &config);
-	void ironhors(machine_config &config);
+	void base(machine_config &config);
 
-private:
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void sh_irqtrigger_w(uint8_t data);
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
@@ -49,26 +50,9 @@ private:
 	void flipscreen_w(uint8_t data);
 	void filter_w(uint8_t data);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_farwest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void palette(palette_device &palette) const;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ironhors_scanline_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(farwest_scanline_tick);
-
-	void ironhors_palette(palette_device &palette) const;
-	DECLARE_VIDEO_START(farwest);
-
-	void farwest_master_map(address_map &map);
-	void farwest_slave_map(address_map &map);
-	void master_map(address_map &map);
-	void slave_io_map(address_map &map);
-	void slave_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -77,25 +61,69 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<discrete_device> m_disc_ih;
 
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint8_t> m_interrupt_enable;
 	required_shared_ptr<uint8_t> m_scroll;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_spriteram2;
-	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 
-	/* video-related */
-	tilemap_t    *m_bg_tilemap;
-	int        m_palettebank;
-	int        m_charbank;
-	int        m_spriterambank;
+	// video-related
+	tilemap_t *m_bg_tilemap;
+	uint8_t m_palettebank;
+	uint8_t m_charbank;
+	uint8_t m_spriterambank;
+};
 
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+class ironhors_state : public ironhors_base_state
+{
+public:
+	ironhors_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ironhors_base_state(mconfig, type, tag)
+	{ }
+
+	void ironhors(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_tick);
+
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+	void slave_io_map(address_map &map);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(farwest_get_bg_tile_info);
+};
+
+class farwest_state : public ironhors_base_state
+{
+public:
+	farwest_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ironhors_base_state(mconfig, type, tag)
+	{ }
+
+	void farwest(machine_config &config);
+
+protected:
+	virtual void video_start() override;
+
+private:
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_tick);
+
+	void master_map(address_map &map);
+	void slave_map(address_map &map);
+
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 };
 
 #endif // MAME_INCLUDES_IRONHORS_H

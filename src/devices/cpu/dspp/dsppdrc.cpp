@@ -94,7 +94,7 @@ registers
 inline void dspp_device::load_fast_iregs(drcuml_block &block)
 {
 #if 0 // TODO
-	for (uint32_t regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (uint32_t regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -115,7 +115,7 @@ void dspp_device::save_fast_iregs(drcuml_block &block)
 #if 0 // TODO
 	int regnum;
 
-	for (regnum = 0; regnum < ARRAY_LENGTH(m_regmap); regnum++)
+	for (regnum = 0; regnum < std::size(m_regmap); regnum++)
 	{
 		if (m_regmap[regnum].is_int_register())
 		{
@@ -501,10 +501,10 @@ void dspp_device::generate_set_rbase(drcuml_block &block, compiler_state *compil
 		case 0:
 			UML_MOV(block, mem(&m_core->m_rbase[0]), addr);
 			UML_MOV(block, mem(&m_core->m_rbase[1]), addr + 4 - base);
-		// Intentional fall-through
+			[[fallthrough]];
 		case 8:
 			UML_MOV(block, mem(&m_core->m_rbase[2]), addr + 8 - base);
-		// Intentional fall-through
+			[[fallthrough]];
 		case 12:
 			UML_MOV(block, mem(&m_core->m_rbase[3]), addr + 12 - base);
 			break;

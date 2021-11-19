@@ -523,10 +523,10 @@ void xor100_state::xor100(machine_config &config)
 	m_ctc->zc_callback<2>().set(FUNC(xor100_state::ctc_z2_w));
 
 	FD1795(config, m_fdc, 8_MHz_XTAL / 4);
-	FLOPPY_CONNECTOR(config, WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":0", xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":1", xor100_floppies, "8ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":2", xor100_floppies, nullptr,    floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, WD1795_TAG":3", xor100_floppies, nullptr,    floppy_image_device::default_mfm_floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(I8255A_TAG, FUNC(i8255_device::pc4_w));

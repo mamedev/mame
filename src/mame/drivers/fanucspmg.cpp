@@ -112,7 +112,7 @@ Note: To initiate booting from the floppy drive hold down the LOAD key for 3-5 s
 
 The software for the Fanuc System P-Model G is extremely rare now and very difficult to find.
 If you do have any of these wanted software titles or any manuals listed below and want to help
-please contact me (Guru) via http://mamedev.org/contact.html
+please contact me (Guru) via http://members.iinet.net.au/~lantra9jp1_nbn/gurudumps/comments.html
 
 The following is a complete list of manuals available for the first edition of the
 Fanuc System P-Model G released in 1983. The info is taken from a glossy sales brochure
@@ -590,7 +590,7 @@ private:
 	required_shared_ptr<uint8_t> m_shared;
 	required_memory_region m_chargen;
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
@@ -939,9 +939,11 @@ static void fanuc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
-	FLOPPY_IMD_FORMAT
-FLOPPY_FORMATS_END
+void fanucspmg_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_IMD_FORMAT);
+}
 
 void fanucspmg_state::fanucspmg(machine_config &config)
 {

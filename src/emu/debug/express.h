@@ -18,6 +18,7 @@
 #include <deque>
 #include <functional>
 #include <list>
+#include <string_view>
 #include <unordered_map>
 
 
@@ -33,13 +34,13 @@ enum expression_space
 	EXPSPACE_PROGRAM_LOGICAL,
 	EXPSPACE_DATA_LOGICAL,
 	EXPSPACE_IO_LOGICAL,
-	EXPSPACE_SPACE3_LOGICAL,
+	EXPSPACE_OPCODE_LOGICAL,
 	EXPSPACE_PROGRAM_PHYSICAL,
 	EXPSPACE_DATA_PHYSICAL,
 	EXPSPACE_IO_PHYSICAL,
-	EXPSPACE_SPACE3_PHYSICAL,
-	EXPSPACE_OPCODE,
-	EXPSPACE_RAMWRITE,
+	EXPSPACE_OPCODE_PHYSICAL,
+	EXPSPACE_PRGDIRECT,
+	EXPSPACE_OPDIRECT,
 	EXPSPACE_REGION
 };
 
@@ -203,7 +204,7 @@ private:
 	u64 read_memory_region(const char *rgntag, offs_t address, int size);
 	void write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
-	device_t *expression_get_device(const char *tag);
+	expression_error expression_get_space(const char *tag, int &spacenum, device_memory_interface *&memory);
 	void notify_memory_modified();
 
 	// internal state
@@ -223,7 +224,8 @@ class parsed_expression
 {
 public:
 	// construction/destruction
-	parsed_expression(symbol_table &symtable, const char *expression = nullptr, int default_base = 16);
+	parsed_expression(symbol_table &symtable);
+	parsed_expression(symbol_table &symtable, std::string_view expression, int default_base = 16);
 	parsed_expression(const parsed_expression &src);
 	parsed_expression(parsed_expression &&src) = default;
 
@@ -241,7 +243,7 @@ public:
 	void set_default_base(int base) { assert(base == 8 || base == 10 || base == 16); m_default_base = base; }
 
 	// execution
-	void parse(const char *string);
+	void parse(std::string_view string);
 	u64 execute() { return execute_tokens(); }
 
 private:
@@ -283,7 +285,6 @@ private:
 		parse_token(int offset = 0);
 
 		// getters
-		parse_token *next() const { return m_next; }
 		int offset() const { return m_offset; }
 		bool is_number() const { return (m_type == NUMBER); }
 		bool is_string() const { return (m_type == STRING); }
@@ -294,8 +295,9 @@ private:
 		bool is_lval() const { return ((m_type == SYMBOL && m_symbol->is_lval()) || m_type == MEMORY); }
 
 		u64 value() const { assert(m_type == NUMBER); return m_value; }
+		const char *string() const { assert(m_type == STRING); return m_string; }
 		u32 address() const { assert(m_type == MEMORY); return m_value; }
-		symbol_entry *symbol() const { assert(m_type == SYMBOL); return m_symbol; }
+		symbol_entry &symbol() const { assert(m_type == SYMBOL); return *m_symbol; }
 
 		u8 optype() const { assert(m_type == OPERATOR); return (m_flags & TIN_OPTYPE_MASK) >> TIN_OPTYPE_SHIFT; }
 		u8 precedence() const { assert(m_type == OPERATOR); return (m_flags & TIN_PRECEDENCE_MASK) >> TIN_PRECEDENCE_SHIFT; }
@@ -329,7 +331,6 @@ private:
 
 	private:
 		// internal state
-		parse_token *           m_next;             // next token in list
 		token_type              m_type;             // type of token
 		int                     m_offset;           // offset within the string
 		u64                     m_value;            // integral value
@@ -340,7 +341,7 @@ private:
 
 	// internal helpers
 	void copy(const parsed_expression &src);
-	void print_tokens(FILE *out);
+	void print_tokens();
 
 	// parsing helpers
 	void parse_string_into_tokens();
@@ -349,7 +350,7 @@ private:
 	void parse_quoted_char(parse_token &token, const char *&string);
 	void parse_quoted_string(parse_token &token, const char *&string);
 	void parse_memory_operator(parse_token &token, const char *string, bool disable_se);
-	void normalize_operator(parse_token *prevtoken, parse_token &thistoken, const std::list<parse_token> &stack, bool was_rparen);
+	void normalize_operator(parse_token &thistoken, parse_token *prevtoken, parse_token *nexttoken, const std::list<parse_token> &stack, bool was_rparen);
 	void infix_to_postfix();
 
 	// execution helpers

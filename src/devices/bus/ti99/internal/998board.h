@@ -87,7 +87,7 @@
 
 // --------------------------------------------------
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 class mainboard8_device;
 
@@ -697,7 +697,7 @@ private:
 	uint8_t*   m_pascalrom = nullptr;
 };
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)

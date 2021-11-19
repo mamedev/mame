@@ -212,9 +212,11 @@ static GFXDECODE_START( gfx_pk8020 )
 GFXDECODE_END
 
 
-FLOPPY_FORMATS_MEMBER( pk8020_state::floppy_formats )
-	FLOPPY_PK8020_FORMAT
-FLOPPY_FORMATS_END
+void pk8020_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_PK8020_FORMAT);
+}
 
 static void pk8020_floppies(device_slot_interface &device)
 {

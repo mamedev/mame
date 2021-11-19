@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Wilbert Pol
+// copyright-holders:R. Belmont, Wilbert Pol, Nigel Barnes
 /***************************************************************************
 
     Acorn Communicator
@@ -7,8 +7,19 @@
     Driver-in-progress by R. Belmont
     Electron ULA emulation by Wilbert Pol
 
-    Main CPU: 65C816
-    Other chips: 6850 UART, 6522 VIA, SAA5240(video?), AM7910 modem, PCF0335(?), PCF8573P
+    Main CPU:
+      65C816
+
+    Other chips:
+      6850 UART
+      6522 VIA
+      SAA5240 (Teletext)
+      MC68B54 (Econet)
+      AM7910  (Modem)
+      PCD3312 (Tone Generator)
+      PCF0335 (Pulse Dialler?)
+      PCF8573 (RTC)
+      SCN2641 (RS423)
 
 ****************************************************************************/
 
@@ -17,11 +28,16 @@
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
+#include "machine/input_merger.h"
 #include "machine/mc6854.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/pcf8573.h"
+#include "machine/scn_pci.h"
 #include "machine/bankdev.h"
 #include "sound/beep.h"
+#include "sound/pcd3311.h"
+#include "video/saa5240.h"
 #include "bus/econet/econet.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
@@ -47,11 +63,17 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_maincpu_region(*this, "maincpu"),
+		m_irqs(*this, "irqs"),
+		m_screen(*this, "screen"),
+		m_cct(*this, "saa5240"),
 		m_beeper(*this, "beeper"),
+		m_dtmf(*this, "dtmf"),
 		m_ram(*this, RAM_TAG),
+		m_rtc(*this, "rtc"),
 		m_via(*this, "via6522"),
 		m_acia(*this, "acia"),
 		m_acia_clock(*this, "acia_clock"),
+		m_scn2641(*this, "aci"),
 		m_adlc(*this, "mc6854"),
 		m_vram(*this, "vram"),
 		m_keybd1(*this, "LINE1.%u", 0),
@@ -62,6 +84,7 @@ public:
 	{ }
 
 	void accomm(machine_config &config);
+	void accommi(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 
@@ -70,6 +93,8 @@ protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -83,18 +108,24 @@ private:
 	void sheila_w(offs_t offset, uint8_t data);
 
 	void accomm_palette(palette_device &palette) const;
-	INTERRUPT_GEN_MEMBER(vbl_int);
 
 	void main_map(address_map &map);
+	void saa5240_map(address_map &map);
 
 	// devices
 	required_device<g65816_device> m_maincpu;
 	required_memory_region m_maincpu_region;
+	required_device<input_merger_device> m_irqs;
+	required_device<screen_device> m_screen;
+	required_device<saa5240_device> m_cct;
 	required_device<beep_device> m_beeper;
+	required_device<pcd3311_device> m_dtmf;
 	required_device<ram_device> m_ram;
+	required_device<pcf8573_device> m_rtc;
 	required_device<via6522_device> m_via;
 	required_device<acia6850_device> m_acia;
 	required_device<clock_device> m_acia_clock;
+	required_device<scn2641_device> m_scn2641;
 	required_device<mc6854_device> m_adlc;
 	required_shared_ptr<uint8_t> m_vram;
 	required_ioport_array<14> m_keybd1, m_keybd2;
@@ -107,6 +138,11 @@ private:
 
 	bool m_ch00rom_enabled;
 
+	enum
+	{
+		TIMER_SCANLINE_INTERRUPT
+	};
+
 	/* ULA context */
 
 	struct ULA
@@ -116,15 +152,14 @@ private:
 		uint8_t rompage;
 		uint16_t screen_start;
 		uint16_t screen_base;
-		int screen_size;
+		uint16_t screen_size;
 		uint16_t screen_addr;
-		uint8_t *vram;
+		int screen_dispend;
 		int current_pal[16];
 		int communication_mode;
 		int screen_mode;
 		int shiftlock_mode;
 		int capslock_mode;
-		//  int scanline;
 		/* tape reading related */
 		uint32_t tape_value;
 		int tape_steps;
@@ -136,27 +171,18 @@ private:
 		uint8_t tape_byte;
 	};
 
-
 	ULA m_ula;
 	int m_map4[256];
 	int m_map16[256];
-};
-
-static const rgb_t electron_palette[8]=
-{
-	rgb_t(0x0ff,0x0ff,0x0ff),
-	rgb_t(0x000,0x0ff,0x0ff),
-	rgb_t(0x0ff,0x000,0x0ff),
-	rgb_t(0x000,0x000,0x0ff),
-	rgb_t(0x0ff,0x0ff,0x000),
-	rgb_t(0x000,0x0ff,0x000),
-	rgb_t(0x0ff,0x000,0x000),
-	rgb_t(0x000,0x000,0x000)
+	emu_timer *m_scanline_timer;
 };
 
 void accomm_state::accomm_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, electron_palette);
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		palette.set_pen_color(i ^ 7, rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2)));
+	}
 }
 
 uint8_t accomm_state::read_keyboard1(offs_t offset)
@@ -187,11 +213,6 @@ uint8_t accomm_state::read_keyboard2(offs_t offset)
 	return data;
 }
 
-INTERRUPT_GEN_MEMBER(accomm_state::vbl_int)
-{
-	interrupt_handler( INT_SET, INT_DISPLAY_END );
-}
-
 void accomm_state::machine_reset()
 {
 	m_ula.communication_mode = 0x04;
@@ -201,11 +222,10 @@ void accomm_state::machine_reset()
 	m_ula.screen_start = 0x3000;
 	m_ula.screen_base = 0x3000;
 	m_ula.screen_size = 0x8000 - 0x3000;
-	m_ula.screen_addr = 0;
+	m_ula.screen_addr = 0x3000;
 	m_ula.tape_running = 0;
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0;
-	m_ula.vram = (uint8_t *)m_vram.target() + m_ula.screen_base;
 
 	m_ch00rom_enabled = true;
 }
@@ -217,6 +237,21 @@ void accomm_state::machine_start()
 
 	m_ula.interrupt_status = 0x82;
 	m_ula.interrupt_control = 0x00;
+
+	save_item(STRUCT_MEMBER(m_ula, interrupt_status));
+	save_item(STRUCT_MEMBER(m_ula, interrupt_control));
+	save_item(STRUCT_MEMBER(m_ula, rompage));
+	save_item(STRUCT_MEMBER(m_ula, screen_start));
+	save_item(STRUCT_MEMBER(m_ula, screen_base));
+	save_item(STRUCT_MEMBER(m_ula, screen_size));
+	save_item(STRUCT_MEMBER(m_ula, screen_addr));
+	save_item(STRUCT_MEMBER(m_ula, screen_dispend));
+	save_item(STRUCT_MEMBER(m_ula, current_pal));
+	save_item(STRUCT_MEMBER(m_ula, communication_mode));
+	save_item(STRUCT_MEMBER(m_ula, screen_mode));
+	save_item(STRUCT_MEMBER(m_ula, shiftlock_mode));
+	save_item(STRUCT_MEMBER(m_ula, capslock_mode));
+	save_item(NAME(m_ch00rom_enabled));
 }
 
 void accomm_state::video_start()
@@ -226,6 +261,8 @@ void accomm_state::video_start()
 		m_map4[i] = ( ( i & 0x10 ) >> 3 ) | ( i & 0x01 );
 		m_map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE_INTERRUPT);
+	m_scanline_timer->adjust( m_screen->time_until_pos(0), 0, m_screen->scan_period() );
 }
 
 void accomm_state::ch00switch_w(offs_t offset, uint8_t data)
@@ -237,7 +274,8 @@ void accomm_state::ch00switch_w(offs_t offset, uint8_t data)
 
 inline uint8_t accomm_state::read_vram(uint16_t addr)
 {
-	return m_ula.vram[ addr % m_ula.screen_size ];
+	if ( addr & 0x8000 ) addr -= m_ula.screen_size;
+	return m_vram[ addr ];
 }
 
 inline void accomm_state::plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
@@ -252,9 +290,6 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	int scanline = screen.vpos();
 	rectangle r = cliprect;
 	r.sety(scanline, scanline);
-
-	if (scanline == 0)
-		m_ula.screen_addr = m_ula.screen_start - m_ula.screen_base;
 
 	/* set up palette */
 	int pal[16];
@@ -439,8 +474,32 @@ uint32_t accomm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 		break;
 	}
+	if ( m_ula.screen_addr & 0x8000 )
+		m_ula.screen_addr -= m_ula.screen_size;
 
 	return 0;
+}
+
+
+void accomm_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_SCANLINE_INTERRUPT)
+	{
+		switch (m_screen->vpos())
+		{
+		case 99:
+			interrupt_handler( INT_SET, INT_RTC );
+			break;
+		case 249:
+		case 255:
+			if ( m_screen->vpos() == m_ula.screen_dispend )
+				interrupt_handler( INT_SET, INT_DISPLAY_END );
+			break;
+		case 311:
+			m_ula.screen_addr = m_ula.screen_start;
+			break;
+		}
+	}
 }
 
 
@@ -499,17 +558,17 @@ uint8_t accomm_state::sheila_r(offs_t offset)
 		data = m_ula.tape_byte;
 		break;
 	}
-	logerror( "ULA: read offset %02x: %02x\n", offset, data );
 	return data;
 }
 
 static const int palette_offset[4] = { 0, 4, 5, 1 };
-static const uint16_t screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x5800 };
+static const uint16_t screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 0x5800, 0x5800, 0x6000, 0x6000 };
+static const int mode_end[8] = { 255, 255, 255 ,249 ,255, 255, 249, 249 };
 
 void accomm_state::sheila_w(offs_t offset, uint8_t data)
 {
 	int i = palette_offset[(( offset >> 1 ) & 0x03)];
-	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
+
 	switch( offset & 0x0f )
 	{
 	case 0x00:  /* Interrupt control */
@@ -519,11 +578,9 @@ void accomm_state::sheila_w(offs_t offset, uint8_t data)
 		break;
 	case 0x02:  /* Screen start address #1 */
 		m_ula.screen_start = ( m_ula.screen_start & 0x7e00 ) | ( ( data & 0xe0 ) << 1 );
-		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
 		break;
 	case 0x03:  /* Screen start address #2 */
-		m_ula.screen_start = ( m_ula.screen_start & 0x1c0 ) | ( ( data & 0x3f ) << 9 );
-		logerror( "screen_start changed to %04x\n", m_ula.screen_start );
+		m_ula.screen_start = ( m_ula.screen_start & 0x1ff ) | ( ( data & 0x3f ) << 9 );
 		break;
 	case 0x04:  /* Cassette data shift register */
 		break;
@@ -585,23 +642,22 @@ void accomm_state::sheila_w(offs_t offset, uint8_t data)
 		m_ula.screen_mode = ( data >> 3 ) & 0x07;
 		m_ula.screen_base = screen_base[ m_ula.screen_mode ];
 		m_ula.screen_size = 0x8000 - m_ula.screen_base;
-		m_ula.vram = (uint8_t *)m_vram.target() + m_ula.screen_base;
-		logerror( "ULA: screen mode set to %d\n", m_ula.screen_mode );
+		m_ula.screen_dispend = mode_end[ m_ula.screen_mode ];
 		m_ula.shiftlock_mode = !BIT(data, 6);
 		m_shiftlock_led = m_ula.shiftlock_mode;
 		m_ula.capslock_mode = BIT(data, 7);
 		m_capslock_led = m_ula.capslock_mode;
 		break;
-	case 0x08: case 0x0A: case 0x0C: case 0x0E:
-		// video_update
-		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 1));
+	case 0x08: case 0x0a: case 0x0c: case 0x0e:
+		/* colour palette */
+		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x01) | (((data & 0x80) >> 5) | ((data & 0x08) >> 2));
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x01) | (((data & 0x40) >> 4) | ((data & 0x04) >> 1));
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x03) | ((data & 0x20) >> 3);
 		m_ula.current_pal[i] = (m_ula.current_pal[
 		i] & 0x03) | ((data & 0x10) >> 2);
 		break;
-	case 0x09: case 0x0B: case 0x0D: case 0x0F:
-		// video_update
+	case 0x09: case 0x0b: case 0x0d: case 0x0f:
+		/* colour palette */
 		m_ula.current_pal[i+10] = (m_ula.current_pal[i+10] & 0x06) | ((data & 0x08) >> 3);
 		m_ula.current_pal[i+8] = (m_ula.current_pal[i+8] & 0x06) | ((data & 0x04) >> 2);
 		m_ula.current_pal[i+2] = (m_ula.current_pal[i+2] & 0x04) | (((data & 0x20) >> 4) | ((data & 0x02) >> 1));
@@ -636,10 +692,10 @@ void accomm_state::main_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rw(FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));               /* System RAM */
 	map(0x200000, 0x3fffff).noprw();                                                                /* External expansion RAM */
-	map(0x400000, 0x400000).noprw();                                                                /* MODEM */
+	map(0x400000, 0x400001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* MODEM */
 	map(0x410000, 0x410000).ram();                                                                  /* Econet ID */
 	map(0x420000, 0x42000f).m(m_via, FUNC(via6522_device::map));                                    /* 6522 VIA (printer etc) */
-	map(0x430000, 0x430001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* 2641 ACIA (RS423) */
+	map(0x430000, 0x430003).rw(m_scn2641, FUNC(scn2641_device::read), FUNC(scn2641_device::write)); /* 2641 ACIA (RS423) */
 	map(0x440000, 0x44ffff).w(FUNC(accomm_state::ch00switch_w));                                    /* CH00SWITCH */
 	map(0x450000, 0x457fff).ram().share("vram");                                                    /* Video RAM */
 	map(0x458000, 0x459fff).r(FUNC(accomm_state::read_keyboard1));                                  /* Video ULA */
@@ -656,6 +712,12 @@ void accomm_state::main_map(address_map &map)
 	map(0xfd0000, 0xfdffff).rom().region("maincpu", 0x020000);                                      /* ROM bank 2 (ROM Slot 1) */
 	map(0xfe0000, 0xfeffff).rom().region("maincpu", 0x000000);                                      /* ROM bank 0 (ROM Slot 0) */
 	map(0xff0000, 0xffffff).rom().region("maincpu", 0x010000);                                      /* ROM bank 1 (ROM Slot 0) */
+}
+
+void accomm_state::saa5240_map(address_map &map)
+{
+	map.global_mask(0x07ff);
+	map(0x0000, 0x07ff).ram();
 }
 
 INPUT_CHANGED_MEMBER(accomm_state::trigger_reset)
@@ -840,15 +902,14 @@ void accomm_state::accomm(machine_config &config)
 {
 	G65816(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &accomm_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(accomm_state::vbl_int));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50.08);
-	screen.set_size(640, 312);
-	screen.set_visarea(0, 640 - 1, 0, 256 - 1);
-	screen.set_screen_update(FUNC(accomm_state::screen_update));
-	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_palette("palette");
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
+	m_screen->set_screen_update(FUNC(accomm_state::screen_update));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(accomm_state::accomm_palette), 16);
 
@@ -863,27 +924,53 @@ void accomm_state::accomm(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	/* rtc pcf8573 */
+	/* rtc */
+	PCF8573(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->comp_cb().set(m_via, FUNC(via6522_device::write_cb1));
+
+	/* teletext */
+	SAA5240A(config, m_cct, 6_MHz_XTAL);
+	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
 
 	/* via */
-	VIA6522(config, m_via, 16_MHz_XTAL / 16);
+	MOS6522(config, m_via, 16_MHz_XTAL / 16);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_via->ca2_handler().set("centronics", FUNC(centronics_device::write_strobe));
+	m_via->readpb_handler().set(m_rtc, FUNC(pcf8573_device::sda_r)).bit(0);
+	m_via->readpb_handler().append(m_cct, FUNC(saa5240a_device::read_sda)).bit(0);
+	m_via->writepb_handler().set(m_rtc, FUNC(pcf8573_device::sda_w)).bit(1).invert();
+	m_via->writepb_handler().append(m_rtc, FUNC(pcf8573_device::scl_w)).bit(2).invert();
+	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_sda)).bit(1).invert();
+	m_via->writepb_handler().append(m_cct, FUNC(saa5240a_device::write_scl)).bit(2).invert();
+	m_via->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	/* acia */
+	/* rs423 */
+	SCN2641(config, m_scn2641, 3.6864_MHz_XTAL);
+	m_scn2641->txd_handler().set("rs423", FUNC(rs232_port_device::write_txd));
+	m_scn2641->rts_handler().set("rs423", FUNC(rs232_port_device::write_rts));
+	m_scn2641->intr_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
+
+	rs232_port_device &rs423(RS232_PORT(config, "rs423", default_rs232_devices, nullptr));
+	rs423.rxd_handler().set(m_scn2641, FUNC(scn2641_device::rxd_w));
+	rs423.dcd_handler().set(m_scn2641, FUNC(scn2641_device::dcd_w));
+	rs423.cts_handler().set(m_scn2641, FUNC(scn2641_device::cts_w));
+
+	/* modem */
 	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set("serial", FUNC(rs232_port_device::write_txd));
-	m_acia->rts_handler().set("serial", FUNC(rs232_port_device::write_rts));
-	m_acia->irq_handler().set_inputline("maincpu", G65816_LINE_IRQ);
+	m_acia->txd_handler().set("modem", FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set("modem", FUNC(rs232_port_device::write_rts));
+	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<2>));
 
-	rs232_port_device &serial(RS232_PORT(config, "serial", default_rs232_devices, nullptr));
-	serial.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
-	serial.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
-	serial.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
+	rs232_port_device &modem(RS232_PORT(config, "modem", default_rs232_devices, "null_modem"));
+	modem.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
+	modem.dcd_handler().set(m_acia, FUNC(acia6850_device::write_dcd));
+	modem.cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
 
 	CLOCK(config, m_acia_clock, 16_MHz_XTAL / 13);
 	m_acia_clock->signal_handler().set(m_acia, FUNC(acia6850_device::write_txc));
 	m_acia_clock->signal_handler().append(m_acia, FUNC(acia6850_device::write_rxc));
+
+	PCD3311(config, m_dtmf, 3.57864_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3312
 
 	/* econet */
 	MC6854(config, m_adlc);
@@ -903,6 +990,17 @@ void accomm_state::accomm(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	centronics.set_output_latch(cent_data_out);
 }
+
+
+void accomm_state::accommi(machine_config &config)
+{
+	accomm(config);
+
+	/* teletext */
+	SAA5240B(config.replace(), m_cct, 6_MHz_XTAL);
+	m_cct->set_addrmap(0, &accomm_state::saa5240_map);
+}
+
 
 ROM_START(accomm)
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -989,7 +1087,9 @@ ROM_START(accommi)
 	ROM_REGION(0x380000, "ext", ROMREGION_ERASEFF)
 ROM_END
 
-COMP( 1986, accomm,  0,      0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator",             MACHINE_NOT_WORKING )
-COMP( 1985, accommp, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
-COMP( 1987, accommb, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
-COMP( 1988, accommi, accomm, 0, accomm, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )
+
+/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT   CLASS         INIT        COMPANY            FULLNAME                          FLAGS */
+COMP( 1986, accomm,  0,      0,     accomm,  accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator",             MACHINE_NOT_WORKING )
+COMP( 1985, accommp, accomm, 0,     accomm,  accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (prototype)", MACHINE_NOT_WORKING )
+COMP( 1987, accommb, accomm, 0,     accomm,  accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Briefcase Communicator",   MACHINE_NOT_WORKING )
+COMP( 1988, accommi, accomm, 0,     accommi, accomm, accomm_state, empty_init, "Acorn Computers", "Acorn Communicator (Italian)",   MACHINE_NOT_WORKING )

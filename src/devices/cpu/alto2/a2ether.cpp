@@ -1318,9 +1318,9 @@ void alto2_cpu_device::init_ether(int task)
 	save_item(NAME(m_eth.tx_count));
 	save_item(NAME(m_eth.breath_of_life));
 
-	m_ether_a41 = prom_load(machine(), &pl_enet_a41, memregion("ether_a41")->base());
-	m_ether_a42 = prom_load(machine(), &pl_enet_a42, memregion("ether_a42")->base());
-	m_ether_a49 = prom_load(machine(), &pl_enet_a49, memregion("ether_a49")->base());
+	m_ether_a41 = prom_load<uint8_t>(machine(), &pl_enet_a41, memregion("ether_a41")->base());
+	m_ether_a42 = prom_load<uint8_t>(machine(), &pl_enet_a42, memregion("ether_a42")->base());
+	m_ether_a49 = prom_load<uint8_t>(machine(), &pl_enet_a49, memregion("ether_a49")->base());
 
 	m_eth.rx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);
 	m_eth.tx_packet = std::make_unique<uint16_t[]>(sizeof(uint16_t)*ALTO2_ETHER_PACKET_SIZE);

@@ -5,50 +5,185 @@
 
 #include "k573fpga.h"
 
+#define LOG_GENERAL  (1 << 0)
+#define VERBOSE      (LOG_GENERAL)
+// #define LOG_OUTPUT_STREAM std::cout
 
-k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+#include "logmacro.h"
+
+k573fpga_device::k573fpga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI_573_DIGITAL_FPGA, tag, owner, clock),
+	ram(*this, finder_base::DUMMY_TAG),
+	mas3507d(*this, "mpeg"),
 	use_ddrsbm_fpga(false)
 {
 }
 
+void k573fpga_device::device_add_mconfig(machine_config &config)
+{
+	MAS3507D(config, mas3507d);
+	mas3507d->sample_cb().set(*this, FUNC(k573fpga_device::get_decrypted));
+}
+
 void k573fpga_device::device_start()
 {
+	save_item(NAME(crypto_key1));
+	save_item(NAME(crypto_key2));
+	save_item(NAME(crypto_key3));
+	save_item(NAME(mp3_start_addr));
+	save_item(NAME(mp3_cur_addr));
+	save_item(NAME(mp3_end_addr));
+	save_item(NAME(use_ddrsbm_fpga));
+	save_item(NAME(is_stream_active));
+	save_item(NAME(is_timer_active));
+	save_item(NAME(counter_previous));
+	save_item(NAME(counter_current));
+	save_item(NAME(last_playback_status));
 }
 
 void k573fpga_device::device_reset()
 {
-	mp3_cur_adr = 0;
-	mp3_end_adr = 0;
+	mp3_start_addr = 0;
+	mp3_cur_addr = 0;
+	mp3_end_addr = 0;
+
 	crypto_key1 = 0;
 	crypto_key2 = 0;
 	crypto_key3 = 0;
+
+	is_stream_active = false;
+	is_timer_active = false;
+
+	counter_current = counter_previous = counter_offset = 0;
+
+	mas3507d->reset_playback();
+	last_playback_status = get_mpeg_ctrl();
 }
 
-u16 k573fpga_device::get_mpeg_ctrl()
-{
-	if ((mpeg_ctrl_flag & 0xe000) == 0xe000) {
-		// This has been tested with real hardware, but this flag is always held 0x1000 when the audio is being played
-		return 0x1000;
+void k573fpga_device::reset_counter() {
+	counter_current = counter_previous = counter_offset = 0;
+	status_update();
+}
+
+void k573fpga_device::status_update() {
+	auto cur_playback_status = get_mpeg_ctrl();
+	is_timer_active = is_streaming() || ((cur_playback_status == last_playback_status && last_playback_status > PLAYBACK_STATE_IDLE) || cur_playback_status > last_playback_status);
+	last_playback_status = cur_playback_status;
+
+	if(!is_timer_active)
+		counter_current = counter_previous = counter_offset = 0;
+}
+
+uint32_t k573fpga_device::get_counter() {
+	status_update();
+
+	counter_previous = counter_current;
+
+	if(is_timer_active) {
+		mas3507d->update_stream();
+		counter_current = mas3507d->get_samples() - counter_offset;
 	}
 
-	return 0x0000;
+	return counter_current;
 }
 
-void k573fpga_device::set_mpeg_ctrl(u16 data)
+uint32_t k573fpga_device::get_counter_diff() {
+	// Delta playback time since last counter update.
+	// I couldn't find any active usages of this register but it exists in some code paths.
+	// The functionality was tested using custom code running on real hardware.
+	// When this is called, it will return the difference between the current counter value
+	// and the last read counter value, and then reset the counter back to the previously read counter's value.
+	auto diff = counter_current - counter_previous;
+	counter_current -= diff;
+	counter_previous = counter_current;
+	get_counter();
+	return diff;
+}
+
+uint16_t k573fpga_device::mas_i2c_r()
 {
-	logerror("FPGA MPEG control %c%c%c | %08x %08x\n",
+	uint16_t scl = mas3507d->i2c_scl_r() << 13;
+	uint16_t sda = mas3507d->i2c_sda_r() << 12;
+	return scl | sda;
+}
+
+void k573fpga_device::mas_i2c_w(uint16_t data)
+{
+	mas3507d->i2c_scl_w(data & 0x2000);
+	mas3507d->i2c_sda_w(data & 0x1000);
+}
+
+uint16_t k573fpga_device::get_mpeg_ctrl()
+{
+	switch(mas3507d->get_status()) {
+		case mas3507d_device::PLAYBACK_STATE_IDLE:
+			return PLAYBACK_STATE_IDLE;
+
+		case mas3507d_device::PLAYBACK_STATE_BUFFER_FULL:
+			return PLAYBACK_STATE_BUFFER_FULL;
+
+		case mas3507d_device::PLAYBACK_STATE_DEMAND_BUFFER:
+			return PLAYBACK_STATE_DEMAND_BUFFER;
+	}
+
+	return PLAYBACK_STATE_IDLE;
+}
+
+bool k573fpga_device::is_mp3_playing()
+{
+	return get_mpeg_ctrl() > PLAYBACK_STATE_IDLE;
+}
+
+uint16_t k573fpga_device::get_fpga_ctrl()
+{
+	// 0x0000 Not Streaming
+	// 0x1000 Streaming
+	return is_streaming() << 12;
+}
+
+bool k573fpga_device::is_streaming()
+{
+	return is_stream_active && mp3_cur_addr < mp3_end_addr;
+}
+
+void k573fpga_device::set_mpeg_ctrl(uint16_t data)
+{
+	LOG("FPGA MPEG control %c%c%c | %04x\n",
 				data & 0x8000 ? '#' : '.',
-				data & 0x4000 ? '#' : '.',
+				data & 0x4000 ? '#' : '.', // "Active" flag. The FPGA will never start streaming data without this bit set
 				data & 0x2000 ? '#' : '.',
-				mp3_cur_adr, mp3_end_adr);
+				data);
 
-	mpeg_ctrl_flag = data;
+	mas3507d->reset_playback();
+
+	if(data == 0xa000) {
+		is_stream_active = false;
+		counter_current = counter_previous = 0;
+		status_update();
+	} else if(data == 0xe000) {
+		is_stream_active = true;
+		mp3_cur_addr = mp3_start_addr;
+
+		reset_counter();
+
+		if(!mas3507d->is_started) {
+			mas3507d->start_playback();
+			mas3507d->update_stream();
+
+			// Audio should be buffered by this point.
+			// The assumption is that the number of samples actually played can be
+			// calculated by subtracting the base sample count when the song was started
+			// from the current sample count when the counter register is read.
+			// Otherwise, the sample count will always be ahead by the number of samples
+			// that were in the buffered frames.
+			counter_offset = mas3507d->get_samples();
+		}
+	}
 }
 
-u16 k573fpga_device::decrypt_default(u16 v)
+uint16_t k573fpga_device::decrypt_default(uint16_t v)
 {
-	u16 m = crypto_key1 ^ crypto_key2;
+	uint16_t m = crypto_key1 ^ crypto_key2;
 
 	v = bitswap<16>(
 		v,
@@ -80,7 +215,7 @@ u16 k573fpga_device::decrypt_default(u16 v)
 		(BIT(m, 0x0) << 0);
 
 	v ^= bitswap<16>(
-		(u16)crypto_key3,
+		(uint16_t)crypto_key3,
 		7, 0, 6, 1,
 		5, 2, 4, 3,
 		3, 4, 2, 5,
@@ -97,10 +232,10 @@ u16 k573fpga_device::decrypt_default(u16 v)
 	return v;
 }
 
-u16 k573fpga_device::decrypt_ddrsbm(u16 data)
+uint16_t k573fpga_device::decrypt_ddrsbm(uint16_t data)
 {
-	u8 key[16] = {0};
-	u16 key_state = bitswap<16>(
+	uint8_t key[16] = {0};
+	uint16_t key_state = bitswap<16>(
 		crypto_key1,
 		13, 11, 9, 7,
 		5, 3, 1, 15,
@@ -114,7 +249,7 @@ u16 k573fpga_device::decrypt_ddrsbm(u16 data)
 		key_state = ((key_state & 0x8080) >> 7) | ((key_state & 0x7f7f) << 1);
 	}
 
-	u16 output_word = 0;
+	uint16_t output_word = 0;
 	for(int cur_bit = 0; cur_bit < 8; cur_bit++) {
 		int even_bit_shift = cur_bit * 2;
 		int odd_bit_shift = cur_bit * 2 + 1;
@@ -138,15 +273,16 @@ u16 k573fpga_device::decrypt_ddrsbm(u16 data)
 	return output_word;
 }
 
-u16 k573fpga_device::get_decrypted()
+uint16_t k573fpga_device::get_decrypted()
 {
-	if(mp3_cur_adr >= mp3_end_adr || (mpeg_ctrl_flag & 0xe000) != 0xe000) {
+	if(!is_streaming()) {
+		is_stream_active = false;
 		return 0;
 	}
 
-	u16 src = ram[mp3_cur_adr >> 1];
-	u16 result = use_ddrsbm_fpga ? decrypt_ddrsbm(src) : decrypt_default(src);
-	mp3_cur_adr += 2;
+	uint16_t src = ram[mp3_cur_addr >> 1];
+	uint16_t result = use_ddrsbm_fpga ? decrypt_ddrsbm(src) : decrypt_default(src);
+	mp3_cur_addr += 2;
 
 	return result;
 }

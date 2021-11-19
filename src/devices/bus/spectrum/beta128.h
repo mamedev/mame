@@ -27,7 +27,7 @@ public:
 	// construction/destruction
 	spectrum_beta128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	DECLARE_INPUT_CHANGED_MEMBER(magic_button);
 
 protected:

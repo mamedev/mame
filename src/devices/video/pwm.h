@@ -21,7 +21,7 @@ public:
 	pwm_display_device &set_refresh(attotime duration) { m_framerate_set = duration; return *this; } // time between each outputs refresh
 	pwm_display_device &set_interpolation(double factor) { m_interpolation = factor; return *this; } // frame interpolation (0.0 - 1.0)
 	pwm_display_device &set_segmask(u64 digits, u64 mask); // mask for multi-state outputs, eg. 7seg led
-	pwm_display_device &reset_segmask() { std::fill_n(m_segmask, ARRAY_LENGTH(m_segmask), 0); return *this; }
+	pwm_display_device &reset_segmask() { std::fill(std::begin(m_segmask), std::end(m_segmask), 0); return *this; }
 	pwm_display_device &set_bri_levels(double l0, double l1 = 1.0, double l2 = 1.0, double l3 = 1.0); // brightness threshold per level (0.0 - 1.0)
 	pwm_display_device &set_bri_minimum(u8 i) { m_level_min = i; return *this; } // minimum level index for element to be considered "on"
 	pwm_display_device &set_bri_maximum(double b) { m_level_max = b; return *this; } // maximum brightness level, 0.0 for auto
@@ -31,23 +31,28 @@ public:
 	auto output_a() { return m_output_a_cb.bind(); }
 	auto output_digit() { return m_output_digit_cb.bind(); }
 
-	void reset_bri_levels() { std::fill_n(m_levels, ARRAY_LENGTH(m_levels), 1.0); }
+	void reset_bri_levels() { std::fill(std::begin(m_levels), std::end(m_levels), 1.0); }
 	void set_bri_one(u8 i, double level) { m_levels[i] = level; }
 	void segmask_one(u8 y, u64 mask) { m_segmask[y] = mask; }
 
-	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata, bool upd = true);
-	void matrix(u64 rowsel, u64 rowdata, bool upd = true) { matrix_partial(0, m_height, rowsel, rowdata, upd); }
-	void update(); // apply changes to m_rowdata
+	// matrix accessors
+	void matrix_partial(u8 start, u8 height, u64 rowsel, u64 rowdata);
+	void matrix(u64 rowsel, u64 rowdata) { matrix_partial(0, m_height, rowsel, rowdata); }
 	void clear() { matrix(0, 0); }
+
+	void write_my(u64 y) { matrix(y, m_rowdata_last); }
+	void write_mx(u64 x) { matrix(m_rowsel, x); }
+	u64 read_my() { return m_rowsel; }
+	u64 read_mx() { return m_rowdata_last; }
 
 	// directly handle individual element (does not affect m_rowsel), y = row num, x = row bit
 	int read_element(u8 y, u8 x) { return BIT(m_rowdata[y], x); }
-	void write_element(u8 y, u8 x, int state) { m_rowdata[y] = (m_rowdata[y] & ~(u64(1) << x)) | (u64(state ? 1 : 0) << x); }
+	void write_element(u8 y, u8 x, int state) { sync(); m_rowdata[y] = (m_rowdata[y] & ~(u64(1) << x)) | (u64(state ? 1 : 0) << x); }
 
 	// directly handle row data
 	u64 read_row(offs_t offset) { return m_rowdata[offset]; }
-	void write_row(offs_t offset, u64 data) { m_rowdata[offset] = data; m_rowsel |= u64(1) << offset; }
-	void clear_row(offs_t offset, u64 data = 0) { m_rowdata[offset] = 0; m_rowsel &= ~(u64(1) << offset); }
+	void write_row(offs_t offset, u64 data) { sync(); m_rowdata[offset] = data; m_rowsel |= u64(1) << offset; }
+	void clear_row(offs_t offset, u64 data = 0) { sync(); m_rowdata[offset] = 0; m_rowsel &= ~(u64(1) << offset); }
 
 	// directly handle element current brightness
 	double read_element_bri(u8 y, u8 x) { return m_bri[y][x]; }
@@ -81,17 +86,17 @@ private:
 
 	u64 m_segmask[0x40];
 	u64 m_rowsel;
-	u64 m_rowsel_prev;
 	u64 m_rowdata[0x40];
-	u64 m_rowdata_prev[0x40];
+	u64 m_rowdata_last;
 
 	double m_bri[0x40][0x41];
-	attotime m_update_time;
+	attotime m_sync_time;
 	attotime m_acc[0x40][0x41];
 
 	emu_timer *m_frame_timer;
 	TIMER_CALLBACK_MEMBER(frame_tick);
 	void schedule_frame();
+	void sync();
 };
 
 

@@ -2,7 +2,7 @@
 // copyright-holders:Kevin Thacker
 /***************************************************************************
 
-  pcw.c
+  pcw.cpp
 
   Functions to emulate the video hardware of the Amstrad PCW.
 

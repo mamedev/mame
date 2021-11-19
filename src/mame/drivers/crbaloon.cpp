@@ -5,10 +5,6 @@
     Taito Crazy Balloon hardware
 
     To-Do:
-        * Video timing from schematics
-        * Watchdog length from schematics
-        * Interrupt timing from schematics
-        * DIP switches
         * Faithfully implement the custom chips
         * Coin counter and lock-out
 
@@ -18,6 +14,7 @@
 #include "includes/crbaloon.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "screen.h"
 
 
@@ -157,29 +154,31 @@ uint8_t crbaloon_state::pc3259_r(offs_t offset)
 
 void crbaloon_state::port_sound_w(uint8_t data)
 {
-	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
+	// D0 - interrupt enable - also goes to PC3259 as /HTCTRL
 	m_irq_mask = data & 0x01;
-	crbaloon_set_clear_collision_address((data & 0x01) ? true : false);
+	crbaloon_set_clear_collision_address(BIT(data, 0));
+	if (!m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-	/* D1 - SOUND STOP */
-	machine().sound().system_enable((data & 0x02) ? true : false);
+	// D1 - SOUND STOP
+	machine().sound().system_mute(!BIT(data, 1));
 
-	/* D2 - unlabeled - music enable */
-	crbaloon_audio_set_music_enable((data & 0x04) ? true : false);
+	// D2 - unlabeled - music enable
+	crbaloon_audio_set_music_enable(BIT(data, 2));
 
-	/* D3 - EXPLOSION */
-	crbaloon_audio_set_explosion_enable((data & 0x08) ? true : false);
+	// D3 - EXPLOSION
+	crbaloon_audio_set_explosion_enable(BIT(data, 3));
 
-	/* D4 - BREATH */
-	crbaloon_audio_set_breath_enable((data & 0x10) ? true : false);
+	// D4 - BREATH
+	crbaloon_audio_set_breath_enable(BIT(data, 4));
 
-	/* D5 - APPEAR */
-	crbaloon_audio_set_appear_enable((data & 0x20) ? true : false);
+	// D5 - APPEAR
+	crbaloon_audio_set_appear_enable(BIT(data, 5));
 
-	/* D6 - unlabeled - laugh enable */
-	crbaloon_audio_set_laugh_enable((data & 0x40) ? true : false);
+	// D6 - unlabeled - laugh enable
+	crbaloon_audio_set_laugh_enable(BIT(data, 6));
 
-	/* D7 - unlabeled - goes to PC3259 pin 16 */
+	// D7 - unlabeled - goes to PC3259 pin 16
 
 	pc3259_update();
 }
@@ -219,7 +218,7 @@ void crbaloon_state::main_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x0c).portr("IN1");
 
 	map(0x00, 0x00).nopw();    /* not connected */
-	map(0x01, 0x01).nopw(); /* watchdog */
+	map(0x01, 0x01).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x02, 0x04).writeonly().share("spriteram");
 	map(0x05, 0x05).w(FUNC(crbaloon_state::crbaloon_audio_set_music_freq));
 	map(0x06, 0x06).w(FUNC(crbaloon_state::port_sound_w));
@@ -352,20 +351,22 @@ void crbaloon_state::machine_reset()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
+WRITE_LINE_MEMBER(crbaloon_state::vbl_int_w)
 {
-	if(m_irq_mask)
-		device.execute().set_input_line(0, HOLD_LINE);
+	if (state && m_irq_mask)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
 void crbaloon_state::crbaloon(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, CRBALOON_MASTER_XTAL / 3);
+	Z80(config, m_maincpu, CRBALOON_MASTER_XTAL / 4); // CPU clock based on 1H?
 	m_maincpu->set_addrmap(AS_PROGRAM, &crbaloon_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &crbaloon_state::main_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(crbaloon_state::vblank_irq));
+
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 256);
+	// Reset pulse comes from last stage of 74LS393 (8J) driven by 2VBL
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_crbaloon);
@@ -373,12 +374,10 @@ void crbaloon_state::crbaloon(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_raw(CRBALOON_MASTER_XTAL / 2, 320, 0, 256, 262, 0, 224);
 	screen.set_screen_update(FUNC(crbaloon_state::screen_update_crbaloon));
 	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(crbaloon_state::vbl_int_w));
 
 	/* audio hardware */
 	crbaloon_audio(config);

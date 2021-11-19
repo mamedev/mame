@@ -698,8 +698,6 @@ void k3_state::k3(machine_config &config)
 
 ROM_START( 1945kiii )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//  ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x40000, CRC(c4bbae5d) SHA1(a326fad902150c6b64c39618dda2c58baf12ae98) )
-//  ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x40000, CRC(092abf2e) SHA1(be42c54c3051d4efe76858e4bc85dfadc2d0cc1a) )
 	ROM_LOAD16_BYTE( "prg-1.u51", 0x00001, 0x80000, CRC(6b345f27) SHA1(60867fa0e2ea7ebdd4b8046315ee0c83e5cf0d74) ) /* identical halves */
 	ROM_LOAD16_BYTE( "prg-2.u52", 0x00000, 0x80000, CRC(ce09b98c) SHA1(a06bb712b9cf2249cc535de4055b14a21c68e0c5) ) /* identical halves */
 
@@ -719,8 +717,6 @@ ROM_END
 
 ROM_START( 1945kiiin )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//  ROM_LOAD16_BYTE( "u34", 0x00001, 0x40000, CRC(234a55a5) SHA1(df0464793531251ac64cee54e474314e5e5f05ab) )
-//  ROM_LOAD16_BYTE( "u35", 0x00000, 0x40000, CRC(1e6e23a5) SHA1(c0e3f8b34be77ff34f6dfbe1f966ca05db285e76) )
 	ROM_LOAD16_BYTE( "u34", 0x00001, 0x80000, CRC(d0cf4f03) SHA1(3455927221afae5103c02b12c1b855f416c47e91) ) /* 27C040 ROM had no label - identical halves */
 	ROM_LOAD16_BYTE( "u35", 0x00000, 0x80000, CRC(056c64ed) SHA1(b0eddad9c950676b94316d3aeb32f3ed4b9ade0f) ) /* 27C040 ROM had no label - identical halves */
 
@@ -750,8 +746,6 @@ ROM_END
 
 ROM_START( 1945kiiio )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-//  ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x40000, CRC(bcfb8b84) SHA1(7126463231cfaf4d6baf4d2efba88079c6c4c399) )
-//  ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x40000, CRC(ec1234a5) SHA1(36cf7a48236acd75365eefbba81024c343bb0124) )
 	ROM_LOAD16_BYTE( "3.u34", 0x00001, 0x80000, CRC(5515baa0) SHA1(6fd4c9b7cc27035d6baaafa73f5f5930bfde62a4) ) /* 0x40000 to 0x7FFFF 0x00 padded */
 	ROM_LOAD16_BYTE( "4.u35", 0x00000, 0x80000, CRC(fd177664) SHA1(0ea1854be8d88577129546a56d13bcdc4739ae52) ) /* 0x40000 to 0x7FFFF 0x00 padded */
 

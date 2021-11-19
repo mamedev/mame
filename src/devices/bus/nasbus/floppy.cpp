@@ -24,9 +24,11 @@
 
 DEFINE_DEVICE_TYPE(NASCOM_FDC, nascom_fdc_device, "nascom_fdc", "Nascom Floppy Disc Controller")
 
-FLOPPY_FORMATS_MEMBER( nascom_fdc_device::floppy_formats )
-	FLOPPY_NASCOM_FORMAT
-FLOPPY_FORMATS_END
+void nascom_fdc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_NASCOM_FORMAT);
+}
 
 static void nascom_floppies(device_slot_interface &device)
 {

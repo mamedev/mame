@@ -331,7 +331,7 @@ void eeprom_serial_base_device::set_state(eeprom_state newstate)
 		{ STATE_WAIT_FOR_COMPLETION, "WAIT_FOR_COMPLETION" },
 	};
 	const char *newstate_string = "UNKNOWN";
-	for (int index = 0; index < ARRAY_LENGTH(s_state_names); index++)
+	for (int index = 0; index < std::size(s_state_names); index++)
 		if (s_state_names[index].state == newstate)
 			newstate_string = s_state_names[index].string;
 	LOG2("New state: %s\n", newstate_string);
@@ -484,7 +484,7 @@ void eeprom_serial_base_device::execute_command()
 		{ COMMAND_ERASEALL, "Execute command:ERASEALL\n" },
 	};
 	const char *command_string = s_command_names[0].string;
-	for (int index = 0; index < ARRAY_LENGTH(s_command_names); index++)
+	for (int index = 0; index < std::size(s_command_names); index++)
 		if (s_command_names[index].command == m_command)
 			command_string = s_command_names[index].string;
 	LOG1(command_string, m_address);
@@ -565,7 +565,7 @@ void eeprom_serial_base_device::execute_write_command()
 		{ COMMAND_WRITEALL, "Execute write command: WRITEALL (%X) = 0x%X\n" },
 	};
 	const char *command_string = "UNKNOWN";
-	for (int index = 0; index < ARRAY_LENGTH(s_command_names); index++)
+	for (int index = 0; index < std::size(s_command_names); index++)
 		if (s_command_names[index].command == m_command)
 			command_string = s_command_names[index].string;
 	LOG1(command_string, m_address, m_shift_register);
@@ -807,7 +807,7 @@ void eeprom_serial_x24c44_device::execute_command()
 		{ COMMAND_COPY_RAM_TO_EEPROM, "Execute command:COPY_RAM_TO_EEPROM\n" },
 	};
 	const char *command_string = s_command_names[0].string;
-	for (int index = 0; index < ARRAY_LENGTH(s_command_names); index++)
+	for (int index = 0; index < std::size(s_command_names); index++)
 		if (s_command_names[index].command == m_command)
 			command_string = s_command_names[index].string;
 	LOG1(command_string, m_address);

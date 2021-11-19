@@ -176,7 +176,7 @@ void hng64_state::hng64_videoram_w(offs_t offset, uint32_t data, uint32_t mem_ma
 /* internal set of transparency states for rendering */
 
 
-static void hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat)
+void hng64_state::hng64_configure_blit_parameters(blit_parameters *blit, tilemap_t *tmap, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask, hng64trans_t drawformat)
 {
 	/* start with nothing */
 	memset(blit, 0, sizeof(*blit));
@@ -1049,8 +1049,8 @@ uint32_t hng64_state::screen_update_hng64(screen_device &screen, bitmap_rgb32 &b
 
 WRITE_LINE_MEMBER(hng64_state::screen_vblank_hng64)
 {
-	// rising edge
-	if (state)
+	// rising edge and buffer swap
+	if (state && (m_tcram[0x50/4] & 0x10000))
 		clear3d();
 }
 

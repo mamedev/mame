@@ -21,10 +21,9 @@ ROM_START(hp98543)
 	ROM_LOAD("1818-3907.bin", 0x000000, 0x002000, CRC(5e2bf02a) SHA1(9ba9391cf39624ef8027ce42c84e100344b2a2b8))
 ROM_END
 
-DEFINE_DEVICE_TYPE_NS(HPDIO_98543, bus::hp_dio, dio16_98543_device, "dio98543", "HP98543 medium-res color DIO video card")
+DEFINE_DEVICE_TYPE(HPDIO_98543, bus::hp_dio::dio16_98543_device, "dio98543", "HP98543 medium-res color DIO video card")
 
-namespace bus {
-	namespace hp_dio {
+namespace bus::hp_dio {
 
 void dio16_98543_device::device_add_mconfig(machine_config &config)
 {
@@ -253,4 +252,3 @@ uint32_t dio16_98543_device::screen_update(screen_device &screen, bitmap_rgb32 &
 }
 
 } // namespace bus::hp_dio
-} // namespace bus

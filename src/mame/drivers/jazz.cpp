@@ -151,8 +151,6 @@ public:
 
 	void init_common();
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
-
 protected:
 	// devices
 	required_device<r4000_device> m_cpu;
@@ -282,14 +280,9 @@ static void jazz_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
-FLOPPY_FORMATS_MEMBER(jazz_state::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 void jazz_state::jazz(machine_config &config)
 {
-	// FIXME: slow the cpu clock to get past session manager bugcheck
-	R4000(config, m_cpu, 50_MHz_XTAL / 5);
+	R4000(config, m_cpu, 50_MHz_XTAL);
 	m_cpu->set_addrmap(0, &jazz_state::cpu_map);
 
 	RAM(config, m_ram);
@@ -336,7 +329,7 @@ void jazz_state::jazz(machine_config &config)
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 	m_fdc->intrq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::irq<1>));
 	m_fdc->drq_wr_callback().set(m_mct_adr, FUNC(mct_adr_device::drq<1>));
-	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, jazz_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 	m_mct_adr->dma_r_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_r));
 	m_mct_adr->dma_w_cb<1>().set(m_fdc, FUNC(n82077aa_device::dma_w));
 
@@ -348,22 +341,14 @@ void jazz_state::jazz(machine_config &config)
 	AMD_28F020(config, m_flash);
 
 	// pc keyboard connector
-	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd_con", 0));
+	pc_kbdc_device &kbd_con(PC_KBDC(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
 	kbd_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	kbd_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// keyboard port
-	pc_kbdc_slot_device &kbd(PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL));
-	kbd.set_pc_kbdc_slot(&kbd_con);
-
 	// auxiliary connector
-	pc_kbdc_device &aux_con(PC_KBDC(config, "aux_con", 0));
+	pc_kbdc_device &aux_con(PC_KBDC(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
 	aux_con.out_clock_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 	aux_con.out_data_cb().set(m_kbdc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
-	// auxiliary port
-	pc_kbdc_slot_device &aux(PC_KBDC_SLOT(config, "aux", ps2_mice, STR_HLE_PS2_MOUSE));
-	aux.set_pc_kbdc_slot(&aux_con);
 
 	// keyboard controller
 	PS2_KEYBOARD_CONTROLLER(config, m_kbdc, 12_MHz_XTAL);

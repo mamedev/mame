@@ -20,8 +20,8 @@ static CX4 cx4;
 static uint16_t CX4_readw(uint16_t addr);
 static uint32_t CX4_readl(uint16_t addr);
 
-static void CX4_writew(running_machine &machine, uint16_t addr, uint16_t data);
-//static void CX4_writel(running_machine &machine, uint16_t addr, uint32_t data);
+static void CX4_writew(address_space &space, uint16_t addr, uint16_t data);
+//static void CX4_writel(address_space &space, uint16_t addr, uint32_t data);
 
 static void CX4_C4DrawLine(int32_t X1, int32_t Y1, int16_t Z1, int32_t X2, int32_t Y2, int16_t Z2, uint8_t Color);
 
@@ -98,7 +98,7 @@ static void CX4_immediate_reg(uint32_t start)
 	CX4_str(0, cx4.r0);
 }
 
-static void CX4_transfer_data(running_machine &machine)
+static void CX4_transfer_data(address_space &space)
 {
 	uint32_t src;
 	uint16_t dest, count;
@@ -108,17 +108,16 @@ static void CX4_transfer_data(running_machine &machine)
 	count = (cx4.reg[0x43]) | (cx4.reg[0x44] << 8);
 	dest  = (cx4.reg[0x45]) | (cx4.reg[0x46] << 8);
 
-	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i=0;i<count;i++)
 	{
-		CX4_write(machine, dest++, space.read_byte(src++));
+		CX4_write(space, dest++, space.read_byte(src++));
 	}
 }
 
 #include "machine/cx4oam.hxx"
 #include "machine/cx4ops.hxx"
 
-void CX4_write(running_machine &machine, uint32_t addr, uint8_t data)
+void CX4_write(address_space &space, uint32_t addr, uint8_t data)
 {
 	addr &= 0x1fff;
 
@@ -141,7 +140,7 @@ void CX4_write(running_machine &machine, uint32_t addr, uint8_t data)
 	if(addr == 0x1f47)
 	{
 		//memory transfer
-		CX4_transfer_data(machine);
+		CX4_transfer_data(space);
 		return;
 	}
 
@@ -157,17 +156,17 @@ void CX4_write(running_machine &machine, uint32_t addr, uint8_t data)
 
 		switch(data)
 		{
-			case 0x00: CX4_op00(machine); break;
-			case 0x01: CX4_op01(machine); break;
-			case 0x05: CX4_op05(machine); break;
-			case 0x0d: CX4_op0d(machine); break;
+			case 0x00: CX4_op00(space); break;
+			case 0x01: CX4_op01(space); break;
+			case 0x05: CX4_op05(space); break;
+			case 0x0d: CX4_op0d(space); break;
 			case 0x10: CX4_op10(); break;
 			case 0x13: CX4_op13(); break;
-			case 0x15: CX4_op15(machine); break;
-			case 0x1f: CX4_op1f(machine); break;
+			case 0x15: CX4_op15(space); break;
+			case 0x1f: CX4_op1f(space); break;
 			case 0x22: CX4_op22(); break;
 			case 0x25: CX4_op25(); break;
-			case 0x2d: CX4_op2d(machine); break;
+			case 0x2d: CX4_op2d(space); break;
 			case 0x40: CX4_op40(); break;
 			case 0x54: CX4_op54(); break;
 			case 0x5c: CX4_op5c(); break;
@@ -193,24 +192,24 @@ void CX4_write(running_machine &machine, uint32_t addr, uint8_t data)
 }
 
 #ifdef UNUSED_FUNCTION
-void CX4_writeb(running_machine &machine, uint16_t addr, uint8_t data)
+void CX4_writeb(address_space &space, uint16_t addr, uint8_t data)
 {
-	CX4_write(machine, addr,     data);
+	CX4_write(space, addr,     data);
 }
 #endif
 
-static void CX4_writew(running_machine &machine, uint16_t addr, uint16_t data)
+static void CX4_writew(address_space &space, uint16_t addr, uint16_t data)
 {
-	CX4_write(machine, addr + 0, data >> 0);
-	CX4_write(machine, addr + 1, data >> 8);
+	CX4_write(space, addr + 0, data >> 0);
+	CX4_write(space, addr + 1, data >> 8);
 }
 
 #ifdef UNUSED_FUNCTION
-void CX4_writel(running_machine &machine, uint16_t addr, uint32_t data)
+void CX4_writel(address_space &space, uint16_t addr, uint32_t data)
 {
-	CX4_write(machine, addr + 0, data >>  0);
-	CX4_write(machine, addr + 1, data >>  8);
-	CX4_write(machine, addr + 2, data >> 16);
+	CX4_write(space, addr + 0, data >>  0);
+	CX4_write(space, addr + 1, data >>  8);
+	CX4_write(space, addr + 2, data >> 16);
 }
 #endif
 

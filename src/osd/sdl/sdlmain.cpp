@@ -36,6 +36,7 @@
 #include <SDL2/SDL.h>
 
 // MAME headers
+#include "corestr.h"
 #include "osdepend.h"
 #include "emu.h"
 #include "emuopts.h"
@@ -92,7 +93,8 @@ const options_entry sdl_options::s_option_entries[] =
 	#ifdef SDLMAME_X11
 	{ nullptr,                               nullptr,  OPTION_HEADER,     "SDL FULL SCREEN OPTIONS" },
 	{ SDLOPTION_USEALLHEADS,                 "0",     OPTION_BOOLEAN,    "split full screen image across monitors" },
-	#endif
+	{ SDLOPTION_ATTACH_WINDOW,               "",      OPTION_STRING,     "attach to arbitrary window" },
+	#endif // SDLMAME_X11
 
 	// keyboard mapping
 	{ nullptr,                               nullptr,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
@@ -170,7 +172,7 @@ sdl_options::sdl_options()
 	std::string ini_path(INI_PATH);
 	add_entries(sdl_options::s_option_entries);
 	strreplace(ini_path,"APP_NAME", emulator_info::get_appname_lower());
-	set_default_value(SDLOPTION_INIPATH, ini_path.c_str());
+	set_default_value(SDLOPTION_INIPATH, std::move(ini_path));
 }
 
 //============================================================
@@ -419,6 +421,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	int bench = options().bench();
 	if (bench > 0)
 	{
+		options().set_value(OPTION_SLEEP, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_SOUND, "none", OPTION_PRIORITY_MAXIMUM);
 		options().set_value(OSDOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
@@ -440,25 +443,25 @@ void sdl_osd_interface::init(running_machine &machine)
 		osd_setenv(SDLENV_VIDEODRIVER, stemp, 1);
 	}
 
-		stemp = options().render_driver();
-		if (stemp != nullptr)
+	stemp = options().render_driver();
+	if (stemp != nullptr)
+	{
+		if (strcmp(stemp, OSDOPTVAL_AUTO) != 0)
 		{
-			if (strcmp(stemp, OSDOPTVAL_AUTO) != 0)
-			{
-				osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
-				//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
-				SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
-			}
-			else
-			{
-#if defined(SDLMAME_WIN32)
-				// OpenGL renderer has less issues with mode switching on windows
-				osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", "opengl");
-				//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
-				SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
-#endif
-			}
+			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
+			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
+			SDL_SetHint(SDL_HINT_RENDER_DRIVER, stemp);
 		}
+		else
+		{
+#if defined(SDLMAME_WIN32)
+			// OpenGL renderer has less issues with mode switching on windows
+			osd_printf_verbose("Setting SDL renderdriver '%s' ...\n", "opengl");
+			//osd_setenv(SDLENV_RENDERDRIVER, stemp, 1);
+			SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
+#endif
+		}
+	}
 
 	/* Set the SDL environment variable for drivers wanting to load the
 	 * lib at startup.
@@ -491,7 +494,8 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	/* Initialize SDL */
 
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO)) {
+	if (SDL_InitSubSystem(SDL_INIT_VIDEO))
+	{
 		osd_printf_error("Could not initialize SDL %s\n", SDL_GetError());
 		exit(-1);
 	}

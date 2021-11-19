@@ -7,9 +7,9 @@
 
     TODO:
 
+    - proper video timings, seems to be some contention involved
     - floppy support (I/O 0xe6-0xe7 = drive 1, 0xea-0xeb = drive 2)
     - modem
-    - "old" version of BASIC ROM
 
 Dick Smith catalog numbers, taken from advertisements:
 
@@ -77,7 +77,7 @@ void aquarius_state::cassette_w(uint8_t data)
 */
 uint8_t aquarius_state::vsync_r()
 {
-	return m_screen->vblank() ? 0 : 1;
+	return (m_screen->vpos() < 16 || m_screen->vpos() > 215) ? 0 : 1;
 }
 
 
@@ -88,7 +88,7 @@ uint8_t aquarius_state::vsync_r()
 */
 void aquarius_state::mapper_w(uint8_t data)
 {
-	m_mapper->set_bank(BIT(data, 0));
+	m_mapper.select(BIT(data, 0));
 }
 
 
@@ -179,7 +179,7 @@ void aquarius_state::machine_start()
 void aquarius_state::machine_reset()
 {
 	/* reset memory mapper after power up */
-	m_mapper->set_bank(0);
+	m_mapper.select(0);
 }
 
 
@@ -189,25 +189,21 @@ void aquarius_state::machine_reset()
 
 void aquarius_state::aquarius_mem(address_map &map)
 {
-	map(0x0000, 0xffff).m(m_mapper, FUNC(address_map_bank_device::amap8));
-}
-
-void aquarius_state::aquarius_map(address_map &map)
-{
+	map(0x0000, 0xffff).view(m_mapper);
 	/* Normal mode */
-	map(0x00000, 0x02fff).rom().region("maincpu", 0);
-	map(0x03000, 0x033ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x03400, 0x037ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
-	map(0x03800, 0x03fff).ram();
-	map(0x04000, 0x0bfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
-	map(0x0c000, 0x0ffff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
+	m_mapper[0](0x0000, 0x2fff).rom().region("maincpu", 0);
+	m_mapper[0](0x3000, 0x33ff).ram().w(FUNC(aquarius_state::videoram_w)).share("videoram");
+	m_mapper[0](0x3400, 0x37ff).ram().w(FUNC(aquarius_state::colorram_w)).share("colorram");
+	m_mapper[0](0x3800, 0x3fff).ram();
+	m_mapper[0](0x4000, 0xbfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
+	m_mapper[0](0xc000, 0xffff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
 	/* CP/M mode */
-	map(0x10000, 0x13fff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
-	map(0x14000, 0x1bfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
-	map(0x1c000, 0x1efff).rom().region("maincpu", 0);
-	map(0x1f000, 0x1f3ff).ram().w(FUNC(aquarius_state::aquarius_videoram_w)).share("videoram");
-	map(0x1f400, 0x1f7ff).ram().w(FUNC(aquarius_state::aquarius_colorram_w)).share("colorram");
-	map(0x1f800, 0x1ffff).ram();
+	m_mapper[1](0x0000, 0x3fff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_ce_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_ce_w(offset, data ^ m_scrambler); }));
+	m_mapper[1](0x4000, 0xbfff).lrw8(NAME([this](offs_t offset) { return m_exp->mreq_r(offset) ^ m_scrambler; }), NAME([this](offs_t offset, u8 data) { m_exp->mreq_w(offset, data ^ m_scrambler); }));
+	m_mapper[1](0xc000, 0xefff).rom().region("maincpu", 0);
+	m_mapper[1](0xf000, 0xf3ff).ram().w(FUNC(aquarius_state::videoram_w)).share("videoram");
+	m_mapper[1](0xf400, 0xf7ff).ram().w(FUNC(aquarius_state::colorram_w)).share("colorram");
+	m_mapper[1](0xf800, 0xffff).ram();
 }
 
 void aquarius_state::aquarius_io(address_map &map)
@@ -338,7 +334,6 @@ GFXDECODE_END
 static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_1200)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_1200)
-	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
@@ -359,15 +354,14 @@ void aquarius_state::aquarius(machine_config &config)
 	Z80(config, m_maincpu, 7.15909_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
 	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
-	m_maincpu->set_vblank_int("screen", FUNC(aquarius_state::irq0_line_hold));
-
-	ADDRESS_MAP_BANK(config, m_mapper).set_map(&aquarius_state::aquarius_map).set_options(ENDIANNESS_LITTLE, 8, 17, 0x10000);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(7.15909_MHz_XTAL, 456, 0, 320, 262, 0, 200);
+	m_screen->set_raw(7.15909_MHz_XTAL, 458, 0, 352, 262, 0, 232);
 	m_screen->set_screen_update(FUNC(aquarius_state::screen_update_aquarius));
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_palette(m_palette);
+	m_screen->scanline().set([this](int scanline) { m_maincpu->adjust_icount(-4); }); // TODO: this tries to compensate for contention, needs a better understanding of video timings
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
 	TEA1002(config, m_tea1002, 7.15909_MHz_XTAL);
@@ -403,7 +397,7 @@ void aquarius_state::aquariusp(machine_config &config)
 {
 	aquarius(config);
 
-	m_screen->set_raw(7.15909_MHz_XTAL, 456, 0, 320, 312, 0, 200);
+	m_screen->set_raw(7.15909_MHz_XTAL, 458, 0, 352, 312, 0, 232);
 
 	m_tea1002->set_unscaled_clock(8.867238_MHz_XTAL);
 }
@@ -420,7 +414,7 @@ ROM_START( aquarius )
 	ROM_SYSTEM_BIOS(0, "s2", "S2")
 	ROMX_LOAD("aq_s2.u2", 0x0000, 0x2000, CRC(5cfa5b42) SHA1(02c8ee11e911d1aa346812492d14284b6870cb3e), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "s1", "S1")
-	ROMX_LOAD("aq.u2", 0x0000, 0x2000, NO_DUMP, ROM_BIOS(1))
+	ROMX_LOAD("aq.u2", 0x0000, 0x2000, CRC(28d0fdbd) SHA1(58019da049b611a07adc6456cc9d77d92423d62a), ROM_BIOS(1))
 
 	/* charrom */
 	ROM_REGION(0x0800, "gfx1", 0)

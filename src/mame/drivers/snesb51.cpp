@@ -8,15 +8,15 @@
 
     The following systems are dumped:
     - Mortal Kombat 3
-    - 4 Slot board
+    - 4 Slot board (two different BIOS versions)
     - 4 Slot board with built-in NBA Jam
 
     Hardware (for the 4 slot switcher):
-    - MCS-51 based CPU 44-pin (markings removed)
-    - WD1016D-PL (?)
+    - Unknown PLC44 chip (markings removed) near a 8192-word x 8-bit Static RAM
+    - WD1016D-PL (MCS-51 MCU) or SAB 8051A-P
     - TC5565PL-15 (8k SRAM)
     - 12 MHz XTAL
-    - 4 Position Dipswitch
+    - 4 Position Dipswitch (for configuring the game time)
 
     Connector pinout:
 
@@ -214,7 +214,7 @@ void snesb51_state::snes4sln(machine_config &config)
 	m_mcu->port_out_cb<3>().set(FUNC(snesb51_state::mcu_p3_w));
 }
 
-// this is identical to the snes release apart from a single byte
+// This is identical to the SNES release apart from a single byte
 ROM_START( mk3snes )
 	ROM_REGION(0x400000, "game", 0)
 	ROM_LOAD("5.u5", 0x000000, 0x080000, CRC(c21ee1ac) SHA1(12fc526e39b0b998b39d558fbe5660e72c7fad14))
@@ -236,7 +236,12 @@ ROM_END
 
 ROM_START( snes4sl )
 	ROM_REGION(0x8000, "mcu", 0)
-	ROM_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670))
+	ROM_SYSTEM_BIOS(0, "1207", "12-07") // Found on PCB with Siemens SAB 8051A-P (4KBytes internal ROM undumped)
+	ROMX_LOAD("27c256_12-07.bin", 0x0000, 0x8000, CRC(0922314d) SHA1(04f1265ddc753111e6fcd56162a917ae1791c164), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "1103", "11-03") // Found on PCB with WD1016D-PL
+	ROMX_LOAD("27c256_11-03.bin", 0x0000, 0x8000, CRC(4e471581) SHA1(0f23ad065d448097f56ab45c3850d53cf85f3670), ROM_BIOS(1))
+
+	ROM_DEFAULT_BIOS("1207")
 ROM_END
 
 ROM_START( snes4sln )

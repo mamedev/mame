@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "slot.h"
 
@@ -121,9 +120,9 @@ static const m5_slot slot_list[] =
 
 static int m5_get_pcb_id(const char *slot)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (int i = 0; i < std::size(slot_list); i++)
 	{
-		if (!core_stricmp(slot_list[i].slot_option, slot))
+		if (!strcmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
 
@@ -132,7 +131,7 @@ static int m5_get_pcb_id(const char *slot)
 
 static const char *m5_get_slot(int type)
 {
-	for (int i = 0; i < ARRAY_LENGTH(slot_list); i++)
+	for (int i = 0; i < std::size(slot_list); i++)
 	{
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
@@ -167,7 +166,7 @@ image_init_result m5_cart_slot_device::call_load()
 
 			if (size > 0x5000 && m_type == M5_STD)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Image extends beyond the expected size for an M5 cart");
+				seterror(image_error::INVALIDIMAGE, "Image extends beyond the expected size for an M5 cart");
 				return image_init_result::FAIL;
 			}
 

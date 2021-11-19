@@ -3,6 +3,7 @@
 /**********************************************************************
 
     Nintendo Family Computer & Entertainment System Zapper Lightgun
+    Nintendo Family Computer Bandai Hyper Shot Lightgun
 
 **********************************************************************/
 
@@ -25,17 +26,20 @@ class nes_zapper_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
+	// construction/destruction
+	nes_zapper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual uint8_t read_bit34() override;
-	virtual uint8_t read_exp(offs_t offset) override;
+	virtual u8 read_bit34() override;
+	virtual u8 read_exp(offs_t offset) override;
 
 private:
 	required_ioport m_lightx;
@@ -44,7 +48,32 @@ private:
 };
 
 
+// ======================> nes_bandaihs_device
+
+class nes_bandaihs_device : public nes_zapper_device
+{
+public:
+	// construction/destruction
+	nes_bandaihs_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual ioport_constructor device_input_ports() const override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual u8 read_bit0() override;
+	virtual void write(u8 data) override;
+
+private:
+	required_ioport m_joypad;
+	u8 m_latch;
+	u8 m_strobe;
+};
+
+
 // device type definition
-DECLARE_DEVICE_TYPE(NES_ZAPPER, nes_zapper_device)
+DECLARE_DEVICE_TYPE(NES_ZAPPER,   nes_zapper_device)
+DECLARE_DEVICE_TYPE(NES_BANDAIHS, nes_bandaihs_device)
 
 #endif // MAME_BUS_NES_CTRL_ZAPPER

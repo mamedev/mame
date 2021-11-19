@@ -161,7 +161,7 @@ void sm510_base_device::device_reset()
 	m_y = 0;
 
 	m_r = m_r_out = 0;
-	m_write_r(0, 0, 0xff);
+	m_write_r(0);
 }
 
 
@@ -302,7 +302,8 @@ void sm510_base_device::execute_run()
 		m_prev_pc = m_pc;
 
 		// fetch next opcode
-		debugger_instruction_hook(m_pc);
+		if (!m_skip)
+			debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
 		get_opcode_param();

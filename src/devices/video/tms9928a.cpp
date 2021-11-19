@@ -740,6 +740,8 @@ void tms9928a_device::device_start()
 	m_line_timer = timer_alloc(TIMER_LINE);
 	m_gromclk_timer = timer_alloc(GROMCLK);
 
+	m_INT = 1; // force initial update
+
 	set_palette();
 
 	save_item(NAME(m_Regs[0]));
@@ -784,9 +786,9 @@ void tms9928a_device::device_reset()
 	m_patternmask = 0x3fff;
 	m_Addr = 0;
 	m_ReadAhead = 0;
-	m_INT = 0;
 	m_latch = 0;
 	m_mode = 0;
+	check_interrupt();
 
 	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 

@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, David Haywood
 
-/* 'Zone' systems */
+// JungleTac developed systems sold by under the 'Zone' and 'Wireless' brands these are mostly higer capacity (60+ game) units
+// also Waixing developed systems for the lower capacity (~40 game) units
 
 #include "emu.h"
 #include "includes/spg2xx.h"

@@ -124,7 +124,7 @@ Notes:
 #include "cpu/z80/tmpz84c015.h"
 #include "cpu/z80/kl5c80a12.h"
 #include "sound/ay8910.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
@@ -980,7 +980,7 @@ int ddenlovr_state::blit_draw( int src, int sx )
 
 			default:
 				log_draw_error(src, cmd);
-			// fall through
+				[[fallthrough]];
 			case BLIT_STOP:
 				return ((bit_addr + m_ddenlovr_blit_rom_bits - 1) / m_ddenlovr_blit_rom_bits) & 0xffffff;
 		}
@@ -2867,11 +2867,6 @@ uint8_t ddenlovr_state::hanakanz_rand_r()
 void hanakanz_state::hanakanz_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2889,11 +2884,6 @@ void hanakanz_state::hanakanz_portmap(address_map &map)
 void hanakanz_state::hkagerou_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2912,11 +2902,6 @@ void hanakanz_state::hkagerou_portmap(address_map &map)
 void hanakanz_state::kotbinyo_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2937,11 +2922,6 @@ void hanakanz_state::kotbinyo_portmap(address_map &map)
 void hanakanz_state::kotbinsp_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -2971,11 +2951,6 @@ uint8_t hanakanz_state::mjreach1_protection_r()
 void hanakanz_state::mjreach1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::hanakanz_busy_r), FUNC(hanakanz_state::hanakanz_oki_bank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::hanakanz_dsw_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x80, 0x80).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x81, 0x81).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -3966,11 +3941,6 @@ uint8_t hanakanz_state::jongtei_busy_r()
 void hanakanz_state::jongtei_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x43, 0x43).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
@@ -4023,11 +3993,6 @@ uint8_t hanakanz_state::mjgnight_protection_r()
 void hanakanz_state::mjgnight_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::jongtei_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_rombank_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).portr("SYSTEM");
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x46, 0x46).w(FUNC(hanakanz_state::mjgnight_coincounter_w));
@@ -4334,6 +4299,7 @@ void htengoku_state::htengoku_coin_w(uint8_t data)
 //          popmessage("COINS %02x",data);
 #endif
 			m_coins = data;
+			break;
 
 		case 0x0d:  break;  // ff resets input port sequence?
 
@@ -4599,11 +4565,6 @@ uint8_t hanakanz_state::daimyojn_year_hack_r(offs_t offset)
 void hanakanz_state::daimyojn_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x2c, 0x2c).rw(FUNC(hanakanz_state::jongtei_busy_r), FUNC(hanakanz_state::daimyojn_okibank_w));
-	map(0x2e, 0x2e).w(FUNC(hanakanz_state::daimyojn_palette_sel_w));
-	map(0x30, 0x30).w(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
-	map(0x31, 0x31).w(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
-	map(0x32, 0x32).r(FUNC(hanakanz_state::hanakanz_dsw_r));
 	map(0x40, 0x40).w(FUNC(hanakanz_state::daimyojn_blitter_data_palette_w));
 	map(0x42, 0x44).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
@@ -7944,7 +7905,7 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )  // "s"
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" )
+	PORT_DIPNAME( 0x0f, 0x07, "Pay Out Rate (%)" ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "50" )
 	PORT_DIPSETTING(    0x01, "53" )
 	PORT_DIPSETTING(    0x02, "56" )
@@ -7961,19 +7922,19 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x0d, "90" )
 	PORT_DIPSETTING(    0x0e, "93" )
 	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )
+	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
 	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Max Rate" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Max Bet" ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
@@ -7984,12 +7945,12 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x00)
 
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
+	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" ) PORT_DIPLOCATION("SW2:5,6,7")
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
 	PORT_DIPSETTING(    0x50, "300" )
@@ -7998,83 +7959,83 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x20, "1000" )
 	PORT_DIPSETTING(    0x10, "1000?" )
 	PORT_DIPSETTING(    0x00, "1000?" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Bonus Game" )
+	PORT_DIPNAME( 0x03, 0x03, "Bonus Game" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(    0x00, "Slot? (duplicate)" )
 	PORT_DIPSETTING(    0x03, "Slot?" )
 	PORT_DIPSETTING(    0x02, "Slot + Girls?" )
 	PORT_DIPSETTING(    0x01, "Girl Choice" ) // 4 choices in gal mode check (instead of 3)
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, "Payout" )
+	PORT_DIPNAME( 0x18, 0x18, "Payout" ) PORT_DIPLOCATION("SW3:4,5")
 	PORT_DIPSETTING(    0x18, "300" )
 	PORT_DIPSETTING(    0x10, "500" )
 	PORT_DIPSETTING(    0x08, "700" )
 	PORT_DIPSETTING(    0x00, "1000" )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
+	PORT_DIPNAME( 0x02, 0x00, "In Game Music" ) PORT_DIPLOCATION("SW4:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Set Clock" )
+	PORT_DIPNAME( 0x40, 0x40, "Set Clock" ) PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW5")
-	PORT_DIPNAME( 0x01, 0x01, "Alternate Coinage" )
+	PORT_DIPNAME( 0x01, 0x01, "Alternate Coinage" ) PORT_DIPLOCATION("SW4:9")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:10")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:9")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DonDen Key" )
+	PORT_DIPNAME( 0x08, 0x08, "DonDen Key" ) PORT_DIPLOCATION("SW3:10")
 	PORT_DIPSETTING(    0x08, "Start" )
 	PORT_DIPSETTING(    0x00, "Flip Flop" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:9")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:10")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" )
+	PORT_DIPNAME( 0x40, 0x40, "Credits Per Note" ) PORT_DIPLOCATION("SW1:9")
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:10")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -8083,7 +8044,7 @@ static INPUT_PORTS_START( mjmyorn2 )
 	PORT_INCLUDE(mjmyornt)
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW5",0x01,EQUALS,0x01)
@@ -9700,7 +9661,7 @@ MACHINE_RESET_MEMBER(ddenlovr_state,ddenlovr)
 	m_quiz365_protection[0] = 0;
 	m_quiz365_protection[1] = 0;
 
-	memset(m_palram, 0, ARRAY_LENGTH(m_palram));
+	std::fill(std::begin(m_palram), std::end(m_palram), 0);
 
 	m_blitter_irq_handler(1);
 }
@@ -10091,9 +10052,15 @@ void mmpanic_state::mmpanic(machine_config &config)
 void hanakanz_state::hanakanz(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, 20'000'000); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, 20'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::hanakanz_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10136,9 +10103,15 @@ void hanakanz_state::hkagerou(machine_config &config)
 void hanakanz_state::kotbinyo(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000))); // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::kotbinyo_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::hanakanz_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::hanakanz_oki_bank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::hanakanz_dsw_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10539,9 +10512,15 @@ void ddenlovr_state::hparadis(machine_config &config)
 void hanakanz_state::jongtei(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000)); // KL5C80A12
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::jongtei_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::jongtei_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::jongtei_okibank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_rombank_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,hanakanz)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)
@@ -10753,9 +10732,15 @@ void ddenlovr_state::seljan2(machine_config &config)
 void hanakanz_state::daimyojn(machine_config &config)
 {
 	/* basic machine hardware */
-	KL5C80A12(config, m_maincpu, XTAL(20'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
-	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
+	kl5c80a12_device &maincpu(KL5C80A12(config, m_maincpu, XTAL(20'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &hanakanz_state::hanakanz_map);
+	maincpu.set_addrmap(AS_IO, &hanakanz_state::daimyojn_portmap);
+	maincpu.in_p0_callback().set(FUNC(hanakanz_state::jongtei_busy_r));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::daimyojn_okibank_w));
+	maincpu.out_p1_callback().set(FUNC(hanakanz_state::daimyojn_palette_sel_w));
+	maincpu.out_p2_callback().set(FUNC(hanakanz_state::hanakanz_blitter_reg_w));
+	maincpu.out_p3_callback().set(FUNC(hanakanz_state::jongtei_dsw_keyb_w));
+	maincpu.in_p4_callback().set(FUNC(hanakanz_state::hanakanz_dsw_r));
 
 	MCFG_MACHINE_START_OVERRIDE(hanakanz_state,mjflove)
 	MCFG_MACHINE_RESET_OVERRIDE(hanakanz_state,hanakanz)

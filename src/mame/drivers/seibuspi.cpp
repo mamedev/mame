@@ -220,7 +220,7 @@ Notes:
       4560      - Japan Radio Co. JRC4560 Op Amp IC (DIP8)
       YAC513-W  - Yamaha YAC513-M DAC (SOIC16)
       HA13118   - Audio Power AMP IC (ZIP15)
-      JP121     - Jumper used when swapping game board cartridges
+      JP121     - Jumper to set sound output to mono or stereo
       JP051     - Slide Switch to flip screen
       CN121     - Output connector for left/right speakers
       EXCN1/2   - Connectors for player 3 & 4 controls
@@ -1183,7 +1183,7 @@ void seibuspi_state::spi_soundmap(address_map &map)
 {
 	sxx2e_soundmap(map);
 	map(0x4008, 0x4008).w("soundfifo2", FUNC(fifo7200_device::data_byte_w));
-	map(0x400a, 0x400a).portr("JUMPERS"); // TO DO: get these to actually work
+	map(0x400a, 0x400a).portr("JUMPERS"); // TODO: get these to actually work (only on SXX2C)
 }
 
 void seibuspi_state::spi_ymf271_map(address_map &map)
@@ -1233,7 +1233,7 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 	static const u8 encoding[] = { 6, 5, 4, 3, 2, 7 };
 	ioport_value state = ~m_key[N]->read();
 
-	for (int bit = 0; bit < ARRAY_LENGTH(encoding); bit++)
+	for (int bit = 0; bit < std::size(encoding); bit++)
 		if (state & (1 << bit))
 			return encoding[bit];
 	return 0;
@@ -1241,6 +1241,16 @@ CUSTOM_INPUT_MEMBER(seibuspi_state::ejanhs_encode)
 
 
 /*****************************************************************************/
+
+// JP1 is for SXX2C only
+static INPUT_PORTS_START( sxx2c )
+	PORT_START("JUMPERS")
+	PORT_DIPNAME( 0x03, 0x03, "JP1" ) // "Only used when game-board is changed with a new game" in manual
+	PORT_DIPSETTING(    0x03, "Update" ) // "Changing game" in manual
+	PORT_DIPSETTING(    0x00, "Normal" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( sxx2e )
 	PORT_START("INPUTS")
@@ -1286,13 +1296,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_3button )
 	PORT_INCLUDE( sxx2e )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( sxx2c )
 INPUT_PORTS_END
 
 
@@ -1380,6 +1384,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( spi_ejanhs )
 	PORT_INCLUDE( spi_mahjong_keyboard )
+	PORT_INCLUDE( sxx2c )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x00000007, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(seibuspi_state, ejanhs_encode<3>)
@@ -1405,13 +1410,6 @@ static INPUT_PORTS_START( spi_ejanhs )
 
 	PORT_START("EXCH") // Another set of mahjong inputs is decoded from here but not used
 	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("JUMPERS")
-	PORT_DIPNAME( 0x03, 0x03, "JP1" )
-	PORT_DIPSETTING(    0x03, "Update" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )

@@ -45,7 +45,7 @@ void homedata_state::mrokumei_handleblit( int rom_base )
 	int dest_addr;
 	int base_addr;
 	int opcode, data, num_tiles;
-	uint8_t *pBlitData = &m_blit_rom[rom_base & m_blit_rom.mask()];
+	uint8_t *pBlitData = &m_blit_rom[rom_base & (m_blit_rom.length() - 1)];
 
 	dest_param = m_blitter_param[(m_blitter_param_count - 4) & 3] * 256 +
 		m_blitter_param[(m_blitter_param_count - 3) & 3];
@@ -130,7 +130,7 @@ void homedata_state::reikaids_handleblit( int rom_base )
 	int flipx;
 	int source_addr, base_addr;
 	int dest_addr;
-	uint8_t *pBlitData = &m_blit_rom[rom_base & m_blit_rom.mask()];
+	uint8_t *pBlitData = &m_blit_rom[rom_base & (m_blit_rom.length() - 1)];
 
 	int opcode, data, num_tiles;
 
@@ -227,7 +227,7 @@ void homedata_state::pteacher_handleblit( int rom_base )
 	int source_addr;
 	int dest_addr, base_addr;
 	int opcode, data, num_tiles;
-	uint8_t *pBlitData = &m_blit_rom[rom_base & m_blit_rom.mask()];
+	uint8_t *pBlitData = &m_blit_rom[rom_base & (m_blit_rom.length() - 1)];
 
 	dest_param = m_blitter_param[(m_blitter_param_count - 4) & 3] * 256 +
 		m_blitter_param[(m_blitter_param_count - 3) & 3];
@@ -777,7 +777,7 @@ void homedata_state::reikaids_blitter_start_w(uint8_t data)
 
 void homedata_state::pteacher_blitter_start_w(uint8_t data)
 {
-	pteacher_handleblit((m_blitter_bank >> 5) * 0x10000 & m_blit_rom.mask());
+	pteacher_handleblit((m_blitter_bank >> 5) * 0x10000 & (m_blit_rom.length() - 1));
 }
 
 

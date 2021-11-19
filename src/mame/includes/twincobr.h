@@ -44,7 +44,6 @@ public:
 	void init_twincobr();
 
 protected:
-	virtual void device_post_load() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
@@ -55,7 +54,6 @@ protected:
 	u32 m_fg_rom_bank;
 	u32 m_bg_ram_bank;
 	int m_intenable;
-	int m_dsp_on;
 	int m_dsp_bio;
 	int m_fsharkbt_8741;
 	int m_dsp_execute;
@@ -123,6 +121,7 @@ protected:
 	void wardner_videoram_w(offs_t offset, u8 data);
 	u8 wardner_sprite_r(offs_t offset);
 	void wardner_sprite_w(offs_t offset, u8 data);
+	void pri_cb(u8 priority, u32 &pri_mask);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);

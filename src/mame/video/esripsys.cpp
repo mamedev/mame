@@ -147,6 +147,8 @@ void esripsys_state::video_start()
 	save_item(NAME(m_video_firq_en));
 	save_item(NAME(m_frame_vbl));
 	save_item(NAME(m_12sel));
+
+	m_12sel = 0;
 }
 
 uint32_t esripsys_state::screen_update_esripsys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

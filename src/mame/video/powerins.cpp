@@ -111,6 +111,7 @@ void powerins_state::video_start()
 {
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::powerins_get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(powerins_state::tilemap_scan_pages)), 16, 16, 256, 32);
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerins_state::common_get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_bg_tilemap[1] = nullptr;
 
 	m_tx_tilemap->set_transparent_pen(15);
 

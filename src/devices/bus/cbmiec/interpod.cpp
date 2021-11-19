@@ -128,7 +128,7 @@ void cbm_interpod_device::device_add_mconfig(machine_config &config)
 	M6502(config, m_maincpu, 1000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm_interpod_device::interpod_mem);
 
-	VIA6522(config, m_via, 1000000);
+	MOS6522(config, m_via, 1000000);
 
 	MOS6532_NEW(config, m_riot, 1000000);
 

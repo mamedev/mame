@@ -156,7 +156,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -845,7 +845,7 @@ void oric_state::oric(machine_config &config, bool add_ext) // this variable not
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* via */
-	VIA6522(config, m_via, 12_MHz_XTAL / 12);
+	MOS6522(config, m_via, 12_MHz_XTAL / 12);
 	m_via->writepa_handler().set(FUNC(oric_state::via_a_w));
 	m_via->writepb_handler().set(FUNC(oric_state::via_b_w));
 	m_via->ca2_handler().set(FUNC(oric_state::via_ca2_w));
@@ -861,9 +861,11 @@ void oric_state::prav8d(machine_config &config)
 	oric(config, true);
 }
 
-FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
-	FLOPPY_ORIC_DSK_FORMAT
-FLOPPY_FORMATS_END
+void telestrat_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ORIC_DSK_FORMAT);
+}
 
 static void telestrat_floppies(device_slot_interface &device)
 {
@@ -881,7 +883,7 @@ void telestrat_state::telstrat(machine_config &config)
 	acia.irq_handler().set(FUNC(telestrat_state::acia_irq_w));
 
 	/* via */
-	VIA6522(config, m_via2, 12_MHz_XTAL / 12);
+	MOS6522(config, m_via2, 12_MHz_XTAL / 12);
 	m_via2->writepa_handler().set(FUNC(telestrat_state::via2_a_w));
 	m_via2->writepb_handler().set(FUNC(telestrat_state::via2_b_w));
 	m_via2->ca2_handler().set(FUNC(telestrat_state::via2_ca2_w));
@@ -904,7 +906,10 @@ void telestrat_state::telstrat(machine_config &config)
 
 ROM_START(oric1)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD ("basic10.rom", 0, 0x04000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016))
+	ROM_SYSTEM_BIOS( 0, "ver10", "Basic 1.0")
+	ROMX_LOAD ("basic10.rom", 0, 0x04000, CRC(f18710b4) SHA1(333116e6884d85aaa4dfc7578a91cceeea66d016), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS( 1, "ver10uk", "Basic 1.0 UK")
+	ROMX_LOAD( "basic10uk.rom", 0, 0x04000, CRC(d6006a01) SHA1(84759cc8faae53070f1c8ce8408982a0edcb0796), ROM_BIOS(1))
 ROM_END
 
 ROM_START(orica)

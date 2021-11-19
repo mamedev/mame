@@ -701,7 +701,10 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		break;
 	case FM_ERASEAMD4:
 		// reads outside of the erasing sector return normal data
-		if ((address < m_erase_sector) || (address >= m_erase_sector+(64*1024)))
+		if (
+			!(m_maker_id == MFG_FUJITSU && m_device_id == 0xad) /* Firebeat: pop'n music will poll sector 0 for status updates even when clearing section 1 and beyond */
+			&& ((address < m_erase_sector) || (address >= m_erase_sector+(64*1024)))
+		)
 		{
 			switch( m_bits )
 			{

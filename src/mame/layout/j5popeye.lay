@@ -3537,9 +3537,13 @@
 		</led7seg>
 	</element>
 	<element name="vfd0">
-		<led14segsc>
+		<!-- if these are really 14 segs, and the hookups are meant to be compaible with the 16segs then the MAME bit order is incorrect -->
+		<!--<led14segsc>
+		    <color red="0.0" green="1.0" blue="1.0"/>
+		</led14segsc>-->
+		<led16segsc>
 			<color red="0.0" green="1.0" blue="1.0"/>
-		</led14segsc>
+		</led16segsc>
 	</element>
 	<element name="vfd0_background">
 		<rect>

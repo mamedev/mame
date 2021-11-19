@@ -27,7 +27,7 @@ class mtx_sdx_device :
 	public device_mtx_exp_interface
 {
 public:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;

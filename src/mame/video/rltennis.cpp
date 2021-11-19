@@ -204,7 +204,7 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 				int address=yy*512+xx;
 
-				int pix = m_gfx[ address & m_gfx.mask() ];
+				int pix = m_gfx[address & (m_gfx.length() - 1)];
 				int screen_x=(x&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
 
 				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )
@@ -218,6 +218,9 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 void rltennis_state::video_start()
 {
+	// assumes it can make an address mask with m_gfx.length() - 1
+	assert(!(m_gfx.length() & (m_gfx.length() - 1)));
+
 	m_tmp_bitmap[BITMAP_BG] = std::make_unique<bitmap_ind16>(512, 256);
 	m_tmp_bitmap[BITMAP_FG_1] = std::make_unique<bitmap_ind16>(512, 256);
 	m_tmp_bitmap[BITMAP_FG_2] = std::make_unique<bitmap_ind16>(512, 256);

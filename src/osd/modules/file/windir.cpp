@@ -12,7 +12,7 @@
 #include <tchar.h>
 
 // MAME headers
-#include "osdcore.h"
+#include "osdfile.h"
 #include "strformat.h"
 
 // MAMEOS headers
@@ -108,7 +108,7 @@ bool win_directory::open_impl(std::string const &dirname)
 	assert(m_find == INVALID_HANDLE_VALUE);
 
 	// append \*.* to the directory name
-	std::string dirfilter = string_format("%s\\*.*", dirname);
+	std::string dirfilter = util::string_format("%s\\*.*", dirname);
 
 	// convert the path to TCHARs
 	osd::text::tstring t_dirfilter = osd::text::to_tstring(dirfilter);

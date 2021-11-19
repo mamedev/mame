@@ -29,37 +29,31 @@ uint8_t suna8_state::banked_paletteram_r(offs_t offset)
 	return m_banked_paletteram[offset];
 }
 
-uint8_t suna8_state::suna8_banked_spriteram_r(offs_t offset)
+uint8_t suna8_state::banked_spriteram_r(offs_t offset)
 {
 	offset += m_spritebank * 0x2000;
 	return m_banked_spriteram[offset];
 }
 
-void suna8_state::suna8_spriteram_w(offs_t offset, uint8_t data)
-{
-	m_spriteram[offset] = data;
-}
-
-void suna8_state::suna8_banked_spriteram_w(offs_t offset, uint8_t data)
+void suna8_state::banked_spriteram_w(offs_t offset, uint8_t data)
 {
 	offset += m_spritebank * 0x2000;
 	m_banked_spriteram[offset] = data;
 }
 
-/*
-    Banked Palette RAM. The data is scrambled
-*/
+
+// Banked Palette RAM. The data is scrambled
+
 void suna8_state::brickzn_banked_paletteram_w(offs_t offset, uint8_t data)
 {
 	if (!m_paletteram_enab)
 		return;
 
 	int r,g,b;
-	uint16_t rgb;
 
 	offset += m_palettebank * 0x200;
 	m_banked_paletteram[offset] = data;
-	rgb = (m_banked_paletteram[offset&~1] << 8) + m_banked_paletteram[offset|1];
+	uint16_t rgb = (m_banked_paletteram[offset&~1] << 8) + m_banked_paletteram[offset|1];
 
 	if (m_prot2_prev == 0x3c && m_prot2 == 0x80)
 	{
@@ -97,19 +91,21 @@ void suna8_state::brickzn_banked_paletteram_w(offs_t offset, uint8_t data)
 
 
 
-void suna8_state::suna8_vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_type)
+void suna8_state::vh_start_common(bool has_text, GFXBANK_TYPE_T gfxbank_type)
 {
 	m_has_text      =   has_text;
 	m_spritebank    =   0;
 	m_gfxbank       =   0;
 	m_gfxbank_type  =   gfxbank_type;
 	m_palettebank   =   0;
+
+	save_item(NAME(m_spritebank));
 }
 
-VIDEO_START_MEMBER(suna8_state,suna8_text)              { suna8_vh_start_common( true,  GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_sparkman)          { suna8_vh_start_common( false, GFXBANK_TYPE_SPARKMAN); }
-VIDEO_START_MEMBER(suna8_state,suna8_brickzn)           { suna8_vh_start_common( false, GFXBANK_TYPE_BRICKZN);  }
-VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common( false, GFXBANK_TYPE_STARFIGH); }
+VIDEO_START_MEMBER(suna8_state,text)              { vh_start_common( true,  GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,sparkman)          { vh_start_common( false, GFXBANK_TYPE_SPARKMAN); }
+VIDEO_START_MEMBER(suna8_state,brickzn)           { vh_start_common( false, GFXBANK_TYPE_BRICKZN);  }
+VIDEO_START_MEMBER(suna8_state,starfigh)          { vh_start_common( false, GFXBANK_TYPE_STARFIGH); }
 
 /***************************************************************************
 
@@ -122,7 +118,7 @@ VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common(
 #define PIXEL_OP_REBASE_TRANSPEN_PRIORITY_MASK(DEST, PRIORITY, SOURCE)              \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	uint32_t srcdata = (SOURCE);                                                    \
 	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if ((PRIORITY) == 0)                                                        \
@@ -412,8 +408,6 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 	bool last = false;
 	for (int i = start; i < end && !last; i += 4)
 	{
-		int srcpg, srcx,srcy, dimx,dimy, tx, ty;
-
 		int y       =   spriteram[i + 0];
 		int code    =   spriteram[i + 1];
 		int x       =   spriteram[i + 2];
@@ -422,17 +416,17 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 		if (~code & 0x80)   continue;
 		last = !(bank & 0x80);
 
-		dimx = 2;                   dimy = 2;
-		srcx  = (code & 0xf) * 2;   srcy = ((y & 0xf8) - (ypos & 0xf8) - 0x10) / 8;
-		srcpg = (code >> 4) & 3;
+		int dimx = 2;                   int dimy = 2;
+		int srcx  = (code & 0xf) * 2;   int srcy = ((y & 0xf8) - (ypos & 0xf8) - 0x10) / 8;
+		int srcpg = (code >> 4) & 3;
 
 		x = x - ((bank & 0x40) ? 0x100 : 0);
 
 		bank    =   (bank & 0x3f) * 0x400;
 
-		for (ty = 0; ty < dimy; ty ++)
+		for (int ty = 0; ty < dimy; ty ++)
 		{
-			for (tx = 0; tx < dimx; tx ++)
+			for (int tx = 0; tx < dimx; tx ++)
 			{
 				int addr    =   (srcpg * 0x20 * 0x20) +
 								((srcx + tx) & 0x1f) * 0x20 +
@@ -482,7 +476,7 @@ void suna8_state::draw_text_sprites(screen_device &screen, bitmap_ind16 &bitmap,
 
 ***************************************************************************/
 
-uint32_t suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t suna8_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// see hardhead, hardhea2 test mode (press button 2 for both players)
 	bitmap.fill(0xff, cliprect);

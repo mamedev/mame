@@ -62,7 +62,7 @@ private:
 		bool         play;
 	};
 
-	u8 read_rom_default(offs_t offset) { return m_rom[(m_bank + (offset & 0x1ffff)) & m_rom.mask()]; }
+	u8 read_rom_default(offs_t offset) { return m_rom[(m_bank + (offset & 0x1ffff)) & (m_rom.length() - 1)]; }
 	inline u8 read_sample(int channel, u32 addr) { m_bank = m_channel[channel].bank; return m_cache.read_byte(addr & 0x1ffff); }
 
 	channel_t     m_channel[KDAC_A_PCM_MAX]; // 2 channels

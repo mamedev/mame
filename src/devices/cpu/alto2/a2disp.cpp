@@ -517,9 +517,9 @@ void alto2_cpu_device::init_disp()
 	save_item(NAME(m_dsp.xpreg));
 	save_item(NAME(m_dsp.csr));
 
-	m_disp_a38 = prom_load(machine(), &pl_displ_a38, memregion("displ_a38")->base());
-	m_disp_a63 = prom_load(machine(), &pl_displ_a63, memregion("displ_a63")->base());
-	m_disp_a66 = prom_load(machine(), &pl_displ_a66, memregion("displ_a66")->base());
+	m_disp_a38 = prom_load<uint8_t>(machine(), &pl_displ_a38, memregion("displ_a38")->base());
+	m_disp_a63 = prom_load<uint8_t>(machine(), &pl_displ_a63, memregion("displ_a63")->base());
+	m_disp_a66 = prom_load<uint8_t>(machine(), &pl_displ_a66, memregion("displ_a66")->base());
 
 	m_dsp.hlc = A2_DISP_HLC_START;
 

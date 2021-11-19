@@ -1152,6 +1152,8 @@ void mos6566_device::execute_run()
 			// Third sample of border state
 			m_border_on_sample[2] = m_border_on;
 
+			[[fallthrough]]; // FIXME: really?
+
 		// Graphics
 
 		case 19:
@@ -1738,6 +1740,8 @@ void mos6569_device::execute_run()
 
 			// Third sample of border state
 			m_border_on_sample[2] = m_border_on;
+
+			[[fallthrough]]; // FIXME: really?
 
 		// Graphics
 

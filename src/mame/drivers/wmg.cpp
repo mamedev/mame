@@ -134,8 +134,8 @@ private:
  *************************************/
 void wmg_state::wmg_cpu1(address_map &map)
 {
-	map(0x0000, 0x8fff).bankr("mainbank").writeonly().share("videoram");
-	map(0x9000, 0xbfff).ram();
+	map(0x0000, 0xbfff).ram().share("videoram");
+	map(0x0000, 0x8fff).bankr("mainbank");
 	map(0xc000, 0xcfff).m(m_bankc000, FUNC(address_map_bank_device::amap8));
 	map(0xd000, 0xffff).bankr("codebank");
 	map(0xd000, 0xd000).w(FUNC(wmg_state::wmg_d000_w));

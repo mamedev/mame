@@ -1504,7 +1504,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1597,7 +1597,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1691,7 +1691,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1784,7 +1784,7 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 				case 0x13:
 					imm = opcodes.r8( pos++ );
 					imm = imm | (opcodes.r8( pos++ ) << 8);
-					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
+					buf = string_format("0x%06x", pos + (int16_t)imm);
 					break;
 				}
 				break;
@@ -1933,13 +1933,13 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_D8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, " 0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, " 0x%06x", ( pos + (int8_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_D16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, " 0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, " 0x%06x", ( pos + (int16_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_F:
@@ -2119,13 +2119,13 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_D8:
 		imm = opcodes.r8( pos++ );
-		util::stream_format(stream, ",0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, ",0x%06x", ( pos + (int8_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_D16:
 		imm = opcodes.r8( pos++ );
 		imm = imm | (opcodes.r8( pos++ ) << 8);
-		util::stream_format(stream, ",0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF);
+		util::stream_format(stream, ",0x%06x", ( pos + (int16_t)imm ) & 0xFFFFFF);
 		break;
 
 	case O_F:

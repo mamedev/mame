@@ -13,14 +13,17 @@
  Includes
 *****************************************************************************/
 
-
-#include <ctime>
-#include <cstring>
-#include <cctype>
-
 #include "imgtool.h"
+#include "charconv.h"
 #include "iflopimg.h"
+
 #include "formats/imageutl.h"
+#include "corestr.h"
+#include "opresolv.h"
+
+#include <cctype>
+#include <cstring>
+#include <ctime>
 
 
 
@@ -1979,6 +1982,7 @@ static imgtoolerr_t amiga_image_nextenum(imgtool::directory &enumeration, imgtoo
 	case ST_LINKDIR:
 
 		ent.directory = 1;
+		[[fallthrough]];
 
 	case ST_LINKFILE:
 	{

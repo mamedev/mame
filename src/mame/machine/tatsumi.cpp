@@ -303,19 +303,6 @@ void tatsumi_state::tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t m
 
 /***********************************************************************************/
 
-// Todo:  Current YM2151 doesn't seem to raise the busy flag quickly enough for the
-// self-test in Tatsumi games.  Needs fixed, but hack it here for now.
-uint8_t tatsumi_state::tatsumi_hack_ym2151_r()
-{
-	int r=m_ym2151->status_r();
-
-	if (m_audiocpu->pc()==0x2aca || m_audiocpu->pc()==0x29fe
-		|| m_audiocpu->pc()==0xf9721
-		|| m_audiocpu->pc()==0x1b96 || m_audiocpu->pc()==0x1c65) // BigFight
-		return 0x80;
-	return r;
-}
-
 uint8_t cyclwarr_state::oki_status_xor_r()
 {
 	int r = m_oki->read();

@@ -12,6 +12,7 @@
 #define MAME_EMU_DEBUG_TEXTBUF_H
 
 #include <memory>
+#include <string_view>
 
 #include "emucore.h"
 
@@ -21,12 +22,6 @@
 ***************************************************************************/
 
 struct text_buffer;
-
-struct text_buffer_line
-{
-	const char *text;
-	size_t length;
-};
 
 // helper class for iterating over the lines of a text_buffer
 class text_buffer_lines
@@ -49,7 +44,7 @@ public:
 		}
 
 		// technically this isn't a valid forward iterator, because operator * doesn't return a reference
-		text_buffer_line operator*() const;
+		std::string_view operator*() const;
 		text_buffer_line_iterator &operator++();
 
 		bool operator!=(const text_buffer_line_iterator& rhs)
@@ -82,10 +77,10 @@ text_buffer_ptr text_buffer_alloc(u32 bytes, u32 lines);
 void text_buffer_clear(text_buffer &text);
 
 // "print" data to a text buffer
-void text_buffer_print(text_buffer &text, const char *data);
+void text_buffer_print(text_buffer &text, std::string_view data);
 
 // "print" data to a text buffer with word wrapping to a given column
-void text_buffer_print_wrap(text_buffer &text, const char *data, int wrapcol);
+void text_buffer_print_wrap(text_buffer &text, std::string_view data, int wrapcol);
 
 // get the maximum width of lines seen so far
 u32 text_buffer_max_width(const text_buffer &text);

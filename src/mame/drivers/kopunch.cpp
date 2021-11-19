@@ -45,24 +45,18 @@
 
 ********************************************************/
 
-INTERRUPT_GEN_MEMBER(kopunch_state::vblank_interrupt)
-{
-	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
-	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
-}
-
 INPUT_CHANGED_MEMBER(kopunch_state::left_coin_inserted)
 {
 	// left coin insertion causes a rst6.5 (vector 0x34)
 	if (newval)
-		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(I8085_RST65_LINE, ASSERT_LINE);
 }
 
 INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
 {
 	// right coin insertion causes a rst5.5 (vector 0x2c)
 	if (newval)
-		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
+		m_maincpu->set_input_line(I8085_RST55_LINE, ASSERT_LINE);
 }
 
 
@@ -122,8 +116,11 @@ void kopunch_state::lamp_w(uint8_t data)
 
 void kopunch_state::coin_w(uint8_t data)
 {
-	machine().bookkeeping().coin_counter_w(0, ~data & 0x80);
-	machine().bookkeeping().coin_counter_w(1, ~data & 0x40);
+	// toggles from FF to 00 to FF after output mode is configured, so probably no coin counters here
+	if (!BIT(data, 7))
+		m_maincpu->set_input_line(I8085_RST65_LINE, CLEAR_LINE);
+	if (!BIT(data, 6))
+		m_maincpu->set_input_line(I8085_RST55_LINE, CLEAR_LINE);
 
 //  if ((data & 0x3f) != 0x3e)
 //      printf("port 34 = %02x   ",data);
@@ -239,7 +236,6 @@ void kopunch_state::kopunch(machine_config &config)
 	I8085A(config, m_maincpu, 4000000); // 4 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &kopunch_state::kopunch_map);
 	m_maincpu->set_addrmap(AS_IO, &kopunch_state::kopunch_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(kopunch_state::vblank_interrupt));
 
 	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
 	// $30 - always $9b (PPI mode 0, ports A & B & C as input)
@@ -274,6 +270,7 @@ void kopunch_state::kopunch(machine_config &config)
 	screen.set_visarea(0*8, 32*8-1, 2*8, 28*8-1);
 	screen.set_screen_update(FUNC(kopunch_state::screen_update_kopunch));
 	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, I8085_RST75_LINE);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_kopunch);
 	PALETTE(config, "palette", FUNC(kopunch_state::kopunch_palette), 8);

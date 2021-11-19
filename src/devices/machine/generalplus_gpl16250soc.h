@@ -88,6 +88,7 @@ public:
 	//void set_pal_sprites_hack(int pal_sprites) { m_spg_video->set_pal_sprites(pal_sprites); }
 	//void set_pal_back_hack(int pal_back) { m_spg_video->set_pal_back(pal_back); }
 	void set_alt_extrasprite_hack(int alt_extrasprite_hack) { m_spg_video->set_alt_extrasprite(alt_extrasprite_hack); }
+	void set_legacy_video_mode() { m_spg_video->set_legacy_video_mode(); }
 
 	void set_romtype(int romtype) { m_romtype = romtype; }
 
@@ -463,10 +464,34 @@ private:
 	uint16_t spi_unk_7943_r();
 };
 
+class generalplus_gpspi_direct_device : public sunplus_gcm394_base_device
+{
+public:
+	template <typename T>
+	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpspi_direct_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_csbase = 0x30000;
+	}
+
+	generalplus_gpspi_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void gpspi_direct_internal_map(address_map &map);
+
+	//virtual void device_start() override;
+	//virtual void device_reset() override;
+
+private:
+	uint16_t spi_direct_7b40_r();
+};
+
 
 
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
 DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
 DECLARE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device)
+DECLARE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device)
 
 #endif // MAME_MACHINE_GENERALPLUS_GPL16250SOC_H

@@ -38,6 +38,9 @@
 #include "../../sdl/osdsdl.h"
 #include "input_sdlcommon.h"
 
+
+namespace {
+
 #define MAX_DEVMAP_ENTRIES  16
 
 #define INVALID_EVENT_TYPE     -1
@@ -71,7 +74,7 @@ struct x11_api_state
 #define XI_DBG(format, ...) osd_printf_verbose(format, __VA_ARGS__)
 
 #define print_motion_event(motion) print_motion_event_impl(motion)
-static inline void print_motion_event_impl(XDeviceMotionEvent *motion)
+inline void print_motion_event_impl(XDeviceMotionEvent *motion)
 {
 	/*
 	* print a lot of debug informations of the motion event(s).
@@ -185,7 +188,7 @@ find_device_info(Display    *display,
 }
 
 //Copypasted from xinfo
-static int
+int
 register_events(
 	Display *dpy,
 	XDeviceInfo *info,
@@ -267,15 +270,30 @@ public:
 class x11_event_manager : public event_manager_t<x11_event_handler>
 {
 private:
-	Display *            m_display;
+	struct x_cleanup
+	{
+		void operator()(Display *ptr) const
+		{
+			if (ptr)
+				XCloseDisplay(ptr);
+		}
+		void operator()(XExtensionVersion *ptr) const
+		{
+			if (ptr)
+				XFree(ptr);
+		}
+	};
 
-	x11_event_manager()
-		: event_manager_t(),
-		m_display(nullptr)
+	template <typename T> using x_ptr = std::unique_ptr<T, x_cleanup>;
+
+	x_ptr<Display> m_display;
+
+	x11_event_manager() : event_manager_t()
 	{
 	}
+
 public:
-	Display * display() const { return m_display; }
+	Display * display() const { return m_display.get(); }
 
 	static x11_event_manager& instance()
 	{
@@ -287,18 +305,18 @@ public:
 	{
 		std::lock_guard<std::mutex> scope_lock(m_lock);
 
-		if (m_display != nullptr)
+		if (m_display)
 			return 0;
 
-		m_display = XOpenDisplay(nullptr);
-		if (m_display == nullptr)
+		m_display.reset(XOpenDisplay(nullptr));
+		if (!m_display)
 		{
 			osd_printf_verbose("Unable to connect to X server\n");
 			return -1;
 		}
 
-		XExtensionVersion *version = XGetExtensionVersion(m_display, INAME);
-		if (!version || (version == reinterpret_cast<XExtensionVersion*>(NoSuchExtension)))
+		x_ptr<XExtensionVersion> version(XGetExtensionVersion(m_display.get(), INAME));
+		if (!version || (version.get() == reinterpret_cast<XExtensionVersion *>(NoSuchExtension)))
 		{
 			osd_printf_verbose("xinput extension not available!\n");
 			return -1;
@@ -313,21 +331,21 @@ public:
 		XEvent xevent;
 
 		// If X11 has become invalid for some reason, XPending will crash. Assert instead.
-		assert(m_display != nullptr);
+		assert(m_display);
 
 		//Get XInput events
-		while (XPending(m_display) != 0)
+		while (XPending(m_display.get()) != 0)
 		{
-			XNextEvent(m_display, &xevent);
+			XNextEvent(m_display.get(), &xevent);
 
 			// Find all subscribers for the event type
-			auto subscribers = m_subscription_index.equal_range(xevent.type);
+			auto const subscribers = m_subscription_index.equal_range(xevent.type);
 
 			// Dispatch the events
-			std::for_each(subscribers.first, subscribers.second, [&xevent](auto &pair)
-			{
-				pair.second->handle_event(xevent);
-			});
+			std::for_each(
+					subscribers.first,
+					subscribers.second,
+					[&xevent] (auto &pair) { pair.second->handle_event(xevent); });
 		}
 	}
 };
@@ -341,9 +359,9 @@ class x11_input_device : public event_based_device<XEvent>
 public:
 	x11_api_state x11_state;
 
-	x11_input_device(running_machine &machine, const char *name, const char *id, input_device_class devclass, input_module &module)
-		: event_based_device(machine, name, id, devclass, module),
-			x11_state({0})
+	x11_input_device(running_machine &machine, std::string &&name, std::string &&id, input_device_class devclass, input_module &module) :
+		event_based_device(machine, std::move(name), std::move(id), devclass, module),
+		x11_state({0})
 	{
 	}
 };
@@ -357,9 +375,9 @@ class x11_lightgun_device : public x11_input_device
 public:
 	lightgun_state lightgun;
 
-	x11_lightgun_device(running_machine &machine, const char *name, const char *id, input_module &module)
-		: x11_input_device(machine, name, id, DEVICE_CLASS_LIGHTGUN, module),
-			lightgun({0})
+	x11_lightgun_device(running_machine &machine, std::string &&name, std::string &&id, input_module &module) :
+		x11_input_device(machine, std::move(name), std::move(id), DEVICE_CLASS_LIGHTGUN, module),
+		lightgun({0})
 	{
 	}
 
@@ -440,16 +458,16 @@ private:
 	device_map_t   m_lightgun_map;
 	Display *      m_display;
 public:
-	x11_lightgun_module()
-		: input_module_base(OSD_LIGHTGUNINPUT_PROVIDER, "x11"),
-		  m_display(nullptr)
+	x11_lightgun_module() :
+		input_module_base(OSD_LIGHTGUNINPUT_PROVIDER, "x11"),
+		m_display(nullptr)
 	{
 	}
 
 	virtual bool probe() override
 	{
 		// If there is no X server, X11 lightguns cannot be supported
-		if (XOpenDisplay(nullptr) == nullptr)
+		if (!XOpenDisplay(nullptr))
 		{
 			return false;
 		}
@@ -459,8 +477,6 @@ public:
 
 	void input_init(running_machine &machine) override
 	{
-		int index;
-
 		osd_printf_verbose("Lightgun: Begin initialization\n");
 
 		devmap_init(machine, &m_lightgun_map, SDLOPTION_LIGHTGUNINDEX, 8, "Lightgun mapping");
@@ -472,7 +488,7 @@ public:
 		assert(m_display != nullptr);
 
 		// Loop through all 8 possible devices
-		for (index = 0; index < 8; index++)
+		for (int index = 0; index < 8; index++)
 		{
 			XDeviceInfo *info;
 
@@ -480,19 +496,18 @@ public:
 			if (m_lightgun_map.map[index].name.length() == 0)
 				continue;
 
-			x11_lightgun_device *devinfo;
 			std::string const &name = m_lightgun_map.map[index].name;
 			char defname[512];
 
 			// Register and add the device
-			devinfo = create_lightgun_device(machine, index);
+			auto *devinfo = create_lightgun_device(machine, index);
 			osd_printf_verbose("%i: %s\n", index, name);
 
 			// Find the device info associated with the name
 			info = find_device_info(m_display, name.c_str(), 0);
 
 			// If we couldn't find the device, skip
-			if (info == nullptr)
+			if (!info)
 			{
 				osd_printf_verbose("Can't find device %s!\n", name);
 				continue;
@@ -502,17 +517,17 @@ public:
 			if (info->num_classes > 0)
 			{
 				// Add the lightgun buttons based on what we read
-				add_lightgun_buttons(static_cast<XAnyClassPtr>(info->inputclassinfo), info->num_classes, devinfo);
+				add_lightgun_buttons(static_cast<XAnyClassPtr>(info->inputclassinfo), info->num_classes, *devinfo);
 
 				// Also, set the axix min/max ranges if we got them
-				set_lightgun_axis_props(static_cast<XAnyClassPtr>(info->inputclassinfo), info->num_classes, devinfo);
+				set_lightgun_axis_props(static_cast<XAnyClassPtr>(info->inputclassinfo), info->num_classes, *devinfo);
 			}
 
 			// Add X and Y axis
-			sprintf(defname, "X %s", devinfo->name());
+			sprintf(defname, "X %s", devinfo->name().c_str());
 			devinfo->device()->add_item(defname, ITEM_ID_XAXIS, generic_axis_get_state<std::int32_t>, &devinfo->lightgun.lX);
 
-			sprintf(defname, "Y %s", devinfo->name());
+			sprintf(defname, "Y %s", devinfo->name().c_str());
 			devinfo->device()->add_item(defname, ITEM_ID_YAXIS, generic_axis_get_state<std::int32_t>, &devinfo->lightgun.lY);
 
 			// Save the device id
@@ -525,7 +540,7 @@ public:
 			// register ourself to handle events from event manager
 			int event_types[] = { motion_type, button_press_type, button_release_type };
 			osd_printf_verbose("Events types to register: motion:%d, press:%d, release:%d\n", motion_type, button_press_type, button_release_type);
-			x11_event_manager::instance().subscribe(event_types, ARRAY_LENGTH(event_types), this);
+			x11_event_manager::instance().subscribe(event_types, std::size(event_types), this);
 		}
 
 		osd_printf_verbose("Lightgun: End initialization\n");
@@ -581,24 +596,26 @@ public:
 	}
 
 private:
-	x11_lightgun_device* create_lightgun_device(running_machine &machine, int index)
+	x11_lightgun_device *create_lightgun_device(running_machine &machine, int index)
 	{
-		char tempname[20];
-
 		if (m_lightgun_map.map[index].name.length() == 0)
 		{
 			if (m_lightgun_map.initialized)
 			{
-				snprintf(tempname, ARRAY_LENGTH(tempname), "NC%d", index);
-				return devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
-			} else
+				char tempname[20];
+				snprintf(tempname, std::size(tempname), "NC%d", index);
+				return &devicelist()->create_device<x11_lightgun_device>(machine, tempname, tempname, *this);
+			}
+			else
+			{
 				return nullptr;
+			}
 		}
 
-		return devicelist()->create_device<x11_lightgun_device>(machine, m_lightgun_map.map[index].name.c_str(), m_lightgun_map.map[index].name.c_str(), *this);
+		return &devicelist()->create_device<x11_lightgun_device>(machine, std::string(m_lightgun_map.map[index].name), std::string(m_lightgun_map.map[index].name), *this);
 	}
 
-	void add_lightgun_buttons(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo) const
+	void add_lightgun_buttons(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device &devinfo) const
 	{
 		XAnyClassPtr any = first_info_class;
 
@@ -611,7 +628,7 @@ private:
 				for (int button = 0; button < b->num_buttons; button++)
 				{
 					input_item_id itemid = static_cast<input_item_id>(ITEM_ID_BUTTON1 + button);
-					devinfo->device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo->lightgun.buttons[button]);
+					devinfo.device()->add_item(default_button_name(button), itemid, generic_button_get_state<std::int32_t>, &devinfo.lightgun.buttons[button]);
 				}
 				break;
 			}
@@ -620,7 +637,7 @@ private:
 		}
 	}
 
-	void set_lightgun_axis_props(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device *devinfo) const
+	void set_lightgun_axis_props(XAnyClassPtr first_info_class, int num_classes, x11_lightgun_device &devinfo) const
 	{
 		XAnyClassPtr any = first_info_class;
 
@@ -636,15 +653,15 @@ private:
 					if (j == 0)
 					{
 						XI_DBG("Set minx=%d, maxx=%d\n", axis_info->min_value, axis_info->max_value);
-						devinfo->x11_state.maxx = axis_info->max_value;
-						devinfo->x11_state.minx = axis_info->min_value;
+						devinfo.x11_state.maxx = axis_info->max_value;
+						devinfo.x11_state.minx = axis_info->min_value;
 					}
 
 					if (j == 1)
 					{
 						XI_DBG("Set miny=%d, maxy=%d\n", axis_info->min_value, axis_info->max_value);
-						devinfo->x11_state.maxy = axis_info->max_value;
-						devinfo->x11_state.miny = axis_info->min_value;
+						devinfo.x11_state.maxy = axis_info->max_value;
+						devinfo.x11_state.miny = axis_info->min_value;
 					}
 				}
 				break;
@@ -655,8 +672,12 @@ private:
 	}
 };
 
-#else
+} // anonymous namespace
+
+#else // defined(SDLMAME_SDL2) && !defined(SDLMAME_WIN32) && defined(USE_XINPUT) && USE_XINPUT
+
 MODULE_NOT_SUPPORTED(x11_lightgun_module, OSD_LIGHTGUNINPUT_PROVIDER, "x11")
-#endif
+
+#endif //  defined(SDLMAME_SDL2) && !defined(SDLMAME_WIN32) && defined(USE_XINPUT) && USE_XINPUT
 
 MODULE_DEFINITION(LIGHTGUN_X11, x11_lightgun_module)

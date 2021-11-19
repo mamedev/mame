@@ -62,7 +62,7 @@ dave_device::dave_device(const machine_config &mconfig, const char *tag, device_
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
 		m_program_space_config("program", ENDIANNESS_LITTLE, 8, 22, 0, address_map_constructor(FUNC(dave_device::program_map), this)),
-		m_io_space_config("i/o", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
+		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(dave_device::io_map), this)),
 		m_write_irq(*this),
 		m_write_lh(*this),
 		m_write_rh(*this),

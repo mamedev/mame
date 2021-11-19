@@ -363,10 +363,13 @@ void fm77_state::alu_function_not(uint32_t offset)
 	{
 		if(!(m_alu.bank_disable & (1 << x)))
 		{
+#ifdef UNUSED
+			// "dat" is overwritten before it can get used: Coverity 315775
 			if(m_alu.lcolour & (1 << x))
 				dat = 0xff;
 			else
 				dat = 0;
+#endif
 
 			mask = (m_video_ram[(offset & 0x3fff) + (x * 0x4000) + (page * 0xc000)]);
 			dat = ~mask;

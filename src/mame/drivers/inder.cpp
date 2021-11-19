@@ -43,6 +43,8 @@
 #include "inder.lh"
 
 
+namespace {
+
 class inder_state : public genpin_class
 {
 public:
@@ -58,6 +60,7 @@ public:
 		, m_13(*this, "13")
 		, m_switches(*this, "SW.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_p_speech(*this, "speech")
 	{ }
 
 	void inder(machine_config &config);
@@ -67,6 +70,10 @@ public:
 
 	void init_inder();
 	void init_inder1();
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
 
 private:
 	uint8_t ppic_r();
@@ -106,9 +113,7 @@ private:
 	uint8_t m_sndcmd;
 	uint8_t m_sndbank;
 	uint32_t m_sound_addr;
-	uint8_t *m_p_speech;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<sn76489_device> m_sn;
@@ -119,6 +124,7 @@ private:
 	optional_device<hct157_device> m_13;
 	required_ioport_array<11> m_switches;
 	output_finder<50> m_digits;
+	optional_region_ptr<uint8_t> m_p_speech;
 };
 
 void inder_state::brvteam_map(address_map &map)
@@ -1321,6 +1327,13 @@ void inder_state::ppic_w(uint8_t data)
 }
 
 
+void inder_state::machine_start()
+{
+	m_digits.resolve();
+
+	std::fill(std::begin(m_segment), std::end(m_segment), 0);
+}
+
 void inder_state::machine_reset()
 {
 	m_sound_addr = 0;
@@ -1335,7 +1348,6 @@ void inder_state::machine_reset()
 
 void inder_state::init_inder()
 {
-	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
 	{
 		m_7a->d_w(0);
@@ -1347,7 +1359,6 @@ void inder_state::init_inder()
 
 void inder_state::init_inder1()
 {
-	m_p_speech = memregion("speech")->base();
 	if (m_7a.found())
 	{
 		m_7a->d_w(0);
@@ -1359,17 +1370,17 @@ void inder_state::init_inder1()
 
 void inder_state::brvteam(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::brvteam_map);
 	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_inder);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 	SPEAKER(config, "snvol").front_center();
 	SN76489(config, m_sn, XTAL(8'000'000) / 2).add_route(ALL_OUTPUTS, "snvol", 2.0); // jumper choice of 2 or 4 MHz
@@ -1377,17 +1388,17 @@ void inder_state::brvteam(machine_config &config)
 
 void inder_state::canasta(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::canasta_map);
 	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_inder);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
 	AY8910(config, "ay", XTAL(4'000'000) / 2).add_route(ALL_OUTPUTS, "ayvol", 1.0);
@@ -1395,7 +1406,7 @@ void inder_state::canasta(machine_config &config)
 
 void inder_state::lapbylap(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_map);
 	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
@@ -1406,10 +1417,10 @@ void inder_state::lapbylap(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_inder);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
 	AY8910(config, "ay1", XTAL(2'000'000)).add_route(ALL_OUTPUTS, "ayvol", 1.0); // same xtal that drives subcpu
@@ -1420,7 +1431,7 @@ void inder_state::lapbylap(machine_config &config)
 
 void inder_state::inder(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::inder_map);
 	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
@@ -1431,10 +1442,10 @@ void inder_state::inder(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	/* Video */
+	// Video
 	config.set_default_layout(layout_inder);
 
-	/* Sound */
+	// Sound
 	genpin_audio(config);
 	SPEAKER(config, "msmvol").front_center();
 	MSM5205(config, m_msm, 384_kHz_XTAL);
@@ -1443,7 +1454,7 @@ void inder_state::inder(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
-	/* Devices */
+	// Devices
 	i8255_device &ppi60(I8255A(config, "ppi60"));
 	ppi60.out_pa_callback().set(FUNC(inder_state::ppi60a_w));
 	ppi60.out_pb_callback().set(FUNC(inder_state::ppi60b_w));
@@ -1593,6 +1604,22 @@ ROM_START(atleta)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ La Rana (1991)
+/ Main PCB: Inder SA UCPU87 (only 2 of 4 I8255 sockets populated)
+/ Sound PCB: USVYS (only 1 of 8 speech ROM sockets populated)
+/-------------------------------------------------------------------*/
+ROM_START(larana)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD("inder_sa_mod_la_rana_0_050790.bin", 0x0000, 0x2000, CRC(ba94618f) SHA1(0fd6ffe9a6ef514c1dbf8856b881a54bf184e863))
+
+	ROM_REGION(0x2000, "audiocpu", 0)
+	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x0000, 0x2000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
+
+	ROM_REGION(0x80000, "speech", ROMREGION_ERASE00)
+	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
+ROM_END
+
+/*-------------------------------------------------------------------
 / 250 CC (1992)
 /-------------------------------------------------------------------*/
 ROM_START(ind250cc)
@@ -1631,6 +1658,8 @@ ROM_START(metalman)
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
 
+} // Anonymous namespace
+
 
 // old cpu board, 6 digits, sn76489
 GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
@@ -1647,6 +1676,7 @@ GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_inder1, ROT0, "In
 GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1991,  larana,   0, inder,    metalman, inder_state, init_inder,  ROT0, "Inder", "La Rana",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, later revision of msm5205 sound board

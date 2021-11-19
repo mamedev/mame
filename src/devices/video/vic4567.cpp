@@ -317,7 +317,7 @@ void vic3_device::device_start()
 
 void vic3_device::device_reset()
 {
-	memset(m_reg, 0, ARRAY_LENGTH(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0);
 
 	m_on = 1;
 
@@ -355,8 +355,8 @@ void vic3_device::device_reset()
 	m_lastline = 0;
 	m_rasterline = 0;
 
-	memset(m_shift, 0, ARRAY_LENGTH(m_shift));
-	memset(m_multi_collision, 0, ARRAY_LENGTH(m_multi_collision));
+	std::fill(std::begin(m_shift), std::end(m_shift), 0);
+	std::fill(std::begin(m_multi_collision), std::end(m_multi_collision), 0);
 
 	for (int i = 0; i < 256; i++)
 	{

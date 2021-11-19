@@ -79,6 +79,7 @@ void ti68k_state::ti68k_io_w(offs_t offset, uint16_t data)
 			break;
 		case 0x0b:
 			m_timer_val = data & 0xff;
+			break;
 		case 0x0c:
 			m_kb_mask = data & 0x03ff;
 			break;
@@ -487,8 +488,8 @@ void ti68k_state::machine_reset()
 	m_lcd_height = 0;
 	m_lcd_on = 0;
 	m_lcd_contrast = 0;
-	memset(m_io_hw1, 0, ARRAY_LENGTH(m_io_hw1) * sizeof(uint16_t));
-	memset(m_io_hw2, 0, ARRAY_LENGTH(m_io_hw2) * sizeof(uint16_t));
+	std::fill(std::begin(m_io_hw1), std::end(m_io_hw1), 0);
+	std::fill(std::begin(m_io_hw2), std::end(m_io_hw2), 0);
 	m_timer_on = 0;
 	m_timer_mask = 0xf;
 	m_timer_val = 0;

@@ -278,6 +278,8 @@ End
 #include "speaker.h"
 
 
+namespace {
+
 class sg1000a_state : public driver_device
 {
 public:
@@ -287,6 +289,7 @@ public:
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	void sderbys(machine_config &config);
+	void sderby2s(machine_config &config);
 	void sg1000ax(machine_config &config);
 	void sg1000a(machine_config &config);
 
@@ -502,7 +505,7 @@ void sg1000a_state::sg1000ax(machine_config &config)
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 }
 
-void sg1000a_state::sderbys(machine_config &config)
+void sg1000a_state::sderby2s(machine_config &config)
 {
 	sg1000a(config);
 	m_maincpu->set_clock(XTAL(10'738'635) / 3);
@@ -511,6 +514,11 @@ void sg1000a_state::sderbys(machine_config &config)
 	// Actually uses a Sega 315-5066 chip, which is a TMS9918 and SN76489 in the same package but with RGB output
 }
 
+void sg1000a_state::sderbys(machine_config &config)
+{
+	sderby2s(config);
+	m_maincpu->set_addrmap(AS_OPCODES, &sg1000a_state::decrypted_opcodes_map);
+}
 /*************************************
  *
  *  ROM definitions
@@ -558,16 +566,32 @@ ROM_END
 
 void sg1000a_state::init_sderby()
 {
-	// mini daughterboard in ic10 socket, with TI 27C128 rom and unknown ic(label scraped off)
-	u8 *rom = machine().root_device().memregion("maincpu")->base();
-	const u32 len = memregion("maincpu")->bytes();
+	// mini daughterboard in ic10 socket, with TI 27C128 rom and unknown ic (label scraped off)
+	u8 *rom = memregion("maincpu")->base();
 
-	for (int i = 0; i < len; i++)
-		rom[i] = bitswap<8>(rom[i],3,7,4,6,5,2,1,0);
+	// TODO: there's something fishy in the first 0x130 bytes, then it seems to be correct.
+	// i.e. compare the following addresses
+	// sderbys    sderby2s
+	// 0x134      0x13c
+	// 0x237      0x280
+	// 0x2ad      0x336
+	// 0x402      0x4ac
+	// 0x11f1     0x132b
+	// 0x1300     0x1413
+	// 0x1680     0x1793
 
-	// TODO: decryption is unfinished
+	for (int i = 0; i < 0x4000; i++)
+	{
+		if (i < 0x100) // this is wrong
+			m_decrypted_opcodes[i] = bitswap<8>(rom[i], 3, 7, 4, 6, 5, 2, 1, 0);
+		else
+			m_decrypted_opcodes[i] = bitswap<8>(rom[i], 3, 7, 4, 5, 6, 2, 1, 0);
+
+		rom[i] = bitswap<8>(rom[i], 3, 7, 4, 5, 6, 2, 1, 0);
+	}
 }
 
+} // Anonymous namespace
 
 
 /*************************************
@@ -582,5 +606,5 @@ GAME( 1985, dokidoki, 0, sg1000a,  dokidoki, sg1000a_state, empty_init, ROT0, "S
 
 // inputs aren't hooked up, probably needs to be connected to the main board anyway
 // TODO: move these guys over to sderby2.cpp
-GAME( 1984, sderbys,  0, sderbys, sderbys, sg1000a_state, init_sderby, ROT0, "Sega", "Super Derby (satellite board)", MACHINE_NOT_WORKING )
-GAME( 1985, sderby2s, 0, sderbys, sderbys, sg1000a_state, empty_init,  ROT0, "Sega", "Super Derby II (satellite board)", MACHINE_NOT_WORKING )
+GAME( 1984, sderbys,  0, sderbys,  sderbys, sg1000a_state, init_sderby, ROT0, "Sega", "Super Derby (satellite board)", MACHINE_NOT_WORKING ) // decryption incomplete, currently displays IC23 and IC24 bad if resetted a few times
+GAME( 1985, sderby2s, 0, sderby2s, sderbys, sg1000a_state, empty_init,  ROT0, "Sega", "Super Derby II (satellite board)", MACHINE_NOT_WORKING )

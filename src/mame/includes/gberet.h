@@ -38,6 +38,11 @@ public:
 
 	void init_mrgoemon();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_colorram;
@@ -70,9 +75,6 @@ private:
 	void gberet_sprite_bank_w(uint8_t data);
 	void gberetb_scroll_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_MACHINE_START(gberet);
-	DECLARE_MACHINE_RESET(gberet);
-	DECLARE_VIDEO_START(gberet);
 	void gberet_palette(palette_device &palette) const;
 	uint32_t screen_update_gberet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gberetb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

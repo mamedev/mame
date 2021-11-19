@@ -23,18 +23,25 @@
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
+
 #include "ui/uimain.h"
 #include "uiinput.h"
+
 #include "window.h"
+
+#include "util/language.h"
+
+#include "osdepend.h"
 #include "strconv.h"
 
 #include "../../sdl/osdsdl.h"
 #include "input_common.h"
 #include "input_sdlcommon.h"
 
+
 #define GET_WINDOW(ev) window_from_id((ev)->windowID)
 //#define GET_WINDOW(ev) ((ev)->windowID)
+
 
 static std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 {
@@ -86,23 +93,9 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 
 	switch (sdlevent.window.event)
 	{
-	case SDL_WINDOWEVENT_SHOWN:
-		m_has_focus = true;
-		break;
-
-	case SDL_WINDOWEVENT_CLOSE:
-		machine.schedule_exit();
-		break;
-
-	case SDL_WINDOWEVENT_LEAVE:
-		machine.ui_input().push_mouse_leave_event(window->target());
-		m_mouse_over_window = 0;
-		break;
-
 	case SDL_WINDOWEVENT_MOVED:
 		window->notify_changed();
 		m_focus_window = window;
-		m_has_focus = true;
 		break;
 
 	case SDL_WINDOWEVENT_RESIZED:
@@ -116,24 +109,28 @@ void sdl_event_manager::process_window_event(running_machine &machine, SDL_Event
 			//printf("event data1,data2 %d x %d %ld\n", event.window.data1, event.window.data2, sizeof(SDL_Event));
 			window->resize(sdlevent.window.data1, sdlevent.window.data2);
 		}
-		m_focus_window = window;
-		m_has_focus = true;
 		break;
 
 	case SDL_WINDOWEVENT_ENTER:
 		m_mouse_over_window = 1;
-		/* fall through */
-	case SDL_WINDOWEVENT_FOCUS_GAINED:
-	case SDL_WINDOWEVENT_EXPOSED:
-	case SDL_WINDOWEVENT_MAXIMIZED:
-	case SDL_WINDOWEVENT_RESTORED:
-		m_focus_window = window;
-		m_has_focus = true;
 		break;
 
-	case SDL_WINDOWEVENT_MINIMIZED:
+	case SDL_WINDOWEVENT_LEAVE:
+		machine.ui_input().push_mouse_leave_event(window->target());
+		m_mouse_over_window = 0;
+		break;
+
+	case SDL_WINDOWEVENT_FOCUS_GAINED:
+		m_focus_window = window;
+		machine.ui_input().push_window_focus_event(window->target());
+		break;
+
 	case SDL_WINDOWEVENT_FOCUS_LOST:
-		m_has_focus = false;
+		machine.ui_input().push_window_defocus_event(window->target());
+		break;
+
+	case SDL_WINDOWEVENT_CLOSE:
+		machine.schedule_exit();
 		break;
 	}
 }
@@ -175,15 +172,9 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			break;
 			// alt-enter for fullscreen
 		case IPT_OSD_1:
-			entry.configure_osd("TOGGLE_FULLSCREEN", "Toggle Fullscreen");
+			entry.configure_osd("TOGGLE_FULLSCREEN", N_p("input-name", "Toggle Fullscreen"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ENTER, KEYCODE_LALT);
 			break;
-
-			// disable UI_SELECT when LALT is down, this stops selecting
-			// things in the menu when toggling fullscreen with LALT+ENTER
-			/*          case IPT_UI_SELECT:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ENTER, input_seq::not_code, KEYCODE_LALT);
-			break;*/
 
 			// page down for fastforward (must be OSD_3 as per src/emu/ui.c)
 		case IPT_UI_FAST_FORWARD:
@@ -195,21 +186,11 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			// various dipswitches, and pressing them together with
 			// LCTRL will still press/toggle these dipswitches.
 
-			// LCTRL-F3 to toggle fullstretch
-		case IPT_OSD_2:
-			entry.configure_osd("TOGGLE_FULLSTRETCH", "Toggle Uneven stretch");
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F3, KEYCODE_LCONTROL);
-			break;
 			// add a Not lcrtl condition to the reset key
 		case IPT_UI_SOFT_RESET:
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F3, input_seq::not_code, KEYCODE_LCONTROL, input_seq::not_code, KEYCODE_LSHIFT);
 			break;
 
-			// LCTRL-F4 to toggle keep aspect
-		case IPT_OSD_4:
-			entry.configure_osd("TOGGLE_KEEP_ASPECT", "Toggle Keepaspect");
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F4, KEYCODE_LCONTROL);
-			break;
 			// add a Not lcrtl condition to the show gfx key
 		case IPT_UI_SHOW_GFX:
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F4, input_seq::not_code, KEYCODE_LCONTROL);
@@ -217,17 +198,13 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 
 			// LCTRL-F5 to toggle OpenGL filtering
 		case IPT_OSD_5:
-			entry.configure_osd("TOGGLE_FILTER", "Toggle Filter");
+			entry.configure_osd("TOGGLE_FILTER", N_p("input-name", "Toggle Filter"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LCONTROL);
-			break;
-			// add a Not lcrtl condition to the toggle debug key
-		case IPT_UI_TOGGLE_DEBUG:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, input_seq::not_code, KEYCODE_LCONTROL);
 			break;
 
 			// LCTRL-F6 to decrease OpenGL prescaling
 		case IPT_OSD_6:
-			entry.configure_osd("DECREASE_PRESCALE", "Decrease Prescaling");
+			entry.configure_osd("DECREASE_PRESCALE", N_p("input-name", "Decrease Prescaling"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, KEYCODE_LCONTROL);
 			break;
 			// add a Not lcrtl condition to the toggle cheat key
@@ -237,13 +214,13 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 
 			// LCTRL-F7 to increase OpenGL prescaling
 		case IPT_OSD_7:
-			entry.configure_osd("INCREASE_PRESCALE", "Increase Prescaling");
+			entry.configure_osd("INCREASE_PRESCALE", N_p("input-name", "Increase Prescaling"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, KEYCODE_LCONTROL);
 			break;
 
 		// lshift-lalt-F12 for fullscreen video (BGFX)
 		case IPT_OSD_8:
-			entry.configure_osd("RENDER_AVI", "Record Rendered Video");
+			entry.configure_osd("RENDER_AVI", N_p("input-name", "Record Rendered Video"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
 			break;
 

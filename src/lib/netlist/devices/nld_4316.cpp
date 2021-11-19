@@ -25,7 +25,7 @@
 #include "analog/nlid_twoterm.h"
 #include "solver/nld_solver.h"
 
-namespace netlist { namespace devices {
+namespace netlist::devices {
 
 	// FIXME: tristate outputs?
 
@@ -67,5 +67,4 @@ namespace netlist { namespace devices {
 
 	NETLIB_DEVICE_IMPL(CD4316_GATE, "CD4316_GATE", "")
 
-} // namespace devices
- } // namespace netlist
+} // namespace netlist::devices

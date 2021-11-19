@@ -3,21 +3,21 @@
 // thanks-to:Sean Riddle, Kevin Horton
 /***************************************************************************
 
-  This driver is a collection of simple dedicated handheld and tabletop
-  toys based around the TMS1000 MCU series. Anything more complex or clearly
-  part of a series is (or will be) in its own driver, see:
-  - eva: Chrysler EVA-11 (and EVA-24)
-  - microvsn: Milton Bradley MicroVision
-  - sag: Entex Select-A-Game Machine
+This driver is a collection of simple dedicated handheld and tabletop
+toys based around the TMS1000 MCU series. Anything more complex or clearly
+part of a series is (or will be) in its own driver, see:
+- eva: Chrysler EVA-11 (and EVA-24)
+- microvsn: Milton Bradley Microvision
+- sag: Entex Select-A-Game Machine
 
-  (contd.) hh_tms1k child drivers:
-  - tispellb: TI Spelling B series gen. 1
-  - tispeak: TI Speak & Spell series gen. 1
+(contd.) hh_tms1k child drivers:
+- tispellb: TI Spelling B series gen. 1
+- tispeak: TI Speak & Spell series gen. 1
 
-  Let's use this driver for a list of known devices and their serials,
-  excluding most of TI's own products(they normally didn't use "MP" codes).
-  For TI's calculators, a comprehensive list of MCU serials is available
-  on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
+Let's use this driver for a list of known devices and their serials,
+excluding most of TI's own products(they normally didn't use "MP" codes).
+For TI's calculators, a comprehensive list of MCU serials is available
+on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   serial   device    etc.
 --------------------------------------------------------------------
@@ -30,6 +30,7 @@
  @MP0166   TMS1000   1980, A-One Arrange Ball/LJN Computer Impulse/Tandy Zingo (model 60-2123)
  @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
+ *MP0220   TMS1000   1980, Tomy Teacher
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Radio Shack Monkey See
  @MP0907   TMS1000   1979, Conic Basketball (101-006)
@@ -52,11 +53,12 @@
  @MP1204   TMS1100   1980, Entex Baseball 3 (6007)
  *MP1209   TMS1100   1980, U.S. Games Space Cruiser/Strategy Football
  @MP1211   TMS1100   1980, Entex Space Invader (6012)
+ *MP1215   TMS1100   1980, Tiger Playmaker
  @MP1218   TMS1100   1980, Entex Basketball 2 (6010)
  @MP1219   TMS1100   1980, U.S. Games Super Sports-4
  @MP1221   TMS1100   1980, Entex Raise The Devil (6011)
  *MP1231   TMS1100   1983, Tandy 3-in-1 Sports Arena (model 60-2178)
- *MP1296   TMS1100?  1982, Entex Black Knight
+ @MP1296   TMS1100   1982, Entex Black Knight Pinball (6081)
  *MP1311   TMS1100   1981, Bandai TC7: Air Traffic Control
  @MP1312   TMS1100   1983, Gakken FX-Micom R-165/Radio Shack Science Fair Microcomputer Trainer
  *MP1359   TMS1100?  1985, Capsela CRC2000
@@ -67,57 +69,61 @@
  @MP2110   TMS1370   1980, Gakken Invader/Tandy Fire Away
  @MP2139   TMS1370   1981, Gakken Galaxy Invader 1000/Tandy Cosmic 1000 Fire Away
  @MP2726   TMS1040   1979, Tomy Break Up
- *MP2788   TMS1040?  1980, Bandai Flight Time (? note: VFD-capable)
+ *MP2788   TMS1070?  1980, Bandai Flight Time (? note: VFD-capable)
  @MP3005   TMS1730   1989, Tiger Copy Cat (model 7-522)
  @MP3200   TMS1000   1978, Parker Brothers Electronic Master Mind
  @MP3201   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750A)
+ *MP3206   TMS1000   1979, Concept 2000 Mr. Mus-I-Cal
  @MP3208   TMS1000   1977, Milton Bradley Electronic Battleship (1977, model 4750B)
  @MP3226   TMS1000   1978, Milton Bradley Simon (Rev A)
- *MP3232   TMS1000   1979, Fonas 2-Player Baseball (no "MP" on chip label)
+ *MP3232   TMS1000   1979, Fonas 2 Player Baseball (no "MP" on chip label)
  @MP3260   TMS1000   1979, Electroplay Quickfire
  @MP3300   TMS1000   1979, Milton Bradley Simon (Rev F)
  @MP3301A  TMS1000   1979, Milton Bradley Big Trak
  @MP3320A  TMS1000   1979, Coleco Head to Head: Electronic Basketball
  @MP3321A  TMS1000   1979, Coleco Head to Head: Electronic Hockey
- *MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
+ @MP3352   TMS1200   1979, Tiger Sub Wars (model 7-490)
  @M32001   TMS1000   1981, Coleco Quiz Wiz Challenger (note: MP3398, MP3399, M3200x?)
  *M32018   TMS1000   1990, unknown device (have decap/dump)
   M32045B  TMS1000   1983, Chrysler Electronic Voice Alert (11-function) -> eva.cpp
  @MP3403   TMS1100   1978, Marx Electronic Bowling
  @MP3404   TMS1100   1978, Parker Brothers Merlin
  @MP3405   TMS1100   1979, Coleco Amaze-A-Tron
+ *MP3407   TMS1100   1979, General Electric The Great Awakening (model 7-4880)
  @MP3415   TMS1100   1978, Coleco Electronic Quarterback
  @MP3435   TMS1100   1979, Coleco Zodiac
  @MP3438A  TMS1100   1979, Kenner Star Wars Electronic Battle Command
-  MP3450A  TMS1100   1979, MicroVision cartridge: Block Buster
-  MP3454   TMS1100   1979, MicroVision cartridge: Star Trek Phaser Strike
-  MP3455   TMS1100   1980, MicroVision cartridge: Pinball
-  MP3457   TMS1100   1979, MicroVision cartridge: Mindbuster
+  MP3450A  TMS1100   1979, Microvision cartridge: Block Buster
+  MP3454   TMS1100   1979, Microvision cartridge: Star Trek Phaser Strike
+  MP3455   TMS1100   1980, Microvision cartridge: Pinball
+  MP3457   TMS1100   1979, Microvision cartridge: Mindbuster
  @MP3460   TMS1100   1979, Coleco Head to Head: Electronic Football
-  MP3474   TMS1100   1979, MicroVision cartridge: Vegas Slots
-  MP3475   TMS1100   1979, MicroVision cartridge: Bowling
+  MP3474   TMS1100   1979, Microvision cartridge: Vegas Slots
+  MP3475   TMS1100   1979, Microvision cartridge: Bowling
  @MP3476   TMS1100   1979, Milton Bradley Super Simon
-  MP3479   TMS1100   1980, MicroVision cartridge: Baseball
-  MP3481   TMS1100   1979, MicroVision cartridge: Connect Four
+  MP3479   TMS1100   1980, Microvision cartridge: Baseball
+  MP3481   TMS1100   1979, Microvision cartridge: Connect Four
  *MP3489   TMS1100   1980, Kenner Live Action Football
  @MP3491   TMS1100   1979, Mattel Thoroughbred Horse Race Analyzer
  *MP3493   TMS1100   1980, Milton Bradley OMNI Entertainment System (1/2)
  *MP3494   TMS1100   1980, Milton Bradley OMNI Entertainment System (2/2)
-  MP3496   TMS1100   1980, MicroVision cartridge: Sea Duel
-  M34009   TMS1100   1981, MicroVision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
+  MP3496   TMS1100   1980, Microvision cartridge: Sea Duel
+  M34009   TMS1100   1981, Microvision cartridge: Alien Raiders (note: MP3498, MP3499, M3400x..)
  @M34012   TMS1100   1980, Mattel Dungeons & Dragons - Computer Labyrinth Game
  *M34014   TMS1100   1981, Coleco Bowlatronic
-  M34017   TMS1100   1981, MicroVision cartridge: Cosmic Hunter
+  M34017   TMS1100   1981, Microvision cartridge: Cosmic Hunter
  @M34018   TMS1100   1981, Coleco Head to Head: Electronic Boxing
  @M34038   TMS1100   1982, Parker Brothers Lost Treasure
-  M34047   TMS1100   1982, MicroVision cartridge: Super Blockbuster
+  M34047   TMS1100   1982, Microvision cartridge: Super Blockbuster
  @M34078A  TMS1100   1983, Milton Bradley Electronic Arcade Mania
+ *M34137   TMS1100?  1985, Technasonic Weight Talker
  @MP4486A  TMS1000C  1983, Vulcan XL 25
  *MP6061   TMS0970   1979, Texas Instruments Electronic Digital Thermostat (from patent, the one in MAME didn't have a label)
  @MP6100A  TMS0980   1979, Ideal Electronic Detective
  @MP6101B  TMS0980   1979, Parker Brothers Stop Thief
  *MP6354   ?         1982, Tsukuda The Dracula (? note: 40-pin, VFD-capable)
  *MP6361   ?         1983, Defender Strikes (? note: VFD-capable)
+ *MP7302   TMS1400   1980, Tiger Deluxe Football with Instant Replay
  @MP7304   TMS1400   1982, Tiger 7 in 1 Sports Stadium (model 7-555)
  @MP7313   TMS1400   1980, Parker Brothers Bank Shot
  @MP7314   TMS1400   1980, Parker Brothers Split Second
@@ -128,7 +134,8 @@
  @MP7551   TMS1670   1980, Entex Color Football 4 (6009)
  @MPF553   TMS1670   1980, Gakken/Entex Jackpot: Gin Rummy & Black Jack (6008) (note: assume F to be a misprint)
   MP7573   TMS1670   1981, Entex Select-A-Game cartridge: Football 4 -> sag.cpp
- *M95041   ?         1983, Tsukuda Game Pachinko (? note: 40-pin, VFD-capable)
+ *M30026   TMS2370   1983, Yaesu FT-757 Display Unit part
+ *M95041   TMS2670   1983, Tsukuda Game Pachinko (have decap, missing MCU emulation)
 
   inconsistent:
 
@@ -137,36 +144,58 @@
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+============================================================================
 
-  TODO:
-  - verify output PLA and microinstructions PLA for MCUs that have been dumped
-    electronically (mpla is usually the default, opla is often custom)
-  - unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
-    but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
-  - fake-press ON button when emulation starts for machines that have it on the button matrix
-    (doesn't look like any relies on it though)
-  - 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
-    Possibly BTANB, players are expected to quickly press the "First Up" button after the alarm sound.
-  - bship discrete sound, netlist is documented
-  - finish bshipb SN76477 sound
-  - improve elecbowl driver
-  - tithermos temperature sensor comparator (right now just the digital clock works)
-  - is alphie(patent) the same as the final version?
+ROM source notes when dumped from another publisher, but confident it's the same:
+- arrball: Tandy Zingo
+- bcheetah: Fundimensions Incredible Brain Buggy
+- cmsport: Conic Basketball
+- cnbaskb: Cardinal Electronic Basketball
+- cnfball: Elecsonic Football
+- copycat: Sears Follow Me
+- ditto: Tandy Electronic Pocket Repeat
+- fxmcr165: Tandy Science Fair Microcomputer Trainer
+- ginv1000: Tandy Cosmic 1000 Fire Away
+- gjackpot: Entex Electronic Jackpot: Gin Rummy & Black Jack
+- gpoker: Entex Electronic Poker
+- matchnum: LJN Electronic Concentration
+- palmf31: Toshiba BC-8018B
+- ti1250: Texas Instruments TI-1200
+- ti25503: Texas Instruments TI-1265
+- ti5100: loose 1979 TMS1073NL chip
+
+TODO:
+- verify output PLA and microinstructions PLA for MCUs that have been dumped
+  electronically (mpla is usually the default, opla is often custom)
+- unknown MCU clocks for some: TMS1000 RC curve is documented in the data manual,
+  but not for newer ones (rev. E or TMS1400 MCUs). TMS0970/0980 osc. is on-die.
+- fake-press ON button when emulation starts for machines that have it on the button matrix
+  (doesn't look like any relies on it though)
+- 7in1ss: in 2-player mode, game select and skill select can be configured after selecting a game?
+  Possibly BTANB, players are expected to quickly press the "First Up" button after the alarm sound.
+- bship discrete sound, netlist is documented
+- finish bshipb SN76477 sound
+- improve elecbowl driver
+- tithermos temperature sensor comparator (right now just the digital clock works)
+- is alphie(patent) the same as the final version?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/hh_tms1k.h"
 
-#include "machine/tms1024.h"
 #include "machine/clock.h"
+#include "machine/ds8874.h"
 #include "machine/timer.h"
+#include "machine/tmc0999.h"
+#include "machine/tms1024.h"
 #include "sound/beep.h"
 #include "sound/s14001a.h"
 #include "sound/sn76477.h"
 #include "video/hlcd0515.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+
 #include "softlist.h"
 #include "screen.h"
 #include "speaker.h"
@@ -183,7 +212,6 @@
 #include "bigtrak.lh"
 #include "bship.lh" // clickable
 #include "cmsport.lh"
-#include "cmulti8.lh"
 #include "cnbaskb.lh"
 #include "cnfball.lh"
 #include "cnfball2.lh"
@@ -198,6 +226,7 @@
 #include "ebball2.lh"
 #include "ebball3.lh"
 #include "ebaskb2.lh"
+#include "ebknight.lh"
 #include "efootb4.lh"
 #include "einvader.lh"
 #include "elecbowl.lh"
@@ -225,6 +254,8 @@
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
 #include "monkeysee.lh"
+#include "palmf31.lh"
+#include "palmmd8.lh"
 #include "pbmastm.lh"
 #include "phpball.lh"
 #include "qfire.lh" // clickable
@@ -237,6 +268,7 @@
 #include "ssports4.lh"
 #include "starwbc.lh" // clickable
 #include "stopthief.lh" // clickable
+#include "subwars.lh"
 #include "tandy12.lh" // clickable
 #include "tbreakup.lh"
 #include "tc4.lh"
@@ -244,8 +276,10 @@
 #include "tcfballa.lh"
 #include "ti1250.lh"
 #include "ti1270.lh"
+#include "ti1680.lh"
 #include "ti25503.lh"
 #include "ti30.lh"
+#include "ti5100.lh"
 #include "timaze.lh"
 #include "tisr16.lh"
 #include "tithermos.lh"
@@ -383,7 +417,7 @@ namespace {
   used on the boxes for "A-One LSI" is same as "Bandai Electronics" from early-80s.
 
   known releases:
-  - Japan: Match Number (white case, Queen playing card bezel)
+  - Japan: Match Number, published by A-One (white case, Queen playing card bezel)
   - USA: Electronic Concentration, published by LJN (black case, rainbow pattern bezel)
   - UK: Electronic Concentration, published by Peter Pan Playthings (same as USA version)
 
@@ -523,7 +557,7 @@ ROM_END
   * 2-digit 7seg LED display + 22 LEDs, 1-bit sound
 
   known releases:
-  - Japan/World: Arrange Ball (black case)
+  - Japan/World: Arrange Ball, published by A-One (black case)
   - USA(1): Zingo (model 60-2123), published by Tandy (red case)
   - USA(2): Computer Impulse, published by LJN (white case)
   - Germany: Fixball, unknown publisher, same as LJN version
@@ -801,7 +835,7 @@ ROM_END
   and press the go-key.
 
   known releases:
-  - Japan: System Control Car: Cheetah
+  - Japan: System Control Car: Cheetah, published by Bandai
   - USA: The Incredible Brain Buggy, published by Fundimensions
   - UK: The Incredible Brain Buggy, published by Palitoy (same as USA version)
 
@@ -928,21 +962,26 @@ ROM_END
 
 /***************************************************************************
 
-  Canon Multi 8 (Palmtronic MD-8) / Canon Canola MD 810
-  * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
-  * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
-  * PCB label Canon EHI-0115-03
+  Canon Palmtronic F-31, Canon Canola L813, Toshiba BC-8111B, Toshiba BC-8018B,
+  Triumph-Adler 81 SN, Silver-Reed 8J, more
+  * TMS1040 MCU label TMS1045NL (die label 1040A, 1045)
+  * 9-digit cyan VFD display (leftmost may be custom)
+
+  TMS1045NL is a versatile calculator chip for 3rd party manufacturers, used
+  by Canon, Toshiba, and several smaller companies. It doesn't look like it
+  was used in any TI calculator. It was up to the manufacturer to choose which
+  functions(keys) to leave out.
 
 ***************************************************************************/
 
-class cmulti8_state : public hh_tms1k_state
+class palmf31_state : public hh_tms1k_state
 {
 public:
-	cmulti8_state(const machine_config &mconfig, device_type type, const char *tag) :
+	palmf31_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void cmulti8(machine_config &config);
+	void palmf31(machine_config &config);
 
 private:
 	void update_display();
@@ -953,7 +992,173 @@ private:
 
 // handlers
 
-void cmulti8_state::update_display()
+void palmf31_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void palmf31_state::write_r(u16 data)
+{
+	// R0-R8: select digit, input mux
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+void palmf31_state::write_o(u16 data)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+u8 palmf31_state::read_k()
+{
+	// K: multiplexed inputs, one of the columns is K2+K8
+	u8 data = read_inputs(9);
+	if (data & 1)
+		data = (data & 0xe) | 0xa;
+
+	// switches are on K1
+	if (m_inp_mux & m_inputs[9]->read())
+		data |= 1;
+
+	return data;
+}
+
+// config
+
+static INPUT_PORTS_START( palmf31 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("M+") // add to memory
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("SC") // sign change
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("M-") // subtract from memory
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("RV") // reverse
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as M+
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // same as sqrt
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("(")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("1/x")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME(")")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT)
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME(UTF8_SMALL_PI)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("RM/CM") // combined function (press twice)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("% +/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("CM") // clear memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("RM") // recall memory
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("C") // clear (all)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(UTF8_LEFT)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("CI") // clear indicator
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("CI/C") // combined function (press twice)
+
+	PORT_START("IN.9") // K1
+	PORT_CONFNAME( 0x1f, 0x00, "DP" ) // display point
+	PORT_CONFSETTING(    0x02, "+" )
+	PORT_CONFSETTING(    0x01, "0" )
+	PORT_CONFSETTING(    0x04, "2" )
+	PORT_CONFSETTING(    0x08, "3" )
+	PORT_CONFSETTING(    0x10, "4" )
+	PORT_CONFSETTING(    0x00, "F" )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x100, 0x000, "AM" ) // accumulate memory
+	PORT_CONFSETTING(     0x000, DEF_STR( Off ) )
+	PORT_CONFSETTING(     0x100, DEF_STR( On ) )
+INPUT_PORTS_END
+
+void palmf31_state::palmf31(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1040(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(palmf31_state::read_k));
+	m_maincpu->o().set(FUNC(palmf31_state::write_o));
+	m_maincpu->r().set(FUNC(palmf31_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 8);
+	m_display->set_segmask(0x1ff, 0xff);
+	config.set_default_layout(layout_palmf31);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( palmf31 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1045nl", 0x0000, 0x0400, CRC(0c42d43e) SHA1(b76d404623e3abfd0b237ee1c0b46e83f96ceb78) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_palmf31_micro.pla", 0, 867, CRC(639cbc13) SHA1(a96152406881bdfc7ddc542cf4b478525c8b0e23) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_palmf31_output.pla", 0, 365, CRC(bc295ea6) SHA1(7e7c9ed0c1e5e37173dd8f297473516c410bca8c) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Canon Palmtronic MD-8 (Multi 8) / Canon Canola MD 810
+  * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
+  * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * PCB label Canon EHI-0115-03
+
+  The only difference between MD-8 and MD 810 is the form factor. The latter
+  is a tabletop calculator.
+
+***************************************************************************/
+
+class palmmd8_state : public hh_tms1k_state
+{
+public:
+	palmmd8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void palmmd8(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void palmmd8_state::update_display()
 {
 	// M-digit is on in memory mode, upper row is off in single mode
 	u32 m = (m_inputs[10]->read() & 0x10) ? 0x100000 : 0;
@@ -964,21 +1169,21 @@ void cmulti8_state::update_display()
 	m_display->matrix((sel & mask) | m, m_o);
 }
 
-void cmulti8_state::write_r(u16 data)
+void palmmd8_state::write_r(u16 data)
 {
 	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	update_display();
 }
 
-void cmulti8_state::write_o(u16 data)
+void palmmd8_state::write_o(u16 data)
 {
 	// O0-O7: digit segments
 	m_o = bitswap<8>(data,0,4,5,6,7,1,2,3);
 	update_display();
 }
 
-u8 cmulti8_state::read_k()
+u8 palmmd8_state::read_k()
 {
 	// K: multiplexed inputs
 	return read_inputs(11);
@@ -986,7 +1191,7 @@ u8 cmulti8_state::read_k()
 
 // config
 
-static INPUT_PORTS_START( cmulti8 )
+static INPUT_PORTS_START( palmmd8 )
 	PORT_START("IN.0") // R0
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("% +/-")
@@ -1059,32 +1264,32 @@ static INPUT_PORTS_START( cmulti8 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void cmulti8_state::cmulti8(machine_config &config)
+void palmmd8_state::palmmd8(machine_config &config)
 {
 	/* basic machine hardware */
 	TMS1070(config, m_maincpu, 250000); // approximation - RC osc. R=56K, C=68pf
-	m_maincpu->k().set(FUNC(cmulti8_state::read_k));
-	m_maincpu->o().set(FUNC(cmulti8_state::write_o));
-	m_maincpu->r().set(FUNC(cmulti8_state::write_r));
+	m_maincpu->k().set(FUNC(palmmd8_state::read_k));
+	m_maincpu->o().set(FUNC(palmmd8_state::write_o));
+	m_maincpu->r().set(FUNC(palmmd8_state::write_r));
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(21, 8);
 	m_display->set_segmask(0xfffff, 0xff);
-	config.set_default_layout(layout_cmulti8);
+	config.set_default_layout(layout_palmmd8);
 
 	/* no sound! */
 }
 
 // roms
 
-ROM_START( cmulti8 )
+ROM_START( palmmd8 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tmc1079nl", 0x0000, 0x0400, CRC(202c5ed8) SHA1(0143975cac20cb4a4e9f659ca0535e8a9056f5bb) )
 
 	ROM_REGION( 867, "maincpu:mpla", 0 )
 	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
-	ROM_LOAD( "tms1000_cmulti8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+	ROM_LOAD( "tms1000_palmmd8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
 ROM_END
 
 
@@ -1398,7 +1603,7 @@ ROM_END
   * 9-digit LED grid, 1-bit sound
 
   known releases:
-  - USA(1): Electronic Quarterback
+  - USA(1): Electronic Quarterback, published by Coleco
   - USA(2): Electronic Touchdown, published by Sears
 
 ***************************************************************************/
@@ -1470,9 +1675,9 @@ static INPUT_PORTS_START( cqback )
 	PORT_BIT( 0x02, 0x02, IPT_CUSTOM ) PORT_CONDITION("IN.1", 0x01, EQUALS, 0x00) // run/kick
 
 	PORT_START("IN.2") // K4
-	PORT_CONFNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_CONFSETTING(    0x02, "1" )
-	PORT_CONFSETTING(    0x01, "2" )
+	PORT_CONFNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
 
 	PORT_START("IN.3") // K8
 	PORT_CONFNAME( 0x01, 0x00, "Factory Test" )
@@ -1530,7 +1735,7 @@ ROM_END
   offense blips appear brighter. The hardware is similar to cqback.
 
   known releases:
-  - USA(1): Head to Head: Electronic Football
+  - USA(1): Head to Head: Electronic Football, published by Coleco
   - USA(2): Team Play Football, published by Sears
 
 ***************************************************************************/
@@ -1864,7 +2069,7 @@ ROM_END
   * 9-digit cyan VFD display, and other LEDs behind bezel, 1-bit sound
 
   known releases:
-  - USA: Head to Head: Electronic Baseball
+  - USA: Head to Head: Electronic Baseball, published by Coleco
   - Japan: Computer Baseball, published by Tsukuda
 
 ***************************************************************************/
@@ -2188,7 +2393,7 @@ DEVICE_IMAGE_LOAD_MEMBER(quizwizc_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
 		return image_init_result::FAIL;
 	}
 
@@ -2376,7 +2581,7 @@ DEVICE_IMAGE_LOAD_MEMBER(tc4_state::cart_load)
 {
 	if (!image.loaded_through_softlist())
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Can only load through softwarelist");
+		image.seterror(image_error::UNSUPPORTED, "Can only load through softwarelist");
 		return image_init_result::FAIL;
 	}
 
@@ -2516,7 +2721,7 @@ ROM_END
   MP0907(101-006) are nearly identical. MP0168 is found in Conic Multisport.
 
   known releases:
-  - Hong Kong: Electronic Basketball
+  - Hong Kong: Electronic Basketball, published by Conic
   - USA: Electronic Basketball, published by Cardinal
 
 ***************************************************************************/
@@ -2639,8 +2844,8 @@ ROM_END
   MAME external artwork is needed for the switchable overlays.
 
   known releases:
-  - Hong Kong: Electronic Multisport
-  - Hong Kong: Basketball/Ice Hockey/Soccer (3 separate handhelds)
+  - Hong Kong: Electronic Multisport, published by Conic
+  - Hong Kong: Basketball/Ice Hockey/Soccer, published by Conic (3 separate handhelds)
   - USA(1): Electronic Multisport, published by Innocron
   - USA(2): Sports Arena, published by Tandy (model 60-2158)
 
@@ -2766,9 +2971,9 @@ ROM_END
   by distributing the game under subsidiary brands - see list below.
 
   known releases:
-  - Hong Kong: Electronic Football, Conic
-  - USA(1): Football, E.R.S.(Electronic Readout Systems)
-  - USA(2): Football, ELECsonic
+  - Hong Kong: Electronic Football, published by Conic
+  - USA(1): Football, published by E.R.S.(Electronic Readout Systems)
+  - USA(2): Football, published by ELECsonic
   - USA(3): Football, no brand!
 
   Another hardware revision of this game uses a PIC16 MCU.
@@ -2779,8 +2984,12 @@ class cnfball_state : public hh_tms1k_state
 {
 public:
 	cnfball_state(const machine_config &mconfig, device_type type, const char *tag) :
-		hh_tms1k_state(mconfig, type, tag)
+		hh_tms1k_state(mconfig, type, tag),
+		m_ds8874(*this, "ds8874")
 	{ }
+
+	required_device<ds8874_device> m_ds8874;
+	void ds8874_output_w(u16 data);
 
 	void update_display();
 	void write_r(u16 data);
@@ -2793,7 +3002,13 @@ public:
 
 void cnfball_state::update_display()
 {
-	m_display->matrix(m_grid, m_o | (m_r << 6 & 0x700));
+	m_display->matrix(~m_grid, m_o | (m_r << 6 & 0x700));
+}
+
+void cnfball_state::ds8874_output_w(u16 data)
+{
+	m_grid = data;
+	update_display();
 }
 
 void cnfball_state::write_r(u16 data)
@@ -2805,14 +3020,10 @@ void cnfball_state::write_r(u16 data)
 	// R9,R10: input mux
 	m_inp_mux = data >> 9 & 3;
 
-	// R0: DS8874N CP: clock pulse edge-triggered
-	// note: DS8874N CP goes back to K8 too, game relies on it
-	if ((data ^ m_r) & 1)
-		m_grid = m_grid << 1 & 0x1ff;
-
-	// R1: DS8874N _DATA: reset shift register
-	if (~data & 2)
-		m_grid = 1;
+	// R0: DS8874N CP (note: it goes back to K8 too, game relies on it)
+	// R1: DS8874N _DATA
+	m_ds8874->cp_w(BIT(data, 0));
+	m_ds8874->data_w(BIT(data, 1));
 
 	// R2-R4: led data
 	m_r = data;
@@ -2863,7 +3074,8 @@ void cnfball_state::cnfball(machine_config &config)
 	m_maincpu->o().set(FUNC(cnfball_state::write_o));
 
 	/* video hardware */
-	PWM_DISPLAY(config, m_display).set_size(10, 8+3);
+	DS8874(config, m_ds8874).write_output().set(FUNC(cnfball_state::ds8874_output_w));
+	PWM_DISPLAY(config, m_display).set_size(9, 8+3);
 	m_display->set_segmask(0xc3, 0x7f);
 	m_display->set_segmask(0x38, 0xff); // only the middle 3 7segs have DP
 	m_display->set_bri_levels(0.01, 0.1); // player led is brighter
@@ -2904,8 +3116,8 @@ ROM_END
   the offense(player) leds brighter.
 
   known releases:
-  - Hong Kong: Electronic Football II, Conic
-  - USA: Electronic Football II, Tandy
+  - Hong Kong: Electronic Football II, published by Conic
+  - USA: Electronic Football II, published by Tandy
 
 ***************************************************************************/
 
@@ -3036,7 +3248,7 @@ ROM_END
   This is a peg solitaire game, with random start position.
 
   known releases:
-  - Hong Kong: Electronic I.Q.
+  - Hong Kong: Electronic I.Q., published by Conic
   - UK: Solitaire, published by Grandstand
 
 ***************************************************************************/
@@ -3205,7 +3417,6 @@ void qfire_state::write_r(u16 data)
 
 	// R3,R4,R6-R8: leds (direct)
 	m_display->write_row(2, (data >> 3 & 3) | (data >> 4 & 0x1c));
-	m_display->update();
 
 	// R9: speaker out
 	m_speaker->level_w(data >> 9 & 1);
@@ -3217,7 +3428,6 @@ void qfire_state::write_o(u16 data)
 	// O1-O7: 2nd digit segments
 	m_display->write_row(0, (data & 1) ? 6 : 0);
 	m_display->write_row(1, data >> 1 & 0x7f);
-	m_display->update();
 }
 
 u8 qfire_state::read_k()
@@ -3759,13 +3969,12 @@ void ebball3_state::set_clock()
 
 void ebball3_state::update_display()
 {
-	m_display->matrix_partial(0, 10, m_r, m_o, false);
+	m_display->matrix_partial(0, 10, m_r, m_o);
 
 	// R0,R1 are normal 7segs
 	// R4,R7 contain segments(only F and B) for the two other digits
 	m_display->write_row(10, (m_display->read_row(4) & 0x20) | (m_display->read_row(7) & 0x02));
 	m_display->write_row(11, ((m_display->read_row(4) & 0x10) | (m_display->read_row(7) & 0x01)) << 1);
-	m_display->update();
 }
 
 void ebball3_state::write_r(u16 data)
@@ -4402,7 +4611,12 @@ ROM_END
   * TMS1100 MP1221 (die label same)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
-  led translation table: led zz from game PCB = MAME y.x:
+  Entex Black Knight (licensed handheld version of Williams' pinball game)
+  * TMS1100 MP1296 (no decap)
+  * same hardware as Raise The Devil
+
+  raisedvl led translation table: led zz from game PCB = MAME y.x:
+  (no led labels on ebknight PCB)
 
     0 = -     10 = 4.4   20 = 5.3   30 = 9.5   40 = 9.2
     1 = 3.0   11 = 4.5   21 = 5.4   31 = 8.5   41 = 9.3
@@ -4434,6 +4648,7 @@ public:
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(skill_switch) { set_clock(); }
 	void raisedvl(machine_config &config);
+	void ebknight(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -4519,13 +4734,18 @@ void raisedvl_state::raisedvl(machine_config &config)
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(10, 7);
 	m_display->set_segmask(7, 0x7f);
-	m_display->set_bri_levels(0.01, 0.125); // ball is brighter
 	config.set_default_layout(layout_raisedvl);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void raisedvl_state::ebknight(machine_config &config)
+{
+	raisedvl(config);
+	config.set_default_layout(layout_ebknight);
 }
 
 // roms
@@ -4540,6 +4760,16 @@ ROM_START( raisedvl )
 	ROM_LOAD( "tms1100_raisedvl_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
 ROM_END
 
+ROM_START( ebknight )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "mp1296", 0x0000, 0x0800, CRC(bc57a46a) SHA1(f60843779f49a8bd28291df3390086e54b9e3f40) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, BAD_DUMP CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) ) // not verified, taken from raisedvl
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1100_ebknight_output.pla", 0, 365, BAD_DUMP CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) ) // "
+ROM_END
+
 
 
 
@@ -4551,7 +4781,7 @@ ROM_END
   * 4 7seg LEDs, 37 other LEDs, 1-bit sound
 
   known releases:
-  - World: 2 Player Baseball
+  - World: 2 Player Baseball, published by Fonas
   - USA: 2 Player Baseball, published by Sears
   - Canada: 2 Player Baseball, published by Talbot Electronics
 
@@ -4834,7 +5064,7 @@ ROM_END
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
-  - Japan: Poker
+  - Japan: Poker, published by Gakken
   - USA: Electronic Poker, published by Entex
 
 ***************************************************************************/
@@ -4968,7 +5198,7 @@ void gpoker_state::gpoker(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 2405); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
+	BEEP(config, m_beeper, 2400); // astable multivibrator - C1 and C2 are 0.003uF, R1 and R4 are 1K, R2 and R3 are 100K
 	m_beeper->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
@@ -4996,7 +5226,7 @@ ROM_END
   * 11-digit cyan VFD display Itron FG1114B, oscillator sound
 
   known releases:
-  - Japan: Jackpot(?)
+  - Japan: Jackpot(?), published by Gakken
   - USA: Electronic Jackpot: Gin Rummy & Black Jack, published by Entex
 
 ***************************************************************************/
@@ -5117,7 +5347,7 @@ ROM_END
   * cyan VFD display Itron? CP5008A, 1-bit sound
 
   known releases:
-  - World: Invader
+  - World: Invader, published by Gakken
   - USA(1): Galaxy Invader, published by CGL
   - USA(2): Fire Away, published by Tandy
   - USA(3): Electron Blaster, published by Vanity Fair
@@ -5244,8 +5474,8 @@ ROM_END
   * cyan/red VFD display Futaba DM-25Z 2D, 1-bit sound
 
   known releases:
-  - World: Galaxy Invader 1000
-  - Japan: Invader 1000
+  - World: Galaxy Invader 1000, published by Gakken
+  - Japan: Invader 1000, published by Gakken
   - USA(1): Galaxy Invader 1000, published by CGL
   - USA(2): Cosmic 1000 Fire Away, published by Tandy
 
@@ -5370,7 +5600,7 @@ ROM_END
   * cyan/red/green VFD display, 1-bit sound
 
   known releases:
-  - World: Invader 2000
+  - World: Invader 2000, published by Gakken
   - USA(1): Galaxy Invader 10000, published by CGL
   - USA(2): Cosmic 3000 Fire Away, published by Tandy
 
@@ -5516,7 +5746,7 @@ ROM_END
   the R-165 as GMC-4, obviously on modern hardware, but fully compatible.
 
   known releases:
-  - Japan: FX-Micom R-165
+  - Japan: FX-Micom R-165, published by Gakken
   - USA: Science Fair Microcomputer Trainer, published by Tandy. Of note is
     the complete redesign of the case, adding more adjustable wiring
 
@@ -5545,7 +5775,6 @@ void fxmcr165_state::update_display()
 
 	// leds from R4-R10
 	m_display->write_row(1, m_r >> 4 & 0x7f);
-	m_display->update();
 }
 
 void fxmcr165_state::write_r(u16 data)
@@ -6131,7 +6360,7 @@ public:
 void elecbowl_state::update_display()
 {
 	// standard 7segs
-	m_display->matrix_partial(0, 4, m_r >> 4, m_o, false);
+	m_display->matrix_partial(0, 4, m_r >> 4, m_o);
 
 	// lamp muxes
 	u8 sel = m_o & 7;
@@ -6143,7 +6372,6 @@ void elecbowl_state::update_display()
 
 	// digit 4 is from mux2 Q7
 	m_display->write_row(4, m_display->read_element(6, 7) ? 6 : 0);
-	m_display->update();
 }
 
 void elecbowl_state::write_r(u16 data)
@@ -6263,10 +6491,8 @@ ROM_END
   This handheld is not a toy, read the manual for more information. In short,
   it is a device for predicting the winning chance of a gambling horserace.
 
-  known releases:
-  - USA: Thoroughbred Horse Race Analyzer
-  - China/Canada: Thoroughbred Horse Race Analyzer, published in 1994 by
-    Advanced Handicapping Technologies, Inc.
+  It was rereleased in 1994 in China/Canada by AHTI(Advanced Handicapping
+  Technologies, Inc.), on a Hitachi HD613901.
 
 ***************************************************************************/
 
@@ -6295,13 +6521,11 @@ void horseran_state::lcd_output_w(offs_t offset, u32 data)
 		return;
 
 	// update lcd segments
-	m_display->matrix_partial(0, 3, 1 << offset, data, false);
+	m_display->matrix_partial(0, 3, 1 << offset, data);
 
 	// col5-11 and col13-19 are 7segs
 	for (int i = 0; i < 2; i++)
 		m_display->write_row(3 + (offset << 1 | i), bitswap<8>(data >> (4+8*i),7,3,5,2,0,1,4,6) & 0x7f);
-
-	m_display->update();
 }
 
 void horseran_state::write_r(u16 data)
@@ -6624,9 +6848,9 @@ ROM_END
   Refer to the official manual for more information.
 
   known releases:
-  - USA: Comp IV (two versions, different case)
-  - Europe: Logic 5
-  - Japan: Pythaligoras
+  - USA: Comp IV (two versions, different case), published by MB
+  - Europe: Logic 5, published by MB
+  - Japan: Pythaligoras, published by Takara
 
 ***************************************************************************/
 
@@ -7660,8 +7884,6 @@ void mbdtower_state::update_display()
 		m_display->write_row(2, (m_o & 0x80) ? o : 0);
 		m_display->write_row(1, (m_o & 0x80) ? 0 : o);
 		m_display->write_row(0, (m_r >> 8 & 1) | (m_r >> 4 & 0xe));
-
-		m_display->update();
 	}
 	else
 	{
@@ -9230,7 +9452,7 @@ ROM_END
   * 12 lamps behind buttons, 1-bit sound
 
   known releases:
-  - World: Tandy-12: Computerized Arcade
+  - World: Tandy-12: Computerized Arcade, published by Tandy
   - Mexico: Fabuloso Fred, published by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
@@ -9411,7 +9633,7 @@ ROM_END
   tell you if it was right(green) or wrong(red). For example 1+2=3?
 
   known releases:
-  - USA(1): Monkey See
+  - USA(1): Monkey See, published by Tandy
   - USA(2): Heathcliff, published by McNaught Syndicate in 1983
 
 ***************************************************************************/
@@ -9716,13 +9938,12 @@ public:
 
 void tisr16_state::update_display()
 {
-	m_display->matrix(m_r, m_o, false);
+	m_display->matrix(m_r, m_o);
 
 	// exponent sign is from R10 O1, and R10 itself only uses segment G
 	u8 r10 = m_display->read_row(10);
 	m_display->write_row(11, r10 << 5 & 0x40);
 	m_display->write_row(10, r10 & 0x40);
-	m_display->update();
 }
 
 void tisr16_state::write_r(u16 data)
@@ -10124,9 +10345,12 @@ ROM_END
 
 /***************************************************************************
 
-  TI-2550 III/TI-1265 (both have same chip)
+  TI-2550 III, TI-1650/TI-1600, TI-1265 (they have the same chip)
   * TMS1040 MCU label TMS1043NL ZA0352 (die label 1040A, 1043A)
   * 9-digit cyan VFD display
+
+  Only the TI-2550 III has the top button row (RV, SQRT, etc).
+  TI-1600 doesn't have the memory buttons.
 
 ***************************************************************************/
 
@@ -10223,7 +10447,7 @@ INPUT_PORTS_END
 void ti25503_state::ti25503(machine_config &config)
 {
 	/* basic machine hardware */
-	TMS1000(config, m_maincpu, 250000); // approximation
+	TMS1040(config, m_maincpu, 250000); // approximation
 	m_maincpu->k().set(FUNC(ti25503_state::read_k));
 	m_maincpu->o().set(FUNC(ti25503_state::write_o));
 	m_maincpu->r().set(FUNC(ti25503_state::write_r));
@@ -10246,6 +10470,158 @@ ROM_START( ti25503 )
 	ROM_LOAD( "tms1000_ti25503_micro.pla", 0, 867, CRC(65d274ae) SHA1(33d77efe38f8b067096c643d71263bb5adde0ca9) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1000_ti25503_output.pla", 0, 365, CRC(ac43b768) SHA1(5eb19b493328c73edab73e44591afda0fbe4965f) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-5100, more (see below)
+  * TMS1070 MCU label TMS1073NL or TMC1073NL (die label 1070B, 1073)
+  * 11-digit 7seg VFD (1 custom digit)
+
+  This chip was also used in 3rd-party calculators, such as Toshiba BC-1015,
+  Panasonic JE1601U, Radio Shack EC2001, Triumph-Adler D100. The original
+  TI version did not have the 3 buttons at R4.
+
+***************************************************************************/
+
+class ti5100_state : public hh_tms1k_state
+{
+public:
+	ti5100_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void ti5100(machine_config &config);
+
+private:
+	void update_display();
+	void write_o(u16 data);
+	void write_r(u16 data);
+	u8 read_k();
+};
+
+// handlers
+
+void ti5100_state::update_display()
+{
+	// extra segment on R10
+	m_display->matrix(m_r, (m_r >> 2 & 0x100) | m_o);
+}
+
+void ti5100_state::write_r(u16 data)
+{
+	// R0-R10: input mux, select digit
+	m_r = m_inp_mux = data;
+	update_display();
+}
+
+void ti5100_state::write_o(u16 data)
+{
+	// O0-O7: digit segments
+	m_o = data;
+	update_display();
+}
+
+u8 ti5100_state::read_k()
+{
+	// K: multiplexed inputs
+	return read_inputs(11);
+}
+
+// config
+
+static INPUT_PORTS_START( ti5100 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "K" ) // constant mode
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "DP" ) // display point
+	PORT_CONFSETTING(    0x00, "F" )
+	PORT_CONFSETTING(    0x08, "2" )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // clear all?
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("EX")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("GPM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME(UTF8_CAPITAL_DELTA"%")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/CE")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("CM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("N")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R8 0x01
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // duplicate of R9 0x02
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-=")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.10") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M+=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_INSERT) PORT_NAME("M-=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("RM")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+INPUT_PORTS_END
+
+void ti5100_state::ti5100(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1070(config, m_maincpu, 250000); // approximation
+	m_maincpu->k().set(FUNC(ti5100_state::read_k));
+	m_maincpu->o().set(FUNC(ti5100_state::write_o));
+	m_maincpu->r().set(FUNC(ti5100_state::write_r));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(11, 9);
+	m_display->set_segmask(0x7ff, 0xff);
+	config.set_default_layout(layout_ti5100);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( ti5100 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tms1073nl", 0x0000, 0x0400, CRC(94185933) SHA1(d2d9432f857b8530ac399f5097c6d412f06d8814) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_ti5100_micro.pla", 0, 867, CRC(31b43e95) SHA1(6864e4c20f3affffcd3810dcefbc9484dd781547) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_ti5100_output.pla", 0, 365, CRC(11f6f0f4) SHA1(f25cf6bd284ab4614746b2e3f98d42d2585e425a) )
 ROM_END
 
 
@@ -10364,11 +10740,11 @@ static INPUT_PORTS_START( ti30 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_NAME("1/x")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tiprog )
@@ -10423,11 +10799,11 @@ static INPUT_PORTS_START( tiprog )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_PGUP) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("C/ON") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_NAME("DEC")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_NAME("OCT")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_NAME("HEX")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tibusan )
@@ -10483,11 +10859,11 @@ static INPUT_PORTS_START( tibusan )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.7") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("2nd")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_NAME("x" UTF8_POW_2"  " UTF8_SQUAREROOT"x")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_NAME("ln(x)  e" UTF8_POW_X)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 INPUT_PORTS_END
 
 void ti30_state::ti30(machine_config &config)
@@ -10627,13 +11003,13 @@ static INPUT_PORTS_START( ti1000 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
@@ -10913,14 +11289,13 @@ void lilprof78_state::write_r(u16 data)
 	// update leds state
 	u8 seg = bitswap<8>(m_o,7,4,3,2,1,0,6,5) & 0x7f;
 	u16 r = (data & 7) | (data << 1 & 0x1f0);
-	m_display->matrix(r, seg, false);
+	m_display->matrix(r, seg);
 
 	// 3rd digit A/G(equals sign) is from O7
 	m_display->write_row(3, (r != 0 && m_o & 0x80) ? 0x41 : 0);
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display->write_row(6, bitswap<8>(m_display->read_row(6),7,6,1,4,2,3,5,0));
-	m_display->update();
 }
 
 void lilprof78_state::write_o(u16 data)
@@ -10961,13 +11336,13 @@ static INPUT_PORTS_START( lilprof78 )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.3") // O3 or O4?
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Set")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Level")
 
 	PORT_START("IN.4") // O5
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
@@ -11003,6 +11378,152 @@ ROM_START( lilprof78 )
 	ROM_LOAD( "tms0980_lilprof78_output.pla", 0, 352, CRC(b7416cc0) SHA1(57891ffeaf34aafe8a915086c6d2feb78f5113af) )
 	ROM_REGION( 157, "maincpu:spla", 0 )
 	ROM_LOAD( "tms0980_common3_segment.pla", 0, 157, CRC(b5b3153f) SHA1(e0145c729695a4f962970aee0571d42cee6f5a9e) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  TI-1680, TI-2550-IV
+  * TMS1980 MCU label TMC1981NL (die label 1980A 81F)
+  * TMC0999NL 256x4 RAM (die label 0999B)
+  * 9-digit cyan VFD display(leftmost digit is custom)
+
+  The extra RAM is for scrolling back through calculations. For some reason,
+  TI-2550-IV has the same hardware, this makes it very different from II and III.
+
+***************************************************************************/
+
+class ti1680_state : public hh_tms1k_state
+{
+public:
+	ti1680_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
+		m_ram(*this, "ram")
+	{ }
+
+	required_device<tmc0999_device> m_ram;
+
+	void ti1680(machine_config &config);
+
+	virtual void update_display();
+	virtual void write_o(u16 data);
+	virtual void write_r(u16 data);
+	virtual u8 read_k();
+};
+
+// handlers
+
+void ti1680_state::update_display()
+{
+	// note the extra segments on R9 and R3
+	m_display->matrix(m_r & 0x1ff, m_o | (m_r >> 2 & 0x80) | (m_r << 5 & 0x100));
+}
+
+void ti1680_state::write_r(u16 data)
+{
+	// R8,R0,R5,R6: TMC0999 data inputs
+	// R2,R4+R1/R7: TMC0999 control pins
+	m_ram->di_w(bitswap<4>(data,8,0,5,6));
+	m_ram->adr_w(BIT(data, 2));
+	m_ram->wr_w(BIT(data, 4) & BIT(data, 7));
+	m_ram->rd_w(BIT(data, 4) & BIT(data, 1));
+
+	// R3-R8: input mux
+	m_inp_mux = data >> 3 & 0x3f;
+
+	// R0-R8: select digit
+	// R9: digit DP segment
+	m_r = data;
+	update_display();
+}
+
+void ti1680_state::write_o(u16 data)
+{
+	// O0-O6: digit segments A-G
+	m_o = bitswap<8>(data,7,1,6,5,4,3,2,0) & 0x7f;
+	update_display();
+}
+
+u8 ti1680_state::read_k()
+{
+	// K: multiplexed inputs, RAM data
+	return read_inputs(6) | m_ram->do_r();
+}
+
+// config
+
+static INPUT_PORTS_START( ti1680 )
+	PORT_START("IN.0") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("M")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("MR")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("BST")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("RPL")
+
+	PORT_START("IN.1") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_DEL) PORT_NAME("On/C") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") // -> auto_power_off
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("%")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.2") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.3") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.4") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.5") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("+/-")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+INPUT_PORTS_END
+
+void ti1680_state::ti1680(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1980(config, m_maincpu, 300000); // approximation
+	m_maincpu->k().set(FUNC(ti1680_state::read_k));
+	m_maincpu->o().set(FUNC(ti1680_state::write_o));
+	m_maincpu->r().set(FUNC(ti1680_state::write_r));
+	m_maincpu->power_off().set(FUNC(hh_tms1k_state::auto_power_off));
+
+	TMC0999(config, m_ram);
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(9, 9);
+	m_display->set_segmask(0x1fe, 0xff);
+	config.set_default_layout(layout_ti1680);
+
+	/* no sound! */
+}
+
+// roms
+
+ROM_START( ti1680 )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1981nl", 0x0000, 0x1000, CRC(8467c5a1) SHA1(d3a48f6c9dd41e2dc0e0cfafa84dac8d21aacaa3) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_ti1680_output.pla", 0, 525, CRC(188af340) SHA1(eaf707266dde0d708870ef5d8f985ce88d35b43e) )
 ROM_END
 
 
@@ -11097,8 +11618,8 @@ static INPUT_PORTS_START( dataman )
 
 	// note: even though power buttons are on the matrix, they are not CPU-controlled
 	PORT_START("IN.5") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_U) PORT_NAME("On/User Entry") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F2) PORT_NAME("Off") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, false)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("?")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Electro Flash")
 INPUT_PORTS_END
@@ -11183,7 +11704,7 @@ static INPUT_PORTS_START( mathmarv )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Review")
 
 	PORT_MODIFY("IN.5") // Vss!
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F1) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, true)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
 INPUT_PORTS_END
@@ -11443,7 +11964,7 @@ void tithermos_state::tithermos(machine_config &config)
 	m_maincpu->r().set(FUNC(tithermos_state::write_r));
 	m_maincpu->o().set(FUNC(tithermos_state::write_o));
 
-	CLOCK(config, "ac_line", 60).signal_handler().set_nop();
+	CLOCK(config, "ac_line", 60);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);
@@ -11475,13 +11996,110 @@ ROM_END
 
 /***************************************************************************
 
+  Tiger Sub Wars (model 7-490)
+  * PCB label CSG201A(main), CSG201B(leds)
+  * TMS1200N2LL MP3352 (die label 1000C, MP3352)
+  * 4-digit 7seg LED display + 55 other LEDs, 1-bit sound
+
+  Tiger/Yeno also published an LCD handheld called Sub Wars, it's not related.
+
+  This handheld was modified and used as a prop in the 1981 movie Escape from
+  New York, Snake Plissken uses it as a homing device.
+
+***************************************************************************/
+
+class subwars_state : public hh_tms1k_state
+{
+public:
+	subwars_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void update_display();
+	void write_r(u16 data);
+	void write_o(u16 data);
+	void subwars(machine_config &config);
+};
+
+// handlers
+
+void subwars_state::update_display()
+{
+	m_display->matrix(m_r, m_o);
+}
+
+void subwars_state::write_r(u16 data)
+{
+	// R0-R3: digit select
+	// R4-R12: led select
+	m_r = data;
+	update_display();
+}
+
+void subwars_state::write_o(u16 data)
+{
+	// O0-O6: led data
+	m_o = data;
+	update_display();
+
+	// O7: speaker out
+	m_speaker->level_w(BIT(data, 7));
+}
+
+// config
+
+static INPUT_PORTS_START( subwars )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+void subwars_state::subwars(machine_config &config)
+{
+	/* basic machine hardware */
+	TMS1200(config, m_maincpu, 550000); // approximation - RC osc. R=24K, C=47pF
+	m_maincpu->k().set_ioport("IN.0");
+	m_maincpu->r().set(FUNC(subwars_state::write_r));
+	m_maincpu->o().set(FUNC(subwars_state::write_o));
+
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(13, 7);
+	m_display->set_segmask(0xf, 0x7f);
+	config.set_default_layout(layout_subwars);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( subwars )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp3352", 0x0000, 0x0400, CRC(5dece1e4) SHA1(65ef77b063c94ff4b6c83dace54ea2f75bd3d6a9) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common1_micro.pla", 0, 867, CRC(4becec19) SHA1(3c8a9be0f00c88c81f378b76886c39b10304f330) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_subwars_output.pla", 0, 365, CRC(372b9bbc) SHA1(06a875e114b7757c6f4f1727416d1739ebe60931) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
   Tiger Electronics Copy Cat (model 7-520)
   * PCB label CC REV B
   * TMS1000 MCU, label 69-11513 MP0919 (die label MP0919)
   * 4 LEDs, 1-bit sound
 
   known releases:
-  - World: Copy Cat
+  - World: Copy Cat, published by Tiger
   - USA(1): Follow Me, published by Sears
   - USA(2): Electronic Repeat, published by Tandy
 
@@ -11688,7 +12306,7 @@ ROM_END
   * 4 LEDs, 1-bit sound
 
   known releases:
-  - World: Ditto
+  - World: Ditto, published by Tiger
   - USA: Electronic Pocket Repeat (model 60-2152/60-2468A), published by Tandy
     note: 1996 model 60-2482 MCU is a Z8, and is assumed to be a clone of Tiger Copycat Jr.
 
@@ -11768,7 +12386,7 @@ ROM_END
 
 /***************************************************************************
 
-  Tiger 7 in 1 Sports Stadium
+  Tiger 7 in 1 Sports Stadium (model 7-555)
   * TMS1400 MP7304 (die label TMS1400 MP7304A)
   * 2x2-digit 7seg LED display + 39 other LEDs, 1-bit sound
 
@@ -11777,7 +12395,7 @@ ROM_END
   MAME external artwork is needed for the switchable overlays.
 
   known releases:
-  - World: 7 in 1 Sports Stadium
+  - World: 7 in 1 Sports Stadium, published by Tiger
   - USA: 7 in 1 Sports, published by Sears
 
 ***************************************************************************/
@@ -11904,9 +12522,9 @@ ROM_END
   * 2-digit 7seg display, 46 other leds, 1-bit sound
 
   known releases:
-  - USA: Break Up
-  - Japan: Block Attack
-  - UK: Break-In
+  - USA: Break Up, published by Tomy
+  - Japan: Block Attack, published by Tomy
+  - UK: Break-In, published by Tomy
 
   led translation table: led zz from game PCB = MAME y.x:
 
@@ -11982,16 +12600,14 @@ void tbreakup_state::set_clock()
 void tbreakup_state::update_display()
 {
 	// 7seg leds from R0,R1 and O0-O6
-	m_display->matrix_partial(0, 2, m_r, m_o & 0x7f, false);
+	m_display->matrix_partial(0, 2, m_r, m_o & 0x7f);
 
 	// 22 round leds from O2-O7 and expander port 7
-	m_display->matrix_partial(2, 6, m_o >> 2, m_exp_port[6], false);
+	m_display->matrix_partial(2, 6, m_o >> 2, m_exp_port[6]);
 
 	// 24 rectangular leds from expander ports 1-6 (not strobed)
 	for (int y = 0; y < 6; y++)
 		m_display->write_row(y+8, m_exp_port[y]);
-
-	m_display->update();
 }
 
 void tbreakup_state::expander_w(offs_t offset, u8 data)
@@ -12107,9 +12723,9 @@ ROM_END
   * 3 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
   known releases:
-  - USA: Power House Pinball
-  - Japan: Pinball
-  - Europe: Flipper
+  - USA: Power House Pinball, published by Tomy
+  - Japan: Pinball, published by Tomy
+  - Europe: Flipper, published by Tomy
 
   led translation table: led zz from game PCB = MAME y.x:
 
@@ -12565,7 +13181,8 @@ COMP( 1980, mathmagi,   0,         0, mathmagi,  mathmagi,  mathmagi_state,  emp
 
 CONS( 1979, bcheetah,   0,         0, bcheetah,  bcheetah,  bcheetah_state,  empty_init, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 
-COMP( 1977, cmulti8,    0,         0, cmulti8,   cmulti8,   cmulti8_state,   empty_init, "Canon", "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, palmf31,    0,         0, palmf31,   palmf31,   palmf31_state,   empty_init, "Canon", "Palmtronic F-31", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, palmmd8,    0,         0, palmmd8,   palmmd8,   palmmd8_state,   empty_init, "Canon", "Palmtronic MD-8 (Multi 8)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 CONS( 1978, amaztron,   0,         0, amaztron,  amaztron,  amaztron_state,  empty_init, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_CONTROLS ) // ***
 COMP( 1979, zodiac,     0,         0, zodiac,    zodiac,    zodiac_state,    empty_init, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -12594,7 +13211,8 @@ CONS( 1979, esbattle,   0,         0, esbattle,  esbattle,  esbattle_state,  emp
 CONS( 1980, einvader,   0,         0, einvader,  einvader,  einvader_state,  empty_init, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, efootb4 ,   0,         0, efootb4,   efootb4,   efootb4_state,   empty_init, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,   0,         0, ebaskb2,   ebaskb2,   ebaskb2_state,   empty_init, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1980, raisedvl,   0,         0, raisedvl,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Raise The Devil Pinball", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1982, ebknight,   0,         0, ebknight,  raisedvl,  raisedvl_state,  empty_init, "Entex", "Black Knight Pinball (Entex)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 CONS( 1979, f2pbball,   0,         0, f2pbball,  f2pbball,  f2pbball_state,  empty_init, "Fonas", "2 Player Baseball (Fonas)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, f3in1,      0,         0, f3in1,     f3in1,     f3in1_state,     empty_init, "Fonas", "3 in 1: Football, Basketball, Soccer", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -12653,6 +13271,7 @@ COMP( 1975, ti1250,     0,         0, ti1250,    ti1250,    ti1250_state,    emp
 COMP( 1976, ti125076,   ti1250,    0, ti1270,    ti1250,    ti1250_state,    empty_init, "Texas Instruments", "TI-1250 (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti1270,     0,         0, ti1270,    ti1270,    ti1250_state,    empty_init, "Texas Instruments", "TI-1270", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti25503,    0,         0, ti25503,   ti25503,   ti25503_state,   empty_init, "Texas Instruments", "TI-2550 III", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti5100,     0,         0, ti5100,    ti5100,    ti5100_state,    empty_init, "Texas Instruments", "TI-5100", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, ti30,       0,         0, ti30,      ti30,      ti30_state,      empty_init, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, tibusan,    0,         0, ti30,      tibusan,   ti30_state,      empty_init, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, tiprog,     0,         0, ti30,      tiprog,    ti30_state,      empty_init, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -12660,11 +13279,13 @@ COMP( 1977, ti1000,     0,         0, ti1000,    ti1000,    ti1000_state,    emp
 COMP( 1977, wizatron,   0,         0, wizatron,  wizatron,  wizatron_state,  empty_init, "Texas Instruments", "Wiz-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1976, lilprof,    0,         0, lilprof,   lilprof,   lilprof_state,   empty_init, "Texas Instruments", "Little Professor (1976 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1978, lilprof78,  lilprof,   0, lilprof78, lilprof78, lilprof78_state, empty_init, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, ti1680,     0,         0, ti1680,    ti1680,    ti1680_state,    empty_init, "Texas Instruments", "TI-1680", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, dataman,    0,         0, dataman,   dataman,   dataman_state,   empty_init, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1980, mathmarv,   0,         0, mathmarv,  mathmarv,  mathmarv_state,  empty_init, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, timaze,     0,         0, timaze,    timaze,    timaze_state,    empty_init, "Texas Instruments", "unknown electronic maze game (patent)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-CONS( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+SYST( 1979, tithermos,  0,         0, tithermos, tithermos, tithermos_state, empty_init, "Texas Instruments", "Electronic Digital Thermostat", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
+CONS( 1979, subwars,    0,         0, subwars,   subwars,   subwars_state,   empty_init, "Tiger Electronics", "Sub Wars (LED version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, copycat,    0,         0, copycat,   copycat,   copycat_state,   empty_init, "Tiger Electronics", "Copy Cat (model 7-520)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1989, copycatm2,  copycat,   0, copycatm2, copycatm2, copycatm2_state, empty_init, "Tiger Electronics", "Copy Cat (model 7-522)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1981, ditto,      0,         0, ditto,     ditto,     ditto_state,     empty_init, "Tiger Electronics", "Ditto", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -12678,4 +13299,4 @@ CONS( 1980, ssports4,   0,         0, ssports4,  ssports4,  ssports4_state,  emp
 CONS( 1983, xl25,       0,         0, xl25,      xl25,      xl25_state,      empty_init, "Vulcan Electronics", "XL 25", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
-// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
+// with other, unemulatable, things eg. game board/pieces, book, playing cards, pen & paper, etc.

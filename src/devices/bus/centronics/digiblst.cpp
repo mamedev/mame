@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
 /*
- * digiblst.c
+ * digiblst.cpp
  *
  *  Created on: 23/08/2014
  */
@@ -11,7 +11,7 @@
 #include "speaker.h"
 
 //**************************************************************************
-//  COVOX DEVICE
+//  DIGIBLASTER DEVICE
 //**************************************************************************
 
 // device type definition
@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(CENTRONICS_DIGIBLASTER, centronics_digiblaster_device, "digib
     IMPLEMENTATION
 ***************************************************************************/
 //-------------------------------------------------
-//  centronics_covox_device - constructor
+//  centronics_digiblaster_device - constructor
 //-------------------------------------------------
 
 centronics_digiblaster_device::centronics_digiblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

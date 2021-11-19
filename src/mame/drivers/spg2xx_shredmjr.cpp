@@ -243,7 +243,7 @@ CONS( 2007, shredmjr,    0,        0,        shredmjr,     taikeegr, shredmjr_ga
 // doesn't have a Senario logo ingame, but does on box.  unique song selection
 CONS( 200?, guitarst,    0,        0,        taikeegr,     taikeegr, shredmjr_game_state, init_taikeegr, "Senario", "Guitar Star (US, Senario, NTSC)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
 
-// This one has the same songs as 'rockstar' but different game style / presentation. 
+// This one has the same songs as 'rockstar' but different game style / presentation.
 // Unit found in Ireland "imported by Cathay Product Sourcing Ltd." on the box, with address in Ireland
 // ITEM #01109 on instruction sheet, no manufacturer named on either box or instructions
 CONS( 200?, guitarstp,   0,        0,        taikeegrp,    guitarstp,shredmjr_game_state, init_taikeegr, "<unknown>", "Guitar Star (Europe, PAL)", MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^

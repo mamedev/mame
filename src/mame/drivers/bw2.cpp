@@ -495,9 +495,11 @@ WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
 	}
 }
 
-FLOPPY_FORMATS_MEMBER( bw2_state::floppy_formats )
-	FLOPPY_BW2_FORMAT
-FLOPPY_FORMATS_END
+void bw2_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW2_FORMAT);
+}
 
 static void bw2_floppies(device_slot_interface &device)
 {

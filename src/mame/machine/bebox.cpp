@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods, R. Belmont
 /***************************************************************************
 
-    machine/bebox.c
+    machine/bebox.cpp
 
     BeBox
 
@@ -206,15 +206,15 @@ void bebox_state::bebox_crossproc_interrupts_w(offs_t offset, uint64_t data, uin
 		{ 0x08000000, 0, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ },
 		{ 0x04000000, 1, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ }
 	};
-	int i, line;
 	uint32_t old_crossproc_interrupts = m_crossproc_interrupts;
 
 	bebox_mbreg32_w(&m_crossproc_interrupts, data, mem_mask);
 
-	for (i = 0; i < ARRAY_LENGTH(crossproc_map); i++)
+	for (int i = 0; i < std::size(crossproc_map); i++)
 	{
 		if ((old_crossproc_interrupts ^ m_crossproc_interrupts) & crossproc_map[i].mask)
 		{
+			int line;
 			if (m_crossproc_interrupts & crossproc_map[i].mask)
 				line = crossproc_map[i].active_high ? ASSERT_LINE : CLEAR_LINE;
 			else
@@ -306,7 +306,7 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 	if (LOG_INTERRUPTS)
 	{
 		/* make sure that we don't shoot ourself in the foot */
-		if ((interrupt_bit >= ARRAY_LENGTH(interrupt_names)) || !interrupt_names[interrupt_bit])
+		if ((interrupt_bit >= std::size(interrupt_names)) || !interrupt_names[interrupt_bit])
 			throw emu_fatalerror("bebox_state::bebox_set_irq_bit: Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
@@ -662,8 +662,8 @@ void bebox_state::scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	}
 }
 
+// the 2 following methods are legacy code, currently unused
 
-#ifdef UNUSED_LEGACY_CODE
 uint32_t bebox_state::scsi53c810_pci_read(int function, int offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
@@ -717,14 +717,13 @@ void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, 
 						address_space &space = m_ppc[0]->space(AS_PROGRAM);
 
 						addr = (m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
-						space.install_readwrite_handler(addr, addr + 0xFF, read64_delegate(FUNC(bebox_state::scsi53c810_r),this), write64_delegate(FUNC(bebox_state::scsi53c810_w),this));
+						space.install_readwrite_handler(addr, addr + 0xFF, read64s_delegate(*this, FUNC(bebox_state::scsi53c810_r)), write64s_delegate(*this, FUNC(bebox_state::scsi53c810_w)));
 					}
 				}
 				break;
 		}
 	}
 }
-#endif
 
 
 void bebox_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -758,6 +757,7 @@ void bebox_state::machine_reset()
 
 void bebox_state::machine_start()
 {
+	m_interrupts = 0;
 }
 
 void bebox_state::init_bebox()

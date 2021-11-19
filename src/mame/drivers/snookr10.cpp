@@ -37,6 +37,7 @@
   PROMs:  1x 82S147, AM27S29, or similar. (512 bytes).
 
   Clock:  1x Crystal: 16MHz.
+          1x Resonator: 1MHz
 
   Other:  1x 28x2 edge connector.
           1x 15-pins connector.
@@ -626,8 +627,6 @@
 #include "snookr10.lh"
 
 
-#define MASTER_CLOCK    XTAL(16'000'000)
-
 /**********************
 * Read/Write Handlers *
 *   - Input Ports -   *
@@ -1043,7 +1042,7 @@ GFXDECODE_END
 void snookr10_state::snookr10(machine_config &config)
 {
 	/* basic machine hardware */
-	M65SC02(config, m_maincpu, MASTER_CLOCK/8);    /* 2 MHz (1.999 MHz measured) */
+	M65SC02(config, m_maincpu, XTAL(16'000'000)/8);    /* 2 MHz (1.999 MHz measured) */
 	m_maincpu->set_addrmap(AS_PROGRAM, &snookr10_state::snookr10_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1064,7 +1063,7 @@ void snookr10_state::snookr10(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, "oki", MASTER_CLOCK/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.8);   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.8);   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 }
 
 void snookr10_state::apple10(machine_config &config)

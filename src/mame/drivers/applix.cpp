@@ -133,7 +133,7 @@ private:
 	u16 fdc_stat_r(offs_t offset);
 	void fdc_data_w(u16 data);
 	void fdc_cmd_w(u16 data);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 	u8 internal_data_read(offs_t offset);
 	void internal_data_write(offs_t offset, u8 data);
 	u8 p1_read();
@@ -462,7 +462,7 @@ void applix_state::main_mem(address_map &map)
 	map(0x500000, 0x51ffff).rom().region("maincpu", 0);
 	map(0x600000, 0x60007f).w(FUNC(applix_state::palette_w));
 	map(0x600080, 0x6000ff).w(FUNC(applix_state::dac_latch_w));
-	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nibble; video base, low nibble) (odd)
+	map(0x600100, 0x60017f).w(FUNC(applix_state::video_latch_w)); //video latch (=border colour, high nybble; video base, low nybble) (odd)
 	map(0x600180, 0x6001ff).w(FUNC(applix_state::analog_latch_w));
 	map(0x700000, 0x700007).mirror(0x78).rw("scc", FUNC(scc8530_device::ab_dc_r), FUNC(scc8530_device::ab_dc_w)).umask16(0xff00).cswidth(16);
 	map(0x700080, 0x7000ff).r(FUNC(applix_state::applix_inputs_r));
@@ -748,9 +748,11 @@ void applix_state::machine_reset()
 	m_maincpu->reset();
 }
 
-FLOPPY_FORMATS_MEMBER( applix_state::floppy_formats )
-	FLOPPY_APPLIX_FORMAT
-FLOPPY_FORMATS_END
+void applix_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_APPLIX_FORMAT);
+}
 
 static void applix_floppies(device_slot_interface &device)
 {
@@ -785,6 +787,8 @@ void applix_state::applix_palette(palette_device &palette) const
 
 void applix_state::machine_start()
 {
+	std::fill(std::begin(m_palette_latch), std::end(m_palette_latch), 0);
+
 	save_item(NAME(m_video_latch));
 	save_item(NAME(m_pa));
 	save_item(NAME(m_palette_latch));
@@ -917,7 +921,7 @@ void applix_state::applix(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(applix_state::crtc_update_border));
 	m_crtc->out_vsync_callback().set(FUNC(applix_state::vsync_w));
 
-	VIA6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
+	MOS6522(config, m_via, 30_MHz_XTAL / 4 / 10); // VIA uses 68000 E clock
 	m_via->readpb_handler().set(FUNC(applix_state::applix_pb_r));
 	// in CB1 kbd clk
 	// in CA2 vsync

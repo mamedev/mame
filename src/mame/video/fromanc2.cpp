@@ -327,6 +327,12 @@ VIDEO_START_MEMBER(fromanc2_state,fromancr)
 	save_item(NAME(m_scrolly[1]));
 	save_item(NAME(m_gfxbank[0]));
 	save_item(NAME(m_gfxbank[1]));
+
+	for (int i = 0; i < 2; i++)
+	{
+		std::fill(std::begin(m_scrollx[i]), std::end(m_scrollx[i]), 0 );
+		std::fill(std::begin(m_scrolly[i]), std::end(m_scrolly[i]), 0 );
+	}
 }
 
 VIDEO_START_MEMBER(fromanc2_state,fromanc4)

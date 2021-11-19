@@ -7,7 +7,7 @@ Info from Atariage and Atarimania
 
 The scharger cartridge must be loaded before being able to load a tape. Press Play when asked.
 
-e.g. mame64 a2600 scharger -cass commumut
+e.g. mame a2600 scharger -cass commumut
 
 -->
 

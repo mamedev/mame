@@ -281,8 +281,8 @@ uint16_t hk68v10_state::bootvect_r(offs_t offset){
 
 void hk68v10_state::bootvect_w(offs_t offset, uint16_t data, uint16_t mem_mask){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
@@ -378,6 +378,7 @@ ROM_START (hk68v10)
 	 *  'bw'       Boot from Winchester
 	 *  'bf'       Boot from floppy (MIO, SBX-FDIO)
 	 *  'bsf'      Boot from floppy (SCSI)
+	 *  'x'        Display registers
 	 *
 	 * Setup sequence channel B
 	 * :scc B Reg 04 <- 4c x16 clock, 2 stop bits, no parity

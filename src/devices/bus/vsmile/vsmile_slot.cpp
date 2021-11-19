@@ -7,7 +7,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "vsmile_slot.h"
 
@@ -122,7 +121,7 @@ static int vsmile_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -140,7 +139,7 @@ image_init_result vsmile_cart_slot_device::call_load()
 		uint32_t size = loaded_through_softlist() ? get_software_region_length("rom") : length();
 		if (size > 0x1000000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 16MB");
+			seterror(image_error::INVALIDIMAGE, "Attempted loading a cart larger than 16MB");
 			return image_init_result::FAIL;
 		}
 

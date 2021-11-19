@@ -299,9 +299,11 @@ static void abc_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-FLOPPY_FORMATS_MEMBER( luxor_55_10828_device::floppy_formats )
-	FLOPPY_ABC800_FORMAT
-FLOPPY_FORMATS_END
+void luxor_55_10828_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ABC800_FORMAT);
+}
 
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {

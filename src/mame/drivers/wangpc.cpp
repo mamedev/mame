@@ -186,8 +186,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
 
@@ -1100,10 +1098,6 @@ static void wangpc_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( wangpc_state::floppy_formats )
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
 WRITE_LINE_MEMBER( wangpc_state::fdc_irq )
 {
 	if (LOG) logerror("FDC INT %u\n", state);
@@ -1331,8 +1325,8 @@ void wangpc_state::wangpc(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, false, false);
 	m_fdc->intrq_wr_callback().set(FUNC(wangpc_state::fdc_irq));
 	m_fdc->drq_wr_callback().set(FUNC(wangpc_state::fdc_drq));
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", wangpc_floppies, "525dd", wangpc_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", wangpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", wangpc_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->set_data_input_buffer(m_cent_data_in);

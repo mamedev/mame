@@ -115,7 +115,7 @@ uint16_t offtwall_state::bankrom_r(address_space &space, offs_t offset)
 			return us >> 16;
 	}
 
-	return m_bankrom_base[0x38000 | ((m_bank_offset + offset) & 0x3fff)];
+	return m_bankrom_base[(0x38000 / 2) | ((m_bank_offset + offset) & 0x3fff)];
 }
 
 

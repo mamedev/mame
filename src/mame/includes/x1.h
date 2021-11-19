@@ -25,7 +25,7 @@
 #include "machine/z80dma.h"
 #include "machine/z80sio.h"
 #include "sound/ay8910.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/mc6845.h"
 
 #include "formats/x1_tap.h"
@@ -78,7 +78,7 @@ public:
 		m_kanji_rom(*this, "kanji")
 	{ }
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	required_device<z80_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

@@ -108,9 +108,11 @@ static void swiftdisc_floppies(device_slot_interface &device)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(spectrum_swiftdisc_device::floppy_formats)
-	FLOPPY_SWD_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_swiftdisc_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_SWD_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( swiftdisc )

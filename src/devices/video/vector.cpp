@@ -50,7 +50,8 @@
 
 #define VECTOR_WIDTH_DENOM 512
 
-#define MAX_POINTS 10000
+// 20000 is needed for mhavoc (see MT 06668) 10000 is enough for other games
+#define MAX_POINTS 20000
 
 float vector_options::s_flicker = 0.0f;
 float vector_options::s_beam_width_min = 0.0f;
@@ -107,7 +108,7 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
 
-	intensity = std::max(0, std::min(255, intensity));
+	intensity = std::clamp(intensity, 0, 255);
 
 	m_min_intensity = intensity > 0 ? std::min(m_min_intensity, intensity) : m_min_intensity;
 	m_max_intensity = intensity > 0 ? std::max(m_max_intensity, intensity) : m_max_intensity;
@@ -118,7 +119,7 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 
 		intensity -= (int)(intensity * random * vector_options::s_flicker);
 
-		intensity = std::max(0, std::min(255, intensity));
+		intensity = std::clamp(intensity, 0, 255);
 	}
 
 	newpoint = &m_vector_list[m_vector_index];

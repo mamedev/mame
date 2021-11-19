@@ -7,8 +7,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> redbaron_sound_device
-
 class redbaron_sound_device : public device_t, public device_sound_interface
 {
 public:
@@ -24,26 +22,28 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
 private:
+	[[maybe_unused]] void pokey_w(offs_t offset, uint8_t data);
+
 	std::unique_ptr<int16_t[]> m_vol_lookup;
 
 	int16_t m_vol_crash[16];
 
 	sound_stream *m_channel;
-	int m_latch;
-	int m_poly_counter;
-	int m_poly_shift;
+	uint8_t m_latch;
+	int32_t m_poly_counter;
+	uint16_t m_poly_shift;
 
-	int m_filter_counter;
+	int32_t m_filter_counter;
 
-	int m_crash_amp;
-	int m_shot_amp;
-	int m_shot_amp_counter;
+	uint8_t m_crash_amp;
+	uint16_t m_shot_amp;
+	int32_t m_shot_amp_counter;
 
-	int m_squeal_amp;
-	int m_squeal_amp_counter;
-	int m_squeal_off_counter;
-	int m_squeal_on_counter;
-	int m_squeal_out;
+	uint16_t m_squeal_amp;
+	int32_t m_squeal_amp_counter;
+	int32_t m_squeal_off_counter;
+	int32_t m_squeal_on_counter;
+	uint8_t m_squeal_out;
 };
 
 DECLARE_DEVICE_TYPE(REDBARON, redbaron_sound_device)

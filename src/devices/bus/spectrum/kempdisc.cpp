@@ -57,14 +57,6 @@ static void kempdisc_floppies(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
-//-------------------------------------------------
-
-FLOPPY_FORMATS_MEMBER(spectrum_kempdisc_device::floppy_formats)
-	FLOPPY_DSK_FORMAT
-FLOPPY_FORMATS_END
-
-//-------------------------------------------------
 //  ROM( kempdisc )
 //-------------------------------------------------
 
@@ -95,10 +87,10 @@ void spectrum_kempdisc_device::device_add_mconfig(machine_config &config)
 {
 	WD1770(config, m_fdc, 16_MHz_XTAL / 2);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", kempdisc_floppies, "525qd", spectrum_kempdisc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", kempdisc_floppies, "525qd", spectrum_kempdisc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:2", kempdisc_floppies, nullptr, spectrum_kempdisc_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:3", kempdisc_floppies, nullptr, spectrum_kempdisc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", kempdisc_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", kempdisc_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", kempdisc_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", kempdisc_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// passthru
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);

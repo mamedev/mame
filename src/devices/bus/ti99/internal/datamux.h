@@ -33,7 +33,7 @@
 #define TI99_SOUNDCHIP_TAG   "soundchip"
 #define TI99_VDP_TAG         "vdp"
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 /*
     Main class
@@ -147,7 +147,7 @@ private:
 
 /******************************************************************************/
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal
 
 DECLARE_DEVICE_TYPE_NS(TI99_DATAMUX, bus::ti99::internal, datamux_device)
 

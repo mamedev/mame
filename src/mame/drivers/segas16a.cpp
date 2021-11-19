@@ -490,7 +490,9 @@ void segas16a_state::mcu_io_w(offs_t offset, uint8_t data)
 
 		// access text RAM
 		case 1:
-			if (offset >= 0x8000 && offset < 0x9000)
+			if (offset < 0x8000)
+				m_maincpu->space(AS_PROGRAM).write_byte(0x400001 ^ (offset & 0x7fff), data);
+			else if (offset < 0x9000)
 				m_maincpu->space(AS_PROGRAM).write_byte(0x410001 ^ (offset & 0xfff), data);
 			else
 				logerror("%03X: MCU movx write mode %02X offset %04X = %02X\n", m_mcu->pc(), m_mcu_control, offset, data);
@@ -540,8 +542,11 @@ uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset)
 
 		// access text RAM
 		case 1:
-			if (offset >= 0x8000 && offset < 0x9000)
+			if (offset < 0x8000)
+				return m_maincpu->space(AS_PROGRAM).read_byte(0x400001 ^ (offset & 0x7fff));
+			else if (offset < 0x9000)
 				return m_maincpu->space(AS_PROGRAM).read_byte(0x410001 ^ (offset & 0xfff));
+
 			logerror("%03X: MCU movx read mode %02X offset %04X\n", m_mcu->pc(), m_mcu_control, offset);
 			return 0xff;
 
@@ -1527,8 +1532,8 @@ static INPUT_PORTS_START( quartet )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -1537,8 +1542,8 @@ static INPUT_PORTS_START( quartet )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )
 
@@ -1547,8 +1552,8 @@ static INPUT_PORTS_START( quartet )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE3 )
 
@@ -1557,8 +1562,8 @@ static INPUT_PORTS_START( quartet )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
@@ -2051,6 +2056,9 @@ void segas16a_state::system16a_i8751(machine_config &config)
 	m_mcu->port_out_cb<1>().set(FUNC(segas16a_state::mcu_control_w));
 
 	m_screen->screen_vblank().set(FUNC(segas16a_state::i8751_main_cpu_vblank_w));
+
+	// prevent glitchy background scroll on quartet stage 18
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 void segas16a_state::system16a_no7751(machine_config &config)
@@ -2063,7 +2071,7 @@ void segas16a_state::system16a_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void segas16a_state::system16a_no7751p(machine_config &config)
@@ -2082,9 +2090,8 @@ void segas16a_state::system16a_i8751_no7751(machine_config &config)
     system16a_i8751(config);
     config.device_remove("n7751");
     config.device_remove("dac");
-    config.device_remove("vref");
 
-    YM2151(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+    YM2151(config.replace(), "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 */
 
@@ -2097,7 +2104,7 @@ void segas16a_state::system16a_fd1089a_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
@@ -2109,7 +2116,7 @@ void segas16a_state::system16a_fd1089b_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 void segas16a_state::system16a_fd1094_no7751(machine_config &config)
@@ -2121,7 +2128,7 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 	config.device_remove("dac");
 
 	YM2151(config.replace(), m_ymsnd, 4000000);
-	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 1.0);
+	m_ymsnd->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 

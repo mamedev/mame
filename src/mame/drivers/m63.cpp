@@ -129,6 +129,8 @@ Dip locations verified for:
 #include "speaker.h"
 #include "tilemap.h"
 
+namespace {
+
 class m63_state : public driver_device
 {
 public:
@@ -156,6 +158,11 @@ public:
 
 	void init_wilytowr();
 	void init_fghtbskt();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_spriteram;
@@ -210,9 +217,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_MACHINE_START(m63);
-	DECLARE_MACHINE_RESET(m63);
-	DECLARE_VIDEO_START(m63);
 	void m63_palette(palette_device &palette) const;
 	uint32_t screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
@@ -333,7 +337,7 @@ TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
 	tileinfo.set(0, code, 0, m_fg_flag);
 }
 
-VIDEO_START_MEMBER(m63_state,m63)
+void m63_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m63_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -726,7 +730,7 @@ INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
 	m_sound_irq = 1;
 }
 
-MACHINE_START_MEMBER(m63_state,m63)
+void m63_state::machine_start()
 {
 	save_item(NAME(m_pal_bank));
 	save_item(NAME(m_fg_flag));
@@ -739,7 +743,7 @@ MACHINE_START_MEMBER(m63_state,m63)
 	save_item(NAME(m_p2));
 }
 
-MACHINE_RESET_MEMBER(m63_state,m63)
+void m63_state::machine_reset()
 {
 	m_pal_bank = 0;
 	m_fg_flag = 0;
@@ -778,9 +782,6 @@ void m63_state::m63(machine_config &config)
 	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60));
 
-	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
-	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -792,8 +793,6 @@ void m63_state::m63(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_m63);
 	PALETTE(config, m_palette, FUNC(m63_state::m63_palette), 256+4);
-
-	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center(); /* ????? */
@@ -825,10 +824,10 @@ void m63_state::fghtbskt(machine_config &config)
 	I8039(config, m_soundcpu, XTAL(12'000'000)/4); /* ????? */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &m63_state::i8039_map);
 	m_soundcpu->set_addrmap(AS_IO, &m63_state::i8039_port_map);
+	m_soundcpu->p1_out_cb().set(FUNC(m63_state::p1_w));
+	m_soundcpu->p2_out_cb().set(FUNC(m63_state::p2_w));
+	m_soundcpu->t1_in_cb().set(FUNC(m63_state::irq_r));
 	m_soundcpu->set_periodic_int(FUNC(m63_state::snd_irq), attotime::from_hz(60/2));
-
-	MCFG_MACHINE_START_OVERRIDE(m63_state,m63)
-	MCFG_MACHINE_RESET_OVERRIDE(m63_state,m63)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -841,8 +840,6 @@ void m63_state::fghtbskt(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fghtbskt);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
-
-	MCFG_VIDEO_START_OVERRIDE(m63_state,m63)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1040,6 +1037,9 @@ void m63_state::init_fghtbskt()
 {
 	m_sy_offset = 240;
 }
+
+} // Anonymous namespace
+
 
 GAME( 1984, wilytowr, 0,        m63,      wilytowr, m63_state, init_wilytowr, ROT180, "Irem",                    "Wily Tower", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, atomboy,  wilytowr, atomboy,  wilytowr, m63_state, init_wilytowr, ROT180, "Irem (Memetron license)", "Atomic Boy (revision B)", MACHINE_SUPPORTS_SAVE )

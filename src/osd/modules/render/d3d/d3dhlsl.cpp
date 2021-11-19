@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "drivenum.h"
 #include "render.h"
+#include "rendlay.h"
 #include "rendutil.h"
 #include "emuopts.h"
 #include "aviio.h"
@@ -25,8 +26,12 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
+
 #include <array>
+#include <locale>
+#include <sstream>
 #include <utility>
+
 
 //============================================================
 //  PROTOTYPES
@@ -352,21 +357,21 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 	}
 
 	emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr = machine->video().open_next(file, "png");
-	if (filerr != osd_file::error::NONE)
+	std::error_condition const filerr = machine->video().open_next(file, "png");
+	if (filerr)
 		return;
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
 	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().type.fullname());
 	util::png_info pnginfo;
-	pnginfo.add_text("Software", text1.c_str());
-	pnginfo.add_text("System", text2.c_str());
+	pnginfo.add_text("Software", text1);
+	pnginfo.add_text("System", text2);
 
 	// now do the actual work
-	util::png_error error = util::png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
-	if (error != util::png_error::NONE)
-		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", std::underlying_type_t<util::png_error>(error));
+	std::error_condition const error = util::png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
+	if (error)
+		osd_printf_error("Error generating PNG for HLSL snapshot (%s:%d %s)\n", error.category().name(), error.value(), error.message());
 
 	result = snap_copy_target->UnlockRect();
 	if (FAILED(result))
@@ -721,7 +726,7 @@ int shaders::create_resources()
 		osd_printf_verbose("Direct3D: Error %08lX during device SetRenderTarget call\n", result);
 
 	emu_file file(machine->options().art_path(), OPEN_FLAG_READ);
-	if (file.open(options->shadow_mask_texture) == osd_file::error::NONE)
+	if (!file.open(options->shadow_mask_texture))
 	{
 		render_load_png(shadow_bitmap, file);
 		file.close();
@@ -746,7 +751,7 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
-	if (file.open(options->lut_texture) == osd_file::error::NONE)
+	if (!file.open(options->lut_texture))
 	{
 		render_load_png(lut_bitmap, file);
 		file.close();
@@ -769,7 +774,7 @@ int shaders::create_resources()
 		d3d->get_texture_manager()->m_texture_list.push_back(std::move(tex));
 	}
 
-	if (file.open(options->ui_lut_texture) == osd_file::error::NONE)
+	if (!file.open(options->ui_lut_texture))
 	{
 		render_load_png(ui_lut_bitmap, file);
 		file.close();
@@ -1097,9 +1102,9 @@ rgb_t shaders::apply_color_convolution(rgb_t color)
 	b = chroma[2] * saturation + luma;
 
 	return rgb_t(
-		std::max(0, std::min(255, int(r * 255.0f))),
-		std::max(0, std::min(255, int(g * 255.0f))),
-		std::max(0, std::min(255, int(b * 255.0f))));
+		std::clamp(int(r * 255.0f), 0, 255),
+		std::clamp(int(g * 255.0f), 0, 255),
+		std::clamp(int(b * 255.0f), 0, 255));
 }
 
 int shaders::color_convolution_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
@@ -1163,7 +1168,7 @@ int shaders::scanline_pass(d3d_render_target *rt, int source_index, poly_info *p
 		return next_index;
 
 	auto win = d3d->assert_window();
-	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device_enumerator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 	float xscale = 1.0f / screen_container.xscale();
@@ -1244,7 +1249,7 @@ int shaders::post_pass(d3d_render_target *rt, int source_index, poly_info *poly,
 
 	auto win = d3d->assert_window();
 
-	screen_device_iterator screen_iterator(machine->root_device());
+	screen_device_enumerator screen_iterator(machine->root_device());
 	screen_device *screen = screen_iterator.byindex(curr_screen);
 	render_container &screen_container = screen->container();
 
@@ -1794,7 +1799,7 @@ bool shaders::add_render_target(renderer_d3d9* d3d, render_primitive *prim, int 
 //============================================================
 void shaders::enumerate_screens()
 {
-	screen_device_iterator iter(machine->root_device());
+	screen_device_enumerator iter(machine->root_device());
 	num_screens = iter.count();
 }
 
@@ -1957,25 +1962,24 @@ void shaders::delete_resources()
 
 static void get_vector(const char *data, int count, float *out, bool report_error)
 {
-	if (count > 3 &&
-		sscanf(data, "%f,%f,%f,%f", &out[0], &out[1], &out[2], &out[3]) < 4 && report_error)
+	std::istringstream is(data);
+	is.imbue(std::locale::classic());
+	for (int i = 0; count > i; )
 	{
-		osd_printf_error("Illegal quad vector value = %s\n", data);
-	}
-	else if (count > 2 &&
-		sscanf(data, "%f,%f,%f", &out[0], &out[1], &out[2]) < 3 && report_error)
-	{
-		osd_printf_error("Illegal triple vector value = %s\n", data);
-	}
-	else if (count > 1 &&
-		sscanf(data, "%f,%f", &out[0], &out[1]) < 2 && report_error)
-	{
-		osd_printf_error("Illegal double vector value = %s\n", data);
-	}
-	else if (count > 0 &&
-		sscanf(data, "%f", &out[0]) < 1 && report_error)
-	{
-		osd_printf_error("Illegal single vector value = %s\n", data);
+		is >> out[i];
+		bool bad = !is;
+		if (++i < count)
+		{
+			char ch;
+			is >> ch;
+			bad = bad || !is || (',' != ch);
+		}
+		if (bad)
+		{
+			if (report_error)
+				osd_printf_error("Illegal %d-item vector value = %s\n", count, data);
+			return;
+		}
 	}
 }
 
@@ -1986,23 +1990,10 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
+std::unique_ptr<slider_state> shaders::slider_alloc(std::string &&title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, slider *arg)
 {
-	auto state = std::make_unique<slider_state>();
-
-	state->minval = minval;
-	state->defval = defval;
-	state->maxval = maxval;
-	state->incval = incval;
-
 	using namespace std::placeholders;
-	state->update = std::bind(&shaders::slider_changed, this, _1, _2, _3, _4, _5);
-
-	state->arg = arg;
-	state->id = id;
-	state->description = title;
-
-	return state;
+	return std::make_unique<slider_state>(std::move(title), minval, defval, maxval, incval, std::bind(&slider::update, arg, _1, _2));
 }
 
 
@@ -2064,15 +2055,6 @@ int32_t slider::update(std::string *str, int32_t newval)
 			}
 			return (int32_t)floor(*val_ptr / m_desc->scale + 0.5f);
 		}
-	}
-	return 0;
-}
-
-int32_t shaders::slider_changed(running_machine& /*machine*/, void *arg, int /*id*/, std::string *str, int32_t newval)
-{
-	if (arg != nullptr)
-	{
-		return reinterpret_cast<slider *>(arg)->update(str, newval);
 	}
 	return 0;
 }
@@ -2336,7 +2318,7 @@ void shaders::init_slider_list()
 	}
 	internal_sliders.clear();
 
-	const screen_device *first_screen = screen_device_iterator(machine->root_device()).first();;
+	const screen_device *first_screen = screen_device_enumerator(machine->root_device()).first();;
 	if (first_screen == nullptr)
 	{
 		return;
@@ -2387,16 +2369,12 @@ void shaders::init_slider_list()
 						break;
 				}
 
-				std::unique_ptr<slider_state> core_slider = slider_alloc(desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
+				std::unique_ptr<slider_state> core_slider = slider_alloc(std::move(name), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
-				ui::menu_item item;
-				item.text = core_slider->description;
-				item.subtext = "";
-				item.flags = 0;
-				item.ref = core_slider.get();
-				item.type = ui::menu_item_type::SLIDER;
-				m_sliders.push_back(item);
-				m_core_sliders.push_back(std::move(core_slider));
+				ui::menu_item item(ui::menu_item_type::SLIDER, core_slider.get());
+				item.set_text(core_slider->description);
+				m_sliders.emplace_back(item);
+				m_core_sliders.emplace_back(std::move(core_slider));
 			}
 		}
 	}
@@ -2427,7 +2405,7 @@ void uniform::update()
 	renderer_d3d9 *d3d = shadersys->d3d;
 
 	auto win = d3d->assert_window();
-	const screen_device *first_screen = screen_device_iterator(win->machine().root_device()).first();
+	const screen_device *first_screen = screen_device_enumerator(win->machine().root_device()).first();
 
 	bool vector_screen =
 		first_screen != nullptr &&
@@ -2599,6 +2577,7 @@ void uniform::update()
 			break;
 		case CU_CHROMA_CONVERSION_GAIN:
 			m_shader->set_vector("ConversionGain", 3, &options->chroma_conversion_gain[0]);
+			break;
 		case CU_CHROMA_Y_GAIN:
 			m_shader->set_vector("YGain", 3, &options->chroma_y_gain[0]);
 			break;

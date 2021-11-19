@@ -20,7 +20,9 @@ public:
 		: pocketc_state(mconfig, type, tag)
 		, m_keys(*this, "KEY%u", 0U)
 		, m_mode(*this, "MODE")
-	{ }
+	{
+		std::fill(std::begin(m_reg), std::end(m_reg), 0);
+	}
 
 	void init_pc1251();
 

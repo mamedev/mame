@@ -3,39 +3,40 @@
 /***********************************************************************************************************
 
 
- MegaDrive / Genesis cart+EEPROM emulation
+ MegaDrive / Genesis cart + I2C EEPROM emulation
 
 
- TODO: proper EEPROM emulation, still not worked on (just hooked up the I2C device)
+ TODO: EEPROM hookup verification in most games.
 
 
- i2c games mapping table:
+ I2C games mapping table:
 
- game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
- ----------------------------------|------------|------------|------------|----------------|-----------|
- NBA Jam                           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x00ff (24C02) |   0x03    | xx
- NBA Jam TE                        | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | xx
- NBA Jam TE (32x)                  | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    |
- NFL Quarterback Club              | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    | xx
- NFL Quarterback Club 96           | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x07ff (24C16) |   0x07    | xx
- College Slam                      | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    | xx
- Frank Thomas Big Hurt Baseball    | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    | xx
- NHLPA Hockey 93                   | 0x200001-7 | 0x200001-7 | 0x200001-6 | 0x007f (24C01) |   0x03    | xx
- Rings of Power                    | 0x200001-7 | 0x200001-7 | 0x200001-6 | 0x007f (24C01) |   0x03    | xx
- Evander Holyfield's Boxing        | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    | xx
- Greatest Heavyweights of the Ring | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    | xx
- Wonder Boy V                      | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    | xx
- Sports Talk Baseball              | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    | xx
- Megaman - the Wily Wars           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    | xx **
- Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
- Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
- Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |
- Brian Lara Cricket 96             | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x1fff (24C64) |   0x??*   |
- ----------------------------------|------------|------------|------------|----------------|-----------|
+ Game Name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK | WORKS |
+ ----------------------------------|------------|------------|------------|----------------|-----------|-------|
+ NBA Jam                           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x00ff (24C02) |   0x03    |       |
+ NBA Jam TE                        | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    |       |
+ NBA Jam TE (32x)                  | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    |       |
+ NFL Quarterback Club              | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x00ff (24C02) |   0x03    |       |
+ NFL Quarterback Club 96           | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x07ff (24C16) |   0x07    |       |
+ College Slam                      | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    |       |
+ Frank Thomas Big Hurt Baseball    | 0x200001-0 | 0x200001-0 | 0x200000-0 | 0x1fff (24C64) |   0x07    |       |
+ NHLPA Hockey 93                   | 0x200001-7 | 0x200001-7 | 0x200001-6 | 0x007f (24C01) |   0x03    |       |
+ Rings of Power                    | 0x200001-7 | 0x200001-7 | 0x200001-6 | 0x007f (24C01) |   0x03    |       |
+ Honoo no Toukyuuji - Dodge Danpei | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |  Unk. |
+ Evander Holyfield's Boxing        | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |  Yes  |
+ Greatest Heavyweights of the Ring | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |  Yes  |
+ Wonder Boy V                      | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |  Yes  |
+ Sports Talk Baseball              | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |  Yes  |
+ Megaman - The Wily Wars           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x007f (24C01) |   0x03    |  Yes  | **
+ Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |  Yes  |
+ Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |  Yes  |
+ Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |  Yes  |
+ Brian Lara Cricket 96             | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x1fff (24C64) |   0x??*   |       |
+ Shame Warne Cricket               | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x1fff (24C64) |   0x??*   |       |
+ ----------------------------------|------------|------------|------------|----------------|-----------|-------|
 
- * Notes: check these
- ** original Rockman Mega World (J) set uses normal backup RAM
-
+ * Not specified in Eke-Eke's document
+ ** Original Rockman Mega World (J) set uses normal backup RAM
 
  Micro Machines 2, Micro Machines Military, Micro Machines 96 are emulated in md_jcart
 
@@ -58,6 +59,7 @@ DEFINE_DEVICE_TYPE(MD_EEPROM_NFLQB,    md_eeprom_nflqb_device,    "md_eeprom_nfl
 DEFINE_DEVICE_TYPE(MD_EEPROM_CSLAM,    md_eeprom_cslam_device,    "md_eeprom_cslam",    "MD College Slam")
 DEFINE_DEVICE_TYPE(MD_EEPROM_NHLPA,    md_eeprom_nhlpa_device,    "md_eeprom_nhlpa",    "MD NHLPA 93")
 DEFINE_DEVICE_TYPE(MD_EEPROM_BLARA,    md_eeprom_blara_device,    "md_eeprom_blara",    "MD Brian Lara")
+DEFINE_DEVICE_TYPE(MD_EEPROM_MODE1,    md_eeprom_mode1_device,    "md_eeprom_mode1",    "MD Serial EEPROM Mode 1")
 
 
 md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
@@ -102,6 +104,11 @@ md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, co
 {
 }
 
+md_eeprom_mode1_device::md_eeprom_mode1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: md_std_eeprom_device(mconfig, MD_EEPROM_MODE1, tag, owner, clock)
+{
+}
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -142,6 +149,11 @@ void md_eeprom_blara_device::device_add_mconfig(machine_config &config)
 	I2C_24C64(config, m_i2cmem);
 }
 
+void md_eeprom_mode1_device::device_add_mconfig(machine_config &config)
+{
+	I2C_X24C01(config, m_i2cmem);
+}
+
 void md_std_eeprom_device::device_start()
 {
 	save_item(NAME(m_i2c_mem));
@@ -166,7 +178,8 @@ uint16_t md_std_eeprom_device::read(offs_t offset)
 {
 	if (offset == 0x200000/2)
 	{
-		return m_i2cmem->read_sda();
+		const uint8_t data = m_i2cmem->read_sda();
+		return ((uint16_t)data << 8) | data;
 	}
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];

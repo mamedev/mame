@@ -173,19 +173,11 @@ Exidy Sorcerer Video/Disk Unit:
 void sorcerer_state::sorcerer_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xbfff).ram();
+	map(0x0000, 0xffff).ram();
 	//map(0xc000, 0xdfff).rom();      // mapped by the cartslot
 	map(0xe000, 0xefff).rom().region("maincpu", 0).nopw();    // bios
-	map(0xf000, 0xf7ff).ram();                                // screen ram
 	map(0xf800, 0xfbff).rom().region("chargen", 0).nopw();    // inbuilt characters
-	map(0xfc00, 0xffff).ram().share("pcg");                   // PCG
-}
-
-void sorcerer_state::sorcererb_mem(address_map &map)
-{
-	map.unmap_value_high();
-	sorcerer_mem(map);
-	map(0xc000, 0xdfff).ram();
+	map(0xfc00, 0xffff).share("pcg");                   // PCG
 }
 
 void sorcererd_state::sorcererd_mem(address_map &map)
@@ -435,7 +427,6 @@ static const floppy_interface sorcerer_floppy_interface =
 static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_1200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_1200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_STARTBITS", 0xff, RS232_STARTBITS_1 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
@@ -450,10 +441,7 @@ void sorcerer_state::sorcerer(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(200));
-	screen.set_size(64*8, 30*8);
-	screen.set_visarea(0, 64*8-1, 0, 30*8-1);
+	screen.set_raw(ES_VIDEO_CLOCK, 806, 0, 512, 261, 0, 240); // TODO: 313 lines in 50 Hz mode
 	screen.set_screen_update(FUNC(sorcerer_state::screen_update));
 	screen.set_palette("palette");
 
@@ -481,8 +469,9 @@ void sorcerer_state::sorcerer(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in");
 
 	/* quickload */
-	SNAPSHOT(config, "snapshot", "snp", attotime::from_seconds(4)).set_load_callback(FUNC(sorcerer_state::snapshot_cb));
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(4)).set_load_callback(FUNC(sorcerer_state::quickload_cb));
+	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "bin,snp", attotime::from_seconds(4)));
+	quickload.set_load_callback(FUNC(sorcerer_state::quickload_cb));
+	quickload.set_interface("sorcerer_quik");
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
@@ -502,6 +491,7 @@ void sorcerer_state::sorcerer(machine_config &config)
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("sorcerer_cart");
 	SOFTWARE_LIST(config, "cass_list").set_original("sorcerer_cass");
+	SOFTWARE_LIST(config, "quik_list").set_original("sorcerer_quik");
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("8K,16K,32K");
@@ -535,8 +525,8 @@ void sorcererd_state::sorcererd(machine_config &config)
 	m_fdc2->set_force_ready(true);
 	m_fdc2->intrq_wr_callback().set([this] (bool state) { sorcererd_state::intrq2_w(state); });
 	m_fdc2->drq_wr_callback().set([this] (bool state) { sorcererd_state::drq2_w(state); });
-	FLOPPY_CONNECTOR(config, "fdc2:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc2:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc2:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc2:1", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");
 }
 
@@ -549,10 +539,10 @@ void sorcerer_state::sorcerera(machine_config &config)
 	WD2793(config, m_fdc4, 4_MHz_XTAL / 2);
 	m_fdc4->intrq_wr_callback().set([this] (bool state) { sorcerer_state::intrq4_w(state); });
 	m_fdc4->drq_wr_callback().set([this] (bool state) { sorcerer_state::intrq4_w(state); });
-	FLOPPY_CONNECTOR(config, "fdc4:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc4:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc4:2", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc4:3", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:1", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:2", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc4:3", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");   // no suitable software yet
 
 	// internal ram
@@ -563,7 +553,6 @@ void sorcerer_state::sorcerera(machine_config &config)
 void sorcerer_state::sorcererb(machine_config &config)
 {
 	sorcerer(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &sorcerer_state::sorcererb_mem);
 	m_maincpu->set_addrmap(AS_IO, &sorcerer_state::sorcererb_io);
 
 	Z80DMA(config, m_dma, ES_CPU_CLOCK);
@@ -576,10 +565,10 @@ void sorcerer_state::sorcererb(machine_config &config)
 	FD1793(config, m_fdc3, 4_MHz_XTAL / 2);
 	m_fdc3->set_force_ready(true);
 	m_fdc3->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
-	FLOPPY_CONNECTOR(config, "fdc3:0", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc3:1", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc3:2", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc3:3", floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:1", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:2", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc3:3", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	//SOFTWARE_LIST(config, "flop_list").set_original("sorcerer_flop");   // no suitable software yet
 
 	config.device_remove("cart_list");

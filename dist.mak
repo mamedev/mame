@@ -67,10 +67,8 @@ else
 endif
 
 ifeq ($(PTR64),1)
-  MAINBINARCH := 64
   BUILDARCH := x64
 else
-  MAINBINARCH :=
   BUILDARCH := x32
 endif
 
@@ -97,7 +95,7 @@ ifndef TARGET
   TARGET := mame
 endif
 
-MAINBIN := $(TARGET)$(MAINBINARCH)$(MAINBINVARIANT)
+MAINBIN := $(TARGET)$(MAINBINVARIANT)
 BINDIR := build/$(PROJECTTYPE)/bin/$(BUILDARCH)/$(BUILDVARIANT)
 STAGEDIR := build/release/$(BUILDARCH)/$(BUILDVARIANT)/$(TARGET)
 

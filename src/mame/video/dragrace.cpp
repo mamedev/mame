@@ -13,15 +13,13 @@
 TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 {
 	uint8_t code = m_playfield_ram[tile_index];
-	int num = 0;
+	int num = code & 0x1f;
 	int col = 0;
-
-	num = code & 0x1f;
 
 	if ((code & 0xc0) == 0x40)
 		num |= 0x20;
 
-	switch (code & 0xA0)
+	switch (code & 0xa0)
 	{
 		case 0x00:
 			col = 0;
@@ -32,12 +30,12 @@ TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
 		case 0x80:
 			col = (code & 0x40) ? 1 : 0;
 			break;
-		case 0xA0:
+		case 0xa0:
 			col = (code & 0x40) ? 3 : 2;
 			break;
 	}
 
-	tileinfo.set(((code & 0xA0) == 0x80) ? 1 : 0, num, col, 0);
+	tileinfo.set(((code & 0xa0) == 0x80) ? 1 : 0, num, col, 0);
 }
 
 
@@ -47,7 +45,7 @@ void dragrace_state::video_start()
 }
 
 
-uint32_t dragrace_state::screen_update_dragrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dragrace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
 

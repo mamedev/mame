@@ -68,6 +68,7 @@ public:
 	void qcrayon2(machine_config &config);
 	void qtorimon(machine_config &config);
 	void driftout(machine_config &config);
+	void driftoutct(machine_config &config);
 	void solfigtr(machine_config &config);
 	void qzquest(machine_config &config);
 	void liquidk(machine_config &config);
@@ -158,6 +159,7 @@ protected:
 	int           m_nibble;
 	s32           m_driveout_sound_latch;
 	emu_timer     *m_int6_timer;
+	std::unique_ptr<u8[]> m_decoded_gfx;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -258,6 +260,7 @@ protected:
 	void dinorex_map(address_map &map);
 	void dondokod_map(address_map &map);
 	void driftout_map(address_map &map);
+	void driftoutct_map(address_map &map);
 	void driveout_map(address_map &map);
 	void driveout_oki_map(address_map &map);
 	void driveout_sound_map(address_map &map);

@@ -325,8 +325,6 @@ void galaxia_state::galaxia(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaxia);
 	PALETTE(config, m_palette, FUNC(galaxia_state::galaxia_palette), 0x18+2);
 
-	MCFG_VIDEO_START_OVERRIDE(galaxia_state,galaxia)
-
 	S2636(config, m_s2636[0], 0);
 	m_s2636[0]->set_offsets(-13, -26);
 	m_s2636[0]->add_route(ALL_OUTPUTS, "mono", 0.25);

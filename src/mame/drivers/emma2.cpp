@@ -197,7 +197,7 @@ void emma2_state::emma2(machine_config &config)
 	m_display->set_segmask(0xff, 0xff);
 
 	/* Devices */
-	VIA6522(config, m_via, 1'000'000);  // #2 from cpu
+	MOS6522(config, m_via, 1'000'000);  // #2 from cpu
 	m_via->irq_handler().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
 	PIA6821(config, m_pia, 0);

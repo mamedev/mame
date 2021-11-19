@@ -36,7 +36,6 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "rendlay.h"
 #include "speaker.h"
 
 #include "barata.lh"
@@ -213,6 +212,7 @@ void barata_state::fpga_send(unsigned char cmd)
 				{
 					m_lamps[lamp_index] = state ? 0 : 1;
 				}
+				[[fallthrough]]; // FIXME: really?
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 				break;
@@ -248,6 +248,7 @@ void barata_state::fpga_send(unsigned char cmd)
 					m_digits[2*counter_bank] = dec_7seg(counter_data/10);
 					m_digits[2*counter_bank+1] = dec_7seg(counter_data%10);
 				}
+				[[fallthrough]]; // FIXME: really?
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 				break;
@@ -265,6 +266,7 @@ void barata_state::fpga_send(unsigned char cmd)
 			case 2:
 				sample_index = (sample_index << 3) | cmd;
 				logerror("PLAY_SAMPLE #%d.\n", sample_index);
+				[[fallthrough]]; // FIXME: really?
 			default:
 				mode = FPGA_WAITING_FOR_NEW_CMD;
 				break;

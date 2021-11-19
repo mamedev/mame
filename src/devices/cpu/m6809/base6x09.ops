@@ -2,17 +2,22 @@
 // copyright-holders:Nathan Woods
 NMI:
 	m_nmi_asserted = false;
+	@dummy_read_opcode_arg(0);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_NMI);
-	eat(1);
 	standard_irq_callback(INPUT_LINE_NMI);
 	goto INTERRUPT_VECTOR;
 
 FIRQ:
+	@dummy_read_opcode_arg(0);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	if (firq_saves_entire_state())
 	{
 		m_cc |= CC_E;
@@ -27,31 +32,36 @@ FIRQ:
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	set_ea(VECTOR_FIRQ);
-	eat(1);
 	standard_irq_callback(M6809_FIRQ_LINE);
 	goto INTERRUPT_VECTOR;
 
 IRQ:
+	@dummy_read_opcode_arg(0);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
 	m_cc |= CC_I;
 	set_ea(VECTOR_IRQ);
-	eat(1);
 	standard_irq_callback(M6809_IRQ_LINE);
 	goto INTERRUPT_VECTOR;
 
 INTERRUPT_VECTOR:
-	@eat(4);
-	@m_pc.b.h = read_operand(0);	// Not sure if this is cycle exact
-	@m_pc.b.l = read_operand(1);	// Not sure if this is cycle exact
+	@dummy_vma(1);
+	@m_pc.b.h = read_operand(0);
+	@m_pc.b.l = read_operand(1);
+	@dummy_vma(1);
 	return;
 
 NEG8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags(CC_NZVC, (uint8_t)0, m_temp.b.l, -m_temp.b.l);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
@@ -60,7 +70,10 @@ COM8:
 	m_cc &= ~CC_V;
 	m_cc |= CC_C;
 	m_temp.b.l = set_flags(CC_NZ, (uint8_t) ~m_temp.b.l);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
@@ -69,14 +82,20 @@ LSR8:
 	m_cc &= ~CC_C;
 	m_cc |= (m_temp.b.l & 1) ? CC_C : 0;
 	m_temp.b.l = set_flags<uint8_t>(CC_NZ, m_temp.b.l >> 1);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
 ROR8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZ, rotate_right(m_temp.b.l));
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
@@ -85,43 +104,64 @@ ASR8:
 	m_cc &= ~CC_C;
 	m_cc |= (m_temp.b.l & 1) ? CC_C : 0;
 	m_temp.b.l = set_flags<uint8_t>(CC_NZ, ((int8_t) m_temp.b.l) >> 1);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
 ASL8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZVC, m_temp.b.l, m_temp.b.l, m_temp.b.l << 1);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
 ROL8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, m_temp.b.l, rotate_left(m_temp.b.l));
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
 DEC8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, 1, m_temp.b.l - 1);
-	@eat(hd6309_native_mode() && is_register_addressing_mode() ? 0 : 1);
+	if(!hd6309_native_mode() || !is_register_addressing_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
 INC8:
 	@m_temp.b.l = read_operand();
 	m_temp.b.l = set_flags<uint8_t>(CC_NZV, m_temp.b.l, 1, m_temp.b.l + 1);
-	@eat(hd6309_native_mode() && is_register_addressing_mode() ? 0 : 1);
+	if(!hd6309_native_mode() || !is_register_addressing_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(m_temp.b.l);
 	return;
 
 TST8:
 	@m_temp.b.l = read_operand();
 	set_flags(CC_NZV, m_temp.b.l);
-	eat(hd6309_native_mode() ? 0 : 1);
-	eat(is_register_addressing_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
+	if(!is_register_addressing_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	return;
 
 JMP:
@@ -132,7 +172,10 @@ CLR8:
 	@read_operand();
 	m_cc &= ~CC_NZVC;
 	m_cc |= CC_Z;
-	@eat(hd6309_native_mode() && is_register_addressing_mode() ? 0 : 1);
+	if(!hd6309_native_mode() || !is_register_addressing_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(0);
 	return;
 
@@ -140,7 +183,10 @@ NEG16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags(CC_NZVC, (uint16_t)0, m_temp.w, -m_temp.w);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -151,7 +197,10 @@ LSR16:
 	m_cc &= ~CC_C;
 	m_cc |= (m_temp.w & 1) ? CC_C : 0;
 	m_temp.w = set_flags<uint16_t>(CC_NZ, m_temp.w >> 1);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -160,7 +209,10 @@ ROR16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZ, rotate_right(m_temp.w));
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -171,7 +223,10 @@ ASR16:
 	m_cc &= ~CC_C;
 	m_cc |= (m_temp.w & 1) ? CC_C : 0;
 	m_temp.w = set_flags<uint16_t>(CC_NZ, ((int16_t) m_temp.w) >> 1);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -180,7 +235,10 @@ ASL16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, m_temp.w, m_temp.w << 1);
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -189,7 +247,10 @@ ROL16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZV, rotate_left(m_temp.w));
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	@write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -198,7 +259,10 @@ DEC16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, 1, m_temp.w - 1);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -207,7 +271,10 @@ INC16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
 	m_temp.w = set_flags<uint16_t>(CC_NZVC, m_temp.w, 1, m_temp.w + 1);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
 	return;
@@ -216,12 +283,21 @@ TST16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
 	set_flags(CC_NZV, m_temp.w);
-	eat(hd6309_native_mode() ? 0 : 1);
-	eat(is_register_addressing_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
+	if(!is_register_addressing_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	return;
 
 CLR16:
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	m_cc &= ~CC_NZVC;
 	m_cc |= CC_Z;
 	write_operand(0, 0x00);
@@ -277,21 +353,30 @@ ADD16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	regop16().w = set_flags(CC_NZVC, regop16().w, m_temp.w, regop16().w + m_temp.w);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 SUB16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	regop16().w = set_flags(CC_NZVC, regop16().w, m_temp.w, regop16().w - m_temp.w);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 CMP16:
 	@m_temp.b.h = read_operand(0);
 	@m_temp.b.l = read_operand(1);
 	set_flags(CC_NZVC, regop16().w, m_temp.w, regop16().w - m_temp.w);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 LD8:
@@ -318,14 +403,17 @@ ST16:
 	return;
 
 NOP:
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 SYNC:
 	// SYNC stops processing instructions until an interrupt request happens.
 	// This doesn't require the corresponding interrupt to be enabled: if it
 	// is disabled, execution continues with the next instruction.
-	eat(3);
+	@dummy_read_opcode_arg(0);
 
 	while(!m_nmi_asserted && !m_firq_line && !m_irq_line)
 	{
@@ -338,31 +426,47 @@ SYNC:
 		// unmassage...
 		m_pc.w++;
 	}
+	@eat(1);
 	return;
 
 DAA:
 	daa();
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 ORCC:
 	m_cc |= read_operand();
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 ANDCC:
 	m_cc &= read_operand();
-	eat(1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 SEX:
 	m_q.r.d = set_flags<uint16_t>(CC_NZ, (int8_t) m_q.r.b);
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	return;
 
 BRANCH:
 	@m_temp.b.l = read_opcode_arg();
-	eat(1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	if (branch_taken())
 	{
 		m_pc.w += (int8_t) m_temp.b.l;
@@ -372,29 +476,36 @@ BRANCH:
 LBRANCH:
 	@m_temp.b.h = read_opcode_arg();
 	@m_temp.b.l = read_opcode_arg();
-	eat(1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	if (branch_taken())
 	{
 		m_pc.w += m_temp.w;
-		eat(hd6309_native_mode() ? 0 : 1);
+		if(!hd6309_native_mode()) {
+			@dummy_vma(1);
+			;
+	    }
 	}
 	return;
 
 BSR:
 	@m_temp.b.l = read_opcode_arg();
 	m_ea.w = m_pc.w + (int8_t) m_temp.b.l;
-	@eat(hd6309_native_mode() ? 2 : 3);
+	@dummy_vma(hd6309_native_mode() ? 2 : 3);
 	goto GOTO_SUBROUTINE;
 
 LBSR:
 	@m_temp.b.h = read_opcode_arg();
 	@m_temp.b.l = read_opcode_arg();
 	m_ea.w = m_pc.w + (int16_t) m_temp.w;
-	@eat(hd6309_native_mode() ? 2 : 4);
+	@dummy_vma(hd6309_native_mode() ? 2 : 4);
 	goto GOTO_SUBROUTINE;
 
 JSR:
-	@eat(2);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	goto GOTO_SUBROUTINE;
 
 GOTO_SUBROUTINE:
@@ -405,30 +516,39 @@ GOTO_SUBROUTINE:
 
 RTS:
 	m_temp.w = 0x80;	// RTS is equivalent to "PULS PC"
-	eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		;
+    }
 	set_regop16(m_s);
 	goto PULL_REGISTERS;
 
 ABX:
 	m_x.w += m_q.r.b;
-	eat(hd6309_native_mode() ? 0 : 2);
+	if(!hd6309_native_mode()) {
+		@dummy_read_opcode_arg(0);
+		@dummy_vma(1);
+		;
+    }
 	return;
 
 MUL:
 	mul();
-	eat(hd6309_native_mode() ? 9 : 10);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(hd6309_native_mode() ? 8 : 9);
 	return;
 
 RTI:
+	@dummy_read_opcode_arg(0);
 	set_regop16(m_s);
-	m_temp.w = 0x01;	// PULS CC
-	%PULL_REGISTERS;
+	@m_cc = read_memory(regop16().w++);	// PULS CC
 	m_temp.w = ((m_cc & CC_E) ? entire_state_registers() : partial_state_registers()) & ~0x01;
 	goto PULL_REGISTERS;
 
 CWAI:
 	@m_cc &= read_opcode_arg();
-	@eat(2);
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 
 	m_cc |= CC_E;
 	set_regop16(m_s);
@@ -466,37 +586,45 @@ CWAI:
 
 LEA_xy:
 	regop16().w = set_flags(CC_Z, m_ea.w);
-	eat(1);
+	@dummy_vma(1);
 	return;
 
 LEA_us:
 	if (&regop16() == &m_s)
 		m_lds_encountered = true;
 	regop16().w = m_ea.w;
-	eat(1);
+	@dummy_vma(1);
 	return;
 
 PSHS:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 2 : 3);
+	@dummy_vma(2);
 	set_regop16(m_s);
+	if(!hd6309_native_mode()) {
+		@(void)read_memory(regop16().w);
+		;
+    }
 	goto PUSH_REGISTERS;
 
 PULS:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 1 : 2);
+	@dummy_vma(hd6309_native_mode() ? 1 : 2);
 	set_regop16(m_s);
 	goto PULL_REGISTERS;
 
 PSHU:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 2 : 3);
+	@dummy_vma(2);
 	set_regop16(m_u);
+	if(!hd6309_native_mode()) {
+		@(void)read_memory(regop16().w);
+		;
+    }
 	goto PUSH_REGISTERS;
 
 PULU:
 	@m_temp.w = read_opcode_arg();
-	@eat(hd6309_native_mode() ? 1 : 2);
+	@dummy_vma(hd6309_native_mode() ? 1 : 2);
 	set_regop16(m_u);
 	goto PULL_REGISTERS;
 
@@ -508,6 +636,8 @@ SWI:
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	%PUSH_REGISTERS;
 	m_cc |= CC_I | CC_F;
 	goto INTERRUPT_VECTOR;
@@ -527,16 +657,24 @@ SOFTWARE_INTERRUPT:
 	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
+	@dummy_read_opcode_arg(0);
+	@dummy_vma(1);
 	%PUSH_REGISTERS;
 	goto INTERRUPT_VECTOR;
 
 DIRECT:
 	@set_ea(((uint16_t)m_dp << 8) | read_opcode_arg());
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	return;
 
 EXTENDED:
 	@set_ea_h(read_opcode_arg());
 	@set_ea_l(read_opcode_arg());
-	@eat(hd6309_native_mode() ? 0 : 1);
+	if(!hd6309_native_mode()) {
+		@dummy_vma(1);
+		;
+    }
 	return;

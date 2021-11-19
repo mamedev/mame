@@ -63,6 +63,18 @@ protected:
 };
 
 
+class bbc_tube_16032_device : public bbc_tube_32016_device
+{
+public:
+	bbc_tube_16032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 class bbc_tube_32016l_device : public bbc_tube_32016_device
 {
 public:
@@ -78,6 +90,7 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_TUBE_32016, bbc_tube_32016_device)
+DECLARE_DEVICE_TYPE(BBC_TUBE_16032, bbc_tube_16032_device)
 DECLARE_DEVICE_TYPE(BBC_TUBE_32016L, bbc_tube_32016l_device)
 
 

@@ -14,6 +14,7 @@
   - Phase 3 - seems awfully hard - dip settings ?
   - Hook up Coin Counter
   - Test/Service Mode - not working?
+  - No attract demo? is this correct?
 
 ************************************************************************
 
@@ -195,9 +196,9 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) ) // requires initial coin, but doesn't decrease coins on game over
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )                 /* confirmed */
 	PORT_DIPSETTING(    0x00, "Collisions excluded" )
 	PORT_DIPSETTING(    0x80, "Collisions included" )

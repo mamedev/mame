@@ -53,7 +53,7 @@ protected:
 	virtual void video_start() override;
 
 private:
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	uint8_t keyboard_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);

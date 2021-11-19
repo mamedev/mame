@@ -5,7 +5,7 @@
     Istrebiteli driver by MetalliC
 
     TODO:
-      hardware-like noice sound generation
+      hardware-like noise sound generation
       accurate sprite collision
 
     how to play:
@@ -16,8 +16,8 @@
       insert 12 or more coins then press 2 player start
 
     notes:
-      dumped PCB is early game version, have several bugs, possible test/prototype.
-      later version was seen in St.Petersburg arcade museum, CPU board have single 8Kx8 ROM.
+      dumped PCB is early game version, has several bugs, possible test/prototype.
+      later version was seen in St.Petersburg arcade museum, CPU board has single 8Kx8 ROM.
 
 **************************************************************************/
 
@@ -36,6 +36,12 @@
 class istrebiteli_sound_device : public device_t, public device_sound_interface
 {
 public:
+	template <typename T> istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&region_tag)
+		: istrebiteli_sound_device(mconfig, tag, owner, clock)
+	{
+		m_rom.set_tag(std::forward<T>(region_tag));
+	}
+
 	istrebiteli_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void sound_w(uint8_t data);
@@ -50,10 +56,10 @@ protected:
 private:
 	// internal state
 	sound_stream *m_channel;
-	uint8_t *m_rom;
-	int m_rom_cnt;
-	int m_rom_incr;
-	int m_sample_num;
+	required_region_ptr<uint8_t> m_rom;
+	uint16_t m_rom_cnt;
+	uint8_t m_rom_incr;
+	uint8_t m_sample_num;
 	bool m_cnt_reset;
 	bool m_rom_out_en;
 	uint8_t m_prev_data;
@@ -69,7 +75,7 @@ istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig
 	: device_t(mconfig, ISTREBITELI_SOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
-		m_rom(nullptr),
+		m_rom(*this, finder_base::DUMMY_TAG),
 		m_rom_cnt(0),
 		m_rom_incr(0),
 		m_sample_num(0),
@@ -82,7 +88,13 @@ istrebiteli_sound_device::istrebiteli_sound_device(const machine_config &mconfig
 void istrebiteli_sound_device::device_start()
 {
 	m_channel = stream_alloc(0, 1, clock() / 2);
-	m_rom = machine().root_device().memregion("soundrom")->base();
+
+	save_item(NAME(m_rom_cnt));
+	save_item(NAME(m_rom_incr));
+	save_item(NAME(m_sample_num));
+	save_item(NAME(m_cnt_reset));
+	save_item(NAME(m_rom_out_en));
+	save_item(NAME(m_prev_data));
 }
 
 void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
@@ -96,7 +108,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::ve
 			smpl = (m_rom[m_rom_cnt] >> m_sample_num) & 1;
 
 		// below is huge guess
-		if ((m_prev_data & 0x40) == 0)              // b6 noice enable ?
+		if ((m_prev_data & 0x40) == 0)              // b6 noise enable ?
 			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
@@ -124,6 +136,8 @@ void istrebiteli_sound_device::sound_w(uint8_t data)
 }
 
 //////////////////////////////////////////////////////////////
+
+namespace {
 
 class istrebiteli_state : public driver_device
 {
@@ -613,7 +627,7 @@ void istrebiteli_state::istreb(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
+	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256, "soundrom").add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 void istrebiteli_state::motogonki(machine_config &config)
@@ -644,7 +658,7 @@ void istrebiteli_state::motogonki(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256).add_route(ALL_OUTPUTS, "mono", 1.00);
+	ISTREBITELI_SOUND(config, m_sound_dev, XTAL(8'000'000) / 2 / 256, "soundrom").add_route(ALL_OUTPUTS, "mono", 1.00);
 }
 
 ROM_START( istreb )
@@ -690,6 +704,9 @@ ROM_START( motogonki )
 	ROM_LOAD( "006_01.d3",  0x100, 0x100, CRC(b53b83c9) SHA1(8f9733c827cc9aacc7c182585dcbc5da01357468) ) // sprite generators outputs combine prom
 	ROM_LOAD( "006_04.w13", 0x200, 0x100, CRC(e43a500c) SHA1(c9a90b54587d0dc9d7d66c419790627088f2546e) ) // ports 30-37 address decoder prom
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 198?, istreb,    0, istreb,    istreb, istrebiteli_state, init_istreb, ROT0, "Terminal", "Istrebiteli", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 GAME( 198?, motogonki, 0, motogonki, moto,   istrebiteli_state, init_moto,   ROT0, "Terminal", "Motogonki", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

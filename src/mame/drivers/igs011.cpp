@@ -66,10 +66,9 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
-#include "sound/ym2413.h"
-#include "sound/3812intf.h"
 #include "sound/ics2115.h"
+#include "sound/okim6295.h"
+#include "sound/ymopl.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "emupal.h"
@@ -621,6 +620,7 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 void igs011_state::machine_start()
 {
 	m_prot1_addr = 0;
+	m_lhb_irq_enable = 0;
 
 	save_item(NAME(m_igs_dips_sel));
 	save_item(NAME(m_igs_input_sel));
@@ -1747,7 +1747,7 @@ u16 igs011_state::lhb2_igs003_r()
 			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
 			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
 			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
-			/* fall through */
+			[[fallthrough]];
 		default:
 			logerror("%06x: warning, reading with igs003_reg = %02x\n", m_maincpu->pc(), m_igs003_reg);
 			break;
@@ -1882,7 +1882,7 @@ u16 igs011_state::xymg_igs003_r()
 			if (~m_igs_input_sel & 0x04)    return m_io_key[2]->read();
 			if (~m_igs_input_sel & 0x08)    return m_io_key[3]->read();
 			if (~m_igs_input_sel & 0x10)    return m_io_key[4]->read();
-			/* fall through */
+			[[fallthrough]];
 
 		case 0x20:  return 0x49;
 		case 0x21:  return 0x47;

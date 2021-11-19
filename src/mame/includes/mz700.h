@@ -50,6 +50,9 @@ public:
 	void init_mz800();
 	void init_mz700();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	uint8_t mz700_e008_r();
 	void mz700_e008_w(uint8_t data);
@@ -75,7 +78,6 @@ private:
 	void mz800_cgram_w(offs_t offset, uint8_t data);
 	DECLARE_MACHINE_RESET(mz700);
 	DECLARE_MACHINE_RESET(mz800);
-	virtual void machine_start() override;
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);

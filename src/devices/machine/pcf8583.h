@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tim Schuerewegen, Ryan Holtz
+// copyright-holders:Nigel Barnes
 /*********************************************************************
 
     Philips PCF8583 Clock and Calendar with 240 x 8-bit RAM
@@ -62,17 +62,25 @@
 #include "dirtc.h"
 
 
-class pcf8583_device :  public device_t,
-						public device_rtc_interface,
-						public device_nvram_interface
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> pcf8583_device
+
+class pcf8583_device :
+	public device_t,
+	public device_rtc_interface,
+	public device_nvram_interface
 {
 public:
-	pcf8583_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 32'768);
+	pcf8583_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto irq() { return m_irq_callback.bind(); }
+	auto irq() { return m_irq_cb.bind(); }
 
-	void set_a0(uint8_t a0);
+	void set_a0(int a0) { m_slave_address = (m_slave_address & 0xfd) | (a0 << 1); }
 
+	DECLARE_WRITE_LINE_MEMBER(a0_w);
 	DECLARE_WRITE_LINE_MEMBER(scl_w);
 	DECLARE_WRITE_LINE_MEMBER(sda_w);
 	DECLARE_READ_LINE_MEMBER(sda_r);
@@ -80,11 +88,11 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
 	virtual bool rtc_feature_y2k() const override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 	// device_nvram_interface overrides
@@ -93,6 +101,8 @@ protected:
 	virtual void nvram_write(emu_file &file) override;
 
 private:
+	static constexpr uint8_t PCF8583_SLAVE_ADDRESS = 0xa0;
+
 	enum
 	{
 		REG_CONTROL             = 0x00,
@@ -115,7 +125,7 @@ private:
 
 	enum
 	{
-		CONTROL_STOP_BIT    = 0x80
+		CONTROL_STOP_BIT = 7
 	};
 
 	static const device_timer_id TIMER_TICK = 0;
@@ -136,31 +146,27 @@ private:
 	uint8_t get_time_second()           { return bcd_to_integer(m_data[REG_SECONDS]); }
 	void set_time_second(uint8_t second){ m_data[REG_SECONDS] = convert_to_bcd(second); }
 
-	void write_register(uint8_t offset, uint8_t data);
 	void advance_hundredths();
-	void clear_rx_buffer();
 
-	devcb_write_line m_irq_callback;
+	optional_memory_region m_region;
+
+	devcb_write_line m_irq_cb;
 
 	// internal state
-	uint8_t     m_data[256];
-	int         m_scl;
-	int         m_sda;
-	int         m_inp;
-	bool        m_transfer_active;
-	int         m_bit_index;
-	bool        m_irq;
-	uint8_t     m_data_recv_index;
-	uint8_t     m_data_recv;
-	uint8_t     m_mode;
-	uint8_t     m_pos;
-	uint8_t     m_write_address;
-	uint8_t     m_read_address;
+	uint8_t m_data[256];
+	int m_slave_address;
+	int m_scl;
+	int m_sdaw;
+	int m_sdar;
+	int m_state;
+	int m_bits;
+	int m_shift;
+	int m_devsel;
+	int m_register;
+	bool m_irq;
 	emu_timer * m_timer;
-	enum        { RTC_MODE_NONE, RTC_MODE_SEND, RTC_MODE_RECV };
 
-	static constexpr uint8_t WRITE_ADDRESS_BASE = 0xa0;
-	static constexpr uint8_t READ_ADDRESS_BASE = 0xa1;
+	enum { STATE_IDLE, STATE_DEVSEL, STATE_REGISTER, STATE_DATAIN, STATE_DATAOUT };
 };
 
 // device type definition

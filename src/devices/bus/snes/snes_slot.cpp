@@ -48,7 +48,6 @@
 
  ***********************************************************************************************************/
 
-
 #include "emu.h"
 #include "snes_slot.h"
 
@@ -312,7 +311,7 @@ static int sns_get_pcb_id(const char *slot)
 {
 	for (auto & elem : slot_list)
 	{
-		if (!core_stricmp(elem.slot_option, slot))
+		if (!strcmp(elem.slot_option, slot))
 			return elem.pcb_id;
 	}
 
@@ -1022,13 +1021,14 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
 		uint32_t offset;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large file
 		std::vector<uint8_t> rom(len);
 		int type = 0, addon = 0;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check for error result or read returning short
 
 		offset = snes_skip_header(&rom[0], len);
 
@@ -1071,7 +1071,7 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 				break;
 		}
 
-		slot_string = sns_get_slot(type);
+		char const *const slot_string = sns_get_slot(type);
 
 		return std::string(slot_string);
 	}
@@ -1373,7 +1373,7 @@ void base_sns_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t l
 
 	logerror( "\tSize:          %d megabits [%d]\n", 1 << (ROM[hilo_mode + 0x17] - 7), ROM[hilo_mode + 0x17]);
 	logerror( "\tSRAM:          %d kilobits [%d]\n", ROM[hilo_mode + 0x18] * 8, ROM[hilo_mode + 0x18] );
-	if (ROM[hilo_mode + 0x19] < ARRAY_LENGTH(countries))
+	if (ROM[hilo_mode + 0x19] < std::size(countries))
 		logerror( "\tCountry:       %s [%d]\n", countries[ROM[hilo_mode + 0x19]], ROM[hilo_mode + 0x19]);
 	else
 		logerror( "\tCountry:       Unknown [%d]\n", ROM[hilo_mode + 0x19]);

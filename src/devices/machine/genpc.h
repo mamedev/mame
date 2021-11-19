@@ -20,7 +20,6 @@
 
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/pc_kbd/pc_kbdc.h"
 
 
 // ======================> ibm5160_mb_device
@@ -28,7 +27,7 @@ class ibm5160_mb_device : public device_t
 {
 public:
 	// construction/destruction
-	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// inline configuration
 	template <typename T> void set_cputag(T &&tag)
@@ -40,6 +39,8 @@ public:
 
 	auto int_callback() { return m_int_callback.bind(); }
 	auto nmi_callback() { return m_nmi_callback.bind(); }
+	auto kbdclk_callback() { return m_kbdclk_callback.bind(); }
+	auto kbddata_callback() { return m_kbddata_callback.bind(); }
 
 	void map(address_map &map);
 
@@ -54,6 +55,10 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
 
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
+
+	// interface to the keyboard
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
 
 protected:
 	ibm5160_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -76,11 +81,12 @@ protected:
 	optional_device<i8255_device>           m_ppi8255;
 	required_device<speaker_sound_device>   m_speaker;
 	required_device<isa8_device>            m_isabus;
-	optional_device<pc_kbdc_device>         m_pc_kbdc;
 	required_device<ram_device>             m_ram;
 
 	devcb_write_line m_int_callback;
 	devcb_write_line m_nmi_callback;
+	devcb_write_line m_kbdclk_callback;
+	devcb_write_line m_kbddata_callback;
 
 	/* U73 is an LS74 - dual flip flop */
 	/* Q2 is set by OUT1 from the 8253 and goes to DRQ1 on the 8237 */
@@ -102,10 +108,6 @@ protected:
 	uint8_t                   m_ppi_data_signal;
 	uint8_t                   m_ppi_shift_register;
 	uint8_t                   m_ppi_shift_enable;
-
-	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
 
 	uint8_t pc_ppi_porta_r();
 	uint8_t pc_ppi_portc_r();
@@ -141,7 +143,7 @@ class ibm5150_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
@@ -170,7 +172,9 @@ class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 
 protected:
 	ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -183,8 +187,6 @@ protected:
 private:
 	uint8_t pc_ppi_portc_r();
 	void pc_ppi_portb_w(uint8_t data);
-
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
 };
 
 DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
@@ -194,7 +196,7 @@ class ec1840_mb_device : public ec1841_mb_device
 {
 public:
 	// construction/destruction
-	ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	// optional information overrides
@@ -214,7 +216,7 @@ class pc_noppi_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
-	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint8_t pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 

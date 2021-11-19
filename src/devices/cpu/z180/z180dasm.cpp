@@ -467,6 +467,7 @@ offs_t z180_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 				break;
 			case 'X':
 				offset = (int8_t) params.r8(pos++);
+				[[fallthrough]];
 			case 'Y':
 				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset));
 				break;

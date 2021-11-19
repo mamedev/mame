@@ -149,10 +149,241 @@ Fax                  1982  6502   FXL, FLA
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/exidy.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
-#include "audio/exidy.h"
-#include "includes/exidy.h"
+#include "sound/dac.h"
+#include "sound/samples.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+namespace {
+
+#define EXIDY_MASTER_CLOCK              (XTAL(11'289'000))
+#define EXIDY_CPU_CLOCK                 (EXIDY_MASTER_CLOCK / 16)
+#define EXIDY_PIXEL_CLOCK               (EXIDY_MASTER_CLOCK / 2)
+#define EXIDY_HTOTAL                    (0x150)
+#define EXIDY_HBEND                     (0x000)
+#define EXIDY_HBSTART                   (0x100)
+#define EXIDY_HSEND                     (0x140)
+#define EXIDY_HSSTART                   (0x120)
+#define EXIDY_VTOTAL                    (0x118)
+#define EXIDY_VBEND                     (0x000)
+#define EXIDY_VBSTART                   (0x100)
+#define EXIDY_VSEND                     (0x108)
+#define EXIDY_VSSTART                   (0x100)
+
+
+class exidy_state : public driver_device
+{
+public:
+	enum
+	{
+		TIMER_COLLISION_IRQ
+	};
+
+	exidy_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_color_latch(*this, "color_latch"),
+		m_videoram(*this, "videoram"),
+		m_sprite1_xpos(*this, "sprite1_xpos"),
+		m_sprite1_ypos(*this, "sprite1_ypos"),
+		m_sprite2_xpos(*this, "sprite2_xpos"),
+		m_sprite2_ypos(*this, "sprite2_ypos"),
+		m_spriteno(*this, "spriteno"),
+		m_sprite_enable(*this, "sprite_enable"),
+		m_characterram(*this, "characterram")
+	{
+	}
+
+	void venture(machine_config &config);
+	void mtrap(machine_config &config);
+	void pepper2(machine_config &config);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_color_latch;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void video_start() override;
+
+	void base(machine_config &config);
+
+	void exidy_video_config(uint8_t _collision_mask, uint8_t _collision_invert, int _is_2bpp);
+
+	uint8_t exidy_interrupt_r();
+
+	void exidy_map(address_map &map);
+
+private:
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_sprite1_xpos;
+	required_shared_ptr<uint8_t> m_sprite1_ypos;
+	required_shared_ptr<uint8_t> m_sprite2_xpos;
+	required_shared_ptr<uint8_t> m_sprite2_ypos;
+	required_shared_ptr<uint8_t> m_spriteno;
+	required_shared_ptr<uint8_t> m_sprite_enable;
+	optional_shared_ptr<uint8_t> m_characterram;
+
+	uint8_t m_collision_mask;
+	uint8_t m_collision_invert;
+	int m_is_2bpp;
+	uint8_t m_int_condition;
+	bitmap_ind16 m_background_bitmap;
+	bitmap_ind16 m_motion_object_1_vid;
+	bitmap_ind16 m_motion_object_2_vid;
+	bitmap_ind16 m_motion_object_2_clip;
+
+	void mtrap_ocl_w(uint8_t data);
+
+	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
+
+	void latch_condition(int collision);
+	void set_1_color(int index, int which);
+	void set_colors();
+	void draw_background();
+	int sprite_1_enabled();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void check_collision();
+
+	void venture_map(address_map &map);
+	void mtrap_map(address_map &map);
+	void pepper2_map(address_map &map);
+};
+
+
+class spectar_state : public exidy_state
+{
+public:
+	spectar_state(const machine_config &mconfig, device_type type, const char *tag) :
+		exidy_state(mconfig, type, tag),
+		m_dac(*this, "dac"),
+		m_samples(*this, "samples")
+	{
+	}
+
+	void sidetrac(machine_config &config);
+	void spectar(machine_config &config);
+	void rallys(machine_config &config);
+	void phantoma(machine_config &config);
+
+	void init_sidetrac();
+	void init_spectar();
+
+protected:
+	virtual void machine_start() override;
+
+	void set_max_freq(int freq) { m_max_freq = freq; }
+
+	void spectar_audio_1_w(uint8_t data);
+	void spectar_audio_2_w(uint8_t data);
+
+	void adjust_sample(uint8_t freq);
+	bool RISING_EDGE(uint8_t data, uint8_t bit) const { return (data & bit) && !(m_port_1_last & bit); }
+	bool FALLING_EDGE(uint8_t data, uint8_t bit) const { return !(data & bit) && (m_port_1_last & bit); }
+
+private:
+	required_device<dac_bit_interface> m_dac;
+	required_device<samples_device> m_samples;
+
+	// Targ and Spectar samples
+	int m_max_freq;
+	uint8_t m_port_1_last;
+	uint8_t m_tone_freq;
+	uint8_t m_tone_active;
+
+	void sidetrac_map(address_map &map);
+	void spectar_map(address_map &map);
+	void rallys_map(address_map &map);
+	void phantoma_map(address_map &map);
+};
+
+
+class targ_state : public spectar_state
+{
+public:
+	targ_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spectar_state(mconfig, type, tag),
+		m_sound_prom(*this, "targ")
+	{
+	}
+
+	void targ(machine_config &config);
+
+	void init_targ();
+
+protected:
+	virtual void machine_start() override;
+
+	void targ_audio_1_w(uint8_t data);
+	void targ_audio_2_w(uint8_t data);
+
+private:
+	required_region_ptr<uint8_t> m_sound_prom;
+
+	uint8_t m_port_2_last;
+	uint8_t m_tone_pointer;
+
+	void targ_map(address_map &map);
+};
+
+
+class teetert_state : public exidy_state
+{
+public:
+	teetert_state(const machine_config &mconfig, device_type type, const char *tag) :
+		exidy_state(mconfig, type, tag),
+		m_dial(*this, "DIAL")
+	{
+	}
+
+	void teetert(machine_config &config);
+
+	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_ioport m_dial;
+	uint8_t m_last_dial;
+};
+
+
+class fax_state : public exidy_state
+{
+public:
+	fax_state(const machine_config &mconfig, device_type type, const char *tag) :
+		exidy_state(mconfig, type, tag),
+		m_rom_bank(*this, "bank1")
+	{
+	}
+
+	void fax(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	required_memory_bank m_rom_bank;
+
+	void fax_bank_select_w(uint8_t data);
+
+	void fax_map(address_map &map);
+};
 
 
 /*************************************
@@ -161,12 +392,11 @@ Fax                  1982  6502   FXL, FLA
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
+CUSTOM_INPUT_MEMBER(teetert_state::teetert_input_r)
 {
-	uint8_t dial = ioport("DIAL")->read();
-	int result = 0;
+	uint8_t dial = m_dial->read();
 
-	result = (dial != m_last_dial) << 4;
+	int result = (dial != m_last_dial) << 4;
 	if (result != 0)
 	{
 		if (((dial - m_last_dial) & 0xff) < 0x80)
@@ -189,9 +419,9 @@ CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
  *
  *************************************/
 
-void exidy_state::fax_bank_select_w(uint8_t data)
+void fax_state::fax_bank_select_w(uint8_t data)
 {
-	membank("bank1")->set_entry(data & 0x1f);
+	m_rom_bank->set_entry(data & 0x1f);
 
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n", data & 0x1f);
@@ -230,40 +460,40 @@ void exidy_state::exidy_map(address_map &map)
 }
 
 
-void exidy_state::sidetrac_map(address_map &map)
+void spectar_state::sidetrac_map(address_map &map)
 {
 	exidy_map(map);
 	map(0x0800, 0x3fff).rom();
-	map(0x4800, 0x4fff).rom().share("characterram");
-	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
+	map(0x4800, 0x4fff).rom();
+	map(0x5200, 0x5200).w(FUNC(spectar_state::spectar_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(spectar_state::spectar_audio_2_w));
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
 }
 
 
-void exidy_state::targ_map(address_map &map)
-{
-	exidy_map(map);
-	map(0x0800, 0x3fff).rom();
-	map(0x4800, 0x4fff).ram().share("characterram");
-	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(FUNC(exidy_state::targ_audio_2_w));
-	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
-}
-
-
-void exidy_state::spectar_map(address_map &map)
+void targ_state::targ_map(address_map &map)
 {
 	exidy_map(map);
 	map(0x0800, 0x3fff).rom();
 	map(0x4800, 0x4fff).ram().share("characterram");
-	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5200, 0x5200).w(FUNC(targ_state::targ_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(targ_state::targ_audio_2_w));
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
 }
 
 
-void exidy_state::rallys_map(address_map &map)
+void spectar_state::spectar_map(address_map &map)
+{
+	exidy_map(map);
+	map(0x0800, 0x3fff).rom();
+	map(0x4800, 0x4fff).ram().share("characterram");
+	map(0x5200, 0x5200).w(FUNC(spectar_state::spectar_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(spectar_state::spectar_audio_2_w));
+	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
+
+
+void spectar_state::rallys_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram();
 	map(0x0800, 0x3fff).rom();
@@ -275,14 +505,21 @@ void exidy_state::rallys_map(address_map &map)
 	map(0x5100, 0x5100).mirror(0x00fc).writeonly().share("spriteno");
 	map(0x5101, 0x5101).mirror(0x00fc).portr("IN0");
 	map(0x5101, 0x5101).mirror(0x00fc).writeonly().share("sprite_enable");
-	map(0x5103, 0x5103).mirror(0x00fc).r(FUNC(exidy_state::exidy_interrupt_r));
-	map(0x5200, 0x5200).w(FUNC(exidy_state::targ_audio_1_w));
-	map(0x5201, 0x5201).w(FUNC(exidy_state::spectar_audio_2_w));
+	map(0x5103, 0x5103).mirror(0x00fc).r(FUNC(spectar_state::exidy_interrupt_r));
+	map(0x5200, 0x5200).w(FUNC(spectar_state::spectar_audio_1_w));
+	map(0x5201, 0x5201).w(FUNC(spectar_state::spectar_audio_2_w));
 	map(0x5210, 0x5212).writeonly().share("color_latch");
 	map(0x5213, 0x5213).portr("IN2");
 	map(0x5300, 0x5300).writeonly().share("sprite2_xpos");
 	map(0x5301, 0x5301).writeonly().share("sprite2_ypos");
 	map(0xff00, 0xffff).rom().region("maincpu", 0x3f00);
+}
+
+
+void spectar_state::phantoma_map(address_map &map)
+{
+	rallys_map(map);
+	map(0xf800, 0xffff).rom().region("maincpu", 0xf800); // the ROM is actually mapped high
 }
 
 
@@ -310,14 +547,14 @@ void exidy_state::mtrap_map(address_map &map)
 	map(0x5101, 0x5101).w(FUNC(exidy_state::mtrap_ocl_w));
 }
 
-void exidy_state::fax_map(address_map &map)
+void fax_state::fax_map(address_map &map)
 {
 	exidy_map(map);
 	map(0x0400, 0x07ff).ram();
 	map(0x1a00, 0x1a00).portr("IN4");
 	map(0x1c00, 0x1c00).portr("IN3");
-	map(0x2000, 0x2000).w(FUNC(exidy_state::fax_bank_select_w));
-	map(0x2000, 0x3fff).bankr("bank1");
+	map(0x2000, 0x2000).w(FUNC(fax_state::fax_bank_select_w));
+	map(0x2000, 0x3fff).bankr(m_rom_bank);
 	map(0x5200, 0x520f).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x5213, 0x5217).nopw();        /* empty control lines on color/sound board */
 	map(0x6000, 0x6fff).ram().share("characterram");
@@ -638,7 +875,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exidy_state, teetert_input_r)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(teetert_state, teetert_input_r)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -823,14 +1060,413 @@ GFXDECODE_END
 
 /*************************************
  *
+ *  Video configuration
+ *
+ *************************************/
+
+void exidy_state::exidy_video_config(uint8_t _collision_mask, uint8_t _collision_invert, int _is_2bpp)
+{
+	m_collision_mask   = _collision_mask;
+	m_collision_invert = _collision_invert;
+	m_is_2bpp          = _is_2bpp;
+}
+
+
+
+/*************************************
+ *
+ *  Video startup
+ *
+ *************************************/
+
+void exidy_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_background_bitmap);
+	m_motion_object_1_vid.allocate(16, 16);
+	m_motion_object_2_vid.allocate(16, 16);
+	m_motion_object_2_clip.allocate(16, 16);
+
+	save_item(NAME(m_int_condition));
+	save_item(NAME(m_background_bitmap));
+	save_item(NAME(m_motion_object_1_vid));
+	save_item(NAME(m_motion_object_2_vid));
+	save_item(NAME(m_motion_object_2_clip));
+}
+
+
+
+/*************************************
+ *
+ *  Interrupt generation
+ *
+ *************************************/
+
+inline void exidy_state::latch_condition(int collision)
+{
+	collision ^= m_collision_invert;
+	m_int_condition = (ioport("INTSOURCE")->read() & ~0x1c) | (collision & m_collision_mask);
+}
+
+
+INTERRUPT_GEN_MEMBER(exidy_state::exidy_vblank_interrupt)
+{
+	/* latch the current condition */
+	latch_condition(0);
+	m_int_condition &= ~0x80;
+
+	/* set the IRQ line */
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+
+
+uint8_t exidy_state::exidy_interrupt_r()
+{
+	/* clear any interrupts */
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	/* return the latched condition */
+	return m_int_condition;
+}
+
+
+
+/*************************************
+ *
+ *  Palette handling
+ *
+ *************************************/
+
+inline void exidy_state::set_1_color(int index, int which)
+{
+	m_palette->set_pen_color(index,
+							pal1bit(m_color_latch[2] >> which),
+							pal1bit(m_color_latch[1] >> which),
+							pal1bit(m_color_latch[0] >> which));
+}
+
+void exidy_state::set_colors()
+{
+	/* motion object 1 */
+	set_1_color(0, 0);
+	set_1_color(1, 7);
+
+	/* motion object 2 */
+	set_1_color(2, 0);
+	set_1_color(3, 6);
+
+	/* characters */
+	set_1_color(4, 4);
+	set_1_color(5, 3);
+	set_1_color(6, 2);
+	set_1_color(7, 1);
+}
+
+
+
+/*************************************
+ *
+ *  Background update
+ *
+ *************************************/
+
+void exidy_state::draw_background()
+{
+	const uint8_t *const cram = m_characterram ? &m_characterram[0] : memregion("maincpu")->base() + 0x4800;
+
+	pen_t off_pen = 0;
+
+	for (offs_t offs = 0; offs < 0x400; offs++)
+	{
+		uint8_t y = offs >> 5 << 3;
+		uint8_t const code = m_videoram[offs];
+
+		pen_t on_pen_1, on_pen_2;
+		if (m_is_2bpp)
+		{
+			on_pen_1 = 4 + ((code >> 6) & 0x02);
+			on_pen_2 = 5 + ((code >> 6) & 0x02);
+		}
+		else
+		{
+			on_pen_1 = 4 + ((code >> 6) & 0x03);
+			on_pen_2 = off_pen;  /* unused */
+		}
+
+		for (uint8_t cy = 0; cy < 8; cy++)
+		{
+			uint8_t x = offs << 3;
+
+			if (m_is_2bpp)
+			{
+				uint8_t data1 = cram[0x000 | (code << 3) | cy];
+				uint8_t data2 = cram[0x800 | (code << 3) | cy];
+
+				for (int i = 0; i < 8; i++)
+				{
+					if (data1 & 0x80)
+						m_background_bitmap.pix(y, x) = (data2 & 0x80) ? on_pen_2 : on_pen_1;
+					else
+						m_background_bitmap.pix(y, x) = off_pen;
+
+					x++;
+					data1 <<= 1;
+					data2 <<= 1;
+				}
+			}
+			else // 1bpp
+			{
+				uint8_t data = cram[(code << 3) | cy];
+
+				for (int i = 0; i < 8; i++)
+				{
+					m_background_bitmap.pix(y, x) = (data & 0x80) ? on_pen_1 : off_pen;
+
+					x++;
+					data <<= 1;
+				}
+			}
+
+			y++;
+		}
+	}
+}
+
+
+
+/*************************************
+ *
+ *  Sprite hardware
+ *
+ *************************************/
+
+inline int exidy_state::sprite_1_enabled()
+{
+	/* if the collision_mask is 0x00, then we are on old hardware that always has */
+	/* sprite 1 enabled regardless */
+	return (!(*m_sprite_enable & 0x80) || (*m_sprite_enable & 0x10) || (m_collision_mask == 0x00));
+}
+
+
+void exidy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* draw sprite 2 first */
+	int sprite_set_2 = ((*m_sprite_enable & 0x40) != 0);
+
+	int sx = 236 - *m_sprite2_xpos - 4;
+	int sy = 244 - *m_sprite2_ypos - 4;
+
+	m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+			((*m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 1,
+			0, 0, sx, sy, 0);
+
+	/* draw sprite 1 next */
+	if (sprite_1_enabled())
+	{
+		int sprite_set_1 = ((*m_sprite_enable & 0x20) != 0);
+
+		sx = 236 - *m_sprite1_xpos - 4;
+		sy = 244 - *m_sprite1_ypos - 4;
+
+		if (sy < 0) sy = 0;
+
+		m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
+				(*m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
+				0, 0, sx, sy, 0);
+	}
+
+}
+
+
+
+/*************************************
+ *
+ *  Collision detection
+ *
+ *************************************/
+
+/***************************************************************************
+
+    Exidy hardware checks for two types of collisions based on the video
+    signals.  If the Motion Object 1 and Motion Object 2 signals are on at
+    the same time, an M1M2 collision bit gets set.  If the Motion Object 1
+    and Background Character signals are on at the same time, an M1CHAR
+    collision bit gets set.  So effectively, there's a pixel-by-pixel
+    collision check comparing Motion Object 1 (the player) to the
+    background and to the other Motion Object (typically a bad guy).
+
+***************************************************************************/
+
+void exidy_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_COLLISION_IRQ:
+		/* latch the collision bits */
+		latch_condition(param);
+
+		/* set the IRQ line */
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+
+		break;
+	default:
+		throw emu_fatalerror("Unknown id in exidy_state::device_timer");
+	}
+}
+
+
+void exidy_state::check_collision()
+{
+	uint8_t sprite_set_1 = ((*m_sprite_enable & 0x20) != 0);
+	uint8_t sprite_set_2 = ((*m_sprite_enable & 0x40) != 0);
+	const rectangle clip(0, 15, 0, 15);
+	int org_1_x = 0, org_1_y = 0;
+	int org_2_x = 0, org_2_y = 0;
+	int count = 0;
+
+	/* if there is nothing to detect, bail */
+	if (m_collision_mask == 0)
+		return;
+
+	/* draw sprite 1 */
+	m_motion_object_1_vid.fill(0xff, clip);
+	if (sprite_1_enabled())
+	{
+		org_1_x = 236 - *m_sprite1_xpos - 4;
+		org_1_y = 244 - *m_sprite1_ypos - 4;
+		m_gfxdecode->gfx(0)->transpen(m_motion_object_1_vid,clip,
+				(*m_spriteno & 0x0f) + 16 * sprite_set_1, 0,
+				0, 0, 0, 0, 0);
+	}
+
+	/* draw sprite 2 */
+	m_motion_object_2_vid.fill(0xff, clip);
+	org_2_x = 236 - *m_sprite2_xpos - 4;
+	org_2_y = 244 - *m_sprite2_ypos - 4;
+	m_gfxdecode->gfx(0)->transpen(m_motion_object_2_vid,clip,
+			((*m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
+			0, 0, 0, 0, 0);
+
+	/* draw sprite 2 clipped to sprite 1's location */
+	m_motion_object_2_clip.fill(0xff, clip);
+	if (sprite_1_enabled())
+	{
+		int sx = org_2_x - org_1_x;
+		int sy = org_2_y - org_1_y;
+		m_gfxdecode->gfx(0)->transpen(m_motion_object_2_clip,clip,
+				((*m_spriteno >> 4) & 0x0f) + 32 + 16 * sprite_set_2, 0,
+				0, 0, sx, sy, 0);
+	}
+
+	/* scan for collisions */
+	for (int sy = 0; sy < 16; sy++)
+		for (int sx = 0; sx < 16; sx++)
+		{
+			if (m_motion_object_1_vid.pix(sy, sx) != 0xff)
+			{
+				uint8_t current_collision_mask = 0;
+
+				/* check for background collision (M1CHAR) */
+				if (m_background_bitmap.pix(org_1_y + sy, org_1_x + sx) != 0)
+					current_collision_mask |= 0x04;
+
+				/* check for motion object collision (M1M2) */
+				if (m_motion_object_2_clip.pix(sy, sx) != 0xff)
+					current_collision_mask |= 0x10;
+
+				/* if we got one, trigger an interrupt */
+				if ((current_collision_mask & m_collision_mask) && (count++ < 128))
+					timer_set(m_screen->time_until_pos(org_1_x + sx, org_1_y + sy), TIMER_COLLISION_IRQ, current_collision_mask);
+			}
+
+			if (m_motion_object_2_vid.pix(sy, sx) != 0xff)
+			{
+				/* check for background collision (M2CHAR) */
+				if (m_background_bitmap.pix(org_2_y + sy, org_2_x + sx) != 0)
+					if ((m_collision_mask & 0x08) && (count++ < 128))
+						timer_set(m_screen->time_until_pos(org_2_x + sx, org_2_y + sy), TIMER_COLLISION_IRQ, 0x08);
+			}
+		}
+}
+
+
+
+/*************************************
+ *
+ *  Standard screen refresh callback
+ *
+ *************************************/
+
+uint32_t exidy_state::screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* refresh the colors from the palette (static or dynamic) */
+	set_colors();
+
+	/* update the background and draw it */
+	draw_background();
+	copybitmap(bitmap, m_background_bitmap, 0, 0, 0, 0, cliprect);
+
+	/* draw the sprites */
+	draw_sprites(bitmap, cliprect);
+
+	/* check for collision, this will set the appropriate bits in collision_mask */
+	check_collision();
+
+	return 0;
+}
+
+
+
+/*************************************
+ *
  *  Machine init
  *
  *************************************/
 
-MACHINE_START_MEMBER(exidy_state,teetert)
+void spectar_state::machine_start()
 {
+	exidy_state::machine_start();
+
+	m_tone_freq = 0;
+	m_tone_active = 0;
+
+	/* start_raw can't be called here: chan.source will be set by
+	samples_device::device_start and then nulled out by samples_device::device_reset
+	at the soft_reset stage of init_machine() and will never be set again.
+	Thus, I've moved it to exidy_state::adjust_sample() were it will be set after
+	machine initialization. */
+	//m_samples->set_volume(3, 0);
+	//m_samples->start_raw(3, sine_wave, 32, 1000, true);
+
+	save_item(NAME(m_port_1_last));
+	save_item(NAME(m_tone_freq));
+	save_item(NAME(m_tone_active));
+}
+
+void targ_state::machine_start()
+{
+	spectar_state::machine_start();
+
+	m_tone_pointer = 0;
+
+	save_item(NAME(m_port_2_last));
+	save_item(NAME(m_tone_pointer));
+}
+
+void teetert_state::machine_start()
+{
+	exidy_state::machine_start();
+
 	save_item(NAME(m_last_dial));
 }
+
+void fax_state::machine_start()
+{
+	exidy_state::machine_start();
+
+	m_rom_bank->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x2000);
+}
+
 
 /*************************************
  *
@@ -840,11 +1476,11 @@ MACHINE_START_MEMBER(exidy_state,teetert)
 
 void exidy_state::base(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M6502(config, m_maincpu, EXIDY_CPU_CLOCK);
 	m_maincpu->set_vblank_int("screen", FUNC(exidy_state::exidy_vblank_interrupt));
 
-	/* video hardware */
+	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exidy);
 	PALETTE(config, m_palette).set_entries(8);
 
@@ -856,48 +1492,77 @@ void exidy_state::base(machine_config &config)
 }
 
 
-void exidy_state::sidetrac(machine_config &config)
+void spectar_state::sidetrac(machine_config &config)
 {
+	static const char *const sample_names[] =
+	{
+		"*targ",
+		"expl",
+		"shot",
+		"sexpl",
+		"spslow",
+		"spfast",
+		nullptr
+	};
+
 	base(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::sidetrac_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectar_state::sidetrac_map);
 
-	/* audio hardware */
-	spectar_audio(config);
+	// video hardware
+	exidy_video_config(0x00, 0x00, false);
+
+	// audio hardware
+	set_max_freq(525'000);
+
+	SPEAKER(config, "speaker").front_center();
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(4);
+	m_samples->set_samples_names(sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
 }
 
 
-void exidy_state::targ(machine_config &config)
+void targ_state::targ(machine_config &config)
 {
-	base(config);
+	sidetrac(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::targ_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &targ_state::targ_map);
 
-	/* audio hardware */
-	targ_audio(config);
+	// audio hardware
+	set_max_freq(125'000);
 }
 
 
-void exidy_state::spectar(machine_config &config)
+void spectar_state::spectar(machine_config &config)
 {
-	base(config);
+	sidetrac(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::spectar_map);
-
-	/* audio hardware */
-	spectar_audio(config);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectar_state::spectar_map);
 }
 
 
-void exidy_state::rallys(machine_config &config)
+void spectar_state::rallys(machine_config &config)
 {
-	spectar(config);
+	sidetrac(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::rallys_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectar_state::rallys_map);
+}
+
+
+void spectar_state::phantoma(machine_config &config)
+{
+	sidetrac(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &spectar_state::phantoma_map);
 }
 
 
@@ -905,12 +1570,15 @@ void exidy_state::venture(machine_config &config)
 {
 	base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::venture_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
-	/* audio hardware */
+	// video hardware
+	exidy_video_config(0x04, 0x04, false);
+
+	// audio hardware
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
@@ -925,14 +1593,15 @@ void exidy_state::venture(machine_config &config)
 }
 
 
-void exidy_state::teetert(machine_config &config)
+void teetert_state::teetert(machine_config &config)
 {
 	venture(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_periodic_int(FUNC(exidy_state::nmi_line_pulse), attotime::from_hz(10*60));
+	// basic machine hardware
+	m_maincpu->set_periodic_int(FUNC(teetert_state::nmi_line_pulse), attotime::from_hz(10*60));
 
-	MCFG_MACHINE_START_OVERRIDE(exidy_state, teetert )
+	// video hardware
+	exidy_video_config(0x0c, 0x0c, false);
 }
 
 
@@ -940,12 +1609,15 @@ void exidy_state::mtrap(machine_config &config)
 {
 	base(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::mtrap_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1920));
 
-	/* audio hardware */
+	// video hardware
+	exidy_video_config(0x14, 0x00, false);
+
+	// audio hardware
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set("soundbd", FUNC(venture_sound_device::pb_w));
 	pia.writepb_handler().set("soundbd", FUNC(venture_sound_device::pa_w));
@@ -964,19 +1636,141 @@ void exidy_state::pepper2(machine_config &config)
 {
 	venture(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::pepper2_map);
+
+	// video hardware
+	exidy_video_config(0x14, 0x04, true);
 }
 
 
-void exidy_state::fax(machine_config &config)
+void fax_state::fax(machine_config &config)
 {
 	pepper2(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &exidy_state::fax_map);
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &fax_state::fax_map);
+
+	// video hardware
+	exidy_video_config(0x04, 0x04, true);
 }
 
+/*************************************************************************
+
+    Targ hardware
+
+*************************************************************************/
+
+/* Sound channel usage
+   0 = CPU music,  Shoot
+   1 = Crash
+   2 = Spectar sound
+   3 = Tone generator
+*/
+
+static const int16_t sine_wave[32] =
+{
+	 0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
+	-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
+};
+
+
+void spectar_state::adjust_sample(uint8_t freq)
+{
+	m_tone_freq = freq;
+
+	if (!m_samples->playing(3))
+	{
+		m_samples->set_volume(3, 0);
+		m_samples->start_raw(3, sine_wave, 32, 1000, true);
+	}
+
+	if ((m_tone_freq == 0xff) || (m_tone_freq == 0x00))
+		m_samples->set_volume(3, 0);
+	else
+	{
+		m_samples->set_frequency(3, 1.0 * m_max_freq / (0xff - m_tone_freq));
+		m_samples->set_volume(3, m_tone_active);
+	}
+}
+
+
+void spectar_state::spectar_audio_1_w(uint8_t data)
+{
+	// CPU music
+	if (BIT(m_port_1_last ^ data, 0))
+		m_dac->write(BIT(data, 0));
+
+	// shot
+	if (FALLING_EDGE(data, 0x02) && !m_samples->playing(0))
+		m_samples->start(0,1);
+	if (RISING_EDGE(data, 0x02))
+		m_samples->start(0,1);
+
+	// crash
+	if (RISING_EDGE(data, 0x20))
+	{
+		if (data & 0x40)
+			m_samples->start(1,0);
+		else
+			m_samples->start(1,2);
+	}
+
+	// Sspec
+	if (data & 0x10)
+		m_samples->stop(2);
+	else
+	{
+		if ((data & 0x08) != (m_port_1_last & 0x08))
+		{
+			if (data & 0x08)
+				m_samples->start(2,3,true);
+			else
+				m_samples->start(2,4,true);
+		}
+	}
+
+	// Game (tone generator enable)
+	if (FALLING_EDGE(data, 0x80))
+	{
+		m_tone_active = 0;
+
+		adjust_sample(m_tone_freq);
+	}
+
+	if (RISING_EDGE(data, 0x80))
+		m_tone_active = 1;
+
+	m_port_1_last = data;
+}
+
+
+void spectar_state::spectar_audio_2_w(uint8_t data)
+{
+	adjust_sample(data);
+}
+
+
+void targ_state::targ_audio_1_w(uint8_t data)
+{
+	if (FALLING_EDGE(data, 0x80))
+		m_tone_pointer = 0;
+
+	spectar_audio_1_w(data);
+}
+
+
+void targ_state::targ_audio_2_w(uint8_t data)
+{
+	if ((data & 0x01) && !(m_port_2_last & 0x01))
+	{
+		m_tone_pointer = (m_tone_pointer + 1) & 0x0f;
+
+		adjust_sample(m_sound_prom[((data & 0x02) << 3) | m_tone_pointer]);
+	}
+
+	m_port_2_last = data;
+}
 
 
 /*************************************
@@ -1040,41 +1834,41 @@ ROM_END
 
 ROM_START( spectar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spl11a-3", 0x1000, 0x0800, CRC(08880aff) SHA1(3becef348245ff4c8b0aae4a14751ab740b7d160) )
-	ROM_LOAD( "spl10a-2", 0x1800, 0x0800, CRC(fca667c1) SHA1(168426f9e87c002d2673c0230fceac4d0831d594) )
-	ROM_LOAD( "spl9a-3",  0x2000, 0x0800, CRC(9d4ce8ba) SHA1(2ef45c225fe704e49d10247c3eba1ef14141b3b7) )
-	ROM_LOAD( "spl8a-2",  0x2800, 0x0800, CRC(cfacbadf) SHA1(77b27cf6f35e8e8dd2fd4f31bba2a96f3076163e) )
-	ROM_LOAD( "spl7a-2",  0x3000, 0x0800, CRC(4c4741ff) SHA1(8de72613a385095253bb9e6da76493caec3115e4) )
-	ROM_LOAD( "spl6a-2",  0x3800, 0x0800, CRC(0cb46b25) SHA1(65c5d2cc8df67225339dc8781dd29d4b57ded70c) )
+	ROM_LOAD( "spl11a-3.11a", 0x1000, 0x0800, CRC(08880aff) SHA1(3becef348245ff4c8b0aae4a14751ab740b7d160) )
+	ROM_LOAD( "spl10a-2.10a", 0x1800, 0x0800, CRC(fca667c1) SHA1(168426f9e87c002d2673c0230fceac4d0831d594) )
+	ROM_LOAD( "spl9a-3.9a",   0x2000, 0x0800, CRC(9d4ce8ba) SHA1(2ef45c225fe704e49d10247c3eba1ef14141b3b7) )
+	ROM_LOAD( "spl8a-2.8a",   0x2800, 0x0800, CRC(cfacbadf) SHA1(77b27cf6f35e8e8dd2fd4f31bba2a96f3076163e) )
+	ROM_LOAD( "spl7a-2.7a",   0x3000, 0x0800, CRC(4c4741ff) SHA1(8de72613a385095253bb9e6da76493caec3115e4) )
+	ROM_LOAD( "spl6a-2.6a",   0x3800, 0x0800, CRC(0cb46b25) SHA1(65c5d2cc8df67225339dc8781dd29d4b57ded70c) )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
-	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+	ROM_LOAD( "hrl11d-2.11d", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
+	ROM_CONTINUE(             0x0000, 0x0400 )  /* overwrite with the real one */
 
-	ROM_REGION( 0x0140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. The 2 6331 match the Targ ones.
-	ROM_LOAD( "prom.5c",  0x0000, 0x0100, BAD_DUMP CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual
-	ROM_LOAD( "prom.6d",  0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Spectar manual
-	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
+	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
 ROM_START( spectar1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "spl12a1",  0x0800, 0x0800, CRC(7002efb4) SHA1(fbb19ccd2aee49b78606eadcbef94e842e1be905) )
-	ROM_LOAD( "spl11a1",  0x1000, 0x0800, CRC(8eb8526a) SHA1(0c42ee073fc73c89731dec4e3ecfc82c9b8301e9) )
-	ROM_LOAD( "spl10a1",  0x1800, 0x0800, CRC(9d169b3d) SHA1(bee9d029df6e2fba24a5ba41a76f1658e9038838) )
-	ROM_LOAD( "spl9a1",   0x2000, 0x0800, CRC(40e3eba1) SHA1(197aaed9a6159b6f3e347c0446be9e44733c1341) )
-	ROM_LOAD( "spl8a1",   0x2800, 0x0800, CRC(64d8eb84) SHA1(a249c832ea951fddc6699f7ac0b4486e8a5be98e) )
-	ROM_LOAD( "spl7a1",   0x3000, 0x0800, CRC(e08b0d8d) SHA1(6ffd6f8fb50c9fc09c38f56da7d6d005b66e78cc) )
-	ROM_LOAD( "spl6a1",   0x3800, 0x0800, CRC(f0e4e71a) SHA1(5487a94650c964a7ab07f30aacab0b470dcb3b40) )
+	ROM_LOAD( "spl12a-1.12a", 0x0800, 0x0800, CRC(7002efb4) SHA1(fbb19ccd2aee49b78606eadcbef94e842e1be905) )
+	ROM_LOAD( "spl11a-1.11a", 0x1000, 0x0800, CRC(8eb8526a) SHA1(0c42ee073fc73c89731dec4e3ecfc82c9b8301e9) )
+	ROM_LOAD( "spl10a-1.10a", 0x1800, 0x0800, CRC(9d169b3d) SHA1(bee9d029df6e2fba24a5ba41a76f1658e9038838) )
+	ROM_LOAD( "spl9a-1.9a",   0x2000, 0x0800, CRC(40e3eba1) SHA1(197aaed9a6159b6f3e347c0446be9e44733c1341) )
+	ROM_LOAD( "spl8a-1.8a",   0x2800, 0x0800, CRC(64d8eb84) SHA1(a249c832ea951fddc6699f7ac0b4486e8a5be98e) )
+	ROM_LOAD( "spl7a-1.7a",   0x3000, 0x0800, CRC(e08b0d8d) SHA1(6ffd6f8fb50c9fc09c38f56da7d6d005b66e78cc) )
+	ROM_LOAD( "spl6a-1.6a",   0x3800, 0x0800, CRC(f0e4e71a) SHA1(5487a94650c964a7ab07f30aacab0b470dcb3b40) )
 
-	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "hrl11d-2", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
-	ROM_CONTINUE(         0x0000, 0x0400 )  /* overwrite with the real one */
+	ROM_REGION( 0x0400, "gfx1", 0 ) // some PCBs were seen with hrl11d-1
+	ROM_LOAD( "hrl11d-2.11d", 0x0000, 0x0400, CRC(c55b645d) SHA1(0c18277939d74e3e1281a7f114a34781d30c2baf) )  /* this is actually not used (all FF) */
+	ROM_CONTINUE(             0x0000, 0x0400 )  /* overwrite with the real one */
 
-	ROM_REGION( 0x0140, "proms", 0 ) // were dumped from a bootleg, very probably they are the same, but marked as bad dump for precaution. The 2 6331 match the Targ ones.
-	ROM_LOAD( "prom.5c",  0x0000, 0x0100, BAD_DUMP CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual
-	ROM_LOAD( "prom.6d",  0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // 6331 according to the Spectar manual
-	ROM_LOAD( "hrl14h-1", 0x0120, 0x0020, BAD_DUMP CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "spl5c-2.5c",   0x0000, 0x0100, CRC(9ca2e061) SHA1(4111325b00a1017042d55c59308d41e8333ba627) ) // 6301 according to the Spectar manual, also seen as IM 5623CPE on PCB
+	ROM_LOAD( "prom.6d",      0x0100, 0x0020, BAD_DUMP CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) ) // screen controller PROM, 6331 according to the Spectar manual, dumped from a bootleg
+	ROM_LOAD( "hrl14h-1.14h", 0x0120, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // 6331 according to the Spectar manual
 ROM_END
 
 ROM_START( spectarrf )
@@ -1387,9 +2181,9 @@ ROM_START( venture )
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
-	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
-	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c-1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d-1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 ROM_START( venture5a )
@@ -1414,9 +2208,9 @@ ROM_START( venture5a )
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
-	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
-	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c-1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d-1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 ROM_START( venture4 )
@@ -1441,9 +2235,9 @@ ROM_START( venture4 )
 	ROM_LOAD( "vel_11d-2.11d", 0x0000, 0x0800, CRC(ea6fd981) SHA1(46b1658e1607423d5a073f14097c2a48d59057c0) )
 
 	ROM_REGION( 0x140, "proms", 0 )
-	ROM_LOAD( "hrl14h 1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
-	ROM_LOAD( "vel5c 1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
-	ROM_LOAD( "hrl6d 1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) )
+	ROM_LOAD( "vel5c-1.c5",   0x0020, 0x0100, CRC(43b35bb7) SHA1(0a0cecea8faff9f3ff4c2ceda0b5b25e8e1cd667) )
+	ROM_LOAD( "hrl6d-1.d6",   0x0120, 0x0020, CRC(e26f9053) SHA1(eec35b6aa2c2d305418306bf4a1754a0583f109f) )
 ROM_END
 
 ROM_START( venture5b )
@@ -1481,16 +2275,18 @@ ROM_START( pepper2 )
 	ROM_LOAD( "p2l-8_6a.6a",   0xf000, 0x1000, CRC(515b1046) SHA1(bdcccd4e415c00ee8e5ec185597df75ecafe7d3d) )
 
 	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
-	ROM_LOAD( "p2a_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) ) // unknown revision
-	ROM_LOAD( "p2a_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
-	ROM_LOAD( "p2a_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
+	ROM_LOAD( "p2a-2_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
+	ROM_LOAD( "p2a-2_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
+	ROM_LOAD( "p2a-2_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "p2l-1_11d.11d", 0x0000, 0x0800, CRC(b25160cd) SHA1(3d768552960a3a660891dcb85da6a5c382b33991) )
 
-	ROM_REGION( 0x120, "proms", 0 )
-	ROM_LOAD( "p2l5c-1.c5",   0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "p2l6d-1.d6",   0x0100, 0x0020, NO_DUMP )
+	// loaded, but not hooked up
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // == HRL14H-1 from other Exidy games
+	ROM_LOAD( "p2l5c-1.c5",   0x0020, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) ) // == fxl-6b from FAX set
+	ROM_LOAD( "p2l6d-1.d6",   0x0120, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) ) // == fxl-8b from FAX set
 ROM_END
 
 ROM_START( pepper27 )
@@ -1504,16 +2300,18 @@ ROM_START( pepper27 )
 	ROM_LOAD( "p2l-7_6a.6a",   0xf000, 0x1000, CRC(db8dd4fc) SHA1(9ae00f8d1a19280670dc65a20cf9cc4e7f1cc973) )
 
 	ROM_REGION( 0x8000, "soundbd:audiocpu", 0 )
-	ROM_LOAD( "p2a_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) ) // unknown revision
-	ROM_LOAD( "p2a_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
-	ROM_LOAD( "p2a_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
+	ROM_LOAD( "p2a-2_5a.5a", 0x6800, 0x0800, CRC(90e3c781) SHA1(d51a9e011167a132e8af9f4b1201600a58e86b62) )
+	ROM_LOAD( "p2a-2_6a.6a", 0x7000, 0x0800, CRC(dd343e34) SHA1(4ec55bb73d6afbd167fa91d2606d1d55a15b5c39) )
+	ROM_LOAD( "p2a-2_7a.7a", 0x7800, 0x0800, CRC(e02b4356) SHA1(9891e14d84221c1d6f2d15a29813eb41024290ca) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "p2l-1_11d.11d", 0x0000, 0x0800, CRC(b25160cd) SHA1(3d768552960a3a660891dcb85da6a5c382b33991) )
 
-	ROM_REGION( 0x120, "proms", 0 )
-	ROM_LOAD( "p2l5c-1.c5",   0x0000, 0x0100, NO_DUMP )
-	ROM_LOAD( "p2l6d-1.d6",   0x0100, 0x0020, NO_DUMP )
+	// loaded, but not hooked up
+	ROM_REGION( 0x140, "proms", 0 )
+	ROM_LOAD( "hrl14h-1.h14", 0x0000, 0x0020, CRC(f76b4fcf) SHA1(197e0cc508ffeb5cefa4046bdfb158939d598225) ) // == HRL14H-1 from other Exidy games
+	ROM_LOAD( "p2l5c-1.c5",   0x0020, 0x0100, CRC(e1e867ae) SHA1(fe4cb560860579102aedad2c81fd7bed5825f484) ) // == fxl-6b from FAX set
+	ROM_LOAD( "p2l6d-1.d6",   0x0120, 0x0020, CRC(0da1bdf9) SHA1(0c2d85da59cf86f2d9cf5f33bdc63902ca5507d3) ) // == fxl-8b from FAX set
 ROM_END
 
 
@@ -1678,94 +2476,33 @@ ROM_END
  *
  *************************************/
 
-void exidy_state::init_sidetrac()
+void spectar_state::init_sidetrac()
 {
-	exidy_video_config(0x00, 0x00, false);
-
-	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	// hard-coded palette controlled via 8x3 DIP switches on the board
 	m_color_latch[2] = 0xf8;
 	m_color_latch[1] = 0xdc;
 	m_color_latch[0] = 0xb8;
 }
 
 
-void exidy_state::init_targ()
+void targ_state::init_targ()
 {
-	exidy_video_config(0x00, 0x00, false);
-
-	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	// hard-coded palette controlled via 8x3 DIP switches on the board
 	m_color_latch[2] = 0x5c;
 	m_color_latch[1] = 0xee;
 	m_color_latch[0] = 0x6b;
 }
 
 
-void exidy_state::init_spectar()
+void spectar_state::init_spectar()
 {
-	exidy_video_config(0x00, 0x00, false);
-
-	/* hard-coded palette controlled via 8x3 DIP switches on the board */
+	// hard-coded palette controlled via 8x3 DIP switches on the board
 	m_color_latch[2] = 0x58;
 	m_color_latch[1] = 0xee;
 	m_color_latch[0] = 0x09;
 }
 
-void exidy_state::init_rallys()
-{
-	exidy_video_config(0x00, 0x00, false);
-
-	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	m_color_latch[2] = 0x58;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x09;
-}
-
-void exidy_state::init_phantoma()
-{
-	exidy_video_config(0x00, 0x00, false);
-
-	/* hard-coded palette controlled via 8x3 DIP switches on the board */
-	m_color_latch[2] = 0x58;
-	m_color_latch[1] = 0xee;
-	m_color_latch[0] = 0x09;
-
-	/* the ROM is actually mapped high */
-	m_maincpu->space(AS_PROGRAM).install_rom(0xf800, 0xffff, memregion("maincpu")->base() + 0xf800);
-}
-
-
-void exidy_state::init_mtrap()
-{
-	exidy_video_config(0x14, 0x00, false);
-}
-
-
-void exidy_state::init_venture()
-{
-	exidy_video_config(0x04, 0x04, false);
-}
-
-
-void exidy_state::init_teetert()
-{
-	exidy_video_config(0x0c, 0x0c, false);
-}
-
-
-void exidy_state::init_pepper2()
-{
-	exidy_video_config(0x14, 0x04, true);
-}
-
-
-void exidy_state::init_fax()
-{
-	//address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	exidy_video_config(0x04, 0x04, true);
-
-	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x2000);
-}
+} // anonymous namespace
 
 
 
@@ -1775,38 +2512,38 @@ void exidy_state::init_fax()
  *
  *************************************/
 
-GAME( 1979, sidetrac,  0,       sidetrac, sidetrac,  exidy_state, init_sidetrac, ROT0, "Exidy",   "Side Trak", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
+GAME( 1979, sidetrac,  0,       sidetrac, sidetrac,  spectar_state, init_sidetrac, ROT0, "Exidy",   "Side Trak", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Side Track" on title screen, but cabinet/flyers/documentation clearly indicates otherwise, "Side Trak" it is
 
-GAME( 1980, targ,      0,       targ,     targ,      exidy_state, init_targ,     ROT0, "Exidy",   "Targ", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, targc,     targ,    targ,     targ,      exidy_state, init_targ,     ROT0, "Exidy",   "Targ (cocktail?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, targ,      0,       targ,     targ,      targ_state,    init_targ,     ROT0, "Exidy",   "Targ", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, targc,     targ,    targ,     targ,      targ_state,    init_targ,     ROT0, "Exidy",   "Targ (cocktail?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, spectar,   0,       spectar,  spectar,   exidy_state, init_spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spectar1,  spectar, spectar,  spectar,   exidy_state, init_spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, spectarrf, spectar, spectar,  spectarrf, exidy_state, init_spectar,  ROT0, "bootleg (Recreativos Franco)", "Spectar (revision 2, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallys,    spectar, rallys,   rallys,    exidy_state, init_rallys,   ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, rallysa,   spectar, rallys,   rallys,    exidy_state, init_rallys,   ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, panzer,    spectar, rallys,   rallys,    exidy_state, init_rallys,   ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phantoma,  spectar, rallys,   phantoma,  exidy_state, init_phantoma, ROT0, "bootleg (Jeutel)", "Phantomas (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, phantom,   spectar, rallys,   phantoma,  exidy_state, init_phantoma, ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spectar,   0,       spectar,  spectar,   spectar_state, init_spectar,  ROT0, "Exidy",   "Spectar (revision 3)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spectar1,  spectar, spectar,  spectar,   spectar_state, init_spectar,  ROT0, "Exidy",   "Spectar (revision 1?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, spectarrf, spectar, spectar,  spectarrf, spectar_state, init_spectar,  ROT0, "bootleg (Recreativos Franco)", "Spectar (revision 2, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallys,    spectar, rallys,   rallys,    spectar_state, init_spectar,  ROT0, "bootleg (Novar)", "Rallys (bootleg of Spectar, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, rallysa,   spectar, rallys,   rallys,    spectar_state, init_spectar,  ROT0, "bootleg (Musik Box Brescia)", "Rallys (bootleg of Spectar, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, panzer,    spectar, rallys,   rallys,    spectar_state, init_spectar,  ROT0, "bootleg (Proel)", "Panzer (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phantoma,  spectar, phantoma, phantoma,  spectar_state, init_spectar,  ROT0, "bootleg (Jeutel)", "Phantomas (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phantom,   spectar, phantoma, phantoma,  spectar_state, init_spectar,  ROT0, "bootleg (Proel)", "Phantom (bootleg of Spectar)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, mtrap,     0,       mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap4,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap3,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrap2,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrapb,    mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, mtrapb2,   mtrap,   mtrap,    mtrap,     exidy_state, init_mtrap,    ROT0, "bootleg", "Mouse Trap (version 4, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap,     0,       mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap4,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap3,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrap2,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "Exidy",   "Mouse Trap (version 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrapb,    mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "bootleg", "Mouse Trap (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, mtrapb2,   mtrap,   mtrap,    mtrap,     exidy_state,   empty_init,    ROT0, "bootleg", "Mouse Trap (version 4, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, venture,   0,       venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture5a, venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture4,  venture, venture,  venture,   exidy_state, init_venture,  ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, venture5b, venture, venture,  venture,   exidy_state, init_venture,  ROT0, "bootleg", "Venture (version 5 set 2, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture,   0,       venture,  venture,   exidy_state,   empty_init,    ROT0, "Exidy",   "Venture (version 5 set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture5a, venture, venture,  venture,   exidy_state,   empty_init,    ROT0, "Exidy",   "Venture (version 5 set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture4,  venture, venture,  venture,   exidy_state,   empty_init,    ROT0, "Exidy",   "Venture (version 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, venture5b, venture, venture,  venture,   exidy_state,   empty_init,    ROT0, "bootleg", "Venture (version 5 set 2, bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, teetert,   0,       teetert,  teetert,   exidy_state, init_teetert,  ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, teetert,   0,       teetert,  teetert,   teetert_state, empty_init,    ROT0, "Exidy",   "Teeter Torture (prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, pepper2,   0,       pepper2,  pepper2,   exidy_state, init_pepper2,  ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pepper27,  pepper2, pepper2,  pepper2,   exidy_state, init_pepper2,  ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pepper2,   0,       pepper2,  pepper2,   exidy_state,   empty_init,    ROT0, "Exidy",   "Pepper II (version 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pepper27,  pepper2, pepper2,  pepper2,   exidy_state,   empty_init,    ROT0, "Exidy",   "Pepper II (version 7)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, hardhat,   0,       pepper2,  pepper2,   exidy_state, init_pepper2,  ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, hardhat,   0,       pepper2,  pepper2,   exidy_state,   empty_init,    ROT0, "Exidy",   "Hard Hat", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1983, fax,       0,       fax,      fax,       exidy_state, init_fax,      ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, fax2,      fax,     fax,      fax,       exidy_state, init_fax,      ROT0, "Exidy",   "FAX 2", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fax,       0,       fax,      fax,       fax_state,     empty_init,    ROT0, "Exidy",   "FAX", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, fax2,      fax,     fax,      fax,       fax_state,     empty_init,    ROT0, "Exidy",   "FAX 2", MACHINE_SUPPORTS_SAVE )

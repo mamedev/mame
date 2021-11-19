@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "matrix.h"
 
-namespace bus { namespace amiga { namespace keyboard {
+namespace bus::amiga::keyboard {
 
 namespace {
 
@@ -852,4 +852,4 @@ INPUT_PORTS_START(remove_keypad)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-} } } // namespace bus::amiga::keyboard
+} // namespace bus::amiga::keyboard

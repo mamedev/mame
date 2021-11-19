@@ -11,7 +11,7 @@ Bankswitched ROM with page size of 3KB.
 #include "emu.h"
 #include "ktaa.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_KTAA, o2_ktaa_device, "o2_ktaa", "Odyssey 2 Homebrew KTAA")
+DEFINE_DEVICE_TYPE(O2_ROM_KTAA, o2_ktaa_device, "o2_ktaa", "Videopac+ KTAA Cartridge")
 
 
 //-------------------------------------------------
@@ -30,11 +30,25 @@ void o2_ktaa_device::device_start()
 
 void o2_ktaa_device::cart_init()
 {
-	u32 size = m_rom_size;
-	if (size != 0xc00 && size != 0xc00*2 && size != 0xc00*4)
-		fatalerror("o2_ktaa_device: ROM size must be multiple of 3KB\n");
+	bool err = false;
 
-	m_bank_mask = (size / 0xc00) - 1;
+	if (m_rom_size & (m_rom_size - 1))
+	{
+		// freely released binary file is 12KB
+		err = m_rom_size != 0xc00 && m_rom_size != 0xc00*2 && m_rom_size != 0xc00*4;
+		m_page_size = 0xc00;
+	}
+	else
+	{
+		// actual ROM is 16KB(27C128), first 1KB of each 4KB block is empty
+		err = m_rom_size < 0x1000;
+		m_page_size = 0x1000;
+	}
+
+	if (err)
+		fatalerror("o2_ktaa_device: ROM size must be multiple of 3KB or 4KB\n");
+
+	m_bank_mask = (m_rom_size / m_page_size) - 1;
 }
 
 
@@ -44,10 +58,6 @@ void o2_ktaa_device::cart_init()
 
 u8 o2_ktaa_device::read_rom04(offs_t offset)
 {
-	return m_rom[offset + m_bank * 0xc00];
-}
-
-u8 o2_ktaa_device::read_rom0c(offs_t offset)
-{
-	return m_rom[offset + 0x800 + m_bank * 0xc00];
+	offset += m_page_size - 0xc00;
+	return m_rom[offset + m_bank * m_page_size];
 }

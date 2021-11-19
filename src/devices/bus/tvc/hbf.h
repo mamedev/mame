@@ -40,7 +40,7 @@ protected:
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// internal state
 	required_device<fd1793_device>   m_fdc;

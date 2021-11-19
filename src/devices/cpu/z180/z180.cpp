@@ -482,16 +482,6 @@ device_memory_interface::space_config_vector z180_device::memory_space_config() 
 		};
 }
 
-uint8_t z180_device::z180_read_memory(offs_t addr)
-{
-	return m_program.read_byte(addr);
-}
-
-void z180_device::z180_write_memory(offs_t addr, uint8_t data)
-{
-	m_program.write_byte(addr, data);
-}
-
 uint8_t z180_device::z180_readcontrol(offs_t port)
 {
 	// normal external readport (ignore the data)
@@ -1693,7 +1683,6 @@ void z180_device::device_start()
 		state_add(STATE_GENPC,     "GENPC",     _PCD).noshow();
 		state_add(STATE_GENPCBASE, "CURPC",     m_PREPC.w.l).noshow();
 		state_add(Z180_SP,         "SP",        m_SP.w.l);
-		state_add(STATE_GENSP,     "GENSP",     m_SP.w.l).noshow();
 		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_AF.b.l).noshow().formatstr("%8s");
 		state_add(Z180_A,          "A",         _A).noshow();
 		state_add(Z180_B,          "B",         _B).noshow();

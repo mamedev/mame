@@ -641,7 +641,7 @@ m68hc05eg_device::m68hc05eg_device(const machine_config &mconfig, const char *ta
 			owner,
 			clock,
 			M68HC05EG,
-			{ s_hmos_s_ops, s_hmos_cycles, 13, 0x00ff, 0x00c0, 0xfffc }) // completely wrong, but it preserves existing behaviour
+			{ s_hc_s_ops, s_hc_cycles, 13, 0x00ff, 0x00c0, 0xfffc })
 {
 }
 
@@ -671,6 +671,20 @@ void m68hc05eg_device::interrupt_vector()
 	}
 }
 
+u64 m68hc05eg_device::execute_clocks_to_cycles(u64 clocks) const noexcept
+{
+	return (clocks + 1) / 2;
+}
+
+u64 m68hc05eg_device::execute_cycles_to_clocks(u64 cycles) const noexcept
+{
+	return cycles * 2;
+}
+
+std::unique_ptr<util::disasm_interface> m68hc05eg_device::create_disassembler()
+{
+	return std::make_unique<m68hc05_disassembler>();
+}
 
 /****************************************************************************
  * HD63705 section

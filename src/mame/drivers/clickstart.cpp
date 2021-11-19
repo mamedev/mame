@@ -186,7 +186,7 @@ void clickstart_state::machine_reset()
 	m_mouse_dx = 0;
 	m_mouse_dy = 0;
 
-	memset(m_uart_tx_fifo, 0, ARRAY_LENGTH(m_uart_tx_fifo));
+	std::fill(std::begin(m_uart_tx_fifo), std::end(m_uart_tx_fifo), 0);
 	m_uart_tx_fifo_start = 0;
 	m_uart_tx_fifo_end = 0;
 	m_uart_tx_fifo_count = 0;
@@ -219,19 +219,19 @@ void clickstart_state::handle_uart_tx()
 		return;
 
 	m_maincpu->uart_rx(m_uart_tx_fifo[m_uart_tx_fifo_start]);
-	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+	m_uart_tx_fifo_start = (m_uart_tx_fifo_start + 1) % std::size(m_uart_tx_fifo);
 	m_uart_tx_fifo_count--;
 }
 
 void clickstart_state::uart_tx_fifo_push(uint8_t value)
 {
-	if (m_uart_tx_fifo_count >= ARRAY_LENGTH(m_uart_tx_fifo))
+	if (m_uart_tx_fifo_count >= std::size(m_uart_tx_fifo))
 	{
 		logerror("Warning: Trying to push too much data onto the mouse Tx FIFO, data will be lost.\n");
 	}
 
 	m_uart_tx_fifo[m_uart_tx_fifo_end] = value;
-	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % ARRAY_LENGTH(m_uart_tx_fifo);
+	m_uart_tx_fifo_end = (m_uart_tx_fifo_end + 1) % std::size(m_uart_tx_fifo);
 	m_uart_tx_fifo_count++;
 }
 

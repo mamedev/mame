@@ -238,7 +238,7 @@ public:
 		m_vblank = m_refresh / vtotal * (vtotal - (vbstart - vbend));
 		m_width = htotal;
 		m_height = vtotal;
-		m_visarea.set(hbend, hbstart - 1, vbend, vbstart - 1);
+		m_visarea.set(hbend, hbstart ? hbstart - 1 : htotal - 1, vbend, vbstart - 1);
 		return *this;
 	}
 	screen_device &set_raw(const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
@@ -320,7 +320,7 @@ public:
 
 	/// \brief Set visible area to full area
 	///
-	/// Set visible screen area to the full screen area (i.e. noi
+	/// Set visible screen area to the full screen area (i.e. no
 	/// horizontal or vertical blanking period).  This is generally not
 	/// possible for raster displays, but is useful for other display
 	/// simulations.  Must be called after calling #set_size.
@@ -550,15 +550,6 @@ private:
 DECLARE_DEVICE_TYPE(SCREEN, screen_device)
 
 // iterator helper
-typedef device_type_iterator<screen_device> screen_device_iterator;
-
-/*!
- @defgroup Screen device configuration functions
- @{
- @def set_type
-  Modify the screen device type
-  @see screen_type_enum
- @}
- */
+typedef device_type_enumerator<screen_device> screen_device_enumerator;
 
 #endif // MAME_EMU_SCREEN_H

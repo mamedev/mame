@@ -432,7 +432,7 @@ tms32032_device::tms32032_device(const machine_config &mconfig, const char *tag,
 tms3203x_device::~tms3203x_device()
 {
 #if (TMS_3203X_LOG_OPCODE_USAGE)
-	for (int i = 0; i < ARRAY_LENGTH(m_hits); i++)
+	for (int i = 0; i < std::size(m_hits); i++)
 		if (m_hits[i] != 0)
 			printf("%10d - %03X.%X\n", m_hits[i], i / 4, i % 4);
 #endif

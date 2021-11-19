@@ -14,23 +14,33 @@
 
 #include "ui/menu.h"
 
+#include "iptseqpoll.h"
+
 #include <chrono>
 #include <unordered_map>
 
+
 namespace ui {
 
-// ======================> menu_load_save_state_base
-
-class menu_load_save_state_base : public menu
+class menu_load_save_state_base : public autopause_menu<>
 {
 public:
 	virtual ~menu_load_save_state_base() override;
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 protected:
-	menu_load_save_state_base(mame_ui_manager &mui, render_container &container, const char *header, const char *footer, bool must_exist);
+	menu_load_save_state_base(
+			mame_ui_manager &mui,
+			render_container &container,
+			std::string_view header,
+			std::string_view footer,
+			bool must_exist,
+			bool one_shot);
+
+	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void handle_keys(uint32_t flags, int &iptkey) override;
+	virtual void populate(float &customtop, float &custombottom) override;
+	virtual void handle(event const *ev) override;
+
 	virtual void process_file(std::string &&file_name) = 0;
 
 private:
@@ -54,12 +64,15 @@ private:
 
 	static std::string                              s_last_file_selected;
 
+	switch_code_poller                              m_switch_poller;
 	std::unordered_map<std::string, file_entry>     m_file_entries;
 	std::unordered_map<std::string, std::string>    m_filename_to_code_map;
-	char const *const                               m_header;
-	char const *const                               m_footer;
+	std::string_view const                          m_header;
+	std::string_view const                          m_footer;
+	std::string                                     m_delete_prompt;
+	std::string                                     m_confirm_prompt;
+	file_entry const *                              m_confirm_delete;
 	bool const                                      m_must_exist;
-	bool                                            m_was_paused;
 	bool                                            m_keys_released;
 
 	static void *itemref_from_file_entry(const file_entry &entry);
@@ -73,23 +86,21 @@ private:
 	std::string get_visible_name(const std::string &file_name);
 };
 
-// ======================> menu_load_state
 
 class menu_load_state : public menu_load_save_state_base
 {
 public:
-	menu_load_state(mame_ui_manager &mui, render_container &container);
+	menu_load_state(mame_ui_manager &mui, render_container &container, bool one_shot);
 
 protected:
 	virtual void process_file(std::string &&file_name) override;
 };
 
-// ======================> menu_save_state
 
 class menu_save_state : public menu_load_save_state_base
 {
 public:
-	menu_save_state(mame_ui_manager &mui, render_container &container);
+	menu_save_state(mame_ui_manager &mui, render_container &container, bool one_shot);
 
 protected:
 	virtual void process_file(std::string &&file_name) override;

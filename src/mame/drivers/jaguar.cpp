@@ -1908,12 +1908,12 @@ void jaguarcd_state::init_jaguarcd()
 	save_item(NAME(m_joystick_data));
 }
 
-image_init_result jaguar_state::quickload_cb(device_image_interface &image, const char *file_type, int quickload_size)
+image_init_result jaguar_state::quickload_cb(device_image_interface &image)
 {
 	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 
 	memset(m_shared_ram, 0, 0x200000);
-	quickload_size = std::min(quickload_size, int(0x200000 - quickload_begin));
+	offs_t quickload_size = std::min(offs_t(image.length()), 0x200000 - quickload_begin);
 
 	image.fread( &memregion("maincpu")->base()[quickload_begin], quickload_size);
 
@@ -1967,7 +1967,7 @@ image_init_result jaguar_state::quickload_cb(device_image_interface &image, cons
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	m_maincpu->set_state_int(STATE_GENSP, 0x1000);
+	m_maincpu->set_state_int(M68K_SP, 0x1000);
 	m_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */

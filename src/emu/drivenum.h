@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "lrucache.h"
+
 #include <algorithm>
 #include <cassert>
 #include <memory>

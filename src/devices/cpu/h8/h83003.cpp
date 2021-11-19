@@ -41,34 +41,40 @@ void h83003_device::map(address_map &map)
 
 	map(base | 0xfd10, base | 0xff0f).ram();
 
-	// DMA: only full address mode supported
 	map(base | 0xff20, base | 0xff21).rw("dma:0", FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
 	map(base | 0xff22, base | 0xff23).rw("dma:0", FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
 	map(base | 0xff24, base | 0xff25).rw("dma:0", FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
+	map(base | 0xff26, base | 0xff26).rw("dma:0", FUNC(h8_dma_channel_device::ioara8_r), FUNC(h8_dma_channel_device::ioara8_w));
 	map(base | 0xff27, base | 0xff27).rw("dma:0", FUNC(h8_dma_channel_device::dtcra_r), FUNC(h8_dma_channel_device::dtcra_w));
 	map(base | 0xff28, base | 0xff29).rw("dma:0", FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
 	map(base | 0xff2a, base | 0xff2b).rw("dma:0", FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
 	map(base | 0xff2c, base | 0xff2d).rw("dma:0", FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
+	map(base | 0xff2e, base | 0xff2e).rw("dma:0", FUNC(h8_dma_channel_device::ioarb8_r), FUNC(h8_dma_channel_device::ioarb8_w));
 	map(base | 0xff2f, base | 0xff2f).rw("dma:0", FUNC(h8_dma_channel_device::dtcrb_r), FUNC(h8_dma_channel_device::dtcrb_w));
 	map(base | 0xff30, base | 0xff31).rw("dma:1", FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
 	map(base | 0xff32, base | 0xff33).rw("dma:1", FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
 	map(base | 0xff34, base | 0xff35).rw("dma:1", FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
+	map(base | 0xff36, base | 0xff36).rw("dma:1", FUNC(h8_dma_channel_device::ioara8_r), FUNC(h8_dma_channel_device::ioara8_w));
 	map(base | 0xff37, base | 0xff37).rw("dma:1", FUNC(h8_dma_channel_device::dtcra_r), FUNC(h8_dma_channel_device::dtcra_w));
 	map(base | 0xff38, base | 0xff39).rw("dma:1", FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
 	map(base | 0xff3a, base | 0xff3b).rw("dma:1", FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
 	map(base | 0xff3c, base | 0xff3d).rw("dma:1", FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
+	map(base | 0xff3e, base | 0xff3e).rw("dma:1", FUNC(h8_dma_channel_device::ioarb8_r), FUNC(h8_dma_channel_device::ioarb8_w));
 	map(base | 0xff3f, base | 0xff3f).rw("dma:1", FUNC(h8_dma_channel_device::dtcrb_r), FUNC(h8_dma_channel_device::dtcrb_w));
 	map(base | 0xff40, base | 0xff41).rw("dma:2", FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
 	map(base | 0xff42, base | 0xff43).rw("dma:2", FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
 	map(base | 0xff44, base | 0xff45).rw("dma:2", FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
+	map(base | 0xff46, base | 0xff46).rw("dma:2", FUNC(h8_dma_channel_device::ioara8_r), FUNC(h8_dma_channel_device::ioara8_w));
 	map(base | 0xff47, base | 0xff47).rw("dma:2", FUNC(h8_dma_channel_device::dtcra_r), FUNC(h8_dma_channel_device::dtcra_w));
 	map(base | 0xff48, base | 0xff49).rw("dma:2", FUNC(h8_dma_channel_device::marbh_r), FUNC(h8_dma_channel_device::marbh_w));
 	map(base | 0xff4a, base | 0xff4b).rw("dma:2", FUNC(h8_dma_channel_device::marbl_r), FUNC(h8_dma_channel_device::marbl_w));
 	map(base | 0xff4c, base | 0xff4d).rw("dma:2", FUNC(h8_dma_channel_device::etcrb_r), FUNC(h8_dma_channel_device::etcrb_w));
+	map(base | 0xff4e, base | 0xff4e).rw("dma:2", FUNC(h8_dma_channel_device::ioarb8_r), FUNC(h8_dma_channel_device::ioarb8_w));
 	map(base | 0xff4f, base | 0xff4f).rw("dma:2", FUNC(h8_dma_channel_device::dtcrb_r), FUNC(h8_dma_channel_device::dtcrb_w));
 	map(base | 0xff50, base | 0xff51).rw("dma:3", FUNC(h8_dma_channel_device::marah_r), FUNC(h8_dma_channel_device::marah_w));
 	map(base | 0xff52, base | 0xff53).rw("dma:3", FUNC(h8_dma_channel_device::maral_r), FUNC(h8_dma_channel_device::maral_w));
 	map(base | 0xff54, base | 0xff55).rw("dma:3", FUNC(h8_dma_channel_device::etcra_r), FUNC(h8_dma_channel_device::etcra_w));
+	map(base | 0xff56, base | 0xff56).rw("dma:3", FUNC(h8_dma_channel_device::ioara8_r), FUNC(h8_dma_channel_device::ioara8_w));
 	map(base | 0xff57, base | 0xff57).rw("dma:3", FUNC(h8_dma_channel_device::dtcra_r), FUNC(h8_dma_channel_device::dtcra_w));
 
 	map(base | 0xff60, base | 0xff60).rw("timer16", FUNC(h8_timer16_device::tstr_r), FUNC(h8_timer16_device::tstr_w));

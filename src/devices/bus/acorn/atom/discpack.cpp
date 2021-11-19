@@ -21,9 +21,11 @@ DEFINE_DEVICE_TYPE(ATOM_DISCPACK, atom_discpack_device, "atom_discpack", "Acorn 
 //  MACHINE_DRIVER( discpack )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(atom_discpack_device::floppy_formats )
-	FLOPPY_ACORN_SSD_FORMAT
-FLOPPY_FORMATS_END
+void atom_discpack_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+}
 
 static void atom_floppies(device_slot_interface &device)
 {

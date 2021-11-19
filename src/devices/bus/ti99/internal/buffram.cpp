@@ -16,9 +16,9 @@
 
 #define BUFFRAM_TAG "buffered_ram"
 
-DEFINE_DEVICE_TYPE_NS(BUFF_RAM, bus::ti99::internal, buffered_ram_device, BUFFRAM_TAG, "Buffered SRAM")
+DEFINE_DEVICE_TYPE(BUFF_RAM, bus::ti99::internal::buffered_ram_device, BUFFRAM_TAG, "Buffered SRAM")
 
-namespace bus { namespace ti99 { namespace internal {
+namespace bus::ti99::internal {
 
 
 // ========== Buffered SRAM ============
@@ -58,4 +58,4 @@ void buffered_ram_device::nvram_write(emu_file &file)
 		file.write(m_mem.get(), m_size);
 }
 
-} } } // end namespace bus::ti99::internal
+} // end namespace bus::ti99::internal

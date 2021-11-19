@@ -18,7 +18,7 @@ void rf5c296_device::device_start()
 {
 }
 
-void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
+void rf5c296_device::reg_w(uint8_t reg, uint8_t data)
 {
 	//  fprintf(stderr, "%s rf5c296_reg_w %02x, %02x\n", machine().describe_context().c_str(), reg, data);
 	switch (reg)
@@ -37,7 +37,7 @@ void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
 	}
 }
 
-uint8_t rf5c296_device::reg_r(ATTR_UNUSED uint8_t reg)
+uint8_t rf5c296_device::reg_r(uint8_t reg)
 {
 	//  fprintf(stderr, "%s rf5c296_reg_r %02x\n", machine().describe_context().c_str(), reg);
 	return 0x00;

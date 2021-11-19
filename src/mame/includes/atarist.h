@@ -327,7 +327,7 @@ protected:
 
 	bitmap_rgb32 m_bitmap;
 
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	static void floppy_formats(format_registration &fr);
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;

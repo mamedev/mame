@@ -53,12 +53,14 @@ public:
 	void cobram3(machine_config &config);
 	void screwloo(machine_config &config);
 	void gottlieb2(machine_config &config);
+	void gottlieb2_ram_rom(machine_config &config);
 	void reactor(machine_config &config);
 	void tylz(machine_config &config);
 	void g2laser(machine_config &config);
 	void qbert(machine_config &config);
 	void qbert_knocker(machine_config &config);
 	void gottlieb1(machine_config &config);
+	void gottlieb1_rom(machine_config &config);
 	void gottlieb1_votrax(machine_config &config);
 
 	void init_romtiles();
@@ -71,6 +73,12 @@ public:
 
 	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(track_delta_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum
@@ -113,13 +121,11 @@ private:
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
-	void gottlieb_map(address_map &map);
+	void gottlieb_base_map(address_map &map);
+	void gottlieb_ram_map(address_map &map);
+	void gottlieb_ram_rom_map(address_map &map);
+	void gottlieb_rom_map(address_map &map);
 	void reactor_map(address_map &map);
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -216,13 +216,13 @@ void am2901b_device::disassemble()
 	};
 
 	char dasm_buf[64];
-	int buf_idx = snprintf(dasm_buf, ARRAY_LENGTH(dasm_buf), "%s %s", s_func_table[(m_i >> 3) & 7], s_dst_table[(m_i >> 6) & 7]);
+	int buf_idx = snprintf(dasm_buf, std::size(dasm_buf), "%s %s", s_func_table[(m_i >> 3) & 7], s_dst_table[(m_i >> 6) & 7]);
 	while (buf_idx < 12)
 	{
 		dasm_buf[buf_idx] = ' ';
 		buf_idx++;
 	}
-	snprintf(dasm_buf + buf_idx, ARRAY_LENGTH(dasm_buf) - 12, "%c,%c", s_r_table[m_i & 7], s_s_table[m_i & 7]);
+	snprintf(dasm_buf + buf_idx, std::size(dasm_buf) - 12, "%c,%c", s_r_table[m_i & 7], s_s_table[m_i & 7]);
 
 	LOG("%s: %s\n", machine().describe_context(), dasm_buf);
 }

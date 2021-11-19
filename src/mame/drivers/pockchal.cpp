@@ -32,6 +32,8 @@ Cart sizes: 1MB, 2MB, 4MB
 #include "softlist.h"
 
 
+namespace {
+
 class pockchalv1_state : public driver_device
 {
 public:
@@ -55,7 +57,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	uint32_t  m_rom_size;
+	uint32_t m_rom_size;
 };
 
 
@@ -130,6 +132,9 @@ void pockchalv1_state::pockchalv1(machine_config &config)
 
 ROM_START( pockchal )
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                FULLNAME                      FLAGS
 CONS( 199?, pockchal, 0,      0,      pockchalv1, pockchalv1, pockchalv1_state, empty_init, "Benesse Corporation", "Pocket Challenge W (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

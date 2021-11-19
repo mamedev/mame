@@ -1023,14 +1023,23 @@ void zaxxon_state::razmataze(machine_config &config)
 
 void zaxxon_state::ixion(machine_config &config)
 {
-	razmataze(config);
+	root(config);
 	sega_315_5013_device &maincpu(SEGA_315_5013(config.replace(), m_maincpu, MASTER_CLOCK/16));
 	maincpu.set_addrmap(AS_PROGRAM, &zaxxon_state::ixion_map);
 	maincpu.set_addrmap(AS_OPCODES, &zaxxon_state::decrypted_opcodes_map);
 	maincpu.set_decrypted_tag(":decrypted_opcodes");
 	maincpu.set_size(0x6000);
 
+	config.device_remove("ppi8255");
+
 	m_mainlatch[0]->q_out_cb<6>().set_nop(); // flip screen not used
+
+	/* video hardware */
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(zaxxon_state::screen_update_ixion));
+
+	/* sound hardware */
+	SPEAKER(config, "speaker").front_center();
+	SEGAUSBROM(config, "usbsnd", 0, m_maincpu).add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -1615,7 +1624,7 @@ GAME( 1984, futspy,   0,      futspye,   futspy,   zaxxon_state,   empty_init,  
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
 GAME( 1983, razmataz, 0,      razmataze, razmataz, zaxxon_state,   init_razmataz, ROT90,  "Sega",    "Razzmatazz",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   empty_init,    ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
+GAME( 1983, ixion,    0,      ixion,     ixion,    zaxxon_state,   empty_init,    ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */

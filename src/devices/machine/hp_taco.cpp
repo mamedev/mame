@@ -29,7 +29,7 @@
 // - Handling of error conditions, R/W bits, tachometer ticks and gaps according to [1]
 // What's not in:
 // - Commands that are not used at all by the software I analyzed, especially those that
-//   R/W tapes in HP9825 format. They could be added easily, though.
+//   write tapes in HP9825 format. They could be added easily, though.
 // - Accurate execution times of commands
 // - Handling of FLG signal: the emulated chip always reports itself as ready for writing.
 // - Read threshold is ignored. Real tapes could be read with either a low or high threshold.
@@ -269,10 +269,10 @@ enum cmd_t : uint8_t {
 	CMD_INT_STOP_N_TACH = 0b111000, // Interrupt and stop on N tach
 	CMD_INT_STOP_N_TACH1= 0b111001, // Interrupt and stop on N tach (int when stopped)
 	CMD_RD_6UPD         = 0b111010, // Read 6% update
-	CMD_RD_9825_6UPD    = 0b111011, // Read 9825 6% update (*)
+	CMD_RD_9825_6UPD    = 0b111011, // Read 9825 6% update
 	CMD_INT_N_TACH      = 0b111100, // Interrupt on N tach
 	CMD_RD_CSUM_6UPD    = 0b111110, // Read checksum 6% update
-	CMD_RD_9825_CSUM6   = 0b111111  // Read checksum 9825 6% update (*)
+	CMD_RD_9825_CSUM6   = 0b111111  // Read checksum 9825 6% update
 };
 
 // Device type definition
@@ -291,6 +291,11 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: hp_taco_device(mconfig, HP_TACO, tag, owner, clock)
 {
+}
+
+void hp_taco_device::set_name(const std::string& name)
+{
+	m_tape->set_name(name);
 }
 
 void hp_taco_device::reg_w(offs_t offset, uint16_t data)
@@ -434,7 +439,7 @@ WRITE_LINE_MEMBER(hp_taco_device::tacho_tick_w)
 				if (m_cmd_state != CMD_PH1) {
 					break;
 				}
-				// Falls through!
+				[[fallthrough]];
 
 			case CMD_WR_GAP_N_TACH:
 			case CMD_INT_N_TACH:
@@ -464,7 +469,9 @@ WRITE_LINE_MEMBER(hp_taco_device::rd_bit_w)
 	if (m_cmd_state != CMD_IDLE) {
 		switch (get_cmd(m_cmd_reg)) {
 		case CMD_RD_6UPD:
+		case CMD_RD_9825_6UPD:
 		case CMD_RD_CSUM_6UPD:
+		case CMD_RD_9825_CSUM6:
 			if (m_cmd_state == CMD_PH1) {
 				if (m_bit_idx < 8) {
 					m_bit_idx++;
@@ -472,24 +479,29 @@ WRITE_LINE_MEMBER(hp_taco_device::rd_bit_w)
 					// Synchronized
 					LOG_RW("RD synced!\n");
 					m_cmd_state = CMD_PH2;
-					m_bit_idx = 15;
+					m_bit_idx = BIT(m_cmd_reg , CMD_ST_G0) ? 16 : 15;
 					m_working_reg = 0;
 				}
 			} else if (m_cmd_state == CMD_PH2) {
-				if (state) {
-					BIT_SET(m_working_reg , m_bit_idx);
-				}
-				if (m_bit_idx) {
+				if (m_bit_idx == 16) {
+					// Skip 17th bit when reading in 9825 format
 					m_bit_idx--;
 				} else {
-					m_data_reg = m_working_reg;
-					m_bit_idx = 15;
-					m_working_reg = 0;
-					if (!BIT(m_cmd_reg , CMD_ST_G2)) {
-						update_checksum(m_data_reg);
+					if (state) {
+						BIT_SET(m_working_reg , m_bit_idx);
 					}
-					LOG_RW("RD word %04x csum=%04x\n" , m_data_reg , m_checksum_reg);
-					irq_w(true);
+					if (m_bit_idx) {
+						m_bit_idx--;
+					} else {
+						m_data_reg = m_working_reg;
+						m_bit_idx = BIT(m_cmd_reg , CMD_ST_G0) ? 16 : 15;
+						m_working_reg = 0;
+						if (!BIT(m_cmd_reg , CMD_ST_G2)) {
+							update_checksum(m_data_reg);
+						}
+						LOG_RW("RD word %04x csum=%04x\n" , m_data_reg , m_checksum_reg);
+						irq_w(true);
+					}
 				}
 			}
 			break;
@@ -538,7 +550,7 @@ void hp_taco_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LEN);
-	m_tape->set_bits_per_word(16);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_16_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp_taco_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp_taco_device::hole_w));
@@ -628,7 +640,9 @@ void hp_taco_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 
 		case CMD_RD_6UPD:
+		case CMD_RD_9825_6UPD:
 		case CMD_RD_CSUM_6UPD:
+		case CMD_RD_9825_CSUM6:
 			// Gap in read error
 			set_error(false , true);
 			break;
@@ -895,7 +909,9 @@ void hp_taco_device::cmd_fsm()
 			break;
 
 		case CMD_RD_6UPD:
+		case CMD_RD_9825_6UPD:
 		case CMD_RD_CSUM_6UPD:
+		case CMD_RD_9825_CSUM6:
 			if (m_cmd_state == CMD_PH0 && is_at_slow_speed()) {
 				m_cmd_state = CMD_PH1;
 				start_rd();
@@ -1073,7 +1089,9 @@ void hp_taco_device::start_cmd_exec(uint16_t new_cmd_reg)
 			break;
 
 		case CMD_RD_6UPD:
+		case CMD_RD_9825_6UPD:
 		case CMD_RD_CSUM_6UPD:
+		case CMD_RD_9825_CSUM6:
 			// 1. Wait for tape to reach 22 ips
 			// 2. Wait for preamble
 			// 3. Read words

@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/sf7000_dsk.h"
 
 sf7000_format::sf7000_format() : upd765_format(formats)

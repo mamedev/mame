@@ -16,7 +16,7 @@
 
 #include "joyport.h"
 
-namespace bus { namespace ti99 { namespace joyport {
+namespace bus::ti99::joyport {
 
 class mecmouse_device : public device_t, public device_ti99_joyport_interface
 {
@@ -44,7 +44,8 @@ private:
 
 	emu_timer   *m_poll_timer;
 };
-} } } // end namespace bus::ti99::joyport
+
+} // end namespace bus::ti99::joyport
 
 DECLARE_DEVICE_TYPE_NS(TI99_MECMOUSE, bus::ti99::joyport, mecmouse_device)
 

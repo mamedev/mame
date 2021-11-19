@@ -50,13 +50,7 @@ void sma_prot_device::kof99_bankswitch_w(uint16_t data)
 	};
 
 	// unscramble bank number
-	data =
-		(BIT(data, 14) << 0)+
-		(BIT(data,  6) << 1)+
-		(BIT(data,  8) << 2)+
-		(BIT(data, 10) << 3)+
-		(BIT(data, 12) << 4)+
-		(BIT(data,  5) << 5);
+	data = bitswap<6>(data, 5, 12, 10, 8, 6, 14);
 
 	bankaddress = 0x100000 + bankoffset[data];
 	m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
@@ -85,13 +79,7 @@ void sma_prot_device::garou_bankswitch_w(uint16_t data)
 	};
 
 	// unscramble bank number
-	data =
-		(BIT(data,  5) << 0)+
-		(BIT(data,  9) << 1)+
-		(BIT(data,  7) << 2)+
-		(BIT(data,  6) << 3)+
-		(BIT(data, 14) << 4)+
-		(BIT(data, 12) << 5);
+	data = bitswap<6>(data, 12, 14, 6, 7, 9, 5);
 
 	bankaddress = 0x100000 + bankoffset[data];
 	m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
@@ -122,13 +110,7 @@ void sma_prot_device::garouh_bankswitch_w(uint16_t data)
 	};
 
 	// unscramble bank number
-	data =
-		(BIT(data,  4) << 0)+
-		(BIT(data,  8) << 1)+
-		(BIT(data, 14) << 2)+
-		(BIT(data,  2) << 3)+
-		(BIT(data, 11) << 4)+
-		(BIT(data, 13) << 5);
+	data = bitswap<6>(data, 13, 11, 2, 14, 8, 4);
 
 	bankaddress = 0x100000 + bankoffset[data];
 	m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
@@ -156,13 +138,7 @@ void sma_prot_device::mslug3_bankswitch_w(uint16_t data)
 	};
 
 	// unscramble bank number
-	data =
-		(BIT(data, 14) << 0)+
-		(BIT(data, 12) << 1)+
-		(BIT(data, 15) << 2)+
-		(BIT(data,  6) << 3)+
-		(BIT(data,  3) << 4)+
-		(BIT(data,  9) << 5);
+	data = bitswap<6>(data, 9, 3, 6, 15, 12, 14);
 
 	bankaddress = 0x100000 + bankoffset[data];
 	m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
@@ -186,13 +162,7 @@ void sma_prot_device::kof2000_bankswitch_w(uint16_t data)
 	};
 
 	// unscramble bank number
-	data =
-		(BIT(data, 15) << 0)+
-		(BIT(data, 14) << 1)+
-		(BIT(data,  7) << 2)+
-		(BIT(data,  3) << 3)+
-		(BIT(data, 10) << 4)+
-		(BIT(data,  5) << 5);
+	data = bitswap<6>(data, 5, 10, 3, 7, 14, 15);
 
 	bankaddress = 0x100000 + bankoffset[data];
 	m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
@@ -215,13 +185,7 @@ uint32_t sma_prot_device::kof99_bank_base(uint16_t sel)
 	};
 
 	/* unscramble bank number */
-	int data =
-		(BIT(sel, 14) << 0)+
-		(BIT(sel,  6) << 1)+
-		(BIT(sel,  8) << 2)+
-		(BIT(sel, 10) << 3)+
-		(BIT(sel, 12) << 4)+
-		(BIT(sel,  5) << 5);
+	int data = bitswap<6>(sel, 5, 12, 10, 8, 6, 14);
 
 	int bankaddress = 0x100000 + bankoffset[data];
 	return bankaddress;
@@ -248,13 +212,7 @@ uint32_t sma_prot_device::garou_bank_base(uint16_t sel)
 	};
 
 	// unscramble bank number
-	int data =
-		(BIT(sel,  5) << 0)+
-		(BIT(sel,  9) << 1)+
-		(BIT(sel,  7) << 2)+
-		(BIT(sel,  6) << 3)+
-		(BIT(sel, 14) << 4)+
-		(BIT(sel, 12) << 5);
+	int data = bitswap<6>(sel, 12, 14, 6, 7, 9, 5);
 
 	int bankaddress = 0x100000 + bankoffset[data];
 	return bankaddress;
@@ -283,13 +241,7 @@ uint32_t sma_prot_device::garouh_bank_base(uint16_t sel)
 	};
 
 	// unscramble bank number
-	int data =
-		(BIT(sel,  4) << 0)+
-		(BIT(sel,  8) << 1)+
-		(BIT(sel, 14) << 2)+
-		(BIT(sel,  2) << 3)+
-		(BIT(sel, 11) << 4)+
-		(BIT(sel, 13) << 5);
+	int data = bitswap<6>(sel, 13, 11, 2, 14, 8, 4);
 
 	int bankaddress = 0x100000 + bankoffset[data];
 	return bankaddress;
@@ -315,13 +267,7 @@ uint32_t sma_prot_device::mslug3_bank_base(uint16_t sel)
 	};
 
 	// unscramble bank number
-	int data =
-		(BIT(sel, 14) << 0)+
-		(BIT(sel, 12) << 1)+
-		(BIT(sel, 15) << 2)+
-		(BIT(sel,  6) << 3)+
-		(BIT(sel,  3) << 4)+
-		(BIT(sel,  9) << 5);
+	int data = bitswap<6>(sel, 9, 3, 6, 15, 12, 14);
 
 	int bankaddress = 0x100000 + bankoffset[data];
 	return bankaddress;
@@ -347,13 +293,7 @@ uint32_t sma_prot_device::mslug3a_bank_base(uint16_t sel)
 	};
 
 	// unscramble bank number
-	int data =
-	   (BIT(sel, 15) << 0)+
-	   (BIT(sel,  3) << 1)+
-	   (BIT(sel,  1) << 2)+
-	   (BIT(sel,  6) << 3)+
-	   (BIT(sel, 12) << 4)+
-	   (BIT(sel, 11) << 5);
+	int data = bitswap<6>(sel, 11, 12, 6, 1, 3, 15);
 
 	int bankaddress = 0x100000 + bankoffset[data];
 	return bankaddress;
@@ -375,13 +315,7 @@ uint32_t sma_prot_device::kof2000_bank_base(uint16_t sel)
 	};
 
 	// unscramble bank number
-	int data =
-		(BIT(sel, 15) << 0)+
-		(BIT(sel, 14) << 1)+
-		(BIT(sel,  7) << 2)+
-		(BIT(sel,  3) << 3)+
-		(BIT(sel, 10) << 4)+
-		(BIT(sel,  5) << 5);
+	int data = bitswap<6>(sel, 5, 10, 3, 7, 14, 15);
 
 	int bankaddress = 0x100000 + bankoffset[data];
 	return bankaddress;
@@ -431,13 +365,13 @@ void sma_prot_device::kof99_decrypt_68k(uint8_t* base)
 		uint16_t buffer[0x800/2];
 		memcpy(buffer, &rom[i], 0x800);
 		for (int j = 0; j < 0x800/2; j++)
-			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,13,12,11,10,6,2,4,9,8,3,1,7,0,5)];
+			rom[i+j] = buffer[bitswap<10>(j,6,2,4,9,8,3,1,7,0,5)];
 	}
 
 	// swap address lines & relocate fixed part
 	rom = (uint16_t *)base;
 	for (int i = 0; i < 0x0c0000/2; i++)
-		rom[i] = rom[0x700000/2 + bitswap<24>(i,23,22,21,20,19,18,11,6,14,17,16,5,8,10,12,0,4,3,2,7,9,15,13,1)];
+		rom[i] = rom[0x700000/2 + bitswap<19>(i,18,11,6,14,17,16,5,8,10,12,0,4,3,2,7,9,15,13,1)];
 }
 
 
@@ -452,7 +386,7 @@ void sma_prot_device::garou_decrypt_68k(uint8_t* base)
 	// swap address lines & relocate fixed part
 	rom = (uint16_t *)base;
 	for (int i = 0; i < 0x0c0000/2; i++)
-		rom[i] = rom[0x710000/2 + bitswap<24>(i,23,22,21,20,19,18,4,5,16,14,7,9,6,13,17,15,3,1,2,12,11,8,10,0)];
+		rom[i] = rom[0x710000/2 + bitswap<19>(i,18,4,5,16,14,7,9,6,13,17,15,3,1,2,12,11,8,10,0)];
 
 	// swap address lines for the banked part
 	rom = (uint16_t *)(base + 0x100000);
@@ -461,7 +395,7 @@ void sma_prot_device::garou_decrypt_68k(uint8_t* base)
 		uint16_t buffer[0x8000/2];
 		memcpy(buffer, &rom[i], 0x8000);
 		for (int j = 0; j < 0x8000/2; j++)
-			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,9,4,8,3,13,6,2,7,0,12,1,11,10,5)];
+			rom[i+j] = buffer[bitswap<14>(j,9,4,8,3,13,6,2,7,0,12,1,11,10,5)];
 	}
 }
 
@@ -477,7 +411,7 @@ void sma_prot_device::garouh_decrypt_68k(uint8_t* base)
 	// swap address lines & relocate fixed part
 	rom = (uint16_t *)base;
 	for (int i = 0; i < 0x0c0000/2; i++)
-		rom[i] = rom[0x7f8000/2 + bitswap<24>(i,23,22,21,20,19,18,5,16,11,2,6,7,17,3,12,8,14,4,0,9,1,10,15,13)];
+		rom[i] = rom[0x7f8000/2 + bitswap<19>(i,18,5,16,11,2,6,7,17,3,12,8,14,4,0,9,1,10,15,13)];
 
 	// swap address lines for the banked part
 	rom = (uint16_t *)(base + 0x100000);
@@ -486,7 +420,7 @@ void sma_prot_device::garouh_decrypt_68k(uint8_t* base)
 		uint16_t buffer[0x8000/2];
 		memcpy(buffer, &rom[i], 0x8000);
 		for (int j = 0; j < 0x8000/2; j++)
-			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,12,8,1,7,11,3,13,10,6,9,5,4,0,2)];
+			rom[i+j] = buffer[bitswap<14>(j,12,8,1,7,11,3,13,10,6,9,5,4,0,2)];
 	}
 }
 
@@ -502,7 +436,7 @@ void sma_prot_device::mslug3_decrypt_68k(uint8_t* base)
 	// swap address lines & relocate fixed part
 	rom = (uint16_t *)base;
 	for (int i = 0; i < 0x0c0000/2; i++)
-		rom[i] = rom[0x5d0000/2 + bitswap<24>(i,23,22,21,20,19,18,15,2,1,13,3,0,9,6,16,4,11,5,7,12,17,14,10,8)];
+		rom[i] = rom[0x5d0000/2 + bitswap<19>(i,18,15,2,1,13,3,0,9,6,16,4,11,5,7,12,17,14,10,8)];
 
 	// swap address lines for the banked part
 	rom = (uint16_t *)(base + 0x100000);
@@ -511,7 +445,7 @@ void sma_prot_device::mslug3_decrypt_68k(uint8_t* base)
 		uint16_t buffer[0x10000/2];
 		memcpy(buffer, &rom[i], 0x10000);
 		for (int j = 0; j < 0x10000/2; j++)
-			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,2,11,0,14,6,4,13,8,9,3,10,7,5,12,1)];
+			rom[i+j] = buffer[bitswap<15>(j,2,11,0,14,6,4,13,8,9,3,10,7,5,12,1)];
 	}
 }
 
@@ -526,7 +460,7 @@ void sma_prot_device::mslug3a_decrypt_68k(uint8_t* base)
 	/* swap address lines & relocate fixed part */
 	rom = (uint16_t *)base;
 		for (int i = 0; i < 0x0c0000/2; i++)
-		   rom[i] = rom[0x5d0000/2 + bitswap<24>(i,23,22,21,20,19,18,1,16,14,7,17,5,8,4,15,6,3,2,0,13,10,12,9,11)];
+		   rom[i] = rom[0x5d0000/2 + bitswap<19>(i,18,1,16,14,7,17,5,8,4,15,6,3,2,0,13,10,12,9,11)];
 
 	rom = (uint16_t *)(base + 0x100000);
 	/* swap address lines for the banked part */
@@ -535,7 +469,7 @@ void sma_prot_device::mslug3a_decrypt_68k(uint8_t* base)
 		uint16_t buffer[0x10000/2];
 		memcpy(buffer,&rom[i],0x10000);
 		for (int j = 0;j < 0x10000/2;j++)
-			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,12,0,11,3,4,13,6,8,14,7,5,2,10,9,1)];
+			rom[i+j] = buffer[bitswap<15>(j,12,0,11,3,4,13,6,8,14,7,5,2,10,9,1)];
 	}
 }
 
@@ -554,11 +488,11 @@ void sma_prot_device::kof2000_decrypt_68k(uint8_t* base)
 		uint16_t buffer[0x800/2];
 		memcpy(buffer, &rom[i], 0x800);
 		for (int j = 0; j < 0x800/2; j++)
-			rom[i+j] = buffer[bitswap<24>(j,23,22,21,20,19,18,17,16,15,14,13,12,11,10,4,1,3,8,6,2,7,0,9,5)];
+			rom[i+j] = buffer[bitswap<10>(j,4,1,3,8,6,2,7,0,9,5)];
 	}
 
 	// swap address lines & relocate fixed part
 	rom = (uint16_t *)base;
 	for (int i = 0; i < 0x0c0000/2; i++)
-		rom[i] = rom[0x73a000/2 + bitswap<24>(i,23,22,21,20,19,18,8,4,15,13,3,14,16,2,6,17,7,12,10,0,5,11,1,9)];
+		rom[i] = rom[0x73a000/2 + bitswap<19>(i,18,8,4,15,13,3,14,16,2,6,17,7,12,10,0,5,11,1,9)];
 }

@@ -9,7 +9,7 @@
 #include "hp_dio.h"
 #include "machine/am79c90.h"
 
-namespace bus { namespace hp_dio {
+namespace bus::hp_dio {
 
 static constexpr int REG_SWITCHES_REMOTE = 0x80;
 
@@ -84,7 +84,6 @@ private:
 };
 
 } // namespace bus::hp_dio
-} // namespace bus
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(HPDIO_98643, bus::hp_dio, dio16_98643_device)

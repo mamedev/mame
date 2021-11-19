@@ -22,12 +22,12 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE_NS(ZORRO_ACTION_REPLAY_MK1, bus::amiga::zorro, action_replay_mk1_device, "zorro_ar1", "Datel Action Replay MK-I")
-DEFINE_DEVICE_TYPE_NS(ZORRO_ACTION_REPLAY_MK2, bus::amiga::zorro, action_replay_mk2_device, "zorro_ar2", "Datel Action Replay MK-II")
-DEFINE_DEVICE_TYPE_NS(ZORRO_ACTION_REPLAY_MK3, bus::amiga::zorro, action_replay_mk3_device, "zorro_ar3", "Datel Action Replay MK-III")
+DEFINE_DEVICE_TYPE(ZORRO_ACTION_REPLAY_MK1, bus::amiga::zorro::action_replay_mk1_device, "zorro_ar1", "Datel Action Replay MK-I")
+DEFINE_DEVICE_TYPE(ZORRO_ACTION_REPLAY_MK2, bus::amiga::zorro::action_replay_mk2_device, "zorro_ar2", "Datel Action Replay MK-II")
+DEFINE_DEVICE_TYPE(ZORRO_ACTION_REPLAY_MK3, bus::amiga::zorro::action_replay_mk3_device, "zorro_ar3", "Datel Action Replay MK-III")
 
 
-namespace bus { namespace amiga { namespace zorro {
+namespace bus::amiga::zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -150,4 +150,4 @@ INPUT_CHANGED_MEMBER( action_replay_device_base::freeze )
 	m_slot->ipl_w(newval == 1 ? 7 : 0);
 }
 
-} } } // namespace bus::amiga::zorro
+} // namespace bus::amiga::zorro

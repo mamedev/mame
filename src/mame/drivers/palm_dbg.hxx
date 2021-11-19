@@ -1154,7 +1154,7 @@ static const char *lookup_trap(uint16_t opcode)
 
 	int i;
 
-	for (i = 0; i < ARRAY_LENGTH(traps); i++)
+	for (i = 0; i < std::size(traps); i++)
 	{
 		if (traps[i].trap == opcode)
 			return traps[i].name;

@@ -21,7 +21,7 @@
 #include "machine/kabuki.h"  // needed for decoding functions only
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
-#include "sound/ym2413.h"
+#include "sound/ymopl.h"
 #include "screen.h"
 #include "speaker.h"
 

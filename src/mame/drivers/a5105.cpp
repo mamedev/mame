@@ -78,7 +78,7 @@ private:
 	void pcg_addr_w(uint8_t data);
 	void pcg_val_w(uint8_t data);
 	void a5105_palette(palette_device &palette) const;
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
@@ -114,7 +114,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( a5105_state::hgdc_display_pixels )
 {
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
-	int const gfx = m_video_ram[(address & 0x1ffff) >> 1];
+	int const gfx = m_video_ram[(address & 0xffff)];
 
 	for (int xi = 0; xi < 16; xi++)
 	{
@@ -570,9 +570,11 @@ void a5105_state::upd7220_map(address_map &map)
 	map(0x00000, 0x1ffff).ram().share("video_ram");
 }
 
-FLOPPY_FORMATS_MEMBER( a5105_state::floppy_formats )
-	FLOPPY_A5105_FORMAT
-FLOPPY_FORMATS_END
+void a5105_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_A5105_FORMAT);
+}
 
 static void a5105_floppies(device_slot_interface &device)
 {

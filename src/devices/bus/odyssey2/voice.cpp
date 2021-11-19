@@ -12,13 +12,16 @@ Hardware notes:
 Cartridge pins A,B,E,1,10,11 are repurposed for the extra speech ROM. This means
 that (European) cartridges using extra I/O won't work on it.
 
+TODO:
+- bees sound at level complete "MORE MORE MORE CHK CHK CHK" should be more rapid
+
 ******************************************************************************/
 
 #include "emu.h"
 #include "voice.h"
 #include "speaker.h"
 
-DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Passthrough Cart")
+DEFINE_DEVICE_TYPE(O2_ROM_VOICE, o2_voice_device, "o2_voice", "Odyssey 2 The Voice Cartridge")
 
 //-------------------------------------------------
 //  o2_voice_device - constructor
@@ -33,7 +36,6 @@ o2_voice_device::o2_voice_device(const machine_config &mconfig, const char *tag,
 
 void o2_voice_device::device_start()
 {
-	save_item(NAME(m_lrq_state));
 	save_item(NAME(m_control));
 }
 
@@ -68,7 +70,6 @@ void o2_voice_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	SP0256(config, m_speech, 3.12_MHz_XTAL);
-	m_speech->data_request_callback().set(FUNC(o2_voice_device::lrq_callback));
 	// The Voice uses a speaker with its own volume control so the relative volumes to use are subjective, these sound good
 	m_speech->add_route(ALL_OUTPUTS, "mono", 1.00);
 
@@ -88,11 +89,6 @@ const tiny_rom_entry *o2_voice_device::device_rom_region() const
 //-------------------------------------------------
 //  mapper specific handlers
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
-{
-	m_lrq_state = state;
-}
 
 READ_LINE_MEMBER(o2_voice_device::t0_read)
 {

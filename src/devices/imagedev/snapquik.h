@@ -20,7 +20,7 @@ class snapshot_image_device :   public device_t,
 								public device_image_interface
 {
 public:
-	typedef device_delegate<image_init_result (device_image_interface &, const char *, int)> load_delegate;
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
 
 	// construction/destruction
 	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, const char* extensions, attotime delay = attotime::zero)
@@ -94,10 +94,10 @@ DECLARE_DEVICE_TYPE(QUICKLOAD, quickload_image_device)
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-#define SNAPSHOT_LOAD_MEMBER(_name)                 image_init_result _name(device_image_interface &image, const char *file_type, int snapshot_size)
+#define SNAPSHOT_LOAD_MEMBER(_name)                 image_init_result _name(device_image_interface &image)
 #define DECLARE_SNAPSHOT_LOAD_MEMBER(_name)         SNAPSHOT_LOAD_MEMBER(_name)
 
-#define QUICKLOAD_LOAD_MEMBER(_name)                image_init_result _name(device_image_interface &image, const char *file_type, int quickload_size)
+#define QUICKLOAD_LOAD_MEMBER(_name)                image_init_result _name(device_image_interface &image)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        QUICKLOAD_LOAD_MEMBER(_name)
 
 #endif // MAME_DEVICES_IMAGEDEV_SNAPQUIK_H

@@ -20,7 +20,7 @@ public:
 	u8 status_r();
 	void dr_w(u8 data);
 	u8 dr_r();
-	
+
 	// 5 bits used per byte, blocks of 16 lines, 80 blocks
 	const u8 *render();
 
@@ -53,7 +53,7 @@ private:
 	void shift_left();
 	void shift_right();
 
-	void busy(attotime tm);	
+	void busy(attotime tm);
 };
 
 DECLARE_DEVICE_TYPE(LC7985, lc7985_device)

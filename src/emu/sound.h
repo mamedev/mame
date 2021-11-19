@@ -61,6 +61,8 @@
 #ifndef MAME_EMU_SOUND_H
 #define MAME_EMU_SOUND_H
 
+#include "wavwrite.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -209,11 +211,10 @@ public:
 	// for debugging, provide an interface to write a WAV stream
 	void open_wav(char const *filename);
 	void flush_wav();
-	void close_wav();
 
 private:
 	// internal debugging state
-	wav_file *m_wav_file = nullptr;       // pointer to the current WAV file
+	util::wav_file_ptr m_wav_file;        // pointer to the current WAV file
 	u32 m_last_written = 0;               // last written sample index
 #endif
 };
@@ -370,23 +371,16 @@ public:
 	}
 
 	// safely write a sample to the buffer
-	void put(s32 index, sample_t sample)
+	void put(s32 start, sample_t sample)
 	{
-		sound_assert(u32(index) < samples());
-		index += m_start;
-		if (index >= m_buffer->size())
-			index -= m_buffer->size();
-		m_buffer->put(index, sample);
+		m_buffer->put(index_to_buffer_index(start), sample);
 	}
 
 	// write a sample to the buffer, clamping to +/- the clamp value
 	void put_clamp(s32 index, sample_t sample, sample_t clamp = 1.0)
 	{
-		if (sample > clamp)
-			sample = clamp;
-		if (sample < -clamp)
-			sample = -clamp;
-		put(index, sample);
+		assert(clamp >= sample_t(0));
+		put(index, std::clamp(sample, -clamp, clamp));
 	}
 
 	// write a sample to the buffer, converting from an integer with the given maximum
@@ -398,20 +392,14 @@ public:
 	// write a sample to the buffer, converting from an integer with the given maximum
 	void put_int_clamp(s32 index, s32 sample, s32 maxclamp)
 	{
-		if (sample > maxclamp)
-			sample = maxclamp;
-		else if (sample < -maxclamp)
-			sample = -maxclamp;
-		put_int(index, sample, maxclamp);
+		assert(maxclamp >= 0);
+		put_int(index, std::clamp(sample, -maxclamp, maxclamp), maxclamp);
 	}
 
 	// safely add a sample to the buffer
-	void add(s32 index, sample_t sample)
+	void add(s32 start, sample_t sample)
 	{
-		sound_assert(u32(index) < samples());
-		index += m_start;
-		if (index >= m_buffer->size())
-			index -= m_buffer->size();
+		u32 index = index_to_buffer_index(start);
 		m_buffer->put(index, m_buffer->get(index) + sample);
 	}
 
@@ -426,7 +414,7 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		u32 index = start + m_start;
+		u32 index = index_to_buffer_index(start);
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
 			m_buffer->put(index, value);
@@ -441,7 +429,7 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		u32 index = start + m_start;
+		u32 index = index_to_buffer_index(start);
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
 			m_buffer->put(index, src.get(start + sampindex));
@@ -456,7 +444,7 @@ public:
 	{
 		if (start + count > samples())
 			count = samples() - start;
-		u32 index = start + m_start;
+		u32 index = index_to_buffer_index(start);
 		for (s32 sampindex = 0; sampindex < count; sampindex++)
 		{
 			m_buffer->put(index, m_buffer->get(index) + src.get(start + sampindex));
@@ -465,6 +453,17 @@ public:
 	}
 	void add(read_stream_view const &src, s32 start) { add(src, start, samples() - start); }
 	void add(read_stream_view const &src) { add(src, 0, samples()); }
+
+private:
+	// given a stream starting offset, return the buffer index
+	u32 index_to_buffer_index(s32 start) const
+	{
+		sound_assert(u32(start) < samples());
+		u32 index = start + m_start;
+		if (index >= m_buffer->size())
+			index -= m_buffer->size();
+		return index;
+	}
 };
 
 
@@ -763,24 +762,28 @@ public:
 	attotime last_update() const { return m_last_update; }
 	int sample_count() const { return m_samples_this_update; }
 	int unique_id() { return m_unique_id++; }
+	stream_buffer::sample_t compressor_scale() const { return m_compressor_scale; }
 
 	// allocate a new stream with a new-style callback
 	sound_stream *stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags);
 
-	// begin recording a WAV file if options has requested it
-	void start_recording();
-
-	// stop recording the WAV file
+	// WAV recording
+	bool is_recording() const { return bool(m_wavfile); }
+	bool start_recording();
+	bool start_recording(std::string_view filename);
 	void stop_recording();
 
 	// set the global OSD attenuation level
 	void set_attenuation(float attenuation);
 
 	// mute sound for one of various independent reasons
-	void ui_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_UI); }
-	void debugger_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_DEBUGGER); }
-	void system_mute(bool turn_off = true) { mute(turn_off, MUTE_REASON_SYSTEM); }
-	void system_enable(bool turn_on = true) { mute(!turn_on, MUTE_REASON_SYSTEM); }
+	bool muted() const { return bool(m_muted); }
+	bool ui_mute() const { return bool(m_muted & MUTE_REASON_UI); }
+	bool debugger_mute() const { return bool(m_muted & MUTE_REASON_DEBUGGER); }
+	bool system_mute() const { return bool(m_muted & MUTE_REASON_SYSTEM); }
+	void ui_mute(bool turn_off) { mute(turn_off, MUTE_REASON_UI); }
+	void debugger_mute(bool turn_off) { mute(turn_off, MUTE_REASON_DEBUGGER); }
+	void system_mute(bool turn_off) { mute(turn_off, MUTE_REASON_SYSTEM); }
 
 	// return information about the given mixer input, by index
 	bool indexed_mixer_input(int index, mixer_input &info) const;
@@ -806,7 +809,7 @@ private:
 	void resume();
 
 	// handle configuration load/save
-	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// helper to adjust scale factor toward a goal
@@ -818,6 +821,7 @@ private:
 	// internal state
 	running_machine &m_machine;           // reference to the running machine
 	emu_timer *m_update_timer;            // timer that runs the update function
+	std::vector<std::reference_wrapper<speaker_device> > m_speakers;
 
 	u32 m_update_number;                  // current update index; used for sample rate updates
 	attotime m_last_update;               // time of the last update
@@ -829,12 +833,13 @@ private:
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
+	bool m_compressor_enabled;            // enable compressor (it will still be calculated for detecting overdrive)
 
 	u8 m_muted;                           // bitmask of muting reasons
 	bool m_nosound_mode;                  // true if we're in "nosound" mode
 	int m_attenuation;                    // current attentuation level (at the OSD)
 	int m_unique_id;                      // unique ID used for stream identification
-	wav_file *m_wavfile;                  // WAV file for streaming
+	util::wav_file_ptr m_wavfile;         // WAV file for streaming
 
 	// streams data
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list; // list of streams

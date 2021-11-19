@@ -52,7 +52,8 @@ protected:
 	virtual void tx_complete() override;
 	virtual void tx_timeout() override;
 	virtual void rx_complete(uint8_t data, bool cts) override;
-	virtual uint16_t stale_all() { return STALE_ALL; }
+
+	uint16_t stale_all() { return STALE_ALL; }
 
 	void uart_tx_fifo_push(uint8_t data);
 

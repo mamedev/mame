@@ -51,9 +51,13 @@ public:
 	u8 pread();
 	void pwrite(u8 data);
 
+	// to use when the underlying decryption changes and remapping is needed
+	void decryption_changed();
+
 	// mapping helpers
 	void map_as_rom(u32 offset, u32 length, offs_t mirror, const char *bank_name, const char *decrypted_bank_name, offs_t rgnoffset, write16_delegate whandler);
 	void map_as_ram(u32 offset, u32 length, offs_t mirror, const char *bank_share_name, write16_delegate whandler);
+	void map_as_region(u32 offset, u32 length, offs_t mirror, const char *region_name, write16_delegate whandler);
 	void map_as_handler(u32 offset, u32 length, offs_t mirror, read16_delegate rhandler, write16_delegate whandler);
 
 	// perform an explicit configuration (for bootlegs with hard-coded mappings)
@@ -92,11 +96,11 @@ private:
 		// configuration
 		void set_decrypt(fd1089_base_device *fd1089);
 		void set_decrypt(fd1094_device *fd1094);
-		void clear() { set(0, 0, ~0, nullptr); }
-		void *set(offs_t start, offs_t end, offs_t rgnoffs, void *src);
+		void clear() { m_start = 0; m_end = ~0; m_rgnoffs = 0; m_srcptr = nullptr; }
+		void set(offs_t start, offs_t end, offs_t rgnoffs, void *src, memory_bank *bank);
 
 		// updating
-		void *update();
+		void update(memory_bank *bank);
 		void reset() { m_fd1089_decrypted.clear(); if (m_fd1094_cache != nullptr) m_fd1094_cache->reset(); }
 
 	private:
@@ -123,11 +127,12 @@ private:
 	devcb_write_line            m_mcu_int_callback;
 
 	// internal state
-	address_space *        m_space;
-	address_space *        m_decrypted_space;
-	u8                     m_regs[0x20];
-	u8                     m_curregion;
-	decrypt_bank           m_banks[8];
+	address_space *              m_space;
+	address_space *              m_decrypted_space;
+	memory_bank_array_creator<8> m_decryption_banks;
+	u8                           m_regs[0x20];
+	u8                           m_curregion;
+	decrypt_bank                 m_banks[8];
 
 	// communication registers
 	u8                     m_to_sound;

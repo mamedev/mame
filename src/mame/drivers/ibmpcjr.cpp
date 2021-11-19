@@ -467,7 +467,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 				header_size = 0x200;
 				break;
 			default:
-				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
+				image.seterror(image_error::INVALIDIMAGE, "Invalid header size");
 				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)
@@ -580,8 +580,8 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 void pcjr_state::ibmpcjx_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0x80000, 0x9ffff).ram().share("vram"); // TODO: remove this part of vram hack
+	map(0x80000, 0xb7fff).rom().region("kanji", 0);
 	map(0xb8000, 0xbffff).m("pcvideo_pcjr:vram", FUNC(address_map_bank_device::amap8));
 	map(0xd0000, 0xdffff).r(m_cart1, FUNC(generic_slot_device::read_rom));
 	map(0xe0000, 0xfffff).rom().region("bios", 0);
@@ -597,7 +597,7 @@ void pcjr_state::ibmpcjx_io(address_map &map)
 void pcjr_state::ibmpcjr(machine_config &config)
 {
 	/* basic machine hardware */
-	I8088(config, m_maincpu, 4900000);
+	I8088(config, m_maincpu, XTAL(14'318'181)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pcjr_state::ibmpcjr_map);
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));

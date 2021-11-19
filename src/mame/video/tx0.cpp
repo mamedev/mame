@@ -8,7 +8,6 @@
 
 #include "emu.h"
 
-#include "cpu/pdp1/tx0.h"
 #include "includes/tx0.h"
 #include "video/crt.h"
 
@@ -57,8 +56,8 @@ WRITE_LINE_MEMBER(tx0_state::screen_vblank_tx0)
 void tx0_state::tx0_plot(int x, int y)
 {
 	/* compute pixel coordinates and plot */
-	x = x*crt_window_width/0777;
-	y = y*crt_window_height/0777;
+	x = (x ^ 0400) * crt_window_width / 0777;
+	y = (y ^ 0400) * crt_window_height / 0777;
 	m_crt->plot(x, y);
 }
 

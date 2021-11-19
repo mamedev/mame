@@ -23,6 +23,9 @@ ToDo:
 //#include "bus/s100/s100.h"
 #include "softlist.h"
 
+
+namespace {
+
 class dps1_state : public driver_device
 {
 public:
@@ -39,9 +42,11 @@ public:
 
 	void dps1(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
-	void machine_reset() override;
-	void machine_start() override;
 	void portb2_w(u8 data);
 	void portb4_w(u8 data);
 	void portb6_w(u8 data);
@@ -55,6 +60,7 @@ private:
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+
 	bool m_dma_dir;
 	u16 m_dma_adr;
 	required_device<cpu_device> m_maincpu;
@@ -68,8 +74,8 @@ private:
 
 void dps1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x03ff).bankr("bank1");
+	map(0x0000, 0xffff).ram().share(m_ram);
+	map(0x0000, 0x03ff).bankr(m_bank1);
 }
 
 void dps1_state::io_map(address_map &map)
@@ -176,6 +182,7 @@ void dps1_state::machine_start()
 {
 	m_bank1->configure_entry(0, m_ram);
 	m_bank1->configure_entry(1, m_rom);
+
 	save_item(NAME(m_dma_dir));
 	save_item(NAME(m_dma_adr));
 }
@@ -224,8 +231,8 @@ void dps1_state::dps1(machine_config &config)
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 2, false, true);
 	//m_fdc->intrq_wr_callback().set(FUNC(dps1_state::fdc_int_w)); // doesn't appear to be used
 	m_fdc->drq_wr_callback().set(FUNC(dps1_state::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_floppy_formats).enable_sound(true);
-	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "floppy0", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	//FLOPPY_CONNECTOR(config, "fdc:1", floppies, "floppy1", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("dps1");
@@ -235,5 +242,8 @@ ROM_START( dps1 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "boot 1280", 0x0000, 0x0400, CRC(9c2e98fa) SHA1(78e6c9d00aa6e8f6c4d3c65984cfdf4e99434c66) ) // actually on the FDC-2 board
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 1979, dps1, 0, 0, dps1, dps1, dps1_state, empty_init, "Ithaca InterSystems", "DPS-1", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

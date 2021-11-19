@@ -3,10 +3,10 @@
 // thanks-to:Kevin Horton
 /***************************************************************************
 
-  Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
-  most of them are VFD electronic games/toys.
+Hitachi HMCS40 MCU tabletops/handhelds or other simple devices,
+most of them are VFD electronic games/toys.
 
-  known chips:
+known chips:
 
   serial  device   etc.
 ----------------------------------------------------------------
@@ -19,10 +19,12 @@
  *A67     HD38750  1982, Romtec Pucki & Monsters (ET-803)
 
  @A04     HD38800  1980, Gakken Heiankyo Alien
+  A16     HD38800  1981, Entex Select-A-Game cartridge: Basketball 3 -> sag.cpp
  *A20     HD38800  1981, Entex Super Space Invader 2
  @A25     HD38800  1981, Coleco Alien Attack
  @A27     HD38800  1981, Bandai Packri Monster
  @A31     HD38800  1981, Entex Select-A-Game cartridge: Space Invader 2 -> sag.cpp - also used in 2nd version of Super Space Invader 2!
+  A36     HD38800  1981, Entex Select-A-Game cartridge: Pac-Man 2       -> "
   A37     HD38800  1981, Entex Select-A-Game cartridge: Baseball 4      -> "
   A38     HD38800  1981, Entex Select-A-Game cartridge: Pinball         -> "
  *A41     HD38800  1982, Gakken Puck Monster
@@ -49,13 +51,14 @@
  @A23     HD38820  1981, Entex Pac Man 2
  @A28     HD38820  1981, Coleco Pac-Man (ver 1)
  @A29     HD38820  1981, Coleco Pac-Man (ver 2)
- *A32     HD38820  198?, Gakken Super Cobra
+ @A32     HD38820  1982, Gakken Super Cobra
  *A38     HD38820  1982, Entex Crazy Climber
  @A42     HD38820  1982, Entex Stargate
  @A43     HD38820  1982, Entex Turtles
  @A45     HD38820  1982, Coleco Donkey Kong
  @A49     HD38820  1983, Bandai Zackman
  @A61     HD38820  1983, Coleco Ms. Pac-Man
+ *A62     HD38820  1983, Coleco Zaxxon
  @A63     HD38820  1983, Bandai Pengo
  @A65     HD38820  1983, Bandai Burger Time (PT-389)
  @A69     HD38820  1983, Gakken Dig Dug
@@ -90,32 +93,42 @@
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+============================================================================
 
-  TODO:
-  - cgalaxn discrete sound (alien attacking sound effect)
-  - gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
-    It can be tested by jumping up repeatedly at the start position under the ladder,
-    if the glitch happens there, you can jump onto the 2nd floor.
-  - epacman2 booting the game in demo mode, pacman should take the shortest route to
-    the upper-left power pill: mcu cycle/interrupt timing related
-  - kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
-    the 2nd half of the ROM, none of the games access it though and it's impossible
-    to execute unless the chip is in testmode.
-  - Though very uncommon when compared to games with LED/lamp display, some
-    games may manipulate VFD plate brightness by strobing it longer/shorter,
-    eg. cgalaxn when a ship explodes.
-  - bzaxxon 3D effect is difficult to simulate
-  - improve/redo SVGs of: bzaxxon, bpengo, bbtime
+ROM source notes when dumped from another publisher, but confident it's the same:
+- gckong: CGL Super Kong
+- ghalien: CGL Earth Invaders
+- kingman: Tandy Kingman
+- zackman: Tandy Zackman
+
+TODO:
+- cgalaxn discrete sound (alien attacking sound effect)
+- gckong glitchy jump on 1st level (rarely happens), caused by MCU stack overflow.
+  It can be tested by jumping up repeatedly at the start position under the ladder,
+  if the glitch happens there, you can jump onto the 2nd floor.
+- epacman2 booting the game in demo mode, pacman should take the shortest route to
+  the upper-left power pill: mcu cycle/interrupt timing related
+- kevtris's HMCS40 ROM dumps are incomplete, missing MCU factory test code from
+  the 2nd half of the ROM, none of the games access it though and it's impossible
+  to execute unless the chip is in testmode.
+- Though very uncommon when compared to games with LED/lamp display, some
+  games may manipulate VFD plate brightness by strobing it longer/shorter,
+  eg. cgalaxn when a ship explodes.
+- bzaxxon 3D effect is difficult to simulate
+- improve/redo SVGs of: bzaxxon, bbtime
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/hmcs40/hmcs40.h"
 #include "cpu/cop400/cop400.h"
 #include "video/pwm.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -662,8 +675,8 @@ ROM_END
   * cyan/red/green VFD display Futaba DM-21ZK 2B, with bezel overlay
 
   known releases:
-  - Japan: FL Packri Monster
-  - USA(World?): Packri Monster
+  - Japan: FL Packri Monster, published by Bandai
+  - USA(World?): Packri Monster, published by Bandai
   - USA/Canada: Hungry Monster, published by Tandy
   - other: Gobble Man/Ogre Monster, published by Tandy
 
@@ -909,6 +922,10 @@ ROM_END
   * Hitachi QFP HD38820A49 MCU
   * cyan/red/yellow VFD display Futaba DM-53Z 3E, with color overlay
 
+  known releases:
+  - World: Zackman, published by Bandai
+  - USA: Zackman, published by Tandy
+
 ***************************************************************************/
 
 class zackman_state : public hh_hmcs40_state
@@ -1151,8 +1168,8 @@ ROM_START( bpengo )
 	ROM_LOAD( "hd38820a63", 0x0000, 0x1000, CRC(ebd6bc64) SHA1(0a322c47b9553a2739a85908ce64b9650cf93d49) )
 	ROM_CONTINUE(           0x1e80, 0x0100 )
 
-	ROM_REGION( 744461, "screen", 0)
-	ROM_LOAD( "bpengo.svg", 0, 744461, BAD_DUMP CRC(2b9abaa5) SHA1(c70a6ac1fa757fdd3ababfe6e00573ef1410c1eb) )
+	ROM_REGION( 565069, "screen", 0)
+	ROM_LOAD( "bpengo.svg", 0, 565069, CRC(fb25ffeb) SHA1(fb4db5120f1e35e39c7fb2da4af3aa63417efaf1) )
 ROM_END
 
 
@@ -2205,7 +2222,7 @@ ROM_END
   - P1 Up:    Eat & Run
   - P1 Down:  Demo
 
-  BTANB note: 1st version doesn't show the whole maze on power-on
+  BTANB: 1st version doesn't show the whole maze on power-on
 
 ***************************************************************************/
 
@@ -2341,7 +2358,7 @@ ROM_END
   - P1 Down:  Head-to-Head Ms. Pac-Man (2-player mode)
   - P1 Up:    Demo
 
-  BTANB note: in demo-mode, she hardly ever walks to the upper two rows
+  BTANB: in demo-mode, she hardly ever walks to the upper two rows
 
 ***************************************************************************/
 
@@ -2464,8 +2481,8 @@ ROM_END
   * cyan/red/green VFD display Futaba DM-20
 
   known releases:
-  - USA: Galaxian 2
-  - UK: Astro Invader (Hales/Entex)
+  - USA: Galaxian 2, published by Entex
+  - UK: Astro Invader, published by Hales/Entex
 
 ***************************************************************************/
 
@@ -3138,7 +3155,7 @@ ROM_END
   * cyan/red VFD display Futaba DM-11Z 1H
 
   known releases:
-  - Japan: Heiankyo Alien
+  - Japan: Heiankyo Alien, published by Gakken
   - USA: Earth Invaders, published by CGL
 
 ***************************************************************************/
@@ -3265,7 +3282,7 @@ ROM_END
   * cyan/red/blue VFD display Futaba DM-54Z 2H, with bezel overlay
 
   known releases:
-  - Japan: Crazy Kong
+  - Japan: Crazy Kong, published by Gakken
   - USA: Super Kong, published by CGL
 
 ***************************************************************************/
@@ -3384,6 +3401,140 @@ ROM_START( gckong )
 
 	ROM_REGION( 346588, "screen", 0)
 	ROM_LOAD( "gckong.svg", 0, 346588, CRC(317af984) SHA1(ff6323526d1f5e46eccf8fa8d979175895be75de) )
+ROM_END
+
+
+
+
+
+/***************************************************************************
+
+  Gakken Super Cobra
+  * PCB label SUPER COBRA 3000N
+  * Hitachi QFP HD38820A32 MCU
+  * cyan/red/green VFD display
+
+  known releases:
+  - World: Super Cobra, published by Gakken
+  - USA: Cobra Super Copter, published by Tandy
+
+  There are 2 versions, a green one and a white one. They have the same MCU,
+  though the VFD has color differences and is more compact.
+
+  BTANB(green version): 1 rocket seems out of place at the top-right area
+
+***************************************************************************/
+
+class gscobra_state : public hh_hmcs40_state
+{
+public:
+	gscobra_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_hmcs40_state(mconfig, type, tag)
+	{ }
+
+	void plate_w(offs_t offset, u8 data);
+	void grid_w(u16 data);
+
+	void update_int0();
+	DECLARE_INPUT_CHANGED_MEMBER(input_changed) { update_int0(); }
+	void gscobra(machine_config &config);
+};
+
+// handlers
+
+void gscobra_state::plate_w(offs_t offset, u8 data)
+{
+	// R0x-R6x(,D1-D3): vfd plate
+	int shift = offset * 4;
+	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
+
+	// update display
+	m_display->matrix(m_grid, m_plate);
+}
+
+void gscobra_state::grid_w(u16 data)
+{
+	// D0: speaker out
+	m_speaker->level_w(data & 1);
+
+	// D10-D15: input mux
+	u8 inp_mux = data >> 10 & 0x3f;
+	if (inp_mux != m_inp_mux)
+	{
+		m_inp_mux = inp_mux;
+		update_int0();
+	}
+
+	// D7-D15: vfd grid
+	m_grid = data >> 7 & 0x1ff;
+
+	// D1-D3: more plates (update display there)
+	plate_w(7, data >> 1 & 7);
+}
+
+void gscobra_state::update_int0()
+{
+	// INT0 on multiplexed inputs
+	set_interrupt(0, read_inputs(6));
+}
+
+// config
+
+static INPUT_PORTS_START( gscobra )
+	PORT_START("IN.0") // D10 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.1") // D11 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.2") // D12 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.3") // D13 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.4") // D14 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+
+	PORT_START("IN.5") // D15 INT0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, gscobra_state, input_changed, 0)
+INPUT_PORTS_END
+
+void gscobra_state::gscobra(machine_config &config)
+{
+	/* basic machine hardware */
+	HD38820(config, m_maincpu, 400000); // approximation
+	m_maincpu->write_r<0>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<1>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<2>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<3>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<4>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<5>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_r<6>().set(FUNC(gscobra_state::plate_w));
+	m_maincpu->write_d().set(FUNC(gscobra_state::grid_w));
+
+	/* video hardware */
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen.set_refresh_hz(60);
+	screen.set_size(1920, 852);
+	screen.set_visarea_full();
+
+	PWM_DISPLAY(config, m_display).set_size(9, 31);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+// roms
+
+ROM_START( gscobra )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "hd38820a32", 0x0000, 0x1000, CRC(7bbd130f) SHA1(91dd280e4108fad7ba99191355364bd3217b9d17) )
+	ROM_CONTINUE(           0x1e80, 0x0100 )
+
+	ROM_REGION( 232919, "screen", 0)
+	ROM_LOAD( "gscobra.svg", 0, 232919, CRC(5ceb4bfc) SHA1(77c9a45569d780838ebe75818acb2d2ced4bda00) )
 ROM_END
 
 
@@ -3518,14 +3669,14 @@ ROM_END
 
 /***************************************************************************
 
-  Mattel World Championship Baseball
+  Mattel World Championship Baseball (model 3201)
   * PCB label MEL-001 Baseball Rev. B
   * Hitachi QFP HD38820A09 MCU
   * cyan/red/green VFD display Futaba DM-24ZK 1G, with etched overlay
 
-  To start the game in 2-player mode, simply turn the game on. For 1-player,
-  turn the game on while holding the 1-key and use the visitor's side keypad
-  to play offsense.
+  It was patented under US4372557. To start the game in 2-player mode, simply
+  turn the game on. For 1-player, turn the game on while holding the 1-key
+  and use the visitor's side keypad to play offsense.
 
 ***************************************************************************/
 
@@ -3601,9 +3752,9 @@ u8 mwcbaseb_state::input_r()
     SLOW     CURVE    FAST                                    SLOW     CURVE    FAST
 */
 
-static INPUT_PORTS_START( mwcbaseb )
+static INPUT_PORTS_START( mwcbaseb ) // P1 = left/visitor, P2 = right/home
 	PORT_START("IN.0") // D9 port R4x
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4") // note: P1 = left/visitor, P2 = right/home
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("P2 4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_NAME("P2 3")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_NAME("P2 2")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_NAME("P2 1")
@@ -4059,6 +4210,10 @@ ROM_END
   * Hitachi HD38800B23 MCU
   * cyan/red/blue VFD display Futaba DM-65ZK 3A
 
+  known releases:
+  - World: Kingman, published by Tomy
+  - USA: Kingman, published by Tandy
+
 ***************************************************************************/
 
 class kingman_state : public hh_hmcs40_state
@@ -4185,7 +4340,7 @@ ROM_END
   * cyan/red VFD display Futaba DM-26Z 1G, with bezel
 
   known releases:
-  - USA: Invaders/Sonic Invader
+  - USA: Invaders/Sonic Invader, published by VTech
   - UK: Cosmic Invader, published by Grandstand
   - UK: Galactic Invaders, published by Prinztronic
 
@@ -4320,6 +4475,7 @@ CONS( 1982, estargte,  0,        0, estargte, estargte, estargte_state, empty_in
 
 CONS( 1980, ghalien,   0,        0, ghalien,  ghalien,  ghalien_state,  empty_init, "Gakken", "Heiankyo Alien (Gakken)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, gckong,    0,        0, gckong,   gckong,   gckong_state,   empty_init, "Gakken", "Crazy Kong (Gakken)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, gscobra,   0,        0, gscobra,  gscobra,  gscobra_state,  empty_init, "Gakken", "Super Cobra (Gakken, green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1983, gdigdug,   0,        0, gdigdug,  gdigdug,  gdigdug_state,  empty_init, "Gakken", "Dig Dug (Gakken)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, mwcbaseb,  0,        0, mwcbaseb, mwcbaseb, mwcbaseb_state, empty_init, "Mattel", "World Championship Baseball", MACHINE_SUPPORTS_SAVE )

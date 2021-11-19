@@ -297,7 +297,7 @@ SNAPSHOT_LOAD_MEMBER(lviv_state::snapshot_cb)
 
 	image.fread(&snapshot_data[0], LVIV_SNAPSHOT_SIZE);
 
-	if (verify_snapshot(&snapshot_data[0], snapshot_size) != image_verify_result::PASS)
+	if (verify_snapshot(&snapshot_data[0], image.length()) != image_verify_result::PASS)
 	{
 		return image_init_result::FAIL;
 	}

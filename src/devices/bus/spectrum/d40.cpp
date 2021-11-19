@@ -63,14 +63,6 @@ static void didaktik_floppies(device_slot_interface &device)
 }
 
 //-------------------------------------------------
-//  floppy_format_type floppy_formats
-//-------------------------------------------------
-
-FLOPPY_FORMATS_MEMBER(spectrum_d40base_device::floppy_formats)
-	FLOPPY_PC_FORMAT
-FLOPPY_FORMATS_END
-
-//-------------------------------------------------
 //  ROM
 //-------------------------------------------------
 
@@ -99,8 +91,8 @@ void spectrum_d40_device::device_add_mconfig(machine_config &config)
 	WD2797(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(spectrum_d40_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(spectrum_d40_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "525dd", spectrum_d40_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "525dd", spectrum_d40_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "525dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "525dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("JOY");
@@ -114,8 +106,8 @@ void spectrum_d80_device::device_add_mconfig(machine_config &config)
 	WD2797(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(FUNC(spectrum_d80_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(spectrum_d80_device::fdc_drq_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "35dd", spectrum_d80_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "35dd", spectrum_d80_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	I8255(config, m_ppi);
 
@@ -126,8 +118,8 @@ void spectrum_d80_device::device_add_mconfig(machine_config &config)
 void spectrum_d80v2_device::device_add_mconfig(machine_config &config)
 {
 	WD37C65C(config, m_fdc, 16_MHz_XTAL); // actually GM82C765B
-	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "35dd", spectrum_d80v2_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "35dd", spectrum_d80v2_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:0", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", didaktik_floppies, "35dd", floppy_image_device::default_pc_floppy_formats).enable_sound(true);
 
 	I8255(config, m_ppi);
 

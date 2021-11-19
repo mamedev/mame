@@ -17,9 +17,6 @@
   Hang-On (Sonic)
   Ator (Video Dens)
 
-  Others not emulated (need roms):
-  Storm (Sonic)
-
   Sir Lancelot (Peyper, 1994)
   - CPU is a B409 (could be a higher-speed Z80)
   - Audio CPU is a TMP91P640F-10. Other audio chips are YMF262 and YAC512.
@@ -242,7 +239,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )               // Tilt
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )             // Start game - Might also display next screen in "Test Mode"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )              // Small coin (25 pesetas)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )              // Medium coin (50 pesetas but 100 pesetas in 'sonstwar') - never mentionned in the manuals
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )              // Medium coin (50 pesetas but 100 pesetas in 'sonstwar') - never mentioned in the manuals
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )              // Big coin (100 pesetas)
 
 	/* DSW0 : port 0x20 - DSW0-1 is bit 7 ... DSW0-8 is bit 0 */
@@ -262,7 +259,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x03, 0x00, "Replay at / High-score" )    // Puntos/Premios - high-score not mentionned in some manuals - values are game specific
+	PORT_DIPNAME( 0x03, 0x00, "Replay at / High-score" )    // Puntos/Premios - high-score not mentioned in some manuals - values are game specific
 	PORT_DIPSETTING(    0x00, "0k 0k and 0k / 0k" )
 	PORT_DIPSETTING(    0x01, "0k 0k and 0k / 0k" )
 	PORT_DIPSETTING(    0x02, "0k 0k and 0k / 0k" )
@@ -843,6 +840,7 @@ ROM_START(odisea)
 	ROM_LOAD("odiseab.bin", 0x2000, 0x2000, CRC(8bdf7c17) SHA1(7202b4770646fce5b2ba9e3b8ca097a993123b14))
 	ROM_LOAD("odiseac.bin", 0x4000, 0x2000, CRC(832dee5e) SHA1(9b87ffd768ab2610f2352adcf22c4a7880de47ab))
 ROM_END
+// Note that odisea roms of size 0x4000 exist on the web, the first half of each is identical to what we have, the 2nd half is all 0xFF.
 
 /*-------------------------------------------------------------------
 / Nemesis (1986)
@@ -867,7 +865,14 @@ ROM_END
 /*-------------------------------------------------------------------
 / Ator (1985)
 /-------------------------------------------------------------------*/
-ROM_START(ator)
+ROM_START(ator) // Version with 2 bumpers, probably older
+	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_LOAD("ator1.bin", 0x0000, 0x2000, CRC(87967577) SHA1(6586401a4b1a837bacd61d156b44eedaab271479))
+	ROM_LOAD("ator2.bin", 0x2000, 0x2000, CRC(832b06ea) SHA1(c70c613fd29d1d560951890bce072cbf45525526))
+	// No ROM 3
+ROM_END
+
+ROM_START(ator3bmp) // Version with 3 bumpers, probably newer
 	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
 	ROM_LOAD("ator 2 _0xba29.bin", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
@@ -902,5 +907,6 @@ GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_wolfman, 
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_wolfman, ROT0, "Peyper",     "Nemesis",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_wolfman, ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
-GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
+GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
 GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0, "Peyper",     "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)

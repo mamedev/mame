@@ -73,7 +73,7 @@ license:CC0
 		</element>
 
 
-	<!-- main element -->
+	<!-- main bezel -->
 
 		<element ref="static_white"><bounds x="19.3" y="19.3" width="15.4" height="27.4" /></element>
 		<element ref="static_black2"><bounds x="19.5" y="19.5" width="15.0" height="27.0" /></element>

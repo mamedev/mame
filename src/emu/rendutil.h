@@ -15,6 +15,7 @@
 
 #include "rendertypes.h"
 
+#include <algorithm>
 #include <cmath>
 
 
@@ -42,10 +43,10 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 bool render_clip_line(render_bounds *bounds, const render_bounds *clip);
 bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
 void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1);
-void render_load_msdib(bitmap_argb32 &bitmap, util::core_file &file);
-void render_load_jpeg(bitmap_argb32 &bitmap, util::core_file &file);
-bool render_load_png(bitmap_argb32 &bitmap, util::core_file &file, bool load_as_alpha_to_existing = false);
-ru_imgformat render_detect_image(util::core_file &file);
+void render_load_msdib(bitmap_argb32 &bitmap, util::random_read &file);
+void render_load_jpeg(bitmap_argb32 &bitmap, util::random_read &file);
+bool render_load_png(bitmap_argb32 &bitmap, util::random_read &file, bool load_as_alpha_to_existing = false);
+ru_imgformat render_detect_image(util::random_read &file);
 
 
 
@@ -69,7 +70,7 @@ static inline float render_round_nearest(float f)
     flip flags
 -------------------------------------------------*/
 
-static inline int orientation_swap_flips(int orientation)
+constexpr int orientation_swap_flips(int orientation)
 {
 	return (orientation & ORIENTATION_SWAP_XY) |
 			((orientation & ORIENTATION_FLIP_X) ? ORIENTATION_FLIP_Y : 0) |
@@ -82,7 +83,7 @@ static inline int orientation_swap_flips(int orientation)
     that will undo another orientation
 -------------------------------------------------*/
 
-static inline int orientation_reverse(int orientation)
+constexpr int orientation_reverse(int orientation)
 {
 	/* if not swapping X/Y, then just apply the same transform to reverse */
 	if (!(orientation & ORIENTATION_SWAP_XY))
@@ -99,7 +100,7 @@ static inline int orientation_reverse(int orientation)
     after applying two subsequent orientations
 -------------------------------------------------*/
 
-static inline int orientation_add(int orientation1, int orientation2)
+constexpr int orientation_add(int orientation1, int orientation2)
 {
 	/* if the 2nd transform doesn't swap, just XOR together */
 	if (!(orientation2 & ORIENTATION_SWAP_XY))
@@ -126,11 +127,7 @@ static inline float apply_brightness_contrast_gamma_fp(float srcval, float brigh
 	srcval = (srcval * contrast) + brightness - 1.0f;
 
 	/* clamp and return */
-	if (srcval < 0.0f)
-		srcval = 0.0f;
-	if (srcval > 1.0f)
-		srcval = 1.0f;
-	return srcval;
+	return std::clamp(srcval, 0.0f, 1.0f);
 }
 
 

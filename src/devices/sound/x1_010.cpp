@@ -215,13 +215,13 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 //  if (m_sound_enable == 0) return;
 
+	auto &bufL = outputs[0];
+	auto &bufR = outputs[1];
 	for (int ch = 0; ch < NUM_CHANNELS; ch++)
 	{
 		X1_010_CHANNEL *reg = (X1_010_CHANNEL *)&(m_reg[ch*sizeof(X1_010_CHANNEL)]);
 		if ((reg->status & 1) != 0)                            // Key On
 		{
-			auto &bufL = outputs[0];
-			auto &bufR = outputs[1];
 			const int div = (reg->status & 0x80) ? 1 : 0;
 			if ((reg->status & 2) == 0)                        // PCM sampling
 			{
@@ -294,5 +294,11 @@ void x1_010_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				m_env_offset[ch] = env_offs;
 			}
 		}
+	}
+
+	for (int i = 0; i < bufL.samples(); i++)
+	{
+		bufL.put(i, std::clamp(bufL.getraw(i), -1.0f, 1.0f));
+		bufR.put(i, std::clamp(bufR.getraw(i), -1.0f, 1.0f));
 	}
 }

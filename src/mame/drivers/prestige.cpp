@@ -109,6 +109,8 @@ Notes:
 #include "softlist.h"
 
 
+namespace {
+
 class prestige_state : public driver_device
 {
 public:
@@ -693,6 +695,15 @@ void prestige_state::machine_start()
 	m_bank4->set_entry(0);
 	m_bank5->set_entry(0);
 
+	m_irq_counter = 0;
+
+	m_lcdc.addr1 = 0;
+	m_lcdc.addr2 = 0;
+	m_lcdc.lcd_w = 0;
+	m_lcdc.lcd_h = 0;
+	m_lcdc.fb_width = 0;
+	m_lcdc.split_pos = 0;
+
 	//pointer to the videoram
 	m_vram = ram;
 }
@@ -917,6 +928,7 @@ ROM_START( gmmc )
 	ROM_CONTINUE( 0x000000, 0x020000 )
 ROM_END
 
+} // Anonymous namespace
 
 
 /* Driver */

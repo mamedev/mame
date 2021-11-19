@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( bw12_state::pia_cb2_w )
 		/* keyboard shift clock */
 		m_key_shift++;
 
-		if (m_key_shift < 10)
+		if (m_key_shift < 9)
 		{
 			m_key_sin = m_key_data[m_key_shift];
 		}
@@ -469,18 +469,22 @@ static void bw12_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_SSDD);
 }
 
-FLOPPY_FORMATS_MEMBER( bw12_state::bw12_floppy_formats )
-	FLOPPY_BW12_FORMAT
-FLOPPY_FORMATS_END
+void bw12_state::bw12_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW12_FORMAT);
+}
 
 static void bw14_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-FLOPPY_FORMATS_MEMBER( bw12_state::bw14_floppy_formats )
-	FLOPPY_BW12_FORMAT
-FLOPPY_FORMATS_END
+void bw12_state::bw14_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_BW12_FORMAT);
+}
 
 
 /* F4 Character Displayer */
@@ -658,7 +662,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
-COMP( 1984, bw12, 0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, bw14d, 0,     0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell Portable Computer Model 14 (German keyboard)", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY             FULLNAME       FLAGS */
+COMP( 1984, bw12,  0,      0,      bw12,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 12", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14,  bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell 14", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, bw14d, bw12,   0,      bw14,    bw12,  bw12_state, empty_init, "Bondwell Holding", "Bondwell Portable Computer Model 14 (German keyboard)", MACHINE_SUPPORTS_SAVE )

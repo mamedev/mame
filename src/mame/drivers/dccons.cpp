@@ -617,8 +617,8 @@ INPUT_PORTS_END
 void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^aica", 1.0);
-	cdda->add_route(1, "^^aica", 1.0);
+	cdda->add_route(0, "^^aica", 0.4);
+	cdda->add_route(1, "^^aica", 0.4);
 }
 
 void dc_cons_state::dc_base(machine_config &config)
@@ -665,8 +665,8 @@ void dc_cons_state::dc_base(machine_config &config)
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
 	m_aica->set_addrmap(0, &dc_cons_state::aica_map);
-	m_aica->add_route(0, "lspeaker", 1.0);
-	m_aica->add_route(1, "rspeaker", 1.0);
+	m_aica->add_route(0, "lspeaker", 0.4);
+	m_aica->add_route(1, "rspeaker", 0.4);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 
@@ -749,7 +749,11 @@ struct factory_sector
         char factory_code[4];
         char total_number[16];
         uint8_t sum;        // byte sum of above
-        uint8_t machine_id[8];  // 64bit UID
+        struct {
+            uint8_t sum_inv;    // ~(UID byte sum)
+            uint8_t sum;        // UID byte sum
+            uint8_t id[6];      // UID
+        } machine_id;
         uint8_t machine_type;   // FF - Dreamcast
         uint8_t machine_version;// FF - VA0, FE - VA1, FD - VA2, NOTE: present in 1st factory record only, in 2nd always FF
         uint8_t unused[0x40]    // FF filled
@@ -819,7 +823,7 @@ ROM_START( dcdev )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "1011", "Katana Set5 v1.011 (World)")    // BOOT flash rom update from Katana SDK R9-R11, WinCE SDK v2.1
 	ROM_LOAD_BIOS(0, "set5v1.011.ic507", 0x000000, 0x200000, CRC(2186e0e5) SHA1(6bd18fb83f8fdb56f1941e079580e5dd672a6dad) )
-	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from WinCE SDK v1.0
+	ROM_SYSTEM_BIOS(1, "1001", "Katana Set5 v1.001 (Japan)")    // BOOT flash rom update from Katana SDK 1.42J and WinCE SDK v1.0
 	ROM_LOAD_BIOS(1, "set5v1.001.ic507", 0x000000, 0x200000, CRC(5702d38f) SHA1(ea7a3ae1de73683008dd795c252941a4fc81b42e) )
 	ROM_SYSTEM_BIOS(2, "0976", "Katana Set5 v0.976 (Japan)")    // BOOT flash rom update from Katana SDK 1.20J
 	ROM_LOAD_BIOS(2, "set5v0.976.ic507", 0x000000, 0x200000, CRC(dcb2e86f) SHA1(c88b4b6704811e3a428ee225727e4f7df467a3b5) )

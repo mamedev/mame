@@ -55,6 +55,8 @@ ToDo:
 #include "atari_s1.lh"
 
 
+namespace {
+
 #define MASTER_CLK XTAL(4'000'000) / 4
 #define DMA_CLK MASTER_CLK / 2
 #define AUDIO_CLK DMA_CLK / 4
@@ -67,16 +69,22 @@ class atari_s1_state : public genpin_class
 public:
 	atari_s1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
+		, m_p_prom(*this, "proms")
 		, m_maincpu(*this, "maincpu")
 		, m_p_ram(*this, "ram")
 		, m_dac(*this, "dac")
 		, m_switch(*this, "SWITCH.%u", 0)
 		, m_digits(*this, "digit%u", 0U)
+		, m_player_lamps(*this, "text%u", 0U)
 	{ }
 
 	void midearth(machine_config &config);
 	void atari_s1(machine_config &config);
 	void atarians(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	uint8_t m1080_r();
@@ -108,14 +116,13 @@ private:
 	uint8_t m_bit6;
 	uint8_t m_out_offs;
 	uint8_t m_t_c;
-	uint8_t *m_p_prom;
-	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	required_region_ptr<uint8_t> m_p_prom;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport_array<10> m_switch;
 	output_finder<78> m_digits;
+	output_finder<8> m_player_lamps;
 };
 
 void atari_s1_state::atari_s1_map(address_map &map)
@@ -379,26 +386,25 @@ uint8_t atari_s1_state::switch_r(offs_t offset)
 TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+
 	m_bit6++;
 	if (m_t_c > 0x40)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	else
 		m_t_c++;
 
-	m_out_offs++;
-	m_out_offs &= 0x1f;
-	if ((m_out_offs & 3) == 3)
+	m_out_offs = (m_out_offs + 1) & 0x1f;
+	uint8_t const p_val = m_p_ram[m_out_offs];
+	if ((m_out_offs & 0x03) == 0x03)
 	{
 		// Player number
-		char wordnum[8];
-		sprintf(wordnum,"text%d",m_out_offs>>2);
-		output().set_value(wordnum, !BIT(patterns[m_p_ram[m_out_offs]&15], 6)); // uses 'g' segment
+		m_player_lamps[m_out_offs >> 2] = !BIT(patterns[p_val & 0x0f], 6); // uses 'g' segment
 	}
 	else
 	{
 		// Digits
-		m_digits[m_out_offs << 1] = patterns[m_p_ram[m_out_offs]>>4];
-		m_digits[(m_out_offs << 1)+1] = patterns[m_p_ram[m_out_offs]&15];
+		m_digits[(m_out_offs << 1) + 0] = patterns[p_val >> 4];
+		m_digits[(m_out_offs << 1) + 1] = patterns[p_val & 0x0f];
 	}
 }
 
@@ -440,13 +446,20 @@ void atari_s1_state::audiores_w(uint8_t data)
 }
 
 
+void atari_s1_state::machine_start()
+{
+	m_digits.resolve();
+	m_player_lamps.resolve();
+}
+
 void atari_s1_state::machine_reset()
 {
-	m_p_prom = memregion("proms")->base();
 	m_vol = 0;
 	m_dac->set_output_gain(0, 0);
 	m_t_c = 0;
 	m_audiores = 0;
+	m_bit6 = 0;
+	m_out_offs = 0;
 }
 
 void atari_s1_state::atari_s1(machine_config &config)
@@ -491,7 +504,7 @@ ROM_START(atarians)
 	ROM_LOAD("atarian.e0", 0x7800, 0x0800, CRC(45cb0427) SHA1(e286930ca36bdd0f79acefd142d2a5431fa8005b))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("07028-01.bin", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -503,7 +516,7 @@ ROM_START(time2000)
 	ROM_LOAD("time.e0", 0x7800, 0x0800, CRC(1e79c133) SHA1(54ce5d59a00334fcec8b12c077d70e3629549af0))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("07028-01.bin", 0x0000, 0x0200, CRC(e8034b5b) SHA1(6959912c530efcc4a0c690800867fb0d1f33627f))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -515,7 +528,7 @@ ROM_START(aavenger)
 	ROM_LOAD("airborne.e0", 0x7800, 0x0800, CRC(44e67c54) SHA1(7f94189c12e322c41908d651cf6a3b6061426959))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("20252-01.bin", 0x0000, 0x0200, CRC(3d44551d) SHA1(926100f8169ab20230ad2168f94e6ad65fb1a7dc))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -548,8 +561,10 @@ ROM_START(spcrider)
 	ROM_LOAD("spacel.bin", 0x7800, 0x0800, CRC(66ffb04e) SHA1(42d8b7fb7206b30478f631d0e947c0908dcf5419))
 
 	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("82s130.bin", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
+	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // PinMAME note: nuatari lists 20967-01 (and claims that all the SR boards (5) he has feature that one), manual schematics and parts list 20252-01 though
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1976, atarians,  0,        atarians, atari_s1, atari_s1_state, empty_init, ROT0, "Atari", "The Atarians",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

@@ -71,7 +71,7 @@ void sgi_re2_device::device_start()
 	m_dram = std::make_unique<u32[]>(1280 * 1024);
 
 	// save state
-	for (unsigned i = 0; i < ARRAY_LENGTH(m_reg); i++)
+	for (unsigned i = 0; i < std::size(m_reg); i++)
 		if (regmask[i])
 			save_item(m_reg[i], regname[i]);
 

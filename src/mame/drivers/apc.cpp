@@ -900,13 +900,6 @@ CH2: ("reserved for future graphics expansion")
 CH3: AUX
 */
 
-static const floppy_format_type apc_floppy_formats[] = {
-	FLOPPY_D88_FORMAT,
-	FLOPPY_IMD_FORMAT,
-	FLOPPY_MFI_FORMAT,
-	nullptr
-};
-
 static void apc_floppies(device_slot_interface &device)
 {
 	device.option_add("8", FLOPPY_8_DSDD);
@@ -953,8 +946,8 @@ void apc_state::apc(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", floppy_image_device::default_fm_floppy_formats, "8");
+	FLOPPY_CONNECTOR(config, m_fdc_connector[1], apc_floppies, "8", floppy_image_device::default_fm_floppy_formats, "8");
 	SOFTWARE_LIST(config, "disk_list").set_original("apc");
 
 	/* video hardware */
@@ -995,7 +988,7 @@ ROM_START( apc )
 	ROM_LOAD16_BYTE( "pfbu2l.bin",   0x00001, 0x001000, CRC(38df2e70) SHA1(a37ccaea00c2b290610d354de08b489fa897ec48) )
 
 //  ROM_REGION( 0x10000, "file", ROMREGION_ERASE00 )
-//  ROM_LOAD( "sioapc.o", 0, 0x10000, CRC(1) SHA1(1) )
+//  ROM_LOAD( "sioapc.bin", 0, 0x10000, NO_DUMP )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )

@@ -124,9 +124,11 @@ static void beta_floppies(device_slot_interface &device)
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(spectrum_betav2_device::floppy_formats)
-	FLOPPY_TRD_FORMAT
-FLOPPY_FORMATS_END
+void spectrum_betav2_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_TRD_FORMAT);
+}
 
 //-------------------------------------------------
 //  ROM( beta )
@@ -410,8 +412,8 @@ spectrum_betacbi_device::spectrum_betacbi_device(const machine_config &mconfig, 
 
 spectrum_gamma_device::spectrum_gamma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: spectrum_betaplus_device(mconfig, type, tag, owner, clock)
-	, m_ppi(*this, "PPI")
-	, m_acia(*this, "ACIA")
+	, m_ppi(*this, "ppi")
+	, m_acia(*this, "acia")
 	, m_centronics(*this, "centronics")
 	, m_centronics_busy(0)
 {

@@ -128,6 +128,7 @@ uint8_t dpc_device::read(offs_t offset)
 				return m_shift_reg;
 			case 0x04:      // Sound value, MOVAMT value AND'd with Draw Line Carry; with Draw Line Add
 				m_latch_62 = m_latch_64;
+				[[fallthrough]];
 			case 0x06:      // Sound value, MOVAMT value AND'd with Draw Line Carry; without Draw Line Add
 				m_latch_64 = m_latch_62 + m_df[4].top;
 				m_dlc = (m_latch_62 + m_df[4].top > 0xff) ? 1 : 0;

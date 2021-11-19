@@ -113,9 +113,9 @@ void astrocde_state::astrocade_palette(palette_device &palette) const
 			int b = (by + y) * 255;
 
 			// clamp and store
-			r = (std::min)((std::max)(r, 0), 255);
-			g = (std::min)((std::max)(g, 0), 255);
-			b = (std::min)((std::max)(b, 0), 255);
+			r = std::clamp(r, 0, 255);
+			g = std::clamp(g, 0, 255);
+			b = std::clamp(b, 0, 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
@@ -215,6 +215,9 @@ VIDEO_START_MEMBER(astrocde_state,profpac)
 	save_item(NAME(m_profpac_vw));
 
 	std::fill(std::begin(m_profpac_palette), std::end(m_profpac_palette), 0);
+
+	m_pattern_height = 0;
+	m_pattern_width = 0;
 }
 
 

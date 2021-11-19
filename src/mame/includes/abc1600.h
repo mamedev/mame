@@ -105,6 +105,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	uint8_t fc_r();
 	uint8_t bus_r(offs_t offset);
 	void bus_w(offs_t offset, uint8_t data);
 	uint8_t dart_r(offs_t offset);

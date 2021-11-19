@@ -329,8 +329,8 @@ void osborne1_state::osborne1_base(machine_config &config)
 
 	MB8877(config, m_fdc, MAIN_CLOCK/16);
 	m_fdc->set_force_ready(true);
-	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy0, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, osborne1_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("68K"); // 64kB main RAM and 4kbit video attribute RAM

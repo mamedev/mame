@@ -41,6 +41,8 @@ ToDo:
 
 #include "s9.lh"
 
+namespace {
+
 class s9_state : public genpin_class
 {
 public:
@@ -65,6 +67,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 
+protected:
+	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 private:
 	uint8_t sound_r();
 	void dig0_w(uint8_t data);
@@ -83,7 +89,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
 	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_MACHINE_RESET(s9);
 
 	void s9_audio_map(address_map &map);
 	void s9_main_map(address_map &map);
@@ -93,9 +98,7 @@ private:
 	uint8_t m_switch_col;
 	bool m_data_ok;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hc55516_device> m_hc55516;
@@ -319,10 +322,6 @@ void s9_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 	}
 }
 
-MACHINE_RESET_MEMBER( s9_state, s9 )
-{
-}
-
 void s9_state::init_s9()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -334,7 +333,6 @@ void s9_state::s9(machine_config &config)
 	/* basic machine hardware */
 	M6808(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &s9_state::s9_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
 	/* Video */
 	config.set_default_layout(layout_s9);
@@ -528,6 +526,8 @@ ROM_START(alcat_l7)
 
 	ROM_REGION(0x8000, "audioroms", ROMREGION_ERASEFF)
 ROM_END
+
+} // Anonymous namespace
 
 
 GAME( 1983, ratrc_l1, 0,        s9, s9, s9_state, init_s9, ROT0, "Williams", "Rat Race (L-1)",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

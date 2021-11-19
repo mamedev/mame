@@ -72,8 +72,8 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380N).machine_config([this](device_t *device) {
-		downcast<ncr5380n_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
+	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
+		downcast<ncr5380_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
 	});
 }
 
@@ -150,9 +150,6 @@ uint8_t a2bus_scsi_device::read_c0nx(uint8_t offset)
 
 		case 9:     // our SCSI ID (normally 0x80 = 7)
 			return (1<<7);
-
-		case 0xa:   // RAM/ROM bank
-			return m_bank;
 
 		case 0xe:   // DRQ status in bit 7
 			return m_drq;

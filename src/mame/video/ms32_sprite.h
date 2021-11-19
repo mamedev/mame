@@ -18,8 +18,10 @@ public:
 	// configuration
 	void set_color_base(u16 base) { m_color_base = base; }
 	void set_color_entries(u16 entries) { m_color_entries = entries; }
+	void set_zoom(bool enable) { m_has_zoom = enable; }
+	void set_yuv(bool enable) { m_has_yuv = enable; }
 
-	void extract_parameters(bool has_zoom, bool is_yuv, const u16 *ram, bool &disable, u8 &pri, bool &flipx, bool &flipy, u32 &code, u32 &color, u8 &tx, u8 &ty, u16 &srcwidth, u16 &srcheight, s32 &sx, s32 &sy, u16 &incx, u16 &incy);
+	void extract_parameters(const u16 *ram, bool &disable, u8 &pri, bool &flipx, bool &flipy, u32 &code, u32 &color, u8 &tx, u8 &ty, u16 &srcwidth, u16 &srcheight, s32 &sx, s32 &sy, u16 &incx, u16 &incy);
 
 	// ----- core graphics drawing -----
 
@@ -83,6 +85,8 @@ private:
 
 	// configurations
 	u16 m_color_base, m_color_entries;
+	bool m_has_zoom;
+	bool m_has_yuv;
 };
 
 DECLARE_DEVICE_TYPE(JALECO_MEGASYSTEM32_SPRITE, ms32_sprite_device)

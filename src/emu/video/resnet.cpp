@@ -58,7 +58,7 @@ double compute_resistor_weights(
 	int count_2, const int * resistances_2, double * weights_2, int pulldown_2, int pullup_2,
 	int count_3, const int * resistances_3, double * weights_3, int pulldown_3, int pullup_3 )
 {
-	int networks_no;
+	assert(minval < maxval);
 
 	int rescount[MAX_NETS];     /* number of resistors in each of the nets */
 	double r[MAX_NETS][MAX_RES_PER_NET];        /* resistances */
@@ -70,14 +70,10 @@ double compute_resistor_weights(
 	double max_out[MAX_NETS];
 	double * out[MAX_NETS];
 
-	int i,j,n;
-	double scale;
-	double max;
-
 	/* parse input parameters */
 
-	networks_no = 0;
-	for (n = 0; n < MAX_NETS; n++)
+	int networks_no = 0;
+	for (int n = 0; n < MAX_NETS; n++)
 	{
 		int count, pd, pu;
 		const int * resistances;
@@ -116,7 +112,7 @@ double compute_resistor_weights(
 		if (count > 0)
 		{
 			rescount[networks_no] = count;
-			for (i=0; i < count; i++)
+			for (int i=0; i < count; i++)
 			{
 				r[networks_no][i] = 1.0 * resistances[i];
 			}
@@ -130,17 +126,17 @@ double compute_resistor_weights(
 		fatalerror("compute_resistor_weights(): no input data\n");
 
 	/* calculate outputs for all given networks */
-	for( i = 0; i < networks_no; i++ )
+	for (int i = 0; i < networks_no; i++)
 	{
 		double R0, R1, Vout, dst;
 
 		/* of n resistors */
-		for(n = 0; n < rescount[i]; n++)
+		for (int n = 0; n < rescount[i]; n++)
 		{
 			R0 = ( r_pd[i] == 0 ) ? 1.0/1e12 : 1.0/r_pd[i];
 			R1 = ( r_pu[i] == 0 ) ? 1.0/1e12 : 1.0/r_pu[i];
 
-			for( j = 0; j < rescount[i]; j++ )
+			for (int j = 0; j < rescount[i]; j++)
 			{
 				if( j==n )  /* only one resistance in the network connected to Vcc */
 				{
@@ -158,21 +154,21 @@ double compute_resistor_weights(
 			Vout = (maxval - minval) * R0 / (R1 + R0) + minval;
 
 			/* and convert it to a destination value */
-			dst = (Vout < minval) ? minval : (Vout > maxval) ? maxval : Vout;
+			dst = std::clamp(Vout, double(minval), double(maxval));
 
 			w[i][n] = dst;
 		}
 	}
 
 	/* calculate maximum outputs for all given networks */
-	j = 0;
-	max = 0.0;
-	for( i = 0; i < networks_no; i++ )
+	int j = 0;
+	double max = 0.0;
+	for (int i = 0; i < networks_no; i++)
 	{
 		double sum = 0.0;
 
 		/* of n resistors */
-		for( n = 0; n < rescount[i]; n++ )
+		for (int n = 0; n < rescount[i]; n++)
 			sum += w[i][n]; /* maximum output, ie when each resistance is connected to Vcc */
 
 		max_out[i] = sum;
@@ -183,17 +179,17 @@ double compute_resistor_weights(
 		}
 	}
 
-
+	double scale;
 	if (scaler < 0.0)   /* use autoscale ? */
 		/* calculate the output scaler according to the network with the greatest output */
-		scale = ((double)maxval) / max_out[j];
+		scale = double(maxval) / max_out[j];
 	else                /* use scaler provided on entry */
 		scale = scaler;
 
 	/* calculate scaled output and fill the output table(s)*/
-	for(i = 0; i < networks_no;i++)
+	for (int i = 0; i < networks_no; i++)
 	{
-		for (n = 0; n < rescount[i]; n++)
+		for (int n = 0; n < rescount[i]; n++)
 		{
 			ws[i][n] = w[i][n]*scale;   /* scale the result */
 			(out[i])[n] = ws[i][n];     /* fill the output table */
@@ -206,7 +202,7 @@ if (VERBOSE)
 	osd_printf_info("compute_resistor_weights():  scaler = %15.10f\n",scale);
 	osd_printf_info("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
-	for(i = 0; i < networks_no;i++)
+	for (int i = 0; i < networks_no; i++)
 	{
 		double sum = 0.0;
 
@@ -216,7 +212,7 @@ if (VERBOSE)
 		if (r_pd[i] != 0)
 			osd_printf_info(", pulldown resistor: %i Ohms",r_pd[i]);
 		osd_printf_info("\n  maximum output of this network:%10.5f (scaled to %15.10f)\n", max_out[i], max_out[i]*scale );
-		for (n = 0; n < rescount[i]; n++)
+		for (int n = 0; n < rescount[i]; n++)
 		{
 			osd_printf_info("   res %2i:%9.1f Ohms  weight=%10.5f (scaled = %15.10f)\n", n, r[i][n], w[i][n], ws[i][n] );
 			sum += ws[i][n];
@@ -237,7 +233,7 @@ double compute_resistor_net_outputs(
 	int count_2, const int * resistances_2, double * outputs_2, int pulldown_2, int pullup_2,
 	int count_3, const int * resistances_3, double * outputs_3, int pulldown_3, int pullup_3 )
 {
-	int networks_no;
+	assert(minval < maxval);
 
 	int rescount[MAX_NETS];     /* number of resistors in each of the nets */
 	double r[MAX_NETS][MAX_RES_PER_NET];        /* resistances */
@@ -248,18 +244,13 @@ double compute_resistor_net_outputs(
 	double min_out[MAX_NETS];
 	double * out[MAX_NETS];
 
-	int i,j,n;
-	double scale;
-	double min;
-	double max;
-
 	/* parse input parameters */
 
 	std::vector<double> o((1<<MAX_RES_PER_NET) *  MAX_NETS);
 	std::vector<double> os((1<<MAX_RES_PER_NET) *  MAX_NETS);
 
-	networks_no = 0;
-	for (n = 0; n < MAX_NETS; n++)
+	int networks_no = 0;
+	for (int n = 0; n < MAX_NETS; n++)
 	{
 		int count, pd, pu;
 		const int * resistances;
@@ -297,7 +288,7 @@ double compute_resistor_net_outputs(
 		if (count > 0)
 		{
 			rescount[networks_no] = count;
-			for (i=0; i < count; i++)
+			for (int i = 0; i < count; i++)
 			{
 				r[networks_no][i] = 1.0 * resistances[i];
 			}
@@ -312,17 +303,17 @@ double compute_resistor_net_outputs(
 		fatalerror("compute_resistor_net_outputs(): no input data\n");
 
 	/* calculate outputs for all given networks */
-	for( i = 0; i < networks_no; i++ )
+	for (int i = 0; i < networks_no; i++)
 	{
 		double R0, R1, Vout, dst;
 
 		/* of n resistors, generating 1<<n possible outputs */
-		for(n = 0; n < (1<<rescount[i]); n++)
+		for (int n = 0; n < (1<<rescount[i]); n++)
 		{
 			R0 = ( r_pd[i] == 0 ) ? 1.0/1e12 : 1.0/r_pd[i];
 			R1 = ( r_pu[i] == 0 ) ? 1.0/1e12 : 1.0/r_pu[i];
 
-			for( j = 0; j < rescount[i]; j++ )
+			for (int j = 0; j < rescount[i]; j++)
 			{
 				if( (n & (1<<j)) == 0 )/* only when this resistance in the network connected to GND */
 					if (r[i][j] != 0.0)
@@ -335,22 +326,22 @@ double compute_resistor_net_outputs(
 			Vout = (maxval - minval) * R0 / (R1 + R0) + minval;
 
 			/* and convert it to a destination value */
-			dst = (Vout < minval) ? minval : (Vout > maxval) ? maxval : Vout;
+			dst = std::clamp(Vout, double(minval), double(maxval));
 
 			o[i*(1<<MAX_RES_PER_NET)+n] = dst;
 		}
 	}
 
 	/* calculate minimum outputs for all given networks */
-	min = maxval;
-	max = minval;
-	for( i = 0; i < networks_no; i++ )
+	double min = maxval;
+	double max = minval;
+	for (int i = 0; i < networks_no; i++)
 	{
 		double val;
 		double max_tmp = minval;
 		double min_tmp = maxval;
 
-		for (n = 0; n < (1<<rescount[i]); n++)
+		for (int n = 0; n < (1<<rescount[i]); n++)
 		{
 			if (min_tmp > o[i*(1<<MAX_RES_PER_NET)+n])
 				min_tmp = o[i*(1<<MAX_RES_PER_NET)+n];
@@ -373,17 +364,17 @@ double compute_resistor_net_outputs(
 		}
 	}
 
-
+	double scale;
 	if (scaler < 0.0)   /* use autoscale ? */
 		/* calculate the output scaler according to the network with the smallest output */
-		scale = ((double)maxval) / (max-min);
+		scale = double(maxval) / (max-min);
 	else                /* use scaler provided on entry */
 		scale = scaler;
 
 	/* calculate scaled output and fill the output table(s) */
-	for(i = 0; i < networks_no; i++)
+	for (int i = 0; i < networks_no; i++)
 	{
-		for (n = 0; n < (1<<rescount[i]); n++)
+		for (int n = 0; n < (1<<rescount[i]); n++)
 		{
 			os[i*(1<<MAX_RES_PER_NET)+n] = (o[i*(1<<MAX_RES_PER_NET)+n] - min) * scale; /* scale the result */
 			(out[i])[n] = os[i*(1<<MAX_RES_PER_NET)+n];     /* fill the output table */
@@ -396,7 +387,7 @@ if (VERBOSE)
 	osd_printf_info("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
 	osd_printf_info("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
 
-	for(i = 0; i < networks_no;i++)
+	for (int i = 0; i < networks_no; i++)
 	{
 		osd_printf_info(" Network no.%i=>  resistances: %i", i, rescount[i] );
 		if (r_pu[i] != 0)
@@ -405,11 +396,11 @@ if (VERBOSE)
 			osd_printf_info(", pulldown resistor: %i Ohms",r_pd[i]);
 		osd_printf_info("\n  maximum output of this network:%10.5f", max_out[i] );
 		osd_printf_info("\n  minimum output of this network:%10.5f\n", min_out[i] );
-		for (n = 0; n < rescount[i]; n++)
+		for (int n = 0; n < rescount[i]; n++)
 		{
 			osd_printf_info("   res %2i:%9.1f Ohms\n", n, r[i][n]);
 		}
-		for (n = 0; n < (1<<rescount[i]); n++)
+		for (int n = 0; n < (1<<rescount[i]); n++)
 		{
 			osd_printf_info("   combination %2i  out=%10.5f (scaled = %15.10f)\n", n, o[i*(1<<MAX_RES_PER_NET)+n], os[i*(1<<MAX_RES_PER_NET)+n] );
 		}
@@ -449,7 +440,6 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 {
 	double rTotal=0.0;
 	double v = 0;
-	int    i;
 
 	double vBias = di.rgb[channel].vBias;
 	double vOH = di.vOH;
@@ -606,7 +596,7 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 
 	/* compute here - pass a / low inputs */
 
-	for (i=0; i<di.rgb[channel].num; i++)
+	for (int i = 0; i < di.rgb[channel].num; i++)
 	{
 		int level = ((inputs >> i) & 1);
 		if (di.rgb[channel].R[i] != 0.0 && !level)
@@ -650,7 +640,7 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 
 	/* Second pass - high inputs */
 
-	for (i=0; i<di.rgb[channel].num; i++)
+	for (int i = 0; i < di.rgb[channel].num; i++)
 	{
 		int level = ((inputs >> i) & 1);
 		if (di.rgb[channel].R[i] != 0.0 && level)
@@ -689,31 +679,27 @@ int compute_res_net(int inputs, int channel, const res_net_info &di)
 			break;
 	}
 
-	return (int) (v * 255 / vcc + 0.4);
+	return int(v * 255 / vcc + 0.4);
 }
 
 void compute_res_net_all(std::vector<rgb_t> &rgb, const u8 *prom, const res_net_decode_info &rdi, const res_net_info &di)
 {
-	u8 r,g,b;
-	int i,j,k;
-
 	rgb.resize(rdi.end - rdi.start + 1);
-	for (i=rdi.start; i<=rdi.end; i++)
+	for (int i = rdi.start; i <= rdi.end; i++)
 	{
 		u8 t[3] = {0,0,0};
-		int s;
-		for (j=0;j<rdi.numcomp;j++)
-			for (k=0; k<3; k++)
+		for (int j = 0; j < rdi.numcomp; j++)
+			for (int k = 0; k < 3; k++)
 			{
-				s = rdi.shift[3*j+k];
+				int s = rdi.shift[3*j+k];
 				if (s>0)
 					t[k] = t[k] | ( (prom[i+rdi.offset[3*j+k]]>>s) & rdi.mask[3*j+k]);
 				else
 					t[k] = t[k] | ( (prom[i+rdi.offset[3*j+k]]<<(0-s)) & rdi.mask[3*j+k]);
 			}
-		r = compute_res_net(t[0], RES_NET_CHAN_RED, di);
-		g = compute_res_net(t[1], RES_NET_CHAN_GREEN, di);
-		b = compute_res_net(t[2], RES_NET_CHAN_BLUE, di);
+		u8 r = compute_res_net(t[0], RES_NET_CHAN_RED, di);
+		u8 g = compute_res_net(t[1], RES_NET_CHAN_GREEN, di);
+		u8 b = compute_res_net(t[2], RES_NET_CHAN_BLUE, di);
 		rgb[i-rdi.start] = rgb_t(r,g,b);
 	}
 }

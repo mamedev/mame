@@ -22,6 +22,7 @@ MAME Documentation
 
     usingmame/index
     commandline/index
+    plugins/index
     advanced/index
 
     debugger/index

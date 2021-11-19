@@ -79,7 +79,7 @@ void liberate_state::deco16_bank_w(uint8_t data)
 	if (m_bank)
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8sm_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, membank("bank1"));
+		m_maincpu->space(AS_PROGRAM).install_rom(0x8000, 0x800f, memregion("maincpu")->base());
 }
 
 uint8_t liberate_state::prosoccr_bank_r(offs_t offset)
@@ -253,7 +253,7 @@ void liberate_state::prosport_map(address_map &map)
 	map(0x3800, 0x3fff).ram().share("spriteram");
 	map(0x4000, 0xffff).rom();
 	map(0x8000, 0x800f).w(FUNC(liberate_state::prosport_io_w));
-	map(0x8000, 0x800f).bankr("bank1");
+	map(0x8000, 0x800f).rom().share("bank1");
 }
 
 void liberate_state::liberate_map(address_map &map)
@@ -267,7 +267,7 @@ void liberate_state::liberate_map(address_map &map)
 	map(0x6200, 0x67ff).writeonly().share("scratchram");
 	map(0x8000, 0xffff).rom();
 	map(0x8000, 0x800f).w(FUNC(liberate_state::deco16_io_w));
-	map(0x8000, 0x800f).bankr("bank1");
+	map(0x8000, 0x800f).rom().share("bank1");
 }
 
 void liberate_state::decrypted_opcodes_map(address_map &map)
@@ -733,7 +733,7 @@ MACHINE_START_MEMBER(liberate_state,liberate)
 
 MACHINE_RESET_MEMBER(liberate_state,liberate)
 {
-	memset(m_io_ram, 0, ARRAY_LENGTH(m_io_ram));
+	std::fill(std::begin(m_io_ram), std::end(m_io_ram), 0);
 
 	m_background_disable = 0;
 	m_background_color = 0;
@@ -876,6 +876,17 @@ void liberate_state::prosport(machine_config &config)
  *
  *************************************/
 
+// top PCB is marked: "DATA EAST DECO SSI-16" and "DE-0148-1 MADE IN JAPAN" on component side
+// mid PCB is marked: "DECO DE-0157-1 CHB-01 MADE IN JAPAN" on component side
+// bottom PCB is marked: "DATA EAST DECO DSP-17A DE-0188-1 MADE IN JAPAN" on component side
+// label format is:
+// ---
+// --------------
+// | PRO SOCCER | -> game name
+// | AM 10-3    | -> rom number
+// | C 1983     | -> copyright
+// | DATA EAST  | -> copyright
+// --------------
 ROM_START( prosoccr )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD( "am08.9e",  0xa000, 0x2000, CRC(73d45d0d) SHA1(07736286087478af404bd9c6b279d631a01cf4e2) )

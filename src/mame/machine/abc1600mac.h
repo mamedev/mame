@@ -35,7 +35,8 @@ class abc1600_mac_device : public device_t,
 public:
 	abc1600_mac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	auto fc_cb() { return m_read_fc.bind(); }
+	auto buserr_cb() { return m_write_buserr.bind(); }
 
 	virtual void map(address_map &map);
 
@@ -102,7 +103,7 @@ private:
 	uint8_t dma_iorq_r(int index, uint16_t offset);
 	void dma_iorq_w(int index, uint16_t offset, uint8_t data);
 
-	const address_space_config m_space_config;
+	const address_space_config m_program_config;
 
 	required_memory_region m_rom;
 	memory_share_creator<uint8_t> m_segment_ram;
@@ -110,7 +111,8 @@ private:
 
 	required_device<watchdog_timer_device> m_watchdog;
 
-	required_device<m68000_base_device> m_cpu;
+	devcb_read8        m_read_fc;
+	devcb_write_line   m_write_buserr;
 
 	int m_ifc2;
 	uint8_t m_task;

@@ -52,7 +52,7 @@ void cpc_rs232_device::device_add_mconfig(machine_config &config)
 	m_rs232->rxd_handler().set(m_dart, FUNC(z80dart_device::rxa_w));
 	m_rs232->dcd_handler().set(m_dart, FUNC(z80dart_device::dcda_w));
 	m_rs232->cts_handler().set(m_dart, FUNC(z80dart_device::ctsa_w));
-//  m_rs232->ri_handler().set(m_dart, FUNC(z80dart_device::ria_w));
+	m_rs232->ri_handler().set(m_dart, FUNC(z80dart_device::ria_w));
 
 	// pass-through
 	cpc_expansion_slot_device &exp(CPC_EXPANSION_SLOT(config, "exp", DERIVED_CLOCK(1, 1), cpc_exp_cards, nullptr));

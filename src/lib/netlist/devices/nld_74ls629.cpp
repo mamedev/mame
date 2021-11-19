@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Couriersud
 /*
  * nld_SN74LS629.cpp
@@ -60,10 +60,7 @@
 
 #include "analog/nlid_twoterm.h"
 
-namespace netlist
-{
-	namespace devices
-	{
+namespace netlist::devices {
 
 	struct SN74LS629clk
 	{
@@ -207,5 +204,4 @@ namespace netlist
 
 	NETLIB_DEVICE_IMPL(SN74LS629,     "SN74LS629",     "CAP,@VCC,@GND")
 
-	} //namespace devices
-} // namespace netlist
+} // namespace netlist::devices

@@ -17,7 +17,6 @@
 #include "machine/wd_fdc.h"
 #include "video/msm6255.h"
 #include "emupal.h"
-#include "rendlay.h"
 
 #define Z80_TAG         "ic1"
 #define I8255A_TAG      "ic4"
@@ -38,7 +37,7 @@ public:
 		m_lcdc(*this, MSM6255_TAG),
 		m_pit(*this, "ic6"),
 		m_centronics(*this, CENTRONICS_TAG),
-		m_exp(*this, BW2_EXPANSION_SLOT_TAG),
+		m_exp(*this, "exp"),
 		m_ram(*this, RAM_TAG),
 		m_floppy0(*this, WD2797_TAG":0"),
 		m_floppy1(*this, WD2797_TAG":1"),
@@ -75,7 +74,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( mtron_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	// keyboard state
 	uint8_t m_kb;

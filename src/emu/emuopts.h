@@ -25,7 +25,7 @@
 #define OPTION_WRITECONFIG          "writeconfig"
 
 // core search path options
-#define OPTION_HOMEPATH             "homepath"
+#define OPTION_PLUGINDATAPATH       "homepath"
 #define OPTION_MEDIAPATH            "rompath"
 #define OPTION_HASHPATH             "hashpath"
 #define OPTION_SAMPLEPATH           "samplepath"
@@ -47,6 +47,7 @@
 #define OPTION_SNAPSHOT_DIRECTORY   "snapshot_directory"
 #define OPTION_DIFF_DIRECTORY       "diff_directory"
 #define OPTION_COMMENT_DIRECTORY    "comment_directory"
+#define OPTION_SHARE_DIRECTORY      "share_directory"
 
 // core state/playback options
 #define OPTION_STATE                "state"
@@ -55,7 +56,6 @@
 #define OPTION_REWIND_CAPACITY      "rewind_capacity"
 #define OPTION_PLAYBACK             "playback"
 #define OPTION_RECORD               "record"
-#define OPTION_RECORD_TIMECODE      "record_timecode"
 #define OPTION_EXIT_AFTER_PLAYBACK  "exit_after_playback"
 #define OPTION_MNGWRITE             "mngwrite"
 #define OPTION_AVIWRITE             "aviwrite"
@@ -119,6 +119,7 @@
 #define OPTION_SAMPLERATE           "samplerate"
 #define OPTION_SAMPLES              "samples"
 #define OPTION_VOLUME               "volume"
+#define OPTION_COMPRESSOR           "compressor"
 #define OPTION_SPEAKER_REPORT       "speaker_report"
 
 // core input options
@@ -220,8 +221,9 @@ public:
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// seters
-	void specify(const std::string &text, bool peg_priority = true);
+	void specify(std::string_view text, bool peg_priority = true);
 	void specify(std::string &&text, bool peg_priority = true);
+	void specify(const char *text, bool peg_priority = true) { specify(std::string_view(text), peg_priority); }
 	void set_bios(std::string &&text);
 	void set_default_card_software(std::string &&s);
 
@@ -254,8 +256,9 @@ public:
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
 
 	// mutators
-	void specify(const std::string &value, bool peg_priority = true);
+	void specify(std::string_view value, bool peg_priority = true);
 	void specify(std::string &&value, bool peg_priority = true);
+	void specify(const char *value, bool peg_priority = true) { specify(std::string_view(value), peg_priority); }
 
 	// instantiates an option entry (don't call outside of emuopts.cpp)
 	core_options::entry::shared_ptr setup_option_entry(std::vector<std::string> &&names);
@@ -291,7 +294,8 @@ public:
 	~emu_options();
 
 	// mutation
-	void set_system_name(const std::string &new_system_name);
+	void set_system_name(const char *new_system_name) { set_system_name(std::string(new_system_name)); }
+	void set_system_name(std::string_view new_system_name) { set_system_name(std::string(new_system_name)); }
 	void set_system_name(std::string &&new_system_name);
 	void set_software(std::string &&new_software);
 
@@ -306,7 +310,7 @@ public:
 	bool write_config() const { return bool_value(OPTION_WRITECONFIG); }
 
 	// core search path options
-	const char *home_path() const { return value(OPTION_HOMEPATH); }
+	const char *plugin_data_path() const { return value(OPTION_PLUGINDATAPATH); }
 	const char *media_path() const { return value(OPTION_MEDIAPATH); }
 	const char *hash_path() const { return value(OPTION_HASHPATH); }
 	const char *sample_path() const { return value(OPTION_SAMPLEPATH); }
@@ -328,6 +332,7 @@ public:
 	const char *snapshot_directory() const { return value(OPTION_SNAPSHOT_DIRECTORY); }
 	const char *diff_directory() const { return value(OPTION_DIFF_DIRECTORY); }
 	const char *comment_directory() const { return value(OPTION_COMMENT_DIRECTORY); }
+	const char *share_directory() const { return value(OPTION_SHARE_DIRECTORY); }
 
 	// core state/playback options
 	const char *state() const { return value(OPTION_STATE); }
@@ -336,7 +341,6 @@ public:
 	int rewind_capacity() const { return int_value(OPTION_REWIND_CAPACITY); }
 	const char *playback() const { return value(OPTION_PLAYBACK); }
 	const char *record() const { return value(OPTION_RECORD); }
-	bool record_timecode() const { return bool_value(OPTION_RECORD_TIMECODE); }
 	bool exit_after_playback() const { return bool_value(OPTION_EXIT_AFTER_PLAYBACK); }
 	const char *mng_write() const { return value(OPTION_MNGWRITE); }
 	const char *avi_write() const { return value(OPTION_AVIWRITE); }
@@ -400,6 +404,7 @@ public:
 	int sample_rate() const { return int_value(OPTION_SAMPLERATE); }
 	bool samples() const { return bool_value(OPTION_SAMPLES); }
 	int volume() const { return int_value(OPTION_VOLUME); }
+	bool compressor() const { return bool_value(OPTION_COMPRESSOR); }
 	int speaker_report() const { return int_value(OPTION_SPEAKER_REPORT); }
 
 	// core input options

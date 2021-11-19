@@ -54,7 +54,7 @@ protected:
 	required_device<z80_device> m_cpu;
 
 private:
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	static void floppy_formats(format_registration &fr);
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 

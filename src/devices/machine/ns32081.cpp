@@ -108,7 +108,7 @@ void ns32081_device::device_start()
 void ns32081_device::device_reset()
 {
 	m_fsr = 0;
-	std::fill_n(&m_f[0], ARRAY_LENGTH(m_f), 0);
+	std::fill(std::begin(m_f), std::end(m_f), 0);
 
 	m_state = IDLE;
 }

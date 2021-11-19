@@ -1887,6 +1887,10 @@ void st_state::machine_start()
 	m_mfp->i4_w(1);
 	m_mfp->i5_w(1);
 	m_mfp->i7_w(1);
+
+	m_shifter_base = 0;
+	m_shifter_ofs = 0;
+	m_shifter_mode = 0;
 }
 
 
@@ -1989,9 +1993,13 @@ void stbook_state::machine_start()
 	m_mfp->i5_w(1);
 }
 
-FLOPPY_FORMATS_MEMBER( st_state::floppy_formats )
-	FLOPPY_ST_FORMAT, FLOPPY_MSA_FORMAT, FLOPPY_PASTI_FORMAT
-FLOPPY_FORMATS_END
+void st_state::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ST_FORMAT);
+	fr.add(FLOPPY_MSA_FORMAT);
+	fr.add(FLOPPY_PASTI_FORMAT);
+}
 
 static void atari_floppies(device_slot_interface &device)
 {

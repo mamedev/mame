@@ -7,7 +7,6 @@
 #include "sound/cdp1869.h"
 #include "sound/wave.h"
 #include "video/mc6845.h"
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 

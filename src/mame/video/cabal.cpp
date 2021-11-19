@@ -2,7 +2,7 @@
 // copyright-holders:Carlos A. Lozano
 /***************************************************************************
 
-  cabal.c
+  cabal.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/cabal.h"
 
-TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
+TILE_GET_INFO_MEMBER(cabal_base_state::get_back_tile_info)
 {
 	int tile = m_videoram[tile_index];
 	int color = (tile>>12)&0xf;
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
+TILE_GET_INFO_MEMBER(cabal_base_state::get_text_tile_info)
 {
 	int tile = m_colorram[tile_index];
 	int color = (tile>>10);
@@ -38,10 +38,10 @@ TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
 }
 
 
-void cabal_state::video_start()
+void cabal_base_state::video_start()
 {
-	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabal_state::get_back_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
-	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabal_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,   8, 8, 32, 32);
+	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabal_base_state::get_back_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 16, 16);
+	m_text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabal_base_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,   8, 8, 32, 32);
 
 	m_text_layer->set_transparent_pen(3);
 	m_background_layer->set_transparent_pen(15);
@@ -50,25 +50,22 @@ void cabal_state::video_start()
 
 /**************************************************************************/
 
-void cabal_state::flipscreen_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cabal_base_state::flipscreen_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		int flip = (data & 0x20) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-		m_background_layer->set_flip(flip);
-		m_text_layer->set_flip(flip);
+	int flip = (data & 0x20) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	m_background_layer->set_flip(flip);
+	m_text_layer->set_flip(flip);
 
-		flip_screen_set(data & 0x20);
-	}
+	flip_screen_set(data & 0x20);
 }
 
-void cabal_state::background_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cabal_base_state::background_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 	m_background_layer->mark_tile_dirty(offset);
 }
 
-void cabal_state::text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void cabal_base_state::text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_colorram[offset]);
 	m_text_layer->mark_tile_dirty(offset);
@@ -96,14 +93,13 @@ void cabal_state::text_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mas
 
 ********************************************************************/
 
-void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cabal_base_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int offs,data0,data1,data2;
-	for( offs = m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4 )
+	for( int offs = m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4 )
 	{
-		data0 = m_spriteram[offs];
-		data1 = m_spriteram[offs+1];
-		data2 = m_spriteram[offs+2];
+		int data0 = m_spriteram[offs];
+		int data1 = m_spriteram[offs+1];
+		int data2 = m_spriteram[offs+2];
 
 		if( data0 & 0x100 )
 		{
@@ -134,7 +130,7 @@ void cabal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 }
 
 
-uint32_t cabal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cabal_base_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_background_layer->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(bitmap,cliprect);

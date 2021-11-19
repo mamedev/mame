@@ -297,7 +297,6 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 			*dest++ = src[0] | (src[1] << 16);
 			src += 2;
 		}
-		memcpy(&m_vram_fg_data[(address & 0x7fc000) >> 4], shiftreg, 0x400);
 	}
 	else if (address >= 0xac000000 && address <= 0xafffffff)
 	{

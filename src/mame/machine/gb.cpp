@@ -244,6 +244,7 @@ void gb_state::gb_io_w(offs_t offset, uint8_t data)
 		case 0x00:
 		case 0x01:
 			m_sio_count = 0;
+			break;
 		case 0x80:              /* enabled & external clock */
 			m_sio_count = 16;
 			break;

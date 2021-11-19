@@ -85,6 +85,11 @@ void k054321_device::device_start()
 	save_item(NAME(m_active));
 }
 
+void k054321_device::device_reset()
+{
+	m_volume = 0;
+}
+
 void k054321_device::device_add_mconfig(machine_config &config)
 {
 	for (int i = 0; i < 3; i++)

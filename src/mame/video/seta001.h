@@ -9,13 +9,18 @@ typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 
 #define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
 
-class seta001_device : public device_t
+class seta001_device : public device_t, public device_gfx_interface
 {
 public:
 	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T> seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)
+		: seta001_device(mconfig, tag, owner, clock)
+	{
+		set_info(gfxinfo);
+		set_palette(std::forward<T>(palette_tag));
+	}
 
 	// configuration
-	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	template <typename... T> void set_gfxbank_callback(T &&... args) { m_gfxbank_cb.set(std::forward<T>(args)...); }
 
 	void spritebgflag_w8(uint8_t data);
@@ -61,7 +66,6 @@ protected:
 private:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 	void draw_foreground(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
-	required_device<gfxdecode_device> m_gfxdecode;
 
 	gfxbank_cb_delegate m_gfxbank_cb;
 

@@ -29,11 +29,13 @@ DEFINE_DEVICE_TYPE(ELECTRON_CUMANA, electron_cumana_device, "electron_cumana", "
 //  FLOPPY_FORMATS( cumana )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(electron_cumana_device::floppy_formats)
-	FLOPPY_ACORN_SSD_FORMAT,
-	FLOPPY_ACORN_DSD_FORMAT,
-	FLOPPY_ACORN_ADFS_OLD_FORMAT
-FLOPPY_FORMATS_END
+void electron_cumana_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_ACORN_SSD_FORMAT);
+	fr.add(FLOPPY_ACORN_DSD_FORMAT);
+	fr.add(FLOPPY_ACORN_ADFS_OLD_FORMAT);
+}
 
 void cumana_floppies(device_slot_interface &device)
 {

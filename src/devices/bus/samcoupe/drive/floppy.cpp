@@ -17,9 +17,11 @@
 
 DEFINE_DEVICE_TYPE(SAM_FLOPPY, sam_floppy_device, "sam_floppy", "SAM Coupe Internal Floppy")
 
-FLOPPY_FORMATS_MEMBER( sam_floppy_device::floppy_formats )
-	FLOPPY_MGT_FORMAT
-FLOPPY_FORMATS_END
+void sam_floppy_device::floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_MGT_FORMAT);
+}
 
 static void samcoupe_floppies(device_slot_interface &device)
 {

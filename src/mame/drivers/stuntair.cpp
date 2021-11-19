@@ -166,7 +166,7 @@ private:
 void stuntair_state::stuntair_palette(palette_device &palette) const
 {
 	// need resistor weights etc
-	uint8_t const *const color_prom = machine().root_device().memregion("proms")->base();
+	uint8_t const *const color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{

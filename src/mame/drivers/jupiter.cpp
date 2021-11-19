@@ -37,6 +37,9 @@ ToDo: (both)
 #include "emupal.h"
 #include "screen.h"
 
+
+namespace {
+
 #define MCM6571AP_TAG   "vid125_6c"
 #define S6820_TAG       "vid125_4a"
 #define Z80_TAG         "cpu126_4c"
@@ -59,10 +62,12 @@ public:
 
 	void init_jupiter2();
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void jupiter2_mem(address_map &map);
 
-	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia0;
 	required_device<acia6850_device> m_acia1;
@@ -83,6 +88,9 @@ public:
 
 	void init_jupiter3();
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void kbd_put(u8 data);
@@ -93,7 +101,6 @@ private:
 	void jupiter3_io(address_map &map);
 	void jupiter3_mem(address_map &map);
 
-	virtual void machine_reset() override;
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -270,6 +277,8 @@ void jupiter3_state::machine_reset()
 	uint8_t* ROM = memregion(Z80_TAG)->base();
 	memcpy(m_p_ram, ROM, 0x1000);
 	m_maincpu->set_pc(0xe000);
+
+	m_term_data = 0;
 }
 
 
@@ -290,8 +299,8 @@ void jupiter2_state::jupiter2(machine_config &config)
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	ACIA6850(config, m_acia0, XTAL(2'000'000)); // unknown frequency
 	m_acia0->txd_handler().set("serial0", FUNC(rs232_port_device::write_txd));
@@ -338,8 +347,8 @@ void jupiter3_state::jupiter3(machine_config &config)
 
 	// devices
 	FD1771(config, INS1771N1_TAG, 1000000);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(jupiter3_state::kbd_put));
@@ -432,6 +441,9 @@ void jupiter3_state::init_jupiter3()
 		rom[0xfff - addr] = inverted[addr + 0xc00];
 	}
 }
+
+} // Anonymous namespace
+
 
 //**************************************************************************
 //  SYSTEM DRIVERS

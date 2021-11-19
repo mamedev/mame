@@ -243,10 +243,8 @@ void gt64xxx_device::device_start()
 	save_item(NAME(m_cpu_stalled_mem_mask));
 	save_item(NAME(m_prev_addr));
 	save_item(NAME(m_reg));
-	for (int i = 0; i < ARRAY_LENGTH(m_timer); i++) {
-		save_item(NAME(m_timer[i].active), i);
-		save_item(NAME(m_timer[i].count), i);
-	}
+	save_item(STRUCT_MEMBER(m_timer, active));
+	save_item(STRUCT_MEMBER(m_timer, count));
 	save_item(NAME(m_dma_active));
 	// m_ram[4]
 	save_pointer(NAME(m_ram[0].data()), m_simm_size[0] / 4);
@@ -875,7 +873,13 @@ TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
 
 	/* if we're a timer, adjust the timer to fire again */
 	if (m_reg[GREG_TIMER_CONTROL] & (2 << (2 * which)))
-		timer->timer->adjust(TIMER_PERIOD * timer->count, which);
+	{
+		// unsure what a 0-length timer should do, but it produces an infinite loop so guard against it
+		u32 effcount = timer->count;
+		if (effcount == 0)
+			effcount = (which != 0) ? 0xffffff : 0xffffffff;
+		timer->timer->adjust(TIMER_PERIOD * effcount, which);
+	}
 	else
 		timer->active = timer->count = 0;
 

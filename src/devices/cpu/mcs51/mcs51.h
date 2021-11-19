@@ -315,7 +315,6 @@ protected:
 	void xrl_a_r(uint8_t r);
 	void illegal(uint8_t r);
 	uint8_t ds5002fp_protected(size_t offset, uint8_t data, uint8_t ta_mask, uint8_t mask);
-
 };
 
 
@@ -348,6 +347,7 @@ DECLARE_DEVICE_TYPE(SAB80C535, sab80c535_device)
 DECLARE_DEVICE_TYPE(AT89C4051, at89c4051_device)
 
 DECLARE_DEVICE_TYPE(I8344, i8344_device)
+DECLARE_DEVICE_TYPE(I8744, i8744_device)
 
 DECLARE_DEVICE_TYPE(DS5002FP, ds5002fp_device)
 
@@ -540,6 +540,16 @@ class i8344_device : public mcs51_cpu_device
 public:
 	// construction/destruction
 	i8344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+class i8744_device : public mcs51_cpu_device
+{
+public:
+	// construction/destruction
+	i8744_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

@@ -22,7 +22,7 @@ in the other.
 Rally X uses a single Z80 and Namco sound hardware, while the others use the
 standard Konami sound hardware of that era (slave Z80 + 2xAY-3-8910).
 Also, the Konami design includes an optional starfield generator, only used
-by Tactician.
+by Tactician. This is identical to the starfield circuit from Scramble.
 
 Rally X has two Namco customs. They are nothing more than simple logic and can
 be replaced by daughter boards with TTL parts.
@@ -203,7 +203,7 @@ TODO:
 #include "sound/samples.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL(18'432'000)
+static constexpr XTAL MASTER_CLOCK = 18.432_MHz_XTAL;
 
 
 /*************************************
@@ -214,8 +214,13 @@ TODO:
 
 void rallyx_state::rallyx_interrupt_vector_w(uint8_t data)
 {
-	m_maincpu->set_input_line_vector(0, data); // Z80
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_interrupt_vector = data;
+}
+
+
+IRQ_CALLBACK_MEMBER(rallyx_state::interrupt_vector_r)
+{
+	return m_interrupt_vector;
 }
 
 
@@ -797,11 +802,14 @@ static const char *const rallyx_sample_names[] =
  *
  *************************************/
 
-MACHINE_START_MEMBER(rallyx_state,rallyx)
+void rallyx_state::machine_start()
 {
+	m_interrupt_vector = 0;
+
 	save_item(NAME(m_last_bang));
 	save_item(NAME(m_stars_enable));
 	save_item(NAME(m_main_irq_mask));
+	save_item(NAME(m_interrupt_vector));
 }
 
 void rallyx_state::rallyx_vblank_irq(int state)
@@ -822,6 +830,7 @@ void rallyx_state::rallyx(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK/6);    // 3.072 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rallyx_state::rallyx_map);
 	m_maincpu->set_addrmap(AS_IO, &rallyx_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(rallyx_state::interrupt_vector_r));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 259 at 12M or 4099 at 11M on Logic Board I
 	mainlatch.q_out_cb<0>().set(FUNC(rallyx_state::bang_w)); // BANG
@@ -835,14 +844,9 @@ void rallyx_state::rallyx(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
-
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60.606060);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(36*8, 32*8);
-	m_screen->set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(MASTER_CLOCK/3, 48*8, 0*8, 36*8, 33*8, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_rallyx));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(rallyx_state::rallyx_vblank_irq));
@@ -885,14 +889,9 @@ void rallyx_state::jungler(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
-
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));  // frames per second, vblank duration
-	m_screen->set_size(36*8, 32*8);
-	m_screen->set_visarea(0*8, 36*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(MASTER_CLOCK/3, 48*8, 0*8, 36*8, 33*8, 2*8, 30*8);
 	m_screen->set_screen_update(FUNC(rallyx_state::screen_update_jungler));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(FUNC(rallyx_state::jungler_vblank_irq));

@@ -198,11 +198,13 @@ TODO:
   Terminator 2's t2.107. I can only assume this was a mistake of the dumper.
 - lots of unknown reads and writes, also in galpanic but particularly in
   the Comad ones.
-- fantasia and newfant have a service mode but they doesn't work well (text
-  is missing or replaced by garbage). This might be just how the games are.
 - Is there a background enable register? Or a background clear. fantasia and
   newfant certainly look ugly as they are.
 
+BTANB:
+- fantasia and newfant have a service mode but it doesn't work well (text
+  is missing or replaced by garbage). This has been verified to happen with
+  New Fantasia (1994 copyright) on a Comad 940630 PCB.
 */
 
 #include "emu.h"
@@ -409,7 +411,7 @@ uint32_t expro02_state::screen_update_zipzap(screen_device &screen, bitmap_ind16
  *
  *************************************/
 
-static INPUT_PORTS_START( expro02 )
+static INPUT_PORTS_START( expro02 ) // TODO: at least for the 1994 version of New Fantasia running on the 940630 SWA and SWB should be inverted
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWA:1,2")
@@ -1245,7 +1247,7 @@ Fantasia (c) 1994  Comad & New Japan System
 +--------------------------------------+
 
    CPU: MC68000P10
- Sound: OKI M6295 (rebaged as AD-65)
+ Sound: OKI M6295 (rebadged as AD-65)
  Video: TI TPC1020AFN-084C
    OSC: 16MHz & 12MHz
    DSW: 8-way switch x 2
@@ -1273,7 +1275,7 @@ Memory: HY62C256P-15, HY6264ALP-10
 +--------------------------------------+
 
    CPU: MC68000P10
- Sound: OKI M6295 (rebaged as AD-65)
+ Sound: OKI M6295 (rebadged as AD-65)
  Video: TI TPC1020AFN-084C x 2
    OSC: 16MHz & 12MHz
    DSW: 8-way switch x 2
@@ -1404,7 +1406,7 @@ scr*   - gfx
 */
 
 
-ROM_START( fantsy95 ) // fantasy 95 - derived from new fantasia?
+ROM_START( fantsy95 ) // fantasy 95 - hack of Hot Night below? Are both derived from new fantasia?
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "prog2.12",  0x000000, 0x80000, CRC(1e684da7) SHA1(2104a6fb5f019011009f4faa769afcada90cff97) ) // sldh
 	ROM_LOAD16_BYTE( "prog1.7",   0x000001, 0x80000, CRC(dc4e4f6b) SHA1(9934121692a6d32164bef03c72c25dc727438e54) )
@@ -1424,6 +1426,28 @@ ROM_START( fantsy95 ) // fantasy 95 - derived from new fantasia?
 	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
 	ROM_LOAD( "music1.1", 0x00000, 0x80000, CRC(3117e2ef) SHA1(6581a7104556d44f814c537bbd74998922927034) )
 	ROM_LOAD( "music2.2", 0x80000, 0x80000, CRC(0c1109f9) SHA1(0e4ea534a32b1649e2e9bb8af7254b917ec03a90) )
+ROM_END
+
+ROM_START( hotnight ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 940630 MADE IN KOREA
+	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "12_prog2_4m_12.ue17",   0x000000, 0x80000, CRC(30094b5c) SHA1(e907273aa3b2f4a677339e2f143e1b04fb186ece) ) // *** all ROMs labeled simply 1 to 13, info between underscore
+	ROM_LOAD16_BYTE( "7_prog1_4m_7.ud17",     0x000001, 0x80000, CRC(64503285) SHA1(ef9c3151a9e371073fe8fc9cd876c766f2660bcb) ) // *** and PCB location is silkscreened on the PCB
+	ROM_LOAD16_BYTE( "10_i-scr2_4m_10.ue16b", 0x100000, 0x80000, CRC(ab8756ff) SHA1(0a7aa977151962e67b15a7e0f819b1412ff8dbdc) ) // == i-scr2.10 from Fantasy '95
+	ROM_LOAD16_BYTE( "5_i-scr1_4m_5.ue16a",   0x100001, 0x80000, CRC(d8e2ef77) SHA1(ec2c1dcc13e281288b5df43fa7a0b3cdf7357459) ) // == i-scr1.5 from Fantasy '95
+	ROM_LOAD16_BYTE( "9_i-scr4_4m_9.ue15b",   0x200000, 0x80000, CRC(4e52eb23) SHA1(be61c0dc68c49ded2dc6e8852fd92acac4986700) ) // == i-scr4.9 from Fantasy '95
+	ROM_LOAD16_BYTE( "4_i-scr3_4m_4.ue15a",   0x200001, 0x80000, CRC(797731f8) SHA1(571f939a7f85bd5b75a0660621961b531f44f736) ) // == i-scr3.4 from Fantasy '95
+	ROM_LOAD16_BYTE( "8_i-scr6_4m_8.ue14b",   0x300000, 0x80000, CRC(6f8e5239) SHA1(a1c2ec79e80906ca18cf3532ce38a1495ab37e44) ) // == i-scr6.8 from Fantasy '95
+	ROM_LOAD16_BYTE( "3_i-scr5_4m_3.ue14a",   0x300001, 0x80000, CRC(85420e3f) SHA1(d29e81cb1a33dca6232e14a0df2e21c8de45ba71) ) // == i-scr5.3 from Fantasy '95
+	ROM_LOAD16_BYTE( "11_i-scr8_4m_11.ue20b", 0x400000, 0x80000, CRC(67006b4e) SHA1(15537c0a46af1104cb0bafe08a3d9d0862ab5dea) )
+	ROM_LOAD16_BYTE( "6_i-scr7_4m_6.ue20a",   0x400001, 0x80000, CRC(8979ffaf) SHA1(7ce5a3818dc230fea814a92929727617e6bfc776) )
+
+	ROM_REGION( 0x80000, "kan_spr", 0 ) // sprites
+	ROM_LOAD( "13_obj1_4m_13.u5", 0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // == obj1.13 from Fantasy '95
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "1_music1_4m_1.ub6", 0x00000, 0x80000, CRC(3117e2ef) SHA1(6581a7104556d44f814c537bbd74998922927034) ) // == music1.1 from Fantasy '95
+	ROM_LOAD( "2_music2_4m_2.uc6", 0x80000, 0x80000, CRC(0c1109f9) SHA1(0e4ea534a32b1649e2e9bb8af7254b917ec03a90) ) // == music2.2 from Fantasy '95
 ROM_END
 
 ROM_START( fantasian ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 940803 MADE IN KOREA
@@ -1470,26 +1494,26 @@ ROM_START( newfant )
 	ROM_LOAD( "musc2.02", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
-ROM_START( newfanta )
+ROM_START( newfanta ) // Comad 940630 PCB
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD16_BYTE( "prog2.12", 0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
-	ROM_LOAD16_BYTE( "prog1.07", 0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
-	ROM_LOAD16_BYTE( "iscr2.10", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
-	ROM_LOAD16_BYTE( "iscr1.05", 0x100001, 0x80000, CRC(63c6894f) SHA1(213544da570a167f3411357308c576805f6882f3) )
-	ROM_LOAD16_BYTE( "iscr4.09", 0x200000, 0x80000, CRC(725741ec) SHA1(3455cf0aed9653c66b8b2f905ad683687d517419) )
-	ROM_LOAD16_BYTE( "iscr3.04", 0x200001, 0x80000, CRC(51d6b362) SHA1(bcd57643ac9d79c150714ec6b6a2bb8a24acf7a5) )
-	ROM_LOAD16_BYTE( "iscr6.08", 0x300000, 0x80000, CRC(178b2ef3) SHA1(d3c092a282278968a319e06731481570f217d404) )
-	ROM_LOAD16_BYTE( "iscr5.03", 0x300001, 0x80000, CRC(d2b5c5fa) SHA1(80fde69bc5f4e958b5d57a5179b6e601192780f4) )
-	ROM_LOAD16_BYTE( "iscr8.11", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
-	ROM_LOAD16_BYTE( "iscr7.06", 0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
+	ROM_LOAD16_BYTE( "12.ue17",  0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
+	ROM_LOAD16_BYTE( "7.ud17",   0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
+	ROM_LOAD16_BYTE( "10.ue16b", 0x100000, 0x80000, CRC(4f2da2eb) SHA1(4f0b72327d1bdfad24d822953f45218bfae29cff) )
+	ROM_LOAD16_BYTE( "5.ue16a",  0x100001, 0x80000, CRC(63c6894f) SHA1(213544da570a167f3411357308c576805f6882f3) )
+	ROM_LOAD16_BYTE( "9.ue15b",  0x200000, 0x80000, CRC(725741ec) SHA1(3455cf0aed9653c66b8b2f905ad683687d517419) )
+	ROM_LOAD16_BYTE( "4.ue15a",  0x200001, 0x80000, CRC(51d6b362) SHA1(bcd57643ac9d79c150714ec6b6a2bb8a24acf7a5) )
+	ROM_LOAD16_BYTE( "8.ue14b",  0x300000, 0x80000, CRC(178b2ef3) SHA1(d3c092a282278968a319e06731481570f217d404) )
+	ROM_LOAD16_BYTE( "3.ue14a",  0x300001, 0x80000, CRC(d2b5c5fa) SHA1(80fde69bc5f4e958b5d57a5179b6e601192780f4) )
+	ROM_LOAD16_BYTE( "11.ue20b", 0x400000, 0x80000, CRC(f4148528) SHA1(4e27fff0b7ead068a159b3ed80c5793a6166fc4e) )
+	ROM_LOAD16_BYTE( "6.ue20a",  0x400001, 0x80000, CRC(2dee0c31) SHA1(1097006e6e5d16b24fb71615b6c0754fe0ecbe33) )
 
 	ROM_REGION( 0x80000, "kan_spr", 0 ) // sprites
-	ROM_LOAD( "obj1.13", 0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) ) // sldh
+	ROM_LOAD( "13.u5", 0x00000, 0x80000, CRC(832cd451) SHA1(29dfab1d4b7a15f3fe9fbedef41d405a40235a77) )
 
 	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
 	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
-	ROM_LOAD( "musc1.01", 0x00000, 0x80000, CRC(10347fce) SHA1(f5fbe8ef363fe18b7104be5d2fa92943d1a5d7a2) )
-	ROM_LOAD( "musc2.02", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
+	ROM_LOAD( "1.ub6", 0x00000, 0x80000, CRC(10347fce) SHA1(f5fbe8ef363fe18b7104be5d2fa92943d1a5d7a2) )
+	ROM_LOAD( "2.uc6", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
 ROM_START( missw96 )
@@ -1916,6 +1940,7 @@ GAME( 1994, supmodel,  0,        supmodel, fantasiaa, expro02_state, empty_init,
 
 GAME( 1995, newfant,   0,        fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
 GAME( 1994, newfanta,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, hotnight,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Bulldog Amusements Inc.",  "Hot Night",                     MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 GAME( 1995, fantsy95,  newfant,  fantasia, fantasiaa, expro02_state, empty_init,   ROT90, "Hi-max Technology Inc.",   "Fantasy '95",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 // the PCB label (A/B) could be related to the 3 different levels of nudity Comad offered

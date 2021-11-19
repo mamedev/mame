@@ -257,7 +257,7 @@ uint32_t wpc_dot_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			for(uint8_t bit=0;bit<8;bit++)  // bits
 			{
-				assert(offset >= 0 && offset < ARRAY_LENGTH(m_dmdram));
+				assert(offset >= 0 && offset < std::size(m_dmdram));
 				uint32_t col;
 				if(m_dmdram[offset] & (1<<bit))
 					col = rgb_t(0xff,0xaa,0x00);

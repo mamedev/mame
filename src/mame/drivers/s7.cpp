@@ -34,7 +34,7 @@ Game              Outhole   Tilt        Notes
 Black Knight      L Z C     U           To start, hold down LZC and press 1.
 Firepower II      S D [D F]             To start, hold down SD or DF and press 1.
 Defender          rs I O                To start, hold down IO and Right-Shift, then press 1.
-Pharoah           Right Up              To start, hold down Right and Down, and press 1
+Pharaoh           Right Up              To start, hold down Right and Down, and press 1
 Starlight         S D                   To start, hold down SD and press 1.
 Cosmic Gunfight   ; '                   To start, press 1 then hold down quote and colon
 Thunderball                             Speech is mixed up
@@ -46,7 +46,7 @@ Time Fantasy      Up        Q           Works
 Varkon            S \                   X is 2-player start
 Jungle Lord       X S       Q           May need to also press W to get outhole to work
 Joust                                   Does something? Not a normal pinball
-Hyperball                               Does something? Not a normal pinball
+HyperBall                               Does something? Not a normal pinball
 
 
 ToDo:
@@ -66,6 +66,8 @@ ToDo:
 
 #include "s7.lh"
 
+
+namespace {
 
 class s7_state : public genpin_class
 {
@@ -92,6 +94,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
+
+protected:
+	virtual void machine_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	uint8_t sound_r();
@@ -120,7 +126,6 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
 	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
-	DECLARE_MACHINE_RESET(s7);
 	void s7_audio_map(address_map &map);
 	void s7_main_map(address_map &map);
 
@@ -131,9 +136,7 @@ private:
 	bool m_data_ok;
 	bool m_memprotect;
 	emu_timer* m_irq_timer;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	static const device_timer_id TIMER_IRQ = 0;
-	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<hc55516_device> m_hc55516;
@@ -285,7 +288,7 @@ void s7_state::sol2_w(uint8_t data)
 	m_pia21->ca1_w(BIT(data, 5));
 }
 
-void s7_state::sol3_w(uint8_t data)
+[[maybe_unused]] void s7_state::sol3_w(uint8_t data)
 {
 	if (BIT(data, 1))
 		m_samples->start(0, 6); // knocker
@@ -429,10 +432,6 @@ void s7_state::machine_start()
 	subdevice<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 }
 
-MACHINE_RESET_MEMBER( s7_state, s7 )
-{
-}
-
 void s7_state::init_s7()
 {
 	m_irq_timer = timer_alloc(TIMER_IRQ);
@@ -444,7 +443,6 @@ void s7_state::s7(machine_config &config)
 	/* basic machine hardware */
 	M6808(config, m_maincpu, 3580000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &s7_state::s7_main_map);
-	MCFG_MACHINE_RESET_OVERRIDE(s7_state, s7)
 
 	/* Video */
 	config.set_default_layout(layout_s7);
@@ -880,6 +878,7 @@ ROM_START(strlt_l1)
 	ROM_LOAD("sound3.716",   0x4800, 0x0800, CRC(55a10d13) SHA1(521d4cdfb0ed8178b3594cedceae93b772a951a4))
 ROM_END
 
+} // Anonymous namespace
 
 
 GAME( 1980, bk_l4,    0,        s7, s7, s7_state, init_s7, ROT0, "Williams",  "Black Knight (L-4)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

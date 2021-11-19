@@ -12,11 +12,13 @@
 #include "formats/tzx_cas.h"
 
 
-class scorpion_state : public spectrum_state
+namespace {
+
+class scorpion_state : public spectrum_128_state
 {
 public:
 	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag)
+		: spectrum_128_state(mconfig, type, tag)
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
@@ -28,6 +30,9 @@ public:
 	void profi(machine_config &config);
 	void quorum(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	uint8_t beta_neutral_r(offs_t offset);
 	uint8_t beta_enable_r(offs_t offset);
@@ -35,8 +40,6 @@ private:
 	void scorpion_0000_w(offs_t offset, uint8_t data);
 	void scorpion_port_7ffd_w(uint8_t data);
 	void scorpion_port_1ffd_w(uint8_t data);
-	DECLARE_MACHINE_START(scorpion);
-	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 
 	void scorpion_io(address_map &map);
@@ -209,7 +212,7 @@ void scorpion_state::scorpion_switch(address_map &map)
 	map(0x4000, 0xffff).r(FUNC(scorpion_state::beta_disable_r));
 }
 
-MACHINE_RESET_MEMBER(scorpion_state,scorpion)
+void scorpion_state::machine_reset()
 {
 	uint8_t *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
@@ -233,10 +236,6 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	m_port_1ffd_data = 0;
 	scorpion_update_memory();
 }
-MACHINE_START_MEMBER(scorpion_state,scorpion)
-{
-}
-
 
 /* F4 Character Displayer */
 static const gfx_layout spectrum_charlayout =
@@ -300,8 +299,6 @@ void scorpion_state::scorpion(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &scorpion_state::scorpion_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &scorpion_state::scorpion_switch);
 
-	MCFG_MACHINE_START_OVERRIDE(scorpion_state, scorpion )
-	MCFG_MACHINE_RESET_OVERRIDE(scorpion_state, scorpion )
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
 
 	BETA_DISK(config, m_beta, 0);
@@ -403,6 +400,9 @@ ROM_START( kay1024 )
 	ROM_SYSTEM_BIOS(2, "v3", "Kramis V0.3")
 	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(2))
 ROM_END
+
+} // Anonymous namespace
+
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY              FULLNAME           FLAGS
 COMP( 1994, scorpio, spec128, 0,      scorpion, spec_plus, scorpion_state, empty_init, "Zonov and Co.",     "Scorpion ZS-256", 0 )

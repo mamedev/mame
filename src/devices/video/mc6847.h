@@ -107,7 +107,7 @@ protected:
 				uint8_t character = data[i];
 
 				// based on the mode, determine which entry to use
-				const entry *e = &m_entries[mode % ARRAY_LENGTH(m_entries)];
+				const entry *e = &m_entries[mode % std::size(m_entries)];
 
 				// identify the character in the font data
 				const uint8_t *font_character = e->m_fontdata + (character & e->m_character_mask) * 12;

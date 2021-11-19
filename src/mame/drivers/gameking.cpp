@@ -261,7 +261,7 @@ DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 
 	if (size > 0x100000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(image_error::INVALIDIMAGE, "Unsupported cartridge size");
 		return image_init_result::FAIL;
 	}
 
@@ -299,7 +299,7 @@ void gameking_state::gameking(machine_config &config)
 	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), ARRAY_LENGTH(gameking_pens));
+	PALETTE(config, m_palette, FUNC(gameking_state::gameking_palette), std::size(gameking_pens));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();

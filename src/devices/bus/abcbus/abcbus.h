@@ -271,7 +271,7 @@ void abcbus_cards(device_slot_interface &device);
 void abc1600bus_cards(device_slot_interface &device);
 
 
-typedef device_type_iterator<abcbus_slot_device> abcbus_slot_device_iterator;
+typedef device_type_enumerator<abcbus_slot_device> abcbus_slot_device_enumerator;
 
 
 #endif // MAME_DEVICES_ABCBUS_ABCBUS_H

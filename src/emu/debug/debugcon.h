@@ -16,6 +16,7 @@
 #include "textbuf.h"
 
 #include <functional>
+#include <set>
 
 
 /***************************************************************************
@@ -30,7 +31,7 @@ constexpr u32 CMDFLAG_NONE                  = 0x0000;
 constexpr u32 CMDFLAG_KEEP_QUOTES           = 0x0001;
 constexpr u32 CMDFLAG_CUSTOM_HELP           = 0x0002;
 
-/* parameter separator macros */
+// parameter separator macros
 #define CMDPARAM_SEPARATOR                  "\0"
 #define CMDPARAM_TERMINATOR                 "\0\0"
 
@@ -71,7 +72,6 @@ public:
 
 private:
 	u16 m_error_class, m_error_offset;
-
 };
 
 
@@ -83,7 +83,7 @@ public:
 	// command handling
 	CMDERR          execute_command(const std::string &command, bool echo);
 	CMDERR          validate_command(const char *command);
-	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, const std::vector<std::string> &)> handler);
+	void            register_command(const char *command, u32 flags, int minparams, int maxparams, std::function<void (const std::vector<std::string> &)> &&handler);
 	void            source_script(const char *file);
 	void            process_source_file();
 
@@ -94,11 +94,11 @@ public:
 	void vprintf_wrap(int wrapcol, util::format_argument_pack<std::ostream> &&args);
 	text_buffer &get_console_textbuf() const { return *m_console_textbuf; }
 
-	/* errorlog management */
+	// errorlog management
 	void errorlog_write_line(const char *line);
 	text_buffer &get_errorlog_textbuf() const { return *m_errorlog_textbuf; }
 
-	/* convenience templates */
+	// convenience templates
 	template <typename Format, typename... Params>
 	inline void printf(Format &&fmt, Params &&...args)
 	{
@@ -119,26 +119,33 @@ public:
 private:
 	void exit();
 
-	void execute_help_custom(int ref, const std::vector<std::string> &params);
-	void execute_condump(int ref, const std::vector<std::string>& params);
+	void execute_help_custom(const std::vector<std::string> &params);
+	void execute_condump(const std::vector<std::string>& params);
 
 	void trim_parameter(char **paramptr, bool keep_quotes);
 	CMDERR internal_execute_command(bool execute, int params, char **param);
 	CMDERR internal_parse_command(const std::string &original_command, bool execute);
 
-	void print_core(const char *text);                   // core text output
-	void print_core_wrap(const char *text, int wrapcol); // core text output
+	void print_core(std::string_view text);                   // core text output
+	void print_core_wrap(std::string_view text, int wrapcol); // core text output
 
 	struct debug_command
 	{
-		debug_command(const char *_command, u32 _flags, int _ref, int _minparams, int _maxparams, std::function<void(int, const std::vector<std::string> &)> _handler);
+		debug_command(const char *_command, u32 _flags, int _minparams, int _maxparams, std::function<void (const std::vector<std::string> &)> &&_handler);
 
-		char            command[32];
+		struct compare
+		{
+			using is_transparent = void;
+			bool operator()(const debug_command &a, const debug_command &b) const;
+			bool operator()(const char *a, const debug_command &b) const;
+			bool operator()(const debug_command &a, const char *b) const;
+		};
+
+		std::string     command;
 		const char *    params;
 		const char *    help;
-		std::function<void(int, const std::vector<std::string> &)> handler;
+		std::function<void (const std::vector<std::string> &)> handler;
 		u32             flags;
-		int             ref;
 		int             minparams;
 		int             maxparams;
 	};
@@ -151,7 +158,7 @@ private:
 	text_buffer_ptr m_console_textbuf;
 	text_buffer_ptr m_errorlog_textbuf;
 
-	std::forward_list<debug_command> m_commandlist;
+	std::set<debug_command, debug_command::compare> m_commandlist;
 
 	std::unique_ptr<std::istream> m_source_file;        // script source file
 	std::unique_ptr<emu_file> m_logfile;                // logfile for debug console output

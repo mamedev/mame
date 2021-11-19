@@ -328,15 +328,17 @@ static DEVICE_INPUT_DEFAULTS_START( dc5 )
 DEVICE_INPUT_DEFAULTS_END
 
 
-FLOPPY_FORMATS_MEMBER( swtpc09_state::floppy_flex_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_FLEX_FORMAT
-FLOPPY_FORMATS_END
+void swtpc09_state::floppy_flex_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_FLEX_FORMAT);
+}
 
-FLOPPY_FORMATS_MEMBER( swtpc09_state::floppy_uniflex_formats )
-	FLOPPY_MFI_FORMAT,
-	FLOPPY_UNIFLEX_FORMAT
-FLOPPY_FORMATS_END
+void swtpc09_state::floppy_uniflex_formats(format_registration &fr)
+{
+	fr.add_fm_containers();
+	fr.add(FLOPPY_UNIFLEX_FORMAT);
+}
 
 
 // todo: implement floppy controller cards as slot devices and do this properly
@@ -552,7 +554,7 @@ void swtpc09_state::swtpc09d3(machine_config &config)
 	HARDDISK(config, "hdc:2", 0);
 	HARDDISK(config, "hdc:3", 0);
 
-	via6522_device &via(VIA6522(config, "via", 4_MHz_XTAL / 4));
+	via6522_device &via(MOS6522(config, "via", 4_MHz_XTAL / 4));
 	via.readpa_handler().set(FUNC(swtpc09_state::dmaf3_via_read_porta));
 	via.readpb_handler().set(FUNC(swtpc09_state::dmaf3_via_read_portb));
 	via.writepa_handler().set(FUNC(swtpc09_state::dmaf3_via_write_porta));

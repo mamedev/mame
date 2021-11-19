@@ -13,7 +13,7 @@
 #include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/nvram.h"
-#include "sound/ym2151.h"
+#include "sound/ymopm.h"
 #include "video/hd44780.h"
 
 #include "emupal.h"
@@ -75,8 +75,8 @@ void fb01_state::fb01_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	// 00-01  YM2164
-	map(0x00, 0x00).w("ym2164", FUNC(ym2151_device::register_w));
-	map(0x01, 0x01).rw("ym2164", FUNC(ym2151_device::status_r), FUNC(ym2151_device::data_w));
+	map(0x00, 0x00).w("ym2164", FUNC(ym2164_device::address_w));
+	map(0x01, 0x01).rw("ym2164", FUNC(ym2164_device::status_r), FUNC(ym2164_device::data_w));
 
 	// 10-11  USART uPD71051C  4MHz & 4MHz / 8
 	map(0x10, 0x11).rw(m_upd71051, FUNC(i8251_device::read), FUNC(i8251_device::write));

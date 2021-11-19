@@ -10,7 +10,7 @@
 #include "machine/keyboard.h"
 
 
-namespace bus { namespace hp_hil {
+namespace bus::hp_hil {
 
 class hle_hp_ipc_device
 		: public hle_device_base
@@ -64,7 +64,7 @@ private:
 	void transmit_byte(uint8_t byte);
 };
 
-} } // namespace bus::hp_hil
+} // namespace bus::hp_hil
 
 
 DECLARE_DEVICE_TYPE_NS(HP_IPC_HLE_KEYBOARD, bus::hp_hil, hle_hp_ipc_device);

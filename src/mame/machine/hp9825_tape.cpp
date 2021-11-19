@@ -92,7 +92,7 @@ void hp9825_tape_device::device_add_mconfig(machine_config &config)
 	m_tape->set_acceleration(ACCELERATION);
 	m_tape->set_set_points(SLOW_SPEED , FAST_SPEED);
 	m_tape->set_tick_size(TACH_TICK_LENGTH);
-	m_tape->set_bits_per_word(17);
+	m_tape->set_image_format(hti_format_t::HTI_DELTA_MOD_17_BITS);
 	m_tape->set_go_threshold(MOVING_THRESHOLD);
 	m_tape->cart_out().set(FUNC(hp9825_tape_device::cart_out_w));
 	m_tape->hole().set(FUNC(hp9825_tape_device::hole_w));

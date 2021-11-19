@@ -992,7 +992,7 @@ ROM_START(990189v)
 
 	/* boot ROM */
 	ROM_LOAD("990-469.u33", 0x3000, 0x1000, CRC(e9b4ac1b) SHA1(96e88f4cb7a374033cdf3af0dc26ca5b1d55b9f9))
-	/*ROM_LOAD("unibasic.bin", 0x3000, 0x1000, CRC(de4d9744))*/ /* older, partial dump of university BASIC */
+	/*ROM_LOAD("unibasic.bin", 0x3000, 0x1000, CRC(de4d9744) SHA1(47afe7f6b04b564d2f30f21461e0ed7ea97fba4c) )*/ /* older, partial dump of university BASIC */
 ROM_END
 
 #define JOYSTICK_DELTA          10

@@ -201,6 +201,7 @@ uint8_t electron_romboxp_device::expbus_r(offs_t offset)
 		case 13:
 			data &= m_cart[0]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
 			data &= m_cart[1]->read(offset & 0x3fff, 0, 0, m_romsel & 0x01, 0, 1);
+			[[fallthrough]];
 		case 14:
 		case 15:
 			if (m_rom_base == 12)
@@ -274,6 +275,7 @@ void electron_romboxp_device::expbus_w(offs_t offset, uint8_t data)
 		case 13:
 			m_cart[0]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
 			m_cart[1]->write(offset & 0x3fff, data, 0, 0, m_romsel & 0x01, 0, 1);
+			[[fallthrough]];
 		case 14:
 		case 15:
 			if (m_rom_base == 12)
@@ -326,7 +328,7 @@ image_init_result electron_romboxp_device::load_rom(device_image_interface &imag
 	// socket accepts 8K and 16K ROM only
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 8K/16K is supported");
+		image.seterror(image_error::INVALIDIMAGE, "Invalid size: Only 8K/16K is supported");
 		return image_init_result::FAIL;
 	}
 

@@ -710,18 +710,25 @@ LVS-DG2
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 
-#define VERBOSE 1
+#define LOG_GENERAL         (1U << 0)
+#define LOG_COMRW           (1U << 1)
+#define LOG_SNDCOM_UNKNWN   (1U << 2)
+#define LOG_DMA             (1U << 3)
+#define LOG_VREGS           (1U << 4)
+
+#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-uint32_t hng64_state::hng64_com_r(offs_t offset)
+
+uint32_t hng64_state::hng64_com_r(offs_t offset, uint32_t mem_mask)
 {
-	//LOG("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
+	LOGMASKED(LOG_COMRW, "com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_idt7133_dpram[offset]);
 	return m_idt7133_dpram[offset];
 }
 
 void hng64_state::hng64_com_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	//LOG("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
+	LOGMASKED(LOG_COMRW, "com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_idt7133_dpram[offset]);
 }
 
@@ -776,7 +783,7 @@ void hng64_state::do_dma(address_space &space)
 {
 	// check if this determines how long the crosshatch is visible for, we might need to put it on a timer.
 
-	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
+	LOGMASKED(LOG_DMA, "Performing DMA Start %08x Len %08x Dst %08x\n", m_dma_start, m_dma_len, m_dma_dst);
 	while (m_dma_len >= 0)
 	{
 		uint32_t dat;
@@ -1049,7 +1056,7 @@ void hng64_state::hng64_sprite_clear_odd_w(offs_t offset, uint32_t data, uint32_
 
 void hng64_state::hng64_vregs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-//  printf("hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
+	LOGMASKED(LOG_DMA, "hng64_vregs_w %02x, %08x %08x\n", offset * 4, data, mem_mask);
 	COMBINE_DATA(&m_videoregs[offset]);
 }
 
@@ -1062,7 +1069,7 @@ uint16_t hng64_state::main_sound_comms_r(offs_t offset)
 		case 0x06:
 			return sound_latch[1];
 		default:
-			//printf("%08x R\n",offset*2);
+			LOGMASKED(LOG_SNDCOM_UNKNWN, "%08x R\n",offset*2);
 			break;
 	}
 	return 0;
@@ -1081,10 +1088,10 @@ void hng64_state::main_sound_comms_w(offs_t offset, uint16_t data, uint16_t mem_
 		case 0x08:
 			m_audiocpu->set_input_line(5, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 			if(data & 0xfe)
-				//printf("IRQ send %02x?\n",data);
+				LOGMASKED(LOG_SNDCOM_UNKNWN, "IRQ send %02x?\n",data);
 			break;
 		default:
-			//printf("%02x %04x\n",offset*2,data);
+			LOGMASKED(LOG_SNDCOM_UNKNWN, "%02x %04x\n",offset*2,data);
 			break;
 	}
 }
@@ -2308,21 +2315,6 @@ void hng64_state::ioport4_w(uint8_t data)
 
 /***********************************************
 
- Other port accesses from MCU side
-
-***********************************************/
-
-uint8_t hng64_state::anport0_r() { return m_an_in[0]->read(); }
-uint8_t hng64_state::anport1_r() { return m_an_in[1]->read(); }
-uint8_t hng64_state::anport2_r() { return m_an_in[2]->read(); }
-uint8_t hng64_state::anport3_r() { return m_an_in[3]->read(); }
-uint8_t hng64_state::anport4_r() { return m_an_in[4]->read(); }
-uint8_t hng64_state::anport5_r() { return m_an_in[5]->read(); }
-uint8_t hng64_state::anport6_r() { return m_an_in[6]->read(); }
-uint8_t hng64_state::anport7_r() { return m_an_in[7]->read(); }
-
-/***********************************************
-
  Serial Accesses from MCU side
 
 ***********************************************/
@@ -2411,14 +2403,14 @@ void hng64_state::hng64(machine_config &config)
 	//iomcu.p6_out_cb().set(FUNC(hng64_state::ioport6_w)); // the IO MCU code uses the ADC which shares pins with port 6, meaning port 6 isn't used as an IO port
 	iomcu.p7_out_cb().set(FUNC(hng64_state::ioport7_w)); // configuration / clocking for shared ram (port 0) accesses
 	// most likely the analog inputs, up to a maximum of 8
-	iomcu.an0_in_cb().set(FUNC(hng64_state::anport0_r));
-	iomcu.an1_in_cb().set(FUNC(hng64_state::anport1_r));
-	iomcu.an2_in_cb().set(FUNC(hng64_state::anport2_r));
-	iomcu.an3_in_cb().set(FUNC(hng64_state::anport3_r));
-	iomcu.an4_in_cb().set(FUNC(hng64_state::anport4_r));
-	iomcu.an5_in_cb().set(FUNC(hng64_state::anport5_r));
-	iomcu.an6_in_cb().set(FUNC(hng64_state::anport6_r));
-	iomcu.an7_in_cb().set(FUNC(hng64_state::anport7_r));
+	iomcu.an0_in_cb().set_ioport("AN0");
+	iomcu.an1_in_cb().set_ioport("AN1");
+	iomcu.an2_in_cb().set_ioport("AN2");
+	iomcu.an3_in_cb().set_ioport("AN3");
+	iomcu.an4_in_cb().set_ioport("AN4");
+	iomcu.an5_in_cb().set_ioport("AN5");
+	iomcu.an6_in_cb().set_ioport("AN6");
+	iomcu.an7_in_cb().set_ioport("AN7");
 	// network related?
 	iomcu.serial0_out_cb().set(FUNC(hng64_state::sio0_w));
 	//iomcu.serial1_out_cb().set(FUNC(hng64_state::sio1_w)); // not initialized / used
@@ -2432,14 +2424,14 @@ void hng64_state::hng64_default(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps0_out_cb().set(FUNC(hng64_state::hng64_default_lamps0_w));
-	lamps.lamps1_out_cb().set(FUNC(hng64_state::hng64_default_lamps1_w));
-	lamps.lamps2_out_cb().set(FUNC(hng64_state::hng64_default_lamps2_w));
-	lamps.lamps3_out_cb().set(FUNC(hng64_state::hng64_default_lamps3_w));
-	lamps.lamps4_out_cb().set(FUNC(hng64_state::hng64_default_lamps4_w));
-	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_default_lamps5_w));
-	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_default_lamps6_w));
-	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_default_lamps7_w));
+	lamps.lamps_out_cb<0>().set(FUNC(hng64_state::hng64_default_lamps_w<0>));
+	lamps.lamps_out_cb<1>().set(FUNC(hng64_state::hng64_default_lamps_w<1>));
+	lamps.lamps_out_cb<2>().set(FUNC(hng64_state::hng64_default_lamps_w<2>));
+	lamps.lamps_out_cb<3>().set(FUNC(hng64_state::hng64_default_lamps_w<3>));
+	lamps.lamps_out_cb<4>().set(FUNC(hng64_state::hng64_default_lamps_w<4>));
+	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::hng64_default_lamps_w<5>));
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_default_lamps_w<6>));
+	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::hng64_default_lamps_w<7>));
 }
 
 void hng64_state::hng64_drive(machine_config &config)
@@ -2447,9 +2439,9 @@ void hng64_state::hng64_drive(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps5_out_cb().set(FUNC(hng64_state::hng64_drive_lamps5_w)); // force feedback steering
-	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_drive_lamps6_w)); // lamps + coin counter
-	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_drive_lamps7_w)); // lamps
+	lamps.lamps_out_cb<5>().set(FUNC(hng64_state::hng64_drive_lamps5_w)); // force feedback steering
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_drive_lamps6_w)); // lamps + coin counter
+	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::hng64_drive_lamps7_w)); // lamps
 }
 
 void hng64_state::hng64_shoot(machine_config &config)
@@ -2457,8 +2449,8 @@ void hng64_state::hng64_shoot(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some missing?!)
-	lamps.lamps7_out_cb().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_shoot_lamps6_w)); // start lamps (some missing?!)
+	lamps.lamps_out_cb<7>().set(FUNC(hng64_state::hng64_shoot_lamps7_w)); // gun lamps
 }
 
 void hng64_state::hng64_fight(machine_config &config)
@@ -2466,7 +2458,7 @@ void hng64_state::hng64_fight(machine_config &config)
 	hng64(config);
 
 	hng64_lamps_device &lamps(HNG64_LAMPS(config, m_lamps, 0));
-	lamps.lamps6_out_cb().set(FUNC(hng64_state::hng64_fight_lamps6_w)); // coin counters
+	lamps.lamps_out_cb<6>().set(FUNC(hng64_state::hng64_fight_lamps6_w)); // coin counters
 }
 
 
@@ -2501,8 +2493,12 @@ void hng64_state::hng64_fight(machine_config &config)
 	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
 	/* TMP87PH40AN (I/O MCU) */ \
 	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
-	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
-
+	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) ) \
+	/* BR9020F (EEPROM) */ \
+	ROM_REGION( 0x100, "eeprom", 0 ) /* EEPROMs on the I/O boards, mostly empty, currently not used by the emulation */ \
+	ROM_LOAD( "lvs-ioj-br9020f.u2", 0x000, 0x100, CRC(78b7020d) SHA1(2b8549532ef5e1e8102dbe71af55fdfb27ccbba6) ) \
+	ROM_LOAD( "lvs-igx-br9020f.u3", 0x000, 0x100, CRC(af9f4287) SHA1(6df0e35c77dbfee2fab7ff490dcd651db420e367) ) \
+	ROM_LOAD( "lvs-jam-br9020f.u3", 0x000, 0x100, CRC(dabec5d2) SHA1(19c5be89c57387d6ea563b3dc55674d0692af98e) )
 
 ROM_START( hng64 )
 	/* BIOS */

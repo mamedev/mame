@@ -34,7 +34,7 @@ void firetrk_state::firetrk_palette(palette_device &palette)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < std::size(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -93,7 +93,7 @@ void firetrk_state::montecar_palette(palette_device &palette)
 
 	m_color1_mask = m_color2_mask = 0;
 
-	for (int i = 0; i < ARRAY_LENGTH(colortable_source); i++)
+	for (int i = 0; i < std::size(colortable_source); i++)
 	{
 		uint8_t color = colortable_source[i];
 
@@ -105,8 +105,8 @@ void firetrk_state::montecar_palette(palette_device &palette)
 		prom_to_palette(i, color_prom[0x100 + colortable_source[i]]);
 	}
 
-	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 0, rgb_t::black());
-	palette.set_pen_color(ARRAY_LENGTH(colortable_source) + 1, rgb_t::white());
+	palette.set_pen_color(std::size(colortable_source) + 0, rgb_t::black());
+	palette.set_pen_color(std::size(colortable_source) + 1, rgb_t::white());
 }
 
 

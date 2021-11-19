@@ -229,8 +229,8 @@ void tms9995_device::device_start()
 		// callexport = need to use the state_export method to read the state variable
 		state_add(i, s_statename[i], m_state_any).callimport().callexport().formatstr("%04X");
 	}
-	state_add(STATE_GENPC, "GENPC", PC_debug).formatstr("%4s").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", PC_debug).formatstr("%4s").noshow();
+	state_add(STATE_GENPC, "GENPC", PC_debug).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", PC_debug).noshow();
 	state_add(STATE_GENFLAGS, "status", m_state_any).callimport().callexport().formatstr("%16s").noshow();
 
 	// Set up the lookup table for command decoding
@@ -383,7 +383,7 @@ void tms9995_device::state_string_export(const device_state_entry &entry, std::s
 {
 	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
-	memset(flags, 0x00, ARRAY_LENGTH(flags));
+	std::fill(std::begin(flags), std::end(flags), 0x00);
 	uint16_t val = 0x8000;
 	if (entry.index()==STATE_GENFLAGS)
 	{

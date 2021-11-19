@@ -6,6 +6,8 @@ Universal Commandline Options
 This section contains configuration options that are applicable to *all* MAME
 sub-builds (both SDL and Windows native).
 
+.. contents:: :local:
+
 
 Commands and Verbs
 ------------------
@@ -31,7 +33,6 @@ patterns to avoid having your shell try to expand them against filenames (e.g.
 
 
 .. _mame-commandline-paths:
-
 
 File Names and Directory Paths
 ------------------------------
@@ -63,20 +64,20 @@ executable (for example you could call it ``mame-here`` )::
 
     #!/bin/sh
     cd "`dirname "$0"`"
-    exec ./mame64
+    exec ./mame
 
 You should be able to use any text editor.  If you have a choice of file format
-or line ending style, choose UNIX.  This assumes you're using a 64-bit release
-build of MAME, but if you aren't you just need to change ``mame64`` to the name
-of your MAME executable.  Once you've created the file, you need to mark is as
-executable.  You can do this by opening a Terminal window, typing **chmod a+x**
-followed by a space, dragging the file you created onto the window (this causes
-Terminal to insert the full escaped path to the file), and then ensuring the
-Terminal window is active and hitting **Return** (or **Enter**) on your
-keyboard.  You can close the Terminal window after doing this.  Now if you
-double-click the script in the Finder, it will open a Terminal window, set the
-working directory to the location of the script (i.e. the folder containing
-MAME), and then start MAME.
+or line ending style, choose UNIX. This assumes you're using a 64-bit release
+build of MAME, but if you aren't you just need to change ``mame`` to the name
+of your MAME executable (e.g. mamed, mamep, mamedp).  Once you've created the
+file, you need to mark it as executable.  You can do this by opening a Terminal
+window, typing **chmod a+x** followed by a space, dragging the file you created
+onto the window (this causes Terminal to insert the full escaped path to the
+file), and then ensuring the Terminal window is active and hitting **Return**
+(or **Enter**) on your keyboard.  You can close the Terminal window after doing
+this.  Now if you double-click the script in the Finder, it will open a
+Terminal window, set the working directory to the location of the script
+(i.e. the folder containing MAME), and then start MAME.
 
 
 Core Verbs
@@ -101,7 +102,7 @@ Core Verbs
     Example:
         .. code-block:: bash
 
-            mame64 -help
+            mame -help
 
 .. _mame-commandline-validate:
 
@@ -119,7 +120,7 @@ Core Verbs
     Example:
         .. code-block:: bash
 
-            mame64 -validate
+            mame -validate
             Driver ace100 (file apple2.cpp): 1 errors, 0 warnings
             Errors:
             Software List device 'flop525_orig': apple2_flop_orig.xml: Errors parsing software list:
@@ -149,7 +150,7 @@ Configuration Verbs
     Example:
         .. code-block:: bash
 
-            mame64 -createconfig
+            mame -createconfig
 
 .. _mame-commandline-showconfig:
 
@@ -191,7 +192,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 -listcrc puckman > list.txt
+            mame -listcrc puckman > list.txt
 
     This creates (or overwrites the existing file if already there) ``list.txt``
     and fills the file with the results of **-listcrc puckman**.  In other
@@ -214,7 +215,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 galaxian -listxml
+            mame galaxian -listxml
             <?xml version="1.0"?>
             <!DOCTYPE mame [
             <!ELEMENT mame (machine+)>
@@ -238,7 +239,7 @@ overwritten.
 
 .. Tip:: Output from this command is typically more useful if redirected to
          an output file. For instance, doing
-         **mame64 -listxml galaxian > galax.xml** will make ``galax.xml`` or
+         **mame -listxml galaxian > galax.xml** will make ``galax.xml`` or
          overwrite any existing data in the file with the results of
          **-listxml**; this will allow you to view it in a text editor or parse
          it with external tools.
@@ -250,7 +251,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 -listfull galaxian*
+            mame -listfull galaxian*
             Name:             Description:
             galaxian          "Galaxian (Namco set 1)"
             galaxiana         "Galaxian (Namco set 2)"
@@ -279,7 +280,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 galaga -listsource
+            mame galaga -listsource
             galaga           galaga.cpp
 
 .. _mame-commandline-listclones:
@@ -294,14 +295,14 @@ overwritten.
     Example 1:
         .. code-block:: bash
 
-            mame64 pacman -listclones
+            mame pacman -listclones
             Name:            Clone of:
             pacman           puckman
 
     Example 2:
         .. code-block:: bash
 
-            mame64 puckman -listclones
+            mame puckman -listclones
             Name:            Clone of:
             abscam           puckman
             bucaner          puckman
@@ -321,7 +322,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 galaxian -listbrothers
+            mame galaxian -listbrothers
             Source file:         Name:            Parent:
             galaxian.cpp         amidar
             galaxian.cpp         amidar1          amidar
@@ -342,7 +343,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 playch10 -listcrc
+            mame playch10 -listcrc
             d52fa07a pch1-c__8t_e-2.8t                      playch10                PlayChoice-10 BIOS
             503ee8b1 pck1-c.8t                              playch10                PlayChoice-10 BIOS
             123ffa37 pch1-c_8te.8t                          playch10                PlayChoice-10 BIOS
@@ -375,7 +376,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 neogeo -listroms
+            mame neogeo -listroms
             ROMs required for driver "neogeo".
             Name                                   Size Checksum
             sp-s2.sp1                            131072 CRC(9036d879) SHA1(4f5ed7105b7128794654ce82b51723e16e389543)
@@ -397,7 +398,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 armorap -listsamples
+            mame armorap -listsamples
             Samples required for driver "armorap".
             loexp
             jeepfire
@@ -418,7 +419,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 gradius -verifyroms
+            mame gradius -verifyroms
             romset gradius [nemesis] is good
             1 romsets found, 1 were OK.
 
@@ -434,7 +435,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 armorap -verifysamples
+            mame armorap -verifysamples
             sampleset armorap [armora] is good
             1 samplesets found, 1 were OK.
 
@@ -455,7 +456,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 unknown.rom -romident
+            mame unknown.rom -romident
             Identifying unknown.rom....
             unknown.rom         = 456-a07.17l           gradius    Gradius (Japan, ROM version)
 
@@ -474,7 +475,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 apple2e -listdevices
+            mame apple2e -listdevices
             Driver apple2e (Apple //e):
                <root>                         Apple //e
                  a2bus                        Apple II Bus
@@ -506,7 +507,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 apple2e -listslots
+            mame apple2e -listslots
             SYSTEM           SLOT NAME        SLOT OPTIONS     SLOT DEVICE NAME
             ---------------- ---------------- ---------------- ----------------------------
             apple2e          sl1              4play            4play Joystick Card (rev. B)
@@ -536,7 +537,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 coco3 -listmedia
+            mame coco3 -listmedia
             SYSTEM           MEDIA NAME       (brief)    IMAGE FILE EXTENSIONS SUPPORTED
             ---------------- --------------------------- -------------------------------
             coco3            cassette         (cass)     .wav  .cas
@@ -557,7 +558,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 coco3 -listsoftware
+            mame coco3 -listsoftware
             <?xml version="1.0"?>
             <!DOCTYPE softwarelists [
             <!ELEMENT softwarelists (softwarelist*)>
@@ -594,7 +595,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 coco3 -verifysoftware
+            mame coco3 -verifysoftware
             romset coco_cart:7cardstd is good
             coco_cart:amazing: a mazing world of malcom mortar (1987)(26-3160)(zct systems).rom (16384 bytes) - NEEDS REDUMP
             romset coco_cart:amazing is best available
@@ -613,7 +614,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 -getsoftlist apple2_flop_orig
+            mame -getsoftlist apple2_flop_orig
             <?xml version="1.0"?>
             <!DOCTYPE softwarelists [
             <!ELEMENT softwarelists (softwarelist*)>
@@ -648,7 +649,7 @@ overwritten.
     Example:
         .. code-block:: bash
 
-            mame64 -verifysoftlist apple2_flop_orig
+            mame -verifysoftlist apple2_flop_orig
             romset apple2_flop_orig:agentusa is good
             romset apple2_flop_orig:airheart is good
             romset apple2_flop_orig:aplpanic is good
@@ -681,11 +682,11 @@ OSD-related Options
     Example:
         .. code-block:: bash
 
-            mame64 ibm5150 -uimodekey DEL
+            mame ibm5150 -uimodekey DEL
 
 .. _mame-commandline-uifontprovider:
 
-**-uifontprovider**
+**-uifontprovider** *<module>*
 
     Chooses provider for UI font rendering. The default setting is ``auto``.
 
@@ -724,11 +725,11 @@ OSD-related Options
 Example:
     .. code-block:: bash
 
-        mame64 ajax -uifontprovider dwrite
+        mame ajax -uifontprovider dwrite
 
 .. _mame-commandline-keyboardprovider:
 
-**-keyboardprovider**
+**-keyboardprovider** *<module>*
 
     Chooses how MAME will get keyboard input. The default is ``auto``.
 
@@ -776,11 +777,11 @@ Example:
 Example:
     .. code-block:: bash
 
-        mame64 c64 -keyboardprovider win32
+        mame c64 -keyboardprovider win32
 
 .. _mame-commandline-mouseprovider:
 
-**\-mouseprovider**
+**-mouseprovider** *<module>*
 
     Chooses how MAME will get mouse input. The default is ``auto``.
 
@@ -824,11 +825,11 @@ Example:
 Example:
     .. code-block:: bash
 
-        mame64 indy_4610 -mouseprovider win32
+        mame indy_4610 -mouseprovider win32
 
 .. _mame-commandline-lightgunprovider:
 
-**\-lightgunprovider**
+**-lightgunprovider** *<module>*
 
     Chooses how MAME will get light gun input. The default is ``auto``.
 
@@ -871,11 +872,11 @@ Example:
 Example:
     .. code-block:: bash
 
-        mame64 lethalen -lightgunprovider x11
+        mame lethalen -lightgunprovider x11
 
 .. _mame-commandline-joystickprovider:
 
-**\-joystickprovider**
+**-joystickprovider** *<module>*
 
     Chooses how MAME will get joystick input. The default is ``auto``.
 
@@ -912,7 +913,7 @@ Example:
 Example:
     .. code-block:: bash
 
-        mame64 mk2 -joystickprovider winhybrid
+        mame mk2 -joystickprovider winhybrid
 
 .. Tip:: On Windows, winhybrid is likely to give the best experience by
          supporting both XInput and DirectInput controllers.
@@ -923,14 +924,14 @@ OSD CLI Options
 
 .. _mame-commandline-listmidi:
 
-**\-listmidi**
+**-listmidi**
 
-    Create a list of available MIDI I/O devices for use with emulation.
+    List available MIDI I/O devices for use with emulation.
 
     Example:
         .. code-block:: bash
 
-            mame64 -listmidi
+            mame -listmidi
             MIDI input ports:
 
             MIDI output ports:
@@ -939,20 +940,20 @@ OSD CLI Options
 
 .. _mame-commandline-listnetwork:
 
-**\-listnetwork**
+**-listnetwork**
 
-    Create a list of available Network Adapters for use with emulation.
+    List available network adapters for use with emulation.
 
     Example 1:
         .. code-block:: bash
 
-            mame64 -listnetwork
+            mame -listnetwork
             No network adapters were found
 
     Example 2:
         .. code-block:: bash
 
-            mame64 -listnetwork
+            mame -listnetwork
             Available network adapters:
                 Local Area Connection
 
@@ -978,7 +979,7 @@ OSD Output Options
     Example:
         .. code-block:: bash
 
-            mame64 asteroid -output console
+            mame asteroid -output console
             led0 = 1
             led0 = 0
             ...
@@ -1021,7 +1022,7 @@ Configuration Options
     Example:
         .. code-block:: bash
 
-            mame64 apple2ee -noreadconfig -sl6 diskii -sl7 cffa2 -hard1 TotalReplay.2mg
+            mame apple2ee -noreadconfig -sl6 diskii -sl7 cffa2 -hard1 TotalReplay.2mg
 
 
 Core Search Path Options
@@ -1038,7 +1039,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -homepath c:\mame\lua
+            mame -homepath c:\mame\lua
 
 .. _mame-commandline-rompath:
 
@@ -1053,7 +1054,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -rompath c:\mame\roms;c:\roms\another
+            mame -rompath c:\mame\roms;c:\roms\another
 
 .. _mame-commandline-hashpath:
 
@@ -1068,7 +1069,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -hashpath c:\mame\hash;c:\roms\softlists
+            mame -hashpath c:\mame\hash;c:\roms\softlists
 
 .. _mame-commandline-samplepath:
 
@@ -1083,11 +1084,11 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -samplepath c:\mame\samples;c:\roms\samples
+            mame -samplepath c:\mame\samples;c:\roms\samples
 
 .. _mame-commandline-artpath:
 
-**-artpath** *<path>* *<path>*
+**-artpath** *<path>*
 
     Specifies one or more paths within which to find external layout and artwork
     files.  Multiple paths can be specified by separating them with semicolons.
@@ -1098,14 +1099,15 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -artpath c:\mame\artwork;c:\emu\shared-artwork
+            mame -artpath c:\mame\artwork;c:\emu\shared-artwork
 
 .. _mame-commandline-ctrlrpath:
 
 **-ctrlrpath** *<path>*
 
-    Specifies one or more paths within which to find default input configuration
+    Specifies one or more paths within which to find controller configuration
     files.  Multiple paths can be specified by separating them with semicolons.
+    Used in conjunction with the ``-ctrlr`` option.
 
     The default is ``ctrlr`` (that is, a directory ``ctrlr`` in the current
     working directory).
@@ -1113,7 +1115,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
+            mame -ctrlrpath c:\mame\ctrlr;c:\emu\controllers
 
 .. _mame-commandline-inipath:
 
@@ -1142,7 +1144,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -inipath c:\users\thisuser\documents\mameini
+            mame -inipath c:\users\thisuser\documents\mameini
 
 .. _mame-commandline-fontpath:
 
@@ -1157,7 +1159,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -fontpath c:\mame\;c:\emu\artwork\mamefonts
+            mame -fontpath c:\mame\;c:\emu\artwork\mamefonts
 
 .. _mame-commandline-cheatpath:
 
@@ -1172,7 +1174,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -cheatpath c:\mame\cheat;c:\emu\cheats
+            mame -cheatpath c:\mame\cheat;c:\emu\cheats
 
 .. _mame-commandline-crosshairpath:
 
@@ -1187,7 +1189,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
+            mame -crosshairpath c:\mame\crsshair;c:\emu\artwork\crosshairs
 
 .. _mame-commandline-pluginspath:
 
@@ -1201,7 +1203,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -pluginspath c:\mame\plugins;c:\emu\lua
+            mame -pluginspath c:\mame\plugins;c:\emu\lua
 
 .. _mame-commandline-languagepath:
 
@@ -1216,7 +1218,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -languagepath c:\mame\language;c:\emu\mame-languages
+            mame -languagepath c:\mame\language;c:\emu\mame-languages
 
 .. _mame-commandline-swpath:
 
@@ -1230,7 +1232,7 @@ Core Search Path Options
     Example:
         .. code-block:: bash
 
-            mame64 -swpath c:\mame\software;c:\emu\mydisks
+            mame -swpath c:\mame\software;c:\emu\mydisks
 
 
 Core Output Directory Options
@@ -1253,7 +1255,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -cfg_directory c:\mame\cfg
+            mame -cfg_directory c:\mame\cfg
 
 .. _mame-commandline-nvramdirectory:
 
@@ -1271,7 +1273,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -nvram_directory c:\mame\nvram
+            mame -nvram_directory c:\mame\nvram
 
 .. _mame-commandline-inputdirectory:
 
@@ -1288,7 +1290,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -input_directory c:\mame\inp
+            mame -input_directory c:\mame\inp
 
 .. _mame-commandline-statedirectory:
 
@@ -1305,7 +1307,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -state_directory c:\mame\sta
+            mame -state_directory c:\mame\sta
 
 .. _mame-commandline-snapshotdirectory:
 
@@ -1321,7 +1323,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -snapshot_directory c:\mame\snap
+            mame -snapshot_directory c:\mame\snap
 
 .. _mame-commandline-diffdirectory:
 
@@ -1340,7 +1342,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -diff_directory c:\mame\diff
+            mame -diff_directory c:\mame\diff
 
 .. _mame-commandline-commentdirectory:
 
@@ -1357,7 +1359,7 @@ Core Output Directory Options
     Example:
         .. code-block:: bash
 
-            mame64 -comment_directory c:\mame\comments
+            mame -comment_directory c:\mame\comments
 
 
 Core State/Playback Options
@@ -1382,7 +1384,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 -norewind
+            mame -norewind
 
 .. _mame-commandline-rewindcapacity:
 
@@ -1397,7 +1399,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 -rewind_capacity 30
+            mame -rewind_capacity 30
 
 .. _mame-commandline-state:
 
@@ -1409,7 +1411,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 -state 1
+            mame -state 1
 
 .. _mame-commandline-noautosave:
 
@@ -1425,7 +1427,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 -autosave
+            mame -autosave
 
 .. _mame-commandline-playback:
 
@@ -1440,7 +1442,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -playback worldrecord
+            mame pacman -playback worldrecord
 
 .. Tip:: You may experience desync in playback if the configuration, NVRAM, and
          memory card files don't match the original; this is why it is suggested
@@ -1460,7 +1462,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -playback worldrecord -exit_after_playback
+            mame pacman -playback worldrecord -exit_after_playback
 
 .. _mame-commandline-record:
 
@@ -1475,28 +1477,12 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -record worldrecord
+            mame pacman -record worldrecord
 
 .. Tip:: You may experience desync in playback if the configuration, NVRAM, and
          memory card files don't match the original; this is why it is suggested
          you should only record and playback with all configuration (.cfg),
          NVRAM (.nv), and memory card files deleted.
-
-.. _mame-commandline-recordtimecode:
-
-**-record_timecode**
-
-    Tells MAME to create a timecode file. It contains a line with elapsed times
-    on each press of timecode shortcut key (default is **F12**).  This option
-    works only when recording mode is enabled (**-record** option).  The
-    timecode file is saved in the ``inp`` folder.
-
-    By default, no timecode file is saved.
-
-    Example:
-        .. code-block:: bash
-
-            mame64 pacman -record worldrecord -record_timecode
 
 .. _mame-commandline-mngwrite:
 
@@ -1513,7 +1499,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -mngwrite pacman-video
+            mame pacman -mngwrite pacman-video
 
 .. _mame-commandline-aviwrite:
 
@@ -1533,7 +1519,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -playback worldrecord -exit_after_playback -aviwrite worldrecord
+            mame pacman -playback worldrecord -exit_after_playback -aviwrite worldrecord
 
 .. _mame-commandline-wavwrite:
 
@@ -1544,12 +1530,12 @@ Core State/Playback Options
 
     The default is ``NULL`` (no recording).
 
-.. _mame-commandline-snapname:
-
     Example:
         .. code-block:: bash
 
-            mame64 pacman -wavewrite pacsounds
+            mame pacman -wavewrite pacsounds
+
+.. _mame-commandline-snapname:
 
 **-snapname** *<name>*
 
@@ -1574,21 +1560,21 @@ Core State/Playback Options
     Example 1:
         .. code-block:: bash
 
-            mame64 robby -snapname foo\%g%i
+            mame robby -snapname foo\%g%i
 
         Snapshots will be saved as ``snaps\foo\robby0000.png``, ``snaps\foo\robby0001.png`` and so on.
 
     Example 2:
         .. code-block:: bash
 
-            mame64 nes -cart robby -snapname %g\%d_cart
+            mame nes -cart robby -snapname %g\%d_cart
 
         Snapshots will be saved as ``snaps\nes\robby.png``.
 
     Example 3:
         .. code-block:: bash
 
-            mame64 c64 -flop1 robby -snapname %g\%d_flop1/%i
+            mame c64 -flop1 robby -snapname %g\%d_flop1/%i
 
         Snapshots will be saved as ``snaps\c64\robby\0000.png``.
 
@@ -1607,7 +1593,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -snapsize 1920x1080
+            mame pacman -snapsize 1920x1080
 
 .. Tip:: -snapsize does not automatically rotate if the system is vertically
          oriented, so for vertical systems you'll want to swap the width and
@@ -1617,25 +1603,29 @@ Core State/Playback Options
 
 **-snapview** *<viewname>*
 
-    Specifies the view to use when rendering snapshots and movies.
+    Specifies the view to use when rendering snapshots and videos.  The
+    *<viewname>* does not need to be the full name of a view, MAME will choose
+    the first view with a name that has the *<viewname>* as a prefix.  For
+    example **-snapview "screen 0 pixel"** will match the
+    “\ *Screen 0 Pixel Aspect (10:7)*\ ” view.
 
-    By default, both use a special 'internal' view, which renders a separate
-    snapshot per screen or renders movies only of the first screen.  By
-    specifying this option, you can override this default behavior and select a
-    single view that will apply to all snapshots and movies.  Note that
-    <viewname> does not need to be a perfect match; rather, it will select the
-    first view whose name matches all the characters specified by <viewname>.
+    If the *<viewname>* is ``auto`` or an empty string, MAME will select a view
+    based on the number of emulated screens in the system, and the available
+    external and internal artwork.  MAME tries to select a view that shows all
+    emulated screens by default.
 
-    For example, **-snapview native** will match the "Native (15:14)" view even
-    though it is not a perfect match.  <viewname> can also be 'auto', which
-    selects the first view with all screens present.
+    If the *<viewname>* is ``native``, MAME uses special internal view to save a
+    separate snapshot for each visible emulated screen, or to record a video for
+    the first visible screen only.  The snapshot(s) or video will have the same
+    resolution as the emulated screen(s) with no artwork elements drawn or
+    effects applied.
 
-    The default value is ``internal``.
+    The default value is ``auto``.
 
     Example:
         .. code-block:: bash
 
-            mame64 pang -snapview pixel
+            mame wrecking -snapview cocktail
 
 
 .. _mame-commandline-nosnapbilinear:
@@ -1643,14 +1633,14 @@ Core State/Playback Options
 **-[no]snapbilinear**
 
     Specify if the snapshot or movie should have bilinear filtering applied.
-    Shutting this off can improve performance while recording video to a file.
+    Disabling this off can improve performance while recording video to a file.
 
     The default is ON (**-snapbilinear**).
 
     Example:
         .. code-block:: bash
 
-            mame64 pacman -nosnapbilinear
+            mame pacman -nosnapbilinear
 
 .. _mame-commandline-statename:
 
@@ -1673,19 +1663,19 @@ Core State/Playback Options
     Example 1:
         .. code-block:: bash
 
-            mame64 robby -statename foo\%g
+            mame robby -statename foo\%g
             All save states will be stored inside sta\foo\robby\
 
     Example 2:
         .. code-block:: bash
 
-            mame64 nes -cart robby -statename %g/%d_cart
+            mame nes -cart robby -statename %g/%d_cart
             All save states will be stored inside sta\nes\robby\
 
     Example 3:
         .. code-block:: bash
 
-            mame64 c64 -flop1 robby -statename %g/%d_flop1
+            mame c64 -flop1 robby -statename %g/%d_flop1
             All save states will be stored inside sta\c64\robby\
 
 .. Tip:: Note that even on Microsoft Windows, you should use ``/`` as your
@@ -1713,7 +1703,7 @@ Core State/Playback Options
     Example:
         .. code-block:: bash
 
-            mame64 neogeo -burnin
+            mame neogeo -burnin
 
 
 Core Performance Options
@@ -1732,7 +1722,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius4 -autoframeskip
+            mame gradius4 -autoframeskip
 
 .. _mame-commandline-frameskip:
 
@@ -1749,7 +1739,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius4 -frameskip 2
+            mame gradius4 -frameskip 2
 
 .. _mame-commandline-secondstorun:
 
@@ -1760,13 +1750,13 @@ Core Performance Options
     benchmarking and automated testing.  By combining this with a fixed set of
     other command line options, you can set up a consistent environment for
     benchmarking MAME's emulation performance.  In addition, upon exit, the
-    **-str** option will write a screenshot called ``final.png`` to the system's
-    snapshot directory.
+    **-str** option will write a screenshot to the system's snapshot directory
+    with the file name determined by the **-snapname** option.
 
     Example:
         .. code-block:: bash
 
-            mame64 pacman -seconds_to_run 60
+            mame pacman -seconds_to_run 60
 
 .. _mame-commandline-nothrottle:
 
@@ -1784,7 +1774,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -nothrottle
+            mame pacman -nothrottle
 
 .. _mame-commandline-nosleep:
 
@@ -1801,7 +1791,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius 4 -nosleep
+            mame gradius 4 -nosleep
 
 .. _mame-commandline-speed:
 
@@ -1820,7 +1810,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -speed 1.25
+            mame pacman -speed 1.25
 
 .. _mame-commandline-norefreshspeed:
 
@@ -1838,7 +1828,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -refreshspeed
+            mame pacman -refreshspeed
 
 .. _mame-commandline-numprocessors:
 
@@ -1854,7 +1844,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius4 -numprocessors 2
+            mame gradius4 -numprocessors 2
 
 .. _mame-commandline-bench:
 
@@ -1868,7 +1858,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius4 -bench 300
+            mame gradius4 -bench 300
 
 .. _mame-commandline-lowlatency:
 
@@ -1885,7 +1875,7 @@ Core Performance Options
     Example:
         .. code-block:: bash
 
-            mame64 bgaregga -lowlatency
+            mame bgaregga -lowlatency
 
 
 Core Rotation Options
@@ -1906,7 +1896,7 @@ Core Rotation Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -norotate
+            mame pacman -norotate
 
 .. _mame-commandline-noror:
 
@@ -1926,12 +1916,12 @@ Core Rotation Options
     Example 1:
         .. code-block:: bash
 
-            mame64 pacman -ror
+            mame pacman -ror
 
     Example 2:
         .. code-block:: bash
 
-            mame64 pacman -rol
+            mame pacman -rol
 
 
 .. _mame-commandline-noautoror:
@@ -1952,12 +1942,12 @@ Core Rotation Options
     Example 1:
         .. code-block:: bash
 
-            mame64 pacman -autoror
+            mame pacman -autoror
 
     Example 2:
         .. code-block:: bash
 
-            mame64 pacman -autorol
+            mame pacman -autorol
 
 .. Tip:: If you have a display that can be rotated, **-autorol** or
          **-autoror** will allow you to get a larger display for both horizontal
@@ -1980,12 +1970,12 @@ Core Rotation Options
     Example 1:
         .. code-block:: bash
 
-            mame64 -flipx pacman
+            mame -flipx pacman
 
     Example 2:
         .. code-block:: bash
 
-            mame64 -flipy suprmrio
+            mame -flipy suprmrio
 
 
 Core Video Options
@@ -2033,7 +2023,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius3 -video bgfx
+            mame gradius3 -video bgfx
 
 .. _mame-commandline-numscreens:
 
@@ -2052,12 +2042,12 @@ Core Video Options
     Example 1:
         .. code-block:: bash
 
-            mame64 darius -numscreens 3
+            mame darius -numscreens 3
 
     Example 2:
         .. code-block:: bash
 
-            mame64 pc_cntra -numscreens 2
+            mame pc_cntra -numscreens 2
 
 .. _mame-commandline-window:
 
@@ -2070,7 +2060,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 coco3 -window
+            mame coco3 -window
 
 .. _mame-commandline-maximize:
 
@@ -2088,7 +2078,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 apple2e -window -nomaximize
+            mame apple2e -window -nomaximize
 
 .. _mame-commandline-keepaspect:
 
@@ -2123,7 +2113,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 sf2ua -nokeepaspect
+            mame sf2ua -nokeepaspect
 
 .. _mame-commandline-waitvsync:
 
@@ -2162,7 +2152,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 gradius2 -waitvsync
+            mame gradius2 -waitvsync
 
 .. _mame-commandline-syncrefresh:
 
@@ -2184,7 +2174,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 mk -syncrefresh
+            mame mk -syncrefresh
 
 **-prescale** *<amount>*
 
@@ -2203,7 +2193,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -video d3d -prescale 3
+            mame pacman -video d3d -prescale 3
 
 .. _mame-commandline-filter:
 
@@ -2225,7 +2215,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -nofilter
+            mame pacman -nofilter
 
 .. _mame-commandline-unevenstretch:
 
@@ -2239,7 +2229,7 @@ Core Video Options
     Example:
         .. code-block:: bash
 
-            mame64 dkong -nounevenstretch
+            mame dkong -nounevenstretch
 
 
 Core Full Screen Options
@@ -2264,7 +2254,7 @@ Core Full Screen Options
     Example:
         .. code-block:: bash
 
-            mame64 kof97 -video d3d -switchres -resolution 1280x1024
+            mame kof97 -video d3d -switchres -resolution 1280x1024
 
 
 Core Per-Window Options
@@ -2301,12 +2291,12 @@ Core Per-Window Options
     Example 1:
         .. code-block:: bash
 
-            mame64 pc_cntra -numscreens 2 -screen0 \\.\DISPLAY1 -screen1 \\.\DISPLAY2
+            mame pc_cntra -numscreens 2 -screen0 \\.\DISPLAY1 -screen1 \\.\DISPLAY2
 
     Example 2:
         .. code-block:: bash
 
-            mame64 darius -numscreens 3 -screen0 \\.\DISPLAY1 -screen1 \\.\DISPLAY3 -screen2 \\.\DISPLAY2
+            mame darius -numscreens 3 -screen0 \\.\DISPLAY1 -screen1 \\.\DISPLAY3 -screen2 \\.\DISPLAY2
 
 .. Tip:: Using **-verbose** will tell you which displays you have on your
          system, where they are connected, and what their current resolutions
@@ -2345,12 +2335,12 @@ Core Per-Window Options
     Example 1:
         .. code-block:: bash
 
-            mame64 contra -aspect 16:9
+            mame contra -aspect 16:9
 
     Example 2:
         .. code-block:: bash
 
-            mame64 pc_cntra -numscreens 2 -aspect0 16:9 -aspect1 5:4
+            mame pc_cntra -numscreens 2 -aspect0 16:9 -aspect1 5:4
 
 
 .. _mame-commandline-resolution:
@@ -2388,7 +2378,7 @@ Core Per-Window Options
     Example:
         .. code-block:: bash
 
-            mame64 pc_cntra -numscreens 2 -resolution0 1920x1080 -resolution1 1280x1024
+            mame pc_cntra -numscreens 2 -resolution0 1920x1080 -resolution1 1280x1024
 
 .. _mame-commandline-view:
 
@@ -2402,23 +2392,34 @@ Core Per-Window Options
 
 **-view3** *<viewname>*
 
-    Specifies the initial view setting for each window.  The *<viewname>* does
-    not need to be a perfect match; rather, it will select the first view whose
-    name matches all the characters specified by *<viewname>*.  For example,
-    **-view native** will match the "*Native (15:14)*" view even though it is
-    not a perfect match.  The value ``auto`` is also supported, and requests
-    that MAME perform a default selection.
+    Specifies the initial view setting for each window/screen.  The *<viewname>*
+    does not need to be the full name of a view, MAME will choose the first view
+    with a name that has the *<viewname>* as a prefix.  For example
+    **-view "screen 0 pixel"** will match the
+    “\ *Screen 0 Pixel Aspect (10:7)*\ ” view.
+
+    If the *<viewname>* is ``auto`` or an empty string, MAME will select views
+    based on the number of emulated screens in the system, the number of
+    windows/screens MAME is using, and the available external and internal
+    artwork.  MAME tries to select views so that all emulated screens are
+    visible by default.
 
     The default value for these options is ``auto``.
 
     The **-view0**, **-view1**, **-view2**, **-view3** parameters apply to the
-    specific window.  The **-view** parameter applies to all windows. The
-    window-specific options override values from the all window option.
+    specific window.  The **-view** parameter applies to all windows.  The
+    window-specific options override values from the all windows option.
+
+    Note that view settings saved in the configuration file for the machine take
+    precedence over the initial view settings.  If you change the selected views
+    in the Video Options menu, this will be saved in the configuration file for
+    the machine and take precedence over any initial views specified in INI
+    files or on the command line.
 
     Example:
         .. code-block:: bash
 
-            mame64 contra -view native
+            mame contra -view native
 
 
 Core Artwork Options
@@ -2438,7 +2439,7 @@ Core Artwork Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -artwork_crop
+            mame pacman -artwork_crop
 
 .. Tip:: **-artwork_crop** is great for widescreen displays. You will get a
          full-sized system display and the artwork will fill the empty space on
@@ -2455,7 +2456,7 @@ Core Artwork Options
     Example:
         .. code-block:: bash
 
-            mame64 coco -fallback_artwork suprmrio
+            mame coco -fallback_artwork suprmrio
 
 .. Tip:: You can use **fallback_artwork <artwork name>** in
          ``horizontal.ini`` and ``vertical.ini`` to specify different
@@ -2471,7 +2472,7 @@ Core Artwork Options
     Example:
         .. code-block:: bash
 
-            mame64 galaga -override_artwork puckman
+            mame galaga -override_artwork puckman
 
 
 Core Screen Options
@@ -2492,7 +2493,7 @@ Core Screen Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -brightness 0.5
+            mame pacman -brightness 0.5
 
 .. _mame-commandline-contrast:
 
@@ -2509,7 +2510,7 @@ Core Screen Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -contrast 0.5
+            mame pacman -contrast 0.5
 
 .. _mame-commandline-gamma:
 
@@ -2529,7 +2530,7 @@ Core Screen Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -gamma 0.8
+            mame pacman -gamma 0.8
 
 .. _mame-commandline-pausebrightness:
 
@@ -2542,7 +2543,7 @@ Core Screen Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -pause_brightness 0.33
+            mame pacman -pause_brightness 0.33
 
 .. _mame-commandline-effect:
 
@@ -2565,7 +2566,7 @@ Core Screen Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -effect scanlines
+            mame pacman -effect scanlines
 
 
 Core Vector Options
@@ -2583,7 +2584,7 @@ Core Vector Options
     Example:
         .. code-block:: bash
 
-            mame64 asteroid -beam_width_min 0.1
+            mame asteroid -beam_width_min 0.1
 
 .. _mame-commandline-beamwidthmax:
 
@@ -2597,7 +2598,7 @@ Core Vector Options
     Example:
         .. code-block:: bash
 
-            mame64 asteroid -beam_width_max 2
+            mame asteroid -beam_width_max 2
 
 .. _mame-commandline-beamintensityweight:
 
@@ -2613,7 +2614,7 @@ Core Vector Options
     Example:
         .. code-block:: bash
 
-            mame64 asteroid -beam_intensity_weight 0.5
+            mame asteroid -beam_intensity_weight 0.5
 
 .. _mame-commandline-beamdotsize:
 
@@ -2630,7 +2631,7 @@ Core Vector Options
     Example:
         .. code-block:: bash
 
-            mame64 asteroid -beam_dot_size 2
+            mame asteroid -beam_dot_size 2
 
 .. _mame-commandline-flicker:
 
@@ -2645,7 +2646,7 @@ Core Vector Options
     Example:
         .. code-block:: bash
 
-            mame64 asteroid -flicker 0.15
+            mame asteroid -flicker 0.15
 
 
 Core Video OpenGL Debugging Options
@@ -2706,7 +2707,7 @@ Core Video OpenGL GLSL Options
     Example:
         .. code-block:: bash
 
-            mame64 galaxian -gl_glsl
+            mame galaxian -gl_glsl
 
 .. _mame-commandline-glglslfilter:
 
@@ -2722,7 +2723,7 @@ Core Video OpenGL GLSL Options
     Example:
         .. code-block:: bash
 
-            mame64 galaxian -gl_glsl -gl_glsl_filter 0
+            mame galaxian -gl_glsl -gl_glsl_filter 0
 
 .. _mame-commandline-glslshadermame:
 
@@ -2741,7 +2742,7 @@ Core Video OpenGL GLSL Options
     Example:
         .. code-block:: bash
 
-            mame64 suprmrio -gl_glsl -glsl_shader_mame0 NTSC/NTSC_chain -glsl_shader_mame1 CRT-geom/CRT-geom
+            mame suprmrio -gl_glsl -glsl_shader_mame0 NTSC/NTSC_chain -glsl_shader_mame1 CRT-geom/CRT-geom
 
 .. _mame-commandline-glslshaderscreen:
 
@@ -2761,7 +2762,7 @@ Core Video OpenGL GLSL Options
     Example:
         .. code-block:: bash
 
-            mame64 suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
+            mame suprmrio -gl_glsl -glsl_shader_screen0 gaussx -glsl_shader_screen1 gaussy -glsl_shader_screen2 CRT-geom-halation
 
 
 .. _mame-commandline-glglslvidattr:
@@ -2776,7 +2777,7 @@ Core Video OpenGL GLSL Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -gl_glsl -gl_glsl_vid_attr off
+            mame pacman -gl_glsl -gl_glsl_vid_attr off
 
 Core Sound Options
 ------------------
@@ -2794,7 +2795,7 @@ Core Sound Options
     Example:
         .. code-block:: bash
 
-            mame64 galaga -samplerate 44100
+            mame galaga -samplerate 44100
 
 .. _mame-commandline-nosamples:
 
@@ -2807,7 +2808,21 @@ Core Sound Options
     Example:
         .. code-block:: bash
 
-            mame64 qbert -nosamples
+            mame qbert -nosamples
+
+.. _mame-commandline-nocompressor:
+
+**-[no]compressor**
+
+    Enable audio compressor. It temporarily reduces the overall volume when
+    the audio output is overdriven.
+
+    The default is ON (**-compressor**).
+
+    Example:
+        .. code-block:: bash
+
+            mame popeye -nocompressor
 
 .. _mame-commandline-volume:
 
@@ -2822,7 +2837,7 @@ Core Sound Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -volume -30
+            mame pacman -volume -30
 
 .. _mame-commandline-sound:
 
@@ -2845,7 +2860,7 @@ Core Sound Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -sound portaudio
+            mame pacman -sound portaudio
 
 .. list-table:: Supported sound subsystems per-platform
     :header-rows: 0
@@ -2898,7 +2913,7 @@ Core Sound Options
     Example:
         .. code-block:: bash
 
-            mame64 galaga -audio_latency 1
+            mame galaga -audio_latency 1
 
 
 Core Input Options
@@ -2921,22 +2936,24 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 suprmrio -coin_lockout
+            mame suprmrio -coin_lockout
 
 .. _mame-commandline-ctrlr:
 
 **-ctrlr** *<controller>*
 
-    Enables support for special controllers. Configuration files are loaded from
-    the ctrlrpath.  They are in the same format as the .cfg files that are
-    saved, but only control configuration data is read from the file.
+    Specifies a controller configuration file, typically used to set more
+    suitable default input assignments for special controllers. Directories
+    specified using the ``ctrlrpath`` option are searched.  Controller
+    configuration files use a similar format to ``.cfg`` used to save system
+    settings. See :ref:`ctrlrcfg` for more details.
 
-    The default is ``NULL`` (no controller file).
+    The default is ``NULL`` (no controller configuration file).
 
     Example:
         .. code-block:: bash
 
-            mame64 dkong -ctrlr xarcade
+            mame dkong -ctrlr xarcade
 
 .. _mame-commandline-nomouse:
 
@@ -2951,7 +2968,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 centiped -mouse
+            mame centiped -mouse
 
 .. _mame-commandline-nojoystick:
 
@@ -2967,7 +2984,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 mappy -joystick
+            mame mappy -joystick
 
 .. _mame-commandline-nolightgun:
 
@@ -2982,7 +2999,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 lethalen -lightgun
+            mame lethalen -lightgun
 
 .. _mame-commandline-nomultikeyboard:
 
@@ -3000,7 +3017,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 sf2ceua -multikey
+            mame sf2ceua -multikey
 
 .. _mame-commandline-nomultimouse:
 
@@ -3017,7 +3034,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 warlords -multimouse
+            mame warlords -multimouse
 
 .. _mame-commandline-nosteadykey:
 
@@ -3035,7 +3052,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 sf2ua -steadykey
+            mame sf2ua -steadykey
 
 .. _mame-commandline-uiactive:
 
@@ -3048,7 +3065,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 apple2e -ui_active
+            mame apple2e -ui_active
 
 .. _mame-commandline-nooffscreenreload:
 
@@ -3066,7 +3083,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 lethalen -offscreen_reload
+            mame lethalen -offscreen_reload
 
 .. _mame-commandline-joystickmap:
 
@@ -3218,7 +3235,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 sinistar -joystick_deadzone 0.45
+            mame sinistar -joystick_deadzone 0.45
 
 .. _mame-commandline-joysticksaturation:
 
@@ -3235,7 +3252,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 sinistar -joystick_saturation 1.0
+            mame sinistar -joystick_saturation 1.0
 
 .. _mame-commandline-natural:
 
@@ -3269,7 +3286,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 coco2 -natural
+            mame coco2 -natural
 
 .. _mame-commandline-joystickcontradictory:
 
@@ -3283,7 +3300,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 pc_smb -joystick_contradictory
+            mame pc_smb -joystick_contradictory
 
 .. _mame-commandline-coinimpulse:
 
@@ -3297,7 +3314,7 @@ Core Input Options
     Example:
         .. code-block:: bash
 
-            mame64 contra -coin_impulse 1
+            mame contra -coin_impulse 1
 
 
 Core Input Automatic Enable Options
@@ -3345,7 +3362,7 @@ Core Input Automatic Enable Options
     Example:
         .. code-block:: bash
 
-            mame64 sbrkout -paddle_device mouse
+            mame sbrkout -paddle_device mouse
 
 .. Tip:: Note that these controls override the values of **-[no]mouse**,
          **-[no]joystick**, etc.
@@ -3366,7 +3383,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 polepos -verbose
+            mame polepos -verbose
 
 .. Tip:: IMPORTANT: When reporting bugs to MAMEdev, please run with **-verbose**
          and include the resulting information.
@@ -3388,7 +3405,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 mappy -oslog
+            mame mappy -oslog
 
 .. _mame-commandline-log:
 
@@ -3403,27 +3420,62 @@ Debugging Options
     Example 1:
         .. code-block:: bash
 
-            mame64 qbert -log
+            mame qbert -log
 
     Example 2:
         .. code-block:: bash
 
-            mame64 qbert -oslog -log
+            mame qbert -oslog -log
 
 .. _mame-commandline-debug:
 
 **-[no]debug**
 
-    Activates the integrated debugger.  By default, the debugger is entered by
-    pressing the tilde (**~**) key during emulation. It is also entered
-    immediately at startup.
+    Activates the integrated debugger.  By default, pressing the backtick/tilde
+    (**~**) key during emulation breaks into the debugger.  MAME also breaks
+    into the debugger after the initial soft reset on startup if the debugger is
+    active.  See :ref:`debugger` for information on using the debugger.
 
     The default is OFF (**-nodebug**).
 
     Example:
         .. code-block:: bash
 
-            mame64 indy_4610 -debug
+            mame indy_4610 -debug
+
+.. _mame-commandline-debugger:
+
+**-debugger** *<module>*
+
+    Chooses the module to use for debugging the target system when the
+    :ref:`debug <mame-commandline-debug>` option is on.  Available debugger
+    modules depend on the host platform and build options.
+
+    Supported debugger modules:
+
+    windows
+        Win32 GUI debugger (default on Windows).  Only supported on Windows.
+    qt
+        Qt GUI debugger (default on Linux).  Supported on Windows, Linux and
+        macOS, but only included on Linux by default.  Set ``USE_QTDEBUG=1``
+        when compiling MAME to include the Qt debugger on Windows or macOS.
+    osx
+        Cocoa GUI debugger (default on macOS).  Only supported on macOS.
+    imgui
+        ImgUi GUI debugger displayed in first MAME window.  Requires
+        :ref:`video <mame-commandline-video>` option to be set to **bgfx**.
+        Supported on all platforms with BGFX video output support.
+    gdbstub
+        Acts as a remote debugging server for the GNU debugger (GDB).  Only a
+        small subset of the CPUs emulated by MAME are supported.  Use the
+        :ref:`debugger_port <mame-commandline-debuggerport>` option to set the
+        listening port on the loopback interface.  Supported on all platforms
+        with TCP socket support.
+
+    Example:
+        .. code-block:: bash
+
+            mame ambush -debug -debugger qt
 
 .. _mame-commandline-debugscript:
 
@@ -3437,7 +3489,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 galaga -debugscript testscript.txt
+            mame galaga -debug -debugscript testscript.txt
 
 .. _mame-commandline-updateinpause:
 
@@ -3452,7 +3504,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 indy_4610 -update_in_pause
+            mame indy_4610 -update_in_pause
 
 .. _mame-commandline-watchdog:
 
@@ -3470,7 +3522,22 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 ibm_5150 -watchdog 30
+            mame ibm_5150 -watchdog 30
+
+.. _mame-commandline-debuggerport:
+
+**-debugger_port** *<port>*
+
+    Set the TCP port number to listen on for GDB connections when using the GDB
+    stub debugger module (see the :ref:`debugger <mame-commandline-debugger>`
+    option).
+
+    The default is ``23946``.
+
+    Example:
+        .. code-block:: bash
+
+            mame rfjet -debug -debugger gdbstub -debugger_port 2159
 
 .. _mame-commandline-debuggerfont:
 
@@ -3485,7 +3552,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 marble -debug -debugger_font "Comic Sans MS"
+            mame marble -debug -debugger_font "Comic Sans MS"
 
 .. _mame-commandline-debuggerfontsize:
 
@@ -3500,7 +3567,7 @@ Debugging Options
     Example:
         .. code-block:: bash
 
-            mame64 marble -debug -debugger_font "Comic Sans MS" -debugger_font_size 16
+            mame marble -debug -debugger_font "Comic Sans MS" -debugger_font_size 16
 
 
 Core Communication Options
@@ -3519,7 +3586,7 @@ Core Communication Options
     Example:
         .. code-block:: bash
 
-            mame64 arescue -comm_localhost 192.168.1.2
+            mame arescue -comm_localhost 192.168.1.2
 
 .. _mame-commandline-commlocalport:
 
@@ -3533,7 +3600,7 @@ Core Communication Options
     Example:
         .. code-block:: bash
 
-            mame64 arescue -comm_localhost 192.168.1.2 -comm_localport 30100
+            mame arescue -comm_localhost 192.168.1.2 -comm_localport 30100
 
 .. _mame-commandline-commremotehost:
 
@@ -3548,7 +3615,7 @@ Core Communication Options
     Example:
         .. code-block:: bash
 
-            mame64 arescue -comm_remotehost 192.168.1.2
+            mame arescue -comm_remotehost 192.168.1.2
 
 .. _mame-commandline-commremoteport:
 
@@ -3562,7 +3629,7 @@ Core Communication Options
     Example:
         .. code-block:: bash
 
-            mame64 arescue -comm_remotehost 192.168.1.2 -comm_remoteport 30100
+            mame arescue -comm_remotehost 192.168.1.2 -comm_remoteport 30100
 
 .. _mame-commandline-commframesync:
 
@@ -3575,7 +3642,7 @@ Core Communication Options
     Example:
         .. code-block:: bash
 
-            mame64 arescue -comm_remotehost 192.168.1.3 -comm_remoteport 30100 -comm_framesync
+            mame arescue -comm_remotehost 192.168.1.3 -comm_remoteport 30100 -comm_framesync
 
 
 Core Misc Options
@@ -3592,7 +3659,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 ironfort -nodrc
+            mame ironfort -nodrc
 
 .. _mame-commandline-drcusec:
 
@@ -3605,7 +3672,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 ironfort -drc_use_c
+            mame ironfort -drc_use_c
 
 .. _mame-commandline-drcloguml:
 
@@ -3618,7 +3685,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 ironfort -drc_log_uml
+            mame ironfort -drc_log_uml
 
 .. _mame-commandline-drclognative:
 
@@ -3631,7 +3698,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 ironfort -drc_log_native
+            mame ironfort -drc_log_native
 
 .. _mame-commandline-bios:
 
@@ -3646,7 +3713,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 mslug -bios unibios33
+            mame mslug -bios unibios33
 
 .. _mame-commandline-cheat:
 
@@ -3664,7 +3731,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 dkong -cheat
+            mame dkong -cheat
 
 .. _mame-commandline-skipgameinfo:
 
@@ -3677,7 +3744,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 samsho5 -skip_gameinfo
+            mame samsho5 -skip_gameinfo
 
 .. _mame-commandline-uifont:
 
@@ -3693,7 +3760,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 -uifont "Comic Sans MS"
+            mame -uifont "Comic Sans MS"
 
 .. _mame-commandline-ui:
 
@@ -3706,7 +3773,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 -ui simple
+            mame -ui simple
 
 .. _mame-commandline-ramsize:
 
@@ -3717,7 +3784,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 coco -ramsize 16K
+            mame coco -ramsize 16K
 
 .. _mame-commandline-confirmquit:
 
@@ -3731,7 +3798,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 pacman -confirm_quit
+            mame pacman -confirm_quit
 
 .. _mame-commandline-uimouse:
 
@@ -3746,7 +3813,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 -ui_mouse
+            mame -ui_mouse
 
 **-language** *<language>*
 
@@ -3755,7 +3822,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 -language Japanese
+            mame -language Japanese
 
 .. _mame-commandline-nvramsave:
 
@@ -3771,7 +3838,7 @@ Core Misc Options
     Example:
         .. code-block:: bash
 
-            mame64 galaga88 -nonvram_save
+            mame galaga88 -nonvram_save
 
 
 Scripting Options
@@ -3790,7 +3857,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 c64 -autoboot_delay 5 -autoboot_command "load """$""",8,1\n"
+            mame c64 -autoboot_delay 5 -autoboot_command "load """$""",8,1\n"
 
 .. _mame-commandline-autobootdelay:
 
@@ -3801,7 +3868,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 c64 -autoboot_delay 5 -autoboot_command "load """$""",8,1\n"
+            mame c64 -autoboot_delay 5 -autoboot_command "load """$""",8,1\n"
 
 .. _mame-commandline-autobootscript:
 
@@ -3812,7 +3879,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 ibm5150 -autoboot_script myscript.lua
+            mame ibm5150 -autoboot_script myscript.lua
 
 .. _mame-commandline-console:
 
@@ -3825,7 +3892,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 ibm5150 -console
+            mame ibm5150 -console
 
 .. _mame-commandline-plugins:
 
@@ -3838,7 +3905,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 apple2e -plugins
+            mame apple2e -plugins
 
 .. _mame-commandline-plugin:
 
@@ -3849,7 +3916,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 alcon -plugin cheat,discord,autofire
+            mame alcon -plugin cheat,discord,autofire
 
 .. _mame-commandline-noplugin:
 
@@ -3860,7 +3927,7 @@ Scripting Options
     Example:
         .. code-block:: bash
 
-            mame64 alcon -noplugin cheat
+            mame alcon -noplugin cheat
 
 
 HTTP Server Options
@@ -3876,11 +3943,11 @@ HTTP Server Options
     Example:
         .. code-block:: bash
 
-            mame64 -http
+            mame -http
 
 .. _mame-commandline-httpport:
 
-**-http_port** *[port]*
+**-http_port** *<port>*
 
     Choose HTTP server port.
 
@@ -3889,11 +3956,11 @@ HTTP Server Options
     Example:
         .. code-block:: bash
 
-            mame64 apple2 -http -http_port 6502
+            mame apple2 -http -http_port 6502
 
 .. _mame-commandline-httproot:
 
-**-http_root** *[rootfolder]*
+**-http_root** *<rootfolder>*
 
     Choose HTTP server document root.
 
@@ -3902,7 +3969,7 @@ HTTP Server Options
     Example:
         .. code-block:: bash
 
-            mame64 apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
+            mame apple2 -http -http_port 6502 -http_root c:\users\me\appleweb\root
 
 
 PortAudio Options
@@ -3919,7 +3986,7 @@ PortAudio Options
     Example 1:
         .. code-block:: bash
 
-            mame64 -sound portaudio -verbose
+            mame -sound portaudio -verbose
             Attempting load of mame.ini
             ...
             PortAudio: API MME has 20 devices
@@ -3962,7 +4029,7 @@ PortAudio Options
     Example 2:
         .. code-block:: bash
 
-            mame64 suprmrio -sound portaudio -pa_api "Windows WASAPI"
+            mame suprmrio -sound portaudio -pa_api "Windows WASAPI"
 
 .. _mame-commandline-pa-device:
 
@@ -3976,7 +4043,7 @@ PortAudio Options
     Example:
         .. code-block:: bash
 
-            mame64 suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
+            mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)"
 
 .. _mame-commandline-pa-latency:
 
@@ -3993,4 +4060,4 @@ PortAudio Options
     Example:
         .. code-block:: bash
 
-            mame64 suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)" -pa_latency 0.20
+            mame suprmrio -sound portaudio -pa_api "Windows WASAPI" -pa_device "NX-EDG27 (NVIDIA High Definition Audio)" -pa_latency 0.20

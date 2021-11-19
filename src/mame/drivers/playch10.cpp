@@ -299,7 +299,6 @@ Notes & Todo:
 #include "machine/rp5h01.h"
 #include "machine/nvram.h"
 
-#include "rendlay.h"
 #include "screen.h"
 #include "speaker.h"
 

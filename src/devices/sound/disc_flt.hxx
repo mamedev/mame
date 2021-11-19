@@ -469,6 +469,7 @@ DISCRETE_RESET(dst_op_amp_filt)
 				m_rTotal = info->r1;
 			else
 				m_rTotal = RES_2_PARALLEL(info->r1, info->r2);
+			[[fallthrough]];
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 		{
 			double fc = 1.0 / (2 * M_PI * sqrt(m_rTotal * info->rF * info->c1 * info->c2));

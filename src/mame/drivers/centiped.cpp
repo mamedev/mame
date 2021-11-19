@@ -448,6 +448,10 @@ void centiped_state::machine_start()
 	save_item(NAME(m_oldpos));
 	save_item(NAME(m_sign));
 	save_item(NAME(m_dsw_select));
+
+	std::fill(std::begin(m_oldpos), std::end(m_oldpos), 0);
+	std::fill(std::begin(m_sign), std::end(m_sign), 0);
+	m_dsw_select = 0;
 }
 
 void multiped_state::machine_start()

@@ -72,13 +72,6 @@
 DEFINE_DEVICE_TYPE(SUNMOUSE_PORT, sun_mouse_port_device, "sunmouse", "Sun Mouse Port")
 
 
-int const device_sun_mouse_port_interface::START_BIT_COUNT;
-int const device_sun_mouse_port_interface::DATA_BIT_COUNT;
-device_serial_interface::parity_t const device_sun_mouse_port_interface::PARITY;
-device_serial_interface::stop_bits_t const device_sun_mouse_port_interface::STOP_BITS;
-int const device_sun_mouse_port_interface::BAUD;
-
-
 
 sun_mouse_port_device::sun_mouse_port_device(
 		machine_config const &mconfig,

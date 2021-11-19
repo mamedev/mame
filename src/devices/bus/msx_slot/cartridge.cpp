@@ -165,7 +165,7 @@ image_init_result msx_slot_cartridge_device::call_load()
 
 			if (fread(m_cartridge->get_rom_base(), length) != length)
 			{
-				seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read file");
+				seterror(image_error::UNSPECIFIED, "Unable to fully read file");
 				return image_init_result::FAIL;
 			}
 
@@ -278,8 +278,6 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 	if (hook.image_file())
 	{
 		const char *slot_string = "nomapper";
-		uint32_t length = hook.image_file()->size();
-		std::vector<uint8_t> rom(length);
 		int type = NOMAPPER;
 
 		// Check if there's some mapper related information in the hashfiles
@@ -323,7 +321,11 @@ std::string msx_slot_cartridge_device::get_default_card_software(get_default_car
 		if (type == NOMAPPER)
 		{
 			// Not identified through hashfile, try automatic detection
-			hook.image_file()->read(&rom[0], length);
+			uint64_t length;
+			hook.image_file()->length(length); // FIXME: check error return, guard against excessively large files
+			std::vector<uint8_t> rom(length);
+			size_t actual;
+			hook.image_file()->read(&rom[0], length, actual); // FIXME: check error return or read returning short
 			type = get_cart_type(&rom[0], length);
 		}
 

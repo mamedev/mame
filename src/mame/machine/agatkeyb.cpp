@@ -250,7 +250,7 @@ bool agat_keyboard_device::translate(u8 code, u16 &translated) const
 	{
 		translated = (code < 0x20) ? code : (ctrl ? (code & 0x1f) : code);
 	}
-//	logerror("code %02x c %d s %d m %d -> %02x\n", code, ctrl, shift, m_meta, translated);
+//  logerror("code %02x c %d s %d m %d -> %02x\n", code, ctrl, shift, m_meta, translated);
 	return true;
 }
 

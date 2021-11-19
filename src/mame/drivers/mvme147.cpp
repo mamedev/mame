@@ -290,8 +290,8 @@ uint32_t mvme147_state::bootvect_r(offs_t offset){
 }
 
 void mvme147_state::bootvect_w(offs_t offset, uint32_t data, uint32_t mem_mask){
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % std::size(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % std::size(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 

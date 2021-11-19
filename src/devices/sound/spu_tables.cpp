@@ -617,7 +617,7 @@ spu_device::reverb_preset spu_device::reverb_presets[]=
 
 float spu_device::get_linear_rate(const int n)
 {
-	static constexpr int num_linear_rates=ARRAY_LENGTH(linear_rate);
+	static constexpr int num_linear_rates=std::size(linear_rate);
 	if (n>=num_linear_rates) return 0.0f;
 	return linear_rate[n]*freq_multiplier;
 }
@@ -630,7 +630,7 @@ float spu_device::get_linear_rate_neg_phase(const int n)
 
 float spu_device::get_pos_exp_rate(const int n)
 {
-	static constexpr int num_pos_exp_rates=ARRAY_LENGTH(pos_exp_rate);
+	static constexpr int num_pos_exp_rates=std::size(pos_exp_rate);
 	if (n>=num_pos_exp_rates) return 0.0f;
 	return pos_exp_rate[n]*freq_multiplier;
 }
@@ -643,7 +643,7 @@ float spu_device::get_pos_exp_rate_neg_phase(const int n)
 
 float spu_device::get_neg_exp_rate(const int n)
 {
-	static constexpr int num_neg_exp_rates=ARRAY_LENGTH(neg_exp_rate);
+	static constexpr int num_neg_exp_rates=std::size(neg_exp_rate);
 	if (n>=num_neg_exp_rates) return 0.0f;
 	return -neg_exp_rate[n]*freq_multiplier;
 }
@@ -666,14 +666,14 @@ float spu_device::get_sustain_level(const int n)
 
 float spu_device::get_linear_release_rate(const int n)
 {
-	static constexpr int num_linear_release_rates=ARRAY_LENGTH(linear_release_rate);
+	static constexpr int num_linear_release_rates=std::size(linear_release_rate);
 	if (n>=num_linear_release_rates) return 0.0f;
 	return linear_release_rate[n]*freq_multiplier;
 }
 
 float spu_device::get_exp_release_rate(const int n)
 {
-	static constexpr int num_exp_release_rates=ARRAY_LENGTH(exp_release_rate);
+	static constexpr int num_exp_release_rates=std::size(exp_release_rate);
 	if (n>=num_exp_release_rates) return 0.0f;
 	return exp_release_rate[n]*freq_multiplier;
 }

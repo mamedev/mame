@@ -5,7 +5,9 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+
 #include "screen.h"
+
 
 /******************************************************************************
  Sprites
@@ -19,8 +21,8 @@
 // bg pri is 2
 // sprite already here is 1 / 3
 
-static inline bool get_flipy(u8 flip) { return BIT(flip, 1); }
-static inline bool get_flipx(u8 flip) { return BIT(flip, 0); }
+static constexpr bool get_flipy(u8 flip) { return BIT(flip, 1); }
+static constexpr bool get_flipx(u8 flip) { return BIT(flip, 0); }
 
 inline void pgm_state::pgm_draw_pix(int xdrawpos, int pri, u16* dest, u8* destpri, const rectangle &cliprect, u16 srcdat)
 {
@@ -74,7 +76,7 @@ inline void pgm_state::pgm_draw_pix_pri(int xdrawpos, u16* dest, u8* destpri, co
 
 inline u8 pgm_state::get_sprite_pix()
 {
-	const u8 srcdat = ((m_adata[m_aoffset & m_adata.mask()] >> m_abit) & 0x1f);
+	const u8 srcdat = ((m_adata[m_aoffset & (m_adata.length() - 1)] >> m_abit) & 0x1f);
 	m_abit += 5; // 5 bit per pixel, 3 pixels in each word; 15 bit used
 	if (m_abit >= 15)
 	{
@@ -97,7 +99,7 @@ void pgm_state::draw_sprite_line(int wide, u16* dest, u8* destpri, const rectang
 
 	for (int xcnt = 0; xcnt < wide; xcnt++)
 	{
-		u16 msk = m_bdata[m_boffset & m_bdata.mask()];
+		u16 msk = m_bdata[m_boffset & (m_bdata.length() - 1)];
 
 		for (int x = 0; x < 16; x++)
 		{
@@ -170,7 +172,7 @@ void pgm_state::draw_sprite_new_zoomed(int wide, int high, int xpos, int ypos, i
 	int ydrawpos;
 	int xcnt = 0;
 
-	m_aoffset = (m_bdata[(m_boffset + 1) & m_bdata.mask()] << 16) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
+	m_aoffset = (m_bdata[(m_boffset + 1) & (m_bdata.length() - 1)] << 16) | (m_bdata[(m_boffset + 0) & (m_bdata.length() - 1)] << 0);
 	m_aoffset = m_aoffset >> 2;
 	m_abit = 0;
 
@@ -328,7 +330,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 	{
 		for (int xcnt = 0; xcnt < wide; xcnt++)
 		{
-			u16 msk = m_bdata[m_boffset & m_bdata.mask()];
+			u16 msk = m_bdata[m_boffset & (m_bdata.length() - 1)];
 
 			for (int x = 0; x < 16; x++)
 			{
@@ -367,7 +369,7 @@ void pgm_state::draw_sprite_line_basic(int wide, u16* dest, u8* destpri, const r
 	{
 		for (int xcnt = 0; xcnt < wide; xcnt++)
 		{
-			u16 msk = m_bdata[m_boffset & m_bdata.mask()];
+			u16 msk = m_bdata[m_boffset & (m_bdata.length() - 1)];
 
 			for (int x = 0; x < 16; x++)
 			{
@@ -413,7 +415,7 @@ void pgm_state::draw_sprite_new_basic(int wide, int high, int xpos, int ypos, in
 {
 	int ydrawpos;
 
-	m_aoffset = (m_bdata[(m_boffset + 1) & m_bdata.mask()] << 16) | (m_bdata[(m_boffset + 0) & m_bdata.mask()] << 0);
+	m_aoffset = (m_bdata[(m_boffset + 1) & (m_bdata.length() - 1)] << 16) | (m_bdata[(m_boffset + 0) & (m_bdata.length() - 1)] << 0);
 	m_aoffset = m_aoffset >> 2;
 	m_abit = 0;
 
@@ -617,6 +619,10 @@ TILE_GET_INFO_MEMBER(pgm_state::get_bg_tile_info)
 
 void pgm_state::video_start()
 {
+	// assumes it can make an address mask with .length() - 1 on these
+	assert(!(m_adata.length() & (m_adata.length() - 1)));
+	assert(!(m_bdata.length() & (m_bdata.length() - 1)));
+
 	m_spritelist = std::make_unique<sprite_t[]>(0xa00/2/5);
 	m_sprite_ptr_pre = m_spritelist.get();
 
