@@ -227,8 +227,8 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 	m_fdc->intrq_wr_callback().set(*this, FUNC(vme_hcpu30_card_device::fdcirq_callback)).invert();
 
 	// FIXME: drive select signals are swapped, handle this
-	FLOPPY_CONNECTOR(config, "floppy:0", hcpu_floppies, "525qd", floppy_image_device::default_floppy_formats);
-	FLOPPY_CONNECTOR(config, "floppy:1", hcpu_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "floppy:0", hcpu_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
+	FLOPPY_CONNECTOR(config, "floppy:1", hcpu_floppies, "525qd", floppy_image_device::default_pc_floppy_formats);
 
 	RTC62421(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -566,8 +566,6 @@ vme_hcpu30_card_device::vme_hcpu30_card_device(const machine_config &mconfig, co
 void vme_hcpu30_card_device::device_start()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
-
-	set_vme_device();
 
 	m_bus_error_timer = timer_alloc(0);
 }
