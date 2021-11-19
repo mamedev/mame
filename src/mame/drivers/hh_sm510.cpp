@@ -1404,12 +1404,12 @@ public:
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
+	void gnw_mmouse(machine_config &config);
+	void gnw_egg(machine_config &config);
+	void nupogodi(machine_config &config);
 	void exospace(machine_config &config);
 	void fowling(machine_config &config);
-	void mnkgoalkeep(machine_config &config);
-	void nupogodi(machine_config &config);
-	void gnw_egg(machine_config &config);
-	void gnw_mmouse(machine_config &config);
+	void monkeygk(machine_config &config);
 };
 
 // config
@@ -1471,7 +1471,7 @@ void gnw_mmouse_state::fowling(machine_config &config)
 	kb1013vk12_common(config, 1632, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::mnkgoalkeep(machine_config &config)
+void gnw_mmouse_state::monkeygk(machine_config &config)
 {
 	kb1013vk12_common(config, 1655, 1080); // R mask option ?
 }
@@ -1518,12 +1518,12 @@ ROM_START( fowling )
 	ROM_LOAD( "fowling.svg", 0, 116145, CRC(258fb5e6) SHA1(77e597e36a84a75eee6b4e32ffedecb808c582b8) )
 ROM_END
 
-ROM_START( mnkgoalkeep )
+ROM_START( monkeygk )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-22.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 148724, "screen", 0)
-	ROM_LOAD( "mnkgoalkeep.svg", 0, 148724, CRC(4a348f5d) SHA1(a667b985f1a59c233fee717ca0f9544a015a9e29) )
+	ROM_REGION( 131901, "screen", 0)
+	ROM_LOAD( "monkeygk.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
 ROM_END
 
 
@@ -9575,7 +9575,7 @@ CONS( 1981, gnw_egg,      gnw_mmouse,  0, gnw_egg,      gnw_mmouse,   gnw_mmouse
 CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, exospace,     gnw_mmouse,  0, exospace,     exospace,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Explorers of Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, fowling,      gnw_mmouse,  0, fowling,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Fowling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, mnkgoalkeep,  gnw_mmouse,  0, mnkgoalkeep,  gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Monkey Goalkeeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, monkeygk,     gnw_mmouse,  0, monkeygk,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Monkey Goalkeeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
