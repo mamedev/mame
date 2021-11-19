@@ -11312,8 +11312,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This game uses an unemulated punching bag controller -->
-	<software name="exboxing" supported="no">
+	<software name="exboxing" supported="partial">
 		<description>Exciting Boxing (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
@@ -11323,6 +11322,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc1" />
 			<feature name="pcb" value="KONAMI-VRC-1" />
+			<feature name="peripheral" value="konami_airbag" />
 			<dataarea name="prg" size="131072">
 				<rom name="rc250j0p" size="131072" crc="786148b6" sha1="20cba7316cb907d7a6245c598640ce7aca56f30a" offset="00000" />
 			</dataarea>
