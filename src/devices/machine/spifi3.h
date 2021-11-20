@@ -234,7 +234,7 @@ private:
 	void fifoctrl_w(uint32_t data);
 	std::queue<uint32_t> m_even_fifo;
 	std::queue<uint32_t> m_odd_fifo;
-	void clear_queue(std::queue<uint32_t> queue)
+	void clear_queue(std::queue<uint32_t>& queue)
 	{
 		while (!queue.empty())
 		{
@@ -244,22 +244,48 @@ private:
 
 	// spstat
 	const uint32_t SPS_IDLE = 0x00;
-	// const uint32_t SPS_SEL = 0x01;
-	// const uint32_t SPS_ARB = 0x02;
+	// TODO: const uint32_t SPS_SEL = 0x01;
+	// TODO: const uint32_t SPS_ARB = 0x02;
 	// const uint32_t SPS_RESEL = 0x03;
-	// const uint32_t SPS_MSGOUT = 0x04;
-	// const uint32_t SPS_COMMAND = 0x05;
+	const uint32_t SPS_MSGOUT = 0x04;
+	const uint32_t SPS_COMMAND = 0x05;
 	// const uint32_t SPS_DISCON = 0x06;
 	// const uint32_t SPS_NXIN = 0x07;
 	const uint32_t SPS_INTR = 0x08;
 	// const uint32_t SPS_NXOUT = 0x09;
 	// const uint32_t SPS_CCOMP = 0x0a;
 	// const uint32_t SPS_SVPTR = 0x0b;
-	// const uint32_t SPS_STATUS = 0x0c;
-	// const uint32_t SPS_MSGIN = 0x0d;
-	// const uint32_t SPS_DATAOUT = 0x0e;
-	// const uint32_t SPS_DATAIN = 0x0f;
+	const uint32_t SPS_STATUS = 0x0c;
+	const uint32_t SPS_MSGIN = 0x0d;
+	const uint32_t SPS_DATAOUT = 0x0e;
+	const uint32_t SPS_DATAIN = 0x0f;
 	uint32_t spstat_r();
+	uint32_t prcmd_to_spstat(uint32_t cmd)
+	{
+		uint32_t spstat_val = 0;
+		switch (cmd)
+		{
+			case PRC_DATAIN:
+				spstat_val = SPS_DATAIN;
+				break;
+			case PRC_DATAOUT:
+				spstat_val = SPS_DATAOUT;
+				break;
+			case PRC_COMMAND:
+				spstat_val = SPS_COMMAND;
+				break;
+			case PRC_STATUS:
+				spstat_val = SPS_STATUS;
+				break;
+			case PRC_MSGOUT:
+				spstat_val = SPS_MSGOUT;
+				break;
+			case PRC_MSGIN:
+				spstat_val = SPS_MSGIN;
+				break;
+		}
+		return spstat_val;
+	}
 
 	// prstat
 	const uint32_t PRS_IO = 0x08;
@@ -288,7 +314,7 @@ private:
 	// const uint32_t ICOND_SVPTEXP = 0x10;
 	// const uint32_t ICOND_ADATAMIS = 0x20;
 	const uint32_t ICOND_CNTZERO = 0x40;
-	// const uint32_t ICOND_UXPHASEZ = 0x80;
+	const uint32_t ICOND_UXPHASEZ = 0x80;
 	// const uint32_t ICOND_UXPHASENZ = 0x81;
 	// const uint32_t ICOND_NXTREQ = 0xa0;
 	// const uint32_t ICOND_UKMSGZ = 0xc0;
@@ -342,7 +368,8 @@ private:
 		dma_direction result = DMA_NONE;
 		if ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id)
 		{
-			result = (spifi_reg.autodata & ADATA_IN) ? DMA_IN : DMA_OUT;
+			result = (spifi_reg.autodata & ADATA_IN) ? DMA_IN :
+				DMA_OUT;
 		}
 		return result;
 	}

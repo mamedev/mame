@@ -34,22 +34,11 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	enum
-	{
-		LANGUAGE_MENU = 1,
-		SYSNAMES_MENU,
-		FONT_MENU,
-		COLORS_MENU,
-		HIDE_MENU
-	};
-
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
 
 	void find_languages();
 	void find_sysnames();
-
-	static const char *const    HIDE_STATUS[];
 
 	std::function<void ()>      m_handler;
 	std::vector<std::string>    m_languages;
@@ -72,15 +61,6 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	enum
-	{
-		INFOS_SIZE = 1,
-		FONT_SIZE,
-		MUI_FNT,
-		MUI_BOLD,
-		MUI_ITALIC
-	};
-
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
 
@@ -88,15 +68,15 @@ private:
 
 	std::function<void (bool)> m_handler;
 	std::vector<std::pair<std::string, std::string> > m_fonts;
-	const int m_font_min, m_font_max;
+	int const m_font_min, m_font_max;
 	int m_font_size;
-	const float m_info_min, m_info_max;
+	float const m_info_min, m_info_max;
 	float m_info_size;
 	bool m_changed;
 
-	std::uint16_t                                       m_actual;
+	std::uint16_t m_actual;
 #ifdef UI_WINDOWS
-	bool                                                m_bold, m_italic;
+	bool m_bold, m_italic;
 #endif
 
 };

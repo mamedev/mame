@@ -23,6 +23,9 @@ public:
 	menu_keyboard_mode(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_keyboard_mode();
 
+protected:
+	virtual void menu_activated() override;
+
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;

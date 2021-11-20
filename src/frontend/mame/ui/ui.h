@@ -262,7 +262,6 @@ private:
 	static std::string      messagebox_poptext;
 
 	static std::vector<ui::menu_item> slider_list;
-	static slider_state     *slider_current;
 
 	// UI handlers
 	uint32_t handler_ingame(render_container &container);

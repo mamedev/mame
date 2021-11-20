@@ -75,7 +75,6 @@
  *  ~2GB HD image that plays well with the NEWS-OS installer: `chdman createhd -o test.chd -s 2088960000`
  *
  *  Known issues:
- *  - ps has some weird behavior at times, usually random hangs
  *  - At one point, I saw some telnet issues (root would work, one regular user couldn't log in even though `su user` from root also worked).
  *    I haven't been able to reproduce that recently.
  *  - NEWS-OS APbus bootloader doesn't work with DRC enabled (see CPU section above)
@@ -84,10 +83,6 @@
  *     both on real hardware and in emulation)
  *  - NetBSD kernel doesn't work with DRC disabled on the MIPS3 driver.
  *  - SCSI performance seems variable from run to run. Will probably need to do some runtime profiling on that.
- *  - Running a binary multiple times with dbx (debugger) can corrupt the system state (some syscalls start failing, random programs fail to load).
- *    At first, I suspected SCSI issues here because dbx was what triggered the need for the pad workaround.
- *    It could still be that, but "power cycling" the emulated platform, even after using the halt command (which synchronizes disks)
- *    restores the emulated system to a good state, so it might not actually be a SCSI issue (unless it is only a read issue).
  *  - Reboot/halt+boot fails because the ESCC FIFO isn't reset properly. For now, the emulator must be hard reset.
  *    It prints out a message (`esccf0: ai->ai_addr points AProm`) and then tries to allocate and use a different FIFO (which fails)
  *
@@ -99,7 +94,6 @@
  *  - Framebuffer (and remaining kb/ms support)
  *  - APbus expansion slots
  *  - Triage and fix the known issues mentioned above
- *  - Figure out SPIFI3/DMAC3 handshake for pad to eliminate SPIFI workaround
  *  - Save state support
  *
  *  TODO before opening first MR:

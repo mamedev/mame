@@ -31,15 +31,14 @@ const int TMS3203X_IRQ0     = 0;        // IRQ0
 const int TMS3203X_IRQ1     = 1;        // IRQ1
 const int TMS3203X_IRQ2     = 2;        // IRQ2
 const int TMS3203X_IRQ3     = 3;        // IRQ3
-const int TMS3203X_XINT0    = 4;        // serial 0 transmit interrupt
-const int TMS3203X_RINT0    = 5;        // serial 0 receive interrupt
-const int TMS3203X_XINT1    = 6;        // serial 1 transmit interrupt
-const int TMS3203X_RINT1    = 7;        // serial 1 receive interrupt
+const int TMS3203X_XINT0    = 4;        // serial (0) transmit interrupt
+const int TMS3203X_RINT0    = 5;        // serial (0) receive interrupt
+const int TMS3203X_XINT1    = 6;        // serial 1 transmit interrupt (TMS320C30 only)
+const int TMS3203X_RINT1    = 7;        // serial 1 receive interrupt  (TMS320C30 only)
 const int TMS3203X_TINT0    = 8;        // timer 0 interrupt
 const int TMS3203X_TINT1    = 9;        // timer 1 interrupt
-const int TMS3203X_DINT     = 10;       // DMA interrupt
-const int TMS3203X_DINT0    = 10;       // DMA 0 interrupt (32032 only)
-const int TMS3203X_DINT1    = 11;       // DMA 1 interrupt (32032 only)
+const int TMS3203X_DINT0    = 10;       // DMA (0) interrupt
+const int TMS3203X_DINT1    = 11;       // DMA 1 interrupt (TMS320C32 only)
 const int TMS3203X_MCBL     = 12;       // Microcomputer/boot loader mode
 const int TMS3203X_HOLD     = 13;       // Primary bus interface hold signal
 
@@ -138,13 +137,13 @@ public:
 protected:
 	enum
 	{
-		CHIP_TYPE_TMS32030,
-		CHIP_TYPE_TMS32031,
-		CHIP_TYPE_TMS32032
+		CHIP_TYPE_TMS32030, // 'C30
+		CHIP_TYPE_TMS32031, // 'C31/'VC33
+		CHIP_TYPE_TMS32032  // 'C32
 	};
 
 	// construction/destruction
-	tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, address_map_constructor internal_map);
+	tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map);
 	void common_3203x(address_map &map);
 
 	// device-level overrides
@@ -157,6 +156,8 @@ protected:
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual uint32_t execute_input_lines() const noexcept override;
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -184,6 +185,7 @@ protected:
 	void check_irqs();
 	void execute_one();
 	void update_special(int dreg);
+	void burn_cycle(int cycle);
 	bool condition(int which);
 
 	// floating point helpers
@@ -732,7 +734,7 @@ protected:
 
 	// configuration
 	const address_space_config      m_program_config;
-	uint32_t                          m_chip_type;
+	uint32_t                        m_chip_type;
 
 	union int_double
 	{
@@ -742,9 +744,9 @@ protected:
 	};
 
 	// core registers
-	uint32_t              m_pc;
+	uint32_t            m_pc;
 	tmsreg              m_r[36];
-	uint32_t              m_bkmask;
+	uint32_t            m_bkmask;
 
 	// internal peripheral registers
 	enum primary_bus_control_mask : uint32_t
@@ -766,6 +768,7 @@ protected:
 	bool                m_irq_pending;
 	bool                m_is_idling;
 	int                 m_icount;
+	int                 m_clock_per_inst; // clock per instruction cycle
 
 	uint32_t            m_iotemp;
 	memory_access<24, 2, -2, ENDIANNESS_LITTLE>::cache m_cache;
@@ -775,6 +778,7 @@ protected:
 
 	bool                m_mcbl_mode;
 	bool                m_hold_state;
+	bool                m_is_lopower;
 
 	devcb_write8        m_xf0_cb;
 	devcb_write8        m_xf1_cb;
@@ -826,9 +830,21 @@ public:
 };
 
 
+// ======================> tms32033_device
+
+class tms32033_device : public tms3203x_device
+{
+public:
+	// construction/destruction
+	tms32033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void internal_32033(address_map &map);
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(TMS32030, tms32030_device)
 DECLARE_DEVICE_TYPE(TMS32031, tms32031_device)
 DECLARE_DEVICE_TYPE(TMS32032, tms32032_device)
+DECLARE_DEVICE_TYPE(TMS32033, tms32033_device)
 
 #endif // MAME_CPU_TMS32031_TMS32031_H

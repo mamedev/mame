@@ -43,7 +43,7 @@ device_memory_interface::space_config_vector cxd8452aq_device::memory_space_conf
 
 void cxd8452aq_device::map(address_map &map)
 {
-	map(0x00, 0x03).rw(FUNC(cxd8452aq_device::sonic3_r), FUNC(cxd8452aq_device::sonic3_w));
+	map(0x00, 0x03).rw(FUNC(cxd8452aq_device::control_r), FUNC(cxd8452aq_device::control_w));
 	map(0x04, 0x07).lrw32(NAME([this]()
 							   { return m_sonic3_reg.config; }),
 						  NAME([this](uint32_t data)
@@ -90,21 +90,21 @@ void cxd8452aq_device::map(address_map &map)
 	map(0x20, 0x23).rw(FUNC(cxd8452aq_device::tx_count_r), FUNC(cxd8452aq_device::tx_count_w));
 }
 
-uint32_t cxd8452aq_device::sonic3_r(offs_t offset)
+uint32_t cxd8452aq_device::control_r(offs_t offset)
 {
-	return m_sonic3_reg.sonic;
+	return m_sonic3_reg.control;
 }
 
-void cxd8452aq_device::sonic3_w(offs_t offset, uint32_t data)
+void cxd8452aq_device::control_w(offs_t offset, uint32_t data)
 {
-	LOGMASKED(LOG_REGISTERS, "set sonic3.sonic = 0x%x\n", data);
+	LOGMASKED(LOG_REGISTERS, "set sonic3.control = 0x%x\n", data);
 
 	// Clear and reprogram interrupt enable bits
-	m_sonic3_reg.sonic &= ~INT_EN_MASK;
-	m_sonic3_reg.sonic |= data & INT_EN_MASK;
+	m_sonic3_reg.control &= ~INT_EN_MASK;
+	m_sonic3_reg.control |= data & INT_EN_MASK;
 
 	// Clear specified interrupts by getting 0s on interrupt status bits to clear
-	m_sonic3_reg.sonic &= (~INT_CLR_MASK | (data & INT_CLR_MASK));
+	m_sonic3_reg.control &= (~INT_CLR_MASK | (data & INT_CLR_MASK));
 	m_irq_check->adjust(attotime::zero);
 }
 
@@ -159,7 +159,7 @@ void cxd8452aq_device::sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 
 TIMER_CALLBACK_MEMBER(cxd8452aq_device::irq_check)
 {
-	bool newIrq = m_sonic3_reg.sonic & (EXT_INT | RX_DMA_COMPLETE | TX_DMA_COMPLETE);
+	bool newIrq = m_sonic3_reg.control & (EXT_INT | RX_DMA_COMPLETE | TX_DMA_COMPLETE);
 	if (m_irq != newIrq)
 	{
 		LOGMASKED(LOG_INTERRUPT, "sonic3 interrupt changed to %d!\n", newIrq);
@@ -190,7 +190,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 		m_sonic3_reg.rx_host_address += 1;
 		if (m_sonic3_reg.rx_count == DMA_START)
 		{
-			m_sonic3_reg.sonic |= RX_DMA_COMPLETE;
+			m_sonic3_reg.control |= RX_DMA_COMPLETE;
 
 			// TODO: determine if rx_count is cleared here
 			m_sonic3_reg.rx_count = 0;
@@ -208,7 +208,7 @@ TIMER_CALLBACK_MEMBER(cxd8452aq_device::dma_check)
 		m_sonic3_reg.tx_sonic_address += 1;
 		if (m_sonic3_reg.tx_count == DMA_START)
 		{
-			m_sonic3_reg.sonic |= TX_DMA_COMPLETE;
+			m_sonic3_reg.control |= TX_DMA_COMPLETE;
 
 			// TODO: determine if tx_count is cleared here
 			m_sonic3_reg.tx_count = 0;

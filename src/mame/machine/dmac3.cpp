@@ -77,7 +77,6 @@ void dmac3_device::intr_w(dmac3_controller controller, uint32_t data)
 	m_controllers[controller].intr &= ~INTR_EN_MASK;    // Clear all mask bits
 	m_controllers[controller].intr |= intr_enable_bits; // Set mask bits to new mask
 	m_irq_check->adjust(attotime::zero);
-	// TODO: does it make sense to clear INTR_INT??
 }
 
 void dmac3_device::length_w(dmac3_controller controller, uint32_t data)
@@ -134,7 +133,7 @@ TIMER_CALLBACK_MEMBER(dmac3_device::irq_check)
 	for (int controller = 0; controller < 2; ++controller)
 	{
 		const uint32_t intr = m_controllers[controller].intr;
-		newIrq |= (intr & INTR_INT) && (intr & INTR_INTEN);  // External interrupt (SPIFI)
+		newIrq |= ((intr & INTR_INT) && (intr & INTR_INTEN));  // External interrupt (SPIFI)
 		newIrq |= (intr & INTR_EOPI) && (intr & INTR_EOPIE); // End-of-operation interrupt
 		newIrq |= (intr & INTR_DRQI) && (intr & INTR_DRQIE); // DRQ interrupt (?)
 		newIrq |= (intr & INTR_TCI) && (intr & INTR_TCIE);   // Transfer count interrupt (?)

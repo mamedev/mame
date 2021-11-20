@@ -99,7 +99,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 			{
 				sectors2 = sectors0;
 			}
-
+			
 			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}
@@ -571,9 +571,9 @@ const acorn_adfs_new_format::format acorn_adfs_new_format::formats[] =
 		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
 		2000, 5, 80, 2, 1024, {}, -1, { 0,1,2,3,4 }, 32, 22, 90
 	},
-	{ // F - 1600K 3 1/2 inch 80 track double sided quad density
+	{ // F - 1600K 3 1/2 inch 80 track double sided high density
 		floppy_image::FF_35, floppy_image::DSHD, floppy_image::MFM,
-		2000, 10, 80, 2, 1024, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 50, 22, 90
+		1000, 10, 80, 2, 1024, {}, -1, { 0,1,2,3,4,5,6,7,8,9 }, 50, 22, 90
 	},
 	{}
 };

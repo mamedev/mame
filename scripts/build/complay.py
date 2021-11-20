@@ -253,7 +253,7 @@ class LayoutChecker(Minifyer):
         if self.checkIntAttribute('orientation', attrs, 'rotate', 0) not in self.ORIENTATIONS:
             self.handleError('Element orientation attribute rotate "%s" is unsupported' % (attrs['rotate'], ))
         for name in ('swapxy', 'flipx', 'flipy'):
-            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['yesno'])):
+            if (attrs.get(name, 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs[name])):
                 self.handleError('Element orientation attribute %s "%s" is not "yes" or "no"' % (name, attrs[name]))
 
     def checkColor(self, attrs):
@@ -332,6 +332,8 @@ class LayoutChecker(Minifyer):
         self.have_bounds.append(None if 'group' == name else { })
         self.have_orientation.append(False)
         self.have_color.append(None if 'group' == name else { })
+        self.have_xscroll.append(None if ('group' == name) or ('screen' == name) else False)
+        self.have_yscroll.append(None if ('group' == name) or ('screen' == name) else False)
 
     def rootStartHandler(self, name, attrs):
         if 'mamelayout' != name:
@@ -665,6 +667,24 @@ class LayoutChecker(Minifyer):
             else:
                 self.handleError('Duplicate element color (previous %s)' % (self.have_color[-1], ))
             self.checkColor(attrs)
+        elif ('xscroll' == name) or ('yscroll' == name):
+            have_scroll = self.have_xscroll if 'xscroll' == name else self.have_yscroll
+            if have_scroll[-1] is None:
+                self.handleError('Encountered unexpected element %s' % (name, ))
+            elif have_scroll[-1]:
+                self.handleError('Duplicate element %s' % (name, ))
+            else:
+                have_scroll[-1] = self.formatLocation()
+                self.checkFloatAttribute(name, attrs, 'size', 1.0)
+                if (attrs.get('wrap', 'no') not in self.YESNO) and (not self.VARPATTERN.match(attrs['wrap'])):
+                    self.handleError('Element %s attribute wrap "%s" is not "yes" or "no"' % (name, attrs['wrap']))
+                if 'inputtag' in attrs:
+                    if 'name' in attrs:
+                        self.handleError('Element %s has both attribute inputtag and attribute name' % (name, ))
+                    self.checkTag(attrs['inputtag'], name, 'inputtag')
+                self.checkIntAttribute(name, attrs, 'mask', None)
+                self.checkIntAttribute(name, attrs, 'min', None)
+                self.checkIntAttribute(name, attrs, 'max', None)
         else:
             self.handleError('Encountered unexpected element %s' % (name, ))
         self.ignored_depth = 1
@@ -673,6 +693,8 @@ class LayoutChecker(Minifyer):
         self.have_bounds.pop()
         self.have_orientation.pop()
         self.have_color.pop()
+        self.have_xscroll.pop()
+        self.have_yscroll.pop()
         self.handlers.pop()
 
     def setDocumentLocator(self, locator):
@@ -688,6 +710,8 @@ class LayoutChecker(Minifyer):
         self.have_bounds = [ ]
         self.have_orientation = [ ]
         self.have_color = [ ]
+        self.have_xscroll = [ ]
+        self.have_yscroll = [ ]
         self.generated_element_names = False
         self.generated_group_names = False
         super(LayoutChecker, self).startDocument()
@@ -709,6 +733,8 @@ class LayoutChecker(Minifyer):
         del self.have_bounds
         del self.have_orientation
         del self.have_color
+        del self.have_xscroll
+        del self.have_yscroll
         del self.generated_element_names
         del self.generated_group_names
         super(LayoutChecker, self).endDocument()

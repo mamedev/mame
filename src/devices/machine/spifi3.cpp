@@ -15,8 +15,7 @@
  *  - Reselection, target mode, SDTR
  *  - LUN selection (currently assumes 0)
  *  - Non-chip-reset conditions
- *  - Find out the proper handshake between the SCSI and DMA controller when padding is required
- *  - SPSTAT and ICOND values
+ *  - Other SPSTAT and ICOND values
  *  - CMDPAGE details
  *  - Anything the Sony NEWS driver doesn't use
  */
@@ -36,7 +35,6 @@
 #define SPIFI3_TRACE (SPIFI3_DEBUG | LOG_STATE | LOG_CMD)
 #define SPIFI3_MAX (SPIFI3_TRACE | LOG_DATA)
 
-// #define VERBOSE SPIFI3_DEBUG
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(SPIFI3, spifi3_device, "spifi3", "HP 1TV3-0302 SPIFI3 SCSI-2 Protocol Controller")
@@ -52,23 +50,6 @@ spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, dev
 void spifi3_device::device_start()
 {
 	nscsi_device::device_start();
-
-	/*
-	TODO: Save state support
-	save_item(NAME(spifi_reg));
-	save_item(NAME(clock_conv));
-	save_item(NAME(sync_period));
-	save_item(NAME(bus_id));
-	save_item(NAME(tcounter));
-	save_item(NAME(mode));
-	save_item(NAME(command_pos));
-	save_item(NAME(state));
-	save_item(NAME(xfr_phase));
-	save_item(NAME(dma_dir));
-	save_item(NAME(irq));
-	save_item(NAME(drq));
-	save_item(NAME(m_even_fifo));
-	*/
 
 	m_irq_handler.resolve_safe();
 	m_drq_handler.resolve_safe();
@@ -428,6 +409,7 @@ void spifi3_device::map(address_map &map)
 							   {
 								   LOGMASKED(LOG_REGISTER, "write spifi_reg.intr = 0x%x\n", data);
 								   spifi_reg.intr &= data;
+								   spifi_reg.icond = 0;
 								   check_irq();
 							   }));
 
@@ -520,10 +502,8 @@ void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
 
 uint32_t spifi3_device::spstat_r()
 {
-	// TODO: barely anything is setting this right now. Based on NetBSD code, and the fact that practically nothing
-	// from this register was needed to get NEWS-OS to boot, I imagine this is mostly used for error handling and debug.
-	const uint32_t spstat = spifi_reg.spstat << 4 | ((spifi_reg.intr > 0) ? SPS_INTR : 0);
-	LOG("read spifi_reg.spstat = 0x%x\n", spstat);
+	const uint32_t spstat = (spifi_reg.spstat << 4) | ((spifi_reg.intr > 0) ? SPS_INTR : 0);
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.spstat = 0x%x\n", spstat);
 	return spstat;
 }
 
@@ -665,7 +645,7 @@ uint32_t spifi3_device::prcmd_r()
 
 void spifi3_device::prcmd_w(uint32_t data)
 {
-	LOGMASKED(LOG_REGISTER, "write spifi_reg.prcmd = 0x%x\n", data);
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.prcmd = 0x%x (%s)\n", data, machine().describe_context());
 	spifi_reg.prcmd = data;
 
 	// TODO: NJMP and other commands
@@ -680,6 +660,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 		const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_OUT ? DMA_OUT : DMA_NONE;
 		dma_set(luntar_dma_setting);
 		LOGMASKED(LOG_CMD, "start command DATAOUT, DMA = %d\n", luntar_dma_setting);
+		spifi_reg.spstat = SPS_DATAOUT;
 		break;
 	}
 	case PRC_DATAIN:
@@ -690,6 +671,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 		const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_IN ? DMA_IN : DMA_NONE;
 		dma_set(luntar_dma_setting);
 		LOGMASKED(LOG_CMD, "start command DATAIN, DMA = %d\n", luntar_dma_setting);
+		spifi_reg.spstat = SPS_DATAIN;
 		break;
 	}
 	case PRC_MSGOUT:
@@ -703,6 +685,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 
 		command_pos = 0;
 		dma_set(DMA_NONE);
+		spifi_reg.spstat = prcmd_to_spstat(cmd);
 		break;
 	}
 	case PRC_TRPAD:
@@ -767,23 +750,23 @@ void spifi3_device::check_drq()
 
 	switch (dma_dir)
 	{
-	case DMA_NONE:
-	{
-		drq_state = false;
-		break;
-	}
+		case DMA_NONE:
+		{
+			drq_state = false;
+			break;
+		}
 
-	case DMA_IN: // device to memory
-	{
-		drq_state = !transfer_count_zero() && !m_even_fifo.empty();
-		break;
-	}
+		case DMA_IN: // device to memory
+		{
+			drq_state = !transfer_count_zero() && !m_even_fifo.empty();
+			break;
+		}
 
-	case DMA_OUT: // memory to device
-	{
-		drq_state = !transfer_count_zero() && m_even_fifo.size() < 8;
-		break;
-	}
+		case DMA_OUT: // memory to device
+		{
+			drq_state = !transfer_count_zero() && m_even_fifo.size() < 8;
+			break;
+		}
 	}
 
 	if (drq_state != drq)
@@ -883,7 +866,6 @@ void spifi3_device::bus_complete()
 	LOG("bus_complete\n");
 	state = IDLE;
 
-	// TODO: Any ICOND changes needed here?
 	spifi_reg.intr |= INTR_BSRQ;
 	spifi_reg.prcmd = 0;
 	dma_set(DMA_NONE);
@@ -955,6 +937,10 @@ void spifi3_device::dma_w(uint8_t val)
 uint8_t spifi3_device::dma_r()
 {
 	LOGMASKED(LOG_DATA, "dma_r called! Fifo count = %d, state = %d.%d, tcounter = %d\n", m_even_fifo.size(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, tcounter);
+	if(m_even_fifo.empty())
+	{
+		fatalerror("spifi_3::dma_r called with empty FIFO!");
+	}
 	uint8_t val = m_even_fifo.front();
 	m_even_fifo.pop();
 	decrement_tcounter();
@@ -980,6 +966,7 @@ void spifi3_device::start_autostat(int target_id)
 	LOGMASKED(LOG_AUTO, "start AUTOSTAT\n");
 	state = INIT_XFR;
 	xfr_phase = S_PHASE_STATUS;
+	spifi_reg.spstat = SPS_STATUS;
 	dma_set(DMA_NONE);
 }
 
@@ -988,6 +975,7 @@ void spifi3_device::start_automsg(int msg_phase)
 	LOGMASKED(LOG_AUTO, "start AUTOMSG\n");
 	state = INIT_XFR;
 	xfr_phase = msg_phase;
+	spifi_reg.spstat = msg_phase == S_PHASE_MSG_IN ? SPS_MSGIN : SPS_MSGOUT;
 	dma_set(DMA_NONE);
 }
 
@@ -997,6 +985,7 @@ void spifi3_device::start_autocmd()
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // Deassert ACK since we are automatically moving to the command phase
 	state = INIT_XFR;
 	xfr_phase = S_PHASE_COMMAND;
+	spifi_reg.spstat = SPS_COMMAND;
 	dma_set(DMA_NONE);
 }
 
@@ -1006,6 +995,7 @@ void spifi3_device::start_autodata(int data_phase)
 	state = INIT_XFR;
 	xfr_phase = data_phase;
 	dma_set(data_phase == S_PHASE_DATA_IN ? DMA_IN : DMA_OUT);
+	spifi_reg.spstat = data_phase == S_PHASE_DATA_IN ? SPS_DATAIN : SPS_DATAOUT;
 	check_drq();
 }
 
@@ -1064,7 +1054,6 @@ void spifi3_device::step(bool timeout)
 	{
 		case IDLE:
 		{
-			spifi_reg.spstat = SPS_IDLE;
 			break;
 		}
 
@@ -1560,16 +1549,20 @@ void spifi3_device::step(bool timeout)
 				LOGMASKED(LOG_DATA, "DMA transfer complete\n");
 				if (xfr_phase == S_PHASE_DATA_OUT && new_phase == S_PHASE_DATA_OUT)
 				{
-					// WORKAROUND - I haven't been able to figure out how to make the interrupts and register values work out
-					// to where DMAC3 triggers a parity error only when PAD is needed. So, we'll just transfer it ourselves instead.
-					LOG("applying write pad workaround\n");
-					state = INIT_XFR_SEND_PAD_WAIT_REQ;
+					// Set ICOND so that NEWS-OS knows that SPIFI is ready to send pad bytes.
+					// NEWS-OS will sometimes set tcounter to less than one block size, then sends TR_PAD in response to this ICOND value.
+					spifi_reg.icond = ICOND_UXPHASEZ;
+					state = INIT_XFR_BUS_COMPLETE;
 				}
 				else if (xfr_phase == S_PHASE_DATA_IN && new_phase == S_PHASE_DATA_IN)
 				{
+					// Dump the remaining contents of the FIFO - at this point, the transfer counter is exhausted so whatever
+					// is left in the queue is pad byte junk read after the real data was received but before the DMA transfer completed
+					clear_queue(m_even_fifo);
+
 					// See above
-					LOG("applying read pad workaround\n");
-					state = INIT_XFR_RECV_PAD_WAIT_REQ;
+					spifi_reg.icond = ICOND_UXPHASEZ;
+					state = INIT_XFR_BUS_COMPLETE;
 				}
 				else
 				{

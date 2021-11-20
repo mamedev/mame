@@ -36,11 +36,11 @@ public:
 	{
 		if (state)
 		{
-			m_sonic3_reg.sonic |= 0x1;
+			m_sonic3_reg.control |= 0x1;
 		}
 		else
 		{
-			m_sonic3_reg.sonic &= ~0x1;
+			m_sonic3_reg.control &= ~0x1;
 		}
 		m_irq_check->adjust(attotime::zero);
 	}
@@ -63,8 +63,8 @@ protected:
 	void sonic_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 
 	// Register accessors
-	uint32_t sonic3_r(offs_t offset);
-	void sonic3_w(offs_t offset, uint32_t data);
+	uint32_t control_r(offs_t offset);
+	void control_w(offs_t offset, uint32_t data);
 	uint32_t tx_count_r(offs_t offset);
 	void tx_count_w(offs_t offset, uint32_t data);
 	uint32_t rx_count_r(offs_t offset);
@@ -72,7 +72,7 @@ protected:
 
 	// Interrupt handling
 	devcb_write_line m_irq_handler;
-	bool m_irq = false; // Chip-level IRQ
+	bool m_irq = false;
 	emu_timer *m_irq_check;
 	TIMER_CALLBACK_MEMBER(irq_check);
 
@@ -88,7 +88,7 @@ protected:
 	struct sonic3_register_file
 	{
 		// General registers
-		uint32_t sonic = 0x80000000;
+		uint32_t control = 0x80000000;
 		uint32_t config = 0x0;
 		uint32_t revision = 0x3;
 
@@ -101,7 +101,7 @@ protected:
 		uint32_t tx_count = 0x0;
 	} m_sonic3_reg;
 
-	// sonic register constants
+	// control register constants
 	const uint32_t INT_EN_MASK = 0x7f00;
 	// TODO: determine if external interrupt should be included when cleared
 	const uint32_t INT_CLR_MASK = 0xf0;

@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="archimedes_rom" description="Acorn Archimedes ROM images">
+
+	<!-- 5th column extension ROMs (A5000 and A4 only) -->
+
+	<software name="wizzo4_312" cloneof="wizzo4">
+		<description>Wizzo4 3.12</description>
+		<year>1994</year>
+		<publisher>Ian Copestake Software</publisher>
+		<sharedfeat name="compatibility" value="A4"/>
+		<part name="rom" interface="ext_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="ICS94_Wizzo4_3v12.bin" size="32768" crc="76bf3345" sha1="04b44be233351ae49d020dcb4d0bf494b9459a4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizzo4">
+		<description>Wizzo4 3.22</description>
+		<year>1997</year>
+		<publisher>Baildon Electronics/APDL</publisher>
+		<sharedfeat name="compatibility" value="A4"/>
+		<part name="rom" interface="ext_rom">
+			<dataarea name="rom" size="65536">
+				<rom name="BE-APDL95_Wizzo4_3v22.bin" size="65536" crc="7b37e63b" sha1="ba9d256b122a6c570ba56f9fe674ef36bccc6efd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizzo5_312" cloneof="wizzo5">
+		<description>Wizzo5 3.12</description>
+		<year>1994</year>
+		<publisher>Ian Copestake Software</publisher>
+		<sharedfeat name="compatibility" value="A5000"/>
+		<part name="rom" interface="ext_rom">
+			<dataarea name="rom" size="32768">
+				<rom name="ICS94_Wizzo5_3v12.bin" size="32768" crc="915bb109" sha1="f22c4ad60918ce759fc48a400a33a34b8371865c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizzo5_313" cloneof="wizzo5">
+		<description>Wizzo5 3.13</description>
+		<year>1995</year>
+		<publisher>Ian Copestake Software</publisher>
+		<sharedfeat name="compatibility" value="A5000"/>
+		<part name="rom" interface="ext_rom">
+			<dataarea name="rom" size="65536">
+				<rom name="ICS95_Wizzo5_3v13.bin" size="65536" crc="df9315cc" sha1="e0dd226e9da72a37a075ad8a1ebe9adb1d8667c7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizzo5">
+		<description>Wizzo5 3.15</description>
+		<year>1996</year>
+		<publisher>Ian Copestake Software</publisher>
+		<sharedfeat name="compatibility" value="A5000"/>
+		<part name="rom" interface="ext_rom">
+			<dataarea name="rom" size="65536">
+				<rom name="ICS95_Wizzo5_3v15.bin" size="65536" crc="a48af152" sha1="296ba12091be8562070c8795ba2a7c83cf2451ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

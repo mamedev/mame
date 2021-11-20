@@ -25,6 +25,10 @@
 #include <clocale>
 #include <cstdarg>
 #include <cstdio>
+#include <mutex>
+#include <optional>
+#include <sstream>
+#include <thread>
 
 // standard windows headers
 #include <windows.h>
@@ -55,6 +59,27 @@
 
 class winui_output_error : public osd_output
 {
+private:
+	struct ui_state
+	{
+		~ui_state()
+		{
+			if (thread)
+				thread->join();
+		}
+
+		std::ostringstream buffer;
+		std::optional<std::thread> thread;
+		std::mutex mutex;
+		bool active;
+	};
+
+	static ui_state &get_state()
+	{
+		static ui_state state;
+		return state;
+	}
+
 public:
 	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args) override
 	{
@@ -64,12 +89,46 @@ public:
 			if ((video_config.windowed == 0) && !osd_common_t::s_window_list.empty())
 				winwindow_toggle_full_screen();
 
-			std::ostringstream buffer;
-			util::stream_format(buffer, args);
-			win_message_box_utf8(!osd_common_t::s_window_list.empty() ? std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window() : nullptr, buffer.str().c_str(), emulator_info::get_appname(), MB_OK);
+			auto &state(get_state());
+			std::lock_guard<std::mutex> guard(state.mutex);
+			util::stream_format(state.buffer, args);
+			if (!state.active)
+			{
+				if (state.thread)
+				{
+					state.thread->join();
+					state.thread = std::nullopt;
+				}
+				state.thread.emplace(
+						[] ()
+						{
+							auto &state(get_state());
+							std::string message;
+							while (true)
+							{
+								{
+									std::lock_guard<std::mutex> guard(state.mutex);
+									message = std::move(state.buffer).str();
+									if (message.empty())
+									{
+										state.active = false;
+										return;
+									}
+									state.buffer.str(std::string());
+								}
+								// Don't hold any locks lock while calling MessageBox.
+								// Parent window isn't set because MAME could destroy
+								// the window out from under us on a fatal error.
+								win_message_box_utf8(nullptr, message.c_str(), emulator_info::get_appname(), MB_OK);
+							}
+						});
+				state.active = true;
+			}
 		}
 		else
+		{
 			chain_output(channel, args);
+		}
 	}
 };
 

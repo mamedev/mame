@@ -2,7 +2,7 @@
 // network_v6.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2014 Oliver Kowalke (oliver dot kowalke at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -87,15 +87,15 @@ void test()
     net1 = ip::make_network_v6("10.0.0.0/8", ec);
     net1 = ip::make_network_v6(s1);
     net1 = ip::make_network_v6(s1, ec);
-#if defined(ASIO_HAS_STD_STRING_VIEW)
-# if defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
-    std::experimental::string_view string_view_value("0::0/8");
-# else // defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+#if defined(ASIO_HAS_STRING_VIEW)
+# if defined(ASIO_HAS_STD_STRING_VIEW)
     std::string_view string_view_value("0::0/8");
+# elif defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
+    std::experimental::string_view string_view_value("0::0/8");
 # endif // defined(ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW)
     net1 = ip::make_network_v6(string_view_value);
     net1 = ip::make_network_v6(string_view_value, ec);
-#endif // defined(ASIO_HAS_STD_STRING_VIEW)
+#endif // defined(ASIO_STD_STRING_VIEW)
 
     // network_v6 I/O.
 
@@ -152,6 +152,19 @@ void test()
   ASIO_CHECK(make_network_v6("2001:370::10:7344/128").network() == make_address_v6("2001:370::10:7344"));
   ASIO_CHECK(make_network_v6("2001:370::10:7344/64").network() == make_address_v6("2001:370::"));
   ASIO_CHECK(make_network_v6("2001:370::10:7344/27").network() == make_address_v6("2001:360::"));
+
+  // construct network from invalid string
+  asio::error_code ec;
+  make_network_v6("a:b/24", ec);
+  ASIO_CHECK(!!ec);
+  make_network_v6("2001:370::10:7344/129", ec);
+  ASIO_CHECK(!!ec);
+  make_network_v6("2001:370::10:7344/-1", ec);
+  ASIO_CHECK(!!ec);
+  make_network_v6("2001:370::10:7344/", ec);
+  ASIO_CHECK(!!ec);
+  make_network_v6("2001:370::10:7344", ec);
+  ASIO_CHECK(!!ec);
 
   // prefix length
   ASIO_CHECK(make_network_v6("2001:370::10:7344/128").prefix_length() == 128);

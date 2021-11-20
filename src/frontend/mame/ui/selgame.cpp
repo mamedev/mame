@@ -167,7 +167,7 @@ void menu_select_game::menu_activated()
 void menu_select_game::handle(event const *ev)
 {
 	if (!m_prev_selected)
-		m_prev_selected = item(0).ref;
+		m_prev_selected = item(0).ref();
 
 	// if I have to select software, force software list submenu
 	if (reselect_last::get())

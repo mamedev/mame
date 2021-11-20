@@ -420,7 +420,7 @@ void menu_load_save_state_base::custom_render(void *selectedref, float top, floa
 		text[count++] = m_footer;
 
 	// provide a prompt to delete if a state is selected
-	if (selected_item().ref)
+	if (selected_item().ref())
 	{
 		if (m_delete_prompt.empty())
 			m_delete_prompt = util::string_format(_("Press %1$s to delete"), machine().input().seq_name(machine().ioport().type_seq(IPT_UI_CLEAR)));

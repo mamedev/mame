@@ -54,7 +54,7 @@ public:
 	void item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(std::string(text), std::string(subtext), flags, ref, type); }
 	void item_append(std::string &&text, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN) { item_append(text, std::string(), flags, ref, type); }
 	void item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
-	void item_append(menu_item item) { item_append(item.text, item.subtext, item.flags, item.ref, item.type); }
+	void item_append(menu_item item) { item_append(item.text(), item.subtext(), item.flags(), item.ref(), item.type()); }
 	void item_append(menu_item_type type, uint32_t flags = 0);
 	void item_append_on_off(const std::string &text, bool state, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 
@@ -117,8 +117,8 @@ protected:
 	// menu-related events
 	struct event
 	{
-		void                *itemref;   // reference for the selected item
-		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+		void                *itemref;   // reference for the selected item or nullptr
+		menu_item           *item;      // selected item or nullptr
 		int                 iptkey;     // one of the IPT_* values from inptport.h
 		char32_t            unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
@@ -150,7 +150,7 @@ protected:
 	int item_count() const { return m_items.size(); }
 
 	// retrieves the ref of the currently selected menu item or nullptr
-	void *get_selection_ref() const { return selection_valid() ? m_items[m_selected].ref : nullptr; }
+	void *get_selection_ref() const { return selection_valid() ? m_items[m_selected].ref() : nullptr; }
 
 	menu_item &selected_item() { return m_items[m_selected]; }
 	menu_item const &selected_item() const { return m_items[m_selected]; }
@@ -203,39 +203,37 @@ protected:
 	{
 		// size up the text
 		float const lrborder(ui().box_lr_border() * machine().render().ui_aspect(&container()));
-		float maxwidth(origx2 - origx1);
+		float const origwidth(origx2 - origx1 - (2.0f * lrborder));
+		float maxwidth(origwidth);
 		for (Iter it = begin; it != end; ++it)
 		{
-			float width;
-			ui().draw_text_full(
-					container(), std::string_view(*it),
-					0.0f, 0.0f, 1.0f, justify, wrap,
-					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
-					&width, nullptr, text_size);
-			width += 2.0f * lrborder;
-			maxwidth = (std::max)(maxwidth, width);
+			std::string_view const &line(*it);
+			if (!line.empty())
+			{
+				auto layout = ui().create_layout(container(), 1.0f, justify, wrap);
+				layout.add_text(std::string_view(*it), rgb_t::white(), rgb_t::black(), text_size);
+				maxwidth = (std::max)(layout.actual_width(), maxwidth);
+			}
 		}
-		if (scale && ((origx2 - origx1) < maxwidth))
+		if (scale && (origwidth < maxwidth))
 		{
-			text_size *= ((origx2 - origx1) / maxwidth);
-			maxwidth = origx2 - origx1;
+			text_size *= origwidth / maxwidth;
+			maxwidth = origwidth;
 		}
 
 		// draw containing box
-		float x1(0.5f * (1.0f - maxwidth));
-		float x2(x1 + maxwidth);
-		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
+		float const boxleft(0.5f - (maxwidth * 0.5f) - lrborder);
+		float boxright(0.5f + (maxwidth * 0.5f) + lrborder);
+		ui().draw_outlined_box(container(), boxleft, y1, boxright, y2, bgcolor);
 
 		// inset box and draw content
-		x1 += lrborder;
-		x2 -= lrborder;
+		float const textleft(0.5f - (maxwidth * 0.5f));
 		y1 += ui().box_tb_border();
-		y2 -= ui().box_tb_border();
 		for (Iter it = begin; it != end; ++it)
 		{
 			ui().draw_text_full(
 					container(), std::string_view(*it),
-					x1, y1, x2 - x1, justify, wrap,
+					textleft, y1, maxwidth, justify, wrap,
 					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
 			y1 += ui().get_line_height();
@@ -281,7 +279,7 @@ protected:
 
 	static bool is_selectable(menu_item const &item)
 	{
-		return (!(item.flags & menu::FLAG_DISABLE) && (item.type != menu_item_type::SEPARATOR));
+		return (!(item.flags() & menu::FLAG_DISABLE) && (item.type() != menu_item_type::SEPARATOR));
 	}
 
 	// get arrows status
