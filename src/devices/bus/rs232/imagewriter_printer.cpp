@@ -569,7 +569,7 @@ uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 			(ioport("LINEFEED")->read()               << 6) | //
 			(BIT(ioport("DIPSW2")->read(), 3)         << 7);  // DIP 2-4 (unused)
 
-	m_bitmap_printer->setprintheadcolor(
+	m_bitmap_printer->set_printhead_color(
 			m_ic17_flipflop_select_status   ? 0x888888 : 0x00dd00,    // select led
 			ioport("PAPEREND")->read()      ? 0xff0000 : 0x000000 );  // paperend led
 

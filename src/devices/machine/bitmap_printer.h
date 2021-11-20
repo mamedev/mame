@@ -7,6 +7,8 @@
 	*	reads and writes pixels (representing printer dots)
 	*	function to save the bitmap
 	*	updates the bitmap to screen and draws the printhead
+	*	printhead position given in m_xpos and m_ypos
+	*	also provides a cr_stepper and a pf_stepper
 
  */
 #include "screen.h"
@@ -43,83 +45,80 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
-
-	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int m_distfrombottom = 50;  // print position from bottom of screen
-public:
-	int m_xpos = 0;
-	int m_ypos = 0;
-private:
 	required_device<screen_device> m_screen;
 	required_device<session_time_device> m_session_time;
 public:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 	
-	int m_cr_direction = 1; // last direction of carriage
+	int m_cr_direction = 1; // direction of carriage
 	int m_pf_stepper_ratio0 = 1;
 	int m_pf_stepper_ratio1 = 1;
 	int m_cr_stepper_ratio0 = 1;
 	int m_cr_stepper_ratio1 = 1;
+	int m_xpos = 0;
+	int m_ypos = 0;
 
-	void set_pf_stepper_ratio(int ratio0, int ratio1) { m_pf_stepper_ratio0 = ratio0; m_pf_stepper_ratio1 = ratio1;}
-	void set_cr_stepper_ratio(int ratio0, int ratio1) { m_cr_stepper_ratio0 = ratio0; m_cr_stepper_ratio1 = ratio1;}
 private:	
 	bitmap_rgb32  m_internal_bitmap;  // internal bitmap
 	bitmap_rgb32* m_bitmap = &m_internal_bitmap;  // pointer to bitmap, use internal bitmap by default
 
-	std::string m_printername;
-	std::string m_snapshotdir;
+	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+	const int m_distfrombottom = 50;  // print position from bottom of screen
 
-	int m_printheadcolor       = 0xEEE8AA;
-	int m_printheadbordercolor = 0xBDB76B;
-	int m_printheadbordersize = 3;
-	int m_printheadxsize = 10;
-	int m_printheadysize = 20;
+	int m_printhead_color       = 0xEEE8AA;
+	int m_printhead_bordercolor = 0xBDB76B;
+	int m_printhead_bordersize = 3;
+	int m_printhead_xsize = 10;
+	int m_printhead_ysize = 20;
 	int m_pagedirty = 0;
 	int m_paperwidth;
 	int m_paperheight;
 	int m_hdpi;
 	int m_vdpi;
 	int clear_pos = 0;
-
+	int newpageflag = 0;  // used to keep printhead at the top of page until actual printing
+	
 public:
 	bitmap_rgb32& get_bitmap(){ return *m_bitmap; }
 
-	void setprintheadcolor(int headcolor, int bordcolor);
-	void setprintheadsize(int xsize, int ysize, int bordersize);
-
+	void set_printhead_color(int headcolor, int bordcolor);
+	void set_printhead_size(int xsize, int ysize, int bordersize);
+	void setheadpos(int x, int y){  if (m_xpos != x) newpageflag = 0; m_xpos = x; m_ypos = y;}
+	
 	session_time_device* get_session_time_device() {return m_session_time;}
 
 	void write_snapshot_to_file(std::string directory, std::string name);
 
-	void drawpixel(int x, int y, int pixelval);
-	int getpixel(int x, int y);
+	void draw_pixel(int x, int y, int pixelval);
+	int get_pixel(int x, int y);
 	unsigned int& pix(int y, int x);
-	void setheadpos(int x, int y){  if (m_xpos != x) newpageflag = 0; m_xpos = x; m_ypos=y;}
+
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 	void bitmap_clear_band(int from_line, int to_line, u32 color);
+	void clear_to_pos(int to_line, u32 color = 0xffffff);
+
 	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
+
 	int get_top_margin();
 	int get_bottom_margin();
 	bool check_new_page();
-	bool check_ypos() { return 0; }
-	void clear_to_pos(int to_line, u32 color = 0xffffff);
-	int newpageflag = 0;
-private:
-	void drawprinthead(bitmap_rgb32 &bitmap, int x, int y);
 
-	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int update_stepper_delta(stepper_device * stepper, uint8_t pattern);	
+	void update_cr_stepper(int pattern);
+	void update_pf_stepper(int pattern);
+
+	void set_pf_stepper_ratio(int ratio0, int ratio1) { m_pf_stepper_ratio0 = ratio0; m_pf_stepper_ratio1 = ratio1;}
+	void set_cr_stepper_ratio(int ratio0, int ratio1) { m_cr_stepper_ratio0 = ratio0; m_cr_stepper_ratio1 = ratio1;}
+private:
+	void draw_printhead(bitmap_rgb32 &bitmap, int x, int y);
 
 	int calc_scroll_y(bitmap_rgb32& bitmap);
+	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor);
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap);
 	void draw_inch_marks(bitmap_rgb32& bitmap);
-	int update_stepper_delta(stepper_device * stepper, uint8_t pattern);
-public:
-	void update_cr_stepper(uint8_t pattern);
-	void update_pf_stepper(int pattern);
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)

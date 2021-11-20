@@ -391,7 +391,7 @@ uint8_t epson_lx810l_device::porta_r(offs_t offset)
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
 
 	// Update the printhead display, only put this here since this routine gets called frequently
-	m_bitmap_printer->setprintheadcolor( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0); 
+	m_bitmap_printer->set_printhead_color( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0); 
 
 	return result;
 }

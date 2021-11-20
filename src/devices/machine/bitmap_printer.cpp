@@ -91,11 +91,11 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 //**************************************************************************
 
 bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, type, tag, owner, clock),
-		m_screen(*this, "screen"),
-		m_session_time(*this, "session_time"),
-		m_pf_stepper(*this, "pf_stepper"),
-		m_cr_stepper(*this, "cr_stepper")
+	device_t(mconfig, type, tag, owner, clock),
+	m_screen(*this, "screen"),
+	m_session_time(*this, "session_time"),
+	m_pf_stepper(*this, "pf_stepper"),
+	m_cr_stepper(*this, "cr_stepper")
 {
 }
 
@@ -120,16 +120,21 @@ void bitmap_printer_device::device_start()
 
 void bitmap_printer_device::device_reset_after_children()
 {
-	m_ypos = 10;
+	m_ypos = get_top_margin();
 }
 
 void bitmap_printer_device::device_reset()
 {
-//  printf("Bitmap Printer : Tagname=%s\n",tagname().c_str());
-//  printf("Bitmap Printer : Simplename=%s\n",simplename().c_str());
-//  printf("Bitmap Printer : name=%s\n",getprintername().c_str());
 }
 
+//-------------------------------------------------
+//    SCREEN UPDATE FUNCTIONS
+//-------------------------------------------------
+
+int bitmap_printer_device::calc_scroll_y(bitmap_rgb32& bitmap)
+{
+	return bitmap.height() - m_distfrombottom - m_ypos;
+}
 
 uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 							 bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -142,14 +147,16 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paperheight, m_paperwidth, 2, 0xEE8844);  // draw a line on the bottom edge of page
 	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paperheight + 2, m_paperwidth, m_distfrombottom, 0xDDDDDD);  // cover up visible parts of current page at the bottom
 
-	drawprinthead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
+	draw_printhead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
 
 	draw_inch_marks(bitmap);
 
 	return 0;
 }
 
-
+//-------------------------------------------------
+//    BITMAP CLEARING FUNCTIONS
+//-------------------------------------------------
 
 void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 {
@@ -164,9 +171,6 @@ void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 //	printf("new clear pos: %d \n",clear_pos);
 }
 
-
-
-
 void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 color)
 {
 	bitmap_clear_band(*m_bitmap, from_line, to_line, color);
@@ -178,6 +182,10 @@ void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_lin
 	// plot_box( x, y, width, height, color)
 	bitmap.plot_box(0, from_line, m_paperwidth, to_line - from_line + 1, color);
 }
+
+//-------------------------------------------------
+//    WRITE SNAPSHOT TO FILE
+//-------------------------------------------------
 
 void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
 {
@@ -196,29 +204,37 @@ void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::s
 	}
 }
 
-void bitmap_printer_device::setprintheadcolor(int headcolor, int bordcolor)
+//-------------------------------------------------
+//    PRINTHEAD FUNCTIONS
+//-------------------------------------------------
+
+void bitmap_printer_device::set_printhead_color(int headcolor, int bordcolor)
 {
-	m_printheadcolor = headcolor;
-	m_printheadbordercolor = bordcolor;
+	m_printhead_color = headcolor;
+	m_printhead_bordercolor = bordcolor;
 }
 
-void bitmap_printer_device::setprintheadsize(int xsize, int ysize, int bordersize)
+void bitmap_printer_device::set_printhead_size(int xsize, int ysize, int bordersize)
 {
-	m_printheadxsize = xsize;
-	m_printheadysize = ysize;
-	m_printheadbordersize = bordersize;
+	m_printhead_xsize = xsize;
+	m_printhead_ysize = ysize;
+	m_printhead_bordersize = bordersize;
 }
 
-void bitmap_printer_device::drawprinthead(bitmap_rgb32 &bitmap, int x, int y)
+void bitmap_printer_device::draw_printhead(bitmap_rgb32 &bitmap, int x, int y)
 {
-	int bordx = m_printheadbordersize;
-	int bordy = m_printheadbordersize;
+	int bordx = m_printhead_bordersize;
+	int bordy = m_printhead_bordersize;
 	int offy = 9 + bordy;
-	int sizex = m_printheadxsize;
-	int sizey = m_printheadysize;
-	bitmap.plot_box(x - sizex / 2- bordx, y + offy - bordy, sizex + 2 * bordx, sizey + bordy * 2, m_printheadbordercolor);
-	bitmap.plot_box(x - sizex / 2,        y + offy,         sizex,             sizey,             m_printheadcolor);
+	int sizex = m_printhead_xsize;
+	int sizey = m_printhead_ysize;
+	bitmap.plot_box(x - sizex / 2- bordx, y + offy - bordy, sizex + 2 * bordx, sizey + bordy * 2, m_printhead_bordercolor);
+	bitmap.plot_box(x - sizex / 2,        y + offy,         sizex,             sizey,             m_printhead_color);
 }
+
+//-------------------------------------------------
+//    DRAW INCH MARKS AND NUMBERS
+//-------------------------------------------------
 
 void bitmap_printer_device::draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor)
 {
@@ -273,7 +289,11 @@ void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 	}
 }
 
-void bitmap_printer_device::drawpixel(int x, int y, int pixelval)
+//-------------------------------------------------
+//    DRAW PIXEL FUNCTIONS
+//-------------------------------------------------
+
+void bitmap_printer_device::draw_pixel(int x, int y, int pixelval)
 {
 	if (y >= m_bitmap->height()) y = m_bitmap->height() - 1;
 	if (x >= m_bitmap->width()) x = m_bitmap->width() - 1;
@@ -283,7 +303,7 @@ void bitmap_printer_device::drawpixel(int x, int y, int pixelval)
 	m_pagedirty = 1;
 };
 
-int bitmap_printer_device::getpixel(int x, int y)
+int bitmap_printer_device::get_pixel(int x, int y)
 {
 	if (y >= m_bitmap->height()) y = m_bitmap->height() - 1;
 	if (x >= m_bitmap->width()) x = m_bitmap->width() - 1;
@@ -299,18 +319,8 @@ unsigned int& bitmap_printer_device::pix(int y, int x)    // reversed y x
 	return m_bitmap->pix(y,x);
 };
 
-int bitmap_printer_device::calc_scroll_y(bitmap_rgb32& bitmap)
-{
-	return bitmap.height() - m_distfrombottom - m_ypos;
-}
-
-
-
-
-
-
 //-------------------------------------------------
-//    STEPPER RELATED FUNCTIONS
+//    STEPPER AND MARGIN FUNCTIONS
 //-------------------------------------------------
 
 int bitmap_printer_device::get_top_margin()    { return ioport("TOPMARGIN")->read(); }
@@ -368,7 +378,7 @@ int bitmap_printer_device::update_stepper_delta(stepper_device * stepper, uint8_
 	return delta;
 }
 
-void bitmap_printer_device::update_cr_stepper(uint8_t pattern) 
+void bitmap_printer_device::update_cr_stepper(int pattern) 
 {
 
 	int delta = update_stepper_delta(m_cr_stepper, pattern);
