@@ -122,7 +122,6 @@ private:
 	{
 		int lastpos = stepper->get_absolute_position();
 		stepper->update(pattern);
-//		stepper->update(bitswap<4>(pattern, 3, 1, 2, 0));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
 		int delta = stepper->get_absolute_position() - lastpos;
 		return delta;
 	}
@@ -132,43 +131,26 @@ public:
 
 		int delta = update_stepper_delta(m_cr_stepper, pattern);
 
-	//  printf("CR STEPPER pat = %d, delta = %d, m_xpos = %d\n",hstepper,delta,m_xpos);
-
 		if (delta != 0)
 		{
 			newpageflag = 0;
 
 			if (delta > 0)
 			{
-				//m_xpos += delta; 
 				m_cr_direction = 1;
 			}
 			else if (delta < 0)
 			{
-				//m_xpos += delta; 
 				m_cr_direction = -1;
 			}
 		}
 
-	m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
-
-	//	setheadpos(x_pixel_coord(m_xpos), y_pixel_coord(m_ypos));
-}
-	void update_pf_stepper(int pattern) 
-	{	[[maybe_unused]]	int delta = update_stepper_delta(m_pf_stepper, pattern);
+		m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
+	}
 	
-			if (delta != 0)
-		{
-
-			if (delta > 0)
-			{
-				//m_ypos += delta;
-			}
-			else if (delta < 0)
-			{
-				//m_ypos += delta; 
-			}
-		}
+	void update_pf_stepper(int pattern) 
+	{	[[maybe_unused]] int delta = update_stepper_delta(m_pf_stepper, pattern);
+	
 		m_ypos = m_pf_stepper->get_absolute_position() * m_pf_stepper_ratio0 / m_pf_stepper_ratio1;
 		check_new_page();
 	}

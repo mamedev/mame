@@ -180,8 +180,7 @@ ROM_END
 
 void a2bus_silentype_device::device_add_mconfig(machine_config &config)
 {
-	[[maybe_unused]] silentype_printer_device &printer(SILENTYPE_PRINTER(config, m_silentype_printer, 0));
-
+	SILENTYPE_PRINTER(config, m_silentype_printer, 0);
 }
 
 //-------------------------------------------------
@@ -261,7 +260,7 @@ uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
 
 void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	LOG("Silentype WRITE %x = %x\n",offset + slotno()* 0x10 + 0xc080,data);
+	LOG("Silentype WRITE %x = %x\n",offset + slotno() * 0x10 + 0xc080, data);
 
 	if (BIT(offset,0))  // decodes a0
 	{
@@ -290,12 +289,11 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 			(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
 			(BIT(data, SILENTYPE_SHIFTCLOCKB) == 0) &&
 			(BIT(data, SILENTYPE_STORECLOCK) == 0)
-			)
+			)  // clear parallel register
 		{
 			LOG("Silentype Clear Parallel Register\n");
 
 			m_parallel_reg = 0;
-			printf("Silentype Clear Parallel Register = %4x   time=%f\n", m_parallel_reg,machine().time().as_double());
 
 			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));  // inverted by ULN2003
 			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));  // inverted by ULN2003
@@ -308,17 +306,7 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 			)  // store shift register to parallel register
 		{
 			m_parallel_reg = m_shift_reg;
-/*
-			LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
 
-			printf("Silentype Store Parallel Register = %4x   time=%f\n", m_parallel_reg,machine().time().as_double());
-static double timeon = 0.0;
-			if (BIT(m_parallel_reg, 9, 7) && (timeon == 0.0)) timeon = machine().time().as_double();
-			else if (BIT(m_parallel_reg, 9, 7)) {printf("STILL ON = %f\n", machine().time().as_double() - timeon);}
-			else {printf("NOW OFF TIME SINCE ON = %f\n", machine().time().as_double() - timeon); timeon=0.0; }
-*/
-//			m_silentype_printer->update_cr_stepper(bitswap<4>(BIT(m_parallel_reg, 0, 4), 3, 1, 2, 0));
-//			m_silentype_printer->update_pf_stepper(bitswap<4>(BIT(m_parallel_reg, 4, 4), 3, 1, 2, 0));
 			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
 			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
 

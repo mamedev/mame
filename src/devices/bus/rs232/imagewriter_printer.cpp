@@ -111,8 +111,6 @@ apple_imagewriter_printer_device::apple_imagewriter_printer_device(const machine
 	m_pulse1(*this, "pulse1"),
 	m_pulse2(*this, "pulse2"),
 	m_bitmap_printer(*this, "bitmap_printer"),
-//	m_pf_stepper(*this, "pf_stepper"),
-//	m_cr_stepper(*this, "cr_stepper"),
 	m_timer_rxclock(*this, "rx_clock_8251"),
 	m_power_led(*this, "power_led"),
 	m_paper_error_led(*this, "paper_error_led"),
@@ -175,14 +173,9 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	m_bitmap_printer->set_pf_stepper_ratio(1,1);
 	m_bitmap_printer->set_cr_stepper_ratio(1,1);
 	
-//	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
-//	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
-
 	TIMER(config, m_timer_rxclock, 0);
 
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
-
-//  printf("ioreadsafe = %x\n",ioportsaferead("WIDTH"));//causes segfault
 
 	// Baud Rate Clock (pulse_uart_clock)
 	// output from 74393 is either 1/16 input clock of (9.8304mhz / 2 / 2 (aka CLK1))  or 1/128 input clock (CLK1)
@@ -425,7 +418,6 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
 uint8_t apple_imagewriter_printer_device::maincpu_in_sid_func()
 {
 	return (PAPER_WIDTH_INCHES == 15.0) ? 0 : 1;  // for imagewriter15, will be 0, regular imagewriter will be 1
-//	return ioportsaferead("WIDTH");
 }
 
 //-------------------------------------------------
@@ -568,11 +560,9 @@ void apple_imagewriter_printer_device::head_to(uint8_t data)
 uint8_t apple_imagewriter_printer_device::switch_pa_r(offs_t offset)
 {
 	u8 data =
-//			(!(x_pixel_coord(m_xpos) <= m_left_edge)  << 0) | // m4 home detector
 			(!((m_bitmap_printer->m_xpos) <= m_left_edge)  << 0) | // m4 home detector
 			(ioport("PAPEREND")->read()               << 1) | // simulate a paper out error
 			(ioport("COVER")->read()                  << 2) | //
-//			(!(x_pixel_coord(m_xpos) >  m_right_edge) << 3) | // return switch
 			(!((m_bitmap_printer->m_xpos) >  m_right_edge) << 3) | // return switch
 			(m_ic17_flipflop_select_status            << 4) | // select status flip flop
 			(ioport("FORMFEED")->read()               << 5) | //
@@ -746,14 +736,10 @@ void apple_imagewriter_printer_device::update_printhead()
 
 	for (int i = 0; i < numdots; i++)
 	{
-
 		int xdirection = m_bitmap_printer->m_cr_direction;
 		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment
 		int ypixel = (m_bitmap_printer->m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
 	
-//		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment
-//		int ypixel = y_pixel_coord(m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
-
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
 			int darklevel = (ioport("DARKPIXEL")->read() & 0x7);
@@ -770,29 +756,11 @@ void apple_imagewriter_printer_device::update_printhead()
 //-------------------------------------------------
 //    Update Paper Feed Stepper
 //-------------------------------------------------
-/*
-void silentype_printer_device::update_pf_stepper(uint8_t pattern)
-{
-	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
-}
-*/
-//-------------------------------------------------
-//    Update Carriage Stepper
-//-------------------------------------------------
 
-
-/*void silentype_printer_device::update_cr_stepper(uint8_t pattern)
-{
-	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
-}
-*/
 void apple_imagewriter_printer_device::update_pf_stepper(uint8_t pattern)
 {
-//	stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
  	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0)); // backwards
-//	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 0, 2, 1, 3));
 }
-
 
 //-------------------------------------------------
 //    Update Carriage Stepper
@@ -800,8 +768,6 @@ void apple_imagewriter_printer_device::update_pf_stepper(uint8_t pattern)
 
 void apple_imagewriter_printer_device::update_cr_stepper(uint8_t pattern)
 {
-//	stepper->update(bitswap<4>(pattern, 0, 2, 1, 3));  // drive pattern is the "standard" reel pattern when bits 1,2 swapped
-//	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 3, 1, 2, 0));
 	m_bitmap_printer->update_cr_stepper(bitswap<4>(pattern, 0, 2, 1, 3));
 }
 

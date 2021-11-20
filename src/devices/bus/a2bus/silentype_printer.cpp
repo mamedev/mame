@@ -108,7 +108,7 @@ ioport_constructor silentype_printer_device::device_input_ports() const
 
 void silentype_printer_device::device_add_mconfig(machine_config &config)
 {
-	[[maybe_unused]] bitmap_printer_device &printer(BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 60, 60));
+	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 60, 60);
 	m_bitmap_printer->set_pf_stepper_ratio(7,8);  // 7 / 4 / 2 = 7 / 8
 	m_bitmap_printer->set_cr_stepper_ratio(1,2);  // half steps = 1 / 2
 }
@@ -225,9 +225,6 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	for (int i=0;i<7;i++)
 	{
 		adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
-
-//		int xpixel = x_pixel_coord(m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
-//		int ypixel = y_pixel_coord(m_ypos) + (6 - i);
 
 		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
 		int ypixel = (m_bitmap_printer->m_ypos) + (6 - i);

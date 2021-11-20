@@ -153,7 +153,6 @@ void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 {
 	printf("clear to pos: %d   current:%d\n",to_line,clear_pos);
 	int from_line = clear_pos;
-//	to_line = std::min(m_bitmap->width(), to_line);  for reals!!! using width instead of height
 	to_line = std::min(m_bitmap->height(), to_line);
 	if (to_line >= from_line)
 	{
@@ -330,7 +329,6 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 			// so we can still see the last page printed.
 		{
 			// clear paper to bottom from current position
-//			bitmap_clear_band(clear_pos, m_paperheight - 1, rgb_t::white());
 			clear_to_pos(m_paperheight - 1, rgb_t::white());
 			
 			// save a snapshot with the slot and page as part of the filename
@@ -343,18 +341,17 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 						".png");
 
 			newpageflag = 1;
-			// clear page down to visible area, starting from the top of page
 
+			// clear page down to visible area, starting from the top of page
 			clear_pos = 0;
 			clear_to_pos(m_paperheight - 1 - PAPER_SCREEN_HEIGHT), 
-//			bitmap_clear_band(0, PAPER_HEIGHT - 1 - PAPER_SCREEN_HEIGHT, rgb_t::white());
 
 			m_ypos = get_top_margin();  // lock to the top of page until we seek horizontally
 			m_pf_stepper->set_absolute_position(get_top_margin() / m_pf_stepper_ratio0 * m_pf_stepper_ratio1);
 			retval = true;
 		}
-		else { clear_to_pos ( m_ypos + m_distfrombottom); }
-		return retval;
+	else { clear_to_pos ( m_ypos + m_distfrombottom); }
+	return retval;
 		
 }
 
