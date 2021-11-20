@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-   bitmap printer
+   bitmap printer (dot printer)
 
 	*	provides a page bitmap to draw on
 	*	reads and writes pixels (representing printer dots)
@@ -9,6 +9,7 @@
 	*	updates the bitmap to screen and draws the printhead
 	*	printhead position given in m_xpos and m_ypos
 	*	also provides a cr_stepper and a pf_stepper
+	*	moving the cr_stepper/pf_stepper will update m_xpos/m_ypos according to ratio specified
 
  */
 #include "screen.h"
@@ -68,7 +69,7 @@ private:
 
 	int m_printhead_color       = 0xEEE8AA;
 	int m_printhead_bordercolor = 0xBDB76B;
-	int m_printhead_bordersize = 3;
+	int m_printhead_bordersize = 2;
 	int m_printhead_xsize = 10;
 	int m_printhead_ysize = 20;
 	int m_pagedirty = 0;
@@ -110,6 +111,7 @@ public:
 
 	void set_pf_stepper_ratio(int ratio0, int ratio1) { m_pf_stepper_ratio0 = ratio0; m_pf_stepper_ratio1 = ratio1;}
 	void set_cr_stepper_ratio(int ratio0, int ratio1) { m_cr_stepper_ratio0 = ratio0; m_cr_stepper_ratio1 = ratio1;}
+
 private:
 	void draw_printhead(bitmap_rgb32 &bitmap, int x, int y);
 

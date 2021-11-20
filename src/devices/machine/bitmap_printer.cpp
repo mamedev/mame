@@ -116,6 +116,23 @@ void bitmap_printer_device::device_start()
 	save_item(NAME(m_internal_bitmap));
 	save_item(NAME(m_xpos));
 	save_item(NAME(m_ypos));
+	save_item(NAME(m_cr_direction));
+	save_item(NAME(m_pf_stepper_ratio0));
+	save_item(NAME(m_pf_stepper_ratio1));
+	save_item(NAME(m_cr_stepper_ratio0));
+	save_item(NAME(m_cr_stepper_ratio1));
+	save_item(NAME(m_printhead_color));
+	save_item(NAME(m_printhead_bordercolor));
+	save_item(NAME(m_printhead_bordersize));
+	save_item(NAME(m_printhead_xsize));
+	save_item(NAME(m_printhead_ysize));
+	save_item(NAME(m_pagedirty));
+	save_item(NAME(m_paperwidth));
+	save_item(NAME(m_paperheight));
+	save_item(NAME(m_hdpi));
+	save_item(NAME(m_vdpi));
+	save_item(NAME(clear_pos));
+	save_item(NAME(newpageflag));
 }
 
 void bitmap_printer_device::device_reset_after_children()
