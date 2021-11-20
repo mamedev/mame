@@ -159,9 +159,9 @@ void gt913_sound_device::update_sample(voice_t& voice)
 		voice.m_exp_at_loop = voice.m_exp;
 	}
 
-	u16 word = m_cache.read_word(voice.m_addr_current & ~1U);
+	u16 word = m_cache.read_word(voice.m_addr_current & ~1);
 	s16 delta = 0;
-	
+
 	if (!BIT(voice.m_addr_current, 0))
 	{
 		voice.m_exp += exp_2_to_3[word & 3];
@@ -225,7 +225,14 @@ void gt913_sound_device::command_w(u16 data)
 	auto& voice = m_voices[voicenum];
 	if (voicecmd == 0x0008)
 	{
-		voice.m_addr_start = (m_data[1] | (m_data[2] << 16)) & 0x1fffff;
+		/*
+		sample start addresses seem to need to be word-aligned to decode properly
+		(see: ctk551 "Trumpet" patch, which will have a bad exponent value otherwise)
+		this apparently doesn't apply to end/loop addresses, though, or else samples
+		may loop badly or even become noticeably detuned
+		TODO: is the LSB of start addresses supposed to indicate something else, then?
+		*/
+		voice.m_addr_start = (m_data[1] | (m_data[2] << 16)) & 0x1ffffe;
 	}
 	else if (voicecmd == 0x0000)
 	{
@@ -259,7 +266,11 @@ void gt913_sound_device::command_w(u16 data)
 	}
 	else if (voicecmd == 0x4005)
 	{
-		voice.m_pitch = (m_data[0] << 8) | (m_data[1] >> 8);
+		/*
+		for pitch, data[1] apparently contains both the most and least significant of 4 bytes,
+		with data0 in the middle. strange, but apparently correct (see higher octaves of ctk551 E.Piano2)
+		*/
+		voice.m_pitch = (m_data[1] << 24) | (m_data[0] << 8) | (m_data[1] >> 8);
 	}
 	else if (voicecmd == 0x6006)
 	{
@@ -270,6 +281,8 @@ void gt913_sound_device::command_w(u16 data)
 	else if (voicecmd == 0x6007)
 	{
 		logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
+		/* TODO - this logic is probably not right
+		see func at 0x1e24 in ctk551 */
 		if (BIT(m_data[0], 15))
 		{
 			voice.m_volume_current = voice.m_volume_target = 0;
