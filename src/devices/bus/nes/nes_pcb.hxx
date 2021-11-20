@@ -229,6 +229,7 @@ static const nes_pcb pcb_list[] =
 	{ "somari",           SOMARI_SL12 },  // mapper 116
 	{ "huang2",           SOMARI_HUANG2 },  // mapper 116 also
 	{ "nitra",            NITRA_TDA },
+	{ "bmw8544",          UNL_BMW8544 },
 	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },
 	{ "family4646",       BMC_FAMILY_4646 },
@@ -396,7 +397,6 @@ static const nes_pcb pcb_list[] =
 	{ "onebus",           UNSUPPORTED_BOARD },
 	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };

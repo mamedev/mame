@@ -21,6 +21,30 @@ public:
 };
 
 
+// ======================> nes_bmw8544_device
+
+class nes_bmw8544_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_bmw8544_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_prg(int prg_base, int prg_mask) override;
+
+private:
+	u8 m_reg;
+};
+
+
 // ======================> nes_fs6_device
 
 class nes_fs6_device : public nes_txrom_device
@@ -1119,6 +1143,7 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device)
+DECLARE_DEVICE_TYPE(NES_BMW8544,       nes_bmw8544_device)
 DECLARE_DEVICE_TYPE(NES_FS6,           nes_fs6_device)
 DECLARE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device)
 DECLARE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device)

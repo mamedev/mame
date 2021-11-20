@@ -327,9 +327,9 @@ static const nes_mmc mmc_list[] =
 	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
 	{ 291, BMC_NT639 },
-	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
+	{ 292, UNL_BMW8544 },          // Dragon Fighter by Flying Star
 	// 293 NewStar multicarts, do we have these in nes.xml?
-	{ 294, BMC_FAMILY_4646 },    // FIXME: is this really exactly the same as mapper 134?
+	{ 294, BMC_FAMILY_4646 },      // FIXME: is this really exactly the same as mapper 134?
 	// 295 JY multicarts not yet in nes.xml
 	// 296 VT3x handhelds
 	{ 297, TXC_22110 },            // 2-in-1 Uzi Lightgun

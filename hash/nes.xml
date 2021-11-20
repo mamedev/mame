@@ -63349,8 +63349,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Flying Star</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_drgnfgt" />
-			<feature name="pcb" value="UNL-DRAGONFIGHTER" />
+			<feature name="slot" value="bmw8544" />
+			<feature name="pcb_model" value="BMW8544" />
 			<dataarea name="chr" size="524288">
 				<rom name="dragon fighter (unl)[u].chr" size="524288" crc="a62e97c9" sha1="af094d6a93241ea2702fb5b946fd5d789af5dd8f" offset="00000" status="baddump" />
 			</dataarea>
