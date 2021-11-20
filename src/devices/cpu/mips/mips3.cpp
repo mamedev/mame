@@ -5666,7 +5666,6 @@ inline uint32_t r4400scbe_device::virt_to_phys_safe(uint32_t vaddr)
 	return (vtlb_table()[vaddr >> 12] & ~0xfff) | (vaddr & 0xfff);
 }
 
-
 void r4400scbe_device::handle_cache(uint32_t op)
 {
 	if ((SR & SR_KSU_MASK) != SR_KSU_KERNEL && !(SR & SR_COP0) && !(SR & (SR_EXL | SR_ERL)))
@@ -5694,8 +5693,6 @@ void r4400scbe_device::handle_cache(uint32_t op)
 				const auto stag = (tag & 0x7ffff);
 				const auto pidx = (vaddr & 0x380000) >> 19;
 				m_core->cpr[0][COP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
-
-				// std::cout << std::hex << machine().describe_context() << " index load tag vaddr " << std::hex << vaddr << " result " << std::hex << tag << " setting taglo to " << std::hex << m_core->cpr[0][COP0_TagLo] << std::endl;
 				break;
 			}
 
@@ -5712,8 +5709,6 @@ void r4400scbe_device::handle_cache(uint32_t op)
 				const auto stag = (tag_lo & 0xffffe000) >> 13;
 				const auto pidx = (vaddr & 0x7000) >> 12;
 				m_scache_tag[index] = cs << 22 | pidx << 19 | stag;
-
-				// std::cout << std::hex << machine().describe_context() << " index store tag vaddr " << std::hex << vaddr << " tlbaddress " << tlbaddress << " index " << index << " new_entry " << std::hex << m_scache_tag[index] << std::endl;
 				break;
 			}
 
