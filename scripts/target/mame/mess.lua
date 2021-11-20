@@ -1366,6 +1366,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"pitronic",
 		"poly",
 		"poly88",
+		"positron",
 		"psion",
 		"quantel",
 		"qume",
@@ -3399,6 +3400,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/poly88.cpp",
 	MAME_DIR .. "src/mame/includes/poly88.h",
 	MAME_DIR .. "src/mame/machine/poly88.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "positron")
+files {
+	MAME_DIR .. "src/mame/drivers/positron.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "psion")
