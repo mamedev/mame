@@ -42,13 +42,9 @@
  * an offset must be used to centralize the pixels.
  */
 #define CR_OFFSET    (-14)
-//#define PAPER_WIDTH  1024
-//#define PAPER_HEIGHT 576
 
-#define PAPER_WIDTH  1024 
-// 120 dpi * 8.5333 inches
-#define PAPER_HEIGHT (11*72) 
-// 72 dpi * 11 inches
+#define PAPER_WIDTH  1024    // 120 dpi * 8.5333 inches
+#define PAPER_HEIGHT (11*72) // 72 dpi * 11 inches
 
 
 
@@ -145,15 +141,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	upd.co1_func().set("dac", FUNC(dac_bit_interface::write));
 
 //  config.set_default_layout(layout_lx800);
-/*
-	// video hardware (simulates paper)
-	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(PAPER_WIDTH, PAPER_HEIGHT);
-	screen.set_visarea(0, PAPER_WIDTH-1, 0, PAPER_HEIGHT-1);
-	screen.set_screen_update(FUNC(epson_lx810l_device::screen_update_lx810l));
-*/
+
 	/* audio hardware */
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
@@ -176,9 +164,6 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 120, 72);  // do 72 dpi
 	m_bitmap_printer->set_pf_stepper_ratio(1,6);  // pf stepper moves at 216 dpi so at 72dpi half steps
 	m_bitmap_printer->set_cr_stepper_ratio(1,1);
-//	STEPPER(config, m_pf_stepper, (uint8_t)4);
-//	STEPPER(config, m_cr_stepper, (uint8_t)2);
-
 }
 
 /***************************************************************************
@@ -325,9 +310,6 @@ void epson_lx810l_device::device_start()
 	m_online_led.resolve();
 
 	m_cr_timer = timer_alloc(TIMER_CR);
-
-//	m_screen->register_screen_bitmap(m_bitmap);
-//	m_bitmap.fill(0xffffff); /* Start with a clean white piece of paper */
 }
 
 
@@ -354,17 +336,10 @@ void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int
 		 * the same period as each half-step (417 microseconds), but with
 		 * a 356 microseconds delay relative to the motor steps.
 		 */
-//		m_real_cr_pos += param;
-
 		m_in_between_offset += param;
-
-//		m_bitmap_printer->m_cr_stepper->set_absolute_position(m_bitmap_printer->m_cr_stepper->get_absolute_position()+param);
-
-//m_bitmap_printer->m_xpos = m_bitmap_printer->m_cr_stepper->get_absolute_position() * m_bitmap_printer->m_cr_stepper_ratio0 / m_bitmap_printer->m_cr_stepper_ratio1;
 
 		m_real_cr_steps--;
 		if (m_real_cr_steps)
-//			m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
 			m_cr_timer->adjust(attotime::from_usec(400), m_bitmap_printer->m_cr_direction);
 		break;
 	}
@@ -403,7 +378,6 @@ void epson_lx810l_device::fakemem_w(uint8_t data)
 uint8_t epson_lx810l_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
-//	uint8_t hp_sensor = m_real_cr_pos <= 0 ? 0 : 1; // use m_real_cr_pos instead of m_cr_pos_abs (fixes walking carriage on mame soft reset)
 	uint8_t hp_sensor = m_bitmap_printer->m_xpos <= 0 ? 0 : 1; // use m_real_cr_pos instead of m_cr_pos_abs (fixes walking carriage on mame soft reset)
 
 	//uint8_t pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
@@ -416,7 +390,8 @@ uint8_t epson_lx810l_device::porta_r(offs_t offset)
 
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
 
-	m_bitmap_printer->setprintheadcolor( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0); // just put this here since it gets called frequently
+	// Update the printhead display, only put this here since this routine gets called frequently
+	m_bitmap_printer->setprintheadcolor( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0); 
 
 	return result;
 }
@@ -515,56 +490,20 @@ void epson_lx810l_device::printhead(uint16_t data)
 
 void epson_lx810l_device::pf_stepper(uint8_t data)
 {
-//	m_bitmap_printer->update_pf_stepper(bitswap<4>(data, 0, 1, 2, 3));
 	m_bitmap_printer->update_pf_stepper(data);
-/*
-	int changed = m_pf_stepper->update(data);
-	m_pf_pos_abs = -m_pf_stepper->get_absolute_position();
-
-	// clear last line of paper
-	if (changed > 0) {
-		void *line = m_bitmap.raw_pixptr(bitmap_line(9), 0);
-		memset(line, 0xff, m_bitmap.width() * 4);
-	}
-
-	LOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_pf_pos_abs);
-*/
 }
 
 void epson_lx810l_device::cr_stepper(uint8_t data)
 {
 	m_bitmap_printer->update_cr_stepper(bitswap<4>(data, 0, 1, 2, 3));  // reverse bits
-//	m_bitmap_printer->update_cr_stepper(data);
 
 	m_in_between_offset = 0;
 
 	if (!m_real_cr_steps)
 	{
 		m_cr_timer->adjust(attotime::from_usec(400), m_bitmap_printer->m_cr_direction);
-	m_real_cr_steps++;
+		m_real_cr_steps++;
 	}
-
-
-/*
-	int m_cr_pos_abs_prev = m_cr_pos_abs;
-
-	m_cr_stepper->update(data);
-	m_cr_pos_abs = -m_cr_stepper->get_absolute_position();
-
-	if (m_cr_pos_abs > m_cr_pos_abs_prev) {
-		// going right 
-		m_real_cr_dir =  1;
-	} else {
-		// going left 
-		m_real_cr_dir = -1;
-	}
-
-	if (!m_real_cr_steps)
-		m_cr_timer->adjust(attotime::from_usec(400), m_real_cr_dir);
-	m_real_cr_steps++;
-
-	LOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_cr_pos_abs);
-*/
 }
 
 WRITE_LINE_MEMBER( epson_lx810l_device::e05a30_ready )
@@ -573,24 +512,6 @@ WRITE_LINE_MEMBER( epson_lx810l_device::e05a30_ready )
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_double(0.09));
 }
 
-
-/***************************************************************************
-    Video hardware (simulates paper)
-***************************************************************************/
-/*
-uint32_t epson_lx810l_device::screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int scrolly = -bitmap_line(9);
-	copyscrollbitmap(bitmap, m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
-
-	// draw "printhead" 
-	int bordersize = 1;
-	bitmap.plot_box(m_real_cr_pos + CR_OFFSET - 10 - bordersize, PAPER_HEIGHT - 36 - bordersize, 20 + bordersize * 2, 36 + bordersize * 2, 0x000000 );
-	bitmap.plot_box(m_real_cr_pos + CR_OFFSET - 10, PAPER_HEIGHT - 36, 20, 36, m_e05a30->ready_led() ? 0x55ff55 : 0x337733 );
-
-	return 0;
-}
-*/
 
 /***************************************************************************
     Extended Timer Output
@@ -612,12 +533,12 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 		 * noticeably off in the 20+ years old printer used for testing =).
 		 */
 		if (m_bitmap_printer->m_xpos < m_bitmap_printer->get_bitmap().width()) {
-//		if (m_real_cr_pos < m_bitmap.width()) {
-			for (int i = 0; i < 9; i++) {
-//				unsigned int const y = bitmap_line(i);
+			for (int i = 0; i < 9; i++) 
+			{
 				if ((m_printhead & (1<<(8-i))) != 0)
-//					m_bitmap.pix(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
-					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset + (m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;					
+					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1,
+					m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset +
+					(m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;
 			}
 		}
 	}
