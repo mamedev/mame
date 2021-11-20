@@ -121,7 +121,12 @@ ROM_START( fnf )
 	OPTIPLEX740_BIOS
 
 	DISK_REGION( "ide:0:hdd:image" )
-	DISK_IMAGE( "faf306", 0, NO_DUMP )
+	/* Clean image created from the recovery CDs on the original machine.
+	   After installing the software from the discs, the PC reboots several times for configurating
+	   the hardware devices and peripherals, and then asks for controllers calibration.
+	   The image is just up to this point, before performing any calibration. On the first boot from
+	   this image, you'll be asked for the calibration, and after it, the game is ready for playing. */
+	DISK_IMAGE( "faf306", 0, SHA1(2aefe396a79e3328f58ae5e4ccda0041af1b4a1a) )
 
 	// Two recovery CDs, you need both for a full restore
 
