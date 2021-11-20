@@ -46025,6 +46025,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="decoasc">
+		<description>Data East All-Star Collection</description>
+		<year>2017</year>
+		<publisher>retro-bit</publisher>
+		<info name="serial" value="RB-CT-102"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="2097152">
+				<rom name="data east all-star collection.prg" size="2097152" crc="9e8fd9a4" sha1="755b43ebfc7f934225906b7cf526487bf98c5562" status="baddump" />
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="diehardj" cloneof="diehard">
 		<description>Die Hard (Jpn)</description>
 		<year>1991</year>
@@ -57359,13 +57376,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="chuliuxx" supported="no">
 		<description>Chǔ Liúxiāng Xīnzhuàn (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1015"/>
 		<info name="alt_title" value="楚留香新传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1015] chu liu xiang xin zhuan (c).prg" size="1048576" crc="830bcf70" sha1="f409cfb87e1a141b532ceb29c91bb43a1e744282" offset="00000" status="baddump" />
 			</dataarea>
@@ -83045,6 +83062,26 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Mega Man 1 and 2 have glitched audio. Does this happen on hardware? -->
+	<software name="mc_mega8">
+		<description>Mega Man 8 in 1 (PL-0006)</description>
+		<year>20??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="4194304">
+				<rom name="megaman 8 in 1 (pl-0006).prg" size="4194304" crc="19114c05" sha1="12e8de939d60610a6ca11b8fb1ef7f2b0c8c4ccb" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_n4" supported="partial">
 		<description>New 4 in 1 Supergame (YH4239)</description>
 		<year>19??</year>
@@ -84263,28 +84300,16 @@ that the real dumps might surface -->
 	</software>
 
 
-<!-- These use a MMC3 variant we still don't support! -->
+<!-- TODO: looks like these were put at the end of the list to be sorted later. Move to regular multicart subsection? -->
 
-	<software name="mc_hh210" supported="no">
-		<description>Handheld 210 in 1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="COOLBOY" />
-			<dataarea name="prg" size="33554432">
-				<rom name="msp55lv128t.u4" size="16777216" crc="9ba520d4" sha1="627f811b24314197e289a2ade668ff4115421bed" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_cb198" supported="no">
+	<software name="mc_cb198" supported="partial">
 		<description>CoolBoy 198 in 1</description>
 		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1146.u3" size="33554432" crc="253364ea" sha1="808ad7ff037e016c6a7a88dbe7b2bf1d41a46546" offset="00000" />
 			</dataarea>
@@ -84294,13 +84319,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_cb400" supported="no">
+	<software name="mc_cb400" supported="partial">
 		<description>CoolBoy 400 in 1</description>
-		<year>19??</year>
+		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="rom.prg" size="33554432" crc="da8f37f1" sha1="bc5a2777a04b58219702a2a32e1e6a04cc0a5c5a" offset="00000" />
 			</dataarea>
@@ -84310,44 +84336,32 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_cb400a" cloneof="mc_cb400" supported="no">
-		<description>CoolBoy 400 in 1 (Alt, 403 games)</description>
-		<year>19??</year>
+	<software name="mc_cb400a" cloneof="mc_cb400" supported="partial">
+		<description>CoolBoy 400 in 1 (alt, 403 games)</description>
+		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1102.bin" size="33554432" crc="6a98c5ee" sha1="f5de587420d0ad4e8fdff6b4ba32a940f1fe35bd" offset="00000" />
 			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_cb280" supported="no">
-		<description>Coolboy RS-18 (280 in 1)</description>
-		<year>19??</year>
-		<publisher>CoolBoy</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="COOLBOY" />
-			<dataarea name="prg" size="4194304">
-				<rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
-			</dataarea>
+			<!-- 128k VRAM on cartridge -->
 			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
+<!-- Is this a bad dump? Wrong mapper? -->
 	<software name="mc_cb203" supported="no">
 		<description>Coolboy RS-17 (203 in 1)</description>
-		<year>19??</year>
+		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="4194304">
 				<rom name="s25fl032.bin" size="4194304" crc="33c4e67b" sha1="5787db4c8ce4c2569a5f9e9054cbb1944c1b3092" offset="00000" />
 			</dataarea>
@@ -84356,13 +84370,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_g450" supported="no">
+	<software name="mc_g450" supported="partial">
 		<description>Game 450 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="g450in1.bin" size="33554432" crc="a4396e58" sha1="780d85b737bfc3ba9918f84d09c2d90d72c88dd3" offset="00000" />
 			</dataarea>
@@ -84372,13 +84387,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_g500" supported="no">
+	<software name="mc_g500" supported="partial">
 		<description>Game 500 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="g500in1.bin" size="33554432" crc="74787d9d" sha1="63f28d991351320f3427ddd541c9edb6d3c8fe5f" offset="00000" />
 			</dataarea>
@@ -84388,13 +84404,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_pg150" supported="no">
+	<software name="mc_pg150" supported="partial">
 		<description>Pocket Games 150 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="pocketgames150-in1.bin" size="33554432" crc="32f1176b" sha1="2cfd9b61ebdfc328f020ae9bd5e5e2219321e828" offset="00000" />
 			</dataarea>
@@ -84404,13 +84421,34 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_sg218" supported="no">
+	<software name="mc_sg143" supported="partial">
+		<description>Super Games 143 in 1 (The Best Games of NES)</description>
+		<year>201?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
+			<dataarea name="prg" size="33554432">
+				<rom name="super game 143-in-1 (the best games of nes).prg" size="33554432" crc="4026eed1" sha1="f127498b71dab1ab3196e0967055cb986779dfa9" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sg218" supported="partial">
 		<description>Super Game 218 in 1 (JF2181)</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b0932.u3" size="33554432" crc="82fc4149" sha1="080cb14134e2756472114227267b6ade4f1aab9b" offset="00000" />
 			</dataarea>
@@ -84420,29 +84458,34 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_sg360" supported="no">
+	<software name="mc_sg360" supported="partial">
 		<description>Super Game 360 in 1</description>
-		<year>19??</year>
+		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1324.u3" size="33554432" crc="f1371c17" sha1="77bdc59514e12910aee73c69e563a69f47675a2a" offset="00000" />
 			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_sg402" supported="no">
+	<software name="mc_sg402" supported="partial">
 		<description>Super Game 402 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1310.u3" size="33554432" crc="205daab3" sha1="b403daad9e0cd3b8490ef9127bcb7acd5b40f710" offset="00000" />
 			</dataarea>
