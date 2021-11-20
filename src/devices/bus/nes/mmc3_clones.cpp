@@ -445,6 +445,7 @@ nes_smd133_device::nes_smd133_device(const machine_config &mconfig, const char *
 
 
 
+
 void nes_bmw8544_device::device_start()
 {
 	mmc3_start();
