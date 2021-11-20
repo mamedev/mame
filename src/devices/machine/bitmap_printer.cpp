@@ -138,7 +138,9 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	copyscrollbitmap(bitmap, *m_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the bitmap
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paperwidth, 2, 0xEEE8AA);  // draw a line on the very top of the top edge of page
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paperheight, m_paperwidth, 2, 0xEE8844);  // draw a line on the bottom edge of page
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paperheight + 2, m_paperwidth, m_distfrombottom, 0xDDDDDD);  // cover up visible parts of current page at the bottom
 
 	drawprinthead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
 
@@ -151,7 +153,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 {
-	printf("clear to pos: %d   current:%d\n",to_line,clear_pos);
+//	printf("clear to pos: %d   current:%d\n",to_line,clear_pos);
 	int from_line = clear_pos;
 	to_line = std::min(m_bitmap->height(), to_line);
 	if (to_line >= from_line)
@@ -159,7 +161,7 @@ void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 		bitmap_clear_band(*m_bitmap, from_line, to_line, color);
 	}
 	clear_pos = std::max(clear_pos, to_line + 1);
-	printf("new clear pos: %d \n",clear_pos);
+//	printf("new clear pos: %d \n",clear_pos);
 }
 
 
@@ -172,14 +174,13 @@ void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 co
 
 void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
 {
-	printf("clear band (%d,%d)\n",from_line,to_line);
+//	printf("clear band (%d,%d)\n",from_line,to_line);
 	// plot_box( x, y, width, height, color)
 	bitmap.plot_box(0, from_line, m_paperwidth, to_line - from_line + 1, color);
 }
 
 void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
 {
-	printf("write snapshot\n");
 	machine().popmessage("snapshot written to " + directory + "/" + name);
 	emu_file file(machine().options().snapshot_directory() + std::string("/") + directory,
 		  OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
@@ -241,7 +242,7 @@ void bitmap_printer_device::draw_number(int number, int x, int y, bitmap_rgb32& 
 
 	int width = m_hdpi / 15;  // 1/10 of inch
 	int height = m_vdpi / 30;
-	int thick = m_hdpi / 60;
+	int thick = std::min(m_vdpi / 72, 1);
 
 	for (int i = s.length()-1; i>=0; i--)
 		draw7seg( s.at(i) - 0x30, true,
@@ -274,7 +275,6 @@ void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 
 void bitmap_printer_device::drawpixel(int x, int y, int pixelval)
 {
-//	y += get_top_margin();
 	if (y >= m_bitmap->height()) y = m_bitmap->height() - 1;
 	if (x >= m_bitmap->width()) x = m_bitmap->width() - 1;
 
@@ -285,7 +285,6 @@ void bitmap_printer_device::drawpixel(int x, int y, int pixelval)
 
 int bitmap_printer_device::getpixel(int x, int y)
 {
-//	y += get_top_margin();
 	if (y >= m_bitmap->height()) y = m_bitmap->height() - 1;
 	if (x >= m_bitmap->width()) x = m_bitmap->width() - 1;
 
@@ -294,7 +293,6 @@ int bitmap_printer_device::getpixel(int x, int y)
 
 unsigned int& bitmap_printer_device::pix(int y, int x)    // reversed y x
 {
-//	y += get_top_margin();
 	if (y >= m_bitmap->height()) y = m_bitmap->height() - 1;
 	if (x >= m_bitmap->width()) x = m_bitmap->width() - 1;
 
@@ -308,10 +306,17 @@ int bitmap_printer_device::calc_scroll_y(bitmap_rgb32& bitmap)
 
 
 
-int bitmap_printer_device::get_top_margin()    { return ioport("TOPMARGIN")->read(); }  // incorrect ioport string causes segfault
+
+
+
+//-------------------------------------------------
+//    STEPPER RELATED FUNCTIONS
+//-------------------------------------------------
+
+int bitmap_printer_device::get_top_margin()    { return ioport("TOPMARGIN")->read(); }
 int bitmap_printer_device::get_bottom_margin() { return ioport("BOTTOMMARGIN")->read(); }
 
-bool bitmap_printer_device::check_new_page() // reset_ypos()
+bool bitmap_printer_device::check_new_page()
 {
 	bool retval = false;
 	
@@ -333,8 +338,8 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 			
 			// save a snapshot with the slot and page as part of the filename
 			write_snapshot_to_file(
-						owner()->basetag(), //std::string("imagewriter"),
-						owner()->basetag() + std::string("_") + //std::string("imagewriter_") +
+						owner()->basetag(),
+						owner()->basetag() + std::string("_") +
 						get_session_time_device()->getprintername() +
 						"_page_" +
 						padzeroes(std::to_string(get_session_time_device()->page_num++),3) +
@@ -353,5 +358,41 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 	else { clear_to_pos ( m_ypos + m_distfrombottom); }
 	return retval;
 		
+}
+
+int bitmap_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
+{
+	int lastpos = stepper->get_absolute_position();
+	stepper->update(pattern);
+	int delta = stepper->get_absolute_position() - lastpos;
+	return delta;
+}
+
+void bitmap_printer_device::update_cr_stepper(uint8_t pattern) 
+{
+
+	int delta = update_stepper_delta(m_cr_stepper, pattern);
+
+	if (delta != 0)
+	{
+		newpageflag = 0;
+
+		if (delta > 0)
+		{
+			m_cr_direction = 1;
+		}
+		else if (delta < 0)
+		{
+			m_cr_direction = -1;
+		}
+	}
+	m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
+}
+
+void bitmap_printer_device::update_pf_stepper(int pattern) 
+{	[[maybe_unused]] int delta = update_stepper_delta(m_pf_stepper, pattern);
+
+	m_ypos = m_pf_stepper->get_absolute_position() * m_pf_stepper_ratio0 / m_pf_stepper_ratio1;
+	check_new_page();
 }
 

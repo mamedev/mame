@@ -116,45 +116,10 @@ private:
 	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor);
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap);
 	void draw_inch_marks(bitmap_rgb32& bitmap);
-
-
-	int update_stepper_delta(stepper_device * stepper, uint8_t pattern)
-	{
-		int lastpos = stepper->get_absolute_position();
-		stepper->update(pattern);
-		int delta = stepper->get_absolute_position() - lastpos;
-		return delta;
-	}
-
+	int update_stepper_delta(stepper_device * stepper, uint8_t pattern);
 public:
-	void update_cr_stepper(uint8_t pattern) {
-
-		int delta = update_stepper_delta(m_cr_stepper, pattern);
-
-		if (delta != 0)
-		{
-			newpageflag = 0;
-
-			if (delta > 0)
-			{
-				m_cr_direction = 1;
-			}
-			else if (delta < 0)
-			{
-				m_cr_direction = -1;
-			}
-		}
-
-		m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
-	}
-	
-	void update_pf_stepper(int pattern) 
-	{	[[maybe_unused]] int delta = update_stepper_delta(m_pf_stepper, pattern);
-	
-		m_ypos = m_pf_stepper->get_absolute_position() * m_pf_stepper_ratio0 / m_pf_stepper_ratio1;
-		check_new_page();
-	}
-
+	void update_cr_stepper(uint8_t pattern);
+	void update_pf_stepper(int pattern);
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)
