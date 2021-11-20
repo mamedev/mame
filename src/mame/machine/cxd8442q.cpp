@@ -19,15 +19,12 @@
  *  and potentially more.
  *
  * TODO:
- *  - Cleanup
  *  - Hardware-accurate behavior of the FIFO - this is a best guess.
  *  - Actual clock rate
  *  - Additional features and registers
  */
 
 #include "cxd8442q.h"
-
-// #define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIFOQ")

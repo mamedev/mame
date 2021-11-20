@@ -51,10 +51,10 @@
  *       The monitor ROM works just fine with DRC. NetBSD doesn't boot without DRC,
  *       so you must recompile without the DRC disable or with R4000.cpp to use the NetBSD floppy.
  *   - 10x Motorola MCM67A618FN12 SRAMs (secondary cache): partially emulated
- *     - Tag manipulation is implemented. This seems to be enough for NEWS-OS 4 to work, at least to a reasonable degree
+ *     - Tag manipulation is implemented. This seems to be enough for NEWS-OS 4 to work.
  *  Motherboard:
  *   - Sony CXD8490G, CXD8491G, CXD8492G, CXD8489G (unknown ASICs): not emulated
- *   - Main memory: partially emulated (memory controller is unknown and not emulated - memory configurations other than 64MB don't work at the moment)
+ *   - Main memory: partially emulated (memory controller is unknown and barely emulated - memory configurations other than 64MB don't work at the moment)
  *  I/O board:
  *   - Sony CXD8409Q Parallel Interface: not emulated
  *   - National Semi PC8477B Floppy Controller: emulated (-A differences unemulated but seem to be unneeded)
@@ -75,8 +75,6 @@
  *  ~2GB HD image that plays well with the NEWS-OS installer: `chdman createhd -o test.chd -s 2088960000`
  *
  *  Known issues:
- *  - At one point, I saw some telnet issues (root would work, one regular user couldn't log in even though `su user` from root also worked).
- *    I haven't been able to reproduce that recently.
  *  - NEWS-OS APbus bootloader doesn't work with DRC enabled (see CPU section above)
  *  - Monitor ROM command `ss -r` doesn't show most register values
  *    (TLB dump is broken, but that is broken on the real NWS-5000X too. Use the `mp` command for a working version that shows the TLB correctly,
@@ -320,7 +318,8 @@ protected:
 	uint8_t apbus_cmd_r(offs_t offset);
 	void apbus_cmd_w(offs_t offset, uint32_t data);
 	uint32_t apbus_virt_to_phys(uint32_t v_address);
-	std::map<offs_t, std::string> m_apbus_cmd_decoder {
+	std::map<offs_t, std::string> m_apbus_cmd_decoder
+	{
 		{0xc, "INTMSK"},    // Interrupt mask
 		{0x14, "INSTST"},   // Interrupt status
 		{0x1c, "BER_ADDR"}, // Bus error address

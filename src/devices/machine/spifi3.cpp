@@ -11,7 +11,6 @@
  *
  * TODO:
  *  - NetBSD compatibility
- *  - Single method for applying AUTO* mode
  *  - Reselection, target mode, SDTR
  *  - LUN selection (currently assumes 0)
  *  - Non-chip-reset conditions
