@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0
+-->
+
+<softwarelist name="pc200" description="Sinclair PC200 disk images">
+
+	<software name="msdos">
+		<description>Microsoft MS DOS Operating System</description>
+		<year>1988</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Startup &amp; Utilities v3.3"/>
+			<dataarea name="flop" size="737280">
+				<rom name="Sinclair PC200 - Boot Disk.img" size="737280" crc="f9eae66d" sha1="cb1e8fef3050a492c03d32441b3a67020bb9a482"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Startup &amp; GEM/3 Desktop with GEM Paint"/>
+			<dataarea name="flop" size="737280">
+				<rom name="Sinclair PC200 - Gem Disk.img" size="737280" crc="24afbde6" sha1="cfbd50c982b3b5d3a6f642450449362226ba3659"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="promo">
+		<description>PC200 Promotion</description>
+		<year>1988</year>
+		<publisher>Amstrad</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Organizer Disk"/>
+			<dataarea name="flop" size="737280">
+				<rom name="Sinclair PC200 - PP201 Organizer Disk.img" size="737280" crc="7de018a4" sha1="5ff5d58ab0b8ca06ecd7271f0a27c6252f5188dd"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Games Disk"/>
+			<dataarea name="flop" size="737280">
+				<rom name="Sinclair PC200 - PP201 Games Disk.img" size="737280" crc="e12bc20c" sha1="4f6813043b920d6d206efddac68b02576fe42fa8"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

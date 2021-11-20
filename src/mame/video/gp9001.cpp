@@ -112,7 +112,7 @@ There seems to be sprite buffering - double buffering actually.
 Scroll Register 0E writes (Video controller inits ?) from different games:
 
 Teki-Paki        | Ghox             | Knuckle Bash     | Truxton 2        |
-0003, 0002, 4000 | ????, ????, ???? | 0202, 0203, 4200 | 0003, 0002, 4000 |
+0003, 0002, 4000 | 0003, 0002, 4000 | 0202, 0203, 4200 | 0003, 0002, 4000 |
 
 Dogyuun          | Batsugun         |
 0202, 0203, 4200 | 0202, 0203, 4200 |
@@ -120,6 +120,12 @@ Dogyuun          | Batsugun         |
 
 Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 0003, 0002, 4000 | 0202, 0203, 4200 | 0202, 0203, 4200 | 0202, 0203, 4200 |
+
+Enma Daio        | Power Kick       | Othello Derby    | Sorcer Striker   |
+0202, 0203, 4200 | 0003, 0002, 4000 | 0003, 0002, 4000 | 0003, 0002, 4000 |
+
+Kingdom GrandP.  | Battle Garegga   | Batrider         | Battle Bakraid   |
+0003, 0002, 4000 | 0003, 0002, 4000 | 0003, 0002, 4000 | 0003, 0002, 4000 |
 
 ***************************************************************************/
 

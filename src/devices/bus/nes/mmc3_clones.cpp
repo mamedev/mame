@@ -29,6 +29,7 @@
 //-------------------------------------------------
 
 DEFINE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device,         "nes_nitra",         "NES Cart Nitra PCB")
+DEFINE_DEVICE_TYPE(NES_BMW8544,       nes_bmw8544_device,       "nes_bmw8544",       "NES Cart BMW8544 PCB")
 DEFINE_DEVICE_TYPE(NES_FS6,           nes_fs6_device,           "nes_fs6",           "NES Cart Fight Street VI PCB")
 DEFINE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device,       "nes_smb11",         "NES Cart SMB 11 PCB")
 DEFINE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device,        "nes_malisb",        "NES Cart Mali Splash Bomb PCB")
@@ -125,6 +126,11 @@ ioport_constructor nes_bmc_f600_device::device_input_ports() const
 
 nes_nitra_device::nes_nitra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_NITRA, tag, owner, clock)
+{
+}
+
+nes_bmw8544_device::nes_bmw8544_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMW8544, tag, owner, clock), m_reg(0)
 {
 }
 
@@ -435,6 +441,23 @@ nes_pjoy84_device::nes_pjoy84_device(const machine_config &mconfig, const char *
 nes_coolboy_device::nes_coolboy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_txrom_device(mconfig, NES_COOLBOY, tag, owner, clock)
 {
+}
+
+
+
+
+void nes_bmw8544_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmw8544_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+
+	m_reg = 0;
+	mmc3_common_initialize(0x0f, 0xff, 0);
 }
 
 void nes_family4646_device::device_start()
@@ -1028,6 +1051,42 @@ void nes_nitra_device::write_h(offs_t offset, uint8_t data)
 	LOG_MMC(("nitra write_h, offset: %04x, data: %02x\n", offset, data));
 
 	txrom_write((offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
+}
+
+/*-------------------------------------------------
+
+ Board BMW8544
+
+ Games: Dragon Fighter (Flying Star)
+
+ MMC3 clone with poorly understood PRG/CHR banking.
+
+ NES 2.0: mapper 292
+
+ In MAME: Not supported.
+
+ -------------------------------------------------*/
+
+void nes_bmw8544_device::set_prg(int prg_base, int prg_mask)
+{
+	nes_txrom_device::set_prg(prg_base, prg_mask);
+	prg8_89(m_reg);
+}
+
+u8 nes_bmw8544_device::read_m(offs_t offset)
+{
+//	LOG_MMC(("bmw8544 read_m, offset: %04x\n", offset));
+
+	// CHR banking may be done by reads in this address range
+
+	return nes_txrom_device::read_m(offset);
+}
+
+void nes_bmw8544_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmw8544 write_m, offset: %04x, data: %02x\n", offset, data));
+	m_reg = data;
+	prg8_89(data);
 }
 
 /*-------------------------------------------------

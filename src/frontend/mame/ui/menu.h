@@ -117,8 +117,8 @@ protected:
 	// menu-related events
 	struct event
 	{
-		void                *itemref;   // reference for the selected item
-		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
+		void                *itemref;   // reference for the selected item or nullptr
+		menu_item           *item;      // selected item or nullptr
 		int                 iptkey;     // one of the IPT_* values from inptport.h
 		char32_t            unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM

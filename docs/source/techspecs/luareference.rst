@@ -2815,7 +2815,7 @@ view.has_art
 Layout view item
 ~~~~~~~~~~~~~~~~
 
-Wraps MAME’s ``layout_view::item`` class, representing an item in a view.  An
+Wraps MAME’s ``layout_view_item`` class, representing an item in a view.  An
 item is drawn as a rectangular textured surface.  The texture is supplied by an
 emulated screen or a layout element.
 
@@ -2832,7 +2832,7 @@ Methods
 item:set_state(state)
     Set the value used as the element state and animation state in the absence
     of bindings.  The argument must be an integer.
-item.set_element_state_callback(cb)
+item:set_element_state_callback(cb)
     Set a function to call to obtain the element state for the item.  The
     function must accept no arguments and return an integer.  Call with ``nil``
     to restore the default element state callback (based on bindings in the XML
@@ -2844,7 +2844,7 @@ item.set_element_state_callback(cb)
     This callback will not be used to obtain the animation state for the item,
     even if the item lacks explicit animation state bindings in the XML layout
     file.
-item.set_animation_state_callback(cb)
+item:set_animation_state_callback(cb)
     Set a function to call to obtain the animation state for the item.  The
     function must accept no arguments and return an integer.  Call with ``nil``
     to restore the default animation state callback (based on bindings in the
@@ -2852,7 +2852,7 @@ item.set_animation_state_callback(cb)
 
     Note that the function must not access the item’s ``animation_state``
     property, as this will result in infinite recursion.
-item.set_bounds_callback(cb)
+item:set_bounds_callback(cb)
     Set a function to call to obtain the bounds for the item.  The function must
     accept no arguments and return a
     :ref:`render bounds <luareference-render-bounds>` object in render target
@@ -2862,7 +2862,7 @@ item.set_bounds_callback(cb)
 
     Note that the function must not access the item’s ``bounds`` property, as
     this will result in infinite recursion.
-item.set_color_callback(cb)
+item:set_color_callback(cb)
     Set a function to call to obtain the multiplier colour for the item.  The
     function must accept no arguments and return a
     :ref:`render colour <luareference-render-color>` object.  Call with ``nil``
@@ -2871,6 +2871,50 @@ item.set_color_callback(cb)
 
     Note that the function must not access the item’s ``color`` property, as
     this will result in infinite recursion.
+item:set_scroll_size_x_callback(cb)
+    Set a function to call to obtain the size of the horizontal scroll window as
+    a proportion of the associated element’s width.  The function must accept no
+    arguments and return a floating-point value.  Call with ``nil`` to restore
+    the default horizontal scroll window size callback (based on the ``xscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_size_x``
+    property, as this will result in infinite recursion.
+item:set_scroll_size_y_callback(cb)
+    Set a function to call to obtain the size of the vertical scroll window as a
+    proportion of the associated element’s height.  The function must accept no
+    arguments and return a floating-point value.  Call with ``nil`` to restore
+    the default vertical scroll window size callback (based on the ``yscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_size_y``
+    property, as this will result in infinite recursion.
+item:set_scroll_pos_x_callback(cb)
+    Set a function to call to obtain the horizontal scroll position.  A value of
+    zero places the horizontal scroll window at the left edge of the associated
+    element.  If the item does not wrap horizontally, a value of 1.0 places the
+    horizontal scroll window at the right edge of the associated element; if the
+    item wraps horizontally, a value of 1.0 corresponds to wrapping back to the
+    left edge of the associated element.  The function must accept no arguments
+    and return a floating-point value.  Call with ``nil`` to restore the default
+    horizontal scroll position callback (based on bindings in the ``xscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_pos_x`` property,
+    as this will result in infinite recursion.
+item:set_scroll_pos_y_callback(cb)
+    Set a function to call to obtain the vertical scroll position.  A value of
+    zero places the vertical scroll window at the top edge of the associated
+    element.  If the item does not wrap vertically, a value of 1.0 places the
+    vertical scroll window at the bottom edge of the associated element; if the
+    item wraps vertically, a value of 1.0 corresponds to wrapping back to the
+    left edge of the associated element.  The function must accept no arguments
+    and return a floating-point value.  Call with ``nil`` to restore the default
+    vertical scroll position callback (based on bindings in the ``yscroll``
+    child element in the XML layout file).
+
+    Note that the function must not access the item’s ``scroll_pos_y`` property,
+    as this will result in infinite recursion.
 
 Properties
 ^^^^^^^^^^
@@ -2892,6 +2936,28 @@ item.color (read-only)
     The item’s colour for the current state.  The colour of the screen or
     element texture is multiplied by this colour.  This is a
     :ref:`render colour <luareference-render-color>` object.
+item.scroll_wrap_x (read-only)
+    A Boolean indicating whether the item wraps horizontally.
+item.scroll_wrap_y (read-only)
+    A Boolean indicating whether the item wraps vertically.
+item.scroll_size_x (read/write)
+    Get the item’s horizontal scroll window size for the current state, or set
+    the horizontal scroll window size to use in the absence of bindings.  This
+    is a floating-point value representing a proportion of the associated
+    element’s width.
+item.scroll_size_y (read/write)
+    Get the item’s vertical scroll window size for the current state, or set the
+    vertical scroll window size to use in the absence of bindings.  This is a
+    floating-point value representing a proportion of the associated element’s
+    height.
+item.scroll_pos_x (read/write)
+    Get the item’s horizontal scroll position for the current state, or set the
+    horizontal scroll position size to use in the absence of bindings.  This is
+    a floating-point value.
+item.scroll_pos_y (read/write)
+    Get the item’s vertical scroll position for the current state, or set the
+    vertical position size to use in the absence of bindings.  This is a
+    floating-point value.
 item.blend_mode (read-only)
     Get the item’s blend mode.  This is an integer value, where 0 means no
     blending, 1 means alpha blending, 2 means RGB multiplication, 3 means

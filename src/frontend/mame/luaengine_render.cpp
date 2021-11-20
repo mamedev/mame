@@ -39,7 +39,7 @@ struct layout_view_items
 	layout_view_items(layout_view &v) : view(v) { }
 	layout_view::item_list &items() { return view.items(); }
 
-	static layout_view::item &unwrap(layout_view::item_list::iterator const &it) { return *it; }
+	static layout_view_item &unwrap(layout_view::item_list::iterator const &it) { return *it; }
 	static int push_key(lua_State *L, layout_view::item_list::iterator const &it, std::size_t ix) { return sol::stack::push(L, ix + 1); }
 
 	layout_view &view;
@@ -97,7 +97,7 @@ public:
 	{
 		layout_view_items &self(get_self(L));
 		char const *const id(stack::unqualified_get<char const *>(L));
-		layout_view::item *const item(self.view.get_item(id));
+		layout_view_item *const item(self.view.get_item(id));
 		if (item)
 			return stack::push_reference(L, *item);
 		else
@@ -279,48 +279,86 @@ void lua_engine::initialize_render(sol::table &emu)
 	layout_view_type["has_art"] = sol::property(&layout_view::has_art);
 
 
-	auto layout_view_item_type = sol().registry().new_usertype<layout_view::item>("layout_item", sol::no_constructor);
-	layout_view_item_type["set_state"] = &layout_view::item::set_state;
+	auto layout_view_item_type = sol().registry().new_usertype<layout_view_item>("layout_item", sol::no_constructor);
+	layout_view_item_type["set_state"] = &layout_view_item::set_state;
 	layout_view_item_type["set_element_state_callback"] =
 		make_simple_callback_setter<int>(
-				&layout_view::item::set_element_state_callback,
+				&layout_view_item::set_element_state_callback,
 				[] () { return 0; },
 				"set_element_state_callback",
 				"element state");
 	layout_view_item_type["set_animation_state_callback"] =
 		make_simple_callback_setter<int>(
-				&layout_view::item::set_animation_state_callback,
+				&layout_view_item::set_animation_state_callback,
 				[] () { return 0; },
 				"set_animation_state_callback",
 				"animation state");
 	layout_view_item_type["set_bounds_callback"] =
 		make_simple_callback_setter<render_bounds>(
-				&layout_view::item::set_bounds_callback,
+				&layout_view_item::set_bounds_callback,
 				[] () { return render_bounds{ 0.0f, 0.0f, 1.0f, 1.0f }; },
 				"set_bounds_callback",
 				"bounds");
 	layout_view_item_type["set_color_callback"] =
 		make_simple_callback_setter<render_color>(
-				&layout_view::item::set_color_callback,
+				&layout_view_item::set_color_callback,
 				[] () { return render_color{ 1.0f, 1.0f, 1.0f, 1.0f }; },
 				"set_color_callback",
 				"color");
+	layout_view_item_type["set_scroll_size_x_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_size_x_callback,
+				[] () { return 1.0f; },
+				"set_scroll_size_x_callback",
+				"horizontal scroll window size");
+	layout_view_item_type["set_scroll_size_y_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_size_y_callback,
+				[] () { return 1.0f; },
+				"set_scroll_size_y_callback",
+				"vertical scroll window size");
+	layout_view_item_type["set_scroll_pos_x_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_pos_x_callback,
+				[] () { return 1.0f; },
+				"set_scroll_pos_x_callback",
+				"horizontal scroll position");
+	layout_view_item_type["set_scroll_pos_y_callback"] =
+		make_simple_callback_setter<float>(
+				&layout_view_item::set_scroll_pos_y_callback,
+				[] () { return 1.0f; },
+				"set_scroll_pos_y_callback",
+				"vertical scroll position");
 	layout_view_item_type["id"] = sol::property(
-			[] (layout_view::item &i, sol::this_state s) -> sol::object
+			[] (layout_view_item &i, sol::this_state s) -> sol::object
 			{
 				if (i.id().empty())
 					return sol::lua_nil;
 				else
 					return sol::make_object(s, i.id());
 			});
-	layout_view_item_type["bounds_animated"] = sol::property(&layout_view::item::bounds_animated);
-	layout_view_item_type["color_animated"] = sol::property(&layout_view::item::color_animated);
-	layout_view_item_type["bounds"] = sol::property(&layout_view::item::bounds);
-	layout_view_item_type["color"] = sol::property(&layout_view::item::color);
-	layout_view_item_type["blend_mode"] = sol::property(&layout_view::item::blend_mode);
-	layout_view_item_type["orientation"] = sol::property(&layout_view::item::orientation);
-	layout_view_item_type["element_state"] = sol::property(&layout_view::item::element_state);
-	layout_view_item_type["animation_state"] = sol::property(&layout_view::item::animation_state);
+	layout_view_item_type["bounds_animated"] = sol::property(&layout_view_item::bounds_animated);
+	layout_view_item_type["color_animated"] = sol::property(&layout_view_item::color_animated);
+	layout_view_item_type["bounds"] = sol::property(&layout_view_item::bounds);
+	layout_view_item_type["color"] = sol::property(&layout_view_item::color);
+	layout_view_item_type["scroll_wrap_x"] = sol::property(&layout_view_item::scroll_wrap_x);
+	layout_view_item_type["scroll_wrap_y"] = sol::property(&layout_view_item::scroll_wrap_y);
+	layout_view_item_type["scroll_size_x"] = sol::property(
+			&layout_view_item::scroll_size_x,
+			&layout_view_item::set_scroll_size_x);
+	layout_view_item_type["scroll_size_y"] = sol::property(
+			&layout_view_item::scroll_size_y,
+			&layout_view_item::set_scroll_size_y);
+	layout_view_item_type["scroll_pos_x"] = sol::property(
+			&layout_view_item::scroll_pos_x,
+			&layout_view_item::set_scroll_pos_y);
+	layout_view_item_type["scroll_pos_y"] = sol::property(
+			&layout_view_item::scroll_pos_y,
+			&layout_view_item::set_scroll_pos_y);
+	layout_view_item_type["blend_mode"] = sol::property(&layout_view_item::blend_mode);
+	layout_view_item_type["orientation"] = sol::property(&layout_view_item::orientation);
+	layout_view_item_type["element_state"] = sol::property(&layout_view_item::element_state);
+	layout_view_item_type["animation_state"] = sol::property(&layout_view_item::animation_state);
 
 
 	auto layout_file_type = sol().registry().new_usertype<layout_file>("layout_file", sol::no_constructor);

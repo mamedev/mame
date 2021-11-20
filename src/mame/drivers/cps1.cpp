@@ -14070,7 +14070,7 @@ GAME( 1988, forgottnue,  forgottn, forgottn,   forgottn, cps_state, init_cps1,  
 GAME( 1988, forgottnuc,  forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, forgottnua,  forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, forgottnuaa, forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. AA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, forgottnj,   forgottn, forgottn,   forgottnj,cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, forgottnj,   forgottn, forgottn,   forgottnj,cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (Japan) (English prototype)", MACHINE_SUPPORTS_SAVE ) // shows a Japan warning but runs an English localized version of the game, many changes, unfinished levels, ends abruptly.
 GAME( 1988, lostwrld,    forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Lost Worlds (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, lostwrldo,   forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Lost Worlds (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ghouls,      0,        cps1_10MHz, ghouls,   cps_state, init_cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)", MACHINE_SUPPORTS_SAVE )   // "EXPORT" // Wed.26.10.1988 in the ROMs

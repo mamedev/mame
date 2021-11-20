@@ -132,7 +132,7 @@ void fifo7200_device::fifo_write(uint16_t data)
 		m_ff_handler(!m_ff);
 	}
 
-	else if (((m_read_ptr + 1 + m_ram_size / 2) % m_ram_size) == m_write_ptr)
+	else if (!m_hf && (fifo_used() >= m_ram_size / 2))
 	{
 		m_hf = 1;
 		m_hf_handler(!m_hf);
@@ -166,10 +166,28 @@ uint16_t fifo7200_device::fifo_read()
 			m_ef_handler(!m_ef);
 		}
 
-		else if (((m_read_ptr + m_ram_size / 2) % m_ram_size) == m_write_ptr)
+		else if (m_hf && (fifo_used() < m_ram_size / 2))
 		{
 			m_hf = 0;
 			m_hf_handler(!m_hf);
+		}
+	}
+	return ret;
+}
+
+int fifo7200_device::fifo_used()
+{
+	int ret = m_ram_size;
+
+	if (!m_ff)
+	{
+		if (m_write_ptr >= m_read_ptr)
+		{
+			ret = m_write_ptr - m_read_ptr;
+		}
+		else
+		{
+			ret = m_ram_size + m_write_ptr - m_read_ptr;
 		}
 	}
 

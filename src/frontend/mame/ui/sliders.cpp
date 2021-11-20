@@ -25,12 +25,14 @@ menu_sliders::menu_sliders(mame_ui_manager &mui, render_container &container, bo
 	, m_hidden(menuless_mode)
 {
 	set_one_shot(menuless_mode);
+	set_needs_prev_menu_item(!menuless_mode);
 	set_process_flags(PROCESS_LR_REPEAT | (m_hidden ? PROCESS_CUSTOM_ONLY : 0));
 }
 
 menu_sliders::~menu_sliders()
 {
 }
+
 
 //-------------------------------------------------
 //  menu_sliders - handle the sliders menu
@@ -55,15 +57,15 @@ void menu_sliders::handle(event const *ev)
 			}
 
 		}
-		else if (ev->itemref && (ev->type == menu_item_type::SLIDER))
+		else if (ev->itemref && (ev->item->type() == menu_item_type::SLIDER))
 		{
 			// handle keys if there is a valid item selected
 			const slider_state *slider = (const slider_state *)ev->itemref;
 			int32_t curvalue = slider->update(nullptr, SLIDER_NOCHANGE);
 			int32_t increment = 0;
-			bool alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
-			bool ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
-			bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
+			bool const alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
+			bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
+			bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 
 			switch (ev->iptkey)
 			{
@@ -97,6 +99,7 @@ void menu_sliders::handle(event const *ev)
 
 				// restore default
 				case IPT_UI_SELECT:
+				case IPT_UI_CLEAR:
 					increment = slider->defval - curvalue;
 					break;
 			}
@@ -114,6 +117,8 @@ void menu_sliders::handle(event const *ev)
 
 				// update the slider and recompute the menu
 				slider->update(nullptr, newvalue);
+				if (m_menuless_mode)
+					ui().get_session_data<menu_sliders, void *>(nullptr) = ev->itemref;
 				reset(reset_options::REMEMBER_REF);
 			}
 		}
@@ -124,7 +129,9 @@ void menu_sliders::handle(event const *ev)
 			{
 				// if we got here via up or page up, select the previous item
 				if (is_first_selected())
+				{
 					select_last_item();
+				}
 				else
 				{
 					set_selected_index(selected_index() - 1);
@@ -209,8 +216,17 @@ void menu_sliders::populate(float &customtop, float &custombottom)
 		}
 	}
 
+	// reselect last slider used in menuless mode
+	if (m_menuless_mode)
+	{
+		auto const ref = ui().get_session_data<menu_sliders, void *>(nullptr);
+		if (ref)
+			set_selection(ref);
+	}
+
 	custombottom = 2.0f * ui().get_line_height() + 2.0f * ui().box_tb_border();
 }
+
 
 //-------------------------------------------------
 //  menu_sliders_custom_render - perform our special
@@ -289,6 +305,29 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 				text_layout::text_justify::CENTER, text_layout::word_wrapping::WORD,
 				mame_ui_manager::NORMAL, ui().colors().text_color(), ui().colors().text_bg_color(), nullptr, &text_height);
 	}
+}
+
+
+//-------------------------------------------------
+//  menu_activated - handle menu gaining focus
+//-------------------------------------------------
+
+void menu_sliders::menu_activated()
+{
+	// scripts or the other form of the menu could have changed something in the mean time
+	reset(reset_options::REMEMBER_POSITION);
+}
+
+
+//-------------------------------------------------
+//  menu_deactivated - handle menu losing focus
+//-------------------------------------------------
+
+void menu_sliders::menu_deactivated()
+{
+	// save active slider for next time in menuless mode
+	if (m_menuless_mode)
+		ui().get_session_data<menu_sliders, void *>(nullptr) = get_selection_ref();
 }
 
 } // namespace ui

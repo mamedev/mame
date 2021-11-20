@@ -70,6 +70,18 @@ files {
 }
 
 
+---------------------------------------------------
+--
+--@src/devices/machine/acorn_bmu.h,MACHINES["ACORN_BMU"] = true
+---------------------------------------------------
+
+if (MACHINES["ACORN_BMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_bmu.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_bmu.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/machine/acorn_ioc.h,MACHINES["ACORN_IOC"] = true
@@ -79,6 +91,18 @@ if (MACHINES["ACORN_IOC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/acorn_ioc.cpp",
 		MAME_DIR .. "src/devices/machine/acorn_ioc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/acorn_lc.h,MACHINES["ACORN_LC"] = true
+---------------------------------------------------
+
+if (MACHINES["ACORN_LC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_lc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_lc.h",
 	}
 end
 
@@ -3179,6 +3203,7 @@ if (MACHINES["SPG290"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg290_ppu.h",
 	}
 end
+
 ---------------------------------------------------
 --
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
@@ -3449,6 +3474,30 @@ if (MACHINES["UCB1200"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ucb1200.cpp",
 		MAME_DIR .. "src/devices/machine/ucb1200.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/upc82c710.h,MACHINES["UPC82C710"] = true
+---------------------------------------------------
+
+if (MACHINES["UPC82C710"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upc82c710.cpp",
+		MAME_DIR .. "src/devices/machine/upc82c710.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/upc82c711.h,MACHINES["UPC82C711"] = true
+---------------------------------------------------
+
+if (MACHINES["UPC82C711"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upc82c711.cpp",
+		MAME_DIR .. "src/devices/machine/upc82c711.h",
 	}
 end
 

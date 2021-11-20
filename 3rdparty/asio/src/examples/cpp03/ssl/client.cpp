@@ -2,7 +2,7 @@
 // client.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -10,7 +10,7 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "asio.hpp"
 #include "asio/ssl.hpp"
 
@@ -26,7 +26,8 @@ public:
   {
     socket_.set_verify_mode(asio::ssl::verify_peer);
     socket_.set_verify_callback(
-        boost::bind(&client::verify_certificate, this, _1, _2));
+        boost::bind(&client::verify_certificate, this,
+          boost::placeholders::_1, boost::placeholders::_2));
 
     asio::async_connect(socket_.lowest_layer(), endpoints,
         boost::bind(&client::handle_connect, this,

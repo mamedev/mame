@@ -405,7 +405,7 @@ const menu::event *menu::process()
 	if ((m_event.iptkey != IPT_INVALID) && selection_valid())
 	{
 		m_event.itemref = get_selection_ref();
-		m_event.type = m_items[m_selected].type();
+		m_event.item = &m_items[m_selected];
 		return &m_event;
 	}
 	else
