@@ -568,8 +568,6 @@ bool dp83932c_device::address_filter(u8 *buf)
 		}
 	}
 
-	LOGMASKED(LOG_FILTER, "address_filter rejected\n");
-
 	return false;
 }
 
