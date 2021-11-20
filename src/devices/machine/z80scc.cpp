@@ -110,7 +110,6 @@ baud rate:
 #define LOG_DCD     (1U <<  8)
 #define LOG_SYNC    (1U <<  9)
 
-// #define VERBOSE LOG_GENERAL
 //#define VERBOSE (LOG_GENERAL|LOG_SETUP|LOG_READ|LOG_INT|LOG_CMD|LOG_TX|LOG_RCV|LOG_CTS|LOG_DCD|LOG_SYNC)
 //#define LOG_OUTPUT_STREAM std::cout
 
@@ -3037,6 +3036,4 @@ void z80scc_channel::check_dma_request()
 		// assert /W//REQ if transmit buffer is empty and transmitter is enabled
 		m_uart->m_out_wreq_cb[m_index](((m_rr0 & RR0_TX_BUFFER_EMPTY) && (m_wr5 & WR5_TX_ENABLE)) ? 0 : 1);
 	}
-
-
 }

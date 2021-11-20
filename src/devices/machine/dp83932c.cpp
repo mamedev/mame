@@ -29,7 +29,7 @@
 #define LOG_FILTER  (1U << 2)
 #define LOG_PACKETS (1U << 3)
 
-// #define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
+//#define VERBOSE (LOG_GENERAL|LOG_COMMAND|LOG_FILTER|LOG_PACKETS)
 #include "logmacro.h"
 
 #define EA(hi, lo) ((u32(hi) << 16) | lo)
