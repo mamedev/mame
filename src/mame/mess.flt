@@ -893,6 +893,7 @@ roland_tb303.cpp
 roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp
+roland_tr808.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp

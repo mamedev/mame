@@ -2,23 +2,28 @@
 // copyright-holders:hap
 /***************************************************************************
 
-  Roland TB-303 Bass Line, 1982, designed by Tadao Kikumoto
-  * NEC uCOM-43 MCU, labeled D650C 133
-  * 3*uPD444C 1024x4 Static CMOS SRAM
-  * board is packed with discrete components
+Roland TB-303 Bass Line, 1982, designed by Tadao Kikumoto
 
-  TODO:
-  - still too much to list here
+Hardware notes:
+- NEC uCOM-43 MCU, labeled D650C 133
+- 3*uPD444C 1024x4 Static CMOS SRAM
+- board is packed with discrete components
+
+TODO:
+- still too much to list here
 
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/ucom4/ucom4.h"
+#include "machine/clock.h"
 #include "video/pwm.h"
-#include "machine/timer.h"
 
 #include "tb303.lh"
 
+
+namespace {
 
 class tb303_state : public driver_device
 {
@@ -42,12 +47,12 @@ private:
 
 	u8 m_ram[0xc00];
 	u8 m_ram_addrset[3];
-	u16 m_ram_address;
-	u8 m_ram_data;
-	bool m_ram_ce;
-	bool m_ram_we;
-	u8 m_led_data;
-	u8 m_inp_mux;
+	u16 m_ram_address = 0;
+	u8 m_ram_data = 0;
+	bool m_ram_ce = false;
+	bool m_ram_we = false;
+	u8 m_led_data = 0;
+	u8 m_inp_mux = 0;
 
 	void refresh_ram();
 	template<int N> void ram_address_w(u8 data);
@@ -59,9 +64,6 @@ private:
 	void led_w(u8 data);
 	void input_w(u8 data);
 	u8 input_r(offs_t offset);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 };
 
 void tb303_state::machine_start()
@@ -69,12 +71,6 @@ void tb303_state::machine_start()
 	// zerofill
 	memset(m_ram, 0, sizeof(m_ram));
 	memset(m_ram_addrset, 0, sizeof(m_ram_addrset));
-	m_ram_address = 0;
-	m_ram_data = 0;
-	m_ram_ce = false;
-	m_ram_we = false;
-	m_led_data = 0;
-	m_inp_mux = 0;
 
 	// register for savestates
 	save_item(NAME(m_ram));
@@ -87,18 +83,10 @@ void tb303_state::machine_start()
 	save_item(NAME(m_inp_mux));
 }
 
-// TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
-#define TP2_HZ      454545
-
-// TP3 to MCU _INT: square wave, 1.8ms interval, short duty cycle
-#define TP3_PERIOD  attotime::from_usec(1800)
-#define TP3_LOW     (TP3_PERIOD / 8)
 
 
 /***************************************************************************
-
-  I/O
-
+    I/O
 ***************************************************************************/
 
 // external ram
@@ -222,9 +210,7 @@ u8 tb303_state::input_r(offs_t offset)
 
 
 /***************************************************************************
-
-  Inputs
-
+    Inputs
 ***************************************************************************/
 
 static INPUT_PORTS_START( tb303 )
@@ -282,15 +268,13 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-
-  Machine Config
-
+    Machine Configs
 ***************************************************************************/
 
 void tb303_state::tb303(machine_config &config)
 {
-	/* basic machine hardware */
-	NEC_D650(config, m_maincpu, TP2_HZ);
+	// basic machine hardware
+	NEC_D650(config, m_maincpu, 454545); // LC circuit(TI S74230), 2.2us
 	m_maincpu->read_a().set(FUNC(tb303_state::input_r));
 	m_maincpu->read_b().set(FUNC(tb303_state::input_r));
 	m_maincpu->read_c().set(FUNC(tb303_state::ram_data_r));
@@ -302,25 +286,23 @@ void tb303_state::tb303(machine_config &config)
 	m_maincpu->write_h().set(FUNC(tb303_state::input_w));
 	m_maincpu->write_i().set(FUNC(tb303_state::strobe_w));
 
-	timer_device &tp3_clock(TIMER(config, "tp3_clock"));
-	tp3_clock.configure_periodic(FUNC(tb303_state::tp3_clock), TP3_PERIOD);
-	tp3_clock.set_start_delay(TP3_PERIOD - TP3_LOW);
-	TIMER(config, "tp3_clear").configure_periodic(FUNC(tb303_state::tp3_clear), TP3_PERIOD);
+	auto &irq_clock(CLOCK(config, "irq_clock"));
+	irq_clock.set_period(attotime::from_usec(1800)); // clock rate 1.8ms
+	irq_clock.set_duty_cycle(0.1); // short duty cycle
+	irq_clock.signal_handler().set_inputline(m_maincpu, 0);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 4);
 	config.set_default_layout(layout_tb303);
 
-	/* sound hardware */
+	// sound hardware
 	// discrete...
 }
 
 
 
 /***************************************************************************
-
-  Game driver(s)
-
+    ROM Definitions
 ***************************************************************************/
 
 ROM_START( tb303 )
@@ -328,5 +310,12 @@ ROM_START( tb303 )
 	ROM_LOAD( "d650c-133.ic8", 0x0000, 0x0800, CRC(268a8d8b) SHA1(7a4236b2bc9a5cd4c80c63ca1a193e03becfcb4c) )
 ROM_END
 
+} // anonymous namespace
 
-CONS( 1982, tb303, 0, 0, tb303, tb303, tb303_state, empty_init, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+
+
+/***************************************************************************
+    Drivers
+***************************************************************************/
+
+SYST( 1982, tb303, 0, 0, tb303, tb303, tb303_state, empty_init, "Roland", "TB-303 Bass Line", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
