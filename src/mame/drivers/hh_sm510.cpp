@@ -1514,8 +1514,8 @@ ROM_START( fowling )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-16.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 116145, "screen", 0)
-	ROM_LOAD( "fowling.svg", 0, 116145, CRC(258fb5e6) SHA1(77e597e36a84a75eee6b4e32ffedecb808c582b8) )
+	ROM_REGION( 117838, "screen", 0)
+	ROM_LOAD( "fowling.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
 ROM_END
 
 ROM_START( monkeygk )

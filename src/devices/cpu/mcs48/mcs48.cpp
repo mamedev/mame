@@ -1144,35 +1144,32 @@ void mcs48_cpu_device::device_start()
 	update_regptr();
 
 	// set up the state table
+	state_add(MCS48_PC,        "PC",        m_pc).mask(0xfff);
+	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
+	state_add(MCS48_SP,        "SP",        m_psw).mask(0x7).noshow();
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
+	state_add(MCS48_A,         "A",         m_a);
+	state_add(MCS48_TC,        "TC",        m_timer);
+	state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);
+
+	if (m_feature_mask & I802X_FEATURE)
+		state_add(MCS48_P0,    "P0",        m_dbbo);
+	state_add(MCS48_P1,        "P1",        m_p1);
+	state_add(MCS48_P2,        "P2",        m_p2);
+
+	for (int regnum = 0; regnum < 8; regnum++) {
+		state_add(MCS48_R0 + regnum, string_format("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
+	}
+
+	if (m_feature_mask & EXT_BUS_FEATURE)
+		state_add(MCS48_EA,    "EA",        m_ea).mask(0x1);
+
+	if (m_feature_mask & UPI41_FEATURE)
 	{
-		state_add(MCS48_PC,        "PC",        m_pc).mask(0xfff);
-		state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
-		state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
-		state_add(MCS48_SP,        "SP",        m_psw).mask(0x7).noshow();
-		state_add(STATE_GENFLAGS,  "GENFLAGS",  m_psw).noshow().formatstr("%11s");
-		state_add(MCS48_A,         "A",         m_a);
-		state_add(MCS48_TC,        "TC",        m_timer);
-		state_add(MCS48_TPRE,      "TPRE",      m_prescaler).mask(0x1f);
-
-		if (m_feature_mask & I802X_FEATURE)
-			state_add(MCS48_P0,    "P0",        m_dbbo);
-		state_add(MCS48_P1,        "P1",        m_p1);
-		state_add(MCS48_P2,        "P2",        m_p2);
-
-		for (int regnum = 0; regnum < 8; regnum++) {
-			state_add(MCS48_R0 + regnum, string_format("R%d", regnum).c_str(), m_rtemp).callimport().callexport();
-		}
-
-		if (m_feature_mask & EXT_BUS_FEATURE)
-			state_add(MCS48_EA,    "EA",        m_ea).mask(0x1);
-
-		if (m_feature_mask & UPI41_FEATURE)
-		{
-			state_add(MCS48_STS,   "STS",       m_sts).mask(0xf3);
-			state_add(MCS48_DBBI,  "DBBI",      m_dbbi);
-			state_add(MCS48_DBBO,  "DBBO",      m_dbbo);
-		}
-
+		state_add(MCS48_STS,   "STS",       m_sts).mask(0xf3);
+		state_add(MCS48_DBBI,  "DBBI",      m_dbbi);
+		state_add(MCS48_DBBO,  "DBBO",      m_dbbo);
 	}
 
 	// register for savestates
