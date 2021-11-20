@@ -431,13 +431,9 @@ void spifi3_device::map(address_map &map)
 
 uint8_t spifi3_device::cmd_buf_r(offs_t offset)
 {
-	// find which cmd entry
 	// 8 slots in the buffer, 16 bytes each
 	// so, divide the offset by 16 (truncated) to get the cmd entry
 	const int cmd_entry = offset / 16;
-
-	// now, return the right item
-	// this is ugly, I need to improve this
 	uint8_t result = 0;
 	const int register_offset = offset % 16;
 	if (register_offset < 12)
@@ -469,13 +465,10 @@ uint8_t spifi3_device::cmd_buf_r(offs_t offset)
 void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_CMD, "cmd_buf_w(0x%x, 0x%x)\n", offset, data);
-	// find which cmd entry
+
 	// 8 slots in the buffer, 16 bytes each
 	// so, divide the offset by 16 (truncated) to get the cmd entry
 	const int cmd_entry = offset / 16;
-
-	// now, write the appropriate item
-	// this is ugly, I need to improve this
 	const int register_offset = offset % 16;
 	if (register_offset < 12)
 	{
@@ -566,7 +559,7 @@ void spifi3_device::fifoctrl_w(uint32_t data)
 	if (spifi_reg.fifoctrl & FIFOC_RQOVRN)
 	{
 		LOG("fifoctrl.RQOVRN: w unimplemented");
-	} // likely RO - Whatever this is, it would cause NetBSD to panic
+	} // likely RO - probably fifo overrun. Whatever this is, it would cause NetBSD to panic
 	if (spifi_reg.fifoctrl & FIFOC_CLREVEN)
 	{
 		LOG("Clearing even FIFO of %d items\n", m_even_fifo.size());
@@ -1164,7 +1157,7 @@ void spifi3_device::step(bool timeout)
 				mode = MODE_I;
 			}
 
-			state &= STATE_MASK; // Clear sub step
+			state &= STATE_MASK;
 			step(true);
 			break;
 		}

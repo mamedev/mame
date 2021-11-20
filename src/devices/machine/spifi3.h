@@ -242,19 +242,11 @@ private:
 		}
 	}
 
-	// spstat
+	// spstat - not fully implemented yet
 	const uint32_t SPS_IDLE = 0x00;
-	// TODO: const uint32_t SPS_SEL = 0x01;
-	// TODO: const uint32_t SPS_ARB = 0x02;
-	// const uint32_t SPS_RESEL = 0x03;
 	const uint32_t SPS_MSGOUT = 0x04;
 	const uint32_t SPS_COMMAND = 0x05;
-	// const uint32_t SPS_DISCON = 0x06;
-	// const uint32_t SPS_NXIN = 0x07;
 	const uint32_t SPS_INTR = 0x08;
-	// const uint32_t SPS_NXOUT = 0x09;
-	// const uint32_t SPS_CCOMP = 0x0a;
-	// const uint32_t SPS_SVPTR = 0x0b;
 	const uint32_t SPS_STATUS = 0x0c;
 	const uint32_t SPS_MSGIN = 0x0d;
 	const uint32_t SPS_DATAOUT = 0x0e;
@@ -287,53 +279,25 @@ private:
 		return spstat_val;
 	}
 
-	// prstat
+	// prstat - PRS_Z not implemented yet
 	const uint32_t PRS_IO = 0x08;
 	const uint32_t PRS_CD = 0x10;
 	const uint32_t PRS_MSG = 0x20;
 	const uint32_t PRS_ATN = 0x40;
-	// const uint32_t PRS_Z = 0x80;
-	// const uint32_t PRS_PHASE = (PRS_MSG | PRS_CD | PRS_IO);
 	uint32_t prstat_r();
 
-	// Interrupt status register
+	// Interrupt status register - Not all interrupts implemented yet
 	const uint32_t INTR_BSRQ = 0x01;
-	// const uint32_t INTR_COMRECV = 0x02;
-	// const uint32_t INTR_PERR = 0x04;
 	const uint32_t INTR_TIMEO = 0x08;
-	// const uint32_t INTR_DERR = 0x10;
-	// const uint32_t INTR_TGSEL = 0x20;
-	// const uint32_t INTR_DISCON = 0x40;
 	const uint32_t INTR_FCOMP = 0x80;
 
-	// Interrupt condition register
-	// const uint32_t ICOND_ADATAOFF = 0x02;
-	// const uint32_t ICOND_AMSGOFF = 0x06;
-	// const uint32_t ICOND_ACMDOFF = 0x0a;
-	// const uint32_t ICOND_ASTATOFF = 0x0e;
-	// const uint32_t ICOND_SVPTEXP = 0x10;
-	// const uint32_t ICOND_ADATAMIS = 0x20;
+	// Interrupt condition register - Not all interrupts implemented yet
 	const uint32_t ICOND_CNTZERO = 0x40;
 	const uint32_t ICOND_UXPHASEZ = 0x80;
-	// const uint32_t ICOND_UXPHASENZ = 0x81;
-	// const uint32_t ICOND_NXTREQ = 0xa0;
-	// const uint32_t ICOND_UKMSGZ = 0xc0;
-	// const uint32_t ICOND_UKMSGNZ = 0xc1;
-	// const uint32_t ICOND_UBF = 0xe0; // Unexpected bus free
 
-	// Config register
-	// const uint32_t CONFIG_INITIATOR_ID = 0x7;
-	// const uint32_t CONFIG_PGENEN = 0x08;
-	// const uint32_t CONFIG_PCHKEN = 0x10;
-	// const uint32_t CONFIG_WORDEN = 0x20;
-	// const uint32_t CONFIG_AUTOID = 0x40;
-	// const uint32_t CONFIG_DMABURST = 0x80;
-
-	// Select register
-	// const uint32_t SEL_SETATN = 0x02;   // Set ATN??? NetBSD doesn't use this...
-	// const uint32_t SEL_IRESELEN = 0x04; // Enable reselection phase
-	const uint32_t SEL_ISTART = 0x08;   // Start selection
-	const uint32_t SEL_WATN = 0x80;     // Select with ATN
+	// Select register - SETATN and IRESELEN not implemented yet
+	const uint32_t SEL_ISTART = 0x08;
+	const uint32_t SEL_WATN = 0x80;
 	const uint32_t SEL_TARGET = 0x70;
 	void select_w(uint32_t data);
 	int get_target_id()
