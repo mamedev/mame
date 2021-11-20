@@ -1392,7 +1392,7 @@ ROM_END
   The following Mickey Mouse Elektronika clones are emulated in MAME:
   * IM-02: Nu, pogodi! (Ну, погоди!)
   * IM-13: Explorers of Space (Разведчики космоса)
-  * IM-16: Fowling (Охота) (also listed as IM-18 and I-08 by some sources)
+  * IM-16: Fowling (Охота)
   * IM-22: Monkey Goalkeeper (Весёлые футболисты)
 
 ***************************************************************************/
