@@ -153,7 +153,8 @@ void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 {
 	printf("clear to pos: %d   current:%d\n",to_line,clear_pos);
 	int from_line = clear_pos;
-	to_line = std::min(m_bitmap->width(), to_line);
+//	to_line = std::min(m_bitmap->width(), to_line);  for reals!!! using width instead of height
+	to_line = std::min(m_bitmap->height(), to_line);
 	if (to_line >= from_line)
 	{
 		bitmap_clear_band(*m_bitmap, from_line, to_line, color);
@@ -329,8 +330,9 @@ bool bitmap_printer_device::check_new_page() // reset_ypos()
 			// so we can still see the last page printed.
 		{
 			// clear paper to bottom from current position
-			bitmap_clear_band(clear_pos, m_paperheight - 1, rgb_t::white());
-
+//			bitmap_clear_band(clear_pos, m_paperheight - 1, rgb_t::white());
+			clear_to_pos(m_paperheight - 1, rgb_t::white());
+			
 			// save a snapshot with the slot and page as part of the filename
 			write_snapshot_to_file(
 						owner()->basetag(), //std::string("imagewriter"),

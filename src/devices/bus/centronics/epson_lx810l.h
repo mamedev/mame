@@ -126,6 +126,8 @@ private:
 	int m_real_cr_steps;
 	int m_real_cr_dir; /* 1 is going right, -1 is going left */
 	uint8_t m_fakemem;
+	int m_in_between_offset = 0; // in between cr_stepper phases
+	int m_rightward_offset = -3; // pixels when stepper moving rightward
 //	bitmap_rgb32 m_bitmap;
 
 	enum {

@@ -45,8 +45,10 @@
 //#define PAPER_WIDTH  1024
 //#define PAPER_HEIGHT 576
 
-#define PAPER_WIDTH  1024
-#define PAPER_HEIGHT (11*72)
+#define PAPER_WIDTH  1024 
+// 120 dpi * 8.5333 inches
+#define PAPER_HEIGHT (11*72) 
+// 72 dpi * 11 inches
 
 
 
@@ -173,11 +175,11 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 120, 72);  // do 72 dpi
 	m_bitmap_printer->set_pf_stepper_ratio(1,6);  // pf stepper moves at 216 dpi so at 72dpi half steps
-	m_bitmap_printer->set_cr_stepper_ratio(2,3);
+	m_bitmap_printer->set_cr_stepper_ratio(1,1);
 //	STEPPER(config, m_pf_stepper, (uint8_t)4);
 //	STEPPER(config, m_cr_stepper, (uint8_t)2);
-}
 
+}
 
 /***************************************************************************
     INPUT PORTS
@@ -354,8 +356,11 @@ void epson_lx810l_device::device_timer(emu_timer &timer, device_timer_id id, int
 		 */
 //		m_real_cr_pos += param;
 
-		m_bitmap_printer->m_cr_stepper->set_absolute_position(m_bitmap_printer->m_cr_stepper->get_absolute_position()+param);
-m_bitmap_printer->m_xpos = m_bitmap_printer->m_cr_stepper->get_absolute_position() * m_bitmap_printer->m_cr_stepper_ratio0 / m_bitmap_printer->m_cr_stepper_ratio1;
+		m_in_between_offset += param;
+
+//		m_bitmap_printer->m_cr_stepper->set_absolute_position(m_bitmap_printer->m_cr_stepper->get_absolute_position()+param);
+
+//m_bitmap_printer->m_xpos = m_bitmap_printer->m_cr_stepper->get_absolute_position() * m_bitmap_printer->m_cr_stepper_ratio0 / m_bitmap_printer->m_cr_stepper_ratio1;
 
 		m_real_cr_steps--;
 		if (m_real_cr_steps)
@@ -410,6 +415,8 @@ uint8_t epson_lx810l_device::porta_r(offs_t offset)
 	result |= ioport("FORMFEED")->read() << 7;
 
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
+
+	m_bitmap_printer->setprintheadcolor( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0); // just put this here since it gets called frequently
 
 	return result;
 }
@@ -493,6 +500,7 @@ void epson_lx810l_device::portc_w(offs_t offset, uint8_t data)
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
 	m_online_led = !BIT(data, 2);
+
 }
 
 
@@ -528,6 +536,7 @@ void epson_lx810l_device::cr_stepper(uint8_t data)
 	m_bitmap_printer->update_cr_stepper(bitswap<4>(data, 0, 1, 2, 3));  // reverse bits
 //	m_bitmap_printer->update_cr_stepper(data);
 
+	m_in_between_offset = 0;
 
 	if (!m_real_cr_steps)
 	{
@@ -608,7 +617,7 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 //				unsigned int const y = bitmap_line(i);
 				if ((m_printhead & (1<<(8-i))) != 0)
 //					m_bitmap.pix(y, m_real_cr_pos + CR_OFFSET) = 0x000000;
-					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, m_bitmap_printer->m_xpos + CR_OFFSET) = 0x000000;					
+					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset + (m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;					
 			}
 		}
 	}

@@ -308,7 +308,7 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 			)  // store shift register to parallel register
 		{
 			m_parallel_reg = m_shift_reg;
-
+/*
 			LOG("Silentype Store Parallel Register = %4x\n", m_parallel_reg);
 
 			printf("Silentype Store Parallel Register = %4x   time=%f\n", m_parallel_reg,machine().time().as_double());
@@ -316,7 +316,7 @@ static double timeon = 0.0;
 			if (BIT(m_parallel_reg, 9, 7) && (timeon == 0.0)) timeon = machine().time().as_double();
 			else if (BIT(m_parallel_reg, 9, 7)) {printf("STILL ON = %f\n", machine().time().as_double() - timeon);}
 			else {printf("NOW OFF TIME SINCE ON = %f\n", machine().time().as_double() - timeon); timeon=0.0; }
-
+*/
 //			m_silentype_printer->update_cr_stepper(bitswap<4>(BIT(m_parallel_reg, 0, 4), 3, 1, 2, 0));
 //			m_silentype_printer->update_pf_stepper(bitswap<4>(BIT(m_parallel_reg, 4, 4), 3, 1, 2, 0));
 			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
