@@ -6705,7 +6705,6 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	<software name="hacker">
 		<description>Hacker</description>
 		<year>1985</year>
-		<info name="usage" value="Remove c1541 Slot Device"/>
 		<publisher>Proein Soft Line</publisher>
 
 		<part name="cass1" interface="cbm_cass">
