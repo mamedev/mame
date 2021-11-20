@@ -93,9 +93,6 @@
  *  - APbus expansion slots
  *  - Triage and fix the known issues mentioned above
  *  - Save state support
- *
- *  TODO before opening first MR:
- *  - Finish SPIFI3 refactoring and bug squash
  */
 
 #include "emu.h"
