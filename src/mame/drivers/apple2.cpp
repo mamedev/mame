@@ -1440,9 +1440,9 @@ void apple2_state::apple2_common(machine_config &config)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	/* Set up the softlists: clean cracks priority, originals second, others last */
-	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
+	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter("A2");
+	SOFTWARE_LIST(config, "flop_a2_misc").set_compatible("apple2_flop_misc");
 	SOFTWARE_LIST(config, "cass_list").set_original("apple2_cass");
 	//MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
@@ -1462,7 +1462,7 @@ void apple2_state::apple2(machine_config &config)
 void apple2_state::apple2p(machine_config &config)
 {
 	apple2_common(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2P"); // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2P"); // Filter list to compatible disks for this machine.
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 }
