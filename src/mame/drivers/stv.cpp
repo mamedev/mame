@@ -54,8 +54,6 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#include "coreutil.h"
-
 #include "critcrsh.lh"
 #include "segabill.lh"
 #include "segabillv.lh"
