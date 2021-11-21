@@ -7633,10 +7633,3 @@ msgid ""
 msgstr ""
 "Δώστε ακολουθία ή πατήστε %s για ακύρωση\n"
 "%s"
-
-#~ msgid "Device Mapping"
-#~ msgstr "Χαρτογράφηση Συσκευών"
-
-#~ msgctxt "input-name"
-#~ msgid "Write current timecode"
-#~ msgstr "Εγγραφή τρέχοντος χρονοκώδικα"
