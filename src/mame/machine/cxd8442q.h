@@ -13,8 +13,6 @@
 
 #pragma once
 
-#include "emu.h"
-
 class cxd8442q_device;
 
 // Class that represents a single FIFO channel. Each instance of the FIFOQ chip has 4 of these.

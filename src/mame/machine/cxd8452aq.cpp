@@ -9,6 +9,7 @@
  *  - Error-related interrupts
  */
 
+#include "emu.h"
 #include "cxd8452aq.h"
 
 #define LOG_GENERAL (1U << 0)

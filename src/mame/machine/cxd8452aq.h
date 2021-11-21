@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "emu.h"
-
 class cxd8452aq_device : public device_t, public device_memory_interface
 {
 public:

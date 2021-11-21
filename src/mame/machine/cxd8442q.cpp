@@ -24,6 +24,7 @@
  *  - Additional features and registers
  */
 
+#include "emu.h"
 #include "cxd8442q.h"
 #include "logmacro.h"
 
