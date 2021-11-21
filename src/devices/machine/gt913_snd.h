@@ -66,7 +66,8 @@ private:
 		u8 m_exp, m_exp_at_loop;
 
 		u32 m_volume_current, m_volume_target;
-		u8 m_volume_rate;
+		u32 m_volume_rate;
+		bool m_volume_end;
 
 		u8 m_balance[2];
 		u8 m_gain;

@@ -34,14 +34,14 @@ const u8 gt913_sound_device::exp_2_to_3[4] = { 0, 1, 2, 7 };
 // sign-extend 7-bit sample deltas
 const s8 gt913_sound_device::sample_7_to_8[128] =
 {
-	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
-	32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,
-	48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63,
+	  0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  10,  11,  12,  13,  14,  15,
+	 16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,  30,  31,
+	 32,  33,  34,  35,  36,  37,  38,  39,  40,  41,  42,  43,  44,  45,  46,  47,
+	 48,  49,  50,  51,  52,  53,  54,  55,  56,  57,  58,  59,  60,  61,  62,  63,
 	-64, -63, -62, -61, -60, -59, -58, -57, -56, -55, -54, -53, -52, -51, -50, -49,
 	-48, -47, -46, -45, -44, -43, -42, -41, -40, -39, -38, -37, -36, -35, -34, -33,
 	-32, -31, -30, -29, -28, -27, -26, -25, -24, -23, -22, -21, -20, -19, -18, -17,
-	-16, -15, -14, -13, -12, -11, -10, -9, -8, -7, -6, -5, -4, -3, -2, -1
+	-16, -15, -14, -13, -12, -11, -10,  -9,  -8,  -7,  -6,  -5,  -4,  -3,  -2,  -1
 };
 
 gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -88,6 +88,7 @@ void gt913_sound_device::device_start()
 		save_item(NAME(m_voices[i].m_volume_current), i);
 		save_item(NAME(m_voices[i].m_volume_target), i);
 		save_item(NAME(m_voices[i].m_volume_rate), i);
+		save_item(NAME(m_voices[i].m_volume_end), i);
 
 		save_item(NAME(m_voices[i].m_balance), i);
 		save_item(NAME(m_voices[i].m_gain), i);
@@ -146,8 +147,8 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 	}
 
 	// mix sample into output
-	left += (s32)voice.m_sample * (voice.m_volume_current >> 12) * voice.m_balance[0];
-	right += (s32)voice.m_sample * (voice.m_volume_current >> 12) * voice.m_balance[1];
+	left += (s32)voice.m_sample * (voice.m_volume_current >> 24) * voice.m_balance[0];
+	right += (s32)voice.m_sample * (voice.m_volume_current >> 24) * voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
@@ -211,10 +212,7 @@ void gt913_sound_device::command_w(u16 data)
 
 	if (data == 0x0012)
 	{
-		uint8_t gain = m_data[0] & 0x3f;
-		if (gain != m_gain)
-			logerror("gain %u\n", gain);
-		m_gain = gain;
+		m_gain = m_data[0] & 0x3f;
 		return;
 	}
 	else if (voicenum >= 24)
@@ -258,6 +256,7 @@ void gt913_sound_device::command_w(u16 data)
 		}
 
 		voice.m_enable = enable;
+		voice.m_volume_end &= enable;
 	}
 	else if (voicecmd == 0x4004)
 	{
@@ -281,19 +280,16 @@ void gt913_sound_device::command_w(u16 data)
 	else if (voicecmd == 0x6007)
 	{
 		logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
-		/* TODO - this logic is probably not right
-		see func at 0x1e24 in ctk551 */
-		if (BIT(m_data[0], 15))
+		/* only set a new volume level/rate if we haven't previously indicated the end of an envelope
+		otherwise, a timer irq may try to update the normal envelope while other code is trying to force a note off */
+		if (!voice.m_volume_end)
 		{
-			voice.m_volume_current = voice.m_volume_target = 0;
-		}
-		else
-		{
-			voice.m_volume_target = (m_data[0] & 0x7f00) << 4;
-			if (BIT(m_data[0], 7))
-				voice.m_volume_current = voice.m_volume_target;
-			else
-				voice.m_volume_rate = m_data[0] & 0x7f;
+			voice.m_volume_end = BIT(m_data[0], 15);
+
+			voice.m_volume_target = (m_data[0] & 0x7f00) << 16;
+			const u8 x = m_data[0] & 0xff;
+			voice.m_volume_rate = 8 * x * x * x;
+
 		}
 	}
 	else if (voicecmd == 0x2028)
@@ -303,7 +299,7 @@ void gt913_sound_device::command_w(u16 data)
 		to determine if it's time to start the next part of the volume envelope or not.
 		(TODO: also figure out what it expects to be returned in data1)
 		*/
-		m_data[0] = voice.m_enable ? (voice.m_volume_current >> 4) : 0;
+		m_data[0] = voice.m_enable ? (voice.m_volume_current >> 16) : 0;
 		m_data[1] = 0;
 	}
 	else
