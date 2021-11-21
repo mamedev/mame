@@ -1108,7 +1108,7 @@ void screen_device::realloc_screen_bitmaps()
 	s32 effwidth = std::max(per_scanline ? m_max_width : m_width, m_visarea.right() + 1);
 	s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
 
-	// reize all registered screen bitmaps
+	// resize all registered screen bitmaps
 	for (auto &item : m_auto_bitmap_list)
 		item->m_bitmap.resize(effwidth, effheight);
 
@@ -1870,7 +1870,7 @@ void screen_device::finalize_burnin()
 			m_visarea.top() * m_burnin.height() / m_height,
 			m_visarea.bottom() * m_burnin.height() / m_height);
 
-	// wrap a bitmap around the memregion we care about
+	// wrap a bitmap around the subregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();
