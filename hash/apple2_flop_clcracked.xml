@@ -4,7 +4,7 @@
 license:CC0
 -->
 
-<softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked 5.25&quot; disks">
+<softwarelist name="apple2_flop_clcracked" description="Apple II cleanly cracked disks">
 
 	<!-- A 'cleanly cracked' disk is one that removes the copy
 	protection while not defacing the appearance or removing any
@@ -46392,6 +46392,34 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="winter games (4am crack) side b.dsk" size="143360" crc="b8d713fd" sha1="e2c6b9b0dfdf2f23c59c03ec803b0ffb79135482" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nmbrball">
+		<description>Numberball (cleanly cracked)</description>
+		<year>1994</year>
+		<publisher>Micrograms</publisher>
+		<info name="release" value="2021-11-10"/>
+		<!--"Numberball" is a 1994 educational game developed and distributed by Micrograms Publishing.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="numberball (4am crack).dsk" size="143360" crc="bd983ba9" sha1="73da61404aa405fd65616a957ef75ffc12f6af04"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pfsfilea00">
+		<description>PFS:File (Version A.00) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Software Publishing Corporation</publisher>
+		<info name="release" value="2021-11-11"/>
+		<!--"PFS:File" is a 1983 productivity program developed and distributed by Software Publishing Corporation. This is version A.00. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="pfs file va.00 (4am crack).dsk" size="143360" crc="49980399" sha1="14451182f9d319d2c08a7f7fd68aec10654299b1"/>
 			</dataarea>
 		</part>
 	</software>

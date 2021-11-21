@@ -4980,9 +4980,9 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */
-	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
+	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop_a2_misc").set_compatible("apple2_flop_misc");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
@@ -5008,7 +5008,7 @@ void apple2e_state::mprof3(machine_config &config)
 void apple2e_state::apple2ee(machine_config &config)
 {
 	apple2e(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
@@ -5055,7 +5055,7 @@ void apple2e_state::apple2ep(machine_config &config)
 void apple2e_state::apple2c(machine_config &config)
 {
 	apple2ee(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
@@ -5350,7 +5350,7 @@ void apple2e_state::cec(machine_config &config)
 
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	SOFTWARE_LIST(config, "flop525_cec").set_original("cecflop");
+	SOFTWARE_LIST(config, "flop_cec").set_original("cecflop");
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	config.device_remove("aux");
