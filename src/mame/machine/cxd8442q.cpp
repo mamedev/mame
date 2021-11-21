@@ -29,8 +29,9 @@
 
 DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIFOQ")
 
-cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, CXD8442Q, tag, owner, clock), out_irq(*this),
-																													fifo_channels{apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this)}
+cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) 
+	: device_t(mconfig, CXD8442Q, tag, owner, clock), out_irq(*this),
+	fifo_channels{apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this), apfifo_channel(*this)}
 {
 }
 
