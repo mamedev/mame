@@ -3506,6 +3506,8 @@ if (BUSES["TI99"]~=null) then
 		MAME_DIR .. "src/devices/bus/ti99/peb/pgram.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/samsmem.h",
+		MAME_DIR .. "src/devices/bus/ti99/peb/scsicard.cpp",
+		MAME_DIR .. "src/devices/bus/ti99/peb/scsicard.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/sidmaster.cpp",
 		MAME_DIR .. "src/devices/bus/ti99/peb/sidmaster.h",
 		MAME_DIR .. "src/devices/bus/ti99/peb/spchsyn.cpp",
