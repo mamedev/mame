@@ -278,8 +278,8 @@ void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
 		{
 			u8 databit = BIT(data, SILENTYPE_DATAWRITEENABLE) ? BIT(data, SILENTYPE_DATA) : 0;
 			LOG("Silentype Shift Bit = %x\n", databit);
-			m_shift_reg = 
-				(m_shift_reg << 1) | 
+			m_shift_reg =
+				(m_shift_reg << 1) |
 				(BIT(m_parallel_reg, 8) ? BIT(m_shift_reg, 15) : databit );
 		}
 

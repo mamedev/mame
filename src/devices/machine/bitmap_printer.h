@@ -3,13 +3,13 @@
 /*
    bitmap printer (dot printer)
 
-	*	provides a page bitmap to draw on
-	*	reads and writes pixels (representing printer dots)
-	*	function to save the bitmap
-	*	updates the bitmap to screen and draws the printhead
-	*	printhead position given in m_xpos and m_ypos
-	*	also provides a cr_stepper and a pf_stepper
-	*	moving the cr_stepper/pf_stepper will update m_xpos/m_ypos according to ratio specified
+    *   provides a page bitmap to draw on
+    *   reads and writes pixels (representing printer dots)
+    *   function to save the bitmap
+    *   updates the bitmap to screen and draws the printhead
+    *   printhead position given in m_xpos and m_ypos
+    *   also provides a cr_stepper and a pf_stepper
+    *   moving the cr_stepper/pf_stepper will update m_xpos/m_ypos according to ratio specified
 
  */
 #include "screen.h"
@@ -51,7 +51,7 @@ private:
 public:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
-	
+
 	int m_cr_direction = 1; // direction of carriage
 	int m_pf_stepper_ratio0 = 1;
 	int m_pf_stepper_ratio1 = 1;
@@ -60,7 +60,7 @@ public:
 	int m_xpos = 0;
 	int m_ypos = 0;
 
-private:	
+private:
 	bitmap_rgb32  m_internal_bitmap;  // internal bitmap
 	bitmap_rgb32* m_bitmap = &m_internal_bitmap;  // pointer to bitmap, use internal bitmap by default
 
@@ -79,14 +79,14 @@ private:
 	int m_vdpi;
 	int clear_pos = 0;
 	int newpageflag = 0;  // used to keep printhead at the top of page until actual printing
-	
+
 public:
 	bitmap_rgb32& get_bitmap(){ return *m_bitmap; }
 
 	void set_printhead_color(int headcolor, int bordcolor);
 	void set_printhead_size(int xsize, int ysize, int bordersize);
 	void setheadpos(int x, int y){  if (m_xpos != x) newpageflag = 0; m_xpos = x; m_ypos = y;}
-	
+
 	session_time_device* get_session_time_device() {return m_session_time;}
 
 	void write_snapshot_to_file(std::string directory, std::string name);
@@ -105,7 +105,7 @@ public:
 	int get_bottom_margin();
 	bool check_new_page();
 
-	int update_stepper_delta(stepper_device * stepper, uint8_t pattern);	
+	int update_stepper_delta(stepper_device * stepper, uint8_t pattern);
 	void update_cr_stepper(int pattern);
 	void update_pf_stepper(int pattern);
 

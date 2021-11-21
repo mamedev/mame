@@ -270,11 +270,11 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
 	m_bitmap_printer(*this, "bitmap_printer"),
-//	m_pf_stepper(*this, "pf_stepper"),
-//	m_cr_stepper(*this, "cr_stepper"),
+//  m_pf_stepper(*this, "pf_stepper"),
+//  m_cr_stepper(*this, "cr_stepper"),
 	m_eeprom(*this, "eeprom"),
 	m_e05a30(*this, "e05a30"),
-//	m_screen(*this, "screen"),
+//  m_screen(*this, "screen"),
 	m_online_led(*this, "online_led"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
@@ -382,7 +382,7 @@ uint8_t epson_lx810l_device::porta_r(offs_t offset)
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
 
 	// Update the printhead display, only put this here since this routine gets called frequently
-	m_bitmap_printer->set_printhead_color( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0); 
+	m_bitmap_printer->set_printhead_color( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0);
 
 	return result;
 }
@@ -524,7 +524,7 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 		 * noticeably off in the 20+ years old printer used for testing =).
 		 */
 		if (m_bitmap_printer->m_xpos < m_bitmap_printer->get_bitmap().width()) {
-			for (int i = 0; i < 9; i++) 
+			for (int i = 0; i < 9; i++)
 			{
 				if ((m_printhead & (1<<(8-i))) != 0)
 					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, // * 1 for no interleave at 72 vdpi

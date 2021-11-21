@@ -21,7 +21,7 @@
 #include "logmacro.h"
 
 /***************************************************************************
-	DEVICE DECLARATION
+    DEVICE DECLARATION
 ***************************************************************************/
 
 DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bitmap Printer Device")
@@ -30,9 +30,9 @@ DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bit
 //    INPUT PORTS
 //**************************************************************************
 
-#define PORT_ADJUSTER_16MASK(_default, _name)					\
-        configurer.field_alloc(IPT_ADJUSTER, (_default), 0xffff, (_name)); \
-        configurer.field_set_min_max(0, 100);
+#define PORT_ADJUSTER_16MASK(_default, _name)                   \
+		configurer.field_alloc(IPT_ADJUSTER, (_default), 0xffff, (_name)); \
+		configurer.field_set_min_max(0, 100);
 
 INPUT_PORTS_START(bitmap_printer)
 	PORT_START("DRAWMARKS")
@@ -40,7 +40,7 @@ INPUT_PORTS_START(bitmap_printer)
 	PORT_CONFSETTING(0x0, "Off")
 	PORT_CONFSETTING(0x1, "with marks")
 	PORT_CONFSETTING(0x2, "with numbers")
-	
+
 	PORT_START("TOPMARGIN")
 	PORT_ADJUSTER_16MASK(18, "Printer Top Margin")
 	PORT_MINMAX(0,500)
@@ -168,7 +168,7 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 {
-//	printf("clear to pos: %d   current:%d\n",to_line,clear_pos);
+//  printf("clear to pos: %d   current:%d\n",to_line,clear_pos);
 	int from_line = clear_pos;
 	to_line = std::min(m_bitmap->height(), to_line);
 	if (to_line >= from_line)
@@ -176,7 +176,7 @@ void bitmap_printer_device::clear_to_pos(int to_line, u32 color)
 		bitmap_clear_band(*m_bitmap, from_line, to_line, color);
 	}
 	clear_pos = std::max(clear_pos, to_line + 1);
-//	printf("new clear pos: %d \n",clear_pos);
+//  printf("new clear pos: %d \n",clear_pos);
 }
 
 void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 color)
@@ -186,7 +186,7 @@ void bitmap_printer_device::bitmap_clear_band(int from_line, int to_line, u32 co
 
 void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color)
 {
-//	printf("clear band (%d,%d)\n",from_line,to_line);
+//  printf("clear band (%d,%d)\n",from_line,to_line);
 	// plot_box( x, y, width, height, color)
 	bitmap.plot_box(0, from_line, m_paperwidth, to_line - from_line + 1, color);
 }
@@ -337,7 +337,7 @@ int bitmap_printer_device::get_bottom_margin() { return ioport("BOTTOMMARGIN")->
 bool bitmap_printer_device::check_new_page()
 {
 	bool retval = false;
-	
+
 	// idea here is that you update the position, then check the page, this will do the saving of the page
 	// if this routine returns true, means there's a new page and you should clear the yposition
 	if (newpageflag == 1)
@@ -345,15 +345,15 @@ bool bitmap_printer_device::check_new_page()
 		// if you change m_ypos you have to change the stepper abs position too
 		m_ypos = get_top_margin();  // lock to the top of page until we seek horizontally
 		m_pf_stepper->set_absolute_position(get_top_margin() / m_pf_stepper_ratio0 * m_pf_stepper_ratio1);
-	}	
-	if (m_ypos > get_bitmap().height() - 1 - get_bottom_margin())  
+	}
+	if (m_ypos > get_bitmap().height() - 1 - get_bottom_margin())
 			// If we are at the bottom of the page we will
 			// write the page to a file, then erase the top part of the page
 			// so we can still see the last page printed.
 		{
 			// clear paper to bottom from current position
 			clear_to_pos(m_paperheight - 1, rgb_t::white());
-			
+
 			// save a snapshot with the slot and page as part of the filename
 			write_snapshot_to_file(
 						owner()->basetag(),
@@ -367,7 +367,7 @@ bool bitmap_printer_device::check_new_page()
 
 			// clear page down to visible area, starting from the top of page
 			clear_pos = 0;
-			clear_to_pos(m_paperheight - 1 - PAPER_SCREEN_HEIGHT), 
+			clear_to_pos(m_paperheight - 1 - PAPER_SCREEN_HEIGHT),
 
 			m_ypos = get_top_margin();  // lock to the top of page until we seek horizontally
 			m_pf_stepper->set_absolute_position(get_top_margin() / m_pf_stepper_ratio0 * m_pf_stepper_ratio1);
@@ -375,7 +375,7 @@ bool bitmap_printer_device::check_new_page()
 		}
 	else { clear_to_pos ( m_ypos + m_distfrombottom); }
 	return retval;
-		
+
 }
 
 int bitmap_printer_device::update_stepper_delta(stepper_device * stepper, uint8_t pattern)
@@ -392,7 +392,7 @@ int bitmap_printer_device::update_stepper_delta(stepper_device * stepper, uint8_
 // If the stepper drive is in the opposite direction, just reverse the
 // bits in the bitswap.
 
-void bitmap_printer_device::update_cr_stepper(int pattern) 
+void bitmap_printer_device::update_cr_stepper(int pattern)
 {
 
 	int delta = update_stepper_delta(m_cr_stepper, pattern);
@@ -413,8 +413,8 @@ void bitmap_printer_device::update_cr_stepper(int pattern)
 	m_xpos = m_cr_stepper->get_absolute_position() * m_cr_stepper_ratio0 / m_cr_stepper_ratio1;
 }
 
-void bitmap_printer_device::update_pf_stepper(int pattern) 
-{	[[maybe_unused]] int delta = update_stepper_delta(m_pf_stepper, pattern);
+void bitmap_printer_device::update_pf_stepper(int pattern)
+{   [[maybe_unused]] int delta = update_stepper_delta(m_pf_stepper, pattern);
 
 	m_ypos = m_pf_stepper->get_absolute_position() * m_pf_stepper_ratio0 / m_pf_stepper_ratio1;
 	check_new_page();

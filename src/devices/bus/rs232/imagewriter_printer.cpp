@@ -172,7 +172,7 @@ void apple_imagewriter_printer_device::device_add_mconfig(machine_config &config
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 144, 160);
 	m_bitmap_printer->set_pf_stepper_ratio(1,1);
 	m_bitmap_printer->set_cr_stepper_ratio(1,1);
-	
+
 	TIMER(config, m_timer_rxclock, 0);
 
 	m_timer_rxclock->configure_periodic(FUNC(apple_imagewriter_printer_device::pulse_uart_clock), attotime::from_hz( 9600 * 16 * 2));
@@ -239,9 +239,9 @@ const tiny_rom_entry *apple_imagewriter_printer_device::device_rom_region() cons
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-#define PORT_ADJUSTER_16MASK(_default, _name)					\
-        configurer.field_alloc(IPT_ADJUSTER, (_default), 0xffff, (_name)); \
-        configurer.field_set_min_max(0, 100);
+#define PORT_ADJUSTER_16MASK(_default, _name)                   \
+		configurer.field_alloc(IPT_ADJUSTER, (_default), 0xffff, (_name)); \
+		configurer.field_set_min_max(0, 100);
 
 
 static INPUT_PORTS_START( apple_imagewriter )
@@ -408,7 +408,7 @@ INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::select_sw)
 
 INPUT_CHANGED_MEMBER(apple_imagewriter_printer_device::reset_sw)
 {
-       if (newval == 0) m_maincpu->reset();
+	   if (newval == 0) m_maincpu->reset();
 }
 
 //-------------------------------------------------
@@ -739,7 +739,7 @@ void apple_imagewriter_printer_device::update_printhead()
 		int xdirection = m_bitmap_printer->m_cr_direction;
 		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset); // offset to correct alignment
 		int ypixel = (m_bitmap_printer->m_ypos) + 2 * i; // gap of 1/72 between printhead dots so multiply by 2
-	
+
 		if ((xpixel >= 0) && (xpixel <= (PAPER_WIDTH - 1)))
 		{
 			int darklevel = (ioport("DARKPIXEL")->read() & 0x7);
@@ -759,7 +759,7 @@ void apple_imagewriter_printer_device::update_printhead()
 
 void apple_imagewriter_printer_device::update_pf_stepper(uint8_t pattern)
 {
- 	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0)); // backwards
+	m_bitmap_printer->update_pf_stepper(bitswap<4>(pattern, 3, 1, 2, 0)); // backwards
 }
 
 //-------------------------------------------------
