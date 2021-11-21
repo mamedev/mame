@@ -124,12 +124,12 @@ public:
 	static const int FIFO_RAM_OFFSET = 0x80000;
 
 	// DMA emulation
-	template <fifo_channel_number channel_number>
-	void drq_w(int state) { fifo_channels[channel_number].drq_w(state); };
-	template <fifo_channel_number channel_number>
-	void bind_dma_r(std::function<uint32_t(void)> dma_r) { fifo_channels[channel_number].set_dma_r_callback(dma_r); };
-	template <fifo_channel_number channel_number>
-	void bind_dma_w(std::function<void(uint32_t)> dma_w) { fifo_channels[channel_number].set_dma_w_callback(dma_w); };
+	template <fifo_channel_number ChannelNumber>
+	void drq_w(int state) { fifo_channels[ChannelNumber].drq_w(state); };
+	template <fifo_channel_number ChannelNumber>
+	void bind_dma_r(std::function<uint32_t(void)> dma_r) { fifo_channels[ChannelNumber].set_dma_r_callback(dma_r); };
+	template <fifo_channel_number ChannelNumber>
+	void bind_dma_w(std::function<void(uint32_t)> dma_w) { fifo_channels[ChannelNumber].set_dma_w_callback(dma_w); };
 
 protected:
 	// FIFO RAM
