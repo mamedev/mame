@@ -389,7 +389,10 @@ WRITE_LINE_MEMBER(peribox_device::clock_in)
 void peribox_device::inta_join(int slot, int state)
 {
 	LOGMASKED(LOG_INT, "propagating INTA from slot %d to console: %d\n", slot, state);
-	util::set_bit(m_inta_flag, slot, state==ASSERT_LINE);
+	if (state==ASSERT_LINE)
+		m_inta_flag |= (1 << slot);
+	else
+		m_inta_flag &= ~(1 << slot);
 
 	if (m_ioport_connected)
 		set_extint((m_inta_flag != 0)? ASSERT_LINE : CLEAR_LINE);
@@ -400,7 +403,10 @@ void peribox_device::inta_join(int slot, int state)
 void peribox_device::intb_join(int slot, int state)
 {
 	LOGMASKED(LOG_INT, "propagating INTB from slot %d to console: %d\n", slot, state);
-	util::set_bit(m_intb_flag, slot, state==ASSERT_LINE);
+	if (state==ASSERT_LINE)
+		m_intb_flag |= (1 << slot);
+	else
+		m_intb_flag &= ~(1 << slot);
 
 	// Not propagated to console
 	if (!m_ioport_connected)
@@ -410,7 +416,10 @@ void peribox_device::intb_join(int slot, int state)
 void peribox_device::lcp_join(int slot, int state)
 {
 	LOGMASKED(LOG_INT, "propagating LCP from slot %d to SGCPU: %d\n", slot, state);
-	util::set_bit(m_lcp_flag, slot, state==ASSERT_LINE);
+	if (state==ASSERT_LINE)
+		m_lcp_flag |= (1 << slot);
+	else
+		m_lcp_flag &= ~(1 << slot);
 
 	// Not propagated to console
 	if (!m_ioport_connected)
@@ -424,7 +433,10 @@ void peribox_device::ready_join(int slot, int state)
 {
 	LOGMASKED(LOG_READY, "Incoming READY=%d from slot %d\n", state, slot);
 	// We store the inverse state
-	util::set_bit(m_ready_flag, slot, state==CLEAR_LINE);
+	if (state==CLEAR_LINE)
+		m_ready_flag |= (1 << slot);
+	else
+		m_ready_flag &= ~(1 << slot);
 
 	if (m_ioport_connected)
 		set_ready((m_ready_flag != 0)? CLEAR_LINE : ASSERT_LINE);
