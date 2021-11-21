@@ -47,6 +47,9 @@ public:
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
 
+	/* Reset Printer (equivalent to turning power off and back on) */
+	DECLARE_INPUT_CHANGED_MEMBER(reset_printer);
+
 protected:
 	epson_lx810l_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

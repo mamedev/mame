@@ -96,7 +96,6 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 
 #include "emu.h"
 #include "silentype.h"
-//#include <bitset>
 
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -161,7 +160,6 @@ Mentions using the 6522 chip in the Apple III to interface to the Silentype ther
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Interface Card")
-//DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, <<shortname>>, <<name>>)   tag comes from including device constructor
 
 #define SILENTYPE_ROM_REGION  "rom"
 

@@ -70,14 +70,6 @@
 #define SERIAL_CLOCK_STATUS           (6)  // current shift clock output, read on A01
 
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 DEFINE_DEVICE_TYPE(SILENTYPE_PRINTER, silentype_printer_device, "silentype", "Apple Silentype Printer")
 
 
@@ -134,23 +126,17 @@ silentype_printer_device::silentype_printer_device(const machine_config &mconfig
 
 void silentype_printer_device::device_start()
 {
-	save_item(NAME(m_xpos));
-	save_item(NAME(m_ypos));
 	save_item(NAME(right_offset));
 	save_item(NAME(left_offset));
 	save_item(NAME(heattime));
 	save_item(NAME(decaytime));
 	save_item(NAME(lastheadbits));
 	save_item(NAME(headtemp));
-	save_item(NAME(xdirection));
-	save_item(NAME(newpageflag));
-	save_item(NAME(page_count));
 	save_item(NAME(last_update_time));
 }
 
 void silentype_printer_device::device_reset_after_children()
 {
-	m_ypos=10;
 }
 
 void silentype_printer_device::device_reset()
@@ -222,11 +208,12 @@ void silentype_printer_device::update_printhead(uint8_t headbits)
 	LOG("PRINTHEAD TIME ELAPSED = %f   %f usec     bitpattern=%s\n",
 	  time_elapsed, time_elapsed*1e6, std::bitset<8>(headbits).to_string().c_str());
 
-	for (int i=0;i<7;i++)
+	for (int i = 0; i < 7; i++)
 	{
 		adjust_headtemp( BIT(lastheadbits,i), time_elapsed,  headtemp[i] );
 
-		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset);  // offset to correct alignment when changing direction
+		int xpixel = (m_bitmap_printer->m_xpos) + ((xdirection == 1) ? right_offset : left_offset);
+		// offset to correct alignment when changing direction
 		int ypixel = (m_bitmap_printer->m_ypos) + (6 - i);
 
 

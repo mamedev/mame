@@ -21,18 +21,13 @@
 #include "logmacro.h"
 
 /***************************************************************************
-    PARAMETERS
+	DEVICE DECLARATION
 ***************************************************************************/
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
 DEFINE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device, "bitmap_printer", "Bitmap Printer Device")
 
-
 //**************************************************************************
-//  INPUT PORTS
+//    INPUT PORTS
 //**************************************************************************
 
 #define PORT_ADJUSTER_16MASK(_default, _name)					\
@@ -61,10 +56,6 @@ ioport_constructor bitmap_printer_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(bitmap_printer);
 }
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -394,6 +385,12 @@ int bitmap_printer_device::update_stepper_delta(stepper_device * stepper, uint8_
 	int delta = stepper->get_absolute_position() - lastpos;
 	return delta;
 }
+
+// When sending patterns to the update_cr_stepper and update_pf_stepper
+// functions, the stepper device uses a "standard drive table"
+// so you have to match that drive table by using a bitswap function.
+// If the stepper drive is in the opposite direction, just reverse the
+// bits in the bitswap.
 
 void bitmap_printer_device::update_cr_stepper(int pattern) 
 {

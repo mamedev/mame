@@ -171,7 +171,6 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 ***************************************************************************/
 
 static INPUT_PORTS_START( epson_lx810l )
-
 	/* Buttons on printer */
 	PORT_START("ONLINE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, online_sw, 0)
@@ -183,68 +182,49 @@ static INPUT_PORTS_START( epson_lx810l )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_1_PAD)
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
+	PORT_START("RESET")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, epson_lx810l_device, reset_printer, 0)
 
-	/* DIPSW1 */
 	PORT_START("DIPSW1")
+	PORT_DIPNAME(0x01, 0x00, "Character spacing")             PORT_DIPLOCATION("SW 1:!1")
+	PORT_DIPSETTING(   0x00, "10 cpi")
+	PORT_DIPSETTING(   0x01, "12 cpi")
+	PORT_DIPNAME(0x02, 0x00, "Shape of zero")                 PORT_DIPLOCATION("SW 1:!2")
+	PORT_DIPSETTING(   0x00, "Not slashed")
+	PORT_DIPSETTING(   0x02, "Slashed")
+	PORT_DIPNAME(0x04, 0x00, "Character table")               PORT_DIPLOCATION("SW 1:!3")
+	PORT_DIPSETTING(   0x00, "Italics")
+	PORT_DIPSETTING(   0x04, "Graphics")
+	PORT_DIPNAME(0x08, 0x08, "Short tear-off")                PORT_DIPLOCATION("SW 1:!4")
+	PORT_DIPSETTING(   0x08, DEF_STR(Off))
+	PORT_DIPSETTING(   0x00, DEF_STR(On))
+	PORT_DIPNAME(0x10, 0x00, "Draft printing speed")          PORT_DIPLOCATION("SW 1:!6")
+	PORT_DIPSETTING(   0x10, DEF_STR(Normal))
+	PORT_DIPSETTING(   0x00, "High speed")
+	PORT_DIPNAME(0xe0, 0xe0, "International character set")   PORT_DIPLOCATION("SW 1:!6,!7,!8")
+	PORT_DIPSETTING(   0xe0, "USA (PC 437)")
+	PORT_DIPSETTING(   0x60, "France (PC 850)")
+	PORT_DIPSETTING(   0xa0, "Germany (PC 860)")
+	PORT_DIPSETTING(   0x20, "UK (PC 863)")
+	PORT_DIPSETTING(   0xc0, "Denmark (PC 865)")
+	PORT_DIPSETTING(   0x40, "Sweden (PC 437)")
+	PORT_DIPSETTING(   0x80, "Italy (PC 437)")
+	PORT_DIPSETTING(   0x00, "Spain (PC 437)")
 
-	PORT_DIPNAME(0x01, 0x01, "Character spacing")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x01, "12 cpi") /* default */
-	PORT_DIPSETTING(0x00, "10 cpi")
-
-	PORT_DIPNAME(0x02, 0x00, "Shape of zero")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x02, "Slashed")
-	PORT_DIPSETTING(0x00, "Not slashed") /* default */
-
-	PORT_DIPNAME(0x0c, 0x08, "Page length")
-	PORT_DIPLOCATION("DIP:3,4")
-	PORT_DIPSETTING(0x00, "11 inches")
-	PORT_DIPSETTING(0x04, "12 inches")
-	PORT_DIPSETTING(0x08, "8.5 inches") /* default */
-	PORT_DIPSETTING(0x0c, "11.7 inches")
-
-	PORT_DIPNAME(0x10, 0x10, "Character table")
-	PORT_DIPLOCATION("DIP:5")
-	PORT_DIPSETTING(0x10, "Graphics") /* default */
-	PORT_DIPSETTING(0x00, "Italics")
-
-	PORT_DIPNAME(0xe0, 0xe0, "International characters and PC selection")
-	PORT_DIPLOCATION("DIP:6,7,8")
-	PORT_DIPSETTING(0xe0, "United States") /* default */
-	PORT_DIPSETTING(0x60, "France")
-	PORT_DIPSETTING(0xa0, "Germany")
-	PORT_DIPSETTING(0x20, "United Kingdom")
-	PORT_DIPSETTING(0xc0, "Denmark")
-	PORT_DIPSETTING(0x40, "Sweden")
-	PORT_DIPSETTING(0x80, "Italy")
-	PORT_DIPSETTING(0x00, "Spain")
-
-	/* DIPSW2 */
 	PORT_START("DIPSW2")
-
-	PORT_DIPNAME(0x01, 0x01, "Short tear-off")
-	PORT_DIPLOCATION("DIP:1")
-	PORT_DIPSETTING(0x01, "Invalid") /* default */
-	PORT_DIPSETTING(0x00, "Valid")
-
-	PORT_DIPNAME(0x02, 0x00, "Cut-sheet feeder mode")
-	PORT_DIPLOCATION("DIP:2")
-	PORT_DIPSETTING(0x02, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
-	PORT_DIPNAME(0x04, 0x00, "Skip-over-perforation")
-	PORT_DIPLOCATION("DIP:3")
-	PORT_DIPSETTING(0x04, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
-	PORT_DIPNAME(0x08, 0x00, "Auto line feed")
-	PORT_DIPLOCATION("DIP:4")
-	PORT_DIPSETTING(0x08, "ON")
-	PORT_DIPSETTING(0x00, "OFF") /* default */
-
+	PORT_DIPNAME(0x01, 0x00, "Page length")                   PORT_DIPLOCATION("SW 2:!1")
+	PORT_DIPSETTING(   0x00, "11\"")
+	PORT_DIPSETTING(   0x01, "12\"")
+	PORT_DIPNAME(0x02, 0x00, "Cut-sheet feeder mode")         PORT_DIPLOCATION("SW 2:!2")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x02, DEF_STR(On))
+	PORT_DIPNAME(0x04, 0x00, "Skip over perforation")         PORT_DIPLOCATION("SW 2:!3")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x04, "1\"")
+	PORT_DIPNAME(0x08, 0x00, "Auto line feed")                PORT_DIPLOCATION("SW 2:!4")
+	PORT_DIPSETTING(   0x00, DEF_STR(Off))
+	PORT_DIPSETTING(   0x08, DEF_STR(On))
 INPUT_PORTS_END
-
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -259,6 +239,17 @@ INPUT_CHANGED_MEMBER(epson_lx810l_device::online_sw)
 {
 	m_maincpu->set_input_line(UPD7810_INTF2, newval ? CLEAR_LINE : ASSERT_LINE);
 }
+
+INPUT_CHANGED_MEMBER(epson_lx810l_device::reset_printer)
+{
+	if (newval)
+	{
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);  // reset cpu
+		m_e05a30->reset();  // this will generate an NMI interrupt when the e05a30 is ready (minimum 0.9 seconds after reset)
+	}
+}
+
+
 
 
 //**************************************************************************
@@ -378,7 +369,7 @@ void epson_lx810l_device::fakemem_w(uint8_t data)
 uint8_t epson_lx810l_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
-	uint8_t hp_sensor = m_bitmap_printer->m_xpos <= 0 ? 0 : 1; // use m_real_cr_pos instead of m_cr_pos_abs (fixes walking carriage on mame soft reset)
+	uint8_t hp_sensor = m_bitmap_printer->m_xpos <= 0 ? 0 : 1;
 
 	//uint8_t pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
 
@@ -536,7 +527,7 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 			for (int i = 0; i < 9; i++) 
 			{
 				if ((m_printhead & (1<<(8-i))) != 0)
-					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1,
+					m_bitmap_printer->pix(m_bitmap_printer->m_ypos + i * 1, // * 1 for no interleave at 72 vdpi
 					m_bitmap_printer->m_xpos + CR_OFFSET + m_in_between_offset +
 					(m_bitmap_printer->m_cr_direction > 0 ? m_rightward_offset : 0)) = 0x000000;
 			}

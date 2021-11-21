@@ -103,26 +103,14 @@ private:
 	XTAL CLK1 = CLK2 / 2;            // CLK1 name from Sams schematic = 2.4576 Mhz
 protected:
 	int dpi = 144;
-	double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 162 dpi, not 144 dpi)
+	double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 160 dpi, not 144 dpi)
 	double PAPER_WIDTH_INCHES = 8.5;
 	double PAPER_HEIGHT_INCHES = 11.0;
 	double MARGIN_INCHES = .25;
 	int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi * xscale;  // 8.5 inches wide
 	int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;          // 11  inches high
 	int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	int distfrombottom = 50;
 
-	int xposratio0 = 144;
-	int xposratio1 = 144;
-	int yposratio0 = 18;
-	int yposratio1 = 18;
-
-	int m_xpos = PAPER_WIDTH / 2;  // set initial position at middle of paper (paper width in pixels)
-	int m_ypos = 30;
-	s32 x_pixel_coord(s32 xpos) { return xpos * xposratio0 / xposratio1; }  // x position
-	s32 y_pixel_coord(s32 ypos) { return ypos * yposratio0 / yposratio1; }  // y position given in half steps
-
-	int update_stepper_delta(stepper_device * stepper, uint8_t stepper_pattern, const char * name, int direction);
 	void update_printhead();
 	void update_pf_stepper(uint8_t data);
 	void update_cr_stepper(uint8_t data);

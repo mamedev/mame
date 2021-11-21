@@ -785,12 +785,6 @@ void apple_imagewriter_printer_device::device_start()
 	save_item(NAME(right_offset));
 	save_item(NAME(m_left_edge));
 	save_item(NAME(m_right_edge));
-	save_item(NAME(xposratio0));
-	save_item(NAME(xposratio1));
-	save_item(NAME(yposratio0));
-	save_item(NAME(yposratio1));
-	save_item(NAME(PAPER_WIDTH_INCHES));
-	save_item(NAME(PAPER_WIDTH));
 }
 
 //-------------------------------------------------
