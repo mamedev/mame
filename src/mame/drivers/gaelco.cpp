@@ -18,16 +18,16 @@ Year   Game                PCB            NOTES
 
 TODO: Figure out why Thunder Hoop crashes if you die on Level 4
       This can be bypassed by killing yourself at the same time as
-	  the Level 3 boss dies, suggesting the end stage animation is
-	  somehow corrupting the game state. Could this be a bug in
-	  the supported revision of the game?  It doesn't depend on
-	  CPU clock, vblank timing, there are no unmapped reads or
-	  writes of significance.  Could it be related to a dipswitch
-	  setting?
+      the Level 3 boss dies, suggesting the end stage animation is
+      somehow corrupting the game state. Could this be a bug in
+      the supported revision of the game?  It doesn't depend on
+      CPU clock, vblank timing, there are no unmapped reads or
+      writes of significance.  Could it be related to a dipswitch
+      setting?
 
-	  Priorities for all games - the games don't make extensive
-	  enough use of the priority scheme to properly draw any
-	  conclusions.
+      Priorities for all games - the games don't make extensive
+      enough use of the priority scheme to properly draw any
+      conclusions.
 
 ***************************************************************************/
 

@@ -410,7 +410,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 								u16 *const pixel = srcy + xpos;
 								const u16 src_color = *pixel;
-					
+
 								/* make background color darker or brighter */
 								*pixel = (src_color & 0xfff) | 0x1000*gfx_pen;
 							}
@@ -477,11 +477,11 @@ u32 gaelco2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	the game code.
 
 	_______________________________________ entry number
-						1111 1111 1111 1111
+	                    1111 1111 1111 1111
 	0123 4567 89ab cdef 0123 4567 89ab cdef
 	_______________________________________ offset into linescroll ram
-	0000 0000 0000 1111 1111 1111 1111 1111 
-	6677 7888 8999 0001 1112 2233 3444 4555 
+	0000 0000 0000 1111 1111 1111 1111 1111
+	6677 7888 8999 0001 1112 2233 3444 4555
 	5814 7036 9258 1470 3692 5814 7036 9258
 	_______________________________________
 	                                         scr = expected scroll value if bit 0x1000 at offset is set
@@ -569,8 +569,8 @@ int gaelco2_state::get_rowscrollmode_yscroll(bool first_screen)
 	uint16_t base = first_screen ? 0x2000 / 2 : 0x2400 / 2;
 
 	uint8_t checkoffsets[32] = {
-		0x02, 0x0e, 0x0a, 0x1b,	0x15, 0x13, 0x04, 0x19,
-		0x0c, 0x1f, 0x08, 0x1d,	0x11, 0x06, 0x17, 0x10,
+		0x02, 0x0e, 0x0a, 0x1b, 0x15, 0x13, 0x04, 0x19,
+		0x0c, 0x1f, 0x08, 0x1d, 0x11, 0x06, 0x17, 0x10,
 		0x01, 0x0d, 0x16, 0x09, 0x1a, 0x05, 0x1e, 0x00,
 		0x12, 0x0b, 0x14, 0x03, 0x1c, 0x18, 0x07, 0x0f };
 
@@ -607,7 +607,7 @@ u32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 	}
 
 	if (m_vregs[1] & 0x8000)
-	{	
+	{
 		scroll1y += get_rowscrollmode_yscroll(false);
 	}
 
