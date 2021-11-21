@@ -1,0 +1,162 @@
+// license:BSD-3-Clause
+// copyright-holders:Golden Child
+#ifndef MAME_BUS_IMAGEWRITER_PRINTER_H
+#define MAME_BUS_IMAGEWRITER_PRINTER_H
+
+#pragma once
+
+#include "rs232.h"
+#include "cpu/i8085/i8085.h"
+#include "machine/bitmap_printer.h"
+#include "machine/i8155.h"
+#include "machine/i8251.h"
+#include "machine/steppers.h"
+#include "machine/74123.h"
+//#include "machine/74161.h"
+#include "machine/timer.h"
+
+class apple_imagewriter_printer_device : public device_t,
+	public device_rs232_port_interface
+{
+public:
+	apple_imagewriter_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_INPUT_CHANGED_MEMBER(reset_sw);
+	DECLARE_INPUT_CHANGED_MEMBER(select_sw);
+	DECLARE_INPUT_CHANGED_MEMBER(paper_width_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(dcd_changed);
+
+protected:
+	apple_imagewriter_printer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+
+private:
+
+	required_device<i8085a_cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart;
+	required_device<i8155_device> m_8155head;
+	required_device<i8155_device> m_8155switch;
+	required_device<ttl74123_device> m_pulse1;
+	required_device<ttl74123_device> m_pulse2;
+
+	required_device<bitmap_printer_device> m_bitmap_printer;
+
+	required_device<timer_device> m_timer_rxclock;
+
+	output_finder<> m_power_led;
+	output_finder<> m_paper_error_led;
+	output_finder<> m_select_led;
+
+	void maincpu_out_sod_func(uint8_t data);
+
+	uint8_t head_pa_r(offs_t offset);
+	void head_pa_w(uint8_t data);
+	uint8_t head_pb_r(offs_t offset);
+	void head_pb_w(uint8_t data);
+	uint8_t head_pc_r(offs_t offset);
+	void head_pc_w(uint8_t data);
+	void head_to(uint8_t data);
+
+	uint8_t switch_pa_r(offs_t offset);
+	void switch_pa_w(uint8_t data);
+	uint8_t switch_pb_r(offs_t offset);
+	void switch_pb_w(uint8_t data);
+	uint8_t switch_pc_r(offs_t offset);
+	void switch_pc_w(uint8_t data);
+	void switch_to(uint8_t data);
+
+	int ioportsaferead(const char * name);
+
+	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
+
+	void rxrdy_handler(uint8_t data);
+
+	int m_pulse1_out_last = 1;
+
+	void pulse1_out_handler(uint8_t data);
+	void pulse2_out_handler(uint8_t data);
+
+	uint8_t maincpu_in_sid_func();
+	void dtr_handler(uint8_t data);
+	void rts_handler(uint8_t data);
+
+	void txd_handler(uint8_t data);
+
+	TIMER_DEVICE_CALLBACK_MEMBER (pulse_uart_clock);
+
+
+	int xdirection = 0;
+	int newpageflag = 0;
+	int page_count = 0;
+
+	XTAL baseCLK = 9.8304_MHz_XTAL;  // base clock to 8085 cpu = 9.8304 Mhz
+	XTAL CLK2 = baseCLK / 2;         // CLK2 name from Sams schematic = 4.9152 Mhz
+	XTAL CLK1 = CLK2 / 2;            // CLK1 name from Sams schematic = 2.4576 Mhz
+protected:
+	int dpi = 144;
+	double xscale = 9.0 / 8.0; // 1.125  (stepper moves at 160 dpi, not 144 dpi)
+	double PAPER_WIDTH_INCHES = 8.5;
+	double PAPER_HEIGHT_INCHES = 11.0;
+	double MARGIN_INCHES = .25;
+	int PAPER_WIDTH  = PAPER_WIDTH_INCHES * dpi * xscale;  // 8.5 inches wide
+	int PAPER_HEIGHT = PAPER_HEIGHT_INCHES * dpi;          // 11  inches high
+	int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+
+	void update_printhead();
+	void update_pf_stepper(uint8_t data);
+	void update_cr_stepper(uint8_t data);
+
+	u8 m_uart_clock = 0;
+	int m_baud_clock_divisor = 1;
+	int m_baud_clock_divisor_delay = 0;
+
+	int m_ic17_flipflop_head = 0;           // connected to 8155 head     (ic17 7474 part 1/2)
+	int m_ic17_flipflop_select_status = 0;  // connected to 8155 switches (ic17 7474 part 2/2)
+	int m_head_to_last = 0;
+	int m_head_pb_last = 0;
+	int m_switches_pc_last = 0;
+	int m_switches_to_last = 0;
+	u16 m_dotpattern = 0;
+
+	int m_left_edge_adjust = -6;  // to get perfect centering with macpaint
+
+	int right_offset = 0;
+	int left_offset  = 0;
+	int m_left_edge  = (MARGIN_INCHES) * dpi * xscale + m_left_edge_adjust;
+	int m_right_edge = (PAPER_WIDTH_INCHES + MARGIN_INCHES) * dpi * xscale - 1;
+
+	// m_left_edge controls the location of the print head position sensor on the left side of the
+	// printer.
+	//
+	// m_right edge controls the location of the print head position switch on the right side of the
+	// printer.  When the carriage hits the right edge, it will return to the left edge and
+	// the printer will go deselected.
+	// If this is set improperly, the self test will not print more than a single line since it will
+	// deselect the printer at the right edge.
+
+	void darken_pixel(double darkpct, unsigned int& pixel);
+	void update_head_pos();
+};
+
+
+class apple_imagewriter15_printer_device : public apple_imagewriter_printer_device
+{
+public:
+	apple_imagewriter15_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+};
+
+
+DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER_PRINTER, apple_imagewriter_printer_device)
+DECLARE_DEVICE_TYPE(APPLE_IMAGEWRITER15_PRINTER, apple_imagewriter15_printer_device)
+
+#endif // MAME_BUS_IMAGEWRITER_PRINTER_H

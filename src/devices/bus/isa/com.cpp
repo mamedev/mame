@@ -10,6 +10,7 @@
 #include "com.h"
 
 #include "bus/rs232/hlemouse.h"
+#include "bus/rs232/imagewriter_printer.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
@@ -26,6 +27,7 @@ static void isa_com(device_slot_interface &device)
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
 	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+	device.option_add("imagewriter", APPLE_IMAGEWRITER_PRINTER);
 }
 
 

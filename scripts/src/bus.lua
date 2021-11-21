@@ -2579,6 +2579,10 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard16k.h",
 		MAME_DIR .. "src/devices/bus/a2bus/sider.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/sider.h",
+		MAME_DIR .. "src/devices/bus/a2bus/silentype.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/silentype.h",
+		MAME_DIR .. "src/devices/bus/a2bus/silentype_printer.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/silentype_printer.h",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/softcard3.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ssbapple.cpp",
@@ -2775,6 +2779,8 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/hlemouse.h",
 		MAME_DIR .. "src/devices/bus/rs232/ie15.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/ie15.h",
+		MAME_DIR .. "src/devices/bus/rs232/imagewriter_printer.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/imagewriter_printer.h",
 		MAME_DIR .. "src/devices/bus/rs232/keyboard.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/keyboard.h",
 		MAME_DIR .. "src/devices/bus/rs232/loopback.cpp",
@@ -2801,6 +2807,14 @@ if (BUSES["RS232"]~=null) then
 		MAME_DIR .. "src/devices/bus/rs232/terminal.h",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/xvd701.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/bus/rs232/imagewriter_printer.cpp",  GEN_DIR .. "emu/layout/imagewriter_printer.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "imagewriter_printer"),
 	}
 end
 

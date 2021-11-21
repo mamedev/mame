@@ -92,6 +92,7 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/ramcard16k.h"
 #include "bus/a2bus/ssbapple.h"
 #include "bus/a2bus/ssprite.h"
+#include "bus/a2bus/silentype.h"
 #include "bus/a2bus/suprterminal.h"
 #include "bus/a2bus/timemasterho.h"
 #include "bus/a2bus/transwarp.h"
@@ -1362,6 +1363,7 @@ static void apple2_cards(device_slot_interface &device)
 	device.option_add("booti", A2BUS_BOOTI);  /* Booti Card */
 	device.option_add("q68", A2BUS_Q68);      /* Stellation Q68 68000 card */
 	device.option_add("q68plus", A2BUS_Q68PLUS); /* Stellation Q68 Plus 68000 card */
+	device.option_add("silentype", A2BUS_SILENTYPE);  /* Apple Silentype Card */
 }
 
 void apple2_state::apple2_common(machine_config &config)

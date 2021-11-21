@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Golden Child
+-->
+<mamelayout version="2">
+
+	<element name="devicetag_str" defstate="0">
+		<text string="~devicetag~">
+			<color red="0" green="0" blue="0" />
+			<bounds x="0" y="0" width="40" height="4" />
+		</text>
+	</element>
+	<element name="background">
+		<rect>
+			<color red="0.92" green="0.91" blue="0.75" />
+		</rect>
+	</element>
+
+	<element name="patch">
+		<rect>
+			<color red="0.64" green="0.67" blue="0.62" />
+		</rect>
+	</element>
+
+	<element name="red_rect_led" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.02" y="0.02" width=".96" height="0.96" />
+			<color red="0.2" green="0" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.2" blue=".20" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.02" y="0.02" width=".96" height="0.96" />
+			<color red="0.8" green="0" blue="0" />
+		</rect>
+	</element>
+
+	<element name="green_rect_led" defstate="0">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.02" y="0.02" width=".96" height="0.96" />
+			<color red="0.0" green="0.2" blue="0" />
+		</rect>
+		<rect state="1">
+			<color red="0.2" green="0.2" blue=".20" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.02" y="0.02" width=".96" height="0.96" />
+			<color red="0.2" green="0.9" blue="0" />
+		</rect>
+	</element>
+
+	<element name="pushbutton_rect" defstate="0">
+		<rect state="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<bounds x="0.02" y="0.02" width=".96" height="0.96" />
+			<color red="0.92" green="0.91" blue="0.75" />
+		</rect>
+		<rect state="1">
+			<color red="0.5" green="0.5" blue="0.5" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.02" y="0.02" width=".96" height="0.96" />
+			<color red="0.0" green="0" blue="0" />
+		</rect>
+		<disk state="1">
+			<bounds xc=".5" yc=".5" width=".90" height=".90" />
+			<color red="1.0" green="1.0" blue="0" alpha = "0.50" />
+		</disk>
+		<disk state="1">
+			<bounds xc=".5" yc=".5" width=".50" height=".50" />
+			<color red="1.0" green="1.0" blue="0" alpha = "0.85" />
+		</disk>
+		<text string="Pressed" state="1">
+			<color red="1.0" green="0.0" blue=".25" alpha = "1.0"/>
+			<bounds xc=".5" yc=".5" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<element name="on_off_str" defstate="0">
+		<text string="ON/OFF">
+			<color red="0.92" green="0.91" blue="0.75" />
+		</text>
+	</element>
+
+	<element name="power_str" defstate="0">
+		<text string="POWER">
+			<color red="0.92" green="0.91" blue="0.75" />
+		</text>
+	</element>
+
+	<element name="paper_str" defstate="0">
+		<text string="PAPER">
+			<color red="0.92" green="0.91" blue="0.75" />
+		</text>
+	</element>
+
+	<element name="error_str" defstate="0">
+		<text string="ERROR">
+			<color red="0.92" green="0.91" blue="0.75" />
+		</text>
+	</element>
+
+	<element name="select_str" defstate="0">
+		<text string="SELECT">
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+	</element>
+
+	<element name="line_feed_str" defstate="0">
+		<text string="LINE FEED">
+			<color red="0.64" green="0.67" blue="0.62" />
+		</text>
+	</element>
+
+	<element name="form_feed_str" defstate="0">
+		<text string="FORM FEED">
+			<color red="0.64" green="0.67" blue="0.62" />
+		</text>
+	</element>
+
+	<group name="Control Panel Group">
+		<element ref="background">
+			<bounds x="0" y="0" width="1.0" height="1.0" />
+		</element>
+
+		<element ref="patch">
+			<bounds x="0.05" y="0.025" width=".90" height=".35" />
+		</element>
+
+		<element ref="patch">
+			<bounds x="0.05" y="0.45" width=".90" height=".10" />
+		</element>
+
+		<element id="power_led" name="power_led" ref="green_rect_led">
+			<bounds xc=".3" yc=".3" width=".15" height=".033" />
+		</element>
+
+		<element id="select_led" name="select_led" ref="green_rect_led">
+			<bounds xc=".3" yc=".5" width=".15" height=".033" />
+		</element>
+
+
+		<element id="paper_error_led" name="paper_error_led" ref="red_rect_led">
+			<bounds xc=".75" yc=".3" width=".15" height=".033" />
+		</element>
+
+		<element id="on_off_str" ref="on_off_str">
+			<bounds xc=".5" yc=".06" width=".3" height=".06" />
+		</element>
+
+		<element id="on_off_button" inputtag="RESET" inputmask="0x01" ref="pushbutton_rect">
+			<bounds xc=".5" yc=".125" width=".4" height=".08" />
+		</element>
+
+		<element id="select_button" inputtag="SELECT" inputmask="0x01" ref="pushbutton_rect">
+			<bounds xc=".75" yc=".5" width=".2" height=".06" />
+		</element>
+
+		<element id="select_str" ref="select_str">
+			<bounds xc=".52" yc=".5" width=".22" height=".04" />
+		</element>
+
+		<element id="line_feed_str" ref="line_feed_str">
+			<bounds xc=".3" yc=".7" width=".5" height=".06" />
+		</element>
+
+		<element id="form_feed_str" ref="form_feed_str">
+			<bounds xc=".3" yc=".85" width=".5" height=".06" />
+		</element>
+
+		<element id="line_feed_button"  inputtag="LINEFEED" inputmask="0x01" ref="pushbutton_rect">
+			<bounds xc=".75" yc=".7" width=".2" height=".06" />
+		</element>
+
+		<element id="form_feed_button" inputtag="FORMFEED" inputmask="0x01" ref="pushbutton_rect">
+			<bounds xc=".75" yc=".85" width=".2" height=".06" />
+		</element>
+
+		<element id="power_str" ref="power_str">
+			<bounds xc=".3" yc=".25" width=".3" height=".06" />
+		</element>
+
+		<element id="paper_str" ref="paper_str">
+			<bounds xc=".75" yc=".20" width=".3" height=".06" />
+		</element>
+
+		<element id="error_str" ref="error_str">
+			<bounds xc=".75" yc=".25" width=".3" height=".06" />
+		</element>
+	</group>
+
+
+	<view name="Control Panel View">
+		<bounds x="0" y="0" width="512" height="384" />
+
+		<screen tag="bitmap_printer:screen">
+		  <bounds x="0" y="0" width="512" height="384"/>
+		</screen>
+
+		<collection name="Imagewriter Control Panel" visible="yes">
+			<group ref="Control Panel Group">
+				<bounds x="362" y="0" width="150" height="250" />
+			</group>
+		</collection>
+
+		<element id="devicetag_back" ref="background">
+			<bounds xc="128" yc="20" width="200" height="30" />
+			<color red="0.92" green="0.91" blue="0.75" />
+		</element>
+
+		<element id="devicetag_str" ref="devicetag_str">
+			<bounds xc="128" yc="20" width="200" height="20" />
+		</element>
+	</view>
+
+
+<!-- the content of the script element will be called as a function by the layout plugin -->
+<!-- use CDATA block to avoid the need to escape angle brackets and ampersands -->
+
+<script><![CDATA[
+
+-- file is the layout file object
+
+--print("LAYOUT LOADED  file.device.name = "..file.device.name)
+--print("LAYOUT LOADED  file.device.shortname = "..file.device.shortname)
+--print("LAYOUT LOADED  file.device.tag = = "..file.device.tag)
+
+]]></script>
+
+</mamelayout>

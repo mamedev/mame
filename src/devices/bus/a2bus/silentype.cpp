@@ -1,0 +1,359 @@
+// license:BSD-3-Clause
+// copyright-holders: Golden Child
+/*********************************************************************
+
+    silentype.cpp
+
+    Implementation of the Apple Silentype Printer Interface Card
+
+    (implements Silentype Synch Interface and Printer Deserializer Board)
+
+**********************************************************************
+
+Useful Resources:
+
+OpenEmulator's Apple Silentype driver by Marc S. Ressl
+
+Apple II Documentation Project:
+Apple II Documentation Project/Interface Cards/Serial/Apple Synch Printer Interface Card (Silentype)/
+
+Apple II Documentation Project/Interface Cards/Serial/Apple Synch Printer Interface Card (Silentype)/Schematics/
+Apple Silentype Schematics:
+Apple Sync Printer Card - Schematics 050-0024-00.pdf
+Apple Sync Printer Card - Schematics 050-0024-01.pdf
+
+Apple II Documentation Project/Peripherals/Printers/Apple Silentype/Photos/
+Apple Silentype - Info 1.jpg  (specs: 60 dpi  6 pixel wide chars * 80 chars = 480 dots across = 8 inches)
+                              (actually can do 83 chars across for 498 dots across)
+Apple Silentype - Info 2.jpg  (Full Technical Specs: horiz resolution = 60 dots/inch  vertical resolution = 60 dots/inch)
+
+Apple II Documentation Project/Peripherals/Printers/Apple Silentype/Manuals/
+Apple Silentype Operation and Reference Manual.pdf
+
+Apple II Documentation Project/Peripherals/Printers/Apple Silentype/Schematics/
+Apple Deserializer Driver Printer - Schematics 050-0023-01.pdf
+(shows the 74LS673 16 bit shift register and how the outputs are connected
+to the print head, paper drive motor and the head drive motor.)
+
+Apple-Orchard-v1n3-1980-1-Winter.pdf
+Inside the Silentype Firmware by J.D. Eisenberg and A.J. Hertzfeld
+(The Apple Orchard Winter 1980, p.43)
+(This shows you how to print bit graphics patterns.  It has warnings about
+using the Silentype and the Disk II simultaneously as it will
+damage the Apple's power supply.)
+
+1982_02_BYTE_07-02_Winter_Computing.pdf
+Double-Width Silentype Graphics for Your Apple by Charles H Putney (Byte Feb 1982, p413)
+
+Nibble 1981_v2n6.pdf
+Silentype Double Hi-Res Printing by Jenny Schmidt
+(Nibble Magazine, V2N6 1981 p.121)
+
+Apple Service Level I Technical Procedures #072 0062 Vol II
+https://archive.org/details/AppleServiceLevelITechnicalProcedures0720062VolIIJan1986Ed/page/n29/mode/2up
+covers using the Apple II Product Diagnostics Disk to perform diagnostics on the Silentype Printer and Interface.
+
+Diagnostics disk named "Apple II+ Products diagnostic 652-0334.dsk"
+Diagnostics disk named "Apple II Peripherals diskette 077-0217-A.dsk"
+
+https://www.folklore.org/StoryView.py?project=Macintosh&story=What_Hath_Woz_Wrought
+Story about Silentype development by Andy Hertzfeld from September 1979
+
+https://www.folklore.org/StoryView.py?project=Macintosh&story=Apple_II_Mouse_Card.txt
+Mentions using the 6522 chip in the Apple III to interface to the Silentype thermal printer.
+======================================================================
+
+
+    C0nX: C0n1 is write address, for slot 1 = C091, offset=1, bit 5 = rom enable
+          C0n4 is read register, for slot 1 = C094, offset=4, bit 7 = left side head limit switch
+
+
+    Cn00-CnFF: ROM (First 256 bytes of ROM mirrored here)
+    C800-CBFF: ROM 2048 byte ROM
+    CF00-CFFF: RAM (256 bytes) switched in/out by bit 5 of data writes to C081
+
+    The ROM in the overlapping RAM/ROM area from CF00-CFFF is only accessed for font table data,
+    so the code writes $2C to the write register, setting bit 5 and enabling the rom.  Once it reads the
+    font data, it immediately writes a $0C to the write register, disabling the rom again.
+    This is the only place in the code that the font data is accessed.
+
+00CC37  1  A9 2C                LDA #$2C
+00CC39  1  20 A3 CA             JSR sendStateBit
+
+00CAA3  1               sendStateBit:
+00CAA3  1  AE 00 CF             LDX varIOBase
+00CAA6  1  9D 81 C0             STA ioBase1,X    ; Write 0x2C, enables rom, bit 5 = 1
+00CAA9  1  60                   RTS
+
+00CC3C  1  B1 2A                LDA (textBaseL),Y  ; load our font data
+00CC3E  1  48                   PHA
+00CC3F  1  A9 0C                LDA #$0C
+00CC41  1  9D 81 C0             STA ioBase1,X   ; Write 0x0c, disables rom, bit 5 = 0
+00CC44  1  68                   PLA
+
+
+*********************************************************************/
+
+#include "emu.h"
+#include "silentype.h"
+
+//#define VERBOSE 1
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+
+// write bits @ c091
+#define SILENTYPE_DATA                (0)
+#define SILENTYPE_SHIFTCLOCKB         (1)  // SHIFT CLOCK (MOMENTARILY CLOCKED OUT WITH PHI-1)
+#define SILENTYPE_STORECLOCK          (2)  // STORE CLOCK  (printer receives inverted signal, so falling edge does store)
+#define SILENTYPE_DATAWRITEENABLE     (3)  // OUTPUT ENABLE
+#define SILENTYPE_SHIFTCLOCKA         (4)  // LATCHED SHIFT CLOCK
+#define SILENTYPE_ROMENABLE           (5)  // ENABLE ROM
+#define SILENTYPE_SHIFTCLOCKDISABLE   (6)  // SHIFT CLOCK OUTPUT DISABLE
+
+// shift register shifts when shift clock goes low (falling edge)
+//
+// storage register of 673 gets loaded on rising edge of store clock but this signal is inverted
+//    so it will load on falling edge of bit 2 (d2 going from 1 to 0).
+//
+// (both store clock low (d4=0) and shift clock low (d2=0) will clear the storage register)
+//   for example, writing 0 to c091 will reset the 673 parallel storage register
+//
+// Normal writing pattern to the shift register is 16 bytes of either 0x0e or 0x0f.
+//
+//    0x0e will shift in a 0
+//    0x0f will shift in a 1
+//
+//       hstepperbits = BITS(m_parallel_reg, 0, 4);  // bits 0-3 are for the horizontal stepper
+//       vstepperbits = BITS(m_parallel_reg, 4, 4);  // bits 4-7 are for the vertical stepper
+//       headbits     = BITS(m_parallel_reg, 9, 7);  // bits 9-15 are for the print head
+//
+//    Bit 8 is for R/W* input to the shift register and is normally sent as a 0.
+//
+//    It was most likely used for diagnostic purposes in order to read the contents of the shift register,
+//       since the serial data connection is bidirectional.  Once the parallel register gets loaded with bit 8 = 1,
+//       the LS673 will be put into read mode.
+//
+//  Following the 16 bytes is a sequence of 4 bytes of 0x1c, 0x18, 0x1c, 0x0c.
+//    The first 0x1c will raise d4.  d2 is already kept high from the previous 0x0e or previous 0x0f.
+//    The 0x18 will drop d2: this will load the parallel storage register on the falling edge of d2.
+//    We have to raise d2 by sending 0x1c before we drop d4 by sending 0x0c or the parallel register will be reset.
+//    Dropping d4 has the side effect of shifting in another bit.
+//  We don't care about this extra shift since we will always load 16 bits, and the extra bit will
+//    get completely shifted out.
+
+
+// read bits @ c094
+#define SILENTYPE_STATUS              (7)  // margin switch status
+
+// read bits @ c092
+#define SERIAL_DATA_Q15               (7)  // shift register Q15 output
+#define SHIFT_CLOCK_STATUS            (6)  // current shift clock output or shift clock from printer, read on A01
+
+
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(A2BUS_SILENTYPE, a2bus_silentype_device, "a2silentype", "Apple Silentype Interface Card")
+
+#define SILENTYPE_ROM_REGION  "rom"
+
+ROM_START( silentype )
+	ROM_REGION(0x800, SILENTYPE_ROM_REGION, 0)
+	ROM_LOAD( "341-0039-00.bin", 0x000000, 0x000800, CRC(bfdcf54d) SHA1(5a133c11b379c5866bcf7fcef902ed2bad415f57))
+ROM_END
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void a2bus_silentype_device::device_add_mconfig(machine_config &config)
+{
+	SILENTYPE_PRINTER(config, m_silentype_printer, 0);
+}
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *a2bus_silentype_device::device_rom_region() const
+{
+	return ROM_NAME( silentype );
+}
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_a2bus_card_interface(mconfig, *this),
+		m_silentype_printer(*this, "silentype_printer"),
+		m_rom(*this, "rom")
+{
+}
+
+a2bus_silentype_device::a2bus_silentype_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		a2bus_silentype_device(mconfig, A2BUS_SILENTYPE, tag, owner, clock)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void a2bus_silentype_device::device_start()
+{
+	memset(m_ram, 0, sizeof(m_ram));
+
+	save_item(NAME(m_ram));
+}
+
+void a2bus_silentype_device::device_reset_after_children()
+{
+}
+
+void a2bus_silentype_device::device_reset()
+{
+}
+
+/*-------------------------------------------------
+  read_c0nx - called for reads from this card's c0nx space
+  -------------------------------------------------*/
+
+uint8_t a2bus_silentype_device::read_c0nx(uint8_t offset)
+{
+	u8 retval = 0;
+
+	if (BIT(offset,2))  // c094  (decodes bit a02)
+	{
+		retval |= m_silentype_printer->margin_switch_input() << SILENTYPE_STATUS;  // margin switch on d7
+	}
+
+	if (BIT(offset,1))  // c091  (decodes bit a01)
+	{
+		retval |= m_silentype_printer->serial_data() << SERIAL_DATA_Q15; // if datawriteenable is off, read serial data from the printer on d7, otherwise reads serial data out (unimplemented)
+//      retval |= 0 << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
+
+		retval |= (BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKDISABLE) ? 1 :
+					BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKA)) << SHIFT_CLOCK_STATUS; // read shift clock status on d6 (unimplemented) (pulled up to +5v if printer connected and shift clock output disabled)
+
+	}
+	return retval;
+}
+
+//-------------------------------------------------
+//    write_c0nx
+//-------------------------------------------------
+
+void a2bus_silentype_device::write_c0nx(uint8_t offset, uint8_t data)
+{
+	LOG("Silentype WRITE %x = %x\n",offset + slotno() * 0x10 + 0xc080, data);
+
+	if (BIT(offset,0))  // decodes a0
+	{
+		m_romenable = BIT(data, SILENTYPE_ROMENABLE) ? 1 : 0;
+
+		if (
+			(
+			(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
+			(BIT(data, SILENTYPE_SHIFTCLOCKB) == 1)     // transitory shift clock
+			)
+				||
+			(
+			(BIT(last_write_c0nx, SILENTYPE_SHIFTCLOCKA) == 1) &&   // latched transition from 1 to 0
+			(BIT(data,            SILENTYPE_SHIFTCLOCKA) == 0)
+			)
+			)
+		{
+			u8 databit = BIT(data, SILENTYPE_DATAWRITEENABLE) ? BIT(data, SILENTYPE_DATA) : 0;
+			LOG("Silentype Shift Bit = %x\n", databit);
+			m_shift_reg =
+				(m_shift_reg << 1) |
+				(BIT(m_parallel_reg, 8) ? BIT(m_shift_reg, 15) : databit );
+		}
+
+		if (
+			(BIT(data, SILENTYPE_SHIFTCLOCKA) == 0) &&
+			(BIT(data, SILENTYPE_SHIFTCLOCKB) == 0) &&
+			(BIT(data, SILENTYPE_STORECLOCK) == 0)
+			)  // clear parallel register
+		{
+			LOG("Silentype Clear Parallel Register\n");
+
+			m_parallel_reg = 0;
+
+			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));  // inverted by ULN2003
+			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));  // inverted by ULN2003
+			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
+
+		}
+		else if (
+			(BIT(last_write_c0nx, SILENTYPE_STORECLOCK) == 1) &&  // transition from 1 to 0
+			(BIT(data,            SILENTYPE_STORECLOCK) == 0)
+			)  // store shift register to parallel register
+		{
+			m_parallel_reg = m_shift_reg;
+
+			m_silentype_printer->update_cr_stepper(BIT(m_parallel_reg, 0, 4));
+			m_silentype_printer->update_pf_stepper(BIT(m_parallel_reg, 4, 4));
+
+			m_silentype_printer->update_printhead (BIT(m_parallel_reg, 9, 7));
+
+		}
+		last_write_c0nx = data;
+	}
+}
+
+/*-------------------------------------------------
+    read_cnxx - called for reads from this card's cnxx space
+-------------------------------------------------*/
+
+uint8_t a2bus_silentype_device::read_cnxx(uint8_t offset)
+{
+	return m_rom[offset];
+}
+
+/*-------------------------------------------------
+    write_cnxx - called for writes to this card's cnxx space
+-------------------------------------------------*/
+
+void a2bus_silentype_device::write_cnxx(uint8_t offset, uint8_t data)
+{
+}
+
+/*-------------------------------------------------
+    read_c800 - called for reads from this card's c800 space
+-------------------------------------------------*/
+
+uint8_t a2bus_silentype_device::read_c800(uint16_t offset)
+{
+	if ((offset >= 0x700) && (!m_romenable))
+	{
+		return m_ram[offset - 0x700];
+	}
+	else
+	{
+		return m_rom[offset];
+	}
+}
+
+/*-------------------------------------------------
+    write_c800 - called for writes to this card's c800 space
+-------------------------------------------------*/
+
+void a2bus_silentype_device::write_c800(uint16_t offset, uint8_t data)
+{
+	if (offset >= 0x700) m_ram[(offset - 0x700) & 0xff] = data;
+}
+
