@@ -55,10 +55,10 @@ Moto GP......................................... XXXX56X  MGP1004-NA-HDD0-A    H
 Netchuu Pro Yakyuu 2002......................... X23XXXX  NPY1 CD0B            CD           NM00009   NPY Ver.B              Namco 2002
 Pride GP 2003................................... 123456X  PR21 DVD0            DVD          NM00011   PR21 Ver.A             Capcom 2003                   %
 Quiz Mobile Suit Gundam Tou Senshi.............. 123456X  QG1                  DVD          NM00030   QG1 Ver.A              Banpresto 2006                %
-Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV1 Ver.A             Namco 2001
-   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV2 Ver.A             Namco 2001
-   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001  *RRV2 Ver.B             Namco 2001
-   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV3 Ver.A             Namco 2001
+Ridge Racer V Arcade Battle..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV1 Ver.A             Namco 2000
+   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV2 Ver.A             Namco 2000
+   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001  *RRV2 Ver.B             Namco 2000
+   "                       ..................... 1XXXXXX  RRV1-A               CD           NM00001   RRV3 Ver.A             Namco 2000
 Sengoku Basara X Cross.......................... 123456X  BAX1 DVD0            DVD          NM00042   BAX1 VER.A             Capcom/ARC System Works 2007  % #
 Smash Court Pro Tournament...................... ------X  SCP1 CD0             CD           NM00006   SCP1 Ver.A             Namco 2001
 Soul Calibur II................................. 123456X  SC21 DVD0            DVD          NM00007   SC21 Ver.A             Namco 2002                    \
@@ -1632,11 +1632,11 @@ ROM_END
 
 // System 246
 GAME(2001, sys246,          0, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "System 246 BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2000, rrvac,      sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2000, rrvac2,      rrvac, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", MACHINE_IS_SKELETON)
+GAME(2000, rrvac1,      rrvac, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2001, vnight,     sys246, system246, system246, namcops2_state, empty_init, ROT0, "Sega / Namco", "Vampire Night (VPN3 Ver. B)", MACHINE_IS_SKELETON)
 GAME(2001, bldyr3b,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "bootleg", "Bloody Roar 3 (bootleg)", MACHINE_IS_SKELETON)
-GAME(2001, rrvac,      sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV3 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2001, rrvac2,      rrvac, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV2 Ver. A)", MACHINE_IS_SKELETON)
-GAME(2001, rrvac1,      rrvac, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Ridge Racer V Arcade Battle (RRV1 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2001, tekken4,    sys246, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", MACHINE_IS_SKELETON)
 GAME(2001, tekken4a,  tekken4, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", MACHINE_IS_SKELETON)
 GAME(2001, tekken4b,  tekken4, system246, system246, namcops2_state, empty_init, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", MACHINE_IS_SKELETON)
