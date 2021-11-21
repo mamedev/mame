@@ -86,6 +86,5 @@ private:
 	void thoop_map(address_map &map);
 
 	/* per-game configuration */
-	bool m_use_squash_sprite_disable;
 	uint8_t m_sprite_palette_force_high;
 };
