@@ -28,8 +28,8 @@
 
 #pragma once
 
-#include <queue>
 #include "machine/nscsi_bus.h"
+#include <queue>
 
 class spifi3_device
 	: public nscsi_device,

@@ -14,9 +14,6 @@
 #pragma once
 
 #include "emu.h"
-#include "device.h"
-#include "devfind.h"
-#include "mconfig.h"
 
 class cxd8442q_device;
 

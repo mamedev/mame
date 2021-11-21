@@ -23,13 +23,14 @@
 
 DEFINE_DEVICE_TYPE(CXD8452AQ, cxd8452aq_device, "cxd8452aq", "Sony CXD8452AQ WSC-SONIC3")
 
-cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : device_t(mconfig, CXD8452AQ, tag, owner, clock),
-																													  device_memory_interface(mconfig, *this),
-																													  main_bus_config("main_bus", ENDIANNESS_BIG, 32, 32, 0),
-																													  sonic_config("sonic", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(cxd8452aq_device::sonic_bus_map), this)),
-																													  m_irq_handler(*this),
-																													  m_apbus_virt_to_phys_callback(*this),
-																													  m_bus(*this, finder_base::DUMMY_TAG, -1, 64) {}
+cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, CXD8452AQ, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	main_bus_config("main_bus", ENDIANNESS_BIG, 32, 32, 0),
+	sonic_config("sonic", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(cxd8452aq_device::sonic_bus_map), this)),
+	m_irq_handler(*this),
+	m_apbus_virt_to_phys_callback(*this),
+	m_bus(*this, finder_base::DUMMY_TAG, -1, 64) {}
 
 device_memory_interface::space_config_vector cxd8452aq_device::memory_space_config() const
 {

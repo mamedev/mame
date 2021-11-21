@@ -695,6 +695,7 @@ MACHINES["SEGA_SCU"] = true
 MACHINES["SMPC"] = true
 MACHINES["SPG2XX"] = true
 MACHINES["SPG290"] = true
+MACHINES["SPIFI3"] = true
 MACHINES["SPISDCARD"] = true
 MACHINES["STVCD"] = true
 MACHINES["SUN4C_MMU"] = true
@@ -3830,8 +3831,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/news_r3k.cpp",
 	MAME_DIR .. "src/mame/drivers/news_r4k.cpp",
 	MAME_DIR .. "src/mame/drivers/news_38xx.cpp",
-	MAME_DIR .. "src/devices/machine/spifi3.cpp",
-	MAME_DIR .. "src/devices/machine/spifi3.h",
 	MAME_DIR .. "src/mame/machine/dmac_0448.cpp",
 	MAME_DIR .. "src/mame/machine/dmac_0448.h",
 	MAME_DIR .. "src/mame/machine/dmac_0266.cpp",

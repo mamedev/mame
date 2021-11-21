@@ -4755,6 +4755,7 @@ end
 ---------------------------------------------------
 
 if (MACHINES["SPIFI3"]~=null) then
+	MACHINES["NSCSI"] = true
 	files {
 		MAME_DIR .. "src/devices/machine/spifi3.cpp",
 		MAME_DIR .. "src/devices/machine/spifi3.h",
