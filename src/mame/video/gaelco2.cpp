@@ -235,10 +235,6 @@ void gaelco2_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 	/* update shadow/highlight palettes */
 	for (int i = 1; i < 16; i++)
 	{
-		/* because the last palette entry is reserved for shadows and highlights, we
-		don't use it and that way we save some colors so the UI looks fine ;-) */
-		//if ((offset >= 0xff0) && (offset <= 0xfff)) return;
-
 		const u8 auxr = ADJUST_COLOR(r + pen_color_adjust[i]);
 		const u8 auxg = ADJUST_COLOR(g + pen_color_adjust[i]);
 		const u8 auxb = ADJUST_COLOR(b + pen_color_adjust[i]);
