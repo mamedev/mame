@@ -614,8 +614,7 @@ void wd_fdc_device_base::read_sector_continue()
 
 		case SECTOR_READ:
 			LOGSTATE("SECTOR_READ\n");
-			if(cur_live.crc)
-			{
+			if(cur_live.crc) {
 				status |= S_CRC;
 				LOGCRC("CRC error in readsector %04X\n",cur_live.crc);
 			}
@@ -1024,14 +1023,11 @@ void wd_fdc_device_base::interrupt_start()
 	// This behavior is required by the RM nimbus driver, otherwise the forced interrupt
 	// at the end of a multiple sector write occasionally prevents the CRC byte being
 	// written, causing the disk to be corrupted.
-	if (/*((main_state == READ_SECTOR) && (cur_live.state == READ_SECTOR_DATA)) ||*/
-		((main_state == WRITE_SECTOR) && (cur_live.state == WRITE_BYTE)))
-	{
+	if(/*((main_state == READ_SECTOR) && (cur_live.state == READ_SECTOR_DATA)) ||*/
+		((main_state == WRITE_SECTOR) && (cur_live.state == WRITE_BYTE))) {
 		delay_int = true;
 		return;
-	}
-	else
-	{
+	} else {
 		delay_int = false;
 	}
 
@@ -1043,9 +1039,7 @@ void wd_fdc_device_base::interrupt_start()
 		status &= ~S_BUSY;
 		drop_drq();
 		motor_timeout = 0;
-	}
-	else
-	{
+	} else {
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
@@ -1059,14 +1053,13 @@ void wd_fdc_device_base::interrupt_start()
 			intrq_cb(intrq);
 	}
 
-	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
-	{
+	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
 		motor_timeout = 0;
 
 		if (head_control)
 			set_hld();
 
-		if (motor_control) {
+		if(motor_control) {
 			status |= S_MON | S_SPIN;
 
 			mon_cb(0);
@@ -1984,11 +1977,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 			} else if(slot < sector_size+2) {
 				// CRC
-				if(slot == sector_size+1)
-				{
+				if(slot == sector_size+1) {
 					// act on delayed interrupt if active
-/*                  if (delay_int)
-                    {
+/*                  if(delay_int) {
                         interrupt_start();
                         return;
                     }
@@ -2209,11 +2200,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.state = IDLE;
 
 						// Act on delayed interrupt if set.
-						if (delay_int)
-						{
+						if(delay_int)
 							interrupt_start();
-							return;
-						}
+
 						return;
 					}
 
@@ -2249,11 +2238,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.state = IDLE;
 
 						// Act on delayed interrupt if set.
-						if (delay_int)
-						{
+						if(delay_int)
 							interrupt_start();
-							return;
-						}
+
 						return;
 					}
 				}
