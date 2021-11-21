@@ -109,16 +109,16 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-#define MOUSE_NONE		0x00
-#define MOUSE_LEFT		0x01
-#define MOUSE_RIGHT		0x02
-#define MOUSE_DOWN		0x04
-#define MOUSE_UP		0x08
-#define MOUSE_LBUTTON	0x10
-#define MOUSE_RBUTTON	0x20
+#define MOUSE_NONE      0x00
+#define MOUSE_LEFT      0x01
+#define MOUSE_RIGHT     0x02
+#define MOUSE_DOWN      0x04
+#define MOUSE_UP        0x08
+#define MOUSE_LBUTTON   0x10
+#define MOUSE_RBUTTON   0x20
 
 // Frequency in Hz to poll for mouse movement.
-#define MOUSE_POLL_FREQUENCY	500
+#define MOUSE_POLL_FREQUENCY    500
 
 #define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
@@ -137,7 +137,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 /* Debugging */
 
-#define DEBUG_SET(flags)  		((m_debug_machine & (flags))==(flags))
+#define DEBUG_SET(flags)        ((m_debug_machine & (flags))==(flags))
 #define DEBUG_SET_STATE(flags)  ((state->m_debug_machine & (flags))==(flags))
 
 #define DEBUG_NONE          0x0000000
@@ -216,7 +216,7 @@ void rmnimbus_state::machine_reset()
 void rmnimbus_state::machine_start()
 {
 	m_nimbus_mouse.m_mouse_timer=timer_alloc(TIMER_MOUSE);
-	
+
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -231,7 +231,7 @@ void rmnimbus_state::machine_start()
 	m_debug_trap=0;
 	m_voice_enabled=false;
 	m_fdc->dden_w(0);
-	//m_fdc->overide_delays(64,m_fdc->get_cmd_delay()); 
+	//m_fdc->overide_delays(64,m_fdc->get_cmd_delay());
 }
 
 void rmnimbus_state::debug_command(const std::vector<std::string> &params)
@@ -258,8 +258,8 @@ static int instruction_hook(device_t &device, offs_t curpc)
 	rmnimbus_state  *state = device.machine().driver_data<rmnimbus_state>();
 	address_space   &space = device.memory().space(AS_PROGRAM);
 	uint8_t         *addr_ptr;
-	uint8_t			first;
-	
+	uint8_t         first;
+
 	addr_ptr = (uint8_t*)space.get_read_ptr(curpc);
 
 	first = (curpc & 0x01) ? 1 : 0;
@@ -273,7 +273,7 @@ static int instruction_hook(device_t &device, offs_t curpc)
 	{
 		if(DEBUG_SET_STATE(DECODE_BIOS) && (addr_ptr[first+1]==0xF0))
 			state->decode_subbios(&device,curpc);
-		
+
 		if(DEBUG_SET_STATE(DECODE_DOS21) && (addr_ptr[first+1]==0x21))
 			state->decode_dos21(&device,curpc);
 	}
@@ -799,13 +799,13 @@ void rmnimbus_state::decode_dssi_f_rw_sectors(uint16_t ds, uint16_t si)
 	params=(uint16_t  *)get_regpair_ptr(space,ds,si);
 
 	logerror("unitno=%04X, count=%02X, first_sector=%08X buffer=%04X:%04X (%05X)\n",
-		     params[0],
+			 params[0],
 			 params[1],
 			 ((params[3] * 65536)+params[2]),
 			 params[5],params[4],
 			 ((params[5]*16)+params[4])
 			 );
- 
+
 	for(param_no=0;param_no<16;param_no++)
 		logerror("%04X ",params[param_no]);
 
@@ -816,8 +816,8 @@ void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	//uint16_t  *params;
-	char	*path;
-	
+	char    *path;
+
 	uint16_t  ax = m_maincpu->state_int(I8086_AX);
 	uint16_t  bx = m_maincpu->state_int(I8086_BX);
 	uint16_t  cx = m_maincpu->state_int(I8086_CX);
@@ -830,8 +830,8 @@ void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 	uint16_t  si = m_maincpu->state_int(I8086_SI);
 	uint16_t  di = m_maincpu->state_int(I8086_DI);
 	uint16_t  bp = m_maincpu->state_int(I8086_BP);
-	
-	uint8_t	dosfn = ax >> 8;	// Dos function is AH, upper half of AX.
+
+	uint8_t dosfn = ax >> 8;    // Dos function is AH, upper half of AX.
 
 	logerror("=======================================================================\n");
 	logerror("DOS Int 0x21 call at %05X\n",pc);
@@ -839,16 +839,16 @@ void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 	logerror("CS=%04X, DS=%04X, ES=%04X, SS=%04X\n",cs,ds,es,ss);
 	logerror("SI=%04X, DI=%04X, BP=%04X\n",si,di,bp);
 	logerror("=======================================================================\n");
-	
-	if (((dosfn >= 0x39)  && (dosfn <= 0x3d)) 
-		|| (0x43 == dosfn) 
-		|| (0x4e == dosfn) 
+
+	if (((dosfn >= 0x39)  && (dosfn <= 0x3d))
+		|| (0x43 == dosfn)
+		|| (0x4e == dosfn)
 		|| (0x56 == dosfn)
-	    || ((dosfn >= 0x5a) && (dosfn <= 0x5b)) )
+		|| ((dosfn >= 0x5a) && (dosfn <= 0x5b)) )
 	{
 		path=(char *)get_regpair_ptr(space,ds,dx);
 		logerror("Path at DS:DX=%s\n",path);
-		
+
 		if (0x56 == dosfn)
 		{
 			path=(char *)get_regpair_ptr(space,es,di);
@@ -858,44 +858,44 @@ void rmnimbus_state::decode_dos21(device_t *device,offs_t pc)
 	}
 }
 
-#define CBUFLEN	32
+#define CBUFLEN 32
 
 offs_t rmnimbus_state::dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	unsigned call;
-	char	callname[CBUFLEN];
+	char    callname[CBUFLEN];
 	offs_t result = 0;
 
 	// decode and document (some) INT XX calls
 	if (opcodes.r8(pc) == 0xCD)
 	{
 		call = opcodes.r8(pc+1);
-		switch (call) 
+		switch (call)
 		{
 			case 0x20 :
-				strcpy(callname, "(dos terminate)"); 
+				strcpy(callname, "(dos terminate)");
 				break;
-				
+
 			case 0x21 :
-				strcpy(callname, "(dos function)"); 
+				strcpy(callname, "(dos function)");
 				break;
-				
+
 			case 0xf0 :
-				strcpy(callname, "(sub_bios)"); 
+				strcpy(callname, "(sub_bios)");
 				break;
-				
+
 			case 0xf3 :
-				strcpy(callname, "(dispatch handler)"); 
+				strcpy(callname, "(dispatch handler)");
 				break;
-				
+
 			case 0xf5 :
-				strcpy(callname, "(event handler)"); 
+				strcpy(callname, "(event handler)");
 				break;
 
 			case 0xf6 :
-				strcpy(callname, "(resource message)"); 
+				strcpy(callname, "(resource message)");
 				break;
-				
+
 			default :
 				strcpy(callname, "");
 		}
@@ -1216,7 +1216,7 @@ void rmnimbus_state::fdc_ctl_w(uint8_t data)
 	uint8_t old_drq = m_nimbus_drives.reg400 & HDC_DRQ_MASK;
 	char drive[5];
 	floppy_image_device *floppy;
-	
+
 	m_nimbus_drives.reg400 = data;
 
 	sprintf(drive, "%d", FDC_DRIVE());
@@ -1272,14 +1272,14 @@ void rmnimbus_state::hdc_reset()
 	m_scsi_req = 0;
 
 	// Latched req, IC11b
-	m_scsi_reqlat = 0; 
+	m_scsi_reqlat = 0;
 }
 
-/* 
-	The SCSI code outputs a 1 to indicate an active line, even though it is active low
-	The inputs on the RM schematic are fed through inverters, but because of the above
-	we don't need to invert them, unless the schematic uses the signal directly
-	For consistency we will invert msg before latching.
+/*
+    The SCSI code outputs a 1 to indicate an active line, even though it is active low
+    The inputs on the RM schematic are fed through inverters, but because of the above
+    we don't need to invert them, unless the schematic uses the signal directly
+    For consistency we will invert msg before latching.
 */
 
 void rmnimbus_state::check_scsi_irq()
@@ -1294,13 +1294,13 @@ WRITE_LINE_MEMBER(rmnimbus_state::write_scsi_iena)
 }
 
 // This emulates the 74LS74 latched version of req
-void rmnimbus_state::set_scsi_drqlat(bool	clock, bool clear)
-{ 
+void rmnimbus_state::set_scsi_drqlat(bool   clock, bool clear)
+{
 	if (clear)
 		m_scsi_reqlat = 0;
 	else if (clock)
 		m_scsi_reqlat = 1;
-		
+
 	if(m_scsi_reqlat)
 		hdc_drq(true);
 	else
@@ -1311,9 +1311,9 @@ void rmnimbus_state::hdc_post_rw()
 {
 	if(m_scsi_req)
 		m_scsibus->write_ack(1);
-		
+
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
-	set_scsi_drqlat(false, true);		
+	set_scsi_drqlat(false, true);
 }
 
 void rmnimbus_state::hdc_drq(bool state)
@@ -1329,10 +1329,10 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_bsy )
 WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_cd )
 {
 	m_scsi_cd = state;
-	
+
 	// IC17A, IC17B, latched req cleared by SCSI data read or write, or C/D= command
 	set_scsi_drqlat(false, !m_scsi_cd);
-	
+
 	check_scsi_irq();
 }
 
@@ -1356,22 +1356,22 @@ WRITE_LINE_MEMBER( rmnimbus_state::write_scsi_req )
 {
 	// Detect rising edge on req, IC11b, clock
 	int rising = ((m_scsi_req == 0) && (state == 1));
-	
+
 	// This is the state of the actual line from the SCSI
 	m_scsi_req = state;
-	
+
 	// Latched req, is forced low by C/D being set to command
 	set_scsi_drqlat(rising, m_scsi_cd);
-	
+
 	if (!m_scsi_reqlat)
 		m_scsibus->write_ack(0);
-	
+
 	check_scsi_irq();
 }
 
 void rmnimbus_state::nimbus_voice_w(offs_t offset, uint8_t data)
 {
-	if (offset == 0xB0) 
+	if (offset == 0xB0)
 		m_voice_enabled = true;
 	else if (offset == 0xB2)
 		m_voice_enabled = false;
@@ -1607,7 +1607,7 @@ void rmnimbus_state::iou_reset()
 uint8_t rmnimbus_state::nimbus_rompack_r(offs_t offset)
 {
 	logerror("Rompack read offset %02X, rompack address=%04X\n",offset,(m_ay8910_b*256)+m_ay8910_a);
-	
+
 	return 0;
 }
 
@@ -1658,7 +1658,7 @@ void rmnimbus_state::nimbus_sound_ay8910_portb_w(uint8_t data)
 		m_last_playmode = (data & 0x07);
 		m_msm->playmode_w(m_last_playmode);
 	}
-	
+
 	// ROMpack upper address lines
 	m_ay8910_b=data;
 }
@@ -1673,7 +1673,7 @@ void rmnimbus_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch(id)
 	{
-		case TIMER_MOUSE	: do_mouse(); break;
+		case TIMER_MOUSE    : do_mouse(); break;
 	}
 }
 
@@ -1682,41 +1682,41 @@ static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
 
 void rmnimbus_state::do_mouse()
 {
-	int   mouse_x 	= 0;	// Current mouse X and Y
-	int   mouse_y 	= 0;
-	int   xdiff 	= 0;	// Difference from previous X and Y
-	int   ydiff 	= 0;
-	
-	uint8_t	intstate_x;		// Used to calculate if we should trigger interrupt
-	uint8_t	intstate_y;
-	int     xint;			// X and Y interrupts to trigger
+	int   mouse_x   = 0;    // Current mouse X and Y
+	int   mouse_y   = 0;
+	int   xdiff     = 0;    // Difference from previous X and Y
+	int   ydiff     = 0;
+
+	uint8_t intstate_x;     // Used to calculate if we should trigger interrupt
+	uint8_t intstate_y;
+	int     xint;           // X and Y interrupts to trigger
 	int     yint;
 
-	uint8_t   mxa;			// Values of quadrature encoders for X and Y
+	uint8_t   mxa;          // Values of quadrature encoders for X and Y
 	uint8_t   mxb;
 	uint8_t   mya;
 	uint8_t   myb;
 
 	// Read mouse buttons
 	m_nimbus_mouse.m_reg0a4 = m_io_mouse_button->read();
-	
+
 	// Read mose positions and calculate difference from previous value
 	mouse_x = m_io_mousex->read();
 	mouse_y = m_io_mousey->read();
 
 	xdiff = m_nimbus_mouse.m_mouse_x - mouse_x;
 	ydiff = m_nimbus_mouse.m_mouse_y - mouse_y;
-	
+
 	// check and compensate for wrap.....
-	if (xdiff > 0x80) 
+	if (xdiff > 0x80)
 		xdiff -= 0x100;
 	else if (xdiff < -0x80)
 		xdiff += 0x100;
 
-	if (ydiff > 0x80) 
+	if (ydiff > 0x80)
 		ydiff -= 0x100;
 	else if (ydiff < -0x80)
-		ydiff += 0x100;	
+		ydiff += 0x100;
 
 	// convert movement into emulated movement of quadrature encoder in mouse.
 	if (xdiff < 0)
@@ -1728,7 +1728,7 @@ void rmnimbus_state::do_mouse()
 		m_nimbus_mouse.m_mouse_pcy++;
 	else if (ydiff > 0)
 		m_nimbus_mouse.m_mouse_pcy--;
-	
+
 	// Compensate for quadrature wrap.
 	m_nimbus_mouse.m_mouse_pcx &= 0x03;
 	m_nimbus_mouse.m_mouse_pcy &= 0x03;

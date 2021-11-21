@@ -354,7 +354,7 @@ void macp_state::mac16k(machine_config &config)
 	kbdc.out_sl_callback().set(FUNC(macp_state::scanlines_w));    // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(macp_state::digit_w));      // display A&B
 	kbdc.in_rl_callback().set(FUNC(macp_state::kbd_r));           // kbd RL lines
-	kbdc.out_irq_callback().set(FUNC(macp_state::irq_w)); 
+	kbdc.out_irq_callback().set(FUNC(macp_state::irq_w));
 
 	/* sound hardware */
 	genpin_audio(config);

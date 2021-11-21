@@ -120,10 +120,10 @@ private:
 	/*
 	enum super_mmc_t
 	{
-		CXB = 0,
-		DXB = 1,
-		EXB = 2,
-		FXB = 3
+	    CXB = 0,
+	    DXB = 1,
+	    EXB = 2,
+	    FXB = 3
 	};
 	*/
 	bool m_bank_hi[4];
@@ -144,7 +144,7 @@ private:
 	// DMA Control (DCNT)
 	inline const bool DCNT_DMAEN()   { return BIT(m_dma_ctrl, 7); }                        // DMA Enable control
 	//inline const bool DCNT_DPRIO() { return BIT(m_dma_ctrl, 6); }                        // Processing priority between SA-1 CPU and DMA; Not emulated currently
-	inline const bool DCNT_CDEN()    { return BIT(m_dma_ctrl, 5); }                        // DMA mode selection (Normal/Character conversion) 
+	inline const bool DCNT_CDEN()    { return BIT(m_dma_ctrl, 5); }                        // DMA mode selection (Normal/Character conversion)
 	inline const bool DCNT_CDSEL()   { return BIT(m_dma_ctrl, 4); }                        // Character conversion DMA type
 	inline const bool DCNT_DD()      { return BIT(m_dma_ctrl, 2); }                        // Destination device (IRAM, BWRAM)
 	inline const u8 DCNT_SD()        { return BIT(m_dma_ctrl, 0, 1); }                     // Source device (ROM, IRAM, BWRAM)

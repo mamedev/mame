@@ -211,7 +211,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	msm5205.add_route(ALL_OUTPUTS, MONO_TAG, 0.75);
 
 	SOFTWARE_LIST(config, "disk_list").set_original("nimbus");
-	
+
 	m_maincpu->set_dasm_override(FUNC(rmnimbus_state::dasm_override));
 }
 

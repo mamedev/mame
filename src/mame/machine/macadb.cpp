@@ -396,10 +396,10 @@ int macadb_device::adb_pollkbd(int update)
 		}
 	}
 
-//	if ((codes[0] != 0xff) || (codes[1] != 0xff))
-//	{
-//		printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
-//	}
+//  if ((codes[0] != 0xff) || (codes[1] != 0xff))
+//  {
+//      printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
+//  }
 
 	// figure out if there was a change
 	if ((m_adb_currentkeys[0] != codes[0]) || (m_adb_currentkeys[1] != codes[1]))
@@ -454,7 +454,7 @@ void macadb_device::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 	NewX = m_mouse2->read();
 	NewY = m_mouse1->read();
 
-//	printf("pollmouse: X %d Y %d\n", NewX, NewY);
+//  printf("pollmouse: X %d Y %d\n", NewX, NewY);
 
 	/* see if it moved in the x coord */
 	if (NewX != m_adb_lastmousex)
@@ -499,7 +499,7 @@ void macadb_device::adb_talk()
 	addr = (m_adb_command>>4);
 	reg = (m_adb_command & 3);
 
-//	printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", m_adb_command, (m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
+//  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", m_adb_command, (m_adb_command>>2)&3, addr, reg, m_adb_mouseaddr, m_adb_keybaddr);
 
 	if (m_adb_waiting_cmd)
 	{

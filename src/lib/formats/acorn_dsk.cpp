@@ -99,7 +99,7 @@ int acorn_ssd_format::find_size(util::random_read &io, uint32_t form_factor, con
 			{
 				sectors2 = sectors0;
 			}
-			
+
 			if (sectors0 > 0 && sectors0 % 10 == 0 && sectors2 > 0 && sectors2 % 10 == 0 && size <= (sectors0 + sectors2) * 256)
 				return i;
 		}

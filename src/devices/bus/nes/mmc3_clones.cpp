@@ -1089,7 +1089,7 @@ void nes_bmw8544_device::set_prg(int prg_base, int prg_mask)
 
 u8 nes_bmw8544_device::read_m(offs_t offset)
 {
-//	LOG_MMC(("bmw8544 read_m, offset: %04x\n", offset));
+//  LOG_MMC(("bmw8544 read_m, offset: %04x\n", offset));
 
 	// CHR banking may be done by reads in this address range
 

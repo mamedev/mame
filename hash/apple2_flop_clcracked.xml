@@ -46380,7 +46380,7 @@ license:CC0
 		<!-- "Winter Games" is a 1985 sports game developed by Action Graphics.  -->
 		<!-- Disks re-cracked on August 28th, 2021 due to subtle
 		timing difference between Disk II and IWM hardware that resulted
-        in the previous version not working on some machines. -->
+		in the previous version not working on some machines. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>

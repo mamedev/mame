@@ -46,6 +46,8 @@
 #include "logmacro.h"
 
 
+namespace {
+
 class positron_state : public driver_device
 {
 public:
@@ -408,63 +410,63 @@ static INPUT_PORTS_START(positron)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("COL2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 #")                PORT_CODE(KEYCODE_0)            PORT_CHAR('0')      PORT_CHAR('#')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 !")                PORT_CODE(KEYCODE_1)            PORT_CHAR('1')      PORT_CHAR('!')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2 \"")               PORT_CODE(KEYCODE_2)            PORT_CHAR('2')      PORT_CHAR('\"')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3 £")                PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR(0xA3)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4 $")                PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5 %")                PORT_CODE(KEYCODE_5)            PORT_CHAR('5')      PORT_CHAR('%')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6 &")                PORT_CODE(KEYCODE_6)            PORT_CHAR('6')      PORT_CHAR('&')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7 '")                PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_0)            PORT_CHAR('0')      PORT_CHAR('#')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_1)            PORT_CHAR('1')      PORT_CHAR('!')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_2)            PORT_CHAR('2')      PORT_CHAR('\"')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_3)            PORT_CHAR('3')      PORT_CHAR(0xA3)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_4)            PORT_CHAR('4')      PORT_CHAR('$')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_5)            PORT_CHAR('5')      PORT_CHAR('%')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_6)            PORT_CHAR('6')      PORT_CHAR('&')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_7)            PORT_CHAR('7')      PORT_CHAR('\'')
 
 	PORT_START("COL3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8 (")                PORT_CODE(KEYCODE_8)            PORT_CHAR('8')      PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9 )")                PORT_CODE(KEYCODE_9)            PORT_CHAR('9')      PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(": *")                PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(':')      PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("; +")                PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';')      PORT_CHAR('+')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", <")                PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')      PORT_CHAR('<')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("= -")                PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('=')      PORT_CHAR('-')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(". >")                PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')      PORT_CHAR('>')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/ ?")                PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/')      PORT_CHAR('?')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_8)            PORT_CHAR('8')      PORT_CHAR('(')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_9)            PORT_CHAR('9')      PORT_CHAR(')')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_QUOTE)        PORT_CHAR(':')      PORT_CHAR('*')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_COLON)        PORT_CHAR(';')      PORT_CHAR('+')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_COMMA)        PORT_CHAR(',')      PORT_CHAR('<')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_MINUS)        PORT_CHAR('=')      PORT_CHAR('-')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_STOP)         PORT_CHAR('.')      PORT_CHAR('>')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_SLASH)        PORT_CHAR('/')      PORT_CHAR('?')
 
 	PORT_START("COL4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("@ _")                PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('@')      PORT_CHAR('_')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A")                  PORT_CODE(KEYCODE_A)            PORT_CHAR('A')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B")                  PORT_CODE(KEYCODE_B)            PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C")                  PORT_CODE(KEYCODE_C)            PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D")                  PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E")                  PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F")                  PORT_CODE(KEYCODE_F)            PORT_CHAR('F')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G")                  PORT_CODE(KEYCODE_G)            PORT_CHAR('G')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_BACKSLASH)    PORT_CHAR('@')      PORT_CHAR('_')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_A)            PORT_CHAR('A')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_B)            PORT_CHAR('B')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_C)            PORT_CHAR('C')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_D)            PORT_CHAR('D')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_E)            PORT_CHAR('E')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_F)            PORT_CHAR('F')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_G)            PORT_CHAR('G')
 
 	PORT_START("COL5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H")                  PORT_CODE(KEYCODE_H)            PORT_CHAR('H')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I")                  PORT_CODE(KEYCODE_I)            PORT_CHAR('I')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J")                  PORT_CODE(KEYCODE_J)            PORT_CHAR('J')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K")                  PORT_CODE(KEYCODE_K)            PORT_CHAR('K')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L")                  PORT_CODE(KEYCODE_L)            PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M")                  PORT_CODE(KEYCODE_M)            PORT_CHAR('M')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N")                  PORT_CODE(KEYCODE_N)            PORT_CHAR('N')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O")                  PORT_CODE(KEYCODE_O)            PORT_CHAR('O')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_H)            PORT_CHAR('H')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_I)            PORT_CHAR('I')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_J)            PORT_CHAR('J')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_K)            PORT_CHAR('K')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_L)            PORT_CHAR('L')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_M)            PORT_CHAR('M')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_N)            PORT_CHAR('N')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_O)            PORT_CHAR('O')
 
 	PORT_START("COL6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P")                  PORT_CODE(KEYCODE_P)            PORT_CHAR('P')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q")                  PORT_CODE(KEYCODE_Q)            PORT_CHAR('Q')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R")                  PORT_CODE(KEYCODE_R)            PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S")                  PORT_CODE(KEYCODE_S)            PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T")                  PORT_CODE(KEYCODE_T)            PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U")                  PORT_CODE(KEYCODE_U)            PORT_CHAR('U')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V")                  PORT_CODE(KEYCODE_V)            PORT_CHAR('V')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W")                  PORT_CODE(KEYCODE_W)            PORT_CHAR('W')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_P)            PORT_CHAR('P')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_Q)            PORT_CHAR('Q')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_R)            PORT_CHAR('R')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_S)            PORT_CHAR('S')
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_T)            PORT_CHAR('T')
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_U)            PORT_CHAR('U')
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_V)            PORT_CHAR('V')
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_W)            PORT_CHAR('W')
 
 	PORT_START("COL7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X")                  PORT_CODE(KEYCODE_X)            PORT_CHAR('X')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y")                  PORT_CODE(KEYCODE_Y)            PORT_CHAR('Y')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z")                  PORT_CODE(KEYCODE_Z)            PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"← ¼")              PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[')      PORT_CHAR('{')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"½ ‖")              PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\')     PORT_CHAR('|')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"→ ¾")              PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']')      PORT_CHAR('}')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(u8"^ ÷")              PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^')      PORT_CHAR('~')
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_X)            PORT_CHAR('X')
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_Y)            PORT_CHAR('Y')
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_Z)            PORT_CHAR('Z')
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR(0x2190)   PORT_CHAR(0xbc)    // ←  ¼
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR(0xbd)     PORT_CHAR(0x2016)  // ½  ‖
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(0x2192)   PORT_CHAR(0xbe)    // →  ¾
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD)                                 PORT_CODE(KEYCODE_EQUALS)       PORT_CHAR('^')      PORT_CHAR(0xf7)    // ÷
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SPACE")              PORT_CODE(KEYCODE_SPACE)        PORT_CHAR(' ')
 
 	PORT_START("COL8") // Video Attributes
@@ -967,7 +969,8 @@ ROM_START(positron)
 	ROM_LOAD("os9_1_0007.bin", 0x1e000, 0x2000, CRC(63f0fb57) SHA1(7c50c0cbc7c0dbaf8da186ccb474d263f71416ea))
 ROM_END
 
+} // anonymous namespace
+
 
 //    YEAR  NAME      PARENT  COMPAT   MACHINE   INPUT     CLASS           INIT        COMPANY                   FULLNAME         FLAGS
 COMP( 1982, positron, 0,      0,       positron, positron, positron_state, empty_init, "Positron Computers Ltd", "Positron 9000", MACHINE_NOT_WORKING )
-

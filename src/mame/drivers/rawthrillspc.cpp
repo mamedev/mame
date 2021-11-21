@@ -112,7 +112,7 @@ ROM_END
 
 /*
  Two I/O boards on "The Fast and The Furious":
-   1. With Xilinx XC95144XL (labeled "FAST & FURIOUS U4 REV 1.0 (c)2004 RightHand Tech, Inc"), 
+   1. With Xilinx XC95144XL (labeled "FAST & FURIOUS U4 REV 1.0 (c)2004 RightHand Tech, Inc"),
        ST72F63BK4M1 (labeled "U6 FAST&FURIOUS Release 3 3311h (c)2004 RightHand Tech, Inc") and a bank of 8 dipswitches.
    2- With Xilinx XC9536XL (labeled "r1.0 (c)2004 RightHand Tech, Inc")
  Parallel port HASP4 1.5 dongle (MCU Marvin2)
