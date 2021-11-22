@@ -1393,11 +1393,11 @@ ROM_END
 
   Model  Title               Transliteration      Export version      Note
   ---------------------------------------------------------------------------------
-  IM-02  Ну, погоди!         Nu, pogodi!          -                   -
-  IM-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
-  IM-16  Охота               Okhota               Fowling             -
-  IM-22  Весёлые футболисты  Vesjolye futbolisty  Monkey Goalkeeper   -
-  IM-32  Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
+  ИМ-16  Охота               Okhota               Fowling             -
+  ИМ-22  Весёлые футболисты  Vesjolye futbolisty  Monkey Goalkeeper   -
+  ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
 
 ***************************************************************************/
 
