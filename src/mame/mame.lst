@@ -12770,7 +12770,6 @@ easykara
 ec1840                          //
 ec1841                          //
 ec1845                          //
-ec1847                          //
 
 @source:ec65.cpp
 ec65                            //
@@ -33810,6 +33809,7 @@ comport                         // Compaq Portable
 coppc21                         // Corona PPC-21 portable
 coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
+ec1847                          //
 eagle1600                       //
 dtkerso                         // 198? PC-XT clones with a DTK/ERSO BIOS
 eaglespirit                     // Eagle PC Spirit
