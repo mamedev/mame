@@ -88,7 +88,7 @@ void gt913_device::device_add_mconfig(machine_config &config)
 {
 	GT913_INTC(config, "intc");
 
-	GT913_SOUND(config, m_sound, clock());
+	GT913_SOUND(config, m_sound, std::round(clock() / 416.0f));
 	GT913_KBD_HLE(config, m_kbd, 0);
 	m_kbd->irq_cb().set([this](int val) { if (val) m_intc->internal_interrupt(5); });
 	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);

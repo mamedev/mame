@@ -150,7 +150,7 @@ void ctk551_state::driver_start()
 void ctk551_state::ctk551(machine_config &config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30'000'000);
+	GT913(config, m_maincpu, 30'000'000 / 2); // 30MHz oscillator, divided down internally
 	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
 	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(0, "lspeaker", 1.0);
 	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(1, "rspeaker", 1.0);

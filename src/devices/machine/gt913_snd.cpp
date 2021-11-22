@@ -63,7 +63,7 @@ void gt913_sound_device::device_start()
 	space(0).install_rom(0x000000, m_rom.bytes() - 1, m_rom.target());
 	space(0).cache(m_cache);
 
-	m_stream = stream_alloc(0, 2, std::round(clock() / 832.0f));
+	m_stream = stream_alloc(0, 2, clock());
 
 	save_item(NAME(m_gain));
 	save_item(NAME(m_data));
@@ -289,7 +289,6 @@ void gt913_sound_device::command_w(u16 data)
 			voice.m_volume_target = (m_data[0] & 0x7f00) << 16;
 			const u8 x = m_data[0] & 0xff;
 			voice.m_volume_rate = 8 * x * x * x;
-
 		}
 	}
 	else if (voicecmd == 0x2028)
