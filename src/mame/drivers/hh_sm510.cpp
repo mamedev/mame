@@ -9594,7 +9594,7 @@ CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse
 CONS( 1989, exospace,     gnw_mmouse,  0, exospace,     exospace,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Explorers of Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, fowling,      gnw_mmouse,  0, fowling,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Fowling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, monkeygk,     gnw_mmouse,  0, monkeygk,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Monkey Goalkeeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
