@@ -1912,7 +1912,7 @@ ROM_START( columns2 ) /* Columns II - The Voyage Through Time  (c)1990 Sega - 83
 ROM_END
 
 
-ROM_START( column2j ) /* Columns II - The Voyage Through Time (Jpn)  (c)1990 Sega */
+ROM_START( column2j ) /* Columns II - The Voyage Through Time (Jpn)  (c)1990 Sega - 834-7555 COLUMNS 2 */
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "epr-13361.ic32", 0x000000, 0x020000, CRC(b54b5f12) SHA1(4d7fbae7d9bcadd433ebc25aef255dc43df611bc) )
 	ROM_LOAD16_BYTE( "epr-13360.ic31", 0x000001, 0x020000, CRC(a59b1d4f) SHA1(e9ee315677782e1c61ae8f11260101cc03176188) )
