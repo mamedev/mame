@@ -1398,6 +1398,7 @@ ROM_END
   ИМ-16  Охота               Okhota               Fowling             -
   ИМ-22  Весёлые футболисты  Vesjolye futbolisty  Monkey Goalkeeper   -
   ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
 
 ***************************************************************************/
 
@@ -1414,7 +1415,8 @@ public:
 	void exospace(machine_config &config);
 	void fowling(machine_config &config);
 	void monkeygk(machine_config &config);
-	void krybolov(machine_config & config);
+	void krybolov(machine_config &config);
+	void frogling(machine_config &config);
 };
 
 // config
@@ -1486,6 +1488,11 @@ void gnw_mmouse_state::krybolov(machine_config &config)
 	kb1013vk12_common(config, 1638, 1080); // R mask option ?
 }
 
+void gnw_mmouse_state::frogling(machine_config &config)
+{
+	kb1013vk12_common(config, 1660, 1080); // R mask option ?
+}
+
 // roms
 
 ROM_START( gnw_mmouse )
@@ -1542,6 +1549,14 @@ ROM_START( krybolov )
 
 	ROM_REGION( 132804, "screen", 0)
 	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
+ROM_END
+
+ROM_START( frogling )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 131961, "screen", 0)
+	ROM_LOAD( "frogling.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
 ROM_END
 
 
@@ -9595,6 +9610,7 @@ CONS( 1989, exospace,     gnw_mmouse,  0, exospace,     exospace,     gnw_mmouse
 CONS( 1989, fowling,      gnw_mmouse,  0, fowling,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Fowling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, monkeygk,     gnw_mmouse,  0, monkeygk,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Monkey Goalkeeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, frogling,     gnw_mmouse,  0, frogling,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Frogling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
