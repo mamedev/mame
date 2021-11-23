@@ -337,8 +337,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		icon.second.texture.reset();
 
 	set_switch_image();
-	int old_item_selected = -1;
 
+	bool have_prev_selected = false;
+	int old_item_selected = -1;
 	if (!isfavorite())
 	{
 		if (m_populated_favorites)
@@ -391,7 +392,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		int curitem = 0;
 		for (ui_system_info const &elem : m_displaylist)
 		{
-			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
+			have_prev_selected = have_prev_selected || (&elem == m_prev_selected);
+			if ((old_item_selected == -1) && (elem.driver->name == reselect_last::driver()))
 				old_item_selected = curitem;
 
 			item_append(elem.description, elem.is_clone ? FLAG_INVERT : 0, (void *)&elem);
@@ -406,8 +408,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		m_populated_favorites = true;
 		m_search.clear();
 		mame_machine_manager::instance()->favorite().apply_sorted(
-				[this, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
+				[this, &have_prev_selected, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
 				{
+					have_prev_selected = have_prev_selected || (&info == m_prev_selected);
 					if (info.startempty)
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
@@ -440,6 +443,9 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		item_append(_("Configure Options"), 0, (void *)(uintptr_t)CONF_OPTS);
 		item_append(_("Configure Machine"), 0, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 3;
+
+		if (m_prev_selected && !have_prev_selected)
+			m_prev_selected = item(0).ref();
 	}
 	else
 	{
