@@ -102,7 +102,7 @@ void gt913_device::device_add_mconfig(machine_config &config)
 
 void gt913_device::uart_rate_w(uint8_t data)
 {
-	m_sci->brr_w(data >> 1);
+	m_sci->brr_w(data >> 2);
 }
 
 void gt913_device::uart_control_w(uint8_t data)

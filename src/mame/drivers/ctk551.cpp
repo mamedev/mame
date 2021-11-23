@@ -362,4 +362,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME     FLAGS
-SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
