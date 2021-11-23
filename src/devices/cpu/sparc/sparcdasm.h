@@ -26,6 +26,7 @@ public:
 		virtual uint8_t get_fcc(unsigned index) const = 0; // ?><=
 	};
 
+	enum sparc_version { v7, v8, sparclite, v9 };
 	enum vis_level { vis_none, vis_1, vis_2, vis_2p, vis_3, vis_3b };
 
 	struct asi_desc
@@ -55,8 +56,8 @@ public:
 	};
 	typedef std::map<uint8_t, prftch_desc> prftch_desc_map;
 
-	sparc_disassembler(const config *conf, unsigned version);
-	sparc_disassembler(const config *conf, unsigned version, vis_level vis);
+	sparc_disassembler(const config *conf, sparc_version version);
+	sparc_disassembler(const config *conf, sparc_version version, vis_level vis);
 
 	template <typename T> void add_state_reg_desc(const T &desc)
 	{
@@ -215,6 +216,7 @@ private:
 	static const branch_desc                    CBCCC_DESC;
 	static const int_op_desc_map::value_type    V7_INT_OP_DESC[];
 	static const int_op_desc_map::value_type    V8_INT_OP_DESC[];
+	static const int_op_desc_map::value_type    SPARCLITE_INT_OP_DESC[];
 	static const int_op_desc_map::value_type    V9_INT_OP_DESC[];
 	static const state_reg_desc_map::value_type V9_STATE_REG_DESC[];
 	static const char * const                   MOVCC_CC_NAMES[8];
@@ -239,7 +241,7 @@ private:
 	static const vis_op_desc_map::value_type    VIS3B_OP_DESC[];
 
 	//const config *m_config;
-	unsigned                m_version;
+	sparc_version           m_version;
 	vis_level               m_vis_level;
 	int                     m_op_field_width;
 	branch_desc             m_branch_desc[8];

@@ -176,6 +176,10 @@ const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V7_INT
 	{ 0x3d, { false, "restore"  } }
 };
 
+const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::SPARCLITE_INT_OP_DESC[] = {
+	{ 0x1d, { false, "divscc"   } }, { 0x22, { false, "scan"     } }
+};
+
 const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V8_INT_OP_DESC[] = {
 	{ 0x0a, { false, "umul"     } }, { 0x1a, { false, "umulcc"   } },
 	{ 0x0b, { false, "smul"     } }, { 0x1b, { false, "smulcc"   } },
@@ -610,24 +614,24 @@ inline void sparc_disassembler::pad_op_field(std::ostream &stream, std::streampo
 		stream << ' ';
 }
 
-sparc_disassembler::sparc_disassembler(const config *conf, unsigned version)
+sparc_disassembler::sparc_disassembler(const config *conf, sparc_version version)
 	: sparc_disassembler(conf, version, vis_none)
 {
 }
 
-sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis_level vis)
+sparc_disassembler::sparc_disassembler(const config *conf, sparc_version version, vis_level vis)
 	: m_version(version)
 	, m_vis_level(vis)
 	, m_op_field_width(9)
 	, m_branch_desc{
 		EMPTY_BRANCH_DESC,
-		(version >= 9) ? BPCC_DESC : EMPTY_BRANCH_DESC,     // branch on integer condition codes with prediction, SPARCv9
-		BICC_DESC,                                          // branch on integer condition codes
-		(version >= 9) ? BPR_DESC : EMPTY_BRANCH_DESC,      // branch on integer register with prediction, SPARCv9
+		(version >= v9) ? BPCC_DESC : EMPTY_BRANCH_DESC,     // branch on integer condition codes with prediction, SPARCv9
+		BICC_DESC,                                           // branch on integer condition codes
+		(version >= v9) ? BPR_DESC : EMPTY_BRANCH_DESC,      // branch on integer register with prediction, SPARCv9
 		EMPTY_BRANCH_DESC,
-		(version >= 9) ? FBPFCC_DESC : EMPTY_BRANCH_DESC,   // branch on floating-point condition codes with prediction, SPARCv9
-		FBFCC_DESC,                                         // branch on floating-point condition codes
-		(version == 8) ? CBCCC_DESC : EMPTY_BRANCH_DESC     // branch on coprocessor condition codes, SPARCv8
+		(version >= v9) ? FBPFCC_DESC : EMPTY_BRANCH_DESC,   // branch on floating-point condition codes with prediction, SPARCv9
+		FBFCC_DESC,                                          // branch on floating-point condition codes
+		(version == v8) ? CBCCC_DESC : EMPTY_BRANCH_DESC     // branch on coprocessor condition codes, SPARCv8
 	}
 	, m_int_op_desc(std::begin(V7_INT_OP_DESC), std::end(V7_INT_OP_DESC))
 	, m_state_reg_desc()
@@ -638,12 +642,16 @@ sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis
 	, m_prftch_desc()
 	, m_vis_op_desc()
 {
-	if (m_version >= 8)
+	if (m_version == sparclite)
+	{
+		add_int_op_desc(SPARCLITE_INT_OP_DESC);
+	}
+	else if (m_version >= v8)
 	{
 		add_int_op_desc(V8_INT_OP_DESC);
 	}
 
-	if (m_version >= 9)
+	if (m_version >= v9)
 	{
 		m_op_field_width = 11;
 
