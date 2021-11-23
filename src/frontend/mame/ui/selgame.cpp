@@ -341,6 +341,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 
 	if (!isfavorite())
 	{
+		if (m_populated_favorites)
+			m_prev_selected = nullptr;
 		m_populated_favorites = false;
 		m_displaylist.clear();
 		machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
@@ -399,6 +401,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	else
 	{
 		// populate favorites list
+		if (!m_populated_favorites)
+			m_prev_selected = nullptr;
 		m_populated_favorites = true;
 		m_search.clear();
 		mame_machine_manager::instance()->favorite().apply_sorted(
@@ -412,8 +416,8 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 						bool cloneof = strcmp(info.driver->parent, "0");
 						if (cloneof)
 						{
-							int cx = driver_list::find(info.driver->parent);
-							if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
+							int const cx = driver_list::find(info.driver->parent);
+							if ((0 <= cx) && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 								cloneof = false;
 						}
 
@@ -1036,7 +1040,7 @@ void menu_select_game::get_selection(ui_software_info const *&software, ui_syste
 	if (m_populated_favorites)
 	{
 		software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
-		system = &m_persistent_data.systems()[driver_list::find(software->driver->name)];
+		system = software ? &m_persistent_data.systems()[driver_list::find(software->driver->name)] : nullptr;
 	}
 	else
 	{
@@ -1100,7 +1104,7 @@ void menu_select_game::filter_selected()
 						}
 					}
 					m_persistent_data.filter_data().set_current_filter_type(new_type);
-					reset(reset_options::SELECT_FIRST);
+					reset(reset_options::REMEMBER_REF);
 				});
 	}
 }
