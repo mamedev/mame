@@ -6690,10 +6690,11 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="heroa" cloneof="hero" supported="no"> <!-- game loads fully with a black screen but doesn't run -->
+	<software name="heroa" cloneof="hero">
 		<description>H.E.R.O. (Activision)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="965743">
@@ -6706,6 +6707,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Hacker</description>
 		<year>1985</year>
 		<publisher>Proein Soft Line</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="465790">
