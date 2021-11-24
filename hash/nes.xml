@@ -84404,7 +84404,7 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-<!-- FIXME: Is this a handheld game? Is it even a Famiclone? -->
+<!-- FIXME: this seems to be a handheld game unit and according to Haze it appears to belong in st2302u_bbl_spi.cpp -->
 	<software name="mc_cb203" supported="no">
 		<description>Coolboy RS-17 (203 in 1)</description>
 		<year>201?</year>
