@@ -16,7 +16,7 @@ The module doesn't have its own LCD screen. It has a grill+fan underneath
 at the front part, and a heatsink on the CPU.
 
 TODO:
-- runs too slow? opening book moves take around 3 seconds, but on the real
+- runs too slow? opening book moves take around 2.5 seconds, but on the real
   device less than 1 second
 
 ***************************************************************************/
