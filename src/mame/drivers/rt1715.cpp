@@ -9,8 +9,6 @@
     Notes:
     - keyboard connected to sio channel a
     - sio channel a clock output connected to ctc trigger 0
-    - memory map not 100% clear
-    - rt1715w: SCP3 boot loops while executing PROFILE.SUB
 
     Docs:
     - http://www.robotrontechnik.de/html/computer/pc1715w.htm
