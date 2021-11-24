@@ -81,9 +81,8 @@ void gt913_sound_device::device_start()
 		save_item(NAME(m_voices[i].m_pitch), i);
 
 		save_item(NAME(m_voices[i].m_sample), i);
-		save_item(NAME(m_voices[i].m_sample_at_loop), i);
+		save_item(NAME(m_voices[i].m_sample_next), i);
 		save_item(NAME(m_voices[i].m_exp), i);
-		save_item(NAME(m_voices[i].m_exp_at_loop), i);
 
 		save_item(NAME(m_voices[i].m_volume_current), i);
 		save_item(NAME(m_voices[i].m_volume_target), i);
@@ -146,50 +145,51 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 		voice.m_volume_current = voice.m_volume_target;
 	}
 
+	const u8 step = (voice.m_addr_frac >> 20) & 7;
+	const s32 sample = voice.m_sample + (voice.m_sample_next * step / 8);
+
 	// mix sample into output
-	left += (s32)voice.m_sample * (voice.m_volume_current >> 24) * voice.m_balance[0];
-	right += (s32)voice.m_sample * (voice.m_volume_current >> 24) * voice.m_balance[1];
+	left += sample * (voice.m_volume_current >> 24) * voice.m_balance[0];
+	right += sample * (voice.m_volume_current >> 24) * voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
 {
-	if (voice.m_addr_current == voice.m_addr_loop)
-	{
-	//	logerror("at loop start - sample %d exp %u\n", voice.m_sample, voice.m_exp);
-		voice.m_sample_at_loop = voice.m_sample;
-		voice.m_exp_at_loop = voice.m_exp;
-	}
+	voice.m_sample += voice.m_sample_next;
 
-	u16 word = m_cache.read_word(voice.m_addr_current & ~1);
-	s16 delta = 0;
-
-	if (!BIT(voice.m_addr_current, 0))
+	if (voice.m_addr_current == (voice.m_addr_loop | 1))
 	{
-		voice.m_exp += exp_2_to_3[word & 3];
-		voice.m_exp &= 7;
-		delta = sample_7_to_8[(word >> 2) & 0x7f];
+		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
+		const s16 word = m_cache.read_word(addr_loop_data);
+		voice.m_exp = m_cache.read_word(addr_loop_data + 10) & 7;
+		voice.m_sample_next = word - voice.m_sample;
 	}
 	else
 	{
-		delta = sample_7_to_8[word >> 9];
-	}
+		const u16 word = m_cache.read_word(voice.m_addr_current & ~1);
+		s16 delta = 0;
 
-	voice.m_sample += (delta * (1 << voice.m_exp) * voice.m_gain) >> 4;
+		if (!BIT(voice.m_addr_current, 0))
+		{
+			voice.m_exp += exp_2_to_3[word & 3];
+			voice.m_exp &= 7;
+			delta = sample_7_to_8[(word >> 2) & 0x7f];
+		}
+		else
+		{
+			delta = sample_7_to_8[word >> 9];
+		}
+
+		voice.m_sample_next = (delta * (1 << voice.m_exp) * voice.m_gain) >> 4;
+	}
 
 	voice.m_addr_current++;
 	if (voice.m_addr_current == voice.m_addr_end)
 	{
+		voice.m_addr_current = voice.m_addr_loop;
+
 		if (voice.m_addr_loop == voice.m_addr_end)
-		{
 			voice.m_enable = false;
-			voice.m_sample = 0;
-		}
-		else
-		{
-			voice.m_sample = voice.m_sample_at_loop;
-			voice.m_exp = voice.m_exp_at_loop;
-			voice.m_addr_current = voice.m_addr_loop;
-		}
 	}
 }
 

@@ -64,8 +64,8 @@ private:
 		u32 m_addr_current;
 		u32 m_addr_frac, m_pitch;
 
-		s16 m_sample, m_sample_at_loop;
-		u8 m_exp, m_exp_at_loop;
+		s16 m_sample, m_sample_next;
+		u8 m_exp;
 
 		u32 m_volume_current, m_volume_target;
 		u32 m_volume_rate;
