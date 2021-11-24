@@ -13880,6 +13880,7 @@ damesc                          //
 fdes2000d                       //
 fdes2100d                       //
 fdes2265                        //
+fdes2265a                       //
 fdes2325                        //
 
 @source:fidel_eag68k.cpp

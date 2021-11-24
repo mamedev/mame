@@ -366,9 +366,16 @@ ROM_END
 
 ROM_START( fdes2265 ) // model 6113, PCB label 510.1134A02
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("13e_red.ic11",  0x00000, 0x08000, CRC(15a35628) SHA1(8213862e129951c6943a80f73cd0b63a31bb1357) ) // 27c256
-	ROM_LOAD16_BYTE("13o_blue.ic10", 0x00001, 0x08000, CRC(81ce7ab2) SHA1(f01a70bcf2fbfe66c7a77d3c4437d897e5cc682d) ) // "
+	ROM_LOAD16_BYTE("13_e3_red.ic11",  0x00000, 0x08000, CRC(fc352636) SHA1(e87350eab0c9ec7ea6321d82246c500c9d7b463e) ) // WSI 27C256L-12
+	ROM_LOAD16_BYTE("13_o3_blue.ic10", 0x00001, 0x08000, CRC(f335a2d5) SHA1(e0b861d77f394d39ab68ca2ef9ac1ceb9e829aed) ) // "
 ROM_END
+
+ROM_START( fdes2265a ) // "
+	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("13_e_red.ic11",  0x00000, 0x08000, CRC(15a35628) SHA1(8213862e129951c6943a80f73cd0b63a31bb1357) ) // WSI 27C256L-12
+	ROM_LOAD16_BYTE("13_o_blue.ic10", 0x00001, 0x08000, CRC(81ce7ab2) SHA1(f01a70bcf2fbfe66c7a77d3c4437d897e5cc682d) ) // "
+ROM_END
+
 
 ROM_START( fdes2325 ) // model 6129, PCB label 510.1149A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -390,5 +397,6 @@ ROM_END
 CONS( 1988, fdes2100d, 0,         0, fdes2100d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2100 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1988, fdes2000d, fdes2100d, 0, fdes2000d, desdis, desdis_state, init_fdes2100d, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, fdes2265,  0,         0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, fdes2265,  0,         0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, fdes2265a, fdes2265,  0, fdes2265,  desdis, desmas_state, init_fdes2265,  "Fidelity Electronics", "Designer Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1991, fdes2325,  fdes2265,  0, fdes2325,  desdis, desmas_state, empty_init,     "Fidelity Electronics", "Designer Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
