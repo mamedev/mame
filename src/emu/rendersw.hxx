@@ -578,47 +578,33 @@ private:
 
 	static void draw_rect(const render_primitive &prim, PixelType *dstdata, s32 width, s32 height, u32 pitch)
 	{
-		render_bounds fpos = prim.bounds;
+		render_bounds const fpos = prim.bounds;
 		assert(fpos.x0 <= fpos.x1);
 		assert(fpos.y0 <= fpos.y1);
 
-		// clamp to integers
-		s32 startx = round_nearest(fpos.x0);
-		s32 starty = round_nearest(fpos.y0);
-		s32 endx = round_nearest(fpos.x1);
-		s32 endy = round_nearest(fpos.y1);
-
-		// ensure we fit
-		if (startx < 0) startx = 0;
-		if (startx >= width) startx = width;
-		if (endx < 0) endx = 0;
-		if (endx >= width) endx = width;
-		if (starty < 0) starty = 0;
-		if (starty >= height) starty = height;
-		if (endy < 0) endy = 0;
-		if (endy >= height) endy = height;
+		// clamp to integers and ensure we fit
+		s32 const startx = std::clamp<s32>(round_nearest(fpos.x0), 0, width);
+		s32 const starty = std::clamp<s32>(round_nearest(fpos.y0), 0, width);
+		s32 const endx = std::clamp<s32>(round_nearest(fpos.x1), 0, height);
+		s32 const endy = std::clamp<s32>(round_nearest(fpos.y1), 0, height);
 
 		// bail if nothing left
-		if (fpos.x0 > fpos.x1 || fpos.y0 > fpos.y1)
+		if ((startx > endx) || (starty > endy))
 			return;
 
 		// only support alpha and "none" blendmodes
 		assert(PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE ||
 				PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_ALPHA);
 
-		// fast case: no alpha
-		if (PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE || is_opaque(prim.color.a))
+		if ((PRIMFLAG_GET_BLENDMODE(prim.flags) == BLENDMODE_NONE) || is_opaque(prim.color.a))
 		{
-			u32 r = u32(256.0f * prim.color.r);
-			u32 g = u32(256.0f * prim.color.g);
-			u32 b = u32(256.0f * prim.color.b);
-			u32 pix;
+			// fast case: no alpha
 
 			// clamp R,G,B to 0-256 range
-			if (r > 0xff) { if (s32(r) < 0) r = 0; else r = 0xff; }
-			if (g > 0xff) { if (s32(g) < 0) g = 0; else g = 0xff; }
-			if (b > 0xff) { if (s32(b) < 0) b = 0; else b = 0xff; }
-			pix = dest_rgb_to_pixel(r, g, b);
+			u32 r = u32(std::clamp(256.0f * prim.color.r, 0.0f, 255.0f));
+			u32 g = u32(std::clamp(256.0f * prim.color.g, 0.0f, 255.0f));
+			u32 b = u32(std::clamp(256.0f * prim.color.b, 0.0f, 255.0f));
+			u32 const pix = dest_rgb_to_pixel(r, g, b);
 
 			// loop over rows
 			for (s32 y = starty; y < endy; y++)
@@ -630,23 +616,18 @@ private:
 					*dest++ = pix;
 			}
 		}
-
-		// alpha and/or coloring case
 		else if (!is_transparent(prim.color.a))
 		{
-			u32 rmask = dest_rgb_to_pixel(0xff,0x00,0x00);
-			u32 gmask = dest_rgb_to_pixel(0x00,0xff,0x00);
-			u32 bmask = dest_rgb_to_pixel(0x00,0x00,0xff);
-			u32 r = u32(256.0f * prim.color.r * prim.color.a);
-			u32 g = u32(256.0f * prim.color.g * prim.color.a);
-			u32 b = u32(256.0f * prim.color.b * prim.color.a);
-			u32 inva = u32(256.0f * (1.0f - prim.color.a));
+			// alpha and/or coloring case
+			u32 const rmask = dest_rgb_to_pixel(0xff,0x00,0x00);
+			u32 const gmask = dest_rgb_to_pixel(0x00,0xff,0x00);
+			u32 const bmask = dest_rgb_to_pixel(0x00,0x00,0xff);
 
 			// clamp R,G,B and inverse A to 0-256 range
-			if (r > 0xff) { if (s32(r) < 0) r = 0; else r = 0xff; }
-			if (g > 0xff) { if (s32(g) < 0) g = 0; else g = 0xff; }
-			if (b > 0xff) { if (s32(b) < 0) b = 0; else b = 0xff; }
-			if (inva > 0x100) { if (s32(inva) < 0) inva = 0; else inva = 0x100; }
+			u32 r = u32(std::clamp(256.0f * prim.color.r * prim.color.a, 0.0f, 255.0f));
+			u32 g = u32(std::clamp(256.0f * prim.color.g * prim.color.a, 0.0f, 255.0f));
+			u32 b = u32(std::clamp(256.0f * prim.color.b * prim.color.a, 0.0f, 255.0f));
+			u32 const inva = u32(std::clamp(256.0f * (1.0f - prim.color.a), 0.0f, 256.0f));
 
 			// pre-shift the RGBA pieces
 			r = dest_rgb_to_pixel(r, 0, 0) << 8;
