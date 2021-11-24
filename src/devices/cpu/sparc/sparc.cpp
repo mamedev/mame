@@ -642,8 +642,8 @@ void mb86930_device::device_start()
 	save_item(NAME(m_amr));
 	save_item(NAME(m_wssr));
 	save_item(NAME(m_last_masked_addr));
-	save_item(NAME(m_same_page_waits[6]));
-	save_item(NAME(m_other_page_waits[6]));
+	save_item(NAME(m_same_page_waits));
+	save_item(NAME(m_other_page_waits));
 
 	std::fill_n(&m_arsr[0], 6, 0);
 	std::fill_n(&m_amr[0], 6, 0);
