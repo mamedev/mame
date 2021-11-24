@@ -4262,7 +4262,7 @@ ROM_START( ssia )
 	ROM_LOAD( "c64-11.ic43", 0x200, 0x117, CRC(f116413e) SHA1(696a8c404ef3d6d832e0fcf530452344f96dd0b2) )
 ROM_END
 
-ROM_START( ssib ) // this is identical to majest12u, but the region-defining byte which is changed to 0x03 (World). All labels are original and the new ROM's number (13) does fill a hole, so seems original
+ROM_START( ssib )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
 	ROM_LOAD16_BYTE( "c64_13.ic8", 0x00001, 0x40000, CRC(99e3dd1c) SHA1(631e6db268d5411acf73d2892ad5107401212a5d) )
@@ -4288,8 +4288,8 @@ ROM_END
 
 ROM_START( majest12u )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
-	ROM_LOAD16_BYTE( "c64_14.ic8", 0x00001, 0x40000, CRC(eee4ed8a) SHA1(ad50dc12ede0d327ef9ded5ffd9dbd6e865ebcfc) )
+	ROM_LOAD16_BYTE( "c64_15.ic9", 0x00000, 0x40000, CRC(3a6d591b) SHA1(cc08aa89046e774046d1e47afb7d124c9a6b0b88) )
+	ROM_LOAD16_BYTE( "c64_17.ic8", 0x00001, 0x40000, CRC(fd514ad9) SHA1(14646ed90dad208b5874191a329396f35f3c0a0d) )
 
 	ROM_REGION( 0x100000, "tc0100scn_1", ROMREGION_ERASEFF )
 	/* empty! */
@@ -4310,11 +4310,10 @@ ROM_START( majest12u )
 	ROM_LOAD( "c64-11.ic43", 0x200, 0x117, CRC(f116413e) SHA1(696a8c404ef3d6d832e0fcf530452344f96dd0b2) )
 ROM_END
 
-// this is identical to ssia, but the region-defining byte which is changed to 0x02 (US). All labels are original and the new ROM's number (17) does fill a hole, so seems original.
 ROM_START( majest12ua )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "c64_15.ic9", 0x00000, 0x40000, CRC(3a6d591b) SHA1(cc08aa89046e774046d1e47afb7d124c9a6b0b88) )
-	ROM_LOAD16_BYTE( "c64_17.ic8", 0x00001, 0x40000, CRC(fd514ad9) SHA1(14646ed90dad208b5874191a329396f35f3c0a0d) )
+	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
+	ROM_LOAD16_BYTE( "c64_14.ic8", 0x00001, 0x40000, CRC(eee4ed8a) SHA1(ad50dc12ede0d327ef9ded5ffd9dbd6e865ebcfc) )
 
 	ROM_REGION( 0x100000, "tc0100scn_1", ROMREGION_ERASEFF )
 	/* empty! */
@@ -5519,8 +5518,8 @@ GAME( 1990, quizhq,     0,        quizhq,    quizhq,     taitof2_state, empty_in
 GAME( 1990, ssi,        0,        ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ssia,       ssi,      ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ssib,       ssi,      ssi,       ssi,        taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, earlier?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12u,  ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US, earlier?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12ua, ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12u,  ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12ua, ssi,      ssi,       majest12u,  taitof2_state, empty_init,    ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US, earlier?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, majest12j,  ssi,      ssi,       majest12j,  taitof2_state, empty_init,    ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state, empty_init,    ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
