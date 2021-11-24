@@ -1005,12 +1005,12 @@ void mb86930_device::wait_specifier_w(offs_t offset, uint32_t data, uint32_t mem
 	COMBINE_DATA(&m_wssr[offset]);
 
 	const uint32_t wait_idx = (offset << 1);
-	const bool wait_en0 = BIT(m_wssr[offset], 21) && !BIT(m_wssr[offset], 20);
-	const bool wait_en1 = BIT(m_wssr[offset], 8) && !BIT(m_wssr[offset], 7);
-	m_other_page_waits[wait_idx] = wait_en0 ? (((m_wssr[offset] >> 27) & 0x1f) + 1) : 0;
-	m_same_page_waits[wait_idx] = wait_en0 ? (((m_wssr[offset] >> 22) & 0x1f) + 1) : 0;
-	m_other_page_waits[wait_idx + 1] = wait_en1 ? (((m_wssr[offset] >> 14) & 0x1f) + 1) : 0;
-	m_same_page_waits[wait_idx + 1] = wait_en1 ? (((m_wssr[offset] >> 9) & 0x1f) + 1) : 0;
+	const bool wait_en0 = BIT(m_wssr[offset], 8) && !BIT(m_wssr[offset], 7);
+	const bool wait_en1 = BIT(m_wssr[offset], 21) && !BIT(m_wssr[offset], 20);
+	m_same_page_waits[wait_idx] = wait_en0 ? (((m_wssr[offset] >> 9) & 0x1f) + 1) : 0;
+	m_other_page_waits[wait_idx] = wait_en0 ? (((m_wssr[offset] >> 14) & 0x1f) + 1) : 0;
+	m_same_page_waits[wait_idx + 1] = wait_en1 ? (((m_wssr[offset] >> 22) & 0x1f) + 1) : 0;
+	m_other_page_waits[wait_idx + 1] = wait_en1 ? (((m_wssr[offset] >> 27) & 0x1f) + 1) : 0;
 }
 
 

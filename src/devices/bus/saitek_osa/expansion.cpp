@@ -132,7 +132,7 @@ void saitekosa_expansion_device::pw_w(int state)
 
 u32 saitekosa_expansion_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return (m_module) ? m_module->screen_update(screen, bitmap, cliprect) : UPDATE_HAS_NOT_CHANGED;
+	return (m_module) ? m_module->screen_update(screen, bitmap, cliprect) : 0;
 }
 
 
