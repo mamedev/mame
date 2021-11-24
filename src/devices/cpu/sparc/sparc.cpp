@@ -827,7 +827,7 @@ uint32_t mb86930_device::mmu_r(offs_t offset, uint32_t mem_mask)
 	{
 		if ((full_addr & m_full_masks[cs]) == m_full_ranges[cs])
 		{
-			eat_cycles(is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs]);
+			m_icount -= is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs];
 			return m_cs_r[cs](offset, mem_mask);
 		}
 	}
@@ -847,7 +847,7 @@ template <uint8_t Asi> void mb86930_device::mmu_w(offs_t offset, uint32_t data, 
 	{
 		if ((full_addr & m_full_masks[cs]) == m_full_ranges[cs])
 		{
-			eat_cycles(is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs]);
+			m_icount -= is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs];
 			m_cs_w[cs](offset, data, mem_mask);
 			return;
 		}
