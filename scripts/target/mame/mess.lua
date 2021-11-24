@@ -1850,7 +1850,6 @@ files {
 	MAME_DIR .. "src/mame/machine/macscsi.cpp",
 	MAME_DIR .. "src/mame/machine/macscsi.h",
 	MAME_DIR .. "src/mame/drivers/iphone2g.cpp",
-	MAME_DIR .. "src/mame/drivers/superga2.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "applied")

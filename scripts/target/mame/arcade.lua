@@ -5133,6 +5133,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/summit.cpp",
 	MAME_DIR .. "src/mame/drivers/sumt8035.cpp",
 	MAME_DIR .. "src/mame/drivers/supercrd.cpp",
+	MAME_DIR .. "src/mame/drivers/superga2.cpp",
 	MAME_DIR .. "src/mame/drivers/supertnk.cpp",
 	MAME_DIR .. "src/mame/drivers/tapatune.cpp",
 	MAME_DIR .. "src/mame/drivers/tattack.cpp",
