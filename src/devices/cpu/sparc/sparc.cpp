@@ -659,8 +659,8 @@ void mb86930_device::device_reset()
 	m_spmr = 0;
 	m_spmr_mask = ~0ULL;
 	std::fill_n(&m_wssr[0], 3, 0);
+	m_last_masked_addr = 0ULL;
 
-	std::fill_n(&m_last_masked_addr[0], 6, 0ULL);
 	std::fill_n(&m_same_page_waits[0], 6, 0);
 	std::fill_n(&m_other_page_waits[0], 6, 0);
 
@@ -819,14 +819,14 @@ uint32_t mb86930_device::mmu_r(offs_t offset, uint32_t mem_mask)
 {
 	const uint64_t full_addr = ((uint64_t)Asi << 30) | offset;
 
+	const uint64_t masked_addr = full_addr & m_spmr_mask;
+	const bool is_same_page = (masked_addr == m_last_masked_addr);
+	m_last_masked_addr = masked_addr;
+
 	for (int cs = 0; cs < 6; cs++)
 	{
 		if ((full_addr & m_full_masks[cs]) == m_full_ranges[cs])
 		{
-			const uint64_t masked_addr = full_addr & m_spmr_mask;
-			const bool is_same_page = (masked_addr == m_last_masked_addr[cs]);
-			m_last_masked_addr[cs] = masked_addr;
-
 			eat_cycles(is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs]);
 			return m_cs_r[cs](offset, mem_mask);
 		}
@@ -839,14 +839,14 @@ template <uint8_t Asi> void mb86930_device::mmu_w(offs_t offset, uint32_t data, 
 {
 	const uint64_t full_addr = ((uint64_t)Asi << 30) | offset;
 
+	const uint64_t masked_addr = full_addr & m_spmr_mask;
+	const bool is_same_page = (masked_addr == m_last_masked_addr);
+	m_last_masked_addr = masked_addr;
+
 	for (int cs = 0; cs < 6; cs++)
 	{
 		if ((full_addr & m_full_masks[cs]) == m_full_ranges[cs])
 		{
-			const uint64_t masked_addr = full_addr & m_spmr_mask;
-			const bool is_same_page = (masked_addr == m_last_masked_addr[cs]);
-			m_last_masked_addr[cs] = masked_addr;
-
 			eat_cycles(is_same_page ? m_same_page_waits[cs] : m_other_page_waits[cs]);
 			m_cs_w[cs](offset, data, mem_mask);
 			return;
@@ -2390,7 +2390,6 @@ void mb86930_device::execute_divscc(uint32_t op)
 	const uint64_t dividend = ((uint64_t)m_y << 32) | RS1REG;
 	const uint32_t remainder = m_y << 1;
 	const uint32_t divisor = (USEIMM ? SIMM13 : RS2REG);*/
-
 }
 
 void mb86930_device::execute_scan(uint32_t op)

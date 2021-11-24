@@ -419,7 +419,7 @@ protected:
 	u32 m_amr[6];
 	u64 m_full_masks[6];
 	u64 m_full_ranges[6];
-	u64 m_last_masked_addr[6];
+	u64 m_last_masked_addr;
 	int m_same_page_waits[6];
 	int m_other_page_waits[6];
 
