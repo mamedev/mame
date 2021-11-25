@@ -74,6 +74,9 @@ void dmac3_device::csr_w(dmac3_controller controller, uint32_t data)
 
 void dmac3_device::intr_w(dmac3_controller controller, uint32_t data)
 {
+	static constexpr uint32_t INTR_CLR_MASK = (INTR_INT | INTR_TCI | INTR_EOP | INTR_EOPI | INTR_DREQ | INTR_DRQI | INTR_PERR);
+	static constexpr uint32_t INTR_EN_MASK = (INTR_INTEN | INTR_TCIE | INTR_EOPIE | INTR_DRQIE);
+
 	LOGMASKED(LOG_REGISTER, "dmac3-%d intr_w: 0x%x\n", controller, data);
 	const auto intr_clear_bits = data & INTR_CLR_MASK;  // Get 1s on bits to clear
 	const auto intr_enable_bits = data & INTR_EN_MASK;  // Get 1s on bits to set

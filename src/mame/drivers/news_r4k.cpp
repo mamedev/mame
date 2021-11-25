@@ -356,14 +356,14 @@ protected:
 	uint64_t front_panel_r(offs_t offset);
 
 	// Constants
-	const uint32_t ICACHE_SIZE = 16384;
-	const uint32_t DCACHE_SIZE = 16384;
-	const uint32_t SCACHE_SIZE = 0x100000;
+	static constexpr uint32_t ICACHE_SIZE = 16384;
+	static constexpr uint32_t DCACHE_SIZE = 16384;
+	static constexpr uint32_t SCACHE_SIZE = 0x100000;
+	static constexpr int FREERUN_FREQUENCY = 1000000; // Hz
+	static constexpr int TIMER0_FREQUENCY = 100;      // Hz
+	static constexpr uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
+	static constexpr uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
 	const char *MAIN_MEMORY_DEFAULT = "64M";
-	const int FREERUN_FREQUENCY = 1000000; // Hz
-	const int TIMER0_FREQUENCY = 100;      // Hz
-	const uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
-	const uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
 
 	// RAM debug
 	bool m_map_shift = false;
