@@ -19,7 +19,7 @@ PCB coninage (monedero-billetero-hopper) R.F. 53452303
   PIC18F448-I/P
   ULN2803A
   Xtal 12.000 MHz
-  PCA82C251
+  SEEPROM PCA82C251
   3xHC573A
   74HC238D
 
@@ -45,10 +45,12 @@ PCB Sound R.F. 53422409 LF
 PCB ccTalk R.F. 53475502
   PIC18F2580
   Xtal 10.000 MHz
+  SEEPROM 82C251Y
 
-PCB counters (contadores) (no R.F. P/N)
+PCB counters (contadores) R.F. 53430106
   PIC18F2580
   Xtal 12.00 MHz
+  SEEPROM 82C251
 */
 
 #include "emu.h"
@@ -135,9 +137,18 @@ ROM_START( rfsantafeg )
 	ROM_REGION(0x4000, "pics", 0)
 
 	/*
-	PCB counters (contadores) (no R.F. P/N)
+	PCB counters (contadores) R.F. 53430106	
+    ___________________________________
+    | :  ·····      __________  :  ··  |__
+    |    Xtal 12.00 |ULN2803A|  :  :      |
+    |  _____     _____________     ·      |
+    |  A4N46    |_PIC18F2580_|   ______   |
+    | . ...  .. .  ______ ______ MAX232 __|
+    |              MAX232 82C251  ···· |
+    |__________________________________|
 	-PIC18F2580
 	-Xtal 12.00 MHz
+	-SEEPROM 82C251
 	*/
 	ROM_LOAD("pic_contadores_15112a_ips_pic18f2580.bin",                      0x00000, 0x1000, NO_DUMP ) // 32K Flash
 
@@ -155,12 +166,12 @@ ROM_START( rfsantafeg )
 	*/
 	ROM_LOAD("pic_luces_superior_11125c_2f05c0_pic18f4480-i-p.u2",            0x01800, 0x0800, NO_DUMP ) // 16K Flash
 
-		/*
+	/*
 	PCB coinage (monedero-billetero-hopper) R.F. 53452303
 	-PIC18F448-I/P
 	-ULN2803A
 	-Xtal 12.000 MHz
-	-PCA82C251
+	-SEEPROM PCA82C251
 	-3xHC573A
 	-74HC238D
 	*/
@@ -168,8 +179,17 @@ ROM_START( rfsantafeg )
 
 	/*
 	PCB ccTalk R.F. 53475502
+	_________________________
+    | ··   .... CAN ....     |
+    | ..           82C251Y  :|
+    |   _____________       :|
+    |: |_PIC18F2580_|  ccTalk|
+    |:        Xtal          :|
+    |:       10.000 MHz     :|
+    |________________________|
 	-PIC18F2580
 	-Xtal 10.000 MHz
+	-SEEPROM 82C251Y
 	*/
 	ROM_LOAD("pic_placa_cctalk_pic18f2580.u1",                                0x02800, 0x1000, NO_DUMP ) // 32K Flash
 
