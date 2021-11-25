@@ -17574,10 +17574,11 @@ license:CC0
 	</software>
 
 	<software name="hyperolg" cloneof="hyperol">
-		<description>Hyper Olympic (Jpn, Gentaiban!)</description>
+		<description>Hyper Olympic (Japan, Genteiban!)</description>
 		<year>1985</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="KON-RC800LE"/>
+		<info name="alt_title" value="ハイパーオリンピック 限定版!"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x139" />
 			<feature name="pcb" value="KONAMI-74*139/74" />
