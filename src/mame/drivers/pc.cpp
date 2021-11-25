@@ -75,6 +75,7 @@ public:
 	void earthst(machine_config &config);
 	void vpcii(machine_config &config);
 	void fraking(machine_config &config);
+	void ec1847(machine_config &config);
 
 	void init_bondwell();
 
@@ -1738,6 +1739,26 @@ ROM_START( nms9100 )
 	ROMX_LOAD("philipsxt.bin", 0x8000, 0x8000, CRC(2f3135e7) SHA1(d2fc4c06cf09e2c5a62017f0977b084be8bf9bbd), ROM_BIOS(2))
 ROM_END
 
+/**************************************************************** EC-1847 ***
+Desktop?
+*****************************************************************************/
+
+void pc_state::ec1847(machine_config &config)
+{
+	pccga(config);
+//	subdevice<isa8_slot_device>("isa1")->set_default_option("hercules");
+}
+
+ROM_START( ec1847 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("308_d47_2764.bin",  0x8000, 0x2000, CRC(f06924f2) SHA1(83a5dedf1c06f875c598f087bbc087524bc9bfa3)) // hdc
+	ROM_LOAD("188m_d47_2764.bin", 0x4000, 0x2000, CRC(bc8742c7) SHA1(3af09d14e891e976b7a9a2a6e1af63f0eabe5426))
+	ROM_LOAD("188m_d48_2764.bin", 0xe000, 0x2000, CRC(7d290e95) SHA1(e73e6c8e19477fce5de3f95b89693dc6ad6781ab))
+
+	ROM_REGION(0x2000, "gfx1", ROMREGION_ERASE00)
+	ROM_LOAD("317_d28_2732.bin", 0x00000, 0x1000, CRC(8939599b) SHA1(53d02460cf93596882a96758ef4bac5fa1ce55b2)) // monochrome font
+ROM_END
+
 /************************************************* AEG Olympia Olystar 20F ***
 Form Factor: Desktop
 uses an Acer 710IIN motherboard, BIOS-Version 4.06
@@ -2317,6 +2338,7 @@ COMP( 198?, dtkerso,        ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1983, eagle1600,      ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Eagle",                           "Eagle 1600" ,           MACHINE_NOT_WORKING )
 COMP( 1983, eaglespirit,    ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "Eagle PC Spirit",       MACHINE_NOT_WORKING )
 COMP( 198?, eaglepc2,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Eagle",                           "PC-2",                  MACHINE_NOT_WORKING )
+COMP( 1990, ec1847,         ibm5150, 0,      ec1847,         pccga,    pc_state, empty_init,    "<unknown>",                       "EC-1847",               MACHINE_NOT_WORKING )
 COMP( 1985, eppc,           ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Ericsson Information System",     "Ericsson Portable PC",  MACHINE_NOT_WORKING )
 COMP( 1989, fraking,        ibm5150, 0,      modernxt,       pccga,    pc_state, empty_init,    "Frael",                           "King",                  MACHINE_NOT_WORKING )
 COMP( 198?, hyo88t,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Hyosung",                         "Topstar 88T",           MACHINE_NOT_WORKING )
