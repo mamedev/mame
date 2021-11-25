@@ -20,18 +20,36 @@
 #define SONIC3_DEBUG (LOG_GENERAL | LOG_INTERRUPT)
 #define SONIC3_TRACE (SONIC3_DEBUG | LOG_DATA)
 
+#define VERBOSE SONIC3_DEBUG
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8452AQ, cxd8452aq_device, "cxd8452aq", "Sony CXD8452AQ WSC-SONIC3")
 
+// control register constants
+static constexpr uint32_t INT_EN_MASK = 0x7f00;
+
+// TODO: determine if external interrupt should be included when cleared
+static constexpr uint32_t INT_CLR_MASK = 0xf0;
+static constexpr uint32_t RX_DMA_COMPLETE = 0x40;
+static constexpr uint32_t TX_DMA_COMPLETE = 0x20;
+static constexpr uint32_t EXT_INT = 0x1;
+
+// count register constants
+static constexpr uint32_t DMA_START = 0x80000000;
+
+// DMA update timer
+// TODO: Actual frequency, since we don't have DRQ to implictly rate limit
+//       Might be the APbus frequency.
+static constexpr int DMA_TIMER = 100;
+
 cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CXD8452AQ, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	main_bus_config("main_bus", ENDIANNESS_BIG, 32, 32, 0),
-	sonic_config("sonic", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(cxd8452aq_device::sonic_bus_map), this)),
-	m_irq_handler(*this),
-	m_apbus_virt_to_phys_callback(*this),
-	m_bus(*this, finder_base::DUMMY_TAG, -1, 64) {}
+	  device_memory_interface(mconfig, *this),
+	  main_bus_config("main_bus", ENDIANNESS_BIG, 32, 32, 0),
+	  sonic_config("sonic", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(cxd8452aq_device::sonic_bus_map), this)),
+	  m_irq_handler(*this),
+	  m_apbus_virt_to_phys_callback(*this),
+	  m_bus(*this, finder_base::DUMMY_TAG, -1, 64) {}
 
 device_memory_interface::space_config_vector cxd8452aq_device::memory_space_config() const
 {
@@ -44,49 +62,13 @@ device_memory_interface::space_config_vector cxd8452aq_device::memory_space_conf
 void cxd8452aq_device::map(address_map &map)
 {
 	map(0x00, 0x03).rw(FUNC(cxd8452aq_device::control_r), FUNC(cxd8452aq_device::control_w));
-	map(0x04, 0x07).lrw32(NAME([this]()
-							   { return m_sonic3_reg.config; }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTERS, "set sonic3.config = 0x%x\n", data);
-								   m_sonic3_reg.config = data;
-							   }));
-	map(0x08, 0x0b).lrw32(NAME([this]()
-							   { return m_sonic3_reg.revision; }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTERS, "set sonic3.revision = 0x%x, but it is probably write only?\n", data);
-								   m_sonic3_reg.revision = data;
-							   }));
-	map(0x0c, 0x0f).lrw32(NAME([this]()
-							   { return m_sonic3_reg.rx_sonic_address; }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTERS, "set sonic3.rx_sonic_address = 0x%x\n", data);
-								   m_sonic3_reg.rx_sonic_address = data;
-							   }));
-	map(0x10, 0x13).lrw32(NAME([this]()
-							   { return m_sonic3_reg.rx_host_address; }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTERS, "set sonic3.rx_host_address = 0x%x\n", data);
-								   m_sonic3_reg.rx_host_address = data;
-							   }));
+	map(0x04, 0x07).rw(FUNC(cxd8452aq_device::config_r), FUNC(cxd8452aq_device::config_w));
+	map(0x08, 0x0b).r(FUNC(cxd8452aq_device::revision_r));
+	map(0x0c, 0x0f).rw(FUNC(cxd8452aq_device::rx_sonic_addr_r), FUNC(cxd8452aq_device::rx_sonic_addr_w));
+	map(0x10, 0x13).rw(FUNC(cxd8452aq_device::rx_host_addr_r), FUNC(cxd8452aq_device::rx_host_addr_w));
 	map(0x14, 0x17).rw(FUNC(cxd8452aq_device::rx_count_r), FUNC(cxd8452aq_device::rx_count_w));
-	map(0x18, 0x1b).lrw32(NAME([this]()
-							   { return m_sonic3_reg.tx_sonic_address; }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTERS, "set sonic3.tx_sonic_address = 0x%x\n", data);
-								   m_sonic3_reg.tx_sonic_address = data;
-							   }));
-	map(0x1c, 0x1f).lrw32(NAME([this]()
-							   { return m_sonic3_reg.tx_host_address; }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTERS, "set sonic3.tx_host_address = 0x%x\n", data);
-								   m_sonic3_reg.tx_host_address = data;
-							   }));
+	map(0x18, 0x1b).rw(FUNC(cxd8452aq_device::tx_sonic_addr_r), FUNC(cxd8452aq_device::tx_sonic_addr_w));
+	map(0x1c, 0x1f).rw(FUNC(cxd8452aq_device::tx_host_addr_r), FUNC(cxd8452aq_device::tx_host_addr_w));
 	map(0x20, 0x23).rw(FUNC(cxd8452aq_device::tx_count_r), FUNC(cxd8452aq_device::tx_count_w));
 }
 
@@ -106,6 +88,66 @@ void cxd8452aq_device::control_w(offs_t offset, uint32_t data)
 	// Clear specified interrupts by getting 0s on interrupt status bits to clear
 	m_sonic3_reg.control &= (~INT_CLR_MASK | (data & INT_CLR_MASK));
 	m_irq_check->adjust(attotime::zero);
+}
+
+uint32_t cxd8452aq_device::revision_r(offs_t offset)
+{
+	return m_sonic3_reg.revision;
+}
+
+uint32_t cxd8452aq_device::config_r(offs_t offset)
+{
+	return m_sonic3_reg.config;
+}
+
+void cxd8452aq_device::config_w(offs_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_REGISTERS, "set sonic3.config = 0x%x\n", data);
+	m_sonic3_reg.config = data;
+}
+
+uint32_t cxd8452aq_device::rx_sonic_addr_r(offs_t offset)
+{
+	return m_sonic3_reg.rx_sonic_address;
+}
+
+void cxd8452aq_device::rx_sonic_addr_w(offs_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_REGISTERS, "set sonic3.rx_sonic_address = 0x%x\n", data);
+	m_sonic3_reg.rx_sonic_address = data;
+}
+
+uint32_t cxd8452aq_device::rx_host_addr_r(offs_t offset)
+{
+	return m_sonic3_reg.rx_host_address;
+}
+
+void cxd8452aq_device::rx_host_addr_w(offs_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_REGISTERS, "set sonic3.rx_host_address = 0x%x\n", data);
+	m_sonic3_reg.rx_host_address = data;
+}
+
+uint32_t cxd8452aq_device::tx_sonic_addr_r(offs_t offset)
+{
+	return m_sonic3_reg.tx_sonic_address;
+}
+
+void cxd8452aq_device::tx_sonic_addr_w(offs_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_REGISTERS, "set sonic3.tx_sonic_address = 0x%x\n", data);
+	m_sonic3_reg.tx_sonic_address = data;
+}
+
+uint32_t cxd8452aq_device::tx_host_addr_r(offs_t offset)
+{
+	return m_sonic3_reg.tx_host_address;
+}
+
+void cxd8452aq_device::tx_host_addr_w(offs_t offset, uint32_t data)
+{
+	LOGMASKED(LOG_REGISTERS, "set sonic3.tx_host_address = 0x%x\n", data);
+	m_sonic3_reg.tx_host_address = data;
 }
 
 uint32_t cxd8452aq_device::tx_count_r(offs_t offset)
