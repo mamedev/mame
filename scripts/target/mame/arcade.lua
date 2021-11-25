@@ -151,6 +151,7 @@ CPUS["KS0164"] = true
 --CPUS["COPS1"] = true
 CPUS["MEG"] = true
 CPUS["F2MC16"] = true
+CPUS["M68HC16"] = true
 
 --------------------------------------------------
 -- specify available sound cores

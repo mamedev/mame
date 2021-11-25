@@ -3518,9 +3518,16 @@ if opt_tool(CPUS, "MK1") then
 end
 
 --------------------------------------------------
--- Motorola M68HC16 (CPU16) - Disassembler only
---@src/devices/cpu/m68hc16/m68hc16.h,CPUS["M68HC16"] = true
+-- Motorola M68HC16 (CPU16)
+--@src/devices/cpu/m68hc16/cpu16.h,CPUS["M68HC16"] = true
 --------------------------------------------------
+
+if CPUS["M68HC16"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.cpp",
+		MAME_DIR .. "src/devices/cpu/m68hc16/cpu16.h",
+	}
+end
 
 if opt_tool(CPUS, "M68HC16") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m68hc16/cpu16dasm.cpp")

@@ -170,6 +170,7 @@ CPUS["UPD78K"] = true
 CPUS["ROMP"] = true
 CPUS["COPS1"] = true
 CPUS["MK1"] = true
+CPUS["M68HC16"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
