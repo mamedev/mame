@@ -1052,8 +1052,7 @@ void sparc_base_device::device_post_load()
 
 void mb86930_device::device_post_load()
 {
-	sparc_base_device::device_post_load();
-
+	sparcv8_device::device_post_load();
 	update_addr_masks();
 }
 
