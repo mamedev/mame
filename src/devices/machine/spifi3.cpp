@@ -38,6 +38,121 @@
 
 DEFINE_DEVICE_TYPE(SPIFI3, spifi3_device, "spifi3", "HP 1TV3-0302 SPIFI3 SCSI-2 Protocol Controller")
 
+// AUXCTRL constants and functions
+static constexpr uint32_t AUXCTRL_DMAEDGE = 0x04;
+static constexpr uint32_t AUXCTRL_SETRST = 0x20;
+static constexpr uint32_t AUXCTRL_CRST = 0x40;
+static constexpr uint32_t AUXCTRL_SRST = 0x80;
+
+// spstat - not fully implemented yet
+static constexpr uint32_t SPS_IDLE = 0x00;
+static constexpr uint32_t SPS_MSGOUT = 0x04;
+static constexpr uint32_t SPS_COMMAND = 0x05;
+static constexpr uint32_t SPS_INTR = 0x08;
+static constexpr uint32_t SPS_STATUS = 0x0c;
+static constexpr uint32_t SPS_MSGIN = 0x0d;
+static constexpr uint32_t SPS_DATAOUT = 0x0e;
+static constexpr uint32_t SPS_DATAIN = 0x0f;
+
+// prstat - PRS_Z not implemented yet
+static constexpr uint32_t PRS_IO = 0x08;
+static constexpr uint32_t PRS_CD = 0x10;
+static constexpr uint32_t PRS_MSG = 0x20;
+static constexpr uint32_t PRS_ATN = 0x40;
+
+// Interrupt status register - Not all interrupts implemented yet
+static constexpr uint32_t INTR_BSRQ = 0x01;
+static constexpr uint32_t INTR_TIMEO = 0x08;
+static constexpr uint32_t INTR_FCOMP = 0x80;
+
+// Interrupt condition register - Not all interrupts implemented yet
+static constexpr uint32_t ICOND_CNTZERO = 0x40;
+static constexpr uint32_t ICOND_UXPHASEZ = 0x80;
+
+// Select register - SETATN and IRESELEN not implemented yet
+static constexpr uint32_t SEL_ISTART = 0x08;
+static constexpr uint32_t SEL_WATN = 0x80;
+static constexpr uint32_t SEL_TARGET = 0x70;
+
+// Autodata register
+static constexpr uint32_t ADATA_IN = 0x40;
+static constexpr uint32_t ADATA_EN = 0x80;
+static constexpr uint32_t ADATA_TARGET_ID = 0x07;
+
+// cmlen register
+static constexpr uint32_t CML_LENMASK = 0x0f;
+static constexpr uint32_t CML_AMSG_EN = 0x40;
+static constexpr uint32_t CML_ACOM_EN = 0x80;
+
+// init_status register
+static constexpr uint32_t INIT_STATUS_ACK = 0x40;
+
+// FIFOCTRL constants and functions
+// Based on the existence of CLREVEN/ODD, the fact that NetBSD only uses EVEN, and the max is 8
+// even though this is a 4 bit value, it seems likely that there are actually two FIFOs,
+// one in the even slots, and one in the odd slots
+static constexpr uint32_t FIFOC_FSLOT = 0x0f; // Free slots in FIFO, max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT)
+static constexpr uint32_t FIFOC_SSTKACT = 0x10;
+static constexpr uint32_t FIFOC_RQOVRN = 0x20;
+static constexpr uint32_t FIFOC_CLREVEN = 0x00;
+static constexpr uint32_t FIFOC_CLRODD = 0x40;
+static constexpr uint32_t FIFOC_FLUSH = 0x80;
+static constexpr uint32_t FIFOC_LOAD = 0xc0;
+
+// SPIFI commands
+enum PRCMD_COMMANDS : uint32_t
+{
+	PRC_DATAOUT = 0x0,
+	PRC_DATAIN = 0x1,
+	PRC_COMMAND = 0x2,
+	PRC_STATUS = 0x3,
+	PRC_TRPAD = 0x4,
+	PRC_MSGOUT = 0x6,
+	PRC_MSGIN = 0x7,
+	PRC_KILLREQ = 0x08,
+	PRC_CLRACK = 0x10,
+	PRC_NJMP = 0x80
+};
+
+static constexpr uint32_t PRCMD_MASK = 0x1f;
+static const std::string prcmd_command_names[9] = {"PRC_DATAOUT", "PRC_DATAIN", "PRC_COMMAND", "PRC_STATUS", "PRC_TRPAD", "UNKNOWN", "PRC_MSGOUT", "PRC_MSGIN", "PRC_KILLREQ"};
+
+// Helper functions
+inline uint32_t prcmd_to_spstat(uint32_t cmd)
+{
+	uint32_t spstat_val = 0;
+	switch (cmd)
+	{
+		case PRC_DATAIN:
+			spstat_val = SPS_DATAIN;
+			break;
+		case PRC_DATAOUT:
+			spstat_val = SPS_DATAOUT;
+			break;
+		case PRC_COMMAND:
+			spstat_val = SPS_COMMAND;
+			break;
+		case PRC_STATUS:
+			spstat_val = SPS_STATUS;
+			break;
+		case PRC_MSGOUT:
+			spstat_val = SPS_MSGOUT;
+			break;
+		case PRC_MSGIN:
+			spstat_val = SPS_MSGIN;
+			break;
+	}
+	return spstat_val;
+}
+
+inline void clear_queue(std::queue<uint32_t>& queue)
+{
+	while (!queue.empty())
+	{
+		queue.pop();
+	}
+}
+
 spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: nscsi_device(mconfig, SPIFI3, tag, owner, clock),
 	  nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
@@ -59,437 +174,37 @@ void spifi3_device::device_start()
 
 void spifi3_device::map(address_map &map)
 {
-	// Basic getters/setters
-	map(0x08, 0x0b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.cmdpage = 0x%x\n", spifi_reg.cmdpage);
-								   return spifi_reg.cmdpage;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.cmdpage = 0x%x\n", data);
-								   spifi_reg.cmdpage = data;
-							   }));
-	map(0x18, 0x1b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.svptr_hi = 0x%x\n", spifi_reg.svptr_hi);
-								   return spifi_reg.svptr_hi;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.svptr_hi = 0x%x\n", data);
-								   spifi_reg.svptr_hi = data;
-							   }));
-	map(0x1c, 0x1f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.svptr_mid = 0x%x\n", spifi_reg.svptr_mid);
-								   return spifi_reg.svptr_mid;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.svptr_mid = 0x%x\n", data);
-								   spifi_reg.svptr_mid = data;
-							   }));
-	map(0x20, 0x23).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.svptr_low = 0x%x\n", spifi_reg.svptr_low);
-								   return spifi_reg.svptr_low;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.svptr_low = 0x%x\n", data);
-								   spifi_reg.svptr_low = data;
-							   }));
-	map(0x28, 0x2b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.imask = 0x%x\n", spifi_reg.imask);
-								   return spifi_reg.imask;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.imask = 0x%x\n", data);
-								   spifi_reg.imask = data;
-							   }));
-	map(0x2c, 0x2f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.prctrl = 0x%x\n", spifi_reg.prctrl);
-								   return spifi_reg.prctrl;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.prctrl = 0x%x\n", data);
-								   spifi_reg.prctrl = data;
-							   }));
-	map(0x3c, 0x3f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.fifodata = 0x%x\n", spifi_reg.fifodata);
-								   return spifi_reg.fifodata;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.fifodata = 0x%x\n", data);
-								   spifi_reg.fifodata = data;
-							   }));
-	map(0x40, 0x43).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.config = 0x%x\n", spifi_reg.config);
-								   return spifi_reg.config;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.config = 0x%x\n", data);
-								   spifi_reg.config = data;
-							   }));
-	map(0x44, 0x47).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.data_xfer = 0x%x\n", spifi_reg.data_xfer);
-								   return spifi_reg.data_xfer;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.data_xfer = 0x%x\n", data);
-								   spifi_reg.data_xfer = data;
-							   }));
-	map(0x48, 0x4b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.autocmd = 0x%x\n", spifi_reg.autocmd);
-								   return spifi_reg.autocmd;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.autocmd = 0x%x\n", data);
-								   spifi_reg.autocmd = data;
-							   }));
-	map(0x50, 0x53).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.resel = 0x%x\n", spifi_reg.resel);
-								   return spifi_reg.resel;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.resel = 0x%x\n", data);
-								   spifi_reg.resel = data;
-							   }));
-	map(0x64, 0x67).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.loopctrl = 0x%x\n", spifi_reg.loopctrl);
-								   return spifi_reg.loopctrl;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.loopctrl = 0x%x\n", data);
-								   spifi_reg.loopctrl = data;
-							   }));
-	map(0x68, 0x6b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.loopdata = 0x%x\n", spifi_reg.loopdata);
-								   return spifi_reg.loopdata;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.loopdata = 0x%x\n", data);
-								   spifi_reg.loopdata = data;
-							   }));
-	map(0x6c, 0x6f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.identify = 0x%x\n", spifi_reg.identify);
-								   return spifi_reg.identify;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.identify = 0x%x\n", data);
-								   spifi_reg.identify = data;
-							   }));
-	map(0x70, 0x73).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.complete = 0x%x\n", spifi_reg.complete);
-								   return spifi_reg.complete;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.complete = 0x%x\n", data);
-								   spifi_reg.complete = data;
-							   }));
-	map(0x74, 0x77).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.scsi_status = 0x%x\n", spifi_reg.scsi_status);
-								   return spifi_reg.scsi_status;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.scsi_status = 0x%x\n", data);
-								   spifi_reg.scsi_status = data;
-							   }));
-	map(0x78, 0x7b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.data = 0x%x\n", spifi_reg.data);
-								   return spifi_reg.data;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.data = 0x%x\n", data);
-								   spifi_reg.data = data;
-							   }));
-	map(0x7c, 0x7f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.icond = 0x%x\n", spifi_reg.icond);
-								   return spifi_reg.icond;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.icond = 0x%x\n", data);
-								   spifi_reg.icond = data;
-							   }));
-	map(0x80, 0x83).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.fastwide = 0x%x\n", spifi_reg.fastwide);
-								   return spifi_reg.fastwide;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.fastwide = 0x%x\n", data);
-								   spifi_reg.fastwide = data;
-							   }));
-	map(0x84, 0x87).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.exctrl = 0x%x\n", spifi_reg.exctrl);
-								   return spifi_reg.exctrl;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.exctrl = 0x%x\n", data);
-								   spifi_reg.exctrl = data;
-							   }));
-	map(0x88, 0x8b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.exstat = 0x%x\n", spifi_reg.exstat);
-								   return spifi_reg.exstat;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.exstat = 0x%x\n", data);
-								   spifi_reg.exstat = data;
-							   }));
-	map(0x8c, 0x8f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.test = 0x%x\n", spifi_reg.test);
-								   return spifi_reg.test;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.test = 0x%x\n", data);
-								   spifi_reg.test = data;
-							   }));
-	map(0x90, 0x93).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.quematch = 0x%x\n", spifi_reg.quematch);
-								   return spifi_reg.quematch;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.quematch = 0x%x\n", data);
-								   spifi_reg.quematch = data;
-							   }));
-	map(0x94, 0x97).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.quecode = 0x%x\n", spifi_reg.quecode);
-								   return spifi_reg.quecode;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.quecode = 0x%x\n", data);
-								   spifi_reg.quecode = data;
-							   }));
-	map(0x98, 0x9b).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.quetag = 0x%x\n", spifi_reg.quetag);
-								   return spifi_reg.quetag;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.quetag = 0x%x\n", data);
-								   spifi_reg.quetag = data;
-							   }));
-	map(0x9c, 0x9f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.quepage = 0x%x\n", spifi_reg.quepage);
-								   return spifi_reg.quepage;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.quepage = 0x%x\n", data);
-								   spifi_reg.quepage = data;
-							   }));
-
-	// Registers with their own methods for accessing them
 	map(0x00, 0x03).r(FUNC(spifi3_device::spstat_r));
+	map(0x04, 0x07).rw(FUNC(spifi3_device::cmlen_r), FUNC(spifi3_device::cmlen_w));
+	map(0x08, 0x0b).rw(FUNC(spifi3_device::cmdpage_r), FUNC(spifi3_device::cmdpage_w));
+	map(0x0c, 0x17).rw(FUNC(spifi3_device::count_r), FUNC(spifi3_device::count_w));
+	// svptr
+	map(0x24, 0x27).rw(FUNC(spifi3_device::intr_r), FUNC(spifi3_device::intr_w));
+	map(0x28, 0x2b).rw(FUNC(spifi3_device::imask_r), FUNC(spifi3_device::imask_w));
+	// prctrl
 	map(0x30, 0x33).r(FUNC(spifi3_device::prstat_r));
 	map(0x34, 0x37).r(FUNC(spifi3_device::init_status_r));
 	map(0x38, 0x3b).rw(FUNC(spifi3_device::fifoctrl_r), FUNC(spifi3_device::fifoctrl_w));
-	map(0x54, 0x57).w(FUNC(spifi3_device::select_w));
-	map(0x54, 0x57).lr32(NAME([this]()
-							  {
-								  LOGMASKED(LOG_REGISTER, "read spifi_reg.select = 0x%x\n", spifi_reg.select);
-								  return spifi_reg.select;
-							  }));
-	map(0x58, 0x5b).rw(FUNC(spifi3_device::prcmd_r), FUNC(spifi3_device::prcmd_w));
+	// fifodata, config
+	map(0x44, 0x47).rw(FUNC(spifi3_device::data_xfer_r), FUNC(spifi3_device::data_xfer_w));
+	map(0x48, 0x4b).rw(FUNC(spifi3_device::autocmd_r), FUNC(spifi3_device::autocmd_w));
+	map(0x4c, 0x4f).rw(FUNC(spifi3_device::autostat_r), FUNC(spifi3_device::autostat_w));
+	// resel
+	map(0x54, 0x57).rw(FUNC(spifi3_device::select_r), FUNC(spifi3_device::select_w));
+	map(0x58, 0x5b).w(FUNC(spifi3_device::prcmd_w));
 	map(0x5c, 0x5f).rw(FUNC(spifi3_device::auxctrl_r), FUNC(spifi3_device::auxctrl_w));
-	map(0x60, 0x63).w(FUNC(spifi3_device::autodata_w));
-	map(0x60, 0x63).lr32(NAME([this]()
-							  {
-								  LOGMASKED(LOG_REGISTER, "read spifi_reg.autodata = 0x%x\n", spifi_reg.autodata);
-								  return spifi_reg.autodata;
-							  }));
+	map(0x60, 0x63).rw(FUNC(spifi3_device::autodata_r), FUNC(spifi3_device::autodata_w));
+	// loopctrl, loopdata
+	map(0x6c, 0x6f).rw(FUNC(spifi3_device::identify_r), FUNC(spifi3_device::identify_w));
+	// complete
+	map(0x74, 0x77).rw(FUNC(spifi3_device::scsi_status_r), FUNC(spifi3_device::scsi_status_w));
+	// data
+	map(0x7c, 0x7f).rw(FUNC(spifi3_device::icond_r), FUNC(spifi3_device::icond_w));
+	map(0x80, 0x83).rw(FUNC(spifi3_device::fastwide_r), FUNC(spifi3_device::fastwide_w));
+	map(0x84, 0x87).rw(FUNC(spifi3_device::exctrl_r), FUNC(spifi3_device::exctrl_w));
+	// exstat, test, quematch, quecode, quetag, quepage
 
-	// Everything else
-	map(0x04, 0x07).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.cmlen = 0x%x\n", spifi_reg.cmlen);
-								   return spifi_reg.cmlen;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.cmlen = 0x%x\n", data);
-								   spifi_reg.cmlen = data;
-
-								   // Not sure if this is where this is actually cleared.
-								   // Putting it here prevents NEWS-OS from trying to
-								   // transition to the DATAOUT phase too early when it sees
-								   // the CNTZERO condition flag
-								   spifi_reg.icond &= ~ICOND_CNTZERO;
-							   }));
-	map(0x0c, 0x0f).lrw32(NAME([this]()
-							   {
-								   uint8_t count_hi = (tcounter >> 16) & 0xff;
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.count_hi = 0x%x\n", count_hi);
-								   return count_hi;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.count_hi = 0x%x\n", data);
-								   spifi_reg.icond &= ~ICOND_CNTZERO;
-								   tcounter &= ~0xff0000;
-								   tcounter |= (data & 0xff) << 16;
-							   }));
-	map(0x10, 0x13).lrw32(NAME([this]()
-							   {
-								   uint8_t count_mid = (tcounter >> 8) & 0xff;
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.count_mid = 0x%x\n", count_mid);
-								   return count_mid;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.count_mid = 0x%x\n", data);
-								   spifi_reg.icond &= ~ICOND_CNTZERO;
-								   tcounter &= ~0xff00;
-								   tcounter |= (data & 0xff) << 8;
-							   }));
-
-	map(0x14, 0x17).lrw32(NAME([this]()
-							   {
-								   uint8_t count_lo = tcounter & 0xff;
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.count_low = 0x%x\n", count_lo);
-								   return count_lo;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.count_low = 0x%x\n", data);
-								   spifi_reg.icond &= ~ICOND_CNTZERO;
-								   tcounter &= ~0xff;
-								   tcounter |= data & 0xff;
-							   }));
-
-	map(0x24, 0x27).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.intr = 0x%x (%s)\n", spifi_reg.intr, machine().describe_context());
-								   return spifi_reg.intr;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.intr = 0x%x\n", data);
-								   spifi_reg.intr &= data;
-								   spifi_reg.icond = 0;
-								   check_irq();
-							   }));
-
-	// This is based on what the NEWS-OS kernel does with this register.
-	// NetBSD doesn't use this register the same way based on its source code.
-	map(0x4c, 0x4f).lrw32(NAME([this]()
-							   {
-								   LOGMASKED(LOG_REGISTER, "read spifi_reg.autostat = 0x%x\n", spifi_reg.autostat);
-								   return spifi_reg.autostat;
-							   }),
-						  NAME([this](uint32_t data)
-							   {
-								   LOGMASKED(LOG_REGISTER, "write spifi_reg.autostat = 0x%x\n", data);
-								   spifi_reg.autostat |= data;
-							   }));
-
-	// Map command buffer
 	map(0x200, 0x3ff).rw(FUNC(spifi3_device::cmd_buf_r), FUNC(spifi3_device::cmd_buf_w)).umask32(0xff);
-}
-
-uint8_t spifi3_device::cmd_buf_r(offs_t offset)
-{
-	// 8 slots in the buffer, 16 bytes each
-	// so, divide the offset by 16 (truncated) to get the cmd entry
-	const int cmd_entry = offset / 16;
-	uint8_t result = 0;
-	const int register_offset = offset % 16;
-	if (register_offset < 12)
-	{
-		result = spifi_reg.cmbuf[cmd_entry].cdb[register_offset];
-	}
-	else if (register_offset == 12)
-	{
-		result = spifi_reg.cmbuf[cmd_entry].quecode;
-	}
-	else if (register_offset == 13)
-	{
-		result = spifi_reg.cmbuf[cmd_entry].quetag;
-	}
-	else if (register_offset == 14)
-	{
-		result = spifi_reg.cmbuf[cmd_entry].idmsg;
-	}
-	else if (register_offset == 15)
-	{
-		result = spifi_reg.cmbuf[cmd_entry].status;
-	}
-
-	LOGMASKED(LOG_CMD, "cmd_buf_r(0x%x) -> 0x%x\n", offset, result);
-
-	return result;
-}
-
-void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
-{
-	LOGMASKED(LOG_CMD, "cmd_buf_w(0x%x, 0x%x)\n", offset, data);
-
-	// 8 slots in the buffer, 16 bytes each
-	// so, divide the offset by 16 (truncated) to get the cmd entry
-	const int cmd_entry = offset / 16;
-	const int register_offset = offset % 16;
-	if (register_offset < 12)
-	{
-		spifi_reg.cmbuf[cmd_entry].cdb[register_offset] = data;
-	}
-	else if (register_offset == 12)
-	{
-		spifi_reg.cmbuf[cmd_entry].quecode = data;
-	}
-	else if (register_offset == 13)
-	{
-		spifi_reg.cmbuf[cmd_entry].quetag = data;
-	}
-	else if (register_offset == 14)
-	{
-		spifi_reg.cmbuf[cmd_entry].idmsg = data;
-	}
-	else if (register_offset == 15)
-	{
-		spifi_reg.cmbuf[cmd_entry].status = data;
-	}
 }
 
 uint32_t spifi3_device::spstat_r()
@@ -499,42 +214,98 @@ uint32_t spifi3_device::spstat_r()
 	return spstat;
 }
 
-uint32_t spifi3_device::auxctrl_r()
+uint32_t spifi3_device::cmlen_r()
 {
-	LOGMASKED(LOG_REGISTER, "read spifi_reg.auxctrl = 0x%x\n", spifi_reg.auxctrl);
-	return spifi_reg.auxctrl;
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.cmlen = 0x%x\n", spifi_reg.cmlen);
+	return spifi_reg.cmlen;
 }
 
-void spifi3_device::auxctrl_w(uint32_t data)
+void spifi3_device::cmlen_w(uint32_t data)
 {
-	LOGMASKED(LOG_REGISTER, "write spifi_reg.auxctrl = 0x%x\n", data);
-	const auto prev_auxctrl = spifi_reg.auxctrl;
-	spifi_reg.auxctrl = data;
-	if (spifi_reg.auxctrl & AUXCTRL_SRST)
-	{
-		// TODO: reset of some kind
-		LOG("SRST asserted\n");
-	}
-	if (spifi_reg.auxctrl & AUXCTRL_CRST)
-	{
-		LOG("chip reset\n");
-		spifi_reg = {};
-		dma_dir = DMA_NONE;
-		tcounter = 0;
-		command_pos = 0;
-	}
-	if ((spifi_reg.auxctrl & AUXCTRL_SETRST) && !(prev_auxctrl & AUXCTRL_SETRST))
-	{
-		LOG("SETRST asserted - resetting SCSI bus\n");
-		state = BUSRESET_WAIT_INT;
-		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
-		delay(130);
-	}
-	if (spifi_reg.auxctrl & AUXCTRL_DMAEDGE)
-	{
-		// TODO: do we need to take action here?
-		LOG("DMAEDGE asserted\n");
-	}
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.cmlen = 0x%x\n", data);
+	spifi_reg.cmlen = data;
+
+	// Not sure if this is where this is actually cleared.
+	// Putting it here prevents NEWS-OS from trying to
+	// transition to the DATAOUT phase too early when it sees
+	// the CNTZERO condition flag
+	spifi_reg.icond &= ~ICOND_CNTZERO;
+}
+
+uint32_t spifi3_device::cmdpage_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.cmdpage = 0x%x\n", spifi_reg.cmdpage);
+	return spifi_reg.cmdpage;
+}
+
+void spifi3_device::cmdpage_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.cmdpage = 0x%x\n", data);
+	spifi_reg.cmdpage = data;
+}
+
+uint32_t spifi3_device::count_r(offs_t offset)
+{
+	const uint8_t count = (tcounter >> (8 * (2 - offset))) & 0xff;
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.count%d = 0x%x -> 0x%x\n", offset, tcounter, count);
+	return count;
+}
+
+void spifi3_device::count_w(offs_t offset, uint32_t data)
+{
+	spifi_reg.icond &= ~ICOND_CNTZERO;
+	tcounter &= ~(0xff << (8 * (2 - offset)));
+	tcounter |= (data & 0xff) << (8 * (2 - offset));
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.count%d = 0x%x -> 0x%x\n", offset, data, tcounter);
+}
+
+uint32_t spifi3_device::intr_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.intr = 0x%x (%s)\n", spifi_reg.intr, machine().describe_context());
+	return spifi_reg.intr;
+}
+
+void spifi3_device::intr_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.intr = 0x%x\n", data);
+	spifi_reg.intr &= data;
+	spifi_reg.icond = 0;
+	check_irq();
+}
+
+uint32_t spifi3_device::imask_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.imask = 0x%x\n", spifi_reg.imask);
+	return spifi_reg.imask;
+}
+
+void spifi3_device::imask_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.imask = 0x%x\n", data);
+	spifi_reg.imask = data;
+}
+
+uint32_t spifi3_device::prstat_r()
+{
+	auto ctrl = scsi_bus->ctrl_r();
+
+	// TODO: PRS_Z (disconnect state?)
+	uint32_t prstat = 0;
+	prstat |= (ctrl & S_ATN) ? PRS_ATN : 0;
+	prstat |= (ctrl & S_MSG) ? PRS_MSG : 0;
+	prstat |= (ctrl & S_CTL) ? PRS_CD : 0;
+	prstat |= (ctrl & S_INP) ? PRS_IO : 0;
+	spifi_reg.prstat = prstat; // Might be able to get rid of the register copy of this since we can compute it on demand.
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.prstat = 0x%x\n", prstat);
+	return prstat;
+}
+
+uint32_t spifi3_device::init_status_r()
+{
+	// NetBSD only lists this bit, but there is probably more in this register.
+	const auto init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.init_status = 0x%x\n", init_status);
+	return init_status;
 }
 
 uint32_t spifi3_device::fifoctrl_r()
@@ -580,10 +351,54 @@ void spifi3_device::fifoctrl_w(uint32_t data)
 	} // Load FIFO synchronously (only needed for SDTR mode?)
 }
 
-void spifi3_device::clear_fifo()
+uint32_t spifi3_device::data_xfer_r()
 {
-	clear_queue(m_even_fifo);
-	clear_queue(m_odd_fifo);
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.data_xfer = 0x%x\n", spifi_reg.data_xfer);
+	return spifi_reg.data_xfer;
+}
+
+void spifi3_device::data_xfer_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.data_xfer = 0x%x\n", data);
+	spifi_reg.data_xfer = data;
+}
+
+uint32_t spifi3_device::autocmd_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.autocmd = 0x%x\n", spifi_reg.autocmd);
+	return spifi_reg.autocmd;
+}
+
+void spifi3_device::autocmd_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.autocmd = 0x%x\n", data);
+	spifi_reg.autocmd = data;
+}
+
+uint32_t spifi3_device::autodata_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.autodata = 0x%x\n", spifi_reg.autodata);
+	return spifi_reg.autodata;
+}
+
+uint32_t spifi3_device::autostat_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.autostat = 0x%x\n", spifi_reg.autostat);
+	return spifi_reg.autostat;
+}
+
+void spifi3_device::autostat_w(uint32_t data)
+{
+	// This is based on what the NEWS-OS kernel does with this register.
+	// NetBSD doesn't use this register the same way based on its source code.
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.autostat = 0x%x\n", data);
+	spifi_reg.autostat |= data;
+}
+
+uint32_t spifi3_device::select_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.select = 0x%x\n", spifi_reg.select);
+	return spifi_reg.select;
 }
 
 void spifi3_device::select_w(uint32_t data)
@@ -603,6 +418,44 @@ void spifi3_device::select_w(uint32_t data)
 	}
 }
 
+uint32_t spifi3_device::auxctrl_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.auxctrl = 0x%x\n", spifi_reg.auxctrl);
+	return spifi_reg.auxctrl;
+}
+
+void spifi3_device::auxctrl_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.auxctrl = 0x%x\n", data);
+	const auto prev_auxctrl = spifi_reg.auxctrl;
+	spifi_reg.auxctrl = data;
+	if (spifi_reg.auxctrl & AUXCTRL_SRST)
+	{
+		// TODO: reset of some kind
+		LOG("SRST asserted\n");
+	}
+	if (spifi_reg.auxctrl & AUXCTRL_CRST)
+	{
+		LOG("chip reset\n");
+		spifi_reg = {};
+		dma_dir = DMA_NONE;
+		tcounter = 0;
+		command_pos = 0;
+	}
+	if ((spifi_reg.auxctrl & AUXCTRL_SETRST) && !(prev_auxctrl & AUXCTRL_SETRST))
+	{
+		LOG("SETRST asserted - resetting SCSI bus\n");
+		state = BUSRESET_WAIT_INT;
+		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
+		delay(130);
+	}
+	if (spifi_reg.auxctrl & AUXCTRL_DMAEDGE)
+	{
+		// TODO: do we need to take action here?
+		LOG("DMAEDGE asserted\n");
+	}
+}
+
 void spifi3_device::autodata_w(uint32_t data)
 {
 	LOGMASKED(LOG_REGISTER, "write spifi_reg.autodata = 0x%x\n", data);
@@ -614,31 +467,75 @@ void spifi3_device::autodata_w(uint32_t data)
 	}
 }
 
-uint32_t spifi3_device::prstat_r()
+uint32_t spifi3_device::identify_r()
 {
-	auto ctrl = scsi_bus->ctrl_r();
-
-	// TODO: PRS_Z (disconnect state?)
-	uint32_t prstat = 0;
-	prstat |= (ctrl & S_ATN) ? PRS_ATN : 0;
-	prstat |= (ctrl & S_MSG) ? PRS_MSG : 0;
-	prstat |= (ctrl & S_CTL) ? PRS_CD : 0;
-	prstat |= (ctrl & S_INP) ? PRS_IO : 0;
-	spifi_reg.prstat = prstat; // Might be able to get rid of the register copy of this since we can compute it on demand.
-	LOGMASKED(LOG_REGISTER, "read spifi_reg.prstat = 0x%x\n", prstat);
-	return prstat;
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.identify = 0x%x\n", spifi_reg.identify);
+	return spifi_reg.identify;
 }
 
-uint32_t spifi3_device::prcmd_r()
+void spifi3_device::identify_w(uint32_t data)
 {
-	LOGMASKED(LOG_REGISTER, "read spifi_reg.prcmd = 0x%x\n", spifi_reg.prcmd);
-	return spifi_reg.prcmd;
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.identify = 0x%x\n", data);
+	spifi_reg.identify = data;
+}
+
+uint32_t spifi3_device::scsi_status_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.scsi_status = 0x%x\n", spifi_reg.scsi_status);
+	return spifi_reg.scsi_status;
+}
+
+void spifi3_device::scsi_status_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.scsi_status = 0x%x\n", data);
+	spifi_reg.scsi_status = data;
+}
+
+uint32_t spifi3_device::icond_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.icond = 0x%x\n", spifi_reg.icond);
+	return spifi_reg.icond;
+}
+
+void spifi3_device::icond_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.icond = 0x%x\n", data);
+	spifi_reg.icond = data;
+}
+
+uint32_t spifi3_device::fastwide_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.fastwide = 0x%x\n", spifi_reg.fastwide);
+	return spifi_reg.fastwide;
+}
+
+void spifi3_device::fastwide_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.fastwide = 0x%x\n", data);
+	spifi_reg.fastwide = data;
+}
+
+uint32_t spifi3_device::exctrl_r()
+{
+	LOGMASKED(LOG_REGISTER, "read spifi_reg.exctrl = 0x%x\n", spifi_reg.exctrl);
+	return spifi_reg.exctrl;
+}
+
+void spifi3_device::exctrl_w(uint32_t data)
+{
+	LOGMASKED(LOG_REGISTER, "write spifi_reg.exctrl = 0x%x\n", data);
+	spifi_reg.exctrl = data;
+}
+
+void spifi3_device::clear_fifo()
+{
+	clear_queue(m_even_fifo);
+	clear_queue(m_odd_fifo);
 }
 
 void spifi3_device::prcmd_w(uint32_t data)
 {
 	LOGMASKED(LOG_REGISTER, "write spifi_reg.prcmd = 0x%x (%s)\n", data, machine().describe_context());
-	spifi_reg.prcmd = data;
 
 	// TODO: NJMP and other commands
 	const auto cmd = data & PRCMD_MASK;
@@ -710,12 +607,67 @@ void spifi3_device::prcmd_w(uint32_t data)
 	step(false);
 }
 
-uint32_t spifi3_device::init_status_r()
+uint8_t spifi3_device::cmd_buf_r(offs_t offset)
 {
-	// NetBSD only lists this bit, but there is probably more in this register.
-	const auto init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
-	LOGMASKED(LOG_REGISTER, "read spifi_reg.init_status = 0x%x\n", init_status);
-	return init_status;
+	// 8 slots in the buffer, 16 bytes each
+	// so, divide the offset by 16 (truncated) to get the cmd entry
+	const int cmd_entry = offset / 16;
+	uint8_t result = 0;
+	const int register_offset = offset % 16;
+	if (register_offset < 12)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].cdb[register_offset];
+	}
+	else if (register_offset == 12)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].quecode;
+	}
+	else if (register_offset == 13)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].quetag;
+	}
+	else if (register_offset == 14)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].idmsg;
+	}
+	else if (register_offset == 15)
+	{
+		result = spifi_reg.cmbuf[cmd_entry].status;
+	}
+
+	LOGMASKED(LOG_CMD, "cmd_buf_r(0x%x) -> 0x%x\n", offset, result);
+
+	return result;
+}
+
+void spifi3_device::cmd_buf_w(offs_t offset, uint8_t data)
+{
+	LOGMASKED(LOG_CMD, "cmd_buf_w(0x%x, 0x%x)\n", offset, data);
+
+	// 8 slots in the buffer, 16 bytes each
+	// so, divide the offset by 16 (truncated) to get the cmd entry
+	const int cmd_entry = offset / 16;
+	const int register_offset = offset % 16;
+	if (register_offset < 12)
+	{
+		spifi_reg.cmbuf[cmd_entry].cdb[register_offset] = data;
+	}
+	else if (register_offset == 12)
+	{
+		spifi_reg.cmbuf[cmd_entry].quecode = data;
+	}
+	else if (register_offset == 13)
+	{
+		spifi_reg.cmbuf[cmd_entry].quetag = data;
+	}
+	else if (register_offset == 14)
+	{
+		spifi_reg.cmbuf[cmd_entry].idmsg = data;
+	}
+	else if (register_offset == 15)
+	{
+		spifi_reg.cmbuf[cmd_entry].status = data;
+	}
 }
 
 void spifi3_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -833,7 +785,6 @@ void spifi3_device::function_bus_complete()
 
 	// TODO: Any ICOND changes needed here?
 	spifi_reg.intr |= INTR_FCOMP | INTR_BSRQ;
-	spifi_reg.prcmd = 0;
 	dma_set(DMA_NONE);
 	check_drq();
 	check_irq();
@@ -847,7 +798,6 @@ void spifi3_device::function_complete()
 
 	// TODO: Any ICOND changes needed here?
 	spifi_reg.intr |= INTR_FCOMP;
-	spifi_reg.prcmd = 0;
 	dma_set(DMA_NONE);
 	check_drq();
 	check_irq();
@@ -859,7 +809,6 @@ void spifi3_device::bus_complete()
 	state = IDLE;
 
 	spifi_reg.intr |= INTR_BSRQ;
-	spifi_reg.prcmd = 0;
 	dma_set(DMA_NONE);
 	check_drq();
 	check_irq();
@@ -929,7 +878,7 @@ void spifi3_device::dma_w(uint8_t val)
 uint8_t spifi3_device::dma_r()
 {
 	LOGMASKED(LOG_DATA, "dma_r called! Fifo count = %d, state = %d.%d, tcounter = %d\n", m_even_fifo.size(), state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, tcounter);
-	if(m_even_fifo.empty())
+	if (m_even_fifo.empty())
 	{
 		fatalerror("spifi_3::dma_r called with empty FIFO!");
 	}
@@ -953,7 +902,62 @@ void spifi3_device::scsi_ctrl_changed()
 	step(false);
 }
 
-void spifi3_device::start_autostat(int target_id)
+spifi3_device::dma_direction spifi3_device::dma_setting(int target_id)
+{
+	// TODO: LUN? That is also written to this register in NetBSD
+	//       (and probably NEWS-OS). Need to figure out how to get
+	//       a device with multiple LUNs to test to nail down this
+	//       logic.
+	dma_direction result = DMA_NONE;
+	if ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id)
+	{
+		result = (spifi_reg.autodata & ADATA_IN) ? DMA_IN :
+			DMA_OUT;
+	}
+	return result;
+}
+
+int spifi3_device::get_target_id()
+{
+	return (spifi_reg.select & SEL_TARGET) >> 4;
+}
+
+bool spifi3_device::autodata_active(int target_id)
+{
+	return (spifi_reg.autodata & ADATA_EN) && ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id);
+}
+
+bool spifi3_device::autodata_in(int target_id)
+{
+	return autodata_active(target_id) && (spifi_reg.autodata & ADATA_IN);
+}
+
+bool spifi3_device::autodata_out(int target_id)
+{
+	return autodata_active(target_id) && !(spifi_reg.autodata & ADATA_IN);
+}
+
+void spifi3_device::autostat_done(int target_id)
+{
+	spifi_reg.autostat &= ~(1 << target_id);
+}
+
+bool spifi3_device::autostat_active(int target_id)
+{
+	return spifi_reg.autostat & (1 << target_id);
+}
+
+bool spifi3_device::automsg_active()
+{
+	return spifi_reg.cmlen & CML_AMSG_EN;
+}
+
+bool spifi3_device::autocmd_active()
+{
+	return spifi_reg.cmlen & CML_ACOM_EN;
+}
+
+void spifi3_device::start_autostat()
 {
 	LOGMASKED(LOG_AUTO, "start AUTOSTAT\n");
 	state = INIT_XFR;
@@ -1014,7 +1018,7 @@ void spifi3_device::auto_phase_transfer(int new_phase)
 	}
 	else if (new_phase == S_PHASE_STATUS && autostat_active(bus_id))
 	{
-		start_autostat(bus_id);
+		start_autostat();
 	}
 	else if ((new_phase == S_PHASE_MSG_IN || new_phase == S_PHASE_MSG_OUT) && automsg_active())
 	{

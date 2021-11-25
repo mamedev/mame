@@ -77,6 +77,8 @@ private:
 	uint8_t clock_conv = 2; // TODO: appropriate value for SPIFI
 	emu_timer *tm;
 	int bus_id;
+	std::queue<uint32_t> m_even_fifo;
+	std::queue<uint32_t> m_odd_fifo;
 
 	// I/O ports
 	devcb_write_line m_irq_handler;
@@ -186,13 +188,15 @@ private:
 		DMA_IN,
 		DMA_OUT
 	};
+
+	dma_direction dma_dir;
+
 	static inline bool dma_command(dma_direction current_direction)
 	{
 		return current_direction != DMA_NONE;
 	}
-	dma_direction dma_dir;
 
-	// State-related functions
+	// State-related methods
 	void step(bool timeout);
 	void check_irq();
 	void check_drq();
@@ -210,186 +214,65 @@ private:
 	void arbitrate();
 	void clear_fifo();
 	void auto_phase_transfer(int new_phase);
+	void start_autodata(int data_phase);
+	void start_autostat();
+	void start_automsg(int msg_phase);
+	void start_autocmd();
+	dma_direction dma_setting(int target_id);
 
-	// AUXCTRL constants and functions
-	const uint32_t AUXCTRL_DMAEDGE = 0x04;
-	const uint32_t AUXCTRL_SETRST = 0x20;
-	const uint32_t AUXCTRL_CRST = 0x40;
-	const uint32_t AUXCTRL_SRST = 0x80;
-	uint32_t auxctrl_r();
-	void auxctrl_w(uint32_t data);
+	// Register processing methods
+	int get_target_id();
+	bool autodata_active(int target_id);
+	bool autodata_in(int target_id);
+	bool autodata_out(int target_id);
+	void autostat_done(int target_id);
+	bool autostat_active(int target_id);
+	bool automsg_active();
+	bool autocmd_active();
 
-	// FIFOCTRL constants and functions
-	// Based on the existence of CLREVEN/ODD, the fact that NetBSD only uses EVEN, and the max is 8
-	// even though this is a 4 bit value, it seems likely that there are actually two FIFOs,
-	// one in the even slots, and one in the odd slots
-	const uint32_t FIFOC_FSLOT = 0x0f; // Free slots in FIFO, max 8. Free slots = 8 - (FIFOCTRL & FIFOC_FSLOT)
-	const uint32_t FIFOC_SSTKACT = 0x10;
-	const uint32_t FIFOC_RQOVRN = 0x20;
-	const uint32_t FIFOC_CLREVEN = 0x00;
-	const uint32_t FIFOC_CLRODD = 0x40;
-	const uint32_t FIFOC_FLUSH = 0x80;
-	const uint32_t FIFOC_LOAD = 0xc0;
+	// Register accessors
+	uint32_t spstat_r();
+	uint32_t cmlen_r();
+	void cmlen_w(uint32_t data);
+	uint32_t cmdpage_r();
+	void cmdpage_w(uint32_t data);
+	uint32_t count_r(offs_t offset);
+	void count_w(offs_t offset, uint32_t data);
+	uint32_t intr_r();
+	void intr_w(uint32_t data);
+	uint32_t imask_r();
+	void imask_w(uint32_t data);
+	uint32_t prstat_r();
+	uint32_t init_status_r();
 	uint32_t fifoctrl_r();
 	void fifoctrl_w(uint32_t data);
-	std::queue<uint32_t> m_even_fifo;
-	std::queue<uint32_t> m_odd_fifo;
-	void clear_queue(std::queue<uint32_t>& queue)
-	{
-		while (!queue.empty())
-		{
-			queue.pop();
-		}
-	}
-
-	// spstat - not fully implemented yet
-	const uint32_t SPS_IDLE = 0x00;
-	const uint32_t SPS_MSGOUT = 0x04;
-	const uint32_t SPS_COMMAND = 0x05;
-	const uint32_t SPS_INTR = 0x08;
-	const uint32_t SPS_STATUS = 0x0c;
-	const uint32_t SPS_MSGIN = 0x0d;
-	const uint32_t SPS_DATAOUT = 0x0e;
-	const uint32_t SPS_DATAIN = 0x0f;
-	uint32_t spstat_r();
-	uint32_t prcmd_to_spstat(uint32_t cmd)
-	{
-		uint32_t spstat_val = 0;
-		switch (cmd)
-		{
-			case PRC_DATAIN:
-				spstat_val = SPS_DATAIN;
-				break;
-			case PRC_DATAOUT:
-				spstat_val = SPS_DATAOUT;
-				break;
-			case PRC_COMMAND:
-				spstat_val = SPS_COMMAND;
-				break;
-			case PRC_STATUS:
-				spstat_val = SPS_STATUS;
-				break;
-			case PRC_MSGOUT:
-				spstat_val = SPS_MSGOUT;
-				break;
-			case PRC_MSGIN:
-				spstat_val = SPS_MSGIN;
-				break;
-		}
-		return spstat_val;
-	}
-
-	// prstat - PRS_Z not implemented yet
-	const uint32_t PRS_IO = 0x08;
-	const uint32_t PRS_CD = 0x10;
-	const uint32_t PRS_MSG = 0x20;
-	const uint32_t PRS_ATN = 0x40;
-	uint32_t prstat_r();
-
-	// Interrupt status register - Not all interrupts implemented yet
-	const uint32_t INTR_BSRQ = 0x01;
-	const uint32_t INTR_TIMEO = 0x08;
-	const uint32_t INTR_FCOMP = 0x80;
-
-	// Interrupt condition register - Not all interrupts implemented yet
-	const uint32_t ICOND_CNTZERO = 0x40;
-	const uint32_t ICOND_UXPHASEZ = 0x80;
-
-	// Select register - SETATN and IRESELEN not implemented yet
-	const uint32_t SEL_ISTART = 0x08;
-	const uint32_t SEL_WATN = 0x80;
-	const uint32_t SEL_TARGET = 0x70;
+	uint32_t data_xfer_r();
+	void data_xfer_w(uint32_t data);
+	uint32_t autocmd_r();
+	void autocmd_w(uint32_t data);
+	uint32_t autostat_r();
+	void autostat_w(uint32_t data);
+	uint32_t select_r();
 	void select_w(uint32_t data);
-	int get_target_id()
-	{
-		return (spifi_reg.select & SEL_TARGET) >> 4;
-	}
-
-	// Autodata register
-	const uint32_t ADATA_IN = 0x40;
-	const uint32_t ADATA_EN = 0x80;
-	const uint32_t ADATA_TARGET_ID = 0x07;
-	void autodata_w(uint32_t data);
-	void start_autodata(int data_phase);
-	bool autodata_active(int target_id)
-	{
-		return (spifi_reg.autodata & ADATA_EN) && ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id);
-	}
-	bool autodata_in(int target_id)
-	{
-		return autodata_active(target_id) && (spifi_reg.autodata & ADATA_IN);
-	}
-	bool autodata_out(int target_id)
-	{
-		return autodata_active(target_id) && !(spifi_reg.autodata & ADATA_IN);
-	}
-	dma_direction dma_setting(int target_id)
-	{
-		// TODO: LUN? That is also written to this register in NetBSD
-		//       (and probably NEWS-OS). Need to figure out how to get
-		//       a device with multiple LUNs to test to nail down this
-		//       logic.
-		dma_direction result = DMA_NONE;
-		if ((spifi_reg.autodata & ADATA_TARGET_ID) == target_id)
-		{
-			result = (spifi_reg.autodata & ADATA_IN) ? DMA_IN :
-				DMA_OUT;
-		}
-		return result;
-	}
-
-	// Autostat register
-	void autostat_done(int target_id)
-	{
-		spifi_reg.autostat &= ~(1 << target_id);
-	}
-	bool autostat_active(int target_id)
-	{
-		return spifi_reg.autostat & (1 << target_id);
-	}
-	void start_autostat(int target_id);
-
-	// prcmd
-	enum PRCMD_COMMANDS : uint32_t
-	{
-		PRC_DATAOUT = 0x0,
-		PRC_DATAIN = 0x1,
-		PRC_COMMAND = 0x2,
-		PRC_STATUS = 0x3,
-		PRC_TRPAD = 0x4,
-		PRC_MSGOUT = 0x6,
-		PRC_MSGIN = 0x7,
-		PRC_KILLREQ = 0x08,
-		PRC_CLRACK = 0x10,
-		PRC_NJMP = 0x80
-	};
-	const uint32_t PRCMD_MASK = 0x1f;
-	const std::string prcmd_command_names[9] = {"PRC_DATAOUT", "PRC_DATAIN", "PRC_COMMAND", "PRC_STATUS", "PRC_TRPAD", "UNKNOWN", "PRC_MSGOUT", "PRC_MSGIN", "PRC_KILLREQ"};
-	uint32_t prcmd_r();
 	void prcmd_w(uint32_t data);
+	uint32_t auxctrl_r();
+	void auxctrl_w(uint32_t data);
+	uint32_t autodata_r();
+	void autodata_w(uint32_t data);
+	uint32_t identify_r();
+	void identify_w(uint32_t data);
+	uint32_t scsi_status_r();
+	void scsi_status_w(uint32_t data);
+	uint32_t icond_r();
+	void icond_w(uint32_t data);
+	uint32_t fastwide_r();
+	void fastwide_w(uint32_t data);
+	uint32_t exctrl_r();
+	void exctrl_w(uint32_t data);
 
-	// Command buffer constants and functions
+	// Command buffer accessors
 	uint8_t cmd_buf_r(offs_t offset);
 	void cmd_buf_w(offs_t offset, uint8_t data);
-
-	// cmlen register
-	const uint32_t CML_LENMASK = 0x0f;
-	const uint32_t CML_AMSG_EN = 0x40;
-	const uint32_t CML_ACOM_EN = 0x80;
-	bool automsg_active()
-	{
-		return spifi_reg.cmlen & CML_AMSG_EN;
-	}
-	void start_automsg(int msg_phase);
-	bool autocmd_active()
-	{
-		return spifi_reg.cmlen & CML_ACOM_EN;
-	}
-	void start_autocmd();
-
-	// init_status
-	uint32_t init_status_r();
-	const uint32_t INIT_STATUS_ACK = 0x40;
 
 	struct spifi_cmd_entry
 	{
@@ -431,7 +314,7 @@ private:
 
 		uint32_t resel = 0;
 		uint32_t select = 0;
-		uint32_t prcmd = 0;
+		// prcmd, which is used to trigger commands
 		uint32_t auxctrl = 0;
 
 		uint32_t autodata = 0;
@@ -440,9 +323,7 @@ private:
 		uint32_t identify = 0;
 
 		uint32_t complete = 0;
-
-		// MROM reads this to check if the SPIFI is alive at system boot, so the WO description from NetBSD might be wrong.
-		uint32_t scsi_status = 0x1;
+		uint32_t scsi_status = 0x1; // Must be 0x1 for SPIFI to be recognized at boot
 		uint32_t data = 0;
 		uint32_t icond = 0;
 
