@@ -57,7 +57,6 @@ private:
 	void audio_mem_map(address_map &map);
 	void audio_io_map(address_map &map);
 
-	u8 m_out_offs = 0;
 	u8 m_sndcmd = 0xff;
 	u8 m_io[32]{};
 	virtual void machine_reset() override;
