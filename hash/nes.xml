@@ -78820,6 +78820,23 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="awinner" supported="partial"> <!-- Controls other than play and next track don't work. -->
+		<description>A Winner is You</description>
+		<year>2016</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="RET-WY-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="dpcmcart" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="67108864">
+				<rom name="a winner is you (sergio elisondo) (2016).prg" size="67108864" crc="7dcbded6" sha1="e44b5d14c4c24dfcd41eb15f0b5c218e585235bd" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Multicarts using homebrew mapper #28. These have their origin in NESDev competitions. The following roms are freely available digital releases. They need to be checked against commercial physical carts. -->
 
@@ -79432,13 +79449,13 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fk23ca" />
+			<feature name="slot" value="fk23ca" /> <!-- FIXME: really is unsupported mapper 176, submapper 2 -->
 			<feature name="pcb" value="BMC-FK23CA" />
 			<dataarea name="prg" size="16777216">
 				<rom name="he jin zhuang bei 150-in-1 real game (unl)[u].prg" size="16777216" crc="d14617d7" sha1="5052b5566d2dc7840464bcf6668b1905669e2aec" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -79958,13 +79975,13 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fk23ca" />
+			<feature name="slot" value="fk23ca" /> <!-- FIXME: really is unsupported mapper 176, submapper 2 -->
 			<feature name="pcb" value="BMC-FK23CA" />
 			<dataarea name="prg" size="16777216">
 				<rom name="23 plus 222-in-1 (unl)[u].prg" size="16777216" crc="e79f157e" sha1="63b37851ee0716472d20e2f27b3f708dfc16a8af" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -81314,6 +81331,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_400rg" supported="no">
+		<description>400 in 1 Real Game</description>
+		<year>201?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="fk23ca" /> <!-- FIXME: really is unsupported mapper 176, submapper 2 -->
+			<dataarea name="prg" size="67108864">
+				<rom name="400-in-1 (200-in-1 real game x2).prg" size="67108864" crc="3ae35ec1" sha1="e77f527dababdc9bc9ee558f6d40a4d4c756f9f9" status="baddump" />
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
@@ -84302,6 +84334,25 @@ that the real dumps might surface -->
 
 <!-- TODO: looks like these were put at the end of the list to be sorted later. Move to regular multicart subsection? -->
 
+	<software name="mc_bb500" supported="partial"> <!-- Soft reset is not working. -->
+		<description>Bully Boy 500 in 1</description>
+		<year>201?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="33554432">
+				<rom name="500-in-1 (bully boy) (unl).prg" size="33554432" crc="24131e3d" sha1="b8f0405feed3d093e2ea524e74902f43973cafc3" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_cb198" supported="partial">
 		<description>CoolBoy 198 in 1</description>
 		<year>201?</year>
@@ -84353,23 +84404,6 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-<!-- Is this a bad dump? Wrong mapper? -->
-	<software name="mc_cb203" supported="no">
-		<description>Coolboy RS-17 (203 in 1)</description>
-		<year>201?</year>
-		<publisher>CoolBoy</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smd133" />
-			<feature name="pcb" value="COOLBOY" />
-			<feature name="smd133-addr" value="6K" />
-			<dataarea name="prg" size="4194304">
-				<rom name="s25fl032.bin" size="4194304" crc="33c4e67b" sha1="5787db4c8ce4c2569a5f9e9054cbb1944c1b3092" offset="00000" />
-			</dataarea>
-			<dataarea name="vram" size="131072">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mc_g450" supported="partial">
 		<description>Game 450 in 1</description>
 		<year>201?</year>
@@ -84406,8 +84440,8 @@ that the real dumps might surface -->
 
 	<software name="mc_pg150" supported="partial">
 		<description>Pocket Games 150 in 1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2015</year>
+		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
@@ -84417,6 +84451,30 @@ that the real dumps might surface -->
 			</dataarea>
 			<!-- 256k VRAM on cartridge -->
 			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_pg150a" cloneof="mc_pg150" supported="partial">
+		<description>Pocket Games 150 in 1 (Mario boot screen)</description>
+		<year>2015</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="33554432">
+				<rom name="pocketgames 150-in-1 (mario version)(coolboy).prg" size="33554432" crc="41d23e8f" sha1="c8dceebb17baa65ed711ff4799f0ea52faf166b6" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
