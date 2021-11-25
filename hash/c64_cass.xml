@@ -953,34 +953,34 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<publisher>Domark</publisher>
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="582692">
 				<rom name="APB_Side_1.tap" size="582692" crc="6bd55d0f" sha1="54cadbb25e03ce82eeba4fd5a46db21f6236c9fb"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="591896">
 				<rom name="APB_Side_2.tap" size="591896" crc="2405c53d" sha1="2a8f9757d7c38462314aada36598f8b0c802c0a0"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="apba" cloneof="apb" supported="no"> <!-- tape loads but doesn't run (remains stuck showing black screen) -->
+	<software name="apba" cloneof="apb">
 		<description>APB (alt)</description>
 		<year>1989</year>
 		<publisher>Domark</publisher>
 
 		<part name="cass1" interface="cbm_cass">
-			<feature name="part_id" value="Side A"/>
+			<feature name="part_id" value="Side 1"/>
 			<dataarea name="cass" size="582695">
 				<rom name="APB_Side_1 (alt).tap" size="582695" crc="5feeaf42" sha1="adfe6390e092435638cb397d5b080b87c9e24b45"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="cbm_cass">
-			<feature name="part_id" value="Side B"/>
+			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="591908">
 				<rom name="APB_Side_2 (alt).tap" size="591908" crc="6d6b5ea1" sha1="7cbd62ddb837e401722978c0e9b301e71d9ddecb"/>
 			</dataarea>
@@ -5152,10 +5152,11 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="flintstn" supported="no"> <!-- game loads but doesn't run (just displays a light blue screen) -->
+	<software name="flintstn">
 		<description>The Flintstones</description>
 		<year>1989</year>
 		<publisher>Grandslam</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="614404">
@@ -5895,10 +5896,11 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="ghostbsta" cloneof="ghostbst" supported="no"> <!-- game loads fully but crashes with a blue screen as soon as it runs -->
+	<software name="ghostbsta" cloneof="ghostbst">
 		<description>Ghostbusters (Activision)</description>
 		<year>1984</year>
 		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="467682">
@@ -6437,10 +6439,11 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="gberet" supported="no"> <!-- game loads but doesn't run (just displays a black screen) -->
+	<software name="gberet">
 		<description>Green Beret</description>
 		<year>1986</year>
 		<publisher>Imagine</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="724171">
