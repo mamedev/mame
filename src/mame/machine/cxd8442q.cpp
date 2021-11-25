@@ -59,11 +59,11 @@ void cxd8442q_device::map(address_map &map)
 		int channel_base = FIFO_REGION_OFFSET * channel; // start of a channel's registers
 
 		map(channel_base + 0x00, channel_base + 0x03).lrw32(NAME(([this, channel]()
-																  { return fifo_channels[channel].mask; })),
+																  { return fifo_channels[channel].fifo_size; })),
 															NAME(([this, channel](uint32_t data)
 																  {
-																	  LOG("FIFO CH%d: Setting mask to 0x%x\n", channel, data);
-																	  fifo_channels[channel].mask = data;
+																	  LOG("FIFO CH%d: Setting fifo_size to 0x%x\n", channel, data);
+																	  fifo_channels[channel].fifo_size = data;
 																  })));
 
 		map(channel_base + 0x04, channel_base + 0x07).lrw32(NAME(([this, channel]()
@@ -137,6 +137,11 @@ void cxd8442q_device::device_start()
 	fifo_ram = std::make_unique<uint32_t[]>(FIFO_MAX_RAM_SIZE);
 	save_pointer(NAME(fifo_ram), FIFO_MAX_RAM_SIZE);
 	fifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cxd8442q_device::fifo_dma_execute), this));
+
+	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
+	{
+		fifo_channels[channel].resolve_callbacks();
+	}
 }
 
 void cxd8442q_device::device_reset()
@@ -181,18 +186,33 @@ TIMER_CALLBACK_MEMBER(cxd8442q_device::fifo_dma_execute)
 	}
 }
 
-bool apfifo_channel::dma_cycle()
+void cxd8442q_device::irq_check()
+{
+	bool irq_state = false;
+	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
+	{
+		apfifo_channel &this_channel = fifo_channels[channel];
+		auto mask = this_channel.intctrl & 0x1;
+		if (this_channel.intstat & mask)
+		{
+			irq_state = true;
+		}
+	}
+	out_irq(irq_state);
+}
+
+bool cxd8442q_device::apfifo_channel::dma_cycle()
 {
 	// TODO: Error handling (FIFO overrun, etc) - for now it will send stale data or overwrite fresh data in those cases
 	bool stay_active = true;
-	if (dma_r_callback != nullptr && (dma_mode & (DMA_DIRECTION | DMA_EN)) == DMA_EN)
+	if ((dma_mode & (DMA_DIRECTION | DMA_EN)) == DMA_EN)
 	{
 		// Grab our next chunk of data (might just be a byte, needs more investigation)
 		fifo_device.fifo_ram[address + fifo_w_position] = dma_r_callback();
 		++count;
 
 		// Increment and check if we need to wrap around
-		if (++fifo_w_position > mask)
+		if (++fifo_w_position > fifo_size)
 		{
 			fifo_w_position = 0;
 		}
@@ -203,14 +223,14 @@ bool apfifo_channel::dma_cycle()
 		intstat = 0x1;
 		fifo_device.irq_check();
 	}
-	else if ((dma_w_callback != nullptr) && (count > 0) && ((dma_mode & (DMA_DIRECTION | DMA_EN)) == (DMA_DIRECTION | DMA_EN)))
+	else if ((count > 0) && ((dma_mode & (DMA_DIRECTION | DMA_EN)) == (DMA_DIRECTION | DMA_EN)))
 	{
 		// Move our next chunk of data from memory to the device
 		dma_w_callback(fifo_device.fifo_ram[address + fifo_r_position]);
 		--count;
 
 		// Decrement and check if we need to wrap around
-		if (++fifo_r_position > mask)
+		if (++fifo_r_position > fifo_size)
 		{
 			fifo_r_position = 0;
 		}
@@ -227,22 +247,7 @@ bool apfifo_channel::dma_cycle()
 	return stay_active;
 }
 
-void cxd8442q_device::irq_check()
-{
-	bool irq_state = false;
-	for (int channel = 0; channel < FIFO_CH_TOTAL; ++channel)
-	{
-		apfifo_channel &this_channel = fifo_channels[channel];
-		auto mask = this_channel.intctrl & 0x1;
-		if (this_channel.intstat & mask)
-		{
-			irq_state = true;
-		}
-	}
-	out_irq(irq_state);
-}
-
-uint32_t apfifo_channel::read_data_from_fifo()
+uint32_t cxd8442q_device::apfifo_channel::read_data_from_fifo()
 {
 	// read data out of RAM at the current read position (relative to the start address)
 	uint32_t value = fifo_device.fifo_ram[address + fifo_r_position];
@@ -259,7 +264,7 @@ uint32_t apfifo_channel::read_data_from_fifo()
 	fifo_device.irq_check();
 
 	// Increment and check if we need to wrap around
-	if (++fifo_r_position > mask)
+	if (++fifo_r_position > fifo_size)
 	{
 		fifo_r_position = 0;
 	}
@@ -271,19 +276,19 @@ uint32_t apfifo_channel::read_data_from_fifo()
 	return (value << 24) | (value << 16) | (value << 8) | value;
 }
 
-void apfifo_channel::write_data_to_fifo(uint32_t data)
+void cxd8442q_device::apfifo_channel::write_data_to_fifo(uint32_t data)
 {
 	fifo_device.fifo_ram[address + fifo_w_position] = data;
 	++count;
 
 	// Increment and check if we need to wrap around
-	if (++fifo_w_position > mask)
+	if (++fifo_w_position > fifo_size)
 	{
 		fifo_w_position = 0;
 	}
 }
 
-void apfifo_channel::drq_w(int state)
+void cxd8442q_device::apfifo_channel::drq_w(int state)
 {
 	drq = state != 0;
 	fifo_device.fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(DMA_TIMER));

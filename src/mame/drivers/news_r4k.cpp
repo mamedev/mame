@@ -356,8 +356,8 @@ protected:
 	uint64_t front_panel_r(offs_t offset);
 
 	// Constants
-	static constexpr uint32_t ICACHE_SIZE = 16384;
-	static constexpr uint32_t DCACHE_SIZE = 16384;
+	static constexpr uint32_t ICACHE_SIZE = 0x4000;
+	static constexpr uint32_t DCACHE_SIZE = 0x4000;
 	static constexpr uint32_t SCACHE_SIZE = 0x100000;
 	static constexpr int FREERUN_FREQUENCY = 1000000; // Hz
 	static constexpr int TIMER0_FREQUENCY = 100;      // Hz
@@ -464,9 +464,9 @@ void news_r4k_state::machine_common(machine_config &config)
 									{ m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH2>(!status); });
 	m_escc->out_wreqa_callback().set([this](int status)
 									 { m_fifo1->drq_w<cxd8442q_device::fifo_channel_number::CH3>(!status); });
-	m_fifo1->bind_dma_w<cxd8442q_device::fifo_channel_number::CH2>([this](uint32_t data)
+	m_fifo1->dma_w_cb<cxd8442q_device::fifo_channel_number::CH2>().set([this](uint32_t data)
 																   { m_escc->da_w(0, data); });
-	m_fifo1->bind_dma_r<cxd8442q_device::fifo_channel_number::CH3>([this]()
+	m_fifo1->dma_r_cb<cxd8442q_device::fifo_channel_number::CH3>().set([this]()
 																   { return m_escc->da_r(0); });
 	m_fifo1->out_int_callback().set([this](int status)
 									{
@@ -506,7 +506,7 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(news_r4k_state::irq_w<irq0_number::FDC>));
 	m_fdc->drq_wr_callback().set([this](int status)
 								 { m_fifo0->drq_w<cxd8442q_device::fifo_channel_number::CH2>(status); });
-	m_fifo0->bind_dma_r<cxd8442q_device::fifo_channel_number::CH2>([this]()
+	m_fifo0->dma_r_cb<cxd8442q_device::fifo_channel_number::CH2>().set([this]()
 																   { return (uint32_t)(m_fdc->dma_r()); });
 
 	DMAC3(config, m_dmac, 0);
