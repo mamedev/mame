@@ -26,9 +26,25 @@
 
 #include "emu.h"
 #include "cxd8442q.h"
+
+#define VERBOSE 1
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(CXD8442Q, cxd8442q_device, "cxd8442q", "Sony CXD8442Q WSC-FIFOQ")
+
+// Various constants
+// 128KiB used as the FIFO RAM (can be divided up to 4 regions, 1 per channel)
+static constexpr int FIFO_MAX_RAM_SIZE = 0x20000;
+
+// offset from one channel to the next
+static constexpr int FIFO_REGION_OFFSET = 0x10000;
+
+// offset from the channel 0 control register to the RAM
+static constexpr int FIFO_RAM_OFFSET = 0x80000;
+
+// DMA update timer rate
+// TODO: figure out the real clock rate for this
+static constexpr int DMA_TIMER = 1;
 
 cxd8442q_device::cxd8442q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) 
 	: device_t(mconfig, CXD8442Q, tag, owner, clock), out_irq(*this),
@@ -272,5 +288,5 @@ void apfifo_channel::write_data_to_fifo(uint32_t data)
 void apfifo_channel::drq_w(int state)
 {
 	drq = state != 0;
-	fifo_device.fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(fifo_device.DMA_TIMER));
+	fifo_device.fifo_timer->adjust(attotime::zero, 0, attotime::from_usec(DMA_TIMER));
 }

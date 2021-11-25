@@ -21,8 +21,8 @@ class apfifo_channel
 public:
 	apfifo_channel(cxd8442q_device &fifo_device) : fifo_device(fifo_device) {}
 
-	static const int DMA_EN = 0x1;
-	static const int DMA_DIRECTION = 0x2; // 1 = out, 0 = in
+	static constexpr int DMA_EN = 0x1;
+	static constexpr int DMA_DIRECTION = 0x2; // 1 = out, 0 = in
 
 	// Mask = total bytes avaliable for use by this channel
 	uint32_t mask = 0;
@@ -111,18 +111,6 @@ public:
 		CH3 = 3
 	};
 
-	// Each FIFO chip has 4 channels
-	static const int FIFO_CH_TOTAL = 4;
-
-	// 128KiB used as the FIFO RAM (can be divided up to 4 regions, 1 per channel)
-	static const int FIFO_MAX_RAM_SIZE = 0x20000;
-
-	// offset from one channel to the next
-	static const int FIFO_REGION_OFFSET = 0x10000;
-
-	// offset from the channel 0 control register to the RAM
-	static const int FIFO_RAM_OFFSET = 0x80000;
-
 	// DMA emulation
 	template <fifo_channel_number ChannelNumber>
 	void drq_w(int state) { fifo_channels[ChannelNumber].drq_w(state); };
@@ -132,11 +120,8 @@ public:
 	void bind_dma_w(std::function<void(uint32_t)> dma_w) { fifo_channels[ChannelNumber].set_dma_w_callback(dma_w); };
 
 protected:
-	// FIFO RAM
 	std::unique_ptr<uint32_t[]> fifo_ram;
 
-	// TODO: figure out the real clock rate for this
-	static const int DMA_TIMER = 1;
 	emu_timer *fifo_timer;
 	TIMER_CALLBACK_MEMBER(fifo_dma_execute);
 
@@ -150,6 +135,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
+	static constexpr int FIFO_CH_TOTAL = 4;
 	apfifo_channel fifo_channels[FIFO_CH_TOTAL];
 	friend class apfifo_channel;
 };
