@@ -84404,23 +84404,6 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-<!-- FIXME: this seems to be a handheld game unit and according to Haze it appears to belong in st2302u_bbl_spi.cpp -->
-	<software name="mc_cb203" supported="no">
-		<description>Coolboy RS-17 (203 in 1)</description>
-		<year>201?</year>
-		<publisher>CoolBoy</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="smd133" />
-			<feature name="pcb" value="COOLBOY" />
-			<feature name="smd133-addr" value="6K" />
-			<dataarea name="prg" size="4194304">
-				<rom name="s25fl032.bin" size="4194304" crc="33c4e67b" sha1="5787db4c8ce4c2569a5f9e9054cbb1944c1b3092" offset="00000" />
-			</dataarea>
-			<dataarea name="vram" size="131072">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mc_g450" supported="partial">
 		<description>Game 450 in 1</description>
 		<year>201?</year>
