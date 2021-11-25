@@ -15,8 +15,6 @@
 #include "cpu/arm7/arm7core.h"
 #include "screen.h"
 
-#include "coreutil.h"
-
 #include <algorithm>
 
 

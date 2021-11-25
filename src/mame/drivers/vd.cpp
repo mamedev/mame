@@ -2,15 +2,23 @@
 // copyright-holders:Robbbert
 /**************************************************************************************
 
-    PINBALL
-    Video Dens S.A., Madrid
+PINBALL
+Video Dens S.A., Madrid
 
-    PinMAME used as reference. The Break '86 manual scan available on the net includes
-    a mostly illegible schematic.
+PinMAME used as reference. The Break '86 manual scan available on the net includes
+a mostly illegible schematic.
 
-    Nothing in this driver is confirmed except where noted.
+Machines by this manufacturer: Ator, Break, Papillion.
+Ator runs on different hardware (peyper.cpp).
 
-    Ator runs on different hardware (peyper.cpp).
+Status:
+- Games are playable
+- You need to hold X when starting a game
+
+ToDo:
+- Papillion: ball number not showing
+- Status display is in different digits per game
+- Mechanical sounds
 
 ***************************************************************************************/
 
@@ -25,6 +33,8 @@
 
 #include "vd.lh"
 
+namespace {
+
 class vd_state : public genpin_class
 {
 public:
@@ -32,46 +42,52 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
 	void vd(machine_config &config);
+	void init_0() { m_game = 0; }
+	void init_1() { m_game = 1; }
 
 private:
-	uint8_t ack_r();
-	void col_w(uint8_t data);
-	void disp_w(offs_t offset, uint8_t data);
-	void lamp_w(uint8_t data) { };
-	void sol_w(uint8_t data) { };
+	u8 ack_r();
+	u8 x0_r();
+	void col_w(u8 data);
+	void disp_w(offs_t offset, u8 data);
+	void lamp_w(offs_t, u8);
+	void sol_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void vd_io(address_map &map);
-	void vd_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint8_t m_t_c;
-	uint8_t segment[5];
+	bool m_ready = 0;
+	u8 m_t_c = 0;
+	u8 m_game = 0;
+	u8 m_segment[5]{};
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
 	required_device<cpu_device> m_maincpu;
-	output_finder<60> m_digits;
+	output_finder<48> m_digits;
+	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps
 };
 
 
-uint8_t vd_state::ack_r()
+u8 vd_state::ack_r()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // guess
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return 0; // this value is not used
 }
 
-void vd_state::vd_map(address_map &map)
+void vd_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x62ff).ram();
-	map(0x6700, 0x67ff).ram();
+	map(0x6000, 0x67ff).ram().share("nvram");
 }
 
-void vd_state::vd_io(address_map &map)
+void vd_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("X0");
+	map(0x00, 0x00).r(FUNC(vd_state::x0_r));
 	map(0x01, 0x01).portr("X1");
 	map(0x02, 0x02).portr("X2");
 	map(0x03, 0x03).portr("X3");
@@ -109,7 +125,7 @@ static INPUT_PORTS_START( break86 )
 
 	PORT_START("DSW2") // "Micro Swicher Nº 2"
 	PORT_DIPNAME(0x03, 0x03, "Scoring") PORT_DIPLOCATION("SW2:8,7") // "Tanteo"
-	PORT_DIPSETTING(0x03, "800k / 1.4M / 2.0M / 2.6M") // = "Bola Extra," "1ª Partida," "2ª Partida," "High Score"
+	PORT_DIPSETTING(0x03, "800k / 1.4M / 2.0M / 2.6M") // = "Bola Extra," "1 Partida," "2 Partida," "High Score"
 	PORT_DIPSETTING(0x02, "1.0M / 1.6M / 2.2M / 2.8M")
 	PORT_DIPSETTING(0x01, "1.2M / 1.8M / 2.4M / 3.0M")
 	PORT_DIPSETTING(0x00, "1.4M / 2.0M / 2.6M / 3.2M")
@@ -135,16 +151,64 @@ static INPUT_PORTS_START( break86 )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED) // SW3 not populated
 
 	PORT_START("X0")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_START1)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN2)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("INP02")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("INP03")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("INP04")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("INP05")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("INP06")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("INP07")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("X1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)  // start
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("INP12")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("INP13")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("INP14")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("INP15")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("INP16")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("INP17")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("X2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("INP21")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("INP22")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("INP23")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_P) PORT_NAME("INP24")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("INP25")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("INP26")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("INP27")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("X3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)  // coin
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("INP32")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME("INP33")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("INP34")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("INP35")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("INP36")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("INP37")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("X4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP42")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP43")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP44")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP45") // start break
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP46") // start pap
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP47")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	PORT_START("X5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP51")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP52")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP53")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP54")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP55")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP56")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP57")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( papillon )
@@ -153,57 +217,112 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
 {
-	if (m_t_c > 40)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+	if (m_t_c > 4)
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	else
 		m_t_c++;
 }
 
-void vd_state::disp_w(offs_t offset, uint8_t data)
+// machine won't boot without a ball in the outhole,
+// so this does it for you.
+u8 vd_state::x0_r()
 {
-	segment[offset] = data;
-#if 0 // probably not how this works
-	if (!offset)
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-#endif
+	return ioport("X0")->read() | (m_ready ? 0 : 1);
 }
 
-void vd_state::col_w(uint8_t data)
+void vd_state::lamp_w(offs_t offset, u8 data)
 {
-	if (data != 0x3f)
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[16+offset*8+i] = BIT(data, i);
+}
+
+void vd_state::sol_w(u8 data)
+{
+	for (u8 i = 0; i < 16; i++)
+		m_io_outputs[i] = (data == i) ? 1 : 0;
+
+	// Outhole for each game
+	if (((data == 0x0a) && (m_game == 1)) || ((data == 0x0b) && (m_game == 0)))
 	{
-		data &= 7;
-		m_digits[data + 11] = segment[0];
-		m_digits[data + 21] = segment[1];
-		m_digits[data + 31] = segment[2];
-		m_digits[data + 41] = segment[3];
-		m_digits[data + 51] = segment[4];
+		m_samples->start(0, 5);
+		m_ready = 1;
 	}
+}
+
+void vd_state::disp_w(offs_t offset, u8 data)
+{
+	m_segment[offset] = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
+// The digits are standard 7-segment, except that there's no DP but instead a comma at the front.
+void vd_state::col_w(u8 data)
+{
+	if (data & 8)
+		return;
+
+	data &= 7;
+	if (!data) // machine writes to this digit but it doesn't physically exist
+		return;
+
+	// apply or remove comma in the previous digit
+	for (u8 i = 0; i < 5; i++)
+	{
+		u8 t = (m_digits[data+10*i-1] & 0x7f) | (m_segment[i] & 0x80);
+		m_digits[data+10*i-1] = t;
+	}
+
+	// now do the current digits
+	// if the comma was there before, keep it on to stop flicker
+	for (u8 i = 0; i < 5; i++)
+	{
+		u8 t = m_digits[data+10*i] & 0x80;
+		m_digits[data+10*i] = (m_segment[i] & 0x7f) | t;
+	}
+}
+
+void vd_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_segment));
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_game));
+	save_item(NAME(m_ready));
 }
 
 void vd_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_t_c = 0;
+	m_ready = 0;
 }
 
 void vd_state::vd(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 4000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vd_state::vd_map);
-	m_maincpu->set_addrmap(AS_IO, &vd_state::vd_io);
-	TIMER(config, "irq").configure_periodic(FUNC(vd_state::irq), attotime::from_hz(484));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vd_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &vd_state::io_map);
+	TIMER(config, "irq").configure_periodic(FUNC(vd_state::irq), attotime::from_hz(300));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	ay8910_device &ay1(AY8910(config, "ay1", 2000000)); //?
-	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.33/3);
+	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 	ay1.port_a_read_callback().set_ioport("DSW2");
 	ay1.port_b_read_callback().set_ioport("DSW1");
 	ay8910_device &ay2(AY8910(config, "ay2", 2000000)); //?
-	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.33/3);
+	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.5);
 	ay2.port_b_read_callback().set_ioport("DSW3");
 
 	/* Video */
@@ -234,6 +353,7 @@ ROM_START(papillon)
 	ROM_LOAD("u6.dat", 0x4000, 0x2000, CRC(6b2867b3) SHA1(720fe8a65b447e839b0eb9ea21e0b3cb0e50cf7a))
 ROM_END
 
+} // Anonymous namespace
 
-GAME(1986, break86,  0,    vd,  break86,  vd_state, empty_init, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1986, papillon, 0,    vd,  papillon, vd_state, empty_init, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, break86,  0,    vd,  break86,  vd_state, init_0, ROT0,  "Video Dens", "Break '86", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1986, papillon, 0,    vd,  papillon, vd_state, init_1, ROT0,  "Video Dens", "Papillon",  MACHINE_IS_SKELETON_MECHANICAL)

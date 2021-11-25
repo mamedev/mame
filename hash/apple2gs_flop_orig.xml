@@ -4,7 +4,7 @@
 license:CC0
 -->
 
-<softwarelist name="apple2gs_flop_orig" description="Apple IIgs 3.5&quot; original disks">
+<softwarelist name="apple2gs_flop_orig" description="Apple IIgs original disks">
 
 	<software name="rastan">
 		<description>Rastan</description>

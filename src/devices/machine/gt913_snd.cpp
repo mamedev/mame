@@ -85,7 +85,7 @@ void gt913_sound_hle_device::command_w(uint16_t data)
 		This is usually word-aligned, but not always
 		(e.g. ctk551's lowest piano sample is at address 0x5a801)
 		*/
-		uint32_t samplestart = (m_data[1] | (m_data[2] << 16)) & 0xfffff;
+		uint32_t samplestart = (m_data[1] | (m_data[2] << 16)) & 0x1fffff;
 		logerror("voice %u sample start 0x%06x\n", voicenum, samplestart);
 	}
 	else if (voicecmd == 0x0000)
@@ -93,7 +93,7 @@ void gt913_sound_hle_device::command_w(uint16_t data)
 		/*
 		Set the voice's sample end point as a ROM address.
 		*/
-		uint32_t sampleend = (m_data[0] | (m_data[1] << 16)) & 0xfffff;
+		uint32_t sampleend = (m_data[0] | (m_data[1] << 16)) & 0x1fffff;
 		logerror("voice %u sample end   0x%06x\n", voicenum, sampleend);
 	}
 	else if (voicecmd == 0x2000)
@@ -101,8 +101,12 @@ void gt913_sound_hle_device::command_w(uint16_t data)
 		/*
 		Set the voice's sample loop point as a ROM address.
 		*/
-		uint32_t sampleloop = (m_data[0] | (m_data[1] << 16)) & 0xfffff;
+		uint32_t sampleloop = (m_data[0] | (m_data[1] << 16)) & 0x1fffff;
 		logerror("voice %u sample loop  0x%06x\n", voicenum, sampleloop);
+	}
+	else if (voicecmd == 0x200a)
+	{
+		logerror("voice %u cmd 0x200a (data = %02x)\n", voicenum, m_data[2] & 0xff);
 	}
 	else if (voicecmd == 0x200b)
 	{
@@ -130,6 +134,10 @@ void gt913_sound_hle_device::command_w(uint16_t data)
 		*/
 		uint32_t pitch = (m_data[0] << 8) | (m_data[1] >> 8);
 		logerror("voice %u pitch 0x%06x\n", voicenum, pitch);
+	}
+	else if (voicecmd == 0x6006)
+	{
+		logerror("voice %u cmd 0x6006 (data = %02x)\n", voicenum, m_data[1] & 0xff);
 	}
 	else if (voicecmd == 0x6007)
 	{

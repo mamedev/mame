@@ -124,7 +124,13 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setShortcut(QKeySequence("Ctrl+2"));
 	formatActFour->setShortcut(QKeySequence("Ctrl+4"));
 	formatActEight->setShortcut(QKeySequence("Ctrl+8"));
-	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+9"));
+	formatActOneOctal->setShortcut(QKeySequence("Ctrl+3"));
+	formatActTwoOctal->setShortcut(QKeySequence("Ctrl+5"));
+	formatActFourOctal->setShortcut(QKeySequence("Ctrl+7"));
+	formatActEightOctal->setShortcut(QKeySequence("Ctrl+9"));
+	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+Shift+F"));
+	formatAct64bitFloat->setShortcut(QKeySequence("Ctrl+Shift+D"));
+	formatAct80bitFloat->setShortcut(QKeySequence("Ctrl+Shift+E"));
 	formatActOne->setChecked(true);
 	connect(dataFormat, &QActionGroup::triggered, this, &MemoryWindow::formatChanged);
 
@@ -157,6 +163,8 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	radixActHexadecimal->setActionGroup(radixGroup);
 	radixActDecimal->setActionGroup(radixGroup);
 	radixActOctal->setActionGroup(radixGroup);
+	radixActHexadecimal->setShortcut(QKeySequence("Ctrl+Shift+H"));
+	radixActOctal->setShortcut(QKeySequence("Ctrl+Shift+O"));
 	radixActHexadecimal->setChecked(true);
 	connect(radixGroup, &QActionGroup::triggered, this, &MemoryWindow::radixChanged);
 

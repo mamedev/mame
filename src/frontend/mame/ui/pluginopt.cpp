@@ -19,14 +19,12 @@
 
 namespace ui {
 
-void menu_plugin::handle()
+void menu_plugin::handle(event const *ev)
 {
-	const event *menu_event = process(0);
-
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_SELECT)
-			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)menu_event->itemref);
+		if (ev->iptkey == IPT_UI_SELECT)
+			menu::stack_push<menu_plugin_opt>(ui(), container(), (char *)ev->itemref);
 	}
 }
 
@@ -46,7 +44,7 @@ void menu_plugin::populate(float &customtop, float &custombottom)
 void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, char *menu)
 {
 	// reset the menu stack
-	menu::stack_reset(mui.machine());
+	menu::stack_reset(mui);
 
 	// add the plugin menu entry
 	menu::stack_push<menu_plugin_opt>(mui, container, menu);
@@ -65,19 +63,17 @@ menu_plugin::~menu_plugin()
 menu_plugin_opt::menu_plugin_opt(mame_ui_manager &mui, render_container &container, std::string_view menu) :
 	ui::menu(mui, container),
 	m_menu(menu),
-	m_process_flags(0U),
 	m_need_idle(false)
 {
 }
 
-void menu_plugin_opt::handle()
+void menu_plugin_opt::handle(event const *ev)
 {
-	event const *const menu_event = process(m_process_flags);
-	void *const itemref = menu_event ? menu_event->itemref : get_selection_ref();
+	void *const itemref = ev ? ev->itemref : get_selection_ref();
 	std::string key;
-	if (menu_event)
+	if (ev)
 	{
-		switch (menu_event->iptkey)
+		switch (ev->iptkey)
 		{
 		case IPT_UI_UP:
 			key = "up";
@@ -90,6 +86,12 @@ void menu_plugin_opt::handle()
 			break;
 		case IPT_UI_RIGHT:
 			key = "right";
+			break;
+		case IPT_UI_PREV_GROUP:
+			key = "prevgroup";
+			break;
+		case IPT_UI_NEXT_GROUP:
+			key = "nextgroup";
 			break;
 		case IPT_UI_SELECT:
 			key = "select";
@@ -104,7 +106,7 @@ void menu_plugin_opt::handle()
 			key = "cancel";
 			break;
 		case IPT_SPECIAL:
-			key = std::to_string((u32)menu_event->unichar);
+			key = std::to_string((u32)ev->unichar);
 			break;
 		default:
 			break;
@@ -117,7 +119,7 @@ void menu_plugin_opt::handle()
 			set_selection(reinterpret_cast<void *>(uintptr_t(*result.second)));
 		if (result.first)
 			reset(reset_options::REMEMBER_REF);
-		else if (menu_event && (menu_event->iptkey == IPT_UI_CANCEL))
+		else if (ev && (ev->iptkey == IPT_UI_CANCEL))
 			stack_pop();
 	}
 }
@@ -160,6 +162,8 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 				item_flags_or |= FLAG_INVERT;
 			else if (flag == "heading")
 				item_flags_or |= FLAG_DISABLE | FLAG_UI_HEADING;
+			else
+				osd_printf_info("menu_plugin_opt: unknown flag '%s' for item %d (%s)\n", flag, i, text);
 		}
 
 		if (text == "---")
@@ -173,7 +177,7 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 	if (sel)
 		set_selection(reinterpret_cast<void *>(uintptr_t(*sel)));
 
-	m_process_flags = 0U;
+	uint32_t process_flags = 0U;
 	m_need_idle = false;
 	if (!flags.empty())
 	{
@@ -187,16 +191,25 @@ void menu_plugin_opt::populate(float &customtop, float &custombottom)
 			mflags.remove_prefix(flag.length());
 			flag_start = mflags.find_first_not_of(' ');
 
-			if (flag == "lralways")
-				m_process_flags |= PROCESS_LR_ALWAYS;
+			if (flag == "nokeys")
+				process_flags |= PROCESS_NOKEYS;
+			else if (flag == "lralways")
+				process_flags |= PROCESS_LR_ALWAYS;
 			else if (flag == "lrrepeat")
-				m_process_flags |= PROCESS_LR_REPEAT;
+				process_flags |= PROCESS_LR_REPEAT;
 			else if (flag == "customnav")
-				m_process_flags |= PROCESS_CUSTOM_NAV;
+				process_flags |= PROCESS_CUSTOM_NAV;
+			else if (flag == "ignorepause")
+				process_flags |= PROCESS_IGNOREPAUSE;
 			else if (flag == "idle")
 				m_need_idle = true;
+			else
+				osd_printf_info("menu_plugin_opt: unknown processing flag '%s'\n", flag);
 		}
+		if (process_flags & PROCESS_NOKEYS)
+			m_need_idle = true;
 	}
+	set_process_flags(process_flags);
 }
 
 menu_plugin_opt::~menu_plugin_opt()

@@ -4,7 +4,7 @@
 license:CC0
 -->
 
-<softwarelist name="apple2_flop_orig" description="Apple II 5.25&quot; original disks">
+<softwarelist name="apple2_flop_orig" description="Apple II original disks">
 
 	<software name="agentusa">
 		<description>Agent USA</description>
@@ -17976,6 +17976,139 @@ license:CC0
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296152">
 				<rom name="the new print shop 800k.woz" size="1296152" crc="df2c9138" sha1="d5f690d14861672cbefb9ab9a1ad275a087979e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wargle">
+		<description>Wargle!</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2021-10-30"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Wargle!" is a 1982 action game developed and distributed by Hayden Book Company. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="wargle.woz" size="234778" crc="1206aa31" sha1="c2431e7f2cbda517edb71d4458fa0e85a36338fb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scruples">
+		<description>A Question of Scruples</description>
+		<year>1987</year>
+		<publisher>Leisure Genius</publisher>
+		<info name="release" value="2021-10-30"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"A Question of Scruples" is a 1987 board game developed by Sentient Software and distributed by Leisure Genius. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234838">
+				<rom name="a question of scruples - disk a (program disk).woz" size="234838" crc="8d6b5e39" sha1="fc05cbe47accd7359e439e7bab276e73253ab458"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="234840">
+				<rom name="a question of scruples - disk b (questions disk).woz" size="234840" crc="e06d7439" sha1="e79bb730be5b7c5455a34c5e1538fc10e24e37ef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jbird">
+		<description>J-Bird</description>
+		<year>1983</year>
+		<publisher>Orion Software</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"J-Bird" is a 1983 action game developed by Daryl Rotta and distributed by Orion Software. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234788">
+				<rom name="j-bird.woz" size="234788" crc="98debcd8" sha1="f22a533197f895a950cdb04965a20a09d073ca54"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stardanc">
+		<description>Star Dance</description>
+		<year>1981</year>
+		<publisher>United Software of America</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 13-sector drive but otherwise runs on any Apple ][ with 48K. -->
+		<!--"Star Dance" is a 1981 action game developed by Gustavo Fernandez and distributed by United Software of America. It requires a 13-sector drive but otherwise runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101683">
+				<rom name="star dance.woz" size="101683" crc="61551723" sha1="fb89e011fff5dccc442362ace2b526d3a9a36816"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dskorg26">
+		<description>Disk Organizer (Version 2.6)</description>
+		<year>1982</year>
+		<publisher>Sensible Software</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E"/>
+		<!-- It requires an Apple ][, ][+, or unenhanced //e with 48K. -->
+		<!--"Disk Organizer" is a 1982 disk utility developed and distributed by Sensible Software. This is version 2.6. It requires an Apple ][, ][+, or unenhanced //e with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="114981">
+				<rom name="disk organizer.woz" size="114981" crc="30895055" sha1="1dadfd95788019e35948f4e0889bfa3f22c58720"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sdiskc38">
+		<description>Super Disk Copy (Version 3.8)</description>
+		<year>1981</year>
+		<publisher>Sensible Software</publisher>
+		<info name="release" value="2021-11-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Super Disk Copy" is a 1981 disk utility developed and distributed by Sensible Software. This is version 3.8. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="55072">
+				<rom name="super disk copy v3.8.woz" size="55072" crc="0981c164" sha1="cd957476e7ac4fe1dfded3dd9c1f9e8d3a75a4b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nibaw2c3">
+		<description>Nibbles Away ][ (Version C3)</description>
+		<year>1983</year>
+		<publisher>COMPUTER:applications</publisher>
+		<info name="release" value="2021-11-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Nibbles Away ][" is a 1983 disk utility developed and distributed by COMPUTER:applications. This is version C3. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="146764">
+				<rom name="nibbles away ][.woz" size="146764" crc="db6d9e93" sha1="8729a7c7e69d74bb474a96e14a36a8b2fe0c085f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eddupl44">
+		<description>Essential Data Duplicator (Version 4.4)</description>
+		<year>1986</year>
+		<publisher>Utilico Microware</publisher>
+		<info name="release" value="2021-11-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It runs on any Apple II with 48K. -->
+		<!--"Essential Data Duplicator" is a 1986 disk utility developed by Donald A. Schnapp and distributed by Utilico Microware. This is version 4.4. It runs on any Apple ][ with 48K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="106863">
+				<rom name="essential data duplicator v4.4.woz" size="106863" crc="a50ae8ed" sha1="c3f6a000171af417c81af7d47c81dc7f1d2026f7"/>
 			</dataarea>
 		</part>
 	</software>

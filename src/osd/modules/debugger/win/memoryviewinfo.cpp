@@ -46,6 +46,11 @@ bool memoryview_info::physical() const
 	return view<debug_view_memory>()->physical();
 }
 
+int memoryview_info::address_radix() const
+{
+	return view<debug_view_memory>()->address_radix();
+}
+
 
 void memoryview_info::set_expression(const std::string &string)
 {
@@ -70,6 +75,11 @@ void memoryview_info::set_reverse(bool reverse)
 void memoryview_info::set_physical(bool physical)
 {
 	view<debug_view_memory>()->set_physical(physical);
+}
+
+void memoryview_info::set_address_radix(int radix)
+{
+	view<debug_view_memory>()->set_address_radix(radix);
 }
 
 

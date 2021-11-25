@@ -119,7 +119,7 @@ std::vector<uint8_t> vtech_common_format::flux_to_image(floppy_image *image)
 		int pos = 0;
 		int count = 0;
 		uint8_t *dest = nullptr;
-		uint16_t checksum = 0;
+		[[maybe_unused]] uint16_t checksum = 0;
 		uint64_t buf = 0;
 		sz = bitstream.size();
 		if(sz < 128)
@@ -283,7 +283,7 @@ bool vtech_dsk_format::load(util::random_read &io, uint32_t form_factor, const s
 
 	int mode = 0;
 	int count = 0;
-	uint16_t checksum = 0;
+	[[maybe_unused]] uint16_t checksum = 0;
 	uint64_t buf = 0;
 	uint8_t *dest = nullptr;
 

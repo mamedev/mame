@@ -333,7 +333,7 @@ K056832_CB_MEMBER(midnrun_state::tile_callback)
 void midnrun_state::video_start()
 {
 	m_k056832->set_layer_offs(0, -29, -27);
-	m_k056832->set_layer_offs(1, -29, -27);
+	m_k056832->set_layer_offs(1, -25, -27);
 	m_k056832->set_layer_offs(2, -29, -27);
 	m_k056832->set_layer_offs(3, -29, -27);
 	m_k056832->set_layer_offs(4, -29, -27);

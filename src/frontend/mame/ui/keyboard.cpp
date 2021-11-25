@@ -28,6 +28,12 @@ menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &c
 {
 }
 
+void menu_keyboard_mode::menu_activated()
+{
+	// scripts could have changed something behind our back
+	reset(reset_options::REMEMBER_POSITION);
+}
+
 void menu_keyboard_mode::populate(float &customtop, float &custombottom)
 {
 	natural_keyboard &natkbd(machine().natkeyboard());
@@ -64,32 +70,44 @@ menu_keyboard_mode::~menu_keyboard_mode()
 {
 }
 
-void menu_keyboard_mode::handle()
+void menu_keyboard_mode::handle(event const *ev)
 {
-	event const *const menu_event(process(0));
-	if (menu_event && uintptr_t(menu_event->itemref))
+	if (ev && uintptr_t(ev->itemref))
 	{
 		natural_keyboard &natkbd(machine().natkeyboard());
-		uintptr_t const ref(uintptr_t(menu_event->itemref));
-		bool const left(IPT_UI_LEFT == menu_event->iptkey);
-		bool const right(IPT_UI_RIGHT == menu_event->iptkey);
+		uintptr_t const ref(uintptr_t(ev->itemref));
+		bool left(IPT_UI_LEFT == ev->iptkey);
+		bool right(IPT_UI_RIGHT == ev->iptkey);
 		if (ITEM_KBMODE == ref)
 		{
+			if (IPT_UI_SELECT == ev->iptkey)
+			{
+				left = natkbd.in_use();
+				right = !left;
+			}
 			if ((left || right) && (natkbd.in_use() != right))
 			{
 				natkbd.set_in_use(right);
-				reset(reset_options::REMEMBER_REF);
+				ev->item->set_subtext(right ? _("Natural") : _("Emulated"));
+				ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
 			}
 		}
 		else if (ITEM_KBDEV_FIRST <= ref)
 		{
-			if ((left || right) && (natkbd.keyboard_enabled(ref - ITEM_KBDEV_FIRST) != right))
+			auto const kbdno(ref - ITEM_KBDEV_FIRST);
+			if (IPT_UI_SELECT == ev->iptkey)
+			{
+				left = natkbd.keyboard_enabled(kbdno);
+				right = !left;
+			}
+			if ((left || right) && (natkbd.keyboard_enabled(kbdno) != right))
 			{
 				if (right)
-					natkbd.enable_keyboard(ref - ITEM_KBDEV_FIRST);
+					natkbd.enable_keyboard(kbdno);
 				else
-					natkbd.disable_keyboard(ref - ITEM_KBDEV_FIRST);
-				reset(reset_options::REMEMBER_REF);
+					natkbd.disable_keyboard(kbdno);
+				ev->item->set_subtext(right ? _("Enabled") : _("Disabled"));
+				ev->item->set_flags(right ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW);
 			}
 		}
 	}

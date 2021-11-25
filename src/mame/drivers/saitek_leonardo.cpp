@@ -176,7 +176,7 @@ void leo_state::unk_w(u8 data)
 
 void leo_state::exp_rts_w(int state)
 {
-	// NAND with ACK-P (not used by module)
+	// NAND with ACK-P (not used by chesscomputer?)
 }
 
 

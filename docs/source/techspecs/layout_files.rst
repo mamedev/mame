@@ -406,8 +406,8 @@ usually comes from an I/O port field or an emulated output (see
 :ref:`layfile-interact-elemstate` for information on connecting an element to an
 emulated I/O port or output).  Any component of an element may be restricted to
 only drawing when the element’s state is a particular value.  Some components
-(e.g.  multi-segment displays and reels) use the state directly to determine
-their appearance.
+(e.g.  multi-segment displays) use the state directly to determine their
+appearance.
 
 Each element has its own internal coordinate system.  The bounds of the
 element’s coordinate system are computed as the union of the bounds of the
@@ -591,10 +591,6 @@ simplecounter
     to set text alignment.  If present, the ``align`` attribute must be an
     integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 2
     (two) means right-aligned; if absent, the text will be centred.
-reel
-    Used for drawing slot machine reels.  Supported attributes include
-    ``symbollist``, ``stateoffset``, ``numsymbolsvisible``, ``reelreversed``,
-    and ``beltreel``.
 
 An example element that draws a static left-aligned text string:
 
@@ -838,6 +834,48 @@ Screens (``screen`` elements) and layout elements (``element`` elements) may
 have their colour and position/size animated by supplying multiple ``color``
 and/or ``bounds`` child elements with ``state`` attributes.  See
 :ref:`layfile-interact-itemanim` for details.
+
+Layout elements (``element`` elements) may be configured to show only part of
+the element’s width or height using ``xscroll`` and/or ``yscroll`` child
+elements.  This can be used for devices like slot machine reels.  The
+``xscroll`` and ``yscroll`` elements support the same attributes:
+
+size
+    The size of the horizontal or vertical scroll window, as a proportion of the
+    element’s width or height, respectively.  Must be in the range 0.01 to 1.0,
+    inclusive, if present (1% of the width/height to the full width/height).  By
+    default, the entire width and height of the element is shown.
+wrap
+    Whether the element should wrap horizontally or vertically.  Must be either
+    ``yes`` or ``no`` if present.  By default, items do not wrap horizontally or
+    vertically.
+inputtag
+    If present, the horizontal or vertical scroll position will be taken from
+    the value of the corresponding I/O port.  Specifies the tag path of an I/O
+    port relative to the device that caused the layout file to be loaded.  The
+    raw value from the input port is used, active-low switch values are not
+    normalised.
+name
+    If present, the horizontal or vertical scroll position will be taken from
+    the correspondingly named output.
+mask
+    If present, the horizontal or vertical scroll position will be masked with
+    the value and shifted to the right to remove trailing zeroes (for example a
+    mask of 0x05 will result in no shift, while a mask of 0x68 will result in
+    the value being shifted three bits to the right).  Note that this applies to
+    output values (specified with the ``name`` attribute) as well as input port
+    values (specified with the ``inputtag`` attribute).  Must be an integer
+    value if present.  If not present, it is equivalent to all 32 bits being
+    set.
+min
+    Minimum horizontal or vertical scroll position value.  When the horizontal
+    or vertical scroll position has this value, the left or top edge or the
+    scroll window will be aligned with the left or top edge of the element.
+    Must be an integer value if present.  Defaults to zero.
+max
+    Maximum horizontal or vertical scroll position value.  Must be an integer
+    value if present.  Defaults to the ``mask`` value shifted to the right to
+    remove trailing zeroes.
 
 
 .. _layfile-parts-collections:
@@ -1149,9 +1187,8 @@ Clickable items
     item will activate the emulated switch.
 State-dependent components
     Some components will be drawn differently depending on the containing
-    element’s state.  These include the dot matrix, multi-segment LED display,
-    simple counter and reel elements.  See :ref:`layfile-parts-elements` for
-    details.
+    element’s state.  These include the dot matrix, multi-segment LED display
+    and simple counter elements.  See :ref:`layfile-parts-elements` for details.
 Conditionally-drawn components
     Components may be conditionally drawn or hidden depending on the containing
     element’s state by supplying ``state`` and/or ``statemask`` attributes.  See
@@ -1298,7 +1335,7 @@ If the ``animate`` child element has a ``mask`` attribute, the item’s animatio
 state will be masked with the ``mask`` value and shifted to the right to remove
 trailing zeroes (for example a mask of 0x05 will result in no shift, while a
 mask of 0xb0 will result in the value being shifted four bits to the right).
-Note that the ``mask`` attribute applies to output value (specified with the
+Note that the ``mask`` attribute applies to output values (specified with the
 ``name`` attribute) as well as input port values (specified with the
 ``inputtag`` attribute).  If the ``mask`` attribute is present, it must be an
 integer value.  If the ``mask`` attribute is not present, it is equivalent to

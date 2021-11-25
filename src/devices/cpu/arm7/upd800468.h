@@ -12,7 +12,7 @@
 #include "machine/vic_pl192.h"
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 class upd800468_timer_device : public device_t
@@ -46,7 +46,7 @@ class upd800468_device : public arm7_cpu_device
 {
 public:
 	upd800468_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
-	
+
 	void upd800468_map(address_map &map);
 
 	template<offs_t i> auto adc_cb() { return m_adc_cb[i].bind(); }
@@ -96,7 +96,7 @@ private:
 	u32 m_ram_enable;
 };
 
-// device type 
+// device type
 DECLARE_DEVICE_TYPE(UPD800468_TIMER, upd800468_timer_device)
 DECLARE_DEVICE_TYPE(UPD800468, upd800468_device)
 

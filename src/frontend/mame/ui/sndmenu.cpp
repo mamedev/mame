@@ -9,12 +9,16 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
 #include "ui/sndmenu.h"
+
 #include "ui/selector.h"
+#include "ui/ui.h"
+
 #include "../osd/modules/lib/osdobj_common.h" // TODO: remove
 
+
 namespace ui {
+
 const int menu_sound_options::m_sound_rate[] = { 11025, 22050, 44100, 48000 };
 
 //-------------------------------------------------
@@ -41,48 +45,42 @@ menu_sound_options::menu_sound_options(mame_ui_manager &mui, render_container &c
 }
 
 //-------------------------------------------------
-//  dtor
+//  menu_dismissed
 //-------------------------------------------------
 
-menu_sound_options::~menu_sound_options()
+void menu_sound_options::menu_dismissed()
 {
 	emu_options &moptions = machine().options();
 
-	if (strcmp(moptions.value(OSDOPTION_SOUND), m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE) != 0)
-	{
+	if (strcmp(moptions.value(OSDOPTION_SOUND), m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE))
 		moptions.set_value(OSDOPTION_SOUND, m_sound ? OSDOPTVAL_AUTO : OSDOPTVAL_NONE, OPTION_PRIORITY_CMDLINE);
-	}
+
 	if (moptions.bool_value(OPTION_COMPRESSOR) != m_compressor)
-	{
 		moptions.set_value(OPTION_COMPRESSOR, m_compressor, OPTION_PRIORITY_CMDLINE);
-	}
+
 	if (moptions.int_value(OPTION_SAMPLERATE) != m_sound_rate[m_cur_rates])
-	{
 		moptions.set_value(OPTION_SAMPLERATE, m_sound_rate[m_cur_rates], OPTION_PRIORITY_CMDLINE);
-	}
+
 	if (moptions.bool_value(OPTION_SAMPLES) != m_samples)
-	{
 		moptions.set_value(OPTION_SAMPLES, m_samples, OPTION_PRIORITY_CMDLINE);
-	}
+
 }
 
 //-------------------------------------------------
 //  handle
 //-------------------------------------------------
 
-void menu_sound_options::handle()
+void menu_sound_options::handle(event const *ev)
 {
 	bool changed = false;
 
 	// process the menu
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (ev && ev->itemref)
 	{
-		switch ((uintptr_t)menu_event->itemref)
+		switch ((uintptr_t)ev->itemref)
 		{
 		case ENABLE_SOUND:
-			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT)
 			{
 				m_sound = !m_sound;
 				changed = true;
@@ -90,7 +88,7 @@ void menu_sound_options::handle()
 			break;
 
 		case ENABLE_COMPRESSOR:
-			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT)
 			{
 				m_compressor = !m_compressor;
 				changed = true;
@@ -98,12 +96,12 @@ void menu_sound_options::handle()
 			break;
 
 		case SAMPLE_RATE:
-			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+			if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 			{
-				(menu_event->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
+				(ev->iptkey == IPT_UI_LEFT) ? m_cur_rates-- : m_cur_rates++;
 				changed = true;
 			}
-			else if (menu_event->iptkey == IPT_UI_SELECT)
+			else if (ev->iptkey == IPT_UI_SELECT)
 			{
 				int total = std::size(m_sound_rate);
 				std::vector<std::string> s_sel(total);
@@ -121,7 +119,7 @@ void menu_sound_options::handle()
 			break;
 
 		case ENABLE_SAMPLES:
-			if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT)
 			{
 				m_samples = !m_samples;
 				changed = true;

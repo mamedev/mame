@@ -100,7 +100,7 @@ void lua_engine::initialize_debug(sol::table &emu)
 	debugger_type["consolelog"] = sol::property([] (debugger_manager &debug) { return wrap_textbuf(debug.console().get_console_textbuf()); });
 	debugger_type["errorlog"] = sol::property([](debugger_manager &debug) { return wrap_textbuf(debug.console().get_errorlog_textbuf()); });
 	debugger_type["visible_cpu"] = sol::property(
-			[](debugger_manager &debug) { debug.console().get_visible_cpu(); },
+			[](debugger_manager &debug) { return debug.console().get_visible_cpu(); },
 			[](debugger_manager &debug, device_t &dev) { debug.console().set_visible_cpu(&dev); });
 	debugger_type["execution_state"] = sol::property(
 			[] (debugger_manager &debug) { return debug.cpu().is_stopped() ? "stop" : "run"; },

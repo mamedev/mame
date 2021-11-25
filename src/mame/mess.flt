@@ -304,6 +304,7 @@ exelv.cpp
 exorciser.cpp
 exorterm.cpp
 exp85.cpp
+f387x.cpp
 facit4440.cpp
 falco5220.cpp
 falcots.cpp
@@ -820,6 +821,7 @@ poly800.cpp
 poly88.cpp
 poly880.cpp
 polysix.cpp
+positron.cpp
 powerstack.cpp
 pp.cpp
 pp01.cpp
@@ -892,6 +894,7 @@ roland_tb303.cpp
 roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp
+roland_tr808.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
@@ -1024,6 +1027,7 @@ sx1000.cpp
 sym1.cpp
 symbolics.cpp
 synthex.cpp
+sys1121.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp

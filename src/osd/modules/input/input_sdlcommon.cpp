@@ -23,18 +23,25 @@
 
 // MAME headers
 #include "emu.h"
-#include "osdepend.h"
+
 #include "ui/uimain.h"
 #include "uiinput.h"
+
 #include "window.h"
+
+#include "util/language.h"
+
+#include "osdepend.h"
 #include "strconv.h"
 
 #include "../../sdl/osdsdl.h"
 #include "input_common.h"
 #include "input_sdlcommon.h"
 
+
 #define GET_WINDOW(ev) window_from_id((ev)->windowID)
 //#define GET_WINDOW(ev) ((ev)->windowID)
+
 
 static std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 {
@@ -165,15 +172,9 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 			break;
 			// alt-enter for fullscreen
 		case IPT_OSD_1:
-			entry.configure_osd("TOGGLE_FULLSCREEN", "Toggle Fullscreen");
+			entry.configure_osd("TOGGLE_FULLSCREEN", N_p("input-name", "Toggle Fullscreen"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ENTER, KEYCODE_LALT);
 			break;
-
-			// disable UI_SELECT when LALT is down, this stops selecting
-			// things in the menu when toggling fullscreen with LALT+ENTER
-			/*          case IPT_UI_SELECT:
-			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ENTER, input_seq::not_code, KEYCODE_LALT);
-			break;*/
 
 			// page down for fastforward (must be OSD_3 as per src/emu/ui.c)
 		case IPT_UI_FAST_FORWARD:
@@ -197,13 +198,13 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 
 			// LCTRL-F5 to toggle OpenGL filtering
 		case IPT_OSD_5:
-			entry.configure_osd("TOGGLE_FILTER", "Toggle Filter");
+			entry.configure_osd("TOGGLE_FILTER", N_p("input-name", "Toggle Filter"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F5, KEYCODE_LCONTROL);
 			break;
 
 			// LCTRL-F6 to decrease OpenGL prescaling
 		case IPT_OSD_6:
-			entry.configure_osd("DECREASE_PRESCALE", "Decrease Prescaling");
+			entry.configure_osd("DECREASE_PRESCALE", N_p("input-name", "Decrease Prescaling"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F6, KEYCODE_LCONTROL);
 			break;
 			// add a Not lcrtl condition to the toggle cheat key
@@ -213,13 +214,13 @@ void sdl_osd_interface::customize_input_type_list(std::vector<input_type_entry> 
 
 			// LCTRL-F7 to increase OpenGL prescaling
 		case IPT_OSD_7:
-			entry.configure_osd("INCREASE_PRESCALE", "Increase Prescaling");
+			entry.configure_osd("INCREASE_PRESCALE", N_p("input-name", "Increase Prescaling"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F7, KEYCODE_LCONTROL);
 			break;
 
 		// lshift-lalt-F12 for fullscreen video (BGFX)
 		case IPT_OSD_8:
-			entry.configure_osd("RENDER_AVI", "Record Rendered Video");
+			entry.configure_osd("RENDER_AVI", N_p("input-name", "Record Rendered Video"));
 			entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_F12, KEYCODE_LSHIFT, KEYCODE_LALT);
 			break;
 

@@ -21,6 +21,30 @@ public:
 };
 
 
+// ======================> nes_bmw8544_device
+
+class nes_bmw8544_device : public nes_txrom_device
+{
+public:
+	// construction/destruction
+	nes_bmw8544_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	virtual void set_prg(int prg_base, int prg_mask) override;
+
+private:
+	u8 m_reg;
+};
+
+
 // ======================> nes_fs6_device
 
 class nes_fs6_device : public nes_txrom_device
@@ -1099,26 +1123,35 @@ private:
 	uint8_t m_reg[4];
 };
 
-// ======================> nes_coolboy_device
 
-class nes_coolboy_device : public nes_txrom_device
+// ======================> nes_smd133_device
+
+class nes_smd133_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_coolboy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_smd133_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
 	virtual void prg_cb(int start, int bank) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 private:
-	uint8_t m_reg[4];
+	void smd133_write(offs_t offset, u8 data);
+	u8 m_reg[6];
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_NITRA,         nes_nitra_device)
+DECLARE_DEVICE_TYPE(NES_BMW8544,       nes_bmw8544_device)
 DECLARE_DEVICE_TYPE(NES_FS6,           nes_fs6_device)
 DECLARE_DEVICE_TYPE(NES_SBROS11,       nes_sbros11_device)
 DECLARE_DEVICE_TYPE(NES_MALISB,        nes_malisb_device)
@@ -1175,6 +1208,6 @@ DECLARE_DEVICE_TYPE(NES_BMC_830832C,   nes_bmc_830832c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_YY841101C, nes_bmc_yy841101c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_YY841155C, nes_bmc_yy841155c_device)
 DECLARE_DEVICE_TYPE(NES_PJOY84,        nes_pjoy84_device)
-DECLARE_DEVICE_TYPE(NES_COOLBOY,       nes_coolboy_device)
+DECLARE_DEVICE_TYPE(NES_SMD133,        nes_smd133_device)
 
 #endif // MAME_BUS_NES_MMC3_CLONES_H

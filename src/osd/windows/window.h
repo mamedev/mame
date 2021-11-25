@@ -98,8 +98,8 @@ public:
 	int                 m_ismaximized;
 
 	// monitor info
-	int                                m_fullscreen_safe;
-	float                              m_aspect;
+	int                 m_fullscreen_safe;
+	float               m_aspect;
 
 	// rendering info
 	std::mutex          m_render_lock;
@@ -110,8 +110,9 @@ public:
 
 	// input info
 	std::chrono::steady_clock::time_point  m_lastclicktime;
-	int                                    m_lastclickx;
-	int                                    m_lastclicky;
+	int                 m_lastclickx;
+	int                 m_lastclicky;
+	char16_t            m_last_surrogate;
 
 private:
 	void draw_video_contents(HDC dc, bool update);

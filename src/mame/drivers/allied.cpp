@@ -51,6 +51,8 @@ ToDo:
 #include "machine/timer.h"
 #include "allied.lh"
 
+namespace {
+
 class allied_state : public genpin_class
 {
 public:
@@ -72,38 +74,38 @@ public:
 	void allied(machine_config &config);
 
 private:
-	void ic1_b_w(uint8_t data);
-	void ic2_b_w(uint8_t data);
+	void ic1_b_w(u8 data);
+	void ic2_b_w(u8 data);
 	void ic2_cb2_w(int state);
-	void ic3_b_w(uint8_t data);
-	void ic4_b_w(uint8_t data);
+	void ic3_b_w(u8 data);
+	void ic4_b_w(u8 data);
 	void ic4_cb2_w(int state);
-	void ic5_b_w(uint8_t data);
-	void ic6_b_w(uint8_t data);
-	void ic7_b_w(uint8_t data);
-	void ic8_a_w(uint8_t data);
-	void ic8_b_w(uint8_t data);
-	uint8_t ic1_a_r();
-	uint8_t ic2_a_r();
-	uint8_t ic4_a_r();
-	uint8_t ic5_a_r();
-	uint8_t ic6_a_r();
-	uint8_t ic6_b_r();
-	uint8_t ic7_a_r();
+	void ic5_b_w(u8 data);
+	void ic6_b_w(u8 data);
+	void ic7_b_w(u8 data);
+	void ic8_a_w(u8 data);
+	void ic8_b_w(u8 data);
+	u8 ic1_a_r();
+	u8 ic2_a_r();
+	u8 ic4_a_r();
+	u8 ic5_a_r();
+	u8 ic6_a_r();
+	u8 ic6_b_r();
+	u8 ic7_a_r();
 	void ic8_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void allied_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint32_t m_player_score[6];
-	uint8_t m_display;
-	uint8_t m_bit_counter;
+	u32 m_player_score[6];
+	u8 m_display;
+	u8 m_bit_counter;
 	bool m_disp_data;
-	uint8_t m_ic5a;
-	uint8_t m_ic6a0;
-	uint8_t m_ic6a1;
-	uint8_t m_ic6a2;
-	uint8_t m_ic6b4;
-	uint8_t m_ic6b7;
+	u8 m_ic5a;
+	u8 m_ic6a0;
+	u8 m_ic6a1;
+	u8 m_ic6a2;
+	u8 m_ic6b4;
+	u8 m_ic6b7;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m6504_device> m_maincpu;
@@ -120,7 +122,7 @@ private:
 };
 
 
-void allied_state::allied_map(address_map &map)
+void allied_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // ic6
 	map(0x0044, 0x0047).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -369,25 +371,25 @@ static INPUT_PORTS_START( allied )
 INPUT_PORTS_END
 
 // 1 target, 1 rollover
-uint8_t allied_state::ic1_a_r()
+u8 allied_state::ic1_a_r()
 {
 	return ioport("X1A")->read();
 }
 
 // 6 lamps
-void allied_state::ic1_b_w(uint8_t data)
+void allied_state::ic1_b_w(u8 data)
 {
 	for (u8 i = 0; i < 8; i++)
 		m_io_outputs[i+32] = !BIT(data, i);
 }
 
 // 8 switches
-uint8_t allied_state::ic2_a_r()
+u8 allied_state::ic2_a_r()
 {
 	return ioport("X2A")->read();
 }
 
-void allied_state::ic2_b_w(uint8_t data)
+void allied_state::ic2_b_w(u8 data)
 {
 // PB0-4,6 - lamps
 
@@ -408,21 +410,21 @@ void allied_state::ic2_cb2_w(int state)
 	}
 }
 
-void allied_state::ic3_b_w(uint8_t data)
+void allied_state::ic3_b_w(u8 data)
 {
 	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 6 switches
-uint8_t allied_state::ic4_a_r()
+u8 allied_state::ic4_a_r()
 {
 	return ioport("X4A")->read();
 }
 
-void allied_state::ic4_b_w(uint8_t data)
+void allied_state::ic4_b_w(u8 data)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
-	uint8_t segment, i;
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
+	u8 segment, i;
 	for (i = 0; i < 4; i++)
 	{
 		if (!BIT(data, i+4))
@@ -466,13 +468,13 @@ void allied_state::ic4_cb2_w(int state)
 }
 
 // 8 of the adjustment connectors
-uint8_t allied_state::ic5_a_r()
+u8 allied_state::ic5_a_r()
 {
 	return m_ic5a;
 }
 
 // cabinet solenoids
-void allied_state::ic5_b_w(uint8_t data)
+void allied_state::ic5_b_w(u8 data)
 {
 // PB0 - play meter
 // PB1 - replay meter
@@ -496,18 +498,18 @@ void allied_state::ic5_b_w(uint8_t data)
 }
 
 // 4 adjustments, 3 coin slots, slam tilt
-uint8_t allied_state::ic6_a_r()
+u8 allied_state::ic6_a_r()
 {
 	return m_ic6a0 | m_ic6a1 | m_ic6a2 | ioport("X6A")->read();
 }
 
 // 1 adjustment, test switch
-uint8_t allied_state::ic6_b_r()
+u8 allied_state::ic6_b_r()
 {
 	return m_ic6b4 | ioport("TEST")->read() | m_ic6b7 | 0x4f;
 }
 
-void allied_state::ic6_b_w(uint8_t data)
+void allied_state::ic6_b_w(u8 data)
 {
 // PB0-3 to drop targets
 	for (u8 i = 0; i < 4; i++)
@@ -517,12 +519,12 @@ void allied_state::ic6_b_w(uint8_t data)
 }
 
 // 6 inputs
-uint8_t allied_state::ic7_a_r()
+u8 allied_state::ic7_a_r()
 {
 	return ioport("X7A")->read();
 }
 
-void allied_state::ic7_b_w(uint8_t data)
+void allied_state::ic7_b_w(u8 data)
 {
 // PB7 - tilt lamp
 
@@ -580,7 +582,7 @@ void allied_state::ic7_b_w(uint8_t data)
 }
 
 // playfield solenoids
-void allied_state::ic8_a_w(uint8_t data)
+void allied_state::ic8_a_w(u8 data)
 {
 	if ((data & 0x07) < 0x07) // 3 bumpers
 		m_samples->start(0, 0);
@@ -598,7 +600,7 @@ void allied_state::ic8_a_w(uint8_t data)
 }
 
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
-void allied_state::ic8_b_w(uint8_t data)
+void allied_state::ic8_b_w(u8 data)
 {
 	for (u8 i = 0; i < 6; i++)
 		m_leds[i+1] = !BIT(data, i);
@@ -615,7 +617,7 @@ void allied_state::ic8_cb2_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 {
-	uint8_t data = ioport("X6A")->read();
+	u8 data = ioport("X6A")->read();
 
 	m_ic8->ca1_w(BIT(data, 4));
 	m_ic8->cb1_w(BIT(data, 5));
@@ -658,7 +660,7 @@ void allied_state::allied(machine_config &config)
 {
 	/* basic machine hardware */
 	M6504(config, m_maincpu, 3572549/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::allied_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::mem_map);
 
 	/* Video */
 	config.set_default_layout(layout_allied);
@@ -755,6 +757,7 @@ ROM_END
 #define rom_circa33     rom_allied
 #define rom_starshot    rom_allied
 
+} // anonymous namespace
 
 GAME(1977,  allied,   0,      allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Allied System",               MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME(1977,  suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

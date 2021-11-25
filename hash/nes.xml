@@ -2174,7 +2174,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="athlwrldu" cloneof="athlwrld" supported="partial">
+	<software name="athlwrldu" cloneof="athlwrld">
 		<description>Athletic World (USA)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -2194,7 +2194,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="athlwrld" supported="partial">
+	<software name="athlwrld">
 		<description>Athletic World (Euro)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
@@ -7886,7 +7886,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="dancaero" supported="partial">
+	<software name="dancaero">
 		<description>Dance Aerobics (USA)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -11312,8 +11312,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This game uses an unemulated punching bag controller -->
-	<software name="exboxing" supported="no">
+	<software name="exboxing" supported="partial">
 		<description>Exciting Boxing (Japan)</description>
 		<year>1987</year>
 		<publisher>Konami</publisher>
@@ -11323,6 +11322,7 @@ license:CC0
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="vrc1" />
 			<feature name="pcb" value="KONAMI-VRC-1" />
+			<feature name="peripheral" value="konami_airbag" />
 			<dataarea name="prg" size="131072">
 				<rom name="rc250j0p" size="131072" crc="786148b6" sha1="20cba7316cb907d7a6245c598640ce7aca56f30a" offset="00000" />
 			</dataarea>
@@ -12167,8 +12167,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw" cloneof="athlwrld" supported="partial">
-		<description>Family Trainer 1 - Athletic World (Jpn, v1.1)</description>
+	<software name="train1aw" cloneof="athlwrld">
+		<description>Family Trainer 1 - Athletic World (Japan, v1.1)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-01"/>
@@ -12188,8 +12188,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train1aw1" cloneof="athlwrld" supported="partial">
-		<description>Family Trainer 1 - Athletic World (Jpn)</description>
+	<software name="train1aw1" cloneof="athlwrld">
+		<description>Family Trainer 1 - Athletic World (Japan)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-01"/>
@@ -12209,8 +12209,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train2rs" cloneof="stadevnt" supported="partial">
-		<description>Family Trainer 2 - Running Stadium (Jpn)</description>
+	<software name="train2rs" cloneof="wctmeet">
+		<description>Family Trainer 2 - Running Stadium (Japan)</description>
 		<year>1986</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-02"/>
@@ -12230,8 +12230,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train3as" cloneof="dancaero" supported="partial">
-		<description>Family Trainer 3 - Aerobics Studio (Jpn)</description>
+	<software name="train3as" cloneof="dancaero">
+		<description>Family Trainer 3 - Aerobics Studio (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-03"/>
@@ -12255,8 +12255,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train4jr" supported="partial">
-		<description>Family Trainer 4 - Jogging Race (Jpn)</description>
+	<software name="train4jr">
+		<description>Family Trainer 4 - Jogging Race (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-04"/>
@@ -12276,8 +12276,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train5md" supported="partial">
-		<description>Family Trainer 5 - Meiro Daisakusen (Jpn)</description>
+	<software name="train5md">
+		<description>Family Trainer 5 - Meiro Daisakusen (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-05"/>
@@ -12297,8 +12297,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train7d" cloneof="steamg" supported="partial">
-		<description>Family Trainer 7 - Daiundoukai (Jpn)</description>
+	<software name="train7d" cloneof="steamg">
+		<description>Family Trainer 7 - Daiundoukai (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-07"/>
@@ -12318,8 +12318,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train8ft" supported="partial">
-		<description>Family Trainer 8 - Totsugeki! Fuuun Takeshi-Jou (Jpn)</description>
+	<software name="train8ft">
+		<description>Family Trainer 8 - Totsugeki! Fuuun Takeshi-Jou (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-08"/>
@@ -12339,8 +12339,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="train9f2" supported="partial">
-		<description>Family Trainer 9 - Totsugeki! Fuuun Takeshi-Jou 2 (Jpn)</description>
+	<software name="train9f2">
+		<description>Family Trainer 9 - Totsugeki! Fuuun Takeshi-Jou 2 (Japan)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-09"/>
@@ -33944,7 +33944,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="eggsplod" supported="partial">
+	<software name="eggsplod">
 		<description>Short Order / Eggsplode! (USA)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -35644,7 +35644,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stadevntu" cloneof="stadevnt" supported="partial">
+	<software name="stadevntu" cloneof="wctmeet">
 		<description>Stadium Events (USA)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
@@ -35664,9 +35664,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="stadevnt" supported="partial">
+	<software name="stadevnt" cloneof="wctmeet">
 		<description>Stadium Events (Euro)</description>
-		<year>1990</year>
+		<year>1988?</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="NES-SD-EEC"/>
 		<info name="release" value="19900223"/>
@@ -36731,8 +36731,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This is marked as partially supported due to lack of powerpad emulation! -->
-	<software name="smbdhwca" cloneof="smbdhwc" supported="partial">
+	<software name="smbdhwca" cloneof="smbdhwc">
 		<description>Super Mario Bros. / Duck Hunt / World Class Track Meet (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -36751,8 +36750,7 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This is marked as partially supported due to lack of powerpad emulation! -->
-	<software name="smbdhwc" supported="partial">
+	<software name="smbdhwc">
 		<description>Super Mario Bros. / Duck Hunt / World Class Track Meet (USA, Rev. A)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -37030,18 +37028,18 @@ license:CC0
 		</part>
 	</software>
 
-<!-- This game uses an unemulated whack-a-mole pad -->
-	<software name="supermog" supported="no">
+	<software name="supermog">
 		<description>Super Mogura Tataki!! Pokkun Moguraa (Japan)</description>
 		<year>1989</year>
 		<publisher>IGS</publisher>
 		<info name="serial" value="IGS-X1"/>
 		<info name="release" value="19891208"/>
-		<info name="alt_title" value="ぽっくんモグラー"/>
+		<info name="alt_title" value="スーパーモグラたたき‼︎ぽっくんモグラー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="taptapmat" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="32768" crc="36a9c087" sha1="0f46f52d3995234e933933e3b525ba76fe3aa7d2" offset="00000" />
 			</dataarea>
@@ -37348,7 +37346,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="steamg" supported="no">
+	<software name="steamg">
 		<description>Super Team Games (USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -37358,7 +37356,7 @@ license:CC0
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="4p_adapter" />
+			<feature name="peripheral" value="powerpad" />
 			<dataarea name="prg" size="32768">
 				<rom name="nes-un-0 prg" size="32768" crc="f210e68f" sha1="1f706ae232ffb5f54ff1918b624dcdae4fa27a15" offset="00000" />
 			</dataarea>
@@ -43057,7 +43055,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wctmeeta" cloneof="wctmeet" supported="partial">
+	<software name="wctmeeta" cloneof="wctmeet">
 		<description>World Class Track Meet (USA)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -43077,7 +43075,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="wctmeet" supported="partial">
+	<software name="wctmeet">
 		<description>World Class Track Meet (USA, Rev. A)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -46027,6 +46025,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="decoasc">
+		<description>Data East All-Star Collection</description>
+		<year>2017</year>
+		<publisher>retro-bit</publisher>
+		<info name="serial" value="RB-CT-102"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="2097152">
+				<rom name="data east all-star collection.prg" size="2097152" crc="9e8fd9a4" sha1="755b43ebfc7f934225906b7cf526487bf98c5562" status="baddump" />
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="diehardj" cloneof="diehard">
 		<description>Die Hard (Jpn)</description>
 		<year>1991</year>
@@ -46599,14 +46614,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="trai10rkp" cloneof="trai10rk" supported="partial">
-		<description>Family Trainer 10 - Rairai Kyonsees (Jpn, Prototype)</description>
+	<software name="trai10rkp" cloneof="trai10rk">
+		<description>Family Trainer 10 - Rairai Kyonshiizu - Baby Kyonshii no Amida Daibouken (Japan, prototype)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="32768">
 				<rom name="family trainer 10 - rairai kyonsees (japan) (beta).chr" size="32768" crc="c688741a" sha1="ab747dc1d1007f46de07d2c44a7cacdacd691fb9" offset="00000" status="baddump" />
 			</dataarea>
@@ -46616,8 +46632,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="trai10rk" supported="partial">
-		<description>Family Trainer 10 - Rairai Kyonsees (Jpn)</description>
+	<software name="trai10rk">
+		<description>Family Trainer 10 - Rairai Kyonshiizu - Baby Kyonshii no Amida Daibouken (Japan)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-10"/>
@@ -46627,6 +46643,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="NES-CNROM" />
 			<feature name="mirroring" value="horizontal" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="32768">
 				<rom name="family trainer 10 - rairai kyonsees (japan).chr" size="32768" crc="ecb80045" sha1="6ef04bcc4fd32949a6f7460b3ab7f5d00f55218d" offset="00000" status="baddump" />
 			</dataarea>
@@ -46636,8 +46653,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="train6mp" cloneof="streetcp" supported="partial">
-		<description>Family Trainer 6 - Manhattan Police (Jpn)</description>
+	<software name="train6mp" cloneof="streetcp">
+		<description>Family Trainer 6 - Manhattan Police (Japan)</description>
 		<year>1987</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-06"/>
@@ -46647,6 +46664,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="ftrainer" />
 			<dataarea name="chr" size="131072">
 				<rom name="family trainer 6 - manhattan police (japan).chr" size="131072" crc="b40d4a42" sha1="595f4f58ce13686a872299225232bd360752e25f" offset="00000" status="baddump" />
 			</dataarea>
@@ -48310,6 +48328,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaman2u30" cloneof="megaman2" supported="no">
+		<description>Mega Man 2 - 30th Anniversary Classic Cartridge</description>
+		<year>2018</year>
+		<publisher>Capcom / iam8bit</publisher>
+		<info name="serial" value="8BIT-LCC-002"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="pcb_model" value="INL-D-RAM" />
+			<feature name="mirroring" value="4screen" />
+			<dataarea name="prg" size="262144">
+				<rom name="mega man 2 (iam8bit 30th anniversary).prg" size="262144" crc="891c14bc" sha1="80d61ba914ee2e9e68899afebb30ed29a54dc66a" />
+			</dataarea>
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -50070,9 +50106,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- The Bandai Hyper Shot controller/zapper for Space Shadow is not emulated -->
-	<software name="spaceshd" supported="no">
-		<description>Space Shadow (Jpn)</description>
+	<software name="spaceshd">
+		<description>Space Shadow (Japan)</description>
 		<year>1989</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BA-HYPER"/>
@@ -50082,6 +50117,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
 			<feature name="mirroring" value="pcb_controlled" />
+			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="chr" size="131072">
 				<rom name="space shadow (japan).chr" size="131072" crc="6690e5c1" sha1="f05cc0478786a5e6d153c2f85c00c14afa0e61b0" offset="00000" status="baddump" />
 			</dataarea>
@@ -57340,13 +57376,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 	<software name="chuliuxx" supported="no">
 		<description>Chǔ Liúxiāng Xīnzhuàn (China)</description>
-		<year>19??</year>
+		<year>20??</year>
 		<publisher>Shenzhen Jncota</publisher>
 		<info name="serial" value="KT-1015"/>
 		<info name="alt_title" value="楚留香新传"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txrom" />
-			<feature name="pcb" value="NES-TLROM" />    <!-- Wrong. It actually uses an extended mapper, based on TLROM, which we don't support yet -->
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[kt-1015] chu liu xiang xin zhuan (c).prg" size="1048576" crc="830bcf70" sha1="f409cfb87e1a141b532ceb29c91bb43a1e744282" offset="00000" status="baddump" />
 			</dataarea>
@@ -63330,8 +63366,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>Flying Star</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="unl_drgnfgt" />
-			<feature name="pcb" value="UNL-DRAGONFIGHTER" />
+			<feature name="slot" value="bmw8544" />
+			<feature name="pcb_model" value="BMW8544" />
 			<dataarea name="chr" size="524288">
 				<rom name="dragon fighter (unl)[u].chr" size="524288" crc="a62e97c9" sha1="af094d6a93241ea2702fb5b946fd5d789af5dd8f" offset="00000" status="baddump" />
 			</dataarea>
@@ -78568,7 +78604,25 @@ be better to redump them properly. -->
 			<dataarea name="prg" size="1048576">
 				<rom name="2a03puritans.prg" size="1048576" crc="5baee143" sha1="5024cf5f53995119892067603bed3e23c3655e9e" status="baddump" />
 			</dataarea>
-			<!-- 8 VRAM on cartridge -->
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This release is nearly identical to the prototype 1 set but with rebranding -->
+	<software name="airballr" cloneof="airball">
+		<description>Airball (RetroZone)</description>
+		<year>2007</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-AB-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="airball (retrousb) (2007).prg" size="131072" crc="3e9d567b" sha1="76c9d4a9b9c1a4b587dd15661e39c68f125628c4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -78579,13 +78633,14 @@ be better to redump them properly. -->
 		<description>E.T.</description>
 		<year>2014</year>
 		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="serial" value="KHG-ET-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="unrom512" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="et.prg" size="131072" crc="9e8eca2c" sha1="fa88ca7cadca763eb68e606c97ebf9a4302eedfd" status="baddump" />
 			</dataarea>
-			<!-- 8 VRAM on cartridge? -->
+			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
@@ -78595,6 +78650,7 @@ be better to redump them properly. -->
 		<description>Glider</description>
 		<year>2008</year>
 		<publisher>RetroZone</publisher>
+		<info name="serial" value="RET-GL-GBL"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cufrom" />
 			<feature name="mirroring" value="vertical" />
@@ -78606,6 +78662,107 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="larrylov" supported="partial"> <!-- Save/Continue not yet supported -->
+		<description>Larry and the Long Look for a Luscious Lover</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="KHG-LL-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="larry and the long look for a luscious lover (khan games) (2014).prg" size="524288" crc="8bc0340c" sha1="c21f74fcac66f74a248c831eda1b84c0bdf5a3e0" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legowlia">
+		<description>The Legends of Owlia</description>
+		<year>2016</year>
+		<publisher>Infinite NES Lives</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="legends of owlia (gradual games) (2016).prg" size="524288" crc="95dfc71c" sha1="1680c45e7bb1a67d754b4fef5046c6ecf16d3da4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madwiz">
+		<description>The Mad Wizard - A Candelabra Chronicle</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="SDS-MW-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="the mad wizard - a candelabra chronicle.prg" size="131072" crc="b4a7b014" sha1="c3b49ba3dd16ac203af6a43b29a8b61add21c118" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mysticpi">
+		<description>Mystic Pillars</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="SIV-MP-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="65536">
+				<rom name="mystic pillars (sivak games) (2008).prg" size="65536" crc="318c0a59" sha1="21a75108278a6d311f652c34430e30f3522cf742" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nomolos">
+		<description>Nomolos - Storming the Catsle</description>
+		<year>2014</year>
+		<publisher>RetroZone</publisher> <!-- also re-released by Infinite NES Lives -->
+		<info name="serial" value="GRD-NM-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="nomolos - storming the catsle (gradual games) (2012).prg" size="524288" crc="222b13a0" sha1="e0c33747107ba715bf3689429fbdb3b0caedac64" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amondus">
+		<description>The Rise of Amondus</description>
+		<year>2015</year>
+		<publisher>retroUSB</publisher>
+		<info name="serial" value="SDS-RA-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="the rise of amondus.prg" size="131072" crc="825313ca" sha1="f796b7d700bd2aca18b17036e7146ef955395e4f" status="baddump" /> <!-- this is from the .nes file distributed by the author, Sly Dog Studios -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78641,6 +78798,24 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="dpcm" size="8388608">
 				<rom name="super russian roulette.dpcm" size="8388608" crc="e880dbe6" sha1="b05f2bd2845c3ec3aa63d7aec855c23058fc8412" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Audio pops on NTSC. Game also incorrectly detects PAL mode when soft reset. -->
+	<software name="ultfrogc" supported="partial">
+		<description>Ultimate Frogger Championship</description>
+		<year>2009</year>
+		<publisher>RetroZone</publisher>
+		<info name="serial" value="KHG-UF-GBL"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="ultimate frogger champion.prg" size="32768" crc="c9c408cf" sha1="89cbc3856737967849278c0f60aa7b25d01cef4f" status="baddump" /> <!-- this is from the .nes file distributed by the author, KHAN Games -->
+			</dataarea>
+			<dataarea name="chr" size="16384">
+				<rom name="ultimate frogger champion.chr" size="16384" crc="96a3389f" sha1="5662ac095f8d6fad77c79fd356ccea41baef9944" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -82887,6 +83062,26 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- Mega Man 1 and 2 have glitched audio. Does this happen on hardware? -->
+	<software name="mc_mega8">
+		<description>Mega Man 8 in 1 (PL-0006)</description>
+		<year>20??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="4194304">
+				<rom name="megaman 8 in 1 (pl-0006).prg" size="4194304" crc="19114c05" sha1="12e8de939d60610a6ca11b8fb1ef7f2b0c8c4ccb" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_n4" supported="partial">
 		<description>New 4 in 1 Supergame (YH4239)</description>
 		<year>19??</year>
@@ -84105,28 +84300,16 @@ that the real dumps might surface -->
 	</software>
 
 
-<!-- These use a MMC3 variant we still don't support! -->
+<!-- TODO: looks like these were put at the end of the list to be sorted later. Move to regular multicart subsection? -->
 
-	<software name="mc_hh210" supported="no">
-		<description>Handheld 210 in 1</description>
-		<year>201?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="COOLBOY" />
-			<dataarea name="prg" size="33554432">
-				<rom name="msp55lv128t.u4" size="16777216" crc="9ba520d4" sha1="627f811b24314197e289a2ade668ff4115421bed" offset="00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_cb198" supported="no">
+	<software name="mc_cb198" supported="partial">
 		<description>CoolBoy 198 in 1</description>
 		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1146.u3" size="33554432" crc="253364ea" sha1="808ad7ff037e016c6a7a88dbe7b2bf1d41a46546" offset="00000" />
 			</dataarea>
@@ -84136,13 +84319,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_cb400" supported="no">
+	<software name="mc_cb400" supported="partial">
 		<description>CoolBoy 400 in 1</description>
-		<year>19??</year>
+		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="rom.prg" size="33554432" crc="da8f37f1" sha1="bc5a2777a04b58219702a2a32e1e6a04cc0a5c5a" offset="00000" />
 			</dataarea>
@@ -84152,44 +84336,32 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_cb400a" cloneof="mc_cb400" supported="no">
-		<description>CoolBoy 400 in 1 (Alt, 403 games)</description>
-		<year>19??</year>
+	<software name="mc_cb400a" cloneof="mc_cb400" supported="partial">
+		<description>CoolBoy 400 in 1 (alt, 403 games)</description>
+		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1102.bin" size="33554432" crc="6a98c5ee" sha1="f5de587420d0ad4e8fdff6b4ba32a940f1fe35bd" offset="00000" />
 			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="mc_cb280" supported="no">
-		<description>Coolboy RS-18 (280 in 1)</description>
-		<year>19??</year>
-		<publisher>CoolBoy</publisher>
-		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
-			<feature name="pcb" value="COOLBOY" />
-			<dataarea name="prg" size="4194304">
-				<rom name="w25q32.u5" size="4194304" crc="c9541bdf" sha1="f0ce46f18658ca5dbed881e5a80460e59820bbd0" offset="00000" />
-			</dataarea>
+			<!-- 128k VRAM on cartridge -->
 			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>
 
+<!-- Is this a bad dump? Wrong mapper? -->
 	<software name="mc_cb203" supported="no">
 		<description>Coolboy RS-17 (203 in 1)</description>
-		<year>19??</year>
+		<year>201?</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="4194304">
 				<rom name="s25fl032.bin" size="4194304" crc="33c4e67b" sha1="5787db4c8ce4c2569a5f9e9054cbb1944c1b3092" offset="00000" />
 			</dataarea>
@@ -84198,13 +84370,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_g450" supported="no">
+	<software name="mc_g450" supported="partial">
 		<description>Game 450 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="g450in1.bin" size="33554432" crc="a4396e58" sha1="780d85b737bfc3ba9918f84d09c2d90d72c88dd3" offset="00000" />
 			</dataarea>
@@ -84214,13 +84387,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_g500" supported="no">
+	<software name="mc_g500" supported="partial">
 		<description>Game 500 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="g500in1.bin" size="33554432" crc="74787d9d" sha1="63f28d991351320f3427ddd541c9edb6d3c8fe5f" offset="00000" />
 			</dataarea>
@@ -84230,13 +84404,14 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_pg150" supported="no">
+	<software name="mc_pg150" supported="partial">
 		<description>Pocket Games 150 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="pocketgames150-in1.bin" size="33554432" crc="32f1176b" sha1="2cfd9b61ebdfc328f020ae9bd5e5e2219321e828" offset="00000" />
 			</dataarea>
@@ -84246,13 +84421,34 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_sg218" supported="no">
+	<software name="mc_sg143" supported="partial">
+		<description>Super Games 143 in 1 (The Best Games of NES)</description>
+		<year>201?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="5K" />
+			<dataarea name="prg" size="33554432">
+				<rom name="super game 143-in-1 (the best games of nes).prg" size="33554432" crc="4026eed1" sha1="f127498b71dab1ab3196e0967055cb986779dfa9" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_sg218" supported="partial">
 		<description>Super Game 218 in 1 (JF2181)</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b0932.u3" size="33554432" crc="82fc4149" sha1="080cb14134e2756472114227267b6ade4f1aab9b" offset="00000" />
 			</dataarea>
@@ -84262,29 +84458,34 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_sg360" supported="no">
+	<software name="mc_sg360" supported="partial">
 		<description>Super Game 360 in 1</description>
-		<year>19??</year>
+		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1324.u3" size="33554432" crc="f1371c17" sha1="77bdc59514e12910aee73c69e563a69f47675a2a" offset="00000" />
 			</dataarea>
-			<!-- 8k? VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mc_sg402" supported="no">
+	<software name="mc_sg402" supported="partial">
 		<description>Super Game 402 in 1</description>
 		<year>201?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="coolboy" />
+			<feature name="slot" value="smd133" />
 			<feature name="pcb" value="COOLBOY" />
+			<feature name="smd133-addr" value="6K" />
 			<dataarea name="prg" size="33554432">
 				<rom name="b1310.u3" size="33554432" crc="205daab3" sha1="b403daad9e0cd3b8490ef9127bcb7acd5b40f710" offset="00000" />
 			</dataarea>
