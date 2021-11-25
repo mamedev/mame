@@ -24,22 +24,25 @@
 
 DEFINE_DEVICE_TYPE(CXD8452AQ, cxd8452aq_device, "cxd8452aq", "Sony CXD8452AQ WSC-SONIC3")
 
-// control register constants
-static constexpr uint32_t INT_EN_MASK = 0x7f00;
+namespace
+{
+	// control register constants
+	static constexpr uint32_t INT_EN_MASK = 0x7f00;
 
-// TODO: determine if external interrupt should be included when cleared
-static constexpr uint32_t INT_CLR_MASK = 0xf0;
-static constexpr uint32_t RX_DMA_COMPLETE = 0x40;
-static constexpr uint32_t TX_DMA_COMPLETE = 0x20;
-static constexpr uint32_t EXT_INT = 0x1;
+	// TODO: determine if external interrupt should be included when cleared
+	static constexpr uint32_t INT_CLR_MASK = 0xf0;
+	static constexpr uint32_t RX_DMA_COMPLETE = 0x40;
+	static constexpr uint32_t TX_DMA_COMPLETE = 0x20;
+	static constexpr uint32_t EXT_INT = 0x1;
 
-// count register constants
-static constexpr uint32_t DMA_START = 0x80000000;
+	// count register constants
+	static constexpr uint32_t DMA_START = 0x80000000;
 
-// DMA update timer
-// TODO: Actual frequency, since we don't have DRQ to implictly rate limit
-//       Might be the APbus frequency.
-static constexpr int DMA_TIMER = 100;
+	// DMA update timer
+	// TODO: Actual frequency, since we don't have DRQ to implictly rate limit
+	//       Might be the APbus frequency.
+	static constexpr int DMA_TIMER = 100;
+}
 
 cxd8452aq_device::cxd8452aq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CXD8452AQ, tag, owner, clock),
