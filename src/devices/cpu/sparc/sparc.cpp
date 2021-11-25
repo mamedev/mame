@@ -1050,6 +1050,13 @@ void sparc_base_device::device_post_load()
 	update_gpr_pointers();
 }
 
+void mb86930_device::device_post_load()
+{
+	sparc_base_device::device_post_load();
+
+	update_addr_masks();
+}
+
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration

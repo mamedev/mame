@@ -342,8 +342,10 @@ public:
 	auto cs5_write_cb() { return m_cs_w[5].bind(); }
 
 protected:
+	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 	virtual bool execute_extra_group2(uint32_t op) override;
 
