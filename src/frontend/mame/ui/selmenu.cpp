@@ -1419,7 +1419,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		}
 		else if (m_focus == focused_menu::LEFT)
 		{
-			m_prev_selected = nullptr;
 			filter_selected();
 		}
 		return;
@@ -1774,7 +1773,6 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() >= HOVER_FILTER_FIRST && hover() <= HOVER_FILTER_LAST)
 				{
-					m_prev_selected = nullptr;
 					m_filter_highlight = hover() - HOVER_FILTER_FIRST;
 					filter_selected();
 					stop = true;
@@ -1953,18 +1951,29 @@ void menu_select_launch::draw(uint32_t flags)
 	// make sure the selection
 	if (m_available_items < m_visible_lines)
 		m_visible_lines = m_available_items;
-	if (top_line < 0 || is_first_selected())
+	int selection;
+	if (selected_index() < m_available_items)
+	{
+		selection = selected_index();
+	}
+	else
+	{
+		selection = 0;
+		while ((m_available_items > selection) && (item(selection).ref() != m_prev_selected))
+			++selection;
+	}
+	if (top_line < 0 || !selection)
 	{
 		top_line = 0;
 	}
-	else if (selected_index() < m_available_items)
+	else if (selection < m_available_items)
 	{
-		if (selected_index() >= (top_line + m_visible_lines))
-			top_line = selected_index() - (m_visible_lines / 2);
+		if ((selection >= (top_line + m_visible_lines)) || (selection <= top_line))
+			top_line = (std::max)(selection - (m_visible_lines / 2), 0);
 		if ((top_line + m_visible_lines) >= m_available_items)
 			top_line = m_available_items - m_visible_lines;
-		else if (selected_index() >= (top_line + m_visible_lines - 2))
-			top_line = selected_index() - m_visible_lines + ((selected_index() == (m_available_items - 1)) ? 1: 2);
+		else if (selection >= (top_line + m_visible_lines - 2))
+			top_line = selection - m_visible_lines + ((selection == (m_available_items - 1)) ? 1: 2);
 	}
 
 	// determine effective positions taking into account the hilighting arrows

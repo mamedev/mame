@@ -189,14 +189,14 @@ void vme_hcpu30_card_device::device_add_mconfig(machine_config &config)
 	m_dusccterm->out_txda_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_txd));
 	m_dusccterm->out_dtra_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_dtr));
 	m_dusccterm->out_rtsa_callback().set(RS232P1_TAG, FUNC(rs232_port_device::write_rts));
-//	m_dusccterm->out_dtra_callback().set(m_dusccterm, FUNC(duscc68562_device::dcda_w));
-//	m_dusccterm->out_rtsa_callback().set(m_dusccterm, FUNC(duscc68562_device::ctsa_w));
+//  m_dusccterm->out_dtra_callback().set(m_dusccterm, FUNC(duscc68562_device::dcda_w));
+//  m_dusccterm->out_rtsa_callback().set(m_dusccterm, FUNC(duscc68562_device::ctsa_w));
 	m_dusccterm->out_txdb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_txd));
 	m_dusccterm->out_dtrb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_dtr));
 	m_dusccterm->out_rtsb_callback().set(RS232P2_TAG, FUNC(rs232_port_device::write_rts));
-//	m_dusccterm->out_txdb_callback().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
-//	m_dusccterm->out_dtrb_callback().set(m_dusccterm, FUNC(duscc68562_device::dcdb_w));
-//	m_dusccterm->out_rtsb_callback().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
+//  m_dusccterm->out_txdb_callback().set(m_dusccterm, FUNC(duscc68562_device::rxb_w));
+//  m_dusccterm->out_dtrb_callback().set(m_dusccterm, FUNC(duscc68562_device::dcdb_w));
+//  m_dusccterm->out_rtsb_callback().set(m_dusccterm, FUNC(duscc68562_device::ctsb_w));
 	m_dusccterm->out_int_callback().set(FUNC(vme_hcpu30_card_device::dusirq_callback));
 
 	rs232_port_device &rs232p1(RS232_PORT(config, RS232P1_TAG, default_rs232_devices, "terminal"));
@@ -397,23 +397,23 @@ WRITE_LINE_MEMBER(vme_hcpu30_card_device::fdcdrq_callback)
 // D69 translates to DI0-7, D67 to DL24-31
 //
 // == f101.w ==
-// 0	- SYSFAIL*
-// 1	- ACFAIL*
-// 2	- TERMRES*
-// 3	- nc
-// 4	- FPSENSE*
-// 5	- RST*
-// 6	- IRQ30*	D119 PLM output (CLRINT* and VECT20 inputs)
-// 7	- SDMRQ*
+// 0    - SYSFAIL*
+// 1    - ACFAIL*
+// 2    - TERMRES*
+// 3    - nc
+// 4    - FPSENSE*
+// 5    - RST*
+// 6    - IRQ30*    D119 PLM output (CLRINT* and VECT20 inputs)
+// 7    - SDMRQ*
 // == f100.w ==
-// 8	- SCSIIRQ
-// 9	- CENTIRQ*
-// 10	- FDCIRQ*
-// 11	- ABORT*
-// 12	- DUSIRQ*
-// 13	- LANIRQ
-// 14	- IPEND*	from 030
-// 15	- LDMARQ*
+// 8    - SCSIIRQ
+// 9    - CENTIRQ*
+// 10   - FDCIRQ*
+// 11   - ABORT*
+// 12   - DUSIRQ*
+// 13   - LANIRQ
+// 14   - IPEND*    from 030
+// 15   - LDMARQ*
 uint32_t vme_hcpu30_card_device::irq_state_r(offs_t offset)
 {
 	return m_irq_state << 16;
@@ -438,21 +438,21 @@ void vme_hcpu30_card_device::update_030_irq(int irq, line_state state)
 
 // D60 translates from DI0-7 (DL24-31)
 // D61 translates from DL16-21
-// 0	- INTL0
-// 1	- INTL1
-// 2	- INTL2
-// 3	- VME16
-// 4	- CLRINT*	D119 PLM input
-// 5	- LPBK* (loopback?)
-// 6-7	- nc
-// 8	- SCSIRES*
-// 9	- ROR
-// 10	- CENTDS (strobe)
-// 11	- RESET*
-// 12	- HALT*
-// 13	- SRLOCL*
-// 14	- PWRDOWN
-// 15	- INTENA*	"enable input" pin of LS148 priority encoder
+// 0    - INTL0
+// 1    - INTL1
+// 2    - INTL2
+// 3    - VME16
+// 4    - CLRINT*   D119 PLM input
+// 5    - LPBK* (loopback?)
+// 6-7  - nc
+// 8    - SCSIRES*
+// 9    - ROR
+// 10   - CENTDS (strobe)
+// 11   - RESET*
+// 12   - HALT*
+// 13   - SRLOCL*
+// 14   - PWRDOWN
+// 15   - INTENA*   "enable input" pin of LS148 priority encoder
 void vme_hcpu30_card_device::irq_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	uint16_t diff;

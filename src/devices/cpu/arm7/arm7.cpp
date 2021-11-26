@@ -29,6 +29,7 @@ TODO:
 - Fix and finish the DRC code, or remove it entirely
 
 *****************************************************************************/
+
 #include "emu.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
@@ -44,6 +45,8 @@ TODO:
 #define LOG_COPRO_UNKNOWN   (1 << 4)
 #define LOG_COPRO_RESERVED  (1 << 5)
 #define LOG_TLB             (1 << 6)
+#define LOG_TLB_MISS        (1 << 7)
+#define LOG_PREFETCH        (1 << 8)
 
 #define VERBOSE             (0) // (LOG_COPRO_READS | LOG_COPRO_WRITES | LOG_COPRO_UNKNOWN | LOG_COPRO_RESERVED)
 #include "logmacro.h"
@@ -700,9 +703,12 @@ bool arm7_cpu_device::page_table_translate(offs_t &vaddr, const int flags)
 	const uint32_t lvl1_addr = m_tlb_base_mask | ((vaddr & COPRO_TLB_VADDR_FLTI_MASK) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT);
 	const uint32_t lvl1_desc = m_program->read_dword(lvl1_addr);
 
+	LOGMASKED(LOG_MMU, "ARM7: Translating page table entry for %08x, lvl1_addr %08x, lvl1_desc %08x\n", vaddr, lvl1_addr, lvl1_desc);
+
 	switch (lvl1_desc & 3)
 	{
 		case 0: // Unmapped
+			LOGMASKED(LOG_MMU, "ARM7: Translating page table entry for %08x, Unmapped, lvl1a %08x, lvl1d %08x\n", vaddr, lvl1_addr, lvl1_desc);
 			if (flags & ARM7_TLB_ABORT_D)
 			{
 				LOGMASKED(LOG_MMU, "ARM7: Page Table Translation failed (D), PC %08x, lvl1 unmapped, vaddr = %08x, lvl1A = %08x, lvl1D = %08x\n", m_r[eR15], vaddr, lvl1_addr, lvl1_desc);
@@ -721,6 +727,8 @@ bool arm7_cpu_device::page_table_translate(offs_t &vaddr, const int flags)
 		{
 			const uint32_t lvl2_addr = (lvl1_desc & COPRO_TLB_CFLD_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_CSLTI_MASK) >> COPRO_TLB_VADDR_CSLTI_MASK_SHIFT);
 			const uint32_t lvl2_desc = m_program->read_dword(lvl2_addr);
+
+			LOGMASKED(LOG_MMU, "ARM7: Translating page table entry for %08x, Coarse, lvl1a %08x, lvl1d %08x, lvl2a %08x, lvl2d %08x\n", vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
 
 			switch (lvl2_desc & 3)
 			{
@@ -753,12 +761,15 @@ bool arm7_cpu_device::page_table_translate(offs_t &vaddr, const int flags)
 		}
 
 		case 2: // Section Descriptor
+			LOGMASKED(LOG_MMU, "ARM7: Translating page table entry for %08x, Section, lvl1a %08x, lvl1d %08x\n", vaddr, lvl1_addr, lvl1_desc);
 			return page_table_finish_translation(vaddr, COPRO_TLB_TYPE_SECTION, lvl1_desc, lvl1_desc, flags, lvl1_addr, lvl1_addr);
 
 		case 3: // Fine Table
 		{
 			const uint32_t lvl2_addr = (lvl1_desc & COPRO_TLB_FPTB_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_FSLTI_MASK) >> COPRO_TLB_VADDR_FSLTI_MASK_SHIFT);
 			const uint32_t lvl2_desc = m_program->read_dword(lvl2_addr);
+
+			LOGMASKED(LOG_MMU, "ARM7: Translating page table entry for %08x, Fine, lvl1a %08x, lvl1d %08x, lvl2a %08x, lvl2d %08x\n", vaddr, lvl1_addr, lvl1_desc, lvl2_addr, lvl2_desc);
 
 			switch (lvl2_desc & 3)
 			{
@@ -837,6 +848,8 @@ bool arm7_cpu_device::translate_vaddr_to_paddr(offs_t &vaddr, const int flags)
 	}
 	else
 	{
+		if (m_tlb_log)
+			LOGMASKED(LOG_MMU, "No TLB entry for %08x yet, running page_table_translate\n", vaddr);
 		return page_table_translate(vaddr, flags);
 	}
 }
@@ -1143,29 +1156,37 @@ void arm7_cpu_device::update_insn_prefetch(uint32_t curr_pc)
 	curr_pc &= ~3;
 	if (m_insn_prefetch_address[m_insn_prefetch_index] != curr_pc)
 	{
+		LOGMASKED(LOG_PREFETCH, "Prefetch addr %08x doesn't match curr_pc %08x, flushing prefetch buffer\n", m_insn_prefetch_address[m_insn_prefetch_index], curr_pc);
 		m_insn_prefetch_count = 0;
 		m_insn_prefetch_index = 0;
 	}
 
 	if (m_insn_prefetch_count == m_insn_prefetch_depth)
+	{
+		LOGMASKED(LOG_PREFETCH, "We have prefetched up to the max depth, bailing\n");
 		return;
+	}
 
 	const uint32_t to_fetch = m_insn_prefetch_depth - m_insn_prefetch_count;
 	const uint32_t start_index = (m_insn_prefetch_depth + (m_insn_prefetch_index - to_fetch)) % m_insn_prefetch_depth;
 	//printf("need to prefetch %d instructions starting at index %d\n", to_fetch, start_index);
 
+	LOGMASKED(LOG_PREFETCH, "Need to fetch %d entries starting from index %d\n", to_fetch, start_index);
 	uint32_t pc = curr_pc + m_insn_prefetch_count * 4;
 	for (uint32_t i = 0; i < to_fetch; i++)
 	{
 		uint32_t index = (i + start_index) % m_insn_prefetch_depth;
+		LOGMASKED(LOG_PREFETCH, "About to get prefetch index %d from addr %08x\n", index, pc);
 		m_insn_prefetch_valid[index] = true;
 		offs_t physical_pc = pc;
 		if ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical_pc, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
 		{
+			LOGMASKED(LOG_PREFETCH, "Unable to fetch, bailing\n");
 			m_insn_prefetch_valid[index] = false;
 			break;
 		}
 		uint32_t op = m_pr32(physical_pc);
+		LOGMASKED(LOG_PREFETCH, "Got op %08x\n", op);
 		//printf("ipb[%d] <- %08x(%08x)\n", index, op, pc);
 		m_insn_prefetch_buffer[index] = op;
 		m_insn_prefetch_address[index] = pc;
@@ -1193,6 +1214,7 @@ bool arm7_cpu_device::insn_fetch_arm(uint32_t pc, uint32_t &out_insn)
 	//printf("ipb[%d] = %08x\n", m_insn_prefetch_index, m_insn_prefetch_buffer[m_insn_prefetch_index]);
 	out_insn = m_insn_prefetch_buffer[m_insn_prefetch_index];
 	bool valid = m_insn_prefetch_valid[m_insn_prefetch_index];
+	LOGMASKED(LOG_PREFETCH, "Fetched op %08x for PC %08x with %s entry from %08x\n", out_insn, pc, valid ? "valid" : "invalid", m_insn_prefetch_address[m_insn_prefetch_index]);
 	m_insn_prefetch_index = (m_insn_prefetch_index + 1) % m_insn_prefetch_depth;
 	m_insn_prefetch_count--;
 	return valid;
@@ -1797,7 +1819,7 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 //            LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Cache Ops = %08x (%d) (%d)\n", data, op2, op3);
 			break;
 		case 8:             // TLB Operations
-			LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops = %08x (%d) (%d), PC = %08x\n", data, op2, op3, m_r[eR15]);
+			LOGMASKED(LOG_COPRO_WRITES, "%s: arm7_rt_w_callback TLB Ops = %08x (%d) (%d), PC = %08x\n", machine().describe_context(), data, op2, op3, m_r[eR15]);
 			switch (op2)
 			{
 				case 0:
@@ -1831,18 +1853,51 @@ void arm7_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 					}
 					break;
 				case 1:
-					if (op3 == 6)
+					switch (op3)
 					{
-						// Flush D single entry
-						tlb_entry *entry = tlb_map_entry(m_r[op3], ARM7_TLB_ABORT_D);
-						if (entry)
+						case 5:
 						{
-							entry->valid = false;
+							// Flush I single entry
+							tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_P);
+							if (entry)
+							{
+								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed I entry for %08x\n", data);
+								entry->valid = false;
+							}
+							break;
 						}
-					}
-					else
-					{
-						LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Unsupported TLB Op\n");
+
+						case 6:
+						{
+							// Flush D single entry
+							tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
+							if (entry)
+							{
+								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed D entry for %08x\n", data);
+								entry->valid = false;
+							}
+							break;
+						}
+						case 7:
+						{
+							// Flush unified single entry
+							tlb_entry *entry = tlb_probe(data, ARM7_TLB_ABORT_D);
+							if (entry)
+							{
+								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed D entry for %08x\n", data);
+								entry->valid = false;
+							}
+							entry = tlb_probe(data, ARM7_TLB_ABORT_P);
+							if (entry)
+							{
+								LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback TLB Ops: Successfully flushed I entry for %08x\n", data);
+								entry->valid = false;
+							}
+							break;
+						}
+						default:
+							LOGMASKED(LOG_COPRO_WRITES, "arm7_rt_w_callback Unsupported TLB Op\n");
+							break;
 					}
 					break;
 			}

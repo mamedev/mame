@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Katherine Rohl
 /*
- *  Motorola SYS1121 VME chassis. 
+ *  Motorola SYS1121 VME chassis.
  *
  *  The basic configuration was an MVME12x MPU,
  *  an MVME050 system controller, and an MVME320 disk
  *  controller.
  */
- 
+
 #include "emu.h"
 #include "bus/vme/vme_mvme120.h"
 #include "logmacro.h"
 
-namespace 
+namespace
 {
 	class sys1121_state : public driver_device
 	{
@@ -51,7 +51,7 @@ namespace
 	}
 
 	// This is a VME chassis so any ROMs are contained in the cards.
-	ROM_START(sys1121) 
+	ROM_START(sys1121)
 	ROM_END
 }
 

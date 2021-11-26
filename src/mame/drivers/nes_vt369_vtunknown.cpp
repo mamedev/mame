@@ -411,7 +411,7 @@ void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_bt(machine_config &config
 
 void nes_vt369_vtunknown_cy_state::bittboy_412c_w(uint8_t data)
 {
-	//bittboy (ok), mc_pg150 (not working)
+	// bittboy (ok)
 	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
 }
@@ -698,11 +698,6 @@ ROM_START( bittboy )
 	ROM_LOAD( "bittboy_flash_read_s29gl256n-tf-v2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
 ROM_END
 
-ROM_START( mc_pg150 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "pocketgames150-in1.bin", 0x00000, 0x2000000, CRC(32f1176b) SHA1(2cfd9b61ebdfc328f020ae9bd5e5e2219321e828) )
-ROM_END
-
 ROM_START( mc_hh210 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "msp55lv128t.u4", 0x00000, 0x1000000, CRC(9ba520d4) SHA1(627f811b24314197e289a2ade668ff4115421bed) )
@@ -876,8 +871,6 @@ void nes_vt369_vtunknown_state::init_lxcmcypp()
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,    0,        0,  nes_vt369_vtunknown_bt_2x16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
-// Broken GFX, investigate, is this really a system? research indicates it's a multicart for a regular NES?
-CONS( 201?, mc_pg150,   0,        0,  nes_vt369_vtunknown_bt_2x16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "<unknown>", "Pocket Games 150 in 1", MACHINE_NOT_WORKING ) // has external banking
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
 CONS( 201?, mc_hh210,   0,        0,  nes_vt369_vtunknown_4k_ram_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )

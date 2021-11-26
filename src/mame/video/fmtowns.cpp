@@ -1358,6 +1358,7 @@ void towns_state::towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* re
 
 void towns_state::render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t jis, uint8_t attr)
 {
+#if 0
 	uint32_t rom_addr;
 	uint32_t vram_addr;
 	uint16_t linesize = m_video.towns_crtc_reg[24] * 4;
@@ -1428,6 +1429,7 @@ void towns_state::render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t
 		vram_addr += linesize;
 		vram_addr &= 0x3ffff;
 	}
+#endif
 }
 
 void towns_state::draw_text_layer()

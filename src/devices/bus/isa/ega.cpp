@@ -1345,7 +1345,7 @@ void isa8_ega_device::pc_ega8_3c0_w(offs_t offset, uint8_t data)
 		m_attribute.index_write ^= 0x01;
 		break;
 
-	/* Misccellaneous Output */
+	/* Miscellaneous Output */
 	case 2:
 		m_misc_output = data;
 		install_banks();
