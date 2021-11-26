@@ -1690,14 +1690,11 @@ files {
 createMAMEProjects(_target, _subtarget, "dataeast")
 files {
 	MAME_DIR .. "src/mame/drivers/actfancr.cpp",
-	MAME_DIR .. "src/mame/includes/actfancr.h",
-	MAME_DIR .. "src/mame/video/actfancr.cpp",
 	MAME_DIR .. "src/mame/drivers/astrof.cpp",
 	MAME_DIR .. "src/mame/includes/astrof.h",
 	MAME_DIR .. "src/mame/audio/astrof.cpp",
 	MAME_DIR .. "src/mame/drivers/backfire.cpp",
 	MAME_DIR .. "src/mame/drivers/battlera.cpp",
-	MAME_DIR .. "src/mame/includes/battlera.h",
 	MAME_DIR .. "src/mame/drivers/boogwing.cpp",
 	MAME_DIR .. "src/mame/includes/boogwing.h",
 	MAME_DIR .. "src/mame/video/boogwing.cpp",
