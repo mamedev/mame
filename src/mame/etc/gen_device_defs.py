@@ -1,4 +1,8 @@
-# license: BSD-3-Clause
+#!/usr/bin/python
+##
+## license: BSD-3-Clause
+## copyright-holders:Angelo Salese
+##
 """Simple Python script to generate a new definition from the template_* files
 """
 import argparse

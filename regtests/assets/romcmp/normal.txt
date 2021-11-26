@@ -1,0 +1,5 @@
+4 files
+fill00.bin                                      FIXED BITS (00000000)
+fill01.bin                                      FIXED BITS (0000000011111111)
+fill10.bin                                      FIXED BITS (1111111100000000)
+fill11.bin                                      FIXED BITS (11111111)
