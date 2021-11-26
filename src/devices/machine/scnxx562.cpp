@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+// license:BSD-3-Clause 
+// copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
     DUSCC Dual Serial Communications Controller emulation
