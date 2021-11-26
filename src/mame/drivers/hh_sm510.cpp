@@ -1401,6 +1401,7 @@ ROM_END
   ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
   ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
   ИМ-50  Космический полёт   Kosmicheskij poljot  Space Flight        The Model ID is the same as Amusing Arithmetic (not emulated in MAME)
+  ИМ-51  Морская атака       Morskaja ataka       -                   -
 
 ***************************************************************************/
 
@@ -1421,6 +1422,7 @@ public:
 	void frogling(machine_config &config);
 	void nburglar(machine_config &config);
 	void spaceflt(machine_config &config);
+	void morataka(machine_config &config);
 };
 
 // config
@@ -1507,6 +1509,11 @@ void gnw_mmouse_state::spaceflt(machine_config &config)
 	kb1013vk12_common(config, 1658, 1080); // R mask option ?
 }
 
+void gnw_mmouse_state::morataka(machine_config &config)
+{
+	kb1013vk12_common(config, 1648, 1080); // R mask option ?
+}
+
 // roms
 
 ROM_START( gnw_mmouse )
@@ -1587,6 +1594,14 @@ ROM_START( spaceflt )
 
 	ROM_REGION( 110214, "screen", 0)
 	ROM_LOAD( "spaceflt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
+ROM_END
+
+ROM_START( morataka )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-51.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 105057, "screen", 0)
+	ROM_LOAD( "morataka.svg", 0, 105057, CRC(c235c56c) SHA1(b6ef74ba7826221683243e23513270d0f0f2cfda) )
 ROM_END
 
 
@@ -9643,6 +9658,7 @@ CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse
 CONS( 1989, frogling,     gnw_mmouse,  0, frogling,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Frogling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 19??, nburglar,     gnw_mmouse,  0, nburglar,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Night Burglars", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 19??, spaceflt,     gnw_mmouse,  0, spaceflt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Space Flight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, morataka,     gnw_mmouse,  0, morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
