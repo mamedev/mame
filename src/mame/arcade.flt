@@ -1282,6 +1282,7 @@ supduck.cpp
 superchs.cpp
 supercrd.cpp
 superdq.cpp
+superga2.cpp
 superqix.cpp
 supertnk.cpp
 superwng.cpp
