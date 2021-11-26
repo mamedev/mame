@@ -347,6 +347,11 @@ public:
 		m_dispatch_write = m_root_write->get_dispatch();
 	}
 
+	virtual ~address_space_specific() {
+		m_root_read ->unref();
+		m_root_write->unref();
+	}
+
 	std::pair<void *, void *> get_cache_info() override {
 		std::pair<void *, void *> rw;
 		rw.first  = m_root_read;
