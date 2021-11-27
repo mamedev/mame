@@ -87,15 +87,6 @@ sparc_base_device::sparc_base_device(const machine_config &mconfig, device_type 
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
 	m_debugger_config = address_space_config("debug", ENDIANNESS_BIG, 32, 32);
-
-	if (type != MB86930)
-	{
-		for (int i = 0; i < 0x10; i++)
-		{
-			m_asi_names[i] = util::string_format("asi%x", i);
-			m_asi_config[i] = address_space_config(m_asi_names[i].c_str(), ENDIANNESS_BIG, 32, 32);
-		}
-	}
 }
 
 
@@ -1728,7 +1719,7 @@ void sparc_base_device::execute_rdsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
 
-	if ((RDPSR or RDWIM or RDBTR
+	if ((RDPSR or RDWIM or RDTBR
 	    or (RDASR and (privileged_ASR(rs1) = 1))) and (S = 0)) then (
 	    trap <- 1;
 	    privileged_instruction <- 1;
@@ -1744,7 +1735,7 @@ void sparc_base_device::execute_rdsr(uint32_t op)
 	);
 	*/
 
-	if (((WRPSR || WRWIM || WRTBR) || (WRASR && m_privileged_asr[RS1])) && IS_USER)
+	if (((RDPSR || RDWIM || RDTBR) || (RDASR && m_privileged_asr[RS1])) && IS_USER)
 	{
 		m_trap = 1;
 		m_privileged_instruction = 1;
@@ -1826,12 +1817,12 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 	    ) else (
 	        WIM'''' <- result
 	    )
-	) else if (WRBTR) then (
+	) else if (WRTBR) then (
 	    if (S = 0) then (
 	        trap <- 1;
 	        privileged_instruction <- 1
 	    ) else (
-	        WIM'''' <- result
+	        TBR'''' <- result
 	    )
 	);
 	*/
@@ -5072,7 +5063,7 @@ void sparcv8_device::execute_swap(uint32_t op)
 	        trap <- 1;
 	        illegal_instruction <- 1
 	    ) else (
-	        address <- r[rs1] + r[rs1];
+	        address <- r[rs1] + r[rs2];
 	        addr_space <- asi
 	    )
 	);
@@ -5181,7 +5172,7 @@ void sparcv8_device::execute_swap(uint32_t op)
 		}
 		else
 		{
-			if (RD != 0)
+			if (RDBITS)
 				RDREG = word;
 		}
 	}
@@ -5231,7 +5222,7 @@ void sparcv8_device::execute_mul(uint32_t op)
 		result = (uint32_t)dresult;
 	}
 
-	if (RD != 0)
+	if (RDBITS)
 	{
 		RDREG = result;
 	}
@@ -5346,7 +5337,7 @@ void sparcv8_device::execute_div(uint32_t op)
 			}
 		}
 
-		if (RD != 0)
+		if (RDBITS)
 			RDREG = result;
 
 		if (UDIVCC || SDIVCC)
