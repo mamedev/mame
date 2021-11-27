@@ -87,6 +87,15 @@ sparc_base_device::sparc_base_device(const machine_config &mconfig, device_type 
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
 	m_debugger_config = address_space_config("debug", ENDIANNESS_BIG, 32, 32);
+
+	if (type != MB86930)
+	{
+		for (int i = 0; i < 0x10; i++)
+		{
+			m_asi_names[i] = util::string_format("asi%x", i);
+			m_asi_config[i] = address_space_config(m_asi_names[i].c_str(), ENDIANNESS_BIG, 32, 32);
+		}
+	}
 }
 
 
