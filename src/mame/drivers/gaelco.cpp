@@ -194,7 +194,7 @@ void gaelco_state::thoop_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                      // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x440000, 0x440fff).ram().share("spriteram");                                              // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
@@ -337,10 +337,10 @@ static INPUT_PORTS_START( biomtoy )
 
 	PORT_START("DSW2")
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW2:8" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Not Listed/shown in test mode */
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") // Not Listed/shown in test mode
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") /* Not Listed/shown in test mode */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") // Not Listed/shown in test mode
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")

@@ -251,5 +251,5 @@ ROM_START(kuzmich)
 	ROM_LOAD("ke.bin", 0x0000, 0x8000, CRC(102d246b) SHA1(492dcdf0cc31190a97057a69010e2c9c23b6e59d))
 ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY    FULLNAME
-COMP( 199?, kuzmich,  0,      0,      kuzmich,  kuzmich, superga2_state, empty_init, "Nippel",  "Kuzmich-Egorych", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT    CLASS           INIT              COMPANY    FULLNAME
+GAME( 199?, kuzmich,  0,      kuzmich,  kuzmich, superga2_state, empty_init, ROT0, "Nippel",  "Kuzmich-Egorych", MACHINE_SUPPORTS_SAVE )
