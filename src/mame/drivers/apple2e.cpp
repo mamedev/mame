@@ -1301,6 +1301,7 @@ void apple2e_state::init_128ex()
 {
 	m_accel_laser = true;
 	m_has_laser_mouse = true;
+	m_inverse_text = true;
 }
 
 void apple2e_state::init_spect()
