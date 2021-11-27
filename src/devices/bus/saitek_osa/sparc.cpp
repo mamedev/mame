@@ -16,8 +16,9 @@ The module doesn't have its own LCD screen. It has a grill+fan underneath
 at the front part, and a heatsink on the CPU.
 
 TODO:
-- runs too slow? opening book moves take around 3 seconds per ply, but on the
-  real device less than 1 second, maybe cpu cache related?
+- runs too slow? solving mate problems is around 60% slower than real device,
+  maybe cpu cache related?
+- opening book moves take 3 around seconds per ply, should be almost immediate
 
 ***************************************************************************/
 
