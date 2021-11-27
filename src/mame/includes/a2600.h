@@ -21,6 +21,7 @@
 #include "bus/vcs/vcs_slot.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6507.h"
+#include "machine/bankdev.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
 
@@ -106,5 +107,39 @@ protected:
 private:
 	required_device<vcs_cart_slot_device> m_cart;
 };
+
+
+class a2600_pop_state : public a2600_base_state
+{
+public:
+	a2600_pop_state(const machine_config &mconfig, device_type type, const char *tag)
+		: a2600_base_state(mconfig, type, tag)
+		, m_bankdev(*this, "bank")
+		, m_a8(*this, "A8")
+		, m_swb(*this, "SWB")
+	{ }
+
+	void a2600_pop(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	void memory_map(address_map &map);
+	void banked_map(address_map &map);
+
+	uint8_t rom_switch_r(offs_t offset);
+	void rom_switch_w(offs_t offset, uint8_t data);
+	TIMER_CALLBACK_MEMBER(reset_timer_callback);
+	TIMER_CALLBACK_MEMBER(game_select_button_timer_callback);
+
+	required_device<address_map_bank_device> m_bankdev;
+	required_ioport m_a8;
+	required_ioport m_swb;
+	emu_timer *m_reset_timer;
+	emu_timer *m_game_select_button_timer;
+};
+
 
 #endif // MAME_INCLUDES_A2600_H

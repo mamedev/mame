@@ -271,6 +271,7 @@ tvpoker                         // (c) 197? A-1 Supply
 @source:a2600.cpp
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
+a2600_pop                       // Atari 2600 Point of Purchase Display
 
 @source:a5105.cpp
 a5105                           //
