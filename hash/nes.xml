@@ -78845,6 +78845,206 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+<!-- 8-bit Xmas 2008-2011 are not really NROM, but an NROM-like board with flashing LEDs -->
+	<software name="xmas08" supported="partial">
+		<description>8-bit Xmas 2008</description>
+		<year>2008</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas08demo.prg" size="32768" crc="3ae2a150" sha1="5ce021bebb9049604434af45d6c397e6dd7b84c4" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas09" supported="partial">
+		<description>8-bit Xmas 2009</description>
+		<year>2009</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas09demo.prg" size="32768" crc="851cea10" sha1="88ed2741e88144eda26366985d216f27629cf3f8" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas10" supported="partial">
+		<description>8-bit Xmas 2010</description>
+		<year>2010</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas10demo.prg" size="32768" crc="a6e02975" sha1="a3a81cc6fdb7a68efbb061ba44dd52407a978e26" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas11" supported="partial">
+		<description>8-bit Xmas 2011</description>
+		<year>2011</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<dataarea name="prg" size="32768">
+				<rom name="xmas11demo.prg" size="32768" crc="d0d0c932" sha1="067bbd99c5f9ccaf66ef484e024b9c98e4893d6d" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This will crash if left on the title screen. The mini-game seems fine, however. -->
+	<software name="xmas12" supported="partial">
+		<description>8-bit Xmas 2012</description>
+		<year>2012</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas12demo.prg" size="131072" crc="feab08f1" sha1="4834a8bea6df40c9566b97412de775de2ffde492" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas13" supported="partial">
+		<description>8-bit Xmas 2013</description>
+		<year>2013</year>
+		<publisher>RetroZone</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas13demo.prg" size="131072" crc="f8d04aa0" sha1="98e57ebca93689042d254fe205c357cdc4d84b0a" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas14" supported="partial">
+		<description>8-bit Xmas 2014</description>
+		<year>2014</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas14demo.prg" size="131072" crc="900ca825" sha1="9e7a881a5c1e643b1327a7c4434e2623eefb95e5" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas15" supported="partial">
+		<description>8-bit Xmas 2015</description>
+		<year>2015</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas15demo.prg" size="131072" crc="376c9fcc" sha1="658929d3377e30469c82b3bf8a66c7d2fbcd0b57" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas16" supported="no">
+		<description>8-bit Xmas 2016</description>
+		<year>2016</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas16demo.prg" size="131072" crc="19eb1773" sha1="9a22cb50f0b7d26f81dd0b9f8e3f05e07c3b4834" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas18">
+		<description>8-bit Xmas 2018</description>
+		<year>2018</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas18demo.prg" size="131072" crc="38431bf6" sha1="cb5a7ee17b4a4a7a30d4c98073d107561d903641" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas19">
+		<description>8-bit Xmas 2019</description>
+		<year>2019</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas19demo.prg" size="131072" crc="3e03466b" sha1="a8cceadd892a8fb4c43ccc660a2073c2d8b2d69e" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas20">
+		<description>8-bit Xmas 2020</description>
+		<year>2020</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas20demo.prg" size="131072" crc="bad62c7b" sha1="b0d4a83d71e571ab7ba5ba95784498f17b527606" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas21">
+		<description>8-bit Xmas 2021</description>
+		<year>2021</year>
+		<publisher>retroUSB</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="8bitxmas" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="xmas21demo.prg" size="131072" crc="d8ab6288" sha1="8b15b9eff1bcb128ff4969de7a5d4d47b3b2b62f" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge? -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This release is nearly identical to the prototype 1 set but with rebranding -->
 	<software name="airballr" cloneof="airball">
 		<description>Airball (RetroZone)</description>
