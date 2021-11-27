@@ -1,29 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Casio CTK-2000 keyboard (and related models)
+    Casio CTK-2000 keyboard (and related models)
 
-	- CTK-2000 (2008)
-	  Basic 61-key model
-	- CTK-3000
-	  Adds velocity-sensitive keys and pitch wheel
-	- CTK-2100 (2009)
-	  More flexible sampling feature, lesson buttons double as voice/drum pads
-	  (based on CTK-2000, not 3000)
+    - CTK-2000 (2008)
+      Basic 61-key model
+    - CTK-3000
+      Adds velocity-sensitive keys and pitch wheel
+    - CTK-2100 (2009)
+      More flexible sampling feature, lesson buttons double as voice/drum pads
+      (based on CTK-2000, not 3000)
 
-	Main board (M800-MDA1):
+    Main board (M800-MDA1):
 
-	IC1: CPU (NEC uPD800468)
-		Custom chip (ARM-based), built in peripheral controllers & sound generator
+    IC1: CPU (NEC uPD800468)
+        Custom chip (ARM-based), built in peripheral controllers & sound generator
 
-	LSI2: 16Mbit ROM (OKI MR27T1602L)
+    LSI2: 16Mbit ROM (OKI MR27T1602L)
 
-	Console PCB (M800-CNA):
+    Console PCB (M800-CNA):
 
-	IC401: LCD controller (Sitronix ST7066U-0A, HD44780 compatible)
+    IC401: LCD controller (Sitronix ST7066U-0A, HD44780 compatible)
 
-	CTK-2000 service manual with schematics, pinouts, etc.:
-	https://www.manualslib.com/manual/933451/Casio-Ctk-2000.html
+    CTK-2000 service manual with schematics, pinouts, etc.:
+    https://www.manualslib.com/manual/933451/Casio-Ctk-2000.html
 
  */
 
@@ -211,7 +211,7 @@ INPUT_PORTS_START(ctk2100)
 
 	PORT_START("maincpu:kbd:FI8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("maincpu:kbd:FI9")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)

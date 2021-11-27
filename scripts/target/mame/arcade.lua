@@ -151,6 +151,7 @@ CPUS["KS0164"] = true
 --CPUS["COPS1"] = true
 CPUS["MEG"] = true
 CPUS["F2MC16"] = true
+CPUS["M68HC16"] = true
 
 --------------------------------------------------
 -- specify available sound cores
@@ -1689,14 +1690,11 @@ files {
 createMAMEProjects(_target, _subtarget, "dataeast")
 files {
 	MAME_DIR .. "src/mame/drivers/actfancr.cpp",
-	MAME_DIR .. "src/mame/includes/actfancr.h",
-	MAME_DIR .. "src/mame/video/actfancr.cpp",
 	MAME_DIR .. "src/mame/drivers/astrof.cpp",
 	MAME_DIR .. "src/mame/includes/astrof.h",
 	MAME_DIR .. "src/mame/audio/astrof.cpp",
 	MAME_DIR .. "src/mame/drivers/backfire.cpp",
 	MAME_DIR .. "src/mame/drivers/battlera.cpp",
-	MAME_DIR .. "src/mame/includes/battlera.h",
 	MAME_DIR .. "src/mame/drivers/boogwing.cpp",
 	MAME_DIR .. "src/mame/includes/boogwing.h",
 	MAME_DIR .. "src/mame/video/boogwing.cpp",
@@ -4164,7 +4162,6 @@ files {
 	MAME_DIR .. "src/mame/includes/taito_l.h",
 	MAME_DIR .. "src/mame/video/taito_l.cpp",
 	MAME_DIR .. "src/mame/drivers/taito_x.cpp",
-	MAME_DIR .. "src/mame/includes/taito_x.h",
 	MAME_DIR .. "src/mame/machine/taitocchip.cpp",
 	MAME_DIR .. "src/mame/machine/taitocchip.h",
 	MAME_DIR .. "src/mame/drivers/taito_z.cpp",
@@ -5134,6 +5131,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/summit.cpp",
 	MAME_DIR .. "src/mame/drivers/sumt8035.cpp",
 	MAME_DIR .. "src/mame/drivers/supercrd.cpp",
+	MAME_DIR .. "src/mame/drivers/superga2.cpp",
 	MAME_DIR .. "src/mame/drivers/supertnk.cpp",
 	MAME_DIR .. "src/mame/drivers/tapatune.cpp",
 	MAME_DIR .. "src/mame/drivers/tattack.cpp",

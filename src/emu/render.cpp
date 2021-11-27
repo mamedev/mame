@@ -536,8 +536,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container, u
 //-------------------------------------------------
 
 render_container::render_container(render_manager &manager, screen_device *screen)
-	: m_next(nullptr)
-	, m_manager(manager)
+	: m_manager(manager)
 	, m_screen(screen)
 	, m_overlaybitmap(nullptr)
 	, m_overlaytexture(nullptr)
@@ -894,7 +893,6 @@ render_target::render_target(render_manager &manager, util::xml::data_node const
 template <typename T> render_target::render_target(render_manager &manager, T &&layout, u32 flags, constructor_impl_t)
 	: m_next(nullptr)
 	, m_manager(manager)
-	, m_filelist(std::make_unique<std::list<layout_file>>())
 	, m_curview(0U)
 	, m_flags(flags)
 	, m_listindex(0)
@@ -960,7 +958,7 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 
 	// load the layout files
 	load_layout_files(std::forward<T>(layout), flags & RENDER_CREATE_SINGLE_FILE);
-	for (layout_file &file : *m_filelist)
+	for (layout_file &file : m_filelist)
 		for (layout_view &view : file.views())
 			if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 				m_views.emplace_back(view, view.default_visibility_mask());
@@ -1417,23 +1415,6 @@ render_primitive_list &render_target::get_primitives()
 		}
 	}
 
-	// process the debug containers
-	for (render_container &debug : m_debug_containers)
-	{
-		object_transform ui_xform;
-		ui_xform.xoffs = 0;
-		ui_xform.yoffs = 0;
-		ui_xform.xscale = (float)m_width;
-		ui_xform.yscale = (float)m_height;
-		ui_xform.color.r = ui_xform.color.g = ui_xform.color.b = 1.0f;
-		ui_xform.color.a = 0.9f;
-		ui_xform.orientation = m_orientation;
-		ui_xform.no_center = true;
-
-		// add UI elements
-		add_container_primitives(list, root_xform, ui_xform, debug, BLENDMODE_ALPHA);
-	}
-
 	// process the UI if we are the UI target
 	if (is_ui_target())
 	{
@@ -1604,44 +1585,12 @@ void render_target::invalidate_all(void *refptr)
 
 
 //-------------------------------------------------
-//  debug_alloc - allocate a container for a debug
-//  view
-//-------------------------------------------------
-
-render_container *render_target::debug_alloc()
-{
-	return &m_debug_containers.append(*m_manager.container_alloc());
-}
-
-
-//-------------------------------------------------
-//  debug_free - free a container for a debug view
-//-------------------------------------------------
-
-void render_target::debug_free(render_container &container)
-{
-	m_debug_containers.remove(container);
-}
-
-
-//-------------------------------------------------
-//  debug_append - move a debug view container to
-//  the end of the list
-//-------------------------------------------------
-
-void render_target::debug_append(render_container &container)
-{
-	m_debug_containers.append(m_debug_containers.detach(container));
-}
-
-
-//-------------------------------------------------
 //  resolve_tags - resolve tag lookups
 //-------------------------------------------------
 
 void render_target::resolve_tags()
 {
-	for (layout_file &file : *m_filelist)
+	for (layout_file &file : m_filelist)
 		file.resolve_tags();
 
 	current_view().recompute(visibility_mask(), m_layerconfig.zoom_to_screen());
@@ -1808,7 +1757,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	auto const nth_view =
 		[this] (unsigned n) -> layout_view *
 		{
-			for (layout_file &file : *m_filelist)
+			for (layout_file &file : m_filelist)
 				for (layout_view &view : file.views())
 					if (!(m_flags & RENDER_CREATE_NO_ART) || !view.has_art())
 						if (n-- == 0)
@@ -1821,7 +1770,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 		if (!nth_view(0))
 		{
 			load_layout_file(nullptr, layout_noscreens);
-			if (m_filelist->empty())
+			if (m_filelist.empty())
 				throw emu_fatalerror("Couldn't parse default layout??");
 		}
 	}
@@ -2226,7 +2175,7 @@ bool render_target::load_layout_file(device_t &device, util::xml::data_node cons
 	// parse and catch any errors
 	try
 	{
-		m_filelist->emplace_back(device, rootnode, searchpath, dirname);
+		m_filelist.emplace_back(device, rootnode, searchpath, dirname);
 	}
 	catch (emu_fatalerror &err)
 	{
@@ -3107,7 +3056,7 @@ render_manager::render_manager(running_machine &machine)
 	, m_ui_target(nullptr)
 	, m_live_textures(0)
 	, m_texture_id(0)
-	, m_ui_container(new render_container(*this))
+	, m_ui_container(std::make_unique<render_container>(*this))
 {
 	// register callbacks
 	machine.configuration().config_register(
@@ -3117,7 +3066,7 @@ render_manager::render_manager(running_machine &machine)
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_enumerator(machine.root_device()))
-		screen.set_container(*container_alloc(&screen));
+		screen.set_container(m_screen_container_list.emplace_back(*this, &screen));
 }
 
 
@@ -3128,8 +3077,8 @@ render_manager::render_manager(running_machine &machine)
 render_manager::~render_manager()
 {
 	// free all the containers since they may own textures
-	container_free(m_ui_container);
-	m_screen_container_list.reset();
+	m_ui_container.reset();
+	m_screen_container_list.clear();
 
 	// better not be any outstanding textures when we die
 	assert(m_live_textures == 0);
@@ -3229,7 +3178,7 @@ float render_manager::ui_aspect(render_container *rc)
 	int orient;
 	float aspect;
 
-	if (rc == m_ui_container || rc == nullptr) {
+	if (rc == m_ui_container.get() || rc == nullptr) {
 		// ui container, aggregated multi-screen target
 
 		orient = orientation_add(m_ui_target->orientation(), m_ui_container->orientation());
@@ -3341,29 +3290,6 @@ void render_manager::resolve_tags()
 
 
 //-------------------------------------------------
-//  container_alloc - allocate a new container
-//-------------------------------------------------
-
-render_container *render_manager::container_alloc(screen_device *screen)
-{
-	auto container = new render_container(*this, screen);
-	if (screen != nullptr)
-		m_screen_container_list.append(*container);
-	return container;
-}
-
-
-//-------------------------------------------------
-//  container_free - release a container
-//-------------------------------------------------
-
-void render_manager::container_free(render_container *container)
-{
-	m_screen_container_list.remove(*container);
-}
-
-
-//-------------------------------------------------
 //  config_load - read and apply data from the
 //  configuration file
 //-------------------------------------------------
@@ -3395,24 +3321,29 @@ void render_manager::config_load(config_type cfg_type, config_level cfg_level, u
 	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
 	{
 		int const index = screennode->get_attribute_int("index", -1);
-		render_container *container = m_screen_container_list.find(index);
+		render_container *container = nullptr;
+		if (index >= 0 && index < m_screen_container_list.size())
+			container = &*std::next(m_screen_container_list.begin(), index);
 
-		// fetch current settings
-		render_container::user_settings settings = container->get_user_settings();
+		if (container != nullptr)
+		{
+			// fetch current settings
+			render_container::user_settings settings = container->get_user_settings();
 
-		// fetch color controls
-		settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
-		settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
-		settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
+			// fetch color controls
+			settings.m_brightness = screennode->get_attribute_float("brightness", settings.m_brightness);
+			settings.m_contrast = screennode->get_attribute_float("contrast", settings.m_contrast);
+			settings.m_gamma = screennode->get_attribute_float("gamma", settings.m_gamma);
 
-		// fetch positioning controls
-		settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
-		settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
-		settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
-		settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
+			// fetch positioning controls
+			settings.m_xoffset = screennode->get_attribute_float("hoffset", settings.m_xoffset);
+			settings.m_xscale = screennode->get_attribute_float("hstretch", settings.m_xscale);
+			settings.m_yoffset = screennode->get_attribute_float("voffset", settings.m_yoffset);
+			settings.m_yscale = screennode->get_attribute_float("vstretch", settings.m_yscale);
 
-		// set the new values
-		container->set_user_settings(settings);
+			// set the new values
+			container->set_user_settings(settings);
+		}
 	}
 }
 
@@ -3457,7 +3388,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 
 	// iterate over screen containers
 	int scrnum = 0;
-	for (render_container *container = m_screen_container_list.first(); container != nullptr; container = container->next(), scrnum++)
+	for (render_container &container : m_screen_container_list)
 	{
 		// create a node
 		util::xml::data_node *const screennode = parentnode->add_child("screen", nullptr);
@@ -3468,7 +3399,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			// output the basics
 			screennode->set_attribute_int("index", scrnum);
 
-			render_container::user_settings settings = container->get_user_settings();
+			render_container::user_settings const settings = container.get_user_settings();
 
 			// output the color controls
 			if (settings.m_brightness != machine().options().brightness())
@@ -3518,5 +3449,7 @@ void render_manager::config_save(config_type cfg_type, util::xml::data_node *par
 			if (!changed)
 				screennode->delete_node();
 		}
+
+		scrnum++;
 	}
 }

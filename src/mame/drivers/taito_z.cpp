@@ -172,7 +172,7 @@ K1100457A AQUA JACK (sticker)
 Notes:
       68000 - Motorola MC68000P12 CPUs, running at 12.000MHz [24/2]
         Z80 - Zilog Z0840004PSC Z80 CPU, running at 4.000MHz [16/4]
-     YM2610 - Yahama YM2610 sound chip, running at 8.000MHz [16/2]
+     YM2610 - Yamaha YM2610 sound chip, running at 8.000MHz [16/2]
        2063 - Toshiba TMM2063 8K x8 SRAM (DIP28)
        2018 - Toshiba TMM2018 2K x8 SRAM (DIP24)
       58257 - Sony CXK58257 32K x8 SRAM (DIP28)

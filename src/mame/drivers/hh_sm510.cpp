@@ -1390,10 +1390,18 @@ ROM_END
   (Razvedchiki kosmosa, export version: Explorers of Space).
 
   The following Mickey Mouse Elektronika clones are emulated in MAME:
-  * IM-02: Nu, pogodi! (Ну, погоди!)
-  * IM-13: Explorers of Space (Разведчики космоса)
-  * IM-16: Fowling (Охота)
-  * IM-22: Monkey Goalkeeper (Весёлые футболисты)
+
+  Model  Title               Transliteration      Export version      Note
+  ---------------------------------------------------------------------------------
+  ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
+  ИМ-16  Охота               Okhota               Fowling             -
+  ИМ-22  Весёлые футболисты  Vesjolye futbolisty  Monkey Goalkeeper   -
+  ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
+  ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
+  ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
+  ИМ-50  Космический полёт   Kosmicheskij poljot  Space Flight        The Model ID is the same as Amusing Arithmetic (not emulated in MAME)
+  ИМ-51  Морская атака       Morskaja ataka       -                   -
 
 ***************************************************************************/
 
@@ -1410,6 +1418,11 @@ public:
 	void exospace(machine_config &config);
 	void fowling(machine_config &config);
 	void monkeygk(machine_config &config);
+	void krybolov(machine_config &config);
+	void frogling(machine_config &config);
+	void nburglar(machine_config &config);
+	void spaceflt(machine_config &config);
+	void morataka(machine_config &config);
 };
 
 // config
@@ -1476,6 +1489,31 @@ void gnw_mmouse_state::monkeygk(machine_config &config)
 	kb1013vk12_common(config, 1655, 1080); // R mask option ?
 }
 
+void gnw_mmouse_state::krybolov(machine_config &config)
+{
+	kb1013vk12_common(config, 1638, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::frogling(machine_config &config)
+{
+	kb1013vk12_common(config, 1660, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::nburglar(machine_config &config)
+{
+	kb1013vk12_common(config, 1641, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::spaceflt(machine_config &config)
+{
+	kb1013vk12_common(config, 1658, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::morataka(machine_config &config)
+{
+	kb1013vk12_common(config, 1648, 1080); // R mask option ?
+}
+
 // roms
 
 ROM_START( gnw_mmouse )
@@ -1524,6 +1562,46 @@ ROM_START( monkeygk )
 
 	ROM_REGION( 131901, "screen", 0)
 	ROM_LOAD( "monkeygk.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+ROM_END
+
+ROM_START( krybolov )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-32.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 132804, "screen", 0)
+	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
+ROM_END
+
+ROM_START( frogling )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 131961, "screen", 0)
+	ROM_LOAD( "frogling.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
+ROM_END
+
+ROM_START( nburglar )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-49.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 136498, "screen", 0)
+	ROM_LOAD( "nburglar.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
+ROM_END
+
+ROM_START( spaceflt )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-50.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 110214, "screen", 0)
+	ROM_LOAD( "spaceflt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
+ROM_END
+
+ROM_START( morataka )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-51.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 105057, "screen", 0)
+	ROM_LOAD( "morataka.svg", 0, 105057, CRC(c235c56c) SHA1(b6ef74ba7826221683243e23513270d0f0f2cfda) )
 ROM_END
 
 
@@ -9576,6 +9654,11 @@ CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse
 CONS( 1989, exospace,     gnw_mmouse,  0, exospace,     exospace,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Explorers of Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, fowling,      gnw_mmouse,  0, fowling,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Fowling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, monkeygk,     gnw_mmouse,  0, monkeygk,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Monkey Goalkeeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, frogling,     gnw_mmouse,  0, frogling,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Frogling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, nburglar,     gnw_mmouse,  0, nburglar,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Night Burglars", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, spaceflt,     gnw_mmouse,  0, spaceflt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Space Flight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, morataka,     gnw_mmouse,  0, morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

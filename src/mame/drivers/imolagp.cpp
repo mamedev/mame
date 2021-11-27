@@ -95,7 +95,7 @@ p2-1.bin     [4/4]      07.bin                  IDENTICAL
 p2-2.bin     [4/4]      05.bin                  IDENTICAL
 p1-1.bin     [4/4]      02.bin                  IDENTICAL
 
-The only xtal on this PCB is 16.00000 MHz. 
+The only xtal on this PCB is 16.00000 MHz.
 This "Ferrari 1" was legally registered by Videotronic on Spain on 1985. The PCB is
 silkscreened by Falgas and the cab contains Falgas logos with a small note that reads
 "Manufactured by Videotronic for Falgas" (in Spanish).

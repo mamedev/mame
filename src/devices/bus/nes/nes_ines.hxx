@@ -303,7 +303,7 @@ static const nes_mmc mmc_list[] =
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
 	{ 267, BMC_EL861121C },
-	// 268 COOLBOY and MINDKIDS
+	{ 268, SMD133_BOARD },
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones
 	// 271 TXC 4 in 1 MGC-026, not in nes.xml?
@@ -752,6 +752,16 @@ void nes_cart_slot_device::call_load_ines()
 		{
 			submapper = 0;
 			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
+		}
+		// 268: SMD133 boards
+		else if (mapper == 268)
+		{
+			if (submapper == 0)
+				m_cart->set_smd133_addr(0x6000);
+			else if (submapper == 1)
+				m_cart->set_smd133_addr(0x5000);
+			else
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
 		}
 		// 313: BMC RESET-TXROM
 		else if (mapper == 313)

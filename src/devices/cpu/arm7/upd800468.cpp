@@ -212,7 +212,7 @@ u8 upd800468_device::port_ddr_r(offs_t num)
 void upd800468_device::port_ddr_w(offs_t num, u8 data)
 {
 	m_port_ddr[num] = data;
-//	logerror("port %u ddr_w: %02x\n", num, data);
+//  logerror("port %u ddr_w: %02x\n", num, data);
 	port_update(num);
 }
 
@@ -232,7 +232,7 @@ void upd800468_device::port_w(offs_t num, u8 data)
 
 void upd800468_device::port_update(offs_t num)
 {
-//	logerror("port %u out: %02x\n", num, m_port_data[num] & m_port_ddr[num]);
+//  logerror("port %u out: %02x\n", num, m_port_data[num] & m_port_ddr[num]);
 	m_out_cb[num](m_port_data[num] & m_port_ddr[num]);
 }
 

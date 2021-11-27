@@ -136,7 +136,7 @@ enum
 	OPENCORP_DAOU306, HES_BOARD, SVISION16_BOARD, RUMBLESTATION_BOARD, JYCOMPANY_A, JYCOMPANY_B, JYCOMPANY_C,
 	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12, SOMARI_HUANG2,
 	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1, SUBOR_TYPE2,
-	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, YOKO_BOARD,
+	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, SMD133_BOARD, YOKO_BOARD,
 	RCM_GS2015, RCM_GS2004, RCM_GS2013, RCM_TF9IN1, RCM_3DBLOCK,
 	WAIXING_TYPE_A, WAIXING_TYPE_A1, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
 	WAIXING_TYPE_E, WAIXING_TYPE_F, WAIXING_TYPE_G, WAIXING_TYPE_H, WAIXING_TYPE_H1,
@@ -228,6 +228,7 @@ public:
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_outer_prg_size(int val) { m_outer_prg_size = val; }
 	void set_outer_chr_size(int val) { m_outer_chr_size = val; }
+	void set_smd133_addr(int val) {  m_smd133_addr = val; }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
 	uint8_t get_open_bus() { return m_open_bus; }
@@ -303,6 +304,7 @@ protected:
 	int m_n163_vol;
 	int m_outer_prg_size;
 	int m_outer_chr_size;
+	int m_smd133_addr;
 
 	int m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;

@@ -1136,7 +1136,7 @@ u8 sns_sa1_device::rom_r(offs_t offset)
 		else    // when HiROM mapping is enabled, we mirror [(cx,dx,ex,fx)][0000-ffff] bank
 			bank = BIT(offset, 16, 5) | (m_bank_rom[slot] << 5);
 
-		ret = m_rom[(rom_bank_map[bank] << 15) | (offset & 0x7fff)];	
+		ret = m_rom[(rom_bank_map[bank] << 15) | (offset & 0x7fff)];
 	}
 	return ret;
 }

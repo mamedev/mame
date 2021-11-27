@@ -447,6 +447,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("nt639",            NES_NT639);
 	device.option_add_internal("resettxrom",       NES_RESETTXROM);
 	device.option_add_internal("s24in1c03",        NES_S24IN1SC03);
+	device.option_add_internal("smd133",           NES_SMD133);
 	device.option_add_internal("tech9in1",         NES_TECHLINE9IN1);
 	device.option_add_internal("bmc_8in1",         NES_BMC_8IN1);
 	device.option_add_internal("bmc_15in1",        NES_BMC_15IN1);
@@ -484,7 +485,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("unl_dance",        NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("onebus",           NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("pec586",           NES_NROM);    // UNSUPPORTED
-	device.option_add_internal("coolboy",          NES_NROM);    // UNSUPPORTED
 	device.option_add_internal("unl_drgnfgt",      NES_NROM);    // UNSUPPORTED
 // are there dumps of games with these boards?
 	device.option_add_internal("bmc_hik_kof",      NES_NROM); // mapper 251 - UNSUPPORTED

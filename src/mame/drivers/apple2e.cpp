@@ -136,6 +136,8 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "bus/centronics/ctronics.h"
+
 #include "bus/a2bus/4play.h"
 #include "bus/a2bus/a2alfam2.h"
 #include "bus/a2bus/a2applicard.h"
@@ -288,7 +290,9 @@ public:
 #else
 		m_iicpiwm(*this, "fdc"),
 #endif
-		m_ds1315(*this, "nsc")
+		m_ds1315(*this, "nsc"),
+		m_printer_conn(*this, "parallel"),
+		m_printer_out(*this, "laserprnout")
 	{
 		m_accel_laser = false;
 		m_has_laser_mouse = false;
@@ -297,6 +301,7 @@ public:
 		m_iscec = false;
 		m_iscecm = false;
 		m_iscec2000 = false;
+		m_isace500 = false;
 		m_spectrum_text = false;
 		m_inverse_text = false;
 		m_pal = false;
@@ -345,6 +350,8 @@ public:
 	optional_device<legacy_iwm_device> m_iicpiwm;
 #endif
 	required_device<ds1315_device> m_ds1315;
+	optional_device<centronics_device>      m_printer_conn;
+	optional_device<output_latch_device>    m_printer_out;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
@@ -386,6 +393,9 @@ public:
 	void c000_w(offs_t offset, u8 data);
 	u8 c000_laser_r(offs_t offset);
 	void c000_laser_w(offs_t offset, u8 data);
+	u8 laserprn_busy_r();
+	void laserprn_w(u8 data);
+	TIMER_CALLBACK_MEMBER(update_laserprn_strobe);
 	u8 c000_iic_r(offs_t offset);
 	void c000_iic_w(offs_t offset, u8 data);
 	u8 c080_r(offs_t offset);
@@ -426,6 +436,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	DECLARE_WRITE_LINE_MEMBER(busy_w);
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
@@ -433,12 +444,15 @@ public:
 	u8 memexp_r(offs_t offset);
 	void memexp_w(offs_t offset, u8 data);
 	u8 nsc_backing_r(offs_t offset);
+	u8 ace500_c0bx_r(offs_t offset);
+	void ace500_c0bx_w(offs_t offset, u8 data);
 
 	void apple2cp(machine_config &config);
 	void spectred(machine_config &config);
 	void laser128(machine_config &config);
 	void laser128o(machine_config &config);
 	void laser128ex2(machine_config &config);
+	void ace500(machine_config &config);
 	void apple2c_iwm(machine_config &config);
 	void apple2c_mem(machine_config &config);
 	void cec(machine_config &config);
@@ -459,6 +473,7 @@ public:
 	void c800bank_map(address_map &map);
 	void inhbank_map(address_map &map);
 	void laser128_map(address_map &map);
+	void ace500_map(address_map &map);
 	void lcbank_map(address_map &map);
 	void r0000bank_map(address_map &map);
 	void r0200bank_map(address_map &map);
@@ -471,6 +486,7 @@ public:
 	void init_128ex();
 	void init_spect();
 	void init_pal();
+	void init_ace500();
 
 	bool m_35sel, m_hdsel, m_intdrive;
 
@@ -511,6 +527,9 @@ private:
 	u8 m_migram[0x800];
 	u16 m_migpage;
 
+	bool m_isace500, m_ace_cnxx_bank;
+	u16 m_ace500rombank;
+
 	bool m_accel_unlocked;
 	bool m_accel_fast;
 	bool m_accel_present;
@@ -520,6 +539,10 @@ private:
 	int m_accel_stage;
 	u32 m_accel_speed;
 	u8 m_accel_slotspk, m_accel_gameio;
+
+	emu_timer *m_strobe_timer;
+	u8  m_next_strobe;
+	bool m_centronics_busy;
 
 	u8 *m_ram_ptr, *m_rom_ptr, *m_cec_ptr;
 	int m_ram_size;
@@ -839,6 +862,11 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
 	}
 }
 
+WRITE_LINE_MEMBER(apple2e_state::busy_w)
+{
+	m_centronics_busy = state;
+}
+
 u8 apple2e_state::memexp_r(offs_t offset)
 {
 	u8 retval = m_exp_regs[offset];
@@ -1072,6 +1100,13 @@ void apple2e_state::machine_start()
 		m_iscec2000 = false;
 	}
 
+	if ((m_has_laser_mouse) || (m_isace500))
+	{
+		m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2e_state::update_laserprn_strobe), this));
+		m_next_strobe = 1U;
+	}
+
+
 	// setup save states
 	save_item(NAME(m_speaker_state));
 	save_item(NAME(m_cassette_state));
@@ -1142,6 +1177,9 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_accel_temp_slowdown));
 	save_item(NAME(m_accel_laser));
 	save_item(NAME(m_accel_speed));
+	save_item(NAME(m_next_strobe));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_ace500rombank));
 }
 
 void apple2e_state::machine_reset()
@@ -1178,6 +1216,7 @@ void apple2e_state::machine_reset()
 	m_accel_present = false;
 	m_accel_temp_slowdown = false;
 	m_accel_fast = false;
+	m_centronics_busy = false;
 
 	// is Zip enabled?
 	if (m_sysconfig->read() & 0x10)
@@ -1222,6 +1261,21 @@ void apple2e_state::machine_reset()
 		m_accel_speed = 1021800;
 	}
 
+	if (m_has_laser_mouse)
+	{
+	   a2bus_laser128_device *printer_slot = static_cast<a2bus_laser128_device *>(m_slotdevice[1]);
+
+	   if (m_sysconfig->read() & 0x08)
+	   {
+		  printer_slot->set_parallel_printer(true);
+	   }
+	   else
+	   {
+		  printer_slot->set_parallel_printer(false);
+	   }
+
+	}
+
 	m_80store = false;
 	m_altzp = false;
 	m_ramrd = false;
@@ -1247,6 +1301,7 @@ void apple2e_state::init_128ex()
 {
 	m_accel_laser = true;
 	m_has_laser_mouse = true;
+	m_inverse_text = true;
 }
 
 void apple2e_state::init_spect()
@@ -1258,6 +1313,12 @@ void apple2e_state::init_laser128()
 {
 	m_inverse_text = true;
 	m_has_laser_mouse = true;
+}
+
+void apple2e_state::init_ace500()
+{
+	m_isace500 = true;
+	m_ace_cnxx_bank = false;
 }
 
 void apple2e_state::init_pal()
@@ -1294,7 +1355,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 {
 	int scanline = param;
 
-	if ((m_isiic) || (m_has_laser_mouse))
+	if ((m_isiic) || (m_has_laser_mouse) || (m_isace500))
 	{
 		update_iic_mouse();
 	}
@@ -1686,11 +1747,11 @@ void apple2e_state::lc_update(int offset, bool writing)
 	}
 
 	#if 0
-	printf("LC: new state %c%c dxxx=%04x altzp=%d\n",
+	printf("LC: new state %c%c dxxx=%04x altzp=%d (PC=%x)\n",
 			m_lcram ? 'R' : 'x',
 			m_lcwriteenable ? 'W' : 'x',
 			m_lcram2 ? 0x1000 : 0x0000,
-			m_altzp);
+			m_altzp, m_maincpu->pc());
 	#endif
 }
 
@@ -1926,7 +1987,7 @@ void apple2e_state::do_io(int offset, bool is_iic)
 		// trigger joypad read
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			if (is_iic)
+			if ((is_iic) || (m_isace500))
 			{
 				m_vbl = false;
 				lower_irq(IRQ_VBL);
@@ -2156,6 +2217,40 @@ void apple2e_state::c000_laser_w(offs_t offset, u8 data)
 		}
 
 		c000_w(offset, data);
+	}
+}
+
+u8 apple2e_state::laserprn_busy_r()
+{
+	u8 retval = read_floatingbus() & 0x7f;
+
+	if (m_centronics_busy)
+	{
+		retval |= 0x80;
+	}
+
+	return retval;
+}
+
+void apple2e_state::laserprn_w(u8 data)
+{
+	m_printer_out->write(data);
+
+   // generate strobe pulse after one clock cycle
+	m_next_strobe = 0U;
+	if (!m_strobe_timer->enabled())
+	{
+	   m_strobe_timer->adjust(attotime::from_hz(1021800));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(apple2e_state::update_laserprn_strobe)
+{
+	m_printer_conn->write_strobe(m_next_strobe);
+	if (!m_next_strobe)
+	{
+		m_next_strobe = 1U;
+		m_strobe_timer->adjust(attotime::from_hz(1021800));
 	}
 }
 
@@ -2935,7 +3030,20 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 
 u8 apple2e_state::read_int_rom(int slotbias, int offset)
 {
-	//return m_rom_ptr[slotbias + offset];
+	int slot = ((slotbias + offset) >> 8) & 0xf;
+
+	// slot 4 can't remap because the IRQ handler is there
+	if ((m_isace500) && (m_ace_cnxx_bank) && (slot != 4))
+	{
+		slotbias += 0x4000;
+		// even numbered slots come from $6x00 in this mode?
+		if (!(slot & 1))
+		{
+			slotbias += 0x2000;
+		}
+		return m_rom_ptr[slotbias + offset];
+	}
+
 	return m_ds1315->read(slotbias + offset);
 }
 
@@ -3055,6 +3163,53 @@ u8 apple2e_state::c800_r(offs_t offset)
 	return read_floatingbus();
 }
 
+u8 apple2e_state::ace500_c0bx_r(offs_t offset)
+{
+	switch (offset)
+	{
+		// Used by the IRQ handler.  Appears to return altzp status in bit 7, same as $C016.
+		case 0xc:
+			return (m_altzp ? 0x80 : 0x00);
+
+		default:
+			logerror("c0bx_r @ %x (PC=%x)\n", offset, m_maincpu->pc());
+			break;
+	}
+
+	return 0xff;
+}
+
+
+// $C0B8 - $C100-$C7FF alt bank
+// $C0B9 - $C100-$C7FF main bank
+// $C0BA - release $C800 force, use $CFFF mechanism
+// $C0BB - force main rom bank at $C800
+void apple2e_state::ace500_c0bx_w(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+		case 0x8:
+			m_ace_cnxx_bank = true;
+			break;
+
+		case 0x9:
+			m_ace_cnxx_bank = false;
+			break;
+
+		case 0xa:
+			m_ace500rombank = 0;
+			break;
+
+		case 0xb:
+			m_ace500rombank = 0x7000;
+			break;
+
+		default:
+			logerror("unknown c0bx_w %x (PC=%x)\n", offset, m_maincpu->pc());
+			break;
+	}
+}
+
 u8 apple2e_state::c800_int_r(offs_t offset)
 {
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
@@ -3067,6 +3222,11 @@ u8 apple2e_state::c800_int_r(offs_t offset)
 	if (m_iscec)
 	{
 		return m_rom_ptr[0x4800 + offset];
+	}
+
+	if (m_isace500)
+	{
+		return m_rom_ptr[m_ace500rombank + offset];
 	}
 
 	return m_rom_ptr[0x800 + offset];
@@ -3091,6 +3251,27 @@ u8 apple2e_state::c800_b2_int_r(offs_t offset)
 
 void apple2e_state::c800_w(offs_t offset, u8 data)
 {
+	if ((m_isace500) && (offset == 0x7ff))
+	{
+		// TODO: use a version of our conventional CnXX handling for this
+		u8 page = (m_maincpu->pc() >> 8) & 0xf;
+		switch (page)
+		{
+			case 1:
+				m_ace500rombank = 0x4800;
+				break;
+
+			case 3:
+				m_ace500rombank = 0x800;
+				break;
+
+			case 5:
+				m_ace500rombank = 0x5800;
+				break;
+		}
+		return;
+	}
+
 	if ((m_isiicplus) && (m_romswitch) && (((offset >= 0x400) && (offset < 0x500)) || ((offset >= 0x600) && (offset < 0x700))))
 	{
 		mig_w(offset-0x400, data);
@@ -3464,12 +3645,35 @@ void apple2e_state::laser128_map(address_map &map)
 	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
 	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_laser_r), FUNC(apple2e_state::c000_laser_w));
 	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
 	map(0xc098, 0xc09b).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0a8, 0xc0ab).rw(m_acia2, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0xc0c0, 0xc0cf).rw(FUNC(apple2e_state::laser_mouse_r), FUNC(apple2e_state::laser_mouse_w));
 	map(0xc0d0, 0xc0d3).rw(FUNC(apple2e_state::memexp_r), FUNC(apple2e_state::memexp_w));
 	map(0xc0e0, 0xc0ef).rw(m_laserudc, FUNC(applefdc_base_device::read), FUNC(applefdc_base_device::write));
 	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
+	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
+	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
+
+void apple2e_state::ace500_map(address_map &map)
+{
+	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_iic_r), FUNC(apple2e_state::c000_iic_w));
+	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc0a8, 0xc0ab).rw(m_acia1, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
+	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
+	map(0xc0b0, 0xc0bf).rw(FUNC(apple2e_state::ace500_c0bx_r), FUNC(apple2e_state::ace500_c0bx_w));
+	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
 	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
 	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
@@ -3710,6 +3914,19 @@ static INPUT_PORTS_START( apple2_sysconfig_no_accel )
 	PORT_CONFSETTING(0x01, "B&W")
 	PORT_CONFSETTING(0x02, "Green")
 	PORT_CONFSETTING(0x03, "Amber")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( laser128_sysconfig )
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x01, "B&W")
+	PORT_CONFSETTING(0x02, "Green")
+	PORT_CONFSETTING(0x03, "Amber")
+
+	PORT_CONFNAME(0x08, 0x00, "Printer type")
+	PORT_CONFSETTING(0x00, "Serial")
+	PORT_CONFSETTING(0x08, "Parallel")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c_sysconfig )
@@ -4277,7 +4494,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( apple2_sysconfig_no_accel )
+	PORT_INCLUDE( laser128_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
@@ -4980,9 +5197,9 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* softlist config for baseline A2E
 	By default, filter lists where possible to compatible disks for A2E */
-	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
+	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter("A2E");
+	SOFTWARE_LIST(config, "flop_a2_misc").set_compatible("apple2_flop_misc");
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);
@@ -5008,7 +5225,7 @@ void apple2e_state::mprof3(machine_config &config)
 void apple2e_state::apple2ee(machine_config &config)
 {
 	apple2e(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2EE");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
@@ -5055,7 +5272,7 @@ void apple2e_state::apple2ep(machine_config &config)
 void apple2e_state::apple2c(machine_config &config)
 {
 	apple2ee(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
@@ -5289,6 +5506,11 @@ void apple2e_state::laser128(machine_config &config)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
 }
 
@@ -5312,6 +5534,11 @@ void apple2e_state::laser128o(machine_config &config)
 	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, nullptr);
 	A2BUS_LASER128_ORIG(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
 
 	// original Laser 128 doesn't have the Slinky memory expansion
 	m_ram->set_default_size("128K").set_extra_options("128K");
@@ -5338,7 +5565,27 @@ void apple2e_state::laser128ex2(machine_config &config)
 	A2BUS_LASER128(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 	A2BUS_LASER128(config, "sl7", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
 	m_ram->set_default_size("128K").set_extra_options("128K, 384K, 640K, 896K, 1152K");
+}
+
+void apple2e_state::ace500(machine_config &config)
+{
+	apple2c_iwm(config);
+	M65C02(config.replace(), m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
+	// memory above 128K is RAMWorks compatible, a 256K machine has 128K of RAMWorks, and a 512K has 384K.
+	m_ram->set_default_size("256K").set_extra_options("256K, 512K");
 }
 
 void apple2e_state::cec(machine_config &config)
@@ -5350,7 +5597,7 @@ void apple2e_state::cec(machine_config &config)
 
 	A2BUS_DISKIING(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
-	SOFTWARE_LIST(config, "flop525_cec").set_original("cecflop");
+	SOFTWARE_LIST(config, "flop_cec").set_original("cecflop");
 
 	// there is no aux slot, the "aux" side of the //e is used for additional ROM
 	config.device_remove("aux");
@@ -5568,7 +5815,9 @@ ROM_END
 
 ROM_START(laser128)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "laser 128 video rom vt27-0706-0.bin", 0x000000, 0x002000, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc) )
+	ROM_LOAD( "laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc) )
+	ROM_CONTINUE(0x0000, 0x0800)    // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000)    // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "871222", "v4.3")
@@ -5586,7 +5835,9 @@ ROM_END
 
 ROM_START(laser128o)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD( "laser 128 video rom vt27-0706-0.bin", 0x000000, 0x002000, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc) )
+	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "871212", "v3.3")
@@ -5610,8 +5861,9 @@ ROM_END
 
 ROM_START(las128ex)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("las128ex.256", 0x0000, 0x8000, CRC(b67c8ba1) SHA1(8bd5f82a501b1cf9d988c7207da81e514ca254b0))
@@ -5622,8 +5874,9 @@ ROM_END
 
 ROM_START(las128e2)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, BAD_DUMP CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10)) // need to dump real laser rom
+	ROM_LOAD("laser 128 video rom vt27-0706-0.bin", 0x0800, 0x0800, CRC(7884cc0f) SHA1(693a0a66191465825b8f7b5e746b463f3000e9cc))
+	ROM_CONTINUE(0x0000, 0x0800) // international character set (how is this selected?)
+	ROM_CONTINUE(0x1000, 0x1000) // lo-res patterns, twice
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD( "laser 128ex2 rom version 6.1.bin", 0x000000, 0x008000, CRC(7f911c90) SHA1(125754c1bd777d4c510f5239b96178c6f2e3236b) )
@@ -5786,6 +6039,19 @@ ROM_START(zijini)
 	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
 ROM_END
 
+ROM_START(ace500)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("franklin500-rom.bin", 0x004000, 0x004000, CRC(376c9104) SHA1(7f82706adc0bfb5f60c207c81271eb0ba8510a11))
+	ROM_CONTINUE(0x0000, 0x4000)
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+ROM_END
+
 } // anonymous namespace
 
 
@@ -5816,3 +6082,4 @@ COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, 
 COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2cp,  apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1986, ace500,     apple2c, 0,      ace500,      apple2c,   apple2e_state, init_ace500,"Franklin Computer", "ACE 500", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

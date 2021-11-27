@@ -14,7 +14,9 @@
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
 
     TODO:
+	- Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
+	- Derive from SCSP device;
 */
 
 #include "emu.h"
@@ -810,6 +812,7 @@ void aica_device::UpdateRegR(int reg)
 				u16 LP;
 				if (!(AFSEL()))
 				{
+					// AEG monitor
 					LP = slot->lpend ? 0x8000 : 0x0000;
 					slot->lpend = 0;
 					u16 SGC = (slot->EG.state << 13) & 0x6000;
@@ -822,7 +825,9 @@ void aica_device::UpdateRegR(int reg)
 				}
 				else
 				{
+					// FEG monitor
 					LP = slot->lpend ? 0x8000 : 0x0000;
+					// TODO: no EG monitoring? Documentation suggests otherwise
 					m_udata.data[0x10 / 2] = LP;
 				}
 			}
@@ -978,7 +983,6 @@ u16 aica_device::r16(u32 addr)
 		{
 			UpdateRegR(addr & 0xff);
 			v= *((u16 *)(m_udata.datab+((addr & 0xff))));
-			if ((addr & 0xfffe) == 0x2810) m_udata.data[0x10 / 2] &= 0x7FFF;   // reset LP on read
 		}
 		else if (addr == 0x2d00)
 		{
@@ -1188,9 +1192,10 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 				StopSlot(slot,0);
 			}
 			break;
-		// TODO: causes an hang in Border Down/Metal Slug 6/Karous etc.
-		//       for mslug6 culprit RAM address is 0x13880 ARM side (a flag that should be zeroed somehow)
 		case 1: //normal loop
+			// TODO: loop mechanism causes hangs in Border Down/Metal Slug 6/Karous etc.
+			// - For mslug6 culprit RAM address is 0x13880 ARM side (a flag that should be zeroed somehow)
+			// - The lpend mechanism more or less works if the ARM CPU is downclocked at about 10%.
 			if (*addr[addr_select] >= chanlea)
 			{
 				slot->lpend = 1;

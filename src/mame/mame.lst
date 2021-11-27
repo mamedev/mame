@@ -1467,6 +1467,7 @@ cecg                            // China Education Computer-G
 cecm                            // China Education Computer-M
 cec2000                         // China Education Computer-2000
 zijini                          // 1989 Zi Jin I
+ace500                          // 1986 Franklin Ace 500
 
 @source:apple2gs.cpp
 apple2gs                        // Aug 1989 Apple IIgs ROM03
@@ -12770,7 +12771,6 @@ easykara
 ec1840                          //
 ec1841                          //
 ec1845                          //
-ec1847                          //
 
 @source:ec65.cpp
 ec65                            //
@@ -13880,6 +13880,7 @@ damesc                          //
 fdes2000d                       //
 fdes2100d                       //
 fdes2265                        //
+fdes2265a                       //
 fdes2325                        //
 
 @source:fidel_eag68k.cpp
@@ -16401,6 +16402,7 @@ auslalom                        // Elektronika
 bassmate                        // Telko
 exospace                        // Elektronika
 fowling                         // Elektronika
+frogling                        // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -16466,13 +16468,17 @@ kgarfld                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
 knfl                            // Konami
+krybolov                        // Elektronika
 ktmnt                           // Konami
 ktopgun                         // Konami
 merrycook                       // Elektronika
 monkeygk                        // Elektronika
+morataka                        // Elektronika
+nburglar                        // Elektronika
 nummunch                        // VTech
 nupogodi                        // Elektronika
 spacebridge                     // Elektronika
+spaceflt                        // Elektronika
 taddams                         // Tiger
 taltbeast                       // Tiger
 tapollo13                       // Tiger
@@ -22859,6 +22865,7 @@ kickoffb                        // bootleg (Comodo)
 lomakai                         // (c) 1988 (World)
 lordofk                         // (c) 1989 (Japan)
 lordofkb                        // bootleg
+lordofkbp                       // bootleg
 makaiden                        // (c) 1988 (Japan)
 monkelf                         // bootleg
 p47                             // (c) 1988
@@ -23449,6 +23456,7 @@ crusnwld20                      // (c) 1996 Midway
 crusnwld23                      // (c) 1996 Midway
 crusnwld24                      // (c) 1996 Midway
 offroadc                        // (c) 1997 Midway (v1.63)
+offroadc0                       // (c) 1997 Midway (v1.00)
 offroadc1                       // (c) 1997 Midway (v1.10)
 offroadc3                       // (c) 1997 Midway (v1.30)
 offroadc4                       // (c) 1997 Midway (v1.40)
@@ -31740,7 +31748,8 @@ aquarush                        // 2000.02 Aqua Rush (Japan, AQ1/VER.A1)
 ehrgeiz                         // 1998.?? Ehrgeiz (World, EG2/VER.A)
 ehrgeizja                       // 1998.05 Ehrgeiz (Japan, EG1/VER.A)
 ehrgeizua                       // 1998.?? Ehrgeiz (US, EG3/VER.A)
-fgtlayer                        // 1998.12 Fighting Layer (Japan, FTL0/VER.A)
+fgtlayer                        // 199?.?? Fighting Layer (US, FTL3/VER.A)
+fgtlayerj                       // 1998.12 Fighting Layer (Japan, FTL0/VER.A)
 g13knd                          // 2000.10 Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)
 ghlpanic                        // 1999.?? Ghoul Panic (World, OB2/VER.A)
 golgo13                         // 2000.03 Golgo 13 (Japan, GLG1/VER.A)
@@ -31885,6 +31894,7 @@ aquajet                         // (c) 1996
 cybrcomm                        // (c) 1995
 cybrcycc                        // (c) 1995
 dirtdash                        // (c) 1995
+dirtdasha                       // (c) 1995
 dirtdashj                       // (c) 1995
 propcycl                        // (c) 1996
 propcyclj                       // (c) 1996
@@ -31914,7 +31924,8 @@ crszonev3a                      // Crisis Zone - December 1999
 crszonev3b                      // Crisis Zone - December 1999
 crszonev3b2                     // Crisis Zone - December 1999
 crszonev4a                      // Crisis Zone - December 1999
-downhill                        // March 1998
+downhill                        // ? 1998
+downhillu                       // March 1998
 finfurl                         // July 1997
 finfurl2                        // March 1999
 finfurl2j                       // March 1999
@@ -32982,7 +32993,6 @@ lxcmcysw
 lxcyber
 mc_cb280
 mc_hh210
-mc_pg150
 mog_m320
 myarccn
 otrail
@@ -33810,6 +33820,7 @@ comport                         // Compaq Portable
 coppc21                         // Corona PPC-21 portable
 coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
+ec1847                          //
 eagle1600                       //
 dtkerso                         // 198? PC-XT clones with a DTK/ERSO BIOS
 eaglespirit                     // Eagle PC Spirit
@@ -35437,6 +35448,9 @@ popobear                        // (c) 2000 BMC
 @source:popper.cpp
 popper                          // (c) 1983 Omori Electric Co., Ltd.
 
+@source:positron.cpp
+positron                        // 1982 Positron 9000
+
 @source:portrait.cpp
 portrait                        // (c) 1983 Olympia
 portraita                       // (c) 1983 Olympia
@@ -36755,6 +36769,7 @@ intchess
 galileo
 leonardo
 leonardoa
+leonardob
 
 @source:saitek_mark5.cpp
 ccmk5
@@ -38683,6 +38698,7 @@ endless                         // bootleg
 endlessa                        // bootleg
 fatfurspb                       // bootleg
 ffight2b                        // bootleg
+ffight3b                        // bootleg
 iron                            // bootleg
 legendsb                        // bootleg
 kinstb                          // bootleg
@@ -38872,6 +38888,7 @@ dphh8213
 
 @source:st2302u_bbl_spi.cpp
 bbl380
+mc_cb203
 rhhc152
 ragc153
 dphh8630
@@ -39425,6 +39442,7 @@ vasara2                         // (c) 2001 Visco
 vasara2a                        // (c) 2001 Visco
 
 @source:st_mp100.cpp
+blkshpsq                        //
 dracula                         //
 hothand                         //
 lectrono                        //
@@ -39442,7 +39460,6 @@ wildfyre                        //
 @source:st_mp200.cpp
 ali                             //
 biggame                         //
-blkshpsq                        //
 catacomp                        //
 cheetah                         //
 cheetahb                        //
@@ -40266,6 +40283,7 @@ liquidk                         // 1990.?? C49 (c) 1990 Taito Corporation Japan 
 liquidku                        // 1990.?? C49 (c) 1990 Taito America Corporation (US)
 majest12j                       // 1990.11 C64 (c) 1990 Taito Corporation (Japan)
 majest12u                       // 1990.11 C64 (c) 1990 Taito America Corporation (US)
+majest12ua                      // 1990.11 C64 (c) 1990 Taito America Corporation (US)
 megablst                        // 1989.?? C11 (c) 1989 Taito Corporation Japan (World)
 megablstj                       // 1989.11 C11 (c) 1989 Taito Corporation (Japan)
 megablstu                       // 1989.?? C11 (c) 1989 Taito America Corporation (US)

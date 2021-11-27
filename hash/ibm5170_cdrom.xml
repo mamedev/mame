@@ -399,6 +399,22 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="alienodu" cloneof="alienody" supported="no">
+        <!--
+            L384 9614 05921024 B51103-30 M1S4
+            IFPI6100
+        -->
+		<description>Alien Odyssey (US)</description>
+		<year>1995</year>
+		<publisher>Philips / Argonaut Software LTD</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="310691059-2" sha1="4db3c0e2559d0b56c620ad34895d504f2cde5128" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- TODO: can't setup sb16 sound card properly, hangs at "TimerRegister Event" -->
 	<!-- TODO: disc swap doesn't work properly -->
 	<software name="alienscb" supported="partial">
@@ -2134,6 +2150,23 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="heavybarrel_cd" sha1="0d6ea927d897d36f71d49950ccb805e807b92857" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="ignition" supported="no">
+        <!--
+            FUTURE MEDIA / CA
+            FM 16942 (CD-C95-1063-0/IN0002)
+            IFPI 3V17
+        -->
+		<description>Ignition (US)</description>
+		<year>1997</year>
+		<publisher>Interplay</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cd-c95-1063-0" sha1="48bad304857689acb3fc7fcc9e22c2c7e9d8b45f" />
 			</diskarea>
 		</part>
 	</software>

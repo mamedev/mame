@@ -28,10 +28,10 @@ class menu_custom_ui : public menu
 {
 public:
 	menu_custom_ui(mame_ui_manager &mui, render_container &container, std::function<void ()> &&handler);
-	virtual ~menu_custom_ui() override;
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_dismissed() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
@@ -55,10 +55,10 @@ class menu_font_ui : public menu
 {
 public:
 	menu_font_ui(mame_ui_manager &mui, render_container &container, std::function<void (bool)> &&handler);
-	virtual ~menu_font_ui() override;
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_dismissed() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
@@ -89,10 +89,10 @@ class menu_colors_ui : public menu
 {
 public:
 	menu_colors_ui(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_colors_ui() override;
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
+	virtual void menu_dismissed() override;
 
 private:
 	enum
@@ -136,8 +136,7 @@ private:
 class menu_rgb_ui : public menu
 {
 public:
-	menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *_color, std::string _title);
-	virtual ~menu_rgb_ui() override;
+	menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *color, std::string &&title);
 
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
@@ -172,7 +171,6 @@ class menu_palette_sel : public menu
 {
 public:
 	menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color);
-	virtual ~menu_palette_sel() override;
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;

@@ -36,8 +36,6 @@ Options: 8087 FPU
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
 
-#include "coreutil.h"
-
 
 class compc_state : public driver_device
 {

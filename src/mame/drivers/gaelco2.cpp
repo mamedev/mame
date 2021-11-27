@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Manuel Abadia
+// copyright-holders:Manuel Abadia, David Haywood
 /***************************************************************************
 
     Gaelco CG-1V/GAE1 based games
@@ -194,7 +194,7 @@ void gaelco2_state::maniacsq(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -478,7 +478,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1010,7 +1010,7 @@ void gaelco2_state::play2000(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1049,7 +1049,7 @@ void gaelco2_state::srollnd(machine_config& config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1154,7 +1154,7 @@ void bang_state::bang(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1399,7 +1399,7 @@ void gaelco2_state::alighunt(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -1750,7 +1750,7 @@ void gaelco2_state::touchgo(machine_config &config)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
@@ -2069,7 +2069,7 @@ void gaelco2_state::snowboar(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -2113,7 +2113,7 @@ void gaelco2_state::maniacsqs(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
@@ -2394,7 +2394,7 @@ void wrally2_state::wrally2(machine_config &config)
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco2);
-	PALETTE(config, m_palette).set_entries(4096*16 - 16);   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+	PALETTE(config, m_palette).set_entries(0x10000);
 	config.set_default_layout(layout_dualhsxs);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));

@@ -6,60 +6,60 @@
 
         Unibus models
         ==================
-        PDP-11/20 and PDP-11/15 ? The original, non-microprogrammed processor;
+        PDP-11/20 and PDP-11/15 - The original, non-microprogrammed processor;
                 designed by Jim O'Loughlin. Floating point was supported by
                 peripheral options using various data formats.
-        PDP-11/35 and PDP-11/40 ? A microprogrammed successor to the PDP-11/20;
+        PDP-11/35 and PDP-11/40 - A microprogrammed successor to the PDP-11/20;
                 the design team was led by Jim O'Loughlin.
         PDP-11/45, PDP-11/50, and PDP-11/55 ? A much faster microprogrammed processor
                 that could use up to 256 kB of semiconductor memory instead of or in
                 addition to core memory. First model to support an optional FP11
                 floating-point coprocessor, which established the format used in
                 later models.
-        PDP-11/70 ? The 11/45 architecture expanded to allow 4 MB of physical memory
+        PDP-11/70 - The 11/45 architecture expanded to allow 4 MB of physical memory
                 segregated onto a private memory bus, 2 kB of cache memory, and much
                 faster I/O devices connected via the Massbus.[9]
-        PDP-11/05 and PDP-11/10 ? A cost-reduced successor to the PDP-11/20.
-        PDP-11/34 and PDP-11/04 ? Cost-reduced follow-on products to the 11/35
+        PDP-11/05 and PDP-11/10 - A cost-reduced successor to the PDP-11/20.
+        PDP-11/34 and PDP-11/04 - Cost-reduced follow-on products to the 11/35
                 and 11/05; the PDP-11/34 concept was created by Bob Armstrong.
                 The 11/34 supported up to 256 kB of Unibus memory. The PDP-11/34a
                 supported a fast floating-point option, and the 11/34c supported a
                 cache memory option.
-        PDP-11/60 ? A PDP-11 with user-writable microcontrol store; this was
+        PDP-11/60 - A PDP-11 with user-writable microcontrol store; this was
                 designed by another team led by Jim O'Loughlin.
-        PDP-11/44 ? Replacement for the 11/45 and 11/70 that supported optional cache
+        PDP-11/44 - Replacement for the 11/45 and 11/70 that supported optional cache
                 memory and floating-point processor, and included a sophisticated serial
                 console interface and support for 4 MB of physical memory. The design
                 team was managed by John Sofio.
-        PDP-11/24 ? First VLSI PDP-11 for Unibus, using the "Fonz-11" (F11) chip set
+        PDP-11/24 - First VLSI PDP-11 for Unibus, using the "Fonz-11" (F11) chip set
                 with a Unibus adapter.
-        PDP-11/84 ? Using the VLSI "Jaws-11" (J11) chip set with a Unibus adapter.
-        PDP-11/94 ? J11-based, faster than 11/84.
+        PDP-11/84 - Using the VLSI "Jaws-11" (J11) chip set with a Unibus adapter.
+        PDP-11/94 - J11-based, faster than 11/84.
 
         Q-bus models
         ==============
-        PDP-11/03 (also known as the LSI-11/03) ? The first LSI PDP-11, this system
+        PDP-11/03 (also known as the LSI-11/03) - The first LSI PDP-11, this system
                 used a chipset from Western Digital and supported 60 kB of memory.
-        PDP-11/23 ? Second generation of LSI (F-11). Early units supported
+        PDP-11/23 - Second generation of LSI (F-11). Early units supported
                 only 248 kB of memory.
-        PDP-11/23+/MicroPDP-11/23 ? Improved 11/23 with more functions on the
+        PDP-11/23+/MicroPDP-11/23 - Improved 11/23 with more functions on the
                 (larger) processor card.
-        MicroPDP-11/73 ? The third generation LSI-11, this system used the
+        MicroPDP-11/73 - The third generation LSI-11, this system used the
                 faster "Jaws-11" (J-11) chip set and supported up to 4 MB of memory.
-        MicroPDP-11/53 ? Slower 11/73 with on-board memory.
-        MicroPDP-11/83 ? Faster 11/73 with PMI (private memory interconnect).
-        MicroPDP-11/93 ? Faster 11/83; final DEC Q-Bus PDP-11 model.
+        MicroPDP-11/53 - Slower 11/73 with on-board memory.
+        MicroPDP-11/83 - Faster 11/73 with PMI (private memory interconnect).
+        MicroPDP-11/93 - Faster 11/83; final DEC Q-Bus PDP-11 model.
         KXJ11 - QBUS card (M7616) with PDP-11 based peripheral processor and
                 DMA controller. Based on a J11 CPU equipped with 512 kB of RAM,
                 64 kB of ROM, and parallel and serial interfaces.
-        Mentec M100 ? Mentec redesign of the 11/93, with J-11 chipset at 19.66 MHz,
+        Mentec M100 - Mentec redesign of the 11/93, with J-11 chipset at 19.66 MHz,
                 four on-board serial ports, 1-4 MB of on-board memory, and optional FPU.
-        Mentec M11 ? Processor upgrade board; microcode implementation of PDP-11
+        Mentec M11 - Processor upgrade board; microcode implementation of PDP-11
                 instruction set by Mentec, using the TI 8832 ALU and TI 8818
                 microsequencer from Texas Instruments.
-        Mentec M1 ? Processor upgrade board; microcode implementation of
+        Mentec M1 - Processor upgrade board; microcode implementation of
                 PDP-11 instruction set by Mentec, using Atmel 0.35 ?m ASIC.[10]
-        Quickware QED-993 ? High performance PDP-11/93 processor upgrade board.
+        Quickware QED-993 - High performance PDP-11/93 processor upgrade board.
         DECserver 500 and 550 LAT terminal servers DSRVS-BA using the KDJ11-SB chipset
 
         All PDP-11's execept the first one (11/15 and 11/20) are microprogrammed.

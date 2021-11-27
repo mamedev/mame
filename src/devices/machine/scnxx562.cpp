@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+// license:BSD-3-Clause 
+// copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
     DUSCC Dual Serial Communications Controller emulation
@@ -17,8 +18,8 @@
     CMOS        26C562  68C562
 ----------------------------------
     For more info see:
-      page 511: http://bitsavers.informatik.uni-stuttgart.de/pdf/signetics/_dataBooks/1986_Signetics_Microprocessor.pdf
-      page 514: http://bitsavers.informatik.uni-stuttgart.de/pdf/signetics/_dataBooks/1994_Signetics_Data_Communications.pdf
+      page 511: http://bitsavers.informatik.uni-stuttgart.de/components/signetics/_dataBooks/1986_Signetics_Microprocessor.pdf
+      page 514: http://bitsavers.informatik.uni-stuttgart.de/components/signetics/_dataBooks/1994_Signetics_Data_Communications.pdf
 
 Designs known of including one or more DUSCCs
 ------------------------------------------------
@@ -268,9 +269,9 @@ void duscc_device::device_reset()
    into three bits which are inserted into bits [2:0] or [4:2] of the interrupt vector register. This forms the content of the IVRM during
    an interrupt acknowledge cycle. Unmodified and modified vectors can read directly through specified registers. Two of the conditions
    are the inclusive OR of several other maskable conditions:
-   - Extemal or CIT special condition: Delta DCD, Delta CTS or CIT zero count (ICTSR[6:4j).
-   - Rxrrx error or special condition: any condition in the Receiver Status Register (RSR[7:0J) or a transmitter or DPLL condition in
-     the Transmitter and Receiver Status Register (TRSR[7:3J).
+   - External or CIT special condition: Delta DCD, Delta CTS or CIT zero count (ICTSR[6:4]).
+   - Rxrrx error or special condition: any condition in the Receiver Status Register (RSR[7:0]) or a transmitter or DPLL condition in
+     the Transmitter and Receiver Status Register (TRSR[7:3]).
    The TxRDY and RxRDY conditions are defined by OMR[4] and OMR[3], respectively. Also associated with the interrupt system are
    the Interrupt Enable Register (IER), one bit in the Countermmer Control Register (CTCR), and the Interrupt Control Register (lCR).
 
@@ -465,9 +466,9 @@ uint8_t duscc_device::modify_vector(uint8_t vec, int index, uint8_t src)
    1. Interrupt Enable Register (IERA/B). - checked by trigger_interrupt
    2. Receiver Status Register (RSRA/B).
    3. Transmitter and Receiver Status Register (TRSRA/B).
-   4. Input and Counter/timer Status Register (ICTSRA/B).
-   5. interrupt Vector Register (IVR) and Modified Interrupt Vector Register (IVRM).
-   6. Interrupt control register (lCR).
+   4. Input and Counter/Timer Status Register (ICTSRA/B).
+   5. Interrupt Vector Register (IVR) and Modified Interrupt Vector Register (IVRM).
+   6. Interrupt control register (ICR).
    7. General status register (GSR)
 */
 
@@ -483,7 +484,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 
 	LOGINT("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state);
 
-	/* The Interrup Controll Register (ICR) bits, must be set for the correspondning channel */
+	// The Interrupt Control Register (ICR) bits, must be set for the corresponding channel
 	// ICR Check is probably by the caller but we check again to be sure
 	if ((m_icr & (index == CHANNEL_A ? REG_ICR_CHA : REG_ICR_CHB)) == 0)
 	{
@@ -814,21 +815,24 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 /*  The DUSCC 16 bit Timer
+
     Counter/Timer Control and Value Registers
+
     There are five registers in this set consisting of the following:
-    1. Counterltimer control register (CTCRAlB).
-    2. Counterltimer preset Highland Low registers (CTPRHAlB, CTPRLAlB).
-    3. Counter/bmer (current value) High and Low registers (CTHAlB, CTLAlB)
-    The control register contains the operational information for the counterltimer. The preset registers contain the count which is
-    loaded into the counterltimer circuits. The third group contains the current value of the counterltimer as it operates.
-*/
-/* Counter/Timer Control Register (CTCRA/CTCRB)
+    1. Counter/Timer control register (CTCRA/B).
+    2. Counter/Timer preset Highland Low registers (CTPRHA/B, CTPRLA/B).
+    3. Counter/Timer (current value) High and Low registers (CTHA/B, CTLA/B)
+    The control register contains the operational information for the counter/timer. The preset registers contain the count which is
+    loaded into the counter/timer circuits. The third group contains the current value of the counterltimer as it operates.
+
+    Counter/Timer Control Register (CTCRA/CTCRB)
+
     [7] Zero Detect Interrupt - This bit determines whether the assertion of the CIT ZERO COUNT status bit (ICTSR[6)) causes an
     interrupt to be generated if set to 1 and the Master interrupt control bit (ICR[0:1]) is set
     [6] Zero Detect Control - his bit determines the action of the counter upon reaching zero count
-    0 - The counter/timer is preset to the value contained in the counterltimer preset registers (CTPRL, CTPRH) at the next clock edge.
-    1 - The counterltimer continues counting without preset. The value at the next clock edge will be H'FFFF'.
-    [5] CounterlTimer Output Control - This bit selects the output waveform when the counterltimer is selected to be output on TRxC or RTxC.
+    0 - The counter/timer is preset to the value contained in the counter/timer preset registers (CTPRL, CTPRH) at the next clock edge.
+    1 - The counter/timer continues counting without preset. The value at the next clock edge will be H'FFFF'.
+    [5] Counter/Timer Output Control - This bit selects the output waveform when the counter/timer is selected to be output on TRxC or RTxC.
     0 - The output toggles each time the CIT reaches zero count. The output is cleared to Low by either of the preset counterltimer commands.
     1 - The output is a single clock positive width pulse each time the CIT reaches zero count. (The duration of this pulse is one clock period.)
     [4:3] Clock Select - This field selects whether the clock selected by [2:0J is prescaled prior to being applied to the input of the CIT.
@@ -844,8 +848,8 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
          start of counting until the RxD input goes Low. It continues counting until the RxD input goes High, then stops and sets
          the CIT zero count status bit. The CPU can use the value in the CIT to determine the bit rate of the incoming data.
          The clock is the crystal oscillator or system clock input divided by four.
-     100 Source is the 32X BRG output selected by RTR[3:0J of own channel.
-     101 Source is the 32X BRG output selected by TTR[3:0J of own channel.
+     100 Source is the 32X BRG output selected by RTR[3:0] of own channel.
+     101 Source is the 32X BRG output selected by TTR[3:0] of own channel.
      110 Source is the internal signal which loads received characters from the receive shift register into the receiver
          FIFO. When operating in this mode, the FIFOed EOM status bit (RSR[7)) shall be set when the character which
          causes the count to go to zero is loaded into the receive FIFO.
@@ -1818,7 +1822,7 @@ void duscc_channel::do_dusccreg_rtr_w(uint8_t data)
        to the transmit shift register. If not reset by the CPU, TxRDY remains asserted until the FIFO is full, at which time
        it is automatically negated.
      1 FIFO empty. The channel's TxRDY status bit is asserted when a character transfer from the transmit FIFO to the
-       transmit shift register causes the FI FO to become empty. If not reset by the CPU, TxRDY remains asserted until the
+       transmit shift register causes the FIFO to become empty. If not reset by the CPU, TxRDY remains asserted until the
        FIFO is full, at which time it is negated.
      If the TxRDY status bit is reset by the CPU, it will remain negated regardless of the current state of the transmit
      FIFO, until it is asserted again due to the occurrence of one of the above conditions.
@@ -2082,9 +2086,9 @@ void duscc_channel::do_dusccreg_txfifo_w(uint8_t data)
 }
 
 /* Receiver Status Register (RSRA, RSRB)
-   This register informs the CPU of receiver status. Bits indicated as 'not used';n a particular mode will read as zero. The logical OR of
+   This register informs the CPU of receiver status. Bits indicated as 'not used' in a particular mode will read as zero. The logical OR of
    these bits is presented in GSR[2] or GSR[6] (ORed with the bits of TRSR) for Channels A and B, respectively. Unless otherwise
-   indicated, asserted status bits are reset only be performing a write operation to the status register with the bits to be reset being ones in
+   indicated, asserted status bits are reset only by performing a write operation to the status register with the bits to be reset being ones in
    the accompanying data word, or when the RESETN input is asserted, or when a 'reset receiver' command is issued.
    Certain status bits are specified as being FIFOed. This means that they occupy positions in a status FIFO that correspond to the data
    FIFO. As the data is brought to the top of the FIFO (the position read when the RxFIFO is read), the FIFOed status bits are logically
@@ -2116,15 +2120,15 @@ void duscc_channel::do_dusccreg_ictsr_w(uint8_t data)
 /* The GSR register provides a 'quick look' at the overall status of both channels of the DUSCC. A write to this register with ls at the
    corresponding bit pOSitions causes TxRDY (bits 5 and 1) and/or RxRDY (bits 4 and 0) to be reset. The other status bits can be reset
    only by resetting the individual status bits that they point to.
-   [7] Channel 8 External or Coutnerrrimer Status - This bit indicates that one of the following status bits is asserted: ICTSRB[6:4].
+   [7] Channel 8 External or Counter/Timer Status - This bit indicates that one of the following status bits is asserted: ICTSRB[6:4].
    [6] Channel B Receiver or Transmitter Status - This bit indicates that one of the following status bits is asserted: RSRB[7:0], TRSRB[7:3].
    [5] Channel 8 Transmitter Ready - The assertion of this bit indicates that one or more characters may be loaded into the Channel B
        transmitter FIFO to be serialized by the transmit shift register. See description of OMR[4j. This bit can be asserted only
        when the transmitter is enabled. Reselling the transmitter negates TxRDY.
    [4] Channel 8 Receiver Ready - The assertion of this bit indicates that one or more characters are available in the Channel B receiver
-       FIFO to be read by the CPU. See deSCription of OMR[3]. RxRDY is initially reset (negated) by a chip reset or when a 'reset Channel B
+       FIFO to be read by the CPU. See description of OMR[3]. RxRDY is initially reset (negated) by a chip reset or when a 'reset Channel B
        receiver' command is invoked.
-   [3] Channel A External or Countermmer Status - This bit indicates that one of the following status bits is asserted: ICTSRA[6:4].
+   [3] Channel A External or Counter/Timer Status - This bit indicates that one of the following status bits is asserted: ICTSRA[6:4].
    [2] Channel A Receiver or Transmitter Status - This bit indicates that one of the following status bits is asserted: RSRA(7:0], TRSRA(7:3].
    [1) Channel A Transmitter Ready - The assertion of this bit indicates that one or more characters may be loaded into the Channel A
        transmitter FIFO to be serialized by the transmit shift register. See description of OMR[4]. This bit can be asserted only

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-19 02:50+1100\n"
-"PO-Revision-Date: 2021-11-14 21:00+0300\n"
+"PO-Revision-Date: 2021-11-21 11:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -582,7 +582,7 @@ msgstr "Ώθηση κερμάτων"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Input Device Options"
-msgstr ""
+msgstr "Επιλογές Συσκευών Εισαγωγής"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Lightgun Device Assignment"
@@ -618,19 +618,19 @@ msgstr "Ανάθεση Συσκευής Ποντικιού"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Keyboard Input Provider"
-msgstr ""
+msgstr "Προμηθευτής Εισαγωγής Πληκτρολογίου"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Mouse Input Provider"
-msgstr ""
+msgstr "Προμηθευτής Εισαγωγής Ποντικιού"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Lightgun Input Provider"
-msgstr ""
+msgstr "Προμηθευτής Εισαγωγής Όπλου φωτός"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Joystick Input Provider"
-msgstr ""
+msgstr "Προμηθευτής Εισαγωγής Μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/mainmenu.cpp:174
 msgid "Video Options"
@@ -1046,7 +1046,7 @@ msgstr "Οθόνη"
 #: src/frontend/mame/ui/info.cpp:570 src/frontend/mame/ui/info.cpp:581
 #, c-format
 msgid "%1$s:\n"
-msgstr ""
+msgstr "%1$s:\n"
 
 #: src/frontend/mame/ui/info.cpp:662
 msgid "Not supported"
@@ -2521,27 +2521,27 @@ msgstr "Αναθεώρηση: %1$s"
 #: src/frontend/mame/ui/analogipt.cpp:91
 #, c-format
 msgid "Press %s to show menu"
-msgstr ""
+msgstr "Πατήστε %s για προβολή του μενού"
 
 #: src/frontend/mame/ui/analogipt.cpp:369
 #, c-format
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s Ταχύτητα Άυξησης/Μείωσης"
 
 #: src/frontend/mame/ui/analogipt.cpp:374
 #, c-format
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s Ταχύτητα Αυτόματου-κεντραρίσματος"
 
 #: src/frontend/mame/ui/analogipt.cpp:379
 #, c-format
 msgid "%1$s Reverse"
-msgstr ""
+msgstr "%1$s Αναστροφή"
 
 #: src/frontend/mame/ui/analogipt.cpp:384
 #, c-format
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s Ευαισθησία"
 
 #: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
@@ -7138,7 +7138,7 @@ msgstr "%s [%d Hz]"
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "n/a [%g Hz]"
-msgstr ""
+msgstr "μ/δ [%g Hz]"
 
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
@@ -7154,7 +7154,7 @@ msgstr "Προσθήκη πλήκτρου autofire"
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
 msgid "n/a"
-msgstr ""
+msgstr "μ/δ"
 
 #: plugins/autofire/autofire_menu.lua:152
 #: plugins/autofire/autofire_menu.lua:154
@@ -7221,80 +7221,80 @@ msgstr "Επιλέξτε μια είσαγωγή για autofire"
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "TIMECODE: Έναρξη εισαγωγής στις %s"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "TIMECODE: Διάρκεια εισαγωγής %s"
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "TIMECODE: Έναρξη παιχνιδιού στο %s"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "TIMECODE: Διάρκεια παιχνιδιού %s"
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "TIMECODE: Επιπλέον %d έναρξη στις %s"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "TIMECODE: Επιπλέον %d διάρκεια στις %s"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr " %s%s%02d:%02d [έγινε παύση] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d "
-msgstr ""
+msgstr " %s%s%02d:%02d "
 
 #: plugins/timecode/init.lua:217
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "ΣΥΝΟΛΟ %02d:%02d "
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
 msgid "Timecode Recorder"
-msgstr ""
+msgstr "Εγγραφέας Timecode"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugin-timecode"
 msgid "Assume 60 Hz"
-msgstr ""
+msgstr "Υπόθεση 60 Hz"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugins-timecode"
 msgid "Count emulated frames"
-msgstr ""
+msgstr "Καταμέτρηση καρέ εξομοίωσης"
 
 #: plugins/timecode/init.lua:327
 msgctxt "plugin-timecode"
 msgid "Frame numbers"
-msgstr ""
+msgstr "Αριθμός καρέ"
 
 #: plugins/timecode/init.lua:330
 msgctxt "plugin-timecode"
 msgid "Hotkey"
-msgstr ""
+msgstr "Πλήκτρο συντόμευσης"
 
 #: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
 msgctxt "plugin-inputmacro"
@@ -7389,7 +7389,7 @@ msgstr "Διάρκεια (καρέ)"
 #: plugins/inputmacro/inputmacro_menu.lua:398
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "μ/δ"
 
 #: plugins/inputmacro/inputmacro_menu.lua:402
 #, lua-format
@@ -7462,17 +7462,17 @@ msgstr "%03d:%02d:%02d"
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "Ρολόι τοίχου"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "Χρόνος εξομοίωσης"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "Αναφορά"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
@@ -7633,10 +7633,3 @@ msgid ""
 msgstr ""
 "Δώστε ακολουθία ή πατήστε %s για ακύρωση\n"
 "%s"
-
-#~ msgid "Device Mapping"
-#~ msgstr "Χαρτογράφηση Συσκευών"
-
-#~ msgctxt "input-name"
-#~ msgid "Write current timecode"
-#~ msgstr "Εγγραφή τρέχοντος χρονοκώδικα"

@@ -3360,9 +3360,17 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		}
 		break;
 
-		case 0x05:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (0888 KGB 32-bit)\n",x,y,packmode);
-			break;
+		case 0x05: // 0888 KRGB 32 bit
+		{
+			switch(unpackmode)
+			{
+				case 0x00: fb_convert_8888argb_to_555rgb(space,x,y); break;
+				case 0x01: fb_convert_8888argb_to_565rgb(space,x,y); break;
+				case 0x02: fb_convert_8888argb_to_888rgb24(space,x,y); break;
+				case 0x03: fb_convert_8888argb_to_888rgb32(space,x,y); break;
+			}
+		}
+		break;
 
 		case 0x06: // 8888 ARGB 32 bit
 		{
