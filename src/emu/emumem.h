@@ -1378,7 +1378,7 @@ public:
 	u16 write_dword_flags(offs_t address, u32 data) { if constexpr(Width == 2) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 2, true>(wopf(), address, data, 0xffffffff); }
 	u16 write_dword_flags(offs_t address, u32 data, u32 mask) { return memory_write_generic_flags<Width, AddrShift, Endian, 2, true>(wopf(), address, data, mask); }
 	u16 write_dword_unaligned_flags(offs_t address, u32 data) { return memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, 0xffffffff); }
-	u16 write_dword_unaligned_flags(offs_t address, u32 data, u32 mask) { memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, mask); }
+	u16 write_dword_unaligned_flags(offs_t address, u32 data, u32 mask) { return memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, mask); }
 	u16 write_qword_flags(offs_t address, u64 data) { if constexpr(Width == 3) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wopf(), address, data, 0xffffffffffffffffU); }
 	u16 write_qword_flags(offs_t address, u64 data, u64 mask) { return memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wop(), address, data, mask); }
 	u16 write_qword_unaligned_flags(offs_t address, u64 data) { return memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(wopf(), address, data, 0xffffffffffffffffU); }
@@ -1523,7 +1523,7 @@ public:
 	u16 write_dword_flags(offs_t address, u32 data) { if constexpr(Width == 2) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 2, true>(wopf(), address, data, 0xffffffff); }
 	u16 write_dword_flags(offs_t address, u32 data, u32 mask) { return memory_write_generic_flags<Width, AddrShift, Endian, 2, true>(wopf(), address, data, mask); }
 	u16 write_dword_unaligned_flags(offs_t address, u32 data) { return memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, 0xffffffff); }
-	u16 write_dword_unaligned_flags(offs_t address, u32 data, u32 mask) { memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, mask); }
+	u16 write_dword_unaligned_flags(offs_t address, u32 data, u32 mask) { return memory_write_generic_flags<Width, AddrShift, Endian, 2, false>(wopf(), address, data, mask); }
 	u16 write_qword_flags(offs_t address, u64 data) { if constexpr(Width == 3) return write_native_flags(address & ~NATIVE_MASK, data); else return memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wopf(), address, data, 0xffffffffffffffffU); }
 	u16 write_qword_flags(offs_t address, u64 data, u64 mask) { return memory_write_generic_flags<Width, AddrShift, Endian, 3, true>(wop(), address, data, mask); }
 	u16 write_qword_unaligned_flags(offs_t address, u64 data) { return memory_write_generic_flags<Width, AddrShift, Endian, 3, false>(wopf(), address, data, 0xffffffffffffffffU); }
