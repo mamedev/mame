@@ -145,22 +145,30 @@ uint8_t a2600_pop_state::rom_switch_r(offs_t offset)
 void a2600_pop_state::rom_switch_w(offs_t offset, uint8_t data)
 {
 	m_bankdev->set_bank(data & 0x7f);
-	if (data & 0x80) {
+	if (data & 0x80)
+	{
 		// (re)start reset timer?
 		// Unknown what happens when multiple dipswitches are set
 		uint8_t a8 = m_a8->read();
 		attotime reset_time = attotime::never;
-		if (a8 & 0x08) {
+		if (a8 & 0x08)
+		{
 			// infinite
 			// enable reset by pressing game selection button when on infinite timer
 			m_game_select_button_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
-		} else if (a8 & 0x04) {
+		}
+		else if (a8 & 0x04)
+		{
 			// 30 seconds
 			reset_time = attotime::from_seconds(30);
-		} else if (a8 & 0x02) {
+		}
+		else if (a8 & 0x02)
+		{
 			// 1 minute
 			reset_time = attotime::from_seconds(60);
-		} else if (a8 & 0x01) {
+		}
+		else if (a8 & 0x01)
+		{
 			// 2 minutes
 			reset_time = attotime::from_seconds(120);
 		}
@@ -595,7 +603,7 @@ void a2600_state::a2600_cartslot(machine_config &config)
 	SOFTWARE_LIST(config, "cass_list").set_original("a2600_cass");
 }
 
-void a2600_state::a2600(machine_config &config)
+void a2600_base_state::a2600_base_ntsc(machine_config &config)
 {
 	/* basic machine hardware */
 	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
@@ -631,6 +639,12 @@ void a2600_state::a2600(machine_config &config)
 	m_riot->out_pb_callback().set(FUNC(a2600_state::switch_B_w));
 	m_riot->irq_callback().set(FUNC(a2600_state::irq_callback));
 #endif
+}
+
+
+void a2600_state::a2600(machine_config &config)
+{
+	a2600_base_ntsc(config);
 
 	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, nullptr);
@@ -687,40 +701,8 @@ void a2600_state::a2600p(machine_config &config)
 
 void a2600_pop_state::a2600_pop(machine_config &config)
 {
-	/* basic machine hardware */
-	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
+	a2600_base_ntsc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_pop_state::memory_map);
-
-	/* video hardware */
-	TIA_NTSC_VIDEO(config, m_tia, 0, "tia");
-	m_tia->read_input_port_callback().set(FUNC(a2600_pop_state::a2600_read_input_port));
-	m_tia->databus_contents_callback().set(FUNC(a2600_pop_state::a2600_get_databus_contents));
-	m_tia->vsync_callback().set(FUNC(a2600_pop_state::a2600_tia_vsync_callback));
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_NTSC, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
-	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-	TIA(config, "tia", MASTER_CLOCK_NTSC/114).add_route(ALL_OUTPUTS, "mono", 0.90);
-
-	/* devices */
-#if USE_NEW_RIOT
-	MOS6532_NEW(config, m_riot, MASTER_CLOCK_NTSC / 3);
-	m_riot->pa_rd_callback().set(FUNC(a2600_pop_state::switch_A_r));
-	m_riot->pa_wr_callback().set(FUNC(a2600_pop_state::switch_A_w));
-	m_riot->pb_rd_callback().set_ioport("SWB");
-	m_riot->pb_wr_callback().set(FUNC(a2600_pop_state::switch_B_w));
-	m_riot->irq_wr_callback().set(FUNC(a2600_pop_state::irq_callback));
-#else
-	RIOT6532(config, m_riot, MASTER_CLOCK_NTSC / 3);
-	m_riot->in_pa_callback().set(FUNC(a2600_pop_state::switch_A_r));
-	m_riot->out_pa_callback().set(FUNC(a2600_pop_state::switch_A_w));
-	m_riot->in_pb_callback().set_ioport("SWB");
-	m_riot->out_pb_callback().set(FUNC(a2600_pop_state::switch_B_w));
-	m_riot->irq_callback().set(FUNC(a2600_pop_state::irq_callback));
-#endif
 
 	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
@@ -817,4 +799,4 @@ CONS( 1978, a2600p, a2600,  0,      a2600p,  a2600, a2600_state, empty_init, "At
 // Released in 1981/1982
 // Games 35-42 are copyright 1982 and looking at the game list they seem to be
 // added later.
-CONS( 198?, a2600_pop, 0,      0,      a2600_pop, a2600_pop, a2600_pop_state, empty_init, "Atari",    "Atari 2600 Point of Purchase Display",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, a2600_pop, 0,      a2600_pop, a2600_pop, a2600_pop_state, empty_init, ROT0, "Atari",    "Atari 2600 Point of Purchase Display",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

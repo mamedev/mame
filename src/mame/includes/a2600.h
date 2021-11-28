@@ -53,6 +53,8 @@ protected:
 
 	virtual void machine_start() override;
 
+	void a2600_base_ntsc(machine_config &config);
+
 	void switch_A_w(uint8_t data);
 	uint8_t switch_A_r();
 	void switch_B_w(uint8_t data);
