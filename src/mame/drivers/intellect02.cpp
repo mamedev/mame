@@ -39,12 +39,13 @@ keypad legend:
 
 #include "emu.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "sound/beep.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 #include "softlist.h"
 #include "speaker.h"
 
@@ -215,7 +216,7 @@ INPUT_PORTS_END
 
 void intel02_state::intel02(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080A(config, m_maincpu, 1500000); // measured (no XTAL)
 	m_maincpu->set_addrmap(AS_PROGRAM, &intel02_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &intel02_state::main_io);
@@ -227,17 +228,17 @@ void intel02_state::intel02(machine_config &config)
 	m_ppi8255->out_pc_callback().set(FUNC(intel02_state::control_w));
 	m_ppi8255->tri_pc_callback().set_constant(0x80);
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(6, 7);
 	m_display->set_segmask(0xf, 0x7f);
 	config.set_default_layout(layout_intellect02);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	BEEP(config, m_beeper, 3640); // measured, from RC circuit
 	m_beeper->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "intellect02").set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("intellect02");
 }

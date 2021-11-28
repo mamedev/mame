@@ -17140,6 +17140,9 @@ ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 @source:ikt5a.cpp
 ikt5a                           //
 
+@source:im01.cpp
+im01
+
 @source:imds2.cpp
 imds2                           // Intellec MDS series-II
 
