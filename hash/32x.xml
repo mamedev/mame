@@ -49,7 +49,7 @@ license:CC0
 	</software>
 
 	<software name="sharrier">
-		<description>Space Harrier (Europe)</description>
+		<description>Space Harrier (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>
