@@ -1402,7 +1402,7 @@ ROM_END
   ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
   ИМ-50  Космический полёт   Kosmicheskij poljot  Space Flight        The Model ID is the same as Amusing Arithmetic (not emulated in MAME)
   ИМ-51  Морская атака       Morskaja ataka       -                   -
-  ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics is very similar to ИМ-50
+  ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
 
 ***************************************************************************/
 
