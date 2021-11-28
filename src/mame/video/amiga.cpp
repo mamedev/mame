@@ -19,21 +19,7 @@
  *
  *************************************/
 
-#define LOG_COPPER          0
-#define GUESS_COPPER_OFFSET 0
 #define LOG_SPRITE_DMA      0
-
-
-
-/*************************************
- *
- *  Macros
- *
- *************************************/
-
-#define COPPER_CYCLES_TO_PIXELS(x)      (4 * (x))
-
-
 
 /*************************************
  *
@@ -79,29 +65,6 @@ const uint16_t amiga_state::s_expand_byte[256] =
 	0x5540, 0x5541, 0x5544, 0x5545, 0x5550, 0x5551, 0x5554, 0x5555
 };
 
-const uint16_t delay[256] =
-{
-	1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,1,1,0,0,0,0,0,0,0,0,    /* 0x000 - 0x03e */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x040 - 0x05e */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x060 - 0x07e */
-	0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,                        /* 0x080 - 0x09e */
-	1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,    /* 0x0a0 - 0x0de */
-	/* BPLxPTH/BPLxPTL */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x0e0 - 0x0fe */
-	/* BPLCON0-3,BPLMOD1-2 */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,                        /* 0x100 - 0x11e */
-	/* SPRxPTH/SPRxPTL */
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,                        /* 0x120 - 0x13e */
-	/* SPRxPOS/SPRxCTL/SPRxDATA/SPRxDATB */
-	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,    /* 0x140 - 0x17e */
-	/* COLORxx */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,    /* 0x180 - 0x1be */
-	/* RESERVED */
-	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 /* 0x1c0 - 0x1fe */
-};
-
-
-
 /*************************************
  *
  *  4-4-4 palette init
@@ -135,12 +98,6 @@ VIDEO_START_MEMBER( amiga_state, amiga )
 	}
 	// TODO: verify usage of values in the 64-255 range
 	// (should black out pf1 if j & 0x40, pf2 if j & 0x80)
-
-#if GUESS_COPPER_OFFSET
-	m_wait_offset = 3;
-#else
-	(void)m_wait_offset;
-#endif
 
 	/* reset the genlock color */
 	m_genlock_color = 0xffff;
@@ -190,171 +147,6 @@ void amiga_state::set_genlock_color(uint16_t color)
 {
 	m_genlock_color = color;
 }
-
-
-
-/*************************************
- *
- *  Copper emulation
- *
- *************************************/
-
-void amiga_state::copper_setpc(uint32_t pc)
-{
-	if (LOG_COPPER)
-		logerror("copper_setpc(%06x)\n", pc);
-
-	m_copper_pc = pc;
-	m_copper_waiting = false;
-}
-
-
-int amiga_state::copper_execute_next(int xpos)
-{
-	uint8_t ypos = m_last_scanline & 0xff;
-	int word0, word1;
-
-	/* bail if not enabled */
-	if ((CUSTOM_REG(REG_DMACON) & (DMACON_COPEN | DMACON_DMAEN)) != (DMACON_COPEN | DMACON_DMAEN))
-		return 511;
-
-	/* flush any pending writes */
-	if (m_copper_pending_offset)
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-
-		if (LOG_COPPER)
-			logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[m_copper_pending_offset & 0xff], m_copper_pending_data);
-		space.write_word(0xdff000 | (m_copper_pending_offset << 1), m_copper_pending_data);
-		m_copper_pending_offset = 0;
-	}
-
-	/* if we're waiting, check for a breakthrough */
-	if (m_copper_waiting)
-	{
-		int curpos = (ypos << 8) | (xpos >> 1);
-
-		/* if we're past the wait time, stop it and hold up 2 cycles */
-		if ((curpos & m_copper_waitmask) >= (m_copper_waitval & m_copper_waitmask) &&
-			(!m_copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
-		{
-			m_copper_waiting = false;
-#if GUESS_COPPER_OFFSET
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + m_wait_offset);
-#else
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
-#endif
-		}
-
-		/* otherwise, see if this line is even a possibility; if not, punt */
-		if (((curpos | 0xff) & m_copper_waitmask) < (m_copper_waitval & m_copper_waitmask))
-			return 511;
-
-		/* else just advance another pixel */
-		xpos += COPPER_CYCLES_TO_PIXELS(1);
-		return xpos;
-	}
-
-	/* fetch the first data word */
-	word0 = read_chip_ram(m_copper_pc);
-	m_copper_pc += 2;
-	xpos += COPPER_CYCLES_TO_PIXELS(1);
-
-	/* fetch the second data word */
-	word1 = read_chip_ram(m_copper_pc);
-	m_copper_pc += 2;
-	xpos += COPPER_CYCLES_TO_PIXELS(1);
-
-	if (LOG_COPPER)
-		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", m_last_scanline, xpos / 2, m_copper_pc - 4, word0, word1);
-
-	/* handle a move */
-	if ((word0 & 1) == 0)
-	{
-		int min = (CUSTOM_REG(REG_COPCON) & 2) ? 0x20 : 0x40;
-
-		/* do the write if we're allowed */
-		word0 = (word0 >> 1) & 0xff;
-		if (word0 >= min)
-		{
-			if (delay[word0] == 0)
-			{
-				address_space &space = m_maincpu->space(AS_PROGRAM);
-
-				if (LOG_COPPER)
-					logerror("%02X.%02X: Write to %s = %04x\n", m_last_scanline, xpos / 2, s_custom_reg_names[word0 & 0xff], word1);
-				space.write_word(0xdff000 | (word0 << 1), word1);
-			}
-			else    // additional 2 cycles needed for non-Agnus registers
-			{
-				m_copper_pending_offset = word0;
-				m_copper_pending_data = word1;
-			}
-		}
-
-		/* illegal writes suspend until next frame */
-		else
-		{
-			if (LOG_COPPER)
-				logerror("%02X.%02X: Aborting copper on illegal write\n", m_last_scanline, xpos / 2);
-
-			m_copper_waitval = 0xffff;
-			m_copper_waitmask = 0xffff;
-			m_copper_waitblit = false;
-			m_copper_waiting = true;
-
-			return 511;
-		}
-	}
-	else
-	{
-		/* extract common wait/skip values */
-		m_copper_waitval = word0 & 0xfffe;
-
-#if 0
-		if (m_copper_waitval != 0xfffe)
-			m_copper_waitval = (word0 & 0x00fe) | ((((word0 >> 8) & 0xff) + 1) << 8);
-#endif
-
-		m_copper_waitmask = word1 | 0x8001;
-		m_copper_waitblit = (~word1 >> 15) & 1;
-
-		/* handle a wait */
-		if ((word1 & 1) == 0)
-		{
-			if (LOG_COPPER)
-				logerror("  Waiting for %04x & %04x (currently %04x)\n", m_copper_waitval, m_copper_waitmask, (m_last_scanline << 8) | (xpos >> 1));
-
-			m_copper_waiting = true;
-		}
-
-		/* handle a skip */
-		else
-		{
-			int curpos = (ypos << 8) | (xpos >> 1);
-
-			if (LOG_COPPER)
-				logerror("  Skipping if %04x & %04x (currently %04x)\n", m_copper_waitval, m_copper_waitmask, (m_last_scanline << 8) | (xpos >> 1));
-
-			/* if we're past the wait time, stop it and hold up 2 cycles */
-			if ((curpos & m_copper_waitmask) >= (m_copper_waitval & m_copper_waitmask) &&
-				(!m_copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
-			{
-				if (LOG_COPPER)
-					logerror("  Skipped\n");
-
-				/* count the cycles it out have taken to fetch the next instruction */
-				m_copper_pc += 4;
-				xpos += COPPER_CYCLES_TO_PIXELS(2);
-			}
-		}
-	}
-
-	/* advance and consume 8 cycles */
-	return xpos;
-}
-
-
 
 /*************************************
  *
@@ -703,7 +495,7 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
 		// reset copper and ham color
-		copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+		m_copper->vblank_sync();
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -762,7 +554,11 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = copper_execute_next(x);
+			next_copper_x = m_copper->execute_next(
+				x,
+				m_last_scanline & 0xff, 
+				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
+			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
@@ -1059,16 +855,6 @@ void amiga_state::render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// save
 	if (dst != nullptr)
 		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix(save_scanline));
-
-#if GUESS_COPPER_OFFSET
-	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
-	{
-		if (machine().input().code_pressed(KEYCODE_Q))
-			popmessage("%d", m_wait_offset -= 1);
-		if (machine().input().code_pressed(KEYCODE_W))
-			popmessage("%d", m_wait_offset += 1);
-	}
-#endif
 }
 
 

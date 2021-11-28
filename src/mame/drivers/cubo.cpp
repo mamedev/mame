@@ -1069,6 +1069,11 @@ void cubo_state::cubo(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cubo_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cubo_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
 
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_28M_PAL / 2);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(true);
+
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
 	akiko_device &akiko(AKIKO(config, "akiko", 0));

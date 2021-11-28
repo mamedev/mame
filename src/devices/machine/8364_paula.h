@@ -55,7 +55,7 @@ public:
 	paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	auto mem_read_cb() { return m_mem_r.bind(); }
+	auto mem_read_cb() { return m_chipmem_r.bind(); }
 	auto int_cb() { return m_int_w.bind(); }
 
 	void update();
@@ -108,7 +108,7 @@ private:
 	void dma_reload(audio_channel *chan, bool startup);
 
 	// callbacks
-	devcb_read16 m_mem_r;
+	devcb_read16 m_chipmem_r;
 	devcb_write8 m_int_w;
 
 	audio_channel m_channel[4];

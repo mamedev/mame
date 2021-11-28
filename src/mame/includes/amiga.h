@@ -20,6 +20,7 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "bus/centronics/ctronics.h"
 #include "machine/mos6526.h"
 #include "machine/amigafdc.h"
+#include "machine/amiga_copper.h"
 #include "machine/msm6242.h"
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
@@ -316,6 +317,10 @@ public:
 		, m_cia_1(*this, "cia_1")
 		, m_rs232(*this, "rs232")
 		, m_centronics(*this, "centronics")
+// 		, m_agnus(*this, "agnus")
+//		, m_denise(*this, "denise")
+		, m_copper(*this, "copper")
+//		, m_blitter(*this, "blitter")
 		, m_paula(*this, "paula")
 		, m_fdc(*this, "fdc")
 		, m_screen(*this, "screen")
@@ -579,6 +584,7 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
+	required_device<amiga_copper_device> m_copper;
 	required_device<paula_8364_device> m_paula;
 	optional_device<amiga_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
@@ -630,8 +636,6 @@ private:
 protected:
 	void set_genlock_color(uint16_t color);
 private:
-	void copper_setpc(uint32_t pc);
-	int copper_execute_next(int xpos);
 	void sprite_dma_reset(int which);
 	void sprite_enable_comparitor(int which, int enable);
 	void fetch_sprite_data(int scanline, int sprite);

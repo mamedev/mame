@@ -30,8 +30,6 @@ To do:
  *
  *************************************/
 
-// FIXME: you have to enable this *and* correlated macro in amiga.cpp
-#define GUESS_COPPER_OFFSET 0
 #define LOG_SPRITE_DMA      0
 
 
@@ -485,7 +483,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		if (CUSTOM_REG(REG_BPLCON0) & BPLCON0_LACE)
 			CUSTOM_REG(REG_VPOSR) ^= VPOSR_LOF;
 
-		copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
+		m_copper->vblank_sync();
 		m_ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
@@ -528,6 +526,7 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 
 	/* loop over the line */
 	/* copper runs on odd timeslots */
+	// TODO: diverges wrt OCS, is this right?
 	next_copper_x = 2;
 	// TODO: verify where we're missing pixels here for the GFX pitch bitplane failures
 	// i.e. wbenc30 scrolling in lores mode, sockid_a gameplay
@@ -542,7 +541,11 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = copper_execute_next(x);
+			next_copper_x = m_copper->execute_next(
+				x,
+				m_last_scanline & 0xff,
+				bool(BIT(CUSTOM_REG(REG_DMACON), 14)) // BBUSY
+			);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
 			if (m_genlock_color != 0xffff)
 				CUSTOM_REG(REG_COLOR00) = m_genlock_color;
@@ -898,16 +901,6 @@ void amiga_state::aga_render_scanline(bitmap_rgb32 &bitmap, int scanline)
 	// save
 	if (dst != nullptr)
 		std::copy_n(dst, amiga_state::SCREEN_WIDTH, &m_flickerfixer.pix(save_scanline));
-
-#if GUESS_COPPER_OFFSET
-	if (m_screen->frame_number() % 64 == 0 && scanline == 0)
-	{
-		if (machine().input().code_pressed(KEYCODE_Q))
-			popmessage("%d", m_wait_offset -= 1);
-		if (machine().input().code_pressed(KEYCODE_W))
-			popmessage("%d", m_wait_offset += 1);
-	}
-#endif
 }
 
 

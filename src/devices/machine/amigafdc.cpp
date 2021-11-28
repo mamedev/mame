@@ -4,6 +4,8 @@
 
     Amiga floppy disk controller emulation "Trackdisk"
 
+    Contained inside MOS 8364 Paula device
+
 ***************************************************************************/
 
 
@@ -450,7 +452,9 @@ void amiga_fdc_device::dsksync_w(uint16_t data)
 void amiga_fdc_device::dmacon_set(uint16_t data)
 {
 	live_sync();
-	if (data != dmacon)
+	// log changes only
+	// FIXME: needs better boilerplate code on top level
+	if ((data & 0x210) != (dmacon & 0x210))
 		LOGDMA("%s: DMACON set DSKEN %d DMAEN %d (%04x)\n", machine().describe_context(), BIT(data, 4), BIT(data, 9), data);
 	dmacon = data;
 	dma_check();

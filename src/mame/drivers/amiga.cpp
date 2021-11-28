@@ -1623,6 +1623,13 @@ void amiga_state::amiga_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
 
+	// TODO: shouldn't have a clock
+	// (finite state machine, controlled by Agnus beams)
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_PAL);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(false);
+
 	// rs232
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(FUNC(amiga_state::rs232_rx_w));
@@ -1707,6 +1714,7 @@ void a2000_state::a2000(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a2000_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a2000_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	m_copper->set_ecs_mode(true);
 
 	// real-time clock
 	MSM6242(config, m_rtc, XTAL(32'768));
@@ -1809,6 +1817,7 @@ void cdtv_state::cdtv(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cdtv_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	// FIXME: CDTV is actually ECS Agnus but OCS Denise
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cdtv_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	m_copper->set_ecs_mode(true);
 
 	// standard sram
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
@@ -1873,6 +1882,7 @@ void a3000_state::a3000(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a3000_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a3000_state::ecs_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	m_copper->set_ecs_mode(true);
 
 	// real-time clock
 	RP5C01(config, "rtc", XTAL(32'768));
@@ -1911,6 +1921,7 @@ void a500p_state::a500p(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a500p_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a500p_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	m_copper->set_ecs_mode(true);
 
 	// real-time clock
 	MSM6242(config, m_rtc, XTAL(32'768));
@@ -1952,6 +1963,7 @@ void a600_state::a600(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a600_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a600_state::ecs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
+	m_copper->set_ecs_mode(true);
 
 	gayle_device &gayle(GAYLE(config, "gayle", amiga_state::CLK_28M_PAL / 2));
 	gayle.set_id(a600_state::GAYLE_ID);
@@ -1991,10 +2003,11 @@ void a1200_state::a1200(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a1200_state::a1200_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
+	amiga_base(config);
+
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a1200_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a1200_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
-
-	amiga_base(config);
+	m_copper->set_ecs_mode(true);
 
 	// keyboard
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a1200_us")); // FIXME: replace with Amiga 1200 devices when we have mask ROM dump
@@ -2051,10 +2064,11 @@ void a4000_state::a4000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
+	amiga_base(config);
+
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&a4000_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&a4000_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
-
-	amiga_base(config);
+	m_copper->set_ecs_mode(true);
 
 	// keyboard
 	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
@@ -2123,10 +2137,12 @@ void cd32_state::cd32(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cd32_state::cd32_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
+	amiga_base(config);
+
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cd32_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
  	ADDRESS_MAP_BANK(config, m_chipset).set_map(&cd32_state::aga_map).set_options(ENDIANNESS_BIG, 32, 9, 0x200);
+	m_copper->set_ecs_mode(true);
 
-	amiga_base(config);
 	FLOPPY_CONNECTOR(config.replace(), "fdc:0", amiga_floppies, nullptr, amiga_fdc_device::floppy_formats).enable_sound(true);
 
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N

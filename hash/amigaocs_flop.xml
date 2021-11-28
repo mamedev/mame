@@ -19,6 +19,8 @@ license:CC0
     - a generic "failed" means that most if not all tracks reports as bad (test didn't complete);
     - C refers to the Track number(s), H is the (U)pper, (L)ower head (if not omitted),
       "1 Sector Bad" reports as one sector being bad, otherwise "Bad" [Track];
+	Notice this is just an extra note added to identify disk behaviour with our FDC:
+	it has no value for the supported flag.
 
 	Note that disk swaps are known to be quite fussy on Amiga.
 	As a rule of thumb it's really advised to not try a "live swap" of disks,
@@ -1618,7 +1620,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="alianatr" supported="no">
+	<software name="alianatr" supported="yes">
 		<!-- SPS (CAPS) release 1905 -->
 		<description>Alianator (Euro)</description>
 		<!-- coverdisk, standalone -->
@@ -1626,8 +1628,10 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Amiga Fun</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<!-- Has dBooter initial check for virus -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1905)alianator.ipf" size="1049612" crc="8e93efe4" sha1="e0430c5eb4a116949a5b059616e32acb5da93706"/>
@@ -2546,6 +2550,7 @@ ATK test: OK
 
 	<software name="anstoss" supported="no">
 		<!-- SPS (CAPS) release 798 -->
+		<!-- TODO: German release -->
 		<description>Anstoss - Die Fußball-Manager-Simulation (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
@@ -2554,6 +2559,7 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -3296,7 +3302,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="arthur" supported="no">
+	<software name="arthur" supported="yes">
 		<!-- SPS (CAPS) release 1401 -->
 		<description>Arthur: The Quest for Excalibur (USA, r54)</description>
 		<!-- retail, standalone -->
@@ -3304,8 +3310,11 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Arthur from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1401)arthur-thequestforexcalibur.ipf" size="1049612" crc="86245427" sha1="54cf8f890de193fc5a0cd5fbf3adf83d2a93ac8f"/>
@@ -4462,7 +4471,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="ballyhoo" supported="no">
+	<software name="ballyhoo" supported="yes">
 		<!-- SPS (CAPS) release 2682 -->
 		<description>Ballyhoo (Euro, r97)</description>
 		<!-- retail, standalone -->
@@ -4470,8 +4479,11 @@ ATK test: failed
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Ballyhoo from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2682)ballyhoo.ipf" size="1049612" crc="7c6367df" sha1="fb4387c443974828e3cacf24a4a5ae24d8bacbaa"/>
@@ -5445,7 +5457,7 @@ ATK test: H:U 1 Sector Bad, C:0 H:L 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="btech" supported="no">
+	<software name="btech" supported="yes">
 		<!-- SPS (CAPS) release 1402 -->
 		<description>BattleTech (USA, v2.3)</description>
 		<!-- retail, standalone -->
@@ -5453,9 +5465,12 @@ ATK test: H:U 1 Sector Bad, C:0 H:L 1 Sector Bad
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<info name="alt_title" value="BattleTech - The Crescent Hawk's Inception (Box)" />
+		<!-- Developer: Westwood -->
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1402)battletech-thecrescenthawksinception.ipf" size="1049612" crc="349c6328" sha1="a69840e8984a754c84091f068cc34c0fd1cde6c9"/>
@@ -6151,7 +6166,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="beyzork" supported="no">
+	<software name="beyzork" supported="yes">
 		<!-- SPS (CAPS) release 1403 -->
 		<description>Beyond Zork - The Coconut of Quendor (USA, r57)</description>
 		<!-- retail, standalone -->
@@ -6159,8 +6174,11 @@ ATK test: failed
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Beyond Zork from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1403)beyondzork.ipf" size="1049612" crc="38af6a75" sha1="b8d4357768e09dfdec8ed56ef99cbb0ce5b90a7a"/>
@@ -6395,7 +6413,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="bionicc" supported="no">
+	<software name="bionicc" supported="yes">
 		<!-- SPS (CAPS) release 1072 -->
 		<description>Bionic Commando (Euro)</description>
 		<!-- retail, standalone -->
@@ -6403,6 +6421,7 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -6437,6 +6456,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
+black screen after initial disk swap, [FDC] with adkcon=1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -6461,6 +6481,8 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>P.S.S.</publisher>
 		<notes><![CDATA[
+Black screen, jump off to PC=0, [FDC] dsksync bootblock
+On soft reset sometimes Bismarck title is drawn (after Guru Meditation), still doesn't boot
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7154,6 +7176,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<notes><![CDATA[
+Black screen after Three-Sixty logo display, [FDC] with adkcon=1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -7176,7 +7199,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="bluesb" supported="no">
 		<!-- SPS (CAPS) release 3081 -->
 		<description>The Blues Brothers (Euro)</description>
@@ -7184,6 +7206,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1028720">
 				<rom name="(sps3081)bluesbrothers,the.ipf" size="1028720" crc="5dd15801" sha1="5071b71f7d76fd7fe16a5dffe04498df1ccc1104"/>
@@ -7191,7 +7216,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="bluesb1" cloneof="bluesb" supported="no">
 		<!-- SPS (CAPS) release 3082 -->
 		<description>The Blues Brothers (Euro, alt)</description>
@@ -7199,6 +7223,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1028720">
 				<rom name="(sps3082)bluesbrothers,the.ipf" size="1028720" crc="99b57dfd" sha1="06cc9e6dd233c41b57f938b78cc51142345f62a7"/>
@@ -7935,7 +7962,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="bubblep" supported="no">
+	<software name="bubblep" supported="partial">
 		<!-- SPS (CAPS) release 2886 -->
 		<description>Bubble + (Euro)</description>
 		<!-- retail, standalone -->
@@ -7943,6 +7970,8 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Infogrames</publisher>
 		<notes><![CDATA[
+boot OK
+Has ugly [Denise] color vertical scroll transitions (btanb?)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -8360,16 +8389,20 @@ ATK test: C:79 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="bund3000" supported="no">
+	<software name="bund3000" supported="partial">
 		<!-- SPS (CAPS) release 2786 -->
+		<!-- TODO: German language -->
 		<description>Bundesliga 3000 (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>Schatztruhe</publisher>
 		<notes><![CDATA[
+boot OK
+Needs Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Has optional HDD install"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Programm Diskette" />
 			<dataarea name="flop" size="1049612">
@@ -8392,6 +8425,7 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Software 2000</publisher>
 		<notes><![CDATA[
+Requires Save Disk to start a new game, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -8431,7 +8465,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="bureaucr" supported="no">
+	<software name="bureaucr" supported="yes">
 		<!-- SPS (CAPS) release 1493 -->
 		<description>Bureaucracy (USA, r86)</description>
 		<!-- retail, standalone -->
@@ -8439,8 +8473,11 @@ ATK test: C:79 H:U 1 Sector Bad
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Bureaucracy from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1493)bureaucracy.ipf" size="1049612" crc="066c5c07" sha1="727a4cc329b050c6fd157970a895993b8eabc9a0"/>
@@ -9440,12 +9477,14 @@ ATK test: C:0 H:U 1 Sector Bad
 
 	<software name="drbrain" supported="no">
 		<!-- SPS (CAPS) release 304 -->
+		<!-- TODO: clearly a German release, not Europe -->
 		<description>Castle of Dr. Brain (Euro, v1.0)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
+Hangs after initial boot disk swaps with hourglass mouse pointer, [FDC]?
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -9700,7 +9739,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="century" supported="no">
+	<software name="century" supported="partial">
 		<!-- SPS (CAPS) release 640 -->
 		<description>Century (Euro)</description>
 		<!-- retail, standalone -->
@@ -9708,6 +9747,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Software 2000</publisher>
 		<notes><![CDATA[
+Has wrong sprite colors (should be orange, they instead change depending on stage played)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -9759,6 +9799,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Grandslam</publisher>
 		<notes><![CDATA[
+Grandslam GFX logo is cutoff on left portion
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -9928,7 +9969,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="cmang93" supported="no">
+	<software name="cmang93" supported="partial">
 		<!-- SPS (CAPS) release 1662 -->
 		<description>Championship Manager '93 (Euro)</description>
 		<!-- retail, standalone -->
@@ -9936,8 +9977,11 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
+boot OK, tested quick start mode
+Requires write enable copy of disks, [FDC] format
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (match results), requires write enabled disks"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -10002,8 +10046,12 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
+Cannot install from blank disks, [FDC] format
+Guru Meditation when attempting to install to HDD after asking to insert DF0: disk which is already in
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Needs two blank disks or HDD install"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1626)championshipmanageritalia.ipf" size="1049612" crc="1f5e7f46" sha1="d12392375944387b850eeaf2ee9deacbca36fd5f"/>
@@ -10891,7 +10939,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="cliffh" supported="no">
+	<software name="cliffh" supported="partial">
 		<!-- SPS (CAPS) release 1598 -->
 		<description>Cliffhanger (Euro)</description>
 		<!-- retail, standalone -->
@@ -10899,8 +10947,12 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<notes><![CDATA[
+boot OK
+Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically), also [keyboard] pausing the game with 'P' will sometimes not register key release properly (unpauses unless you don't release button)
+Runs too fast? (TODO: test on real HW)
 ATK test: OK
 ]]></notes>
+		<!-- Omake: type "ultimate lives" on gameplay to enable cheat mode (infinite lives and no damage). F1 thru F6 switches to the correlated level -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1598)cliffhanger.ipf" size="1049612" crc="361a41a8" sha1="5536cd159572b075fb82f7f0638e512bf8668ff6"/>
@@ -10975,6 +11027,8 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>B.O.M.S.</publisher>
 		<notes><![CDATA[
+Hangs during Half Time on a match
+Requires Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -11156,7 +11210,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="cohort2" supported="no">
+	<software name="cohort2" supported="partial">
 		<!-- SPS (CAPS) release 2941 -->
 		<description>Cohort II - Fighting for Rome (Euro)</description>
 		<!-- retail, standalone -->
@@ -11164,8 +11218,13 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Impressions</publisher>
 		<notes><![CDATA[
+a500: crashes when launched from disk (btanb? Needs RAM?)
+a500p: boot OK
+Has optional save feature, [FDC] format
 ATK test: OK
 ]]></notes>
+		<!-- TODO: optional data disk for Caesar? -->
+		<info name="usage" value="Type 'Play Cohort2' at CLI prompt to start from disk, or use the optional HDD install options as listed by the OSD first boot"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2941)cohortii-fightingforrome.ipf" size="1049180" crc="6750c32e" sha1="064654572b20891cb773215f6c3facc0010c05e8"/>
@@ -12527,7 +12586,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="cutthr" supported="no">
+	<software name="cutthr" supported="yes">
 		<!-- SPS (CAPS) release 2683 -->
 		<description>Cutthroats (Euro, r23)</description>
 		<!-- retail, standalone -->
@@ -12535,8 +12594,11 @@ ATK test: C:0 H:U Bad
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Cutthroats from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2683)cutthroats.ipf" size="1049612" crc="a12416f4" sha1="24304396acf2d12c0cc6ad6a4a34a3f3044c6b15"/>
@@ -13021,7 +13083,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="dqkrynn" supported="no">
+	<software name="dqkrynn" supported="partial">
 		<!-- SPS (CAPS) release 988 -->
 		<description>The Dark Queen of Krynn (Euro, v1.0 19920616)</description>
 		<!-- retail, standalone -->
@@ -13029,8 +13091,12 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
+boot OK
+Optional save disk required, [FDC] format
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (adventurer's journal)"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -13488,7 +13554,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="dogem" supported="no">
+	<software name="dogem" supported="yes">
 		<!-- SPS (CAPS) release 2139 -->
 		<description>Death or Glory - Das Erbe von Morgan (Ger, Hard Disk Version)</description>
 		<!-- retail, standalone -->
@@ -13496,8 +13562,10 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Software 2000</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Requires HDD install"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -14054,7 +14122,6 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="dicktr" supported="no">
 		<!-- SPS (CAPS) release 3083 -->
 		<description>Dick Tracy (Euro, Titus)</description>
@@ -14062,6 +14129,9 @@ ATK test: C:0 H:U Bad
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
 		<publisher>Titus</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="853776">
 				<rom name="(sps3083)dicktracy.ipf" size="853776" crc="4bf9beba" sha1="02589a4204c294c91a54514cd9d6289c45f785fe"/>
@@ -14357,7 +14427,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="dogsowar" supported="no">
 		<!-- SPS (CAPS) release 3008 -->
 		<description>Dogs Of War</description>
@@ -14365,6 +14434,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
 		<publisher>Elite</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1016901">
 				<rom name="dogsofwar.ipf" size="1016901" crc="e738511f" sha1="5581ab144292d0e1283beaa6188addd111bb4099" status="baddump"/>
@@ -15540,6 +15612,9 @@ ATK test: failed
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<!-- TODO: untested after copy protection -->
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2498)driller.ipf" size="1049612" crc="db3c514a" sha1="b373ad3f300ce53f0af8304e0263c3d934e94d8b"/>
@@ -15547,16 +15622,19 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="driller1" cloneof="driller" supported="no">
+	<software name="driller1" cloneof="driller" supported="yes">
 		<!-- SPS (CAPS) release 2256 -->
 		<description>Driller (Euro, Budget)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
+		<!-- US Gold license -->
 		<publisher>Kixx</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<!-- Has no copy protection -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2256)driller.ipf" size="1049180" crc="b933e8d7" sha1="0c148cbaddcd9c3a2335b03c0632297914383ab6"/>
@@ -15624,6 +15702,9 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Europress</publisher>
 		<notes><![CDATA[
+Randomly crashes during sub-game loading
+"Le Basket-ball" sub-game recognizes [keyboard] 'M' press as ','
+Other games beyond 2nd one untested
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -15708,7 +15789,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="dune" supported="no">
+	<software name="dune" supported="partial">
 		<!-- SPS (CAPS) release 1156 -->
 		<description>Dune (Euro)</description>
 		<!-- retail, standalone -->
@@ -15716,8 +15797,12 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Virgin</publisher>
 		<notes><![CDATA[
+Glitchy GFXs on first two intro screens
+Has dots GFX glitch in lower right corner
+Exiting from talk mode causes cut off screen on transitions
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (images)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -16350,6 +16435,7 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
+Guru Meditation during initial boot, [FDC] with adkcon=1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -16991,8 +17077,10 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Empire Software</publisher>
 		<notes><![CDATA[
+Soccer field background GFX has serious glitches during gameplay, wrong [Blitter] copies
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports score card copy-protection at first half time"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps844)empiresoccer94.ipf" size="1049612" crc="96cc1a0c" sha1="93c6ad07592199e69ddc8c7b81004769c181347c"/>
@@ -17042,6 +17130,8 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Rauser</publisher>
 		<notes><![CDATA[
+Randomly black screens during gameplay
+Requires Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -17094,8 +17184,11 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Loriciel</publisher>
 		<notes><![CDATA[
+black screen, [FDC] dsksync
+Scrolling cliprect issues on right edge during gameplay
 ATK test: C:79 H:U 1 Sector Bad
 ]]></notes>
+		<info name="usage" value="Boot Disk 2 to skip intro"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 (Demo)" />
 			<dataarea name="flop" size="1049612">
@@ -17387,6 +17480,8 @@ ATK test: failed
 		<year>1990</year>
 		<publisher>CDS</publisher>
 		<notes><![CDATA[
+Black screen at boot, soft reset causes a Guru Meditation then boots, [FDC] with adkcon=1100
+Has Save Disk option, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -17396,7 +17491,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="euro88" supported="no">
+	<software name="euro88" supported="yes">
 		<!-- SPS (CAPS) release 679 -->
 		<description>Euro Soccer '88 (Ger)</description>
 		<!-- retail, standalone -->
@@ -17404,6 +17499,7 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>Ariolasoft</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -17421,8 +17517,12 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Flair Software</publisher>
 		<notes><![CDATA[
+a500: Guru Meditation on initial boot with unmapped RAM access
+a500p: intro GFXs are glitchy, [Copper]?
 ATK test: failed
 ]]></notes>
+		<!-- TODO: untested after copy protection -->
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -17831,7 +17931,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="f15se2" supported="no">
+	<software name="f15se2" supported="yes">
 		<!-- SPS (CAPS) release 479 -->
 		<description>F-15 Strike Eagle II (Euro)</description>
 		<!-- retail, standalone -->
@@ -17839,8 +17939,10 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>MicroProse</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports language-based manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Game Disk" />
 			<dataarea name="flop" size="1049612">
@@ -18043,14 +18145,16 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="faceoff" supported="no">
+	<software name="faceoff" supported="partial">
 		<!-- SPS (CAPS) release 1670 -->
-		<description>Face-Off (Euro)</description>
+		<description>Face-Off (Euro, Krisalis)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>Krisalis</publisher>
 		<notes><![CDATA[
+boot OK
+Has repeated text display and color bugs on scorecards (start, half times, end of game), [Copper]?
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<info name="alt_title" value="Face-Off Ice Hockey (Box)" />
@@ -18064,7 +18168,7 @@ ATK test: C:0 H:U Bad
 	<software name="faceoff1" cloneof="faceoff" supported="no">
 		<!-- invalid - this was marked as SPS but these checksums don't appear in the list -->
 		<!-- SPS (CAPS) release 1670 -->
-		<description>Face-Off (Euro, Bad?)</description>
+		<description>Face-Off (Euro, Krisalis, Bad?)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
@@ -18080,14 +18184,16 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="faceoffa" supported="no">
+	<software name="faceoffa" supported="yes">
 		<!-- SPS (CAPS) release 2483 -->
-		<description>Face Off (Euro, Budget)</description>
+		<description>Face Off (Euro, Anco, Budget)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
+		<!-- Developer: Anco -->
 		<publisher>Prism Leisure</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<info name="alt_title" value="Ice Hockey (Box)" />
@@ -18686,7 +18792,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="fifa" supported="no">
+	<software name="fifa" supported="yes">
 		<!-- SPS (CAPS) release 501 -->
 		<description>FIFA International Soccer (Euro)</description>
 		<!-- retail, standalone -->
@@ -18694,8 +18800,10 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Accept 2B joysticks only in DB9 ports"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -18875,7 +18983,8 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
-boot OK but bad colors for sprites and layers
+Bad colors and eventually corruption for sprites and layers
+Crashes after stage 1
 ATK test: H:U 1 Sector Bad, C:0 H:L 1 Sector Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -19699,14 +19808,17 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="footdir2" supported="no">
+	<software name="footdir2" supported="partial">
 		<!-- SPS (CAPS) release 1026 -->
+		<!-- "This is Beta Test Version 2.XXIV.IX.91" -->
 		<description>Football Director II (Euro, v2.06D CDS)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1991</year>
 		<publisher>CDS</publisher>
 		<notes><![CDATA[
+boot OK
+Unemulated optional [FDC] format option for saving game
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -19733,14 +19845,17 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="fbmang" supported="no">
+	<software name="fbmang" supported="partial">
 		<!-- SPS (CAPS) release 1634 -->
 		<description>Football Manager (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
+		<!-- Publisher: Prism Leisure -->
 		<publisher>Addictive</publisher>
 		<notes><![CDATA[
+boot OK
+Optional write enabled Disk copy required, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -19756,8 +19871,10 @@ ATK test: OK
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
+		<!-- Publisher: Prism Leisure -->
 		<publisher>Addictive</publisher>
 		<notes><![CDATA[
+Guru Meditation during Workbench load after pressing left mouse button on Hot Shot advertisement 
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -20986,7 +21103,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="gbachamp" supported="no">
+	<software name="gbachamp" supported="yes">
 		<!-- SPS (CAPS) release 2948 -->
 		<description>GBA Championship Basketball - Two-on-Two (Euro)</description>
 		<!-- retail, standalone -->
@@ -20994,6 +21111,7 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Gamestar</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -21011,8 +21129,10 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Hollyware</publisher>
 		<notes><![CDATA[
+Black screen after couple new tries with [Serial] polling of RBF (TODO: recheck)
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (Gear Pattern Table"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1028)gearworks.ipf" size="1049612" crc="0e13e008" sha1="debe8e3b950b0cae4057b0921764c7ad7e862663"/>
@@ -21064,6 +21184,7 @@ ATK test: failed
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Configuration Disk" />
 			<dataarea name="flop" size="1049180">
@@ -21896,7 +22017,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="gotcha" supported="no">
+	<software name="gotcha" supported="partial">
 		<!-- SPS (CAPS) release 2756 -->
 		<description>Gotcha! (Euro)</description>
 		<!-- retail, standalone -->
@@ -21904,6 +22025,8 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Kingsoft</publisher>
 		<notes><![CDATA[
+boot OK
+Has glitchy Hi-Score display
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -21921,8 +22044,11 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Impulze</publisher>
 		<notes><![CDATA[
+Crashes during boot with red genlock color, [FDC] dsksync
+Crashes on copy-protection screen with raster color genlock
 ATK test: C:0 H:U Bad
 ]]></notes>
+		<info name="usage" value="Sports color copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049304">
 				<rom name="(sps1700)graemesounessvectorsoccer.ipf" size="1049304" crc="8193a8be" sha1="0777525b447bbaab3ac0a0c8250af26d3adc18ff"/>
@@ -22361,6 +22487,8 @@ ATK test: OK
 		<year>1987</year>
 		<publisher>Firebird</publisher>
 		<notes><![CDATA[
+Hangs when trying to restore a saved game, [FDC] write
+Garbled intro GFX screen, uses [Denise] HAM in LACE mode
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -23734,7 +23862,7 @@ ATK test: failed
 		<publisher>Hollyware</publisher>
 		<notes><![CDATA[
 Locks up after Kickstart (white screen) [FDC] dsksync
-No sprites on gameplay, BGM is too fast?
+No player sprite on gameplay, [Paula] BGM is too fast?
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -23785,7 +23913,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="hollyhij" supported="no">
+	<software name="hollyhij" supported="yes">
 		<!-- SPS (CAPS) release 1492 -->
 		<description>Hollywood Hijinx (USA, r37)</description>
 		<!-- retail, standalone -->
@@ -23793,8 +23921,11 @@ ATK test: OK
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Hollywood Hijinx from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1492)hollywoodhijinx.ipf" size="1049612" crc="1624d67d" sha1="67c4b71cd7f2adae03db046c48969129654d9ec2"/>
@@ -24991,14 +25122,18 @@ ATK test: failed
 
 	<software name="indyatad" supported="no">
 		<!-- SPS (CAPS) release 851 -->
-		<description>Indiana Jones and the Fate of Atlantis (Euro, TGA, v1.06 19921012)</description>
+		<description>Indiana Jones and the Fate of Atlantis: The Graphic Adventure (Euro, v1.06 19921012)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+Asks to disk swap with save/load disk at boot, [FDC] format, can cause random Guru Meditation
 ATK test: OK
 ]]></notes>
+		<!-- TODO: test after copy protection check -->
+		<info name="usage" value="Sports manual copy-protection"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -25069,7 +25204,7 @@ ATK test: OK
 
 	<software name="indyatadf" cloneof="indyatad" supported="no">
 		<!-- SPS (CAPS) release 1639 -->
-		<description>Indiana Jones and the Fate of Atlantis (Fra, TGA, v1.0 19930302)</description>
+		<description>Indiana Jones and the Fate of Atlantis: The Graphic Adventure (Fra, v1.0 19930302)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -25147,7 +25282,7 @@ ATK test: OK
 
 	<software name="indyatadg" cloneof="indyatad" supported="no">
 		<!-- SPS (CAPS) release 342 -->
-		<description>Indiana Jones and the Fate of Atlantis (Ger, TGA, v1.0 19921028)</description>
+		<description>Indiana Jones and the Fate of Atlantis: The Graphic Adventure (Ger, v1.0 19921028)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1993</year>
@@ -25225,7 +25360,7 @@ ATK test: OK
 
 	<software name="indycrus" supported="no">
 		<!-- SPS (CAPS) release 1619 -->
-		<description>Indiana Jones and the Last Crusade (Euro, TAG)</description>
+		<description>Indiana Jones and the Last Crusade: The Arcade Game (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -25244,7 +25379,7 @@ ATK test: failed
 
 	<software name="indycrad" supported="no">
 		<!-- SPS (CAPS) release 1990 -->
-		<description>Indiana Jones and the Last Crusade (USA, TGA, v1.4 19891004)</description>
+		<description>Indiana Jones and the Last Crusade: The Graphic Adventure (USA, v1.4 19891004)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -25274,7 +25409,7 @@ ATK test: OK
 
 	<software name="indycradf" cloneof="indycrad" supported="no">
 		<!-- SPS (CAPS) release 1986 -->
-		<description>Indiana Jones and the Last Crusade (Fra, TGA, v1.4 19891006, Fun Radio la Compil Micro 3)</description>
+		<description>Indiana Jones and the Last Crusade: The Graphic Adventure (Fra, v1.4 19891006, Fun Radio la Compil Micro 3)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -25304,7 +25439,7 @@ ATK test: OK
 
 	<software name="indycradg" cloneof="indycrad" supported="no">
 		<!-- SPS (CAPS) release 343 -->
-		<description>Indiana Jones and the Last Crusade (Ger, TGA, v1.4 19891020)</description>
+		<description>Indiana Jones and the Last Crusade: The Graphic Adventure (Ger, v1.4 19891020)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -25334,7 +25469,7 @@ ATK test: OK
 
 	<software name="indycradi" cloneof="indycrad" supported="no">
 		<!-- SPS (CAPS) release 2323 -->
-		<description>Indiana Jones and the Last Crusade (Ita, TGA, Version Amiga Italian v1.5 19891229)</description>
+		<description>Indiana Jones and the Last Crusade: The Graphic Adventure (Ita, Version Amiga Italian v1.5 19891229)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1989</year>
@@ -25413,7 +25548,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="infidel" supported="no">
+	<software name="infidel" supported="yes">
 		<!-- SPS (CAPS) release 1490 -->
 		<description>Infidel (USA, r22)</description>
 		<!-- retail, standalone -->
@@ -25421,8 +25556,11 @@ ATK test: failed
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Infidel from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1490)infidel.ipf" size="1049612" crc="6fe0a105" sha1="c7d78d9433a69017d30ef831d42dec114101d2cc"/>
@@ -25751,6 +25889,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Ubi Soft</publisher>
 		<notes><![CDATA[
+Random Guru Meditations, [FDC] with adkon=1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -26378,7 +26517,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="shogun" supported="no">
+	<software name="shogun" supported="yes">
 		<!-- SPS (CAPS) release 1257 -->
 		<description>James Clavell's Shōgun (Euro)</description>
 		<!-- retail, standalone -->
@@ -26386,8 +26525,11 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Shogun from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1257)jamesclavellsshogun.ipf" size="1049612" crc="da2fbee6" sha1="ee2238d01f0dbaa7caa0d3f9e213d3229eaab388"/>
@@ -26951,7 +27093,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="journey" supported="no">
+	<software name="journey" supported="yes">
 		<!-- SPS (CAPS) release 499 -->
 		<description>Journey (Euro)</description>
 		<!-- retail, standalone -->
@@ -26959,8 +27101,11 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Journey from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps499)journey.ipf" size="1049612" crc="46a771da" sha1="b3c3bd083cfa6176652898722ecd517ae37ff22f"/>
@@ -27062,6 +27207,8 @@ ATK test: C:1 Bad
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<!-- TODO: untested after copy protection -->
+		<info name="usage" value="Sports color code copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps516)junglebook,the.ipf" size="1049612" crc="f9381a95" sha1="4d980550ed24b4c361aabadbeff83a942a6c40f1"/>
@@ -28204,7 +28351,7 @@ ATK test: C:0 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="kingqst4" supported="no">
+	<software name="kingqst4" supported="yes">
 		<!-- SPS (CAPS) release 822 -->
 		<description>King's Quest IV - The Perils of Rosella (Euro, v1.023 19900530)</description>
 		<!-- retail, standalone -->
@@ -28212,8 +28359,10 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1990</year>
 		<publisher>Sierra</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -28844,6 +28993,7 @@ ATK test: C:79 H:U 1 Sector Bad
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports colorsheet copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps2582)labyrinthederrare,le.ipf" size="1049180" crc="cb3054a6" sha1="1ed06f5db5a11e9106955ebfc8c9b48ba353a1b8"/>
@@ -29557,7 +29707,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="legvalor" supported="no">
+	<software name="legvalor" supported="yes">
 		<!-- SPS (CAPS) release 837 -->
 		<description>Legends of Valour (Euro)</description>
 		<!-- retail, standalone -->
@@ -29565,9 +29715,11 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<info name="alt_title" value="Legends of Valour - Volume 1 ~ The Dawning (Box)" />
+		<info name="usage" value="Type AMIGA2 on CLI prompt to start from disk, or install from HDD by following the OSD help at first boot"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -30094,7 +30246,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="lxcess">
 		<!-- SPS (CAPS) release 3058 -->
 		<description>Lethal Xcess (Euro)</description>
@@ -30102,6 +30253,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, NTSC) -->
 		<year>1991</year>
 		<publisher>Eclipse</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1004597">
@@ -30359,8 +30513,9 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Thalion</publisher>
 		<notes><![CDATA[
-boot OK in a1200 and a500. a500 doesn't draw any sprite
-has major raster/alignment issues (stage intro text, in-game), first boss background layer has wrong colors.
+Has DIW alignment issues (stage intro text, in-game), first boss background layer has wrong colors.
+a500/a500p: doesn't draw any sprite
+a1200: major GFX pitch corruption on bitplanes (regressed after adding extended [Denise] delays)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -31277,7 +31432,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="lurkinh" supported="no">
+	<software name="lurkinh" supported="yes">
 		<!-- SPS (CAPS) release 1404 -->
 		<description>The Lurking Horror (USA, r221)</description>
 		<!-- retail, standalone -->
@@ -31285,8 +31440,11 @@ ATK test: failed
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:The Lurking Horror from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1404)lurkinghorror,the.ipf" size="1049612" crc="86f4e3d0" sha1="31ae074d7266543dffe34322a3dca6dba7675436"/>
@@ -31294,16 +31452,19 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="muds" supported="no">
+	<software name="muds" supported="yes">
 		<!-- SPS (CAPS) release 703 -->
 		<description>M.U.D.S. - Mean Ugly Dirty Sport (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
+		<!-- Developer: Rainbow Arts -->
 		<publisher>Golden Goblins</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports icon sheet copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -31625,7 +31786,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="manager" supported="no">
+	<software name="manager" supported="partial">
 		<!-- SPS (CAPS) release 1310 -->
 		<description>The Manager (Euro, v2.0)</description>
 		<!-- retail, standalone -->
@@ -31633,24 +31794,26 @@ ATK test: C:0 H:U Bad
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<notes><![CDATA[
+boot OK
+Requires optional Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Animation Disk" />
-			<dataarea name="flop" size="1049180">
-				<rom name="(sps1310)manager,the_animationdisk.ipf" size="1049180" crc="8babc9a3" sha1="f50aff7e530b04e44c6b94e6024e838234d4a741"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1310)manager,the_disk1.ipf" size="1049180" crc="474f25d5" sha1="a12fb7f7568847cb97e30776aa828303c6490f1e"/>
 			</dataarea>
 		</part>
-		<part name="flop3" interface="floppy_3_5">
+		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1049180">
 				<rom name="(sps1310)manager,the_disk2.ipf" size="1049180" crc="dde62e21" sha1="c7162f65f250f0b9911445bc6e98653fdd32a578"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Animation Disk" />
+			<dataarea name="flop" size="1049180">
+				<rom name="(sps1310)manager,the_animationdisk.ipf" size="1049180" crc="8babc9a3" sha1="f50aff7e530b04e44c6b94e6024e838234d4a741"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33162,7 +33325,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="millen" supported="no">
+	<software name="millen" supported="yes">
 		<!-- SPS (CAPS) release 2027 -->
 		<description>Millenium - Return to Earth (USA)</description>
 		<!-- retail, standalone -->
@@ -33170,6 +33333,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Paragon</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -33230,7 +33394,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="mindfrvr" supported="no">
+	<software name="mindfrvr" supported="yes">
 		<!-- SPS (CAPS) release 1400 -->
 		<description>A Mind Forever Voyaging (USA, r79)</description>
 		<!-- retail, standalone -->
@@ -33238,8 +33402,11 @@ ATK test: C:0 H:U Bad
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:AMFV from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1400)mindforevervoyaging,a.ipf" size="1049612" crc="2ccef174" sha1="b0de873725285b4e4d9d958c91554a7583f66c79"/>
@@ -33627,7 +33794,6 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="monstbus">
 		<!-- SPS (CAPS) release 3032 -->
 		<description>Monster Business (Euro)</description>
@@ -33635,6 +33801,9 @@ ATK test: C:0 H:U Bad
 		<!-- (Amiga, OCS, PAL / Atari ST, PAL) -->
 		<year>1991</year>
 		<publisher>Eclipse</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1009109">
 				<rom name="monster business (europe) (amiga + st).ipf" size="1009109" crc="be6095a0" sha1="c6d0706c363f3fd7f5e40864b49568ac9e157c8b" />
@@ -33725,8 +33894,11 @@ ATK test: C:79 H:U 1 Sector Bad
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Moonmist from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1405)moonmist.ipf" size="1049612" crc="c9897433" sha1="a646fa0ac067dcccbe8b59cdbdeff2b2ffee5ece"/>
@@ -34050,7 +34222,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="munsters" supported="no">
+	<software name="munsters" supported="yes">
 		<!-- SPS (CAPS) release 1265 -->
 		<description>The Munsters (Euro, Kids Pack)</description>
 		<!-- retail, standalone -->
@@ -34058,6 +34230,7 @@ ATK test: C:0 H:U Bad
 		<year>1989</year>
 		<publisher>Again Again</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -34133,6 +34306,7 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Turtle Byte</publisher>
 		<notes><![CDATA[
+Resets machine on initial please wait, [FDC] dsksync bootblock
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -34371,6 +34545,7 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Interactivision</publisher>
 		<notes><![CDATA[
+Doesn't accept input at copy protection screen, expects PORTS irq
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -35236,7 +35411,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="nordbert" supported="no">
+	<software name="nordbert" supported="yes">
 		<!-- SPS (CAPS) release 1406 -->
 		<description>Nord and Bert Couldn't Make Head or Tail of It (USA, r19)</description>
 		<!-- retail, standalone -->
@@ -35244,8 +35419,11 @@ ATK test: OK
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Nord and Bert ... from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1406)nordandbertcouldntmakeheadortailofit.ipf" size="1049612" crc="c8261a3c" sha1="87e7a9f8b8e6fbf9777ca666ed063d47e698becb"/>
@@ -35985,6 +36163,8 @@ ATK test: failed
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<!-- TODO: untested afterwards -->
+		<info name="usage" value="Sports code wheel copy-protection"/> 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1051)operationharrier.ipf" size="1049612" crc="c1b27e88" sha1="e6a7a0ca4fbf3f4a041262009da77cdaba9c331f"/>
@@ -36009,7 +36189,7 @@ ATK test: C:1 Bad
 		</part>
 	</software>
 
-	<software name="opneptun" supported="no">
+	<software name="opneptun" supported="yes">
 		<!-- SPS (CAPS) release 546 -->
 		<description>Operation Neptune (Euro)</description>
 		<!-- retail, standalone -->
@@ -36017,6 +36197,7 @@ ATK test: C:1 Bad
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -36607,7 +36788,7 @@ ATK test: failed
 		<notes><![CDATA[
 Hangs at now loading logo, [FDC] dsksync
 Has scrolling glitches during gameplay, [Copper]
-Sprite is cutoff when using the pneumatic drill
+Sprite is cutoff when player uses the pneumatic drill
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37697,7 +37878,7 @@ ATK test: C:0 H:U 1 Sector Bad
 		</part>
 	</software>
 
-	<software name="piracyhs" supported="no">
+	<software name="piracyhs" supported="partial">
 		<!-- SPS (CAPS) release 1999 -->
 		<description>Piracy on the High Seas (Euro)</description>
 		<!-- retail, standalone -->
@@ -37705,6 +37886,8 @@ ATK test: C:0 H:U 1 Sector Bad
 		<year>1992</year>
 		<publisher>I.C.E.</publisher>
 		<notes><![CDATA[
+boot OK
+Has Format Save Disk option, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -37852,7 +38035,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="planetfa" supported="no">
+	<software name="planetfa" supported="yes">
 		<!-- SPS (CAPS) release 2540 -->
 		<description>Planetfall (Euro, r37)</description>
 		<!-- retail, standalone -->
@@ -37860,8 +38043,11 @@ ATK test: OK
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Planetfall from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2540)planetfall.ipf" size="1049612" crc="ee862cd0" sha1="f5f033c13a805310ff9c5b0719d274789105d4bb"/>
@@ -38479,7 +38665,7 @@ ATK test: C:0 H:U Bad
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-Doesn't accept keyboard input when prompted to insert name
+Doesn't accept [keyboard] input when prompted to insert name
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -38655,6 +38841,8 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Hangs on title screen, Guru Meditation on soft reset
+Requires optional Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -38679,6 +38867,8 @@ ATK test: OK
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Mouse cursor is uncontrollable, [joytest] reset counters
+Requires optional Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -38709,6 +38899,8 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Mouse cursor is uncontrollable, [joytest] reset counters
+Requires optional Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -38750,6 +38942,8 @@ ATK test: OK
 		<year>1996</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Mouse cursor is uncontrollable, [joytest] reset counters
+Requires optional Save Disk, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -39042,6 +39236,7 @@ ATK test: OK
 		<notes><![CDATA[
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -40187,6 +40382,8 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
 		<notes><![CDATA[
+Hangs after initial Rambo III credits screen, [CIAB] fails on comparing a TOD 0xd9 > 0x115 at PC=5856
+TODO: shooting enemies may give repeated [Paula] samples, reverify
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -40505,6 +40702,8 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Dynamix</publisher>
 		<notes><![CDATA[
+Hangs after disk swap when begin mission or watch demo is selected, [FDC] write
+Soft reset machine throws a read/write error in Workbench
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -40589,8 +40788,9 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Guru Meditation, [Blitter] transfer at PC=00DBD6 that pitfalls existing code
-[FDC] dsksync afterward
+Black screen, [FDC] dsksync
+Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically)
+Guru Meditation on loading, [Blitter] transfer at PC=00DBD6 that pitfalls existing code (reverify, a500p only?)
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -40608,6 +40808,8 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>The Hit Squad</publisher>
 		<notes><![CDATA[
+Black screen, [FDC] dsksync
+Stuck Joystick inputs on transitions (noticeable when game restarts a new game after game over automatically)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -41272,8 +41474,10 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
+Hangs with color cycle genlock at boot, [FDC] dsksync
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (bike stats)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049180">
@@ -41964,7 +42168,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="romantic" supported="no">
+	<software name="romantic" supported="partial">
 		<!-- SPS (CAPS) release 719 -->
 		<description>Romantic Encounters at the Dome (Euro)</description>
 		<!-- retail, standalone -->
@@ -41972,8 +42176,12 @@ ATK test: OK
 		<year>1988</year>
 		<publisher>MicroIllusions</publisher>
 		<notes><![CDATA[
+boot OK
+Slight garbage GFXs at bottom of title screen
+Completing Other menu quiz doesn't give any result about the user answers (btanb?)
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="At passcode screen insert Tanya when playing as Man, Larry when playing as Woman"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1049612">
@@ -42162,6 +42370,7 @@ ATK test: C:0 H:U Bad
 		<year>1992</year>
 		<publisher>CDS</publisher>
 		<notes><![CDATA[
+black screen, tight loops on compiled code, prompts user to select PAL/NTSC afterwards with BEAMCON0 access
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -42196,6 +42405,7 @@ ATK test: OK
 		<year>1991</year>
 		<publisher>Mindcraft</publisher>
 		<notes><![CDATA[
+Fails with a floppy read/write error when creating game, [FDC]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -42625,7 +42835,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="seastalk" supported="no">
+	<software name="seastalk" supported="yes">
 		<!-- SPS (CAPS) release 2684 -->
 		<description>Seastalker (Euro, r16)</description>
 		<!-- retail, standalone -->
@@ -42633,8 +42843,11 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Seastalker from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2684)seastalker.ipf" size="1049612" crc="e00579de" sha1="c0386c9ce24fc41753afae98ecfe6238b60340b9"/>
@@ -45538,6 +45751,7 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Kaiko</publisher>
 		<notes><![CDATA[
+Hangs on Lade Spiel (Game loading) after disk swap, [FDC]
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -45585,8 +45799,11 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>QQP</publisher>
 		<notes><![CDATA[
+On anything except a500p throws Out of Memory on boot
 ATK test: OK
 ]]></notes>
+		<!-- TODO: untested after copy-protection -->
+		<info name="usage" value="Sports manual copy-protection"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -46341,7 +46558,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="spcstatn" supported="no">
+	<software name="spcstatn" supported="yes">
 		<!-- SPS (CAPS) release 1615 -->
 		<description>Space Station - Part I (Euro)</description>
 		<!-- retail, standalone -->
@@ -46349,6 +46566,7 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Prism Leisure</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -47188,7 +47406,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="starx" supported="no">
+	<software name="starx" supported="yes">
 		<!-- SPS (CAPS) release 1409 -->
 		<description>Starcross (USA, r17)</description>
 		<!-- retail, standalone -->
@@ -47196,8 +47414,11 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Starcross from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1409)starcross.ipf" size="1049612" crc="15f2e1e8" sha1="eb19f65f52dbb4b8f5b05eddaf782213afe31e1e"/>
@@ -47504,7 +47725,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="stationf" supported="no">
+	<software name="stationf" supported="yes">
 		<!-- SPS (CAPS) release 1491 -->
 		<description>Stationfall (USA, r107)</description>
 		<!-- retail, standalone -->
@@ -47512,8 +47733,11 @@ ATK test: OK
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Stationfall from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1491)stationfall.ipf" size="1049612" crc="5aa9096e" sha1="2d5dce15f182478d1076737b009f762a766fdac0"/>
@@ -48052,6 +48276,7 @@ ATK test: C:0 H:U Bad
 		<year>1991</year>
 		<publisher>D &amp; H Games</publisher>
 		<notes><![CDATA[
+Hangs on title screen loading
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -48594,7 +48819,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="suprski2" supported="no">
+	<software name="suprski2" supported="yes">
 		<!-- SPS (CAPS) release 734 -->
 		<description>Super Ski II (Euro)</description>
 		<!-- retail, standalone -->
@@ -48602,8 +48827,10 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Microids</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Sports manual copy-protection (country flags)"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1049612">
@@ -48900,14 +49127,17 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="superzoc" supported="no">
+	<software name="superzoc" supported="yes">
 		<!-- SPS (CAPS) release 1537 -->
 		<description>Super Zocker + Blackjack II (Ger)</description>
 		<!-- coverdisk, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
+		<!-- Super Zocker: Harald Mueller -->
+		<!-- Blackjack II: aroch software -->
 		<publisher>&lt;coverdisk&gt;</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -49042,7 +49272,8 @@ ATK test: failed
 boot OK
 ATK test: OK
 ]]></notes>
-		<info name="usage" value="Launch Suspect from Workbench"/>
+		<info name="usage" value="Launch DF0:Suspect from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2868)suspect.ipf" size="1049612" crc="6b7cdae5" sha1="ce8e0e8b0e62943e2069a7da96eba494a98b340b"/>
@@ -49050,7 +49281,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="suspend" supported="no">
+	<software name="suspend" supported="yes">
 		<!-- SPS (CAPS) release 1410 -->
 		<description>Suspended (USA, r8)</description>
 		<!-- retail, standalone -->
@@ -49058,8 +49289,11 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Suspended from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1410)suspended.ipf" size="1049612" crc="dee8d85e" sha1="ecaf2fa92f04559a8c455c3146068d8813b256b4"/>
@@ -49231,7 +49465,7 @@ ATK test: OK
 		<publisher>Discovery</publisher>
 		<notes><![CDATA[
 black screen [FDC] dsksync
-Has sprite GFX vertical strip on map screen
+Has sprite GFX vertical strip on first loaded map screen
 Has incorrect transparent pixels across gameplay (cfr. player sprite left boot, spears in stage 2, barrels in stage 3)
 Game Over screen has [Denise] GFX glitch
 TODO: verify collision detection (cfr. attack doesn't trigger when extremely near enemies, pickups)
@@ -49793,13 +50027,17 @@ ATK test: C:1 Bad
 		</part>
 	</software>
 
-	<software name="tengenah" supported="no">
+	<software name="tengenah" supported="partial">
 		<description>Tengen Arcade Hits (Euro)</description>
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>199?</year>
 		<publisher>Domark</publisher>
 		<notes><![CDATA[
+APB: boot OK, gradient is pretty dim (btanb)
+EPROM: boot OK
+Hard Drivin II: randomly throws Guru Meditation during loading with open bus accessed
+Klax: boot OK
 ATK test: OK
 ]]></notes>
 		<!-- SPS (CAPS) release 2870 -->
@@ -50196,7 +50434,7 @@ ATK test: C:0 H:U Bad
 		</part>
 	</software>
 
-	<software name="thaiboxn" supported="no">
+	<software name="thaiboxn" supported="partial">
 		<!-- SPS (CAPS) release 2851 -->
 		<description>Thai Boxing (Euro)</description>
 		<!-- retail, standalone -->
@@ -50204,6 +50442,8 @@ ATK test: C:0 H:U Bad
 		<year>1987</year>
 		<publisher>Anco</publisher>
 		<notes><![CDATA[
+boot OK
+Pressing 'P' doesn't pause the game, but instead narrows gameplay bitplanes (btanb?)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -51321,7 +51561,8 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Simulmondo</publisher>
 		<notes><![CDATA[
-Locks up at language select screen
+Locks up at language select screen (btanb, uses joystick selection)
+Locks up on new game loading, with background blue color rasters
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -51784,6 +52025,7 @@ ATK test: OK
 		<year>1994</year>
 		<publisher>Digital Integration</publisher>
 		<notes><![CDATA[
+Black screen after title screen display, [FDC] with adkcon=1100
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -52189,6 +52431,8 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>SSI</publisher>
 		<notes><![CDATA[
+"Please replace volume <gibberish chars> in unit 0" during intro, [FDC]
+Needs optional Save Disk to save, [FDC] format
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -52256,7 +52500,7 @@ ATK test: OK
 boot OK
 ATK test: OK
 ]]></notes>
-		<info name="usage" value="Launch Trinity file from Workbench"/>
+		<info name="usage" value="Launch DF0:Trinity from Workbench"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
@@ -54244,6 +54488,7 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>MPH</publisher>
 		<notes><![CDATA[
+Guru Meditation at first [FDC] block loading with adkcon=1100, jumps to lalaland at PC=5ca0
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -55349,7 +55594,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="wishbrin" supported="no">
+	<software name="wishbrin" supported="yes">
 		<!-- SPS (CAPS) release 2543 -->
 		<description>Wishbringer (Euro, r69)</description>
 		<!-- retail, standalone -->
@@ -55357,8 +55602,11 @@ ATK test: failed
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Wishbringer from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2543)wishbringer.ipf" size="1049612" crc="06f62a2a" sha1="4789b2cd50ca8e1f9a5c25b4b592687165916e66"/>
@@ -55366,7 +55614,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="witness" supported="no">
+	<software name="witness" supported="yes">
 		<!-- SPS (CAPS) release 2041 -->
 		<description>The Witness (USA, r22)</description>
 		<!-- retail, standalone -->
@@ -55374,8 +55622,11 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Witness from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2041)witness.ipf" size="1049612" crc="6815c0e4" sha1="67a26d28d6445e07ddcf50f792cf88e8fba5442d"/>
@@ -55591,7 +55842,7 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Core Design</publisher>
 		<notes><![CDATA[
-Shows Core Design logo then hangs with red backdrop [FDC] dsksync
+Shows Core Design logo then hangs with red genlock [FDC] dsksync
 Has GFX stripe glitch when player dies
 ATK test: OK
 ]]></notes>
@@ -56384,7 +56635,6 @@ ATK test: OK
 		</part>
 	</software>
 
-	<!-- fatalerrors when trying to mount "Incompatible image format or corrupted data" -->
 	<software name="xr35b" cloneof="xr35" supported="no">
 		<!-- invalid - this was marked as SPS but these checksums don't appear in the list -->
 		<!-- SPS (CAPS) release 34 -->
@@ -56393,6 +56643,9 @@ ATK test: OK
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1988</year>
 		<publisher>Anco</publisher>
+		<notes><![CDATA[
+fatalerrors when trying to mount "Incompatible image format or corrupted data"
+]]></notes>
 		<part name="flop7" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 7" />
 			<dataarea name="flop" size="1049768">
@@ -56628,7 +56881,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="zargon" supported="no">
+	<software name="zargon" supported="partial">
 		<!-- SPS (CAPS) release 1684 -->
 		<description>Zargon (Ger)</description>
 		<!-- retail, standalone -->
@@ -56636,6 +56889,8 @@ ATK test: failed
 		<year>1989</year>
 		<publisher>Markt &amp; Technik</publisher>
 		<notes><![CDATA[
+boot OK
+Has minor sprite glitches (flickering, some stuck trails, wrong color set from time to time)
 ATK test: OK
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -56744,9 +56999,13 @@ ATK test: OK
 		<year>1992</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Code wheel copy-protection main seed is always the same
+Enables AGA bitplanes == 7 even on OCS and ECS machines
 ATK test: failed
 ]]></notes>
 		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
+		<info name="usage" value="Sports code wheel copy-protection"/> 
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1003013">
@@ -56769,9 +57028,12 @@ ATK test: failed
 		<year>1992</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+Top-most score display is garbled, [Copper]
+Has severe [Copper] bitplane color glitches on gameplay
 ATK test: failed
 ]]></notes>
 		<info name="alt_title" value="Zool - Ninja of the &quot;Nth&quot; Dimension (Box)"/>
+		<!-- Has no code wheel -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1003013">
@@ -56786,7 +57048,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="zool2" supported="no">
+	<software name="zool2" supported="partial">
 		<!-- SPS (CAPS) release 1111 -->
 		<description>Zool 2 (Euro)</description>
 		<!-- retail, standalone -->
@@ -56794,8 +57056,13 @@ ATK test: failed
 		<year>1993</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes><![CDATA[
+boot OK
+[Denise] GFX bitplanes have wrong colors when vertical scrolling occurs in gameplay
+Top-most score display is garbled, [Copper]
+[Paula] gives white noise on BGM loop
 ATK test: failed
 ]]></notes>
+		<info name="usage" value="Sports code wheel copy-protection"/> 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1009206">
@@ -56818,6 +57085,7 @@ ATK test: failed
 		<year>1988</year>
 		<publisher>Discovery</publisher>
 		<notes><![CDATA[
+Black screen, jumps to lalaland, [FDC]?
 ATK test: failed
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
@@ -56827,7 +57095,7 @@ ATK test: failed
 		</part>
 	</software>
 
-	<software name="zork" supported="no">
+	<software name="zork" supported="yes">
 		<!-- SPS (CAPS) release 2681 -->
 		<description>Zork I - The Great Underground Empire (Euro, r88)</description>
 		<!-- retail, standalone -->
@@ -56835,8 +57103,11 @@ ATK test: failed
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Zork1 from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2681)zorki.ipf" size="1049612" crc="dbb0ce09" sha1="8c20ff9564d93648757c005963bf35d6b2204cd9"/>
@@ -56844,7 +57115,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="zork2" supported="no">
+	<software name="zork2" supported="yes">
 		<!-- SPS (CAPS) release 2542 -->
 		<description>Zork II - The Wizard Of Frobozz (Euro, v48)</description>
 		<!-- retail, standalone -->
@@ -56852,8 +57123,11 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Zork II from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2542)zorkii.ipf" size="1049612" crc="f65ac57e" sha1="c0ce57e6b4ef25ee180ce58f199661f642f1c968"/>
@@ -56861,7 +57135,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="zorktril" supported="no">
+	<software name="zorktril" supported="yes">
 		<!-- SPS (CAPS) release 2042 -->
 		<description>Zork Trilogy - Zork I (r88) + Zork II (v48) + Zork III (r17) (USA)</description>
 		<!-- retail, standalone -->
@@ -56869,8 +57143,12 @@ ATK test: OK
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:ZorkN from Workbench, where N is the episode you wanna play"/>
+
+		<!-- TODO: has serial numbers, related to game version or it's a disk watermark? -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps2042)zorktrilogy.ipf" size="1049612" crc="c8a7d3ea" sha1="ad0ebccc64990fbcaf15d4afdb1eb3190cf79ccb"/>
@@ -56878,7 +57156,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="zork0" supported="no">
+	<software name="zork0" supported="yes">
 		<!-- SPS (CAPS) release 1411 -->
 		<description>Zork Zero (USA, r366)</description>
 		<!-- retail, standalone -->
@@ -56886,8 +57164,11 @@ ATK test: OK
 		<year>1989</year>
 		<publisher>Infocom</publisher>
 		<notes><![CDATA[
+boot OK
 ATK test: OK
 ]]></notes>
+		<info name="usage" value="Launch DF0:Zork Zero from Workbench"/>
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1049612">
 				<rom name="(sps1411)zorkzero.ipf" size="1049612" crc="66d4370d" sha1="db43ec7573a4d726460fb2f4b9566ac41da64957"/>

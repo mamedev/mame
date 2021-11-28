@@ -1172,7 +1172,7 @@ void amiga_state::ocs_map(address_map &map)
 //	map(0x028, 0x029).w(FUNC(amiga_state::refptr_w));
 	map(0x02a, 0x02b).w(FUNC(amiga_state::vposw_w));
 //	map(0x02c, 0x02d).w(FUNC(amiga_state::vhposw_w));
-//	map(0x02e, 0x02f).w(FUNC(amiga_state::copcon_w));
+	map(0x02e, 0x02f).w(m_copper, FUNC(amiga_copper_device::copcon_w));
 
 	// input strobes
 //	map(0x030, 0x031).w(FUNC(amiga_state::serdat_w));
@@ -1189,7 +1189,9 @@ void amiga_state::ocs_map(address_map &map)
 //	map(0x07c, 0x07d).r <open bus for OCS>
 	map(0x07e, 0x07f).w(m_fdc, FUNC(amiga_fdc_device::dsksync_w));
 
-//	map(0x080, 0x08d).m(m_copper, FUNC(amiga_copper_device::regs_map));
+	// Copper
+	map(0x080, 0x08b).m(m_copper, FUNC(amiga_copper_device::regs_map));
+	map(0x08c, 0x08d).w(m_copper, FUNC(amiga_copper_device::copins_w));
 	// Display window
 //	map(0x08e, 0x08f).w(FUNC(amiga_state::diwstrt_w));
 //	map(0x090, 0x091).w(FUNC(amiga_state::diwstop_w));
@@ -1400,14 +1402,6 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 		case REG_INTREQR:
 			return CUSTOM_REG(REG_INTREQ);
 
-		case REG_COPJMP1:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
-			break;
-
-		case REG_COPJMP2:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
-			break;
-
 		case REG_CLXDAT:
 			temp = CUSTOM_REG(REG_CLXDAT);
 			CUSTOM_REG(REG_CLXDAT) = 0;
@@ -1580,19 +1574,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			sprite_enable_comparitor((offset - REG_SPR0DATA) / 4, true);
 			break;
 
-		case REG_COP1LCH:
-		case REG_COP2LCH:
-			data &= ( m_chip_ram_mask >> 16 );
-			break;
-
-		case REG_COPJMP1:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
-			break;
-
-		case REG_COPJMP2:
-			copper_setpc(CUSTOM_REG_LONG(REG_COP2LCH));
-			break;
-
 		case REG_DDFSTRT:
 			/* impose hardware limits ( HRM, page 75 ) */
 			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
@@ -1619,6 +1600,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
 			m_fdc->dmacon_set(data);
 			m_paula->dmacon_set(data);
+			m_copper->dmacon_set(data);
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )

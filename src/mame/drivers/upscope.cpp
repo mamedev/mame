@@ -274,6 +274,11 @@ void upscope_state::upscope(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&upscope_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, m_chipset).set_map(&upscope_state::ocs_map).set_options(ENDIANNESS_BIG, 16, 9, 0x200);
 
+	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	m_copper->set_host_cpu_tag(m_maincpu);
+	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
+	m_copper->set_ecs_mode(false);
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */

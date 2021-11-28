@@ -45,10 +45,11 @@ DEFINE_DEVICE_TYPE(PAULA_8364, paula_8364_device, "paula_8364", "MOS 8364 \"Paul
 //-------------------------------------------------
 
 paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PAULA_8364, tag, owner, clock),
-	device_sound_interface(mconfig, *this),
-	m_mem_r(*this), m_int_w(*this),
-	m_stream(nullptr)
+	: device_t(mconfig, PAULA_8364, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, m_chipmem_r(*this)
+	, m_int_w(*this)
+	, m_stream(nullptr)
 {
 }
 
@@ -59,7 +60,7 @@ paula_8364_device::paula_8364_device(const machine_config &mconfig, const char *
 void paula_8364_device::device_start()
 {
 	// resolve callbacks
-	m_mem_r.resolve_safe(0);
+	m_chipmem_r.resolve_safe(0);
 	m_int_w.resolve_safe();
 
 	// initialize channels
@@ -126,6 +127,7 @@ template void paula_8364_device::audio_channel_map<3>(address_map &map);
 template <u8 ch> void paula_8364_device::audxlch_w(u16 data)
 {
 	m_stream->update();
+	// TODO: chipmem mask
 	m_channel[ch].loc = (m_channel[ch].loc & 0x0000ffff) | ((data & 0x001f) << 16);
 }
 
@@ -345,7 +347,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 					chan->curlocation++;
 				if (chan->dma_enabled && !(chan->curlocation & 1))
 				{
-					chan->dat = m_mem_r(chan->curlocation);
+					chan->dat = m_chipmem_r(chan->curlocation);
 
 					if (chan->curlength != 0)
 						chan->curlength--;
@@ -360,7 +362,7 @@ void paula_8364_device::sound_stream_update(sound_stream &stream, std::vector<re
 						// For example: Xenon 2 sets up location=0x63298 length=0x20
 						// for silencing channels on-the-fly without relying on irqs.
 						// Without this the location will read at 0x632d8 (data=0x7a7d), causing annoying buzzing.
-						chan->dat = m_mem_r(chan->curlocation);
+						chan->dat = m_chipmem_r(chan->curlocation);
 					}
 				}
 
