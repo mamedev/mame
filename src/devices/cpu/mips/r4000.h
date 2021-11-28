@@ -51,6 +51,19 @@ public:
 	// When the timer interrupt is disabled, interrupt 5 becomes a standard general-purpose interrupt.
 	void set_timintdis(bool enabled) { m_timer_interrupt_enabled = enabled; }
 
+	// Secondary cache configuration
+	void set_scache_size(u32 size)
+	{
+		if(size != 0)
+		{
+			m_cp0[CP0_Config] &= ~CONFIG_SC;
+		}
+
+		m_scache_size = size;
+	}
+
+	void set_secondary_cache_line_size(u8 size) { m_scache_line_size = size; }
+
 protected:
 	enum cache_size
 	{
@@ -348,6 +361,7 @@ protected:
 	void cpu_sdr(u32 const op);
 
 	// cp0 implementation
+	void cp0_cache(u32 const op);
 	void cp0_execute(u32 const op);
 	u64 cp0_get(unsigned const reg);
 	void cp0_set(unsigned const reg, u64 const data);
@@ -463,6 +477,22 @@ protected:
 	unsigned m_icache_shift;
 	std::unique_ptr<u32[]> m_icache_tag;
 	std::unique_ptr<u32[]> m_icache_data;
+
+	// experimental scache state
+	// Size of the secondary cache in bytes
+	u32 m_scache_size = 0;
+
+	// Secondary cache line size
+	u8 m_scache_line_size = 0;
+
+	// Secondary cache line shift
+	u32 m_scache_line_index = 0;
+
+	// Mask for extracting the tag from a physical address
+	u32 m_scache_tag_mask = 0;
+
+	// scache tag memory
+	std::unique_ptr<u32[]> m_scache_tag;
 
 	// statistics
 	u64 m_tlb_scans;

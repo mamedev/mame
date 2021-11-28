@@ -5691,7 +5691,7 @@ void r4400scbe_device::handle_cache(uint32_t op)
 				// Note: A full implementation would also need to load the ECC register here
 				const auto cs = (tag & 0x1c00000) >> 22;
 				const auto stag = (tag & 0x7ffff);
-				const auto pidx = (vaddr & 0x380000) >> 19;
+				const auto pidx = (tag & 0x380000) >> 19;
 				m_core->cpr[0][COP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
 				break;
 			}
