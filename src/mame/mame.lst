@@ -2888,6 +2888,9 @@ via4386vio                      // Via 4386 VIO / Highscreen universal board (48
 zi4dvs                          // Zida 4DVS motherboard (486)
 zito4dps                        // ZIDA Tomato board 4DPS (486)
 
+@source:atari_4x4.cpp
+fourx4                          //
+
 @source:atari_s1.cpp
 aavenger                        //
 atarians                        //
@@ -2897,7 +2900,6 @@ spcrider                        //
 time2000                        //
 
 @source:atari_s2.cpp
-fourx4                          //
 hercules                        //
 roadrunr                        //
 supermap                        //

@@ -14,7 +14,6 @@ Status:
 - Superman, Hercules, Roadrunner are playable.
 
 ToDo:
-- 4x4 not emulated yet, it's totally different hardware.
 - noise generator sounds like a loud barrrr instead of noise, fortunately it isn't used.
 - roadrunr: test button not working, sets off an alarm instead. Slam Tilt?
 
@@ -24,7 +23,6 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 
-#include "cpu/m6502/m6502.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -51,7 +49,6 @@ public:
 
 	void atari_s2(machine_config &config);
 	void atari_s3(machine_config &config);
-	void fourx4(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -70,7 +67,6 @@ private:
 
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
-	void fourx4_map(address_map &map);
 
 	bool m_timer_sb = 0;
 	u8 m_timer_s[5]{};
@@ -125,16 +121,6 @@ void atari_s2_state::atari_s3_map(address_map &map)
 	map(0x2009, 0x2009).mirror(0x07F4).portr("DSW5");
 	map(0x200a, 0x200a).mirror(0x07F4).portr("DSW6");
 	map(0x200b, 0x200b).mirror(0x07F4).portr("DSW7");
-}
-
-void atari_s2_state::fourx4_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram();
-	map(0x2000, 0x27ff).ram();
-	map(0x3000, 0x37ff).ram();
-	map(0x8000, 0xffff).rom().region("maincpu", 0);
 }
 
 static INPUT_PORTS_START( atari_s2 )
@@ -553,26 +539,6 @@ void atari_s2_state::atari_s3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s2_state::atari_s3_map);
 }
 
-void atari_s2_state::fourx4(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 1'000'000);  // guess
-	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s2_state::fourx4_map);
-
-	/* Sound */
-	genpin_audio(config);
-	SPEAKER(config, "speaker").front_center();
-
-	DAC_4BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r23-r26 (68k,33k,18k,8.2k)
-	DAC_3BIT_BINARY_WEIGHTED(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r18-r20 (100k,47k,100k)
-
-	/* Video */
-	config.set_default_layout(layout_atari_s2);
-
-//	TIMER(config, "irq").configure_periodic(FUNC(atari_s2_state::irq), attotime::from_hz(XTAL(4'000'000) / 8192));
-//	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s2_state::timer_s), attotime::from_hz(150000));
-}
-
 
 /*-------------------------------------------------------------------
 / Superman (03/1979)
@@ -613,24 +579,9 @@ ROM_START(roadrunr)
 	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, BAD_DUMP CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // PinMAME note: unknown so far if using the 20967-01 is correct for Road Runner, but sounds good
 ROM_END
 
-/*-------------------------------------------------------------------
-/ 4x4 (10/1982)
-/-------------------------------------------------------------------*/
-ROM_START(fourx4)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("8000ce65.bin", 0x0000, 0x2000, CRC(27341155) SHA1(c0da1fbf64f93ab163b2ea6bfbfc7b778cea819f))
-	ROM_LOAD("a0004c37.bin", 0x2000, 0x2000, CRC(6f93102f) SHA1(d6520987ed5805b0e6b5da5653fc7cb063e86dda))
-	ROM_LOAD("c000a70c.bin", 0x4000, 0x2000, CRC(c31ca8d3) SHA1(53f20eff0084771dc61d19db7ddae52e4423e75e))
-	ROM_RELOAD(0x6000, 0x2000)
-
-	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // labelled as 82s130.bin which is the old name
-ROM_END
-
 } // Anonymous namespace
 
 
 GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, fourx4,   0, fourx4,   atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "4x4",                MACHINE_IS_SKELETON_MECHANICAL )
