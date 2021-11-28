@@ -3363,7 +3363,7 @@ ROM_START( inyourfa )
 	ROM_LOAD( "08.27c1001",  0x020000, 0x020000, CRC(cadd4731) SHA1(1c4e7ea7064b9c6b2dfdf01fd64f37de6d50bdfa) ) // 11xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(1341ba02) SHA1(edff62979d0376ac01b8da0aca46df087d6e4051) ) // wasn't dumped, this one has been handcrafted
+	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(21390e3a) SHA1(e641be8ee6ed2ac62a027bf47ec49acb30d65ced) ) // was missing from PCB, this one has been handcrafted
 ROM_END
 
 /***************************************************************************
