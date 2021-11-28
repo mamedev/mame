@@ -124,7 +124,7 @@ void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address sp
 	map(0x0280, 0x029f).mirror(0x0d00).rw("riot", FUNC(riot6532_device::read), FUNC(riot6532_device::write));
 #endif
 	map(0x0800, 0x0800).rw(FUNC(a2600_pop_state::rom_switch_r), FUNC(a2600_pop_state::rom_switch_w));
-	map(0x1000, 0x1fff).rw(m_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x1000, 0x1fff).bankr(m_bank);
 }
 
 
@@ -144,7 +144,7 @@ uint8_t a2600_pop_state::rom_switch_r(offs_t offset)
 //	Rom switch
 void a2600_pop_state::rom_switch_w(offs_t offset, uint8_t data)
 {
-	m_bankdev->set_bank(data & 0x7f);
+	m_bank->set_entry(data & 0x7f);
 	if (data & 0x80)
 	{
 		// (re)start reset timer?
@@ -507,7 +507,8 @@ void a2600_state::machine_start()
 void a2600_pop_state::machine_start()
 {
 	a2600_base_state::machine_start();
-	m_bankdev->set_bank(0);
+	m_bank->configure_entries(0, 48, memregion("maincpu")->base(), 0x1000);
+	m_bank->set_entry(0);
 	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::reset_timer_callback),this), nullptr);
 	m_game_select_button_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_pop_state::game_select_button_timer_callback),this), nullptr);
 }
@@ -516,7 +517,8 @@ void a2600_pop_state::machine_start()
 void a2600_pop_state::machine_reset()
 {
 	a2600_base_state::machine_reset();
-	m_bankdev->set_bank(0);
+
+	m_bank->set_entry(0);
 	m_reset_timer->adjust(attotime::never);
 	m_game_select_button_timer->adjust(attotime::never);
 }
@@ -706,8 +708,6 @@ void a2600_pop_state::a2600_pop(machine_config &config)
 
 	VCS_CONTROL_PORT(config, CONTROL1_TAG, vcs_control_port_devices, "joy");
 	VCS_CONTROL_PORT(config, CONTROL2_TAG, vcs_control_port_devices, "joy");
-
-	ADDRESS_MAP_BANK(config, "bank").set_map(&a2600_pop_state::banked_map).set_options(ENDIANNESS_LITTLE, 8, 22, 0x1000);
 }
 
 

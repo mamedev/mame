@@ -21,7 +21,6 @@
 #include "bus/vcs/vcs_slot.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6507.h"
-#include "machine/bankdev.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
 
@@ -116,7 +115,7 @@ class a2600_pop_state : public a2600_base_state
 public:
 	a2600_pop_state(const machine_config &mconfig, device_type type, const char *tag)
 		: a2600_base_state(mconfig, type, tag)
-		, m_bankdev(*this, "bank")
+		, m_bank(*this, "bank")
 		, m_a8(*this, "A8")
 		, m_swb(*this, "SWB")
 	{ }
@@ -136,7 +135,7 @@ private:
 	TIMER_CALLBACK_MEMBER(reset_timer_callback);
 	TIMER_CALLBACK_MEMBER(game_select_button_timer_callback);
 
-	required_device<address_map_bank_device> m_bankdev;
+	required_memory_bank m_bank;
 	required_ioport m_a8;
 	required_ioport m_swb;
 	emu_timer *m_reset_timer;
