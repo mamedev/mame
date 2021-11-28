@@ -18,6 +18,7 @@ TODO:
 - emulate K1809BB1
 - inputs, 7segs, sound
 - cpu frequency, irq frequency
+- dump/add im01 (rom serial 106/107)
 
 ******************************************************************************/
 
@@ -131,7 +132,7 @@ void im01_state::im01(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( im01 )
+ROM_START( im01t )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("0000148", 0x2000, 0x2000, CRC(327c6055) SHA1(b90b3b1261d677eb93014ea9e809e45b3b25152a) )
 	ROM_LOAD("0000149", 0x4000, 0x2000, CRC(43b14589) SHA1(b083b631f38a26a335226bc474669ef7f332f541) )
@@ -145,5 +146,5 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-//    YEAR  NAME  PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, im01, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
+CONS( 1986, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
