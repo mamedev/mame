@@ -101,7 +101,7 @@
 // The default one has DRC and is faster, but the other one has some different features
 // Uncomment the following line and rebuild to switch implementations. This driver supports
 // both, as long as the #define is used to select which implementation to use.
-// #define NO_MIPS3
+#define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
 #else
