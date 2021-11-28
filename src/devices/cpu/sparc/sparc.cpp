@@ -2570,7 +2570,7 @@ void sparc_base_device::execute_store(uint32_t op)
 		m_icount = 0;
 		return;
 	}
-	else if (USEIMM && (STDA || STA || STHA || STBA))
+	else if ((USEIMM && (STDA || STA || STHA || STBA)) || ((STD || STDA) && (RD & 1)))
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
@@ -2888,6 +2888,15 @@ if (((trap = 0) and (LDD or LDDA or LDDF or LDDC)) then (
 
 inline void sparc_base_device::execute_ldd(uint32_t op)
 {
+	if (RD & 1)
+	{
+		m_trap = 1;
+		m_illegal_instruction = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
 	if (address & 7)
@@ -3403,7 +3412,7 @@ inline void sparc_base_device::execute_ldda(uint32_t op)
 		m_icount = 0;
 		return;
 	}
-	else if (USEIMM)
+	else if (USEIMM || (RD & 1))
 	{
 		m_trap = 1;
 		m_illegal_instruction = 1;
