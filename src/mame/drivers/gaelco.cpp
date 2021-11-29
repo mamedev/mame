@@ -138,7 +138,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0x700008, 0x700009).portr("SERVICE");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000f, 0x70000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));               // Triggers a FIRQ on the sound CPU
-	map(0xff8000, 0xffffff).ram();                                                              // Work RAM
+	map(0xff8000, 0xffffff).ram().share("mainram");                                             // Work RAM
 }
 
 void gaelco_state::bigkarnk_snd_map(address_map &map)
@@ -166,7 +166,7 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0x700006, 0x700007).portr("P2");
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status register
-	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
+	map(0xff0000, 0xffffff).ram().share("mainram");                                               // Work RAM
 }
 
 void gaelco_state::squash_map(address_map &map)
@@ -185,14 +185,14 @@ void gaelco_state::squash_map(address_map &map)
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status register
-	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
+	map(0xff0000, 0xffffff).ram().share("mainram");                                               // Work RAM
 }
 
 void gaelco_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
+	map(0x102000, 0x102fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
 	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -204,7 +204,7 @@ void gaelco_state::thoop_map(address_map &map)
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI6295 status register
-	map(0xff0000, 0xffffff).ram();                                                                 // Work RAM
+	map(0xff8000, 0xffffff).ram().share("mainram");                                                // Work RAM
 }
 
 
@@ -1136,9 +1136,9 @@ ROM_END
 
 
 ROM_START( thoop ) // PCB - REF.922804/1
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )    // 68000 code
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
-	ROM_LOAD16_BYTE( "th161eb4.020", 0x000001, 0x40000, CRC(6add61ed) SHA1(0e789d9a0ac19b6143044fbc04ab2227735b2a8f) )
+	ROM_LOAD16_BYTE( "th161eb4.020", 0x000001, 0x40000, CRC(6add61ed) SHA1(0e789d9a0ac19b6143044fbc04ab2227735b2a8f) ) // 2nd ROM in pair is intentionally smaller, data in 2nd half is 8-bit
 
 	ROM_REGION( 0x400000, "gfx1", 0 )
 	ROM_LOAD( "c09", 0x300000, 0x040000, CRC(06f0edbf) SHA1(3cf2e5c29cd00b43d49a106084076f2ac0dbad98) ) // Encrypted video RAM
@@ -1169,7 +1169,34 @@ ROM_START( thoop ) // PCB - REF.922804/1
 	ROM_LOAD ( "thunderhoop_gal20v8.h11", 0x385, 0x157, BAD_DUMP CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Bruteforced but verified
 ROM_END
 
+void gaelco_state::thoop_ramhack_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	logerror("%s: thoop_ramhack_w %04x (%04x)\n", machine().describe_context(), data, mem_mask);
 
+	/* During the animation after defeating the 3rd stage boss the code at
+	   0xc368 sets 0xffe08e to 0x27 after checking several other RAM locations.
+
+	   This address is checked during player respawn at 0x16d00, with an
+	   explicit compare against 0x27, which if true eventually sends the
+	   code off the rails.
+
+	   What is this? Is it some culimnation of other protection check fails
+	   that sets a flag to intentionally crash the game? what are the other
+	   checks? incorrect behavior with the 'screen ram' portion of encrypted
+	   VRAM?
+	*/
+
+	int pc = m_maincpu->pc();
+	if ((pc == 0xc36c) && ((data & mem_mask) == 0x2700) && (mem_mask == 0xff00))
+		data = 0x0000;
+
+	COMBINE_DATA(&m_mainram[0x608e / 2]);
+}
+
+void gaelco_state::init_thoop()
+{
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffe08e, 0xffe08f, write16s_delegate(*this, FUNC(gaelco_state::thoop_ramhack_w)));
+}
 
 /*************************************
  *
@@ -1178,12 +1205,17 @@ ROM_END
  *************************************/
 
 GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, empty_init, ROT0, "Gaelco", "Big Karnak",                                  MACHINE_SUPPORTS_SAVE )
+
 GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1870)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
+
 GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)",                   MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
+
 GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)",                      MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
+
 GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco", "Squash (Ver. 1.0)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // could be other versions, still Ver. 1 but different checksum listed on boot
+
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, init_thoop, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

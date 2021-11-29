@@ -26,6 +26,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_vregs(*this, "vregs"),
 		m_spriteram(*this, "spriteram"),
+		m_mainram(*this, "mainram"),
 		m_screenram(*this, "screenram"),
 		m_sprite_palette_force_high(0x38)
 	{ }
@@ -34,6 +35,8 @@ public:
 	void thoop(machine_config &config);
 	void maniacsq(machine_config &config);
 	void squash(machine_config &config);
+
+	void init_thoop();
 
 private:
 	/* devices */
@@ -49,6 +52,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_mainram;
 	optional_shared_ptr<uint16_t> m_screenram;
 
 	/* video-related */
@@ -65,6 +69,7 @@ private:
 	void thoop_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void irqack_w(uint16_t data);
+	void thoop_ramhack_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
