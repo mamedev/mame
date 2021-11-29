@@ -52468,6 +52468,36 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_125jy">
+		<description>125 in 1 (JY-125)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="2097152">
+				<rom name="125-in-1 (jy-125).prg" size="2097152" crc="736cf414" sha1="b66db219935bc341e251a810060c93de5bf9f33c" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="2097152">
+				<rom name="125-in-1 (jy-125).chr" size="2097152" crc="8a08e887" sha1="49281aa889ff1d7d68460e480d52c32d9927d4e2" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_130jy">
+		<description>130 in 1 (JY-130)</description>
+		<year>19??</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="2097152">
+				<rom name="130-in-1 (jy-130).prg" size="2097152" crc="94a92bbc" sha1="b848cac4d7511da03691d24fe1c822d8955c4a2d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="2097152">
+				<rom name="130-in-1 (jy-130).chr" size="2097152" crc="c65724c7" sha1="0be083de5aaf1351d70b9ded6a3acd11508a4d5d" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_7j201">
 		<description>1997 Super 7 in 1 (JY-201)</description>
 		<year>1997</year>
@@ -79029,8 +79059,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- Most games seem to work fine. Several have totally garbled graphics. -->
-	<software name="mc_101" supported="partial">
+	<software name="mc_101">
 		<description>101 in 1 Games</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -79040,8 +79069,8 @@ be better to redump them properly. -->
 			<dataarea name="prg" size="4194304">
 				<rom name="101-in-1 games [p1].prg" size="4194304" crc="63ac35dc" sha1="225fd85cd45f2dd597fdd060902282dcae2065af" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
+			<!-- 32k VRAM on cartridge -->
+			<dataarea name="vram" size="32768">
 			</dataarea>
 		</part>
 	</software>
@@ -83053,6 +83082,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_mf7">
+		<description>Mario Family 7 in 1</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="mario family 7-in-1.prg" size="1048576" crc="c87dadfc" sha1="a8c8786c1793f91f70d0cc7b03ecb95b6a178706" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="mario family 7-in-1.chr" size="1048576" crc="1582975f" sha1="86a02b798f39b6f3a3c3ee833b11a512142cc406" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_marif" supported="partial">
 		<description>Super Mario Family 10 in 1</description>
 		<year>1992?</year>
@@ -83302,6 +83346,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_s13">
+		<description>Super 13 in 1</description>
+		<year>2004</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="4194304">
+				<rom name="2004 super 13-in-1.prg" size="4194304" crc="28a92a86" sha1="a45412ca8a5f8afa32a559f6e45887ec60ab5122" status="baddump" />
+			</dataarea>
+			<!-- 256k VRAM on cartridge -->
+			<dataarea name="vram" size="262144">
 			</dataarea>
 		</part>
 	</software>
