@@ -14425,9 +14425,15 @@ sxevious                        // (c) 1984
 sxeviousj                       // (c) 1984
 xevios                          // bootleg
 xevious                         // (c) 1982
-xeviousa                        // 136018   (c) 1982 + Atari license
-xeviousb                        // 136018   (c) 1982 + Atari license
-xeviousc                        // 136018   (c) 1982 + Atari license
+xeviousa0                       // 136018   (c) 1982 + Atari license
+xeviousa0n                      // 136018   (c) 1982 + Atari license
+xeviousa1                       // 136018   (c) 1982 + Atari license
+xeviousa1n                      // 136018   (c) 1982 + Atari license
+xeviousa2                       // 136018   (c) 1982 + Atari license
+xeviousa2n                      // 136018   (c) 1982 + Atari license
+xeviousa3                       // 136018   (c) 1982 + Atari license
+xeviousa4                       // 136018   (c) 1982 + Atari license
+xeviousa4i                      // 136018   (c) 1982 + Atari license
 
 @source:galastrm.cpp
 galastrm                        // C99 (c) 1992 Taito Corporation
