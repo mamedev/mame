@@ -146,11 +146,12 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 	}
 
 	const u8 step = (voice.m_addr_frac >> 20) & 7;
-	const s32 sample = voice.m_sample + (voice.m_sample_next * step / 8);
+	const u16 gain = (voice.m_volume_current >> 24) * voice.m_gain;
+	const s32 sample = ((voice.m_sample + (voice.m_sample_next * step / 8)) * gain) >> 4;
 
 	// mix sample into output
-	left += sample * (voice.m_volume_current >> 24) * voice.m_balance[0];
-	right += sample * (voice.m_volume_current >> 24) * voice.m_balance[1];
+	left += sample * voice.m_balance[0];
+	right += sample * voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
@@ -160,9 +161,9 @@ void gt913_sound_device::update_sample(voice_t& voice)
 	if (voice.m_addr_current == (voice.m_addr_loop | 1))
 	{
 		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
-		const s16 word = m_cache.read_word(addr_loop_data);
+		
+		voice.m_sample_next = m_cache.read_word(addr_loop_data) - voice.m_sample;
 		voice.m_exp = m_cache.read_word(addr_loop_data + 10) & 7;
-		voice.m_sample_next = word - voice.m_sample;
 	}
 	else
 	{
@@ -180,7 +181,7 @@ void gt913_sound_device::update_sample(voice_t& voice)
 			delta = sample_7_to_8[word >> 9];
 		}
 
-		voice.m_sample_next = (delta * (1 << voice.m_exp) * voice.m_gain) >> 4;
+		voice.m_sample_next = delta * (1 << voice.m_exp);
 	}
 
 	voice.m_addr_current++;
