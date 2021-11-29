@@ -1167,6 +1167,7 @@ void dynax_state::tenkai_p3_w(uint8_t data)
 	m_rombank = ((data & 0x04) << 1) | (m_rombank & 0x07);
 	tenkai_update_rombank();
 }
+
 void dynax_state::tenkai_p4_w(uint8_t data)
 {
 	m_rombank = (m_rombank & 0x08) | ((data & 0x0e) >> 1);
@@ -1347,6 +1348,7 @@ void dynax_state::ougonhai_p7_w(uint8_t data)
 	if (data & 0x0f)
 		m_tenkai_p5_val |= (1 << 3);
 }
+
 /***************************************************************************
                                 Castle Of Dracula
 ***************************************************************************/
@@ -4927,9 +4929,11 @@ void dynax_state::mjreach(machine_config &config)
 void dynax_state::ougonhai(machine_config &config)
 {
 	tenkai(config);
-	tmp91640_device* tmp = downcast<tmp91640_device *>(m_maincpu.target());
-	tmp->port_write<7>().set(FUNC(dynax_state::ougonhai_p7_w));
+
+	tmp91640_device &tmp = downcast<tmp91640_device &>(*m_maincpu);
+	tmp.port_write<7>().set(FUNC(dynax_state::ougonhai_p7_w));
 }
+
 /***************************************************************************
                                 Mahjong Gekisha
 ***************************************************************************/
@@ -7083,7 +7087,7 @@ PCB Layout
 
 ***************************************************************************/
 
-ROM_START( ougonhaib )
+ROM_START( ougonhaib1 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "tydg001.u11",      0x00000, 0x40000, CRC(4ffa543c) SHA1(ab6ec7bd735358643f5186c6c983fa8b599fe84b) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
@@ -7098,7 +7102,7 @@ ROM_START( ougonhaib )
 ROM_END
 
 
-ROM_START( ougonhaib1 )
+ROM_START( ougonhaib2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "hc03.u11",      0x00000, 0x40000, CRC(fc635d8a) SHA1(fb4cbe676022890c53e79cb173ceada5e22687f2) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
@@ -7112,7 +7116,7 @@ ROM_START( ougonhaib1 )
 ROM_END
 
 
-ROM_START( ougonhaib2 )
+ROM_START( ougonhaib3 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "mg-1.u11",      0x00000, 0x40000, CRC(dd1ed979) SHA1(53ae532f789b184c7cd4d504408f4ad2c1492cfb) )
 	ROM_RELOAD(                   0x10000, 0x40000 )
@@ -7408,10 +7412,10 @@ GAME( 1991, tenkai2b, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    
 GAME( 1991, tenkaibb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg b)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkaicb, tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Tenkaigen (bootleg c)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1991, tenkaie,  tenkai,   tenkai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Tenkaigen (set 2)",                                     MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhai, 0,        ougonhai,   tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon no Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib,ougonhai, ougonhai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib1,ougonhai, ougonhai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 1)",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ougonhaib2,ougonhai, ougonhai,   tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 2)",                                MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhai, 0,        ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "Dynax",                    "Mahjong Ougon no Hai",                                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib1,ougonhai,ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 1)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib2,ougonhai,ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 2)",                          MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ougonhaib3,ougonhai,ougonhai, tenkai,   dynax_state, empty_init,    ROT0,   "bootleg",                  "Mahjong Ougon no Hai (bootleg set 3)",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreach,  0,        mjreach,  mjreach,  dynax_state, empty_init,    ROT0,   "bootleg / Dynax",          "Mahjong Reach (bootleg)",                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula, 0,        cdracula, cdracula, dynax_state, empty_init,    ROT0,   "Yun Sung (Escape license)","Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a dynax board
 GAME( 1995, shpeng,   0,        sprtmtch, drgpunch, dynax_state, empty_init,    ROT0,   "WSAC Systems?",            "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a dynax board. proms?
