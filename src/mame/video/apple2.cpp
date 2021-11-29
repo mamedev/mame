@@ -764,18 +764,14 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
-// this function forces all of the template versions to be created, otherwise there's a link error
-void a2_video_device::hackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
-{
-	text_update<false, false, false>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<false, false, true>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<false, true, false>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<false, true, true>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<true, false, false>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<true, false, true>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<true, true, false>(screen, bitmap, cliprect, beginrow, endrow);
-	text_update<true, true, true>(screen, bitmap, cliprect, beginrow, endrow);
-}
+template void a2_video_device::text_update<false, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<false, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<false, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<false, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<true, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::text_update_jplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
