@@ -25,6 +25,10 @@ TODO:
 #include "emu.h"
 
 #include "cpu/t11/t11.h"
+#include "sound/dac.h"
+#include "video/pwm.h"
+
+#include "speaker.h"
 
 
 namespace {
@@ -34,31 +38,44 @@ class im01_state : public driver_device
 public:
 	im01_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_display(*this, "display"),
+		m_dac(*this, "dac"),
+		m_inputs(*this, "IN.%u", 0)
 	{ }
 
 	void im01(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	required_device<t11_device> m_maincpu;
+	required_device<pwm_display_device> m_display;
+	required_device<dac_bit_interface> m_dac;
+	required_ioport_array<6> m_inputs;
 
 	void main_map(address_map &map);
 
 	u8 irq_callback(offs_t offset);
 	INTERRUPT_GEN_MEMBER(interrupt);
+
+	void update_display();
+	u16 mux_r(offs_t offset, u16 mem_mask);
+	void mux_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 digit_r(offs_t offset, u16 mem_mask);
+	void digit_w(offs_t offset, u16 data, u16 mem_mask);
+	u16 input_r(offs_t offset, u16 mem_mask);
+
+	u16 m_inp_mux = 0;
+	u16 m_digit_data = 0;
 };
 
 void im01_state::machine_start()
 {
-}
-
-void im01_state::machine_reset()
-{
-	m_maincpu->set_input_line(t11_device::VEC_LINE, ASSERT_LINE);
+	// register for savestates
+	save_item(NAME(m_inp_mux));
+	save_item(NAME(m_digit_data));
 }
 
 
@@ -89,6 +106,50 @@ INTERRUPT_GEN_MEMBER(im01_state::interrupt)
     I/O
 ******************************************************************************/
 
+void im01_state::update_display()
+{
+	m_display->matrix(m_inp_mux, bitswap<8>(m_digit_data,0,1,2,3,4,5,6,7));
+}
+
+u16 im01_state::mux_r(offs_t offset, u16 mem_mask)
+{
+	return m_inp_mux;
+}
+
+void im01_state::mux_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// d0-d5: input mux
+	COMBINE_DATA(&m_inp_mux);
+	update_display();
+
+	// d7: speaker out
+	m_dac->write(BIT(m_inp_mux, 7));
+}
+
+u16 im01_state::digit_r(offs_t offset, u16 mem_mask)
+{
+	return m_digit_data;
+}
+
+void im01_state::digit_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// d0-d7: digit segment data
+	COMBINE_DATA(&m_digit_data);
+	update_display();
+}
+
+u16 im01_state::input_r(offs_t offset, u16 mem_mask)
+{
+	u16 data = 0;
+
+	// d8-d11: multiplexed inputs
+	for (int i = 0; i < 6; i++)
+		if (BIT(m_inp_mux, i))
+			data |= m_inputs[i]->read();
+
+	return data << 8;
+}
+
 
 
 /******************************************************************************
@@ -99,6 +160,9 @@ void im01_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram();
 	map(0x2000, 0x5fff).rom();
+	map(0xe830, 0xe831).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
+	map(0xe83c, 0xe83d).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
+	map(0xe83e, 0xe83f).r(FUNC(im01_state::input_r));
 }
 
 
@@ -108,6 +172,41 @@ void im01_state::main_map(address_map &map)
 ******************************************************************************/
 
 static INPUT_PORTS_START( im01 )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // d4  1311r
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // c3
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // b2
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // a1  4342r
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // verify?
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // enter
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // h8
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // g7
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // f6
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // e5
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) // lv
 INPUT_PORTS_END
 
 
@@ -123,7 +222,15 @@ void im01_state::im01(machine_config &config)
 	m_maincpu->set_initial_mode(3 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::main_map);
 	m_maincpu->in_iack().set(FUNC(im01_state::irq_callback));
-	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(50));
+	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(200));
+
+	// video hardware
+	PWM_DISPLAY(config, m_display).set_size(5, 8);
+	m_display->set_segmask(0x1f, 0x7f);
+
+	// sound hardware
+	SPEAKER(config, "speaker").front_center();
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
