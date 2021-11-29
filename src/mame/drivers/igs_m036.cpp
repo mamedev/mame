@@ -352,6 +352,6 @@ GAME( 200?, cjdh2c,  cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,  
 
 GAME( 200?, cjddzsp, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS", "Super Dou Di Zhu Special (V122CN)", MACHINE_IS_SKELETON )
 
-GAME( 200?, lhzb3in1, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS", "Mahjong Dragon Tiger 3in1 (V100CN)", MACHINE_IS_SKELETON )
+GAME( 200?, lhzb3in1,0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp, ROT0, "IGS", "Long Hu Zhengba San He Yi (V100CN)", MACHINE_IS_SKELETON ) // 龙虎争霸三合一
 
 GAME( 200?, igsm312, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312, ROT0, "IGS", "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_IS_SKELETON ) // there's very little code and no gfx roms, might be a 'set/clear' chip for a gambling game.
