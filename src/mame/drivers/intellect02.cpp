@@ -10,7 +10,7 @@ announced(can't say for certain how many released). PCB labels have prefix ДМ�
 it's assumed to have been designed by НИИ БРЭА (SRI BREA). First shown in 1983,
 produced during around 1985-1992.
 
-hardware notes:
+Hardware notes:
 - КР580ВМ80А CPU (i8080A clone) @ 1.5MHz
 - КР580ИК55 (i8255 clone)
 - 1 KB RAM (8*КР565РУ2), cartridge port
@@ -26,7 +26,7 @@ The 2nd(4-level) chess cartridge is completely different, not a CC3 clone.
 Intellect-01 looks like it didn't get further than a prototype. It was a dedicated
 chess computer, probably a clone of CC3.
 
-keypad legend:
+Keypad legend:
 
 СБ - сброс (reset)
 ВВ - ввод (input)
@@ -93,16 +93,12 @@ private:
 	void digit_w(u8 data);
 	void control_w(u8 data);
 
-	u8 m_digit_data;
-	u8 m_led_select;
+	u8 m_digit_data = 0;
+	u8 m_led_select = 0;
 };
 
 void intel02_state::machine_start()
 {
-	// zerofill
-	m_digit_data = 0;
-	m_led_select = 0;
-
 	// register for savestates
 	save_item(NAME(m_digit_data));
 	save_item(NAME(m_led_select));

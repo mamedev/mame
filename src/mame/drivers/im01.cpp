@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Radon17, Berger
 /******************************************************************************
 
 Электроника ИМ-01 (Elektronika IM-01)
@@ -8,16 +9,21 @@ Soviet chess computer, produced by Svetana from 1986-1992.
 IM-01T is the same hardware, the program has more difficulty levels.
 
 Hardware notes:
-- К1801ВМ1 CPU (PDP-11 derived)
-- 16KB ROM (2*К1809РЕ1), 4KB RAM(К1809РУ1)
+- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz
+- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1)
 - K1809BB1 (I/O, counter)
-- 4-digit 7seg panel, beeper
+- 4-digit VFD 7seg panel(cyan, green window overlay), beeper
 
 TODO:
 - emulate К1801ВМ1, using T11 for now and I hope it works ok
-- emulate K1809BB1
-- inputs, 7segs, sound
-- cpu frequency, irq frequency
+- emulate K1809BB1, IRQ is from here too (measured 177.4Hz)
+- It's running a bit too fast?: XTAL was measured 9.22MHz, CPU clock was
+  measured 4.61MHz, beeper frequency 3.73KHz and beeper duration 34.2ms.
+  In MAME, beeper frequency is 4.15KHz and duration is 31ms, meaning it's
+  around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
+  and/or T11 core timing itself is not 100% accurate. There's a big "but":
+  these measurements are from the older IM-01.
+- verify actual XTAL, the label couldn't be seen
 - dump/add im01 (rom serial 106/107)
 
 ******************************************************************************/
@@ -29,6 +35,9 @@ TODO:
 #include "video/pwm.h"
 
 #include "speaker.h"
+
+// internal artwork
+#include "im01.lh"
 
 
 namespace {
@@ -50,6 +59,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
+	// devices/pointers
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -60,6 +70,7 @@ private:
 	u8 irq_callback(offs_t offset);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
+	// I/O handlers
 	void update_display();
 	u16 mux_r(offs_t offset, u16 mem_mask);
 	void mux_w(offs_t offset, u16 data, u16 mem_mask);
@@ -158,7 +169,7 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 
 void im01_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0fff).ram();
+	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x5fff).rom();
 	map(0xe830, 0xe831).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
 	map(0xe83c, 0xe83d).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
@@ -218,15 +229,16 @@ INPUT_PORTS_END
 void im01_state::im01(machine_config &config)
 {
 	// basic machine hardware
-	T11(config, m_maincpu, 5'000'000);
+	T11(config, m_maincpu, 9.216_MHz_XTAL / 2); // actually К1801ВМ1
 	m_maincpu->set_initial_mode(3 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::main_map);
 	m_maincpu->in_iack().set(FUNC(im01_state::irq_callback));
-	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(200));
+	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(177));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(5, 8);
 	m_display->set_segmask(0x1f, 0x7f);
+	config.set_default_layout(layout_im01);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -254,4 +266,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
