@@ -6,7 +6,7 @@
 Электроника ИМ-01 (Elektronika IM-01)
 
 Soviet chess computer, produced by Svetana from 1986-1992.
-IM-01T is the same hardware, improved program and has 1 more difficulty level.
+ИМ-01Т is the same hardware, improved program and has 1 more difficulty level.
 
 TODO:
 - emulate К1801ВМ1, using T11 for now and I hope it works ok
@@ -16,7 +16,7 @@ TODO:
   In MAME, beeper frequency is 4.15KHz and duration is 31ms, meaning it's
   around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
   and/or T11 core timing itself is not 100% accurate. There's a big "but":
-  these measurements are from the older IM-01.
+  these measurements are from the older ИМ-01.
 - verify actual XTAL, the label couldn't be seen
 - add button panel to internal artwork
 - dump/add im01 (rom serial 106/107)
@@ -293,4 +293,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE )
