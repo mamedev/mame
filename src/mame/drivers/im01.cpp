@@ -6,13 +6,7 @@
 Электроника ИМ-01 (Elektronika IM-01)
 
 Soviet chess computer, produced by Svetana from 1986-1992.
-IM-01T is the same hardware, the program has more difficulty levels.
-
-Hardware notes:
-- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz
-- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1)
-- K1809BB1 (I/O, counter)
-- 4-digit VFD 7seg panel(cyan, green window overlay), beeper
+IM-01T is the same hardware, improved program and has 1 more difficulty level.
 
 TODO:
 - emulate К1801ВМ1, using T11 for now and I hope it works ok
@@ -24,7 +18,40 @@ TODO:
   and/or T11 core timing itself is not 100% accurate. There's a big "but":
   these measurements are from the older IM-01.
 - verify actual XTAL, the label couldn't be seen
+- add button panel to internal artwork
 - dump/add im01 (rom serial 106/107)
+
+*******************************************************************************
+
+Hardware notes:
+- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz
+- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1)
+- K1809BB1 (I/O, counter)
+- 4-digit VFD 7seg panel(cyan, green window overlay), beeper
+
+Keypad legend (excluding A1-H8 and black/white):
+
+Фиг: префиксная клавиша для ввода кода шахматной фигуры, - Prefix Key (hold)
+     а также для установки фигур в начальную позицию,
+     сброса фигур с доски и изменения очередности хода
+
+НП:  установка фигур в начальную позицию                 - Reset Board
+СД:  сброс всех фигур с доски                            - Clear Board
+↓:   ввод в компьютер Вашего хода,                       - Enter
+     а также фигуры при установке позиции
+
+ПХ:  передача хода компьютера                            - Move
+≡:   индикация уровня сложности                          - Set Level (hold)
+↑:   индикация текущего уровня                           - Show Depth
+CИ:  сброс информации на индикаторе                      - Clear Entry
+?:   проверка позиции                                    - Verify Position
+Вар: ввод варианта                                       - Enter Variant
+     (несколько ходов подряд за белых и черных)
+
+↺:   ход назад                                           - Take Back
+И:   индикация анализируемого хода                       - Show Analyzed Move
+N:   чксло ходов                                         - Show Moves
+РЗ:  установка режима решения шахматных задач            - Position Mode
 
 ******************************************************************************/
 
@@ -184,40 +211,40 @@ void im01_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( im01 )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) // d4  1311r
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) // c3
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) // b2
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) // a1  4342r
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("D 4 / Rook")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("C 3 / Bishop")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B 2 / Knight")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A) PORT_NAME("A 1 / Pawn")
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) // verify?
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME(u8"N (Show Moves)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME(u8"Вар (Enter Variant)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("? (Verify Position)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Show Depth")
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) // enter
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"ПХ (Move)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(u8"CИ (Clear Entry)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Enter")
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) // h8
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) // g7
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) // f6
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) // e5
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H 8")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G 7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("F 6 / King")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("E 5 / Queen")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME(u8"Фиг (Prefix Key)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME(u8"И (Show Analyzed Move)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"РЗ (Position Mode)")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) // lv
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset Board)") // hold Фиг
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Clear Board)") // hold Фиг
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Black")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Set Level")
 INPUT_PORTS_END
 
 
@@ -266,4 +293,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1986, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+CONS( 1986, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE )
