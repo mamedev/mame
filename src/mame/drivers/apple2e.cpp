@@ -302,8 +302,6 @@ public:
 		m_iscecm = false;
 		m_iscec2000 = false;
 		m_isace500 = false;
-		m_spectrum_text = false;
-		m_inverse_text = false;
 		m_pal = false;
 #if IICP_NEW_IWM
 		m_cur_floppy = nullptr;
@@ -360,7 +358,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	template <bool invert, bool flip>
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
+	u32 screen_update_ft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, true>(screen, bitmap, cliprect); }
+	u32 screen_update_tf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, false>(screen, bitmap, cliprect); }
+	u32 screen_update_tt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, true>(screen, bitmap, cliprect); }
 
 	u8 ram0000_r(offs_t offset);
 	void ram0000_w(offs_t offset, u8 data);
@@ -484,7 +488,6 @@ public:
 	void spectred_keyb_map(address_map &map);
 	void init_laser128();
 	void init_128ex();
-	void init_spect();
 	void init_pal();
 	void init_ace500();
 
@@ -523,7 +526,7 @@ private:
 	bool m_mockingboard4c;
 	bool m_intc8rom;
 
-	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_spectrum_text, m_inverse_text, m_pal;
+	bool m_isiic, m_isiicplus, m_iscec, m_iscecm, m_iscec2000, m_pal;
 	u8 m_migram[0x800];
 	u16 m_migpage;
 
@@ -1038,8 +1041,19 @@ void apple2e_state::machine_start()
 
 	for (int adr = 0; adr < ram_size; adr += 2)
 	{
-		m_ram_ptr[adr] = 0;
-		m_ram_ptr[adr+1] = 0xff;
+		// invert the fill pattern order on the ACE 500, as it interacts with
+		// Franklin's monitor not returning the same values as Apple's plus some
+		// bugs in DOS 3.3.
+		if (m_isace500)
+		{
+			m_ram_ptr[adr] = 0xff;
+			m_ram_ptr[adr+1] = 0;
+		}
+		else
+		{
+			m_ram_ptr[adr] = 0;
+			m_ram_ptr[adr + 1] = 0xff;
+		}
 
 		if (m_ram_size >= (128*1024))
 		{
@@ -1301,17 +1315,10 @@ void apple2e_state::init_128ex()
 {
 	m_accel_laser = true;
 	m_has_laser_mouse = true;
-	m_inverse_text = true;
-}
-
-void apple2e_state::init_spect()
-{
-	m_spectrum_text = true;
 }
 
 void apple2e_state::init_laser128()
 {
-	m_inverse_text = true;
 	m_has_laser_mouse = true;
 }
 
@@ -1335,7 +1342,6 @@ void apple2e_state::raise_irq(int irq)
 		m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	}
 }
-
 
 void apple2e_state::lower_irq(int irq)
 {
@@ -1391,6 +1397,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	}
 }
 
+template<bool invert, bool flip>
 u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool old_page2 = m_video->m_page2;
@@ -1419,18 +1426,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
 				}
 
-				if (m_spectrum_text)
-				{
-					m_video->text_update_spectrum(screen, bitmap, cliprect, 160, 191);
-				}
-				else if (m_inverse_text)
-				{
-					m_video->text_update_inverse(screen, bitmap, cliprect, 160, 191);
-				}
-				else
-				{
-					m_video->text_update(screen, bitmap, cliprect, 160, 191);
-				}
+				m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1444,7 +1440,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 				}
 			}
 		}
-		else    // lo-res
+		else // lo-res
 		{
 			if (m_video->m_mix)
 			{
@@ -1457,7 +1453,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 					m_video->lores_update(screen, bitmap, cliprect, 0, 159);
 				}
 
-				m_video->text_update(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -1474,18 +1470,7 @@ u32 apple2e_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	}
 	else
 	{
-		if (m_spectrum_text)
-		{
-			m_video->text_update_spectrum(screen, bitmap, cliprect, 0, 191);
-		}
-		else if (m_inverse_text)
-		{
-			m_video->text_update_inverse(screen, bitmap, cliprect, 0, 191);
-		}
-		else
-		{
-			m_video->text_update(screen, bitmap, cliprect, 0, 191);
-		}
+		m_video->text_update<true, invert, flip>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	m_video->m_page2 = old_page2;
@@ -4123,7 +4108,9 @@ static INPUT_PORTS_START( apple2e_common )
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( apple2e_special )
 	PORT_START("keyb_special")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
@@ -4475,11 +4462,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2e )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2_sysconfig )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2c )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2c_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -4496,6 +4485,38 @@ static INPUT_PORTS_START( laser128 )
 	PORT_INCLUDE( apple2e_common )
 	PORT_INCLUDE( laser128_sysconfig )
 
+	PORT_START("keyb_special")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open Triangle")   PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid Triangle")  PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
+	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
+
+	PORT_START(MOUSE_XAXIS_TAG) /* Mouse - X AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START(MOUSE_YAXIS_TAG) /* Mouse - Y AXIS */
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(20) PORT_KEYDELTA(0) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ace500 )
+	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( laser128_sysconfig )
+
+	PORT_START("keyb_special")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Control")      PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Open F")       PORT_CODE(KEYCODE_LALT)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Solid F")      PORT_CODE(KEYCODE_RALT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RESET")        PORT_CODE(KEYCODE_F12)
+
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button") PORT_CODE(MOUSECODE_BUTTON1)
 
@@ -4508,6 +4529,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2cp )
 	PORT_INCLUDE( apple2e_common )
+	PORT_INCLUDE( apple2e_special )
 	PORT_INCLUDE( apple2cp_sysconfig )
 
 	PORT_START(MOUSE_BUTTON_TAG) /* Mouse - button */
@@ -5103,7 +5125,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple2e_state::screen_update));
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_ff));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -5247,9 +5269,10 @@ void apple2e_state::spectred(machine_config &config)
 	apple2e(config);
 	i8035_device &keyb_mcu(I8035(config, "keyb_mcu", XTAL(4'000'000))); /* guessed frequency */
 	keyb_mcu.set_addrmap(AS_PROGRAM, &apple2e_state::spectred_keyb_map);
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_ft));
 
-		//TODO: implement the actual interfacing to this 8035 MCU and
-		//      and then remove the keyb CPU inherited from apple2e
+	// TODO: implement the actual interfacing to this 8035 MCU and
+	//       and then remove the keyb CPU inherited from apple2e
 }
 
 void apple2e_state::tk3000(machine_config &config)
@@ -5491,6 +5514,8 @@ void apple2e_state::laser128(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
+
 	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
@@ -5519,6 +5544,8 @@ void apple2e_state::laser128o(machine_config &config)
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
 	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
@@ -5550,6 +5577,8 @@ void apple2e_state::laser128ex2(machine_config &config)
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
 
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
+
 	LEGACY_APPLEFDC(config, m_laserudc, &fdc_interface);
 	FLOPPY_APPLE(config, FLOPPY_0, &floppy_interface, 15, 16);
 	FLOPPY_APPLE(config, FLOPPY_1, &floppy_interface, 15, 16);
@@ -5578,6 +5607,9 @@ void apple2e_state::ace500(machine_config &config)
 	apple2c_iwm(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tt));
 
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
 	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
@@ -6041,8 +6073,9 @@ ROM_END
 
 ROM_START(ace500)
 	ROM_REGION(0x2000,"gfx1",0)
-	ROM_LOAD ( "341-0265-a.chr", 0x0000, 0x1000, CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
-	ROM_LOAD ( "341-0265-a.chr", 0x1000, 0x1000, CRC(2651014d) SHA1(b2b5d87f52693817fc747df087a4aa1ddcdb1f10))
+	// not sure if the 500 and 2000 have the same character set.  First 4K is normal charset, second 4K is MouseText
+	ROM_LOAD("franklin_ace2000_videorom.bin", 0x1000, 0x1000, CRC(545bdeea) SHA1(26ebc4b0d3080311f550090bc1b29807cb22d083))
+	ROM_CONTINUE(0x0000, 0x1000)
 
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("franklin500-rom.bin", 0x004000, 0x004000, CRC(376c9104) SHA1(7f82706adc0bfb5f60c207c81271eb0ba8510a11))
@@ -6065,7 +6098,7 @@ COMP( 1985, apple2eeuk, apple2e, 0,      apple2eepal, apple2euk, apple2e_state, 
 COMP( 1985, apple2eefr, apple2e, 0,      apple2eepal, apple2efr, apple2e_state, init_pal,   "Apple Computer",   "Apple //e (enhanced, France)", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, apple2ep,   apple2e, 0,      apple2ep,    apple2ep,  apple2e_state, empty_init, "Apple Computer",   "Apple //e (Platinum)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2c,    0,       apple2, apple2c,     apple2c,   apple2e_state, empty_init, "Apple Computer",   "Apple //c" , MACHINE_SUPPORTS_SAVE )
-COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, init_spect, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
+COMP( 1985?,spectred,   apple2e, 0,      spectred,    apple2e,   apple2e_state, empty_init, "Scopus/Spectrum",  "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
 COMP( 1986, tk3000,     apple2c, 0,      tk3000,      apple2e,   apple2e_state, empty_init, "Microdigital",     "TK3000//e" , MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8c,     apple2e, 0,      apple2e,     apple2e,   apple2e_state, empty_init, "Pravetz",          "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128,   apple2c, 0,      laser128,    laser128,  apple2e_state, init_laser128, "Video Technology", "Laser 128", MACHINE_SUPPORTS_SAVE )
@@ -6082,4 +6115,4 @@ COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, 
 COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2cp,  apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
-COMP( 1986, ace500,     apple2c, 0,      ace500,      apple2c,   apple2e_state, init_ace500,"Franklin Computer", "ACE 500", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+COMP( 1986, ace500,     apple2c, 0,      ace500,      ace500,    apple2e_state, init_ace500,"Franklin Computer", "ACE 500", MACHINE_SUPPORTS_SAVE)
