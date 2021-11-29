@@ -32758,8 +32758,15 @@ ATK test: OK
 		<!-- retail, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<year>1990</year>
+		<!-- Developer: Team 17 -->
 		<publisher>Codemasters</publisher>
 		<notes><![CDATA[
+Black screen [FDC] copy protection check at PC=11BE (enables 68k trace mode)
+Boots to Codemasters TAS if above is debug tricked, fails [FDC] serial, auth code is tested at PC=A96 RAM=928 for plaintext code
+a1200: doesn't accept [keyboard] input on TAS
+a500, a500p: No player sprite, [Copper]
+a1200: Player sprite is half cut, [Copper]
+1 bitplane has wrong colors with vertical scroll, [Copper]
 ATK test: C:0 H:U Bad
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
