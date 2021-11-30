@@ -469,9 +469,7 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		if (eclass != 15)
 		{
 			// simple events: all but program change and aftertouch have a second parameter
-			// TODO: should we respect the channel for these? or maybe the drivers should
-			// configure us with the number of channels they support?
-			event.append(type & 0xf0);
+			event.append(type);
 			event.append(buffer.byte());
 			if (eclass != 12 && eclass != 13)
 				event.append(buffer.byte());
