@@ -156,7 +156,7 @@ u16 im01_state::mux_r(offs_t offset, u16 mem_mask)
 
 void im01_state::mux_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// d0-d5: input mux
+	// d0-d5: input mux, digit select
 	COMBINE_DATA(&m_inp_mux);
 	update_display();
 
@@ -171,7 +171,7 @@ u16 im01_state::digit_r(offs_t offset, u16 mem_mask)
 
 void im01_state::digit_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// d0-d7: digit segment data
+	// d1-d7: digit segment data
 	COMBINE_DATA(&m_digit_data);
 	update_display();
 }
@@ -263,7 +263,7 @@ void im01_state::im01(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(177));
 
 	// video hardware
-	PWM_DISPLAY(config, m_display).set_size(5, 8);
+	PWM_DISPLAY(config, m_display).set_size(5, 7);
 	m_display->set_segmask(0x1f, 0x7f);
 	config.set_default_layout(layout_im01);
 
