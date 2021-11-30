@@ -479,20 +479,12 @@ protected:
 	std::unique_ptr<u32[]> m_icache_data;
 
 	// experimental scache state
-	// Size of the secondary cache in bytes
-	u32 m_scache_size = 0;
-
-	// Secondary cache line size
-	u8 m_scache_line_size = 0;
-
-	// Secondary cache line shift
-	u32 m_scache_line_index = 0;
-
-	// Mask for extracting the tag from a physical address
-	u32 m_scache_tag_mask = 0;
-
-	// scache tag memory
-	std::unique_ptr<u32[]> m_scache_tag;
+	u32 m_scache_size = 0; // Size of the secondary cache in bytes
+	u8 m_scache_line_size = 0; // Secondary cache line size
+	u32 m_scache_line_index = 0; // Secondary cache line shift
+	u32 m_scache_tag_mask = 0; // Mask for extracting the tag from a physical address
+	u32 m_scache_tag_size = 0; // Tag count in the scache
+	std::unique_ptr<u32[]> m_scache_tag; // scache tag memory
 
 	// statistics
 	u64 m_tlb_scans;

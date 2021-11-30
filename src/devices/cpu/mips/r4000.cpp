@@ -233,11 +233,11 @@ void r4000_base_device::device_start()
 			m_cp0[CP0_Config] |= 3 << 22;
 		}
 
-		u32 tag_size = m_scache_size >> m_scache_line_index;
+		m_scache_tag_size = m_scache_size >> m_scache_line_index;
 		m_scache_tag_mask = m_scache_size - 1;
 
-		m_scache_tag = std::make_unique<u32[]>(tag_size);
-		save_pointer(NAME(m_scache_tag), tag_size);
+		m_scache_tag = std::make_unique<u32[]>(m_scache_tag_size);
+		save_pointer(NAME(m_scache_tag), m_scache_tag_size);
 	}
 }
 
@@ -1252,6 +1252,10 @@ void r4000_base_device::cp0_cache(u32 const op)
 		{
 			m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] &= ~ICACHE_V;
 		}
+		else
+		{
+			//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
+		}
 		break;
 	case 0x04: // index load tag (I)
 		if (ICACHE)
@@ -1261,6 +1265,10 @@ void r4000_base_device::cp0_cache(u32 const op)
 			m_cp0[CP0_TagLo] = ((tag & ICACHE_PTAG) << 8) | ((tag & ICACHE_V) >> 18) | ((tag & ICACHE_P) >> 25);
 			m_cp0[CP0_ECC] = 0; // data ecc or parity
 		}
+		else
+		{
+			//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
+		}
 		break;
 	case 0x08: // index store tag (I)
 		if (ICACHE)
@@ -1268,6 +1276,10 @@ void r4000_base_device::cp0_cache(u32 const op)
 			// FIXME: compute parity
 			m_icache_tag[(ADDR(m_r[RSREG], s16(op)) & m_icache_mask_hi) >> m_icache_shift] =
 				(m_cp0[CP0_TagLo] & TAGLO_PTAGLO) >> 8 | (m_cp0[CP0_TagLo] & TAGLO_PSTATE) << 18;
+		}
+		else
+		{
+			//LOGMASKED(LOG_CACHE, "cache 0x%08x unimplemented (%s)\n", op, machine().describe_context());
 		}
 		break;
 	case 0x01: // index writeback invalidate (D)
@@ -1282,7 +1294,7 @@ void r4000_base_device::cp0_cache(u32 const op)
 		if(SCACHE)
 		{
 			// Get physical address and extract tag
-				// TODO: translation type for CACHE instruction?
+			// TODO: translation type for CACHE instruction?
 			u64 physical_address = ADDR(m_r[RSREG], s16(op));
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
 			if (t == ERROR || t == MISS)
@@ -1290,14 +1302,25 @@ void r4000_base_device::cp0_cache(u32 const op)
 				return;
 			}
 			u32 const index = (physical_address & m_scache_tag_mask) >> m_scache_line_index;
-			auto const tag = m_scache_tag[index];
+			if(index < m_scache_tag_size)
+			{
+				auto const tag = m_scache_tag[index];
 
-			// Decode entry and marshal each field to the TagLo register
-			// TODO: Load the ECC register here
-			auto const cs = (tag & 0x1c00000) >> 22;
-			auto const stag = (tag & 0x7ffff);
-			auto const pidx = (tag & 0x380000) >> 19;
-			m_cp0[CP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
+				// Decode entry and marshal each field to the TagLo register
+				// TODO: Load the ECC register here
+				auto const cs = (tag & 0x1c00000) >> 22;
+				auto const stag = (tag & 0x7ffff);
+				auto const pidx = (tag & 0x380000) >> 19;
+				m_cp0[CP0_TagLo] = (stag << 13) | (cs << 10) | (pidx << 7);
+			}
+			else
+			{
+				fatalerror("r4000 scache load tag index out of range!");
+			}
+		}
+		else
+		{
+			LOGMASKED(LOG_CACHE, "cache 0x%08x called without scache enabled (%s)\n", op, machine().describe_context());
 		}
 		break;
 	}
@@ -1310,10 +1333,10 @@ void r4000_base_device::cp0_cache(u32 const op)
 		if(SCACHE)
 		{
 			// Get virtual and physical addresses
-			u64 const vaddr = ADDR(m_r[RSREG], s16(op));
+			u64 const virtual_address = ADDR(m_r[RSREG], s16(op));
 
 			// TODO: translation type for CACHE instruction?
-			u64 physical_address = vaddr;
+			u64 physical_address = virtual_address;
 			translate_result const t = translate(TRANSLATE_READ, physical_address);
 			if (t == ERROR || t == MISS)
 			{
@@ -1322,14 +1345,24 @@ void r4000_base_device::cp0_cache(u32 const op)
 
 			// Prepare index for tag
 			u64 const index = (physical_address & m_scache_tag_mask) >> m_scache_line_index;
-
-			// Assemble and set tag entry
-			// TODO: Calculate ECC bits here
-			auto const tag_lo = m_cp0[CP0_TagLo];
-			auto const cs = (tag_lo & 0x1c00) >> 10;
-			auto const stag = (tag_lo & 0xffffe000) >> 13;
-			auto const pidx = (vaddr & 0x7000) >> 12;
-			m_scache_tag[index] = cs << 22 | pidx << 19 | stag;
+			if(index < m_scache_tag_size)
+			{
+				// Assemble and set tag entry
+				// TODO: Calculate ECC bits here
+				auto const tag_lo = m_cp0[CP0_TagLo];
+				auto const cs = (tag_lo & 0x1c00) >> 10;
+				auto const stag = (tag_lo & 0xffffe000) >> 13;
+				auto const pidx = (virtual_address & 0x7000) >> 12;
+				m_scache_tag[index] = cs << 22 | pidx << 19 | stag;
+			}
+			else
+			{
+				fatalerror("r4000 scache store tag index out of range!");
+			}
+		}
+		else
+		{
+			LOGMASKED(LOG_CACHE, "cache 0x%08x called without scache enabled (%s)\n", op, machine().describe_context());
 		}
 		break;
 	}
