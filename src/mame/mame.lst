@@ -16405,9 +16405,6 @@ smastmind                       // Invicta
 atakaast                        // Elektronika
 auslalom                        // Elektronika
 bassmate                        // Telko
-exospace                        // Elektronika
-fowling                         // Elektronika
-frogling                        // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -16473,17 +16470,18 @@ kgarfld                         // Konami
 kgradius                        // Konami
 kloneran                        // Konami
 knfl                            // Konami
+kosmicmt                        // Elektronika
+kosmicpt                        // Elektronika
 krybolov                        // Elektronika
 ktmnt                           // Konami
 ktopgun                         // Konami
-merrycook                       // Elektronika
-monkeygk                        // Elektronika
+kvakazad                        // Elektronika
 morataka                        // Elektronika
-nburglar                        // Elektronika
+nochnyev                        // Elektronika
 nummunch                        // VTech
 nupogodi                        // Elektronika
-spacebridge                     // Elektronika
-spaceflt                        // Elektronika
+okhota                          // Elektronika
+rkosmosa                        // Elektronika
 taddams                         // Tiger
 taltbeast                       // Tiger
 tapollo13                       // Tiger
@@ -16540,6 +16538,8 @@ tvindictr                       // Tiger
 twworld                         // Tiger
 txmen                           // Tiger
 txmenpx                         // Tiger
+vespovar                        // Elektronika
+vfutbol                         // Elektronika
 
 @source:hh_tms1k.cpp
 7in1ss                          // Tiger Electronics
