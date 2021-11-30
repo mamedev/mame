@@ -62,12 +62,12 @@ private:
 	tilemap_t *m_bg_tilemap[2][4];
 	int      m_visible_page;
 	int      m_priority;
-	uint8_t    m_reikaids_which;
+	uint8_t  m_reikaids_which;
 	int      m_flipscreen;
-	uint8_t      m_gfx_bank[2];   // pteacher only uses the first one
-	uint8_t      m_blitter_bank;
+	uint8_t  m_gfx_bank[2];   // pteacher only uses the first one
+	uint8_t  m_blitter_bank;
 	int      m_blitter_param_count;
-	uint8_t      m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
+	uint8_t  m_blitter_param[4];      /* buffers last 4 writes to 0x8006 */
 
 
 	/* misc */

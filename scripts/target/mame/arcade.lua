@@ -2586,8 +2586,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/nwk-tr.cpp",
 	MAME_DIR .. "src/mame/drivers/otomedius.cpp",
 	MAME_DIR .. "src/mame/drivers/overdriv.cpp",
-	MAME_DIR .. "src/mame/includes/overdriv.h",
-	MAME_DIR .. "src/mame/video/overdriv.cpp",
 	MAME_DIR .. "src/mame/drivers/pandoras.cpp",
 	MAME_DIR .. "src/mame/includes/pandoras.h",
 	MAME_DIR .. "src/mame/video/pandoras.cpp",
