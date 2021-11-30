@@ -1420,7 +1420,7 @@ ROM_END
   ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
   ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
   ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Amusing Arithmetic (not emulated in MAME)
+  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arifmetika, export version: Amusing Arithmetic) (not emulated in MAME)
   ИМ-51  Морская атака       Morskaya ataka       -                   -
   ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
 
