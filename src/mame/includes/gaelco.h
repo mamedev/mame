@@ -87,4 +87,6 @@ private:
 
 	/* per-game configuration */
 	uint8_t m_sprite_palette_force_high;
+
+	static constexpr double FRAMERATE_922804 = 57.42;
 };
