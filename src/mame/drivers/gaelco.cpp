@@ -54,7 +54,7 @@ Year   Game                PCB            NOTES
 	  met, then the game will intentionally corrupt memory
 	  and crash.
 
-	  Many of these checks are done with obfusicated code
+	  Many of these checks are done with obfuscated code
 	  to hide the target addresses eg.
 
 	  writing 0x27 to 0xffe08e
@@ -81,7 +81,7 @@ Year   Game                PCB            NOTES
 	  No checks have been observed in Biomechanical Toy,
 	  the Maniac Square prototype, or the Last KM prototype.
 
-	  Big Karnk runs on a different board type and does fail
+	  Big Karnak runs on a different board type and does fail
 	  if the CPU clock is set to 10Mhz rather than 12Mhz,
 	  but that could be unrelated.
 
