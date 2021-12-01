@@ -38,8 +38,8 @@
 
 #include "logmacro.h"
 
-static constexpr u8 DATA_RESPONSE_OK = 0x05;
-static constexpr u8 DATA_RESPONSE_IO_ERROR = 0x0d;
+static constexpr u8 DATA_RESPONSE_OK        = 0x05;
+static constexpr u8 DATA_RESPONSE_IO_ERROR  = 0x0d;
 
 DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device, "spi_sdhccard", "SDHC Card (SPI Interface)")
 DEFINE_DEVICE_TYPE(SPI_SDCARDV2, spi_sdcard_sdv2_device, "spi_sdv2card", "SDV2 Card (SPI Interface)")
