@@ -156,7 +156,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 					m_data[m_write_ptr++] = m_in_latch;
 					if (m_write_ptr == (m_blksize + 2))
 					{
-						u32 blk = ((u32) m_cmd[1] << 24) | ((u32) m_cmd[2] << 16) | ((u32) m_cmd[3] << 8) | (u32) m_cmd[4];
+						u32 blk = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
 						if (m_type == SD_TYPE_V2)
 						{
 							blk /= m_blksize;
@@ -291,7 +291,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
-			m_blksize = ((u16) m_cmd[3] << 8) | (u16) m_cmd[4];
+			m_blksize = (u16(m_cmd[3]) << 8) | u16(m_cmd[4]);
 			if (hard_disk_set_block_size(m_harddisk, m_blksize))
 			{
 				m_data[0] = 0;
@@ -316,7 +316,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 				// byte of space between R1 and the data packet.
 				m_data[1] = 0xff;
 				m_data[2] = 0xfe; // data token
-				u32 blk = ((u32) m_cmd[1] << 24) | ((u32) m_cmd[2] << 16) | ((u32) m_cmd[3] << 8) | (u32) m_cmd[4];
+				u32 blk = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
 				if (m_type == SD_TYPE_V2)
 				{
 					blk /= m_blksize;
@@ -344,7 +344,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 				// data token occurs some time after the R1 response.  A2SD
 				// expects at least 1 byte of space between R1 and the data
 				// packet.
-				m_blknext = ((u32) m_cmd[1] << 24) | ((u32) m_cmd[2] << 16) | ((u32) m_cmd[3] << 8) | (u32) m_cmd[4];
+				m_blknext = (u32(m_cmd[1]) << 24) | (u32(m_cmd[2]) << 16) | (u32(m_cmd[3]) << 8) | u32(m_cmd[4]);
 				if (m_type == SD_TYPE_V2)
 				{
 					m_blknext /= m_blksize;
