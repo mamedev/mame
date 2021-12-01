@@ -107,6 +107,7 @@ private:
 	void midearth_w(offs_t offset, u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	void common_map(address_map &map);
 	void mem_map(address_map &map);
 	void atarians_map(address_map &map);
 	void midearth_map(address_map &map);
@@ -130,11 +131,10 @@ private:
 	output_finder<160> m_io_outputs;   // 32 solenoids + 128 lamps
 };
 
-void atari_s1_state::mem_map(address_map &map)
+void atari_s1_state::common_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0x7fff);
-	map(0x0000, 0x00ff).ram().share("ram").w(FUNC(atari_s1_state::disp_w));
 	map(0x1080, 0x1083).rw(FUNC(atari_s1_state::m1080_r), FUNC(atari_s1_state::m1080_w));
 	map(0x1084, 0x1087).rw(FUNC(atari_s1_state::m1084_r), FUNC(atari_s1_state::m1084_w));
 	map(0x1088, 0x108b).rw(FUNC(atari_s1_state::m1088_r), FUNC(atari_s1_state::m1088_w));
@@ -147,18 +147,20 @@ void atari_s1_state::mem_map(address_map &map)
 	map(0x7000, 0x7fff).rom().region("maincpu",0);
 }
 
+void atari_s1_state::mem_map(address_map &map)
+{
+	common_map(map);
+	map(0x0000, 0x00ff).ram().share("ram").w(FUNC(atari_s1_state::disp_w));
+}
+
 void atari_s1_state::atarians_map(address_map &map)
 {
-	map.unmap_value_high();
-	map.global_mask(0x7fff);
-	mem_map(map);
-	map(0x0100, 0x01ff).ram();
+	common_map(map);
+	map(0x0000, 0x01ff).ram().share("ram").w(FUNC(atari_s1_state::disp_w));
 }
 
 void atari_s1_state::midearth_map(address_map &map)
 {
-	map.unmap_value_high();
-	map.global_mask(0x7fff);
 	atarians_map(map);
 	map(0x1000, 0x11ff).w(FUNC(atari_s1_state::midearth_w));
 }
