@@ -45,25 +45,25 @@ DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device, "spi_sdhccard", "SDHC Car
 DEFINE_DEVICE_TYPE(SPI_SDCARDV2, spi_sdcard_sdv2_device, "spi_sdv2card", "SDV2 Card (SPI Interface)")
 
 spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-        device_t(mconfig, type, tag, owner, clock),
-        write_miso(*this),
-        m_image(*this, "image"),
-        m_state(SD_STATE_IDLE),
-        m_harddisk(nullptr),
-        m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
-        m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_blksize(512), m_blknext(0),
-        m_ss(false), m_in_bit(false), m_bACMD(false)
+	device_t(mconfig, type, tag, owner, clock),
+	write_miso(*this),
+	m_image(*this, "image"),
+	m_state(SD_STATE_IDLE),
+	m_harddisk(nullptr),
+	m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
+	m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_blksize(512), m_blknext(0),
+	m_ss(false), m_in_bit(false), m_bACMD(false)
 {
 }
 
-spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-        spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
+spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
 {
 	m_type = SD_TYPE_V2;
 }
 
-spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
-        spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
+spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
 {
 	m_type = SD_TYPE_HC;
 }
