@@ -66,7 +66,7 @@ private:
 	hard_disk_file *m_harddisk;
 
 	u8 m_in_latch, m_out_latch, m_cur_bit;
-    u16 m_out_count, m_out_ptr, m_write_ptr, m_blksize;
+	u16 m_out_count, m_out_ptr, m_write_ptr, m_blksize;
 	u32 m_blknext;
 
 	bool m_ss, m_in_bit, m_bACMD;

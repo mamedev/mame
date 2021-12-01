@@ -18,7 +18,7 @@
 
     Refrences:
     https://www.sdcard.org/downloads/pls/ (Physical Layer Simplified Specification)
-	REF tags are refering to the spec form above. 'Physical Layer Simplified Specification v8.00'
+    REF: tags are refering to the spec form above. 'Physical Layer Simplified Specification v8.00'
 
     http://www.dejazzer.com/ee379/lecture_notes/lec12_sd_card.pdf
     https://embdev.net/attachment/39390/TOSHIBA_SD_Card_Specification.pdf
