@@ -31,7 +31,7 @@ static int sorc_get_tracks_per_disk(floppy_image_legacy *floppy)
 
 static uint64_t sorc_translate_offset(floppy_image_legacy *floppy, int track, int head, int sector)
 {
-	return 270*(16*track+sector);
+	return 270*(16*uint64_t(track+sector));
 }
 
 static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, uint64_t *offset)
