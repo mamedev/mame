@@ -139,6 +139,8 @@ public:
 	// construction/destruction
 	saturn_vdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template<class T> void set_hostcpu(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
+
 	// I/O operations
 	void regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 regs_r(offs_t offset);
@@ -146,7 +148,6 @@ public:
 	u32 vram_r(offs_t offset);
 	u32 framebuffer0_r(offs_t offset, u32 mem_mask = ~0);
 	void framebuffer0_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	template<class T> void set_hostcpu(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 
 	// public helpers for VDP2 interface
 	uint16_t *read_fb_display_lines(int y);
