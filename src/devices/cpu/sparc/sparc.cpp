@@ -16,6 +16,9 @@
 //      - Test: SPARCv8 ops are untested
 //      - Extended-precision FPU support
 //      - Coprocessor support
+//      - Finish SPARClite peripherals
+//      - SPARClite m_wssr[0] should be 0x7ff40 at reset (32 wait cycles for CS0),
+//        but that is problematic for Saitek Renaissance + Sparc module
 //
 //================================================================
 
@@ -636,14 +639,13 @@ void mb86930_device::device_start()
 	m_alu_op3_assigned[OP3_DIVSCC] = true;
 	m_alu_op3_assigned[OP3_SCAN] = true;
 
+	save_item(NAME(m_ssctrl));
 	save_item(NAME(m_spmr));
 	save_item(NAME(m_spmr_mask));
 	save_item(NAME(m_arsr));
 	save_item(NAME(m_amr));
 	save_item(NAME(m_wssr));
 	save_item(NAME(m_last_masked_addr));
-	save_item(NAME(m_same_page_waits));
-	save_item(NAME(m_other_page_waits));
 
 	std::fill_n(&m_arsr[0], 6, 0);
 	std::fill_n(&m_amr[0], 6, 0);
@@ -656,18 +658,17 @@ void mb86930_device::device_reset()
 {
 	sparcv8_device::device_reset();
 
+	m_ssctrl = 0x08;
 	m_spmr = 0;
 	m_spmr_mask = ~0ULL;
 	std::fill_n(&m_wssr[0], 3, 0);
 	m_last_masked_addr = 0ULL;
 
-	std::fill_n(&m_same_page_waits[0], 6, 0);
-	std::fill_n(&m_other_page_waits[0], 6, 0);
-
 	m_arsr[0] = (9 << 23);
 	m_amr[0] = (0x1f << 1);
 
 	update_addr_masks();
+	update_wait_states();
 }
 
 
@@ -869,6 +870,30 @@ void mb86930_device::update_addr_masks()
 	}
 }
 
+void mb86930_device::update_wait_states()
+{
+	for (int i = 0; i < 6; i++)
+	{
+		const uint8_t shift = (i & 1) ? 19 : 6;
+		const bool enable = bool(BIT(m_wssr[i >> 1], shift + 2));
+		const bool single = bool(BIT(m_wssr[i >> 1], shift + 1));
+		//const bool override = bool(BIT(m_wssr[i >> 1], shift + 0));
+
+		if (BIT(m_ssctrl, 3) && !single && enable)
+		{
+			const uint8_t count1 = ((m_wssr[i >> 1] >> (shift + 8)) & 0x1f) + 1;
+			const uint8_t count2 = ((m_wssr[i >> 1] >> (shift + 3)) & 0x1f) + 1;
+			m_other_page_waits[i] = count1;
+			m_same_page_waits[i] = BIT(m_ssctrl, 5) ? count2 : count1;
+		}
+		else
+		{
+			m_other_page_waits[i] = 0;
+			m_same_page_waits[i] = 0;
+		}
+	}
+}
+
 uint32_t mb86930_device::biu_ctrl_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t data = 0;
@@ -936,7 +961,7 @@ void mb86930_device::restore_lock_ctrl_w(offs_t offset, uint32_t data, uint32_t 
 
 uint32_t mb86930_device::system_support_ctrl_r(offs_t offset, uint32_t mem_mask)
 {
-	uint32_t data = 0;
+	uint32_t data = m_ssctrl;
 	LOGMASKED(LOG_SYSTEM_CTRL, "%s: system_ctrl_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
@@ -944,6 +969,8 @@ uint32_t mb86930_device::system_support_ctrl_r(offs_t offset, uint32_t mem_mask)
 void mb86930_device::system_support_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	LOGMASKED(LOG_SYSTEM_CTRL, "%s: system_ctrl_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	COMBINE_DATA(&m_ssctrl);
+	update_wait_states();
 }
 
 
@@ -1003,14 +1030,7 @@ void mb86930_device::wait_specifier_w(offs_t offset, uint32_t data, uint32_t mem
 {
 	LOGMASKED(LOG_WAIT_STATE, "%s: wait_state_w[%d]: %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
 	COMBINE_DATA(&m_wssr[offset]);
-
-	const uint32_t wait_idx = (offset << 1);
-	const bool wait_en0 = BIT(m_wssr[offset], 8) && !BIT(m_wssr[offset], 7);
-	const bool wait_en1 = BIT(m_wssr[offset], 21) && !BIT(m_wssr[offset], 20);
-	m_same_page_waits[wait_idx] = wait_en0 ? (((m_wssr[offset] >> 9) & 0x1f) + 1) : 0;
-	m_other_page_waits[wait_idx] = wait_en0 ? (((m_wssr[offset] >> 14) & 0x1f) + 1) : 0;
-	m_same_page_waits[wait_idx + 1] = wait_en1 ? (((m_wssr[offset] >> 22) & 0x1f) + 1) : 0;
-	m_other_page_waits[wait_idx + 1] = wait_en1 ? (((m_wssr[offset] >> 27) & 0x1f) + 1) : 0;
+	update_wait_states();
 }
 
 
@@ -1054,6 +1074,7 @@ void mb86930_device::device_post_load()
 {
 	sparcv8_device::device_post_load();
 	update_addr_masks();
+	update_wait_states();
 }
 
 
@@ -4518,7 +4539,7 @@ void sparcv8_device::execute_div(uint32_t op)
 
 			result = uint32_t(temp_64bit);
 
-			temp_v = ((temp_64bit & 0xffffffff00000000) == 0) ? false : true;
+			temp_v = ((temp_64bit & 0xffffffff00000000ULL) == 0) ? false : true;
 		}
 		else if (SDIV || SDIVCC)
 		{
@@ -4527,7 +4548,7 @@ void sparcv8_device::execute_div(uint32_t op)
 			result = uint32_t(temp_64bit);
 
 			uint64_t shifted = uint64_t(temp_64bit) >> 31;
-			temp_v = (shifted == 0 || shifted == 0x1ffffffff) ? false : true;
+			temp_v = (shifted == 0 || shifted == 0x1ffffffffULL) ? false : true;
 		}
 
 		if (temp_v)
