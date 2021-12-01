@@ -38,21 +38,36 @@ protected:
 	int m_type;
 
 private:
-	enum
+	enum sd_state
 	{
+		//REF Table 4-1:Overview of Card States vs. Operation Mode
 		SD_STATE_IDLE = 0,
+		SD_STATE_READY,
+		SD_STATE_IDENT,
+		SD_STATE_STBY,
+		SD_STATE_TRAN,
+		SD_STATE_DATA,
+		SD_STATE_DATA_MULTI, // synthetical state for this implementation
+		SD_STATE_RCV,
+		SD_STATE_PRG,
+		SD_STATE_DIS,
+		SD_STATE_INA,
+
+		//FIXME Existing states wich must be revisited
 		SD_STATE_WRITE_WAITFE,
 		SD_STATE_WRITE_DATA
 	};
 
-	void send_data(int count);
-	void do_command();
+	void send_data(int count, sd_state new_state);
+	void do_command(u8 m_cmd[6]);
+	void change_state(sd_state m_new_state);
 
 	u8 m_data[520], m_cmd[6];
 	hard_disk_file *m_harddisk;
 
 	u8 m_in_latch, m_out_latch;
-	int m_cmd_ptr, m_state, m_out_ptr, m_out_count, m_ss, m_in_bit, m_cur_bit, m_write_ptr, m_blksize;
+	int m_cmd_ptr, m_out_ptr, m_out_count, m_ss, m_in_bit, m_cur_bit, m_write_ptr, m_blksize, m_blknext;
+	sd_state m_state;
 	bool m_bACMD;
 };
 
