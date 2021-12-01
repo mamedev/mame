@@ -6234,13 +6234,12 @@ int saturn_state::stv_vdp2_start ( void )
 	return 0;
 }
 
-/* maybe we should move this to video/stv.c */
 VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 {
 	int i;
 	m_screen->register_screen_bitmap(m_tmpbitmap);
 	stv_vdp2_start();
-	stv_vdp1_start();
+//	stv_vdp1_start();
 	m_vdpdebug_roz = 0;
 	m_gfxdecode->gfx(0)->set_source(m_vdp2.gfx_decode.get());
 	m_gfxdecode->gfx(1)->set_source(m_vdp2.gfx_decode.get());
@@ -6638,7 +6637,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	}
 
 	/* framebuffer interlace */
-	if ( (STV_VDP2_LSMD == 3) && m_vdp1.framebuffer_double_interlace == 0 )
+	if ( (STV_VDP2_LSMD == 3) && m_vdp1->read_fb_double_interlace_mode() )
 		interlace_framebuffer = 1;
 	else
 		interlace_framebuffer = 0;
@@ -6646,7 +6645,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	// Guess: astrass & findlove needs that the horizontal sprite size to be doubled
 	// Is it implied that VDP2 beams are scanning VDP1 framebuffer(s) on different speeds
 	// TODO: enable condition may not be right
-	if(STV_VDP1_TVM == 0 && STV_VDP2_HRES & 2)
+	if(m_vdp1->is_tvm_zero() && STV_VDP2_HRES & 2)
 		double_x = 1;
 	else
 		double_x = 0;
@@ -6672,7 +6671,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
 						continue;
 
-				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
+				framebuffer_line = m_vdp1->read_fb_display_lines(y);
 				bitmap_line = &bitmap.pix(y);
 
 				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
@@ -6765,7 +6764,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
 						continue;
 
-				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
+				framebuffer_line = m_vdp1->read_fb_display_lines(y);
 				bitmap_line = &bitmap.pix(y);
 
 				for ( x = cliprect.left(); x <= cliprect.right(); x++ )
@@ -6874,7 +6873,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
 					continue;
 
-			framebuffer_line = m_vdp1.framebuffer_display_lines[y];
+			framebuffer_line = m_vdp1->read_fb_display_lines(y);
 			if ( interlace_framebuffer == 0 )
 			{
 				bitmap_line = &bitmap.pix(y);

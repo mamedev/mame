@@ -1626,6 +1626,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn.cpp",
 	MAME_DIR .. "src/mame/video/segasaturn_vdp1.cpp",
+	MAME_DIR .. "src/mame/video/segasaturn_vdp1.h",
 	MAME_DIR .. "src/mame/video/segasaturn_vdp2.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.h",

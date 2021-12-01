@@ -20,6 +20,9 @@
 #include "machine/smpc.h"
 #include "machine/timer.h"
 
+#include "video/segasaturn_vdp1.h"
+//#include "video/segasaturn_vdp2.h"
+
 #include "sound/scsp.h"
 
 #include "debugger.h"
@@ -30,21 +33,23 @@ class saturn_state : public driver_device
 {
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_rom(*this, "bios"),
-			m_workram_l(*this, "workram_l"),
-			m_workram_h(*this, "workram_h"),
-			m_sound_ram(*this, "sound_ram"),
-			m_fake_comms(*this, "fake"),
-			m_maincpu(*this, "maincpu"),
-			m_slave(*this, "slave"),
-			m_audiocpu(*this, "audiocpu"),
-			m_scsp(*this, "scsp"),
-			m_smpc_hle(*this, "smpc"),
-			m_scu(*this, "scu"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_rom(*this, "bios")
+		, m_workram_l(*this, "workram_l")
+		, m_workram_h(*this, "workram_h")
+		, m_sound_ram(*this, "sound_ram")
+		, m_fake_comms(*this, "fake")
+		, m_maincpu(*this, "maincpu")
+		, m_slave(*this, "slave")
+		, m_audiocpu(*this, "audiocpu")
+		, m_vdp1(*this, "vdp1")
+//		, m_vdp2(*this, "vdp2")
+		, m_scsp(*this, "scsp")
+		, m_smpc_hle(*this, "smpc")
+		, m_scu(*this, "scu")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -74,8 +79,6 @@ protected:
 	std::unique_ptr<uint16_t[]>    m_vdp2_regs;
 	std::unique_ptr<uint32_t[]>    m_vdp2_vram;
 	std::unique_ptr<uint32_t[]>    m_vdp2_cram;
-	std::unique_ptr<uint32_t[]>    m_vdp1_vram;
-	std::unique_ptr<uint16_t[]>    m_vdp1_regs;
 
 	uint8_t     m_en_68k;
 
@@ -83,29 +86,6 @@ protected:
 	int       m_sinit_boost;
 	attotime  m_minit_boost_timeslice;
 	attotime  m_sinit_boost_timeslice;
-
-	struct {
-		std::unique_ptr<uint16_t * []> framebuffer_display_lines;
-		int       framebuffer_mode;
-		int       framebuffer_double_interlace;
-		int       fbcr_accessed;
-		int       framebuffer_width;
-		int       framebuffer_height;
-		int       framebuffer_current_display;
-		int       framebuffer_current_draw;
-		int       framebuffer_clear_on_next_frame;
-		rectangle system_cliprect;
-		rectangle user_cliprect;
-		std::unique_ptr<uint16_t []> framebuffer[2];
-		std::unique_ptr<uint16_t * []> framebuffer_draw_lines;
-		std::unique_ptr<uint8_t []> gfx_decode;
-		uint16_t    lopr;
-		uint16_t    copr;
-		uint16_t    ewdr;
-
-		int       local_x;
-		int       local_y;
-	}m_vdp1;
 
 	struct {
 		std::unique_ptr<uint8_t[]>      gfx_decode;
@@ -124,6 +104,7 @@ protected:
 	required_device<sh2_device> m_maincpu;
 	required_device<sh2_device> m_slave;
 	required_device<m68000_base_device> m_audiocpu;
+	required_device<saturn_vdp1_device> m_vdp1;
 	required_device<scsp_device> m_scsp;
 	required_device<smpc_hle_device> m_smpc_hle;
 	required_device<sega_scu_device> m_scu;
@@ -138,7 +119,6 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_slave_scanline);
 
 
-	TIMER_CALLBACK_MEMBER(vdp1_draw_end);
 	void saturn_soundram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t saturn_soundram_r(offs_t offset);
 	void minit_w(uint32_t data);
@@ -166,96 +146,6 @@ protected:
 	void saturn_vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void saturn_vdp2_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-
-	/* VDP1 */
-	void stv_set_framebuffer_config( void );
-	void stv_prepare_framebuffers( void );
-	void stv_vdp1_change_framebuffers( void );
-	void video_update_vdp1( void );
-	void stv_vdp1_process_list( void );
-	void stv_vdp1_set_drawpixel( void );
-
-	void stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite_type);
-	void stv_vdp1_draw_scaled_sprite(const rectangle &cliprect);
-	void stv_vdp1_draw_distorted_sprite(const rectangle &cliprect);
-	void stv_vdp1_draw_poly_line(const rectangle &cliprect);
-	void stv_vdp1_draw_line(const rectangle &cliprect);
-	int x2s(int v);
-	int y2s(int v);
-	void vdp1_fill_quad(const rectangle &cliprect, int patterndata, int xsize, const struct spoint *q);
-	void vdp1_fill_line(const rectangle &cliprect, int patterndata, int xsize, int32_t y, int32_t x1, int32_t x2, int32_t u1, int32_t u2, int32_t v1, int32_t v2);
-	void (saturn_state::*drawpixel)(int x, int y, int patterndata, int offsetcnt);
-	void drawpixel_poly(int x, int y, int patterndata, int offsetcnt);
-	void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt);
-	void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt);
-	void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt);
-	void drawpixel_generic(int x, int y, int patterndata, int offsetcnt);
-	void vdp1_fill_slope(const rectangle &cliprect, int patterndata, int xsize,
-							int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t *nx1, int32_t *nx2,
-							int32_t u1, int32_t u2, int32_t slu1, int32_t slu2, int32_t *nu1, int32_t *nu2,
-							int32_t v1, int32_t v2, int32_t slv1, int32_t slv2, int32_t *nv1, int32_t *nv2,
-							int32_t _y1, int32_t y2);
-	void stv_vdp1_setup_shading_for_line(int32_t y, int32_t x1, int32_t x2,
-												int32_t r1, int32_t g1, int32_t b1,
-												int32_t r2, int32_t g2, int32_t b2);
-	void stv_vdp1_setup_shading_for_slope(
-							int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t *nx1, int32_t *nx2,
-							int32_t r1, int32_t r2, int32_t slr1, int32_t slr2, int32_t *nr1, int32_t *nr2,
-							int32_t g1, int32_t g2, int32_t slg1, int32_t slg2, int32_t *ng1, int32_t *ng2,
-							int32_t b1, int32_t b2, int32_t slb1, int32_t slb2, int32_t *nb1, int32_t *nb2,
-							int32_t _y1, int32_t y2);
-	uint16_t stv_vdp1_apply_gouraud_shading( int x, int y, uint16_t pix );
-	void stv_vdp1_setup_shading(const struct spoint* q, const rectangle &cliprect);
-	uint8_t stv_read_gouraud_table( void );
-	void stv_clear_gouraud_shading(void);
-
-	void stv_clear_framebuffer( int which_framebuffer );
-	void stv_vdp1_state_save_postload( void );
-	int stv_vdp1_start ( void );
-
-	struct stv_vdp1_poly_scanline
-	{
-		int32_t   x[2];
-		int32_t   b[2];
-		int32_t   g[2];
-		int32_t   r[2];
-		int32_t   db;
-		int32_t   dg;
-		int32_t   dr;
-	};
-
-	struct stv_vdp1_poly_scanline_data
-	{
-		int32_t   sy, ey;
-		struct  stv_vdp1_poly_scanline scanline[512];
-	};
-
-	std::unique_ptr<struct stv_vdp1_poly_scanline_data> stv_vdp1_shading_data;
-
-	struct stv_vdp2_sprite_list
-	{
-		int CMDCTRL, CMDLINK, CMDPMOD, CMDCOLR, CMDSRCA, CMDSIZE, CMDGRDA;
-		int CMDXA, CMDYA;
-		int CMDXB, CMDYB;
-		int CMDXC, CMDYC;
-		int CMDXD, CMDYD;
-
-		int ispoly;
-
-	} stv2_current_sprite;
-
-	/* Gouraud shading */
-
-	struct _stv_gouraud_shading
-	{
-		/* Gouraud shading table */
-		uint16_t  GA;
-		uint16_t  GB;
-		uint16_t  GC;
-		uint16_t  GD;
-	} stv_gouraud_shading;
-
-	uint16_t m_sprite_colorbank;
 
 	/* VDP1 Framebuffer handling */
 	int      stv_sprite_priorities_used[8];
@@ -452,14 +342,6 @@ protected:
 // These two clocks are synthesized by the 315-5746
 #define MASTER_CLOCK_352 XTAL(14'318'181)*4
 #define MASTER_CLOCK_320 XTAL(14'318'181)*3.75
-#define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
-#define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
-#define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
-#define BEF_0   m_vdp1_regs[0x010/2]&=~0x0001
-#define STV_VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
-#define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
-#define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
-
 
 extern gfx_decode_entry const gfx_stv[];
 

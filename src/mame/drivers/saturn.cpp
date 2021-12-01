@@ -562,9 +562,9 @@ void sat_console_state::saturn_mem(address_map &map)
 	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::saturn_soundram_r), FUNC(sat_console_state::saturn_soundram_w));
 	map(0x05b00000, 0x05b00fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
 	/* VDP1 */
-	map(0x05c00000, 0x05c7ffff).rw(FUNC(sat_console_state::saturn_vdp1_vram_r), FUNC(sat_console_state::saturn_vdp1_vram_w));
-	map(0x05c80000, 0x05cbffff).rw(FUNC(sat_console_state::saturn_vdp1_framebuffer0_r), FUNC(sat_console_state::saturn_vdp1_framebuffer0_w));
-	map(0x05d00000, 0x05d0001f).rw(FUNC(sat_console_state::saturn_vdp1_regs_r), FUNC(sat_console_state::saturn_vdp1_regs_w));
+	map(0x05c00000, 0x05c7ffff).rw(m_vdp1, FUNC(saturn_vdp1_device::vram_r), FUNC(saturn_vdp1_device::vram_w));
+	map(0x05c80000, 0x05cbffff).rw(m_vdp1, FUNC(saturn_vdp1_device::framebuffer0_r), FUNC(saturn_vdp1_device::framebuffer0_w));
+	map(0x05d00000, 0x05d0001f).rw(m_vdp1, FUNC(saturn_vdp1_device::regs_r), FUNC(saturn_vdp1_device::regs_w));
 	map(0x05e00000, 0x05e7ffff).mirror(0x80000).rw(FUNC(sat_console_state::saturn_vdp2_vram_r), FUNC(sat_console_state::saturn_vdp2_vram_w));
 	map(0x05f00000, 0x05f7ffff).rw(FUNC(sat_console_state::saturn_vdp2_cram_r), FUNC(sat_console_state::saturn_vdp2_cram_w));
 	map(0x05f80000, 0x05fbffff).rw(FUNC(sat_console_state::saturn_vdp2_regs_r), FUNC(sat_console_state::saturn_vdp2_regs_w));
@@ -856,10 +856,12 @@ void sat_console_state::saturn(machine_config &config)
 	NVRAM(config, "nvram").set_custom_handler(FUNC(sat_console_state::nvram_init));
 
 	/* video hardware */
+	SATURN_VDP1(config, m_vdp1, 0);
+	m_vdp1->set_hostcpu(m_maincpu);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(MASTER_CLOCK_320/8, 427, 0, 320, 263, 0, 224);
 	m_screen->set_screen_update(FUNC(sat_console_state::screen_update_stv_vdp2));
-
 	PALETTE(config, m_palette).set_entries(2048+(2048*2)); //standard palette + extra memory for rgb brightness.
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stv);
