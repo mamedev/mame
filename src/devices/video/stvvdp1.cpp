@@ -438,19 +438,6 @@ uint32_t saturn_state::saturn_vdp1_framebuffer0_r(offs_t offset, uint32_t mem_ma
 	return result;
 }
 
-#ifdef UNUSED_FUNCTION
-void saturn_state::saturn_vdp1_framebuffer1_w(offs_t offset, uint32_t data)
-{
-	//popmessage ("STV VDP1 Framebuffer 1 WRITE offset %08x data %08x",offset, data);
-}
-
-uint32_t saturn_state::saturn_vdp1_framebuffer1_r()
-{
-	//popmessage ("STV VDP1 Framebuffer 1 READ offset %08x",offset);
-	return 0xffff;
-}
-#endif
-
 
 /*
 

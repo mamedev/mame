@@ -5597,7 +5597,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.transparency |= STV_TRANSPARENCY_ALPHA;
 		}
 
-		#ifdef UNUSED_FUNCTION
+#if 0
 		// old reference code
 		mycliprect = cliprect;
 
@@ -5608,7 +5608,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 			stv2_current_tilemap.window_control.enabled[0] = 0;
 			stv2_current_tilemap.window_control.enabled[1] = 0;
 		}
-		#endif
+#endif
 
 		stv2_current_tilemap.fade_control = fade_control;
 

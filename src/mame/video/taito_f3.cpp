@@ -729,7 +729,7 @@ u16 taito_f3_state::lineram_r(offs_t offset)
 
 void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	#ifdef UNUSED_FUNCTION
+#if 0
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
 	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
 	values.  I'm not sure what the real machine would do with these values, and this
@@ -750,7 +750,7 @@ void taito_f3_state::lineram_w(offs_t offset, u16 data, u16 mem_mask)
 			return;
 		}
 	}
-	#endif
+#endif
 
 	COMBINE_DATA(&m_line_ram[offset]);
 }
