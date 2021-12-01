@@ -1625,7 +1625,7 @@ files {
 	MAME_DIR .. "src/mame/includes/saturn.h",
 	MAME_DIR .. "src/mame/drivers/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn.cpp",
-	MAME_DIR .. "src/mame/drivers/saturn.cpp",
+	MAME_DIR .. "src/mame/video/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.h",
 }
