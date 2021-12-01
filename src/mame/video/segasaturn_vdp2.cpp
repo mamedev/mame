@@ -40,16 +40,20 @@ TODO (brief, concrete examples in SW list):
 - VRAM cycle pattern section needs to be better encapsulated and investigated thru real HW
   also cfr. several "minor GFX" glitches scattered across, kingbox on gameplay, columns Sega Ages
   logo;
-- Missing mosaic effect;
+- Missing mosaic effect
+  cfr. Saturn BIOS memory screens, capgen2 Choh Makai Mura map transitions (obviously); 
 - Per-scanline raster effects, at very least Color Offset section is eligible to those
   cfr. elevact2, ogrebatl, probably htheros missing crowd too;
 - ODD and H/V Counters needs to be fine tuned with real HW tests.
   Also PAL modes are wrong and basically untested;
 - Interlace Modes should be better emulated;
 - Verify Exclusive Screen Modes a.k.a. "VGA";
-- "Reduction Enable", a.k.a. zooming limiters;
-- A pletoria of other miscellaneous missing effects here and there,
+- Missing "Reduction Enable", a.k.a. zooming limiters;
+- A plethora of other miscellaneous missing effects here and there,
   cfr. most correlated notes near popmessage fns;
+- Shadow code handling, checkout portions marked with code smell
+  (double conditional over contradicting conditions!?)
+  also cfr. mfpool & voiceido gameplay;
 - Performance gets quite dire in some selected places, may be shared with VDP1, 
   may be useful to investigate culprit
   cfr. decathlt gameplay, kingobox main menu, htheros intro;
