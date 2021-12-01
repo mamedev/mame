@@ -12,9 +12,9 @@ class spi_sdcard_device : public device_t
 public:
 	// SPI 4-wire interface
 	auto spi_miso_callback() { return write_miso.bind(); }
-	void spi_clock_w(bool state);
-	void spi_ss_w(bool state) { m_ss = state; }
-	void spi_mosi_w(bool state) { m_in_bit = state; }
+	void spi_clock_w(int state);
+	void spi_ss_w(int state) { m_ss = state; }
+	void spi_mosi_w(int state) { m_in_bit = state; }
 
 	bool get_card_present() { return !(m_harddisk == nullptr); }
 
@@ -65,11 +65,11 @@ private:
 	u8 m_data[520], m_cmd[6];
 	hard_disk_file *m_harddisk;
 
+	int m_ss, m_in_bit;
 	u8 m_in_latch, m_out_latch, m_cur_bit;
 	u16 m_out_count, m_out_ptr, m_write_ptr, m_blksize;
 	u32 m_blknext;
-
-	bool m_ss, m_in_bit, m_bACMD;
+	bool m_bACMD;
 };
 
 class spi_sdcard_sdhc_device : public spi_sdcard_device

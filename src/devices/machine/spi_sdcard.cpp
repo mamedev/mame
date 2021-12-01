@@ -50,9 +50,10 @@ spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type 
 	m_image(*this, "image"),
 	m_state(SD_STATE_IDLE),
 	m_harddisk(nullptr),
+	m_ss(0), m_in_bit(0),
 	m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
 	m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_blksize(512), m_blknext(0),
-	m_ss(false), m_in_bit(false), m_bACMD(false)
+	m_bACMD(false)
 {
 }
 
@@ -108,7 +109,7 @@ void spi_sdcard_device::send_data(u16 count, sd_state new_state)
 	change_state(new_state);
 }
 
-void spi_sdcard_device::spi_clock_w(bool state)
+void spi_sdcard_device::spi_clock_w(int state)
 {
 	// only respond if selected
 	if (m_ss)
