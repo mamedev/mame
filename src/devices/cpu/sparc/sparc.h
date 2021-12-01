@@ -411,10 +411,12 @@ protected:
 	void dcache_data_map(address_map &map);
 
 	void update_addr_masks();
+	void update_wait_states();
 
 	devcb_read32::array<6> m_cs_r;
 	devcb_write32::array<6> m_cs_w;
 
+	u32 m_ssctrl;
 	u32 m_spmr;
 	u64 m_spmr_mask;
 	u32 m_arsr[6];

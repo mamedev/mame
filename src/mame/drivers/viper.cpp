@@ -1792,9 +1792,9 @@ TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-uint64_t viper_state::input_r(offs_t offset, uint64_t mem_mask)
+uint8_t viper_state::input_r(offs_t offset)
 {
+#if 0
 	uint64_t r = 0;
 	//return 0;//0x0000400000000000U;
 
@@ -1837,12 +1837,9 @@ uint64_t viper_state::input_r(offs_t offset, uint64_t mem_mask)
 	}
 
 	return r;
-}
-#endif
-
-uint8_t viper_state::input_r(offs_t offset)
-{
+#else
 	return (m_io_ports[offset & 7])->read();
+#endif
 }
 
 int viper_state::ds2430_insert_cmd_bit(int bit)

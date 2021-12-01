@@ -177,7 +177,7 @@ inline void pc6001_state::ppi_control_hack_w(uint8_t data)
 	else
 		m_port_c_8255 &= ~(1<<((data>>1)&0x07));
 
-	#ifdef UNUSED_FUNCTION
+#if 0
 	// this switch-case is overwritten below anyway!?
 	switch(data)
 	{
@@ -187,7 +187,7 @@ inline void pc6001_state::ppi_control_hack_w(uint8_t data)
 		case 0x0d: m_port_c_8255 &= 0xf7; break;
 		default: break;
 	}
-	#endif
+#endif
 
 	m_port_c_8255 |= 0xa8;
 }
@@ -942,7 +942,7 @@ void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, u8 data)
 	{
 		ppi_control_hack_w(data);
 
-		#ifdef UNUSED_FUNCTION
+#if 0
 		{
 			//printf("%02x\n",data);
 
@@ -951,7 +951,7 @@ void pc6001mk2sr_state::necsr_ppi8255_w(offs_t offset, u8 data)
 			if ((data & 0x0f) == 0x04)
 				m_bank1->set_base(m_region_gfx1->base());
 		}
-		#endif
+#endif
 	}
 
 	m_ppi->write(offset,data);
