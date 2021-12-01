@@ -1886,7 +1886,7 @@ msgstr "Grafika: neimplementovaná, "
 #: src/frontend/mame/ui/simpleselgame.cpp:363
 #: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Graphics: Imperfect, "
-msgstr "Grafika: nedokonalá, "
+msgstr "Grafika: nedostatočná, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:365
 #: src/frontend/mame/ui/selmenu.cpp:735

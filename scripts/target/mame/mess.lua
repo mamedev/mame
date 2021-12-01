@@ -3946,8 +3946,6 @@ files {
 createMESSProjects(_target, _subtarget, "teamconc")
 files {
 	MAME_DIR .. "src/mame/drivers/comquest.cpp",
-	MAME_DIR .. "src/mame/includes/comquest.h",
-	MAME_DIR .. "src/mame/video/comquest.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tectoy")
