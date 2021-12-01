@@ -22,7 +22,7 @@ Framebuffer todo:
 
 
 #include "emu.h"
-#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+#include "includes/saturn.h"
 
 
 #define VDP1_LOG 0
@@ -2321,10 +2321,6 @@ In other words,the first three types uses the offset and not the color allocated
     \-M Stores VDP1 ram contents from a file.
     \-N Stores VDP1 ram contents into a file.
 */
-
-#include "emu.h"
-#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
-
 
 #define DEBUG_MODE 0
 #define TEST_FUNCTIONS 0
