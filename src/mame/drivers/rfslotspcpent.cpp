@@ -15,7 +15,7 @@ Motherboard
   1GB RAM
   Compact Flash Transcend 512MB 20100202
 
-PCB coninage (monedero-billetero-hopper) R.F. 53452303
+PCB coinage (monedero-billetero-hopper) R.F. 53452303
   PIC18F448-I/P
   ULN2803A
   Xtal 12.000 MHz
@@ -33,7 +33,7 @@ PCB upper lights (luces superior) R.F. 53446002 LF
 
 PCB reels (rodillos) R.F. 53435604 LF
   PIC 18F2480
-  Xatl 12.000 MHz
+  Xtal 12.000 MHz
 
 PCB Sound R.F. 53422409 LF
   Empty sockets: SND1 U22 (40 pin), HIGH U1 (32 pin), LOW U3 (32 pin), RAM U6 (32 pin)
