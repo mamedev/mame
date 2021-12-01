@@ -56,7 +56,8 @@ private:
 		//FIXME Existing states wich must be revisited
 		SD_STATE_WRITE_WAITFE,
 		SD_STATE_WRITE_DATA
-	} m_state;
+	};
+	sd_state m_state;
 
 	void send_data(u16 count, sd_state new_state);
 	void do_command(u8 m_cmd[6]);
