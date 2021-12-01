@@ -79,10 +79,11 @@ Year   Game                PCB            NOTES
 	  MAME over a 10 minute period.
 
 	  No checks have been observed in Biomechanical Toy,
-	  the Maniac Square prototype, Last KM prototype, or the
-	  gym machines.  Big Karnk runs on a different board
-	  type and does fail if the CPU clock is set to 10Mhz
-	  rather than 12Mhz, but that could be unrelated.
+	  the Maniac Square prototype, or the Last KM prototype.
+
+	  Big Karnk runs on a different board type and does fail
+	  if the CPU clock is set to 10Mhz rather than 12Mhz,
+	  but that could be unrelated.
 
 ***************************************************************************/
 
