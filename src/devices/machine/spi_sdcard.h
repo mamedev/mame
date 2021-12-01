@@ -61,7 +61,7 @@ private:
 
 	void send_data(u16 count, sd_state new_state);
 	void do_command();
-	void change_state(sd_state m_new_state);
+	void change_state(sd_state new_state);
 
 	u8 m_data[520], m_cmd[6];
 	hard_disk_file *m_harddisk;

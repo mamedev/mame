@@ -422,10 +422,10 @@ void spi_sdcard_device::do_command()
 	}
 }
 
-void spi_sdcard_device::change_state(sd_state m_new_state)
+void spi_sdcard_device::change_state(sd_state new_state)
 {
 	// TODO validate if transition is valid using refs below.
 	// REF Figure 4-13:SD Memory Card State Diagram (Transition Mode)
 	// REF Table 4-35:Card State Transition Table
-	m_state = m_new_state;
+	m_state = new_state;
 }
