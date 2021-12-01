@@ -65,7 +65,6 @@ private:
 	void paletteram_w(offs_t offset, uint8_t data);
 	void output_w(uint8_t data);
 	void tile_bank_w(uint8_t data);
-	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void prg_map(address_map &map);
 };
@@ -86,12 +85,12 @@ uint32_t poker72_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	{
 		for (int x = 0; x < 64; x++)
 		{
-			int tile = ((m_vram[count + 1] & 0x0f) << 8 ) | (m_vram[count+0] & 0xff); //TODO: tile bank
+			int tile = ((m_vram[count + 1] & 0x0f) << 8 ) | (m_vram[count + 0] & 0xff); //TODO: tile bank
 			int fx = (m_vram[count + 1] & 0x10);
 			int fy = (m_vram[count + 1] & 0x20);
 			int color = (m_vram[count + 1] & 0xc0) >> 6;
 
-			tile|= m_tile_bank << 12;
+			tile |= m_tile_bank << 12;
 
 			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, color, fx, fy, x * 8, y * 8);
 
@@ -110,7 +109,7 @@ void poker72_state::paletteram_w(offs_t offset, uint8_t data)
 	int const g = m_pal[(offset & 0x3ff) + 0x400] & 0x3f;
 	int const b = m_pal[(offset & 0x3ff) + 0x800] & 0x3f;
 
-	m_palette->set_pen_color( offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
+	m_palette->set_pen_color(offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 void poker72_state::output_w(uint8_t data)
@@ -361,17 +360,6 @@ static GFXDECODE_START( gfx_poker72 )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-// default 444 palette for debug purpose
-void poker72_state::palette(palette_device &palette) const
-{
-	for (int x = 0; x < 0x100; x++)
-	{
-		int const r = (x & 0x0f);
-		int const g = (x & 0x3c) >> 2;
-		int const b = (x & 0xf0) >> 4;
-		palette.set_pen_color(x, rgb_t(pal4bit(r), pal4bit(g), pal4bit(b)));
-	}
-}
 
 void poker72_state::machine_reset()
 {
@@ -397,7 +385,7 @@ void poker72_state::poker72(machine_config &config)
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poker72);
-	PALETTE(config, m_palette, FUNC(poker72_state::palette), 0xe00);
+	PALETTE(config, m_palette).set_entries(0x400);
 
 	SPEAKER(config, "mono").front_center();
 
