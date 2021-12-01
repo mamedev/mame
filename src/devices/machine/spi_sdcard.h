@@ -12,16 +12,16 @@ class spi_sdcard_device : public device_t
 public:
 	// SPI 4-wire interface
 	auto spi_miso_callback() { return write_miso.bind(); }
-	void spi_clock_w(int state);
-	void spi_ss_w(int state) { m_ss = state; }
-	void spi_mosi_w(int state) { m_in_bit = state; }
+	void spi_clock_w(bool state);
+	void spi_ss_w(bool state) { m_ss = state; }
+	void spi_mosi_w(bool state) { m_in_bit = state; }
 
 	bool get_card_present() { return !(m_harddisk == nullptr); }
 
 	devcb_write_line write_miso;
 
 protected:
-	enum
+	enum sd_type : u8
 	{
 		SD_TYPE_V2 = 0,
 		SD_TYPE_HC
@@ -35,10 +35,10 @@ protected:
 
 	required_device<harddisk_image_device> m_image;
 
-	int m_type;
+	sd_type m_type;
 
 private:
-	enum sd_state
+	enum sd_state : u8
 	{
 		//REF Table 4-1:Overview of Card States vs. Operation Mode
 		SD_STATE_IDLE = 0,
@@ -56,19 +56,20 @@ private:
 		//FIXME Existing states wich must be revisited
 		SD_STATE_WRITE_WAITFE,
 		SD_STATE_WRITE_DATA
-	};
+	} m_state;
 
-	void send_data(int count, sd_state new_state);
+	void send_data(u16 count, sd_state new_state);
 	void do_command(u8 m_cmd[6]);
 	void change_state(sd_state m_new_state);
 
 	u8 m_data[520], m_cmd[6];
 	hard_disk_file *m_harddisk;
 
-	u8 m_in_latch, m_out_latch;
-	int m_cmd_ptr, m_out_ptr, m_out_count, m_ss, m_in_bit, m_cur_bit, m_write_ptr, m_blksize, m_blknext;
-	sd_state m_state;
-	bool m_bACMD;
+	u8 m_in_latch, m_out_latch, m_cur_bit;
+    u16 m_out_count, m_out_ptr, m_write_ptr, m_blksize;
+	u32 m_blknext;
+
+	bool m_ss, m_in_bit, m_bACMD;
 };
 
 class spi_sdcard_sdhc_device : public spi_sdcard_device

@@ -31,7 +31,7 @@
 
 #define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
-#define LOG_SPI (1U << 2)
+#define LOG_SPI     (1U << 2)
 
 //#define VERBOSE (LOG_COMMAND)
 #define LOG_OUTPUT_FUNC osd_printf_info
@@ -44,38 +44,39 @@ static constexpr u8 DATA_RESPONSE_IO_ERROR = 0x0d;
 DEFINE_DEVICE_TYPE(SPI_SDCARD, spi_sdcard_sdhc_device, "spi_sdhccard", "SDHC Card (SPI Interface)")
 DEFINE_DEVICE_TYPE(SPI_SDCARDV2, spi_sdcard_sdv2_device, "spi_sdv2card", "SDV2 Card (SPI Interface)")
 
-spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig,
-									 device_type type, const char *tag,
-									 device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock), write_miso(*this),
-	  m_image(*this, "image"), m_harddisk(nullptr), m_in_latch(0),
-	  m_out_latch(0xff), m_cmd_ptr(0), m_out_ptr(0), m_out_count(0),
-	  m_ss(0), m_in_bit(0), m_cur_bit(0), m_write_ptr(0), m_blksize(512),
-	  m_blknext(0), m_state(SD_STATE_IDLE), m_bACMD(false)
+spi_sdcard_device::spi_sdcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+        device_t(mconfig, type, tag, owner, clock),
+        write_miso(*this),
+        m_image(*this, "image"),
+        m_state(SD_STATE_IDLE),
+        m_harddisk(nullptr),
+        m_in_latch(0), m_out_latch(0xff), m_cur_bit(0),
+        m_out_count(0), m_out_ptr(0), m_write_ptr(0), m_blksize(512), m_blknext(0),
+        m_ss(false), m_in_bit(false), m_bACMD(false)
 {
 }
 
-spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
+spi_sdcard_sdv2_device::spi_sdcard_sdv2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+        spi_sdcard_device(mconfig, SPI_SDCARDV2, tag, owner, clock)
 {
 	m_type = SD_TYPE_V2;
 }
 
-spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
+spi_sdcard_sdhc_device::spi_sdcard_sdhc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock):
+        spi_sdcard_device(mconfig, SPI_SDCARD, tag, owner, clock)
 {
 	m_type = SD_TYPE_HC;
 }
 
 ALLOW_SAVE_TYPE(spi_sdcard_device::sd_state);
+ALLOW_SAVE_TYPE(spi_sdcard_device::sd_type);
 
 void spi_sdcard_device::device_start()
 {
 	write_miso.resolve_safe();
+	save_item(NAME(m_state));
 	save_item(NAME(m_in_latch));
 	save_item(NAME(m_out_latch));
-	save_item(NAME(m_cmd_ptr));
-	save_item(NAME(m_state));
 	save_item(NAME(m_out_ptr));
 	save_item(NAME(m_out_count));
 	save_item(NAME(m_ss));
@@ -100,14 +101,14 @@ void spi_sdcard_device::device_add_mconfig(machine_config &config)
 	HARDDISK(config, m_image).set_interface("spi_sdcard");
 }
 
-void spi_sdcard_device::send_data(int count, sd_state new_state)
+void spi_sdcard_device::send_data(u16 count, sd_state new_state)
 {
 	m_out_ptr = 0;
 	m_out_count = count;
 	change_state(new_state);
 }
 
-void spi_sdcard_device::spi_clock_w(int state)
+void spi_sdcard_device::spi_clock_w(bool state)
 {
 	// only respond if selected
 	if (m_ss)
@@ -128,7 +129,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 			if (m_cur_bit == 8)
 			{
 				LOGMASKED(LOG_SPI, "SDCARD: got %02x\n", m_in_latch);
-				for (int i = 0; i < 5; i++)
+				for (u8 i = 0; i < 5; i++)
 				{
 					m_cmd[i] = m_cmd[i + 1];
 				}
@@ -154,7 +155,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 					m_data[m_write_ptr++] = m_in_latch;
 					if (m_write_ptr == (m_blksize + 2))
 					{
-						u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+						u32 blk = ((u32) m_cmd[1] << 24) | ((u32) m_cmd[2] << 16) | ((u32) m_cmd[3] << 8) | (u32) m_cmd[4];
 						if (m_type == SD_TYPE_V2)
 						{
 							blk /= m_blksize;
@@ -223,7 +224,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 
 void spi_sdcard_device::do_command(u8 m_cmd[6])
 {
-	if ((((m_cmd[0] & 0xc0) == 0x40) && (m_cmd[5] & 1)))
+	if (((m_cmd[0] & 0xc0) == 0x40) && (m_cmd[5] & 1))
 	{
 		LOGMASKED(LOG_COMMAND, "SDCARD: cmd %02d %02x %02x %02x %02x %02x\n", m_cmd[0] & 0x3f, m_cmd[1], m_cmd[2], m_cmd[3], m_cmd[4], m_cmd[5]);
 		bool clean_cmd = true;
@@ -289,7 +290,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 			break;
 
 		case 16: // CMD16 - SET_BLOCKLEN
-			m_blksize = (m_cmd[3] << 8) | m_cmd[4];
+			m_blksize = ((u16) m_cmd[3] << 8) | (u16) m_cmd[4];
 			if (hard_disk_set_block_size(m_harddisk, m_blksize))
 			{
 				m_data[0] = 0;
@@ -314,7 +315,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 				// byte of space between R1 and the data packet.
 				m_data[1] = 0xff;
 				m_data[2] = 0xfe; // data token
-				u32 blk = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+				u32 blk = ((u32) m_cmd[1] << 24) | ((u32) m_cmd[2] << 16) | ((u32) m_cmd[3] << 8) | (u32) m_cmd[4];
 				if (m_type == SD_TYPE_V2)
 				{
 					blk /= m_blksize;
@@ -342,7 +343,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 				// data token occurs some time after the R1 response.  A2SD
 				// expects at least 1 byte of space between R1 and the data
 				// packet.
-				m_blknext = (m_cmd[1] << 24) | (m_cmd[2] << 16) | (m_cmd[3] << 8) | m_cmd[4];
+				m_blknext = ((u32) m_cmd[1] << 24) | ((u32) m_cmd[2] << 16) | ((u32) m_cmd[3] << 8) | (u32) m_cmd[4];
 				if (m_type == SD_TYPE_V2)
 				{
 					m_blknext /= m_blksize;
@@ -412,7 +413,7 @@ void spi_sdcard_device::do_command(u8 m_cmd[6])
 
 		if (clean_cmd)
 		{
-			for (int i = 0; i < 6; i++)
+			for (u8 i = 0; i < 6; i++)
 			{
 				m_cmd[i] = 0xff;
 			}
