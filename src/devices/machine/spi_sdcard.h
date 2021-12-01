@@ -60,7 +60,7 @@ private:
 	sd_state m_state;
 
 	void send_data(u16 count, sd_state new_state);
-	void do_command(u8 m_cmd[6]);
+	void do_command();
 	void change_state(sd_state m_new_state);
 
 	u8 m_data[520], m_cmd[6];

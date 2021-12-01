@@ -139,7 +139,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 				switch (m_state)
 				{
 				case SD_STATE_IDLE:
-					do_command(m_cmd);
+					do_command();
 					break;
 
 				case SD_STATE_WRITE_WAITFE:
@@ -178,7 +178,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 					break;
 
 				case SD_STATE_DATA_MULTI:
-					do_command(m_cmd);
+					do_command();
 					if (m_state == SD_STATE_DATA_MULTI && m_out_count == 0)
 					{
 						m_data[0] = 0xfe; // data token
@@ -194,7 +194,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 				default:
 					if (((m_cmd[0] & 0x70) == 0x40) || (m_out_count == 0)) // CMD0 - GO_IDLE_STATE
 					{
-						do_command(m_cmd);
+						do_command();
 					}
 					break;
 				}
@@ -223,7 +223,7 @@ void spi_sdcard_device::spi_clock_w(int state)
 	}
 }
 
-void spi_sdcard_device::do_command(u8 m_cmd[6])
+void spi_sdcard_device::do_command()
 {
 	if (((m_cmd[0] & 0xc0) == 0x40) && (m_cmd[5] & 1))
 	{
