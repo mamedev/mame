@@ -18,27 +18,31 @@
 
 DEFINE_DEVICE_TYPE(MIDIIN, midiin_device, "midiin", "MIDI In image device")
 
+namespace {
+
 INPUT_PORTS_START(midiin)
 	PORT_START("CFG")
-	PORT_CONFNAME(0xff, 0xff, "MIDI In channel")
-	PORT_CONFSETTING(   0xff, "All")
-	PORT_CONFSETTING(   0x00, "1")
-	PORT_CONFSETTING(   0x01, "2")
-	PORT_CONFSETTING(   0x02, "3")
-	PORT_CONFSETTING(   0x03, "4")
-	PORT_CONFSETTING(   0x04, "5")
-	PORT_CONFSETTING(   0x05, "6")
-	PORT_CONFSETTING(   0x06, "7")
-	PORT_CONFSETTING(   0x07, "8")
-	PORT_CONFSETTING(   0x08, "9")
-	PORT_CONFSETTING(   0x09, "10")
-	PORT_CONFSETTING(   0x0a, "11")
-	PORT_CONFSETTING(   0x0b, "12")
-	PORT_CONFSETTING(   0x0c, "13")
-	PORT_CONFSETTING(   0x0d, "14")
-	PORT_CONFSETTING(   0x0e, "15")
-	PORT_CONFSETTING(   0x0f, "16")
+	PORT_CONFNAME(0xff, 0xff, "MIDI file mode")
+	PORT_CONFSETTING(   0xff, "Multi")
+	PORT_CONFSETTING(   0x00, "Poly: Channel 1")
+	PORT_CONFSETTING(   0x01, "Poly: Channel 2")
+	PORT_CONFSETTING(   0x02, "Poly: Channel 3")
+	PORT_CONFSETTING(   0x03, "Poly: Channel 4")
+	PORT_CONFSETTING(   0x04, "Poly: Channel 5")
+	PORT_CONFSETTING(   0x05, "Poly: Channel 6")
+	PORT_CONFSETTING(   0x06, "Poly: Channel 7")
+	PORT_CONFSETTING(   0x07, "Poly: Channel 8")
+	PORT_CONFSETTING(   0x08, "Poly: Channel 9")
+	PORT_CONFSETTING(   0x09, "Poly: Channel 10")
+	PORT_CONFSETTING(   0x0a, "Poly: Channel 11")
+	PORT_CONFSETTING(   0x0b, "Poly: Channel 12")
+	PORT_CONFSETTING(   0x0c, "Poly: Channel 13")
+	PORT_CONFSETTING(   0x0d, "Poly: Channel 14")
+	PORT_CONFSETTING(   0x0e, "Poly: Channel 15")
+	PORT_CONFSETTING(   0x0f, "Poly: Channel 16")
 INPUT_PORTS_END
+
+} // anonymous namespace
 
 /*-------------------------------------------------
     ctor
