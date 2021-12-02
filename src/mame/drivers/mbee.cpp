@@ -77,7 +77,7 @@ from Brett Selwood and Andrew Davies.
     - Most versions of Telcom can have their parameters adjusted directly from Basic,
       without needing to enter the Telcom program.
     - Most versions of Telcom have an optional clock. In older models firstly select VS
-      from the MESS config menu, then enter NET CLOCK to enable it. NET TIME hhmm to set
+      from the MAME config menu, then enter NET CLOCK to enable it. NET TIME hhmm to set
       the time (24hour format). NET CLOCKD is supposed to remove the status line, but it
       doesn't, although the clock stops updating. NET CLOCK and NET CLOCKD are toggles.
     - Telcom 1.2 (used in mbeeic) has a bug. If you enter NET CLOCK, the status line is
@@ -106,7 +106,7 @@ from Brett Selwood and Andrew Davies.
 
     FDC:   (TODO: see if these bugs still exist)
     - B drive doesn't work with most disks.
-    - some disks cause MESS to freeze.
+    - some disks cause MAME to freeze.
 
     - 128k: Simply Write has no keyboard.
 

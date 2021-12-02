@@ -437,7 +437,7 @@ void at_state::init_at_common(int xmsbase)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	/* MESS managed RAM */
+	/* managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
 	if (m_ram->size() > xmsbase)

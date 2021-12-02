@@ -354,7 +354,6 @@ void nick_device::initialize_palette()
 	}
 }
 
-// MESS specific
 /* 8-bit pixel write! */
 void nick_device::write_pixel(int ci)
 {

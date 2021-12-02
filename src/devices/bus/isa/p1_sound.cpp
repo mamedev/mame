@@ -6,9 +6,6 @@
 
     Memory-mapped, uses IRQ3 and IRQ7, no DMA.
 
-    Copyright MESS Team.
-    Visit https://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #include "emu.h"

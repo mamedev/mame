@@ -99,7 +99,7 @@
     # Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
     - Fantasian
     * Final Zone
-    # Final Zone (demo) (REGRESSION: asserts at MESS boot)
+    # Final Zone (demo) (REGRESSION: asserts at MAME boot)
     - Fruit Panic
     - FSD Sample Ongaku Shuu Vol. 1-7
     - Gaia no Kiba (Disk I/O error at 150)

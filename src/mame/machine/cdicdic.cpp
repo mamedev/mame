@@ -1331,13 +1331,13 @@ void cdicdic_device::device_reset()
 
 	if (m_cdrom_dev)
 	{
-		// MESS case (has CDROM device)
+		// Console case (has CDROM device)
 		m_cd = m_cdrom_dev->get_cdrom_file();
 		m_cdda->set_cdrom(m_cd);
 	}
 	else
 	{
-		// MAME case
+		// Arcade case
 		m_cd = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 		m_cdda->set_cdrom(m_cd);
 	}

@@ -497,7 +497,7 @@ void running_machine::schedule_soft_reset()
 //-------------------------------------------------
 //  get_statename - allow to specify a subfolder of
 //  the state directory for state loading/saving,
-//  very useful for MESS and consoles or computers
+//  very useful for consoles or computers
 //  where you can have separate folders for diff
 //  software
 //-------------------------------------------------

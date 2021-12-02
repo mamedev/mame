@@ -44304,7 +44304,7 @@ license:CC0
 	</software>
 
 <!-- The Demo Boy II was a display unit for the Game Boy ( see http://my.ais.net/~xtreme/SF/NES/demoboy/README.TXT ) containing a NES CPU + PPU + MMC5A.
-We should eventually add it to MESS as a separate driver with a NES CPU and a GB CPU! -->
+We should eventually add it to MAME as a separate driver with a NES CPU and a GB CPU! -->
 	<software name="demoboy2" supported="no">
 		<description>Demo Boy II</description>
 		<year>19??</year>

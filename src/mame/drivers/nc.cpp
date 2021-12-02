@@ -2,8 +2,6 @@
 // copyright-holders:Wilbert Pol, Kevin Thacker
 /******************************************************************************
 
-        nc.cpp
-
         NC100/NC150/NC200 Notepad computer
 
         system driver
@@ -83,15 +81,11 @@
         Self Test:
 
         - requires memory save and real time clock save to be working!
-        (i.e. for MESS nc100 driver, nc100.nv can be created)
+        (i.e. for MAME nc100 driver, nc100.nv can be created)
         - turn off nc (use NMI button)
         - reset+FUNCTION+SYMBOL must be pressed together.
 
         Note: NC200 Self test does not test disc hardware :(
-
-
-
-        Kevin Thacker [MESS driver]
 
  ******************************************************************************/
 

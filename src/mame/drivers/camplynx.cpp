@@ -704,7 +704,7 @@ void camplynx_state::port80_w(u8 data)
 /* DAC port (6-bit). If writing cassette, output goes to tape as a sine wave, otherwise it goes to speaker.
    There is code below to write as a sine wave or a square wave, both work and can be loaded successfully.
    However the PALE emulator cannot load either of them, although it loads its own output.
-   MESS can load PALE's wav files though.
+   MAME can load PALE's wav files though.
    Currently square wave output is selected. */
 
 void camplynx_state::port84_w(u8 data)

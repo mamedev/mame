@@ -78,7 +78,7 @@ private:
 
 /*************************************
  *
- *  Video (copied from MESS apart from support
+ *  Video (copied from spectrum driver apart from support
  *  for changing border color mid-frame)
  *
  *************************************/
