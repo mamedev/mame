@@ -2095,6 +2095,7 @@ u8 apple2e_state::c000_r(offs_t offset)
 			{
 				return (m_sysconfig->read() & 0x80) | uFloatingBus7;
 			}
+			break;
 
 		case 0x60: // cassette in
 		case 0x68:
