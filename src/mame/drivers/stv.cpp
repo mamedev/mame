@@ -1144,7 +1144,6 @@ void stv_state::stv(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom"); /* Actually AK93C45F */
 
 	/* video hardware */
-	// standard palette + extra memory for Color Offset
 	constexpr XTAL pixel_clock = MASTER_CLOCK_320 / 8;
 
 	SATURN_VDP1(config, m_vdp1, pixel_clock);
