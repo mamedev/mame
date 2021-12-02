@@ -1,0 +1,28 @@
+ColumnLimit: 100
+IndentWidth: 4
+AccessModifierOffset: -4
+
+AllowShortIfStatementsOnASingleLine: true
+PointerAlignment: Left
+AllowShortBlocksOnASingleLine: Always
+AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: None
+BreakBeforeBraces: Custom
+AlwaysBreakTemplateDeclarations: true
+BraceWrapping:
+  SplitEmptyFunction: false
+  AfterCaseLabel: true
+  AfterClass: false
+  AfterControlStatement: MultiLine
+  AfterEnum: false
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: true
+  BeforeElse: true
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+AllowAllConstructorInitializersOnNextLine: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+IndentPPDirectives: AfterHash

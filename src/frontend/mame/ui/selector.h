@@ -38,7 +38,7 @@ protected:
 	virtual bool custom_ui_cancel() override { return !m_search.empty(); }
 
 private:
-	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
+	enum { VISIBLE_ITEMS_IN_SEARCH = 200 };
 
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle(event const *ev) override;
@@ -50,9 +50,9 @@ private:
 	std::function<void (int)>      m_handler;
 	std::vector<std::u32string>    m_ucs_items;
 	int                            m_initial;
-	std::string                    *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
+	std::string                    *m_searchlist[VISIBLE_ITEMS_IN_SEARCH + 1];
 };
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_SELECTOR_H */
+#endif // MAME_FRONTEND_UI_SELECTOR_H
