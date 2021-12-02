@@ -9,13 +9,17 @@
 
 #pragma once
 
+#include "dirom.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // ======================> gt913_sound_device
 
-class gt913_sound_device : public device_t, public device_sound_interface, public device_memory_interface
+class gt913_sound_device : public device_t,
+	public device_sound_interface,
+	public device_rom_interface<21, 1, 0, ENDIANNESS_BIG>
 {
 public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
@@ -36,15 +40,10 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
 
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-	address_space_config m_data_config;
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 private:
-	memory_access<21, 1, 0, ENDIANNESS_BIG>::cache m_cache;
-	required_region_ptr<u16> m_rom;
-
 	sound_stream *m_stream;
 
 	u8 m_gain;

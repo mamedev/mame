@@ -47,22 +47,12 @@ const s8 gt913_sound_device::sample_7_to_8[128] =
 gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, GT913_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_memory_interface(mconfig, *this)
-	, m_data_config("data", ENDIANNESS_BIG, 16, 21)
-	, m_rom(*this, DEVICE_SELF_OWNER)
+	, device_rom_interface(mconfig, *this)
 {
-}
-
-device_memory_interface::space_config_vector gt913_sound_device::memory_space_config() const
-{
-	return space_config_vector{ std::make_pair(0, &m_data_config) };
 }
 
 void gt913_sound_device::device_start()
 {
-	space(0).install_rom(0x000000, m_rom.bytes() - 1, m_rom.target());
-	space(0).cache(m_cache);
-
 	m_stream = stream_alloc(0, 2, clock());
 
 	save_item(NAME(m_gain));
@@ -119,13 +109,18 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 	}
 }
 
+void gt913_sound_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
 void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 {
 	// update sample position
 	voice.m_addr_frac += voice.m_pitch;
-	while (voice.m_addr_frac >= (1 << 23))
+	while (voice.m_addr_frac >= (1 << 25))
 	{
-		voice.m_addr_frac -= (1 << 23);
+		voice.m_addr_frac -= (1 << 25);
 		update_sample(voice);
 	}
 
@@ -145,7 +140,7 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 		voice.m_volume_current = voice.m_volume_target;
 	}
 
-	const u8 step = (voice.m_addr_frac >> 20) & 7;
+	const u8 step = (voice.m_addr_frac >> 22) & 7;
 	const u16 gain = (voice.m_volume_current >> 24) * voice.m_gain;
 	const s32 sample = ((voice.m_sample + (voice.m_sample_next * step / 8)) * gain) >> 4;
 
@@ -162,12 +157,12 @@ void gt913_sound_device::update_sample(voice_t& voice)
 	{
 		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
 		
-		voice.m_sample_next = m_cache.read_word(addr_loop_data) - voice.m_sample;
-		voice.m_exp = m_cache.read_word(addr_loop_data + 10) & 7;
+		voice.m_sample_next = read_word(addr_loop_data) - voice.m_sample;
+		voice.m_exp = read_word(addr_loop_data + 10) & 7;
 	}
 	else
 	{
-		const u16 word = m_cache.read_word(voice.m_addr_current & ~1);
+		const u16 word = read_word(voice.m_addr_current & ~1);
 		s16 delta = 0;
 
 		if (!BIT(voice.m_addr_current, 0))
@@ -289,7 +284,7 @@ void gt913_sound_device::command_w(u16 data)
 
 			voice.m_volume_target = (m_data[0] & 0x7f00) << 16;
 			const u8 x = m_data[0] & 0xff;
-			voice.m_volume_rate = 8 * x * x * x;
+			voice.m_volume_rate = 2 * x * x * x;
 		}
 	}
 	else if (voicecmd == 0x2028)
