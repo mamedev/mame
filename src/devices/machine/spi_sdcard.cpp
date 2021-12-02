@@ -245,11 +245,11 @@ void spi_sdcard_device::do_command()
 			break;
 
 		case 8:					  // CMD8 - SEND_IF_COND (SD v2 only)
-			m_data[0] = 0;		  // 0x01;
-			m_data[1] = m_cmd[1]; // 0;
-			m_data[2] = m_cmd[2]; // 0;
-			m_data[3] = m_cmd[3]; // 0x01;
-			m_data[4] = m_cmd[4]; // 0xaa;
+			m_data[0] = 0x01;
+			m_data[1] = 0;
+			m_data[2] = 0;
+			m_data[3] = 0x01;
+			m_data[4] = 0xaa;
 			send_data(5, SD_STATE_IDLE);
 			break;
 
