@@ -11,24 +11,10 @@
 
 #pragma once
 
-#include "machine/z80daisy.h"
 #include "machine/pdp11.h"
+#include "machine/z80daisy.h"
+
 #include "diserial.h"
-
-
-/* registers */
-
-#define DLRCSR_RD       (CSR_DONE|CSR_IE)
-#define DLRCSR_WR       (CSR_IE)
-
-#define DLRBUF_ERR      0100000
-#define DLRBUF_OVR      0040000
-#define DLRBUF_RBRK     0020000
-#define DLRBUF_PERR     0020000
-
-#define DLTCSR_XBRK     0000001
-#define DLTCSR_RD       (CSR_DONE|CSR_IE|DLTCSR_XBRK)
-#define DLTCSR_WR       (CSR_IE|DLTCSR_XBRK)
 
 
 /***************************************************************************
@@ -78,6 +64,20 @@ protected:
 	virtual void z80daisy_irq_reti() override;
 
 private:
+	/* registers */
+
+	static constexpr uint16_t DLRCSR_RD      = CSR_DONE | CSR_IE;
+	static constexpr uint16_t DLRCSR_WR      = CSR_IE;
+
+	static constexpr uint16_t DLRBUF_ERR     = 0100000;
+	static constexpr uint16_t DLRBUF_OVR     = 0040000;
+	static constexpr uint16_t DLRBUF_RBRK    = 0020000;
+	static constexpr uint16_t DLRBUF_PERR    = 0020000;
+
+	static constexpr uint16_t DLTCSR_XBRK    = 0000001;
+	static constexpr uint16_t DLTCSR_RD      = CSR_DONE | CSR_IE | DLTCSR_XBRK;
+	static constexpr uint16_t DLTCSR_WR      = CSR_IE | DLTCSR_XBRK;
+
 	devcb_write_line   m_write_txd;
 	devcb_write_line   m_write_rxrdy;
 	devcb_write_line   m_write_txrdy;

@@ -601,7 +601,7 @@ msgstr "Zariadenie ovládajúce pedál"
 
 #: src/frontend/mame/ui/submenu.cpp:106
 msgid "Adstick Device Assignment"
-msgstr ""
+msgstr "Zariadenie ovládajúce analógový joystick"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
@@ -1530,12 +1530,12 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:254
 msgid "Coin %1$c: NA%3$s\n"
-msgstr "Minca %1$c: NA%3$s\n"
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:254
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "Minca %1$c: %2$d%3$s\n"
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:257
 msgid " (locked)"
@@ -3533,7 +3533,7 @@ msgstr "Hráč 1 Štart"
 #: src/emu/inpttype.ipp:51
 msgctxt "input-name"
 msgid "P1 Select"
-msgstr ""
+msgstr "Hráč 1 Select"
 
 #: src/emu/inpttype.ipp:56
 msgctxt "input-name"
@@ -4003,7 +4003,7 @@ msgstr "Hráč 2 Štart"
 #: src/emu/inpttype.ipp:169
 msgctxt "input-name"
 msgid "P2 Select"
-msgstr ""
+msgstr "Hráč 2 Select"
 
 #: src/emu/inpttype.ipp:174
 msgctxt "input-name"
@@ -4348,7 +4348,7 @@ msgstr "Hráč 3 Štart"
 #: src/emu/inpttype.ipp:250
 msgctxt "input-name"
 msgid "P3 Select"
-msgstr ""
+msgstr "Hráč 3 Select"
 
 #: src/emu/inpttype.ipp:255
 msgctxt "input-name"
@@ -4498,7 +4498,7 @@ msgstr "Hráč 4 Štart"
 #: src/emu/inpttype.ipp:284
 msgctxt "input-name"
 msgid "P4 Select"
-msgstr ""
+msgstr "Hráč 4 Select"
 
 #: src/emu/inpttype.ipp:289
 msgctxt "input-name"
@@ -4648,7 +4648,7 @@ msgstr "Hráč 5 Štart"
 #: src/emu/inpttype.ipp:318
 msgctxt "input-name"
 msgid "P5 Select"
-msgstr ""
+msgstr "Hráč 5 Select"
 
 #: src/emu/inpttype.ipp:323
 msgctxt "input-name"
@@ -4798,7 +4798,7 @@ msgstr "Hráč 6 Štart"
 #: src/emu/inpttype.ipp:352
 msgctxt "input-name"
 msgid "P6 Select"
-msgstr ""
+msgstr "Hráč 6 Select"
 
 #: src/emu/inpttype.ipp:357
 msgctxt "input-name"
@@ -4948,7 +4948,7 @@ msgstr "Hráč 7 Štart"
 #: src/emu/inpttype.ipp:386
 msgctxt "input-name"
 msgid "P7 Select"
-msgstr ""
+msgstr "Hráč 7 Select"
 
 #: src/emu/inpttype.ipp:391
 msgctxt "input-name"
@@ -5098,7 +5098,7 @@ msgstr "Hráč 8 Štart"
 #: src/emu/inpttype.ipp:420
 msgctxt "input-name"
 msgid "P8 Select"
-msgstr ""
+msgstr "Hráč 8 Select"
 
 #: src/emu/inpttype.ipp:425
 msgctxt "input-name"
@@ -5248,7 +5248,7 @@ msgstr "Hráč 9 Štart"
 #: src/emu/inpttype.ipp:454
 msgctxt "input-name"
 msgid "P9 Select"
-msgstr ""
+msgstr "Hráč 9 Select"
 
 #: src/emu/inpttype.ipp:459
 msgctxt "input-name"
@@ -5398,7 +5398,7 @@ msgstr "Hráč 10 Štart"
 #: src/emu/inpttype.ipp:488
 msgctxt "input-name"
 msgid "P10 Select"
-msgstr ""
+msgstr "Hráč 10 Select"
 
 #: src/emu/inpttype.ipp:493
 msgctxt "input-name"
@@ -7455,22 +7455,22 @@ msgstr ""
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "Systémový čas"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "Emulovaný čas"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "Referencia"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
 msgid "Current time"
-msgstr ""
+msgstr "Uplynutý čas"
 
 #: plugins/timer/init.lua:40
 msgctxt "plugin-timer"
