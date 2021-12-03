@@ -902,7 +902,7 @@ bool imgtool_validitychecks(void)
 			if ((!module->createimage_optguide && !module->createimage_optspec.empty())
 				|| (module->createimage_optguide && module->createimage_optspec.empty()))
 			{
-				util::stream_format(std::wcerr, L"imgtool module %s does has partially incomplete creation options\n", wstring_from_utf8(module->name));
+				util::stream_format(std::wcerr, L"imgtool module %s has partially incomplete creation options\n", wstring_from_utf8(module->name));
 				error = true;
 			}
 
@@ -2251,7 +2251,7 @@ imgtool::directory::directory(imgtool::partition &partition)
 	if (partition.m_directory_extra_bytes > 0)
 	{
 		m_extra_bytes = std::make_unique<uint8_t[]>(partition.m_directory_extra_bytes);
-		memset(m_extra_bytes.get(), 0, sizeof(m_extra_bytes.get()[0] * partition.m_directory_extra_bytes));
+		memset(m_extra_bytes.get(), 0, sizeof(m_extra_bytes[0]) * partition.m_directory_extra_bytes);
 	}
 }
 

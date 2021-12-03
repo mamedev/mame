@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+-->
+<mamelayout version="2">
+
+<!-- NOTE: no chesspieces simulation here -->
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.15" green="1.0" blue="0.05" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="1"><color red="0.15" green="1.0" blue="0.05" /></disk>
+		<disk state="0"><color red="0.015" green="0.1" blue="0.005" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds x="-1.5" y="10" width="20.5" height="8" />
+
+		<element name="digit4" ref="digit"><bounds x="-0.9" y="11" width="4" height="6" /></element>
+		<element name="digit3" ref="digit"><bounds x="3.8" y="11" width="4" height="6" /></element>
+		<element name="digit1" ref="digit"><bounds x="9.7" y="11" width="4" height="6" /></element>
+		<element name="digit0" ref="digit"><bounds x="14.4" y="11" width="4" height="6" /></element>
+
+		<element name="2.0" ref="led"><bounds x="8.6" y="12.0" width="0.6" height="0.6" /></element>
+		<element name="2.3" ref="led"><bounds x="8.4" y="15.5" width="0.6" height="0.6" /></element>
+	</view>
+</mamelayout>

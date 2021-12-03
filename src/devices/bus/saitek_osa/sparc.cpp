@@ -8,15 +8,22 @@ Saitek OSA Module: Kasparov Sparc (1993)
 The chess engine is by the Spracklen's. Their last, and also their strongest.
 
 Hardware notes:
-- Fujitsu MB86930 SPARClite @ 20MHz
+- Fujitsu MB86930-20 SPARClite @ 20MHz
 - 256KB ROM (4*AMD AM27C512)
 - 1MB DRAM (8*NEC 424256-60), expandable to 4MB
 
 The module doesn't have its own LCD screen. It has a grill+fan underneath
 at the front part, and a heatsink on the CPU.
 
+About expanded RAM: The 4MB expansion mentioned in the manual works well,
+but it doesn't look like the software was designed to work with other options.
+At 2MB it doesn't work at all. At 8MB or 16MB it becomes very inefficient,
+only using 5MB or 9MB of the available RAM for hash tables.
+
 TODO:
-- skeleton device, missing SPARClite emulation, maybe only needs the MMU?
+- runs too slow? solving mate problems is around 60% slower than real device,
+  maybe cpu cache related?
+- opening book moves take 3 around seconds per ply, should be almost immediate
 
 ***************************************************************************/
 
@@ -34,15 +41,31 @@ DEFINE_DEVICE_TYPE(OSA_SPARC, saitekosa_sparc_device, "osa_sparc", "Sparc")
 saitekosa_sparc_device::saitekosa_sparc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, OSA_SPARC, tag, owner, clock),
 	device_saitekosa_expansion_interface(mconfig, *this),
-	m_maincpu(*this, "maincpu")
+	m_maincpu(*this, "maincpu"),
+	m_rom(*this, "maincpu"),
+	m_ram(*this, "ram")
 { }
 
 void saitekosa_sparc_device::device_start()
 {
+	m_rom_mask = m_rom.length() - 1;
+	set_ram_mask(20); // 1MB default
+
+	// register for savestates
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_rom_mask));
+	save_item(NAME(m_ram_mask));
+	save_item(NAME(m_installed));
 }
 
 void saitekosa_sparc_device::device_reset()
 {
+	if (!m_installed)
+	{
+		// MAME doesn't allow reading ioport at device_start
+		set_ram_mask(ioport("RAM")->read() ? 22 : 20);
+		m_installed = true;
+	}
 }
 
 
@@ -82,17 +105,36 @@ const tiny_rom_entry *saitekosa_sparc_device::device_rom_region() const
 
 
 //-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+static INPUT_PORTS_START( sparc )
+	PORT_START("RAM")
+	PORT_CONFNAME( 0x01, 0x00, "RAM Size" )
+	PORT_CONFSETTING(    0x00, "1MB" )
+	PORT_CONFSETTING(    0x01, "4MB" )
+INPUT_PORTS_END
+
+ioport_constructor saitekosa_sparc_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(sparc);
+}
+
+
+//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void saitekosa_sparc_device::device_add_mconfig(machine_config &config)
 {
 	// basic machine hardware
-#if 0
-	SPARCV8(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(0, &saitekosa_sparc_device::main_map);
-	m_maincpu->set_mmu(nullptr);
-#endif
+	MB86930(config, m_maincpu, 20_MHz_XTAL);
+	m_maincpu->set_addrmap(0x00, &saitekosa_sparc_device::debugger_map);
+	m_maincpu->cs0_read_cb().set(FUNC(saitekosa_sparc_device::rom_r));
+	m_maincpu->cs2_read_cb().set(FUNC(saitekosa_sparc_device::ram_r));
+	m_maincpu->cs2_write_cb().set(FUNC(saitekosa_sparc_device::ram_w));
+	m_maincpu->cs3_read_cb().set(FUNC(saitekosa_sparc_device::host_io_r));
+	m_maincpu->cs3_write_cb().set(FUNC(saitekosa_sparc_device::host_io_w));
 }
 
 
@@ -100,8 +142,26 @@ void saitekosa_sparc_device::device_add_mconfig(machine_config &config)
 //  internal i/o
 //-------------------------------------------------
 
-void saitekosa_sparc_device::main_map(address_map &map)
+u32 saitekosa_sparc_device::host_io_r(offs_t offset, u32 mem_mask)
 {
+	// d0-d7: data input latch, d8: ACK-P
+	return m_expansion->data_state() | (m_expansion->ack_state() ? 0 : 0x100);
+}
+
+void saitekosa_sparc_device::host_io_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// d0-d7: data output latch, d10: output latch enable
+	COMBINE_DATA(&m_data_out);
+
+	// d8: STB-P, d9: RTS-P
+	m_expansion->stb_w(BIT(m_data_out, 8));
+	m_expansion->rts_w(BIT(~m_data_out, 9));
+}
+
+void saitekosa_sparc_device::debugger_map(address_map &map)
+{
+	map(0x00000000, 0x0003ffff).rom().region("maincpu", 0);
+	map(0x01000000, 0x013fffff).ram().share("ram"); // 4MB
 }
 
 
@@ -111,5 +171,16 @@ void saitekosa_sparc_device::main_map(address_map &map)
 
 u8 saitekosa_sparc_device::data_r()
 {
-	return 0xff;
+	return (m_data_out & 0x400) ? 0xff : (u8)m_data_out;
+}
+
+void saitekosa_sparc_device::nmi_w(int state)
+{
+	m_maincpu->set_input_line(SPARC_IRQ1, !state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void saitekosa_sparc_device::ack_w(int state)
+{
+	if (state != m_expansion->ack_state())
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }

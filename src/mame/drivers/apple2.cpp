@@ -163,9 +163,15 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	template <bool invert, bool flip>
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	u32 screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	u32 screen_update_ff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, false>(screen, bitmap, cliprect); }
+	u32 screen_update_ft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<false, true>(screen, bitmap, cliprect); }
+	u32 screen_update_tf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, false>(screen, bitmap, cliprect); }
+	u32 screen_update_tt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return screen_update<true, true>(screen, bitmap, cliprect); }
 
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
@@ -203,6 +209,8 @@ public:
 	void apple2(machine_config &config);
 	void space84(machine_config &config);
 	void dodo(machine_config &config);
+	void albert(machine_config &config);
+	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
 	void apple2_map(address_map &map);
 	void inhbank_map(address_map &map);
@@ -408,7 +416,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
 	}
 }
 
-
+template <bool invert, bool flip>
 u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
@@ -421,14 +429,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				if (!strcmp(machine().system().name, "ivelultr"))
-				{
-					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
-				}
-				else
-				{
-					m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
-				}
+				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -440,14 +441,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				if (!strcmp(machine().system().name, "ivelultr"))
-				{
-					m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
-				}
-				else
-				{
-					m_video->text_update_orig(screen, bitmap, cliprect, 160, 191);
-				}
+				m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -457,14 +451,7 @@ u32 apple2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 	else
 	{
-		if (!strcmp(machine().system().name, "ivelultr"))
-		{
-			m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
-		}
-		else
-		{
-			m_video->text_update_orig(screen, bitmap, cliprect, 0, 191);
-		}
+		m_video->text_update<false, invert, flip>(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -510,7 +497,7 @@ u32 apple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 apple2_state::screen_update_ultr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// always update the flash timer here so it's smooth regardless of mode switches
 	m_video->m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
@@ -522,19 +509,19 @@ u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap
 			if (m_video->m_mix)
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_dodo(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
 				m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
 			}
 		}
-		else    // lo-res
+		else // lo-res
 		{
 			if (m_video->m_mix)
 			{
 				m_video->lores_update(screen, bitmap, cliprect, 0, 159);
-				m_video->text_update_dodo(screen, bitmap, cliprect, 160, 191);
+				m_video->text_update_ultr(screen, bitmap, cliprect, 160, 191);
 			}
 			else
 			{
@@ -544,7 +531,7 @@ u32 apple2_state::screen_update_dodo(screen_device &screen, bitmap_ind16 &bitmap
 	}
 	else
 	{
-		m_video->text_update_dodo(screen, bitmap, cliprect, 0, 191);
+		m_video->text_update_ultr(screen, bitmap, cliprect, 0, 191);
 	}
 
 	return 0;
@@ -1380,7 +1367,7 @@ void apple2_state::apple2_common(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update));
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tt));
 	m_screen->set_palette(m_video);
 
 	/* sound hardware */
@@ -1440,9 +1427,9 @@ void apple2_state::apple2_common(machine_config &config)
 	A2BUS_SLOT(config, "sl7", m_a2bus, apple2_cards, nullptr);
 
 	/* Set up the softlists: clean cracks priority, originals second, others last */
-	SOFTWARE_LIST(config, "flop525_clean").set_original("apple2_flop_clcracked");
-	SOFTWARE_LIST(config, "flop525_orig").set_compatible("apple2_flop_orig").set_filter("A2");
-	SOFTWARE_LIST(config, "flop525_misc").set_compatible("apple2_flop_misc");
+	SOFTWARE_LIST(config, "flop_a2_clean").set_original("apple2_flop_clcracked");
+	SOFTWARE_LIST(config, "flop_a2_orig").set_compatible("apple2_flop_orig").set_filter("A2");
+	SOFTWARE_LIST(config, "flop_a2_misc").set_compatible("apple2_flop_misc");
 	SOFTWARE_LIST(config, "cass_list").set_original("apple2_cass");
 	//MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
@@ -1462,7 +1449,7 @@ void apple2_state::apple2(machine_config &config)
 void apple2_state::apple2p(machine_config &config)
 {
 	apple2_common(config);
-	subdevice<software_list_device>("flop525_orig")->set_filter("A2P"); // Filter list to compatible disks for this machine.
+	subdevice<software_list_device>("flop_a2_orig")->set_filter("A2P"); // Filter list to compatible disks for this machine.
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 }
@@ -1481,7 +1468,19 @@ void apple2_state::apple2jp(machine_config &config)
 void apple2_state::dodo(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(FUNC(apple2_state::screen_update_dodo));
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_tf));
+}
+
+void apple2_state::albert(machine_config &config)
+{
+	apple2p(config);
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ft));
+}
+
+void apple2_state::ivelultr(machine_config &config)
+{
+	apple2p(config);
+	m_screen->set_screen_update(FUNC(apple2_state::screen_update_ultr));
 }
 
 #if 0
@@ -1852,15 +1851,15 @@ COMP( 1982, uniap2en, apple2, 0,      apple2p,  apple2p, apple2_state, empty_ini
 COMP( 1982, uniap2pt, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_SUPPORTS_SAVE )
-// reverse font direction -\/
-COMP( 1984, ivelultr, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+// reverse font direction + wider character cell -\/
+COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
 COMP( 1985, space84,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
 COMP( 1985, am64,     apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
 //COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, laser2c,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, laser2c,  apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
 COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_SUPPORTS_SAVE )
 COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, albert,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, albert,   apple2, 0,      albert,   apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
 COMP( 198?, am100,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )
-COMP( 198?, dodo,     apple2, 0,         dodo,  apple2p, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )
+COMP( 198?, dodo,     apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )

@@ -1304,6 +1304,19 @@ void snes_console_state::machine_start()
 //              m_maincpu->set_5a22_map();
 				break;
 		}
+		// install memory access taps (send address pin to cartridge slot)
+		m_maincpu->space(AS_PROGRAM).install_readwrite_tap
+		(
+			0x000000, 0xffffff, "cartslot_tap",
+			[this](offs_t offset, u8 &, u8)
+			{
+				m_cartslot->set_address(offset);
+			},
+			[this](offs_t offset, u8 &, u8)
+			{
+				m_cartslot->set_address(offset);
+			}
+		);
 		m_cartslot->save_ram();
 	}
 }
@@ -1317,7 +1330,7 @@ void snes_console_state::machine_reset()
 void snes_console_state::snes(machine_config &config)
 {
 	/* basic machine hardware */
-	_5A22(config, m_maincpu, MCLK_NTSC);   /* 2.68 MHz, also 3.58 MHz */
+	_5A22(config, m_maincpu, MCLK_NTSC);   // Nintendo S-CPU 5A22-0x, 21.477272MHz / (6, 8, 12) = 1.79 MHz, 2.68 MHz, also 3.58 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &snes_console_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
@@ -1328,6 +1341,9 @@ void snes_console_state::snes(machine_config &config)
 
 	//config.set_maximum_quantum(attotime::from_hz(48000));
 	config.set_perfect_quantum(m_maincpu);
+
+	INPUT_MERGER_ANY_HIGH(config, m_scpu_irq);
+	m_scpu_irq->output_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1355,8 +1371,9 @@ void snes_console_state::snes(machine_config &config)
 	m_s_dsp->add_route(1, "rspeaker", 1.00);
 
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
-	m_cartslot->irq_callback().set_inputline(m_maincpu, G65816_LINE_IRQ); // FIXME: conflict with video interrupt, it should be ORed
+	m_cartslot->irq_callback().set(m_scpu_irq, FUNC(input_merger_device::in_w<1>)); // FIXME: conflict with video interrupt, it should be ORed
 	m_cartslot->open_bus_callback().set(FUNC(snes_console_state::snes_open_bus_r));
+	m_cartslot->set_scanlines(SNES_VTOTAL_NTSC);
 
 	SOFTWARE_LIST(config, "cart_list").set_original("snes");
 	SOFTWARE_LIST(config, "bsx_list").set_original("snes_bspack");
@@ -1372,6 +1389,7 @@ void snes_console_state::snespal(machine_config &config)
 
 	m_ppu->set_clock(MCLK_PAL);
 	m_cartslot->set_clock(MCLK_PAL);
+	m_cartslot->set_scanlines(SNES_VTOTAL_PAL);
 }
 
 

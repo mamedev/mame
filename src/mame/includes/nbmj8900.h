@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
+#ifndef MAME_INCLUDES_NBMJ8900_H
+#define MAME_INCLUDES_NBMJ8900_H
+
+#pragma once
+
 #include "machine/nb1413m3.h"
 #include "emupal.h"
 #include "screen.h"
@@ -7,14 +12,13 @@
 class nbmj8900_state : public driver_device
 {
 public:
-
-
-	nbmj8900_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	nbmj8900_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
 		m_nb1413m3(*this, "nb1413m3"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")   { }
+		m_palette(*this, "palette")
+	{ }
 
 	void ohpaipee(machine_config &config);
 	void togenkyo(machine_config &config);
@@ -61,6 +65,10 @@ private:
 
 	uint8_t palette_type1_r(offs_t offset);
 	void palette_type1_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] uint8_t palette_type2_r(offs_t offset);
+	[[maybe_unused]] void palette_type2_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] uint8_t palette_type3_r(offs_t offset);
+	[[maybe_unused]] void palette_type3_w(offs_t offset, uint8_t data);
 	void clutsel_w(uint8_t data);
 	uint8_t clut_r(offs_t offset);
 	void clut_w(offs_t offset, uint8_t data);
@@ -84,3 +92,5 @@ private:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_NBMJ8900_H

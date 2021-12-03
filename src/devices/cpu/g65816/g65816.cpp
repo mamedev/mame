@@ -771,7 +771,6 @@ void g65816_device::g65816_set_pc(unsigned val)
 	g65816_jumping(REGISTER_PB | REGISTER_PC);
 }
 
-#ifdef UNUSED_FUNCTION
 /* Get the current Stack Pointer */
 unsigned g65816_device::g65816_get_sp()
 {
@@ -783,7 +782,6 @@ void g65816_device::g65816_set_sp(unsigned val)
 {
 	REGISTER_S = FLAG_E ? MAKE_UINT_8(val) | 0x100 : MAKE_UINT_16(val);
 }
-#endif
 
 /* Get a register */
 unsigned g65816_device::g65816_get_reg(int regnum)

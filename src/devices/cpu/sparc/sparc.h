@@ -152,7 +152,7 @@ protected:
 	void log_fcodes();
 #endif
 
-	required_device<sparc_mmu_interface> m_mmu;
+	optional_device<sparc_mmu_interface> m_mmu;
 
 	// address spaces
 	std::string m_asi_names[0x10];
@@ -172,7 +172,7 @@ protected:
 	virtual uint8_t get_fcc(unsigned index) const override;
 
 	// general-purpose registers
-	uint32_t m_r[120];
+	uint32_t m_r[136];
 
 	// FPU registers
 	uint32_t m_fpr[32];
@@ -279,6 +279,9 @@ public:
 	sparcv7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	sparcv7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual bool execute_extra_group2(uint32_t op) override;
 	virtual bool execute_extra_group3(uint32_t op) override;
 	virtual bool dispatch_extra_instruction(uint32_t op) override;
@@ -290,7 +293,12 @@ class sparcv8_device : public sparc_base_device
 public:
 	sparcv8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
 protected:
+	sparcv8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -312,9 +320,120 @@ private:
 	bool m_division_by_zero;
 };
 
+class mb86930_device : public sparcv8_device
+{
+public:
+	mb86930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	auto cs0_read_cb() { return m_cs_r[0].bind(); }
+	auto cs0_write_cb() { return m_cs_w[0].bind(); }
+	auto cs1_read_cb() { return m_cs_r[1].bind(); }
+	auto cs1_write_cb() { return m_cs_w[1].bind(); }
+	auto cs2_read_cb() { return m_cs_r[2].bind(); }
+	auto cs2_write_cb() { return m_cs_w[2].bind(); }
+	auto cs3_read_cb() { return m_cs_r[3].bind(); }
+	auto cs3_write_cb() { return m_cs_w[3].bind(); }
+	auto cs4_read_cb() { return m_cs_r[4].bind(); }
+	auto cs4_write_cb() { return m_cs_w[4].bind(); }
+	auto cs5_read_cb() { return m_cs_r[5].bind(); }
+	auto cs5_write_cb() { return m_cs_w[5].bind(); }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_post_load() override;
+
+	virtual bool execute_extra_group2(uint32_t op) override;
+
+	void execute_divscc(uint32_t op);
+	void execute_scan(uint32_t op);
+
+	uint32_t biu_ctrl_r(offs_t offset, uint32_t mem_mask);
+	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t lock_ctrl_r(offs_t offset, uint32_t mem_mask);
+	void lock_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t lock_ctrl_save_r(offs_t offset, uint32_t mem_mask);
+	void lock_ctrl_save_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cache_status_r(offs_t offset, uint32_t mem_mask);
+	void cache_status_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t restore_lock_ctrl_r(offs_t offset, uint32_t mem_mask);
+	void restore_lock_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t system_support_ctrl_r(offs_t offset, uint32_t mem_mask);
+	void system_support_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t same_page_mask_r(offs_t offset, uint32_t mem_mask);
+	void same_page_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t addr_range_spec_r(offs_t offset, uint32_t mem_mask);
+	void addr_range_spec_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t addr_mask_r(offs_t offset, uint32_t mem_mask);
+	void addr_mask_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t wait_specifier_r(offs_t offset, uint32_t mem_mask);
+	void wait_specifier_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t timer_r(offs_t offset, uint32_t mem_mask);
+	void timer_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t timer_preload_r(offs_t offset, uint32_t mem_mask);
+	void timer_preload_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	template <uint8_t Asi> uint32_t mmu_r(offs_t offset, uint32_t mem_mask);
+	template <uint8_t Asi> void mmu_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t icache_lock_r(offs_t offset, uint32_t mem_mask);
+	void icache_lock_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t dcache_lock_r(offs_t offset, uint32_t mem_mask);
+	void dcache_lock_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	uint32_t icache_tag_r(offs_t offset, uint32_t mem_mask);
+	void icache_tag_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t icache_data_r(offs_t offset, uint32_t mem_mask);
+	void icache_data_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+
+	u32 dcache_tag_r(offs_t offset, u32 mem_mask);
+	void dcache_tag_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 dcache_data_r(offs_t offset, u32 mem_mask);
+	void dcache_data_w(offs_t offset, u32 data, u32 mem_mask);
+
+	void control_map(address_map &map);
+	void icache_lock_map(address_map &map);
+	void dcache_lock_map(address_map &map);
+	template <uint8_t Asi> void mmu_map(address_map &map);
+	void icache_tag_map(address_map &map);
+	void icache_data_map(address_map &map);
+	void dcache_tag_map(address_map &map);
+	void dcache_data_map(address_map &map);
+
+	void update_addr_masks();
+	void update_wait_states();
+
+	devcb_read32::array<6> m_cs_r;
+	devcb_write32::array<6> m_cs_w;
+
+	u32 m_ssctrl;
+	u32 m_spmr;
+	u64 m_spmr_mask;
+	u32 m_arsr[6];
+	u32 m_amr[6];
+	u64 m_full_masks[6];
+	u64 m_full_ranges[6];
+	u64 m_last_masked_addr;
+	int m_same_page_waits[6];
+	int m_other_page_waits[6];
+
+	u32 m_wssr[3];
+};
+
 // device type definition
 DECLARE_DEVICE_TYPE(SPARCV7, sparcv7_device)
 DECLARE_DEVICE_TYPE(SPARCV8, sparcv8_device)
+DECLARE_DEVICE_TYPE(MB86930, mb86930_device)
 
 enum
 {

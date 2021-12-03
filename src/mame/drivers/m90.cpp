@@ -55,13 +55,6 @@ void m90_state::quizf1_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_m
 		m_mainbank->set_entry(data & 0xf);
 }
 
-#ifdef UNUSED_FUNCTION
-void m90_state::unknown_w(uint16_t data)
-{
-	printf("%04x    ",data);
-}
-#endif
-
 /***************************************************************************/
 
 void m90_state::m90_main_cpu_map(address_map &map)
@@ -122,11 +115,11 @@ void m90_state::dynablsb_main_cpu_io_map(address_map &map)
 	map(0x00, 0x01).portr("P1_P2");
 	map(0x02, 0x03).w(FUNC(m90_state::coincounter_w));
 	map(0x02, 0x03).portr("SYSTEM");
-//  map(0x04, 0x05).w(FUNC(m90_state::unknown_w));      /* dynablsb: write continuously 0x6000 */
+//  map(0x04, 0x05).w(NAME([] (uint16_t data) { printf("%04x    ", data); }));      /* dynablsb: write continuously 0x6000 */
 	map(0x04, 0x05).portr("DSW");
 	map(0x06, 0x07).portr("P3_P4");
 	map(0x80, 0x8f).writeonly().share("video_control");
-//  map(0x90, 0x91).w(FUNC(m90_state::unknown_w));
+//  map(0x90, 0x91).w(NAME([] (uint16_t data) { printf("%04x    ", data); }));
 }
 
 /*****************************************************************************/

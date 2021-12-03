@@ -204,7 +204,6 @@ static int read_physical_record(imgtool::stream &file_handle, int secnum, void *
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 /*
     write_physical_record
 
@@ -216,7 +215,7 @@ static int read_physical_record(imgtool::stream &file_handle, int secnum, void *
 
     Return non-zero on error
 */
-static int write_physical_record(imgtool::stream *file_handle, int secnum, const void *src)
+[[maybe_unused]] static int write_physical_record(imgtool::stream *file_handle, int secnum, const void *src)
 {
 	int reply;
 
@@ -231,7 +230,6 @@ static int write_physical_record(imgtool::stream *file_handle, int secnum, const
 
 	return 0;
 }
-#endif
 
 /*
     Search for a file name on a concept_image

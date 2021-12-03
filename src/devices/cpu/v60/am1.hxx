@@ -1089,69 +1089,56 @@ uint32_t v60_device::am1ImmediateQuick()
 uint32_t v60_device::am1Error1()
 {
 	fatalerror("CPU - AM1 - 1 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam1Error1()
 {
 	fatalerror("CPU - BAM1 - 1 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::am1Error2()
 {
 	fatalerror("CPU - AM1 - 2 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam1Error2()
 {
 	fatalerror("CPU - BAM1 - 2 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
-#ifdef UNUSED_FUNCTION
 uint32_t v60_device::am1Error3()
 {
 	fatalerror("CPU - AM1 - 3 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam1Error3()
 {
 	fatalerror("CPU - BAM1 - 3 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
-#endif
 
 uint32_t v60_device::am1Error4()
 {
 	fatalerror("CPU - AM1 - 4 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam1Error4()
 {
 	fatalerror("CPU - BAM1 - 4 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::am1Error5()
 {
 	fatalerror("CPU - AM1 - 5 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam1Error5()
 {
 	fatalerror("CPU - BAM1 - 5 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 uint32_t v60_device::bam1Error6()
 {
 	fatalerror("CPU - BAM1 - 6 (PC=%06x)\n", PC);
-	return 0; /* never reached, fatalerror won't return */
 }
 
 const v60_device::am_func v60_device::s_AMTable1_G7a[16] =

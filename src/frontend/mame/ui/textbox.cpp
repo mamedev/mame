@@ -29,6 +29,7 @@ menu_textbox::menu_textbox(mame_ui_manager &mui, render_container &container)
 	, m_layout_width(-1.0f)
 	, m_desired_width(-1.0f)
 	, m_desired_lines(-1)
+	, m_window_lines(0)
 	, m_top_line(0)
 {
 }

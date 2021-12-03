@@ -1,13 +1,13 @@
-# Czech translations for PACKAGE package.
-# Copyright (C) 2016 THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# Automatically generated, 2016.
+# Czech translations for MAME package.
+# Copyright (C) 1997-2021 MAMEdev and contributors
+# This file is distributed under the same license as the MAME package.
+# Automatically generated, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-31 10:10+1100\n"
+"POT-Creation-Date: 2021-11-19 02:50+1100\n"
 "PO-Revision-Date: 2016-04-01 16:38+0200\n"
 "Last-Translator: Karel Brejcha <pankabre@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Poedit 1.8.7\n"
 
-#: src/frontend/mame/ui/ui.cpp:477 src/frontend/mame/ui/ui.cpp:550
+#: src/frontend/mame/ui/ui.cpp:469 src/frontend/mame/ui/ui.cpp:542
 msgid ""
 "\n"
 "\n"
@@ -28,217 +28,204 @@ msgstr ""
 "\n"
 "Stiskni klávesu pro pokračování"
 
-#: src/frontend/mame/ui/ui.cpp:562
+#: src/frontend/mame/ui/ui.cpp:554
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
 "Tento ovladač vyžaduje aby byl obraz media nahrán do následujících zařízení: "
 
-#: src/frontend/mame/ui/ui.cpp:1286
+#: src/frontend/mame/ui/ui.cpp:1248
 #, c-format
 msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1288
+#: src/frontend/mame/ui/ui.cpp:1250
 #, c-format
 msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1487
-#, c-format
-msgid ""
-"Are you sure you want to quit?\n"
-"\n"
-"Press ''%1$s'' to quit,\n"
-"Press ''%2$s'' to return to emulation."
-msgstr ""
-"Určitě chcete odejít?\n"
-"\n"
-"Stiskni ''%1$s'' pro ukončení,\n"
-"Stiskni ''%2$s'' pro návrat do emulace."
-
-#: src/frontend/mame/ui/ui.cpp:1537
+#: src/frontend/mame/ui/ui.cpp:1459
 msgid "Master Volume"
 msgstr "Hlavní hlasitost"
 
-#: src/frontend/mame/ui/ui.cpp:1546
+#: src/frontend/mame/ui/ui.cpp:1468
 #, c-format
 msgid "%1$s Volume"
 msgstr "%1$s hlasitost"
 
-#: src/frontend/mame/ui/ui.cpp:1568
+#: src/frontend/mame/ui/ui.cpp:1490
 #, c-format
 msgid "Overclock CPU %1$s"
 msgstr "Přetakt CPU %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1576
+#: src/frontend/mame/ui/ui.cpp:1498
 #, c-format
 msgid "Overclock %1$s sound"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1595
+#: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
 msgid "%1$s Refresh Rate"
 msgstr "%1$s Obnovovací frekvence"
 
-#: src/frontend/mame/ui/ui.cpp:1600
+#: src/frontend/mame/ui/ui.cpp:1522
 #, c-format
 msgid "%1$s Brightness"
 msgstr "%1$s Jas"
 
-#: src/frontend/mame/ui/ui.cpp:1602
+#: src/frontend/mame/ui/ui.cpp:1524
 #, c-format
 msgid "%1$s Contrast"
 msgstr "%1$s Kontrast"
 
-#: src/frontend/mame/ui/ui.cpp:1604
+#: src/frontend/mame/ui/ui.cpp:1526
 #, c-format
 msgid "%1$s Gamma"
 msgstr "%1$s Gamma"
 
-#: src/frontend/mame/ui/ui.cpp:1608
+#: src/frontend/mame/ui/ui.cpp:1530
 #, c-format
 msgid "%1$s Horiz Stretch"
 msgstr "%1$s Horiz Roztah"
 
-#: src/frontend/mame/ui/ui.cpp:1610
+#: src/frontend/mame/ui/ui.cpp:1532
 #, c-format
 msgid "%1$s Horiz Position"
 msgstr "%1$s Horiz Pozice"
 
-#: src/frontend/mame/ui/ui.cpp:1612
+#: src/frontend/mame/ui/ui.cpp:1534
 #, c-format
 msgid "%1$s Vert Stretch"
 msgstr "%1$s Vert Roztah"
 
-#: src/frontend/mame/ui/ui.cpp:1614
+#: src/frontend/mame/ui/ui.cpp:1536
 #, c-format
 msgid "%1$s Vert Position"
 msgstr "%1$s Vert Pozice"
 
-#: src/frontend/mame/ui/ui.cpp:1630
+#: src/frontend/mame/ui/ui.cpp:1552
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
 msgstr "Laserdisc '%1$s' Horiz Roztah"
 
-#: src/frontend/mame/ui/ui.cpp:1633
+#: src/frontend/mame/ui/ui.cpp:1555
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
 msgstr "Laserdisc '%1$s' Horiz Pozice"
 
-#: src/frontend/mame/ui/ui.cpp:1635
+#: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
 msgstr "Laserdisc '%1$s' Vert Roztah"
 
-#: src/frontend/mame/ui/ui.cpp:1638
+#: src/frontend/mame/ui/ui.cpp:1560
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
 msgstr "Laserdisc '%1$s' Vert Pozice"
 
-#: src/frontend/mame/ui/ui.cpp:1648
+#: src/frontend/mame/ui/ui.cpp:1570
 msgid "Vector Flicker"
 msgstr "Vektor Blikač"
 
-#: src/frontend/mame/ui/ui.cpp:1649
+#: src/frontend/mame/ui/ui.cpp:1571
 msgid "Beam Width Minimum"
 msgstr "Minimální šířka svazku"
 
-#: src/frontend/mame/ui/ui.cpp:1650
+#: src/frontend/mame/ui/ui.cpp:1572
 msgid "Beam Width Maximum"
 msgstr "Maximální šířka svazku"
 
-#: src/frontend/mame/ui/ui.cpp:1651
+#: src/frontend/mame/ui/ui.cpp:1573
 msgid "Beam Dot Size"
 msgstr ""
 
-#: src/frontend/mame/ui/ui.cpp:1652
+#: src/frontend/mame/ui/ui.cpp:1574
 msgid "Beam Intensity Weight"
 msgstr "Váha intenzity svazku"
 
-#: src/frontend/mame/ui/ui.cpp:1665
+#: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Crosshair Scale %1$s"
 msgstr "Zaměřovač škála %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1665 src/frontend/mame/ui/ui.cpp:1667
+#: src/frontend/mame/ui/ui.cpp:1587 src/frontend/mame/ui/ui.cpp:1589
 msgid "X"
 msgstr "X"
 
-#: src/frontend/mame/ui/ui.cpp:1665 src/frontend/mame/ui/ui.cpp:1667
+#: src/frontend/mame/ui/ui.cpp:1587 src/frontend/mame/ui/ui.cpp:1589
 msgid "Y"
 msgstr "Y"
 
-#: src/frontend/mame/ui/ui.cpp:1667
+#: src/frontend/mame/ui/ui.cpp:1589
 #, c-format
 msgid "Crosshair Offset %1$s"
 msgstr "Zaměřovač posun %1$s"
 
-#: src/frontend/mame/ui/ui.cpp:1699
+#: src/frontend/mame/ui/ui.cpp:1617
 #, c-format
 msgid "%1$3ddB"
 msgstr "%1$3ddB"
 
-#: src/frontend/mame/ui/ui.cpp:1742
+#: src/frontend/mame/ui/ui.cpp:1660
 #, c-format
 msgid "%1$d%%"
 msgstr "%1$d%%"
 
-#: src/frontend/mame/ui/ui.cpp:1757
+#: src/frontend/mame/ui/ui.cpp:1675
 #, c-format
 msgid "%1$3.0f%%"
 msgstr "%1$3.0f%%"
 
-#: src/frontend/mame/ui/ui.cpp:1780 src/frontend/mame/ui/ui.cpp:1800
-#: src/frontend/mame/ui/ui.cpp:1819 src/frontend/mame/ui/ui.cpp:1837
-#: src/frontend/mame/ui/ui.cpp:1856 src/frontend/mame/ui/ui.cpp:1875
-#: src/frontend/mame/ui/ui.cpp:1894 src/frontend/mame/ui/ui.cpp:1913
-#: src/frontend/mame/ui/ui.cpp:1934 src/frontend/mame/ui/ui.cpp:1955
-#: src/frontend/mame/ui/ui.cpp:1976 src/frontend/mame/ui/ui.cpp:1997
+#: src/frontend/mame/ui/ui.cpp:1698 src/frontend/mame/ui/ui.cpp:1718
+#: src/frontend/mame/ui/ui.cpp:1737 src/frontend/mame/ui/ui.cpp:1755
+#: src/frontend/mame/ui/ui.cpp:1774 src/frontend/mame/ui/ui.cpp:1793
+#: src/frontend/mame/ui/ui.cpp:1812 src/frontend/mame/ui/ui.cpp:1831
+#: src/frontend/mame/ui/ui.cpp:1852 src/frontend/mame/ui/ui.cpp:1873
+#: src/frontend/mame/ui/ui.cpp:1894 src/frontend/mame/ui/ui.cpp:1915
 #, c-format
 msgid "%1$.3f"
 msgstr "%1$.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2012 src/frontend/mame/ui/ui.cpp:2027
-#: src/frontend/mame/ui/ui.cpp:2042 src/frontend/mame/ui/ui.cpp:2057
-#: src/frontend/mame/ui/ui.cpp:2072
+#: src/frontend/mame/ui/ui.cpp:1930 src/frontend/mame/ui/ui.cpp:1945
+#: src/frontend/mame/ui/ui.cpp:1960 src/frontend/mame/ui/ui.cpp:1975
+#: src/frontend/mame/ui/ui.cpp:1990
 #, c-format
 msgid "%1$1.2f"
 msgstr "%1$1.2f"
 
-#: src/frontend/mame/ui/ui.cpp:2088
+#: src/frontend/mame/ui/ui.cpp:2006
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
 msgstr "Zaměřovač škála X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2088
+#: src/frontend/mame/ui/ui.cpp:2006
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
 msgstr "Zaměřovač škála Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2105
+#: src/frontend/mame/ui/ui.cpp:2023
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
 msgstr "Zaměřovač posun X %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2105
+#: src/frontend/mame/ui/ui.cpp:2023
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
 msgstr "Zaměřovač posun Y %1$1.3f"
 
-#: src/frontend/mame/ui/ui.cpp:2192
+#: src/frontend/mame/ui/ui.cpp:2110
 msgid "**Error saving ui.ini**"
 msgstr "**Chyba ukládání ui.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2251
+#: src/frontend/mame/ui/ui.cpp:2169
 #, c-format
 msgid "**Error saving %s.ini**"
 msgstr "**Chyba ukládání %s.ini**"
 
-#: src/frontend/mame/ui/ui.cpp:2255 src/frontend/mame/ui/miscmenu.cpp:774
+#: src/frontend/mame/ui/ui.cpp:2173 src/frontend/mame/ui/miscmenu.cpp:748
 msgid ""
 "\n"
 "    Configuration saved    \n"
@@ -248,7 +235,7 @@ msgstr ""
 "    Configurace uložena    \n"
 "\n"
 
-#: src/frontend/mame/ui/selsoft.cpp:484 src/frontend/mame/ui/selgame.cpp:306
+#: src/frontend/mame/ui/selsoft.cpp:484 src/frontend/mame/ui/selgame.cpp:300
 #, c-format
 msgid ""
 "%s\n"
@@ -257,8 +244,8 @@ msgstr ""
 "%s\n"
 " přidán do seznamu oblíbených."
 
-#: src/frontend/mame/ui/selsoft.cpp:489 src/frontend/mame/ui/selgame.cpp:311
-#: src/frontend/mame/ui/selgame.cpp:317
+#: src/frontend/mame/ui/selsoft.cpp:489 src/frontend/mame/ui/selgame.cpp:305
+#: src/frontend/mame/ui/selgame.cpp:311
 #, c-format
 msgid ""
 "%s\n"
@@ -267,35 +254,35 @@ msgstr ""
 "%s\n"
 " odstraněn ze seznamu oblíbených."
 
-#: src/frontend/mame/ui/selsoft.cpp:523
+#: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Start empty]"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:523
+#: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Use file manager]"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:706
+#: src/frontend/mame/ui/selsoft.cpp:705
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:707
+#: src/frontend/mame/ui/selsoft.cpp:706
 #, c-format
 msgid "Driver: \"%1$s\" software list "
 msgstr "Driver: \"%1$s\" software list "
 
-#: src/frontend/mame/ui/selsoft.cpp:712 src/frontend/mame/ui/selgame.cpp:1076
+#: src/frontend/mame/ui/selsoft.cpp:711 src/frontend/mame/ui/selgame.cpp:1066
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:714 src/frontend/mame/ui/selgame.cpp:1078
+#: src/frontend/mame/ui/selsoft.cpp:713 src/frontend/mame/ui/selgame.cpp:1068
 #, c-format
 msgid "Search: %1$s_"
 msgstr ""
 
-#: src/frontend/mame/ui/selsoft.cpp:721
+#: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
 msgstr ""
@@ -308,7 +295,7 @@ msgstr "Možnosti zvuku"
 msgid "General Inputs"
 msgstr "Základní vstupy"
 
-#: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:971
+#: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:945
 msgid "Plugins"
 msgstr "Pluginy"
 
@@ -332,383 +319,407 @@ msgstr "Upravení UI"
 msgid "Configure Directories"
 msgstr "Konfigurace složek"
 
-#: src/frontend/mame/ui/filesel.cpp:259 src/frontend/mame/ui/swlist.cpp:89
+#: src/frontend/mame/ui/filesel.cpp:260 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
 msgstr "[prázdný slot]"
 
-#: src/frontend/mame/ui/filesel.cpp:263
+#: src/frontend/mame/ui/filesel.cpp:264
 msgid "[create]"
 msgstr "[vytvořit]"
 
-#: src/frontend/mame/ui/filesel.cpp:267 src/frontend/mame/ui/swlist.cpp:100
+#: src/frontend/mame/ui/filesel.cpp:268 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
 msgstr "[software list]"
 
-#: src/frontend/mame/ui/filesel.cpp:323
+#: src/frontend/mame/ui/filesel.cpp:324
 #, c-format
 msgid "Error accessing %s"
 msgstr ""
 
-#: src/frontend/mame/ui/filesel.cpp:545
+#: src/frontend/mame/ui/filesel.cpp:546
 msgid "Select access mode"
 msgstr "Vyber přístupový režim"
 
-#: src/frontend/mame/ui/filesel.cpp:546
+#: src/frontend/mame/ui/filesel.cpp:547
 msgid "Read-only"
 msgstr "Pouze čtení"
 
-#: src/frontend/mame/ui/filesel.cpp:548
+#: src/frontend/mame/ui/filesel.cpp:549
 msgid "Read-write"
 msgstr "Čtení-Zápis"
 
-#: src/frontend/mame/ui/filesel.cpp:549
+#: src/frontend/mame/ui/filesel.cpp:550
 msgid "Read this image, write to another image"
 msgstr "Číst tento obrázek, zapsat do jiného obrázku"
 
-#: src/frontend/mame/ui/filesel.cpp:550
+#: src/frontend/mame/ui/filesel.cpp:551
 msgid "Read this image, write to diff"
 msgstr "Číst tento obrázek, zapsat do diff"
 
-#: src/frontend/mame/ui/submenu.cpp:31
+#: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
 msgstr "Různé možnosti"
 
-#: src/frontend/mame/ui/submenu.cpp:32
+#: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:33
+#: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last machine launched"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:34
+#: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
 msgstr "Zvětši obrázky v pravém panelu"
 
-#: src/frontend/mame/ui/submenu.cpp:35
+#: src/frontend/mame/ui/submenu.cpp:37
 msgid "Cheats"
 msgstr "Cheaty"
 
-#: src/frontend/mame/ui/submenu.cpp:36
+#: src/frontend/mame/ui/submenu.cpp:38
 msgid "Show mouse pointer"
 msgstr "Zobraz ukazatel myši"
 
-#: src/frontend/mame/ui/submenu.cpp:37
+#: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from machines"
 msgstr "Potvrď odchod ze zařízení"
 
-#: src/frontend/mame/ui/submenu.cpp:38
+#: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip information screen at startup"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:39
+#: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:40
+#: src/frontend/mame/ui/submenu.cpp:42
 msgid "Use image as background"
 msgstr "Použij obrázek jako pozadí"
 
-#: src/frontend/mame/ui/submenu.cpp:41
+#: src/frontend/mame/ui/submenu.cpp:43
 msgid "Skip BIOS selection menu"
 msgstr "Přeskoč menu s výběrem BIOSu"
 
-#: src/frontend/mame/ui/submenu.cpp:42
+#: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software parts selection menu"
 msgstr "Přeskoč menu s výběrem částí software"
 
-#: src/frontend/mame/ui/submenu.cpp:43
+#: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:44
+#: src/frontend/mame/ui/submenu.cpp:46
 msgid "Hide romless machine from available list"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:50
+#: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:51
+#: src/frontend/mame/ui/submenu.cpp:53
 msgid "Performance Options"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:52
+#: src/frontend/mame/ui/submenu.cpp:54
 msgid "Auto frame skip"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:53
+#: src/frontend/mame/ui/submenu.cpp:55
 msgid "Frame skip"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:54
+#: src/frontend/mame/ui/submenu.cpp:56
 msgid "Throttle"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:55
+#: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:56
+#: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:57
+#: src/frontend/mame/ui/submenu.cpp:59
 msgid "Speed"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:58
+#: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:59
+#: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:61
+#: src/frontend/mame/ui/submenu.cpp:63
 msgid "Rotation Options"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:62 src/frontend/mame/ui/videoopt.cpp:179
+#: src/frontend/mame/ui/submenu.cpp:64 src/frontend/mame/ui/videoopt.cpp:179
 msgid "Rotate"
 msgstr "Rotace"
 
-#: src/frontend/mame/ui/submenu.cpp:63
+#: src/frontend/mame/ui/submenu.cpp:65
 msgid "Rotate right"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:64
+#: src/frontend/mame/ui/submenu.cpp:66
 msgid "Rotate left"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:65
+#: src/frontend/mame/ui/submenu.cpp:67
 msgid "Auto rotate right"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:66
+#: src/frontend/mame/ui/submenu.cpp:68
 msgid "Auto rotate left"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:67
+#: src/frontend/mame/ui/submenu.cpp:69
 msgid "Flip X"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:68
+#: src/frontend/mame/ui/submenu.cpp:70
 msgid "Flip Y"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:70
+#: src/frontend/mame/ui/submenu.cpp:72
 msgid "Artwork Options"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:71
+#: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:73
+#: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:74
+#: src/frontend/mame/ui/submenu.cpp:76
 msgid "Automatic save/restore"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:75
+#: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:76
+#: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:77
+#: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:78
+#: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:80
+#: src/frontend/mame/ui/submenu.cpp:82
 msgid "Input Options"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:81
+#: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin lockout"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:82
+#: src/frontend/mame/ui/submenu.cpp:84
 msgid "Mouse"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:83
+#: src/frontend/mame/ui/submenu.cpp:85
 msgid "Joystick"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:84
+#: src/frontend/mame/ui/submenu.cpp:86
 msgid "Lightgun"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:85
+#: src/frontend/mame/ui/submenu.cpp:87
 msgid "Multi-keyboard"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:86
+#: src/frontend/mame/ui/submenu.cpp:88
 msgid "Multi-mouse"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:87
+#: src/frontend/mame/ui/submenu.cpp:89
 msgid "Steadykey"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:88
+#: src/frontend/mame/ui/submenu.cpp:90
 msgid "UI active"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:89
+#: src/frontend/mame/ui/submenu.cpp:91
 msgid "Offscreen reload"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:90
+#: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:91
+#: src/frontend/mame/ui/submenu.cpp:93
 msgid "Joystick saturation"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:92
+#: src/frontend/mame/ui/submenu.cpp:94
 msgid "Natural keyboard"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:93
+#: src/frontend/mame/ui/submenu.cpp:95
 msgid "Simultaneous contradictory"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:94
+#: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:100
-msgid "Device Mapping"
-msgstr "Mapování zařízení"
+#: src/frontend/mame/ui/submenu.cpp:102
+msgid "Input Device Options"
+msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:101
+#: src/frontend/mame/ui/submenu.cpp:103
 msgid "Lightgun Device Assignment"
 msgstr "Lightgun zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:102
+#: src/frontend/mame/ui/submenu.cpp:104
 msgid "Trackball Device Assignment"
 msgstr "Trackball zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:103
+#: src/frontend/mame/ui/submenu.cpp:105
 msgid "Pedal Device Assignment"
 msgstr "Pedál zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:104
+#: src/frontend/mame/ui/submenu.cpp:106
 msgid "Adstick Device Assignment"
 msgstr "ADStick zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:105
+#: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
 msgstr "Pádlo zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:106
+#: src/frontend/mame/ui/submenu.cpp:108
 msgid "Dial Device Assignment"
 msgstr "Vytáčecí zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:107
+#: src/frontend/mame/ui/submenu.cpp:109
 msgid "Positional Device Assignment"
 msgstr "Poziční zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:108
+#: src/frontend/mame/ui/submenu.cpp:110
 msgid "Mouse Device Assignment"
 msgstr "Myš zařízení přiřazení"
 
-#: src/frontend/mame/ui/submenu.cpp:114 src/frontend/mame/ui/mainmenu.cpp:172
+#: src/frontend/mame/ui/submenu.cpp:112
+msgid "Keyboard Input Provider"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:113
+msgid "Mouse Input Provider"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:114
+msgid "Lightgun Input Provider"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:115
+msgid "Joystick Input Provider"
+msgstr ""
+
+#: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/mainmenu.cpp:174
 msgid "Video Options"
 msgstr "Nastavení videa"
 
-#: src/frontend/mame/ui/submenu.cpp:115
+#: src/frontend/mame/ui/submenu.cpp:122
 msgid "Video Mode"
 msgstr "Video Mód"
 
-#: src/frontend/mame/ui/submenu.cpp:116
+#: src/frontend/mame/ui/submenu.cpp:123
 msgid "Number Of Screens"
 msgstr ""
 
-#: src/frontend/mame/ui/submenu.cpp:118
+#: src/frontend/mame/ui/submenu.cpp:125
 msgid "Triple Buffering"
 msgstr "Triple Buffering"
 
-#: src/frontend/mame/ui/submenu.cpp:119
+#: src/frontend/mame/ui/submenu.cpp:126
 msgid "HLSL"
 msgstr "HLSL"
 
-#: src/frontend/mame/ui/submenu.cpp:121
+#: src/frontend/mame/ui/submenu.cpp:128
 msgid "GLSL"
 msgstr "GLSL"
 
-#: src/frontend/mame/ui/submenu.cpp:122
+#: src/frontend/mame/ui/submenu.cpp:129
 msgid "Bilinear Filtering"
 msgstr "Bilineární filtrování"
 
-#: src/frontend/mame/ui/submenu.cpp:123
+#: src/frontend/mame/ui/submenu.cpp:130
 msgid "Bitmap Prescaling"
 msgstr "Bitmap Prescaling"
 
-#: src/frontend/mame/ui/submenu.cpp:124
+#: src/frontend/mame/ui/submenu.cpp:131
 msgid "Window Mode"
 msgstr "Okenní mód"
 
-#: src/frontend/mame/ui/submenu.cpp:125
+#: src/frontend/mame/ui/submenu.cpp:132
 msgid "Enforce Aspect Ratio"
 msgstr "Vynutit poměr stran"
 
-#: src/frontend/mame/ui/submenu.cpp:126
+#: src/frontend/mame/ui/submenu.cpp:133
 msgid "Start Out Maximized"
 msgstr "Spustit maximalizovaně"
 
-#: src/frontend/mame/ui/submenu.cpp:127
+#: src/frontend/mame/ui/submenu.cpp:134
 msgid "Synchronized Refresh"
 msgstr "Synchronizované obnovení"
 
-#: src/frontend/mame/ui/submenu.cpp:128
+#: src/frontend/mame/ui/submenu.cpp:135
 msgid "Wait Vertical Sync"
 msgstr "Čekat na V-Sync"
 
-#: src/frontend/mame/ui/menu.cpp:367 src/frontend/mame/ui/menu.cpp:695
-#: src/frontend/mame/ui/videoopt.cpp:191 plugins/cheatfind/init.lua:766
-#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:666
+#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:687
+#: src/frontend/mame/ui/videoopt.cpp:191 src/frontend/mame/ui/custui.cpp:490
+#: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:766
+#: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
 msgid "On"
 msgstr "Zapnuto"
 
-#: src/frontend/mame/ui/menu.cpp:367 src/frontend/mame/ui/menu.cpp:698
-#: src/frontend/mame/ui/videoopt.cpp:207 plugins/cheatfind/init.lua:763
-#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:669
-#: plugins/cheat/init.lua:678
+#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:690
+#: src/frontend/mame/ui/videoopt.cpp:207 src/frontend/mame/ui/custui.cpp:490
+#: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:763
+#: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
+#: plugins/cheat/init.lua:680
 msgid "Off"
 msgstr "Vypnuto"
 
-#: src/frontend/mame/ui/menu.cpp:701
+#: src/frontend/mame/ui/menu.cpp:693
 msgid "Auto"
 msgstr "Automaticky"
 
-#: src/frontend/mame/ui/menu.cpp:1199
+#: src/frontend/mame/ui/menu.cpp:1195
 #: src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Return to Previous Menu"
 msgstr "Zpět na předchozí menu"
 
-#: src/frontend/mame/ui/filemngr.cpp:141 src/frontend/mame/ui/inputmap.cpp:541
+#: src/frontend/mame/ui/filemngr.cpp:139
+#: src/frontend/mame/ui/confswitch.cpp:119
+#: src/frontend/mame/ui/inputmap.cpp:559 src/frontend/mame/ui/analogipt.cpp:360
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/filemngr.cpp:154
-#: src/frontend/mame/ui/confswitch.cpp:172 src/frontend/mame/ui/slotopt.cpp:203
+#: src/frontend/mame/ui/filemngr.cpp:153
+#: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:203
 msgid "Reset Machine"
+msgstr ""
+
+#: src/frontend/mame/ui/filemngr.cpp:153 src/frontend/mame/ui/mainmenu.cpp:208
+msgid "Start Machine"
 msgstr ""
 
 #: src/frontend/mame/ui/videoopt.cpp:57
@@ -744,112 +755,112 @@ msgstr ""
 msgid "Cannot change options while recording!"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:32
+#: src/frontend/mame/ui/info.cpp:37
 msgctxt "emulation-feature"
 msgid "protection"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:33
+#: src/frontend/mame/ui/info.cpp:38
 msgctxt "emulation-feature"
 msgid "timing"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:34
+#: src/frontend/mame/ui/info.cpp:39
 msgctxt "emulation-feature"
 msgid "graphics"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:35
+#: src/frontend/mame/ui/info.cpp:40
 msgctxt "emulation-feature"
 msgid "color palette"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:36
+#: src/frontend/mame/ui/info.cpp:41
 msgctxt "emulation-feature"
 msgid "sound"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:37
+#: src/frontend/mame/ui/info.cpp:42
 msgctxt "emulation-feature"
 msgid "capture hardware"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:38
+#: src/frontend/mame/ui/info.cpp:43
 msgctxt "emulation-feature"
 msgid "camera"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:39
+#: src/frontend/mame/ui/info.cpp:44
 msgctxt "emulation-feature"
 msgid "microphone"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:40
+#: src/frontend/mame/ui/info.cpp:45
 msgctxt "emulation-feature"
 msgid "controls"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:41
+#: src/frontend/mame/ui/info.cpp:46
 msgctxt "emulation-feature"
 msgid "keyboard"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:42
+#: src/frontend/mame/ui/info.cpp:47
 msgctxt "emulation-feature"
 msgid "mouse"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:43
+#: src/frontend/mame/ui/info.cpp:48
 msgctxt "emulation-feature"
 msgid "media"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:44
+#: src/frontend/mame/ui/info.cpp:49
 msgctxt "emulation-feature"
 msgid "disk"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:45
+#: src/frontend/mame/ui/info.cpp:50
 msgctxt "emulation-feature"
 msgid "printer"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:46
+#: src/frontend/mame/ui/info.cpp:51
 msgctxt "emulation-feature"
 msgid "magnetic tape"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:47
+#: src/frontend/mame/ui/info.cpp:52
 msgctxt "emulation-feature"
 msgid "punch tape"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:48
+#: src/frontend/mame/ui/info.cpp:53
 msgctxt "emulation-feature"
 msgid "magnetic drum"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:49
+#: src/frontend/mame/ui/info.cpp:54
 msgctxt "emulation-feature"
 msgid "solid state storage"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:50
+#: src/frontend/mame/ui/info.cpp:55
 msgctxt "emulation-feature"
 msgid "communications"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:51
+#: src/frontend/mame/ui/info.cpp:56
 msgctxt "emulation-feature"
 msgid "LAN"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:52
+#: src/frontend/mame/ui/info.cpp:57
 msgctxt "emulation-feature"
 msgid "WAN"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:231
+#: src/frontend/mame/ui/info.cpp:66
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
@@ -857,7 +868,7 @@ msgstr ""
 "Jedna nebo více ROMs/CHDs pro toto zařízení je nekorektních. Zařízení nemusí "
 "fungovat správně.\n"
 
-#: src/frontend/mame/ui/info.cpp:241
+#: src/frontend/mame/ui/info.cpp:79
 msgid ""
 "There are known problems with this machine\n"
 "\n"
@@ -865,40 +876,40 @@ msgstr ""
 "S tímto zařízením jsou známy problémy\n"
 "\n"
 
-#: src/frontend/mame/ui/info.cpp:246
+#: src/frontend/mame/ui/info.cpp:84
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
 msgstr ""
 "Jedna nebo více ROM/CHD pro toto zařízení je špatně stažena (dumpnuta).\n"
 
-#: src/frontend/mame/ui/info.cpp:251
+#: src/frontend/mame/ui/info.cpp:92
 msgid "Completely unemulated features: "
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:257 src/frontend/mame/ui/info.cpp:273
+#: src/frontend/mame/ui/info.cpp:98 src/frontend/mame/ui/info.cpp:114
 #, c-format
 msgid "%s"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:257 src/frontend/mame/ui/info.cpp:273
-#: src/frontend/mame/ui/info.cpp:318
+#: src/frontend/mame/ui/info.cpp:98 src/frontend/mame/ui/info.cpp:114
+#: src/frontend/mame/ui/info.cpp:165
 #, c-format
 msgid ", %s"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:267
+#: src/frontend/mame/ui/info.cpp:108
 msgid "Imperfectly emulated features: "
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:282
+#: src/frontend/mame/ui/info.cpp:129
 msgid "Screen flipping in cocktail mode is not supported.\n"
 msgstr "Otočení obrazu v koktail módu není podporováno.\n"
 
-#: src/frontend/mame/ui/info.cpp:284
+#: src/frontend/mame/ui/info.cpp:131
 msgid "This machine requires external artwork files.\n"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:286
+#: src/frontend/mame/ui/info.cpp:133
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
@@ -906,7 +917,7 @@ msgstr ""
 "Zařízení nebylo nikdy dokončeno. Může se objevit zvláštní chování nebo "
 "chybějící části, jež nejsou chybou emulace.\n"
 
-#: src/frontend/mame/ui/info.cpp:288
+#: src/frontend/mame/ui/info.cpp:135
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
@@ -914,7 +925,7 @@ msgstr ""
 "Zařízení nemá zvukový hardware, MAME nebyde přehrávat zvuky, toto je "
 "očekávané chování.\n"
 
-#: src/frontend/mame/ui/info.cpp:292
+#: src/frontend/mame/ui/info.cpp:139
 msgid ""
 "\n"
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
@@ -925,7 +936,7 @@ msgstr ""
 "ZAŘÍZENÍ NEFUNGUJE. Emulace tohoto zařízení není ještě kompletní. Nic s tím "
 "nemůžete udělat, jen čekat na vývojáře až vylepší emulaci.\n"
 
-#: src/frontend/mame/ui/info.cpp:294
+#: src/frontend/mame/ui/info.cpp:141
 msgid ""
 "\n"
 "Elements of this machine cannot be emulated as they require physical "
@@ -933,7 +944,7 @@ msgid ""
 "experience this machine.\n"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:316
+#: src/frontend/mame/ui/info.cpp:163
 #, c-format
 msgid ""
 "\n"
@@ -944,7 +955,7 @@ msgstr ""
 "\n"
 "Existují funkční klony tohoto zařízení: %s"
 
-#: src/frontend/mame/ui/info.cpp:340
+#: src/frontend/mame/ui/info.cpp:364
 #, c-format
 msgid ""
 "%1$s\n"
@@ -959,27 +970,27 @@ msgstr ""
 "\n"
 "CPU:\n"
 
-#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
+#: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
 msgid "GHz"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
+#: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
 msgid "MHz"
 msgstr "MHz"
 
-#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
+#: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
 msgid "kHz"
 msgstr "kHz"
 
-#: src/frontend/mame/ui/info.cpp:382 src/frontend/mame/ui/info.cpp:425
-#: src/frontend/mame/ui/devopt.cpp:104 src/frontend/mame/ui/devopt.cpp:180
+#: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
 msgid "Hz"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:396
+#: src/frontend/mame/ui/info.cpp:420
 msgid ""
 "\n"
 "Sound:\n"
@@ -987,7 +998,7 @@ msgstr ""
 "\n"
 "Zvuk:\n"
 
-#: src/frontend/mame/ui/info.cpp:429
+#: src/frontend/mame/ui/info.cpp:453
 msgid ""
 "\n"
 "Video:\n"
@@ -995,41 +1006,46 @@ msgstr ""
 "\n"
 "Video:\n"
 
-#: src/frontend/mame/ui/info.cpp:433
+#: src/frontend/mame/ui/info.cpp:457
 msgid "None\n"
 msgstr "Žádný\n"
 
-#: src/frontend/mame/ui/info.cpp:440
+#: src/frontend/mame/ui/info.cpp:464
 msgid "Vector"
 msgstr "Vektor"
 
-#: src/frontend/mame/ui/info.cpp:456
+#: src/frontend/mame/ui/info.cpp:480
 #, c-format
 msgid "%1$s: %2$s\n"
 msgstr "%1$s: %2$s\n"
 
-#: src/frontend/mame/ui/info.cpp:456
+#: src/frontend/mame/ui/info.cpp:480
 msgid "%2$s\n"
 msgstr "%2$s\n"
 
-#: src/frontend/mame/ui/info.cpp:473
+#: src/frontend/mame/ui/info.cpp:497
 #, c-format
 msgid "Screen '%1$s'"
 msgstr "Obraz '%1$s'"
 
-#: src/frontend/mame/ui/info.cpp:475
+#: src/frontend/mame/ui/info.cpp:499
 msgid "Screen"
 msgstr "Obraz"
 
-#: src/frontend/mame/ui/info.cpp:607
+#: src/frontend/mame/ui/info.cpp:570 src/frontend/mame/ui/info.cpp:581
+#, c-format
+msgid "%1$s:\n"
+msgstr ""
+
+#: src/frontend/mame/ui/info.cpp:662
 msgid "Not supported"
 msgstr "Nepodporováno"
 
-#: src/frontend/mame/ui/info.cpp:610
+#: src/frontend/mame/ui/info.cpp:665
 msgid "Partially supported"
 msgstr "Částečná podpora"
 
-#: src/frontend/mame/ui/info.cpp:619
+#: src/frontend/mame/ui/info.cpp:674
 msgid "[empty]"
 msgstr "[prázdný]"
 
@@ -1037,19 +1053,19 @@ msgstr "[prázdný]"
 msgid "[file manager]"
 msgstr "[souborový manažer]"
 
-#: src/frontend/mame/ui/swlist.cpp:226
+#: src/frontend/mame/ui/swlist.cpp:227
 msgid "Switch Item Ordering"
 msgstr "Přepnout řazení"
 
-#: src/frontend/mame/ui/swlist.cpp:258
+#: src/frontend/mame/ui/swlist.cpp:259
 msgid "Switched Order: entries now ordered by shortname"
 msgstr "Přepnuté řazení: záznamy nyní řazeny podle shortname"
 
-#: src/frontend/mame/ui/swlist.cpp:259
+#: src/frontend/mame/ui/swlist.cpp:260
 msgid "Switched Order: entries now ordered by description"
 msgstr "Přepnuté řazení: záznamy nyní řazeny podle popis"
 
-#: src/frontend/mame/ui/swlist.cpp:395
+#: src/frontend/mame/ui/swlist.cpp:396
 msgid "[compatible lists]"
 msgstr "[kompatibilní seznamy]"
 
@@ -1089,32 +1105,33 @@ msgstr "Vyber formát obrázku"
 msgid "Select initial contents"
 msgstr ""
 
-#: src/frontend/mame/ui/keyboard.cpp:39 src/frontend/mame/ui/mainmenu.cpp:168
+#: src/frontend/mame/ui/keyboard.cpp:45 src/frontend/mame/ui/mainmenu.cpp:170
 msgid "Keyboard Mode"
 msgstr "Režim klávesnice"
 
-#: src/frontend/mame/ui/keyboard.cpp:40
+#: src/frontend/mame/ui/keyboard.cpp:46 src/frontend/mame/ui/keyboard.cpp:91
 msgid "Natural"
 msgstr "Přirozená"
 
-#: src/frontend/mame/ui/keyboard.cpp:40
+#: src/frontend/mame/ui/keyboard.cpp:46 src/frontend/mame/ui/keyboard.cpp:91
 msgid "Emulated"
 msgstr "Emulovaná"
 
-#: src/frontend/mame/ui/keyboard.cpp:53 src/frontend/mame/ui/inputmap.cpp:539
+#: src/frontend/mame/ui/keyboard.cpp:59 src/frontend/mame/ui/confswitch.cpp:117
+#: src/frontend/mame/ui/inputmap.cpp:557 src/frontend/mame/ui/analogipt.cpp:358
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/keyboard.cpp:53
+#: src/frontend/mame/ui/keyboard.cpp:59
 msgid "[root%2$s]"
 msgstr ""
 
-#: src/frontend/mame/ui/keyboard.cpp:56
+#: src/frontend/mame/ui/keyboard.cpp:62 src/frontend/mame/ui/keyboard.cpp:109
 msgid "Enabled"
 msgstr "Aktivováno"
 
-#: src/frontend/mame/ui/keyboard.cpp:56
+#: src/frontend/mame/ui/keyboard.cpp:62 src/frontend/mame/ui/keyboard.cpp:109
 msgid "Disabled"
 msgstr "Deaktivováno"
 
@@ -1461,7 +1478,7 @@ msgctxt "swlist-info"
 msgid "Software list/item"
 msgstr ""
 
-#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2692
+#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2698
 msgid "Software List Info"
 msgstr ""
 
@@ -1474,7 +1491,7 @@ msgstr "Verze: %1$s"
 msgid "Reset"
 msgstr "Reset"
 
-#: src/frontend/mame/ui/miscmenu.cpp:233
+#: src/frontend/mame/ui/miscmenu.cpp:234
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d:%3$02d\n"
@@ -1483,7 +1500,7 @@ msgstr ""
 "Čas běhu: %1$d:%2$02d:%3$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:235
+#: src/frontend/mame/ui/miscmenu.cpp:236
 #, c-format
 msgid ""
 "Uptime: %1$d:%2$02d\n"
@@ -1492,7 +1509,7 @@ msgstr ""
 "Čas běhu: %1$d:%2$02d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:240
+#: src/frontend/mame/ui/miscmenu.cpp:241
 #, c-format
 msgid ""
 "Tickets dispensed: %1$d\n"
@@ -1501,96 +1518,109 @@ msgstr ""
 "Lístků zahozeno: %1$d\n"
 "\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:253
+#: src/frontend/mame/ui/miscmenu.cpp:254
 msgid "Coin %1$c: NA%3$s\n"
 msgstr "Mince %1$c: NA%3$s\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:253
+#: src/frontend/mame/ui/miscmenu.cpp:254
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
 msgstr "Mince %1$c: %2$d%3$s\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:256
+#: src/frontend/mame/ui/miscmenu.cpp:257
 msgid " (locked)"
 msgstr " (zamčeno)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:473
+#: src/frontend/mame/ui/miscmenu.cpp:474
 #, c-format
 msgid "P%d Visibility"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:527
+#: src/frontend/mame/ui/miscmenu.cpp:528
 #, c-format
 msgid "P%d Crosshair"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:544
+#: src/frontend/mame/ui/miscmenu.cpp:545
 msgid "Visible Delay"
 msgstr "Viditelné zpoždění"
 
-#: src/frontend/mame/ui/miscmenu.cpp:654
+#: src/frontend/mame/ui/miscmenu.cpp:629
 #, c-format
 msgid "%s.xml saved in UI settings folder."
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:680
+#: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Name:             Description:\n"
 msgstr "Jméno:             Popis:\n"
 
-#: src/frontend/mame/ui/miscmenu.cpp:691
+#: src/frontend/mame/ui/miscmenu.cpp:666
 #, c-format
 msgid "%s.txt saved in UI settings folder."
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:708
+#: src/frontend/mame/ui/miscmenu.cpp:683
 msgid "Export list in XML format (like -listxml)"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:709
+#: src/frontend/mame/ui/miscmenu.cpp:684
 msgid "Export list in XML format (like -listxml, but exclude devices)"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:710
+#: src/frontend/mame/ui/miscmenu.cpp:685
 msgid "Export list in TXT format (like -listfull)"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:818
+#: src/frontend/mame/ui/miscmenu.cpp:792
 msgid "BIOS"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:822
+#: src/frontend/mame/ui/miscmenu.cpp:796
 msgid "Driver"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:825
+#: src/frontend/mame/ui/miscmenu.cpp:799
 msgid "This machine has no BIOS."
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:834 src/frontend/mame/ui/mainmenu.cpp:192
+#: src/frontend/mame/ui/miscmenu.cpp:808 src/frontend/mame/ui/mainmenu.cpp:194
 msgid "Add To Favorites"
 msgstr "Přidat do oblíbených"
 
-#: src/frontend/mame/ui/miscmenu.cpp:836 src/frontend/mame/ui/mainmenu.cpp:194
+#: src/frontend/mame/ui/miscmenu.cpp:810 src/frontend/mame/ui/mainmenu.cpp:196
 msgid "Remove From Favorites"
 msgstr "Odstranit z oblíbených"
 
-#: src/frontend/mame/ui/miscmenu.cpp:839
+#: src/frontend/mame/ui/miscmenu.cpp:813
 msgid "Save Machine Configuration"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:850
+#: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "Configure Machine:"
 msgstr ""
 
-#: src/frontend/mame/ui/miscmenu.cpp:884 src/frontend/mame/ui/selmenu.cpp:2632
+#: src/frontend/mame/ui/miscmenu.cpp:858 src/frontend/mame/ui/selmenu.cpp:2638
 msgid " (default)"
 msgstr " (standardní)"
 
-#: src/frontend/mame/ui/miscmenu.cpp:960
+#: src/frontend/mame/ui/miscmenu.cpp:934
 msgid "No plugins found"
 msgstr ""
 
-#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:153
+#: src/frontend/mame/ui/quitmenu.cpp:37
+#, c-format
+msgid ""
+"Are you sure you want to quit?\n"
+"\n"
+"Press %1$s to quit\n"
+"Press %2$s to return to emulation"
+msgstr ""
+"Určitě chcete odejít?\n"
+"\n"
+"Stiskni %1$s pro ukončení\n"
+"Stiskni %2$s pro návrat do emulace"
+
+#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:155
 msgid "Pseudo terminals"
 msgstr "Pseudo terminály"
 
@@ -1598,15 +1628,15 @@ msgstr "Pseudo terminály"
 msgid "[failed]"
 msgstr "[chybný]"
 
-#: src/frontend/mame/ui/state.cpp:224
+#: src/frontend/mame/ui/state.cpp:217
 msgid "[no saved states found]"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:229 plugins/cheatfind/init.lua:492
+#: src/frontend/mame/ui/state.cpp:222 plugins/cheatfind/init.lua:492
 msgid "Cancel"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:277
+#: src/frontend/mame/ui/state.cpp:261
 #, c-format
 msgid ""
 "Delete saved state %1$s?\n"
@@ -1614,29 +1644,29 @@ msgid ""
 "Press %3$s to cancel"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:390
+#: src/frontend/mame/ui/state.cpp:374
 #, c-format
 msgid "Error removing saved state file %1$s"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:442
+#: src/frontend/mame/ui/state.cpp:426
 #, c-format
 msgid "Press %1$s to delete"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:515
+#: src/frontend/mame/ui/state.cpp:499
 msgid "Load State"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:515
+#: src/frontend/mame/ui/state.cpp:499
 msgid "Select state to load"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:539
+#: src/frontend/mame/ui/state.cpp:523
 msgid "Save State"
 msgstr ""
 
-#: src/frontend/mame/ui/state.cpp:539
+#: src/frontend/mame/ui/state.cpp:523
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
 
@@ -1658,52 +1688,52 @@ msgstr ""
 msgid "Other Controls"
 msgstr "Ostatní ovládání"
 
-#: src/frontend/mame/ui/inputmap.cpp:226
+#: src/frontend/mame/ui/inputmap.cpp:227
 msgid "This machine has no configurable inputs."
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:318
+#: src/frontend/mame/ui/inputmap.cpp:327
 msgid "Pressed"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:388
+#: src/frontend/mame/ui/inputmap.cpp:397
 msgid "Invalid sequence entered"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:524
+#: src/frontend/mame/ui/inputmap.cpp:542
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:525
+#: src/frontend/mame/ui/inputmap.cpp:543
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:526
+#: src/frontend/mame/ui/inputmap.cpp:544
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:568
+#: src/frontend/mame/ui/inputmap.cpp:586
 #, c-format
 msgid "Press %1$s to set\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:569
+#: src/frontend/mame/ui/inputmap.cpp:587
 #, c-format
 msgid "Press %1$s to append\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:570
+#: src/frontend/mame/ui/inputmap.cpp:588
 #, c-format
 msgid "Press %1$s to clear\n"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:571
+#: src/frontend/mame/ui/inputmap.cpp:589
 #, c-format
 msgid "Press %1$s to restore default\n"
 msgstr ""
@@ -1758,7 +1788,7 @@ msgid ""
 "Please acquire the correct files or select a different one."
 msgstr ""
 
-#: src/frontend/mame/ui/simpleselgame.cpp:147
+#: src/frontend/mame/ui/simpleselgame.cpp:146
 msgid ""
 "The selected game is missing one or more required ROM or CHD images. Please "
 "select a different game.\n"
@@ -1767,7 +1797,7 @@ msgid ""
 msgstr ""
 
 #: src/frontend/mame/ui/simpleselgame.cpp:273
-#: src/frontend/mame/ui/selgame.cpp:443
+#: src/frontend/mame/ui/selgame.cpp:436
 msgid "Configure Options"
 msgstr "Možnosti konfigurace"
 
@@ -1863,7 +1893,7 @@ msgstr "Zvuk: Nedokonalý"
 msgid "Sound: OK"
 msgstr "Zvuk: OK"
 
-#: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:749
+#: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:751
 #, c-format, lua-format
 msgid ""
 "Cheat Comment:\n"
@@ -1876,11 +1906,11 @@ msgstr ""
 msgid "All cheats reloaded"
 msgstr "Všechny cheaty znovu načteny"
 
-#: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:696
+#: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:698
 msgid "Reset All"
 msgstr "Resetovat vše"
 
-#: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:697
+#: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:699
 msgid "Reload All"
 msgstr "Znovu načíst vše"
 
@@ -2101,16 +2131,16 @@ msgstr ""
 msgid "Expand to fit"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:444
+#: src/frontend/mame/ui/selgame.cpp:437
 msgid "Configure Machine"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:1060
+#: src/frontend/mame/ui/selgame.cpp:1050
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
 msgstr "%1$s %2$s ( %3$d / %4$d zařízení (%5$d BIOS) )"
 
-#: src/frontend/mame/ui/selgame.cpp:1088
+#: src/frontend/mame/ui/selgame.cpp:1078
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "Systém: %1$-.100s"
@@ -2160,283 +2190,283 @@ msgstr ""
 msgid "Press %1$s to cancel\n"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:33
+#: src/frontend/mame/ui/custui.cpp:52
 msgid "Show All"
 msgstr "Zobrazit vše"
 
-#: src/frontend/mame/ui/custui.cpp:34
+#: src/frontend/mame/ui/custui.cpp:53
 msgid "Hide Filters"
 msgstr "Skrýt filtry"
 
-#: src/frontend/mame/ui/custui.cpp:35
+#: src/frontend/mame/ui/custui.cpp:54
 msgid "Hide Info/Image"
 msgstr "Skrýt info/obrázek"
 
-#: src/frontend/mame/ui/custui.cpp:36
+#: src/frontend/mame/ui/custui.cpp:55
 msgid "Hide Both"
 msgstr "Skrýt obojí"
 
-#: src/frontend/mame/ui/custui.cpp:175
+#: src/frontend/mame/ui/custui.cpp:210
 msgid "Fonts"
 msgstr "Písma"
 
-#: src/frontend/mame/ui/custui.cpp:176
+#: src/frontend/mame/ui/custui.cpp:211
 msgid "Colors"
 msgstr "Barvy"
 
-#: src/frontend/mame/ui/custui.cpp:179
+#: src/frontend/mame/ui/custui.cpp:214
 msgid "Language"
 msgstr "Jazyk"
 
-#: src/frontend/mame/ui/custui.cpp:182
+#: src/frontend/mame/ui/custui.cpp:217
 msgid "System Names"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:185
+#: src/frontend/mame/ui/custui.cpp:220
 msgid "Show side panels"
 msgstr "Zobraz postranní panely"
 
-#: src/frontend/mame/ui/custui.cpp:197
+#: src/frontend/mame/ui/custui.cpp:232
 msgid "UI Customization Settings"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:211 src/frontend/mame/ui/custui.cpp:255
+#: src/frontend/mame/ui/custui.cpp:246 src/frontend/mame/ui/custui.cpp:290
 msgid "[built-in]"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:339
+#: src/frontend/mame/ui/custui.cpp:374
 msgid "default"
 msgstr "standardní"
 
-#: src/frontend/mame/ui/custui.cpp:458
+#: src/frontend/mame/ui/custui.cpp:509
 msgid "UI Font"
 msgstr "UI Písmo"
 
-#: src/frontend/mame/ui/custui.cpp:463
+#: src/frontend/mame/ui/custui.cpp:514
 msgid "Bold"
 msgstr "Tučné"
 
-#: src/frontend/mame/ui/custui.cpp:464
+#: src/frontend/mame/ui/custui.cpp:515
 msgid "Italic"
 msgstr "Kurzíva"
 
-#: src/frontend/mame/ui/custui.cpp:469
+#: src/frontend/mame/ui/custui.cpp:520
 msgid "Lines"
 msgstr "Linie"
 
-#: src/frontend/mame/ui/custui.cpp:475
+#: src/frontend/mame/ui/custui.cpp:525
 msgid "Infos text size"
 msgstr "Velikost info textů"
 
-#: src/frontend/mame/ui/custui.cpp:489
+#: src/frontend/mame/ui/custui.cpp:539
 msgid "UI Fonts Settings"
 msgstr "Nastavení písma UI"
 
-#: src/frontend/mame/ui/custui.cpp:498
+#: src/frontend/mame/ui/custui.cpp:548
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
 "Ukázkový text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
-#: src/frontend/mame/ui/custui.cpp:581
+#: src/frontend/mame/ui/custui.cpp:625
 msgctxt "color-option"
 msgid "Normal text"
 msgstr "Normální text"
 
-#: src/frontend/mame/ui/custui.cpp:582
+#: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
 msgid "Selected color"
 msgstr "Vybraná barva"
 
-#: src/frontend/mame/ui/custui.cpp:583
+#: src/frontend/mame/ui/custui.cpp:627
 msgctxt "color-option"
 msgid "Normal text background"
 msgstr "Pozadí normálního textu"
 
-#: src/frontend/mame/ui/custui.cpp:584
+#: src/frontend/mame/ui/custui.cpp:628
 msgctxt "color-option"
 msgid "Selected background color"
 msgstr "Barva pozadí vybraného textu"
 
-#: src/frontend/mame/ui/custui.cpp:585
+#: src/frontend/mame/ui/custui.cpp:629
 msgctxt "color-option"
 msgid "Subitem color"
 msgstr "Barva podpoložky"
 
-#: src/frontend/mame/ui/custui.cpp:586
+#: src/frontend/mame/ui/custui.cpp:630
 msgctxt "color-option"
 msgid "Clone"
 msgstr "Klon"
 
-#: src/frontend/mame/ui/custui.cpp:587
+#: src/frontend/mame/ui/custui.cpp:631
 msgctxt "color-option"
 msgid "Border"
 msgstr "Okraj"
 
-#: src/frontend/mame/ui/custui.cpp:588
+#: src/frontend/mame/ui/custui.cpp:632
 msgctxt "color-option"
 msgid "Background"
 msgstr "Pozadí"
 
-#: src/frontend/mame/ui/custui.cpp:589
+#: src/frontend/mame/ui/custui.cpp:633
 msgctxt "color-option"
 msgid "DIP switch"
 msgstr "DIP přepínač"
 
-#: src/frontend/mame/ui/custui.cpp:590
+#: src/frontend/mame/ui/custui.cpp:634
 msgctxt "color-option"
 msgid "Unavailable color"
 msgstr "Barva nedostupné položky"
 
-#: src/frontend/mame/ui/custui.cpp:591
+#: src/frontend/mame/ui/custui.cpp:635
 msgctxt "color-option"
 msgid "Slider color"
 msgstr "Barva posuvníku"
 
-#: src/frontend/mame/ui/custui.cpp:592
+#: src/frontend/mame/ui/custui.cpp:636
 msgctxt "color-option"
 msgid "Graphics viewer background"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:593
+#: src/frontend/mame/ui/custui.cpp:637
 msgctxt "color-option"
 msgid "Mouse over color"
 msgstr "Barva při přejetí myši"
 
-#: src/frontend/mame/ui/custui.cpp:594
+#: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
 msgid "Mouse over background color"
 msgstr "Barva pozadí při přejetí myši"
 
-#: src/frontend/mame/ui/custui.cpp:595
+#: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Mouse down color"
 msgstr "Barva při stisku myši"
 
-#: src/frontend/mame/ui/custui.cpp:596
+#: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
 msgid "Mouse down background color"
 msgstr "Barva pozadí při stisku myši"
 
-#: src/frontend/mame/ui/custui.cpp:599
+#: src/frontend/mame/ui/custui.cpp:644
 msgid "Restore default colors"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:611
+#: src/frontend/mame/ui/custui.cpp:656
 msgid "UI Color Settings"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:620
+#: src/frontend/mame/ui/custui.cpp:665
 #, c-format
 msgid "Double-click or press %1$s to change color"
 msgstr ""
 
-#: src/frontend/mame/ui/custui.cpp:628
+#: src/frontend/mame/ui/custui.cpp:673
 msgid "Menu Preview"
 msgstr "Menu náhled"
 
-#: src/frontend/mame/ui/custui.cpp:642
+#: src/frontend/mame/ui/custui.cpp:687
 msgctxt "color-sample"
 msgid "Normal"
 msgstr "Normální"
 
-#: src/frontend/mame/ui/custui.cpp:643
+#: src/frontend/mame/ui/custui.cpp:688
 msgctxt "color-sample"
 msgid "Subitem"
 msgstr "Podpoložka"
 
-#: src/frontend/mame/ui/custui.cpp:644
+#: src/frontend/mame/ui/custui.cpp:689
 msgctxt "color-sample"
 msgid "Selected"
 msgstr "Vybraný"
 
-#: src/frontend/mame/ui/custui.cpp:645
+#: src/frontend/mame/ui/custui.cpp:690
 msgctxt "color-sample"
 msgid "Mouse Over"
 msgstr "Přejetí myši"
 
-#: src/frontend/mame/ui/custui.cpp:646
+#: src/frontend/mame/ui/custui.cpp:691
 msgctxt "color-sample"
 msgid "Clone"
 msgstr "Klon"
 
-#: src/frontend/mame/ui/custui.cpp:868
+#: src/frontend/mame/ui/custui.cpp:914
 msgid "ARGB Settings"
 msgstr "ARGB nastavení"
 
-#: src/frontend/mame/ui/custui.cpp:873 src/frontend/mame/ui/custui.cpp:876
+#: src/frontend/mame/ui/custui.cpp:919 src/frontend/mame/ui/custui.cpp:922
 msgctxt "color-channel"
 msgid "Alpha"
 msgstr "Průhlednost"
 
-#: src/frontend/mame/ui/custui.cpp:881 src/frontend/mame/ui/custui.cpp:884
+#: src/frontend/mame/ui/custui.cpp:927 src/frontend/mame/ui/custui.cpp:930
 msgctxt "color-channel"
 msgid "Red"
 msgstr "Červená"
 
-#: src/frontend/mame/ui/custui.cpp:889 src/frontend/mame/ui/custui.cpp:892
+#: src/frontend/mame/ui/custui.cpp:935 src/frontend/mame/ui/custui.cpp:938
 msgctxt "color-channel"
 msgid "Green"
 msgstr "Zelená"
 
-#: src/frontend/mame/ui/custui.cpp:897 src/frontend/mame/ui/custui.cpp:900
+#: src/frontend/mame/ui/custui.cpp:943 src/frontend/mame/ui/custui.cpp:946
 msgctxt "color-channel"
 msgid "Blue"
 msgstr "Modrá"
 
-#: src/frontend/mame/ui/custui.cpp:903
+#: src/frontend/mame/ui/custui.cpp:949
 msgid "Choose from palette"
 msgstr "Výběr z palety"
 
-#: src/frontend/mame/ui/custui.cpp:950
+#: src/frontend/mame/ui/custui.cpp:996
 msgid "Color preview:"
 msgstr "Barevný náhled:"
 
-#: src/frontend/mame/ui/custui.cpp:1043
+#: src/frontend/mame/ui/custui.cpp:1093
 msgctxt "color-preset"
 msgid "White"
 msgstr "Bílá"
 
-#: src/frontend/mame/ui/custui.cpp:1044
+#: src/frontend/mame/ui/custui.cpp:1094
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "Stříbrná"
 
-#: src/frontend/mame/ui/custui.cpp:1045
+#: src/frontend/mame/ui/custui.cpp:1095
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "Šedá"
 
-#: src/frontend/mame/ui/custui.cpp:1046
+#: src/frontend/mame/ui/custui.cpp:1096
 msgctxt "color-preset"
 msgid "Black"
 msgstr "Černá"
 
-#: src/frontend/mame/ui/custui.cpp:1047
+#: src/frontend/mame/ui/custui.cpp:1097
 msgctxt "color-preset"
 msgid "Red"
 msgstr "Červená"
 
-#: src/frontend/mame/ui/custui.cpp:1048
+#: src/frontend/mame/ui/custui.cpp:1098
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "Oranžová"
 
-#: src/frontend/mame/ui/custui.cpp:1049
+#: src/frontend/mame/ui/custui.cpp:1099
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Žlutá"
 
-#: src/frontend/mame/ui/custui.cpp:1050
+#: src/frontend/mame/ui/custui.cpp:1100
 msgctxt "color-preset"
 msgid "Green"
 msgstr "Zelená"
 
-#: src/frontend/mame/ui/custui.cpp:1051
+#: src/frontend/mame/ui/custui.cpp:1101
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "Modrá"
 
-#: src/frontend/mame/ui/custui.cpp:1052
+#: src/frontend/mame/ui/custui.cpp:1102
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "Fialová"
@@ -2459,6 +2489,31 @@ msgctxt "about-header"
 msgid "Revision: %1$s"
 msgstr ""
 
+#: src/frontend/mame/ui/analogipt.cpp:91
+#, c-format
+msgid "Press %s to show menu"
+msgstr ""
+
+#: src/frontend/mame/ui/analogipt.cpp:369
+#, c-format
+msgid "%1$s Increment/Decrement Speed"
+msgstr ""
+
+#: src/frontend/mame/ui/analogipt.cpp:374
+#, c-format
+msgid "%1$s Auto-centering Speed"
+msgstr ""
+
+#: src/frontend/mame/ui/analogipt.cpp:379
+#, c-format
+msgid "%1$s Reverse"
+msgstr ""
+
+#: src/frontend/mame/ui/analogipt.cpp:384
+#, c-format
+msgid "%1$s Sensitivity"
+msgstr ""
+
 #: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
 msgstr "Nový čárový kód:"
@@ -2471,100 +2526,96 @@ msgstr "Vložit kód"
 msgid "Barcode length invalid!"
 msgstr "Špatná délka čárového kódu!"
 
-#: src/frontend/mame/ui/mainmenu.cpp:119
+#: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Input (general)"
 msgstr "Vstup (vše)"
 
-#: src/frontend/mame/ui/mainmenu.cpp:121
+#: src/frontend/mame/ui/mainmenu.cpp:123
 msgid "Input (this Machine)"
 msgstr "Vstup (toto zařízení)"
 
-#: src/frontend/mame/ui/mainmenu.cpp:124
+#: src/frontend/mame/ui/mainmenu.cpp:126
 msgid "Analog Controls"
 msgstr "Analogové ovladače"
 
-#: src/frontend/mame/ui/mainmenu.cpp:126
+#: src/frontend/mame/ui/mainmenu.cpp:128
 msgid "DIP Switches"
 msgstr "DIP přepínače"
 
-#: src/frontend/mame/ui/mainmenu.cpp:128
+#: src/frontend/mame/ui/mainmenu.cpp:130
 msgid "Machine Configuration"
 msgstr "Nastavení zařízení"
 
-#: src/frontend/mame/ui/mainmenu.cpp:130
+#: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Bookkeeping Info"
 msgstr "Zapsané informace"
 
-#: src/frontend/mame/ui/mainmenu.cpp:132
+#: src/frontend/mame/ui/mainmenu.cpp:134
 msgid "Machine Information"
 msgstr "Informace o zařízení"
 
-#: src/frontend/mame/ui/mainmenu.cpp:135
+#: src/frontend/mame/ui/mainmenu.cpp:137
 msgid "Warning Information"
 msgstr ""
 
-#: src/frontend/mame/ui/mainmenu.cpp:141
+#: src/frontend/mame/ui/mainmenu.cpp:143
 msgid "Image Information"
 msgstr "Informace o programu"
 
-#: src/frontend/mame/ui/mainmenu.cpp:143
+#: src/frontend/mame/ui/mainmenu.cpp:145
 msgid "File Manager"
 msgstr "Souborový manažer"
 
-#: src/frontend/mame/ui/mainmenu.cpp:150
+#: src/frontend/mame/ui/mainmenu.cpp:152
 msgid "Tape Control"
 msgstr "Ovládání kazetového přehrávače"
 
-#: src/frontend/mame/ui/mainmenu.cpp:156
+#: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
 msgstr "Výběr BIOSu"
 
-#: src/frontend/mame/ui/mainmenu.cpp:159
+#: src/frontend/mame/ui/mainmenu.cpp:161
 msgid "Slot Devices"
 msgstr "Zásuvná zařízení"
 
-#: src/frontend/mame/ui/mainmenu.cpp:162
+#: src/frontend/mame/ui/mainmenu.cpp:164
 msgid "Barcode Reader"
 msgstr "Čtečka čárového kódu"
 
-#: src/frontend/mame/ui/mainmenu.cpp:165
+#: src/frontend/mame/ui/mainmenu.cpp:167
 msgid "Network Devices"
 msgstr "Síťová zařízení"
 
-#: src/frontend/mame/ui/mainmenu.cpp:170
+#: src/frontend/mame/ui/mainmenu.cpp:172
 msgid "Slider Controls"
 msgstr "Posuvné ovladače"
 
-#: src/frontend/mame/ui/mainmenu.cpp:175
+#: src/frontend/mame/ui/mainmenu.cpp:177
 msgid "Crosshair Options"
 msgstr "Nastavení zameřovače"
 
-#: src/frontend/mame/ui/mainmenu.cpp:178 plugins/cheat/init.lua:797
+#: src/frontend/mame/ui/mainmenu.cpp:180 plugins/cheat/init.lua:799
 msgid "Cheat"
 msgstr "Cheat"
 
-#: src/frontend/mame/ui/mainmenu.cpp:183
+#: src/frontend/mame/ui/mainmenu.cpp:185
 msgid "Plugin Options"
 msgstr ""
 
-#: src/frontend/mame/ui/mainmenu.cpp:186
+#: src/frontend/mame/ui/mainmenu.cpp:188
 msgid "External DAT View"
 msgstr "Externí DAT zobrazení"
 
-#: src/frontend/mame/ui/mainmenu.cpp:198
+#: src/frontend/mame/ui/mainmenu.cpp:200
 #, c-format
 msgid "About %s"
 msgstr ""
 
-#: src/frontend/mame/ui/mainmenu.cpp:206
-msgid "Start Machine"
-msgstr ""
-
-#: src/frontend/mame/ui/mainmenu.cpp:210
+#: src/frontend/mame/ui/mainmenu.cpp:212
 msgid "Select New Machine"
 msgstr "Vyber nové zařízení"
 
-#: src/frontend/mame/ui/mainmenu.cpp:211
+#: src/frontend/mame/ui/mainmenu.cpp:213
 msgid "Return to Machine"
 msgstr "Zpět na zařízení"
 
@@ -2717,355 +2768,355 @@ msgstr "Driver je klon: %1$s"
 msgid "%1$s %2$s"
 msgstr "%1$s %2$s"
 
-#: src/frontend/mame/ui/selmenu.cpp:2229
+#: src/frontend/mame/ui/selmenu.cpp:2235
 msgid "Images"
 msgstr "Obrázky"
 
-#: src/frontend/mame/ui/selmenu.cpp:2230
+#: src/frontend/mame/ui/selmenu.cpp:2236
 msgid "Infos"
 msgstr "Informace"
 
-#: src/frontend/mame/ui/selmenu.cpp:2545
+#: src/frontend/mame/ui/selmenu.cpp:2551
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2561
+#: src/frontend/mame/ui/selmenu.cpp:2567
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2577
+#: src/frontend/mame/ui/selmenu.cpp:2583
 msgid "incorrect checksum"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2580
+#: src/frontend/mame/ui/selmenu.cpp:2586
 msgid "incorrect length"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2583
+#: src/frontend/mame/ui/selmenu.cpp:2589
 msgid "not found"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2594
+#: src/frontend/mame/ui/selmenu.cpp:2600
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2596
+#: src/frontend/mame/ui/selmenu.cpp:2602
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2600
+#: src/frontend/mame/ui/selmenu.cpp:2606
 msgid "Press any key to continue."
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2729
+#: src/frontend/mame/ui/selmenu.cpp:2735
 msgid "General Info"
 msgstr "Základní informace"
 
-#: src/frontend/mame/ui/selmenu.cpp:2881
+#: src/frontend/mame/ui/selmenu.cpp:2887
 #, c-format
 msgid "Romset\t%1$s\n"
 msgstr "Romset\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2882
+#: src/frontend/mame/ui/selmenu.cpp:2888
 #, c-format
 msgid "Year\t%1$s\n"
 msgstr "Rok\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2883
+#: src/frontend/mame/ui/selmenu.cpp:2889
 #, c-format
 msgid "Manufacturer\t%1$s\n"
 msgstr "Výrobce\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2890
+#: src/frontend/mame/ui/selmenu.cpp:2896
 #, c-format
 msgid "Driver is Clone of\t%1$s\n"
 msgstr "Driver je Klon\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2895
+#: src/frontend/mame/ui/selmenu.cpp:2901
 msgid "Driver is Parent\t\n"
 msgstr "Driver je Parent\t\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2899
+#: src/frontend/mame/ui/selmenu.cpp:2905
 msgid "Analog Controls\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2901
+#: src/frontend/mame/ui/selmenu.cpp:2907
 msgid "Keyboard Inputs\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2904
+#: src/frontend/mame/ui/selmenu.cpp:2910
 msgid "Overall\tNOT WORKING\n"
 msgstr "Celkově\tNEFUNGUJE\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2906
+#: src/frontend/mame/ui/selmenu.cpp:2912
 msgid "Overall\tUnemulated Protection\n"
 msgstr "Celkově\tNeemulovaná ochrana\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2908
+#: src/frontend/mame/ui/selmenu.cpp:2914
 msgid "Overall\tWorking\n"
 msgstr "Celkově\tFunguje\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2911
+#: src/frontend/mame/ui/selmenu.cpp:2917
 msgid "Graphics\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2913
+#: src/frontend/mame/ui/selmenu.cpp:2919
 msgid "Graphics\tWrong Colors\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2915
+#: src/frontend/mame/ui/selmenu.cpp:2921
 msgid "Graphics\tImperfect Colors\n"
 msgstr "Grafika\tNedokonalé barvy\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2917
+#: src/frontend/mame/ui/selmenu.cpp:2923
 msgid "Graphics\tImperfect\n"
 msgstr "Grafika\tNedokonalá\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2919
+#: src/frontend/mame/ui/selmenu.cpp:2925
 msgid "Graphics\tOK\n"
 msgstr "Grafika\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2922
+#: src/frontend/mame/ui/selmenu.cpp:2928
 msgid "Sound\tNone\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2924
+#: src/frontend/mame/ui/selmenu.cpp:2930
 msgid "Sound\tUnimplemented\n"
 msgstr "Zvuk\tNeimplementován\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2926
+#: src/frontend/mame/ui/selmenu.cpp:2932
 msgid "Sound\tImperfect\n"
 msgstr "Zvuk\tNedokonalý\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2928
+#: src/frontend/mame/ui/selmenu.cpp:2934
 msgid "Sound\tOK\n"
 msgstr "Zvuk\tOK\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2931
+#: src/frontend/mame/ui/selmenu.cpp:2937
 msgid "Capture\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2933
+#: src/frontend/mame/ui/selmenu.cpp:2939
 msgid "Capture\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2936
+#: src/frontend/mame/ui/selmenu.cpp:2942
 msgid "Camera\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2938
+#: src/frontend/mame/ui/selmenu.cpp:2944
 msgid "Camera\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2941
+#: src/frontend/mame/ui/selmenu.cpp:2947
 msgid "Microphone\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2943
+#: src/frontend/mame/ui/selmenu.cpp:2949
 msgid "Microphone\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2946
+#: src/frontend/mame/ui/selmenu.cpp:2952
 msgid "Controls\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2948
+#: src/frontend/mame/ui/selmenu.cpp:2954
 msgid "Controls\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2951
+#: src/frontend/mame/ui/selmenu.cpp:2957
 msgid "Keyboard\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2953
+#: src/frontend/mame/ui/selmenu.cpp:2959
 msgid "Keyboard\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2956
+#: src/frontend/mame/ui/selmenu.cpp:2962
 msgid "Mouse\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2958
+#: src/frontend/mame/ui/selmenu.cpp:2964
 msgid "Mouse\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2961
+#: src/frontend/mame/ui/selmenu.cpp:2967
 msgid "Media\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2963
+#: src/frontend/mame/ui/selmenu.cpp:2969
 msgid "Media\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2966
+#: src/frontend/mame/ui/selmenu.cpp:2972
 msgid "Disk\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2968
+#: src/frontend/mame/ui/selmenu.cpp:2974
 msgid "Disk\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2971
+#: src/frontend/mame/ui/selmenu.cpp:2977
 msgid "Printer\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2973
+#: src/frontend/mame/ui/selmenu.cpp:2979
 msgid "Printer\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2976
+#: src/frontend/mame/ui/selmenu.cpp:2982
 msgid "Mag. Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2978
+#: src/frontend/mame/ui/selmenu.cpp:2984
 msgid "Mag. Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2981
+#: src/frontend/mame/ui/selmenu.cpp:2987
 msgid "Punch Tape\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2983
+#: src/frontend/mame/ui/selmenu.cpp:2989
 msgid "Punch Tape\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2986
+#: src/frontend/mame/ui/selmenu.cpp:2992
 msgid "Mag. Drum\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2988
+#: src/frontend/mame/ui/selmenu.cpp:2994
 msgid "Mag. Drum\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2991
+#: src/frontend/mame/ui/selmenu.cpp:2997
 msgid "(EP)ROM\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2993
+#: src/frontend/mame/ui/selmenu.cpp:2999
 msgid "(EP)ROM\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2996
+#: src/frontend/mame/ui/selmenu.cpp:3002
 msgid "Communications\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2998
+#: src/frontend/mame/ui/selmenu.cpp:3004
 msgid "Communications\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3001
+#: src/frontend/mame/ui/selmenu.cpp:3007
 msgid "LAN\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3003
+#: src/frontend/mame/ui/selmenu.cpp:3009
 msgid "LAN\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3006
+#: src/frontend/mame/ui/selmenu.cpp:3012
 msgid "WAN\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3008
+#: src/frontend/mame/ui/selmenu.cpp:3014
 msgid "WAN\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3011
+#: src/frontend/mame/ui/selmenu.cpp:3017
 msgid "Timing\tUnimplemented\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3013
+#: src/frontend/mame/ui/selmenu.cpp:3019
 msgid "Timing\tImperfect\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "Mechanical Machine\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3015
+#: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "Mechanical Machine\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3016
+#: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Requires Artwork\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3016
+#: src/frontend/mame/ui/selmenu.cpp:3022
 msgid "Requires Artwork\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3017
+#: src/frontend/mame/ui/selmenu.cpp:3023
 msgid "Requires Clickable Artwork\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3017
+#: src/frontend/mame/ui/selmenu.cpp:3023
 msgid "Requires Clickable Artwork\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3019
+#: src/frontend/mame/ui/selmenu.cpp:3025
 msgid "Support Cocktail\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3020
+#: src/frontend/mame/ui/selmenu.cpp:3026
 msgid "Driver is BIOS\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3020
+#: src/frontend/mame/ui/selmenu.cpp:3026
 msgid "Driver is BIOS\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3021
+#: src/frontend/mame/ui/selmenu.cpp:3027
 msgid "Support Save\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3021
+#: src/frontend/mame/ui/selmenu.cpp:3027
 msgid "Support Save\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:3028
 msgid "Screen Orientation\tVertical\n"
 msgstr "Orientace obrazovky\tVertikální\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:3028
 msgid "Screen Orientation\tHorizontal\n"
 msgstr "Orientace obrazovky\tHorizontální\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3032
+#: src/frontend/mame/ui/selmenu.cpp:3038
 msgid "Requires CHD\tYes\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3032
+#: src/frontend/mame/ui/selmenu.cpp:3038
 msgid "Requires CHD\tNo\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3045
+#: src/frontend/mame/ui/selmenu.cpp:3051
 msgid "ROM Audit Result\tOK\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3047
+#: src/frontend/mame/ui/selmenu.cpp:3053
 msgid "ROM Audit Result\tBAD\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3050
+#: src/frontend/mame/ui/selmenu.cpp:3056
 msgid "Samples Audit Result\tNone Needed\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3052
+#: src/frontend/mame/ui/selmenu.cpp:3058
 msgid "Samples Audit Result\tOK\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3054
+#: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "Samples Audit Result\tBAD\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:3058
+#: src/frontend/mame/ui/selmenu.cpp:3064
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
@@ -3087,7 +3138,7 @@ msgstr "Vzorkovací frekvence"
 msgid "Use External Samples"
 msgstr "Použít externí samply"
 
-#: src/frontend/mame/ui/devopt.cpp:57
+#: src/frontend/mame/ui/devopt.cpp:58
 #, c-format
 msgid ""
 "[This option is currently mounted in the running system]\n"
@@ -3098,7 +3149,7 @@ msgid ""
 "The selected option enables the following items:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:58
+#: src/frontend/mame/ui/devopt.cpp:59
 #, c-format
 msgid ""
 "[This option is NOT currently mounted in the running system]\n"
@@ -3109,117 +3160,117 @@ msgid ""
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:67
+#: src/frontend/mame/ui/devopt.cpp:68
 msgid "* CPU:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:113
+#: src/frontend/mame/ui/devopt.cpp:114
 msgid "* Video:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:118
+#: src/frontend/mame/ui/devopt.cpp:119
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:131
+#: src/frontend/mame/ui/devopt.cpp:132
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:132
+#: src/frontend/mame/ui/devopt.cpp:133
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:146
+#: src/frontend/mame/ui/devopt.cpp:147
 msgid "* Sound:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:210
+#: src/frontend/mame/ui/devopt.cpp:211
 #, c-format
 msgid ""
 "* BIOS settings:\n"
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:254 src/frontend/mame/ui/devopt.cpp:270
-#: src/frontend/mame/ui/devopt.cpp:331
+#: src/frontend/mame/ui/devopt.cpp:255 src/frontend/mame/ui/devopt.cpp:271
+#: src/frontend/mame/ui/devopt.cpp:332
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:259 src/frontend/mame/ui/devopt.cpp:275
+#: src/frontend/mame/ui/devopt.cpp:260 src/frontend/mame/ui/devopt.cpp:276
 #, c-format
 msgid "  %1$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:281
+#: src/frontend/mame/ui/devopt.cpp:282
 msgid "* DIP switch settings:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:286
+#: src/frontend/mame/ui/devopt.cpp:287
 msgid "* Configuration settings:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:290
+#: src/frontend/mame/ui/devopt.cpp:291
 msgid "* Input device(s):\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:292
+#: src/frontend/mame/ui/devopt.cpp:293
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:294
+#: src/frontend/mame/ui/devopt.cpp:295
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:296
+#: src/frontend/mame/ui/devopt.cpp:297
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:298
+#: src/frontend/mame/ui/devopt.cpp:299
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:300
+#: src/frontend/mame/ui/devopt.cpp:301
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:302
+#: src/frontend/mame/ui/devopt.cpp:303
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:304
+#: src/frontend/mame/ui/devopt.cpp:305
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:306
+#: src/frontend/mame/ui/devopt.cpp:307
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:311
+#: src/frontend/mame/ui/devopt.cpp:312
 msgid "* Media Options:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:316
+#: src/frontend/mame/ui/devopt.cpp:317
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:326
+#: src/frontend/mame/ui/devopt.cpp:327
 msgid "* Slot Options:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:340
+#: src/frontend/mame/ui/devopt.cpp:341
 msgid "[None]\n"
 msgstr ""
 
@@ -6466,180 +6517,175 @@ msgstr ""
 
 #: src/emu/inpttype.ipp:823
 msgctxt "input-name"
-msgid "Write current timecode"
+msgid "Record MNG"
 msgstr ""
 
 #: src/emu/inpttype.ipp:824
 msgctxt "input-name"
-msgid "Record MNG"
+msgid "Record AVI"
 msgstr ""
 
 #: src/emu/inpttype.ipp:825
 msgctxt "input-name"
-msgid "Record AVI"
+msgid "Toggle Cheat"
 msgstr ""
 
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
-msgid "Toggle Cheat"
+msgid "UI Up"
 msgstr ""
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
-msgid "UI Up"
+msgid "UI Down"
 msgstr ""
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
-msgid "UI Down"
+msgid "UI Left"
 msgstr ""
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
-msgid "UI Left"
+msgid "UI Right"
 msgstr ""
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
-msgid "UI Right"
+msgid "UI Home"
 msgstr ""
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
-msgid "UI Home"
+msgid "UI End"
 msgstr ""
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
-msgid "UI End"
+msgid "UI Page Up"
 msgstr ""
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
-msgid "UI Page Up"
+msgid "UI Page Down"
 msgstr ""
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
-msgid "UI Page Down"
+msgid "UI Focus Next"
 msgstr ""
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
-msgid "UI Focus Next"
+msgid "UI Focus Previous"
 msgstr ""
 
 #: src/emu/inpttype.ipp:836
 msgctxt "input-name"
-msgid "UI Focus Previous"
+msgid "UI Select"
 msgstr ""
 
 #: src/emu/inpttype.ipp:837
 msgctxt "input-name"
-msgid "UI Select"
+msgid "UI Cancel"
 msgstr ""
 
 #: src/emu/inpttype.ipp:838
 msgctxt "input-name"
-msgid "UI Cancel"
+msgid "UI Display Comment"
 msgstr ""
 
 #: src/emu/inpttype.ipp:839
 msgctxt "input-name"
-msgid "UI Display Comment"
+msgid "UI Clear"
 msgstr ""
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
-msgid "UI Clear"
+msgid "UI Zoom In"
 msgstr ""
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
-msgid "UI Zoom In"
+msgid "UI Zoom Out"
 msgstr ""
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
-msgid "UI Zoom Out"
+msgid "UI Default Zoom"
 msgstr ""
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
-msgid "UI Default Zoom"
+msgid "UI Previous Group"
 msgstr ""
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
-msgid "UI Previous Group"
+msgid "UI Next Group"
 msgstr ""
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
-msgid "UI Next Group"
+msgid "UI Rotate"
 msgstr ""
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
-msgid "UI Rotate"
+msgid "Show Profiler"
 msgstr ""
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
-msgid "Show Profiler"
+msgid "UI Toggle"
 msgstr ""
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
-msgid "UI Toggle"
+msgid "UI Release Pointer"
 msgstr ""
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
-msgid "UI Release Pointer"
+msgid "UI Paste Text"
 msgstr ""
 
 #: src/emu/inpttype.ipp:850
 msgctxt "input-name"
-msgid "UI Paste Text"
+msgid "Save State"
 msgstr ""
 
 #: src/emu/inpttype.ipp:851
 msgctxt "input-name"
-msgid "Save State"
+msgid "Load State"
 msgstr ""
 
 #: src/emu/inpttype.ipp:852
 msgctxt "input-name"
-msgid "Load State"
+msgid "UI (First) Tape Start"
 msgstr ""
 
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
-msgid "UI (First) Tape Start"
+msgid "UI (First) Tape Stop"
 msgstr ""
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
-msgid "UI (First) Tape Stop"
+msgid "UI External DAT View"
 msgstr ""
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
-msgid "UI External DAT View"
+msgid "UI Add/Remove favorite"
 msgstr ""
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
-msgid "UI Add/Remove favorite"
-msgstr ""
-
-#: src/emu/inpttype.ipp:857
-msgctxt "input-name"
 msgid "UI Export List"
 msgstr ""
 
-#: src/emu/inpttype.ipp:858
+#: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "UI Audit Media"
 msgstr ""
@@ -6661,7 +6707,7 @@ msgctxt "input-name"
 msgid "Record Rendered Video"
 msgstr ""
 
-#: src/osd/modules/input/input_windows.cpp:149
+#: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
 msgstr ""
@@ -6998,12 +7044,12 @@ msgstr ""
 msgid "Input ports"
 msgstr ""
 
-#: plugins/autofire/init.lua:103
+#: plugins/autofire/init.lua:94
 msgctxt "plugin-autofire"
 msgid "Failed to load autofire menu"
 msgstr ""
 
-#: plugins/autofire/init.lua:110
+#: plugins/autofire/init.lua:101
 msgctxt "plugin-autofire"
 msgid "Autofire"
 msgstr ""
@@ -7019,85 +7065,175 @@ msgctxt "plugin-autofire"
 msgid "Press %s to delete"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:91
+#: plugins/autofire/autofire_menu.lua:93
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "%s [%g Hz]"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:99
+#: plugins/autofire/autofire_menu.lua:95
+#, lua-format
+msgctxt "plugin-autofire"
+msgid "n/a [%g Hz]"
+msgstr ""
+
+#: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:105
-#: plugins/autofire/autofire_menu.lua:251
+#: plugins/autofire/autofire_menu.lua:109
+#: plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:142
-#: plugins/autofire/autofire_menu.lua:143
+#: plugins/autofire/autofire_menu.lua:150
+msgctxt "plugin-autofire"
+msgid "n/a"
+msgstr ""
+
+#: plugins/autofire/autofire_menu.lua:152
+#: plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:144
+#: plugins/autofire/autofire_menu.lua:155
 msgctxt "plugin-autofire"
 msgid "Input"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:148
+#: plugins/autofire/autofire_menu.lua:159
 msgctxt "plugin-autofire"
 msgid "Hotkey"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:149
+#: plugins/autofire/autofire_menu.lua:160
 msgctxt "plugin-autofire"
 msgid "On frames"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:150
+#: plugins/autofire/autofire_menu.lua:161
 msgctxt "plugin-autofire"
 msgid "Off frames"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:188
+#: plugins/autofire/autofire_menu.lua:200
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:201
+#: plugins/autofire/autofire_menu.lua:213
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:218
+#: plugins/autofire/autofire_menu.lua:230
 msgctxt "plugin-autofire"
 msgid "Edit autofire button"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:226
+#: plugins/autofire/autofire_menu.lua:238
 msgctxt "plugin-autofire"
 msgid "Done"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:260
+#: plugins/autofire/autofire_menu.lua:272
 msgctxt "plugin-autofire"
 msgid "Create"
 msgstr "Vytvořit"
 
-#: plugins/autofire/autofire_menu.lua:262
+#: plugins/autofire/autofire_menu.lua:274
 msgctxt "plugin-autofire"
 msgid "Cancel"
 msgstr ""
 
-#: plugins/autofire/autofire_menu.lua:312
+#: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
 msgstr ""
 
-#: plugins/inputmacro/init.lua:130 plugins/inputmacro/inputmacro_menu.lua:520
+#: plugins/timecode/init.lua:155
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TIMECODE: Intro started at %s"
+msgstr ""
+
+#: plugins/timecode/init.lua:160
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TIMECODE: Intro duration %s"
+msgstr ""
+
+#: plugins/timecode/init.lua:165
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TIMECODE: Gameplay started at %s"
+msgstr ""
+
+#: plugins/timecode/init.lua:170
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TIMECODE: Gameplay duration %s"
+msgstr ""
+
+#: plugins/timecode/init.lua:176
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TIMECODE: Extra %d started at %s"
+msgstr ""
+
+#: plugins/timecode/init.lua:182
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TIMECODE: Extra %d duration %s"
+msgstr ""
+
+#: plugins/timecode/init.lua:207
+#, lua-format
+msgctxt "plugin-timecode"
+msgid " %s%s%02d:%02d [paused] "
+msgstr ""
+
+#: plugins/timecode/init.lua:207
+#, lua-format
+msgctxt "plugin-timecode"
+msgid " %s%s%02d:%02d "
+msgstr ""
+
+#: plugins/timecode/init.lua:217
+#, lua-format
+msgctxt "plugin-timecode"
+msgid "TOTAL %02d:%02d "
+msgstr ""
+
+#: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
+msgctxt "plugin-timecode"
+msgid "Timecode Recorder"
+msgstr ""
+
+#: plugins/timecode/init.lua:326
+msgctxt "plugin-timecode"
+msgid "Assume 60 Hz"
+msgstr ""
+
+#: plugins/timecode/init.lua:326
+msgctxt "plugins-timecode"
+msgid "Count emulated frames"
+msgstr ""
+
+#: plugins/timecode/init.lua:327
+msgctxt "plugin-timecode"
+msgid "Frame numbers"
+msgstr ""
+
+#: plugins/timecode/init.lua:330
+msgctxt "plugin-timecode"
+msgid "Hotkey"
+msgstr ""
+
+#: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
 msgstr ""
@@ -7113,214 +7249,234 @@ msgctxt "plugin-inputmacro"
 msgid "New macro %d"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:81
+#: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:319
+#: plugins/inputmacro/inputmacro_menu.lua:350
 msgctxt "plugin-inputmacro"
 msgid "Name"
 msgstr "Jméno"
 
-#: plugins/inputmacro/inputmacro_menu.lua:327
-#: plugins/inputmacro/inputmacro_menu.lua:363
+#: plugins/inputmacro/inputmacro_menu.lua:358
+#: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:328
+#: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Activation sequence"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:331
+#: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:331
+#: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:332
+#: plugins/inputmacro/inputmacro_menu.lua:363
 msgctxt "plugin-inputmacro"
 msgid "On release"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:338
+#: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Release"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:341
+#: plugins/inputmacro/inputmacro_menu.lua:372
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:346
+#: plugins/inputmacro/inputmacro_menu.lua:377
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:348
+#: plugins/inputmacro/inputmacro_menu.lua:379
 msgctxt "plugin-inputmacro"
 msgid "When held"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:352
+#: plugins/inputmacro/inputmacro_menu.lua:383
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:353
+#: plugins/inputmacro/inputmacro_menu.lua:384
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:359
+#: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:364
+#: plugins/inputmacro/inputmacro_menu.lua:398
+msgctxt "plugin-inputmacro"
+msgid "n/a"
+msgstr ""
+
+#: plugins/inputmacro/inputmacro_menu.lua:402
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:369
+#: plugins/inputmacro/inputmacro_menu.lua:407
 msgctxt "plugin-inputmacro"
 msgid "Add input"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:374
+#: plugins/inputmacro/inputmacro_menu.lua:412
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:390
+#: plugins/inputmacro/inputmacro_menu.lua:428
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:434
+#: plugins/inputmacro/inputmacro_menu.lua:474
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:441
+#: plugins/inputmacro/inputmacro_menu.lua:481
 msgctxt "plugin-inputmacro"
 msgid "Create"
 msgstr "Vytvořit"
 
-#: plugins/inputmacro/inputmacro_menu.lua:443
+#: plugins/inputmacro/inputmacro_menu.lua:483
 msgctxt "plugin-inputmacro"
 msgid "Cancel"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:459
+#: plugins/inputmacro/inputmacro_menu.lua:499
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:465
+#: plugins/inputmacro/inputmacro_menu.lua:505
 msgctxt "plugin-inputmacro"
 msgid "Done"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:521
+#: plugins/inputmacro/inputmacro_menu.lua:561
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:533
+#: plugins/inputmacro/inputmacro_menu.lua:573
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
 msgstr ""
 
-#: plugins/inputmacro/inputmacro_menu.lua:538
+#: plugins/inputmacro/inputmacro_menu.lua:578
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
 msgstr ""
 
-#: plugins/timer/init.lua:89
+#: plugins/timer/init.lua:27
 #, lua-format
 msgctxt "plugin-timer"
 msgid "%03d:%02d:%02d"
 msgstr ""
 
-#: plugins/timer/init.lua:98
+#: plugins/timer/init.lua:32
+msgctxt "plugin-timer"
+msgid "Wall clock"
+msgstr ""
+
+#: plugins/timer/init.lua:32
+msgctxt "plugin-timer"
+msgid "Emulated time"
+msgstr ""
+
+#: plugins/timer/init.lua:37
+msgctxt "plugin-timer"
+msgid "Reference"
+msgstr ""
+
+#: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
 msgid "Current time"
 msgstr ""
 
-#: plugins/timer/init.lua:99
+#: plugins/timer/init.lua:40
 msgctxt "plugin-timer"
 msgid "Total time"
 msgstr ""
 
-#: plugins/timer/init.lua:100
+#: plugins/timer/init.lua:41
 msgctxt "plugin-timer"
 msgid "Play Count"
 msgstr ""
 
-#: plugins/timer/init.lua:109
+#: plugins/timer/init.lua:73
 msgctxt "plugin-timer"
 msgid "Timer"
 msgstr ""
 
-#: plugins/cheat/init.lua:609
+#: plugins/cheat/init.lua:611
 msgid "Select cheat to set hotkey"
 msgstr ""
 
-#: plugins/cheat/init.lua:610
+#: plugins/cheat/init.lua:612
 #, lua-format
 msgid "Press %s to clear hotkey"
 msgstr ""
 
-#: plugins/cheat/init.lua:638
+#: plugins/cheat/init.lua:640
 msgid "None"
 msgstr ""
 
-#: plugins/cheat/init.lua:644
+#: plugins/cheat/init.lua:646
 msgid "Done"
 msgstr ""
 
-#: plugins/cheat/init.lua:662 plugins/cheat/init.lua:676
+#: plugins/cheat/init.lua:664 plugins/cheat/init.lua:678
 msgid "Set"
 msgstr ""
 
-#: plugins/cheat/init.lua:695
+#: plugins/cheat/init.lua:697
 msgid "Set hotkeys"
 msgstr ""
 
-#: plugins/cheat/init.lua:783
+#: plugins/cheat/init.lua:785
 #, lua-format
 msgid "Activated: %s = %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:785 plugins/cheat/init.lua:843
+#: plugins/cheat/init.lua:787 plugins/cheat/init.lua:845
 #, lua-format
 msgid "Activated: %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:847
+#: plugins/cheat/init.lua:849
 #, lua-format
 msgid "Enabled: %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:852
+#: plugins/cheat/init.lua:854
 #, lua-format
 msgid "Disabled: %s"
 msgstr ""
 
-#: plugins/cheat/init.lua:911
+#: plugins/cheat/init.lua:913
 #, lua-format
 msgid "%s added"
 msgstr ""
@@ -7408,6 +7564,9 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
+
+#~ msgid "Device Mapping"
+#~ msgstr "Mapování zařízení"
 
 #, c-format
 #~ msgid "%s.xml saved under ui folder."

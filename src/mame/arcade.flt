@@ -83,6 +83,7 @@ atarisy1.cpp
 atarisy2.cpp
 atarisy4.cpp
 atarittl.cpp
+atari_4x4.cpp
 atari_s1.cpp
 atari_s2.cpp
 atetris.cpp
@@ -344,6 +345,7 @@ dkmb.cpp
 dkong.cpp
 dlair.cpp
 dlair2.cpp
+dmainevent.cpp
 dmndrby.cpp
 docastle.cpp
 dogfgt.cpp
@@ -399,6 +401,7 @@ exzisus.cpp
 ez2d.cpp
 f-32.cpp
 f1gp.cpp
+falgas_m89.cpp
 famibox.cpp
 fantland.cpp
 fastfred.cpp
@@ -557,6 +560,7 @@ homerun.cpp
 hornet.cpp
 hotblock.cpp
 hotstuff.cpp
+houseball.cpp
 hshavoc.cpp
 hvyunit.cpp
 hyhoo.cpp
@@ -1041,8 +1045,10 @@ rampart.cpp
 ramtek.cpp
 rastan.cpp
 rastersp.cpp
+rawthrillspc.cpp
 rbisland.cpp
 rbmk.cpp
+rbowlorama.cpp
 rcorsair.cpp
 re900.cpp
 realbrk.cpp
@@ -1278,6 +1284,7 @@ supduck.cpp
 superchs.cpp
 supercrd.cpp
 superdq.cpp
+superga2.cpp
 superqix.cpp
 supertnk.cpp
 superwng.cpp

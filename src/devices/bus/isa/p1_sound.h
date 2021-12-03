@@ -4,9 +4,6 @@
 
     Poisk-1 sound card
 
-    Copyright MESS Team.
-    Visit https://mamedev.org for licensing and usage restrictions.
-
 **********************************************************************/
 
 #ifndef MAME_BUS_P1_SOUND_H

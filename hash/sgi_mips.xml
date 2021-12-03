@@ -1834,7 +1834,7 @@ license:CC0
 	</software>
 
 	<software name="tido_4_0_5epl">
-		<description>Trusted IRIS Development Option 4.0.5 EPL"</description>
+		<description>Trusted IRIS Development Option 4.0.5 EPL</description>
 		<year>1995</year> <!-- 02/95 -->
 		<publisher>Silicon Graphics</publisher>
 		<part name="cdrom" interface="cdrom">

@@ -23,7 +23,7 @@ so a chessboard display + 7seg info. It's on a small drawer that can be
 pushed in to hide the chessboard display.
 
 TODO:
-- fart noise at boot if maestroa module is inserted
+- fart noise at boot if maestroa or sparc module is inserted
 - make it a subdriver of saitek_leonardo.cpp? or too many differences
 - same TODO list as saitek_leonardo.cpp
 
@@ -199,7 +199,7 @@ u8 ren_state::control_r()
 
 void ren_state::exp_rts_w(int state)
 {
-	// NAND with ACK-P (not used by module)
+	// NAND with ACK-P (not used by chesscomputer?)
 }
 
 
