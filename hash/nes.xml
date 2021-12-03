@@ -78983,7 +78983,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas18">
+	<software name="xmas18" supported="partial">
 		<description>8-bit Xmas 2018</description>
 		<year>2018</year>
 		<publisher>retroUSB</publisher>
@@ -78999,7 +78999,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas19">
+	<software name="xmas19" supported="partial">
 		<description>8-bit Xmas 2019</description>
 		<year>2019</year>
 		<publisher>retroUSB</publisher>
@@ -79014,7 +79014,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas20">
+	<software name="xmas20" supported="partial">
 		<description>8-bit Xmas 2020</description>
 		<year>2020</year>
 		<publisher>retroUSB</publisher>
@@ -79029,7 +79029,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas21">
+	<software name="xmas21" supported="partial">
 		<description>8-bit Xmas 2021</description>
 		<year>2021</year>
 		<publisher>retroUSB</publisher>
