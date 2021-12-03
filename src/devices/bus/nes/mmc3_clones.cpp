@@ -797,6 +797,7 @@ void nes_bmc_hik8_device::device_start()
 void nes_bmc_hik8_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	set_nt_mirroring(PPU_MIRROR_VERT);  // necessary since some boards/games don't reliably set mirroring (Rockman 1 on mc_s13 at least)
 
 	m_count = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
