@@ -321,6 +321,7 @@ static const nes_pcb pcb_list[] =
 	{ "s24in1c03",        BMC_S24IN1SC03 },
 	{ "smd133",           SMD133_BOARD },
 	{ "tech9in1",         BMC_TECHLINE9IN1 },
+	{ "bmc_5in1",         BMC_5IN1_1993 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
