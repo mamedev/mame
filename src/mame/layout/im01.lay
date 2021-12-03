@@ -271,13 +271,18 @@ license:CC0
 
 <!-- build screen -->
 
-	<view name="Internal Layout">
-
+	<view name="Internal Layout (Full)">
 		<group ref="display"><bounds x="8.3" y="19.74" width="13.7" height="4.26" /></group>
 		<element ref="under" blend="add"><bounds x="5.3" y="16.74" width="19.7" height="11" /></element>
 		<element ref="greenm" blend="multiply"><bounds x="5.3" y="16.74" width="19.7" height="11" /></element>
 
 		<group ref="panel"><bounds x="5.3" y="27" width="19.7" height="51" /></group>
-
 	</view>
+
+	<view name="Internal Layout (Display)">
+		<group ref="display"><bounds x="8.3" y="19.74" width="13.7" height="4.26" /></group>
+		<element ref="under" blend="add"><bounds x="5.3" y="16.74" width="19.7" height="10.26" /></element>
+		<element ref="greenm" blend="multiply"><bounds x="5.3" y="16.74" width="19.7" height="10.26" /></element>
+	</view>
+
 </mamelayout>
