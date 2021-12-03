@@ -18,7 +18,6 @@ TODO:
   and/or T11 core timing itself is not 100% accurate. There's a big "but":
   these measurements are from the older ИМ-01.
 - verify actual XTAL, the label couldn't be seen
-- add button panel to internal artwork
 - dump/add im01 (rom serial 106/107)
 
 *******************************************************************************
@@ -64,7 +63,7 @@ N:   чксло ходов                                         - Show Moves
 #include "speaker.h"
 
 // internal artwork
-#include "im01.lh"
+#include "im01.lh" // clickable
 
 
 namespace {
@@ -293,4 +292,4 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1991, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE )
+CONS( 1991, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
