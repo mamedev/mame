@@ -52369,6 +52369,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="fifa96jy" cloneof="jlwingol">
+		<description>FIFA International Soccer '96 (J.League Winning Goal pirate)</description>
+		<year>199?</year>
+		<publisher>J.Y. Company</publisher>
+		<info name="serial" value="JY-060"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="131072">
+				<rom name="fifa international soccer '96 (jy-060).prg" size="131072" crc="fa1c5fc1" sha1="1dd9cf86c701936d58cc40689ce5f47addefdb74" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="fifa international soccer '96 (jy-060).chr" size="131072" crc="1160133b" sha1="e7fa6d423a1eee5601be3c597a47ee164757ba92" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4jy72">
 		<description>1996 Super HiK 4 in 1 (JY-072)</description>
 		<year>1996</year>
@@ -54539,6 +54559,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="bookymana" cloneof="bookyman">
+		<description>Booky Man (Brazil)</description>
+		<year>1991</year>
+		<publisher>Mega Soft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="bookyman (mega soft).prg" size="16384" crc="e65fe725" sha1="158f59ba1228dba208f9abd4c31ed610e6d93ec7" status="baddump" />
+				<rom size="16384" offset="0x4000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="bookyman (mega soft).chr" size="8192" crc="e838b839" sha1="09e2bc2fa043675d5300a065fbc0e29d321a6ba3" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmocops" cloneof="cosmocop">
 		<description>Cosmos Cop (Spa)</description>
 		<year>1991</year>
@@ -54652,6 +54689,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="destroyra" cloneof="destroyr">
+		<description>Destroyer (Asia)</description>
+		<year>1992</year>
+		<publisher>Mega Soft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="destroyer (mega soft).prg" size="32768" crc="d0f4c55a" sha1="ca1bb1d77925e1bafea93031cdc9a3d14f62d47d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="destroyer (mega soft).chr" size="32768" crc="b7c70cae" sha1="19d6e0440251060a0dc33f26894f8d109f4716d6" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gobenny">
 		<description>Go! Benny! (Spa)</description>
 		<year>1992</year>
@@ -54668,6 +54721,22 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="32768">
 				<rom name="0.chr" size="32768" crc="ceaadb67" sha1="0e5173485ccac504ee50320c156edd2b19638316" offset="00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gobennya" cloneof="gobenny">
+		<description>Go! Benny! (Asia)</description>
+		<year>1992</year>
+		<publisher>Mega Soft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cnrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="32768">
+				<rom name="go benny (mega soft).prg" size="32768" crc="b732bde3" sha1="c01d753bfbdb0f8fd5c1747c86ad144872e5fc1a" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="32768">
+				<rom name="go benny (mega soft).chr" size="32768" crc="cc699118" sha1="4174465dbd9276e89ce194c18f6f117e5d2dab3c" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -64157,9 +64226,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- nointro -->
 	<software name="jwest" supported="no">
-		<description>Xi Tian Qu Jing - Journey To The West (Asia)</description>
+		<description>Xītiān Qǔjīng - Journey To The West (Asia)</description>
+		<year>19??</year>
+		<publisher>Micro Genius</publisher>
+		<info name="alt_title" value="西天取经"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bnrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="journey to the west.prg" size="131072" crc="162f1311" sha1="b069b50088ade57c892d54802088c9d91d6e8217" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+<!-- nointro. Is this a multicart extract? -->
+	<software name="jwesta" cloneof="jwest" supported="no">
+		<description>Xītiān Qǔjīng - Journey To The West (Asia, alt)</description>
 		<year>19??</year>
 		<publisher>Micro Genius</publisher>
 		<info name="alt_title" value="西天取经"/>
@@ -64172,10 +64258,6 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
-			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -65664,6 +65746,41 @@ We don't include these hacks because they were not burned into real carts nor so
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="x-war (silk worm hack).prg" size="131072" crc="49444ead" sha1="ef52ce8326bfe4202b569458947ca379a0e7d6f5" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- FIXME: The board game (Dudu Wawa) crashes when landing on certain squares. This happens in Nestopia and FCEUX too. -->
+	<software name="xiaobaik" supported="partial">
+		<description>Xiǎo Bǎikē 2 in 1 - Dūdū Wāwā Dà Màoxiǎn &amp; Zhìlì Pīntú (China)</description>
+		<year>1994</year>
+		<publisher>Shenzhen Lingjie</publisher>
+		<info name="alt_title" value="小百科 2合1 嘟嘟哇哇大冒险+智力拼图"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bnrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="xiao baike 2-in-1.prg" size="131072" crc="ae1a88a9" sha1="d743a4c7b3c889da4dd24a8b6e0d795450be2c1d" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xiaozysx">
+		<description>Xiǎo Zhuàngyuán Shùxué (China)</description>
+		<year>1995</year>
+		<publisher>Hongtu Development Company</publisher>
+		<info name="alt_title" value="小状元数学"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<rom name="xiao zhuangyuan shuxue (b1.0).prg" size="131072" crc="58cdcc17" sha1="41f82974c233ffbcbdf8af6956da9a084cdadee3" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -73947,6 +74064,23 @@ Other
 		</part>
 	</software>
 
+	<software name="captplanh" cloneof="captplan">
+		<description>Captain Planet and the Planeteers (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<info name="serial" value="VT-3121"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="captain planet and the planeteers (vt-3121).prg" size="131072" crc="981104b7" sha1="1be3fa74f241e4bff41ac28aef5b3fed14e60413" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="captain planet and the planeteers (vt-3121).chr" size="131072" crc="8d92550d" sha1="322063abc983cb9d2c4d22eed388090de597f1b5" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chipndl3" cloneof="hbarrel" supported="no">
 		<description>Chip &amp; Dale 3 (Heavy Barrel pirate)</description>
 		<year>1995</year>
@@ -74723,6 +74857,25 @@ Other
 		</part>
 	</software>
 
+	<software name="overhorzh" cloneof="overhorz">
+		<description>Over Horizon (pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="over horizon (bootleg).prg" size="131072" crc="b70659fc" sha1="19dc1dd00b32c815b54e60169e428a1461e9cc0c" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="over horizon (bootleg).chr" size="131072" crc="9ea75f49" sha1="fa3850431c3a13d0c33dbb068d7dc331a1d8c52c" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pandamar" cloneof="smb">
 		<description>Pandamar (Super Mario Bros. pirate)</description>
 		<year>19??</year>
@@ -74742,7 +74895,7 @@ Other
 
 <!-- Is this some sort of 2-in-1 game? It needs some investigation of the data in the .prg! -->
 	<software name="superkid" cloneof="smb">
-		<description>Super Kid  (Super Mario Bros. pirate, LB-35)</description>
+		<description>Super Kid (Super Mario Bros. pirate, LB-35)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -74872,6 +75025,25 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="pokemon 2000 (mitsume ga tooru hack) [p1].prg" size="131072" crc="7bcf8d85" sha1="3e9e77638a2c8f29cceadab9ac95e372c1363fb1" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge -->
+			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poke2ka" cloneof="felix">
+		<description>Pokemon 2000 (Felix the Cat pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TSROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="pokemon 2000.prg" size="131072" crc="44573503" sha1="ba61b7b1dcdc76c612afb006a0a1b2b42191d99b" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="pokemon 2000.chr" size="131072" crc="c26a782d" sha1="e9c7127412e146f46f9b37fe34b17016e7b3c0f8" status="baddump" />
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
@@ -75346,6 +75518,22 @@ Other
 		</part>
 	</software>
 
+	<software name="smario15" cloneof="kaikeya3">
+		<description>Super Mario 15 (Kaiketsu Yanchamaru 3 - Taiketsu! Zouringen pirate)</description>
+		<year>19??</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="super mario 15.prg" size="131072" crc="a80d46a3" sha1="b44228925d193fe9f3eeb60f85db03926fe18f1d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="super mario 15.chr" size="131072" crc="d8abd6d8" sha1="faa6a0037ed60065d5f57ca4a069034d4f8506e7" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="smb6" cloneof="ttoonadv">
 		<description>Super Bros. 6 (Tiny Toon Adventures pirate)</description>
 		<year>19??</year>
@@ -75772,6 +75960,22 @@ Other
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="super contra - 3 game select (hack).prg" size="131072" crc="979c172f" sha1="e30bc3a59dd17fd823a9dab9250e54ae2f276cc9" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scontrads" cloneof="probot2">
+		<description>Super Contra DS (Super Contra pirate)</description>
+		<year>1990</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="super contra (1990 yellow).prg" size="131072" crc="69e9a652" sha1="f836c6ef07349971128bc48d645d1e70262c8020" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="super contra (1990 yellow).chr" size="131072" crc="6637575c" sha1="44a9d6db1087a6ad0907065fe147e9e1fb136661" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
