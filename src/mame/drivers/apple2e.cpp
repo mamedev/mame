@@ -2703,6 +2703,16 @@ void apple2e_state::c000_iic_w(offs_t offset, u8 data)
 			}
 			break;
 
+		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
+				if (m_auxslotdevice)
+				{
+					m_auxslotdevice->write_c07x(offset & 0xf, data);
+
+					// card may have banked auxram; get a new bank pointer
+					m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
+				}
+				break;
+
 		case 0x78:  // IIc mirror of SETIOUDIS used by the mouse firmware
 		case 0x7a:
 		case 0x7c:
@@ -5698,7 +5708,9 @@ void apple2e_state::laser128ex2(machine_config &config)
 
 void apple2e_state::ace500(machine_config &config)
 {
-	apple2c_iwm(config);
+	apple2ee(config);
+		subdevice<software_list_device>("flop_a2_orig")->set_filter("A2C");  // Filter list to compatible disks for this machine.
+
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
 	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
@@ -5710,8 +5722,32 @@ void apple2e_state::ace500(machine_config &config)
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	// memory above 128K is RAMWorks compatible, a 256K machine has 128K of RAMWorks, and a 512K has 384K.
-	m_ram->set_default_size("256K").set_extra_options("256K, 512K");
+	MOS6551(config, m_acia1, 0);
+	m_acia1->set_xtal(1.8432_MHz_XTAL);
+	m_acia1->txd_handler().set(MODEM_PORT_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia1->irq_handler().set(FUNC(apple2e_state::a2bus_irq_w));
+
+	rs232_port_device &modem(RS232_PORT(config, MODEM_PORT_TAG, default_rs232_devices, nullptr));
+	modem.rxd_handler().set(m_acia1, FUNC(mos6551_device::write_rxd));
+	modem.dcd_handler().set(m_acia1, FUNC(mos6551_device::write_dcd));
+	modem.dsr_handler().set(m_acia1, FUNC(mos6551_device::write_dsr));
+	modem.cts_handler().set(m_acia1, FUNC(mos6551_device::write_cts));
+
+	config.device_remove(A2_CASSETTE_TAG);
+	config.device_remove("sl1");
+	config.device_remove("sl2");
+	config.device_remove("sl3");
+	config.device_remove("sl4");
+	config.device_remove("sl5");
+	config.device_remove("sl6");
+	config.device_remove("sl7");
+	config.device_remove("aux");
+
+	A2BUS_IWM(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+
+	A2EAUX_FRANKLIN384(config, "aux", A2BUS_7M_CLOCK).set_onboard(m_a2eauxslot);
+
+	m_ram->set_default_size("128K");
 }
 
 void apple2e_state::ace2200(machine_config &config)
@@ -5739,12 +5775,15 @@ void apple2e_state::ace2200(machine_config &config)
 	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, "mockingboard");
 	A2BUS_ACE2X00_SLOT6(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
 
+	config.device_remove("aux");
+	A2EAUX_FRANKLIN512(config, "aux", A2BUS_7M_CLOCK).set_onboard(m_a2eauxslot);
+
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
 	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
 	OUTPUT_LATCH(config, m_printer_out);
 	m_printer_conn->set_output_latch(*m_printer_out);
 
-	m_ram->set_default_size("128K").set_extra_options("128K");
+	m_ram->set_default_size("128K");
 }
 
 void apple2e_state::cec(machine_config &config)
