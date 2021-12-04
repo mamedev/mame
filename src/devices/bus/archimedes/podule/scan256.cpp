@@ -60,8 +60,8 @@ void arc_scan256_device::ioc_map(address_map &map)
 //-------------------------------------------------
 
 ROM_START( scan256 )
-	ROM_REGION(0x10000, "podule_rom", 0)
-	ROM_LOAD("scan256_1.00.bin", 0x0000, 0x10000, CRC(3e5d5877) SHA1(9ea4bba1a752090b19a8ab9bf06414053fb8f7ff))
+	ROM_REGION(0x20000, "podule_rom", 0)
+	ROM_LOAD("scan256_1.00.bin", 0x0000, 0x20000, CRC(3e5d5877) SHA1(9ea4bba1a752090b19a8ab9bf06414053fb8f7ff))
 ROM_END
 
 const tiny_rom_entry *arc_scan256_device::device_rom_region() const
