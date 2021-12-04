@@ -2,29 +2,36 @@
 // copyright-holders:Robbbert
 /*******************************************************************************************************
 
-  PINBALL
-  Inder S.A. of Spain
+PINBALL
+Inder S.A. of Spain
 
-  All manuals are in Spanish (including the 'English' ones), so some guesswork will be needed.
-  The schematics for Brave Team, Canasta are too blurry to read.
-  Each game has different hardware. Note with switches: "Veleta" is normally closed.
+All manuals are in Spanish (including the 'English' ones), so some guesswork will be needed.
+The schematics for Brave Team, Canasta, Metal Man are too blurry to read.
+Each game has different hardware. Note with switches: "Veleta" is normally closed.
+Order of dips on "new cpu" games: 3,2,1,0,4,5,6,7 (so SL1(1) uses bit 3 of input definition).
 
-  Setting up:
-  - First time run, the displays will all show zero. Set up the dips. Then exit and restart.
-    The game will be working.
+Setting up:
+- First time run, the displays will all show zero. Hit F3. The game will now be working.
+- If you want to change the "Handicap" (High Score) setting, you may have to wipe the NVRAM before it
+   will take.
 
-  Status:
-  - Brave Team: working
-  - Canasta '86: working
-  - Lap by Lap: working
-  - Moon Light: dips don't always work. No mechanical sounds.
-  - Clown: dips don't always work. No mechanical sounds.
-  - Corsario: dips don't always work. No mechanical sounds.
-  - Mundial 90: dips don't always work. No mechanical sounds.
-  - Atleta: dips don't always work. No mechanical sounds.
-  - 250CC: dips don't always work. No mechanical sounds.
-  - Metal Man: not working
+Note
+- La Rana is not a pinball machine - it looks like an upright arcade game with a frog's mouth and some
+   holes on a lower panel, while some indicators are on the upper panel. The main scores are on the
+   marquee. Each of 4 players has 3 digits. There's other buttons on the marquee too. The game has
+   no screen. The purpose and usage of the game is unknown. Unable to get a manual, although it is known
+   to exist.
+   It can be played by pressing 5 (insert coin), press 1 (start) for each player, press A (start timer),
+   press various keys to score. Don't press X or the game instantly ends. When the timer runs out it
+   switches to the next player, or ends.
 
+Status:
+- All games are playable with sound, except Metal Man.
+
+ToDo:
+- The "new cpu" machines are lacking mechanical sounds. The output bits vary per game.
+- Metal Man: playable, very bad sound. It uses 2 speech cards which are different to the other games.
+- La Rana: playable. Needs its own layout. Inputs to be figured out.
 
 ********************************************************************************************************/
 
@@ -58,9 +65,10 @@ public:
 		, m_9a(*this, "9a")
 		, m_9b(*this, "9b")
 		, m_13(*this, "13")
-		, m_switches(*this, "SW.%u", 0)
-		, m_digits(*this, "digit%u", 0U)
 		, m_p_speech(*this, "speech")
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void inder(machine_config &config);
@@ -68,51 +76,60 @@ public:
 	void canasta(machine_config &config);
 	void lapbylap(machine_config &config);
 
-	void init_inder();
-	void init_inder1();
-
-protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
+	void init_0();
+	void init_1();
+	void init_2();
 
 private:
-	uint8_t ppic_r();
-	void ppia_w(uint8_t data);
-	void ppib_w(uint8_t data);
-	void ppic_w(uint8_t data);
-	void ppi60a_w(uint8_t data);
-	void ppi60b_w(uint8_t data);
-	void ppi64c_w(uint8_t data);
-	uint8_t sw_r();
-	void sw_w(offs_t offset, uint8_t data);
-	void sol_brvteam_w(uint8_t data);
-	void sol_canasta_w(uint8_t data);
-	void sn_w(uint8_t data);
-	uint8_t sndcmd_r();
-	void sndbank_w(uint8_t data);
-	void sndcmd_w(uint8_t data);
-	void sndcmd_lapbylap_w(uint8_t data);
-	void lamp_w(uint8_t data) { };
-	void disp_w(offs_t offset, uint8_t data);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	u8 ppic_r();
+	void ppia_w(u8 data);
+	void ppib_w(u8 data);
+	void ppic_w(u8 data);
+	void ppi60a_w(u8 data);
+	void ppi60b_w(u8 data);
+	void ppi64a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[i] = BIT(data, i); }
+	void ppi64b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+i] = BIT(data, i); }
+	void ppi64c_w(u8 data);
+	void ppi68a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[16U+i] = BIT(data, i); }
+	void ppi68b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[24U+i] = BIT(data, i) ^ 1; }
+	void ppi68c_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[32U+i] = BIT(data, i); }
+	void ppi6ca_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[40U+i] = BIT(data, i); }
+	void ppi6cb_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[48U+i] = BIT(data, i); }
+	void ppi6cc_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[56U+i] = BIT(data, i); }
+	void extras_w(offs_t offset, u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[64U+offset*8+i] = BIT(data, i); }
+	u8 sw_r();
+	u8 ppi60b_r() { return 0xff; }  // metalman checks bit 1 and hangs if not high
+	void sw_w(offs_t offset, u8 data);
+	void sol_brvteam_w(u8 data);
+	void sol_canasta_w(u8 data);
+	void sn_w(u8 data);
+	u8 sndcmd_r();
+	void sndbank_w(u8 data);
+	void sndcmd_w(u8 data);
+	void sndcmd_lapbylap_w(u8 data);
+	void lamp_w(offs_t offset, u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[8U+offset*8+i] = BIT(data, i); }
+	void disp_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
 	DECLARE_WRITE_LINE_MEMBER(q9a_w);
 	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
+	void update_mus();
 	void brvteam_map(address_map &map);
 	void canasta_map(address_map &map);
-	void inder_map(address_map &map);
-	void inder_sub_map(address_map &map);
-	void lapbylap_map(address_map &map);
-	void lapbylap_sub_map(address_map &map);
+	void main_map(address_map &map);
+	void audio_map(address_map &map);
+	void lapbylap_main_map(address_map &map);
+	void lapbylap_audio_map(address_map &map);
 
-	void update_mus();
-	bool m_pc0;
-	uint8_t m_game;
-	uint8_t m_portc;
-	uint8_t m_row;
-	uint8_t m_segment[8];
-	uint8_t m_sndcmd;
-	uint8_t m_sndbank;
-	uint32_t m_sound_addr;
+	bool m_pc0 = 0;
+	u8 m_game = 0;
+	u8 m_portc = 0;
+	u8 m_row = 0;
+	u8 m_segment[8]{};
+	u8 m_sndcmd = 0;
+	u8 m_sndbank = 0;
+	u32 m_sound_addr = 0;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -122,9 +139,10 @@ private:
 	optional_device<ttl7474_device> m_9a;
 	optional_device<ttl7474_device> m_9b;
 	optional_device<hct157_device> m_13;
-	required_ioport_array<11> m_switches;
+	optional_region_ptr<u8> m_p_speech;
+	required_ioport_array<11> m_io_keyboard;
 	output_finder<50> m_digits;
-	optional_region_ptr<uint8_t> m_p_speech;
+	output_finder<128> m_io_outputs;
 };
 
 void inder_state::brvteam_map(address_map &map)
@@ -153,7 +171,7 @@ void inder_state::canasta_map(address_map &map)
 	map(0x4b02, 0x4b02).w("ay", FUNC(ay8910_device::data_w));
 }
 
-void inder_state::lapbylap_map(address_map &map)
+void inder_state::lapbylap_main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x20ff).w(FUNC(inder_state::disp_w));
@@ -165,7 +183,7 @@ void inder_state::lapbylap_map(address_map &map)
 	map(0x4b00, 0x4b00).w(FUNC(inder_state::sndcmd_lapbylap_w));
 }
 
-void inder_state::lapbylap_sub_map(address_map &map)
+void inder_state::lapbylap_audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x87ff).ram(); // 6116
@@ -177,7 +195,7 @@ void inder_state::lapbylap_sub_map(address_map &map)
 	map(0xa002, 0xa002).w("ay2", FUNC(ay8910_device::data_w));
 }
 
-void inder_state::inder_map(address_map &map)
+void inder_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).mirror(0x1800).ram().share("nvram"); // 6116, battery-backed
@@ -186,11 +204,12 @@ void inder_state::inder_map(address_map &map)
 	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c20, 0x6c3f).mirror(0x1300).w(FUNC(inder_state::sndcmd_w));
+	map(0x6c40, 0x6c47).mirror(0x1300).w(FUNC(inder_state::extras_w));  // metalman; presume some kind of output
 	map(0x6c60, 0x6c7f).mirror(0x1300).w(FUNC(inder_state::disp_w));
 	map(0x6ce0, 0x6ce0).nopw();
 }
 
-void inder_state::inder_sub_map(address_map &map)
+void inder_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x27ff).mirror(0x1800).ram(); // 6116
@@ -200,7 +219,7 @@ void inder_state::inder_sub_map(address_map &map)
 }
 
 static INPUT_PORTS_START( brvteam )
-	PORT_START("SW.0")
+	PORT_START("X0")
 	PORT_DIPNAME( 0x03, 0x01, "Coin Slot 1") // sw G,H
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas  // selection 00 is same as 01
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C )) // slot 2: 1 moneda 5 partidas
@@ -215,7 +234,7 @@ static INPUT_PORTS_START( brvteam )
 	PORT_DIPSETTING(    0x30, "700000")
 	PORT_BIT( 0xc4, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.1")
+	PORT_START("X1")
 	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
 	PORT_DIPSETTING(    0x00, "990000")
 	PORT_DIPSETTING(    0x01, "950000")
@@ -226,71 +245,71 @@ static INPUT_PORTS_START( brvteam )
 	PORT_DIPSETTING(    0x00, "20")
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.2") // bank of unused dipswitches
+	PORT_START("X2") // bank of unused dipswitches
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.4")
+	PORT_START("X4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.5") // Contactos 50-57
+	PORT_START("X5") // Contactos 50-57
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // "Monedero B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.6") // 60-67
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X6") // 60-67
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP67")
 
-	PORT_START("SW.7") // 70-77
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X7") // 70-77
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP77")
 
-	PORT_START("SW.8") // 80-87
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X8") // 80-87
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP80")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP81")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP82")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP83")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP84")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP85")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP86")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP87")
 
-	PORT_START("SW.9") // 90-97
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X9") // 90-97
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP90")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP92")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP93")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP94")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP95")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP96")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP97")
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( canasta )
-	PORT_START("SW.0")
+	PORT_START("X0")
 	PORT_DIPNAME( 0x03, 0x00, "Coin Slot 1") // sw G,H
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_5C )) // slot 2: 1 moneda 5 partidas
@@ -311,7 +330,7 @@ static INPUT_PORTS_START( canasta )
 	PORT_DIPSETTING(    0xc0, "2500000")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.1")
+	PORT_START("X1")
 	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
 	PORT_DIPSETTING(    0x00, "3500000")
 	PORT_DIPSETTING(    0x01, "3000000")
@@ -319,71 +338,71 @@ static INPUT_PORTS_START( canasta )
 	PORT_DIPSETTING(    0x03, "2000000")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.2") // bank of unused dipswitches
+	PORT_START("X2") // bank of unused dipswitches
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.4")
+	PORT_START("X4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.5") // Contactos 50-57
+	PORT_START("X5") // Contactos 50-57
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // "Monedero B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.6") // 60-67
+	PORT_START("X6") // 60-67
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP67")
 
-	PORT_START("SW.7") // 70-77
+	PORT_START("X7") // 70-77
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP77")
 
-	PORT_START("SW.8") // 80-87
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X8") // 80-87
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP80")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP81")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP82")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP83")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP84")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP85")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP86")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP87")
 
-	PORT_START("SW.9") // 90-97
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_START("X9") // 90-97
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP90")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP92")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP93")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP94")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP96")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP97")
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lapbylap )
-	PORT_START("SW.0")
+	PORT_START("X0")
 	PORT_DIPNAME( 0x03, 0x03, "Coin Slot 1") // sw G,H
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
@@ -397,7 +416,7 @@ static INPUT_PORTS_START( lapbylap )
 	PORT_DIPSETTING(    0x30, "2300000")
 	PORT_BIT( 0xc4, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.1")
+	PORT_START("X1")
 	PORT_DIPNAME( 0x03, 0x03, "High Score") //"Handicap"  // sw O,P
 	PORT_DIPSETTING(    0x00, "4600000")
 	PORT_DIPSETTING(    0x01, "4400000")
@@ -415,7 +434,7 @@ static INPUT_PORTS_START( lapbylap )
 	PORT_DIPSETTING(    0x20, "Derribo Completo Dianas Laterales")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.2")
+	PORT_START("X2")
 	PORT_DIPNAME( 0x03, 0x03, "High Score Returns??") //"Handicap de Vueltas"  // sw W,X
 	PORT_DIPSETTING(    0x00, "40")
 	PORT_DIPSETTING(    0x01, "35")
@@ -429,747 +448,725 @@ static INPUT_PORTS_START( lapbylap )
 	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.4")
+	PORT_START("X4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.5") // Contactos 50-57
+	PORT_START("X5") // Contactos 50-57
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) // "Monedero B"
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // "Pulsador Partidas"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.6") // 60-67
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_START("X6") // 60-67
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP65")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP67")
 
-	PORT_START("SW.7") // 70-77
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X7") // 70-77
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP77")
 
-	PORT_START("SW.8") // 80-87
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X8") // 80-87
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP80")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP81")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP82")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP83")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP84")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP85")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP86")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP87")
 
-	PORT_START("SW.9") // 90-97
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X9") // 90-97
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP90")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP92")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP93")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP94")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP95")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP96")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP97")
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pinmoonl )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "2600000")
-	PORT_DIPSETTING(    0x08, "3000000")
-	PORT_DIPSETTING(    0x04, "3400000")
-	PORT_DIPSETTING(    0x00, "3800000")
+	PORT_START("X0")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "2600000")
+	PORT_DIPSETTING(    0x10, "3000000")
+	PORT_DIPSETTING(    0x20, "3400000")
+	PORT_DIPSETTING(    0x30, "3800000")
 
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
-	PORT_DIPSETTING(    0x30, "4800000")
-	PORT_DIPSETTING(    0x20, "5000000")
-	PORT_DIPSETTING(    0x10, "5200000")
-	PORT_DIPSETTING(    0x00, "5400000")
-	PORT_DIPNAME( 0x08, 0x08, "Especial en Picabolas")
-	PORT_DIPSETTING(    0x08, "1st Derribo")
-	PORT_DIPSETTING(    0x00, "2nd Derribo")
-	PORT_DIPNAME( 0x04, 0x04, "Bola Extra En Rampas")
-	PORT_DIPSETTING(    0x04, "4 dianas")
-	PORT_DIPSETTING(    0x00, "2 dianas")
-	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "4800000")
+	PORT_DIPSETTING(    0x01, "5000000")
+	PORT_DIPSETTING(    0x02, "5200000")
+	PORT_DIPSETTING(    0x03, "5400000")
+	PORT_DIPNAME( 0x10, 0x00, "Especial en Picabolas")
+	PORT_DIPSETTING(    0x00, "1st Derribo")
+	PORT_DIPSETTING(    0x10, "2nd Derribo")
+	PORT_DIPNAME( 0x20, 0x00, "Bola Extra En Rampas")
+	PORT_DIPSETTING(    0x00, "4 dianas")
+	PORT_DIPSETTING(    0x20, "2 dianas")
 
-	PORT_START("SW.2")
-	PORT_DIPNAME( 0x30, 0x30, "High Score Returns??") //"Handicap de Vueltas"
-	PORT_DIPSETTING(    0x30, "20")
-	PORT_DIPSETTING(    0x20, "25")
-	PORT_DIPSETTING(    0x10, "30")
-	PORT_DIPSETTING(    0x00, "35")
-	PORT_DIPNAME( 0x01, 0x01, "Apagado de dianas")
-	PORT_DIPSETTING(    0x01, DEF_STR(Easy)) // "Facil"
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
-	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X2")
+	PORT_DIPNAME( 0x03, 0x00, "High Score Returns??") //"Handicap de Vueltas"
+	PORT_DIPSETTING(    0x00, "20")
+	PORT_DIPSETTING(    0x01, "25")
+	PORT_DIPSETTING(    0x02, "30")
+	PORT_DIPSETTING(    0x03, "35")
+	PORT_DIPNAME( 0x80, 0x00, "Apagado de dianas")
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy)) // "Facil"
+	PORT_DIPSETTING(    0x80, DEF_STR(Hard)) // "Dificil"
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pinclown )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "2800000")
-	PORT_DIPSETTING(    0x08, "3200000")
-	PORT_DIPSETTING(    0x04, "3600000")
-	PORT_DIPSETTING(    0x00, "4000000")
-
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
-	PORT_DIPSETTING(    0x30, "4800000")
-	PORT_DIPSETTING(    0x20, "5000000")
-	PORT_DIPSETTING(    0x10, "5200000")
-	PORT_DIPSETTING(    0x00, "5400000")
-	PORT_DIPNAME( 0x04, 0x04, "Bola Extra En Pasillos Inferiores")
-	PORT_DIPSETTING(    0x04, "2")
+	PORT_START("X0")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
 	PORT_DIPSETTING(    0x00, "3")
-	PORT_BIT( 0xcb, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "2800000")
+	PORT_DIPSETTING(    0x10, "3200000")
+	PORT_DIPSETTING(    0x20, "3600000")
+	PORT_DIPSETTING(    0x30, "4000000")
 
-	PORT_START("SW.2")
-	PORT_DIPNAME( 0x04, 0x04, "Quita bola extra al 2nd derribo")
-	PORT_DIPSETTING(    0x04, DEF_STR(Yes))
-	PORT_DIPSETTING(    0x00, DEF_STR(No))
-	PORT_DIPNAME( 0x01, 0x01, "Apagado de dianas")
-	PORT_DIPSETTING(    0x01, DEF_STR(Easy)) // "Facil"
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
-	PORT_BIT( 0xfa, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "4800000")
+	PORT_DIPSETTING(    0x01, "5000000")
+	PORT_DIPSETTING(    0x02, "5200000")
+	PORT_DIPSETTING(    0x03, "5400000")
+	PORT_DIPNAME( 0x20, 0x00, "Bola Extra En Pasillos Inferiores")
+	PORT_DIPSETTING(    0x00, "2")
+	PORT_DIPSETTING(    0x20, "3")
 
-	PORT_START("SW.3")
+	PORT_START("X2")
+	PORT_DIPNAME( 0x20, 0x00, "Quita bola extra al 2nd derribo")
+	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
+	PORT_DIPSETTING(    0x20, DEF_STR(No))
+	PORT_DIPNAME( 0x80, 0x00, "Apagado de dianas")
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy)) // "Facil"
+	PORT_DIPSETTING(    0x80, DEF_STR(Hard)) // "Dificil"
+
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP40")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP44")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP50")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( corsario )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "3000000")
-	PORT_DIPSETTING(    0x08, "3500000")
-	PORT_DIPSETTING(    0x04, "4000000")
-	PORT_DIPSETTING(    0x00, "4500000")
-
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
+	PORT_START("X0")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "3000000")
+	PORT_DIPSETTING(    0x10, "3500000")
+	PORT_DIPSETTING(    0x20, "4000000")
 	PORT_DIPSETTING(    0x30, "4500000")
-	PORT_DIPSETTING(    0x20, "5000000")
-	PORT_DIPSETTING(    0x10, "5500000")
-	PORT_DIPSETTING(    0x00, "6000000")
-	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "4500000")
+	PORT_DIPSETTING(    0x01, "5000000")
+	PORT_DIPSETTING(    0x02, "5500000")
+	PORT_DIPSETTING(    0x03, "6000000")
 
-	PORT_START("SW.3")
+	PORT_START("X2")
+
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP44")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP54")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mundial )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "3600000")
-	PORT_DIPSETTING(    0x08, "4000000")
-	PORT_DIPSETTING(    0x04, "4400000")
-	PORT_DIPSETTING(    0x00, "4800000")
+	PORT_START("X0")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "3600000")
+	PORT_DIPSETTING(    0x10, "4000000")
+	PORT_DIPSETTING(    0x20, "4400000")
+	PORT_DIPSETTING(    0x30, "4800000")
 
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
-	PORT_DIPSETTING(    0x30, "5500000")
-	PORT_DIPSETTING(    0x20, "5700000")
-	PORT_DIPSETTING(    0x10, "5900000")
-	PORT_DIPSETTING(    0x00, "6100000")
-	PORT_BIT( 0xcf, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "5500000")
+	PORT_DIPSETTING(    0x01, "5700000")
+	PORT_DIPSETTING(    0x02, "5900000")
+	PORT_DIPSETTING(    0x03, "6100000")
 
-	PORT_START("SW.2")
-	PORT_DIPNAME( 0x04, 0x04, "Dianas")
-	PORT_DIPSETTING(    0x04, "Alternativos")
-	PORT_DIPSETTING(    0x00, "Fijos")
-	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X2")
+	PORT_DIPNAME( 0x20, 0x00, "Dianas")
+	PORT_DIPSETTING(    0x00, "Alternativos")
+	PORT_DIPSETTING(    0x20, "Fijos")
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP55")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( atleta )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "3500000")
-	PORT_DIPSETTING(    0x08, "4000000")
-	PORT_DIPSETTING(    0x04, "4500000")
-	PORT_DIPSETTING(    0x00, "5000000")
+	PORT_START("X0")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x02, 0x00, "Coin Slot 1")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C )) // and 4c_3c
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "3500000")
+	PORT_DIPSETTING(    0x10, "4000000")
+	PORT_DIPSETTING(    0x20, "4500000")
+	PORT_DIPSETTING(    0x30, "5000000")
 
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x80, 0x80, "Dianas") // "Dificultad bola extra dianas posterior bancada"
-	PORT_DIPSETTING(    0x80, DEF_STR(Easy)) // "Facil"
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
-	PORT_DIPSETTING(    0x30, "5500000")
-	PORT_DIPSETTING(    0x20, "6000000")
-	PORT_DIPSETTING(    0x10, "6500000")
-	PORT_DIPSETTING(    0x00, "7000000")
-	PORT_BIT( 0x4f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x08, 0x00, "Dianas") // "Dificultad bola extra dianas posterior bancada"
+	PORT_DIPSETTING(    0x00, DEF_STR(Easy)) // "Facil"
+	PORT_DIPSETTING(    0x08, DEF_STR(Hard)) // "Dificil"
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "5500000")
+	PORT_DIPSETTING(    0x01, "6000000")
+	PORT_DIPSETTING(    0x02, "6500000")
+	PORT_DIPSETTING(    0x03, "7000000")
 
-	PORT_START("SW.2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X2")
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ind250cc )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "2600000")
-	PORT_DIPSETTING(    0x08, "3000000")
-	PORT_DIPSETTING(    0x04, "3400000")
-	PORT_DIPSETTING(    0x00, "3800000")
+	PORT_START("X0")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x02, 0x00, "Coins")
+	PORT_DIPSETTING(    0x00, "Slot1 1coin/1game; Slot2 1coin/4games")
+	PORT_DIPSETTING(    0x02, "Slot1 2coins/1game; Slot2 1coin/3games")
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "3000000")
+	PORT_DIPSETTING(    0x10, "3300000")
+	PORT_DIPSETTING(    0x20, "3500000")
+	PORT_DIPSETTING(    0x30, "3800000")
 
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
-	PORT_DIPSETTING(    0x30, "4800000")
-	PORT_DIPSETTING(    0x20, "5000000")
-	PORT_DIPSETTING(    0x10, "5200000")
-	PORT_DIPSETTING(    0x00, "5400000")
-	PORT_DIPNAME( 0x08, 0x08, "Especial en Picabolas")
-	PORT_DIPSETTING(    0x08, "1st Derribo")
-	PORT_DIPSETTING(    0x00, "2nd Derribo")
-	PORT_DIPNAME( 0x04, 0x04, "Bola Extra En Rampas")
-	PORT_DIPSETTING(    0x04, "4 dianas")
-	PORT_DIPSETTING(    0x00, "2 dianas")
-	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "5000000")
+	PORT_DIPSETTING(    0x01, "5200000")
+	PORT_DIPSETTING(    0x02, "5400000")
+	PORT_DIPSETTING(    0x03, "5600000")
 
-	PORT_START("SW.2")
-	PORT_DIPNAME( 0x04, 0x04, "Quita bola extra en passillos 1,2,y 3")
-	PORT_DIPSETTING(    0x04, DEF_STR(No))
-	PORT_DIPSETTING(    0x00, DEF_STR(Yes))
-	PORT_BIT( 0xfb, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X2")
+	PORT_DIPNAME( 0x20, 0x20, "Quita bola extra en passillos 1,2,y 3")
+	PORT_DIPSETTING(    0x00, DEF_STR(No))
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes))
 
-	PORT_START("SW.3")
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Reset") // "Puesta a cero"
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 // wrong
 static INPUT_PORTS_START( metalman )
-	PORT_START("SW.0")
-	PORT_DIPNAME( 0x80, 0x80, "Balls")
-	PORT_DIPSETTING(    0x80, "3")
-	PORT_DIPSETTING(    0x00, "5")
-	PORT_DIPNAME( 0x30, 0x30, "Coin Slot 1")
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C )) // slot 2: 1 moneda 4 partidas
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C )) // and 4c_3c; slot 2: 1 moneda 3 partidas
-	PORT_DIPNAME( 0x0c, 0x0c, "Points for free game")
-	PORT_DIPSETTING(    0x0c, "2600000")
-	PORT_DIPSETTING(    0x08, "3000000")
-	PORT_DIPSETTING(    0x04, "3400000")
-	PORT_DIPSETTING(    0x00, "3800000")
-
-	PORT_START("SW.1")
-	PORT_DIPNAME( 0x30, 0x30, "High Score") //"Handicap"
+	PORT_START("X0")
+	PORT_DIPNAME( 0x01, 0x00, "Coin control 1")
+	PORT_DIPSETTING(    0x00, "Off")
+	PORT_DIPSETTING(    0x01, "On")
+	PORT_DIPNAME( 0x02, 0x00, "Coin control 2")
+	PORT_DIPSETTING(    0x00, "Off")
+	PORT_DIPSETTING(    0x02, "On")
+	PORT_DIPNAME( 0x04, 0x00, "Coin control 3")
+	PORT_DIPSETTING(    0x00, "Off")
+	PORT_DIPSETTING(    0x04, "On")
+	PORT_DIPNAME( 0x08, 0x00, "Coin control 4")
+	PORT_DIPSETTING(    0x00, "Off")
+	PORT_DIPSETTING(    0x08, "On")
+	PORT_DIPNAME( 0x30, 0x00, "Points for free game")
+	PORT_DIPSETTING(    0x00, "3600000")
+	PORT_DIPSETTING(    0x10, "4000000")
+	PORT_DIPSETTING(    0x20, "4400000")
 	PORT_DIPSETTING(    0x30, "4800000")
-	PORT_DIPSETTING(    0x20, "5000000")
-	PORT_DIPSETTING(    0x10, "5200000")
-	PORT_DIPSETTING(    0x00, "5400000")
-	PORT_DIPNAME( 0x08, 0x08, "Especial en Picabolas")
-	PORT_DIPSETTING(    0x08, "1st Derribo")
-	PORT_DIPSETTING(    0x00, "2nd Derribo")
-	PORT_DIPNAME( 0x04, 0x04, "Bola Extra En Rampas")
-	PORT_DIPSETTING(    0x04, "4 dianas")
-	PORT_DIPSETTING(    0x00, "2 dianas")
-	PORT_BIT( 0xc3, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.2")
-	PORT_DIPNAME( 0x30, 0x30, "High Score Returns??") //"Handicap de Vueltas"
-	PORT_DIPSETTING(    0x30, "20")
-	PORT_DIPSETTING(    0x20, "25")
-	PORT_DIPSETTING(    0x10, "30")
-	PORT_DIPSETTING(    0x00, "35")
-	PORT_DIPNAME( 0x01, 0x01, "Apagado de dianas")
-	PORT_DIPSETTING(    0x01, DEF_STR(Easy)) // "Facil"
-	PORT_DIPSETTING(    0x00, DEF_STR(Hard)) // "Dificil"
-	PORT_BIT( 0xce, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("X1")
+	PORT_DIPNAME( 0x08, 0x00, "Balls")
+	PORT_DIPSETTING(    0x00, "3")
+	PORT_DIPSETTING(    0x08, "5")
+	PORT_DIPNAME( 0x03, 0x00, "High Score") //"Handicap"
+	PORT_DIPSETTING(    0x00, "5600000")
+	PORT_DIPSETTING(    0x01, "6000000")
+	PORT_DIPSETTING(    0x02, "6400000")
+	PORT_DIPSETTING(    0x03, "6800000")
+	PORT_DIPNAME( 0x10, 0x00, "Dificultad de Especiales")
+	PORT_DIPSETTING(    0x00, "Varios por partida")
+	PORT_DIPSETTING(    0x10, "Solo uno por partida")
 
-	PORT_START("SW.3")
+	PORT_START("X2") // not on the pcb
+
+	PORT_START("X3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) // "Monedero A"
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) // "Monedero B"
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_TILT ) // "Falta"
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // "Falta"
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) // "Pulsador Partidas"
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting info") // "Test economico"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Test") // "Test tecnico"
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Reset") // "Puesta a cero"
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Accounting info") // "Test economico"
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test") // "Test tecnico"
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP60")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP61")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP62")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP63")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP64")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP65")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP66")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP77")
 
-	PORT_START("SW.8")
+	PORT_START("X8")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.9")
+	PORT_START("X9")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("SW.10")
+	PORT_START("X10")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-uint8_t inder_state::sw_r()
+u8 inder_state::sw_r()
 {
-	return m_switches[m_row]->read();
+	return m_io_keyboard[m_row]->read();
 }
 
-void inder_state::sw_w(offs_t offset, uint8_t data)
+void inder_state::sw_w(offs_t offset, u8 data)
 {
 	m_row = offset;
 }
 
-void inder_state::sn_w(uint8_t data)
+void inder_state::sn_w(u8 data)
 {
 	m_sn->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
-void inder_state::sndcmd_lapbylap_w(uint8_t data)
+void inder_state::sndcmd_lapbylap_w(u8 data)
 {
 	m_sndcmd = data;
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void inder_state::sndcmd_w(uint8_t data)
+void inder_state::sndcmd_w(u8 data)
 {
 	m_sndcmd = data;
 }
 
-uint8_t inder_state::sndcmd_r()
+u8 inder_state::sndcmd_r()
 {
 	return m_sndcmd;
 }
 
 // "bobinas"
-void inder_state::sol_brvteam_w(uint8_t data)
+void inder_state::sol_brvteam_w(u8 data)
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
@@ -1191,10 +1188,12 @@ void inder_state::sol_brvteam_w(uint8_t data)
 		if (BIT(data, 7))
 			m_samples->start(4, 0); // middle bumper
 	}
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = (BIT(data, i) && BIT(data, 4));
 }
 
 // no slings in this game
-void inder_state::sol_canasta_w(uint8_t data)
+void inder_state::sol_canasta_w(u8 data)
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
@@ -1210,11 +1209,13 @@ void inder_state::sol_canasta_w(uint8_t data)
 		if (BIT(data, 7))
 			m_samples->start(4, 0); // middle bumper
 	}
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = (BIT(data, i) && BIT(data, 4));
 }
 
-void inder_state::disp_w(offs_t offset, uint8_t data)
+void inder_state::disp_w(offs_t offset, u8 data)
 {
-	uint8_t i;
+	u8 i;
 	if (offset < 8)
 		m_segment[offset] = data;
 	else
@@ -1227,43 +1228,46 @@ void inder_state::disp_w(offs_t offset, uint8_t data)
 	}
 }
 
-void inder_state::ppi60a_w(uint8_t data)
+void inder_state::ppi60a_w(u8 data)
 {
 	if (data)
-		for (uint8_t i = 0; i < 8; i++)
+		for (u8 i = 0; i < 8; i++)
 			if (BIT(data, i))
 				m_row = i;
 }
 
-// always 0 but we'll support it anyway
-void inder_state::ppi60b_w(uint8_t data)
+void inder_state::ppi60b_w(u8 data)
 {
 	if (data & 7)
-		for (uint8_t i = 0; i < 3; i++)
+		for (u8 i = 0; i < 3; i++)
 			if (BIT(data, i))
 				m_row = i+8;
 }
 
-void inder_state::ppi64c_w(uint8_t data)
+void inder_state::ppi64c_w(u8 data)
 {
-	uint8_t i;
+	u8 i;
 	data &= 15;
 	if (BIT(data, 3)) // 8 to 15)
 	{
-		data ^= 15; // now 7 to 0
+		if (m_game == 2)
+			data &= 7; // metalman
+		else
+			data ^= 15; // now 7 to 0
+
 		for (i = 0; i < 5; i++)
 		{
-			if ((m_game==1) && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
+			if (m_game && (i == 4))  // metalan,mundial,clown,250cc,atleta have credit and ball displays swapped
 				data ^= 4;
 			m_digits[i*10+data] = m_segment[i];
 		}
 	}
 }
 
-void inder_state::sndbank_w(uint8_t data)
+void inder_state::sndbank_w(u8 data)
 {
 	m_sndbank = data;
-	uint8_t i;
+	u8 i;
 	// look for last rom enabled
 	for (i = 0; i < 4; i++)
 		if (!(BIT(data, i)))
@@ -1298,24 +1302,24 @@ WRITE_LINE_MEMBER( inder_state::qc9b_w )
 	m_13->select_w(state);
 }
 
-uint8_t inder_state::ppic_r()
+u8 inder_state::ppic_r()
 {
 	return (m_pc0 ? 1 : 0) | m_portc;
 }
 
-void inder_state::ppia_w(uint8_t data)
+void inder_state::ppia_w(u8 data)
 {
 	m_sound_addr = (m_sound_addr & 0x3ff00) | data;
 	update_mus();
 }
 
-void inder_state::ppib_w(uint8_t data)
+void inder_state::ppib_w(u8 data)
 {
 	m_sound_addr = (m_sound_addr & 0x300ff) | (data << 8);
 	update_mus();
 }
 
-void inder_state::ppic_w(uint8_t data)
+void inder_state::ppic_w(u8 data)
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))
@@ -1329,13 +1333,28 @@ void inder_state::ppic_w(uint8_t data)
 
 void inder_state::machine_start()
 {
-	m_digits.resolve();
+	genpin_class::machine_start();
 
-	std::fill(std::begin(m_segment), std::end(m_segment), 0);
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_pc0));
+	save_item(NAME(m_game));
+	save_item(NAME(m_portc));
+	save_item(NAME(m_row));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_sndcmd));
+	save_item(NAME(m_sndbank));
+	save_item(NAME(m_sound_addr));
 }
 
 void inder_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
+	std::fill(std::begin(m_segment), std::end(m_segment), 0);
 	m_sound_addr = 0;
 	m_sndbank = 0xff;
 	m_row = 0;
@@ -1346,7 +1365,7 @@ void inder_state::machine_reset()
 	}
 }
 
-void inder_state::init_inder()
+void inder_state::init_0()
 {
 	if (m_7a.found())
 	{
@@ -1357,15 +1376,16 @@ void inder_state::init_inder()
 	m_game = 0;
 }
 
-void inder_state::init_inder1()
+void inder_state::init_1()
 {
-	if (m_7a.found())
-	{
-		m_7a->d_w(0);
-		m_7a->clear_w(0);
-		m_9b->preset_w(1);
-	}
+	init_0();
 	m_game = 1;
+}
+
+void inder_state::init_2()
+{
+	init_0();
+	m_game = 2;
 }
 
 void inder_state::brvteam(machine_config &config)
@@ -1408,11 +1428,11 @@ void inder_state::lapbylap(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_main_map);
 	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
 
 	Z80(config, m_audiocpu, XTAL(2'000'000));
-	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_sub_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_state::lapbylap_audio_map);
 	m_audiocpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE555
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -1433,11 +1453,11 @@ void inder_state::inder(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(5'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::inder_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inder_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE556
 
 	Z80(config, m_audiocpu, XTAL(5'000'000) / 2);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_state::inder_sub_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &inder_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(inder_state::irq0_line_hold), attotime::from_hz(250)); // NE555
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
@@ -1458,14 +1478,23 @@ void inder_state::inder(machine_config &config)
 	i8255_device &ppi60(I8255A(config, "ppi60"));
 	ppi60.out_pa_callback().set(FUNC(inder_state::ppi60a_w));
 	ppi60.out_pb_callback().set(FUNC(inder_state::ppi60b_w));
+	ppi60.in_pb_callback().set(FUNC(inder_state::ppi60b_r));
 	ppi60.in_pc_callback().set(FUNC(inder_state::sw_r));
 
 	i8255_device &ppi64(I8255A(config, "ppi64"));
+	ppi64.out_pa_callback().set(FUNC(inder_state::ppi64a_w));
+	ppi64.out_pb_callback().set(FUNC(inder_state::ppi64b_w));
 	ppi64.out_pc_callback().set(FUNC(inder_state::ppi64c_w));
 
-	I8255A(config, "ppi68");
+	i8255_device &ppi68(I8255A(config, "ppi68"));
+	ppi68.out_pa_callback().set(FUNC(inder_state::ppi68a_w));
+	ppi68.out_pb_callback().set(FUNC(inder_state::ppi68b_w));
+	ppi68.out_pc_callback().set(FUNC(inder_state::ppi68c_w));
 
-	I8255A(config, "ppi6c");
+	i8255_device &ppi6c(I8255A(config, "ppi6c"));
+	ppi6c.out_pa_callback().set(FUNC(inder_state::ppi6ca_w));
+	ppi6c.out_pb_callback().set(FUNC(inder_state::ppi6cb_w));
+	ppi6c.out_pc_callback().set(FUNC(inder_state::ppi6cc_w));
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(inder_state::ppia_w));
@@ -1521,7 +1550,7 @@ ROM_END
 / Moon Light (1987)
 /-------------------------------------------------------------------*/
 ROM_START(pinmoonl)
-	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("ci-3.bin", 0x0000, 0x2000, CRC(56b901ae) SHA1(7269d1a100c378b21454f9f80f5bd9fbb736c222))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -1538,7 +1567,7 @@ ROM_END
 / Clown (1988)
 /-------------------------------------------------------------------*/
 ROM_START(pinclown)
-	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("clown_a.bin", 0x0000, 0x2000, CRC(b7c3f9ab) SHA1(89ede10d9e108089da501b28f53cd7849f791a00))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -1555,7 +1584,7 @@ ROM_END
 / Corsario (1989)
 /-------------------------------------------------------------------*/
 ROM_START(corsario)
-	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("0-corsar.bin", 0x0000, 0x2000, CRC(800f6895) SHA1(a222e7ea959629202686815646fc917ffc5a646c))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -1572,7 +1601,7 @@ ROM_END
 / Mundial 90 (1990)
 /-------------------------------------------------------------------*/
 ROM_START(mundial)
-	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("mundial.cpu", 0x0000, 0x2000, CRC(b615e69b) SHA1(d129eb6f2943af40ddffd0da1e7a711b58f65b3c))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -1609,13 +1638,13 @@ ROM_END
 / Sound PCB: USVYS (only 1 of 8 speech ROM sockets populated)
 /-------------------------------------------------------------------*/
 ROM_START(larana)
-	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASE00)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("inder_sa_mod_la_rana_0_050790.bin", 0x0000, 0x2000, CRC(ba94618f) SHA1(0fd6ffe9a6ef514c1dbf8856b881a54bf184e863))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x0000, 0x2000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
 
-	ROM_REGION(0x80000, "speech", ROMREGION_ERASE00)
+	ROM_REGION(0x40000, "speech", ROMREGION_ERASEFF)
 	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
 ROM_END
 
@@ -1623,7 +1652,7 @@ ROM_END
 / 250 CC (1992)
 /-------------------------------------------------------------------*/
 ROM_START(ind250cc)
-	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("0-250cc.bin", 0x0000, 0x2000, CRC(753d82ec) SHA1(61950336ba571f9f75f2fc31ccb7beaf4e05dddc))
 
 	ROM_REGION(0x2000, "audiocpu", 0)
@@ -1647,13 +1676,13 @@ ROM_START(metalman)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("sound_e1.bin", 0x0000, 0x2000, CRC(55e889e8) SHA1(0a240868c1b17762588c0ed9a14f568a6e50f409))
 
-	ROM_REGION(0x80000, "speech", 0)
+	ROM_REGION(0x80000, "speech", ROMREGION_ERASEFF)
 	ROM_LOAD("sound_e2.bin", 0x00000, 0x20000, CRC(5ac61535) SHA1(75b9a805f8639554251192e3777073c29952c78f))
 
-	ROM_REGION(0x10000, "soundcpu2", 0)
-	ROM_LOAD("sound_m1.bin", 0x00000, 0x02000, CRC(21a9ee1d) SHA1(d906ac7d6e741f05e81076a5be33fc763f0de9c1))
+	ROM_REGION(0x2000, "audiocpu2", 0)
+	ROM_LOAD("sound_m1.bin", 0x0000, 0x2000, CRC(21a9ee1d) SHA1(d906ac7d6e741f05e81076a5be33fc763f0de9c1))
 
-	ROM_REGION(0x80000, "user2", 0)
+	ROM_REGION(0x80000, "speech2", ROMREGION_ERASEFF)
 	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
@@ -1662,22 +1691,22 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1985,  brvteam,  0, brvteam,  brvteam,  inder_state, empty_init,  ROT0, "Inder", "Brave Team",    MACHINE_IS_SKELETON_MECHANICAL )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  canasta,  0, canasta,  canasta,  inder_state, empty_init,  ROT0, "Inder", "Canasta '86'",  MACHINE_IS_SKELETON_MECHANICAL )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1986,  lapbylap, 0, lapbylap, lapbylap, inder_state, empty_init,  ROT0, "Inder", "Lap By Lap",    MACHINE_IS_SKELETON_MECHANICAL )
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1991,  larana,   0, inder,    metalman, inder_state, init_inder,  ROT0, "Inder", "La Rana",            MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1987,  pinmoonl, 0, inder,    pinmoonl, inder_state, init_0, ROT0, "Inder", "Moon Light (Inder)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder", "Clown (Inder)",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder", "Corsario",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder", "Mundial 90",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder", "Atleta",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1991,  larana,   0, inder,    metalman, inder_state, init_0, ROT0, "Inder", "La Rana",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder", "250 CC",             MACHINE_IS_SKELETON_MECHANICAL )
 
-// new cpu board, later revision of msm5205 sound board
-GAME(1992,  metalman, 0, inder,    metalman, inder_state, init_inder,  ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL)
+// new cpu board, uses 2x a later revision of msm5205 sound board
+GAME(1992,  metalman, 0, inder,    metalman, inder_state, init_2, ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL )

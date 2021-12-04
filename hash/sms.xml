@@ -6369,7 +6369,7 @@ license:CC0
 
 	<software name="sonicedu">
 		<description>Sonic's Edusoft (prototype)</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
@@ -6800,7 +6800,7 @@ license:CC0
 
 	<software name="suprbskt">
 		<description>Super Basketball (USA, CES Demo)</description>
-		<year>1989?</year>
+		<year>1990</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="65536">

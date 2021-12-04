@@ -77,7 +77,7 @@
 
 
 TODO:
-- Update more drivers in MESS and MAME and unify with src/emu/video/pc_cga.c
+- Update more drivers in MAME and unify with src/emu/video/pc_cga.c
 - Separate out more cards/implementations
 
 ***************************************************************************/

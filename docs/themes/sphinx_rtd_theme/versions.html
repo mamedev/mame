@@ -32,3 +32,18 @@
     </div>
   </div>
 {% endif %}
+{# This section only gets used when mamedevorg is set to anything in theme.conf #}
+{% if theme_mamedevorg %}
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="{{ _('Downloads') }}">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book">Downloads</span>
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <dl>
+        <dd><a href="https://docs.mamedev.org/_files/MAME.pdf">PDF</a></dd>
+        <dd><a href="https://docs.mamedev.org/_files/MAME.epub">EPUB</a></dd>
+      </dl>
+    </div>
+  </div>
+{% endif %}

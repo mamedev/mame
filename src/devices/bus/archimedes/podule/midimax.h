@@ -15,5 +15,6 @@
 
 // device type definition
 DECLARE_DEVICE_TYPE(ARC_MIDIMAX, device_archimedes_podule_interface)
+DECLARE_DEVICE_TYPE(ARC_MIDIMAX2, device_archimedes_podule_interface)
 
 #endif // MAME_BUS_ARCHIMEDES_PODULE_MIDIMAX_H

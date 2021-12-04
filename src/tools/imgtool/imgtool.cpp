@@ -2251,7 +2251,7 @@ imgtool::directory::directory(imgtool::partition &partition)
 	if (partition.m_directory_extra_bytes > 0)
 	{
 		m_extra_bytes = std::make_unique<uint8_t[]>(partition.m_directory_extra_bytes);
-		memset(m_extra_bytes.get(), 0, sizeof(m_extra_bytes.get()[0] * partition.m_directory_extra_bytes));
+		memset(m_extra_bytes.get(), 0, sizeof(m_extra_bytes[0]) * partition.m_directory_extra_bytes);
 	}
 }
 

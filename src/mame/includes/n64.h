@@ -143,7 +143,7 @@ public:
 	uint32_t vi_vburst;
 	uint8_t field;
 
-	/* nvram-specific for MESS */
+	// nvram-specific for the console
 	device_t *m_nvram_image;
 
 	n64_savable_data_t m_save_data;

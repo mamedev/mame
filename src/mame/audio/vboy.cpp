@@ -4,7 +4,7 @@
     vboy.c - Virtual Boy audio emulation
 
     By Richard Bannister and Gil Pedersen.
-    MESS device adaptation by R. Belmont
+    MAME device adaptation by R. Belmont
 */
 
 #include "emu.h"

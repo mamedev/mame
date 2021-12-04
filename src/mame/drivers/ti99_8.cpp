@@ -2,7 +2,7 @@
 // copyright-holders:Michael Zapf
 /****************************************************************************
 
-    The MESS TI-99/8 emulation driver
+    TI-99/8
 
     The TI-99/8 was the envisaged successor to the TI-99/4A but never passed
     its prototype state. Only a few dozen consoles were built. The ROMs

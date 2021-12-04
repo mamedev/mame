@@ -3358,7 +3358,7 @@ GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, init_technodr, ROT0, "Namco",           "Techno Drive (Japan, TH1/VER.B)", MACHINE_NODEVICE_PRINTER ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", 0 ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", 0 ) /* KC036 */
-GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (US, FTL3/VER.A)", 0 ) /* KC037 */
+GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (FTL3/VER.A)", 0 ) /* KC037 */ // supposedly US region but doesn't show the usual warning / WDUD screens
 GAME( 1998, fgtlayerj, fgtlayer, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL0/VER.A)", 0 ) /* KC037 */
 GAME( 1998, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", 0 ) /* KC038 */
 GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", 0 ) /* KC042 */

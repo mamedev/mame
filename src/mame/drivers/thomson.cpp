@@ -72,7 +72,7 @@
    - digitisation extension (DI 90-011) (@)
    - barcode reader (@)
 
-   (@) means MESS is lacking support for this kind of device / feature anyway
+   (@) means MAME is lacking support for this kind of device / feature anyway
 
 */
 
@@ -250,9 +250,9 @@ boot floppy.
 * devices:
   - AZERTY keyboard, 58-keys, French with accents
   - cartridge 16 KB (up to 64 KB using bank-switching),
-    the MESS cartridge device is named -cart
+    the MAME cartridge device is named -cart
   - cassette 900 bauds (frequency signals: 0=4.5 kHz, 1=6.3 kHz)
-    the MESS cassette device is named -cass
+    the MAME cassette device is named -cass
   - 1-bit internal buzzer
   - lightpen, with 8-pixel horizontal resolution, 1-pixel vertical
   - SX 90-018 game & music extension
@@ -280,7 +280,7 @@ boot floppy.
        sides)
     . floppies are 40 tracks/side, 16 sectors/track, 128 or 256 bytes/sector
       = from 80 KB one-sided single-density, to 320 KB two-sided double-density
-    . MESS floppy devices are named -flop0 to -flop3
+    . MAME floppy devices are named -flop0 to -flop3
   - alternate 5"1/2 floppy drive extension
     . CD 90-015 floppy controller, based on a HD 46503 S
     . UD 90-070 5"1/4 single-sided single density floppy drive

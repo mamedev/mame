@@ -362,6 +362,11 @@ WRITE_LINE_MEMBER( whtech_scsi_card_device::irq_w )
 	operate_ready_line();
 }
 
+void whtech_scsi_card_device::signal_scsi_eop(int state)
+{
+	m_controller->eop_w(state);
+}
+
 void whtech_scsi_card_device::device_add_mconfig(machine_config &config)
 {
 	// RAM circuit
@@ -625,8 +630,8 @@ void whtscsi_pld_device::cruwrite(offs_t offset, uint8_t data)
 			m_dma_lock = (data != 0);
 			break;
 		case 3:           // SCSI EOP
-			// signal_scsi_eop(data != 0);
 			LOGMASKED(LOG_CRU, "SCSI EOP %s\n", (data!=0)? "on" : "off");
+			m_board->signal_scsi_eop((data != 0)? ASSERT_LINE : CLEAR_LINE);
 			break;
 		case 4:
 			LOGMASKED(LOG_CRU, "Word transfer %s\n", (data!=0)? "on" : "off");

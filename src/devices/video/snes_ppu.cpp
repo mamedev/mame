@@ -1658,7 +1658,7 @@ void snes_ppu_device::write_object( uint16_t address, uint8_t data )
  to attempt this. While byuu, in his emu, maps
  those accesses to 0x01ff, because it is more
  accurate to invalidate the 'expected' address
- than not, MESS has issues if we don't write to
+ than not, MAME has issues if we don't write to
  the expected address (see e.g. Tokimeki Memorial).
  This is because writes should work during hblank
  (so that the game can produce color fading), but

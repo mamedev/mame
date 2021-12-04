@@ -7,6 +7,7 @@
 #define LOG_GENERAL (1U << 0)
 #define LOG_COMMAND (1U << 1)
 #define LOG_DATA    (1U << 2)
+#define LOG_UNSUPPORTED (1U << 3)
 
 #define VERBOSE 0
 
@@ -531,7 +532,8 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	default:
-		LOG("command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
+		LOGMASKED(LOG_UNSUPPORTED, "command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
+		// Parent may handle this
 		nscsi_full_device::scsi_command();
 		break;
 	}

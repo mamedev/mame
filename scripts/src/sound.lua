@@ -1158,7 +1158,7 @@ end
 
 
 ---------------------------------------------------
--- WAVE file (used for MESS cassette)
+-- WAVE file (used for cassette)
 --@src/devices/sound/wave.h,SOUNDS["WAVE"] = true
 ---------------------------------------------------
 

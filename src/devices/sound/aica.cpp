@@ -1036,7 +1036,6 @@ u16 aica_device::r16(u32 addr)
 }
 
 
-#ifdef UNUSED_FUNCTION
 void aica_device::TimersAddTicks(int ticks)
 {
 	if (m_TimCnt[0] <= 0xff00)
@@ -1075,7 +1074,6 @@ void aica_device::TimersAddTicks(int ticks)
 		m_udata.data[0x98 / 2] |= m_TimCnt[2] >> 8;
 	}
 }
-#endif
 
 s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 {
@@ -1379,14 +1377,6 @@ void aica_device::exec_dma()
 	m_mcipd |= 0x10;
 	CheckPendingIRQ_SH4();
 }
-
-#ifdef UNUSED_FUNCTION
-int aica_device::IRQCB(void *param)
-{
-	CheckPendingIRQ(param);
-	return -1;
-}
-#endif
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update

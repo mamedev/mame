@@ -369,7 +369,7 @@ static const nes_mmc mmc_list[] =
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
 	{ 333, BMC_8IN1 },
-	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
+	{ 334, BMC_5IN1_1993 },
 	{ 335, BMC_CTC09 },
 	{ 336, BMC_K3046 },
 	// { 337, BMC_CTC_12IN1 }, not in nes.xml

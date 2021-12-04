@@ -1,4 +1,5 @@
-// license:BSD-3-Clause copyright-holders: Joakim Larsson Edstrom
+// license:BSD-3-Clause 
+// copyright-holders: Joakim Larsson Edstrom
 /***************************************************************************
 
     DUSCC Dual Serial Communications Controller emulation
@@ -483,7 +484,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 
 	LOGINT("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state);
 
-	/* The Interrupt Control Register (ICR) bits, must be set for the correspondning channel */
+	// The Interrupt Control Register (ICR) bits, must be set for the corresponding channel
 	// ICR Check is probably by the caller but we check again to be sure
 	if ((m_icr & (index == CHANNEL_A ? REG_ICR_CHA : REG_ICR_CHB)) == 0)
 	{

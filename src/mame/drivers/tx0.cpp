@@ -885,7 +885,7 @@ image_init_result tx0_magtape_image_device::call_load()
 	{
 		m_tx0->m_magtape.img = this;
 
-		m_tx0->m_magtape.irg_pos = MTIRGP_END;
+		m_tx0->m_magtape.irg_pos = tx0_state::MTIRGP_END;
 
 		/* restart IO when necessary */
 		/* note that this function may be called before tx0_init_machine, therefore
@@ -893,7 +893,7 @@ image_init_result tx0_magtape_image_device::call_load()
 		nullptr parameter! */
 		if (m_tx0->m_magtape.timer)
 		{
-			if (m_tx0->m_magtape.state == MTS_SELECTING)
+			if (m_tx0->m_magtape.state == tx0_state::MTS_SELECTING)
 				m_tx0->schedule_select();
 		}
 	}
@@ -909,12 +909,12 @@ void tx0_magtape_image_device::call_unload()
 
 		if (m_tx0->m_magtape.timer)
 		{
-			if (m_tx0->m_magtape.state == MTS_SELECTING)
+			if (m_tx0->m_magtape.state == tx0_state::MTS_SELECTING)
 				/* I/O has not actually started, we can cancel the selection */
 				m_tx0->m_tape_reader.timer->enable(0);
-			if ((m_tx0->m_magtape.state == MTS_SELECTED) || ((m_tx0->m_magtape.state == MTS_SELECTING) && (m_tx0->m_magtape.command == 2)))
+			if ((m_tx0->m_magtape.state == tx0_state::MTS_SELECTED) || ((m_tx0->m_magtape.state == tx0_state::MTS_SELECTING) && (m_tx0->m_magtape.command == 2)))
 			{   /* unit has become unavailable */
-				m_tx0->m_magtape.state = MTS_UNSELECTING;
+				m_tx0->m_magtape.state = tx0_state::MTS_UNSELECTING;
 				m_tx0->m_maincpu->set_state_int(TX0_PF, m_tx0->m_maincpu->state_int(TX0_PF) | PF_RWC);
 				m_tx0->schedule_unselect();
 			}
