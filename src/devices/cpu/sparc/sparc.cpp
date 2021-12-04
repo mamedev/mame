@@ -3885,9 +3885,8 @@ inline void sparc_base_device::dispatch_instruction(uint32_t op)
 		case OP2_BICC: // branch on integer condition codes
 			execute_bicc(op);
 			break;
-		case OP2_SETHI: // sethi
-			*m_regs[RD] = op << 10;
-			m_r[0] = 0;
+		case OP2_SETHI: // sethi or nop
+			if (RDBITS) RDREG = op << 10;
 			PC = nPC;
 			nPC = nPC + 4;
 			break;
@@ -4419,51 +4418,54 @@ void sparcv8_device::execute_swap(uint32_t op)
 		}
 	}
 
+	if (address & 3)
+	{
+		m_trap = 1;
+		m_mem_address_not_aligned = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+
 	uint32_t word = 0;
-	uint32_t temp = 0;
-	if (!m_trap)
+	uint32_t data = RDREG;
+
+	//while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
+	//{
+		// { wait for lock(s) to be lifted }
+		// { an implementation actually need only block when another SWAP is pending on
+		//   the same word in memory as the one addressed by this SWAP, or a LDSTUB is
+		//   pending on any byte of the word in memory addressed by this SWAP }
+	//}
+
+	m_pb_block_ldst_word = 1;
+
+	word = read_word(addr_space, address);
+
+	if (MAE)
 	{
-		temp = RDREG;
-		while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
-		{
-			// { wait for lock(s) to be lifted }
-			// { an implementation actually need only block when another SWAP is pending on
-			//   the same word in memory as the one addressed by this SWAP, or a LDSTUB is
-			//   pending on any byte of the word in memory addressed by this SWAP }
-		}
-
-		m_pb_block_ldst_word = 1;
-
-		word = read_word(addr_space, address);
-
-		if (MAE)
-		{
-			m_trap = 1;
-			m_data_access_exception = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
-			return;
-		}
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
 	}
-	if (!m_trap)
+
+	write_word(addr_space, address, data);
+
+	m_pb_block_ldst_word = 0;
+
+	if (MAE)
 	{
-		write_word(addr_space, address, temp);
-
-		m_pb_block_ldst_word = 0;
-		if (MAE)
-		{
-			m_trap = 1;
-			m_data_access_exception = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
-			return;
-		}
-		else
-		{
-			if (RDBITS)
-				RDREG = word;
-		}
+		m_trap = 1;
+		m_data_access_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
 	}
+
+	if (RDBITS)
+		RDREG = word;
 
 	PC = nPC;
 	nPC = nPC + 4;
