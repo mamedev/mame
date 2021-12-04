@@ -58,27 +58,97 @@ public:
 	falgasm89_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_inputs(*this, "IN%u", 0U)
+		, m_psg_pa(0xff)
 	{
 	}
 
 	void cbully(machine_config &config);
 
 protected:
+	virtual void machine_start() override;
+
+private:
+	void psg_pa_w(u8 data);
+	u8 psg_pb_r();
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
+
 	required_device<i8085a_cpu_device> m_maincpu;
+	required_ioport_array<4> m_inputs;
+
+	u8 m_psg_pa;
 };
 
+void falgasm89_state::machine_start()
+{
+	save_item(NAME(m_psg_pa));
+}
+
+void falgasm89_state::psg_pa_w(u8 data)
+{
+	m_psg_pa = data;
+}
+
+u8 falgasm89_state::psg_pb_r()
+{
+	u8 result = 0xff;
+	for (int n = 0; n < 4; n++)
+		if (!BIT(m_psg_pa, n))
+			result &= m_inputs[n]->read();
+
+	return result;
+}
+
+void falgasm89_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom().region("maincpu", 0);
+	map(0xf800, 0xffff).ram(); // NVRAM?
+}
+
+void falgasm89_state::io_map(address_map &map)
+{
+	map(0x00, 0x00).rw("psg", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x04, 0x04).w("psg", FUNC(ay8910_device::address_w));
+}
+
 INPUT_PORTS_START(cbully)
+	PORT_START("IN0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("IN3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void falgasm89_state::cbully(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &falgasm89_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &falgasm89_state::io_map);
 
 	// I8255(config, "i8255"); // "Coche Bully" has the i8255 socket empty
 
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "ay0", 6_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 0.50); // divider unknown
+	ay8910_device &psg(AY8910(config, "psg", 6_MHz_XTAL / 4)); // divider unknown
+	psg.add_route(ALL_OUTPUTS, "mono", 0.50);
+	psg.port_a_write_callback().set(FUNC(falgasm89_state::psg_pa_w));
+	psg.port_b_read_callback().set(FUNC(falgasm89_state::psg_pb_r));
 }
 
 ROM_START(cbully)
