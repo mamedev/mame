@@ -4477,7 +4477,7 @@
 		<repeat count="16">
 			<param name="n" start="0" increment="1" />
 			<param name="x" start="1150" increment="32" />
-			<element name="vfd~0~" ref="debug_vfd" state="0">
+			<element name="vfd~n~" ref="debug_vfd" state="0">
 				<bounds x="~x~" y="600" width="32" height="48"/>
 			</element>
 		</repeat>

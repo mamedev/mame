@@ -2998,16 +2998,24 @@
 			<bounds x="1688" y="996" width="80" height="44"/>
 		</element>
 
-		<repeat count="16">
-			<param name="s" start="0" increment="16" />
-			<param name="y" start="47" increment="64" />
-			<repeat count="16">
+		<repeat count="8">
+			<param name="s" start="0" increment="8" />
+			<param name="y" start="671" increment="48" />
+			<repeat count="8">
 				<param name="n" start="~s~" increment="1" />
-				<param name="x" start="47" increment="64" />
-				<element name="debug_lamp_label_~n~" ref="debug_lamp_label_~n~">
-					<bounds x="~x~" y="~y~" width="30" height="30"/>
+				<param name="x" start="1120" increment="84" />
+				<element name="debug_button_label_~n~" ref="debug_button_label_~n~">
+					<bounds x="~x~" y="~y~" width="40" height="22"/>
 				</element>
 			</repeat>
+		</repeat>
+
+		<repeat count="16">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="1150" increment="32" />
+			<element name="vfd~n~" ref="debug_vfd" state="0">
+				<bounds x="~x~" y="600" width="32" height="48"/>
+			</element>
 		</repeat>
 
 		<element ref="reel_background">

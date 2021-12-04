@@ -213,16 +213,16 @@ uint8_t bfm_dm01_device::comm_r()
 {
 	int result = 0;
 
-	if ( m_data_avail )
+	if (m_data_avail)
 	{
 		result = read_data();
 
-		#ifdef UNUSED_FUNCTION
-		if ( m_data_avail() )
+#if 0
+		if (m_data_avail())
 		{
 			cpu_set_irq_line(1, M6809_IRQ_LINE, ASSERT_LINE );  // trigger IRQ
 		}
-		#endif
+#endif
 	}
 
 	return result;
