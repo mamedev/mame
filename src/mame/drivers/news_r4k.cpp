@@ -98,9 +98,9 @@
 #include "emu.h"
 
 // There are two MIPSIII/R4000 implementations in MAME
-// The default one has DRC and is faster, but the other one has some different features
-// Uncomment the following line and rebuild to switch implementations. This driver supports
-// both, as long as the #define is used to select which implementation to use.
+// MIPS3 is faster, but to avoid any architectural violations related to implementing functionality
+// in the interpreter but not the DRC, the default for this driver is r4000.cpp
+// MIPS3 will not work out of the box, even if you change the #define.
 #define NO_MIPS3
 #ifndef NO_MIPS3
 #include "cpu/mips/mips3.h"
