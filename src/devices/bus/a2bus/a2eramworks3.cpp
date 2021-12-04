@@ -115,9 +115,9 @@ void a2eaux_franklin384_device::write_c07x(uint8_t offset, uint8_t data)
 	{
 	   // RamWorks/Z-RAM bank order is 0 3 4 7 8 11 12 15
 	   // so cut off access above bank 11 to limit to 384K.
-	   if (m_bank > 11)
+	   if (data > 11)
 	   {
-		  m_bank = 0;
+		  data = 0;
 	   }
 	   m_bank = 0x10000 * (data & 0xf);
 	}
