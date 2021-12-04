@@ -46,10 +46,10 @@ public:
 	void bus_error() { m_bus_error = true; }
 
 	// This method allows bit 19 of the Boot-Mode Settings to be flipped. See Chapter 9, page 223 of the R4000 User Manual.
-	// When this bit is 0 (enabled = true), then the CP0 timer will set interrupt 5 whenever it expires.
-	// When this bit is 1 (enabled = false), the CP0 timer interrupt is disabled.
+	// When this bit is 0 (interrupt_disabled = false), then the CP0 timer will set interrupt 5 whenever it expires.
+	// When this bit is 1 (interrupt_disabled = true), the CP0 timer interrupt is disabled.
 	// When the timer interrupt is disabled, interrupt 5 becomes a standard general-purpose interrupt.
-	void set_timintdis(bool enabled) { m_timer_interrupt_enabled = enabled; }
+	void set_timer_interrupt_disable(bool interrupt_disabled) { m_timer_interrupt_enabled = !interrupt_disabled; }
 
 	// Secondary cache configuration
 	void set_scache_size(u32 size)
@@ -479,11 +479,11 @@ protected:
 	std::unique_ptr<u32[]> m_icache_data;
 
 	// experimental scache state
-	u32 m_scache_size = 0; // Size of the secondary cache in bytes
-	u8 m_scache_line_size = 0; // Secondary cache line size
-	u32 m_scache_line_index = 0; // Secondary cache line shift
-	u32 m_scache_tag_mask = 0; // Mask for extracting the tag from a physical address
-	u32 m_scache_tag_size = 0; // Tag count in the scache
+	u32 m_scache_size; // Size of the secondary cache in bytes
+	u8 m_scache_line_size; // Secondary cache line size
+	u32 m_scache_line_index; // Secondary cache line shift
+	u32 m_scache_tag_mask; // Mask for extracting the tag from a physical address
+	u32 m_scache_tag_size; // Tag count in the scache
 	std::unique_ptr<u32[]> m_scache_tag; // scache tag memory
 
 	// statistics
@@ -511,7 +511,7 @@ public:
 	r4400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 		: r4000_base_device(mconfig, R4400, tag, owner, clock, 0x0440, 0x0500, CACHE_16K, CACHE_16K, 10, 20, 69, 133)
 	{
-		// no secondary cache
+		// no secondary cache by default
 		m_cp0[CP0_Config] |= CONFIG_SC;
 	}
 };
