@@ -298,6 +298,7 @@ SOUNDS["TT5665"] = true
 --SOUNDS["UDA1344"] = true
 SOUNDS["SWP30"] = true
 SOUNDS["XT446"] = true
+--SOUNDS["LYNX"] = true
 
 --------------------------------------------------
 -- specify available video cores

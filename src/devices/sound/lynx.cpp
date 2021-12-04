@@ -1,11 +1,15 @@
 // license:GPL-2.0+
 // copyright-holders:Peter Trauner
 /******************************************************************************
+
+ Atari Lynx sound hardware, Part of Mikey (Hayato in Lynx II)
  PeT mess@utanet.at 2000,2001
+
 ******************************************************************************/
 
 #include "emu.h"
-#include "audio/lynx.h"
+#include "lynx.h"
+#include <algorithm>
 
 
 /* accordingly to atari's reference manual
@@ -85,8 +89,8 @@ AUD_A_RIGHT EQU %00000001
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(LYNX_SND,  lynx_sound_device,  "lynx_sound",  "Mikey")
-DEFINE_DEVICE_TYPE(LYNX2_SND, lynx2_sound_device, "lynx2_sound", "Mikey (Lynx II)")
+DEFINE_DEVICE_TYPE(LYNX_SND,  lynx_sound_device,  "lynx_sound",  "Atari Mikey (Sound)")
+DEFINE_DEVICE_TYPE(LYNX2_SND, lynx2_sound_device, "lynx2_sound", "Atari Hayato (Sound)")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -172,8 +176,7 @@ void lynx_sound_device::init()
 
 void lynx_sound_device::device_start()
 {
-	m_mixer_channel = stream_alloc(0, 1, machine().sample_rate());
-	m_usec_per_sample = 1000000 / machine().sample_rate();
+	m_mixer_channel = stream_alloc(0, 1, clock() / 16);
 	m_timer_delegate.resolve();
 	init();
 	register_save();
@@ -182,8 +185,7 @@ void lynx_sound_device::device_start()
 
 void lynx2_sound_device::device_start()
 {
-	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
-	m_usec_per_sample = 1000000 / machine().sample_rate();
+	m_mixer_channel = stream_alloc(0, 2, clock() / 16);
 	m_timer_delegate.resolve();
 	init();
 	register_save();
@@ -201,6 +203,15 @@ void lynx_sound_device::device_reset()
 	}
 }
 
+//-------------------------------------------------
+//  device_clock_changed - called if the clock
+//  changes
+//-------------------------------------------------
+
+void lynx_sound_device::device_clock_changed()
+{
+	m_mixer_channel->set_sample_rate(clock() / 16);
+}
 
 void lynx_sound_device::reset_channel(LYNX_AUDIO *channel)
 {
@@ -223,7 +234,7 @@ void lynx_sound_device::reset_channel(LYNX_AUDIO *channel)
 void lynx_sound_device::count_down(int nr)
 {
 	LYNX_AUDIO *channel = &m_audio[nr];
-	if (channel->reg.control1 & 8 && (channel->reg.control1 & 7) != 7)
+	if ((channel->reg.count_en()) && (!(channel->reg.linked())))
 		return;
 	if (nr == 0)
 		m_mixer_channel->update();
@@ -233,25 +244,25 @@ void lynx_sound_device::count_down(int nr)
 
 void lynx_sound_device::shift(int chan_nr)
 {
-	int16_t out_temp;
+	s16 out_temp;
 	LYNX_AUDIO *channel;
 
 	assert(chan_nr < 4);
 
 	channel = &m_audio[chan_nr];
-	//channel->shifter = ((channel->shifter<<1)&0xffe) | (m_shift_xor[ channel->shifter & channel->mask ]&1);
+	//channel->shifter = ((channel->shifter << 1) & 0xffe) | (m_shift_xor[channel->shifter & channel->mask] & 1);
 
 	// alternative method (functionally the same as above)
-	uint8_t xor_out = 0;
+	u8 xor_out = 1; // output of xor is inverted
 	for (int bit = 0; bit < 12; bit++)
 	{
-		if ((channel->mask >> bit) & 1)
-			xor_out ^= (channel->shifter >> bit) & 1;
+		if (BIT(channel->mask, bit))
+			xor_out ^= BIT(channel->shifter, bit);
 	}
-	channel->shifter = ((channel->shifter << 1) & 0xffe) | (xor_out ^ 1); // output of xor is inverted
+	channel->shifter = ((channel->shifter << 1) & 0xffe) | xor_out;
 
 
-	if (channel->reg.control1 & 0x20) // integrate mode enabled
+	if (channel->reg.integrate_mode()) // integrate mode enabled
 	{
 		if (channel->shifter & 1)
 			out_temp = channel->reg.output + channel->reg.volume;
@@ -259,9 +270,7 @@ void lynx_sound_device::shift(int chan_nr)
 			out_temp = channel->reg.output - channel->reg.volume;
 
 		// clipping
-		if (out_temp > 127) out_temp = 127;
-		if (out_temp < -128) out_temp = -128;
-		channel->reg.output = (int16_t)out_temp;
+		channel->reg.output = std::clamp<s16>((s16)out_temp, -128, 127);
 	}
 
 	switch (chan_nr)
@@ -284,22 +293,22 @@ void lynx_sound_device::execute(int chan_nr)
 
 	channel = &m_audio[chan_nr];
 
-	if (channel->reg.control1 & 8) // count enable
+	if (channel->reg.count_en()) // count enable
 	{
-		channel->ticks += m_usec_per_sample;
-		if ((channel->reg.control1 & 7) == 7) // link
+		channel->ticks++;
+		if (channel->reg.linked()) // link
 		{
 			if (channel->count < 0) // counter finished
 			{
 				//channel->count+=channel->reg.counter; // reload (wrong?)
-				if (channel->reg.control1 & 0x10)
+				if (channel->reg.reload_en())
 					channel->count = channel->reg.bakup;
 				shift(chan_nr);
 			}
 		}
 		else
 		{
-			int t = 1 << (channel->reg.control1 & 7); // microseconds per count
+			const int t = 1 << (channel->reg.timer_clock()); // microseconds per count
 			for (;;)
 			{
 				for (; (channel->ticks >= t) && (channel->count >= 0); channel->ticks -= t) // at least one sampled worth of time left, timer not expired
@@ -311,7 +320,7 @@ void lynx_sound_device::execute(int chan_nr)
 				if (channel->count < 0)
 				{
 					shift(chan_nr);
-					if (channel->reg.control1 & 0x10)
+					if (channel->reg.reload_en())
 						channel->count = channel->reg.bakup;
 					else
 						break;
@@ -319,9 +328,9 @@ void lynx_sound_device::execute(int chan_nr)
 			}
 		}
 
-		if (!(channel->reg.control1 & 0x20)) // normal mode
+		if (!(channel->reg.integrate_mode())) // normal mode
 		{
-			channel->reg.output = (channel->shifter & 1) ? channel->reg.volume : -channel->reg.volume;
+			channel->reg.output = BIT(channel->shifter, 0) ? channel->reg.volume : -channel->reg.volume;
 		}
 	}
 	else
@@ -331,9 +340,9 @@ void lynx_sound_device::execute(int chan_nr)
 	}
 }
 
-uint8_t lynx_sound_device::read(offs_t offset)
+u8 lynx_sound_device::read(offs_t offset)
 {
-	uint8_t value = 0;
+	u8 value = 0;
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];
 
 	m_mixer_channel->update();
@@ -363,7 +372,7 @@ uint8_t lynx_sound_device::read(offs_t offset)
 				break;
 			case 6:
 				//current timer value
-				if (channel->count >=0)
+				if (channel->count >= 0)
 					value = channel->count;
 				else
 					value = 0;
@@ -394,7 +403,7 @@ uint8_t lynx_sound_device::read(offs_t offset)
 	return value;
 }
 
-void lynx_sound_device::write(offs_t offset, uint8_t data)
+void lynx_sound_device::write(offs_t offset, u8 data)
 {
 	//logerror("audio write %.2x %.2x\n", offset, data);
 	LYNX_AUDIO *channel = &m_audio[(offset >> 3) & 3];
@@ -414,7 +423,7 @@ void lynx_sound_device::write(offs_t offset, uint8_t data)
 			case 1:
 				channel->reg.feedback = data;
 				channel->mask &= 0x80;
-				channel->mask |= (data & 0x3f) | ((data & 0xc0)<<4);
+				channel->mask |= (data & 0x3f) | ((data & 0xc0) << 4);
 				break;
 			// Output value
 			case 2:
@@ -433,17 +442,17 @@ void lynx_sound_device::write(offs_t offset, uint8_t data)
 			// Audio control bits
 			case 5:
 				channel->mask &= ~0x80;
-				channel->mask |= (data&0x80);
+				channel->mask |= (data & 0x80);
 				channel->reg.control1 = data;
 				break;
 			// Current count
 			case 6:
-				channel->count=data;
+				channel->count = data;
 				break;
 			// Upper 4 bits of shift register and audio status bits
 			case 7:
-				channel->shifter&=0xff;
-				channel->shifter|=(data&0xf0)<<4;
+				channel->shifter &= 0xff;
+				channel->shifter |= (data & 0xf0) << 4;
 				channel->reg.control2 = data;
 				break;
 		}
@@ -453,7 +462,7 @@ void lynx_sound_device::write(offs_t offset, uint8_t data)
 		switch (offset) // Stereo Registers
 		{
 			case 0x40: case 0x41: case 0x42: case 0x43:
-				m_audio[offset&3].attenuation = data;
+				m_audio[offset & 3].attenuation = data;
 				break;
 			case 0x44:
 				m_attenuation_enable = data;
