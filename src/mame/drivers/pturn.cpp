@@ -77,15 +77,19 @@ ROMS: All ROM labels say only "PROM" and a number.
 
 */
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
+
+namespace {
 
 class pturn_state : public driver_device
 {
@@ -126,6 +130,8 @@ private:
 	bool m_nmi_sub;
 
 	void videoram_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] uint8_t protection_r();
+	[[maybe_unused]] uint8_t protection2_r();
 	DECLARE_WRITE_LINE_MEMBER(nmi_main_enable_w);
 	void nmi_sub_enable_w(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
@@ -239,7 +245,6 @@ uint32_t pturn_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-#ifdef UNUSED_FUNCTION
 uint8_t pturn_state::protection_r()
 {
 	return 0x66;
@@ -249,7 +254,6 @@ uint8_t pturn_state::protection2_r()
 {
 	return 0xfe;
 }
-#endif
 
 void pturn_state::videoram_w(offs_t offset, uint8_t data)
 {
@@ -604,5 +608,7 @@ void pturn_state::init_pturn()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc0db, 0xc0db, read8_delegate(FUNC(pturn_state::protection2_r), this));
 	*/
 }
+
+} // anonymous namespace
 
 GAME( 1984, pturn,  0, pturn,  pturn, pturn_state, init_pturn, ROT90, "Jaleco", "Parallel Turn",  MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

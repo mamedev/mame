@@ -176,7 +176,7 @@ void mtxl_state::machine_start()
 #ifndef REAL_PCI_CHIPSET
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 
-	/* MESS managed RAM */
+	/* managed RAM */
 	membank("bank10")->set_base(m_ram->pointer());
 
 	if (m_ram->size() > 0xa0000)

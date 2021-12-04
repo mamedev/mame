@@ -1267,7 +1267,7 @@ void apple2gs_state::adb_write_datareg(u8 data)
 }
 
 // real rom 3 h/w reads 0x90 when idle, 0x98 when key pressed
-// current MESS reads back 0xb0 when idle
+// current MAME reads back 0xb0 when idle
 u8 apple2gs_state::adb_read_kmstatus()
 {
 	return m_adb_kmstatus;

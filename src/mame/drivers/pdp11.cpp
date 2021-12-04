@@ -90,9 +90,10 @@
 
 #include "emu.h"
 #include "bus/qbus/qbus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
 #include "cpu/i86/i186.h"
-#include "machine/terminal.h"
+#include "machine/dl11.h"
 #include "machine/rx01.h"
 
 
@@ -104,7 +105,8 @@ public:
 	pdp11_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
+		, m_dl11(*this, "dl11")
+		, m_rs232(*this, "rs232")
 		, m_qbus(*this, "qbus")
 	{ }
 
@@ -119,13 +121,9 @@ protected:
 
 private:
 	required_device<t11_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<dl11_device> m_dl11;
+	required_device<rs232_port_device> m_rs232;
 	required_device<qbus_device> m_qbus;
-	uint16_t teletype_ctrl_r(offs_t offset);
-	void teletype_ctrl_w(offs_t offset, uint16_t data);
-	void kbd_put(u8 data);
-	uint8_t m_teletype_data;
-	uint16_t m_teletype_status;
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
@@ -134,50 +132,12 @@ private:
 	void sms1000_mem_188(address_map &map);
 };
 
-uint16_t pdp11_state::teletype_ctrl_r(offs_t offset)
-{
-	uint16_t res = 0;
-
-	switch(offset)
-	{
-		/*
-		    keyboard
-		    ---- x--- ---- ---- busy bit
-		    ---- ---- x--- ---- ready bit (set on character receive, clear on buffer read)
-		    ---- ---- -x-- ---- irq enable
-		    ---- ---- ---- ---x reader enable (?)
-		*/
-		case 0: res = m_teletype_status; break; // reader status register (tks)
-		case 1: m_teletype_status &= ~0x80; res = m_teletype_data; break;// reader buffer register (tkb)
-		/*
-		    printer
-		    ---- ---- x--- ---- ready bit
-		    ---- ---- -x-- ---- irq enable
-		    ---- ---- ---- -x-- maintenance
-		*/
-		case 2: res = 0x80; break; // punch status register (tps)
-		case 3: res = 0; break; // punch buffer register (tpb)
-	}
-
-	return res;
-}
-
-void pdp11_state::teletype_ctrl_w(offs_t offset, uint16_t data)
-{
-	switch(offset)
-	{
-		case 3:
-			m_terminal->write(data);
-			break;
-	}
-}
-
 void pdp11_state::pdp11_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();  // RAM
 	map(0xea00, 0xfeff).rom();
-	map(0xff70, 0xff77).rw(FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
+	map(0xff70, 0xff77).rw(m_dl11, FUNC(dl11_device::read), FUNC(dl11_device::write));
 
 	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
 }
@@ -288,11 +248,6 @@ INPUT_PORTS_END
 
 void pdp11_state::machine_start()
 {
-	m_teletype_data = 0;
-	m_teletype_status = 0;
-
-	save_item(NAME(m_teletype_data));
-	save_item(NAME(m_teletype_status));
 }
 
 void pdp11_state::machine_reset()
@@ -376,12 +331,6 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 }
 
 
-void pdp11_state::kbd_put(u8 data)
-{
-	m_teletype_data = data;
-	m_teletype_status |= 0x80;
-}
-
 void pdp11_state::pdp11(machine_config &config)
 {
 	/* basic machine hardware */
@@ -389,9 +338,18 @@ void pdp11_state::pdp11(machine_config &config)
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
 
-	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(pdp11_state::kbd_put));
+	DL11(config, m_dl11, XTAL(4'608'000));
+	m_dl11->set_rxc(9600);
+	m_dl11->set_txc(9600);
+	m_dl11->set_rxvec(060);
+	m_dl11->set_txvec(064);
+	m_dl11->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+// future
+//	m_dl11->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//	m_dl11->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set(m_dl11, FUNC(dl11_device::rx_w));
 
 	RX01(config, "rx01", 0);
 	QBUS(config, m_qbus, 0);

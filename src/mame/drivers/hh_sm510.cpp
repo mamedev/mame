@@ -17,7 +17,7 @@ Use -autosave to at least make them remember the highscores.
 TODO:
 - improve display decay simulation? but SVG doesn't support setting brightness
   per segment, adding pwm_display_device right now has no added value
-- improve/redo SVG of: exospace
+- improve/redo SVG of: rkosmosa
 - confirm gnw_bfight rom (assumed to be the same as gnw_bfightn)
 - confirm gnw_climber rom (assumed to be the same as gnw_climbern)
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
@@ -1316,7 +1316,7 @@ ROM_END
   * Sharp SM5A label FP-24 51YB (die label CMS646, ROM ID 74)
   * lcd screen with custom segments, 1-bit sound
 
-  In 1989, Elektronika(USSR) released a clone: Весёлый повар (Vesolyy povar,
+  In 1989, Elektronika(USSR) released a clone: Весёлый повар (Vesyolyy povar,
   export version: Merry Cook). This game shares the same ROM, though the graphics
   are slightly different.
 
@@ -1329,7 +1329,7 @@ public:
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void merrycook(machine_config &config);
+	void vespovar(machine_config &config);
 	void gnw_chef(machine_config &config);
 };
 
@@ -1365,7 +1365,7 @@ void gnw_chef_state::gnw_chef(machine_config &config)
 	sm5a_common(config, 1666, 1080); // assuming same R mask option as merry cook
 }
 
-void gnw_chef_state::merrycook(machine_config & config)
+void gnw_chef_state::vespovar(machine_config & config)
 {
 	kb1013vk12_common(config, 1679, 1080); // R mask option confirmed
 }
@@ -1380,12 +1380,12 @@ ROM_START( gnw_chef )
 	ROM_LOAD( "gnw_chef.svg", 0, 199518, CRC(ecc18d28) SHA1(1c0b7dfff71faa4d4395c19a84454870e403f927) )
 ROM_END
 
-ROM_START( merrycook )
+ROM_START( vespovar )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-04.bin", 0x0000, 0x0740, CRC(2806ab39) SHA1(18261a80eec5bf768bb88b803c598f80e078c71f) )
 
 	ROM_REGION( 144128, "screen", 0)
-	ROM_LOAD( "merrycook.svg", 0, 144128, CRC(dcd1c073) SHA1(e15bf643f17b7ead37407c985e053e6434683d7c) )
+	ROM_LOAD( "vespovar.svg", 0, 144128, CRC(dcd1c073) SHA1(e15bf643f17b7ead37407c985e053e6434683d7c) )
 ROM_END
 
 
@@ -1416,12 +1416,12 @@ ROM_END
   ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
   ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
   ИМ-16  Охота               Okhota               Fowling             -
-  ИМ-22  Весёлые футболисты  Vesjolye futbolisty  Monkey Goalkeeper   -
+  ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
   ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
   ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
   ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50  Космический полёт   Kosmicheskij poljot  Space Flight        The Model ID is the same as Amusing Arithmetic (not emulated in MAME)
-  ИМ-51  Морская атака       Morskaja ataka       -                   -
+  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arifmetika, export version: Amusing Arithmetic) (not emulated in MAME)
+  ИМ-51  Морская атака       Morskaya ataka       -                   -
   ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
 
 ***************************************************************************/
@@ -1436,13 +1436,13 @@ public:
 	void gnw_mmouse(machine_config &config);
 	void gnw_egg(machine_config &config);
 	void nupogodi(machine_config &config);
-	void exospace(machine_config &config);
-	void fowling(machine_config &config);
-	void monkeygk(machine_config &config);
+	void rkosmosa(machine_config &config);
+	void okhota(machine_config &config);
+	void vfutbol(machine_config &config);
 	void krybolov(machine_config &config);
-	void frogling(machine_config &config);
-	void nburglar(machine_config &config);
-	void spaceflt(machine_config &config);
+	void kvakazad(machine_config &config);
+	void nochnyev(machine_config &config);
+	void kosmicpt(machine_config &config);
 	void morataka(machine_config &config);
 	void atakaast(machine_config &config);
 };
@@ -1474,7 +1474,7 @@ static INPUT_PORTS_START( gnw_mmouse )
 	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( exospace )
+static INPUT_PORTS_START( rkosmosa )
 	PORT_INCLUDE( gnw_mmouse )
 
 	PORT_MODIFY("BA")
@@ -1496,17 +1496,17 @@ void gnw_mmouse_state::nupogodi(machine_config &config)
 	kb1013vk12_common(config, 1715, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::exospace(machine_config &config)
+void gnw_mmouse_state::rkosmosa(machine_config &config)
 {
 	kb1013vk12_common(config, 1756, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::fowling(machine_config &config)
+void gnw_mmouse_state::okhota(machine_config &config)
 {
 	kb1013vk12_common(config, 1632, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::monkeygk(machine_config &config)
+void gnw_mmouse_state::vfutbol(machine_config &config)
 {
 	kb1013vk12_common(config, 1655, 1080); // R mask option ?
 }
@@ -1516,17 +1516,17 @@ void gnw_mmouse_state::krybolov(machine_config &config)
 	kb1013vk12_common(config, 1638, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::frogling(machine_config &config)
+void gnw_mmouse_state::kvakazad(machine_config &config)
 {
 	kb1013vk12_common(config, 1660, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::nburglar(machine_config &config)
+void gnw_mmouse_state::nochnyev(machine_config &config)
 {
 	kb1013vk12_common(config, 1641, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::spaceflt(machine_config &config)
+void gnw_mmouse_state::kosmicpt(machine_config &config)
 {
 	kb1013vk12_common(config, 1658, 1080); // R mask option ?
 }
@@ -1567,28 +1567,28 @@ ROM_START( nupogodi )
 	ROM_LOAD( "nupogodi.svg", 0, 156488, CRC(8ae6ec5d) SHA1(28cb05967837e52fc40f088361456e1dcd4ec09f) )
 ROM_END
 
-ROM_START( exospace )
+ROM_START( rkosmosa )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-13.bin", 0x0000, 0x0740, CRC(553e2b09) SHA1(2b74f8437b881fbb62b61f25435a5bfc66872a9a) )
 
 	ROM_REGION( 89361, "screen", 0)
-	ROM_LOAD( "exospace.svg", 0, 89361, BAD_DUMP CRC(d61f3bdc) SHA1(932d45dc9302db5550971ce0d295a88e8c507e3f) )
+	ROM_LOAD( "rkosmosa.svg", 0, 89361, BAD_DUMP CRC(d61f3bdc) SHA1(932d45dc9302db5550971ce0d295a88e8c507e3f) )
 ROM_END
 
-ROM_START( fowling )
+ROM_START( okhota )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-16.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 117838, "screen", 0)
-	ROM_LOAD( "fowling.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
+	ROM_LOAD( "okhota.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
 ROM_END
 
-ROM_START( monkeygk )
+ROM_START( vfutbol )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-22.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 131901, "screen", 0)
-	ROM_LOAD( "monkeygk.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
+	ROM_LOAD( "vfutbol.svg", 0, 131901, CRC(85811308) SHA1(288aa41bade08c61e0d346b9c1109179564e34ed) )
 ROM_END
 
 ROM_START( krybolov )
@@ -1599,28 +1599,28 @@ ROM_START( krybolov )
 	ROM_LOAD( "krybolov.svg", 0, 132804, CRC(4e3e70d3) SHA1(18f1300afa601deb6ac01dcf7dca88187b7940a3) )
 ROM_END
 
-ROM_START( frogling )
+ROM_START( kvakazad )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-33.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 131961, "screen", 0)
-	ROM_LOAD( "frogling.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
+	ROM_LOAD( "kvakazad.svg", 0, 131961, CRC(37b27420) SHA1(25d9e273f056c10e3a5bc4476ce980bfdb8095e1) )
 ROM_END
 
-ROM_START( nburglar )
+ROM_START( nochnyev )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-49.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 136498, "screen", 0)
-	ROM_LOAD( "nburglar.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
+	ROM_LOAD( "nochnyev.svg", 0, 136498, CRC(24a287cd) SHA1(2d14aa9b55b42c634df141fe4037ae286549b17b) )
 ROM_END
 
-ROM_START( spaceflt )
+ROM_START( kosmicpt )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-50.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 110214, "screen", 0)
-	ROM_LOAD( "spaceflt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
+	ROM_LOAD( "kosmicpt.svg", 0, 110214, CRC(ccef6d27) SHA1(71f3cf49a5797ed9296f1e86ec4575ffefab67dd) )
 ROM_END
 
 ROM_START( morataka )
@@ -1667,7 +1667,7 @@ public:
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void spacebridge(machine_config &config);
+	void kosmicmt(machine_config &config);
 	void gnw_fire(machine_config &config);
 };
 
@@ -1706,7 +1706,7 @@ void gnw_fire_state::gnw_fire(machine_config &config)
 	sm5a_common(config, 1624, 1080); // R mask option confirmed
 }
 
-void gnw_fire_state::spacebridge(machine_config & config)
+void gnw_fire_state::kosmicmt(machine_config & config)
 {
 	kb1013vk12_common(config, 1673, 1080); // R mask option confirmed
 }
@@ -1721,12 +1721,12 @@ ROM_START( gnw_fire )
 	ROM_LOAD( "gnw_fire.svg", 0, 163920, CRC(be8a9f05) SHA1(644d8bed6228fa7e2f541b60fcfc1a0d97df0df6) )
 ROM_END
 
-ROM_START( spacebridge )
+ROM_START( kosmicmt )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-09.bin", 0x0000, 0x0740, CRC(f4c53ef0) SHA1(6b57120a0f9d2fd4dcd65ad57a5f32def71d905f) )
 
 	ROM_REGION( 124578, "screen", 0)
-	ROM_LOAD( "spacebridge.svg", 0, 124578, CRC(913324ef) SHA1(6e72f7f517da754075af11283d71fc8d24ac0529) )
+	ROM_LOAD( "kosmicmt.svg", 0, 124578, CRC(913324ef) SHA1(6e72f7f517da754075af11283d71fc8d24ac0529) )
 ROM_END
 
 
@@ -9682,21 +9682,21 @@ CONS( 1981, gnw_pchute,   0,           0, gnw_pchute,   gnw_pchute,   gnw_pchute
 CONS( 1981, gnw_octopus,  0,           0, gnw_octopus,  gnw_octopus,  gnw_octopus_state,  empty_init, "Nintendo", "Game & Watch: Octopus", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_popeye,   0,           0, gnw_popeye,   gnw_popeye,   gnw_popeye_state,   empty_init, "Nintendo", "Game & Watch: Popeye (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_chef,     0,           0, gnw_chef,     gnw_chef,     gnw_chef_state,     empty_init, "Nintendo", "Game & Watch: Chef", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, merrycook,    gnw_chef,    0, merrycook,    gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Merry Cook", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, vespovar,     gnw_chef,    0, vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_mmouse,   0,           0, gnw_mmouse,   gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_egg,      gnw_mmouse,  0, gnw_egg,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, exospace,     gnw_mmouse,  0, exospace,     exospace,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Explorers of Space", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, fowling,      gnw_mmouse,  0, fowling,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Fowling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, monkeygk,     gnw_mmouse,  0, monkeygk,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Monkey Goalkeeper", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, rkosmosa,     gnw_mmouse,  0, rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, okhota,       gnw_mmouse,  0, okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, vfutbol,      gnw_mmouse,  0, vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, frogling,     gnw_mmouse,  0, frogling,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Frogling", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 19??, nburglar,     gnw_mmouse,  0, nburglar,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Night Burglars", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 19??, spaceflt,     gnw_mmouse,  0, spaceflt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Space Flight", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kvakazad,     gnw_mmouse,  0, kvakazad,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, nochnyev,     gnw_mmouse,  0, nochnyev,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nochnye vorishki", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 19??, kosmicpt,     gnw_mmouse,  0, kosmicpt,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kosmicheskiy polyot", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 19??, morataka,     gnw_mmouse,  0, morataka,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Morskaja ataka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1992, atakaast,     gnw_mmouse,  0, atakaast,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Ataka asteroidov", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_fire,     0,           0, gnw_fire,     gnw_fire,     gnw_fire_state,     empty_init, "Nintendo", "Game & Watch: Fire (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1989, spacebridge,  gnw_fire,    0, spacebridge,  gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Space Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, kosmicmt,     gnw_fire,    0, kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_tbridge,  0,           0, gnw_tbridge,  gnw_tbridge,  gnw_tbridge_state,  empty_init, "Nintendo", "Game & Watch: Turtle Bridge", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_fireatk,  0,           0, gnw_fireatk,  gnw_fireatk,  gnw_fireatk_state,  empty_init, "Nintendo", "Game & Watch: Fire Attack", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1982, gnw_stennis,  0,           0, gnw_stennis,  gnw_stennis,  gnw_stennis_state,  empty_init, "Nintendo", "Game & Watch: Snoopy Tennis", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )

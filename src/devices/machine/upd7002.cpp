@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Gordon Jefferyes
 /******************************************************************************
+
     uPD7002 Analogue to Digital Converter
-
-    MESS Driver By:
-
-    Gordon Jefferyes
-    mess_bbc@gjeffery.dircon.co.uk
 
 ******************************************************************************/
 

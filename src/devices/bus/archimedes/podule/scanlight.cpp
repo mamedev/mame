@@ -6,6 +6,10 @@
 
     http://chrisacorns.computinghistory.org.uk/32bit_UpgradesA2G/CC_Scannerif.html
 
+    Computer Concepts A3000 Scanner interface
+
+    http://chrisacorns.computinghistory.org.uk/32bit_UpgradesA2G/CC_scanner_minipodule.html
+
     Computer Concepts ScanLight Video 256
 
     http://chrisacorns.computinghistory.org.uk/32bit_UpgradesA2G/CC_ScanlightVideo256.html
@@ -72,6 +76,20 @@ protected:
 };
 
 
+// ======================> arc_scanjunior3_device
+
+class arc_scanjunior3_device : public arc_scanlight_device
+{
+public:
+	// construction/destruction
+	arc_scanjunior3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 // ======================> arc_scanvideo_device
 
 class arc_scanvideo_device : public arc_scanlight_device
@@ -90,8 +108,6 @@ protected:
 
 private:
 	required_device<avivideo_image_device> m_avivideo;
-
-	u8 m_rom_bank;
 };
 
 
@@ -103,8 +119,8 @@ void arc_scanlight_device::ioc_map(address_map &map)
 
 void arc_scanvideo_device::ioc_map(address_map &map)
 {
-	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | ((m_rom_page << 11) & 0xf800)]; })).umask32(0x000000ff);
-	map(0x2000, 0x2000).lw8(NAME([this](u8 data) { m_rom_page = data | (m_rom_bank << 4); }));
+	map(0x0000, 0x1fff).lr8(NAME([this](offs_t offset) { return m_podule_rom->base()[offset | (((m_rom_page ^ 0x10) << 11) & 0xf800)]; })).umask32(0x000000ff);
+	map(0x2000, 0x2000).lw8(NAME([this](u8 data) { m_rom_page = data; }));
 }
 
 
@@ -114,19 +130,27 @@ void arc_scanvideo_device::ioc_map(address_map &map)
 
 ROM_START( scanlight )
 	ROM_REGION(0x8000, "podule_rom", 0)
-	ROM_LOAD("scan-light.rom", 0x0000, 0x8000, CRC(6ba1764b) SHA1(fa69fb69e01553b27409b65a37d3d30a376e7380))
+	ROM_SYSTEM_BIOS(0, "100", "1.00 (05 Sep 1990)") // also on A3000 Scanner mini-podule
+	ROMX_LOAD("scan-light_1.00.rom", 0x0000, 0x8000, CRC(6ba1764b) SHA1(fa69fb69e01553b27409b65a37d3d30a376e7380), ROM_BIOS(0))
 ROM_END
 
 ROM_START( scanjunior )
 	ROM_REGION(0x8000, "podule_rom", 0)
-	ROM_LOAD("scan-light_jr.rom", 0x0000, 0x8000, CRC(bf1b8268) SHA1(3c63f8379d8fc222fc57838a9384ecec7c5d2484))
+	ROM_SYSTEM_BIOS(0, "100", "1.00 (05 Sep 1990)")
+	ROMX_LOAD("scan-light_jr_1.00.rom", 0x0000, 0x8000, CRC(bf1b8268) SHA1(3c63f8379d8fc222fc57838a9384ecec7c5d2484), ROM_BIOS(0))
+ROM_END
+
+ROM_START( scanjunior3 )
+	ROM_REGION(0x8000, "podule_rom", 0)
+	ROM_SYSTEM_BIOS(0, "200", "2.00 (02 Oct 1992)")
+	ROMX_LOAD("scan-light_jr_2.00.rom", 0x0000, 0x8000, CRC(bdc729bb) SHA1(382193f2b6cf8ba5ed04481d99050fe2f691ad0a), ROM_BIOS(0))
 ROM_END
 
 ROM_START( scanvideo )
 	ROM_REGION(0x10000, "podule_rom", 0)
-	ROM_LOAD("video256_1.20.rom", 0x0000, 0x10000, CRC(3e9a44b8) SHA1(9fe739b42c5bf5dab69e3c1ffb1c3c5a5d8d7a50))
+	ROM_SYSTEM_BIOS(0, "120", "1.20 (04 May 1994)")
+	ROMX_LOAD("video256_1.20.rom", 0x0000, 0x10000, CRC(3e9a44b8) SHA1(9fe739b42c5bf5dab69e3c1ffb1c3c5a5d8d7a50), ROM_BIOS(0))
 ROM_END
-
 
 
 const tiny_rom_entry *arc_scanlight_device::device_rom_region() const
@@ -137,6 +161,11 @@ const tiny_rom_entry *arc_scanlight_device::device_rom_region() const
 const tiny_rom_entry *arc_scanjunior_device::device_rom_region() const
 {
 	return ROM_NAME( scanjunior );
+}
+
+const tiny_rom_entry *arc_scanjunior3_device::device_rom_region() const
+{
+	return ROM_NAME( scanjunior3 );
 }
 
 const tiny_rom_entry *arc_scanvideo_device::device_rom_region() const
@@ -189,10 +218,14 @@ arc_scanjunior_device::arc_scanjunior_device(const machine_config &mconfig, cons
 {
 }
 
+arc_scanjunior3_device::arc_scanjunior3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: arc_scanlight_device(mconfig, ARC_SCANJUNIOR3, tag, owner, clock)
+{
+}
+
 arc_scanvideo_device::arc_scanvideo_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: arc_scanlight_device(mconfig, ARC_SCANVIDEO, tag, owner, clock)
 	, m_avivideo(*this, "srcavi")
-	, m_rom_bank(1)
 {
 }
 
@@ -224,4 +257,5 @@ void arc_scanlight_device::device_reset()
 
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCANLIGHT, device_archimedes_podule_interface, arc_scanlight_device, "arc_scanlight", "Computer Concepts ScanLight")
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCANJUNIOR, device_archimedes_podule_interface, arc_scanjunior_device, "arc_scanjunior", "Computer Concepts ScanLight Junior")
+DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCANJUNIOR3, device_archimedes_podule_interface, arc_scanjunior3_device, "arc_scanjunior3", "Computer Concepts ScanLight Junior MkIII")
 DEFINE_DEVICE_TYPE_PRIVATE(ARC_SCANVIDEO, device_archimedes_podule_interface, arc_scanvideo_device, "arc_scanvideo", "Computer Concepts ScanLight Video 256")

@@ -240,10 +240,12 @@ void device_archimedes_podule_interface::interface_post_start()
 
 // slot devices
 #include "a448.h"
+#include "acejoy.h"
+//#include "archdigi.h"
+//#include "archscan.h"
 #include "armadeus.h"
 //#include "discbuffer.h"
 //#include "colourcard.h"
-//#include "digitiser_we.h"
 #include "eaglem2.h"
 #include "ether1.h"
 //#include "ether2.h"
@@ -254,12 +256,15 @@ void device_archimedes_podule_interface::interface_post_start()
 #include "etherr.h"
 #include "faxpack.h"
 //#include "g8.h"
+#include "greyhawk.h"
 //#include "hdfc_rdev.h"
 //#include "hdisc.h"
 //#include "hdisc_cw.h"
+//#include "hdisc_morley.h"
 //#include "hdisc_we.h"
 #include "ide_be.h"
 //#include "ide_castle.h"
+//#include "ide_dt.h"
 //#include "ide_hccs.h"
 //#include "ide_ics.h"
 #include "ide_rdev.h"
@@ -276,6 +281,7 @@ void device_archimedes_podule_interface::interface_post_start()
 #include "rom.h"
 //#include "rom_cc.h"
 #include "rs423.h"
+#include "scan256.h"
 #include "scanlight.h"
 //#include "scsi_a500.h"
 //#include "scsi_acorn.h"
@@ -284,6 +290,7 @@ void device_archimedes_podule_interface::interface_post_start()
 //#include "scsi_oak.h"
 #include "scsi_vti.h"
 #include "serial.h"
+#include "spectra.h"
 #include "tube.h"
 //#include "ultimate.h"
 //#include "ultimatecd.h"
@@ -296,12 +303,14 @@ void archimedes_exp_devices(device_slot_interface &device)
 {
 	device.option_add("a448", ARC_A448);                  // Armadillo Systems A448 Sound Sampler
 	device.option_add("a448b", ARC_A448B);                // Armadillo Systems A448b Stereo MIDI Sound Sampler
+	device.option_add("acejoy", ARC_ACEJOY);              // ACE Joy Connect
+	//device.option_add("archdigi", ARC_ARCHDIGI);          // Watford Electronics Archimedes Video Digitiser
+	//device.option_add("archscan", ARC_ARCHSCAN);          // Watford Electronics Archimedes Scanner
 	device.option_add("armadeus", ARC_ARMADEUS);          // Clares Armadeus Sampler Board
 	device.option_add("bbcio_aka10", ARC_BBCIO_AKA10);    // Acorn AKA10 BBC I/O Podule
 	device.option_add("bbcio_we", ARC_BBCIO_WE);          // Watford BBC User I/O Card
 	//device.option_add("cc", ARC_CC);                      // Wild Vision/Computer Concepts Colour Card
 	//device.option_add("ccgold", ARC_CCGOLD);              // Wild Vision/Computer Concepts Colour Card Gold
-	//device.option_add("digitiser_we", ARC_DIGITISER_WE);  // Watford Electronics Archimedes Video Digitiser
 	device.option_add("eaglem2", ARC_EAGLEM2);            // Wild Vision/Computer Concepts Eagle M2
 	device.option_add("ether1", ARC_ETHER1_AKA25);        // Acorn AKA25 Ethernet
 	//device.option_add("ether2", ARC_ETHER2_AEH50);        // Acorn AEH50 Ethernet II
@@ -309,12 +318,16 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("ether5", ARC_ETHER5);              // Atomwide Ethernet V Podule
 	device.option_add("etherr", ARC_ETHERR);              // RISC Developments Ethernet Card
 	device.option_add("faxpack", ARC_FAXPACK);            // Computer Concepts Fax-Pack
+	//device.option_add("g8", ARC_G8);                      // State Machine G8 Graphic Accelerator
 	//device.option_add("g16", ARC_G16);                    // State Machine G16 Graphic Accelerator
+	device.option_add("greyhawk", ARC_GREYHAWK);          // Computer Concepts GreyHawk Video Digitiser
 	//device.option_add("hdfc_rdev", ARC_HDFC_RDEV);        // RISC Developments High Density Floppy Controller
 	//device.option_add("hdisc_akd52", ARC_HDISC_AKD52);    // Acorn AKD52 Hard Disc Podule
 	//device.option_add("hdisc_cw", ARC_HDISC_CW);          // Computerware Hard Disk Podule
+	//device.option_add("hdisc_morley", ARC_HDISC_MORLEY);  // Morley Electronics Hard Disc Podule
 	//device.option_add("hdisc_we", ARC_HDISC_WE);          // Watford Electronics Archimedes Hard Disk Podule
 	device.option_add("ide_be", ARC_IDE_BE);              // Baildon Electronics IDE HD Interface
+	//device.option_add("ide_dt", ARC_IDE_DT);              // D.T. Software IDE Interface
 	//device.option_add("ide_hccs", ARC_IDE_HCCS);          // HCCS IDE Interface
 	device.option_add("ide_rdev", ARC_IDE_RDEV);          // RISC Developments IDE Hard Disc System
 	//device.option_add("ide1v4_ics", ARC_IDE1V4_ICS);      // ICS ideA Hard Disc System
@@ -323,14 +336,17 @@ void archimedes_exp_devices(device_slot_interface &device)
 	device.option_add("lbp4", ARC_LBP4);                  // Computer Concepts LaserDirect LBP-4
 	device.option_add("midi_aka16", ARC_MIDI_AKA16);      // Acorn AKA16 MIDI Podule
 	device.option_add("midimax", ARC_MIDIMAX);            // Wild Vision MidiMax
+	device.option_add("midimax2", ARC_MIDIMAX2);          // Wild Vision MidiMax 2
 	device.option_add("nexus_a500", ARC_NEXUS_A500);      // SJ Research Nexus Interface (A500)
 	//device.option_add("prisma3", ARC_PRISMA3);            // Millipede PRISMA-3 Podule
 	//device.option_add("prisma3p", ARC_PRISMA3P);          // Millipede PRISMA-3 Plus Podule
 	device.option_add("rom_aka05", ARC_ROM_AKA05);        // Acorn AKA05 ROM Podule
 	//device.option_add("rom_cc", ARC_ROM_CC);              // Computer Concepts ROM/RAM Podule
 	device.option_add("rs423", ARC_RS423);                // Intelligent Interfaces Dual RS423 Serial Interface
+	device.option_add("scan256", ARC_SCAN256);            // Watford Electronics 256 Grey-Scale Scanner
 	device.option_add("scanlight", ARC_SCANLIGHT);        // Computer Concepts ScanLight
 	device.option_add("scanjunior", ARC_SCANJUNIOR);      // Computer Concepts ScanLight Junior
+	device.option_add("scanjunior3", ARC_SCANJUNIOR3);    // Computer Concepts ScanLight Junior Mk3
 	device.option_add("scanvideo", ARC_SCANVIDEO);        // Computer Concepts ScanLight Video 256
 	//device.option_add("scsi_a500", ARC_SCSI_A500);        // Acorn A500 SCSI Interface
 	//device.option_add("scsi_aka31", ARC_SCSI_AKA31);      // Acorn AKA31 SCSI Expansion Card
@@ -340,7 +356,9 @@ void archimedes_exp_devices(device_slot_interface &device)
 	//device.option_add("scsi_oak", ARC_SCSI_OAK);          // Oak Solutions SCSI Interface
 	device.option_add("scsi_vti", ARC_SCSI_VTI);          // VTI User Port and SCSI Podule
 	device.option_add("serial", ARC_SERIAL);              // Atomwide Serial Expansion Card
+	device.option_add("spectra", ARC_SPECTRA);            // Beebug Spectra Colour Scanner
 	device.option_add("tube", ARC_TUBE);                  // Acorn Tube Podule
+	device.option_add("ua_morley", ARC_UA_MORLEY);        // Morley Electronics Analogue and User Interface
 	//device.option_add("ultcd", ARC_ULTCD);                // HCCS Ultimate CD-ROM
 }
 
@@ -355,11 +373,14 @@ void archimedes_mini_exp_devices(device_slot_interface &device)
 	//device.option_add("disc_a3k6", ARC_DISC_A3K6);        // PRES A3K6 Disc Buffer
 	//device.option_add("ethera", ARC_ETHERA);              // ANT Ethernet 10base2 mini-podule
 	device.option_add("etherd", ARC_ETHERD);              // Digital Services Ethernet Podule
+	//device.option_add("ide_a3k_hccs", ARC_IDE_A3K_HCCS);  // HCCS IDE A3000 Interface
 	//device.option_add("ide_castle", ARC_IDE_CASTLE);      // Castle Technology A3000 IDE Expansion Card
 	//device.option_add("ide1v5_ics", ARC_IDE1V5_ICS);      // ICS ideA Hard Disc System
 	//device.option_add("ide3v5_ics", ARC_IDE3V5_ICS);      // ICS ideA Hard Disc System
 	//device.option_add("ide_we", ARC_IDE_WE);              // Watford Electronics A3000 IDE Interface
+	device.option_add("scanlight", ARC_SCANLIGHT);        // Computer Concepts A3000 ScanLight
 	//device.option_add("ult3010", ARC_ULT3010);            // HCCS A3010 Ultimate Expansion System
+	device.option_add("uma_morley", ARC_UMA_MORLEY);      // Morley Electronics User/MIDI/Analogue Interface
 	device.option_add("upa_hccs", ARC_UPA_HCCS);          // HCCS User/Analogue Podule
 	device.option_add("upmidi_aka12", ARC_UPMIDI_AKA12);  // Acorn AKA12 User Port/MIDI Upgrade
 }

@@ -5,7 +5,7 @@ license:CC0
 
     load software with LOAD ""
 
-    Tape must be started manually from the MESS menu
+    Tape must be started manually from the MAME menu
     " is mapped to ] by default on a UK keyboard layout
 
    The Sam Coupe will recognize most Spectrum tapes but isn't actually directly compatible with the majority of them due to different memory mapping

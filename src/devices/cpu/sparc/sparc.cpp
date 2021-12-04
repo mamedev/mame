@@ -16,6 +16,9 @@
 //      - Test: SPARCv8 ops are untested
 //      - Extended-precision FPU support
 //      - Coprocessor support
+//      - Finish SPARClite peripherals
+//      - SPARClite m_wssr[0] should be 0x7ff40 at reset (32 wait cycles for CS0),
+//        but that is problematic for Saitek Renaissance + Sparc module
 //
 //================================================================
 
@@ -661,9 +664,6 @@ void mb86930_device::device_reset()
 	std::fill_n(&m_wssr[0], 3, 0);
 	m_last_masked_addr = 0ULL;
 
-	std::fill_n(&m_same_page_waits[0], 6, 0);
-	std::fill_n(&m_other_page_waits[0], 6, 0);
-
 	m_arsr[0] = (9 << 23);
 	m_amr[0] = (0x1f << 1);
 
@@ -879,22 +879,17 @@ void mb86930_device::update_wait_states()
 		const bool single = bool(BIT(m_wssr[i >> 1], shift + 1));
 		//const bool override = bool(BIT(m_wssr[i >> 1], shift + 0));
 
-		if (!BIT(m_ssctrl, 3) || enable == single)
-		{
-			m_other_page_waits[i] = 0;
-			m_same_page_waits[i] = 0;
-		}
-		else if (single && !enable)
-		{
-			m_other_page_waits[i] = 1;
-			m_same_page_waits[i] = 1;
-		}
-		else if (!single && enable)
+		if (BIT(m_ssctrl, 3) && !single && enable)
 		{
 			const uint8_t count1 = ((m_wssr[i >> 1] >> (shift + 8)) & 0x1f) + 1;
 			const uint8_t count2 = ((m_wssr[i >> 1] >> (shift + 3)) & 0x1f) + 1;
 			m_other_page_waits[i] = count1;
 			m_same_page_waits[i] = BIT(m_ssctrl, 5) ? count2 : count1;
+		}
+		else
+		{
+			m_other_page_waits[i] = 0;
+			m_same_page_waits[i] = 0;
 		}
 	}
 }
@@ -4544,7 +4539,7 @@ void sparcv8_device::execute_div(uint32_t op)
 
 			result = uint32_t(temp_64bit);
 
-			temp_v = ((temp_64bit & 0xffffffff00000000) == 0) ? false : true;
+			temp_v = ((temp_64bit & 0xffffffff00000000ULL) == 0) ? false : true;
 		}
 		else if (SDIV || SDIVCC)
 		{
@@ -4553,7 +4548,7 @@ void sparcv8_device::execute_div(uint32_t op)
 			result = uint32_t(temp_64bit);
 
 			uint64_t shifted = uint64_t(temp_64bit) >> 31;
-			temp_v = (shifted == 0 || shifted == 0x1ffffffff) ? false : true;
+			temp_v = (shifted == 0 || shifted == 0x1ffffffffULL) ? false : true;
 		}
 
 		if (temp_v)

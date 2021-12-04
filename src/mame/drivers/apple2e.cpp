@@ -173,6 +173,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2vulcan.h"
 #include "bus/a2bus/a2zipdrive.h"
+#include "bus/a2bus/ace2x00.h"
 #include "bus/a2bus/booti.h"
 #include "bus/a2bus/byte8251.h"
 #include "bus/a2bus/cmsscsi.h"
@@ -302,6 +303,8 @@ public:
 		m_iscecm = false;
 		m_iscec2000 = false;
 		m_isace500 = false;
+		m_isace2200 = false;
+		m_ace2200_axxx_bank = false;
 		m_pal = false;
 #if IICP_NEW_IWM
 		m_cur_floppy = nullptr;
@@ -377,6 +380,7 @@ public:
 	u8 ram2000_r(offs_t offset);
 	void ram2000_w(offs_t offset, u8 data);
 	u8 ram4000_r(offs_t offset);
+	u8 ram4000_ace2200_r(offs_t offset);
 	void ram4000_w(offs_t offset, u8 data);
 	u8 cec4000_r(offs_t offset);
 	u8 cec8000_r(offs_t offset);
@@ -457,6 +461,7 @@ public:
 	void laser128o(machine_config &config);
 	void laser128ex2(machine_config &config);
 	void ace500(machine_config &config);
+	void ace2200(machine_config &config);
 	void apple2c_iwm(machine_config &config);
 	void apple2c_mem(machine_config &config);
 	void cec(machine_config &config);
@@ -478,6 +483,7 @@ public:
 	void inhbank_map(address_map &map);
 	void laser128_map(address_map &map);
 	void ace500_map(address_map &map);
+	void ace2200_map(address_map &map);
 	void lcbank_map(address_map &map);
 	void r0000bank_map(address_map &map);
 	void r0200bank_map(address_map &map);
@@ -485,11 +491,13 @@ public:
 	void r0800bank_map(address_map &map);
 	void r2000bank_map(address_map &map);
 	void r4000bank_map(address_map &map);
+	void r4000bank_ace2200_map(address_map &map);
 	void spectred_keyb_map(address_map &map);
 	void init_laser128();
 	void init_128ex();
 	void init_pal();
 	void init_ace500();
+	void init_ace2200();
 
 	bool m_35sel, m_hdsel, m_intdrive;
 
@@ -530,7 +538,7 @@ private:
 	u8 m_migram[0x800];
 	u16 m_migpage;
 
-	bool m_isace500, m_ace_cnxx_bank;
+	bool m_isace500, m_isace2200, m_ace_cnxx_bank, m_ace2200_axxx_bank;
 	u16 m_ace500rombank;
 
 	bool m_accel_unlocked;
@@ -1041,10 +1049,10 @@ void apple2e_state::machine_start()
 
 	for (int adr = 0; adr < ram_size; adr += 2)
 	{
-		// invert the fill pattern order on the ACE 500, as it interacts with
+		// invert the fill pattern order on the ACE 500 and 2200, as it interacts with
 		// Franklin's monitor not returning the same values as Apple's plus some
 		// bugs in DOS 3.3.
-		if (m_isace500)
+		if ((m_isace500) || (m_isace2200))
 		{
 			m_ram_ptr[adr] = 0xff;
 			m_ram_ptr[adr+1] = 0;
@@ -1114,7 +1122,7 @@ void apple2e_state::machine_start()
 		m_iscec2000 = false;
 	}
 
-	if ((m_has_laser_mouse) || (m_isace500))
+	if ((m_has_laser_mouse) || (m_isace500) || (m_isace2200))
 	{
 		m_strobe_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(apple2e_state::update_laserprn_strobe), this));
 		m_next_strobe = 1U;
@@ -1194,6 +1202,8 @@ void apple2e_state::machine_start()
 	save_item(NAME(m_next_strobe));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_ace500rombank));
+	save_item(NAME(m_ace_cnxx_bank));
+	save_item(NAME(m_ace2200_axxx_bank));
 }
 
 void apple2e_state::machine_reset()
@@ -1326,6 +1336,11 @@ void apple2e_state::init_ace500()
 {
 	m_isace500 = true;
 	m_ace_cnxx_bank = false;
+}
+
+void apple2e_state::init_ace2200()
+{
+	m_isace2200 = true;
 }
 
 void apple2e_state::init_pal()
@@ -2075,6 +2090,13 @@ u8 apple2e_state::c000_r(offs_t offset)
 		case 0x1f:  // read 80COL
 			return (m_video->m_80col ? 0x80 : 0x00) | m_transchar;
 
+		case 0x26:  // Ace 2x00 DIP switches
+			if (m_isace2200)
+			{
+				return (m_sysconfig->read() & 0x80) | uFloatingBus7;
+			}
+			break;
+
 		case 0x60: // cassette in
 		case 0x68:
 			if (m_cassette)
@@ -2391,6 +2413,17 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 
 		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d:
+			if (m_isace2200)
+			{
+				if (offset == 0x78)
+				{
+					m_ace2200_axxx_bank = false;
+				}
+				else if (offset == 0x79)
+				{
+					m_ace2200_axxx_bank = true;
+				}
+			}
 			if (m_auxslotdevice)
 			{
 				m_auxslotdevice->write_c07x(offset & 0xf, data);
@@ -3152,6 +3185,14 @@ u8 apple2e_state::ace500_c0bx_r(offs_t offset)
 {
 	switch (offset)
 	{
+		// Printer "auto-LF" DIP switch in bit 7
+		case 0x0:
+			return (m_sysconfig->read() & 0x80);
+
+		// Alt key status (0=pressed).  Reads as pressed for function keys.
+		case 0x4:
+			return 0xff;
+
 		// Used by the IRQ handler.  Appears to return altzp status in bit 7, same as $C016.
 		case 0xc:
 			return (m_altzp ? 0x80 : 0x00);
@@ -3532,6 +3573,15 @@ u8   apple2e_state::ram4000_r(offs_t offset)          { return m_ram_ptr[offset+
 void apple2e_state::ram4000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x4000] = data; }
 void apple2e_state::ram8000_w(offs_t offset, u8 data) { m_ram_ptr[offset+0x8000] = data; }
 
+u8 apple2e_state::ram4000_ace2200_r(offs_t offset)
+{
+	if ((offset >= 0x6000) && (m_ace2200_axxx_bank))
+	{
+		return m_rom_ptr[0x4000 + (offset - 0x6000)];
+	}
+	return m_ram_ptr[offset+0x4000];
+}
+
 u8 apple2e_state::cec4000_r(offs_t offset)
 {
 	//printf("cec4000_r: ofs %x\n", offset);
@@ -3665,6 +3715,25 @@ void apple2e_state::ace500_map(address_map &map)
 	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }
 
+void apple2e_state::ace2200_map(address_map &map)
+{
+	map(0x0000, 0x01ff).m(m_0000bank, FUNC(address_map_bank_device::amap8));
+	map(0x0200, 0x03ff).m(m_0200bank, FUNC(address_map_bank_device::amap8));
+	map(0x0400, 0x07ff).m(m_0400bank, FUNC(address_map_bank_device::amap8));
+	map(0x0800, 0x1fff).m(m_0800bank, FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_2000bank, FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0xbfff).m(m_4000bank, FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xc07f).rw(FUNC(apple2e_state::c000_r), FUNC(apple2e_state::c000_w));
+	map(0xc080, 0xc0ff).rw(FUNC(apple2e_state::c080_r), FUNC(apple2e_state::c080_w));
+	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
+	map(0xc100, 0xc2ff).m(m_c100bank, FUNC(address_map_bank_device::amap8));
+	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
+	map(0xc300, 0xc3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	map(0xc400, 0xc7ff).m(m_c400bank, FUNC(address_map_bank_device::amap8));
+	map(0xc800, 0xcfff).m(m_c800bank, FUNC(address_map_bank_device::amap8));
+	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
+}
+
 void apple2e_state::r0000bank_map(address_map &map)
 {
 	map(0x0000, 0x01ff).rw(FUNC(apple2e_state::ram0000_r), FUNC(apple2e_state::ram0000_w));
@@ -3706,6 +3775,16 @@ void apple2e_state::r2000bank_map(address_map &map)
 void apple2e_state::r4000bank_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x08000, 0x0ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x10000, 0x17fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
+	map(0x18000, 0x1ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
+	map(0x20000, 0x23fff).rw(FUNC(apple2e_state::cec4000_r), FUNC(apple2e_state::ram4000_w));
+	map(0x24000, 0x27fff).rw(FUNC(apple2e_state::cec8000_r), FUNC(apple2e_state::ram8000_w));
+}
+
+void apple2e_state::r4000bank_ace2200_map(address_map &map)
+{
+	map(0x00000, 0x07fff).rw(FUNC(apple2e_state::ram4000_ace2200_r), FUNC(apple2e_state::ram4000_w));
 	map(0x08000, 0x0ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::ram4000_w));
 	map(0x10000, 0x17fff).rw(FUNC(apple2e_state::ram4000_r), FUNC(apple2e_state::auxram4000_w));
 	map(0x18000, 0x1ffff).rw(FUNC(apple2e_state::auxram4000_r), FUNC(apple2e_state::auxram4000_w));
@@ -4506,7 +4585,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ace500 )
 	PORT_INCLUDE( apple2e_common )
-	PORT_INCLUDE( laser128_sysconfig )
+
+	PORT_START("a2_config")
+	PORT_CONFNAME(0x03, 0x00, "Composite monitor type")
+	PORT_CONFSETTING(0x00, "Color")
+	PORT_CONFSETTING(0x01, "B&W")
+	PORT_CONFSETTING(0x02, "Green")
+	PORT_CONFSETTING(0x03, "Amber")
+
+	PORT_CONFNAME(0x80, 0x00, "Auto Line Feed for printer")
+	PORT_CONFSETTING(0x80, DEF_STR(On))
+	PORT_CONFSETTING(0x00, DEF_STR(Off))
 
 	PORT_START("keyb_special")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_KEYBOARD) PORT_NAME("Caps Lock")    PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
@@ -5290,6 +5379,7 @@ void apple2e_state::apple2ep(machine_config &config)
 	apple2e(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2e_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 }
 
 void apple2e_state::apple2c(machine_config &config)
@@ -5299,6 +5389,7 @@ void apple2e_state::apple2c(machine_config &config)
 
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::apple2c_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	// IIc and friends have no cassette port
 	config.device_remove(A2_CASSETTE_TAG);
@@ -5513,6 +5604,7 @@ void apple2e_state::laser128(machine_config &config)
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
@@ -5544,6 +5636,7 @@ void apple2e_state::laser128o(machine_config &config)
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
@@ -5576,6 +5669,7 @@ void apple2e_state::laser128ex2(machine_config &config)
 	apple2c(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::laser128_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 
@@ -5607,8 +5701,8 @@ void apple2e_state::ace500(machine_config &config)
 	apple2c_iwm(config);
 	M65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace500_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
 
-	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tf));
 	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tt));
 
 	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
@@ -5618,6 +5712,39 @@ void apple2e_state::ace500(machine_config &config)
 
 	// memory above 128K is RAMWorks compatible, a 256K machine has 128K of RAMWorks, and a 512K has 384K.
 	m_ram->set_default_size("256K").set_extra_options("256K, 512K");
+}
+
+void apple2e_state::ace2200(machine_config &config)
+{
+	apple2e(config);
+	M65C02(config.replace(), m_maincpu, 1021800);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::ace2200_map);
+	m_maincpu->set_dasm_override(FUNC(apple2e_state::dasm_trampoline));
+
+	m_screen->set_screen_update(FUNC(apple2e_state::screen_update_tt));
+
+	config.device_remove(A2_4000_TAG);
+	ADDRESS_MAP_BANK(config, A2_4000_TAG).set_map(&apple2e_state::r4000bank_ace2200_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
+
+	// The Ace 2000 series has 3 physical slots, 2, 4/7, and 5.
+	// 4/7 can be slot 4 or 7 via a jumper; we fix it to slot 7 here
+	// because that's most useful (for e.g. cffa202).
+	config.device_remove("sl1");
+	config.device_remove("sl3");
+	config.device_remove("sl4");
+	config.device_remove("sl5");
+	config.device_remove("sl6");
+
+	A2BUS_ACE2X00_SLOT1(config, "sl1", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+	A2BUS_SLOT(config, "sl5", m_a2bus, apple2_cards, "mockingboard");
+	A2BUS_ACE2X00_SLOT6(config, "sl6", A2BUS_7M_CLOCK).set_onboard(m_a2bus);
+
+	CENTRONICS(config, m_printer_conn, centronics_devices, "printer");
+	m_printer_conn->busy_handler().set(FUNC(apple2e_state::busy_w));
+	OUTPUT_LATCH(config, m_printer_out);
+	m_printer_conn->set_output_latch(*m_printer_out);
+
+	m_ram->set_default_size("128K").set_extra_options("128K");
 }
 
 void apple2e_state::cec(machine_config &config)
@@ -6071,6 +6198,20 @@ ROM_START(zijini)
 	ROM_LOAD( "u40.m2822.bin", 0x000000, 0x000100, CRC(b72a2c70) SHA1(bc39fbd5b9a8d2287ac5d0a42e639fc4d3c2f9d4) )
 ROM_END
 
+ROM_START(ace2200)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD("franklin_ace2000_videorom.bin", 0x1000, 0x1000, CRC(545bdeea) SHA1(26ebc4b0d3080311f550090bc1b29807cb22d083))
+	ROM_CONTINUE(0x0000, 0x1000)
+
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("franklin_ace2000_rom_u2_p2_rev6.bin", 0x000000, 0x002000, CRC(1ab6e4d3) SHA1(5bdb10089fbdadaee9772afa1f7439a51289636b))
+	ROM_LOAD("franklin_ace2000_rom_u3_p1_rev6.bin", 0x002000, 0x002000, CRC(197f4936) SHA1(ec9de6da0ca6b6fd97fbef34eec64bf5c3c1b6c5))
+	ROM_LOAD("franklin_ace2000_rom_u1_p3_rev6_franklinrom.bin", 0x004000, 0x002000, CRC(5cc150a7) SHA1(7ac8028bbf8cb7730f432e0bae32e364523555fb))
+
+	ROM_REGION( 0x800, "keyboard", ROMREGION_ERASE00 )
+	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
+ROM_END
+
 ROM_START(ace500)
 	ROM_REGION(0x2000,"gfx1",0)
 	// not sure if the 500 and 2000 have the same character set.  First 4K is normal charset, second 4K is MouseText
@@ -6115,4 +6256,5 @@ COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, 
 COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2cp,  apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, ace2200,    apple2e, 0,      ace2200,     ace500,    apple2e_state, init_ace2200,"Franklin Computer", "ACE 2200", MACHINE_SUPPORTS_SAVE)
 COMP( 1986, ace500,     apple2c, 0,      ace500,      ace500,    apple2e_state, init_ace500,"Franklin Computer", "ACE 500", MACHINE_SUPPORTS_SAVE)
