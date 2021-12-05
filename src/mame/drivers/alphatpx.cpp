@@ -1411,7 +1411,7 @@ ROM_END
 // Alphatronic P3
 ROM_START( alphatp3 )
 	ROM_REGION(0x1800, "boot", 0) // P3 ROM space 0x1000
-	ROM_SYSTEM_BIOS(0, "gx347", "gx347") // earlier P3, seperate 48K and 16K RAM boards
+	ROM_SYSTEM_BIOS(0, "gx347", "gx347") // earlier P3, separate 48K and 16K RAM boards
 	ROM_SYSTEM_BIOS(1, "lb352", "lb352") // later P3, one 64K RAM board
 
 	ROM_LOAD("caap36_02_19.bin", 0x0000, 0x1000, CRC(23df6666) SHA1(5ea04cd299dec9951425eb91ecceb4818c4c6378) ) // identical between earlier and later P3

@@ -22,6 +22,7 @@ Known games using this hardware:
 - Great Sluggers '93
 - Great Sluggers '94
 - Gun Bullet / Point Blank
+- J-League Soccer V-Shoot
 - Nebulas Ray
 - Super World Stadium '95
 - Super World Stadium '96
@@ -1793,6 +1794,48 @@ ROM_START( outfxiesj )
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
 
+ROM_START( outfxiesja ) // this set uses different "c355spr", "c169roz" and "c123tmap" region ROMs. The rest of the ROMs is identical. It was found on 2 different PCB sets.
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "ou1_mprl.11c", 0x00002, 0x80000, CRC(d3b9e530) SHA1(3f5fe5eea817a23dfe42e76f32912ce94d4c49c9) )
+	ROM_LOAD32_WORD( "ou1_mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
+
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) // sound data
+	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) // samples
+	ROM_LOAD( "ou1voi0.6n", 0, 0x200000, CRC(2d8fb271) SHA1(bde9d45979728f5a2cd8ec89f5f81bf16b694cc2) )
+
+	ROM_REGION( 0x200000, "c123tmap:mask", 0 )
+	ROM_LOAD( "ou1shas.12s", 0, 0x200000,CRC(9bcb0397) SHA1(54a32b6394d0e6f51bfd281f8a4bafce6ddf6246) )
+
+	ROM_REGION( 0x200000, "c169roz:mask", 0 )
+	ROM_LOAD( "ou1shar.18s", 0, 0x200000,   CRC(fbb48194) SHA1(2d3ec5bc519fad2b755018f83fadfe0cba13c292) )
+
+	ROM_REGION( 0x2000000, "c355spr", 0 ) // all sldh
+	ROM_LOAD32_WORD( "ou1obj0l.4c", 0x0000000, 0x200000, CRC(ecf135e4) SHA1(f88924bf4528845c6d178abf0c0d71e3030d6823) )
+	ROM_LOAD32_WORD( "ou1obj0u.8c", 0x0000002, 0x200000, CRC(229fe774) SHA1(97de8777a2bf3d39c8331183fa13e339ee946287) )
+	ROM_LOAD32_WORD( "ou1obj1l.4b", 0x0400000, 0x200000, CRC(0b9d060e) SHA1(3e148d5fd5857d267c83e08a2065e8af6554f538) )
+	ROM_LOAD32_WORD( "ou1obj1u.8b", 0x0400002, 0x200000, CRC(34a0feca) SHA1(dcd88d762c19ff2972f52f0c7fd506b48f2ad3e5) )
+	ROM_LOAD32_WORD( "ou1obj2l.4a", 0x0800000, 0x200000, CRC(128119c4) SHA1(92f373bda457826dbf017971171d91f01b4fb17b) )
+	ROM_LOAD32_WORD( "ou1obj2u.8a", 0x0800002, 0x200000, CRC(ce74c385) SHA1(fe93b451a762cbfc8b72778837f205b2c300d6b3) )
+	ROM_LOAD32_WORD( "ou1obj3l.6c", 0x0c00000, 0x200000, CRC(39d9aa54) SHA1(d5a40c145da84f77d9fa0c635ea6253d0d30bec4) )
+	ROM_LOAD32_WORD( "ou1obj3u.9c", 0x0c00002, 0x200000, CRC(022f4a73) SHA1(d0cf1df3731c5166f0e882f2eaa5603ff643d0e5) )
+	ROM_LOAD32_WORD( "ou1obj4l.6b", 0x1000000, 0x200000, CRC(b26fbb92) SHA1(906f4f9ebc114872ffb9a1443d3daec7fc9a66e4) )
+	ROM_LOAD32_WORD( "ou1obj4u.9b", 0x1000002, 0x200000, CRC(ad99607d) SHA1(b5a3442d74a2c153e646f498f4386a078fe51b80) )
+
+	ROM_REGION( 0x600000, "c169roz", 0 ) // all sldh
+	ROM_LOAD( "ou1-rot0.3d", 0x000000, 0x200000, CRC(30511ffb) SHA1(26f6c8ad0763427b90aa811528112318160399c1) )
+	ROM_LOAD( "ou1-rot1.3c", 0x200000, 0x200000, CRC(f4b61c22) SHA1(8421c021ab4eceef5974cf90b4281c09a6cd3fc7) )
+	ROM_LOAD( "ou1-rot2.3b", 0x400000, 0x200000, CRC(d48b29d8) SHA1(f4359eb0a5a1cf860abaa90a812e3ca5b2ed6e37) )
+
+	ROM_REGION( 0x200000, "c123tmap", 0 )
+	ROM_LOAD( "ou1-scr0.1d", 0x000000, 0x200000, CRC(692b63f8) SHA1(a16b95eb5e99ad59c39f64b83d09ae6c95ac7865) ) // sldh
+
+	ROM_REGION32_BE( 0x100000, "data", 0 )
+	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
+	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
+ROM_END
+
 ROM_START( outfxiesa ) /* briefly shows "For use in Japan" notice, but Japanese text removed from game play. A Korean version? */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "mprl.11c", 0x00002, 0x80000, CRC(22cd638d) SHA1(7b11ded9f2265678bb96b3fb706ed5fa37745511) ) // no label on ROM
@@ -1929,22 +1972,23 @@ ROM_END
 /***************************************************************/
 
 /*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    CLASS,          INIT,          MONITOR,COMPANY,FULLNAME,   FLAGS */
-GAME( 1994, nebulray,  0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, nebulrayj, nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblank,   0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, ptblanka,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletj, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gunbuletw, ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gslugrsj,  0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94u,  0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, gslgr94j,  gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, sws95,     0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, sws96,     0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, sws97,     0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, vshoot,    0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulray,   0,        namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (World, NR2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, nebulrayj,  nebulray, namconb1, namconb1, namconb1_state, init_nebulray, ROT90, "Namco", "Nebulas Ray (Japan, NR1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblank,    0,        namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, ptblanka,   ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Point Blank (World, GN2 Rev B, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletj,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (Japan, GN1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gunbuletw,  ptblank,  namconb1, gunbulet, namconb1_state, init_gunbulet, ROT0,  "Namco", "Gun Bullet (World, GN3 Rev B)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gslugrsj,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94u,   0,        namconb1, namconb1, namconb1_state, init_gslgr94u, ROT0,  "Namco", "Great Sluggers '94", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gslgr94j,   gslgr94u, namconb1, namconb1, namconb1_state, init_gslgr94j, ROT0,  "Namco", "Great Sluggers '94 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, sws95,      0,        namconb1, namconb1, namconb1_state, init_sws95,    ROT0,  "Namco", "Super World Stadium '95 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, sws96,      0,        namconb1, namconb1, namconb1_state, init_sws96,    ROT0,  "Namco", "Super World Stadium '96 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, sws97,      0,        namconb1, namconb1, namconb1_state, init_sws97,    ROT0,  "Namco", "Super World Stadium '97 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, vshoot,     0,        namconb1, namconb1, namconb1_state, init_vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, outfxies,  0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesj, outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, outfxiesa, outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, machbrkr,  0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
-GAME( 1995, machbrkrj, machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxies,   0,        outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (World, OU2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesj,  outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, outfxiesja, outfxies, machbrkr, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Japan, OU1, alternate GFX ROMs)", MACHINE_SUPPORTS_SAVE ) // GFX ROMs are different and are in the same format as the Mach Breakers ones
+GAME( 1994, outfxiesa,  outfxies, outfxies, namconb1, namconb1_state, init_outfxies, ROT0, "Namco", "The Outfoxies (Korea?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, machbrkr,   0,        machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers (World, MB2)", MACHINE_SUPPORTS_SAVE ) /* Title screen doesn't show subtitle "Numan Athletics 2" */
+GAME( 1995, machbrkrj,  machbrkr, machbrkr, namconb1, namconb1_state, init_machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan, MB1)", MACHINE_SUPPORTS_SAVE )

@@ -398,9 +398,7 @@ void ssv_state::dsp_w(offs_t offset, uint16_t data)
 
 ***************************************************************************/
 
-#ifdef UNUSED_FUNCTION
-uint16_t ssv_state::fake_r(offs_t offset){   return ssv_scroll[offset];  }
-#endif
+uint16_t ssv_state::fake_r(offs_t offset) { return m_scroll[offset]; }
 
 void ssv_state::ssv_map(address_map &map, u32 rom)
 {
@@ -1343,10 +1341,10 @@ static INPUT_PORTS_START( eaglshot )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "DSW2:8" )
 
 	PORT_START("TRACKX")    // IN5 - trackball x ($d00000)
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 
 	PORT_START("TRACKY")    // IN6 - trackball y ($d00000)
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_RESET PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 

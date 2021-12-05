@@ -418,6 +418,10 @@ cheat_script::script_entry::script_entry(
 			if (!expression || !expression[0])
 				throw emu_fatalerror("%s.xml(%d): missing expression in action tag\n", filename, entrynode.line);
 			m_expression.parse(expression);
+
+			// initialise these to defautlt values
+			m_line = 0;
+			m_justify = ui::text_layout::text_justify::LEFT;
 		}
 		else
 		{
@@ -1056,6 +1060,9 @@ constexpr int cheat_manager::CHEAT_VERSION;
 
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_framecount(0)
+	, m_numlines(0)
+	, m_lastline(0)
 	, m_disabled(true)
 	, m_symtable(machine)
 {

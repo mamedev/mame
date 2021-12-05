@@ -220,7 +220,8 @@ private:
 	void cpu0_recalc_firq(int state);
 	void cpu1_recalc_firq(int state);
 	void ScanInKeyboard(void);
-	void dgn_beta_frame_interrupt (int data);
+	void dgn_beta_frame_interrupt(int data);
+	[[maybe_unused]] void dgn_beta_line_interrupt(int data);
 
 	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 

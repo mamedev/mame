@@ -24,7 +24,6 @@
 #include <any>
 #include <cassert>
 #include <ctime>
-#include <functional>
 #include <map>
 #include <set>
 #include <string_view>
@@ -66,7 +65,6 @@ class laserdisc_device;
 ***************************************************************************/
 
 class mame_ui_manager;
-typedef uint32_t (*ui_callback)(mame_ui_manager &, render_container &, uint32_t);
 
 enum class ui_callback_type
 {
@@ -151,8 +149,6 @@ public:
 	void initialize(running_machine &machine);
 	std::vector<ui::menu_item> slider_init(running_machine &machine);
 
-	void set_handler(ui_callback_type callback_type, const std::function<uint32_t (render_container &)> &&callback);
-
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
 	void update_and_render(render_container &container);
@@ -190,8 +186,6 @@ public:
 	void decrease_frameskip();
 	void request_quit();
 	void draw_fps_counter(render_container &container);
-	void draw_timecode_counter(render_container &container);
-	void draw_timecode_total(render_container &container);
 	void draw_profiler(render_container &container);
 	void start_save_state();
 	void start_load_state();
@@ -231,7 +225,7 @@ public:
 	std::string get_general_input_setting(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
 
 private:
-	using handler_callback_func = std::function<uint32_t (render_container &)>;
+	using handler_callback_func = delegate<uint32_t (render_container &)>;
 	using device_feature_set = std::set<std::pair<std::string, std::string> >;
 	using session_data_map = std::map<std::type_index, std::any>;
 
@@ -268,14 +262,12 @@ private:
 	static std::string      messagebox_poptext;
 
 	static std::vector<ui::menu_item> slider_list;
-	static slider_state     *slider_current;
 
 	// UI handlers
 	uint32_t handler_ingame(render_container &container);
-	uint32_t handler_load_save(render_container &container, uint32_t state);
-	uint32_t handler_confirm_quit(render_container &container);
 
 	// private methods
+	void set_handler(ui_callback_type callback_type, handler_callback_func &&callback);
 	void exit();
 	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);

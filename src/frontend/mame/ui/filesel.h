@@ -61,10 +61,11 @@ private:
 
 	struct file_selector_entry
 	{
-		file_selector_entry() { }
+		file_selector_entry() = default;
 		file_selector_entry(file_selector_entry &&) = default;
 		file_selector_entry &operator=(file_selector_entry &&) = default;
-		file_selector_entry_type type;
+
+		file_selector_entry_type type = SELECTOR_ENTRY_TYPE_EMPTY;
 		std::string basename;
 		std::string fullpath;
 	};
@@ -82,7 +83,7 @@ private:
 	std::string                     m_filename;
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// methods
 	int compare_entries(const file_selector_entry *e1, const file_selector_entry *e2);
@@ -120,7 +121,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// internal state
 	bool        m_can_in_place;

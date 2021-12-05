@@ -49958,7 +49958,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 
 <!--
 
-  TODO: .hdm raw files should be supported, but MESS always fails with " Wrong track size in generate_track, expected 166666, got 41076". why?
+  TODO: .hdm raw files should be supported, but MAME always fails with " Wrong track size in generate_track, expected 166666, got 41076". why?
   some other disks have the same error too!
 
  -->

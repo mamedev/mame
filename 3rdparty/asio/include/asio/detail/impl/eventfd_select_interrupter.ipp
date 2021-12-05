@@ -2,7 +2,7 @@
 // detail/impl/eventfd_select_interrupter.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 // Copyright (c) 2008 Roelof Naude (roelof.naude at gmail dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -23,11 +23,11 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 8
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 8 && !defined(__UCLIBC__)
 # include <asm/unistd.h>
-#else // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8
+#else // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8 && !defined(__UCLIBC__)
 # include <sys/eventfd.h>
-#endif // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8
+#endif // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8 && !defined(__UCLIBC__)
 #include "asio/detail/cstdint.hpp"
 #include "asio/detail/eventfd_select_interrupter.hpp"
 #include "asio/detail/throw_error.hpp"
@@ -45,14 +45,14 @@ eventfd_select_interrupter::eventfd_select_interrupter()
 
 void eventfd_select_interrupter::open_descriptors()
 {
-#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 8
+#if __GLIBC__ == 2 && __GLIBC_MINOR__ < 8 && !defined(__UCLIBC__)
   write_descriptor_ = read_descriptor_ = syscall(__NR_eventfd, 0);
   if (read_descriptor_ != -1)
   {
     ::fcntl(read_descriptor_, F_SETFL, O_NONBLOCK);
     ::fcntl(read_descriptor_, F_SETFD, FD_CLOEXEC);
   }
-#else // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8
+#else // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8 && !defined(__UCLIBC__)
 # if defined(EFD_CLOEXEC) && defined(EFD_NONBLOCK)
   write_descriptor_ = read_descriptor_ =
     ::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK);
@@ -69,7 +69,7 @@ void eventfd_select_interrupter::open_descriptors()
       ::fcntl(read_descriptor_, F_SETFD, FD_CLOEXEC);
     }
   }
-#endif // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8
+#endif // __GLIBC__ == 2 && __GLIBC_MINOR__ < 8 && !defined(__UCLIBC__)
 
   if (read_descriptor_ == -1)
   {
@@ -134,8 +134,7 @@ bool eventfd_select_interrupter::reset()
       int bytes_read = ::read(read_descriptor_, &counter, sizeof(uint64_t));
       if (bytes_read < 0 && errno == EINTR)
         continue;
-      bool was_interrupted = (bytes_read > 0);
-      return was_interrupted;
+      return true;
     }
   }
   else
@@ -145,12 +144,19 @@ bool eventfd_select_interrupter::reset()
       // Clear all data from the pipe.
       char data[1024];
       int bytes_read = ::read(read_descriptor_, data, sizeof(data));
-      if (bytes_read < 0 && errno == EINTR)
+      if (bytes_read == sizeof(data))
         continue;
-      bool was_interrupted = (bytes_read > 0);
-      while (bytes_read == sizeof(data))
-        bytes_read = ::read(read_descriptor_, data, sizeof(data));
-      return was_interrupted;
+      if (bytes_read > 0)
+        return true;
+      if (bytes_read == 0)
+        return false;
+      if (errno == EINTR)
+        continue;
+      if (errno == EWOULDBLOCK)
+        return true;
+      if (errno == EAGAIN)
+        return true;
+      return false;
     }
   }
 }

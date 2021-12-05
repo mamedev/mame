@@ -123,7 +123,7 @@ Compiled by K1W1
 
   * Copy Protection - Some cartridges were produced that utilised a form of copy protection by writing data back to the ROM area in memory. There are many versions of
     these ROM's available that have been altered to circumvent this protection. This collection where possible has used original unaltered ROM's, those that have been
-    altered have been commented. The original Copy Protected versions will run in MESS emulation.
+    altered have been commented. The original Copy Protected versions will run in MAME emulation.
 
   * Re-releases mentioned in the comments below were generally bit copies of the originals re-packaged in different cartridges.
 

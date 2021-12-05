@@ -257,7 +257,7 @@ private:
 		{
 			for (int x = 0; x < item_count(); ++x)
 			{
-				if (item(x).ref == m_prev_selected)
+				if (item(x).ref() == m_prev_selected)
 				{
 					set_selected_index(x);
 					break;

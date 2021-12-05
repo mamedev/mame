@@ -266,6 +266,9 @@ void debug_imgui::handle_mouse()
 {
 	m_prev_mouse_button = m_mouse_button;
 	m_machine->ui_input().find_mouse(&m_mouse_x, &m_mouse_y, &m_mouse_button);
+	ImGuiIO& io = ImGui::GetIO();
+	io.MousePos = ImVec2(m_mouse_x,m_mouse_y);
+	io.MouseDown[0] = m_mouse_button;
 }
 
 void debug_imgui::handle_mouse_views()
@@ -324,8 +327,9 @@ void debug_imgui::handle_keys()
 			focus_view = *view_ptr;
 
 	// check views in main views also (only the disassembler view accepts inputs)
-	if(view_main_disasm->has_focus)
-		focus_view = view_main_disasm;
+	if(view_main_disasm != nullptr)
+		if(view_main_disasm->has_focus)
+			focus_view = view_main_disasm;
 
 	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
 		io.KeyCtrl = true;
@@ -426,8 +430,9 @@ void debug_imgui::handle_keys_views()
 			focus_view = *view_ptr;
 
 	// check views in main views also (only the disassembler view accepts inputs)
-	if(view_main_disasm->has_focus)
-		focus_view = view_main_disasm;
+	if(view_main_disasm != nullptr)
+		if(view_main_disasm->has_focus)
+			focus_view = view_main_disasm;
 
 	// if no view has focus, then there's nothing to do
 	if(focus_view == nullptr)
@@ -846,21 +851,37 @@ void debug_imgui::draw_memory(debug_area* view_ptr, bool* opened)
 				bool rev = mem->reverse();
 				debug_view_memory::data_format format = mem->get_data_format();
 				uint32_t chunks = mem->chunks_per_row();
+				int radix = mem->address_radix();
 
-				if(ImGui::MenuItem("1-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_8BIT) ? true : false))
+				if(ImGui::MenuItem("1-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_8BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::HEX_8BIT);
-				if(ImGui::MenuItem("2-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_16BIT) ? true : false))
+				if(ImGui::MenuItem("2-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_16BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::HEX_16BIT);
-				if(ImGui::MenuItem("4-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_32BIT) ? true : false))
+				if(ImGui::MenuItem("4-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_32BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::HEX_32BIT);
-				if(ImGui::MenuItem("8-byte chunks", nullptr,(format == debug_view_memory::data_format::HEX_64BIT) ? true : false))
+				if(ImGui::MenuItem("8-byte hexadecimal", nullptr,(format == debug_view_memory::data_format::HEX_64BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::HEX_64BIT);
+				if(ImGui::MenuItem("1-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_8BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_8BIT);
+				if(ImGui::MenuItem("2-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_16BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_16BIT);
+				if(ImGui::MenuItem("4-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_32BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_32BIT);
+				if(ImGui::MenuItem("8-byte octal", nullptr,(format == debug_view_memory::data_format::OCTAL_64BIT) ? true : false))
+					mem->set_data_format(debug_view_memory::data_format::OCTAL_64BIT);
 				if(ImGui::MenuItem("32-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_32BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
 				if(ImGui::MenuItem("64-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_64BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::FLOAT_64BIT);
 				if(ImGui::MenuItem("80-bit floating point", nullptr,(format == debug_view_memory::data_format::FLOAT_80BIT) ? true : false))
 					mem->set_data_format(debug_view_memory::data_format::FLOAT_80BIT);
+				ImGui::Separator();
+				if(ImGui::MenuItem("Hexadecimal Addresses", nullptr,(radix == 16)))
+					mem->set_address_radix(16);
+				if(ImGui::MenuItem("Decimal Addresses", nullptr,(radix == 10)))
+					mem->set_address_radix(10);
+				if(ImGui::MenuItem("Octal Addresses", nullptr,(radix == 8)))
+					mem->set_address_radix(8);
 				ImGui::Separator();
 				if(ImGui::MenuItem("Logical addresses", nullptr,!physical))
 					mem->set_physical(false);
@@ -1234,6 +1255,10 @@ void debug_imgui::draw_create_dialog(const char* label)
 void debug_imgui::draw_console()
 {
 	ImGuiWindowFlags flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
+	bool show_menu = false;
+
+	if(view_main_disasm == nullptr || view_main_regs == nullptr || view_main_console == nullptr)
+		return;
 
 	ImGui::SetNextWindowSize(ImVec2(view_main_regs->width + view_main_disasm->width,view_main_disasm->height + view_main_console->height + ImGui::GetTextLineHeight()*3),ImGuiCond_Once);
 	if(ImGui::Begin(view_main_console->title.c_str(), nullptr,flags))
@@ -1244,6 +1269,7 @@ void debug_imgui::draw_console()
 		{
 			if(ImGui::BeginMenu("Debug"))
 			{
+				show_menu = true;
 				if(ImGui::MenuItem("New disassembly window", "Ctrl+D"))
 					add_disasm(++m_win_count);
 				if(ImGui::MenuItem("New memory window", "Ctrl+M"))
@@ -1289,6 +1315,7 @@ void debug_imgui::draw_console()
 			}
 			if(ImGui::BeginMenu("Window"))
 			{
+				show_menu = true;
 				if(ImGui::MenuItem("Show all"))
 				{
 					for(auto view_ptr = view_list.begin();view_ptr != view_list.end();++view_ptr)
@@ -1307,7 +1334,10 @@ void debug_imgui::draw_console()
 				ImGui::EndMenu();
 			}
 			if(m_has_images)
+			{
+				show_menu = true;
 				draw_images_menu();
+			}
 			ImGui::EndMenuBar();
 		}
 
@@ -1338,7 +1368,7 @@ void debug_imgui::draw_console()
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags,history_set))
 			view_main_console->exec_cmd = true;
-		if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+		if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0) && !show_menu))
 			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 		if(m_mount_open)
 		{
@@ -1503,23 +1533,27 @@ void debug_imgui::wait_for_debugger(device_t &device, bool firststop)
 		m_running = false;
 	}
 	m_hide = false;
-//  m_machine->ui_input().frame_update();
+	//m_machine->ui_input().frame_update();
 	handle_mouse();
 	handle_keys();
 	handle_console(m_machine);
 	update_cpu_view(&device);
 	imguiBeginFrame(m_mouse_x,m_mouse_y,m_mouse_button ? IMGUI_MBUT_LEFT : 0, 0, width, height,m_key_char);
-	update();
-	imguiEndFrame();
 	handle_mouse_views();
 	handle_keys_views();
+	update();
+	imguiEndFrame();
 	m_machine->ui_input().reset();  // clear remaining inputs, so they don't fall through to the UI
 	device.machine().osd().update(false);
+	osd_sleep(osd_ticks_per_second() / 1000 * 50);
 }
 
 
 void debug_imgui::debugger_update()
 {
+	if(view_main_disasm == nullptr || view_main_regs == nullptr || view_main_console == nullptr)
+		return;
+
 	if (m_machine && (m_machine->phase() == machine_phase::RUNNING) && !m_machine->debugger().cpu().is_stopped() && !m_hide)
 	{
 		uint32_t width = m_machine->render().ui_target().width();

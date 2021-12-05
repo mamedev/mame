@@ -145,6 +145,8 @@ protected:
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq);
 	uint8_t read_open_bus();
+	int scanlines_r();
+	offs_t address_r();
 
 	// internal state
 	uint8_t *m_rom;
@@ -172,6 +174,8 @@ public:
 	// configuration
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto open_bus_callback() { return m_open_bus_callback.bind(); }
+	void set_scanlines(int scanlines) { m_scanlines = scanlines; }
+	void set_address(offs_t address) { m_address = address; }
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -194,8 +198,14 @@ public:
 	void setup_nvram();
 	void internal_header_logging(uint8_t *ROM, uint32_t len);
 
-	void save_ram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram();
-					if (m_cart && m_cart->get_rtc_ram_size()) m_cart->save_rtc_ram(); }
+	void save_ram()
+	{
+		save_item(NAME(m_address));
+		if (m_cart && m_cart->get_nvram_size())
+			m_cart->save_nvram();
+		if (m_cart && m_cart->get_rtc_ram_size())
+			m_cart->save_rtc_ram();
+	}
 
 	// reading and writing
 	uint8_t read_l(offs_t offset);
@@ -209,6 +219,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_irq) { m_irq_callback(state); }
 	uint8_t read_open_bus() { return m_open_bus_callback(); }
+	int scanlines_r() { return m_scanlines; }
+	offs_t address_r() { return m_address; }
 
 	// in order to support legacy dumps + add-on CPU dump appended at the end of the file, we
 	// check if the required data is present and update bank map accordingly
@@ -238,6 +250,8 @@ protected:
 private:
 	devcb_write_line m_irq_callback;
 	devcb_read8 m_open_bus_callback;
+	int m_scanlines;
+	offs_t m_address;
 };
 
 // ======================> sns_cart_slot_device

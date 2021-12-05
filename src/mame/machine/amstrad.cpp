@@ -2341,7 +2341,7 @@ void amstrad_state::amstrad_reset_machine()
 	/* set ram config 0 */
 	amstrad_GateArray_write(0x0c0);
 
-	// Get manufacturer name and TV refresh rate from PCB link (dipswitch for mess emulation)
+	// Get manufacturer name and TV refresh rate from PCB link (dipswitch for MAME emulation)
 	m_ppi_port_inputs[amstrad_ppi_PortB] = (((m_io_solder_links->read()&MANUFACTURER_NAME)<<1) | (m_io_solder_links->read()&TV_REFRESH_RATE));
 
 	if ( m_system_type == SYSTEM_PLUS || m_system_type == SYSTEM_GX4000 )
@@ -2553,8 +2553,8 @@ Bit Description
 7   Cassette read data
 6   Parallel/Printer port ready signal ("1" = not ready, "0" = Ready)
 5   /EXP signal on expansion port (note 6)
-4   50/60 Hz (link on PCB. For this MESS driver I have used the dipswitch feature) (note 5)
-3   | PCB links to define manufacturer name. For this MESS driver I have used the dipswitch feature. (note 1) (note 4)
+4   50/60 Hz (link on PCB. For this MAME driver I have used the dipswitch feature) (note 5)
+3   | PCB links to define manufacturer name. For this MAME driver I have used the dipswitch feature. (note 1) (note 4)
 2   | (note 2)
 1   | (note 3)
 0   VSYNC State from 6845. "1" = VSYNC active, "0" = VSYNC inactive

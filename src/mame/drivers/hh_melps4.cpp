@@ -6,6 +6,10 @@
 Mitsubishi MELPS 4 MCU tabletops/handhelds or other simple devices,
 most of them are VFD electronic games/toys.
 
+TODO:
+- dump/add Gakken version of Frogger
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -116,7 +120,10 @@ namespace {
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
-  There's also a Gakken version that appears to be the same game underneath.
+  Gakken / Konami Frogger
+  * PCB label Konami Gakken KH-8201D
+  * Mitsubishi M58846-700P MCU (Konami logo on it)
+  * cyan/red/green VFD display, with partial color overlay
 
 ***************************************************************************/
 
@@ -238,7 +245,7 @@ ROM_END
 
 /***************************************************************************
 
-  Gakken Jungler (manufactured in Japan, licensed from Konami)
+  Gakken / Konami Jungler (manufactured in Japan)
   * PCB label Konami Gakken GR503
   * Mitsubishi M58846-702P MCU
   * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
@@ -369,6 +376,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT CMP MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1981, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
+CONS( 1982, cfrogger, 0,      0, cfrogger, cfrogger, cfrogger_state, empty_init, "Coleco / Konami", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1982, gjungler, 0,      0, gjungler, gjungler, gjungler_state, empty_init, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )

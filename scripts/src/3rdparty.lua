@@ -1186,6 +1186,11 @@ project "bimg"
 			MAME_DIR .. "3rdparty/bx/include/compat/freebsd",
 		}
 
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
+
 	configuration { }
 
 	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
@@ -2209,6 +2214,11 @@ if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
 project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions {
+			"-Wno-unused-but-set-variable",
+		}
 
 	configuration { }
 

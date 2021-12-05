@@ -311,7 +311,7 @@ void f2mc16_device::execute_run()
 				m_usp-=2;
 				write_16((m_usb << 16) | m_usp, read_rwX(3));
 				write_rwX(3, m_usp);
-				m_ssp -= m_tmp8;
+				m_usp -= m_tmp8;
 			}
 			m_pc += 2;
 			m_icount -= 6;

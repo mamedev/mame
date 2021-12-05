@@ -89,6 +89,7 @@ public:
 	void init_stdragona();
 	void init_stdragonb();
 	void init_systemz();
+	void init_lordofkbp();
 
 private:
 	required_shared_ptr<u16> m_objectram;

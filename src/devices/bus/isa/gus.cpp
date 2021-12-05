@@ -4,6 +4,9 @@
  *  Gravis Ultrasound ISA card
  *
  *  Started: 28/01/2012
+ *
+ *  to do: xref with lowsrc.doc from GUS SDK
+ *  - 256K DMA and 16-bit sample playback boundaries
  */
 
 
@@ -720,7 +723,7 @@ void gf1_device::global_reg_data_w(offs_t offset, uint8_t data)
  * bit 2 - roll over condition (generate IRQ, and not stop playing voice, no looping)
  * bit 3 - enable looping
  * bit 4 - enable bi-directional looping
- * bit 5 - rnable IRQ at end of ramp */
+ * bit 5 - enable IRQ at end of ramp */
 		if(offset == 1)
 		{
 			m_voice[m_current_voice].vol_ramp_ctrl = data & 0x7f;

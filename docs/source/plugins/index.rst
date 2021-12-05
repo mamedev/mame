@@ -70,4 +70,5 @@ sample code that you can use as a starting point when writing your own plugins.
     hiscore
     inputmacro
     layout
+    timecode
     timer

@@ -129,6 +129,7 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_n163_vol(0)
 	, m_outer_prg_size(0)
 	, m_outer_chr_size(0)
+	, m_smd133_addr(0x6000)
 	, m_mirroring(PPU_MIRROR_NONE)
 	, m_pcb_ctrl_mirror(false)
 	, m_four_screen_vram(false)

@@ -69,7 +69,6 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_REWIND_CAPACITY "(1-2048)",                 "100",       OPTION_INTEGER,    "rewind buffer size in megabytes" },
 	{ OPTION_PLAYBACK ";pb",                             nullptr,     OPTION_STRING,     "playback an input file" },
 	{ OPTION_RECORD ";rec",                              nullptr,     OPTION_STRING,     "record an input file" },
-	{ OPTION_RECORD_TIMECODE,                            "0",         OPTION_BOOLEAN,    "record an input timecode file (requires -record option)" },
 	{ OPTION_EXIT_AFTER_PLAYBACK,                        "0",         OPTION_BOOLEAN,    "close the program at the end of playback" },
 
 	{ OPTION_MNGWRITE,                                   nullptr,     OPTION_STRING,     "optional filename to write a MNG movie of the current session" },
@@ -206,7 +205,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_RAMSIZE ";ram",                             nullptr,     OPTION_STRING,     "size of RAM (if supported by driver)" },
 	{ OPTION_CONFIRM_QUIT,                               "0",         OPTION_BOOLEAN,    "ask for confirmation before exiting" },
 	{ OPTION_UI_MOUSE,                                   "1",         OPTION_BOOLEAN,    "display UI mouse cursor" },
-	{ OPTION_LANGUAGE ";lang",                           "English",   OPTION_STRING,     "set UI display language" },
+	{ OPTION_LANGUAGE ";lang",                           "",          OPTION_STRING,     "set UI display language" },
 	{ OPTION_NVRAM_SAVE ";nvwrite",                      "1",         OPTION_BOOLEAN,    "save NVRAM data on exit" },
 
 	{ nullptr,                                           nullptr,     OPTION_HEADER,     "SCRIPTING OPTIONS" },

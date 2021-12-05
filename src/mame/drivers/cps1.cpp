@@ -957,10 +957,10 @@ static INPUT_PORTS_START( forgottn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DIAL0")
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
 	PORT_START("DIAL1")
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -1022,10 +1022,10 @@ static INPUT_PORTS_START( forgottnj ) // Where's the Demo Sound????
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DIAL0")
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 
 	PORT_START("DIAL1")
-	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_RESET PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ghouls )
@@ -1962,14 +1962,23 @@ INPUT_PORTS_START( sf2 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 INPUT_PORTS_END
 
-/* Needs further checking */
 static INPUT_PORTS_START( sf2j )
 	PORT_INCLUDE( sf2 )
 
 	PORT_MODIFY("DSWB")
 	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )                    PORT_DIPLOCATION("SW(B):4")
-	PORT_DIPSETTING(    0x08, "1 Credit/No Continue" )
+	PORT_DIPSETTING(    0x08, "1 Credit/No Continue" ) // 1 Credit for versus play, and "Here comes a new challenger" option is disabled
 	PORT_DIPSETTING(    0x00, "2 Credits/Winner Continue" ) //Winner stays, loser pays, in other words.
+INPUT_PORTS_END
+
+/* Same as sf2j but options are inverted. Default position here is 2 Credits for versus play */
+static INPUT_PORTS_START( sf2cej )
+	PORT_INCLUDE( sf2 )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x08, 0x08, "2 Players Game" )                    PORT_DIPLOCATION("SW(B):4")
+	PORT_DIPSETTING(    0x08, "2 Credits/Winner Continue" ) //Winner stays, loser pays, in other words.
+	PORT_DIPSETTING(    0x00, "1 Credit/No Continue" )  // 1 Credit for versus play, and "Here comes a new challenger" option is disabled
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sf2rb )
@@ -14061,7 +14070,7 @@ GAME( 1988, forgottnue,  forgottn, forgottn,   forgottn, cps_state, init_cps1,  
 GAME( 1988, forgottnuc,  forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, forgottnua,  forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, forgottnuaa, forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (USA, B-Board 88618B-2, Rev. AA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, forgottnj,   forgottn, forgottn,   forgottnj,cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, forgottnj,   forgottn, forgottn,   forgottnj,cps_state, init_cps1,     ROT0,   "Capcom", "Forgotten Worlds (Japan) (English prototype)", MACHINE_SUPPORTS_SAVE ) // shows a Japan warning but runs an English localized version of the game, many changes, unfinished levels, ends abruptly.
 GAME( 1988, lostwrld,    forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Lost Worlds (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, lostwrldo,   forgottn, forgottn,   forgottn, cps_state, init_cps1,     ROT0,   "Capcom", "Lost Worlds (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ghouls,      0,        cps1_10MHz, ghouls,   cps_state, init_cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)", MACHINE_SUPPORTS_SAVE )   // "EXPORT" // Wed.26.10.1988 in the ROMs
@@ -14184,9 +14193,9 @@ GAME( 1992, sf2ceua,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,  
 GAME( 1992, sf2ceub,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920513)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2ceuc,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (USA 920803)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2cet,      sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Taiwan 920313)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2ceja,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920322)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2cejb,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920513)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2cejc,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920803)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2ceja,     sf2ce,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920322)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2cejb,     sf2ce,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920513)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2cejc,     sf2ce,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Champion Edition (Japan 920803)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, sf2bhh,      sf2ce,    cps1_12MHz, sf2bhh,   cps_state, init_sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Hung Hsi, bootleg)", MACHINE_SUPPORTS_SAVE ) // derived from sf2cet, was on actual Capcom hw with changed, unlabeled ROMs. Has turbo mode.
 GAME( 1992, sf2cebltw,   sf2ce,    cps1_12MHz, sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition ('Taiwan' bootleg with PAL)", MACHINE_SUPPORTS_SAVE ) // 'Taiwan', similar to sf2bhh but without Hung Hsi copyright
 GAME( 1992, sf2rb,       sf2ce,    cps1_12MHz, sf2rb,    cps_state, init_sf2rb,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (Rainbow, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )           // 920322 - based on World version
@@ -14241,7 +14250,7 @@ GAME( 1992, wofj,        wof,      qsound,     wof,      cps_state, init_wof,   
 GAME( 1999, wofhfh,      wof,      wofhfh,     wofhfh,   cps_state, init_cps1,     ROT0,   "bootleg", "Huo Feng Huang (Chinese bootleg of Sangokushi II)", MACHINE_SUPPORTS_SAVE )    // 921005 - based on Asia version
 GAME( 1992, sf2hf,       0,        cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Hyper Fighting (World 921209)", MACHINE_SUPPORTS_SAVE ) // "ETC"
 GAME( 1992, sf2hfu,      sf2hf,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II': Hyper Fighting (USA 921209)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sf2hfj,      sf2hf,    cps1_12MHz, sf2j,     cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo: Hyper Fighting (Japan 921209)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sf2hfj,      sf2hf,    cps1_12MHz, sf2cej,   cps_state, init_cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo: Hyper Fighting (Japan 921209)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dino,        0,        qsound,     dino,     cps_state, init_dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (World 930201)", MACHINE_SUPPORTS_SAVE )    // "ETC"
 GAME( 1993, dinou,       dino,     qsound,     dino,     cps_state, init_dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (USA 930201)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dinoa,       dino,     qsound,     dino,     cps_state, init_dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (Asia TW 930223)", MACHINE_SUPPORTS_SAVE ) // Title screen shows "distributed by Hung Hsi Enterprise".

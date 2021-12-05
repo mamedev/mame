@@ -8,7 +8,7 @@
 
     to do:
     - cassette i/o and softlist
-    - verify palette
+    - use palette rom
     - monochrome output
     - trap: does memory always get written or it's up to NMI ISR to complete writes?
     - keyboard layout for earliest revision (v89r0)

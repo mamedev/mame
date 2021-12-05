@@ -4,7 +4,7 @@
 
     dc.c - Sega Dreamcast hardware
 
-    MESS (DC home console) hardware overrides (GD-ROM drive etc)
+    DC home console hardware overrides (GD-ROM drive etc)
 
     c230048 - 5 is written, want 6
     c0d9d9e - where bad happens, from routine @ c0da260

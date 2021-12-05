@@ -139,32 +139,28 @@ void menu_audit::populate(float &customtop, float &custombottom)
 	custombottom = (ui().get_line_height() * 1.0f) + (ui().box_tb_border() * 3.0f);
 }
 
-void menu_audit::handle()
+void menu_audit::handle(event const *ev)
 {
 	switch (m_phase)
 	{
 	case phase::CONFIRMATION:
+		if (ev && (IPT_UI_SELECT == ev->iptkey))
 		{
-			event const *const menu_event(process(0));
-			if (menu_event && (IPT_UI_SELECT == menu_event->iptkey))
+			if ((ITEMREF_START_FULL == ev->itemref) || (ITEMREF_START_FAST == ev->itemref))
 			{
-				if ((ITEMREF_START_FULL == menu_event->itemref) || (ITEMREF_START_FAST == menu_event->itemref))
-				{
-					m_phase = phase::AUDIT;
-					m_fast = ITEMREF_START_FAST == menu_event->itemref;
-					m_prompt = util::string_format(_("Press %1$s to cancel\n"), ui().get_general_input_setting(IPT_UI_CANCEL));
-					m_future.resize(std::thread::hardware_concurrency());
-					for (auto &future : m_future)
-						future = std::async(std::launch::async, [this] () { return do_audit(); });
-				}
+				set_process_flags(PROCESS_CUSTOM_ONLY | PROCESS_NOINPUT);
+				m_phase = phase::AUDIT;
+				m_fast = ITEMREF_START_FAST == ev->itemref;
+				m_prompt = util::string_format(_("Press %1$s to cancel\n"), ui().get_general_input_setting(IPT_UI_CANCEL));
+				m_future.resize(std::thread::hardware_concurrency());
+				for (auto &future : m_future)
+					future = std::async(std::launch::async, [this] () { return do_audit(); });
 			}
 		}
 		break;
 
 	case phase::AUDIT:
 	case phase::CANCELLATION:
-		process(PROCESS_CUSTOM_ONLY | PROCESS_NOINPUT);
-
 		if ((m_next.load() >= m_availablesorted.size()) || m_cancel.load())
 		{
 			bool done(true);

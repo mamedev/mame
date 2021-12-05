@@ -350,7 +350,7 @@ void i7220_device::delay_cycles(emu_timer *tm, int cycles)
 
 void i7220_device::command_end(bubble_info &bi, bool success)
 {
-	logerror("command done (%s) - %02x\n", success ? "success" : "fail", m_str);
+	LOG("command done (%s) - %02x\n", success ? "success" : "fail", m_str);
 	main_phase = PHASE_RESULT;
 	bi.main_state = bi.sub_state = IDLE;
 	if (success)
@@ -374,23 +374,20 @@ void i7220_device::command_fail_start(bubble_info &bi)
 
 void i7220_device::command_fail_continue(bubble_info &bi)
 {
-	for (;;)
+	switch (bi.sub_state)
 	{
-		switch (bi.sub_state)
-		{
-		case INITIALIZE:
-			bi.sub_state = COMMAND_DONE;
-			delay_cycles(bi.tm, 1200); // XXX
-			return;
+	case INITIALIZE:
+		bi.sub_state = COMMAND_DONE;
+		delay_cycles(bi.tm, 1200); // XXX
+		return;
 
-		case COMMAND_DONE:
-			command_end(bi, false);
-			return;
+	case COMMAND_DONE:
+		command_end(bi, false);
+		return;
 
-		default:
-			LOG("BMC fail unknown sub-state %d\n", bi.sub_state);
-			return;
-		}
+	default:
+		LOG("BMC fail unknown sub-state %d\n", bi.sub_state);
+		return;
 	}
 }
 

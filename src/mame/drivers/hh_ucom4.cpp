@@ -43,7 +43,7 @@ known chips:
  @513     uPD557LC 1980, Castle Toy Name That Tune
 
  @060     uPD650C  1979, Mattel Computer Gin
- *085     uPD650C  1980, Roland TR-808
+  085     uPD650C  1980, Roland TR-808 -> roland_tr808.cpp
  *127     uPD650C  198?, Sony OA-S1100 Typecorder (subcpu, have dump)
   128     uPD650C  1981, Roland TR-606 -> roland_tr606.cpp
   133     uPD650C  1982, Roland TB-303 -> roland_tb303.cpp
@@ -62,11 +62,15 @@ r = revision of the VFD
 c = custom display
 s = unique display part number
 
+============================================================================
 
 ROM source notes when dumped from another publisher, but confident it's the same:
 - astrocmd: Tandy Astro Command
 - caveman: Tandy Caveman
 - grobot9: Mego Fabulous Fred
+
+TODO:
+- get rid of hardcoded color overlay from SVGs, use MAME internal artwork
 
 ***************************************************************************/
 

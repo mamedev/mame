@@ -48,7 +48,6 @@ WindowQt::WindowQt(running_machine &machine, QWidget *parent) :
 	connect(debugActOpenPoints, &QAction::triggered, this, &WindowQt::debugActOpenPoints);
 
 	QAction *debugActOpenDevices = new QAction("New D&evices Window", this);
-	debugActOpenDevices->setShortcut(QKeySequence("Shift+Ctrl+D"));
 	connect(debugActOpenDevices, &QAction::triggered, this, &WindowQt::debugActOpenDevices);
 
 	QAction *dbgActRun = new QAction("Run", this);

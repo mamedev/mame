@@ -16,6 +16,19 @@ Year   Game                PCB            NOTES
 1995   Biomechanical Toy   REF 922804/2   Unprotected
 1996   Maniac Square       REF 922804/2   Prototype
 
+TODO: Figure out why Thunder Hoop crashes if you die on Level 4
+      This can be bypassed by killing yourself at the same time as
+      the Level 3 boss dies, suggesting the end stage animation is
+      somehow corrupting the game state. Could this be a bug in
+      the supported revision of the game?  It doesn't depend on
+      CPU clock, vblank timing, there are no unmapped reads or
+      writes of significance.  Could it be related to a dipswitch
+      setting?
+
+      Priorities for all games - the games don't make extensive
+      enough use of the priority scheme to properly draw any
+      conclusions.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -64,6 +77,12 @@ void gaelco_state::oki_bankswitch_w(uint8_t data)
 	m_okibank->set_entry(data & 0x0f);
 }
 
+void gaelco_state::irqack_w(uint16_t data)
+{
+	// INT 6 ACK or Watchdog timer - written at the end of an IRQ
+	m_maincpu->set_input_line(6, CLEAR_LINE);
+}
+
 /*********** Squash Encryption Related Code ******************/
 
 void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -109,7 +128,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");              // Video RAM
 	map(0x102000, 0x103fff).ram();                                                              // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                         // Video Registers
-//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                  // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                    // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
 	map(0x440000, 0x440fff).ram().share("spriteram");                                           // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW1");
@@ -138,7 +157,7 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");                // Video RAM
 	map(0x102000, 0x103fff).ram();                                                                // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                           // Video Registers
-//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                    // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                      // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
 	map(0x440000, 0x440fff).ram().share("spriteram");                                             // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
@@ -156,7 +175,7 @@ void gaelco_state::squash_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");     // Video RAM
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");         // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                          // Video Registers
-//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                   // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                     // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x440000, 0x440fff).ram().share("spriteram");                                            // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
@@ -175,7 +194,7 @@ void gaelco_state::thoop_map(address_map &map)
 	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
 	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
-//  map(0x10800c, 0x10800d).w("watchdog", FUNC(watchdog_timer_device::reset16_w));                     // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x440000, 0x440fff).ram().share("spriteram");                                              // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
@@ -318,10 +337,10 @@ static INPUT_PORTS_START( biomtoy )
 
 	PORT_START("DSW2")
 	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW2:8" )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") /* Not Listed/shown in test mode */
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7") // Not Listed/shown in test mode
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") /* Not Listed/shown in test mode */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6") // Not Listed/shown in test mode
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
@@ -641,7 +660,7 @@ void gaelco_state::bigkarnk(machine_config &config)
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P10, 12 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
 	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  // 68B09EP, 2 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_snd_map);
@@ -684,7 +703,7 @@ void gaelco_state::maniacsq(machine_config &config)
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000)/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::maniacsq_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -713,7 +732,7 @@ void gaelco_state::squash(machine_config &config)
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::squash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -730,13 +749,13 @@ void gaelco_state::squash(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco_state::screen_update_maniacsq));
+	screen.set_screen_update(FUNC(gaelco_state::screen_update_thoop));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,squash)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -751,7 +770,7 @@ void gaelco_state::thoop(machine_config &config)
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000)/2); // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::thoop_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
+	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -768,13 +787,13 @@ void gaelco_state::thoop(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco_state::screen_update_maniacsq));
+	screen.set_screen_update(FUNC(gaelco_state::screen_update_thoop));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco_state,maniacsq)
+	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1164,7 +1183,7 @@ GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, RO
 GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1870)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
-GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)",                   MACHINE_SUPPORTS_SAVE ) // sometimes listed as a 1992 proto?
+GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)",                   MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
 GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)",                      MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
 GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco", "Squash (Ver. 1.0)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // could be other versions, still Ver. 1 but different checksum listed on boot
