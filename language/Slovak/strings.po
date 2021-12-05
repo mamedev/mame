@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-19 02:50+1100\n"
-"PO-Revision-Date: 2021-11-29 15:06+0100\n"
+"PO-Revision-Date: 2021-12-04 17:55+0100\n"
 "Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sk\n"
@@ -445,7 +445,7 @@ msgstr "Vypnúť zvuk pri deaktivovanej škrtiacej klapke"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
-msgstr ""
+msgstr "Umožniť beh aj ostatným aplikáciám"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Speed"
@@ -453,7 +453,7 @@ msgstr "Rýchlosť"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr "Upraviť rýchlosť podľa obnovovacej frekvencie"
+msgstr "Prispôsobiť rýchlosť obnovovacej frekvencii"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
@@ -577,7 +577,7 @@ msgstr "Prirodzená klávesnica"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Simultaneous contradictory"
-msgstr ""
+msgstr "Súbežná aktivácia protichodných vstupov joysticku"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
@@ -2185,7 +2185,7 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
-"Prebieha audit ROM-iek... (%2$u z %3$u)\n"
+"Prebieha audit médií... (%2$u z %3$u)\n"
 "%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
@@ -2196,7 +2196,7 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
-"Ukončiť audit ROM-iek?\n"
+"Ukončiť audit médií?\n"
 "\n"
 "Ak áno, stlačte %1$s\n"
 "Ak pokračovať v audite, stlačte %2$s"
@@ -2204,12 +2204,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable"
-msgstr "Vykonať audit pre %1$u zariadení označených ako Nedostupné"
+msgstr "Vykonať audit médií pre %1$u zariadení označených ako Nedostupné"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit ROMs for all %1$u machines"
-msgstr "Vykonať audit pre všetkých %1$u zariadení"
+msgstr "Vykonať audit médií pre všetkých %1$u zariadení"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
@@ -2740,7 +2740,7 @@ msgstr "Exportovať zobrazený zoznam do súboru"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Audit media"
-msgstr "Vykonať audit ROM-iek"
+msgstr "Vykonať audit médií"
 
 #: src/frontend/mame/ui/selmenu.cpp:99
 msgid "Show DATs view"
@@ -3132,11 +3132,11 @@ msgstr "Vyžaduje CHD\tnie\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3051
 msgid "ROM Audit Result\tOK\n"
-msgstr "Výsledok auditu ROM\tplatná\n"
+msgstr "Výsledok auditu médií\tplatné\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3053
 msgid "ROM Audit Result\tBAD\n"
-msgstr "Výsledok auditu ROM\tNEPLATNÁ\n"
+msgstr "Výsledok auditu médií\tNEPLATNÉ\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3056
 msgid "Samples Audit Result\tNone Needed\n"
@@ -3155,7 +3155,7 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
-"Audit ROM\tvypnutý\n"
+"Audit médií\tvypnutý\n"
 "Audit samplov\tvypnutý\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:150
@@ -3408,42 +3408,42 @@ msgstr "Hráč 1 Vpravo"
 #: src/emu/inpttype.ipp:26
 msgctxt "input-name"
 msgid "P1 Right Stick/Up"
-msgstr "Hráč 1 Pravá páčka/Hore"
+msgstr "Hráč 1 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:27
 msgctxt "input-name"
 msgid "P1 Right Stick/Down"
-msgstr "Hráč 1 Pravá páčka/Dolu"
+msgstr "Hráč 1 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:28
 msgctxt "input-name"
 msgid "P1 Right Stick/Left"
-msgstr "Hráč 1 Pravá páčka/Vľavo"
+msgstr "Hráč 1 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:29
 msgctxt "input-name"
 msgid "P1 Right Stick/Right"
-msgstr "Hráč 1 Pravá páčka/Vpravo"
+msgstr "Hráč 1 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:30
 msgctxt "input-name"
 msgid "P1 Left Stick/Up"
-msgstr "Hráč 1 Ľavá páčka/Hore"
+msgstr "Hráč 1 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:31
 msgctxt "input-name"
 msgid "P1 Left Stick/Down"
-msgstr "Hráč 1 Ľavá páčka/Dolu"
+msgstr "Hráč 1 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:32
 msgctxt "input-name"
 msgid "P1 Left Stick/Left"
-msgstr "Hráč 1 Ľavá páčka/Vľavo"
+msgstr "Hráč 1 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:33
 msgctxt "input-name"
 msgid "P1 Left Stick/Right"
-msgstr "Hráč 1 Ľavá páčka/Vpravo"
+msgstr "Hráč 1 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:34
 msgctxt "input-name"
@@ -3878,42 +3878,42 @@ msgstr "Hráč 2 Vpravo"
 #: src/emu/inpttype.ipp:144
 msgctxt "input-name"
 msgid "P2 Right Stick/Up"
-msgstr "Hráč 2 Pravá páčka/Hore"
+msgstr "Hráč 2 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:145
 msgctxt "input-name"
 msgid "P2 Right Stick/Down"
-msgstr "Hráč 2 Pravá páčka/Dolu"
+msgstr "Hráč 2 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:146
 msgctxt "input-name"
 msgid "P2 Right Stick/Left"
-msgstr "Hráč 2 Pravá páčka/Vľavo"
+msgstr "Hráč 2 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:147
 msgctxt "input-name"
 msgid "P2 Right Stick/Right"
-msgstr "Hráč 2 Pravá páčka/Vpravo"
+msgstr "Hráč 2 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:148
 msgctxt "input-name"
 msgid "P2 Left Stick/Up"
-msgstr "Hráč 2 Ľavá páčka/Hore"
+msgstr "Hráč 2 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:149
 msgctxt "input-name"
 msgid "P2 Left Stick/Down"
-msgstr "Hráč 2 Ľavá páčka/Dolu"
+msgstr "Hráč 2 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:150
 msgctxt "input-name"
 msgid "P2 Left Stick/Left"
-msgstr "Hráč 2 Ľavá páčka/Vľavo"
+msgstr "Hráč 2 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:151
 msgctxt "input-name"
 msgid "P2 Left Stick/Right"
-msgstr "Hráč 2 Ľavá páčka/Vpravo"
+msgstr "Hráč 2 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:152
 msgctxt "input-name"
@@ -4223,42 +4223,42 @@ msgstr "Hráč 3 Vpravo"
 #: src/emu/inpttype.ipp:225
 msgctxt "input-name"
 msgid "P3 Right Stick/Up"
-msgstr "Hráč 3 Pravá páčka/Hore"
+msgstr "Hráč 3 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:226
 msgctxt "input-name"
 msgid "P3 Right Stick/Down"
-msgstr "Hráč 3 Pravá páčka/Dolu"
+msgstr "Hráč 3 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:227
 msgctxt "input-name"
 msgid "P3 Right Stick/Left"
-msgstr "Hráč 3 Pravá páčka/Vľavo"
+msgstr "Hráč 3 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:228
 msgctxt "input-name"
 msgid "P3 Right Stick/Right"
-msgstr "Hráč 3 Pravá páčka/Vpravo"
+msgstr "Hráč 3 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:229
 msgctxt "input-name"
 msgid "P3 Left Stick/Up"
-msgstr "Hráč 3 Ľavá páčka/Hore"
+msgstr "Hráč 3 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:230
 msgctxt "input-name"
 msgid "P3 Left Stick/Down"
-msgstr "Hráč 3 Ľavá páčka/Dolu"
+msgstr "Hráč 3 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:231
 msgctxt "input-name"
 msgid "P3 Left Stick/Left"
-msgstr "Hráč 3 Ľavá páčka/Vľavo"
+msgstr "Hráč 3 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:232
 msgctxt "input-name"
 msgid "P3 Left Stick/Right"
-msgstr "Hráč 3 Ľavá páčka/Vpravo"
+msgstr "Hráč 3 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:233
 msgctxt "input-name"
@@ -4373,42 +4373,42 @@ msgstr "Hráč 4 Vpravo"
 #: src/emu/inpttype.ipp:259
 msgctxt "input-name"
 msgid "P4 Right Stick/Up"
-msgstr "Hráč 4 Pravá páčka/Hore"
+msgstr "Hráč 4 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:260
 msgctxt "input-name"
 msgid "P4 Right Stick/Down"
-msgstr "Hráč 4 Pravá páčka/Dolu"
+msgstr "Hráč 4 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:261
 msgctxt "input-name"
 msgid "P4 Right Stick/Left"
-msgstr "Hráč 4 Pravá páčka/Vľavo"
+msgstr "Hráč 4 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:262
 msgctxt "input-name"
 msgid "P4 Right Stick/Right"
-msgstr "Hráč 4 Pravá páčka/Vpravo"
+msgstr "Hráč 4 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:263
 msgctxt "input-name"
 msgid "P4 Left Stick/Up"
-msgstr "Hráč 4 Ľavá páčka/Hore"
+msgstr "Hráč 4 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:264
 msgctxt "input-name"
 msgid "P4 Left Stick/Down"
-msgstr "Hráč 4 Ľavá páčka/Dolu"
+msgstr "Hráč 4 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:265
 msgctxt "input-name"
 msgid "P4 Left Stick/Left"
-msgstr "Hráč 4 Ľavá páčka/Vľavo"
+msgstr "Hráč 4 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:266
 msgctxt "input-name"
 msgid "P4 Left Stick/Right"
-msgstr "Hráč 4 Ľavá páčka/Vpravo"
+msgstr "Hráč 4 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:267
 msgctxt "input-name"
@@ -4523,42 +4523,42 @@ msgstr "Hráč 5 Vpravo"
 #: src/emu/inpttype.ipp:293
 msgctxt "input-name"
 msgid "P5 Right Stick/Up"
-msgstr "Hráč 5 Pravá páčka/Hore"
+msgstr "Hráč 5 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:294
 msgctxt "input-name"
 msgid "P5 Right Stick/Down"
-msgstr "Hráč 5 Pravá páčka/Dolu"
+msgstr "Hráč 5 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:295
 msgctxt "input-name"
 msgid "P5 Right Stick/Left"
-msgstr "Hráč 5 Pravá páčka/Vľavo"
+msgstr "Hráč 5 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:296
 msgctxt "input-name"
 msgid "P5 Right Stick/Right"
-msgstr "Hráč 5 Pravá páčka/Vpravo"
+msgstr "Hráč 5 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:297
 msgctxt "input-name"
 msgid "P5 Left Stick/Up"
-msgstr "Hráč 5 Ľavá páčka/Hore"
+msgstr "Hráč 5 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:298
 msgctxt "input-name"
 msgid "P5 Left Stick/Down"
-msgstr "Hráč 5 Ľavá páčka/Dolu"
+msgstr "Hráč 5 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:299
 msgctxt "input-name"
 msgid "P5 Left Stick/Left"
-msgstr "Hráč 5 Ľavá páčka/Vľavo"
+msgstr "Hráč 5 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:300
 msgctxt "input-name"
 msgid "P5 Left Stick/Right"
-msgstr "Hráč 5 Ľavá páčka/Vpravo"
+msgstr "Hráč 5 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:301
 msgctxt "input-name"
@@ -4673,42 +4673,42 @@ msgstr "Hráč 6 Vpravo"
 #: src/emu/inpttype.ipp:327
 msgctxt "input-name"
 msgid "P6 Right Stick/Up"
-msgstr "Hráč 6 Pravá páčka/Hore"
+msgstr "Hráč 6 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:328
 msgctxt "input-name"
 msgid "P6 Right Stick/Down"
-msgstr "Hráč 6 Pravá páčka/Dolu"
+msgstr "Hráč 6 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:329
 msgctxt "input-name"
 msgid "P6 Right Stick/Left"
-msgstr "Hráč 6 Pravá páčka/Vľavo"
+msgstr "Hráč 6 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:330
 msgctxt "input-name"
 msgid "P6 Right Stick/Right"
-msgstr "Hráč 6 Pravá páčka/Vpravo"
+msgstr "Hráč 6 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:331
 msgctxt "input-name"
 msgid "P6 Left Stick/Up"
-msgstr "Hráč 6 Ľavá páčka/Hore"
+msgstr "Hráč 6 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:332
 msgctxt "input-name"
 msgid "P6 Left Stick/Down"
-msgstr "Hráč 6 Ľavá páčka/Dolu"
+msgstr "Hráč 6 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:333
 msgctxt "input-name"
 msgid "P6 Left Stick/Left"
-msgstr "Hráč 6 Ľavá páčka/Vľavo"
+msgstr "Hráč 6 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:334
 msgctxt "input-name"
 msgid "P6 Left Stick/Right"
-msgstr "Hráč 6 Ľavá páčka/Vpravo"
+msgstr "Hráč 6 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:335
 msgctxt "input-name"
@@ -4823,42 +4823,42 @@ msgstr "Hráč 7 Vpravo"
 #: src/emu/inpttype.ipp:361
 msgctxt "input-name"
 msgid "P7 Right Stick/Up"
-msgstr "Hráč 7 Pravá páčka/Hore"
+msgstr "Hráč 7 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:362
 msgctxt "input-name"
 msgid "P7 Right Stick/Down"
-msgstr "Hráč 7 Pravá páčka/Dolu"
+msgstr "Hráč 7 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:363
 msgctxt "input-name"
 msgid "P7 Right Stick/Left"
-msgstr "Hráč 7 Pravá páčka/Vľavo"
+msgstr "Hráč 7 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:364
 msgctxt "input-name"
 msgid "P7 Right Stick/Right"
-msgstr "Hráč 7 Pravá páčka/Vpravo"
+msgstr "Hráč 7 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:365
 msgctxt "input-name"
 msgid "P7 Left Stick/Up"
-msgstr "Hráč 7 Ľavá páčka/Hore"
+msgstr "Hráč 7 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:366
 msgctxt "input-name"
 msgid "P7 Left Stick/Down"
-msgstr "Hráč 7 Ľavá páčka/Dolu"
+msgstr "Hráč 7 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:367
 msgctxt "input-name"
 msgid "P7 Left Stick/Left"
-msgstr "Hráč 7 Ľavá páčka/Vľavo"
+msgstr "Hráč 7 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:368
 msgctxt "input-name"
 msgid "P7 Left Stick/Right"
-msgstr "Hráč 7 Ľavá páčka/Vpravo"
+msgstr "Hráč 7 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:369
 msgctxt "input-name"
@@ -4973,42 +4973,42 @@ msgstr "Hráč 8 Vpravo"
 #: src/emu/inpttype.ipp:395
 msgctxt "input-name"
 msgid "P8 Right Stick/Up"
-msgstr "Hráč 8 Pravá páčka/Hore"
+msgstr "Hráč 8 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:396
 msgctxt "input-name"
 msgid "P8 Right Stick/Down"
-msgstr "Hráč 8 Pravá páčka/Dolu"
+msgstr "Hráč 8 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:397
 msgctxt "input-name"
 msgid "P8 Right Stick/Left"
-msgstr "Hráč 8 Pravá páčka/Vľavo"
+msgstr "Hráč 8 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:398
 msgctxt "input-name"
 msgid "P8 Right Stick/Right"
-msgstr "Hráč 8 Pravá páčka/Vpravo"
+msgstr "Hráč 8 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:399
 msgctxt "input-name"
 msgid "P8 Left Stick/Up"
-msgstr "Hráč 8 Ľavá páčka/Hore"
+msgstr "Hráč 8 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:400
 msgctxt "input-name"
 msgid "P8 Left Stick/Down"
-msgstr "Hráč 8 Ľavá páčka/Dolu"
+msgstr "Hráč 8 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:401
 msgctxt "input-name"
 msgid "P8 Left Stick/Left"
-msgstr "Hráč 8 Ľavá páčka/Vľavo"
+msgstr "Hráč 8 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:402
 msgctxt "input-name"
 msgid "P8 Left Stick/Right"
-msgstr "Hráč 8 Ľavá páčka/Vpravo"
+msgstr "Hráč 8 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:403
 msgctxt "input-name"
@@ -5123,42 +5123,42 @@ msgstr "Hráč 9 Vpravo"
 #: src/emu/inpttype.ipp:429
 msgctxt "input-name"
 msgid "P9 Right Stick/Up"
-msgstr "Hráč 9 Pravá páčka/Hore"
+msgstr "Hráč 9 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:430
 msgctxt "input-name"
 msgid "P9 Right Stick/Down"
-msgstr "Hráč 9 Pravá páčka/Dolu"
+msgstr "Hráč 9 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:431
 msgctxt "input-name"
 msgid "P9 Right Stick/Left"
-msgstr "Hráč 9 Pravá páčka/Vľavo"
+msgstr "Hráč 9 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:432
 msgctxt "input-name"
 msgid "P9 Right Stick/Right"
-msgstr "Hráč 9 Pravá páčka/Vpravo"
+msgstr "Hráč 9 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:433
 msgctxt "input-name"
 msgid "P9 Left Stick/Up"
-msgstr "Hráč 9 Ľavá páčka/Hore"
+msgstr "Hráč 9 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:434
 msgctxt "input-name"
 msgid "P9 Left Stick/Down"
-msgstr "Hráč 9 Ľavá páčka/Dolu"
+msgstr "Hráč 9 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:435
 msgctxt "input-name"
 msgid "P9 Left Stick/Left"
-msgstr "Hráč 9 Ľavá páčka/Vľavo"
+msgstr "Hráč 9 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:436
 msgctxt "input-name"
 msgid "P9 Left Stick/Right"
-msgstr "Hráč 9 Ľavá páčka/Vpravo"
+msgstr "Hráč 9 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:437
 msgctxt "input-name"
@@ -5273,42 +5273,42 @@ msgstr "Hráč 10 Vpravo"
 #: src/emu/inpttype.ipp:463
 msgctxt "input-name"
 msgid "P10 Right Stick/Up"
-msgstr "Hráč 10 Pravá páčka/Hore"
+msgstr "Hráč 10 Pravá páka/Hore"
 
 #: src/emu/inpttype.ipp:464
 msgctxt "input-name"
 msgid "P10 Right Stick/Down"
-msgstr "Hráč 10 Pravá páčka/Dolu"
+msgstr "Hráč 10 Pravá páka/Dolu"
 
 #: src/emu/inpttype.ipp:465
 msgctxt "input-name"
 msgid "P10 Right Stick/Left"
-msgstr "Hráč 10 Pravá páčka/Vľavo"
+msgstr "Hráč 10 Pravá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:466
 msgctxt "input-name"
 msgid "P10 Right Stick/Right"
-msgstr "Hráč 10 Pravá páčka/Vpravo"
+msgstr "Hráč 10 Pravá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:467
 msgctxt "input-name"
 msgid "P10 Left Stick/Up"
-msgstr "Hráč 10 Ľavá páčka/Hore"
+msgstr "Hráč 10 Ľavá páka/Hore"
 
 #: src/emu/inpttype.ipp:468
 msgctxt "input-name"
 msgid "P10 Left Stick/Down"
-msgstr "Hráč 10 Ľavá páčka/Dolu"
+msgstr "Hráč 10 Ľavá páka/Dolu"
 
 #: src/emu/inpttype.ipp:469
 msgctxt "input-name"
 msgid "P10 Left Stick/Left"
-msgstr "Hráč 10 Ľavá páčka/Vľavo"
+msgstr "Hráč 10 Ľavá páka/Vľavo"
 
 #: src/emu/inpttype.ipp:470
 msgctxt "input-name"
 msgid "P10 Left Stick/Right"
-msgstr "Hráč 10 Ľavá páčka/Vpravo"
+msgstr "Hráč 10 Ľavá páka/Vpravo"
 
 #: src/emu/inpttype.ipp:471
 msgctxt "input-name"
@@ -6033,252 +6033,252 @@ msgstr ""
 #: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Track X"
-msgstr ""
+msgstr "Trackball X"
 
 #: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Track X 2"
-msgstr ""
+msgstr "Trackball X 2"
 
 #: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Track X 3"
-msgstr ""
+msgstr "Trackball X 3"
 
 #: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Track X 4"
-msgstr ""
+msgstr "Trackball X 4"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Track X 5"
-msgstr ""
+msgstr "Trackball X 5"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Track X 6"
-msgstr ""
+msgstr "Trackball X 6"
 
 #: src/emu/inpttype.ipp:682
 msgctxt "input-name"
 msgid "Track X 7"
-msgstr ""
+msgstr "Trackball X 7"
 
 #: src/emu/inpttype.ipp:683
 msgctxt "input-name"
 msgid "Track X 8"
-msgstr ""
+msgstr "Trackball X 8"
 
 #: src/emu/inpttype.ipp:684
 msgctxt "input-name"
 msgid "Track X 9"
-msgstr ""
+msgstr "Trackball X 9"
 
 #: src/emu/inpttype.ipp:685
 msgctxt "input-name"
 msgid "Track X 10"
-msgstr ""
+msgstr "Trackball X 10"
 
 #: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Track Y"
-msgstr ""
+msgstr "Trackball Y"
 
 #: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Track Y 2"
-msgstr ""
+msgstr "Trackball Y 2"
 
 #: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Track Y 3"
-msgstr ""
+msgstr "Trackball Y 3"
 
 #: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Track Y 4"
-msgstr ""
+msgstr "Trackball Y 4"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Track Y 5"
-msgstr ""
+msgstr "Trackball Y 5"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Track Y 6"
-msgstr ""
+msgstr "Trackball Y 6"
 
 #: src/emu/inpttype.ipp:696
 msgctxt "input-name"
 msgid "Track Y 7"
-msgstr ""
+msgstr "Trackball Y 7"
 
 #: src/emu/inpttype.ipp:697
 msgctxt "input-name"
 msgid "Track Y 8"
-msgstr ""
+msgstr "Trackball Y 8"
 
 #: src/emu/inpttype.ipp:698
 msgctxt "input-name"
 msgid "Track Y 9"
-msgstr ""
+msgstr "Trackball Y 9"
 
 #: src/emu/inpttype.ipp:699
 msgctxt "input-name"
 msgid "Track Y 10"
-msgstr ""
+msgstr "Trackball Y 10"
 
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "Analógový joystick X"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "Analógový joystick X 2"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "Analógový joystick X 3"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "Analógový joystick X 4"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "Analógový joystick X 5"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "Analógový joystick X 6"
 
 #: src/emu/inpttype.ipp:710
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "Analógový joystick X 7"
 
 #: src/emu/inpttype.ipp:711
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "Analógový joystick X 8"
 
 #: src/emu/inpttype.ipp:712
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "Analógový joystick X 9"
 
 #: src/emu/inpttype.ipp:713
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "Analógový joystick X 10"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "Analógový joystick Y"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "Analógový joystick Y 2"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "Analógový joystick Y 3"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "Analógový joystick Y 4"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "Analógový joystick Y 5"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "Analógový joystick Y 6"
 
 #: src/emu/inpttype.ipp:724
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "Analógový joystick Y 7"
 
 #: src/emu/inpttype.ipp:725
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "Analógový joystick Y 8"
 
 #: src/emu/inpttype.ipp:726
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "Analógový joystick Y 9"
 
 #: src/emu/inpttype.ipp:727
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "Analógový joystick Y 10"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "Analógový joystick Z"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "Analógový joystick Z 2"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "Analógový joystick Z 3"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "Analógový joystick Z 4"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "Analógový joystick Z 5"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "Analógový joystick Z 6"
 
 #: src/emu/inpttype.ipp:738
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "Analógový joystick Z 7"
 
 #: src/emu/inpttype.ipp:739
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "Analógový joystick Z 8"
 
 #: src/emu/inpttype.ipp:740
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "Analógový joystick Z 9"
 
 #: src/emu/inpttype.ipp:741
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "Analógový joystick Z 10"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
@@ -6583,122 +6583,122 @@ msgstr "Prepnúť cheat"
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "UI Up"
-msgstr "Používateľské rozhranie - Hore"
+msgstr "Použív. rozhranie - Hore"
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "UI Down"
-msgstr "Používateľské rozhranie - Dolu"
+msgstr "Použív. rozhranie - Dolu"
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "UI Left"
-msgstr "Používateľské rozhranie - Vľavo"
+msgstr "Použív. rozhranie - Vľavo"
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "UI Right"
-msgstr "Používateľské rozhranie - Vpravo"
+msgstr "Použív. rozhranie - Vpravo"
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "UI Home"
-msgstr "Používateľské rozhranie - Home"
+msgstr "Použív. rozhranie - Home"
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "UI End"
-msgstr "Používateľské rozhranie - End"
+msgstr "Použív. rozhranie - End"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "UI Page Up"
-msgstr "Používateľské rozhranie - Stránka nahor"
+msgstr "Použív. rozhranie - Stránka nahor"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "UI Page Down"
-msgstr "Používateľské rozhranie - Stránka nadol"
+msgstr "Použív. rozhranie - Stránka nadol"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "UI Focus Next"
-msgstr "Používateľské rozhranie - Prejsť na nasledujúci"
+msgstr "Použív. rozhranie - Prejsť na nasledujúci"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "UI Focus Previous"
-msgstr "Používateľské rozhranie - Prejsť na predchádzajúci"
+msgstr "Použív. rozhranie - Prejsť na predchádzajúci"
 
 #: src/emu/inpttype.ipp:836
 msgctxt "input-name"
 msgid "UI Select"
-msgstr "Používateľské rozhranie - Vybrať"
+msgstr "Použív. rozhranie - Vybrať"
 
 #: src/emu/inpttype.ipp:837
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr "Používateľské rozhranie - Storno"
+msgstr "Použív. rozhranie - Storno"
 
 #: src/emu/inpttype.ipp:838
 msgctxt "input-name"
 msgid "UI Display Comment"
-msgstr "Používateľské rozhranie - Display Comment"
+msgstr "Použív. rozhranie - Display Comment"
 
 #: src/emu/inpttype.ipp:839
 msgctxt "input-name"
 msgid "UI Clear"
-msgstr "Používateľské rozhranie - Vymazať"
+msgstr "Použív. rozhranie - Vymazať"
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "UI Zoom In"
-msgstr "Používateľské rozhranie - Zväčšiť"
+msgstr "Použív. rozhranie - Zväčšiť"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "UI Zoom Out"
-msgstr "Používateľské rozhranie - Zmenšiť"
+msgstr "Použív. rozhranie - Zmenšiť"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "UI Default Zoom"
-msgstr "Používateľské rozhranie - Pôvodná veľkosť"
+msgstr "Použív. rozhranie - Pôvodná veľkosť"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "UI Previous Group"
-msgstr "Používateľské rozhranie - Predchádzajúca skupina"
+msgstr "Použív. rozhranie - Predchádzajúca skupina"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "UI Next Group"
-msgstr "Používateľské rozhranie - Nasledujúca skupina"
+msgstr "Použív. rozhranie - Nasledujúca skupina"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "UI Rotate"
-msgstr "Používateľské rozhranie - Otočiť"
+msgstr "Použív. rozhranie - Otočiť"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "Show Profiler"
-msgstr ""
+msgstr "Zobraziť profiler"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "UI Toggle"
-msgstr "Používateľské rozhranie - Prepnúť"
+msgstr "Použív. rozhranie - Prepnúť"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr "Používateľské rozhranie - Uvoľniť pointer"
+msgstr "Použív. rozhranie - Uvoľniť pointer"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "UI Paste Text"
-msgstr "Používateľské rozhranie - Vlepiť text"
+msgstr "Použív. rozhranie - Vlepiť text"
 
 #: src/emu/inpttype.ipp:850
 msgctxt "input-name"
@@ -6713,32 +6713,32 @@ msgstr "Načítať stav"
 #: src/emu/inpttype.ipp:852
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr "Používateľské rozhranie - Štart (prvej) pásky"
+msgstr "Použív. rozhranie - Štart (prvej) pásky"
 
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr "Používateľské rozhranie - Zastaviť (prvú) pásku"
+msgstr "Použív. rozhranie - Zastaviť (prvú) pásku"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "UI External DAT View"
-msgstr "Používateľské rozhranie - Zobrazenie externého DAT"
+msgstr "Použív. rozhranie - Zobrazenie externého DAT"
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "UI Add/Remove favorite"
-msgstr "Používateľské rozhranie - Pridať do/Odobrať zo zoznamu Obľúbené"
+msgstr "Použív. rozhranie - Pridať do/Odobrať zo zoznamu Obľúbené"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr "Používateľské rozhranie - Exportovať zoznam"
+msgstr "Použív. rozhranie - Exportovať zoznam"
 
 #: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "UI Audit Media"
-msgstr ""
+msgstr "Použív. rozhranie - Audit médií"
 
 #: src/osd/modules/input/input_windows.cpp:111
 #: src/osd/modules/input/input_sdlcommon.cpp:175
@@ -6770,12 +6770,12 @@ msgstr "Prepnúť filter"
 #: src/osd/modules/input/input_sdlcommon.cpp:207
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "Znížiť hodnotu predškálovania"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:217
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "Zvýšiť hodnotu predškálovania"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
@@ -6898,7 +6898,9 @@ msgstr "Pauza je aktivovaná automaticky pri zobrazenom menu"
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
-msgstr "Všetky sloty sú vymazané a aktuálny stav je uložený do Slotu 1"
+msgstr ""
+"Všetky snapshoty pamäti boli vymazané a aktuálny stav je uložený do "
+"Snapshotu 1"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
@@ -6907,12 +6909,12 @@ msgstr "Začať nové hľadanie"
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr "Stav pamäti je uložený do Slotu %d"
+msgstr "Obraz pamäti bol uložený do Snapshotu %d"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr "Uložiť aktuálny stav pamäti do Slotu %d"
+msgstr "Uložiť aktuálny obraz pamäti do Snapshotu %d"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
@@ -6922,27 +6924,27 @@ msgstr "Nájdených %d úplných zhôd"
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr "Vykonať porovnanie: Slot %d %s Slot %d"
+msgstr "Vykonať porovnanie: Snapshot %d %s Snapshot %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr "Vykonať porovnanie: Slot %d %s Slot %d %s %d"
+msgstr "Vykonať porovnanie: Snapshot %d %s Snapshot %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr "Vykonať porovnanie: Slot %d BITWISE%s Slot %d"
+msgstr "Vykonať porovnanie: Snapshot %d BITOVÝ%s Snapshot %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr "Vykonať porovnanie: Slot %d %s %d"
+msgstr "Vykonať porovnanie: Snapshot %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "Snapshot %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
@@ -7002,11 +7004,11 @@ msgstr "Formát dát"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr "Hodnota Slotu 1"
+msgstr "Hodnota v Snapshote 1"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr "Hodnota posledného Slotu"
+msgstr "Hodnota v poslednom Snapshote"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
@@ -7017,21 +7019,21 @@ msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
-"Použiť toto, ak chcete vložiť hodnotu Slotu 1 (napr. ak ste s nejakou "
-"začali, ale ste ju stratili)"
+"Použite toto, ak chcete vložiť hodnotu zo Snapshotu 1 (napr. ak ste s "
+"nejakou začali, ale ste ju stratili)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
-"Použiť toto, ak chcete vložiť hodnotu posledného Slotu (napr. ak ste so "
-"žiadnou nezačali, ale práve ste ju našli)"
+"Použite toto, ak chcete vložiť hodnotu z posledného Snapshotu (napr. ak ste "
+"so žiadnou nezačali, ale práve ste ju našli)"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr "Použiť toto, ak chcete vložiť %s"
+msgstr "Použite toto, ak chcete vložiť %s"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
