@@ -124,8 +124,8 @@ produced by factories belonging to the Ministry of Electronic Industry
 
 The LCD games were produced by: Angstrem, Mikron, Voschod (Russia), Billur
 (Azerbaijan), Kamerton, Evistor (Belarus), Severodonetsk Instrument-Making
-Plant (Ukraine) and more. Their most popular LCD game (Nu, pogodi!), is
-known to be initially produced by Evistor.
+Plant (Ukraine), PO Proton and more. Their most popular LCD game (Nu, pogodi!),
+is known to be initially produced by Evistor.
 
 Most of the games are marked "bootleg" in MAME, because the ROM contents are
 a 1:1 copy of Nintendo Game & Watch games. Known G&W cloned by Elektronika:
@@ -1414,6 +1414,7 @@ ROM_END
   Model  Title               Transliteration      Export version      Note
   ---------------------------------------------------------------------------------
   ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
+  ИМ-10  Хоккей              Khokkey              Ice Hockey          Export version manufactured by PO Proton
   ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
   ИМ-16  Охота               Okhota               Fowling             -
   ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
@@ -1436,6 +1437,7 @@ public:
 	void gnw_mmouse(machine_config &config);
 	void gnw_egg(machine_config &config);
 	void nupogodi(machine_config &config);
+	void khokkey(machine_config &config);
 	void rkosmosa(machine_config &config);
 	void okhota(machine_config &config);
 	void vfutbol(machine_config &config);
@@ -1494,6 +1496,11 @@ void gnw_mmouse_state::gnw_egg(machine_config &config)
 void gnw_mmouse_state::nupogodi(machine_config &config)
 {
 	kb1013vk12_common(config, 1715, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::khokkey(machine_config &config)
+{
+	kb1013vk12_common(config, 1782, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::rkosmosa(machine_config &config)
@@ -1565,6 +1572,14 @@ ROM_START( nupogodi )
 
 	ROM_REGION( 156488, "screen", 0)
 	ROM_LOAD( "nupogodi.svg", 0, 156488, CRC(8ae6ec5d) SHA1(28cb05967837e52fc40f088361456e1dcd4ec09f) )
+ROM_END
+
+ROM_START( khokkey )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-10.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 94977, "screen", 0)
+	ROM_LOAD( "khokkey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
 ROM_END
 
 ROM_START( rkosmosa )
@@ -9686,6 +9701,7 @@ CONS( 1989, vespovar,     gnw_chef,    0, vespovar,     gnw_chef,     gnw_chef_s
 CONS( 1981, gnw_mmouse,   0,           0, gnw_mmouse,   gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_egg,      gnw_mmouse,  0, gnw_egg,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, khokkey,      gnw_mmouse,  0, khokkey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Khokkey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, rkosmosa,     gnw_mmouse,  0, rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, okhota,       gnw_mmouse,  0, okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, vfutbol,      gnw_mmouse,  0, vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
