@@ -9522,7 +9522,7 @@ ROM_END
 
 /***************************************************************************
 
-  Elektronika Автослалом (Autoslalom) (model IM-23)
+  Elektronika Автослалом (Avtoslalom, export version: Autoslalom) (model ИМ-23)
   * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
 
@@ -9531,19 +9531,19 @@ ROM_END
 
 ***************************************************************************/
 
-class auslalom_state : public hh_sm510_state
+class avslalom_state : public hh_sm510_state
 {
 public:
-	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
+	avslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void auslalom(machine_config &config);
+	void avslalom(machine_config &config);
 };
 
 // config
 
-static INPUT_PORTS_START( auslalom )
+static INPUT_PORTS_START( avslalom )
 	PORT_START("IN.0") // R2
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -9563,19 +9563,19 @@ static INPUT_PORTS_START( auslalom )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-void auslalom_state::auslalom(machine_config &config)
+void avslalom_state::avslalom(machine_config &config)
 {
 	kb1013vk12_common(config, 1732, 1080); // R mask option ?
 }
 
 // roms
 
-ROM_START( auslalom )
+ROM_START( avslalom )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
 
 	ROM_REGION( 117520, "screen", 0)
-	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
+	ROM_LOAD( "avslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
 ROM_END
 
 
@@ -9844,5 +9844,5 @@ CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_
 CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
-CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, avslalom,     0,           0, avslalom,     avslalom,     avslalom_state,     empty_init, "Elektronika", "Avtoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, nummunch,     0,           0, nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
