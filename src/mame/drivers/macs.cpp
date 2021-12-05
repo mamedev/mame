@@ -62,6 +62,7 @@ KISEKAE -- info
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "speaker.h"
 
 class macs_state : public driver_device
 {
@@ -509,6 +510,7 @@ void macs_state::macs(machine_config &config)
 	m_maincpu->set_memory_map(&macs_state::macs_mem);
 	m_maincpu->set_io_map(&macs_state::macs_io);
 	m_maincpu->set_dma_offs_callback(FUNC(macs_state::dma_offset));
+	m_maincpu->set_screen("screen");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -526,6 +528,13 @@ void macs_state::macs(machine_config &config)
 	generic_cartslot_device &slot_b(GENERIC_CARTSLOT(config, "slot_b", generic_plain_slot, "macs_cart"));
 	slot_b.set_default_option("rom");
 	slot_b.set_user_loadable(false);
+
+	// TODO: Mono?
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
 }
 
 

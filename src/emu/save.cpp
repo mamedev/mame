@@ -272,12 +272,14 @@ save_error save_manager::write_file(emu_file &file)
 			{
 				if (file.seek(0, SEEK_SET))
 					return false;
-				writer = util::core_file_read_write(file);
-				return bool(writer);
+				util::core_file::ptr proxy;
+				std::error_condition filerr = util::core_file::open_proxy(file, proxy);
+				writer = std::move(proxy);
+				return !filerr && writer;
 			},
 			[&file, &writer] ()
 			{
-				writer = util::zlib_write(util::core_file_read_write(file), 6, 16384);
+				writer = util::zlib_write(file, 6, 16384);
 				return bool(writer);
 			});
 	return (STATERR_NONE != err) ? err : writer->finalize() ? STATERR_WRITE_ERROR : STATERR_NONE;
@@ -303,12 +305,14 @@ save_error save_manager::read_file(emu_file &file)
 			{
 				if (file.seek(0, SEEK_SET))
 					return false;
-				reader = util::core_file_read(file);
-				return bool(reader);
+				util::core_file::ptr proxy;
+				std::error_condition filerr = util::core_file::open_proxy(file, proxy);
+				reader = std::move(proxy);
+				return !filerr && reader;
 			},
 			[&file, &reader] ()
 			{
-				reader = util::zlib_read(util::core_file_read(file), 16384);
+				reader = util::zlib_read(file, 16384);
 				return bool(reader);
 			});
 }

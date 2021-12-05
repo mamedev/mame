@@ -9,6 +9,16 @@ license:CC0
 Cartridges(MCU+ROM) for Entex Select-A-Game Machine, note that the manual and
 label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartridge"
 
+Games released, MCU:
+- Baseball 4       - HD38800
+- Basketball 3     - HD38800
+- Football 4       - TMS1670
+- Pac-Man 2        - HD38800
+- Pinball          - HD38800
+- Space Invader 2  - HD38800
+
+Battleship and Turtles were announced but unreleased.
+
 -->
 
 <softwarelist name="entex_sag" description="Select-A-Game cartridges">
@@ -50,6 +60,18 @@ label calls one "Select-A-Game Cartridge" and not "Select-A-Game Machine Cartrid
 			</dataarea>
 			<dataarea name="rom:opla" size="557">
 				<rom name="tms1400_sag_fb4_output.pla" size="557" crc="f15dc6a1" sha1="ee11a64037895ac566e902b6b590ff62a7f703b0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman2">
+		<description>Pac-Man 2</description>
+		<year>1981</year>
+		<publisher>Entex</publisher>
+		<part name="cart" interface="sag_cart">
+			<dataarea name="rom" size="0x2000"> <!-- HD38800 MCU -->
+				<rom name="pac1_hd38800a36" offset="0x0000" size="0x1000" crc="6050bc45" sha1="093d0905b73dc9050adb6a6d700ca4f068f009c1" />
+				<rom offset="0x1e80" size="0x0100" loadflag="continue" />
 			</dataarea>
 		</part>
 	</software>

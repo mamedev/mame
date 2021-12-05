@@ -13,6 +13,7 @@
 #include "corestr.h"
 #include "unzip.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
 #include <cstdlib>
@@ -48,7 +49,7 @@ int is_path_separator(char c)
 
 bool is_root(std::string_view path)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	// FIXME: don't assume paths are DOS-like - UNC paths, \\?\ long path prefix, etc. complicate this
 
 	// skip drive letter
@@ -58,8 +59,7 @@ bool is_root(std::string_view path)
 	// skip path separators
 	return path.find_first_not_of(PATH_SEPARATOR) == std::string_view::npos;
 #else
-	// FIXME: handle multiple successive path separators, current directory references, parent directory references
-	return (path.length() == 1) && (path[0] == '/');
+	return path.find_first_not_of(PATH_SEPARATOR) == std::string_view::npos;
 #endif
 }
 
@@ -208,14 +208,12 @@ std::error_condition zippath_resolve(std::string_view path, osd::directory::entr
 	bool went_up = false;
 	do
 	{
-		if (!is_root(apath))
-		{
-			// trim the path of trailing path separators
-			auto i = apath.find_last_not_of(PATH_SEPARATOR);
-			if (i == std::string::npos)
-				break;
-			apath = apath.substr(0, i + 1);
-		}
+		// trim the path of trailing path separators
+		auto const i = apath.find_last_not_of(PATH_SEPARATOR);
+		if (i != std::string::npos)
+			apath.erase(std::max<decltype(i)>(i + 1, 2)); // don't erase drive letter
+		else if (!is_root(apath))
+			break;
 
 		apath_trimmed = apath;
 
@@ -353,6 +351,9 @@ public:
 		m_zipfile(std::move(zipfile)),
 		m_zipprefix(std::move(zipprefix))
 	{
+		for (char &ch : m_zipprefix)
+			if (is_path_separator(ch))
+				ch = '/';
 	}
 
 	virtual bool is_archive() const override { return true; }
@@ -458,7 +459,7 @@ private:
 
 	bool m_called_zip_first = false;
 	archive_file::ptr const m_zipfile;
-	std::string const m_zipprefix;
+	std::string m_zipprefix;
 	std::forward_list<std::string> m_returned_dirlist;
 };
 
@@ -569,14 +570,13 @@ zippath_directory::~zippath_directory()
 std::string zippath_parent(std::string_view path)
 {
 	// skip over trailing path separators
-	std::string_view::size_type pos = path.find_last_not_of(PATH_SEPARATOR);
+	auto pos = std::find_if_not(path.rbegin(), path.rend(), &is_path_separator);
 
 	// now skip until we find a path separator
-	while ((pos != std::string_view::npos) && !is_path_separator(path[pos]))
-		pos = (pos > 0) ? pos - 1 : std::string_view::npos;
+	pos = std::find_if(pos, path.rend(), &is_path_separator);
 
-	if (pos != std::string_view::npos)
-		return std::string(path, 0, pos + 1);
+	if (path.rend() != pos)
+		return std::string(path.begin(), pos.base());
 	else
 		return std::string();
 }
@@ -613,7 +613,7 @@ std::string &zippath_combine(std::string &dst, const std::string &path1, const s
 	{
 		dst.assign(path2);
 	}
-	else if (!path1.empty() && !is_path_separator(*path1.rbegin()))
+	else if (!path1.empty() && !is_path_separator(path1.back()))
 	{
 		dst.assign(path1).append(PATH_SEPARATOR).append(path2);
 	}
@@ -671,7 +671,7 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 	file = nullptr;
 
 	// loop through
-	while (!file && !mainpath.empty() && ((openflags == OPEN_FLAG_READ) || subpath.empty()))
+	while (!file && !mainpath.empty())
 	{
 		// is the mainpath a ZIP path?
 		if (is_zip_file(mainpath) || is_7z_file(mainpath))
@@ -680,23 +680,34 @@ std::error_condition zippath_fopen(std::string_view filename, uint32_t openflags
 			std::error_condition const ziperr = is_zip_file(mainpath) ? archive_file::open_zip(mainpath, zip) : archive_file::open_7z(mainpath, zip);
 			if (!ziperr)
 			{
-				// it is a zip file - error if we're not opening for reading
-				if (openflags != OPEN_FLAG_READ)
-				{
-					filerr = std::errc::permission_denied;
-					goto done;
-				}
-
 				osd::directory::entry::entry_type entry_type;
 				int header;
 				if (!subpath.empty())
+				{
 					header = zippath_find_sub_path(*zip, subpath, entry_type);
+				}
 				else
+				{
 					header = zip->first_file();
+					entry_type = osd::directory::entry::entry_type::FILE;
+				}
 
 				if (header < 0)
 				{
-					filerr = std::errc::no_such_file_or_directory;
+					if (openflags & OPEN_FLAG_CREATE)
+						filerr = std::errc::permission_denied;
+					else
+						filerr = std::errc::no_such_file_or_directory;
+					goto done;
+				}
+				else if (osd::directory::entry::entry_type::DIR == entry_type)
+				{
+					filerr = std::errc::is_a_directory;
+					goto done;
+				}
+				else if (openflags & OPEN_FLAG_WRITE)
+				{
+					filerr = std::errc::permission_denied;
 					goto done;
 				}
 

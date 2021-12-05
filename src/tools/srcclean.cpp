@@ -186,7 +186,7 @@ private:
 
 	// output state management
 	unsigned                    m_output_column = 0U;
-	unsigned                    m_indent;
+	unsigned                    m_indent        = 0U;
 	unsigned                    m_tab_limit     = std::numeric_limits<unsigned>::max();
 	std::vector<char32_t>       m_whitespace;
 
@@ -2212,7 +2212,7 @@ int main(int argc, char *argv[])
 {
 	bool                    keep_backup(false);
 	bool                    dry_run(false);
-#if defined(WIN32)
+#if defined(_WIN32)
 	cleaner_base::newline   newline_mode(cleaner_base::newline::DOS);
 #else
 	cleaner_base::newline   newline_mode(cleaner_base::newline::UNIX);
@@ -2287,9 +2287,15 @@ int main(int argc, char *argv[])
 
 			// read/process in chunks
 			output.clear();
-			std::uint64_t remaining(infile->size());
-			std::uint32_t block;
-			while (remaining && (0U != (block = infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining)))))
+			std::uint64_t remaining;
+			if (infile->length(remaining))
+			{
+				util::stream_format(std::cerr, "Can't get length of %1$s\n", argv[i]);
+				++failures;
+				continue;
+			}
+			std::size_t block;
+			while (remaining && !infile->read(original, (std::min)(std::uint64_t(sizeof(original)), remaining), block) && block)
 			{
 				remaining -= block;
 				cleaner->process(original, original + block);

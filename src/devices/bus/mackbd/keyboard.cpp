@@ -742,6 +742,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -757,6 +759,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -771,6 +775,8 @@ public:
 		: keyboard_base(mconfig, MACKBD_M0110T, tag, owner, clock)
 	{
 	}
+
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
 
 protected:
 	virtual ioport_constructor device_input_ports() const override
@@ -839,6 +845,8 @@ public:
 	{
 	}
 
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
+
 protected:
 	virtual ioport_constructor device_input_ports() const override
 	{
@@ -853,6 +861,8 @@ public:
 		: keypad_base(mconfig, MACKBD_M0120P, tag, owner, clock)
 	{
 	}
+
+	static auto parent_rom_device_type() { return &MACKBD_M0110; }
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override

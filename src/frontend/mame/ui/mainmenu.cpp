@@ -46,21 +46,78 @@
 
 namespace ui {
 
+enum : unsigned {
+	INPUT_GROUPS,
+	INPUT_SPECIFIC,
+	SETTINGS_DIP_SWITCHES,
+	SETTINGS_DRIVER_CONFIG,
+	ANALOG,
+	BOOKKEEPING,
+	GAME_INFO,
+	WARN_INFO,
+	IMAGE_MENU_IMAGE_INFO,
+	IMAGE_MENU_FILE_MANAGER,
+	TAPE_CONTROL,
+	SLOT_DEVICES,
+	NETWORK_DEVICES,
+	KEYBOARD_MODE,
+	SLIDERS,
+	VIDEO_TARGETS,
+	VIDEO_OPTIONS,
+	CROSSHAIR,
+	CHEAT,
+	PLUGINS,
+	BIOS_SELECTION,
+	BARCODE_READ,
+	PTY_INFO,
+	EXTERNAL_DATS,
+	ADD_FAVORITE,
+	REMOVE_FAVORITE,
+	ABOUT,
+	QUIT_GAME,
+	DISMISS,
+	SELECT_GAME
+};
+
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
 
 /*-------------------------------------------------
-    menu_main constructor - populate the main menu
+    menu_main constructor/destructor
 -------------------------------------------------*/
 
-menu_main::menu_main(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_main::menu_main(mame_ui_manager &mui, render_container &container)
+	: menu(mui, container)
+	, m_phase(machine_phase::PREINIT)
+{
+	set_needs_prev_menu_item(false);
+}
+
+menu_main::~menu_main()
 {
 }
 
+
+/*-------------------------------------------------
+    menu_activated - handle coming to foreground
+-------------------------------------------------*/
+
+void menu_main::menu_activated()
+{
+	if (machine().phase() != m_phase)
+		reset(reset_options::REMEMBER_REF);
+}
+
+
+/*-------------------------------------------------
+    populate - populate main menu items
+-------------------------------------------------*/
+
 void menu_main::populate(float &customtop, float &custombottom)
 {
-	/* add main menu items */
+	m_phase = machine().phase();
+
 	item_append(_("Input (general)"), 0, (void *)INPUT_GROUPS);
 
 	item_append(_("Input (this Machine)"), 0, (void *)INPUT_SPECIFIC);
@@ -122,11 +179,14 @@ void menu_main::populate(float &customtop, float &custombottom)
 	if (machine().options().cheat())
 		item_append(_("Cheat"), 0, (void *)CHEAT);
 
-	if (machine().options().plugins() && !mame_machine_manager::instance()->lua()->get_menu().empty())
-		item_append(_("Plugin Options"), 0, (void *)PLUGINS);
+	if (machine_phase::RESET <= m_phase)
+	{
+		if (machine().options().plugins() && !mame_machine_manager::instance()->lua()->get_menu().empty())
+			item_append(_("Plugin Options"), 0, (void *)PLUGINS);
 
-	if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
-		item_append(_("External DAT View"), 0, (void *)EXTERNAL_DATS);
+		if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
+			item_append(_("External DAT View"), 0, (void *)EXTERNAL_DATS);
+	}
 
 	item_append(menu_item_type::SEPARATOR);
 
@@ -143,23 +203,29 @@ void menu_main::populate(float &customtop, float &custombottom)
 
 //  item_append(_("Quit from Machine"), 0, (void *)QUIT_GAME);
 
-	item_append(_("Select New Machine"), 0, (void *)SELECT_GAME);
+	if (machine_phase::INIT == m_phase)
+	{
+		item_append(_("Start Machine"), 0, (void *)DISMISS);
+	}
+	else
+	{
+		item_append(_("Select New Machine"), 0, (void *)SELECT_GAME);
+		item_append(_("Return to Machine"), 0, (void *)DISMISS);
+	}
 }
 
-menu_main::~menu_main()
-{
-}
 
 /*-------------------------------------------------
-    menu_main - handle the main menu
+    handle - handle main menu events
 -------------------------------------------------*/
 
-void menu_main::handle()
+void menu_main::handle(event const *ev)
 {
-	/* process the menu */
-	const event *menu_event = process(0);
-	if (menu_event != nullptr && menu_event->iptkey == IPT_UI_SELECT) {
-		switch((long long)(menu_event->itemref)) {
+	// process the menu
+	if (ev && (ev->iptkey == IPT_UI_SELECT))
+	{
+		switch (uintptr_t(ev->itemref))
+		{
 		case INPUT_GROUPS:
 			menu::stack_push<menu_input_groups>(ui(), container());
 			break;
@@ -269,18 +335,22 @@ void menu_main::handle()
 
 		case ADD_FAVORITE:
 			mame_machine_manager::instance()->favorite().add_favorite(machine());
-			reset(reset_options::REMEMBER_POSITION);
+			reset(reset_options::REMEMBER_REF);
 			break;
 
 		case REMOVE_FAVORITE:
 			mame_machine_manager::instance()->favorite().remove_favorite(machine());
-			reset(reset_options::REMEMBER_POSITION);
+			reset(reset_options::REMEMBER_REF);
 			break;
 
 		case QUIT_GAME:
 			stack_pop();
 			ui().request_quit();
 			break;
+
+		case DISMISS:
+			stack_pop();
+			return;
 
 		default:
 			fatalerror("ui::menu_main::handle - unknown reference\n");

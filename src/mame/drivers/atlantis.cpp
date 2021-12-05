@@ -52,7 +52,6 @@
 #include "machine/pci-ide.h"
 #include "video/zeus2.h"
 #include "machine/timekpr.h"
-#include "coreutil.h"
 #include "emupal.h"
 
 

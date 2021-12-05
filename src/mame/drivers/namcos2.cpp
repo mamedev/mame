@@ -3727,8 +3727,54 @@ ROM_START( fourtraxa )
 	ROM_LOAD16_BYTE( "fx_voi-1.3m", 0x000000, 0x080000, CRC(6173364f) SHA1(cc426f49b7e87b11f1f51e8e10db7cad87ffb44d) )
 ROM_END
 
-/* MARVEL LAND (USA) */
+/* MARVEL LAND (JAPAN) */
 ROM_START( marvland )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
+	ROM_LOAD16_BYTE( "mv1-mpr0.bin",  0x000000, 0x010000, CRC(8369120f) SHA1(58cf481bf97f74a91ecc5ff77696528441b41b04) )
+	ROM_LOAD16_BYTE( "mv1-mpr1.bin",  0x000001, 0x010000, CRC(6d5442cc) SHA1(8cdaf6e1ec735740ace78393df2d867a213a4725) )
+
+	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
+	ROM_LOAD16_BYTE( "mv1-spr0.bin",  0x000000, 0x010000, CRC(c3909925) SHA1(bf76cb77c38787574bf75caf868700316894895c) )
+	ROM_LOAD16_BYTE( "mv1-spr1.bin",  0x000001, 0x010000, CRC(1c5599f5) SHA1(6bdf11da4e2a56c6bb6011977b045d9537d0597f) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
+	ROM_LOAD( "mv1-snd0.bin",  0x000000, 0x020000, CRC(51b8ccd7) SHA1(5aacb020c12d9a3c43c098f3abd8358bc18acc64) )
+
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
+	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj0.bin",  0x000003, CRC(73a29361) SHA1(fc8ac9a063c1f18ae619ddca3062491774c86040) )
+	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj1.bin",  0x000002, CRC(abbe4a99) SHA1(7f8df4b40236b97a0dce984698308647d5803244) )
+	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj2.bin",  0x000001, CRC(753659e0) SHA1(2662acf7bec528c7ac4181f62154581e304eea82) )
+	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj3.bin",  0x000000, CRC(d1ce7339) SHA1(a89a0ef39b6ac3fdaf6a2b3c04fd048827fcdb13) )
+
+	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
+	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr0.bin",  0x000000, CRC(1c7e8b4f) SHA1(b9d61895d9c9302c5cb5f7bb7f045b2014c12317) )
+	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr1.bin",  0x080000, CRC(01e4cafd) SHA1(27c911d6d4501233094826cf1b4b809b832d6d9f) )
+	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr2.bin",  0x100000, CRC(198fcc6f) SHA1(b28f97d58fb2365843bbc3764cb59bfb9d5dfd92) )
+	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr3.bin",  0x180000, CRC(ed6f22a5) SHA1(62ab2a2746abbbed533a5b519bbb0d603030cdca) )
+
+	ROM_REGION( 0x400000, "s2roz", 0 ) /* ROZ Tiles */
+	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz0.bin",  0x000000, CRC(7381a5a9) SHA1(0515630f124725adfd21575b390209833bb6a6ef) )
+	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz1.bin",  0x080000, CRC(e899482e) SHA1(caa511baba1805c485503353efdade9e218f2ba5) )
+	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz2.bin",  0x100000, CRC(de141290) SHA1(c1daa6c01ba592138cffef02edfa0928f2232079) )
+	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz3.bin",  0x180000, CRC(e310324d) SHA1(936c7aeace677ed51a720e4ae96cdac0f4984a9b) )
+	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz4.bin",  0x200000, CRC(48ddc5a9) SHA1(c524b18d7b4526227d5b99d7e4a4582ce2ecd373) )
+
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 ) /* Mask shape */
+	NAMCOS2_GFXROM_LOAD_256K( "mv1-sha.bin",  0x000000, CRC(a47db5d3) SHA1(110e26412aa84f229773049112709be457b7a6ff) )
+
+	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
+	NAMCOS2_DATA_LOAD_E_128K( "mv1-dat0.13s",  0x000000, CRC(e15f412e) SHA1(d3ff006d4577540a690c912e94897a1b638ac265) )
+	NAMCOS2_DATA_LOAD_O_128K( "mv1-dat1.13p",  0x000000, CRC(73e1545a) SHA1(a04034e56fef69fb2a2eb88f2f392c376e52d00d) )
+
+	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
+	ROM_LOAD16_BYTE( "mv1-voi1.bin",  0x000000, 0x080000, CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) )
+ROM_END
+
+/* MARVEL LAND (USA) */
+ROM_START( marvlandup )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "mv2_mpr0",  0x000000, 0x020000, CRC(d8b14fee) SHA1(8b5615106426efad45c651f1d6b9a6e3238bc242) )
 	ROM_LOAD16_BYTE( "mv2_mpr1",  0x000001, 0x020000, CRC(29ff2738) SHA1(9f493f32ae1c4e7ef48d7e208c63a222636bda06) )
@@ -3773,52 +3819,6 @@ ROM_START( marvland )
 
 	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
 	ROM_LOAD16_BYTE( "mv1-voi1.bin",  0x000000, 0x080000, BAD_DUMP CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) ) // either undumped, or PCB was wrongly populated with JP samples ROM?
-ROM_END
-
-/* MARVEL LAND (JAPAN) */
-ROM_START( marvlandj )
-	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "mv1-mpr0.bin",  0x000000, 0x010000, CRC(8369120f) SHA1(58cf481bf97f74a91ecc5ff77696528441b41b04) )
-	ROM_LOAD16_BYTE( "mv1-mpr1.bin",  0x000001, 0x010000, CRC(6d5442cc) SHA1(8cdaf6e1ec735740ace78393df2d867a213a4725) )
-
-	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "mv1-spr0.bin",  0x000000, 0x010000, CRC(c3909925) SHA1(bf76cb77c38787574bf75caf868700316894895c) )
-	ROM_LOAD16_BYTE( "mv1-spr1.bin",  0x000001, 0x010000, CRC(1c5599f5) SHA1(6bdf11da4e2a56c6bb6011977b045d9537d0597f) )
-
-	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "mv1-snd0.bin",  0x000000, 0x020000, CRC(51b8ccd7) SHA1(5aacb020c12d9a3c43c098f3abd8358bc18acc64) )
-
-	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
-	ROM_LOAD( "sys2c65c.bin",  0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
-
-	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
-	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj0.bin",  0x000003, CRC(73a29361) SHA1(fc8ac9a063c1f18ae619ddca3062491774c86040) )
-	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj1.bin",  0x000002, CRC(abbe4a99) SHA1(7f8df4b40236b97a0dce984698308647d5803244) )
-	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj2.bin",  0x000001, CRC(753659e0) SHA1(2662acf7bec528c7ac4181f62154581e304eea82) )
-	NAMCOS2_SPRROM_LOAD_256K( "mv1-obj3.bin",  0x000000, CRC(d1ce7339) SHA1(a89a0ef39b6ac3fdaf6a2b3c04fd048827fcdb13) )
-
-	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
-	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr0.bin",  0x000000, CRC(1c7e8b4f) SHA1(b9d61895d9c9302c5cb5f7bb7f045b2014c12317) )
-	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr1.bin",  0x080000, CRC(01e4cafd) SHA1(27c911d6d4501233094826cf1b4b809b832d6d9f) )
-	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr2.bin",  0x100000, CRC(198fcc6f) SHA1(b28f97d58fb2365843bbc3764cb59bfb9d5dfd92) )
-	NAMCOS2_GFXROM_LOAD_256K( "mv1-chr3.bin",  0x180000, CRC(ed6f22a5) SHA1(62ab2a2746abbbed533a5b519bbb0d603030cdca) )
-
-	ROM_REGION( 0x400000, "s2roz", 0 ) /* ROZ Tiles */
-	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz0.bin",  0x000000, CRC(7381a5a9) SHA1(0515630f124725adfd21575b390209833bb6a6ef) )
-	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz1.bin",  0x080000, CRC(e899482e) SHA1(caa511baba1805c485503353efdade9e218f2ba5) )
-	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz2.bin",  0x100000, CRC(de141290) SHA1(c1daa6c01ba592138cffef02edfa0928f2232079) )
-	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz3.bin",  0x180000, CRC(e310324d) SHA1(936c7aeace677ed51a720e4ae96cdac0f4984a9b) )
-	NAMCOS2_GFXROM_LOAD_128K( "mv1-roz4.bin",  0x200000, CRC(48ddc5a9) SHA1(c524b18d7b4526227d5b99d7e4a4582ce2ecd373) )
-
-	ROM_REGION( 0x080000, "c123tmap:mask", 0 ) /* Mask shape */
-	NAMCOS2_GFXROM_LOAD_256K( "mv1-sha.bin",  0x000000, CRC(a47db5d3) SHA1(110e26412aa84f229773049112709be457b7a6ff) )
-
-	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "mv1-dat0.13s",  0x000000, CRC(e15f412e) SHA1(d3ff006d4577540a690c912e94897a1b638ac265) )
-	NAMCOS2_DATA_LOAD_O_128K( "mv1-dat1.13p",  0x000000, CRC(73e1545a) SHA1(a04034e56fef69fb2a2eb88f2f392c376e52d00d) )
-
-	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
-	ROM_LOAD16_BYTE( "mv1-voi1.bin",  0x000000, 0x080000, CRC(de5cac09) SHA1(2d73e54c4f159e52db2c403a59d6c137cce6f53e) )
 ROM_END
 
 /* METAL HAWK */
@@ -3962,6 +3962,57 @@ ROM_START( mirninja )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
 	ROM_LOAD16_BYTE( "mn_mpr0e.bin",  0x000000, 0x010000, CRC(fa75f977) SHA1(15f8ce9417d663ea659e2c35d5b318c5e275f997) )
 	ROM_LOAD16_BYTE( "mn_mpr1e.bin",  0x000001, 0x010000, CRC(58ddd464) SHA1(1b0c0023f7130c8b4cdc207ed32582f107953b51) )
+
+	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
+	ROM_LOAD16_BYTE( "mn1_spr0.bin",  0x000000, 0x010000, CRC(3f1a17be) SHA1(0d6a4e26235f44db4ad217b859c3d215f4e9b423) )
+	ROM_LOAD16_BYTE( "mn1_spr1.bin",  0x000001, 0x010000, CRC(2bc66f60) SHA1(7b778ee3a24f57d43c9bcffbdb77cf8be2463c2d) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
+	ROM_LOAD( "mn_snd0.bin",  0x000000, 0x020000, CRC(6aa1ae84) SHA1(2186f93c4ccc4c202fa14d80b440060237659fc5) )
+
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65b.bin",  0x000000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
+
+	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj0.bin",  0x000003, CRC(6bd1e290) SHA1(11e5f7adef0d7a519246c6d88f9371e49a6b49e9) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj1.bin",  0x000002, CRC(5e8503be) SHA1(e03e13e70932b65e1bd560f685eda107f00a8bb6) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj2.bin",  0x000001, CRC(a96d9b45) SHA1(5ad32ef08c38bff368590e0549c4b4552af5c2c8) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj3.bin",  0x000000, CRC(0086ef8b) SHA1(cd282868e9f05a305816cec6043d31bfa26314b3) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj4.bin",  0x200003, CRC(b3f48755) SHA1(d3b4a0b5d9939dad9b63a85e86afe5aa26dc9849) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj5.bin",  0x200002, CRC(c21e995b) SHA1(03022f11f314f1a6a568cf75850117c98b7c0ce1) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj6.bin",  0x200001, CRC(a052c582) SHA1(eadf07df0e7e13c6e51672860aad4c22b5dcc853) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj7.bin",  0x200000, CRC(1854c6f5) SHA1(f49d18655d05ea9abf1dded17abc61855dba61ef) )
+
+	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr0.bin",  0x000000, CRC(4f66df26) SHA1(7ca1215cb33b9c0898fc17721618a3129d751722) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr1.bin",  0x080000, CRC(f5de5ea7) SHA1(58ba4a5cca631e53b685db342697625c9c9ea50c) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr2.bin",  0x100000, CRC(9ff61924) SHA1(27537743b2df32eb492ec933faabd149e3283256) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr3.bin",  0x180000, CRC(ba208bf5) SHA1(924478a44155707b79698518901fba4e21485740) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr4.bin",  0x200000, CRC(0ef00aff) SHA1(01bf3753d11a3e5ea41fd205d4384f6949ad1c01) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr5.bin",  0x280000, CRC(4cd9d377) SHA1(188e1a88dbd4f6aedd6fbe5e22d4f3a0a88dec3a) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr6.bin",  0x300000, CRC(114aca76) SHA1(d2c6bdfdd0e42cd0c6f99517321c2105e5fc780d) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr7.bin",  0x380000, CRC(2d5705d3) SHA1(690a50b3950a1cf9c27461aa3722c3f1f6a90c87) )
+
+	ROM_REGION( 0x400000, "s2roz", 0 ) /* ROZ Tiles */
+	NAMCOS2_GFXROM_LOAD_128K( "mn_roz0.bin",  0x000000, CRC(677a4f25) SHA1(8ca64833189c75c3f4efd022dbddc54dc2632ec1) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_roz1.bin",  0x080000, CRC(f00ae572) SHA1(cd7f28b2ba03a0bb4d5702ffa36b1140560c9541) )
+
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 ) /* Mask shape */
+	NAMCOS2_GFXROM_LOAD_128K( "mn_sha.bin",  0x000000, CRC(c28af90f) SHA1(8b7f95375eb32c3e30c2a55b7f543235f56d3a13) )
+
+	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
+	NAMCOS2_DATA_LOAD_E_128K( "mn1_dat0.13s",  0x000000, CRC(104bcca8) SHA1(e8368d0dc51bf0653143bf2261d7ed5b54d92941) )
+	NAMCOS2_DATA_LOAD_O_128K( "mn1_dat1.13p",  0x000000, CRC(d2a918fb) SHA1(032b7a7bcc60c41325e7b35df9a932e68cdd0788) )
+
+	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
+	ROM_LOAD16_BYTE( "mn_voi1.bin",  0x000000, 0x080000, CRC(2ca3573c) SHA1(b2af101730de4ccc68acc1ed143c21a8c81f64db) )
+	ROM_LOAD16_BYTE( "mn_voi2.bin",  0x100000, 0x080000, CRC(466c3b47) SHA1(9c282ffda8b0620ae60789c81c6e36c086a9a335) )
+ROM_END
+
+ROM_START( mirninjaa )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
+	ROM_LOAD16_BYTE( "mn1_mpr0",  0x000000, 0x010000, CRC(6d061fd6) SHA1(42d197edc8c8020dc5020ddb187bac6625acc41f) )
+	ROM_LOAD16_BYTE( "mn1_mpr1",  0x000001, 0x010000, CRC(2ece6323) SHA1(1769b0a05e657dcf271f25f4be7452811af6691f) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
 	ROM_LOAD16_BYTE( "mn1_spr0.bin",  0x000000, 0x010000, CRC(3f1a17be) SHA1(0d6a4e26235f44db4ad217b859c3d215f4e9b423) )
@@ -5564,11 +5615,6 @@ void namcos2_state::init_kyukaidk()
 	m_gametype = NAMCOS2_KYUUKAI_DOUCHUUKI;
 }
 
-void namcos2_state::init_marvlanj()
-{
-	m_gametype = NAMCOS2_MARVEL_LAND;
-}
-
 void namcos2_state::init_marvland()
 {
 	m_gametype = NAMCOS2_MARVEL_LAND;
@@ -5735,7 +5781,8 @@ GAME(  1988, ordyne,     0,        base,     base,     namcos2_state, init_ordyn
 GAME(  1988, ordyneje,   ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", MACHINE_SUPPORTS_SAVE )
 GAME(  1988, ordynej,    ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1988, mirninja,   0,        base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, mirninja,   0,        base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, mirninjaa,  mirninja, base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME(  1988, phelios,    0,        base2,    base,     namcos2_state, init_phelios,  ROT90,  "Namco", "Phelios", MACHINE_SUPPORTS_SAVE )
 GAME(  1988, pheliosj,   phelios,  base2,    base,     namcos2_state, init_phelios,  ROT90,  "Namco", "Phelios (Japan)", MACHINE_SUPPORTS_SAVE )
@@ -5753,8 +5800,8 @@ GAME(  1989, finehour,   0,        base2,    base,     namcos2_state, init_fineh
 GAME(  1989, burnforc,   0,        base3,    base,     namcos2_state, init_burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", MACHINE_SUPPORTS_SAVE )
 GAME(  1989, burnforco,  burnforc, base3,    base,     namcos2_state, init_burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1989, marvland,   0,        base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (US, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1989, marvlandj,  marvland, base,     base,     namcos2_state, init_marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, marvland,   0,        base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1989, marvlandup, marvland, base,     base,     namcos2_state, init_marvland, ROT0,   "Namco", "Marvel Land (US, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // or World as no WDUD logo. Game is incomplete and ends abruptly at World 3-4
 
 GAME(  1990, kyukaidk,   0,        base,     kyukaidk, namcos2_state, init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", MACHINE_SUPPORTS_SAVE )
 GAME(  1990, kyukaidko,  kyukaidk, base,     kyukaidk, namcos2_state, init_kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", MACHINE_SUPPORTS_SAVE )

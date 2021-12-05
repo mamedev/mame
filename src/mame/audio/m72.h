@@ -10,8 +10,10 @@
 
 #pragma once
 
-#include "dirom.h"
 #include "sound/dac.h"
+
+#include "dirom.h"
+
 
 class m72_audio_device : public device_t, public device_rom_interface<32> // unknown address bits
 {

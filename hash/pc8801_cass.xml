@@ -4,6 +4,61 @@
 license:CC0
 
 NOTE: This list is here only to document available dumps and it's not used (yet) by MAME!
+
+TODO:
+- Verify which games actually needs to be moved to separate pc8001[mk2[sr]]_cass.xml lists
+  once cassette support works for either system;
+
+Known undumped N-Basic games (excluding stuff already in pc8001_flop.xml except for collection disks):
+kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
+ヘッドオン　パート２, Head-On Part 2, Compaq, 不明, (*) (made by Geimu Kyoujin)
+スペースマウス, Space Mouse, Compaq, Oct 81, (, (*) (made by Geimu Kyoujin)
+ルナシティＳＯＳ, Lunar City SOS, Compaq, Apr 81, (*) (made by Geimu Kyoujin)
+パラシュート, Parachute, Compaq, Jul 82, (Published on マイコンゲームの本3, made by 今風太氏)
+マリンベルト, Marine Belt, Compaq, Jul 82, (*) (made by 今風太氏)
+チェックＰ, Check.P, Compaq, Jul 82, (Published on マイコンゲームの本3, made by 今風太氏)
+スペースシップ, Space Ship, Compaq, Apr 82, (Published on マイコンゲームの本２, made by 今風太氏)
+サブマリン, Sub-Marine, Compaq, Apr 82, (Published on マイコンゲームの本２, made by 今風太氏, not to be confused with "SUBMLIN" games in flop.xml)
+スペーストリップ, Space Trip, Compaq, Feb 82, (*) (made by ＴＯＴＯ氏, any relationship with "Space Trip 2"?)
+ジャックタイガー, Jack Tiger, Compaq, ??? 82,
+パックマン3, Puck Man 3, Compaq, Jul 82, (Published on マイコンゲームの本3, made by Ｙ．Ｋ氏)
+スーパー　インベーダー, Super Invaders, Tsukumo, 不明,
+スペースインベーダー, Space Invaders, 不明, 不明, (made by Ｔ．Ｋ氏)
+クレイジー　クライマー, Crazy Climber, Compaq, Dec 81, (*) (made by Ｓ．Ｉ氏)
+スターウォーズ帝国の逆襲ゲーム, Star Wars: The Empire Strikes Back, Compaq, Dec 80, (*)
+グラフィック　ＱＩＸ, Graphic QIX, Compaq, Jul 82, (Published on マイコンゲームの本3, made by Ｙ．Ｓ氏)
+カーボーイ　ゲーム, Cowboy Game, Compaq, Apr 82, (Published on マイコンゲームの本２, made by Ｈ．Ｎ氏)
+カーレース, Car Race, Tsukumo, 不明,
+スーパースペースウォー, Super Space War, Tsukumo,
+アーマーバルーン, Armor Balloon, Apollo Technica, (Made by Ｍ．Ｕ氏, Mispelled as "Armer?")
+ムービング　ブロック, Moving Block, Tsukumo, 不明,
+ドッグ　ファイト, Dog Fight, 不明, 不明, (Made by ＮＯＤＡ氏)
+ビリヤード, Billiards, 不明, 不明,
+スターファイアー, Star Fire, SystemSoft, 不明,
+バリアアタック, Barrier Attack, Micomsoft, 不明, (Made by Ａ．Ｎ氏　Ｋ．Ｍ氏　Ｍ．Ｉ氏 )
+スターダストナイト, Stardust Night, ASCII, 不明, (Made by Ｊ．Ｈ氏)
+ドラゴンメイズ, Dragon Maze, ASCII, 不明, (Made by ＮＡＣ氏)
+ザ・ナイトボンバー, The Night Bomber, なし, 不明, (Published on PiO Magazine)
+マリンウォー, Marine War, なし, Jan 85 (Made by ＤＡＲＴＨ　ＶＡＤＥＲ氏)
+ワープエイリアン, Warp Alien, なし, Jun 84 (Published on PiO Magazine, made by Ｋ．Ｏ氏)
+バクテリアランド, Bacteria Land, なし, Jun 85 (Published on PiO Magazine, made by 復活のＰＣ氏 / GANBARE8001氏)
+エイリアンプラネット, Alien Planet, Compaq, 不明, (Published on PiO Magazine, made by Ｍｉｃｒｏ　ＯＲＢ氏)
+３Ｄバトルメイズ, 3D-Battle Maze, なし, (Published on PiO Magazine, made by Ｙ．Ｓ氏)
+ベガースネーク, Begger Snake, Compaq, Jun 82 (*, made by Ｈ．Ａ氏)
+ウォーミィ, Wormy, なし, なし (Published on PiO Magazine, made by Ｙ．Ｈ氏)
+ファントムⅣ, Phantom IV, Compaq, Dec 82, (Published on マイコンゲームの本4, made by Ｋ．Ｓ氏)
+ＢＵＲＮ紫の炎, BURN Murasaki no Honoo, Compaq, Apr 82, (Published on マイコンゲームの本2, made by Ａ．Ｋ氏)
+サーキット, Circuit, Compaq, Sep 82, (*)
+スーパーモンスター, Super Monster, Compaq, Jul 82, (Published on マイコンゲームの本3, made by Ｙ．Ｎ氏)
+オセロ, Othello, Compaq, Apr 82, (Published on マイコンゲームの本2, made by Ｙ．Ｉ氏)
+ＴＨＥ悟空 , The Goku, Compaq, Dec 82, (Published on マイコンゲームの本4, made by Ｈ．Ｎ氏)
+リアルタイムアニメーションツール, Real Time Animation Tool, Compaq, 不明, (*)
+ランダムウォーカー, Random Walker, Ample Software, 不明, (also on PC8801, made by Ｍｒ　ＳＡＳＡ)
+キックバル, Kick Ball, なし, なし, (Published on PiO Magazine, also on disk? made by ＴＲＯＰＩＣＡＬ氏)
+
+(*) Published on I/O Magazine
+(**) マイコンゲームの本# is "Microcomputer Game" mag published by Kohgakusha
+
 -->
 <softwarelist name="pc8801_cass" description="NEC PC-8801 cassettes">
 
@@ -39,7 +94,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 <!-- these might be 2-sided cassettes (i.e. we should merge some parts) -->
 <!-- for 8001SR? -->
-	<software name="blckonyx">
+	<software name="blckonyxmk2">
 		<description>The Black Onyx</description>
 		<year>1984</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
@@ -213,7 +268,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="cosmomut">
+	<software name="cosmomu">
 		<description>Cosmo Mutar</description>
 		<year>1984</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -514,7 +569,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="holein1">
+	<software name="holein1t">
 		<description>Hole in One</description>
 		<year>1985</year>
 		<publisher>HAL研究所 (HAL Kenkyuujo)</publisher>
@@ -865,7 +920,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="pacman">
+	<software name="pacmant">
 		<description>Pacman</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
@@ -1263,7 +1318,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="4dhouse">
+	<software name="4dhouset">
 		<description>Yojigen no Ie - 4 Dimension House</description>
 		<year>1983</year>
 		<publisher>プロシューマー (Prosumer)</publisher>

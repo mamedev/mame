@@ -418,6 +418,10 @@ cheat_script::script_entry::script_entry(
 			if (!expression || !expression[0])
 				throw emu_fatalerror("%s.xml(%d): missing expression in action tag\n", filename, entrynode.line);
 			m_expression.parse(expression);
+
+			// initialise these to defautlt values
+			m_line = 0;
+			m_justify = ui::text_layout::text_justify::LEFT;
 		}
 		else
 		{
@@ -431,12 +435,12 @@ cheat_script::script_entry::script_entry(
 
 			// extract other attributes
 			m_line = entrynode.get_attribute_int("line", 0);
-			m_justify = ui::text_layout::LEFT;
+			m_justify = ui::text_layout::text_justify::LEFT;
 			char const *const align(entrynode.get_attribute_string("align", "left"));
 			if (!std::strcmp(align, "center"))
-				m_justify = ui::text_layout::CENTER;
+				m_justify = ui::text_layout::text_justify::CENTER;
 			else if (!std::strcmp(align, "right"))
-				m_justify = ui::text_layout::RIGHT;
+				m_justify = ui::text_layout::text_justify::RIGHT;
 			else if (std::strcmp(align, "left"))
 				throw emu_fatalerror("%s.xml(%d): invalid alignment '%s' specified\n", filename, entrynode.line, align);
 
@@ -547,9 +551,9 @@ void cheat_script::script_entry::save(emu_file &cheatfile) const
 		if (m_line != 0)
 			cheatfile.printf(" line=\"%d\"", m_line);
 
-		if (m_justify == ui::text_layout::CENTER)
+		if (m_justify == ui::text_layout::text_justify::CENTER)
 			cheatfile.printf(" align=\"center\"");
-		else if (m_justify == ui::text_layout::RIGHT)
+		else if (m_justify == ui::text_layout::text_justify::RIGHT)
 			cheatfile.printf(" align=\"right\"");
 
 		if (m_arglist.size() == 0)
@@ -1056,6 +1060,9 @@ constexpr int cheat_manager::CHEAT_VERSION;
 
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine)
+	, m_framecount(0)
+	, m_numlines(0)
+	, m_lastline(0)
 	, m_disabled(true)
 	, m_symtable(machine)
 {
@@ -1236,10 +1243,13 @@ void cheat_manager::render_text(mame_ui_manager &mui, render_container &containe
 		if (!m_output[linenum].empty())
 		{
 			// output the text
-			mui.draw_text_full(container, m_output[linenum],
+			mui.draw_text_full(
+					container,
+					m_output[linenum],
 					0.0f, float(linenum) * mui.get_line_height(), 1.0f,
-					m_justify[linenum], ui::text_layout::NEVER, mame_ui_manager::OPAQUE_,
-					rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+					m_justify[linenum], ui::text_layout::word_wrapping::NEVER,
+					mame_ui_manager::OPAQUE_, rgb_t::white(), rgb_t::black(),
+					nullptr, nullptr);
 		}
 	}
 }

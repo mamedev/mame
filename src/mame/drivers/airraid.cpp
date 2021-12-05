@@ -59,8 +59,8 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
   - Inputs notes :
 
-      * COINx don't work correctly : see "cshooter_coin_r" read handler.
-    * In game, bits 3 and 4 of 0xc202 ("START") are tested,
+      * COINx don't work correctly.
+      * In game, bits 3 and 4 of 0xc202 ("START") are tested,
         while bits 4 and 5 are tested in the "test mode".
       * Pressing STARTx while in game adds lives (depending on the
         "Lives" Dip Switch) for player x.
@@ -172,54 +172,54 @@ public:
 		, m_palette(*this, "palette")
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_airraid_video(*this,"airraid_vid")
+		, m_mainbank(*this, "mainbank")
 	{ }
 
 	void airraid(machine_config &config);
-	void airraid_crypt(machine_config &config);
 
 	void init_cshootere();
 	void init_cshooter();
 
 private:
 	required_device<cpu_device> m_maincpu;
-	optional_device<seibu_sound_device> m_seibu_sound;
-	optional_shared_ptr<uint8_t> m_mainram;
+	required_device<seibu_sound_device> m_seibu_sound;
+	required_shared_ptr<uint8_t> m_mainram;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
-
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_device<airraid_video_device> m_airraid_video;
+	required_memory_bank m_mainbank;
 
-	void cshooter_c500_w(uint8_t data);
-	void cshooter_c700_w(uint8_t data);
+	void c500_w(uint8_t data);
+	void c700_w(uint8_t data);
 	void bank_w(uint8_t data);
-	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
-	void airraid_map(address_map &map);
-	void airraid_sound_decrypted_opcodes_map(address_map &map);
-	void airraid_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_decrypted_opcodes_map(address_map &map);
+	void sound_map(address_map &map);
 	void decrypted_opcodes_map(address_map &map);
 };
 
 
 
-/* main cpu */
+// main CPU
 
-TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::cshooter_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::scanline)
 {
 	int scanline = param;
 
-	if(scanline == 240) // updates scroll resgiters
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
+	if (scanline == 240) // updates scroll registers
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
 
-	if(scanline == 250) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
+	if (scanline == 250) // vblank-out irq
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
 }
 
-void airraid_state::cshooter_c500_w(uint8_t data)
+void airraid_state::c500_w(uint8_t data)
 {
 }
 
-void airraid_state::cshooter_c700_w(uint8_t data)
+void airraid_state::c700_w(uint8_t data)
 {
 }
 
@@ -234,28 +234,27 @@ void airraid_state::bank_w(uint8_t data)
 	// f = fg layer disable
 	// s = sprite layer enable
 
-	membank("bank1")->set_entry((data>>4)&3);
+	m_mainbank->set_entry((data >> 4) & 3);
 
 	m_airraid_video->layer_enable_w(data & 0xcf);
-
 }
 
 
 
 
-void airraid_state::airraid_map(address_map &map)
+void airraid_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0xbfff).bankr("bank1").nopw(); // rld result write-back
+	map(0x8000, 0xbfff).bankr(m_mainbank).nopw(); // rld result write-back
 	map(0xc000, 0xc000).portr("IN0");
 	map(0xc001, 0xc001).portr("IN1");
 	map(0xc002, 0xc002).portr("IN2");
 	map(0xc003, 0xc003).portr("DSW2");
 	map(0xc004, 0xc004).portr("DSW1");
-	map(0xc500, 0xc500).w(FUNC(airraid_state::cshooter_c500_w));
-//  map(0xc600, 0xc600).w(FUNC(airraid_state::cshooter_c600_w));            // see notes
-	map(0xc700, 0xc700).w(FUNC(airraid_state::cshooter_c700_w));
-//  map(0xc801, 0xc801).w(FUNC(airraid_state::cshooter_c801_w));            // see notes
+	map(0xc500, 0xc500).w(FUNC(airraid_state::c500_w));
+//  map(0xc600, 0xc600).w(FUNC(airraid_state::c600_w));            // see notes
+	map(0xc700, 0xc700).w(FUNC(airraid_state::c700_w));
+//  map(0xc801, 0xc801).w(FUNC(airraid_state::c801_w));            // see notes
 	map(0xd000, 0xd7ff).ram().w(m_airraid_video, FUNC(airraid_video_device::txram_w)).share("txram");
 	map(0xd800, 0xd8ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xda00, 0xdaff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
@@ -266,16 +265,16 @@ void airraid_state::airraid_map(address_map &map)
 //  map(0xdc1e, 0xdc1e).ram();
 //  map(0xdc1f, 0xdc1f).ram();
 	map(0xde00, 0xde0f).rw(m_seibu_sound, FUNC(seibu_sound_device::main_r), FUNC(seibu_sound_device::main_w));
-	map(0xe000, 0xfdff).ram().share("mainram");
+	map(0xe000, 0xfdff).ram().share(m_mainram);
 	map(0xfe00, 0xffff).ram().share("sprite_ram");
 }
 
 void airraid_state::decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x7fff).rom().share(m_decrypted_opcodes);
 }
 
-void airraid_state::airraid_sound_map(address_map &map)
+void airraid_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::data_r));
 	map(0x2000, 0x27ff).ram();
@@ -293,7 +292,7 @@ void airraid_state::airraid_sound_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void airraid_state::airraid_sound_decrypted_opcodes_map(address_map &map)
+void airraid_state::sound_decrypted_opcodes_map(address_map &map)
 {
 	map(0x0000, 0x1fff).r("sei80bu", FUNC(sei80bu_device::opcode_r));
 	map(0x8000, 0xffff).rom().region("audiocpu", 0x8000);
@@ -301,7 +300,7 @@ void airraid_state::airraid_sound_decrypted_opcodes_map(address_map &map)
 
 
 static INPUT_PORTS_START( airraid )
-	PORT_START("IN0")   /* IN0  (0xc200) */
+	PORT_START("IN0")   // IN0  (0xc200)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -311,7 +310,7 @@ static INPUT_PORTS_START( airraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")   /* IN1  (0xc201) */
+	PORT_START("IN1")   // IN1  (0xc201)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -321,7 +320,7 @@ static INPUT_PORTS_START( airraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")   /* START    (0xc202) */
+	PORT_START("IN2")   // START    (0xc202)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -331,7 +330,7 @@ static INPUT_PORTS_START( airraid )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW2")  /* DSW2 (0xc203) */
+	PORT_START("DSW2")  // DSW2 (0xc203)
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
@@ -350,7 +349,7 @@ static INPUT_PORTS_START( airraid )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START("DSW1")  /* DSW1 (0xc204) */
+	PORT_START("DSW1")  // DSW1 (0xc204)
 	PORT_DIPNAME( 0x01, 0x01, "Coin Slots" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
@@ -370,7 +369,7 @@ static INPUT_PORTS_START( airraid )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:8" )
 
-	PORT_START("COIN")  /* COIN (0xc205) */
+	PORT_START("COIN")  // COIN (0xc205)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -385,14 +384,15 @@ INPUT_PORTS_END
 
 void airraid_state::airraid(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);        /* verified on pcb */
-	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::airraid_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::cshooter_scanline), "airraid_vid:screen", 0, 1);
+	// basic machine hardware
+	Z80(config, m_maincpu, XTAL(12'000'000) / 2);        // verified on PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &airraid_state::main_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &airraid_state::decrypted_opcodes_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(airraid_state::scanline), "airraid_vid:screen", 0, 1);
 
-	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181)/4));      /* verified on pcb */
-	audiocpu.set_addrmap(AS_PROGRAM, &airraid_state::airraid_sound_map);
-	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::airraid_sound_decrypted_opcodes_map);
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(14'318'181) / 4));      // verified on PCB
+	audiocpu.set_addrmap(AS_PROGRAM, &airraid_state::sound_map);
+	audiocpu.set_addrmap(AS_OPCODES, &airraid_state::sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	config.set_perfect_quantum(m_maincpu);
@@ -401,10 +401,10 @@ void airraid_state::airraid(machine_config &config)
 
 	AIRRAID_VIDEO(config, m_airraid_video, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4));
 	ymsnd.irq_handler().set(m_seibu_sound, FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
@@ -417,16 +417,6 @@ void airraid_state::airraid(machine_config &config)
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 }
-
-
-void airraid_state::airraid_crypt(machine_config &config)
-{
-	airraid(config);
-	m_maincpu->set_addrmap(AS_OPCODES, &airraid_state::decrypted_opcodes_map);
-}
-
-
-
 
 
 /*
@@ -462,7 +452,7 @@ ROM_START( airraid )
 	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
 	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different proms when compared to the cshootert hardware PCB where they were dumped
+	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different PROMs when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "6308.a13",  0x0000, 0x0100, NO_DUMP )
 
@@ -472,7 +462,7 @@ ROM_START( airraid )
 	ROM_REGION( 0x100, "airraid_vid:tx_clut", 0 ) // taken from cshootert, not verified for this PCB
 	ROM_LOAD( "63s281.d16", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
 
-	/* ### MODULE 1 ### Background generation / graphics  */
+	// ### MODULE 1 ### Background generation / graphics
 	ROM_REGION( 0x40000, "airraid_vid:bg_map", 0 )
 	ROM_LOAD16_BYTE( "bg_layouts_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "bg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
@@ -482,7 +472,7 @@ ROM_START( airraid )
 	ROM_REGION( 0x100, "airraid_vid:bg_clut", 0 )
 	ROM_LOAD( "bg_clut",   0x000, 0x100, NO_DUMP )
 
-	/* ### MODULE 2 ### Foreground generation / graphics  */
+	// ### MODULE 2 ### Foreground generation / graphics
 	ROM_REGION( 0x40000, "airraid_vid:fg_map", 0 )
 	ROM_LOAD16_BYTE( "fg_layouts_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
@@ -492,7 +482,7 @@ ROM_START( airraid )
 	ROM_REGION( 0x100, "airraid_vid:fg_clut", 0 )
 	ROM_LOAD( "fg_clut",   0x000, 0x100, NO_DUMP )
 
-	/* ### MODULE 3 ### Sprite graphics  */
+	// ### MODULE 3 ### Sprite graphics
 	ROM_REGION( 0x40000, "airraid_vid:spr_gfx", 0 )
 	ROM_LOAD16_BYTE( "sprite_tiles_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "sprite_tiles_odd",    0x00001, 0x20000, NO_DUMP )
@@ -535,17 +525,17 @@ Note, all ROMs have official sticker, "(C) SEIBU KAIHATSU INC." and a number.
 */
 
 ROM_START( cshooter )
-	ROM_REGION( 0x10000, "maincpu", 0 ) // Main CPU
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.k19",   0x00000, 0x08000, CRC(71418952) SHA1(9745ca006576381c9e9595d8e42ab276bab80a41) )
 
-	ROM_REGION( 0x10000, "maindata", 0 ) // cpu data
+	ROM_REGION( 0x10000, "maindata", 0 ) // CPU data
 	ROM_LOAD( "2.k20",   0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
 	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
-	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different proms when compared to the cshootert hardware PCB where they were dumped
+	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different PROMs when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "6308.a13",  0x0000, 0x0100, NO_DUMP )
 
@@ -556,7 +546,7 @@ ROM_START( cshooter )
 	ROM_REGION( 0x100, "airraid_vid:tx_clut", 0 ) // taken from cshootert, not verified for this PCB
 	ROM_LOAD( "63s281.d16", 0x0000, 0x0100, CRC(0b8b914b) SHA1(8cf4910b846de79661cc187887171ed8ebfd6719) ) // clut
 
-	/* ### MODULE 1 ### Background generation / graphics  */
+	// ### MODULE 1 ### Background generation / graphics
 	ROM_REGION( 0x40000, "airraid_vid:bg_map", 0 )
 	ROM_LOAD16_BYTE( "bg_layouts_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "bg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
@@ -566,7 +556,7 @@ ROM_START( cshooter )
 	ROM_REGION( 0x100, "airraid_vid:bg_clut", 0 )
 	ROM_LOAD( "bg_clut",   0x000, 0x100, NO_DUMP )
 
-	/* ### MODULE 2 ### Foreground generation / graphics  */
+	// ### MODULE 2 ### Foreground generation / graphics
 	ROM_REGION( 0x40000, "airraid_vid:fg_map", 0 )
 	ROM_LOAD16_BYTE( "fg_layouts_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "fg_layouts_odd",    0x00001, 0x20000, NO_DUMP )
@@ -576,7 +566,7 @@ ROM_START( cshooter )
 	ROM_REGION( 0x100, "airraid_vid:fg_clut", 0 )
 	ROM_LOAD( "fg_clut",   0x000, 0x100, NO_DUMP )
 
-	/* ### MODULE 3 ### Sprite graphics  */
+	// ### MODULE 3 ### Sprite graphics
 	ROM_REGION( 0x40000, "airraid_vid:spr_gfx", 0 )
 	ROM_LOAD16_BYTE( "sprite_tiles_even",   0x00000, 0x20000, NO_DUMP )
 	ROM_LOAD16_BYTE( "sprite_tiles_odd",    0x00001, 0x20000, NO_DUMP )
@@ -588,46 +578,44 @@ ROM_END
 
 void airraid_state::init_cshooter()
 {
-	membank("bank1")->configure_entries(0, 4, memregion("maindata")->base(), 0x4000);
+	m_mainbank->configure_entries(0, 4, memregion("maindata")->base(), 0x4000);
 }
 
 void airraid_state::init_cshootere()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	for (int A = 0x0000;A < 0x8000;A++)
+	for (int A = 0x0000; A < 0x8000; A++)
 	{
-		/* decode the opcodes */
+		// decode the opcodes
 		m_decrypted_opcodes[A] = rom[A];
 
-		if (BIT(A,5) && !BIT(A,3))
+		if (BIT(A, 5) && !BIT(A, 3))
 			m_decrypted_opcodes[A] ^= 0x40;
 
-		if (BIT(A,10) && !BIT(A,9) && BIT(A,3))
+		if (BIT(A, 10) && !BIT(A, 9) && BIT(A, 3))
 			m_decrypted_opcodes[A] ^= 0x20;
 
-		if ((BIT(A,10) ^ BIT(A,9)) && BIT(A,1))
+		if ((BIT(A, 10) ^ BIT(A, 9)) && BIT(A, 1))
 			m_decrypted_opcodes[A] ^= 0x02;
 
-		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
-			m_decrypted_opcodes[A] = bitswap<8>(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
+		if (BIT(A, 9) || !BIT(A, 5) || BIT(A, 3))
+			m_decrypted_opcodes[A] = bitswap<8>(m_decrypted_opcodes[A], 7, 6, 1, 4, 3, 2, 5, 0);
 
-		/* decode the data */
-		if (BIT(A,5))
+		// decode the data
+		if (BIT(A, 5))
 			rom[A] ^= 0x40;
 
-		if (BIT(A,9) || !BIT(A,5))
-			rom[A] = bitswap<8>(rom[A],7,6,1,4,3,2,5,0);
+		if (BIT(A, 9) || !BIT(A,5))
+			rom[A] = bitswap<8>(rom[A], 7, 6, 1, 4, 3, 2, 5, 0);
 	}
 
 	init_cshooter();
-
 }
 
 } // Anonymous namespace
 
 
 // There's also an undumped International Games version
-GAME( 1987, cshooter, airraid, airraid_crypt, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airraid,  0,       airraid_crypt, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-
+GAME( 1987, cshooter, airraid, airraid, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (Single PCB)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airraid,  0,       airraid, airraid, airraid_state, init_cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (Single PCB)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

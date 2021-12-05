@@ -151,24 +151,32 @@ void lua_engine::initialize_input(sol::table &emu)
 	ioport_manager_type["type_group"] = sol::overload(
 			&ioport_manager::type_group,
 			[] (ioport_manager &im, ioport_type type) { return im.type_group(type, 0); });
-	ioport_manager_type["type_seq"] = sol::overload(
-			[] (ioport_manager &im, ioport_type type, int player, char const *seq_type_string)
+	ioport_manager_type["type_seq"] =
+			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string)
 			{
-				input_seq_type seq_type = s_seq_type_parser(seq_type_string);
-				return im.type_seq(type, player, seq_type);
-			},
-			[] (ioport_manager &im, ioport_type type, int player) { return im.type_seq(type, player, SEQ_TYPE_STANDARD); },
-			[] (ioport_manager &im, ioport_type type) { return im.type_seq(type, 0, SEQ_TYPE_STANDARD); });
+				if (!player)
+					player = 0;
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				return im.type_seq(type, *player, seq_type);
+			};
+	ioport_manager_type["set_type_seq"] =
+			[] (ioport_manager &im, ioport_type type, std::optional<int> player, std::optional<char const *> seq_type_string, input_seq const &seq)
+			{
+				if (!player)
+					player = 0;
+				input_seq_type seq_type = seq_type_string ? s_seq_type_parser(*seq_type_string) : SEQ_TYPE_STANDARD;
+				im.set_type_seq(type, *player, seq_type, seq);
+			};
 	ioport_manager_type["token_to_input_type"] =
-		[] (ioport_manager &im, std::string const &string)
-		{
-			int player;
-			ioport_type const type = im.token_to_input_type(string.c_str(), player);
-			return std::make_tuple(type, player);
-		};
+			[] (ioport_manager &im, std::string const &string)
+			{
+				int player;
+				ioport_type const type = im.token_to_input_type(string.c_str(), player);
+				return std::make_tuple(type, player);
+			};
 	ioport_manager_type["input_type_to_token"] = sol::overload(
-			&ioport_manager::input_type_to_token,
-			[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
+				&ioport_manager::input_type_to_token,
+				[] (ioport_manager &im, ioport_type type) { return im.input_type_to_token(type, 0); });
 	ioport_manager_type["ports"] = sol::property([] (ioport_manager &im) { return tag_object_ptr_map<ioport_list>(im.ports()); });
 
 
@@ -203,7 +211,7 @@ void lua_engine::initialize_input(sol::table &emu)
 			});
 
 
-	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor);
+	auto ioport_port_type = sol().registry().new_usertype<ioport_port>("ioport_port", sol::no_constructor);
 	ioport_port_type["read"] = &ioport_port::read;
 	ioport_port_type["write"] = &ioport_port::write;
 	ioport_port_type["field"] = &ioport_port::field;
@@ -244,6 +252,12 @@ void lua_engine::initialize_input(sol::table &emu)
 			ioport_field::user_settings settings;
 			f.get_user_settings(settings);
 			settings.seq[seq_type] = seq;
+			if (seq.is_default())
+				settings.cfg[seq_type].clear();
+			else if (!seq.length())
+				settings.cfg[seq_type] = "NONE";
+			else
+				settings.cfg[seq_type] = f.port().device().machine().input().seq_to_tokens(seq);
 			f.set_user_settings(settings);
 		};
 	ioport_field_type["input_seq"] =
@@ -394,6 +408,17 @@ void lua_engine::initialize_input(sol::table &emu)
 	seqpoll_type["sequence"] = sol::property(&input_sequence_poller::sequence);
 	seqpoll_type["valid"] = sol::property(&input_sequence_poller::valid);
 	seqpoll_type["modified"] = sol::property(&input_sequence_poller::modified);
+
+
+	auto iptseq_type = emu.new_usertype<input_seq>(
+			"input_seq",
+			sol::call_constructor, sol::constructors<input_seq(), input_seq(input_seq const &)>());
+	iptseq_type["reset"] = &input_seq::reset;
+	iptseq_type["set_default"] = &input_seq::set_default;
+	iptseq_type["empty"] = sol::property(&input_seq::empty);
+	iptseq_type["length"] = sol::property(&input_seq::length);
+	iptseq_type["is_valid"] = sol::property(&input_seq::is_valid);
+	iptseq_type["is_default"] = sol::property(&input_seq::is_default);
 
 
 	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", sol::no_constructor);

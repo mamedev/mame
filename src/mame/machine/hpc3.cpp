@@ -28,16 +28,16 @@ hpc3_device::hpc3_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, SGI_HPC3, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_pio_space_config{
-		{"PIO channel 0", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 1", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 2", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 3", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 4", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 5", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 6", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 7", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 8", ENDIANNESS_LITTLE, 16, 8, -1},
-		{"PIO channel 9", ENDIANNESS_LITTLE, 16, 8, -1}}
+		{"pio0", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio1", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio2", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio3", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio4", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio5", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio6", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio7", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio8", ENDIANNESS_LITTLE, 16, 8, -1},
+		{"pio9", ENDIANNESS_LITTLE, 16, 8, -1}}
 	, m_gio64_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_hal2(*this, finder_base::DUMMY_TAG)
 	, m_enet(*this, finder_base::DUMMY_TAG)

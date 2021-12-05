@@ -176,6 +176,10 @@ const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V7_INT
 	{ 0x3d, { false, "restore"  } }
 };
 
+const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::SPARCLITE_INT_OP_DESC[] = {
+	{ 0x1d, { false, "divscc"   } }, { 0x22, { false, "scan"     } }
+};
+
 const sparc_disassembler::int_op_desc_map::value_type sparc_disassembler::V8_INT_OP_DESC[] = {
 	{ 0x0a, { false, "umul"     } }, { 0x1a, { false, "umulcc"   } },
 	{ 0x0b, { false, "smul"     } }, { 0x1b, { false, "smulcc"   } },
@@ -610,24 +614,24 @@ inline void sparc_disassembler::pad_op_field(std::ostream &stream, std::streampo
 		stream << ' ';
 }
 
-sparc_disassembler::sparc_disassembler(const config *conf, unsigned version)
+sparc_disassembler::sparc_disassembler(const config *conf, sparc_version version)
 	: sparc_disassembler(conf, version, vis_none)
 {
 }
 
-sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis_level vis)
+sparc_disassembler::sparc_disassembler(const config *conf, sparc_version version, vis_level vis)
 	: m_version(version)
 	, m_vis_level(vis)
 	, m_op_field_width(9)
 	, m_branch_desc{
 		EMPTY_BRANCH_DESC,
-		(version >= 9) ? BPCC_DESC : EMPTY_BRANCH_DESC,     // branch on integer condition codes with prediction, SPARCv9
-		BICC_DESC,                                          // branch on integer condition codes
-		(version >= 9) ? BPR_DESC : EMPTY_BRANCH_DESC,      // branch on integer register with prediction, SPARCv9
+		(version >= v9) ? BPCC_DESC : EMPTY_BRANCH_DESC,     // branch on integer condition codes with prediction, SPARCv9
+		BICC_DESC,                                           // branch on integer condition codes
+		(version >= v9) ? BPR_DESC : EMPTY_BRANCH_DESC,      // branch on integer register with prediction, SPARCv9
 		EMPTY_BRANCH_DESC,
-		(version >= 9) ? FBPFCC_DESC : EMPTY_BRANCH_DESC,   // branch on floating-point condition codes with prediction, SPARCv9
-		FBFCC_DESC,                                         // branch on floating-point condition codes
-		(version == 8) ? CBCCC_DESC : EMPTY_BRANCH_DESC     // branch on coprocessor condition codes, SPARCv8
+		(version >= v9) ? FBPFCC_DESC : EMPTY_BRANCH_DESC,   // branch on floating-point condition codes with prediction, SPARCv9
+		FBFCC_DESC,                                          // branch on floating-point condition codes
+		(version == v8) ? CBCCC_DESC : EMPTY_BRANCH_DESC     // branch on coprocessor condition codes, SPARCv8
 	}
 	, m_int_op_desc(std::begin(V7_INT_OP_DESC), std::end(V7_INT_OP_DESC))
 	, m_state_reg_desc()
@@ -638,12 +642,16 @@ sparc_disassembler::sparc_disassembler(const config *conf, unsigned version, vis
 	, m_prftch_desc()
 	, m_vis_op_desc()
 {
-	if (m_version >= 8)
+	if (m_version == sparclite)
+	{
+		add_int_op_desc(SPARCLITE_INT_OP_DESC);
+	}
+	else if (m_version >= v8)
 	{
 		add_int_op_desc(V8_INT_OP_DESC);
 	}
 
-	if (m_version >= 9)
+	if (m_version >= v9)
 	{
 		m_op_field_width = 11;
 
@@ -759,7 +767,7 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 		return 4 | SUPPORTED;
 	case 1:
 		util::stream_format(stream, "%-*s%%pc%c0x%08x ! 0x%08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
-		return 4 | SUPPORTED;
+		return 4 | STEP_OVER | step_over_extra(1) | SUPPORTED;
 	case 2:
 		switch (OP3)
 		{
@@ -1025,8 +1033,8 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 			{
 				switch (RD)
 				{
-				case 0: util::stream_format(stream, "done"); return 4 | SUPPORTED;
-				case 1: util::stream_format(stream, "retry"); return 4 | SUPPORTED;
+				case 0: util::stream_format(stream, "done"); return 4 | STEP_OUT | SUPPORTED;
+				case 1: util::stream_format(stream, "retry"); return 4 | STEP_OUT | SUPPORTED;
 				}
 			}
 			break;
@@ -1396,6 +1404,7 @@ offs_t sparc_disassembler::dasm_jmpl(std::ostream &stream, offs_t pc, uint32_t o
 	if (USEIMM && (RD == 0) && ((RS1 == 15) || (RS1 == 31)) && (SIMM13 == 8))
 	{
 		util::stream_format(stream, (RS1 == 31) ? "ret" : "retl");
+		return 4 | STEP_OUT | step_over_extra(1) | SUPPORTED;
 	}
 	else
 	{
@@ -1403,8 +1412,11 @@ offs_t sparc_disassembler::dasm_jmpl(std::ostream &stream, offs_t pc, uint32_t o
 		dasm_address(stream, op);
 		if ((RD != 0) && (RD != 15))
 			util::stream_format(stream, ",%s", REG_NAMES[RD]);
+		if (RD != 0)
+			return 4 | STEP_OVER | step_over_extra(1) | SUPPORTED;
+		else
+			return 4 | SUPPORTED;
 	}
-	return 4 | SUPPORTED;
 }
 
 
@@ -1412,7 +1424,7 @@ offs_t sparc_disassembler::dasm_return(std::ostream &stream, offs_t pc, uint32_t
 {
 	util::stream_format(stream, "%-*s", m_op_field_width, (m_version >= 9) ? "return" : "rett");
 	dasm_address(stream, op);
-	return 4 | SUPPORTED;
+	return 4 | STEP_OUT | step_over_extra(1) | SUPPORTED;
 }
 
 
@@ -1445,7 +1457,7 @@ offs_t sparc_disassembler::dasm_tcc(std::ostream &stream, offs_t pc, uint32_t op
 		else if (RS2 == 0)  util::stream_format(stream, "%s", REG_NAMES[RS1]);
 		else                util::stream_format(stream, "%s,%s", REG_NAMES[RS1], REG_NAMES[RS2]);
 	}
-	return 4 | SUPPORTED;
+	return 4 | STEP_OVER | SUPPORTED;
 }
 
 

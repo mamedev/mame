@@ -10,18 +10,16 @@
   JVS Support by R. Belmont
 
   Notes:
-    - technodr: Calibrate controls by turning on the service mode switch (F2) while holding service coin (9).
+    - technodr, kartduel: Calibrate controls by turning on the service mode switch (F2) while holding service coin (9).
 
   Issues:
-    not all games work due to either banking, dma or protection issues.
-    graphics are glitchy in some games.
-
-    - golgo13 assumes the test switch is a switch, not a button - must hold down F2 to stay in test mode
-
+    - not all games work due to either banking, dma or protection issues.
+    - graphics are glitchy in some games.
+    - kartduel does a "BSOD" crash when you start the game in race mode, or after finishing a race in time trial mode
+    - kartduel frame rate is choppy, it freezes every half second
     - truckk doesn't boot: the H8/3002 never enters InitJVSBoards @ 1DE2.  1DE2 is referenced in a table of commands at 4032,
       which is called by the routine at 3FEA.  It is not clear how execution is intended to get to 3FEA - there are no direct
       branches to that location, and the bytes 3F EA don't appear at all in the program.
-
     - technodr: printer not emulated. To play the game, press F2 to enter the test menu, navigate to GAME OPTIONS and disable
       the printer by setting "PRINTER" to OFF.
 
@@ -36,6 +34,7 @@ Derby Quiz My Dream Horse (MDH1/VER.A2)  (C) Namco,        1998  COH-700     SYS
 Ehrgeiz (EG1/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG2/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
 Ehrgeiz (EG3/VER.A)                      (C) Square/Namco, 1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC021
+Fighting Layer (FTL3/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
 Fighting Layer (FTL0/VER.A)              (C) Arika/Namco,  1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M5F4    KC037
 Ghoul Panic (OB2/VER.A)                  (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
 Oh! Bakyuuun (OB1/VER.A)                 (C) Namco/Raizing,1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC045
@@ -277,6 +276,7 @@ Notes:
                      --------------------------------------------------------------------
                      Attack Pla-Rail           AP1 Ver.A    none             MOTHER(B)
                      Ehrgeiz                   EG2 Ver.A    EG2/VER.A        MOTHER(B)
+                     Fighting Layer            FTL3 Ver.A   FTL3/VER.A       MOTHER(B)
                      Fighting Layer            FTL1 Ver.A   FTL0/VER.A       MOTHER(B)
                      Ghoul Panic               OB2 Ver.A    OB2/VER.A        MOTHER(B)
                      Soul Calibur              SOC1 Ver.B   SOC11/VER.B      MOTHER(B)
@@ -491,6 +491,11 @@ Attack Pla-Rail AP1/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC032
                                                                                     AP1 ROM0, AP1 ROM1, AP1 ROM2
                                                                                     AP1 FL4L, AP1 FL4H
                                                                                     AP1 FL3L, AP1 FL3H
+
+Fighting Layer FTL3/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC037    FTL1 WAVE0, FTL1 WAVE1
+                                                                                    FTL1 ROM0, FTL1 ROM1, FTL1 ROM2
+                                                                                    FTL1 FL4L, FTL1 FL4H
+                                                                                    FTL1 FL3L, FTL1 FL3H
 
 Fighting Layer FTL0/VER.A   SYSTEM 12 M5F4 PCB 8661961200 (8661971200)     KC037    FTL1 WAVE0, FTL1 WAVE1
                                                                                     FTL1 ROM0, FTL1 ROM1, FTL1 ROM2
@@ -1135,6 +1140,7 @@ protected:
 	virtual void machine_reset() override;
 
 	void golgo13_h8iomap(address_map &map);
+	void kartduel_h8iomap(address_map &map);
 	void jvsiomap(address_map &map);
 	void jvsmap(address_map &map);
 	void namcos12_map(address_map &map);
@@ -1223,6 +1229,8 @@ public:
 	void truckk(machine_config &config);
 	void tektagt(machine_config &config);
 	void ptblank2(machine_config &config);
+	void kartduel(machine_config &config);
+
 private:
 	virtual void machine_reset() override;
 };
@@ -1664,6 +1672,14 @@ void namcos12_state::s12h8railiomap(address_map &map)
 	map(h8_device::ADC_3, h8_device::ADC_3).noprw();
 }
 
+void namcos12_state::kartduel_h8iomap(address_map &map)
+{
+	s12h8iomap(map);
+	map(h8_device::ADC_0, h8_device::ADC_0).portr("BRAKE");
+	map(h8_device::ADC_1, h8_device::ADC_1).portr("GAS");
+	map(h8_device::ADC_2, h8_device::ADC_2).portr("STEER");
+}
+
 // Golgo 13 lightgun inputs
 
 uint16_t namcos12_state::s12_mcu_gun_h_r()
@@ -1809,6 +1825,14 @@ void namcos12_boothack_state::golgo13(machine_config &config)
 
 	/* basic machine hardware */
 	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::golgo13_h8iomap);
+}
+
+void namcos12_boothack_state::kartduel(machine_config &config)
+{
+	coh700(config);
+
+	/* basic machine hardware */
+	m_sub->set_addrmap(AS_IO, &namcos12_boothack_state::kartduel_h8iomap);
 }
 
 #define JVSCLOCK    (XTAL(14'745'600))
@@ -2060,6 +2084,29 @@ static INPUT_PORTS_START( golgo13 )
 	PORT_BIT( 0xffff, 0x00fe, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_MINMAX(0x1f,0x1de) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_REVERSE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kartduel )
+	PORT_INCLUDE( namcos12 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) // enter switch
+	PORT_BIT( 0xffe3, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN1")
+	PORT_SERVICE( 0x4000, IP_ACTIVE_LOW )
+	PORT_BIT( 0x1fff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("GAS")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("STEER")
+	PORT_BIT( 0x3ff, 0x0200, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( technodr )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR(Service_Mode) ) PORT_DIPLOCATION( "DIP SW2:1" )
@@ -2216,8 +2263,30 @@ ROM_END
 
 ROM_START( fgtlayer )
 	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
-	ROM_LOAD16_BYTE( "ftl1vera.2e",  0x0000000, 0x200000, CRC(f4156e79) SHA1(cedb917940be8c74fa4ddb48213ce6917444e306) )
-	ROM_LOAD16_BYTE( "ftl1vera.2j",  0x0000001, 0x200000, CRC(c65b57c0) SHA1(0051aa46d09fbe9d896ae5f534e21955373f1d46) )
+	ROM_LOAD16_BYTE( "ftl3vera.2e",  0x0000000, 0x200000, CRC(90e33126) SHA1(81caedd72d7634810d6f7093d4ad437aca83fbf2) )
+	ROM_LOAD16_BYTE( "ftl3vera.2j",  0x0000001, 0x200000, CRC(1626465d) SHA1(941e7f8fbbaa232aab10a52aba1c462b4c91bb71) )
+
+	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD(        "ftl1rom0.9",   0x0000000, 0x800000, CRC(e33ce365) SHA1(f7e5b98d2e8e5f233265909477c84331f016ebfb) )
+	ROM_LOAD(        "ftl1rom1.10",  0x0800000, 0x800000, CRC(a1ec7d08) SHA1(e693a0b16235c44d4165b2f53dc25d5288297c27) )
+	ROM_LOAD(        "ftl1rom2.11",  0x1000000, 0x800000, CRC(204be858) SHA1(95b22b678b7d11b0ec907698c18cebd84437c656) )
+	ROM_LOAD16_BYTE( "ftl1fl3l.7",   0x1800000, 0x200000, CRC(e4fb01e1) SHA1(c7883e86afb58412281a317bfdf62a21488421be) )
+	ROM_LOAD16_BYTE( "ftl1fl3h.8",   0x1800001, 0x200000, CRC(67a5c56f) SHA1(6f0a4f93b4975b24efb26c3dd47b791c92c55fbf) )
+	ROM_LOAD16_BYTE( "ftl1fl4l.5",   0x1c00000, 0x200000, CRC(8039242c) SHA1(9c3f9637d7cd0c004c0c39aee815eed228ebad20) )
+	ROM_LOAD16_BYTE( "ftl1fl4h.6",   0x1c00001, 0x200000, CRC(5ad59726) SHA1(b3a68f7ba2052b99407a5423223202001f2a4f67) )
+
+	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
+	ROM_LOAD16_WORD_SWAP( "ftl1vera.11s", 0x0000000, 0x080000, CRC(e3f957cd) SHA1(1c7f2033025fb9c40654cff26d78697baf697c59) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* samples */
+	ROM_LOAD( "ftl1wave0.2",         0x0000000, 0x800000, CRC(ee009a2b) SHA1(c332bf59917b2673d7acb864bf92d25d74a350b6) )
+	ROM_LOAD( "ftl1wave1.1",         0x0800000, 0x800000, CRC(a54a89cd) SHA1(543b47c6442f7a78e26992b041235a91d719bb89) )
+ROM_END
+
+ROM_START( fgtlayerj )
+	ROM_REGION32_LE( 0x00400000, "maincpu:rom", 0 ) /* main prg */
+	ROM_LOAD16_BYTE( "ftl0vera.2e",  0x0000000, 0x200000, CRC(f4156e79) SHA1(cedb917940be8c74fa4ddb48213ce6917444e306) ) // Service mode shows FTL0/VER.A
+	ROM_LOAD16_BYTE( "ftl0vera.2j",  0x0000001, 0x200000, CRC(c65b57c0) SHA1(0051aa46d09fbe9d896ae5f534e21955373f1d46) )
 
 	ROM_REGION32_LE( 0x2000000, "bankedroms", 0 ) /* main data */
 	ROM_LOAD(        "ftl1rom0.9",   0x0000000, 0x800000, CRC(e33ce365) SHA1(f7e5b98d2e8e5f233265909477c84331f016ebfb) )
@@ -2347,9 +2416,9 @@ ROM_START( kartduel )
 	ROM_LOAD16_BYTE( "ktd1vera.2l",  0x0000000, 0x200000, CRC(0c207249) SHA1(6c57de25d452226a25f658638d89b81257960741) )
 	ROM_LOAD16_BYTE( "ktd1vera.2p",  0x0000001, 0x200000, CRC(f6e2581f) SHA1(06eb108c2775290590dba75f964f26443a585d70) )
 
-	ROM_REGION32_LE( 0x00800000, "bankedroms", 0 ) /* main data */
-	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x400000, BAD_DUMP CRC(8e2d5d9e) SHA1(6f703e27a19740af4094004b783b3cc2974c3de0) ) // These probably should be 64MBIT
-	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x400000, BAD_DUMP CRC(49ec5dbd) SHA1(336db6d3e361938850a9234b6b64070dbdc36d45) ) //
+	ROM_REGION32_LE( 0x01000000, "bankedroms", 0 ) /* main data */
+	ROM_LOAD16_BYTE( "kdt1rom0l.ic12", 0x000000, 0x800000, CRC(4a3bac12) SHA1(7758d97049d30a00b7bede3688d451fbf4eddbfb) )
+	ROM_LOAD16_BYTE( "kdt1rom0u.ic11", 0x000001, 0x800000, CRC(bab0d328) SHA1(9a15bfb38c63b0012f29755b2be071e9c82d1c20) )
 
 	ROM_REGION( 0x0080000, "sub", 0 ) /* sound prg */
 	ROM_LOAD16_WORD_SWAP( "ktd1vera.11s", 0x000000, 0x080000, CRC(c2ff1971) SHA1(32ee2afe08e92049d8139c9324a0ea1a3b7ee5a1) )
@@ -3262,6 +3331,7 @@ ROM_START( aplarail )
 	ROM_LOAD( "at28c16",      0x000000, 0x000800, CRC(db1b63c5) SHA1(01fc3386a2d1cb1bed1b7fd9bd2fd59e503832d3) )
 ROM_END
 
+//    YEAR  NAME       PARENT    MACHINE   INPUT      CLASS                    INIT           ROT   COMPANY            FULLNAME, FLAGS
 GAME( 1996, tekken3,   0,        coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", 0 ) /* KC006 */
 GAME( 1996, tekken3d,  tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.D)", 0 ) /* KC006 */
 GAME( 1996, tekken3b,  tekken3,  coh700,   namcos12,  namcos12_state,          init_namcos12, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", 0 ) /* KC006 */
@@ -3288,7 +3358,8 @@ GAME( 1998, sws98,     0,        coh700,   namcos12,  namcos12_state,          i
 GAME( 1998, technodr,  0,        technodr, technodr,  namcos12_boothack_state, init_technodr, ROT0, "Namco",           "Techno Drive (Japan, TH1/VER.B)", MACHINE_NODEVICE_PRINTER ) /* KC056 */
 GAME( 1998, tenkomor,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (World, TKM2/VER.A1)", 0 ) /* KC036 */
 GAME( 1998, tenkomorja,tenkomor, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT90,"Namco",           "Tenkomori Shooting (Japan, TKM1/VER.A1)", 0 ) /* KC036 */
-GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL1/VER.A)", 0 ) /* KC037 */
+GAME( 1998, fgtlayer,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (FTL3/VER.A)", 0 ) /* KC037 */ // supposedly US region but doesn't show the usual warning / WDUD screens
+GAME( 1998, fgtlayerj, fgtlayer, coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Arika / Namco",   "Fighting Layer (Japan, FTL0/VER.A)", 0 ) /* KC037 */
 GAME( 1998, pacapp,    0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Produce / Namco", "Paca Paca Passion (Japan, PPP1/VER.A2)", 0 ) /* KC038 */
 GAME( 1999, ptblank2,  0,        ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Point Blank 2 (GNB5/VER.A)", 0 ) /* KC042 */
 GAME( 1999, gunbarl,   ptblank2, ptblank2, ptblank2,  namcos12_boothack_state, init_ptblank2, ROT0, "Namco",           "Gunbarl (Japan, GNB4/VER.A)", 0 ) /* KC042 */
@@ -3312,5 +3383,5 @@ GAME( 1999, golgo13,   0,        golgo13,  golgo13,   namcos12_boothack_state, i
 GAME( 2000, g13knd,    0,        golgo13,  golgo13,   namcos12_boothack_state, init_golgo13,  ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */
 GAME( 2000, sws2000,   0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_NOT_WORKING ) /* KC055 */
 GAME( 2000, truckk,    0,        truckk,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) /* KC056 */
-GAME( 2000, kartduel,  0,        coh700,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
+GAME( 2000, kartduel,  0,        kartduel, kartduel,  namcos12_boothack_state, init_namcos12, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", MACHINE_NOT_WORKING ) /* KC057 */
 GAME( 2001, sws2001,   sws2000,  coh716,   namcos12,  namcos12_boothack_state, init_namcos12, ROT0, "Namco",           "Super World Stadium 2001 (Japan, SS11/VER.A)", MACHINE_NOT_WORKING ) /* KC061 */

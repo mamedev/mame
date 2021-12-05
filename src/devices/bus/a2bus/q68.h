@@ -15,6 +15,15 @@
 
 #include "a2bus.h"
 
+
+//**************************************************************************
+//  DEVICE TYPE DECLARATION
+//**************************************************************************
+
+DECLARE_DEVICE_TYPE(A2BUS_Q68, a2bus_q68_device)
+DECLARE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device)
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -61,16 +70,13 @@ class a2bus_q68plus_device : public a2bus_68k_device
 public:
 	a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	static auto parent_rom_device_type() { return &A2BUS_Q68; }
+
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	void m68008_mem(address_map &map);
 };
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(A2BUS_Q68, a2bus_q68_device)
-DECLARE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device)
 
 #endif // MAME_BUS_A2BUS_Q68_H

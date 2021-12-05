@@ -3,9 +3,10 @@
 #include "emu.h"
 #include "h8_intc.h"
 
-DEFINE_DEVICE_TYPE(H8_INTC,  h8_intc_device,  "h8_intc",  "H8 interrupt controller")
-DEFINE_DEVICE_TYPE(H8H_INTC, h8h_intc_device, "h8h_intc", "H8H interrupt controller")
-DEFINE_DEVICE_TYPE(H8S_INTC, h8s_intc_device, "h8s_intc", "H8S interrupt controller")
+DEFINE_DEVICE_TYPE(H8_INTC,    h8_intc_device,    "h8_intc",    "H8 interrupt controller")
+DEFINE_DEVICE_TYPE(H8H_INTC,   h8h_intc_device,   "h8h_intc",   "H8H interrupt controller")
+DEFINE_DEVICE_TYPE(H8S_INTC,   h8s_intc_device,   "h8s_intc",   "H8S interrupt controller")
+DEFINE_DEVICE_TYPE(GT913_INTC, gt913_intc_device, "gt913_intc", "Casio GT913F interrupt controller")
 
 h8_intc_device::h8_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8_intc_device(mconfig, H8_INTC, tag, owner, clock)
@@ -47,7 +48,7 @@ int h8_intc_device::interrupt_taken(int vector)
 	if(0)
 		logerror("taking internal interrupt %d\n", vector);
 	pending_irqs[vector >> 5] &= ~(1 << (vector & 31));
-	if(vector >= irq_vector_base && vector < irq_vector_base + 8) {
+	if(irq_vector_base >= 0 && vector >= irq_vector_base && vector < irq_vector_base + 8) {
 		int irq = vector - irq_vector_base;
 		if(irq_type[irq] != IRQ_LEVEL || !(irq_input & (1 << irq)))
 			isr &= ~(1 << irq);
@@ -159,8 +160,11 @@ void h8_intc_device::update_irq_types()
 
 void h8_intc_device::update_irq_state()
 {
-	pending_irqs[0] &= ~(255 << irq_vector_base);
-	pending_irqs[0] |= (isr & ier) << irq_vector_base;
+	if (irq_vector_base >= 0)
+	{
+		pending_irqs[0] &= ~(255 << irq_vector_base);
+		pending_irqs[0] |= (isr & ier) << irq_vector_base;
+	}
 
 	int cur_vector = 0;
 	int cur_level = -1;
@@ -187,8 +191,21 @@ void h8_intc_device::update_irq_state()
 
 void h8_intc_device::get_priority(int vect, int &icr_pri, int &ipr_pri) const
 {
-	icr_pri = 0;
+	icr_pri = vect == 3 ? 2 : 0; // NMI
 	ipr_pri = 0;
+}
+
+
+gt913_intc_device::gt913_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	gt913_intc_device(mconfig, GT913_INTC, tag, owner, clock)
+{
+	irq_vector_base = -1; // no external IRQs
+	irq_vector_nmi = 3;
+}
+
+gt913_intc_device::gt913_intc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	h8_intc_device(mconfig, type, tag, owner, clock)
+{
 }
 
 
@@ -293,10 +310,10 @@ void h8h_intc_device::update_irq_types()
 const int h8h_intc_device::vector_to_slot[64] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, // NMI at 7
 	-1, -1, -1, -1,  0,  1,  2,  2, // IRQ 0-3
-		3,  3,  3,  3,  4,  4,  4,  4, // IRQ 4-5, (reservedx2), WOVI, CMI, (reserved), ADI
-		5,  5,  5,  5,  6,  6,  6,  6, // IMIA0, IMIB0, OVI0, (reserved), IMIA1, IMIB1, OVI1, (reserved)
-		7,  7,  7,  7,  8,  8,  8,  8, // IMIA2, IMIB2, OVI2, (reserved), CMIA0, CMIB0, CMIx1, TOVI0/1
-		9,  9,  9,  9, 10, 10, 10, 10, // CMIA2, CMIB2, CMIx3, TOVI2/3, DEND0A, DEND0B, DEND1A, DEND1B
+	 3,  3,  3,  3,  4,  4,  4,  4, // IRQ 4-5, (reservedx2), WOVI, CMI, (reserved), ADI
+	 5,  5,  5,  5,  6,  6,  6,  6, // IMIA0, IMIB0, OVI0, (reserved), IMIA1, IMIB1, OVI1, (reserved)
+	 7,  7,  7,  7,  8,  8,  8,  8, // IMIA2, IMIB2, OVI2, (reserved), CMIA0, CMIB0, CMIx1, TOVI0/1
+	 9,  9,  9,  9, 10, 10, 10, 10, // CMIA2, CMIB2, CMIx3, TOVI2/3, DEND0A, DEND0B, DEND1A, DEND1B
 	11, 11, 11, 11, 12, 12, 12, 12, // (reservedx4), ERI0, RXI0, TXI0, TEI0
 	13, 13, 13, 13, 14, 14, 14, 14  // ERI1, RXI1, TXI1, TEI1, ERI2, RXI2, TXI2, TEI2
 };

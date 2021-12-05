@@ -31,7 +31,7 @@
 #include "emu.h"
 #include "ti_32kmem.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_32KMEM, bus::ti99::peb, ti_32k_expcard_device, "ti99_32kmem", "TI-99 32KiB memory expansion card")
+DEFINE_DEVICE_TYPE(TI99_32KMEM, bus::ti99::peb::ti_32k_expcard_device, "ti99_32kmem", "TI-99 32KiB memory expansion card")
 
 namespace bus::ti99::peb {
 

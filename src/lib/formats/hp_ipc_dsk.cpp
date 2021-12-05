@@ -8,8 +8,6 @@
 
 *********************************************************************/
 
-#include <cassert>
-
 #include "formats/hp_ipc_dsk.h"
 
 hp_ipc_format::hp_ipc_format() : wd177x_format(formats)

@@ -96,6 +96,19 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="abcword">
+		<description>ABC Word Game</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="Press 1. Press Home twice. Press Space." /><!-- Incomplete -->
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="3128h00-3h1.ic1.bin" size="0x2000" crc="c258f5a1" sha1="0b9b142eb6153742bfd1289d396c514ba1f1ccc1" offset="0x2000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="burger">
 		<description>Burger Shop</description>
 		<year>1983</year>
@@ -142,6 +155,19 @@ The monitor will expect you to load a program from cassette.
 			<dataarea name="rom" size="32768">
 				<rom name="73.ic1.bin" size="0x2000" crc="6237e902" sha1="0f7c236b9425508b3f22664ce7a5f10fc1b991b3" offset="0x4000" />
 				<rom name="72.ic2.bin" size="0x2000" crc="06e91723" sha1="b0bff97cd5569dbba7b88aef2914fc6b248a171f" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="extennis">
+		<description>Excite Tennis</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<info name="usage" value="1 to start, then Backspace or Home. / to serve" /><!-- incomplete -->
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="90.ic2.bin" size="0x2000" crc="ba91681d" sha1="2d78b8aee850be723db74699029a31f2c07d0b0e" offset="0x4000" />
+				<rom name="91.ic1.bin" size="0x2000" crc="e9a0e30e" sha1="be04289e704e589b49bacc1986b5b80b5f7be0ea" offset="0x6000" />
 			</dataarea>
 		</part>
 	</software>

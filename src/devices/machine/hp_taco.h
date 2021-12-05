@@ -110,6 +110,7 @@ private:
 	bool is_at_slow_speed() const;
 	void start_rd();
 	void start_wr();
+	bool adv_bit_idx();
 	void update_checksum(uint16_t data);
 	void cmd_fsm();
 	static uint8_t get_cmd(uint16_t cmd_reg);

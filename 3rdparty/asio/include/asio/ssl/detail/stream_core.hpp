@@ -2,7 +2,7 @@
 // ssl/detail/stream_core.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -37,10 +37,11 @@ struct stream_core
   // sufficient to hold the largest possible TLS record.
   enum { max_tls_record_size = 17 * 1024 };
 
-  stream_core(SSL_CTX* context, asio::io_context& io_context)
+  template <typename Executor>
+  stream_core(SSL_CTX* context, const Executor& ex)
     : engine_(context),
-      pending_read_(io_context),
-      pending_write_(io_context),
+      pending_read_(ex),
+      pending_write_(ex),
       output_buffer_space_(max_tls_record_size),
       output_buffer_(asio::buffer(output_buffer_space_)),
       input_buffer_space_(max_tls_record_size),
@@ -50,9 +51,80 @@ struct stream_core
     pending_write_.expires_at(neg_infin());
   }
 
+#if defined(ASIO_HAS_MOVE)
+  stream_core(stream_core&& other)
+    : engine_(ASIO_MOVE_CAST(engine)(other.engine_)),
+#if defined(ASIO_HAS_BOOST_DATE_TIME)
+      pending_read_(
+         ASIO_MOVE_CAST(asio::deadline_timer)(
+           other.pending_read_)),
+      pending_write_(
+         ASIO_MOVE_CAST(asio::deadline_timer)(
+           other.pending_write_)),
+#else // defined(ASIO_HAS_BOOST_DATE_TIME)
+      pending_read_(
+         ASIO_MOVE_CAST(asio::steady_timer)(
+           other.pending_read_)),
+      pending_write_(
+         ASIO_MOVE_CAST(asio::steady_timer)(
+           other.pending_write_)),
+#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
+      output_buffer_space_(
+          ASIO_MOVE_CAST(std::vector<unsigned char>)(
+            other.output_buffer_space_)),
+      output_buffer_(other.output_buffer_),
+      input_buffer_space_(
+          ASIO_MOVE_CAST(std::vector<unsigned char>)(
+            other.input_buffer_space_)),
+      input_buffer_(other.input_buffer_),
+      input_(other.input_)
+  {
+    other.output_buffer_ = asio::mutable_buffer(0, 0);
+    other.input_buffer_ = asio::mutable_buffer(0, 0);
+    other.input_ = asio::const_buffer(0, 0);
+  }
+#endif // defined(ASIO_HAS_MOVE)
+
   ~stream_core()
   {
   }
+
+#if defined(ASIO_HAS_MOVE)
+  stream_core& operator=(stream_core&& other)
+  {
+    if (this != &other)
+    {
+      engine_ = ASIO_MOVE_CAST(engine)(other.engine_);
+#if defined(ASIO_HAS_BOOST_DATE_TIME)
+      pending_read_ =
+        ASIO_MOVE_CAST(asio::deadline_timer)(
+          other.pending_read_);
+      pending_write_ =
+        ASIO_MOVE_CAST(asio::deadline_timer)(
+          other.pending_write_);
+#else // defined(ASIO_HAS_BOOST_DATE_TIME)
+      pending_read_ =
+        ASIO_MOVE_CAST(asio::steady_timer)(
+          other.pending_read_);
+      pending_write_ =
+        ASIO_MOVE_CAST(asio::steady_timer)(
+          other.pending_write_);
+#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
+      output_buffer_space_ =
+        ASIO_MOVE_CAST(std::vector<unsigned char>)(
+          other.output_buffer_space_);
+      output_buffer_ = other.output_buffer_;
+      input_buffer_space_ =
+        ASIO_MOVE_CAST(std::vector<unsigned char>)(
+          other.input_buffer_space_);
+      input_ = other.input_;
+      other.output_buffer_ = asio::mutable_buffer(0, 0);
+      other.input_buffer_ = asio::mutable_buffer(0, 0);
+      other.input_ = asio::const_buffer(0, 0);
+    }
+    return *this;
+  }
+#endif // defined(ASIO_HAS_MOVE)
 
   // The SSL engine.
   engine engine_;
@@ -113,13 +185,13 @@ struct stream_core
   std::vector<unsigned char> output_buffer_space_;
 
   // A buffer that may be used to prepare output intended for the transport.
-  const asio::mutable_buffer output_buffer_;
+  asio::mutable_buffer output_buffer_;
 
   // Buffer space used to read input intended for the engine.
   std::vector<unsigned char> input_buffer_space_;
 
   // A buffer that may be used to read input intended for the engine.
-  const asio::mutable_buffer input_buffer_;
+  asio::mutable_buffer input_buffer_;
 
   // The buffer pointing to the engine's unconsumed input.
   asio::const_buffer input_;

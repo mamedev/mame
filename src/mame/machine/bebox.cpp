@@ -768,7 +768,7 @@ void bebox_state::init_bebox()
 	/* set up boot and flash ROM */
 	membank("bank2")->set_base(memregion("user2")->base());
 
-	/* install MESS managed RAM */
+	/* install managed RAM */
 	space_0.install_ram(0, m_ram->size() - 1, 0x02000000, m_ram->pointer());
 	space_1.install_ram(0, m_ram->size() - 1, 0x02000000, m_ram->pointer());
 
@@ -777,7 +777,7 @@ void bebox_state::init_bebox()
 	 * lets CPU #1 go.  However, it seems that CPU #1 jumps into never-never
 	 * land, crashes, and then goes into NetBSD's crash handler which catches
 	 * it.  The current PowerPC core cannot catch this trip into never-never
-	 * land properly, and MESS crashes.  In the interim, this "mitten" catches
+	 * land properly, and MAME crashes.  In the interim, this "mitten" catches
 	 * the crash
 	 */
 	{

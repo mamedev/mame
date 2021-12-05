@@ -1068,6 +1068,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_rightmix(machine.sample_rate()),
 	m_compressor_scale(1.0),
 	m_compressor_counter(0),
+	m_compressor_enabled(machine.options().compressor()),
 	m_muted(0),
 	m_nosound_mode(machine.osd().no_sound()),
 	m_attenuation(0),
@@ -1543,8 +1544,11 @@ void sound_manager::update(void *ptr, int param)
 		if (lscale != m_compressor_scale && sample != m_finalmix_leftover)
 			lscale = adjust_toward_compressor_scale(lscale, lprev, lsamp);
 
+		lprev = lsamp * lscale;
+		if (m_compressor_enabled)
+			lsamp = lprev;
+
 		// clamp the left side
-		lprev = lsamp *= lscale;
 		if (lsamp > 1.0)
 			lsamp = 1.0;
 		else if (lsamp < -1.0)
@@ -1556,8 +1560,11 @@ void sound_manager::update(void *ptr, int param)
 		if (rscale != m_compressor_scale && sample != m_finalmix_leftover)
 			rscale = adjust_toward_compressor_scale(rscale, rprev, rsamp);
 
-		// clamp the left side
-		rprev = rsamp *= rscale;
+		rprev = rsamp * rscale;
+		if (m_compressor_enabled)
+			rsamp = rprev;
+
+		// clamp the right side
 		if (rsamp > 1.0)
 			rsamp = 1.0;
 		else if (rsamp < -1.0)

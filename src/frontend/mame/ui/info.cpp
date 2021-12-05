@@ -9,14 +9,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/info.h"
+
+#include "ui/systemlist.h"
 #include "ui/ui.h"
 
 #include "drivenum.h"
 #include "romload.h"
 #include "softlist.h"
 #include "emuopts.h"
+
+#include <set>
+#include <sstream>
+#include <type_traits>
+#include <utility>
 
 
 namespace ui {
@@ -28,27 +34,143 @@ constexpr machine_flags::type MACHINE_WARNINGS  = machine_flags::NO_COCKTAIL | m
 constexpr machine_flags::type MACHINE_BTANB     = machine_flags::NO_SOUND_HW | machine_flags::IS_INCOMPLETE;
 
 constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
-		{ device_t::feature::PROTECTION,    __("protection")            },
-		{ device_t::feature::TIMING,        __("timing")                },
-		{ device_t::feature::GRAPHICS,      __("graphics")              },
-		{ device_t::feature::PALETTE,       __("color palette")         },
-		{ device_t::feature::SOUND,         __("sound")                 },
-		{ device_t::feature::CAPTURE,       __("capture hardware")      },
-		{ device_t::feature::CAMERA,        __("camera")                },
-		{ device_t::feature::MICROPHONE,    __("microphone")            },
-		{ device_t::feature::CONTROLS,      __("controls")              },
-		{ device_t::feature::KEYBOARD,      __("keyboard")              },
-		{ device_t::feature::MOUSE,         __("mouse")                 },
-		{ device_t::feature::MEDIA,         __("media")                 },
-		{ device_t::feature::DISK,          __("disk")                  },
-		{ device_t::feature::PRINTER,       __("printer")               },
-		{ device_t::feature::TAPE,          __("magnetic tape")         },
-		{ device_t::feature::PUNCH,         __("punch tape")            },
-		{ device_t::feature::DRUM,          __("magnetic drum")         },
-		{ device_t::feature::ROM,           __("solid state storage")   },
-		{ device_t::feature::COMMS,         __("communications")        },
-		{ device_t::feature::LAN,           __("LAN")                   },
-		{ device_t::feature::WAN,           __("WAN")                   } };
+		{ device_t::feature::PROTECTION,    N_p("emulation-feature",    "protection")           },
+		{ device_t::feature::TIMING,        N_p("emulation-feature",    "timing")               },
+		{ device_t::feature::GRAPHICS,      N_p("emulation-feature",    "graphics")             },
+		{ device_t::feature::PALETTE,       N_p("emulation-feature",    "color palette")        },
+		{ device_t::feature::SOUND,         N_p("emulation-feature",    "sound")                },
+		{ device_t::feature::CAPTURE,       N_p("emulation-feature",    "capture hardware")     },
+		{ device_t::feature::CAMERA,        N_p("emulation-feature",    "camera")               },
+		{ device_t::feature::MICROPHONE,    N_p("emulation-feature",    "microphone")           },
+		{ device_t::feature::CONTROLS,      N_p("emulation-feature",    "controls")             },
+		{ device_t::feature::KEYBOARD,      N_p("emulation-feature",    "keyboard")             },
+		{ device_t::feature::MOUSE,         N_p("emulation-feature",    "mouse")                },
+		{ device_t::feature::MEDIA,         N_p("emulation-feature",    "media")                },
+		{ device_t::feature::DISK,          N_p("emulation-feature",    "disk")                 },
+		{ device_t::feature::PRINTER,       N_p("emulation-feature",    "printer")              },
+		{ device_t::feature::TAPE,          N_p("emulation-feature",    "magnetic tape")        },
+		{ device_t::feature::PUNCH,         N_p("emulation-feature",    "punch tape")           },
+		{ device_t::feature::DRUM,          N_p("emulation-feature",    "magnetic drum")        },
+		{ device_t::feature::ROM,           N_p("emulation-feature",    "solid state storage")  },
+		{ device_t::feature::COMMS,         N_p("emulation-feature",    "communications")       },
+		{ device_t::feature::LAN,           N_p("emulation-feature",    "LAN")                  },
+		{ device_t::feature::WAN,           N_p("emulation-feature",    "WAN")                  } };
+
+void get_general_warnings(std::ostream &buf, running_machine &machine, machine_flags::type flags, device_t::feature_type unemulated, device_t::feature_type imperfect)
+{
+	// add a warning if any ROMs were loaded with warnings
+	bool bad_roms(false);
+	if (machine.rom_load().warnings() > 0)
+	{
+		bad_roms = true;
+		buf << _("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n");
+	}
+	if (!machine.rom_load().software_load_warnings_message().empty())
+	{
+		bad_roms = true;
+		buf << machine.rom_load().software_load_warnings_message();
+	}
+
+	// if we have at least one warning flag, print the general header
+	if ((machine.rom_load().knownbad() > 0) || (flags & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated || imperfect)
+	{
+		if (bad_roms)
+			buf << '\n';
+		buf << _("There are known problems with this machine\n\n");
+	}
+
+	// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
+	if (machine.rom_load().knownbad() > 0)
+		buf << _("One or more ROMs/CHDs for this machine have not been correctly dumped.\n");
+}
+
+void get_device_warnings(std::ostream &buf, device_t::feature_type unemulated, device_t::feature_type imperfect)
+{
+	// add line for unemulated features
+	if (unemulated)
+	{
+		buf << _("Completely unemulated features: ");
+		bool first = true;
+		for (auto const &feature : FEATURE_NAMES)
+		{
+			if (unemulated & feature.first)
+			{
+				util::stream_format(buf, first ? _("%s") : _(", %s"), _("emulation-feature", feature.second));
+				first = false;
+			}
+		}
+		buf << '\n';
+	}
+
+	// add line for imperfect features
+	if (imperfect)
+	{
+		buf << _("Imperfectly emulated features: ");
+		bool first = true;
+		for (auto const &feature : FEATURE_NAMES)
+		{
+			if (imperfect & feature.first)
+			{
+				util::stream_format(buf, first ? _("%s") : _(", %s"), _("emulation-feature", feature.second));
+				first = false;
+			}
+		}
+		buf << '\n';
+	}
+}
+
+void get_system_warnings(std::ostream &buf, running_machine &machine, machine_flags::type flags, device_t::feature_type unemulated, device_t::feature_type imperfect)
+{
+	// start with the unemulated/imperfect features
+	get_device_warnings(buf, unemulated, imperfect);
+
+	// add one line per machine warning flag
+	if (flags & ::machine_flags::NO_COCKTAIL)
+		buf << _("Screen flipping in cocktail mode is not supported.\n");
+	if (flags & ::machine_flags::REQUIRES_ARTWORK)
+		buf << _("This machine requires external artwork files.\n");
+	if (flags & ::machine_flags::IS_INCOMPLETE)
+		buf << _("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
+	if (flags & ::machine_flags::NO_SOUND_HW)
+		buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
+
+	// these are more severe warnings
+	if (flags & ::machine_flags::NOT_WORKING)
+		buf << _("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
+	if (flags & ::machine_flags::MECHANICAL)
+		buf << _("\nElements of this machine cannot be emulated as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this machine.\n");
+
+	if ((flags & MACHINE_ERRORS) || ((machine.system().type.unemulated_features() | machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
+	{
+		// find the parent of this driver
+		driver_enumerator drivlist(machine.options());
+		int maindrv = drivlist.find(machine.system());
+		int clone_of = drivlist.non_bios_clone(maindrv);
+		if (clone_of != -1)
+			maindrv = clone_of;
+
+		// scan the driver list for any working clones and add them
+		bool foundworking = false;
+		while (drivlist.next())
+		{
+			if (drivlist.current() == maindrv || drivlist.clone() == maindrv)
+			{
+				game_driver const &driver(drivlist.driver());
+				if (!(driver.flags & MACHINE_ERRORS) && !((driver.type.unemulated_features() | driver.type.imperfect_features()) & device_t::feature::PROTECTION))
+				{
+					// this one works, add a header and display the name of the clone
+					if (!foundworking)
+						util::stream_format(buf, _("\n\nThere are working clones of this machine: %s"), driver.name);
+					else
+						util::stream_format(buf, _(", %s"), driver.name);
+					foundworking = true;
+				}
+			}
+		}
+		if (foundworking)
+			buf << '\n';
+	}
+}
 
 } // anonymous namespace
 
@@ -224,105 +346,8 @@ machine_info::machine_info(running_machine &machine)
 std::string machine_info::warnings_string() const
 {
 	std::ostringstream buf;
-
-	// add a warning if any ROMs were loaded with warnings
-	if (m_machine.rom_load().warnings() > 0)
-		buf << _("One or more ROMs/CHDs for this machine are incorrect. The machine may not run correctly.\n");
-
-	if (!m_machine.rom_load().software_load_warnings_message().empty())
-		buf << m_machine.rom_load().software_load_warnings_message();
-
-	// if we have at least one warning flag, print the general header
-	if ((m_machine.rom_load().knownbad() > 0) || (machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) || unemulated_features() || imperfect_features())
-	{
-		if (!buf.str().empty())
-			buf << '\n';
-		buf << _("There are known problems with this machine\n\n");
-	}
-
-	// add a warning if any ROMs are flagged BAD_DUMP/NO_DUMP
-	if (m_machine.rom_load().knownbad() > 0)
-		buf << _("One or more ROMs/CHDs for this machine have not been correctly dumped.\n");
-
-	// add line for unemulated features
-	if (unemulated_features())
-	{
-		buf << _("Completely unemulated features: ");
-		bool first = true;
-		for (auto const &feature : FEATURE_NAMES)
-		{
-			if (unemulated_features() & feature.first)
-			{
-				util::stream_format(buf, first ? _("%s") : _(", %s"), _(feature.second));
-				first = false;
-			}
-		}
-		buf << '\n';
-	}
-
-	// add line for imperfect features
-	if (imperfect_features())
-	{
-		buf << _("Imperfectly emulated features: ");
-		bool first = true;
-		for (auto const &feature : FEATURE_NAMES)
-		{
-			if (imperfect_features() & feature.first)
-			{
-				util::stream_format(buf, first ? _("%s") : _(", %s"), _(feature.second));
-				first = false;
-			}
-		}
-		buf << '\n';
-	}
-
-	// add one line per machine warning flag
-	if (machine_flags() & ::machine_flags::NO_COCKTAIL)
-		buf << _("Screen flipping in cocktail mode is not supported.\n");
-	if (machine_flags() & ::machine_flags::REQUIRES_ARTWORK)
-		buf << _("This machine requires external artwork files.\n");
-	if (machine_flags() & ::machine_flags::IS_INCOMPLETE)
-		buf << _("This machine was never completed. It may exhibit strange behavior or missing elements that are not bugs in the emulation.\n");
-	if (machine_flags() & ::machine_flags::NO_SOUND_HW)
-		buf << _("This machine has no sound hardware, MAME will produce no sounds, this is expected behaviour.\n");
-
-	// these are more severe warnings
-	if (machine_flags() & ::machine_flags::NOT_WORKING)
-		buf << _("\nTHIS MACHINE DOESN'T WORK. The emulation for this machine is not yet complete. There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
-	if (machine_flags() & ::machine_flags::MECHANICAL)
-		buf << _("\nElements of this machine cannot be emulated as they require physical interaction or consist of mechanical devices. It is not possible to fully experience this machine.\n");
-
-	if ((machine_flags() & MACHINE_ERRORS) || ((m_machine.system().type.unemulated_features() | m_machine.system().type.imperfect_features()) & device_t::feature::PROTECTION))
-	{
-		// find the parent of this driver
-		driver_enumerator drivlist(m_machine.options());
-		int maindrv = drivlist.find(m_machine.system());
-		int clone_of = drivlist.non_bios_clone(maindrv);
-		if (clone_of != -1)
-			maindrv = clone_of;
-
-		// scan the driver list for any working clones and add them
-		bool foundworking = false;
-		while (drivlist.next())
-		{
-			if (drivlist.current() == maindrv || drivlist.clone() == maindrv)
-			{
-				game_driver const &driver(drivlist.driver());
-				if (!(driver.flags & MACHINE_ERRORS) && !((driver.type.unemulated_features() | driver.type.imperfect_features()) & device_t::feature::PROTECTION))
-				{
-					// this one works, add a header and display the name of the clone
-					if (!foundworking)
-						util::stream_format(buf, _("\n\nThere are working clones of this machine: %s"), driver.name);
-					else
-						util::stream_format(buf, _(", %s"), driver.name);
-					foundworking = true;
-				}
-			}
-		}
-		if (foundworking)
-			buf << '\n';
-	}
-
+	get_general_warnings(buf, m_machine, machine_flags(), unemulated_features(), imperfect_features());
+	get_system_warnings(buf, m_machine, machine_flags(), unemulated_features(), imperfect_features());
 	return buf.str();
 }
 
@@ -337,7 +362,7 @@ std::string machine_info::game_info_string() const
 
 	// print description, manufacturer, and CPU:
 	util::stream_format(buf, _("%1$s\n%2$s %3$s\nDriver: %4$s\n\nCPU:\n"),
-			m_machine.system().type.fullname(),
+			system_list::instance().systems()[driver_list::find(m_machine.system().name)].description,
 			m_machine.system().year,
 			m_machine.system().manufacturer,
 			core_filename_extract_base(m_machine.system().type.source()));
@@ -480,23 +505,35 @@ std::string machine_info::get_screen_desc(screen_device &screen) const
   menu_game_info - handle the game information menu
 -------------------------------------------------*/
 
-menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_game_info::menu_game_info(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
 {
+	set_process_flags(PROCESS_CUSTOM_NAV);
 }
 
 menu_game_info::~menu_game_info()
 {
 }
 
-void menu_game_info::populate(float &customtop, float &custombottom)
+void menu_game_info::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
-	item_append(ui().machine_info().game_info_string(), FLAG_MULTILINE, nullptr);
+	if (!layout || (layout->width() != width))
+	{
+		rgb_t const color = ui().colors().text_color();
+		layout.emplace(ui().create_layout(container(), width));
+		layout->add_text(ui().machine_info().game_info_string(), color);
+		lines = layout->lines();
+	}
+	width = layout->actual_width();
 }
 
-void menu_game_info::handle()
+void menu_game_info::populate(float &customtop, float &custombottom)
 {
-	// process the menu
-	process(0);
+}
+
+void menu_game_info::handle(event const *ev)
+{
+	if (ev)
+		handle_key(ev->iptkey);
 }
 
 
@@ -504,23 +541,64 @@ void menu_game_info::handle()
   menu_warn_info - handle the emulation warnings menu
 -------------------------------------------------*/
 
-menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu(mui, container)
+menu_warn_info::menu_warn_info(mame_ui_manager &mui, render_container &container) : menu_textbox(mui, container)
 {
+	set_process_flags(PROCESS_CUSTOM_NAV);
 }
 
 menu_warn_info::~menu_warn_info()
 {
 }
 
-void menu_warn_info::populate(float &customtop, float &custombottom)
+void menu_warn_info::populate_text(std::optional<text_layout> &layout, float &width, int &lines)
 {
-	item_append(ui().machine_info().warnings_string(), FLAG_MULTILINE, nullptr);
+	if (!layout || (layout->width() != width))
+	{
+		std::ostringstream buf;
+		std::set<std::add_pointer_t<device_type> > seen;
+		bool first(!machine().rom_load().knownbad());
+
+		machine_info const &info(ui().machine_info());
+		device_t &root(machine().root_device());
+		get_general_warnings(buf, machine(), info.machine_flags(), info.unemulated_features(), info.imperfect_features());
+		if ((info.machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) || root.type().unemulated_features() || root.type().imperfect_features())
+		{
+			seen.insert(&root.type());
+			if (!first)
+				buf << '\n';
+			first = false;
+			util::stream_format(buf, _("%1$s:\n"), root.name());
+			get_system_warnings(buf, machine(), info.machine_flags(), root.type().unemulated_features(), root.type().imperfect_features());
+		}
+
+		for (device_t const &device : device_enumerator(root))
+		{
+			if ((device.type().unemulated_features() || device.type().imperfect_features()) && seen.insert(&device.type()).second)
+			{
+				if (!first)
+					buf << '\n';
+				first = false;
+				util::stream_format(buf, _("%1$s:\n"), device.name());
+				get_device_warnings(buf, device.type().unemulated_features(), device.type().imperfect_features());
+			}
+		}
+
+		rgb_t const color(ui().colors().text_color());
+		layout.emplace(ui().create_layout(container(), width));
+		layout->add_text(std::move(buf).str(), color);
+		lines = layout->lines();
+	}
+	width = layout->actual_width();
 }
 
-void menu_warn_info::handle()
+void menu_warn_info::populate(float &customtop, float &custombottom)
 {
-	// process the menu
-	process(0);
+}
+
+void menu_warn_info::handle(event const *ev)
+{
+	if (ev)
+		handle_key(ev->iptkey);
 }
 
 
@@ -536,19 +614,23 @@ menu_image_info::~menu_image_info()
 {
 }
 
+void menu_image_info::menu_activated()
+{
+	reset(reset_options::REMEMBER_POSITION);
+}
+
 void menu_image_info::populate(float &customtop, float &custombottom)
 {
-	item_append(machine().system().type.fullname(), FLAG_DISABLE, nullptr);
+	ui_system_info const &system(system_list::instance().systems()[driver_list::find(machine().system().name)]);
+	item_append(system.description, FLAG_DISABLE, nullptr);
 	item_append(std::string(), FLAG_DISABLE, nullptr);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
 		image_info(&image);
 }
 
-void menu_image_info::handle()
+void menu_image_info::handle(event const *ev)
 {
-	// process the menu
-	process(0);
 }
 
 

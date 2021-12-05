@@ -172,7 +172,7 @@ private:
 	uint8_t   m_TMR;      /* interval timer */
 
 	/* clock registers */
-	emu_timer *m_dectimer;          /* MESS timer, used to emulate the decrementer register */
+	emu_timer *m_dectimer;          /* MAME timer, used to emulate the decrementer register */
 	emu_timer *m_recvtimer;
 	emu_timer *m_sendtimer;
 

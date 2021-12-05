@@ -10,7 +10,7 @@
 
 #include "harddisk.h"
 
-#include "corefile.h"
+#include "ioprocs.h"
 
 #include <cstdlib>
 
@@ -21,9 +21,9 @@
 
 struct hard_disk_file
 {
-	chd_file *          chd;                /* CHD file */
-	util::core_file     *fhandle;           /* core_file if not a CHD */
-	hard_disk_info      info;               /* hard disk info */
+	chd_file *                  chd;        // CHD file
+	util::random_read_write *   fhandle;    // file if not a CHD
+	hard_disk_info              info;       // hard disk info
 };
 
 
@@ -73,11 +73,16 @@ hard_disk_file *hard_disk_open(chd_file *chd)
 	return file;
 }
 
-hard_disk_file *hard_disk_open(util::core_file &corefile, uint32_t skipoffs)
+hard_disk_file *hard_disk_open(util::random_read_write &corefile, uint32_t skipoffs)
 {
+	// bail if getting the file length fails
+	std::uint64_t length;
+	if (corefile.length(length))
+		return nullptr;
+
 	hard_disk_file *file;
 
-	/* allocate memory for the hard disk file */
+	// allocate memory for the hard disk file
 	file = (hard_disk_file *)malloc(sizeof(hard_disk_file));
 	if (file == nullptr)
 		return nullptr;
@@ -91,7 +96,7 @@ hard_disk_file *hard_disk_open(util::core_file &corefile, uint32_t skipoffs)
 	file->info.fileoffset = skipoffs;
 
 	// attempt to guess geometry in case this is an ATA situation
-	for (uint32_t totalsectors = (corefile.size() - skipoffs) / file->info.sectorbytes; ; totalsectors++)
+	for (uint32_t totalsectors = (length - skipoffs) / file->info.sectorbytes; ; totalsectors++)
 		for (uint32_t cursectors = 63; cursectors > 1; cursectors--)
 			if (totalsectors % cursectors == 0)
 			{
@@ -118,9 +123,7 @@ hard_disk_file *hard_disk_open(util::core_file &corefile, uint32_t skipoffs)
 void hard_disk_close(hard_disk_file *file)
 {
 	if (file->fhandle)
-	{
 		file->fhandle->flush();
-	}
 
 	free(file);
 }
@@ -147,7 +150,7 @@ chd_file *hard_disk_get_chd(hard_disk_file *file)
  *
  * @brief   Hard disk get information.
  *
- * @param [in,out]  file    If non-null, the file.
+ * @param [in,out]  file    The hard disk file object to operate on.
  *
  * @return  null if it fails, else a hard_disk_info*.
  */
@@ -164,30 +167,32 @@ hard_disk_info *hard_disk_get_info(hard_disk_file *file)
 -------------------------------------------------*/
 
 /**
- * @fn  uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
+ * @fn  bool hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
  *
  * @brief   Hard disk read.
  *
- * @param [in,out]  file    If non-null, the file.
- * @param   lbasector       The lbasector.
- * @param [in,out]  buffer  If non-null, the buffer.
+ * @param [in,out]  file    The hard disk file object to operate on.
+ * @param   lbasector       The sector number (Linear Block Address) to read.
+ * @param   buffer          The buffer where the hard disk data will be placed.
  *
- * @return  An uint32_t.
+ * @return  True if the operation succeeded
  */
 
-uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
+bool hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
 {
+	std::error_condition err;
 	if (file->chd)
 	{
-		std::error_condition err = file->chd->read_units(lbasector, buffer);
+		err = file->chd->read_units(lbasector, buffer);
 		return !err;
 	}
 	else
 	{
-		uint32_t actual = 0;
-		file->fhandle->seek(file->info.fileoffset + (lbasector * file->info.sectorbytes), SEEK_SET);
-		actual = file->fhandle->read(buffer, file->info.sectorbytes);
-		return (actual == file->info.sectorbytes);
+		size_t actual = 0;
+		err = file->fhandle->seek(file->info.fileoffset + (lbasector * file->info.sectorbytes), SEEK_SET);
+		if (!err)
+			err = file->fhandle->read(buffer, file->info.sectorbytes, actual);
+		return !err && (actual == file->info.sectorbytes);
 	}
 }
 
@@ -198,29 +203,70 @@ uint32_t hard_disk_read(hard_disk_file *file, uint32_t lbasector, void *buffer)
 -------------------------------------------------*/
 
 /**
- * @fn  uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer)
+ * @fn  bool hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer)
  *
  * @brief   Hard disk write.
  *
- * @param [in,out]  file    If non-null, the file.
- * @param   lbasector       The lbasector.
- * @param   buffer          The buffer.
+ * @param [in,out]  file    The hard disk file object to operate on.
+ * @param   lbasector       The sector number (Linear Block Address) to write.
+ * @param   buffer          The buffer containing the data to write.
  *
- * @return  An uint32_t.
+ * @return  True if the operation succeeded
  */
 
-uint32_t hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer)
+bool hard_disk_write(hard_disk_file *file, uint32_t lbasector, const void *buffer)
 {
+	std::error_condition err;
 	if (file->chd)
 	{
-		std::error_condition err = file->chd->write_units(lbasector, buffer);
+		err = file->chd->write_units(lbasector, buffer);
 		return !err;
 	}
 	else
 	{
-		uint32_t actual = 0;
-		file->fhandle->seek(file->info.fileoffset + (lbasector * file->info.sectorbytes), SEEK_SET);
-		actual = file->fhandle->write(buffer, file->info.sectorbytes);
-		return (actual == file->info.sectorbytes);
+		size_t actual = 0;
+		err = file->fhandle->seek(file->info.fileoffset + (lbasector * file->info.sectorbytes), SEEK_SET);
+		if (!err)
+			err = file->fhandle->write(buffer, file->info.sectorbytes, actual);
+		return !err && (actual == file->info.sectorbytes);
+	}
+}
+
+
+/*-------------------------------------------------
+    hard_disk_set_block_size - sets the block size
+    for a non-CHD-backed hard disk (a bare file).
+-------------------------------------------------*/
+
+/**
+ * @fn  bool hard_disk_set_block_size(hard_disk_file *file, uint32_t blocksize)
+ *
+ * @brief   Hard disk set block size (works only for non-CHD-files)
+ *
+ * @param [in,out]  file    The hard_disk_file object to operate on.
+ * @param   blocksize       The block size of this hard disk, in bytes.
+ *
+ * @return  true on success, false on failure.  Failure means a CHD is in use and the CHD
+ *          block size does not match the passed in size.  If a CHD is in use and the block
+ *          sizes match, success is returned).
+ */
+
+bool hard_disk_set_block_size(hard_disk_file *file, uint32_t blocksize)
+{
+	if (file->chd)
+	{
+		// if the CHD block size matches our block size, we're OK.
+		if (file->chd->unit_bytes() == blocksize)
+		{
+			return true;
+		}
+
+		// indicate failure, since we can't change the block size of a CHD.
+		return false;
+	}
+	else
+	{
+		file->info.sectorbytes = blocksize;
+		return true;
 	}
 }

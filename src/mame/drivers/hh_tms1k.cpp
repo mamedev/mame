@@ -144,6 +144,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 
   (* means undumped unless noted, @ denotes it's in this driver)
 
+============================================================================
+
 ROM source notes when dumped from another publisher, but confident it's the same:
 - arrball: Tandy Zingo
 - bcheetah: Fundimensions Incredible Brain Buggy
@@ -11962,7 +11964,7 @@ void tithermos_state::tithermos(machine_config &config)
 	m_maincpu->r().set(FUNC(tithermos_state::write_r));
 	m_maincpu->o().set(FUNC(tithermos_state::write_o));
 
-	CLOCK(config, "ac_line", 60).signal_handler().set_nop();
+	CLOCK(config, "ac_line", 60);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(4, 7);

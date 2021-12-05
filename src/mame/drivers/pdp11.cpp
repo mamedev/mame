@@ -6,60 +6,60 @@
 
         Unibus models
         ==================
-        PDP-11/20 and PDP-11/15 ? The original, non-microprogrammed processor;
+        PDP-11/20 and PDP-11/15 - The original, non-microprogrammed processor;
                 designed by Jim O'Loughlin. Floating point was supported by
                 peripheral options using various data formats.
-        PDP-11/35 and PDP-11/40 ? A microprogrammed successor to the PDP-11/20;
+        PDP-11/35 and PDP-11/40 - A microprogrammed successor to the PDP-11/20;
                 the design team was led by Jim O'Loughlin.
         PDP-11/45, PDP-11/50, and PDP-11/55 ? A much faster microprogrammed processor
                 that could use up to 256 kB of semiconductor memory instead of or in
                 addition to core memory. First model to support an optional FP11
                 floating-point coprocessor, which established the format used in
                 later models.
-        PDP-11/70 ? The 11/45 architecture expanded to allow 4 MB of physical memory
+        PDP-11/70 - The 11/45 architecture expanded to allow 4 MB of physical memory
                 segregated onto a private memory bus, 2 kB of cache memory, and much
                 faster I/O devices connected via the Massbus.[9]
-        PDP-11/05 and PDP-11/10 ? A cost-reduced successor to the PDP-11/20.
-        PDP-11/34 and PDP-11/04 ? Cost-reduced follow-on products to the 11/35
+        PDP-11/05 and PDP-11/10 - A cost-reduced successor to the PDP-11/20.
+        PDP-11/34 and PDP-11/04 - Cost-reduced follow-on products to the 11/35
                 and 11/05; the PDP-11/34 concept was created by Bob Armstrong.
                 The 11/34 supported up to 256 kB of Unibus memory. The PDP-11/34a
                 supported a fast floating-point option, and the 11/34c supported a
                 cache memory option.
-        PDP-11/60 ? A PDP-11 with user-writable microcontrol store; this was
+        PDP-11/60 - A PDP-11 with user-writable microcontrol store; this was
                 designed by another team led by Jim O'Loughlin.
-        PDP-11/44 ? Replacement for the 11/45 and 11/70 that supported optional cache
+        PDP-11/44 - Replacement for the 11/45 and 11/70 that supported optional cache
                 memory and floating-point processor, and included a sophisticated serial
                 console interface and support for 4 MB of physical memory. The design
                 team was managed by John Sofio.
-        PDP-11/24 ? First VLSI PDP-11 for Unibus, using the "Fonz-11" (F11) chip set
+        PDP-11/24 - First VLSI PDP-11 for Unibus, using the "Fonz-11" (F11) chip set
                 with a Unibus adapter.
-        PDP-11/84 ? Using the VLSI "Jaws-11" (J11) chip set with a Unibus adapter.
-        PDP-11/94 ? J11-based, faster than 11/84.
+        PDP-11/84 - Using the VLSI "Jaws-11" (J11) chip set with a Unibus adapter.
+        PDP-11/94 - J11-based, faster than 11/84.
 
         Q-bus models
         ==============
-        PDP-11/03 (also known as the LSI-11/03) ? The first LSI PDP-11, this system
+        PDP-11/03 (also known as the LSI-11/03) - The first LSI PDP-11, this system
                 used a chipset from Western Digital and supported 60 kB of memory.
-        PDP-11/23 ? Second generation of LSI (F-11). Early units supported
+        PDP-11/23 - Second generation of LSI (F-11). Early units supported
                 only 248 kB of memory.
-        PDP-11/23+/MicroPDP-11/23 ? Improved 11/23 with more functions on the
+        PDP-11/23+/MicroPDP-11/23 - Improved 11/23 with more functions on the
                 (larger) processor card.
-        MicroPDP-11/73 ? The third generation LSI-11, this system used the
+        MicroPDP-11/73 - The third generation LSI-11, this system used the
                 faster "Jaws-11" (J-11) chip set and supported up to 4 MB of memory.
-        MicroPDP-11/53 ? Slower 11/73 with on-board memory.
-        MicroPDP-11/83 ? Faster 11/73 with PMI (private memory interconnect).
-        MicroPDP-11/93 ? Faster 11/83; final DEC Q-Bus PDP-11 model.
+        MicroPDP-11/53 - Slower 11/73 with on-board memory.
+        MicroPDP-11/83 - Faster 11/73 with PMI (private memory interconnect).
+        MicroPDP-11/93 - Faster 11/83; final DEC Q-Bus PDP-11 model.
         KXJ11 - QBUS card (M7616) with PDP-11 based peripheral processor and
                 DMA controller. Based on a J11 CPU equipped with 512 kB of RAM,
                 64 kB of ROM, and parallel and serial interfaces.
-        Mentec M100 ? Mentec redesign of the 11/93, with J-11 chipset at 19.66 MHz,
+        Mentec M100 - Mentec redesign of the 11/93, with J-11 chipset at 19.66 MHz,
                 four on-board serial ports, 1-4 MB of on-board memory, and optional FPU.
-        Mentec M11 ? Processor upgrade board; microcode implementation of PDP-11
+        Mentec M11 - Processor upgrade board; microcode implementation of PDP-11
                 instruction set by Mentec, using the TI 8832 ALU and TI 8818
                 microsequencer from Texas Instruments.
-        Mentec M1 ? Processor upgrade board; microcode implementation of
+        Mentec M1 - Processor upgrade board; microcode implementation of
                 PDP-11 instruction set by Mentec, using Atmel 0.35 ?m ASIC.[10]
-        Quickware QED-993 ? High performance PDP-11/93 processor upgrade board.
+        Quickware QED-993 - High performance PDP-11/93 processor upgrade board.
         DECserver 500 and 550 LAT terminal servers DSRVS-BA using the KDJ11-SB chipset
 
         All PDP-11's execept the first one (11/15 and 11/20) are microprogrammed.
@@ -90,9 +90,10 @@
 
 #include "emu.h"
 #include "bus/qbus/qbus.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
 #include "cpu/i86/i186.h"
-#include "machine/terminal.h"
+#include "machine/dl11.h"
 #include "machine/rx01.h"
 
 
@@ -104,7 +105,8 @@ public:
 	pdp11_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_terminal(*this, "terminal")
+		, m_dl11(*this, "dl11")
+		, m_rs232(*this, "rs232")
 		, m_qbus(*this, "qbus")
 	{ }
 
@@ -119,13 +121,9 @@ protected:
 
 private:
 	required_device<t11_device> m_maincpu;
-	required_device<generic_terminal_device> m_terminal;
+	required_device<dl11_device> m_dl11;
+	required_device<rs232_port_device> m_rs232;
 	required_device<qbus_device> m_qbus;
-	uint16_t teletype_ctrl_r(offs_t offset);
-	void teletype_ctrl_w(offs_t offset, uint16_t data);
-	void kbd_put(u8 data);
-	uint8_t m_teletype_data;
-	uint16_t m_teletype_status;
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
@@ -134,50 +132,12 @@ private:
 	void sms1000_mem_188(address_map &map);
 };
 
-uint16_t pdp11_state::teletype_ctrl_r(offs_t offset)
-{
-	uint16_t res = 0;
-
-	switch(offset)
-	{
-		/*
-		    keyboard
-		    ---- x--- ---- ---- busy bit
-		    ---- ---- x--- ---- ready bit (set on character receive, clear on buffer read)
-		    ---- ---- -x-- ---- irq enable
-		    ---- ---- ---- ---x reader enable (?)
-		*/
-		case 0: res = m_teletype_status; break; // reader status register (tks)
-		case 1: m_teletype_status &= ~0x80; res = m_teletype_data; break;// reader buffer register (tkb)
-		/*
-		    printer
-		    ---- ---- x--- ---- ready bit
-		    ---- ---- -x-- ---- irq enable
-		    ---- ---- ---- -x-- maintenance
-		*/
-		case 2: res = 0x80; break; // punch status register (tps)
-		case 3: res = 0; break; // punch buffer register (tpb)
-	}
-
-	return res;
-}
-
-void pdp11_state::teletype_ctrl_w(offs_t offset, uint16_t data)
-{
-	switch(offset)
-	{
-		case 3:
-			m_terminal->write(data);
-			break;
-	}
-}
-
 void pdp11_state::pdp11_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0xdfff).ram();  // RAM
 	map(0xea00, 0xfeff).rom();
-	map(0xff70, 0xff77).rw(FUNC(pdp11_state::teletype_ctrl_r), FUNC(pdp11_state::teletype_ctrl_w));
+	map(0xff70, 0xff77).rw(m_dl11, FUNC(dl11_device::read), FUNC(dl11_device::write));
 
 	map(0xfe78, 0xfe7b).w("rx01", FUNC(rx01_device::write));
 }
@@ -288,11 +248,6 @@ INPUT_PORTS_END
 
 void pdp11_state::machine_start()
 {
-	m_teletype_data = 0;
-	m_teletype_status = 0;
-
-	save_item(NAME(m_teletype_data));
-	save_item(NAME(m_teletype_status));
 }
 
 void pdp11_state::machine_reset()
@@ -376,12 +331,6 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 }
 
 
-void pdp11_state::kbd_put(u8 data)
-{
-	m_teletype_data = data;
-	m_teletype_status |= 0x80;
-}
-
 void pdp11_state::pdp11(machine_config &config)
 {
 	/* basic machine hardware */
@@ -389,9 +338,18 @@ void pdp11_state::pdp11(machine_config &config)
 	m_maincpu->set_initial_mode(6 << 13);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pdp11_state::pdp11_mem);
 
-	/* video hardware */
-	GENERIC_TERMINAL(config, m_terminal, 0);
-	m_terminal->set_keyboard_callback(FUNC(pdp11_state::kbd_put));
+	DL11(config, m_dl11, XTAL(4'608'000));
+	m_dl11->set_rxc(9600);
+	m_dl11->set_txc(9600);
+	m_dl11->set_rxvec(060);
+	m_dl11->set_txvec(064);
+	m_dl11->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
+// future
+//	m_dl11->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//	m_dl11->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
+	m_rs232->rxd_handler().set(m_dl11, FUNC(dl11_device::rx_w));
 
 	RX01(config, "rx01", 0);
 	QBUS(config, m_qbus, 0);

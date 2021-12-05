@@ -449,7 +449,7 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(K053247, k053247_device)
-DECLARE_DEVICE_TYPE(K053246, k053247_device)
+static auto &K053246 = K053247;
 
 class k055673_device : public k053247_device
 {

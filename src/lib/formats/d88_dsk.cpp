@@ -29,7 +29,7 @@
  *
  */
 
-#include "flopimg.h"
+#include "flopimg_legacy.h"
 #include "imageutl.h"
 
 #include "ioprocs.h"

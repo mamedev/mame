@@ -117,15 +117,17 @@ std::string aquarius_cartridge_slot_device::get_default_card_software(get_defaul
 
 	if (hook.image_file())
 	{
-		const char *slot_string = "rom";
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return
 
+		const char *slot_string = "rom";
 		if (len >= 0x10000)
 		{
-			std::vector<uint8_t> header(16);
+			uint8_t header[16];
 
-			hook.image_file()->seek(len - 0x2000, SEEK_SET);
-			hook.image_file()->read(&header[0], 16);
+			size_t actual;
+			hook.image_file()->seek(len - 0x2000, SEEK_SET); // FIXME: check error return
+			hook.image_file()->read(&header[0], 16, actual); // FIXME: check error return or read returning short
 
 			// detect SuperCart header
 			if (!memcmp(&header[0], SC08_HEADER, 16) || !memcmp(&header[0], SC16_HEADER, 16))

@@ -132,19 +132,6 @@
 */
 
 
-/***************************************************************************
-    DEVICE TYPE GLOBALS
-***************************************************************************/
-
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd, hle_type3_device,    "kbd_type3_hle",    "Sun Type 3 Keyboard (HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd, hle_type4_device,    "kbd_type4_hle",    "Sun Type 4 Keyboard (HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd, hle_type5_device,    "kbd_type5_hle_us", "Sun Type 5 Keyboard (U.S.A. - HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd, hle_type5_gb_device, "kbd_type5_hle_gb", "Sun Type 5 Keyboard (Great Britain - HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd, hle_type5_se_device, "kbd_type5_hle_se", "Sun Type 5 Keyboard (Sweden - HLE)")
-DEFINE_DEVICE_TYPE_NS(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd, hle_type5_jp_device, "kbd_type5_hle_jp", "Sun Type 5 Keyboard (Japan - HLE)")
-
-
-
 namespace bus::sunkbd {
 
 namespace {
@@ -728,6 +715,212 @@ INPUT_PORTS_START( hle_type5_jp_device )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Kana")         PORT_CODE(KEYCODE_RALT) // かな
 INPUT_PORTS_END
 
+
+
+/***************************************************************************
+    BASE TYPE 4/5/6 HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type4_device_base : public hle_device_base
+{
+protected:
+	using hle_device_base::hle_device_base;
+
+private:
+	// return identification byte for self test pass response
+	virtual uint8_t ident_byte() override
+	{
+		return (m_dips->read() & 0x80U) ? 0x03U : 0x04U;
+	}
+};
+
+
+
+/***************************************************************************
+    TYPE 3 HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type3_device : public hle_device_base
+{
+public:
+	hle_type3_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_device_base(
+				mconfig,
+				SUN_TYPE3_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(hle_type3_device);
+	}
+
+private:
+	// return identification byte for self test pass response
+	virtual uint8_t ident_byte() override
+	{
+		return 0x03U;
+	}
+};
+
+
+
+/***************************************************************************
+    TYPE 4 HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type4_device : public hle_type4_device_base
+{
+public:
+	hle_type4_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_type4_device_base(
+				mconfig,
+				SUN_TYPE4_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(hle_type4_device);
+	}
+};
+
+
+
+/***************************************************************************
+    TYPE 5 HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type5_device : public hle_type4_device_base
+{
+public:
+	hle_type5_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_type4_device_base(
+				mconfig,
+				SUN_TYPE5_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(hle_type5_device);
+	}
+};
+
+
+
+/***************************************************************************
+    TYPE 5 UK HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type5_gb_device : public hle_type4_device_base
+{
+public:
+	hle_type5_gb_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_type4_device_base(
+				mconfig,
+				SUN_TYPE5_GB_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(hle_type5_gb_device);
+	}
+};
+
+
+
+/***************************************************************************
+    TYPE 5 SWEDISH HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type5_se_device : public hle_type4_device_base
+{
+public:
+	hle_type5_se_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_type4_device_base(
+				mconfig,
+				SUN_TYPE5_SE_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(hle_type5_se_device);
+	}
+};
+
+
+
+/***************************************************************************
+    TYPE 5 JAPANESE HLE KEYBOARD DEVICE
+***************************************************************************/
+
+class hle_type5_jp_device : public hle_type4_device_base
+{
+public:
+	hle_type5_jp_device(
+			machine_config const &mconfig,
+			char const *tag,
+			device_t *owner,
+			uint32_t clock)
+		: hle_type4_device_base(
+				mconfig,
+				SUN_TYPE5_JP_HLE_KEYBOARD,
+				tag,
+				owner,
+				clock)
+	{
+	}
+
+protected:
+	virtual ioport_constructor device_input_ports() const override
+	{
+		return INPUT_PORTS_NAME(hle_type5_jp_device);
+	}
+};
+
 } // anonymous namespace
 
 
@@ -1035,249 +1228,17 @@ void hle_device_base::received_byte(uint8_t byte)
 	}
 }
 
-
-
-/***************************************************************************
-    BASE TYPE 4/5/6 HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type4_device_base::ident_byte
-    return identification byte for self test pass
-    response
---------------------------------------------------*/
-
-uint8_t hle_type4_device_base::ident_byte()
-{
-	return (m_dips->read() & 0x80U) ? 0x03U : 0x04U;
-}
-
-
-
-/***************************************************************************
-    TYPE 3 HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type3_device::hle_type3_device
-    abbreviated constructor
---------------------------------------------------*/
-
-hle_type3_device::hle_type3_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock)
-	: hle_device_base(
-			mconfig,
-			SUN_TYPE3_HLE_KEYBOARD,
-			tag,
-			owner,
-			clock)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type3_device::device_input_ports
-    get input ports for this device
---------------------------------------------------*/
-
-ioport_constructor hle_type3_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hle_type3_device);
-}
-
-
-/*--------------------------------------------------
-    hle_type3_device::ident_byte
-    return identification byte for self test pass
-    response
---------------------------------------------------*/
-
-uint8_t hle_type3_device::ident_byte()
-{
-	return 0x03U;
-}
-
-
-
-/***************************************************************************
-    TYPE 4 HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type4_device::hle_type4_device
-    abbreviated constructor
---------------------------------------------------*/
-
-hle_type4_device::hle_type4_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock)
-	: hle_type4_device_base(
-			mconfig,
-			SUN_TYPE4_HLE_KEYBOARD,
-			tag,
-			owner,
-			clock)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type4_device::device_input_ports
-    get input ports for this device
---------------------------------------------------*/
-
-ioport_constructor hle_type4_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hle_type4_device);
-}
-
-
-
-/***************************************************************************
-    TYPE 5 HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type5_device::hle_type5_device
-    abbreviated constructor
---------------------------------------------------*/
-
-hle_type5_device::hle_type5_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock)
-	: hle_type4_device_base(
-			mconfig,
-			SUN_TYPE5_HLE_KEYBOARD,
-			tag,
-			owner,
-			clock)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type5_device::device_input_ports
-    get input ports for this device
---------------------------------------------------*/
-
-ioport_constructor hle_type5_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hle_type5_device);
-}
-
-
-
-/***************************************************************************
-    TYPE 5 UK HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type5_gb_device::hle_type5_gb_device
-    abbreviated constructor
---------------------------------------------------*/
-
-hle_type5_gb_device::hle_type5_gb_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock)
-	: hle_type4_device_base(
-			mconfig,
-			SUN_TYPE5_GB_HLE_KEYBOARD,
-			tag,
-			owner,
-			clock)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type5_gb_device::device_input_ports
-    get input ports for this device
---------------------------------------------------*/
-
-ioport_constructor hle_type5_gb_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hle_type5_gb_device);
-}
-
-
-
-/***************************************************************************
-    TYPE 5 SWEDISH HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type5_se_device::hle_type5_se_device
-    abbreviated constructor
---------------------------------------------------*/
-
-hle_type5_se_device::hle_type5_se_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock)
-	: hle_type4_device_base(
-			mconfig,
-			SUN_TYPE5_SE_HLE_KEYBOARD,
-			tag,
-			owner,
-			clock)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type5_se_device::device_input_ports
-    get input ports for this device
---------------------------------------------------*/
-
-ioport_constructor hle_type5_se_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hle_type5_se_device);
-}
-
-
-
-/***************************************************************************
-    TYPE 5 JAPANESE HLE KEYBOARD DEVICE
-***************************************************************************/
-
-/*--------------------------------------------------
-    hle_type5_jp_device::hle_type5_jp_device
-    abbreviated constructor
---------------------------------------------------*/
-
-hle_type5_jp_device::hle_type5_jp_device(
-		machine_config const &mconfig,
-		char const *tag,
-		device_t *owner,
-		uint32_t clock)
-	: hle_type4_device_base(
-			mconfig,
-			SUN_TYPE5_JP_HLE_KEYBOARD,
-			tag,
-			owner,
-			clock)
-{
-}
-
-
-/*--------------------------------------------------
-    hle_type5_jp_device::device_input_ports
-    get input ports for this device
---------------------------------------------------*/
-
-ioport_constructor hle_type5_jp_device::device_input_ports() const
-{
-	return INPUT_PORTS_NAME(hle_type5_jp_device);
-}
-
 } // namespace bus::sunkbd
+
+
+
+/***************************************************************************
+    DEVICE TYPE GLOBALS
+***************************************************************************/
+
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE3_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type3_device,    "kbd_type3_hle",    "Sun Type 3 Keyboard (HLE)")
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE4_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type4_device,    "kbd_type4_hle",    "Sun Type 4 Keyboard (HLE)")
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE5_HLE_KEYBOARD,    bus::sunkbd::hle_device_base, bus::sunkbd::hle_type5_device,    "kbd_type5_hle_us", "Sun Type 5 Keyboard (U.S.A. - HLE)")
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE5_GB_HLE_KEYBOARD, bus::sunkbd::hle_device_base, bus::sunkbd::hle_type5_gb_device, "kbd_type5_hle_gb", "Sun Type 5 Keyboard (Great Britain - HLE)")
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE5_SE_HLE_KEYBOARD, bus::sunkbd::hle_device_base, bus::sunkbd::hle_type5_se_device, "kbd_type5_hle_se", "Sun Type 5 Keyboard (Sweden - HLE)")
+DEFINE_DEVICE_TYPE_PRIVATE(SUN_TYPE5_JP_HLE_KEYBOARD, bus::sunkbd::hle_device_base, bus::sunkbd::hle_type5_jp_device, "kbd_type5_hle_jp", "Sun Type 5 Keyboard (Japan - HLE)")

@@ -2,7 +2,7 @@
 // copyright-holders:Roberto Fresca
 /******************************************************************************
 
-    Unknown TMS9980 Poker Game  <--- We need the real name & manufacturer! :)
+    Unknown TMS9980 Poker Game  <--- We need the real name & confirm the manufacturer! :)
     --------------------------
 
     Driver by Roberto Fresca.
@@ -10,7 +10,8 @@
 
     Games running on this hardware:
 
-    * Unknown TMS9980 Poker Game,  198?,  Unknown.
+    * Unknown TMS9980 Poker Game,  198?,  Jeutel?
+    * Las Vegas, 198?, Jeutel (two sets)
 
 
 *******************************************************************************
@@ -608,6 +609,12 @@ void tmspoker_state::tmspoker(machine_config &config)
 *        Rom Load        *
 *************************/
 
+#define TMSPOKER_BIOS \
+	ROM_REGION( 0x0800, "chars", 0 ) \
+	ROM_LOAD( "3.bin",  0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) ) \
+	ROM_REGION( 0x0100, "proms", 0 ) \
+	ROM_LOAD( "tibp22.bin", 0x0000, 0x0100, CRC(74ec6bbd) SHA1(3ab696506de03c69d9f40d49c5fc6d3ac6601acf) )
+
 ROM_START( tmspoker )
 	ROM_REGION( 0x4000, "maincpu", 0 ) // TMS9980 selectable code
 	ROM_LOAD( "0.bin",  0x0800, 0x0800, CRC(a20ae6cb) SHA1(d47780119b4ebb16dc759a50dfc880ddbc6a1112) )  // Program 1
@@ -615,11 +622,54 @@ ROM_START( tmspoker )
 	ROM_LOAD( "8.bin",  0x1800, 0x0800, CRC(0c0a7159) SHA1(92cc3dc32a5bf4a7fa197e72c3931e583c96ef33) )  // Program 2
 	ROM_CONTINUE(       0x1000, 0x0800 )
 
-	ROM_REGION( 0x0800, "chars", 0 )
-	ROM_LOAD( "3.bin",  0x0000, 0x0800, CRC(55458dae) SHA1(bf96d1b287292ff89bc2dbd9451a88a2ab941f3e) )
+	TMSPOKER_BIOS
+ROM_END
 
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "tibp22.bin", 0x0000, 0x0100, CRC(74ec6bbd) SHA1(3ab696506de03c69d9f40d49c5fc6d3ac6601acf) )
+/*
+'tmspoker2' and 'tmspoker3' were removable carts, having the PCB a slot instead of the ROM sockets found on 'tmspoker' (but the
+PCB was the same on every other component). Each game cart had 2 2716 EPROMs, and the main PCB was silkscreened as "POKER".
+Both 'tmspoker2' and 'tmspoker3' seems like different sets of the same game, having only 22 different bytes, where the value always
+change by adding 8, and only on addresses ending by 'E'.
+
+         Sea Pk
+0000012E: 2A 22
+0000013E: 2C 24
+0000014E: 3E 36
+0000015E: FA F2
+0000017E: E8 E0
+0000018E: 4C 44
+000001AE: 19 11
+000001BE: 2A 22
+0000020E: 0B 03
+0000022E: 2C 24
+0000026E: 2C 24
+0000027E: 2C 24
+000002CE: 2D 25
+000002DE: 2C 24
+000002EE: 2F 27
+0000031E: 2C 24
+0000034E: 2C 24
+0000039E: DA D2
+000003BE: 2D 25
+0000044E: 2C 24
+0000045E: 2D 25
+0000046E: 2C 24
+*/
+
+ROM_START( jlasvegas )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "sea_1_2716.bin", 0x0800, 0x0800, CRC(e49ce839) SHA1(07e2cc5129825c3c241890b7d75ddb7a7af7fef1) )
+	ROM_LOAD( "sea_2_2716.bin", 0x1800, 0x0800, CRC(d675a0a6) SHA1(b9d2efcb33f9ffde394cf3360fb863cd8a7e946d) )
+
+	TMSPOKER_BIOS
+ROM_END
+
+ROM_START( jlasvegasa )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "pk4_2716.bin", 0x0800, 0x0800, CRC(e49ce839) SHA1(07e2cc5129825c3c241890b7d75ddb7a7af7fef1) )
+	ROM_LOAD( "pk5_2716.bin", 0x1800, 0x0800, CRC(f9756009) SHA1(88bfb5482510751a2f7e6bb7824342f2469aeea1) )
+
+	TMSPOKER_BIOS
 ROM_END
 
 
@@ -654,5 +704,7 @@ void tmspoker_state::init_bus()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT      ROT   COMPANY      FULLNAME                      FLAGS
-GAME( 198?, tmspoker, 0,      tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "<unknown>", "unknown TMS9980 poker game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT     MACHINE   INPUT     STATE           INIT      ROT   COMPANY    FULLNAME                      FLAGS
+GAME( 198?, tmspoker,   0,         tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "Jeutel?", "unknown TMS9980 poker game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 198?, jlasvegas,  0,         tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "Jeutel",  "Las Vegas (Jeutel, set 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 198?, jlasvegasa, jlasvegas, tmspoker, tmspoker, tmspoker_state, init_bus, ROT0, "Jeutel",  "Las Vegas (Jeutel, set 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

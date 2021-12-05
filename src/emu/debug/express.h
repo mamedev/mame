@@ -18,6 +18,7 @@
 #include <deque>
 #include <functional>
 #include <list>
+#include <string_view>
 #include <unordered_map>
 
 
@@ -33,13 +34,13 @@ enum expression_space
 	EXPSPACE_PROGRAM_LOGICAL,
 	EXPSPACE_DATA_LOGICAL,
 	EXPSPACE_IO_LOGICAL,
-	EXPSPACE_SPACE3_LOGICAL,
+	EXPSPACE_OPCODE_LOGICAL,
 	EXPSPACE_PROGRAM_PHYSICAL,
 	EXPSPACE_DATA_PHYSICAL,
 	EXPSPACE_IO_PHYSICAL,
-	EXPSPACE_SPACE3_PHYSICAL,
-	EXPSPACE_OPCODE,
-	EXPSPACE_RAMWRITE,
+	EXPSPACE_OPCODE_PHYSICAL,
+	EXPSPACE_PRGDIRECT,
+	EXPSPACE_OPDIRECT,
 	EXPSPACE_REGION
 };
 
@@ -203,7 +204,7 @@ private:
 	u64 read_memory_region(const char *rgntag, offs_t address, int size);
 	void write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
 	void write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
-	device_t *expression_get_device(const char *tag);
+	expression_error expression_get_space(const char *tag, int &spacenum, device_memory_interface *&memory);
 	void notify_memory_modified();
 
 	// internal state
@@ -223,7 +224,8 @@ class parsed_expression
 {
 public:
 	// construction/destruction
-	parsed_expression(symbol_table &symtable, const char *expression = nullptr, int default_base = 16);
+	parsed_expression(symbol_table &symtable);
+	parsed_expression(symbol_table &symtable, std::string_view expression, int default_base = 16);
 	parsed_expression(const parsed_expression &src);
 	parsed_expression(parsed_expression &&src) = default;
 
@@ -241,7 +243,7 @@ public:
 	void set_default_base(int base) { assert(base == 8 || base == 10 || base == 16); m_default_base = base; }
 
 	// execution
-	void parse(const char *string);
+	void parse(std::string_view string);
 	u64 execute() { return execute_tokens(); }
 
 private:

@@ -1833,8 +1833,13 @@ void usclssic_state::lockout_w(u8 data)
 {
 	u16 tiles_offset = BIT(data, 4) ? 0x4000 : 0;
 
-	m_port_select = BIT(data, 6);
-	m_buttonmux->select_w(m_port_select);
+	if (m_port_select != BIT(data, 6))
+	{
+		m_upd4701->update();
+		m_port_select = BIT(data, 6);
+		m_buttonmux->select_w(m_port_select);
+		m_upd4701->recalibrate();
+	}
 
 	m_upd4701->resetx_w(BIT(data, 7));
 	m_upd4701->resety_w(BIT(data, 7));
@@ -2420,13 +2425,13 @@ void seta_state::drgnunit_map(address_map &map)
                                 The Roulette
 ***************************************************************************/
 
-MACHINE_START_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_start()
 {
 	m_leds.resolve();
 }
 
 // Coin drop
-MACHINE_RESET_MEMBER(setaroul_state, setaroul)
+void setaroul_state::machine_reset()
 {
 	m_coin_start_cycles = 0;
 }
@@ -4124,10 +4129,10 @@ static INPUT_PORTS_START( calibr50 )
 	PORT_DIPSETTING(      0x0000, "Coin Mode 2" )
 
 	PORT_START("ROT1")  // Rotation Player 1
-	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_RESET PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 
 	PORT_START("ROT2")  // Rotation Player 2
-	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_RESET PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
+	PORT_BIT( 0xfff, 0x00, IPT_DIAL ) PORT_PLAYER(2) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -5091,7 +5096,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 #define KRZYBOWL_TRACKBALL(_dir_, _n_ ) \
-	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE PORT_RESET
+	PORT_BIT( 0x0fff, 0x0000, IPT_TRACKBALL_##_dir_ ) PORT_PLAYER(_n_) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_REVERSE
 
 static INPUT_PORTS_START( krzybowl )
 	PORT_START("P1") //Player 1
@@ -6556,16 +6561,16 @@ static INPUT_PORTS_START( usclssic )
 	PORT_BIT( 0xfff, 0x000, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(usclssic_state, trackball_y_r)
 
 	PORT_START("TRACK1_X")     /* muxed port 0 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
 	PORT_START("TRACK1_Y")     /* muxed port 0 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30)
 
 	PORT_START("TRACK2_X")     /* muxed port 1 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_COCKTAIL
 
 	PORT_START("TRACK2_Y")     /* muxed port 1 */
-	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_RESET PORT_COCKTAIL
+	PORT_BIT( 0xfff, 0x000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(70) PORT_KEYDELTA(30) PORT_COCKTAIL
 
 	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_WRITE_LINE_DEVICE_MEMBER("buttonmux", hc157_device, a0_w)
@@ -7942,8 +7947,6 @@ void downtown_state::tndrcade(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8000,8 +8003,6 @@ void downtown_state::twineagl(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8051,8 +8052,6 @@ void downtown_state::downtown(machine_config &config)
 	m_layers[0]->set_xoffsets(0, -1);
 
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8142,8 +8141,6 @@ void usclssic_state::usclssic(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(usclssic_state::usclssic_palette), 16*32 + 64*32*2, 0x400); // sprites, layer - layer is 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(usclssic_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8207,8 +8204,6 @@ void downtown_state::calibr50(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8262,8 +8257,6 @@ void downtown_state::metafox(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	MCFG_VIDEO_START_OVERRIDE(downtown_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8312,8 +8305,6 @@ void seta_state::atehate(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8361,8 +8352,6 @@ void seta_state::blandia(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8399,8 +8388,6 @@ void seta_state::blandiap(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(6, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(6, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::blandia_palette), (16*32 + 64*32*4)*2, 0x600*2);  // sprites, layer1, layer2, palette effect - layers 1&2 are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8439,8 +8426,6 @@ void seta_state::blockcar(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8518,8 +8503,6 @@ void seta_state::daioh(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8576,8 +8559,6 @@ void seta_state::drgnunit(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8638,9 +8619,6 @@ void setaroul_state::setaroul(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	MCFG_MACHINE_START_OVERRIDE(setaroul_state, setaroul)
-	MCFG_MACHINE_RESET_OVERRIDE(setaroul_state, setaroul)
-
 	SETA001_SPRITE(config, m_seta001, 16'000'000, m_palette, gfx_setaroul_sprites);
 	m_seta001->set_gfxbank_callback(FUNC(seta_state::setac_gfxbank_callback));
 	// position kludges
@@ -8668,8 +8646,6 @@ void setaroul_state::setaroul(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_setaroul).set_xoffsets(0, 5);
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
-
-	MCFG_VIDEO_START_OVERRIDE(setaroul_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8716,8 +8692,6 @@ void seta_state::eightfrc(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8763,8 +8737,6 @@ void seta_state::extdwnhl(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -8832,8 +8804,6 @@ void seta_state::gundhara(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8909,8 +8879,6 @@ void seta_state::jjsquawk(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -8944,8 +8912,6 @@ void seta_state::jjsquawb(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawkb_layer1).set_xoffsets(-1, -1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawkb_layer2).set_xoffsets(-1, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -8993,8 +8959,6 @@ void seta_state::kamenrid(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9033,8 +8997,6 @@ void seta_state::orbs(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9076,8 +9038,6 @@ void seta_state::keroppi(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9126,8 +9086,6 @@ void seta_state::krzybowl(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9173,8 +9131,6 @@ void seta_state::madshark(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_jjsquawk_layer1);
 	X1_012(config, m_layers[1], m_palette, gfx_jjsquawk_layer2);
 	PALETTE(config, m_palette, FUNC(seta_state::jjsquawk_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9226,8 +9182,6 @@ void seta_state::magspeed(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9273,8 +9227,6 @@ void seta_state::msgundam(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(-2, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9416,8 +9368,6 @@ void kiwame_state::kiwame(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(kiwame_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -9463,8 +9413,6 @@ void seta_state::rezon(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(-2, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9503,8 +9451,6 @@ void seta_state::thunderl(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9580,8 +9526,6 @@ void seta_state::wiggie(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9622,8 +9566,6 @@ void seta_state::wits(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9660,8 +9602,6 @@ void seta_state::umanclub(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9705,8 +9645,6 @@ void seta_state::utoukond(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_msgundam_layer1).set_xoffsets(0, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -9768,8 +9706,6 @@ void seta_state::wrofaero(machine_config &config)
 	X1_012(config, m_layers[1], m_palette, gfx_msgundam_layer2);
 	PALETTE(config, m_palette).set_entries(512 * 3);    // sprites, layer1, layer2
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9815,8 +9751,6 @@ void seta_state::zingzip(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_zingzip_layer1).set_xoffsets(-2, -1);
 	X1_012(config, m_layers[1], m_palette, gfx_zingzip_layer2).set_xoffsets(-2, -1);
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -9872,8 +9806,6 @@ void seta_state::pairlove(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(2048);   // sprites only
 
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
-
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
@@ -9923,8 +9855,6 @@ void seta_state::crazyfgt(machine_config &config)
 	X1_012(config, m_layers[0], m_palette, gfx_blandia_layer1).set_xoffsets(0, -2);
 	X1_012(config, m_layers[1], m_palette, gfx_blandia_layer2).set_xoffsets(0, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::gundhara_palette), 16*32 + 64*32*4, 0x600);  // sprites, layer2, layer1 - layers are 6 planes deep (seta_state,but have only 4 palettes)
-
-	MCFG_VIDEO_START_OVERRIDE(seta_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -10004,8 +9934,6 @@ void jockeyc_state::jockeyc(machine_config &config)
 
 	X1_012(config, m_layers[0], m_palette, gfx_downtown).set_xoffsets(126, -2);
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
-
-	MCFG_VIDEO_START_OVERRIDE(jockeyc_state,seta)
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -10569,6 +10497,12 @@ ROM_START( rezon )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD16_WORD_SWAP( "us001009.u70",  0x000000, 0x100000, CRC(0d7d2e2b) SHA1(cfba19314ecb0a49ed9ff8df32cd6a3fe37ff526) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "us-010.u14", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "us-011.u35", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "us-012.u36", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "us-013.u76", 0x600, 0x104, NO_DUMP )
 ROM_END
 
 /* note the ONLY byte that changes is the year, 1992 instead of 1991.  The actual license is controlled by a jumper but
@@ -10594,6 +10528,12 @@ ROM_START( rezont )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD16_WORD_SWAP( "us001009.u70",  0x000000, 0x100000, CRC(0d7d2e2b) SHA1(cfba19314ecb0a49ed9ff8df32cd6a3fe37ff526) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "us-010.u14", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "us-011.u35", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "us-012.u36", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "us-013.u76", 0x600, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( stg )
@@ -10640,6 +10580,14 @@ ROM_START( blandia )
 	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ux001013.u69", 0x000000, 0x100000, CRC(5cd273cd) SHA1(602e1f10454e2b1c941f2e6983872bb9ca77a542) )
 	ROM_LOAD( "ux001014.u70", 0x100000, 0x080000, CRC(86b49b4e) SHA1(045b352950d848907af4c22b817d154b2cfff382) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "ux-015.u206", 0x000, 0x117, CRC(08cddbdd) SHA1(c7330b96375f96406c63abe5d17d02e84828d884) )
+	ROM_LOAD( "ux-016.u116", 0x200, 0x117, CRC(9734f1af) SHA1(e7299892a26e9e8ee607ece93cefdee19a13ffae) )
+	ROM_LOAD( "ux-017.u14",  0x400, 0x117, CRC(9e95d8d5) SHA1(f7e7250e9aa6fc1c14874230a5b0019704e54c4c) )
+	ROM_LOAD( "ux-018.u35",  0x600, 0x117, CRC(c9579473) SHA1(ff65a5ed840b60bd8416ae7e11805635bfcec9ad) )
+	ROM_LOAD( "ux-019.u36",  0x800, 0x117, CRC(d85c359d) SHA1(251c1fc833c1be6b15e70240cbb6c997443baea3) )
+	ROM_LOAD( "ux-020.u76",  0xa00, 0x117, CRC(116278bf) SHA1(e34bceab30dce17c2a9cb0bf51a5eda0a89da08c) )
 ROM_END
 
 ROM_START( blandiap )
@@ -10705,7 +10653,11 @@ ROM_START( blockcar )
 	ROM_LOAD( "bl-chr-1.l3",  0x080000, 0x080000, CRC(563de808) SHA1(40b2f9f4a4cb1a019f6419572ee21d66dda7d4af) )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
-	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
+	/* The game plays music from 0x000000 to 0x0bffff and sfx from 0x0c0000 to 0x0fffff
+	   Loading the ROM mirrored like this causes sfx to play instead of music in some levels.
+	   the most logical conclusion is that the ROM below was dumped at half size and should
+	   be 1MByte, hence BAD_DUMP */
+	ROM_LOAD( "bl-snd-0.a13",  0x000000, 0x080000, BAD_DUMP CRC(a92dabaf) SHA1(610c1dc0467753dfddaa4b27bc40cb118b0bc7a3) )
 	ROM_RELOAD(                0x080000, 0x080000  )
 ROM_END
 
@@ -10758,6 +10710,10 @@ ROM_START( umanclub )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "uw003.u13", 0x000000, 0x100000, CRC(e2f718eb) SHA1(fd085b68f76c8778816a1b7d47783b9dc20bff12) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "bp-u-004.u30", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "bp-u-005.u32", 0x200, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( zingzip )
@@ -10778,6 +10734,13 @@ ROM_START( zingzip )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "uy001011.70",  0x000000, 0x100000, CRC(bd845f55) SHA1(345b79cfcd8c924d6ba365814286e518438f10bc) ) // uy001017 + uy001018
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "uy-012.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-013.u14",  0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-014.u35",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-015.u36",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-016.u76",  0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( zingzipbl )
@@ -10854,6 +10817,13 @@ ROM_START( daioh )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fg-008.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-009.u14",  0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-010.u35",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-011.u36",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-012.u76",  0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( daioha )
@@ -10873,6 +10843,13 @@ ROM_START( daioha )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fg-001-007",  0x000000, 0x100000, CRC(4a2fe9e0) SHA1(e55b6f301f842ff5d3c7a0041856695ac1d8a78f) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fg-008.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-009.u14",  0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-010.u35",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-011.u36",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fg-012.u76",  0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( daiohp ) /* Found on the same P0-072-2 PCB as the Blandia prototype */
@@ -11011,6 +10988,13 @@ ROM_START( msgundam )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fa-011.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-012.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-013.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-014.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-015.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( msgundam1 )
@@ -11030,6 +11014,13 @@ ROM_START( msgundam1 )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fa001004.u26",  0x000000, 0x100000, CRC(b965f07c) SHA1(ff7827cc80655465ffbb732d55ba81f21f51a5ca) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fa-011.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-012.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-013.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-014.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fa-015.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( msgundamb ) // 2 PCB stack, one has a 'Tecnoval - tecnologia valenciana del recreativo' sticker
@@ -11140,6 +11131,14 @@ ROM_START( wrofaero )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u69.bin",  0x000000, 0x080000, CRC(957ecd41) SHA1(3b37ba44b8b8f0f0de41c8c26c3dfdb391ba572c) )
 	ROM_LOAD( "u70.bin",  0x080000, 0x080000, CRC(8d756fdf) SHA1(d66712a6aa19252f2c915ac66fc27df031fa9512) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "m-009.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "m-010.u116", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "m-011.u14",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "m-012.u35",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "m-013.u36",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "m-014.u76",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( jjsquawk ) /* PCB stickered  J.J. SQUAWKERS 9401- 1022 */
@@ -11168,6 +11167,14 @@ ROM_START( jjsquawk ) /* PCB stickered  J.J. SQUAWKERS 9401- 1022 */
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fe2001005.u69", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
 	ROM_LOAD( "fe2001006.u70", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "m-009.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "m-010.u116", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "m2-011.u14", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "m-012.u35",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "m-013.u36",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "m-014.u76",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( jjsquawko ) /* Official 93111A PCB missing version sticker */
@@ -11196,6 +11203,14 @@ ROM_START( jjsquawko ) /* Official 93111A PCB missing version sticker */
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fe2001005.u69", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
 	ROM_LOAD( "fe2001006.u70", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "m-009.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "m-010.u116", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "m2-011.u14", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "m-012.u35",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "m-013.u36",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "m-014.u76",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( jjsquawkb )
@@ -11291,6 +11306,13 @@ ROM_START( kamenrid )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fj001008.26", 0x000000, 0x100000, CRC(45e2b329) SHA1(8526afae1aa9178570c906eb96438f174d174f4d) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fj-111.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fj-012.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fj-013.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fj-014.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fj-015.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( eightfrc )
@@ -11311,6 +11333,14 @@ ROM_START( eightfrc )
 	ROM_REGION( 0x200000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u70.bin",  0x000000, 0x100000, CRC(dfdb67a3) SHA1(0fed6fb498dcfc1276facd0ecd2dfde45ff671f2) )
 	ROM_LOAD( "u69.bin",  0x100000, 0x100000, CRC(82ec08f1) SHA1(f17300d3cf990ef5c11056fd922f8cae0b2c918f) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "uy-012.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-013.u14",  0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-014.u35",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-015.u36",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-016.u76",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "uy-017.u116", 0xa00, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( kiwame )
@@ -11342,6 +11372,10 @@ ROM_START( krzybowl )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fv001.005", 0x000000, 0x080000, CRC(5e206062) SHA1(e47cfb6947df178f3547dfe61907571bcb84e4ac) )
 	ROM_LOAD( "fv001.006", 0x080000, 0x080000, CRC(572a15e7) SHA1(b6a3e99e14a473b78ff48d1a46b20a0862d128e9) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "fv-007.u22", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fv-008.u23", 0x200, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( orbs )   /* All eproms are socketed and labelled (handwritten) "ORBS 10\7\94" */
@@ -11410,6 +11444,13 @@ ROM_START( extdwnhl )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fw001007.026",  0x080000, 0x080000, CRC(16d84d7a) SHA1(fdc13776ba1ec9c48a33a9f2dfe8a0e55c54d89e) )   // swapped halves
 	ROM_CONTINUE(              0x000000, 0x080000  )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fw-001.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-002.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-003.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-004.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-005.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( gundhara )
@@ -11436,6 +11477,14 @@ ROM_START( gundhara )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "bpgh-013.u70",  0x080000, 0x080000, CRC(0fa5d503) SHA1(fd7a80cd25c23e737cc2c3d11de2291e22313b58) )   // swapped halves
 	ROM_CONTINUE(              0x000000, 0x080000  )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "fx-001.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fx-002.u116", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fx-003.u14",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fx-004.u35",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fx-005.u36",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "fx-006.u76",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 /* Chinese factory board, possibly bootleg but appears to come from the
@@ -11502,6 +11551,13 @@ ROM_START( sokonuke )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "001-006.bin",   0x080000, 0x080000, CRC(ecfac767) SHA1(3d05bdb2c2a8c7eb5fa77b0c4482f98d3947c6d6) )
 	ROM_CONTINUE(              0x000000, 0x080000  )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fw-001.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-002.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-003.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-004.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fw-005.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( zombraid )
@@ -11528,6 +11584,14 @@ ROM_START( zombraid )
 
 	ROM_REGION(0x10000, "nvram", 0)
 	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "fy-001.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fy-002.u116", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fy-003.u14",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fy-004.u35",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fy-005.u36",  0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "fy-006.u76",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 /* Notes about the Proto/Test roms:
@@ -11708,6 +11772,14 @@ ROM_START( utoukond )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "93uta08.69", 0x000000, 0x100000, CRC(3d50bbcd) SHA1(e9b78d08466e1f9b42f11999bb53b6deceb81a12) )
+
+	ROM_REGION( 0xc00, "plds", 0 )
+	ROM_LOAD( "93ut-a12.u206", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "93ut-a13.u14",  0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "93ut-a14.u35",  0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "93ut-a15.u36",  0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "93ut-a16.u110", 0x800, 0x104, NO_DUMP )
+	ROM_LOAD( "93ut-a17.u76",  0xa00, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( neobattl )   // 1CC74: "SD GUNDAM v0.00. 1992/11/04 10:04:33"
@@ -11721,6 +11793,10 @@ ROM_START( neobattl )   // 1CC74: "SD GUNDAM v0.00. 1992/11/04 10:04:33"
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "bp923-005.u4", 0x000000, 0x100000, CRC(7c0e37be) SHA1(5d5779de948f986971a82db2a5a4302044c3257a) )
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "bp923-007.u37", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "bp923-008.u38", 0x200, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( pairlove )
@@ -11732,9 +11808,8 @@ ROM_START( pairlove )
 	ROM_LOAD( "ut2-001-004.5j",  0x000000, 0x080000, CRC(fdc47b26) SHA1(0de51bcf67b909ac9578f0d1b14af8a4c758aacf) )
 	ROM_LOAD( "ut2-001-005.5l",  0x080000, 0x080000, CRC(076f94a2) SHA1(94b4b41a497dea1b6db5396bd7cd81ebcb217735) )
 
-	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x80000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "ut2-001-003.12a",  0x000000, 0x080000, CRC(900219a9) SHA1(3260a900df25beba597bf947a9fbb6f7392827d7) )
-	ROM_RELOAD(                   0x080000, 0x080000 )
 ROM_END
 
 ROM_START( crazyfgt )

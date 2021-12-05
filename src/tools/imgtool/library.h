@@ -17,17 +17,19 @@
 
 #pragma once
 
-#include "charconv.h"
-#include "stream.h"
+#include "imgterrs.h"
 
-#include "corestr.h"
-#include "opresolv.h"
 #include "timeconv.h"
-#include "unicode.h"
+#include "utilfwd.h"
 
 #include <chrono>
+#include <cstdint>
 #include <ctime>
+#include <iosfwd>
 #include <list>
+#include <memory>
+#include <string>
+#include <vector>
 
 
 namespace imgtool
@@ -35,6 +37,8 @@ namespace imgtool
 	class image;
 	class partition;
 	class directory;
+	class charconverter;
+	class stream;
 };
 
 enum imgtool_suggestion_viability_t
@@ -382,9 +386,9 @@ union imgtoolinfo
 	void *  f;                                          /* generic function pointers */
 	char *  s;                                          /* generic strings */
 
-	imgtoolerr_t    (*open)             (imgtool::image &image, imgtool::stream::ptr &&stream);
+	imgtoolerr_t    (*open)             (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream);
 	void            (*close)            (imgtool::image &image);
-	imgtoolerr_t    (*create)           (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts);
+	imgtoolerr_t    (*create)           (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream, util::option_resolution *opts);
 	imgtoolerr_t    (*create_partition) (imgtool::image &image, uint64_t first_block, uint64_t block_count);
 	void            (*info)             (imgtool::image &image, std::ostream &stream);
 	imgtoolerr_t    (*begin_enum)       (imgtool::directory &enumeration, const char *path);
@@ -476,10 +480,10 @@ struct imgtool_module
 	bool writing_untested = false;               /* used when we support writing, but not in main build */
 	bool creation_untested = false;              /* used when we support creation, but not in main build */
 
-	imgtoolerr_t    (*open)         (imgtool::image &image, imgtool::stream::ptr &&stream) = nullptr;
+	imgtoolerr_t    (*open)         (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream) = nullptr;
 	void            (*close)        (imgtool::image &image) = nullptr;
 	void            (*info)         (imgtool::image &image, std::ostream &stream) = nullptr;
-	imgtoolerr_t    (*create)       (imgtool::image &image, imgtool::stream::ptr &&stream, util::option_resolution *opts) = nullptr;
+	imgtoolerr_t    (*create)       (imgtool::image &image, std::unique_ptr<imgtool::stream> &&stream, util::option_resolution *opts) = nullptr;
 	imgtoolerr_t    (*get_geometry) (imgtool::image &image, uint32_t *track, uint32_t *heads, uint32_t *sectors) = nullptr;
 	imgtoolerr_t    (*read_sector)  (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer) = nullptr;
 	imgtoolerr_t    (*write_sector) (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len) = nullptr;

@@ -18,15 +18,19 @@
 
 namespace util {
 
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
+/// \defgroup pathutils Filesystem path utilities
+/// \{
 
-// is a given character a directory separator?
-
+/// \brief Is a character a directory separator?
+///
+/// Determine whether a character is used to separate components within
+/// a filesystem path.
+/// \param [in] c A character to test.
+/// \return True if the character is used to separate components in
+///   filesystem paths.
 constexpr bool is_directory_separator(char c)
 {
-#if defined(WIN32)
+#if defined(_WIN32)
 	return ('\\' == c) || ('/' == c) || (':' == c);
 #else
 	return '/' == c;
@@ -34,8 +38,15 @@ constexpr bool is_directory_separator(char c)
 }
 
 
-// append to a path
-
+/// \brief Append components to a filesystem path
+///
+/// Appends directory components to a filesystem path.
+/// \param [in,out] path The path to append to.
+/// \param [in] next The first directory component to append to the
+///   path.
+/// \param [in] more Additional directory components to append to the
+///   path.
+/// \return A reference to the modified path.
 template <typename T, typename... U>
 inline std::string &path_append(std::string &path, T &&next, U &&... more)
 {
@@ -49,8 +60,13 @@ inline std::string &path_append(std::string &path, T &&next, U &&... more)
 }
 
 
-// concatenate paths
-
+/// \brief Concatenate filsystem paths
+///
+/// Concatenates multiple filesystem paths.
+/// \param [in] first Initial filesystem path.
+/// \param [in] more Additional directory components to append to the
+///   intial path.
+/// \return The concatenated filesystem path.
 template <typename T, typename... U>
 inline std::string path_concat(T &&first, U &&... more)
 {
@@ -59,6 +75,8 @@ inline std::string path_concat(T &&first, U &&... more)
 		path_append(result, std::forward<U>(more)...);
 	return result;
 }
+
+/// \}
 
 } // namespace util
 

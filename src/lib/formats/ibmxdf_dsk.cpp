@@ -31,6 +31,7 @@
 *********************************************************************/
 
 #include "ibmxdf_dsk.h"
+#include "imageutl.h"
 
 #include "ioprocs.h"
 

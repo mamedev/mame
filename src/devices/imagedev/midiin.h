@@ -46,6 +46,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -61,6 +62,7 @@ private:
 	void xmit_char(uint8_t data);
 
 	std::unique_ptr<osd_midi_device> m_midi;
+	required_ioport m_config;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
 	uint8_t m_xmitring[XMIT_RING_SIZE];
@@ -152,7 +154,7 @@ private:
 		void clear() { m_list.clear(); }
 
 		// parse a new sequence
-		bool parse(u8 const *data, u32 length);
+		bool parse(u8 const *data, u32 length, u8 force_channel);
 
 		// rewind to the start of time
 		void rewind(attotime const &basetime);
@@ -163,8 +165,8 @@ private:
 	private:
 		// internal helpers
 		midi_event &event_at(u32 tick);
-		u32 parse_track_data(midi_parser &buffer, u32 start_tick);
-		void parse_midi_data(midi_parser &buffer);
+		u32 parse_track_data(midi_parser &buffer, u32 start_tick, u8 force_channel);
+		void parse_midi_data(midi_parser &buffer, u8 force_channel);
 
 		// internal state
 		std::list<midi_event> m_list;

@@ -168,8 +168,8 @@ hd6120_device::hd6120_device(const machine_config &config, const char *tag, devi
 	: cpu_device(config, HD6120, tag, owner, clock)
 	, m_inst_config("instruction", ENDIANNESS_BIG, 16, 16, -1) // 12 data bits
 	, m_data_config("data", ENDIANNESS_BIG, 16, 16, -1) // 12 data bits
-	, m_io_config("I/O", ENDIANNESS_BIG, 16, 9, -1) // 12 data bits
-	, m_devctl_config("device control", ENDIANNESS_BIG, 8, 9, 0) // only 3 bits used
+	, m_io_config("io", ENDIANNESS_BIG, 16, 9, -1) // 12 data bits
+	, m_devctl_config("devctl", ENDIANNESS_BIG, 8, 9, 0) // only 3 bits used
 	, m_lxmar_callback(*this)
 	, m_lxpar_callback(*this)
 	, m_lxdar_callback(*this)
@@ -664,21 +664,29 @@ void hd6120_device::execute_run()
 
 		case minor_state::OP1_1:
 			m_pc = m_temp & 07777;
-			m_temp = ((BIT(m_ir, 7) ? 0 : m_ac) ^ (BIT(m_ir, 5) ? 07777 : 0)) + (m_ir & 0001);
+			m_temp = (BIT(m_ir, 7) ? 0 : m_ac) ^ (BIT(m_ir, 5) ? 07777 : 0); // CLA and/or CMA
+			if (BIT(m_ir, 6))
+				m_flags &= 3; // CLL
+			if (BIT(m_ir, 4))
+				m_flags ^= 4; // CML
 			m_state = minor_state::OP1_2;
 			break;
 
 		case minor_state::OP1_2:
-			m_ac = m_temp & 07777;
-			if (BIT(m_ir, 6))
-				m_flags &= 3;
-			if (BIT(m_ir, 4))
-				m_flags ^= 4;
+			if (BIT(m_ir, 0))
+			{
+				++m_temp; // IAC
+				if (m_temp == 010000)
+				{
+					m_flags ^= 4; // LINK is complemented upon carry out
+					m_temp = 0;
+				}
+			}
 			m_state = minor_state::OP1_3;
 			break;
 
 		case minor_state::OP1_3:
-			m_temp = rotate_step(m_ac);
+			m_temp = rotate_step(m_temp);
 			if (BIT(m_ir, 1))
 				m_state = minor_state::OP1_4;
 			else

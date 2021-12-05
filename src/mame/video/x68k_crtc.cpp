@@ -421,8 +421,50 @@ void x68k_crtc_device::crtc_w(offs_t offset, u16 data, u16 mem_mask)
 		m_operation = data;
 		if (data & 0x02)  // high-speed graphic screen clear
 		{
-			for (offs_t addr = 0; addr < 0x40000; addr++)
-				m_gvram_write_callback(addr, 0, 0xffff);
+			// this is based on the docs except for the higher color depth modes which isn't
+			// explicitly described this way but is likely based on how the plane scroll works
+			// XXX: not sufficiently tested especially in hires modes
+			for (int page = 0; page < 4; page++)
+			{
+				if (!(m_reg[21] & (1 << page)))
+					continue;
+				uint16_t xscr = xscr_gfx(page) & 0x1ff;
+				uint16_t yscr = yscr_gfx(page) & 0x1ff;
+				uint16_t mask = ~(0xf << (page * 4));
+				for (int y = yscr; y < (m_height + yscr); y++)
+				{
+					if (is_1024x1024())
+					{
+						if (m_width > 256)
+						{
+							for (int x = 0; x < 512; x++)
+							{
+								uint16_t data = m_gvram_read_callback(((y * 512) + x) & 0x3ffff, 0xffff);
+								m_gvram_write_callback(((y * 512) + x) & 0x3ffff, data & mask, 0xffff);
+							}
+						}
+						else
+						{
+							for (int x = 0; x < 256; x++)
+							{
+								uint16_t data = m_gvram_read_callback(((y * 512) + x + xscr) & 0x3ffff, 0xffff);
+								m_gvram_write_callback(((y * 512) + x + xscr) & 0x3ffff, data & mask, 0xffff);
+								data = m_gvram_read_callback(((y * 512) + x + xscr + 256) & 0x3ffff, 0xffff);
+								m_gvram_write_callback(((y * 512) + x + xscr + 256) & 0x3ffff, data & mask, mask);
+							}
+						}
+					}
+					else
+					{
+						for (int x = 0; x < m_width; x++)
+						{
+							uint16_t data = m_gvram_read_callback(((y * 512) + x) & 0x3ffff, 0xffff);
+							m_gvram_write_callback(((y * 512) + x) & 0x3ffff, data & mask, 0xffff);
+						}
+					}
+				}
+
+			}
 			m_operation_end_timer->adjust(attotime::from_msec(10), 0x02);  // time taken to do operation is a complete guess.
 		}
 		break;

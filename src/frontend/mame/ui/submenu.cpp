@@ -9,16 +9,18 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/ui.h"
 #include "ui/submenu.h"
-#include "ui/utils.h"
+
 #include "ui/menuitem.h"
+#include "ui/ui.h"
+#include "ui/utils.h"
 
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
 #include "../osd/windows/winmain.h"
 #else
 #include "../osd/modules/lib/osdobj_common.h"
 #endif
+#include "../osd/modules/input/input_module.h"
 
 #include <limits>
 
@@ -28,111 +30,116 @@ namespace ui {
 std::vector<submenu::option> submenu::misc_options()
 {
 	return std::vector<option>{
-			{ option_type::HEAD, __("Miscellaneous Options") },
-			{ option_type::UI,   __("Skip imperfect emulation warnings"),       OPTION_SKIP_WARNINGS },
-			{ option_type::UI,   __("Re-select last machine launched"),         OPTION_REMEMBER_LAST },
-			{ option_type::UI,   __("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
-			{ option_type::EMU,  __("Cheats"),                                  OPTION_CHEAT },
-			{ option_type::EMU,  __("Show mouse pointer"),                      OPTION_UI_MOUSE },
-			{ option_type::EMU,  __("Confirm quit from machines"),              OPTION_CONFIRM_QUIT },
-			{ option_type::EMU,  __("Skip information screen at startup"),      OPTION_SKIP_GAMEINFO },
-			{ option_type::UI,   __("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
-			{ option_type::UI,   __("Use image as background"),                 OPTION_USE_BACKGROUND },
-			{ option_type::UI,   __("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
-			{ option_type::UI,   __("Skip software parts selection menu"),      OPTION_SKIP_PARTS_MENU },
-			{ option_type::UI,   __("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
-			{ option_type::UI,   __("Hide romless machine from available list"),OPTION_HIDE_ROMLESS } };
+			{ option_type::HEAD, N_("Miscellaneous Options") },
+			{ option_type::UI,   N_("Skip imperfect emulation warnings"),       OPTION_SKIP_WARNINGS },
+			{ option_type::UI,   N_("Re-select last machine launched"),         OPTION_REMEMBER_LAST },
+			{ option_type::UI,   N_("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
+			{ option_type::EMU,  N_("Cheats"),                                  OPTION_CHEAT },
+			{ option_type::EMU,  N_("Show mouse pointer"),                      OPTION_UI_MOUSE },
+			{ option_type::EMU,  N_("Confirm quit from machines"),              OPTION_CONFIRM_QUIT },
+			{ option_type::EMU,  N_("Skip information screen at startup"),      OPTION_SKIP_GAMEINFO },
+			{ option_type::UI,   N_("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
+			{ option_type::UI,   N_("Use image as background"),                 OPTION_USE_BACKGROUND },
+			{ option_type::UI,   N_("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
+			{ option_type::UI,   N_("Skip software parts selection menu"),      OPTION_SKIP_PARTS_MENU },
+			{ option_type::UI,   N_("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
+			{ option_type::UI,   N_("Hide romless machine from available list"),OPTION_HIDE_ROMLESS } };
 }
 
 std::vector<submenu::option> submenu::advanced_options()
 {
 	return std::vector<option>{
-			{ option_type::HEAD, __("Advanced Options") },
-			{ option_type::HEAD, __("Performance Options") },
-			{ option_type::EMU,  __("Auto frame skip"),                         OPTION_AUTOFRAMESKIP },
-			{ option_type::EMU,  __("Frame skip"),                              OPTION_FRAMESKIP },
-			{ option_type::EMU,  __("Throttle"),                                OPTION_THROTTLE },
-			{ option_type::UI,   __("Mute when unthrottled"),                   OPTION_UNTHROTTLE_MUTE },
-			{ option_type::EMU,  __("Sleep"),                                   OPTION_SLEEP },
-			{ option_type::EMU,  __("Speed"),                                   OPTION_SPEED },
-			{ option_type::EMU,  __("Adjust speed to match refresh rate"),      OPTION_REFRESHSPEED },
-			{ option_type::EMU,  __("Low latency"),                             OPTION_LOWLATENCY },
+			{ option_type::HEAD, N_("Advanced Options") },
+			{ option_type::HEAD, N_("Performance Options") },
+			{ option_type::EMU,  N_("Auto frame skip"),                         OPTION_AUTOFRAMESKIP },
+			{ option_type::EMU,  N_("Frame skip"),                              OPTION_FRAMESKIP },
+			{ option_type::EMU,  N_("Throttle"),                                OPTION_THROTTLE },
+			{ option_type::UI,   N_("Mute when unthrottled"),                   OPTION_UNTHROTTLE_MUTE },
+			{ option_type::EMU,  N_("Sleep"),                                   OPTION_SLEEP },
+			{ option_type::EMU,  N_("Speed"),                                   OPTION_SPEED },
+			{ option_type::EMU,  N_("Adjust speed to match refresh rate"),      OPTION_REFRESHSPEED },
+			{ option_type::EMU,  N_("Low latency"),                             OPTION_LOWLATENCY },
 
-			{ option_type::HEAD, __("Rotation Options") },
-			{ option_type::EMU,  __("Rotate"),                                  OPTION_ROTATE },
-			{ option_type::EMU,  __("Rotate right"),                            OPTION_ROR },
-			{ option_type::EMU,  __("Rotate left"),                             OPTION_ROL },
-			{ option_type::EMU,  __("Auto rotate right"),                       OPTION_AUTOROR },
-			{ option_type::EMU,  __("Auto rotate left"),                        OPTION_AUTOROL },
-			{ option_type::EMU,  __("Flip X"),                                  OPTION_FLIPX },
-			{ option_type::EMU,  __("Flip Y"),                                  OPTION_FLIPY },
+			{ option_type::HEAD, N_("Rotation Options") },
+			{ option_type::EMU,  N_("Rotate"),                                  OPTION_ROTATE },
+			{ option_type::EMU,  N_("Rotate right"),                            OPTION_ROR },
+			{ option_type::EMU,  N_("Rotate left"),                             OPTION_ROL },
+			{ option_type::EMU,  N_("Auto rotate right"),                       OPTION_AUTOROR },
+			{ option_type::EMU,  N_("Auto rotate left"),                        OPTION_AUTOROL },
+			{ option_type::EMU,  N_("Flip X"),                                  OPTION_FLIPX },
+			{ option_type::EMU,  N_("Flip Y"),                                  OPTION_FLIPY },
 
-			{ option_type::HEAD, __("Artwork Options") },
-			{ option_type::EMU,  __("Zoom to screen area"),                     OPTION_ARTWORK_CROP },
+			{ option_type::HEAD, N_("Artwork Options") },
+			{ option_type::EMU,  N_("Zoom to screen area"),                     OPTION_ARTWORK_CROP },
 
-			{ option_type::HEAD, __("State/Playback Options") },
-			{ option_type::EMU,  __("Automatic save/restore"),                  OPTION_AUTOSAVE },
-			{ option_type::EMU,  __("Allow rewind"),                            OPTION_REWIND },
-			{ option_type::EMU,  __("Rewind capacity"),                         OPTION_REWIND_CAPACITY },
-			{ option_type::EMU,  __("Bilinear filtering for snapshots"),        OPTION_SNAPBILINEAR },
-			{ option_type::EMU,  __("Burn-in"),                                 OPTION_BURNIN },
+			{ option_type::HEAD, N_("State/Playback Options") },
+			{ option_type::EMU,  N_("Automatic save/restore"),                  OPTION_AUTOSAVE },
+			{ option_type::EMU,  N_("Allow rewind"),                            OPTION_REWIND },
+			{ option_type::EMU,  N_("Rewind capacity"),                         OPTION_REWIND_CAPACITY },
+			{ option_type::EMU,  N_("Bilinear filtering for snapshots"),        OPTION_SNAPBILINEAR },
+			{ option_type::EMU,  N_("Burn-in"),                                 OPTION_BURNIN },
 
-			{ option_type::HEAD, __("Input Options") },
-			{ option_type::EMU,  __("Coin lockout"),                            OPTION_COIN_LOCKOUT },
-			{ option_type::EMU,  __("Mouse"),                                   OPTION_MOUSE },
-			{ option_type::EMU,  __("Joystick"),                                OPTION_JOYSTICK },
-			{ option_type::EMU,  __("Lightgun"),                                OPTION_LIGHTGUN },
-			{ option_type::EMU,  __("Multi-keyboard"),                          OPTION_MULTIKEYBOARD },
-			{ option_type::EMU,  __("Multi-mouse"),                             OPTION_MULTIMOUSE },
-			{ option_type::EMU,  __("Steadykey"),                               OPTION_STEADYKEY },
-			{ option_type::EMU,  __("UI active"),                               OPTION_UI_ACTIVE },
-			{ option_type::EMU,  __("Offscreen reload"),                        OPTION_OFFSCREEN_RELOAD },
-			{ option_type::EMU,  __("Joystick deadzone"),                       OPTION_JOYSTICK_DEADZONE },
-			{ option_type::EMU,  __("Joystick saturation"),                     OPTION_JOYSTICK_SATURATION },
-			{ option_type::EMU,  __("Natural keyboard"),                        OPTION_NATURAL_KEYBOARD },
-			{ option_type::EMU,  __("Simultaneous contradictory"),              OPTION_JOYSTICK_CONTRADICTORY },
-			{ option_type::EMU,  __("Coin impulse"),                            OPTION_COIN_IMPULSE } };
+			{ option_type::HEAD, N_("Input Options") },
+			{ option_type::EMU,  N_("Coin lockout"),                            OPTION_COIN_LOCKOUT },
+			{ option_type::EMU,  N_("Mouse"),                                   OPTION_MOUSE },
+			{ option_type::EMU,  N_("Joystick"),                                OPTION_JOYSTICK },
+			{ option_type::EMU,  N_("Lightgun"),                                OPTION_LIGHTGUN },
+			{ option_type::EMU,  N_("Multi-keyboard"),                          OPTION_MULTIKEYBOARD },
+			{ option_type::EMU,  N_("Multi-mouse"),                             OPTION_MULTIMOUSE },
+			{ option_type::EMU,  N_("Steadykey"),                               OPTION_STEADYKEY },
+			{ option_type::EMU,  N_("UI active"),                               OPTION_UI_ACTIVE },
+			{ option_type::EMU,  N_("Offscreen reload"),                        OPTION_OFFSCREEN_RELOAD },
+			{ option_type::EMU,  N_("Joystick deadzone"),                       OPTION_JOYSTICK_DEADZONE },
+			{ option_type::EMU,  N_("Joystick saturation"),                     OPTION_JOYSTICK_SATURATION },
+			{ option_type::EMU,  N_("Natural keyboard"),                        OPTION_NATURAL_KEYBOARD },
+			{ option_type::EMU,  N_("Simultaneous contradictory"),              OPTION_JOYSTICK_CONTRADICTORY },
+			{ option_type::EMU,  N_("Coin impulse"),                            OPTION_COIN_IMPULSE } };
 }
 
 std::vector<submenu::option> submenu::control_options()
 {
 	return std::vector<option>{
-			{ option_type::HEAD, __("Device Mapping") },
-			{ option_type::EMU,  __("Lightgun Device Assignment"),              OPTION_LIGHTGUN_DEVICE },
-			{ option_type::EMU,  __("Trackball Device Assignment"),             OPTION_TRACKBALL_DEVICE },
-			{ option_type::EMU,  __("Pedal Device Assignment"),                 OPTION_PEDAL_DEVICE },
-			{ option_type::EMU,  __("Adstick Device Assignment"),               OPTION_ADSTICK_DEVICE },
-			{ option_type::EMU,  __("Paddle Device Assignment"),                OPTION_PADDLE_DEVICE },
-			{ option_type::EMU,  __("Dial Device Assignment"),                  OPTION_DIAL_DEVICE },
-			{ option_type::EMU,  __("Positional Device Assignment"),            OPTION_POSITIONAL_DEVICE },
-			{ option_type::EMU,  __("Mouse Device Assignment"),                 OPTION_MOUSE_DEVICE } };
+			{ option_type::HEAD, N_("Input Device Options") },
+			{ option_type::EMU,  N_("Lightgun Device Assignment"),              OPTION_LIGHTGUN_DEVICE },
+			{ option_type::EMU,  N_("Trackball Device Assignment"),             OPTION_TRACKBALL_DEVICE },
+			{ option_type::EMU,  N_("Pedal Device Assignment"),                 OPTION_PEDAL_DEVICE },
+			{ option_type::EMU,  N_("Adstick Device Assignment"),               OPTION_ADSTICK_DEVICE },
+			{ option_type::EMU,  N_("Paddle Device Assignment"),                OPTION_PADDLE_DEVICE },
+			{ option_type::EMU,  N_("Dial Device Assignment"),                  OPTION_DIAL_DEVICE },
+			{ option_type::EMU,  N_("Positional Device Assignment"),            OPTION_POSITIONAL_DEVICE },
+			{ option_type::EMU,  N_("Mouse Device Assignment"),                 OPTION_MOUSE_DEVICE },
+			{ option_type::SEP },
+			{ option_type::OSD,  N_("Keyboard Input Provider"),                 OSD_KEYBOARDINPUT_PROVIDER },
+			{ option_type::OSD,  N_("Mouse Input Provider"),                    OSD_MOUSEINPUT_PROVIDER },
+			{ option_type::OSD,  N_("Lightgun Input Provider"),                 OSD_LIGHTGUNINPUT_PROVIDER },
+			{ option_type::OSD,  N_("Joystick Input Provider"),                 OSD_JOYSTICKINPUT_PROVIDER } };
 }
 
 std::vector<submenu::option> submenu::video_options()
 {
 	return std::vector<option>{
-			{ option_type::HEAD, __("Video Options") },
-			{ option_type::OSD,  __("Video Mode"),                              OSDOPTION_VIDEO },
-			{ option_type::OSD,  __("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
+			{ option_type::HEAD, N_("Video Options") },
+			{ option_type::OSD,  N_("Video Mode"),                              OSDOPTION_VIDEO },
+			{ option_type::OSD,  N_("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
-			{ option_type::OSD,  __("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
-			{ option_type::OSD,  __("HLSL"),                                    WINOPTION_HLSL_ENABLE },
+			{ option_type::OSD,  N_("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
+			{ option_type::OSD,  N_("HLSL"),                                    WINOPTION_HLSL_ENABLE },
 #endif
-			{ option_type::OSD,  __("GLSL"),                                    OSDOPTION_GL_GLSL },
-			{ option_type::OSD,  __("Bilinear Filtering"),                      OSDOPTION_FILTER },
-			{ option_type::OSD,  __("Bitmap Prescaling"),                       OSDOPTION_PRESCALE },
-			{ option_type::OSD,  __("Window Mode"),                             OSDOPTION_WINDOW },
-			{ option_type::EMU,  __("Enforce Aspect Ratio"),                    OPTION_KEEPASPECT },
-			{ option_type::OSD,  __("Start Out Maximized"),                     OSDOPTION_MAXIMIZE },
-			{ option_type::OSD,  __("Synchronized Refresh"),                    OSDOPTION_SYNCREFRESH },
-			{ option_type::OSD,  __("Wait Vertical Sync"),                      OSDOPTION_WAITVSYNC } };
+			{ option_type::OSD,  N_("GLSL"),                                    OSDOPTION_GL_GLSL },
+			{ option_type::OSD,  N_("Bilinear Filtering"),                      OSDOPTION_FILTER },
+			{ option_type::OSD,  N_("Bitmap Prescaling"),                       OSDOPTION_PRESCALE },
+			{ option_type::OSD,  N_("Window Mode"),                             OSDOPTION_WINDOW },
+			{ option_type::EMU,  N_("Enforce Aspect Ratio"),                    OPTION_KEEPASPECT },
+			{ option_type::OSD,  N_("Start Out Maximized"),                     OSDOPTION_MAXIMIZE },
+			{ option_type::OSD,  N_("Synchronized Refresh"),                    OSDOPTION_SYNCREFRESH },
+			{ option_type::OSD,  N_("Wait Vertical Sync"),                      OSDOPTION_WAITVSYNC } };
 }
 
 //std::vector<submenu::option> submenu::export_options()
 //{
 //  return std::vector<option>{
-//          { option_type::COMMAND, __("Export XML format (like -listxml)"),               "exportxml" },
-//          { option_type::COMMAND, __("Export TXT format (like -listfull)"),              "exporttxt" } };
+//          { option_type::COMMAND, N_("Export XML format (like -listxml)"),               "exportxml" },
+//          { option_type::COMMAND, N_("Export TXT format (like -listfull)"),              "exporttxt" } };
 //}
 
 
@@ -150,13 +157,15 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	, m_options(std::move(suboptions))
 	, m_driver(drv)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
+
 	core_options *opts = nullptr;
 	if (m_driver == nullptr)
-		opts = dynamic_cast<core_options*>(&mui.machine().options());
+		opts = dynamic_cast<core_options *>(&mui.machine().options());
 	else
-		opts = dynamic_cast<core_options*>(options);
+		opts = dynamic_cast<core_options *>(options);
 
-	for (option & sm_option : m_options)
+	for (option &sm_option : m_options)
 	{
 		switch (sm_option.type)
 		{
@@ -190,7 +199,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 			if (sm_option.entry->type() == OPTION_STRING)
 			{
 				sm_option.value.clear();
-				std::string descr(sm_option.entry->description()), delim(", ");
+				std::string descr(machine().options().get_entry(sm_option.name)->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
 
 				std::string default_value(sm_option.entry->default_value());
@@ -234,19 +243,16 @@ submenu::~submenu()
 //  handle the options menu
 //-------------------------------------------------
 
-void submenu::handle()
+void submenu::handle(event const *ev)
 {
 	bool changed = false;
 	std::string error_string, tmptxt;
 	float f_cur, f_step;
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr &&
-			(menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT || menu_event->iptkey == IPT_UI_SELECT))
+	if (ev && ev->itemref && (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT))
 	{
-		option &sm_option = *reinterpret_cast<option *>(menu_event->itemref);
+		option &sm_option = *reinterpret_cast<option *>(ev->itemref);
 
 		switch (sm_option.type)
 		{
@@ -260,16 +266,16 @@ void submenu::handle()
 				sm_option.options->set_value(sm_option.name, !strcmp(sm_option.entry->value(),"1") ? "0" : "1", OPTION_PRIORITY_CMDLINE);
 				break;
 			case OPTION_INTEGER:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
 					int i_cur = atoi(sm_option.entry->value());
-					(menu_event->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
+					(ev->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
 					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			case OPTION_FLOAT:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
 					f_cur = atof(sm_option.entry->value());
@@ -291,7 +297,7 @@ void submenu::handle()
 						tmptxt = '1' + std::string(precision, '0');
 						f_step = 1 / atof(tmptxt.c_str());
 					}
-					if (menu_event->iptkey == IPT_UI_LEFT)
+					if (ev->iptkey == IPT_UI_LEFT)
 						f_cur -= f_step;
 					else
 						f_cur += f_step;
@@ -300,12 +306,12 @@ void submenu::handle()
 				}
 				break;
 			case OPTION_STRING:
-				if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
+				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
 					std::string v_cur(sm_option.entry->value());
 					int cur_value = std::distance(sm_option.value.begin(), std::find(sm_option.value.begin(), sm_option.value.end(), v_cur));
-					if (menu_event->iptkey == IPT_UI_LEFT)
+					if (ev->iptkey == IPT_UI_LEFT)
 						v_cur = sm_option.value[--cur_value];
 					else
 						v_cur = sm_option.value[++cur_value];
@@ -349,7 +355,7 @@ void submenu::populate(float &customtop, float &custombottom)
 			item_append(menu_item_type::SEPARATOR);
 			break;
 		case option_type::CMD:
-			item_append(_(sm_option->description), 0, static_cast<void*>(&(*sm_option)));
+			item_append(_(sm_option->description), 0, reinterpret_cast<void *>(&*sm_option));
 			break;
 		case option_type::EMU:
 		case option_type::UI:
@@ -357,10 +363,11 @@ void submenu::populate(float &customtop, float &custombottom)
 			switch (sm_option->entry->type())
 			{
 			case OPTION_BOOLEAN:
-				item_append_on_off(_(sm_option->description),
-					sm_option->options->bool_value(sm_option->name),
-					0,
-					static_cast<void*>(&(*sm_option)));
+				item_append_on_off(
+						_(sm_option->description),
+						sm_option->options->bool_value(sm_option->name),
+						0,
+						static_cast<void*>(&(*sm_option)));
 				break;
 			case OPTION_INTEGER:
 				{
@@ -377,10 +384,11 @@ void submenu::populate(float &customtop, float &custombottom)
 						i_max = std::numeric_limits<int>::max();
 					}
 					arrow_flags = get_arrow_flags(i_min, i_max, i_cur);
-					item_append(_(sm_option->description),
-						sm_option->entry->value(),
-						arrow_flags,
-						static_cast<void*>(&(*sm_option)));
+					item_append(
+							_(sm_option->description),
+							sm_option->entry->value(),
+							arrow_flags,
+							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
 			case OPTION_FLOAT:
@@ -399,10 +407,11 @@ void submenu::populate(float &customtop, float &custombottom)
 					}
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
 					std::string tmptxt = string_format("%g", f_cur);
-					item_append(_(sm_option->description),
-						tmptxt,
-						arrow_flags,
-						static_cast<void*>(&(*sm_option)));
+					item_append(
+							_(sm_option->description),
+							tmptxt,
+							arrow_flags,
+							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
 			case OPTION_STRING:
@@ -410,16 +419,20 @@ void submenu::populate(float &customtop, float &custombottom)
 					std::string v_cur(sm_option->entry->value());
 					int const cur_value = std::distance(sm_option->value.begin(), std::find(sm_option->value.begin(), sm_option->value.end(), v_cur));
 					arrow_flags = get_arrow_flags(0, int(unsigned(sm_option->value.size() - 1)), cur_value);
-					item_append(_(sm_option->description),
+					item_append(
+							_(sm_option->description),
 							sm_option->options->value(sm_option->name),
-							arrow_flags, static_cast<void*>(&(*sm_option)));
+							arrow_flags,
+							reinterpret_cast<void *>(&*sm_option));
 				}
 				break;
 			default:
 				arrow_flags = FLAG_RIGHT_ARROW;
-				item_append(_(sm_option->description),
-					sm_option->options->value(sm_option->name),
-					arrow_flags, static_cast<void*>(&(*sm_option)));
+				item_append(
+						_(sm_option->description),
+						sm_option->options->value(sm_option->name),
+						arrow_flags,
+						reinterpret_cast<void *>(&*sm_option));
 				break;
 			}
 			break;
@@ -443,7 +456,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	if (selectedref)
@@ -455,8 +468,8 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 			draw_text_box(
 					std::begin(bottomtext), std::end(bottomtext),
 					origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-					ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+					text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
+					ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 		}
 	}
 }

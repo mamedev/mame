@@ -19,6 +19,7 @@
 #include "formats/imageutl.h"
 
 #include "util/ioprocs.h"
+#include "util/ioprocsfilter.h"
 
 
 #define VERBOSE     0
@@ -426,7 +427,7 @@ image_init_result legacy_floppy_image_device::internal_floppy_device_load(bool i
 
 	floperr_t err;
 	check_for_file();
-	auto io = util::core_file_read_write(image_core_file(), 0xff);
+	auto io = util::random_read_write_fill(image_core_file(), 0xff);
 	if (!io)
 	{
 		err = FLOPPY_ERROR_OUTOFMEMORY;

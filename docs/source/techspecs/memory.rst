@@ -588,6 +588,19 @@ trigger the handler if a wider part of the bus is accessed.  The
 parameter is that trigger width (would be 16 in the 68000 case).
 
 
+4.4.6 User flags
+''''''''''''''''
+
+.. code-block:: C++
+
+    (...).flags(16-bits mask)
+
+This parameter allows to set user-defined flags on the handler which
+can then be retrieved by an accessing device to change their
+behaviour.  An example of use the the i960 which marks burstable zones
+that way (they have a specific hardware-level support).
+
+
 4.5 View setup
 ~~~~~~~~~~~~~~
 
@@ -683,18 +696,18 @@ Note that as all delegates, they can also wrap lambdas.
 
 .. code-block:: C++
 
-    space.install_read_handler(addrstart, addrend, read_delegate, unitmask, cswidth)
-    space.install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, read_delegate, unitmask, cswidth)
-    space.install_write_handler(addrstart, addrend, write_delegate, unitmask, cswidth)
-    space.install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, write_delegate, unitmask, cswidth)
-    space.install_readwrite_handler(addrstart, addrend, read_delegate, write_delegate, unitmask, cswidth)
-    space.install_readwrite_handler(addrstart, addrend, addrmask, addrmirror, addrselect, read_delegate, write_delegate, unitmask, cswidth)
+    space.install_read_handler(addrstart, addrend, read_delegate, unitmask, cswidth, flags)
+    space.install_read_handler(addrstart, addrend, addrmask, addrmirror, addrselect, read_delegate, unitmask, cswidth, flags)
+    space.install_write_handler(addrstart, addrend, write_delegate, unitmask, cswidth, flags)
+    space.install_write_handler(addrstart, addrend, addrmask, addrmirror, addrselect, write_delegate, unitmask, cswidth, flags)
+    space.install_readwrite_handler(addrstart, addrend, read_delegate, write_delegate, unitmask, cswidth, flags)
+    space.install_readwrite_handler(addrstart, addrend, addrmask, addrmirror, addrselect, read_delegate, write_delegate, unitmask, cswidth, flags)
 
 These six methods allow to install delegate-wrapped handlers in a live
 address space. Either plain or with mask, mirror and select.  In the
 read/write case both delegates must be of the same flavor (``smo``
 stuff) to avoid a combinatorial explosion of method types.  The
-``unitmask`` and ``cswidth`` arguments are optional.
+``unitmask``, ``cswidth`` and ``flags`` arguments are optional.
 
 5.3 Direct memory range mapping
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -703,15 +716,18 @@ stuff) to avoid a combinatorial explosion of method types.  The
 
     space.install_rom(addrstart, addrend, void *pointer)
     space.install_rom(addrstart, addrend, addrmirror, void *pointer)
+    space.install_rom(addrstart, addrend, addrmirror, flags, void *pointer)
     space.install_writeonly(addrstart, addrend, void *pointer)
     space.install_writeonly(addrstart, addrend, addrmirror, void *pointer)
+    space.install_writeonly(addrstart, addrend, addrmirror, flags, void *pointer)
     space.install_ram(addrstart, addrend, void *pointer)
     space.install_ram(addrstart, addrend, addrmirror, void *pointer)
+    space.install_ram(addrstart, addrend, addrmirror, flags, void *pointer)
 
-Installs a memory block in an address space, with or without mirror.
-``_rom`` is read-only, ``_ram`` is read/write, ``_writeonly`` is
-write-only.  The pointer must be non-null, this method will not allocate
-the memory.
+Installs a memory block in an address space, with or without mirror
+and flags.  ``_rom`` is read-only, ``_ram`` is read/write,
+``_writeonly`` is write-only.  The pointer must be non-null, this
+method will not allocate the memory.
 
 5.4 Bank mapping
 ~~~~~~~~~~~~~~~~
@@ -720,10 +736,13 @@ the memory.
 
     space.install_read_bank(addrstart, addrend, memory_bank *bank)
     space.install_read_bank(addrstart, addrend, addrmirror, memory_bank *bank)
+    space.install_read_bank(addrstart, addrend, addrmirror, flags, memory_bank *bank)
     space.install_write_bank(addrstart, addrend, memory_bank *bank)
     space.install_write_bank(addrstart, addrend, addrmirror, memory_bank *bank)
+    space.install_write_bank(addrstart, addrend, addrmirror, flags, memory_bank *bank)
     space.install_readwrite_bank(addrstart, addrend, memory_bank *bank)
     space.install_readwrite_bank(addrstart, addrend, addrmirror, memory_bank *bank)
+    space.install_readwrite_bank(addrstart, addrend, addrmirror, flags, memory_bank *bank)
 
 Install an existing memory bank for reading, writing or both in an
 address space.
@@ -735,10 +754,13 @@ address space.
 
     space.install_read_port(addrstart, addrend, const char *rtag)
     space.install_read_port(addrstart, addrend, addrmirror, const char *rtag)
+    space.install_read_port(addrstart, addrend, addrmirror, flags, const char *rtag)
     space.install_write_port(addrstart, addrend, const char *wtag)
     space.install_write_port(addrstart, addrend, addrmirror, const char *wtag)
+    space.install_write_port(addrstart, addrend, addrmirror, flags, const char *wtag)
     space.install_readwrite_port(addrstart, addrend, const char *rtag, const char *wtag)
     space.install_readwrite_port(addrstart, addrend, addrmirror, const char *rtag, const char *wtag)
+    space.install_readwrite_port(addrstart, addrend, addrmirror, flags, const char *rtag, const char *wtag)
 
 Install ports by name for reading, writing or both.
 
@@ -747,33 +769,33 @@ Install ports by name for reading, writing or both.
 
 .. code-block:: C++
 
-    space.nop_read(addrstart, addrend, addrmirror)
-    space.nop_write(addrstart, addrend, addrmirror)
-    space.nop_readwrite(addrstart, addrend, addrmirror)
+    space.nop_read(addrstart, addrend, addrmirror, flags)
+    space.nop_write(addrstart, addrend, addrmirror, flags)
+    space.nop_readwrite(addrstart, addrend, addrmirror, flags)
 
-Drops the accesses for a given range with an optional mirror.
+Drops the accesses for a given range with an optional mirror and flags;
 
 5.7 Unmapped accesses
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: C++
 
-    space.unmap_read(addrstart, addrend, addrmirror)
-    space.unmap_write(addrstart, addrend, addrmirror)
-    space.unmap_readwrite(addrstart, addrend, addrmirror)
+    space.unmap_read(addrstart, addrend, addrmirror, flags)
+    space.unmap_write(addrstart, addrend, addrmirror, flags)
+    space.unmap_readwrite(addrstart, addrend, addrmirror, flags)
 
 Unmaps the accesses (e.g. logs the access as unmapped) for a given range
-with an optional mirror.
+with an optional mirror and flags.
 
 5.8 Device map installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: C++
 
-    space.install_device(addrstart, addrend, device, map, unitmask, cswidth)
+    space.install_device(addrstart, addrend, device, map, unitmask, cswidth, flags)
 
 Install a device address with an address map in a space.  The
-``unitmask`` and ``cswidth`` arguments are optional.
+``unitmask``, ``cswidth`` and ``flags`` arguments are optional.
 
 5.9 View installation
 ~~~~~~~~~~~~~~~~~~~~~

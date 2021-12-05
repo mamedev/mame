@@ -22,6 +22,7 @@
 
 
 namespace ui {
+
 static int ADDING = 1;
 static int CHANGE = 2;
 
@@ -34,35 +35,37 @@ struct folders_entry
 
 static const folders_entry s_folders[] =
 {
-	{ __("ROMs"),                OPTION_MEDIAPATH,          ADDING },
-	{ __("Software Media"),      OPTION_SWPATH,             CHANGE },
-	{ __("UI"),                  OPTION_UI_PATH,            CHANGE },
-	{ __("Language"),            OPTION_LANGUAGEPATH,       CHANGE },
-	{ __("Samples"),             OPTION_SAMPLEPATH,         ADDING },
-	{ __("DATs"),                OPTION_HISTORY_PATH,       ADDING },
-	{ __("INIs"),                OPTION_INIPATH,            ADDING },
-	{ __("Category INIs"),       OPTION_CATEGORYINI_PATH,   CHANGE },
-	{ __("Icons"),               OPTION_ICONS_PATH,         ADDING },
-	{ __("Cheats"),              OPTION_CHEATPATH,          ADDING },
-	{ __("Snapshots"),           OPTION_SNAPSHOT_DIRECTORY, ADDING },
-	{ __("Cabinets"),            OPTION_CABINETS_PATH,      ADDING },
-	{ __("Flyers"),              OPTION_FLYERS_PATH,        ADDING },
-	{ __("Titles"),              OPTION_TITLES_PATH,        ADDING },
-	{ __("Ends"),                OPTION_ENDS_PATH,          ADDING },
-	{ __("PCBs"),                OPTION_PCBS_PATH,          ADDING },
-	{ __("Marquees"),            OPTION_MARQUEES_PATH,      ADDING },
-	{ __("Controls Panels"),     OPTION_CPANELS_PATH,       ADDING },
-	{ __("Crosshairs"),          OPTION_CROSSHAIRPATH,      ADDING },
-	{ __("Artworks"),            OPTION_ARTPATH,            ADDING },
-	{ __("Bosses"),              OPTION_BOSSES_PATH,        ADDING },
-	{ __("Artworks Preview"),    OPTION_ARTPREV_PATH,       ADDING },
-	{ __("Select"),              OPTION_SELECT_PATH,        ADDING },
-	{ __("GameOver"),            OPTION_GAMEOVER_PATH,      ADDING },
-	{ __("HowTo"),               OPTION_HOWTO_PATH,         ADDING },
-	{ __("Logos"),               OPTION_LOGOS_PATH,         ADDING },
-	{ __("Scores"),              OPTION_SCORES_PATH,        ADDING },
-	{ __("Versus"),              OPTION_VERSUS_PATH,        ADDING },
-	{ __("Covers"),              OPTION_COVER_PATH,         ADDING }
+	{ N_p("path-option", "ROMs"),               OPTION_MEDIAPATH,          ADDING },
+	{ N_p("path-option", "Software Media"),     OPTION_SWPATH,             CHANGE },
+	{ N_p("path-option", "Sound Samples"),      OPTION_SAMPLEPATH,         ADDING },
+	{ N_p("path-option", "Artwork"),            OPTION_ARTPATH,            ADDING },
+	{ N_p("path-option", "Crosshairs"),         OPTION_CROSSHAIRPATH,      ADDING },
+	{ N_p("path-option", "Cheat Files"),        OPTION_CHEATPATH,          ADDING },
+	{ N_p("path-option", "Plugins"),            OPTION_PLUGINSPATH,        ADDING },
+	{ N_p("path-option", "UI Translations"),    OPTION_LANGUAGEPATH,       CHANGE },
+	{ N_p("path-option", "INIs"),               OPTION_INIPATH,            ADDING },
+	{ N_p("path-option", "UI Settings"),        OPTION_UI_PATH,            CHANGE },
+	{ N_p("path-option", "Plugin Data"),        OPTION_PLUGINDATAPATH,     CHANGE },
+	{ N_p("path-option", "DATs"),               OPTION_HISTORY_PATH,       ADDING },
+	{ N_p("path-option", "Category INIs"),      OPTION_CATEGORYINI_PATH,   CHANGE },
+	{ N_p("path-option", "Snapshots"),          OPTION_SNAPSHOT_DIRECTORY, ADDING },
+	{ N_p("path-option", "Icons"),              OPTION_ICONS_PATH,         ADDING },
+	{ N_p("path-option", "Control Panels"),     OPTION_CPANELS_PATH,       ADDING },
+	{ N_p("path-option", "Cabinets"),           OPTION_CABINETS_PATH,      ADDING },
+	{ N_p("path-option", "Marquees"),           OPTION_MARQUEES_PATH,      ADDING },
+	{ N_p("path-option", "PCBs"),               OPTION_PCBS_PATH,          ADDING },
+	{ N_p("path-option", "Flyers"),             OPTION_FLYERS_PATH,        ADDING },
+	{ N_p("path-option", "Title Screens"),      OPTION_TITLES_PATH,        ADDING },
+	{ N_p("path-option", "Game Endings"),       OPTION_ENDS_PATH,          ADDING },
+	{ N_p("path-option", "Bosses"),             OPTION_BOSSES_PATH,        ADDING },
+	{ N_p("path-option", "Artwork Previews"),   OPTION_ARTPREV_PATH,       ADDING },
+	{ N_p("path-option", "Select"),             OPTION_SELECT_PATH,        ADDING },
+	{ N_p("path-option", "Game Over Screens"),  OPTION_GAMEOVER_PATH,      ADDING },
+	{ N_p("path-option", "HowTo"),              OPTION_HOWTO_PATH,         ADDING },
+	{ N_p("path-option", "Logos"),              OPTION_LOGOS_PATH,         ADDING },
+	{ N_p("path-option", "Scores"),             OPTION_SCORES_PATH,        ADDING },
+	{ N_p("path-option", "Versus"),             OPTION_VERSUS_PATH,        ADDING },
+	{ N_p("path-option", "Covers"),             OPTION_COVER_PATH,         ADDING }
 };
 
 
@@ -87,12 +90,10 @@ menu_directory::~menu_directory()
 //  handle
 //-------------------------------------------------
 
-void menu_directory::handle()
+void menu_directory::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
+	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
 		menu::stack_push<menu_display_actual>(ui(), container(), selected_index());
 }
 
@@ -103,7 +104,7 @@ void menu_directory::handle()
 void menu_directory::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : s_folders)
-		item_append(_(elem.name), 0, (void *)(uintptr_t)elem.action);
+		item_append(_("path-option", elem.name), 0, (void *)(uintptr_t)elem.action);
 
 	item_append(menu_item_type::SEPARATOR);
 	customtop = ui().get_line_height() + 3.0f * ui().box_tb_border();
@@ -119,7 +120,7 @@ void menu_directory::custom_render(void *selectedref, float top, float bottom, f
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -143,12 +144,11 @@ menu_display_actual::~menu_display_actual()
 //  handle
 //-------------------------------------------------
 
-void menu_display_actual::handle()
+void menu_display_actual::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		switch ((uintptr_t)menu_event->itemref)
+	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
+		switch ((uintptr_t)ev->itemref)
 		{
 		case REMOVE:
 			menu::stack_push<menu_remove_folder>(ui(), container(), m_ref);
@@ -166,7 +166,7 @@ void menu_display_actual::handle()
 
 void menu_display_actual::populate(float &customtop, float &custombottom)
 {
-	m_heading[0] = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
+	m_heading[0] = string_format(_("Current %1$s Folders"), _("path-option", s_folders[m_ref].name));
 	if (ui().options().exists(s_folders[m_ref].option))
 		m_searchpath.assign(ui().options().value(s_folders[m_ref].option));
 	else
@@ -197,12 +197,12 @@ void menu_display_actual::custom_render(void *selectedref, float top, float bott
 	float const maxwidth(draw_text_box(
 			std::begin(m_folders), std::end(m_folders),
 			origx1, origx2, origy1 - (3.0f * ui().box_tb_border()) - (m_folders.size() * lineheight), origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), ui().colors().background_color(), 1.0f));
 	draw_text_box(
 			std::begin(m_heading), std::end(m_heading),
 			0.5f * (1.0f - maxwidth), 0.5f * (1.0f + maxwidth), origy1 - top, origy1 - top + lineheight + (2.0f * ui().box_tb_border()),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 
@@ -242,20 +242,18 @@ menu_add_change_folder::~menu_add_change_folder()
 //  handle
 //-------------------------------------------------
 
-void menu_add_change_folder::handle()
+void menu_add_change_folder::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_SELECT)
 		{
-			int index = (uintptr_t)menu_event->itemref - 1;
+			int index = (uintptr_t)ev->itemref - 1;
 			const menu_item &pitem = item(index);
 
 			// go up to the parent path
-			if (pitem.text == "..")
+			if (pitem.text() == "..")
 			{
 				size_t first_sep = m_current_path.find_first_of(PATH_SEPARATOR[0]);
 				size_t last_sep = m_current_path.find_last_of(PATH_SEPARATOR[0]);
@@ -265,26 +263,26 @@ void menu_add_change_folder::handle()
 			else
 			{
 				// if isn't a drive, appends the directory
-				if (pitem.subtext != "[DRIVE]")
+				if (pitem.subtext() != "[DRIVE]")
 				{
 					if (m_current_path[m_current_path.length() - 1] == PATH_SEPARATOR[0])
-						m_current_path.append(pitem.text);
+						m_current_path.append(pitem.text());
 					else
-						m_current_path.append(PATH_SEPARATOR).append(pitem.text);
+						m_current_path.append(PATH_SEPARATOR).append(pitem.text());
 				}
 				else
-					m_current_path = pitem.text;
+					m_current_path = pitem.text();
 			}
 
 			// reset the char buffer also in this case
 			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
 		}
-		else if (menu_event->iptkey == IPT_SPECIAL)
+		else if (ev->iptkey == IPT_SPECIAL)
 		{
 			bool update_selected = false;
 
-			if (menu_event->unichar == 0x09)
+			if (ev->unichar == 0x09)
 			{
 				// Tab key, save current path
 				std::string error_string;
@@ -322,7 +320,7 @@ void menu_add_change_folder::handle()
 			else
 			{
 				// if it's any other key and we're not maxed out, update
-				update_selected = input_character(m_search, menu_event->unichar, uchar_is_printable);
+				update_selected = input_character(m_search, ev->unichar, uchar_is_printable);
 			}
 
 			// check for entries which matches our search buffer
@@ -333,12 +331,12 @@ void menu_add_change_folder::handle()
 
 				// from current item to the end
 				for (entry = cur_selected; entry < item_count(); entry++)
-					if (item(entry).ref != nullptr && !m_search.empty())
+					if (item(entry).ref() && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
@@ -352,12 +350,12 @@ void menu_add_change_folder::handle()
 				// and from the first item to current one
 				for (entry = 0; entry < cur_selected; entry++)
 				{
-					if (item(entry).ref != nullptr && !m_search.empty())
+					if (item(entry).ref() && !m_search.empty())
 					{
 						int match = 0;
 						for (int i = 0; i < m_search.size() + 1; i++)
 						{
-							if (core_strnicmp(item(entry).text.c_str(), m_search.data(), i) == 0)
+							if (core_strnicmp(item(entry).text().c_str(), m_search.data(), i) == 0)
 								match = i;
 						}
 
@@ -371,7 +369,7 @@ void menu_add_change_folder::handle()
 				centre_selection();
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_CANCEL)
+		else if (ev->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
 			m_search.clear();
@@ -417,13 +415,13 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 	std::string const toptext[] = {
 			util::string_format(
 					m_change ? _("Change %1$s Folder - Search: %2$s_") : _("Add %1$s Folder - Search: %2$s_"),
-					_(s_folders[m_ref].name),
+					_("path-option", s_folders[m_ref].name),
 					m_search),
 			m_current_path };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::NEVER, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 
 	// bottom text
@@ -431,8 +429,8 @@ void menu_add_change_folder::custom_render(void *selectedref, float top, float b
 	draw_text_box(
 			std::begin(bottomtext), std::end(bottomtext),
 			origx1, origx2, origy2 + ui().box_tb_border(), origy2 + bottom,
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
-			ui().colors().text_color(), UI_RED_COLOR, 1.0f);
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
+			ui().colors().text_color(), ui().colors().background_color(), 1.0f);
 }
 
 /**************************************************
@@ -464,11 +462,10 @@ menu_remove_folder::~menu_remove_folder()
 //  handle
 //-------------------------------------------------
 
-void menu_remove_folder::handle()
+void menu_remove_folder::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
+	if (ev && ev->itemref && ev->iptkey == IPT_UI_SELECT)
 	{
 		std::string tmppath, error_string;
 		m_folders.erase(m_folders.begin() + selected_index());
@@ -511,11 +508,11 @@ void menu_remove_folder::populate(float &customtop, float &custombottom)
 
 void menu_remove_folder::custom_render(void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2)
 {
-	std::string const toptext[] = {string_format(_("Remove %1$s Folder"), _(s_folders[m_ref].name)) };
+	std::string const toptext[] = {string_format(_("Remove %1$s Folder"), _("path-option", s_folders[m_ref].name)) };
 	draw_text_box(
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - ui().box_tb_border(),
-			ui::text_layout::CENTER, ui::text_layout::TRUNCATE, false,
+			text_layout::text_justify::CENTER, text_layout::word_wrapping::TRUNCATE, false,
 			ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 }
 

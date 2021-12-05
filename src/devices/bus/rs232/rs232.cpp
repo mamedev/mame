@@ -42,7 +42,7 @@
 #include "emu.h"
 #include "rs232.h"
 
-DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS232 Port")
+DEFINE_DEVICE_TYPE(RS232_PORT, rs232_port_device, "rs232", "RS-232 Port")
 
 rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	rs232_port_device(mconfig, RS232_PORT, tag, owner, clock)
@@ -91,6 +91,13 @@ void rs232_port_device::device_resolve_objects()
 	m_cts_handler.resolve_safe();
 	m_rxc_handler.resolve_safe();
 	m_txc_handler.resolve_safe();
+
+	m_rxd = 1;
+	m_dcd = 1;
+	m_dsr = 1;
+	m_ri = 1;
+	m_si = 1;
+	m_cts = 1;
 }
 
 void rs232_port_device::device_reset()
@@ -113,13 +120,6 @@ void rs232_port_device::device_start()
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dce_rxc));
 	save_item(NAME(m_dce_txc));
-
-	m_rxd = 1;
-	m_dcd = 1;
-	m_dsr = 1;
-	m_ri = 1;
-	m_si = 1;
-	m_cts = 1;
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_txd )
@@ -162,31 +162,37 @@ device_rs232_port_interface::~device_rs232_port_interface()
 {
 }
 
+
+#include "ie15.h"
 #include "keyboard.h"
 #include "loopback.h"
+#include "mboardd.h"
 #include "null_modem.h"
+#include "patchbox.h"
 #include "printer.h"
 #include "pty.h"
+#include "rs232_sync_io.h"
 #include "sun_kbd.h"
 #include "swtpc8212.h"
 #include "terminal.h"
-#include "ie15.h"
-#include "rs232_sync_io.h"
-#include "mboardd.h"
+
+template class device_finder<device_rs232_port_interface, false>;
+template class device_finder<device_rs232_port_interface, true>;
 
 void default_rs232_devices(device_slot_interface &device)
 {
-	device.option_add("dec_loopback", DEC_RS232_LOOPBACK);
-	device.option_add("ie15", SERIAL_TERMINAL_IE15);
-	device.option_add("keyboard", SERIAL_KEYBOARD);
-	device.option_add("loopback", RS232_LOOPBACK);
-	device.option_add("null_modem", NULL_MODEM);
-	device.option_add("printer", SERIAL_PRINTER);
-	device.option_add("pty", PSEUDO_TERMINAL);
-	device.option_add("rs_printer", RADIO_SHACK_SERIAL_PRINTER);
+	device.option_add("dec_loopback",  DEC_RS232_LOOPBACK);
+	device.option_add("ie15",          SERIAL_TERMINAL_IE15);
+	device.option_add("keyboard",      SERIAL_KEYBOARD);
+	device.option_add("loopback",      RS232_LOOPBACK);
+	device.option_add("mockingboard",  SERIAL_MOCKINGBOARD_D);
+	device.option_add("null_modem",    NULL_MODEM);
+	device.option_add("patch",         RS232_PATCH_BOX);
+	device.option_add("printer",       SERIAL_PRINTER);
+	device.option_add("pty",           PSEUDO_TERMINAL);
 	device.option_add("rs232_sync_io", RS232_SYNC_IO);
-	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
-	device.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
-	device.option_add("terminal", SERIAL_TERMINAL);
-	device.option_add("mockingboard", SERIAL_MOCKINGBOARD_D);
+	device.option_add("rs_printer",    RADIO_SHACK_SERIAL_PRINTER);
+	device.option_add("sunkbd",        SUN_KBD_ADAPTOR);
+	device.option_add("swtpc8212",     SERIAL_TERMINAL_SWTPC8212);
+	device.option_add("terminal",      SERIAL_TERMINAL);
 }

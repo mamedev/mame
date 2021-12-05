@@ -104,7 +104,7 @@
 #define VERBOSE ( LOG_WARN )
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE_NS(TI99_GROMPORT_GK, bus::ti99::gromport, ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
+DEFINE_DEVICE_TYPE(TI99_GROMPORT_GK, bus::ti99::gromport::ti99_gkracker_device,         "ti99_gkracker",  "Miller's Graphics GRAM Kracker")
 
 namespace bus::ti99::gromport {
 

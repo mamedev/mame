@@ -723,13 +723,13 @@ Manic Panic Ghost! (USA)                            840-0170C-01 not present  5 
 Melty Blood Actress Again (Japan)                   841-0061C    not present  6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 Melty Blood Actress Again Version A (Rev A)         841-0061C    24455        6 (512Mb)   present  317-5133-JPN  present  IC2# is labeled "REV.A" - IC4# is marked "5A"
 /MushiKing The King of Beetles
-\(2K3 2ND Ver. 1.000-, China)                       840-0157C    not present  1 (512Mb)   present  317-0???-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
+\(2K3 2ND Ver. 1.000-, China)                       840-0157C    not present  1 (512Mb)   present  317-0437-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking II / III / III+ (Ver. 1.001) (World)     840-0164C    not present  2 (512Mb)   present  317-0437-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking II / III / III+ (Ver. 2.001) (World)     840-0164C    24357        2 (512Mb)   present  317-0437-COM  present  IC4# is marked "18"
 /Mushiking The King Of Beetles
-\Mushiking II / III / III+ (Ver. 1.000-) (Korea)    840-0168C    not present  2 (512Mb)   present  317-0???-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
+\Mushiking II / III / III+ (Ver. 1.000-) (Korea)    840-0168C    not present  2 (512Mb)   present  317-0437-COM  present  requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 /Mushiking The King Of Beetles
 \Mushiking IV / V / VI (World)                      840-0180C    not present  2 (512Mb)   present  317-0437-COM  present  IC2# is labeled "VER.1", IC4# is marked "8A", requires 610-0669 barcode reader, 838-14245-92 "MAPLE/232C CONVERT BD" (MIE-based), 838-14243 "RFID CHIP R/W BD" and RFID chip
 Mushiking The King Of Beetles 2006 First (Japan)    840-0167C    not present  2 (512Mb)   present  317-0444-JPN  present  IC4# is marked "18", require 610-0669 barcode reader
@@ -5078,7 +5078,7 @@ ROM_START( mushike )
 	ROM_REGION( 0x80, "rf_tag", 0 )
 	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
 
-	// 840-0150    2003     317-0394-COM   Naomi
+	// 840-0150    2004     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
 ROM_END
 
@@ -5106,8 +5106,59 @@ ROM_START( mushikeo )
 	ROM_REGION( 0x80, "rf_tag", 0 )
 	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
 
-	// 840-0150    2003     317-0394-COM   Naomi
+	// 840-0150    2004     317-0394-COM   Naomi
 	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
+ROM_END
+
+ROM_START( mushikk )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "epr-24265.ic11",         0x0000000, 0x0400000, CRC(dccb210b) SHA1(35891f97bec251083b2c927e926d73685d750a4d) )
+	ROM_LOAD32_WORD( "opr-24266.ic17s", 0x1000000, 0x0800000, CRC(293e5350) SHA1(7107d3378fe3a73e868bc03e0572b19e91152a3b) )
+	ROM_LOAD32_WORD( "opr-24267.ic18",  0x1000002, 0x0800000, CRC(80798f9a) SHA1(a843a052dce254f9a5a7b7024f21e4e6f8621666) )
+	ROM_LOAD32_WORD( "opr-24268.ic19s", 0x2000000, 0x0800000, CRC(b512c772) SHA1(f45084f2e242e07e47c25eeeed44624274a95a7e) )
+	ROM_LOAD32_WORD( "opr-24269.ic20",  0x2000002, 0x0800000, CRC(25d4a162) SHA1(2a987803e272d7d8b8302d9dedfecf4bdd8cad7b) )
+	ROM_LOAD32_WORD( "opr-24270.ic21s", 0x3000000, 0x0800000, CRC(02a513ad) SHA1(29213eac56b7b42a3ff43469093d53705019d9af) )
+	ROM_LOAD32_WORD( "opr-24271.ic22",  0x3000002, 0x0800000, CRC(7e5c745c) SHA1(1163b0d549e9af629fa57dcb68c25dbc99cb47cc) )
+
+	ROM_COPY( "rom_board", 0x1000000, 0x400000, 0xc00000 )
+
+	ROM_REGION( 0x200, "some_eeprom", ROMREGION_ERASEFF )
+	ROM_LOAD( "25lc010.ic13s", 0, 0x84, CRC(2299ab22) SHA1(8cf2cf3a6a7ca8cc13998f1cdeed5d6b4a832781) )
+
+	// MUSHIKING
+	// The King of Beetle
+	// TYPE-1
+	// 800
+	// note: this dump from "empty/dead" Management Chip with no game run count left
+	ROM_REGION( 0x80, "rf_tag", 0 )
+	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
+
+	// 840-0155    2004     317-0394-COM   Naomi
+	ROM_PARAMETER( ":rom_board:key", "3892fb3a" )
+ROM_END
+
+ROM_START( mushikc )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x4000000, "rom_board", ROMREGION_ERASEFF )
+	ROM_LOAD( "ic8.bin", 0x0000000, 0x4000000, CRC(5edc61fb) SHA1(039a6cc27512c93eaea3f5fc88e1c710f550446b) )
+
+	// MUSHIKING
+	// The King of Beetle
+	// TYPE-1
+	// 800
+	// note: this dump from "empty/dead" Management Chip with no game run count left
+	ROM_REGION( 0x80, "rf_tag", 0 )
+	ROM_LOAD( "mushi_type1.bin", 0, 0x80, CRC(8f36572b) SHA1(87e00e56d07a961e9180c7da02e35f7fd216dbae) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, CRC(3b6fcee8) SHA1(65fbdd3b8c61a4b5ccb6389b25483a7ecdc0794d) )
+
+	ROM_PARAMETER(":rom_board:id", "5501")
 ROM_END
 
 // Prototype or location test version. Cartridge case have no game name sticker, PCB have label 840-0150B-FLS
@@ -7039,6 +7090,21 @@ ROM_START( mushik2e )
 	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, CRC(3b6fcee8) SHA1(65fbdd3b8c61a4b5ccb6389b25483a7ecdc0794d) )
 
 	ROM_PARAMETER( ":rom_board:id", "5582" )
+ROM_END
+
+// require rev.H Korea BIOS, not dumped
+ROM_START( mushik2k )
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "rom_board", ROMREGION_ERASEFF)
+	ROM_LOAD( "fpr-24355.ic8", 0x0000000, 0x4000000, CRC(8bd89229) SHA1(912fd2707573cefbbaa41e586a394d124f5afeba) )
+	ROM_LOAD( "fpr-24356.ic9", 0x4000000, 0x4000000, CRC(ed649c81) SHA1(79a489728dbe16eb01080d1dcc6cfa2594c81318) )
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0437-com.ic3", 0, 0x800, CRC(3b6fcee8) SHA1(65fbdd3b8c61a4b5ccb6389b25483a7ecdc0794d) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 ROM_END
 
 // change game version (4/5/6): in BACKUP DATA CLEAR menu hold P1 and P2 buttons 1 for 3 seconds, then change version number in appeared menu and select YES(CLEAR)
@@ -11796,14 +11862,14 @@ ROM_END
 /* 0150    */ GAME( 2004, mushikeo,  mushike,  naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.002-, World)", GAME_FLAGS ) // not for Japan
 /* 0150-FLS*/ GAME( 2004, mushikep,  mushike,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (MUSHIUSA '04 1ST, Prototype)", GAME_FLAGS )
 /* 0152    */ GAME( 2004, mushi2k4,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2004 Second (Japan)", GAME_FLAGS )
-// 0155 Mushiking 2K3 2ND (Korea)
-// 0157 Mushiking 2K3 2ND (China)
+/* 0155    */ GAME( 2004, mushikk,   mushike,  naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.000-, Korea)", GAME_FLAGS )
+/* 0157    */ GAME( 2004, mushikc,   mushike,  naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetle (2K3 2ND Ver. 1.000-, China)", GAME_FLAGS )
 /* 0158    */ GAME( 2005, mushi2k5,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2005 First (Japan)", GAME_FLAGS )
 /* 0164    */ GAME( 2005, mushi2eo,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0164    */ GAME( 2005, mushik2e,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 2.001) (World)", GAME_FLAGS ) // not for Japan or Korea, version can be changed in secret menu, ~equivalent of Japanese 2K5 versions.
 /* 0166    */ GAME( 2006, zunou,     naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Touch De Zunou (Japan, Rev A)", GAME_FLAGS )
 /* 0167    */ GAME( 2006, mushi2k61, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 First (Japan)", GAME_FLAGS )
-// 0168 Mushiking II (Korea)
+/* 0168    */ GAME( 2005, mushik2k,  mushik2e, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles - Mushiking II / III / III+ (Ver. 1.000-) (Korea)", GAME_FLAGS )
 /* 0170-01 */ GAME( 2007, manicpnc,  naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Manic Panic Ghosts! (USA, Export)", GAME_FLAGS )
 /* 0170    */ GAME( 2007, pokasuka,  manicpnc, naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Pokasuka Ghost! (Japan)", GAME_FLAGS )
 /* 0171    */ GAME( 2006, mushi2k62, naomi,    naomim4, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Mushiking The King Of Beetles 2006 Second (Japan)", GAME_FLAGS )
@@ -11990,6 +12056,10 @@ ROM_END
 /* 0042A */ GAME( 2009, ndcfboxa, naomigd, naomigd,  naomi,   naomi_state, init_naomigd, ROT0, "Sega", "Naomi DIMM Firmware Update for CF-BOX (4.01) (GDS-0042A)", GAME_FLAGS )
 // 00??  Get Bass 2 (GDS-00xx)
 
+/* GDD-xxxx (Sega GD-ROM games) */
+// 0001B SEGA DRIVING SIMULATOR Ver,1.00
+// 0002  SEGA DRIVING SIMULATOR Ver. 2.00
+
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
 /* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )
@@ -12107,7 +12177,7 @@ GAME( 2005, ngbc,      awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2005, ngbcj,     ngbc,     aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "NeoGeo Battle Coliseum (Japan)", GAME_FLAGS )                   // Jun 25 2005 17:00:38
 GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "Samurai Spirits Tenkaichi Kenkakuden", GAME_FLAGS )             // Aug 05 2005 16:43:48
 GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )                          // Aug 07 2005 18:11:25
-GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star", GAME_FLAGS )                           // Nov 28 2005 21:04:40
+GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star / Hokuto no Ken", GAME_FLAGS )           // Nov 28 2005 21:04:40
 GAME( 2006, mslug6,    awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_FLAGS)                                      // Jan 13 2006 00:49:12
 GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_state, init_xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )                                // May 26 2006 14:03:22
 GAME( 2006, dirtypig,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", GAME_FLAGS)                            // Sep 10 2006 20:24:14

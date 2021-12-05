@@ -2420,7 +2420,7 @@ u32 *model2_state::geo_code_upload( geo_state *geo, u32 opcode, u32 *input )
 
 	for( i = 0; i < count; i++ )
 	{
-		u64  code;
+		[[maybe_unused]] u64  code;
 
 		/* read the top part of the opcode */
 		code = *input++;

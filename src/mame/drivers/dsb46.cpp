@@ -25,14 +25,16 @@ The photos show 3 boards:
 
 ********************************************************************************************************************/
 
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80daisy.h"
-#include "machine/z80ctc.h"
-#include "machine/z80sio.h"
-#include "bus/rs232/rs232.h"
 
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
+#include "machine/z80daisy.h"
+#include "machine/z80sio.h"
+
+
+namespace {
 
 class dsb46_state : public driver_device
 {
@@ -47,9 +49,11 @@ public:
 
 	void dsb46(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
 private:
-	void machine_reset() override;
-	void machine_start() override;
 	void port1a_w(u8 data);
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
@@ -61,8 +65,8 @@ private:
 
 void dsb46_state::mem_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().share("mainram");
-	map(0x0000, 0x07ff).bankr("bank1");
+	map(0x0000, 0xffff).ram().share(m_ram);
+	map(0x0000, 0x07ff).bankr(m_bank1);
 }
 
 void dsb46_state::io_map(address_map &map)
@@ -142,5 +146,8 @@ ROM_START( dsb46 )
 	ROM_REGION( 0x4000, "ades", 0 )
 	ROM_LOAD( "ades.bin", 0x0000, 0x4000, CRC(d374abf0) SHA1(331f51a2bb81375aeffbe63c1ebc1d7cd779b9c3) )
 ROM_END
+
+} // anonymous namespace
+
 
 COMP( 198?, dsb46, 0, 0, dsb46, dsb46, dsb46_state, empty_init, "Davidge", "DSB-4/6",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

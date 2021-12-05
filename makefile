@@ -406,6 +406,7 @@ endif
 endif
 
 ifeq ($(findstring riscv64,$(UNAME)),riscv64)
+ARCHITECTURE :=
 ifndef FORCE_DRC_C_BACKEND
 	FORCE_DRC_C_BACKEND := 1
 endif
@@ -439,7 +440,7 @@ endif
 endif # BIGENDIAN
 
 ifndef PYTHON_EXECUTABLE
-PYTHON := python
+PYTHON := python3
 else
 PYTHON := $(PYTHON_EXECUTABLE)
 endif
@@ -1020,19 +1021,6 @@ ifeq (posix,$(SHELLTYPE))
 MSBUILD_PARAMS := $(subst /,-,$(MSBUILD_PARAMS))
 endif
 endif
-ifdef FASTBUILD
-FASTBUILD_PARAMS := -j$(NUMBER_OF_PROCESSORS)
-ifeq ($(CONFIG),debug)
-FASTBUILD_TARGET := all-Debug
-else
-FASTBUILD_TARGET := all-Release
-endif
-ifeq ($(ARCHITECTURE),_x64)
-FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x64
-else
-FASTBUILD_PARAMS += $(FASTBUILD_TARGET)-x32
-endif
-endif
 else
 ifdef OVERRIDE_CC
 GCC_VERSION      := $(shell $(TOOLCHAIN)$(subst @,,$(OVERRIDE_CC)) -dumpversion 2> /dev/null)
@@ -1072,7 +1060,7 @@ endif
 ifneq ($(GIT_AVAILABLE),git)
 	IGNORE_GIT := 1
 endif
-ifeq ($(wildcard .git/*),)
+ifeq ($(filter .git,$(wildcard .*)),)
 	IGNORE_GIT := 1
 endif
 
@@ -1163,84 +1151,6 @@ windows_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-mingw-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-mingw-clang config=$(CONFIG)32 WINDRES=$(WINDRES)
 
 #-------------------------------------------------
-# Visual Studio 2015
-#-------------------------------------------------
-
-.PHONY: vs2015
-vs2015: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_intel
-vs2015_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_xp
-vs2015_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2015-xp vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_uwp
-vs2015_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2015
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2015_fastbuild
-vs2015_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2015-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
-# Visual Studio 2017
-#-------------------------------------------------
-
-.PHONY: vs2017
-vs2017: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_intel
-vs2017_intel: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_xp
-vs2017_xp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2017-xp vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_uwp
-vs2017_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2017
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2017_fastbuild
-vs2017_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2017-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
 # Visual Studio 2019
 #-------------------------------------------------
 
@@ -1263,31 +1173,6 @@ vs2019_intel: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2019
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2019_uwp
-vs2019_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --NO_USE_PORTAUDIO=1 --MODERN_WIN_API=1 vs2019
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2019-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
-endif
-
-.PHONY: vs2019_fastbuild
-vs2019_fastbuild: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2019-fastbuild
-ifdef FASTBUILD
-	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2019-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
-endif
-
-#-------------------------------------------------
-# Visual Studio LLVM
-#-------------------------------------------------
-
-.PHONY: vsllvm
-vsllvm: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vsllvm
-ifdef MSBUILD
-	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vsllvm/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1463,14 +1348,6 @@ macosx_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)32
 
-.PHONY: xcode4
-xcode4: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=osx xcode4
-
-.PHONY: xcode4-ios
-xcode4-ios: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --targetos=macosx --xcode=ios xcode4
-
 #-------------------------------------------------
 # gmake-solaris
 #-------------------------------------------------
@@ -1608,93 +1485,6 @@ openbsd_x86: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)32
 
 #-------------------------------------------------
-# gmake-steamlink
-#-------------------------------------------------
-
-$(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef MARVELL_SDK_PATH
-	$(error MARVELL_SDK_PATH is not set)
-endif
-ifndef MARVELL_ROOTFS
-	$(error MARVELL_ROOTFS is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=steamlink --gcc_version=$(GCC_VERSION) --NO_OPENGL=1 --NO_USE_MIDI=1 --NO_X11=1 --NOASM=1 --SDL_INSTALL_ROOT=$(MARVELL_ROOTFS)/usr  $(MAKETYPE)
-
-.PHONY: steamlink
-steamlink: generate $(PROJECTDIR)/$(MAKETYPE)-steamlink/Makefile
-ifndef MARVELL_SDK_PATH
-	$(error MARVELL_SDK_PATH is not set)
-endif
-ifndef MARVELL_ROOTFS
-	$(error MARVELL_ROOTFS is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-steamlink config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-steamlink config=$(CONFIG)
-
-#-------------------------------------------------
-# gmake-rpi
-#-------------------------------------------------
-
-$(PROJECTDIR_SDL)/$(MAKETYPE)-rpi/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef RASPBERRY_SDK_PATH
-	$(error RASPBERRY_SDK_PATH is not set)
-endif
-ifndef RASPBERRY_SYSROOT
-	$(error RASPBERRY_SYSROOT is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=rpi --gcc_version=4.9.2 --osd=sdl --targetos=rpi --targetos=rpi --NO_USE_MIDI=1 --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)
-
-.PHONY: rpi
-rpi: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi/Makefile
-ifndef RASPBERRY_SDK_PATH
-	$(error RASPBERRY_SDK_PATH is not set)
-endif
-ifndef RASPBERRY_SYSROOT
-	$(error RASPBERRY_SYSROOT is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-rpi config=$(CONFIG)
-
-#-------------------------------------------------
-# gmake-ci20
-#-------------------------------------------------
-
-$(PROJECTDIR_SDL)/$(MAKETYPE)-ci20/Makefile: makefile $(SCRIPTS) $(GENIE)
-ifndef MIPS_LINUXGNU_ROOT
-	$(error MIPS_LINUXGNU_ROOT is not set)
-endif
-ifndef CI20_SYSROOT
-	$(error CI20_SYSROOT is not set)
-endif
-	$(SILENT) $(GENIE) $(PARAMS) --gcc=ci20 --gcc_version=4.9.2 --osd=sdl --targetos=ci20 --targetos=ci20 --NO_USE_MIDI=1  --PLATFORM=arm --NOASM=1 --USE_QTDEBUG=0 --SDL_INSTALL_ROOT=$(RASPBERRY_SYSROOT)/usr  $(MAKETYPE)
-
-.PHONY: ci20
-ci20: generate $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20/Makefile
-ifndef MIPS_LINUXGNU_ROOT
-	$(error MIPS_LINUXGNU_ROOT is not set)
-endif
-ifndef CI20_SYSROOT
-	$(error CI20_SYSROOT is not set)
-endif
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20 config=$(CONFIG) precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR_SDL)/$(MAKETYPE)-ci20 config=$(CONFIG)
-
-#-------------------------------------------------
-# cmake
-#-------------------------------------------------
-
-.PHONY: cmake
-cmake: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) cmake
-ifneq (posix,$(SHELLTYPE))
-	$(SILENT)echo cmake_minimum_required(VERSION 2.8.4) > CMakeLists.txt
-	$(SILENT)echo add_subdirectory($(PROJECTDIR)/cmake) >> CMakeLists.txt
-else
-	$(SILENT)echo "cmake_minimum_required(VERSION 2.8.4)" > CMakeLists.txt
-	$(SILENT)echo "add_subdirectory($(PROJECTDIR)/cmake)" >> CMakeLists.txt
-endif
-
-#-------------------------------------------------
 # Clean/bootstrap
 #-------------------------------------------------
 
@@ -1711,8 +1501,9 @@ genieclean:
 
 clean: genieclean
 	@echo Cleaning...
-	-@rm -rf $(BUILDDIR)
-	-@rm -rf 3rdparty/bgfx/.build
+	-$(SILENT)rm -f language/*/*.mo
+	-$(SILENT)rm -rf $(BUILDDIR)
+	-$(SILENT)rm -rf 3rdparty/bgfx/.build
 
 GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 
@@ -1755,18 +1546,24 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.235"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.238"' > $@
+	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
+	@echo 'extern const char bare_vcs_revision[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
-	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
+	@echo 'const char bare_vcs_revision[] = BARE_VCS_REVISION;' >> $@
+	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.235" > $@
+	@echo #define BARE_BUILD_VERSION "0.238" > $@
+	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
+	@echo extern const char bare_vcs_revision[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
-	@echo const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))"; >> $@
+	@echo const char bare_vcs_revision[] = BARE_VCS_REVISION; >> $@
+	@echo const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")"; >> $@
 endif
 
 
@@ -1802,39 +1599,24 @@ tests: $(REGTESTS)
 cleansrc:
 	@echo Cleaning up tabs/spaces/end of lines....
 ifeq (posix,$(SHELLTYPE))
-	$(SILENT) find src -name \*.c -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.cpp -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.h -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.hpp -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.hxx -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.ipp -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.lay -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.lst -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.mak -exec ./srcclean {} \; >&2
-	$(SILENT) find src -name \*.mm -exec ./srcclean {} \; >&2
-	$(SILENT) find hash -name \*.hsi -exec ./srcclean {} \; >&2
-	$(SILENT) find hash -name \*.xml -exec ./srcclean {} \; >&2
-	$(SILENT) find bgfx -name \*.json -exec ./srcclean {} \; >&2
-	$(SILENT) find plugins -name \*.lua -exec ./srcclean {} \; >&2
-	$(SILENT) find plugins -name \*.json -exec ./srcclean {} \; >&2
-	$(SILENT) find scripts -name \*.lua -exec ./srcclean {} \; >&2
+	$(SILENT) find src \( \
+		-name \*.c -o -name \*.cpp -o \
+		-name \*.h -o -name \*.hpp -o -name \*.hxx -o \
+		-name \*.ipp -o \
+		-name \*.mm -o \
+		-name \*.lay -o \
+		-name \*.lst \
+		\) -exec ./srcclean {} \; >&2
+	$(SILENT) find hash    \( -name \*.hsi -o -name \*.xml  \) -exec ./srcclean {} \; >&2
+	$(SILENT) find bgfx    \( -name \*.json                 \) -exec ./srcclean {} \; >&2
+	$(SILENT) find plugins \( -name \*.lua -o -name \*.json \) -exec ./srcclean {} \; >&2
+	$(SILENT) find scripts \( -name \*.lua                  \) -exec ./srcclean {} \; >&2
 else
-	$(shell for /r src %%i in (*.c) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.cpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.h) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hpp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.hxx) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.ipp) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lay) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.lst) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mak) do srcclean %%i >&2 )
-	$(shell for /r src %%i in (*.mm) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.hsi) do srcclean %%i >&2 )
-	$(shell for /r hash %%i in (*.xml) do srcclean %%i >&2 )
-	$(shell for /r bgfx %%i in (*.json) do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.lua) do srcclean %%i >&2 )
-	$(shell for /r plugins %%i in (*.json) do srcclean %%i >&2 )
-	$(shell for /r scripts %%i in (*.lua) do srcclean %%i >&2 )
+	$(shell for /r src     %%i in (*.c, *.cpp, *.h, *.hpp, *.hxx, *.ipp, *.mm, *.lay, *.lst) do srcclean %%i >&2 )
+	$(shell for /r hash    %%i in (*.hsi, *.xml)  do srcclean %%i >&2 )
+	$(shell for /r bgfx    %%i in (*.json)        do srcclean %%i >&2 )
+	$(shell for /r plugins %%i in (*.lua, *.json) do srcclean %%i >&2 )
+	$(shell for /r scripts %%i in (*.lua)         do srcclean %%i >&2 )
 endif
 
 #-------------------------------------------------
@@ -1929,8 +1711,22 @@ shaders: bgfx-tools
 
 $(GENDIR)/mame.pot: FORCE
 	$(SILENT) echo Generating mame.pot
-	$(SILENT) find src -iname "*.cpp" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -o $@
-	$(SILENT) find plugins -iname "*.lua" -print0 | xargs -0 xgettext --from-code=UTF-8 -k_ -k__ -j -o $@
+	$(SILENT) find src/frontend "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2
+	$(SILENT) find src/devices "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -j
+	$(SILENT) find src/emu "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -j
+	$(SILENT) find src/lib "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -j
+	$(SILENT) find src/mame "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -j
+	$(SILENT) find src/osd "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -j
+	$(SILENT) find src/tools "(" -name "*.cpp" -o -name "*.ipp" ")" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=C++ -k_:1,1t -k_:1c,2,2t -kN_ -kN_p:1c,2 -j
+	$(SILENT) find plugins -name "*.lua" -print0 | xargs -0 \
+		xgettext -o $@ --from-code=UTF-8 --language=Lua -k_:1 -k_p:1c,2 -kN_ -kN_p:1c,2 -j
 
 translation: $(GENDIR)/mame.pot
 	$(SILENT) find language -name "*.po" -print0 | xargs -0 -n 1 -I %% msgmerge -U -N %% $<

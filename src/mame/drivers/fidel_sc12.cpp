@@ -47,13 +47,13 @@ If control Q4 is set, printer data can be read from I0.
 #include "emu.h"
 #include "machine/fidel_clockdiv.h"
 
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/r65c02.h"
+#include "machine/clock.h"
 #include "machine/sensorboard.h"
-#include "machine/timer.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist.h"
 #include "speaker.h"
@@ -71,7 +71,6 @@ class sc12_state : public fidel_clockdiv_state
 public:
 	sc12_state(const machine_config &mconfig, device_type type, const char *tag) :
 		fidel_clockdiv_state(mconfig, type, tag),
-		m_irq_on(*this, "irq_on"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -87,7 +86,6 @@ protected:
 
 private:
 	// devices/pointers
-	required_device<timer_device> m_irq_on;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
@@ -96,23 +94,18 @@ private:
 	// address maps
 	void main_map(address_map &map);
 
-	// periodic interrupts
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(Line, ASSERT_LINE); }
-	template<int Line> TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(Line, CLEAR_LINE); }
-
 	// I/O handlers
 	void control_w(u8 data);
 	u8 input_r(offs_t offset);
 
-	u8 m_inp_mux;
+	u8 m_inp_mux = 0;
 };
 
 void sc12_state::machine_start()
 {
 	fidel_clockdiv_state::machine_start();
 
-	// zerofill/register for savestates
-	m_inp_mux = 0;
+	// register for savestates
 	save_item(NAME(m_inp_mux));
 }
 
@@ -213,10 +206,9 @@ void sc12_state::sc12(machine_config &config)
 	R65C02(config, m_maincpu, 3_MHz_XTAL); // R65C02P3
 	m_maincpu->set_addrmap(AS_PROGRAM, &sc12_state::main_map);
 
-	const attotime irq_period = attotime::from_hz(600); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
-	TIMER(config, m_irq_on).configure_periodic(FUNC(sc12_state::irq_on<M6502_IRQ_LINE>), irq_period);
-	m_irq_on->set_start_delay(irq_period - attotime::from_nsec(15250)); // active for 15.25us
-	TIMER(config, "irq_off").configure_periodic(FUNC(sc12_state::irq_off<M6502_IRQ_LINE>), irq_period);
+	auto &irq_clock(CLOCK(config, "irq_clock", 600)); // from 556 timer (22nF, 102K, 1K), ideal frequency is 600Hz
+	irq_clock.set_pulse_width(attotime::from_nsec(15250)); // active for 15.25us
+	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

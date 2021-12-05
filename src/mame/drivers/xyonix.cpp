@@ -430,8 +430,8 @@ void xyonix_state::xyonix(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "sn1", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
-	SN76496(config, "sn2", 16000000/4).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76496(config, "sn1", 16000000/4).add_route(ALL_OUTPUTS, "mono", 0.5);
+	SN76496(config, "sn2", 16000000/4).add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 /* ROM Loading ***************************************************************/

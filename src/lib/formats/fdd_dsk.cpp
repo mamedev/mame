@@ -35,6 +35,10 @@
 
 #include "ioprocs.h"
 
+#include "osdcomm.h" // little_endianize_int32
+
+#include <cstring>
+
 
 fdd_format::fdd_format()
 {
@@ -84,7 +88,7 @@ bool fdd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	for (int track = 0; track < 160; track++)
 	{
-		int curr_num_sec = 0, curr_track_size = 0;
+		int curr_num_sec = 0; [[maybe_unused]] int curr_track_size = 0;
 		for (int sect = 0; sect < 26; sect++)
 		{
 			// read sector map for this sector

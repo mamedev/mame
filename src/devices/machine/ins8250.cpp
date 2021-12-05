@@ -81,7 +81,7 @@ ASCII/EBCDIC control character recognition, timed interrupts and more.
 
 
 Known issues:
-- MESS does currently not handle all these model specific features.
+- MAME does currently not handle all these model specific features.
 
 
 History:

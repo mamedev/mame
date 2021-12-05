@@ -2433,7 +2433,7 @@ void m2_te_device::destination_blend(uint32_t x, uint32_t y, uint32_t w, const r
 	bool winclipdis = false;
 
 	// Z Status
-	uint32_t zgel = 0;
+	[[maybe_unused]] uint32_t zgel = 0;
 
 	uint32_t zaddr;
 

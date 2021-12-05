@@ -4,8 +4,6 @@
 
     Sinclair QL
 
-    MESS Driver by Curt Coder
-
 */
 
 /*

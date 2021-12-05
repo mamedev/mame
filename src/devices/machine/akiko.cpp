@@ -142,12 +142,12 @@ void akiko_device::device_reset()
 {
 	if (m_cddevice.found())
 	{
-		// MESS case
+		// CD32 case
 		m_cdrom = m_cddevice->get_cdrom_file();
 	}
 	else
 	{
-		// MAME case
+		// Arcade case
 		m_cdrom = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 	}
 

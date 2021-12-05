@@ -10,9 +10,9 @@
 
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/radio86.h"
 
+#include "cpu/i8085/i8085.h"
 
 
 void radio86_state::radio86_init_keyboard()
@@ -186,8 +186,7 @@ u8 radio86_state::radio86ram_romdisk_porta_r()
 	u8 *romdisk = m_rom + 0x10000;
 	if ((m_disk_sel & 0x0f) ==0)
 		return romdisk[m_romdisk_msb*256+m_romdisk_lsb];
-	else
-	if (m_disk_sel==0xdf)
+	else if (m_disk_sel==0xdf)
 		return m_radio_ram_disk[m_romdisk_msb*256+m_romdisk_lsb + 0x10000];
 	else
 		return m_radio_ram_disk[m_romdisk_msb*256+m_romdisk_lsb];

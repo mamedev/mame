@@ -7,7 +7,7 @@
 
 #define M2COMM_SIMULATION
 
-#include "osdcore.h"
+#include "osdfile.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

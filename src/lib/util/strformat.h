@@ -132,6 +132,7 @@
     - Inappropriate type for parameterised width/precision
     - Positional width/precision specifier not terminated with $
     - Inappropriate type for n conversion
+    - Default conversion for type that lacks stream out operator
 
     Some limitations have been described in passing.  Major limitations
     and bugs include:
@@ -589,40 +590,32 @@ private:
 	template <typename U>
 	using unsigned_integer_semantics = std::bool_constant<std::is_integral_v<U> && !std::is_signed_v<U> >;
 
-	static void apply_signed(Stream &str, char16_t const &value)
-	{
-		str << std::make_signed_t<std::uint_least16_t>(std::uint_least16_t(value));
-	}
-	static void apply_signed(Stream &str, char32_t const &value)
-	{
-		str << std::make_signed_t<std::uint_least32_t>(std::uint_least32_t(value));
-	}
 	template <typename U>
 	static std::enable_if_t<std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> > || std::is_integral_v<U> > apply_signed(Stream &str, U const &value)
 	{
 		if constexpr (std::is_same_v<std::make_signed_t<U>, std::make_signed_t<char> >)
 			str << int(std::make_signed_t<U>(value));
-		else if constexpr (std::is_signed_v<U>)
-			str << value;
-		else
+		else if constexpr (!std::is_signed_v<U> || std::is_same_v<typename Stream::char_type, U>)
 			str << std::make_signed_t<U>(value);
+#if __cplusplus > 201703L
+		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
+			str << std::make_signed_t<U>(value);
+#endif
+		else
+			str << value;
 	}
 
-	static void apply_unsigned(Stream &str, char16_t const &value)
-	{
-		str << std::uint_least16_t(value);
-	}
-	static void apply_unsigned(Stream &str, char32_t const &value)
-	{
-		str << std::uint_least32_t(value);
-	}
 	template <typename U>
 	static std::enable_if_t<std::is_same_v<std::make_unsigned_t<U>, std::make_unsigned_t<char> > || std::is_integral_v<U> > apply_unsigned(Stream &str, U const &value)
 	{
 		if constexpr (std::is_same_v<std::make_unsigned_t<U>, std::make_unsigned_t<char> >)
 			str << unsigned(std::make_unsigned_t<U>(value));
-		else if constexpr (std::is_signed_v<U>)
+		else if constexpr (!std::is_unsigned_v<U> || std::is_same_v<typename Stream::char_type, U>)
 			str << std::make_unsigned_t<U>(value);
+#if __cplusplus > 201703L
+		else if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
+			str << std::make_unsigned_t<U>(value);
+#endif
 		else
 			str << value;
 	}
@@ -830,7 +823,17 @@ public:
 				str << reinterpret_cast<void const *>(std::uintptr_t(value));
 				break;
 			default:
-				str << value;
+#if __cplusplus > 201703L
+				if constexpr (!std::is_invocable_v<decltype([] (auto &x, auto &y) -> decltype(x << y) { return x << y; }), Stream &, U const &>)
+				{
+					assert(false); // stream out operator not declared or declared deleted
+					str << '?';
+				}
+				else
+#endif
+				{
+					str << value;
+				}
 			}
 		}
 		else

@@ -80,6 +80,10 @@
 
 DEFINE_DEVICE_TYPE(A2BUS_SLOT, a2bus_slot_device, "a2bus_slot", "Apple II Slot")
 
+template class device_finder<device_a2bus_card_interface, false>;
+template class device_finder<device_a2bus_card_interface, true>;
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************

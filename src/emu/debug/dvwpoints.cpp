@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Andrew Gardner, Vas Crabb
 /*********************************************************************
 
     dvwpoints.cpp
@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "dvwpoints.h"
+
 #include "points.h"
 
 #include <algorithm>

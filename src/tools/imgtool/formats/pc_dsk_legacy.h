@@ -11,7 +11,7 @@
 #ifndef PC_DSK_LEGACY_H
 #define PC_DSK_LEGACY_H
 
-#include "formats/flopimg.h"
+#include "formats/flopimg_legacy.h"
 
 
 /**************************************************************************/

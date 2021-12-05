@@ -207,6 +207,8 @@ crei680.cpp
 crimson.cpp
 crvision.cpp
 ct486.cpp
+ctk2000.cpp
+ctk551.cpp
 cvicny.cpp
 cxg_ch2001.cpp
 cxg_dominator.cpp
@@ -302,6 +304,7 @@ exelv.cpp
 exorciser.cpp
 exorterm.cpp
 exp85.cpp
+f387x.cpp
 facit4440.cpp
 falco5220.cpp
 falcots.cpp
@@ -316,6 +319,7 @@ fidel_card.cpp
 fidel_cc1.cpp
 fidel_cc10.cpp
 fidel_cc7.cpp
+fidel_checkc2.cpp
 fidel_chesster.cpp
 fidel_csc.cpp
 fidel_dames.cpp
@@ -445,6 +449,7 @@ ie15.cpp
 iez80.cpp
 if800.cpp
 ikt5a.cpp
+im01.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -547,6 +552,7 @@ llc2.cpp
 lms46.cpp
 lnw80.cpp
 lola8a.cpp
+luna_68k.cpp
 lviv.cpp
 lwriter.cpp
 lynx.cpp
@@ -816,6 +822,7 @@ poly800.cpp
 poly88.cpp
 poly880.cpp
 polysix.cpp
+positron.cpp
 powerstack.cpp
 pp.cpp
 pp01.cpp
@@ -888,6 +895,7 @@ roland_tb303.cpp
 roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp
+roland_tr808.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
@@ -1005,7 +1013,6 @@ sun3x.cpp
 sun4.cpp
 super6.cpp
 super80.cpp
-superga2.cpp
 superslave.cpp
 supracan.cpp
 sv8000.cpp
@@ -1020,6 +1027,7 @@ sx1000.cpp
 sym1.cpp
 symbolics.cpp
 synthex.cpp
+sys1121.cpp
 sys2900.cpp
 sys9002.cpp
 systec.cpp

@@ -14,37 +14,8 @@
 #pragma once
 
 #include "a2bus.h"
-#include "sound/tms5220.h"
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-class a2bus_ssb_device:
-	public device_t,
-	public device_a2bus_card_interface
-{
-public:
-	// construction/destruction
-	a2bus_ssb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
-	required_device<tms5220_device> m_tms;
-
-protected:
-	a2bus_ssb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_add_mconfig(machine_config &config) override;
-
-	// overrides of standard a2bus slot functions
-	virtual uint8_t read_cnxx(uint8_t offset) override;
-	virtual void write_cnxx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override;
-};
-
-// device type definition
-DECLARE_DEVICE_TYPE(A2BUS_SSBAPPLE, a2bus_ssb_device)
+// device type declaration
+DECLARE_DEVICE_TYPE(A2BUS_SSBAPPLE, device_a2bus_card_interface)
 
 #endif // MAME_BUS_A2BUS_A2SSBAPPLE_H

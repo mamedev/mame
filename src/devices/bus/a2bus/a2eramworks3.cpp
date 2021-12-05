@@ -23,6 +23,8 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(A2EAUX_RAMWORKS3, a2eaux_ramworks3_device, "a2erwks3", "Applied Engineering RamWorks III")
+DEFINE_DEVICE_TYPE(A2EAUX_FRANKLIN384, a2eaux_franklin384_device, "a2ef384", "Franklin ACE 500 expansion RAM")
+DEFINE_DEVICE_TYPE(A2EAUX_FRANKLIN512, a2eaux_franklin512_device, "a2ef512", "Franklin ACE 2x00 expansion RAM")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -37,6 +39,16 @@ a2eaux_ramworks3_device::a2eaux_ramworks3_device(const machine_config &mconfig, 
 		device_t(mconfig, type, tag, owner, clock),
 		device_a2eauxslot_card_interface(mconfig, *this),
 		m_bank(0)
+{
+}
+
+a2eaux_franklin384_device::a2eaux_franklin384_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		a2eaux_ramworks3_device(mconfig, A2EAUX_FRANKLIN384, tag, owner, clock)
+{
+}
+
+a2eaux_franklin512_device::a2eaux_franklin512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		a2eaux_ramworks3_device(mconfig, A2EAUX_FRANKLIN512, tag, owner, clock)
 {
 }
 
@@ -96,3 +108,26 @@ void a2eaux_ramworks3_device::write_c07x(uint8_t offset, uint8_t data)
 		m_bank = 0x10000 * (data & 0x7f);
 	}
 }
+
+void a2eaux_franklin384_device::write_c07x(uint8_t offset, uint8_t data)
+{
+	if ((offset & 0x9) == 1)
+	{
+	   // RamWorks/Z-RAM bank order is 0 3 4 7 8 11 12 15
+	   // so cut off access above bank 11 to limit to 384K.
+	   if (data > 11)
+	   {
+		  data = 0;
+	   }
+	   m_bank = 0x10000 * (data & 0xf);
+	}
+}
+
+void a2eaux_franklin512_device::write_c07x(uint8_t offset, uint8_t data)
+{
+   if ((offset & 0x9) == 1)
+   {
+	  m_bank = 0x10000 * (data & 0x0f);
+   }
+}
+

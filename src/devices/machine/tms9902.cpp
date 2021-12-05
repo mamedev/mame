@@ -260,7 +260,7 @@ void tms9902_device::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	// This call-back is called by the MESS timer system when the decrementer
+	// This call-back is called by the MAME timer system when the decrementer
 	// reaches 0.
 	case DECTIMER:
 		m_TIMERR = m_TIMELP;

@@ -12,6 +12,10 @@
 
 #include "ioprocs.h"
 
+#include "osdcore.h" // osd_printf_*
+
+#include <cstring>
+
 
 wd177x_format::wd177x_format(const format *_formats)
 {

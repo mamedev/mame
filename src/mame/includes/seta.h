@@ -108,6 +108,8 @@ public:
 	u32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
+	virtual void video_start() override;
+
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<seta001_device> m_seta001;
@@ -161,8 +163,6 @@ protected:
 	void pairlove_prot_w(offs_t offset, u16 data);
 	void magspeed_lights_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 extra_r();
-
-	DECLARE_VIDEO_START(seta);
 
 	void blandia_palette(palette_device &palette) const;
 	void zingzip_palette(palette_device &palette) const;
@@ -437,6 +437,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	void rtc_w(u16 data);
 	u16 rtc_r(offs_t offset);
@@ -453,9 +457,6 @@ private:
 	void spriteylow_w(offs_t offset, u16 data);
 
 	void spritectrl_w(offs_t offset, u16 data);
-
-	DECLARE_MACHINE_START(setaroul);
-	DECLARE_MACHINE_RESET(setaroul);
 
 	void setaroul_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -195,13 +195,8 @@ int osd_getpid()
 //  osd_dynamic_bind
 //============================================================
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 // for classic desktop applications
 #define load_library(filename) LoadLibrary(filename)
-#else
-// for Windows Store universal applications
-#define load_library(filename) LoadPackagedLibrary(filename, 0)
-#endif
 
 namespace osd {
 

@@ -10,7 +10,6 @@
         <meta name="generator" content="Doxygen $doxygenversion"/>
 
         <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
-        <script type="text/javascript" src="http://stevenbenner.github.io/jquery-powertip/scripts/jquery.powertip.js"></script>
 
         <!--BEGIN PROJECT_NAME--><title>$projectname: $title</title><!--END PROJECT_NAME-->
         <!--BEGIN !PROJECT_NAME--><title>$title</title><!--END !PROJECT_NAME-->
@@ -18,29 +17,26 @@
         <script type="text/javascript" src="$relpath^dynsections.js"></script>
         $treeview
         $search
-
+        $mathjax
         <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
-
-        <link rel="stylesheet" href="http://bootswatch.com/journal/bootstrap.min.css">
+        $extrastylesheet
+        <link href='https://fonts.googleapis.com/css?family=Roboto+Slab' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="$relpath^doxy-boot.js"></script>
-
-        $extrastylesheet
-
     </head>
-      <body>
+    <body>
         <nav class="navbar navbar-default" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <span class="navbar-brand">$projectname $projectnumber</span>
-                </div>
-                <div class="navbar-header">
-                  <span class="navbar-brand brief">$projectbrief</span>
+                    <a class="navbar-brand">$projectname $projectnumber</a>
                 </div>
             </div>
         </nav>
-
         <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
             <div class="content" id="content">
-
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 panel " style="padding-bottom: 15px;">
+                            <div style="margin-bottom: 15px;">
 <!-- end header part -->

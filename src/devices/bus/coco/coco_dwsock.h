@@ -3,7 +3,7 @@
 #ifndef MAME_BUS_COCO_COCO_DWSOCKH_H
 #define MAME_BUS_COCO_COCO_DWSOCKH_H
 
-#include "osdcore.h"
+#include "osdfile.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS

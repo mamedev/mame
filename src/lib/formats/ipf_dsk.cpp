@@ -4,7 +4,7 @@
 
 #include "ioprocs.h"
 
-#include <cassert>
+#include <cstring>
 
 
 const floppy_format_type FLOPPY_IPF_FORMAT = &floppy_image_format_creator<ipf_format>;

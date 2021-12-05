@@ -27,7 +27,7 @@ Upper:
  Sound
   ROM 9 (ST M27256)
   Standard Zilog Z80 (Z0840004PSC)
-  Yamaha YM2203C
+  Yamaha YM2203C (horrible music, that is not an emulation bug)
 
  GFX?
   Mask ROMs 401, 402 & 403 (Hitachi HN62414 Mask ROMs)

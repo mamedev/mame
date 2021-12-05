@@ -117,12 +117,19 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	// main NES CPU here, even if it does not belong to this device.
 	, m_maincpu(*this, ":maincpu")
 	, m_mapper_sram(nullptr)
+	, m_misc_rom(nullptr)
 	, m_mapper_sram_size(0)
+	, m_misc_rom_size(0)
 	, m_ce_mask(0)
 	, m_ce_state(0)
+	, m_mmc1_type(mmc1_type::MMC1B)
 	, m_vrc_ls_prg_a(0)
 	, m_vrc_ls_prg_b(0)
 	, m_vrc_ls_chr(0)
+	, m_n163_vol(0)
+	, m_outer_prg_size(0)
+	, m_outer_chr_size(0)
+	, m_smd133_addr(0x6000)
 	, m_mirroring(PPU_MIRROR_NONE)
 	, m_pcb_ctrl_mirror(false)
 	, m_four_screen_vram(false)
@@ -230,6 +237,17 @@ void device_nes_cart_interface::vrom_alloc(size_t size, const char *tag)
 	}
 }
 
+void device_nes_cart_interface::misc_rom_alloc(size_t size, const char *tag)
+{
+	if (m_misc_rom == nullptr)
+	{
+		std::string tempstring(tag);
+		tempstring.append(NESSLOT_MISC_ROM_REGION_TAG);
+		m_misc_rom = device().machine().memory().region_alloc(tempstring.c_str(), size, 1, ENDIANNESS_LITTLE)->base();
+		m_misc_rom_size = size;
+	}
+}
+
 void device_nes_cart_interface::prgram_alloc(size_t size)
 {
 	m_prgram.resize(size);
@@ -319,48 +337,12 @@ void device_nes_cart_interface::prg16_cdef(int bank)
 	update_prg_banks(2, 3);
 }
 
-void device_nes_cart_interface::prg8_89(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[0] = bank;
-	update_prg_banks(0, 0);
-}
-
-void device_nes_cart_interface::prg8_ab(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[1] = bank;
-	update_prg_banks(1, 1);
-}
-
-void device_nes_cart_interface::prg8_cd(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[2] = bank;
-	update_prg_banks(2, 2);
-}
-
-void device_nes_cart_interface::prg8_ef(int bank)
-{
-	/* assumes that bank references an 8k chunk */
-	bank = prg_8k_bank_num(bank);
-
-	m_prg_bank[3] = bank;
-	update_prg_banks(3, 3);
-}
-
-/* We also define an additional helper to map 8k PRG-ROM to one of the banks (passed as parameter) */
+// We define a parameterized helper to map 8k PRG-ROM to one of the banks
 void device_nes_cart_interface::prg8_x(int start, int bank)
 {
 	assert(start < 4);
 
-	/* assumes that bank references an 8k chunk */
+	// assumes that bank references an 8k chunk
 	bank = prg_8k_bank_num(bank);
 
 	m_prg_bank[start] = bank;
@@ -930,16 +912,17 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
-		const char *slot_string = "nrom";
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
+		const char *slot_string = "nrom";
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))
 			slot_string = get_default_card_ines(hook, &rom[0], len);
-
-		if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
+		else if ((rom[0] == 'U') && (rom[1] == 'N') && (rom[2] == 'I') && (rom[3] == 'F'))
 			slot_string = get_default_card_unif(&rom[0], len);
 
 		return std::string(slot_string);

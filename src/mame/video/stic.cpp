@@ -424,26 +424,23 @@ void stic_device::device_start()
 	save_item(NAME(m_left_edge_inhibit));
 	save_item(NAME(m_top_edge_inhibit));
 	save_item(NAME(m_backtab_buffer));
-	for (int sp = 0; sp < MOBS; sp++)
-	{
-		save_item(m_sprite[sp].visible, "STIC sprite/m_sprite[sp].visible", sp);
-		save_item(m_sprite[sp].xpos, "STIC sprite/m_sprite[sp].xpos", sp);
-		save_item(m_sprite[sp].ypos, "STIC sprite/m_sprite[sp].ypos", sp);
-		save_item(m_sprite[sp].coll, "STIC sprite/m_sprite[sp].coll", sp);
-		save_item(m_sprite[sp].collision, "STIC sprite/m_sprite[sp].collision", sp);
-		save_item(m_sprite[sp].doublex, "STIC sprite/m_sprite[sp].doublex", sp);
-		save_item(m_sprite[sp].doubley, "STIC sprite/m_sprite[sp].doubley", sp);
-		save_item(m_sprite[sp].quady, "STIC sprite/m_sprite[sp].quady", sp);
-		save_item(m_sprite[sp].xflip, "STIC sprite/m_sprite[sp].xflip", sp);
-		save_item(m_sprite[sp].yflip, "STIC sprite/m_sprite[sp].yflip", sp);
-		save_item(m_sprite[sp].behind_foreground, "STIC sprite/m_sprite[sp].behind_foreground", sp);
-		save_item(m_sprite[sp].grom, "STIC sprite/m_sprite[sp].grom", sp);
-		save_item(m_sprite[sp].card, "STIC sprite/m_sprite[sp].card", sp);
-		save_item(m_sprite[sp].color, "STIC sprite/m_sprite[sp].color", sp);
-		save_item(m_sprite[sp].doubleyres, "STIC sprite/m_sprite[sp].doubleyres", sp);
-		save_item(m_sprite[sp].dirty, "STIC sprite/m_sprite[sp].dirty", sp);
-		save_item(m_sprite_buffers[sp], "STIC sprite/m_sprite[sp].sprite_buffers", sp);
-	}
+	save_item(STRUCT_MEMBER(m_sprite, visible));
+	save_item(STRUCT_MEMBER(m_sprite, xpos));
+	save_item(STRUCT_MEMBER(m_sprite, ypos));
+	save_item(STRUCT_MEMBER(m_sprite, coll));
+	save_item(STRUCT_MEMBER(m_sprite, collision));
+	save_item(STRUCT_MEMBER(m_sprite, doublex));
+	save_item(STRUCT_MEMBER(m_sprite, doubley));
+	save_item(STRUCT_MEMBER(m_sprite, quady));
+	save_item(STRUCT_MEMBER(m_sprite, xflip));
+	save_item(STRUCT_MEMBER(m_sprite, yflip));
+	save_item(STRUCT_MEMBER(m_sprite, behind_foreground));
+	save_item(STRUCT_MEMBER(m_sprite, grom));
+	save_item(STRUCT_MEMBER(m_sprite, card));
+	save_item(STRUCT_MEMBER(m_sprite, color));
+	save_item(STRUCT_MEMBER(m_sprite, doubleyres));
+	save_item(STRUCT_MEMBER(m_sprite, dirty));
+	save_item(NAME(m_sprite_buffers));
 }
 
 void stic_device::device_reset()
@@ -682,9 +679,9 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 		{
 			nextCard = m_backtab_buffer[h][w];
 
-			// colored squares mode
 			if ((nextCard & (STIC_CSTM_FG3|STIC_CSTM_SEL)) == STIC_CSTM_FG3)
 			{
+				// colored squares mode
 				uint8_t csColor = m_stic_registers[STIC_CSR + csPtr];
 				uint8_t color0 = nextCard & STIC_CSQM_A;
 				uint8_t color1 = (nextCard & STIC_CSQM_B) >> 3;
@@ -697,9 +694,9 @@ void stic_device::render_color_stack_mode(bitmap_ind16 &bitmap)
 										(color2 == 7 ? csColor : (color2 | FOREGROUND_BIT)),
 										(color3 == 7 ? csColor : (color3 | FOREGROUND_BIT)));
 			}
-			//color stack mode
 			else
 			{
+				//color stack mode
 				uint8_t isGrom;
 				uint16_t memoryLocation, fgcolor, bgcolor;
 				uint8_t* memory;
@@ -859,23 +856,17 @@ void stic_device::render_background(bitmap_ind16 &bitmap)
 		render_fg_bg_mode(bitmap);
 }
 
-#ifdef UNUSED_CODE
+#if 0
+// this code had already rotted to the point of not compiling before MESS was imported into MAME
+// the main issue right now is that the device no longer has decoded graphics layouts to draw from
+// this should either be patched up or removed altogether if it no longer has value
+
 void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 {
 	// First, draw the background
-	int offs = 0;
-	int value = 0;
-	int row,col;
 	int fgcolor,bgcolor = 0;
-	int code;
 
 	int colora, colorb, colorc, colord;
-
-	int n_bit;
-	int p_bit;
-	int g_bit;
-
-	int j;
 
 	int x0 = OVERSCAN_LEFT_WIDTH + m_col_delay;
 	int y0 = OVERSCAN_TOP_HEIGHT + m_row_delay;
@@ -883,15 +874,15 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 	if (m_color_stack_mode == 1)
 	{
 		m_color_stack_offset = 0;
-		for(row = 0; row < BACKTAB_HEIGHT; row++)
+		for (int row = 0; row < BACKTAB_HEIGHT; row++)
 		{
-			for(col = 0; col < BACKTAB_WIDTH; col++)
+			for (int col = 0; col < BACKTAB_WIDTH; col++)
 			{
-				value = m_ram16[offs];
+				int value = m_backtab_buffer[row][col];
 
-				n_bit = value & STIC_CSTM_ADV;
-				p_bit = value & STIC_CSTM_FG3;
-				g_bit = value & STIC_CSTM_SEL;
+				int n_bit = value & STIC_CSTM_ADV;
+				int p_bit = value & STIC_CSTM_FG3;
+				int g_bit = value & STIC_CSTM_SEL;
 
 				if (p_bit && (!g_bit)) // colored squares mode
 				{
@@ -905,7 +896,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 					if (colorc == 7) colorc = m_stic_registers[STIC_CSR + CSR3];
 					if (colord == 7) colord = m_stic_registers[STIC_CSR + CSR3];
 					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colora);
-					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH + STIC_CSQM_WIDTH)) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colorb);
+					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH + STIC_CSQM_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colorb);
 					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT + STIC_CSQM_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colorc);
 					intv_plot_box(bitmap, (x0 + col * CARD_WIDTH + STIC_CSQM_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT + STIC_CSQM_HEIGHT) * Y_SCALE, STIC_CSQM_WIDTH * X_SCALE, STIC_CSQM_HEIGHT * Y_SCALE, colord);
 				}
@@ -923,7 +914,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 						fgcolor = value & STIC_CSTM_FG20;
 
 					bgcolor = m_stic_registers[STIC_CSR + m_color_stack_offset];
-					code = (value & STIC_CSTM_C)>>3;
+					int code = (value & STIC_CSTM_C)>>3;
 
 					if (g_bit) // read from gram
 					{
@@ -943,7 +934,7 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 								0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 								0,transparency,bgcolor);
 
-						for(j=0;j<8;j++)
+						for (int j=0;j<8;j++)
 						{
 							//intv_set_pixel(bitmap, (x0 + col * CARD_WIDTH + j) * X_SCALE, (y0 + row * CARD_HEIGHT + 7) * Y_SCALE + 1, 1);
 						}
@@ -957,27 +948,26 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 								0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 								0,transparency,bgcolor);
 
-						for(j=0;j<8;j++)
+						for (int j=0;j<8;j++)
 						{
 							//intv_set_pixel(bitmap, (x0 + col * CARD_WIDTH + j) * X_SCALE, (y0 + row * CARD_HEIGHT + 7) * Y_SCALE + 1, 2);
 						}
 					}
 				}
-				offs++;
 			} // next col
 		} // next row
 	}
 	else
 	{
 		// fg/bg mode goes here
-		for(row = 0; row < BACKTAB_HEIGHT; row++)
+		for (int row = 0; row < BACKTAB_HEIGHT; row++)
 		{
-			for(col = 0; col < BACKTAB_WIDTH; col++)
+			for (int col = 0; col < BACKTAB_WIDTH; col++)
 			{
-				value = m_ram16[offs];
+				int value = m_backtab_buffer[row][col];
 				fgcolor = value & STIC_FBM_FG;
 				bgcolor = ((value & STIC_FBM_BG2) >> 11) + ((value & STIC_FBM_BG310) >> 9);
-				code = (value & STIC_FBM_C) >> 3;
+				int code = (value & STIC_FBM_C) >> 3;
 
 				if (value & STIC_FBM_SEL) // read for GRAM
 				{
@@ -1004,31 +994,29 @@ void stic_device::draw_background(bitmap_ind16 &bitmap, int transparency)
 							0,0, (x0 + col * CARD_WIDTH) * X_SCALE, (y0 + row * CARD_HEIGHT) * Y_SCALE,
 							0,transparency,bgcolor);
 				}
-				offs++;
 			} // next col
 		} // next row
 	}
 }
-#endif
 
 /* TBD: need to handle sprites behind foreground? */
-#ifdef UNUSED_FUNCTION
 void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 {
-	int code;
 	int x0 = OVERSCAN_LEFT_WIDTH + m_col_delay - CARD_WIDTH;
 	int y0 = OVERSCAN_TOP_HEIGHT + m_row_delay - CARD_HEIGHT;
 
 	for (int i = MOBS - 1; i >= 0; --i)
 	{
 		intv_sprite_type *s = &m_sprite[i];
+		int xsize = s->doublex ? 2 : 1;
+		int ysize = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1);
 		if (s->visible && (s->behind_foreground == behind_foreground))
 		{
-			code = s->card;
+			int code = s->card;
 			if (!s->grom)
 			{
 				code %= 64;  // keep from going outside the array
-				if (s->yres == 1)
+				if (!s->doubleyres)
 				{
 					//if (m_gramdirtybytes[code] == 1)
 					{
@@ -1039,12 +1027,12 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 						m_gramdirtybytes[code] = 0;
 					}
 					// Draw GRAM char
-					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&screen().visible_area(),
 											code,
 											s->color,
 											s->xflip,s->yflip,
 											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE,
-											0x8000 * s->xsize, 0x8000 * s->ysize,0);
+											0x8000 * xsize, 0x8000 * ysize, 0);
 				}
 				else
 				{
@@ -1062,46 +1050,46 @@ void stic_device::draw_sprites(bitmap_ind16 &bitmap, int behind_foreground)
 						m_gramdirtybytes[code+1] = 0;
 					}
 					// Draw GRAM char
-					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&screen().visible_area(),
 											code,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + s->yflip * s->ysize * CARD_HEIGHT,
-											0x8000*s->xsize, 0x8000*s->ysize,0);
-					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&machine().screen[0].visarea,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + s->yflip * ysize * CARD_HEIGHT,
+											0x8000 * xsize, 0x8000 * ysize, 0);
+					m_gfxdecode->gfx(1)->zoom_transpen(bitmap,&screen().visible_area(),
 											code+1,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + (1 - s->yflip) * s->ysize * CARD_HEIGHT,
-											0x8000*s->xsize, 0x8000*s->ysize,0);
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + (1 - s->yflip) * ysize * CARD_HEIGHT,
+											0x8000 * xsize, 0x8000 * ysize, 0);
 				}
 			}
 			else
 			{
-				if (s->yres == 1)
+				if (!s->doubleyres)
 				{
 					// Draw GROM char
-					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&screen().visible_area(),
 											code,
 											s->color,
 											s->xflip,s->yflip,
 											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE,
-											0x8000*s->xsize, 0x8000*s->ysize,0);
+											0x8000 * xsize, 0x8000 * ysize, 0);
 				}
 				else
 				{
-					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&screen().visible_area(),
 											code,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + s->yflip * s->ysize * CARD_HEIGHT,
-											0x8000*s->xsize, 0x8000*s->ysize,0);
-					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&machine().screen[0].visarea,
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + s->yflip * ysize * CARD_HEIGHT,
+											0x8000 * xsize, 0x8000 * ysize, 0);
+					m_gfxdecode->gfx(0)->zoom_transpen(bitmap,&screen().visible_area(),
 											code+1,
 											s->color,
 											s->xflip,s->yflip,
-											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + (1 - s->yflip) * s->ysize * CARD_HEIGHT,
-											0x8000*s->xsize, 0x8000*s->ysize,0);
+											(s->xpos + x0) * X_SCALE, (s->ypos + y0) * Y_SCALE + (1 - s->yflip) * ysize * CARD_HEIGHT,
+											0x8000 * xsize, 0x8000 * ysize, 0);
 				}
 			}
 		}

@@ -70,6 +70,18 @@ files {
 }
 
 
+---------------------------------------------------
+--
+--@src/devices/machine/acorn_bmu.h,MACHINES["ACORN_BMU"] = true
+---------------------------------------------------
+
+if (MACHINES["ACORN_BMU"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_bmu.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_bmu.h",
+	}
+end
+
 --------------------------------------------------
 --
 --@src/devices/machine/acorn_ioc.h,MACHINES["ACORN_IOC"] = true
@@ -79,6 +91,18 @@ if (MACHINES["ACORN_IOC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/acorn_ioc.cpp",
 		MAME_DIR .. "src/devices/machine/acorn_ioc.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/acorn_lc.h,MACHINES["ACORN_LC"] = true
+---------------------------------------------------
+
+if (MACHINES["ACORN_LC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/acorn_lc.cpp",
+		MAME_DIR .. "src/devices/machine/acorn_lc.h",
 	}
 end
 
@@ -1103,6 +1127,16 @@ if (MACHINES["CXD1095"]~=null) then
 	}
 end
 
+--@src/devices/machine/dl11.h,MACHINES["DL11"] = true
+---------------------------------------------------
+
+if (MACHINES["DL11"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dl11.cpp",
+		MAME_DIR .. "src/devices/machine/dl11.h",
+	}
+end
+
 --@src/devices/machine/ds1204.h,MACHINES["DS1204"] = true
 ---------------------------------------------------
 
@@ -1388,6 +1422,22 @@ if (MACHINES["FGA002"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/fga002.cpp",
 		MAME_DIR .. "src/devices/machine/fga002.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/gt913.h,MACHINES["GT913"] = true
+---------------------------------------------------
+
+if (MACHINES["GT913"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/gt913_io.cpp",
+		MAME_DIR .. "src/devices/machine/gt913_io.h",
+		MAME_DIR .. "src/devices/machine/gt913_kbd.cpp",
+		MAME_DIR .. "src/devices/machine/gt913_kbd.h",
+		MAME_DIR .. "src/devices/machine/gt913_snd.cpp",
+		MAME_DIR .. "src/devices/machine/gt913_snd.h",
 	}
 end
 
@@ -3163,6 +3213,7 @@ if (MACHINES["SPG290"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg290_ppu.h",
 	}
 end
+
 ---------------------------------------------------
 --
 --@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
@@ -3433,6 +3484,30 @@ if (MACHINES["UCB1200"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ucb1200.cpp",
 		MAME_DIR .. "src/devices/machine/ucb1200.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/upc82c710.h,MACHINES["UPC82C710"] = true
+---------------------------------------------------
+
+if (MACHINES["UPC82C710"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upc82c710.cpp",
+		MAME_DIR .. "src/devices/machine/upc82c710.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/upc82c711.h,MACHINES["UPC82C711"] = true
+---------------------------------------------------
+
+if (MACHINES["UPC82C711"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/upc82c711.cpp",
+		MAME_DIR .. "src/devices/machine/upc82c711.h",
 	}
 end
 
@@ -4180,6 +4255,17 @@ if (MACHINES["SMARTMEDIA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/smartmed.cpp",
 		MAME_DIR .. "src/devices/machine/smartmed.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/spi_sdcard.h,MACHINES["SPISDCARD"] = true
+---------------------------------------------------
+if (MACHINES["SPISDCARD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/spi_sdcard.cpp",
+		MAME_DIR .. "src/devices/machine/spi_sdcard.h",
 	}
 end
 

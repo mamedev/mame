@@ -103,11 +103,6 @@ video_manager::video_manager(running_machine &machine)
 	, m_snap_native(true)
 	, m_snap_width(0)
 	, m_snap_height(0)
-	, m_timecode_enabled(false)
-	, m_timecode_write(false)
-	, m_timecode_text("")
-	, m_timecode_start(attotime::zero)
-	, m_timecode_total(attotime::zero)
 {
 	// request a callback upon exiting
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&video_manager::exit, this));
@@ -213,21 +208,22 @@ void video_manager::frame_update(bool from_debugger)
 	// only render sound and video if we're in the running phase
 	machine_phase const phase = machine().phase();
 	bool skipped_it = m_skipping_this_frame;
-	if (phase == machine_phase::RUNNING && (!machine().paused() || machine().options().update_in_pause()))
-	{
-		bool anything_changed = finish_screen_updates();
-
-		// if none of the screens changed and we haven't skipped too many frames in a row,
-		// mark this frame as skipped to prevent throttling; this helps for games that
-		// don't update their screen at the monitor refresh rate
-		if (!anything_changed && !m_auto_frameskip && m_frameskip_level == 0 && m_empty_skip_count++ < 3)
-			skipped_it = true;
-		else
-			m_empty_skip_count = 0;
-	}
+	bool const update_screens = (phase == machine_phase::RUNNING) && (!machine().paused() || machine().options().update_in_pause());
+	bool anything_changed = update_screens && finish_screen_updates();
 
 	// draw the user interface
 	emulator_info::draw_user_interface(machine());
+
+	// let plugins draw over the UI
+	anything_changed = emulator_info::frame_hook() || anything_changed;
+
+	// if none of the screens changed and we haven't skipped too many frames in a row,
+	// mark this frame as skipped to prevent throttling; this helps for games that
+	// don't update their screen at the monitor refresh rate
+	if (!anything_changed && !m_auto_frameskip && (m_frameskip_level == 0) && (m_empty_skip_count++ < 3))
+		skipped_it = true;
+	else
+		m_empty_skip_count = 0;
 
 	// if we're throttling, synchronize before rendering
 	attotime current_time = machine().time();
@@ -339,9 +335,9 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 	// now do the actual work
 	const rgb_t *palette = (screen != nullptr && screen->has_palette()) ? screen->palette().palette()->entry_list_adjusted() : nullptr;
 	int entries = (screen != nullptr && screen->has_palette()) ? screen->palette().entries() : 0;
-	util::png_error error = util::png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
-	if (error != util::png_error::NONE)
-		osd_printf_error("Error generating PNG for snapshot: png_error = %d\n", std::underlying_type_t<util::png_error>(error));
+	std::error_condition const error = util::png_write_bitmap(file, &pnginfo, m_snap_bitmap, entries, palette);
+	if (error)
+		osd_printf_error("Error generating PNG for snapshot (%s:%d %s)\n", error.category().name(), error.value(), error.message());
 }
 
 
@@ -372,45 +368,6 @@ void video_manager::save_active_screen_snapshots()
 		if (!filerr)
 			save_snapshot(nullptr, file);
 	}
-}
-
-
-//-------------------------------------------------
-//  save_input_timecode - add a line of current
-//  timestamp to inp.timecode file
-//-------------------------------------------------
-
-void video_manager::save_input_timecode()
-{
-	// if record timecode input is not active, do nothing
-	if (!m_timecode_enabled) {
-		return;
-	}
-	m_timecode_write = true;
-}
-
-std::string &video_manager::timecode_text(std::string &str)
-{
-	attotime elapsed_time = machine().time() - m_timecode_start;
-	str = string_format(" %s%s%02d:%02d %s",
-			m_timecode_text,
-			m_timecode_text.empty() ? "" : " ",
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60,
-			machine().paused() ? "[paused] " : "");
-	return str;
-}
-
-std::string &video_manager::timecode_total_text(std::string &str)
-{
-	attotime elapsed_time = m_timecode_total;
-	if (machine().ui().show_timecode_counter()) {
-		elapsed_time += machine().time() - m_timecode_start;
-	}
-	str = string_format("TOTAL %02d:%02d ",
-			(elapsed_time.m_seconds / 60) % 60,
-			elapsed_time.m_seconds % 60);
-	return str;
 }
 
 
@@ -648,9 +605,6 @@ bool video_manager::finish_screen_updates()
 	for (screen_device &screen : iter)
 		if (screen.update_quads())
 			anything_changed = true;
-
-	// draw HUD from LUA callback (if any)
-	anything_changed |= emulator_info::frame_hook();
 
 	// update our movie recording and burn-in state
 	if (!machine().paused())
@@ -1007,7 +961,7 @@ void video_manager::recompute_speed(const attotime &emutime)
 	{
 		// create a final screenshot
 		emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-		std::error_condition filerr = file.open(machine().basename() + PATH_SEPARATOR "final.png");
+		std::error_condition const filerr = open_next(file, "png");
 		if (!filerr)
 			save_snapshot(nullptr, file);
 

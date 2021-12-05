@@ -36,13 +36,18 @@ Status:
 ****************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "video/tms9928a.h"
-#include "machine/6522via.h"
-#include "sound/ay8910.h"
-#include "machine/ins8250.h"
+
 #include "bus/rs232/rs232.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/6522via.h"
+#include "machine/ins8250.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+
 #include "speaker.h"
+
+
+namespace {
 
 class ultim809_state : public driver_device
 {
@@ -61,9 +66,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_button);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	void mem_map(address_map &map);
-	virtual void machine_start() override;
 	std::unique_ptr<u8[]> m_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<via6522_device> m_via;
@@ -167,6 +174,9 @@ ROM_START( ultim809 )
 	ROM_REGION(0x2000, "maincpu", 0)
 	ROM_LOAD( "ultim809.u9", 0x0000, 0x2000, CRC(b827aaf1) SHA1(64d9e94542d8ff13f64a4d787508eef7b64d4946) )
 ROM_END
+
+} // anonymous namespace
+
 
 /* Driver */
 

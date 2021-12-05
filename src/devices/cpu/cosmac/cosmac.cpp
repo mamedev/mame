@@ -18,7 +18,6 @@ TODO:
 #include "emu.h"
 #include "debugger.h"
 #include "cosmac.h"
-#include "coreutil.h"
 
 // permit our enums to be saved
 ALLOW_SAVE_TYPE(cosmac_device::cosmac_mode);

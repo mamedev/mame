@@ -1607,6 +1607,7 @@ void amiga_state::amiga_base(machine_config &config)
 
 	// floppy drives
 	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_PAL);
+	m_fdc->index_callback().set(m_cia_1, FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));
 	m_fdc->dskblk_callback().set(FUNC(amiga_state::fdc_dskblk_w));
@@ -1644,6 +1645,11 @@ void amiga_state::amiga_base(machine_config &config)
 
 void a1000_state::a1000(machine_config &config)
 {
+	// main cpu
+	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a1000_state::a1000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1654,11 +1660,6 @@ void a1000_state::a1000(machine_config &config)
 	A1000_KBRESET(config, "kbrst")
 			.set_delays(attotime::from_msec(152), attotime::from_usec(176), attotime::from_msec(704))
 			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
-
-	// main cpu
-	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a1000_state::a1000_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&a1000_state::a1000_overlay_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	ADDRESS_MAP_BANK(config, "bootrom").set_map(&a1000_state::a1000_bootrom_map).set_options(ENDIANNESS_BIG, 16, 19, 0x40000);
@@ -1681,6 +1682,11 @@ void a1000_state::a1000n(machine_config &config)
 
 void a2000_state::a2000(machine_config &config)
 {
+	// main cpu
+	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a2000_state::a2000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1691,11 +1697,6 @@ void a2000_state::a2000(machine_config &config)
 	A1000_KBRESET(config, "kbrst")
 			.set_delays(attotime::from_msec(112), attotime::from_msec(74), attotime::from_msec(1294))
 			.kbrst_cb().set(FUNC(a2000_state::kbreset_w));
-
-	// main cpu
-	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a2000_state::a2000_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_512kb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1733,6 +1734,11 @@ void a2000_state::a2000n(machine_config &config)
 
 void a500_state::a500(machine_config &config)
 {
+	// main cpu
+	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a500_state::a500_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1740,11 +1746,6 @@ void a500_state::a500(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
-
-	// main cpu
-	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a500_state::a500_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1769,6 +1770,11 @@ void a500_state::a500n(machine_config &config)
 
 void cdtv_state::cdtv(machine_config &config)
 {
+	// main cpu
+	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdtv_state::cdtv_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1779,11 +1785,6 @@ void cdtv_state::cdtv(machine_config &config)
 	A1000_KBRESET(config, "kbrst")
 			.set_delays(attotime::from_usec(11238), attotime::from_usec(7432), attotime::from_usec(27539))
 			.kbrst_cb().set(FUNC(a1000_state::kbreset_w));
-
-	// main cpu
-	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &cdtv_state::cdtv_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	// remote control input converter
 	m6502_device &u75(M6502(config, "u75", XTAL(3'000'000)));
@@ -1847,6 +1848,11 @@ void cdtv_state::cdtvn(machine_config &config)
 
 void a3000_state::a3000(machine_config &config)
 {
+	// main cpu
+	M68030(config, m_maincpu, XTAL(32'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a3000_state::a3000_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1854,17 +1860,12 @@ void a3000_state::a3000(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
-	// main cpu
-	M68030(config, m_maincpu, XTAL(32'000'000) / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a3000_state::a3000_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
-
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	// real-time clock
 	RP5C01(config, "rtc", XTAL(32'768));
 
-	// todo: zorro3 slots, super dmac, scsi
+	// TODO: zorro3 slots, super dmac, scsi
 
 	// software
 	SOFTWARE_LIST(config, "a3000_list").set_original("amiga_a3000");
@@ -1883,6 +1884,11 @@ void a3000_state::a3000n(machine_config &config)
 
 void a500p_state::a500p(machine_config &config)
 {
+	// main cpu
+	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a500p_state::a500p_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1890,11 +1896,6 @@ void a500p_state::a500p(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
-
-	// main cpu
-	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a500p_state::a500p_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1923,6 +1924,11 @@ void a500p_state::a500pn(machine_config &config)
 
 void a600_state::a600(machine_config &config)
 {
+	// main cpu
+	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a600_state::a600_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1930,11 +1936,6 @@ void a600_state::a600(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
-
-	// main cpu
-	M68000(config, m_maincpu, amiga_state::CLK_7M_PAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a600_state::a600_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map16).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 
@@ -1949,7 +1950,7 @@ void a600_state::a600(machine_config &config)
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set("gayle", FUNC(gayle_device::ide_interrupt_w));
 
-	// todo: pcmcia
+	// TODO: pcmcia
 
 	// software
 	SOFTWARE_LIST(config, "ecs_list").set_original("amigaecs_flop");
@@ -1971,6 +1972,13 @@ void a600_state::a600n(machine_config &config)
 
 void a1200_state::a1200(machine_config &config)
 {
+	// main cpu
+	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &a1200_state::a1200_mem);
+	m_maincpu->set_cpu_space(AS_PROGRAM);
+
+	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+
 	amiga_base(config);
 
 	// keyboard
@@ -1978,13 +1986,6 @@ void a1200_state::a1200(machine_config &config)
 	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
 	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 	kbd.krst_handler().set(FUNC(amiga_state::kbreset_w));
-
-	// main cpu
-	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &a1200_state::a1200_mem);
-	m_maincpu->set_cpu_space(AS_PROGRAM);
-
-	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
 
@@ -2008,7 +2009,7 @@ void a1200_state::a1200(machine_config &config)
 	subdevice<amiga_keyboard_bus_device>("kbd").set_default_option("a1200_us");
 #endif
 
-	// todo: pcmcia
+	// TODO: pcmcia
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
@@ -2032,19 +2033,19 @@ void a1200_state::a1200n(machine_config &config)
 
 void a4000_state::a4000(machine_config &config)
 {
-	amiga_base(config);
-
-	// keyboard
-	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
-	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
-	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
-
 	// main cpu
 	M68040(config, m_maincpu, XTAL(50'000'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+
+	amiga_base(config);
+
+	// keyboard
+	auto &kbd(AMIGA_KEYBOARD_INTERFACE(config, "kbd", amiga_keyboard_devices, "a2000_us"));
+	kbd.kclk_handler().set("cia_0", FUNC(mos8520_device::cnt_w));
+	kbd.kdat_handler().set("cia_0", FUNC(mos8520_device::sp_w));
 
 	m_screen->set_screen_update(FUNC(amiga_state::screen_update_amiga_aga));
 
@@ -2059,7 +2060,7 @@ void a4000_state::a4000(machine_config &config)
 	ata_interface_device &ata(ATA_INTERFACE(config, "ata").options(ata_devices, "hdd", nullptr, false));
 	ata.irq_handler().set(FUNC(a4000_state::ide_interrupt_w));
 
-	// todo: zorro3
+	// TODO: zorro3
 
 	// software
 	SOFTWARE_LIST(config, "aga_list").set_original("amigaaga_flop");
@@ -2088,7 +2089,7 @@ void a4000_state::a400030(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a400030_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	// todo: ide
+	// TODO: ide
 }
 
 void a4000_state::a400030n(machine_config &config)
@@ -2105,14 +2106,14 @@ void a4000_state::a400030n(machine_config &config)
 
 void cd32_state::cd32(machine_config &config)
 {
-	amiga_base(config);
-
 	// main cpu
 	M68EC020(config, m_maincpu, amiga_state::CLK_28M_PAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cd32_state::cd32_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
 	ADDRESS_MAP_BANK(config, "overlay").set_map(&amiga_state::overlay_2mb_map32).set_options(ENDIANNESS_BIG, 32, 22, 0x200000);
+
+	amiga_base(config);
 
 	I2C_24C08(config, "i2cmem", 0); // AT24C08N
 
@@ -2163,7 +2164,7 @@ void a4000_state::a4000t(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &a4000_state::a4000t_mem);
 	m_maincpu->set_cpu_space(AS_PROGRAM);
 
-	// todo: ide, zorro3, scsi, super dmac
+	// TODO: ide, zorro3, scsi, super dmac
 }
 
 void a4000_state::a4000tn(machine_config &config)
@@ -2422,7 +2423,8 @@ ROM_END
 
 ROM_START( cd32 )
 	ROM_REGION32_BE(0x100000, "kickstart", 0)
-//  ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(a4fbc94a) SHA1(816ce6c5077875850c7d43452230a9ba3a2902db)) // todo: this is the real dump
+	// TODO: this is the real dump
+//  ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(a4fbc94a) SHA1(816ce6c5077875850c7d43452230a9ba3a2902db))
 	ROM_LOAD16_WORD("391640-03.u6a", 0x000000, 0x100000, CRC(d3837ae4) SHA1(06807db3181637455f4d46582d9972afec8956d9))
 ROM_END
 

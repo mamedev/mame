@@ -14,11 +14,14 @@
 #pragma once
 
 #include "ui/menu.h"
+
 #include "imagedev/floppy.h"
+
 
 class floppy_image_format_t;
 
 namespace ui {
+
 // ======================> menu_confirm_save_as
 
 class menu_confirm_save_as : public menu
@@ -29,7 +32,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	bool *m_yes;
 };
@@ -48,7 +51,7 @@ protected:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	bool &                          m_ok;
 	device_image_interface *        m_image;
@@ -69,7 +72,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// internal state
 	std::vector<floppy_image_format_t *> m_formats;
@@ -88,7 +91,7 @@ public:
 
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// internal state
 	const std::vector<floppy_image_device::fs_info> &m_fs;

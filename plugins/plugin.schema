@@ -1,0 +1,35 @@
+{
+	"type": "object",
+	"properties": {
+		"plugin": {
+			"type": "object",
+			"properties": {
+				"name": {
+					"type": "string",
+					"pattern": "^[A-Za-z][0-9A-Za-z_]*$"
+				},
+				"description": {
+					"type": "string"
+				},
+				"version": {
+					"type": "string"
+				},
+				"author": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string",
+					"pattern": "^(plugin|library)$"
+				},
+				"start": {
+					"type": "string",
+					"pattern": "^(true|false)$"
+				}
+			},
+			"additionalProperties": false,
+			"required": [ "name", "description", "version", "author", "type" ]
+		}
+	},
+	"additionalProperties": false,
+	"required": [ "plugin" ]
+}
