@@ -28,7 +28,7 @@ private:
 	int convert_raw_to_result(u8 *buf);
 	u8 status_r();
 
-	u8 m_raw_Acx[4], m_raw_Acy[4], m_raw_Bcx[4], m_raw_Bcy[4]; 
+	u8 m_raw_Acx[4], m_raw_Acy[4], m_raw_Bcx[4], m_raw_Bcy[4];
 	int m_Acx, m_Acy, m_Bcx, m_Bcy;
 	int m_Aax, m_Aay, m_Bax, m_Bay;
 

@@ -2,16 +2,16 @@
 // copyright-holders:David Haywood, Angelo Salese
 /**************************************************************************************************
 
-	Konami K054000 hitbox/math custom chip
+    Konami K054000 hitbox/math custom chip
 
-	Sort of a protection device, used for collision detection.
-	It is passed a few parameters, and returns a boolean telling if collision
-	happened. It has no access to gfx data, it only does arithmetical operations
-	on the parameters.
+    Sort of a protection device, used for collision detection.
+    It is passed a few parameters, and returns a boolean telling if collision
+    happened. It has no access to gfx data, it only does arithmetical operations
+    on the parameters.
 
-	TODO:
-	- Thunder Cross II POST checks of this chip, we currently bypass that with a ROM patch in
-	  driver. It literally tests the chip in an unit test fashion:
+    TODO:
+    - Thunder Cross II POST checks of this chip, we currently bypass that with a ROM patch in
+      driver. It literally tests the chip in an unit test fashion:
       1. zeroing all ports;
       2. test that status returns 0;
       3. ping ACX reg 0 with 0xff;
@@ -20,19 +20,19 @@
       6. test status = 0;
       7. ping ACX reg 1 with 0xff;
       8. test status = 1;
-	  9. rinse and repeat until all registers are exausted.
-	  Assertion eventually fails when testing the "delta" registers:
+      9. rinse and repeat until all registers are exausted.
+      Assertion eventually fails when testing the "delta" registers:
 
-	  ACX ffffffff|ACY ffffff00|AAX 01 AAY 01
+      ACX ffffffff|ACY ffffff00|AAX 01 AAY 01
       BCX ffffff00|BCY ffffff00|BAX 01 BAY 01
       Result: actual 0 (yes), expected 1 (no)
 
-      The fun part is that game doesn't even access the chip at all during gameplay 
-	  (or at least not until stage 6, where game disallows continues) while the specific
-	  "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT#06393, MT#07839).
+      The fun part is that game doesn't even access the chip at all during gameplay
+      (or at least not until stage 6, where game disallows continues) while the specific
+      "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT#06393, MT#07839).
       We currently pay the technical debt inside thndrx2 itself, by notifying that "14D" returns
-	  bad but still making it to boot anyway while marking these games with MUP.
-	  Any attempt to fix it here without real HW tests goes into wild speculations unfortunately.
+      bad but still making it to boot anyway while marking these games with MUP.
+      Any attempt to fix it here without real HW tests goes into wild speculations unfortunately.
 
 **************************************************************************************************/
 
@@ -136,7 +136,7 @@ inline int k054000_device::convert_raw_to_result(u8 *buf)
 {
 	int res = (buf[0] << 16) | (buf[1] << 8) | buf[2];
 	//if (buf[0] & 0x80)
-	//	res = (0x1000000 - res);
+	//  res = (0x1000000 - res);
 	// last value in the buffer is used as OTG correction in Vendetta
 	if (buf[3] & 0x80)
 		res -= (0x100 - buf[3]);
@@ -172,7 +172,7 @@ void k054000_device::bcy_w(offs_t offset, u8 data)
 u8 k054000_device::status_r()
 {
 	u8 res = 0;
-	
+
 	if (m_Acx + m_Aax < m_Bcx - m_Bax)
 		res |= 1;
 
@@ -225,16 +225,16 @@ u8 k054000_device::read(offs_t offset)
 	Acy = (m_regs[0x09] << 16) | (m_regs[0x0a] << 8) | m_regs[0x0b];
 
 	// TODO: this is a hack to make thndrx2 pass the startup check. It is certainly wrong.
-//	if (m_regs[0x04] == 0xff)
-//		Acx+=3;
-//	if (m_regs[0x0c] == 0xff)
-//		Acy+=3;
+//  if (m_regs[0x04] == 0xff)
+//      Acx+=3;
+//  if (m_regs[0x0c] == 0xff)
+//      Acy+=3;
 	// Used as OTG correction in Vendetta
 	if (m_regs[0x04] & 0x80)
 		Acx -= (0x100 - m_regs[0x04]);
 	else
 		Acx += m_regs[0x04];
-	
+
 	if (m_regs[0x0c] & 0x80)
 		Acy -= (0x100 - m_regs[0x0c]);
 	else
