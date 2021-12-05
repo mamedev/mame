@@ -4,7 +4,7 @@
    GI SP0256 Narrator Speech Processor
    GI SPB640 Speech Buffer
 
-   By Joe Zbiciak. Ported to MESS by tim lindner.
+   By Joe Zbiciak. Ported to MAME by tim lindner.
 
    Unimplemented:
    - Microsequencer repeat count of zero

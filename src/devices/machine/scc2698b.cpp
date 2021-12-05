@@ -7,10 +7,10 @@
     Enhanced Octal Universal Asynchronous Receiver/Transmitter
 
 Notes:
-    This device is similiar to four 2681 DUART chips tied together
+    This device is similar to four 2681 DUART chips tied together
     in a single package, with some shared resources.
     The 2681 DUART is implemented in scn2681_device - but this
-    chip is being independently emulated seperately for mainly
+    chip is being independently emulated separately for mainly
     educational purposes. When functionality for this device is
     completed we will consider merging the devices if it's
     practical.

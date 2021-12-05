@@ -1,16 +1,30 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert,AJR
 /*****************************************************************************************
+PINBALL
 
-  8088-based pinball games by Unidesa/Stargame:
-  - Mephisto
-  - Cirsa Sport 2000
+8088-based pinball games by Unidesa/Stargame:
+- Mephisto
+- Cirsa Sport 2000
 
-  Serial communication with the sound board is handled by a 8256 MUART (not emulated yet).
+Serial communication with the sound board is handled by a 8256 MUART (not emulated yet).
+
+
+Status:
+- Not working
+
+ToDo:
+- Outputs
+- Inputs
+- Layouts
+- Display
+- Sound comms
+- Mechanical sounds
 
 ******************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8155.h"
@@ -20,15 +34,21 @@
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 #include "speaker.h"
+//#include "mephistp.lh"
 
-class mephisto_state : public driver_device
+namespace {
+
+class mephisto_state : public genpin_class
 {
 public:
 	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_aysnd(*this, "aysnd")
 		, m_soundbank(*this, "soundbank")
+		//, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void mephisto(machine_config &config);
@@ -58,6 +78,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_aysnd;
 	required_memory_bank m_soundbank;
+	//required_ioport_array<8> m_io_keyboard;
+	output_finder<55> m_digits;  // tba
+	output_finder<56> m_io_outputs;   // tba ?? solenoids + ?? lamps
 };
 
 
@@ -158,12 +181,14 @@ INPUT_PORTS_END
 
 void mephisto_state::machine_start()
 {
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
 	m_soundbank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
 	m_soundbank->set_entry(0);
 
-	m_ay8910_data = 0;
-	m_ay8910_bdir = 1;
-	m_ay8910_bc1 = 1;
 	save_item(NAME(m_ay8910_data));
 	save_item(NAME(m_ay8910_bdir));
 	save_item(NAME(m_ay8910_bc1));
@@ -171,6 +196,13 @@ void mephisto_state::machine_start()
 
 void mephisto_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
+	m_ay8910_data = 0;
+	m_ay8910_bdir = 1;
+	m_ay8910_bc1 = 1;
 }
 
 void mephisto_state::mephisto(machine_config &config)
@@ -181,6 +213,9 @@ void mephisto_state::mephisto(machine_config &config)
 	//m_maincpu->set_irq_acknowledge_callback("muart", FUNC(i8256_device::inta_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	/* Video */
+	//config.set_default_layout(layout_mephistp);
 
 	//i8256_device &muart(I8256(config, "muart", XTAL(18'000'000)/3));
 	//muart.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -201,6 +236,9 @@ void mephisto_state::mephisto(machine_config &config)
 	soundcpu.port_out_cb<1>().set(FUNC(mephisto_state::ay8910_write));
 	soundcpu.port_out_cb<3>().set(FUNC(mephisto_state::t0_t1_w));
 	soundcpu.serial_rx_cb().set_constant(0); // from MUART
+
+	/* Sound */
+	genpin_audio(config);
 
 	SPEAKER(config, "mono").front_center();
 
@@ -295,7 +333,9 @@ ROM_START(sport2k)
 	ROM_LOAD("s511_512.bin", 0x40000, 0x10000, CRC(ca9afa80) SHA1(6f219bdc1ad06e340b2930610897b70369a43684))
 ROM_END
 
-GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND)
-GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND)
+} // Anonymous namespace
+
+GAME(1987,  mephistp,   0,         mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  mephistp1,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (rev. 1.1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  mephistpn,  mephistp,  mephisto,  mephisto, mephisto_state, empty_init, ROT0,  "Stargame",    "Mephisto (Stargame) (newer?)",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1988,  sport2k,    0,         sport2k,   mephisto, mephisto_state, empty_init, ROT0,  "Cirsa",       "Sport 2000",                     MACHINE_IS_SKELETON_MECHANICAL )

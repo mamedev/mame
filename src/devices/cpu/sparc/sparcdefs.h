@@ -142,7 +142,7 @@
 #define RDREG   *m_regs[RD]
 #define RS1REG  *m_regs[RS1]
 #define RS2REG  *m_regs[RS2]
-#define SET_RDREG(x)    do { if(RD) { RDREG = (x); } } while (0)
+#define SET_RDREG(x)    do { if(RDBITS) { RDREG = (x); } } while (0)
 #define ADDRESS (USEIMM ? (RS1REG + SIMM13) : (RS1REG + RS2REG))
 
 #define PC      m_pc

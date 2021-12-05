@@ -410,7 +410,6 @@ VIDEOS["SED1356"] = true
 VIDEOS["SED1500"] = true
 VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
-VIDEOS["STVVDP"] = true
 VIDEOS["T6963C"] = true
 VIDEOS["T6A04"] = true
 VIDEOS["TEA1002"] = true
@@ -510,6 +509,7 @@ MACHINES["CS4031"] = true
 MACHINES["CS8221"] = true
 MACHINES["CS8900A"] = true
 MACHINES["CXD1095"] = true
+MACHINES["DL11"] = true
 MACHINES["DP8390"] = true
 MACHINES["DP83932C"] = true
 MACHINES["DP8573"] = true
@@ -1258,8 +1258,8 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"eaca",
 		"einis",
 		"elektor",
-		"elektrka",
 		"elektron",
+		"elektronika",
 		"emusys",
 		"ensoniq",
 		"enterprise",
@@ -1508,6 +1508,7 @@ function createProjects_mame_mess(_target, _subtarget)
 -- 3do.c (MESS + MAME), konamim2.c (MAME)
 -- vectrex.c (MESS + MAME)
 -- cps1.c (MESS + MAME)
+-- apple
 --------------------------------------------------
 if (_subtarget=="mess") then
 createMESSProjects(_target, _subtarget, "mameshared")
@@ -1626,8 +1627,13 @@ files {
 	MAME_DIR .. "src/mame/includes/saturn.h",
 	MAME_DIR .. "src/mame/drivers/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn.cpp",
+	MAME_DIR .. "src/mame/video/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.h",
+	MAME_DIR .. "src/mame/video/apple2.cpp",
+	MAME_DIR .. "src/mame/video/apple2.h",
+	MAME_DIR .. "src/mame/machine/apple2common.cpp",
+	MAME_DIR .. "src/mame/machine/apple2common.h",
 }
 end
 --------------------------------------------------
@@ -1812,12 +1818,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/apple2.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2e.cpp",
 	MAME_DIR .. "src/mame/includes/apple2e.h",
-	MAME_DIR .. "src/mame/video/apple2.cpp",
-	MAME_DIR .. "src/mame/video/apple2.h",
 	MAME_DIR .. "src/mame/drivers/tk2000.cpp",
 	MAME_DIR .. "src/mame/drivers/apple2gs.cpp",
-	MAME_DIR .. "src/mame/machine/apple2common.cpp",
-	MAME_DIR .. "src/mame/machine/apple2common.h",
 	MAME_DIR .. "src/mame/drivers/apple3.cpp",
 	MAME_DIR .. "src/mame/includes/apple3.h",
 	MAME_DIR .. "src/mame/machine/apple3.cpp",
@@ -2328,22 +2330,6 @@ files {
 	MAME_DIR .. "src/mame/video/pecom.cpp",
 }
 
-createMESSProjects(_target, _subtarget, "elektrka")
-files {
-	MAME_DIR .. "src/mame/drivers/bk.cpp",
-	MAME_DIR .. "src/mame/includes/bk.h",
-	MAME_DIR .. "src/mame/machine/bk.cpp",
-	MAME_DIR .. "src/mame/drivers/dvk_kcgd.cpp",
-	MAME_DIR .. "src/mame/drivers/dvk_ksm.cpp",
-	MAME_DIR .. "src/mame/machine/ms7004.cpp",
-	MAME_DIR .. "src/mame/machine/ms7004.h",
-	MAME_DIR .. "src/mame/drivers/mk85.cpp",
-	MAME_DIR .. "src/mame/drivers/mk90.cpp",
-	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
-	MAME_DIR .. "src/mame/machine/kr1601rr1.cpp",
-	MAME_DIR .. "src/mame/machine/kr1601rr1.h",
-}
-
 createMESSProjects(_target, _subtarget, "elektor")
 files {
 	MAME_DIR .. "src/mame/drivers/avrmax.cpp",
@@ -2355,6 +2341,23 @@ files {
 createMESSProjects(_target, _subtarget, "elektron")
 files {
 	MAME_DIR .. "src/mame/drivers/elektronmono.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "elektronika")
+files {
+	MAME_DIR .. "src/mame/drivers/bk.cpp",
+	MAME_DIR .. "src/mame/includes/bk.h",
+	MAME_DIR .. "src/mame/machine/bk.cpp",
+	MAME_DIR .. "src/mame/drivers/dvk_kcgd.cpp",
+	MAME_DIR .. "src/mame/drivers/dvk_ksm.cpp",
+	MAME_DIR .. "src/mame/drivers/im01.cpp",
+	MAME_DIR .. "src/mame/machine/ms7004.cpp",
+	MAME_DIR .. "src/mame/machine/ms7004.h",
+	MAME_DIR .. "src/mame/drivers/mk85.cpp",
+	MAME_DIR .. "src/mame/drivers/mk90.cpp",
+	MAME_DIR .. "src/mame/drivers/ms6102.cpp",
+	MAME_DIR .. "src/mame/machine/kr1601rr1.cpp",
+	MAME_DIR .. "src/mame/machine/kr1601rr1.h",
 }
 
 createMESSProjects(_target, _subtarget, "emusys")
@@ -3945,8 +3948,6 @@ files {
 createMESSProjects(_target, _subtarget, "teamconc")
 files {
 	MAME_DIR .. "src/mame/drivers/comquest.cpp",
-	MAME_DIR .. "src/mame/includes/comquest.h",
-	MAME_DIR .. "src/mame/video/comquest.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "tectoy")

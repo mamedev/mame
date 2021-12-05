@@ -601,7 +601,7 @@ in EXT+Shift Mode on a real Spectrum).
 
 /* TO DO: replace PORT_CHAR(0xD7) with an 'empty' PORT_CHAR. I used \xD7 (multiplication sign) just as a placeholder. There should be no
 PORT_CHAR for those functions (which have no equivalent on modern keyboards), but something is needed (to correctly have natural support for
-a few keys in SYMBOL Mode) and I found no EMPTY PORT_CHAR in MESS */
+a few keys in SYMBOL Mode) and I found no EMPTY PORT_CHAR in MAME */
 INPUT_PORTS_START( spectrum )
 	/* PORT_NAME =  KEY Mode    CAPS Mode    SYMBOL Mode   EXT Mode   EXT+Shift Mode   BASIC Mode  */
 	PORT_START("LINE0") /* 0xFEFE */

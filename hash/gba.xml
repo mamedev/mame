@@ -20938,6 +20938,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mechanic">
+		<description>Mechanic Mechanica (Japan, prototype)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="メカニクメカニカ"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="mechanic.bin" size="8388608" crc="64251e43" sha1="a02c9fbcd430d6a0e3295642d5aedfa853b0c74a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="medabmtb">
 		<description>Medabots - Metabee Version (Euro)</description>
 		<year>2003</year>

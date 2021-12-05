@@ -12,10 +12,8 @@ The only difference seems to be an extra bank of inputs (or something) at 2008-2
 
 Status:
 - Superman, Hercules, Roadrunner are playable.
-- Hercules: unassigned inputs, if pressed, will cause the machine to reboot
 
 ToDo:
-- 4x4 not emulated yet, it's totally different hardware.
 - noise generator sounds like a loud barrrr instead of noise, fortunately it isn't used.
 - roadrunr: test button not working, sets off an alarm instead. Slam Tilt?
 
@@ -25,7 +23,6 @@ ToDo:
 #include "emu.h"
 #include "machine/genpin.h"
 
-#include "cpu/m6502/m6502.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/timer.h"
 #include "machine/watchdog.h"
@@ -52,7 +49,6 @@ public:
 
 	void atari_s2(machine_config &config);
 	void atari_s3(machine_config &config);
-	void fourx4(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -71,7 +67,6 @@ private:
 
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
-	void fourx4_map(address_map &map);
 
 	bool m_timer_sb = 0;
 	u8 m_timer_s[5]{};
@@ -126,16 +121,6 @@ void atari_s2_state::atari_s3_map(address_map &map)
 	map(0x2009, 0x2009).mirror(0x07F4).portr("DSW5");
 	map(0x200a, 0x200a).mirror(0x07F4).portr("DSW6");
 	map(0x200b, 0x200b).mirror(0x07F4).portr("DSW7");
-}
-
-void atari_s2_state::fourx4_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x07ff).ram();
-	map(0x1000, 0x17ff).ram();
-	map(0x2000, 0x27ff).ram();
-	map(0x3000, 0x37ff).ram();
-	map(0x8000, 0xffff).rom().region("maincpu", 0);
 }
 
 static INPUT_PORTS_START( atari_s2 )
@@ -259,10 +244,10 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X1") // 1001
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09") // Hercules: reboots machine
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10") // Hercules: reboots machine
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11") // Hercules: reboots machine
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -280,7 +265,7 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP24")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP25")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP26")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("INP27") // Hercules: reboots machine
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("INP27")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP28")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP29")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -296,9 +281,9 @@ static INPUT_PORTS_START( atari_s2 )
 
 	PORT_START("X5") // 1005
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP40")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP41") // Hercules: reboots machine
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP42") // Hercules: reboots machine
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP43") // Hercules: reboots machine
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP43")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -315,13 +300,28 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_START("X7") // 1007
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP56")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP57")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP58") // Hercules: reboots machine
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP59") // Hercules: reboots machine
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP60") // Hercules: reboots machine
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP61") // Hercules: reboots machine
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP58")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP59")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP60")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP61")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+// remove unassigned inputs that cause machine to reboot
+static INPUT_PORTS_START( hercules )
+	PORT_INCLUDE(atari_s2)
+	PORT_MODIFY("X1")
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("X3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("X5")
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("X7")
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 /* solenoids hercules
    4,5 = bumpers
    8,9 = slings
@@ -539,26 +539,6 @@ void atari_s2_state::atari_s3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s2_state::atari_s3_map);
 }
 
-void atari_s2_state::fourx4(machine_config &config)
-{
-	/* basic machine hardware */
-	M6502(config, m_maincpu, 1'000'000);  // guess
-	m_maincpu->set_addrmap(AS_PROGRAM, &atari_s2_state::fourx4_map);
-
-	/* Sound */
-	genpin_audio(config);
-	SPEAKER(config, "speaker").front_center();
-
-	DAC_4BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r23-r26 (68k,33k,18k,8.2k)
-	DAC_3BIT_BINARY_WEIGHTED(config, m_dac1, 0).add_route(ALL_OUTPUTS, "speaker", 0.15); // r18-r20 (100k,47k,100k)
-
-	/* Video */
-	config.set_default_layout(layout_atari_s2);
-
-//	TIMER(config, "irq").configure_periodic(FUNC(atari_s2_state::irq), attotime::from_hz(XTAL(4'000'000) / 8192));
-//	TIMER(config, "timer_s").configure_periodic(FUNC(atari_s2_state::timer_s), attotime::from_hz(150000));
-}
-
 
 /*-------------------------------------------------------------------
 / Superman (03/1979)
@@ -599,24 +579,9 @@ ROM_START(roadrunr)
 	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, BAD_DUMP CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // PinMAME note: unknown so far if using the 20967-01 is correct for Road Runner, but sounds good
 ROM_END
 
-/*-------------------------------------------------------------------
-/ 4x4 (10/1982)
-/-------------------------------------------------------------------*/
-ROM_START(fourx4)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("8000ce65.bin", 0x0000, 0x2000, CRC(27341155) SHA1(c0da1fbf64f93ab163b2ea6bfbfc7b778cea819f))
-	ROM_LOAD("a0004c37.bin", 0x2000, 0x2000, CRC(6f93102f) SHA1(d6520987ed5805b0e6b5da5653fc7cb063e86dda))
-	ROM_LOAD("c000a70c.bin", 0x4000, 0x2000, CRC(c31ca8d3) SHA1(53f20eff0084771dc61d19db7ddae52e4423e75e))
-	ROM_RELOAD(0x6000, 0x2000)
-
-	ROM_REGION(0x0200, "proms", 0)
-	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // labelled as 82s130.bin which is the old name
-ROM_END
-
 } // Anonymous namespace
 
 
 GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1979, hercules, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1982, fourx4,   0, fourx4,   atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "4x4",                MACHINE_IS_SKELETON_MECHANICAL )

@@ -45,6 +45,7 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_data_config;
+
 private:
 	enum AICA_STATE {AICA_ATTACK,AICA_DECAY1,AICA_DECAY2,AICA_RELEASE};
 
@@ -123,7 +124,8 @@ private:
 	void UpdateRegR(int reg);
 	void w16(u32 addr,u16 val);
 	u16 r16(u32 addr);
-	inline s32 UpdateSlot(AICA_SLOT *slot);
+	[[maybe_unused]] void TimersAddTicks(int ticks);
+	s32 UpdateSlot(AICA_SLOT *slot);
 	void DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr);
 	void exec_dma();
 

@@ -5,18 +5,6 @@
 PINBALL
 Playmatic MPU 3,4,5
 
-Status:
-- Lamps, Solenoids to add
-- AY chips output port adds various components across the analog outputs
-- Lots of loud siren-like noises when there should be silence
-- Mechanical sounds to add
-- Most games work
--- Spain82: not working (no manual available; uses same sound board as Cerberus)
--- Nautilus: sound is broken (runs into the weeds)
--- Skill Flight, Phantom Ship: not working
--- Miss Disco: not working (no manual available)
--- Meg Aaton: Ball number doesn't show
-
 Note: The input lines INT, EF1-4 are inverted (not true voltage).
 
 First time:
@@ -25,19 +13,48 @@ First time:
 - Keep holding X, insert credits, and press start. When it says ball 1, let go immediately.
 - If you hold down X longer than you should, it says Coil Error, and the game is ended. You
   should let go the instant the ball number increments.
-- Any games marked working actually do work, but like most pinballs they are a pain to play
-  with the keyboard.
 
 Setting up:
 The manual is not that clear, there's a lot we don't know, this *seems* to work...
-- Start machine, wait for it to say No Ball, and it plays a tune
-- Press 8 (to simulate opening the front door)
+- Start machine, wait for it to say No Ball, and it may play a tune
+- Press num-1 (to simulate opening the front door)
 - Press 1, it says BooP (Bookkeeping)
-- Press 8 and the credits number increments to 8, then 01 and on to 17 (2 pushes per number)
+- Press num-1 and the credits number increments to 8, then 01 and on to 17 (2 pushes per number)
 - When it gets to 01, the display says Adjust
 - To adjust a setting, press 1 to choose a digit, then tap 9 until it is correct.
 - The settings in the manual do not fully line up with what we see in the display.
 
+Small FAQ:
+- If game shows "Test" just after start, try cleaning the nvram etc. If it still does it, when
+  the red screen shows, hold down num-1 until "No Ball" starts flashing, then release the key.
+- Game says "No Ball". Press and hold X.
+- Game says "Coil Error". You held down X too long.
+
+Status:
+- flashman, fldragon, ironball, kz26, nautilus, phntmshp, ridersrf, rock2500, starfirp, theraid,
+   trailer, terrlake: playable
+- sklflite: can insert coin, cannot start game
+- spain82: see notes below
+- megaaton: playable, ball number doesn't show. If it says Test, see FAQ above.
+- ufo_x: playable. Make sure to release X after the last ball ends, or you get "Coil Error".
+         If you can't seem to score any points, hit minus to kick it into gear.
+
+ToDo:
+- Sometimes the machine starts up in a non-responsive state. Exit and restart.
+- Output lamps
+- Mechanical sounds
+- Skill Flight: not working
+- Miss Disco: not working (no manual available). Uses different hardware. No sound rom.
+- Spain82: can start a game but it's not really playable, has no sound (no manual available;
+   uses same sound board as Cerberus). The test buttons are unknown. The ball number doesn't show.
+   So, after starting the machine, make sure the displays cycle between blank and 700000. If it
+   just sits there it has hung up, exit and restart. Insert a coin, hold X and press 1. Now,
+   you need to jiggle F and G and perhaps other nearby keys until the 0 starts flashing. You
+   can then score. At outhole time, need to press F,G,X to register the fact. If you hit X too
+   many times the machine reboots itself. The machine has 2 capture holes and therefore multiball.
+   At ball 2, the playfield becomes unresponsive.
+- Meg Aaton: Ball number doesn't show. Can suddenly reboot in the middle of a game. Match digits
+   are reversed.
 
 ***********************************************************************************************/
 
@@ -48,13 +65,14 @@ The manual is not that clear, there's a lot we don't know, this *seems* to work.
 
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"
+#include "machine/ripple_counter.h"
 #include "machine/7474.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
 
 #include "play_3.lh"
 
-
+namespace {
 
 class play_3_state : public genpin_class
 {
@@ -65,75 +83,82 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_4013a(*this, "4013a")
 		, m_4013b(*this, "4013b")
-		, m_aysnd1(*this, "aysnd1")
-		, m_aysnd2(*this, "aysnd2")
+		, m_4020(*this, "4020")
+		, m_ay1(*this, "ay1")
+		, m_ay2(*this, "ay2")
 		, m_zsu(*this, "zsu")
-		, m_keyboard(*this, "X.%u", 0)
+		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void sklflite(machine_config &config);
 	void play_3(machine_config &config);
+	void flashman(machine_config &config);
 	void megaaton(machine_config &config);
+	void sklflite(machine_config &config);
+	void terrlake(machine_config &config);
 
 private:
 	void port01_w(u8 data);
-	void megaaton_port01_w(u8 data);
+	void terrlake_port01_w(u8 data);
 	void port02_w(u8 data);
 	void port03_w(u8 data);
 	void sklflite_port03_w(u8 data);
 	u8 port04_r();
 	u8 port05_r();
 	void port06_w(u8 data);
+	void flashman_port06_w(u8 data);
 	void port07_w(u8 data);
 	DECLARE_READ_LINE_MEMBER(clear_r);
 	DECLARE_READ_LINE_MEMBER(ef1_r);
 	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(q4013a_w);
+	void clockcnt_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 	DECLARE_WRITE_LINE_MEMBER(clock2_w);
 	void port01_a_w(u8 data);
 	u8 port02_a_r();
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
-	void megaaton_io(address_map &map);
-	void play_3_audio_io(address_map &map);
-	void play_3_audio_map(address_map &map);
-	void play_3_io(address_map &map);
-	void play_3_map(address_map &map);
+	void terrlake_io(address_map &map);
+	void audio_io_map(address_map &map);
+	void audio_mem_map(address_map &map);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	void flashman_io(address_map &map);
 	void sklflite_io(address_map &map);
 
-	u16 m_clockcnt;
-	u16 m_resetcnt;
-	u16 m_resetcnt_a;
-	u8 m_soundlatch;
-	u8 m_port03_old;
-	u8 m_a_irqset;
-	u16 m_a_irqcnt;
-	u8 m_kbdrow;
-	u8 m_segment[5];
-	bool m_disp_sw;
+	u8 m_resetcnt = 0;
+	u8 m_resetcnt_a = 0;
+	u8 m_soundlatch = 0;
+	u8 m_port03_old = 0;
+	u8 m_a_irqset = 0;
+	u16 m_a_irqcnt = 0;
+	u8 m_kbdrow = 0;
+	u8 m_segment[5]{};
+	bool m_disp_sw = 0;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<cosmac_device> m_maincpu;
 	optional_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
-	optional_device<ay8910_device> m_aysnd1;
-	optional_device<ay8910_device> m_aysnd2;
+	required_device<ripple_counter_device> m_4020;
+	optional_device<ay8910_device> m_ay1;
+	optional_device<ay8910_device> m_ay2;
 	optional_device<efo_zsu_device> m_zsu;
-	required_ioport_array<10> m_keyboard;
-	output_finder<66> m_digits;
+	required_ioport_array<10> m_io_keyboard;
+	output_finder<70> m_digits;
+	output_finder<64> m_io_outputs;   // 16 solenoids + 48 lamps
 };
 
 
-void play_3_state::play_3_map(address_map &map)
+void play_3_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x8000, 0x80ff).ram().share("nvram"); // pair of 5101, battery-backed
 }
 
-void play_3_state::play_3_io(address_map &map)
+void play_3_state::io_map(address_map &map)
 {
 	map(0x01, 0x01).w(FUNC(play_3_state::port01_w)); // digits, scan-lines
 	map(0x02, 0x02).w(FUNC(play_3_state::port02_w)); // sound code
@@ -144,27 +169,34 @@ void play_3_state::play_3_io(address_map &map)
 	map(0x07, 0x07).w(FUNC(play_3_state::port07_w)); // flipflop clear
 }
 
-void play_3_state::megaaton_io(address_map &map)
+void play_3_state::flashman_io(address_map &map)
 {
-	play_3_io(map);
-	map(0x01, 0x01).w(FUNC(play_3_state::megaaton_port01_w)); // digits, scan-lines
+	io_map(map);
+	map(0x01, 0x01).w(FUNC(play_3_state::terrlake_port01_w)); // digits, scan-lines
+	map(0x06, 0x06).w(FUNC(play_3_state::flashman_port06_w)); // segments
 }
 
 void play_3_state::sklflite_io(address_map &map)
 {
-	play_3_io(map);
+	io_map(map);
 	map(0x03, 0x03).w(FUNC(play_3_state::sklflite_port03_w)); //
 }
 
-void play_3_state::play_3_audio_map(address_map &map)
+void play_3_state::terrlake_io(address_map &map)
+{
+	sklflite_io(map);
+	map(0x01, 0x01).w(FUNC(play_3_state::terrlake_port01_w)); // digits, scan-lines
+}
+
+void play_3_state::audio_mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4001).mirror(0x1ffe).rw(m_aysnd1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
-	map(0x6000, 0x6001).mirror(0x1ffe).rw(m_aysnd2, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x4000, 0x4001).mirror(0x1ffe).rw(m_ay1, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
+	map(0x6000, 0x6001).mirror(0x1ffe).rw(m_ay2, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0x8000, 0x80ff).ram();
 }
 
-void play_3_state::play_3_audio_io(address_map &map)
+void play_3_state::audio_io_map(address_map &map)
 {
 	map(0x01, 0x01).w(FUNC(play_3_state::port01_a_w)); // irq counter
 	map(0x02, 0x02).r(FUNC(play_3_state::port02_a_r)); // sound code
@@ -172,108 +204,127 @@ void play_3_state::play_3_audio_io(address_map &map)
 
 
 static INPUT_PORTS_START( play_3 )
-	PORT_START("X.0") // 11-18
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD)
+	PORT_START("X0") // 11-18
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP11")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP12")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP13")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP14")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP15")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP16")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP17")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP18")
 
-	PORT_START("X.1") // 21-28
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X1") // 21-28
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP21")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP22")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP23")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP24")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP25")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP26")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP27")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP28")
 
-	PORT_START("X.2") // 31-38
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
+	PORT_START("X2") // 31-38
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP31")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP32")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP33")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP34")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP35")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP36")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP37")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP38")
 
-	PORT_START("X.3") // 41-48
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_MINUS)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
+	PORT_START("X3") // 41-48
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP48")
 
-	PORT_START("X.4") // 51-58
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_UP)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_DOWN)
+	PORT_START("X4") // 51-58
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP51")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP52")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP53")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP54")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP55")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP56")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP57")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP58")
 
-	PORT_START("X.5") // 61-68
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X5") // 61-68
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP61")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_NAME("INP62")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGDN) PORT_NAME("INP63")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP64")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP65")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("INP66")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SPACE) PORT_NAME("INP67")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("INP68")
 
-	PORT_START("X.6")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_TOGGLE // zone select (door switch)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) // outhole
+	PORT_START("X6")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_TOGGLE PORT_NAME("Door Switch")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_TOGGLE // test button
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_TOGGLE PORT_NAME("Test") // test button
 
-	PORT_START("X.7")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_START("X7")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_BIT( 0xE0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("X.8")
+	PORT_START("X8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("X.9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE )
+	PORT_START("X9")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Service") // Marked as "Reset" on some schematics
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( megaaton )
 	PORT_INCLUDE( play_3 )
-	PORT_MODIFY("X.0") // 11-18
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_X) // outhole
+	PORT_MODIFY("X0") // 11-18
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 
-	PORT_MODIFY("X.6")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_TOGGLE // zone select (door switch)
+	PORT_MODIFY("X6")
+	//PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_TOGGLE PORT_NAME("Door Switch")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_TOGGLE // test button
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( spain82 )
+	PORT_INCLUDE( megaaton )
+	PORT_MODIFY("X6")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START )
+INPUT_PORTS_END
+
+void play_3_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_resetcnt_a));
+	save_item(NAME(m_port03_old));
+	save_item(NAME(m_a_irqset));
+	save_item(NAME(m_a_irqcnt));
+	save_item(NAME(m_kbdrow));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_resetcnt));
+	save_item(NAME(m_disp_sw));
+	save_item(NAME(m_soundlatch));
+}
 
 void play_3_state::machine_reset()
 {
-	m_clockcnt = 0;
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_resetcnt = 0;
 	m_resetcnt_a = 0;
 	m_4013b->d_w(1);
@@ -282,8 +333,7 @@ void play_3_state::machine_reset()
 	m_soundlatch = 0;
 	m_kbdrow = 0;
 	m_disp_sw = 0;
-	for (u8 i = 0; i < 5; i++)
-		m_segment[i] = 0;
+	std::fill(std::begin(m_segment), std::end(m_segment), 0);
 	m_port03_old = 0;
 }
 
@@ -305,8 +355,8 @@ void play_3_state::port01_w(u8 data)
 	}
 }
 
-// megaaton status digits are rearranged slightly
-void play_3_state::megaaton_port01_w(u8 data)
+// terrlake,flashman ball number needs to move over
+void play_3_state::terrlake_port01_w(u8 data)
 {
 	u8 i,j,digit;
 	m_kbdrow = data;
@@ -318,7 +368,7 @@ void play_3_state::megaaton_port01_w(u8 data)
 				for (i = 0; i < 5; i++)
 				{
 					digit = j*10+i;
-					if (digit == 44)
+					if (digit == 24)
 						digit = 64;
 					m_digits[digit] = m_segment[i] & 0x7f;
 					// decimal dot on tens controls if last 0 shows or not
@@ -335,28 +385,29 @@ void play_3_state::port02_w(u8 data)
 
 void play_3_state::port03_w(u8 data)
 {
-	if (BIT(data, 6))
+	if (!BIT(data, 6))
 		m_audiocpu->ef1_w(1); // inverted
+
 	if (BIT(data, 5))
 	{
 		if (m_soundlatch == 11)
 			m_samples->start(0, 5); // outhole
-		//if (m_soundlatch == 13)
-			//m_samples->start(0, 6); // no knocker?
+		for (u8 i = 0; i < 16; i++)
+			m_io_outputs[i] = (m_soundlatch == i) ? 1 : 0;
 	}
-
 }
 
 void play_3_state::sklflite_port03_w(u8 data)
 {
 	if (BIT(data, 6) && !BIT(m_port03_old, 6))
 		m_zsu->sound_command_w(m_soundlatch);
+
 	if (BIT(data, 5))
 	{
 		if (m_soundlatch == 11)
 			m_samples->start(0, 5); // outhole
-		//if (m_soundlatch == 13)
-			//m_samples->start(0, 6); // no knocker?
+		for (u8 i = 0; i < 16; i++)
+			m_io_outputs[i] = (m_soundlatch == i) ? 1 : 0;
 	}
 
 	m_port03_old = data;
@@ -367,18 +418,18 @@ u8 play_3_state::port04_r()
 	if (m_kbdrow & 0x3f)
 		for (u8 i = 0; i < 6; i++)
 			if (BIT(m_kbdrow, i))
-				return m_keyboard[i]->read();
+				return m_io_keyboard[i]->read();
 
 	return 0;
 }
 
 u8 play_3_state::port05_r()
 {
-	u8 data = 0, key8 = m_keyboard[8]->read() & 0x0f;
+	u8 data = 0, key8 = m_io_keyboard[8]->read() & 0x0f;
 	if (BIT(m_kbdrow, 0))
-		data |= m_keyboard[6]->read();
+		data |= m_io_keyboard[6]->read();
 	if (BIT(m_kbdrow, 1))
-		data |= m_keyboard[7]->read();
+		data |= m_io_keyboard[7]->read();
 	return (data & 0xf0) | key8;
 }
 
@@ -390,6 +441,11 @@ void play_3_state::port06_w(u8 data)
 	m_segment[1] = m_segment[0];
 	m_segment[0] = data;
 	m_disp_sw = 1;
+}
+
+void play_3_state::flashman_port06_w(u8 data)
+{
+	port06_w(bitswap<8>(data, 0, 3, 1, 7, 6, 4, 2, 5));
 }
 
 void play_3_state::port07_w(u8 data)
@@ -413,52 +469,44 @@ u8 play_3_state::port02_a_r()
 READ_LINE_MEMBER( play_3_state::clear_r )
 {
 	// A hack to make the machine reset itself on boot
-	if (m_resetcnt < 0xffff)
+	if (m_resetcnt < 0xff)
 		m_resetcnt++;
-	return (m_resetcnt == 0xff00) ? 0 : 1;
+	return (m_resetcnt < 0xf0) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( play_3_state::clear_a_r )
 {
 	// A hack to make the machine reset itself on boot
-	if (m_resetcnt_a < 0xffff)
+	if (m_resetcnt_a < 0xff)
 		m_resetcnt_a++;
-	return (m_resetcnt_a == 0xff00) ? 0 : 1;
+	return (m_resetcnt_a < 0xf0) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( play_3_state::ef1_r )
 {
-	return (!BIT(m_clockcnt, 10)); // inverted
+	return (!BIT(m_4020->count(), 10)); // inverted
 }
 
 READ_LINE_MEMBER( play_3_state::ef4_r )
 {
-	return BIT(m_keyboard[9]->read(), 0); // inverted test button - doesn't seem to do anything
+	return BIT(m_io_keyboard[9]->read(), 0); // inverted test/reset button - doesn't seem to do anything
 }
 
-WRITE_LINE_MEMBER( play_3_state::clock_w )
+void play_3_state::clockcnt_w(u16 data)
 {
-	m_4013a->clock_w(state);
+	m_4013b->preset_w(!BIT(data, 10)); // Q10 output, 4013 is inverted
 
-	if (!state)
+	if (m_audiocpu.found())
 	{
-		m_clockcnt++;
-		// simulate 4020 chip
-		if ((m_clockcnt & 0x3ff) == 0)
-			m_4013b->preset_w(BIT(m_clockcnt, 10)); // Q10 output
-
-		if (m_audiocpu.found())
+		// sound irq
+		m_a_irqcnt--;
+		if (m_a_irqcnt == 1)
+			m_audiocpu->int_w(1); // inverted
+		else
+		if (m_a_irqcnt == 0)
 		{
-			// sound irq
-			m_a_irqcnt--;
-			if (m_a_irqcnt == 1)
-				m_audiocpu->int_w(1); // inverted
-			else
-			if (m_a_irqcnt == 0)
-			{
-				m_a_irqcnt = (m_a_irqset << 3) | 7;
-				m_audiocpu->int_w(0); // inverted
-			}
+			m_a_irqcnt = (m_a_irqset << 3) | 7;
+			m_audiocpu->int_w(0); // inverted
 		}
 	}
 }
@@ -469,23 +517,19 @@ WRITE_LINE_MEMBER( play_3_state::clock2_w )
 	m_maincpu->ef3_w(state); // inverted
 }
 
-WRITE_LINE_MEMBER( play_3_state::q4013a_w )
-{
-	m_clockcnt = 0;
-}
-
 void play_3_state::play_3(machine_config &config)
 {
 	/* basic machine hardware */
 	CDP1802(config, m_maincpu, 3.579545_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_map);
-	m_maincpu->set_addrmap(AS_IO, &play_3_state::play_3_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_3_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::io_map);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(play_3_state::clear_r));
 	m_maincpu->ef1_cb().set(FUNC(play_3_state::ef1_r));
 	m_maincpu->ef4_cb().set(FUNC(play_3_state::ef4_r));
-	m_maincpu->q_cb().set("4013a", FUNC(ttl7474_device::clear_w));
-	m_maincpu->tpb_cb().set(FUNC(play_3_state::clock_w));
+	m_maincpu->q_cb().set(m_4013a, FUNC(ttl7474_device::clear_w)).invert(); // 4013 is inverted
+	m_maincpu->tpb_cb().set(m_4013a, FUNC(ttl7474_device::clock_w));
+	m_maincpu->tpb_cb().append(m_4020, FUNC(ripple_counter_device::clock_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -498,34 +542,46 @@ void play_3_state::play_3(machine_config &config)
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
 	TTL7474(config, m_4013a, 0);
-	m_4013a->output_cb().set(FUNC(play_3_state::q4013a_w));
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
+	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w));
 
 	TTL7474(config, m_4013b, 0);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w)).invert(); // inverted
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // inverted
 
+	RIPPLE_COUNTER(config, m_4020);
+	m_4020->set_stages(14); // only Q10 is actually used
+	m_4020->count_out_cb().set(FUNC(play_3_state::clockcnt_w));
+
 	/* Sound */
 	genpin_audio(config);
 
 	CDP1802(config, m_audiocpu, 3.579545_MHz_XTAL);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &play_3_state::play_3_audio_map);
-	m_audiocpu->set_addrmap(AS_IO, &play_3_state::play_3_audio_io);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &play_3_state::audio_mem_map);
+	m_audiocpu->set_addrmap(AS_IO, &play_3_state::audio_io_map);
 	m_audiocpu->wait_cb().set_constant(1);
 	m_audiocpu->clear_cb().set(FUNC(play_3_state::clear_a_r));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	AY8910(config, m_aysnd1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	AY8910(config, m_aysnd2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	AY8910(config, m_ay1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	AY8910(config, m_ay2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	m_ay1->set_resistors_load(6900, 6900, 6900);
+	m_ay2->set_resistors_load(6900, 6900, 6900);
+	m_ay1->port_a_write_callback().set_nop();
+	m_ay2->port_a_write_callback().set_nop();
+}
+
+void play_3_state::flashman(machine_config &config)
+{
+	play_3(config);
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::flashman_io);
 }
 
 void play_3_state::megaaton(machine_config &config)
 {
 	play_3(config);
-
 	m_maincpu->set_clock(2.95_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_IO, &play_3_state::megaaton_io);
 }
 
 void play_3_state::sklflite(machine_config &config)
@@ -534,14 +590,36 @@ void play_3_state::sklflite(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &play_3_state::sklflite_io);
 
 	config.device_remove("audiocpu");
-	config.device_remove("aysnd1");
-	config.device_remove("aysnd2");
+	config.device_remove("ay1");
+	config.device_remove("ay2");
 	config.device_remove("lspeaker");
 	config.device_remove("rspeaker");
 
 	EFO_ZSU1(config, m_zsu);
 }
 
+void play_3_state::terrlake(machine_config &config)
+{
+	sklflite(config);
+	m_maincpu->set_addrmap(AS_IO, &play_3_state::terrlake_io);
+}
+
+
+/* PLAYMATIC MPU-3/4/5 ALTERNATE ROMS =======================================================================
+
+This is a list of known alternate roms. Nothing has been tested.
+
+KZ-26
+ROM_LOAD( "sound2.su4",   0x0000, 0x1000, CRC(b66100d3) SHA1(85f5a319715f99d1b7afeca0d01c81aa615d416a) )
+ROM_LOAD( "sound1.su3",   0x0000, 0x2000, CRC(f9550ab4) SHA1(7186158f515fd9fbe5a7a09c6b7d2e8dfc3b4bb2) )
+
+Meg-aaton
+ROM_LOAD( "smogot.bin",   0x0000, 0x2000, CRC(92fa0742) SHA1(ef3100a53323fd67e23b47fc3e72fdb4671e9b0a) )
+
+Star Fire
+ROM_LOAD( "sound 1b0 _0xd5ac.bin", 0x0000, 0x2000, CRC(9c304f90) SHA1(36114055ebf4f904c2c55f025867f777b33a6a7b) )
+
+*/
 
 /*-------------------------------------------------------------------
 / Spain 82 (10/82)
@@ -785,26 +863,28 @@ ROM_START(terrlake)
 	ROM_LOAD("stl_1b0.u4", 0x08000, 0x8000, CRC(3bbdd791) SHA1(68cd86cb96a278538d18ca0a77b372309829edf4))
 ROM_END
 
-GAME(1982,  spain82,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Spain '82",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1983,  megaaton,  0,        megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1983,  megaatona, megaaton, megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton (alternate set)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1984,  nautilus,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Nautilus",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1984,  theraid,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "The Raid",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1984,  theraida,  theraid,  play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "The Raid (alternate set)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1984,  ufo_x,     0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "UFO-X",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1984,  kz26,      0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "KZ-26",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1985,  rock2500,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Rock 2500",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1985,  starfirp,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Star Fire",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1985,  starfirpa, starfirp, play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Star Fire (alternate set)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1985,  trailer,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Trailer",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1986,  fldragon,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Flash Dragon",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1986,  fldragona, fldragon, play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Flash Dragon (alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  phntmshp,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Phantom Ship",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  sklflite,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Skill Flight (Playmatic)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+} // anonymous namespace
+
+GAME(1982,  spain82,   0,        play_3,   spain82,  play_3_state, empty_init, ROT0, "Playmatic", "Spain '82",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1983,  megaaton,  0,        megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1983,  megaatona, megaaton, megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton (alternate set)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  nautilus,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Nautilus",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  theraid,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "The Raid",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  theraida,  theraid,  play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "The Raid (alternate set)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  ufo_x,     0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "UFO-X",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1984,  kz26,      0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "KZ-26",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  rock2500,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Rock 2500",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  starfirp,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Star Fire",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  starfirpa, starfirp, play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Star Fire (alternate set)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  trailer,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Trailer",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  fldragon,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Flash Dragon",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  fldragona, fldragon, play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Flash Dragon (alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  phntmshp,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Phantom Ship",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  sklflite,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Skill Flight (Playmatic)",     MACHINE_IS_SKELETON_MECHANICAL )
 // not by Playmatic, but same hardware
-GAME(1984,  flashman,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Flashman",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1986,  ridersrf,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "JocMatic",    "Rider's Surf",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Stargame",    "Iron Balls",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  terrlake,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Terrific Lake",              MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1984,  flashman,  0,        flashman, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Flashman",                   MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  ridersrf,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "JocMatic",    "Rider's Surf",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Stargame",    "Iron Balls",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  terrlake,  0,        terrlake, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Terrific Lake",              MACHINE_IS_SKELETON_MECHANICAL )
 // bingo hardware, to be split (?)
-GAME(1983,  msdisco,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Miss Disco (Bingo)",           MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1983,  msdisco,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Miss Disco (Bingo)",           MACHINE_IS_SKELETON_MECHANICAL )

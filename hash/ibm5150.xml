@@ -193,7 +193,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="developer" value="Free Fall Associates" />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
-			<!--- Bad Dump? Doesn't work at all. MESS say invalid Image -->
+			<!--- Bad Dump? Doesn't work at all. MAME say invalid Image -->
 			<dataarea name="flop" size="204800">
 				<rom name="archon.img" size="204800" crc="484ebbbd" sha1="4a913c1310ad590b6947dd6ceb69e187bcb641f9"/>
 			</dataarea>

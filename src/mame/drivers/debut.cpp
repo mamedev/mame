@@ -29,7 +29,7 @@ A bit more detailed, list of other Soviet standard TTL chips used and their equi
 - К561ЛЕ5А = CD4001
 - PC74HC259P = the odd one out
 
-keypad legend:
+Keypad legend:
 
 АН  - анализ (analysis, switches view info)
 ХОД - ходи (force move)
@@ -44,10 +44,12 @@ keypad legend:
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
 
 // internal artwork
@@ -98,19 +100,16 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(lcd_update_w);
 
 	u8 m_latch[5];
-	u8 m_dac_data;
-	u8 m_lcd_update;
+	u8 m_dac_data = 0;
+	u8 m_lcd_update = 0;
 };
 
 void debut_state::machine_start()
 {
+	memset(m_latch, 0, sizeof(m_latch));
+
 	// resolve handlers
 	m_out_digit.resolve();
-
-	// zerofill
-	memset(m_latch, 0, sizeof(m_latch));
-	m_dac_data = 0;
-	m_lcd_update = 0;
 
 	// register for savestates
 	save_item(NAME(m_latch));
@@ -229,7 +228,7 @@ INPUT_PORTS_END
 
 void debut_state::debutm(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8086(config, m_maincpu, 16.2_MHz_XTAL / 3);
 	m_maincpu->set_periodic_int(FUNC(debut_state::interrupt), attotime::from_hz(380));
 	m_maincpu->set_addrmap(AS_PROGRAM, &debut_state::main_map);
@@ -240,12 +239,12 @@ void debut_state::debutm(machine_config &config)
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
 	m_board->set_delay(attotime::from_msec(150));
 
-	/* video hardware */
+	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	m_display->set_bri_maximum(0.5);
 	config.set_default_layout(layout_debutm);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }

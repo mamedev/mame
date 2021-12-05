@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Nigel Barnes
 /******************************************************************************
+
     Acorn Electron driver
-
-    MESS Driver By:
-
-    Wilbert Pol
 
 ******************************************************************************/
 

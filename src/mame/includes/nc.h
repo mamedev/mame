@@ -185,11 +185,14 @@ protected:
 	void nc200_uart_control_w(uint8_t data);
 	void nc200_memory_card_wait_state_w(uint8_t data);
 	void nc200_poweroff_control_w(uint8_t data);
+	[[maybe_unused]] void nc200_display_memory_start_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(write_nc200_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(nc200_txrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_rxrdy_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
+
+	[[maybe_unused]] void nc200_floppy_drive_index_callback(int drive_id);
 
 	virtual void machine_reset() override;
 

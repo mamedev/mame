@@ -15,6 +15,11 @@ Hardware notes:
 The module doesn't have its own LCD screen. It has a grill+fan underneath
 at the front part, and a heatsink on the CPU.
 
+About expanded RAM: The 4MB expansion mentioned in the manual works well,
+but it doesn't look like the software was designed to work with other options.
+At 2MB it doesn't work at all. At 8MB or 16MB it becomes very inefficient,
+only using 5MB or 9MB of the available RAM for hash tables.
+
 TODO:
 - runs too slow? solving mate problems is around 60% slower than real device,
   maybe cpu cache related?

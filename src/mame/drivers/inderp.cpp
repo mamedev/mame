@@ -312,6 +312,9 @@ void inderp_state::machine_start()
 void inderp_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_t_c = 0;
 }
 

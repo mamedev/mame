@@ -10,7 +10,8 @@ The IOS board common to all games provides sound effects through the CDP1863.
 - Black Fever has the Speaking System board, which produces analog signals for
   controlling an 8-track tape player.
 - Zira uses the Sound-2 board with a COP402 and AY-3-8910. The latter device is
-  also supposedly used to control lights through a separate connector.
+  also supposedly used to control lights through a separate connector. These
+  lights pulse along with the sounds, something like a disco.
 - Cerberus uses the Sound-3 board with a 90435 processor, which is most likely a
   CDP1802 by another name. The 90503 "synthesizer" is the only sound IC on this
   board; it has a TI logo and seems at least pin-compatible with TMS52xx.
@@ -38,6 +39,7 @@ ToDo:
 #include "machine/7474.h"
 #include "machine/clock.h"
 #include "machine/ripple_counter.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/cdp1863.h"
 #include "speaker.h"
@@ -56,6 +58,7 @@ public:
 		, m_4013b(*this, "4013b")
 		, m_4020(*this, "4020")
 		, m_1863(*this, "1863")
+		, m_snd_off(*this, "snd_off")
 		, m_io_keyboard(*this, "X%u", 0U)
 		, m_digits(*this, "digit%u", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
@@ -75,17 +78,19 @@ protected:
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	void clockcnt_w(u16 data);
 	DECLARE_WRITE_LINE_MEMBER(clock2_w);
+	TIMER_DEVICE_CALLBACK_MEMBER(snd_off_callback) { m_1863->set_output_gain(0, 0.00); }
 
 	void play_2_io(address_map &map);
 	void play_2_map(address_map &map);
 
-	u16 m_resetcnt = 0;
+	u8 m_resetcnt = 0;
 	u8 m_kbdrow = 0;
 	u8 m_segment[5]{};
 	bool m_disp_sw = 0;
 	u8 m_port06 = 0;
 	u8 m_old_solenoids[8]{};
 	u8 m_soundlatch = 0;
+	bool m_snd_on = false;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cosmac_device> m_maincpu;
@@ -93,6 +98,7 @@ protected:
 	required_device<ttl7474_device> m_4013b;
 	required_device<ripple_counter_device> m_4020;
 	required_device<cdp1863_device> m_1863;
+	required_device<timer_device> m_snd_off;
 	required_ioport_array<8> m_io_keyboard;
 	output_finder<55> m_digits;
 	output_finder<56> m_io_outputs;   // 8 solenoids + 48 lamps
@@ -232,6 +238,7 @@ void play_2_state::machine_start()
 	//save_item(NAME(m_psg_latch));
 	save_item(NAME(m_port06));
 	save_item(NAME(m_old_solenoids));
+	save_item(NAME(m_snd_on));
 }
 
 void play_2_state::machine_reset()
@@ -245,11 +252,11 @@ void play_2_state::machine_reset()
 	m_kbdrow = 0;
 	m_disp_sw = 0;
 	m_port06 = 0;
-	for (u8 i = 0; i < std::size(m_segment); i++)
-		m_segment[i] = 0;
-	for (u8 i = 0; i < std::size(m_old_solenoids); i++)
-		m_old_solenoids[i] = 0;
+	m_snd_on = false;
+	std::fill(std::begin(m_segment), std::end(m_segment), 0);
+	std::fill(std::begin(m_old_solenoids), std::end(m_old_solenoids), 0);
 	m_1863->oe_w(1);
+	m_1863->set_output_gain(0, 0.00);
 }
 
 void play_2_state::port01_w(u8 data)
@@ -263,7 +270,17 @@ void play_2_state::port01_w(u8 data)
 				for (u8 i = 0; i < 5; i++)
 					m_digits[j*10 + i] = m_segment[i] & 0x7f;
 	}
-	m_1863->set_output_gain(0, BIT(data, 7) ? 1.00 : 0.00);
+	if (BIT(data, 7))
+	{
+		m_1863->set_output_gain(0, 1.00);
+		m_snd_on = true;
+	}
+	else
+	{
+		if (m_snd_on)
+			m_snd_off->adjust(attotime::from_msec(200));
+		m_snd_on = false;
+	}
 }
 
 void play_2_state::port02_w(u8 data)
@@ -336,9 +353,9 @@ void play_2_state::port07_w(u8 data)
 READ_LINE_MEMBER( play_2_state::clear_r )
 {
 	// A hack to make the machine reset itself on boot
-	if (m_resetcnt < 0xffff)
+	if (m_resetcnt < 0xff)
 		m_resetcnt++;
-	return (m_resetcnt == 0xff00) ? 0 : 1;
+	return (m_resetcnt < 0xf0) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( play_2_state::ef1_r )
@@ -446,6 +463,7 @@ void play_2_state::play_2(machine_config &config)
 	CDP1863(config, m_1863, 0);
 	m_1863->set_clock2(2.95_MHz_XTAL / 8);
 	m_1863->add_route(ALL_OUTPUTS, "mono", 0.75);
+	TIMER(config, m_snd_off).configure_generic(FUNC(play_2_state::snd_off_callback));
 }
 
 void zira_state::zira(machine_config &config)
@@ -470,7 +488,7 @@ void zira_state::init_zira()
 	membank("bank1")->set_entry(0);
 }
 
-/* PLAYMATIC SYSTEM-2 ALTERNATE ROMS =======================================================================
+/* PLAYMATIC MPU-2 ALTERNATE ROMS =======================================================================
 
 This is a list of known alternate roms. Nothing has been tested.
 

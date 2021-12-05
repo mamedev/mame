@@ -377,7 +377,6 @@ VIDEOS["PWM_DISPLAY"] = true
 --VIDEOS["SED1500"] = true
 --VIDEOS["SED1520"] = true
 VIDEOS["SNES_PPU"] = true
-VIDEOS["STVVDP"] = true
 --VIDEOS["T6963C"] = true
 --VIDEOS["T6A04"] = true
 VIDEOS["TLC34076"] = true
@@ -1350,8 +1349,6 @@ files {
 	MAME_DIR .. "src/mame/audio/sprint2.cpp",
 	MAME_DIR .. "src/mame/video/sprint2.cpp",
 	MAME_DIR .. "src/mame/drivers/sprint4.cpp",
-	MAME_DIR .. "src/mame/includes/sprint4.h",
-	MAME_DIR .. "src/mame/video/sprint4.cpp",
 	MAME_DIR .. "src/mame/audio/sprint4.cpp",
 	MAME_DIR .. "src/mame/audio/sprint4.h",
 	MAME_DIR .. "src/mame/drivers/sprint8.cpp",
@@ -2586,8 +2583,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/nwk-tr.cpp",
 	MAME_DIR .. "src/mame/drivers/otomedius.cpp",
 	MAME_DIR .. "src/mame/drivers/overdriv.cpp",
-	MAME_DIR .. "src/mame/includes/overdriv.h",
-	MAME_DIR .. "src/mame/video/overdriv.cpp",
 	MAME_DIR .. "src/mame/drivers/pandoras.cpp",
 	MAME_DIR .. "src/mame/includes/pandoras.h",
 	MAME_DIR .. "src/mame/video/pandoras.cpp",
@@ -3264,8 +3259,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/ddealer.cpp",
 	MAME_DIR .. "src/mame/drivers/jalmah.cpp",
 	MAME_DIR .. "src/mame/drivers/macrossp.cpp",
-	MAME_DIR .. "src/mame/includes/macrossp.h",
-	MAME_DIR .. "src/mame/video/macrossp.cpp",
 	MAME_DIR .. "src/mame/drivers/nmk16.cpp",
 	MAME_DIR .. "src/mame/includes/nmk16.h",
 	MAME_DIR .. "src/mame/machine/nmk004.cpp",
@@ -3635,6 +3628,7 @@ files {
 	MAME_DIR .. "src/mame/includes/saturn.h",
 	MAME_DIR .. "src/mame/drivers/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn.cpp",
+	MAME_DIR .. "src/mame/video/saturn.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.cpp",
 	MAME_DIR .. "src/mame/machine/saturn_cdb.h",
 	MAME_DIR .. "src/mame/includes/stv.h",
@@ -4638,6 +4632,7 @@ createMAMEProjects(_target, _subtarget, "pinball")
 files {
 	MAME_DIR .. "src/mame/drivers/allied.cpp",
 	MAME_DIR .. "src/mame/drivers/alvg.cpp",
+	MAME_DIR .. "src/mame/drivers/atari_4x4.cpp",
 	MAME_DIR .. "src/mame/drivers/atari_s1.cpp",
 	MAME_DIR .. "src/mame/drivers/atari_s2.cpp",
 	MAME_DIR .. "src/mame/drivers/barni.cpp",
@@ -4790,10 +4785,12 @@ files {
 	MAME_DIR .. "src/mame/includes/ampoker2.h",
 	MAME_DIR .. "src/mame/video/ampoker2.cpp",
 	MAME_DIR .. "src/mame/drivers/amspdwy.cpp",
-	MAME_DIR .. "src/mame/includes/amspdwy.h",
-	MAME_DIR .. "src/mame/video/amspdwy.cpp",
 	MAME_DIR .. "src/mame/drivers/amusco.cpp",
 	MAME_DIR .. "src/mame/drivers/anes.cpp",
+	MAME_DIR .. "src/mame/video/apple2.cpp",
+	MAME_DIR .. "src/mame/video/apple2.h",
+	MAME_DIR .. "src/mame/machine/apple2common.cpp",
+	MAME_DIR .. "src/mame/machine/apple2common.h",
 	MAME_DIR .. "src/mame/drivers/arachnid.cpp",
 	MAME_DIR .. "src/mame/drivers/artmagic.cpp",
 	MAME_DIR .. "src/mame/includes/artmagic.h",
@@ -4912,6 +4909,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ettrivia.cpp",
 	MAME_DIR .. "src/mame/drivers/extrema.cpp",
 	MAME_DIR .. "src/mame/drivers/ez2d.cpp",
+	MAME_DIR .. "src/mame/drivers/falgas_m89.cpp",
 	MAME_DIR .. "src/mame/drivers/fastinvaders.cpp",
 	MAME_DIR .. "src/mame/drivers/fireball.cpp",
 	MAME_DIR .. "src/mame/drivers/flipjack.cpp",

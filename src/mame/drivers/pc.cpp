@@ -1074,7 +1074,7 @@ CPU: 8088 @ 8MHz
 RAM: 640KB
 Bus: 3x ISA:    1)  ATI Graphics Solution SR https://sites.google.com/site/atiwonderseriesdatabase/
 Video: MDA/CGA/Plantronics
-Mass storage: 1 or 2 5.25" 360K floppies, MFM harddisk on hardcard or via seperate controller
+Mass storage: 1 or 2 5.25" 360K floppies, MFM harddisk on hardcard or via separate controller
 On board ports: serial, parallel, floppy
 
 ******************************************************************************/
@@ -1887,7 +1887,7 @@ Graphics: S230790/00 GEJA04, MC6845P based, OSC: 20.0000 MHz, modes: 160x100 (16
 320x200 or 320x400 (4col. altogether: 1/16 for the background, 1 for the foreground (red, green or brown,
 alt. cobalt blue, violet or white), 640x200 or 640x400 (black, white and two intermediate hues)
 Floppy controller: S131005/00A CE0121/8AJ00072 - NEC B9201C, Intel P8272A
-Keyboard: has seperate "Shift Locke" and "Caps Lock" keys, "Clear" key (Ctrl-Clear to clear the screen),
+Keyboard: has separate "Shift Locke" and "Caps Lock" keys, "Clear" key (Ctrl-Clear to clear the screen),
 an "alpha" key and 18 function keys, it has no NumLock key.
 If you load the "tw" utility and press Ctrl-Alpha, you switch the computer into typewriter mode,
 and all typed text goes straight to the printer.

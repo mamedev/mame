@@ -1,9 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
 /******************************************************************************
-    Atari 400/800
 
-    MESS Driver
+    Atari 400/800
 
     Juergen Buchmueller, June 1998
 
@@ -1019,7 +1018,7 @@ One side effect of this on the console's palette is that some
 values of red may appear too pinkish - Too much blue to red.
 This is not the same as a traditional tint-hue control
 adjustment; rather, can be demonstrated by changing the blue
-ratio values via MESS HLSL settings.
+ratio values via MAME HLSL settings.
 
 Lastly, the Atari 2600 & 7800 NTSC color palettes hold the same
 hue structure order and have similar appearance differences

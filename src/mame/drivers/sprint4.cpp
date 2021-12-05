@@ -7,12 +7,20 @@ Atari Sprint 4 driver
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/sprint4.h"
 #include "audio/sprint4.h"
 
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
+#include "machine/watchdog.h"
+#include "sound/discrete.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
 
 #define MASTER_CLOCK    12096000
 
@@ -20,6 +28,93 @@ Atari Sprint 4 driver
 #define VTOTAL 262
 
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
+
+class sprint4_state : public driver_device
+{
+public:
+	enum
+	{
+		TIMER_NMI
+	};
+
+	sprint4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_discrete(*this, "discrete"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
+		m_videoram(*this, "videoram"),
+		m_io_wheel(*this, "WHEEL%u", 1U),
+		m_io_lever(*this, "LEVER%u", 1U),
+		m_io_in0(*this, "IN0"),
+		m_io_analog(*this, "ANALOG"),
+		m_io_coin(*this, "COIN"),
+		m_io_collision(*this, "COLLISION"),
+		m_io_dip(*this, "DIP")
+	{ }
+
+	void sprint4(machine_config &config);
+
+	template <int N> DECLARE_READ_LINE_MEMBER(lever_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(wheel_r);
+	template <int N> DECLARE_READ_LINE_MEMBER(collision_flipflop_r);
+
+private:
+	uint8_t wram_r(offs_t offset);
+	uint8_t analog_r(offs_t offset);
+	uint8_t coin_r(offs_t offset);
+	uint8_t collision_r(offs_t offset);
+	uint8_t options_r(offs_t offset);
+	void wram_w(offs_t offset, uint8_t data);
+	void collision_reset_w(offs_t offset, uint8_t data);
+	void da_latch_w(uint8_t data);
+	[[maybe_unused]] void lockout_w(offs_t offset, uint8_t data);
+	void video_ram_w(offs_t offset, uint8_t data);
+	void bang_w(uint8_t data);
+	void attract_w(uint8_t data);
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	void sprint4_palette(palette_device &palette) const;
+
+	TILE_GET_INFO_MEMBER(tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	TIMER_CALLBACK_MEMBER(nmi_callback);
+
+	void sprint4_cpu_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<discrete_sound_device> m_discrete;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	required_shared_ptr<uint8_t> m_videoram;
+
+	required_ioport_array<4> m_io_wheel;
+	required_ioport_array<4> m_io_lever;
+	required_ioport m_io_in0;
+	required_ioport m_io_analog;
+	required_ioport m_io_coin;
+	required_ioport m_io_collision;
+	required_ioport m_io_dip;
+
+	int m_da_latch;
+	int m_steer_FF1[4];
+	int m_steer_FF2[4];
+	int m_gear[4];
+	uint8_t m_last_wheel[4];
+	int m_collision[4];
+	tilemap_t* m_playfield;
+	bitmap_ind16 m_helper;
+	emu_timer *m_nmi_timer;
+};
 
 
 template <int N>
@@ -62,26 +157,12 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 	/* MAME updates controls only once per frame but the game checks them on every NMI */
 
-	uint8_t wheel[4] =
-	{
-		static_cast<uint8_t>(ioport("WHEEL1")->read()),
-		static_cast<uint8_t>(ioport("WHEEL2")->read()),
-		static_cast<uint8_t>(ioport("WHEEL3")->read()),
-		static_cast<uint8_t>(ioport("WHEEL4")->read())
-	};
-	uint8_t lever[4] =
-	{
-		static_cast<uint8_t>(ioport("LEVER1")->read()),
-		static_cast<uint8_t>(ioport("LEVER2")->read()),
-		static_cast<uint8_t>(ioport("LEVER3")->read()),
-		static_cast<uint8_t>(ioport("LEVER4")->read())
-	};
-
 	/* emulation of steering wheels isn't very accurate */
 
 	for (int i = 0; i < 4; i++)
 	{
-		signed char delta = wheel[i] - m_last_wheel[i];
+		uint8_t wheel = uint8_t(m_io_wheel[i]->read());
+		signed char delta = wheel - m_last_wheel[i];
 
 		if (delta < 0)
 		{
@@ -92,14 +173,15 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 			m_steer_FF2[i] = 1;
 		}
 
-		m_steer_FF1[i] = (wheel[i] >> 4) & 1;
+		m_steer_FF1[i] = (wheel >> 4) & 1;
 
-		if (lever[i] & 1) { m_gear[i] = 1; }
-		if (lever[i] & 2) { m_gear[i] = 2; }
-		if (lever[i] & 4) { m_gear[i] = 3; }
-		if (lever[i] & 8) { m_gear[i] = 4; }
+		uint8_t lever = uint8_t(m_io_lever[i]->read());
+		if (lever & 1) m_gear[i] = 1;
+		if (lever & 2) m_gear[i] = 2;
+		if (lever & 4) m_gear[i] = 3;
+		if (lever & 8) m_gear[i] = 4;
 
-		m_last_wheel[i] = wheel[i];
+		m_last_wheel[i] = wheel;
 	}
 
 	scanline += 64;
@@ -111,9 +193,9 @@ TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x40);
+	m_watchdog->watchdog_enable(m_io_in0->read() & 0x40);
 
-	if (ioport("IN0")->read() & 0x40)
+	if (m_io_in0->read() & 0x40)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	m_nmi_timer->adjust(m_screen->time_until_pos(scanline), scanline);
@@ -157,21 +239,21 @@ uint8_t sprint4_state::wram_r(offs_t offset)
 
 uint8_t sprint4_state::analog_r(offs_t offset)
 {
-	return (ioport("ANALOG")->read() << (~offset & 7)) & 0x80;
+	return (m_io_analog->read() << (~offset & 7)) & 0x80;
 }
 uint8_t sprint4_state::coin_r(offs_t offset)
 {
-	return (ioport("COIN")->read() << (~offset & 7)) & 0x80;
+	return (m_io_coin->read() << (~offset & 7)) & 0x80;
 }
 uint8_t sprint4_state::collision_r(offs_t offset)
 {
-	return (ioport("COLLISION")->read() << (~offset & 7)) & 0x80;
+	return (m_io_collision->read() << (~offset & 7)) & 0x80;
 }
 
 
 uint8_t sprint4_state::options_r(offs_t offset)
 {
-	return (ioport("DIP")->read() >> (2 * (offset & 3))) & 3;
+	return (m_io_dip->read() >> (2 * (offset & 3))) & 3;
 }
 
 
@@ -194,12 +276,10 @@ void sprint4_state::da_latch_w(uint8_t data)
 
 
 
-#ifdef UNUSED_FUNCTION
 void sprint4_state::lockout_w(offs_t offset, uint8_t data)
 {
 	machine().bookkeeping().coin_lockout_global_w(~offset & 1);
 }
-#endif
 
 
 void sprint4_state::bang_w(uint8_t data)
@@ -211,6 +291,132 @@ void sprint4_state::bang_w(uint8_t data)
 void sprint4_state::attract_w(uint8_t data)
 {
 	m_discrete->write(SPRINT4_ATTRACT_EN, data & 1);
+}
+
+
+void sprint4_state::sprint4_palette(palette_device &palette) const
+{
+	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00)); // black
+	palette.set_indirect_color(1, rgb_t(0xfc, 0xdf, 0x80)); // peach
+	palette.set_indirect_color(2, rgb_t(0xf0, 0x00, 0xf0)); // violet
+	palette.set_indirect_color(3, rgb_t(0x00, 0xf0, 0x0f)); // green
+	palette.set_indirect_color(4, rgb_t(0x30, 0x4f, 0xff)); // blue
+	palette.set_indirect_color(5, rgb_t(0xff, 0xff, 0xff)); // white
+
+	palette.set_pen_indirect(0, 0);
+	palette.set_pen_indirect(2, 0);
+	palette.set_pen_indirect(4, 0);
+	palette.set_pen_indirect(6, 0);
+	palette.set_pen_indirect(8, 0);
+
+	palette.set_pen_indirect(1, 1);
+	palette.set_pen_indirect(3, 2);
+	palette.set_pen_indirect(5, 3);
+	palette.set_pen_indirect(7, 4);
+	palette.set_pen_indirect(9, 5);
+}
+
+
+TILE_GET_INFO_MEMBER(sprint4_state::tile_info)
+{
+	uint8_t code = m_videoram[tile_index];
+
+	if ((code & 0x30) == 0x30)
+		tileinfo.set(0, code & ~0x40, (code >> 6) ^ 3, 0);
+	else
+		tileinfo.set(0, code, 4, 0);
+}
+
+
+void sprint4_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_helper);
+
+	m_playfield = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sprint4_state::tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+
+uint32_t sprint4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_playfield->draw(screen, bitmap, cliprect, 0, 0);
+
+	for (int i = 0; i < 4; i++)
+	{
+		int bank = 0;
+
+		uint8_t horz = m_videoram[0x390 + 2 * i + 0];
+		uint8_t attr = m_videoram[0x390 + 2 * i + 1];
+		uint8_t vert = m_videoram[0x398 + 2 * i + 0];
+		uint8_t code = m_videoram[0x398 + 2 * i + 1];
+
+		if (i & 1)
+			bank = 32;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			(code >> 3) | bank,
+			(attr & 0x80) ? 4 : i,
+			0, 0,
+			horz - 15,
+			vert - 15, 0);
+	}
+	return 0;
+}
+
+
+WRITE_LINE_MEMBER(sprint4_state::screen_vblank)
+{
+	// rising edge
+	if (state)
+	{
+		/* check for sprite-playfield collisions */
+
+		for (int i = 0; i < 4; i++)
+		{
+			int bank = 0;
+
+			uint8_t horz = m_videoram[0x390 + 2 * i + 0];
+			uint8_t vert = m_videoram[0x398 + 2 * i + 0];
+			uint8_t code = m_videoram[0x398 + 2 * i + 1];
+
+			rectangle rect(
+					horz - 15,
+					horz - 15 + m_gfxdecode->gfx(1)->width() - 1,
+					vert - 15,
+					vert - 15 + m_gfxdecode->gfx(1)->height() - 1);
+			rect &= m_screen->visible_area();
+
+			m_playfield->draw(*m_screen, m_helper, rect, 0, 0);
+
+			if (i & 1)
+				bank = 32;
+
+			m_gfxdecode->gfx(1)->transpen(m_helper,rect,
+				(code >> 3) | bank,
+				4,
+				0, 0,
+				horz - 15,
+				vert - 15, 1);
+
+			for (int y = rect.top(); y <= rect.bottom(); y++)
+				for (int x = rect.left(); x <= rect.right(); x++)
+					if (m_palette->pen_indirect(m_helper.pix(y, x)) != 0)
+						m_collision[i] = 1;
+		}
+
+		/* update sound status */
+
+		m_discrete->write(SPRINT4_MOTOR_DATA_1, m_videoram[0x391] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_2, m_videoram[0x393] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_3, m_videoram[0x395] & 15);
+		m_discrete->write(SPRINT4_MOTOR_DATA_4, m_videoram[0x397] & 15);
+	}
+}
+
+
+void sprint4_state::video_ram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+	m_playfield->mark_tile_dirty(offset);
 }
 
 
@@ -452,6 +658,8 @@ ROM_START( sprint4a )
 	ROM_REGION( 0x0200, "user1", 0 )
 	ROM_LOAD( "30024-01.p8", 0x0000, 0x0200, CRC(e71d2e22) SHA1(434c3a8237468604cce7feb40e6061d2670013b3) ) /* SYNC */
 ROM_END
+
+} // anonymous namespace
 
 
 GAME( 1977, sprint4,  0,       sprint4,  sprint4, sprint4_state, empty_init, ROT180, "Atari", "Sprint 4 (set 1)", MACHINE_SUPPORTS_SAVE ) /* large cars */

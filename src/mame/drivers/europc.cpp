@@ -10,7 +10,7 @@
 * Euro PC: Computer and floppy drive integrated into the keyboard, 8088, 512K RAM, there was an upgrade card for the ISA slot that took it to 640K, single ISA slot
            FD360 external 360K 5.25" DS DD floppy, FD720 external 720K 3,5" DS DD floppy, HD-20 external harddisk, internal graphics card is CGA or Hercules, 64KB VRAM
 * Euro PC II: like Euro PC, socket for 8087, 768K RAM on board, driver on Schneider DOS disk allowed the portion over 640K to be used as extended memory or ramdisk.
-* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key seperate keyboard, internal XTA (XT-IDE) 20MB harddisk, connector for FD360 and FD720 was retained
+* Euro XT: conventional desktop, specs like Euro PC II, two ISA slots on a riser card, 102 key separate keyboard, internal XTA (XT-IDE) 20MB harddisk, connector for FD360 and FD720 was retained
 *
 * https://www.forum64.de/index.php?thread/43066-schneider-euro-pc-i-ii-xt-welche-bios-version-habt-ihr/ claims Versions BIOS >=2.06 have a change in memory management.
 * Versions 2.04 and 2.05 only show a single dash on the top left of the screen, set slot 1 to from AGA to CGA or Hercules to get them to display.

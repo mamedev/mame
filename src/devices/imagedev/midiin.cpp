@@ -18,6 +18,32 @@
 
 DEFINE_DEVICE_TYPE(MIDIIN, midiin_device, "midiin", "MIDI In image device")
 
+namespace {
+
+INPUT_PORTS_START(midiin)
+	PORT_START("CFG")
+	PORT_CONFNAME(0xff, 0xff, "MIDI file mode")
+	PORT_CONFSETTING(   0xff, "Multi")
+	PORT_CONFSETTING(   0x00, "Poly: Channel 1")
+	PORT_CONFSETTING(   0x01, "Poly: Channel 2")
+	PORT_CONFSETTING(   0x02, "Poly: Channel 3")
+	PORT_CONFSETTING(   0x03, "Poly: Channel 4")
+	PORT_CONFSETTING(   0x04, "Poly: Channel 5")
+	PORT_CONFSETTING(   0x05, "Poly: Channel 6")
+	PORT_CONFSETTING(   0x06, "Poly: Channel 7")
+	PORT_CONFSETTING(   0x07, "Poly: Channel 8")
+	PORT_CONFSETTING(   0x08, "Poly: Channel 9")
+	PORT_CONFSETTING(   0x09, "Poly: Channel 10")
+	PORT_CONFSETTING(   0x0a, "Poly: Channel 11")
+	PORT_CONFSETTING(   0x0b, "Poly: Channel 12")
+	PORT_CONFSETTING(   0x0c, "Poly: Channel 13")
+	PORT_CONFSETTING(   0x0d, "Poly: Channel 14")
+	PORT_CONFSETTING(   0x0e, "Poly: Channel 15")
+	PORT_CONFSETTING(   0x0f, "Poly: Channel 16")
+INPUT_PORTS_END
+
+} // anonymous namespace
+
 /*-------------------------------------------------
     ctor
 -------------------------------------------------*/
@@ -27,12 +53,18 @@ midiin_device::midiin_device(const machine_config &mconfig, const char *tag, dev
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
 		m_midi(),
+		m_config(*this, "CFG"),
 		m_timer(nullptr),
 		m_input_cb(*this),
 		m_xmit_read(0),
 		m_xmit_write(0),
 		m_tx_busy(false)
 {
+}
+
+ioport_constructor midiin_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(midiin);
 }
 
 /*-------------------------------------------------
@@ -134,7 +166,7 @@ image_init_result midiin_device::call_load()
 		// if the parsing succeeds, schedule the start to happen at least
 		// 10 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
-		if (m_sequence.parse(reinterpret_cast<u8 const *>(ptr()), length()))
+		if (m_sequence.parse(reinterpret_cast<u8 const *>(ptr()), length(), m_config->read()))
 		{
 			m_sequence_start = std::max(machine().time(), attotime(10, 0));
 			m_timer->adjust(attotime::zero);
@@ -325,7 +357,7 @@ midiin_device::midi_event &midiin_device::midi_sequence::event_at(u32 tick)
 //  parse - parse a MIDI sequence from a buffer
 //-------------------------------------------------
 
-bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
+bool midiin_device::midi_sequence::parse(u8 const *data, u32 length, u8 force_channel)
 {
 	// start with an empty list of events
 	m_list.clear();
@@ -338,7 +370,7 @@ bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
 	{
 		// if not a RIFF-encoed MIDI, just parse as-is
 		if (buffer.dword_le() != fourcc_le("RIFF"))
-			parse_midi_data(buffer.reset());
+			parse_midi_data(buffer.reset(), force_channel);
 		else
 		{
 			// check the RIFF type and size
@@ -356,7 +388,7 @@ bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
 				midi_parser chunk = riffdata.subset(chunksize);
 				if (chunktype == fourcc_le("data"))
 				{
-					parse_midi_data(chunk);
+					parse_midi_data(chunk, force_channel);
 					break;
 				}
 			}
@@ -378,7 +410,7 @@ bool midiin_device::midi_sequence::parse(u8 const *data, u32 length)
 //  into tracks
 //-------------------------------------------------
 
-void midiin_device::midi_sequence::parse_midi_data(midi_parser &buffer)
+void midiin_device::midi_sequence::parse_midi_data(midi_parser &buffer, u8 force_channel)
 {
 	// scan for syntactic correctness, and to find global state
 	u32 headertype = buffer.dword_le();
@@ -415,7 +447,7 @@ void midiin_device::midi_sequence::parse_midi_data(midi_parser &buffer)
 
 		// parse the track data
 		midi_parser trackdata = buffer.subset(chunksize);
-		u32 numticks = parse_track_data(trackdata, curtick);
+		u32 numticks = parse_track_data(trackdata, curtick, force_channel);
 		if (format == 2)
 			curtick += numticks;
 	}
@@ -444,7 +476,7 @@ void midiin_device::midi_sequence::parse_midi_data(midi_parser &buffer)
 //  add it to the buffer
 //-------------------------------------------------
 
-u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 start_tick)
+u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 start_tick, u8 force_channel)
 {
 	u32 curtick = start_tick;
 	u8 last_type = 0;
@@ -469,9 +501,11 @@ u32 midiin_device::midi_sequence::parse_track_data(midi_parser &buffer, u32 star
 		if (eclass != 15)
 		{
 			// simple events: all but program change and aftertouch have a second parameter
-			// TODO: should we respect the channel for these? or maybe the drivers should
-			// configure us with the number of channels they support?
-			event.append(type & 0xf0);
+			if (force_channel <= 15)
+			{
+				type = (type & 0xf0) | force_channel;
+			}
+			event.append(type);
 			event.append(buffer.byte());
 			if (eclass != 12 && eclass != 13)
 				event.append(buffer.byte());
