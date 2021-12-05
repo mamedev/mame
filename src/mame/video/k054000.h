@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Angelo Salese
 #ifndef MAME_VIDEO_K054000_H
 #define MAME_VIDEO_K054000_H
 
@@ -31,6 +31,8 @@ private:
 	u8 m_raw_Acx[4], m_raw_Acy[4], m_raw_Bcx[4], m_raw_Bcy[4]; 
 	int m_Acx, m_Acy, m_Bcx, m_Bcy;
 	int m_Aax, m_Aay, m_Bax, m_Bay;
+
+	std::string print_hitbox_state(bool result);
 };
 
 DECLARE_DEVICE_TYPE(K054000, k054000_device)

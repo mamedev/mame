@@ -1,25 +1,9 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, Angelo Salese
+/**************************************************************************************************
 
-#include "emu.h"
-#include "k054000.h"
+	Konami K054000
 
-
-#define VERBOSE 0
-#include "logmacro.h"
-
-
-/***************************************************************************/
-/*                                                                         */
-/*                                 054000                                  */
-/*                                                                         */
-/***************************************************************************/
-
-/*
-
-
-054000
-------
 Sort of a protection device, used for collision detection.
 It is passed a few parameters, and returns a boolean telling if collision
 happened. It has no access to gfx data, it only does arithmetical operations
@@ -44,14 +28,19 @@ Memory map:
 15-17 W B center X
 18    R 0 = collision, 1 = no collision
 
-*/
+**************************************************************************************************/
+
+#include "emu.h"
+#include "k054000.h"
+
+#define LIVE_HITBOX_VIEW 1
+#include <cstring>
+
+//#define VERBOSE 0
+//#include "logmacro.h"
 
 
-/***************************************************************************/
-/*                                                                         */
-/*                                 054000                                  */
-/*                                                                         */
-/***************************************************************************/
+
 
 DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "K054000 Protection")
 
@@ -170,19 +159,32 @@ u8 k054000_device::status_r()
 	if (m_Bcy + m_Bay < m_Acy - m_Aay)
 		res |= 1;
 
-//	printf("%d %d %d %d (%d|%d)|%d %d %d %d == %d\n", m_Acx, m_Acy, m_Aax, m_Aay, m_raw_Acx[3], m_raw_Acy[3], m_Bcx, m_Bcy, m_Bax, m_Bay, res);
-	printf("ACX %02x%02x%02x%02x|", m_raw_Acx[0], m_raw_Acx[1], m_raw_Acx[2], m_raw_Acx[3]);
-	printf("ACY %02x%02x%02x%02x|", m_raw_Acy[0], m_raw_Acy[1], m_raw_Acy[2], m_raw_Acy[3]);
-	printf("AAX %02x AAY %02x\n", m_Aax, m_Aay);
-	printf("BCX %02x%02x%02x%02x|", m_raw_Bcx[0], m_raw_Bcx[1], m_raw_Bcx[2], m_raw_Bcx[3]);
-	printf("BCY %02x%02x%02x%02x|", m_raw_Bcy[0], m_raw_Bcy[1], m_raw_Bcy[2], m_raw_Bcy[3]);
-	printf("BAX %02x BAY %02x\n", m_Bax, m_Bay);
-	printf("%d\n===\n", res);
+	if (LIVE_HITBOX_VIEW)
+		logerror(print_hitbox_state(res));
 
 	return res;
 }
 
-#ifdef UNUSED_FUNCTION
+// debugging
+std::string k054000_device::print_hitbox_state(bool result)
+{
+	std::ostringstream outbuffer;
+
+	util::stream_format(outbuffer, "%s collision check:\n", machine().describe_context());
+	util::stream_format(outbuffer, "ACX %02x%02x%02x%02x|", m_raw_Acx[0], m_raw_Acx[1], m_raw_Acx[2], m_raw_Acx[3]);
+	util::stream_format(outbuffer, "ACY %02x%02x%02x%02x|", m_raw_Acy[0], m_raw_Acy[1], m_raw_Acy[2], m_raw_Acy[3]);
+	util::stream_format(outbuffer, "AAX %02x AAY %02x\n", m_Aax, m_Aay);
+	util::stream_format(outbuffer, "BCX %02x%02x%02x%02x|", m_raw_Bcx[0], m_raw_Bcx[1], m_raw_Bcx[2], m_raw_Bcx[3]);
+	util::stream_format(outbuffer, "BCY %02x%02x%02x%02x|", m_raw_Bcy[0], m_raw_Bcy[1], m_raw_Bcy[2], m_raw_Bcy[3]);
+	util::stream_format(outbuffer, "BAX %02x BAY %02x\n", m_Bax, m_Bay);
+	util::stream_format(outbuffer, "Result: %d (%s)\n", result, result ? "no" : "yes");
+	util::stream_format(outbuffer, "===\n");
+
+	return outbuffer.str();
+}
+
+// old code, left as documentation reasons
+#if 0
 u8 k054000_device::read(offs_t offset)
 {
 	int Acx, Acy, Aax, Aay;
@@ -221,7 +223,7 @@ u8 k054000_device::read(offs_t offset)
 	Bay = m_regs[0x0f] + 1;
 
 	//if (m_regs[0x04] || m_regs[0x0c])
-	printf("%d %d %d %d (%d|%d)|%d %d %d %d\n", Acx, Acy, Aax, Aay, m_regs[0x04], m_regs[0x0c], Bcx, Bcy, Bax, Bay);
+	//printf("%d %d %d %d (%d|%d)|%d %d %d %d\n", Acx, Acy, Aax, Aay, m_regs[0x04], m_regs[0x0c], Bcx, Bcy, Bax, Bay);
 
 	if (Acx + Aax < Bcx - Bax)
 		return 1;
