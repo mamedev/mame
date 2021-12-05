@@ -2,38 +2,44 @@
 // copyright-holders:David Haywood, Angelo Salese
 /**************************************************************************************************
 
-	Konami K054000
+	Konami K054000 hitbox/math custom chip
 
-Sort of a protection device, used for collision detection.
-It is passed a few parameters, and returns a boolean telling if collision
-happened. It has no access to gfx data, it only does arithmetical operations
-on the parameters.
+	Sort of a protection device, used for collision detection.
+	It is passed a few parameters, and returns a boolean telling if collision
+	happened. It has no access to gfx data, it only does arithmetical operations
+	on the parameters.
 
-Memory map:
-00      unused
-01-03 W A center X
-04    W unknown, needed by thndrx2 to pass the startup check, we use a hack
-05      unused
-06    W A semiaxis X
-07    W A semiaxis Y
-08      unused
-09-0b W A center Y
-0c    W unknown, needed by thndrx2 to pass the startup check, we use a hack
-0d      unused
-0e    W B semiaxis X
-0f    W B semiaxis Y
-10      unused
-11-13 W B center Y
-14      unused
-15-17 W B center X
-18    R 0 = collision, 1 = no collision
+	TODO:
+	- Thunder Cross II POST checks of this chip, we currently bypass that with a ROM patch in
+	  driver. It literally tests the chip in an unit test fashion:
+      1. zeroing all ports;
+      2. test that status returns 0;
+      3. ping ACX reg 0 with 0xff;
+      4. test status = 1;
+      5. ping BCX reg 0 with 0xff;
+      6. test status = 0;
+      7. ping ACX reg 1 with 0xff;
+      8. test status = 1;
+	  9. rinse and repeat until all registers are exausted.
+	  Assertion eventually fails when testing the "delta" registers:
+
+	  ACX ffffffff|ACY ffffff00|AAX 01 AAY 01
+      BCX ffffff00|BCY ffffff00|BAX 01 BAY 01
+      Result: actual 0 (yes), expected 1 (no)
+
+      The fun part is that game doesn't even access the chip at all during gameplay 
+	  (or at least not until stage 6, where game disallows continues) while the specific
+	  "delta" registers are instead challenged by Vendetta OTG attacks (cfr. MT#06393, MT#07839).
+      We currently pay the technical debt inside thndrx2 itself, by notifying that "14D" returns
+	  bad but still making it to boot anyway while marking these games with MUP.
+	  Any attempt to fix it here without real HW tests goes into wild speculations unfortunately.
 
 **************************************************************************************************/
 
 #include "emu.h"
 #include "k054000.h"
 
-#define LIVE_HITBOX_VIEW 1
+#define LIVE_HITBOX_VIEW 0
 #include <cstring>
 
 //#define VERBOSE 0
@@ -90,6 +96,26 @@ void k054000_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
+/*
+Memory map:
+00      unused
+01-03 W A center X
+04    W A delta correction X?
+05      unused
+06    W A semiaxis X
+07    W A semiaxis Y
+08      unused
+09-0b W A center Y
+0c    W A delta correction Y?
+0d      unused
+0e    W B semiaxis X
+0f    W B semiaxis Y
+10      unused
+11-13 W B center Y
+14      unused
+15-17 W B center X
+18    R 0 = collision, 1 = no collision
+*/
 void k054000_device::map(address_map &map)
 {
 	map.unmap_value_low();
