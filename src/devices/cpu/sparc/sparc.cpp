@@ -57,8 +57,6 @@ DEFINE_DEVICE_TYPE(SPARCV7, sparcv7_device, "sparcv7", "Sun SPARC v7")
 DEFINE_DEVICE_TYPE(SPARCV8, sparcv8_device, "sparcv8", "Sun SPARC v8")
 DEFINE_DEVICE_TYPE(MB86930, mb86930_device, "mb86930", "Fujitsu MB86930 'SPARClite'")
 
-const int sparc_base_device::NWINDOWS = 7;
-
 #if LOG_FCODES
 #include "ss1fcode.ipp"
 #endif
@@ -263,6 +261,11 @@ void sparc_base_device::device_start()
 	}
 	m_log_fcodes = false;
 #endif
+
+	NWINDOWS = 7;
+	PSR = 0;
+	m_ver = 0;
+	m_impl = 0;
 
 	m_bp_reset_in = false;
 	m_bp_fpu_present = true;
@@ -481,12 +484,12 @@ void sparc_base_device::device_start()
 	save_item(NAME(m_alu_op3_assigned));
 	save_item(NAME(m_ldst_op3_assigned));
 	save_item(NAME(m_alu_setcc));
+	save_item(NAME(m_nwindows));
 	save_item(NAME(m_privileged_asr));
 	save_item(NAME(m_illegal_instruction_asr));
 	save_item(NAME(m_mae));
 	save_item(NAME(m_no_annul));
 	save_item(NAME(m_hold_bus));
-	save_item(NAME(m_icount));
 	save_item(NAME(m_stashed_icount));
 	save_item(NAME(m_insn_space));
 	save_item(NAME(m_data_space));
@@ -558,9 +561,16 @@ void sparc_base_device::device_reset()
 	TBR = 0;
 	Y = 0;
 
-	PSR = PSR_S_MASK | PSR_PS_MASK;
+	PSR = (PSR & PSR_ZERO_MASK) | (PSR_S_MASK | PSR_PS_MASK);
 	m_s = true;
+	m_ps = true;
 	m_data_space = 11;
+	m_pil = 0;
+	m_et = false;
+	m_icc = 0;
+	m_ec = false;
+	m_ef = false;
+	m_cwp = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -633,6 +643,13 @@ void sparcv8_device::device_reset()
 void mb86930_device::device_start()
 {
 	sparcv8_device::device_start();
+
+	NWINDOWS = 8;
+	PSR |= 2 << PSR_VER_SHIFT;
+	m_ver = 2;
+
+	m_bp_cp_present = false;
+	m_bp_fpu_present = false;
 
 	m_alu_setcc[OP3_DIVSCC] = true;
 
@@ -1716,7 +1733,7 @@ void sparc_base_device::execute_wrsr(uint32_t op)
 			return;
 		}
 
-		PSR = result &~ PSR_ZERO_MASK;
+		PSR = (PSR & PSR_ZERO_MASK) | (result & ~PSR_ZERO_MASK);
 		update_gpr_pointers();
 
 		m_et = PSR & PSR_ET_MASK;

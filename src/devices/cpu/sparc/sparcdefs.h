@@ -85,6 +85,8 @@
 #define WIM                 m_wim
 #define TBR                 m_tbr
 
+#define NWINDOWS            m_nwindows
+
 #define OP_NS   (op & 0xc0000000)
 
 #define OP      (op >> 30)
