@@ -24,7 +24,8 @@ TODO (brief, concrete examples in SW list):
 - Mixing with VDP2 (has priority per dot mode and other caveats)
   also cfr. basically any MD Sega Ages;
 - Polygon vertices goes wrong place in some places,
-  cfr. blaztorn match intro, twcup98 (STV) team select world cup, other places;
+  cfr. blaztorn match intro, twcup98 (STV) team select world cup, 
+  sandor (STV) match moai sub-game, other places;
 - FB rotation framebuffer (shared with VDP2)
   cfr. capgen4 Yoko/Tate Modes;
 - Zooming rounding errors in some places
@@ -64,7 +65,8 @@ void saturn_vdp1_device::device_start()
 
 	stv_vdp1_shading_data = std::make_unique<struct stv_vdp1_poly_scanline_data>();
 
-	framebuffer[0] = std::make_unique<uint16_t[]>(1024 * 256 * 2 ); /* *2 is for double interlace */
+	/* *2 is for double interlace */
+	framebuffer[0] = std::make_unique<uint16_t[]>(1024 * 256 * 2 );
 	framebuffer[1] = std::make_unique<uint16_t[]>(1024 * 256 * 2 );
 
 	framebuffer_display_lines = std::make_unique<uint16_t * []>(512);
@@ -80,7 +82,7 @@ void saturn_vdp1_device::device_start()
 	framebuffer_clear_on_next_frame = 0;
 
 	system_cliprect.set(0, 0, 0, 0);
-	/* Kidou Senshi Z Gundam - Zenpen Zeta no Kodou loves to use the user cliprect vars in an undefined state ... */
+	// zgundzen uses VDP1 user cliprect in undefined state ...
 	user_cliprect.set(0, 512, 0, 256);
 
 	// save state
@@ -97,12 +99,15 @@ void saturn_vdp1_device::device_start()
 
 void saturn_vdp1_device::device_reset()
 {
+	// TODO: VDP1 is really in undefined state at startup
+	// we currently use this for convenience
 	vram_clear();
 }
 
 void saturn_vdp1_device::vram_clear()
 {
 	memset(m_vdp1_vram.get(), 0x00, 0x100000);
+	// TODO: framebuffer RAM needs to be zapped too
 }
 
 void saturn_vdp1_device::check_fb_clear()

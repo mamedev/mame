@@ -11,7 +11,7 @@ Please don't remove them if for no reason you truly want to mess with this.
 
 Notes of interest:
 - The natural ultimate evolution of the Sega line of custom video renderers,
-  has decidedly common points with earlier Sega System 32;
+  has decidedly common points with earlier VDPs, cfr. Sega System 32;
 - Some parts can be selectively ported back in MAME core once this file is properly
   device-ized since you basically can do all sorts of abuses with a tilemap/bitmap layer;
 - Ditto for layer debugging, we lack at very least a bitmap viewer;
@@ -63,24 +63,27 @@ TODO (brief, concrete examples in SW list):
 - Back layer isn't drawn in biohaz, investigate;
 - Bogus Title Screen blinking for vhydlid and probably other T&E Soft games, investigate;
 - Verify batmanfr crashing before final boss (assuming it's reproducible),
-  prime suspect VDP2 overrunning a buffer on the complicated ROZ setup it does for Riddler screens;
+  prime suspect VDP2 overrunning a buffer on the complicated ROZ setup it does for Riddler screen;
 - Verify hanagumi ending (there are sources sporting bad tiles, it's most likely fixed a long
   time ago);
 - Verify rsgun Xiga final boss implications with rotation read controls 
   (should still be wrong as per current);
+- Verify sandor (STV) martial artist dry towel sub-game (overall screen setup looked
+  wrong, saw from a thuntk playthrough with unknown MAME version used);
 
 Other misc notes worth being mentioned:
 - STV BIOS is drawn with NBG3 layer only, with basic Color Offset for transitions.
 - shanhigw (STV) was the original reason about our current VRAM cycle pattern handling
   (had glitchy layer enables on intro);
 - hanagumi (STV, probably Saturn version too) sports a RED logo in a hidden layer during attract.
-  That layer isn't actually displayed because its priority level is 0.
+  That layer isn't actually displayed because its priority level is 0,
+  VDP2 draws only levels 1 to 7;
 - H-Blank bit reads runs on a different thread than V-Blank. 
   This can cause wrong gameplay speed in gaxeduel (STV) if handled inaccurately;
 - Layer scrolling is screen display wise, meaning that a scrolling value is masked with the
   screen resolution size values (ETA: reverify this claim);
-- Bitmap layers can have transparency pens. It's entry = 0 for color modes 16, 256, 2048 and 
-  MSB = 0 in RGB based structures (32,768 and 16.7M)
+- Bitmap layers can have transparency pens. It's entry = 0 for color modes 16, 256, 2048
+  and MSB = 0 in RGB based structures (32,768 and 16.7M)
   cfr. elandore gameplay HP bars, mausuke gameplay foreground, shanhigw pseudo-sprites (actually tilemap layers);
 
 **************************************************************************************************/
@@ -152,7 +155,7 @@ static const gfx_layout tiles16x16x8_layout =
 	64*16   /* really 128*16, but granularity is 32 bytes */
 };
 
-static GFXDECODE_START( gfx_stv )
+static GFXDECODE_START( gfx_vdp2 )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x4_layout,   0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x4_layout, 0x00, (0x80*(2+1))  )
 	GFXDECODE_ENTRY( nullptr, 0, tiles8x8x8_layout,   0x00, (0x08*(2+1))  )
@@ -162,10 +165,11 @@ GFXDECODE_END
 saturn_vdp2_device::saturn_vdp2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SATURN_VDP2, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, device_gfx_interface(mconfig, *this, gfx_stv, "^palette")
+//	, device_gfx_interface(mconfig, *this, gfx_stv, "^palette")
 //	, device_palette_interface(mconfig, *this)
 	, m_vdp1(*this, finder_base::DUMMY_TAG)
 	, m_palette(*this, "^palette")
+	, m_gfxdecode(*this, "^gfxdecode")
 {
 }
 
@@ -181,10 +185,15 @@ void saturn_vdp2_device::device_add_mconfig(machine_config &config)
 {
 	// standard palette + extra memory for Color Offset
 	PALETTE(config, m_palette).set_entries( 2048 + (2048 * 2));
+	
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_vdp2);
 }
 
 void saturn_vdp2_device::device_start()
 {
+	if (!m_gfxdecode->started())
+		throw device_missing_dependencies();
+	
 	int i;
 	screen().register_screen_bitmap(m_tmpbitmap);
 
@@ -197,8 +206,8 @@ void saturn_vdp2_device::device_start()
 	m_vdp2_cram = make_unique_clear<uint32_t[]>( 0x080000/4 );
 	gfx_decode_buffer = std::make_unique<uint8_t[]>( 0x100000 );
 
-//  gfx(0)->granularity()=4;
-//  gfx(1)->granularity()=4;
+//  m_gfxdecode->gfx(0)->granularity()=4;
+//  m_gfxdecode->gfx(1)->granularity()=4;
 
 	memset( &stv_rbg_cache_data, 0, sizeof(stv_rbg_cache_data));
 	stv_rbg_cache_data.is_cache_dirty = 3;
@@ -210,10 +219,10 @@ void saturn_vdp2_device::device_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(saturn_vdp2_device::stv_vdp2_state_save_postload), this));
 
 	m_vdpdebug_roz = 0;
-	gfx(0)->set_source(gfx_decode_buffer.get());
-	gfx(1)->set_source(gfx_decode_buffer.get());
-	gfx(2)->set_source(gfx_decode_buffer.get());
-	gfx(3)->set_source(gfx_decode_buffer.get());
+	m_gfxdecode->gfx(0)->set_source(gfx_decode_buffer.get());
+	m_gfxdecode->gfx(1)->set_source(gfx_decode_buffer.get());
+	m_gfxdecode->gfx(2)->set_source(gfx_decode_buffer.get());
+	m_gfxdecode->gfx(3)->set_source(gfx_decode_buffer.get());
 
 	/* calc V counter offsets */
 	/* 224 mode */
@@ -245,14 +254,17 @@ void saturn_vdp2_device::device_reset()
 {
 	old_crmd = -1;
 	old_tvmd = -1;
+	// TODO: VDP2 is really in undefined state at startup
+	// we currently use this for convenience
 	vram_clear();
 }
 
 void saturn_vdp2_device::vram_clear()
 {
-	memset(m_vdp2_regs.get(),0x00,0x040000);
-	memset(m_vdp2_vram.get(),0x00,0x100000);
-	memset(m_vdp2_cram.get(),0x00,0x080000);
+	// TODO: verify actual register state
+	memset(m_vdp2_regs.get(), 0x00, 0x040000);
+	memset(m_vdp2_vram.get(), 0x00, 0x100000);
+	memset(m_vdp2_cram.get(), 0x00, 0x080000);
 }
 
 void saturn_vdp2_device::stv_vdp2_exit ( void )
@@ -4158,10 +4170,10 @@ void saturn_vdp2_device::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const
 					else
 					{
 						/* normal */
-						stv_vdp2_drawgfxzoom(bitmap,cliprect,gfx(gfx_num),tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfxzoom(bitmap,cliprect,gfx(gfx_num),tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex) >> 16,drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfxzoom(bitmap,cliprect,gfx(gfx_num),tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16,(drawypos+tilesizey) >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfxzoom(bitmap,cliprect,gfx(gfx_num),tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex)>> 16,(drawypos+tilesizey) >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfxzoom(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfxzoom(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex) >> 16,drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfxzoom(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos >> 16,(drawypos+tilesizey) >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X, SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfxzoom(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,(drawxpos+tilesizex)>> 16,(drawypos+tilesizey) >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X1(tilesizex), SCR_TILESIZE_Y1(tilesizey),stv2_current_tilemap.alpha);
 					}
 				}
 				else
@@ -4173,7 +4185,7 @@ void saturn_vdp2_device::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const
 						stv_vdp2_drawgfxzoom_rgb555(bitmap,cliprect,tilecode,pal,flipyx&1,flipyx&2, drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X,SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
 					}
 					else
-						stv_vdp2_drawgfxzoom(bitmap,cliprect,gfx(gfx_num),tilecode,pal,flipyx&1,flipyx&2, drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X,SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfxzoom(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode,pal,flipyx&1,flipyx&2, drawxpos >> 16, drawypos >> 16,stv2_current_tilemap.transparency,scalex,scaley,SCR_TILESIZE_X,SCR_TILESIZE_Y,stv2_current_tilemap.alpha);
 				}
 			}
 			else
@@ -4202,18 +4214,18 @@ void saturn_vdp2_device::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const
 					else if (stv2_current_tilemap.transparency & STV_TRANSPARENCY_ALPHA)
 					{
 						/* alpha */
-						stv_vdp2_drawgfx_alpha(bitmap,cliprect,gfx(gfx_num),tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfx_alpha(bitmap,cliprect,gfx(gfx_num),tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfx_alpha(bitmap,cliprect,gfx(gfx_num),tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
-						stv_vdp2_drawgfx_alpha(bitmap,cliprect,gfx(gfx_num),tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_alpha(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_alpha(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_alpha(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+						stv_vdp2_drawgfx_alpha(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
 					}
 					else
 					{
 						/* normal */
-						stv_vdp2_drawgfx_transpen(bitmap,cliprect,gfx(gfx_num),tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency);
-						stv_vdp2_drawgfx_transpen(bitmap,cliprect,gfx(gfx_num),tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency);
-						stv_vdp2_drawgfx_transpen(bitmap,cliprect,gfx(gfx_num),tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency);
-						stv_vdp2_drawgfx_transpen(bitmap,cliprect,gfx(gfx_num),tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency);
+						stv_vdp2_drawgfx_transpen(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(0+(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos, drawypos,stv2_current_tilemap.transparency);
+						stv_vdp2_drawgfx_transpen(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(1-(flipyx&1)+(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos,stv2_current_tilemap.transparency);
+						stv_vdp2_drawgfx_transpen(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(2+(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos,drawypos+8,stv2_current_tilemap.transparency);
+						stv_vdp2_drawgfx_transpen(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode+(3-(flipyx&1)-(flipyx&2))*tilecodespacing,pal,flipyx&1,flipyx&2,drawxpos+8,drawypos+8,stv2_current_tilemap.transparency);
 					}
 				}
 				else
@@ -4229,9 +4241,9 @@ void saturn_vdp2_device::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const
 					else
 					{
 						if (stv2_current_tilemap.transparency & STV_TRANSPARENCY_ALPHA)
-							stv_vdp2_drawgfx_alpha(bitmap,cliprect,gfx(gfx_num),tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
+							stv_vdp2_drawgfx_alpha(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,stv2_current_tilemap.transparency,stv2_current_tilemap.alpha);
 						else
-							stv_vdp2_drawgfx_transpen(bitmap,cliprect,gfx(gfx_num),tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,stv2_current_tilemap.transparency);
+							stv_vdp2_drawgfx_transpen(bitmap,cliprect,m_gfxdecode->gfx(gfx_num),tilecode,pal,flipyx&1,flipyx&2, drawxpos, drawypos,stv2_current_tilemap.transparency);
 					}
 				}
 				drawxpos = olddrawxpos;
@@ -5909,16 +5921,16 @@ void saturn_vdp2_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 	gfxdata[offset*4+2] = (data & 0x0000ff00) >> 8;
 	gfxdata[offset*4+3] = (data & 0x000000ff) >> 0;
 
-	gfx(0)->mark_dirty(offset/8);
-	gfx(1)->mark_dirty(offset/8);
-	gfx(2)->mark_dirty(offset/8);
-	gfx(3)->mark_dirty(offset/8);
+	m_gfxdecode->gfx(0)->mark_dirty(offset/8);
+	m_gfxdecode->gfx(1)->mark_dirty(offset/8);
+	m_gfxdecode->gfx(2)->mark_dirty(offset/8);
+	m_gfxdecode->gfx(3)->mark_dirty(offset/8);
 
 	/* 8-bit tiles overlap, so this affects the previous one as well */
 	if (offset/8 != 0)
 	{
-		gfx(2)->mark_dirty(offset/8 - 1);
-		gfx(3)->mark_dirty(offset/8 - 1);
+		m_gfxdecode->gfx(2)->mark_dirty(offset/8 - 1);
+		m_gfxdecode->gfx(3)->mark_dirty(offset/8 - 1);
 	}
 
 	if ( stv_rbg_cache_data.watch_vdp2_vram_writes )
@@ -6359,16 +6371,16 @@ void saturn_vdp2_device::stv_vdp2_state_save_postload( void )
 		gfxdata[offset*4+2] = (data & 0x0000ff00) >> 8;
 		gfxdata[offset*4+3] = (data & 0x000000ff) >> 0;
 
-		gfx(0)->mark_dirty(offset/8);
-		gfx(1)->mark_dirty(offset/8);
-		gfx(2)->mark_dirty(offset/8);
-		gfx(3)->mark_dirty(offset/8);
+		m_gfxdecode->gfx(0)->mark_dirty(offset/8);
+		m_gfxdecode->gfx(1)->mark_dirty(offset/8);
+		m_gfxdecode->gfx(2)->mark_dirty(offset/8);
+		m_gfxdecode->gfx(3)->mark_dirty(offset/8);
 
 		/* 8-bit tiles overlap, so this affects the previous one as well */
 		if (offset/8 != 0)
 		{
-			gfx(2)->mark_dirty(offset/8 - 1);
-			gfx(3)->mark_dirty(offset/8 - 1);
+			m_gfxdecode->gfx(2)->mark_dirty(offset/8 - 1);
+			m_gfxdecode->gfx(3)->mark_dirty(offset/8 - 1);
 		}
 
 	}

@@ -20,8 +20,7 @@ Sega Saturn / ST-V - VDP2
 //**************************************************************************
 
 class saturn_vdp2_device : public device_t, 
-						   public device_video_interface,
-						   public device_gfx_interface
+						   public device_video_interface
 {
 public:
 	// construction/destruction
@@ -56,6 +55,7 @@ protected:
 private:
 	required_device <saturn_vdp1_device> m_vdp1;
 	required_device <palette_device> m_palette;
+	required_device <gfxdecode_device> m_gfxdecode;
 	
 	/* VDP1 Framebuffer/mixing handling */
 	int      stv_sprite_priorities_used[8];
