@@ -21,16 +21,16 @@ public:
 protected:
 	struct LYNX_AUDIO {
 		struct {
-			//const inline bool reset_done()     { return BIT(control1, 6); }       // Reset timer done flag (not implemented)
-			const inline bool   integrate_mode() { return BIT(control1, 5); }       // Integrate mode
-			const inline bool   reload_en()      { return BIT(control1, 4); }       // Reload enable
-			const inline bool   count_en()       { return BIT(control1, 3); }       // Count enable
-			const inline u8     timer_clock()    { return BIT(control1, 0, 3); }    // Timer clock
-			const inline bool   linked()         { return timer_clock() == 0b111; } // Linked timer?
+			//bool reset_done()     const { return BIT(control1, 6); }       // Reset timer done flag (not implemented)
+			bool   integrate_mode() const { return BIT(control1, 5); }       // Integrate mode
+			bool   reload_en()      const { return BIT(control1, 4); }       // Reload enable
+			bool   count_en()       const { return BIT(control1, 3); }       // Count enable
+			u8     timer_clock()    const { return BIT(control1, 0, 3); }    // Timer clock
+			bool   linked()         const { return timer_clock() == 0b111; } // Linked timer?
 
-			//const inline bool last_clock()     { return BIT(control2, 2); }       // Last clock (not implemented)
-			//const inline bool borrow_in()      { return BIT(control2, 1); }       // Borrow in (not implemented)
-			//const inline bool borrow_out()     { return BIT(control2, 0); }       // Borrow out (not implemented)
+			//bool last_clock()     const { return BIT(control2, 2); }       // Last clock (not implemented)
+			//bool borrow_in()      const { return BIT(control2, 1); }       // Borrow in (not implemented)
+			//bool borrow_out()     const { return BIT(control2, 0); }       // Borrow out (not implemented)
 
 			s8 volume = 0;
 			u8 feedback = 0;

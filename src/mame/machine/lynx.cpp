@@ -88,7 +88,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 				dram_byte_w(screen, color << 4, 0xf0);
 				m_blitter.memory_accesses++;
 
-				if (m_blitter.sprite_collide && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE())
 				{
 					back = BIT(dram_byte_r(colbuf), 4, 4);
 					if (back > m_blitter.fred)
@@ -102,7 +102,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 			{
 				dram_byte_w(screen, color, 0x0f);
 
-				if (m_blitter.sprite_collide && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE())
 				{
 					back = BIT(dram_byte_r(colbuf), 0, 4);
 					if (back > m_blitter.fred)
@@ -124,7 +124,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 					dram_byte_w(screen, color << 4, 0xf0);
 					m_blitter.memory_accesses++;
 				}
-				if (m_blitter.sprite_collide && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE())
 				{
 					back = BIT(dram_byte_r(colbuf), 4, 4);
 					if (back > m_blitter.fred)
@@ -140,7 +140,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 				{
 					dram_byte_w(screen, color, 0x0f);
 				}
-				if (m_blitter.sprite_collide && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE())
 				{
 					back = BIT(dram_byte_r(colbuf), 0, 4);
 					if (back > m_blitter.fred)
@@ -160,7 +160,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 				dram_byte_w(screen, color << 4, 0xf0);
 				m_blitter.memory_accesses++;
 
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					back = BIT(dram_byte_r(colbuf), 4, 4);
 					if (back > m_blitter.fred)
@@ -174,7 +174,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 			{
 				dram_byte_w(screen, color, 0x0f);
 
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					back = BIT(dram_byte_r(colbuf), 0, 4);
 					if (back > m_blitter.fred)
@@ -197,7 +197,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 					dram_byte_w(screen, color << 4, 0xf0);
 					m_blitter.memory_accesses++;
 				}
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					back = BIT(dram_byte_r(colbuf), 4, 4);
 					if (back > m_blitter.fred)
@@ -213,7 +213,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 				{
 					dram_byte_w(screen, color, 0x0f);
 				}
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					back = BIT(dram_byte_r(colbuf), 0, 4);
 					if (back > m_blitter.fred)
@@ -234,7 +234,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 				dram_byte_w(screen, color << 4, 0xf0);
 				m_blitter.memory_accesses++;
 
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					dram_byte_w(colbuf, m_blitter.spritenr << 4, 0xf0);
 					m_blitter.memory_accesses++;
@@ -245,7 +245,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 			{
 				dram_byte_w(screen, color, 0x0f);
 
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					dram_byte_w(colbuf, m_blitter.spritenr, 0x0f);
 				}
@@ -294,7 +294,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 			{
 				dram_byte_w(screen, dram_byte_r(screen) ^ (color << 4), 0xf0);
 				m_blitter.memory_accesses += 2;
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					back = BIT(dram_byte_r(colbuf), 4, 4);
 					if (back > m_blitter.fred)
@@ -307,7 +307,7 @@ inline void lynx_state::plot_pixel(const s16 x, const s16 y, const u8 color)
 			else                    /* Lower nibble */
 			{
 				dram_byte_w(screen, dram_byte_r(screen) ^ color, 0x0f);
-				if (m_blitter.sprite_collide && (color != 0x0e) && !(m_blitter.no_collide))
+				if (m_blitter.SPRITE_COLLIDE() && (color != 0x0e))
 				{
 					back = BIT(dram_byte_r(colbuf), 0, 4);
 					if (back > m_blitter.fred)
@@ -2105,13 +2105,12 @@ DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
 	}
 	else
 	{
-		size_t audin_offset = image.get_software_region_length("audin_offset");
-		if (audin_offset)
-			m_audin_offset = audin_offset;
+		// Some cartridge uses AUDIN pin for bankswitch
+		if (image.get_feature("audin_offset") != nullptr)
+			m_audin_offset = atol(image.get_feature("audin_offset"));
 
-		size_t granularity = image.get_software_region_length("granularity");
-		if (granularity)
-			m_granularity = granularity;
+		if (image.get_feature("granularity") != nullptr)
+			m_granularity = atol(image.get_feature("granularity"));
 		else
 		{
 			if (size > 0xffff) // 64,128,256,512k cartridges

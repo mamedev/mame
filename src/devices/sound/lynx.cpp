@@ -270,7 +270,7 @@ void lynx_sound_device::shift(int chan_nr)
 			out_temp = channel->reg.output - channel->reg.volume;
 
 		// clipping
-		channel->reg.output = std::clamp<s16>((s16)out_temp, -128, 127);
+		channel->reg.output = std::clamp<s16>(out_temp, -128, 127);
 	}
 
 	switch (chan_nr)
@@ -329,9 +329,8 @@ void lynx_sound_device::execute(int chan_nr)
 		}
 
 		if (!(channel->reg.integrate_mode())) // normal mode
-		{
 			channel->reg.output = BIT(channel->shifter, 0) ? channel->reg.volume : -channel->reg.volume;
-		}
+
 	}
 	else
 	{
@@ -481,7 +480,6 @@ void lynx_sound_device::write(offs_t offset, u8 data)
 
 void lynx_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	int v;
 	auto &buffer = outputs[0];
 
 	for (int i = 0; i < buffer.samples(); i++)
@@ -490,8 +488,7 @@ void lynx_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 		for (int channel = 0; channel < LYNX_AUDIO_CHANNELS; channel++)
 		{
 			execute(channel);
-			v = m_audio[channel].reg.output;
-			result += v * 15; // where does the *15 come from?
+			result += m_audio[channel].reg.output * 15; // where does the *15 come from?
 		}
 		buffer.put_int(i, result, 32768);
 	}
@@ -503,9 +500,8 @@ void lynx_sound_device::sound_stream_update(sound_stream &stream, std::vector<re
 
 void lynx2_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
-	auto &left=outputs[0];
-	auto &right=outputs[1];
-	int v;
+	auto &left = outputs[0];
+	auto &right = outputs[1];
 
 	for (int i = 0; i < left.samples(); i++)
 	{
@@ -514,7 +510,7 @@ void lynx2_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 		for (int channel = 0; channel < LYNX_AUDIO_CHANNELS; channel++)
 		{
 			execute(channel);
-			v = m_audio[channel].reg.output;
+			int v = m_audio[channel].reg.output;
 			if (!(m_master_enable & (0x10 << channel)))
 			{
 				if (m_attenuation_enable & (0x10 << channel))

@@ -56,26 +56,26 @@ private:
 	struct BLITTER
 	{
 		// 0xfc80 SPRCTL0 Sprite control bits 0
-		const inline u8     BPP()            { return BIT(spr_ctl0, 6, 2); } // Bit per pixel - 1
-		const inline bool   HFLIP()          { return BIT(spr_ctl0, 5); }    // Horizontal flip
-		const inline bool   VFLIP()          { return BIT(spr_ctl0, 4); }    // Vertical flip
-		const inline u8     SPRITE_TYPE()    { return BIT(spr_ctl0, 0, 3); } // Sprite type
+		u8     BPP()            const { return BIT(spr_ctl0, 6, 2); } // Bit per pixel - 1
+		bool   HFLIP()          const { return BIT(spr_ctl0, 5); }    // Horizontal flip
+		bool   VFLIP()          const { return BIT(spr_ctl0, 4); }    // Vertical flip
+		u8     SPRITE_TYPE()    const { return BIT(spr_ctl0, 0, 3); } // Sprite type
 
 		// 0xfc81 SPRCTL1 Sprite control bits 1
-		const inline bool   RLE()            { return BIT(spr_ctl1, 7); }    // Normal(1) or RLE(0) sprite
-		//const inline bool ALGO3()          { return BIT(spr_ctl1, 6); }    // Size algorithm, Adder(0, Algo4), Shifter(1, algo3) (not implemented)
-		const inline u8     RELOAD_SCALE()   { return BIT(spr_ctl1, 4, 2); } // Reload scale factors
-		const inline bool   REUSE_PALETTE()  { return BIT(spr_ctl1, 3); }    // Reload(0) or Reuse(1) palette
-		const inline bool   SKIP_SPRITE()    { return BIT(spr_ctl1, 2); }    // Skip this sprite
-		const inline u8     DRAW_ORIGIN()    { return BIT(spr_ctl1, 0, 2); } // Start draw origin
-		//const inline bool DRAW_UP()        { return BIT(spr_ctl1, 1); }    // Start drawing up(1) or down(0)
-		//const inline bool DRAW_LEFT()      { return BIT(spr_ctl1, 0); }    // Start drawing left(1) or right(0)
+		bool   RLE()            const { return BIT(spr_ctl1, 7); }    // Normal(1) or RLE(0) sprite
+		//bool ALGO3()          const { return BIT(spr_ctl1, 6); }    // Size algorithm, Adder(0, Algo4), Shifter(1, algo3) (not implemented)
+		u8     RELOAD_SCALE()   const { return BIT(spr_ctl1, 4, 2); } // Reload scale factors
+		bool   REUSE_PALETTE()  const { return BIT(spr_ctl1, 3); }    // Reload(0) or Reuse(1) palette
+		bool   SKIP_SPRITE()    const { return BIT(spr_ctl1, 2); }    // Skip this sprite
+		u8     DRAW_ORIGIN()    const { return BIT(spr_ctl1, 0, 2); } // Start draw origin
+		//bool DRAW_UP()        const { return BIT(spr_ctl1, 1); }    // Start drawing up(1) or down(0)
+		//bool DRAW_LEFT()      const { return BIT(spr_ctl1, 0); }    // Start drawing left(1) or right(0)
 
 		// 0xfc82 SPRCOLL Sprite collision number
-		const inline bool   SPRITE_COLLEN()  { return BIT(spr_coll, 5); }    // Sprite collide(0) or Don't collide(1) flag
-		const inline u8     SPRITE_COLNUM()  { return BIT(spr_coll, 0, 4); } // Sprite collision number
+		bool   SPRITE_COLLEN()  const { return BIT(spr_coll, 5); }    // Sprite collide(0) or Don't collide(1) flag
+		u8     SPRITE_COLNUM()  const { return BIT(spr_coll, 0, 4); } // Sprite collision number
 
-		const inline bool   SPRITE_COLLIDE() { return sprite_collide && (!(no_collide)); } // collision enabled?
+		bool   SPRITE_COLLIDE() const { return sprite_collide && (!(no_collide)); } // collision enabled?
 
 		// global
 		u16 screen = 0;
@@ -123,13 +123,13 @@ private:
 	struct UART
 	{
 		// 0xfd8c SERCTL Serial control register (Write)
-		const inline bool   TXINTEN()  { return BIT(serctl, 7); } // Transmit interrupt enable
-		const inline bool   RXINTEN()  { return BIT(serctl, 6); } // Receive interrupt enable
-		//const inline bool PAREN()    { return BIT(serctl, 4); } // Xmit parity bit enable (not implemented)
-		//const inline bool RESETERR() { return BIT(serctl, 3); } // Reset all errors (not implemented)
-		//const inline bool TXOPEN()   { return BIT(serctl, 2); } // Open collector driver(1) or TTL driver(0) (not implemented)
-		//const inline bool TXBRK()    { return BIT(serctl, 1); } // Send a break (not implemented)
-		//const inline bool PAREVEN()  { return BIT(serctl, 0); } // Send/Recevie even parity (not implemented)
+		bool   TXINTEN()  const { return BIT(serctl, 7); } // Transmit interrupt enable
+		bool   RXINTEN()  const { return BIT(serctl, 6); } // Receive interrupt enable
+		//bool PAREN()    const { return BIT(serctl, 4); } // Xmit parity bit enable (not implemented)
+		//bool RESETERR() const { return BIT(serctl, 3); } // Reset all errors (not implemented)
+		//bool TXOPEN()   const { return BIT(serctl, 2); } // Open collector driver(1) or TTL driver(0) (not implemented)
+		//bool TXBRK()    const { return BIT(serctl, 1); } // Send a break (not implemented)
+		//bool PAREVEN()  const { return BIT(serctl, 0); } // Send/Recevie even parity (not implemented)
 
 		u8 serctl = 0;
 		u8 data_received = 0;
@@ -143,8 +143,8 @@ private:
 	struct SUZY
 	{
 		// 0xfc91 SPRGO Sprite process start bit
-		const inline bool EVER_ON()   { return BIT(data[0x91], 2); } // Everon detector enable
-		const inline bool SPRITE_GO() { return BIT(data[0x91], 0); } // Sprite process enable
+		bool EVER_ON()   const { return BIT(data[0x91], 2); } // Everon detector enable
+		bool SPRITE_GO() const { return BIT(data[0x91], 0); } // Sprite process enable
 
 		u8 data[0x100] = {0};
 		bool signed_math = false;
@@ -155,16 +155,16 @@ private:
 	struct MIKEY
 	{
 		// 0xfd8a IODIR
-		const inline u8 IODIR() { return data[0x8a]; } // Parallel I/O direction
+		u8 IODIR() const { return data[0x8a]; } // Parallel I/O direction
 
 		// 0xfd8b IODAT
-		const inline u8 IODAT() { return data[0x8b]; } // Parallel I/O data
+		u8 IODAT() const { return data[0x8b]; } // Parallel I/O data
 
 		// 0xfd92 DISPCTL Video bus request enable
-		//const inline bool COLOR()       { return BIT(data[0x92], 3); } // Color(1) or Monochrome(0) display (not implemented)
-		//const inline bool FOURBIT()     { return BIT(data[0x92], 2); } // 4bpp(1) or 2bpp(0) color (not implemented)
-		const inline bool   FLIP_SCREEN() { return BIT(data[0x92], 1); } // Flipped screen
-		//const inline bool VIDEO_DMA()   { return BIT(data[0x92], 0); } // Video DMA enabled (not implemented)
+		//bool COLOR()       const { return BIT(data[0x92], 3); } // Color(1) or Monochrome(0) display (not implemented)
+		//bool FOURBIT()     const { return BIT(data[0x92], 2); } // 4bpp(1) or 2bpp(0) color (not implemented)
+		bool   FLIP_SCREEN() const { return BIT(data[0x92], 1); } // Flipped screen
+		//bool VIDEO_DMA()   const { return BIT(data[0x92], 0); } // Video DMA enabled (not implemented)
 
 		u8 data[0x100] = {0};
 		u16 disp_addr = 0;
@@ -174,20 +174,20 @@ private:
 
 	struct LYNX_TIMER
 	{
-		const inline bool   int_en()      { return BIT(cntrl1, 7); }         // Interrupt enable
-		//const inline bool reset_done()  { return BIT(cntrl1, 6); }         // Reset timer done flag
-		const inline bool   reload_en()   { return BIT(cntrl1, 4); }         // Reload enable
-		const inline bool   count_en()    { return BIT(cntrl1, 3); }         // Count enable
-		const inline u8     timer_clock() { return BIT(cntrl1, 0, 3); }      // Timer clock
-		const inline bool   linked()      { return timer_clock() == 0b111; } // Linked timer?
+		bool   int_en()      const { return BIT(cntrl1, 7); }         // Interrupt enable
+		//bool reset_done()  const { return BIT(cntrl1, 6); }         // Reset timer done flag
+		bool   reload_en()   const { return BIT(cntrl1, 4); }         // Reload enable
+		bool   count_en()    const { return BIT(cntrl1, 3); }         // Count enable
+		u8     timer_clock() const { return BIT(cntrl1, 0, 3); }      // Timer clock
+		bool   linked()      const { return timer_clock() == 0b111; } // Linked timer?
 
-		const inline bool   timer_done()  { return BIT(cntrl2, 3); }         // Timer done flag
-		//const inline bool last_clock()  { return BIT(cntrl2, 2); }         // Last clock (not implemented)
-		//const inline bool borrow_in()   { return BIT(cntrl2, 1); }         // Borrow in (not implemented)
-		const inline bool   borrow_out()  { return BIT(cntrl2, 0); }         // Borrow out
+		bool   timer_done()  const { return BIT(cntrl2, 3); }         // Timer done flag
+		//bool last_clock()  const { return BIT(cntrl2, 2); }         // Last clock (not implemented)
+		//bool borrow_in()   const { return BIT(cntrl2, 1); }         // Borrow in (not implemented)
+		bool   borrow_out()  const { return BIT(cntrl2, 0); }         // Borrow out
 
 		// set timer done flag
-		inline void set_timer_done(bool set)
+		void set_timer_done(bool set)
 		{
 			if (set) // set
 				cntrl2 |= 8;
@@ -196,7 +196,7 @@ private:
 		}
 
 		// set borrow out flag
-		inline void set_borrow_out(bool set)
+		void set_borrow_out(bool set)
 		{
 			if (set) // set
 				cntrl2 |= 1;
