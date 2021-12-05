@@ -2375,6 +2375,9 @@ ROM_START( sfrush )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "315_sf_rush.u96", 0x0000, 0x1000, CRC(e3527a3a) SHA1(5e556e6dfd87df5a895bdf4bd7f77708ac327db7) )
 ROM_END
 
 
@@ -2395,6 +2398,9 @@ ROM_START( sfrusha )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version L1.06
 	DISK_IMAGE( "sfrush", 0, SHA1(e2db0270a707fb2115207f988d5751081d6b4994) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "315_sf_rush.u96", 0x0000, 0x1000, CRC(e3527a3a) SHA1(5e556e6dfd87df5a895bdf4bd7f77708ac327db7) )
 ROM_END
 
 
@@ -2415,6 +2421,9 @@ ROM_START( sfrushrk )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "331_rush_the_rock.u96", 0x0000, 0x1000, CRC(425155b6) SHA1(4ec5471d8ede6154322e9dc6de372b8f4686e11b) )
 ROM_END
 
 
@@ -2435,6 +2444,9 @@ ROM_START( sfrushrkw )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "331_rush_the_rock.u96", 0x0000, 0x1000, CRC(425155b6) SHA1(4ec5471d8ede6154322e9dc6de372b8f4686e11b) )
 ROM_END
 
 
@@ -2455,6 +2467,9 @@ ROM_START( sfrushrkwo )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Hard Drive Version 1.2
 	DISK_IMAGE( "sfrushrk", 0, SHA1(e763f26aca67ebc17fe8b8df4fba91d492cf7837) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "331_rush_the_rock.u96", 0x0000, 0x1000, CRC(425155b6) SHA1(4ec5471d8ede6154322e9dc6de372b8f4686e11b) )
 ROM_END
 
 
