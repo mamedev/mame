@@ -2313,7 +2313,10 @@ bool ioport_manager::load_controller_config(
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 			{
 				if (input_seq_good(machine(), newseq[seqtype].first))
+				{
+					field.live().seq[seqtype] = newseq[seqtype].first;
 					field.set_defseq(seqtype, newseq[seqtype].first);
+				}
 			}
 
 			// fetch configurable attributes
