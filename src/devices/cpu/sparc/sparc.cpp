@@ -2460,6 +2460,7 @@ inline void sparc_base_device::execute_ldd(uint32_t op)
 		m_mem_address_not_aligned = 1;
 		m_stashed_icount = m_icount;
 		m_icount = 0;
+		return;
 	}
 
 	const uint32_t data = read_word(m_data_space, address);
@@ -3296,7 +3297,6 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 		{
 			address = RS1REG + RS2REG;
 			addr_space = ASI;
-			return;
 		}
 	}
 
@@ -4643,8 +4643,8 @@ inline void sparc_base_device::execute_step()
 				if (m_fp_exception_pending)
 				{
 					m_fp_exception_pending = false;
-					m_fp_exception = 1;
 					m_trap = 1;
+					m_fp_exception = 1;
 					m_stashed_icount = m_icount;
 					m_icount = 0;
 					return;
