@@ -5153,9 +5153,6 @@ void apple2e_state::apple2e(machine_config &config)
 	/* built-in language card emulation */
 	ADDRESS_MAP_BANK(config, A2_LCBANK_TAG).set_map(&apple2e_state::lcbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
-	/* /INH banking */
-	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2e_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
 	/* keyboard controller */
 	ay3600_device &kbdc(AY3600(config, "ay3600", 0));
 	kbdc.x0().set_ioport("X0");
