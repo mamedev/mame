@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-11-19 02:50+1100\n"
-"PO-Revision-Date: 2021-12-04 17:55+0100\n"
+"PO-Revision-Date: 2021-12-06 13:24+0100\n"
 "Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sk\n"
@@ -7294,7 +7294,7 @@ msgstr ""
 #: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr "Vstupné makrá"
+msgstr "Vstupové makrá"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
@@ -7305,7 +7305,7 @@ msgstr "Nové makro"
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr "Nové makro %d"
+msgstr "Nové makro #%d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
@@ -7331,12 +7331,12 @@ msgstr "Aktivačná sekvencia"
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr "Zastaviť ihneď"
+msgstr "Makro ihneď ukončiť"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr "Skompletizovať makro"
+msgstr "Nechať makro dobehnúť"
 
 #: plugins/inputmacro/inputmacro_menu.lua:363
 msgctxt "plugin-inputmacro"
@@ -7346,45 +7346,45 @@ msgstr "Pri uvoľnení"
 #: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr "Uvoľnenie"
+msgstr "Makro vykonať iba raz"
 
 #: plugins/inputmacro/inputmacro_menu.lua:372
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "Opakovať od kroku %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:377
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "Opakovať iba krok %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:379
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "Ak je aktiv. sekvencia stále stlačená"
 
 #: plugins/inputmacro/inputmacro_menu.lua:383
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "Krok %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:384
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr "Oneskorenie (framov)"
+msgstr "Oneskorenie (počet framov)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr "Trvanie (framov)"
+msgstr "Trvanie (počet framov)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:398
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "---"
 
 #: plugins/inputmacro/inputmacro_menu.lua:402
 #, lua-format
@@ -7405,12 +7405,12 @@ msgstr "Vymazať krok"
 #: plugins/inputmacro/inputmacro_menu.lua:428
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr "Pridať krok na pozícii"
+msgstr "Pridať krok na pozíciu"
 
 #: plugins/inputmacro/inputmacro_menu.lua:474
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr "Pridať vstupné makro"
+msgstr "Pridať vstupové makro"
 
 #: plugins/inputmacro/inputmacro_menu.lua:481
 msgctxt "plugin-inputmacro"
@@ -7425,7 +7425,7 @@ msgstr "Storno"
 #: plugins/inputmacro/inputmacro_menu.lua:499
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr "Zmeniť vstupné makro"
+msgstr "Zmeniť vstupové makro"
 
 #: plugins/inputmacro/inputmacro_menu.lua:505
 msgctxt "plugin-inputmacro"

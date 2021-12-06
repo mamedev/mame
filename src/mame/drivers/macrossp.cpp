@@ -3,7 +3,7 @@
 /*** DRIVER INFO **************************************************************
 
 Macross Plus                        (c)1996 Banpresto
-Quiz Bisyoujo Senshi Sailor Moon    (c)1997 Banpresto
+Quiz Bishoujo Senshi Sailor Moon    (c)1997 Banpresto
 
 Driver by David Haywood
 
@@ -143,7 +143,7 @@ BP964A.U49  27C010
 
 --- ROMSET: quizmoon ---
 
-Quiz Bisyoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un -
+Quiz Bishoujo Senshi Sailor Moon - Chiryoku Tairyoku Toki no Un -
 (c)1997 Banpresto / Gazelle
 BP965A
 
