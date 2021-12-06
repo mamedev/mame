@@ -1841,6 +1841,12 @@ void sparc_base_device::execute_rett(uint32_t op)
 	}
 
 	update_gpr_pointers();
+
+	if (m_et && (m_bp_irl == 15 || m_bp_irl > m_pil) && m_interrupt_level == 0)
+	{
+		m_trap = 1;
+		m_interrupt_level = m_bp_irl;
+	}
 }
 
 
