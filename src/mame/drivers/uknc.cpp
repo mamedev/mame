@@ -25,13 +25,14 @@ Status: snapshot of work in progress.  needs real VM2 CPU core.
 #include "screen.h"
 
 
-#define UKNC_TOTAL_HORZ (800)
-#define UKNC_DISP_HORZ  (640)
-#define UKNC_HORZ_START (80)
+// video parameters
+static constexpr int UKNC_TOTAL_HORZ = 800;
+static constexpr int UKNC_DISP_HORZ = 640;
+static constexpr int UKNC_HORZ_START = 80;
 
-#define UKNC_TOTAL_VERT (312)
-#define UKNC_DISP_VERT  (288+18)
-#define UKNC_VERT_START (0)
+static constexpr int UKNC_TOTAL_VERT = 312;
+static constexpr int UKNC_DISP_VERT = 288 + 18;
+static constexpr int UKNC_VERT_START = 0;
 
 
 typedef struct
@@ -45,7 +46,7 @@ typedef struct
 	int cursor_color;
 	int cursor_octet;
 	int cursor_pixel;
-} scanline_t;
+} uknc_scanline;
 
 
 class uknc_state : public driver_device
@@ -71,7 +72,6 @@ public:
 private:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
@@ -125,7 +125,7 @@ private:
 		uint32_t palette;
 	} m_video;
 	std::unique_ptr<uint8_t[]> m_videoram;
-	std::unique_ptr<scanline_t[]> m_scanlines;
+	std::unique_ptr<uknc_scanline[]> m_scanlines;
 	bitmap_rgb32 m_tmpbmp;
 
 	void uknc_palette(palette_device &palette) const;
@@ -134,7 +134,7 @@ private:
 	void set_palette__rgb(uint32_t aux);
 	void set_palette_gray(uint32_t aux);
 	void update_displaylist();
-	void draw_scanline(uint32_t *p, scanline_t *scanline);
+	void draw_scanline(uint32_t *p, uknc_scanline *scanline);
 
 protected:
 	required_device<k1801vm2_device> m_maincpu;
@@ -292,6 +292,8 @@ void uknc_state::machine_start()
 {
 	// 3 bitplanes
 	m_videoram = std::make_unique<uint8_t[]>(32768 * 3);
+	m_scanlines = std::make_unique<uknc_scanline[]>(UKNC_DISP_VERT);
+	m_tmpbmp.allocate(UKNC_DISP_HORZ, UKNC_DISP_VERT);
 
 	membank("plane0bank4")->set_base(&m_videoram[0]);
 	membank("plane0bank5")->set_base(&m_videoram[020000]);
@@ -299,18 +301,12 @@ void uknc_state::machine_start()
 	membank("plane0bank7")->set_base(&m_videoram[060000]);
 }
 
-void uknc_state::video_start()
-{
-	m_scanlines = std::make_unique<scanline_t[]>(UKNC_DISP_VERT);
-
-	m_tmpbmp.allocate(UKNC_DISP_HORZ, UKNC_DISP_VERT);
-}
-
 void uknc_state::uknc_palette(palette_device &palette) const
 {
+	// for debugging only, will be overwritten by firmware
 	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(i, rgb_t(i << 5, i << 5, i << 5));
+		palette.set_pen_color(i, rgb_t(pal3bit(i), pal3bit(i), pal3bit(i)));
 	}
 }
 
@@ -702,7 +698,7 @@ void uknc_state::set_palette_gray(uint32_t aux)
 {
 	for (int i = 0; i < 8; i++)
 	{
-		m_palette->set_pen_color(i, rgb_t(i * 255 / 8, i * 255 / 8, i * 255 / 8));
+		m_palette->set_pen_color(i, rgb_t(pal3bit(i), pal3bit(i), pal3bit(i)));
 	}
 }
 
@@ -711,13 +707,13 @@ void uknc_state::set_palette_gray(uint32_t aux)
 
 void uknc_state::update_displaylist()
 {
-	int row, wide = 0;
+	int wide = 0;
 	uint16_t addr = 0270, nextaddr;
 	bool cursor = false, cursor_type = false;
 	int cursor_color = 0, cursor_octet = 0, cursor_pixel = 0;
-	scanline_t *scanline;
+	uknc_scanline *scanline;
 
-	for (row = 0; row < UKNC_DISP_VERT; row++)
+	for (int row = 0; row < UKNC_DISP_VERT; row++)
 	{
 		scanline = &m_scanlines[row];
 		scanline->addr = m_subcpu->space(AS_PROGRAM).read_word(addr);
@@ -783,11 +779,8 @@ void uknc_state::update_displaylist()
  * 19	-
  * 20-21	scaling
  */
-void uknc_state::draw_scanline(uint32_t *p, scanline_t *scanline)
+void uknc_state::draw_scanline(uint32_t *p, uknc_scanline *scanline)
 {
-	int i, start, wide = 0, pixel_x;
-	const pen_t *pen = m_palette->pens();
-
 	if (scanline->addr < 0100000)
 	{
 		// TODO fetch pixel data from main RAM
@@ -802,8 +795,6 @@ void uknc_state::draw_scanline(uint32_t *p, scanline_t *scanline)
 	{
 		m_video.control = scanline->aux;
 	}
-	wide = (m_video.control >> 20) & 3;
-	start = scanline->addr - 0100000;
 
 	if (scanline->color || scanline->control)
 	{
@@ -827,7 +818,11 @@ void uknc_state::draw_scanline(uint32_t *p, scanline_t *scanline)
 		}
 	}
 
-	for (i = 0; i < (80 >> wide); i++)
+	const pen_t *pen = m_palette->pens();
+	int wide = (m_video.control >> 20) & 3;
+	int start = scanline->addr - 0100000;
+
+	for (int i = 0; i < (80 >> wide); i++)
 	{
 		uint8_t bit_plane_0 = m_videoram[start + i];
 		uint8_t bit_plane_1 = m_videoram[start + i + 32768];
@@ -854,7 +849,7 @@ void uknc_state::draw_scanline(uint32_t *p, scanline_t *scanline)
 			}
 		}
 
-		for (pixel_x = 0; pixel_x < 8; pixel_x++)
+		for (int pixel_x = 0; pixel_x < 8; pixel_x++)
 		{
 			uint8_t pen_bit_0, pen_bit_1, pen_bit_2;
 			uint8_t pen_selected;
