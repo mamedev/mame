@@ -17,8 +17,6 @@
 //      - Extended-precision FPU support
 //      - Coprocessor support
 //      - Finish SPARClite peripherals
-//      - SPARClite m_wssr[0] should be 0x7ff40 at reset (32 wait cycles for CS0),
-//        but that is problematic for Saitek Renaissance + Sparc module
 //
 //================================================================
 
@@ -675,8 +673,10 @@ void mb86930_device::device_reset()
 	m_ssctrl = 0x08;
 	m_spmr = 0;
 	m_spmr_mask = ~0ULL;
-	std::fill_n(&m_wssr[0], 3, 0);
 	m_last_masked_addr = 0ULL;
+
+	std::fill_n(&m_wssr[0], 3, 0);
+	m_wssr[0] = 0x1ffd << 6;
 
 	m_arsr[0] = (9 << 23);
 	m_amr[0] = (0x1f << 1);
