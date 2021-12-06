@@ -23,7 +23,6 @@
 #include "imagedev/harddriv.h"
 #include "machine/6850acia.h"
 #include "machine/74259.h"
-#include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/output_latch.h"
 #include "machine/ram.h"
