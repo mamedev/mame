@@ -1414,14 +1414,14 @@ ROM_END
   Model  Title               Transliteration      Export version      Note
   ---------------------------------------------------------------------------------
   ИМ-02  Ну, погоди!         Nu, pogodi!          -                   -
-  ИМ-10  Хоккей              Khokkey              Ice Hockey          Export version manufactured by PO Proton
+  ИМ-10  Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
   ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
   ИМ-16  Охота               Okhota               Fowling             -
   ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
   ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
   ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
   ИМ-49  Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arifmetika, export version: Amusing Arithmetic) (not emulated in MAME)
+  ИМ-50  Космический полёт   Kosmicheskiy polyot  Space Flight        The Model ID is the same as Весёлая арифметика (Vesyolaya arithmetika, export version: Amusing Arithmetic) (not emulated in MAME)
   ИМ-51  Морская атака       Morskaya ataka       -                   -
   ИМ-53  Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
 
@@ -1437,7 +1437,7 @@ public:
 	void gnw_mmouse(machine_config &config);
 	void gnw_egg(machine_config &config);
 	void nupogodi(machine_config &config);
-	void khokkey(machine_config &config);
+	void ehockey(machine_config &config);
 	void rkosmosa(machine_config &config);
 	void okhota(machine_config &config);
 	void vfutbol(machine_config &config);
@@ -1498,7 +1498,7 @@ void gnw_mmouse_state::nupogodi(machine_config &config)
 	kb1013vk12_common(config, 1715, 1080); // R mask option ?
 }
 
-void gnw_mmouse_state::khokkey(machine_config &config)
+void gnw_mmouse_state::ehockey(machine_config &config)
 {
 	kb1013vk12_common(config, 1782, 1080); // R mask option ?
 }
@@ -1574,12 +1574,12 @@ ROM_START( nupogodi )
 	ROM_LOAD( "nupogodi.svg", 0, 156488, CRC(8ae6ec5d) SHA1(28cb05967837e52fc40f088361456e1dcd4ec09f) )
 ROM_END
 
-ROM_START( khokkey )
+ROM_START( ehockey )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-10.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
 	ROM_REGION( 94977, "screen", 0)
-	ROM_LOAD( "khokkey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
+	ROM_LOAD( "ehockey.svg", 0, 94977, CRC(98cf43b0) SHA1(4353505709612344cd3b597c3b4e9f6b441ddb66) )
 ROM_END
 
 ROM_START( rkosmosa )
@@ -9522,7 +9522,7 @@ ROM_END
 
 /***************************************************************************
 
-  Elektronika Автослалом (Avtoslalom, export version: Autoslalom) (model ИМ-23)
+  Elektronika Автослалом (Autoslalom) (model ИМ-23)
   * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
 
@@ -9531,19 +9531,19 @@ ROM_END
 
 ***************************************************************************/
 
-class avslalom_state : public hh_sm510_state
+class auslalom_state : public hh_sm510_state
 {
 public:
-	avslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
+	auslalom_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void avslalom(machine_config &config);
+	void auslalom(machine_config &config);
 };
 
 // config
 
-static INPUT_PORTS_START( avslalom )
+static INPUT_PORTS_START( auslalom )
 	PORT_START("IN.0") // R2
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -9563,19 +9563,19 @@ static INPUT_PORTS_START( avslalom )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
-void avslalom_state::avslalom(machine_config &config)
+void auslalom_state::auslalom(machine_config &config)
 {
 	kb1013vk12_common(config, 1732, 1080); // R mask option ?
 }
 
 // roms
 
-ROM_START( avslalom )
+ROM_START( auslalom )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-23.bin", 0x0000, 0x0740, CRC(3b6e726f) SHA1(eabd04722811d1cc6519db9386b14a535f5aa865) )
 
 	ROM_REGION( 117520, "screen", 0)
-	ROM_LOAD( "avslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
+	ROM_LOAD( "auslalom.svg", 0, 117520, CRC(2f90fd4c) SHA1(f0de58b1fe2f7c18fc219f9f9a94c227ca1245e4) )
 ROM_END
 
 
@@ -9701,7 +9701,7 @@ CONS( 1989, vespovar,     gnw_chef,    0, vespovar,     gnw_chef,     gnw_chef_s
 CONS( 1981, gnw_mmouse,   0,           0, gnw_mmouse,   gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Mickey Mouse (Wide Screen)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_egg,      gnw_mmouse,  0, gnw_egg,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "Nintendo", "Game & Watch: Egg", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1988, khokkey,      gnw_mmouse,  0, khokkey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Khokkey", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1988, ehockey,      gnw_mmouse,  0, ehockey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, rkosmosa,     gnw_mmouse,  0, rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, okhota,       gnw_mmouse,  0, okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, vfutbol,      gnw_mmouse,  0, vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -9844,5 +9844,5 @@ CONS( 1982, trspacmis,    0,           0, trspacmis,    trspacmis,    trspacmis_
 CONS( 1982, trspider,     trspacmis,   0, trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // misc
-CONS( 1990, avslalom,     0,           0, avslalom,     avslalom,     avslalom_state,     empty_init, "Elektronika", "Avtoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1990, auslalom,     0,           0, auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, nummunch,     0,           0, nummunch,     nummunch,     nummunch_state,     empty_init, "VTech", "Electronic Number Muncher", MACHINE_SUPPORTS_SAVE )
