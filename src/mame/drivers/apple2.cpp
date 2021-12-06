@@ -46,7 +46,6 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "imagedev/cassette.h"
 
 #include "machine/74259.h"
-#include "machine/bankdev.h"
 #include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -213,7 +212,6 @@ public:
 	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
 	void apple2_map(address_map &map);
-	void inhbank_map(address_map &map);
 
 private:
 	int m_speaker_state, m_cassette_state;
@@ -981,12 +979,6 @@ void apple2_state::apple2_map(address_map &map)
 	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
 }
 
-void apple2_state::inhbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(FUNC(apple2_state::inh_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
-}
-
 /***************************************************************************
     KEYBOARD
 ***************************************************************************/
@@ -1375,9 +1367,6 @@ void apple2_state::apple2_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
-
-	/* /INH banking */
-	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
