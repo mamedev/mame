@@ -476,22 +476,10 @@ public:
 	void apple2c_map(address_map &map);
 	void apple2c_memexp_map(address_map &map);
 	void base_map(address_map &map);
-	void c100bank_map(address_map &map);
-	void c300bank_map(address_map &map);
-	void c400bank_map(address_map &map);
-	void c800bank_map(address_map &map);
-	void inhbank_map(address_map &map);
 	void laser128_map(address_map &map);
 	void ace500_map(address_map &map);
 	void ace2200_map(address_map &map);
 	void lcbank_map(address_map &map);
-	void r0000bank_map(address_map &map);
-	void r0200bank_map(address_map &map);
-	void r0400bank_map(address_map &map);
-	void r0800bank_map(address_map &map);
-	void r2000bank_map(address_map &map);
-	void r4000bank_map(address_map &map);
-	void r4000bank_ace2200_map(address_map &map);
 	void spectred_keyb_map(address_map &map);
 	void init_laser128();
 	void init_128ex();
@@ -3750,12 +3738,6 @@ void apple2e_state::ace2200_map(address_map &map)
 
 	map(0xc090, 0xc097).w(FUNC(apple2e_state::laserprn_w));
 	map(0xc1c1, 0xc1c1).r(FUNC(apple2e_state::laserprn_busy_r));
-}
-
-void apple2e_state::inhbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).m(m_lcbank, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(FUNC(apple2e_state::inh_r), FUNC(apple2e_state::inh_w));
 }
 
 void apple2e_state::lcbank_map(address_map &map)
