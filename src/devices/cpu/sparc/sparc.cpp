@@ -2077,14 +2077,6 @@ bool sparcv7_device::execute_extra_group2(uint32_t op)
 {
 	switch (OP3)
 	{
-		case OP3_TADDCCTV:
-			execute_taddcc(op);
-			return true;
-
-		case OP3_TSUBCCTV:
-			execute_tsubcc(op);
-			return true;
-
 		default:
 			return false;
 	}
@@ -2147,6 +2139,12 @@ bool mb86930_device::execute_extra_group2(uint32_t op)
 		case OP3_SCAN:
 			execute_scan(op);
 			return true;
+
+		case OP3_UMUL:
+		case OP3_SMUL:
+		case OP3_UMULCC:
+		case OP3_SMULCC:
+			return sparcv8_device::execute_extra_group2(op);
 
 		default:
 			return false;
@@ -3123,7 +3121,6 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 		}
 	}
 
-	uint32_t data(0);
 	//while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
 	//{
 		// { wait for lock(s) to be lifted }
@@ -3134,7 +3131,7 @@ void sparc_base_device::execute_ldstub(uint32_t op)
 	m_pb_block_ldst_byte = 1;
 
 	static const uint32_t mask8[4] = { 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff };
-	data = read_word(addr_space, address, mask8[address & 3]);
+	uint32_t data = read_word(addr_space, address, mask8[address & 3]);
 
 	if (MAE)
 	{

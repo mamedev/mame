@@ -207,7 +207,6 @@
 #define OP3_SDIVCC  31
 #define OP3_TADDCC  32
 #define OP3_TSUBCC  33
-#define OP3_SCAN    34
 #define OP3_TADDCCTV    34
 #define OP3_TSUBCCTV    35
 #define OP3_MULSCC  36
@@ -218,6 +217,7 @@
 #define OP3_RDPSR   41
 #define OP3_RDWIM   42
 #define OP3_RDTBR   43
+#define OP3_SCAN    44
 #define OP3_WRASR   48
 #define OP3_WRPSR   49
 #define OP3_WRWIM   50
