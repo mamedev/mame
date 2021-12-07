@@ -82,15 +82,15 @@ Year   Game                PCB            NOTES
 	  the Maniac Square prototype, or the Last KM prototype.
 
 	  Big Karnak runs on a different board type and does fail
-	  if the CPU clock is set to 10Mhz rather than 12Mhz,
-	  but that could be unrelated.
+	  if the CPU clock is set to 10Mhz rather than 12Mhz, it
+	  also has additional checks which may still fail and
+	  need more extensive research to determine exactly what
+	  is being timed.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/gaelco.h"
-
-#include "includes/gaelcrpt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
@@ -144,7 +144,7 @@ void gaelco_state::irqack_w(uint16_t data)
 void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
+	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
 	vram_w(offset, data, mem_mask);
 }
 
@@ -152,23 +152,7 @@ void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_m
 void gaelco_state::encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
-	COMBINE_DATA(&m_screenram[offset]);
-}
-
-/*********** Thunder Hoop Encryption Related Code ******************/
-
-void gaelco_state::thoop_vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
-	vram_w(offset, data, mem_mask);
-}
-
-void gaelco_state::thoop_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
+	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
 	COMBINE_DATA(&m_screenram[offset]);
 }
 
@@ -247,8 +231,8 @@ void gaelco_state::squash_map(address_map &map)
 void gaelco_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram"); // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
 	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -792,6 +776,9 @@ void gaelco_state::squash(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
+	GAELCO_VRAM_ENCRYPTION(config, m_vramcrypt);
+	m_vramcrypt->set_params(0x0f, 0x4228);
+
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
@@ -829,6 +816,9 @@ void gaelco_state::thoop(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
+
+	GAELCO_VRAM_ENCRYPTION(config, m_vramcrypt);
+	m_vramcrypt->set_params(0x0e, 0x4228);
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted
