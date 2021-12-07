@@ -476,10 +476,11 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("action53",         NES_ACTION53);
 	device.option_add_internal("batmap_000",       NES_BATMAP_000);
 	device.option_add_internal("batmap_srrx",      NES_BATMAP_SRRX);
+	device.option_add_internal("8bitxmas",         NES_8BITXMAS);
 	device.option_add_internal("cufrom",           NES_CUFROM);
+	device.option_add_internal("dpcmcart",         NES_DPCMCART);
 	device.option_add_internal("unrom512",         NES_UNROM512);
 	device.option_add_internal("2a03pur",          NES_2A03PURITANS);
-	device.option_add_internal("dpcmcart",         NES_DPCMCART);
 	device.option_add_internal("farid_slrom8in1",  NES_FARID_SLROM);
 	device.option_add_internal("farid_unrom8in1",  NES_FARID_UNROM);
 // other unsupported...

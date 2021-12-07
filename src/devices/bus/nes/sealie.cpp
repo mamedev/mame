@@ -11,6 +11,7 @@
  * SEALIE RET-CUFROM [mapper 29]
  * SEALIE DPCMcart [mapper 409]
  * SEALIE UNROM 512 [mapper 30]
+ * SEALIE 8BIT XMAS [mapper 30]
 
  ***********************************************************************************************************/
 
@@ -32,6 +33,7 @@
 //  constructor
 //-------------------------------------------------
 
+DEFINE_DEVICE_TYPE(NES_8BITXMAS, nes_8bitxmas_device, "nes_8bitxmas", "NES Cart Sealie 8BIT XMAS PCB")
 DEFINE_DEVICE_TYPE(NES_CUFROM,   nes_cufrom_device,   "nes_cufrom",   "NES Cart Sealie RET-CUFROM PCB")
 DEFINE_DEVICE_TYPE(NES_DPCMCART, nes_dpcmcart_device, "nes_dpcmcart", "NES Cart Sealie DPCMcart PCB")
 DEFINE_DEVICE_TYPE(NES_UNROM512, nes_unrom512_device, "nes_unrom512", "NES Cart Sealie UNROM 512 PCB")
@@ -47,8 +49,18 @@ nes_dpcmcart_device::nes_dpcmcart_device(const machine_config &mconfig, const ch
 {
 }
 
+nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, type, tag, owner, clock)
+{
+}
+
 nes_unrom512_device::nes_unrom512_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_UNROM512, tag, owner, clock)
+	: nes_unrom512_device(mconfig, NES_UNROM512, tag, owner, clock)
+{
+}
+
+nes_8bitxmas_device::nes_8bitxmas_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_unrom512_device(mconfig, NES_8BITXMAS, tag, owner, clock), m_led(0)
 {
 }
 
@@ -76,6 +88,23 @@ void nes_unrom512_device::pcb_reset()
 	if (m_pcb_ctrl_mirror)
 		set_nt_mirroring(PPU_MIRROR_LOW);
 }
+
+void nes_8bitxmas_device::device_start()
+{
+	nes_unrom512_device::device_start();
+	save_item(NAME(m_led));
+
+	m_bus_conflict = false;
+}
+
+void nes_8bitxmas_device::pcb_reset()
+{
+	nes_unrom512_device::pcb_reset();
+
+	m_led = 0;
+	update_led();
+}
+
 
 
 /*-------------------------------------------------
@@ -158,4 +187,57 @@ void nes_unrom512_device::write_h(offs_t offset, u8 data)
 		set_nt_mirroring(BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	prg16_89ab(data & 0x1f);
 	chr8((data >> 5) & 0x03, CHRRAM);
+}
+
+/*-------------------------------------------------
+
+ Sealie 8BIT XMAS revD board
+
+ Games: 8-bit Xmas 2012-2016 and 2018-2021?
+
+ This board is a variant of UNROM512 with 16 LEDs
+ in 4 colors, blue, yellow, green, red, which are
+ controlled in pairs by each byte written to
+ 0x8000-0xbfff. Bits are [BYGR bygr] where bygr
+ control LEDs 1,2 and BYGR control LEDs 3,4. On
+ the 8BIT XMAS revD 2012 board LEDS are arranged:
+
+  _______________________________
+ | RED2                     GRN3 |
+ |                               |
+ | YEL2                     BLU3 |
+ |                               |
+ | BLU1                     YEL4 |
+ |                               |
+ | GRN1                     RED4 |
+ |                               |
+ | RED1                     GRN4 |
+ |                               |
+ | YEL1                     BLU4 |
+  --                           --
+    |   GRN2 BLU2 YEL3 RED3   |
+    |                         |
+
+ iNES: mapper 30
+
+ In MAME: Preliminary partial support.
+
+ -------------------------------------------------*/
+
+void nes_8bitxmas_device::update_led()
+{
+	// TODO: add artwork
+}
+
+void nes_8bitxmas_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("8bitxmas write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (BIT(offset, 14))
+		nes_unrom512_device::write_h(offset, data);
+	else if (m_led != data)
+	{
+		m_led = data;
+		update_led();
+	}
 }
