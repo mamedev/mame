@@ -7463,6 +7463,29 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="icehuntr">
+		<description>Ice Hunter</description>
+		<year>1983</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="297621">
+				<rom name="Ice_Hunter.tap" size="297621" crc="127cdd1f" sha1="5265bf2b8505712b5e85804041b91ee324396933"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikplus">
+		<description>IK+</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="745527">
+				<rom name="IK+.tap" size="745527" crc="2230ed88" sha1="ec2bc848563a77086a5a1f0e621c183f50ca8b73"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ikari">
 		<description>Ikari Warriors</description>
 		<year>1990</year>
@@ -7471,6 +7494,134 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="718171">
 				<rom name="Ikari_Warriors.tap" size="718171" crc="1361c92d" sha1="66d61881a95ce2db3c602d88c478112befabcea7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arcadegi">
+		<description>Imagine's Arcade Giants</description>
+		<year>1987</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: Arkanoid / Mag Max"/>
+			<dataarea name="cass" size="1365692">
+				<rom name="Imagine's_Arcade_Giants_Tape_1_Side_1.tap" size="1365692" crc="2fb74f13" sha1="96358fb670a8cf9cfc2430ae17c2b6a9e76e6316"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Galvan / Slap Fight"/>
+			<dataarea name="cass" size="1411313">
+				<rom name="Imagine's_Arcade_Giants_Tape_1_Side_2.tap" size="1411313" crc="06cdc5e7" sha1="8f1a75ba5fb4370451d40d88b550065a6300215e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Game Over Part 1 &amp; 2"/>
+			<dataarea name="cass" size="710931">
+				<rom name="Imagine's_Arcade_Giants_Tape_2_Side_1.tap" size="710931" crc="a1d86ee2" sha1="4337cc03d2cc1505b4704a958f2f0fe6e659cd32"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Terra Cresta"/>
+			<dataarea name="cass" size="704539">
+				<rom name="Imagine's_Arcade_Giants_Tape_2_Side_2.tap" size="704539" crc="ca77ff01" sha1="ddf2dd6871ec9ffa68978bc939ea90db68d08466"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impact">
+		<description>Impact</description>
+		<year>1987</year>
+		<publisher>Audiogenic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Game"/>
+			<dataarea name="cass" size="395546">
+				<rom name="Impact_Side_1_-_Game.tap" size="395546" crc="8bedd8e1" sha1="cc9764201680a94d87cff6bf3243c052ffa425e1"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Screen Designer"/>
+			<dataarea name="cass" size="203344">
+				<rom name="Impact_Side_2_-_Screen_Designer.tap" size="203344" crc="f3385f2d" sha1="a7dee30dac293ac56636d36e7d74a8038c856c66"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss">
+		<description>Impossible Mission</description>
+		<year>1984</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="530619">
+				<rom name="Impossible_Mission.tap" size="530619" crc="66b60c9c" sha1="e64791b085d2401ecb13d138054ca83c16af2de0"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="529489">
+				<rom name="Impossible_Mission_a1.tap" size="529489" crc="1f3da3c2" sha1="30192cd723c34e8855438b335f28ef511873ac63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmissc" cloneof="impmiss">
+		<description>Impossible Mission (CBS Software)</description>
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="577000">
+				<rom name="Impossible_Mission.tap" size="577000" crc="8f9e3db8" sha1="4713faf25aa878d929266978ace6d6debd6671d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impmiss2">
+		<description>Impossible Mission II</description>
+		<year>1988</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1331706">
+				<rom name="Impossible_Mission_II.tap" size="1331706" crc="73af9e2f" sha1="d8f40614db7fd5a754172070d37371a56f6d29cc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="indydoom">
+		<description>Indiana Jones and the Temple of Doom</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="428482">
+				<rom name="Indiana_Jones_and_the_Temple_of_Doom_Side_1.tap" size="428482" crc="78253ee4" sha1="e75d63e67000b331e0f84db9b3a213577d8aa338"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1627680">
+				<rom name="Indiana_Jones_and_the_Temple_of_Doom_Side_2.tap" size="1627680" crc="d38a4c9a" sha1="81ee5a8102eb6caaf41d5e39c789a529924e5018"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="infiltrt">
+		<description>Infiltrator</description>
+		<year>1986</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2238854">
+				<rom name="Infiltrator.tap" size="2238854" crc="4cbeb8bf" sha1="74e1b282a075e68b915f6aa0a0db78189b097a7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7827,6 +7978,52 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="inspectg">
+		<description>Inspector Gadget and the Circus of !!Fear!!</description>
+		<year>1987</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="407822">
+				<rom name="Inspector_Gadget_and_the_Circus_of_Fear.tap" size="407822" crc="aac8cf73" sha1="54b6ce3e80945361632545dc31dd11c485f96768"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ik">
+		<description>International Karate</description>
+		<year>1985</year>
+		<publisher>System 3</publisher>
+		<info name="alt_title" value="World Karate Championship"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="640706">
+				<rom name="International_Karate_Side_1.tap" size="640706" crc="cd0c5b09" sha1="8dd2899615d407c82f5f0c0cff8ac5ac28699acc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Different Backdrops"/>
+			<dataarea name="cass" size="640722">
+				<rom name="International_Karate_Side_2.tap" size="640722" crc="0d989c8b" sha1="7d85e25e58aea8083b1d354f56993619350b1397"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ikp" cloneof="ik">
+		<description>International Karate (Prism Leisure)</description>
+		<year>1987</year>
+		<publisher>Prism Leisure</publisher>
+		<info name="alt_title" value="World Karate Championship"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="551066">
+				<rom name="International_Karate.tap" size="551066" crc="4328aeff" sha1="47b29c42539374a4252d2d0c744e0adee9118206"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="intrugby">
 		<description>International Rugby Simulator</description>
 		<year>1988</year>
@@ -7845,6 +8042,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="intsoccr" supported="no"> <!-- once FOUND SOCCER is displayed, game title does not load any further -->
+		<description>International Soccer</description>
+		<year>1988</year>
+		<publisher>CRL</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="361008">
+				<rom name="International_Soccer.tap" size="361008" crc="9a30d8c9" sha1="803a73bcf1acc637e351484b6ff5b98b286c557e"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="361008">
+				<rom name="International_Soccer_a1.tap" size="361008" crc="384bbea6" sha1="6b86d0cf87f7795b56a24620cc7e5c65ee088c41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inttenns">
+		<description>International Tennis</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="333202">
+				<rom name="International_Tennis.tap" size="333202" crc="3e034e2b" sha1="c959625785b38e64c991cd6434aa198a371e8083"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="333202">
+				<rom name="International_Tennis_a1.tap" size="333202" crc="f4126e8f" sha1="589083541eef4c98e4df32d0ac6909b41c926fc4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eaglnest" supported="no"> <!-- game loads to the title screen but crashes to a black screen once player has started a game -->
+		<description>Into the Eagles Nest</description>
+		<year>1987</year>
+		<publisher>Pandora</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="472663">
+				<rom name="Into_the_Eagles_Nest.tap" size="472663" crc="244164df" sha1="a109f574918f004f786559456e07334188fa9856"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="intobliv">
 		<description>IO (Into Oblivion)</description>
 		<year>1991</year>
@@ -7859,6 +8104,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="951139">
 				<rom name="IO_(Into_Oblivion)_a1.tap" size="951139" crc="51e4d833" sha1="2e1c6d7d475ae48012171bcf5a964d7cf00bafa9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="itsaknoc">
+		<description>It's a Knockout</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="604259">
+				<rom name="It's_a_Knockout.tap" size="604259" crc="16ce2007" sha1="08940390ceabc704a9a9b5533aec4bf399135616"/>
 			</dataarea>
 		</part>
 	</software>
