@@ -39105,8 +39105,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisja" cloneof="tetris">
-		<description>Tetris (Jpn, Rev. A)</description>
+	<software name="tetrisja" cloneof="tetrisj">
+		<description>Tetris (Japan, Rev. A)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -39125,8 +39125,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisj" cloneof="tetris">
-		<description>Tetris (Jpn, Rev. B)</description>
+	<software name="tetrisj">
+		<description>Tetris (Japan, Rev. B)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -50853,8 +50853,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tetrisjb" cloneof="tetris">
-		<description>Tetris (Jpn)</description>
+	<software name="tetrisjb" cloneof="tetrisj">
+		<description>Tetris (Japan)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
