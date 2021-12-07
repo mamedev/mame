@@ -16281,6 +16281,9 @@ hcastle                         // GX768 (c) 1988
 hcastlee                        // GX768 (c) 1988
 hcastlek                        // GX768 (c) 1988
 
+@source:hds200.cpp
+hds200                          // (c) Human Developed Systems
+
 @source:headonb.cpp
 blackhol
 foolrace                        // bootleg
