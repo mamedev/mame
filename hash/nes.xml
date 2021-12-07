@@ -1946,6 +1946,7 @@ license:CC0
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="TAITO-74*161/161/32" />
 			<feature name="mirroring" value="pcb_controlled" />
+			<feature name="peripheral" value="vaus" />
 			<dataarea name="prg" size="65536">
 				<rom name="0.prg" size="65536" crc="6267fbd1" sha1="4094905bbb6aabad2db67d6641504a43682a4757" offset="00000" />
 			</dataarea>
@@ -37845,6 +37846,7 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TL1ROM" />
 			<feature name="mmc3_type" value="MMC3A" />
+			<feature name="peripheral" value="vaus" />
 			<dataarea name="prg" size="131072">
 				<rom name="dtf-h9-0 prg" size="131072" crc="ecfd3c69" sha1="a9e3d812ed897fda80de5a1672f8ed4aa19d3da3" offset="00000" />
 			</dataarea>
