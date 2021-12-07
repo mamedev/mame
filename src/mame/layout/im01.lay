@@ -160,12 +160,12 @@ license:CC0
 		<disk><color red="0.1" green="0.1" blue="0.1" /></disk>
 	</element>
 
-	<element name="text_p1"><image file="chess/bk.svg"></image></element>
-	<element name="text_p2"><image file="chess/bq.svg"></image></element>
-	<element name="text_p3"><image file="chess/br.svg"></image></element>
-	<element name="text_p4"><image file="chess/bb.svg"></image></element>
-	<element name="text_p5"><image file="chess/bn.svg"></image></element>
-	<element name="text_p6"><image file="chess/bp.svg"></image></element>
+	<element name="text_p1"><image file="chess/bk.svg"/></element>
+	<element name="text_p2"><image file="chess/bq.svg"/></element>
+	<element name="text_p3"><image file="chess/br.svg"/></element>
+	<element name="text_p4"><image file="chess/bb.svg"/></element>
+	<element name="text_p5"><image file="chess/bn.svg"/></element>
+	<element name="text_p6"><image file="chess/bp.svg"/></element>
 
 	<group name="panel">
 		<element ref="white"><bounds x="5.3" y="7" width="19.7" height="51" /></element>
