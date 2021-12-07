@@ -12503,8 +12503,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fantzonej" cloneof="fantzone">
-		<description>Fantasy Zone (Jpn)</description>
+	<software name="fantzonej">
+		<description>Fantasy Zone (Japan)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-FZ-5300 (SS8)"/>
@@ -23303,8 +23303,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mmansionj" cloneof="mmansion">
-		<description>Maniac Mansion (Jpn)</description>
+<!-- Earlier separate port that doesn't use SCUMM -->
+	<software name="mmansionj">
+		<description>Maniac Mansion (Japan)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-18"/>
