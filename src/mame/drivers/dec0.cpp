@@ -312,7 +312,7 @@ DE-0316-4
 |  PZ-2.A2                                              |
 |-------------------------------------------------------|
 Notes:
-      DEM-01    - Unknown SDIP52 ASIC (no clock input so not an MCU, decapping it found only ASIC, no ROM)
+      DEM-01    - Fujitsu MB8421 Dual port SRAM in disguise as Data East custom chip DEM-01.
       DEC-01    - HuC6280 sound CPU in disguise as Data East custom chip DEC-01. Clock input 21.4772MHz on pin 10
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
       4558      - NEC C4558 Dual Op Amp
