@@ -104,8 +104,8 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 				mix_sample(voice, left, right);
 		}
 
-		outputs[0].put_int(i, left * m_gain, INT_MAX);
-		outputs[1].put_int(i, right * m_gain, INT_MAX);
+		outputs[0].put_int(i, (left * m_gain) >> 16, 32678);
+		outputs[1].put_int(i, (right * m_gain) >> 16, 32768);
 	}
 }
 
@@ -141,12 +141,13 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 	}
 
 	const u8 step = (voice.m_addr_frac >> 22) & 7;
-	const u16 gain = (voice.m_volume_current >> 24) * voice.m_gain;
-	const s32 sample = ((voice.m_sample + (voice.m_sample_next * step / 8)) * gain) >> 4;
+	const u8 env = (voice.m_volume_current >> 24);
+	s32 sample = ((voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain) >> 3;
+	sample = (sample * env * env) >> 7;
 
 	// mix sample into output
 	left += sample * voice.m_balance[0];
-	right += sample * voice.m_balance[1];
+	right += sample *voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
@@ -270,7 +271,7 @@ void gt913_sound_device::command_w(u16 data)
 	else if (voicecmd == 0x6006)
 	{
 		/* per-voice gain used for normalizing samples
-			currently treated such that the lower 4 bits are fractional */
+			currently treated such that the lower 3 bits are fractional */
 		voice.m_gain = m_data[1] & 0xff;
 	}
 	else if (voicecmd == 0x6007)
@@ -292,10 +293,13 @@ void gt913_sound_device::command_w(u16 data)
 		/*
 		ctk551 issues this command and then reads the voice's current volume from data0
 		to determine if it's time to start the next part of the volume envelope or not.
-		(TODO: also figure out what it expects to be returned in data1)
 		*/
 		m_data[0] = voice.m_enable ? (voice.m_volume_current >> 16) : 0;
-		m_data[1] = 0;
+		/*
+		data1 is used to read consecutive output sample and detect zero crossings when
+		applying volume or expression changes to a MIDI channel
+		*/
+		m_data[1] = voice.m_sample;
 	}
 	else
 	{
