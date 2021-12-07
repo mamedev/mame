@@ -247,10 +247,10 @@ private:
 //  required_device<apple2_host_device> m_a2host;
 	required_device<apple2_gameio_device> m_gameio;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<address_map_bank_device> m_upperbank, m_upperaux, m_upper00, m_upper01;
+	memory_view m_upperbank, m_upperaux, m_upper00, m_upper01;
 	required_device<address_map_bank_device> m_c300bank;
-	required_device<address_map_bank_device> m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank;
-	required_device<address_map_bank_device> m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
+	memory_view m_b0_0000bank, m_b0_0200bank, m_b0_0400bank, m_b0_0800bank, m_b0_2000bank, m_b0_4000bank;
+	memory_view m_lcbank, m_lcaux, m_lc00, m_lc01, m_bank0_atc, m_bank1_atc;
 	required_device<z80scc_device> m_scc;
 	required_device<es5503_device> m_doc;
 	required_device<applefdintf_device> m_iwm;
@@ -374,25 +374,8 @@ private:
 
 	void apple2gs_map(address_map &map);
 	void vectors_map(address_map &map);
-	void c300bank_map(address_map &map);
-	void inhbank_map(address_map &map);
-	void inhaux_map(address_map &map);
-	void inh00_map(address_map &map);
-	void inh01_map(address_map &map);
-	void lcbank_map(address_map &map);
-	void lcaux_map(address_map &map);
-	void lc00_map(address_map &map);
-	void lc01_map(address_map &map);
-	void bank0_iolc_map(address_map &map);
-	void bank1_lower48_map(address_map &map);
-	void bank1_iolc_map(address_map &map);
-	void rb0000bank_map(address_map &map);
-	void rb0200bank_map(address_map &map);
-	void rb0400bank_map(address_map &map);
-	void rb0800bank_map(address_map &map);
-	void rb2000bank_map(address_map &map);
-	void rb4000bank_map(address_map &map);
 	void a2gs_es5503_map(address_map &map);
+	void c300bank_map(address_map &map);
 
 	void phases_w(uint8_t phases);
 	void sel35_w(int sel35);
@@ -739,10 +722,10 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 1)
 						{
-							m_upperbank->set_bank(1);
-							m_upperaux->set_bank(1);
-							m_upper00->set_bank(1);
-							m_upper01->set_bank(1);
+							m_upperbank.select(1);
+							m_upperaux.select(1);
+							m_upper00.select(1);
+							m_upper01.select(1);
 							m_inh_bank = 1;
 						}
 					}
@@ -750,10 +733,10 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 0)
 						{
-							m_upperbank->set_bank(0);
-							m_upperaux->set_bank(0);
-							m_upper00->set_bank(0);
-							m_upper01->set_bank(0);
+							m_upperbank.select(0);
+							m_upperaux.select(0);
+							m_upper00.select(0);
+							m_upper01.select(0);
 							m_inh_bank = 0;
 						}
 					}
@@ -767,10 +750,10 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
 		// if no slots are inhibiting, make sure ROM is fully switched in
 		if ((m_inh_slot == -1) && (m_inh_bank != 0))
 		{
-			m_upperbank->set_bank(0);
-			m_upperaux->set_bank(0);
-			m_upper00->set_bank(0);
-			m_upper01->set_bank(0);
+			m_upperbank.select(0);
+			m_upperaux.select(0);
+			m_upper00.select(0);
+			m_upper01.select(0);
 			m_inh_bank = 0;
 		}
 	}
@@ -1377,20 +1360,20 @@ void apple2gs_state::machine_start()
 	m_ram_size = m_ram->size();
 	m_speaker_state = 0;
 	m_speaker->level_w(m_speaker_state);
-	m_upperbank->set_bank(0);
-	m_upperaux->set_bank(0);
-	m_upper00->set_bank(0);
-	m_upper01->set_bank(0);
-	m_lcbank->set_bank(0);
-	m_lcaux->set_bank(0);
-	m_lc00->set_bank(0);
-	m_lc01->set_bank(0);
-	m_b0_0000bank->set_bank(0);
-	m_b0_0200bank->set_bank(0);
-	m_b0_0400bank->set_bank(0);
-	m_b0_0800bank->set_bank(0);
-	m_b0_2000bank->set_bank(0);
-	m_b0_4000bank->set_bank(0);
+	m_upperbank.select(0);
+	m_upperaux.select(0);
+	m_upper00.select(0);
+	m_upper01.select(0);
+	m_lcbank.select(0);
+	m_lcaux.select(0);
+	m_lc00.select(0);
+	m_lc01.select(0);
+	m_b0_0000bank.select(0);
+	m_b0_0200bank.select(0);
+	m_b0_0400bank.select(0);
+	m_b0_0800bank.select(0);
+	m_b0_2000bank.select(0);
+	m_b0_4000bank.select(0);
 	m_inh_bank = 0;
 #if !RUN_ADB_MICRO
 	m_transchar = 0;
@@ -1641,14 +1624,14 @@ void apple2gs_state::machine_reset()
 
 	m_maincpu_space = &m_maincpu->space(AS_PROGRAM);
 
-	m_b0_0000bank->set_bank(0);
-	m_b0_0200bank->set_bank(0);
-	m_b0_0400bank->set_bank(0);
-	m_b0_0800bank->set_bank(0);
-	m_b0_2000bank->set_bank(0);
-	m_b0_4000bank->set_bank(0);
-	m_bank0_atc->set_bank(1);
-	m_bank1_atc->set_bank(1);
+	m_b0_0000bank.select(0);
+	m_b0_0200bank.select(0);
+	m_b0_0400bank.select(0);
+	m_b0_0800bank.select(0);
+	m_b0_2000bank.select(0);
+	m_b0_4000bank.select(0);
+	m_bank0_atc.select(1);
+	m_bank1_atc.select(1);
 
 	// LC default state: read ROM, write enabled, Dxxx bank 2
 	m_lcram = false;
@@ -1935,44 +1918,44 @@ void apple2gs_state::auxbank_update()
 {
 	int ramwr = (m_ramrd ? 1 : 0) | (m_ramwrt ? 2 : 0);
 
-	m_b0_0000bank->set_bank(m_altzp ? 1 : 0);
-	m_b0_0200bank->set_bank(ramwr);
+	m_b0_0000bank.select(m_altzp ? 1 : 0);
+	m_b0_0200bank.select(ramwr);
 
 	if (m_80store)
 	{
 		if (m_page2)
 		{
-			m_b0_0400bank->set_bank(3);
+			m_b0_0400bank.select(3);
 		}
 		else
 		{
-			m_b0_0400bank->set_bank(0);
+			m_b0_0400bank.select(0);
 		}
 	}
 	else
 	{
-		m_b0_0400bank->set_bank(ramwr);
+		m_b0_0400bank.select(ramwr);
 	}
 
-	m_b0_0800bank->set_bank(ramwr);
+	m_b0_0800bank.select(ramwr);
 
 	if ((m_80store) && (m_video->m_hires))
 	{
 		if (m_page2)
 		{
-			m_b0_2000bank->set_bank(3);
+			m_b0_2000bank.select(3);
 		}
 		else
 		{
-			m_b0_2000bank->set_bank(0);
+			m_b0_2000bank.select(0);
 		}
 	}
 	else
 	{
-		m_b0_2000bank->set_bank(ramwr);
+		m_b0_2000bank.select(ramwr);
 	}
 
-	m_b0_4000bank->set_bank(ramwr);
+	m_b0_4000bank.select(ramwr);
 }
 
 void apple2gs_state::update_slotrom_banks()
@@ -2048,17 +2031,17 @@ void apple2gs_state::lc_update(int offset, bool writing)
 	{
 		if (m_lcram)
 		{
-			m_lcbank->set_bank(1);
-			m_lcaux->set_bank(1);
-			m_lc00->set_bank(1 + (m_romswitch ? 2 : 0));
-			m_lc01->set_bank(1);
+			m_lcbank.select(1);
+			m_lcaux.select(1);
+			m_lc00.select(1 + (m_romswitch ? 2 : 0));
+			m_lc01.select(1);
 		}
 		else
 		{
-			m_lcbank->set_bank(0);
-			m_lcaux->set_bank(0);
-			m_lc00->set_bank(0 + (m_romswitch ? 2 : 0));
-			m_lc01->set_bank(0);
+			m_lcbank.select(0);
+			m_lcaux.select(0);
+			m_lc00.select(0 + (m_romswitch ? 2 : 0));
+			m_lc01.select(0);
 		}
 	}
 
@@ -2101,11 +2084,11 @@ void apple2gs_state::do_io(int offset)
 				m_romswitch = !m_romswitch;
 				if (m_lcram)
 				{
-					m_lc00->set_bank(1 + (m_romswitch ? 2 : 0));
+					m_lc00.select(1 + (m_romswitch ? 2 : 0));
 				}
 				else
 				{
-					m_lc00->set_bank(0 + (m_romswitch ? 2 : 0));
+					m_lc00.select(0 + (m_romswitch ? 2 : 0));
 				}
 			}
 			break;
@@ -2970,13 +2953,13 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			// handle I/O and language card inhibit bits here
 			if (m_shadow & SHAD_IOLC)
 			{
-				m_bank0_atc->set_bank(0);
-				m_bank1_atc->set_bank(0);
+				m_bank0_atc.select(0);
+				m_bank1_atc.select(0);
 			}
 			else
 			{
-				m_bank0_atc->set_bank(1);
-				m_bank1_atc->set_bank(1);
+				m_bank0_atc.select(1);
+				m_bank1_atc.select(1);
 
 			}
 			break;
@@ -3134,17 +3117,17 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			// update LC state
 			if (m_lcram)
 			{
-				m_lcbank->set_bank(1);
-				m_lcaux->set_bank(1);
-				m_lc00->set_bank(1);
-				m_lc01->set_bank(1);
+				m_lcbank.select(1);
+				m_lcaux.select(1);
+				m_lc00.select(1);
+				m_lc01.select(1);
 			}
 			else
 			{
-				m_lcbank->set_bank(0);
-				m_lcaux->set_bank(0);
-				m_lc00->set_bank(0);
-				m_lc01->set_bank(0);
+				m_lcbank.select(0);
+				m_lcaux.select(0);
+				m_lc00.select(0);
+				m_lc01.select(0);
 			}
 			break;
 
@@ -4050,15 +4033,75 @@ void apple2gs_state::apple2gs_map(address_map &map)
 {
 	/* "fast side" - runs 2.8 MHz minus RAM refresh, banks 00 and 01 usually have writes shadowed to E0/E1 where I/O lives */
 	/* Banks 00 and 01 also have their own independent language cards which are NOT shadowed. */
-	map(0x000000, 0x0001ff).m(m_b0_0000bank, FUNC(address_map_bank_device::amap8));
-	map(0x000200, 0x0003ff).m(m_b0_0200bank, FUNC(address_map_bank_device::amap8));
-	map(0x000400, 0x0007ff).m(m_b0_0400bank, FUNC(address_map_bank_device::amap8));
-	map(0x000800, 0x001fff).m(m_b0_0800bank, FUNC(address_map_bank_device::amap8));
-	map(0x002000, 0x003fff).m(m_b0_2000bank, FUNC(address_map_bank_device::amap8));
-	map(0x004000, 0x00bfff).m(m_b0_4000bank, FUNC(address_map_bank_device::amap8));
-	map(0x00c000, 0x00ffff).m(m_bank0_atc, FUNC(address_map_bank_device::amap8));
+	map(0x000000, 0x0001ff).view(m_b0_0000bank);
+	m_b0_0000bank[0](0x0000, 0x01ff).rw(FUNC(apple2gs_state::b0ram0000_r), FUNC(apple2gs_state::b0ram0000_w));
+	m_b0_0000bank[1](0x0000, 0x01ff).rw(FUNC(apple2gs_state::b1ram0000_r), FUNC(apple2gs_state::b1ram0000_w));
+
+	map(0x000200, 0x0003ff).view(m_b0_0200bank);
+	m_b0_0200bank[0](0x0200, 0x03ff).rw(FUNC(apple2gs_state::b0ram0200_r), FUNC(apple2gs_state::b0ram0200_w)); // wr 0 rd 0
+	m_b0_0200bank[1](0x0200, 0x03ff).rw(FUNC(apple2gs_state::b1ram0200_r), FUNC(apple2gs_state::b0ram0200_w)); // wr 0 rd 1
+	m_b0_0200bank[2](0x0200, 0x03ff).rw(FUNC(apple2gs_state::b0ram0200_r), FUNC(apple2gs_state::b1ram0200_w)); // wr 1 rd 0
+	m_b0_0200bank[3](0x0200, 0x03ff).rw(FUNC(apple2gs_state::b1ram0200_r), FUNC(apple2gs_state::b1ram0200_w)); // wr 1 rd 1
+
+	map(0x000400, 0x0007ff).view(m_b0_0400bank);
+	m_b0_0400bank[0](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b0ram0400_w)); // wr 0 rd 0
+	m_b0_0400bank[1](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b0ram0400_w));  // wr 0 rd 1
+	m_b0_0400bank[2](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b1ram0400_w));  // wr 1 rd 0
+	m_b0_0400bank[3](0x0400, 0x07ff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b1ram0400_w)); // wr 1 rd 1
+
+	map(0x000800, 0x001fff).view(m_b0_0800bank);
+	m_b0_0800bank[0](0x0800, 0x1fff).rw(FUNC(apple2gs_state::b0ram0800_r), FUNC(apple2gs_state::b0ram0800_w));
+	m_b0_0800bank[1](0x0800, 0x1fff).rw(FUNC(apple2gs_state::b1ram0800_r), FUNC(apple2gs_state::b0ram0800_w));
+	m_b0_0800bank[2](0x0800, 0x1fff).rw(FUNC(apple2gs_state::b0ram0800_r), FUNC(apple2gs_state::b1ram0800_w));
+	m_b0_0800bank[3](0x0800, 0x1fff).rw(FUNC(apple2gs_state::b1ram0800_r), FUNC(apple2gs_state::b1ram0800_w));
+
+	map(0x002000, 0x003fff).view(m_b0_2000bank);
+	m_b0_2000bank[0](0x2000, 0x3fff).rw(FUNC(apple2gs_state::b0ram2000_r), FUNC(apple2gs_state::b0ram2000_w));
+	m_b0_2000bank[1](0x2000, 0x3fff).rw(FUNC(apple2gs_state::b1ram2000_r), FUNC(apple2gs_state::b0ram2000_w));
+	m_b0_2000bank[2](0x2000, 0x3fff).rw(FUNC(apple2gs_state::b0ram2000_r), FUNC(apple2gs_state::b1ram2000_w));
+	m_b0_2000bank[3](0x2000, 0x3fff).rw(FUNC(apple2gs_state::b1ram2000_r), FUNC(apple2gs_state::b1ram2000_w));
+
+	map(0x004000, 0x00bfff).view(m_b0_4000bank);
+	m_b0_4000bank[0](0x4000, 0xbfff).rw(FUNC(apple2gs_state::b0ram4000_r), FUNC(apple2gs_state::b0ram4000_w));
+	m_b0_4000bank[1](0x4000, 0xbfff).rw(FUNC(apple2gs_state::b1ram4000_r), FUNC(apple2gs_state::b0ram4000_w));
+	m_b0_4000bank[2](0x4000, 0xbfff).rw(FUNC(apple2gs_state::b0ram4000_r), FUNC(apple2gs_state::b1ram4000_w));
+	m_b0_4000bank[3](0x4000, 0xbfff).rw(FUNC(apple2gs_state::b1ram4000_r), FUNC(apple2gs_state::b1ram4000_w));
+
+	map(0x00c000, 0x00ffff).view(m_bank0_atc);
+	m_bank0_atc[0](0xc000, 0xffff).rw(FUNC(apple2gs_state::bank0_c000_r), FUNC(apple2gs_state::bank0_c000_w));
+	m_bank0_atc[1](0xc000, 0xffff).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
+	m_bank0_atc[1](0xc080, 0xffff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
+	m_bank0_atc[1](0xc100, 0xffff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
+	m_bank0_atc[1](0xc300, 0xffff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	m_bank0_atc[1](0xc400, 0xffff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	m_bank0_atc[1](0xc800, 0xffff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
+	m_bank0_atc[1](0xd000, 0xffff).view(m_upper00);
+
+	m_upper00[0](0xd000, 0xffff).view(m_lc00);
+	m_upper00[1](0xd000, 0xffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
+
+	m_lc00[0](0xd000, 0xffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_00_w));
+	m_lc00[1](0xd000, 0xffff).rw(FUNC(apple2gs_state::lc_00_r), FUNC(apple2gs_state::lc_00_w));
+	m_lc00[2](0xd000, 0xffff).rom().region("maincpu", 0x39000).w(FUNC(apple2gs_state::lc_00_w));
+	m_lc00[3](0xd000, 0xffff).rw(FUNC(apple2gs_state::lc_00_r), FUNC(apple2gs_state::lc_00_w));
+
 	map(0x010000, 0x01bfff).rw(FUNC(apple2gs_state::bank1_0000_r), FUNC(apple2gs_state::bank1_0000_sh_w));
-	map(0x01c000, 0x01ffff).m(m_bank1_atc, FUNC(address_map_bank_device::amap8));
+
+	map(0x01c000, 0x01ffff).view(m_bank1_atc);
+	m_bank1_atc[0](0x1c000, 0x1ffff).rw(FUNC(apple2gs_state::bank1_c000_r), FUNC(apple2gs_state::bank1_c000_w));
+	m_bank1_atc[1](0x1c000, 0x1c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
+	m_bank1_atc[1](0x1c080, 0x1c0ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
+	m_bank1_atc[1](0x1c100, 0x1c2ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
+	m_bank1_atc[1](0x1c300, 0x1c3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
+	m_bank1_atc[1](0x1c400, 0x1c7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
+	m_bank1_atc[1](0x1c800, 0x1cfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
+
+	m_bank1_atc[1](0x1d000, 0x1ffff).view(m_upper01);
+	m_upper01[0](0x1d000, 0x1ffff).view(m_lc01);
+	m_upper01[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
+
+	m_lc01[0](0x1d000, 0x1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_01_w));
+	m_lc01[1](0x1d000, 0x1ffff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
 
 	/* "Mega II side" - this is basically a 128K IIe on a chip that runs merrily at 1 MHz */
 	/* Unfortunately all I/O happens here, including new IIgs-specific stuff */
@@ -4069,7 +4112,13 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	map(0xe0c300, 0xe0c3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xe0c400, 0xe0c7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
 	map(0xe0c800, 0xe0cfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	map(0xe0d000, 0xe0ffff).m(A2GS_UPPERBANK_TAG, FUNC(address_map_bank_device::amap8));
+
+	map(0xe0d000, 0xe0ffff).view(m_upperbank);
+	m_upperbank[0](0xe0d000, 0xe0ffff).view(m_lcbank);
+	m_upperbank[1](0xe0d000, 0xe0ffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
+
+	m_lcbank[0](0xe0d000, 0xe0ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_w));
+	m_lcbank[1](0xe0d000, 0xe0ffff).rw(FUNC(apple2gs_state::lc_r), FUNC(apple2gs_state::lc_w));
 
 	map(0xe10000, 0xe1bfff).rw(FUNC(apple2gs_state::auxram0000_r), FUNC(apple2gs_state::auxram0000_w));
 	map(0xe1c000, 0xe1c07f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
@@ -4078,7 +4127,13 @@ void apple2gs_state::apple2gs_map(address_map &map)
 	map(0xe1c300, 0xe1c3ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
 	map(0xe1c400, 0xe1c7ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
 	map(0xe1c800, 0xe1cfff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	map(0xe1d000, 0xe1ffff).m(m_upperaux, FUNC(address_map_bank_device::amap8));
+
+	map(0xe1d000, 0xe1ffff).view(m_upperaux);
+	m_upperaux[0](0xe1d000, 0xe1ffff).view(m_lcaux);
+	m_upperaux[1](0xe1d000, 0xe1ffff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
+
+	m_lcaux[0](0xe1d000, 0xe1ffff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_aux_w));
+	m_lcaux[1](0xe1d000, 0xe1ffff).rw(FUNC(apple2gs_state::lc_aux_r), FUNC(apple2gs_state::lc_aux_w));
 
 	map(0xfc0000, 0xffffff).rom().region("maincpu", 0x00000);
 }
@@ -4092,126 +4147,6 @@ void apple2gs_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2gs_state::c300_r), FUNC(apple2gs_state::c300_w));
 	map(0x0100, 0x01ff).r(FUNC(apple2gs_state::c300_int_r)).nopw();
-}
-
-void apple2gs_state::inhbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).m(m_lcbank, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
-}
-
-void apple2gs_state::inhaux_map(address_map &map)
-{
-	map(0x0000, 0x2fff).m(m_lcaux, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
-}
-
-void apple2gs_state::inh00_map(address_map &map)
-{
-	map(0x0000, 0x2fff).m(m_lc00, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
-}
-
-void apple2gs_state::inh01_map(address_map &map)
-{
-	map(0x0000, 0x2fff).m(m_lc01, FUNC(address_map_bank_device::amap8));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::inh_r), FUNC(apple2gs_state::inh_w));
-}
-
-void apple2gs_state::lcbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::lc_r), FUNC(apple2gs_state::lc_w));
-}
-
-void apple2gs_state::lcaux_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_aux_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::lc_aux_r), FUNC(apple2gs_state::lc_aux_w));
-}
-
-void apple2gs_state::lc00_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_00_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::lc_00_r), FUNC(apple2gs_state::lc_00_w));
-	map(0x6000, 0x8fff).rom().region("maincpu", 0x39000).w(FUNC(apple2gs_state::lc_00_w));
-	map(0x9000, 0xbfff).rw(FUNC(apple2gs_state::lc_00_r), FUNC(apple2gs_state::lc_00_w));
-}
-
-void apple2gs_state::lc01_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x3d000).w(FUNC(apple2gs_state::lc_01_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2gs_state::lc_01_r), FUNC(apple2gs_state::lc_01_w));
-}
-
-void apple2gs_state::bank0_iolc_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rw(FUNC(apple2gs_state::bank0_c000_r), FUNC(apple2gs_state::bank0_c000_w));
-	map(0x4000, 0x407f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
-	map(0x4080, 0x40ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	map(0x4100, 0x42ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
-	map(0x4300, 0x43ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0x4400, 0x47ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
-	map(0x4800, 0x4fff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	map(0x5000, 0x7fff).m(m_upper00,  FUNC(address_map_bank_device::amap8));
-}
-
-void apple2gs_state::bank1_iolc_map(address_map &map)
-{
-	map(0x0000, 0x3fff).rw(FUNC(apple2gs_state::bank1_c000_r), FUNC(apple2gs_state::bank1_c000_w));
-	map(0x4000, 0x407f).rw(FUNC(apple2gs_state::c000_r), FUNC(apple2gs_state::c000_w));
-	map(0x4080, 0x40ff).rw(FUNC(apple2gs_state::c080_r), FUNC(apple2gs_state::c080_w));
-	map(0x4100, 0x42ff).rw(FUNC(apple2gs_state::c100_r), FUNC(apple2gs_state::c100_w));
-	map(0x4300, 0x43ff).m(m_c300bank, FUNC(address_map_bank_device::amap8));
-	map(0x4400, 0x47ff).rw(FUNC(apple2gs_state::c400_r), FUNC(apple2gs_state::c400_w));
-	map(0x4800, 0x4fff).rw(FUNC(apple2gs_state::c800_r), FUNC(apple2gs_state::c800_w));
-	map(0x5000, 0x7fff).m(m_upper01,  FUNC(address_map_bank_device::amap8));
-}
-
-void apple2gs_state::rb0000bank_map(address_map &map)
-{
-	map(0x0000, 0x01ff).rw(FUNC(apple2gs_state::b0ram0000_r), FUNC(apple2gs_state::b0ram0000_w));
-	map(0x0200, 0x03ff).rw(FUNC(apple2gs_state::b1ram0000_r), FUNC(apple2gs_state::b1ram0000_w));
-}
-
-void apple2gs_state::rb0200bank_map(address_map &map)
-{
-	map(0x0000, 0x01ff).rw(FUNC(apple2gs_state::b0ram0200_r), FUNC(apple2gs_state::b0ram0200_w)); // wr 0 rd 0
-	map(0x0200, 0x03ff).rw(FUNC(apple2gs_state::b1ram0200_r), FUNC(apple2gs_state::b0ram0200_w)); // wr 0 rd 1
-	map(0x0400, 0x05ff).rw(FUNC(apple2gs_state::b0ram0200_r), FUNC(apple2gs_state::b1ram0200_w)); // wr 1 rd 0
-	map(0x0600, 0x07ff).rw(FUNC(apple2gs_state::b1ram0200_r), FUNC(apple2gs_state::b1ram0200_w)); // wr 1 rd 1
-}
-
-void apple2gs_state::rb0400bank_map(address_map &map)
-{
-	map(0x0000, 0x03ff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b0ram0400_w)); // wr 0 rd 0
-	map(0x0400, 0x07ff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b0ram0400_w));  // wr 0 rd 1
-	map(0x0800, 0x0bff).rw(FUNC(apple2gs_state::b0ram0400_r), FUNC(apple2gs_state::b1ram0400_w));  // wr 1 rd 0
-	map(0x0c00, 0x0fff).rw(FUNC(apple2gs_state::b1ram0400_r), FUNC(apple2gs_state::b1ram0400_w)); // wr 1 rd 1
-}
-
-void apple2gs_state::rb0800bank_map(address_map &map)
-{
-	map(0x0000, 0x17ff).rw(FUNC(apple2gs_state::b0ram0800_r), FUNC(apple2gs_state::b0ram0800_w));
-	map(0x2000, 0x37ff).rw(FUNC(apple2gs_state::b1ram0800_r), FUNC(apple2gs_state::b0ram0800_w));
-	map(0x4000, 0x57ff).rw(FUNC(apple2gs_state::b0ram0800_r), FUNC(apple2gs_state::b1ram0800_w));
-	map(0x6000, 0x77ff).rw(FUNC(apple2gs_state::b1ram0800_r), FUNC(apple2gs_state::b1ram0800_w));
-}
-
-void apple2gs_state::rb2000bank_map(address_map &map)
-{
-	map(0x0000, 0x1fff).rw(FUNC(apple2gs_state::b0ram2000_r), FUNC(apple2gs_state::b0ram2000_w));
-	map(0x2000, 0x3fff).rw(FUNC(apple2gs_state::b1ram2000_r), FUNC(apple2gs_state::b0ram2000_w));
-	map(0x4000, 0x5fff).rw(FUNC(apple2gs_state::b0ram2000_r), FUNC(apple2gs_state::b1ram2000_w));
-	map(0x6000, 0x7fff).rw(FUNC(apple2gs_state::b1ram2000_r), FUNC(apple2gs_state::b1ram2000_w));
-}
-
-void apple2gs_state::rb4000bank_map(address_map &map)
-{
-	map(0x00000, 0x07fff).rw(FUNC(apple2gs_state::b0ram4000_r), FUNC(apple2gs_state::b0ram4000_w));
-	map(0x08000, 0x0ffff).rw(FUNC(apple2gs_state::b1ram4000_r), FUNC(apple2gs_state::b0ram4000_w));
-	map(0x10000, 0x17fff).rw(FUNC(apple2gs_state::b0ram4000_r), FUNC(apple2gs_state::b1ram4000_w));
-	map(0x18000, 0x1ffff).rw(FUNC(apple2gs_state::b1ram4000_r), FUNC(apple2gs_state::b1ram4000_w));
 }
 
 void apple2gs_state::a2gs_es5503_map(address_map &map)
@@ -4945,56 +4880,8 @@ void apple2gs_state::apple2gs(machine_config &config)
 	/* C300 banking */
 	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
-	/* built-in language card emulation */
-	ADDRESS_MAP_BANK(config, A2GS_LCBANK_TAG).set_map(&apple2gs_state::lcbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* aux bank language card emulation */
-	ADDRESS_MAP_BANK(config, A2GS_LCAUX_TAG).set_map(&apple2gs_state::lcaux_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* bank 00 language card emulation */
-	ADDRESS_MAP_BANK(config, A2GS_LC00_TAG).set_map(&apple2gs_state::lc00_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* bank 01 language card emulation */
-	ADDRESS_MAP_BANK(config, A2GS_LC01_TAG).set_map(&apple2gs_state::lc01_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* /INH banking */
-	ADDRESS_MAP_BANK(config, A2GS_UPPERBANK_TAG).set_map(&apple2gs_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* /INH banking - aux bank */
-	ADDRESS_MAP_BANK(config, A2GS_AUXUPPER_TAG).set_map(&apple2gs_state::inhaux_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* /INH banking - bank 00 */
-	ADDRESS_MAP_BANK(config, A2GS_00UPPER_TAG).set_map(&apple2gs_state::inh00_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* /INH banking - bank 01 */
-	ADDRESS_MAP_BANK(config, A2GS_01UPPER_TAG).set_map(&apple2gs_state::inh01_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
-
-	/* Bank 0 - I/O and LC area */
-	ADDRESS_MAP_BANK(config, A2GS_B0CXXX_TAG).set_map(&apple2gs_state::bank0_iolc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-
-	/* Bank 1 - I/O and LC area */
-	ADDRESS_MAP_BANK(config, A2GS_B1CXXX_TAG).set_map(&apple2gs_state::bank1_iolc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
-
-	/* Bank 0 0000 banking */
-	ADDRESS_MAP_BANK(config, A2GS_B00000_TAG).set_map(&apple2gs_state::rb0000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
-
-	/* Bank 0 0200 banking */
-	ADDRESS_MAP_BANK(config, A2GS_B00200_TAG).set_map(&apple2gs_state::rb0200bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x200);
-
-	/* Bank 0 0400 banking */
-	ADDRESS_MAP_BANK(config, A2GS_B00400_TAG).set_map(&apple2gs_state::rb0400bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x400);
-
-	/* Bank 0 0800 banking */
-	ADDRESS_MAP_BANK(config, A2GS_B00800_TAG).set_map(&apple2gs_state::rb0800bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
-
-	/* Bank 0 2000 banking */
-	ADDRESS_MAP_BANK(config, A2GS_B02000_TAG).set_map(&apple2gs_state::rb2000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x2000);
-
-	/* Bank 0 4000 banking */
-	ADDRESS_MAP_BANK(config, A2GS_B04000_TAG).set_map(&apple2gs_state::rb4000bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x8000);
-
 	/* serial */
-	SCC85C30(config, m_scc, A2GS_14M/2);
+	SCC85C30(config, m_scc, A2GS_14M / 2);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
