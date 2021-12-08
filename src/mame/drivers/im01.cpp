@@ -15,10 +15,9 @@ TODO:
   measured 4.61MHz, beeper frequency 3.73KHz and beeper duration 34.2ms.
   In MAME, beeper frequency is 4.15KHz and duration is 31ms, meaning it's
   around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
-  and/or T11 core timing itself is not 100% accurate. There's a big "but":
-  these measurements are from the older ИМ-01.
+  and/or T11 core timing itself is not 100% accurate.
 - verify actual XTAL, the label couldn't be seen
-- dump/add im01 (rom serial 106/107)
+- correct bus conflict between RAM and I/O
 
 *******************************************************************************
 
@@ -184,7 +183,7 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
-	return data << 8;
+	return data << 8 | 0xff;
 }
 
 
@@ -196,10 +195,10 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 void im01_state::main_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x5fff).rom();
-	map(0xe830, 0xe831).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
-	map(0xe83c, 0xe83d).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
-	map(0xe83e, 0xe83f).r(FUNC(im01_state::input_r));
+	map(0x0030, 0x0031).mirror(0xf800).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
+	map(0x003c, 0x003d).mirror(0xf800).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
+	map(0x003e, 0x003f).mirror(0xf800).r(FUNC(im01_state::input_r));
+	map(0x2000, 0x5fff).rom().unmapw();
 }
 
 
@@ -277,6 +276,12 @@ void im01_state::im01(machine_config &config)
     ROM Definitions
 ******************************************************************************/
 
+ROM_START( im01 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("0000107", 0x2000, 0x2000, CRC(2318e85b) SHA1(6a92f6464af69ad0175f323f01dd067b91d345d3) )
+	ROM_LOAD("0000106", 0x4000, 0x2000, CRC(b0ab8808) SHA1(b682e9e8a5e52cd8fee5ae45277ae658bf5c32f1) )
+ROM_END
+
 ROM_START( im01t )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("0000148", 0x2000, 0x2000, CRC(327c6055) SHA1(b90b3b1261d677eb93014ea9e809e45b3b25152a) )
@@ -292,4 +297,5 @@ ROM_END
 ******************************************************************************/
 
 //    YEAR  NAME   PARENT CMP MACHINE  INPUT  CLASS       INIT        COMPANY, FULLNAME, FLAGS
-CONS( 1991, im01t, 0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, im01,  0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1991, im01t, im01,   0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
