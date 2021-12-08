@@ -12503,8 +12503,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="fantzonej" cloneof="fantzone">
-		<description>Fantasy Zone (Jpn)</description>
+	<software name="fantzonej">
+		<description>Fantasy Zone (Japan)</description>
 		<year>1987</year>
 		<publisher>Sunsoft</publisher>
 		<info name="serial" value="SUN-FZ-5300 (SS8)"/>
@@ -23303,8 +23303,9 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="mmansionj" cloneof="mmansion">
-		<description>Maniac Mansion (Jpn)</description>
+<!-- Earlier separate port that doesn't use SCUMM -->
+	<software name="mmansionj">
+		<description>Maniac Mansion (Japan)</description>
 		<year>1988</year>
 		<publisher>Jaleco</publisher>
 		<info name="serial" value="JF-18"/>
@@ -39104,8 +39105,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisja" cloneof="tetris">
-		<description>Tetris (Jpn, Rev. A)</description>
+	<software name="tetrisja" cloneof="tetrisj">
+		<description>Tetris (Japan, Rev. A)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -39124,8 +39125,8 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="tetrisj" cloneof="tetris">
-		<description>Tetris (Jpn, Rev. B)</description>
+	<software name="tetrisj">
+		<description>Tetris (Japan, Rev. B)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
@@ -50852,8 +50853,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="tetrisjb" cloneof="tetris">
-		<description>Tetris (Jpn)</description>
+	<software name="tetrisjb" cloneof="tetrisj">
+		<description>Tetris (Japan)</description>
 		<year>1988</year>
 		<publisher>Bullet-Proof Software</publisher>
 		<info name="serial" value="BPS-T0"/>
