@@ -256,25 +256,6 @@ void dec0_state::sprite_mirror_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 /******************************************************************************/
 
-uint16_t dec0_state::robocop_68000_share_r(offs_t offset)
-{
-//logerror("%08x: Share read %04x\n",m_maincpu->pc(),offset);
-
-	return m_robocop_shared_ram[offset];
-}
-
-void dec0_state::robocop_68000_share_w(offs_t offset, uint16_t data)
-{
-//  logerror("%08x: Share write %04x %04x\n",m_maincpu->pc(),offset,data);
-
-	m_robocop_shared_ram[offset] = data & 0xff;
-
-	if (offset == 0x7ff) /* A control address - not standard ram */
-		m_subcpu->set_input_line(0, HOLD_LINE);
-}
-
-/******************************************************************************/
-
 void dec0_state::h6280_decrypt(const char *cputag)
 {
 	int i;
