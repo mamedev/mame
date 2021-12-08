@@ -144,17 +144,23 @@ u8 nes_zapper_device::read_exp(offs_t offset)
 {
 	u8 ret = 0;
 	if (offset == 1)    // $4017
-		ret |= nes_zapper_device::read_bit34();
+		ret = nes_zapper_device::read_bit34();
 	return ret;
 }
 
-u8 nes_bandaihs_device::read_bit0()
+u8 nes_bandaihs_device::read_exp(offs_t offset)
 {
-	if (m_strobe & 1)
-		m_latch = m_joypad->read();
+	u8 ret = 0;
 
-	u8 ret = m_latch & 1;
-	m_latch = (m_latch >> 1) | 0x80;
+	if (offset == 0)    // $4016
+	{
+		if (m_strobe)
+			m_latch = m_joypad->read();
+		ret = (m_latch & 1) << 1;
+		m_latch = (m_latch >> 1) | 0x80;
+	}
+	else                // $4017
+		ret = nes_zapper_device::read_exp(offset);
 
 	return ret;
 }
@@ -167,8 +173,9 @@ u8 nes_bandaihs_device::read_bit0()
 // carried on expansion port pin 2, so there's likely nothing more going on.
 void nes_bandaihs_device::write(u8 data)
 {
-	if (m_strobe & 1)
-		m_latch = m_joypad->read();
+	u8 prev_strobe = m_strobe;
+	m_strobe = data & 1;
 
-	m_strobe = data;
+	if (prev_strobe && !m_strobe)
+		m_latch = m_joypad->read();
 }

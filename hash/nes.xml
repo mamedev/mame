@@ -50134,7 +50134,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="discrete_74x161" />
 			<feature name="pcb" value="BANDAI-74*161/161/32" />
-			<feature name="mirroring" value="pcb_controlled" />
+			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="chr" size="131072">
 				<rom name="space shadow (japan).chr" size="131072" crc="6690e5c1" sha1="f05cc0478786a5e6d153c2f85c00c14afa0e61b0" offset="00000" status="baddump" />
@@ -55019,7 +55019,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- The Bandai Hyper Shot controller/zapper for Space Shadow is not emulated. Operation Wolf currently only works with joypad but not zapper. -->
+<!-- Operation Wolf currently only works with joypad but not zapper -->
 	<software name="2uzilght" supported="partial">
 		<description>2 in 1 Uzi Lightgun</description>
 		<year>199?</year>
@@ -55027,6 +55027,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="MGC-002"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="txc_22110" />
+			<feature name="peripheral" value="bandai_hypershot" />
 			<dataarea name="prg" size="262144">
 				<rom name="2-in-1 uzi lightgun (mgc-002).prg" size="262144" crc="7349c91a" sha1="00d0c7a423b9c8c18974022c619d9f3084c4fd8d" status="baddump" />
 			</dataarea>

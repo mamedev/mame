@@ -61,7 +61,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	virtual u8 read_bit0() override;
+	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;
 
 private:
