@@ -120,13 +120,16 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 				}
 				else
 				{
-					std::string hz(std::to_string(u32(screen.frame_period().as_hz() * 1'000'000 + 0.5)));
-					size_t dpos = hz.length() - 6;
-					if (dpos == 0)
-						hz.insert(dpos++, "0");
-					hz.insert(dpos, ".");
-					size_t last = hz.find_last_not_of('0');
-					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+					const u32 rate = u32(screen.frame_period().as_hz() * 1'000'000 + 0.5);
+					const bool valid = rate >= 1'000'000;
+					std::string hz(valid ? std::to_string(rate) : "?");
+					if (valid)
+					{
+						size_t dpos = hz.length() - 6;
+						hz.insert(dpos, ".");
+						size_t last = hz.find_last_not_of('0');
+						hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+					}
 
 					const rectangle &visarea = screen.visible_area();
 					layout->add_text(
