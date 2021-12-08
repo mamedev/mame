@@ -393,7 +393,7 @@ local function add_edit_items(items)
 		for j, input in ipairs(step.inputs) do
 			local inputname
 			if input.field then
-				inputname = _p('input-name', input.field.name)
+				inputname = input.field.name
 			elseif input.port then
 				inputname = _p('plugin-inputmacro', 'n/a')
 			else
