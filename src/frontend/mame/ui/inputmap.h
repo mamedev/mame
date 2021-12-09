@@ -54,7 +54,7 @@ protected:
 		input_seq_type      seqtype = SEQ_TYPE_INVALID; // sequence type
 		input_seq           seq;                        // copy of the live sequence
 		const input_seq *   defseq = nullptr;           // pointer to the default sequence
-		const char *        name = nullptr;             // pointer to the base name of the item
+		std::string         name;                       // base name of the item
 		const device_t *    owner = nullptr;            // pointer to the owner of the item
 		ioport_group        group = IPG_INVALID;        // group type
 		uint8_t             type = 0U;                  // type of port

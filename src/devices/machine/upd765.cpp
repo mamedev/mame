@@ -1791,7 +1791,7 @@ void upd765_family_device::read_data_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+			if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}
@@ -2155,7 +2155,7 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 			break;
 		case HEAD_LOAD_DONE:
 			LOGSTATE("HEAD_LOAD_DONE\n");
-			if(fi.pcn == command[2] || !(fifocfg & 0x40)) {
+			if(fi.pcn == command[2] || !(fifocfg & FIF_EIS)) {
 				fi.sub_state = SEEK_DONE;
 				break;
 			}

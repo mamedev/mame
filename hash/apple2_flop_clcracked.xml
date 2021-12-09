@@ -46424,4 +46424,192 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="chcougk0386">
+		<description>Chariots, Cougars, and Kings (Version 03.12.86) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-11-27"/>
+		<!--"Chariots, Cougars, and Kings" is a 1985 educational program developed by Janet Goldman and distributed by Hartley Courseware. This version is dated 03.12.86. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="chariots, cougars, and kings v03.12.86 (4am crack) disk 1.dsk" size="143360" crc="231d0e3c" sha1="92274c01c9e2d91a948189a2dbffc82ac6404f3b"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="chariots, cougars, and kings v03.12.86 (4am crack) disk 2.dsk" size="143360" crc="9ada44e6" sha1="c49515ef61a84c089484f667909017724edf6330"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puncscma">
+		<description>Punctuation Skills: Commas (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Milton Bradley Company</publisher>
+		<info name="release" value="2021-11-27"/>
+		<!--"Punctuation Skills: Commas" is a 1983 educational program developed and distributed by Milton Bradley Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="punctuation skills- commas (4am crack).dsk" size="143360" crc="80b23835" sha1="58aaef40d5eb61bc08cb574975b340ac118eb835"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lgwrkout">
+		<description>Logic Workout (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Avant Garde</publisher>
+		<info name="release" value="2021-11-27"/>
+		<!--"Logic Workout" is a 1983 educational program developed by Verma Jooste and distributed by Avant Garde. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="logic workout (4am crack).dsk" size="143360" crc="32c5c3ca" sha1="bdad70d5ff6bba01cf8706f1e224496b98f58bd3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apprjmng">
+		<description>Apple Project Manager (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-11-27"/>
+		<!--"Apple Project Manager" is a 1981 productivity program developed by Construction Programming Services and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="apple project manager (4am and san inc crack).dsk" size="143360" crc="79938529" sha1="2f40683ae298275384efde772c964926d480d279"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazwrds">
+		<description>A-mazing Words (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="release" value="2021-11-28"/>
+		<!--"A-mazing Words" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="a-mazing words (4am crack).dsk" size="143360" crc="2e7829ee" sha1="557999bc8ccdbd21dddd825f59ab3947dd02c62f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mghtmath">
+		<description>Mighty Math (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="release" value="2021-11-28"/>
+		<!--"Mighty Math" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="mighty math (4am crack).dsk" size="143360" crc="cde288ce" sha1="f1eadcf76376196ebfd65e5921c71293549a2bf3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="takenrth">
+		<description>Take Me North (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="release" value="2021-11-28"/>
+		<!--"Take Me North" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="take me north (4am crack).dsk" size="143360" crc="956ec497" sha1="8b6e02aef35c165b742efc7b0a4d96573a9e4309"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacport">
+		<description>Space Port (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>World Book</publisher>
+		<info name="release" value="2021-11-28"/>
+		<!--"Space Port" is a 1984 educational program developed by Interactive Image Technologies and distributed by World Book. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="space port (4am crack).dsk" size="143360" crc="6c3ecdef" sha1="a51d6534737b539448dd8ea36999e0e4305d53fa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrdplayr">
+		<description>Word-Player (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>World Book</publisher>
+		<info name="release" value="2021-11-28"/>
+		<!--"Word-Player" is a 1985 educational program developed by Synergistic Software and distributed by World Book. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="word-player (4am crack).dsk" size="143360" crc="4aa95a21" sha1="3f99eb15c8adc83895f9ec1e8c38d2624907e6b5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divdecim">
+		<description>Dividing Decimals (Version 1.1) (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2021-11-26"/>
+		<!--"Dividing Decimals" is a 1985 educational program developed by Don Ross, written by Kevin Vessio, translated by Andrew Krainin, and distributed by Microcomputer Workshops Courseware. This is version 1.1. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dividing decimals v1.1 (4am crack).dsk" size="143360" crc="0c8442b6" sha1="d3a9e45e956f4eade3c52baee721c92574782524"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="perpanic">
+		<description>Percentage Panic (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="release" value="2021-11-26"/>
+		<!--"Percentage Panic" is a 1987 educational program developed by Andrew Bagdanov, created by June S. Stark, illustrated by Joseph Hewitt IV, and distributed by Unicorn Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="percentage panic (4am crack).dsk" size="143360" crc="c08e9e70" sha1="394db18625440ffaa5d5af43082da48c29283689"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="moonmadn">
+		<description>Moonlight and Madness Level II (Version 04.19.88) (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Hartley Courseware</publisher>
+		<info name="release" value="2021-11-26"/>
+		<!--"Moonlight and Madness Level II" is a 1988 educational program developed by Learning Lab Publishing and distributed by Hartley Courseware. This version is dated 04.19.88. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moonlight and madness ii v04.19.88 (4am crack) disk 1.dsk" size="143360" crc="885b9d0c" sha1="011b113410e9a4560b9093ceae39e6fd88d99996"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moonlight and madness ii v04.19.88 (4am crack) disk 2.dsk" size="143360" crc="63f7d986" sha1="2fb30f458f67ff9a10c7dd66566302bd6741cbf3"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="moonlight and madness ii v04.19.88 (4am crack) disk 3.dsk" size="143360" crc="96df05d5" sha1="df6ea407fef43236841ccaeceb428fcd7464e1ad"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

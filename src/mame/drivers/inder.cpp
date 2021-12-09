@@ -130,6 +130,7 @@ private:
 	u8 m_sndcmd = 0;
 	u8 m_sndbank = 0;
 	u32 m_sound_addr = 0;
+	u32 m_speech_size = 0;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -1136,7 +1137,10 @@ INPUT_PORTS_END
 
 u8 inder_state::sw_r()
 {
-	return m_io_keyboard[m_row]->read();
+	if (m_row < 11)
+		return m_io_keyboard[m_row]->read();
+	else
+		return 0;
 }
 
 void inder_state::sw_w(offs_t offset, u8 data)
@@ -1277,7 +1281,9 @@ void inder_state::sndbank_w(u8 data)
 
 void inder_state::update_mus()
 {
-	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
+	if (!m_speech_size)
+		return;
+	if ((m_sound_addr < m_speech_size) && (m_sndbank != 0xff))
 		m_13->ba_w(m_p_speech[m_sound_addr]);
 	else
 		m_13->ba_w(0);
@@ -1346,6 +1352,10 @@ void inder_state::machine_start()
 	save_item(NAME(m_sndcmd));
 	save_item(NAME(m_sndbank));
 	save_item(NAME(m_sound_addr));
+
+	m_speech_size = 0;
+	if (memregion("speech"))
+		m_speech_size = memregion("speech")->bytes();
 }
 
 void inder_state::machine_reset()
@@ -1644,7 +1654,7 @@ ROM_START(larana)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x0000, 0x2000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
 
-	ROM_REGION(0x40000, "speech", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "speech", ROMREGION_ERASEFF)
 	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
 ROM_END
 
@@ -1676,13 +1686,13 @@ ROM_START(metalman)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("sound_e1.bin", 0x0000, 0x2000, CRC(55e889e8) SHA1(0a240868c1b17762588c0ed9a14f568a6e50f409))
 
-	ROM_REGION(0x80000, "speech", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000, "speech", ROMREGION_ERASEFF)
 	ROM_LOAD("sound_e2.bin", 0x00000, 0x20000, CRC(5ac61535) SHA1(75b9a805f8639554251192e3777073c29952c78f))
 
 	ROM_REGION(0x2000, "audiocpu2", 0)
 	ROM_LOAD("sound_m1.bin", 0x0000, 0x2000, CRC(21a9ee1d) SHA1(d906ac7d6e741f05e81076a5be33fc763f0de9c1))
 
-	ROM_REGION(0x80000, "speech2", ROMREGION_ERASEFF)
+	ROM_REGION(0x60000, "speech2", ROMREGION_ERASEFF)
 	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
 	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END

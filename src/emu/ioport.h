@@ -798,7 +798,7 @@ public:
 	ioport_group group() const noexcept { return m_group; }
 	u8 player() const noexcept { return m_player; }
 	const char *token() const noexcept { return m_token; }
-	const char *name() const noexcept { return m_name; }
+	std::string name() const;
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) noexcept { return m_defseq[seqtype]; }
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_seq[seqtype]; }
@@ -1037,7 +1037,7 @@ public:
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
 	u8 impulse() const noexcept { return m_impulse; }
-	const char *name() const;
+	std::string name() const;
 	const char *specific_name() const noexcept { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
@@ -1382,7 +1382,7 @@ public:
 	// type helpers
 	const std::vector<input_type_entry> &types() const noexcept { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
-	const char *type_name(ioport_type type, u8 player) const noexcept;
+	std::string type_name(ioport_type type, u8 player) const;
 	ioport_group type_group(ioport_type type, int player) const noexcept;
 	const input_seq &type_seq(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	void set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq) noexcept;

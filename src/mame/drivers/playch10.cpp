@@ -281,8 +281,8 @@ O to A-F AND, at the same time, O to P ... Any help is appreciated ...
 Notes & Todo:
 -------------
 
-- Look at Ninja Gaiden 3. It has some slight timming issues on the
-  second level. Probably related to the mapper's irq timming.
+- Look at Ninja Gaiden 3. It has some slight timing issues on the
+  second level. Probably related to the mapper's irq timing.
 - Fix some remaining bad gfx in Rad Racer II.
 - Implement Dipswitches properly once Mame can support it.
 - Better control layout?. This thing has odd buttons.
@@ -894,11 +894,13 @@ void playch10_state::playch10_k(machine_config &config)
 	ROM_SYSTEM_BIOS( 1, "single",  "Single Monitor Version" ) \
 	ROM_SYSTEM_BIOS( 2, "alt",     "Alt Bios" ) /* this bios doesn't work properly, selecting service mode causes it to hang, is it good? maybe different hw? */ \
 	ROM_SYSTEM_BIOS( 3, "singleb", "Single Monitor Version (Newer?)" ) /* Newer single screen? Four bytes different, reported bugfix in freeplay */ \
+	ROM_SYSTEM_BIOS( 4, "dualb",   "Dual Monitor Version (alternate)" ) /* this bios doesn't work properly, was found on a PCH1-03-CPU PCB */ \
 	ROM_REGION( 0x10000, "maincpu", 0 )                     \
 	ROM_LOAD_BIOS( 0, "pch1-c__8t_e-2.8t", 0x00000, 0x4000, CRC(d52fa07a) SHA1(55cabf52ae10c050c2229081a80b9fe5454ab8c5) ) \
 	ROM_LOAD_BIOS( 1, "pck1-c.8t",         0x00000, 0x4000, CRC(503ee8b1) SHA1(3bd20bc71cac742d1b8c1430a6426d0a19db7ad0) ) \
 	ROM_LOAD_BIOS( 2, "pch1-c_8te.8t",     0x00000, 0x4000, CRC(123ffa37) SHA1(3bef754a5a85a8498bb6222ddf5cb9021f264db5) ) \
-	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t",     0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) )
+	ROM_LOAD_BIOS( 3, "pck1-c_fix.8t",     0x00000, 0x4000, CRC(0be8ceb4) SHA1(45b127a537370226e6b30be2b5a92ad05673ca7f) ) \
+	ROM_LOAD_BIOS( 4, "pch1-c__8t_e-1.8t", 0x00000, 0x4000, CRC(88a8f87e) SHA1(d1d7ffe68d2e7aa2faf8ad41a7ec8421265ede42) )
 
 
 #define BIOS_GFX                                            \

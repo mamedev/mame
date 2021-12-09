@@ -49,13 +49,15 @@ class nes_fcpad2_device : public nes_joypad_device
 {
 public:
 	// construction/destruction
-	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
 protected:
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
+	virtual u8 read_bit2() override;
+
+private:
+	required_ioport m_mic;
 };
 
 // ======================> nes_ccpadl_device

@@ -242,7 +242,7 @@ void duscc_device::device_start()
 
 void duscc_device::device_reset()
 {
-	LOG("%s %s \n",tag(), FUNCNAME);
+	LOG("%s\n", FUNCNAME);
 
 	m_chanA->reset();
 	m_chanB->reset();
@@ -297,7 +297,7 @@ int duscc_device::z80daisy_irq_state()
 {
 	int state = 0;
 
-	LOGINT("%s %s A:[%02x][%02x][%02x][%02x] B:[%02x][%02x][%02x][%02x] ",tag(), FUNCNAME,
+	LOGINT("%s A:[%02x][%02x][%02x][%02x] B:[%02x][%02x][%02x][%02x] ", FUNCNAME,
 		 m_int_state[0], m_int_state[1], m_int_state[2], m_int_state[3],
 		 m_int_state[4], m_int_state[5], m_int_state[6], m_int_state[7]);
 
@@ -325,7 +325,7 @@ int duscc_device::z80daisy_irq_state()
 
 int duscc_device::z80daisy_irq_ack()
 {
-	LOGINT("%s %s()\n",tag(), FUNCNAME);
+	LOGINT("%s()\n", FUNCNAME);
 
 	// loop over all interrupt sources
 	for (auto & elem : m_int_state)
@@ -360,7 +360,7 @@ int duscc_device::z80daisy_irq_ack()
 
 void duscc_device::z80daisy_irq_reti()
 {
-	LOGINT("%s %s \n",tag(), FUNCNAME);
+	LOGINT("%s\n", FUNCNAME);
 
 	// loop over all interrupt sources
 	for (auto & elem : m_int_state)
@@ -379,7 +379,7 @@ void duscc_device::z80daisy_irq_reti()
 
 uint8_t duscc_device::iack()
 {
-	LOGINT("%s %s - returning vector:%02x\n",tag(), FUNCNAME, m_ivrm);
+	LOGINT("%s - returning vector:%02x\n", FUNCNAME, m_ivrm);
 	int vec = z80daisy_irq_ack();
 	z80daisy_irq_reti();
 	return vec;
@@ -387,8 +387,8 @@ uint8_t duscc_device::iack()
 
 void duscc_device::check_interrupts()
 {
-	LOGINT("%s %s()\n",tag(), FUNCNAME);
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
+	LOGINT("%s(icr %02x ierA %02x ierB %02x state %d)\n", FUNCNAME, m_icr, m_chanA->m_ier, m_chanB->m_ier, state);
 
 	// "If no interrupt is pending, an H'FF' is output when reading the IVRM."
 	if (state == CLEAR_LINE)
@@ -406,7 +406,7 @@ void duscc_device::check_interrupts()
 
 void duscc_device::reset_interrupts()
 {
-	LOGINT("%s %s\n",tag(), FUNCNAME);
+	LOGINT("%s\n", FUNCNAME);
 
 	// reset internal interrupt sources
 	for (auto & elem : m_int_state)
@@ -435,7 +435,7 @@ uint8_t duscc_device::modify_vector(uint8_t vec, int index, uint8_t src)
 		  1  1  1 Ch B external or C/T status
 --------------------------------------------------
 		*/
-	LOGINT("%s %c %s, vec:%02x src=%02x\n",tag(), 'A' + index, FUNCNAME, vec, src);
+	LOGINT("%c %s, vec:%02x src=%02x\n", 'A' + index, FUNCNAME, vec, src);
 
 	// TODO: Prevent modification if no vector has been programmed, even if it is the default vector.
 	if ((m_icr & REG_ICR_VEC_MOD) != 0) // Affect vector?
@@ -482,7 +482,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 	uint8_t source = 0;
 	int priority_level = 0;
 
-	LOGINT("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state);
+	LOGINT("%s:%c %02x \n",FUNCNAME, 'A' + index, state);
 
 	// The Interrupt Control Register (ICR) bits, must be set for the corresponding channel
 	// ICR Check is probably by the caller but we check again to be sure
@@ -1288,7 +1288,7 @@ uint8_t duscc_channel::do_dusccreg_gsr_r()
 
 uint8_t duscc_channel::do_dusccreg_ier_r()
 {
-	LOGINT("%s <- %02x\n", FUNCNAME, m_ier);
+	LOGINT("%s(%02x)\n", FUNCNAME, m_ier);
 	return (uint8_t) m_ier;
 }
 
@@ -2039,7 +2039,7 @@ void duscc_channel::do_dusccreg_ccr_w(uint8_t data)
 
 void duscc_channel::do_dusccreg_txfifo_w(uint8_t data)
 {
-	LOGTX(" - TX %s(%02x)'%c'\n", FUNCNAME,data, isalnum(data) ? data : ' ');
+	LOGTX(" - TX %s(%02x)'%c' wp %d rp %d\n", FUNCNAME,data, isprint(data) ? data : ' ', m_tx_fifo_wp, m_tx_fifo_rp);
 
 	/* Tx FIFO is full or...? */
 	if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
@@ -2213,7 +2213,7 @@ uint8_t duscc_channel::read(offs_t &offset)
 {
 	uint8_t data = 0;
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
-	LOG("\"%s\" %s: %c : Register read '%02x' <- [%02x]", owner()->tag(), FUNCNAME, 'A' + m_index, data, reg );
+	LOGR("\"%s\" %s: %c : Register read '%02x' <- [%02x]", owner()->tag(), FUNCNAME, 'A' + m_index, data, reg );
 	LOGR(" *  %c Reg %02x -> %02x  \n", 'A' + m_index, reg, data);
 	switch (reg)
 	{
@@ -2264,7 +2264,7 @@ void duscc_channel::write(uint8_t data, offs_t &offset)
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 
 	LOGSETUP(" *  %s%c Reg %02x <- %02x  \n", owner()->tag(), 'A' + m_index, reg, data);
-	LOG("\"%s\" %s: %c : Register write '%02x' -> [%02x]", owner()->tag(), FUNCNAME, 'A' + m_index, data, reg );
+	LOG("\"%s\" %s: %c : Register write '%02x' -> [%02x]\n", owner()->tag(), FUNCNAME, 'A' + m_index, data, reg );
 	switch (reg)
 	{
 	case REG_CMR1:      do_dusccreg_cmr1_w(data); break;

@@ -78,26 +78,30 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 		for (const input_type_entry &entry : machine().ioport().types())
 		{
 			// add if we match the group and we have a valid name
-			if ((entry.group() == group) && entry.name() && entry.name()[0])
+			if (entry.group() == group)
 			{
-				// loop over all sequence types
-				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+				std::string name = entry.name();
+				if (!name.empty())
 				{
-					// build an entry for the standard sequence
-					input_item_data &item(data.emplace_back());
-					item.ref = &entry;
-					item.seqtype = seqtype;
-					item.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
-					item.defseq = &entry.defseq(seqtype);
-					item.group = entry.group();
-					item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-					item.is_optional = false;
-					item.name = _("input-name", entry.name());
-					item.owner = nullptr;
+					// loop over all sequence types
+					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
+					{
+						// build an entry for the standard sequence
+						input_item_data &item(data.emplace_back());
+						item.ref = &entry;
+						item.seqtype = seqtype;
+						item.seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
+						item.defseq = &entry.defseq(seqtype);
+						item.group = entry.group();
+						item.type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+						item.is_optional = false;
+						item.name = name;
+						item.owner = nullptr;
 
-					// stop after one, unless we're analog
-					if (item.type == INPUT_TYPE_DIGITAL)
-						break;
+						// stop after one, unless we're analog
+						if (item.type == INPUT_TYPE_DIGITAL)
+							break;
+					}
 				}
 			}
 		}
@@ -165,7 +169,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						item.group = machine().ioport().type_group(field.type(), field.player());
 						item.type = field.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 						item.is_optional = field.optional();
-						item.name = _("input-name", field.name());
+						item.name = field.name();
 						item.owner = &field.device();
 
 						// stop after one, unless we're analog
@@ -203,7 +207,7 @@ void menu_input_specific::populate(float &customtop, float &custombottom)
 						return true;
 					if (!codes2.empty() && (codes1.empty() || codes1[0] > codes2[0]))
 						return false;
-					cmp = strcmp(i1.name, i2.name);
+					cmp = i1.name.compare(i2.name);
 					if (cmp < 0)
 						return true;
 					if (cmp > 0)

@@ -42,8 +42,8 @@ DEFINE_DEVICE_TYPE(NES_ARCSTICK,    nes_arcstick_device, "nes_arcstick", "Ninten
 
 static INPUT_PORTS_START( nes_joypad )
 	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -53,15 +53,15 @@ static INPUT_PORTS_START( nes_joypad )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_fcpad_p2 )
-	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Microphone")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_INCLUDE( nes_joypad )
+
+	PORT_MODIFY("JOYPAD")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // no select button
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // or start button on controller 2
+
+	PORT_START("MIC")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Microphone") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_ccpad_left )
@@ -98,8 +98,8 @@ static INPUT_PORTS_START( nes_arcstick )
 	PORT_CONFSETTING(  0x02, "Player II" )
 
 	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY     PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x01)
@@ -180,8 +180,9 @@ nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nes_joypad_device(mconfig, NES_FCPAD_P2, tag, owner, clock)
+nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, NES_FCPAD_P2, tag, owner, clock)
+	, m_mic(*this, "MIC")
 {
 }
 
@@ -234,13 +235,9 @@ uint8_t nes_joypad_device::read_bit0()
 	return ret;
 }
 
-uint8_t nes_fcpad2_device::read_exp(offs_t offset)
+u8 nes_fcpad2_device::read_bit2()
 {
-	uint8_t ret = 0;
-	if (!offset)    // microphone input
-		ret |= m_joypad->read() & 0x04;
-
-	return ret;
+	return m_mic->read();
 }
 
 // NOTE: I haven't found any documentation about what happens when
@@ -286,15 +283,6 @@ void nes_joypad_device::write(uint8_t data)
 		return;
 
 	m_latch = m_joypad->read();
-}
-
-void nes_fcpad2_device::write(uint8_t data)
-{
-	if (data & 0x01)
-		return;
-
-	// microphone is hooked to expansion bits, not to the controller bit
-	m_latch = m_joypad->read() & ~0x04;
 }
 
 void nes_arcstick_device::write(uint8_t data)

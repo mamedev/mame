@@ -46,7 +46,6 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "imagedev/cassette.h"
 
 #include "machine/74259.h"
-#include "machine/bankdev.h"
 #include "machine/kb3600.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -135,8 +134,8 @@ public:
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
-		m_upperbank(*this, A2_UPPERBANK_TAG),
-		m_softlatch(*this, "softlatch")
+		m_softlatch(*this, "softlatch"),
+		m_upperbank(*this, A2_UPPERBANK_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -154,8 +153,8 @@ public:
 	required_ioport m_sysconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
-	required_device<address_map_bank_device> m_upperbank;
 	required_device<addressable_latch_device> m_softlatch;
+	memory_view m_upperbank;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
@@ -213,7 +212,6 @@ public:
 	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
 	void apple2_map(address_map &map);
-	void inhbank_map(address_map &map);
 
 private:
 	int m_speaker_state, m_cassette_state;
@@ -285,7 +283,7 @@ WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 1)
 						{
-							m_upperbank->set_bank(1);
+							m_upperbank.select(1);
 							m_inh_bank = 1;
 						}
 					}
@@ -293,7 +291,7 @@ WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 					{
 						if (m_inh_bank != 0)
 						{
-							m_upperbank->set_bank(0);
+							m_upperbank.select(0);
 							m_inh_bank = 0;
 						}
 					}
@@ -307,7 +305,7 @@ WRITE_LINE_MEMBER(apple2_state::a2bus_inh_w)
 		// if no slots are inhibiting, make sure ROM is fully switched in
 		if ((m_inh_slot == -1) && (m_inh_bank != 0))
 		{
-			m_upperbank->set_bank(0);
+			m_upperbank.select(0);
 			m_inh_bank = 0;
 		}
 	}
@@ -325,7 +323,7 @@ void apple2_state::machine_start()
 	m_speaker->level_w(m_speaker_state);
 	m_cassette_state = 0;
 	m_cassette->output(-1.0f);
-	m_upperbank->set_bank(0);
+	m_upperbank.select(0);
 	m_inh_bank = 0;
 	m_strobe = 0;
 	m_transchar = 0;
@@ -976,13 +974,9 @@ void apple2_state::apple2_map(address_map &map)
 	map(0xc080, 0xc0ff).rw(FUNC(apple2_state::c080_r), FUNC(apple2_state::c080_w));
 	map(0xc100, 0xc7ff).rw(FUNC(apple2_state::c100_r), FUNC(apple2_state::c100_w));
 	map(0xc800, 0xcfff).rw(FUNC(apple2_state::c800_r), FUNC(apple2_state::c800_w));
-	map(0xd000, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
-}
-
-void apple2_state::inhbank_map(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0x1000).w(FUNC(apple2_state::inh_w));
-	map(0x3000, 0x5fff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
+	map(0xd000, 0xffff).view(m_upperbank);
+	m_upperbank[0](0xd000, 0xffff).rom().region("maincpu", 0x1000).w(FUNC(apple2_state::inh_w));
+	m_upperbank[1](0xd000, 0xffff).rw(FUNC(apple2_state::inh_r), FUNC(apple2_state::inh_w));
 }
 
 /***************************************************************************
@@ -1373,9 +1367,6 @@ void apple2_state::apple2_common(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
-
-	/* /INH banking */
-	ADDRESS_MAP_BANK(config, A2_UPPERBANK_TAG).set_map(&apple2_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
 
 	/* soft switches */
 	F9334(config, m_softlatch); // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)

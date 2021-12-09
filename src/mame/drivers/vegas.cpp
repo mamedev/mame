@@ -2501,6 +2501,9 @@ ROM_START( sf2049 )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" ) // Guts 1.03 9/3/1999 Game 9/8/1999
 	DISK_IMAGE( "sf2049", 0, SHA1(9e0661b8566a6c78d18c59c11cd3a6628d025405) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "336_rush_2049.u18", 0x0000, 0x1000, CRC(e258c3ff) SHA1(c78f739638a0775e4075c6a460c70dafbcf08fd5) )
 ROM_END
 
 
@@ -2516,6 +2519,9 @@ ROM_START( sf2049se )
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "sf2049se", 0, SHA1(7b27a8ce2a953050ce267548bb7160b41f3e8054) )
+
+	ROM_REGION( 0x2000, "serial_security_pic", ROMREGION_ERASEFF ) // security PIC (provides game ID code and serial number)
+	ROM_LOAD( "352_rush_2049_se.u18", 0x0000, 0x1007, CRC(6120c20d) SHA1(9bd76514de261aa7957f896c1ea0b3f91d4cb5d6) ) // is this original or bootleg ? PIC timestamp is 1 Jan 1980 and SN# very small number
 ROM_END
 
 

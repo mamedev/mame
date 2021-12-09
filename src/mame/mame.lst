@@ -13660,6 +13660,7 @@ pgalvip                         // (c) 1996 ACE International (Afega stickers on
 pgalvipa                        //
 smissw                          //
 supmodel                        // (c) 1994 Comad & New Japan System
+supmodl2                        // (c) 1997 Comad
 wownfant                        // (c) 2002 Comad
 zipzap                          // (c) 1995 Barko Corp
 zipzapa                         // (c) 1995 Barko Corp
@@ -15438,6 +15439,7 @@ moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
 
 @source:goldnpkr.cpp
+adpoker                         // 198?, Unknown
 animpkr                         // 198?, Unknown
 bchancep                        // 198?, Unknown
 bchanceq                        // 198?, Unknown
@@ -16279,6 +16281,9 @@ hcastle                         // GX768 (c) 1988
 hcastlee                        // GX768 (c) 1988
 hcastlek                        // GX768 (c) 1988
 
+@source:hds200.cpp
+hds200                          // (c) Human Designed Systems
+
 @source:headonb.cpp
 blackhol
 foolrace                        // bootleg
@@ -16409,6 +16414,7 @@ smastmind                       // Invicta
 atakaast                        // Elektronika
 auslalom                        // Elektronika
 bassmate                        // Telko
+ehockey                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -17148,6 +17154,7 @@ ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 ikt5a                           //
 
 @source:im01.cpp
+im01
 im01t
 
 @source:imds2.cpp
