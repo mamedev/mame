@@ -309,15 +309,15 @@ namespace {
  *
  *************************************/
 
-#define PCI_ID_NILE     ":pci:00.0"
-#define PCI_ID_VIDEO    ":pci:03.0"
-#define PCI_ID_IDE      ":pci:05.0"
+#define PCI_ID_NILE     "pci:00.0"
+#define PCI_ID_VIDEO    "pci:03.0"
+#define PCI_ID_IDE      "pci:05.0"
 
 class vegas_state : public driver_device
 {
 public:
-	vegas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	vegas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nile(*this, PCI_ID_NILE),
 		m_timekeeper(*this, "timekeeper") ,
@@ -1905,7 +1905,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_maincpu->set_system_clock(vegas_state::SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, ":pci", 0);
+	PCI_ROOT(config, "pci", 0);
 
 	VRC5074(config, m_nile, 100000000, m_maincpu);
 	m_nile->set_sdram_size(0, 0x00800000);

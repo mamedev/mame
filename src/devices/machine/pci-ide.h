@@ -26,8 +26,7 @@ public:
 		: ide_pci_device(mconfig, tag, owner, clock)
 	{
 		set_ids(main_id, revision, 0x01018a, subdevice_id);
-		m_bus_master_tag = bmtag;
-		m_bus_master_space = bmspace;
+		m_bus_master_space.set_tag(bmtag, bmspace);
 	}
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -69,8 +68,7 @@ private:
 	// Bits 31-20 for legacy mode hack
 	uint32_t m_legacy_top;
 	uint32_t m_pif;
-	const char* m_bus_master_tag;
-	uint32_t m_bus_master_space;
+	required_address_space m_bus_master_space;
 
 	uint32_t m_config_data[0x10];
 	void chan1_data_command_map(address_map &map);

@@ -226,9 +226,9 @@ namespace {
 
 #define SYSTEM_CLOCK            50000000
 
-#define PCI_ID_GALILEO  ":pci:00.0"
-#define PCI_ID_VIDEO    ":pci:08.0"
-#define PCI_ID_IDE      ":pci:09.0"
+#define PCI_ID_GALILEO  "pci:00.0"
+#define PCI_ID_VIDEO    "pci:08.0"
+#define PCI_ID_IDE      "pci:09.0"
 
 // various board configurations
 #define PHOENIX_CONFIG          (0)
@@ -269,8 +269,8 @@ namespace {
 class seattle_state : public driver_device
 {
 public:
-	seattle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	seattle_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_nvram(*this, "nvram"),
 		m_maincpu(*this, "maincpu"),
 		m_galileo(*this, PCI_ID_GALILEO),
@@ -1999,7 +1999,7 @@ void seattle_state::seattle_common(machine_config &config)
 	m_maincpu->set_system_clock(SYSTEM_CLOCK);
 
 	// PCI Bus Devices
-	PCI_ROOT(config, ":pci", 0);
+	PCI_ROOT(config, "pci", 0);
 
 	GT64010(config, m_galileo, SYSTEM_CLOCK, m_maincpu, GALILEO_IRQ_NUM);
 	m_galileo->set_map(0, address_map_constructor(&seattle_state::seattle_cs0_map, "seattle_cs0_map", this), this);
