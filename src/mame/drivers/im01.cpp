@@ -18,12 +18,13 @@ TODO:
   and/or T11 core timing itself is not 100% accurate.
 - verify actual XTAL, the label couldn't be seen
 - correct bus conflict between RAM and I/O
+- is ИМ-01Т extra RAM chip used at all?
 
 *******************************************************************************
 
 Hardware notes:
 - К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz
-- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1)
+- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1) (4KB RAM for ИМ-01Т)
 - K1809BB1 (I/O, counter)
 - 4-digit VFD 7seg panel(cyan, green window overlay), beeper
 
