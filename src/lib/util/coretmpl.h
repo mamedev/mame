@@ -562,6 +562,16 @@ constexpr typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T
 	return static_cast<E>(value);
 }
 
+// template function which takes an integral value and sign-extends or zero-extends it based on the result type
+template <typename T, typename U> constexpr T iext(U n) noexcept
+{
+	static_assert(sizeof(T) >= sizeof(U), "return type too small for result");
+	if constexpr (std::is_signed_v<T>)
+		return T(std::make_signed_t<U>(n));
+	else
+		return T(std::make_unsigned_t<U>(n));
+}
+
 
 /// \defgroup bitutils Useful functions for bit shuffling
 /// \{
@@ -607,6 +617,57 @@ template <typename T, typename U> constexpr T BIT(T x, U n) noexcept { return (x
 template <typename T, typename U, typename V> constexpr T BIT(T x, U n, V w)
 {
 	return (x >> n) & make_bitmask<T>(w);
+}
+
+
+/// \brief Assign a single bit in an integer
+///
+/// Sets or clears a single bit in an integer.
+///
+/// \param [in,out] x A reference to an integer.
+/// \param [in] n The bit to assign, where zero is the least
+///   significant bit of the input.
+/// \param [in] v The Boolean value to assign. A true value sets the bit
+///   to 1, while a false value clears the bit to 0.
+/// \sa BIT exch_bit
+
+template <typename T, typename U> void set_bit(T &x, U n, bool v) noexcept
+{
+	T mask = std::make_unsigned_t<T>(1) << n;
+	if (v)
+		x |= mask;
+	else
+		x &= ~mask;
+}
+
+
+/// \brief Exchange a single bit in an integer
+///
+/// Sets or clears a single bit in an integer and returns its former value.
+///
+/// \param [in,out] x A reference to an integer.
+/// \param [in] n The bit to assign, where zero is the least
+///   significant bit of the input.
+/// \param [in] v The Boolean value to assign. A true value sets the bit
+///   to 1, while a false value clears the bit to 0.
+/// \return The previous value of the bit.
+/// \sa BIT set_bit
+
+template <typename T, typename U> bool exch_bit(T &x, U n, bool v) noexcept
+{
+	T mask = std::make_unsigned_t<T>(1) << n;
+	if (x & mask)
+	{
+		if (!v)
+			x &= ~mask;
+		return true;
+	}
+	else
+	{
+		if (v)
+			x |= mask;
+		return false;
+	}
 }
 
 
@@ -661,7 +722,50 @@ template <unsigned B, typename T, typename... U> T bitswap(T val, U... b) noexce
 	return bitswap(val, b...);
 }
 
+
+/// \brief Concatenate multiple bytes/words into a single word
+///
+/// Concatenates values together.  Specify the words in the order they
+/// should be arranged in the output, from most significant to least
+/// significant.  The words will be packed into a right-aligned
+/// field in the output.
+///
+/// \tparam T Desired output type. May be either signed or unsigned.
+/// \param [in] b The first input word. This word will appear in the
+///   most significant position of the right-aligned output word. It
+///   will be sign-extended if the result type is signed.
+/// \param [in] c The remaining words to concatenate. They will be
+///   given the same type as the first word, but not receive sign
+///   extension.
+/// \return The concatenated words packed into a single word.
+template <typename T, typename U, typename... V> constexpr T icat(U b, V... c) noexcept
+{
+	static_assert(sizeof(T) >= sizeof(U) * (1 + sizeof...(c)), "return type too small for result");
+	if constexpr (sizeof...(c) > 0U)
+		return (iext<T>(b) << 8 * sizeof(U) * sizeof...(c)) | icat<std::make_unsigned_t<T>, U>(c...);
+	else
+		return iext<T>(b);
+}
+
 /// \}
+
+
+// add offset to low bits of base, preserving upper bits
+template <typename T, typename U, typename V>
+[[nodiscard]] constexpr T add_l(T base, U bits, V offset) noexcept
+{
+	T const mask = make_bitmask<T>(bits);
+	return (base & ~mask) | ((base + offset) & mask);
+}
+
+
+// subtract offset from low bits of base, preserving upper bits
+template <typename T, typename U, typename V>
+[[nodiscard]] constexpr T sub_l(T base, U bits, V offset) noexcept
+{
+	T const mask = make_bitmask<T>(bits);
+	return (base & ~mask) | ((base - offset) & mask);
+}
 
 
 // constexpr absolute value of an integer
