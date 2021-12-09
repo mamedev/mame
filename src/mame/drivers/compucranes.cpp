@@ -62,16 +62,16 @@ public:
 	{
 	}
 
-	void omvcrane(machine_config &config);
+	void ganchonew(machine_config &config);
 
 protected:
 	required_device<mcs51_cpu_device> m_maincpu;
 };
 
-INPUT_PORTS_START(omvcrane)
+INPUT_PORTS_START(ganchonew)
 INPUT_PORTS_END
 
-void compucranes_state::omvcrane(machine_config &config)
+void compucranes_state::ganchonew(machine_config &config)
 {
 	I80C32(config, m_maincpu, 6_MHz_XTAL);
 
@@ -98,6 +98,6 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME        PARENT     MACHINE   INPUT     CLASS              INIT        ROT   COMPANY       FULLNAME                FLAGS
-GAME( 199?, mastcrane,  0,         omvcrane, omvcrane, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, mastcranea, ganchonew, omvcrane, omvcrane, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+//    YEAR  NAME        PARENT     MACHINE    INPUT      CLASS              INIT        ROT   COMPANY       FULLNAME                FLAGS
+GAME( 199?, mastcrane,  0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, mastcranea, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
