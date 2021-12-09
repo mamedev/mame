@@ -20,10 +20,14 @@
     - XTAL 22.680 MHz and 35.640 MHz (video)
 
     TODO:
-    - Everything
+    - Z80DMA/SCN2674 hookup
+    - Keyboard
+    - RS232 ports
+    - Sound? (if supported)
 
     Notes:
-    -
+    - The PCB has a large unpopulated area. Possibly this is used for the
+      200G variant.
 
 ***************************************************************************/
 
@@ -54,13 +58,15 @@ public:
 		m_dma(*this, "dma"),
 		m_screen(*this, "screen"),
 		m_avdc(*this, "avdc"),
-		m_duart(*this, "duart%u", 0U)
+		m_duart(*this, "duart%u", 0U),
+		m_rombank(*this, "rombank")
 	{ }
 
 	void hds200(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	void mem_map(address_map &map);
@@ -71,6 +77,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<scn2674_device> m_avdc;
 	required_device_array<scn2681_device, 2> m_duart;
+	required_memory_bank m_rombank;
 
 	void duart0_out_w(uint8_t data);
 	void duart1_out_w(uint8_t data);
@@ -83,7 +90,8 @@ private:
 
 void hds200_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x5fff).rom().region("maincpu", 0);
+	map(0x0000, 0x3fff).rom().region("maincpu", 0);
+	map(0x4000, 0x5fff).bankr(m_rombank);
 	map(0x6800, 0x6fff).ram(); // nvram?
 	map(0x8000, 0xbfff).ram();
 	map(0xc000, 0xffff).noprw(); // expansion ram
@@ -130,11 +138,23 @@ void hds200_state::duart0_out_w(uint8_t data)
 
 void hds200_state::duart1_out_w(uint8_t data)
 {
+	// 76543---  unknown
+	// -----2--  rombank
+	// ------10  unknown
+
 	logerror("duart1_out_w: %02x\n", data);
+
+	m_rombank->set_entry(!BIT(data, 2));
 }
 
 void hds200_state::machine_start()
 {
+	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x4000, 0x2000);
+}
+
+void hds200_state::machine_reset()
+{
+	m_rombank->set_entry(0);
 }
 
 
@@ -203,4 +223,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT   COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY         FULLNAME            FLAGS
-COMP( 198?, hds200, 0,       0,      hds200,  0,     hds200_state, empty_init, "Human Designed Systems", "HDS200", MACHINE_IS_SKELETON )
+COMP( 198?, hds200, 0,       0,      hds200,  0,     hds200_state, empty_init, "Human Designed Systems", "HDS200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
