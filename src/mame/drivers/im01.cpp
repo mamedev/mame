@@ -17,7 +17,11 @@ TODO:
   around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
   and/or T11 core timing itself is not 100% accurate.
 - verify actual XTAL, the label couldn't be seen
-- correct bus conflict between RAM and I/O
+- Bus conflict between RAM and I/O is not understood, ИМ-01(not Т) is picky
+  about it. It expects RAM 0x003f to be non-0, which only gets set in the
+  hardware bus error trap routine. But that routine also overwrites the stack,
+  so I don't think that's it. Another hint that points to a bus conflict is
+  that the game clears RAM 0x003e before reading inputs.
 - is ИМ-01Т extra RAM chip used at all?
 
 *******************************************************************************
@@ -76,6 +80,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
+		m_ram(*this, "ram"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -89,6 +94,7 @@ private:
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
+	required_shared_ptr<u16> m_ram;
 	required_ioport_array<6> m_inputs;
 
 	void main_map(address_map &map);
@@ -103,6 +109,7 @@ private:
 	u16 digit_r(offs_t offset, u16 mem_mask);
 	void digit_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 input_r(offs_t offset, u16 mem_mask);
+	u16 conflict_r(offs_t offset, u16 mem_mask);
 
 	u16 m_inp_mux = 0;
 	u16 m_digit_data = 0;
@@ -184,7 +191,14 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read();
 
-	return data << 8 | 0xff;
+	return data << 8;
+}
+
+u16 im01_state::conflict_r(offs_t offset, u16 mem_mask)
+{
+	// bus conflict between RAM and I/O
+	u16 conflict = (offset >= 0x18 && offset < 0x20) ? 0xff : 0;
+	return m_ram[offset] | conflict;
 }
 
 
@@ -195,11 +209,11 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 
 void im01_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
-	map(0x0030, 0x0031).mirror(0xf800).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
-	map(0x003c, 0x003d).mirror(0xf800).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
-	map(0x003e, 0x003f).mirror(0xf800).r(FUNC(im01_state::input_r));
-	map(0x2000, 0x5fff).rom().unmapw();
+	map(0x0000, 0x07ff).ram().r(FUNC(im01_state::conflict_r)).share("ram");
+	map(0x2000, 0x5fff).rom();
+	map(0xe030, 0xe031).mirror(0x1800).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
+	map(0xe03c, 0xe03d).mirror(0x1800).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
+	map(0xe03e, 0xe03f).mirror(0x1800).r(FUNC(im01_state::input_r));
 }
 
 
@@ -278,13 +292,13 @@ void im01_state::im01(machine_config &config)
 ******************************************************************************/
 
 ROM_START( im01 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
 	ROM_LOAD("0000107", 0x2000, 0x2000, CRC(2318e85b) SHA1(6a92f6464af69ad0175f323f01dd067b91d345d3) )
 	ROM_LOAD("0000106", 0x4000, 0x2000, CRC(b0ab8808) SHA1(b682e9e8a5e52cd8fee5ae45277ae658bf5c32f1) )
 ROM_END
 
 ROM_START( im01t )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION16_LE( 0x10000, "maincpu", 0 )
 	ROM_LOAD("0000148", 0x2000, 0x2000, CRC(327c6055) SHA1(b90b3b1261d677eb93014ea9e809e45b3b25152a) )
 	ROM_LOAD("0000149", 0x4000, 0x2000, CRC(43b14589) SHA1(b083b631f38a26a335226bc474669ef7f332f541) )
 ROM_END
