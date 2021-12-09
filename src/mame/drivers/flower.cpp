@@ -12,7 +12,10 @@
       galaxy, planet ship 3rd boss, 2nd boss);
     - sound chips (similar to Namco custom chips?)
 
-    Video reference: https://youtu.be/ycbJMG09UZ0
+    Video reference:
+	https://youtu.be/ycbJMG09UZ0
+	https://youtu.be/NolazjlEiAY
+	https://youtu.be/8JOPTCWu67g
 
 ===============================================================================
 
@@ -403,7 +406,7 @@ static INPUT_PORTS_START( flower )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flower_state,coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, flower_state, coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_DIPNAME( 0x08, 0x08, "Energy Decrease" )       PORT_DIPLOCATION("SW2:4")
@@ -471,9 +474,9 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_flower )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0,  64 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0,  16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0,  16 )
+	GFXDECODE_ENTRY( "text",    0, charlayout, 0, 64 )
+	GFXDECODE_ENTRY( "tiles",   0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
 void flower_state::machine_start()
@@ -541,16 +544,16 @@ ROM_START( flower ) /* Komax version */
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
 	ROM_LOAD( "3.d9",   0x0000, 0x4000, CRC(8866c2b0) SHA1(d00f31994673e8087a1406f98e8832d07cedeb66) ) // 1xxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT ) /* tx layer */
+	ROM_REGION( 0x2000, "text", ROMREGION_INVERT ) /* tx layer */
 	ROM_LOAD( "10.13e", 0x0000, 0x2000, CRC(62f9b28c) SHA1(d57d06b99e72a4f68f197a5b6c042c926cc70ca0) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_INVERT ) /* bg layers */
+	ROM_REGION( 0x8000, "tiles", ROMREGION_INVERT ) /* bg layers */
 	ROM_LOAD( "8.10e",  0x0000, 0x2000, CRC(f85eb20f) SHA1(699edc970c359143dee6de2a97cc2a552454785b) )
 	ROM_LOAD( "6.7e",   0x2000, 0x2000, CRC(3e97843f) SHA1(4e4e5625dbf78eca97536b1428b2e49ad58c618f) )
 	ROM_LOAD( "9.12e",  0x4000, 0x2000, CRC(f1d9915e) SHA1(158e1cc8c402f9ae3906363d99f2b25c94c64212) )
 	ROM_LOAD( "15.9e",  0x6000, 0x2000, CRC(1cad9f72) SHA1(c38dbea266246ed4d47d12bdd8f9fae22a5f8bb8) )
 
-	ROM_REGION( 0x8000, "gfx3", ROMREGION_INVERT ) /* sprites */
+	ROM_REGION( 0x8000, "sprites", ROMREGION_INVERT ) /* sprites */
 	ROM_LOAD( "14.19e", 0x0000, 0x2000, CRC(11b491c5) SHA1(be1c4a0fbe8fd4e124c21e0f700efa0428376691) )
 	ROM_LOAD( "13.17e", 0x2000, 0x2000, CRC(ea743986) SHA1(bbef4fd0f7d21cc89a52061fa50d7c2ea37287bd) )
 	ROM_LOAD( "12.16e", 0x4000, 0x2000, CRC(e3779f7f) SHA1(8e12d06b3cdc2fcb7b77cc35f8eca45544cc4873) )
@@ -584,16 +587,16 @@ ROM_START( flowerj ) /* Sega/Alpha version.  Sega game number 834-5998 */
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound cpu */
 	ROM_LOAD( "3.d9",   0x0000, 0x4000, CRC(8866c2b0) SHA1(d00f31994673e8087a1406f98e8832d07cedeb66) ) // 1xxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_INVERT ) /* tx layer */
+	ROM_REGION( 0x2000, "text", ROMREGION_INVERT ) /* tx layer */
 	ROM_LOAD( "10.13e", 0x0000, 0x2000, CRC(62f9b28c) SHA1(d57d06b99e72a4f68f197a5b6c042c926cc70ca0) ) // FIRST AND SECOND HALF IDENTICAL
 
-	ROM_REGION( 0x8000, "gfx2", ROMREGION_INVERT ) /* bg layers */
+	ROM_REGION( 0x8000, "tiles", ROMREGION_INVERT ) /* bg layers */
 	ROM_LOAD( "8.10e",  0x0000, 0x2000, CRC(f85eb20f) SHA1(699edc970c359143dee6de2a97cc2a552454785b) )
 	ROM_LOAD( "6.7e",   0x2000, 0x2000, CRC(3e97843f) SHA1(4e4e5625dbf78eca97536b1428b2e49ad58c618f) )
 	ROM_LOAD( "9.12e",  0x4000, 0x2000, CRC(f1d9915e) SHA1(158e1cc8c402f9ae3906363d99f2b25c94c64212) )
 	ROM_LOAD( "7.9e",   0x6000, 0x2000, CRC(e350f36c) SHA1(f97204dc95b4000c268afc053a2333c1629e07d8) )
 
-	ROM_REGION( 0x8000, "gfx3", ROMREGION_INVERT ) /* sprites */
+	ROM_REGION( 0x8000, "sprites", ROMREGION_INVERT ) /* sprites */
 	ROM_LOAD( "14.19e", 0x0000, 0x2000, CRC(11b491c5) SHA1(be1c4a0fbe8fd4e124c21e0f700efa0428376691) )
 	ROM_LOAD( "13.17e", 0x2000, 0x2000, CRC(ea743986) SHA1(bbef4fd0f7d21cc89a52061fa50d7c2ea37287bd) )
 	ROM_LOAD( "12.16e", 0x4000, 0x2000, CRC(e3779f7f) SHA1(8e12d06b3cdc2fcb7b77cc35f8eca45544cc4873) )

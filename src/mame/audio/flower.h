@@ -67,13 +67,11 @@ private:
 		u8 volume_bank = 0;
 		//u8 effect = 0;
 		bool enable = false;
-		bool repeat = 0;
-		int channel_number = 0;
+		bool repeat = false;
 	};
 
 	/* data about the sound system */
 	fl_sound_channel m_channel_list[MAX_VOICES];
-	fl_sound_channel *m_last_channel;
 
 	void make_mixer_table(int voices, int gain);
 
