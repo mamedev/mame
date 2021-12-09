@@ -17,11 +17,6 @@ TODO:
   around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
   and/or T11 core timing itself is not 100% accurate.
 - verify actual XTAL, the label couldn't be seen
-- Bus conflict between RAM and I/O is not understood, ИМ-01(not Т) is picky
-  about it. It expects RAM 0x003f to be non-0, which only gets set in the
-  hardware bus error trap routine. But that routine also overwrites the stack,
-  so I don't think that's it. Another hint that points to a bus conflict is
-  that the game clears RAM 0x003e before reading inputs.
 - is ИМ-01Т extra RAM chip used at all?
 
 *******************************************************************************
@@ -80,7 +75,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
-		m_ram(*this, "ram"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
 
@@ -94,7 +88,6 @@ private:
 	required_device<t11_device> m_maincpu;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_bit_interface> m_dac;
-	required_shared_ptr<u16> m_ram;
 	required_ioport_array<6> m_inputs;
 
 	void main_map(address_map &map);
@@ -109,7 +102,7 @@ private:
 	u16 digit_r(offs_t offset, u16 mem_mask);
 	void digit_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 input_r(offs_t offset, u16 mem_mask);
-	u16 conflict_r(offs_t offset, u16 mem_mask);
+	void error_w(offs_t offset, u16 data, u16 mem_mask);
 
 	u16 m_inp_mux = 0;
 	u16 m_digit_data = 0;
@@ -194,11 +187,10 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 	return data << 8;
 }
 
-u16 im01_state::conflict_r(offs_t offset, u16 mem_mask)
+void im01_state::error_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// bus conflict between RAM and I/O
-	u16 conflict = (offset >= 0x18 && offset < 0x20) ? 0xff : 0;
-	return m_ram[offset] | conflict;
+	// unmapped port, expects a bus error
+	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
 }
 
 
@@ -209,11 +201,12 @@ u16 im01_state::conflict_r(offs_t offset, u16 mem_mask)
 
 void im01_state::main_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram().r(FUNC(im01_state::conflict_r)).share("ram");
+	map(0x0000, 0x07ff).ram();
 	map(0x2000, 0x5fff).rom();
 	map(0xe030, 0xe031).mirror(0x1800).rw(FUNC(im01_state::mux_r), FUNC(im01_state::mux_w));
 	map(0xe03c, 0xe03d).mirror(0x1800).rw(FUNC(im01_state::digit_r), FUNC(im01_state::digit_w));
 	map(0xe03e, 0xe03f).mirror(0x1800).r(FUNC(im01_state::input_r));
+	map(0xffe8, 0xffe9).w(FUNC(im01_state::error_w)).nopr();
 }
 
 
