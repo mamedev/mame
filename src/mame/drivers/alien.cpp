@@ -24,6 +24,9 @@
 
    Upper boards (game specific):
 
+   Capcom AMT-02012-01 (Medalusion 1)
+    - TODO
+
    Capcom AMT-04041 (Alien: The Arcade)
     - 2 x Panasonic MN677511DE MPEG2 decoder
     - 2 x Hynix HY57V161610DTC-7 512K x 16-bit x 2-banks (16Mbit) SDRAM (TSOPII-50)
@@ -32,7 +35,7 @@
     - S29JL064H 64Mbit FlashROM (TSOP-48)
     - Compact Flash connector
 
-   Capcom AMT-05057 (Pingu's Ice Block and Donkey Kong Banana Kingdom)
+   Capcom AMT-05057 (Donkey Kong Banana Kingdom and Medalusion 2 games)
     - Altera MAX EPM3064ATC100-10 CPLD (QFP-100) stamped PS015
     - S29JL064H 64Mbit FlashROM (TSOP-48)
     - Compact Flash connector
@@ -49,10 +52,10 @@
 
     Single player medal machines:
     Medalusion:
-     - Chibi Maruko-chan's "Sugoroku Playfully Everyone" Volume (c) 2003
+ *   - Chibi Maruko-chan's "Sugoroku Playfully Everyone" Volume (c) 2003
      - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
      - Rockman EXE The Medal Operation (c) 2005
-     - Super Mario Fushigi No JanJanLand (c) 2005
+ *   - Super Mario Fushigi No JanJanLand (c) 2005
 
     Medalusion 2:
  !   - Doko Demo Issho Toro's Fishing (c) 2006
@@ -170,6 +173,10 @@ void alien_state::init_dkbanans()
 *        Rom Load        *
 *************************/
 
+////////////////////////////
+// Custom multi-unit games
+////////////////////////////
+
 ROM_START( alien )
 	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
 	ROM_LOAD32_WORD( "aln_s04.4.ic30", 0x000000, 0x400000, CRC(11777d3f) SHA1(8cc9fcae7911e6be273b4532d89b44a309687ead) )
@@ -183,19 +190,6 @@ ROM_START( alien )
 
 	DISK_REGION( "card" ) //compact flash
 	DISK_IMAGE( "alien", 0, SHA1(0328f12765db41a9ef5c8bfb88d4983345093072) )
-ROM_END
-
-// ROM board only dumped, main board is missing
-ROM_START( pingu )
-	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
-
-	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
-	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
-
-	DISK_REGION( "card" ) //compact flash
-	DISK_IMAGE( "pingu", 0, SHA1(9c74e30906f229eba4bff8262c98e556d3ea1c23) )
 ROM_END
 
 // Host unit board, GPUs and YMZ770B not populated.
@@ -232,18 +226,6 @@ ROM_START( dkbanans )
 	// same card was used in both Host and Satellite units
 	DISK_REGION( "card" ) //compact flash
 	DISK_IMAGE( "dkbanana", 0, SHA1(c6b50486f2a6382a7eb36167712342212f87c189) )
-ROM_END
-
-// CF card only dumped, boot ROMs is missing
-ROM_START( dokodemo )
-	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
-	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
-	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
-
-	ROM_REGION( 0x800100, "ymz770b", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
-
-	DISK_REGION( "card" ) //compact flash
-	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
 ROM_END
 
 // 'Center' unit, GPUs and YMZ770B not populated.
@@ -286,6 +268,50 @@ ROM_START( masmario2 )
 	DISK_IMAGE( "massmario2", 0, SHA1(9632c91bf2e4983ee29f417e3122e9380baee25b) )
 ROM_END
 
+////////////////////////
+// Medalusion 1 platform
+////////////////////////
+
+// uses main board with 1 GPU populated and AMT-02012-01 upper I/O board
+
+ROM_START( mmaruchan )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "spt_04b.ic30", 0x000000, 0x400000, CRC(9899f171) SHA1(d114c1ef0608c0740b7d58561c9f39c13b453e3a) )
+	ROM_LOAD32_WORD( "spt_05b.ic33", 0x000002, 0x400000, CRC(108efb71) SHA1(3f9e1c59f7af60976d140bf68b75c270a364f3a2) )
+
+	ROM_REGION( 0x400000, "ymz770b", 0 )
+	ROM_LOAD16_WORD_SWAP( "spt_01.ic31", 0x000000, 0x400000, CRC(790b4bed) SHA1(3df68610f8b81dd5f74dca0f05da47a539b45163) )
+ROM_END
+
+////////////////////////
+// Medalusion 2 platform
+////////////////////////
+
+// CF card only dumped, boot ROMs is missing
+ROM_START( dokodemo )
+	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
+	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+
+	ROM_REGION( 0x800100, "ymz770b", ROMREGION_ERASEFF ) //sound samples flash rom, not really needed, programmed by boot loader
+
+	DISK_REGION( "card" ) //compact flash
+	DISK_IMAGE( "dokodemo", 0, SHA1(0c786b6857a29b26971578abe1c8439fe43d94b5) )
+ROM_END
+
+// ROM board only dumped, main board is missing
+ROM_START( pingu )
+	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, BAD_DUMP CRC(6b2d2ef1) SHA1(0db6490b40c5716c1271b7f99608e8c7ad916516) ) //
+	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, BAD_DUMP CRC(64049fc3) SHA1(b373b2c8cb4d66b9c700e0542bd26444484fae40) ) // modified boot roms from dkbanans
+
+	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom, not really needed, programmed by boot loader
+	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
+
+	DISK_REGION( "card" ) //compact flash
+	DISK_IMAGE( "pingu", 0, SHA1(9c74e30906f229eba4bff8262c98e556d3ea1c23) )
+ROM_END
+
 // CF card only dumped, boot ROMs is missing
 ROM_START( wontame )
 	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
@@ -298,13 +324,16 @@ ROM_START( wontame )
 	DISK_IMAGE( "wontame", 0, SHA1(eb4fe73d5f723b3af08d96c6d3061c9bbc7b2488) )
 ROM_END
 
-
+// Custom
 GAME( 2005, alien,     0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, pingu,     0,        alien, alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, dkbanana,  0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Donkey Kong Banana Kingdom (host)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, dkbanans,  dkbanana, alien, alien, alien_state, init_dkbanans, ROT0, "Capcom",               "Donkey Kong Banana Kingdom (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, dokodemo,  0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2004, masmario,  0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (center)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2004, masmarios, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party (satellite)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2005, masmario2, 0,        alien, alien, alien_state, empty_init,    ROT0, "Nintendo / Capcom",    "Super Mario Fushigi no Korokoro Party 2", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// Medalusion 1
+GAME( 2005, mmaruchan, 0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom",               "Chibi Maruko-chan ~Minna de Sugoroku Asobi~ no Maki", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // ちびまる子ちゃん「みんなですごろく遊び」の巻
+// Medalusion 2
+GAME( 2006, dokodemo,  0,        alien, alien, alien_state, empty_init,    ROT0, "Sony / Capcom",        "Doko Demo Issho: Toro's Fishing", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu,     0,        alien, alien, alien_state, empty_init,    ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, wontame,   0,        alien, alien, alien_state, empty_init,    ROT0, "Capcom / Tomy",        "Won! Tertainment Happy Channel (Ver E)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
