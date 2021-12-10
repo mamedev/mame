@@ -17,10 +17,7 @@ Machines:
   Odisea Paris-Dakar (Peyper)
   Hang-On (Sonic)
   Ator (Video Dens)
-
-  Sir Lancelot (Peyper, 1994)
-  - CPU is a B409 (could be a higher-speed Z80)
-  - Audio CPU is a TMP91P640F-10. Other audio chips are YMF262 and YAC512.
+  Sir Lancelot (Peyper) has its own driver.
 
 Status:
 - odin, odin_dlx, solarwap, poleposn, wolfman, nemesisp, odisea, sonstwar, sonstwr2, hangonp: Playable.
@@ -31,7 +28,6 @@ ToDo:
 - Gammatron: unable to start a game - it's multiball, so need a key combination.
 - ator: playfield inputs not working. Not sure if to use init_1 or init_2, won't know until playfield works.
 - ator3bmp: rom missing
-- lancelot: different hardware, rom missing
 - Mechanical sounds
 - Some sounds can go missing, for example odin/odin_dlx loses sounds while counting the bonuses
 - Any machine with inputs "sonstwar" have mistakes in the dip switches. Therefore sonstwar, sonstwr2
@@ -776,21 +772,6 @@ ROM_START(ator3bmp) // Version with 3 bumpers, probably newer
 	// probably no ROM 3 (PCB photo shows location unpopulated)
 ROM_END
 
-/*-------------------------------------------------------------------
-/ Sir Lancelot (1994)
-/-------------------------------------------------------------------*/
-ROM_START(lancelot)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("lancelot.bin", 0x0000, 0x8000, CRC(26c10926) SHA1(ad032b43c15b1d7a7f32a12ca09ea3344d75105b))
-	ROM_REGION(0x4000, "audiocpu", 0)
-	ROM_LOAD("tmp91640.rom", 0x0000, 0x4000, NO_DUMP)
-	ROM_REGION(0x40000, "sound1", 0)
-	ROM_LOAD("snd_u3.bin", 0x00000, 0x20000, CRC(db88c28d) SHA1(35a80509c4a1f931d07af2fc74adbafc11af5639))
-	ROM_LOAD("snd_u4.bin", 0x20000, 0x20000, CRC(5cebed6e) SHA1(d11cc57fadee95f056fc65927fa1f6ff0f337446))
-	ROM_REGION(0x20000, "sound2", 0)
-	ROM_LOAD("snd_u5.bin", 0x00000, 0x20000, CRC(bf141441) SHA1(630b852bb3bba0fcdae13ae548b1e9810bc64d7d))
-ROM_END
-
 } // Anonymous namespace
 
 GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin",                     MACHINE_IS_SKELETON_MECHANICAL )
@@ -806,4 +787,3 @@ GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_2,     RO
 GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
 GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
 GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // initial program ROM missing; no manual found
-GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init, ROT0, "Peyper",     "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL ) // different hardware (see top of file)
