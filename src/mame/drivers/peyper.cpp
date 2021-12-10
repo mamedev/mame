@@ -29,7 +29,7 @@ Status:
 
 ToDo:
 - Gammatron: unable to start a game - it's multiball, so need a key combination.
-- ator: score flashes 00/20, playfield inputs not working
+- ator: playfield inputs not working. Not sure if to use init_1 or init_2, won't know until playfield works.
 - ator3bmp: rom missing
 - lancelot: different hardware, rom missing
 - Mechanical sounds
@@ -804,6 +804,6 @@ GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_2,     RO
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Nemesis",                  MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_2,     ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
-GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_0,     ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
-GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_0,     ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // initial program ROM missing; no manual found
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
+GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // initial program ROM missing; no manual found
 GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init, ROT0, "Peyper",     "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL ) // different hardware (see top of file)
