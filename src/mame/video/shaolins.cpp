@@ -154,8 +154,12 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int flipx = !(m_spriteram[offs + 0] & 0x40);
 		int flipy = m_spriteram[offs + 0] & 0x80;
 		int sx = m_spriteram2[offs + 0];
-		int sy = 255 - m_spriteram[offs + 1];
+		// alignment with door enemy apperances & falling gaps
+		//int sy = 255 - m_spriteram[offs + 1];
+		int sy = 240 - m_spriteram[offs + 1];
 
+		// done in SW
+		#if 0
 		if (flip_screen())
 		{
 			sx = 240 - sx;
@@ -163,6 +167,7 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			flipx = !flipx;
 			flipy = !flipy;
 		}
+		#endif
 
 		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 			code, color,
