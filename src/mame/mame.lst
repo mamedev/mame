@@ -19801,6 +19801,9 @@ ladyfrog                        // (c) 1990 Mondial Games
 toucheme                        //
 touchemea                       //
 
+@source:lancelot.cpp
+lancelot                        //
+
 @source:laser3k.cpp
 las3000                         // 1983 Laser 3000
 
@@ -34728,7 +34731,6 @@ ator                            //
 ator3bmp                        //
 gamatros                        //
 hangonp                         //
-lancelot                        //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
