@@ -2507,8 +2507,8 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		case ADDR_TA:       DS5_LOGR(TA, data);         break;
 		case ADDR_RNR:      DS5_LOGR(RNR, data);
 			return handle_rnr();
-		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data); /* touchgo stalls unless bit 7 is set, RNR status (Random Number status) */
-			return (mcs51_cpu_device::sfr_read(offset) & 0x7f) | (is_rnr_ready() ? 0x80 : 0x00); 
+		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data);  /* touchgo stalls unless bit 7 is set, RNR status (Random Number status) */
+			return (is_rnr_ready() ? 0x80 : 0x00);  /* falling through to sfr_read for the remaining bits stops high score data loading? */
 		case ADDR_RPS:      DS5_LOGR(RPS, data);        break;
 		case ADDR_PCON:
 			SET_PFW(0);     /* reset PFW flag */
