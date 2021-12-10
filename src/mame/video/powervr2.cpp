@@ -2861,7 +2861,10 @@ void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const 
 
 	dc_state *state = machine().driver_data<dc_state>();
 	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	uint32_t c=space.read_dword(0x05000000+((isp_backgnd_t & 0xfffff8)>>1)+(3+3)*4);
+
+	// TODO: read ISP/TSP command from isp_background_t instead of assuming Gourad-shaded
+	// full-screen polygon.
+	uint32_t c=space.read_dword(0x05000000+(param_base&0xf00000)+((isp_backgnd_t&0xfffff8)>>1)+(3+3)*4);
 	bitmap.fill(c, cliprect);
 
 	// TODO: modifier volumes

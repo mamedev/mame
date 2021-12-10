@@ -80,23 +80,12 @@ public:
 	render_target &snapshot_target() { return *m_snap_target; }
 	void save_snapshot(screen_device *screen, emu_file &file);
 	void save_active_screen_snapshots();
-	void save_input_timecode();
 
 	// movies
 	void begin_recording(const char *name, movie_recording::format format);
 	void end_recording();
 	void add_sound_to_recording(const s16 *sound, int numsamples);
 	bool is_recording() const { return !m_movie_recordings.empty(); }
-
-	void set_timecode_enabled(bool value) { m_timecode_enabled = value; }
-	bool get_timecode_enabled() { return m_timecode_enabled; }
-	bool get_timecode_write() { return m_timecode_write; }
-	void set_timecode_write(bool value) { m_timecode_write = value; }
-	void set_timecode_text(std::string &str) { m_timecode_text = str; }
-	void set_timecode_start(attotime time) { m_timecode_start = time; }
-	void add_to_total_time(attotime time) { m_timecode_total += time; }
-	std::string &timecode_text(std::string &str);
-	std::string &timecode_total_text(std::string &str);
 
 private:
 	// internal helpers
@@ -180,12 +169,6 @@ private:
 
 	static const attoseconds_t ATTOSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;
 	static const int PAUSED_REFRESH_RATE = 30;
-
-	bool                m_timecode_enabled;     // inp.timecode record enabled
-	bool                m_timecode_write;       // Show/hide timer at right (partial time)
-	std::string         m_timecode_text;        // Message for that video part (intro, gameplay, extra)
-	attotime            m_timecode_start;       // Starting timer for that video part (intro, gameplay, extra)
-	attotime            m_timecode_total;       // Show/hide timer at left (total elapsed on resulting video preview)
 };
 
 #endif // MAME_EMU_VIDEO_H

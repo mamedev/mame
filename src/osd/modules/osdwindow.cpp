@@ -69,7 +69,7 @@ std::unique_ptr<osd_renderer> osd_renderer::make_for_type(int mode, std::shared_
 		case VIDEO_MODE_SOFT:
 			return std::make_unique<renderer_retro>(window);
 #else
-#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+#if defined(OSD_WINDOWS)
 		case VIDEO_MODE_NONE:
 			return std::make_unique<renderer_none>(window);
 #endif

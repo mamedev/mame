@@ -98,6 +98,7 @@ u8 rtpc_iocc_device::dma_b_r(offs_t offset)
 				m_csr &= ~CSR_PER;
 				m_csr |= (CSR_DE0 >> m_adc) | CSR_DEXK;
 				m_out_rst(1);
+				m_out_rst(0);
 				set_int(true);
 			}
 		}

@@ -6185,7 +6185,7 @@ COMP( 199?, isa386u30, ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1989, isa386c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Asus",        "ISA-386C", MACHINE_NOT_WORKING )
 COMP( 199?, kma300g,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Arche Technologies Inc.", "KMA-300G-25", MACHINE_NOT_WORKING )
 COMP( 199?, mb133340,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Biostar",     "MB-1340UCQ-B", MACHINE_NOT_WORKING )
-COMP( 100?, mba032q,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "DTK", "MBA-032Q TK83305-4N-D-03", MACHINE_NOT_WORKING )
+COMP( 199?, mba032q,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "DTK", "MBA-032Q TK83305-4N-D-03", MACHINE_NOT_WORKING )
 COMP( 199?, megapcpl,  megapc,  0,       megapcpl,  0,     megapc_state, init_megapcpl,  "Amstrad plc", "MegaPC Plus", MACHINE_NOT_WORKING )
 COMP( 199?, megapcpla, megapc,  0,       megapcpla, 0,     at_vrom_fix_state, init_megapcpla, "Amstrad plc", "MegaPC Plus (WINBUS chipset)", MACHINE_NOT_WORKING )
 COMP( 199?, mokp386,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Morse", "KP920121523 V2.20", MACHINE_NOT_WORKING )

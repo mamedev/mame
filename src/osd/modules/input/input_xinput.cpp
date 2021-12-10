@@ -30,11 +30,7 @@
 #include "input_windows.h"
 #include "input_xinput.h"
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #define XINPUT_LIBRARIES { "xinput1_4.dll", "xinput9_1_0.dll" }
-#else
-#define XINPUT_LIBRARIES { "xinput1_4.dll" }
-#endif
 
 #define XINPUT_AXIS_MINVALUE -32767
 #define XINPUT_AXIS_MAXVALUE 32767

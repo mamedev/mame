@@ -7,9 +7,7 @@
   All tables use the same base roms and some playfields even interchange
   between games.
 
-  6504 CPU, 3x R6530 RRIOT, 5x R6520 PIA
-  It is assumed that the R6530 is the same as MOS6530, and the R6520 is
-  the same as MC6821.
+  6504 CPU, 3x R6530 RRIOT, 5x R6520 PIA.
 
   The schematic is too blurry to make out much detail, so used PinMAME
   for the PIA connections.
@@ -36,6 +34,8 @@
   If required, a fake nvram could be used at 00-3F (like PinMAME does).
   Mechanical meters are used to store accounting information.
 
+Status:
+- Working
 
 ToDo:
 - Coin slot 3 not working. Pressing it a lot kills all the coin slots.
@@ -50,6 +50,8 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 #include "allied.lh"
+
+namespace {
 
 class allied_state : public genpin_class
 {
@@ -66,43 +68,44 @@ public:
 		, m_ic8(*this, "ic8")
 		, m_digits(*this, "digit%u", 0U)
 		, m_leds(*this, "led%u", 0U)
+		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
 	void allied(machine_config &config);
 
 private:
-	void ic1_b_w(uint8_t data);
-	void ic2_b_w(uint8_t data);
+	void ic1_b_w(u8 data);
+	void ic2_b_w(u8 data);
 	void ic2_cb2_w(int state);
-	void ic3_b_w(uint8_t data);
-	void ic4_b_w(uint8_t data);
+	void ic3_b_w(u8 data);
+	void ic4_b_w(u8 data);
 	void ic4_cb2_w(int state);
-	void ic5_b_w(uint8_t data);
-	void ic6_b_w(uint8_t data);
-	void ic7_b_w(uint8_t data);
-	void ic8_a_w(uint8_t data);
-	void ic8_b_w(uint8_t data);
-	uint8_t ic1_a_r();
-	uint8_t ic2_a_r();
-	uint8_t ic4_a_r();
-	uint8_t ic5_a_r();
-	uint8_t ic6_a_r();
-	uint8_t ic6_b_r();
-	uint8_t ic7_a_r();
+	void ic5_b_w(u8 data);
+	void ic6_b_w(u8 data);
+	void ic7_b_w(u8 data);
+	void ic8_a_w(u8 data);
+	void ic8_b_w(u8 data);
+	u8 ic1_a_r();
+	u8 ic2_a_r();
+	u8 ic4_a_r();
+	u8 ic5_a_r();
+	u8 ic6_a_r();
+	u8 ic6_b_r();
+	u8 ic7_a_r();
 	void ic8_cb2_w(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
-	void allied_map(address_map &map);
+	void mem_map(address_map &map);
 
-	uint32_t m_player_score[6];
-	uint8_t m_display;
-	uint8_t m_bit_counter;
+	u32 m_player_score[6];
+	u8 m_display;
+	u8 m_bit_counter;
 	bool m_disp_data;
-	uint8_t m_ic5a;
-	uint8_t m_ic6a0;
-	uint8_t m_ic6a1;
-	uint8_t m_ic6a2;
-	uint8_t m_ic6b4;
-	uint8_t m_ic6b7;
+	u8 m_ic5a;
+	u8 m_ic6a0;
+	u8 m_ic6a1;
+	u8 m_ic6a2;
+	u8 m_ic6b4;
+	u8 m_ic6b7;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m6504_device> m_maincpu;
@@ -115,10 +118,11 @@ private:
 	required_device<pia6821_device> m_ic8;
 	output_finder<42> m_digits;
 	output_finder<7> m_leds;
+	output_finder<40> m_io_outputs;  // 16 solenoids + 24 lamps
 };
 
 
-void allied_state::allied_map(address_map &map)
+void allied_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // ic6
 	map(0x0044, 0x0047).rw(m_ic2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -134,7 +138,7 @@ void allied_state::allied_map(address_map &map)
 
 static INPUT_PORTS_START( allied )
 	PORT_START("TEST")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test")
 	PORT_START("R11")
 	PORT_CONFNAME( 0x0f, 0x00, "1st Replay 1000")
 	PORT_CONFSETTING(    0x00, "0")
@@ -328,66 +332,70 @@ static INPUT_PORTS_START( allied )
 
 	PORT_START("X1A") // ic1_a
 	PORT_BIT( 0x5f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Bullseye target")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("Ball in play")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("Bullseye target")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Ball in play")
 
 	PORT_START("X2A") // ic2_a
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("L Bumper")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("C Bumper")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("R Bumper")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("L Bullseye")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("R Bullseye")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("L Sling")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("R Sling")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("L Bumper")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("C Bumper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("R Bumper")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("L Bullseye")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("R Bullseye")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("L Sling")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("R Sling")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 
 	PORT_START("X4A") // ic4_a
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("Target A")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Target B")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("Target C")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Target D")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("Target A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("Target B")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("Target C")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("Target D")
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START )
 
 	PORT_START("X6A") // ic6_a
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0)  PORT_NAME("Slam Tilt")
 
 	PORT_START("X7A") // ic7_a
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Raise Target A")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("Raise Target D")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("Raise Target A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Raise Target D")
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("500 point rollover")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Raise Target B")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("Raise Target C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("Extra Ball when Lit")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("500 point rollover")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("Raise Target B")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Raise Target C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Extra Ball when Lit")
 INPUT_PORTS_END
 
 // 1 target, 1 rollover
-uint8_t allied_state::ic1_a_r()
+u8 allied_state::ic1_a_r()
 {
 	return ioport("X1A")->read();
 }
 
 // 6 lamps
-void allied_state::ic1_b_w(uint8_t data)
+void allied_state::ic1_b_w(u8 data)
 {
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i+32] = !BIT(data, i);
 }
 
 // 8 switches
-uint8_t allied_state::ic2_a_r()
+u8 allied_state::ic2_a_r()
 {
 	return ioport("X2A")->read();
 }
 
-void allied_state::ic2_b_w(uint8_t data)
+void allied_state::ic2_b_w(u8 data)
 {
 // PB0-4,6 - lamps
 
 	m_disp_data = !BIT(data, 7);
+	for (u8 i = 0; i < 7; i++)
+		m_io_outputs[i+25] = !BIT(data, i);
 }
 
 void allied_state::ic2_cb2_w(int state)
@@ -402,21 +410,21 @@ void allied_state::ic2_cb2_w(int state)
 	}
 }
 
-void allied_state::ic3_b_w(uint8_t data)
+void allied_state::ic3_b_w(u8 data)
 {
 	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 6 switches
-uint8_t allied_state::ic4_a_r()
+u8 allied_state::ic4_a_r()
 {
 	return ioport("X4A")->read();
 }
 
-void allied_state::ic4_b_w(uint8_t data)
+void allied_state::ic4_b_w(u8 data)
 {
-	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
-	uint8_t segment, i;
+	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
+	u8 segment, i;
 	for (i = 0; i < 4; i++)
 	{
 		if (!BIT(data, i+4))
@@ -451,6 +459,8 @@ void allied_state::ic4_b_w(uint8_t data)
 	m_digits[41] = patterns[segment];
 
 // PB0-3 - player 1-4 LED - to do
+	for (u8 i = 0; i < 3; i++)
+		m_io_outputs[i+22] = !BIT(data, i);
 }
 
 void allied_state::ic4_cb2_w(int state)
@@ -458,13 +468,13 @@ void allied_state::ic4_cb2_w(int state)
 }
 
 // 8 of the adjustment connectors
-uint8_t allied_state::ic5_a_r()
+u8 allied_state::ic5_a_r()
 {
 	return m_ic5a;
 }
 
 // cabinet solenoids
-void allied_state::ic5_b_w(uint8_t data)
+void allied_state::ic5_b_w(u8 data)
 {
 // PB0 - play meter
 // PB1 - replay meter
@@ -481,35 +491,40 @@ void allied_state::ic5_b_w(uint8_t data)
 	if (!BIT(data, 5)) // knocker
 		m_samples->start(0, 6);
 
+	for (u8 i = 0; i < 6; i++)
+		m_io_outputs[i] = !BIT(data, i);
+
 	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 4 adjustments, 3 coin slots, slam tilt
-uint8_t allied_state::ic6_a_r()
+u8 allied_state::ic6_a_r()
 {
 	return m_ic6a0 | m_ic6a1 | m_ic6a2 | ioport("X6A")->read();
 }
 
 // 1 adjustment, test switch
-uint8_t allied_state::ic6_b_r()
+u8 allied_state::ic6_b_r()
 {
 	return m_ic6b4 | ioport("TEST")->read() | m_ic6b7 | 0x4f;
 }
 
-void allied_state::ic6_b_w(uint8_t data)
+void allied_state::ic6_b_w(u8 data)
 {
 // PB0-3 to drop targets
+	for (u8 i = 0; i < 4; i++)
+		m_io_outputs[i+6] = !BIT(data, i);
 
 	m_maincpu->set_input_line(M6504_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 // 6 inputs
-uint8_t allied_state::ic7_a_r()
+u8 allied_state::ic7_a_r()
 {
 	return ioport("X7A")->read();
 }
 
-void allied_state::ic7_b_w(uint8_t data)
+void allied_state::ic7_b_w(u8 data)
 {
 // PB7 - tilt lamp
 
@@ -567,7 +582,7 @@ void allied_state::ic7_b_w(uint8_t data)
 }
 
 // playfield solenoids
-void allied_state::ic8_a_w(uint8_t data)
+void allied_state::ic8_a_w(u8 data)
 {
 	if ((data & 0x07) < 0x07) // 3 bumpers
 		m_samples->start(0, 0);
@@ -577,13 +592,20 @@ void allied_state::ic8_a_w(uint8_t data)
 
 	if (!BIT(data, 7)) // outhole
 		m_samples->start(0, 5);
+
+	for (u8 i = 0; i < 3; i++)
+		m_io_outputs[i+10] = !BIT(data, i);
+	for (u8 i = 0; i < 3; i++)
+		m_io_outputs[i+13] = !BIT(data, i+5);
 }
 
 // PB0-4 = ball 1-5 LED; PB5 = shoot again lamp
-void allied_state::ic8_b_w(uint8_t data)
+void allied_state::ic8_b_w(u8 data)
 {
-	for (int i = 0; i < 6; i++)
+	for (u8 i = 0; i < 6; i++)
 		m_leds[i+1] = !BIT(data, i);
+	for (u8 i = 0; i < 6; i++)
+		m_io_outputs[i+16] = !BIT(data, i);
 }
 
 // this line not emulated in PinMAME, maybe it isn't needed
@@ -595,7 +617,7 @@ void allied_state::ic8_cb2_w(int state)
 
 TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 {
-	uint8_t data = ioport("X6A")->read();
+	u8 data = ioport("X6A")->read();
 
 	m_ic8->ca1_w(BIT(data, 4));
 	m_ic8->cb1_w(BIT(data, 5));
@@ -606,6 +628,18 @@ void allied_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_player_score));
+	save_item(NAME(m_display));
+	save_item(NAME(m_bit_counter));
+	save_item(NAME(m_disp_data));
+	save_item(NAME(m_ic5a));
+	save_item(NAME(m_ic6a0));
+	save_item(NAME(m_ic6a1));
+	save_item(NAME(m_ic6a2));
+	save_item(NAME(m_ic6b4));
+	save_item(NAME(m_ic6b7));
 }
 
 void allied_state::machine_reset()
@@ -626,7 +660,7 @@ void allied_state::allied(machine_config &config)
 {
 	/* basic machine hardware */
 	M6504(config, m_maincpu, 3572549/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::allied_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::mem_map);
 
 	/* Video */
 	config.set_default_layout(layout_allied);
@@ -723,16 +757,17 @@ ROM_END
 #define rom_circa33     rom_allied
 #define rom_starshot    rom_allied
 
+} // anonymous namespace
 
 GAME(1977,  allied,   0,      allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Allied System",               MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
-GAME(1977,  suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1977,  royclark, allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1977,  thndbolt, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Thunderbolt",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  hoedown,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hoe Down",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  takefive, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Take Five",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  heartspd, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hearts & Spades",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  foathens, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Flame of Athens",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  disco79,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Disco '79",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  erosone,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Eros One",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  circa33,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Circa 1933",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  starshot, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Star Shooter",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1977,  suprpick, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Super Picker",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1977,  royclark, allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1977,  thndbolt, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Thunderbolt",                 MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  hoedown,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hoe Down",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  takefive, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Take Five",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  heartspd, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Hearts & Spades",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1978,  foathens, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Flame of Athens",             MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  disco79,  allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Disco '79",                   MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  erosone,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Eros One",                    MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  circa33,  allied, allied, allied, allied_state, empty_init, ROT0, "Fascination Int.", "Circa 1933",                  MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1979,  starshot, allied, allied, allied, allied_state, empty_init, ROT0, "Allied Leisure",   "Star Shooter",                MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

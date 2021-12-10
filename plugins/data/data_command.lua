@@ -19,7 +19,7 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	return _("Command")
+	return _p("plugin-data", "Command")
 end
 
 function dat.get()

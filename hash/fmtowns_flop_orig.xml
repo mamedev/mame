@@ -84,7 +84,6 @@ Gear Base                                                           Inter Limite
 Gear Video                                                          Inter Limited Logic               1991/8     FD
 Geitassha Towns (Data Shuu)                                         Shoubi Gakuen                     1990/6     FD×63
 Gokanshi                                                            Tensui Software                   1995/7     FD
-Gorby no Pipeline Daisakusen                                        Compile                           1991/4     FD
 Grapharmony V1.0                                                    Fujitsu                           1992/3     FD
 Hametaoshi Tool                                                     Nikkonren Kikaku                  1995/12    FD×02
 Hana yori Dango                                                     Active                            1992/4     FD×03
@@ -430,6 +429,21 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="3599768">
 				<rom name="cameltry.mfm" size="3599768" crc="cc2a33a3" sha1="7cdcc7cc20f3ceeaad14e4b56c285c8d2657f95a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Triggers the copy protection -->
+	<software name="columns" supported="no">
+		<description>Columns</description>
+		<year>1990</year>
+		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<info name="alt_title" value="コラムス" />
+		<info name="release" value="199012xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="3529095">
+				<rom name="columns.mfm" size="3529095" crc="420b454f" sha1="d95ac61e42eabd38de55abf33181dd880d628327" />
 			</dataarea>
 		</part>
 	</software>
@@ -845,6 +859,132 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		</part>
 	</software>
 
+	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1992)" magazine. -->
+	<software name="futoph02">
+		<description>Futoppara FD Heisei 2-gou</description>
+		<year>1992</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成2号" />
+		<info name="release" value="199204xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #02.hdm" size="1261568" crc="cca4f1ae" sha1="7d73d7e2f6174f09273c7b38218294ce32380fb9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Natsu no Tokubetsu-gou (1992)" magazine. -->
+	<software name="futoph03">
+		<description>Futoppara FD Heisei 3-gou</description>
+		<year>1992</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成3号" />
+		<info name="release" value="199208xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #03.hdm" size="1261568" crc="1009e7c2" sha1="2f3af3115de077a0a69dc045085851d9001814a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Fuyu no Tokubetsu-gou (1992)" magazine. -->
+	<software name="futoph04">
+		<description>Futoppara FD Heisei 4-gou</description>
+		<year>1992</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成4号" />
+		<info name="release" value="199212xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #04.hdm" size="1261568" crc="75ceb8be" sha1="0650754491576875b02e07b573c4a5a06e275ba5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1993)" magazine. -->
+	<software name="futoph05">
+		<description>Futoppara FD Heisei 5-gou</description>
+		<year>1993</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成5号" />
+		<info name="release" value="199303xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #05.hdm" size="1261568" crc="bb41215a" sha1="655f955ad7ee44dc1035c238f8e17b91a34b6bc6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Natsu no Tokubetsu-gou (1993)" magazine. -->
+	<software name="futoph06">
+		<description>Futoppara FD Heisei 6-gou</description>
+		<year>1993</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成6号" />
+		<info name="release" value="199308xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #06.hdm" size="1261568" crc="14bdb0d5" sha1="d6f32df1be6fa3aaa54ec3209af84d4a430ff5cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Aki no Tokubetsu-gou (1993)" magazine. -->
+	<software name="futoph07">
+		<description>Futoppara FD Heisei 7-gou</description>
+		<year>1993</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成7号" />
+		<info name="release" value="199311xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #07.hdm" size="1261568" crc="91d8bc3f" sha1="54eef9754dec15b4ede6a4f16fe2c15eb101255c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Haru no Tokubetsu-gou (1994)" magazine. -->
+	<software name="futoph08">
+		<description>Futoppara FD Heisei 8-gou</description>
+		<year>1994</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成8号" />
+		<info name="release" value="199403xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #08.hdm" size="1261568" crc="f8061488" sha1="fbe9fa3a916b38154ddae4576993855354120ee6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns Shoka no Tokubetsu-gou (1994)" magazine. -->
+	<software name="futoph09">
+		<description>Futoppara FD Heisei 9-gou</description>
+		<year>1994</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成9号" />
+		<info name="release" value="199406xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #09.hdm" size="1261568" crc="8d917956" sha1="10560f07227a6ce945b27deac9a86df96fef0edd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Bundled with "Oh! FM Towns" magazine, March 1995 issue. -->
+	<software name="futoph10">
+		<description>Futoppara FD Heisei 10-gou</description>
+		<year>1995</year>
+		<publisher>SoftBank</publisher>
+		<info name="alt_title" value="太っ腹FD平成10号" />
+		<info name="release" value="199503xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="futoppara fd heisei #10.hdm" size="1261568" crc="ae02ab66" sha1="39a2921484d1f6b141fe43af046003593b07cf0d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- It's unclear what this is exactly, but it's definitely related to TownsGEAR and video cameras -->
 	<software name="gearvid">
 		<description>Gear-Video</description>
@@ -871,6 +1011,20 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="jissen_igo_taikyoku_gokichi-kun_chuukyuu_jou_disk_b.hdm" size="1261568" crc="f833ae7a" sha1="ff3ed44ae9ff071f37b1fd107c5c7a366c32fae4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gorbypip">
+		<description>Gorby no Pipeline Daisakusen</description>
+		<year>1991</year>
+		<publisher>徳間書店インターメディア (Tokuma Shoten Intermedia)</publisher>
+		<info name="serial" value="IA-9102"/>
+		<info name="alt_title" value="ゴルビーのパイプライン大作戦" />
+		<info name="release" value="199104xx" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="gorby_no_pipeline_daisakusen.hdm" size="1261568" crc="5d05f664" sha1="17669ab6d23b7d903c4fdd60a2c86aef7278c184"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1333,7 +1487,7 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 	</software>
 
 	<software name="musicpro">
-		<description>Music Pro-Towns (1990-05-23)</description>
+		<description>Music Pro-Towns v1.0 (1990-05-23)</description>
 		<year>1989</year>
 		<publisher>Musical Plan</publisher>
 		<info name="usage" value="This is a master disk that can be turned into a System, Data or Demo disk. Make a copy of this disk, boot TownsOS V1.1, run the icon for the type of disk you want, and wait until it returns to the TownsOS GUI." />
@@ -1418,6 +1572,20 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 			<feature name="part_id" value="Disk E / い～" />
 			<dataarea name="flop" size="1261568">
 				<rom name="ohpai_disk_e.hdm" size="1261568" crc="cb26de6b" sha1="1be5f1fff8826868f26aa90c4f9b688c1e753425"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Requires the FMT-403 MIDI card, not currently emulated by MAME. Probably came bundled with it. -->
+	<software name="ongakyou" supported="no">
+		<description>Musirou - Ongaku Kyoushitsu Ver. 2.0</description>
+		<year>1994</year>
+		<publisher>ローランド (Roland)</publisher>
+		<info name="alt_title" value="ミュージ郎　音楽教室　Ｖｅｒ．　２．０" />
+		<info name="usage" value="Requires the FMT-403 MIDI card" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="ongaku_kyoushitsu_ver_2.0.hdm" size="1261568" crc="ec54ffee" sha1="0e651ea22241fa163d39be2b5bba4f0795f9f245"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2227,6 +2395,21 @@ Zurukamashi Ver 2.0                                                 Nikkonren Ki
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
 				<rom name="sadistic_gamers_part-5.hdm" size="1261568" crc="a783f0a9" sha1="33d609c14afa750daa1eca3020586db14b14c7ac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- PC-9801 / X68000 / FM Towns hybrid -->
+	<software name="tamacgmai">
+		<description>Tama CG-shuu - Mai</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="alt_title" value="ＴＡＭＡ　ＣＧ集　舞" />
+		<info name="developer" value="88UNIT" />
+		<info name="usage" value="Requires 2 MB RAM. Boot TownsOS V1.1 from CD, then run TOWNS.BAT from floppy drive A:" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="tama_cg-shuu_mai.hdm" size="1261568" crc="b4fdc543" sha1="22abefca1aa23ad54c03f7449f9f07a4f6512ca2"/>
 			</dataarea>
 		</part>
 	</software>

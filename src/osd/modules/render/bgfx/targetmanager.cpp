@@ -81,7 +81,7 @@ bgfx_target* target_manager::create_backbuffer(void *handle, uint16_t width, uin
 bgfx_target* target_manager::target(uint32_t screen, std::string name)
 {
 	std::string full_name = name + std::to_string(screen);
-	if (m_targets.find(full_name) != m_targets.end())
+	if (m_targets.find(full_name) == m_targets.end())
 	{
 		osd_printf_verbose("Warning: Attempting to retrieve a nonexistent target '%s' for screen %d\n", name, screen);
 	}

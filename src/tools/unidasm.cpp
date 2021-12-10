@@ -56,6 +56,7 @@ using util::BIT;
 #include "cpu/g65816/g65816ds.h"
 #include "cpu/gigatron/gigatrondasm.h"
 #include "cpu/h6280/6280dasm.h"
+#include "cpu/h8/gt913d.h"
 #include "cpu/h8/h8d.h"
 #include "cpu/h8/h8hd.h"
 #include "cpu/h8/h8s2000d.h"
@@ -423,6 +424,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
 	{ "gigatron",        be, -1, []() -> util::disasm_interface * { return new gigatron_disassembler; } },
+	{ "gt913",           be,  0, []() -> util::disasm_interface * { return new gt913_disassembler; } },
 	{ "h6280",           le,  0, []() -> util::disasm_interface * { return new h6280_disassembler; } },
 	{ "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },
 	{ "h8h",             be,  0, []() -> util::disasm_interface * { return new h8h_disassembler; } },
@@ -529,6 +531,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },
 	{ "pic16c62x",       le, -1, []() -> util::disasm_interface * { return new pic16c62x_disassembler; } },
 	{ "pic17",           le, -1, []() -> util::disasm_interface * { return new pic17_disassembler; } },
+	{ "power",           be,  0, []() -> util::disasm_interface * { return new power_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },

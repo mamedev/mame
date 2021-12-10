@@ -77,6 +77,29 @@ YA  YB
 Andy Welburn
 www.andys-arcade.com
 
+========================================
+Falgas and Videotronic (both from Spain) did a clone of "Imola GP" called "Ferrari 1".
+The hardware is almost the same, being the only notable difference is that it uses bigger
+ROMs (just three, labeled "P1/1", "P2/1" and "P2/2"), but the contents are the same:
+
+p2-1.bin     [1/4]      12.bin                  IDENTICAL
+p2-2.bin     [1/4]      10.bin                  IDENTICAL
+p1-1.bin     [1/4]      03.bin                  IDENTICAL
+p2-1.bin     [2/4]      08.bin                  IDENTICAL
+p2-2.bin     [2/4]      06.bin                  IDENTICAL
+p1-1.bin     [2/4]      01.bin                  IDENTICAL
+p2-1.bin     [3/4]      11.bin                  IDENTICAL
+p2-2.bin     [3/4]      09.bin                  IDENTICAL
+p1-1.bin     [3/4]      04.bin                  IDENTICAL
+p2-1.bin     [4/4]      07.bin                  IDENTICAL
+p2-2.bin     [4/4]      05.bin                  IDENTICAL
+p1-1.bin     [4/4]      02.bin                  IDENTICAL
+
+The only xtal on this PCB is 16.00000 MHz.
+This "Ferrari 1" was legally registered by Videotronic on Spain on 1985. The PCB is
+silkscreened by Falgas and the cab contains Falgas logos with a small note that reads
+"Manufactured by Videotronic for Falgas" (in Spanish).
+
 ***************************************************************************/
 
 #include "emu.h"
