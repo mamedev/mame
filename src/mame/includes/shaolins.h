@@ -18,6 +18,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram")
 	{ }
@@ -30,6 +31,7 @@ private:
 	required_device<palette_device> m_palette;
 
 	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_colorram;
 	required_shared_ptr<uint8_t> m_videoram;
 

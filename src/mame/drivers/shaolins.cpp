@@ -140,8 +140,8 @@ void shaolins_state::shaolins_map(address_map &map)
 	map(0x1000, 0x1000).nopw();                    /* latch for 76496 #1 */
 	map(0x1800, 0x1800).w(FUNC(shaolins_state::palettebank_w));
 	map(0x2000, 0x2000).w(FUNC(shaolins_state::scroll_w));
-	map(0x2800, 0x2bff).ram();                         /* RAM BANK 2 */
-	map(0x3000, 0x33ff).ram().share("spriteram"); /* RAM BANK 1 */
+	map(0x2800, 0x2bff).ram().share("spriteram");  /* RAM BANK 2 */
+	map(0x3000, 0x33ff).ram().share("spriteram2"); /* RAM BANK 1 */
 	map(0x3800, 0x3bff).ram().w(FUNC(shaolins_state::colorram_w)).share("colorram");
 	map(0x3c00, 0x3fff).ram().w(FUNC(shaolins_state::videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).rom();                         /* Machine checks for extra rom */
