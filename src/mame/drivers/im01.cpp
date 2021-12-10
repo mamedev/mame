@@ -17,7 +17,9 @@ TODO:
   around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
   and/or T11 core timing itself is not 100% accurate.
 - verify actual XTAL, the label couldn't be seen
-- is ИМ-01Т extra RAM chip used at all?
+- Is ИМ-01Т extra RAM chip used at all, and if so, where is it mapped?
+  Even when trying to solve mate problems (level 7, and overclocked CPU),
+  there are no unmapped writes.
 
 *******************************************************************************
 
@@ -33,8 +35,8 @@ Keypad legend (excluding A1-H8 and black/white):
      а также для установки фигур в начальную позицию,
      сброса фигур с доски и изменения очередности хода
 
-НП:  установка фигур в начальную позицию                 - Reset Board
-СД:  сброс всех фигур с доски                            - Clear Board
+НП:  установка фигур в начальную позицию                 - Reset Board*
+СД:  сброс всех фигур с доски                            - Clear Board*
 ↓:   ввод в компьютер Вашего хода,                       - Enter
      а также фигуры при установке позиции
 
@@ -49,7 +51,9 @@ CИ:  сброс информации на индикаторе                 
 ↺:   ход назад                                           - Take Back
 И:   индикация анализируемого хода                       - Show Analyzed Move
 N:   чксло ходов                                         - Show Moves
-РЗ:  установка режима решения шахматных задач            - Position Mode
+РЗ:  установка режима решения шахматных задач            - Solve Mate / Set Up*
+
+* note: hold Фиг
 
 ******************************************************************************/
 
@@ -226,7 +230,7 @@ static INPUT_PORTS_START( im01 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME(u8"N (Show Moves)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_U) PORT_NAME(u8"Вар (Enter Variant)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("? (Verify Position)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Show Depth")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME("Show Depth")
 
 	PORT_START("IN.2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
@@ -244,11 +248,11 @@ static INPUT_PORTS_START( im01 )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME(u8"Фиг (Prefix Key)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME(u8"И (Show Analyzed Move)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"РЗ (Position Mode)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"РЗ (Solve Mate / Set Up)")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset Board)") // hold Фиг
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Clear Board)") // hold Фиг
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset Board)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Clear Board)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Black")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Set Level")
 INPUT_PORTS_END
