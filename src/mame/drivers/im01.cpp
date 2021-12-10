@@ -17,9 +17,11 @@ TODO:
   around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
   and/or T11 core timing itself is not 100% accurate.
 - verify actual XTAL, the label couldn't be seen
-- Is ИМ-01Т extra RAM chip used at all, and if so, where is it mapped?
+- Is im01t extra RAM chip used at all, and if so, where is it mapped?
   Even when trying to solve mate problems (level 7, and overclocked CPU),
   there are no unmapped writes.
+- What is 0x6000-0x7fff for? im01 will test for both RAM and ROM in this
+  area if no bus error was triggered, and will fail to boot up.
 
 *******************************************************************************
 
@@ -193,7 +195,7 @@ u16 im01_state::input_r(offs_t offset, u16 mem_mask)
 
 void im01_state::error_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// unmapped port, expects a bus error
+	// unmapped port, it expects a bus error
 	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
 }
 
