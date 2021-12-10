@@ -21966,7 +21966,7 @@ ATK test: OK
 		</part>
 	</software>
 
-	<software name="goldnaxe" supported="no">
+	<software name="goldnaxe" supported="partial">
 		<!-- SPS (CAPS) release 17 -->
 		<description>Golden Axe (Euro)</description>
 		<!-- retail, standalone -->
@@ -21974,8 +21974,13 @@ ATK test: OK
 		<year>1990</year>
 		<publisher>Virgin Mastertronic</publisher>
 		<notes><![CDATA[
+boot OK
+Looks too fast in gameplay
+[FDC] loading seems too slow? (verify)
 ATK test: failed
 ]]></notes>
+		<!-- Supposed to progressively corrupt GFXs (text, magic goblins) and eventually throw a Guru Meditation at final stage on cracked images. -->
+		<!-- Cracked images also sometimes don't recognize magic key press on those (LALT key for player 1) -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1017530">
 				<rom name="(sps17)goldenaxe.ipf" size="1017530" crc="81a3b705" sha1="7e9c5c932ddcd774e0631a5313a2ab9ebd8feb12"/>
