@@ -46,7 +46,7 @@ IC23, IC22, IC12 = Hitachi HD74HC273P
 IC15 = Natsemi CD4514BCN
 IC8 = Microchip 24LC16B
 IC7 = TI TL7705ACP
-IC1 = Philips REF34VA 9818h- (40-pin DIP: 80C51?)
+IC1 = Philips REF34VA 9818h- (40-pin DIP, confirmed to be a 80C51)
 XT1 = 20.000 MHz
 IC5 = Hitachi HD74HC08P
 IC6 = Hitachi HD74HC138P
@@ -73,7 +73,7 @@ ________________________________________________________________________________
 |  NO   | Champion    | Unknown          | ProSPDP PCB. https://www.recreativas.org/champion-6137-compumatic   | Darts                      |
 |_______|_____________|__________________|_____________________________________________________________________|____________________________|
 
-There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 CPU.
+There's a later revision of the Compumatic Microdar, smaller, with a standard Atmel AT89S51 instead of the REF34 MCU.
 
 */
 
@@ -259,6 +259,57 @@ ROM_START(dibif727)
 	ROM_LOAD("24lc16b.ic8", 0x000, 0x800, CRC(1cae70db) SHA1(575d4c787fd65950417e85fdb34d2961fc327c74))
 ROM_END
 
+/* Info about "Far West":
+ The sound contains shooting samples and a small sample of the Rawhide main theme.
+ Background layout (four shooting targets as food cans with led circles), see https://youtu.be/YVxThMwhvKQ 
+
+                            o o o o
+                    o o o o         o o o o          <- 16 LEDs
+                o o                         o o         first three from the left red, the rest yellow
+
+
+              o                                  o
+           o     o                            o     o      <- Outer circle: 20 blue LEDs
+        o     o     o                      o     o     o      Middle circle: 20 green LEDS
+      o     o   o     o                  o     o   o     o    Inner circle: 7 red LEDs
+    o     o       o     o              o     o       o     o
+  o     o           o     o          o     o           o     o
+      o      o o      o                  o      o o      o
+ o   o      o o o      o   o        o   o      o o o      o   o
+      o      o o      o                  o      o o      o
+   o    o           o    o            o    o           o    o
+          o       o                          o       o
+      o     o   o    o                   o     o   o    o
+              o                                  o
+           o     o                            o     o
+              o                                  o
+
+ |PLAYER 1|  |PLAYER 2|  |PLAYER 3|  |PLAYER 4|     |SHOOTS |   <- Labels.
+  __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __      The display shows scrolling text all across the 20 digits
+ |_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_|   <- 20 x 7-segments display
+ |_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_||_|
+
+              o                                  o
+           o     o                            o     o
+        o     o     o                      o     o     o
+      o     o   o     o                  o     o   o     o
+    o     o       o     o              o     o       o     o
+  o     o           o     o          o     o           o     o
+      o      o o      o                  o      o o      o
+ o   o      o o o      o   o        o   o      o o o      o   o
+      o      o o      o                  o      o o      o
+   o    o           o    o            o    o           o    o
+          o       o                          o       o
+      o     o   o    o                   o     o   o    o
+              o                                  o
+           o     o                            o     o
+              o                                  o
+
+  ________
+  | START | <- Button with light
+  | BUTTON|
+  |_______|
+*/
 ROM_START(cfarwest)
 	// Philips REF34VA K8V2873 Phr9920 0
 	PHILIPS_REF34VA
