@@ -2800,11 +2800,12 @@ license:CC0
 		</part>
 	</software>
 
-	<!-- Notes: FM support -->
+	<!-- Notes: FM support; game uses input code for some unreleased international version of the paddle that must have been in development, glitches heavily on machines that fail Japan region check -->
 	<software name="galactpr">
 		<description>Galactic Protector (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
+		<info name="usage" value="Input works only with drivers of Japanese region, e.g. sms1kr,smsj" />
 		<info name="serial" value="G-1348"/>
 		<info name="release" value="19880221"/>
 		<info name="alt_title" value="ギャラクティック プロテクター" />
