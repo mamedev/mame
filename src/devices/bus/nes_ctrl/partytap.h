@@ -38,7 +38,6 @@ protected:
 
 	required_ioport m_inputs;
 	u8 m_latch;
-	u8 m_strobe;
 };
 
 

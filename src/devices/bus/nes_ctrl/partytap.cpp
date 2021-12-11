@@ -49,7 +49,6 @@ nes_partytap_device::nes_partytap_device(const machine_config &mconfig, const ch
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_inputs(*this, "INPUTS")
 	, m_latch(0)
-	, m_strobe(0)
 {
 }
 
@@ -89,9 +88,6 @@ u8 nes_partytap_device::read_exp(offs_t offset)
 
 void nes_partytap_device::write(u8 data)
 {
-	u8 prev_strobe = m_strobe;
-	m_strobe = data & 1;
-
-	if (prev_strobe && !m_strobe)
+	if (write_strobe(data))
 		m_latch = m_inputs->read();
 }
