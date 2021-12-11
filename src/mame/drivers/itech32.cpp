@@ -20,7 +20,7 @@
         * Shuffleshot (5 sets)
         * Golden Tee 3D Golf (12 sets)
         * Golden Tee Golf '97 (7 sets)
-        * Golden Tee Golf '98 (6 sets)
+        * Golden Tee Golf '98 (7 sets)
         * Golden Tee Golf '99 (4 sets)
         * Golden Tee Golf 2K (5 sets)
         * Golden Tee Classic (3 sets)
@@ -1696,13 +1696,19 @@ static INPUT_PORTS_START( gt97s )
 INPUT_PORTS_END
 
 
+/*
+For GT98 v1.00 & v1.00C:
+  Selecting Upright ignores the "number of trackballs" settings and only uses P1's controls for all game play
+  Selecting Cocktail with 1 trackball results in P2's controls not screen flipped in service mode, but game play works as expected
+  Starting with GT98 v1.10, you can select Upright with 2 trackballs and play a side by side 2 player game
+*/
 static INPUT_PORTS_START( gt98 )
 	PORT_INCLUDE(gt3d)
 
 	PORT_MODIFY("DIPS")
-	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")    /* Seem to have no effect on the game */
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
-	PORT_DIPSETTING(          0x00200000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Controls ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(          0x00000000, "One Trackball" )
+	PORT_DIPSETTING(          0x00200000, "Two Trackballs" )
 	PORT_DIPNAME( 0x00400000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(          0x00400000, DEF_STR( Cocktail ) )
@@ -1746,7 +1752,7 @@ static INPUT_PORTS_START( aama )
 	PORT_DIPSETTING(          0x00000000, "Normal Mount" )                      /* The manual says "Always on (default)" and "Off -- UNUSED --" */
 	PORT_DIPSETTING(          0x00100000, "45 Degree Angle" )
 	PORT_DIPNAME( 0x00200000, 0x00000000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Upright ) )                  /* Two Trackballs will work with Upright for "side by side" controls */
 	PORT_DIPSETTING(          0x00200000, DEF_STR( Cocktail ) )                 /* Cocktail mode REQUIRES "Controls" to be set to "Two Trackballs" */
 INPUT_PORTS_END
 
@@ -4137,6 +4143,36 @@ ROM_START( gt98v100 )   /* Version 1.00 */
 	ROM_LOAD16_BYTE( "gt98_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
 ROM_END
 
+ROM_START( gt98c100 )   /* Version 1.00C */
+	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
+	ROM_LOAD32_BYTE( "gt98_prom0_v1.00c.prom0", 0x00000, 0x80000, CRC(bb508580) SHA1(6ba243386a32dbe9b14b3cef8d9ce9fac8ec4b28) )
+	ROM_LOAD32_BYTE( "gt98_prom1_v1.00c.prom1", 0x00001, 0x80000, CRC(0e414c17) SHA1(08dae822c4e0b3c5c7e7f09e77e01d3663067927) )
+	ROM_LOAD32_BYTE( "gt98_prom2_v1.00c.prom2", 0x00002, 0x80000, CRC(628e84eb) SHA1(b31b74bee1ab4eda7c8f1c4e62bd61837b2c9f1f) )
+	ROM_LOAD32_BYTE( "gt98_prom3_v1.00c.prom3", 0x00003, 0x80000, CRC(870f2464) SHA1(d84fdb28bcf5767a539d11fb21df0fe2973daa43) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "gt98nr_u88_v1.0.u88", 0x10000, 0x18000, CRC(2cee9e98) SHA1(02edac7abab2335c1cd824d1d9b26aa32238a2de) )
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x600000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "gt98_grom0_0.grm0_0", 0x000000, 0x80000, CRC(2d79492b) SHA1(16d66d937c34ddf616f31cba0d285326a31cad85) )
+	ROM_LOAD32_BYTE( "gt98_grom0_1.grm0_1", 0x000001, 0x80000, CRC(79afda1a) SHA1(77a9883f14b58ceece9c76ce88bb900bc4accf25) )
+	ROM_LOAD32_BYTE( "gt98_grom0_2.grm0_2", 0x000002, 0x80000, CRC(8c381f56) SHA1(41a5b70f9e524a1cade031f864350ec75c08c956) )
+	ROM_LOAD32_BYTE( "gt98_grom0_3.grm0_3", 0x000003, 0x80000, CRC(46c35ba6) SHA1(a1976dd8710442cdb92c47f778acacba4380731b) )
+	ROM_LOAD32_BYTE( "gt98_grom1_0.grm1_0", 0x200000, 0x80000, CRC(b07bc634) SHA1(48a9aeafaf844374d129d209884ec3a23abe249f) )
+	ROM_LOAD32_BYTE( "gt98_grom1_1.grm1_1", 0x200001, 0x80000, CRC(b23d59a7) SHA1(be68da263691e297b266e81485f5f28a5a5ad2f2) )
+	ROM_LOAD32_BYTE( "gt98_grom1_2.grm1_2", 0x200002, 0x80000, CRC(9c113abc) SHA1(8cb23da237dce73bbd283662c6344876d1c352f3) )
+	ROM_LOAD32_BYTE( "gt98_grom1_3.grm1_3", 0x200003, 0x80000, CRC(231bbe58) SHA1(b662a2ffd881a22ec0503810dca8bd61a4994463) )
+	ROM_LOAD32_BYTE( "gt98_grom2_0.grm2_0", 0x400000, 0x80000, CRC(db5cec87) SHA1(831cebd0c90c118d007b737b2eb5fb374a86cf4b) )
+	ROM_LOAD32_BYTE( "gt98_grom2_1.grm2_1", 0x400001, 0x80000, CRC(c74fc7d3) SHA1(38581876d4557f79acbc2c639bd4188a49d3b7cc) )
+	ROM_LOAD32_BYTE( "gt98_grom2_2.grm2_2", 0x400002, 0x80000, CRC(1227609d) SHA1(5a586d2383c9090ff3847abd2c645354dacd400f) )
+	ROM_LOAD32_BYTE( "gt98_grom2_3.grm2_3", 0x400003, 0x80000, CRC(78745131) SHA1(c430be4cb650f1f6265406ca8fcad8df809282f5) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "gt98_srom0_nr.srom0", 0x000000, 0x100000, CRC(44983bd7) SHA1(a6ac966ec113b079434d7f871e4ce7266206d234) )
+	ROM_LOAD16_BYTE( "gt98_srom1_nr.srom1", 0x200000, 0x080000, CRC(1b3f18b6) SHA1(3b65de6a90c5ede183b5f8ca1875736bc1425772) )
+ROM_END
+
 ROM_START( gt98s100 ) /* Version 1.00S for the 3 tier type PCB with short ROM board P/N 1088 Rev 0 */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
 	ROM_LOAD32_BYTE( "gt98_prom0_v1.00s.prom0", 0x00000, 0x80000, CRC(962ff444) SHA1(f9abefaee82f811ef1d3df45782edd5bcb1da23a) )
@@ -5163,6 +5199,7 @@ GAME( 1997, gt97t240,  gt97,     tourny, gt97o, itech32_state, init_aamat,     R
 
 GAME( 1998, gt98,      0,        sftm,   aama,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '98 (v1.10)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98v100,  gt98,     sftm,   gt98,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
+GAME( 1998, gt98c100,  gt98,     sftm,   gt98,  itech32_state, init_aama,      ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00C)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98s100,  gt98,     sftm,   gt98s, itech32_state, init_s_ver,     ROT0, "Incredible Technologies", "Golden Tee '98 (v1.00S)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98-M */
 GAME( 1998, gt98t303,  gt98,     tourny, gt98s, itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.03)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
 GAME( 1998, gt98t302,  gt98,     tourny, gt98s, itech32_state, init_aamat,     ROT0, "Incredible Technologies", "Golden Tee '98 Tournament (v3.02)" , MACHINE_SUPPORTS_SAVE ) /* PIC 16C54 labeled as ITGF98 */
