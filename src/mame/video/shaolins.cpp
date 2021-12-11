@@ -156,6 +156,9 @@ void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int sx = m_spriteram2[offs + 0];
 		int sy = 241 - m_spriteram[offs + 1];
 
+		if (flip_screen())
+			sy--;
+
 		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
 			code, color,
 			flipx, flipy,
