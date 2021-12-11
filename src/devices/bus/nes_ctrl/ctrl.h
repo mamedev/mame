@@ -43,7 +43,11 @@ public:
 protected:
 	device_nes_control_port_interface(const machine_config &mconfig, device_t &device);
 
+	// helper to keep track of strobe bit, returns true on 1 to 0 transitions
+	bool write_strobe(u8 data) { u8 prev = m_strobe; m_strobe = data & 1; return prev && !m_strobe; }
+
 	nes_control_port_device *m_port;
+	u8 m_strobe;
 };
 
 

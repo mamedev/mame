@@ -28230,6 +28230,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLRROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="131072">
 				<rom name="cds-81-0 prg" size="131072" crc="41f87a9b" sha1="bd6709f785e9c8e96fc7b0b55f2c26c76fe3f17e" offset="00000" />
 			</dataarea>
@@ -28250,6 +28251,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="131072">
 				<rom name="cds-82-0 prg" size="131072" crc="1644c162" sha1="17f1a1ec7456291122aaeb5431cd4c1c11fe29e3" offset="00000" />
 			</dataarea>
@@ -28314,6 +28316,7 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TNROM" />
 			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="524288">
 				<rom name="cds-84-0 prg" size="524288" crc="e08c8a60" sha1="baf3a4e0423a86e53234e806843149ef7d0974a9" offset="00000" />
 			</dataarea>
@@ -28338,11 +28341,16 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TKROM" />
 			<feature name="mmc3_type" value="MMC3C" />
+			<feature name="peripheral" value="pachinko" />
 			<dataarea name="prg" size="262144">
 				<rom name="cds-pe-0 prg" size="262144" crc="9525fa38" sha1="20b5b83fac09a42bbc7e2b5f3deb9835fa14b650" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="131072">
 				<rom name="cds-pe-0 chr" size="131072" crc="45fd2145" sha1="a1fbb3f96e68ab4d98f2737d63204aee91612ccb" offset="00000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -32059,8 +32067,9 @@ license:CC0
 			<dataarea name="chr" size="262144">
 				<rom name="koe-iu-0 chr" size="262144" crc="44b22b3d" sha1="bfdb1a89f403b7deea2e29addf1d18e745442771" offset="00000" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
 			<dataarea name="mapper_ram" size="1024">
@@ -41533,6 +41542,10 @@ license:CC0
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
 			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -42749,6 +42762,7 @@ license:CC0
 			<feature name="slot" value="uxrom" />
 			<feature name="pcb" value="HVC-UNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="4p_adapter" />
 			<dataarea name="prg" size="131072">
 				<rom name="ath-xw-0 prg" size="131072" crc="b1b16b8a" sha1="bb40175966f18efad8d82bebea3d4d8444a133e6" offset="00000" />
 			</dataarea>
@@ -50158,6 +50172,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SNROM" />
+			<feature name="peripheral" value="4p_adapter" />
 			<dataarea name="prg" size="131072">
 				<rom name="spot - the video game (japan).prg" size="131072" crc="0abdd5ca" sha1="8b62b3fc95957f52d146e7bc3c90ab33c4005aec" offset="00000" status="baddump" />
 			</dataarea>
