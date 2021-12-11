@@ -67,7 +67,6 @@ protected:
 private:
 	required_ioport m_joypad;
 	u8 m_latch;
-	u8 m_strobe;
 };
 
 

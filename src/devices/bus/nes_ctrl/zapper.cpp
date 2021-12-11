@@ -86,7 +86,6 @@ nes_bandaihs_device::nes_bandaihs_device(const machine_config &mconfig, const ch
 	: nes_zapper_device(mconfig, NES_BANDAIHS, tag, owner, clock)
 	, m_joypad(*this, "JOYPAD")
 	, m_latch(0)
-	, m_strobe(0)
 {
 }
 
@@ -173,9 +172,6 @@ u8 nes_bandaihs_device::read_exp(offs_t offset)
 // carried on expansion port pin 2, so there's likely nothing more going on.
 void nes_bandaihs_device::write(u8 data)
 {
-	u8 prev_strobe = m_strobe;
-	m_strobe = data & 1;
-
-	if (prev_strobe && !m_strobe)
+	if (write_strobe(data))
 		m_latch = m_joypad->read();
 }
