@@ -519,7 +519,12 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	case SC_MODE_SELECT_6:
-		LOG("command MODE SELECT\n");
+		LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
+
+		// accept mode select parameter data
+		if(scsi_cmdbuf[4])
+			scsi_data_out(2, scsi_cmdbuf[4]);
+
 		scsi_status_complete(SS_GOOD);
 		break;
 

@@ -21,6 +21,9 @@ Switch at G6 (sw1-4 = free game scores, sw5-8 = config), at G8 (coin chute setti
 
 2021-08-29 Game mostly working [Robbbert]
 
+Status:
+- Playable
+
 TODO:
 - Outputs (lamps)
 - After starting a 2-player game, the credit button will let you waste away your remaining credits.
@@ -46,10 +49,10 @@ public:
 	spirit76_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_switches(*this, "X%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_leds(*this, "led%d", 0U)
-		, m_solenoids(*this, "sol%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void spirit76(machine_config &config);
@@ -65,14 +68,14 @@ private:
 	u8 m_t_c = 0;
 	u8 m_strobe = 0;
 	u8 m_segment = 0;
-	u8 m_last_solenoid[2] = { 0, 0 };
+	u8 m_last_solenoid[2]{ };
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<16> m_switches;
+	required_ioport_array<16> m_io_keyboard;
 	output_finder<16> m_digits;
 	output_finder<8> m_leds;
-	output_finder<16> m_solenoids;
+	output_finder<16> m_io_outputs;
 };
 
 void spirit76_state::maincpu_map(address_map &map)
@@ -82,7 +85,7 @@ void spirit76_state::maincpu_map(address_map &map)
 	map(0x0000, 0x00ff).ram(); // 2x 2112
 	map(0x0200, 0x0203).rw("pia", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // 6820
 	map(0x0400, 0x0400).r(FUNC(spirit76_state::sw_r));
-	map(0x0600, 0x0fff).rom().region("roms", 0);
+	map(0x0600, 0x0fff).rom().region("maincpu", 0);
 }
 
 
@@ -118,45 +121,45 @@ static INPUT_PORTS_START( spirit76 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("Right 500 wing target")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Left 1000pt target")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Right 500 wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("Left 1000pt target")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("Left 500pt wing target")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("Centre bumper")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 500pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Centre bumper")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("1st 7 rollover")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Mystery 1000pt")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("1st 7 rollover")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Mystery 1000pt")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Left Flipper")
 
 	PORT_START("X8")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 100pt wing target")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Left bumper")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("Lower left switch")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Left 100pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Left bumper")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Lower left switch")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Right Flipper")
 
 	PORT_START("X9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("1 rollover")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("Left sling")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("Lower left target")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("1 rollover")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Left sling")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Lower left target")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("X10")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Left 50pt wing target")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Upper left target")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Lower left advance bonus")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("Left 50pt wing target")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("Upper left target")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("Lower left advance bonus")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("X11")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Upper left advance bonus")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("Middle left advance bonus")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("Lower left collect bonus")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("Upper left advance bonus")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Middle left advance bonus")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("Lower left collect bonus")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("X12")
@@ -200,7 +203,7 @@ static INPUT_PORTS_START( spirit76 )
 	PORT_DIPSETTING(    0x0c, "1C_4C")
 
 	PORT_START("X15")
-	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Right Slot")   // has no effect - it does what slot 1 does
+	PORT_DIPNAME( 0x0f, 0x0f, "Coinage Right Slot")   // has no effect - it does what left slot does
 	PORT_DIPSETTING(    0x0f, "1C_1C")
 	PORT_DIPSETTING(    0x0e, "1C_2C")
 	PORT_DIPSETTING(    0x0d, "1C_3C")
@@ -280,7 +283,7 @@ void spirit76_state::portb_w(u8 data)
 		if (data == 0)
 		{
 			if (m_last_solenoid[0])
-				m_solenoids[m_last_solenoid[0]] = 0;   // turn off last solenoid
+				m_io_outputs[m_last_solenoid[0]] = 0;   // turn off last solenoid
 			m_last_solenoid[1] = m_last_solenoid[0];   // store it away
 			m_last_solenoid[0] = 0;
 		}
@@ -289,7 +292,7 @@ void spirit76_state::portb_w(u8 data)
 			m_last_solenoid[0] = data;
 			if (m_last_solenoid[1] != data)
 			{
-				m_solenoids[data] = 1;
+				m_io_outputs[data] = 1;
 				switch (data)
 				{
 					case 1: m_samples->start(3, 3); break; // 10 chime
@@ -315,14 +318,14 @@ u8 spirit76_state::porta_r()
 
 u8 spirit76_state::sw_r()
 {
-	return ~m_switches[m_strobe]->read();
+	return ~m_io_keyboard[m_strobe]->read();
 }
 
 void spirit76_state::machine_start()
 {
 	m_digits.resolve();
 	m_leds.resolve();
-	m_solenoids.resolve();
+	m_io_outputs.resolve();
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_segment));
@@ -361,7 +364,7 @@ void spirit76_state::spirit76(machine_config &config)
 
 
 ROM_START(spirit76)
-	ROM_REGION(0xa00, "roms", 0)
+	ROM_REGION(0xa00, "maincpu", 0)
 	ROM_LOAD_NIB_LOW("1g.bin",  0x0000, 0x0200, CRC(57d7213c) SHA1(0897876f5c662b2518a680bcbfe282bb3a19a161))
 	ROM_LOAD_NIB_HIGH("5g.bin", 0x0000, 0x0200, CRC(90e22786) SHA1(da9e0eae1e8576c6c8ac734a9557784d9e59c141))
 	ROM_LOAD_NIB_LOW("2c.bin",  0x0200, 0x0200, CRC(4b996a52) SHA1(c73378e61598f84e20c1022b811780e300b01cd1))

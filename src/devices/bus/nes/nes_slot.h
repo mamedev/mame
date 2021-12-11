@@ -151,7 +151,7 @@ enum
 	// Batlab Electronics
 	BATMAP_000, BATMAP_SRRX,
 	// Sealie
-	UNL_CUFROM, UNL_UNROM512, UNL_DPCMCART,
+	SEALIE_8BITXMAS, SEALIE_CUFROM, SEALIE_DPCMCART, SEALIE_UNROM512,
 	// FFE boards, for mappers 6, 8, 17
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	// Unsupported (for place-holder boards, with no working emulation) & no-board (at init)

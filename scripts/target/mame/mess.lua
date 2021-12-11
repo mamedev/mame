@@ -1283,6 +1283,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"grundy",
 		"h01x",
 		"hartung",
+		"hds",
 		"heathkit",
 		"hec2hrp",
 		"hegener",
@@ -2567,6 +2568,11 @@ files {
 createMESSProjects(_target, _subtarget, "hartung")
 files {
 	MAME_DIR .. "src/mame/drivers/gmaster.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "hds")
+files {
+	MAME_DIR .. "src/mame/drivers/hds200.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "heathkit")

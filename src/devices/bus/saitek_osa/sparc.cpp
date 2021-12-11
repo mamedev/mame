@@ -66,6 +66,8 @@ void saitekosa_sparc_device::device_reset()
 		set_ram_mask(ioport("RAM")->read() ? 22 : 20);
 		m_installed = true;
 	}
+
+	host_io_w(0, 0x1c00);
 }
 
 

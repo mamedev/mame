@@ -6,7 +6,7 @@ PINBALL
 Inder S.A. of Spain
 
 All manuals are in Spanish (including the 'English' ones), so some guesswork will be needed.
-The schematics for Brave Team, Canasta, Metal Man are too blurry to read.
+The schematics for Brave Team, Canasta are too blurry to read.
 Each game has different hardware. Note with switches: "Veleta" is normally closed.
 Order of dips on "new cpu" games: 3,2,1,0,4,5,6,7 (so SL1(1) uses bit 3 of input definition).
 
@@ -26,11 +26,10 @@ Note
    switches to the next player, or ends.
 
 Status:
-- All games are playable with sound, except Metal Man.
+- All games are playable with sound.
 
 ToDo:
 - The "new cpu" machines are lacking mechanical sounds. The output bits vary per game.
-- Metal Man: playable, very bad sound. It uses 2 speech cards which are different to the other games.
 - La Rana: playable. Needs its own layout. Inputs to be figured out.
 
 ********************************************************************************************************/
@@ -65,7 +64,7 @@ public:
 		, m_9a(*this, "9a")
 		, m_9b(*this, "9b")
 		, m_13(*this, "13")
-		, m_p_speech(*this, "speech")
+		, m_p_audio(*this, "audiorom")
 		, m_io_keyboard(*this, "X%d", 0U)
 		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
@@ -78,7 +77,6 @@ public:
 
 	void init_0();
 	void init_1();
-	void init_2();
 
 private:
 	virtual void machine_reset() override;
@@ -98,9 +96,7 @@ private:
 	void ppi6ca_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[40U+i] = BIT(data, i); }
 	void ppi6cb_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[48U+i] = BIT(data, i); }
 	void ppi6cc_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[56U+i] = BIT(data, i); }
-	void extras_w(offs_t offset, u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[64U+offset*8+i] = BIT(data, i); }
 	u8 sw_r();
-	u8 ppi60b_r() { return 0xff; }  // metalman checks bit 1 and hangs if not high
 	void sw_w(offs_t offset, u8 data);
 	void sol_brvteam_w(u8 data);
 	void sol_canasta_w(u8 data);
@@ -130,6 +126,7 @@ private:
 	u8 m_sndcmd = 0;
 	u8 m_sndbank = 0;
 	u32 m_sound_addr = 0;
+	u32 m_audio_size = 0;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -139,10 +136,10 @@ private:
 	optional_device<ttl7474_device> m_9a;
 	optional_device<ttl7474_device> m_9b;
 	optional_device<hct157_device> m_13;
-	optional_region_ptr<u8> m_p_speech;
+	optional_region_ptr<u8> m_p_audio;
 	required_ioport_array<11> m_io_keyboard;
 	output_finder<50> m_digits;
-	output_finder<128> m_io_outputs;
+	output_finder<64> m_io_outputs;
 };
 
 void inder_state::brvteam_map(address_map &map)
@@ -204,7 +201,6 @@ void inder_state::main_map(address_map &map)
 	map(0x6800, 0x6803).mirror(0x13fc).rw("ppi68", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c00, 0x6c03).mirror(0x131c).rw("ppi6c", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6c20, 0x6c3f).mirror(0x1300).w(FUNC(inder_state::sndcmd_w));
-	map(0x6c40, 0x6c47).mirror(0x1300).w(FUNC(inder_state::extras_w));  // metalman; presume some kind of output
 	map(0x6c60, 0x6c7f).mirror(0x1300).w(FUNC(inder_state::disp_w));
 	map(0x6ce0, 0x6ce0).nopw();
 }
@@ -1038,8 +1034,7 @@ static INPUT_PORTS_START( ind250cc )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-// wrong
-static INPUT_PORTS_START( metalman )
+static INPUT_PORTS_START( larana ) // to be determined, need the manual
 	PORT_START("X0")
 	PORT_DIPNAME( 0x01, 0x00, "Coin control 1")
 	PORT_DIPSETTING(    0x00, "Off")
@@ -1136,7 +1131,10 @@ INPUT_PORTS_END
 
 u8 inder_state::sw_r()
 {
-	return m_io_keyboard[m_row]->read();
+	if (m_row < 11)
+		return m_io_keyboard[m_row]->read();
+	else
+		return 0;
 }
 
 void inder_state::sw_w(offs_t offset, u8 data)
@@ -1250,14 +1248,11 @@ void inder_state::ppi64c_w(u8 data)
 	data &= 15;
 	if (BIT(data, 3)) // 8 to 15)
 	{
-		if (m_game == 2)
-			data &= 7; // metalman
-		else
-			data ^= 15; // now 7 to 0
+		data ^= 15; // now 7 to 0
 
 		for (i = 0; i < 5; i++)
 		{
-			if (m_game && (i == 4))  // metalan,mundial,clown,250cc,atleta have credit and ball displays swapped
+			if (m_game && (i == 4))  // mundial,clown,250cc,atleta have credit and ball displays swapped
 				data ^= 4;
 			m_digits[i*10+data] = m_segment[i];
 		}
@@ -1277,8 +1272,10 @@ void inder_state::sndbank_w(u8 data)
 
 void inder_state::update_mus()
 {
-	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
-		m_13->ba_w(m_p_speech[m_sound_addr]);
+	if (!m_audio_size)
+		return;
+	if ((m_sound_addr < m_audio_size) && (m_sndbank != 0xff))
+		m_13->ba_w(m_p_audio[m_sound_addr]);
 	else
 		m_13->ba_w(0);
 }
@@ -1309,21 +1306,20 @@ u8 inder_state::ppic_r()
 
 void inder_state::ppia_w(u8 data)
 {
-	m_sound_addr = (m_sound_addr & 0x3ff00) | data;
+	m_sound_addr = (m_sound_addr & 0xffff00) | data;
 	update_mus();
 }
 
 void inder_state::ppib_w(u8 data)
 {
-	m_sound_addr = (m_sound_addr & 0x300ff) | (data << 8);
+	m_sound_addr = (m_sound_addr & 0xff00ff) | (data << 8);
 	update_mus();
 }
 
 void inder_state::ppic_w(u8 data)
 {
 	// pc4 - READY line back to cpu board, but not used
-	if (BIT(data, 5) != BIT(m_portc, 5))
-		m_msm->set_prescaler_selector(BIT(data, 5) ? msm5205_device::S48_4B : msm5205_device::S96_4B); // S1 pin
+	m_msm->s1_w(BIT(data, 5));
 	m_7a->clock_w(BIT(data, 6));
 	m_7a->preset_w(!BIT(data, 7));
 	m_9a->preset_w(!BIT(data, 7));
@@ -1346,6 +1342,10 @@ void inder_state::machine_start()
 	save_item(NAME(m_sndcmd));
 	save_item(NAME(m_sndbank));
 	save_item(NAME(m_sound_addr));
+
+	m_audio_size = 0;
+	if (memregion("audiorom"))
+		m_audio_size = memregion("audiorom")->bytes();
 }
 
 void inder_state::machine_reset()
@@ -1380,12 +1380,6 @@ void inder_state::init_1()
 {
 	init_0();
 	m_game = 1;
-}
-
-void inder_state::init_2()
-{
-	init_0();
-	m_game = 2;
 }
 
 void inder_state::brvteam(machine_config &config)
@@ -1471,14 +1465,13 @@ void inder_state::inder(machine_config &config)
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set(m_9a, FUNC(ttl7474_device::clock_w));
 	m_msm->vck_callback().append(m_9b, FUNC(ttl7474_device::clock_w)); // order of writes is sensitive
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // 4KHz 4-bit
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 4KHz 4-bit
 	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
 	// Devices
 	i8255_device &ppi60(I8255A(config, "ppi60"));
 	ppi60.out_pa_callback().set(FUNC(inder_state::ppi60a_w));
 	ppi60.out_pb_callback().set(FUNC(inder_state::ppi60b_w));
-	ppi60.in_pb_callback().set(FUNC(inder_state::ppi60b_r));
 	ppi60.in_pc_callback().set(FUNC(inder_state::sw_r));
 
 	i8255_device &ppi64(I8255A(config, "ppi64"));
@@ -1556,7 +1549,7 @@ ROM_START(pinmoonl)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("ci-11.bin", 0x0000, 0x2000, CRC(a0732fe4) SHA1(54f62cd81bdb7e1924acb67ddbe43eb3d0a4eab0))
 
-	ROM_REGION(0x40000, "speech", 0)
+	ROM_REGION(0x40000, "audiorom", 0)
 	ROM_LOAD("ci-24.bin", 0x00000, 0x10000, CRC(6406bd18) SHA1(ae45ed9e8b1fd278a36a68b780352dbbb6ee781e))
 	ROM_LOAD("ci-23.bin", 0x10000, 0x10000, CRC(eac346da) SHA1(7c4c26ae089dda0dcd7300fd1ecabf5a91099c41))
 	ROM_LOAD("ci-22.bin", 0x20000, 0x10000, CRC(379740da) SHA1(83ad13ab7f1f37c78397d8e830bd74c5a7aea758))
@@ -1573,7 +1566,7 @@ ROM_START(pinclown)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("clown_b.bin", 0x0000, 0x2000, CRC(c223c961) SHA1(ed5180505b6ebbfb9451f67a44d07df3555c8f8d))
 
-	ROM_REGION(0x40000, "speech", 0)
+	ROM_REGION(0x40000, "audiorom", 0)
 	ROM_LOAD("clown_c.bin", 0x00000, 0x10000, CRC(dff89319) SHA1(3745a02c3755d11ea7fb552f7a5df2e8bbee2c29))
 	ROM_LOAD("clown_d.bin", 0x10000, 0x10000, CRC(cce4e1dc) SHA1(561c9331d2d110d34cf250cd7b25be16a72a1d79))
 	ROM_LOAD("clown_e.bin", 0x20000, 0x10000, CRC(98263526) SHA1(509764e65847637824ba93f7e6ce926501c431ce))
@@ -1590,7 +1583,7 @@ ROM_START(corsario)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("a-corsar.bin", 0x0000, 0x2000, CRC(e14b7918) SHA1(5a5fc308b0b70fe041b81071ba4820782b6ff988))
 
-	ROM_REGION(0x40000, "speech", 0)
+	ROM_REGION(0x40000, "audiorom", 0)
 	ROM_LOAD("b-corsar.bin", 0x00000, 0x10000, CRC(7f155828) SHA1(e459c81b2c2e47d4276344d8d6a08c2c6242f941))
 	ROM_LOAD("c-corsar.bin", 0x10000, 0x10000, CRC(047fd722) SHA1(2385507459f85c68141adc7084cb51dfa02462f6))
 	ROM_LOAD("d-corsar.bin", 0x20000, 0x10000, CRC(10d8b448) SHA1(ed1918e6c55eba07dde31b9755c9403e073cad98))
@@ -1607,7 +1600,7 @@ ROM_START(mundial)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("snd11.bin", 0x0000, 0x2000, CRC(2cebc1a5) SHA1(e0dae2b1ce31ff436b55ceb1ec71d39fc56694da))
 
-	ROM_REGION(0x40000, "speech", 0)
+	ROM_REGION(0x40000, "audiorom", 0)
 	ROM_LOAD("snd24.bin", 0x00000, 0x10000, CRC(603bfc3c) SHA1(8badd9731243270ce5b8003373ed09ec7eac6ca6))
 	ROM_LOAD("snd23.bin", 0x10000, 0x10000, CRC(2868ce6f) SHA1(317457763f764be08cbe6a5dd4008ba2257c9d78))
 	ROM_LOAD("snd22.bin", 0x20000, 0x10000, CRC(2559f874) SHA1(cbf57f29e394d5dc320e7dcbd2625f6c96412a06))
@@ -1625,7 +1618,7 @@ ROM_START(atleta)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("atletaa.snd", 0x0000, 0x2000, CRC(051c5329) SHA1(339115af4a2e3f1f2c31073cbed1842518d5916e))
 
-	ROM_REGION(0x40000, "speech", 0)
+	ROM_REGION(0x40000, "audiorom", 0)
 	ROM_LOAD("atletab.snd", 0x00000, 0x10000, CRC(7f155828) SHA1(e459c81b2c2e47d4276344d8d6a08c2c6242f941))
 	ROM_LOAD("atletac.snd", 0x10000, 0x10000, CRC(20456363) SHA1(b226400dac35dedc039a7e03cb525c6033b24ebc))
 	ROM_LOAD("atletad.snd", 0x20000, 0x10000, CRC(6518e3a4) SHA1(6b1d852005dabb76c7c65b87ecc9ee1422f16737))
@@ -1644,7 +1637,7 @@ ROM_START(larana)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("inder_sa_mod_la_rana_a_050690.bin", 0x0000, 0x2000, CRC(1513fd92) SHA1(6ca0723f5d7c86b844476a4830c8fc3744cbf918))
 
-	ROM_REGION(0x40000, "speech", ROMREGION_ERASEFF)
+	ROM_REGION(0x10000, "audiorom", ROMREGION_ERASEFF)
 	ROM_LOAD("inder_sa_mod_la_rana_b_200690.bin", 0x00000, 0x10000, CRC(3aaa7c7d) SHA1(4a8531b6859fc1f2a4bb63a51da35e9081b7e88b))
 ROM_END
 
@@ -1658,33 +1651,11 @@ ROM_START(ind250cc)
 	ROM_REGION(0x2000, "audiocpu", 0)
 	ROM_LOAD("a-250cc.bin", 0x0000, 0x2000, CRC(b64bdafb) SHA1(eab6d54d34b44187d454c1999e4bcf455183d5a0))
 
-	ROM_REGION(0x40000, "speech", 0)
+	ROM_REGION(0x40000, "audiorom", 0)
 	ROM_LOAD("b-250cc.bin", 0x00000, 0x10000, CRC(884c31c8) SHA1(23a838f1f0cb4905fa8552579b5452134f0fc9cc))
 	ROM_LOAD("c-250cc.bin", 0x10000, 0x10000, CRC(5a1dfa1d) SHA1(4957431d87be0bb6d27910b718f7b7edcd405fff))
 	ROM_LOAD("d-250cc.bin", 0x20000, 0x10000, CRC(a0940387) SHA1(0e06483e3e823bf4673d8e0bd120b0a6b802035d))
 	ROM_LOAD("e-250cc.bin", 0x30000, 0x10000, CRC(538b3274) SHA1(eb76c41a60199bb94aec4666222e405bbcc33494))
-ROM_END
-
-/*-------------------------------------------------------------------
-/ Metal Man (1992)
-/-------------------------------------------------------------------*/
-ROM_START(metalman)
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("cpu_0.bin", 0x0000, 0x2000, CRC(7fe4335b) SHA1(52ef2efa29337eebd8c2c9a8aec864356a6829b6))
-	ROM_LOAD("cpu_1.bin", 0x2000, 0x2000, CRC(2cca735e) SHA1(6a76017dfbcac0d57fcec8f07f92d5e04dd3e00b))
-
-	ROM_REGION(0x2000, "audiocpu", 0)
-	ROM_LOAD("sound_e1.bin", 0x0000, 0x2000, CRC(55e889e8) SHA1(0a240868c1b17762588c0ed9a14f568a6e50f409))
-
-	ROM_REGION(0x80000, "speech", ROMREGION_ERASEFF)
-	ROM_LOAD("sound_e2.bin", 0x00000, 0x20000, CRC(5ac61535) SHA1(75b9a805f8639554251192e3777073c29952c78f))
-
-	ROM_REGION(0x2000, "audiocpu2", 0)
-	ROM_LOAD("sound_m1.bin", 0x0000, 0x2000, CRC(21a9ee1d) SHA1(d906ac7d6e741f05e81076a5be33fc763f0de9c1))
-
-	ROM_REGION(0x80000, "speech2", ROMREGION_ERASEFF)
-	ROM_LOAD("sound_m2.bin", 0x00000, 0x20000, CRC(349df1fe) SHA1(47e7ddbdc398396e40bb5340e5edcb8baf06c255))
-	ROM_LOAD("sound_m3.bin", 0x40000, 0x20000, CRC(15ef1866) SHA1(4ffa3b29bf3c30a9a5bc622adde16a1a13833b22))
 ROM_END
 
 } // Anonymous namespace
@@ -1705,8 +1676,5 @@ GAME(1988,  pinclown, 0, inder,    pinclown, inder_state, init_1, ROT0, "Inder",
 GAME(1989,  corsario, 0, inder,    corsario, inder_state, init_1, ROT0, "Inder", "Corsario",           MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1990,  mundial,  0, inder,    mundial,  inder_state, init_1, ROT0, "Inder", "Mundial 90",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1991,  atleta,   0, inder,    atleta,   inder_state, init_1, ROT0, "Inder", "Atleta",             MACHINE_IS_SKELETON_MECHANICAL )
-GAME(1991,  larana,   0, inder,    metalman, inder_state, init_0, ROT0, "Inder", "La Rana",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1991,  larana,   0, inder,    larana,   inder_state, init_0, ROT0, "Inder", "La Rana",            MACHINE_IS_SKELETON_MECHANICAL )
 GAME(1992,  ind250cc, 0, inder,    ind250cc, inder_state, init_1, ROT0, "Inder", "250 CC",             MACHINE_IS_SKELETON_MECHANICAL )
-
-// new cpu board, uses 2x a later revision of msm5205 sound board
-GAME(1992,  metalman, 0, inder,    metalman, inder_state, init_2, ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL )

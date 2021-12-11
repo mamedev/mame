@@ -261,7 +261,7 @@ license:CC0
 		<info name="serial" value="C-64603" />
 		<part name="cart" interface="vic10_cart">
 			<dataarea name="uprom" size="0x2000">
-				<rom name="seawolf.bin" size="0x2000" crc="10daba85" sha1="90d5665bf22c7ebc10d6ebcc533fd2e8272ab7c7" offset="0x0000" />
+				<rom name="325364-02.u1" size="0x2000" crc="10daba85" sha1="90d5665bf22c7ebc10d6ebcc533fd2e8272ab7c7" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

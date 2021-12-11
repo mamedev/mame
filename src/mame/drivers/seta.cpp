@@ -64,7 +64,7 @@ P0-100A                 93 Quiz Kokology 2                      Tecmo
 P0-101-1                94 Pro Mahjong Kiwame                   Athena
 P0-102A                 93 Mad Shark                            Allumer
 P0-107A  (prototype?)   94 Orbs (prototype?)                    American Sammy
-P0-107A                 93 Kero Kero Keroppi no Issyoni Asobou  Sammy Industries  [added Chack'n, Hau]
+P0-107A                 93 Kero Kero Keroppi no Isshoni Asobou  Sammy Industries  [added Chack'n, Hau]
 P0-111A                 94 Magical Speed                        Allumer
 P0-114A  (SKB-001)      94 Krazy Bowl                           American Sammy
 P0-117A  (DH-01)        95 Extreme Downhill                     Sammy Japan
@@ -2175,7 +2175,7 @@ void seta_state::orbs_map(address_map &map)
 }
 
 /***************************************************************************
-                  Kero Kero Keroppi no Issyoni Asobou
+                  Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
 static const u16 keroppi_protection_word[] = {
@@ -6981,7 +6981,7 @@ static INPUT_PORTS_START( orbs )
 INPUT_PORTS_END
 
 /***************************************************************************
-                  Kero Kero Keroppi no Issyoni Asobou
+                  Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
 
@@ -9009,7 +9009,7 @@ void seta_state::orbs(machine_config &config)
 
 
 /***************************************************************************
-                  Kero Kero Keroppi no Issyoni Asobou
+                  Kero Kero Keroppi no Isshoni Asobou
 ***************************************************************************/
 
 void seta_state::keroppi(machine_config &config)
@@ -12484,7 +12484,7 @@ GAME( 1994, magspeed,  0,        magspeed,  magspeed,  seta_state,     empty_ini
 GAME( 1994, orbs,      0,        orbs,      orbs,      seta_state,     empty_init,     ROT0,   "American Sammy",            "Orbs (10/7/94 prototype?)", 0 )
 
 GAME( 1995, keroppi,   0,        keroppi,   keroppi,   seta_state,     empty_init,     ROT0,   "American Sammy",            "Kero Kero Keroppi's Let's Play Together (USA, Version 2.0)", 0 ) // ROM labels are all v1.0 tho.
-GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Issyoni Asobou (Japan)", 0 )
+GAME( 1993, keroppij,  keroppi,  keroppi,   keroppij,  seta_state,     empty_init,     ROT0,   "Sammy Industries",          "Kero Kero Keroppi no Isshoni Asobou (Japan)", 0 )
 
 GAME( 1995, extdwnhl,  0,        extdwnhl,  extdwnhl,  seta_state,     empty_init,     ROT0,   "Sammy Industries Japan",    "Extreme Downhill (v1.5)", MACHINE_IMPERFECT_GRAPHICS )
 

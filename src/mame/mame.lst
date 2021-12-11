@@ -1118,13 +1118,14 @@ zortonbr_100                    // (c) 1993 Picmatic
 
 @source:alien.cpp
 alien                           // (c) 2005 Capcom
-pingu                           // (c) 2006 The Pygos Group / Capcom
 dkbanana                        // (c) 2007 Capcom
 dkbanans                        // (c) 2007 Capcom
 dokodemo                        // (c) 2006 Capcom
 masmario                        // (c) 2004 Capcom
 masmarios                       // (c) 2004 Capcom
 masmario2                       // (c) 2005 Capcom
+mmaruchan                       // (c) 2005 Capcom
+pingu                           // (c) 2006 The Pygos Group / Capcom
 wontame                         // (c) 2008 Capcom
 
 @source:aliens.cpp
@@ -13660,6 +13661,7 @@ pgalvip                         // (c) 1996 ACE International (Afega stickers on
 pgalvipa                        //
 smissw                          //
 supmodel                        // (c) 1994 Comad & New Japan System
+supmodl2                        // (c) 1997 Comad
 wownfant                        // (c) 2002 Comad
 zipzap                          // (c) 1995 Barko Corp
 zipzapa                         // (c) 1995 Barko Corp
@@ -15438,6 +15440,7 @@ moviecrd                        // (c) 1998 Golden Games
 swisspkr                        // (c) 1990 Golden Games
 
 @source:goldnpkr.cpp
+adpoker                         // 198?, Unknown
 animpkr                         // 198?, Unknown
 bchancep                        // 198?, Unknown
 bchanceq                        // 198?, Unknown
@@ -16279,6 +16282,9 @@ hcastle                         // GX768 (c) 1988
 hcastlee                        // GX768 (c) 1988
 hcastlek                        // GX768 (c) 1988
 
+@source:hds200.cpp
+hds200                          // (c) Human Designed Systems
+
 @source:headonb.cpp
 blackhol
 foolrace                        // bootleg
@@ -16409,6 +16415,7 @@ smastmind                       // Invicta
 atakaast                        // Elektronika
 auslalom                        // Elektronika
 bassmate                        // Telko
+ehockey                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
 gnw_bfightn                     // Nintendo
@@ -17148,6 +17155,7 @@ ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 ikt5a                           //
 
 @source:im01.cpp
+im01
 im01t
 
 @source:imds2.cpp
@@ -17168,7 +17176,6 @@ corsario                        //
 ind250cc                        //
 lapbylap                        //
 larana                          //
-metalman                        //
 mundial                         //
 pinclown                        //
 pinmoonl                        //
@@ -17383,6 +17390,7 @@ gt97v120                        // (c) 1997 Incredible Technologies
 gt97v121                        // (c) 1997 Incredible Technologies
 gt97v122                        // (c) 1997 Incredible Technologies
 gt98                            // (c) 1998 Incredible Technologies
+gt98c100                        // (c) 1998 Incredible Technologies
 gt98s100                        // (c) 1998 Incredible Technologies
 gt98t302                        // (c) 1998 Incredible Technologies
 gt98t303                        // (c) 1998 Incredible Technologies
@@ -19794,6 +19802,9 @@ sraider                         // 8203 (c) 1982 Universal
 ladyfrog                        // (c) 1990 Mondial Games
 toucheme                        //
 touchemea                       //
+
+@source:lancelot.cpp
+lancelot                        //
 
 @source:laser3k.cpp
 las3000                         // 1983 Laser 3000
@@ -34722,7 +34733,6 @@ ator                            //
 ator3bmp                        //
 gamatros                        //
 hangonp                         //
-lancelot                        //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
@@ -34766,6 +34776,7 @@ ddpdojb                         //
 ddpdojp                         //
 ddpdojblk                       //
 ddpdojblka                      //
+ddpdojblkb                      //
 ddpdojblkbl                     //
 dmnfrnt                         // (c) 2002 Demon Front
 dmnfrnt103                      //
@@ -39283,6 +39294,7 @@ bushidob                        //
 jolypark                        //
 mach2                           //
 mach2a                          //
+metalman                        //
 vrnwrld                         //
 
 @source:spirit76.cpp
