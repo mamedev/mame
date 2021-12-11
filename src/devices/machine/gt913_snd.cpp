@@ -8,13 +8,13 @@
     which is then input to either a serial DAC or a HG51B-based DSP,
     depending on the model of keyboard.
 
-    Currently, the actual sample format in ROM is unknown.
-    The serial output is twos-complement 16-bit PCM, but the data in ROM
-    doesn't seem to be - reading it as such produces sounds that are
-    somewhat recognizable, but highly distorted.
+	The sample format, as well as other details such as the linear interpolation,
+	are covered in these two Japanese patents:
+	https://patents.google.com/patent/JP3603343B2/en
+	https://patents.google.com/patent/JPH07199996A/en
 
-    For now, all known (and unknown) register writes are just logged
-    without generating any sound.
+	TODO: Volume envelope rates still need adjusting.
+	(See comment in gt913_sound_device::command_w regarding command 6007)
 
 ***************************************************************************/
 
@@ -140,13 +140,18 @@ void gt913_sound_device::mix_sample(voice_t& voice, s64& left, s64& right)
 		voice.m_volume_current = voice.m_volume_target;
 	}
 
+	// interpolate, apply envelope + channel gain, and mix into output
 	const u8 step = (voice.m_addr_frac >> 22) & 7;
 	const u8 env = (voice.m_volume_current >> 24);
-	s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env * env;
+	/*
+	the current envelope level effects amplitude non-linearly, just apply the value twice
+	(this hardware family is branded as "A² (A-Square) Sound Source" in some of Casio's
+	promotional materials, possibly for this reason?)
+	*/
+	const s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env * env;
 
-	// mix sample into output
-	left += sample * voice.m_balance[0];
-	right += sample *voice.m_balance[1];
+	left  += sample * voice.m_balance[0];
+	right += sample * voice.m_balance[1];
 }
 
 void gt913_sound_device::update_sample(voice_t& voice)
@@ -155,6 +160,12 @@ void gt913_sound_device::update_sample(voice_t& voice)
 
 	if (voice.m_addr_current == (voice.m_addr_loop | 1))
 	{
+		/*
+		The last 12 bytes of each sample are a table containing five sample and exponent value pairs
+		for the data words immediately after the loop point. The first pair corresponds to what the
+		sample and exponent value will be _after_ processing the first word after the loop,
+		so once we've reached that point, use those values to reload the current sample and exponent
+		*/
 		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
 		
 		voice.m_sample_next = read_word(addr_loop_data) - voice.m_sample;
@@ -162,6 +173,10 @@ void gt913_sound_device::update_sample(voice_t& voice)
 	}
 	else
 	{
+		/*
+		For all other samples, just get the next sample delta value.
+		For even-numbered samples, also update the exponent/shift value.
+		*/
 		const u16 word = read_word(voice.m_addr_current & ~1);
 		s16 delta = 0;
 
@@ -271,16 +286,20 @@ void gt913_sound_device::command_w(u16 data)
 	}
 	else if (voicecmd == 0x6006)
 	{
-		/* per-voice gain used for normalizing samples
-			currently treated such that the lower 3 bits are fractional */
+		/*
+		per-voice gain used for normalizing samples
+		currently treated such that the lower 3 bits are fractional
+		*/
 		voice.m_gain = m_data[1] & 0xff;
 	}
 	else if (voicecmd == 0x6007)
 	{
 		logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
-		/* only set a new volume level/rate if we haven't previously indicated the end of an envelope,
-			unless the new level also has the high bit set. otherwise, a timer irq may try to update the
-			normal envelope while other code is trying to force a note off */
+		/*
+		only set a new volume level/rate if we haven't previously indicated the end of an envelope,
+		unless the new level also has the high bit set. otherwise, a timer irq may try to update the
+		normal envelope while other code is trying to force a note off
+		*/
 		const bool end = BIT(m_data[0], 15);
 		if (!voice.m_volume_end || end)
 		{
@@ -332,7 +351,9 @@ void gt913_sound_device::command_w(u16 data)
 
 u16 gt913_sound_device::status_r()
 {
-	/* ctk551 reads the current gain level out of the lower 6 bits and ignores the rest
-	it's unknown what, if anything, the other bits are supposed to contain */
+	/*
+	ctk551 reads the current gain level out of the lower 6 bits and ignores the rest
+	it's unknown what, if anything, the other bits are supposed to contain
+	*/
 	return m_gain & 0x3f;
 }

@@ -11,7 +11,7 @@
     - Two timers, three 8-bit ports, two 8-bit ADCs
     - Keyboard controller w/ key velocity detection
     - MIDI UART
-    - 24-voice PCM sound (currently not emulated / fully understood)
+    - 24-voice DPCM sound
 
     Earlier and later Casio keyboard models contain "uPD912" and "uPD914" chips,
     which are presumably similar.
@@ -88,6 +88,11 @@ void gt913_device::device_add_mconfig(machine_config &config)
 {
 	GT913_INTC(config, "intc");
 
+	/*
+	generate sound at 104 cycles per sample (= 144.231 kHz sample clock to the DAC)
+	on keyboard models that include a DSP, this also results in a multiple
+	of the 36.058 kHz CPU->DSP sync signal shown in some schematics (WK-1200 and others)
+	*/
 	GT913_SOUND(config, m_sound, std::round(clock() / 104.0f));
 	m_sound->set_device_rom_tag(tag());
 
