@@ -107,6 +107,7 @@ public:
 	int                 m_targetorient;
 	render_layer_config m_targetlayerconfig;
 	u32                 m_targetvismask;
+	int                 m_targetscalemode;
 
 	// input info
 	std::chrono::steady_clock::time_point  m_lastclicktime;
