@@ -295,7 +295,6 @@ protected:
 	uint32_t m_inten[6] = {0, 0, 0, 0, 0, 0};
 	uint32_t m_intst[6] = {0, 0, 0, 0, 0, 0};
 	uint32_t escc1_int_status = 0;
-	uint32_t escc1_int_mask = 0;
 
 	// Freerun timer (1us period)
 	// NetBSD source code corroborates the period (https://github.com/NetBSD/src/blob/229cf3aa2cda57ba5f0c244a75ae83090e59c716/sys/arch/newsmips/newsmips/news5000.c#L259)
@@ -355,23 +354,13 @@ protected:
 	uint32_t bus_error();
 	uint64_t front_panel_r(offs_t offset);
 
-	// Constants
-	static constexpr uint32_t ICACHE_SIZE = 0x4000;
-	static constexpr uint32_t DCACHE_SIZE = 0x4000;
-	static constexpr uint32_t SCACHE_SIZE = 0x100000;
-	static constexpr int FREERUN_FREQUENCY = 1000000; // Hz
-	static constexpr int TIMER0_FREQUENCY = 100;      // Hz
-	static constexpr uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
-	static constexpr uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
-	const char *MAIN_MEMORY_DEFAULT = "64M";
-
-	// RAM debug
+	// RAM accessors
 	bool m_map_shift = false;
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
 
 	// CXD8421Q glue logic and secondary control for the ESCC
-	// TODO: This probably belongs in a separate device, especially if the other features are ever implemented.
+	// This belongs in a separate device if the other features are ever implemented.
 	enum escc_channel
 	{
 		CHA,
@@ -381,16 +370,24 @@ protected:
 	// Direct channel access
 	uint32_t escc_ch_read(escc_channel channel, offs_t offset);
 	void escc_ch_write(escc_channel channel, offs_t offset, uint32_t data);
-	template <escc_channel channel>
-	uint32_t escc_ch_read(offs_t offset) { return escc_ch_read(channel, offset); }
-	template <escc_channel channel>
-	void escc_ch_write(offs_t offset, uint32_t data) { escc_ch_write(channel, offset, data); }
+	template <escc_channel Channel>
+	uint32_t escc_ch_read(offs_t offset) { return escc_ch_read(Channel, offset); }
+	template <escc_channel Channel>
+	void escc_ch_write(offs_t offset, uint32_t data) { escc_ch_write(Channel, offset, data); }
 
-	// Interrupts
+	// ESCC-related interrupts (probably lives on the CXD8421Q)
 	uint32_t escc1_int_status_r(offs_t offset);
 	void escc1_int_status_w(offs_t offset, uint32_t data);
-	uint32_t escc1_int_mask_r(offs_t offset);
-	void escc1_int_mask_w(offs_t offset, uint32_t data);
+
+	// Constants
+	static constexpr uint32_t ICACHE_SIZE = 0x4000;
+	static constexpr uint32_t DCACHE_SIZE = 0x4000;
+	static constexpr uint32_t SCACHE_SIZE = 0x100000;
+	static constexpr int FREERUN_FREQUENCY = 1000000; // Hz
+	static constexpr int TIMER0_FREQUENCY = 100;      // Hz
+	static constexpr uint32_t APBUS_DMA_MAP_ADDRESS = 0x14c20000;
+	static constexpr uint32_t APBUS_DMA_MAP_RAM_SIZE = 0x20000; // 128 kibibytes
+	const char *MAIN_MEMORY_DEFAULT = "64M";
 };
 
 /*
@@ -611,7 +608,6 @@ void news_r4k_state::cpu_map(address_map &map)
 	map(0x1e940000, 0x1e94000f).rw(FUNC(news_r4k_state::escc_ch_read<CHB>), FUNC(news_r4k_state::escc_ch_write<CHB>));
 	map(0x1e950000, 0x1e95000f).rw(FUNC(news_r4k_state::escc_ch_read<CHA>), FUNC(news_r4k_state::escc_ch_write<CHA>));
 	map(0x1e960000, 0x1e960003).rw(FUNC(news_r4k_state::escc1_int_status_r), FUNC(news_r4k_state::escc1_int_status_w));
-	map(0x1e960004, 0x1e960007).rw(FUNC(news_r4k_state::escc1_int_mask_r), FUNC(news_r4k_state::escc1_int_mask_w));
 
 	// Interestingly, this is also the RAM that is used before main memory is initialized
 	// It is also the only RAM avaliable if "no memory mode" is set (DIP switch #8)
@@ -922,43 +918,47 @@ void news_r4k_state::led_state_w(offs_t offset, uint32_t data)
 }
 
 /*
- * APbus memory addressing
+ * apbus_virt_to_phys
  *
- * The APbus has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
- * is responsible for populating the APbus TLB. The `apbus_pte` struct defines what each entry looks like. Note that to avoid
- * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
- * separate variables, but the actual register is packed like this:
- *
- * 0x xxxx xxxx xxxx xxxx
- *   |   pad   |  entry  |
- *
- * Entry is packed as follows:
- * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
- *    |valid|coherent|    pad2  |       pfnum        |
- *
- * The APbus requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
- *
- * For example, the monitor ROM populates the PTEs as follows in response to a `dl` command.
- * Addr       PTE1             PTE2
- * 0x14c20000 0000000080103ff5 0000000080103ff6
- *
- * It also loads the `address` register of the DMAC3 with 0xd60.
- *
- * This will cause the consuming ASIC (in this case, the DMAC3) to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
- * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
- * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
- *
- * NetBSD splits the mapping RAM into two sections, one for each DMAC3 controller. If the OS does not keep track, the ASICs
- * could end up in a configuration that would cause them to overwrite each other's data. NEWS-OS makes even more extensive
- * use of APbus DMA, including the WSC-SONIC3 for network DMA.
- *
- * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
- * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
- * on the virtual address being used (maybe it goes to the memory controller). It doesn't impact the normal operation of the
- * computer, but does mean that the `pad2` section might only be 6 bits, not 10 bits.
+ * Maps a given virtual APbus address to a physical address. See the below comment for more information.
  */
 uint32_t news_r4k_state::apbus_virt_to_phys(uint32_t v_address)
 {
+	/*
+	 * The APbus has its own virtual->physical addressing scheme. Like the CPU's TLB, the host OS
+	 * is responsible for populating the APbus TLB. The `apbus_pte` struct defines what each entry looks like. Note that to avoid
+	 * bit-order dependencies and other platform-specific stuff, in this implementation, valid, coherent, pad2, and pfnum are
+	 * separate variables, but the actual register is packed like this:
+	 *
+	 * 0x xxxx xxxx xxxx xxxx
+	 *   |   pad   |  entry  |
+	 *
+	 * Entry is packed as follows:
+	 * 0b    x      x     xxxxxxxxxx xxxxxxxxxxxxxxxxxxxx
+	 *    |valid|coherent|    pad2  |       pfnum        |
+	 *
+	 * The APbus requires RAM to hold the TLB. On the NWS-5000X, this is 128KiB starting at physical address 0x14c20000 (and goes to 0x14c3ffff)
+	 *
+	 * For example, the monitor ROM populates the PTEs as follows in response to a `dl` command.
+	 * Addr       PTE1             PTE2
+	 * 0x14c20000 0000000080103ff5 0000000080103ff6
+	 *
+	 * It also loads the `address` register of the DMAC3 with 0xd60.
+	 *
+	 * This will cause the consuming ASIC (in this case, the DMAC3) to start mapping from virtual address 0xd60 to physical address 0x3ff5d60.
+	 * If the address register goes beyond 0xFFF, bit 12 will increment. This will increase the page number so the virtual address will be
+	 * 0x1000, and will cause the DMAC to use the next PTE (in this case, the next sequential page, 0x3ff6000).
+	 *
+	 * NetBSD splits the mapping RAM into two sections, one for each DMAC3 controller. If the OS does not keep track, the ASICs
+	 * could end up in a configuration that would cause them to overwrite each other's data. NEWS-OS makes even more extensive
+	 * use of APbus DMA, including the WSC-SONIC3 for network DMA.
+	 *
+	 * Another note: NetBSD mentions that the `pad2` section of the register is 10 bits. However, this might not be fully accurate.
+	 * On the NWS-5000X, the physical address bus is 36 bits because it has an R4400SC. The 32nd bit is sometimes set, depending
+	 * on the virtual address being used (maybe it goes to the memory controller). It doesn't impact the normal operation of the
+	 * computer, but does mean that the `pad2` section might only be 6 bits, not 10 bits.
+	 */
+
 	// Convert page number to PTE address and read raw PTE data from the APbus DMA mapping RAM
 	uint32_t apbus_page_address = APBUS_DMA_MAP_ADDRESS + 8 * (v_address >> 12);
 	if (apbus_page_address >= (APBUS_DMA_MAP_ADDRESS + APBUS_DMA_MAP_RAM_SIZE))
@@ -1178,6 +1178,11 @@ uint32_t news_r4k_state::bus_error()
 	return 0;
 }
 
+/*
+ * escc_ch_read
+ *
+ * Accesses the read port of the specified ESCC channel.
+ */
 uint32_t news_r4k_state::escc_ch_read(escc_channel channel, offs_t offset)
 {
 	if (offset < 2)
@@ -1193,6 +1198,11 @@ uint32_t news_r4k_state::escc_ch_read(escc_channel channel, offs_t offset)
 	}
 }
 
+/*
+ * escc_ch_read
+ *
+ * Writes `data` to the ESCC specified by channel.
+ */
 void news_r4k_state::escc_ch_write(escc_channel channel, offs_t offset, uint32_t data)
 {
 	if (offset < 2)
@@ -1208,29 +1218,29 @@ void news_r4k_state::escc_ch_write(escc_channel channel, offs_t offset, uint32_t
 	}
 }
 
+/*
+ * escc1_int_status_r
+ *
+ * Reads the ESCC1 interrupt status register. This is used in conjunction with the ESCC and FIFO chips
+ * to provide asynchronous duplex serial communication.
+ */
 uint32_t news_r4k_state::escc1_int_status_r(offs_t offset)
 {
 	LOGMASKED(LOG_ESCC, "Read ESCC1 int status 0x%x (%s)\n", escc1_int_status, machine().describe_context());
 	return escc1_int_status;
 }
 
+/*
+ * escc1_int_status_w
+ *
+ * Clears the ESCC1 interrupt status register. This is used in conjunction with the ESCC and FIFO chips
+ * to provide asynchronous duplex serial communication.
+ */
 void news_r4k_state::escc1_int_status_w(offs_t offset, uint32_t data)
 {
 	// assume clear for now
 	LOGMASKED(LOG_ESCC, "Clear ESCC1 int status (%s)\n", machine().describe_context());
 	escc1_int_status = 0;
-}
-
-uint32_t news_r4k_state::escc1_int_mask_r(offs_t offset)
-{
-	LOGMASKED(LOG_ESCC, "Read ESCC1 int mask 0x%x (%s)\n", escc1_int_mask, machine().describe_context());
-	return escc1_int_mask;
-}
-
-void news_r4k_state::escc1_int_mask_w(offs_t offset, uint32_t data)
-{
-	LOGMASKED(LOG_ESCC, "Set ESCC1 int mask 0x%x (%s)\n", data, machine().describe_context());
-	escc1_int_mask = data;
 }
 
 /*

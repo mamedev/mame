@@ -41,18 +41,22 @@ uint32_t dmac3_device::csr_r(dmac3_controller controller)
 {
 	return m_controllers[controller].csr;
 }
+
 uint32_t dmac3_device::intr_r(dmac3_controller controller)
 {
 	return m_controllers[controller].intr;
 }
+
 uint32_t dmac3_device::length_r(dmac3_controller controller)
 {
 	return m_controllers[controller].length;
 }
+
 uint32_t dmac3_device::address_r(dmac3_controller controller)
 {
 	return m_controllers[controller].address;
 }
+
 uint32_t dmac3_device::conf_r(dmac3_controller controller)
 {
 	return m_controllers[controller].conf;
@@ -100,7 +104,8 @@ void dmac3_device::address_w(dmac3_controller controller, uint32_t data)
 
 void dmac3_device::conf_w(dmac3_controller controller, uint32_t data)
 {
-#if (VERBOSE & LOG_REGISTER) > 0 // No need for the extra comparison if logging isn't enabled
+#if (VERBOSE & LOG_REGISTER) > 0 
+	// No need for the extra comparison if logging isn't enabled
 	// Only log if something other than the access mode changed
 	// since, at least for now, DMAC and SPIFI accesses will go through regardless
 	// of this setting.

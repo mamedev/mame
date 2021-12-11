@@ -1027,7 +1027,7 @@ void spifi3_device::auto_phase_transfer(int new_phase)
 	{
 		start_automsg(new_phase);
 	}
-	else if ((new_phase == S_PHASE_COMMAND && xfr_phase != S_PHASE_COMMAND) && autocmd_active())
+	else if (new_phase == S_PHASE_COMMAND && autocmd_active())
 	{
 		start_autocmd();
 	}
@@ -1075,7 +1075,7 @@ void spifi3_device::step(bool timeout)
 			int arbitrationWinner;
 			for (arbitrationWinner = 7; arbitrationWinner >= 0 && !(data & (1 << arbitrationWinner)); arbitrationWinner--)
 			{
-			};
+			}
 
 			if (arbitrationWinner != scsi_id)
 			{
