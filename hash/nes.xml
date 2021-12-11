@@ -32067,8 +32067,9 @@ license:CC0
 			<dataarea name="chr" size="262144">
 				<rom name="koe-iu-0 chr" size="262144" crc="44b22b3d" sha1="bfdb1a89f403b7deea2e29addf1d18e745442771" offset="00000" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 			<!-- 1k Internal RAM in the MMC5 chip (ExRAM) -->
 			<dataarea name="mapper_ram" size="1024">
@@ -41540,6 +41541,10 @@ license:CC0
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
