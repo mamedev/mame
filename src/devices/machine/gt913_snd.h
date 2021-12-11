@@ -74,7 +74,7 @@ private:
 		u8 m_gain;
 	};
 
-	void mix_sample(voice_t& voice, s32& left, s32& right);
+	void mix_sample(voice_t& voice, s64& left, s64& right);
 	void update_sample(voice_t& voice);
 
 	voice_t m_voices[24];

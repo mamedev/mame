@@ -96,7 +96,7 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 {
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
-		s32 left = 0, right = 0;
+		s64 left = 0, right = 0;
 
 		for (auto& voice : m_voices)
 		{
@@ -104,8 +104,8 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream, std::vector<r
 				mix_sample(voice, left, right);
 		}
 
-		outputs[0].put_int(i, (left * m_gain) >> 16, 32678);
-		outputs[1].put_int(i, (right * m_gain) >> 16, 32768);
+		outputs[0].put_int_clamp(i, (left * m_gain) >> 26, 32678);
+		outputs[1].put_int_clamp(i, (right * m_gain) >> 26, 32768);
 	}
 }
 
@@ -114,7 +114,7 @@ void gt913_sound_device::rom_bank_updated()
 	m_stream->update();
 }
 
-void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
+void gt913_sound_device::mix_sample(voice_t& voice, s64& left, s64& right)
 {
 	// update sample position
 	voice.m_addr_frac += voice.m_pitch;
@@ -142,8 +142,7 @@ void gt913_sound_device::mix_sample(voice_t& voice, s32& left, s32& right)
 
 	const u8 step = (voice.m_addr_frac >> 22) & 7;
 	const u8 env = (voice.m_volume_current >> 24);
-	s32 sample = ((voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain) >> 3;
-	sample = (sample * env * env) >> 7;
+	s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env * env;
 
 	// mix sample into output
 	left += sample * voice.m_balance[0];
@@ -204,8 +203,10 @@ u16 gt913_sound_device::data_r(offs_t offset)
 
 void gt913_sound_device::command_w(u16 data)
 {
-	uint8_t voicenum = (data & 0x1f00) >> 8;
-	uint16_t voicecmd = data & 0x60ff;
+	m_stream->update();
+
+	const uint8_t voicenum = (data & 0x1f00) >> 8;
+	const uint16_t voicecmd = data & 0x60ff;
 
 	if (data == 0x0012)
 	{
@@ -277,15 +278,37 @@ void gt913_sound_device::command_w(u16 data)
 	else if (voicecmd == 0x6007)
 	{
 		logerror("voice %u volume %u rate %u\n", voicenum, (m_data[0] >> 8), m_data[0] & 0xff);
-		/* only set a new volume level/rate if we haven't previously indicated the end of an envelope
-		otherwise, a timer irq may try to update the normal envelope while other code is trying to force a note off */
-		if (!voice.m_volume_end)
+		/* only set a new volume level/rate if we haven't previously indicated the end of an envelope,
+			unless the new level also has the high bit set. otherwise, a timer irq may try to update the
+			normal envelope while other code is trying to force a note off */
+		const bool end = BIT(m_data[0], 15);
+		if (!voice.m_volume_end || end)
 		{
-			voice.m_volume_end = BIT(m_data[0], 15);
+			voice.m_volume_end = end;
 
 			voice.m_volume_target = (m_data[0] & 0x7f00) << 16;
+			/*
+			In addition to volume levels applying non-linearly, envelope rates
+			are also non-linear. Unfortunately, with the ctk-551's limited patch set and
+			lack of editing features, figuring out the correct behavior isn't easy.
+			This is essentially a rough estimate until a higher-end model (ctk-601 series, etc)
+			can be dumped and used for more detailed testing.
+			*/
 			const u8 x = m_data[0] & 0xff;
-			voice.m_volume_rate = 2 * x * x * x;
+			if (x >= 127)
+				voice.m_volume_rate = x << 21;
+			else if (x >= 63)
+				voice.m_volume_rate = x << 16;
+			else if (x >= 47)
+				voice.m_volume_rate = x << 14;
+			else if (x >= 31)
+				voice.m_volume_rate = x << 11;
+			else if (x >= 23)
+				voice.m_volume_rate = x << 9;
+			else if (x >= 15)
+				voice.m_volume_rate = x << 7;
+			else
+				voice.m_volume_rate = x << 5;
 		}
 	}
 	else if (voicecmd == 0x2028)
