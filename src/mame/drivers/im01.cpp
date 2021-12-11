@@ -11,12 +11,11 @@ Soviet chess computer, produced by Svetana from 1986-1992.
 TODO:
 - emulate К1801ВМ1, using T11 for now and I hope it works ok
 - emulate K1809BB1, IRQ is from here too (measured 177.4Hz)
-- It's running a bit too fast?: XTAL was measured 9.22MHz, CPU clock was
-  measured 4.61MHz, beeper frequency 3.73KHz and beeper duration 34.2ms.
-  In MAME, beeper frequency is 4.15KHz and duration is 31ms, meaning it's
-  around 1.1 times faster, maybe К1801ВМ1 internal timing differs from T11,
-  and/or T11 core timing itself is not 100% accurate.
-- verify actual XTAL, the label couldn't be seen
+- It's running a bit too fast?: CPU clock was measured 4.61MHz, beeper
+  frequency 3.73KHz and beeper duration 34.2ms. In MAME, beeper frequency is
+  4.15KHz and duration is 31ms, meaning it's around 1.1 times faster, maybe
+  К1801ВМ1 internal timing differs from T11, and/or MAME's T11 core timing
+  itself is not 100% accurate.
 - Is im01t extra RAM chip used at all, and if so, where is it mapped?
   Even when trying to solve mate problems (level 7, and overclocked CPU),
   there are no unmapped writes.
@@ -26,7 +25,7 @@ TODO:
 *******************************************************************************
 
 Hardware notes:
-- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz
+- К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz (9216 кгц XTAL)
 - 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1) (4KB RAM for ИМ-01Т)
 - K1809BB1 (I/O, counter)
 - 4-digit VFD 7seg panel(cyan, green window overlay), beeper
@@ -247,7 +246,7 @@ static INPUT_PORTS_START( im01 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("E 5 / Queen")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME(u8"Фиг (Prefix Key)")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL) PORT_NAME(u8"Фиг (Prefix Key)")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME(u8"И (Show Analyzed Move)")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME(u8"РЗ (Solve Mate / Set Up)")
