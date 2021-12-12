@@ -1197,10 +1197,10 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 
 			// apply orientation if required
 			if (target_orientation & ORIENTATION_SWAP_XY)
-				src_aspect = 1.0 / src_aspect;
+				src_aspect = 1.0f / src_aspect;
 
 			// we need the ratio of target to source aspect
-			float aspect_ratio = m_keepaspect ? (float)target_width / (float)target_height * target_pixel_aspect / src_aspect : 1.0;
+			float aspect_ratio = m_keepaspect ? (float)target_width / (float)target_height * target_pixel_aspect / src_aspect : 1.0f;
 
 			// first compute (a, b) scale factors to fit the screen
 			float a = (float)target_width / src_width;
@@ -1227,8 +1227,8 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 
 
 			// get the usable bounding box considering the type of scaling for each axis
-			float usable_aspect = (a_is_fract ? a : (float)std::max(1.0, floor(a))) * src_width /
-								 ((b_is_fract ? b : (float)std::max(1.0, floor(b))) * src_height) * target_pixel_aspect;
+			float usable_aspect = (a_is_fract ? a : std::max(1.0f, floorf(a))) * src_width /
+								 ((b_is_fract ? b : std::max(1.0f, floorf(b))) * src_height) * target_pixel_aspect;
 
 			// depending on the relative shape between target and source, let's define 'a' and 'b' so that:
 			// * a is the leader axis (first to hit a boundary)
@@ -1239,25 +1239,25 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 				std::swap(a_user, b_user);
 				std::swap(a_is_fract, b_is_fract);
 				std::swap(a_max, b_max);
-				aspect_ratio = 1.0 / aspect_ratio;
+				aspect_ratio = 1.0f / aspect_ratio;
 			}
 
 			// now find an (a, b) pair that best fits our boundaries and scale options
-			float a_best = 1.0, b_best = 1.0;
+			float a_best = 1.0f, b_best = 1.0f;
 			float diff = 1000;
 
 			// fill (a0, a1) range
 			float u = a_user == 0 ? a : (float)a_user;
-			float a_range[] = {a_is_fract ? u : (float)std::max(1.0, floor(u)), a_is_fract ? u : (float)std::max(1.0, round(u))};
+			float a_range[] = {a_is_fract ? u : std::max(1.0f, floorf(u)), a_is_fract ? u : std::max(1.0f, roundf(u))};
 
 			for (float aa : a_range)
 			{
 				// apply aspect correction to 'b' axis if needed, considering resulting 'a' borders
-				float ba = b * (m_keepaspect ? aspect_ratio * (aa / a) : 1.0);
+				float ba = b * (m_keepaspect ? aspect_ratio * (aa / a) : 1.0f);
 
 				// fill (b0, b1) range
 				float v = b_user == 0 ? ba : (float)b_user;
-				float b_range[] = {b_is_fract ? v : (float)std::max(1.0, floor(v)), b_is_fract ? v : (float)std::max(1.0, round(v))};
+				float b_range[] = {b_is_fract ? v : std::max(1.0f, floorf(v)), b_is_fract ? v : std::max(1.0f, roundf(v))};
 
 				for (float bb : b_range)
 				{
@@ -1266,11 +1266,11 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 					if (m_keepaspect && a_user == 0)
 					{
 						if (a_is_fract) ab *= (bb / ba);
-						else if (b_user != 0) ab = (float)std::max(1.0, round(ab * (bb / ba)));
+						else if (b_user != 0) ab = std::max(1.0f, roundf(ab * (bb / ba)));
 					}
 
-					// if overscan isn't allowed, discard values that exceed the usable bounding box, except a minimum of 1.0
-					if (!int_overscan && ((ab > a_max && bb > 1.0) || (bb > b_max && ab > 1.0)))
+					// if overscan isn't allowed, discard values that exceed the usable bounding box, except a minimum of 1.0f
+					if (!int_overscan && ((ab > a_max && bb > 1.0f) || (bb > b_max && ab > 1.0f)))
 						continue;
 
 					// score the result
