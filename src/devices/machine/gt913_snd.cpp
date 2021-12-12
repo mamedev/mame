@@ -58,30 +58,27 @@ void gt913_sound_device::device_start()
 	save_item(NAME(m_gain));
 	save_item(NAME(m_data));
 
-	for (int i = 0; i < 24; i++)
-	{
-		save_item(NAME(m_voices[i].m_enable), i);
+	save_item(STRUCT_MEMBER(m_voices, m_enable));
 
-		save_item(NAME(m_voices[i].m_addr_start), i);
-		save_item(NAME(m_voices[i].m_addr_end), i);
-		save_item(NAME(m_voices[i].m_addr_loop), i);
+	save_item(STRUCT_MEMBER(m_voices, m_addr_start));
+	save_item(STRUCT_MEMBER(m_voices, m_addr_end));
+	save_item(STRUCT_MEMBER(m_voices, m_addr_loop));
 
-		save_item(NAME(m_voices[i].m_addr_current), i);
-		save_item(NAME(m_voices[i].m_addr_frac), i);
-		save_item(NAME(m_voices[i].m_pitch), i);
+	save_item(STRUCT_MEMBER(m_voices, m_addr_current));
+	save_item(STRUCT_MEMBER(m_voices, m_addr_frac));
+	save_item(STRUCT_MEMBER(m_voices, m_pitch));
 
-		save_item(NAME(m_voices[i].m_sample), i);
-		save_item(NAME(m_voices[i].m_sample_next), i);
-		save_item(NAME(m_voices[i].m_exp), i);
+	save_item(STRUCT_MEMBER(m_voices, m_sample));
+	save_item(STRUCT_MEMBER(m_voices, m_sample_next));
+	save_item(STRUCT_MEMBER(m_voices, m_exp));
 
-		save_item(NAME(m_voices[i].m_volume_current), i);
-		save_item(NAME(m_voices[i].m_volume_target), i);
-		save_item(NAME(m_voices[i].m_volume_rate), i);
-		save_item(NAME(m_voices[i].m_volume_end), i);
+	save_item(STRUCT_MEMBER(m_voices, m_volume_current));
+	save_item(STRUCT_MEMBER(m_voices, m_volume_target));
+	save_item(STRUCT_MEMBER(m_voices, m_volume_rate));
+	save_item(STRUCT_MEMBER(m_voices, m_volume_end));
 
-		save_item(NAME(m_voices[i].m_balance), i);
-		save_item(NAME(m_voices[i].m_gain), i);
-	}
+	save_item(STRUCT_MEMBER(m_voices, m_balance));
+	save_item(STRUCT_MEMBER(m_voices, m_gain));
 }
 
 void gt913_sound_device::device_reset()
