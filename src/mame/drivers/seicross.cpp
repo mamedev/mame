@@ -695,13 +695,13 @@ ROM_START( sectrzona ) // This and set seicross seem bug-fixed versions, where t
 ROM_END
 
 
-GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 1)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 2)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Nichibutsu",         "Frisky Tom (set 3)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA",     "Radical Radial (US)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",      "Radical Radial (Japan)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Seicross (set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 1)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 2, Tecfri hardware)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice", "Sector Zone (set 3)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyt,   0,        nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Jorudan / Nichibutsu", "Frisky Tom (set 1)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskyta,  friskyt,  nvram,    friskyt,  seicross_state, empty_init,    ROT0,  "Jorudan / Nichibutsu", "Frisky Tom (set 2)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, friskytb,  friskyt,  friskytb, friskyt,  seicross_state, empty_init,    ROT0,  "Jorudan / Nichibutsu", "Frisky Tom (set 3)",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, radrad,    0,        no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Nichibutsu USA",       "Radical Radial (US)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, radradj,   radrad,   no_nvram, radrad,   seicross_state, empty_init,    ROT0,  "Logitec Corp.",        "Radical Radial (Japan)",                          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicross,  0,        no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice",   "Seicross (set 1)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, seicrossa, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice",   "Seicross (set 2)",                                MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzon,  seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice",   "Sector Zone (set 1)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzont, seicross, sectznt,  seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice",   "Sector Zone (set 2, Tecfri hardware)",            MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sectrzona, seicross, no_nvram, seicross, seicross_state, empty_init,    ROT90, "Nichibutsu / Alice",   "Sector Zone (set 3)",                             MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
