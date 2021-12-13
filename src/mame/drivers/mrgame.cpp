@@ -24,7 +24,7 @@ Status:
     Motor Show      Hold AS, hit 1, release keys          Hold A, hit X. release keys
     Dakar           Hold ASD, hit 1, release keys         Hold AS, hit X, release keys
     Mac Attack      Hold AS, hit 1, release keys          Hold AS, hit X, release keys
-    World Cup 90    Hold AS, hit 1, release keys. It's a timed game, you can't lose the ball.
+    World Cup 90    Hold ASX, hit 1, release keys. It's a timed game, you can't lose the ball.
 - Balls indicates number of balls left, so 1 = last ball.
 
 Fast Track:
@@ -403,8 +403,7 @@ void mrgame_state::triple_w(u8 data)
 
 void mrgame_state::extadd_w(u8 data)
 {
-	u8 t = m_sxx*8+(data&7);
-	m_io_outputs[t] = m_data & 1;
+	m_io_outputs[m_sxx*8+(data&7)] = m_data & 1;
 }
 
 void mrgame_state::video_w(u8 data)
