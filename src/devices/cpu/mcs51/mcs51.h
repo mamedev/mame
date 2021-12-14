@@ -168,7 +168,7 @@ protected:
 		uint8_t   mcon;                   /* bootstrap loader MCON register */
 		uint8_t   rpctl;                  /* bootstrap loader RPCTL register */
 		uint8_t   crc;                    /* bootstrap loader CRC register */
-		uint8_t   rnr_delay;			  /* delay before new random number available */
+		int32_t   rnr_delay;			  /* delay before new random number available */
 	} m_ds5002fp;
 
 	// for the debugger

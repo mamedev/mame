@@ -2063,7 +2063,7 @@ void mcs51_cpu_device::execute_run()
 			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
 
 			if (m_ds5002fp.rnr_delay > 0)
-				m_ds5002fp.rnr_delay--;
+				m_ds5002fp.rnr_delay-=m_inst_cycles;
 		}
 
 		/* If the chip entered in idle mode, end the loop */
@@ -2479,7 +2479,7 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 
 uint8_t ds5002fp_device::handle_rnr()
 {
-	if (m_ds5002fp.rnr_delay == 0)
+	if (m_ds5002fp.rnr_delay <= 0)
 	{
 		m_ds5002fp.rnr_delay = 160; // delay before another random number can be read
 		return machine().rand();
@@ -2490,7 +2490,7 @@ uint8_t ds5002fp_device::handle_rnr()
 
 bool ds5002fp_device::is_rnr_ready()
 {
-	if (m_ds5002fp.rnr_delay == 0)
+	if (m_ds5002fp.rnr_delay <= 0)
 		return true;
 	else
 		return false;
