@@ -17565,7 +17565,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="ff6621ce" sha1="33be02be4ba014b45394c18255f3885c13253690" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17586,6 +17586,7 @@ license:CC0
 			<feature name="slot" value="discrete_74x139" />
 			<feature name="pcb" value="KONAMI-74*139/74" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="800jx1p" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000"  />
 			</dataarea>
@@ -17606,7 +17607,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="806j0p" size="16384" crc="ac98cd70" sha1="191ede32665ddc042126e90e48805846f76fbe7b" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17628,7 +17629,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.1.prg" size="16384" crc="ba5c8a54" sha1="f4fd4f13078c4aa758a5501d8270785c03018aba" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
