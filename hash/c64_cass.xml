@@ -8108,6 +8108,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="itsaknoc">
+		<description>It's a Knockout</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="604259">
+				<rom name="It's_a_Knockout.tap" size="604259" crc="16ce2007" sha1="08940390ceabc704a9a9b5533aec4bf399135616"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jacknipr">
 		<description>Jack the Nipper</description>
 		<year>1986</year>
