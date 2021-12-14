@@ -8,13 +8,13 @@
     which is then input to either a serial DAC or a HG51B-based DSP,
     depending on the model of keyboard.
 
-	The sample format, as well as other details such as the linear interpolation,
-	are covered in these two Japanese patents:
-	https://patents.google.com/patent/JP3603343B2/en
-	https://patents.google.com/patent/JPH07199996A/en
+    The sample format, as well as other details such as the linear interpolation,
+    are covered in these two Japanese patents:
+    https://patents.google.com/patent/JP3603343B2/en
+    https://patents.google.com/patent/JPH07199996A/en
 
-	TODO: Volume envelope rates still need adjusting.
-	(See comment in gt913_sound_device::command_w regarding command 6007)
+    TODO: Volume envelope rates still need adjusting.
+    (See comment in gt913_sound_device::command_w regarding command 6007)
 
 ***************************************************************************/
 
@@ -142,7 +142,7 @@ void gt913_sound_device::mix_sample(voice_t& voice, s64& left, s64& right)
 	const u8 env = (voice.m_volume_current >> 24);
 	/*
 	the current envelope level effects amplitude non-linearly, just apply the value twice
-	(this hardware family is branded as "A² (A-Square) Sound Source" in some of Casio's
+	(this hardware family is branded as "Aï¿½ (A-Square) Sound Source" in some of Casio's
 	promotional materials, possibly for this reason?)
 	*/
 	const s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env * env;
@@ -164,7 +164,7 @@ void gt913_sound_device::update_sample(voice_t& voice)
 		so once we've reached that point, use those values to reload the current sample and exponent
 		*/
 		const u32 addr_loop_data = (voice.m_addr_end + 1) & ~1;
-		
+
 		voice.m_sample_next = read_word(addr_loop_data) - voice.m_sample;
 		voice.m_exp = read_word(addr_loop_data + 10) & 7;
 	}
