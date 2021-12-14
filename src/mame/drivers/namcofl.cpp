@@ -163,7 +163,6 @@ OSC3: 48.384MHz
 #include "emu.h"
 #include "includes/namcofl.h"
 
-#include "cpu/i960/i960.h"
 #include "sound/c352.h"
 #include "machine/nvram.h"
 #include "speaker.h"
@@ -194,14 +193,9 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
-		if (data == 0)  // RAM at 00000000, ROM at 10000000
-		{
-			set_bank(1);
-		}
-		else        // ROM at 00000000, RAM at 10000000
-		{
-			set_bank(0);
-		}
+		// 0: RAM at 00000000, ROM at 10000000
+		// 1: ROM at 00000000, RAM at 10000000
+		m_mainbank.select(data & 1);
 	}
 }
 
@@ -219,8 +213,12 @@ void namcofl_state::c116_w(offs_t offset, uint8_t data)
 
 void namcofl_state::namcofl_mem(address_map &map)
 {
-	map(0x00000000, 0x000fffff).m(m_mainbank[0], FUNC(address_map_bank_device::amap32));
-	map(0x10000000, 0x100fffff).m(m_mainbank[1], FUNC(address_map_bank_device::amap32));
+	map(0x00000000, 0x1fffffff).view(m_mainbank);
+	m_mainbank[0](0x00000000, 0x000fffff).ram().share("workram");
+	m_mainbank[0](0x10000000, 0x100fffff).rom().region("maincpu", 0);
+	m_mainbank[1](0x00000000, 0x000fffff).rom().region("maincpu", 0);
+	m_mainbank[1](0x10000000, 0x100fffff).ram().share("workram");
+
 	map(0x20000000, 0x201fffff).rom().region("data", 0);
 	map(0x30000000, 0x30001fff).ram().share("nvram"); /* nvram */
 	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::spritebank_w));
@@ -236,12 +234,6 @@ void namcofl_state::namcofl_mem(address_map &map)
 	map(0x30f00000, 0x30f0000f).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
 	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::sysreg_r), FUNC(namcofl_state::sysreg_w));
 	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::unk1_r));
-}
-
-void namcofl_state::namcofl_bank_mem(address_map &map)
-{
-	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
-	map(0x100000, 0x1fffff).ram().share("workram");
 }
 
 
@@ -504,6 +496,8 @@ void namcofl_state::machine_start()
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 	m_vblank_interrupt_timer =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+
+	m_mainbank.select(1);
 }
 
 
@@ -513,8 +507,7 @@ void namcofl_state::machine_reset()
 	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
 
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
-
-	set_bank(0);
+	m_mainbank.select(1);
 }
 
 
@@ -522,13 +515,6 @@ void namcofl_state::namcofl(machine_config &config)
 {
 	I960(config, m_maincpu, 80_MHz_XTAL/4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::namcofl_mem);
-
-	for (int bank = 0; bank < 2; bank++)
-	{
-		ADDRESS_MAP_BANK(config, m_mainbank[bank]);
-		m_mainbank[bank]->set_map(&namcofl_state::namcofl_bank_mem);
-		m_mainbank[bank]->set_options(ENDIANNESS_LITTLE, 32, 21, 0x100000);
-	}
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);
