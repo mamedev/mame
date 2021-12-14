@@ -284,6 +284,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
 	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tf2740",       BMC_TF2740 },
 	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
