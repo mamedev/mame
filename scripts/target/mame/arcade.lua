@@ -4851,6 +4851,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/coinmvga.cpp",
 	MAME_DIR .. "src/mame/drivers/cointek.cpp",
 	MAME_DIR .. "src/mame/drivers/comebaby.cpp",
+	MAME_DIR .. "src/mame/drivers/compucranes.cpp",
 	MAME_DIR .. "src/mame/drivers/cowtipping.cpp",
 	MAME_DIR .. "src/mame/drivers/crazybal.cpp",
 	MAME_DIR .. "src/mame/drivers/cromptons.cpp",
