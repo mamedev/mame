@@ -1173,12 +1173,12 @@ ROM_END
 
 ROM_START( galpani2k ) // Kaneko Z04G2-004 single PCB
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
-	ROM_LOAD16_BYTE( "27c040.u165", 0x000000, 0x080000, CRC(152bbddf) SHA1(b5cb78f7aef145bf37c1252959b479e948e09df4) ) // No labels, but likely different the PCB layout in header
-	ROM_LOAD16_BYTE( "27c040.u164", 0x000001, 0x080000, CRC(906d72af) SHA1(fb57d371d6fa3efeee38ca3e89f3d2725dada0bf) ) // No labels, but likely different the PCB layout in header
+	ROM_LOAD16_BYTE( "27c040.u165", 0x000000, 0x080000, CRC(152bbddf) SHA1(b5cb78f7aef145bf37c1252959b479e948e09df4) ) // No labels, but likely different to the PCB layout in header
+	ROM_LOAD16_BYTE( "27c040.u164", 0x000001, 0x080000, CRC(906d72af) SHA1(fb57d371d6fa3efeee38ca3e89f3d2725dada0bf) ) // No labels, but likely different to the PCB layout in header
 
 	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
-	ROM_LOAD16_BYTE( "27c010.u64", 0x000000, 0x020000, CRC(4fa04a29) SHA1(5819b6e6a845e16cc26704bc465b1bb807b4573d) ) // No labels, but likely different the PCB layout in header
-	ROM_LOAD16_BYTE( "27c010.u63", 0x000001, 0x020000, CRC(c74f6763) SHA1(e39063ec1789fbacfaba6e97031247222f7b206d) ) // No labels, but likely different the PCB layout in header
+	ROM_LOAD16_BYTE( "27c010.u64", 0x000000, 0x020000, CRC(4fa04a29) SHA1(5819b6e6a845e16cc26704bc465b1bb807b4573d) ) // No labels, but likely different to the PCB layout in header
+	ROM_LOAD16_BYTE( "27c010.u63", 0x000001, 0x020000, CRC(c74f6763) SHA1(e39063ec1789fbacfaba6e97031247222f7b206d) ) // No labels, but likely different to the PCB layout in header
 
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD16_BYTE( "gp2-300a-k_0067.u175", 0x000000, 0x100000, CRC(68145adc) SHA1(6d8ab1f344adf2f0ec79aad7bb3c7977c5229651) ) // KANEKO GP2-300A-K 0067
@@ -1200,8 +1200,8 @@ ROM_START( galpani2k ) // Kaneko Z04G2-004 single PCB
 	ROM_CONTINUE(                   0x200000, 0x080000)
 	ROM_LOAD( "gp2-203_0049.u102",  0x380000, 0x080000, CRC(14e0cb38) SHA1(d9a778ebf0c6b67bee5f6f7016cb9ead96c6a992) ) // KANEKO GP2-203 0049
 	ROM_CONTINUE(                   0x300000, 0x080000)
-	ROM_LOAD16_BYTE( "27c020.u169", 0x400000, 0x040000, CRC(048c0ea6) SHA1(6585b0f20135e0b731f7fb801fbb6cb538763069) ) // No labels, but likely different the PCB layout in header
-	ROM_LOAD16_BYTE( "27c020.u170", 0x400001, 0x040000, CRC(15f5012d) SHA1(ccc3bb4a4f4ea1677caa1a3a51bc0a13b4b619c7) ) // No labels, but likely different the PCB layout in header
+	ROM_LOAD16_BYTE( "27c020.u169", 0x400000, 0x040000, CRC(048c0ea6) SHA1(6585b0f20135e0b731f7fb801fbb6cb538763069) ) // No labels, but likely different to the PCB layout in header
+	ROM_LOAD16_BYTE( "27c020.u170", 0x400001, 0x040000, CRC(15f5012d) SHA1(65aa84e25cb83887ac64b0ae27ea08582133430f) ) // No labels, but likely different to the PCB layout in header
 
 	ROM_REGION( 0x140000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "gp2-100-k.u61", 0x040000, 0x100000, CRC(665ae0a2) SHA1(fa67a49eb4cb67f4f7f51bc70bce58fe9baff57b) )
