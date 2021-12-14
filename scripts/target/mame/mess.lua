@@ -325,6 +325,7 @@ SOUNDS["ROLANDPCM"] = true
 --SOUNDS["TT5665"] = true
 SOUNDS["RP2C33_SOUND"] = true
 SOUNDS["UDA1344"] = true
+SOUNDS["LYNX"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -1913,8 +1914,6 @@ files {
 	MAME_DIR .. "src/mame/video/atarist.h",
 	MAME_DIR .. "src/mame/drivers/lynx.cpp",
 	MAME_DIR .. "src/mame/includes/lynx.h",
-	MAME_DIR .. "src/mame/audio/lynx.cpp",
-	MAME_DIR .. "src/mame/audio/lynx.h",
 	MAME_DIR .. "src/mame/machine/lynx.cpp",
 	MAME_DIR .. "src/mame/drivers/pofo.cpp",
 	MAME_DIR .. "src/mame/machine/pofo_kbd.cpp",
