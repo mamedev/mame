@@ -271,6 +271,7 @@ tvpoker                         // (c) 197? A-1 Supply
 @source:a2600.cpp
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
+a2600_pop                       // Atari 2600 Point of Purchase Display
 
 @source:a5105.cpp
 a5105                           //
@@ -1063,6 +1064,7 @@ kurufev                         // (c) 2003 Aruze (Arcade TV Game List - P.75, R
 mayjin3                         // (c) 2000 Seta (Arcade TV Game List - P.101, Right, 9 from top)
 mtetrisc                        // (c) 1998 Capcom
 srmvs                           // (c) 1999 Seta
+srmvsa                          // (c) 1999 Seta
 starsldr                        // (c) 1998 Hudson/Seta
 twrshaft                        // (c) 2003 Aruze
 vivdolls                        // (c) 1998 Visco
@@ -1118,13 +1120,15 @@ zortonbr_100                    // (c) 1993 Picmatic
 
 @source:alien.cpp
 alien                           // (c) 2005 Capcom
-pingu                           // (c) 2006 The Pygos Group / Capcom
 dkbanana                        // (c) 2007 Capcom
 dkbanans                        // (c) 2007 Capcom
 dokodemo                        // (c) 2006 Capcom
+mariojjl                        // (c) 2005 Capcom
 masmario                        // (c) 2004 Capcom
 masmarios                       // (c) 2004 Capcom
 masmario2                       // (c) 2005 Capcom
+mmaruchan                       // (c) 2005 Capcom
+pingu                           // (c) 2006 The Pygos Group / Capcom
 wontame                         // (c) 2008 Capcom
 
 @source:aliens.cpp
@@ -10748,6 +10752,10 @@ compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 @source:compucolor.cpp
 compclr2                        //
 
+@source:compucranes.cpp
+mastcrane                       // (c) 199? Compumatic
+mastcranea                      // (c) 199? Compumatic
+
 @source:comquest.cpp
 comquest                        // Comquest Plus German
 
@@ -14786,6 +14794,7 @@ galpani2gs                      // (c) 1993 Kaneko
 galpani2i                       // (c) 1993 Kaneko
 galpani2i2                      // (c) 1993 Kaneko
 galpani2j                       // (c) 1993 Kaneko
+galpani2k                       // (c) 1993 Kaneko
 galpani2t                       // (c) 1993 Kaneko
 gp2quiz                         // (c) 1993 Kaneko
 gp2se                           // (c) 1994 Kaneko
@@ -17020,9 +17029,6 @@ icecold                         //
 icecoldf                        //
 zekepeak                        //
 
-@source:ichiban.cpp
-ichiban                         // (c) 199? Excel
-
 @source:idsa.cpp
 bsktbllp                        //
 v1                              //
@@ -17154,6 +17160,7 @@ ikki                            // TVG17 (c) 1985 Sun Electronics (Japan)
 ikt5a                           //
 
 @source:im01.cpp
+im01
 im01t
 
 @source:imds2.cpp
@@ -17174,7 +17181,6 @@ corsario                        //
 ind250cc                        //
 lapbylap                        //
 larana                          //
-metalman                        //
 mundial                         //
 pinclown                        //
 pinmoonl                        //
@@ -17389,6 +17395,7 @@ gt97v120                        // (c) 1997 Incredible Technologies
 gt97v121                        // (c) 1997 Incredible Technologies
 gt97v122                        // (c) 1997 Incredible Technologies
 gt98                            // (c) 1998 Incredible Technologies
+gt98c100                        // (c) 1998 Incredible Technologies
 gt98s100                        // (c) 1998 Incredible Technologies
 gt98t302                        // (c) 1998 Incredible Technologies
 gt98t303                        // (c) 1998 Incredible Technologies
@@ -19800,6 +19807,9 @@ sraider                         // 8203 (c) 1982 Universal
 ladyfrog                        // (c) 1990 Mondial Games
 toucheme                        //
 touchemea                       //
+
+@source:lancelot.cpp
+lancelot                        //
 
 @source:laser3k.cpp
 las3000                         // 1983 Laser 3000
@@ -30809,6 +30819,8 @@ dakar                           //
 fasttrack                       //
 macattck                        //
 motrshow                        //
+motrshowa                       //
+motrshowb                       //
 wcup90                          //
 
 @source:mrjong.cpp
@@ -34728,7 +34740,6 @@ ator                            //
 ator3bmp                        //
 gamatros                        //
 hangonp                         //
-lancelot                        //
 nemesisp                        //
 odin                            //
 odin_dlx                        //
@@ -34772,6 +34783,7 @@ ddpdojb                         //
 ddpdojp                         //
 ddpdojblk                       //
 ddpdojblka                      //
+ddpdojblkb                      //
 ddpdojblkbl                     //
 dmnfrnt                         // (c) 2002 Demon Front
 dmnfrnt103                      //
@@ -36434,6 +36446,7 @@ cafetime                        // "63" (c) 1992 Dynax
 chalgirl                        // bootleg
 daisyari                        // (c) 1989 Best System
 dondenmj                        // "03" (c) 1986 Dyna Electronics
+ichiban                         // (c) 199? Excel
 ippatsu                         // 01? (c) 1986 Dyna Electronics
 jangtaku                        // (c) 1986 Dyna Computer
 janoh                           // (c) 1984 Toaplan
@@ -39289,6 +39302,7 @@ bushidob                        //
 jolypark                        //
 mach2                           //
 mach2a                          //
+metalman                        //
 vrnwrld                         //
 
 @source:spirit76.cpp
@@ -43224,6 +43238,7 @@ ij_l6                           //
 ij_l7                           //
 ij_lg7                          //
 jd_l1                           //
+jd_l1d                          //
 jd_l4                           //
 jd_l5                           //
 jd_l6                           //

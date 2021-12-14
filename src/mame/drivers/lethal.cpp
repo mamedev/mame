@@ -365,7 +365,7 @@ void lethal_state::bank4000_map(address_map &map)
 {
 	// VRD = 0 or 1, CBNK = 0
 	map(0x0840, 0x084f).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053244_r), FUNC(k05324x_device::k053244_w));
-	map(0x0880, 0x089f).mirror(0x8000).rw("k054000", FUNC(k054000_device::read), FUNC(k054000_device::write));
+	map(0x0880, 0x089f).mirror(0x8000).m("k054000", FUNC(k054000_device::map));
 	map(0x08c0, 0x08cf).m(m_k054321, FUNC(k054321_device::main_map));
 	map(0x1000, 0x17ff).mirror(0x8000).rw(m_k053244, FUNC(k05324x_device::k053245_r), FUNC(k05324x_device::k053245_w));
 

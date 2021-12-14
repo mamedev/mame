@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Hori Twin (and 4P?) adapters
+    Nintendo Family Computer Hori Twin and 4 Players adapters
 
 **********************************************************************/
 
@@ -25,20 +25,20 @@ class nes_horitwin_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_horitwin_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 private:
-	required_device<nes_control_port_device> m_port1;
-	required_device<nes_control_port_device> m_port2;
+	required_device_array<nes_control_port_device, 2> m_subexp;
 };
+
 
 // ======================> nes_hori4p_device
 
@@ -47,29 +47,29 @@ class nes_hori4p_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_hori4p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override { }
+	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	virtual uint8_t read_exp(offs_t offset) override;
-	virtual void write(uint8_t data) override;
+	virtual u8 read_exp(offs_t offset) override;
+	virtual void write(u8 data) override;
 
 private:
-	required_device<nes_control_port_device> m_port1;
-	required_device<nes_control_port_device> m_port2;
-	required_device<nes_control_port_device> m_port3;
-	required_device<nes_control_port_device> m_port4;
+	void reset_regs();
+
+	required_device_array<nes_control_port_device, 4> m_subexp;
 	required_ioport m_cfg;
+	u8 m_count[2];
+	u8 m_sig[2];
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_HORITWIN, nes_horitwin_device)
 DECLARE_DEVICE_TYPE(NES_HORI4P,   nes_hori4p_device)
-
 
 #endif // MAME_BUS_NES_CTRL_HORI_H

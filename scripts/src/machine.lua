@@ -1427,7 +1427,9 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/gt913.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_io.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_kbd.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_snd.h,MACHINES["GT913"] = true
 ---------------------------------------------------
 
 if (MACHINES["GT913"]~=null) then

@@ -312,7 +312,7 @@ DE-0316-4
 |  PZ-2.A2                                              |
 |-------------------------------------------------------|
 Notes:
-      DEM-01    - Unknown SDIP52 ASIC (no clock input so not an MCU, decapping it found only ASIC, no ROM)
+      DEM-01    - Fujitsu MB8421 Dual port SRAM in disguise as Data East custom chip DEM-01.
       DEC-01    - HuC6280 sound CPU in disguise as Data East custom chip DEC-01. Clock input 21.4772MHz on pin 10
       M6295     - Clock 1.000MHz [20/2/10], pin 7 HIGH
       4558      - NEC C4558 Dual Op Amp
@@ -396,6 +396,7 @@ Notes:
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m68705.h"
+#include "machine/mb8421.h"
 #include "machine/upd4701.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
@@ -478,12 +479,6 @@ void dec0_automat_state::automat_control_w(offs_t offset, uint16_t data, uint16_
 	}
 }
 
-void dec0_state::midres_sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(data & 0xff);
-}
-
 /******************************************************************************/
 
 void dec0_state::dec0_map(address_map &map)
@@ -547,14 +542,14 @@ void dec0_state::dec0_tb_map(address_map &map)
 void dec0_state::robocop_map(address_map &map)
 {
 	dec0_map(map);
-	map(0x180000, 0x180fff).rw(FUNC(dec0_state::robocop_68000_share_r), FUNC(dec0_state::robocop_68000_share_w));
+	map(0x180000, 0x180fff).rw("dem01", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
 }
 
 void dec0_state::robocop_sub_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x1f0000, 0x1f1fff).ram();                                 /* Main ram */
-	map(0x1f2000, 0x1f3fff).ram().share("robocop_shared");  /* Shared ram */
+	map(0x1f2000, 0x1f27ff).rw("dem01", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));  /* Shared ram */
 }
 
 void dec0_state::hippodrm_map(address_map &map)
@@ -751,7 +746,7 @@ void dec0_state::midresb_map(address_map &map)
 	map(0x160010, 0x160011).w(FUNC(dec0_state::priority_w));
 	map(0x180000, 0x18000f).r(FUNC(dec0_state::dec0_controls_r));
 	map(0x180012, 0x180013).noprw();
-	map(0x180014, 0x180015).w(FUNC(dec0_state::midres_sound_w));
+	map(0x180015, 0x180015).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x180018, 0x180019).noprw();
 	map(0x1a0000, 0x1a0001).portr("AN0");
 	map(0x1a0008, 0x1a0009).portr("AN1");
@@ -2176,6 +2171,10 @@ void dec0_state::robocop(machine_config &config)
 	H6280(config, m_subcpu, XTAL(21'477'272) / 16);
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
+
+	mb8421_device &dem01(MB8421(config, "dem01"));
+	dem01.intl_callback().set_inputline(m_maincpu, M68K_IRQ_4);
+	dem01.intr_callback().set_inputline(m_subcpu, 0);
 
 	config.set_maximum_quantum(attotime::from_hz(3000));  /* Interleave between HuC6280 & 68000 */
 
@@ -4181,14 +4180,6 @@ ROM_START( bouldashj )
 ROM_END
 
 
-void dec0_state::init_midresb()
-{
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(*this, FUNC(dec0_state::dec0_controls_r)));
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(*this, FUNC(dec0_state::dec0_rotary_r)));
-
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(*this, FUNC(dec0_state::midres_sound_w)));
-}
-
 uint16_t dec0_state::ffantasybl_242024_r()
 {
 /*
@@ -4241,8 +4232,8 @@ GAME( 1988, drgninjab,  baddudes, drgninjab,  drgninja,   dec0_state, init_drgni
 
 
 // this is a common bootleg board
-GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
-GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, init_midresb,    ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, midresb,    midres,   midresb,    midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // need to hook up 68705? (probably unused)
+GAME( 1989, midresbj,   midres,   midresbj,   midresb,    dec0_state, empty_init,      ROT0, "bootleg", "Midnight Resistance (Joystick bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, empty_init,      ROT0, "bootleg", "Fighting Fantasy (bootleg with 68705)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 68705 not dumped, might be the same as midresb
 GAME( 1988, drgninjab2, baddudes, drgninjab,  drgninja,   dec0_state, init_drgninja,   ROT0, "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text), 68705 dumped but not hooked up
 

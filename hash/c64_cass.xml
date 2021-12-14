@@ -8108,6 +8108,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="jacknipr">
+		<description>Jack the Nipper</description>
+		<year>1986</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="533676">
+				<rom name="Jack_the_Nipper.tap" size="533676" crc="13999665" sha1="f2fe6231108c2854bfbbf7099abdb645b19a2828"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jacknip2">
 		<description>Jack the Nipper II: In Coconut Capers</description>
 		<year>1990</year>
@@ -8116,6 +8128,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="522098">
 				<rom name="Jack_the_Nipper_II-_In_Coconut_Capers.tap" size="522098" crc="6f7f7a52" sha1="d4fcdfd7fe5bbc58aabf552d7b79cb1cfcdda3fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jacknip2g" cloneof="jacknip2">
+		<description>Jack the Nipper II: In Coconut Capers (Gremlin Graphics)</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="522098">
+				<rom name="Jack_the_Nipper_II-_In_Coconut_Capers.tap" size="522098" crc="c0691756" sha1="90a408388b07bb02fd5ef87a70ceebd1e6f66a53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8134,6 +8158,24 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="712270">
 				<rom name="James_Bond_007_in_Live_and_Let_Die_-_The_Computer_Game_a1.tap" size="712270" crc="bbe1aad4" sha1="85afd67902609095b1db9d8c563235f36fd961f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="livinday">
+		<description>James Bond 007 in The Living Daylights - The Computer Game</description>
+		<year>1987</year>
+		<publisher>Domark</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="573375">
+				<rom name="James_Bond_007_in_The_Living_Daylights_the_Computer_Game.tap" size="573375" crc="e17393a1" sha1="ef5272eb78dba2f2cac49ca96d7f895b97b33a58"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="573375">
+				<rom name="James_Bond_007_in_The_Living_Daylights_the_Computer_Game_a1.tap" size="573375" crc="edf971f9" sha1="3c8f8d911a6625cf2ad736b061e0f73519d433eb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8186,6 +8228,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="jinks">
+		<description>Jinks</description>
+		<year>1987</year>
+		<publisher>Go!</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="510562">
+				<rom name="Jinks.tap" size="510562" crc="fffda148" sha1="079e05f0c806d7476ee167a28c99b6b1a2274d71"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="joeblade">
 		<description>Joe Blade</description>
 		<year>1987</year>
@@ -8222,6 +8276,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="matchdy2">
+		<description>Jon Ritman's Match Day II</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="738562">
+				<rom name="Jon_Ritman's_Match_Day_II.tap" size="738562" crc="bb4b3059" sha1="e1723e3b8b0af30a63ec88ef74706ce4027e780a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jbsquash">
 		<description>Jonah Barrington's Squash</description>
 		<year>1989</year>
@@ -8250,6 +8316,72 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2 - Bangers and Mash"/>
 			<dataarea name="cass" size="279498">
 				<rom name="Jonny_and_the_Jimpys_Side_2_-_Bangers_and_Mash.tap" size="279498" crc="c1290409" sha1="dca9ed149fa07bb36d9585ae00979b90609d0176"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="judgedre" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+		<description>Judge Dredd</description>
+		<year>1986</year>
+		<publisher>Melbourne House</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="512664">
+				<rom name="Judge_Dredd.tap" size="512664" crc="0ca7be84" sha1="0b1421d9c4e25226d81489ddc2e0631a79c75c4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="juice">
+		<description>Juice!</description>
+		<year>1984</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="205194">
+				<rom name="Juice.tap" size="205194" crc="6cf28f4c" sha1="9d0e5352340304aaeec0c21970a494b4d0bbd455"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="205194">
+				<rom name="Juice_a1.tap" size="205194" crc="59aa4895" sha1="1bd77b8a02eedcbae254c7ac42244ed97e2a20fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jumpjet">
+		<description>Jump Jet</description>
+		<year>1985</year>
+		<publisher>Anirog</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="354966">
+				<rom name="Jump_Jet.tap" size="354966" crc="631d75f3" sha1="f230ac74c2f0a23de241cb35ee82aa2e243af36f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungleqt">
+		<description>Jungle Quest</description>
+		<year>1984</year>
+		<publisher>Solar Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="614962">
+				<rom name="Jungle_Quest.tap" size="614962" crc="ad13ee95" sha1="03c653bfc4925093c704b278a9aa35af7c3d065e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jungleqta" cloneof="jungleqt">
+		<description>Jungle Quest (alt)</description>
+		<year>1984</year>
+		<publisher>Solar Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="609335">
+				<rom name="Jungle_Quest.tap" size="609335" crc="6f4d0d65" sha1="99b7de57a23ec732edcf32080a5a0b04f013fb3e"/>
 			</dataarea>
 		</part>
 	</software>

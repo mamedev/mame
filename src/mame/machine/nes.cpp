@@ -185,20 +185,13 @@ void nes_base_state::nes_in0_w(uint8_t data)
 uint8_t nes_state::fc_in0_r()
 {
 	uint8_t ret = 0x40;
-	// bit 0 to controller port
+	// bit 0 from controller port
 	ret |= m_ctrl1->read_bit0();
 
-	// expansion port bits (in the original FC, P2 controller was hooked to these lines
-	// too, so in principle some homebrew hardware modification could use the same
-	// connection with P1 controller too)
-	ret |= m_ctrl1->read_exp(0);
-	ret |= m_ctrl2->read_exp(0);
+	// bit 2 from P2 controller microphone
+	ret |= m_ctrl2->read_bit2();
 
-	// at the same time, we might have a standard joypad connected to the expansion port which
-	// shall be read as P3 (this is needed here to avoid implementing the expansion port as a
-	// different device compared to the standard control port... it might be changed later)
-	ret |= (m_exp->read_bit0() << 1);
-	// finally, read the expansion port as expected
+	// and bit 1 comes from expansion port
 	ret |= m_exp->read_exp(0);
 	return ret;
 }
@@ -206,17 +199,10 @@ uint8_t nes_state::fc_in0_r()
 uint8_t nes_state::fc_in1_r()
 {
 	uint8_t ret = 0x40;
-	// bit 0 to controller port
+	// bit 0 from controller port
 	ret |= m_ctrl2->read_bit0();
 
-	// expansion port bits (in the original FC, P2 controller was hooked to these lines
-	// too, so in principle some homebrew hardware modification could use the same
-	// connection with P1 controller too)
-	ret |= m_ctrl1->read_exp(1);
-	ret |= m_ctrl2->read_exp(1);
-
-	// finally, read the expansion port as expected (standard pad cannot be hooked as P4, so
-	// no read_bit0 here)
+	// bits 1-4 from expansion port (in theory bit 0 also can be read on AV Famicom when controller is unplugged)
 	ret |= m_exp->read_exp(1);
 	return ret;
 }

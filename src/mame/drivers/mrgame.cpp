@@ -1,35 +1,58 @@
 // license:BSD-3-Clause
 // copyright-holders:Robbbert
 /****************************************************************************************
-    PINBALL
-    Mr. Game 1B11188/0
+PINBALL
+Mr. Game (Zaccaria) 1B11188/0
 
-    These games have a M68000 and 3x Z80, and a M114 Sound IC.
-    They have a video screen upon which the scores and other info is displayed.
+These games have a M68000 and 3x Z80, and a M114 Sound IC.
+They have a video screen upon which the scores and other info is displayed.
 
 How to set up the machine (motor show, dakar, wcup90):
 - These machines need to be loaded with default settings before they can accept coins
-- Press - key (minus in main keyboard)
+- Press NUM-0 key
 - Press again until you see test 25 (Motor Show) or test 23 (Dakar)
 - In the dipswitch menu turn off the Ram Protect switch
 - Press Left shift and Right shift together (game stops responding)
 - Turn the Ram Protect Switch back on
 - Press F3 or reboot
 - The default settings have been saved to nvram and you can insert coins
-- However, the game cannot be played due to missing balls.
+
+
+Status:
+- Most games are playable. All games are multiball, here are the key codes:
+                    Start Game                            End Ball
+    Motor Show      Hold AS, hit 1, release keys          Hold A, hit X. release keys
+    Dakar           Hold ASD, hit 1, release keys         Hold AS, hit X, release keys
+    Mac Attack      Hold AS, hit 1, release keys          Hold AS, hit X, release keys
+    World Cup 90    Hold ASX, hit 1, release keys. It's a timed game, you can't lose the ball.
+- Balls indicates number of balls left, so 1 = last ball.
+
+Fast Track:
+- There's no video, however it can still be set up and played. Do these steps slowly,
+    with several seconds between each one.
+1. Start the game. Use the tab, dipswitch menu to turn the "Ram Protect" switch Off.
+2. In the game, press NUM-0.
+3. Press both shift keys together.
+4. Use the Tab menu again to turn the "Ram Protect" back to On.
+5. While still in the Dipswitch menu, choose Reset.
+6. The setup has been saved, so to play in the future, start from here.
+7. You can insert a coin (it will say Start Your Engines).
+8. Follow the instructions for Motor Show (above), to start a game and play.
 
 ToDo:
-- Video
-- Outputs
-- Inputs
+- macattck: score is difficult to read
+- Video sprites missing in all games
+- wcup90: one attract screen is corrupted
+- wcup90: sounds seem bad
+- fasttrack: rom missing, game not working
 - Support for electronic volume control
-- Audio rom banking
 - Most sounds missing due to unemulated M114 chip
+- Mechanical sounds
 
 *****************************************************************************************/
 
 #include "emu.h"
-
+#include "machine/genpin.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -49,11 +72,11 @@ ToDo:
 
 namespace {
 
-class mrgame_state : public driver_device
+class mrgame_state : public genpin_class
 {
 public:
 	mrgame_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_p_videoram(*this, "videoram")
 		, m_p_objectram(*this, "objectram")
@@ -65,14 +88,13 @@ public:
 		, m_selectlatch(*this, "selectlatch")
 		, m_io_dsw0(*this, "DSW0")
 		, m_io_dsw1(*this, "DSW1")
-		, m_io_x0(*this, "X0")
-		, m_io_x1(*this, "X1")
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void mrgame(machine_config &config);
+	void macattck(machine_config &config);
 	void wcup90(machine_config &config);
-
-	void init_mrgame();
 
 protected:
 	virtual void machine_start() override;
@@ -80,24 +102,26 @@ protected:
 
 private:
 	void mrgame_palette(palette_device &palette) const;
-	void ack1_w(uint8_t data);
-	void ack2_w(uint8_t data);
-	void portb_w(uint8_t data);
-	void row_w(uint8_t data);
-	void sound_w(uint8_t data);
-	void triple_w(uint8_t data);
-	void video_w(uint8_t data);
-	void videoram_w(offs_t offset, uint8_t data);
-	void videoattr_w(offs_t offset, uint8_t data);
+	u8 ack1_r();
+	void ack2_w(u8 data);
+	void portb_w(u8 data);
+	void data_w(u8 data) { m_data = data; }
+	void extadd_w(u8 data);
+	void row_w(u8 data);
+	void sound_w(u8 data);
+	void triple_w(u8 data);
+	void video_w(u8 data);
+	void videoram_w(offs_t offset, u8 data);
+	void videoattr_w(offs_t offset, u8 data);
 	template <unsigned Bit> DECLARE_WRITE_LINE_MEMBER(video_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(intst_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_intst_w);
 	DECLARE_WRITE_LINE_MEMBER(flip_w);
-	uint8_t col_r();
-	uint8_t sound_r();
-	uint8_t porta_r();
-	uint8_t portc_r();
-	uint8_t rsw_r();
+	u8 col_r();
+	u8 sound_r();
+	u8 porta_r();
+	u8 portc_r();
+	u8 rsw_r();
 	DECLARE_WRITE_LINE_MEMBER(vblank_int_w);
 	DECLARE_WRITE_LINE_MEMBER(vblank_nmi_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
@@ -110,11 +134,13 @@ private:
 	void audio2_map(address_map &map);
 	void main_map(address_map &map);
 	void video_map(address_map &map);
-	void wcup90_video_map(address_map &map);
+	void macattck_video_map(address_map &map);
+	void macattck_audio1_map(address_map &map);
+	void wcup90_audio2_map(address_map &map);
 
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_p_videoram;
-	required_shared_ptr<uint8_t> m_p_objectram;
+	required_shared_ptr<u8> m_p_videoram;
+	required_shared_ptr<u8> m_p_objectram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_device<m68000_device> m_maincpu;
@@ -124,20 +150,22 @@ private:
 	required_device<ls259_device> m_selectlatch;
 	required_ioport m_io_dsw0;
 	required_ioport m_io_dsw1;
-	required_ioport m_io_x0;
-	required_ioport m_io_x1;
+	required_ioport_array<7> m_io_keyboard;
+	output_finder<128> m_io_outputs; // 24 solenoids + 104 lamps
 
-	bool m_ack1;
-	bool m_ack2;
-	bool m_ackv;
-	bool m_flip;
-	bool m_intst;
-	uint8_t m_irq_state;
-	uint8_t m_row_data;
-	uint8_t m_sound_data;
-	uint8_t m_gfx_bank;
-	uint8_t m_video_data;
-	uint8_t m_video_status;
+	bool m_ack1 = 0;
+	bool m_ack2 = 0;
+	bool m_ackv = 0;
+	bool m_flip = 0;
+	bool m_intst = 0;
+	u8 m_data = 0;
+	u8 m_sxx = 0;
+	u8 m_irq_state = 0;
+	u8 m_row = 0;
+	u8 m_sound_data = 0;
+	u8 m_gfx_bank = 0;
+	u8 m_video_data = 0;
+	u8 m_video_status = 0;
 
 	tilemap_t *m_tilemap;
 };
@@ -145,16 +173,16 @@ private:
 
 void mrgame_state::main_map(address_map &map)
 {
-	map(0x000000, 0x00ffff).rom().region("roms", 0);
+	map(0x000000, 0x00ffff).rom();
 	map(0x020000, 0x02ffff).ram().share("nvram");
 	map(0x030001, 0x030001).r(FUNC(mrgame_state::rsw_r)); //RSW ACK
 	map(0x030003, 0x030003).w(FUNC(mrgame_state::sound_w)); //W SOUND
 	map(0x030004, 0x030004).w(FUNC(mrgame_state::video_w)); //W VID
 	map(0x030007, 0x030007).w(FUNC(mrgame_state::triple_w)); //W CS
-	map(0x030008, 0x030009).nopw(); //W DATA - lamp/sol data
+	map(0x030009, 0x030009).w(FUNC(mrgame_state::data_w)); //W DATA
 	map(0x03000b, 0x03000b).w(FUNC(mrgame_state::row_w)); //W ROW
 	map(0x03000d, 0x03000d).r(FUNC(mrgame_state::col_r)); //R COL
-	map(0x03000e, 0x03000f).nopw(); //EXT ADD - lamp/sol data
+	map(0x03000f, 0x03000f).w(FUNC(mrgame_state::extadd_w)); //EXT ADD
 }
 
 void mrgame_state::video_map(address_map &map)
@@ -169,7 +197,7 @@ void mrgame_state::video_map(address_map &map)
 	map(0x8100, 0x8103).mirror(0x7efc).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
-void mrgame_state::wcup90_video_map(address_map &map)
+void mrgame_state::macattck_video_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("video", 0);
 	map(0x8000, 0x87ff).ram();
@@ -183,8 +211,14 @@ void mrgame_state::wcup90_video_map(address_map &map)
 
 void mrgame_state::audio1_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("audio1", 0);
-	map(0xfc00, 0xffff).ram();
+	map(0x0000, 0xfbff).rom().region("audio1", 0);
+	map(0xfc00, 0xfcff).ram().mirror(0x300); // 2x 2112
+}
+
+void mrgame_state::macattck_audio1_map(address_map &map)
+{
+	map(0x0000, 0xfbff).rom().region("audio1", 0);
+	map(0xfc00, 0xffff).ram();  // 2x 2114
 }
 
 void mrgame_state::audio1_io(address_map &map)
@@ -192,14 +226,21 @@ void mrgame_state::audio1_io(address_map &map)
 	map.global_mask(3);
 	map(0x0000, 0x0000).w("dacvol", FUNC(dac_byte_interface::data_w)); //DA1
 	map(0x0001, 0x0001).r(FUNC(mrgame_state::sound_r)); //IN1
-	map(0x0002, 0x0002).w(FUNC(mrgame_state::ack1_w)); //AKL1
+	map(0x0002, 0x0002).r(FUNC(mrgame_state::ack1_r)); //AKL1
 	map(0x0003, 0x0003).nopw(); //SGS pass data to M114
 }
 
 void mrgame_state::audio2_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().region("audio2", 0);
-	map(0xfc00, 0xffff).ram();
+	map(0x0000, 0xfbff).rom().region("audio2", 0);
+	map(0xfc00, 0xfcff).ram().mirror(0x300); // 2x 2112
+}
+
+void mrgame_state::wcup90_audio2_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+	map(0x0000, 0x7bff).rom().region("audio2", 0);
+	map(0x7c00, 0x7fff).ram();   // no manual; assuming 2x 2114
 }
 
 void mrgame_state::audio2_io(address_map &map)
@@ -226,8 +267,8 @@ static INPUT_PORTS_START( mrgame )
 	PORT_DIPSETTING(    0x0a, "Belgium")
 	PORT_DIPSETTING(    0x0c, "Yugoslavia")
 	PORT_DIPSETTING(    0x0e, "U.S.A.")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Flipper") PORT_CODE(KEYCODE_RSHIFT)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Flipper") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Flipper") PORT_CODE(KEYCODE_RSHIFT)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Flipper") PORT_CODE(KEYCODE_LSHIFT)
 
 	// These dips are only documented for Motor Show
 	PORT_START("DSW1")
@@ -245,10 +286,10 @@ static INPUT_PORTS_START( mrgame )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Advance Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Return Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Advance Test")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Return Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Credit Service")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -256,43 +297,85 @@ static INPUT_PORTS_START( mrgame )
 
 	PORT_START("X1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Factory Burn Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Factory Burn Test")
 	PORT_BIT( 0xe9, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("INP16")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP17")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP18")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP19")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP20")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP21")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP22")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP23")
+
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP24")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP25")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP26")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP27")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP28")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP29")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP30")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP31")
+
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP32")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP33")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP34")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP35")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP36")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP37")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP38")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP39")
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP47")
+
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP48")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP49")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP50")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP51")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP52")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP53")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_HOME) PORT_NAME("INP54")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_END) PORT_NAME("INP55")
 INPUT_PORTS_END
 
-uint8_t mrgame_state::rsw_r()
+u8 mrgame_state::rsw_r()
 {
-	return m_io_dsw0->read() | ((uint8_t)m_ack1 << 5) | ((uint8_t)m_ack2 << 4);
+	return m_io_dsw0->read() | ((u8)m_ack1 << 5) | ((u8)m_ack2 << 4);
 }
 
-// this is like a keyboard, energise a row and read the column data
-uint8_t mrgame_state::col_r()
+u8 mrgame_state::col_r()
 {
-	if (m_row_data == 0)
-		return m_io_x0->read();
+	if (m_row < 7)
+		return m_io_keyboard[m_row]->read();
 	else
-	if (m_row_data == 1)
-		return m_io_x1->read();
-	else
-	if (m_row_data == 7)
 		return m_video_status;
-	else
-
-	return 0xff;
 }
 
-void mrgame_state::row_w(uint8_t data)
+void mrgame_state::row_w(u8 data)
 {
-	m_row_data = data & 7;
+	m_row = data & 7;
 }
 
-uint8_t mrgame_state::sound_r()
+u8 mrgame_state::sound_r()
 {
 	return m_sound_data;
 }
 
-void mrgame_state::sound_w(uint8_t data)
+void mrgame_state::sound_w(u8 data)
 {
 	m_sound_data = data;
 	m_audiocpu1->set_input_line(INPUT_LINE_NMI, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -300,24 +383,41 @@ void mrgame_state::sound_w(uint8_t data)
 }
 
 // this produces 24 outputs from three driver chips to drive lamps & solenoids
-void mrgame_state::triple_w(uint8_t data)
+void mrgame_state::triple_w(u8 data)
 {
-	if ((data & 0x18)==0)
-		m_ackv = BIT(data, 7);
+	switch (data & 0x18)
+	{
+		case 0x00:
+			m_ackv = BIT(data, 7);
+			break;
+		case 0x08:
+			m_sxx = data & 7;
+			break;
+		case 0x10:
+			m_sxx = 8U + (data & 7);
+			break;
+		default:
+			break;
+	}
 }
 
-void mrgame_state::video_w(uint8_t data)
+void mrgame_state::extadd_w(u8 data)
+{
+	m_io_outputs[m_sxx*8+(data&7)] = m_data & 1;
+}
+
+void mrgame_state::video_w(u8 data)
 {
 	m_video_data = data;
 }
 
-void mrgame_state::videoram_w(offs_t offset, uint8_t data)
+void mrgame_state::videoram_w(offs_t offset, u8 data)
 {
 	m_p_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-void mrgame_state::videoattr_w(offs_t offset, uint8_t data)
+void mrgame_state::videoattr_w(offs_t offset, u8 data)
 {
 	m_p_objectram[offset] = data;
 	if (BIT(offset, 0))
@@ -334,8 +434,8 @@ void mrgame_state::videoattr_w(offs_t offset, uint8_t data)
 template <unsigned Bit>
 WRITE_LINE_MEMBER(mrgame_state::video_bank_w)
 {
-	m_gfx_bank &= 0x0f & ~(uint8_t(1) << Bit);
-	m_gfx_bank |= uint8_t(state ? 1 : 0) << Bit;
+	m_gfx_bank &= 0x0f & ~(u8(1) << Bit);
+	m_gfx_bank |= u8(state ? 1 : 0) << Bit;
 	m_tilemap->mark_all_dirty();
 }
 
@@ -359,30 +459,31 @@ WRITE_LINE_MEMBER(mrgame_state::flip_w)
 	m_tilemap->mark_all_dirty();
 }
 
-void mrgame_state::ack1_w(uint8_t data)
+u8 mrgame_state::ack1_r()
 {
-	m_ack1 = BIT(data, 0);
+	m_ack1 = 1;  // this is weird
+	return 0xff;
 }
 
-void mrgame_state::ack2_w(uint8_t data)
+void mrgame_state::ack2_w(u8 data)
 {
 	m_ack2 = BIT(data, 0);
 }
 
-uint8_t mrgame_state::porta_r()
+u8 mrgame_state::porta_r()
 {
 	return m_video_data;
 }
 
-void mrgame_state::portb_w(uint8_t data)
+void mrgame_state::portb_w(u8 data)
 {
 	m_video_status = data;
 	m_ackv = 0;
 }
 
-uint8_t mrgame_state::portc_r()
+u8 mrgame_state::portc_r()
 {
-	return m_io_dsw1->read() | ((uint8_t)m_ackv << 4);
+	return m_io_dsw1->read() | (m_ackv ? 0x10 : 0);
 }
 
 void mrgame_state::machine_start()
@@ -392,10 +493,31 @@ void mrgame_state::machine_start()
 			tilemap_get_info_delegate(*this, FUNC(mrgame_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 	m_tilemap->set_scroll_cols(32);
+
+	genpin_class::machine_start();
+
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_ack1));
+	save_item(NAME(m_ack2));
+	save_item(NAME(m_ackv));
+	save_item(NAME(m_flip));
+	save_item(NAME(m_intst));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_row));
+	save_item(NAME(m_sxx));
+	save_item(NAME(m_sound_data));
+	save_item(NAME(m_gfx_bank));
+	save_item(NAME(m_video_data));
+	save_item(NAME(m_video_status));
 }
 
 void mrgame_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_sound_data = 0xff;
 	m_irq_state = 0xff;
 	m_video_data = 0;
@@ -405,11 +527,7 @@ void mrgame_state::machine_reset()
 	m_ack2 = 0;
 	m_ackv = 0;
 	m_flip = 0;
-	m_row_data = 0;
-}
-
-void mrgame_state::init_mrgame()
-{
+	m_row = 0;
 }
 
 WRITE_LINE_MEMBER(mrgame_state::vblank_int_w)
@@ -503,7 +621,7 @@ GFXDECODE_END
 void mrgame_state::mrgame_palette(palette_device &palette) const
 {
 	static constexpr int resistances[3] = { 1000, 470, 220 };
-	uint8_t const *const color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// compute the color output resistor weights
 	double rweights[3], gweights[3], bweights[2];
@@ -513,26 +631,26 @@ void mrgame_state::mrgame_palette(palette_device &palette) const
 			2, &resistances[1], bweights, 0, 0);
 
 	// create a lookup table for the palette
-	for (uint8_t i = 0; i < 32; i++)
+	for (u8 i = 0; i < 32; i++)
 	{
-		uint8_t bit0, bit1, bit2;
+		u8 bit0, bit1, bit2;
 
 		// red component
 		bit0 = BIT(color_prom[i], 0);
 		bit1 = BIT(color_prom[i], 1);
 		bit2 = BIT(color_prom[i], 2);
-		uint8_t const r = combine_weights(rweights, bit0, bit1, bit2);
+		u8 const r = combine_weights(rweights, bit0, bit1, bit2);
 
 		// green component
 		bit0 = BIT(color_prom[i], 3);
 		bit1 = BIT(color_prom[i], 4);
 		bit2 = BIT(color_prom[i], 5);
-		uint8_t const g = combine_weights(gweights, bit0, bit1, bit2);
+		u8 const g = combine_weights(gweights, bit0, bit1, bit2);
 
 		// blue component
 		bit0 = BIT(color_prom[i], 6);
 		bit1 = BIT(color_prom[i], 7);
-		uint8_t const b = combine_weights(bweights, bit0, bit1);
+		u8 const b = combine_weights(bweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 		palette.set_pen_color(i + 32, rgb_t(r, g, b));
@@ -596,6 +714,7 @@ void mrgame_state::mrgame(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_2bpp);
 
 	/* Sound */
+	genpin_audio(config);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	DAC_8BIT_R2R(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
@@ -622,11 +741,12 @@ void mrgame_state::mrgame(machine_config &config)
 	ppi.in_pc_callback().set(FUNC(mrgame_state::portc_r));
 }
 
-void mrgame_state::wcup90(machine_config &config)
+void mrgame_state::macattck(machine_config &config)
 {
 	mrgame(config);
 
-	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::wcup90_video_map);
+	m_videocpu->set_addrmap(AS_PROGRAM, &mrgame_state::macattck_video_map);
+	m_audiocpu1->set_addrmap(AS_PROGRAM, &mrgame_state::macattck_audio1_map);
 
 	m_gfxdecode->set_info(gfx_5bpp);
 
@@ -636,11 +756,17 @@ void mrgame_state::wcup90(machine_config &config)
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(mrgame_state::vblank_int_w));
 }
 
+void mrgame_state::wcup90(machine_config &config)
+{
+	macattck(config);
+	m_audiocpu2->set_addrmap(AS_PROGRAM, &mrgame_state::wcup90_audio2_map);
+}
+
 /*-------------------------------------------------------------------
 / Dakar (06/1988)
 /-------------------------------------------------------------------*/
 ROM_START(dakar)
-	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(83183929) SHA1(977ac10a1e78c759eb0550794f2639fe0e2d1507))
 	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(2010d28d) SHA1(d262dabd9298566df43df298cf71c974bee1434a))
 
@@ -670,17 +796,9 @@ ROM_END
 / Motor Show (1989)
 /-------------------------------------------------------------------*/
 ROM_START(motrshow)
-	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_DEFAULT_BIOS("0")
-	ROM_SYSTEM_BIOS(0, "0", "0")
-	ROMX_LOAD( "cpu_0.ic13",  0x0000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae), ROM_SKIP(1) | ROM_BIOS(0) )
-	ROMX_LOAD( "cpu_0.ic14",  0x0001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e), ROM_SKIP(1) | ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "1", "1")
-	ROMX_LOAD( "cpu_1.ic13a", 0x0000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROMX_LOAD( "cpu_1.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af), ROM_SKIP(1) | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(2, "2", "2")
-	ROMX_LOAD( "cpu_2.ic13b", 0x0000, 0x8000, CRC(9cd2d6f3) SHA1(6f123367ccbe1376b4bd8a5ee0f636efe42f9eac), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "cpu_2.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "cpu_0.ic13",  0x0000, 0x8000, CRC(e862ca71) SHA1(b02e5f39f9427d58b70b7999a5ff6075beff05ae))
+	ROM_LOAD16_BYTE( "cpu_0.ic14",  0x0001, 0x8000, CRC(c898ae25) SHA1(f0e1369284a1e0f394f1d40281fd46252016602e))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
@@ -692,7 +810,59 @@ ROM_START(motrshow)
 	ROM_REGION(0x0020, "proms", 0)
 	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
 
-	ROM_REGION(0x10000, "audio1", 0)
+	ROM_REGION(0x10000, "audio1", ROMREGION_ERASEFF)
+	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(fba5a8f1) SHA1(ddf989abebe05c569c9ecdd498bd8ea409df88ac))
+
+	ROM_REGION(0x4000, "m114", 0)
+	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, CRC(e6c1098e) SHA1(06bf8917a27d5e46e4aab93e1f212918418e3a82))
+
+	ROM_REGION(0x10000, "audio2", 0)
+	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, CRC(9dec153d) SHA1(8a0140257316aa19c0401456839e11b6896609b1))
+	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
+ROM_END
+
+ROM_START(motrshowa)
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "cpu_1.ic13a", 0x0000, 0x8000, CRC(2dbdd9d4) SHA1(b404814a4e83ead6da3c57818ae97f23d380f9da))
+	ROM_LOAD16_BYTE( "cpu_1.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
+
+	ROM_REGION(0x8000, "video", 0)
+	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
+
+	ROM_REGION(0x10000, "chargen", 0)
+	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
+	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
+
+	ROM_REGION(0x0020, "proms", 0)
+	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
+
+	ROM_REGION(0x10000, "audio1", ROMREGION_ERASEFF)
+	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(fba5a8f1) SHA1(ddf989abebe05c569c9ecdd498bd8ea409df88ac))
+
+	ROM_REGION(0x4000, "m114", 0)
+	ROM_LOAD("snd_ic22.rom", 0x0000, 0x4000, CRC(e6c1098e) SHA1(06bf8917a27d5e46e4aab93e1f212918418e3a82))
+
+	ROM_REGION(0x10000, "audio2", 0)
+	ROM_LOAD("snd_ic35.rom", 0x0000, 0x8000, CRC(9dec153d) SHA1(8a0140257316aa19c0401456839e11b6896609b1))
+	ROM_LOAD("snd_ic36.rom", 0x8000, 0x8000, CRC(4f42be6e) SHA1(684e988f413cd21c785ad5d60ef5eaddddaf72ab))
+ROM_END
+
+ROM_START(motrshowb)
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE( "cpu_2.ic13b", 0x0000, 0x8000, CRC(9cd2d6f3) SHA1(6f123367ccbe1376b4bd8a5ee0f636efe42f9eac))
+	ROM_LOAD16_BYTE( "cpu_2.ic14b", 0x0001, 0x8000, CRC(0bd98fec) SHA1(b90a7e997db59740398003ba94a69118b1ee70af))
+
+	ROM_REGION(0x8000, "video", 0)
+	ROM_LOAD("vid_ic14.rom", 0x0000, 0x8000, CRC(1d4568e2) SHA1(bfc2bb59708ce3a09f9a1b3460ed8d5269840c97))
+
+	ROM_REGION(0x10000, "chargen", 0)
+	ROM_LOAD("vid_ic55.rom", 0x0000, 0x8000, CRC(c27a4ded) SHA1(9c2c9b17f1e71afb74bdfbdcbabb99ef935d32db))
+	ROM_LOAD("vid_ic56.rom", 0x8000, 0x8000, CRC(1664ec8d) SHA1(e7b15acdac7dfc51b668e908ca95f02a2b569737))
+
+	ROM_REGION(0x0020, "proms", 0)
+	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
+
+	ROM_REGION(0x10000, "audio1", ROMREGION_ERASEFF)
 	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(fba5a8f1) SHA1(ddf989abebe05c569c9ecdd498bd8ea409df88ac))
 
 	ROM_REGION(0x4000, "m114", 0)
@@ -707,12 +877,14 @@ ROM_END
 / Fast Track (1989)  A predecessor of Motor Show. Green Screen text only
 /-----------------------------------------------------------------------*/
 ROM_START(fasttrack)
-	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("cpuic13.rom", 0x0000, 0x8000, CRC(675cbef6) SHA1(0561aee09bb459a79e54a903d39ef5e5288e8368))
 	ROM_LOAD16_BYTE("cpuic14.rom", 0x0001, 0x8000, CRC(57a1c42f) SHA1(fbfc7527068a1e68afa4c20d5c2650399a1ee3cd))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("ft_vid1.764", 0x0000, 0x2000, NO_DUMP )  // only dump we found was all 0xF7
+	ROM_FILL(0,1,0x18)  // this is to prevent the error.log filling up the hard drive
+	ROM_FILL(1,1,0xfe)
 
 	ROM_REGION(0x10000, "chargen", ROMREGION_ERASEFF)
 	ROM_LOAD("ft_vid2.532",  0x0000, 0x001000, CRC(5145685b) SHA1(6857be53efee5d439311ddb93e9f509590ff26c9) )  // 2nd half is rubbish
@@ -721,7 +893,7 @@ ROM_START(fasttrack)
 	ROM_REGION(0x0020, "proms", 0)
 	ROM_LOAD("vid_ic66.rom", 0x0000, 0x0020, CRC(5b585252) SHA1(b88e56ebdce2c3a4b170aff4b05018e7c21a79b8))
 
-	ROM_REGION(0x10000, "audio1", 0)
+	ROM_REGION(0x10000, "audio1", ROMREGION_ERASEFF)
 	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(fba5a8f1) SHA1(ddf989abebe05c569c9ecdd498bd8ea409df88ac))
 
 	ROM_REGION(0x4000, "m114", 0)
@@ -736,7 +908,7 @@ ROM_END
 / Mac Attack (1990)
 /-------------------------------------------------------------------*/
 ROM_START(macattck)
-	ROM_REGION16_BE(0x10000, "roms", 0)
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
 	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x0000, 0x8000, CRC(35cabad1) SHA1(01279df881b0d7d6586c1b8570b12bdc1fb9ff21) )
 	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x0001, 0x8000, CRC(6a4d7b89) SHA1(090e1a6c069cb6e5efd26a0260df613375f0b063) )
 
@@ -753,7 +925,7 @@ ROM_START(macattck)
 	ROM_REGION(0x0020, "proms", 0)
 	ROM_LOAD("vid_ic61.rom", 0x0000, 0x0020, CRC(538c72ae) SHA1(f704492568257fcc4a4f1189207c6fb6526eb81c) BAD_DUMP) // from wcup90, assumed to be the same
 
-	ROM_REGION(0x10000, "audio1", 0)
+	ROM_REGION(0x10000, "audio1", ROMREGION_ERASEFF)
 	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(4ab94d16) SHA1(4c3755489f699c751d664f420b9852ef16bb3aa6) )
 
 	ROM_REGION(0x4000, "m114", 0)
@@ -768,9 +940,9 @@ ROM_END
 / World Cup 90 (1990)
 /-------------------------------------------------------------------*/
 ROM_START(wcup90)
-	ROM_REGION16_BE(0x10000, "roms", 0)
-	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x000000, 0x8000, CRC(0e2edfb0) SHA1(862fb1f6509fb1f560d0b2bb8a5764f64b259f04))
-	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x000001, 0x8000, CRC(fdd03165) SHA1(6dc6e68197218f8808436098c26cd04fc3215b1c))
+	ROM_REGION16_BE(0x10000, "maincpu", 0)
+	ROM_LOAD16_BYTE("cpu_ic13.rom", 0x0000, 0x8000, CRC(0e2edfb0) SHA1(862fb1f6509fb1f560d0b2bb8a5764f64b259f04))
+	ROM_LOAD16_BYTE("cpu_ic14.rom", 0x0001, 0x8000, CRC(fdd03165) SHA1(6dc6e68197218f8808436098c26cd04fc3215b1c))
 
 	ROM_REGION(0x8000, "video", 0)
 	ROM_LOAD("vid_ic91.rom", 0x0000, 0x8000, CRC(3287ad20) SHA1(d5a453efc7292670073f157dca04897be857b8ed))
@@ -785,7 +957,7 @@ ROM_START(wcup90)
 	ROM_REGION(0x0020, "proms", 0)
 	ROM_LOAD("vid_ic61.rom", 0x0000, 0x0020, CRC(538c72ae) SHA1(f704492568257fcc4a4f1189207c6fb6526eb81c))
 
-	ROM_REGION(0x10000, "audio1", 0)
+	ROM_REGION(0x10000, "audio1", ROMREGION_ERASEFF)
 	ROM_LOAD("snd_ic06.rom", 0x0000, 0x8000, CRC(19a66331) SHA1(fbd71bc378b5a04247fd1754529c66b086eb33d8))
 
 	ROM_REGION(0x4000, "user1", 0)
@@ -795,15 +967,17 @@ ROM_START(wcup90)
 	ROM_LOAD("snd_ic45.rom", 0x00000, 0x10000, CRC(265aa979) SHA1(9ca10c41526a2d227c21f246273ca14bec7f1bc7))
 	ROM_LOAD("snd_ic46.rom", 0x10000, 0x10000, CRC(7edb321e) SHA1(b242e94c24e996d2de803d339aa9bf6e93586a4c))
 
-	ROM_REGION(0x10000, "audio2", 0)
+	ROM_REGION(0x8000, "audio2", 0)
 	ROM_LOAD("snd_ic44.rom", 0x00000, 0x8000, CRC(00946570) SHA1(83e7dd89844679571ab2a803295c8ca8941a4ac7))
 ROM_END
 
 } // anonymous namespace
 
 
-GAME(1988,  dakar,     0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Dakar",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  fasttrack, motrshow,  mrgame,  mrgame, mrgame_state, empty_init,  ROT0, "Mr Game", "Fast Track",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1989,  motrshow,  0,         mrgame,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Motor Show",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME(1990,  macattck,  0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  wcup90,    0,         wcup90,  mrgame, mrgame_state, init_mrgame, ROT0, "Mr Game", "World Cup 90",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME(1988,  dakar,     0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Dakar",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1989,  fasttrack, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Fast Track",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1989,  motrshow,  0,         mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1989,  motrshowa, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1989,  motrshowb, motrshow,  mrgame,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Motor Show (set 3)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1990,  macattck,  0,         macattck,  mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "Mac Attack",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1990,  wcup90,    0,         wcup90,    mrgame, mrgame_state, empty_init, ROT0, "Mr Game", "World Cup 90",       MACHINE_IS_SKELETON_MECHANICAL )

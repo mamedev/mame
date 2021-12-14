@@ -1261,6 +1261,18 @@ a certain item) -->
 		</part>
 	</software>
 
+<!-- This prototype doesn't work on real hardware, nor in MAME, due to a timing issue in its initialization code. It can be made to work by changing the instruction at $02E41 (EI) to 0x00 (NOP). -->
+	<software name="brkthru" supported="no">
+		<description>BreakThru! (prototype)</description>
+		<year>1994</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="breakthru [proto].bin" size="131072" crc="64d7a694" sha1="571bd543320bc67c4103630c804705955bc5250a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bublbobl">
 		<description>Bubble Bobble (Euro, USA)</description>
 		<year>1994</year>

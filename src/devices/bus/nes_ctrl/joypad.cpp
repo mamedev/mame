@@ -25,6 +25,14 @@
     game (an image of such connection is shown e.g. in Nekketsu Koukou
     Dodgeball Bu manual)
 
+    FIXME: The official Nintendo stick mentioned above by Hori has the
+    P1/P2 and 4/8-way switches but it DOESN'T have a daisy chain port.
+    ASCII made at least two sticks, AS-2088-FC and AS-3399-FC, that may
+    be the only two that exist with a daisy chain port. The former has
+    no additional switches at all, so its port may be a pass-thru. The
+    latter has many features: P1/P2 and 4/8-way switches, turbo, jacks
+    for data recorder, etc.
+
 **********************************************************************/
 
 #include "emu.h"
@@ -35,15 +43,16 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(NES_JOYPAD,      nes_joypad_device,   "nes_joypad",   "Nintendo NES / FC Control Pad")
+DEFINE_DEVICE_TYPE(NES_FCPAD_EXP,   nes_fcpadexp_device, "nes_fcpadexp", "Nintendo Family Computer Expansion Port Pad")
 DEFINE_DEVICE_TYPE(NES_FCPAD_P2,    nes_fcpad2_device,   "nes_fcpad2",   "Nintendo Family Computer P2 Pad")
 DEFINE_DEVICE_TYPE(NES_CCPAD_LEFT,  nes_ccpadl_device,   "nes_ccpadl",   "FC Crazy Climber Left Pad")
 DEFINE_DEVICE_TYPE(NES_CCPAD_RIGHT, nes_ccpadr_device,   "nes_ccpadr",   "FC Crazy Climber Right Pad")
 DEFINE_DEVICE_TYPE(NES_ARCSTICK,    nes_arcstick_device, "nes_arcstick", "Nintendo Family Computer Arcade Stick")
 
-static INPUT_PORTS_START( nes_joypad )
+INPUT_PORTS_START( nes_joypad )
 	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -53,15 +62,15 @@ static INPUT_PORTS_START( nes_joypad )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_fcpad_p2 )
-	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Microphone")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_INCLUDE( nes_joypad )
+
+	PORT_MODIFY("JOYPAD")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // no select button
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // or start button on controller 2
+
+	PORT_START("MIC")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Microphone") PORT_CODE(KEYCODE_M)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nes_ccpad_left )
@@ -98,8 +107,8 @@ static INPUT_PORTS_START( nes_arcstick )
 	PORT_CONFSETTING(  0x02, "Player II" )
 
 	PORT_START("JOYPAD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("%p A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("%p B")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY     PORT_CONDITION("CONFIG", 0x01, EQUALS, 0x01)
@@ -168,37 +177,49 @@ void nes_arcstick_device::device_add_mconfig(machine_config &config)
 //  nes_joypad_device - constructor
 //-------------------------------------------------
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_nes_control_port_interface(mconfig, *this),
-	m_joypad(*this, "JOYPAD"), m_latch(0)
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_nes_control_port_interface(mconfig, *this)
+	, m_joypad(*this, "JOYPAD")
+	, m_latch(0)
 {
 }
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nes_joypad_device(mconfig, NES_JOYPAD, tag, owner, clock)
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, NES_JOYPAD, tag, owner, clock)
 {
 }
 
-nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nes_joypad_device(mconfig, NES_FCPAD_P2, tag, owner, clock)
+nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nes_joypad_device(mconfig, NES_CCPAD_LEFT, tag, owner, clock)
+nes_fcpadexp_device::nes_fcpadexp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_fcpadexp_device(mconfig, NES_FCPAD_EXP, tag, owner, clock)
 {
 }
 
-nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nes_joypad_device(mconfig, NES_CCPAD_RIGHT, tag, owner, clock)
+nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, NES_FCPAD_P2, tag, owner, clock)
+	, m_mic(*this, "MIC")
 {
 }
 
-nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nes_joypad_device(mconfig, NES_ARCSTICK, tag, owner, clock),
-	m_daisychain(*this, "subexp"),
-	m_cfg(*this, "CONFIG")
+nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, NES_CCPAD_LEFT, tag, owner, clock)
+{
+}
+
+nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_joypad_device(mconfig, NES_CCPAD_RIGHT, tag, owner, clock)
+{
+}
+
+nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_fcpadexp_device(mconfig, NES_ARCSTICK, tag, owner, clock)
+	, m_daisychain(*this, "subexp")
+	, m_cfg(*this, "CONFIG")
 {
 }
 
@@ -210,16 +231,7 @@ nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const ch
 void nes_joypad_device::device_start()
 {
 	save_item(NAME(m_latch));
-}
-
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_joypad_device::device_reset()
-{
-	m_latch = 0;
+	save_item(NAME(m_strobe));
 }
 
 
@@ -227,20 +239,25 @@ void nes_joypad_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_joypad_device::read_bit0()
+u8 nes_joypad_device::read_bit0()
 {
-	uint8_t ret = m_latch & 1;
-	m_latch >>= 1;
+	if (m_strobe)
+		m_latch = m_joypad->read();
+
+	u8 ret = m_latch & 1;
+	m_latch = (m_latch >> 1) | 0x80;  // fill shift reg with 1s, since excess reads on official pads return 1
+
 	return ret;
 }
 
-uint8_t nes_fcpad2_device::read_exp(offs_t offset)
+u8 nes_fcpadexp_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
-	if (!offset)    // microphone input
-		ret |= m_joypad->read() & 0x04;
+	return offset ? 0 : nes_joypad_device::read_bit0() << 1;
+}
 
-	return ret;
+u8 nes_fcpad2_device::read_bit2()
+{
+	return m_mic->read();
 }
 
 // NOTE: I haven't found any documentation about what happens when
@@ -249,29 +266,14 @@ uint8_t nes_fcpad2_device::read_exp(offs_t offset)
 // with each other? currently, we only support the following setup:
 // if the first pad is set as P1, the daisy chained pad is checked
 // for P2 only, and vice versa.
-uint8_t nes_arcstick_device::read_exp(offs_t offset)
+u8 nes_arcstick_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
-	if (offset == 0)    //$4016
-	{
-		if ((m_cfg->read() & 2) == 0)   // we are P1 input
-		{
-			ret |= (m_latch & 1) << 1;
-			m_latch >>= 1;
-		}
-		else
-			ret |= m_daisychain->read_exp(0);
-	}
-	else    //$4017
-	{
-		if ((m_cfg->read() & 2) == 2)   // we are P2 input
-		{
-			ret |= (m_latch & 1) << 1;
-			m_latch >>= 1;
-		}
-		else
-			ret |= m_daisychain->read_exp(1);
-	}
+	u8 ret = 0;
+
+	if (BIT(m_cfg->read(), 1) == offset)    // P# matches the port? That's us!
+		ret = nes_fcpadexp_device::read_exp(0);
+	else                                    // otherwise it's possibly the other controller
+		ret = m_daisychain->read_exp(offset);
 
 	return ret;
 }
@@ -280,29 +282,14 @@ uint8_t nes_arcstick_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_joypad_device::write(uint8_t data)
+void nes_joypad_device::write(u8 data)
 {
-	if (data & 0x01)
-		return;
-
-	m_latch = m_joypad->read();
+	if (write_strobe(data))
+		m_latch = m_joypad->read();
 }
 
-void nes_fcpad2_device::write(uint8_t data)
-{
-	if (data & 0x01)
-		return;
-
-	// microphone is hooked to expansion bits, not to the controller bit
-	m_latch = m_joypad->read() & ~0x04;
-}
-
-void nes_arcstick_device::write(uint8_t data)
+void nes_arcstick_device::write(u8 data)
 {
 	m_daisychain->write(data);
-
-	if (data & 0x01)
-		return;
-
-	m_latch = m_joypad->read();
+	nes_fcpadexp_device::write(data);
 }

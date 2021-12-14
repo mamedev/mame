@@ -2,9 +2,10 @@
 // copyright-holders:Robbbert,Stephane Humbert
 /********************************************************************************************************
 
-  PINBALL
-  Peyper/Sonic
+PINBALL
+Peyper/Sonic
 
+Machines:
   Odin (Peyper)
   Odin Deluxe (Sonic)
   Solar Wars (Sonic)
@@ -16,16 +17,21 @@
   Odisea Paris-Dakar (Peyper)
   Hang-On (Sonic)
   Ator (Video Dens)
+  Sir Lancelot (Peyper) has its own driver.
 
-  Sir Lancelot (Peyper, 1994)
-  - CPU is a B409 (could be a higher-speed Z80)
-  - Audio CPU is a TMP91P640F-10. Other audio chips are YMF262 and YAC512.
-
-  Most games require a ball in the outhole before starting a game (hold down X and press 1).
+Status:
+- odin, odin_dlx, solarwap, poleposn, wolfman, nemesisp, odisea, sonstwar, sonstwr2, hangonp: Playable.
+- When the machine is started, wait several seconds for the startup tune - then you can insert a coin.
+- Most games require a ball in the outhole before starting a game (hold down X and press 1).
 
 ToDo:
-- Gammatron: unable to start a game
+- Gammatron: unable to start a game - it's multiball, so need a key combination.
+- ator: playfield inputs not working. Not sure if to use init_1 or init_2, won't know until playfield works.
+- ator3bmp: rom missing
 - Mechanical sounds
+- Some sounds can go missing, for example odin/odin_dlx loses sounds while counting the bonuses
+- Any machine with inputs "sonstwar" have mistakes in the dip switches. Therefore sonstwar, sonstwr2
+   and hangonp don't show a match number at game end.
 
 *********************************************************************************************************/
 
@@ -47,63 +53,67 @@ public:
 	peyper_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_switch(*this, "SWITCH.%u", 0)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_leds(*this, "led_%u", 1U)
-		, m_dpl(*this, "dpl_%u", 0U)
-	{
-		std::fill(std::begin(m_disp_layout), std::end(m_disp_layout), 0);
-	}
+		, m_digits(*this, "dpl_%u", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
+		{ }
 
 	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
-	void init_peyper();
-	void init_odin();
-	void init_wolfman();
+	void init_0() { m_game = 0; }
+	void init_1() { m_game = 1; }
+	void init_2() { m_game = 2; }
+	void init_3() { m_game = 0; m_outhole_solenoid = 11; }
 
 	void peyper(machine_config &config);
 
-protected:
+private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	u8 sw_r();
+	void col_w(u8 data);
+	void disp_w(u8 data);
+	void lamp_w(offs_t offset, u8 data);
+	void lamp7_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[32U+i] = BIT(data, i); }
+	void sol_w(u8 data);
+	void p1a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[40U+i] = BIT(data, i); }
+	void p1b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[48U+i] = BIT(data, i); }
+	void p2a_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[56U+i] = BIT(data, i); }
+	void p2b_w(u8 data) { for (u8 i = 0; i < 8; i++) m_io_outputs[64U+i] = BIT(data, i); }
 
-private:
-	uint8_t sw_r();
-	void col_w(uint8_t data);
-	void disp_w(uint8_t data);
-	void lamp_w(offs_t offset, uint8_t data);
-	void lamp7_w(uint8_t data);
-	void sol_w(uint8_t data);
-	void p1a_w(uint8_t data) { } // more lamps
-	void p1b_w(uint8_t data) { } // more lamps
-	void p2a_w(uint8_t data) { } // more lamps
-	void p2b_w(uint8_t data) { } // more lamps
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 
-	void peyper_io(address_map &map);
-	void peyper_map(address_map &map);
-
-	uint8_t m_digit;
-	uint8_t m_disp_layout[36];
+	u8 m_row = 0;
+	u8 m_game = 0;
+	u8 m_outhole_solenoid = 8;
 	required_device<cpu_device> m_maincpu;
-	required_ioport_array<4> m_switch;
+	required_ioport_array<4> m_io_keyboard;
 	output_finder<4> m_leds;
-	output_finder<34> m_dpl; // 0 used as black hole
+	output_finder<34> m_digits; // 0 used as black hole
+	output_finder<72> m_io_outputs;   // 8 solenoids + 64 lamps
 };
 
-void peyper_state::col_w(uint8_t data)
+void peyper_state::col_w(u8 data)
 {
-	m_digit = data;
+	m_row = data;
 }
 
-uint8_t peyper_state::sw_r()
+u8 peyper_state::sw_r()
 {
-	if ((m_digit & 7) < 4)
-		return m_switch[m_digit & 7]->read();
+	if ((m_row & 7) < 4)
+		return m_io_keyboard[m_row & 7]->read();
 
 	return 0xff;
 }
 
-void peyper_state::disp_w(uint8_t data)
+void peyper_state::disp_w(u8 data)
 {
-	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	u8 laydigits[3][36]{
+		{ 25, 27, 26, 28, 23,  5, 22,  4, 21,  3, 20,  2, 19,  1, 33, 30, 34, 36, 35, 29, 17, 11, 16, 10, 15,  9, 14,  8, 13,  7, 32, 31,  6, 12, 18, 24 },   // peyper
+		{ 25, 27, 26, 28, 40, 37, 23,  5, 22,  4, 21,  3, 20,  2, 19,  1,  0, 36, 35, 29, 39, 38, 17, 11, 16, 10, 15,  9, 14,  8, 13,  7,  6, 12, 18, 24 },   // odin
+		{ 25, 27, 26, 28, 40, 37, 19,  1, 23,  5, 22,  4, 21,  3, 20,  2,  0, 36, 35, 29, 39, 38, 13,  7, 17, 11, 16, 10, 15,  9, 14,  8,  6, 12, 18, 24 }};  // wolfman
 /*
 0 -> XA0 DPL25,DPL27
 1 -> XA1 DPL26,DPL28
@@ -123,12 +133,12 @@ void peyper_state::disp_w(uint8_t data)
 15 -> DPL31,DPL32
 */
 
-	uint8_t const p = m_digit << 1;
-	for (uint8_t i = 0; i < 2; i++, data >>= 4)
+	u8 const p = m_row << 1;
+	for (u8 i = 0; i < 2; i++, data >>= 4)
 	{
-		uint8_t const q = m_disp_layout[p | i]; // get control code or digit
-		uint8_t const a = data & 15; // get bcd
-		uint8_t const hex_a = patterns[a]; // get segments
+		u8 const q = laydigits[m_game][p | i]; // get control code or digit
+		u8 const a = data & 15; // get bcd
+		u8 const hex_a = patterns[a]; // get segments
 
 		// special codes
 		switch (q)
@@ -141,10 +151,10 @@ void peyper_state::disp_w(uint8_t data)
 				break;
 
 			case 35: // units digits show 0
-				if (!BIT(a, 0)) m_dpl[m_disp_layout[32]] = 0x3f;
-				if (!BIT(a, 1)) m_dpl[m_disp_layout[33]] = 0x3f;
-				if (!BIT(a, 2)) m_dpl[m_disp_layout[34]] = 0x3f;
-				if (!BIT(a, 3)) m_dpl[m_disp_layout[35]] = 0x3f;
+				if (!BIT(a, 0)) m_digits[laydigits[m_game][32]] = 0x3f;
+				if (!BIT(a, 1)) m_digits[laydigits[m_game][33]] = 0x3f;
+				if (!BIT(a, 2)) m_digits[laydigits[m_game][34]] = 0x3f;
+				if (!BIT(a, 3)) m_digits[laydigits[m_game][35]] = 0x3f;
 				break;
 
 			case 36: // game status indicators
@@ -161,30 +171,30 @@ void peyper_state::disp_w(uint8_t data)
 			case 39: // player 3 indicators (6-digit only)
 			case 40: // player 4 indicators (6-digit only)
 				m_leds[q - 37] = BIT(a, 1); // player indicator
-				m_dpl[q - 7] = BIT(a, 2) ? 6 : 0; // million led (we show blank or 1 in millions digit)
+				m_digits[q - 7] = BIT(a, 2) ? 6 : 0; // million led (we show blank or 1 in millions digit)
 				// bit 3, looks like it turns on all the decimal points, reason unknown
 				break;
 
 			default: // display a digit
-				m_dpl[q] = hex_a;
+				m_digits[q] = hex_a;
 		}
 	}
 }
 
-void peyper_state::lamp_w(offs_t offset, uint8_t data)
+void peyper_state::lamp_w(offs_t offset, u8 data)
 {
-	//logerror("lamp_w %02x\n",data);
-	//logerror("[%d]= %02x\n",4+offset/4,data);
+	u8 t = 8*(BIT(offset, 2, 2)+1);  // t = 8,16,24
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[t+i] = BIT(data, i);
 }
 
-void peyper_state::lamp7_w(uint8_t data)
+void peyper_state::sol_w(u8 data)
 {
-	//logerror("[7]= %02x\n",data);
-}
-
-void peyper_state::sol_w(uint8_t data)
-{
-	//logerror("sol_w %02x\n",data);
+	data &= 15;
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = (data == i);
+	if (data == m_outhole_solenoid)
+		m_samples->start(0, 5); // outhole
 }
 
 
@@ -204,14 +214,14 @@ CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 }
 
 
-void peyper_state::peyper_map(address_map &map)
+void peyper_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x5FFF).rom();
 	map(0x6000, 0x67FF).ram().share("nvram");
 }
 
-void peyper_state::peyper_io(address_map &map)
+void peyper_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
@@ -236,7 +246,7 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )             // N.C.
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )             // N.C.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            // Reset
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )               // Tilt
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )             // Start game - Might also display next screen in "Test Mode"
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )              // Small coin (25 pesetas)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )              // Medium coin (50 pesetas but 100 pesetas in 'sonstwar') - never mentioned in the manuals
@@ -265,45 +275,45 @@ static INPUT_PORTS_START( pbsonic_generic )
 	PORT_DIPSETTING(    0x02, "0k 0k and 0k / 0k" )
 	PORT_DIPSETTING(    0x03, "0k 0k and 0k / 0k" )
 
-	PORT_START("SWITCH.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP01")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP02")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP03")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP04")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP05")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP06")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP07")
 
-	PORT_START("SWITCH.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP10")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP11")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP12")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP13")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP14")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP15")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP16")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP17")
 
-	PORT_START("SWITCH.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP20")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP21")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP22")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP23")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP24")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP25")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP26")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP27")
 
-	PORT_START("SWITCH.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP30")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP31")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP33")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP34")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP35")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP36")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP37")
 INPUT_PORTS_END
 
 
@@ -590,17 +600,22 @@ void peyper_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digit = 0;
-
 	m_leds.resolve();
-	m_dpl.resolve();
+	m_digits.resolve();
+	m_io_outputs.resolve();
 
-	save_item(NAME(m_digit));
+	save_item(NAME(m_row));
+	save_item(NAME(m_game));
+	save_item(NAME(m_outhole_solenoid));
 }
 
 void peyper_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
+	m_row = 0;
 }
 
 
@@ -608,8 +623,8 @@ void peyper_state::peyper(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2'500'000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &peyper_state::peyper_map);
-	m_maincpu->set_addrmap(AS_IO, &peyper_state::peyper_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &peyper_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &peyper_state::io_map);
 	m_maincpu->set_periodic_int(FUNC(peyper_state::irq0_line_hold), attotime::from_hz(1250));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -637,134 +652,12 @@ void peyper_state::peyper(machine_config &config)
 	kbdc.in_ctrl_callback().set_constant(1);
 }
 
-// Not allowed to set up an array all at once, so we have this mess
-void peyper_state::init_peyper()
-{
-	m_disp_layout[0] = 25;
-	m_disp_layout[1] = 27;
-	m_disp_layout[2] = 26;
-	m_disp_layout[3] = 28;
-	m_disp_layout[4] = 23;
-	m_disp_layout[5] = 5;
-	m_disp_layout[6] = 22;
-	m_disp_layout[7] = 4;
-	m_disp_layout[8] = 21;
-	m_disp_layout[9] = 3;
-	m_disp_layout[10] = 20;
-	m_disp_layout[11] = 2;
-	m_disp_layout[12] = 19;
-	m_disp_layout[13] = 1;
-	m_disp_layout[14] = 33;
-	m_disp_layout[15] = 30;
-	m_disp_layout[16] = 34;
-	m_disp_layout[17] = 36;
-	m_disp_layout[18] = 35;
-	m_disp_layout[19] = 29;
-	m_disp_layout[20] = 17;
-	m_disp_layout[21] = 11;
-	m_disp_layout[22] = 16;
-	m_disp_layout[23] = 10;
-	m_disp_layout[24] = 15;
-	m_disp_layout[25] = 9;
-	m_disp_layout[26] = 14;
-	m_disp_layout[27] = 8;
-	m_disp_layout[28] = 13;
-	m_disp_layout[29] = 7;
-	m_disp_layout[30] = 32;
-	m_disp_layout[31] = 31;
-	m_disp_layout[32] = 6;
-	m_disp_layout[33] = 12;
-	m_disp_layout[34] = 18;
-	m_disp_layout[35] = 24;
-}
-
-void peyper_state::init_odin()
-{
-	m_disp_layout[0] = 25;
-	m_disp_layout[1] = 27;
-	m_disp_layout[2] = 26;
-	m_disp_layout[3] = 28;
-	m_disp_layout[4] = 40;
-	m_disp_layout[5] = 37;
-	m_disp_layout[6] = 23;
-	m_disp_layout[7] = 5;
-	m_disp_layout[8] = 22;
-	m_disp_layout[9] = 4;
-	m_disp_layout[10] = 21;
-	m_disp_layout[11] = 3;
-	m_disp_layout[12] = 20;
-	m_disp_layout[13] = 2;
-	m_disp_layout[14] = 19;
-	m_disp_layout[15] = 1;
-	m_disp_layout[16] = 0; // does nothing?
-	m_disp_layout[17] = 36;
-	m_disp_layout[18] = 35;
-	m_disp_layout[19] = 29;
-	m_disp_layout[20] = 39;
-	m_disp_layout[21] = 38;
-	m_disp_layout[22] = 17;
-	m_disp_layout[23] = 11;
-	m_disp_layout[24] = 16;
-	m_disp_layout[25] = 10;
-	m_disp_layout[26] = 15;
-	m_disp_layout[27] = 9;
-	m_disp_layout[28] = 14;
-	m_disp_layout[29] = 8;
-	m_disp_layout[30] = 13;
-	m_disp_layout[31] = 7;
-	m_disp_layout[32] = 6;
-	m_disp_layout[33] = 12;
-	m_disp_layout[34] = 18;
-	m_disp_layout[35] = 24;
-}
-
-void peyper_state::init_wolfman()
-{
-	m_disp_layout[0] = 25;
-	m_disp_layout[1] = 27;
-	m_disp_layout[2] = 26;
-	m_disp_layout[3] = 28;
-	m_disp_layout[4] = 40;
-	m_disp_layout[5] = 37;
-	m_disp_layout[6] = 19;
-	m_disp_layout[7] = 1;
-	m_disp_layout[8] = 23;
-	m_disp_layout[9] = 5;
-	m_disp_layout[10] = 22;
-	m_disp_layout[11] = 4;
-	m_disp_layout[12] = 21;
-	m_disp_layout[13] = 3;
-	m_disp_layout[14] = 20;
-	m_disp_layout[15] = 2;
-	m_disp_layout[16] = 0; // does nothing?
-	m_disp_layout[17] = 36;
-	m_disp_layout[18] = 35;
-	m_disp_layout[19] = 29;
-	m_disp_layout[20] = 39;
-	m_disp_layout[21] = 38;
-	m_disp_layout[22] = 13;
-	m_disp_layout[23] = 7;
-	m_disp_layout[24] = 17;
-	m_disp_layout[25] = 11;
-	m_disp_layout[26] = 16;
-	m_disp_layout[27] = 10;
-	m_disp_layout[28] = 15;
-	m_disp_layout[29] = 9;
-	m_disp_layout[30] = 14;
-	m_disp_layout[31] = 8;
-	m_disp_layout[32] = 6;
-	m_disp_layout[33] = 12;
-	m_disp_layout[34] = 18;
-	m_disp_layout[35] = 24;
-}
-
-
 
 /*-------------------------------------------------------------------
 / Odin (1985)
 /-------------------------------------------------------------------*/
 ROM_START(odin)
-	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("odin_a.bin", 0x0000, 0x2000, CRC(ac3a7770) SHA1(2409629d3adbae0d7e6e5f9fe6f137c1e5a1bb86))
 	ROM_LOAD("odin_b.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
 ROM_END
@@ -773,7 +666,7 @@ ROM_END
 / Odin De Luxe (1985)
 /-------------------------------------------------------------------*/
 ROM_START(odin_dlx)
-	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("1a.bin", 0x0000, 0x2000, CRC(4fca9bfc) SHA1(05dce75919375d01a306aef385bcaac042243695))
 	ROM_LOAD("2a.bin", 0x2000, 0x2000, CRC(46744695) SHA1(fdbd8a93b3e4a9697e77e7d381759829b86fe28b))
 ROM_END
@@ -782,7 +675,7 @@ ROM_END
 / Solar Wars (1986)
 /-------------------------------------------------------------------*/
 ROM_START(solarwap)
-	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("solarw1c.bin", 0x0000, 0x2000, CRC(aa6bf0cd) SHA1(7332a4b1679841283d846f3e4f1792cb8e9529bf))
 	ROM_LOAD("solarw2.bin",  0x2000, 0x2000, CRC(95e2cbb1) SHA1(f9ab3222ca0b9e0796030a7a618847a4e8f77957))
 ROM_END
@@ -791,7 +684,7 @@ ROM_END
 / Gamatron (1986)
 /-------------------------------------------------------------------*/
 ROM_START(gamatros)
-	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("gama_a.bin", 0x0000, 0x2000, CRC(1dc2841c) SHA1(27c6a07b1f8bd5e73b425e7dbdcfb1d5233c18b2))
 	ROM_LOAD("gama_b.bin", 0x2000, 0x2000, CRC(56125890) SHA1(8b30a2282df264d798df1b031ecade999d135f81))
 ROM_END
@@ -866,47 +759,31 @@ ROM_END
 / Ator (1985)
 /-------------------------------------------------------------------*/
 ROM_START(ator) // Version with 2 bumpers, probably older
-	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("ator1.bin", 0x0000, 0x2000, CRC(87967577) SHA1(6586401a4b1a837bacd61d156b44eedaab271479))
 	ROM_LOAD("ator2.bin", 0x2000, 0x2000, CRC(832b06ea) SHA1(c70c613fd29d1d560951890bce072cbf45525526))
 	// No ROM 3
 ROM_END
 
 ROM_START(ator3bmp) // Version with 3 bumpers, probably newer
-	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
 	ROM_LOAD("ator 2 _0xba29.bin", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
 	// probably no ROM 3 (PCB photo shows location unpopulated)
 ROM_END
 
-/*-------------------------------------------------------------------
-/ Sir Lancelot (1994)
-/-------------------------------------------------------------------*/
-ROM_START(lancelot)
-	ROM_REGION(0x8000, "maincpu", 0)
-	ROM_LOAD("lancelot.bin", 0x0000, 0x8000, CRC(26c10926) SHA1(ad032b43c15b1d7a7f32a12ca09ea3344d75105b))
-	ROM_REGION(0x4000, "audiocpu", 0)
-	ROM_LOAD("tmp91640.rom", 0x0000, 0x4000, NO_DUMP)
-	ROM_REGION(0x40000, "sound1", 0)
-	ROM_LOAD("snd_u3.bin", 0x00000, 0x20000, CRC(db88c28d) SHA1(35a80509c4a1f931d07af2fc74adbafc11af5639))
-	ROM_LOAD("snd_u4.bin", 0x20000, 0x20000, CRC(5cebed6e) SHA1(d11cc57fadee95f056fc65927fa1f6ff0f337446))
-	ROM_REGION(0x20000, "sound2", 0)
-	ROM_LOAD("snd_u5.bin", 0x00000, 0x20000, CRC(bf141441) SHA1(630b852bb3bba0fcdae13ae548b1e9810bc64d7d))
-ROM_END
-
 } // Anonymous namespace
 
-GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Peyper",     "Odin",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_odin,    ROT0, "Sonic",      "Odin De Luxe",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_peyper,  ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_peyper,  ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, init_peyper,  ROT0, "Sonic",      "Pole Position (Sonic)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Star Wars (Sonic, set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Star Wars (Sonic, set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_wolfman, ROT0, "Peyper",     "Wolf Man",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_wolfman, ROT0, "Peyper",     "Nemesis",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_wolfman, ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
-GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
-GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_peyper,  ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
-GAME( 1994, lancelot, 0,        peyper,   sonstwar, peyper_state, empty_init,   ROT0, "Peyper",     "Sir Lancelot",             MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)
+GAME( 1985, odin,     0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Peyper",     "Odin",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, odin_dlx, 0,        peyper,   odin_dlx, peyper_state, init_1,     ROT0, "Sonic",      "Odin De Luxe",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, solarwap, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Solar Wars (Sonic)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, gamatros, 0,        peyper,   solarwap, peyper_state, init_0,     ROT0, "Sonic",      "Gamatron (Sonic)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, poleposn, 0,        peyper,   poleposn, peyper_state, init_0,     ROT0, "Sonic",      "Pole Position (Sonic)",    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, sonstwar, 0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Star Wars (Sonic, set 1)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Star Wars (Sonic, set 2)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Wolf Man",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, init_2,     ROT0, "Peyper",     "Nemesis",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, init_2,     ROT0, "Peyper",     "Odisea Paris-Dakar",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, init_3,     ROT0, "Sonic",      "Hang-On (Sonic)",          MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
+GAME( 1985, ator,     0,        peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 1, 2 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // inputs to be checked
+GAME( 1985, ator3bmp, ator,     peyper,   sonstwar, peyper_state, init_1,     ROT0, "Video Dens", "Ator (set 2, 3 bumpers)",  MACHINE_IS_SKELETON_MECHANICAL ) // initial program ROM missing; no manual found
