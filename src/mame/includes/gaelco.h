@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "machine/74259.h"
+#include "machine/gaelcrpt.h"
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -19,6 +20,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_vramcrypt(*this, "vramcrypt"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
 		m_outlatch(*this, "outlatch"),
@@ -40,6 +42,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<gaelco_vram_encryption_device> m_vramcrypt;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<ls259_device> m_outlatch;
@@ -61,8 +64,6 @@ private:
 	void oki_bankswitch_w(uint8_t data);
 	void vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void thoop_vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void thoop_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask);
 	void irqack_w(uint16_t data);
 
@@ -87,4 +88,6 @@ private:
 
 	/* per-game configuration */
 	uint8_t m_sprite_palette_force_high;
+
+	static constexpr double FRAMERATE_922804 = 57.42;
 };
