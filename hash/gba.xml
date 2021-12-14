@@ -25250,6 +25250,18 @@ license:CC0
 		</part>
 	</software>
 
+<!-- This was the last development build, released by the programmer, James Boulton. It was never completed due to lack of publisher interest. -->
+	<software name="perplexd" supported="partial">
+		<description>Perplexus Diodomin (prototype)</description>
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1681812">
+				<rom name="perplexusdiodomin.bin" size="1681812" crc="3442f9cf" sha1="f3c7093e9770632de618c7931f287ebc7b5e0aa2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="petpanrn">
 		<description>Disney's Peter Pan - Return to Neverland (Euro, Rev. 1)</description>
 		<year>2002</year>
