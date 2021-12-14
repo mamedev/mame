@@ -62,7 +62,7 @@ protected:
 	required_device<gt913_intc_device> m_intc;
 
 	/* sound */
-	required_device<gt913_sound_hle_device> m_sound;
+	required_device<gt913_sound_device> m_sound;
 
 	/* key controller */
 	required_device<gt913_kbd_hle_device> m_kbd;

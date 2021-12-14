@@ -53,6 +53,7 @@
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 namespace {
 
@@ -64,6 +65,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "lcdc")
 		, m_led_touch(*this, "led_touch")
+		, m_led_power(*this, "led_power")
 	{
 	}
 
@@ -90,6 +92,7 @@ private:
 	required_device<hd44780_device> m_lcdc;
 
 	output_finder<> m_led_touch;
+	output_finder<> m_led_power;
 
 	ioport_value m_switch;
 };
@@ -97,7 +100,6 @@ private:
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 {
-	logerror("switch_w: %x\n", param);
 	if (!oldval && newval)
 	{
 		if (m_switch == 0x1 && param != m_switch)
@@ -112,8 +114,11 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 WRITE_LINE_MEMBER(ctk551_state::apo_w)
 {
 	logerror("apo_w: %x\n", state);
-	/* TODO: when 1, this should turn off the LCD, speakers, etc.
+	/* auto power off - disable the LCD
 	the CPU will go to sleep until the power switch triggers a NMI */
+	if (state)
+		m_lcdc->reset();
+	m_led_power = !state;
 }
 
 HD44780_PIXEL_UPDATE(ctk551_state::lcd_update)
@@ -140,6 +145,7 @@ void ctk551_state::ctk551_io_map(address_map &map)
 void ctk551_state::driver_start()
 {
 	m_led_touch.resolve();
+	m_led_power.resolve();
 
 	m_switch = 0x2;
 
@@ -149,8 +155,11 @@ void ctk551_state::driver_start()
 void ctk551_state::ctk551(machine_config &config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30'000'000);
+	// 30MHz oscillator, divided down internally (otherwise the test mode's OK/NG sounds play at double speed)
+	GT913(config, m_maincpu, 30'000'000 / 2);
 	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
+	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(0, "lspeaker", 1.0);
+	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(1, "rspeaker", 1.0);
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));
@@ -177,6 +186,9 @@ void ctk551_state::ctk551(machine_config &config)
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(ctk551_state::palette_init), 2);
+
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 }
 
 INPUT_PORTS_START(ctk551)
@@ -356,4 +368,4 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME     FLAGS
-SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
