@@ -86,9 +86,12 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_memory_bank m_rombank;
 
-	void rowbuffer_map(address_map &map);
+	uint8_t attr_r(offs_t offset);
+	void attrram_map(address_map &map);
+	uint8_t char_r(offs_t offset);
+	void charram_map(address_map &map);
+
 	SCN2674_DRAW_CHARACTER_MEMBER(draw_character);
-	uint8_t avdc_videoram_r(offs_t offset);
 
 	uint8_t dma_mreq_r(offs_t offset);
 	void dma_mreq_w(offs_t offset, uint8_t data);
@@ -130,10 +133,28 @@ void hds200_state::io_map(address_map &map)
 //  VIDEO EMULATION
 //**************************************************************************
 
-void hds200_state::rowbuffer_map(address_map &map)
+uint8_t hds200_state::attr_r(offs_t offset)
 {
-	map.global_mask(0xff);
-	map(0x00, 0xff).ram();
+	offs_t addr = ((offset << 1) + 0) & 0x7ff;
+	//logerror("attr_r %04x -> %04x = %02x\n", offset, addr, m_vram[addr]);
+	return m_vram[addr];
+}
+
+void hds200_state::attrram_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(hds200_state::attr_r));
+}
+
+uint8_t hds200_state::char_r(offs_t offset)
+{
+	offs_t addr = ((offset << 1) + 1) & 0x7ff;
+	//logerror("char_r %04x -> %04x = %02x\n", offset, addr, m_vram[addr]);
+	return m_vram[addr];
+}
+
+void hds200_state::charram_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(hds200_state::char_r));
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER( hds200_state::draw_character )
@@ -148,12 +169,6 @@ SCN2674_DRAW_CHARACTER_MEMBER( hds200_state::draw_character )
 	// draw 9 pixels of the character
 	for (int i = 0; i < 9; i++)
 		bitmap.pix(y, x + i) = BIT(data, 8 - i) ? fg : bg;
-}
-
-uint8_t hds200_state::avdc_videoram_r(offs_t offset)
-{
-	logerror("avdc_videoram_r %04x = %02x\n", offset, m_vram[offset & 0x7ff]);
-	return m_vram[offset & 0x7ff];
 }
 
 static const gfx_layout char_layout =
@@ -264,11 +279,11 @@ void hds200_state::hds200(machine_config &config)
 	SCN2674(config, m_avdc, 22.680_MHz_XTAL / 9);
 	m_avdc->intr_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
 	m_avdc->mbc_callback().set(FUNC(hds200_state::nmi_w));
-	m_avdc->set_addrmap(0, &hds200_state::rowbuffer_map);
+	m_avdc->set_addrmap(0, &hds200_state::charram_map);
+	m_avdc->set_addrmap(1, &hds200_state::attrram_map);
 	m_avdc->set_character_width(9);
 	m_avdc->set_screen("screen");
 	m_avdc->set_display_callback(FUNC(hds200_state::draw_character));
-	m_avdc->mbc_char_callback().set(FUNC(hds200_state::avdc_videoram_r));
 
 	SCN2681(config, m_duart[0], 3.6864_MHz_XTAL);
 	m_duart[0]->irq_cb().set("irqs", FUNC(input_merger_device::in_w<1>));
