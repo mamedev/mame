@@ -88,13 +88,8 @@ void gt913_device::device_add_mconfig(machine_config &config)
 {
 	GT913_INTC(config, "intc");
 
-	/*
-	generate sound at 104 cycles per sample (= 144.231 kHz sample clock to the DAC)
-	on keyboard models that include a DSP, this also results in a multiple
-	of the 36.058 kHz CPU->DSP sync signal shown in some schematics (WK-1200 and others)
-	*/
-	GT913_SOUND(config, m_sound, std::round(clock() / 104.0f));
-	m_sound->set_device_rom_tag(tag());
+	GT913_SOUND(config, m_sound, DERIVED_CLOCK(1, 1));
+	m_sound->set_device_rom_tag(DEVICE_SELF);
 
 	GT913_KBD_HLE(config, m_kbd, 0);
 	m_kbd->irq_cb().set([this](int val) { if (val) m_intc->internal_interrupt(5); });
