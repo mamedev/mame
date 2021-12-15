@@ -454,7 +454,7 @@ void s3a_state::s3a_sol0_w(u8 data)
 
 	if ((m_game == 3) && BIT(data, 4)) // disco
 	{
-		m_sound_data = 0x7f | m_io_snd->read();
+		m_sound_data = 0x3f | m_io_snd->read();
 		m_pias->cb1_w(1);
 		m_pias->cb1_w(0);
 	}
