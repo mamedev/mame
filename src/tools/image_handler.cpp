@@ -12,20 +12,7 @@
 #include "ioprocs.h"
 #include "ioprocsfill.h"
 #include "ioprocsvec.h"
-
-
-// Fatalerror implementation
-
-emu_fatalerror::emu_fatalerror(util::format_argument_pack<std::ostream> const &args)
-	: emu_fatalerror(0, args)
-{
-}
-
-emu_fatalerror::emu_fatalerror(int _exitcode, util::format_argument_pack<std::ostream> const &args)
-	: m_text(util::string_format(args))
-	, m_code(_exitcode)
-{
-}
+#include "strformat.h"
 
 
 // Format enumeration

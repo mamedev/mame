@@ -10,6 +10,9 @@
 
 #include "corestr.h"
 #include "ioprocs.h"
+#include "strformat.h"
+
+#include "osdcomm.h"
 
 #include <cassert>
 #include <cctype>
@@ -18,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <exception>
 
 
 static formats_table formats;
@@ -704,7 +708,7 @@ int CLIB_DECL main(int argc, char *argv[])
 			display_usage();
 			return 1;
 		}
-	} catch(const emu_fatalerror &err) {
+	} catch(const std::exception &err) {
 		fprintf(stderr, "Error: %s", err.what());
 		return 1;
 	}

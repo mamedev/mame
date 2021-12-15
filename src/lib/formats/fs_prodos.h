@@ -16,7 +16,7 @@ public:
 	public:
 		class root_dir : public idir_t {
 		public:
-			root_dir(impl &fs, u16 base_block) : m_fs(fs), m_base_block(base_block) { }
+			root_dir(impl &fs, uint16_t base_block) : m_fs(fs), m_base_block(base_block) { }
 			virtual ~root_dir() = default;
 
 			virtual void drop_weak_references() override;
@@ -28,43 +28,43 @@ public:
 
 		protected:
 			impl &m_fs;
-			u16 m_base_block;
+			uint16_t m_base_block;
 
-			std::pair<fsblk_t::block_t, const u8 *> get_entry_ro(uint64_t key);
-			std::pair<fsblk_t::block_t, u8 *> get_entry(uint64_t key);
+			std::pair<fsblk_t::block_t, const uint8_t *> get_entry_ro(uint64_t key);
+			std::pair<fsblk_t::block_t, uint8_t *> get_entry(uint64_t key);
 		};
 
 		class dir : public root_dir {
 		public:
-			dir(impl &fs, const u8 *entry, u16 base_block, u16 key, root_dir *parent_dir);
+			dir(impl &fs, const uint8_t *entry, uint16_t base_block, uint16_t key, root_dir *parent_dir);
 			virtual ~dir() = default;
 
 			virtual fs_meta_data metadata() override;
 
 		protected:
 			root_dir *m_parent_dir;
-			u16 m_key;
-			u8 m_entry[39];
+			uint16_t m_key;
+			uint8_t m_entry[39];
 		};
 
 		class file : public ifile_t {
 		public:
-			file(impl &fs, const u8 *entry, u16 key, root_dir *parent_dir);
+			file(impl &fs, const uint8_t *entry, uint16_t key, root_dir *parent_dir);
 			virtual ~file() = default;
 
 			virtual void drop_weak_references() override;
 
 			virtual fs_meta_data metadata() override;
-			virtual std::vector<u8> read_all() override;
-			virtual std::vector<u8> rsrc_read_all() override;
+			virtual std::vector<uint8_t> read_all() override;
+			virtual std::vector<uint8_t> rsrc_read_all() override;
 
 		private:
 			impl &m_fs;
 			root_dir *m_parent_dir;
-			u16 m_key;
-			u8 m_entry[39];
+			uint16_t m_key;
+			uint8_t m_entry[39];
 
-			std::vector<u8> any_read_all(uint8_t type, u16 block, u32 length);
+			std::vector<uint8_t> any_read_all(uint8_t type, uint16_t block, uint32_t length);
 		};
 
 		impl(fsblk_t &blockdev);
@@ -77,11 +77,11 @@ public:
 
 		void drop_root_ref();
 
-		static util::arbitrary_datetime prodos_to_dt(u32 date);
-		std::vector<fs_dir_entry> contents(u16 block);
+		static util::arbitrary_datetime prodos_to_dt(uint32_t date);
+		std::vector<fs_dir_entry> contents(uint16_t block);
 
 	private:
-		static const u8 boot[512];
+		static const uint8_t boot[512];
 
 		dir_t m_root;
 	};

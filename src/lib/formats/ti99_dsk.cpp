@@ -66,7 +66,7 @@
 #define VERBOSE ( LOG_WARN )
 
 #define __EMU_H__ // logmacro wasn't really intended to be used outside stuff that uses libemu
-#include "logmacro.h"
+#include "../emu/logmacro.h"
 
 
 // ====================================================
