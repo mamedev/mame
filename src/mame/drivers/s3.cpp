@@ -391,6 +391,7 @@ void s3_state::machine_start()
 	save_item(NAME(m_strobe));
 	save_item(NAME(m_row));
 	save_item(NAME(m_data_ok));
+	save_item(NAME(m_lamp_data));
 	save_item(NAME(m_game));
 }
 
