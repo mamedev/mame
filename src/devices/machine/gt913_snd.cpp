@@ -53,7 +53,12 @@ gt913_sound_device::gt913_sound_device(const machine_config &mconfig, const char
 
 void gt913_sound_device::device_start()
 {
-	m_stream = stream_alloc(0, 2, clock());
+	/*
+	generate sound at 104 cycles per sample (~= 144.231 kHz sample clock to the DAC)
+	on keyboard models that include a DSP, this also results in a multiple
+	of the 36.058 kHz CPU->DSP sync signal shown in some schematics (WK-1200 and others)
+	*/
+	m_stream = stream_alloc(0, 2, clock() / 104);
 
 	save_item(NAME(m_gain));
 	save_item(NAME(m_data));
@@ -142,7 +147,7 @@ void gt913_sound_device::mix_sample(voice_t& voice, s64& left, s64& right)
 	const u8 env = (voice.m_volume_current >> 24);
 	/*
 	the current envelope level effects amplitude non-linearly, just apply the value twice
-	(this hardware family is branded as "A� (A-Square) Sound Source" in some of Casio's
+	(this hardware family is branded as "A² (A-Square) Sound Source" in some of Casio's
 	promotional materials, possibly for this reason?)
 	*/
 	const s64 sample = ((s64)voice.m_sample + (voice.m_sample_next * step / 8)) * voice.m_gain * env * env;
