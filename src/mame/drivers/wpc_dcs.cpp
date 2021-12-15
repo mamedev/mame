@@ -645,20 +645,6 @@ ROM_START(jd_l1)
 	ROM_LOAD16_BYTE("jdsnd_u9.bin", 0xe00000, 0x080000, CRC(885b7c70) SHA1(be3bb42aeda3020a72c527f52c5330d0bafa9966))
 ROM_END
 
-ROM_START(jd_l1d)
-	ROM_REGION(0x80000, "maincpu", 0)
-	ROM_LOAD("jd_l1d.u6", 0x00000, 0x80000, CRC(c37d8fed) SHA1(05d85c9c6a59866de4a7a5bb2258b69a1964efa3))
-	ROM_REGION16_LE(0x1000000, "dcs",0)
-	ROM_LOAD16_BYTE("jdsnd_u2.bin", 0x000000, 0x080000, CRC(d8f453c6) SHA1(5dd677fde46436dbf2d2e9058f06dd3048600234))
-	ROM_LOAD16_BYTE("jdsnd_u3.bin", 0x200000, 0x080000, CRC(0a11f673) SHA1(ab556477a25e3493555b8a281ca86677caec8947))
-	ROM_LOAD16_BYTE("jdsnd_u4.bin", 0x400000, 0x080000, CRC(93f6ebc1) SHA1(5cb306afa693e60887069745588dfd5b930c5951))
-	ROM_LOAD16_BYTE("jdsnd_u5.bin", 0x600000, 0x080000, CRC(c9f28ba6) SHA1(8447372428e3b9fc86a98286c05f95a13abe26b0))
-	ROM_LOAD16_BYTE("jdsnd_u6.bin", 0x800000, 0x080000, CRC(ef0bf094) SHA1(c0860cecd436d352fe2c2208533ff6dc71bfced1))
-	ROM_LOAD16_BYTE("jdsnd_u7.bin", 0xa00000, 0x080000, CRC(aebab88b) SHA1(d3f1be60a6840d9d085e22b43aafea1354771980))
-	ROM_LOAD16_BYTE("jdsnd_u8.bin", 0xc00000, 0x080000, CRC(77604893) SHA1(a9a4a66412096edd88ee7adfd960eef6f5d16476))
-	ROM_LOAD16_BYTE("jdsnd_u9.bin", 0xe00000, 0x080000, CRC(885b7c70) SHA1(be3bb42aeda3020a72c527f52c5330d0bafa9966))
-ROM_END
-
 ROM_START(jd_l6)
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("jd_l6.u6", 0x00000, 0x80000, CRC(0a74cba4) SHA1(1872fd86bbfa772eac9cc2ef2634a90b72b3d5e2))
@@ -913,7 +899,6 @@ GAME(1993,  ij_l4,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,
 GAME(1993,  ij_l3,      ij_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_ij,    ROT0,   "Williams",  "Indiana Jones (L-3)",                              MACHINE_MECHANICAL)
 GAME(1993,  jd_l7,      0,          wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-7)",                                MACHINE_MECHANICAL)
 GAME(1993,  jd_l1,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-1)",                                MACHINE_MECHANICAL)
-GAME(1993,  jd_l1d,     jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-1D)",                               MACHINE_MECHANICAL)
 GAME(1993,  jd_l6,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-6)",                                MACHINE_MECHANICAL)
 GAME(1993,  jd_l5,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-5)",                                MACHINE_MECHANICAL)
 GAME(1993,  jd_l4,      jd_l7,      wpc_dcs,    wpc_dcs, wpc_dcs_state, init_jd,    ROT0,   "Bally",     "Judge Dredd (L-4)",                                MACHINE_MECHANICAL)
