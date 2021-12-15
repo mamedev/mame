@@ -25164,14 +25164,13 @@ license:CC0
 		</part>
 	</software>
 
-<!-- FIXME: This game works, but it depends on RAM at byte 0x11 being non-zero at power-up -->
-	<software name="minnatab" supported="no">
-		<description>Minna no Taabou no Nakayoshi Daisakusen (Jpn)</description>
+	<software name="minnatab">
+		<description>Minna no Taabou no Nakayoshi Daisakusen (Japan)</description>
 		<year>1991</year>
 		<publisher>Character Soft</publisher>
 		<info name="serial" value="CTS-9N"/>
 		<info name="release" value="19911122"/>
-		<info name="alt_title" value="みんなのた坊のなかよし大作戦"/>
+		<info name="alt_title" value="みんなのたあ坊のなかよし大作戦"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
