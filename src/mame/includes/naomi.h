@@ -140,24 +140,27 @@ class atomiswave_state : public dc_state
 {
 public:
 	atomiswave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dc_state(mconfig, type, tag),
-		m_awflash(*this, "awflash")
+		: dc_state(mconfig, type, tag)
+		, m_awflash(*this, "awflash")
+		, m_exid(*this, "EXID")
 	   { }
 
 	void aw_base(machine_config &config);
 	void aw1c(machine_config &config);
 	void aw2c(machine_config &config);
+	void aw4c(machine_config &config);
 
 	void init_atomiswave();
 	void init_xtrmhnt2();
 
 private:
 	required_device<macronix_29l001mc_device> m_awflash;
+	optional_ioport m_exid;
 
 	uint64_t aw_flash_r(offs_t offset);
 	void aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t aw_modem_r(offs_t offset, uint64_t mem_mask = ~0);
-	void aw_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	uint32_t aw_modem_r(offs_t offset, uint32_t mem_mask = ~0);
+	void aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint64_t xtrmhnt2_hack_r();
 

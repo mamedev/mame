@@ -1942,44 +1942,38 @@ inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask,
 	return reg;
 }
 
-uint64_t atomiswave_state::aw_modem_r(offs_t offset, uint64_t mem_mask)
+uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 {
-	int reg;
-	uint64_t shift;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-
-	if (reg == 0x280/4)
+	switch(offset)
 	{
-	/*
-	         0x00600280 r  0000dcba
-	             a/b - 1P/2P coin inputs (JAMMA), active low
-	             c/d - 3P/4P coin inputs (EX. IO board), active low
+		/*
+			0x00600280 r  0000dcba
+			a/b - 1P/2P coin inputs (JAMMA), active low
+			c/d - 3P/4P coin inputs (EX. IO board), active low
 
-	             (ab == 0) -> BIOS skip RAM test
-	    */
-		return 0xffffffff00000000U | (ioport("COINS")->read() & 0x0F);
-	} else
-		if (reg == 0x284/4)
-			return 0xffffffff00000000U | aw_ctrl_type;
+			(ab == 0) -> BIOS skip RAM test
+		*/
+		case 0x280/4:
+			return (ioport("COINS")->read() & 0x0f);
+		case 0x284/4:
+			//return aw_ctrl_type;
+			return m_exid.read_safe(0xff);
+	}
 
-
-	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);
+	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+offset*4);
 	return 0;
 }
 
-void atomiswave_state::aw_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	int reg;
-	uint64_t shift;
-	uint32_t dat;
-
-	reg = decode_reg32_64(offset, mem_mask, &shift);
-	dat = (uint32_t)(data >> shift);
-	if (reg == 0x284/4)
+	switch(offset)
 	{
-		aw_ctrl_type = dat & 0xF0;
+		case 0x284/4:
+			// TODO: needed?
+			aw_ctrl_type = data & 0xf0;
+			break;
 	}
+
 	/*
 	        0x00600284 rw ddcc0000
 	            cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
@@ -1995,9 +1989,10 @@ void atomiswave_state::aw_modem_w(offs_t offset, uint64_t data, uint64_t mem_mas
 	            d - 2P coin lockout
 
 	        0x0060028C rw POUT CN304 (EX. IO board)
+				Same as above
 	*/
 
-	osd_printf_verbose("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
+	osd_printf_verbose("MODEM: [%08x] write %x to %x, mask %x\n", 0x600000+offset*4, data, offset, mem_mask);
 }
 
 void atomiswave_state::aw_map(address_map &map)
@@ -2014,7 +2009,7 @@ void atomiswave_state::aw_map(address_map &map)
 	map(0x005f7800, 0x005f78ff).rw(FUNC(atomiswave_state::dc_g2_ctrl_r), FUNC(atomiswave_state::dc_g2_ctrl_w));
 	map(0x005f7c00, 0x005f7cff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::pd_dma_map));
 	map(0x005f8000, 0x005f9fff).mirror(0x02000000).m(m_powervr2, FUNC(powervr2_device::ta_map));
-	map(0x00600000, 0x006007ff).rw(FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w));
+	map(0x00600000, 0x006007ff).rw(FUNC(atomiswave_state::aw_modem_r), FUNC(atomiswave_state::aw_modem_w)).umask64(0xffffffffffffffff);
 	map(0x00700000, 0x00707fff).rw(FUNC(atomiswave_state::dc_aica_reg_r), FUNC(atomiswave_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
 	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::soundram_r), FUNC(atomiswave_state::soundram_w));           // sound RAM (8 MB)
@@ -2925,6 +2920,58 @@ static INPUT_PORTS_START( aw2c )
 	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( aw4c )
+	PORT_INCLUDE( aw2c )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
+
+	PORT_START("EXID")
+	// return 0x0x for p3/p4 connectors to work properly
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3.0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+
+	PORT_START("P3.1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // IPT_SERVICE3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)
+
+	PORT_START("P4.0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+
+	PORT_START("P4.1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) //IPT_SERVICE4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
+INPUT_PORTS_END
+
 // Single-player wheel variant
 static INPUT_PORTS_START( aw1w )
 	PORT_START("P1.0")
@@ -3269,8 +3316,17 @@ void atomiswave_state::aw2c(machine_config &config)
 	dcctrl1.set_port_tags("P2.0", "P2.1", "P2.A0", "P2.A1", "P2.A2", "P2.A3", "P2.A4", "P2.A5");
 }
 
+void atomiswave_state::aw4c(machine_config &config)
+{
+	aw2c(config);
+	dc_controller_device &dcctrl2(DC_CONTROLLER(config, "dcctrl2", 0, m_maple, 2));
+	dcctrl2.set_port_tags("P3.0", "P3.1", "P3.A0", "P3.A1", "P3.A2", "P3.A3", "P3.A4", "P3.A5");
+	dc_controller_device &dcctrl3(DC_CONTROLLER(config, "dcctrl3", 0, m_maple, 3));
+	dcctrl3.set_port_tags("P4.0", "P4.1", "P4.A0", "P4.A1", "P4.A2", "P4.A3", "P4.A4", "P4.A5");
+}
+
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
+	ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
 
 /* BIOS info:
 
@@ -12158,7 +12214,7 @@ GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS )                                    // Jun 09 2003 10:20:37
 GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS)                                      // Jun 27 2003 09:00:03
 GAME( 2003, kov7sprt,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "IGS / Sammy",              "Knights of Valour - The Seven Spirits", GAME_FLAGS)             // Nov 24 2003 16:56:01
-GAME( 2004, ggisuka,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS)                                 // Jan 14 2004 10:04:24
+GAME( 2004, ggisuka,   awbios,   aw4c, aw4c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear Isuka", GAME_FLAGS)                                 // Jan 14 2004 10:04:24
 GAME( 2004, rumblefp,  rumblef,  aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish (prototype)", GAME_FLAGS)                       // Feb 20 2004 09:15:34
 GAME( 2004, rangrmsn,  awbios,   aw2c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "RIZ Inc./ Sammy",          "Ranger Mission", GAME_FLAGS )                                   // Mar 01 2004 19:08:15
 GAME( 2004, rumblef,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / Dimps",            "The Rumble Fish", GAME_FLAGS)                                   // Mar 10 2004 19:07:43
