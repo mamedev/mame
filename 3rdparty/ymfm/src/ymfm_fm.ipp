@@ -1540,8 +1540,7 @@ void fm_engine_base<RegisterType>::engine_mode_write(uint8_t data)
 		// load timers; note that timer B gets a small negative adjustment because
 		// the *16 multiplier is free-running, so the first tick of the clock
 		// is a bit shorter
-if (!m_timer_running[1]) printf("Delta %d\n", std::min(0, 2 - (m_total_clocks & 15)));
-		update_timer(1, m_regs.load_timer_b(), std::min(0, 2 - (m_total_clocks & 15)));
+		update_timer(1, m_regs.load_timer_b(), -(m_total_clocks & 15));
 		update_timer(0, m_regs.load_timer_a(), 0);
 	}
 }
