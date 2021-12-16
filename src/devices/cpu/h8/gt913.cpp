@@ -89,10 +89,10 @@ void gt913_device::device_add_mconfig(machine_config &config)
 	GT913_INTC(config, "intc");
 
 	GT913_SOUND(config, m_sound, DERIVED_CLOCK(1, 1));
-	m_sound->set_device_rom_tag(DEVICE_SELF);
+	m_sound->set_device_rom_tag(m_rom);
 
 	GT913_KBD_HLE(config, m_kbd, 0);
-	m_kbd->irq_cb().set([this](int val) { if (val) m_intc->internal_interrupt(5); });
+	m_kbd->irq_cb().set([this] (int val) { if (val) m_intc->internal_interrupt(5); });
 	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);
 	H8_SCI(config, m_sci, "intc", 8, 9, 10, 0);
 

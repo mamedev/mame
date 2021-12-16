@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2021-11-19 09:33+0800\n"
+"PO-Revision-Date: 2021-12-09 14:25+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -385,11 +385,11 @@ msgstr "顯示滑鼠指標"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "確認離開模擬"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "略過系統資訊畫面"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -573,7 +573,7 @@ msgstr "自然鍵盤"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Allow contradictory joystick inputs"
-msgstr ""
+msgstr "允許搖桿輸入的對立狀況"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
@@ -2170,6 +2170,8 @@ msgid ""
 "Auditing media for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"正在驗證供機台 %2$u 的 %3$u 媒體...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
 #, c-format
@@ -2187,12 +2189,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit media for %1$u machines marked unavailable"
-msgstr ""
+msgstr "驗證標記為不可用的 %1$u 機台媒體"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit media for all %1$u machines"
-msgstr ""
+msgstr "驗證所有 %1$u 機台的媒體"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
@@ -2580,7 +2582,7 @@ msgstr "磁帶控制"
 
 #: src/frontend/mame/ui/mainmenu.cpp:155
 msgid "Pseudo Terminals"
-msgstr ""
+msgstr "偽終端"
 
 #: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
@@ -3116,11 +3118,11 @@ msgstr "需要 CHD\t否\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "媒體驗證結果\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "媒體驗證結果\t錯誤\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Samples Audit Result\tNone Needed\n"
@@ -3139,6 +3141,8 @@ msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
+"媒體驗證\t停用\n"
+"樣本檔驗證\t停用\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:146
 msgid "Sound"
@@ -3376,7 +3380,7 @@ msgstr "P%1$u"
 #: src/emu/ioport.cpp:1924
 msgctxt "input-name"
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: src/emu/inpttype.ipp:22 src/emu/inpttype.ipp:140 src/emu/inpttype.ipp:221
 #: src/emu/inpttype.ipp:255 src/emu/inpttype.ipp:289 src/emu/inpttype.ipp:323
@@ -6107,43 +6111,5 @@ msgstr ""
 "輸入序列或按下 %s 取消\n"
 "%s"
 
-#~ msgid "Confirm quit from machines"
-#~ msgstr "確認離開機台"
-
-#~ msgid "Skip information screen at startup"
-#~ msgstr "略過起始的資訊畫面"
-
 #~ msgid "Skip software parts selection menu"
 #~ msgstr "略過軟體部分選擇選單"
-
-#~ msgid "Simultaneous contradictory"
-#~ msgstr "同時發生的對立狀況"
-
-#, c-format
-#~ msgid ""
-#~ "Auditing ROMs for machine %2$u of %3$u...\n"
-#~ "%1$s"
-#~ msgstr ""
-#~ "正在驗證供機台 %2$u 的 %3$u ROM 檔...\n"
-#~ "%1$s"
-
-#, c-format
-#~ msgid "Audit ROMs for %1$u machines marked unavailable"
-#~ msgstr "驗證標記為不可用的 %1$u 機台 ROM 檔"
-
-#, c-format
-#~ msgid "Audit ROMs for all %1$u machines"
-#~ msgstr "驗證所有 %1$u 機台的 ROM 檔"
-
-#~ msgid "ROM Audit Result\tOK\n"
-#~ msgstr "ROM 驗證結果\tOK\n"
-
-#~ msgid "ROM Audit Result\tBAD\n"
-#~ msgstr "ROM 驗證結果\t錯誤\n"
-
-#~ msgid ""
-#~ "ROM Audit \tDisabled\n"
-#~ "Samples Audit \tDisabled\n"
-#~ msgstr ""
-#~ "ROM 驗證 \t停用\n"
-#~ "樣本檔驗證 \t停用\n"
