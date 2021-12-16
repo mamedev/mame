@@ -4881,3 +4881,16 @@ if (MACHINES["NS32082"]~=null) then
 		MAME_DIR .. "src/devices/machine/ns32082.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/tsconfdma.h,MACHINES["TSCONF"] = true
+---------------------------------------------------
+if (MACHINES["TSCONF"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/tsconfdma.cpp",
+		MAME_DIR .. "src/devices/machine/tsconfdma.h",
+		MAME_DIR .. "src/devices/machine/pckeybrd.cpp",
+		MAME_DIR .. "src/devices/machine/pckeybrd.h",
+	}
+end

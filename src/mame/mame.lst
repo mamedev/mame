@@ -44052,6 +44052,9 @@ zx80                            // 1980 Sinclair ZX-80
 zx81                            // 1981 Sinclair ZX-81
 zx97                            //
 
+@source:tsconf.cpp
+tsconf                           // ZX Evolution - TS-Configuration
+
 @source:testpat.cpp
 tp1983
 tp1985
