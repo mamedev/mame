@@ -964,6 +964,18 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
+	<software name="pachinkop" cloneof="pachinko">
+		<description>Pachinko Hisshou Guide - Pocket Parlor (Jpn, prototype)</description>
+		<year>1999</year>
+		<publisher>Japan Vistec</publisher>
+		<info name="alt_title" value="パチンコ必勝ガイド ポケットパーラー" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="jv pachi.bin" size="1048576" crc="ccf07c2f" sha1="63fd9e4be7ba482e70fcafde6e50773046a5fe40" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Developer: Namco -->
 	<software name="pacman">
 		<description>Pac-Man (World)</description>
@@ -1541,6 +1553,19 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="snk vs. capcom - the match of the millennium (world) (en,ja).bin" size="4194304" crc="b173030a" sha1="7629ea5520d3daee4ef658d4f4b48f45e17217ae" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svct" cloneof="svc">
+		<!-- NGPC only -->
+		<description>Choujou Kessen Saikyou Fighters - SNK vs Capcom - Taikenban (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="頂上決戦 最強ファイターズ エス・エヌ・ケイ バーサス カプコン 体験版" />
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="svc f1 trial.bin" size="2097152" crc="1e19e307" sha1="ebdd4188d2fdfd0098d61913d234d2e23adaaf9d" />
 			</dataarea>
 		</part>
 	</software>
