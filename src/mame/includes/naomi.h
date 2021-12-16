@@ -151,7 +151,10 @@ public:
 	void aw4c(machine_config &config);
 
 	void init_atomiswave();
-	void init_xtrmhnt2();
+
+protected:
+	virtual void aw_map(address_map &map);
+	void aw_port(address_map &map);
 
 private:
 	required_device<macronix_29l001mc_device> m_awflash;
@@ -162,13 +165,22 @@ private:
 	uint32_t aw_modem_r(offs_t offset, uint32_t mem_mask = ~0);
 	void aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	uint64_t xtrmhnt2_hack_r();
-
-	void aw_map(address_map &map);
-	void aw_port(address_map &map);
-
 	uint8_t aw_ctrl_type;
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 };
+
+class atomiswave_xtrmhnt2_state : public atomiswave_state
+{
+public:
+	atomiswave_xtrmhnt2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atomiswave_state(mconfig, type, tag)
+	   { }
+
+protected:
+	virtual void aw_map(address_map &map) override;
+private:
+	uint64_t allnet_hack_r(offs_t offset, uint64_t mem_mask = ~0);
+};
+
 
 INPUT_PORTS_EXTERN( naomi_debug );

@@ -1942,20 +1942,24 @@ inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask,
 	return reg;
 }
 
+/*
+	0x00600280 r  0000dcba
+	a/b - 1P/2P coin inputs (JAMMA), active low
+	c/d - 3P/4P coin inputs (EX. IO board), active low
+
+	(ab == 0) -> BIOS skip RAM test
+*/
 uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
-		/*
-			0x00600280 r  0000dcba
-			a/b - 1P/2P coin inputs (JAMMA), active low
-			c/d - 3P/4P coin inputs (EX. IO board), active low
 
-			(ab == 0) -> BIOS skip RAM test
-		*/
 		case 0x280/4:
 			return (ioport("COINS")->read() & 0x0f);
 		case 0x284/4:
+			// CHECKME: any game that uses non-canonical input method should be checked from here
+			// TODO: blokpong purges the expected ID of 0x20 even if a mouse device is connected.
+			// Is it expecting to be p2 instead?
 			//return aw_ctrl_type;
 			return m_exid.read_safe(0xff);
 	}
@@ -1964,33 +1968,34 @@ uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 	return 0;
 }
 
+/*
+	0x00600284 rw ddcc0000
+		cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
+	0 - regular Atomiswave controller
+	1 - DC lightgun
+	2,3 - DC mouse/trackball
+
+	0x00600288 rw 0000dcba
+		a - 1P coin counter
+		b - 2P coin counter
+		c - 1P coin lockout
+		d - 2P coin lockout
+
+	0x0060028C rw POUT CN304 (EX. IO board)
+		counter/lockout for 3P/4P in ggisuka (same bit mapping as above)
+		dolphin known to read it too (verify)
+*/
 void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	switch(offset)
 	{
 		case 0x284/4:
-			// TODO: needed?
+			// TODO: what exactly this set up on an I/O IDentifier, pin direction?
 			aw_ctrl_type = data & 0xf0;
+			logerror("%s: write to ctrl port %02x %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 	}
 
-	/*
-	        0x00600284 rw ddcc0000
-	            cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
-	        0 - regular Atomiswave controller
-	        1 - DC lightgun
-	        2,3 - DC mouse/trackball
-	        TODO: hook this then MAME have such devices emulated
-
-	        0x00600288 rw 0000dcba
-	            a - 1P coin counter
-	            b - 2P coin counter
-	            c - 1P coin lockout
-	            d - 2P coin lockout
-
-	        0x0060028C rw POUT CN304 (EX. IO board)
-				Same as above
-	*/
 
 	osd_printf_verbose("MODEM: [%08x] write %x to %x, mask %x\n", 0x600000+offset*4, data, offset, mem_mask);
 }
@@ -2051,6 +2056,91 @@ void atomiswave_state::aw_map(address_map &map)
 void atomiswave_state::aw_port(address_map &map)
 {
 //  ???
+}
+
+/*
+ ALL.Net board
+ -------------
+ Block diagram:
+                       GPIO Port A - Jumpers, LEDs
+             PIC16     GPIO Port B - I2C EEPROM
+              |        |
+  G2 Bus <-> FPGA <-> SH-3 <-> Ethernet PHY <-> Ethernet
+                       |
+                       |--- boot flash ROM 4MB
+                       |--- SDRAM 8MB
+                       |--- data buffer flash ROM 16MB
+
+ SH-3 external address space
+  00000000 - 003fffff boot flash ROM (IC2)
+  0c000000 - 0c7fffff SDRAM
+  10000000 - 10ffffff data buffer flash ROM (IC4)
+  16000000 rw FPGA_INT_OUT  interrupt to host, bit 0 active low
+  16000004 rw FPGA_INT_IN   interrupt from host (SH-3 IRQ0 line), bit 0 active low
+  16000008 rw FPGA_INT_MASK enable interrupt from host, bit 0 active low
+  1600000c rw FPGA_READY    bit 0 active high
+  16000010 r  FPGA_REVISION 8bit value
+  16002000 - 16007fff shared RAM (FPGA internal)
+
+ SH-3 GPIO PortA bits
+  2-3 - jumpers x2 (inputs, active low)
+  4-7 - LEDs x4 (outputs, active low)
+
+ SH-3 GPIO PortB bits (24LC024 I2C EEPROM)
+  0 - I2C SCL
+  6 - unknown, set to output 1
+  7 - I2C SDA
+
+ SH-4 address space
+  01000000 r  ID "G2IFSOJ AM"
+  01000020  w interrupt to net board, bit 0 active low
+  01000024  w interrupt from net board (HOLLY EXT IRQ line), bit 0 active low
+  01000028  w enable interrupt from net board, bit 0 active low
+  0100002c  w net board reset?, bit 0 active high
+  01000030 r  FPGA_READY?
+  01000100 - 01000114 protection registers, probably mirror of 010000xx
+  01000400/01000800/01001400/01001800 r at POST, tries to read these, discards the other three values and put the result to 0xc00efc8, expecting a value to "SPAG" / 0x53504147 for a flag at PC=cf1a108, connection handshake related?
+  01010000 - 01016000 shared RAM (FPGA internal)
+
+  protection registers (16bit):
+  00-09 r  ID mirror? (unused)
+  0a    r  some ID? value (unused)
+  0c     w RNG seed?, game write here random value during init
+  0e     w data offset/index (0-3 in xtrmhnt2)
+  10    r  data read, xtrmhnt2 expecting: 1f9f, 1f03, 1f1c, 1f57
+  12    rw control reg?, write 0001 after offset set, wait for bit1=1 before data read
+  14    rw PIC detect/init reg, game check if bit0=1 (probably means if PIC present), then write RNG register, then write 0003, then wait for bit2=1 (probably means PIC initialised OK)
+*/
+
+uint64_t atomiswave_xtrmhnt2_state::allnet_hack_r(offs_t offset, uint64_t mem_mask)
+{
+	// disable ALL.Net board check
+	// PC checks refers to -nodrc || -drc || -drc -debug
+	logerror("%s: ALL.net check %x (%x)\n", machine().describe_context(), offset * 8, mem_mask);
+	// "100 NETBD NOT RESPOND" right off the bat
+	if (m_maincpu->pc() == 0xc03cb30 ||
+	    m_maincpu->pc() == 0xc03cb10 ||
+		m_maincpu->pc() == 0xc03cb2e)
+	{
+		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
+		dc_ram[0x358e2/8] |= (uint64_t)0x200 << 16;
+		dc_ram[0x38bb2/8] |= (uint64_t)0x200 << 16;
+		dc_ram[0x38bee/8] |= (uint64_t)0x200 << 48;
+	}
+	// "ERROR: THIS IS NOT ACCEPTABLE BY MAIN BOARD"
+	if (m_maincpu->pc() == 0xc108240 ||
+	    m_maincpu->pc() == 0xc108210 ||
+		m_maincpu->pc() == 0xc10823e)
+		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & 0xffffffffffff0000U) | (uint64_t)0x0009;
+	return 0;
+}
+
+void atomiswave_xtrmhnt2_state::aw_map(address_map &map)
+{
+	atomiswave_state::aw_map(map);
+	// ALL.net
+	map(0x01000000, 0x0100011f).r(FUNC(atomiswave_xtrmhnt2_state::allnet_hack_r));
+//	map(0x01001800, 0x01001803).lr32(NAME([]() -> u32 { return 0x53504147; }));
 }
 
 void dc_state::dc_audio_map(address_map &map)
@@ -11119,80 +11209,6 @@ void atomiswave_state::init_atomiswave()
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
 }
 
-/*
- ALL.Net board
- -------------
- Block diagram:
-                       GPIO Port A - Jumpers, LEDs
-             PIC16     GPIO Port B - I2C EEPROM
-              |        |
-  G2 Bus <-> FPGA <-> SH-3 <-> Ethernet PHY <-> Ethernet
-                       |
-                       |--- boot flash ROM 4MB
-                       |--- SDRAM 8MB
-                       |--- data buffer flash ROM 16MB
-
- SH-3 external address space
-  00000000 - 003fffff boot flash ROM (IC2)
-  0c000000 - 0c7fffff SDRAM
-  10000000 - 10ffffff data buffer flash ROM (IC4)
-  16000000 rw FPGA_INT_OUT  interrupt to host, bit 0 active low
-  16000004 rw FPGA_INT_IN   interrupt from host (SH-3 IRQ0 line), bit 0 active low
-  16000008 rw FPGA_INT_MASK enable interrupt from host, bit 0 active low
-  1600000c rw FPGA_READY    bit 0 active high
-  16000010 r  FPGA_REVISION 8bit value
-  16002000 - 16007fff shared RAM (FPGA internal)
-
- SH-3 GPIO PortA bits
-  2-3 - jumpers x2 (inputs, active low)
-  4-7 - LEDs x4 (outputs, active low)
-
- SH-3 GPIO PortB bits (24LC024 I2C EEPROM)
-  0 - I2C SCL
-  6 - unknown, set to output 1
-  7 - I2C SDA
-
- SH-4 address space
-  01000000 r  ID "G2IFSOJ AM"
-  01000020  w interrupt to net board, bit 0 active low
-  01000024  w interrupt from net board (HOLLY EXT IRQ line), bit 0 active low
-  01000028  w enable interrupt from net board, bit 0 active low
-  0100002c  w net board reset?, bit 0 active high
-  01000030 r  FPGA_READY?
-  01000100 - 01000114 protection registers, probably mirror of 010000xx
-  01010000 - 01016000 shared RAM (FPGA internal)
-
-  protection registers (16bit):
-  00-09 r  ID mirror? (unused)
-  0a    r  some ID? value (unused)
-  0c     w RNG seed?, game write here random value during init
-  0e     w data offset/index (0-3 in xtrmhnt2)
-  10    r  data read, xtrmhnt2 expecting: 1f9f, 1f03, 1f1c, 1f57
-  12    rw control reg?, write 0001 after offset set, wait for bit1=1 before data read
-  14    rw PIC detect/init reg, game check if bit0=1 (probably means if PIC present), then write RNG register, then write 0003, then wait for bit2=1 (probably means PIC initialised OK)
-*/
-
-uint64_t atomiswave_state::xtrmhnt2_hack_r()
-{
-	// disable ALL.Net board check
-	if (m_maincpu->pc() == 0xc03cb30)
-	{
-		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
-		dc_ram[0x358e2/8] |= (uint64_t)0x200 << 16;
-		dc_ram[0x38bb2/8] |= (uint64_t)0x200 << 16;
-		dc_ram[0x38bee/8] |= (uint64_t)0x200 << 48;
-	}
-	if (m_maincpu->pc() == 0xc108240)
-		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & 0xffffffffffff0000U) | (uint64_t)0x0009;
-	return 0;
-}
-
-void atomiswave_state::init_xtrmhnt2()
-{
-	init_atomiswave();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64smo_delegate(*this, FUNC(atomiswave_state::xtrmhnt2_hack_r)));
-}
-
 ROM_START( fotns )
 	AW_BIOS
 
@@ -12236,7 +12252,7 @@ GAME( 2005, samsptk,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, 
 GAME( 2005, kofxi,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy / SNK Playmore",     "The King of Fighters XI", GAME_FLAGS )                          // Aug 07 2005 18:11:25
 GAME( 2005, fotns,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sega",  "Fist Of The North Star / Hokuto no Ken", GAME_FLAGS )           // Nov 28 2005 21:04:40
 GAME( 2006, mslug6,    awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega / SNK Playmore",      "Metal Slug 6", GAME_FLAGS)                                      // Jan 13 2006 00:49:12
-GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_state, init_xtrmhnt2,   ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS )                                // May 26 2006 14:03:22
+GAME( 2006, xtrmhnt2,  awbios,   aw2c, aw2c, atomiswave_xtrmhnt2_state, init_atomiswave, ROT0,   "Sega",                     "Extreme Hunting 2", GAME_FLAGS | MACHINE_UNEMULATED_PROTECTION )                                // May 26 2006 14:03:22
 GAME( 2006, dirtypig,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dirty Pigskin Football", GAME_FLAGS)                            // Sep 10 2006 20:24:14
 GAME( 2008, claychal,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega",                     "Sega Clay Challenge", GAME_FLAGS )                              // Oct 15 2008 16:08:20
 GAME( 2009, basschalo, basschal, aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sega",                     "Sega Bass Fishing Challenge", GAME_FLAGS )                      // Feb 08 2009 22:35:34
