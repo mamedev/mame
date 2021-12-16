@@ -48,7 +48,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	// TODO
 	void do_sprite_dma(uint32_t len);
 
 	uint16_t m_video_regs[0x100];
