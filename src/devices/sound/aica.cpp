@@ -918,7 +918,12 @@ void aica_device::w16(u32 addr,u16 val)
 		else if (addr < 0x3300)
 			*((u16 *)(m_DSP.MADRS+(addr - 0x3200) / 2)) = val;
 		else if (addr < 0x3400)
-			popmessage("AICADSP write to undocumented reg %04x -> %04x", addr, val);
+		{
+			// 3300-fc zapped along with the full 0x3000-0x3bfc range,
+			// most likely done by the SDK for convenience in resetting DSP in one go.
+			if (val)
+				logerror("%s: AICADSP write to undocumented reg %04x -> %04x\n", machine().describe_context(), addr, val);
+		}
 		else if (addr < 0x3c00)
 		{
 			*((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2)) = val;
@@ -1001,7 +1006,9 @@ u16 aica_device::r16(u32 addr)
 		else if (addr < 0x3300)
 			v= *((u16 *)(m_DSP.MADRS+(addr - 0x3200) / 2));
 		else if (addr < 0x3400)
-			popmessage("AICADSP read undocumented reg %04x", addr);
+		{
+			//logerror("%s: AICADSP read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x3c00)
 			v= *((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2));
 		else if (addr < 0x4000)

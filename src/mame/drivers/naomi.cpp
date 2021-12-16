@@ -1953,7 +1953,6 @@ uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 {
 	switch(offset)
 	{
-
 		case 0x280/4:
 			return (ioport("COINS")->read() & 0x0f);
 		case 0x284/4:
@@ -1991,11 +1990,11 @@ void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	{
 		case 0x284/4:
 			// TODO: what exactly this set up on an I/O IDentifier, pin direction?
+			// written by xtrmhnt2
 			aw_ctrl_type = data & 0xf0;
 			logerror("%s: write to ctrl port %02x %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 	}
-
 
 	osd_printf_verbose("MODEM: [%08x] write %x to %x, mask %x\n", 0x600000+offset*4, data, offset, mem_mask);
 }
