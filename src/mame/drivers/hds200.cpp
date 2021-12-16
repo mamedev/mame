@@ -20,10 +20,10 @@
     - XTAL 22.680 MHz and 35.640 MHz (video)
 
     TODO:
-    - SCN2674 hookup
+    - Fix SCN2674/Z80DMA hookup
     - Keyboard
-    - RS232 ports
-    - Sound? (if supported)
+    - RS232 control lines
+    - Sound? (on keyboard?)
 
     Notes:
     - The PCB has a large unpopulated area. Possibly this is used for the
@@ -38,6 +38,7 @@
 #include "machine/nvram.h"
 #include "machine/z80dma.h"
 #include "video/scn2674.h"
+#include "bus/rs232/rs232.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -243,6 +244,7 @@ void hds200_state::machine_reset()
 	m_nmi_enabled = false;
 	m_rombank->set_entry(0);
 
+	// no duart irq active
 	m_duart[0]->ip4_w(1);
 }
 
@@ -257,8 +259,8 @@ void hds200_state::hds200(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &hds200_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &hds200_state::io_map);
 
-	input_merger_device &irqs(INPUT_MERGER_ANY_HIGH(config, "irqs"));
-	irqs.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	input_merger_device &z80_irq(INPUT_MERGER_ANY_HIGH(config, "z80_irq"));
+	z80_irq.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -277,7 +279,7 @@ void hds200_state::hds200(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 
 	SCN2674(config, m_avdc, 22.680_MHz_XTAL / 9);
-	m_avdc->intr_callback().set("irqs", FUNC(input_merger_device::in_w<0>));
+	m_avdc->intr_callback().set("z80_irq", FUNC(input_merger_device::in_w<0>));
 	m_avdc->mbc_callback().set(FUNC(hds200_state::nmi_w));
 	m_avdc->set_addrmap(0, &hds200_state::charram_map);
 	m_avdc->set_addrmap(1, &hds200_state::attrram_map);
@@ -285,13 +287,32 @@ void hds200_state::hds200(machine_config &config)
 	m_avdc->set_screen("screen");
 	m_avdc->set_display_callback(FUNC(hds200_state::draw_character));
 
+	input_merger_device &duart_irq(INPUT_MERGER_ANY_HIGH(config, "duart_irq"));
+	duart_irq.output_handler().set("z80_irq", FUNC(input_merger_device::in_w<1>));
+	duart_irq.output_handler().append(m_duart[0], FUNC(scn2681_device::ip4_w)).invert();
+
 	SCN2681(config, m_duart[0], 3.6864_MHz_XTAL);
-	m_duart[0]->irq_cb().set("irqs", FUNC(input_merger_device::in_w<1>));
+	m_duart[0]->irq_cb().set("duart_irq", FUNC(input_merger_device::in_w<0>));
 	m_duart[0]->outport_cb().set(FUNC(hds200_state::duart0_out_w));
+	m_duart[0]->a_tx_cb().set("line1", FUNC(rs232_port_device::write_txd));
+	m_duart[0]->b_tx_cb().set("line2", FUNC(rs232_port_device::write_txd));
 
 	SCN2681(config, m_duart[1], 3.6864_MHz_XTAL);
-	m_duart[1]->irq_cb().set("irqs", FUNC(input_merger_device::in_w<2>));
+	m_duart[1]->irq_cb().set("duart_irq", FUNC(input_merger_device::in_w<1>));
 	m_duart[1]->outport_cb().set(FUNC(hds200_state::duart1_out_w));
+	m_duart[1]->a_tx_cb().set("line3", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232_line1(RS232_PORT(config, "line1", default_rs232_devices, nullptr));
+	rs232_line1.rxd_handler().set(m_duart[0], FUNC(scn2681_device::rx_a_w));
+	rs232_line1.cts_handler().set(m_duart[0], FUNC(scn2681_device::ip0_w));
+
+	rs232_port_device &rs232_line2(RS232_PORT(config, "line2", default_rs232_devices, nullptr));
+	rs232_line2.rxd_handler().set(m_duart[0], FUNC(scn2681_device::rx_b_w));
+	rs232_line2.cts_handler().set(m_duart[0], FUNC(scn2681_device::ip1_w));
+
+	rs232_port_device &rs232_line3(RS232_PORT(config, "line3", default_rs232_devices, nullptr));
+	rs232_line3.rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_a_w));
+	rs232_line3.cts_handler().set(m_duart[1], FUNC(scn2681_device::ip0_w));
 }
 
 
