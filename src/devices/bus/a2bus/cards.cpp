@@ -42,6 +42,7 @@
 #include "bus/a2bus/computereyes2.h"
 #include "bus/a2bus/ccs7710.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/grafex.h"
 #include "bus/a2bus/grappler.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
@@ -136,6 +137,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("booti", A2BUS_BOOTI);				   /* Booti Card */
 	device.option_add("q68", A2BUS_Q68);					   /* Stellation Q68 68000 card */
 	device.option_add("q68plus", A2BUS_Q68PLUS);			   /* Stellation Q68 Plus 68000 card */
+	device.option_add("grafex", A2BUS_GRAFEX);				   /* Grafex card (uPD7220 graphics) */
 }
 
 void apple2e_cards(device_slot_interface &device)
@@ -211,6 +213,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("q68", A2BUS_Q68);					   /* Stellation Q68 68000 card */
 	device.option_add("q68plus", A2BUS_Q68PLUS);			   /* Stellation Q68 Plus 68000 card */
 	device.option_add("a2sd", A2BUS_A2SD);					   /* Florian Reitz AppleIISD */
+	device.option_add("grafex", A2BUS_GRAFEX);				   /* Grafex card (uPD7220 graphics) */
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -280,6 +283,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("lancegs", A2BUS_LANCEGS);			   /* ///SHH SYSTEME LANceGS Card */
 	device.option_add("q68", A2BUS_Q68);					   /* Stellation Q68 68000 card */
 	device.option_add("q68plus", A2BUS_Q68PLUS);			   /* Stellation Q68 Plus 68000 card */
+	device.option_add("grafex", A2BUS_GRAFEX);				   /* Grafex card (uPD7220 graphics) */
 }
 
 void apple3_cards(device_slot_interface &device)
@@ -293,4 +297,5 @@ void apple3_cards(device_slot_interface &device)
 	device.option_add("titan3plus2", A2BUS_TITAN3PLUS2);   // Titan /// Plus 2 card
 	device.option_add("mockingboard", A2BUS_MOCKINGBOARD); // Sweet Micro Systems Mockingboard (experimental on ///)
 	device.option_add("softcard3", A2BUS_SOFTCARD3);	   // Microsoft SoftCard ///
+	device.option_add("grafex", A2BUS_GRAFEX);			   /* Grafex card (uPD7220 graphics) */
 }
