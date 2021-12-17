@@ -462,7 +462,7 @@ INPUT_PORTS_END
 void cv1k_state::machine_reset()
 {
 	m_blitter->set_rambase(reinterpret_cast<uint16_t *>(m_ram.target()));
-	m_blitter->set_is_unsafe(machine().root_device().ioport(":BLITCFG")->read());
+	m_blitter->set_is_unsafe(ioport("BLITCFG")->read());
 	m_blitter->install_handlers( 0x18000000, 0x18000057 );
 	m_blitter->reset();
 }
