@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
 
+#include "emu.h"
 #include "includes/tsconf.h"
 
 #define W0_RAM (BIT(MEM_CONFIG, 3))

@@ -1,72 +1,73 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
 /***************************************************************************
- * 
- * TS-Configuration (ZX Evolution) machine driver.
- * Implementation: Revision C / 5-bit VDAC
- *
- * Hobby computer ZX Evolution is Spectrum-compatible with extensions.
- * 
- * Hardware (ZX Evolution):
- * - Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait circles)/ 14 MHz (mega turbo with CPU wait circles);
- * - 4 Mb RAM, 512Kb ROM;
- * - MiniITX board (172x170mm), 2 ZXBUS slots, power ATX or +5,+12V;
- * - Based on fpga (Altera EP1K50);
- * - Peripheral MCU ATMEGA128;
- * - PS/2 keyboard and mouse support;
- * - Floppy (WDC1793) Beta-disk compatible interface, IDE (one channel, up to 2 devices on master/slave mode), SD(HC) card, RS232;
- * - Sound: AY, Beeper, Covox (PWM);
- * - Real-time clock.
- * 
- * Features (TS-Configuration):
- * - Resolutions: 360x288, 320x240, 320x200, 256x192
- * - Hardware scrolled graphic planes
- * - 256 and 16 indexed colors per pixel
- * - Programmable color RAM with RGB555 color space and 256 cells
- * - Text mode with loadable font and hardware vertical scroll
- * - Up to 256 graphic screens
- * 
- * - Up to 85 sprites per line
- * - Sprites sized from 8x8 to 64x64 pixels
- * - Up to 3 sprite planes
- * - Up to 2 tile planes with 8x8 pixels tiles
- * - Up to 16 palettes for sprites per line
- * - Up to 4 palettes for tiles per line for each tile plane
- * 
- * - DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
- * 
- * Refs:
- *   ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
- *  TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
- *          https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
- * FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
- *     ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
- * 
- * HowTo:
- * # Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
- * # Create SD image "wc.img"
- * # Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
- * # Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
- * $ chdman createhd -i wc.img -o wc.chd -c none
- * $ mame tsconf -hard wc.chd
- * # BIOS Setup loads on fresh setup (return to BIOS: RShift+F3)
- * # Change "Reset To: BD boot.$c"
- * # Reset (F3)
- * # Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
- * 
- * TODO:
- * - Interrupts
- * - Sprites
- * - Sound
- * - ZX-Mode locks
- * - CPU frequency
- * - Timings
- * - Ram cache
- * - VDos
- * - Many more...
- * 
+  
+  TS-Configuration (ZX Evolution) machine driver.
+  Implementation: Revision C / 5-bit VDAC
+
+  Hobby computer ZX Evolution is Spectrum-compatible with extensions.
+
+  Hardware (ZX Evolution):
+  - Z80 3.5 MHz (classic mode)/ 7 MHz (turbo mode without CPU wait circles)/ 14 MHz (mega turbo with CPU wait circles);
+  - 4 Mb RAM, 512Kb ROM;
+  - MiniITX board (172x170mm), 2 ZXBUS slots, power ATX or +5,+12V;
+  - Based on fpga (Altera EP1K50);
+  - Peripheral MCU ATMEGA128;
+  - PS/2 keyboard and mouse support;
+  - Floppy (WDC1793) Beta-disk compatible interface, IDE (one channel, up to 2 devices on master/slave mode), SD(HC) card, RS232;
+  - Sound: AY, Beeper, Covox (PWM);
+  - Real-time clock.
+  
+  Features (TS-Configuration):
+  - Resolutions: 360x288, 320x240, 320x200, 256x192
+  - Hardware scrolled graphic planes
+  - 256 and 16 indexed colors per pixel
+  - Programmable color RAM with RGB555 color space and 256 cells
+  - Text mode with loadable font and hardware vertical scroll
+  - Up to 256 graphic screens
+  
+  - Up to 85 sprites per line
+  - Sprites sized from 8x8 to 64x64 pixels
+  - Up to 3 sprite planes
+  - Up to 2 tile planes with 8x8 pixels tiles
+  - Up to 16 palettes for sprites per line
+  - Up to 4 palettes for tiles per line for each tile plane
+  
+  - DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
+  
+  Refs:
+    ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
+   TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
+           https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
+  FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
+      ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
+  
+  HowTo:
+  # Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
+  # Create SD image "wc.img"
+  # Copy WC files from archive https://github.com/tslabs/zx-evo/blob/master/pentevo/soft/WC/wc.zip
+  # Tech Demos (currently *.spg only): http://prods.tslabs.info/index.php?t=4
+  $ chdman createhd -i wc.img -o wc.chd -c none
+  $ mame tsconf -hard wc.chd
+  # BIOS Setup loads on fresh setup (return to BIOS: RShift+F3)
+  # Change "Reset To: BD boot.$c"
+  # Reset (F3)
+  # Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
+  
+  TODO:
+  - Interrupts
+  - Sprites
+  - Sound
+  - ZX-Mode locks
+  - CPU frequency
+  - Timings
+  - Ram cache
+  - VDos
+  - Many more...
+  
  ****************************************************************************/
 
+#include "emu.h"
 #include "includes/tsconf.h"
 
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
@@ -109,16 +110,16 @@ void tsconf_state::tsconf_mem(address_map &map)
 void tsconf_state::tsconf_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x0000).w(FUNC(tsconf_state::tsconf_port_7ffd_w)).mirror(0x7ffd);
-	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
-	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
-	map(0x0057, 0x0057).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)).mirror(0xff00); // spi config
-	map(0x0077, 0x0077).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)).mirror(0xff00); // spi data
-	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
-	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(FUNC(tsconf_state::spectrum_port_fe_r), FUNC(tsconf_state::spectrum_port_fe_w)).select(0xff00);
-	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x00af, 0x00af).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w)).select(0xff00);
+	map(0x0000, 0x0000).mirror(0x7ffd).w(FUNC(tsconf_state::tsconf_port_7ffd_w));
+	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	map(0x0057, 0x0057).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
+	map(0x0077, 0x0077).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
+	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_port_fe_r), FUNC(tsconf_state::spectrum_port_fe_w));
+	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
+	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
 	map(0x8ff7, 0x8ff7).w(FUNC(tsconf_state::tsconf_port_f7_cmos_w)).select(0x7000); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_cmos_r));
 }

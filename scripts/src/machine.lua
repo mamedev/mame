@@ -4890,7 +4890,5 @@ if (MACHINES["TSCONF"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tsconfdma.cpp",
 		MAME_DIR .. "src/devices/machine/tsconfdma.h",
-		MAME_DIR .. "src/devices/machine/pckeybrd.cpp",
-		MAME_DIR .. "src/devices/machine/pckeybrd.h",
 	}
 end

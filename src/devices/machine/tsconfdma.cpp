@@ -21,11 +21,11 @@
 DEFINE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device, "tsconfdma", "TS-Conf DMA Controller")
 
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : device_t(mconfig, TSCONF_DMA, tag, owner, clock)
-    , m_in_mreq_cb(*this)
-    , m_out_mreq_cb(*this)
-    , m_in_mspi_cb(*this)
-    , m_out_cram_cb(*this)
+    : device_t(mconfig, TSCONF_DMA, tag, owner, clock),
+      m_in_mreq_cb(*this),
+      m_out_mreq_cb(*this),
+      m_in_mspi_cb(*this),
+      m_out_cram_cb(*this)
 {
 }
 
@@ -110,10 +110,10 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
     m_ready = false;
     m_align = align_opt ? 512 : 256;
 
-    // TODO Transfers 2 byte/cyrcle at 7MHz
-    if (dev == 0b0001)
-    // Mem -> Mem
+    // TODO Transfers 2 byte/cycle at 7MHz
+    switch (dev)
     {
+    case 0b0001: // Mem -> Mem
         for (u16 block = 0; block <= m_block_num; block++)
         {
             auto s_addr = m_address_s;
@@ -127,10 +127,9 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
             m_address_s = s_align ? (m_address_s + m_align) : s_addr;
             m_address_d = d_align ? (m_address_d + m_align) : d_addr;
         }
-    }
-    else if (dev == 0b0010)
-    // SPI -> Mem
-    {
+        break;
+
+    case 0b0010: // SPI -> Mem
         for (u16 block = 0; block <= m_block_num; block++)
         {
             auto d_addr = m_address_d;
@@ -141,10 +140,9 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
             }
             m_address_d = d_align ? (m_address_d + m_align) : d_addr;
         }
-    }
-    else if (dev == 0b0100)
-    // Fill
-    {
+        break;
+
+    case 0b0100: // Fill
         for (u16 block = 0; block <= m_block_num; block++)
         {
             u16 data = m_in_mreq_cb(m_address_s);
@@ -156,10 +154,9 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
             }
             m_address_d = d_align ? (m_address_d + m_align) : d_addr;
         }
-    }
-    else if (dev == 0b1100)
-    // RAM -> CRAM
-    {
+        break;
+
+    case 0b1100: // RAM -> CRAM
         for (u16 block = 0; block <= m_block_num; block++)
         {
             auto s_addr = m_address_s;
@@ -173,10 +170,11 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
             m_address_s = s_align ? (m_address_s + m_align) : s_addr;
             m_address_d = d_align ? (m_address_d + m_align) : d_addr;
         }
-    }
-    else
-    {
+        break;
+
+    default:
         LOGDMA("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", dev, m_address_s, m_block_len, m_block_num, m_address_d);
+        break;
     }
 
     m_ready = true;

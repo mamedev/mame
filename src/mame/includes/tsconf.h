@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include "machine/beta.h"
 #include "machine/spi_sdcard.h"
 #include "spectrum.h"
