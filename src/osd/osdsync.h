@@ -159,8 +159,8 @@ public:
 private:
 	std::mutex               m_mutex;
 	std::condition_variable  m_cond;
-	std::atomic<int32_t>       m_autoreset;
-	std::atomic<int32_t>       m_signalled;
+	int32_t                  m_autoreset;
+	int32_t                  m_signalled;
 
 };
 
