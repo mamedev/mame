@@ -108,7 +108,6 @@ static const nes_pcb pcb_list[] =
 	{ "cne_shlz",         CNE_SHLZ },
 	{ "cocoma",           COCOMA_BOARD },
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
-	{ "ntdec_2746",       NTDEC_2746 },
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
 	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
