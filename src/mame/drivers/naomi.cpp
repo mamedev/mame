@@ -34,6 +34,8 @@ QA Notes (Update December 2021):
 	- Some SH to ARM sound streaming doesn't work (used by ADX compression system)
 	  Anything that drops the logo it's bound to eventually crash/hang if using a loop.
 	  Is it a regression even? sfz3ugd and trizeal were logged as "playable" back in 2009 ...
+    - marstv: Oddly enough, intro/game select hangs for a long time on line dispatches,
+	          eventually draws a bunch of white overline chars (?)
 
 TODO (legacy, to be removed):
     - Boots and accepts coin, but won't accept start button
@@ -64,7 +66,6 @@ TODO (game-specific):
     - Giant Gram 2: no VMU emulation;
     - Gun Survivor 2: crashes during game loading;
     - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-    - marstv: missing graphics at stage select, renderer fault or something else?
     - monkeyba: CPU jumps to la la land when attempts to load a stage (bp c09e950, uses FPU opcodes for calculating the return address?);
     - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
     - OutTrigger: crashes on naomibd_r();
@@ -12143,7 +12144,7 @@ ROM_END
 /* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Success",      "Tetris Kiwamemichi (Japan) (GDL-0020)", GAME_FLAGS )
 /* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami no Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
-/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND  )
+/* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS |MACHINE_IMPERFECT_SOUND )
 // 0023  Border Down (GDL-0023)
 /* 0023A */ GAME( 2003, bdrdown,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Border Down (Rev A) (GDL-0023A)", GAME_FLAGS )
 /* 0024  */ GAME( 2003, psyvar2,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Success",      "Psyvariar 2 - The Will To Fabricate (Japan) (GDL-0024)", GAME_FLAGS )
@@ -12210,7 +12211,7 @@ GAME( 2001, awbios,    0,        aw2c, aw2c, atomiswave_state, init_atomiswave, 
 																																									// game "exe" build timestamps, shown in SYSTEM MENU -> TEST MODE
 GAME( 2003, ggx15,     awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Arc System Works / Sammy", "Guilty Gear X ver. 1.5", GAME_FLAGS)                            // none
 GAME( 2003, sprtshot,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy USA",                "Sports Shooting USA", GAME_FLAGS )                              // May 02 2003 09:40:31
-GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Sushi Bar", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )// May 23 2003 14:40:15
+GAME( 2003, sushibar,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Sushi Bar", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )// May 23 2003 14:40:15
 GAME( 2003, demofist,  awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Polygon Magic / Dimps",    "Demolish Fist", GAME_FLAGS )                                    // Jun 02 2003 16:45:35
 GAME( 2003, maxspeed,  awbios,   aw1c, aw1w, atomiswave_state, init_atomiswave, ROT0,   "SIMS / Sammy",             "Maximum Speed", GAME_FLAGS )                                    // Jun 09 2003 10:20:37
 GAME( 2003, dolphin,   awbios,   aw2c, aw2c, atomiswave_state, init_atomiswave, ROT0,   "Sammy",                    "Dolphin Blue", GAME_FLAGS)                                      // Jun 27 2003 09:00:03
