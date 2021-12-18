@@ -90,11 +90,11 @@
 #define T1_Y_OFFSER_L REG(0x46)
 #define T1_Y_OFFSER_H REG(0x47)
 
-static constexpr rgb_t rgb15(u16 rgb)
+static constexpr rgb_t from_rgb15(rgb15_t rgb15)
 {
-	u8 r = (BIT(rgb, 10, 5) << 3) | 0x07;
-	u8 g = (BIT(rgb, 5, 5) << 3) | 0x07;
-	u8 b = (BIT(rgb, 0, 5) << 3) | 0x07;
+	u8 r = BIT(rgb15, 10, 5) << 3;
+	u8 g = BIT(rgb15, 5, 5) << 3;
+	u8 b = BIT(rgb15, 0, 5) << 3;
 	return rgb_t(r, g, b);
 }
 
@@ -108,6 +108,7 @@ public:
 		  m_beta(*this, BETA_DISK_TAG),
 		  m_sdcard(*this, "sdcard"),
 		  m_dma(*this, "dma"), m_cmos(*this, "cmos"), m_glukrs(*this, "glukrs"),
+		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
 		  m_cram(*this, "cram")
 	{
@@ -123,7 +124,7 @@ protected:
 private:
 	DECLARE_VIDEO_START(tsconf);
 
-	enum gluk_ext
+	enum gluk_ext : u8
 	{
 		CONF_VERSION = 0x00,
 		BOOTLOADER_VERSION = 0x01,
@@ -136,6 +137,7 @@ private:
 	};
 
 	void tsconf_port_7ffd_w(u8 data);
+	void tsconf_port_fe_w(offs_t offset, u8 data);
 
 	u8 tsconf_port_xxaf_r(offs_t reg);
 	void tsconf_port_xxaf_w(offs_t reg, u8 data);
@@ -180,6 +182,7 @@ private:
 	gluk_ext m_gluk_ext;
 	u8 m_gluk_reg;
 
+	optional_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_ts_tilemap[3];
 	required_device<ram_device> m_cram;

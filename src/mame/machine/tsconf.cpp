@@ -86,16 +86,6 @@ void tsconf_state::tsconf_update_video_mode()
 	}
 
 	m_screen->configure(resolution.width(), resolution.height(), resolution, HZ_TO_ATTOSECONDS(50));
-
-	// Copy 0xf0 palette to 0x00 for ZX mode
-	u16 palette0_base = VM == VM_ZX ? (0xf0 << 1) : 0x00;
-	for (u8 pen = 0; pen < 16; pen++)
-	{
-		rgb_t rgb = rgb15((m_cram->read(palette0_base + pen * 2 + 1) << 8 | m_cram->read(palette0_base + pen * 2)));
-		subdevice<palette_device>("palette")->set_pen_color(pen, rgb);
-	}
-
-	m_screen->update_now();
 }
 
 uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -107,6 +97,16 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 		{
 			if (VM == VM_ZX)
 			{
+				// Zx palette is stored at 0xf0. Adjust bitmaps colors.
+				for (auto y = cliprect.top(); y <= cliprect.bottom(); y++)
+				{
+					u16 *bm = &m_screen_bitmap.pix(y, 0);
+					u16 *border_bm = &m_border_bitmap.pix(y, 0);
+					for (auto x = cliprect.left(); x <= cliprect.right(); x++) {
+						*bm++ |= 0xf0;
+						*border_bm++ |= 0xf0;
+					}
+				}
 				spectrum_state::screen_update_spectrum(screen, bitmap, cliprect);
 			}
 			else if (VM == VM_TXT)
@@ -275,15 +275,8 @@ void tsconf_state::cram_write(u16 offset, u8 data)
 {
 	m_cram->write(offset, data);
 	u8 pen = offset >> 1;
-	rgb_t rgb = rgb15((m_cram->read(offset | 1) << 8 | m_cram->read(offset & 0xfffe)));
-	if (pen > 0x0f || VM != VM_ZX)
-	{
-		subdevice<palette_device>("palette")->set_pen_color(pen, rgb);
-	}
-	if (pen >= 0xf0 && VM == VM_ZX)
-	{
-		subdevice<palette_device>("palette")->set_pen_color(pen & 0x0f, rgb);
-	}
+	rgb_t rgb = from_rgb15((m_cram->read(offset | 1) << 8 | m_cram->read(offset & 0xfffe)));
+	m_palette->set_pen_color(pen, rgb);
 };
 
 void tsconf_state::cram_write16(offs_t offset, u16 data)
@@ -306,6 +299,12 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 	/* update memory */
 	tsconf_update_bank1();
 	tsconf_update_video_mode();
+}
+
+void tsconf_state::tsconf_port_fe_w(offs_t offset, u8 data)
+{
+	BORDER = (data & 0x07) | 0xf0;
+	spectrum_port_fe_w(offset, data);
 }
 
 u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
@@ -405,7 +404,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	}
 	else if (nreg == REGNUM(BORDER))
 	{
-		m_port_fe_data = data;
+		tsconf_port_fe_w(0, data & 0x07);
 	}
 	else if (nreg == REGNUM(DMAS_ADDRESS_L))
 	{
