@@ -21,7 +21,6 @@ project "formats"
 
 	includedirs {
 		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
@@ -80,6 +79,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.cpp",
+		MAME_DIR .. "src/lib/formats/fsmeta.h",
+		MAME_DIR .. "src/lib/formats/fsmeta.cpp",
 	}
 
 --------------------------------------------------

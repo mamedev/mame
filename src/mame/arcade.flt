@@ -256,6 +256,7 @@ combatsc.cpp
 comebaby.cpp
 commando.cpp
 compgolf.cpp
+compucranes.cpp
 contra.cpp
 coolpool.cpp
 coolridr.cpp
@@ -570,7 +571,6 @@ icecold.cpp
 ice_bozopail.cpp
 ice_hhhippos.cpp
 ice_tbd.cpp
-ichiban.cpp
 idsa.cpp
 igs009.cpp
 igs011.cpp

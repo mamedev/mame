@@ -271,6 +271,7 @@ tvpoker                         // (c) 197? A-1 Supply
 @source:a2600.cpp
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
+a2600_pop                       // Atari 2600 Point of Purchase Display
 
 @source:a5105.cpp
 a5105                           //
@@ -1063,6 +1064,7 @@ kurufev                         // (c) 2003 Aruze (Arcade TV Game List - P.75, R
 mayjin3                         // (c) 2000 Seta (Arcade TV Game List - P.101, Right, 9 from top)
 mtetrisc                        // (c) 1998 Capcom
 srmvs                           // (c) 1999 Seta
+srmvsa                          // (c) 1999 Seta
 starsldr                        // (c) 1998 Hudson/Seta
 twrshaft                        // (c) 2003 Aruze
 vivdolls                        // (c) 1998 Visco
@@ -1121,6 +1123,7 @@ alien                           // (c) 2005 Capcom
 dkbanana                        // (c) 2007 Capcom
 dkbanans                        // (c) 2007 Capcom
 dokodemo                        // (c) 2006 Capcom
+mariojjl                        // (c) 2005 Capcom
 masmario                        // (c) 2004 Capcom
 masmarios                       // (c) 2004 Capcom
 masmario2                       // (c) 2005 Capcom
@@ -10749,6 +10752,10 @@ compmahj                        // 1983 Nintendo Computer Mah-jong Yakuman
 @source:compucolor.cpp
 compclr2                        //
 
+@source:compucranes.cpp
+mastcrane                       // (c) 199? Compumatic
+mastcranea                      // (c) 199? Compumatic
+
 @source:comquest.cpp
 comquest                        // Comquest Plus German
 
@@ -14787,6 +14794,7 @@ galpani2gs                      // (c) 1993 Kaneko
 galpani2i                       // (c) 1993 Kaneko
 galpani2i2                      // (c) 1993 Kaneko
 galpani2j                       // (c) 1993 Kaneko
+galpani2k                       // (c) 1993 Kaneko
 galpani2t                       // (c) 1993 Kaneko
 gp2quiz                         // (c) 1993 Kaneko
 gp2se                           // (c) 1994 Kaneko
@@ -17020,9 +17028,6 @@ ice_tbd                         // ICE - Turbo Drive
 icecold                         //
 icecoldf                        //
 zekepeak                        //
-
-@source:ichiban.cpp
-ichiban                         // (c) 199? Excel
 
 @source:idsa.cpp
 bsktbllp                        //
@@ -30814,6 +30819,8 @@ dakar                           //
 fasttrack                       //
 macattck                        //
 motrshow                        //
+motrshowa                       //
+motrshowb                       //
 wcup90                          //
 
 @source:mrjong.cpp
@@ -36439,6 +36446,7 @@ cafetime                        // "63" (c) 1992 Dynax
 chalgirl                        // bootleg
 daisyari                        // (c) 1989 Best System
 dondenmj                        // "03" (c) 1986 Dyna Electronics
+ichiban                         // (c) 199? Excel
 ippatsu                         // 01? (c) 1986 Dyna Electronics
 jangtaku                        // (c) 1986 Dyna Computer
 janoh                           // (c) 1984 Toaplan

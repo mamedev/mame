@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2021-11-21 11:00+0300\n"
+"PO-Revision-Date: 2021-12-11 12:00+0300\n"
 "Last-Translator: Mame.gr - BraiNKilleR\n"
 "Language-Team: MAME Language Team\n"
 "Language: el\n"
@@ -386,11 +386,11 @@ msgstr "Προβολή δείκτη ποντικιού"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "Επιβεβαίωση εγκατάληψης από την εξομοίωση"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "Παράλειψη οθόνης πληροφοριών συστήματος"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -406,7 +406,7 @@ msgstr "Παράλειψη μενού επιλογής BIOS"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "Παράλειψη μενού επιλογής τμήματος λογισμικού"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
@@ -574,7 +574,7 @@ msgstr "Φυσικό πληκτρολόγιο"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Allow contradictory joystick inputs"
-msgstr ""
+msgstr "Να επιτρέπονται αντιφατικές εισαγωγές του μοχλού"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
@@ -2188,6 +2188,8 @@ msgid ""
 "Auditing media for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Γίνεται έλεγχος μέσων για το μηχάνημα %2$u από %3$u...\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
 #, c-format
@@ -2205,12 +2207,12 @@ msgstr ""
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit media for %1$u machines marked unavailable"
-msgstr ""
+msgstr "Έλεγχος μέσων για %1$u μηχανήματα που δεν είναι διαθέσιμα"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit media for all %1$u machines"
-msgstr ""
+msgstr "Έλεγχος μέσων για όλα τα %1$u μηχανήματα"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
@@ -2559,7 +2561,7 @@ msgstr "Χειρισμός (γενικά)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:123
 msgid "Input (this machine)"
-msgstr ""
+msgstr "Χειρισμός (τρέχων μηχάνημα)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:126
 msgid "Analog Controls"
@@ -2599,7 +2601,7 @@ msgstr "Έλεγχος Κασέτας"
 
 #: src/frontend/mame/ui/mainmenu.cpp:155
 msgid "Pseudo Terminals"
-msgstr ""
+msgstr "Ψευδό Τερματικά"
 
 #: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
@@ -3138,11 +3140,11 @@ msgstr "Απαιτεί CHD\tΌχι\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3060
 msgid "Media Audit Result\tOK\n"
-msgstr ""
+msgstr "Αποτέλεσμα Ελέγχου Μέσων\tOK\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3062
 msgid "Media Audit Result\tBAD\n"
-msgstr ""
+msgstr "Αποτέλεσμα Ελέγχου Μέσων\tΛΑΘΟΣ\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3065
 msgid "Samples Audit Result\tNone Needed\n"
@@ -3161,6 +3163,8 @@ msgid ""
 "Media Audit\tDisabled\n"
 "Samples Audit\tDisabled\n"
 msgstr ""
+"Έλεγχος Μέσων \tΑπενεργοποιημένος\n"
+"Έλεγχος Δειγμάτων Ήχου \tΑπενεργοποιημένος\n"
 
 #: src/frontend/mame/ui/sndmenu.cpp:146
 msgid "Sound"
@@ -3398,7 +3402,7 @@ msgstr "P%1$u"
 #: src/emu/ioport.cpp:1924
 msgctxt "input-name"
 msgid "???"
-msgstr ""
+msgstr "???"
 
 #: src/emu/inpttype.ipp:22 src/emu/inpttype.ipp:140 src/emu/inpttype.ipp:221
 #: src/emu/inpttype.ipp:255 src/emu/inpttype.ipp:289 src/emu/inpttype.ipp:323
@@ -6136,46 +6140,3 @@ msgstr ""
 "Δώστε ακολουθία ή πατήστε %s για ακύρωση\n"
 "%s"
 
-#~ msgid "Confirm quit from machines"
-#~ msgstr "Επιβεβαίωση εγκατάληψης από μηχάνημα"
-
-#~ msgid "Skip information screen at startup"
-#~ msgstr "Να μην εμφανίζεται η οθόνη πληροφοριών κατά την εκκίνηση"
-
-#~ msgid "Skip software parts selection menu"
-#~ msgstr "Παράλειψη μενού επιλογής τμημάτων λογισμικού"
-
-#~ msgid "Simultaneous contradictory"
-#~ msgstr "Ταυτόχρονη αναίρεση"
-
-#, c-format
-#~ msgid ""
-#~ "Auditing ROMs for machine %2$u of %3$u...\n"
-#~ "%1$s"
-#~ msgstr ""
-#~ "Γίνεται έλεγχος ROMs για το μηχάνημα %2$u από %3$u...\n"
-#~ "%1$s"
-
-#, c-format
-#~ msgid "Audit ROMs for %1$u machines marked unavailable"
-#~ msgstr "Έλεγχος ROMs για %1$u μηχανήματα που δεν είναι διαθέσιμα"
-
-#, c-format
-#~ msgid "Audit ROMs for all %1$u machines"
-#~ msgstr "Έλεγχος ROMs για όλα τα %1$u μηχανήματα"
-
-#~ msgid "Input (this Machine)"
-#~ msgstr "Χειρισμός (τρέχων Μηχάνημα)"
-
-#~ msgid "ROM Audit Result\tOK\n"
-#~ msgstr "Έλεγχος ROMs\tOK\n"
-
-#~ msgid "ROM Audit Result\tBAD\n"
-#~ msgstr "Έλεγχος ROMs\tΛΑΘΟΣ\n"
-
-#~ msgid ""
-#~ "ROM Audit \tDisabled\n"
-#~ "Samples Audit \tDisabled\n"
-#~ msgstr ""
-#~ "Έλεγχος ROMs \tΑπενεργοποιημένος\n"
-#~ "Έλεγχος Δειγμάτων Ήχου \tΑπενεργοποιημένος\n"

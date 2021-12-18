@@ -14,27 +14,83 @@ Year   Game                PCB            NOTES
 1992   Squash              REF 922804/1   Encrypted Video RAM
 1992   Thunder Hoop        REF 922804/1   Encrypted Video RAM
 1995   Biomechanical Toy   REF 922804/2   Unprotected
-1996   Maniac Square       REF 922804/2   Prototype
-
-TODO: Figure out why Thunder Hoop crashes if you die on Level 4
-      This can be bypassed by killing yourself at the same time as
-      the Level 3 boss dies, suggesting the end stage animation is
-      somehow corrupting the game state. Could this be a bug in
-      the supported revision of the game?  It doesn't depend on
-      CPU clock, vblank timing, there are no unmapped reads or
-      writes of significance.  Could it be related to a dipswitch
-      setting?
+1992   Maniac Square       REF 922804/2   Prototype
 
       Priorities for all games - the games don't make extensive
       enough use of the priority scheme to properly draw any
       conclusions.
 
+-------------------------------------------------------------
+      Note about 57.42 'FRAMERATE_922804' screen refresh
+	  frequency and protection checks.
+
+	  In thoop there's a timing loop at 0x49e-4ac.  It's
+      counting frames between interrupt-triggers.
+
+	  0x49e writes the count to 0xffdb62.
+
+      While fighting the second-stage boss, when the pink
+	  things fly out,  0x8970 is called.  0x8988 fetches
+	  from 0xffdb62.  If the value is > 0xdd1 (via 0x898a)
+	  or < 0xdb1 (via 0x8992), then 0x89ac sets 0xffdc45
+	  to 5.
+
+	  At 60hz the value returned is 0xd29, which causes
+	  the fail condition to trigger. Values >=57.3 or
+	  <=57.7 give a result within the required range. The
+	  failure is not obvious at this point.
+
+	  While fighting the third boss, 0xc2e8 is called.
+	  After passing checks to know exactly when to trigger
+	  (specifically, after the boss is defeated and the
+	  power-up animation is finishes), 0xc350 checks if
+      0xffdc45 is 5.  If it is, then we reach 0xc368, which
+	  0xc368 sets 0xffe08e to 0x27.  Again the failure is
+	  not obvious at this point.
+
+	  0xffe08e is checked during player respawn after
+	  losing a life or continuing at 0x16d00, with an
+	  explicit compare against 0x27, if this condition is
+	  met, then the game will intentionally corrupt memory
+	  and crash.
+
+	  Many of these checks are done with obfuscated code
+	  to hide the target addresses eg.
+
+	  writing 0x27 to 0xffe08e
+	  00C35C: lea     $ffc92b.l, A4
+	  00C362: adda.l  #$1763, A4
+	  00C368: move.b  #$27, (A4)
+
+	  This makes it more difficult to find where the checks
+	  are being performed as an additional layer of
+	  security
+
+	  Squash has a similar timing loop, but with the
+	  expected values adjusted due to the different 68000
+	  clock on the otherwise identical Squash PCB (10Mhz on
+	  Squash vs. 12Mhz on Thunder Hoop)  In the case of
+	  Squash the most obvious sign of failure is bad
+	  'Insert Coin' sprites at the bottom of the screen
+	  after a continue.
+
+	  A refresh rate of 57.42, while not yet accurately
+	  measured, allows a video of thoop to stay in sync with
+	  MAME over a 10 minute period.
+
+	  No checks have been observed in Biomechanical Toy,
+	  the Maniac Square prototype, or the Last KM prototype.
+
+	  Big Karnak runs on a different board type and does fail
+	  if the CPU clock is set to 10Mhz rather than 12Mhz, it
+	  also has additional checks which may still fail and
+	  need more extensive research to determine exactly what
+	  is being timed.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/gaelco.h"
-
-#include "includes/gaelcrpt.h"
 
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
@@ -88,7 +144,7 @@ void gaelco_state::irqack_w(uint16_t data)
 void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
+	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
 	vram_w(offset, data, mem_mask);
 }
 
@@ -96,23 +152,7 @@ void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_m
 void gaelco_state::encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0f, 0x4228);
-	COMBINE_DATA(&m_screenram[offset]);
-}
-
-/*********** Thunder Hoop Encryption Related Code ******************/
-
-void gaelco_state::thoop_vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// osd_printf_debug("vram_encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
-	vram_w(offset, data, mem_mask);
-}
-
-void gaelco_state::thoop_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// osd_printf_debug("encrypted_w!!\n");
-	data = gaelco_decrypt(*m_maincpu, offset, data, 0x0e, 0x4228);
+	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
 	COMBINE_DATA(&m_screenram[offset]);
 }
 
@@ -191,8 +231,8 @@ void gaelco_state::squash_map(address_map &map)
 void gaelco_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::thoop_vram_encrypted_w)).share("videoram"); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::thoop_encrypted_w)).share("screenram");     // Screen RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram"); // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");     // Screen RAM
 	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
 	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
@@ -707,7 +747,7 @@ void gaelco_state::maniacsq(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
@@ -736,6 +776,9 @@ void gaelco_state::squash(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
+	GAELCO_VRAM_ENCRYPTION(config, m_vramcrypt);
+	m_vramcrypt->set_params(0x0f, 0x4228);
+
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
@@ -745,7 +788,7 @@ void gaelco_state::squash(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(58);
+	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
@@ -774,6 +817,9 @@ void gaelco_state::thoop(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
+	GAELCO_VRAM_ENCRYPTION(config, m_vramcrypt);
+	m_vramcrypt->set_params(0x0e, 0x4228);
+
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted
 	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)); // not inverted
@@ -783,7 +829,7 @@ void gaelco_state::thoop(machine_config &config)
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
+	screen.set_refresh_hz(FRAMERATE_922804);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
@@ -1184,6 +1230,6 @@ GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, RO
 GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1870)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
 GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco", "Maniac Square (prototype)",                   MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
-GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)",                      MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
+GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco", "Last KM (Ver 1.0.0275, prototype)",           MACHINE_SUPPORTS_SAVE ) // Similar 'bike controller' idea to the Salter gym equipment Gaelco developed, but in game form
 GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco", "Squash (Ver. 1.0)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // could be other versions, still Ver. 1 but different checksum listed on boot
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)",    MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

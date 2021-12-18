@@ -6,14 +6,12 @@
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already
 #define LOG_DEBUG     (1U <<  1)
-#define LOG_KEYBOARD  (1U <<  2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_DEBUG)
 //#define LOG_OUTPUT_FUNC printf
 #include "logmacro.h"
 
 #define LOGDBG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
-#define LOGKBD(...) LOGMASKED(LOG_KEYBOARD, __VA_ARGS__)
 
 
 DEFINE_DEVICE_TYPE(DW_KEYBOARD, dw_keyboard_device, "dw_kbd", "IBM Displaywriter Keyboard")
@@ -26,19 +24,19 @@ ROM_END
 
 const tiny_rom_entry *dw_keyboard_device::device_rom_region() const
 {
-	return ROM_NAME( dw_keyboard );
+	return ROM_NAME(dw_keyboard);
 }
 
 void dw_keyboard_device::device_add_mconfig(machine_config &config)
 {
-	I8049(config, m_mcu, XTAL(6'000'000));   // XXX RC oscillator
-	m_mcu->bus_in_cb().set(FUNC(dw_keyboard_device::bus_r));
+	I8049(config, m_mcu, XTAL(6'000'000)); // RC oscillator
+	m_mcu->bus_in_cb().set([this] () { return m_bus; });
 	m_mcu->bus_out_cb().set(FUNC(dw_keyboard_device::bus_w));
 	m_mcu->p1_out_cb().set(FUNC(dw_keyboard_device::p1_w));
-	m_mcu->p2_in_cb().set(FUNC(dw_keyboard_device::p2_r));
+	m_mcu->p2_in_cb().set([this] () { return m_p2; });
 	m_mcu->p2_out_cb().set(FUNC(dw_keyboard_device::p2_w));
-	m_mcu->t0_in_cb().set(FUNC(dw_keyboard_device::t0_r));
-	m_mcu->t1_in_cb().set(FUNC(dw_keyboard_device::t1_r));
+	m_mcu->t0_in_cb().set([this] () { return m_ack; });
+	m_mcu->t1_in_cb().set([this] () { return m_keylatch; });
 }
 
 
@@ -84,11 +82,11 @@ INPUT_PORTS_START( dw_keyboard )
 
 	PORT_START("COL.3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("/ ?") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 2") PORT_CODE(KEYCODE_BACKSLASH)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("3 2") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("[ ]") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR(']')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1/4 1/2") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1/4 1/2") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHAR(UCHAR_MAMEKEY(ENTER_PAD))
 
@@ -146,7 +144,7 @@ INPUT_PORTS_START( dw_keyboard )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LShift") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Lock") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Plusminus") PORT_CODE(KEYCODE_TILDE)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Plusminus") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -176,7 +174,7 @@ INPUT_PORTS_END
 
 ioport_constructor dw_keyboard_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( dw_keyboard );
+	return INPUT_PORTS_NAME(dw_keyboard);
 }
 
 dw_keyboard_device::dw_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -194,16 +192,14 @@ void dw_keyboard_device::device_start()
 	m_out_data.resolve_safe();
 	m_out_clock.resolve_safe();
 	m_out_strobe.resolve_safe();
-	m_reset_timer = timer_alloc();
 }
 
 void dw_keyboard_device::device_reset()
 {
-}
-
-void dw_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	LOG("device_reset()\n");
+	m_reset = 1;
+	m_keylatch = 0;
+	m_ack = 0;
 }
 
 void dw_keyboard_device::p1_w(uint8_t data)
@@ -215,7 +211,8 @@ void dw_keyboard_device::p1_w(uint8_t data)
 
 void dw_keyboard_device::p2_w(uint8_t data)
 {
-	if (BIT(m_p2 ^ data, 3) && BIT(data, 3)) {
+	if (BIT(m_p2 ^ data, 3) && BIT(data, 3))
+	{
 		m_sense = data & 7;
 	}
 
@@ -225,33 +222,8 @@ void dw_keyboard_device::p2_w(uint8_t data)
 	LOGDBG("p2 <- %02x = drive %04x sense row %d\n", data, m_drive, data & 7);
 }
 
-uint8_t dw_keyboard_device::p2_r()
-{
-	uint8_t data = m_p2;
-
-	LOGDBG("p2 == %02x\n", data);
-
-	return data;
-}
-
-READ_LINE_MEMBER( dw_keyboard_device::t0_r )
-{
-	LOGKBD("t0 == %d\n", m_ack);
-
-	return m_ack;
-}
-
-READ_LINE_MEMBER( dw_keyboard_device::t1_r )
-{
-	LOGDBG("t1 == %d\n", m_keylatch);
-
-	return m_keylatch;
-}
-
 void dw_keyboard_device::bus_w(uint8_t data)
 {
-	int i, sense = 0;
-
 	/*
 	    bit     description
 
@@ -275,9 +247,14 @@ void dw_keyboard_device::bus_w(uint8_t data)
 	m_out_strobe(BIT(data, 1));
 	m_out_clock(BIT(data, 4));
 
-	if (BIT(data, 7)) {
-		for (i = 0; i < 12; i++) {
-			if (BIT(m_drive, i)) {
+	if (BIT(data, 7))
+	{
+		int i, sense = 0;
+
+		for (i = 0; i < 12; i++)
+		{
+			if (BIT(m_drive, i))
+			{
 				sense |= m_kbd[i]->read();
 				break;
 			}
@@ -287,35 +264,35 @@ void dw_keyboard_device::bus_w(uint8_t data)
 		LOG("bus key %02x pressed (drive %04x sense %x)\n", (i << 3) | m_sense, m_drive, m_sense);
 	}
 
-	if (!BIT(data, 6)) {
+	if (!BIT(data, 6))
+	{
 		m_dip = ~ioport("DIP")->read();
 		LOG("bus loaded DIP switch setting 0x%02x\n", m_dip);
 		m_mcu->set_input_line(MCS48_INPUT_IRQ, m_dip & 1 ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	if (!BIT(data, 5)) {
+	if (!BIT(data, 5))
+	{
 		m_dip >>= 1;
 		m_mcu->set_input_line(MCS48_INPUT_IRQ, m_dip & 1 ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-uint8_t dw_keyboard_device::bus_r()
+WRITE_LINE_MEMBER(dw_keyboard_device::reset_w)
 {
-	return m_bus;
-}
-
-WRITE_LINE_MEMBER( dw_keyboard_device::reset_w )
-{
-	if(!state)
-		m_reset_timer->adjust(attotime::from_msec(50));
-	else
+	if (m_reset ^ state)
 	{
-		m_reset_timer->adjust(attotime::never);
-		m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		LOG("reset changed to %d\n", state);
+		m_reset = state;
+		if (!state)
+		{
+			m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+			m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
 	}
 }
 
-WRITE_LINE_MEMBER( dw_keyboard_device::ack_w )
+WRITE_LINE_MEMBER(dw_keyboard_device::ack_w)
 {
 	m_ack = state;
 }

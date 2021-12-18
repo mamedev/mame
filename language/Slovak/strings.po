@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2021-12-06 13:24+0100\n"
+"POT-Creation-Date: 2021-11-19 02:50+1100\n"
+"PO-Revision-Date: 2021-12-12 16:10+0100\n"
 "Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: sk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/frontend/mame/ui/ui.cpp:469 src/frontend/mame/ui/ui.cpp:542
 msgid ""
@@ -42,7 +42,7 @@ msgid ""
 "Use %1$s to toggle"
 msgstr ""
 "Ovládacie prvky používateľského rozhrania zapnuté\n"
-"Na vypnutie použite %1$s"
+"Pre vypnutie použite %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1250
 #, c-format
@@ -291,7 +291,7 @@ msgstr "Vyhľadať: %1$s_"
 #: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr "Zoznam softvéru/položka: %1$s:%2$s"
+msgstr "Zoznam/položka softvéru: %1$s:%2$s"
 
 #: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:161
 msgid "Sound Options"
@@ -389,7 +389,7 @@ msgstr "Zobraziť ukazovateľ myši"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "Potvrdiť ukončenie emulácie zariadenia"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
@@ -565,11 +565,11 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
-msgstr "Joystick deadzone"
+msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:93
 msgid "Joystick saturation"
-msgstr "Joystick saturation"
+msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Natural keyboard"
@@ -871,7 +871,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Jedna alebo viaceré ROM/CHD pro toto zariadenie nie sú korektné. Zariadenie "
+"Jedna alebo viaceré ROM/CHD pre toto zariadenie nie sú korektné. Zariadenie "
 "nemusí fungovať správne.\n"
 
 #: src/frontend/mame/ui/info.cpp:79
@@ -909,7 +909,7 @@ msgstr "Nedostatočne emulované prvky: "
 
 #: src/frontend/mame/ui/info.cpp:129
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "Prevrátenie obrazovky v režime cocktail nie je podporované.\n"
+msgstr "Prevrátenie obrazovky v režime Cocktail nie je podporované.\n"
 
 #: src/frontend/mame/ui/info.cpp:131
 msgid "This machine requires external artwork files.\n"
@@ -939,8 +939,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"TOTO ZARIADENIE NEFUNGUJE. Emulácia ešte nie je hotová. Treba počkať, kým "
-"vývojári emuláciu dokončia.\n"
+"TOTO ZARIADENIE NEFUNGUJE. Emulácia ešte nie je hotová. Nedá sa nič robiť, "
+"iba počkať, kým vývojári emuláciu dokončia.\n"
 
 #: src/frontend/mame/ui/info.cpp:141
 msgid ""
@@ -1061,7 +1061,7 @@ msgstr "[prázdny]"
 
 #: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
-msgstr "[súborový manažér]"
+msgstr "[správca súborov]"
 
 #: src/frontend/mame/ui/swlist.cpp:227
 msgid "Switch Item Ordering"
@@ -1069,11 +1069,11 @@ msgstr "Prepnúť zoradenie položiek"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "Switched Order: entries now ordered by shortname"
-msgstr "Prepnuté zoradenie: položky sú zoradené podľa shortname"
+msgstr "Zoradenie prepnuté: položky sú zoradené podľa shortname"
 
 #: src/frontend/mame/ui/swlist.cpp:260
 msgid "Switched Order: entries now ordered by description"
-msgstr "Prepnuté zoradenie: položky sú zoradené podľa description"
+msgstr "Zoradenie prepnuté: položky sú zoradené podľa description"
 
 #: src/frontend/mame/ui/swlist.cpp:396
 msgid "[compatible lists]"
@@ -1283,7 +1283,7 @@ msgstr "Bez BIOSu"
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
 msgid "Parents"
-msgstr "Pôvodné"
+msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
@@ -1358,7 +1358,7 @@ msgstr "Obľúbené"
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
 msgid "Parents"
-msgstr "Pôvodné"
+msgstr ""
 
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
@@ -1486,7 +1486,7 @@ msgstr "Vrátane klonov"
 #: src/frontend/mame/ui/utils.cpp:2048 src/frontend/mame/ui/inifile.cpp:272
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr "Položka/zoznam softvéru"
+msgstr "Zoznam/položka softvéru"
 
 #: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2707
 msgid "Software List Info"
@@ -1558,7 +1558,7 @@ msgstr "Viditeľné oneskorenie"
 #: src/frontend/mame/ui/miscmenu.cpp:629
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr "Súbor %s.xml bol uložený do priečinka nastavení MAME."
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Name:             Description:\n"
@@ -1567,7 +1567,7 @@ msgstr "SÚBOR:            NÁZOV ZARIADENIA:\n"
 #: src/frontend/mame/ui/miscmenu.cpp:666
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr "Súbor %s.txt bol uložený do priečinka nastavení MAME."
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:683
 msgid "Export list in XML format (like -listxml)"
@@ -1673,7 +1673,7 @@ msgstr "Načítať stav"
 
 #: src/frontend/mame/ui/state.cpp:499
 msgid "Select state to load"
-msgstr "Vyberte stav, ktorý sa má načítať"
+msgstr "Vyberte stav, ktorý chcete načítať"
 
 #: src/frontend/mame/ui/state.cpp:523
 msgid "Save State"
@@ -1834,9 +1834,9 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Neboli nájdené žiadne zariadenia. Sujte rompath v %1$s.ini súbore.\n"
+"Neboli nájdené žiadne zariadenia. Skontrolujte rompath v %1$s.ini súbore.\n"
 "\n"
-"Ak používáte %2$s prvýkrát, viac informácií o konfigurácii %2$s sa dočítate "
+"Ak používate %2$s prvýkrát, viac informácií o konfigurácii %2$s sa dočítate "
 "v súbore config.txt v priečinku docs."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:315
@@ -2149,7 +2149,7 @@ msgstr "Zväčšenie = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
-msgstr "Prispôsobiť veľkosti"
+msgstr ""
 
 #: src/frontend/mame/ui/selgame.cpp:444
 msgid "Configure Machine"
@@ -2546,7 +2546,7 @@ msgstr "Nový čiarový kód:"
 
 #: src/frontend/mame/ui/barcode.cpp:80
 msgid "Enter Code"
-msgstr "Vložte kód"
+msgstr "Vložte čiarový kód"
 
 #: src/frontend/mame/ui/barcode.cpp:116
 msgid "Barcode length invalid!"
@@ -2590,7 +2590,7 @@ msgstr "Informácie o obraze"
 
 #: src/frontend/mame/ui/mainmenu.cpp:145
 msgid "File Manager"
-msgstr "Súborový manažér"
+msgstr "Správca súborov"
 
 #: src/frontend/mame/ui/mainmenu.cpp:152
 msgid "Tape Control"
@@ -2697,12 +2697,12 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:85
 msgctxt "selmenu-artwork"
 msgid "Logo"
-msgstr "Logo"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:86
 msgctxt "selmenu-artwork"
 msgid "Versus"
-msgstr "Versus"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
@@ -2736,7 +2736,7 @@ msgstr "Obaly"
 
 #: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorite"
-msgstr "Pridať alebo odobrať zo zoznamu Obľúbené"
+msgstr "Pridať alebo odstrániť zo zoznamu Obľúbené"
 
 #: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
@@ -2770,7 +2770,7 @@ msgstr "Softvér je klonom %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:683
 msgid "Software is parent"
-msgstr "Softvér je pôvodný"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:688
 msgid "Supported: No"
@@ -2786,7 +2786,7 @@ msgstr "Podporovaný: Áno"
 
 #: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Driver is parent"
-msgstr "Ovládač je pôvodný"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
 #, c-format
@@ -2856,7 +2856,7 @@ msgstr "Pokračujte stlačením ľubovoľného klávesu."
 
 #: src/frontend/mame/ui/selmenu.cpp:2744
 msgid "General Info"
-msgstr "Technické informácie"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2896
 #, c-format
@@ -2880,7 +2880,7 @@ msgstr "Ovládač je klonom\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2910
 msgid "Driver is Parent\t\n"
-msgstr "Ovládač je pôvodný\t\n"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2914
 msgid "Analog Controls\tYes\n"
@@ -3309,7 +3309,7 @@ msgstr "  Keypad vstupy    [%1$d vstupov]\n"
 #: src/frontend/mame/ui/devopt.cpp:310
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
-msgstr "  Klavesnicové vstupy    [%1$d vstupov]\n"
+msgstr "  Klávesnicové vstupy    [%1$d vstupov]\n"
 
 #: src/frontend/mame/ui/devopt.cpp:315
 msgid "* Media Options:\n"
@@ -5019,7 +5019,7 @@ msgstr "Pauza"
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "Pause - Single Step"
-msgstr "Pauza - O krok"
+msgstr "Pauza - O krok vpred"
 
 #: src/emu/inpttype.ipp:813
 msgctxt "input-name"
@@ -5234,7 +5234,7 @@ msgstr "Použív. rozhranie - Zobrazenie externého DAT"
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "UI Add/Remove favorite"
-msgstr "Použív. rozhranie - Pridať do/Odobrať zo zoznamu Obľúbené"
+msgstr "Použív. rozhranie - Pridať alebo odstrániť zo zoznamu Obľúbené"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
@@ -5597,7 +5597,7 @@ msgstr "Uložiť input names do súboru"
 #: plugins/portname/init.lua:134 plugins/portname/init.lua:139
 #: plugins/portname/init.lua:155
 msgid "Failed to save input name file"
-msgstr "Chyba pri ukladaní input name file"
+msgstr "Chyba pri ukladaní input name súboru"
 
 #: plugins/portname/init.lua:167
 #, lua-format
@@ -5627,7 +5627,7 @@ msgstr "Tlačidlá autofire"
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "Press %s to delete"
-msgstr "Na zmazanie stlačte %s"
+msgstr "Pre zmazanie stlačte %s"
 
 #: plugins/autofire/autofire_menu.lua:93
 #, lua-format
@@ -5942,7 +5942,7 @@ msgstr "Hotovo"
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
-msgstr "Na vymazanie stlačte %s"
+msgstr "Pre vymazanie stlačte %s"
 
 #: plugins/inputmacro/inputmacro_menu.lua:573
 msgctxt "plugin-inputmacro"
@@ -6002,7 +6002,7 @@ msgstr "Vyberte cheat, pre ktorý chcete nastaviť hotkey"
 #: plugins/cheat/init.lua:612
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr "Na vymazanie hotkey stlačte %s"
+msgstr "Pre vymazanie hotkey stlačte %s"
 
 #: plugins/cheat/init.lua:640
 msgid "None"

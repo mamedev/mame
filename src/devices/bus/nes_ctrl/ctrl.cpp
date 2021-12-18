@@ -78,8 +78,9 @@ DEFINE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device, "nes_control_port"
 //  device_nes_control_port_interface - constructor
 //-------------------------------------------------
 
-device_nes_control_port_interface::device_nes_control_port_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "nesctrl")
+device_nes_control_port_interface::device_nes_control_port_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "nesctrl")
+	, m_strobe(0)
 {
 	m_port = dynamic_cast<nes_control_port_device *>(device.owner());
 }
@@ -207,7 +208,7 @@ void fc_control_port2_devices(device_slot_interface &device)
 
 void fc_expansion_devices(device_slot_interface &device)
 {
-	device.option_add("joypad", NES_JOYPAD);
+	device.option_add("joypad", NES_FCPAD_EXP);
 	device.option_add("arcstick", NES_ARCSTICK);
 	device.option_add("fc_keyboard", NES_FCKEYBOARD);
 	device.option_add("zapper", NES_ZAPPER);

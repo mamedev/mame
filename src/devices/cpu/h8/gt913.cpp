@@ -11,7 +11,7 @@
     - Two timers, three 8-bit ports, two 8-bit ADCs
     - Keyboard controller w/ key velocity detection
     - MIDI UART
-    - 24-voice PCM sound (currently not emulated / fully understood)
+    - 24-voice DPCM sound
 
     Earlier and later Casio keyboard models contain "uPD912" and "uPD914" chips,
     which are presumably similar.
@@ -52,9 +52,9 @@ void gt913_device::map(address_map &map)
 	map(0xfac0, 0xffbf).ram(); // CTK-551 zeroes out this range at $0418
 
 	/* ffc0-ffcb: sound */
-	map(0xffc0, 0xffc5).rw(m_sound, FUNC(gt913_sound_hle_device::data_r), FUNC(gt913_sound_hle_device::data_w));
-	map(0xffc6, 0xffc7).w(m_sound, FUNC(gt913_sound_hle_device::command_w));
-	map(0xffca, 0xffcb).r(m_sound, FUNC(gt913_sound_hle_device::status_r));
+	map(0xffc0, 0xffc5).rw(m_sound, FUNC(gt913_sound_device::data_r), FUNC(gt913_sound_device::data_w));
+	map(0xffc6, 0xffc7).w(m_sound, FUNC(gt913_sound_device::command_w));
+	map(0xffca, 0xffcb).r(m_sound, FUNC(gt913_sound_device::status_r));
 
 	/* ffd0-ffd5: key controller */
 	map(0xffd0, 0xffd1).r(m_kbd, FUNC(gt913_kbd_hle_device::read));
@@ -88,9 +88,11 @@ void gt913_device::device_add_mconfig(machine_config &config)
 {
 	GT913_INTC(config, "intc");
 
-	GT913_SOUND_HLE(config, m_sound, 0);
+	GT913_SOUND(config, m_sound, DERIVED_CLOCK(1, 1));
+	m_sound->set_device_rom_tag(m_rom);
+
 	GT913_KBD_HLE(config, m_kbd, 0);
-	m_kbd->irq_cb().set([this](int val) { if (val) m_intc->internal_interrupt(5); });
+	m_kbd->irq_cb().set([this] (int val) { if (val) m_intc->internal_interrupt(5); });
 	GT913_IO_HLE(config, m_io_hle, "intc", 6, 7);
 	H8_SCI(config, m_sci, "intc", 8, 9, 10, 0);
 
@@ -102,7 +104,7 @@ void gt913_device::device_add_mconfig(machine_config &config)
 
 void gt913_device::uart_rate_w(uint8_t data)
 {
-	m_sci->brr_w(data >> 1);
+	m_sci->brr_w(data >> 2);
 }
 
 void gt913_device::uart_control_w(uint8_t data)

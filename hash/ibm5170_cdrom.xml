@@ -2739,6 +2739,19 @@ license:CC0
 		</part>
 	</software>
 
+	<!-- DOS -->
+	<software name="skynet" supported="partial">
+		<description>SkyNET</description>
+		<year>1996</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="skynet" sha1="0b9059f48d86c651bcd0e8b8112983b84fc489a6" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Windows 3.1 -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="spaceinv" supported="partial">
@@ -2777,6 +2790,63 @@ license:CC0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tagteam_cd" sha1="33eaebcca48c8a4382dc3ac87e346e393f47b2d8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Low budget CD release of both games. Each can be installed separately. Also contains video demos for -->
+	<!-- Discoveries of the Deep, Eternam, Terminator 2: Chess Wars, Trolls and Wayne's World. -->
+	<software name="t2gmchess" supported="partial">
+		<description>Terminator 2: Judgment Day - Chess Wars / Grandmaster Chess</description>
+		<year>1993</year>
+		<publisher>Capstone Software</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="t2_cdrom" sha1="9bbb9362fe6a4895c7b1e3e34c179fdd7436c070" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains demos for NCAA: Road to the Final Four 2 and Delta V. -->
+	<software name="term2029dx" supported="partial">
+		<description>The Terminator: 2029 - Deluxe CD Edition</description>
+		<year>1994</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2029_cd" sha1="8bcadedb9f8f24b699a0847edcb1bc1fa1222b7a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains demos for The Elder Scrolls: Daggerfall, Xcar, and PBA Bowling. -->
+	<software name="termfs" supported="partial">
+		<description>The Terminator: Future Shock</description>
+		<year>1995</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="future_shock" sha1="db390639f1c7ae57f1aa43083bdd37c08c3e3e10" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- DOS -->
+	<!-- Also contains video demos for The Elder Scrolls: Arena and Delta V. -->
+	<software name="termramp" supported="partial">
+		<description>The Terminator: Rampage</description>
+		<year>1997</year>
+		<publisher>Bethesda Softworks</publisher>
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rampage" sha1="cb91ee2e34e3b7391169079d6787c75712b1d97f" />
 			</diskarea>
 		</part>
 	</software>

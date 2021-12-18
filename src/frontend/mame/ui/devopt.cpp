@@ -258,12 +258,12 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						if (setting.value() == field.defvalue())
 						{
 							def = true;
-							util::stream_format(dips_opt, _("  %1$s    [default: %2$s]\n"), field.name(), setting.name());
+							util::stream_format(dips_opt, _("  %1$s    [default: %2$s]\n"), field.specific_name(), setting.name());
 							break;
 						}
 					}
 					if (!def)
-						util::stream_format(dips_opt, _("  %1$s\n"), field.name());
+						util::stream_format(dips_opt, _("  %1$s\n"), field.specific_name());
 				}
 				else if (field.type() == IPT_CONFIG)
 				{
@@ -274,12 +274,12 @@ void menu_device_config::populate_text(std::optional<text_layout> &layout, float
 						if (setting.value() == field.defvalue())
 						{
 							def = true;
-							util::stream_format(confs_opt, _("  %1$s    [default: %2$s]\n"), field.name(), setting.name());
+							util::stream_format(confs_opt, _("  %1$s    [default: %2$s]\n"), field.specific_name(), setting.name());
 							break;
 						}
 					}
 					if (!def)
-						util::stream_format(confs_opt, _("  %1$s\n"), field.name());
+						util::stream_format(confs_opt, _("  %1$s\n"), field.specific_name());
 				}
 			}
 

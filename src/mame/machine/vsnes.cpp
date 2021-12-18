@@ -676,151 +676,58 @@ void vsnes_state::init_vsvram()
 /**********************************************************************************/
 
 
-void vsnes_state::mapper4_set_prg(  )
+void vsnes_state::vs108_rom_banking(offs_t offset, uint8_t data)
 {
-	uint8_t *prg = memregion("maincpu")->base();
-	uint8_t prg_flip = (m_MMC3_cmd & 0x40) ? 2 : 0;
-
-	memcpy(&prg[0x8000], &prg[0x2000 * (m_MMC3_prg_bank[0 ^ prg_flip] & m_MMC3_prg_mask) + 0x10000], 0x2000);
-	memcpy(&prg[0xa000], &prg[0x2000 * (m_MMC3_prg_bank[1] & m_MMC3_prg_mask) + 0x10000], 0x2000);
-	memcpy(&prg[0xc000], &prg[0x2000 * (m_MMC3_prg_bank[2 ^ prg_flip] & m_MMC3_prg_mask) + 0x10000], 0x2000);
-	memcpy(&prg[0xe000], &prg[0x2000 * (m_MMC3_prg_bank[3] & m_MMC3_prg_mask) + 0x10000], 0x2000);
-}
-
-void vsnes_state::mapper4_set_chr(  )
-{
-	uint8_t chr_page = (m_MMC3_cmd & 0x80) >> 5;
-
-	v_set_videorom_bank(chr_page ^ 0, 1, m_MMC3_chr_bank[0] & ~0x01);
-	v_set_videorom_bank(chr_page ^ 1, 1, m_MMC3_chr_bank[0] |  0x01);
-	v_set_videorom_bank(chr_page ^ 2, 1, m_MMC3_chr_bank[1] & ~0x01);
-	v_set_videorom_bank(chr_page ^ 3, 1, m_MMC3_chr_bank[1] |  0x01);
-	v_set_videorom_bank(chr_page ^ 4, 1, m_MMC3_chr_bank[2]);
-	v_set_videorom_bank(chr_page ^ 5, 1, m_MMC3_chr_bank[3]);
-	v_set_videorom_bank(chr_page ^ 6, 1, m_MMC3_chr_bank[4]);
-	v_set_videorom_bank(chr_page ^ 7, 1, m_MMC3_chr_bank[5]);
-}
-
-
-void vsnes_state::mapper4_irq( int scanline, int vblank, int blanked )
-{
-	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
-	{
-		int priorCount = m_IRQ_count;
-		if (m_IRQ_count == 0)
-		{
-			m_IRQ_count = m_IRQ_count_latch;
-		}
-		else
-			m_IRQ_count--;
-
-		if (m_IRQ_enable && !blanked && (m_IRQ_count == 0) && priorCount)
-		{
-			m_maincpu->set_input_line(0, HOLD_LINE);
-		}
-	}
-}
-
-void vsnes_state::mapper4_w(offs_t offset, uint8_t data)
-{
-	uint8_t MMC3_helper, cmd;
-
 	switch (offset & 0x6001)
 	{
-		case 0x0000: /* $8000 */
-			MMC3_helper = m_MMC3_cmd ^ data;
-			m_MMC3_cmd = data;
-
-			/* Has PRG Mode changed? */
-			if (MMC3_helper & 0x40)
-				mapper4_set_prg();
-
-			/* Has CHR Mode changed? */
-			if (MMC3_helper & 0x80)
-				mapper4_set_chr();
+		case 0x0000: // $8000
+			m_108_reg = data & 0x07;
 			break;
 
-		case 0x0001: /* $8001 */
-			cmd = m_MMC3_cmd & 0x07;
-			switch (cmd)
+		case 0x0001: // $8001
+			switch (m_108_reg)
 			{
-				case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
+				case 0: case 1:
+					v_set_videorom_bank(m_108_reg * 2, 2, data);
+					break;
 				case 2: case 3: case 4: case 5:
-					m_MMC3_chr_bank[cmd] = data;
-					mapper4_set_chr();
+					v_set_videorom_bank(m_108_reg + 2, 1, data);
 					break;
-				case 6:
-				case 7:
-					m_MMC3_prg_bank[cmd - 6] = data;
-					mapper4_set_prg();
+				case 6: case 7:
+					{
+						uint8_t *prg = memregion("maincpu")->base();
+						int addr = m_108_reg == 6 ? 0x8000 : 0xa000;
+						memcpy(&prg[addr], &prg[0x2000 * (data & m_108_prg_mask) + 0x10000], 0x2000);
+					}
 					break;
 			}
-			break;
-
-		case 0x2000: /* $a000 */
-			if (data & 0x40)
-				v_set_mirroring(1, PPU_MIRROR_HIGH);
-			else
-			{
-				if (data & 0x01)
-					v_set_mirroring(1, PPU_MIRROR_HORZ);
-				else
-					v_set_mirroring(1, PPU_MIRROR_VERT);
-			}
-			break;
-
-		case 0x2001: /* $a001 - extra RAM enable/disable */
-			/* ignored - we always enable it */
-			break;
-
-		case 0x4000: /* $c000 - IRQ scanline counter */
-			m_IRQ_count = data;
-			break;
-
-		case 0x4001: /* $c001 - IRQ scanline latch */
-			m_IRQ_count_latch = data;
-			break;
-
-		case 0x6000: /* $e000 - Disable IRQs */
-			m_IRQ_enable = 0;
-			m_IRQ_count = m_IRQ_count_latch;
-			m_ppu1->set_scanline_callback(nullptr);
-			break;
-
-		case 0x6001: /* $e001 - Enable IRQs */
-			m_IRQ_enable = 1;
-			m_ppu1->set_scanline_callback(*this, FUNC(vsnes_state::mapper4_irq));
 			break;
 
 		default:
-			logerror("mapper4_w uncaught: %04x value: %02x\n", offset + 0x8000, data);
+			logerror("vs108_rom_banking uncaught: %04x value: %02x\n", offset + 0x8000, data);
 			break;
 	}
 }
 
-/* Common init for MMC3 games */
+// Common init for (Namco) 108 games
 
-void vsnes_state::init_MMC3()
+void vsnes_state::init_vs108()
 {
 	uint8_t *prg = memregion("maincpu")->base();
-	m_IRQ_enable = m_IRQ_count = m_IRQ_count_latch = 0;
-	int MMC3_prg_chunks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	int prg_chunks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
-	m_MMC3_prg_bank[0] = m_MMC3_prg_bank[2] = 0xfe;
-	m_MMC3_prg_bank[1] = m_MMC3_prg_bank[3] = 0xff;
-	m_MMC3_cmd = 0;
+	m_108_reg = 0;
+	m_108_prg_mask = (prg_chunks << 1) - 1;
 
-	m_MMC3_prg_mask = ((MMC3_prg_chunks << 1) - 1);
+	memcpy(&prg[0x8000], &prg[(prg_chunks - 1) * 0x4000 + 0x10000], 0x2000);
+	memcpy(&prg[0xa000], &prg[(prg_chunks - 1) * 0x4000 + 0x12000], 0x2000);
+	memcpy(&prg[0xc000], &prg[(prg_chunks - 1) * 0x4000 + 0x10000], 0x2000);
+	memcpy(&prg[0xe000], &prg[(prg_chunks - 1) * 0x4000 + 0x12000], 0x2000);
 
-	memcpy(&prg[0x8000], &prg[(MMC3_prg_chunks - 1) * 0x4000 + 0x10000], 0x2000);
-	memcpy(&prg[0xa000], &prg[(MMC3_prg_chunks - 1) * 0x4000 + 0x12000], 0x2000);
-	memcpy(&prg[0xc000], &prg[(MMC3_prg_chunks - 1) * 0x4000 + 0x10000], 0x2000);
-	memcpy(&prg[0xe000], &prg[(MMC3_prg_chunks - 1) * 0x4000 + 0x12000], 0x2000);
+	// 108 chip at $8000-$9fff
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vsnes_state::vs108_rom_banking)));
 
-	/* MMC3 mapper at writes to $8000-$ffff */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8sm_delegate(*this, FUNC(vsnes_state::mapper4_w)));
-
-	/* extra ram at $6000-$7fff */
+	// extra ram at $6000-$7fff
 	m_extraram = std::make_unique<uint8_t[]>(0x2000);
 	save_pointer(NAME(m_extraram.get()), 0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_extraram.get());
@@ -857,7 +764,7 @@ uint8_t vsnes_state::rbi_hack_r(offs_t offset)
 
 void vsnes_state::init_rbibb()
 {
-	init_MMC3();
+	init_vs108();
 
 	/* RBI Base ball hack */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::rbi_hack_r)));
@@ -904,7 +811,7 @@ uint8_t vsnes_state::supxevs_read_prot_4_r()
 
 void vsnes_state::init_supxevs()
 {
-	init_MMC3();
+	init_vs108();
 
 	/* Vs. Super Xevious Protection */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x54ff, 0x54ff, read8smo_delegate(*this, FUNC(vsnes_state::supxevs_read_prot_1_r)));
@@ -938,7 +845,7 @@ uint8_t vsnes_state::tko_security_r(offs_t offset)
 
 void vsnes_state::init_tkoboxng()
 {
-	init_MMC3();
+	init_vs108();
 
 	/* security device at $5e00-$5e01 */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5e00, 0x5e01, read8sm_delegate(*this, FUNC(vsnes_state::tko_security_r)));
@@ -948,7 +855,7 @@ void vsnes_state::init_tkoboxng()
 
 void vsnes_state::init_vsfdf()
 {
-	init_MMC3();
+	init_vs108();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4016, 0x4016, read8smo_delegate(*this, FUNC(vsnes_state::gun_in0_r)), write8smo_delegate(*this, FUNC(vsnes_state::gun_in0_w)));
 
