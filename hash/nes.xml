@@ -47203,6 +47203,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="heroqstg" cloneof="heroqst">
+		<description>Hero Quest (Germany, prototype)</description>
+		<year>1992</year>
+		<publisher>Gremlin Interactive</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb_model" value="NES-UNEPROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="131072">
+				<!-- not verified: anonymous dumper claims this is from the same cart auctioned on 2021/9/29 -->
+				<rom name="herog 5-5-92" size="131072" crc="d91cf3dc" sha1="1eace77232f2d7d49a9bf40c772a933f182081f2" status="baddump" /> <!-- real label: HEROG 5/5/92 -->
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="heroqstu" cloneof="heroqst">
 		<description>Hero Quest (USA, Prototype)</description>
 		<year>1991</year>
