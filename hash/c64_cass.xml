@@ -8902,6 +8902,26 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="labyrintha">
+		<description>Labyrinth: The Computer Game (Activision)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="1737975">
+				<rom name="Labyrinth_Side_1.tap" size="1737975" crc="642af717" sha1="47d31ef55d22bf057c697d6f20c6e4129ab25d37"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="1779017">
+				<rom name="Labyrinth_Side_2.tap" size="1779017" crc="5f51b71b" sha1="73cc54a573068f86826aa84518daa50d2f614e65"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lanclords">
 		<description>Lancer Lords</description>
 		<year>1983</year>
@@ -8926,6 +8946,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="lastmiss">
+		<description>Last Mission</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="477195">
+				<rom name="Last_Mission.tap" size="477195" crc="4db1b25b" sha1="5a67c06e8571323b7d3277b5a03ee314ee8d2e1b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lastninja">
 		<description>The Last Ninja</description>
 		<year>1991</year>
@@ -8942,6 +8974,50 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="928356">
 				<rom name="Last_Ninja,_The_Side_2.tap" size="928356" crc="56f943cb" sha1="43ce3b28be9f988a606dcc5dc29038c3047a4ea5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninjaa" cloneof="lastninja">
+		<description>The Last Ninja (Activision)</description>
+		<year>1987</year>
+		<publisher>Activision</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1258117">
+				<rom name="Last_Ninja,_The_Cassette_A.tap" size="1258117" crc="2bd5940d" sha1="d52a2ee5ae3cef3c8b2b2199e37b0f038cb0dc36"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="928356">
+				<rom name="Last_Ninja,_The_Cassette_B.tap" size="928356" crc="97f31e99" sha1="3c727f705b7ffc5071142aa00ddc339721933393"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninja2">
+		<description>Last Ninja 2: Back with a Vengeance</description>
+		<year>1988</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="3298230">
+				<rom name="Last_Ninja_2_Limited_Edition.tap" size="3298230" crc="b454ea2d" sha1="5dff5d9d63a1b0d1058fe4ac1422a41f6d27e94a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninja3">
+		<description>Last Ninja 3</description>
+		<year>1991</year>
+		<publisher>System 3</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="3400170">
+				<rom name="Last_Ninja_3.tap" size="3400170" crc="d8cbee93" sha1="da09bd5751d37b6c654195de7f125a39bd69564e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8982,6 +9058,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="lawwest">
+		<description>Law of the West</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1946340">
+				<rom name="Law_of_the_West.tap" size="1946340" crc="664f2ddd" sha1="8676ecd0d76766dc3f704cc3d423df2ddb56f802"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lazforce">
 		<description>Lazer Force</description>
 		<year>1987</year>
@@ -9012,6 +9100,57 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="leadbg">
+		<description>Leader Board</description>
+		<year>1986</year>
+		<publisher>Erbe</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="519387">
+				<rom name="Leader_Board.tap" size="519387" crc="0b23bfd8" sha1="e88be59b513164ae8dbfb9ac0008f7d68838c87d"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="519387">
+				<rom name="Leader_Board_a1.tap" size="519387" crc="58cd2835" sha1="b34356d85385bb83306a7a377924863442d71874"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="leadbgee">
+		<description>Leader Board: Executive Edition</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="alt_title" value="Executive Leaderboard"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="545311">
+				<rom name="Leader_Board_Executive_Edition_Side_1.tap" size="545311" crc="8933a802" sha1="903c256c5a1dcc9acf99cc5522b12aa69e16b895"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="553705">
+				<rom name="Leader_Board_Executive_Edition_Side_2.tap" size="553705" crc="ce4c84ed" sha1="358c64978b3db46be41eeae164af0b206b7296e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lkage">
+		<description>Legend of Kage</description>
+		<year>1987</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="542005">
+				<rom name="Legend_of_Kage.tap" size="542005" crc="b7ad02e4" sha1="467e0ee182780a321ddeaf39f48223abc1dddb2e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="knucker">
 		<description>The Legend of the Knucker-Hole</description>
 		<year>1986</year>
@@ -9020,6 +9159,66 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="474776">
 				<rom name="Legend_of_the_Knucker-Hole,_The.tap" size="474776" crc="7a1c3d62" sha1="4caa3a4481a3dc18090d5fb39f1cfcdd833045fe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lic2killd" cloneof="lic2kill">
+		<description>Licence To Kill</description>
+		<year>1989</year>
+		<publisher>Domark</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="514499">
+				<rom name="Licence_to_Kill.tap" size="514499" crc="9c58b66b" sha1="310784e9f388c2f9a7cdaee64ca029664e49119f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcp">
+		<description>Little Computer People</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="621632">
+				<rom name="Little_Computer_People.tap" size="621632" crc="08df344b" sha1="a82cac076e0b0236a3914c0f11da9c559ac4c148"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liveammo">
+		<description>Live Ammo</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading Green Beret"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 1: The Great Escape"/>
+			<dataarea name="cass" size="577571">
+				<rom name="Live_Ammo_Tape_1_Side_1.tap" size="577571" crc="2ff8e4b6" sha1="173a4843c64bae4553d3c16f8b10e56cd6be89f2"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Tape 1 Side 2: Army Moves"/>
+			<dataarea name="cass" size="1417383">
+				<rom name="Live_Ammo_Tape_1_Side_2.tap" size="1417383" crc="a0b60166" sha1="5803a4a0a2d683e7acd856c257960b67fa745aec"/>
+			</dataarea>
+		</part>
+
+		<part name="cass3" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 1: Green Beret"/>
+			<dataarea name="cass" size="724171">
+				<rom name="Live_Ammo_Tape_2_Side_1.tap" size="724171" crc="b367d6e1" sha1="61b47cdf678cf061420e193d4edf3ef7af936087"/>
+			</dataarea>
+		</part>
+
+		<part name="cass4" interface="cbm_cass">
+			<feature name="part_id" value="Tape 2 Side 2: Top Gun / Rambo: First Blood Part II"/>
+			<dataarea name="cass" size="1332374">
+				<rom name="Live_Ammo_Tape_2_Side_2.tap" size="1332374" crc="dde51d3a" sha1="1e116cd09e2fe8f57e3fe3e830974cb0b39efff8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9042,7 +9241,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="lotus">
+	<software name="lotus" supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>1992</year>
 		<publisher>GBH</publisher>
@@ -9058,6 +9257,38 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="2145276">
 				<rom name="Lotus_Esprit_Turbo_Challenge_Side_2.tap" size="2145276" crc="48caa111" sha1="a5e89cf2007dd7e992ebce2f06017bf582936806"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotusg" cloneof="lotus"  supported="no"> <!-- game loads to side 2 but gets stuck continuosuly loading (game never starts) -->
+		<description>Lotus Esprit Turbo Challenge (Gremlin Graphics)</description>
+		<year>1990</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="727225">
+				<rom name="Lotus_Esprit_Turbo_Challenge_Side_1.tap" size="727225" crc="3567366e" sha1="1b060db8ff2ee4dab57529c0c5156db4f114d7c7"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="2145139">
+				<rom name="Lotus_Esprit_Turbo_Challenge_Side_2.tap" size="2145139" crc="09954270" sha1="6c0fccfa6a750bc0eb16af1aa0dc2c14ed33bc90"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magmax">
+		<description>Mag Max</description>
+		<year>1986</year>
+		<publisher>Imagine</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="725538">
+				<rom name="Mag_Max.tap" size="725538" crc="890af4e0" sha1="b8dd42cf356b22dea186318b13abf7cc189dc876"/>
 			</dataarea>
 		</part>
 	</software>
