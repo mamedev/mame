@@ -339,7 +339,7 @@ uint8_t nes_disksys_device::read_ex(offs_t offset)
 			// bit6 - End of Head (1 when disk head is on the most inner track)
 			// bit7 - Disk Data Read/Write Enable (1 when disk is readable/writable)
 			ret = m_fds_status0 | 0x80;
-			// clear the disk IRQ detect and byte transer flags
+			// clear the disk IRQ detect and byte transfer flags
 			m_fds_status0 &= ~0x03;
 			set_irq_line(CLEAR_LINE);
 			break;
