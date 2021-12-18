@@ -2572,6 +2572,8 @@ files {
 createMESSProjects(_target, _subtarget, "hds")
 files {
 	MAME_DIR .. "src/mame/drivers/hds200.cpp",
+	MAME_DIR .. "src/mame/machine/hds200_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/hds200_kbd.h",
 }
 
 createMESSProjects(_target, _subtarget, "heathkit")
