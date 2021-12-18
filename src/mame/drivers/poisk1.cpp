@@ -32,6 +32,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
 #include "bus/isa/p1_fdc.h"
@@ -93,6 +94,9 @@ protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
+	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	TIMER_DEVICE_CALLBACK_MEMBER(hsync_changed);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic8259;
@@ -112,6 +116,8 @@ private:
 	uint8_t m_p1_input;
 
 	uint8_t m_kbpoll_mask;
+	uint8_t m_vsync;
+	uint8_t m_hsync;
 
 	struct
 	{
@@ -143,7 +149,6 @@ private:
 	uint8_t p1_ppi_r(offs_t offset);
 	void p1_ppi_w(offs_t offset, uint8_t data);
 	void p1_ppi_porta_w(uint8_t data);
-	uint8_t p1_ppi_porta_r();
 	uint8_t p1_ppi_portb_r();
 	uint8_t p1_ppi_portc_r();
 	void p1_ppi_portc_w(uint8_t data);
@@ -183,29 +188,45 @@ void p1_state::p1_trap_w(offs_t offset, uint8_t data)
 
 uint8_t p1_state::p1_cga_r(offs_t offset)
 {
-	uint16_t port = offset + 0x3d0;
+	switch (offset)
+	{
+		case 4: case 5: case 8: case 9:
+			LOG("cga R %.4x\n", offset + 0x3d0);
+			m_video.trap[2] = 0;
+			m_video.trap[1] = 0x43;
+			m_video.trap[0] = offset + 0xd0;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			break;
 
-	LOG("cga R %.4x\n", port);
-	m_video.trap[1] = 0x40 | ((port >> 8) & 0x3f);
-	m_video.trap[0] = port & 255;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		case 10:
+			return m_ppi8255n2->read(2);
+
+		default:
+			break;
+	}
 	return 0;
 }
 
 void p1_state::p1_cga_w(offs_t offset, uint8_t data)
 {
-	uint16_t port = offset + 0x3d0;
+	switch (offset)
+	{
+		case 4: case 5: case 8: case 9:
+			LOG("cga W %.4x $%02x\n", offset + 0x3d0, data);
+			m_video.trap[2] = data;
+			m_video.trap[1] = 0xC3;
+			m_video.trap[0] = offset + 0xd0;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			break;
 
-	LOG("cga W %.4x $%02x\n", port, data);
-	m_video.trap[2] = data;
-	m_video.trap[1] = 0xC0 | ((port >> 8) & 0x3f);
-	m_video.trap[0] = port & 255;
-	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		default:
+			break;
+	}
 }
 
 void p1_state::p1_vram_w(offs_t offset, uint8_t data)
 {
-	LOG("vram W %.4x $%02x\n", offset, data);
+	LOGDBG("vram W %.4x $%02x\n", offset, data);
 	if (m_video.videoram_base) m_video.videoram_base[offset] = data;
 	m_video.trap[2] = data;
 	m_video.trap[1] = 0x80 | ((offset >> 8) & 0x3f);
@@ -321,7 +342,7 @@ POISK1_UPDATE_ROW(p1_state::cga_gfx_2bpp_update_row)
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	uint32_t *p = &bitmap.pix(ra);
 
-	if (ra == 0) LOG("cga_gfx_2bpp_update_row\n");
+	if (ra == 0) LOGDBG("cga_gfx_2bpp_update_row\n");
 	uint16_t odd = (ra & 1) << 13;
 	uint16_t offset = (ma & 0x1fff) | odd;
 	for (int i = 0; i < stride; i++)
@@ -347,7 +368,7 @@ POISK1_UPDATE_ROW(p1_state::cga_gfx_1bpp_update_row)
 	uint32_t *p = &bitmap.pix(ra);
 	uint8_t fg = 15, bg = BG_COLOR(m_video.color_select_68);
 
-	if (ra == 0) LOG("cga_gfx_1bpp_update_row bg %d\n", bg);
+	if (ra == 0) LOGDBG("cga_gfx_1bpp_update_row bg %d\n", bg);
 	uint16_t odd = (ra & 1) << 13;
 	uint16_t offset = (ma & 0x1fff) | odd;
 	for (int i = 0; i < stride; i++)
@@ -377,7 +398,7 @@ POISK1_UPDATE_ROW(p1_state::poisk1_gfx_1bpp_update_row)
 	uint32_t *p = &bitmap.pix(ra);
 	uint8_t bg = BG_COLOR(m_video.color_select_68);
 
-	if (ra == 0) LOG("poisk1_gfx_1bpp_update_row bg %d\n", bg);
+	if (ra == 0) LOGDBG("poisk1_gfx_1bpp_update_row bg %d\n", bg);
 	uint16_t odd = (ra & 1) << 13;
 	uint16_t offset = (ma & 0x1fff) | odd;
 	for (int i = 0; i < stride; i++)
@@ -413,6 +434,16 @@ void p1_state::video_start()
 	m_video.stride = 80;
 
 	space.install_ram(0xb8000, 0xbffff, m_video.videoram);
+}
+
+WRITE_LINE_MEMBER(p1_state::vsync_changed)
+{
+	m_vsync = state ? 9 : 0;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(p1_state::hsync_changed)
+{
+	m_hsync = param & 1;
 }
 
 uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -467,15 +498,6 @@ void p1_state::p1_ppi_porta_w(uint8_t data)
 	LOGDBG("p1_ppi_porta_w %02X <- %02X\n", m_kbpoll_mask, data);
 }
 
-uint8_t p1_state::p1_ppi_porta_r()
-{
-	uint8_t ret;
-
-	ret = m_kbpoll_mask;
-	LOG("p1_ppi_porta_r = %02X\n", ret);
-	return ret;
-}
-
 uint8_t p1_state::p1_ppi_portb_r()
 {
 	uint16_t key = 0xffff;
@@ -516,12 +538,13 @@ uint8_t p1_state::p1_ppi_portc_r()
 
 uint8_t p1_state::p1_ppi2_portc_r()
 {
-	int data = 0xff;
+	int data = m_vsync | m_hsync | 0xc6;
 	double tap_val = m_cassette->input();
 
-	data = (data & ~0x10) | (tap_val < 0 ? 0x10 : 0x00);
+	data |= (tap_val < 0 ? 0x10 : 0x00);
+	data |= (m_p1_input << 5);
 
-	LOGDBG("p1_ppi_portc_r = %02X (tap_val %f) at %s\n", data, tap_val, machine().describe_context());
+	LOGDBG("p1_ppi2_portc_r = %02X (tap_val %f) at %s\n", data, tap_val, machine().describe_context());
 	return data;
 }
 
@@ -595,6 +618,8 @@ void p1_state::machine_start()
 void p1_state::machine_reset()
 {
 	m_kbpoll_mask = 0;
+	m_hsync = 0;
+	m_vsync = 0;
 }
 
 /*
@@ -613,15 +638,15 @@ void p1_state::poisk1_map(address_map &map)
 	map(0xfc000, 0xfffff).rom().region("bios", 0xc000);
 }
 
+// address decoder PROM maps 20-21, 28-2A, 40-43, 60-63, 68-6B, 3D4-3D5, and 3D8-3DA
 void p1_state::poisk1_io(address_map &map)
 {
 	map(0x0020, 0x0021).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0x0028, 0x002B).rw(FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
+	map(0x0028, 0x002A).rw(FUNC(p1_state::p1_trap_r), FUNC(p1_state::p1_trap_w));
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	// can't use regular rw(), because THIS IS SPARTA!
-	// 1st PPI occupies ports 60, 69, 6A and 6B; 2nd PPI -- 68, 61, 62 and 63.
-	map(0x0060, 0x006F).rw(FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
-	map(0x03D0, 0x03DF).rw(FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
+	// can't use regular rw(), because 1st PPI is mapped to 60, 69-6B and 2nd PPI -- to 68, 61-63
+	map(0x0060, 0x006B).rw(FUNC(p1_state::p1_ppi_r), FUNC(p1_state::p1_ppi_w));
+	map(0x03D0, 0x03DA).rw(FUNC(p1_state::p1_cga_r), FUNC(p1_state::p1_cga_w));
 }
 
 static INPUT_PORTS_START( poisk1 )
@@ -648,16 +673,15 @@ void p1_state::poisk1(machine_config &config)
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
 	I8255A(config, m_ppi8255n1);
-	m_ppi8255n1->in_pa_callback().set(FUNC(p1_state::p1_ppi_porta_r)); /*60H*/
-	m_ppi8255n1->out_pa_callback().set(FUNC(p1_state::p1_ppi_porta_w));
-	m_ppi8255n1->in_pb_callback().set(FUNC(p1_state::p1_ppi_portb_r)); /*69H*/
-	m_ppi8255n1->in_pc_callback().set(FUNC(p1_state::p1_ppi_portc_r));
-	m_ppi8255n1->out_pc_callback().set(FUNC(p1_state::p1_ppi_portc_w));   /*6AH*/
+	m_ppi8255n1->out_pa_callback().set(FUNC(p1_state::p1_ppi_porta_w)); // 60h
+	m_ppi8255n1->in_pb_callback().set(FUNC(p1_state::p1_ppi_portb_r)); // 69h
+	m_ppi8255n1->in_pc_callback().set(FUNC(p1_state::p1_ppi_portc_r)); // 6Ah
+	m_ppi8255n1->out_pc_callback().set(FUNC(p1_state::p1_ppi_portc_w));
 
 	I8255A(config, m_ppi8255n2);
-	m_ppi8255n2->out_pa_callback().set(FUNC(p1_state::p1_ppi2_porta_w));  /*68H*/
-	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w));  /*61H*/
-	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r));    /*62H*/
+	m_ppi8255n2->out_pa_callback().set(FUNC(p1_state::p1_ppi2_porta_w)); // 68h
+	m_ppi8255n2->out_pb_callback().set(FUNC(p1_state::p1_ppi2_portb_w)); // 61h
+	m_ppi8255n2->in_pc_callback().set(FUNC(p1_state::p1_ppi2_portc_r)); // 62h and 3DAh
 
 	ISA8(config, m_isabus, 0);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
@@ -678,9 +702,13 @@ void p1_state::poisk1(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
+	// fake hsync
+	TIMER(config, "scantimer").configure_scanline(FUNC(p1_state::hsync_changed), "screen", 0, 1);
+
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(15'000'000), 912,0,640, 262,0,200);
 	m_screen->set_screen_update(FUNC(p1_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(p1_state::vsync_changed));
 
 	/* XXX verify palette */
 	PALETTE(config, m_palette, FUNC(p1_state::p1_palette), CGA_PALETTE_SETS * 16);
