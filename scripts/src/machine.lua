@@ -4884,9 +4884,9 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/tsconfdma.h,MACHINES["TSCONF"] = true
+--@src/devices/machine/tsconfdma.h,MACHINES["TSCONF_DMA"] = true
 ---------------------------------------------------
-if (MACHINES["TSCONF"]~=null) then
+if (MACHINES["TSCONF_DMA"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/tsconfdma.cpp",
 		MAME_DIR .. "src/devices/machine/tsconfdma.h",
