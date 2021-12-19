@@ -10,7 +10,7 @@
     - several unknown registers (effects and unknown register tied to repeat port);
     - repeat certainly needs a cutoff, which is unknown about how it works;
     - keyon/off behavior is not verified
-	- PCM output is incorrect/unverified
+    - PCM output is incorrect/unverified
 
 ***************************************************************************/
 
@@ -111,7 +111,7 @@ void flower_sound_device::make_mixer_table(int voices, int gain)
 
 void flower_sound_device::device_reset()
 {
-	for (auto & voice : m_channel_list)
+	for (auto &voice : m_channel_list)
 	{
 		voice.start_address = 0;
 		voice.position = 0;
@@ -129,7 +129,7 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 	std::fill_n(&m_mixer_buffer[0], buffer.samples(), 0);
 
-	for (auto & voice : m_channel_list)
+	for (auto &voice : m_channel_list)
 	{
 		int ch_volume = voice.volume;
 		int ch_frequency = voice.frequency;
@@ -251,7 +251,7 @@ void flower_sound_device::start_address_w(offs_t offset, u8 data)
 	voice.start_nibbles[offset & 7] = data;
 	/*
 	if ((offset & 7) == 4)
-		voice.effect = data >> 4;
+	    voice.effect = data >> 4;
 	*/
 }
 

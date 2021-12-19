@@ -223,7 +223,7 @@ void nes_state::fds(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(nes_state, fds)
 
 	config.device_remove("nes_slot");
-	NES_DISKSYS(config, "disk", 0);
+	NES_DISKSYS(config, "disk", NTSC_APU_CLOCK);
 
 	config.device_remove("cart_list");
 	config.device_remove("cass_list");
@@ -269,7 +269,7 @@ void nes_state::famitwin(machine_config &config)
 
 	m_cartslot->set_must_be_loaded(false);
 
-	NES_DISKSYS(config, "disk", 0);
+	NES_DISKSYS(config, "disk", NTSC_APU_CLOCK);
 }
 
 

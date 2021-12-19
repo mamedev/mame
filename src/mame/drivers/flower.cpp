@@ -13,9 +13,9 @@
     - sound chips (similar to Namco custom chips?)
 
     Video reference:
-	https://youtu.be/ycbJMG09UZ0
-	https://youtu.be/NolazjlEiAY
-	https://youtu.be/8JOPTCWu67g
+    https://youtu.be/ycbJMG09UZ0
+    https://youtu.be/NolazjlEiAY
+    https://youtu.be/8JOPTCWu67g
 
 ===============================================================================
 
