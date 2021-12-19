@@ -197,7 +197,6 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("cne_shlz",         NES_CNE_SHLZ);
 	device.option_add_internal("cocoma",           NES_COCOMA);
 	device.option_add_internal("nanjing",          NES_NANJING);     // mapper 163
-	device.option_add_internal("ntdec_2746",       NES_NTDEC_2746);
 	device.option_add_internal("ntdec_asder",      NES_NTDEC_ASDER); // mapper 112
 	device.option_add_internal("ntdec_fh",         NES_NTDEC_FH);    // mapper 193
 	device.option_add_internal("ntdec_n715021",    NES_NTDEC_N715021);    // mapper 81

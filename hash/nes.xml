@@ -79887,7 +79887,7 @@ be better to redump them properly. -->
 		<year>1988</year>
 		<publisher>NTDEC</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="ntdec_2746" />
+			<feature name="slot" value="bmc_810544c" />
 			<feature name="pcb_model" value="2746" />
 			<dataarea name="prg" size="262144">
 				<rom name="14-in-1 (ntdec).prg" size="262144" crc="24aebe85" sha1="ba0d04564c4e95b997426815b7cda88e76f4239d" status="baddump" />
