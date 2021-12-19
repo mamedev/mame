@@ -12,8 +12,8 @@ TODO:
 - emulate К1801ВМ1, using T11 for now and I hope it works ok
 - emulate K1809BB1, IRQ is from here too (measured 177.4Hz)
 - It's running a bit too fast?: CPU clock was measured 4.61MHz, beeper
-  frequency 3.73KHz and beeper duration 34.2ms. In MAME, beeper frequency is
-  4.15KHz and duration is 31ms, meaning it's around 1.1 times faster, maybe
+  frequency 3.73kHz and beeper duration 34.2ms. In MAME, beeper frequency is
+  4.15kHz and duration is 31ms, meaning it's around 1.1 times faster, maybe
   К1801ВМ1 internal timing differs from T11, and/or MAME's T11 core timing
   itself is not 100% accurate.
 - Is im01t extra RAM chip used at all, and if so, where is it mapped?
