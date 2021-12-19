@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 	u8 pal = ((BIT(PAL_SEL, 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2)) << 4;
 	if (BIT(hi, 6, 2))
 	{
-		LOGWARN("!!! - FLIP Case\n");
+		logerror("FIXME - FLIP Case\n");
 	}
 	tileinfo.set(2 + Layer, tile, u16(pal), 0);
 }
@@ -210,7 +210,7 @@ void tsconf_state::machine_reset()
 
 	m_ram_0000 = nullptr;
 
-	rgb_t colors[256] = {from_rgb15(0)};
+	rgb_t colors[256] = {0};
 	m_palette->set_pen_colors(0, colors);
 
 	m_gluk_ext = DISABLED;

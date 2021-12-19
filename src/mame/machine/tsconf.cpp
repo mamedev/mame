@@ -28,6 +28,18 @@ enum v_mode : u8
 	VM_TXT
 };
 
+// https://github.com/tslabs/zx-evo/blob/master/pentevo/vdac/vdac1/cpld/top.v
+static constexpr u8 pwm_to_rgb[32] = {
+	0, 10, 21, 31, 42, 53, 63, 74,
+	85, 95, 106, 117, 127, 138, 149, 159,
+	170, 181, 191, 202, 213, 223, 234, 245,
+	255, 255, 255, 255, 255, 255, 255, 255};
+
+static constexpr rgb_t from_pwm(u16 pwm15)
+{
+	return rgb_t(pwm_to_rgb[BIT(pwm15, 10, 5)], pwm_to_rgb[BIT(pwm15, 5, 5)], pwm_to_rgb[BIT(pwm15, 0, 5)]);
+}
+
 void tsconf_state::tsconf_update_bank1()
 {
 
@@ -55,13 +67,11 @@ void tsconf_state::tsconf_update_bank1()
 	{
 		rom0 = m_ram->pointer() + PAGE(m_ROMSelection);
 		m_bank1->set_base(rom0);
-		LOGDEBUG("PAGE0: RAM %X\n", m_ROMSelection);
 	}
 	else
 	{
 		rom0 = &m_p_rom[0x10000 + PAGE(m_ROMSelection & 0x1f)];
 		m_bank1->set_base(rom0);
-		LOGDEBUG("PAGE0: ROM %X\n", m_ROMSelection & 0x1f);
 	}
 	m_ram_0000 = W0_WE ? rom0 : nullptr;
 }
@@ -102,7 +112,8 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 				{
 					u16 *bm = &m_screen_bitmap.pix(y, 0);
 					u16 *border_bm = &m_border_bitmap.pix(y, 0);
-					for (auto x = cliprect.left(); x <= cliprect.right(); x++) {
+					for (auto x = cliprect.left(); x <= cliprect.right(); x++)
+					{
 						*bm++ |= 0xf0;
 						*border_bm++ |= 0xf0;
 					}
@@ -213,7 +224,7 @@ void tsconf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 {
 	for (u8 i = 0; i < 85; i++)
 	{
-		LOGDEBUG("Draw Sprites ....\n");
+		logerror("Draw Sprites ... TODO\n");
 	}
 }
 
@@ -275,7 +286,7 @@ void tsconf_state::cram_write(u16 offset, u8 data)
 {
 	m_cram->write(offset, data);
 	u8 pen = offset >> 1;
-	rgb_t rgb = from_rgb15((m_cram->read(offset | 1) << 8 | m_cram->read(offset & 0xfffe)));
+	rgb_t rgb = from_pwm((m_cram->read(offset | 1) << 8 | m_cram->read(offset & 0xfffe)));
 	m_palette->set_pen_color(pen, rgb);
 };
 
@@ -330,7 +341,7 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 	case 0x31: // FRCnt1
 	case 0x32: // FRCnt2
 	default:
-		LOGERROR("'tsconf': unmapped reg read %02X\n", nreg);
+		logerror("'tsconf': unmapped reg read %02X\n", nreg);
 		break;
 	}
 
@@ -404,7 +415,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	}
 	else if (nreg == REGNUM(BORDER))
 	{
-		tsconf_port_fe_w(0, data & 0x07);
+		tsconf_port_fe_w(0, (m_port_fe_data & 0xf8) | (data & 0x07));
 	}
 	else if (nreg == REGNUM(DMAS_ADDRESS_L))
 	{
@@ -469,7 +480,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	}
 	else
 	{
-		LOGERROR("Unsupported reg write: %02X = %02x\n", nreg, data);
+		logerror("Unsupported reg write: %02X = %02x\n", nreg, data);
 	}
 }
 
@@ -539,7 +550,7 @@ void tsconf_state::tsconf_port_f7_cmos_w(offs_t offset, u8 data)
 				case PS2KEYBOARDS_LOG:
 					break;
 				default:
-					LOGWARN("Gluk extention not supported %x\n", m_gluk_reg);
+					logerror("Gluk extention not supported %x\n", m_gluk_reg);
 					break;
 				}
 				for (u8 i = 0; i < 0xf; i++)

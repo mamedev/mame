@@ -9,14 +9,6 @@
 #include "emu.h"
 #include "tsconfdma.h"
 
-#define LOG_TSDMA (1U << 1)
-
-#define VERBOSE (1U << 1)
-#define LOG_OUTPUT_FUNC osd_printf_info
-
-#include "logmacro.h"
-#define LOGDMA(...) LOGMASKED(LOG_TSDMA, __VA_ARGS__)
-
 // device type definition
 DEFINE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device, "tsconfdma", "TS-Conf DMA Controller")
 
@@ -173,7 +165,7 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
         break;
 
     default:
-        LOGDMA("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", dev, m_address_s, m_block_len, m_block_num, m_address_d);
+        logerror("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", dev, m_address_s, m_block_len, m_block_num, m_address_d);
         break;
     }
 

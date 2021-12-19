@@ -11,26 +11,12 @@
 #pragma once
 
 #include "machine/beta.h"
+#include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "spectrum.h"
-#include "spec128.h"
 #include "machine/tsconfdma.h"
 #include "machine/nvram.h"
-#include "machine/pckeybrd.h"
-#include "machine/8042kbdc.h"
+#include "spectrum.h"
 #include "tilemap.h"
-
-#define LOG_ERROR (1U << 0)
-#define LOG_WARN (1U << 1)
-#define LOG_DEBUG (1U << 2)
-
-#define VERBOSE (LOG_WARN)
-#define LOG_OUTPUT_FUNC osd_printf_info
-
-#include "logmacro.h"
-#define LOGERROR(...) LOGMASKED(LOG_DEBUG | LOG_WARN | LOG_ERROR, __VA_ARGS__)
-#define LOGWARN(...) LOGMASKED(LOG_DEBUG | LOG_WARN, __VA_ARGS__)
-#define LOGDEBUG(...) LOGMASKED(LOG_DEBUG, __VA_ARGS__)
 
 #define PAGE(_r) ((_r) << 14)
 #define RAM_PAGE_OFFST(_page, _offset) (PAGE(_page) + _offset)
@@ -89,14 +75,6 @@
 #define T1_X_OFFSER_H REG(0x45)
 #define T1_Y_OFFSER_L REG(0x46)
 #define T1_Y_OFFSER_H REG(0x47)
-
-static constexpr rgb_t from_rgb15(rgb15_t rgb15)
-{
-	u8 r = BIT(rgb15, 10, 5) << 3;
-	u8 g = BIT(rgb15, 5, 5) << 3;
-	u8 b = BIT(rgb15, 0, 5) << 3;
-	return rgb_t(r, g, b);
-}
 
 class tsconf_state : public spectrum_128_state
 {

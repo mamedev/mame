@@ -1102,6 +1102,7 @@ ts3000.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
+tsconf.cpp
 tsispch.cpp
 tulip1.cpp
 tutor.cpp
