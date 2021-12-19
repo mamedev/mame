@@ -79085,6 +79085,44 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="musicpow">
+		<description>8Bit Music Power</description>
+		<year>2016</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CBC-8M"/>
+		<info name="release" value="20160130"/>
+		<info name="alt_title" value="8ビットミュージックパワー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="KB87D" />
+			<dataarea name="prg" size="524288">
+				<rom name="8bit music power.prg" size="524288" crc="104e9410" sha1="2861b2fa673b785b66bf46814735104da9cc61be" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="8bit music power.chr" size="262144" crc="16f15eb6" sha1="09a4204edb35dd742fb3110e68b533661e8ba35e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicpwf">
+		<description>8Bit Music Power Final</description>
+		<year>2017</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CBC-8F"/>
+		<info name="release" value="20170406"/>
+		<info name="alt_title" value="8ビットミュージックパワーファイナル"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="KB87G" />
+			<dataarea name="prg" size="524288">
+				<rom name="8bit music power final.prg" size="524288" crc="c2856b5d" sha1="c97581829fa9738a8ce6eae9b6140b4b81510f66" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="8bit music power final.chr" size="262144" crc="a8c9290a" sha1="11101ef07c2e7d66421e9ca7e7df34a8c300107f" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This release is nearly identical to the prototype 1 set but with rebranding -->
 	<software name="airballr" cloneof="airball">
 		<description>Airball (RetroZone)</description>
@@ -79137,6 +79175,29 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k WRAM on cartridge -->
 			<dataarea name="wram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kirastar">
+		<description>Kira Kira Star Night DX</description>
+		<year>2016</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="serial" value="CBC-KS"/>
+		<info name="release" value="20161006"/>
+		<info name="alt_title" value="キラキラスターナイトDX"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb_model" value="KB87G" />
+			<dataarea name="prg" size="262144">
+				<rom name="kira kira star night dx.prg" size="262144" crc="35f72799" sha1="a865787e66b5e3c604b895ba92ef16f509bd79d3" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="kira kira star night dx.chr" size="262144" crc="baeb2c47" sha1="3a9f35bfaa920633ca96eb7df5a26b25688f6984" status="baddump" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -79204,6 +79265,23 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge? -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoheian">
+		<description>Neo Heiankyo Alien</description>
+		<year>2017</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="release" value="20170907"/>
+		<info name="alt_title" value="NEO平安京エイリアン"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<dataarea name="prg" size="524288">
+				<rom name="neo heiankyo alien.prg" size="524288" crc="b0fc6145" sha1="a8178c5293aafc2c6dc6d78c5fe4239edfff8395" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="neo heiankyo alien.chr" size="131072" crc="3f726765" sha1="879cb8c5a38295008aa08a79c69388d55292a249" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
