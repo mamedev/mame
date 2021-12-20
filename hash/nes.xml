@@ -52135,6 +52135,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
+	<software name="mc_8j21b">
+		<description>1998 Super HiK 8 in 1 (JY-021B)</description>
+		<year>1998</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy012005" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1998 super hik 8-in-1 (jy-021b).prg" size="1048576" crc="aa1aeece" sha1="c1fe5436d90619106e898a53d33201ca1e00dd16" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1998 super hik 8-in-1 (jy-021b).chr" size="1048576" crc="36ea5a43" sha1="bec2c0ba847d3b67d5c3e2b9b669093b7389cd38" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_4jy22">
 		<description>1995 Super HiK 4 in 1 (JY-022)</description>
 		<year>1995</year>

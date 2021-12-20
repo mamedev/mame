@@ -387,6 +387,7 @@ void nes_cart(device_slot_interface &device)
 	device.option_add_internal("bmc_830928c",      NES_BMC_830928C);
 	device.option_add_internal("bmc_850437c",      NES_BMC_850437C);
 	device.option_add_internal("bmc_970630c",      NES_BMC_970630C);
+	device.option_add_internal("bmc_jy012005",     NES_BMC_JY012005);
 	device.option_add_internal("bmc_jy820845c",    NES_BMC_JY820845C);
 	device.option_add_internal("srpg_5in1",        NES_SRPG_5IN1);
 	device.option_add_internal("n32_4in1",         NES_N32_4IN1);
