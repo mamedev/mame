@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Golden Child
 /*
    bitmap printer (dot printer)
 
@@ -13,7 +13,7 @@
 
  */
 #include "screen.h"
-#include "machine/session_time.h"
+//#include "machine/session_time.h"
 #include "machine/steppers.h"
 
 #ifndef MAME_MACHINE_BITMAP_PRINTER_H
@@ -26,11 +26,11 @@ class bitmap_printer_device : public device_t
 public:
 	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paperwidth, int paperheight, int hdpi, int vdpi) :
+	bitmap_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, int paper_width, int paper_height, int hdpi, int vdpi) :
 		bitmap_printer_device(mconfig, tag, owner, u32(0))
 	{
-		m_paperwidth = paperwidth;
-		m_paperheight = paperheight;
+		m_paper_width = paper_width;
+		m_paper_height = paper_height;
 		m_hdpi = hdpi;
 		m_vdpi = vdpi;
 	}
@@ -47,43 +47,47 @@ protected:
 
 private:
 	required_device<screen_device> m_screen;
-	required_device<session_time_device> m_session_time;
+//  required_device<session_time_device> m_session_time;
 public:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 
-	int m_cr_direction = 1; // direction of carriage
-	int m_pf_stepper_ratio0 = 1;
-	int m_pf_stepper_ratio1 = 1;
-	int m_cr_stepper_ratio0 = 1;
-	int m_cr_stepper_ratio1 = 1;
-	int m_xpos = 0;
-	int m_ypos = 0;
+	int m_cr_direction; // direction of carriage
+	int m_pf_stepper_ratio0;
+	int m_pf_stepper_ratio1;
+	int m_cr_stepper_ratio0;
+	int m_cr_stepper_ratio1;
+	int m_xpos;
+	int m_ypos;
 
 	bitmap_rgb32  m_page_bitmap;  // page bitmap
 private:
-	const int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
-	const int m_distfrombottom = 50;  // print position from bottom of screen
+	static constexpr int PAPER_SCREEN_HEIGHT = 384; // match the height of the apple II driver
+	static constexpr int m_distfrombottom = 50;  // print position from bottom of screen
 
-	int m_printhead_color       = 0xEEE8AA;
-	int m_printhead_bordercolor = 0xBDB76B;
-	int m_printhead_bordersize = 2;
-	int m_printhead_xsize = 10;
-	int m_printhead_ysize = 20;
-	int m_pagedirty = 0;
-	int m_paperwidth;
-	int m_paperheight;
+	int m_printhead_color;
+	int m_printhead_bordercolor;
+	int m_printhead_bordersize;
+	int m_printhead_xsize;
+	int m_printhead_ysize;
+	int m_page_dirty;
+	int m_paper_width;
+	int m_paper_height;
 	int m_hdpi;
 	int m_vdpi;
-	int clear_pos = 0;
-	int newpageflag = 0;  // used to keep printhead at the top of page until actual printing
+	int m_clear_pos;
+	int m_newpage_flag;  // used to keep printhead at the top of page until actual printing
+	static constexpr int MAX_LEDS = 5;
+	int m_led_state[MAX_LEDS];
+	int m_num_leds;
 
 public:
+	void set_led_state(int led, int value) { m_led_state[led] = value; m_num_leds = std::max(m_num_leds, led); }
 	void set_printhead_color(int headcolor, int bordcolor);
 	void set_printhead_size(int xsize, int ysize, int bordersize);
-	void setheadpos(int x, int y){  if (m_xpos != x) newpageflag = 0; m_xpos = x; m_ypos = y;}
+	void setheadpos(int x, int y){  if (m_xpos != x) m_newpage_flag = 0; m_xpos = x; m_ypos = y;}
 
-	session_time_device* get_session_time_device() {return m_session_time;}
+//  session_time_device* get_session_time_device() {return m_session_time;}
 
 	void write_snapshot_to_file(std::string directory, std::string name);
 
@@ -95,7 +99,7 @@ public:
 	void bitmap_clear_band(int from_line, int to_line, u32 color);
 	void clear_to_pos(int to_line, u32 color = 0xffffff);
 
-	std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
+//  std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 
 	int get_top_margin();
 	int get_bottom_margin();
@@ -110,6 +114,7 @@ public:
 
 private:
 	void draw_printhead(bitmap_rgb32 &bitmap, int x, int y);
+	u32 dimcolor(u32 incolor, int factor);
 
 	int calc_scroll_y(bitmap_rgb32& bitmap);
 	uint32_t screen_update_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

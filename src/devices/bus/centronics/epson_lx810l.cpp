@@ -158,6 +158,7 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	e05a30.centronics_fault().set(FUNC(epson_lx810l_device::e05a30_centronics_fault));
 	e05a30.centronics_select().set(FUNC(epson_lx810l_device::e05a30_centronics_select));
 	e05a30.cpu_reset().set(FUNC(epson_lx810l_device::e05a30_cpu_reset));
+	e05a30.ready_led().set(FUNC(epson_lx810l_device::e05a30_ready_led));
 
 	/* 256-bit eeprom */
 	EEPROM_93C06_16BIT(config, "eeprom");
@@ -296,11 +297,14 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_eeprom(*this, "eeprom"),
 	m_e05a30(*this, "e05a30"),
 	m_online_led(*this, "online_led"),
+	m_ready_led(*this, "ready_led"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
 	m_real_cr_steps(0),
-	m_fakemem(0)
+	m_fakemem(0),
+	m_in_between_offset(0),
+	m_rightward_offset(-3)
 {
 }
 
@@ -316,6 +320,7 @@ epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const ch
 void epson_lx810l_device::device_start()
 {
 	m_online_led.resolve();
+	m_ready_led.resolve();
 
 	m_cr_timer = timer_alloc(TIMER_CR);
 }
@@ -327,6 +332,7 @@ void epson_lx810l_device::device_start()
 
 void epson_lx810l_device::device_reset()
 {
+	m_in_between_offset = 0;
 }
 
 
@@ -399,7 +405,8 @@ uint8_t epson_lx810l_device::porta_r(offs_t offset)
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
 
 	// Update the printhead display, only put this here since this routine gets called frequently
-	m_bitmap_printer->set_printhead_color( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0);
+//  m_bitmap_printer->set_printhead_color( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0);
+	m_bitmap_printer->set_led_state(0, !ioport("PAPEREND")->read());
 
 	return result;
 }
@@ -483,7 +490,7 @@ void epson_lx810l_device::portc_w(offs_t offset, uint8_t data)
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
 	m_online_led = !BIT(data, 2);
-
+	m_bitmap_printer->set_led_state(2, m_online_led);
 }
 
 

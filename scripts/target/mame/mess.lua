@@ -826,7 +826,6 @@ MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
 MACHINES["NS32082"] = true
 MACHINES["BITMAP_PRINTER"] = true
-MACHINES["SESSION_TIME"] = true
 
 --------------------------------------------------
 -- specify available bus cores

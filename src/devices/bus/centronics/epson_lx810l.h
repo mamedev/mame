@@ -106,6 +106,9 @@ private:
 
 	DECLARE_WRITE_LINE_MEMBER(e05a30_cpu_reset) { if (!state) m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero); } // reset cpu
 
+	DECLARE_WRITE_LINE_MEMBER(e05a30_ready_led) { m_ready_led = state;  m_bitmap_printer->set_led_state(1, m_ready_led); }
+
+
 	void lx810l_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
@@ -114,14 +117,15 @@ private:
 	required_device<e05a30_device> m_e05a30;
 
 	output_finder<> m_online_led;
+	output_finder<> m_ready_led;
 
 	int m_93c06_clk;
 	int m_93c06_cs;
 	uint16_t m_printhead;
 	int m_real_cr_steps;
 	uint8_t m_fakemem;
-	int m_in_between_offset = 0; // in between cr_stepper phases
-	int m_rightward_offset = -3; // pixels when stepper moving rightward
+	int m_in_between_offset; // in between cr_stepper phases
+	int m_rightward_offset; // pixels when stepper moving rightward
 //  bitmap_rgb32 m_bitmap;
 
 	enum {
