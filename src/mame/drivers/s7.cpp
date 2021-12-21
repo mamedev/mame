@@ -69,7 +69,6 @@ ToDo:
 
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/input_merger.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "speaker.h"
@@ -122,7 +121,6 @@ private:
 	void sol1_w(u8 data);
 	void sol2_w(u8 data);
 	void sound_w(u8 data);
-	void pias_sound_w(u8 data) { if (BIT(data, 7)) m_pias->cb1_w(0); };
 	u8 dips_r();
 	u8 switch_r();
 	void switch_w(u8 data);
@@ -780,7 +778,7 @@ void s7_state::s7(machine_config &config)
 	PIA6821(config, m_pias, 0);
 	m_pias->readpb_handler().set(FUNC(s7_state::sound_r));
 	m_pias->writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
-	m_pias->writepb_handler().set(FUNC(s7_state::pias_sound_w));
+	m_pias->writepb_handler().set_nop();
 	m_pias->readca1_handler().set_constant(1);
 	m_pias->ca2_handler().set(m_hc55516, FUNC(hc55516_device::digit_w));
 	m_pias->cb2_handler().set(m_hc55516, FUNC(hc55516_device::clock_w));
@@ -1162,7 +1160,7 @@ GAME( 1982, thund_p3, thund_p1, s7, thund, s7_state, init_1,     ROT0, "Williams
 GAME( 1981, hypbl_l4, 0,        s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-4)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, hypbl_l3, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-3)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1981, hypbl_l2, hypbl_l4, s7, hypbl, s7_state, empty_init, ROT0, "Williams",  "HyperBall (L-2)",                   MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 1981, barra_l1, 0,        s7, barra, s7_state, init_1, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1981, barra_l1, 0,        s7, barra, s7_state, empty_init, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, vrkon_l1, 0,        s7, vrkon, s7_state, empty_init, ROT0, "Williams",  "Varkon (L-1)",                      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, tmfnt_l5, 0,        s7, tmfnt, s7_state, empty_init, ROT0, "Williams",  "Time Fantasy (L-5)",                MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1982, wrlok_l3, 0,        s7, wrlok, s7_state, empty_init, ROT0, "Williams",  "Warlok (L-3)",                      MACHINE_IS_SKELETON_MECHANICAL )
