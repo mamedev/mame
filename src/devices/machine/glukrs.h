@@ -18,17 +18,17 @@ public:
     u8 read(offs_t address);
     void write(offs_t address, u8 data);
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+    TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override;
-   	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+    virtual void device_add_mconfig(machine_config &config) override;
+    virtual void device_start() override;
+    virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
     u8 m_cmos[0x100];
     required_device<nvram_device> m_nvram;
-	emu_timer *m_timer;
+    emu_timer *m_timer;
 };
 
 DECLARE_DEVICE_TYPE(GLUKRS, glukrs_device)

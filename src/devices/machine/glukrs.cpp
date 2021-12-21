@@ -26,8 +26,8 @@ void glukrs_device::device_start()
 {
   m_nvram->set_base(&m_cmos, sizeof(m_cmos));
 
-	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(glukrs_device::timer_callback), this));
-	m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
+  m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(glukrs_device::timer_callback), this));
+  m_timer->adjust(attotime::from_hz(clock() / XTAL(32'768)), 0, attotime::from_hz(clock() / XTAL(32'768)));
 }
 
 u8 glukrs_device::read(offs_t address)
@@ -53,7 +53,7 @@ void glukrs_device::rtc_clock_updated(int year, int month, int day, int day_of_w
 
 TIMER_CALLBACK_MEMBER(glukrs_device::timer_callback)
 {
-	advance_seconds();
+  advance_seconds();
 }
 
 // device type definition
