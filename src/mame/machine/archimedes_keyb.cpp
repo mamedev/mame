@@ -2,7 +2,23 @@
 // copyright-holders:Angelo Salese, Sandro Ronco
 /**********************************************************************
 
-    Acorn Archimedes keyboard
+    Acorn Archimedes keyboard (A5000)
+
+    Keyboard variants:
+     A500 (external) 6500/11 MCU w/ 2732 ROM (dumped), see A500 Hardware Guide.
+     A3x0 (external) 8031 MCU w/ 2764 ROM (dumped), not documented.
+     A4x0 (external) 8031 MCU w/ 2764 ROM (dumped), same as A3x0.
+     A680 (external) unknown.
+    A3000 (internal) 8051 MCU (part 0280,022) w/ internal ROM (dumped), see A3000TRM.
+     A540 (external) 8051 MCU (part 0280,022) w/ internal ROM, see A500/R200TRM, same as A3000.
+    A5000 (external) 8051 MCU (part 0280,022) w/ internal ROM, see A5000TRM, same as A3000.
+       A4 (internal) 8051 MCU (part 0290,031) w/ internal ROM, see A4TRM. Supports PS/2 keyboard.
+    A30x0 (internal) 8051 MCU (part 0294,031) w/ internal ROM, see A3010TRM.
+    A4000 (external) likely same as A30x0, but not confirmed.
+
+    TODO:
+    - convert to slot device and move to bus/archimedes/keyboard.
+    - add other variants.
 
 *********************************************************************/
 
@@ -188,10 +204,10 @@ static INPUT_PORTS_START( archimedes_keyboard )
 	PORT_BIT(0xfeff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("MOUSE.0")
-	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_MOUSE_X) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_RESET PORT_CODE(MOUSECODE_X) PORT_CHANGED_MEMBER(DEVICE_SELF, archimedes_keyboard_device, update_mouse_input, 0)
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_MOUSE_X) PORT_SENSITIVITY(100)
 
 	PORT_START("MOUSE.1")
-	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_MOUSE_Y) PORT_SENSITIVITY(50) PORT_KEYDELTA(0) PORT_RESET PORT_CODE(MOUSECODE_Y) PORT_CHANGED_MEMBER(DEVICE_SELF, archimedes_keyboard_device, update_mouse_input, 1) PORT_REVERSE
+	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_MOUSE_Y) PORT_SENSITIVITY(100)
 
 	PORT_START("MOUSE.2")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left")
@@ -242,7 +258,8 @@ void archimedes_keyboard_device::device_start()
 
 	save_item(NAME(m_mouse_x));
 	save_item(NAME(m_mouse_y));
-	save_item(NAME(m_mouse_phase));
+	save_item(NAME(m_mouse_xphase));
+	save_item(NAME(m_mouse_yphase));
 	save_item(NAME(m_mouse_xref));
 	save_item(NAME(m_mouse_xdir));
 	save_item(NAME(m_mouse_yref));
@@ -256,14 +273,15 @@ void archimedes_keyboard_device::device_start()
 
 void archimedes_keyboard_device::device_reset()
 {
-	m_mouse_x     = 0;
-	m_mouse_y     = 0;
-	m_mouse_phase = 1;
-	m_mouse_xref  = 1;
-	m_mouse_xdir  = 1;
-	m_mouse_yref  = 1;
-	m_mouse_ydir  = 1;
-	m_mux         = 0;
+	m_mouse_x = 0;
+	m_mouse_y = 0;
+	m_mouse_xphase = 1;
+	m_mouse_xref = 1;
+	m_mouse_xdir = 1;
+	m_mouse_yphase = 1;
+	m_mouse_yref = 1;
+	m_mouse_ydir = 1;
+	m_mux = 0;
 
 	transmit_register_reset();
 	receive_register_reset();
@@ -329,35 +347,72 @@ void archimedes_keyboard_device::device_timer(emu_timer &timer, device_timer_id 
 	//   0    0        0    0
 	//   0    1        1    0
 
-	switch (m_mouse_phase)
+	int16_t x = m_mouse[0]->read();
+	int16_t y = m_mouse[1]->read();
+
+	int16_t dx = x - m_mouse_x;
+	int16_t dy = y - m_mouse_y;
+
+	if (dx)
 	{
-	case 0:
-		m_mouse_xdir = m_mouse_xref = 1;
-		m_mouse_ydir = m_mouse_yref = 1;
-		break;
-	case 1:
-		m_mouse_xref = m_mouse_x < 0 ? 0 : 1;
-		m_mouse_xdir = m_mouse_x > 0 ? 0 : 1;
-		m_mouse_yref = m_mouse_y < 0 ? 0 : 1;
-		m_mouse_ydir = m_mouse_y > 0 ? 0 : 1;
-		break;
-	case 2:
-		m_mouse_xdir = m_mouse_xref = m_mouse_x != 0 ? 0 : 1;
-		m_mouse_ydir = m_mouse_yref = m_mouse_y != 0 ? 0 : 1;
-		break;
-	case 3:
-		m_mouse_xref = m_mouse_x > 0 ? 0 : 1;
-		m_mouse_xdir = m_mouse_x < 0 ? 0 : 1;
-		m_mouse_yref = m_mouse_y > 0 ? 0 : 1;
-		m_mouse_ydir = m_mouse_y < 0 ? 0 : 1;
-		if (m_mouse_x > 0)    m_mouse_x--;
-		if (m_mouse_x < 0)    m_mouse_x++;
-		if (m_mouse_y > 0)    m_mouse_y--;
-		if (m_mouse_y < 0)    m_mouse_y++;
-		break;
+		// Set the output pins according to the current phase
+		switch (m_mouse_xphase)
+		{
+		case 0:
+			m_mouse_xref = 1;
+			break;
+		case 1:
+			m_mouse_xdir = 1;
+			break;
+		case 2:
+			m_mouse_xref = 0;
+			break;
+		case 3:
+			m_mouse_xdir = 0;
+			break;
+		}
+
+		// Change phase
+		if (dx > 0)
+			m_mouse_xphase--;
+		else
+			m_mouse_xphase++;
+
+		// Range check the phase
+		m_mouse_xphase &= 3;
 	}
 
-	m_mouse_phase = (m_mouse_phase + 1) & 3;
+	if (dy)
+	{
+		// Set the output pins according to the current phase
+		switch (m_mouse_yphase)
+		{
+		case 3:
+			m_mouse_yref = 0;
+			break;
+		case 2:
+			m_mouse_ydir = 0;
+			break;
+		case 1:
+			m_mouse_yref = 1;
+			break;
+		case 0:
+			m_mouse_ydir = 1;
+			break;
+		}
+
+		// Change phase
+		if (dy > 0)
+			m_mouse_yphase--;
+		else
+			m_mouse_yphase++;
+
+		// Range check the phase
+		m_mouse_yphase &= 3;
+	}
+
+	m_mouse_x = x;
+	m_mouse_y = y;
 }
 
 void archimedes_keyboard_device::leds_w(uint8_t data)
@@ -380,13 +435,4 @@ void archimedes_keyboard_device::tx_w(uint8_t data)
 {
 	if (is_transmit_register_empty())
 		transmit_register_setup(data);
-}
-
-INPUT_CHANGED_MEMBER(archimedes_keyboard_device::update_mouse_input)
-{
-	if (param == 0)
-		m_mouse_x = (int16_t)m_mouse[0]->read();
-
-	if (param == 1)
-		m_mouse_y = (int16_t)m_mouse[1]->read();
 }
