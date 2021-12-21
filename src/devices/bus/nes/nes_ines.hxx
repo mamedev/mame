@@ -439,7 +439,7 @@ static const nes_mmc mmc_list[] =
 	// 401 Super 19-in-1 VIP 19, not in nes.xml?
 	// 402 22-in-1 Olympic Games, not in nes.xml?
 	// 403 Tetris Family 19-in-1 that only works on Famiclones with 6502's BCD mode
-	// 404 JY-021B multicart, not in nes.xml?
+	{ 404, BMC_JY012005 },
 	// 405 UMC UM6578 NES-on-a-chip games...PnPs?
 	// 406 homebrew game Haradius Zero
 	// 407 VT03 PnP
