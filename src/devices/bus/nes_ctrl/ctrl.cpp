@@ -218,7 +218,7 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("konamibag", NES_KONAMIBAG);
 	device.option_add("konamihs", NES_KONAMIHS);
 	device.option_add("konami_piano", NES_DOREPIANO);
-	device.option_add("mj_panel", NES_MJPANEL);
+	device.option_add("mahjong", NES_MJPANEL);
 	device.option_add("pachinko", NES_PACHINKO);
 	device.option_add("partytap", NES_PARTYTAP);
 	device.option_add("hori_twin", NES_HORITWIN);
