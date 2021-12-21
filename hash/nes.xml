@@ -17565,7 +17565,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="0.prg" size="16384" crc="ff6621ce" sha1="33be02be4ba014b45394c18255f3885c13253690" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17586,6 +17586,7 @@ license:CC0
 			<feature name="slot" value="discrete_74x139" />
 			<feature name="pcb" value="KONAMI-74*139/74" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="800jx1p" size="32768" crc="db9418e8" sha1="91023417168e05ea9b63696ccca34355fc53011c" offset="00000"  />
 			</dataarea>
@@ -17606,7 +17607,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="806j0p" size="16384" crc="ac98cd70" sha1="191ede32665ddc042126e90e48805846f76fbe7b" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17628,7 +17629,7 @@ license:CC0
 			<feature name="slot" value="nrom" />
 			<feature name="pcb" value="KONAMI-NROM-128" />
 			<feature name="mirroring" value="vertical" />
-			<feature name="peripheral" value="hypershot" />
+			<feature name="peripheral" value="konami_hypershot" />
 			<dataarea name="prg" size="32768">
 				<rom name="1.1.prg" size="16384" crc="ba5c8a54" sha1="f4fd4f13078c4aa758a5501d8270785c03018aba" offset="00000" />
 				<rom size="16384" offset="0x4000" loadflag="reload" />
@@ -17728,7 +17729,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ideyumj1" cloneof="ideyumj">
+	<software name="ideyomj1" cloneof="ideyomj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
@@ -17750,7 +17751,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ideyumj">
+	<software name="ideyomj">
 		<description>Ide Yousuke Meijin no Jissen Mahjong (Jpn, Rev. A)</description>
 		<year>1987</year>
 		<publisher>Capcom</publisher>
@@ -17772,7 +17773,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="ideyumj2">
+	<software name="ideyomj2">
 		<description>Ide Yousuke Meijin no Jissen Mahjong II (Jpn)</description>
 		<year>1991</year>
 		<publisher>Capcom</publisher>
@@ -17784,6 +17785,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="mjcontroller" />
 			<dataarea name="prg" size="262144">
 				<rom name="cap-2q-0 prg" size="262144" crc="7b44fb2a" sha1="5f04d72eb14a0014e44c2875f705c62913538e42" offset="00000" />
 			</dataarea>
@@ -52131,6 +52133,21 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="chr" size="524288">
 				<rom name="1997 super hik 4-in-1 (jy-021).chr" size="524288" crc="4a797d16" sha1="e7cf3951f727913aa94dd702e1d5c48e19976bb9" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_8j21b">
+		<description>1998 Super HiK 8 in 1 (JY-021B)</description>
+		<year>1998</year>
+		<publisher>J.Y. Company</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_jy012005" />
+			<dataarea name="prg" size="1048576">
+				<rom name="1998 super hik 8-in-1 (jy-021b).prg" size="1048576" crc="aa1aeece" sha1="c1fe5436d90619106e898a53d33201ca1e00dd16" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="1998 super hik 8-in-1 (jy-021b).chr" size="1048576" crc="36ea5a43" sha1="bec2c0ba847d3b67d5c3e2b9b669093b7389cd38" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

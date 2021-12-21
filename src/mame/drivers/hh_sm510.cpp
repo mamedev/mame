@@ -277,9 +277,6 @@ void hh_sm510_state::sm500_lcd_segment_w(offs_t offset, u16 data)
 
 // generic input handlers - usually S output is input mux, and K input for buttons
 
-#define PORT_CHANGED_CB(x) \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
-
 u8 hh_sm510_state::read_inputs(int columns, int fixed)
 {
 	u8 ret = 0;
@@ -298,7 +295,9 @@ u8 hh_sm510_state::read_inputs(int columns, int fixed)
 void hh_sm510_state::update_k_line()
 {
 	// this is necessary because the MCU can wake up on K input activity
-	m_maincpu->set_input_line(SM510_INPUT_LINE_K, input_r() ? ASSERT_LINE : CLEAR_LINE);
+	u8 input = input_r();
+	for (int i = 0; i < 4; i++)
+		m_maincpu->set_input_line(i, BIT(input, i) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_CHANGED_MEMBER(hh_sm510_state::input_changed)

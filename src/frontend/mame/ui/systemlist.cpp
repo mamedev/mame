@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <functional>
 #include <locale>
 #include <string_view>
 
@@ -32,7 +33,11 @@ void system_list::cache_data(ui_options const &options)
 	if (!m_started)
 	{
 		m_started = true;
+#if defined(__EMSCRIPTEN__)
+		std::invoke(
+#else
 		m_thread = std::make_unique<std::thread>(
+#endif
 				[this, datpath = std::string(options.history_path()), titles = std::string(options.system_names())]
 				{
 					do_cache_data(datpath, titles);

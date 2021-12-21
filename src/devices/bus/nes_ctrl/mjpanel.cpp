@@ -2,7 +2,14 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Mahjong Panel
+    Nintendo Family Computer Capcom Mahjong Controller
+
+    There are two versions of this controller, one packed with the 1st
+    and 2nd Ide Yousoku Meijin no Jissen Mahjong, respectively. Both
+    have the original game's serial "CAP-IM" on back. Controller serials
+    HC-01 or HC-02 appear on revisions of the 1st game's controller.
+    HC-01 also appears on the 2nd game's controller. At least one
+    version of the original controller has a PCB marked 0827-06 HORI.
 
 **********************************************************************/
 
@@ -13,7 +20,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_MJPANEL, nes_mjpanel_device, "nes_mjpanel", "Famicom Mahjong Panel")
+DEFINE_DEVICE_TYPE(NES_MJPANEL, nes_mjpanel_device, "nes_mjpanel", "Capcom Mahjong Controller")
 
 
 static INPUT_PORTS_START( nes_mjpanel )
@@ -22,17 +29,17 @@ static INPUT_PORTS_START( nes_mjpanel )
 
 	PORT_START("MJPANEL.1")
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_N )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_M )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_N ) PORT_NAME("%p Mahjong N / Circle")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_M ) PORT_NAME("%p Mahjong M / Square")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_L )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_K )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_MAHJONG_J )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_I )
 
 	PORT_START("MJPANEL.2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_F )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_MAHJONG_H ) PORT_NAME("%p Mahjong H / Right")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_MAHJONG_G ) PORT_NAME("%p Mahjong G / Up")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_F ) PORT_NAME("%p Mahjong F / Left")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_E )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_C )
@@ -45,9 +52,9 @@ static INPUT_PORTS_START( nes_mjpanel )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MAHJONG_PON )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("Mahjong Select")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Mahjong Start")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_MAHJONG_KAN ) PORT_NAME("%p Mahjong Kan / Right")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("%p Start / Down")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME("%p Select / Left")
 INPUT_PORTS_END
 
 
@@ -70,11 +77,12 @@ ioport_constructor nes_mjpanel_device::device_input_ports() const
 //  nes_mjpanel_device - constructor
 //-------------------------------------------------
 
-nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, NES_MJPANEL, tag, owner, clock)
 	, device_nes_control_port_interface(mconfig, *this)
 	, m_panel(*this, "MJPANEL.%u", 0)
 	, m_latch(0)
+	, m_row(0)
 {
 }
 
@@ -86,16 +94,8 @@ nes_mjpanel_device::nes_mjpanel_device(const machine_config &mconfig, const char
 void nes_mjpanel_device::device_start()
 {
 	save_item(NAME(m_latch));
-}
-
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_mjpanel_device::device_reset()
-{
-	m_latch = 0;
+	save_item(NAME(m_row));
+	save_item(NAME(m_strobe));
 }
 
 
@@ -103,17 +103,16 @@ void nes_mjpanel_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_mjpanel_device::read_exp(offs_t offset)
+u8 nes_mjpanel_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
-	if (offset)
+	u8 ret = 0;
+	if (offset)    // $4017
 	{
+		if (m_strobe)
+			set_latch();
 		ret = (m_latch & 1) << 1;
 		m_latch >>= 1;
 	}
-	else
-		logerror("Error: Mahjong panel read from $4016\n");
-
 	return ret;
 }
 
@@ -121,13 +120,17 @@ uint8_t nes_mjpanel_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_mjpanel_device::write(uint8_t data)
+void nes_mjpanel_device::write(u8 data)
 {
-	if (data & 0x01)
-		return;
+	m_row = (data >> 1) & 0x03;
+	if (write_strobe(data))
+		set_latch();
+}
 
-	if (data & 0xf8)
-		logerror("Error: Mahjong panel read with mux data %02x\n", (data & 0xfe));
-	else
-		m_latch = m_panel[(data & 0xfe) >> 1]->read();
+void nes_mjpanel_device::set_latch()
+{
+	if (m_row)
+		m_latch = m_panel[m_row]->read();
+	else  // hardware behavior of the apparently unused input row
+		m_latch = m_panel[1]->read() | m_panel[2]->read();
 }
