@@ -29,7 +29,6 @@ u8 sm500_device::get_digit()
 }
 
 
-
 // instruction set
 
 // RAM address instructions

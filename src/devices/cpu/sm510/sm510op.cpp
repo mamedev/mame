@@ -438,12 +438,6 @@ void sm510_base_device::op_idiv()
 	m_div = 0;
 }
 
-void sm510_base_device::op_dr()
-{
-	// DR: reset divider low 8 bits
-	m_div &= 0x7f;
-}
-
 void sm510_base_device::op_dta()
 {
 	// DTA: transfer divider low 4 bits to ACC

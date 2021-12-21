@@ -263,7 +263,6 @@ protected:
 	virtual void op_skip();
 	virtual void op_cend();
 	virtual void op_idiv();
-	virtual void op_dr();
 	virtual void op_dta();
 	virtual void op_clklo();
 	virtual void op_clkhi();
