@@ -4892,3 +4892,14 @@ if (MACHINES["TSCONF_DMA"]~=null) then
 		MAME_DIR .. "src/devices/machine/tsconfdma.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/glukrs.h,MACHINES["GLUKRS"] = true
+---------------------------------------------------
+if (MACHINES["GLUKRS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/glukrs.cpp",
+		MAME_DIR .. "src/devices/machine/glukrs.h",
+	}
+end

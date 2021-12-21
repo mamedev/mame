@@ -37,6 +37,8 @@
   
   Refs:
     ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
+           Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
+           Montage scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_mon_revc.pdf
    TsConf: https://github.com/tslabs/zx-evo/blob/master/pentevo/docs/TSconf/tsconf_en.md
            https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
   FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
@@ -120,8 +122,8 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_port_fe_r), FUNC(tsconf_state::tsconf_port_fe_w));
 	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
-	map(0x8ff7, 0x8ff7).w(FUNC(tsconf_state::tsconf_port_f7_cmos_w)).select(0x7000); // 3:bff7 5:dff7 6:eff7
-	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_cmos_r));
+	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
+	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -196,8 +198,6 @@ void tsconf_state::video_start()
 
 void tsconf_state::machine_start()
 {
-	m_glukrs->set_base(m_cmos->pointer(), 0x100);
-
 	save_item(NAME(m_regs));
 	// TODO save'm'all!
 }
@@ -213,7 +213,7 @@ void tsconf_state::machine_reset()
 	rgb_t colors[256] = {0};
 	m_palette->set_pen_colors(0, colors);
 
-	m_gluk_ext = DISABLED;
+	m_port_f7_ext = DISABLED;
 
 	V_CONFIG = 0x00;
 	V_PAGE = 0x05;
@@ -265,8 +265,7 @@ void tsconf_state::tsconf(machine_config &config)
 
 	m_ram->set_default_size("4096K");
 
-	RAM(config, m_cmos).set_default_size("256");
-	NVRAM(config, m_glukrs, nvram_device::DEFAULT_ALL_1);
+	GLUKRS(config, m_glukrs);
 
 	TSCONF_DMA(config, m_dma, XTAL(14'000'000) / 2);
 	m_dma->in_mreq_callback().set(FUNC(tsconf_state::ram_read16));
@@ -291,5 +290,5 @@ ROM_START(tsconf)
 	ROM_LOAD("ts-bios.rom", 0x010000, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
 ROM_END
 
-//    YEAR	NAME	PARENT		COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY		FULLNAME							FLAGS
-COMP( 2011,	tsconf,	spec128,	0,		tsconf,		spec_plus,	tsconf_state,	empty_init,	"TS-Labs",	"ZX Evolution TS-Configuration",	MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_TIMING )
+//    YEAR	NAME	PARENT		COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY				FULLNAME							FLAGS
+COMP( 2011,	tsconf,	spec128,	0,		tsconf,		spec_plus,	tsconf_state,	empty_init,	"NedoPC, TS-Labs",	"ZX Evolution TS-Configuration",	MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_TIMING )

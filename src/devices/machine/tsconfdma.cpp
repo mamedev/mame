@@ -9,9 +9,6 @@
 #include "emu.h"
 #include "tsconfdma.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device, "tsconfdma", "TS-Conf DMA Controller")
-
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : device_t(mconfig, TSCONF_DMA, tag, owner, clock),
       m_in_mreq_cb(*this),
@@ -171,3 +168,6 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
 
     m_ready = true;
 }
+
+// device type definition
+DEFINE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device, "tsconfdma", "TS-Conf DMA Controller")

@@ -11,8 +11,6 @@
 
 #pragma once
 
-DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)
-
 class tsconfdma_device : public device_t
 {
 public:
@@ -54,4 +52,5 @@ private:
     uint16_t m_align;
 };
 
+DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)
 #endif // MAME_MACHINE_TSCONF_DMA_H

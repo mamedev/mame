@@ -484,58 +484,43 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	}
 }
 
-u8 tsconf_state::tsconf_port_f7_cmos_r(offs_t offset)
+u8 tsconf_state::tsconf_port_f7_r(offs_t offset)
 {
 	// BFF7
-	u8 data;
-	if (m_gluk_ext == PS2KEYBOARDS_LOG && m_gluk_reg == 0xf0)
+	u8 data = 0xff;
+	if (m_port_f7_ext == PS2KEYBOARDS_LOG && m_port_f7_gluk_reg == 0xf0)
 	{
 		data = m_keyboard->read();
 	}
-	else if (m_gluk_ext != DISABLED)
+	else if (m_port_f7_ext != DISABLED)
 	{
-		data = m_cmos->read(m_gluk_reg);
+		data = m_glukrs->read(m_port_f7_gluk_reg);
 	}
-	else
-	{
-		data = 0xff;
-	}
+
 	return data;
 }
 
-void tsconf_state::tsconf_port_f7_cmos_w(offs_t offset, u8 data)
+void tsconf_state::tsconf_port_f7_w(offs_t offset, u8 data)
 {
 	auto m_l = offset >> 12;
 	if (m_l == 6) // EF
 	{
-		m_gluk_ext = (data & 0x80) ? CONF_VERSION : DISABLED;
+		m_port_f7_ext = (data & 0x80) ? CONF_VERSION : DISABLED;
 	}
-	else if (m_gluk_ext != DISABLED)
+	else if (m_port_f7_ext != DISABLED)
 	{
 		if (m_l == 5) // DF
 		{
 			// 0x0E..0xEF
-			m_gluk_reg = data;
-			if (m_gluk_reg == 0x00 || m_gluk_reg == 0x02 || m_gluk_reg == 0x04 || m_gluk_reg == 0x06 || m_gluk_reg == 0x07 || m_gluk_reg == 0x08 || m_gluk_reg == 0x09)
-			{
-				system_time curtime;
-				machine().current_datetime(curtime);
-				m_cmos->write(0x00, dec_2_bcd(curtime.local_time.second));
-				m_cmos->write(0x02, dec_2_bcd(curtime.local_time.minute));
-				m_cmos->write(0x04, dec_2_bcd(curtime.local_time.hour));
-				m_cmos->write(0x06, dec_2_bcd(curtime.local_time.weekday));
-				m_cmos->write(0x07, dec_2_bcd(curtime.local_time.mday));
-				m_cmos->write(0x08, dec_2_bcd(curtime.local_time.month));
-				m_cmos->write(0x09, dec_2_bcd(curtime.local_time.year % 100));
-			}
+			m_port_f7_gluk_reg = data;
 		}
 		else if (m_l == 3) // BF
 		{
-			if (m_gluk_reg == 0xf0)
+			if (m_port_f7_gluk_reg == 0xf0)
 			{
 				u8 m_fx[0xf] = {0xff};
-				m_gluk_ext = static_cast<gluk_ext>(data);
-				switch (m_gluk_ext)
+				m_port_f7_ext = static_cast<gluk_ext>(data);
+				switch (m_port_f7_ext)
 				{
 				case CONF_VERSION:
 				{
@@ -550,17 +535,17 @@ void tsconf_state::tsconf_port_f7_cmos_w(offs_t offset, u8 data)
 				case PS2KEYBOARDS_LOG:
 					break;
 				default:
-					logerror("Gluk extention not supported %x\n", m_gluk_reg);
+					logerror("Gluk extention not supported %x\n", m_port_f7_gluk_reg);
 					break;
 				}
 				for (u8 i = 0; i < 0xf; i++)
 				{
-					m_cmos->write(0xf0 + i, m_fx[i]);
+					m_glukrs->write(0xf0 + i, m_fx[i]);
 				}
 			}
 			else
 			{
-				m_cmos->write(m_gluk_reg, data);
+				m_glukrs->write(m_port_f7_gluk_reg, data);
 			}
 		}
 	}

@@ -11,10 +11,10 @@
 #pragma once
 
 #include "machine/beta.h"
+#include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/tsconfdma.h"
-#include "machine/nvram.h"
 #include "spectrum.h"
 #include "tilemap.h"
 
@@ -85,7 +85,8 @@ public:
 		  m_keyboard(*this, "pc_keyboard"),
 		  m_beta(*this, BETA_DISK_TAG),
 		  m_sdcard(*this, "sdcard"),
-		  m_dma(*this, "dma"), m_cmos(*this, "cmos"), m_glukrs(*this, "glukrs"),
+		  m_dma(*this, "dma"),
+		  m_glukrs(*this, "glukrs"),
 		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
 		  m_cram(*this, "cram")
@@ -130,7 +131,8 @@ private:
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
-	template <unsigned Bank> void tsconf_bank_w(offs_t offset, u8 data);
+	template <unsigned Bank>
+	void tsconf_bank_w(offs_t offset, u8 data);
 	void ram_bank_write(u8 bank, offs_t offset, u8 data);
 	void ram_page_write(u8 page, offs_t offset, u8 data);
 
@@ -153,12 +155,11 @@ private:
 	required_device<spi_sdcard_sdhc_device> m_sdcard;
 	required_device<tsconfdma_device> m_dma;
 
-	required_device<ram_device> m_cmos;
-	required_device<nvram_device> m_glukrs;
-	u8 tsconf_port_f7_cmos_r(offs_t offset);
-	void tsconf_port_f7_cmos_w(offs_t offset, u8 data);
-	gluk_ext m_gluk_ext;
-	u8 m_gluk_reg;
+	required_device<glukrs_device> m_glukrs;
+	u8 tsconf_port_f7_r(offs_t offset);
+	void tsconf_port_f7_w(offs_t offset, u8 data);
+	gluk_ext m_port_f7_ext;
+	u8 m_port_f7_gluk_reg;
 
 	optional_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -173,7 +174,8 @@ private:
 	void spectrum_UpdateScreenBitmap(bool eof = false) override;
 
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
-	template <u8 Layer> TILE_GET_INFO_MEMBER(get_tile_info_16c);
+	template <u8 Layer>
+	TILE_GET_INFO_MEMBER(get_tile_info_16c);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	address_space *m_program;
