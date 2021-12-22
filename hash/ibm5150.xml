@@ -306,6 +306,25 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<publisher>Sierra On-Line</publisher>
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1100673">
+				<rom name="the_black_cauldron_v1.1m_disk1.mfm" size="1100673" crc="e321b2e6" sha1="c80815f1404597c8f5baa792b12f5c8faa22c050"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="the_black_cauldron_v1.1m_disk2.img" size="368640" crc="f80e0fc4" sha1="766818981335386b27fee1dc6f10bcf8850c50f3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blackc" cloneof="black">
+		<description>The Black Cauldron (v1.1m, cracked)</description>
+		<year>1986</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="the black cauldron v1.1m (disk 1 of 2).img" size="368640" crc="fa24b4eb" sha1="0839b3f96a160be4450df69439e675c82d66cd00"/>
 			</dataarea>
@@ -8386,6 +8405,26 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Doesn't pass the protection check. The same images work on real hardware. -->
+	<software name="bttf3" supported="no">
+		<description>Back to the Future Part III</description>
+		<year>1991</year>
+		<publisher>Mirrorsoft</publisher>
+		<info name="developer" value="Probe Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 1" />
+			<dataarea name="flop" size = "2156253">
+				<rom name="back_to_the_future_part_iii_disk1.mfm" size="2156253" crc="2e581898" sha1="1dd5c82fc9d6903fdfbb0458fb7774b5652f840f"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 2" />
+			<dataarea name="flop" size = "2164441">
+				<rom name="back_to_the_future_part_iii_disk2.mfm" size="2164441" crc="e1246bf3" sha1="945c32c361743d308e4cab04c9e1a2037dcf0eb8"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="badblood">
 		<description>Bad Blood (5.25")</description>
 		<year>1990</year>
@@ -8844,6 +8883,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Non-booter rerelease -->
+	<software name="bdash_35" cloneof="bdash">
+		<description>Boulder Dash (3.5")</description>
+		<year>1988</year>
+		<publisher>Prism Leisure</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2546439">
+				<rom name="boulder_dash.mfm" size="2546439" crc="011ea462" sha1="7510f06b03be2739af0e4396f40518a96c8683e7"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bdashkit" supported="no">
 		<description>Boulder Dash Construction Kit</description>
 		<year>1987</year>
@@ -8938,6 +8989,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Budokan - The Martial Spirit (Big Games release) [Electronic Arts] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7c3acc15" sha1="ed1e6883d394b2e1fce1006105cc6a5a05f926f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbrodeo">
+		<description>Buffalo Bill's Rodeo Games</description>
+		<year>1989</year>
+		<publisher>Tynesoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2166194">
+				<rom name="buffalo_bills_rodeo_games.mfm" size="2166194" crc="d503114d" sha1="494db14c0cb2ccf7e43f2f90b3b79ddcd6b5d7aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10417,7 +10479,7 @@ has been replaced with an all-zero block. -->
 
 	<software name="f19">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
-		<description>F-19 Stealth Fighter (Version 435.04)</description>
+		<description>F-19 Stealth Fighter (Version 435.04, manual protection)</description>
 		<year>1988</year>
 		<publisher>MicroProse</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -10432,6 +10494,24 @@ has been replaced with an all-zero block. -->
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="737280">
 				<rom name="diskb.img" size="737280" crc="2b0662a2" sha1="5843c7bb6e4d6ad998042cfe53a6c6f07d3fd3e5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f19a" cloneof="f19">
+		<description>F-19 Stealth Fighter (Version 435.04, disk + manual protection)</description>
+		<year>1988</year>
+		<publisher>MicroProse</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size="2176416">
+				<rom name="f19_stealth_fighter_diska.mfm" size="2176416" crc="28597122" sha1="059882a798cab7270215649037186aa4d560c507"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size="737280">
+				<rom name="f19_stealth_fighter_diskb.img" size="737280" crc="a9faf42d" sha1="aef388d2d45cfe1a1fb3520ece772cb8edf2f183"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10744,6 +10824,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Golden Axe [Virgin Games] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="174e89c7" sha1="25464172fedb6e3fa7d3626be5dae591a1aa6fb9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gpcircuit">
+		<description>Grand Prix Circuit</description>
+		<year>1988</year>
+		<publisher>Accolade</publisher>
+		<info name="developer" value="Distinctive Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2168656">
+				<rom name="grand_prix_circuit.mfm" size="2168656" crc="94610ea0" sha1="9c7518d479ba0c25d1137d75b1571390e7b45bd4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11231,8 +11323,9 @@ has been replaced with an all-zero block. -->
 		<info name="developer" value="Dardari Bros." />
 		<info name="usage" value="PC Booter" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
-				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7bfdc1e0" sha1="0dbbc892ce27ace5da144ff8c6a9a55a2f295c32"/>
+			<dataarea name="flop" size = "2152032">
+				<!-- 80-track disk with only the first 40 formatted -->
+				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].mfm" size="2152032" crc="f60c1a9d" sha1="302d4ed84aea32a8d78a9d83462a22f5d370058a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11458,6 +11551,43 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="kingqst2_35">
+		<description>King's Quest II: Romancing the Throne (v2.2, 3.5")</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="Copy the files to a blank disk and run the game from it. Insert the original disk when prompted." />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2192301">
+				<rom name="kings_quest_ii_3.5.mfm" size="2192301" crc="48df8ac1" sha1="e99cda128ed9e2c148d3adbc927708c39ed885da"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kingqst3">
+		<description>King's Quest III: To Heir Is Human (v2.00, 5.25")</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="usage" value="Copy the files from disk 1 to a blank disk and run the game from it. Insert the original disk when prompted." />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1108796">
+				<rom name="kings_quest_iii_5.25_disk1.mfm" size="1108796" crc="3717b706" sha1="d792d371d5ebc6366656678d7fe40757c3528001"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="368640">
+				<rom name="kings_quest_iii_5.25_disk2.img" size="368640" crc="5a2488ff" sha1="32ed6d403e1bb32b94de84eace41ac8d7b8578d0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="368640">
+				<rom name="kings_quest_iii_5.25_disk3.img" size="368640" crc="97cd532f" sha1="13e781a5a2b0f96db201c17e2e491bd632710c62"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kingqst4_35" cloneof="kingqst4">
 		<!-- Dumped via Kryoflux, shows as good and unmodified -->
 		<description>King's Quest IV: The Perils of Rosella (3.5", version #2.2)</description>
@@ -11619,6 +11749,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "327680">
 				<rom name="Laser Surgeon - The Microscopic Mission [1987] [Activision] [5.25] [1 of 1].img" size="327680" crc="728e2c05" sha1="f5293c2860fa6dea89d89d00d2d63cdc4c8f8e6b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastninja">
+		<description>The Last Ninja</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2180307">
+				<rom name="the_last_ninja.mfm" size="2180307" crc="1ce49ec5" sha1="91cb38ac9e5e428b4aabfc47da787a97d9fd0efc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11832,6 +11973,19 @@ has been replaced with an all-zero block. -->
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Leisure Suit Larry III [3.5DD] [Disk 4 of 4].img" size="737280" crc="296a93ce" sha1="69ecb28dec2f58226aa1ace523fc1631bb584d8d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't pass the protection check. The same image works on real hardware. -->
+	<software name="lemmings" supported="no">
+		<description>Lemmings</description>
+		<year>1991</year>
+		<publisher>Psygnosis</publisher>
+		<info name="developer" value="DMA Design" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2181136">
+				<rom name="lemmings.mfm" size="2181136" crc="82b47a9b" sha1="7f0912d798c97a56ac8eea1f87caa20cc2044b94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -12569,6 +12723,44 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Doesn't pass the protection check. The same images work on real hardware. -->
+	<software name="midwintr" supported="no">
+		<description>Midwinter</description>
+		<year>1990</year>
+		<publisher>MicroProse</publisher>
+		<info name="developer" value="Maelstrom Games" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 1" />
+			<dataarea name="flop" size = "2156382">
+				<rom name="midwinter_disk1.mfm" size="2156382" crc="b07cd287" sha1="d0b202616befdd8d4ed61bc2172158f88157a52a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+		<feature name="part_id" value="Disc 2" />
+			<dataarea name="flop" size = "2156467">
+				<rom name="midwinter_disk2.mfm" size="2156467" crc="e8677966" sha1="ed1103bc0bc02c4ff10cf9f389ed93e90e60125e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmagic">
+		<description>Might and Magic: Book One: Secret of the Inner Sanctum</description>
+		<year>1987</year>
+		<publisher>New World Computing</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "1110732">
+				<rom name="might_and_magic_disk1.mfm" size="1110732" crc="f55fd5ae" sha1="3d7e6fbce6261276c41c1d5e3bbd3f6f169f0ad4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="might_and_magic_disk2.img" size="368640" crc="79e3e51b" sha1="b661231c9523394511f2ee654f243830968a4696"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minesttn">
 		<description>Mines of Titan</description>
 		<year>1989</year>
@@ -12970,6 +13162,18 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<!-- Doesn't pass the protection check. The same image works on real hardware. -->
+	<software name="paperboy" supported="no">
+		<description>Paperboy</description>
+		<year>1988</year>
+		<publisher>Mindscape</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2160528">
+				<rom name="paperboy.mfm" size="2160528" crc="448e1e67" sha1="db7c9c87dee0ee7198f4f5f0d4be9b1ed97ef737"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="paperbo2">
 		<description>Paperboy 2</description>
 		<year>1991</year>
@@ -13095,6 +13299,25 @@ has been replaced with an all-zero block. -->
 			<!-- High score file modified -->
 			<dataarea name="flop" size = "368640">
 				<rom name="[PC] Pick'n Pile [5.25].img" size="368640" crc="82b72c98" sha1="afc3130b69c4d1e36b1e182020ef058a6c21f046" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Doesn't pass the protection check. The same images work on real hardware. -->
+	<software name="pitfight" supported="no">
+		<description>Pit-Fighter</description>
+		<year>1991</year>
+		<publisher>Domark</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size = "2162049">
+				<rom name="pit_fighter_disk1.mfm" size="2162049" crc="e95e55a2" sha1="9283a619884680c9ba978bf784ca2a135e818475"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="pit_fighter_disk2.img" size="737280" crc="9b261773" sha1="50893bda71e64ce9fb74c20a38774119b0b20a17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -13438,6 +13661,25 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="protennis">
+		<description>Pro Tennis Tour</description>
+		<year>1989</year>
+		<publisher>Ubi Soft Entertainment Software</publisher>
+		<info name="developer" value="Blue Byte Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A" />
+			<dataarea name="flop" size = "737280">
+				<rom name="pro_tennis_tour_disk1.img" size="737280" crc="51faa633" sha1="76399435b248eb9ea03c8e31718544df8a751847"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk B" />
+			<dataarea name="flop" size = "2164357">
+				<rom name="pro_tennis_tour_disk2.mfm" size="2164357" crc="3b1d0a4d" sha1="24ee937ae698f6fd6ea94ff4c98d29770a2ad5b1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="punisher">
 		<description>The Punisher</description>
 		<year>1990</year>
@@ -13490,6 +13732,18 @@ has been replaced with an all-zero block. -->
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="Rambo III [Taito] [1989] [5.25] [Disk 2 of 2].img" size="368640" crc="0af1499c" sha1="1c1e9c61585eb1d907801e313d2348ad07a98d71"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampage">
+		<description>Rampage</description>
+		<year>1988</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Monarch Development" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="2163793">
+				<rom name="rampage.mfm" size="2163793" crc="b7a2ba2b" sha1="097ca071cf39864f7021d51a2a7ec505f107ca3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -14944,6 +15198,24 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="tenniscup2">
+		<description>Tennis Cup II</description>
+		<year>1992</year>
+		<publisher>Loriciel</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk A/B" />
+			<dataarea name="flop" size = "2157740">
+				<rom name="tennis_cup_2_disk_a-b.mfm" size="2157740" crc="21f6700d" sha1="dc7c7fe9642f77a28efec08728a8c9feed6260f0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk C/D" />
+			<dataarea name="flop" size = "737280">
+				<rom name="tennis_cup_2_disk_c-d.img" size="737280" crc="a829cd2a" sha1="9d773aa9ed718cbf2cacab3548f70226139e518c"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="term2">
 		<description>Terminator 2: Judgment Day</description>
 		<year>1991</year>
@@ -15020,6 +15292,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "242382">
 				<rom name="Tetris [1987] [3.5] [1 of 1].td0" size="242382" crc="a64eb149" sha1="a467d7d8bed7bd268374e282de1f92c298b665c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toiacid">
+		<description>Toi Acid Game</description>
+		<year>1989</year>
+		<publisher>Iber Soft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "2232621">
+				<rom name="toi_acid_game.mfm" size="2232621" crc="3d3fd3c0" sha1="d912c216baadbe7b62595d83d0be777f0bd31b28"/>
 			</dataarea>
 		</part>
 	</software>
