@@ -41,39 +41,11 @@ ioport_constructor nes_pachinko_device::device_input_ports() const
 //-------------------------------------------------
 
 nes_pachinko_device::nes_pachinko_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_fcpadexp_device(mconfig, NES_PACHINKO, tag, owner, clock)
+	: nes_fcpadexp_device(mconfig, NES_PACHINKO, tag, owner, clock, 0)
 	, m_trigger(*this, "TRIGGER")
 {
 }
 
-
-//-------------------------------------------------
-//  read
-//-------------------------------------------------
-
-u8 nes_pachinko_device::read_exp(offs_t offset)
-{
-	u8 ret = 0;
-	// this controller behaves like a standard P3 joypad, with longer stream of inputs
-	if (offset == 0)    //$4016
-	{
-		if (m_strobe)
-			set_latch();
-		ret = (m_latch & 1) << 1;
-		m_latch >>= 1;
-	}
-	return ret;
-}
-
-//-------------------------------------------------
-//  write
-//-------------------------------------------------
-
-void nes_pachinko_device::write(u8 data)
-{
-	if (write_strobe(data))
-		set_latch();
-}
 
 void nes_pachinko_device::set_latch()
 {
