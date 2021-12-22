@@ -8,6 +8,12 @@ Williams System 6a
 Differences to system 6:
 - Player score is 7 digits instead of 6.
 
+Games:
+- Algar (#499)
+- Alien Poker (#501)
+
+The first time run, the display will show the model number. Press F3 to clear this.
+
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.

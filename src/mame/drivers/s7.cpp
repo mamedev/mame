@@ -32,25 +32,27 @@ and start playing.
 
 Most games are multiball - here are the key codes:
 
-Game              Start game                End ball
+Game              NUM  Start game                End ball
 -----------------------------------------------------------------------------------------------
-Black Knight      ASD hit 1                 Hit X, hold A, hit X, hold S, hit X, hit D
-Cosmic Gunfight   AS hit 1                  AS
-Jungle Lord       AS hit 1                  Hit X, hold A, hit X, hit S
-Pharaoh           AS hit 1                  AS
-Solar Fire        ASD hit 1                 ASD
-Thunderball       1                         unknown
-HyperBall         1                         unknown
-Barracora         ASD hit 1                 ASD
-Varkon            AX hit 1                  AX
-Time Fantasy      1                         X
-Warlok            1                         X
-Defender          hold up,left,right,hit 1  Hit X, hold Left, hit X, hold Up, Hit X, hit Right.
-Joust             ABCD hit 1                unknown
-Laser Cue         1                         X
-Firepower II      AS hit 1                  AS
-Wild Texas        AS hit 1                  AS
-Starlight         AS hit 1                  AS
+Black Knight      500  ASD hit 1                 Hit X, hold A, hit X, hold S, hit X, hit D
+Cosmic Gunfight   502  AS hit 1                  AS
+Jungle Lord       503  AS hit 1                  Hit X, hold A, hit X, hit S
+Pharaoh           504  AS hit 1                  AS
+Solar Fire        507  ASD hit 1                 ASD
+Thunderball       508  1                         unknown
+HyperBall         509  1                         unknown
+Barracora         510  ASD hit 1                 ASD
+Varkon            512  AX hit 1                  AX
+Time Fantasy      515  1                         X
+Warlok            516  1                         X
+Defender          517  hold up,left,right,hit 1  Hit X, hold Left, hit X, hold Up, Hit X, hit Right.
+Joust             519  ABCD hit 1                unknown
+Laser Cue         520  1                         X
+Firepower II      521  AS hit 1                  AS
+Wild Texas      *(521) AS hit 1                  AS
+Starlight         530  AS hit 1                  AS
+
+*Wild Texas is a clone/bootleg of Firepower II, and shows the same game number.
 
 Status:
 - All machines are playable
@@ -1171,4 +1173,4 @@ GAME( 1983, lsrcu_l2, 0,        s7, lsrcu, s7_state, empty_init, ROT0, "Williams
 GAME( 1983, fpwr2_l2, 0,        s7, fpwr2, s7_state, empty_init, ROT0, "Williams",  "Firepower II (L-2)",                MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1984, strlt_l1, 0,        s7, strlt, s7_state, empty_init, ROT0, "Williams",  "Star Light (L-1)",                  MACHINE_IS_SKELETON_MECHANICAL )
 // same hardware, unknown manufacturer, clone of fpwr2
-GAME( 1983, wldtexas, 0,        s7, fpwr2, s7_state, empty_init, ROT0, "<unknown>", "Wild Texas",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1983, wldtexas, fpwr2_l2, s7, fpwr2, s7_state, empty_init, ROT0, "<unknown>", "Wild Texas",                        MACHINE_IS_SKELETON_MECHANICAL )

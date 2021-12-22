@@ -2,8 +2,8 @@
 // copyright-holders:Robbbert
 /***********************************************************************************
 
-  PINBALL
-  Williams System 8: Still Crazy
+PINBALL
+Williams System 8: Still Crazy
 
 The first time run, the display will show the model number (543).
 Press F3 to clear this.

@@ -10,7 +10,24 @@ Differences to system 3:
 - Use 6802 instead of 6800+6875.
 - Soundcard does more sounds, and uses 6808.
 
-Phoenix and Pokerino are listed as System 4 systems, but use System 3 ROMs.
+Games:
+- Flash (#486)
+- Trizone (#487)
+- Time Warp (#489)
+- Stellar Wars (#490)
+- Pompei
+- Aristocrat
+- Topaz
+- Taurus
+- King Tut
+- Omni
+- Big Strike
+- Triple Strike
+
+The first time run, the pinballs will display will show the model number, while
+ the shuffle games show 0200 and 419. Press F3 to clear this.
+
+Phoenix and Pokerino are listed as System 4, but use System 3 ROMs.
  They have been moved to s3.cpp, and are working there.
 
 The "Shuffle" games consist of a flat board with an air-driven puck and 10
@@ -18,12 +35,10 @@ The "Shuffle" games consist of a flat board with an air-driven puck and 10
  strikes and spares. Since the maximum score is 300, the displays have 4 digits
  and 6 can play. They will most likely be split off to a separate driver.
 
-When first used, game appears frozen (the score should alternate). Press F3 to fix.
-
 Pressing NUM-8 will select a different set of sounds.
 
 Status:
-- flash, trizn, trmwp, stlwr are playable.
+- Pinballs are playable.
 
 ToDo:
 - Shuffle games: need a layout, and no manuals found. Press 6 to insert coin,
@@ -803,7 +818,7 @@ ROM_END
 
 } // Anonymous namespace
 
-
+// Pinball
 GAME( 1979, flash_l2, 0,        s4a, flash, s4a_state, empty_init, ROT0, "Williams", "Flash (Williams, L-2)",           MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, flash_l1, flash_l2, s4a, flash, s4a_state, empty_init, ROT0, "Williams", "Flash (Williams, L-1)",           MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, flash_t1, flash_l2, s4a, flash, s4a_state, empty_init, ROT0, "Williams", "Flash (Williams, T-1) Ted Estes", MACHINE_IS_SKELETON_MECHANICAL )
@@ -814,6 +829,7 @@ GAME( 1979, tmwrp_l2, tmwrp_l3, s4a, tmwrp, s4a_state, empty_init, ROT0, "Willia
 GAME( 1979, tmwrp_t2, tmwrp_l3, s4a, tmwrp, s4a_state, empty_init, ROT0, "Williams", "Time Warp (Williams, T-2)",       MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1979, stlwr_l2, 0,        s4a, stlwr, s4a_state, empty_init, ROT0, "Williams", "Stellar Wars (L-2)",              MACHINE_IS_SKELETON_MECHANICAL )
 
+// Shuffle
 GAME( 1978, pomp_l1,  0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Pompeii (Shuffle) (L-1)",         MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1978, arist_l1, 0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Aristocrat (Shuffle) (L-1)",      MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 1978, topaz_l1, 0,        s4a, s4a,   s4a_state, empty_init, ROT0, "Williams", "Topaz (Shuffle) (L-1)",           MACHINE_IS_SKELETON_MECHANICAL )

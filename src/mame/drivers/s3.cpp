@@ -11,6 +11,15 @@ Schematic and PinMAME used as references.
 
 Written during October 2012 [Robbbert]
 
+Games:
+- Hot Tip (#477)
+- Lucky Seven (#480)
+- World Cup Soccer (#481)
+- Contact (#482)
+- Disco Fevel (#483)
+- Phoenix (#485)
+- Pokerino (#488)
+
 When first used, it appears frozen (the score should alternate). Press F3 to fix.
 
 For those games with a sound card, pressing NUM-8 will select a different set of
