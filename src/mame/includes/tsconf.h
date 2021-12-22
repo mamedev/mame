@@ -23,16 +23,16 @@ class tsconf_state : public spectrum_128_state
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag),
+		  m_p_rom(*this, "maincpu"),
 		  m_bank1(*this, "bank1"), m_bank2(*this, "bank2"), m_bank3(*this, "bank3"), m_bank4(*this, "bank4"),
 		  m_keyboard(*this, "pc_keyboard"),
 		  m_beta(*this, BETA_DISK_TAG),
-		  m_sdcard(*this, "sdcard"),
 		  m_dma(*this, "dma"),
+		  m_sdcard(*this, "sdcard"),
 		  m_glukrs(*this, "glukrs"),
 		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
-		  m_cram(*this, "cram"),
-		  m_p_rom(*this, "maincpu")
+		  m_cram(*this, "cram")
 	{
 	}
 
@@ -44,8 +44,6 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	DECLARE_VIDEO_START(tsconf);
-
 	enum gluk_ext : u8
 	{
 		CONF_VERSION = 0x00,
@@ -113,35 +111,54 @@ private:
 		T1_Y_OFFSER_H = 0x47
 	};
 
+	DECLARE_VIDEO_START(tsconf);
+	TILE_GET_INFO_MEMBER(get_tile_info_txt);
+	template <u8 Layer>
+	TILE_GET_INFO_MEMBER(get_tile_info_16c);
+
+	void tsconf_palette(palette_device &palette) const;
+	// Changing this consider to revert 'virtual' in spectrum.h
+	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	void spectrum_UpdateBorderBitmap() override;
+	void spectrum_UpdateScreenBitmap(bool eof = false) override;
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tsconf_update_video_mode();
+
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_port_fe_w(offs_t offset, u8 data);
-
 	u8 tsconf_port_xxaf_r(offs_t reg);
 	void tsconf_port_xxaf_w(offs_t reg, u8 data);
-
 	u8 tsconf_port_77_zctr_r(offs_t reg);
 	void tsconf_port_77_zctr_w(offs_t reg, u8 data);
 	u8 tsconf_port_57_zctr_r(offs_t reg);
 	void tsconf_port_57_zctr_w(offs_t reg, u8 data);
 	void tsconf_spi_miso_w(u8 data);
+	u8 tsconf_port_f7_r(offs_t offset);
+	void tsconf_port_f7_w(offs_t offset, u8 data);
 
 	void tsconf_update_bank1();
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
-	template <unsigned Bank>
-	void tsconf_bank_w(offs_t offset, u8 data);
-	void ram_bank_write(u8 bank, offs_t offset, u8 data);
-	void ram_page_write(u8 page, offs_t offset, u8 data);
 
 	void tsconf_io(address_map &map);
 	void tsconf_mem(address_map &map);
 	void tsconf_switch(address_map &map);
 
-	u16 ram_read16(offs_t offset);
+	template <unsigned Bank>
+	void tsconf_bank_w(offs_t offset, u8 data);
+	void ram_bank_write(u8 bank, offs_t offset, u8 data);
+	void ram_page_write(u8 page, offs_t offset, u8 data);
+	void cram_write(u16 offset, u8 data);
+	void cram_write16(offs_t offset, u16 data);
 	void ram_write16(offs_t offset, u16 data);
+	u16 ram_read16(offs_t offset);
 	u16 spi_read16();
 
+	u8 m_regs[0x100];
+
+	address_space *m_program;
+	required_region_ptr<u8> m_p_rom;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
@@ -150,12 +167,12 @@ private:
 	required_device<at_keyboard_device> m_keyboard;
 
 	required_device<beta_disk_device> m_beta;
-	required_device<spi_sdcard_sdhc_device> m_sdcard;
 	required_device<tsconfdma_device> m_dma;
+	required_device<spi_sdcard_sdhc_device> m_sdcard;
+	u8 m_zctl_di;
+	u8 m_zctl_cs;
 
 	required_device<glukrs_device> m_glukrs;
-	u8 tsconf_port_f7_r(offs_t offset);
-	void tsconf_port_f7_w(offs_t offset, u8 data);
 	gluk_ext m_port_f7_ext;
 	u8 m_port_f7_gluk_reg;
 
@@ -163,28 +180,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_ts_tilemap[3];
 	required_device<ram_device> m_cram;
-	void cram_write(u16 offset, u8 data);
-	void cram_write16(offs_t offset, u16 data);
-
-	// Changing this consider to revert 'virtual' in spectrum.h
-	void tsconf_palette(palette_device &palette) const;
-	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	void spectrum_UpdateBorderBitmap() override;
-	void spectrum_UpdateScreenBitmap(bool eof = false) override;
-
-	TILE_GET_INFO_MEMBER(get_tile_info_txt);
-	template <u8 Layer>
-	TILE_GET_INFO_MEMBER(get_tile_info_16c);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	address_space *m_program;
-	required_region_ptr<u8> m_p_rom;
-
-	void tsconf_update_video_mode();
-	u8 m_regs[0x100];
-
-	u8 m_zctl_di;
-	u8 m_zctl_cs;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/
