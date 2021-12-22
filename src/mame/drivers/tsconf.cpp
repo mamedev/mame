@@ -75,7 +75,7 @@
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 {
 	u8 *messram = m_ram->pointer();
-	u8 *m_row_location = messram + PAGE(V_PAGE) + (tile_index / tilemap.cols() * 256);
+	u8 *m_row_location = messram + (m_regs[V_PAGE] << 14) + (tile_index / tilemap.cols() * 256);
 	u8 col = tile_index % tilemap.cols();
 	u8 symbol = m_row_location[col];
 	tileinfo.set(1, symbol, 0, 0);
@@ -88,12 +88,12 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 	u16 row_offset = (((tile_index / tilemap.cols()) << 1) + Layer) * 64 * 2;
 
 	u8 *messram = m_ram->pointer();
-	u8 *tile_info_addr = messram + PAGE(T_MAP_PAGE) + row_offset + col_offset;
+	u8 *tile_info_addr = messram + (m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset;
 	u8 hi = tile_info_addr[1];
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
 	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols());
-	u8 pal = ((BIT(PAL_SEL, 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2)) << 4;
+	u8 pal = ((BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2)) << 4;
 	if (BIT(hi, 6, 2))
 	{
 		logerror("FIXME - FLIP Case\n");
@@ -215,25 +215,25 @@ void tsconf_state::machine_reset()
 
 	m_port_f7_ext = DISABLED;
 
-	V_CONFIG = 0x00;
-	V_PAGE = 0x05;
-	TS_CONFIG &= 0x03; // 000000xx
+	m_regs[V_CONFIG] = 0x00;
+	m_regs[V_PAGE] = 0x05;
+	m_regs[TS_CONFIG] &= 0x03; // 000000xx
 	//m_reg_gxoffset.b.l	= 0x00;
 	//m_reg_gxoffset.b.h	= 0x00; // xxxxxxx0
 	//m_reg_gyoffset.b.l	= 0x00;
 	//m_reg_gyoffset.b.h	= 0x00; // xxxxxxx0
-	FMAPS = 0x00; // xxx0xxxx
-	PAL_SEL = 0x0f;
-	PAGE0 = 0x00;
-	PAGE1 = 0x05;
-	PAGE2 = 0x02;
-	PAGE3 = 0x00;
-	SYS_CONFIG = 0x00;
-	MEM_CONFIG = 0x04;
-	HS_INT = 0x01;	 // 00000001
-	VS_INT_L = 0x00; // 00000001
-	VS_INT_H = 0x00; // 0000xxx0
-	INT_MASK = 0x01; // xxxxx001
+	m_regs[FMAPS] = 0x00; // xxx0xxxx
+	m_regs[PAL_SEL] = 0x0f;
+	m_regs[PAGE0] = 0x00;
+	m_regs[PAGE1] = 0x05;
+	m_regs[PAGE2] = 0x02;
+	m_regs[PAGE3] = 0x00;
+	m_regs[SYS_CONFIG] = 0x00;
+	m_regs[MEM_CONFIG] = 0x04;
+	m_regs[HS_INT] = 0x01;	 // 00000001
+	m_regs[VS_INT_L] = 0x00; // 00000001
+	m_regs[VS_INT_H] = 0x00; // 0000xxx0
+	m_regs[INT_MASK] = 0x01; // xxxxx001
 	// FDDVirt		= 0x00; // 0000xxx0
 	// CacheConfig	= 0x01; // xxxxx001
 

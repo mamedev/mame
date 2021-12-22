@@ -18,64 +18,6 @@
 #include "spectrum.h"
 #include "tilemap.h"
 
-#define PAGE(_r) ((_r) << 14)
-#define RAM_PAGE_OFFST(_page, _offset) (PAGE(_page) + _offset)
-
-#define REG(_p) m_regs[_p]
-#define REGNUM(_r) (&(_r) - &(V_CONFIG))
-
-#define V_CONFIG REG(0x00)
-#define V_PAGE REG(0x01)
-
-#define G_X_OFFS_L REG(0x02)
-#define G_X_OFFS_H REG(0x03)
-#define G_Y_OFFS_L REG(0x04)
-#define G_Y_OFFS_H REG(0x05)
-
-#define TS_CONFIG REG(0x06)
-#define PAL_SEL REG(0x07)
-#define BORDER REG(0x0f)
-
-#define PAGE0 REG(0x10)
-#define PAGE1 REG(0x11)
-#define PAGE2 REG(0x12)
-#define PAGE3 REG(0x13)
-#define FMAPS REG(0x15)
-
-#define T_MAP_PAGE REG(0x16)
-#define T0_G_PAGE REG(0x17)
-#define T1_G_PAGE REG(0x18)
-#define SG_PAGE REG(0x19)
-
-#define DMAS_ADDRESS_L REG(0x1a)
-#define DMAS_ADDRESS_H REG(0x1b)
-#define DMAS_ADDRESS_X REG(0x1c)
-#define DMAD_ADDRESS_L REG(0x1d)
-#define DMAD_ADDRESS_H REG(0x1e)
-#define DMAD_ADDRESS_X REG(0x1f)
-#define DMA_WAIT_PORT_DEV REG(0x25)
-#define DMA_LEN REG(0x26)
-#define DMA_CTRL REG(0x27)
-#define DMA_NUM_L REG(0x28)
-#define DMA_NUM_H REG(0x2c)
-
-#define SYS_CONFIG REG(0x20)
-#define MEM_CONFIG REG(0x21)
-#define HS_INT REG(0x22)
-#define VS_INT_L REG(0x23)
-#define VS_INT_H REG(0x24)
-
-#define INT_MASK REG(0x2a)
-
-#define T0_X_OFFSER_L REG(0x40)
-#define T0_X_OFFSER_H REG(0x41)
-#define T0_Y_OFFSER_L REG(0x42)
-#define T0_Y_OFFSER_H REG(0x43)
-#define T1_X_OFFSER_L REG(0x44)
-#define T1_X_OFFSER_H REG(0x45)
-#define T1_Y_OFFSER_L REG(0x46)
-#define T1_Y_OFFSER_H REG(0x47)
-
 class tsconf_state : public spectrum_128_state
 {
 public:
@@ -113,6 +55,61 @@ private:
 		SPIFL = 0x10,
 
 		DISABLED = 0xff
+	};
+
+	enum tsconf_regs : u8
+	{
+		V_CONFIG = 0x00,
+		V_PAGE = 0x01,
+
+		G_X_OFFS_L = 0x02,
+		G_X_OFFS_H = 0x03,
+		G_Y_OFFS_L = 0x04,
+		G_Y_OFFS_H = 0x05,
+
+		TS_CONFIG = 0x06,
+		PAL_SEL = 0x07,
+
+		BORDER = 0x0f,
+		PAGE0 = 0x10,
+		PAGE1 = 0x11,
+		PAGE2 = 0x12,
+		PAGE3 = 0x13,
+
+		FMAPS = 0x15,
+		T_MAP_PAGE = 0x16,
+		T0_G_PAGE = 0x17,
+		T1_G_PAGE = 0x18,
+		SG_PAGE = 0x19,
+
+		DMAS_ADDRESS_L = 0x1a,
+		DMAS_ADDRESS_H = 0x1b,
+		DMAS_ADDRESS_X = 0x1c,
+		DMAD_ADDRESS_L = 0x1d,
+		DMAD_ADDRESS_H = 0x1e,
+		DMAD_ADDRESS_X = 0x1f,
+
+		SYS_CONFIG = 0x20,
+		MEM_CONFIG = 0x21,
+		HS_INT = 0x22,
+		VS_INT_L = 0x23,
+		VS_INT_H = 0x24,
+
+		DMA_WAIT_PORT_DEV = 0x25,
+		DMA_LEN = 0x26,
+		DMA_CTRL = 0x27,
+		DMA_NUM_L = 0x28,
+		INT_MASK = 0x2a,
+		DMA_NUM_H = 0x2c,
+
+		T0_X_OFFSER_L = 0x40,
+		T0_X_OFFSER_H = 0x41,
+		T0_Y_OFFSER_L = 0x42,
+		T0_Y_OFFSER_H = 0x43,
+		T1_X_OFFSER_L = 0x44,
+		T1_X_OFFSER_H = 0x45,
+		T1_Y_OFFSER_L = 0x46,
+		T1_Y_OFFSER_H = 0x47
 	};
 
 	void tsconf_port_7ffd_w(u8 data);

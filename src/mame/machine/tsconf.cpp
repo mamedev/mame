@@ -4,13 +4,15 @@
 #include "emu.h"
 #include "includes/tsconf.h"
 
-#define W0_RAM (BIT(MEM_CONFIG, 3))
-#define NW0_MAP (BIT(MEM_CONFIG, 2))
-#define W0_WE (BIT(MEM_CONFIG, 1))
-#define ROM128 (BIT(MEM_CONFIG, 0))
-#define RRES (BIT(V_CONFIG, 6, 2))
+#define PAGE4K(_r) ((_r) << 14)
 
-#define VM static_cast<v_mode>(BIT(V_CONFIG, 0, 2))
+#define W0_RAM (BIT(m_regs[MEM_CONFIG], 3))
+#define NW0_MAP (BIT(m_regs[MEM_CONFIG], 2))
+#define W0_WE (BIT(m_regs[MEM_CONFIG], 1))
+#define ROM128 (BIT(m_regs[MEM_CONFIG], 0))
+#define RRES (BIT(m_regs[V_CONFIG], 6, 2))
+
+#define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
 
 static constexpr rectangle resolution_info[5] = {
 	rectangle(52, 256 + 51, 48, 192 + 47), // 52|256|52 x 48-192-48
@@ -46,31 +48,24 @@ void tsconf_state::tsconf_update_bank1()
 	//W0_WE
 	if (NW0_MAP)
 	{
-		m_ROMSelection = PAGE0;
+		m_ROMSelection = m_regs[PAGE0];
 	}
 	else
 	{
 		/* ROM: 0-SYS, 1-DOS, 2-128, 3-48 */
-		if (m_beta->started() && m_beta->is_active())
-		{
-			m_ROMSelection = ROM128;
-		}
-		else
-		{
-			m_ROMSelection = 0x02 | ROM128;
-		}
-		m_ROMSelection |= (PAGE0 & 0xfc);
+		m_ROMSelection = m_beta->started() && m_beta->is_active() ? ROM128 : (0x02 | ROM128);
+		m_ROMSelection |= (m_regs[PAGE0] & 0xfc);
 	}
 
 	uint8_t *rom0;
 	if (W0_RAM)
 	{
-		rom0 = m_ram->pointer() + PAGE(m_ROMSelection);
+		rom0 = m_ram->pointer() + PAGE4K(m_ROMSelection);
 		m_bank1->set_base(rom0);
 	}
 	else
 	{
-		rom0 = &m_p_rom[0x10000 + PAGE(m_ROMSelection & 0x1f)];
+		rom0 = &m_p_rom[0x10000 + PAGE4K(m_ROMSelection & 0x1f)];
 		m_bank1->set_base(rom0);
 	}
 	m_ram_0000 = W0_WE ? rom0 : nullptr;
@@ -84,11 +79,11 @@ void tsconf_state::tsconf_update_video_mode()
 	{
 	case VM_TXT: // Text Mode
 		resolution = resolution_info[4];
-		m_gfxdecode->gfx(1)->set_source(messram + PAGE(V_PAGE ^ 0x01));
+		m_gfxdecode->gfx(1)->set_source(messram + PAGE4K(m_regs[V_PAGE] ^ 0x01));
 		break;
 	case VM_ZX: // Zx
 	{
-		m_screen_location = messram + ((m_port_7ffd_data & 8) ? PAGE(7) : PAGE(5));
+		m_screen_location = messram + ((m_port_7ffd_data & 8) ? PAGE4K(7) : PAGE4K(5));
 		break;
 	}
 	default:
@@ -103,7 +98,7 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 	if (m_screen_bitmap.valid())
 	{
 		// Border + Main Graphics
-		if (!BIT(V_CONFIG, 5))
+		if (!BIT(m_regs[V_CONFIG], 5))
 		{
 			if (VM == VM_ZX)
 			{
@@ -135,17 +130,17 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 
 		// Tiles & Sprites
 		// TODO layers
-		if (!BIT(V_CONFIG, 4))
+		if (!BIT(m_regs[V_CONFIG], 4))
 		{
-			if (BIT(TS_CONFIG, 5))
+			if (BIT(m_regs[TS_CONFIG], 5))
 			{
 				m_ts_tilemap[1]->draw(screen, bitmap, cliprect, 0);
 			}
-			if (BIT(TS_CONFIG, 6))
+			if (BIT(m_regs[TS_CONFIG], 6))
 			{
 				m_ts_tilemap[2]->draw(screen, bitmap, cliprect, 0);
 			}
-			if (BIT(TS_CONFIG, 7))
+			if (BIT(m_regs[TS_CONFIG], 7))
 			{
 				draw_sprites(screen, bitmap, cliprect);
 			}
@@ -156,7 +151,7 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 
 void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 {
-	u8 pal_offset = PAL_SEL << 4;
+	u8 pal_offset = m_regs[PAL_SEL] << 4;
 	if (VM == VM_ZX)
 	{
 		spectrum_state::spectrum_UpdateScreenBitmap(eof);
@@ -165,8 +160,8 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 	{
 		u8 *messram = m_ram->pointer();
 		u16 y = m_screen->vpos();
-		u8 *font_location = messram + PAGE(V_PAGE ^ 0x01);
-		u8 *text_location = messram + PAGE(V_PAGE) + (y / 8 * 256); // OFFSETs
+		u8 *font_location = messram + PAGE4K(m_regs[V_PAGE] ^ 0x01);
+		u8 *text_location = messram + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
 		u16 *bm = &m_screen_bitmap.pix(y, 0);
 		for (auto x = 0; x < 80; x++)
 		{
@@ -187,9 +182,9 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		{
 			u16 line_len = VM == VM_16C ? 256 : 512;
 			u16 y = m_screen->vpos() - resolution.top();
-			u16 offset = ((y + ((G_Y_OFFS_H & 1) << 8) + G_Y_OFFS_L) * line_len) +
-						 ((((G_X_OFFS_H & 1) << 8 /* .. 16/256 */) + G_X_OFFS_L) >> 1);
-			u8 *video_location = m_ram->pointer() + PAGE(V_PAGE) + offset;
+			u16 offset = ((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) * line_len) +
+						 ((((m_regs[G_X_OFFS_H] & 1) << 8 /* .. 16/256 */) + m_regs[G_X_OFFS_L]) >> 1);
+			u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + offset;
 			u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
 			for (auto x = resolution.left(); x <= resolution.right(); x++)
 			{
@@ -230,22 +225,22 @@ void tsconf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, con
 
 void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 {
-	offs_t machine_addr = PAGE(bank) + offset;
-	offs_t fmap_addr = BIT(FMAPS, 0, 4) << 12;
-	if (BIT(FMAPS, 4) && (machine_addr >= fmap_addr) && (machine_addr < (fmap_addr + 512)))
+	offs_t machine_addr = PAGE4K(bank) + offset;
+	offs_t fmap_addr = BIT(m_regs[FMAPS], 0, 4) << 12;
+	if (BIT(m_regs[FMAPS], 4) && (machine_addr >= fmap_addr) && (machine_addr < (fmap_addr + 512)))
 	{
 		cram_write(machine_addr - fmap_addr, data);
 	}
 	else if (bank > 0 || (W0_WE && W0_RAM))
 	{
-		ram_page_write(REG(REGNUM(PAGE0) + bank), offset, data);
+		ram_page_write(m_regs[PAGE0 + bank], offset, data);
 	}
 }
 
 void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 {
-	u32 ram_addr = RAM_PAGE_OFFST(page, offset);
-	if (ram_addr >= PAGE(T_MAP_PAGE) && ram_addr < (PAGE(T_MAP_PAGE + 1)))
+	u32 ram_addr = PAGE4K(page) + offset;
+	if (ram_addr >= PAGE4K(m_regs[T_MAP_PAGE]) && ram_addr < (PAGE4K(m_regs[T_MAP_PAGE] + 1)))
 	{
 		//TODO invalidate sprites, not entire map
 		m_ts_tilemap[1]->mark_all_dirty();
@@ -253,11 +248,11 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 	}
 	else
 	{
-		if (ram_addr >= PAGE(T0_G_PAGE) && ram_addr < PAGE(T0_G_PAGE + 8))
+		if (ram_addr >= PAGE4K(m_regs[T0_G_PAGE]) && ram_addr < PAGE4K(m_regs[T0_G_PAGE] + 8))
 		{
 			m_ts_tilemap[1]->mark_all_dirty();
 		}
-		if (ram_addr >= PAGE(T1_G_PAGE) && ram_addr < PAGE(T1_G_PAGE + 8))
+		if (ram_addr >= PAGE4K(m_regs[T1_G_PAGE]) && ram_addr < PAGE4K(m_regs[T1_G_PAGE] + 8))
 		{
 			m_ts_tilemap[2]->mark_all_dirty();
 		}
@@ -304,8 +299,8 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 
 	/* store new state */
 	m_port_7ffd_data = data;
-	REG(MEM_CONFIG) = (REG(MEM_CONFIG) & 0xfe) | BIT(data, 4); // ROM128
-	REG(V_PAGE) = BIT(data, 3) ? 7 : 5;
+	m_regs[MEM_CONFIG] = (m_regs[MEM_CONFIG] & 0xfe) | BIT(data, 4); // ROM128
+	m_regs[V_PAGE] = BIT(data, 3) ? 7 : 5;
 
 	/* update memory */
 	tsconf_update_bank1();
@@ -314,7 +309,7 @@ void tsconf_state::tsconf_port_7ffd_w(u8 data)
 
 void tsconf_state::tsconf_port_fe_w(offs_t offset, u8 data)
 {
-	BORDER = (data & 0x07) | 0xf0;
+	m_regs[BORDER] = (data & 0x07) | 0xf0;
 	spectrum_port_fe_w(offset, data);
 }
 
@@ -325,15 +320,15 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 
 	switch (nreg)
 	{
-	case 0x00:
+	case V_CONFIG:
 		data = 0b01000011; // PWR_UP, !FDRVER, 5bit VDAC
 		break;
-	case 0x12: // PAGE2
-	case 0x13: // PAGE3
-		data = REG(nreg);
+	case PAGE2:
+	case PAGE3:
+		data = m_regs[nreg];
 		break;
 
-	case 0x27: // DMAStatus
+	case DMA_CTRL: // DMAStatus
 		data = m_dma->is_ready() ? 0x00 : 0x80;
 		break;
 
@@ -352,113 +347,113 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 {
 	u8 nreg = port >> 8;
-	REG(nreg) = data;
+	m_regs[nreg] = data;
 
-	if (nreg == REGNUM(V_CONFIG) || nreg == REGNUM(V_PAGE) || nreg == REGNUM(PAL_SEL))
+	switch (nreg)
 	{
+	case V_CONFIG:
+	case V_PAGE:
+	case PAL_SEL:
 		tsconf_update_video_mode();
-	}
-	else if (nreg == REGNUM(FMAPS))
-	{
-	}
-	else if (nreg == REGNUM(TS_CONFIG))
-	{
-	}
-	else if (nreg == REGNUM(G_X_OFFS_L) || nreg == REGNUM(G_X_OFFS_H) || nreg == REGNUM(G_Y_OFFS_L) || nreg == REGNUM(G_Y_OFFS_H))
-	{
-	}
-	else if (nreg == REGNUM(T_MAP_PAGE))
-	{
+		break;
+
+	case T_MAP_PAGE:
 		m_ts_tilemap[1]->mark_all_dirty();
 		m_ts_tilemap[2]->mark_all_dirty();
-	}
-	else if (nreg == REGNUM(T0_G_PAGE))
-	{
-		m_gfxdecode->gfx(2)->set_source(m_ram->pointer() + PAGE(T0_G_PAGE));
+		break;
+
+	case T0_G_PAGE:
+		m_gfxdecode->gfx(2)->set_source(m_ram->pointer() + PAGE4K(data));
 		m_ts_tilemap[1]->mark_all_dirty();
-	}
-	else if ((nreg >= REGNUM(T0_X_OFFSER_L) && nreg <= REGNUM(T0_Y_OFFSER_H)))
-	{
-		m_ts_tilemap[1]->set_scrollx((T0_X_OFFSER_H << 8) | T0_X_OFFSER_L);
-		m_ts_tilemap[1]->set_scrolly((T0_Y_OFFSER_H << 8) | T0_Y_OFFSER_L);
-	}
-	else if (nreg == REGNUM(T1_G_PAGE))
-	{
-		m_gfxdecode->gfx(3)->set_source(m_ram->pointer() + PAGE(T1_G_PAGE));
+		break;
+
+	case T0_X_OFFSER_L:
+	case T0_X_OFFSER_H:
+	case T0_Y_OFFSER_L:
+	case T0_Y_OFFSER_H:
+		m_ts_tilemap[1]->set_scrollx((m_regs[T0_X_OFFSER_H] << 8) | m_regs[T0_X_OFFSER_L]);
+		m_ts_tilemap[1]->set_scrolly((m_regs[T0_Y_OFFSER_H] << 8) | m_regs[T0_Y_OFFSER_L]);
+		break;
+
+	case T1_G_PAGE:
+		m_gfxdecode->gfx(3)->set_source(m_ram->pointer() + PAGE4K(data));
 		m_ts_tilemap[2]->mark_all_dirty();
-	}
-	else if ((nreg >= REGNUM(T1_X_OFFSER_L) && nreg <= REGNUM(T1_Y_OFFSER_H)))
-	{
-		m_ts_tilemap[2]->set_scrollx((T1_X_OFFSER_H << 8) | T1_X_OFFSER_L);
-		m_ts_tilemap[2]->set_scrolly((T1_Y_OFFSER_H << 8) | T1_Y_OFFSER_L);
-	}
-	else if (nreg == REGNUM(MEM_CONFIG))
-	{
+		break;
+
+	case T1_X_OFFSER_L:
+	case T1_X_OFFSER_H:
+	case T1_Y_OFFSER_L:
+	case T1_Y_OFFSER_H:
+		m_ts_tilemap[2]->set_scrollx((m_regs[T1_X_OFFSER_H] << 8) | m_regs[T1_X_OFFSER_L]);
+		m_ts_tilemap[2]->set_scrolly((m_regs[T1_Y_OFFSER_H] << 8) | m_regs[T1_Y_OFFSER_L]);
+		break;
+
+	case MEM_CONFIG:
 		m_port_7ffd_data = (m_port_7ffd_data & 0xef) | (ROM128 << 4);
 		tsconf_update_bank1();
-	}
-	else if (nreg == REGNUM(PAGE0))
-	{
+		break;
+
+	case PAGE0:
 		tsconf_update_bank1();
-	}
-	else if (nreg == REGNUM(PAGE1))
-	{
-		m_bank2->set_base(m_ram->pointer() + PAGE(PAGE1));
-	}
-	else if (nreg == REGNUM(PAGE2))
-	{
-		m_bank3->set_base(m_ram->pointer() + PAGE(PAGE2));
-	}
-	else if (nreg == REGNUM(PAGE3))
-	{
-		m_bank4->set_base(m_ram->pointer() + PAGE(PAGE3));
-	}
-	else if (nreg == REGNUM(BORDER))
-	{
+		break;
+
+	case PAGE1:
+		m_bank2->set_base(m_ram->pointer() + PAGE4K(data));
+		break;
+
+	case PAGE2:
+		m_bank3->set_base(m_ram->pointer() + PAGE4K(data));
+		break;
+
+	case PAGE3:
+		m_bank4->set_base(m_ram->pointer() + PAGE4K(data));
+		break;
+
+	case BORDER:
 		tsconf_port_fe_w(0, (m_port_fe_data & 0xf8) | (data & 0x07));
-	}
-	else if (nreg == REGNUM(DMAS_ADDRESS_L))
-	{
+		break;
+
+	case DMAS_ADDRESS_L:
 		m_dma->set_saddr_l(data);
-	}
-	else if (nreg == REGNUM(DMAS_ADDRESS_H))
-	{
+		break;
+
+	case DMAS_ADDRESS_H:
 		m_dma->set_saddr_h(data);
-	}
-	else if (nreg == REGNUM(DMAS_ADDRESS_X))
-	{
+		break;
+
+	case DMAS_ADDRESS_X:
 		m_dma->set_saddr_x(data);
-	}
-	else if (nreg == REGNUM(DMAD_ADDRESS_L))
-	{
+		break;
+
+	case DMAD_ADDRESS_L:
 		m_dma->set_daddr_l(data);
-	}
-	else if (nreg == REGNUM(DMAD_ADDRESS_H))
-	{
+		break;
+
+	case DMAD_ADDRESS_H:
 		m_dma->set_daddr_h(data);
-	}
-	else if (nreg == REGNUM(DMAD_ADDRESS_X))
-	{
+		break;
+
+	case DMAD_ADDRESS_X:
 		m_dma->set_daddr_x(data);
-	}
-	else if (nreg == REGNUM(DMA_LEN))
-	{
+		break;
+
+	case DMA_LEN:
 		m_dma->set_block_len(data);
-	}
-	else if (nreg == REGNUM(DMA_NUM_L))
-	{
+		break;
+
+	case DMA_NUM_L:
 		m_dma->set_block_num_l(data);
-	}
-	else if (nreg == REGNUM(DMA_NUM_H))
-	{
+		break;
+
+	case DMA_NUM_H:
 		m_dma->set_block_num_h(data);
-	}
-	else if (nreg == REGNUM(DMA_CTRL))
-	{
+		break;
+
+	case DMA_CTRL:
 		m_dma->start_tx(((BIT(data, 7) << 3) | (data & 0x07)), BIT(data, 5), BIT(data, 4), BIT(data, 3));
-	}
-	else if (nreg == REGNUM(SYS_CONFIG))
-	{
+		break;
+
+	case SYS_CONFIG:
 		/* TODO
 		switch (data & 0x03)
 		{
@@ -474,13 +469,23 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 			break;
 		}
 		*/
-	}
-	else if (nreg == REGNUM(HS_INT) || nreg == REGNUM(VS_INT_L) || nreg == REGNUM(VS_INT_H) || nreg == REGNUM(INT_MASK))
-	{
-	}
-	else
-	{
+		break;
+
+	case FMAPS:
+	case TS_CONFIG:
+	case G_X_OFFS_L:
+	case G_X_OFFS_H:
+	case G_Y_OFFS_L:
+	case G_Y_OFFS_H:
+	case HS_INT:
+	case VS_INT_L:
+	case VS_INT_H:
+	case INT_MASK:
+		break;
+
+	default:
 		logerror("Unsupported reg write: %02X = %02x\n", nreg, data);
+		break;
 	}
 }
 
