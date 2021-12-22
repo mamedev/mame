@@ -16,10 +16,6 @@
 #include "png.h"
 #include "bitmap_printer.h"
 
-//#define VERBOSE 1
-//#define LOG_OUTPUT_FUNC osd_printf_info
-#include "logmacro.h"
-
 /***************************************************************************
     DEVICE DECLARATION
 ***************************************************************************/
@@ -70,8 +66,6 @@ void bitmap_printer_device::device_add_mconfig(machine_config &config)
 	screen.set_size(m_paper_width, PAPER_SCREEN_HEIGHT);
 	screen.set_visarea(0, m_paper_width - 1, 0, PAPER_SCREEN_HEIGHT - 1);
 	screen.set_screen_update(FUNC(bitmap_printer_device::screen_update_bitmap));
-
-//  SESSION_TIME(config, m_session_time, 3);  // skip 3 levels so we don't include the printer tag, bitmap_printer and session_time
 
 	STEPPER(config, m_pf_stepper, (uint8_t) 0xa);
 	STEPPER(config, m_cr_stepper, (uint8_t) 0xa);
@@ -175,9 +169,12 @@ uint32_t bitmap_printer_device::screen_update_bitmap(screen_device &screen,
 
 	copyscrollbitmap(bitmap, m_page_bitmap, 0, nullptr, 1, &scrolly, cliprect);
 
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paper_width, 2, top_edge_color);  // draw a line on the very top of the top edge of page
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height, m_paper_width, 2, bottom_edge_color);  // draw a line on the bottom edge of page
-	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height + 2, m_paper_width, m_distfrombottom, coverup_color);  // cover up visible parts of current page at the bottom
+	// draw a line on the very top of the top edge of page
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos, m_paper_width, 2, top_edge_color);
+	// draw a line on the bottom edge of page
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height, m_paper_width, 2, bottom_edge_color);
+	// cover up visible parts of current page at the bottom
+	bitmap.plot_box(0, bitmap.height() - m_distfrombottom - m_ypos + m_paper_height + 2, m_paper_width, m_distfrombottom, coverup_color);
 
 	draw_printhead(bitmap, std::max(m_xpos, 0) , bitmap.height() - m_distfrombottom);
 
@@ -212,26 +209,6 @@ void bitmap_printer_device::bitmap_clear_band(bitmap_rgb32 &bitmap, int from_lin
 }
 
 //-------------------------------------------------
-//    WRITE SNAPSHOT TO FILE
-//-------------------------------------------------
-
-void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
-{
-	machine().popmessage("writing printer snapshot");
-
-	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	std::error_condition const filerr = machine().video().open_next(file, "png");
-
-	if (!filerr)
-	{
-		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
-
-		// save the paper into a png
-		util::png_write_bitmap(file, nullptr, m_page_bitmap, 2, png_palette);
-	}
-}
-
-//-------------------------------------------------
 //    PRINTHEAD FUNCTIONS
 //-------------------------------------------------
 
@@ -262,10 +239,13 @@ void bitmap_printer_device::draw_printhead(bitmap_rgb32 &bitmap, int x, int y)
 	int offy = 9 + bordy;
 	int sizex = m_printhead_xsize;
 	int sizey = m_printhead_ysize;
-	bitmap.plot_box(x - sizex / 2- bordx, y + offy - bordy, sizex + 2 * bordx, sizey + bordy * 2,  m_led_state[0] ? m_printhead_bordercolor : dimcolor(m_printhead_bordercolor, 4));
+	bitmap.plot_box(x - sizex / 2- bordx, y + offy - bordy, sizex + 2 * bordx, sizey + bordy * 2,  
+		m_led_state[0] ? m_printhead_bordercolor : dimcolor(m_printhead_bordercolor, 4));
 
 	for (int i = 1; i <= m_num_leds; i++)
-	bitmap.plot_box(x - sizex / 2,        y + offy + ((i -1) * sizey / m_num_leds), sizex, ((i+1) * sizey / m_num_leds) - (i * sizey / m_num_leds), m_led_state[i] ? m_printhead_color : dimcolor(m_printhead_color, 4));
+	bitmap.plot_box(x - sizex / 2, y + offy + ((i -1) * sizey / m_num_leds), sizex, 
+		((i+1) * sizey / m_num_leds) - (i * sizey / m_num_leds), 
+		m_led_state[i] ? m_printhead_color : dimcolor(m_printhead_color, 4));
 }
 
 //-------------------------------------------------
@@ -296,7 +276,7 @@ void bitmap_printer_device::draw_number(int number, int x, int y, bitmap_rgb32& 
 	int height = std::max(m_vdpi / 30, 1);
 	int thick = std::max(m_vdpi / 72, 1);
 
-	for (int i = s.length()-1; i>=0; i--)
+	for (int i = s.length() - 1; i >= 0; i--)
 		draw7seg( s.at(i) - 0x30, true,
 					x + ( i - s.length()) * (3 * width) - (width), y + height * 3 / 2,
 					width, height, thick, bitmap, 0x000000, 0);
@@ -304,6 +284,9 @@ void bitmap_printer_device::draw_number(int number, int x, int y, bitmap_rgb32& 
 
 void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 {
+	static constexpr u32 dark_grey_color = 0x202020;
+	static constexpr u32 light_grey_color = 0xc0c0c0;
+
 	int drawmarks = ioport("DRAWMARKS")->read();
 	if (!drawmarks) return;
 
@@ -312,7 +295,7 @@ void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 		int adj_i = i + calc_scroll_y(bitmap) % m_paper_height;
 		int barbase = m_vdpi / 6;
 		int barwidth = ((i % m_vdpi) == 0) ? barbase * 2 : barbase;
-		int barcolor = ((i % m_vdpi) == 0) ? 0x202020 : 0xc0c0c0;
+		int barcolor = ((i % m_vdpi) == 0) ? dark_grey_color : 0xc0c0c0;
 		if (adj_i < bitmap.height())
 		{
 			bitmap.plot_box(bitmap.width() - 1 - barwidth, adj_i, barwidth, 1, barcolor);
@@ -356,6 +339,26 @@ unsigned int& bitmap_printer_device::pix(int y, int x)    // reversed y x
 };
 
 //-------------------------------------------------
+//    WRITE SNAPSHOT TO FILE
+//-------------------------------------------------
+
+void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
+{
+	machine().popmessage("writing printer snapshot");
+
+	emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	std::error_condition const filerr = machine().video().open_next(file, "png");
+
+	if (!filerr)
+	{
+		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
+
+		// save the paper into a png
+		util::png_write_bitmap(file, nullptr, m_page_bitmap, 2, png_palette);
+	}
+}
+
+//-------------------------------------------------
 //    STEPPER AND MARGIN FUNCTIONS
 //-------------------------------------------------
 
@@ -385,11 +388,7 @@ bool bitmap_printer_device::check_new_page()
 			// save a snapshot
 			write_snapshot_to_file(
 						owner()->basetag(),
-						owner()->basetag() + std::string("_") +
-		//              get_session_time_device()->getprintername() +
-						"_page_" +
-		//              padzeroes(std::to_string(get_session_time_device()->page_num++),3) +
-						".png");
+						owner()->basetag());
 
 			m_newpage_flag = 1;
 

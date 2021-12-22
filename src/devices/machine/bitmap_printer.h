@@ -12,8 +12,8 @@
     *   moving the cr_stepper/pf_stepper will update m_xpos/m_ypos according to ratio specified
 
  */
+
 #include "screen.h"
-//#include "machine/session_time.h"
 #include "machine/steppers.h"
 
 #ifndef MAME_MACHINE_BITMAP_PRINTER_H
@@ -47,7 +47,6 @@ protected:
 
 private:
 	required_device<screen_device> m_screen;
-//  required_device<session_time_device> m_session_time;
 public:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
@@ -87,8 +86,6 @@ public:
 	void set_printhead_size(int xsize, int ysize, int bordersize);
 	void setheadpos(int x, int y){  if (m_xpos != x) m_newpage_flag = 0; m_xpos = x; m_ypos = y;}
 
-//  session_time_device* get_session_time_device() {return m_session_time;}
-
 	void write_snapshot_to_file(std::string directory, std::string name);
 
 	void draw_pixel(int x, int y, int pixelval);
@@ -98,8 +95,6 @@ public:
 	void bitmap_clear_band(bitmap_rgb32 &bitmap, int from_line, int to_line, u32 color);
 	void bitmap_clear_band(int from_line, int to_line, u32 color);
 	void clear_to_pos(int to_line, u32 color = 0xffffff);
-
-//  std::string padzeroes( std::string s, int len) { return std::string(len - s.length(), '0') + s; }
 
 	int get_top_margin();
 	int get_bottom_margin();
@@ -125,6 +120,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)
-
 
 #endif // MAME_MACHINE_BITMAP_PRINTER_H
