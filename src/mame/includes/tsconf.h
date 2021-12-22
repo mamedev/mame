@@ -31,7 +31,8 @@ public:
 		  m_glukrs(*this, "glukrs"),
 		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
-		  m_cram(*this, "cram")
+		  m_cram(*this, "cram"),
+		  m_p_rom(*this, "maincpu")
 	{
 	}
 
@@ -176,7 +177,8 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	address_space *m_program;
-	u8 *m_p_rom;
+	required_region_ptr<u8> m_p_rom;
+
 	void tsconf_update_video_mode();
 	u8 m_regs[0x100];
 

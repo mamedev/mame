@@ -206,7 +206,6 @@ void tsconf_state::machine_reset()
 {
 	u8 *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
-	m_p_rom = memregion("maincpu")->base();
 
 	m_ram_0000 = nullptr;
 
@@ -217,24 +216,24 @@ void tsconf_state::machine_reset()
 
 	m_regs[V_CONFIG] = 0x00;
 	m_regs[V_PAGE] = 0x05;
+	m_regs[G_X_OFFS_L] = 0x00;
+	m_regs[G_X_OFFS_H] &= 0xfe; // xxxxxxx0
+	m_regs[G_Y_OFFS_L] = 0x00;
+	m_regs[G_Y_OFFS_H] &= 0xfe; // xxxxxxx0
 	m_regs[TS_CONFIG] &= 0x03; // 000000xx
-	//m_reg_gxoffset.b.l	= 0x00;
-	//m_reg_gxoffset.b.h	= 0x00; // xxxxxxx0
-	//m_reg_gyoffset.b.l	= 0x00;
-	//m_reg_gyoffset.b.h	= 0x00; // xxxxxxx0
-	m_regs[FMAPS] = 0x00; // xxx0xxxx
 	m_regs[PAL_SEL] = 0x0f;
 	m_regs[PAGE0] = 0x00;
 	m_regs[PAGE1] = 0x05;
 	m_regs[PAGE2] = 0x02;
 	m_regs[PAGE3] = 0x00;
+	m_regs[FMAPS] &= 0xef; // xxx0xxxx
 	m_regs[SYS_CONFIG] = 0x00;
 	m_regs[MEM_CONFIG] = 0x04;
 	m_regs[HS_INT] = 0x01;	 // 00000001
 	m_regs[VS_INT_L] = 0x00; // 00000001
 	m_regs[VS_INT_H] = 0x00; // 0000xxx0
-	m_regs[INT_MASK] = 0x01; // xxxxx001
 	// FDDVirt		= 0x00; // 0000xxx0
+	m_regs[INT_MASK] = 0x01; // xxxxx001
 	// CacheConfig	= 0x01; // xxxxx001
 
 	if (m_beta->started())
@@ -286,7 +285,7 @@ void tsconf_state::tsconf(machine_config &config)
 }
 
 ROM_START(tsconf)
-	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF) // 16KB ROM
 	ROM_LOAD("ts-bios.rom", 0x010000, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
 ROM_END
 
