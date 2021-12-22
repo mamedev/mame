@@ -3030,6 +3030,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/partytap.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",
