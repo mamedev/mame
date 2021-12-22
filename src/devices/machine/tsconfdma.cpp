@@ -38,12 +38,12 @@ void tsconfdma_device::device_start()
 void tsconfdma_device::device_reset()
 {
     m_block_num = 0;
-    m_ready = true;
+    m_ready = ASSERT_LINE;
 }
 
 int tsconfdma_device::is_ready()
 {
-    return m_ready ? ASSERT_LINE : CLEAR_LINE;
+    return m_ready;
 }
 
 void tsconfdma_device::set_saddr_l(u8 addr_l)
@@ -95,7 +95,7 @@ void tsconfdma_device::set_block_num_h(u8 num_h)
 
 void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_opt)
 {
-    m_ready = false;
+    m_ready = CLEAR_LINE;
     m_align = align_opt ? 512 : 256;
 
     // TODO Transfers 2 byte/cycle at 7MHz
@@ -165,7 +165,7 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
         break;
     }
 
-    m_ready = true;
+    m_ready = ASSERT_LINE;
 }
 
 // device type definition
