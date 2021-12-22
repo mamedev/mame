@@ -16,10 +16,10 @@ class tsconfdma_device : public device_t
 public:
     tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto in_mreq_callback() { return m_in_mreq_cb.bind(); }
-	auto out_mreq_callback() { return m_out_mreq_cb.bind(); }
+    auto in_mreq_callback() { return m_in_mreq_cb.bind(); }
+    auto out_mreq_callback() { return m_out_mreq_cb.bind(); }
     auto in_spireq_callback() { return m_in_mspi_cb.bind(); }
-	auto out_cram_callback() { return m_out_cram_cb.bind(); }
+    auto out_cram_callback() { return m_out_cram_cb.bind(); }
 
     int is_ready();
 
@@ -33,14 +33,15 @@ public:
     void set_block_num_l(uint8_t num_l);
     void set_block_num_h(uint8_t num_h);
     void start_tx(uint8_t dev, bool s_align, bool d_align, bool blitting_opt);
-private:
-	virtual void device_start() override;
-	virtual void device_reset() override;
 
-    devcb_read16    m_in_mreq_cb;
-    devcb_write16   m_out_mreq_cb;
-    devcb_read16    m_in_mspi_cb;
-    devcb_write16   m_out_cram_cb;
+private:
+    virtual void device_start() override;
+    virtual void device_reset() override;
+
+    devcb_read16 m_in_mreq_cb;
+    devcb_write16 m_out_mreq_cb;
+    devcb_read16 m_in_mspi_cb;
+    devcb_write16 m_out_cram_cb;
 
     int m_ready;
 
