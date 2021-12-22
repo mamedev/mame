@@ -42,6 +42,12 @@ static constexpr rgb_t from_pwm(u16 pwm15)
 	return rgb_t(pwm_to_rgb[BIT(pwm15, 10, 5)], pwm_to_rgb[BIT(pwm15, 5, 5)], pwm_to_rgb[BIT(pwm15, 0, 5)]);
 }
 
+void tsconf_state::tsconf_palette(palette_device &palette) const
+{
+	rgb_t colors[256] = {0};
+	palette.set_pen_colors(0, colors);
+}
+
 void tsconf_state::tsconf_update_bank1()
 {
 

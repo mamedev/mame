@@ -209,9 +209,6 @@ void tsconf_state::machine_reset()
 
 	m_ram_0000 = nullptr;
 
-	rgb_t colors[256] = {0};
-	m_palette->set_pen_colors(0, colors);
-
 	m_port_f7_ext = DISABLED;
 
 	m_regs[V_CONFIG] = 0x00;
@@ -256,6 +253,7 @@ void tsconf_state::tsconf(machine_config &config)
 {
 	spectrum_128(config);
 	config.device_remove("exp");
+	config.device_remove("palette");
 
 	//m_maincpu->set_clock(XTAL(14'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &tsconf_state::tsconf_mem);
@@ -276,9 +274,9 @@ void tsconf_state::tsconf(machine_config &config)
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
+	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 448, 0, 360, 320, 0, 288);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
-	subdevice<palette_device>("palette")->set_entries(256);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
