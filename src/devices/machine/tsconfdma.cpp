@@ -38,13 +38,12 @@ void tsconfdma_device::device_start()
 void tsconfdma_device::device_reset()
 {
     m_block_num = 0;
-
     m_ready = true;
 }
 
-bool tsconfdma_device::is_ready()
+int tsconfdma_device::is_ready()
 {
-    return m_ready;
+    return m_ready ? ASSERT_LINE : CLEAR_LINE;
 }
 
 void tsconfdma_device::set_saddr_l(u8 addr_l)

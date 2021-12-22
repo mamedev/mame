@@ -21,7 +21,8 @@ public:
     auto in_spireq_callback() { return m_in_mspi_cb.bind(); }
 	auto out_cram_callback() { return m_out_cram_cb.bind(); }
 
-    bool is_ready();
+    int is_ready();
+
     void set_saddr_l(uint8_t addr_l);
     void set_saddr_h(uint8_t addr_h);
     void set_saddr_x(uint8_t addr_x);
@@ -45,11 +46,11 @@ private:
 
     offs_t m_address_s;
     offs_t m_address_d;
-    uint8_t m_block_len;
-    uint16_t m_block_num;
+    u8 m_block_len;
+    u16 m_block_num;
     bool m_align_s;
     bool m_align_d;
-    uint16_t m_align;
+    u16 m_align;
 };
 
 DECLARE_DEVICE_TYPE(TSCONF_DMA, tsconfdma_device)
