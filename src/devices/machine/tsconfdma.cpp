@@ -160,6 +160,9 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
         }
         break;
 
+    //case 0b1101: // RAM -> SFILE
+    //    break;
+
     default:
         logerror("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", dev, m_address_s, m_block_len, m_block_num, m_address_d);
         break;

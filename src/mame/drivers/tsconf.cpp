@@ -93,12 +93,17 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
 	tile = tile / tilemap.cols() * 64 * 8 + (tile % tilemap.cols());
-	u8 pal = ((BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2)) << 4;
+	u8 pal = (BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2);
 	if (BIT(hi, 6, 2))
 	{
 		logerror("FIXME - FLIP Case\n");
 	}
-	tileinfo.set(2 + Layer, tile, u16(pal), 0);
+	tileinfo.set(2 + Layer, tile, pal, 0);
+}
+
+TILE_GET_INFO_MEMBER(tsconf_state::get_sprite_info_16c)
+{
+	tileinfo.set(4, tile_index, 0, 0);
 }
 
 void tsconf_state::tsconf_mem(address_map &map)
@@ -182,6 +187,7 @@ static GFXDECODE_START(gfx_tsconf)
 	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)       // TXT
 	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 255) // T0 16cpp
 	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 255) // T1 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 255) // Sprites 16cpp
 GFXDECODE_END
 
 void tsconf_state::video_start()
@@ -190,10 +196,11 @@ void tsconf_state::video_start()
 
 	m_ts_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 	m_ts_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_ts_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-
 	m_ts_tilemap[1]->set_transparent_pen(0);
+	m_ts_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_ts_tilemap[2]->set_transparent_pen(0);
+	m_ts_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_sprite_info_16c)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_ts_tilemap[3]->set_transparent_pen(0);
 }
 
 void tsconf_state::machine_start()

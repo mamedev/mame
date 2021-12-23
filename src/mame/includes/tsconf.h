@@ -115,6 +115,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
+	TILE_GET_INFO_MEMBER(get_sprite_info_16c);
 
 	void tsconf_palette(palette_device &palette) const;
 	// Changing this consider to revert 'virtual' in spectrum.h

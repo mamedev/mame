@@ -206,9 +206,8 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 				if (VM == VM_16C)
 				{
 					*bm++ = (pix >> 4) + pal_offset;
-					pix &= 0x0f;
+					*bm++ = (pix & 0x0f) + pal_offset;
 					x++;
-					*bm++ = (pix & 0x07) + pal_offset;
 				}
 				else
 				{
@@ -231,6 +230,8 @@ void tsconf_state::spectrum_UpdateBorderBitmap()
 
 void tsconf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	//u8 *messram = m_ram->pointer();
+	//u8 *sprites_location = messram + PAGE4K(m_regs[SG_PAGE]);
 	for (u8 i = 0; i < 85; i++)
 	{
 		logerror("Draw Sprites ... TODO\n");
@@ -269,6 +270,10 @@ void tsconf_state::ram_page_write(u8 page, offs_t offset, u8 data)
 		if (ram_addr >= PAGE4K(m_regs[T1_G_PAGE]) && ram_addr < PAGE4K(m_regs[T1_G_PAGE] + 8))
 		{
 			m_ts_tilemap[2]->mark_all_dirty();
+		}
+		if (ram_addr >= PAGE4K(m_regs[SG_PAGE]) && ram_addr < PAGE4K(m_regs[SG_PAGE] + 8))
+		{
+			m_ts_tilemap[3]->mark_all_dirty();
 		}
 	}
 
@@ -400,6 +405,11 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 	case T1_Y_OFFSER_H:
 		m_ts_tilemap[2]->set_scrollx((m_regs[T1_X_OFFSER_H] << 8) | m_regs[T1_X_OFFSER_L]);
 		m_ts_tilemap[2]->set_scrolly((m_regs[T1_Y_OFFSER_H] << 8) | m_regs[T1_Y_OFFSER_L]);
+		break;
+
+	case SG_PAGE:
+		m_gfxdecode->gfx(4)->set_source(m_ram->pointer() + PAGE4K(data));
+		m_ts_tilemap[3]->mark_all_dirty();
 		break;
 
 	case MEM_CONFIG:
