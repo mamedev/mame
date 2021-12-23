@@ -123,8 +123,6 @@ private:
 	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor);
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap);
 	void draw_inch_marks(bitmap_rgb32& bitmap);
-
-	std::error_condition open_next(emu_file &file, const char *extension, uint32_t added_index = 0);
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)
