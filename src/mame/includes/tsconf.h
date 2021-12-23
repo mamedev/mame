@@ -179,7 +179,7 @@ private:
 
 	optional_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	tilemap_t *m_ts_tilemap[3];
+	tilemap_t *m_ts_tilemap[4];
 	required_device<ram_device> m_cram;
 };
 
