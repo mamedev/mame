@@ -46,7 +46,7 @@ license:CC0
 		<part name="rom" interface="u15">
 			<feature name="led_driver" value="tlc5916"/>
 			<dataarea name="rom" size="0x20000">
-				<rom name="char_rom-8bdb0934.rom" size="0x200" crc="0ade51ca" sha1="ef7e9f5b17529461d08197565627a06889b00faa" offset="0" /> // 12th September 2020
+				<rom name="char_rom-8bdb0934.rom" size="0x200" crc="0ade51ca" sha1="ef7e9f5b17529461d08197565627a06889b00faa" offset="0" /> <!-- 12th September 2020 -->
 			</dataarea>
 		</part>
 	</software>
