@@ -76,9 +76,10 @@ To Do / Status:
 *******************************************************************************************************/
 #include "emu.h"
 #include "includes/trs80.h"
-#include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
+
+namespace {
 
 class lnw80_state : public trs80_state
 {
@@ -104,31 +105,26 @@ private:
 
 	void lnw80_io(address_map &map);
 	void lnw80_mem(address_map &map);
-	void lnw_banked_mem(address_map &map);
 
 	u8 m_lnw_mode = 0;
 	required_shared_ptr<u8> m_p_gfxram;
-	required_device<address_map_bank_device> m_lnw_bank;
+	memory_view m_lnw_bank;
 };
 
 
 void lnw80_state::lnw80_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).m(m_lnw_bank, FUNC(address_map_bank_device::amap8));
+	map(0x0000, 0x3fff).view(m_lnw_bank);
+	m_lnw_bank[0](0x0000, 0x2fff).rom().region("maincpu", 0);
+	m_lnw_bank[0](0x37de, 0x37de).rw(FUNC(lnw80_state::sys80_f9_r), FUNC(lnw80_state::sys80_f8_w));
+	m_lnw_bank[0](0x37e0, 0x37e3).rw(FUNC(lnw80_state::irq_status_r), FUNC(lnw80_state::motor_w));
+	m_lnw_bank[0](0x37e4, 0x37e7).w(FUNC(lnw80_state::cassunit_w));
+	m_lnw_bank[0](0x37e8, 0x37eb).rw(FUNC(lnw80_state::printer_r), FUNC(lnw80_state::printer_w));
+	m_lnw_bank[0](0x37ec, 0x37ef).rw(FUNC(lnw80_state::fdc_r), FUNC(lnw80_state::fdc_w));
+	m_lnw_bank[0](0x3800, 0x3bff).r(FUNC(lnw80_state::keyboard_r));
+	m_lnw_bank[0](0x3c00, 0x3fff).ram().share(m_p_videoram);
+	m_lnw_bank[1](0x0000, 0x3fff).ram().share(m_p_gfxram);
 	map(0x4000, 0xffff).ram();
-}
-
-void lnw80_state::lnw_banked_mem(address_map &map)
-{
-	map(0x0000, 0x2fff).rom().region("maincpu", 0);
-	map(0x37de, 0x37de).rw(FUNC(lnw80_state::sys80_f9_r), FUNC(lnw80_state::sys80_f8_w));
-	map(0x37e0, 0x37e3).rw(FUNC(lnw80_state::irq_status_r), FUNC(lnw80_state::motor_w));
-	map(0x37e4, 0x37e7).w(FUNC(lnw80_state::cassunit_w));
-	map(0x37e8, 0x37eb).rw(FUNC(lnw80_state::printer_r), FUNC(lnw80_state::printer_w));
-	map(0x37ec, 0x37ef).rw(FUNC(lnw80_state::fdc_r), FUNC(lnw80_state::fdc_w));
-	map(0x3800, 0x3bff).r(FUNC(lnw80_state::keyboard_r));
-	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
-	map(0x4000, 0x7fff).ram().share(m_p_gfxram);
 }
 
 void lnw80_state::lnw80_io(address_map &map)
@@ -306,7 +302,7 @@ void lnw80_state::lnw80_fe_w(u8 data)
 
 	m_lnw_mode = data;
 
-	m_lnw_bank->set_bank(BIT(data, 3));
+	m_lnw_bank.select(BIT(data, 3));
 }
 
 
@@ -645,12 +641,6 @@ void lnw80_state::lnw80(machine_config &config)
 	m_uart->set_auto_rdav(true);
 	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 
-	ADDRESS_MAP_BANK(config, m_lnw_bank, 0);
-	m_lnw_bank->set_addrmap(0, &lnw80_state::lnw_banked_mem);
-	m_lnw_bank->set_data_width(8);
-	m_lnw_bank->set_addr_width(16);
-	m_lnw_bank->set_stride(0x4000);
-
 	SOFTWARE_LIST(config, "cass_list").set_original("trs80_cass").set_filter("1"); // L
 	SOFTWARE_LIST(config, "quik_list").set_original("trs80_quik").set_filter("1"); // L
 	SOFTWARE_LIST(config, "flop_list").set_original("trs80_flop").set_filter("1"); // L
@@ -679,6 +669,7 @@ ROM_START(lnw80)
 	ROM_LOAD_OPTIONAL("lnw_ntsc.u130",  0x0000, 0x0020, CRC(b990a207) SHA1(1a1cc3150cbfed76b1c88c0d561f9bee954f3234) )
 ROM_END
 
+} // anonymous namespace
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT    CLASS        INIT        COMPANY          FULLNAME    FLAGS
 COMP( 1981, lnw80,       0,        trs80l2,  lnw80,    lnw80,   lnw80_state, empty_init, "LNW Research",  "LNW-80",   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

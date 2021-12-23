@@ -1,12 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Gordon Jefferyes, Nigel Barnes
 /******************************************************************************
+
     BBC Model B
-
-    MESS Driver By:
-
-    Gordon Jefferyes
-    mess_bbc@romvault.com
 
     This is the first go around at converting the BBC code over to using
     mames built in mc6845, there are a number of features now incorrect

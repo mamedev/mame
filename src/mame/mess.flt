@@ -117,7 +117,6 @@ bbcbc.cpp
 bcs3.cpp
 bebox.cpp
 bert.cpp
-besta.cpp
 beta.cpp
 betacam.cpp
 bigbord2.cpp
@@ -395,6 +394,7 @@ harriet.cpp
 hawk.cpp
 hazeltin.cpp
 hazl1420.cpp
+hds200.cpp
 hec2hrp.cpp
 hektor.cpp
 hhtiger.cpp
@@ -449,6 +449,7 @@ ie15.cpp
 iez80.cpp
 if800.cpp
 ikt5a.cpp
+im01.cpp
 imds2.cpp
 imsai.cpp
 indiana.cpp
@@ -821,6 +822,7 @@ poly800.cpp
 poly88.cpp
 poly880.cpp
 polysix.cpp
+positron.cpp
 powerstack.cpp
 pp.cpp
 pp01.cpp
@@ -893,6 +895,7 @@ roland_tb303.cpp
 roland_tr505.cpp
 roland_tr606.cpp
 roland_tr707.cpp
+roland_tr808.cpp
 roland_tr909.cpp
 roland_u20.cpp
 rt1715.cpp
@@ -1010,7 +1013,6 @@ sun3x.cpp
 sun4.cpp
 super6.cpp
 super80.cpp
-superga2.cpp
 superslave.cpp
 supracan.cpp
 sv8000.cpp

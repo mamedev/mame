@@ -5,7 +5,7 @@
 
 /*
     A note regarding other bootlegs:
-    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+    In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into separate
     derived classes and source files.
 
     Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp

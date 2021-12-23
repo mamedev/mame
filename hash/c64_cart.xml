@@ -2188,7 +2188,7 @@ license:CC0
 	</software>
 
 	<software name="dragnden">
-		<description>Dragon's Den</description>
+		<description>Dragonsden</description>
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64???" />
@@ -2196,7 +2196,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="dragon's den (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899"/>
+				<rom name="dragonsden (1983)(commodore).80" size="0x4000" crc="447e9930" sha1="432a1fe70a975b5ad1bee1c0138b3672df7b1899"/>
 			</dataarea>
 		</part>
 	</software>

@@ -1419,7 +1419,6 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		}
 		else if (m_focus == focused_menu::LEFT)
 		{
-			m_prev_selected = nullptr;
 			filter_selected();
 		}
 		return;
@@ -1774,7 +1773,6 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				}
 				else if (hover() >= HOVER_FILTER_FIRST && hover() <= HOVER_FILTER_LAST)
 				{
-					m_prev_selected = nullptr;
 					m_filter_highlight = hover() - HOVER_FILTER_FIRST;
 					filter_selected();
 					stop = true;
@@ -1953,18 +1951,29 @@ void menu_select_launch::draw(uint32_t flags)
 	// make sure the selection
 	if (m_available_items < m_visible_lines)
 		m_visible_lines = m_available_items;
-	if (top_line < 0 || is_first_selected())
+	int selection;
+	if (selected_index() < m_available_items)
+	{
+		selection = selected_index();
+	}
+	else
+	{
+		selection = 0;
+		while ((m_available_items > selection) && (item(selection).ref() != m_prev_selected))
+			++selection;
+	}
+	if (top_line < 0 || !selection)
 	{
 		top_line = 0;
 	}
-	else if (selected_index() < m_available_items)
+	else if (selection < m_available_items)
 	{
-		if (selected_index() >= (top_line + m_visible_lines))
-			top_line = selected_index() - (m_visible_lines / 2);
+		if ((selection >= (top_line + m_visible_lines)) || (selection <= top_line))
+			top_line = (std::max)(selection - (m_visible_lines / 2), 0);
 		if ((top_line + m_visible_lines) >= m_available_items)
 			top_line = m_available_items - m_visible_lines;
-		else if (selected_index() >= (top_line + m_visible_lines - 2))
-			top_line = selected_index() - m_visible_lines + ((selected_index() == (m_available_items - 1)) ? 1: 2);
+		else if (selection >= (top_line + m_visible_lines - 2))
+			top_line = selection - m_visible_lines + ((selection == (m_available_items - 1)) ? 1: 2);
 	}
 
 	// determine effective positions taking into account the hilighting arrows
@@ -2759,7 +2768,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 			}
 			else
 			{
-				m_info_buffer = "";
+				m_info_buffer.clear();
 				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
 			}
 		}
@@ -3048,9 +3057,9 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 
 		// if everything looks good, schedule the new driver
 		if (audit_passed(summary))
-			str << _("ROM Audit Result\tOK\n");
+			str << _("Media Audit Result\tOK\n");
 		else
-			str << _("ROM Audit Result\tBAD\n");
+			str << _("Media Audit Result\tBAD\n");
 
 		if (summary_samples == media_auditor::NONE_NEEDED)
 			str << _("Samples Audit Result\tNone Needed\n");
@@ -3061,10 +3070,10 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	}
 	else
 	{
-		str << _("ROM Audit \tDisabled\nSamples Audit \tDisabled\n");
+		str << _("Media Audit\tDisabled\nSamples Audit\tDisabled\n");
 	}
 
-	buffer = str.str();
+	buffer = std::move(str).str();
 }
 
 } // namespace ui

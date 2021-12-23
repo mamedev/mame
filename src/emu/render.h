@@ -377,15 +377,14 @@ private:
 // a render_container holds a list of items and an orientation for the entire collection
 class render_container
 {
-	friend class simple_list<render_container>;
 	friend class render_manager;
 	friend class render_target;
 
+public:
 	// construction/destruction
 	render_container(render_manager &manager, screen_device *screen = nullptr);
 	~render_container();
 
-public:
 	// user settings describes the collected user-controllable settings
 	struct user_settings
 	{
@@ -404,7 +403,6 @@ public:
 	};
 
 	// getters
-	render_container *next() const { return m_next; }
 	screen_device *screen() const { return m_screen; }
 	render_manager &manager() const { return m_manager; }
 	render_texture *overlay() const { return m_overlaytexture; }
@@ -478,7 +476,6 @@ private:
 	void update_palette();
 
 	// internal state
-	render_container *      m_next;                 // the next container in the list
 	render_manager &        m_manager;              // reference back to the owning manager
 	simple_list<item>       m_itemlist;             // head of the item list
 	fixed_allocator<item>   m_item_allocator;       // free container items
@@ -564,11 +561,6 @@ public:
 	// reference tracking
 	void invalidate_all(void *refptr);
 
-	// debug containers
-	render_container *debug_alloc();
-	void debug_free(render_container &container);
-	void debug_append(render_container &container);
-
 	// resolve tag lookups
 	void resolve_tags();
 
@@ -614,7 +606,7 @@ private:
 	// internal state
 	render_target *         m_next;                     // link to next target
 	render_manager &        m_manager;                  // reference to our owning manager
-	std::unique_ptr<std::list<layout_file>> m_filelist; // list of layout files
+	std::list<layout_file>  m_filelist;                 // list of layout files
 	view_mask_vector        m_views;                    // views we consider
 	unsigned                m_curview;                  // current view index
 	u32                     m_flags;                    // creation flags
@@ -638,7 +630,6 @@ private:
 	render_layer_config     m_base_layerconfig;         // the layer configuration at the time of first frame
 	int                     m_maxtexwidth;              // maximum width of a texture
 	int                     m_maxtexheight;             // maximum height of a texture
-	simple_list<render_container> m_debug_containers;   // list of debug containers
 	s32                     m_clear_extent_count;       // number of clear extents
 	s32                     m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 	bool                    m_transform_container;      // determines whether the screen container is transformed by the core renderer,
@@ -671,7 +662,7 @@ public:
 	render_target *target_alloc(util::xml::data_node const &layout, u32 flags = 0);
 	void target_free(render_target *target);
 	const simple_list<render_target> &targets() const { return m_targetlist; }
-	render_target *first_target() const { return m_targetlist.first(); }
+	render_target *first_target() { return m_targetlist.first(); }
 	render_target *target_by_index(int index) const;
 
 	// UI targets
@@ -696,10 +687,6 @@ public:
 	void resolve_tags();
 
 private:
-	// containers
-	render_container *container_alloc(screen_device *screen = nullptr);
-	void container_free(render_container *container);
-
 	// config callbacks
 	void config_load(config_type cfg_type, config_level cfg_lvl, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
@@ -717,8 +704,8 @@ private:
 	fixed_allocator<render_texture> m_texture_allocator;// texture allocator
 
 	// containers for the UI and for screens
-	render_container *              m_ui_container;     // UI container
-	simple_list<render_container>   m_screen_container_list; // list of containers for the screen
+	std::unique_ptr<render_container> m_ui_container;   // UI container
+	std::list<render_container>     m_screen_container_list; // list of containers for the screen
 };
 
 #endif  // MAME_EMU_RENDER_H

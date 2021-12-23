@@ -4009,6 +4009,57 @@ ROM_START( mirninja )
 	ROM_LOAD16_BYTE( "mn_voi2.bin",  0x100000, 0x080000, CRC(466c3b47) SHA1(9c282ffda8b0620ae60789c81c6e36c086a9a335) )
 ROM_END
 
+ROM_START( mirninjaa )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
+	ROM_LOAD16_BYTE( "mn1_mpr0",  0x000000, 0x010000, CRC(6d061fd6) SHA1(42d197edc8c8020dc5020ddb187bac6625acc41f) )
+	ROM_LOAD16_BYTE( "mn1_mpr1",  0x000001, 0x010000, CRC(2ece6323) SHA1(1769b0a05e657dcf271f25f4be7452811af6691f) )
+
+	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
+	ROM_LOAD16_BYTE( "mn1_spr0.bin",  0x000000, 0x010000, CRC(3f1a17be) SHA1(0d6a4e26235f44db4ad217b859c3d215f4e9b423) )
+	ROM_LOAD16_BYTE( "mn1_spr1.bin",  0x000001, 0x010000, CRC(2bc66f60) SHA1(7b778ee3a24f57d43c9bcffbdb77cf8be2463c2d) )
+
+	ROM_REGION( 0x020000, "audiocpu", 0 ) /* Sound CPU (Banked) */
+	ROM_LOAD( "mn_snd0.bin",  0x000000, 0x020000, CRC(6aa1ae84) SHA1(2186f93c4ccc4c202fa14d80b440060237659fc5) )
+
+	ROM_REGION( 0x8000, "c65mcu:external", ROMREGION_ERASE00 ) /* I/O MCU */
+	ROM_LOAD( "sys2c65b.bin",  0x000000, 0x008000, CRC(e9f2922a) SHA1(5767d2f85e1eb3de19192e73b02221f28b1fbb83) )
+
+	ROM_REGION( 0x400000, "sprite", 0 ) /* Sprites */
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj0.bin",  0x000003, CRC(6bd1e290) SHA1(11e5f7adef0d7a519246c6d88f9371e49a6b49e9) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj1.bin",  0x000002, CRC(5e8503be) SHA1(e03e13e70932b65e1bd560f685eda107f00a8bb6) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj2.bin",  0x000001, CRC(a96d9b45) SHA1(5ad32ef08c38bff368590e0549c4b4552af5c2c8) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj3.bin",  0x000000, CRC(0086ef8b) SHA1(cd282868e9f05a305816cec6043d31bfa26314b3) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj4.bin",  0x200003, CRC(b3f48755) SHA1(d3b4a0b5d9939dad9b63a85e86afe5aa26dc9849) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj5.bin",  0x200002, CRC(c21e995b) SHA1(03022f11f314f1a6a568cf75850117c98b7c0ce1) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj6.bin",  0x200001, CRC(a052c582) SHA1(eadf07df0e7e13c6e51672860aad4c22b5dcc853) )
+	NAMCOS2_SPRROM_LOAD_128K( "mn_obj7.bin",  0x200000, CRC(1854c6f5) SHA1(f49d18655d05ea9abf1dded17abc61855dba61ef) )
+
+	ROM_REGION( 0x400000, "c123tmap", 0 ) /* Tiles */
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr0.bin",  0x000000, CRC(4f66df26) SHA1(7ca1215cb33b9c0898fc17721618a3129d751722) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr1.bin",  0x080000, CRC(f5de5ea7) SHA1(58ba4a5cca631e53b685db342697625c9c9ea50c) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr2.bin",  0x100000, CRC(9ff61924) SHA1(27537743b2df32eb492ec933faabd149e3283256) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr3.bin",  0x180000, CRC(ba208bf5) SHA1(924478a44155707b79698518901fba4e21485740) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr4.bin",  0x200000, CRC(0ef00aff) SHA1(01bf3753d11a3e5ea41fd205d4384f6949ad1c01) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr5.bin",  0x280000, CRC(4cd9d377) SHA1(188e1a88dbd4f6aedd6fbe5e22d4f3a0a88dec3a) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr6.bin",  0x300000, CRC(114aca76) SHA1(d2c6bdfdd0e42cd0c6f99517321c2105e5fc780d) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_chr7.bin",  0x380000, CRC(2d5705d3) SHA1(690a50b3950a1cf9c27461aa3722c3f1f6a90c87) )
+
+	ROM_REGION( 0x400000, "s2roz", 0 ) /* ROZ Tiles */
+	NAMCOS2_GFXROM_LOAD_128K( "mn_roz0.bin",  0x000000, CRC(677a4f25) SHA1(8ca64833189c75c3f4efd022dbddc54dc2632ec1) )
+	NAMCOS2_GFXROM_LOAD_128K( "mn_roz1.bin",  0x080000, CRC(f00ae572) SHA1(cd7f28b2ba03a0bb4d5702ffa36b1140560c9541) )
+
+	ROM_REGION( 0x080000, "c123tmap:mask", 0 ) /* Mask shape */
+	NAMCOS2_GFXROM_LOAD_128K( "mn_sha.bin",  0x000000, CRC(c28af90f) SHA1(8b7f95375eb32c3e30c2a55b7f543235f56d3a13) )
+
+	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
+	NAMCOS2_DATA_LOAD_E_128K( "mn1_dat0.13s",  0x000000, CRC(104bcca8) SHA1(e8368d0dc51bf0653143bf2261d7ed5b54d92941) )
+	NAMCOS2_DATA_LOAD_O_128K( "mn1_dat1.13p",  0x000000, CRC(d2a918fb) SHA1(032b7a7bcc60c41325e7b35df9a932e68cdd0788) )
+
+	ROM_REGION16_BE( 0x200000, "c140", ROMREGION_ERASE00 ) /* Sound voices */
+	ROM_LOAD16_BYTE( "mn_voi1.bin",  0x000000, 0x080000, CRC(2ca3573c) SHA1(b2af101730de4ccc68acc1ed143c21a8c81f64db) )
+	ROM_LOAD16_BYTE( "mn_voi2.bin",  0x100000, 0x080000, CRC(466c3b47) SHA1(9c282ffda8b0620ae60789c81c6e36c086a9a335) )
+ROM_END
+
 /* ORDYNE */
 ROM_START( ordyne )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
@@ -5730,7 +5781,8 @@ GAME(  1988, ordyne,     0,        base,     base,     namcos2_state, init_ordyn
 GAME(  1988, ordyneje,   ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan, English Version)", MACHINE_SUPPORTS_SAVE )
 GAME(  1988, ordynej,    ordyne,   base,     base,     namcos2_state, init_ordyne,   ROT180, "Namco", "Ordyne (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME(  1988, mirninja,   0,        base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, mirninja,   0,        base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME(  1988, mirninjaa,  mirninja, base,     base,     namcos2_state, init_mirninja, ROT0,   "Namco", "Mirai Ninja (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME(  1988, phelios,    0,        base2,    base,     namcos2_state, init_phelios,  ROT90,  "Namco", "Phelios", MACHINE_SUPPORTS_SAVE )
 GAME(  1988, pheliosj,   phelios,  base2,    base,     namcos2_state, init_phelios,  ROT90,  "Namco", "Phelios (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -22,7 +22,7 @@
 #define LOG_STATE   (1U << 12) // Show state machine
 #define LOG_LIVE    (1U << 13) // Live states
 #define LOG_FUNC    (1U << 14) // Function calls
-#define LOG_CRC		(1U << 15) // CRC errors
+#define LOG_CRC     (1U << 15) // CRC errors
 
 #define VERBOSE (LOG_DESC)
 //#define VERBOSE (LOG_DESC | LOG_COMMAND | LOG_MATCH | LOG_WRITE | LOG_STATE | LOG_LINES | LOG_COMP | LOG_CRC )
@@ -82,11 +82,11 @@ DEFINE_DEVICE_TYPE(WD1770,     wd1770_device,     "wd1770",     "Western Digital
 DEFINE_DEVICE_TYPE(WD1772,     wd1772_device,     "wd1772",     "Western Digital WD1772 FDC")
 DEFINE_DEVICE_TYPE(WD1773,     wd1773_device,     "wd1773",     "Western Digital WD1773 FDC")
 
-static const char *const states[] = 
+static const char *const states[] =
 {
-	"IDLE",						
-	"RESTORE",					
-	"SEEK",						
+	"IDLE",
+	"RESTORE",
+	"SEEK",
 	"STEP",
 	"READ_SECTOR",
 	"READ_TRACK",
@@ -186,7 +186,7 @@ void wd_fdc_device_base::device_start()
 	data = 0x00;
 	track = 0x00;
 	mr = true;
-	
+
 	delay_int = false;
 
 	save_item(NAME(status));
@@ -614,8 +614,7 @@ void wd_fdc_device_base::read_sector_continue()
 
 		case SECTOR_READ:
 			LOGSTATE("SECTOR_READ\n");
-			if(cur_live.crc)
-			{
+			if(cur_live.crc) {
 				status |= S_CRC;
 				LOGCRC("CRC error in readsector %04X\n",cur_live.crc);
 			}
@@ -1022,16 +1021,13 @@ void wd_fdc_device_base::interrupt_start()
 
 	// If writing a byte to a sector, then wait until it's written before terminating
 	// This behavior is required by the RM nimbus driver, otherwise the forced interrupt
-	// at the end of a multiple sector write occasionally prevents the CRC byte being 
+	// at the end of a multiple sector write occasionally prevents the CRC byte being
 	// written, causing the disk to be corrupted.
-	if (/*((main_state == READ_SECTOR) && (cur_live.state == READ_SECTOR_DATA)) ||*/
-	    ((main_state == WRITE_SECTOR) && (cur_live.state == WRITE_BYTE)))
-	{
+	if(/*((main_state == READ_SECTOR) && (cur_live.state == READ_SECTOR_DATA)) ||*/
+		((main_state == WRITE_SECTOR) && (cur_live.state == WRITE_BYTE))) {
 		delay_int = true;
 		return;
-	}   
-	else
-	{
+	} else {
 		delay_int = false;
 	}
 
@@ -1043,9 +1039,7 @@ void wd_fdc_device_base::interrupt_start()
 		status &= ~S_BUSY;
 		drop_drq();
 		motor_timeout = 0;
-	}
-	else
-	{
+	} else {
 		// when a force interrupt command is issued and there is no
 		// currently running command, return the status type 1 bits
 		status_type_1 = true;
@@ -1059,14 +1053,13 @@ void wd_fdc_device_base::interrupt_start()
 			intrq_cb(intrq);
 	}
 
-	if (spinup_on_interrupt)  // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
-	{
+	if(spinup_on_interrupt) { // see notes in FD1771 and WD1772 constructors, might be true for other FDC types as well.
 		motor_timeout = 0;
 
 		if (head_control)
 			set_hld();
 
-		if (motor_control) {
+		if(motor_control) {
 			status |= S_MON | S_SPIN;
 
 			mon_cb(0);
@@ -1984,15 +1977,13 @@ void wd_fdc_device_base::live_run(attotime limit)
 
 			} else if(slot < sector_size+2) {
 				// CRC
-				if(slot == sector_size+1) 
-				{
+				if(slot == sector_size+1) {
 					// act on delayed interrupt if active
-/*					if (delay_int)
-					{
-						interrupt_start();
-						return;
-					}
-*/					live_delay(IDLE);
+/*                  if(delay_int) {
+                        interrupt_start();
+                        return;
+                    }
+*/                  live_delay(IDLE);
 					return;
 				}
 			}
@@ -2209,11 +2200,9 @@ void wd_fdc_device_base::live_run(attotime limit)
 						cur_live.state = IDLE;
 
 						// Act on delayed interrupt if set.
-						if (delay_int)
-						{
+						if(delay_int)
 							interrupt_start();
-							return;
-						}
+
 						return;
 					}
 
@@ -2243,17 +2232,15 @@ void wd_fdc_device_base::live_run(attotime limit)
 						live_write_mfm(cur_live.crc >> 8);
 					else if(cur_live.byte_counter < sector_size + 16+3)
 						live_write_mfm(0xff);
-//						live_write_mfm(0x4e);
+//                      live_write_mfm(0x4e);
 					else {
 						pll_stop_writing(floppy, cur_live.tm);
 						cur_live.state = IDLE;
-			
+
 						// Act on delayed interrupt if set.
-						if (delay_int)
-						{
+						if(delay_int)
 							interrupt_start();
-							return;
-						}
+
 						return;
 					}
 				}

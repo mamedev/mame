@@ -314,8 +314,8 @@ above in All Platforms.
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 1.37.29 or later by following the
-instructions at the `official site <https://kripken.github.io/emscripten-site/docs/getting_started/downloads.html>`_.
+First, download and install Emscripten 2.0.25 or later by following the
+instructions at the `official site <https://emscripten.org/docs/getting_started/downloads.html>`_.
 
 Once Emscripten has been installed, it should be possible to compile MAME
 out-of-the-box using Emscripten’s **emmake** tool. Because a full MAME

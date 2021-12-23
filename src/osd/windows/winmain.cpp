@@ -99,11 +99,8 @@ public:
 					state.thread->join();
 					state.thread = std::nullopt;
 				}
-				auto const parent = !osd_common_t::s_window_list.empty()
-						? std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window()
-						: nullptr;
 				state.thread.emplace(
-						[parent] ()
+						[] ()
 						{
 							auto &state(get_state());
 							std::string message;

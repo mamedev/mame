@@ -146,6 +146,7 @@ protected:
 	u32 rdft_speedup_r();
 	u32 viprp1_speedup_r();
 	u32 viprp1o_speedup_r();
+	u32 ejanhs_speedup_r();
 	u32 rf2_speedup_r();
 	u32 rfjet_speedup_r();
 

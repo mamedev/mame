@@ -693,9 +693,9 @@ u8 aa4000_state::ioeb_r(offs_t offset)
 
 	case 0x70: // MID register (monitor)
 		//if (BIT(m_ioeb_control, 2))
-		//	hs = !vidc_get_hs();
+		//  hs = !vidc_get_hs();
 		//else
-		//	hs = vidc_get_hs();
+		//  hs = vidc_get_hs();
 
 		if (hs)
 			data = 0xf0 | mid[1].id | mid[1].hs;
@@ -964,12 +964,12 @@ void aa4_state::memc_map(address_map &map)
 
 
 //static INPUT_PORTS_START( aa4 )
-//	PORT_START("MONITOR")
-//	PORT_CONFNAME( 0x07, 0x07, "Monitor Type" )
-//	PORT_CONFSETTING( 0x02, "Colour SVGA" )
-//	PORT_CONFSETTING( 0x05, "Mono VGA" )
-//	PORT_CONFSETTING( 0x06, "Colour VGA" )
-//	PORT_CONFSETTING( 0x07, "LCD" )
+//  PORT_START("MONITOR")
+//  PORT_CONFNAME( 0x07, 0x07, "Monitor Type" )
+//  PORT_CONFSETTING( 0x02, "Colour SVGA" )
+//  PORT_CONFSETTING( 0x05, "Mono VGA" )
+//  PORT_CONFSETTING( 0x06, "Colour VGA" )
+//  PORT_CONFSETTING( 0x07, "LCD" )
 //INPUT_PORTS_END
 
 

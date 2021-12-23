@@ -61,8 +61,8 @@ static const nes_mmc mmc_list[] =
 	{ 26, KONAMI_VRC6 },
 	{ 27, UNL_CC21 },       // Mihunche, but previously used for World Hero
 	{ 28, UNL_ACTION53 },   // Multi-discrete PCB designed by Tepples for Action 53
-	{ 29, UNL_CUFROM },     // homebrew PCB used by Glider
-	{ 30, UNL_UNROM512 },   // UNROM 512 + Flash
+	{ 29, SEALIE_CUFROM },     // homebrew PCB used by Glider
+	{ 30, SEALIE_UNROM512 },   // UNROM 512 + Flash
 	{ 31, UNL_2A03PURITANS },   // PCB designed by infinitelives & rainwarrior for 2A03 Puritans Album
 	{ 32, IREM_G101 },
 	{ 33, TAITO_TC0190FMC },
@@ -303,7 +303,7 @@ static const nes_mmc mmc_list[] =
 	{ 265, BMC_T262 },
 	{ 266, UNL_CITYFIGHT },
 	{ 267, BMC_EL861121C },
-	// 268 COOLBOY and MINDKIDS
+	{ 268, SMD133_BOARD },
 	// 269 mc_gx121 seems to be a PnP, but there are two actual multicarts for this mapper?
 	// 270 multicarts on OneBus Famiclones
 	// 271 TXC 4 in 1 MGC-026, not in nes.xml?
@@ -327,9 +327,9 @@ static const nes_mmc mmc_list[] =
 	{ 289, BMC_60311C },
 	{ 290, BMC_NTD_03 },
 	{ 291, BMC_NT639 },
-	// { 292, UNL_DRAGONFIGHTER }, in nes.xml, not emulated yet
+	{ 292, UNL_BMW8544 },          // Dragon Fighter by Flying Star
 	// 293 NewStar multicarts, do we have these in nes.xml?
-	{ 294, BMC_FAMILY_4646 },    // FIXME: is this really exactly the same as mapper 134?
+	{ 294, BMC_FAMILY_4646 },      // FIXME: is this really exactly the same as mapper 134?
 	// 295 JY multicarts not yet in nes.xml
 	// 296 VT3x handhelds
 	{ 297, TXC_22110 },            // 2-in-1 Uzi Lightgun
@@ -369,7 +369,7 @@ static const nes_mmc mmc_list[] =
 	{ 331, BMC_12IN1 },
 	{ 332, BMC_WS },
 	{ 333, BMC_8IN1 },
-	// 334 5/20-in-1 1993 Copyright multicart, not in nes.xml?
+	{ 334, BMC_5IN1_1993 },
 	{ 335, BMC_CTC09 },
 	{ 336, BMC_K3046 },
 	// { 337, BMC_CTC_12IN1 }, not in nes.xml
@@ -439,12 +439,12 @@ static const nes_mmc mmc_list[] =
 	// 401 Super 19-in-1 VIP 19, not in nes.xml?
 	// 402 22-in-1 Olympic Games, not in nes.xml?
 	// 403 Tetris Family 19-in-1 that only works on Famiclones with 6502's BCD mode
-	// 404 JY-021B multicart, not in nes.xml?
+	{ 404, BMC_JY012005 },
 	// 405 UMC UM6578 NES-on-a-chip games...PnPs?
 	// 406 homebrew game Haradius Zero
 	// 407 VT03 PnP
 	// 408 Konami PnP
-	{ 409, UNL_DPCMCART },         // A Winner is You homebrew music cart
+	{ 409, SEALIE_DPCMCART },      // A Winner is You homebrew music cart
 	// 410 Unused or JY?
 	{ 411, BMC_A88S1 },
 	// 412 INTV 10-in-1 PnP 2nd edition
@@ -463,15 +463,14 @@ static const nes_mmc mmc_list[] =
 	// 425 Cube Tech PnP
 	// 426 PnP
 	// 427 PnP
-	// 428 a couple multicarts
+	{ 428, BMC_TF2740 },
 	// 429 Unused
 	// 430 Unused
 	{ 431, BMC_GN91B },
 	// 432 Realtec 8090
 	{ 433, BMC_NC20MB },
 	// 434 S-009
-	{ 435, NTDEC_2746 },
-	// 436...442 Unused
+	// 435...442 Unused
 	// 443 NC3000M multicart
 	// 444 NC7000M multicart
 	// 445...511 Unused
@@ -753,6 +752,16 @@ void nes_cart_slot_device::call_load_ines()
 			submapper = 0;
 			logerror("Unimplemented NES 2.0 submapper: CAMERICA-BF9096.\n");
 		}
+		// 268: SMD133 boards
+		else if (mapper == 268)
+		{
+			if (submapper == 0)
+				m_cart->set_smd133_addr(0x6000);
+			else if (submapper == 1)
+				m_cart->set_smd133_addr(0x5000);
+			else
+				logerror("Unimplemented NES 2.0 submapper: %d\n", submapper);
+		}
 		// 313: BMC RESET-TXROM
 		else if (mapper == 313)
 		{
@@ -861,7 +870,7 @@ void nes_cart_slot_device::call_load_ines()
 			}
 			break;
 
-		case UNL_UNROM512:
+		case SEALIE_UNROM512:
 			// this mapper also uses mirroring flags differently
 			m_cart->set_four_screen_vram(false);
 			switch (local_options & 0x09)

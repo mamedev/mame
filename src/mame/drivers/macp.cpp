@@ -330,6 +330,9 @@ void macp_state::machine_start()
 void macp_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 	m_t_c = 0;
 	m_relay_ctrl = 0;
 }
@@ -354,7 +357,7 @@ void macp_state::mac16k(machine_config &config)
 	kbdc.out_sl_callback().set(FUNC(macp_state::scanlines_w));    // scan SL lines
 	kbdc.out_disp_callback().set(FUNC(macp_state::digit_w));      // display A&B
 	kbdc.in_rl_callback().set(FUNC(macp_state::kbd_r));           // kbd RL lines
-	kbdc.out_irq_callback().set(FUNC(macp_state::irq_w)); 
+	kbdc.out_irq_callback().set(FUNC(macp_state::irq_w));
 
 	/* sound hardware */
 	genpin_audio(config);

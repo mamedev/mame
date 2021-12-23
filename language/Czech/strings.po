@@ -1,4 +1,5 @@
 # Czech translations for MAME package.
+# České preklady pre balík MAME.
 # Copyright (C) 1997-2021 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2021.
@@ -7,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-19 02:50+1100\n"
+"POT-Creation-Date: 2021-12-09 04:44+1100\n"
 "PO-Revision-Date: 2016-04-01 16:38+0200\n"
 "Last-Translator: Karel Brejcha <pankabre@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: src/frontend/mame/ui/ui.cpp:469 src/frontend/mame/ui/ui.cpp:542
 msgid ""
@@ -26,12 +27,13 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Stiskni klávesu pro pokračování"
+"Pokračujte stisknutím libovolné klávesy"
 
 #: src/frontend/mame/ui/ui.cpp:554
 msgid "This driver requires images to be loaded in the following device(s): "
 msgstr ""
-"Tento ovladač vyžaduje aby byl obraz media nahrán do následujících zařízení: "
+"Tento ovladač vyžaduje, aby byly obrazy média nahrány do následujících "
+"zařízení: "
 
 #: src/frontend/mame/ui/ui.cpp:1248
 #, c-format
@@ -39,6 +41,8 @@ msgid ""
 "UI controls enabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"Ovládací prvky uživatelského rozhraní zapnuty\n"
+"Pro vypnutí použijte %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1250
 #, c-format
@@ -46,138 +50,140 @@ msgid ""
 "UI controls disabled\n"
 "Use %1$s to toggle"
 msgstr ""
+"Ovládací prvky uživatelského rozhraní vypnuty\n"
+"Pro zapnutí použijte %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1459
 msgid "Master Volume"
-msgstr "Hlavní hlasitost"
+msgstr "Celková hlasitost"
 
 #: src/frontend/mame/ui/ui.cpp:1468
 #, c-format
 msgid "%1$s Volume"
-msgstr "%1$s hlasitost"
+msgstr "Hlasitost %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1490
 #, c-format
 msgid "Overclock CPU %1$s"
-msgstr "Přetakt CPU %1$s"
+msgstr "Přetaktovat CPU %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1498
 #, c-format
 msgid "Overclock %1$s sound"
-msgstr ""
+msgstr "Přetaktovat zvuk %1$s"
 
 #: src/frontend/mame/ui/ui.cpp:1517
 #, c-format
 msgid "%1$s Refresh Rate"
-msgstr "%1$s Obnovovací frekvence"
+msgstr "%1$s - obnovovací frekvence"
 
 #: src/frontend/mame/ui/ui.cpp:1522
 #, c-format
 msgid "%1$s Brightness"
-msgstr "%1$s Jas"
+msgstr "%1$s - jas"
 
 #: src/frontend/mame/ui/ui.cpp:1524
 #, c-format
 msgid "%1$s Contrast"
-msgstr "%1$s Kontrast"
+msgstr "%1$s - kontrast"
 
 #: src/frontend/mame/ui/ui.cpp:1526
 #, c-format
 msgid "%1$s Gamma"
-msgstr "%1$s Gamma"
+msgstr "%1$s - gamma"
 
 #: src/frontend/mame/ui/ui.cpp:1530
 #, c-format
 msgid "%1$s Horiz Stretch"
-msgstr "%1$s Horiz Roztah"
+msgstr "%1$s - natažení vodorovně"
 
 #: src/frontend/mame/ui/ui.cpp:1532
 #, c-format
 msgid "%1$s Horiz Position"
-msgstr "%1$s Horiz Pozice"
+msgstr "%1$s - pozice vodorovně"
 
 #: src/frontend/mame/ui/ui.cpp:1534
 #, c-format
 msgid "%1$s Vert Stretch"
-msgstr "%1$s Vert Roztah"
+msgstr "%1$s - natažení svisle"
 
 #: src/frontend/mame/ui/ui.cpp:1536
 #, c-format
 msgid "%1$s Vert Position"
-msgstr "%1$s Vert Pozice"
+msgstr "%1$s - pozice svisle"
 
 #: src/frontend/mame/ui/ui.cpp:1552
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Stretch"
-msgstr "Laserdisc '%1$s' Horiz Roztah"
+msgstr "Laserdisc '%1$s' - natažení vodorovně"
 
 #: src/frontend/mame/ui/ui.cpp:1555
 #, c-format
 msgid "Laserdisc '%1$s' Horiz Position"
-msgstr "Laserdisc '%1$s' Horiz Pozice"
+msgstr "Laserdisc '%1$s' - pozice vodorovně"
 
 #: src/frontend/mame/ui/ui.cpp:1557
 #, c-format
 msgid "Laserdisc '%1$s' Vert Stretch"
-msgstr "Laserdisc '%1$s' Vert Roztah"
+msgstr "Laserdisc '%1$s' - natažení svisle"
 
 #: src/frontend/mame/ui/ui.cpp:1560
 #, c-format
 msgid "Laserdisc '%1$s' Vert Position"
-msgstr "Laserdisc '%1$s' Vert Pozice"
+msgstr "Laserdisc '%1$s' - pozice svisle"
 
 #: src/frontend/mame/ui/ui.cpp:1570
 msgid "Vector Flicker"
-msgstr "Vektor Blikač"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1571
 msgid "Beam Width Minimum"
-msgstr "Minimální šířka svazku"
+msgstr "Minimální šířka paprsku"
 
 #: src/frontend/mame/ui/ui.cpp:1572
 msgid "Beam Width Maximum"
-msgstr "Maximální šířka svazku"
+msgstr "Maximální šířka paprsku"
 
 #: src/frontend/mame/ui/ui.cpp:1573
 msgid "Beam Dot Size"
-msgstr ""
+msgstr "Velikost bodu paprsku"
 
 #: src/frontend/mame/ui/ui.cpp:1574
 msgid "Beam Intensity Weight"
-msgstr "Váha intenzity svazku"
+msgstr "Intenzita paprsku"
 
 #: src/frontend/mame/ui/ui.cpp:1587
 #, c-format
 msgid "Crosshair Scale %1$s"
-msgstr "Zaměřovač škála %1$s"
+msgstr "%1$s-ová velikost zaměřovače"
 
 #: src/frontend/mame/ui/ui.cpp:1587 src/frontend/mame/ui/ui.cpp:1589
 msgid "X"
-msgstr "X"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1587 src/frontend/mame/ui/ui.cpp:1589
 msgid "Y"
-msgstr "Y"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1589
 #, c-format
 msgid "Crosshair Offset %1$s"
-msgstr "Zaměřovač posun %1$s"
+msgstr "%1$s-ová pozice zaměřovače"
 
 #: src/frontend/mame/ui/ui.cpp:1617
 #, c-format
 msgid "%1$3ddB"
-msgstr "%1$3ddB"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1660
 #, c-format
 msgid "%1$d%%"
-msgstr "%1$d%%"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1675
 #, c-format
 msgid "%1$3.0f%%"
-msgstr "%1$3.0f%%"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1698 src/frontend/mame/ui/ui.cpp:1718
 #: src/frontend/mame/ui/ui.cpp:1737 src/frontend/mame/ui/ui.cpp:1755
@@ -187,43 +193,43 @@ msgstr "%1$3.0f%%"
 #: src/frontend/mame/ui/ui.cpp:1894 src/frontend/mame/ui/ui.cpp:1915
 #, c-format
 msgid "%1$.3f"
-msgstr "%1$.3f"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:1930 src/frontend/mame/ui/ui.cpp:1945
 #: src/frontend/mame/ui/ui.cpp:1960 src/frontend/mame/ui/ui.cpp:1975
 #: src/frontend/mame/ui/ui.cpp:1990
 #, c-format
 msgid "%1$1.2f"
-msgstr "%1$1.2f"
+msgstr ""
 
 #: src/frontend/mame/ui/ui.cpp:2006
 #, c-format
 msgid "Crosshair Scale X %1$1.3f"
-msgstr "Zaměřovač škála X %1$1.3f"
+msgstr "%1$1.3f X-ová velikost zaměřovače"
 
 #: src/frontend/mame/ui/ui.cpp:2006
 #, c-format
 msgid "Crosshair Scale Y %1$1.3f"
-msgstr "Zaměřovač škála Y %1$1.3f"
+msgstr "%1$1.3f Y-ová velikost zaměřovače"
 
 #: src/frontend/mame/ui/ui.cpp:2023
 #, c-format
 msgid "Crosshair Offset X %1$1.3f"
-msgstr "Zaměřovač posun X %1$1.3f"
+msgstr "%1$1.3f X-ová pozice zaměřovače"
 
 #: src/frontend/mame/ui/ui.cpp:2023
 #, c-format
 msgid "Crosshair Offset Y %1$1.3f"
-msgstr "Zaměřovač posun Y %1$1.3f"
+msgstr "%1$1.3f Y-ová pozice zaměřovače"
 
 #: src/frontend/mame/ui/ui.cpp:2110
 msgid "**Error saving ui.ini**"
-msgstr "**Chyba ukládání ui.ini**"
+msgstr "**Chyba při ukládání ui.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2169
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr "**Chyba ukládání %s.ini**"
+msgstr "**Chyba při ukládání %s.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2173 src/frontend/mame/ui/miscmenu.cpp:748
 msgid ""
@@ -232,7 +238,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"    Configurace uložena    \n"
+"    Konfigurace byla uložena    \n"
 "\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:484 src/frontend/mame/ui/selgame.cpp:300
@@ -242,7 +248,7 @@ msgid ""
 " added to favorites list."
 msgstr ""
 "%s\n"
-" přidán do seznamu oblíbených."
+"Zařízení přidáno do seznamu Oblíbené."
 
 #: src/frontend/mame/ui/selsoft.cpp:489 src/frontend/mame/ui/selgame.cpp:305
 #: src/frontend/mame/ui/selgame.cpp:311
@@ -252,48 +258,48 @@ msgid ""
 " removed from favorites list."
 msgstr ""
 "%s\n"
-" odstraněn ze seznamu oblíbených."
+"Zařízení odstraněno ze seznamu Oblíbené."
 
 #: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Start empty]"
-msgstr ""
+msgstr "[Začít prázdný]"
 
 #: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Use file manager]"
-msgstr ""
+msgstr "[Použít správce souborů]"
 
 #: src/frontend/mame/ui/selsoft.cpp:705
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s (%3$d z %4$d softvérových balíků)"
 
 #: src/frontend/mame/ui/selsoft.cpp:706
 #, c-format
 msgid "Driver: \"%1$s\" software list "
-msgstr "Driver: \"%1$s\" software list "
+msgstr "Ovladač: \"%1$s\" seznam softvéru "
 
-#: src/frontend/mame/ui/selsoft.cpp:711 src/frontend/mame/ui/selgame.cpp:1066
+#: src/frontend/mame/ui/selsoft.cpp:711 src/frontend/mame/ui/selgame.cpp:1076
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr ""
+msgstr "%1$s: %2$s - Vyhledat: %3$s_"
 
-#: src/frontend/mame/ui/selsoft.cpp:713 src/frontend/mame/ui/selgame.cpp:1068
+#: src/frontend/mame/ui/selsoft.cpp:713 src/frontend/mame/ui/selgame.cpp:1078
 #, c-format
 msgid "Search: %1$s_"
-msgstr ""
+msgstr "Vyhledat: %1$s_"
 
 #: src/frontend/mame/ui/selsoft.cpp:720
 #, c-format
 msgid "Software list/item: %1$s:%2$s"
-msgstr ""
+msgstr "Seznam/položka softvéru: %1$s:%2$s"
 
-#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:165
+#: src/frontend/mame/ui/optsmenu.cpp:73 src/frontend/mame/ui/sndmenu.cpp:161
 msgid "Sound Options"
-msgstr "Možnosti zvuku"
+msgstr "Nastavení zvuku"
 
 #: src/frontend/mame/ui/optsmenu.cpp:76
 msgid "General Inputs"
-msgstr "Základní vstupy"
+msgstr "Ovládání"
 
 #: src/frontend/mame/ui/optsmenu.cpp:79 src/frontend/mame/ui/miscmenu.cpp:945
 msgid "Plugins"
@@ -301,7 +307,7 @@ msgstr "Pluginy"
 
 #: src/frontend/mame/ui/optsmenu.cpp:81
 msgid "Save Configuration"
-msgstr "Ulož konfiguraci"
+msgstr "Uložit konfiguraci"
 
 #: src/frontend/mame/ui/optsmenu.cpp:148
 msgid "Settings"
@@ -313,11 +319,11 @@ msgstr "Filtr"
 
 #: src/frontend/mame/ui/optsmenu.cpp:217
 msgid "Customize UI"
-msgstr "Upravení UI"
+msgstr "Přizpůsobit uživatelské rozhraní"
 
 #: src/frontend/mame/ui/optsmenu.cpp:218
 msgid "Configure Directories"
-msgstr "Konfigurace složek"
+msgstr "Konfigurovat souborové složky"
 
 #: src/frontend/mame/ui/filesel.cpp:260 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
@@ -330,48 +336,48 @@ msgstr "[vytvořit]"
 
 #: src/frontend/mame/ui/filesel.cpp:268 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
-msgstr "[software list]"
+msgstr "[seznam softvéru]"
 
 #: src/frontend/mame/ui/filesel.cpp:324
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Chyba přístupu do %s"
 
 #: src/frontend/mame/ui/filesel.cpp:546
 msgid "Select access mode"
-msgstr "Vyber přístupový režim"
+msgstr "Vyberte způsob přístupu"
 
 #: src/frontend/mame/ui/filesel.cpp:547
 msgid "Read-only"
-msgstr "Pouze čtení"
+msgstr "Pouze pro čtení"
 
 #: src/frontend/mame/ui/filesel.cpp:549
 msgid "Read-write"
-msgstr "Čtení-Zápis"
+msgstr "Čtení i zápis"
 
 #: src/frontend/mame/ui/filesel.cpp:550
 msgid "Read this image, write to another image"
-msgstr "Číst tento obrázek, zapsat do jiného obrázku"
+msgstr "Číst tento obraz, zapisovat do jiného"
 
 #: src/frontend/mame/ui/filesel.cpp:551
 msgid "Read this image, write to diff"
-msgstr "Číst tento obrázek, zapsat do diff"
+msgstr "Číst tento obraz, zapisovat do diff"
 
 #: src/frontend/mame/ui/submenu.cpp:33
 msgid "Miscellaneous Options"
-msgstr "Různé možnosti"
+msgstr "Další nastavení"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Skip imperfect emulation warnings"
-msgstr ""
+msgstr "Méně upozornění o nedokonalé emulaci"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Re-select last machine launched"
-msgstr ""
+msgstr "Nastavit se na naposledy spuštěné zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:36
 msgid "Enlarge images in the right panel"
-msgstr "Zvětši obrázky v pravém panelu"
+msgstr "Zvětšit obrázky v panelu Obrázky/Informace"
 
 #: src/frontend/mame/ui/submenu.cpp:37
 msgid "Cheats"
@@ -379,155 +385,155 @@ msgstr "Cheaty"
 
 #: src/frontend/mame/ui/submenu.cpp:38
 msgid "Show mouse pointer"
-msgstr "Zobraz ukazatel myši"
+msgstr "Zobrazit ukazatel myši"
 
 #: src/frontend/mame/ui/submenu.cpp:39
-msgid "Confirm quit from machines"
-msgstr "Potvrď odchod ze zařízení"
+msgid "Confirm quit from emulation"
+msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:40
-msgid "Skip information screen at startup"
+msgid "Skip system information screen"
 msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "Snapshoty zobrazovat pouze v poměru 4:3"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Use image as background"
-msgstr "Použij obrázek jako pozadí"
+msgstr "Použít obrázek jako pozadí"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Skip BIOS selection menu"
-msgstr "Přeskoč menu s výběrem BIOSu"
+msgstr "Přeskočit menu s výběrem BIOSu"
 
 #: src/frontend/mame/ui/submenu.cpp:44
-msgid "Skip software parts selection menu"
-msgstr "Přeskoč menu s výběrem částí software"
+msgid "Skip software part selection menu"
+msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
-msgstr ""
+msgstr "Zobrazovat informaci o výsledkech auditů"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "Vynechat zařízení bez ROM v seznamu Dostupné"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Advanced Options"
-msgstr ""
+msgstr "Rozšířené nastavení"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Performance Options"
-msgstr ""
+msgstr "Nastavení výkonu"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Auto frame skip"
-msgstr ""
+msgstr "Automatické vynechávání framu"
 
 #: src/frontend/mame/ui/submenu.cpp:55
 msgid "Frame skip"
-msgstr ""
+msgstr "Počet vynechávaných framů"
 
 #: src/frontend/mame/ui/submenu.cpp:56
 msgid "Throttle"
-msgstr ""
+msgstr "Škrtící klapka"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Mute when unthrottled"
-msgstr ""
+msgstr "Vypnout zvuk při deaktivované škrtící klapce"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Sleep"
-msgstr ""
+msgstr "Umožnit běh i ostatním aplikacím"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Speed"
-msgstr ""
+msgstr "Rychlost"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Adjust speed to match refresh rate"
-msgstr ""
+msgstr "Přizpůsobit rychlost obnovovací frekvenci"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Low latency"
-msgstr ""
+msgstr "Eliminovat opoždění vstupu"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Rotation Options"
-msgstr ""
+msgstr "Nastavení otočení"
 
 #: src/frontend/mame/ui/submenu.cpp:64 src/frontend/mame/ui/videoopt.cpp:179
 msgid "Rotate"
-msgstr "Rotace"
+msgstr "Přizpůsobit otočení obrazovky zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "Rotate right"
-msgstr ""
+msgstr "Otočit obrazovku vpravo"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Rotate left"
-msgstr ""
+msgstr "Otočit obrazovku vlevo"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Auto rotate right"
-msgstr ""
+msgstr "Automaticky otočit vpravo"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Auto rotate left"
-msgstr ""
+msgstr "Automaticky otočit vlevo"
 
 #: src/frontend/mame/ui/submenu.cpp:69
 msgid "Flip X"
-msgstr ""
+msgstr "Přetočit vodorovně"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Flip Y"
-msgstr ""
+msgstr "Přetočit svisle"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Artwork Options"
-msgstr ""
+msgstr "Nastavení artworku"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Zoom to screen area"
-msgstr ""
+msgstr "Maximalizovat obrazovku zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "State/Playback Options"
-msgstr ""
+msgstr "Nastavení ukládání stavu"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Automatické ukládání a znovunačtení stavu zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Allow rewind"
-msgstr ""
+msgstr "Povolit návrat ve stavech"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Kapacita buffru pro návrat ve stavech"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Bilinear filtering for snapshots"
-msgstr ""
+msgstr "Bilineární filtrování snapshotů"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Burn-in"
-msgstr ""
+msgstr "Burn-in snapshoty"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Input Options"
-msgstr ""
+msgstr "Nastavení vstupních zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Coin lockout"
-msgstr ""
+msgstr "Ignorovat vstup z vhazovače mincí"
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Mouse"
-msgstr ""
+msgstr "Myš"
 
 #: src/frontend/mame/ui/submenu.cpp:85
 msgid "Joystick"
@@ -535,27 +541,27 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:86
 msgid "Lightgun"
-msgstr ""
+msgstr "Světelná pistole"
 
 #: src/frontend/mame/ui/submenu.cpp:87
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "Podpora více klávesnic"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Multi-mouse"
-msgstr ""
+msgstr "Podpora více myší"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Steadykey"
-msgstr ""
+msgstr "Podpora Steadykey"
 
 #: src/frontend/mame/ui/submenu.cpp:90
 msgid "UI active"
-msgstr ""
+msgstr "Uživatelské rozhraní nad emulovanou klávesnicí"
 
 #: src/frontend/mame/ui/submenu.cpp:91
-msgid "Offscreen reload"
-msgstr ""
+msgid "Off-screen reload"
+msgstr "Konvertovat tlačítko 2 světelné pistole na offscreen reload"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
@@ -567,91 +573,91 @@ msgstr ""
 
 #: src/frontend/mame/ui/submenu.cpp:94
 msgid "Natural keyboard"
-msgstr ""
+msgstr "Přirozená klávesnice"
 
 #: src/frontend/mame/ui/submenu.cpp:95
-msgid "Simultaneous contradictory"
-msgstr ""
+msgid "Allow contradictory joystick inputs"
+msgstr "Souběžná aktivace protichodných vstupů joysticku"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
-msgstr ""
+msgstr "Čas impulsu mince"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Input Device Options"
-msgstr ""
+msgstr "Nastavení vstupních zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:103
 msgid "Lightgun Device Assignment"
-msgstr "Lightgun zařízení přiřazení"
+msgstr "Zařízení ovládající světelnou pistoli"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Trackball Device Assignment"
-msgstr "Trackball zařízení přiřazení"
+msgstr "Zařízení ovládající trackball"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "Pedal Device Assignment"
-msgstr "Pedál zařízení přiřazení"
+msgstr "Zařízení ovládající pedál"
 
 #: src/frontend/mame/ui/submenu.cpp:106
-msgid "Adstick Device Assignment"
-msgstr "ADStick zařízení přiřazení"
+msgid "AD Stick Device Assignment"
+msgstr "Zařízení ovládající analogový joystick"
 
 #: src/frontend/mame/ui/submenu.cpp:107
 msgid "Paddle Device Assignment"
-msgstr "Pádlo zařízení přiřazení"
+msgstr "Zařízení ovládající paddle"
 
 #: src/frontend/mame/ui/submenu.cpp:108
 msgid "Dial Device Assignment"
-msgstr "Vytáčecí zařízení přiřazení"
+msgstr "Zařízení ovládající dial"
 
 #: src/frontend/mame/ui/submenu.cpp:109
 msgid "Positional Device Assignment"
-msgstr "Poziční zařízení přiřazení"
+msgstr "Zařízení ovládající positional"
 
 #: src/frontend/mame/ui/submenu.cpp:110
 msgid "Mouse Device Assignment"
-msgstr "Myš zařízení přiřazení"
+msgstr "Zařízení ovládající myš"
 
 #: src/frontend/mame/ui/submenu.cpp:112
 msgid "Keyboard Input Provider"
-msgstr ""
+msgstr "Provider vstupu klávesnice"
 
 #: src/frontend/mame/ui/submenu.cpp:113
 msgid "Mouse Input Provider"
-msgstr ""
+msgstr "Provider vstupu myši"
 
 #: src/frontend/mame/ui/submenu.cpp:114
 msgid "Lightgun Input Provider"
-msgstr ""
+msgstr "Provider vstupu světelné pistole"
 
 #: src/frontend/mame/ui/submenu.cpp:115
 msgid "Joystick Input Provider"
-msgstr ""
+msgstr "Provider vstupu joysticku"
 
 #: src/frontend/mame/ui/submenu.cpp:121 src/frontend/mame/ui/mainmenu.cpp:174
 msgid "Video Options"
-msgstr "Nastavení videa"
+msgstr "Nastavení obrazu"
 
 #: src/frontend/mame/ui/submenu.cpp:122
 msgid "Video Mode"
-msgstr "Video Mód"
+msgstr "Metoda grafického rozhraní"
 
 #: src/frontend/mame/ui/submenu.cpp:123
 msgid "Number Of Screens"
-msgstr ""
+msgstr "Počet obrazovek"
 
 #: src/frontend/mame/ui/submenu.cpp:125
 msgid "Triple Buffering"
-msgstr "Triple Buffering"
+msgstr "Trojitý buffering"
 
 #: src/frontend/mame/ui/submenu.cpp:126
 msgid "HLSL"
-msgstr "HLSL"
+msgstr "HLSL post-processing"
 
 #: src/frontend/mame/ui/submenu.cpp:128
 msgid "GLSL"
-msgstr "GLSL"
+msgstr "OpenGL GLSL"
 
 #: src/frontend/mame/ui/submenu.cpp:129
 msgid "Bilinear Filtering"
@@ -659,36 +665,36 @@ msgstr "Bilineární filtrování"
 
 #: src/frontend/mame/ui/submenu.cpp:130
 msgid "Bitmap Prescaling"
-msgstr "Bitmap Prescaling"
+msgstr "Předškálovací faktor"
 
 #: src/frontend/mame/ui/submenu.cpp:131
 msgid "Window Mode"
-msgstr "Okenní mód"
+msgstr "Zobrazování v okně"
 
 #: src/frontend/mame/ui/submenu.cpp:132
 msgid "Enforce Aspect Ratio"
-msgstr "Vynutit poměr stran"
+msgstr "Zachovat poměr stran"
 
 #: src/frontend/mame/ui/submenu.cpp:133
 msgid "Start Out Maximized"
-msgstr "Spustit maximalizovaně"
+msgstr "Spustit maximalizované"
 
 #: src/frontend/mame/ui/submenu.cpp:134
 msgid "Synchronized Refresh"
-msgstr "Synchronizované obnovení"
+msgstr "Synchronizovaný refresh"
 
 #: src/frontend/mame/ui/submenu.cpp:135
 msgid "Wait Vertical Sync"
 msgstr "Čekat na V-Sync"
 
-#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:687
+#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:689
 #: src/frontend/mame/ui/videoopt.cpp:191 src/frontend/mame/ui/custui.cpp:490
 #: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:766
 #: plugins/cheatfind/init.lua:777 plugins/cheat/init.lua:668
 msgid "On"
 msgstr "Zapnuto"
 
-#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:690
+#: src/frontend/mame/ui/menu.cpp:360 src/frontend/mame/ui/menu.cpp:692
 #: src/frontend/mame/ui/videoopt.cpp:207 src/frontend/mame/ui/custui.cpp:490
 #: src/frontend/mame/ui/analogipt.cpp:471 plugins/cheatfind/init.lua:763
 #: plugins/cheatfind/init.lua:774 plugins/cheat/init.lua:671
@@ -696,11 +702,11 @@ msgstr "Zapnuto"
 msgid "Off"
 msgstr "Vypnuto"
 
-#: src/frontend/mame/ui/menu.cpp:693
+#: src/frontend/mame/ui/menu.cpp:695
 msgid "Auto"
 msgstr "Automaticky"
 
-#: src/frontend/mame/ui/menu.cpp:1195
+#: src/frontend/mame/ui/menu.cpp:1197
 #: src/frontend/mame/ui/simpleselgame.cpp:278
 #: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Return to Previous Menu"
@@ -708,7 +714,7 @@ msgstr "Zpět na předchozí menu"
 
 #: src/frontend/mame/ui/filemngr.cpp:139
 #: src/frontend/mame/ui/confswitch.cpp:119
-#: src/frontend/mame/ui/inputmap.cpp:559 src/frontend/mame/ui/analogipt.cpp:360
+#: src/frontend/mame/ui/inputmap.cpp:563 src/frontend/mame/ui/analogipt.cpp:360
 #, c-format
 msgid "[root%1$s]"
 msgstr ""
@@ -716,44 +722,44 @@ msgstr ""
 #: src/frontend/mame/ui/filemngr.cpp:153
 #: src/frontend/mame/ui/confswitch.cpp:170 src/frontend/mame/ui/slotopt.cpp:203
 msgid "Reset Machine"
-msgstr ""
+msgstr "Restartovat zařízení"
 
 #: src/frontend/mame/ui/filemngr.cpp:153 src/frontend/mame/ui/mainmenu.cpp:208
 msgid "Start Machine"
-msgstr ""
+msgstr "Spustit zařízení"
 
 #: src/frontend/mame/ui/videoopt.cpp:57
 #, c-format
 msgid "Screen #%d"
-msgstr "Obraz #%d"
+msgstr "Obrazovka #%d"
 
 #: src/frontend/mame/ui/videoopt.cpp:183
 msgid "Zoom to Screen Area"
-msgstr ""
+msgstr "Maximalizovat"
 
 #: src/frontend/mame/ui/videoopt.cpp:195
 msgid "X Only"
-msgstr ""
+msgstr "Pouze šířku"
 
 #: src/frontend/mame/ui/videoopt.cpp:199
 msgid "Y Only"
-msgstr ""
+msgstr "Pouze výšku"
 
 #: src/frontend/mame/ui/videoopt.cpp:203
 msgid "X or Y (Auto)"
-msgstr ""
+msgstr "Šířku i výšku"
 
 #: src/frontend/mame/ui/videoopt.cpp:210
 msgid "Non-Integer Scaling"
-msgstr ""
+msgstr "Natažení/vtěsnání podle velikosti okna"
 
 #: src/frontend/mame/ui/videoopt.cpp:213
 msgid "Maintain Aspect Ratio"
-msgstr ""
+msgstr "Zachovat poměr stran"
 
 #: src/frontend/mame/ui/videoopt.cpp:227
 msgid "Cannot change options while recording!"
-msgstr ""
+msgstr "Nelze měnit nastavení během nahrávání!"
 
 #: src/frontend/mame/ui/info.cpp:37
 msgctxt "emulation-feature"
@@ -865,7 +871,7 @@ msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
 msgstr ""
-"Jedna nebo více ROMs/CHDs pro toto zařízení je nekorektních. Zařízení nemusí "
+"Jedna nebo víceré ROM/CHD pro toto zařízení nejsou korektní. Zařízení nemusí "
 "fungovat správně.\n"
 
 #: src/frontend/mame/ui/info.cpp:79
@@ -873,18 +879,17 @@ msgid ""
 "There are known problems with this machine\n"
 "\n"
 msgstr ""
-"S tímto zařízením jsou známy problémy\n"
+"Toto zařízení má nedostatky:\n"
 "\n"
 
 #: src/frontend/mame/ui/info.cpp:84
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr ""
-"Jedna nebo více ROM/CHD pro toto zařízení je špatně stažena (dumpnuta).\n"
+msgstr "Jedna nebo víceré ROM/CHD pro toto zařízení nebyly správně dumpnuty.\n"
 
 #: src/frontend/mame/ui/info.cpp:92
 msgid "Completely unemulated features: "
-msgstr ""
+msgstr "Neemulované prvky: "
 
 #: src/frontend/mame/ui/info.cpp:98 src/frontend/mame/ui/info.cpp:114
 #, c-format
@@ -899,31 +904,31 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:108
 msgid "Imperfectly emulated features: "
-msgstr ""
+msgstr "Nedostatečně emulované prvky: "
 
 #: src/frontend/mame/ui/info.cpp:129
 msgid "Screen flipping in cocktail mode is not supported.\n"
-msgstr "Otočení obrazu v koktail módu není podporováno.\n"
+msgstr "Nelze přetočit obrazovku v režimu Cocktail.\n"
 
 #: src/frontend/mame/ui/info.cpp:131
 msgid "This machine requires external artwork files.\n"
-msgstr ""
+msgstr "Toto zařízení vyžaduje artwork.\n"
 
 #: src/frontend/mame/ui/info.cpp:133
 msgid ""
 "This machine was never completed. It may exhibit strange behavior or missing "
 "elements that are not bugs in the emulation.\n"
 msgstr ""
-"Zařízení nebylo nikdy dokončeno. Může se objevit zvláštní chování nebo "
-"chybějící části, jež nejsou chybou emulace.\n"
+"Zařízení ještě není dokončeno. Mohou se objevit chybějící prvky nebo jiné "
+"zvláštní chování, což ale není chybou emulace.\n"
 
 #: src/frontend/mame/ui/info.cpp:135
 msgid ""
 "This machine has no sound hardware, MAME will produce no sounds, this is "
 "expected behaviour.\n"
 msgstr ""
-"Zařízení nemá zvukový hardware, MAME nebyde přehrávat zvuky, toto je "
-"očekávané chování.\n"
+"Toto zařízení nemá zvukový hardvér, MAME proto nebude generovat žádné "
+"zvuky.\n"
 
 #: src/frontend/mame/ui/info.cpp:139
 msgid ""
@@ -933,8 +938,8 @@ msgid ""
 "the developers to improve the emulation.\n"
 msgstr ""
 "\n"
-"ZAŘÍZENÍ NEFUNGUJE. Emulace tohoto zařízení není ještě kompletní. Nic s tím "
-"nemůžete udělat, jen čekat na vývojáře až vylepší emulaci.\n"
+"TOTO ZAŘÍZENÍ NEFUNGUJE. Emulace ješte není hotová. Nedá se nic dělat, pouze "
+"čekat až vývojáři emulaci dokončí.\n"
 
 #: src/frontend/mame/ui/info.cpp:141
 msgid ""
@@ -943,6 +948,10 @@ msgid ""
 "interaction or consist of mechanical devices. It is not possible to fully "
 "experience this machine.\n"
 msgstr ""
+"\n"
+"Některé prvky tohoto zařízení nemohou být emulovány, protože vyžadují "
+"fyzickou interakci nebo pozůstávají z mechanických součástí. Nebude proto "
+"možné poskytnout dokonalý herní zážitek.\n"
 
 #: src/frontend/mame/ui/info.cpp:163
 #, c-format
@@ -965,28 +974,28 @@ msgid ""
 "CPU:\n"
 msgstr ""
 "%1$s\n"
-"%2$s %3$s\n"
-"Driver: %4$s\n"
+"Rok: %2$s   Výrobce: %3$s\n"
+"Ovladač: %4$s\n"
 "\n"
 "CPU:\n"
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "GHz"
 msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "MHz"
-msgstr "MHz"
+msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "kHz"
-msgstr "kHz"
+msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:406 src/frontend/mame/ui/info.cpp:449
-#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:181
+#: src/frontend/mame/ui/devopt.cpp:105 src/frontend/mame/ui/devopt.cpp:184
 msgid "Hz"
 msgstr ""
 
@@ -1004,7 +1013,7 @@ msgid ""
 "Video:\n"
 msgstr ""
 "\n"
-"Video:\n"
+"Obraz:\n"
 
 #: src/frontend/mame/ui/info.cpp:457
 msgid "None\n"
@@ -1012,58 +1021,58 @@ msgstr "Žádný\n"
 
 #: src/frontend/mame/ui/info.cpp:464
 msgid "Vector"
-msgstr "Vektor"
+msgstr "Vektorový"
 
-#: src/frontend/mame/ui/info.cpp:480
+#: src/frontend/mame/ui/info.cpp:483
 #, c-format
 msgid "%1$s: %2$s\n"
-msgstr "%1$s: %2$s\n"
+msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:480
+#: src/frontend/mame/ui/info.cpp:483
 msgid "%2$s\n"
-msgstr "%2$s\n"
+msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:497
+#: src/frontend/mame/ui/info.cpp:500
 #, c-format
 msgid "Screen '%1$s'"
-msgstr "Obraz '%1$s'"
+msgstr "Obrazovka '%1$s'"
 
-#: src/frontend/mame/ui/info.cpp:499
+#: src/frontend/mame/ui/info.cpp:502
 msgid "Screen"
-msgstr "Obraz"
+msgstr "Obrazovka"
 
-#: src/frontend/mame/ui/info.cpp:570 src/frontend/mame/ui/info.cpp:581
+#: src/frontend/mame/ui/info.cpp:573 src/frontend/mame/ui/info.cpp:584
 #, c-format
 msgid "%1$s:\n"
 msgstr ""
 
-#: src/frontend/mame/ui/info.cpp:662
+#: src/frontend/mame/ui/info.cpp:665
 msgid "Not supported"
 msgstr "Nepodporováno"
 
-#: src/frontend/mame/ui/info.cpp:665
+#: src/frontend/mame/ui/info.cpp:668
 msgid "Partially supported"
-msgstr "Částečná podpora"
+msgstr "Částečně podporováno"
 
-#: src/frontend/mame/ui/info.cpp:674
+#: src/frontend/mame/ui/info.cpp:677
 msgid "[empty]"
 msgstr "[prázdný]"
 
 #: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
-msgstr "[souborový manažer]"
+msgstr "[správce souborů]"
 
 #: src/frontend/mame/ui/swlist.cpp:227
 msgid "Switch Item Ordering"
-msgstr "Přepnout řazení"
+msgstr "Přepnout seřazení položek"
 
 #: src/frontend/mame/ui/swlist.cpp:259
 msgid "Switched Order: entries now ordered by shortname"
-msgstr "Přepnuté řazení: záznamy nyní řazeny podle shortname"
+msgstr "Seřazení přepnuto: položky jsou seřazeny podle shortname"
 
 #: src/frontend/mame/ui/swlist.cpp:260
 msgid "Switched Order: entries now ordered by description"
-msgstr "Přepnuté řazení: záznamy nyní řazeny podle popis"
+msgstr "Seřazení přepnuto: položky jsou seřazeny podle description"
 
 #: src/frontend/mame/ui/swlist.cpp:396
 msgid "[compatible lists]"
@@ -1071,7 +1080,7 @@ msgstr "[kompatibilní seznamy]"
 
 #: src/frontend/mame/ui/filecreate.cpp:78
 msgid "File Already Exists - Override?"
-msgstr "Soubor již existuje - Přepsat?"
+msgstr "Soubor již existuje. Přepsat ho?"
 
 #: src/frontend/mame/ui/filecreate.cpp:80 src/frontend/mame/ui/utils.cpp:1090
 msgid "No"
@@ -1083,11 +1092,11 @@ msgstr "Ano"
 
 #: src/frontend/mame/ui/filecreate.cpp:167
 msgid "New Image Name:"
-msgstr "Nové jméno obrázku:"
+msgstr "Nový název obrazu:"
 
 #: src/frontend/mame/ui/filecreate.cpp:173
 msgid "Image Format:"
-msgstr "Formát obrázku:"
+msgstr "Formát obrazu:"
 
 #: src/frontend/mame/ui/filecreate.cpp:179
 msgid "Create"
@@ -1095,15 +1104,15 @@ msgstr "Vytvořit"
 
 #: src/frontend/mame/ui/filecreate.cpp:207
 msgid "Please enter a file extension too"
-msgstr "Prosím vložte i příponu souboru"
+msgstr "Vložte, prosím, také příponu souboru"
 
 #: src/frontend/mame/ui/filecreate.cpp:258
 msgid "Select image format"
-msgstr "Vyber formát obrázku"
+msgstr "Vybrat formát obrazu"
 
 #: src/frontend/mame/ui/filecreate.cpp:317
 msgid "Select initial contents"
-msgstr ""
+msgstr "Vybrat počáteční obsah"
 
 #: src/frontend/mame/ui/keyboard.cpp:45 src/frontend/mame/ui/mainmenu.cpp:170
 msgid "Keyboard Mode"
@@ -1118,7 +1127,7 @@ msgid "Emulated"
 msgstr "Emulovaná"
 
 #: src/frontend/mame/ui/keyboard.cpp:59 src/frontend/mame/ui/confswitch.cpp:117
-#: src/frontend/mame/ui/inputmap.cpp:557 src/frontend/mame/ui/analogipt.cpp:358
+#: src/frontend/mame/ui/inputmap.cpp:561 src/frontend/mame/ui/analogipt.cpp:358
 #, c-format
 msgid "%1$s [root%2$s]"
 msgstr ""
@@ -1129,41 +1138,41 @@ msgstr ""
 
 #: src/frontend/mame/ui/keyboard.cpp:62 src/frontend/mame/ui/keyboard.cpp:109
 msgid "Enabled"
-msgstr "Aktivováno"
+msgstr "Zapnutá"
 
 #: src/frontend/mame/ui/keyboard.cpp:62 src/frontend/mame/ui/keyboard.cpp:109
 msgid "Disabled"
-msgstr "Deaktivováno"
+msgstr "Vypnutá"
 
 #: src/frontend/mame/ui/utils.cpp:63
 msgctxt "swlist-info"
 msgid "Alternate Title"
-msgstr ""
+msgstr "Alternativní název"
 
 #: src/frontend/mame/ui/utils.cpp:64
 msgctxt "swlist-info"
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: src/frontend/mame/ui/utils.cpp:65
 msgctxt "swlist-info"
 msgid "Barcode Number"
-msgstr ""
+msgstr "Čárový kód"
 
 #: src/frontend/mame/ui/utils.cpp:66
 msgctxt "swlist-info"
 msgid "Developer"
-msgstr ""
+msgstr "Vývojář"
 
 #: src/frontend/mame/ui/utils.cpp:67
 msgctxt "swlist-info"
 msgid "Distributor"
-msgstr ""
+msgstr "Distributor"
 
 #: src/frontend/mame/ui/utils.cpp:68
 msgctxt "swlist-info"
 msgid "Installation Instructions"
-msgstr ""
+msgstr "Návod na instalaci"
 
 #: src/frontend/mame/ui/utils.cpp:69
 msgctxt "swlist-info"
@@ -1178,12 +1187,12 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:71
 msgctxt "swlist-info"
 msgid "Original Publisher"
-msgstr ""
+msgstr "Původní vydavatel"
 
 #: src/frontend/mame/ui/utils.cpp:72
 msgctxt "swlist-info"
 msgid "Part Number"
-msgstr ""
+msgstr "Číslo součásti"
 
 #: src/frontend/mame/ui/utils.cpp:73
 msgctxt "swlist-info"
@@ -1193,82 +1202,82 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:74
 msgctxt "swlist-info"
 msgid "Programmer"
-msgstr ""
+msgstr "Programátor"
 
 #: src/frontend/mame/ui/utils.cpp:75
 msgctxt "swlist-info"
 msgid "Release Date"
-msgstr ""
+msgstr "Datum vydání"
 
 #: src/frontend/mame/ui/utils.cpp:76
 msgctxt "swlist-info"
 msgid "Serial Number"
-msgstr ""
+msgstr "Výrobní číslo"
 
 #: src/frontend/mame/ui/utils.cpp:77
 msgctxt "swlist-info"
 msgid "Usage Instructions"
-msgstr ""
+msgstr "Návod na použití"
 
 #: src/frontend/mame/ui/utils.cpp:78
 msgctxt "swlist-info"
 msgid "Version"
-msgstr ""
+msgstr "Verze"
 
 #: src/frontend/mame/ui/utils.cpp:84
 msgctxt "machine-filter"
 msgid "Unfiltered"
-msgstr ""
+msgstr "Všechny"
 
 #: src/frontend/mame/ui/utils.cpp:85
 msgctxt "machine-filter"
 msgid "Available"
-msgstr ""
+msgstr "Dostupné"
 
 #: src/frontend/mame/ui/utils.cpp:86
 msgctxt "machine-filter"
 msgid "Unavailable"
-msgstr ""
+msgstr "Nedostupné"
 
 #: src/frontend/mame/ui/utils.cpp:87
 msgctxt "machine-filter"
 msgid "Working"
-msgstr ""
+msgstr "Funkční"
 
 #: src/frontend/mame/ui/utils.cpp:88
 msgctxt "machine-filter"
 msgid "Not Working"
-msgstr ""
+msgstr "Nefunkční"
 
 #: src/frontend/mame/ui/utils.cpp:89
 msgctxt "machine-filter"
 msgid "Mechanical"
-msgstr ""
+msgstr "Mechanické"
 
 #: src/frontend/mame/ui/utils.cpp:90
 msgctxt "machine-filter"
 msgid "Not Mechanical"
-msgstr ""
+msgstr "Nemechanické"
 
 #: src/frontend/mame/ui/utils.cpp:91
 msgctxt "machine-filter"
 msgid "Category"
-msgstr ""
+msgstr "Kategorie"
 
 #: src/frontend/mame/ui/utils.cpp:92
 msgctxt "machine-filter"
 msgid "Favorites"
-msgstr ""
+msgstr "Oblíbené"
 
 #: src/frontend/mame/ui/utils.cpp:93
 msgctxt "machine-filter"
 msgid "BIOS"
-msgstr ""
+msgstr "S BIOSem"
 
 #: src/frontend/mame/ui/utils.cpp:94
 msgctxt "machine-filter"
 msgid "Not BIOS"
-msgstr ""
+msgstr "Bez BIOSu"
 
 #: src/frontend/mame/ui/utils.cpp:95
 msgctxt "machine-filter"
@@ -1278,12 +1287,12 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:96
 msgctxt "machine-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Klony"
 
 #: src/frontend/mame/ui/utils.cpp:97
 msgctxt "machine-filter"
 msgid "Manufacturer"
-msgstr "Kategorie"
+msgstr "Výrobce"
 
 #: src/frontend/mame/ui/utils.cpp:98
 msgctxt "machine-filter"
@@ -1293,57 +1302,57 @@ msgstr "Rok"
 #: src/frontend/mame/ui/utils.cpp:99
 msgctxt "machine-filter"
 msgid "Save Supported"
-msgstr ""
+msgstr "Podporující uložení"
 
 #: src/frontend/mame/ui/utils.cpp:100
 msgctxt "machine-filter"
 msgid "Save Unsupported"
-msgstr ""
+msgstr "Nepodporující uložení"
 
 #: src/frontend/mame/ui/utils.cpp:101
 msgctxt "machine-filter"
 msgid "CHD Required"
-msgstr ""
+msgstr "Vyžadující CHD"
 
 #: src/frontend/mame/ui/utils.cpp:102
 msgctxt "machine-filter"
 msgid "No CHD Required"
-msgstr ""
+msgstr "Nevyžadující CHD"
 
 #: src/frontend/mame/ui/utils.cpp:103
 msgctxt "machine-filter"
 msgid "Vertical Screen"
-msgstr ""
+msgstr "Svislá obrazovka"
 
 #: src/frontend/mame/ui/utils.cpp:104
 msgctxt "machine-filter"
 msgid "Horizontal Screen"
-msgstr ""
+msgstr "Vodorovná obrazovka"
 
 #: src/frontend/mame/ui/utils.cpp:105
 msgctxt "machine-filter"
 msgid "Custom Filter"
-msgstr ""
+msgstr "Vlastní filtr"
 
 #: src/frontend/mame/ui/utils.cpp:109
 msgctxt "software-filter"
 msgid "Unfiltered"
-msgstr ""
+msgstr "Všechny"
 
 #: src/frontend/mame/ui/utils.cpp:110
 msgctxt "software-filter"
 msgid "Available"
-msgstr ""
+msgstr "Dostupné"
 
 #: src/frontend/mame/ui/utils.cpp:111
 msgctxt "software-filter"
 msgid "Unavailable"
-msgstr ""
+msgstr "Nedostupné"
 
 #: src/frontend/mame/ui/utils.cpp:112
 msgctxt "software-filter"
 msgid "Favorites"
-msgstr ""
+msgstr "Oblíbené"
 
 #: src/frontend/mame/ui/utils.cpp:113
 msgctxt "software-filter"
@@ -1353,7 +1362,7 @@ msgstr ""
 #: src/frontend/mame/ui/utils.cpp:114
 msgctxt "software-filter"
 msgid "Clones"
-msgstr ""
+msgstr "Klony"
 
 #: src/frontend/mame/ui/utils.cpp:115
 msgctxt "software-filter"
@@ -1368,42 +1377,42 @@ msgstr "Vydavatel"
 #: src/frontend/mame/ui/utils.cpp:117
 msgctxt "software-filter"
 msgid "Developer"
-msgstr ""
+msgstr "Vývojář"
 
 #: src/frontend/mame/ui/utils.cpp:118
 msgctxt "software-filter"
 msgid "Distributor"
-msgstr ""
+msgstr "Distributor"
 
 #: src/frontend/mame/ui/utils.cpp:119
 msgctxt "software-filter"
 msgid "Author"
-msgstr ""
+msgstr "Autor"
 
 #: src/frontend/mame/ui/utils.cpp:120
 msgctxt "software-filter"
 msgid "Programmer"
-msgstr ""
+msgstr "Programátor"
 
 #: src/frontend/mame/ui/utils.cpp:121
 msgctxt "software-filter"
 msgid "Supported"
-msgstr ""
+msgstr "Podporované"
 
 #: src/frontend/mame/ui/utils.cpp:122
 msgctxt "software-filter"
 msgid "Partially Supported"
-msgstr ""
+msgstr "Částečně podporované"
 
 #: src/frontend/mame/ui/utils.cpp:123
 msgctxt "software-filter"
 msgid "Unsupported"
-msgstr ""
+msgstr "Nepodporované"
 
 #: src/frontend/mame/ui/utils.cpp:124
 msgctxt "software-filter"
 msgid "Release Region"
-msgstr ""
+msgstr "Region vydání"
 
 #: src/frontend/mame/ui/utils.cpp:125
 msgctxt "software-filter"
@@ -1413,25 +1422,25 @@ msgstr "Typ zařízení"
 #: src/frontend/mame/ui/utils.cpp:126
 msgctxt "software-filter"
 msgid "Software List"
-msgstr "Software List"
+msgstr "Seznam softvéru"
 
 #: src/frontend/mame/ui/utils.cpp:127
 msgctxt "software-filter"
 msgid "Custom Filter"
-msgstr ""
+msgstr "Vlastní filtr"
 
 #: src/frontend/mame/ui/utils.cpp:291
 msgid "<set up filters>"
-msgstr ""
+msgstr "<nastavit filtry>"
 
 #: src/frontend/mame/ui/utils.cpp:396
 msgid "Select custom filters:"
-msgstr "Vyber uživatelský filtr:"
+msgstr "Vybrat vlastní filtr:"
 
 #: src/frontend/mame/ui/utils.cpp:547
 #, c-format
 msgid "Filter %1$u"
-msgstr ""
+msgstr "Filtr %1$u"
 
 #: src/frontend/mame/ui/utils.cpp:561
 msgid "Remove last filter"
@@ -1443,19 +1452,19 @@ msgstr "Přidat filtr"
 
 #: src/frontend/mame/ui/utils.cpp:1002
 msgid "Select category:"
-msgstr ""
+msgstr "Vybrat kategorii:"
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "[no category INI files]"
-msgstr ""
+msgstr "[žádné INI soubory pro kategorie]"
 
 #: src/frontend/mame/ui/utils.cpp:1041
 msgid "[no groups in INI file]"
-msgstr ""
+msgstr "[žádné INI soubory pro skupiny]"
 
 #: src/frontend/mame/ui/utils.cpp:1075
 msgid "No category INI files found"
-msgstr ""
+msgstr "Nenalezeny INI soubory pro kategorie"
 
 #: src/frontend/mame/ui/utils.cpp:1080
 msgid "File"
@@ -1463,33 +1472,33 @@ msgstr "Soubor"
 
 #: src/frontend/mame/ui/utils.cpp:1084
 msgid "No groups found in category file"
-msgstr ""
+msgstr "V souboru pro kategorii nebyly nalezeny žádné skupiny"
 
 #: src/frontend/mame/ui/utils.cpp:1089
 msgid "Group"
-msgstr ""
+msgstr "Skupina"
 
 #: src/frontend/mame/ui/utils.cpp:1090
 msgid "Include clones"
-msgstr ""
+msgstr "Včetně klonů"
 
 #: src/frontend/mame/ui/utils.cpp:2048 src/frontend/mame/ui/inifile.cpp:272
 msgctxt "swlist-info"
 msgid "Software list/item"
-msgstr ""
+msgstr "Seznam/položka softvéru"
 
-#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2698
+#: src/frontend/mame/ui/datmenu.cpp:88 src/frontend/mame/ui/selmenu.cpp:2707
 msgid "Software List Info"
-msgstr ""
+msgstr "Informace o seznamu softvéru"
 
 #: src/frontend/mame/ui/datmenu.cpp:316
 #, c-format
 msgid "Revision: %1$s"
-msgstr "Verze: %1$s"
+msgstr "Revize: %1$s"
 
 #: src/frontend/mame/ui/miscmenu.cpp:78
 msgid "Reset"
-msgstr "Reset"
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:234
 #, c-format
@@ -1515,17 +1524,17 @@ msgid ""
 "Tickets dispensed: %1$d\n"
 "\n"
 msgstr ""
-"Lístků zahozeno: %1$d\n"
+"Vydaných lístků: %1$d\n"
 "\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:254
 msgid "Coin %1$c: NA%3$s\n"
-msgstr "Mince %1$c: NA%3$s\n"
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:254
 #, c-format
 msgid "Coin %1$c: %2$d%3$s\n"
-msgstr "Mince %1$c: %2$d%3$s\n"
+msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:257
 msgid " (locked)"
@@ -1534,16 +1543,16 @@ msgstr " (zamčeno)"
 #: src/frontend/mame/ui/miscmenu.cpp:474
 #, c-format
 msgid "P%d Visibility"
-msgstr ""
+msgstr "Hráč %d - Viditelnost"
 
 #: src/frontend/mame/ui/miscmenu.cpp:528
 #, c-format
 msgid "P%d Crosshair"
-msgstr ""
+msgstr "Hráč %d - Zaměřovač"
 
 #: src/frontend/mame/ui/miscmenu.cpp:545
 msgid "Visible Delay"
-msgstr "Viditelné zpoždění"
+msgstr "Viditelné opoždění"
 
 #: src/frontend/mame/ui/miscmenu.cpp:629
 #, c-format
@@ -1552,7 +1561,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Name:             Description:\n"
-msgstr "Jméno:             Popis:\n"
+msgstr "SOUBOR:            NÁZEV ZAŘÍZENÍ:\n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:666
 #, c-format
@@ -1561,15 +1570,15 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:683
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Exportovat ve formátu XML (jako -listxml)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:684
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Exportovat ve formátu XML (jako -listxml, ovšem bez zařízení)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:685
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Exportovat ve formátu TXT (jako -listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:792
 msgid "BIOS"
@@ -1577,35 +1586,35 @@ msgstr ""
 
 #: src/frontend/mame/ui/miscmenu.cpp:796
 msgid "Driver"
-msgstr ""
+msgstr "Ovladač"
 
 #: src/frontend/mame/ui/miscmenu.cpp:799
 msgid "This machine has no BIOS."
-msgstr ""
+msgstr "Toto zařízení nemá BIOS."
 
 #: src/frontend/mame/ui/miscmenu.cpp:808 src/frontend/mame/ui/mainmenu.cpp:194
 msgid "Add To Favorites"
-msgstr "Přidat do oblíbených"
+msgstr "Přidat do seznamu Oblíbené"
 
 #: src/frontend/mame/ui/miscmenu.cpp:810 src/frontend/mame/ui/mainmenu.cpp:196
 msgid "Remove From Favorites"
-msgstr "Odstranit z oblíbených"
+msgstr "Odstranit ze seznamu Oblíbené"
 
 #: src/frontend/mame/ui/miscmenu.cpp:813
 msgid "Save Machine Configuration"
-msgstr ""
+msgstr "Uložit konfiguraci zařízení"
 
 #: src/frontend/mame/ui/miscmenu.cpp:824
 msgid "Configure Machine:"
-msgstr ""
+msgstr "Konfigurovat zařízení:"
 
-#: src/frontend/mame/ui/miscmenu.cpp:858 src/frontend/mame/ui/selmenu.cpp:2638
+#: src/frontend/mame/ui/miscmenu.cpp:858 src/frontend/mame/ui/selmenu.cpp:2647
 msgid " (default)"
-msgstr " (standardní)"
+msgstr " (původní)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:934
 msgid "No plugins found"
-msgstr ""
+msgstr "Nenalezeny žádné pluginy"
 
 #: src/frontend/mame/ui/quitmenu.cpp:37
 #, c-format
@@ -1615,26 +1624,26 @@ msgid ""
 "Press %1$s to quit\n"
 "Press %2$s to return to emulation"
 msgstr ""
-"Určitě chcete odejít?\n"
+"Jste si jistý, že chcete skončit?\n"
 "\n"
-"Stiskni %1$s pro ukončení\n"
-"Stiskni %2$s pro návrat do emulace"
+"Stiskněte %1$s pro ukončení\n"
+"Nebo %2$s pro návrat do emulace"
 
-#: src/frontend/mame/ui/info_pty.cpp:30 src/frontend/mame/ui/mainmenu.cpp:155
+#: src/frontend/mame/ui/info_pty.cpp:30
 msgid "Pseudo terminals"
-msgstr "Pseudo terminály"
+msgstr "Pseudoterminály"
 
 #: src/frontend/mame/ui/info_pty.cpp:39
 msgid "[failed]"
-msgstr "[chybný]"
+msgstr "[selhaný]"
 
 #: src/frontend/mame/ui/state.cpp:217
 msgid "[no saved states found]"
-msgstr ""
+msgstr "[nenalezeny žádné stavy]"
 
 #: src/frontend/mame/ui/state.cpp:222 plugins/cheatfind/init.lua:492
 msgid "Cancel"
-msgstr ""
+msgstr "Storno"
 
 #: src/frontend/mame/ui/state.cpp:261
 #, c-format
@@ -1643,32 +1652,36 @@ msgid ""
 "Press %2$s to delete\n"
 "Press %3$s to cancel"
 msgstr ""
+"Smazat uložený stav %1$s?\n"
+"Stiskněte %2$s pro smazání\n"
+"Nebo %3$s pro storno"
 
 #: src/frontend/mame/ui/state.cpp:374
 #, c-format
 msgid "Error removing saved state file %1$s"
-msgstr ""
+msgstr "Chyba při smazávání souboru s uloženým stavem %1$s"
 
 #: src/frontend/mame/ui/state.cpp:426
 #, c-format
 msgid "Press %1$s to delete"
-msgstr ""
+msgstr "Stiskněte %1$s pro smazání"
 
 #: src/frontend/mame/ui/state.cpp:499
 msgid "Load State"
-msgstr ""
+msgstr "Načíst stav"
 
 #: src/frontend/mame/ui/state.cpp:499
 msgid "Select state to load"
-msgstr ""
+msgstr "Vyberte stav, který chcete načíst"
 
 #: src/frontend/mame/ui/state.cpp:523
 msgid "Save State"
-msgstr ""
+msgstr "Uložit stav"
 
 #: src/frontend/mame/ui/state.cpp:523
 msgid "Press a key or joystick button, or select state to overwrite"
 msgstr ""
+"Stiskněte klávesu nebo tlačítko joysticku, anebo vyberte stav pro přepsání"
 
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
@@ -1682,61 +1695,61 @@ msgstr "Uživatelské rozhraní"
 #: src/frontend/mame/ui/inputmap.cpp:41
 #, c-format
 msgid "Player %1$d Controls"
-msgstr ""
+msgstr "Ovládání Hráč %1$d"
 
 #: src/frontend/mame/ui/inputmap.cpp:44
 msgid "Other Controls"
-msgstr "Ostatní ovládání"
+msgstr "Další ovládání"
 
-#: src/frontend/mame/ui/inputmap.cpp:227
+#: src/frontend/mame/ui/inputmap.cpp:231
 msgid "This machine has no configurable inputs."
-msgstr ""
+msgstr "Zařízení nemá konfigurovatelné vstupy."
 
-#: src/frontend/mame/ui/inputmap.cpp:327
+#: src/frontend/mame/ui/inputmap.cpp:331
 msgid "Pressed"
-msgstr ""
+msgstr "Stisknuto"
 
-#: src/frontend/mame/ui/inputmap.cpp:397
+#: src/frontend/mame/ui/inputmap.cpp:401
 msgid "Invalid sequence entered"
-msgstr ""
+msgstr "Vložená neplatná sekvence"
 
-#: src/frontend/mame/ui/inputmap.cpp:542
+#: src/frontend/mame/ui/inputmap.cpp:546
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:543
+#: src/frontend/mame/ui/inputmap.cpp:547
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Inc"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:544
+#: src/frontend/mame/ui/inputmap.cpp:548
 #, c-format
 msgctxt "input-name"
 msgid "%1$s Analog Dec"
 msgstr ""
 
-#: src/frontend/mame/ui/inputmap.cpp:586
+#: src/frontend/mame/ui/inputmap.cpp:590
 #, c-format
 msgid "Press %1$s to set\n"
-msgstr ""
+msgstr "Pro nastavení stiskněte %1$s\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:587
+#: src/frontend/mame/ui/inputmap.cpp:591
 #, c-format
 msgid "Press %1$s to append\n"
-msgstr ""
+msgstr "Pro přidání stiskněte %1$s\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:588
+#: src/frontend/mame/ui/inputmap.cpp:592
 #, c-format
 msgid "Press %1$s to clear\n"
-msgstr ""
+msgstr "Pro smazání stiskněte %1$s\n"
 
-#: src/frontend/mame/ui/inputmap.cpp:589
+#: src/frontend/mame/ui/inputmap.cpp:593
 #, c-format
 msgid "Press %1$s to restore default\n"
-msgstr ""
+msgstr "Pro nastavení původní hodnoty stiskněte %1$s\n"
 
 #: src/frontend/mame/ui/tapectrl.cpp:86
 msgid "stopped"
@@ -1744,19 +1757,19 @@ msgstr "zastaveno"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "playing"
-msgstr "přehrává"
+msgstr "přehrává se"
 
 #: src/frontend/mame/ui/tapectrl.cpp:88
 msgid "(playing)"
-msgstr "(přehrává)"
+msgstr "(přehrává se)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:89
 msgid "recording"
-msgstr "nahrává"
+msgstr "nahrává se"
 
 #: src/frontend/mame/ui/tapectrl.cpp:89
 msgid "(recording)"
-msgstr "(nahrává)"
+msgstr "(nahrává se)"
 
 #: src/frontend/mame/ui/tapectrl.cpp:96
 msgid "Pause/Stop"
@@ -1780,13 +1793,15 @@ msgstr "Přetočit dopředu"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:132
 msgid "Cannot save over directory"
-msgstr "Nemohu zapisovat do složky"
+msgstr "Nelze zapisovat do složky"
 
 #: src/frontend/mame/ui/imgcntrl.cpp:165
 msgid ""
 "The software selected is missing one or more required ROM or CHD images.\n"
 "Please acquire the correct files or select a different one."
 msgstr ""
+"Pro zvolený softvér chybí jeden nebo víceré ROM nebo CHD obrazy.\n"
+"Dodejte požadované soubory nebo zvolte jiný softvér."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:146
 msgid ""
@@ -1795,16 +1810,20 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"Pro zvolenou hru chybí jeden nebo víceré ROM nebo CHD obrazy. Zvolte jinou "
+"hru.\n"
+"\n"
+"Pokračujte stisknutím libovolné klávesy."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:273
-#: src/frontend/mame/ui/selgame.cpp:436
+#: src/frontend/mame/ui/selgame.cpp:443
 msgid "Configure Options"
-msgstr "Možnosti konfigurace"
+msgstr "Konfigurovat obecná nastavení"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:274
 #: src/frontend/mame/ui/selmenu.cpp:1280
 msgid "Exit"
-msgstr "Ukončení"
+msgstr "Ukončit MAME"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:299
 #, c-format
@@ -1814,84 +1833,84 @@ msgid ""
 "If this is your first time using %2$s, please see the config.txt file in the "
 "docs directory for information on configuring %2$s."
 msgstr ""
-"Žádná zařízení nenalezena. Prosím zkontrolujte rompath v %1$s.ini souboru.\n"
+"Nebyla nalezena žádná zařízení. Zkontrolujte rompath v %1$s.ini souboru.\n"
 "\n"
-"Pokud používáte %2$s poprvé, prosím podívejte se na config.txt soubor ve "
-"složce docs na informace o konfiguraci %2$s."
+"Pokud používáte %2$s poprvé, více informací o konfiguraci %2$s naleznete v "
+"souboru config.txt ve složce docs."
 
 #: src/frontend/mame/ui/simpleselgame.cpp:315
 #, c-format
 msgid "Type name or select: %1$s_"
-msgstr "Napiš jméno nebo vyber: %1$s_"
+msgstr "Napište jméno nebo vyberte: %1$s_"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:317
 msgid "Type name or select: (random)"
-msgstr "Napiš jméno nebo vyber: (náhodně)"
+msgstr "Napište jméno nebo vyberte: (náhodně)"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:331
 #, c-format
 msgid "%1$-.100s"
-msgstr "%1$-.100s"
+msgstr ""
 
 #: src/frontend/mame/ui/simpleselgame.cpp:334
 #, c-format
 msgid "%1$s, %2$-.100s"
-msgstr "%1$s, %2$-.100s"
+msgstr "Rok výroby: %1$s, výrobce: %2$-.100s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:337
 #, c-format
 msgid "Driver: %1$s"
-msgstr "Driver: %1$s"
+msgstr "Ovladač: %1$s"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:353
 #: src/frontend/mame/ui/selmenu.cpp:723
 msgid "Overall: NOT WORKING"
-msgstr "Celkově: NEFUNGUJE"
+msgstr "Emulace: NEFUNKČNÍ"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:355
 #: src/frontend/mame/ui/selmenu.cpp:725
 msgid "Overall: Unemulated Protection"
-msgstr "Celkově: Neemulovaná ochrana"
+msgstr "Emulace: Neemulovaná ochrana"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:357
 #: src/frontend/mame/ui/selmenu.cpp:727
 msgid "Overall: Working"
-msgstr "Celkově: Funguje"
+msgstr "Emulace: funkční"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:361
 #: src/frontend/mame/ui/selmenu.cpp:731
 msgid "Graphics: Unimplemented, "
-msgstr ""
+msgstr "Grafika: neimplementována, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:363
 #: src/frontend/mame/ui/selmenu.cpp:733
 msgid "Graphics: Imperfect, "
-msgstr "Grafika: Nedokonalá, "
+msgstr "Grafika: nedostatečná, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:365
 #: src/frontend/mame/ui/selmenu.cpp:735
 msgid "Graphics: OK, "
-msgstr "Grafika: OK, "
+msgstr "Grafika: funkční, "
 
 #: src/frontend/mame/ui/simpleselgame.cpp:368
 #: src/frontend/mame/ui/selmenu.cpp:738
 msgid "Sound: None"
-msgstr ""
+msgstr "Zvuk: žádný"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:370
 #: src/frontend/mame/ui/selmenu.cpp:740
 msgid "Sound: Unimplemented"
-msgstr "Zvuk: Neimplementován"
+msgstr "Zvuk: neimplementován"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:372
 #: src/frontend/mame/ui/selmenu.cpp:742
 msgid "Sound: Imperfect"
-msgstr "Zvuk: Nedokonalý"
+msgstr "Zvuk: nedostatečný"
 
 #: src/frontend/mame/ui/simpleselgame.cpp:374
 #: src/frontend/mame/ui/selmenu.cpp:744
 msgid "Sound: OK"
-msgstr "Zvuk: OK"
+msgstr "Zvuk: funkční"
 
 #: src/frontend/mame/ui/cheatopt.cpp:82 plugins/cheat/init.lua:751
 #, c-format, lua-format
@@ -1899,40 +1918,40 @@ msgid ""
 "Cheat Comment:\n"
 "%s"
 msgstr ""
-"Cheat komentář:\n"
+"Komentář k cheatu:\n"
 "%s"
 
 #: src/frontend/mame/ui/cheatopt.cpp:95
 msgid "All cheats reloaded"
-msgstr "Všechny cheaty znovu načteny"
+msgstr "Všechny cheaty načteny znovu"
 
 #: src/frontend/mame/ui/cheatopt.cpp:136 plugins/cheat/init.lua:698
 msgid "Reset All"
-msgstr "Resetovat vše"
+msgstr "Resetovat všechno"
 
 #: src/frontend/mame/ui/cheatopt.cpp:139 plugins/cheat/init.lua:699
 msgid "Reload All"
-msgstr "Znovu načíst vše"
+msgstr "Znovu načíst všechno"
 
 #: src/frontend/mame/ui/dirmenu.cpp:38
 msgctxt "path-option"
 msgid "ROMs"
-msgstr "ROMs"
+msgstr "ROM-ky"
 
 #: src/frontend/mame/ui/dirmenu.cpp:39
 msgctxt "path-option"
 msgid "Software Media"
-msgstr ""
+msgstr "Softvér"
 
 #: src/frontend/mame/ui/dirmenu.cpp:40
 msgctxt "path-option"
 msgid "Sound Samples"
-msgstr ""
+msgstr "Zvukové samply"
 
 #: src/frontend/mame/ui/dirmenu.cpp:41
 msgctxt "path-option"
 msgid "Artwork"
-msgstr ""
+msgstr "Artworky"
 
 #: src/frontend/mame/ui/dirmenu.cpp:42
 msgctxt "path-option"
@@ -1942,47 +1961,47 @@ msgstr "Zaměřovače"
 #: src/frontend/mame/ui/dirmenu.cpp:43
 msgctxt "path-option"
 msgid "Cheat Files"
-msgstr ""
+msgstr "Cheaty"
 
 #: src/frontend/mame/ui/dirmenu.cpp:44
 msgctxt "path-option"
 msgid "Plugins"
-msgstr ""
+msgstr "Pluginy"
 
 #: src/frontend/mame/ui/dirmenu.cpp:45
 msgctxt "path-option"
 msgid "UI Translations"
-msgstr ""
+msgstr "Jazykové mutace"
 
 #: src/frontend/mame/ui/dirmenu.cpp:46
 msgctxt "path-option"
 msgid "INIs"
-msgstr "INIs"
+msgstr "INI soubory"
 
 #: src/frontend/mame/ui/dirmenu.cpp:47
 msgctxt "path-option"
 msgid "UI Settings"
-msgstr ""
+msgstr "Nastavení uživatelského rozhraní"
 
 #: src/frontend/mame/ui/dirmenu.cpp:48
 msgctxt "path-option"
 msgid "Plugin Data"
-msgstr ""
+msgstr "Údaje pluginů"
 
 #: src/frontend/mame/ui/dirmenu.cpp:49
 msgctxt "path-option"
 msgid "DATs"
-msgstr "DATs"
+msgstr "DAT soubory"
 
 #: src/frontend/mame/ui/dirmenu.cpp:50
 msgctxt "path-option"
 msgid "Category INIs"
-msgstr ""
+msgstr "INI soubory pro kategorie"
 
 #: src/frontend/mame/ui/dirmenu.cpp:51
 msgctxt "path-option"
 msgid "Snapshots"
-msgstr "Náhledy"
+msgstr "Snapshoty"
 
 #: src/frontend/mame/ui/dirmenu.cpp:52
 msgctxt "path-option"
@@ -1997,37 +2016,37 @@ msgstr "Ovládací panely"
 #: src/frontend/mame/ui/dirmenu.cpp:54
 msgctxt "path-option"
 msgid "Cabinets"
-msgstr "Kastle"
+msgstr "Kabinety"
 
 #: src/frontend/mame/ui/dirmenu.cpp:55
 msgctxt "path-option"
 msgid "Marquees"
-msgstr "Marquees"
+msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:56
 msgctxt "path-option"
 msgid "PCBs"
-msgstr "Desky spojů"
+msgstr "Desky plošných spojů"
 
 #: src/frontend/mame/ui/dirmenu.cpp:57
 msgctxt "path-option"
 msgid "Flyers"
-msgstr "Plakáty"
+msgstr "Letáky"
 
 #: src/frontend/mame/ui/dirmenu.cpp:58
 msgctxt "path-option"
 msgid "Title Screens"
-msgstr ""
+msgstr "Úvodní obrazovky"
 
 #: src/frontend/mame/ui/dirmenu.cpp:59
 msgctxt "path-option"
 msgid "Game Endings"
-msgstr ""
+msgstr "Konce her"
 
 #: src/frontend/mame/ui/dirmenu.cpp:60
 msgctxt "path-option"
 msgid "Bosses"
-msgstr "Bossové"
+msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:61
 msgctxt "path-option"
@@ -2042,12 +2061,12 @@ msgstr ""
 #: src/frontend/mame/ui/dirmenu.cpp:63
 msgctxt "path-option"
 msgid "Game Over Screens"
-msgstr ""
+msgstr "Obrazovky konců her"
 
 #: src/frontend/mame/ui/dirmenu.cpp:64
 msgctxt "path-option"
 msgid "HowTo"
-msgstr "Jak na to"
+msgstr "Jak-na-to"
 
 #: src/frontend/mame/ui/dirmenu.cpp:65
 msgctxt "path-option"
@@ -2062,7 +2081,7 @@ msgstr "Skóre"
 #: src/frontend/mame/ui/dirmenu.cpp:67
 msgctxt "path-option"
 msgid "Versus"
-msgstr "Versus"
+msgstr ""
 
 #: src/frontend/mame/ui/dirmenu.cpp:68
 msgctxt "path-option"
@@ -2071,12 +2090,12 @@ msgstr "Obaly"
 
 #: src/frontend/mame/ui/dirmenu.cpp:119
 msgid "Folders Setup"
-msgstr "Nastavení složek"
+msgstr "Nastavení složek souborů"
 
 #: src/frontend/mame/ui/dirmenu.cpp:169
 #, c-format
 msgid "Current %1$s Folders"
-msgstr "Aktuální %1$s složky"
+msgstr "Aktuální složky pro %1$s"
 
 #: src/frontend/mame/ui/dirmenu.cpp:181
 msgid "Change Folder"
@@ -2093,21 +2112,21 @@ msgstr "Odstranit složku"
 #: src/frontend/mame/ui/dirmenu.cpp:417
 #, c-format
 msgid "Change %1$s Folder - Search: %2$s_"
-msgstr "Změnit %1$s Složku - Hledat: %2$s_"
+msgstr "Změnit složku pro %1$s - Vyhledat: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:417
 #, c-format
 msgid "Add %1$s Folder - Search: %2$s_"
-msgstr "Přidat %1$s Složku - Hledat: %2$s_"
+msgstr "Přidat složku pro %1$s - Vyhledat: %2$s_"
 
 #: src/frontend/mame/ui/dirmenu.cpp:428
 msgid "Press TAB to set"
-msgstr "Stiskni TAB pro nastavení"
+msgstr "Stiskněte TAB pro nastavení"
 
 #: src/frontend/mame/ui/dirmenu.cpp:511
 #, c-format
 msgid "Remove %1$s Folder"
-msgstr "Odstranit %1$s Složku"
+msgstr "Odstranit složku pro %1$s"
 
 #: src/frontend/mame/ui/viewgfx.cpp:436
 msgid " COLORS"
@@ -2120,44 +2139,44 @@ msgstr " PERA"
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = 1/%1$d"
-msgstr ""
+msgstr "Zvětšení = 1/%1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1224 src/frontend/mame/ui/viewgfx.cpp:1255
 #, c-format
 msgid "Zoom = %1$d"
-msgstr ""
+msgstr "Zvětšení = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
 msgstr ""
 
-#: src/frontend/mame/ui/selgame.cpp:437
+#: src/frontend/mame/ui/selgame.cpp:444
 msgid "Configure Machine"
-msgstr ""
+msgstr "Konfigurovat vybrané zařízení"
 
-#: src/frontend/mame/ui/selgame.cpp:1050
+#: src/frontend/mame/ui/selgame.cpp:1060
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr "%1$s %2$s ( %3$d / %4$d zařízení (%5$d BIOS) )"
+msgstr "%1$s %2$s (zobrazených %3$d z %4$d zařízení (%5$d s BIOSem))"
 
-#: src/frontend/mame/ui/selgame.cpp:1078
+#: src/frontend/mame/ui/selgame.cpp:1088
 #, c-format
 msgid "System: %1$-.100s"
 msgstr "Systém: %1$-.100s"
 
 #: src/frontend/mame/ui/selector.cpp:116
 msgid "Selection List - Search: "
-msgstr "Seznam výběru - Hledání: "
+msgstr "Vyhledat v seznamu: "
 
 #: src/frontend/mame/ui/selector.cpp:124
 #, c-format
 msgid "Double-click or press %1$s to select"
-msgstr "Dvojklik nebo stisk %1$s pro výběr"
+msgstr "Na vybrané položce dvojklikněte nebo stiskněte %1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:60
 #, c-format
 msgid "Results will be saved to %1$s"
-msgstr ""
+msgstr "Výsledky auditu budou uloženy do souboru %1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:98
 #, c-format
@@ -2165,6 +2184,8 @@ msgid ""
 "Auditing ROMs for machine %2$u of %3$u...\n"
 "%1$s"
 msgstr ""
+"Probíhá audit médií... (%2$u z %3$u)\n"
+"%1$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
 #, c-format
@@ -2174,41 +2195,45 @@ msgid ""
 "Press %1$s to cancel\n"
 "Press %2$s to continue"
 msgstr ""
+"Ukončit audit médií?\n"
+"\n"
+"Jestli ano, stiskněte %1$s\n"
+"Jestli pokračovat v auditu, stiskněte %2$s"
 
 #: src/frontend/mame/ui/auditmenu.cpp:136
 #, c-format
 msgid "Audit ROMs for %1$u machines marked unavailable"
-msgstr ""
+msgstr "Vykonat audit médií pro %1$u zařízení označených jako Nedostupné"
 
 #: src/frontend/mame/ui/auditmenu.cpp:137
 #, c-format
 msgid "Audit ROMs for all %1$u machines"
-msgstr ""
+msgstr "Vykonat audit médií pro všech %1$u zařízení"
 
 #: src/frontend/mame/ui/auditmenu.cpp:154
 #, c-format
 msgid "Press %1$s to cancel\n"
-msgstr ""
+msgstr "Pro ukončení stiskněte %1$s\n"
 
 #: src/frontend/mame/ui/custui.cpp:52
 msgid "Show All"
-msgstr "Zobrazit vše"
+msgstr "Zobrazit oba"
 
 #: src/frontend/mame/ui/custui.cpp:53
 msgid "Hide Filters"
-msgstr "Skrýt filtry"
+msgstr "Skrýt Filtry"
 
 #: src/frontend/mame/ui/custui.cpp:54
 msgid "Hide Info/Image"
-msgstr "Skrýt info/obrázek"
+msgstr "Skrýt Obrázky/Informace"
 
 #: src/frontend/mame/ui/custui.cpp:55
 msgid "Hide Both"
-msgstr "Skrýt obojí"
+msgstr "Skrýt oba"
 
 #: src/frontend/mame/ui/custui.cpp:210
 msgid "Fonts"
-msgstr "Písma"
+msgstr "Písmo"
 
 #: src/frontend/mame/ui/custui.cpp:211
 msgid "Colors"
@@ -2220,27 +2245,27 @@ msgstr "Jazyk"
 
 #: src/frontend/mame/ui/custui.cpp:217
 msgid "System Names"
-msgstr ""
+msgstr "Systémové názvy"
 
 #: src/frontend/mame/ui/custui.cpp:220
 msgid "Show side panels"
-msgstr "Zobraz postranní panely"
+msgstr "Postranní panely"
 
 #: src/frontend/mame/ui/custui.cpp:232
 msgid "UI Customization Settings"
-msgstr ""
+msgstr "Uživatelské rozhraní"
 
 #: src/frontend/mame/ui/custui.cpp:246 src/frontend/mame/ui/custui.cpp:290
 msgid "[built-in]"
-msgstr ""
+msgstr "[vestavěné]"
 
 #: src/frontend/mame/ui/custui.cpp:374
 msgid "default"
-msgstr "standardní"
+msgstr "původní"
 
 #: src/frontend/mame/ui/custui.cpp:509
 msgid "UI Font"
-msgstr "UI Písmo"
+msgstr "Typ písma"
 
 #: src/frontend/mame/ui/custui.cpp:514
 msgid "Bold"
@@ -2248,49 +2273,49 @@ msgstr "Tučné"
 
 #: src/frontend/mame/ui/custui.cpp:515
 msgid "Italic"
-msgstr "Kurzíva"
+msgstr "Kurziva"
 
 #: src/frontend/mame/ui/custui.cpp:520
 msgid "Lines"
-msgstr "Linie"
+msgstr "Počet řádků na obrazovce"
 
 #: src/frontend/mame/ui/custui.cpp:525
 msgid "Infos text size"
-msgstr "Velikost info textů"
+msgstr "Velikost informačních textů"
 
 #: src/frontend/mame/ui/custui.cpp:539
 msgid "UI Fonts Settings"
-msgstr "Nastavení písma UI"
+msgstr "Nastavení písma"
 
 #: src/frontend/mame/ui/custui.cpp:548
 msgid "Sample text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 msgstr ""
-"Ukázkový text - Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+"Ukázkový text: Lorem ipsum dolor sit amet, consectetur adipiscing elit."
 
 #: src/frontend/mame/ui/custui.cpp:625
 msgctxt "color-option"
 msgid "Normal text"
-msgstr "Normální text"
+msgstr "Běžný text"
 
 #: src/frontend/mame/ui/custui.cpp:626
 msgctxt "color-option"
 msgid "Selected color"
-msgstr "Vybraná barva"
+msgstr "Vybraný text"
 
 #: src/frontend/mame/ui/custui.cpp:627
 msgctxt "color-option"
 msgid "Normal text background"
-msgstr "Pozadí normálního textu"
+msgstr "Pozadí běžného textu"
 
 #: src/frontend/mame/ui/custui.cpp:628
 msgctxt "color-option"
 msgid "Selected background color"
-msgstr "Barva pozadí vybraného textu"
+msgstr "Pozadí vybraného textu"
 
 #: src/frontend/mame/ui/custui.cpp:629
 msgctxt "color-option"
 msgid "Subitem color"
-msgstr "Barva podpoložky"
+msgstr "Hodnota"
 
 #: src/frontend/mame/ui/custui.cpp:630
 msgctxt "color-option"
@@ -2315,158 +2340,158 @@ msgstr "DIP přepínač"
 #: src/frontend/mame/ui/custui.cpp:634
 msgctxt "color-option"
 msgid "Unavailable color"
-msgstr "Barva nedostupné položky"
+msgstr "Nedostupná položka"
 
 #: src/frontend/mame/ui/custui.cpp:635
 msgctxt "color-option"
 msgid "Slider color"
-msgstr "Barva posuvníku"
+msgstr "Posuvník"
 
 #: src/frontend/mame/ui/custui.cpp:636
 msgctxt "color-option"
 msgid "Graphics viewer background"
-msgstr ""
+msgstr "Pozadí prohlížeče"
 
 #: src/frontend/mame/ui/custui.cpp:637
 msgctxt "color-option"
 msgid "Mouse over color"
-msgstr "Barva při přejetí myši"
+msgstr "Text při přechodu myši"
 
 #: src/frontend/mame/ui/custui.cpp:638
 msgctxt "color-option"
 msgid "Mouse over background color"
-msgstr "Barva pozadí při přejetí myši"
+msgstr "Pozadí při přechodu myši"
 
 #: src/frontend/mame/ui/custui.cpp:639
 msgctxt "color-option"
 msgid "Mouse down color"
-msgstr "Barva při stisku myši"
+msgstr "Text při stisknutí myši"
 
 #: src/frontend/mame/ui/custui.cpp:640
 msgctxt "color-option"
 msgid "Mouse down background color"
-msgstr "Barva pozadí při stisku myši"
+msgstr "Pozadí při stisknutí myši"
 
 #: src/frontend/mame/ui/custui.cpp:644
 msgid "Restore default colors"
-msgstr ""
+msgstr "Vrátit vše do původních barev"
 
 #: src/frontend/mame/ui/custui.cpp:656
 msgid "UI Color Settings"
-msgstr ""
+msgstr "Nastavení barev"
 
 #: src/frontend/mame/ui/custui.cpp:665
 #, c-format
 msgid "Double-click or press %1$s to change color"
-msgstr ""
+msgstr "Pro změnu barvy dvojklikněte nebo stiskněte %1$s"
 
 #: src/frontend/mame/ui/custui.cpp:673
 msgid "Menu Preview"
-msgstr "Menu náhled"
+msgstr "Náhled menu"
 
 #: src/frontend/mame/ui/custui.cpp:687
 msgctxt "color-sample"
 msgid "Normal"
-msgstr "Normální"
+msgstr "Běžný text"
 
 #: src/frontend/mame/ui/custui.cpp:688
 msgctxt "color-sample"
 msgid "Subitem"
-msgstr "Podpoložka"
+msgstr "Hodnota nastavení"
 
 #: src/frontend/mame/ui/custui.cpp:689
 msgctxt "color-sample"
 msgid "Selected"
-msgstr "Vybraný"
+msgstr "Vybraný text"
 
 #: src/frontend/mame/ui/custui.cpp:690
 msgctxt "color-sample"
 msgid "Mouse Over"
-msgstr "Přejetí myši"
+msgstr "Přechod myši"
 
 #: src/frontend/mame/ui/custui.cpp:691
 msgctxt "color-sample"
 msgid "Clone"
 msgstr "Klon"
 
-#: src/frontend/mame/ui/custui.cpp:914
+#: src/frontend/mame/ui/custui.cpp:906
 msgid "ARGB Settings"
-msgstr "ARGB nastavení"
+msgstr "Složky barvy"
+
+#: src/frontend/mame/ui/custui.cpp:911 src/frontend/mame/ui/custui.cpp:914
+msgctxt "color-channel"
+msgid "Alpha"
+msgstr "Průhlednost (A)"
 
 #: src/frontend/mame/ui/custui.cpp:919 src/frontend/mame/ui/custui.cpp:922
 msgctxt "color-channel"
-msgid "Alpha"
-msgstr "Průhlednost"
+msgid "Red"
+msgstr "Červená (R)"
 
 #: src/frontend/mame/ui/custui.cpp:927 src/frontend/mame/ui/custui.cpp:930
 msgctxt "color-channel"
-msgid "Red"
-msgstr "Červená"
+msgid "Green"
+msgstr "Zelená (G)"
 
 #: src/frontend/mame/ui/custui.cpp:935 src/frontend/mame/ui/custui.cpp:938
 msgctxt "color-channel"
-msgid "Green"
-msgstr "Zelená"
-
-#: src/frontend/mame/ui/custui.cpp:943 src/frontend/mame/ui/custui.cpp:946
-msgctxt "color-channel"
 msgid "Blue"
-msgstr "Modrá"
+msgstr "Modrá (B)"
 
-#: src/frontend/mame/ui/custui.cpp:949
+#: src/frontend/mame/ui/custui.cpp:941
 msgid "Choose from palette"
-msgstr "Výběr z palety"
+msgstr "Vybrat z palety"
 
-#: src/frontend/mame/ui/custui.cpp:996
+#: src/frontend/mame/ui/custui.cpp:988
 msgid "Color preview:"
-msgstr "Barevný náhled:"
+msgstr "Náhled barvy:"
 
-#: src/frontend/mame/ui/custui.cpp:1093
+#: src/frontend/mame/ui/custui.cpp:1085
 msgctxt "color-preset"
 msgid "White"
 msgstr "Bílá"
 
-#: src/frontend/mame/ui/custui.cpp:1094
+#: src/frontend/mame/ui/custui.cpp:1086
 msgctxt "color-preset"
 msgid "Silver"
 msgstr "Stříbrná"
 
-#: src/frontend/mame/ui/custui.cpp:1095
+#: src/frontend/mame/ui/custui.cpp:1087
 msgctxt "color-preset"
 msgid "Gray"
 msgstr "Šedá"
 
-#: src/frontend/mame/ui/custui.cpp:1096
+#: src/frontend/mame/ui/custui.cpp:1088
 msgctxt "color-preset"
 msgid "Black"
 msgstr "Černá"
 
-#: src/frontend/mame/ui/custui.cpp:1097
+#: src/frontend/mame/ui/custui.cpp:1089
 msgctxt "color-preset"
 msgid "Red"
 msgstr "Červená"
 
-#: src/frontend/mame/ui/custui.cpp:1098
+#: src/frontend/mame/ui/custui.cpp:1090
 msgctxt "color-preset"
 msgid "Orange"
 msgstr "Oranžová"
 
-#: src/frontend/mame/ui/custui.cpp:1099
+#: src/frontend/mame/ui/custui.cpp:1091
 msgctxt "color-preset"
 msgid "Yellow"
 msgstr "Žlutá"
 
-#: src/frontend/mame/ui/custui.cpp:1100
+#: src/frontend/mame/ui/custui.cpp:1092
 msgctxt "color-preset"
 msgid "Green"
 msgstr "Zelená"
 
-#: src/frontend/mame/ui/custui.cpp:1101
+#: src/frontend/mame/ui/custui.cpp:1093
 msgctxt "color-preset"
 msgid "Blue"
 msgstr "Modrá"
 
-#: src/frontend/mame/ui/custui.cpp:1102
+#: src/frontend/mame/ui/custui.cpp:1094
 msgctxt "color-preset"
 msgid "Violet"
 msgstr "Fialová"
@@ -2487,22 +2512,22 @@ msgstr ""
 #, c-format
 msgctxt "about-header"
 msgid "Revision: %1$s"
-msgstr ""
+msgstr "Revize: %1$s"
 
 #: src/frontend/mame/ui/analogipt.cpp:91
 #, c-format
 msgid "Press %s to show menu"
-msgstr ""
+msgstr "Pro zobrazení menu stiskněte %s"
 
 #: src/frontend/mame/ui/analogipt.cpp:369
 #, c-format
 msgid "%1$s Increment/Decrement Speed"
-msgstr ""
+msgstr "%1$s Zvýšit/snížit rychlost"
 
 #: src/frontend/mame/ui/analogipt.cpp:374
 #, c-format
 msgid "%1$s Auto-centering Speed"
-msgstr ""
+msgstr "%1$s Rychlost automatického centrování"
 
 #: src/frontend/mame/ui/analogipt.cpp:379
 #, c-format
@@ -2512,7 +2537,7 @@ msgstr ""
 #: src/frontend/mame/ui/analogipt.cpp:384
 #, c-format
 msgid "%1$s Sensitivity"
-msgstr ""
+msgstr "%1$s Citlivost"
 
 #: src/frontend/mame/ui/barcode.cpp:77
 msgid "New Barcode:"
@@ -2520,19 +2545,19 @@ msgstr "Nový čárový kód:"
 
 #: src/frontend/mame/ui/barcode.cpp:80
 msgid "Enter Code"
-msgstr "Vložit kód"
+msgstr "Vložte čárový kód"
 
 #: src/frontend/mame/ui/barcode.cpp:116
 msgid "Barcode length invalid!"
-msgstr "Špatná délka čárového kódu!"
+msgstr "Neplatná délka čárového kódu!"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Input (general)"
-msgstr "Vstup (vše)"
+msgstr "Vstup (obecný)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:123
-msgid "Input (this Machine)"
-msgstr "Vstup (toto zařízení)"
+msgid "Input (this machine)"
+msgstr "Vstup (pro toto zařízení)"
 
 #: src/frontend/mame/ui/mainmenu.cpp:126
 msgid "Analog Controls"
@@ -2548,7 +2573,7 @@ msgstr "Nastavení zařízení"
 
 #: src/frontend/mame/ui/mainmenu.cpp:132
 msgid "Bookkeeping Info"
-msgstr "Zapsané informace"
+msgstr "Statistické informace"
 
 #: src/frontend/mame/ui/mainmenu.cpp:134
 msgid "Machine Information"
@@ -2556,19 +2581,23 @@ msgstr "Informace o zařízení"
 
 #: src/frontend/mame/ui/mainmenu.cpp:137
 msgid "Warning Information"
-msgstr ""
+msgstr "Chybové hlášky"
 
 #: src/frontend/mame/ui/mainmenu.cpp:143
 msgid "Image Information"
-msgstr "Informace o programu"
+msgstr "Informace o obrazu"
 
 #: src/frontend/mame/ui/mainmenu.cpp:145
 msgid "File Manager"
-msgstr "Souborový manažer"
+msgstr "Správce souborů"
 
 #: src/frontend/mame/ui/mainmenu.cpp:152
 msgid "Tape Control"
 msgstr "Ovládání kazetového přehrávače"
+
+#: src/frontend/mame/ui/mainmenu.cpp:155
+msgid "Pseudo Terminals"
+msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:158
 msgid "BIOS Selection"
@@ -2592,67 +2621,67 @@ msgstr "Posuvné ovladače"
 
 #: src/frontend/mame/ui/mainmenu.cpp:177
 msgid "Crosshair Options"
-msgstr "Nastavení zameřovače"
+msgstr "Nastavení zaměřovače"
 
 #: src/frontend/mame/ui/mainmenu.cpp:180 plugins/cheat/init.lua:799
 msgid "Cheat"
-msgstr "Cheat"
+msgstr ""
 
 #: src/frontend/mame/ui/mainmenu.cpp:185
 msgid "Plugin Options"
-msgstr ""
+msgstr "Nastavení pluginů"
 
 #: src/frontend/mame/ui/mainmenu.cpp:188
 msgid "External DAT View"
-msgstr "Externí DAT zobrazení"
+msgstr "Zobrazení externího DAT"
 
 #: src/frontend/mame/ui/mainmenu.cpp:200
 #, c-format
-msgid "About %s"
-msgstr ""
+msgid "About %1$s"
+msgstr "O %1s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:212
 msgid "Select New Machine"
-msgstr "Vyber nové zařízení"
+msgstr "Vybrat jiné zařízení"
 
 #: src/frontend/mame/ui/mainmenu.cpp:213
 msgid "Return to Machine"
-msgstr "Zpět na zařízení"
+msgstr "Zpět na toto zařízení"
 
 #: src/frontend/mame/ui/selmenu.cpp:76
 msgctxt "selmenu-artwork"
 msgid "Snapshots"
-msgstr "Náhledy"
+msgstr "Snapshoty"
 
 #: src/frontend/mame/ui/selmenu.cpp:77
 msgctxt "selmenu-artwork"
 msgid "Cabinet"
-msgstr ""
+msgstr "Kabinet"
 
 #: src/frontend/mame/ui/selmenu.cpp:78
 msgctxt "selmenu-artwork"
 msgid "Control Panel"
-msgstr ""
+msgstr "Ovládací panel"
 
 #: src/frontend/mame/ui/selmenu.cpp:79
 msgctxt "selmenu-artwork"
 msgid "PCB"
-msgstr ""
+msgstr "Deska plošných spojů"
 
 #: src/frontend/mame/ui/selmenu.cpp:80
 msgctxt "selmenu-artwork"
 msgid "Flyer"
-msgstr ""
+msgstr "Leták"
 
 #: src/frontend/mame/ui/selmenu.cpp:81
 msgctxt "selmenu-artwork"
 msgid "Title Screen"
-msgstr ""
+msgstr "Úvodní obrazovka"
 
 #: src/frontend/mame/ui/selmenu.cpp:82
 msgctxt "selmenu-artwork"
 msgid "Ending"
-msgstr ""
+msgstr "Ukončení"
 
 #: src/frontend/mame/ui/selmenu.cpp:83
 msgctxt "selmenu-artwork"
@@ -2662,7 +2691,7 @@ msgstr "Náhled artworku"
 #: src/frontend/mame/ui/selmenu.cpp:84
 msgctxt "selmenu-artwork"
 msgid "Bosses"
-msgstr "Bossové"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:85
 msgctxt "selmenu-artwork"
@@ -2672,7 +2701,7 @@ msgstr ""
 #: src/frontend/mame/ui/selmenu.cpp:86
 msgctxt "selmenu-artwork"
 msgid "Versus"
-msgstr "Versus"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:87
 msgctxt "selmenu-artwork"
@@ -2682,7 +2711,7 @@ msgstr "Konec hry"
 #: src/frontend/mame/ui/selmenu.cpp:88
 msgctxt "selmenu-artwork"
 msgid "HowTo"
-msgstr "Jak na to"
+msgstr "Jak-na-to"
 
 #: src/frontend/mame/ui/selmenu.cpp:89
 msgctxt "selmenu-artwork"
@@ -2706,435 +2735,443 @@ msgstr "Obaly"
 
 #: src/frontend/mame/ui/selmenu.cpp:96
 msgid "Add or remove favorite"
-msgstr ""
+msgstr "Přidat nebo odstranit ze seznamu Oblíbené"
 
 #: src/frontend/mame/ui/selmenu.cpp:97
 msgid "Export displayed list to file"
-msgstr "Export zobrazeného seznamu do souboru"
+msgstr "Exportovat zobrazený seznam do souboru"
 
 #: src/frontend/mame/ui/selmenu.cpp:98
 msgid "Audit media"
-msgstr ""
+msgstr "Vykonat audit médií"
 
 #: src/frontend/mame/ui/selmenu.cpp:99
 msgid "Show DATs view"
-msgstr "Zobraz DAT pohled"
+msgstr "Zobrazit soubory DAT"
 
 #: src/frontend/mame/ui/selmenu.cpp:319
 msgid "Software part selection:"
-msgstr "Výběr části software:"
+msgstr "Výběr softvérové části:"
 
 #: src/frontend/mame/ui/selmenu.cpp:424
 msgid "BIOS selection:"
-msgstr ""
+msgstr "Výběr BIOSu:"
 
 #: src/frontend/mame/ui/selmenu.cpp:677 src/frontend/mame/ui/selmenu.cpp:708
 #, c-format
 msgid "%1$s, %2$s"
-msgstr ""
+msgstr "Rok: %1$s, výrobce: %2$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:681
 #, c-format
 msgid "Software is clone of: %1$s"
-msgstr "Software je klon: %1$s"
+msgstr "Softvér je klonem %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:683
 msgid "Software is parent"
-msgstr "Software je parent"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:688
 msgid "Supported: No"
-msgstr "Podpora: Ne"
+msgstr "Podporovaný: Ne"
 
 #: src/frontend/mame/ui/selmenu.cpp:693
 msgid "Supported: Partial"
-msgstr "Podpora: Částečně"
+msgstr "Podporovaný: Částečně"
 
 #: src/frontend/mame/ui/selmenu.cpp:698
 msgid "Supported: Yes"
-msgstr "Podpora: Ano"
+msgstr "Podporovaný: Ano"
 
 #: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Driver is parent"
-msgstr "Driver je parent"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
 #, c-format
 msgid "Driver is clone of: %1$s"
-msgstr "Driver je klon: %1$s"
+msgstr "Ovladač je klonem %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:754
 #, c-format
 msgid "%1$s %2$s"
-msgstr "%1$s %2$s"
+msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2235
+#: src/frontend/mame/ui/selmenu.cpp:2244
 msgid "Images"
 msgstr "Obrázky"
 
-#: src/frontend/mame/ui/selmenu.cpp:2236
+#: src/frontend/mame/ui/selmenu.cpp:2245
 msgid "Infos"
 msgstr "Informace"
 
-#: src/frontend/mame/ui/selmenu.cpp:2551
+#: src/frontend/mame/ui/selmenu.cpp:2560
 msgid ""
 "Required ROM/disk images for the selected system are missing or incorrect. "
 "Please acquire the correct files or select a different system.\n"
 "\n"
 msgstr ""
+"Vyžadované ROM, resp. obrazy disků pro toto zařízení buď není k dispozici "
+"nebo jsou nesprávné. Dodejte správné soubory nebo vyberte jiné zařízení.\n"
+"\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2567
+#: src/frontend/mame/ui/selmenu.cpp:2576
 msgid ""
 "Required ROM/disk images for the selected software are missing or incorrect. "
 "Please acquire the correct files or select a different software item.\n"
 "\n"
 msgstr ""
+"Vyžadované ROM, resp. obrazy disků pro tento softvér buď není k dispozici "
+"nebo jsou nesprávné. Dodejte správné soubory nebo vyberte jiný softvér.\n"
+"\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2583
+#: src/frontend/mame/ui/selmenu.cpp:2592
 msgid "incorrect checksum"
-msgstr ""
+msgstr "nesprávný součet"
 
-#: src/frontend/mame/ui/selmenu.cpp:2586
+#: src/frontend/mame/ui/selmenu.cpp:2595
 msgid "incorrect length"
-msgstr ""
+msgstr "nesprávná délka"
 
-#: src/frontend/mame/ui/selmenu.cpp:2589
+#: src/frontend/mame/ui/selmenu.cpp:2598
 msgid "not found"
-msgstr ""
+msgstr "nenalezen"
 
-#: src/frontend/mame/ui/selmenu.cpp:2600
+#: src/frontend/mame/ui/selmenu.cpp:2609
 #, c-format
 msgid "%1$s (%2$s) - %3$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2602
+#: src/frontend/mame/ui/selmenu.cpp:2611
 #, c-format
 msgid "%1$s - %2$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2606
+#: src/frontend/mame/ui/selmenu.cpp:2615
 msgid "Press any key to continue."
+msgstr "Pokračujte stisknutím libovolné klávesy."
+
+#: src/frontend/mame/ui/selmenu.cpp:2744
+msgid "General Info"
 msgstr ""
 
-#: src/frontend/mame/ui/selmenu.cpp:2735
-msgid "General Info"
-msgstr "Základní informace"
-
-#: src/frontend/mame/ui/selmenu.cpp:2887
+#: src/frontend/mame/ui/selmenu.cpp:2896
 #, c-format
 msgid "Romset\t%1$s\n"
-msgstr "Romset\t%1$s\n"
+msgstr "Název ROM souboru\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2888
+#: src/frontend/mame/ui/selmenu.cpp:2897
 #, c-format
 msgid "Year\t%1$s\n"
-msgstr "Rok\t%1$s\n"
+msgstr "Rok výroby\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2889
+#: src/frontend/mame/ui/selmenu.cpp:2898
 #, c-format
 msgid "Manufacturer\t%1$s\n"
 msgstr "Výrobce\t%1$s\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2896
+#: src/frontend/mame/ui/selmenu.cpp:2905
 #, c-format
 msgid "Driver is Clone of\t%1$s\n"
-msgstr "Driver je Klon\t%1$s\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2901
-msgid "Driver is Parent\t\n"
-msgstr "Driver je Parent\t\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2905
-msgid "Analog Controls\tYes\n"
-msgstr ""
-
-#: src/frontend/mame/ui/selmenu.cpp:2907
-msgid "Keyboard Inputs\tYes\n"
-msgstr ""
+msgstr "Ovladač je klonem\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2910
-msgid "Overall\tNOT WORKING\n"
-msgstr "Celkově\tNEFUNGUJE\n"
-
-#: src/frontend/mame/ui/selmenu.cpp:2912
-msgid "Overall\tUnemulated Protection\n"
-msgstr "Celkově\tNeemulovaná ochrana\n"
+msgid "Driver is Parent\t\n"
+msgstr ""
 
 #: src/frontend/mame/ui/selmenu.cpp:2914
-msgid "Overall\tWorking\n"
-msgstr "Celkově\tFunguje\n"
+msgid "Analog Controls\tYes\n"
+msgstr "Analogové ovládání\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2917
-msgid "Graphics\tUnimplemented\n"
-msgstr ""
+#: src/frontend/mame/ui/selmenu.cpp:2916
+msgid "Keyboard Inputs\tYes\n"
+msgstr "Klávesnicový vstup\tano\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2919
-msgid "Graphics\tWrong Colors\n"
-msgstr ""
+msgid "Overall\tNOT WORKING\n"
+msgstr "Emulace\tNEFUNKČNÍ\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2921
-msgid "Graphics\tImperfect Colors\n"
-msgstr "Grafika\tNedokonalé barvy\n"
+msgid "Overall\tUnemulated Protection\n"
+msgstr "Emulace\tneemulovaná ochrana\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2923
-msgid "Graphics\tImperfect\n"
-msgstr "Grafika\tNedokonalá\n"
+msgid "Overall\tWorking\n"
+msgstr "Emulace\tfunkční\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2925
-msgid "Graphics\tOK\n"
-msgstr "Grafika\tOK\n"
+#: src/frontend/mame/ui/selmenu.cpp:2926
+msgid "Graphics\tUnimplemented\n"
+msgstr "Grafika\tneimplementována\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2928
-msgid "Sound\tNone\n"
-msgstr ""
+msgid "Graphics\tWrong Colors\n"
+msgstr "Grafika\tnesprávné barvy\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2930
-msgid "Sound\tUnimplemented\n"
-msgstr "Zvuk\tNeimplementován\n"
+msgid "Graphics\tImperfect Colors\n"
+msgstr "Grafika\tnevěrohodné barvy\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2932
-msgid "Sound\tImperfect\n"
-msgstr "Zvuk\tNedokonalý\n"
+msgid "Graphics\tImperfect\n"
+msgstr "Grafika\tnedostatečná\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2934
-msgid "Sound\tOK\n"
-msgstr "Zvuk\tOK\n"
+msgid "Graphics\tOK\n"
+msgstr "Grafika\tfunkční\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2937
-msgid "Capture\tUnimplemented\n"
-msgstr ""
+msgid "Sound\tNone\n"
+msgstr "Zvuk\tžádný\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2939
+msgid "Sound\tUnimplemented\n"
+msgstr "Zvuk\tneimplementován\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2941
+msgid "Sound\tImperfect\n"
+msgstr "Zvuk\tnedostatečný\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2943
+msgid "Sound\tOK\n"
+msgstr "Zvuk\tfunkční\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2946
+msgid "Capture\tUnimplemented\n"
+msgstr "Capture\tneimplementováno\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:2948
 msgid "Capture\tImperfect\n"
-msgstr ""
+msgstr "Capture\tnedostatečné\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2942
+#: src/frontend/mame/ui/selmenu.cpp:2951
 msgid "Camera\tUnimplemented\n"
-msgstr ""
+msgstr "Kamera\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2944
+#: src/frontend/mame/ui/selmenu.cpp:2953
 msgid "Camera\tImperfect\n"
-msgstr ""
+msgstr "Kamera\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2947
+#: src/frontend/mame/ui/selmenu.cpp:2956
 msgid "Microphone\tUnimplemented\n"
-msgstr ""
+msgstr "Mikrofon\tneimplementován\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2949
+#: src/frontend/mame/ui/selmenu.cpp:2958
 msgid "Microphone\tImperfect\n"
-msgstr ""
+msgstr "Mikrofon\tnedostatečný\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2952
+#: src/frontend/mame/ui/selmenu.cpp:2961
 msgid "Controls\tUnimplemented\n"
-msgstr ""
+msgstr "Ovládání\tneimplementováno\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2954
+#: src/frontend/mame/ui/selmenu.cpp:2963
 msgid "Controls\tImperfect\n"
-msgstr ""
+msgstr "Ovládání\tnedostatečné\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2957
+#: src/frontend/mame/ui/selmenu.cpp:2966
 msgid "Keyboard\tUnimplemented\n"
-msgstr ""
+msgstr "Klávesnice\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2959
+#: src/frontend/mame/ui/selmenu.cpp:2968
 msgid "Keyboard\tImperfect\n"
-msgstr ""
+msgstr "Klávesnice\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2962
+#: src/frontend/mame/ui/selmenu.cpp:2971
 msgid "Mouse\tUnimplemented\n"
-msgstr ""
+msgstr "Myš\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2964
+#: src/frontend/mame/ui/selmenu.cpp:2973
 msgid "Mouse\tImperfect\n"
-msgstr ""
+msgstr "Myš\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2967
+#: src/frontend/mame/ui/selmenu.cpp:2976
 msgid "Media\tUnimplemented\n"
-msgstr ""
+msgstr "Média\tneimplementovány\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2969
+#: src/frontend/mame/ui/selmenu.cpp:2978
 msgid "Media\tImperfect\n"
-msgstr ""
+msgstr "Média\tnedostatečné\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2972
+#: src/frontend/mame/ui/selmenu.cpp:2981
 msgid "Disk\tUnimplemented\n"
-msgstr ""
+msgstr "Disk\tneimplementován\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2974
+#: src/frontend/mame/ui/selmenu.cpp:2983
 msgid "Disk\tImperfect\n"
-msgstr ""
+msgstr "Disk\tnedostatečný\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2977
+#: src/frontend/mame/ui/selmenu.cpp:2986
 msgid "Printer\tUnimplemented\n"
-msgstr ""
+msgstr "Tiskárna\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2979
+#: src/frontend/mame/ui/selmenu.cpp:2988
 msgid "Printer\tImperfect\n"
-msgstr ""
+msgstr "Tiskárna\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2982
+#: src/frontend/mame/ui/selmenu.cpp:2991
 msgid "Mag. Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Magnetická páska\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2984
+#: src/frontend/mame/ui/selmenu.cpp:2993
 msgid "Mag. Tape\tImperfect\n"
-msgstr ""
+msgstr "Magnetická páska\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2987
+#: src/frontend/mame/ui/selmenu.cpp:2996
 msgid "Punch Tape\tUnimplemented\n"
-msgstr ""
+msgstr "Děrný štítek\tneimplementován\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2989
+#: src/frontend/mame/ui/selmenu.cpp:2998
 msgid "Punch Tape\tImperfect\n"
-msgstr ""
+msgstr "Děrný štítek\tnedostatečný\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2992
+#: src/frontend/mame/ui/selmenu.cpp:3001
 msgid "Mag. Drum\tUnimplemented\n"
-msgstr ""
+msgstr "Magnetický buben\tneimplementován\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2994
+#: src/frontend/mame/ui/selmenu.cpp:3003
 msgid "Mag. Drum\tImperfect\n"
-msgstr ""
+msgstr "Magnetický buben\tnedostatečný\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2997
+#: src/frontend/mame/ui/selmenu.cpp:3006
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr ""
+msgstr "(EP)ROM\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:2999
+#: src/frontend/mame/ui/selmenu.cpp:3008
 msgid "(EP)ROM\tImperfect\n"
-msgstr ""
+msgstr "(EP)ROM\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3002
+#: src/frontend/mame/ui/selmenu.cpp:3011
 msgid "Communications\tUnimplemented\n"
-msgstr ""
+msgstr "Komunikační zařízení\tneimplementováno\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3004
+#: src/frontend/mame/ui/selmenu.cpp:3013
 msgid "Communications\tImperfect\n"
-msgstr ""
+msgstr "Komunikační zařízení\tnedostatečné\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3007
+#: src/frontend/mame/ui/selmenu.cpp:3016
 msgid "LAN\tUnimplemented\n"
-msgstr ""
+msgstr "LAN\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3009
+#: src/frontend/mame/ui/selmenu.cpp:3018
 msgid "LAN\tImperfect\n"
-msgstr ""
+msgstr "LAN\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3012
+#: src/frontend/mame/ui/selmenu.cpp:3021
 msgid "WAN\tUnimplemented\n"
-msgstr ""
+msgstr "WAN\tneimplementována\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3014
+#: src/frontend/mame/ui/selmenu.cpp:3023
 msgid "WAN\tImperfect\n"
-msgstr ""
+msgstr "WAN\tnedostatečná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3017
+#: src/frontend/mame/ui/selmenu.cpp:3026
 msgid "Timing\tUnimplemented\n"
-msgstr ""
+msgstr "Časování\tneimplementováno\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3019
+#: src/frontend/mame/ui/selmenu.cpp:3028
 msgid "Timing\tImperfect\n"
-msgstr ""
+msgstr "Časování\tnedostatečné\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3021
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mechanical Machine\tYes\n"
-msgstr ""
+msgstr "Mechanické zařízení\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3021
+#: src/frontend/mame/ui/selmenu.cpp:3030
 msgid "Mechanical Machine\tNo\n"
-msgstr ""
+msgstr "Mechanické zařízení\tne\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:3031
 msgid "Requires Artwork\tYes\n"
-msgstr ""
+msgstr "Vyžaduje artwork\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3022
+#: src/frontend/mame/ui/selmenu.cpp:3031
 msgid "Requires Artwork\tNo\n"
-msgstr ""
+msgstr "Vyžaduje artwork\tne\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3023
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires Clickable Artwork\tYes\n"
-msgstr ""
+msgstr "Vyžaduje klikatelný artwork\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3023
+#: src/frontend/mame/ui/selmenu.cpp:3032
 msgid "Requires Clickable Artwork\tNo\n"
-msgstr ""
+msgstr "Vyžaduje klikatelný artwork\tne\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3025
+#: src/frontend/mame/ui/selmenu.cpp:3034
 msgid "Support Cocktail\tNo\n"
-msgstr ""
+msgstr "Podporuje režim Cocktail\tne\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3026
+#: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Driver is BIOS\tYes\n"
-msgstr ""
+msgstr "Ovladač je BIOSem\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3026
+#: src/frontend/mame/ui/selmenu.cpp:3035
 msgid "Driver is BIOS\tNo\n"
-msgstr ""
+msgstr "Ovladač je BIOSem\tne\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3027
+#: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Save\tYes\n"
-msgstr ""
+msgstr "Ukládání stavu do souboru\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3027
+#: src/frontend/mame/ui/selmenu.cpp:3036
 msgid "Support Save\tNo\n"
-msgstr ""
+msgstr "Ukládání stavu do souboru\tne\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3028
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Screen Orientation\tVertical\n"
-msgstr "Orientace obrazovky\tVertikální\n"
+msgstr "Orientace obrazovky\tsvislá\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3028
+#: src/frontend/mame/ui/selmenu.cpp:3037
 msgid "Screen Orientation\tHorizontal\n"
-msgstr "Orientace obrazovky\tHorizontální\n"
+msgstr "Orientace obrazovky\tvodorovná\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "Requires CHD\tYes\n"
-msgstr ""
+msgstr "Vyžaduje CHD\tano\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3038
+#: src/frontend/mame/ui/selmenu.cpp:3047
 msgid "Requires CHD\tNo\n"
-msgstr ""
-
-#: src/frontend/mame/ui/selmenu.cpp:3051
-msgid "ROM Audit Result\tOK\n"
-msgstr ""
-
-#: src/frontend/mame/ui/selmenu.cpp:3053
-msgid "ROM Audit Result\tBAD\n"
-msgstr ""
-
-#: src/frontend/mame/ui/selmenu.cpp:3056
-msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
-
-#: src/frontend/mame/ui/selmenu.cpp:3058
-msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Vyžaduje CHD\tne\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3060
+msgid "Media Audit Result\tOK\n"
+msgstr "Výsledek auditu médií\tplatná\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3062
+msgid "Media Audit Result\tBAD\n"
+msgstr "Výsledek auditu médií\tNEPLATNÁ\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3065
+msgid "Samples Audit Result\tNone Needed\n"
+msgstr "Výsledek auditu samplů\tnejsou vyžadovány\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3067
+msgid "Samples Audit Result\tOK\n"
+msgstr "Výsledek auditu samplů\tplatné\n"
+
+#: src/frontend/mame/ui/selmenu.cpp:3069
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Výsledek auditu samplů\tNEPLATNÉ\n"
 
-#: src/frontend/mame/ui/selmenu.cpp:3064
+#: src/frontend/mame/ui/selmenu.cpp:3073
 msgid ""
-"ROM Audit \tDisabled\n"
-"Samples Audit \tDisabled\n"
+"Media Audit\tDisabled\n"
+"Samples Audit\tDisabled\n"
 msgstr ""
+"Audit médií\tvypnutý\n"
+"Audit samplů\tvypnutý\n"
 
-#: src/frontend/mame/ui/sndmenu.cpp:150
+#: src/frontend/mame/ui/sndmenu.cpp:146
 msgid "Sound"
 msgstr "Zvuk"
 
-#: src/frontend/mame/ui/sndmenu.cpp:151
+#: src/frontend/mame/ui/sndmenu.cpp:147
 msgid "Compressor"
-msgstr ""
+msgstr "Komprese"
 
-#: src/frontend/mame/ui/sndmenu.cpp:152
+#: src/frontend/mame/ui/sndmenu.cpp:148
 msgid "Sample Rate"
 msgstr "Vzorkovací frekvence"
 
-#: src/frontend/mame/ui/sndmenu.cpp:153
+#: src/frontend/mame/ui/sndmenu.cpp:149
 msgid "Use External Samples"
 msgstr "Použít externí samply"
 
@@ -3148,6 +3185,12 @@ msgid ""
 "\n"
 "The selected option enables the following items:\n"
 msgstr ""
+"[Toto nastavení je vestavěné ve spuštěném systému]\n"
+"\n"
+"Nastavení: %1$s\n"
+"Zařízení: %2$s\n"
+"\n"
+"Vybrané nastavení povoluje nasledující položky:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:59
 #, c-format
@@ -3159,6 +3202,12 @@ msgid ""
 "\n"
 "If you select this option, the following items will be enabled:\n"
 msgstr ""
+"[Toto nastavení NENÍ vestavěné ve spuštěném systému]\n"
+"\n"
+"Nastavení: %1$s\n"
+"Zařízení: %2$s\n"
+"\n"
+"Když toto nastavení zvolíte, nasledující položky budou povoleny:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:68
 msgid "* CPU:\n"
@@ -3171,513 +3220,685 @@ msgstr ""
 #: src/frontend/mame/ui/devopt.cpp:119
 #, c-format
 msgid "  Screen '%1$s': Vector\n"
-msgstr ""
+msgstr "  Obrazovka '%1$s': Vektorová\n"
 
-#: src/frontend/mame/ui/devopt.cpp:132
+#: src/frontend/mame/ui/devopt.cpp:135
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (V) %4$s Hz\n"
-msgstr ""
+msgstr "  Obrazovka '%1$s': %2$d × %3$d (V) %4$s Hz\n"
 
-#: src/frontend/mame/ui/devopt.cpp:133
+#: src/frontend/mame/ui/devopt.cpp:136
 #, c-format
 msgid "  Screen '%1$s': %2$d × %3$d (H) %4$s Hz\n"
-msgstr ""
+msgstr "  Obrazovka '%1$s': %2$d × %3$d (H) %4$s Hz\n"
 
-#: src/frontend/mame/ui/devopt.cpp:147
+#: src/frontend/mame/ui/devopt.cpp:150
 msgid "* Sound:\n"
-msgstr ""
+msgstr "* Zvuk:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:211
+#: src/frontend/mame/ui/devopt.cpp:214
 #, c-format
 msgid ""
 "* BIOS settings:\n"
 "  %1$d options    [default: %2$s]\n"
 msgstr ""
+"* Nastavení BIOSu:\n"
+"  %1$d volby    [původní: %2$s]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:255 src/frontend/mame/ui/devopt.cpp:271
-#: src/frontend/mame/ui/devopt.cpp:332
+#: src/frontend/mame/ui/devopt.cpp:258 src/frontend/mame/ui/devopt.cpp:274
+#: src/frontend/mame/ui/devopt.cpp:335
 #, c-format
 msgid "  %1$s    [default: %2$s]\n"
-msgstr ""
+msgstr "  %1$s    [původní: %2$s]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:260 src/frontend/mame/ui/devopt.cpp:276
+#: src/frontend/mame/ui/devopt.cpp:263 src/frontend/mame/ui/devopt.cpp:279
 #, c-format
 msgid "  %1$s\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:282
+#: src/frontend/mame/ui/devopt.cpp:285
 msgid "* DIP switch settings:\n"
-msgstr ""
+msgstr "* Nastavení DIP přepínače:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:287
+#: src/frontend/mame/ui/devopt.cpp:290
 msgid "* Configuration settings:\n"
-msgstr ""
+msgstr "* Nastavení konfigurace:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:291
+#: src/frontend/mame/ui/devopt.cpp:294
 msgid "* Input device(s):\n"
-msgstr ""
+msgstr "* Vstupní zařízení:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:293
+#: src/frontend/mame/ui/devopt.cpp:296
 #, c-format
 msgid "  User inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Uživatelské vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:295
+#: src/frontend/mame/ui/devopt.cpp:298
 #, c-format
 msgid "  Mahjong inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Mahjong vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:297
+#: src/frontend/mame/ui/devopt.cpp:300
 #, c-format
 msgid "  Hanafuda inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Hanafuda vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:299
+#: src/frontend/mame/ui/devopt.cpp:302
 #, c-format
 msgid "  Gambling inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Gambling vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:301
+#: src/frontend/mame/ui/devopt.cpp:304
 #, c-format
 msgid "  Analog inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Analogové vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:303
+#: src/frontend/mame/ui/devopt.cpp:306
 #, c-format
 msgid "  Adjuster inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Dolaďovací vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:305
+#: src/frontend/mame/ui/devopt.cpp:308
 #, c-format
 msgid "  Keypad inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Keypad vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:307
+#: src/frontend/mame/ui/devopt.cpp:310
 #, c-format
 msgid "  Keyboard inputs    [%1$d inputs]\n"
-msgstr ""
+msgstr "  Klávesnicové vstupy    [%1$d vstupů]\n"
 
-#: src/frontend/mame/ui/devopt.cpp:312
+#: src/frontend/mame/ui/devopt.cpp:315
 msgid "* Media Options:\n"
-msgstr ""
+msgstr "* Nastavení médií:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:317
+#: src/frontend/mame/ui/devopt.cpp:320
 #, c-format
 msgid "  %1$s    [tag: %2$s]\n"
 msgstr ""
 
-#: src/frontend/mame/ui/devopt.cpp:327
+#: src/frontend/mame/ui/devopt.cpp:330
 msgid "* Slot Options:\n"
-msgstr ""
+msgstr "* Nastavení slotů:\n"
 
-#: src/frontend/mame/ui/devopt.cpp:341
+#: src/frontend/mame/ui/devopt.cpp:344
 msgid "[None]\n"
-msgstr ""
+msgstr "[Žádné]\n"
 
-#: src/emu/render.cpp:1847
+#: src/emu/render.cpp:1796
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Standard (%2$u:%3$u)"
-msgstr ""
+msgstr "Obrazovka č. %1$u - standard (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1873
+#: src/emu/render.cpp:1822
 #, c-format
 msgctxt "view-name"
 msgid "Screen %1$u Pixel Aspect (%2$u:%3$u)"
-msgstr ""
+msgstr "Obrazovka č. %1$u - Pixel Aspect (%2$u:%3$u)"
 
-#: src/emu/render.cpp:1895 src/emu/render.cpp:2030
+#: src/emu/render.cpp:1844 src/emu/render.cpp:1979
 msgctxt "view-name"
 msgid "Cocktail"
-msgstr ""
+msgstr "Režim Cocktail"
 
-#: src/emu/render.cpp:2015
+#: src/emu/render.cpp:1964
 msgctxt "view-name"
 msgid "Left-to-Right"
-msgstr ""
+msgstr "Zleva doprava"
 
-#: src/emu/render.cpp:2016
+#: src/emu/render.cpp:1965
 msgctxt "view-name"
 msgid "Left-to-Right (Gapless)"
-msgstr ""
+msgstr "Zleva doprava (gapless)"
 
-#: src/emu/render.cpp:2017
+#: src/emu/render.cpp:1966
 msgctxt "view-name"
 msgid "Top-to-Bottom"
-msgstr ""
+msgstr "Shora dolů"
 
-#: src/emu/render.cpp:2018
+#: src/emu/render.cpp:1967
 msgctxt "view-name"
 msgid "Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "Shora dolů (gapless)"
 
-#: src/emu/render.cpp:2069
+#: src/emu/render.cpp:2018
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom"
-msgstr ""
+msgstr "%1$u×%2$u Zleva doprava, shora dolů"
 
-#: src/emu/render.cpp:2078
+#: src/emu/render.cpp:2027
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"
-msgstr ""
+msgstr "%1$u×%2$u Zleva doprava, shora dolů (gapless)"
 
-#: src/emu/render.cpp:2087
+#: src/emu/render.cpp:2036
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right"
-msgstr ""
+msgstr "%1$u×%2$u Shora dolů, zleva doprava"
 
-#: src/emu/render.cpp:2096
+#: src/emu/render.cpp:2045
 #, c-format
 msgctxt "view-name"
 msgid "%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"
-msgstr ""
-
-#: src/emu/inpttype.ipp:22
-msgctxt "input-name"
-msgid "P1 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:23
-msgctxt "input-name"
-msgid "P1 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:24
-msgctxt "input-name"
-msgid "P1 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:25
-msgctxt "input-name"
-msgid "P1 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:26
-msgctxt "input-name"
-msgid "P1 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:27
-msgctxt "input-name"
-msgid "P1 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:28
-msgctxt "input-name"
-msgid "P1 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:29
-msgctxt "input-name"
-msgid "P1 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:30
-msgctxt "input-name"
-msgid "P1 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:31
-msgctxt "input-name"
-msgid "P1 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:32
-msgctxt "input-name"
-msgid "P1 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:33
-msgctxt "input-name"
-msgid "P1 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:34
-msgctxt "input-name"
-msgid "P1 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:35
-msgctxt "input-name"
-msgid "P1 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:36
-msgctxt "input-name"
-msgid "P1 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:37
-msgctxt "input-name"
-msgid "P1 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:38
-msgctxt "input-name"
-msgid "P1 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:39
-msgctxt "input-name"
-msgid "P1 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:40
-msgctxt "input-name"
-msgid "P1 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:41
+msgstr "%1$u×%2$u Shora dolů, zleva doprava (gapless)"
+
+#: src/emu/ioport.cpp:332
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 8"
-msgstr ""
+msgid "P%1$u"
+msgstr "Hráč %1$u"
+
+#: src/emu/ioport.cpp:1924
+msgctxt "input-name"
+msgid "???"
+msgstr ""
 
-#: src/emu/inpttype.ipp:42
+#: src/emu/inpttype.ipp:22 src/emu/inpttype.ipp:140 src/emu/inpttype.ipp:221
+#: src/emu/inpttype.ipp:255 src/emu/inpttype.ipp:289 src/emu/inpttype.ipp:323
+#: src/emu/inpttype.ipp:357 src/emu/inpttype.ipp:391 src/emu/inpttype.ipp:425
+#: src/emu/inpttype.ipp:459
+#, c-format
+msgctxt "input-name"
+msgid "%p Up"
+msgstr "%p Nahoru"
+
+#: src/emu/inpttype.ipp:23 src/emu/inpttype.ipp:141 src/emu/inpttype.ipp:222
+#: src/emu/inpttype.ipp:256 src/emu/inpttype.ipp:290 src/emu/inpttype.ipp:324
+#: src/emu/inpttype.ipp:358 src/emu/inpttype.ipp:392 src/emu/inpttype.ipp:426
+#: src/emu/inpttype.ipp:460
+#, c-format
+msgctxt "input-name"
+msgid "%p Down"
+msgstr "%p Dolů"
+
+#: src/emu/inpttype.ipp:24 src/emu/inpttype.ipp:142 src/emu/inpttype.ipp:223
+#: src/emu/inpttype.ipp:257 src/emu/inpttype.ipp:291 src/emu/inpttype.ipp:325
+#: src/emu/inpttype.ipp:359 src/emu/inpttype.ipp:393 src/emu/inpttype.ipp:427
+#: src/emu/inpttype.ipp:461
+#, c-format
+msgctxt "input-name"
+msgid "%p Left"
+msgstr "%p Vlevo"
+
+#: src/emu/inpttype.ipp:25 src/emu/inpttype.ipp:143 src/emu/inpttype.ipp:224
+#: src/emu/inpttype.ipp:258 src/emu/inpttype.ipp:292 src/emu/inpttype.ipp:326
+#: src/emu/inpttype.ipp:360 src/emu/inpttype.ipp:394 src/emu/inpttype.ipp:428
+#: src/emu/inpttype.ipp:462
+#, c-format
+msgctxt "input-name"
+msgid "%p Right"
+msgstr "%p Vpravo"
+
+#: src/emu/inpttype.ipp:26 src/emu/inpttype.ipp:144 src/emu/inpttype.ipp:225
+#: src/emu/inpttype.ipp:259 src/emu/inpttype.ipp:293 src/emu/inpttype.ipp:327
+#: src/emu/inpttype.ipp:361 src/emu/inpttype.ipp:395 src/emu/inpttype.ipp:429
+#: src/emu/inpttype.ipp:463
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Up"
+msgstr "%p Pravá páka/Nahoru"
+
+#: src/emu/inpttype.ipp:27 src/emu/inpttype.ipp:145 src/emu/inpttype.ipp:226
+#: src/emu/inpttype.ipp:260 src/emu/inpttype.ipp:294 src/emu/inpttype.ipp:328
+#: src/emu/inpttype.ipp:362 src/emu/inpttype.ipp:396 src/emu/inpttype.ipp:430
+#: src/emu/inpttype.ipp:464
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Down"
+msgstr "%p Pravá páka/Dolů"
+
+#: src/emu/inpttype.ipp:28 src/emu/inpttype.ipp:146 src/emu/inpttype.ipp:227
+#: src/emu/inpttype.ipp:261 src/emu/inpttype.ipp:295 src/emu/inpttype.ipp:329
+#: src/emu/inpttype.ipp:363 src/emu/inpttype.ipp:397 src/emu/inpttype.ipp:431
+#: src/emu/inpttype.ipp:465
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Left"
+msgstr "%p Pravá páka/Vlevo"
+
+#: src/emu/inpttype.ipp:29 src/emu/inpttype.ipp:147 src/emu/inpttype.ipp:228
+#: src/emu/inpttype.ipp:262 src/emu/inpttype.ipp:296 src/emu/inpttype.ipp:330
+#: src/emu/inpttype.ipp:364 src/emu/inpttype.ipp:398 src/emu/inpttype.ipp:432
+#: src/emu/inpttype.ipp:466
+#, c-format
+msgctxt "input-name"
+msgid "%p Right Stick/Right"
+msgstr "%p Pravá páka/Vpravo"
+
+#: src/emu/inpttype.ipp:30 src/emu/inpttype.ipp:148 src/emu/inpttype.ipp:229
+#: src/emu/inpttype.ipp:263 src/emu/inpttype.ipp:297 src/emu/inpttype.ipp:331
+#: src/emu/inpttype.ipp:365 src/emu/inpttype.ipp:399 src/emu/inpttype.ipp:433
+#: src/emu/inpttype.ipp:467
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Up"
+msgstr "%p Levá páka/Nahoru"
+
+#: src/emu/inpttype.ipp:31 src/emu/inpttype.ipp:149 src/emu/inpttype.ipp:230
+#: src/emu/inpttype.ipp:264 src/emu/inpttype.ipp:298 src/emu/inpttype.ipp:332
+#: src/emu/inpttype.ipp:366 src/emu/inpttype.ipp:400 src/emu/inpttype.ipp:434
+#: src/emu/inpttype.ipp:468
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Down"
+msgstr "%p Levá páka/Dolů"
+
+#: src/emu/inpttype.ipp:32 src/emu/inpttype.ipp:150 src/emu/inpttype.ipp:231
+#: src/emu/inpttype.ipp:265 src/emu/inpttype.ipp:299 src/emu/inpttype.ipp:333
+#: src/emu/inpttype.ipp:367 src/emu/inpttype.ipp:401 src/emu/inpttype.ipp:435
+#: src/emu/inpttype.ipp:469
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Left"
+msgstr "%p Levá páka/Vlevo"
+
+#: src/emu/inpttype.ipp:33 src/emu/inpttype.ipp:151 src/emu/inpttype.ipp:232
+#: src/emu/inpttype.ipp:266 src/emu/inpttype.ipp:300 src/emu/inpttype.ipp:334
+#: src/emu/inpttype.ipp:368 src/emu/inpttype.ipp:402 src/emu/inpttype.ipp:436
+#: src/emu/inpttype.ipp:470
+#, c-format
+msgctxt "input-name"
+msgid "%p Left Stick/Right"
+msgstr "%p Levá páka/Vpravo"
+
+#: src/emu/inpttype.ipp:34 src/emu/inpttype.ipp:152 src/emu/inpttype.ipp:233
+#: src/emu/inpttype.ipp:267 src/emu/inpttype.ipp:301 src/emu/inpttype.ipp:335
+#: src/emu/inpttype.ipp:369 src/emu/inpttype.ipp:403 src/emu/inpttype.ipp:437
+#: src/emu/inpttype.ipp:471
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 1"
+msgstr "%p Tlačítko 1"
+
+#: src/emu/inpttype.ipp:35 src/emu/inpttype.ipp:153 src/emu/inpttype.ipp:234
+#: src/emu/inpttype.ipp:268 src/emu/inpttype.ipp:302 src/emu/inpttype.ipp:336
+#: src/emu/inpttype.ipp:370 src/emu/inpttype.ipp:404 src/emu/inpttype.ipp:438
+#: src/emu/inpttype.ipp:472
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 2"
+msgstr "%p Tlačítko 2"
+
+#: src/emu/inpttype.ipp:36 src/emu/inpttype.ipp:154 src/emu/inpttype.ipp:235
+#: src/emu/inpttype.ipp:269 src/emu/inpttype.ipp:303 src/emu/inpttype.ipp:337
+#: src/emu/inpttype.ipp:371 src/emu/inpttype.ipp:405 src/emu/inpttype.ipp:439
+#: src/emu/inpttype.ipp:473
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 3"
+msgstr "%p Tlačítko 3"
+
+#: src/emu/inpttype.ipp:37 src/emu/inpttype.ipp:155 src/emu/inpttype.ipp:236
+#: src/emu/inpttype.ipp:270 src/emu/inpttype.ipp:304 src/emu/inpttype.ipp:338
+#: src/emu/inpttype.ipp:372 src/emu/inpttype.ipp:406 src/emu/inpttype.ipp:440
+#: src/emu/inpttype.ipp:474
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 4"
+msgstr "%p Tlačítko 4"
+
+#: src/emu/inpttype.ipp:38 src/emu/inpttype.ipp:156 src/emu/inpttype.ipp:237
+#: src/emu/inpttype.ipp:271 src/emu/inpttype.ipp:305 src/emu/inpttype.ipp:339
+#: src/emu/inpttype.ipp:373 src/emu/inpttype.ipp:407 src/emu/inpttype.ipp:441
+#: src/emu/inpttype.ipp:475
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 5"
+msgstr "%p Tlačítko 5"
+
+#: src/emu/inpttype.ipp:39 src/emu/inpttype.ipp:157 src/emu/inpttype.ipp:238
+#: src/emu/inpttype.ipp:272 src/emu/inpttype.ipp:306 src/emu/inpttype.ipp:340
+#: src/emu/inpttype.ipp:374 src/emu/inpttype.ipp:408 src/emu/inpttype.ipp:442
+#: src/emu/inpttype.ipp:476
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 6"
+msgstr "%p Tlačítko 6"
+
+#: src/emu/inpttype.ipp:40 src/emu/inpttype.ipp:158 src/emu/inpttype.ipp:239
+#: src/emu/inpttype.ipp:273 src/emu/inpttype.ipp:307 src/emu/inpttype.ipp:341
+#: src/emu/inpttype.ipp:375 src/emu/inpttype.ipp:409 src/emu/inpttype.ipp:443
+#: src/emu/inpttype.ipp:477
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 7"
+msgstr "%p Tlačítko 7"
+
+#: src/emu/inpttype.ipp:41 src/emu/inpttype.ipp:159 src/emu/inpttype.ipp:240
+#: src/emu/inpttype.ipp:274 src/emu/inpttype.ipp:308 src/emu/inpttype.ipp:342
+#: src/emu/inpttype.ipp:376 src/emu/inpttype.ipp:410 src/emu/inpttype.ipp:444
+#: src/emu/inpttype.ipp:478
+#, c-format
+msgctxt "input-name"
+msgid "%p Button 8"
+msgstr "%p Tlačítko 8"
+
+#: src/emu/inpttype.ipp:42 src/emu/inpttype.ipp:160 src/emu/inpttype.ipp:241
+#: src/emu/inpttype.ipp:275 src/emu/inpttype.ipp:309 src/emu/inpttype.ipp:343
+#: src/emu/inpttype.ipp:377 src/emu/inpttype.ipp:411 src/emu/inpttype.ipp:445
+#: src/emu/inpttype.ipp:479
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 9"
-msgstr ""
+msgid "%p Button 9"
+msgstr "%p Tlačítko 9"
 
-#: src/emu/inpttype.ipp:43
+#: src/emu/inpttype.ipp:43 src/emu/inpttype.ipp:161 src/emu/inpttype.ipp:242
+#: src/emu/inpttype.ipp:276 src/emu/inpttype.ipp:310 src/emu/inpttype.ipp:344
+#: src/emu/inpttype.ipp:378 src/emu/inpttype.ipp:412 src/emu/inpttype.ipp:446
+#: src/emu/inpttype.ipp:480
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 10"
-msgstr ""
+msgid "%p Button 10"
+msgstr "%p Tlačítko 10"
 
-#: src/emu/inpttype.ipp:44
+#: src/emu/inpttype.ipp:44 src/emu/inpttype.ipp:162 src/emu/inpttype.ipp:243
+#: src/emu/inpttype.ipp:277 src/emu/inpttype.ipp:311 src/emu/inpttype.ipp:345
+#: src/emu/inpttype.ipp:379 src/emu/inpttype.ipp:413 src/emu/inpttype.ipp:447
+#: src/emu/inpttype.ipp:481
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 11"
-msgstr ""
+msgid "%p Button 11"
+msgstr "%p Tlačítko 11"
 
-#: src/emu/inpttype.ipp:45
+#: src/emu/inpttype.ipp:45 src/emu/inpttype.ipp:163 src/emu/inpttype.ipp:244
+#: src/emu/inpttype.ipp:278 src/emu/inpttype.ipp:312 src/emu/inpttype.ipp:346
+#: src/emu/inpttype.ipp:380 src/emu/inpttype.ipp:414 src/emu/inpttype.ipp:448
+#: src/emu/inpttype.ipp:482
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 12"
-msgstr ""
+msgid "%p Button 12"
+msgstr "%p Tlačítko 12"
 
-#: src/emu/inpttype.ipp:46
+#: src/emu/inpttype.ipp:46 src/emu/inpttype.ipp:164 src/emu/inpttype.ipp:245
+#: src/emu/inpttype.ipp:279 src/emu/inpttype.ipp:313 src/emu/inpttype.ipp:347
+#: src/emu/inpttype.ipp:381 src/emu/inpttype.ipp:415 src/emu/inpttype.ipp:449
+#: src/emu/inpttype.ipp:483
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 13"
-msgstr ""
+msgid "%p Button 13"
+msgstr "%p Tlačítko 13"
 
-#: src/emu/inpttype.ipp:47
+#: src/emu/inpttype.ipp:47 src/emu/inpttype.ipp:165 src/emu/inpttype.ipp:246
+#: src/emu/inpttype.ipp:280 src/emu/inpttype.ipp:314 src/emu/inpttype.ipp:348
+#: src/emu/inpttype.ipp:382 src/emu/inpttype.ipp:416 src/emu/inpttype.ipp:450
+#: src/emu/inpttype.ipp:484
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 14"
-msgstr ""
+msgid "%p Button 14"
+msgstr "%p Tlačítko 14"
 
-#: src/emu/inpttype.ipp:48
+#: src/emu/inpttype.ipp:48 src/emu/inpttype.ipp:166 src/emu/inpttype.ipp:247
+#: src/emu/inpttype.ipp:281 src/emu/inpttype.ipp:315 src/emu/inpttype.ipp:349
+#: src/emu/inpttype.ipp:383 src/emu/inpttype.ipp:417 src/emu/inpttype.ipp:451
+#: src/emu/inpttype.ipp:485
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 15"
-msgstr ""
+msgid "%p Button 15"
+msgstr "%p Tlačítko 15"
 
-#: src/emu/inpttype.ipp:49
+#: src/emu/inpttype.ipp:49 src/emu/inpttype.ipp:167 src/emu/inpttype.ipp:248
+#: src/emu/inpttype.ipp:282 src/emu/inpttype.ipp:316 src/emu/inpttype.ipp:350
+#: src/emu/inpttype.ipp:384 src/emu/inpttype.ipp:418 src/emu/inpttype.ipp:452
+#: src/emu/inpttype.ipp:486
+#, c-format
 msgctxt "input-name"
-msgid "P1 Button 16"
-msgstr ""
+msgid "%p Button 16"
+msgstr "%p Tlačítko 16"
 
-#: src/emu/inpttype.ipp:50
+#: src/emu/inpttype.ipp:50 src/emu/inpttype.ipp:168 src/emu/inpttype.ipp:249
+#: src/emu/inpttype.ipp:283 src/emu/inpttype.ipp:317 src/emu/inpttype.ipp:351
+#: src/emu/inpttype.ipp:385 src/emu/inpttype.ipp:419 src/emu/inpttype.ipp:453
+#: src/emu/inpttype.ipp:487
+#, c-format
 msgctxt "input-name"
-msgid "P1 Start"
+msgid "%p Start"
 msgstr ""
 
-#: src/emu/inpttype.ipp:51
+#: src/emu/inpttype.ipp:51 src/emu/inpttype.ipp:169 src/emu/inpttype.ipp:250
+#: src/emu/inpttype.ipp:284 src/emu/inpttype.ipp:318 src/emu/inpttype.ipp:352
+#: src/emu/inpttype.ipp:386 src/emu/inpttype.ipp:420 src/emu/inpttype.ipp:454
+#: src/emu/inpttype.ipp:488
+#, c-format
 msgctxt "input-name"
-msgid "P1 Select"
+msgid "%p Select"
 msgstr ""
 
-#: src/emu/inpttype.ipp:56
+#: src/emu/inpttype.ipp:56 src/emu/inpttype.ipp:174
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong A"
+msgid "%p Mahjong A"
 msgstr ""
 
-#: src/emu/inpttype.ipp:57
+#: src/emu/inpttype.ipp:57 src/emu/inpttype.ipp:175
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong B"
+msgid "%p Mahjong B"
 msgstr ""
 
-#: src/emu/inpttype.ipp:58
+#: src/emu/inpttype.ipp:58 src/emu/inpttype.ipp:176
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong C"
+msgid "%p Mahjong C"
 msgstr ""
 
-#: src/emu/inpttype.ipp:59
+#: src/emu/inpttype.ipp:59 src/emu/inpttype.ipp:177
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong D"
+msgid "%p Mahjong D"
 msgstr ""
 
-#: src/emu/inpttype.ipp:60
+#: src/emu/inpttype.ipp:60 src/emu/inpttype.ipp:178
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong E"
+msgid "%p Mahjong E"
 msgstr ""
 
-#: src/emu/inpttype.ipp:61
+#: src/emu/inpttype.ipp:61 src/emu/inpttype.ipp:179
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong F"
+msgid "%p Mahjong F"
 msgstr ""
 
-#: src/emu/inpttype.ipp:62
+#: src/emu/inpttype.ipp:62 src/emu/inpttype.ipp:180
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong G"
+msgid "%p Mahjong G"
 msgstr ""
 
-#: src/emu/inpttype.ipp:63
+#: src/emu/inpttype.ipp:63 src/emu/inpttype.ipp:181
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong H"
+msgid "%p Mahjong H"
 msgstr ""
 
-#: src/emu/inpttype.ipp:64
+#: src/emu/inpttype.ipp:64 src/emu/inpttype.ipp:182
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong I"
+msgid "%p Mahjong I"
 msgstr ""
 
-#: src/emu/inpttype.ipp:65
+#: src/emu/inpttype.ipp:65 src/emu/inpttype.ipp:183
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong J"
+msgid "%p Mahjong J"
 msgstr ""
 
-#: src/emu/inpttype.ipp:66
+#: src/emu/inpttype.ipp:66 src/emu/inpttype.ipp:184
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong K"
+msgid "%p Mahjong K"
 msgstr ""
 
-#: src/emu/inpttype.ipp:67
+#: src/emu/inpttype.ipp:67 src/emu/inpttype.ipp:185
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong L"
+msgid "%p Mahjong L"
 msgstr ""
 
-#: src/emu/inpttype.ipp:68
+#: src/emu/inpttype.ipp:68 src/emu/inpttype.ipp:186
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong M"
+msgid "%p Mahjong M"
 msgstr ""
 
-#: src/emu/inpttype.ipp:69
+#: src/emu/inpttype.ipp:69 src/emu/inpttype.ipp:187
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong N"
+msgid "%p Mahjong N"
 msgstr ""
 
-#: src/emu/inpttype.ipp:70
+#: src/emu/inpttype.ipp:70 src/emu/inpttype.ipp:188
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong O"
+msgid "%p Mahjong O"
 msgstr ""
 
-#: src/emu/inpttype.ipp:71
+#: src/emu/inpttype.ipp:71 src/emu/inpttype.ipp:189
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong P"
+msgid "%p Mahjong P"
 msgstr ""
 
-#: src/emu/inpttype.ipp:72
+#: src/emu/inpttype.ipp:72 src/emu/inpttype.ipp:190
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Q"
+msgid "%p Mahjong Q"
 msgstr ""
 
-#: src/emu/inpttype.ipp:73
+#: src/emu/inpttype.ipp:73 src/emu/inpttype.ipp:191
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Kan"
+msgid "%p Mahjong Kan"
 msgstr ""
 
-#: src/emu/inpttype.ipp:74
+#: src/emu/inpttype.ipp:74 src/emu/inpttype.ipp:192
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Pon"
+msgid "%p Mahjong Pon"
 msgstr ""
 
-#: src/emu/inpttype.ipp:75
+#: src/emu/inpttype.ipp:75 src/emu/inpttype.ipp:193
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Chi"
+msgid "%p Mahjong Chi"
 msgstr ""
 
-#: src/emu/inpttype.ipp:76
+#: src/emu/inpttype.ipp:76 src/emu/inpttype.ipp:194
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Reach"
+msgid "%p Mahjong Reach"
 msgstr ""
 
-#: src/emu/inpttype.ipp:77
+#: src/emu/inpttype.ipp:77 src/emu/inpttype.ipp:195
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Ron"
+msgid "%p Mahjong Ron"
 msgstr ""
 
-#: src/emu/inpttype.ipp:78
+#: src/emu/inpttype.ipp:78 src/emu/inpttype.ipp:200
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Flip Flop"
+msgid "%p Mahjong Flip Flop"
 msgstr ""
 
-#: src/emu/inpttype.ipp:79
+#: src/emu/inpttype.ipp:79 src/emu/inpttype.ipp:196
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Bet"
+msgid "%p Mahjong Bet"
 msgstr ""
 
-#: src/emu/inpttype.ipp:80
+#: src/emu/inpttype.ipp:80 src/emu/inpttype.ipp:198
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Take Score"
+msgid "%p Mahjong Take Score"
 msgstr ""
 
-#: src/emu/inpttype.ipp:81
+#: src/emu/inpttype.ipp:81 src/emu/inpttype.ipp:199
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Double Up"
+msgid "%p Mahjong Double Up"
 msgstr ""
 
-#: src/emu/inpttype.ipp:82
+#: src/emu/inpttype.ipp:82 src/emu/inpttype.ipp:201
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Big"
+msgid "%p Mahjong Big"
 msgstr ""
 
-#: src/emu/inpttype.ipp:83
+#: src/emu/inpttype.ipp:83 src/emu/inpttype.ipp:202
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Small"
+msgid "%p Mahjong Small"
 msgstr ""
 
-#: src/emu/inpttype.ipp:84
+#: src/emu/inpttype.ipp:84 src/emu/inpttype.ipp:197
+#, c-format
 msgctxt "input-name"
-msgid "P1 Mahjong Last Chance"
+msgid "%p Mahjong Last Chance"
 msgstr ""
 
-#: src/emu/inpttype.ipp:89
+#: src/emu/inpttype.ipp:89 src/emu/inpttype.ipp:207
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda A/1"
+msgid "%p Hanafuda A/1"
 msgstr ""
 
-#: src/emu/inpttype.ipp:90
+#: src/emu/inpttype.ipp:90 src/emu/inpttype.ipp:208
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda B/2"
+msgid "%p Hanafuda B/2"
 msgstr ""
 
-#: src/emu/inpttype.ipp:91
+#: src/emu/inpttype.ipp:91 src/emu/inpttype.ipp:209
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda C/3"
+msgid "%p Hanafuda C/3"
 msgstr ""
 
-#: src/emu/inpttype.ipp:92
+#: src/emu/inpttype.ipp:92 src/emu/inpttype.ipp:210
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda D/4"
+msgid "%p Hanafuda D/4"
 msgstr ""
 
-#: src/emu/inpttype.ipp:93
+#: src/emu/inpttype.ipp:93 src/emu/inpttype.ipp:211
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda E/5"
+msgid "%p Hanafuda E/5"
 msgstr ""
 
-#: src/emu/inpttype.ipp:94
+#: src/emu/inpttype.ipp:94 src/emu/inpttype.ipp:212
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda F/6"
+msgid "%p Hanafuda F/6"
 msgstr ""
 
-#: src/emu/inpttype.ipp:95
+#: src/emu/inpttype.ipp:95 src/emu/inpttype.ipp:213
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda G/7"
+msgid "%p Hanafuda G/7"
 msgstr ""
 
-#: src/emu/inpttype.ipp:96
+#: src/emu/inpttype.ipp:96 src/emu/inpttype.ipp:214
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda H/8"
+msgid "%p Hanafuda H/8"
 msgstr ""
 
-#: src/emu/inpttype.ipp:97
+#: src/emu/inpttype.ipp:97 src/emu/inpttype.ipp:215
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda Yes"
+msgid "%p Hanafuda Yes"
 msgstr ""
 
-#: src/emu/inpttype.ipp:98
+#: src/emu/inpttype.ipp:98 src/emu/inpttype.ipp:216
+#, c-format
 msgctxt "input-name"
-msgid "P1 Hanafuda No"
+msgid "%p Hanafuda No"
 msgstr ""
 
 #: src/emu/inpttype.ipp:103
@@ -3805,1655 +4026,110 @@ msgctxt "input-name"
 msgid "Stop All Reels"
 msgstr ""
 
-#: src/emu/inpttype.ipp:140
-msgctxt "input-name"
-msgid "P2 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:141
-msgctxt "input-name"
-msgid "P2 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:142
-msgctxt "input-name"
-msgid "P2 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:143
-msgctxt "input-name"
-msgid "P2 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:144
-msgctxt "input-name"
-msgid "P2 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:145
-msgctxt "input-name"
-msgid "P2 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:146
-msgctxt "input-name"
-msgid "P2 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:147
-msgctxt "input-name"
-msgid "P2 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:148
-msgctxt "input-name"
-msgid "P2 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:149
-msgctxt "input-name"
-msgid "P2 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:150
-msgctxt "input-name"
-msgid "P2 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:151
-msgctxt "input-name"
-msgid "P2 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:152
-msgctxt "input-name"
-msgid "P2 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:153
-msgctxt "input-name"
-msgid "P2 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:154
-msgctxt "input-name"
-msgid "P2 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:155
-msgctxt "input-name"
-msgid "P2 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:156
-msgctxt "input-name"
-msgid "P2 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:157
-msgctxt "input-name"
-msgid "P2 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:158
-msgctxt "input-name"
-msgid "P2 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:159
-msgctxt "input-name"
-msgid "P2 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:160
-msgctxt "input-name"
-msgid "P2 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:161
-msgctxt "input-name"
-msgid "P2 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:162
-msgctxt "input-name"
-msgid "P2 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:163
-msgctxt "input-name"
-msgid "P2 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:164
-msgctxt "input-name"
-msgid "P2 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:165
-msgctxt "input-name"
-msgid "P2 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:166
-msgctxt "input-name"
-msgid "P2 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:167
-msgctxt "input-name"
-msgid "P2 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:168
-msgctxt "input-name"
-msgid "P2 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:169
-msgctxt "input-name"
-msgid "P2 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:174
-msgctxt "input-name"
-msgid "P2 Mahjong A"
-msgstr ""
-
-#: src/emu/inpttype.ipp:175
-msgctxt "input-name"
-msgid "P2 Mahjong B"
-msgstr ""
-
-#: src/emu/inpttype.ipp:176
-msgctxt "input-name"
-msgid "P2 Mahjong C"
-msgstr ""
-
-#: src/emu/inpttype.ipp:177
-msgctxt "input-name"
-msgid "P2 Mahjong D"
-msgstr ""
-
-#: src/emu/inpttype.ipp:178
-msgctxt "input-name"
-msgid "P2 Mahjong E"
-msgstr ""
-
-#: src/emu/inpttype.ipp:179
-msgctxt "input-name"
-msgid "P2 Mahjong F"
-msgstr ""
-
-#: src/emu/inpttype.ipp:180
-msgctxt "input-name"
-msgid "P2 Mahjong G"
-msgstr ""
-
-#: src/emu/inpttype.ipp:181
-msgctxt "input-name"
-msgid "P2 Mahjong H"
-msgstr ""
-
-#: src/emu/inpttype.ipp:182
-msgctxt "input-name"
-msgid "P2 Mahjong I"
-msgstr ""
-
-#: src/emu/inpttype.ipp:183
-msgctxt "input-name"
-msgid "P2 Mahjong J"
-msgstr ""
-
-#: src/emu/inpttype.ipp:184
-msgctxt "input-name"
-msgid "P2 Mahjong K"
-msgstr ""
-
-#: src/emu/inpttype.ipp:185
-msgctxt "input-name"
-msgid "P2 Mahjong L"
-msgstr ""
-
-#: src/emu/inpttype.ipp:186
-msgctxt "input-name"
-msgid "P2 Mahjong M"
-msgstr ""
-
-#: src/emu/inpttype.ipp:187
-msgctxt "input-name"
-msgid "P2 Mahjong N"
-msgstr ""
-
-#: src/emu/inpttype.ipp:188
-msgctxt "input-name"
-msgid "P2 Mahjong O"
-msgstr ""
-
-#: src/emu/inpttype.ipp:189
-msgctxt "input-name"
-msgid "P2 Mahjong P"
-msgstr ""
-
-#: src/emu/inpttype.ipp:190
-msgctxt "input-name"
-msgid "P2 Mahjong Q"
-msgstr ""
-
-#: src/emu/inpttype.ipp:191
-msgctxt "input-name"
-msgid "P2 Mahjong Kan"
-msgstr ""
-
-#: src/emu/inpttype.ipp:192
-msgctxt "input-name"
-msgid "P2 Mahjong Pon"
-msgstr ""
-
-#: src/emu/inpttype.ipp:193
-msgctxt "input-name"
-msgid "P2 Mahjong Chi"
-msgstr ""
-
-#: src/emu/inpttype.ipp:194
-msgctxt "input-name"
-msgid "P2 Mahjong Reach"
-msgstr ""
-
-#: src/emu/inpttype.ipp:195
-msgctxt "input-name"
-msgid "P2 Mahjong Ron"
-msgstr ""
-
-#: src/emu/inpttype.ipp:196
-msgctxt "input-name"
-msgid "P2 Mahjong Bet"
-msgstr ""
-
-#: src/emu/inpttype.ipp:197
-msgctxt "input-name"
-msgid "P2 Mahjong Last Chance"
-msgstr ""
-
-#: src/emu/inpttype.ipp:198
-msgctxt "input-name"
-msgid "P2 Mahjong Take Score"
-msgstr ""
-
-#: src/emu/inpttype.ipp:199
-msgctxt "input-name"
-msgid "P2 Mahjong Double Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:200
-msgctxt "input-name"
-msgid "P2 Mahjong Flip Flop"
-msgstr ""
-
-#: src/emu/inpttype.ipp:201
-msgctxt "input-name"
-msgid "P2 Mahjong Big"
-msgstr ""
-
-#: src/emu/inpttype.ipp:202
-msgctxt "input-name"
-msgid "P2 Mahjong Small"
-msgstr ""
-
-#: src/emu/inpttype.ipp:207
-msgctxt "input-name"
-msgid "P2 Hanafuda A/1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:208
-msgctxt "input-name"
-msgid "P2 Hanafuda B/2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:209
-msgctxt "input-name"
-msgid "P2 Hanafuda C/3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:210
-msgctxt "input-name"
-msgid "P2 Hanafuda D/4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:211
-msgctxt "input-name"
-msgid "P2 Hanafuda E/5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:212
-msgctxt "input-name"
-msgid "P2 Hanafuda F/6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:213
-msgctxt "input-name"
-msgid "P2 Hanafuda G/7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:214
-msgctxt "input-name"
-msgid "P2 Hanafuda H/8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:215
-msgctxt "input-name"
-msgid "P2 Hanafuda Yes"
-msgstr ""
-
-#: src/emu/inpttype.ipp:216
-msgctxt "input-name"
-msgid "P2 Hanafuda No"
-msgstr ""
-
-#: src/emu/inpttype.ipp:221
-msgctxt "input-name"
-msgid "P3 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:222
-msgctxt "input-name"
-msgid "P3 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:223
-msgctxt "input-name"
-msgid "P3 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:224
-msgctxt "input-name"
-msgid "P3 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:225
-msgctxt "input-name"
-msgid "P3 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:226
-msgctxt "input-name"
-msgid "P3 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:227
-msgctxt "input-name"
-msgid "P3 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:228
-msgctxt "input-name"
-msgid "P3 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:229
-msgctxt "input-name"
-msgid "P3 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:230
-msgctxt "input-name"
-msgid "P3 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:231
-msgctxt "input-name"
-msgid "P3 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:232
-msgctxt "input-name"
-msgid "P3 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:233
-msgctxt "input-name"
-msgid "P3 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:234
-msgctxt "input-name"
-msgid "P3 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:235
-msgctxt "input-name"
-msgid "P3 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:236
-msgctxt "input-name"
-msgid "P3 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:237
-msgctxt "input-name"
-msgid "P3 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:238
-msgctxt "input-name"
-msgid "P3 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:239
-msgctxt "input-name"
-msgid "P3 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:240
-msgctxt "input-name"
-msgid "P3 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:241
-msgctxt "input-name"
-msgid "P3 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:242
-msgctxt "input-name"
-msgid "P3 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:243
-msgctxt "input-name"
-msgid "P3 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:244
-msgctxt "input-name"
-msgid "P3 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:245
-msgctxt "input-name"
-msgid "P3 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:246
-msgctxt "input-name"
-msgid "P3 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:247
-msgctxt "input-name"
-msgid "P3 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:248
-msgctxt "input-name"
-msgid "P3 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:249
-msgctxt "input-name"
-msgid "P3 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:250
-msgctxt "input-name"
-msgid "P3 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:255
-msgctxt "input-name"
-msgid "P4 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:256
-msgctxt "input-name"
-msgid "P4 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:257
-msgctxt "input-name"
-msgid "P4 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:258
-msgctxt "input-name"
-msgid "P4 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:259
-msgctxt "input-name"
-msgid "P4 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:260
-msgctxt "input-name"
-msgid "P4 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:261
-msgctxt "input-name"
-msgid "P4 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:262
-msgctxt "input-name"
-msgid "P4 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:263
-msgctxt "input-name"
-msgid "P4 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:264
-msgctxt "input-name"
-msgid "P4 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:265
-msgctxt "input-name"
-msgid "P4 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:266
-msgctxt "input-name"
-msgid "P4 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:267
-msgctxt "input-name"
-msgid "P4 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:268
-msgctxt "input-name"
-msgid "P4 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:269
-msgctxt "input-name"
-msgid "P4 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:270
-msgctxt "input-name"
-msgid "P4 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:271
-msgctxt "input-name"
-msgid "P4 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:272
-msgctxt "input-name"
-msgid "P4 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:273
-msgctxt "input-name"
-msgid "P4 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:274
-msgctxt "input-name"
-msgid "P4 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:275
-msgctxt "input-name"
-msgid "P4 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:276
-msgctxt "input-name"
-msgid "P4 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:277
-msgctxt "input-name"
-msgid "P4 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:278
-msgctxt "input-name"
-msgid "P4 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:279
-msgctxt "input-name"
-msgid "P4 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:280
-msgctxt "input-name"
-msgid "P4 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:281
-msgctxt "input-name"
-msgid "P4 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:282
-msgctxt "input-name"
-msgid "P4 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:283
-msgctxt "input-name"
-msgid "P4 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:284
-msgctxt "input-name"
-msgid "P4 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:289
-msgctxt "input-name"
-msgid "P5 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:290
-msgctxt "input-name"
-msgid "P5 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:291
-msgctxt "input-name"
-msgid "P5 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:292
-msgctxt "input-name"
-msgid "P5 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:293
-msgctxt "input-name"
-msgid "P5 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:294
-msgctxt "input-name"
-msgid "P5 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:295
-msgctxt "input-name"
-msgid "P5 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:296
-msgctxt "input-name"
-msgid "P5 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:297
-msgctxt "input-name"
-msgid "P5 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:298
-msgctxt "input-name"
-msgid "P5 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:299
-msgctxt "input-name"
-msgid "P5 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:300
-msgctxt "input-name"
-msgid "P5 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:301
-msgctxt "input-name"
-msgid "P5 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:302
-msgctxt "input-name"
-msgid "P5 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:303
-msgctxt "input-name"
-msgid "P5 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:304
-msgctxt "input-name"
-msgid "P5 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:305
-msgctxt "input-name"
-msgid "P5 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:306
-msgctxt "input-name"
-msgid "P5 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:307
-msgctxt "input-name"
-msgid "P5 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:308
-msgctxt "input-name"
-msgid "P5 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:309
-msgctxt "input-name"
-msgid "P5 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:310
-msgctxt "input-name"
-msgid "P5 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:311
-msgctxt "input-name"
-msgid "P5 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:312
-msgctxt "input-name"
-msgid "P5 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:313
-msgctxt "input-name"
-msgid "P5 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:314
-msgctxt "input-name"
-msgid "P5 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:315
-msgctxt "input-name"
-msgid "P5 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:316
-msgctxt "input-name"
-msgid "P5 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:317
-msgctxt "input-name"
-msgid "P5 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:318
-msgctxt "input-name"
-msgid "P5 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:323
-msgctxt "input-name"
-msgid "P6 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:324
-msgctxt "input-name"
-msgid "P6 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:325
-msgctxt "input-name"
-msgid "P6 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:326
-msgctxt "input-name"
-msgid "P6 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:327
-msgctxt "input-name"
-msgid "P6 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:328
-msgctxt "input-name"
-msgid "P6 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:329
-msgctxt "input-name"
-msgid "P6 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:330
-msgctxt "input-name"
-msgid "P6 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:331
-msgctxt "input-name"
-msgid "P6 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:332
-msgctxt "input-name"
-msgid "P6 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:333
-msgctxt "input-name"
-msgid "P6 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:334
-msgctxt "input-name"
-msgid "P6 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:335
-msgctxt "input-name"
-msgid "P6 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:336
-msgctxt "input-name"
-msgid "P6 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:337
-msgctxt "input-name"
-msgid "P6 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:338
-msgctxt "input-name"
-msgid "P6 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:339
-msgctxt "input-name"
-msgid "P6 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:340
-msgctxt "input-name"
-msgid "P6 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:341
-msgctxt "input-name"
-msgid "P6 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:342
-msgctxt "input-name"
-msgid "P6 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:343
-msgctxt "input-name"
-msgid "P6 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:344
-msgctxt "input-name"
-msgid "P6 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:345
-msgctxt "input-name"
-msgid "P6 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:346
-msgctxt "input-name"
-msgid "P6 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:347
-msgctxt "input-name"
-msgid "P6 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:348
-msgctxt "input-name"
-msgid "P6 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:349
-msgctxt "input-name"
-msgid "P6 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:350
-msgctxt "input-name"
-msgid "P6 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:351
-msgctxt "input-name"
-msgid "P6 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:352
-msgctxt "input-name"
-msgid "P6 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:357
-msgctxt "input-name"
-msgid "P7 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:358
-msgctxt "input-name"
-msgid "P7 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:359
-msgctxt "input-name"
-msgid "P7 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:360
-msgctxt "input-name"
-msgid "P7 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:361
-msgctxt "input-name"
-msgid "P7 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:362
-msgctxt "input-name"
-msgid "P7 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:363
-msgctxt "input-name"
-msgid "P7 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:364
-msgctxt "input-name"
-msgid "P7 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:365
-msgctxt "input-name"
-msgid "P7 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:366
-msgctxt "input-name"
-msgid "P7 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:367
-msgctxt "input-name"
-msgid "P7 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:368
-msgctxt "input-name"
-msgid "P7 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:369
-msgctxt "input-name"
-msgid "P7 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:370
-msgctxt "input-name"
-msgid "P7 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:371
-msgctxt "input-name"
-msgid "P7 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:372
-msgctxt "input-name"
-msgid "P7 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:373
-msgctxt "input-name"
-msgid "P7 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:374
-msgctxt "input-name"
-msgid "P7 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:375
-msgctxt "input-name"
-msgid "P7 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:376
-msgctxt "input-name"
-msgid "P7 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:377
-msgctxt "input-name"
-msgid "P7 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:378
-msgctxt "input-name"
-msgid "P7 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:379
-msgctxt "input-name"
-msgid "P7 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:380
-msgctxt "input-name"
-msgid "P7 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:381
-msgctxt "input-name"
-msgid "P7 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:382
-msgctxt "input-name"
-msgid "P7 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:383
-msgctxt "input-name"
-msgid "P7 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:384
-msgctxt "input-name"
-msgid "P7 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:385
-msgctxt "input-name"
-msgid "P7 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:386
-msgctxt "input-name"
-msgid "P7 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:391
-msgctxt "input-name"
-msgid "P8 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:392
-msgctxt "input-name"
-msgid "P8 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:393
-msgctxt "input-name"
-msgid "P8 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:394
-msgctxt "input-name"
-msgid "P8 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:395
-msgctxt "input-name"
-msgid "P8 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:396
-msgctxt "input-name"
-msgid "P8 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:397
-msgctxt "input-name"
-msgid "P8 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:398
-msgctxt "input-name"
-msgid "P8 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:399
-msgctxt "input-name"
-msgid "P8 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:400
-msgctxt "input-name"
-msgid "P8 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:401
-msgctxt "input-name"
-msgid "P8 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:402
-msgctxt "input-name"
-msgid "P8 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:403
-msgctxt "input-name"
-msgid "P8 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:404
-msgctxt "input-name"
-msgid "P8 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:405
-msgctxt "input-name"
-msgid "P8 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:406
-msgctxt "input-name"
-msgid "P8 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:407
-msgctxt "input-name"
-msgid "P8 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:408
-msgctxt "input-name"
-msgid "P8 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:409
-msgctxt "input-name"
-msgid "P8 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:410
-msgctxt "input-name"
-msgid "P8 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:411
-msgctxt "input-name"
-msgid "P8 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:412
-msgctxt "input-name"
-msgid "P8 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:413
-msgctxt "input-name"
-msgid "P8 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:414
-msgctxt "input-name"
-msgid "P8 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:415
-msgctxt "input-name"
-msgid "P8 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:416
-msgctxt "input-name"
-msgid "P8 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:417
-msgctxt "input-name"
-msgid "P8 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:418
-msgctxt "input-name"
-msgid "P8 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:419
-msgctxt "input-name"
-msgid "P8 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:420
-msgctxt "input-name"
-msgid "P8 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:425
-msgctxt "input-name"
-msgid "P9 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:426
-msgctxt "input-name"
-msgid "P9 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:427
-msgctxt "input-name"
-msgid "P9 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:428
-msgctxt "input-name"
-msgid "P9 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:429
-msgctxt "input-name"
-msgid "P9 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:430
-msgctxt "input-name"
-msgid "P9 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:431
-msgctxt "input-name"
-msgid "P9 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:432
-msgctxt "input-name"
-msgid "P9 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:433
-msgctxt "input-name"
-msgid "P9 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:434
-msgctxt "input-name"
-msgid "P9 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:435
-msgctxt "input-name"
-msgid "P9 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:436
-msgctxt "input-name"
-msgid "P9 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:437
-msgctxt "input-name"
-msgid "P9 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:438
-msgctxt "input-name"
-msgid "P9 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:439
-msgctxt "input-name"
-msgid "P9 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:440
-msgctxt "input-name"
-msgid "P9 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:441
-msgctxt "input-name"
-msgid "P9 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:442
-msgctxt "input-name"
-msgid "P9 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:443
-msgctxt "input-name"
-msgid "P9 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:444
-msgctxt "input-name"
-msgid "P9 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:445
-msgctxt "input-name"
-msgid "P9 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:446
-msgctxt "input-name"
-msgid "P9 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:447
-msgctxt "input-name"
-msgid "P9 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:448
-msgctxt "input-name"
-msgid "P9 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:449
-msgctxt "input-name"
-msgid "P9 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:450
-msgctxt "input-name"
-msgid "P9 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:451
-msgctxt "input-name"
-msgid "P9 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:452
-msgctxt "input-name"
-msgid "P9 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:453
-msgctxt "input-name"
-msgid "P9 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:454
-msgctxt "input-name"
-msgid "P9 Select"
-msgstr ""
-
-#: src/emu/inpttype.ipp:459
-msgctxt "input-name"
-msgid "P10 Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:460
-msgctxt "input-name"
-msgid "P10 Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:461
-msgctxt "input-name"
-msgid "P10 Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:462
-msgctxt "input-name"
-msgid "P10 Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:463
-msgctxt "input-name"
-msgid "P10 Right Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:464
-msgctxt "input-name"
-msgid "P10 Right Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:465
-msgctxt "input-name"
-msgid "P10 Right Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:466
-msgctxt "input-name"
-msgid "P10 Right Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:467
-msgctxt "input-name"
-msgid "P10 Left Stick/Up"
-msgstr ""
-
-#: src/emu/inpttype.ipp:468
-msgctxt "input-name"
-msgid "P10 Left Stick/Down"
-msgstr ""
-
-#: src/emu/inpttype.ipp:469
-msgctxt "input-name"
-msgid "P10 Left Stick/Left"
-msgstr ""
-
-#: src/emu/inpttype.ipp:470
-msgctxt "input-name"
-msgid "P10 Left Stick/Right"
-msgstr ""
-
-#: src/emu/inpttype.ipp:471
-msgctxt "input-name"
-msgid "P10 Button 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:472
-msgctxt "input-name"
-msgid "P10 Button 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:473
-msgctxt "input-name"
-msgid "P10 Button 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:474
-msgctxt "input-name"
-msgid "P10 Button 4"
-msgstr ""
-
-#: src/emu/inpttype.ipp:475
-msgctxt "input-name"
-msgid "P10 Button 5"
-msgstr ""
-
-#: src/emu/inpttype.ipp:476
-msgctxt "input-name"
-msgid "P10 Button 6"
-msgstr ""
-
-#: src/emu/inpttype.ipp:477
-msgctxt "input-name"
-msgid "P10 Button 7"
-msgstr ""
-
-#: src/emu/inpttype.ipp:478
-msgctxt "input-name"
-msgid "P10 Button 8"
-msgstr ""
-
-#: src/emu/inpttype.ipp:479
-msgctxt "input-name"
-msgid "P10 Button 9"
-msgstr ""
-
-#: src/emu/inpttype.ipp:480
-msgctxt "input-name"
-msgid "P10 Button 10"
-msgstr ""
-
-#: src/emu/inpttype.ipp:481
-msgctxt "input-name"
-msgid "P10 Button 11"
-msgstr ""
-
-#: src/emu/inpttype.ipp:482
-msgctxt "input-name"
-msgid "P10 Button 12"
-msgstr ""
-
-#: src/emu/inpttype.ipp:483
-msgctxt "input-name"
-msgid "P10 Button 13"
-msgstr ""
-
-#: src/emu/inpttype.ipp:484
-msgctxt "input-name"
-msgid "P10 Button 14"
-msgstr ""
-
-#: src/emu/inpttype.ipp:485
-msgctxt "input-name"
-msgid "P10 Button 15"
-msgstr ""
-
-#: src/emu/inpttype.ipp:486
-msgctxt "input-name"
-msgid "P10 Button 16"
-msgstr ""
-
-#: src/emu/inpttype.ipp:487
-msgctxt "input-name"
-msgid "P10 Start"
-msgstr ""
-
-#: src/emu/inpttype.ipp:488
-msgctxt "input-name"
-msgid "P10 Select"
-msgstr ""
-
 #: src/emu/inpttype.ipp:493
 msgctxt "input-name"
 msgid "1 Player Start"
-msgstr ""
+msgstr "Spustit pro 1 hráče"
 
 #: src/emu/inpttype.ipp:494
 msgctxt "input-name"
 msgid "2 Players Start"
-msgstr ""
+msgstr "Spustit pro 2 hráče"
 
 #: src/emu/inpttype.ipp:495
 msgctxt "input-name"
 msgid "3 Players Start"
-msgstr ""
+msgstr "Spustit pro 3 hráče"
 
 #: src/emu/inpttype.ipp:496
 msgctxt "input-name"
 msgid "4 Players Start"
-msgstr ""
+msgstr "Spustit pro 4 hráče"
 
 #: src/emu/inpttype.ipp:497
 msgctxt "input-name"
 msgid "5 Players Start"
-msgstr ""
+msgstr "Spustit pro 5 hráčů"
 
 #: src/emu/inpttype.ipp:498
 msgctxt "input-name"
 msgid "6 Players Start"
-msgstr ""
+msgstr "Spustit pro 6 hráčů"
 
 #: src/emu/inpttype.ipp:499
 msgctxt "input-name"
 msgid "7 Players Start"
-msgstr ""
+msgstr "Spustit pro 7 hráčů"
 
 #: src/emu/inpttype.ipp:500
 msgctxt "input-name"
 msgid "8 Players Start"
-msgstr ""
+msgstr "Spustit pro 8 hráčů"
 
 #: src/emu/inpttype.ipp:505
 msgctxt "input-name"
 msgid "Coin 1"
-msgstr ""
+msgstr "Mince 1"
 
 #: src/emu/inpttype.ipp:506
 msgctxt "input-name"
 msgid "Coin 2"
-msgstr ""
+msgstr "Mince 2"
 
 #: src/emu/inpttype.ipp:507
 msgctxt "input-name"
 msgid "Coin 3"
-msgstr ""
+msgstr "Mince 3"
 
 #: src/emu/inpttype.ipp:508
 msgctxt "input-name"
 msgid "Coin 4"
-msgstr ""
+msgstr "Mince 4"
 
 #: src/emu/inpttype.ipp:509
 msgctxt "input-name"
 msgid "Coin 5"
-msgstr ""
+msgstr "Mince 5"
 
 #: src/emu/inpttype.ipp:510
 msgctxt "input-name"
 msgid "Coin 6"
-msgstr ""
+msgstr "Mince 6"
 
 #: src/emu/inpttype.ipp:511
 msgctxt "input-name"
 msgid "Coin 7"
-msgstr ""
+msgstr "Mince 7"
 
 #: src/emu/inpttype.ipp:512
 msgctxt "input-name"
 msgid "Coin 8"
-msgstr ""
+msgstr "Mince 8"
 
 #: src/emu/inpttype.ipp:513
 msgctxt "input-name"
 msgid "Coin 9"
-msgstr ""
+msgstr "Mince 9"
 
 #: src/emu/inpttype.ipp:514
 msgctxt "input-name"
 msgid "Coin 10"
-msgstr ""
+msgstr "Mince 10"
 
 #: src/emu/inpttype.ipp:515
 msgctxt "input-name"
 msgid "Coin 11"
-msgstr ""
+msgstr "Mince 11"
 
 #: src/emu/inpttype.ipp:516
 msgctxt "input-name"
 msgid "Coin 12"
-msgstr ""
+msgstr "Mince 12"
 
 #: src/emu/inpttype.ipp:517
 msgctxt "input-name"
 msgid "Bill 1"
-msgstr ""
+msgstr "Bankovka 1"
 
 #: src/emu/inpttype.ipp:522
 msgctxt "input-name"
@@ -5498,12 +4174,12 @@ msgstr ""
 #: src/emu/inpttype.ipp:538
 msgctxt "input-name"
 msgid "Power On"
-msgstr ""
+msgstr "Zapnout"
 
 #: src/emu/inpttype.ipp:539
 msgctxt "input-name"
 msgid "Power Off"
-msgstr ""
+msgstr "Vypnout"
 
 #: src/emu/inpttype.ipp:541
 msgctxt "input-name"
@@ -5518,167 +4194,44 @@ msgstr ""
 #: src/emu/inpttype.ipp:543
 msgctxt "input-name"
 msgid "Memory Reset"
-msgstr ""
+msgstr "Reset paměti"
 
 #: src/emu/inpttype.ipp:544
 msgctxt "input-name"
 msgid "Volume Down"
-msgstr ""
+msgstr "Snížit hlasitost"
 
 #: src/emu/inpttype.ipp:545
 msgctxt "input-name"
 msgid "Volume Up"
-msgstr ""
+msgstr "Zvýšit hlasitost"
 
-#: src/emu/inpttype.ipp:550
-msgctxt "input-name"
-msgid "P1 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:551
-msgctxt "input-name"
-msgid "P2 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:552
-msgctxt "input-name"
-msgid "P3 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:553
-msgctxt "input-name"
-msgid "P4 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:554
-msgctxt "input-name"
-msgid "P5 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:555
-msgctxt "input-name"
-msgid "P6 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:556
-msgctxt "input-name"
-msgid "P7 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:557
-msgctxt "input-name"
-msgid "P8 Pedal 1"
-msgstr ""
-
-#: src/emu/inpttype.ipp:558
-msgctxt "input-name"
-msgid "P9 Pedal 1"
-msgstr ""
-
+#: src/emu/inpttype.ipp:550 src/emu/inpttype.ipp:551 src/emu/inpttype.ipp:552
+#: src/emu/inpttype.ipp:553 src/emu/inpttype.ipp:554 src/emu/inpttype.ipp:555
+#: src/emu/inpttype.ipp:556 src/emu/inpttype.ipp:557 src/emu/inpttype.ipp:558
 #: src/emu/inpttype.ipp:559
+#, c-format
 msgctxt "input-name"
-msgid "P10 Pedal 1"
-msgstr ""
+msgid "%p Pedal 1"
+msgstr "%p Pedál 1"
 
-#: src/emu/inpttype.ipp:564
-msgctxt "input-name"
-msgid "P1 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:565
-msgctxt "input-name"
-msgid "P2 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:566
-msgctxt "input-name"
-msgid "P3 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:567
-msgctxt "input-name"
-msgid "P4 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:568
-msgctxt "input-name"
-msgid "P5 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:569
-msgctxt "input-name"
-msgid "P6 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:570
-msgctxt "input-name"
-msgid "P7 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:571
-msgctxt "input-name"
-msgid "P8 Pedal 2"
-msgstr ""
-
-#: src/emu/inpttype.ipp:572
-msgctxt "input-name"
-msgid "P9 Pedal 2"
-msgstr ""
-
+#: src/emu/inpttype.ipp:564 src/emu/inpttype.ipp:565 src/emu/inpttype.ipp:566
+#: src/emu/inpttype.ipp:567 src/emu/inpttype.ipp:568 src/emu/inpttype.ipp:569
+#: src/emu/inpttype.ipp:570 src/emu/inpttype.ipp:571 src/emu/inpttype.ipp:572
 #: src/emu/inpttype.ipp:573
+#, c-format
 msgctxt "input-name"
-msgid "P10 Pedal 2"
-msgstr ""
+msgid "%p Pedal 2"
+msgstr "%p Pedál 2"
 
-#: src/emu/inpttype.ipp:578
-msgctxt "input-name"
-msgid "P1 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:579
-msgctxt "input-name"
-msgid "P2 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:580
-msgctxt "input-name"
-msgid "P3 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:581
-msgctxt "input-name"
-msgid "P4 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:582
-msgctxt "input-name"
-msgid "P5 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:583
-msgctxt "input-name"
-msgid "P6 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:584
-msgctxt "input-name"
-msgid "P7 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:585
-msgctxt "input-name"
-msgid "P8 Pedal 3"
-msgstr ""
-
-#: src/emu/inpttype.ipp:586
-msgctxt "input-name"
-msgid "P9 Pedal 3"
-msgstr ""
-
+#: src/emu/inpttype.ipp:578 src/emu/inpttype.ipp:579 src/emu/inpttype.ipp:580
+#: src/emu/inpttype.ipp:581 src/emu/inpttype.ipp:582 src/emu/inpttype.ipp:583
+#: src/emu/inpttype.ipp:584 src/emu/inpttype.ipp:585 src/emu/inpttype.ipp:586
 #: src/emu/inpttype.ipp:587
+#, c-format
 msgctxt "input-name"
-msgid "P10 Pedal 3"
-msgstr ""
+msgid "%p Pedal 3"
+msgstr "%p Pedál 3"
 
 #: src/emu/inpttype.ipp:592
 msgctxt "input-name"
@@ -5983,452 +4536,452 @@ msgstr ""
 #: src/emu/inpttype.ipp:676
 msgctxt "input-name"
 msgid "Track X"
-msgstr ""
+msgstr "Trackball X"
 
 #: src/emu/inpttype.ipp:677
 msgctxt "input-name"
 msgid "Track X 2"
-msgstr ""
+msgstr "Trackball X 2"
 
 #: src/emu/inpttype.ipp:678
 msgctxt "input-name"
 msgid "Track X 3"
-msgstr ""
+msgstr "Trackball X 3"
 
 #: src/emu/inpttype.ipp:679
 msgctxt "input-name"
 msgid "Track X 4"
-msgstr ""
+msgstr "Trackball X 4"
 
 #: src/emu/inpttype.ipp:680
 msgctxt "input-name"
 msgid "Track X 5"
-msgstr ""
+msgstr "Trackball X 5"
 
 #: src/emu/inpttype.ipp:681
 msgctxt "input-name"
 msgid "Track X 6"
-msgstr ""
+msgstr "Trackball X 6"
 
 #: src/emu/inpttype.ipp:682
 msgctxt "input-name"
 msgid "Track X 7"
-msgstr ""
+msgstr "Trackball X 7"
 
 #: src/emu/inpttype.ipp:683
 msgctxt "input-name"
 msgid "Track X 8"
-msgstr ""
+msgstr "Trackball X 8"
 
 #: src/emu/inpttype.ipp:684
 msgctxt "input-name"
 msgid "Track X 9"
-msgstr ""
+msgstr "Trackball X 9"
 
 #: src/emu/inpttype.ipp:685
 msgctxt "input-name"
 msgid "Track X 10"
-msgstr ""
+msgstr "Trackball X 10"
 
 #: src/emu/inpttype.ipp:690
 msgctxt "input-name"
 msgid "Track Y"
-msgstr ""
+msgstr "Trackball Y"
 
 #: src/emu/inpttype.ipp:691
 msgctxt "input-name"
 msgid "Track Y 2"
-msgstr ""
+msgstr "Trackball Y 2"
 
 #: src/emu/inpttype.ipp:692
 msgctxt "input-name"
 msgid "Track Y 3"
-msgstr ""
+msgstr "Trackball Y 3"
 
 #: src/emu/inpttype.ipp:693
 msgctxt "input-name"
 msgid "Track Y 4"
-msgstr ""
+msgstr "Trackball Y 4"
 
 #: src/emu/inpttype.ipp:694
 msgctxt "input-name"
 msgid "Track Y 5"
-msgstr ""
+msgstr "Trackball Y 5"
 
 #: src/emu/inpttype.ipp:695
 msgctxt "input-name"
 msgid "Track Y 6"
-msgstr ""
+msgstr "Trackball Y 6"
 
 #: src/emu/inpttype.ipp:696
 msgctxt "input-name"
 msgid "Track Y 7"
-msgstr ""
+msgstr "Trackball Y 7"
 
 #: src/emu/inpttype.ipp:697
 msgctxt "input-name"
 msgid "Track Y 8"
-msgstr ""
+msgstr "Trackball Y 8"
 
 #: src/emu/inpttype.ipp:698
 msgctxt "input-name"
 msgid "Track Y 9"
-msgstr ""
+msgstr "Trackball Y 9"
 
 #: src/emu/inpttype.ipp:699
 msgctxt "input-name"
 msgid "Track Y 10"
-msgstr ""
+msgstr "Trackball Y 10"
 
 #: src/emu/inpttype.ipp:704
 msgctxt "input-name"
 msgid "AD Stick X"
-msgstr ""
+msgstr "Analogový joystick X"
 
 #: src/emu/inpttype.ipp:705
 msgctxt "input-name"
 msgid "AD Stick X 2"
-msgstr ""
+msgstr "Analogový joystick X 2"
 
 #: src/emu/inpttype.ipp:706
 msgctxt "input-name"
 msgid "AD Stick X 3"
-msgstr ""
+msgstr "Analogový joystick X 3"
 
 #: src/emu/inpttype.ipp:707
 msgctxt "input-name"
 msgid "AD Stick X 4"
-msgstr ""
+msgstr "Analogový joystick X 4"
 
 #: src/emu/inpttype.ipp:708
 msgctxt "input-name"
 msgid "AD Stick X 5"
-msgstr ""
+msgstr "Analogový joystick X 5"
 
 #: src/emu/inpttype.ipp:709
 msgctxt "input-name"
 msgid "AD Stick X 6"
-msgstr ""
+msgstr "Analogový joystick X 6"
 
 #: src/emu/inpttype.ipp:710
 msgctxt "input-name"
 msgid "AD Stick X 7"
-msgstr ""
+msgstr "Analogový joystick X 7"
 
 #: src/emu/inpttype.ipp:711
 msgctxt "input-name"
 msgid "AD Stick X 8"
-msgstr ""
+msgstr "Analogový joystick X 8"
 
 #: src/emu/inpttype.ipp:712
 msgctxt "input-name"
 msgid "AD Stick X 9"
-msgstr ""
+msgstr "Analogový joystick X 9"
 
 #: src/emu/inpttype.ipp:713
 msgctxt "input-name"
 msgid "AD Stick X 10"
-msgstr ""
+msgstr "Analogový joystick X 10"
 
 #: src/emu/inpttype.ipp:718
 msgctxt "input-name"
 msgid "AD Stick Y"
-msgstr ""
+msgstr "Analogový joystick Y"
 
 #: src/emu/inpttype.ipp:719
 msgctxt "input-name"
 msgid "AD Stick Y 2"
-msgstr ""
+msgstr "Analogový joystick Y 2"
 
 #: src/emu/inpttype.ipp:720
 msgctxt "input-name"
 msgid "AD Stick Y 3"
-msgstr ""
+msgstr "Analogový joystick Y 3"
 
 #: src/emu/inpttype.ipp:721
 msgctxt "input-name"
 msgid "AD Stick Y 4"
-msgstr ""
+msgstr "Analogový joystick Y 4"
 
 #: src/emu/inpttype.ipp:722
 msgctxt "input-name"
 msgid "AD Stick Y 5"
-msgstr ""
+msgstr "Analogový joystick Y 5"
 
 #: src/emu/inpttype.ipp:723
 msgctxt "input-name"
 msgid "AD Stick Y 6"
-msgstr ""
+msgstr "Analogový joystick Y 6"
 
 #: src/emu/inpttype.ipp:724
 msgctxt "input-name"
 msgid "AD Stick Y 7"
-msgstr ""
+msgstr "Analogový joystick Y 7"
 
 #: src/emu/inpttype.ipp:725
 msgctxt "input-name"
 msgid "AD Stick Y 8"
-msgstr ""
+msgstr "Analogový joystick Y 8"
 
 #: src/emu/inpttype.ipp:726
 msgctxt "input-name"
 msgid "AD Stick Y 9"
-msgstr ""
+msgstr "Analogový joystick Y 9"
 
 #: src/emu/inpttype.ipp:727
 msgctxt "input-name"
 msgid "AD Stick Y 10"
-msgstr ""
+msgstr "Analogový joystick Y 10"
 
 #: src/emu/inpttype.ipp:732
 msgctxt "input-name"
 msgid "AD Stick Z"
-msgstr ""
+msgstr "Analogový joystick Z"
 
 #: src/emu/inpttype.ipp:733
 msgctxt "input-name"
 msgid "AD Stick Z 2"
-msgstr ""
+msgstr "Analogový joystick Z 2"
 
 #: src/emu/inpttype.ipp:734
 msgctxt "input-name"
 msgid "AD Stick Z 3"
-msgstr ""
+msgstr "Analogový joystick Z 3"
 
 #: src/emu/inpttype.ipp:735
 msgctxt "input-name"
 msgid "AD Stick Z 4"
-msgstr ""
+msgstr "Analogový joystick Z 4"
 
 #: src/emu/inpttype.ipp:736
 msgctxt "input-name"
 msgid "AD Stick Z 5"
-msgstr ""
+msgstr "Analogový joystick Z 5"
 
 #: src/emu/inpttype.ipp:737
 msgctxt "input-name"
 msgid "AD Stick Z 6"
-msgstr ""
+msgstr "Analogový joystick Z 6"
 
 #: src/emu/inpttype.ipp:738
 msgctxt "input-name"
 msgid "AD Stick Z 7"
-msgstr ""
+msgstr "Analogový joystick Z 7"
 
 #: src/emu/inpttype.ipp:739
 msgctxt "input-name"
 msgid "AD Stick Z 8"
-msgstr ""
+msgstr "Analogový joystick Z 8"
 
 #: src/emu/inpttype.ipp:740
 msgctxt "input-name"
 msgid "AD Stick Z 9"
-msgstr ""
+msgstr "Analogový joystick Z 9"
 
 #: src/emu/inpttype.ipp:741
 msgctxt "input-name"
 msgid "AD Stick Z 10"
-msgstr ""
+msgstr "Analogový joystick Z 10"
 
 #: src/emu/inpttype.ipp:746
 msgctxt "input-name"
 msgid "Lightgun X"
-msgstr ""
+msgstr "Světelná pistole X"
 
 #: src/emu/inpttype.ipp:747
 msgctxt "input-name"
 msgid "Lightgun X 2"
-msgstr ""
+msgstr "Světelná pistole X 2"
 
 #: src/emu/inpttype.ipp:748
 msgctxt "input-name"
 msgid "Lightgun X 3"
-msgstr ""
+msgstr "Světelná pistole X 3"
 
 #: src/emu/inpttype.ipp:749
 msgctxt "input-name"
 msgid "Lightgun X 4"
-msgstr ""
+msgstr "Světelná pistole X 4"
 
 #: src/emu/inpttype.ipp:750
 msgctxt "input-name"
 msgid "Lightgun X 5"
-msgstr ""
+msgstr "Světelná pistole X 5"
 
 #: src/emu/inpttype.ipp:751
 msgctxt "input-name"
 msgid "Lightgun X 6"
-msgstr ""
+msgstr "Světelná pistole X 6"
 
 #: src/emu/inpttype.ipp:752
 msgctxt "input-name"
 msgid "Lightgun X 7"
-msgstr ""
+msgstr "Světelná pistole X 7"
 
 #: src/emu/inpttype.ipp:753
 msgctxt "input-name"
 msgid "Lightgun X 8"
-msgstr ""
+msgstr "Světelná pistole X 8"
 
 #: src/emu/inpttype.ipp:754
 msgctxt "input-name"
 msgid "Lightgun X 9"
-msgstr ""
+msgstr "Světelná pistole X 9"
 
 #: src/emu/inpttype.ipp:755
 msgctxt "input-name"
 msgid "Lightgun X 10"
-msgstr ""
+msgstr "Světelná pistole X 10"
 
 #: src/emu/inpttype.ipp:760
 msgctxt "input-name"
 msgid "Lightgun Y"
-msgstr ""
+msgstr "Světelná pistole Y"
 
 #: src/emu/inpttype.ipp:761
 msgctxt "input-name"
 msgid "Lightgun Y 2"
-msgstr ""
+msgstr "Světelná pistole Y 2"
 
 #: src/emu/inpttype.ipp:762
 msgctxt "input-name"
 msgid "Lightgun Y 3"
-msgstr ""
+msgstr "Světelná pistole Y 3"
 
 #: src/emu/inpttype.ipp:763
 msgctxt "input-name"
 msgid "Lightgun Y 4"
-msgstr ""
+msgstr "Světelná pistole Y 4"
 
 #: src/emu/inpttype.ipp:764
 msgctxt "input-name"
 msgid "Lightgun Y 5"
-msgstr ""
+msgstr "Světelná pistole Y 5"
 
 #: src/emu/inpttype.ipp:765
 msgctxt "input-name"
 msgid "Lightgun Y 6"
-msgstr ""
+msgstr "Světelná pistole Y 6"
 
 #: src/emu/inpttype.ipp:766
 msgctxt "input-name"
 msgid "Lightgun Y 7"
-msgstr ""
+msgstr "Světelná pistole Y 7"
 
 #: src/emu/inpttype.ipp:767
 msgctxt "input-name"
 msgid "Lightgun Y 8"
-msgstr ""
+msgstr "Světelná pistole Y 8"
 
 #: src/emu/inpttype.ipp:768
 msgctxt "input-name"
 msgid "Lightgun Y 9"
-msgstr ""
+msgstr "Světelná pistole Y 9"
 
 #: src/emu/inpttype.ipp:769
 msgctxt "input-name"
 msgid "Lightgun Y 10"
-msgstr ""
+msgstr "Světelná pistole Y 10"
 
 #: src/emu/inpttype.ipp:774
 msgctxt "input-name"
 msgid "Mouse X"
-msgstr ""
+msgstr "Myš X"
 
 #: src/emu/inpttype.ipp:775
 msgctxt "input-name"
 msgid "Mouse X 2"
-msgstr ""
+msgstr "Myš X 2"
 
 #: src/emu/inpttype.ipp:776
 msgctxt "input-name"
 msgid "Mouse X 3"
-msgstr ""
+msgstr "Myš X 3"
 
 #: src/emu/inpttype.ipp:777
 msgctxt "input-name"
 msgid "Mouse X 4"
-msgstr ""
+msgstr "Myš X 4"
 
 #: src/emu/inpttype.ipp:778
 msgctxt "input-name"
 msgid "Mouse X 5"
-msgstr ""
+msgstr "Myš X 5"
 
 #: src/emu/inpttype.ipp:779
 msgctxt "input-name"
 msgid "Mouse X 6"
-msgstr ""
+msgstr "Myš X 6"
 
 #: src/emu/inpttype.ipp:780
 msgctxt "input-name"
 msgid "Mouse X 7"
-msgstr ""
+msgstr "Myš X 7"
 
 #: src/emu/inpttype.ipp:781
 msgctxt "input-name"
 msgid "Mouse X 8"
-msgstr ""
+msgstr "Myš X 8"
 
 #: src/emu/inpttype.ipp:782
 msgctxt "input-name"
 msgid "Mouse X 9"
-msgstr ""
+msgstr "Myš X 9"
 
 #: src/emu/inpttype.ipp:783
 msgctxt "input-name"
 msgid "Mouse X 10"
-msgstr ""
+msgstr "Myš X 10"
 
 #: src/emu/inpttype.ipp:788
 msgctxt "input-name"
 msgid "Mouse Y"
-msgstr ""
+msgstr "Myš Y"
 
 #: src/emu/inpttype.ipp:789
 msgctxt "input-name"
 msgid "Mouse Y 2"
-msgstr ""
+msgstr "Myš Y 2"
 
 #: src/emu/inpttype.ipp:790
 msgctxt "input-name"
 msgid "Mouse Y 3"
-msgstr ""
+msgstr "Myš Y 3"
 
 #: src/emu/inpttype.ipp:791
 msgctxt "input-name"
 msgid "Mouse Y 4"
-msgstr ""
+msgstr "Myš Y 4"
 
 #: src/emu/inpttype.ipp:792
 msgctxt "input-name"
 msgid "Mouse Y 5"
-msgstr ""
+msgstr "Myš Y 5"
 
 #: src/emu/inpttype.ipp:793
 msgctxt "input-name"
 msgid "Mouse Y 6"
-msgstr ""
+msgstr "Myš Y 6"
 
 #: src/emu/inpttype.ipp:794
 msgctxt "input-name"
 msgid "Mouse Y 7"
-msgstr ""
+msgstr "Myš Y 7"
 
 #: src/emu/inpttype.ipp:795
 msgctxt "input-name"
 msgid "Mouse Y 8"
-msgstr ""
+msgstr "Myš Y 8"
 
 #: src/emu/inpttype.ipp:796
 msgctxt "input-name"
 msgid "Mouse Y 9"
-msgstr ""
+msgstr "Myš Y 9"
 
 #: src/emu/inpttype.ipp:797
 msgctxt "input-name"
 msgid "Mouse Y 10"
-msgstr ""
+msgstr "Myš Y 10"
 
 #: src/emu/inpttype.ipp:802
 msgctxt "input-name"
@@ -6438,7 +4991,7 @@ msgstr ""
 #: src/emu/inpttype.ipp:803
 msgctxt "input-name"
 msgid "Keyboard"
-msgstr ""
+msgstr "Klávesnice"
 
 #: src/emu/inpttype.ipp:808
 msgctxt "input-name"
@@ -6448,513 +5001,517 @@ msgstr ""
 #: src/emu/inpttype.ipp:809
 msgctxt "input-name"
 msgid "Break in Debugger"
-msgstr ""
+msgstr "Zastavit v debuggeru"
 
 #: src/emu/inpttype.ipp:810
 msgctxt "input-name"
 msgid "Config Menu"
-msgstr ""
+msgstr "Konfigurační menu"
 
 #: src/emu/inpttype.ipp:811
 msgctxt "input-name"
 msgid "Pause"
-msgstr ""
+msgstr "Pauza"
 
 #: src/emu/inpttype.ipp:812
 msgctxt "input-name"
 msgid "Pause - Single Step"
-msgstr ""
+msgstr "Pauza - O krok vpřed"
 
 #: src/emu/inpttype.ipp:813
 msgctxt "input-name"
 msgid "Rewind - Single Step"
-msgstr ""
+msgstr "Vrátit - O krok"
 
 #: src/emu/inpttype.ipp:814
 msgctxt "input-name"
 msgid "Reset Machine"
-msgstr ""
+msgstr "Restartovat emulaci zařízení"
 
 #: src/emu/inpttype.ipp:815
 msgctxt "input-name"
 msgid "Soft Reset"
-msgstr ""
+msgstr "Reset zařízení"
 
 #: src/emu/inpttype.ipp:816
 msgctxt "input-name"
 msgid "Show Decoded Graphics"
-msgstr ""
+msgstr "Zobrazit dekódovanou grafiku"
 
 #: src/emu/inpttype.ipp:817
 msgctxt "input-name"
 msgid "Frameskip Dec"
-msgstr ""
+msgstr "Snížit hodnotu frameskip"
 
 #: src/emu/inpttype.ipp:818
 msgctxt "input-name"
 msgid "Frameskip Inc"
-msgstr ""
+msgstr "Zvýšit hodnotu frameskip"
 
 #: src/emu/inpttype.ipp:819
 msgctxt "input-name"
 msgid "Throttle"
-msgstr ""
+msgstr "Škrtící klapka"
 
 #: src/emu/inpttype.ipp:820
 msgctxt "input-name"
 msgid "Fast Forward"
-msgstr ""
+msgstr "Rychlý posun vpřed (Fast Forward)"
 
 #: src/emu/inpttype.ipp:821
 msgctxt "input-name"
 msgid "Show FPS"
-msgstr ""
+msgstr "Zobrazit počet snímků za vteřinu (FPS)"
 
 #: src/emu/inpttype.ipp:822
 msgctxt "input-name"
 msgid "Save Snapshot"
-msgstr ""
+msgstr "Uložit snapshot"
 
 #: src/emu/inpttype.ipp:823
 msgctxt "input-name"
 msgid "Record MNG"
-msgstr ""
+msgstr "Nahrát video ve formátu MNG"
 
 #: src/emu/inpttype.ipp:824
 msgctxt "input-name"
 msgid "Record AVI"
-msgstr ""
+msgstr "Nahrát video ve formátu AVI"
 
 #: src/emu/inpttype.ipp:825
 msgctxt "input-name"
 msgid "Toggle Cheat"
-msgstr ""
+msgstr "Přepnout cheat"
 
 #: src/emu/inpttype.ipp:826
 msgctxt "input-name"
 msgid "UI Up"
-msgstr ""
+msgstr "Uživ. rozhraní - Nahoru"
 
 #: src/emu/inpttype.ipp:827
 msgctxt "input-name"
 msgid "UI Down"
-msgstr ""
+msgstr "Uživ. rozhraní - Dolů"
 
 #: src/emu/inpttype.ipp:828
 msgctxt "input-name"
 msgid "UI Left"
-msgstr ""
+msgstr "Uživ. rozhraní - Vlevo"
 
 #: src/emu/inpttype.ipp:829
 msgctxt "input-name"
 msgid "UI Right"
-msgstr ""
+msgstr "Uživ. rozhraní - Vpravo"
 
 #: src/emu/inpttype.ipp:830
 msgctxt "input-name"
 msgid "UI Home"
-msgstr ""
+msgstr "Uživ. rozhraní - Home"
 
 #: src/emu/inpttype.ipp:831
 msgctxt "input-name"
 msgid "UI End"
-msgstr ""
+msgstr "Uživ. rozhraní - End"
 
 #: src/emu/inpttype.ipp:832
 msgctxt "input-name"
 msgid "UI Page Up"
-msgstr ""
+msgstr "Uživ. rozhraní - Stránka nahoru"
 
 #: src/emu/inpttype.ipp:833
 msgctxt "input-name"
 msgid "UI Page Down"
-msgstr ""
+msgstr "Uživ. rozhraní - Stránka dolů"
 
 #: src/emu/inpttype.ipp:834
 msgctxt "input-name"
 msgid "UI Focus Next"
-msgstr ""
+msgstr "Uživ. rozhraní - Přejít na následující"
 
 #: src/emu/inpttype.ipp:835
 msgctxt "input-name"
 msgid "UI Focus Previous"
-msgstr ""
+msgstr "Uživ. rozhraní - Přejít na předchozí"
 
 #: src/emu/inpttype.ipp:836
 msgctxt "input-name"
 msgid "UI Select"
-msgstr ""
+msgstr "Uživ. rozhraní - Vybrat"
 
 #: src/emu/inpttype.ipp:837
 msgctxt "input-name"
 msgid "UI Cancel"
-msgstr ""
+msgstr "Uživ. rozhraní - Storno"
 
 #: src/emu/inpttype.ipp:838
 msgctxt "input-name"
 msgid "UI Display Comment"
-msgstr ""
+msgstr "Uživ. rozhraní - Display Comment"
 
 #: src/emu/inpttype.ipp:839
 msgctxt "input-name"
 msgid "UI Clear"
-msgstr ""
+msgstr "Uživ. rozhraní - Smazat"
 
 #: src/emu/inpttype.ipp:840
 msgctxt "input-name"
 msgid "UI Zoom In"
-msgstr ""
+msgstr "Uživ. rozhraní - Zvětšit"
 
 #: src/emu/inpttype.ipp:841
 msgctxt "input-name"
 msgid "UI Zoom Out"
-msgstr ""
+msgstr "Uživ. rozhraní - Zmenšit"
 
 #: src/emu/inpttype.ipp:842
 msgctxt "input-name"
 msgid "UI Default Zoom"
-msgstr ""
+msgstr "Uživ. rozhraní - Původní velikost"
 
 #: src/emu/inpttype.ipp:843
 msgctxt "input-name"
 msgid "UI Previous Group"
-msgstr ""
+msgstr "Uživ. rozhraní - Předchozí skupina"
 
 #: src/emu/inpttype.ipp:844
 msgctxt "input-name"
 msgid "UI Next Group"
-msgstr ""
+msgstr "Uživ. rozhraní - Následující skupina"
 
 #: src/emu/inpttype.ipp:845
 msgctxt "input-name"
 msgid "UI Rotate"
-msgstr ""
+msgstr "Uživ. rozhraní - Otočit"
 
 #: src/emu/inpttype.ipp:846
 msgctxt "input-name"
 msgid "Show Profiler"
-msgstr ""
+msgstr "Zobrazit profiler"
 
 #: src/emu/inpttype.ipp:847
 msgctxt "input-name"
 msgid "UI Toggle"
-msgstr ""
+msgstr "Uživ. rozhraní - Přepnout"
 
 #: src/emu/inpttype.ipp:848
 msgctxt "input-name"
 msgid "UI Release Pointer"
-msgstr ""
+msgstr "Uživ. rozhraní - Uvolnit pointer"
 
 #: src/emu/inpttype.ipp:849
 msgctxt "input-name"
 msgid "UI Paste Text"
-msgstr ""
+msgstr "Uživ. rozhraní - Vlepit text"
 
 #: src/emu/inpttype.ipp:850
 msgctxt "input-name"
 msgid "Save State"
-msgstr ""
+msgstr "Uložit stav"
 
 #: src/emu/inpttype.ipp:851
 msgctxt "input-name"
 msgid "Load State"
-msgstr ""
+msgstr "Načíst stav"
 
 #: src/emu/inpttype.ipp:852
 msgctxt "input-name"
 msgid "UI (First) Tape Start"
-msgstr ""
+msgstr "Uživ. rozhraní - Start (první) pásky"
 
 #: src/emu/inpttype.ipp:853
 msgctxt "input-name"
 msgid "UI (First) Tape Stop"
-msgstr ""
+msgstr "Uživ. rozhraní - Zastavit (první) pásku"
 
 #: src/emu/inpttype.ipp:854
 msgctxt "input-name"
 msgid "UI External DAT View"
-msgstr ""
+msgstr "Uživ. rozhraní - Zobrazení externího DAT"
 
 #: src/emu/inpttype.ipp:855
 msgctxt "input-name"
 msgid "UI Add/Remove favorite"
-msgstr ""
+msgstr "Uživ. rozhraní - Přidat nebo odstranit ze seznamu Oblíbené"
 
 #: src/emu/inpttype.ipp:856
 msgctxt "input-name"
 msgid "UI Export List"
-msgstr ""
+msgstr "Uživ. rozhraní - Exportovat seznam"
 
 #: src/emu/inpttype.ipp:857
 msgctxt "input-name"
 msgid "UI Audit Media"
-msgstr ""
+msgstr "Uživ. rozhraní - Audit médií"
 
 #: src/osd/modules/input/input_windows.cpp:111
 #: src/osd/modules/input/input_sdlcommon.cpp:175
 msgctxt "input-name"
 msgid "Toggle Fullscreen"
-msgstr ""
+msgstr "Přepnout na celou obrazovku a zpět"
 
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr ""
+msgstr "Sesnímat renderovaný snapshot"
 
 #: src/osd/modules/input/input_windows.cpp:128
 #: src/osd/modules/input/input_sdlcommon.cpp:223
 msgctxt "input-name"
 msgid "Record Rendered Video"
-msgstr ""
+msgstr "Nahrát renderované video"
 
 #: src/osd/modules/input/input_windows.cpp:144
 msgctxt "input-name"
 msgid "Toggle Post-Processing"
-msgstr ""
+msgstr "Přepnout post-processing"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:201
 msgctxt "input-name"
 msgid "Toggle Filter"
-msgstr ""
+msgstr "Přepnout filtr"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:207
 msgctxt "input-name"
 msgid "Decrease Prescaling"
-msgstr ""
+msgstr "Snížit hodnotu předškálování"
 
 #: src/osd/modules/input/input_sdlcommon.cpp:217
 msgctxt "input-name"
 msgid "Increase Prescaling"
-msgstr ""
+msgstr "Zvýšit hodnotu předškálování"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "When updated"
-msgstr ""
+msgstr "Po zvýšení"
 
 #: plugins/hiscore/init.lua:85
 msgctxt "plugin-hiscore"
 msgid "On exit"
-msgstr ""
+msgstr "Při ukončení"
 
 #: plugins/hiscore/init.lua:86
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support Options"
-msgstr ""
+msgstr "Nastavení skóre"
 
 #: plugins/hiscore/init.lua:88
 msgctxt "plugin-hiscore"
 msgid "Save scores"
-msgstr ""
+msgstr "Uložit skóre"
 
 #: plugins/hiscore/init.lua:372
 msgctxt "plugin-hiscore"
 msgid "Hiscore Support"
-msgstr ""
+msgstr "Podpora skóre"
 
 #: plugins/cheatfind/init.lua:387
 msgid "Other: "
-msgstr ""
+msgstr "Jiné: "
 
 #: plugins/cheatfind/init.lua:388
 msgid "Save Cheat"
-msgstr ""
+msgstr "Uložit cheat"
 
 #: plugins/cheatfind/init.lua:391
 msgid "Default"
-msgstr ""
+msgstr "Původní"
 
 #: plugins/cheatfind/init.lua:391
 msgid "Custom"
-msgstr ""
+msgstr "Vlastní"
 
 #: plugins/cheatfind/init.lua:392
 msgid "Cheat Name"
-msgstr ""
+msgstr "Název cheatu"
 
 #: plugins/cheatfind/init.lua:398 plugins/cheatfind/init.lua:977
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Původní název je %s"
 
 #: plugins/cheatfind/init.lua:406
 msgid "Player"
-msgstr ""
+msgstr "Hráč"
 
 #: plugins/cheatfind/init.lua:411
 msgid "Type"
-msgstr ""
+msgstr "Typ"
 
 #: plugins/cheatfind/init.lua:411
 msgid "(empty)"
-msgstr ""
+msgstr "(prázdný)"
 
 #: plugins/cheatfind/init.lua:427
 msgid "You can enter any type name"
-msgstr ""
+msgstr "Vložte libovolný název typu"
 
 #: plugins/cheatfind/init.lua:436
 msgid "Save"
-msgstr ""
+msgstr "Uložit"
 
 #: plugins/cheatfind/init.lua:444
 msgid "Type name is empty"
-msgstr ""
+msgstr "Název typu je prázdný"
 
 #: plugins/cheatfind/init.lua:468
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Cheat zapsán do souboru %s a zároveň přidaný do souboru cheat.simple"
 
 #: plugins/cheatfind/init.lua:478
 msgid "Cheat added to cheat.simple"
-msgstr ""
+msgstr "Cheat přidaný do souboru cheat.simple"
 
 #: plugins/cheatfind/init.lua:483
 msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Chyba při zapisování souboru\n"
+"Ujistěte se, že složka cheatpath existuje"
 
 #: plugins/cheatfind/init.lua:497
 msgid "CPU or RAM"
-msgstr ""
+msgstr "CPU nebo RAM"
 
 #: plugins/cheatfind/init.lua:501
 msgid "Changes to this only take effect when \"Start new search\" is selected"
-msgstr ""
+msgstr "Tyto změny budou účinné po vybrání \"Začít nové hledání\""
 
 #: plugins/cheatfind/init.lua:511
 msgid "Automatic"
-msgstr ""
+msgstr "Automatická"
 
 #: plugins/cheatfind/init.lua:511
 msgid "Manual"
-msgstr ""
+msgstr "Manuální"
 
 #: plugins/cheatfind/init.lua:512
 msgid "Pause Mode"
-msgstr ""
+msgstr "Režim pauzy"
 
 #: plugins/cheatfind/init.lua:519
 msgid "Manually toggle pause when needed"
-msgstr ""
+msgstr "Pauza je ovládána uživatelem"
 
 #: plugins/cheatfind/init.lua:522
 msgid "Automatically toggle pause with on-screen menus"
-msgstr ""
+msgstr "Pauza je aktivována automaticky při zobrazeném menu"
 
 #: plugins/cheatfind/init.lua:543
 msgid "All slots cleared and current state saved to Slot 1"
 msgstr ""
+"Všechny snapshoty paměti byli smazány a aktuální stav je uložen do Snapshotu "
+"1"
 
 #: plugins/cheatfind/init.lua:555
 msgid "Start new search"
-msgstr ""
+msgstr "Začít nové hledání"
 
 #: plugins/cheatfind/init.lua:566
 #, lua-format
 msgid "Memory state saved to Slot %d"
-msgstr ""
+msgstr "Obraz paměti byl uložen do Snapshotu %d"
 
 #: plugins/cheatfind/init.lua:583
 #, lua-format
 msgid "Save current memory state to Slot %d"
-msgstr ""
+msgstr "Uložit aktuální obraz paměti do Snapshotu %d"
 
 #: plugins/cheatfind/init.lua:614
 #, lua-format
 msgid "%d total matches found"
-msgstr ""
+msgstr "Nalezených %d úplných shod"
 
 #: plugins/cheatfind/init.lua:623
 #, lua-format
 msgid "Perform Compare : Slot %d %s Slot %d"
-msgstr ""
+msgstr "Vykonat porovnání: Snapshot %d %s Snapshot %d"
 
 #: plugins/cheatfind/init.lua:624
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s Slot %d %s %d"
-msgstr ""
+msgstr "Vykonat porovnání: Snapshot %d %s Snapshot %d %s %d"
 
 #: plugins/cheatfind/init.lua:625
 #, lua-format
 msgid "Perform Compare  :  Slot %d BITWISE%s Slot %d"
-msgstr ""
+msgstr "Vykonat porovnání: Snapshot %d BITOVÝ%s Snapshot %d"
 
 #: plugins/cheatfind/init.lua:626
 #, lua-format
 msgid "Perform Compare  :  Slot %d %s %d"
-msgstr ""
+msgstr "Vykonat porovnání: Snapshot %d %s %d"
 
 #: plugins/cheatfind/init.lua:667 plugins/cheatfind/init.lua:709
 #, lua-format
 msgid "Slot %d"
-msgstr ""
+msgstr "Snapshot %d"
 
 #: plugins/cheatfind/init.lua:678
 msgid "Left less than right"
-msgstr ""
+msgstr "Levý je menší než pravý"
 
 #: plugins/cheatfind/init.lua:680
 msgid "Left greater than right"
-msgstr ""
+msgstr "Levý je větší než pravý"
 
 #: plugins/cheatfind/init.lua:682
 msgid "Left equal to right"
-msgstr ""
+msgstr "Levý je stejný jako pravý"
 
 #: plugins/cheatfind/init.lua:684
 msgid "Left not equal to right"
-msgstr ""
+msgstr "Levý není rovný pravému"
 
 #: plugins/cheatfind/init.lua:686
 msgid "Left equal to right with bitmask"
-msgstr ""
+msgstr "Levý je stejný jako pravý s bitovou maskou"
 
 #: plugins/cheatfind/init.lua:688
 msgid "Left not equal to right with bitmask"
-msgstr ""
+msgstr "Levý není rovný pravému s bitovou maskou"
 
 #: plugins/cheatfind/init.lua:690
 msgid "Left less than value"
-msgstr ""
+msgstr "Levý je menší než"
 
 #: plugins/cheatfind/init.lua:692
 msgid "Left greater than value"
-msgstr ""
+msgstr "Levý je větší než"
 
 #: plugins/cheatfind/init.lua:694
 msgid "Left equal to value"
-msgstr ""
+msgstr "Levý je rovný"
 
 #: plugins/cheatfind/init.lua:696
 msgid "Left not equal to value"
-msgstr ""
+msgstr "Levý není rovný"
 
 #: plugins/cheatfind/init.lua:718
 msgid "Value"
-msgstr ""
+msgstr "Hodnota"
 
 #: plugins/cheatfind/init.lua:720
 msgid "Difference"
-msgstr ""
+msgstr "Rozdíl"
 
 #: plugins/cheatfind/init.lua:725
 msgid "Any"
-msgstr ""
+msgstr "Libovolný"
 
 #: plugins/cheatfind/init.lua:731
 msgid "Data Format"
-msgstr ""
+msgstr "Formát dat"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Slot 1 Value"
-msgstr ""
+msgstr "Hodnota ve Snapshotu 1"
 
 #: plugins/cheatfind/init.lua:737
 msgid "Last Slot Value"
-msgstr ""
+msgstr "Hodnota v posledním Snapshotu"
 
 #: plugins/cheatfind/init.lua:740
 msgid "Test/Write Poke Value"
@@ -6965,25 +5522,29 @@ msgid ""
 "Use this if you want to poke the Slot 1 value (eg. You started with "
 "something but lost it)"
 msgstr ""
+"Použijte toto, pokud chcete vložit hodnotu ze Snapshotu 1 (např. když jste s "
+"nějakou začali, ale jste ji ztratili)"
 
 #: plugins/cheatfind/init.lua:749
 msgid ""
 "Use this if you want to poke the Last Slot value (eg. You started without an "
 "item but finally got it)"
 msgstr ""
+"Použijte toto, pokud chcete vložit hodnotu z posledního Snapshotu (např. "
+"když jste se žádnou nezačali, ale právě jste ji našli)"
 
 #: plugins/cheatfind/init.lua:751
 #, lua-format
 msgid "Use this if you want to poke %s"
-msgstr ""
+msgstr "Použijte toto, pokud chcete vložit %s"
 
 #: plugins/cheatfind/init.lua:774
 msgid "Aligned only"
-msgstr ""
+msgstr "Pouze zarovnány"
 
 #: plugins/cheatfind/init.lua:791
 msgid "Undo last search -- #"
-msgstr ""
+msgstr "Zvrátit poslední hledání -- #"
 
 #: plugins/cheatfind/init.lua:795
 msgid "Match block"
@@ -6991,24 +5552,24 @@ msgstr ""
 
 #: plugins/cheatfind/init.lua:798
 msgid "All"
-msgstr ""
+msgstr "Všechno"
 
 #: plugins/cheatfind/init.lua:907
 #, lua-format
 msgid "Test Cheat %08X_%02X"
-msgstr ""
+msgstr "Testovat cheat %08X_%02X"
 
 #: plugins/cheatfind/init.lua:947
 msgid "Cheat engine not available"
-msgstr ""
+msgstr "Podpora cheatů není dostupná"
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Test"
-msgstr ""
+msgstr "Testovat"
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Write"
-msgstr ""
+msgstr "Zapsat"
 
 #: plugins/cheatfind/init.lua:1003
 msgid "Watch"
@@ -7080,13 +5641,13 @@ msgstr ""
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr ""
+msgstr "[žádná autofire tlačítka]"
 
 #: plugins/autofire/autofire_menu.lua:109
 #: plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
 msgid "Add autofire button"
-msgstr ""
+msgstr "Přidat autofire tlačítko"
 
 #: plugins/autofire/autofire_menu.lua:150
 msgctxt "plugin-autofire"
@@ -7097,12 +5658,12 @@ msgstr ""
 #: plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
-msgstr ""
+msgstr "[nenastaveno]"
 
 #: plugins/autofire/autofire_menu.lua:155
 msgctxt "plugin-autofire"
 msgid "Input"
-msgstr ""
+msgstr "Vstup"
 
 #: plugins/autofire/autofire_menu.lua:159
 msgctxt "plugin-autofire"
@@ -7122,22 +5683,22 @@ msgstr ""
 #: plugins/autofire/autofire_menu.lua:200
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be pressed"
-msgstr ""
+msgstr "Počet framů, na které bude tlačítko stisknuto"
 
 #: plugins/autofire/autofire_menu.lua:213
 msgctxt "plugin-autofire"
 msgid "Number of frames button will be released"
-msgstr ""
+msgstr "Počet framů, na které bude tlačítko uvolněno"
 
 #: plugins/autofire/autofire_menu.lua:230
 msgctxt "plugin-autofire"
 msgid "Edit autofire button"
-msgstr ""
+msgstr "Změnit autofire tlačítko"
 
 #: plugins/autofire/autofire_menu.lua:238
 msgctxt "plugin-autofire"
 msgid "Done"
-msgstr ""
+msgstr "Hotovo"
 
 #: plugins/autofire/autofire_menu.lua:272
 msgctxt "plugin-autofire"
@@ -7147,54 +5708,54 @@ msgstr "Vytvořit"
 #: plugins/autofire/autofire_menu.lua:274
 msgctxt "plugin-autofire"
 msgid "Cancel"
-msgstr ""
+msgstr "Storno"
 
 #: plugins/autofire/autofire_menu.lua:325
 msgctxt "plugin-autofire"
 msgid "Select an input for autofire"
-msgstr ""
+msgstr "Vyberte vstup pro autofire"
 
 #: plugins/timecode/init.lua:155
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro started at %s"
-msgstr ""
+msgstr "TIMECODE: Intro spuštěno o %s"
 
 #: plugins/timecode/init.lua:160
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Intro duration %s"
-msgstr ""
+msgstr "TIMECODE: Trvání intra %s"
 
 #: plugins/timecode/init.lua:165
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay started at %s"
-msgstr ""
+msgstr "TIMECODE: Hraní hry započato o %s"
 
 #: plugins/timecode/init.lua:170
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Gameplay duration %s"
-msgstr ""
+msgstr "TIMECODE: Trvání hraní hry %s"
 
 #: plugins/timecode/init.lua:176
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d started at %s"
-msgstr ""
+msgstr "TIMECODE: Extra %d spuštěno o %s"
 
 #: plugins/timecode/init.lua:182
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TIMECODE: Extra %d duration %s"
-msgstr ""
+msgstr "TIMECODE: Trvání Extra %d %s"
 
 #: plugins/timecode/init.lua:207
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr ""
+msgstr " %s%s%02d:%02d [pozastaveno] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
@@ -7206,27 +5767,27 @@ msgstr ""
 #, lua-format
 msgctxt "plugin-timecode"
 msgid "TOTAL %02d:%02d "
-msgstr ""
+msgstr "CELKOVĚ %02d:%02d "
 
 #: plugins/timecode/init.lua:323 plugins/timecode/init.lua:345
 msgctxt "plugin-timecode"
 msgid "Timecode Recorder"
-msgstr ""
+msgstr "Timecode záznamník"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugin-timecode"
 msgid "Assume 60 Hz"
-msgstr ""
+msgstr "Předpokládat 60 Hz"
 
 #: plugins/timecode/init.lua:326
 msgctxt "plugins-timecode"
 msgid "Count emulated frames"
-msgstr ""
+msgstr "Počítat emulované framy"
 
 #: plugins/timecode/init.lua:327
 msgctxt "plugin-timecode"
 msgid "Frame numbers"
-msgstr ""
+msgstr "Čísla framů"
 
 #: plugins/timecode/init.lua:330
 msgctxt "plugin-timecode"
@@ -7236,123 +5797,123 @@ msgstr ""
 #: plugins/inputmacro/init.lua:135 plugins/inputmacro/inputmacro_menu.lua:560
 msgctxt "plugin-inputmacro"
 msgid "Input Macros"
-msgstr ""
+msgstr "Vstupová makra"
 
 #: plugins/inputmacro/inputmacro_menu.lua:31
 msgctxt "plugin-inputmacro"
 msgid "New macro"
-msgstr ""
+msgstr "Nové makro"
 
 #: plugins/inputmacro/inputmacro_menu.lua:35
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "New macro %d"
-msgstr ""
+msgstr "Nové makro #%d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:84
 msgctxt "plugin-inputmacro"
 msgid "Set Input"
-msgstr ""
+msgstr "Nastavit vstup"
 
 #: plugins/inputmacro/inputmacro_menu.lua:350
 msgctxt "plugin-inputmacro"
 msgid "Name"
-msgstr "Jméno"
+msgstr "Název"
 
 #: plugins/inputmacro/inputmacro_menu.lua:358
 #: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
-msgstr ""
+msgstr "[nenastaveno]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
 msgid "Activation sequence"
-msgstr ""
+msgstr "Aktivační sekvence"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Stop immediately"
-msgstr ""
+msgstr "Makro ihned ukončit"
 
 #: plugins/inputmacro/inputmacro_menu.lua:362
 msgctxt "plugin-inputmacro"
 msgid "Complete macro"
-msgstr ""
+msgstr "Nechat makro doběhnout"
 
 #: plugins/inputmacro/inputmacro_menu.lua:363
 msgctxt "plugin-inputmacro"
 msgid "On release"
-msgstr ""
+msgstr "Při uvolnění"
 
 #: plugins/inputmacro/inputmacro_menu.lua:369
 msgctxt "plugin-inputmacro"
 msgid "Release"
-msgstr ""
+msgstr "Makro vykonat pouze jednou"
 
 #: plugins/inputmacro/inputmacro_menu.lua:372
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Loop to step %d"
-msgstr ""
+msgstr "Opakovat od kroku %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:377
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Prolong step %d"
-msgstr ""
+msgstr "Opakovat pouze krok %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:379
 msgctxt "plugin-inputmacro"
 msgid "When held"
-msgstr ""
+msgstr "Pokud je aktiv. sekvence pořád stisknuta"
 
 #: plugins/inputmacro/inputmacro_menu.lua:383
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Step %d"
-msgstr ""
+msgstr "Krok %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:384
 msgctxt "plugin-inputmacro"
 msgid "Delay (frames)"
-msgstr ""
+msgstr "Opoždění (počet framů)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:390
 msgctxt "plugin-inputmacro"
 msgid "Duration (frames)"
-msgstr ""
+msgstr "Trvání (počet framů)"
 
 #: plugins/inputmacro/inputmacro_menu.lua:398
 msgctxt "plugin-inputmacro"
 msgid "n/a"
-msgstr ""
+msgstr "---"
 
 #: plugins/inputmacro/inputmacro_menu.lua:402
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Input %d"
-msgstr ""
+msgstr "Vstup %d"
 
 #: plugins/inputmacro/inputmacro_menu.lua:407
 msgctxt "plugin-inputmacro"
 msgid "Add input"
-msgstr ""
+msgstr "Přidat vstup"
 
 #: plugins/inputmacro/inputmacro_menu.lua:412
 msgctxt "plugin-inputmacro"
 msgid "Delete step"
-msgstr ""
+msgstr "Smazat krok"
 
 #: plugins/inputmacro/inputmacro_menu.lua:428
 msgctxt "plugin-inputmacro"
 msgid "Add step at position"
-msgstr ""
+msgstr "Přidat krok na pozici"
 
 #: plugins/inputmacro/inputmacro_menu.lua:474
 msgctxt "plugin-inputmacro"
 msgid "Add Input Macro"
-msgstr ""
+msgstr "Přidat vstupové makro"
 
 #: plugins/inputmacro/inputmacro_menu.lua:481
 msgctxt "plugin-inputmacro"
@@ -7362,33 +5923,33 @@ msgstr "Vytvořit"
 #: plugins/inputmacro/inputmacro_menu.lua:483
 msgctxt "plugin-inputmacro"
 msgid "Cancel"
-msgstr ""
+msgstr "Storno"
 
 #: plugins/inputmacro/inputmacro_menu.lua:499
 msgctxt "plugin-inputmacro"
 msgid "Edit Input Macro"
-msgstr ""
+msgstr "Změnit vstupové makro"
 
 #: plugins/inputmacro/inputmacro_menu.lua:505
 msgctxt "plugin-inputmacro"
 msgid "Done"
-msgstr ""
+msgstr "Hotovo"
 
 #: plugins/inputmacro/inputmacro_menu.lua:561
 #, lua-format
 msgctxt "plugin-inputmacro"
 msgid "Press %s to delete"
-msgstr ""
+msgstr "Pro smazání stiskněte %s"
 
 #: plugins/inputmacro/inputmacro_menu.lua:573
 msgctxt "plugin-inputmacro"
 msgid "[no macros]"
-msgstr ""
+msgstr "[žádná makra]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:578
 msgctxt "plugin-inputmacro"
 msgid "Add macro"
-msgstr ""
+msgstr "Přidat makro"
 
 #: plugins/timer/init.lua:27
 #, lua-format
@@ -7399,102 +5960,102 @@ msgstr ""
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Wall clock"
-msgstr ""
+msgstr "Systémový čas"
 
 #: plugins/timer/init.lua:32
 msgctxt "plugin-timer"
 msgid "Emulated time"
-msgstr ""
+msgstr "Emulovaný čas"
 
 #: plugins/timer/init.lua:37
 msgctxt "plugin-timer"
 msgid "Reference"
-msgstr ""
+msgstr "Reference"
 
 #: plugins/timer/init.lua:39
 msgctxt "plugin-timer"
 msgid "Current time"
-msgstr ""
+msgstr "Uplynulý čas"
 
 #: plugins/timer/init.lua:40
 msgctxt "plugin-timer"
 msgid "Total time"
-msgstr ""
+msgstr "Celkový čas"
 
 #: plugins/timer/init.lua:41
 msgctxt "plugin-timer"
 msgid "Play Count"
-msgstr ""
+msgstr "Počet hraní"
 
 #: plugins/timer/init.lua:73
 msgctxt "plugin-timer"
 msgid "Timer"
-msgstr ""
+msgstr "Časovač"
 
 #: plugins/cheat/init.lua:611
 msgid "Select cheat to set hotkey"
-msgstr ""
+msgstr "Vyberte cheat, pro který chcete nastavit hotkey"
 
 #: plugins/cheat/init.lua:612
 #, lua-format
 msgid "Press %s to clear hotkey"
-msgstr ""
+msgstr "Pro smazání hotkey stiskněte %s"
 
 #: plugins/cheat/init.lua:640
 msgid "None"
-msgstr ""
+msgstr "Žádný"
 
 #: plugins/cheat/init.lua:646
 msgid "Done"
-msgstr ""
+msgstr "Hotovo"
 
 #: plugins/cheat/init.lua:664 plugins/cheat/init.lua:678
 msgid "Set"
-msgstr ""
+msgstr "Nastavit"
 
 #: plugins/cheat/init.lua:697
 msgid "Set hotkeys"
-msgstr ""
+msgstr "Nastavit hotkeys"
 
 #: plugins/cheat/init.lua:785
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Aktivováno: %s = %s"
 
 #: plugins/cheat/init.lua:787 plugins/cheat/init.lua:845
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Aktivováno: %s"
 
 #: plugins/cheat/init.lua:849
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Zapnuto: %s"
 
 #: plugins/cheat/init.lua:854
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Vypnuto: %s"
 
 #: plugins/cheat/init.lua:913
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "Cheat %s přídán"
 
 #: plugins/data/data_command.lua:22
 msgctxt "plugin-data"
 msgid "Command"
-msgstr "Příkaz"
+msgstr ""
 
 #: plugins/data/data_story.lua:22
 msgctxt "plugin-data"
 msgid "Mamescore"
-msgstr "Mameskóre"
+msgstr ""
 
 #: plugins/data/data_sysinfo.lua:15
 msgctxt "plugin-data"
 msgid "Sysinfo"
-msgstr "Sysinfo"
+msgstr ""
 
 #: plugins/data/data_hiscore.lua:1220 plugins/data/data_hiscore.lua:1268
 msgctxt "plugin-data"
@@ -7509,12 +6070,12 @@ msgstr ""
 #: plugins/data/data_gameinit.lua:16
 msgctxt "plugin-data"
 msgid "Gameinit"
-msgstr "Gameinit"
+msgstr ""
 
 #: plugins/data/data_history.lua:172
 msgctxt "plugin-data"
 msgid "History"
-msgstr "Historie"
+msgstr ""
 
 #: plugins/data/data_messinfo.lua:19 plugins/data/data_mameinfo.lua:18
 msgctxt "plugin-data"
@@ -7524,6 +6085,10 @@ msgid ""
 "--- DRIVER INFO ---\n"
 "Driver: "
 msgstr ""
+"\n"
+"\n"
+"--- INFORMACE O OVLADAČI ---\n"
+"Ovladač: "
 
 #: plugins/data/data_messinfo.lua:21
 msgctxt "plugin-data"
@@ -7550,12 +6115,12 @@ msgstr ""
 #: plugins/commonui/init.lua:101
 msgctxt "plugin-commonui"
 msgid "Cancel"
-msgstr ""
+msgstr "Storno"
 
 #: plugins/commonui/init.lua:197
 msgctxt "plugin-commonui"
 msgid "Invalid sequence entered"
-msgstr ""
+msgstr "Vložená neplatná sekvence"
 
 #: plugins/commonui/init.lua:203
 #, lua-format
@@ -7564,371 +6129,11 @@ msgid ""
 "Enter sequence or press %s to cancel\n"
 "%s"
 msgstr ""
+"Vložte sekvenci nebo stiskněte %s pro storno\n"
+"%s"
 
-#~ msgid "Device Mapping"
-#~ msgstr "Mapování zařízení"
+#~ msgid "Confirm quit from machines"
+#~ msgstr "Potvrď odchod ze zařízení"
 
-#, c-format
-#~ msgid "%s.xml saved under ui folder."
-#~ msgstr "%s.xml uložen v ui složce."
-
-#, c-format
-#~ msgid "%s.txt saved under ui folder."
-#~ msgstr "%s.txt uložen v ui složce."
-
-#, c-format
-#~ msgid "Double-click or press %1$s to change the color value"
-#~ msgstr "Dvojklik nebo stisk %1$s pro změnu barvy"
-
-#~ msgid "Gfx viewer background"
-#~ msgstr "Pozadí Gfx prohlížeče"
-
-#~ msgid "Restore originals colors"
-#~ msgstr "Obnovit původní barvy"
-
-#~ msgid "UI Colors Settings"
-#~ msgstr "Nastavení barev UI"
-
-#~ msgid "Add or remove favorites"
-#~ msgstr "Přidat nebo odebrat z oblíbených"
-
-#~ msgid "Custom UI Settings"
-#~ msgstr "Uživatelská nastavení UI"
-
-#~ msgid "Software Usage"
-#~ msgstr "Software použití"
-
-#~ msgid "Usage"
-#~ msgstr "Využití"
-
-#~ msgctxt "path-option"
-#~ msgid "UI"
-#~ msgstr "UI"
-
-#~ msgctxt "path-option"
-#~ msgid "Language"
-#~ msgstr "Jazyk"
-
-#~ msgctxt "path-option"
-#~ msgid "Samples"
-#~ msgstr "Samply"
-
-#~ msgctxt "path-option"
-#~ msgid "Cheats"
-#~ msgstr "Cheaty"
-
-#~ msgctxt "path-option"
-#~ msgid "Titles"
-#~ msgstr "Titulky"
-
-#~ msgctxt "path-option"
-#~ msgid "Ends"
-#~ msgstr "Zakončení"
-
-#~ msgctxt "path-option"
-#~ msgid "Artworks"
-#~ msgstr "Artworky"
-
-#~ msgctxt "path-option"
-#~ msgid "GameOver"
-#~ msgstr "GameOver"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Cabinets"
-#~ msgstr "Kastle"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Control Panels"
-#~ msgstr "Panely ovládání"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "PCBs"
-#~ msgstr "Desky spojů"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Flyers"
-#~ msgstr "Plakáty"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Titles"
-#~ msgstr "Titulky"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Ends"
-#~ msgstr "Zakončení"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Logos"
-#~ msgstr "Loga"
-
-#~ msgctxt "selmenu-artwork"
-#~ msgid "Marquees"
-#~ msgstr "Marquees"
-
-#~ msgid "Select"
-#~ msgstr "Výběr"
-
-#~ msgid "View"
-#~ msgstr "Pohled"
-
-#~ msgid "Cropped"
-#~ msgstr "Ořezaný"
-
-#~ msgid "Full"
-#~ msgstr "Plný"
-
-#~ msgid "Select position to load from"
-#~ msgstr "Vyber pozici pro načtení"
-
-#~ msgid "Select position to save to"
-#~ msgstr "Vyber pozici pro uložení"
-
-#~ msgid "Keyboard Emulation Status"
-#~ msgstr "Stav emulace klávesnice"
-
-#~ msgid "Mode: PARTIAL Emulation"
-#~ msgstr "Režim: ČÁSTEČNÁ Emulace"
-
-#~ msgid "UI:   Enabled"
-#~ msgstr "UI:   Povoleno"
-
-#~ msgid "**Use ScrLock to toggle**"
-#~ msgstr "**Použij ScrLock pro přepnutí**"
-
-#~ msgid "Mode: FULL Emulation"
-#~ msgstr "Režim: PLNÁ Emulace"
-
-#~ msgid "UI:   Disabled"
-#~ msgstr "UI:   Zakázáno"
-
-#~ msgid "Autofire can't be enabled"
-#~ msgstr "Autostřelba nemůže být povolena"
-
-#, c-format
-#~ msgid "%1$.3ffps"
-#~ msgstr "%1$.3ffps"
-
-#~ msgid "Autofire Settings"
-#~ msgstr "Nastavení automatické střelby"
-
-#~ msgid "Autofire Status"
-#~ msgstr "Stav automatické střelby"
-
-#~ msgid "No buttons found on this machine!"
-#~ msgstr "Žádná tlačítka na tomto zařízení nenalezena!"
-
-#~ msgid "Autofire Delay"
-#~ msgstr "Zpoždění autostřelby"
-
-#~ msgid "Keyboard Mode:"
-#~ msgstr "Režim klávesnice:"
-
-#~ msgid "Save machine configuration"
-#~ msgstr "Ulož konfiguraci zařízení"
-
-#~ msgid "Re-select last machine played"
-#~ msgstr "Znovu-vyber poslední spuštěné zařízení"
-
-#~ msgid ""
-#~ "The software selected is missing one or more required ROM or CHD images. "
-#~ "Please select a different one."
-#~ msgstr ""
-#~ "Vybranému softwaru chybí jedna nebo více požadovaných ROM nebo CHD. "
-#~ "Prosím, vyberte jiný."
-
-#~ msgid "Unimplemented"
-#~ msgstr "Neimplementovaný"
-
-#~ msgid "Imperfect"
-#~ msgstr "Nedokonalý"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Gfx: %s, Sound: %s"
-#~ msgstr "Gfx: %s, Zvuk: %s"
-
-#~ msgid "Audit in progress..."
-#~ msgstr "Probíhá audit..."
-
-#~ msgid "Extra INIs"
-#~ msgstr "Extra INIs"
-
-#~ msgid "%1$s (%2$s - %3$s) - "
-#~ msgstr "%1$s (%2$s - %3$s) - "
-
-#~ msgid "%1$s (%2$s) - "
-#~ msgstr "%1$s (%2$s) - "
-
-#~ msgid "%1$s Search: %2$s_"
-#~ msgstr "%1$s Hledání: %2$s_"
-
-#~ msgid "Main filter"
-#~ msgstr "Základní filtr"
-
-#~ msgid "Other filter"
-#~ msgstr "Další filtr"
-
-#~ msgid "^!Region"
-#~ msgstr "^!Region"
-
-#~ msgid "^!Setup custom filter"
-#~ msgstr "^!Nastav uživatelský filtr"
-
-#~ msgid "Region: %1$s -"
-#~ msgstr "Region: %1$s -"
-
-#~ msgid "%s Search: %s_"
-#~ msgstr "%s Hledání: %s_"
-
-#~ msgid "Software History"
-#~ msgstr "Software historie"
-
-#~ msgid "Mameinfo"
-#~ msgstr "Mameinfo"
-
-#~ msgid "Messinfo"
-#~ msgstr "Messinfo"
-
-#~ msgid "The keyboard emulation may not be 100% accurate.\n"
-#~ msgstr "Emulace klávesnice nemusí být na 100% autentická.\n"
-
-#~ msgid "The colors aren't 100% accurate.\n"
-#~ msgstr "Barvy nejsou 100% autentické.\n"
-
-#~ msgid "The colors are completely wrong.\n"
-#~ msgstr "Barvy jsou úplně špatné.\n"
-
-#~ msgid "The video emulation isn't 100% accurate.\n"
-#~ msgstr "Emulace videa není 100% autentická.\n"
-
-#~ msgid "The sound emulation isn't 100% accurate.\n"
-#~ msgstr ""
-#~ "Emulace zvuku není 100% autentická.\n"
-#~ "\n"
-
-#~ msgid "The machine lacks sound.\n"
-#~ msgstr "Zařízení postrádá zvuky.\n"
-
-#~ msgid "The machine requires external artwork files\n"
-#~ msgstr "Zařízení vyžaduje externí artworky\n"
-
-#~ msgid "The machine has protection which isn't fully emulated.\n"
-#~ msgstr "Zařízení má ochranu která není plně emulovaná.\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "Certain elements of this machine cannot be emulated as it requires actual "
-#~ "physical interaction or consists of mechanical devices. It is not "
-#~ "possible to fully play this machine.\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Části tohoto zařízení nemohou být emulovány neboť vyžadují fyzickou "
-#~ "interakci nebo se skládají z mechanických zařízení. Není možné naplno "
-#~ "rozeběhnout toto zařízení.\n"
-
-#~ msgid "Game is Mechanical: %1$s\n"
-#~ msgstr "Hra je mechanická: %1$s\n"
-
-#~ msgid "Requires Artwork: %1$s\n"
-#~ msgstr "Vyžaduje artwork: %1$s\n"
-
-#~ msgid "Requires Clickable Artwork: %1$s\n"
-#~ msgstr "Vyžaduje klikatelný artwork: %1$s\n"
-
-#~ msgid "Support Cocktail: %1$s\n"
-#~ msgstr "Podporuje Cocktail: %1$s\n"
-
-#~ msgid "Driver is Bios: %1$s\n"
-#~ msgstr "Driver je Bios: %1$s\n"
-
-#~ msgid "Support Save: %1$s\n"
-#~ msgstr "Podpora Save: %1$s\n"
-
-#~ msgid "Requires CHD: %1$s\n"
-#~ msgstr "Vyžaduje CHD: %1$s\n"
-
-#~ msgid "Roms Audit Pass: OK\n"
-#~ msgstr ""
-#~ "Audit ROM proběhl: OK\n"
-#~ "\n"
-
-#~ msgid "Roms Audit Pass: BAD\n"
-#~ msgstr "Audit ROM proběhl: ŠPATNĚ\n"
-
-#~ msgid "Samples Audit Pass: None Needed\n"
-#~ msgstr "Samples Audit Pass: None Needed\n"
-
-#~ msgid "Samples Audit Pass: OK\n"
-#~ msgstr "Audit samplů proběhl: OK\n"
-
-#~ msgid "Samples Audit Pass: BAD\n"
-#~ msgstr "Audit samplů proběhl: ŠPATNĚ\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass: Disabled\n"
-#~ "Samples Audit Pass: Disabled\n"
-#~ msgstr ""
-#~ "Audit ROM: Vypnutý\n"
-#~ "Audit samplů: Vypnutý\n"
-
-#~ msgid "No Infos Available"
-#~ msgstr "Žádné dostupné informace"
-
-#~ msgid "DATs info"
-#~ msgstr "DAT informace"
-
-#~ msgid "Save cancelled"
-#~ msgstr "Ukládání zrušeno"
-
-#~ msgid "Load cancelled"
-#~ msgstr "Načítání zrušeno"
-
-#~ msgid "Save to position %s"
-#~ msgstr "Uložení do pozice %s"
-
-#~ msgid "Load from position %s"
-#~ msgstr "Načtení z pozice %s"
-
-#~ msgid "Export XML format (like -listxml)"
-#~ msgstr "Exportuj XML formát (jako -listxml)"
-
-#~ msgid "Export TXT format (like -listfull)"
-#~ msgstr "Exportuj TXT formát (jako -listfull)"
-
-#~ msgid "Dummy"
-#~ msgstr "Prázdný"
-
-#~ msgid "%1$s %2$s ( %3$d / %4$d softwares )"
-#~ msgstr "%1$s %2$s ( %3$d / %4$d softwares )"
-
-#~ msgid "Display Options"
-#~ msgstr "Nastavení zobrazení"
-
-#~ msgid "Skip displaying information's screen at startup"
-#~ msgstr "Přeskoč informační obrazovku při startu"
-
-#~ msgid "Force 4:3 appearance for software snapshot"
-#~ msgstr "Vynuť 4:3 vzhled pro software snapshot"
-
-#~ msgid ""
-#~ "The selected machine is missing one or more required ROM or CHD images. "
-#~ "Please select a different machine.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Vybranému zařízení chybí jedna nebo více požadovaných ROM nebo CHD. "
-#~ "Prosím, vyberte jiné zařízení.\n"
-#~ "\n"
-#~ "Stiskni nějakou klávesu (kromě ESC) pro pokračování."
-
-#~ msgid ""
-#~ "The selected software is missing one or more required files. Please "
-#~ "select a different software.\n"
-#~ "\n"
-#~ "Press any key (except ESC) to continue."
-#~ msgstr ""
-#~ "Vybraný software postrádá jeden nebo více požadovaných soborů. Prosím, "
-#~ "vyberte jiný.\n"
-#~ "\n"
-#~ "Stiskni nějakou klávesu (kromě ESC) pro pokračování."
+#~ msgid "Skip software parts selection menu"
+#~ msgstr "Přeskoč menu s výběrem částí software"

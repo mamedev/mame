@@ -109,12 +109,12 @@ Please stick to using the floppy versions for the time being...
     and then in typing
       run""
     and press return. The latter part can be replaced by using the CPC keyboard shortcut 'Ctrl' + the numeric keypad 'Enter'
-    (in both the real system and MESS, such shortcut is equivalent to the RUN"" command).
+    (in both the real system and MAME, such shortcut is equivalent to the RUN"" command).
     Notice that the '|' key necessary for the former part is mapper to the key on the left of 'P' of your keyboard (corresponding
     to '{' in most English keyboards).
 
     To start/stop the tape you can either use the emulation shortcuts for Tape Play and Tape Stop by default mapped to
-    'F2' and 'Shift'+'F2', or use the Tape Control options in the MESS internal menu, accessible by entering partial keyboard
+    'F2' and 'Shift'+'F2', or use the Tape Control options in the MAME internal menu, accessible by entering partial keyboard
     mode (press 'Scroll Lock' on your keyboard) and then pressing 'TAB'.
 
     Notice that you can speed up the loading process by pressing the FFWD key (by default mapped to 'Insert' on  your keyboard)

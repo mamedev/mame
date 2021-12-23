@@ -111,8 +111,6 @@
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 u32 model2_state::timers_r(offs_t offset)
 {
-	m_maincpu->i960_noburst();
-
 	// if timer is running, calculate current value
 	if (m_timerrun[offset])
 	{
@@ -129,8 +127,6 @@ u32 model2_state::timers_r(offs_t offset)
 void model2_state::timers_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	attotime period;
-
-	m_maincpu->i960_noburst();
 	COMBINE_DATA(&m_timervals[offset]);
 
 	m_timerorig[offset] = m_timervals[offset];
@@ -603,13 +599,11 @@ void model2_tgp_state::copro_boot()
 
 u32 model2_tgp_state::copro_fifo_r()
 {
-	m_maincpu->i960_noburst();
 	return m_copro_fifo_out->pop();
 }
 
 void model2_tgp_state::copro_fifo_w(u32 data)
 {
-	m_maincpu->i960_noburst();
 	if (m_coproctl & 0x80000000)
 	{
 		m_copro_tgp_program[m_coprocnt] = data;
@@ -652,13 +646,11 @@ void model2b_state::copro_boot()
 
 u32 model2b_state::copro_fifo_r()
 {
-	m_maincpu->i960_noburst();
 	return m_copro_fifo_out->pop();
 }
 
 void model2b_state::copro_fifo_w(u32 data)
 {
-	m_maincpu->i960_noburst();
 	if (m_coproctl & 0x80000000)
 	{
 		m_copro_adsp->external_dma_write(m_coprocnt, data & 0xffff);
@@ -732,13 +724,11 @@ void model2c_state::copro_boot()
 
 u32 model2c_state::copro_fifo_r()
 {
-	m_maincpu->i960_noburst();
 	return m_copro_fifo_out->pop();
 }
 
 void model2c_state::copro_fifo_w(u32 data)
 {
-	m_maincpu->i960_noburst();
 	if (m_coproctl & 0x80000000)
 	{
 		if (m_coprocnt & 1)
@@ -931,22 +921,16 @@ void model2_state::geo_w(offs_t offset, u32 data)
 
 u32 model2_state::irq_request_r()
 {
-	m_maincpu->i960_noburst();
-
 	return m_intreq;
 }
 
 u32 model2_state::irq_enable_r()
 {
-	m_maincpu->i960_noburst();
-
 	return m_intena;
 }
 
 void model2_state::irq_ack_w(u32 data)
 {
-	m_maincpu->i960_noburst();
-
 	m_intreq &= data;
 
 	model2_check_irqack_state(data ^ 0xffffffff);
@@ -954,8 +938,6 @@ void model2_state::irq_ack_w(u32 data)
 
 void model2_state::irq_enable_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_maincpu->i960_noburst();
-
 	COMBINE_DATA(&m_intena);
 	model2_check_irq_state();
 }
@@ -1121,9 +1103,9 @@ void model2_state::fbvram_bankB_w(offs_t offset, u16 data, u16 mem_mask) { COMBI
 /* common map for all Model 2 versions */
 void model2_state::model2_base_mem(address_map &map)
 {
-	map(0x00000000, 0x001fffff).rom().nopw();
+	map(0x00000000, 0x001fffff).rom().nopw().flags(i960_cpu_device::BURST);;
 
-	map(0x00500000, 0x005fffff).ram().share("workram");
+	map(0x00500000, 0x005fffff).ram().share("workram").flags(i960_cpu_device::BURST);
 
 	map(0x00800000, 0x00803fff).rw(FUNC(model2_state::geo_r), FUNC(model2_state::geo_w));
 	//map(0x00800010, 0x00800013).nopw();
@@ -1132,7 +1114,7 @@ void model2_state::model2_base_mem(address_map &map)
 
 	//map(0x00880000, 0x00883fff).w(FUNC(model2_state::copro_w));
 
-	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram");
+	map(0x00900000, 0x0091ffff).mirror(0x60000).ram().share("bufferram").flags(i960_cpu_device::BURST);
 
 	map(0x00980004, 0x00980007).r(FUNC(model2_state::fifo_control_2a_r));
 	map(0x0098000c, 0x0098000f).rw(FUNC(model2_state::videoctl_r), FUNC(model2_state::videoctl_w));
@@ -1144,24 +1126,24 @@ void model2_state::model2_base_mem(address_map &map)
 
 	map(0x00f00000, 0x00f0000f).rw(FUNC(model2_state::timers_r), FUNC(model2_state::timers_w));
 
-	map(0x01000000, 0x0100ffff).rw("tile", FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w)).mirror(0x110000);
-	map(0x01020000, 0x01020003).nopw().mirror(0x100000);        // ABSEL, always 0
+	map(0x01000000, 0x0100ffff).rw("tile", FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w)).mirror(0x110000).flags(i960_cpu_device::BURST);
+	map(0x01020000, 0x01020003).nopw().mirror(0x100000).flags(i960_cpu_device::BURST);        // ABSEL, always 0
 	map(0x01040000, 0x01040001).w("tile", FUNC(segas24_tile_device::xhout_w)).mirror(0x100000); // Horizontal synchronization register
 	map(0x01060000, 0x01060001).w("tile", FUNC(segas24_tile_device::xvout_w)).mirror(0x100000); // Vertical synchronization register
 	map(0x01070000, 0x01070003).nopw().mirror(0x100000);        // Video synchronization switch
-	map(0x01080000, 0x010fffff).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w)).mirror(0x100000);
+	map(0x01080000, 0x010fffff).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w)).mirror(0x100000).flags(i960_cpu_device::BURST);
 
-	map(0x01800000, 0x01803fff).rw(FUNC(model2_state::palette_r), FUNC(model2_state::palette_w));
-	map(0x01810000, 0x0181bfff).rw(FUNC(model2_state::colorxlat_r), FUNC(model2_state::colorxlat_w));
+	map(0x01800000, 0x01803fff).rw(FUNC(model2_state::palette_r), FUNC(model2_state::palette_w)).flags(i960_cpu_device::BURST);
+	map(0x01810000, 0x0181bfff).rw(FUNC(model2_state::colorxlat_r), FUNC(model2_state::colorxlat_w)).flags(i960_cpu_device::BURST);
 	map(0x0181c000, 0x0181c003).w(FUNC(model2_state::model2_3d_zclip_w));
-	map(0x01a00000, 0x01a03fff).rw(m_m2comm, FUNC(m2comm_device::share_r), FUNC(m2comm_device::share_w)).mirror(0x10000); // Power Sled access comm.board at 0x01A0XXXX, not sure if really a mirror, or slightly different comm.device
+	map(0x01a00000, 0x01a03fff).rw(m_m2comm, FUNC(m2comm_device::share_r), FUNC(m2comm_device::share_w)).mirror(0x10000).flags(i960_cpu_device::BURST); // Power Sled access comm.board at 0x01A0XXXX, not sure if really a mirror, or slightly different comm.device
 	map(0x01a04000, 0x01a04000).rw(m_m2comm, FUNC(m2comm_device::cn_r), FUNC(m2comm_device::cn_w)).mirror(0x10000);
 	map(0x01a04002, 0x01a04002).rw(m_m2comm, FUNC(m2comm_device::fg_r), FUNC(m2comm_device::fg_w)).mirror(0x10000);
-	map(0x01d00000, 0x01d03fff).ram().share("backup1"); // Backup sram
-	map(0x02000000, 0x03ffffff).rom().region("main_data", 0);
+	map(0x01d00000, 0x01d03fff).ram().share("backup1").flags(i960_cpu_device::BURST); // Backup sram
+	map(0x02000000, 0x03ffffff).rom().region("main_data", 0).flags(i960_cpu_device::BURST);
 
 	// "extra" data
-	map(0x06000000, 0x06ffffff).rom().region("main_data", 0x1000000);
+	map(0x06000000, 0x06ffffff).rom().region("main_data", 0x1000000).flags(i960_cpu_device::BURST);
 
 	map(0x10000000, 0x101fffff).rw(FUNC(model2_state::render_mode_r), FUNC(model2_state::render_mode_w));
 //  map(0x10200000, 0x103fffff) renderer status register
@@ -1172,16 +1154,16 @@ void model2_state::model2_base_mem(address_map &map)
 //  map(0x10c00000, 0x10dfffff) fill memory pong
 
 	// format is xGGGGGRRRRRBBBBB (512x400)
-	map(0x11600000, 0x1167ffff).rw(FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)); // framebuffer A (last bronx title screen)
-	map(0x11680000, 0x116fffff).rw(FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)); // framebuffer B
+	map(0x11600000, 0x1167ffff).rw(FUNC(model2_state::fbvram_bankA_r), FUNC(model2_state::fbvram_bankA_w)).flags(i960_cpu_device::BURST); // framebuffer A (last bronx title screen)
+	map(0x11680000, 0x116fffff).rw(FUNC(model2_state::fbvram_bankB_r), FUNC(model2_state::fbvram_bankB_w)).flags(i960_cpu_device::BURST); // framebuffer B
 
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2_state::lumaram_r), FUNC(model2_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
+	map(0x12800000, 0x1281ffff).rw(FUNC(model2_state::lumaram_r), FUNC(model2_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 }
 
 /* common map for 5881 protection */
 void model2_state::model2_5881_mem(address_map &map)
 {
-	map(0x01d80000, 0x01d8ffff).ram();
+	map(0x01d80000, 0x01d8ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x01d90000, 0x01d9ffff).m(m_cryptdevice, FUNC(sega_315_5881_crypt_device::iomap_le));
 }
 
@@ -1304,16 +1286,16 @@ void model2_tgp_state::model2_tgp_mem(address_map &map)
 {
 	model2_base_mem(map);
 
-	map(0x00804000, 0x00807fff).rw(FUNC(model2_tgp_state::geo_prg_r), FUNC(model2_tgp_state::geo_prg_w));
-	map(0x00880000, 0x00883fff).w(FUNC(model2_tgp_state::copro_function_port_w));
+	map(0x00804000, 0x00807fff).rw(FUNC(model2_tgp_state::geo_prg_r), FUNC(model2_tgp_state::geo_prg_w)).flags(i960_cpu_device::BURST);
+	map(0x00880000, 0x00883fff).w(FUNC(model2_tgp_state::copro_function_port_w)).flags(i960_cpu_device::BURST);
 	map(0x00884000, 0x00887fff).rw(FUNC(model2_tgp_state::copro_fifo_r), FUNC(model2_tgp_state::copro_fifo_w));
 
 	map(0x00980000, 0x00980003).rw(FUNC(model2_tgp_state::copro_ctl1_r), FUNC(model2_tgp_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2_tgp_state::geo_ctl1_w));
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2_tgp_state::model2_serial_r), FUNC(model2_tgp_state::model2_serial_w));
 
-	map(0x12000000, 0x121fffff).ram().w(FUNC(model2o_state::tex0_w)).mirror(0x200000).share("textureram0");   // texture RAM 0
-	map(0x12400000, 0x125fffff).ram().w(FUNC(model2o_state::tex1_w)).mirror(0x200000).share("textureram1");   // texture RAM 1
+	map(0x12000000, 0x121fffff).ram().w(FUNC(model2o_state::tex0_w)).mirror(0x200000).share("textureram0").flags(i960_cpu_device::BURST);   // texture RAM 0
+	map(0x12400000, 0x125fffff).ram().w(FUNC(model2o_state::tex1_w)).mirror(0x200000).share("textureram1").flags(i960_cpu_device::BURST);   // texture RAM 1
 }
 
 /* original Model 2 overrides */
@@ -1321,8 +1303,8 @@ void model2o_state::model2o_mem(address_map &map)
 {
 	model2_tgp_mem(map);
 
-	map(0x00200000, 0x0021ffff).ram();
-	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000);
+	map(0x00200000, 0x0021ffff).ram().flags(i960_cpu_device::BURST);
+	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000).flags(i960_cpu_device::BURST);
 	map(0x00980004, 0x00980007).r(FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
 	map(0x01c80000, 0x01c80003).rw(FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
@@ -1393,7 +1375,7 @@ u8 model2o_gtx_state::gtx_r(offs_t offset)
 void model2o_gtx_state::model2o_gtx_mem(address_map &map)
 {
 	model2o_mem(map);
-	map(0x02c00000,0x02cfffff).r(FUNC(model2o_gtx_state::gtx_r));
+	map(0x02c00000,0x02cfffff).r(FUNC(model2o_gtx_state::gtx_r)).flags(i960_cpu_device::BURST);
 }
 
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
@@ -1410,7 +1392,7 @@ void model2a_state::model2a_crx_mem(address_map &map)
 {
 	model2_tgp_mem(map);
 
-	map(0x00200000, 0x0023ffff).ram();
+	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
 	map(0x01c80000, 0x01c80003).rw(FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w));
@@ -1433,7 +1415,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 {
 	model2_base_mem(map);
 
-	map(0x00200000, 0x0023ffff).ram();
+	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
 
 	map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_prg_r), FUNC(model2b_state::geo_prg_w));
 	//map(0x00804000, 0x00807fff).rw(FUNC(model2b_state::geo_sharc_fifo_r), FUNC(model2b_state::geo_sharc_fifo_w));
@@ -1450,12 +1432,12 @@ void model2b_state::model2b_crx_mem(address_map &map)
 
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 
-	map(0x11000000, 0x110fffff).ram().share("textureram0"); // texture RAM 0 (2b/2c)
-	map(0x11100000, 0x111fffff).ram().share("textureram0"); // texture RAM 0 (2b/2c)
-	map(0x11200000, 0x112fffff).ram().share("textureram1"); // texture RAM 1 (2b/2c)
-	map(0x11300000, 0x113fffff).ram().share("textureram1"); // texture RAM 1 (2b/2c)
-	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w));    // polygon "luma" RAM (2b/2c)
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
+	map(0x11000000, 0x110fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
+	map(0x11100000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
+	map(0x11200000, 0x112fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
+	map(0x11300000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
+	map(0x11400000, 0x1140ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
+	map(0x12800000, 0x1281ffff).rw(FUNC(model2b_state::lumaram_r), FUNC(model2b_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
@@ -1479,7 +1461,7 @@ void model2c_state::model2c_crx_mem(address_map &map)
 {
 	model2_base_mem(map);
 
-	map(0x00200000, 0x0023ffff).ram();
+	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
 
 	map(0x00804000, 0x00807fff).rw(FUNC(model2c_state::geo_prg_r), FUNC(model2c_state::geo_prg_w));
 	map(0x00880000, 0x00883fff).w(FUNC(model2c_state::copro_function_port_w));
@@ -1490,10 +1472,10 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x00980014, 0x00980017).r(FUNC(model2c_state::copro_status_r));
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
 
-	map(0x11000000, 0x111fffff).ram().share("textureram0"); // texture RAM 0 (2b/2c)
-	map(0x11200000, 0x113fffff).ram().share("textureram1"); // texture RAM 1 (2b/2c)
-	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w));    // polygon "luma" RAM (2b/2c)
-	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff); // polygon "luma" RAM
+	map(0x11000000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
+	map(0x11200000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
+	map(0x11400000, 0x1140ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).flags(i960_cpu_device::BURST);    // polygon "luma" RAM (2b/2c)
+	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c80000, 0x01c80003).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));

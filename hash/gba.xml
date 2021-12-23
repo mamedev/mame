@@ -20938,6 +20938,19 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mechanic">
+		<description>Mechanic Mechanica (Japan, prototype)</description>
+		<year>20??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="メカニクメカニカ"/>
+		<part name="cart" interface="gba_cart">
+			<feature name="slot" value="gba_eeprom_4k" />
+			<dataarea name="rom" size="8388608">
+				<rom name="mechanic.bin" size="8388608" crc="64251e43" sha1="a02c9fbcd430d6a0e3295642d5aedfa853b0c74a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="medabmtb">
 		<description>Medabots - Metabee Version (Euro)</description>
 		<year>2003</year>
@@ -25233,6 +25246,18 @@ license:CC0
 			<feature name="slot" value="gba_sram" />
 			<dataarea name="rom" size="4194304">
 				<rom name="penny racers (europe).bin" size="4194304" crc="8fddd48b" sha1="7c097634fadc6270873a4a5cf2eb0a8beb3c9e6e"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This was the last development build, released by the programmer, James Boulton. It was never completed due to lack of publisher interest. -->
+	<software name="perplexd" supported="partial">
+		<description>Perplexus Diodomin (prototype)</description>
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="1681812">
+				<rom name="perplexusdiodomin.bin" size="1681812" crc="3442f9cf" sha1="f3c7093e9770632de618c7931f287ebc7b5e0aa2"/>
 			</dataarea>
 		</part>
 	</software>

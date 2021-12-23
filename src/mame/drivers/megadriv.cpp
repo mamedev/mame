@@ -652,7 +652,7 @@ void md_cons_state::genesis_32x(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the YM because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
+	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
@@ -684,7 +684,7 @@ void md_cons_state::mdj_32x(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
+	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
@@ -716,7 +716,7 @@ void md_cons_state::md_32x(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
+	// due to MAME having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is silent?!)
 	m_ymsnd->reset_routes();
 	m_ymsnd->add_route(0, "lspeaker", (0.50)/2);
 	m_ymsnd->add_route(1, "rspeaker", (0.50)/2);
@@ -1188,7 +1188,7 @@ CONS( 1993, megajet,      gen_nomd, 0,      ms_megadriv2,    megajet,  md_cons_s
 // Mega Drive Pack(PAC-S1)/Genesis Pack(PAC-S10) plugged into the Control Pack slot, for plays Mega Drive/Genesis Cartridge, Mega-CD/Sega CD, Mega-LD stuffs
 CONS( 1993, laseract,     0,        0,      genesis_scd,     md,       md_cons_cd_state, init_genesis, "Pioneer / Sega","LaserActive with Genesis Pack PAC-S10 (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1993, laseractj,    laseract, 0,      mdj_scd,         md,       md_cons_cd_state, init_md_jpn,  "Pioneer / Sega","LaserActive with Mega Drive Pack PAC-S1 (Japan, NTSC)", MACHINE_NOT_WORKING )
-//TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, LD-ROM2 stuffs, but not emulated.
+//TODO: it has also PC Engine Pack(PAC-N1)/TG16 Pack(PAC-N10) for plays PC Engine/TG16 Cartridge, (Super/Arcade) CD-ROM2/TurboGrafx-CD, LD-ROM2 stuffs, but not emulated.
 
 /* clone hardware - not sure if this hardware is running some kind of emulator, or enhanced MD clone, or just custom banking */
 CONS( 200?, dcat16,       0,        0,      dcat16_megadriv, md,       md_cons_slot_state, init_genesis, "Firecore",   "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )

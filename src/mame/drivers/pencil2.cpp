@@ -7,7 +7,7 @@
 
     2012-11-06 [Robbbert]
 
-    Computer kindly donated for MESS by Ian Farquhar.
+    Computer kindly donated for MAME by Ian Farquhar.
 
     Accessories:
     - PEN-216 : 16k RAM expansion

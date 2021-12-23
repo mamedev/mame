@@ -63,6 +63,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device,      "nes_bmc_k1029
 DEFINE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device,      "nes_bmc_k3036",      "NES Cart BMC K-3036 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device,      "nes_bmc_k3046",      "NES Cart BMC K-3046 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device,     "nes_bmc_sa005a",     "NES Cart BMC SA005-A PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_TF2740,     nes_bmc_tf2740_device,     "nes_bmc_tf2740",     "NES Cart BMC TF2740 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device,       "nes_bmc_tj03",       "NES Cart BMC TJ-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device,         "nes_bmc_ws",         "NES Cart BMC WS PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device,      "nes_bmc_1160",       "NES Cart BMC-1160 PCB")
@@ -269,6 +270,11 @@ nes_bmc_k3046_device::nes_bmc_k3046_device(const machine_config &mconfig, const 
 
 nes_bmc_sa005a_device::nes_bmc_sa005a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_SA005A, tag, owner, clock)
+{
+}
+
+nes_bmc_tf2740_device::nes_bmc_tf2740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_TF2740, tag, owner, clock), m_jumper(0)
 {
 }
 
@@ -657,11 +663,6 @@ void nes_bmc_80013b_device::pcb_reset()
 	update_prg();
 }
 
-void nes_bmc_810544c_device::device_start()
-{
-	common_start();
-}
-
 void nes_bmc_810544c_device::pcb_reset()
 {
 	prg16_89ab(0);
@@ -799,6 +800,22 @@ void nes_bmc_sa005a_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, CHRROM);
+}
+
+void nes_bmc_tf2740_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+	save_item(NAME(m_jumper));
+}
+
+void nes_bmc_tf2740_device::pcb_reset()
+{
+	prg16_89ab(0);
+	prg16_cdef(0);
+	chr8(0, CHRROM);
+
+	m_reg[0] = m_reg[1] = m_reg[2] = 0;
 }
 
 void nes_bmc_ws_device::device_start()
@@ -1565,7 +1582,7 @@ u8 nes_vt5201_device::read_h(offs_t offset)
 	LOG_MMC(("bmc_vt5201 read_h, offset: %04x\n", offset));
 
 	if (BIT(m_latch, 0))
-		return (get_open_bus() & 0xfc) | m_jumper;    // TODO: add jumper settings, m_jumper is 0 for now
+		return (get_open_bus() & ~0x03) | m_jumper;    // TODO: add jumper settings, m_jumper is 0 for now
 	else
 		return hi_access_rom(offset);
 }
@@ -1606,9 +1623,9 @@ void nes_bmc_80013b_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-810544-C-A1
+ BMC-810544-C-A1, NTDEC 2746
 
- Games: 200-in-1 Elfland
+ Games: 200-in-1 Elfland, 14 in 1
 
  NES 2.0: mapper 261
 
@@ -1618,20 +1635,15 @@ void nes_bmc_80013b_device::write_h(offs_t offset, u8 data)
 
 void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 {
-	u8 bank = (offset >> 7);
 	LOG_MMC(("bmc_810544c write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (!BIT(offset, 6))
-	{
-		prg16_89ab((bank << 1) | BIT(offset, 5));
-		prg16_cdef((bank << 1) | BIT(offset, 5));
-	}
-	else
-		prg32(bank);
-
-	set_nt_mirroring(BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	u8 bank = bitswap<4>(offset, 9, 8, 7, 5);
+	u8 mode = BIT(offset, 6);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
 
 	chr8(offset & 0x0f, CHRROM);
+	set_nt_mirroring(BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
@@ -2053,6 +2065,60 @@ void nes_bmc_sa005a_device::write_h(offs_t offset, u8 data)
 	prg16_cdef(bank);
 	chr8(bank, CHRROM);
 	set_nt_mirroring(BIT(offset, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+}
+
+/*-------------------------------------------------
+
+ BMC-TF2740
+
+ Games: 14 in 1, 40 in 1, 158 in 1, 9999 in 1,
+ 10000000 in 1
+
+ NES 2.0: mapper 428
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+void nes_bmc_tf2740_device::update_chr()
+{
+	chr8(m_reg[2] & 0xc0 ? (m_reg[1] & 0x04) | (m_reg[0] & 0x03) : m_reg[1] & 0x07, CHRROM);
+}
+
+void nes_bmc_tf2740_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_tf2740 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x03)
+	{
+		case 0x01:
+		{
+			u8 bank = data >> 5;
+			u8 mode = BIT(data, 4);
+			prg16_89ab(bank & ~mode);
+			prg16_cdef(bank | mode);
+
+			set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			[[fallthrough]];
+		}
+		case 0x02:
+			m_reg[offset & 0x03] = data;
+			update_chr();
+			break;
+	}
+}
+
+void nes_bmc_tf2740_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_tf2740 write_h, offset: %04x, data: %02x\n", offset, data));
+	m_reg[0] = data;
+	update_chr();
+}
+
+u8 nes_bmc_tf2740_device::read_m(offs_t offset)
+{
+	LOG_MMC(("bmc_tf2740 read_m, offset: %04x\n", offset));
+	return (get_open_bus() & ~0x03) | m_jumper;    // TODO: add jumper settings, m_jumper is 0 for now
 }
 
 /*-------------------------------------------------

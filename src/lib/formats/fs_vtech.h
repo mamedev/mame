@@ -29,31 +29,31 @@ public:
 			virtual file_t file_create(const fs_meta_data &info) override;
 			virtual void file_delete(uint64_t key) override;
 
-			void update_file(u16 key, const u8 *entry);
+			void update_file(uint16_t key, const uint8_t *entry);
 
 		private:
 			impl &m_fs;
 
-			std::pair<fsblk_t::block_t, u32> get_dir_block(uint64_t key);
+			std::pair<fsblk_t::block_t, uint32_t> get_dir_block(uint64_t key);
 		};
 
 		class file : public ifile_t {
 		public:
-			file(impl &fs, root_dir *dir, const u8 *entry, u16 key);
+			file(impl &fs, root_dir *dir, const uint8_t *entry, uint16_t key);
 			virtual ~file() = default;
 
 			virtual void drop_weak_references() override;
 
 			virtual fs_meta_data metadata() override;
 			virtual void metadata_change(const fs_meta_data &info) override;
-			virtual std::vector<u8> read_all() override;
-			virtual void replace(const std::vector<u8> &data) override;
+			virtual std::vector<uint8_t> read_all() override;
+			virtual void replace(const std::vector<uint8_t> &data) override;
 
 		private:
 			impl &m_fs;
 			root_dir *m_dir;
-			u16 m_key;
-			u8 m_entry[18];
+			uint16_t m_key;
+			uint8_t m_entry[18];
 		};
 
 		impl(fsblk_t &blockdev);
@@ -66,9 +66,9 @@ public:
 
 		void drop_root_ref();
 
-		std::vector<std::pair<u8, u8>> allocate_blocks(u32 count);
-		void free_blocks(const std::vector<std::pair<u8, u8>> &blocks);
-		u32 free_block_count();
+		std::vector<std::pair<uint8_t, uint8_t>> allocate_blocks(uint32_t count);
+		void free_blocks(const std::vector<std::pair<uint8_t, uint8_t>> &blocks);
+		uint32_t free_block_count();
 
 	private:
 		dir_t m_root;

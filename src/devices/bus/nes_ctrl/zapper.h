@@ -36,7 +36,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	virtual u8 read_bit34() override;
 	virtual u8 read_exp(offs_t offset) override;
@@ -62,13 +61,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	virtual u8 read_bit0() override;
+	virtual u8 read_exp(offs_t offset) override;
 	virtual void write(u8 data) override;
 
 private:
 	required_ioport m_joypad;
 	u8 m_latch;
-	u8 m_strobe;
 };
 
 

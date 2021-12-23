@@ -66,12 +66,10 @@ enum
 class i960_cpu_device :  public cpu_device
 {
 public:
+	static constexpr uint16_t BURST = 0x0001;
+
 	// construction/destruction
 	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// call from any read/write handler for a memory area that can't be bursted
-	// on the real hardware (e.g. Model 2's interrupt control registers)
-	void i960_noburst() { m_bursting = 0; }
 
 	void i960_stall()
 	{
@@ -131,7 +129,6 @@ private:
 	uint32_t m_IP;
 	uint32_t m_PIP;
 	uint32_t m_ICR;
-	int m_bursting;
 
 	int m_immediate_irq;
 	int m_immediate_vector;
@@ -143,8 +140,10 @@ private:
 	int m_icount;
 
 	uint32_t i960_read_dword_unaligned(uint32_t address);
+	std::pair<uint32_t, uint16_t> i960_read_dword_unaligned_flags(uint32_t address);
 	uint16_t i960_read_word_unaligned(uint32_t address);
 	void i960_write_dword_unaligned(uint32_t address, uint32_t data);
+	uint16_t i960_write_dword_unaligned_flags(uint32_t address, uint32_t data);
 	void i960_write_word_unaligned(uint32_t address, uint16_t data);
 	void send_iac(uint32_t adr);
 	uint32_t get_ea(uint32_t opcode);

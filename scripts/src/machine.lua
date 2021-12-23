@@ -1127,6 +1127,16 @@ if (MACHINES["CXD1095"]~=null) then
 	}
 end
 
+--@src/devices/machine/dl11.h,MACHINES["DL11"] = true
+---------------------------------------------------
+
+if (MACHINES["DL11"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/dl11.cpp",
+		MAME_DIR .. "src/devices/machine/dl11.h",
+	}
+end
+
 --@src/devices/machine/ds1204.h,MACHINES["DS1204"] = true
 ---------------------------------------------------
 
@@ -1417,7 +1427,9 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/gt913.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_io.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_kbd.h,MACHINES["GT913"] = true
+--@src/devices/machine/gt913_snd.h,MACHINES["GT913"] = true
 ---------------------------------------------------
 
 if (MACHINES["GT913"]~=null) then

@@ -741,7 +741,7 @@ void menu_select_software::filter_selected()
 						}
 					}
 					m_data->set_filter_type(new_type);
-					reset(reset_options::SELECT_FIRST);
+					reset(reset_options::REMEMBER_REF);
 				});
 	}
 }

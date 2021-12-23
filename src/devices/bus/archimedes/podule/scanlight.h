@@ -16,6 +16,7 @@
 // device type definition
 DECLARE_DEVICE_TYPE(ARC_SCANLIGHT, device_archimedes_podule_interface)
 DECLARE_DEVICE_TYPE(ARC_SCANJUNIOR, device_archimedes_podule_interface)
+DECLARE_DEVICE_TYPE(ARC_SCANJUNIOR3, device_archimedes_podule_interface)
 DECLARE_DEVICE_TYPE(ARC_SCANVIDEO, device_archimedes_podule_interface)
 
 #endif // MAME_BUS_ARCHIMEDES_PODULE_SCANLIGHT_H

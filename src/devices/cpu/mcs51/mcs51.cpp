@@ -2059,7 +2059,12 @@ void mcs51_cpu_device::execute_run()
 
 		/* decrement the timed access window */
 		if (m_features & FEATURE_DS5002FP)
+		{
 			m_ds5002fp.ta_window = (m_ds5002fp.ta_window ? (m_ds5002fp.ta_window - 1) : 0x00);
+
+			if (m_ds5002fp.rnr_delay > 0)
+				m_ds5002fp.rnr_delay-=m_inst_cycles;
+		}
 
 		/* If the chip entered in idle mode, end the loop */
 		if ((m_features & FEATURE_CMOS) && GET_IDL)
@@ -2182,6 +2187,7 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_irq_active) );
 	save_item(NAME(m_ds5002fp.previous_ta) );
 	save_item(NAME(m_ds5002fp.ta_window) );
+	save_item(NAME(m_ds5002fp.rnr_delay) );
 	save_item(NAME(m_ds5002fp.range) );
 	save_item(NAME(m_uart.data_out));
 	save_item(NAME(m_uart.bits_to_send));
@@ -2326,6 +2332,7 @@ void mcs51_cpu_device::device_reset()
 		m_ds5002fp.previous_ta = 0;
 		m_ds5002fp.ta_window = 0;
 		m_ds5002fp.range = (GET_RG1 << 1) | GET_RG0;
+		m_ds5002fp.rnr_delay = 160;
 	}
 
 	m_uart.data_out = 0;
@@ -2469,6 +2476,26 @@ void ds5002fp_device::sfr_write(size_t offset, uint8_t data)
 	m_data.write_byte((size_t) offset | 0x100, data);
 }
 
+
+uint8_t ds5002fp_device::handle_rnr()
+{
+	if (m_ds5002fp.rnr_delay <= 0)
+	{
+		m_ds5002fp.rnr_delay = 160; // delay before another random number can be read
+		return machine().rand();
+	}
+	else
+		return 0x00;
+}
+
+bool ds5002fp_device::is_rnr_ready()
+{
+	if (m_ds5002fp.rnr_delay <= 0)
+		return true;
+	else
+		return false;
+}
+
 uint8_t ds5002fp_device::sfr_read(size_t offset)
 {
 	switch (offset)
@@ -2478,8 +2505,10 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		case ADDR_CRCH:     DS5_LOGR(CRCH, data);       break;
 		case ADDR_MCON:     DS5_LOGR(MCON, data);       break;
 		case ADDR_TA:       DS5_LOGR(TA, data);         break;
-		case ADDR_RNR:      DS5_LOGR(RNR, data);        break;
-		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data); return 0x80; break; /* touchgo stalls unless bit 7 is set, why? documentation is unclear */
+		case ADDR_RNR:      DS5_LOGR(RNR, data);
+			return handle_rnr();
+		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data);  /* touchgo stalls unless bit 7 is set, RNR status (Random Number status) */
+			return (is_rnr_ready() ? 0x80 : 0x00);  /* falling through to sfr_read for the remaining bits stops high score data loading? */
 		case ADDR_RPS:      DS5_LOGR(RPS, data);        break;
 		case ADDR_PCON:
 			SET_PFW(0);     /* reset PFW flag */

@@ -108,7 +108,6 @@ static const nes_pcb pcb_list[] =
 	{ "cne_shlz",         CNE_SHLZ },
 	{ "cocoma",           COCOMA_BOARD },
 	{ "nanjing",          NANJING_BOARD },  // mapper 163
-	{ "ntdec_2746",       NTDEC_2746 },
 	{ "ntdec_asder",      NTDEC_ASDER },    // mapper 112
 	{ "ntdec_fh",         NTDEC_FIGHTINGHERO },     // mapper 193
 	{ "ntdec_n715021",    NTDEC_N715021 },  // mapper 81
@@ -229,6 +228,7 @@ static const nes_pcb pcb_list[] =
 	{ "somari",           SOMARI_SL12 },  // mapper 116
 	{ "huang2",           SOMARI_HUANG2 },  // mapper 116 also
 	{ "nitra",            NITRA_TDA },
+	{ "bmw8544",          UNL_BMW8544 },
 	{ "fs6",              UNL_FS6 },  // mapper 196 alt? (for Street Fighter VI / Fight Street VI },
 	{ "sbros11",          BTL_SBROS11 },
 	{ "family4646",       BMC_FAMILY_4646 },
@@ -267,6 +267,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_830928c",      BMC_830928C },
 	{ "bmc_850437c",      BMC_850437C },
 	{ "bmc_970630c",      BMC_970630C },
+	{ "bmc_jy012005",     BMC_JY012005 },
 	{ "bmc_jy820845c",    BMC_JY820845C },
 	{ "srpg_5in1",        BMC_SRPG_5IN1 },
 	{ "n32_4in1",         BMC_N32_4IN1 },
@@ -283,6 +284,7 @@ static const nes_pcb pcb_list[] =
 	{ "bmc_k3036",        BMC_K3036 },
 	{ "bmc_k3046",        BMC_K3046 },
 	{ "bmc_sa005a",       BMC_SA005A },
+	{ "bmc_tf2740",       BMC_TF2740 },
 	{ "bmc_tj03",         BMC_TJ03 },
 	{ "bmc_ws",           BMC_WS },
 	{ "bmc_hik300",       BMC_SUPERHIK_300IN1 },
@@ -318,7 +320,9 @@ static const nes_pcb pcb_list[] =
 	{ "resetsxrom",       BMC_RESETSXROM },
 	{ "resettxrom",       BMC_RESETTXROM },
 	{ "s24in1c03",        BMC_S24IN1SC03 },
+	{ "smd133",           SMD133_BOARD },
 	{ "tech9in1",         BMC_TECHLINE9IN1 },
+	{ "bmc_5in1",         BMC_5IN1_1993 },
 	{ "bmc_8in1",         BMC_8IN1 },
 	{ "bmc_15in1",        BMC_15IN1 },
 	{ "bmc_sbig7in1",     BMC_SUPERBIG_7IN1 },
@@ -382,10 +386,11 @@ static const nes_pcb pcb_list[] =
 	{ "action53",         UNL_ACTION53 },
 	{ "batmap_000",       BATMAP_000 },
 	{ "batmap_srrx",      BATMAP_SRRX },
-	{ "cufrom",           UNL_CUFROM },
-	{ "unrom512",         UNL_UNROM512 },
+	{ "8bitxmas",         SEALIE_8BITXMAS },
+	{ "cufrom",           SEALIE_CUFROM },
+	{ "dpcmcart",         SEALIE_DPCMCART },
+	{ "unrom512",         SEALIE_UNROM512 },
 	{ "2a03pur",          UNL_2A03PURITANS },
-	{ "dpcmcart",         UNL_DPCMCART },
 	{ "farid_slrom8in1",  FARID_SLROM8IN1 },
 	{ "farid_unrom8in1",  FARID_UNROM8IN1 },
 	{ "ffe3",             FFE3_BOARD },
@@ -394,9 +399,7 @@ static const nes_pcb pcb_list[] =
 	{ "unl_dance",        UNSUPPORTED_BOARD },
 	{ "bmc_hik_kof",      UNSUPPORTED_BOARD },
 	{ "onebus",           UNSUPPORTED_BOARD },
-	{ "coolboy",          UNSUPPORTED_BOARD },
 	{ "pec586",           UNSUPPORTED_BOARD },
-	{ "unl_drgnfgt",      UNSUPPORTED_BOARD },  // Dragon Fighter by Flying Star
 	{ "test",             TEST_BOARD },
 	{ "unknown",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
@@ -676,6 +679,17 @@ void nes_cart_slot_device::call_load_pcb()
 	{
 		if (get_feature("n163-vol"))
 			m_cart->set_n163_vol(n163_get_submapper_num(get_feature("n163-vol")));
+	}
+
+	// get address of SMD133 chip on boards that use it
+	if (m_pcb_id == SMD133_BOARD)
+	{
+		const char *addr = get_feature("smd133-addr");
+		int val = 6;
+
+		if (addr == nullptr || sscanf(addr, "%u%*c", &val) != 1 || val < 5 || val > 6)
+			logerror("Unexpected smd133-addr: %s\n", addr ? addr : "(nullptr)");
+		m_cart->set_smd133_addr(val * 0x1000);
 	}
 
 	// get outer PRG bank size for multicart boards that use this feature
