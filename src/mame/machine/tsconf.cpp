@@ -103,7 +103,24 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 {
 	if (m_screen_bitmap.valid())
 	{
-		// Border + Main Graphics
+		// Border
+		if (m_border_bitmap.valid())
+		{
+			for (auto y = cliprect.top(); y <= cliprect.bottom(); y++)
+			{
+				u16 *border_bm = &m_border_bitmap.pix(y, 0);
+				for (auto x = cliprect.left(); x <= cliprect.right(); x++)
+				{
+					*border_bm++ |= 0xf0;
+				}
+			}
+			if (VM != VM_ZX)
+			{
+				copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
+			}
+		}
+
+		// Main Graphics
 		if (!BIT(m_regs[V_CONFIG], 5))
 		{
 			if (VM == VM_ZX)
@@ -112,25 +129,16 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 				for (auto y = cliprect.top(); y <= cliprect.bottom(); y++)
 				{
 					u16 *bm = &m_screen_bitmap.pix(y, 0);
-					u16 *border_bm = &m_border_bitmap.pix(y, 0);
 					for (auto x = cliprect.left(); x <= cliprect.right(); x++)
 					{
 						*bm++ |= 0xf0;
-						*border_bm++ |= 0xf0;
 					}
 				}
 				spectrum_state::screen_update_spectrum(screen, bitmap, cliprect);
 			}
-			else if (VM == VM_TXT)
-			{
-				copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, resolution_info[4]);
-			}
 			else
 			{
-				rectangle resolution = resolution_info[RRES];
-				if (m_border_bitmap.valid() && resolution.left() > 0 && resolution.top() > 0)
-					copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
-				copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, resolution);
+				copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, resolution_info[VM == VM_TXT ? 4 : RRES]);
 			}
 		}
 
