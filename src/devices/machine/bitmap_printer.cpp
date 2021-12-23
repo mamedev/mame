@@ -15,6 +15,7 @@
 #include "fileio.h"
 #include "png.h"
 #include "bitmap_printer.h"
+#include "corestr.h"
 
 /***************************************************************************
     DEVICE DECLARATION
@@ -80,6 +81,9 @@ bitmap_printer_device::bitmap_printer_device(const machine_config &mconfig, devi
 	m_screen(*this, "screen"),
 	m_pf_stepper(*this, "pf_stepper"),
 	m_cr_stepper(*this, "cr_stepper"),
+	m_top_margin_ioport(*this, "TOPMARGIN"),
+	m_bottom_margin_ioport(*this, "BOTTOMMARGIN"),
+	m_draw_marks_ioport(*this, "DRAWMARKS"),
 	m_cr_direction(1),
 	m_pf_stepper_ratio0(1),
 	m_pf_stepper_ratio1(1),
@@ -239,12 +243,12 @@ void bitmap_printer_device::draw_printhead(bitmap_rgb32 &bitmap, int x, int y)
 	int offy = 9 + bordy;
 	int sizex = m_printhead_xsize;
 	int sizey = m_printhead_ysize;
-	bitmap.plot_box(x - sizex / 2- bordx, y + offy - bordy, sizex + 2 * bordx, sizey + bordy * 2,  
+	bitmap.plot_box(x - sizex / 2- bordx, y + offy - bordy, sizex + 2 * bordx, sizey + bordy * 2,
 		m_led_state[0] ? m_printhead_bordercolor : dimcolor(m_printhead_bordercolor, 4));
 
 	for (int i = 1; i <= m_num_leds; i++)
-	bitmap.plot_box(x - sizex / 2, y + offy + ((i -1) * sizey / m_num_leds), sizex, 
-		((i+1) * sizey / m_num_leds) - (i * sizey / m_num_leds), 
+	bitmap.plot_box(x - sizex / 2, y + offy + ((i -1) * sizey / m_num_leds), sizex,
+		((i+1) * sizey / m_num_leds) - (i * sizey / m_num_leds),
 		m_led_state[i] ? m_printhead_color : dimcolor(m_printhead_color, 4));
 }
 
@@ -287,7 +291,7 @@ void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 	static constexpr u32 dark_grey_color = 0x202020;
 	static constexpr u32 light_grey_color = 0xc0c0c0;
 
-	int drawmarks = ioport("DRAWMARKS")->read();
+	int drawmarks = m_draw_marks_ioport->read();
 	if (!drawmarks) return;
 
 	for (int i = 0; i < m_vdpi * 11; i += m_vdpi / 4)
@@ -295,7 +299,7 @@ void bitmap_printer_device::draw_inch_marks(bitmap_rgb32& bitmap)
 		int adj_i = i + calc_scroll_y(bitmap) % m_paper_height;
 		int barbase = m_vdpi / 6;
 		int barwidth = ((i % m_vdpi) == 0) ? barbase * 2 : barbase;
-		int barcolor = ((i % m_vdpi) == 0) ? dark_grey_color : 0xc0c0c0;
+		int barcolor = ((i % m_vdpi) == 0) ? dark_grey_color : light_grey_color;
 		if (adj_i < bitmap.height())
 		{
 			bitmap.plot_box(bitmap.width() - 1 - barwidth, adj_i, barwidth, 1, barcolor);
@@ -342,7 +346,7 @@ unsigned int& bitmap_printer_device::pix(int y, int x)    // reversed y x
 //    WRITE SNAPSHOT TO FILE
 //-------------------------------------------------
 
-void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::string name)
+void bitmap_printer_device::write_snapshot_to_file()
 {
 	machine().popmessage("writing printer snapshot");
 
@@ -362,8 +366,8 @@ void bitmap_printer_device::write_snapshot_to_file(std::string directory, std::s
 //    STEPPER AND MARGIN FUNCTIONS
 //-------------------------------------------------
 
-int bitmap_printer_device::get_top_margin()    { return ioport("TOPMARGIN")->read(); }
-int bitmap_printer_device::get_bottom_margin() { return ioport("BOTTOMMARGIN")->read(); }
+int bitmap_printer_device::get_top_margin()    { return m_top_margin_ioport->read(); }
+int bitmap_printer_device::get_bottom_margin() { return m_bottom_margin_ioport->read(); }
 
 bool bitmap_printer_device::check_new_page()
 {
@@ -386,9 +390,7 @@ bool bitmap_printer_device::check_new_page()
 			clear_to_pos(m_paper_height - 1, rgb_t::white());
 
 			// save a snapshot
-			write_snapshot_to_file(
-						owner()->basetag(),
-						owner()->basetag());
+			write_snapshot_to_file();
 
 			m_newpage_flag = 1;
 

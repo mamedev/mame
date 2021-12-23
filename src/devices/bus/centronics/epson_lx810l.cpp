@@ -298,6 +298,13 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_e05a30(*this, "e05a30"),
 	m_online_led(*this, "online_led"),
 	m_ready_led(*this, "ready_led"),
+	m_online_ioport(*this, "ONLINE"),
+	m_formfeed_ioport(*this, "FORMFEED"),
+	m_linefeed_ioport(*this, "LINEFEED"),
+	m_loadeject_ioport(*this, "LOADEJECT"),
+	m_paperend_ioport(*this, "PAPEREND"),
+	m_dipsw1_ioport(*this, "DIPSW1"),
+	m_dipsw2_ioport(*this, "DIPSW2"),
 	m_93c06_clk(0),
 	m_93c06_cs(0),
 	m_printhead(0),
@@ -392,21 +399,19 @@ void epson_lx810l_device::fakemem_w(uint8_t data)
 uint8_t epson_lx810l_device::porta_r(offs_t offset)
 {
 	uint8_t result = 0;
-	uint8_t hp_sensor = m_bitmap_printer->m_xpos <= 0 ? 0 : 1;
+	uint8_t hp_sensor = (m_bitmap_printer->m_xpos <= 0) ? 0 : 1;
 
 	//uint8_t pe_sensor = m_pf_pos_abs <= 0 ? 1 : 0;
 
 	result |= hp_sensor; /* home position */
 	//result |= pe_sensor << 1; /* paper end */
-	result |= ioport("PAPEREND")->read() << 1;  // simulate a paper out error
-	result |= ioport("LINEFEED")->read() << 6;
-	result |= ioport("FORMFEED")->read() << 7;
+	result |= m_paperend_ioport->read() << 1;  // simulate a paper out error
+	result |= m_linefeed_ioport->read() << 6;
+	result |= m_formfeed_ioport->read() << 7;
 
 	LOG("%s: lx810l_PA_r(%02x): result %02x\n", machine().describe_context(), offset, result);
 
-	// Update the printhead display, only put this here since this routine gets called frequently
-//  m_bitmap_printer->set_printhead_color( m_e05a30->ready_led() ? 0x55ff55 : 0x337733, 0x0);
-	m_bitmap_printer->set_led_state(0, !ioport("PAPEREND")->read());
+	m_bitmap_printer->set_led_state(bitmap_printer_device::LED_ERROR, !m_paperend_ioport->read());
 
 	return result;
 }
@@ -428,7 +433,7 @@ void epson_lx810l_device::porta_w(offs_t offset, uint8_t data)
  */
 uint8_t epson_lx810l_device::portb_r(offs_t offset)
 {
-	uint8_t result = ~ioport("DIPSW1")->read();
+	uint8_t result = ~m_dipsw1_ioport->read();
 
 	/* if 93C06 is selected */
 	if (m_93c06_cs) {
@@ -468,7 +473,7 @@ uint8_t epson_lx810l_device::portc_r(offs_t offset)
 	uint8_t result = 0;
 
 	/* result |= ioport("serial")->read() << 1; */
-	result |= !ioport("ONLINE")->read() << 3;
+	result |= !m_online_ioport->read() << 3;
 	result |= m_93c06_clk << 4;
 	result |= m_93c06_cs  << 5;
 
@@ -490,7 +495,7 @@ void epson_lx810l_device::portc_w(offs_t offset, uint8_t data)
 	m_eeprom->cs_write (m_93c06_cs  ? ASSERT_LINE : CLEAR_LINE);
 
 	m_online_led = !BIT(data, 2);
-	m_bitmap_printer->set_led_state(2, m_online_led);
+	m_bitmap_printer->set_led_state(bitmap_printer_device::LED_ONLINE, m_online_led);
 }
 
 
@@ -566,25 +571,25 @@ WRITE_LINE_MEMBER( epson_lx810l_device::co0_w )
 
 uint8_t epson_lx810l_device::an0_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x01);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x01);
 	return res - 1; /* DIPSW2.1 */
 }
 
 uint8_t epson_lx810l_device::an1_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x02);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x02);
 	return res - 1; /* DIPSW2.2 */
 }
 
 uint8_t epson_lx810l_device::an2_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x04);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x04);
 	return res - 1; /* DIPSW2.3 */
 }
 
 uint8_t epson_lx810l_device::an3_r()
 {
-	uint8_t res = !!(ioport("DIPSW2")->read() & 0x08);
+	uint8_t res = !!(m_dipsw2_ioport->read() & 0x08);
 	return res - 1; /* DIPSW2.4 */
 }
 
@@ -600,7 +605,7 @@ uint8_t epson_lx810l_device::an5_r()
 
 uint8_t epson_lx810l_device::an6_r()
 {
-	uint8_t res = !ioport("LOADEJECT")->read();
+	uint8_t res = !m_loadeject_ioport->read();
 	return res - 1;
 }
 

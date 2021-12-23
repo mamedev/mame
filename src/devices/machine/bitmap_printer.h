@@ -51,6 +51,9 @@ public:
 	required_device<stepper_device> m_pf_stepper;
 	required_device<stepper_device> m_cr_stepper;
 
+	required_ioport m_top_margin_ioport;
+	required_ioport m_bottom_margin_ioport;
+	required_ioport m_draw_marks_ioport;
 	int m_cr_direction; // direction of carriage
 	int m_pf_stepper_ratio0;
 	int m_pf_stepper_ratio1;
@@ -81,12 +84,15 @@ private:
 	int m_num_leds;
 
 public:
+
+	enum { LED_ERROR, LED_READY, LED_ONLINE };
+
 	void set_led_state(int led, int value) { m_led_state[led] = value; m_num_leds = std::max(m_num_leds, led); }
 	void set_printhead_color(int headcolor, int bordcolor);
 	void set_printhead_size(int xsize, int ysize, int bordersize);
 	void setheadpos(int x, int y){  if (m_xpos != x) m_newpage_flag = 0; m_xpos = x; m_ypos = y;}
 
-	void write_snapshot_to_file(std::string directory, std::string name);
+	void write_snapshot_to_file();
 
 	void draw_pixel(int x, int y, int pixelval);
 	int get_pixel(int x, int y);
@@ -117,6 +123,8 @@ private:
 	void draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor);
 	void draw_number(int number, int x, int y, bitmap_rgb32& bitmap);
 	void draw_inch_marks(bitmap_rgb32& bitmap);
+
+	std::error_condition open_next(emu_file &file, const char *extension, uint32_t added_index = 0);
 };
 
 DECLARE_DEVICE_TYPE(BITMAP_PRINTER, bitmap_printer_device)
