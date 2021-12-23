@@ -59,6 +59,7 @@
 #include "partytap.h"
 #include "powerpad.h"
 #include "snesadapter.h"
+#include "turbofile.h"
 #include "suborkey.h"
 #include "zapper.h"
 
@@ -229,4 +230,5 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("barcode_battler", NES_BARCODE_BATTLER);
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
 	device.option_add("taptapmat", NES_TAPTAPMAT);
+	device.option_add("turbofile", NES_TURBOFILE);
 }
