@@ -2,10 +2,10 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-	Apple II bus slot cards
+    Apple II bus slot cards
 
-	All of these cards are electrically compatible, but for compatibility
-	reasons we divide them by machine type.
+    All of these cards are electrically compatible, but for compatibility
+    reasons we divide them by machine type.
 
 ***************************************************************************/
 

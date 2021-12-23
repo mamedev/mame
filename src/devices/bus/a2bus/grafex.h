@@ -14,9 +14,8 @@
 #pragma once
 
 #include "a2bus.h"
-#include "video/upd7220.h"
 
 // device type definition
-DECLARE_DEVICE_TYPE(A2BUS_GRAFEX, a2bus_grafex_device)
+DECLARE_DEVICE_TYPE(A2BUS_GRAFEX, device_a2bus_card_interface)
 
 #endif  // MAME_BUS_A2BUS_GRAFEX_H
