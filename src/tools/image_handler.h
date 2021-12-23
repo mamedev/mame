@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include "../emu/emucore.h"
-
 #include "formats/fsmgr.h"
 
 #include <cstdint>

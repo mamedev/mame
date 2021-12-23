@@ -30,8 +30,7 @@ and saving/loading save states.
 
 **Tab**
     Toggles the configuration menu.
-    Switches to the next UI panel.
-**~** (tilde key)
+**`**/**~** (backtick/tilde key)
     Toggles the On-Screen Display.
 
     If you are running with -debug, this key sends a ‘break’ in emulation.
@@ -60,12 +59,11 @@ and saving/loading save states.
     Change current UI option setting when an arrow is present on it.
 **Right Arrow**
     Change current UI option setting when an arrow is present on it.
-**Home**
-    Highlight first UI menu option.
-**End**
-    Select last UI menu option.
-**Left Shift+Tab**
-    Select previous UI panel.
+**Home**/**End**
+    Highlight first or last UI menu option.
+**[** **]**
+    Move to previous or next group in UI menus that support it (e.g. move to the
+    inputs for the previous or next device in the Input (this Machine) menu).
 **Enter**/**Joystick 1 Button 1**
     Select currently highlighted UI menu option.
 **Space**
@@ -73,10 +71,6 @@ and saving/loading save states.
 **Delete**
     Clear/reset to default when highlighting an entry on the input
     configuration, cheat options, and plugin options pages.
-**[**
-    UI Previous Group
-**]**
-    UI Next Group
 **P**
     Pauses the emulated machine.
 **Left Shift+P**
@@ -203,8 +197,31 @@ and saving/loading save states.
     keyboard as presented upon start by using
     :ref:`-uimodekey<mame-commandline-uimodekey>`
 **Escape**
-    Exits emulator.
-    Cancel current UI option.
+    Exit emulator, return to the previous menu, or cancel the current UI option.
+
+
+.. _default-selmenu-keys:
+
+System and software selection menus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The system and software selection menus use additional controls
+
+**Tab**
+    Moves keyboard/controller focus to the next UI panel.
+**Shift+Tab**
+    Moves keyboard/controller focus to the previous UI panel.
+**Left Alt+F**
+    Adds or removes the selected system or software list item from the favorites
+    list.
+**Left Alt+E**
+    Exports the currently displayed list of systems.
+**Left Alt+D**
+    Shows the full-size info viewer if info is available for the selected system
+    or software list item.  (Shows information loaded by the data plugin from
+    external files, including history.xml and mameinfo.dat.)
+**F1**
+    Audits system ROMs and disk images.
 
 
 .. _default-arcade-keys:

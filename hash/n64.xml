@@ -14315,6 +14315,19 @@ clips onto the player's ear.
 		</part>
 	</software>
 
+<!-- Very early prototype without sound -->
+	<software name="xroller">
+		<description>X'treme Roller (prototype)</description>
+		<year>200?</year>
+		<publisher>Microids</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-16F32SB-B" /> <!-- label on cartridge shell -->
+			<dataarea name="rom" size="25165824">
+				<rom name="xtremeroller.bin" size="25165824" crc="9a47af0f" sha1="238efed4c5f4d6c3aba98774299bf7ea2cb0d021" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yakouch2">
 		<description>Yakouchuu II - Satsujin Kouro (Japan)</description>
 		<year>1999</year>
@@ -14736,6 +14749,28 @@ clips onto the player's ear.
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="xplorer 64 (germany) (v1.067) (unl).bin" size="262144" crc="656acdf5" sha1="3a13b42074c2b6948f55f22d3e4fe44fbf2cde6a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctrlchck" supported="no">
+		<description>Controller Checker Ver.1.01</description> <!-- label: Ver.00 コントローラ検査機 NUS専用Nカセット-->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="cntr64_checker_64mbit.bin" size="8388608" crc="063e0a52" sha1="6cd924266e64be7bdba0017e38004d56d96c22cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rgbtest" supported="no">
+		<description>Unknown RGB Test Cartridge</description> <!-- mislabeled: CONTROLLER PAK TEST V.5.4 -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="cntpak64.bin" size="16777216" crc="bbaaa427" sha1="b2e7432086b1ebc82c713f68e1a3a93abdcebd1c" />
 			</dataarea>
 		</part>
 	</software>

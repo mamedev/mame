@@ -7,8 +7,8 @@
 */
 
 #include "emu.h"
-
 #include "includes/tx0.h"
+
 #include "video/crt.h"
 
 #include <algorithm>
@@ -222,14 +222,12 @@ void tx0_state::tx0_draw_vline(bitmap_ind16 &bitmap, int x, int y, int height, i
 		tx0_plot_pixel(bitmap, x, y++, color);
 }
 
-#ifdef UNUSED_FUNCTION
 /* draw a horizontal line */
 void tx0_state::tx0_draw_hline(bitmap_ind16 &bitmap, int x, int y, int width, int color)
 {
 	while (width--)
 		tx0_plot_pixel(bitmap, x++, y, color);
 }
-#endif
 
 /*
     draw the operator control panel (fixed backdrop)

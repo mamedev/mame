@@ -14,8 +14,10 @@
 
 #include "machine/74259.h"
 #include "machine/adc0844.h"
+
 #include "screen.h"
 #include "tilemap.h"
+
 
 class mcr3_state : public mcr_state
 {
@@ -82,6 +84,7 @@ protected:
 	int16_t m_spyhunt_scrolly;
 	tilemap_t *m_alpha_tilemap;
 
+	[[maybe_unused]] TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(mcrmono_get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
 	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);

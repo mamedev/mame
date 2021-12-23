@@ -55,7 +55,8 @@ private:
 	void unload_disk(device_image_interface &image);
 
 	uint16_t m_irq_count, m_irq_count_latch;
-	int m_irq_enable, m_irq_transfer;
+	int m_irq_enable, m_irq_repeat, m_irq_transfer;
+	int m_disk_reg_enable;
 	bool m_sound_en;
 
 	uint8_t m_fds_motor_on;

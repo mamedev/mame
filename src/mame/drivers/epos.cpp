@@ -35,6 +35,40 @@
     - dealer/beastf/revngr84: "PSG registers not OK" in service mode thru
       sound menu, internal ay8910 not right?
 
+
+    Edge connector pinout from Igmo manual (wire colors omitted)
+
+        Solder Side                     Parts Side
+        -----------                     ----------
+    A   GND                          1  GND
+    B   GND                          2  GND
+    C   Plus 5 VDC                   3  Plus 5 VDC
+    D   Plus 5 VDC                   4  Plus 5 VDC
+    E   TO COIN COUNTER              5
+    F   LIGHT II                     6  LIGHT I
+    H   ID MODULE                    7  ID MODULE
+    J   ID MODULE                    8  ID MODULE
+    K   ID MODULE                    9  ID MODULE
+    L   ID MODULE                   10  ID MODULE
+    M   JOYSTICK UP                 11  JOYSTICK RIGHT
+    N   JOYSTICK DOWN               12  JOYSTICK LEFT
+    P                               13  FIRE BUTTON
+    R   MOVE BUTTON                 14
+    S   1 PLAYER GAME BUTTON        15  COIN IN
+    T                               16  2 PLAYER GAME BUTTON
+    U                               17  DIAGNOSTICS BUTTON
+    V   BLUE GUN                    18  GREEN GUN
+    W   Plus 5 VDC                  19  Plus 5 VDC
+    X   Plus 5 VDC                  20  Plus 5 VDC
+    Y   GND                         21  GND
+    Z   GND                         22  GND
+    a   Minus 5 VDC                 23  Minus 5 VDC
+    b   Minus 5 VDC                 24  Minus 5 VDC
+    c   Plus 12 VDC                 25  Plus 12 VDC
+    d   Plus 12 VDC                 26  Plus 12 VDC
+    e   RED GUN                     27  SPEAKER
+    f   EXTERNAL RESET              28  COMPOSITE SYNC
+
 ***************************************************************************/
 
 #include "emu.h"

@@ -2,7 +2,7 @@
 // detail/socket_types.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,13 +30,13 @@
 #   define ASIO_WSPIAPI_H_DEFINED
 #  endif // !defined(_WSPIAPI_H_)
 # endif // defined(__BORLANDC__)
+# include <winsock2.h>
+# include <ws2tcpip.h>
 # if defined(WINAPI_FAMILY)
 #  if ((WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP) != 0)
 #   include <windows.h>
 #  endif // ((WINAPI_FAMILY & WINAPI_PARTITION_DESKTOP) != 0)
 # endif // defined(WINAPI_FAMILY)
-# include <winsock2.h>
-# include <ws2tcpip.h>
 # if !defined(ASIO_WINDOWS_APP)
 #  include <mswsock.h>
 # endif // !defined(ASIO_WINDOWS_APP)
@@ -152,6 +152,7 @@ typedef int signed_size_type;
 # define ASIO_OS_DEF_SO_DONTROUTE 0x10
 # define ASIO_OS_DEF_SO_KEEPALIVE 0x8
 # define ASIO_OS_DEF_SO_LINGER 0x80
+# define ASIO_OS_DEF_SO_OOBINLINE 0x100
 # define ASIO_OS_DEF_SO_SNDBUF 0x1001
 # define ASIO_OS_DEF_SO_RCVBUF 0x1002
 # define ASIO_OS_DEF_SO_SNDLOWAT 0x1003
@@ -205,6 +206,7 @@ typedef unsigned long ioctl_arg_type;
 typedef u_long u_long_type;
 typedef u_short u_short_type;
 typedef int signed_size_type;
+struct sockaddr_un_type { u_short sun_family; char sun_path[108]; };
 # define ASIO_OS_DEF(c) ASIO_OS_DEF_##c
 # define ASIO_OS_DEF_AF_UNSPEC AF_UNSPEC
 # define ASIO_OS_DEF_AF_INET AF_INET
@@ -236,6 +238,7 @@ typedef int signed_size_type;
 # define ASIO_OS_DEF_SO_DONTROUTE SO_DONTROUTE
 # define ASIO_OS_DEF_SO_KEEPALIVE SO_KEEPALIVE
 # define ASIO_OS_DEF_SO_LINGER SO_LINGER
+# define ASIO_OS_DEF_SO_OOBINLINE SO_OOBINLINE
 # define ASIO_OS_DEF_SO_SNDBUF SO_SNDBUF
 # define ASIO_OS_DEF_SO_RCVBUF SO_RCVBUF
 # define ASIO_OS_DEF_SO_SNDLOWAT SO_SNDLOWAT
@@ -351,6 +354,7 @@ typedef int signed_size_type;
 # define ASIO_OS_DEF_SO_DONTROUTE SO_DONTROUTE
 # define ASIO_OS_DEF_SO_KEEPALIVE SO_KEEPALIVE
 # define ASIO_OS_DEF_SO_LINGER SO_LINGER
+# define ASIO_OS_DEF_SO_OOBINLINE SO_OOBINLINE
 # define ASIO_OS_DEF_SO_SNDBUF SO_SNDBUF
 # define ASIO_OS_DEF_SO_RCVBUF SO_RCVBUF
 # define ASIO_OS_DEF_SO_SNDLOWAT SO_SNDLOWAT

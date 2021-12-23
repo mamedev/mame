@@ -440,13 +440,14 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
+
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
+
 		int type = INTV_STD;
-
-		hook.image_file()->read(&rom[0], len);
-
 		if (rom[0] == 0xa8 && (rom[1] == (rom[2] ^ 0xff)))
 		{
 			// it's .ROM file, so that we don't have currently any way to distinguish RAM-equipped carts
@@ -454,18 +455,17 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 		else
 		{
 			// assume it's .BIN and try to use .hsi file to determine type (just RAM)
-			int start;
-			int mapper, rom[5], ram, extra;
 			std::string extrainfo;
 
 			if (hook.hashfile_extrainfo(extrainfo))
 			{
+				int mapper, rom[5], ram, extra;
 				sscanf(extrainfo.c_str() ,"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 						&rom[3], &ram, &extra);
 
 				if (ram)
 				{
-					start = ((ram & 0xf0) >> 4) * 0x1000;
+					int const start = ((ram & 0xf0) >> 4) * 0x1000;
 					if (start == 0xd000)
 						type = INTV_RAM;
 					if (start == 0x8800)
@@ -475,7 +475,7 @@ std::string intv_cart_slot_device::get_default_card_software(get_default_card_so
 
 		}
 
-		slot_string = intv_get_slot(type);
+		char const *const slot_string = intv_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

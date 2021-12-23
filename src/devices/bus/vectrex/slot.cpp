@@ -198,19 +198,21 @@ std::string vectrex_cart_slot_device::get_default_card_software(get_default_card
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t size = hook.image_file()->size();
+		// FIXME: consider oversize files, check for errors, and check for read returning early
+		// it's also really wasteful to read the whole file here when only a small part of it is used for identification
+		std::uint64_t size;
+		hook.image_file()->length(size);
 		std::vector<uint8_t> rom(size);
+		std::size_t actual;
+		hook.image_file()->read(&rom[0], size, actual);
+
 		int type = VECTREX_STD;
-
-		hook.image_file()->read(&rom[0], size);
-
-		if (!memcmp(&rom[0x06], "SRAM", 4))
+		if (!memcmp(&rom[0x06], "SRAM", 4)) // FIXME: bounds check!
 			type = VECTREX_SRAM;
 		if (size > 0x8000)
 			type = VECTREX_64K;
 
-		slot_string = vectrex_get_slot(type);
+		char const *const slot_string = vectrex_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

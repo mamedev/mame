@@ -203,15 +203,15 @@ std::string gamate_cart_slot_device::get_default_card_software(get_default_card_
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
 		std::vector<uint8_t> rom(len);
-		int type;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check error return or read returning short
 
-		type = get_cart_type(&rom[0], len);
-		slot_string = gamate_get_slot(type);
+		int const type = get_cart_type(&rom[0], len);
+		char const *const slot_string = gamate_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
 

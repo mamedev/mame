@@ -92,5 +92,6 @@ private:
 
 extern const char build_version[];
 extern const char bare_build_version[];
+extern const char bare_vcs_revision[];
 
 #endif // MAME_FRONTEND_MAME_MAME_H

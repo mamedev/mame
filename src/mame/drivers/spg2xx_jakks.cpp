@@ -216,7 +216,7 @@ CONS( 2004, jak_mpacw,0, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JA
 // This was available in 2 different case styles, initially an underwater / jellyfish themed one, then later
 // reissued in a 'SpongeBob head' style case reminiscent of the undumpable 2003 SpongeBob plug and play but
 // with 2 buttons in the top left corner instead of 1
-// 
+//
 // The software on both versions of Jellyfish Dodge is believed to be the same, the build date can be seen in
 // the 'hidden' test mode.
 //

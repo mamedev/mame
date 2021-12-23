@@ -146,9 +146,9 @@ protected:
 
 	uint32_t m_r[/*NUM_REGS*/37];
 
-	void translate_insn_command(int ref, const std::vector<std::string> &params);
-	void translate_data_command(int ref, const std::vector<std::string> &params);
-	void translate_command(int ref, const std::vector<std::string> &params, int intention);
+	void translate_insn_command(const std::vector<std::string> &params);
+	void translate_data_command(const std::vector<std::string> &params);
+	void translate_command(const std::vector<std::string> &params, int intention);
 
 	void update_insn_prefetch(uint32_t curr_pc);
 	bool insn_fetch_thumb(uint32_t pc, uint32_t &out_insn);

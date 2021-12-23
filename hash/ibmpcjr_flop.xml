@@ -120,4 +120,15 @@ license:CC0
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="tdown">
+		<description>Touchdown Football</description>
+		<year>1984</year>
+		<publisher>Imagic</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="327680">
+				<rom name="touchdown football.img" size="327680" crc="0fbaedb6" sha1="c42650559b2b4eb4b789fd2fa22bc5c8c0589e45"/>
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>

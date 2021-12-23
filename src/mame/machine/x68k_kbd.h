@@ -3,7 +3,11 @@
 #ifndef MAME_MACHINE_X68K_KBD_H
 #define MAME_MACHINE_X68K_KBD_H
 
-#include "bus/rs232/keyboard.h"
+#pragma once
+
+#include "bus/rs232/rs232.h"
+#include "machine/keyboard.h"
+
 
 class x68k_keyboard_device : public buffered_rs232_device<16U>, protected device_matrix_keyboard_interface<15U>
 {

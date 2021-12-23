@@ -2,21 +2,20 @@
 // copyright-holders:Robbbert
 /****************************************************************************************
 
-    PINBALL
-    Atari Generation/System 2 and 3
+PINBALL
+Atari Generation/System 2 and 3
 
-    System 2 : Manuals and PinMAME used as references (couldn't find full schematics).
-    System 3 : PinMAME used as reference (couldn't find anything else).
+System 2 : Manuals and PinMAME used as references (couldn't find full schematics).
+System 3 : PinMAME used as reference (couldn't find anything else).
 
-    The only difference seems to be an extra bank of inputs (or something) at 2008-200B.
+The only difference seems to be an extra bank of inputs (or something) at 2008-200B.
+
+Status:
+- Superman, Hercules, Roadrunner are playable.
 
 ToDo:
-- 4x4 not emulated yet, appears to be a different cpu and hardware.
-- sounds to be verified against a real machine
-- noise generator sounds like a loud barrrr instead of noise, fortunately it
-  doesn't seem to be used.
-- inputs, outputs, dips vary per machine
-- High score isn't saved or remembered
+- noise generator sounds like a loud barrrr instead of noise, fortunately it isn't used.
+- roadrunr: test button not working, sets off an alarm instead. Slam Tilt?
 
 
 *****************************************************************************************/
@@ -45,6 +44,7 @@ public:
 		, m_dac(*this, "dac")
 		, m_dac1(*this, "dac1")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void atari_s2(machine_config &config);
@@ -52,50 +52,51 @@ public:
 
 protected:
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 
 private:
-	void sound0_w(uint8_t data);
-	void sound1_w(uint8_t data);
-	void lamp_w(uint8_t data) { };
-	void sol0_w(uint8_t data);
-	void sol1_w(uint8_t data) { };
-	void intack_w(uint8_t data);
-	void display_w(offs_t offset, uint8_t data);
+	void sound0_w(u8 data);
+	void sound1_w(u8 data);
+	void lamp_w(offs_t, u8);
+	void sol0_w(u8 data);
+	void sol1_w(u8 data);
+	void intack_w(u8 data);
+	void display_w(offs_t offset, u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 
 	void atari_s2_map(address_map &map);
 	void atari_s3_map(address_map &map);
 
-	bool m_timer_sb;
-	uint8_t m_timer_s[5];
-	uint8_t m_sound0;
-	uint8_t m_sound1;
-	uint8_t m_vol;
-	uint8_t m_t_c;
-	uint8_t m_segment[7];
-	required_region_ptr<uint8_t> m_p_prom;
+	bool m_timer_sb = 0;
+	u8 m_timer_s[5]{};
+	u8 m_sound0 = 0;
+	u8 m_sound1 = 0;
+	u8 m_vol = 0;
+	u8 m_t_c = 0;
+	u8 m_segment[7]{};
+	required_region_ptr<u8> m_p_prom;
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_4bit_binary_weighted_device> m_dac;
 	required_device<dac_3bit_binary_weighted_device> m_dac1;
 	output_finder<68> m_digits;
+	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps
 };
-
 
 void atari_s2_state::atari_s2_map(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0x3fff);
 	map(0x0000, 0x00ff).mirror(0x0700).ram();
 	map(0x0800, 0x08ff).mirror(0x0700).ram().share("nvram"); // battery backed
-	map(0x1000, 0x1000).mirror(0x07F8).portr("SWITCH.0");
-	map(0x1001, 0x1001).mirror(0x07F8).portr("SWITCH.1");
-	map(0x1002, 0x1002).mirror(0x07F8).portr("SWITCH.2");
-	map(0x1003, 0x1003).mirror(0x07F8).portr("SWITCH.3");
-	map(0x1004, 0x1004).mirror(0x07F8).portr("SWITCH.4");
-	map(0x1005, 0x1005).mirror(0x07F8).portr("SWITCH.5");
-	map(0x1006, 0x1006).mirror(0x07F8).portr("SWITCH.6");
-	map(0x1007, 0x1007).mirror(0x07F8).portr("SWITCH.7");
+	map(0x1000, 0x1000).mirror(0x07F8).portr("X0");
+	map(0x1001, 0x1001).mirror(0x07F8).portr("X1");
+	map(0x1002, 0x1002).mirror(0x07F8).portr("X2");
+	map(0x1003, 0x1003).mirror(0x07F8).portr("X3");
+	map(0x1004, 0x1004).mirror(0x07F8).portr("X4");
+	map(0x1005, 0x1005).mirror(0x07F8).portr("X5");
+	map(0x1006, 0x1006).mirror(0x07F8).portr("X6");
+	map(0x1007, 0x1007).mirror(0x07F8).portr("X7");
 	map(0x1800, 0x1800).mirror(0x071F).w(FUNC(atari_s2_state::sound0_w));
 	map(0x1820, 0x1820).mirror(0x071F).w(FUNC(atari_s2_state::sound1_w));
 	map(0x1840, 0x1847).mirror(0x0718).w(FUNC(atari_s2_state::display_w));
@@ -108,39 +109,18 @@ void atari_s2_state::atari_s2_map(address_map &map)
 	map(0x2001, 0x2001).mirror(0x07FC).portr("DSW1");
 	map(0x2002, 0x2002).mirror(0x07FC).portr("DSW2");
 	map(0x2003, 0x2003).mirror(0x07FC).portr("DSW3");
-	map(0x2800, 0x3fff).rom();
+	map(0x2800, 0x3fff).rom().region("maincpu", 0);
 }
 
 void atari_s2_state::atari_s3_map(address_map &map)
 {
+	map.unmap_value_high();
 	map.global_mask(0x3fff);
-	map(0x0000, 0x00ff).mirror(0x0700).ram();
-	map(0x0800, 0x08ff).mirror(0x0700).ram().share("nvram"); // battery backed
-	map(0x1000, 0x1000).mirror(0x07F8).portr("SWITCH.0");
-	map(0x1001, 0x1001).mirror(0x07F8).portr("SWITCH.1");
-	map(0x1002, 0x1002).mirror(0x07F8).portr("SWITCH.2");
-	map(0x1003, 0x1003).mirror(0x07F8).portr("SWITCH.3");
-	map(0x1004, 0x1004).mirror(0x07F8).portr("SWITCH.4");
-	map(0x1005, 0x1005).mirror(0x07F8).portr("SWITCH.5");
-	map(0x1006, 0x1006).mirror(0x07F8).portr("SWITCH.6");
-	map(0x1007, 0x1007).mirror(0x07F8).portr("SWITCH.7");
-	map(0x1800, 0x1800).mirror(0x071F).w(FUNC(atari_s2_state::sound0_w));
-	map(0x1820, 0x1820).mirror(0x071F).w(FUNC(atari_s2_state::sound1_w));
-	map(0x1840, 0x1847).mirror(0x0718).w(FUNC(atari_s2_state::display_w));
-	map(0x1860, 0x1867).mirror(0x0718).w(FUNC(atari_s2_state::lamp_w));
-	map(0x1880, 0x1880).mirror(0x071F).w(FUNC(atari_s2_state::sol0_w));
-	map(0x18a0, 0x18a7).mirror(0x0718).w(FUNC(atari_s2_state::sol1_w));
-	map(0x18c0, 0x18c0).mirror(0x071F).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x18e0, 0x18e0).mirror(0x071F).w(FUNC(atari_s2_state::intack_w));
-	map(0x2000, 0x2000).mirror(0x07F4).portr("DSW0");
-	map(0x2001, 0x2001).mirror(0x07F4).portr("DSW1");
-	map(0x2002, 0x2002).mirror(0x07F4).portr("DSW2");
-	map(0x2003, 0x2003).mirror(0x07F4).portr("DSW3");
+	atari_s2_map(map);
 	map(0x2008, 0x2008).mirror(0x07F4).portr("DSW4");
 	map(0x2009, 0x2009).mirror(0x07F4).portr("DSW5");
 	map(0x200a, 0x200a).mirror(0x07F4).portr("DSW6");
 	map(0x200b, 0x200b).mirror(0x07F4).portr("DSW7");
-	map(0x2800, 0x3fff).rom();
 }
 
 static INPUT_PORTS_START( atari_s2 )
@@ -204,7 +184,7 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_DIPSETTING(    0x0d, "2 coins/13 credits" )
 	PORT_DIPSETTING(    0x0f, "2 coins/15 credits" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_BIT( 0x40, 0x00, IPT_UNUSED )
+	PORT_BIT( 0x40, 0x00, IPT_UNUSED ) // Hercules: High Score Million Limit (manual says it MUST BE ON)
 	PORT_DIPNAME( 0x80, 0x00, "High Score Display" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -254,79 +234,94 @@ static INPUT_PORTS_START( atari_s2 )
 	PORT_START("DSW7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.0") // 1000
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test") PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_START("X0") // 1000
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Test")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.1") // 1001
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
+	PORT_START("X1") // 1001
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP09")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP10")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP11")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP12")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP13")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.2") // 1002
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
+	PORT_START("X2") // 1002
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP18")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP19")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP20")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP21")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.3") // 1003
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
+	PORT_START("X3") // 1003
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP24")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP25")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP26")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("INP27")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP28")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP29")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.4") // 1004
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X4") // 1004
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP32")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP33")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP34")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP35")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP36")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP37")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.5") // 1005
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_START("X5") // 1005
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.6") // 1006
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
+	PORT_START("X6") // 1006
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt") // Superman: Slam Tilt wired in parallel with this.
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP52")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP53")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SWITCH.7") // 1007
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )
+	PORT_START("X7") // 1007
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP56")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP57")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP58")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP59")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP60")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP61")
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+// remove unassigned inputs that cause machine to reboot
+static INPUT_PORTS_START( hercules )
+	PORT_INCLUDE(atari_s2)
+	PORT_MODIFY("X1")
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("X3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("X5")
+	PORT_BIT( 0x0e, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("X7")
+	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 /* solenoids hercules
    4,5 = bumpers
    8,9 = slings
@@ -344,7 +339,7 @@ INPUT_PORTS_END
         14  = total plays counter
 */
 
-void atari_s2_state::sol0_w(uint8_t data)
+void atari_s2_state::sol0_w(u8 data)
 {
 	switch (data)
 	{
@@ -362,11 +357,25 @@ void atari_s2_state::sol0_w(uint8_t data)
 		//default:
 			//if (data) printf("%X ",data);
 	}
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[i] = BIT(data, i);
 }
 
-void atari_s2_state::display_w(offs_t offset, uint8_t data)
+void atari_s2_state::sol1_w(u8 data)
 {
-	static constexpr uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[8+i] = BIT(data, i);
+}
+
+void atari_s2_state::lamp_w(offs_t offset, u8 data)
+{
+	for (u8 i = 0; i < 8; i++)
+		m_io_outputs[16+offset*8+i] = BIT(data, i);
+}
+
+void atari_s2_state::display_w(offs_t offset, u8 data)
+{
+	static constexpr u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	if (offset < 7)
 	{
 		m_segment[offset] = patterns[data&15];
@@ -374,12 +383,12 @@ void atari_s2_state::display_w(offs_t offset, uint8_t data)
 	else
 	{
 		data &= 7;
-		for (uint8_t i = 0; i < 7; i++)
+		for (u8 i = 0; i < 7; i++)
 			m_digits[i * 10 + data] = m_segment[i];
 	}
 }
 
-void atari_s2_state::intack_w(uint8_t data)
+void atari_s2_state::intack_w(u8 data)
 {
 	m_maincpu->set_input_line(M6800_IRQ_LINE, CLEAR_LINE);
 }
@@ -438,7 +447,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
 // d4-5 = select initial clock frequency
 // d6 h = enable wave
 // d7 h = enable noise
-void atari_s2_state::sound0_w(uint8_t data)
+void atari_s2_state::sound0_w(u8 data)
 {
 	m_sound0 = data;
 	offs_t offs = (m_timer_s[2] & 31) | ((m_sound0 & 15) << 5);
@@ -448,7 +457,7 @@ void atari_s2_state::sound0_w(uint8_t data)
 
 // d0-3 = volume
 // d4-7 = preset on 74LS161
-void atari_s2_state::sound1_w(uint8_t data)
+void atari_s2_state::sound1_w(u8 data)
 {
 	m_sound1 = data >> 4;
 
@@ -472,8 +481,28 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::irq )
 		m_t_c++;
 }
 
+void atari_s2_state::machine_start()
+{
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_timer_sb));
+	save_item(NAME(m_timer_s));
+	save_item(NAME(m_sound0));
+	save_item(NAME(m_sound1));
+	save_item(NAME(m_vol));
+	save_item(NAME(m_t_c));
+	save_item(NAME(m_segment));
+}
+
 void atari_s2_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_vol = 0;
 	m_dac->set_output_gain(0,0);
 	m_dac1->set_output_gain(0,0);
@@ -515,10 +544,10 @@ void atari_s2_state::atari_s3(machine_config &config)
 / Superman (03/1979)
 /-------------------------------------------------------------------*/
 ROM_START(supermap)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("supmn_k.rom", 0x2800, 0x0800, CRC(a28091c2) SHA1(9f5e47db408da96a31cb2f3be0fa9fb1e79f8d85))
-	ROM_LOAD("atari_m.rom", 0x3000, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
-	ROM_LOAD("atari_j.rom", 0x3800, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
+	ROM_REGION(0x1800, "maincpu", 0)
+	ROM_LOAD("supmn_k.rom", 0x0000, 0x0800, CRC(a28091c2) SHA1(9f5e47db408da96a31cb2f3be0fa9fb1e79f8d85))
+	ROM_LOAD("atari_m.rom", 0x0800, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
+	ROM_LOAD("atari_j.rom", 0x1000, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
 
 	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
@@ -528,10 +557,10 @@ ROM_END
 / Hercules (05/1979)
 /-------------------------------------------------------------------*/
 ROM_START(hercules)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("herc_k.rom",  0x2800, 0x0800, CRC(65e099b1) SHA1(83a06bc82e0f8f4c0655886c6a9962bb28d00c5e))
-	ROM_LOAD("atari_m.rom", 0x3000, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
-	ROM_LOAD("atari_j.rom", 0x3800, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
+	ROM_REGION(0x1800, "maincpu", 0)
+	ROM_LOAD("herc_k.rom",  0x0000, 0x0800, CRC(65e099b1) SHA1(83a06bc82e0f8f4c0655886c6a9962bb28d00c5e))
+	ROM_LOAD("atari_m.rom", 0x0800, 0x0800, CRC(1bb6b72c) SHA1(dd24ed54de275aadf8dc0810a6af3ac97aea4026))
+	ROM_LOAD("atari_j.rom", 0x1000, 0x0800, CRC(26521779) SHA1(2cf1c66441aee99b9d01859d495c12025b5ef094))
 
 	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b))
@@ -541,33 +570,18 @@ ROM_END
 / Road Runner (??/1979)
 /-------------------------------------------------------------------*/
 ROM_START(roadrunr)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("0000.716", 0x2800, 0x0800, CRC(62f5f394) SHA1(ff91066d43d788119e3337788abd86e5c0bf2d92))
-	ROM_LOAD("3000.716", 0x3000, 0x0800, CRC(2fc01359) SHA1(d3df20c764bb68a5316367bb18d34a03293e7fa6))
-	ROM_LOAD("3800.716", 0x3800, 0x0800, CRC(77262408) SHA1(3045a732c39c96002f495f64ed752279f7d43ee7))
+	ROM_REGION(0x1800, "maincpu", 0)
+	ROM_LOAD("0000.716",    0x0000, 0x0800, CRC(62f5f394) SHA1(ff91066d43d788119e3337788abd86e5c0bf2d92))
+	ROM_LOAD("3000.716",    0x0800, 0x0800, CRC(2fc01359) SHA1(d3df20c764bb68a5316367bb18d34a03293e7fa6))
+	ROM_LOAD("3800.716",    0x1000, 0x0800, CRC(77262408) SHA1(3045a732c39c96002f495f64ed752279f7d43ee7))
 
 	ROM_REGION(0x0200, "proms", 0)
 	ROM_LOAD("20967-01.j3", 0x0000, 0x0200, BAD_DUMP CRC(da1f77b4) SHA1(b21fdc1c6f196c320ec5404013d672c35f95890b)) // PinMAME note: unknown so far if using the 20967-01 is correct for Road Runner, but sounds good
 ROM_END
 
-/*-------------------------------------------------------------------
-/ 4x4 (10/1982)
-/-------------------------------------------------------------------*/
-ROM_START(fourx4)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("8000ce65.bin", 0x8000, 0x2000, CRC(27341155) SHA1(c0da1fbf64f93ab163b2ea6bfbfc7b778cea819f)) \
-	ROM_LOAD("a0004c37.bin", 0xa000, 0x2000, CRC(6f93102f) SHA1(d6520987ed5805b0e6b5da5653fc7cb063e86dda)) \
-	ROM_LOAD("c000a70c.bin", 0xc000, 0x2000, CRC(c31ca8d3) SHA1(53f20eff0084771dc61d19db7ddae52e4423e75e)) \
-	ROM_RELOAD(0xe000, 0x2000)
-
-	ROM_REGION(0x0200, "proms", ROMREGION_ERASE00)
-	// doesn't have PROMs according to PinMAME
-ROM_END
-
 } // Anonymous namespace
 
 
-GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1979, hercules, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME( 1982, fourx4,   0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "4x4",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1979, supermap, 0, atari_s2, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Superman (Pinball)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, hercules, 0, atari_s2, hercules, atari_s2_state, empty_init, ROT0, "Atari", "Hercules",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1979, roadrunr, 0, atari_s3, atari_s2, atari_s2_state, empty_init, ROT0, "Atari", "Road Runner",        MACHINE_IS_SKELETON_MECHANICAL )

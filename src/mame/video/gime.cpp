@@ -840,6 +840,24 @@ inline void gime_device::write_gime_register(offs_t offset, uint8_t data)
 			//        Bit 0 MC0 ROM map control
 			if (xorval & 0x4B)
 				update_memory();
+
+			// IRQ master switch changed?
+			if (xorval & 0x20)
+			{
+				if (data & 0x20)
+					m_write_irq(irq_r());
+				else
+					m_write_irq(false);
+			}
+
+			// FIRQ master switch changed?
+			if (xorval & 0x10)
+			{
+				if (data & 0x10)
+					m_write_firq(firq_r());
+				else
+					m_write_firq(false);
+			}
 			break;
 
 		case 0x01:
@@ -1169,6 +1187,8 @@ void gime_device::change_gime_irq(uint8_t data)
 		m_irq = data;
 		if (m_gime_registers[0x00] & 0x20)
 			m_write_irq(irq_r());
+		else
+			m_write_irq(false);
 	}
 }
 
@@ -1185,6 +1205,8 @@ void gime_device::change_gime_firq(uint8_t data)
 		m_firq = data;
 		if (m_gime_registers[0x00] & 0x10)
 			m_write_firq(firq_r());
+		else
+			m_write_firq(false);
 	}
 }
 

@@ -285,7 +285,9 @@ util::hash_collection &emu_file::hashes(std::string_view types)
 		return m_hashes;
 
 	// compute the hash
-	m_hashes.compute(filedata, m_file->size(), needed.c_str());
+	std::uint64_t length;
+	if (!m_file->length(length))
+		m_hashes.compute(filedata, length, needed.c_str());
 	return m_hashes;
 }
 
@@ -445,17 +447,18 @@ std::error_condition emu_file::compressed_file_ready()
 //  seek - seek within a file
 //-------------------------------------------------
 
-int emu_file::seek(s64 offset, int whence)
+std::error_condition emu_file::seek(s64 offset, int whence)
 {
 	// load the ZIP file now if we haven't yet
-	if (compressed_file_ready())
-		return 1;
+	std::error_condition err = compressed_file_ready();
+	if (err)
+		return err;
 
 	// seek if we can
 	if (m_file)
 		return m_file->seek(offset, whence);
 
-	return 1;
+	return std::errc::bad_file_descriptor; // TODO: revisit this error condition
 }
 
 
@@ -465,13 +468,15 @@ int emu_file::seek(s64 offset, int whence)
 
 u64 emu_file::tell()
 {
+	// FIXME: need better interface to report errors
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
 		return 0;
 
 	// tell if we can
-	if (m_file)
-		return m_file->tell();
+	u64 result;
+	if (m_file && !m_file->tell(result))
+		return result;
 
 	return 0;
 }
@@ -501,13 +506,15 @@ bool emu_file::eof()
 
 u64 emu_file::size()
 {
+	// FIXME: need better interface to report errors
 	// use the ZIP length if present
-	if (m_zipfile != nullptr)
+	if (m_zipfile)
 		return m_ziplength;
 
 	// return length if we can
-	if (m_file)
-		return m_file->size();
+	u64 result;
+	if (m_file && !m_file->length(result))
+		return result;
 
 	return 0;
 }
@@ -519,15 +526,17 @@ u64 emu_file::size()
 
 u32 emu_file::read(void *buffer, u32 length)
 {
+	// FIXME: need better interface to report errors
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
 		return 0;
 
 	// read the data if we can
+	size_t actual = 0;
 	if (m_file)
-		return m_file->read(buffer, length);
+		m_file->read(buffer, length, actual);
 
-	return 0;
+	return actual;
 }
 
 
@@ -591,11 +600,13 @@ char *emu_file::gets(char *s, int n)
 
 u32 emu_file::write(const void *buffer, u32 length)
 {
+	// FIXME: need better interface to report errors
 	// write the data if we can
+	size_t actual = 0;
 	if (m_file)
-		return m_file->write(buffer, length);
+		m_file->write(buffer, length, actual);
 
-	return 0;
+	return actual;
 }
 
 

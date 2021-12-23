@@ -24,7 +24,7 @@
     - LayDock: hangs at title screen due of a PIT bug (timer irq dies for whatever reason);
     - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
     - Moon Child: window masking doesn't mask bottom part of the screen?
-    - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME / MESS framework;
+    - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME framework;
     - Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
     - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
     - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
@@ -491,7 +491,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 			draw_cg16_screen(bitmap,cliprect,2,640,pri);
 			break;
 		default:
-			popmessage("Unsupported CG mode %02x, contact MESS dev",m_cg_reg[0x0e]);
+			popmessage("Unsupported CG mode %02x, contact MAME dev",m_cg_reg[0x0e]);
 			break;
 	}
 }

@@ -4,7 +4,7 @@
     psxcard.c - Sony PlayStation memory card device
 
     by pSXAuthor
-    MESS conversion by R. Belmont
+    MAME conversion by R. Belmont
 */
 
 #include "emu.h"

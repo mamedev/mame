@@ -48,22 +48,22 @@ public:
 
 	/*! @brief Load an image.
 	  The load function opens an image file and converts it to the
-	  internal MESS floppy representation.
+	  internal MAME floppy representation.
 	  @param io source buffer containing the image data.
 	  @param form_factor Physical form factor of disk, from the enum
 	  in floppy_image
 	  @param variants the variants from floppy_image the drive can handle
-	  @param image output buffer for data in MESS internal format.
+	  @param image output buffer for data in MAME internal format.
 	  @return true on success, false otherwise.
 	*/
 	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image *image) = 0;
 
 	/*! @brief Save an image.
-	  The save function writes back an image from the MESS internal
+	  The save function writes back an image from the MAME internal
 	  floppy representation to the appropriate format on disk.
 	  @param io output buffer for the data in the on-disk format.
 	  @param variants the variants from floppy_image the drive can handle
-	  @param image source buffer containing data in MESS internal format.
+	  @param image source buffer containing data in MAME internal format.
 	  @return true on success, false otherwise.
 	*/
 	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, floppy_image *image);

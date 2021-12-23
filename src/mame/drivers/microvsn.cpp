@@ -10,13 +10,16 @@ Hardware notes:
 - piezo, 12 buttons under membrane + analog paddle(MB calls it the Control Knob)
 - no CPU on console, it is on the cartridge
 
+The LCD motion blur is normal. To decrease it, simply increase the screen contrast
+in MAME, this makes it similar to repro LCD replacements. It's also advised to
+disable screen filtering, eg. with -prescale or -nofilter.
+
 12 games were released, all of them have a TMS1100 MCU. The first couple of
 games had an Intel 8021 MCU at first, but Milton Bradley switched to TMS1100.
 See the softwarelist XML for details.
 
-Each game had a screen- and button overlay attached to it, MAME external
-artwork is recommended. It's also advised to disable screen filtering,
-eg. with -prescale or -nofilter.
+Each game had a screen- and button overlay attached to it, MAME external artwork
+is recommended.
 
 TODO:
 - dump/add remaining 8021 cartridges, which games have 8021 versions? An online
@@ -262,7 +265,7 @@ uint32_t microvision_state::screen_update(screen_device &screen, bitmap_rgb32 &b
 		for (int x = 0; x < 16; x++)
 		{
 			// simulate LCD persistence
-			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 10000;
+			int p = m_lcd_pwm->read_element_bri(y ^ 15, x ^ 15) * 8500;
 			p = (p > 255) ? 0 : p ^ 255;
 
 			if (cliprect.contains(x, y))
@@ -463,7 +466,7 @@ void microvision_state::microvision(machine_config &config)
 	m_lcd->write_cols().set(FUNC(microvision_state::lcd_output_w));
 
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(16, 16);
-	m_lcd_pwm->set_interpolation(0.2);
+	m_lcd_pwm->set_interpolation(0.25);
 	config.set_default_layout(layout_microvision);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

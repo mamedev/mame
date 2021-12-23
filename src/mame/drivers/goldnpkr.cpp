@@ -5346,6 +5346,63 @@ ROM_START( ngoldb )
 ROM_END
 
 
+/*********************************************
+
+  Amstar Draw Poker
+  -----------------
+
+  PCB chips:
+
+  SY6502 main CPU
+  MC8621P x 2
+  MC6845P CRT Controller
+
+  TI NE555P precision timer
+  MB7051 BPROM
+
+  OSC: Unknown, no markings
+
+  8-switch dipswitch on PCB
+  6-switch dipswitch on riser board with 6502 CPU
+  Off/On slider switch
+
+  2x 2732 program ROMs
+  4x 2716 data/graphics? ROMs
+  1x MB7051 BPROM
+
+-----------------------------------------
+
+  Program 2000-3fff / A14 & A15 disconnected.
+
+  NMI  : 2DF0
+  Start: 2D36
+  Reset: 2F0B
+
+  There are code just before the vectors.
+  Curious about it... Will be analyzed.
+
+*********************************************/
+
+ROM_START( adpoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2732.16a",   0x2000, 0x1000, CRC(8892fbd4) SHA1(22a27c0c3709ca4808a9afb8848233bc4124559f) )
+	ROM_LOAD( "2732.17a",   0x3000, 0x1000, CRC(b4db832f) SHA1(af1f26c5b703a9031690d4b63fb8555236cd6ddd) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "2716.8a",    0x1000, 0x0800, CRC(7ce15156) SHA1(13c604b4d97186f1cef2cffbc437e76990f7e4bb) )    // char ROM
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "2716.4a",     0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "loson.6a",    0x0800, 0x0800, CRC(5afb7cc7) SHA1(334deb71f2d59dd7264150d1c15af01e49f9bd86) )    // cards deck gfx, bitplane2
+	ROM_LOAD( "loson.7a",    0x1000, 0x0800, CRC(19fec412) SHA1(580a56d9a2ae94abf1185ed7fc0280d51e9d5964) )    // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "mb7052.9c",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+	   
 /**************************************** BUENA SUERTE SETS ****************************************/
 
 /*
@@ -11847,6 +11904,8 @@ GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
+GAMEL( 198?, adpoker,   0,        pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Amstar?",                  "Amstar Draw Poker",                          0,                layout_goldnpkr )
+
 
 GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",              0,                layout_goldnpkr )
 GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",              0,                layout_goldnpkr )

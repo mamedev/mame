@@ -22,7 +22,7 @@ vt61_cpu_device::vt61_cpu_device(const machine_config &mconfig, const char *tag,
 	: cpu_device(mconfig, VT61_CPU, tag, owner, clock)
 	, m_program_config("microprogram", ENDIANNESS_LITTLE, 16, 10, -1)
 	, m_memory_config("memory", ENDIANNESS_LITTLE, 8, 16, 0)
-	, m_idr_config("IDR", ENDIANNESS_LITTLE, 8, 6, 0)
+	, m_idr_config("idr", ENDIANNESS_LITTLE, 8, 6, 0)
 	, m_time_state(state::T1)
 	, m_pc(0)
 	, m_pc_mode(pc_mode::CLR)

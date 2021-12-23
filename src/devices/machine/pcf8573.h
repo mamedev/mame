@@ -35,13 +35,6 @@
 #include "dirtc.h"
 
 
-/***************************************************************************
-CONSTANTS
-***************************************************************************/
-
-#define PCF8573_SLAVE_ADDRESS ( 0xd0 )
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -77,6 +70,8 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
+	static constexpr uint8_t PCF8573_SLAVE_ADDRESS = 0xd0;
+
 	enum
 	{
 		REG_HOURS               = 0x00,

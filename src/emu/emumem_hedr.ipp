@@ -132,6 +132,11 @@ template<int HighBits, int Width, int AddrShift> typename emu::detail::handler_e
 	return dispatch_read<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
 }
 
+template<int HighBits, int Width, int AddrShift> std::pair<typename emu::detail::handler_entry_size<Width>::uX, u16> handler_entry_read_dispatch<HighBits, Width, AddrShift>::read_flags(offs_t offset, uX mem_mask) const
+{
+	return dispatch_read_flags<Level, Width, AddrShift>(HIGHMASK, offset, mem_mask, m_a_dispatch);
+}
+
 template<int HighBits, int Width, int AddrShift> void *handler_entry_read_dispatch<HighBits, Width, AddrShift>::get_ptr(offs_t offset) const
 {
 	return m_a_dispatch[(offset & HIGHMASK) >> LowBits]->get_ptr(offset);
@@ -593,10 +598,11 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 	} else if(lowbits != LowBits) {
 		u32 dt = lowbits - LowBits;
 		u32 ne = 1 << dt;
+		u32 ee = end_entry - start_entry;
 		if(m_view) {
 			auto filter = [s = m_view->m_addrstart, e = m_view->m_addrend] (handler_entry::range r) { r.intersect(s, e); return r; };
 
-			for(offs_t entry = start_entry; entry <= end_entry; entry++) {
+			for(offs_t entry = 0; entry <= ee; entry++) {
 				dispatch[entry]->ref(ne);
 				u32 e0 = (entry << dt) & BITMASK;
 				for(offs_t e = 0; e != ne; e++) {
@@ -609,7 +615,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 				}
 			}
 		} else {
-			for(offs_t entry = start_entry; entry <= end_entry; entry++) {
+			for(offs_t entry = 0; entry <= ee; entry++) {
 				dispatch[entry]->ref(ne);
 				u32 e0 = (entry << dt) & BITMASK;
 				for(offs_t e = 0; e != ne; e++) {
@@ -626,7 +632,7 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_read_dispatc
 	} else {
 		if(m_view) {
 			auto filter = [s = m_view->m_addrstart, e = m_view->m_addrend] (handler_entry::range r) { r.intersect(s, e); return r; };
-			
+
 			for(offs_t entry = start_entry & BITMASK; entry <= (end_entry & BITMASK); entry++) {
 				if(!(m_u_dispatch[entry]->flags() & handler_entry::F_UNMAP))
 					fatalerror("Collision on multiple init_handlers calls");

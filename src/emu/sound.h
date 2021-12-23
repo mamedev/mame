@@ -373,6 +373,7 @@ public:
 	// safely write a sample to the buffer
 	void put(s32 start, sample_t sample)
 	{
+		sound_assert(u32(start) < samples());
 		m_buffer->put(index_to_buffer_index(start), sample);
 	}
 
@@ -399,6 +400,7 @@ public:
 	// safely add a sample to the buffer
 	void add(s32 start, sample_t sample)
 	{
+		sound_assert(u32(start) < samples());
 		u32 index = index_to_buffer_index(start);
 		m_buffer->put(index, m_buffer->get(index) + sample);
 	}
@@ -458,7 +460,6 @@ private:
 	// given a stream starting offset, return the buffer index
 	u32 index_to_buffer_index(s32 start) const
 	{
-		sound_assert(u32(start) < samples());
 		u32 index = start + m_start;
 		if (index >= m_buffer->size())
 			index -= m_buffer->size();
@@ -833,6 +834,7 @@ private:
 
 	stream_buffer::sample_t m_compressor_scale; // current compressor scale factor
 	int m_compressor_counter;             // compressor update counter for backoff
+	bool m_compressor_enabled;            // enable compressor (it will still be calculated for detecting overdrive)
 
 	u8 m_muted;                           // bitmask of muting reasons
 	bool m_nosound_mode;                  // true if we're in "nosound" mode

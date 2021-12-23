@@ -29,50 +29,50 @@ public:
 			virtual file_t file_create(const fs_meta_data &info) override;
 			virtual void file_delete(uint64_t key) override;
 
-			void update_file(u16 key, const u8 *entry);
+			void update_file(uint16_t key, const uint8_t *entry);
 
 		private:
 			impl &m_fs;
 
-			std::pair<fsblk_t::block_t, u32> get_dir_block(uint64_t key);
+			std::pair<fsblk_t::block_t, uint32_t> get_dir_block(uint64_t key);
 		};
 
 		class file : public ifile_t {
 		public:
-			file(impl &fs, root_dir *dir, const u8 *entry, u16 key);
+			file(impl &fs, root_dir *dir, const uint8_t *entry, uint16_t key);
 			virtual ~file() = default;
 
 			virtual void drop_weak_references() override;
 
 			virtual fs_meta_data metadata() override;
 			virtual void metadata_change(const fs_meta_data &info) override;
-			virtual std::vector<u8> read_all() override;
-			virtual void replace(const std::vector<u8> &data) override;
+			virtual std::vector<uint8_t> read_all() override;
+			virtual void replace(const std::vector<uint8_t> &data) override;
 
 		private:
 			impl &m_fs;
 			root_dir *m_dir;
-			u16 m_key;
-			u8 m_entry[18];
+			uint16_t m_key;
+			uint8_t m_entry[18];
 		};
 
 		class system_file : public ifile_t {
 		public:
-			system_file(impl &fs, root_dir *dir, const u8 *entry, u16 key);
+			system_file(impl &fs, root_dir *dir, const uint8_t *entry, uint16_t key);
 			virtual ~system_file() = default;
 
 			virtual void drop_weak_references() override;
 
 			virtual fs_meta_data metadata() override;
 			virtual void metadata_change(const fs_meta_data &info) override;
-			virtual std::vector<u8> read_all() override;
-			virtual void replace(const std::vector<u8> &data) override;
+			virtual std::vector<uint8_t> read_all() override;
+			virtual void replace(const std::vector<uint8_t> &data) override;
 
 		private:
 			impl &m_fs;
 			root_dir *m_dir;
-			u16 m_key;
-			u8 m_entry[18];
+			uint16_t m_key;
+			uint8_t m_entry[18];
 		};
 
 		impl(fsblk_t &blockdev);
@@ -83,16 +83,16 @@ public:
 		virtual void metadata_change(const fs_meta_data &info) override;
 		virtual dir_t root() override;
 
-		static u32 cs_to_block(u16 ref);
-		static u16 block_to_cs(u32 block);
+		static uint32_t cs_to_block(uint16_t ref);
+		static uint16_t block_to_cs(uint32_t block);
 
-		bool ref_valid(u16 ref);
-		static std::string read_file_name(const u8 *p);
+		bool ref_valid(uint16_t ref);
+		static std::string read_file_name(const uint8_t *p);
 		void drop_root_ref();
 
-		std::vector<u16> allocate_blocks(u32 count);
-		void free_blocks(const std::vector<u16> &blocks);
-		u32 free_block_count();
+		std::vector<uint16_t> allocate_blocks(uint32_t count);
+		void free_blocks(const std::vector<uint16_t> &blocks);
+		uint32_t free_block_count();
 
 		static std::string file_name_prepare(std::string name);
 

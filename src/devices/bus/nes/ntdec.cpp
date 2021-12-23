@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(NES_NTDEC_N715021, nes_ntdec_n715021_device, "nes_ntdec_n7150
 
 
 nes_ntdec_asder_device::nes_ntdec_asder_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_NTDEC_ASDER, tag, owner, clock) , m_latch(0), m_chr_outer(0)
+	: nes_nrom_device(mconfig, NES_NTDEC_ASDER, tag, owner, clock), m_latch(0), m_chr_outer(0)
 {
 }
 
@@ -206,7 +206,7 @@ void nes_ntdec_fh_device::write_m(offs_t offset, u8 data)
 
 void nes_ntdec_n715021_device::write_h(offs_t offset, u8 data)
 {
-	LOG_MMC(("ntdec_n715021 write_m, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("ntdec_n715021 write_h, offset: %04x, data: %02x\n", offset, data));
 	prg16_89ab((offset >> 2) & 0x03);
 	chr8(offset & 0x03, CHRROM);
 }

@@ -8,16 +8,18 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_IMAGECNTRL_H
 #define MAME_FRONTEND_UI_IMAGECNTRL_H
 
-#include "ui/menu.h"
+#pragma once
+
 #include "ui/filesel.h"
+#include "ui/menu.h"
 #include "ui/swlist.h"
 
+
 namespace ui {
+
 // ======================> menu_control_device_image
 
 class menu_control_device_image : public menu
@@ -53,8 +55,9 @@ protected:
 	bool                            m_create_ok;
 
 	// methods
+	virtual void menu_activated() override;
+	virtual void handle(event const *ev) override;
 	virtual void hook_load(const std::string &filename);
-	virtual void handle() override;
 
 private:
 	// instance variables
@@ -72,4 +75,4 @@ private:
 
 } // namespace ui
 
-#endif /* MAME_FRONTEND_UI_IMAGECNTRL_H */
+#endif // MAME_FRONTEND_UI_IMAGECNTRL_H

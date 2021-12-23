@@ -193,7 +193,7 @@ void sdl_osd_interface::extract_video_config()
 	{
 #if (defined SDLMAME_WIN32)
 		stemp = "opengl";
-#elif (defined SDLMAME_MACOSX || defined __STEAMLINK__)
+#elif (defined SDLMAME_MACOSX)
 		stemp = "bgfx";
 #else
 		stemp = "soft";

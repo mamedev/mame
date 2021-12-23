@@ -127,6 +127,7 @@ void shaolins_state::shaolins_map(address_map &map)
 	map(0x0000, 0x0000).w(FUNC(shaolins_state::nmi_w));   /* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	map(0x0100, 0x0100).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0x0200, 0x02ff).lr8(NAME([this]() -> u8 { return m_screen->vpos(); }));
 	map(0x0300, 0x0300).w("sn1", FUNC(sn76489a_device::write)); /* trigger chip to read from latch. The program always */
 	map(0x0400, 0x0400).w("sn2", FUNC(sn76489a_device::write)); /* writes the same number as the latch, so we don't */
 															/* bother emulating them. */
@@ -140,8 +141,8 @@ void shaolins_state::shaolins_map(address_map &map)
 	map(0x1000, 0x1000).nopw();                    /* latch for 76496 #1 */
 	map(0x1800, 0x1800).w(FUNC(shaolins_state::palettebank_w));
 	map(0x2000, 0x2000).w(FUNC(shaolins_state::scroll_w));
-	map(0x2800, 0x2bff).ram();                         /* RAM BANK 2 */
-	map(0x3000, 0x33ff).ram().share("spriteram"); /* RAM BANK 1 */
+	map(0x2800, 0x2bff).ram().share("spriteram");  /* RAM BANK 2 */
+	map(0x3000, 0x33ff).ram().share("spriteram2"); /* RAM BANK 1 */
 	map(0x3800, 0x3bff).ram().w(FUNC(shaolins_state::colorram_w)).share("colorram");
 	map(0x3c00, 0x3fff).ram().w(FUNC(shaolins_state::videoram_w)).share("videoram");
 	map(0x4000, 0x5fff).rom();                         /* Machine checks for extra rom */
@@ -293,13 +294,16 @@ void shaolins_state::shaolins(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(shaolins_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+//	m_screen->set_refresh_hz(60);
+//	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+//	m_screen->set_size(32*8, 32*8);
+//	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	// Pixel clock is / 3 the master clock (6'144'000)
+	// Refresh rate is 60.606060 Hz, with 40 vblank lines
+	m_screen->set_raw(MASTER_CLOCK / 3, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(shaolins_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_shaolins);
 	PALETTE(config, m_palette, FUNC(shaolins_state::shaolins_palette), 16*8*16+16*8*16, 256);

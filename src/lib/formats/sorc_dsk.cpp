@@ -31,22 +31,20 @@ static int sorc_get_tracks_per_disk(floppy_image_legacy *floppy)
 
 static uint64_t sorc_translate_offset(floppy_image_legacy *floppy, int track, int head, int sector)
 {
-	return 270*(16*track+sector);
+	return 270 * ((16 * uint64_t(track)) + sector);
 }
 
 static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, uint64_t *offset)
 {
-	uint64_t offs;
 	/* translate the sector to a raw sector */
 	if (!sector_is_index)
-	{
 		sector -= 1;
-	}
+
 	/* check to see if we are out of range */
 	if ((head != 0) || (track < 0) || (track >= 77) || (sector < 0) || (sector >= 16))
 		return FLOPPY_ERROR_SEEKERROR;
 
-	offs = sorc_translate_offset(floppy, track, head, sector);
+	uint64_t offs = sorc_translate_offset(floppy, track, head, sector);
 	if (offset)
 		*offset = offs;
 	return FLOPPY_ERROR_SUCCESS;

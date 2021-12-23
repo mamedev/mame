@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "ppc_dasm.h"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
@@ -676,6 +678,8 @@ protected:
 	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
+private:
+	powerpc_disassembler m_dasm;
 };
 
 

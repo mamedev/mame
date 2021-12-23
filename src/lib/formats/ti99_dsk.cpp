@@ -66,7 +66,7 @@
 #define VERBOSE ( LOG_WARN )
 
 #define __EMU_H__ // logmacro wasn't really intended to be used outside stuff that uses libemu
-#include "logmacro.h"
+#include "../emu/logmacro.h"
 
 
 // ====================================================
@@ -570,7 +570,7 @@ int ti99_floppy_format::get_sectors(const std::vector<bool> &bitstream, int enco
 	int seccount = 0;
 	uint16_t shift_reg = 0;
 	uint8_t databyte = 0;
-	uint8_t curbyte = 0;
+	[[maybe_unused]] uint8_t curbyte = 0;
 	int rep = 0;
 	int cursect = 0;
 

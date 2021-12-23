@@ -21,7 +21,7 @@ const options_entry ui_options::s_option_entries[] =
 {
 	// search path options
 	{ nullptr,                              nullptr,                       OPTION_HEADER,  "UI SEARCH PATH OPTIONS" },
-	{ OPTION_HISTORY_PATH,                  "history;dats;.",              OPTION_STRING,  "path to history files" },
+	{ OPTION_HISTORY_PATH,                  "history;dats;.",              OPTION_STRING,  "path to system/software info files" },
 	{ OPTION_CATEGORYINI_PATH,              "folders",                     OPTION_STRING,  "path to category ini files" },
 	{ OPTION_CABINETS_PATH,                 "cabinets;cabdevs",            OPTION_STRING,  "path to cabinets / devices image" },
 	{ OPTION_CPANELS_PATH,                  "cpanel",                      OPTION_STRING,  "path to control panel image" },
@@ -44,6 +44,7 @@ const options_entry ui_options::s_option_entries[] =
 
 	// misc options
 	{ nullptr,                              nullptr,    OPTION_HEADER,      "UI MISC OPTIONS" },
+	{ OPTION_SYSTEM_NAMES,                  "",         OPTION_STRING,      "translated system names file" },
 	{ OPTION_SKIP_WARNINGS,                 "0",        OPTION_BOOLEAN,     "display fewer repeated warnings about imperfect emulation" },
 	{ OPTION_REMEMBER_LAST,                 "1",        OPTION_BOOLEAN,     "initially select last used system in main menu" },
 	{ OPTION_ENLARGE_SNAPS,                 "1",        OPTION_BOOLEAN,     "enlarge artwork (snapshot, title, etc.) in right panel (keeping aspect ratio)" },
@@ -60,7 +61,7 @@ const options_entry ui_options::s_option_entries[] =
 
 	// UI options
 	{ nullptr,                              nullptr,        OPTION_HEADER,      "UI OPTIONS" },
-	{ OPTION_INFOS_SIZE "(0.05-1.00)",      "0.75",         OPTION_FLOAT,       "UI right panel infos text size (0.05 - 1.00)" },
+	{ OPTION_INFOS_SIZE "(0.20-1.00)",      "0.75",         OPTION_FLOAT,       "UI right panel infos text size (0.20 - 1.00)" },
 	{ OPTION_FONT_ROWS "(25-40)",           "30",           OPTION_INTEGER,     "UI font lines per screen (25 - 40)" },
 	{ OPTION_HIDE_PANELS "(0-3)",           "0",            OPTION_INTEGER,     "UI hide left/right panel in main view (0 = Show all, 1 = hide left, 2 = hide right, 3 = hide both" },
 	{ OPTION_UI_BORDER_COLOR,               "ffffffff",     OPTION_STRING,      "UI border color (ARGB)" },

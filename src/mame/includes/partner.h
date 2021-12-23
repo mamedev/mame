@@ -15,8 +15,9 @@
 
 #include "imagedev/floppy.h"
 #include "machine/i8255.h"
-#include "machine/wd_fdc.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+
 
 class partner_state : public radio86_state
 {
@@ -30,6 +31,10 @@ public:
 
 	void init_partner();
 	void partner(machine_config &config);
+
+protected:
+	void machine_reset() override;
+	void machine_start() override;
 
 private:
 	u8 floppy_r(offs_t offset);
@@ -54,9 +59,6 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<fd1793_device> m_fdc;
 	required_memory_bank_array<13> m_bank;
-
-	void machine_reset() override;
-	void machine_start() override;
 };
 
 

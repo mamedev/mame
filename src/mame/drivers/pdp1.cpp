@@ -1302,7 +1302,10 @@ void pdp1_cylinder_image_device::set_il(int il)
 	m_il_timer->adjust(il_phase, 0, PARALLEL_DRUM_ROTATION_TIME);
 }
 
-#ifdef UNUSED_FUNCTION
+TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::rotation_timer_callback)
+{
+}
+
 TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::il_timer_callback)
 {
 	if (m_dba)
@@ -1312,15 +1315,14 @@ TIMER_CALLBACK_MEMBER(pdp1_cylinder_image_device::il_timer_callback)
 	}
 }
 
-void pdp1_cylinder_image_device::parallel_drum_init(pdp1_state *state)
+void pdp1_cylinder_image_device::parallel_drum_init()
 {
-	m_rotation_timer = machine().scheduler().timer_alloc();
+	m_rotation_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::rotation_timer_callback), this));
 	m_rotation_timer->adjust(PARALLEL_DRUM_ROTATION_TIME, 0, PARALLEL_DRUM_ROTATION_TIME);
 
-	m_il_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::il_timer_callback),this));
+	m_il_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_cylinder_image_device::il_timer_callback), this));
 	set_il(0);
 }
-#endif
 
 /*
     Open a file for drum

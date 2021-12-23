@@ -66,7 +66,11 @@ public:
 		HEX_64BIT = 8,
 		FLOAT_32BIT = 9,
 		FLOAT_64BIT = 10,
-		FLOAT_80BIT = 11
+		FLOAT_80BIT = 11,
+		OCTAL_8BIT = 12,
+		OCTAL_16BIT = 13,
+		OCTAL_32BIT = 14,
+		OCTAL_64BIT = 15
 	};
 	static bool is_valid_format(data_format format) { return int(format) >= 0 && int(format) < std::size(s_memory_pos_table) && get_posdata(format).m_bytes != 0; }
 
@@ -77,6 +81,7 @@ public:
 	bool reverse() const { return m_reverse_view; }
 	bool ascii() const { return m_ascii_view; }
 	bool physical() const { return m_no_translation; }
+	int address_radix() const { return m_address_radix; }
 	offs_t addressAtCursorPosition(const debug_view_xy& pos) { return get_cursor_pos(pos).m_address; }
 
 	// setters
@@ -84,8 +89,9 @@ public:
 	void set_chunks_per_row(u32 rowchunks);
 	void set_data_format(data_format format);
 	void set_reverse(bool reverse);
-	void set_ascii(bool reverse);
+	void set_ascii(bool ascii);
 	void set_physical(bool physical);
+	void set_address_radix(int radix);
 
 protected:
 	// view overrides
@@ -104,6 +110,7 @@ private:
 
 	// data format helpers
 	static bool is_hex_format(data_format format) { return int(format) <= 8; }
+	static bool is_octal_format(data_format format) { return int(format) >= 12; }
 	static const memory_view_pos &get_posdata(data_format format) { return s_memory_pos_table[int(format)]; }
 
 	// internal helpers
@@ -134,6 +141,8 @@ private:
 	bool                m_ascii_view;           // display ASCII characters?
 	bool                m_no_translation;       // don't run addresses through the cpu translation hook
 	bool                m_edit_enabled;         // can modify contents ?
+	u8                  m_shift_bits;           // number of bits for each character/cursor position
+	u8                  m_address_radix;        // numerical radix for address column and expressions
 	offs_t              m_maxaddr;              // (derived) maximum address to display
 	u32                 m_bytes_per_row;        // (derived) number of bytes displayed per line
 	u32                 m_byte_offset;          // (derived) offset of starting visible byte
@@ -151,9 +160,9 @@ private:
 	{
 		u8           m_bytes;                // bytes per entry
 		u8           m_spacing;              // spacing between each entry
-		u8           m_shift[24];            // shift for each character
+		u8           m_shift[28];            // shift for each character
 	};
-	static const memory_view_pos s_memory_pos_table[12]; // table for rendering at different data formats
+	static const memory_view_pos s_memory_pos_table[16]; // table for rendering at different data formats
 
 	// constants
 	static constexpr int MEM_MAX_LINE_WIDTH = 1024;

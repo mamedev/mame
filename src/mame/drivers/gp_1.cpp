@@ -2,35 +2,37 @@
 // copyright-holders:Robbbert
 /*******************************************************************************
 
-    PINBALL
-    Game Plan MPU-1
-    These are "cocktail" cabinets, although there is only one seating position.
+PINBALL
+Game Plan MPU-1
+These are "cocktail" cabinets, although there is only one seating position.
 
-When first turned on, you need to press 9 to enter the setup program, then keep
-pressing 9 until 05 shows in the balls display. Press the credit button to set
-the first high score at which a free credit is awarded. Then press 9 to set the
-2nd high score, then 9 to set the 3rd high score. Keep pressing 9 until you exit
+When first turned on, you need to press num-0 to enter the setup program, then keep
+pressing num-0 until 05 shows in the balls display. Press the credit button to set
+the first high score at which a free credit is awarded. Then press num-0 to set the
+2nd high score, then num-0 to set the 3rd high score. Keep pressing num-0 until you exit
 back to normal operation. If this setup is not done, each player will get 3 free
 games at the start of ball 1.
 
+Status
+- Working
 
 ToDo:
-- Mechanical
+- Nothing
 
 ********************************************************************************/
 
 #include "emu.h"
 #include "machine/genpin.h"
-
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "machine/i8255.h"
-#include "machine/timer.h"
+#include "machine/clock.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76477.h"
 #include "speaker.h"
-
 #include "gp_1.lh"
+
+namespace {
 
 class gp_1_state : public genpin_class
 {
@@ -51,27 +53,25 @@ public:
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
 		, m_digits(*this, "digit%u", 0U)
+		, m_io_outputs(*this, "out%u", 0U)
 	{ }
 
 	void gp_1(machine_config &config);
 	void gp_1s(machine_config &config);
 
-	void init_gp_1();
-
 private:
-	void porta_w(uint8_t data);
-	void portas_w(uint8_t data);
-	void portc_w(uint8_t data);
-	uint8_t portb_r();
-	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
-	void gp_1_io(address_map &map);
-	void gp_1_map(address_map &map);
-
-	uint8_t m_u14;
-	uint8_t m_digit;
-	uint8_t m_segment[16];
+	void porta_w(u8 data);
+	void portas_w(u8 data);
+	void portc_w(u8 data);
+	u8 portb_r();
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
+	u8 m_u14 = 0;
+	u8 m_digit = 0;
+	u8 m_segment[16]{};
+	u8 m_last_solenoid = 15;
 	virtual void machine_reset() override;
-	virtual void machine_start() override { m_digits.resolve(); }
+	virtual void machine_start() override;
 	required_device<z80_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
 	required_device<z80ctc_device> m_ctc;
@@ -86,16 +86,17 @@ private:
 	required_ioport m_io_xa;
 	required_ioport m_io_xb;
 	output_finder<40> m_digits;
+	output_finder<64> m_io_outputs;   // 16 solenoids + 48 lamps
 };
 
 
-void gp_1_state::gp_1_map(address_map &map)
+void gp_1_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x0fff).rom().region("roms", 0);
+	map(0x0000, 0x0fff).rom();
 	map(0x8c00, 0x8cff).ram().share("nvram");
 }
 
-void gp_1_state::gp_1_io(address_map &map)
+void gp_1_state::io_map(address_map &map)
 {
 	map.global_mask(0x0f);
 	map(0x04, 0x07).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
@@ -246,45 +247,45 @@ static INPUT_PORTS_START( gp_1 )
 	PORT_DIPSETTING(    0xC0, "3")
 
 	PORT_START("X7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Accounting Reset") // This pushbutton on the MPU board is called "S33"
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Accounting Reset") // This pushbutton on the MPU board is called "S33"
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
 
 	PORT_START("X8")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L and R Target") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner C") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner B") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Slingshot") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Special when lit") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Slingshot") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Extra when lit") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L and R Target") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Spinner C") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Spinner B") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Slingshot") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Special when lit") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Slingshot") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Extra when lit") PORT_CODE(KEYCODE_G)
 
 	PORT_START("X9")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Spinner") PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1000 and advance") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Spinner") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("1000 and advance") PORT_CODE(KEYCODE_I)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Advance and Change") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Bumper") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("R. Bumper") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("L. Spinner") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Spinner A") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Advance and Change") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Bumper") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("R. Bumper") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("L. Spinner") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Spinner A") PORT_CODE(KEYCODE_N)
 
 	PORT_START("XA")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("1000 Rollover") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("1000 Rollover") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Setup")
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("XB")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-uint8_t gp_1_state::portb_r()
+u8 gp_1_state::portb_r()
 {
 	switch (m_u14)
 	{
@@ -310,15 +311,18 @@ uint8_t gp_1_state::portb_r()
 	return 0;
 }
 
-void gp_1_state::porta_w(uint8_t data)
+void gp_1_state::porta_w(u8 data)
 {
+	if (m_last_solenoid < 15)
+		m_io_outputs[m_last_solenoid] = 0;
+
 	m_u14 = data >> 4;
-	if ((data > 0x0f) && (data < 0x30))
+	if ((m_u14 >= 1) && (m_u14 <= 2))
 	{
 		switch (data)
 		{
 			case 0x10: // chime c
-				m_samples->start(3, 3);
+				m_samples->start(1, 1);
 				break;
 			case 0x11: // chime b
 				m_samples->start(2, 2);
@@ -326,43 +330,46 @@ void gp_1_state::porta_w(uint8_t data)
 			case 0x12: // knocker
 				m_samples->start(0, 6);
 				break;
-			case 0x13: // not used
-			case 0x14: // not used
-				break;
 			case 0x15: // chime a
-				m_samples->start(1, 1);
+				m_samples->start(3, 3);
 				break;
 			case 0x16: // chime d
 				m_samples->start(4, 4);
 				break;
 			case 0x17: // outhole
-				m_samples->start(5, 5);
+				m_samples->start(0, 5);
 				break;
 			case 0x18: // r sling
 			case 0x19: // l sling
-				m_samples->start(0, 7);
+				m_samples->start(5, 7);
 				break;
 			case 0x1a: // C kickout
 				m_samples->start(5, 5);
 				break;
 			case 0x1b: // r bumper
-				m_samples->start(0, 0);
+				m_samples->start(5, 0);
 				break;
 			case 0x1c: // B kickout
 				m_samples->start(5, 5);
 				break;
 			case 0x1d: // l bumper
-				m_samples->start(0, 0);
+				m_samples->start(5, 0);
 				break;
 			case 0x1e: // A kickout
 				m_samples->start(5, 5);
 				break;
-			case 0x1f: // not used
+			default:
+				data = 15;
 				break;
 		}
+		if ((data & 15) < 15)
+			m_io_outputs[data & 15] = 1;
+		m_last_solenoid = data & 15;
 	}
+	else
+		m_last_solenoid = 15;
 
-	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	if (m_digit == 7)
 		m_segment[m_u14] = data & 15; // only 8,9,10,11 are needed
 	else
@@ -373,9 +380,14 @@ void gp_1_state::porta_w(uint8_t data)
 		m_digits[m_digit+16] = patterns[m_segment[10]];
 		m_digits[m_digit+24] = patterns[m_segment[11]];
 	}
+
+	// Lamps
+	if ((m_u14 >= 3) && (m_u14 <= 5))
+		for (u8 i = 0; i < 16; i++)
+			m_io_outputs[(m_u14 - 3) * 16 + 16 + i] = ((data & 15) == i);
 }
 
-void gp_1_state::portas_w(uint8_t data)
+void gp_1_state::portas_w(u8 data)
 {
 	m_u14 = data >> 4;
 	if (m_u14 == 1)
@@ -410,23 +422,35 @@ void gp_1_state::portas_w(uint8_t data)
 	porta_w(data);
 }
 
-void gp_1_state::portc_w(uint8_t data)
+void gp_1_state::portc_w(u8 data)
 {
 	output().set_value("led0", !BIT(data, 3));
 	m_digit = data & 7;
 }
 
-void gp_1_state::machine_reset()
+void gp_1_state::machine_start()
 {
-	m_u14 = 0;
-	m_digit = 0xff;
+	genpin_class::machine_start();
+
+	m_digits.resolve();
+	m_io_outputs.resolve();
+
+	save_item(NAME(m_u14));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_segment));
+	save_item(NAME(m_last_solenoid));
 }
 
-// zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( gp_1_state::zero_timer )
+void gp_1_state::machine_reset()
 {
-	m_ctc->trg2(0);
-	m_ctc->trg2(1);
+	genpin_class::machine_reset();
+	m_u14 = 0;
+	m_digit = 0xff;
+	m_last_solenoid = 15;
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+	for (u8 i = 0; i < std::size(m_segment); i++)
+		m_segment[i] = 0;
 }
 
 static const z80_daisy_config daisy_chain[] =
@@ -439,8 +463,8 @@ void gp_1_state::gp_1(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 2457600);
-	m_maincpu->set_addrmap(AS_PROGRAM, &gp_1_state::gp_1_map);
-	m_maincpu->set_addrmap(AS_IO, &gp_1_state::gp_1_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp_1_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &gp_1_state::io_map);
 	m_maincpu->set_daisy_config(daisy_chain);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -459,7 +483,9 @@ void gp_1_state::gp_1(machine_config &config)
 
 	Z80CTC(config, m_ctc, 2457600);
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0); // Todo: absence of ints will cause a watchdog reset
-	TIMER(config, "gp1").configure_periodic(FUNC(gp_1_state::zero_timer), attotime::from_hz(120)); // mains freq*2
+
+	clock_device &cpoint_clock(CLOCK(config, "cpoint_clock", 120)); // crosspoint detector
+	cpoint_clock.signal_handler().set(m_ctc, FUNC(z80ctc_device::trg2));
 }
 
 void gp_1_state::gp_1s(machine_config &config)
@@ -487,7 +513,7 @@ void gp_1_state::gp_1s(machine_config &config)
 
 
 ROM_START( gp_110 )
-	ROM_REGION(0x1000, "roms", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "a-110.u12", 0x0000, 0x0800, CRC(ed0d518b) SHA1(8f3ca8792ad907c660d9149a1aa3a3528c7573e3))
 	ROM_LOAD( "b1-110.u13", 0x0800, 0x0800, CRC(a223f2e8) SHA1(767e15e19e11399935c890c1d1034dccf1ad7f92))
 ROM_END
@@ -523,7 +549,7 @@ ROM_END
 / Family Fun! (April 1979) - Model: Cocktail #120
 /-------------------------------------------------------------------*/
 ROM_START(famlyfun)
-	ROM_REGION(0x1000, "roms", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "family.u12", 0x0000, 0x0800, CRC(98f27fdf) SHA1(8bcff1e13b9b978f91110f1e83a3288723930a1d))
 	ROM_LOAD( "family.u13", 0x0800, 0x0800, CRC(b941a1a8) SHA1(a43f8acadb3db3e2274162d5305e30006f912339))
 ROM_END
@@ -532,7 +558,7 @@ ROM_END
 / Star Trip (April 1979) - Model: Cocktail #120
 /-------------------------------------------------------------------*/
 ROM_START(startrip)
-	ROM_REGION(0x1000, "roms", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "startrip.u12", 0x0000, 0x0800, CRC(98f27fdf) SHA1(8bcff1e13b9b978f91110f1e83a3288723930a1d))
 	ROM_LOAD( "startrip.u13", 0x0800, 0x0800, CRC(b941a1a8) SHA1(a43f8acadb3db3e2274162d5305e30006f912339))
 ROM_END
@@ -541,18 +567,24 @@ ROM_END
 / Vegas (August 1979) - Cocktail Model #140
 /-------------------------------------------------------------------*/
 ROM_START(vegasgp)
-	ROM_REGION(0x1000, "roms", 0)
+	ROM_REGION(0x1000, "maincpu", 0)
 	ROM_LOAD( "140a.12", 0x0000, 0x0800, CRC(2c00bc19) SHA1(521d4b44f46dea0a08e90cd3aea5799462215863))
 	ROM_LOAD( "140b.13", 0x0800, 0x0800, CRC(cf26d67b) SHA1(05481e880e23a7bc1d1716b52ac1effc0db437f2))
 ROM_END
 
+} // anonymous namespace
+
 GAME(1978, gp_110,   0,      gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Model 110",         MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(1978, blvelvet, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Black Velvet",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, camlight, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Camel Lights",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, foxylady, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Foxy Lady",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, real,     gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Real",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, rio,      gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Rio",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, chucklck, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Chuck-A-Luck",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, famlyfun, 0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Family Fun!",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, startrip, 0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Star Trip",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, vegasgp,  0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Vegas (Game Plan)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+
+// Chimes
+GAME(1978, blvelvet, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Black Velvet",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978, camlight, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Camel Lights",      MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978, foxylady, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Foxy Lady",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978, real,     gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Real",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978, rio,      gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Rio",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1978, chucklck, gp_110, gp_1,  gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Chuck-A-Luck",      MACHINE_IS_SKELETON_MECHANICAL )
+
+// SN76477 sound
+GAME(1979, famlyfun, 0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Family Fun!",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1979, startrip, 0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Star Trip",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1979, vegasgp,  0,      gp_1s, gp_1, gp_1_state, empty_init, ROT0, "Game Plan", "Vegas (Game Plan)", MACHINE_IS_SKELETON_MECHANICAL )

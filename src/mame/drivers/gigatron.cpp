@@ -44,10 +44,7 @@ public:
 		, m_dac(*this, "dac")
 		, m_screen(*this, "screen")
 		, m_io_inputs(*this, "GAMEPAD")
-		, m_blinken1(*this, "blinken1")
-		, m_blinken2(*this, "blinken2")
-		, m_blinken3(*this, "blinken3")
-		, m_blinken4(*this, "blinken4")
+		, m_blinken(*this, "blinken%u", 1U)
 	{
 	}
 
@@ -85,10 +82,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_ioport m_io_inputs;
 
-	output_finder<> m_blinken1;
-	output_finder<> m_blinken2;
-	output_finder<> m_blinken3;
-	output_finder<> m_blinken4;
+	output_finder<4> m_blinken;
 };
 
 //**************************************************************************
@@ -150,10 +144,11 @@ uint32_t gigatron_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	copybitmap(bitmap, *m_bitmap_render, 0, 0, 0, 0, cliprect);
 	video_reset();
 
-	m_blinken1 = (m_lights >> 3) & 1;
-	m_blinken2 = (m_lights >> 2) & 1;
-	m_blinken3 = (m_lights >> 1) & 1;
-	m_blinken4 = (m_lights >> 0) & 1;
+	m_blinken[0] = BIT(m_lights, 3);
+	m_blinken[1] = BIT(m_lights, 2);
+	m_blinken[2] = BIT(m_lights, 1);
+	m_blinken[3] = BIT(m_lights, 0);
+
 	return 0;
 }
 
@@ -190,10 +185,7 @@ INPUT_PORTS_END
 void gigatron_state::machine_start()
 {
 	//blinkenlights
-	m_blinken1.resolve();
-	m_blinken2.resolve();
-	m_blinken3.resolve();
-	m_blinken4.resolve();
+	m_blinken.resolve();
 
 	//Savestate stuff
 	save_item(NAME(m_lights));
@@ -231,7 +223,7 @@ void gigatron_state::gigatron(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	DAC_4BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	DAC_4BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	GTRON(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &gigatron_state::prog_map);

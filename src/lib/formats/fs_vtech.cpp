@@ -3,9 +3,10 @@
 
 // Management of VTech images
 
-#include "emu.h"
 #include "fs_vtech.h"
 #include "vt_dsk.h"
+
+#include <stdexcept>
 
 const fs_vtech FS_VTECH;
 
@@ -126,9 +127,9 @@ std::vector<fs_dir_entry> fs_vtech::impl::root_dir::contents()
 	uint64_t id = 0;
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_fs.m_blockdev.get(sect);
-		for(u32 i = 0; i != 8; i ++) {
-			u32 off = i*16;
-			u8 type = bdir.r8(off);
+		for(uint32_t i = 0; i != 8; i ++) {
+			uint32_t off = i*16;
+			uint8_t type = bdir.r8(off);
 			if(type != 'T' && type != 'B')
 				continue;
 			if(bdir.r8(off+1) != ':')
@@ -144,14 +145,14 @@ std::vector<fs_dir_entry> fs_vtech::impl::root_dir::contents()
 filesystem_t::file_t fs_vtech::impl::root_dir::file_get(uint64_t key)
 {
 	if(key >= 15*8)
-		fatalerror("Key out of range\n");
+		throw std::out_of_range("Key out of range");
 
 	auto bdir = m_fs.m_blockdev.get(key >> 3);
 	int off = (key & 7) << 4;
 	return file_t(new file(m_fs, this, bdir.rodata() + off, key));
 }
 
-void fs_vtech::impl::root_dir::update_file(u16 key, const u8 *entry)
+void fs_vtech::impl::root_dir::update_file(uint16_t key, const uint8_t *entry)
 {
 	auto bdir = m_fs.m_blockdev.get(key >> 3);
 	int off = (key & 7) << 4;
@@ -160,10 +161,10 @@ void fs_vtech::impl::root_dir::update_file(u16 key, const u8 *entry)
 
 filesystem_t::dir_t fs_vtech::impl::root_dir::dir_get(uint64_t key)
 {
-	fatalerror("Directories not supported\n");
+	throw std::logic_error("Directories not supported");
 }
 
-fs_vtech::impl::file::file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
+fs_vtech::impl::file::file(impl &fs, root_dir *dir, const uint8_t *entry, uint16_t key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 16);
 }
@@ -184,13 +185,13 @@ fs_meta_data fs_vtech::impl::file::metadata()
 	return res;
 }
 
-std::vector<u8> fs_vtech::impl::file::read_all()
+std::vector<uint8_t> fs_vtech::impl::file::read_all()
 {
-	u8 track = m_entry[0xa];
-	u8 sector = m_entry[0xb];
+	uint8_t track = m_entry[0xa];
+	uint8_t sector = m_entry[0xb];
 	int len = ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc)) & 0xffff) + 1;
 
-	std::vector<u8> data(len, 0);
+	std::vector<uint8_t> data(len, 0);
 	int pos = 0;
 	while(pos < len) {
 		if(track >= 40 || sector >= 16)
@@ -213,9 +214,9 @@ fs_vtech::impl::file_t fs_vtech::impl::root_dir::file_create(const fs_meta_data 
 	for(int sect = 0; sect != 14; sect++) {
 		auto bdir = m_fs.m_blockdev.get(sect);
 		uint64_t id = 0;
-		for(u32 i = 0; i != 16; i ++) {
-			u32 off = i*16;
-			u8 type = bdir.r8(off);
+		for(uint32_t i = 0; i != 16; i ++) {
+			uint32_t off = i*16;
+			uint8_t type = bdir.r8(off);
 			if(type != 'T' && type != 'B') {
 				std::string fname = info.get_string(fs_meta_name::name, "");
 				fname.resize(8, ' ');
@@ -239,23 +240,23 @@ void fs_vtech::impl::root_dir::file_delete(uint64_t key)
 {
 }
 
-void fs_vtech::impl::file::replace(const std::vector<u8> &data)
+void fs_vtech::impl::file::replace(const std::vector<uint8_t> &data)
 {
-	u32 cur_len = ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + 1) & 0xffff);
-	u32 new_len = data.size();
+	uint32_t cur_len = ((r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + 1) & 0xffff);
+	uint32_t new_len = data.size();
 	if(new_len > 65535)
 		new_len = 65535;
-	u32 cur_ns = (cur_len + 125)/126;
-	u32 need_ns = (new_len + 125) / 126;
+	uint32_t cur_ns = (cur_len + 125)/126;
+	uint32_t need_ns = (new_len + 125) / 126;
 
 	// Enough space?
 	if(cur_ns < need_ns && m_fs.free_block_count() < need_ns - cur_ns)
 		return;
 
-	u8 track = m_entry[0xa];
-	u8 sector = m_entry[0xb];
-	std::vector<std::pair<u8, u8>> tofree;
-	for(u32 i = 0; i != cur_ns; i++) {
+	uint8_t track = m_entry[0xa];
+	uint8_t sector = m_entry[0xb];
+	std::vector<std::pair<uint8_t, uint8_t>> tofree;
+	for(uint32_t i = 0; i != cur_ns; i++) {
 		tofree.emplace_back(std::make_pair(track, sector));
 		auto dblk = m_fs.m_blockdev.get(track*16 + sector);
 		track = dblk.r8(126);
@@ -264,10 +265,10 @@ void fs_vtech::impl::file::replace(const std::vector<u8> &data)
 
 	m_fs.free_blocks(tofree);
 
-	std::vector<std::pair<u8, u8>> blocks = m_fs.allocate_blocks(need_ns);
-	for(u32 i=0; i != need_ns; i ++) {
+	std::vector<std::pair<uint8_t, uint8_t>> blocks = m_fs.allocate_blocks(need_ns);
+	for(uint32_t i=0; i != need_ns; i ++) {
 		auto dblk = m_fs.m_blockdev.get(blocks[i].first * 16 + blocks[i].second);
-		u32 len = new_len - i*126;
+		uint32_t len = new_len - i*126;
 		if(len > 126)
 			len = 126;
 		else if(len < 126)
@@ -280,7 +281,7 @@ void fs_vtech::impl::file::replace(const std::vector<u8> &data)
 			dblk.w16l(126, 0);
 	}
 
-	u16 end_address = (r16l(m_entry + 0xc) + data.size() - 1) & 0xffff;
+	uint16_t end_address = (r16l(m_entry + 0xc) + data.size() - 1) & 0xffff;
 	w16l(m_entry + 0xe, end_address);
 	if(need_ns) {
 		w8(m_entry + 0xa, blocks[0].first);
@@ -309,25 +310,25 @@ void fs_vtech::impl::file::metadata_change(const fs_meta_data &info)
 		wstr(m_entry+0x2, name);
 	}
 	if(info.has(fs_meta_name::loading_address)) {
-		u16 new_loading = info.get_number(fs_meta_name::loading_address);
-		u16 new_end = r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + new_loading;
+		uint16_t new_loading = info.get_number(fs_meta_name::loading_address);
+		uint16_t new_end = r16l(m_entry + 0xe) - r16l(m_entry + 0xc) + new_loading;
 		w16l(m_entry + 0xc, new_loading);
 		w16l(m_entry + 0xe, new_end);
 	}
 	m_dir->update_file(m_key, m_entry);
 }
 
-std::vector<std::pair<u8, u8>> fs_vtech::impl::allocate_blocks(u32 count)
+std::vector<std::pair<uint8_t, uint8_t>> fs_vtech::impl::allocate_blocks(uint32_t count)
 {
-	std::vector<std::pair<u8, u8>> blocks;
+	std::vector<std::pair<uint8_t, uint8_t>> blocks;
 	if(free_block_count() < count)
 		return blocks;
 
 	auto fmap = m_blockdev.get(15);
-	for(u8 track = 1; track != 40; track++)
-		for(u8 sector = 0; sector != 16; sector++) {
-			u32 off = (track-1)*2 + (sector / 8);
-			u32 bit = 1 << (sector & 7);
+	for(uint8_t track = 1; track != 40; track++)
+		for(uint8_t sector = 0; sector != 16; sector++) {
+			uint32_t off = (track-1)*2 + (sector / 8);
+			uint32_t bit = 1 << (sector & 7);
 			if(!(fmap.r8(off) & bit)) {
 				fmap.w8(off, fmap.r8(off) | bit);
 				blocks.emplace_back(std::make_pair(track, sector));
@@ -338,24 +339,24 @@ std::vector<std::pair<u8, u8>> fs_vtech::impl::allocate_blocks(u32 count)
 	abort();
 }
 
-void fs_vtech::impl::free_blocks(const std::vector<std::pair<u8, u8>> &blocks)
+void fs_vtech::impl::free_blocks(const std::vector<std::pair<uint8_t, uint8_t>> &blocks)
 {
 	auto fmap = m_blockdev.get(15);
 	for(auto ref : blocks) {
-		u8 track = ref.first;
-		u8 sector = ref.second;
-		u32 off = (track-1)*2 + (sector / 8);
-		u32 bit = 1 << (sector & 7);
+		uint8_t track = ref.first;
+		uint8_t sector = ref.second;
+		uint32_t off = (track-1)*2 + (sector / 8);
+		uint32_t bit = 1 << (sector & 7);
 		fmap.w8(off, fmap.r8(off) & ~bit);
 	}
 }
 
-u32 fs_vtech::impl::free_block_count()
+uint32_t fs_vtech::impl::free_block_count()
 {
 	auto fmap = m_blockdev.get(15);
-	u32 nf = 0;
-	for(u32 off = 0; off != (40-1)*2; off++) {
-		u8 m = fmap.r8(off);
+	uint32_t nf = 0;
+	for(uint32_t off = 0; off != (40-1)*2; off++) {
+		uint8_t m = fmap.r8(off);
 		// Count 1 bits;
 		m = ((m & 0xaa) >> 1) | (m & 0x55);
 		m = ((m & 0xcc) >> 2) | (m & 0x33);

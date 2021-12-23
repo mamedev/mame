@@ -168,7 +168,7 @@ public:
 	void close();
 
 	// position
-	int seek(s64 offset, int whence);
+	std::error_condition seek(s64 offset, int whence);
 	u64 tell();
 	bool eof();
 	u64 size();

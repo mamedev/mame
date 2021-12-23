@@ -396,16 +396,16 @@ void boogwing_state::boogwing(machine_config &config)
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_XTAL/9));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 1); /* IRQ2 */
 	ymsnd.port_write_handler().set(FUNC(boogwing_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.80);
-	ymsnd.add_route(1, "rspeaker", 0.80);
+	ymsnd.add_route(0, "lspeaker", 0.32);
+	ymsnd.add_route(1, "rspeaker", 0.32);
 
 	OKIM6295(config, m_oki[0], SOUND_XTAL/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.40);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.40);
+	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.56);
+	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.56);
 
 	OKIM6295(config, m_oki[1], SOUND_XTAL/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.12);
+	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.12);
 }
 
 /**********************************************************************************/

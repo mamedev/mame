@@ -59,6 +59,7 @@ menu_file_selector::menu_file_selector(mame_ui_manager &mui, render_container &c
 	, m_result(result)
 {
 	(void)m_image;
+	set_process_flags(PROCESS_IGNOREPAUSE);
 }
 
 
@@ -347,7 +348,7 @@ void menu_file_selector::type_search_char(char32_t ch)
 	std::string const current(m_filename);
 	if (input_character(m_filename, ch, uchar_is_printable))
 	{
-		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename.c_str());
+		ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
 
 		file_selector_entry const *const cur_selected(reinterpret_cast<file_selector_entry const *>(get_selection_ref()));
 
@@ -478,28 +479,31 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_file_selector::handle()
+void menu_file_selector::handle(event const *ev)
 {
 	// process the menu
-	event const *const event = process(0);
-	if (event && event->itemref)
+	if (ev)
 	{
-		// handle selections
-		if (event->iptkey == IPT_UI_SELECT)
-		{
-			select_item(*reinterpret_cast<file_selector_entry const *>(event->itemref));
-
-			// reset the char buffer when pressing IPT_UI_SELECT
-			m_filename.clear();
-		}
-		else if (event->iptkey == IPT_SPECIAL)
+		if (ev->iptkey == IPT_SPECIAL)
 		{
 			// if it's any other key and we're not maxed out, update
-			type_search_char(event->unichar);
+			type_search_char(ev->unichar);
 		}
-		else if (event->iptkey == IPT_UI_CANCEL)
+		else if (ev->iptkey == IPT_UI_CANCEL)
 		{
 			// reset the char buffer also in this case
+			if (!m_filename.empty())
+			{
+				m_filename.clear();
+				ui().popup_time(ERROR_MESSAGE_TIME, "%s", m_filename);
+			}
+		}
+		else if (ev->itemref && (ev->iptkey == IPT_UI_SELECT))
+		{
+			// handle selections
+			select_item(*reinterpret_cast<file_selector_entry const *>(ev->itemref));
+
+			// reset the char buffer when pressing IPT_UI_SELECT
 			m_filename.clear();
 		}
 	}
@@ -552,13 +556,12 @@ void menu_select_rw::populate(float &customtop, float &custombottom)
 //  handle
 //-------------------------------------------------
 
-void menu_select_rw::handle()
+void menu_select_rw::handle(event const *ev)
 {
 	// process the menu
-	const event *event = process(0);
-	if (event != nullptr && event->iptkey == IPT_UI_SELECT)
+	if (ev && ev->iptkey == IPT_UI_SELECT)
 	{
-		m_result = result_from_itemref(event->itemref);
+		m_result = result_from_itemref(ev->itemref);
 		stack_pop();
 	}
 }

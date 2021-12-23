@@ -22,6 +22,7 @@ enum
 class t11_device :  public cpu_device
 {
 public:
+	// T11 input lines
 	enum
 	{
 		CP0_LINE = 0,           // -AI4 (at PI time)
@@ -33,8 +34,12 @@ public:
 		HLT_LINE = 6            // -AI7 (at PI time)
 	};
 
+	// generic hardware traps
+	static constexpr uint8_t POWER_FAIL = PF_LINE;
+	static constexpr uint8_t BUS_ERROR = 8;
+
 	// construction/destruction
-	t11_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	void set_initial_mode(const uint16_t mode) { c_initial_mode = mode; }
@@ -63,8 +68,8 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 12; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 114; }
-	virtual uint32_t execute_input_lines() const noexcept override { return 7; }
-	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PF_LINE || inputnum == HLT_LINE; }
+	virtual uint32_t execute_input_lines() const noexcept override { return 8; }
+	virtual bool execute_input_edge_triggered(int inputnum) const noexcept override { return inputnum == PF_LINE || inputnum == HLT_LINE || inputnum == BUS_ERROR; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -89,8 +94,10 @@ protected:
 	uint8_t             m_cp_state;
 	bool                m_vec_active;
 	bool                m_pf_active;
+	bool                m_berr_active;
 	bool                m_hlt_active;
 	bool                m_power_fail;
+	bool                m_bus_error;
 	bool                m_ext_halt;
 	int                 m_icount;
 	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;

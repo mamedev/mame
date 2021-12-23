@@ -16,7 +16,6 @@
 - test sprite collision and overflow interrupts
 - sprite precaching
 - rewrite the base renderer loop
-- Add CD support
 - Add expansion port support
 - Add 263 line mode
 - Sprite DMA should use vdc VRAM functions
@@ -49,11 +48,8 @@ Super System Card:
 /**********************************************************************
                           Known Bugs
 ***********************************************************************
-- Benkei Gaiden: hangs after a few Sunsoft logo spins.
-- Busou Keiji Cyber Cross: hangs on attract mode
 - Cadash: After choosing character and name, the game starts and the display 'jiggles' like tracking if off a VCR
 - Fighting Run: has color and sprite issues during gameplay;
-- Hisou Kihei - Xserd: black screen;
 **********************************************************************/
 
 #include "emu.h"
@@ -147,7 +143,7 @@ static void pce_cart(device_slot_interface &device)
 
 void pce_state::pce_common(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	H6280(config, m_maincpu, MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::pce_mem);
 	m_maincpu->set_addrmap(AS_IO, &pce_state::pce_io);
@@ -158,7 +154,7 @@ void pce_state::pce_common(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(pce_state::screen_update));
@@ -209,7 +205,7 @@ void pce_state::tg16(machine_config &config)
 
 void pce_state::sgx(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	H6280(config, m_maincpu, MAIN_CLOCK/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pce_state::sgx_mem);
 	m_maincpu->set_addrmap(AS_IO, &pce_state::sgx_io);
@@ -220,7 +216,7 @@ void pce_state::sgx(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(FUNC(pce_state::screen_update));

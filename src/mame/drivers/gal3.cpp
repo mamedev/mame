@@ -208,7 +208,8 @@ uint32_t gal3_state::screen_update_left(screen_device &screen, bitmap_ind16 &bit
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
-	m_c355spr[0]->get_sprites(cliprect); // TODO : buffered?
+
+	m_c355spr[0]->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	int i;
 	char mst[18], slv[18];
@@ -262,7 +263,7 @@ uint32_t gal3_state::screen_update_right(screen_device &screen, bitmap_ind16 &bi
 {
 	bitmap.fill(0xff, cliprect); // TODO : actually laserdisc layer
 	screen.priority().fill(0, cliprect);
-	m_c355spr[1]->get_sprites(cliprect); // TODO : buffered?
+	m_c355spr[1]->build_sprite_list_and_render_sprites(cliprect); // TODO : buffered?
 
 	static int pivot = 15;
 	int pri;

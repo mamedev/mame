@@ -121,11 +121,11 @@
 #define SEGA_COINAGE_NO_FREE_LOC(DIPBANK) \
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(#DIPBANK":1,2,3,4") \
 	SEGA_COINAGE_A_PART_H \
-	PORT_DIPSETTING(    0x00, " 1 Coin/1 Credit" ) \
+	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit" ) \
 	SEGA_COINAGE_A_PART_L \
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION(#DIPBANK":5,6,7,8") \
 	SEGA_COINAGE_B_PART_H \
-	PORT_DIPSETTING(    0x00, " 1 Coin/1 Credit" ) \
+	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit" ) \
 	SEGA_COINAGE_B_PART_L
 
 // [exception 1.1] not have free play (forbid duplicated settings, hide 0x00)

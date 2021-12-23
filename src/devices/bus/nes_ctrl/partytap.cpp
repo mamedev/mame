@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Nintendo Family Computer Yonezawa / PartyRoom 21 Party Tap Controller
+    Nintendo Family Computer Yonezawa / Party Room 21 Partytap Controller
 
 **********************************************************************/
 
@@ -13,7 +13,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(NES_PARTYTAP, nes_partytap_device, "nes_partytap", "Yonezawa Party Tap Controller")
+DEFINE_DEVICE_TYPE(NES_PARTYTAP, nes_partytap_device, "nes_partytap", "Yonezawa Partytap Controller")
 
 
 static INPUT_PORTS_START( nes_partytap )
@@ -44,12 +44,11 @@ ioport_constructor nes_partytap_device::device_input_ports() const
 //  nes_partytap_device - constructor
 //-------------------------------------------------
 
-nes_partytap_device::nes_partytap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NES_PARTYTAP, tag, owner, clock),
-	device_nes_control_port_interface(mconfig, *this),
-	m_inputs(*this, "INPUTS"),
-	m_mode(0),
-	m_latch(0)
+nes_partytap_device::nes_partytap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, NES_PARTYTAP, tag, owner, clock)
+	, device_nes_control_port_interface(mconfig, *this)
+	, m_inputs(*this, "INPUTS")
+	, m_latch(0)
 {
 }
 
@@ -61,18 +60,7 @@ nes_partytap_device::nes_partytap_device(const machine_config &mconfig, const ch
 void nes_partytap_device::device_start()
 {
 	save_item(NAME(m_latch));
-	save_item(NAME(m_mode));
-}
-
-
-//-------------------------------------------------
-//  device_reset
-//-------------------------------------------------
-
-void nes_partytap_device::device_reset()
-{
-	m_mode = 0xe0;
-	m_latch = 0;
+	save_item(NAME(m_strobe));
 }
 
 
@@ -80,15 +68,16 @@ void nes_partytap_device::device_reset()
 //  read
 //-------------------------------------------------
 
-uint8_t nes_partytap_device::read_exp(offs_t offset)
+u8 nes_partytap_device::read_exp(offs_t offset)
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 	if (offset == 1)    //$4017
 	{
+		if (m_strobe)
+			m_latch = m_inputs->read();
 		ret |= m_latch & 0x1c;
 		m_latch >>= 3;
-		// append mode bits
-		m_latch |= m_mode;
+		m_latch |= 0xa0; // after first two reads, 0x14 will be returned
 	}
 	return ret;
 }
@@ -97,14 +86,8 @@ uint8_t nes_partytap_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_partytap_device::write(uint8_t data)
+void nes_partytap_device::write(u8 data)
 {
-	// inputs are read in two chunks of 3 bits, before the second one is read bit2 is written here
-	// probably a mechanism for the game to detect which group of inputs is being read
-	m_mode = BIT(data, 2) ? 0xa0 : 0xe0;
-
-	if (data & 0x01)
-		return;
-
-	m_latch = m_inputs->read();
+	if (write_strobe(data))
+		m_latch = m_inputs->read();
 }

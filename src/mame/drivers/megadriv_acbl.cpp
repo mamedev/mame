@@ -12,6 +12,7 @@
         * Jurassic Park
         * Mortal Kombat 3
         * Sonic The Hedgehog 2
+        * Sonic The Hedgehog 3
         * Super Street Fighter II - The New Challengers
         * Sunset Riders
         * Top Shooter
@@ -363,6 +364,15 @@ uint16_t md_boot_state::barek2mb_r()
 		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
 
 	logerror("aladbl_r : %06x\n",m_maincpu->pc());
+	return 0x0000;
+}
+
+uint16_t md_boot_state::sonic3mb_r()
+{
+	if (m_maincpu->pc() == 0x1688) return 0x0300; // TODO: should work but doesn't? debug: just put 0x0300 at 0xfffffc during the first startup check to succesfully boot. Coins are stored in the same location
+
+	// logerror("sonic3mb_r : %06x\n", m_maincpu->pc());
+
 	return 0x0000;
 }
 
@@ -1321,6 +1331,14 @@ void md_boot_state::init_sonic2mb()
 	init_megadrij();
 }
 
+void md_boot_state::init_sonic3mb()
+{
+	// m_maincpu->space(AS_PROGRAM).install_write_handler(0x200000, 0x200001, write16smo_delegate(*this, FUNC(md_boot_state::sonic3mb_w))); // seems to write to PIC from here
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x300000, 0x300001, read16smo_delegate(*this, FUNC(md_boot_state::sonic3mb_r))); // reads from PIC from here
+
+	init_megadrij();
+}
+
 void md_boot_state::init_twinktmb()
 {
 	// boot vectors don't seem to be valid, so they are patched...
@@ -1428,6 +1446,17 @@ ROM_START( sonic2mb )
 	ROM_LOAD16_BYTE( "m2", 0x000000, 0x080000,  CRC(84b3f758) SHA1(19846b9d951db6f78f3e155d33f1b6349fb87f1a) )
 ROM_END
 
+ROM_START( sonic3mb )
+	ROM_REGION( 0x400000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "sonic3-4.bin", 0x000000, 0x080000, CRC(b7318bb8) SHA1(1707b563794c3ab4a1f04cb449efdd6f817317fb) )
+	ROM_LOAD16_BYTE( "sonic3-3.bin", 0x000001, 0x080000, CRC(1898479f) SHA1(5f1c581157959e11979882d2180ae4b98c6a89d5) )
+	ROM_LOAD16_BYTE( "sonic3-2.bin", 0x100000, 0x080000, CRC(02232f45) SHA1(8cdcb156603108ac9d3ef888f75adb5327abce1a) )
+	ROM_LOAD16_BYTE( "sonic3-1.bin", 0x100001, 0x080000, CRC(cee2f679) SHA1(4cc7a8a228f7fc4f7a38c69a65585765751a49e5) )
+
+	ROM_REGION( 0x1000, "pic", ROMREGION_ERASE00 )
+	ROM_LOAD( "pic16c57xtp", 0x0000, 0x1000, NO_DUMP )
+ROM_END
+
 ROM_START( barek2mb )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(1c1fa718) SHA1(393488f7747478728eb4f20c10b0cfce3b188719) )
@@ -1512,6 +1541,7 @@ GAME( 1993, srmdb,    0, megadrvb,     srmdb,    md_boot_state, init_srmdb,    R
 GAME( 1995, topshoot, 0, md_bootleg,   topshoot, md_boot_state, init_topshoot, ROT0, "Sun Mixing",       "Top Shooter",                                                                           0 )
 GAME( 1996, sbubsm,   0, md_bootleg,   sbubsm,   md_boot_state, init_sbubsm,   ROT0, "Sun Mixing",       "Super Bubble Bobble (Sun Mixing, Megadrive clone hardware)",                            0 )
 GAME( 1993, sonic2mb, 0, md_bootleg,   sonic2mb, md_boot_state, init_sonic2mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 2 (bootleg of Megadrive version)",                                   0 ) // Flying wires going through the empty PIC space aren't completely understood
+GAME( 1993, sonic3mb, 0, md_bootleg,   twinktmb, md_boot_state, init_sonic3mb, ROT0, "bootleg / Sega",   "Sonic The Hedgehog 3 (bootleg of Megadrive version)",                                   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1994, barek2mb, 0, md_bootleg,   barek2,   md_boot_state, init_barek2,   ROT0, "bootleg / Sega",   "Bare Knuckle II (bootleg of Megadrive version)",                                        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC hook up
 GAME( 1994, barek3mb, 0, megadrvb,     barek3,   md_boot_state, init_barek3,   ROT0, "bootleg / Sega",   "Bare Knuckle III (bootleg of Megadrive version)",                                       0 )
 GAME( 1994, bk3ssrmb, 0, megadrvb_6b,  bk3ssrmb, md_boot_6button_state, init_bk3ssrmb, ROT0, "bootleg / Sega",   "Bare Knuckle III / Sunset Riders (bootleg of Megadrive versions)",                      MACHINE_NOT_WORKING ) // Currently boots as Bare Knuckle III, mechanism to switch game not found yet

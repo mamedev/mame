@@ -10,7 +10,7 @@
         * Cruis'n USA (1994)        [5 sets]
         * Cruis'n World (1996)      [7 sets]
         * War Gods (1996)           [3 sets]
-        * Off Road Challenge (1997) [5 sets]
+        * Off Road Challenge (1997) [6 sets]
 
     Known bugs:
         * textures for automatic/manual selection get overwritten in Cruis'n World
@@ -19,9 +19,6 @@
         * Off Road Challenge has polygon sorting issues, among other problems
         * Issues for the Wargods sets:
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
-
-Known to exist but not dumped:
-    Off Road Challenge v1.00 (Mon 07-28-97)
 
 **************************************************************************/
 
@@ -1726,7 +1723,7 @@ ROM_START( offroadc ) /* Version 1.63, Tue 03-03-98 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.63_off_road_u10_game.u10", 0x0000000, 0x100000, CRC(faaf81b8) SHA1(d0bd40b2cf5d07db9f668826cc7f0ed84c4e84bf) ) /* Version 1.63 program roms */
+	ROM_LOAD32_BYTE( "1.63_off_road_u10_game.u10", 0x0000000, 0x100000, CRC(faaf81b8) SHA1(d0bd40b2cf5d07db9f668826cc7f0ed84c4e84bf) ) /* Version 1.63 program ROMs */
 	ROM_LOAD32_BYTE( "1.63_off_road_u11_game.u11", 0x0000001, 0x100000, CRC(f68e9655) SHA1(e29926ea24cfbd228a2136d04a63a92eba0098d7) )
 	ROM_LOAD32_BYTE( "1.63_off_road_u12_game.u12", 0x0000002, 0x100000, CRC(6a5295b3) SHA1(ac72fe205ffb306598400e8b1d9c98ae67b0bab9) )
 	ROM_LOAD32_BYTE( "1.63_off_road_u13_game.u13", 0x0000003, 0x100000, CRC(cb9233b5) SHA1(2d23b6a2312a75dbaa44de3224512c844aaac7b5) )
@@ -1757,7 +1754,7 @@ ROM_START( offroadc5 ) /* Version 1.50, Tue 10-21-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.5_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(f464be4f) SHA1(da6c04ae49d033f92cdd62f997841365c4a08616) ) /* Version 1.50 program roms */
+	ROM_LOAD32_BYTE( "1.5_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(f464be4f) SHA1(da6c04ae49d033f92cdd62f997841365c4a08616) ) /* Version 1.50 program ROMs */
 	ROM_LOAD32_BYTE( "1.5_off_road_u11_game.u11",  0x0000001, 0x100000, CRC(eaddc9ac) SHA1(a6b810bf7460e3257bf6acdc3b79c532fb71ad68) )
 	ROM_LOAD32_BYTE( "1.5_off_road_u12_game.u12",  0x0000002, 0x100000, CRC(a2da68da) SHA1(b8dcc042b9926055bff9020599c1c218f08b1727) )
 	ROM_LOAD32_BYTE( "1.5_off_road_u13_game.u13",  0x0000003, 0x100000, CRC(b4755ee2) SHA1(1c4cde7ca60a6e8bff12aed348e7148e20a8caba) )
@@ -1788,7 +1785,7 @@ ROM_START( offroadc4 ) /* Version 1.40, Mon 10-06-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.4_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(d263b078) SHA1(d376e120e05cf8526b002300db345fd0b9775702) ) /* Version 1.40 program roms */
+	ROM_LOAD32_BYTE( "1.4_off_road_u10_game.u10",  0x0000000, 0x100000, CRC(d263b078) SHA1(d376e120e05cf8526b002300db345fd0b9775702) ) /* Version 1.40 program ROMs */
 	ROM_LOAD32_BYTE( "1.4_off_road_u11_game.u11",  0x0000001, 0x100000, CRC(1b443a72) SHA1(0e16d923f0e97f21e92c8d5b431fcaa0815b2c87) )
 	ROM_LOAD32_BYTE( "1.4_off_road_u12_game.u12",  0x0000002, 0x100000, CRC(4e82a34b) SHA1(c22a3f638b7e226add511147982339b1f59821e9) )
 	ROM_LOAD32_BYTE( "1.4_off_road_u13_game.u13",  0x0000003, 0x100000, CRC(558b859c) SHA1(b7946a4b44976b08a691622000e1457021267d1a) )
@@ -1819,7 +1816,7 @@ ROM_START( offroadc3 ) /* Version 1.30, Mon 09-15-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.3_off_road_u10.u10",  0x0000000, 0x100000, CRC(71c62ce2) SHA1(e6bdbf3df4795f4cf29a08641cc59d90aed73b57) ) /* Version 1.30 program roms */
+	ROM_LOAD32_BYTE( "1.3_off_road_u10.u10",  0x0000000, 0x100000, CRC(71c62ce2) SHA1(e6bdbf3df4795f4cf29a08641cc59d90aed73b57) ) /* Version 1.30 program ROMs */
 	ROM_LOAD32_BYTE( "1.3_off_road_u11.u11",  0x0000001, 0x100000, CRC(9e362dbb) SHA1(2480710f1081679ff87239a8e28a9a3f235bd3dc) )
 	ROM_LOAD32_BYTE( "1.3_off_road_u12.u12",  0x0000002, 0x100000, CRC(9e0a5b06) SHA1(63bbe427713fc966c65dab575dd42cdce6b00874) )
 	ROM_LOAD32_BYTE( "1.3_off_road_u13.u13",  0x0000003, 0x100000, CRC(d602db7e) SHA1(48bc762a83baeb382476619f54631ccbe12d1b2c) )
@@ -1850,10 +1847,41 @@ ROM_START( offroadc1 ) /* Version 1.10, Mon 08-18-97 */
 	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
 
 	ROM_REGION32_LE( 0x1000000, "user1", 0 )
-	ROM_LOAD32_BYTE( "1.1_off_road_u10.u10",  0x0000000, 0x100000, CRC(4729660c) SHA1(0baff6a27015f4eb3fe0a981ecbac33d140e872a) ) /* Version 1.10 program roms */
+	ROM_LOAD32_BYTE( "1.1_off_road_u10.u10",  0x0000000, 0x100000, CRC(4729660c) SHA1(0baff6a27015f4eb3fe0a981ecbac33d140e872a) ) /* Version 1.10 program ROMs */
 	ROM_LOAD32_BYTE( "1.1_off_road_u11.u11",  0x0000001, 0x100000, CRC(6272d013) SHA1(860121184282627ed692e56a0dafee8b64562811) )
 	ROM_LOAD32_BYTE( "1.1_off_road_u12.u12",  0x0000002, 0x100000, CRC(9c8326be) SHA1(55f16d14379f57d08ed84d82f9db1a582bc223a1) )
 	ROM_LOAD32_BYTE( "1.1_off_road_u13.u13",  0x0000003, 0x100000, CRC(53bbc181) SHA1(1ab29a27a216eb09d69a9f3d681865de1a904717) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-01_u14_video_image.u14", 0x0400000, 0x100000, CRC(1e41d14b) SHA1(3f7c5fae1f8b82ddd811720837fa298785a8dd27) ) /* mask ROMs */
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-02_u15_video_image.u15", 0x0400001, 0x100000, CRC(654d623d) SHA1(a944b8f8d71b099d7b5bbd7df6effb90afc3aec8) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-03_u16_video_image.u16", 0x0400002, 0x100000, CRC(259774d8) SHA1(90cdf659324b84b3c2c59497cc5611e8f12629a6) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-04_u17_video_image.u17", 0x0400003, 0x100000, CRC(50c61434) SHA1(52bc603101b4f88b7d892af683b7c8358cabbf4a) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-05_u18_video_image.u18", 0x0800000, 0x100000, CRC(015be91c) SHA1(1624537068c6bc5fa6235bf0b0343347c337e8d8) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-06_u19_video_image.u19", 0x0800001, 0x100000, CRC(cfc6b70e) SHA1(8c5ad84c50ca142726db0595153cf04caaabec9c) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-07_u20_video_image.u20", 0x0800002, 0x100000, CRC(f48d6e33) SHA1(8b9c205e24f217ac110cdd82388c056ebbbb09b0) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-08_u21_video_image.u21", 0x0800003, 0x100000, CRC(17794b56) SHA1(8bfd8f5b43056bfe7f62524bb8c3a8564a3a9413) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-09_u22_video_image.u22", 0x0c00000, 0x100000, CRC(f2a6e622) SHA1(a7d7004e95b058124cc02e8073dab8fbed8813c5) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-10_u23_video_image.u23", 0x0c00001, 0x100000, CRC(1cba6e20) SHA1(a7c9c58bfc4d26decb08979d83cccedb27528eb6) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-11_u24_video_image.u24", 0x0c00002, 0x100000, CRC(fd3ce11f) SHA1(78c65267712488784bc6dc14eef98a90494a9553) )
+	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-12_u25_video_image.u25", 0x0c00003, 0x100000, CRC(78f8e5db) SHA1(7ec2a5add27d66c43ba5cb7182554321007f5798) )
+ROM_END
+
+
+ROM_START( offroadc0 ) /* Version 1.00, Mon 07-28-97 */
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  /* sound data */
+	ROM_LOAD16_BYTE( "1.0_off_road_u2_sound.u2", 0x000000, 0x80000, CRC(69976e9d) SHA1(63c886ac2563c43a10840f49f929f8613cd94de2) ) /* generally a M27C4001 EPROM with label */
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-01_u3_sound.u3", 0x200000, 0x80000, CRC(2db9b548) SHA1(4f454a3e6a8851b0ef5d325dd28102d57ea11a11) ) /* these are mask ROMs */
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-02_u4_sound.u4", 0x400000, 0x80000, CRC(42bdf9d0) SHA1(04add0f0ee7fa61de1913cc0b988345d3d430cde) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-03_u5_sound.u5", 0x600000, 0x80000, CRC(569cc84b) SHA1(08b917cc41fae6b6a3e9d9461a783d3d2865e72a) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-04_u6_sound.u6", 0x800000, 0x80000, CRC(0896f679) SHA1(dde39ef17834256909ef2c9fcd5b5fb9939d5178) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-05_u7_sound.u7", 0xa00000, 0x80000, CRC(fe242d6a) SHA1(8fbac22ed23044841f309ce58c5b1affcdd5d114) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-06_u8_sound.u8", 0xc00000, 0x80000, CRC(5da13f12) SHA1(2bb5e929e8bc6c70cb4475024a6b0bb07ac25244) )
+	ROM_LOAD16_BYTE( "offroad_challenge_5341-15511-07_u9_sound.u9", 0xe00000, 0x80000, CRC(7ad27f69) SHA1(b33665d0593a95b58d529720aae49e90449bf714) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 )
+	ROM_LOAD32_BYTE( "off_road_u10_game.u10",  0x0000000, 0x100000, CRC(f3535a2c) SHA1(b9578ac9bf3092d983608bc26535127108565062) ) /* Version 1.00 program ROMs  - mask ROMS simply labeled:  OFF ROAD   U1x GAME   1997 Midway */
+	ROM_LOAD32_BYTE( "off_road_u11_game.u11",  0x0000001, 0x100000, CRC(16c904ee) SHA1(ad0a7d9db239cfeb43aba6c4a0a830ba010f397f) )
+	ROM_LOAD32_BYTE( "off_road_u12_game.u12",  0x0000002, 0x100000, CRC(d267d7bf) SHA1(eaafba935392444871c17a06e7f513545846aac5) )
+	ROM_LOAD32_BYTE( "off_road_u13_game.u13",  0x0000003, 0x100000, CRC(e6274bb3) SHA1(3203d0bf6ce01efd8e28114b95ddf31e70df5e6e) )
 	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-01_u14_video_image.u14", 0x0400000, 0x100000, CRC(1e41d14b) SHA1(3f7c5fae1f8b82ddd811720837fa298785a8dd27) ) /* mask ROMs */
 	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-02_u15_video_image.u15", 0x0400001, 0x100000, CRC(654d623d) SHA1(a944b8f8d71b099d7b5bbd7df6effb90afc3aec8) )
 	ROM_LOAD32_BYTE( "offroad_challenge_5341-15510-03_u16_video_image.u16", 0x0400002, 0x100000, CRC(259774d8) SHA1(90cdf659324b84b3c2c59497cc5611e8f12629a6) )
@@ -2075,6 +2103,7 @@ GAMEL( 1997, offroadc5, offroadc, offroadc, offroadc, midvunit_state, init_offro
 GAMEL( 1997, offroadc4, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.40)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1997, offroadc3, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.30)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 GAMEL( 1997, offroadc1, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.10)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
+GAMEL( 1997, offroadc0, offroadc, offroadc, offroadc, midvunit_state, init_offroadc, ROT0, "Midway", "Off Road Challenge (v1.00)", MACHINE_SUPPORTS_SAVE, layout_crusnusa )
 
 GAME( 1995, wargods,   0,        midvplus, wargods, midvunit_state,  init_wargods,  ROT0, "Midway", "War Gods (HD 10/09/1996 - Dual Resolution)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, wargodsa,  wargods,  midvplus, wargodsa, midvunit_state, init_wargods,  ROT0, "Midway", "War Gods (HD 08/15/1996)", MACHINE_SUPPORTS_SAVE )

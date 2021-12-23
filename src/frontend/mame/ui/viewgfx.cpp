@@ -96,7 +96,7 @@ struct ui_gfx_state
 		int         yoffs;          // current Y offset
 		int         zoom;           // zoom factor, either x or 1/x
 		bool        zoom_frac;      // zoom via reciprocal fractions
-		bool        auto_zoom;		// auto-zoom toggle
+		bool        auto_zoom;      // auto-zoom toggle
 		uint8_t     rotate;         // current rotation (orientation) value
 		uint32_t    flags;          // render flags
 	} tilemap;

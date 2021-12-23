@@ -445,7 +445,7 @@ some variation of proportions even within the same display type.
 One side effect of this on the console's palette is that some values of
 red may appear too pinkish - Too much blue to red.  This is not the same
 as a traditional tint-hue control adjustment; rather, can be demonstrated
-by changing the blue ratio values via MESS HLSL settings.
+by changing the blue ratio values via MAME HLSL settings.
 
 Lastly, the Atari 2600 & 5200 NTSC color palettes hold the same hue
 structure order and have similar appearance differences that are dependent

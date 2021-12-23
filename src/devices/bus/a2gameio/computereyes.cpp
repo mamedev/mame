@@ -9,12 +9,40 @@
 #include "emu.h"
 #include "bus/a2gameio/computereyes.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+#include "imagedev/picture.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(APPLE2_COMPUTEREYES, apple2_compeyes_device, "a2ceyes", "Digital Vision ComputerEyes")
+#include "bitmap.h"
+
+
+namespace {
+
+// ======================> apple2_compeyes_device
+
+class apple2_compeyes_device : public device_t, public device_a2gameio_interface
+{
+public:
+	// construction/destruction
+	apple2_compeyes_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// device_a2gameio_interface overrides
+	virtual DECLARE_READ_LINE_MEMBER(sw0_r) override;
+	virtual DECLARE_READ_LINE_MEMBER(sw1_r) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an0_w) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an1_w) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an2_w) override;
+	virtual DECLARE_WRITE_LINE_MEMBER(an3_w) override;
+
+private:
+	required_device<picture_image_device> m_picture;
+	int m_x, m_y, m_an1, m_an2, m_an3, m_level;
+	u8 m_a2_bitmap[280*192];
+};
 
 //**************************************************************************
 //  DEVICE IMPLEMENTATION
@@ -120,3 +148,13 @@ WRITE_LINE_MEMBER(apple2_compeyes_device::an3_w)
 	m_an3 = state;
 	m_level = (128 * m_an2) + (64 * m_an1) + (32 * m_an3);
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE_PRIVATE(APPLE2_COMPUTEREYES, device_a2gameio_interface, apple2_compeyes_device, "a2ceyes", "Digital Vision ComputerEyes")

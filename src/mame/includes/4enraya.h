@@ -34,6 +34,8 @@ public:
 	void fenraya_videoram_w(offs_t offset, uint8_t data);
 
 protected:
+	void _4enraya_video(machine_config &config);
+
 	void sound_data_w(uint8_t data);
 	uint8_t fenraya_custom_map_r(offs_t offset);
 	void fenraya_custom_map_w(offs_t offset, uint8_t data);
@@ -77,12 +79,25 @@ public:
 
 	void unkpacg(machine_config &config);
 	void unkpacga(machine_config &config);
+	void tourpgum(machine_config &config);
 
 private:
 	void unkpacg_main_map(address_map &map);
 	void unkpacga_main_map(address_map &map);
-	void unkpacg_main_portmap(address_map &map);
+	void tourpgum_main_map(address_map &map);
 
+	void unkpacg_main_portmap(address_map &map);
+};
+
+class unk_gambl_enc_state : public unk_gambl_state
+{
+public:
+	unk_gambl_enc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: unk_gambl_state(mconfig, type, tag)
+	{
+	}
+
+private:
 	void driver_init() override;
 };
 

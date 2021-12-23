@@ -17,7 +17,7 @@ void check(int cond, const char *format, ...)
      }
 }
 
-size_t skipspaces(const char *buf, size_t i)
+size_t skipspaces(const unsigned char *buf, size_t i)
 {
     while (isspace(buf[i])) ++i;
     return i;
@@ -27,7 +27,7 @@ size_t skipspaces(const char *buf, size_t i)
    separated by whitespace, and terminated by any character not in
    [0-9a-fA-F] or whitespace, then stores the corresponding utf8 string
    in dest, returning the number of bytes read from buf */
-size_t encode(char *dest, const char *buf)
+size_t encode(unsigned char *dest, const unsigned char *buf)
 {
      size_t i = 0, j, d = 0;
      for (;;) {
@@ -39,8 +39,20 @@ size_t encode(char *dest, const char *buf)
                dest[d] = 0; /* NUL-terminate destination string */
                return i + 1;
           }
-          check(sscanf(buf + i, "%x", (unsigned int *)&c) == 1, "invalid hex input %s", buf+i);
+          check(sscanf((char *) (buf + i), "%x", (unsigned int *)&c) == 1, "invalid hex input %s", buf+i);
           i = j; /* skip to char after hex input */
           d += utf8proc_encode_char(c, (utf8proc_uint8_t *) (dest + d));
      }
+}
+
+/* simplistic, portable replacement for getline, sufficient for our tests */
+size_t simple_getline(unsigned char buf[8192], FILE *f) {
+    size_t i = 0;
+    while (i < 8191) {
+        int c = getc(f);
+        if (c == EOF || c == '\n') break;
+        buf[i++] = (unsigned char) c;
+    }
+    buf[i] = 0;
+    return i;
 }

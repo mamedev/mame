@@ -41,7 +41,7 @@ public:
 	virtual const char *name() const override;
 	virtual const char *description() const override;
 
-	static void format(u32 key, floppy_image *image);
+	static void format(uint32_t key, floppy_image *image);
 
 	virtual void enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
 	virtual std::unique_ptr<filesystem_t> mount(fsblk_t &blockdev) const override;

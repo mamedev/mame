@@ -188,6 +188,30 @@ uint8_t device_sns_cart_interface::read_open_bus()
 	return 0xff;
 }
 
+//-------------------------------------------------
+//  scanlines_r - get motherboard scanline count
+//-------------------------------------------------
+
+int device_sns_cart_interface::scanlines_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->scanlines_r();
+
+	return 0xff;
+}
+
+//-------------------------------------------------
+//  address_r - get address pin from S-CPU
+//-------------------------------------------------
+
+offs_t device_sns_cart_interface::address_r()
+{
+	if (m_slot != nullptr)
+		return m_slot->address_r();
+
+	return 0xff;
+}
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -1021,13 +1045,14 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 {
 	if (hook.image_file())
 	{
-		const char *slot_string;
 		uint32_t offset;
-		uint32_t len = hook.image_file()->size();
+		uint64_t len;
+		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large file
 		std::vector<uint8_t> rom(len);
 		int type = 0, addon = 0;
 
-		hook.image_file()->read(&rom[0], len);
+		size_t actual;
+		hook.image_file()->read(&rom[0], len, actual); // FIXME: check for error result or read returning short
 
 		offset = snes_skip_header(&rom[0], len);
 
@@ -1070,7 +1095,7 @@ std::string base_sns_cart_slot_device::get_default_card_software(get_default_car
 				break;
 		}
 
-		slot_string = sns_get_slot(type);
+		char const *const slot_string = sns_get_slot(type);
 
 		return std::string(slot_string);
 	}

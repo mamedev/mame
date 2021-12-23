@@ -34,11 +34,6 @@
 
 #include "modules/monitor/monitor_common.h"
 
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#include <agile.h>
-using namespace Windows::UI::Core;
-#endif
-
 #include "modules/render/drawbgfx.h"
 #include "modules/render/drawnone.h"
 #include "modules/render/drawd3d.h"
@@ -312,6 +307,7 @@ win_window_info::win_window_info(
 	, m_lastclicktime(std::chrono::steady_clock::time_point::min())
 	, m_lastclickx(0)
 	, m_lastclicky(0)
+	, m_last_surrogate(0)
 	, m_attached_mode(false)
 {
 	m_non_fullscreen_bounds.left = 0;
@@ -324,8 +320,6 @@ win_window_info::win_window_info(
 }
 
 POINT win_window_info::s_saved_cursor_pos = { -1, -1 };
-
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 void win_window_info::capture_pointer()
 {
@@ -360,35 +354,6 @@ void win_window_info::show_pointer()
 	while (ShowCursor(TRUE) < 1) {};
 	ShowCursor(FALSE);
 }
-
-#else
-
-CoreCursor^ win_window_info::s_cursor = nullptr;
-
-void win_window_info::capture_pointer()
-{
-	platform_window<Platform::Agile<CoreWindow^>>()->SetPointerCapture();
-}
-
-void win_window_info::release_pointer()
-{
-	platform_window<Platform::Agile<CoreWindow^>>()->ReleasePointerCapture();
-}
-
-void win_window_info::hide_pointer()
-{
-	auto window = platform_window<Platform::Agile<CoreWindow^>>();
-	win_window_info::s_cursor = window->PointerCursor;
-	window->PointerCursor = nullptr;
-}
-
-void win_window_info::show_pointer()
-{
-	auto window = platform_window<Platform::Agile<CoreWindow^>>();
-	window->PointerCursor = win_window_info::s_cursor;
-}
-
-#endif
 
 //============================================================
 //  winwindow_process_events_periodic
@@ -709,7 +674,7 @@ void winwindow_update_cursor_state(running_machine &machine)
 	// if we should hide the mouse cursor, then do it
 	// rules are:
 	//   1. we must have focus before hiding the cursor
-	//   2. we also hide the cursor in full screen mode and when tshe window doesn't have a menu
+	//   2. we also hide the cursor in full screen mode and when the window doesn't have a menu
 	//   3. we also hide the cursor in windowed mode if we're not paused and
 	//      the input system requests it
 	if (winwindow_has_focus() && (
@@ -1194,7 +1159,34 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 		break;
 
 	case WM_CHAR:
-		window->machine().ui_input().push_char_event(window->target(), (char32_t) wparam);
+		{
+			char16_t const ch = char16_t(wparam);
+			if ((0xd800 <= ch) && (0xdbff >= ch))
+			{
+				window->m_last_surrogate = ch;
+			}
+			else if ((0xdc00 <= ch) && (0xdfff >= ch))
+			{
+				if (window->m_last_surrogate)
+				{
+					char32_t const uch = 0x10000 + ((ch & 0x03ff) | ((window->m_last_surrogate & 0x03ff) << 10));
+					window->machine().ui_input().push_char_event(window->target(), uch);
+				}
+				window->m_last_surrogate = 0;
+			}
+			else
+			{
+				window->machine().ui_input().push_char_event(window->target(), char32_t(ch));
+				window->m_last_surrogate = 0;
+			}
+		}
+		break;
+
+	case WM_UNICHAR:
+		if (UNICODE_NOCHAR == wparam)
+			return TRUE;
+		else
+			window->machine().ui_input().push_char_event(window->target(), char32_t(wparam));
 		break;
 
 	case WM_MOUSEWHEEL:
@@ -1202,8 +1194,8 @@ LRESULT CALLBACK win_window_info::video_window_proc(HWND wnd, UINT message, WPAR
 			UINT ucNumLines = 3; // default
 			SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &ucNumLines, 0);
 			window->machine().ui_input().push_mouse_wheel_event(window->target(), GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), GET_WHEEL_DELTA_WPARAM(wparam), ucNumLines);
-			break;
 		}
+		break;
 
 	// pause the system when we start a menu or resize
 	case WM_ENTERSIZEMOVE:

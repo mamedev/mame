@@ -3,11 +3,53 @@
 #include "emu.h"
 #include "uniprint.h"
 
+#include "bus/centronics/ctronics.h"
+
 //#define VERBOSE 1
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
+
 namespace {
+
+class a2bus_uniprint_device : public device_t, public device_a2bus_card_interface
+{
+public:
+	a2bus_uniprint_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	// device_a2bus_card_interface implementation
+	virtual u8 read_c0nx(u8 offset) override;
+	virtual void write_c0nx(u8 offset, u8 data) override;
+	virtual u8 read_cnxx(u8 offset) override;
+	virtual u8 read_c800(u16 offset) override;
+
+protected:
+	// device_t implementation
+	virtual tiny_rom_entry const *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// timer handlers
+	TIMER_CALLBACK_MEMBER(update_strobe);
+
+private:
+	// printer status inputs
+	DECLARE_WRITE_LINE_MEMBER(ack_w);
+
+	required_device<centronics_device>      m_printer_conn;
+	required_device<output_latch_device>    m_printer_out;
+	required_ioport                         m_s1, m_s2;
+	required_region_ptr<u8>                 m_rom;
+	emu_timer *                             m_strobe_timer;
+
+	u8  m_data_latch;   // U6
+	u8  m_ack_latch;    // U2 (pin 9)
+	u8  m_next_strobe;  // U4 (pin 5)
+	u8  m_ack_in;       // printer connector pin 10
+};
+
 
 ROM_START(uniprint)
 	ROM_REGION(0x1000, "rom", 0)
@@ -45,11 +87,6 @@ INPUT_PORTS_START(uniprint)
 	PORT_DIPSETTING(   0x02, "Negative")
 INPUT_PORTS_END
 
-} // anonymous namespace
-
-
-
-DEFINE_DEVICE_TYPE(A2BUS_UNIPRINT, a2bus_uniprint_device, "a2uniprint", "Videx Uniprint Printer Interface")
 
 a2bus_uniprint_device::a2bus_uniprint_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, A2BUS_UNIPRINT, tag, owner, clock),
@@ -65,18 +102,6 @@ a2bus_uniprint_device::a2bus_uniprint_device(machine_config const &mconfig, char
 	m_next_strobe(1U),
 	m_ack_in(1U)
 {
-}
-
-
-
-//----------------------------------------------
-//  DIP switch handlers
-//----------------------------------------------
-
-INPUT_CHANGED_MEMBER(a2bus_uniprint_device::sw_msb)
-{
-	if (BIT(m_data_latch, 7))
-		m_printer_out->write(m_data_latch & (BIT(m_s1->read(), 3) ? 0xffU : 0x7fU));
 }
 
 
@@ -217,3 +242,9 @@ TIMER_CALLBACK_MEMBER(a2bus_uniprint_device::update_strobe)
 		m_strobe_timer->adjust(attotime::from_ticks(1, clock()));
 	}
 }
+
+} // anonymous namespace
+
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_UNIPRINT, device_a2bus_card_interface, a2bus_uniprint_device, "a2uniprint", "Videx Uniprint Printer Interface")

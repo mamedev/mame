@@ -54,6 +54,7 @@ public:
 
 	void kzaurus(machine_config &config);
 	void koropens(machine_config &config);
+	void pwrchanc(machine_config &config);
 	void spcpokan(machine_config &config);
 	void gs662(machine_config &config);
 
@@ -134,6 +135,7 @@ private:
 
 	void kzaurus_main(address_map &map);
 	void koropens_main(address_map &map);
+	void pwrchanc_main(address_map &map);
 	void spcpokan_main(address_map &map);
 	void gs662_main(address_map &map);
 
@@ -316,6 +318,13 @@ void konmedal68k_state::koropens_main(address_map &map)
 	map(0xc00000, 0xc01fff).r(FUNC(konmedal68k_state::vrom_koropens_r));
 }
 
+void konmedal68k_state::pwrchanc_main(address_map &map)
+{
+	koropens_main(map);
+	map(0xa04000, 0xa05fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+	map(0xa06000, 0xa07fff).rw(m_k056832, FUNC(k056832_device::ram_word_r), FUNC(k056832_device::ram_word_w));
+}
+
 void konmedal68k_slot_state::slot_main(address_map &map)
 {
 	common_main(map);
@@ -419,6 +428,29 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_DIPNAME( 0x8000, 0x0000, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kattobas )
+	PORT_INCLUDE( kzaurus )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x1000, 0x0000, "Player Assist" )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x2000, 0x0000, "Start Time" )         PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x0000, "Quick" )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Normal ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spcpokan )
+	PORT_INCLUDE( kzaurus )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x3000, 0x0000, "Play Timer" )         PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x0000, "36 sec" )
+	PORT_DIPSETTING(    0x1000, "30 sec" )
+	PORT_DIPSETTING(    0x2000, "24 sec" )
+	PORT_DIPSETTING(    0x3000, "18 sec" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crossmg2 )
@@ -629,6 +661,13 @@ void konmedal68k_state::koropens(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::koropens_main);
 }
 
+void konmedal68k_state::pwrchanc(machine_config &config)
+{
+	koropens(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::pwrchanc_main);
+}
+
 void konmedal68k_state::spcpokan(machine_config &config)
 {
 	kzaurus(config);
@@ -762,7 +801,7 @@ ROM_START(spcpokan)
 	ROM_LOAD("642-a02-4f.bin", 0x080000, 0x080000, CRC(99265f42) SHA1(047ebf8ab5454ce8504b837fec17002b7d7da30f))
 ROM_END
 
-ROM_START(unkkonmd)
+ROM_START(unkkonmd) // probably Dragon Palace
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP("662-unk-2n.bin", 0x000000, 0x080000, CRC(e6168538) SHA1(093153adc97bc4add67bb1477b9ad3b25fee26f0))
 
@@ -774,7 +813,7 @@ ROM_START(unkkonmd)
 	ROM_LOAD("662-unk-2d.bin", 0x000000, 0x080000, CRC(8133c41c) SHA1(c0ee21d3d8def86221ef9be008b910d1a58796b0))
 ROM_END
 
-// GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM (palette RAM?), possible have no video output or have it implemented in some unusual way.
+// GS562 PCB with no K056766 color DAC and no IC 20D 8Kbyte SRAM
 // at 1st boot press Service1 to initialise NVRAM
 ROM_START( crossmg2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -802,15 +841,15 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 1995, kzaurus,  0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, dobouchn, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, unkkonmd, 0, gs662,    kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1997, koropens, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, kattobas, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, pwrchanc, 0, koropens, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, spcpokan, 0, spcpokan, kzaurus, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1995, kzaurus,  0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Pittanko Zaurus", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, dobouchn, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Dobou-Chan (ver JAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, unkkonmd, 0, gs662,    kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "unknown Konami medal game (game code GS662)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1997, koropens, 0, koropens, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Korokoro Pensuke", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, kattobas, 0, koropens, kattobas, konmedal68k_state, empty_init, ROT0, "Konami", "Kattobase Power Pro Kun", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, pwrchanc, 0, pwrchanc, kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Powerful Chance", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, ymcapsul, 0, kzaurus,  kzaurus,  konmedal68k_state, empty_init, ROT0, "Konami", "Yu-Gi-Oh Monster Capsule", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, spcpokan, 0, spcpokan, spcpokan, konmedal68k_state, empty_init, ROT0, "Konami", "Space Pokan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
 
-// Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors. 
+// Higher resolution display.  These are Pachinko / Pachislot machines, will require simulation of mechanical parts / ball sensors.
 GAME( 1996, crossmg2,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Cross Magic Mark 2", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )
 GAME( 1996, fruitsmg,  0, slot,     crossmg2, konmedal68k_slot_state, empty_init, ROT0, "Konami", "Fruits Magic - The Magic Party", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_MECHANICAL )

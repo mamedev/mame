@@ -14,7 +14,7 @@
 
 #include "formats/imageutl.h"
 
-#include "corefile.h"
+#include "utilfwd.h"
 
 
 //**************************************************************************
