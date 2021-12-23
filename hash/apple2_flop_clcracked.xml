@@ -46612,4 +46612,32 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="galwars">
+		<description>Galactic Wars (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-12-10"/>
+		<!--"Galactic Wars" is a 1980 strategy game developed by Thomas M. Malinowski and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="galactic wars (4am and san inc crack).dsk" size="143360" crc="66060987" sha1="30a57570e11615285bc953fd7b61305922173a30"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="circanal">
+		<description>Circuit Analysis (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-12-15"/>
+		<!--"Circuit Analysis" is a 1981 educational program developed by A. F. Petrie and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="circuit analysis (4am and san inc crack).dsk" size="143360" crc="1d08e594" sha1="eb5a42525698dfe3405d854a28d3eeea28f46af6"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

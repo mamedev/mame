@@ -61,6 +61,7 @@ std::unique_ptr<util::disasm_interface> sm590_device::create_disassembler()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
+
 void sm590_device::device_reset()
 {
 	// ACL
@@ -76,44 +77,17 @@ void sm590_device::device_reset()
 	//m_write_r(0); // TODO: are the four ports zeroed on reset?
 }
 
-//-------------------------------------------------
-//  wake from suspend mode
-//-------------------------------------------------
-bool sm590_device::wake_me_up()
-{
-	// in halt mode, wake up after R2.2 goes high
-	if (m_rports[2]&0x4)
-	{
-		m_halt = false;
-		do_branch(0, 1, 0); // field 0, page 1, step 0
-
-		standard_irq_callback(0);
-		return true;
-	}
-	else
-		return false;
-}
 
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
+
 void sm590_device::increment_pc()
 {
 	// PL(program counter low 7 bits) is a simple LFSR: newbit = (bit0==bit1)
 	// PU,PM(high bits) specify page, PL specifies steps within page
 	int feed = ((m_pc >> 1 ^ m_pc) & 1) ? 0 : 0x40;
 	m_pc = feed | (m_pc >> 1 & 0x3f) | (m_pc & ~0x7f);
-}
-
-void sm590_device::get_opcode_param()
-{
-	// TL, TLS(TML) opcodes are 2 bytes
-	if ((m_op & 0xf8) == 0x78)
-	{
-		m_icount--;
-		m_param = m_program->read_byte(m_pc);
-		increment_pc();
-	}
 }
 
 void sm590_device::execute_one()
@@ -183,4 +157,10 @@ void sm590_device::execute_one()
 			break; // 0xfc
 
 	} // big switch
+}
+
+bool sm590_device::op_argument()
+{
+	// TL, TLS(TML) opcodes are 2 bytes
+	return (m_op & 0xf8) == 0x78;
 }

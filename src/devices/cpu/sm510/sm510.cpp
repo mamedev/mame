@@ -4,9 +4,6 @@
 
   Sharp SM510 MCU core implementation
 
-  TODO:
-  - X
-
 */
 
 #include "emu.h"
@@ -49,7 +46,6 @@ std::unique_ptr<util::disasm_interface> sm510_device::create_disassembler()
 }
 
 
-
 //-------------------------------------------------
 //  buzzer controller
 //-------------------------------------------------
@@ -80,21 +76,9 @@ void sm510_device::clock_melody()
 }
 
 
-
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-void sm510_device::get_opcode_param()
-{
-	// LBL, TL, TML opcodes are 2 bytes
-	if (m_op == 0x5f || (m_op & 0xf0) == 0x70)
-	{
-		m_icount--;
-		m_param = m_program->read_byte(m_pc);
-		increment_pc();
-	}
-}
 
 void sm510_device::execute_one()
 {
@@ -173,4 +157,10 @@ void sm510_device::execute_one()
 
 	// BM high bit is only valid for 1 step
 	m_sbm = (m_op == 0x02);
+}
+
+bool sm510_device::op_argument()
+{
+	// LBL, TL, TML opcodes are 2 bytes
+	return m_op == 0x5f || (m_op & 0xf0) == 0x70;
 }

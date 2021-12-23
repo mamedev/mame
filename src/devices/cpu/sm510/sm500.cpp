@@ -147,17 +147,6 @@ void sm500_device::clock_melody()
 //  execute
 //-------------------------------------------------
 
-void sm500_device::get_opcode_param()
-{
-	// LBL and prefix opcodes are 2 bytes
-	if (m_op == 0x5e || m_op == 0x5f)
-	{
-		m_icount--;
-		m_param = m_program->read_byte(m_pc);
-		increment_pc();
-	}
-}
-
 void sm500_device::execute_one()
 {
 	switch (m_op & 0xf0)
@@ -247,4 +236,10 @@ void sm500_device::execute_one()
 			break; // 0xfc
 
 	} // big switch
+}
+
+bool sm500_device::op_argument()
+{
+	// LBL and prefix opcodes are 2 bytes
+	return m_op == 0x5e || m_op == 0x5f;
 }

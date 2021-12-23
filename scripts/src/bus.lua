@@ -2382,6 +2382,8 @@ if (BUSES["VME"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/vme/vme.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme.h",
+		MAME_DIR .. "src/devices/bus/vme/vme_cp31.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme_cp31.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
 		MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
 		MAME_DIR .. "src/devices/bus/vme/vme_mvme120.cpp",
@@ -3028,6 +3030,8 @@ if (BUSES["NES_CTRL"]~=null) then
 		MAME_DIR .. "src/devices/bus/nes_ctrl/partytap.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/powerpad.h",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.cpp",
+		MAME_DIR .. "src/devices/bus/nes_ctrl/snesadapter.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.cpp",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/suborkey.h",
 		MAME_DIR .. "src/devices/bus/nes_ctrl/zapper.cpp",

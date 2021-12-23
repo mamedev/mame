@@ -8,6 +8,12 @@ Williams System 6a
 Differences to system 6:
 - Player score is 7 digits instead of 6.
 
+Games:
+- Algar (#499)
+- Alien Poker (#501)
+
+The first time run, the display will show the model number. Press F3 to clear this.
+
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.
@@ -323,7 +329,7 @@ void s6a_state::dig0_w(u8 data)
 
 void s6a_state::dig1_w(u8 data)
 {
-	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
 		m_digits[m_strobe+16] = patterns[data&15];

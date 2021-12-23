@@ -10,6 +10,15 @@ Differences to system 4:
 - Some machines have multiball (scrpn, frpwr).
 - New soundcard.
 
+Games:
+- Laserball (#493)
+- Scorpion (#494)
+- Blackout (#495)
+- Gorgar (#496)
+- Firepower (#497)
+
+The first time run, the display will show the model number. Press F3 to clear this.
+
 Diagnostic actions:
 - You must be in game over mode. All buttons are in the number-pad. When you are
   finished, you must reboot.
@@ -26,12 +35,16 @@ Diagnostic actions:
 
 - Other: Set Dips to SW7 or SW8. Press NUM-0. Press NUM-ENTER.
 
+Here are the key codes to enable play:
+
+Game              NUM  Start game                End ball
+-----------------------------------------------------------------------------------------------
+Scorpion          494  AX hit 1                  AX
+Firepower         497  ASD hit 1                 Hit X, hold D, hit X, hold S, hit X, hit A
+Others            ---  1                         X
 
 Status:
 - All games are playable.
-- scrpn: Multiball - hold AX hit 1 to start; hold AX to end ball
-- frpwr: Multiball - hold ASD hit 1 to start; to end ball is quite tricky:
-    Hit X (wait for sound), hold D, hit X hold S, hit X hold A.
 
 ToDo:
 - Nothing
@@ -393,7 +406,7 @@ void s6_state::dig0_w(u8 data)
 
 void s6_state::dig1_w(u8 data)
 {
-	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
 		m_digits[m_strobe+20] = patterns[data&15];

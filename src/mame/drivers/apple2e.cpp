@@ -6017,5 +6017,5 @@ COMP( 1989, cecm,       0,       apple2, cec,         cecm,      apple2e_state, 
 COMP( 1991, cec2000,    0,       apple2, cec,         ceci,      apple2e_state, empty_init, "Shaanxi Province Computer Factory", "China Education Computer 2000", MACHINE_SUPPORTS_SAVE )
 COMP( 1989, zijini,     0,       apple2, cec,         zijini,    apple2e_state, empty_init, "Nanjing Computer Factory", "Zi Jin I", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, apple2cp,   apple2c, 0,      apple2cp,    apple2cp,  apple2e_state, empty_init, "Apple Computer",   "Apple //c Plus", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, ace2200,    apple2e, 0,      ace2200,     ace500,    apple2e_state, init_ace2200,"Franklin Computer", "ACE 2200", MACHINE_SUPPORTS_SAVE)
-COMP( 1986, ace500,     apple2c, 0,      ace500,      ace500,    apple2e_state, init_ace500,"Franklin Computer", "ACE 500", MACHINE_SUPPORTS_SAVE)
+COMP( 1985, ace2200,    apple2e, 0,      ace2200,     ace500,    apple2e_state, init_ace2200,"Franklin Computer", "Franklin ACE 2200", MACHINE_SUPPORTS_SAVE)
+COMP( 1986, ace500,     apple2c, 0,      ace500,      ace500,    apple2e_state, init_ace500,"Franklin Computer", "Franklin ACE 500", MACHINE_SUPPORTS_SAVE)

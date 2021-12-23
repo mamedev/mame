@@ -55,7 +55,6 @@ sm531_device::sm531_device(const machine_config &mconfig, const char *tag, devic
 { }
 
 
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -65,7 +64,6 @@ void sm530_device::device_start()
 	// common init
 	sm511_device::device_start();
 }
-
 
 
 //-------------------------------------------------
@@ -79,21 +77,9 @@ void sm530_device::device_reset()
 }
 
 
-
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-void sm530_device::get_opcode_param()
-{
-	// LBL, PRE, TL opcodes are 2 bytes
-	if (m_op == 0x6b || m_op == 0x78 || ((m_op & 0xf8) == 0x60))
-	{
-		m_icount--;
-		m_param = m_program->read_byte(m_pc);
-		increment_pc();
-	}
-}
 
 void sm530_device::execute_one()
 {
@@ -173,4 +159,10 @@ void sm530_device::execute_one()
 	// SABL/SABM is only valid for 1 step
 	m_sbl = (m_op == 0x73);
 	m_sbm = (m_op == 0x72);
+}
+
+bool sm530_device::op_argument()
+{
+	// LBL, PRE, TL opcodes are 2 bytes
+	return m_op == 0x6b || m_op == 0x78 || ((m_op & 0xf8) == 0x60);
 }

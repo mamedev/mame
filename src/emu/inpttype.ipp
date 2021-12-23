@@ -250,6 +250,39 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  SELECT,              N_p("input-name", "%p Select"),              input_seq(KEYCODE_7, input_seq::or_code, JOYCODE_SELECT_INDEXED(2)) ) \
 		CORE_INPUT_TYPES_END()
 
+#define CORE_INPUT_TYPES_P3_MAHJONG \
+		CORE_INPUT_TYPES_BEGIN(p3_mahjong) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_A,           N_p("input-name", "%p Mahjong A"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_B,           N_p("input-name", "%p Mahjong B"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_C,           N_p("input-name", "%p Mahjong C"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_D,           N_p("input-name", "%p Mahjong D"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_E,           N_p("input-name", "%p Mahjong E"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_F,           N_p("input-name", "%p Mahjong F"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_G,           N_p("input-name", "%p Mahjong G"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_H,           N_p("input-name", "%p Mahjong H"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_I,           N_p("input-name", "%p Mahjong I"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_J,           N_p("input-name", "%p Mahjong J"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_K,           N_p("input-name", "%p Mahjong K"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_L,           N_p("input-name", "%p Mahjong L"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_M,           N_p("input-name", "%p Mahjong M"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_N,           N_p("input-name", "%p Mahjong N"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_O,           N_p("input-name", "%p Mahjong O"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_P,           N_p("input-name", "%p Mahjong P"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_Q,           N_p("input-name", "%p Mahjong Q"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_KAN,         N_p("input-name", "%p Mahjong Kan"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_PON,         N_p("input-name", "%p Mahjong Pon"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_CHI,         N_p("input-name", "%p Mahjong Chi"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_REACH,       N_p("input-name", "%p Mahjong Reach"),       input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_RON,         N_p("input-name", "%p Mahjong Ron"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_FLIP_FLOP,   N_p("input-name", "%p Mahjong Flip Flop"),   input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_BET,         N_p("input-name", "%p Mahjong Bet"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_SCORE,       N_p("input-name", "%p Mahjong Take Score"),  input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_DOUBLE_UP,   N_p("input-name", "%p Mahjong Double Up"),   input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_BIG,         N_p("input-name", "%p Mahjong Big"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_SMALL,       N_p("input-name", "%p Mahjong Small"),       input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  3, PLAYER3,  MAHJONG_LAST_CHANCE, N_p("input-name", "%p Mahjong Last Chance"), input_seq() ) \
+		CORE_INPUT_TYPES_END()
+
 #define CORE_INPUT_TYPES_P4 \
 		CORE_INPUT_TYPES_BEGIN(p4) \
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  JOYSTICK_UP,         N_p("input-name", "%p Up"),                  input_seq(KEYCODE_8_PAD, input_seq::or_code, JOYCODE_Y_UP_SWITCH_INDEXED(3)) ) \
@@ -282,6 +315,39 @@ namespace {
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  BUTTON16,            N_p("input-name", "%p Button 16"),           input_seq(JOYCODE_BUTTON16_INDEXED(3)) ) \
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  START,               N_p("input-name", "%p Start"),               input_seq(KEYCODE_4, input_seq::or_code, JOYCODE_START_INDEXED(3)) ) \
 		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  SELECT,              N_p("input-name", "%p Select"),              input_seq(KEYCODE_8, input_seq::or_code, JOYCODE_SELECT_INDEXED(3)) ) \
+		CORE_INPUT_TYPES_END()
+
+#define CORE_INPUT_TYPES_P4_MAHJONG \
+		CORE_INPUT_TYPES_BEGIN(p4_mahjong) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_A,           N_p("input-name", "%p Mahjong A"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_B,           N_p("input-name", "%p Mahjong B"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_C,           N_p("input-name", "%p Mahjong C"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_D,           N_p("input-name", "%p Mahjong D"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_E,           N_p("input-name", "%p Mahjong E"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_F,           N_p("input-name", "%p Mahjong F"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_G,           N_p("input-name", "%p Mahjong G"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_H,           N_p("input-name", "%p Mahjong H"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_I,           N_p("input-name", "%p Mahjong I"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_J,           N_p("input-name", "%p Mahjong J"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_K,           N_p("input-name", "%p Mahjong K"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_L,           N_p("input-name", "%p Mahjong L"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_M,           N_p("input-name", "%p Mahjong M"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_N,           N_p("input-name", "%p Mahjong N"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_O,           N_p("input-name", "%p Mahjong O"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_P,           N_p("input-name", "%p Mahjong P"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_Q,           N_p("input-name", "%p Mahjong Q"),           input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_KAN,         N_p("input-name", "%p Mahjong Kan"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_PON,         N_p("input-name", "%p Mahjong Pon"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_CHI,         N_p("input-name", "%p Mahjong Chi"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_REACH,       N_p("input-name", "%p Mahjong Reach"),       input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_RON,         N_p("input-name", "%p Mahjong Ron"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_FLIP_FLOP,   N_p("input-name", "%p Mahjong Flip Flop"),   input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_BET,         N_p("input-name", "%p Mahjong Bet"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_SCORE,       N_p("input-name", "%p Mahjong Take Score"),  input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_DOUBLE_UP,   N_p("input-name", "%p Mahjong Double Up"),   input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_BIG,         N_p("input-name", "%p Mahjong Big"),         input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_SMALL,       N_p("input-name", "%p Mahjong Small"),       input_seq() ) \
+		INPUT_PORT_DIGITAL_TYPE(  4, PLAYER4,  MAHJONG_LAST_CHANCE, N_p("input-name", "%p Mahjong Last Chance"), input_seq() ) \
 		CORE_INPUT_TYPES_END()
 
 #define CORE_INPUT_TYPES_P5 \
@@ -920,7 +986,9 @@ CORE_INPUT_TYPES_P2
 CORE_INPUT_TYPES_P2_MAHJONG
 CORE_INPUT_TYPES_P2_HANAFUDA
 CORE_INPUT_TYPES_P3
+CORE_INPUT_TYPES_P3_MAHJONG
 CORE_INPUT_TYPES_P4
+CORE_INPUT_TYPES_P4_MAHJONG
 CORE_INPUT_TYPES_P5
 CORE_INPUT_TYPES_P6
 CORE_INPUT_TYPES_P7
@@ -978,7 +1046,9 @@ constexpr size_t core_input_types_count()
 			CORE_INPUT_TYPES_P2_MAHJONG
 			CORE_INPUT_TYPES_P2_HANAFUDA
 			CORE_INPUT_TYPES_P3
+			CORE_INPUT_TYPES_P3_MAHJONG
 			CORE_INPUT_TYPES_P4
+			CORE_INPUT_TYPES_P4_MAHJONG
 			CORE_INPUT_TYPES_P5
 			CORE_INPUT_TYPES_P6
 			CORE_INPUT_TYPES_P7
@@ -1034,7 +1104,9 @@ ATTR_COLD inline void emplace_core_types(std::vector<input_type_entry> &typelist
 	emplace_core_types_p2_mahjong(typelist);
 	emplace_core_types_p2_hanafuda(typelist);
 	emplace_core_types_p3(typelist);
+	emplace_core_types_p3_mahjong(typelist);
 	emplace_core_types_p4(typelist);
+	emplace_core_types_p4_mahjong(typelist);
 	emplace_core_types_p5(typelist);
 	emplace_core_types_p6(typelist);
 	emplace_core_types_p7(typelist);

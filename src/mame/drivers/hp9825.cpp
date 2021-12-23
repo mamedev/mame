@@ -11,13 +11,13 @@
 // - Emulation of 9825B and 9825T systems
 // - 12 kw (9825B) or 31kw (9825T) of RAM
 // - 12 kw of system ROM
-// - Keyboard (SHIFT LOCK & RESET not implemented)
+// - Keyboard
 // - Display & run light
 // - DC100 tape drive
 // - Printer
 // - Beeper
 // - Internal expansion ROMs
-// - I/O expansion slots: 98032, 98034 & 98035 modules can be connected
+// - I/O expansion slots: 98032, 98034, 98035 & 98036 modules can be connected
 // - For 9825T: the so-called SKOAL mechanism that transparently overlays RAM & ROM
 //   in the same address space
 // - External expansion ROMs
@@ -73,8 +73,8 @@ constexpr unsigned KDP_CLOCKS_PER_LINE = 50000;
 
 // Beeper constants
 // Values come from R/C values on schematics
-constexpr unsigned BEEPER_FREQ = 900;
-constexpr unsigned BEEPER_MS = 40;
+constexpr unsigned BEEPER_FREQ = 1400;
+constexpr unsigned BEEPER_MS = 22;
 
 // Bit manipulation
 namespace {
@@ -117,10 +117,14 @@ public:
 		, m_io_slot(*this, "slot%u", 0U)
 		, m_display(*this , "char_%u_%u" , 0U , 0U)
 		, m_run_light(*this , "run_light")
+		, m_shift_lock(*this , "shift_lock")
+		, m_tape_led(*this , "tape_led")
 	{
 	}
 
 	void hp9825_base(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(kb_changed);
 
 protected:
 	virtual void machine_start() override;
@@ -144,6 +148,8 @@ private:
 	required_device_array<hp9845_io_slot_device , 3> m_io_slot;
 	output_finder<32 , 7> m_display;
 	output_finder<> m_run_light;
+	output_finder<> m_shift_lock;
+	output_finder<> m_tape_led;
 
 	bool m_display_on;
 	uint8_t m_display_mem[ 32 ];
@@ -190,6 +196,8 @@ void hp9825_state::machine_start()
 {
 	m_display.resolve();
 	m_run_light.resolve();
+	m_shift_lock.resolve();
+	m_tape_led.resolve();
 
 	save_item(NAME(m_display_on));
 	save_item(NAME(m_display_mem));
@@ -229,6 +237,8 @@ void hp9825_state::machine_reset()
 	m_key_pressed = false;
 	m_autorepeating = false;
 	m_autorepeat_cnt = 0;
+	m_run_light = false;
+	m_shift_lock = false;
 	m_printer_idx = 0;
 	m_printer_line = 0;
 	m_prt_timer->reset();
@@ -249,7 +259,7 @@ void hp9825_state::cpu_io_map(address_map &map)
 uint16_t hp9825_state::kb_scancode_r()
 {
 	uint8_t res = m_scancode;
-	if (m_shift_key->read()) {
+	if (BIT(m_shift_key->read() , 0) || m_shift_lock) {
 		BIT_SET(res , 7);
 	}
 	m_io_sys->set_irq(KDP_PA , false);
@@ -270,9 +280,12 @@ void hp9825_state::disp_w(uint16_t data)
 
 uint16_t hp9825_state::kdp_status_r()
 {
-	uint16_t res = 8;
+	uint16_t res = 0;
 	if (m_io_sys->is_irq_pending(KDP_PA)) {
 		BIT_SET(res , 4);
+	}
+	if (!BIT(m_shift_key->read() , 2)) {
+		BIT_SET(res , 3);
 	}
 	if (m_printer_line) {
 		BIT_SET(res , 2);
@@ -525,12 +538,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::kb_scan)
 		// Still pressed ?
 		m_key_pressed = BIT(input[ m_scancode / 32 ] , m_scancode % 32);
 	} else {
-		int max_seq_len = 0;
+		int max_seq_len = -1;
 		unsigned max_seq_idx = 0;
 		for (unsigned i = 0; i < 4; i++) {
 			kb_scan_ioport(input[ i ] , *m_io_key[ i ] , i << 5 , max_seq_len , max_seq_idx);
 		}
-		if (max_seq_len) {
+		if (max_seq_len >= 0) {
 			m_scancode = max_seq_idx;
 			m_key_pressed = true;
 			m_io_sys->set_irq(KDP_PA , true);
@@ -552,6 +565,34 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9825_state::kb_scan)
 	} else {
 		m_autorepeating = false;
 		m_autorepeat_cnt = 0;
+	}
+}
+
+INPUT_CHANGED_MEMBER(hp9825_state::kb_changed)
+{
+	switch (param) {
+	case 0:
+		// Left/right shift
+		if (newval && !BIT(m_shift_key->read() , 1)) {
+			m_shift_lock = false;
+		}
+		break;
+
+	case 1:
+		// Shift lock
+		if (newval) {
+			m_shift_lock = true;
+		} else if (BIT(m_shift_key->read() , 0)) {
+			m_shift_lock = false;
+		}
+		break;
+
+	case 2:
+		// Reset
+		if (newval) {
+			machine().schedule_soft_reset();
+		}
+		break;
 	}
 }
 
@@ -658,6 +699,7 @@ void hp9825_state::hp9825_base(machine_config &config)
 	m_tape->flg().set([this](int state) { m_io_sys->set_flg(TAPE_PA , state); });
 	m_tape->sts().set([this](int state) { m_io_sys->set_sts(TAPE_PA , state); });
 	m_tape->dmar().set([this](int state) { m_io_sys->set_dmar(TAPE_PA , state); });
+	m_tape->led().set([this](int state) { m_tape_led = state; });
 
 	// Printer
 	BITBANGER(config , m_prt_alpha_out , 0);
@@ -836,7 +878,9 @@ static INPUT_PORTS_START(hp9825)
 	PORT_BIT(IOP_MASK(31) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                                            // 7,15: N/U
 
 	PORT_START("KEY_SHIFT")
-	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)    // Shift
+	PORT_BIT(IOP_MASK(0) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1) PORT_CHANGED_MEMBER(DEVICE_SELF, hp9825_state, kb_changed, 0) // Left and right Shift
+	PORT_BIT(IOP_MASK(1) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("Shift lock") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9825_state, kb_changed, 1)     // Shift lock
+	PORT_BIT(IOP_MASK(2) , IP_ACTIVE_HIGH , IPT_KEYBOARD) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, hp9825_state, kb_changed, 2)          // Reset
 INPUT_PORTS_END
 
 // +---------------+

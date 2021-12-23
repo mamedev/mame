@@ -1482,6 +1482,9 @@ void apple2gs_state::machine_reset()
 	m_page2 = false;
 	m_romswitch = false;
 	m_video->m_page2 = false;
+	m_video->m_GSborder = 0x02;
+	m_video->m_GSbg = 0x02;
+	m_video->m_GSfg = 0x0f;
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -2505,7 +2508,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_clkdata;
 
 		case 0x34:  // BORDERCOL
-			return m_clock_control;
+			return (m_clock_control & 0xf0) | (m_video->m_GSborder & 0xf);
 
 		case 0x35:  // SHADOW
 			return m_shadow;
@@ -2888,7 +2891,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x34:  // CLOCKCTL
-			if ((data & 0xf) != m_video->m_GSborder)
+			if ((data & 0xf) != (m_video->m_GSborder & 0xf))
 			{
 				m_screen->update_now();
 			}

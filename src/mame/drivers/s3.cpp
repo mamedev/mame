@@ -11,6 +11,15 @@ Schematic and PinMAME used as references.
 
 Written during October 2012 [Robbbert]
 
+Games:
+- Hot Tip (#477)
+- Lucky Seven (#480)
+- World Cup Soccer (#481)
+- Contact (#482)
+- Disco Fevel (#483)
+- Phoenix (#485)
+- Pokerino (#488)
+
 When first used, it appears frozen (the score should alternate). Press F3 to fix.
 
 For those games with a sound card, pressing NUM-8 will select a different set of
@@ -464,16 +473,16 @@ void s3a_state::s3a_sol0_w(u8 data)
 void s3_state::sol1_w(u8 data)
 {
 	if (BIT(data, 0))
-		m_samples->start(3, 3); // 10 chime
+		m_samples->start(4, 4); // 10 chime
 
 	if (BIT(data, 1))
-		m_samples->start(2, 2); // 100 chime
+		m_samples->start(1, 1); // 100 chime
 
 	if (BIT(data, 2))
-		m_samples->start(1, 1); // 1000 chime
+		m_samples->start(2, 2); // 1000 chime
 
 	if (BIT(data, 3))
-		m_samples->start(4, 4); // 10k chime
+		m_samples->start(3, 3); // 10k chime
 
 	if (BIT(data, 5))
 		m_samples->start(0, 6); // knocker
@@ -536,7 +545,7 @@ void s3_state::dig0_w(u8 data)
 
 void s3_state::dig1_w(u8 data)
 {
-	static const u8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // MC14558
+	static const u8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0,0,0,0,0,0 }; // MC14543
 	if (m_data_ok)
 	{
 		m_digits[m_strobe+16] = patterns[data&15];
