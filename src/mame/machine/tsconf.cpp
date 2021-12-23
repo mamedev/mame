@@ -196,9 +196,9 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		{
 			u16 line_len = VM == VM_16C ? 256 : 512;
 			u16 y = m_screen->vpos() - resolution.top();
-			u16 offset = ((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) * line_len) +
+			u32 offset = ((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) * line_len) +
 						 ((((m_regs[G_X_OFFS_H] & 1) << 8 /* .. 16/256 */) + m_regs[G_X_OFFS_L]) >> 1);
-			u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + offset;
+			u8 *video_location = &m_ram->pointer()[PAGE4K(m_regs[V_PAGE]) + offset];
 			u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
 			for (auto x = resolution.left(); x <= resolution.right(); x++)
 			{
