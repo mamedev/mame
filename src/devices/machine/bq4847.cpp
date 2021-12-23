@@ -1,22 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Michael Zapf
 /*
-    Texas Instruments/Benchmarq BQ4847 Real-time clock
+	Texas Instruments/Benchmarq BQ4847 Real-time clock
 
-    Although featuring a similar interface, this chip is sufficiently
-    different from the BQ4842/BQ4852 that a separate implementation
-    makes sense.
+	Although featuring a similar interface, this chip is sufficiently
+	different from the BQ4842/BQ4852 that a separate implementation
+	makes sense.
 
-    This chip is functionally equivalent to the BQ4845; it does not support
-    a backup battery. Most datasheets about the BQ4847 are incomplete and
-    refer to the BQ4845.
+	This chip is functionally equivalent to the BQ4845; it does not support
+	a backup battery. Most datasheets about the BQ4847 are incomplete and
+	refer to the BQ4845.
 
-    Supports 24h/12h and Daylight saving
-    Supports leap years
+	Supports 24h/12h and Daylight saving
+	Supports leap years
 
-    No internal memory, only clock registers
+	No internal memory, only clock registers
 
-    Michael Zapf, April 2020
+	Michael Zapf, April 2020
 */
 #include "emu.h"
 #include "bq4847.h"
@@ -31,6 +31,7 @@
 #include "logmacro.h"
 
 // device type definition
+DEFINE_DEVICE_TYPE(BQ4845, bq4845_device, "bq4845", "Benchmarq BQ4845 RTC")
 DEFINE_DEVICE_TYPE(BQ4847, bq4847_device, "bq4847", "Benchmarq BQ4847 RTC")
 
 enum
@@ -55,60 +56,84 @@ enum
 
 enum
 {
-	FLAG_AIE = 0x08,
-	FLAG_PIE = 0x04,
-	FLAG_PWRIE = 0x02,
-	FLAG_ABE = 0x01,
+	INTERRUPT_AIE = 0x08,
+	INTERRUPT_PIE = 0x04,
+	INTERRUPT_PWRIE = 0x02,
+	INTERRUPT_ABE = 0x01,
 	FLAG_AF = 0x08,
 	FLAG_PF = 0x04,
 	FLAG_PWRF = 0x02,
 	FLAG_BVF = 0x01,
-	FLAG_UTI = 0x08,
-	FLAG_STOP = 0x04,
-	FLAG_24 = 0x02,
-	FLAG_DSE = 0x01
+	CONTROL_UTI = 0x08,
+	CONTROL_STOP = 0x04,
+	CONTROL_24 = 0x02,
+	CONTROL_DSE = 0x01
 };
 
 //-------------------------------------------------
 //  Constructors for basetype
 //-------------------------------------------------
 
-bq4847_device::bq4847_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BQ4847, tag, owner, clock),
-	  device_nvram_interface(mconfig, *this),
-	  device_rtc_interface(mconfig, *this),
-	  m_interrupt_cb(*this),
-	  m_wdout_cb(*this),
-	  m_watchdog_active(false),
-	  m_writing(false)
+bq4847_device::bq4847_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
+	device_rtc_interface(mconfig, *this),
+	m_region(*this, DEVICE_SELF),
+	m_wdo_handler(*this),
+	m_int_handler(*this),
+	m_rst_handler(*this),
+	m_periodic_timer(nullptr),
+	m_watchdog_timer(nullptr),
+	m_wdo_state(1),
+	m_int_state(1),
+	m_rst_state(1),
+	m_wdi_state(-1),
+	m_writing(false)
 {
 }
 
-/*
-    Inherited from device_rtc_interface. The date and time is given as integer
-    and must be converted to BCD.
-*/
+bq4847_device::bq4847_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: bq4847_device(mconfig, BQ4847, tag, owner, clock)
+{
+}
+
+bq4845_device::bq4845_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
+	: bq4847_device(mconfig, BQ4845, tag, owner, clock)
+{
+}
+
+// device_rtc_interface
+
 void bq4847_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	m_intreg[reg_hours] = convert_to_bcd(hour);
-	m_intreg[reg_minutes] = convert_to_bcd(minute);
-	m_intreg[reg_seconds] = convert_to_bcd(second);
-	m_intreg[reg_year] = convert_to_bcd(year);
-	m_intreg[reg_month] = convert_to_bcd(month);
-	m_intreg[reg_date] = convert_to_bcd(day);
-	m_intreg[reg_days] = convert_to_bcd(day_of_week);
+	if ((m_register[reg_control] & CONTROL_STOP) != 0)
+	{
+		m_register[reg_hours] = ((m_register[reg_control] & CONTROL_24) != 0) ? convert_to_bcd(hour) :
+			(((hour % 24) >= 12) ? 0x80 : 0x00) | convert_to_bcd((hour % 12) ? (hour % 12) : 12);
+		m_register[reg_minutes] = convert_to_bcd(minute);
+		m_register[reg_seconds] = convert_to_bcd(second);
+		m_register[reg_year] = convert_to_bcd(year);
+		m_register[reg_month] = convert_to_bcd(month);
+		m_register[reg_date] = convert_to_bcd(day);
+		m_register[reg_days] = convert_to_bcd(day_of_week);
+	}
+
+	// Clear the saved flags (TODO: check that flags set before power down, or during battery backup are lost)
+	m_register[reg_flags] = 0x00;
+
+	// Interrupts must be re-enabled on power-up (TODO: check, datasheet does not explicitly say ABE & PIE are cleared)
+	m_register[reg_interrupts] = 0x00;
+
+	// TODO: check if user buffer is battery backed
+	// TODO: What if UTI is set?
+	std::copy_n(m_register, std::size(m_register), m_userbuffer);
+
 	// What about the DSE flag?
 }
 
 bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min)
 {
-/*  if (!valid_bcd(bcdnumber, min, limit))
-    {
-        bcdnumber = min;
-        return false;
-    }
-*/
-	if (bcdnumber>=limit)
+	if (bcdnumber >= limit)
 	{
 		bcdnumber = min;
 		return true;
@@ -118,7 +143,7 @@ bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min
 		uint8_t dig0 = bcdnumber & 0x0f;
 		uint8_t dig1 = bcdnumber & 0xf0;
 
-		if (dig0==9)
+		if (dig0 == 9)
 		{
 			bcdnumber = dig1 + 0x10;
 		}
@@ -127,24 +152,14 @@ bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min
 	return false;
 }
 
-// TODO: Remove; the real clock cannot verify BCD numbers.
-bool bq4847_device::valid_bcd(uint8_t value, uint8_t min, uint8_t max)
-{
-	bool valid = ((value>=min) && (value<=max) && ((value&0x0f)<=9));
-	if (!valid) LOGMASKED(LOG_WARN, "Invalid BCD number %02x\n", value);
-	return valid;
-}
-
-// ----------------------------------------------------
-
 /*
-    Update cycle, called every second
-    The BQ RTCs use BCD representation
+	Update cycle, called every second
+	The BQ RTCs use BCD representation
 
-    TODO: We may not be able to use the parent class advance methods, since we
-    have to work with BCD (even with invalid values). Check this.
+	TODO: We may not be able to use the parent class advance methods, since we
+	have to work with BCD (even with invalid values). Check this.
 */
-TIMER_CALLBACK_MEMBER(bq4847_device::rtc_clock_cb)
+TIMER_CALLBACK_MEMBER(bq4847_device::update_callback)
 {
 	// Just for debugging
 	static const char* dow[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
@@ -154,43 +169,41 @@ TIMER_CALLBACK_MEMBER(bq4847_device::rtc_clock_cb)
 
 	if (carry)
 	{
-		carry = increment_bcd(m_intreg[reg_seconds], 0x59, 0);
+		carry = increment_bcd(m_register[reg_seconds], 0x59, 0);
 		newsec = true;
 	}
 
 	if (carry)
-		carry = increment_bcd(m_intreg[reg_minutes], 0x59, 0);
+		carry = increment_bcd(m_register[reg_minutes], 0x59, 0);
 
 	if (carry)
-	{
 		carry = advance_hours_bcd();
-	}
 
 	if (carry)
-	{
 		advance_days_bcd();
-	}
 
 	LOGMASKED(LOG_CLOCK, "%s 20%02x-%02x-%02x %02x:%02x:%02x\n",
-		dow[m_intreg[reg_days]-1], m_intreg[reg_year], m_intreg[reg_month], m_intreg[reg_date],
-		m_intreg[reg_hours], m_intreg[reg_minutes], m_intreg[reg_seconds]);
+		dow[m_register[reg_days] - 1], m_register[reg_year], m_register[reg_month], m_register[reg_date],
+		m_register[reg_hours], m_register[reg_minutes], m_register[reg_seconds]);
 
-	// Copy into memory registers if the UTI bit is reset
 	if (newsec)
 	{
-		if (!is_set(reg_control, FLAG_UTI))
+		if ((m_register[reg_control] & CONTROL_UTI) == 0)
 		{
-			// Copy values from internal registers to accessible registers
-			transfer_to_access();
+			LOGMASKED(LOG_TRANSFER, "Transfer to external regs\n");
+			for (int i = reg_seconds; i < reg_unused; i++)
+			{
+				if (is_clock_register(i)) m_userbuffer[i] = m_register[i];
+			}
 		}
 
-		if (check_match(reg_date, reg_alarmdate) &&
-			check_match(reg_hours, reg_alarmhours) &&
-			check_match(reg_minutes, reg_alarmminutes) &&
-			check_match(reg_seconds, reg_alarmseconds))
+		if (check_alarm(reg_date, reg_alarmdate) &&
+			check_alarm(reg_hours, reg_alarmhours) &&
+			check_alarm(reg_minutes, reg_alarmminutes) &&
+			check_alarm(reg_seconds, reg_alarmseconds))
 		{
-			set_register(reg_flags, FLAG_AF, true);
-			m_interrupt_cb(intrq_r());
+			m_userbuffer[reg_flags] |= FLAG_AF;
+			update_int();
 		}
 	}
 }
@@ -199,46 +212,45 @@ bool bq4847_device::advance_hours_bcd()
 {
 	bool carry = false;
 	// Handle DST
-	if (is_set(reg_control, FLAG_DSE)
-		&& (m_intreg[reg_month]==4) && (m_intreg[reg_days]==0) && (m_intreg[reg_date] < 8)  // first Sunday in April
-		&& (m_intreg[reg_hours]==0x01))
-		m_intreg[reg_hours] = 0x03;
+	if ((m_register[reg_control] & CONTROL_DSE) != 0
+		&& (m_register[reg_month] == 4) && (m_register[reg_days] == 0) && (m_register[reg_date] < 8)  // first Sunday in April
+		&& (m_register[reg_hours] == 0x01))
+		m_register[reg_hours] = 0x03;
 	else
 	{
 		// Increment hour unless the DSE bit is set and we are at 1:59 on the last Sunday in October
-		if (!is_set(reg_control, FLAG_DSE)
-			|| (m_intreg[reg_month]!=10) || (m_intreg[reg_days]!=0) || (m_intreg[reg_date] <= 23)  // last Sunday in October
-			|| (m_intreg[reg_hours]!=0x01))
+		if ((m_register[reg_control] & CONTROL_DSE) == 0
+			|| (m_register[reg_month] != 10) || (m_register[reg_days] != 0) || (m_register[reg_date] <= 23)  // last Sunday in October
+			|| (m_register[reg_hours] != 0x01))
 		{
-			if (is_set(reg_control, FLAG_24))
+			if ((m_register[reg_control] & CONTROL_24) != 0)
 			{
 				// 24h:  0->1->...->23->0(+1)
-				increment_bcd(m_intreg[reg_hours], 0xff, 0);
-				if (m_intreg[reg_hours] == 0x24)
+				increment_bcd(m_register[reg_hours], 0xff, 0);
+				if (m_register[reg_hours] == 0x24)
 				{
-					m_intreg[reg_hours] = 0;
+					m_register[reg_hours] = 0;
 					carry = true;
 				}
 			}
-
 			else
 			{
 				// 12h:  12->1->2->...->11->12'->1'->...->11'->12(+1)
-				increment_bcd(m_intreg[reg_hours], 0xff, 0);
-				switch (m_intreg[reg_hours])
+				increment_bcd(m_register[reg_hours], 0xff, 0);
+				switch (m_register[reg_hours])
 				{
 				case 0x12:
-					m_intreg[reg_hours]=0x92;  // 11:59 am -> 12:00 pm
+					m_register[reg_hours] = 0x92;  // 11:59 am -> 12:00 pm
 					break;
 				case 0x93:
-					m_intreg[reg_hours]=0x81;  // 12:59 pm -> 01:00 pm
+					m_register[reg_hours] = 0x81;  // 12:59 pm -> 01:00 pm
 					break;
 				case 0x92:
-					m_intreg[reg_hours]=0x12;  // 11:59 pm -> 12:00 am
+					m_register[reg_hours] = 0x12;  // 11:59 pm -> 12:00 am
 					carry = true;
 					break;
 				case 0x13:
-					m_intreg[reg_hours]=0x01;  // 12:59 am -> 01:00 am
+					m_register[reg_hours] = 0x01;  // 12:59 am -> 01:00 am
 					break;
 				}
 			}
@@ -258,64 +270,55 @@ void bq4847_device::advance_days_bcd()
 		0x31, 0x31, 0x30, 0x31, 0x30, 0x31
 	};
 
-	uint8_t month = bcd_to_integer(m_intreg[reg_month]);
+	uint8_t month = bcd_to_integer(m_register[reg_month]);
 	if (month > 12) month = 12;
 
-	// if (!valid_bcd(month, 0x01, 0x12)) month = 1;
-	uint8_t days = days_in_month_table[month-1];
+	uint8_t days = days_in_month_table[month - 1];
 
 	// Leap years are indeed handled (but the year is only 2-digit)
-	if ((month==2) && ((m_intreg[reg_year]%4)==0))
+	if ((month == 2) && ((bcd_to_integer(m_register[reg_year]) % 4) == 0))
 		days = 0x29;
 
-	increment_bcd(m_intreg[reg_days], 7, 1);  // Increment the day-of-week (without carry)
-	carry = increment_bcd(m_intreg[reg_date], days, 1);
+	increment_bcd(m_register[reg_days], 7, 1);  // Increment the day-of-week (without carry)
+	carry = increment_bcd(m_register[reg_date], days, 1);
 
 	if (carry)
 	{
-		increment_bcd(m_intreg[reg_month], 0xff, 1);
-		if (m_intreg[reg_month] == 0x13)
+		increment_bcd(m_register[reg_month], 0xff, 1);
+		if (m_register[reg_month] == 0x13)
 		{
-			m_intreg[reg_month] = 0x01;
-			increment_bcd(m_intreg[reg_year], 0xff, 0);
+			m_register[reg_month] = 0x01;
+			increment_bcd(m_register[reg_year], 0xff, 0);
 		}
 	}
 }
 
-bool bq4847_device::check_match(int now, int alarm)
+bool bq4847_device::check_alarm(int now, int alarm)
 {
-	// The ignore feature is active once the alarm has set in
-	// Will lead to a periodic alarm
-	bool ignore = (is_set(m_reg[alarm], 0x80) && is_set(m_reg[alarm], 0x40)) && is_set(reg_flags, FLAG_AF);
-	return ignore || (m_intreg[now] == (m_reg[alarm] & 0x3f));
+	return (m_register[alarm] & 0xc0) == 0xc0 || (m_register[alarm] == m_register[now]);
 }
 
-// =========================================================
-
-/*
-    Read from registers
-*/
 uint8_t bq4847_device::read(offs_t address)
 {
 	int regnum = address & 0x0f;
-	uint8_t value = m_reg[regnum];
+	uint8_t value = m_userbuffer[regnum];
 
 	if (regnum == reg_flags)
 	{
-		set_register(reg_flags, 0xff, false);
-		m_interrupt_cb(intrq_r());
+		value &= 0x7f;
+		m_userbuffer[reg_flags] = 0x00;
+		update_int();
 	}
-	else
-		if (regnum == reg_unused) value = 0;  // Reg 15 is locked to 0 in BQ4847
+	else if (regnum >= reg_interrupts && regnum <= reg_control)
+		value &= 0xf;
+	else if (regnum == reg_unused)
+		value = 0;  // Reg 15 is locked to 0 in BQ4847
 
 	LOGMASKED(LOG_REG, "Reg %d -> %02x\n", regnum, value);
 
 	return value;
 }
 
-/*
-    Write to the registers
-*/
 void bq4847_device::write(offs_t address, uint8_t data)
 {
 	int regnum = address & 0x0f;
@@ -328,226 +331,183 @@ void bq4847_device::write(offs_t address, uint8_t data)
 		return;
 	}
 
-	bool uti_set = is_set(reg_control, FLAG_UTI); // Get it before we change the flag
+	bool uti_set = (m_register[reg_control] & CONTROL_UTI) != 0;
 
-	m_reg[regnum] = data;
+	m_userbuffer[regnum] = data;
+
+	// If inhibit is not set, any write to the time/date registers
+	// is immediately set
+	if (uti_set && is_clock_register(regnum))
+		m_writing = true;
+	else
+		m_register[regnum] = m_userbuffer[regnum];
 
 	if (regnum == reg_rates)
 	{
-		set_watchdog_timer(true);
+		set_watchdog_timer();
 		set_periodic_timer();
 	}
-	else
+	else if (regnum == reg_control)
 	{
-		if (regnum == reg_control)
-		{
-			LOGMASKED(LOG_TRANSFER, "Update transfer %s\n", ((data & FLAG_UTI)!=0)? "inhibit" : "enable");
+		bool uti_set_now = (m_register[reg_control] & CONTROL_UTI) != 0;
+		LOGMASKED(LOG_TRANSFER, "Update transfer %s\n", uti_set_now ? "inhibit" : "enable");
 
-			// After we have written to the registers, transfer to the internal regs
-			if (uti_set && ((data & FLAG_UTI)==0) && m_writing)
+		// After we have written to the registers, transfer to the internal regs
+		if (uti_set && !uti_set_now && m_writing)
+		{
+			LOGMASKED(LOG_TRANSFER, "Transfer to internal regs\n");
+			for (int i = reg_seconds; i < reg_unused; i++)
 			{
-				LOGMASKED(LOG_TRANSFER, "Transfer to internal regs\n");
-				for (int i=reg_seconds; i < reg_unused; i++)
-				{
-					if (is_internal_register(i)) m_intreg[i] = m_reg[i];
-				}
-				// The real device does not auto-convert hours according to AM/PM
+				if (is_clock_register(i)) m_register[i] = m_userbuffer[i];
 			}
 
-			// We ignore the STOP* flag, since it only covers behaviour on power-off
-			// We ignore the 24h/12h flag here; it requires reloading the registers anyway
-			// The DSE flag will have effect on update
-		}
-		else
-		{
-			m_writing = true;
-			// If inhibit is not set, any write to the time/date registers
-			// is immediately set
-			if (!uti_set && is_internal_register(regnum))
-			{
-				m_intreg[regnum] = m_reg[regnum];
-			}
+			m_writing = false;
 		}
 	}
 }
 
-bool bq4847_device::is_internal_register(int regnum)
+bool bq4847_device::is_clock_register(int regnum)
 {
 	return (regnum == reg_seconds || regnum == reg_minutes || regnum == reg_hours ||
-				regnum == reg_date || regnum == reg_days || regnum == reg_month
-				|| regnum == reg_year);
-}
-
-void bq4847_device::set_register(int number, uint8_t bits, bool set)
-{
-	if (set)
-		m_reg[number] |= bits;
-	else
-		m_reg[number] &= ~bits;
-}
-
-bool bq4847_device::is_set(int number, uint8_t flag)
-{
-	return (m_reg[number] & flag)!=0;
-}
-
-void bq4847_device::transfer_to_access()
-{
-	LOGMASKED(LOG_TRANSFER, "Transfer to external regs\n");
-	for (int i=reg_seconds; i < reg_unused; i++)
-	{
-		if (is_internal_register(i)) m_reg[i] = m_intreg[i];
-	}
-	// Clear the flag
-	m_writing = false;
+		regnum == reg_date || regnum == reg_days || regnum == reg_month
+		|| regnum == reg_year);
 }
 
 void bq4847_device::set_periodic_timer()
 {
-	uint8_t rateval = m_reg[reg_rates] & 0x0f;
-	int rate = 1<<(16-rateval);
+	uint8_t rs = m_register[reg_rates] & 0x0f;
+	attotime period = rs ? clocks_to_attotime(1 << (rs - 1)) : attotime::never;
 
-	if (rateval == 0)
-		m_periodic_timer->reset();
-	else
-		m_periodic_timer->adjust(attotime::from_hz(rate), 0, attotime::from_hz(rate));
+	if (m_periodic_timer)
+		m_periodic_timer->adjust(period, 0, period);
 }
 
-void bq4847_device::set_watchdog_timer(bool on)
+void bq4847_device::set_watchdog_timer(int rst_state)
 {
-	int val = (m_reg[reg_rates] & 0x70)>>4;
-
-	// val = 0 -> 1.5 sec
-	// val = 1 -> 3/128 sec
-	// val = 2 -> 3/64 sec
-	// ...
-	// val = 6 -> 3/4 sec
-	// val = 7 -> 3 sec
-
-	s64 time = 250000000L;  // 250 ms
-	if (val > 0)
+	if (m_rst_state == rst_state)
 	{
-		time <<= 1;
-		if (val < 7)
-			time = time / (4<<(6-val));
-	}
+		int wd = (m_register[reg_rates] & 0x70) >> 4;
+		u32 t = (wd == 7) ? 16384 : (wd == 0) ? 8192 : 64 << wd;
+		if (m_rst_state) t *= 6;
+		attotime timeout = m_wdi_state >= 0 ? clocks_to_attotime(t) : attotime::never;
 
-	if (on) time *= 6;  // delay to on is 6 times the delay to off
-
-	if (m_watchdog_active)
-		m_watchdog_timer->adjust(attotime::from_nsec(time)); // single shot
-}
-
-void bq4847_device::set_watchdog_active(bool active)
-{
-	m_watchdog_active = active;
-}
-
-void bq4847_device::retrigger_watchdog()
-{
-	m_wdout_cb(CLEAR_LINE);
-	m_watchdog_asserted = false;
-	set_watchdog_timer(true);
-}
-
-/*
-    Periodic cycle (called at defined intervals)
-*/
-TIMER_CALLBACK_MEMBER(bq4847_device::rtc_periodic_cb)
-{
-	set_register(reg_flags, FLAG_PF, true);
-	if (intrq_r())
-		m_interrupt_cb(ASSERT_LINE);
-}
-
-/*
-    Watchdog callback (BQ4847)
-*/
-TIMER_CALLBACK_MEMBER(bq4847_device::rtc_watchdog_cb)
-{
-	if (m_watchdog_active)
-	{
-		m_wdout_cb(m_watchdog_asserted? CLEAR_LINE : ASSERT_LINE);
-		set_watchdog_timer(!m_watchdog_asserted);
-		m_watchdog_asserted = !m_watchdog_asserted;
-		LOGMASKED(LOG_WATCHDOG, "Watchdog %s\n", m_watchdog_asserted? "asserted" : "cleared");
+		if (m_watchdog_timer)
+			m_watchdog_timer->adjust(timeout);
 	}
 }
 
-READ_LINE_MEMBER(bq4847_device::intrq_r)
+void bq4847_device::set_wdo(int state)
 {
-	bool alarm = is_set(reg_interrupts, FLAG_AIE) && is_set(reg_flags, FLAG_AF);
-	bool period = is_set(reg_interrupts, FLAG_PIE) && is_set(reg_flags, FLAG_PF);
-
-	// We ignore interrupts from power fail or battery low
-	return (alarm || period)? ASSERT_LINE : CLEAR_LINE;
-}
-
-void bq4847_device::connect_osc(bool conn)
-{
-	if (conn)
+	if (m_wdo_state != state)
 	{
-		// The internal update cycle is 1 sec
-		m_clock_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-		set_periodic_timer();
-	}
-	else
-	{
-		// Turn off completely
-		m_clock_timer->reset();
-		m_watchdog_timer->reset();
-		m_periodic_timer->reset();
+		m_wdo_state = state;
+		m_wdo_handler(m_wdo_state);
 	}
 }
+
+WRITE_LINE_MEMBER(bq4847_device::write_wdi)
+{
+	if (m_wdi_state != state)
+	{
+		m_wdi_state = state;
+
+		set_wdo(1);
+		set_watchdog_timer();
+	}
+}
+
+TIMER_CALLBACK_MEMBER(bq4847_device::periodic_callback)
+{
+	m_userbuffer[reg_flags] |= FLAG_PF;
+	update_int();
+}
+
+TIMER_CALLBACK_MEMBER(bq4847_device::watchdog_callback)
+{
+	m_rst_state = !m_rst_state;
+	set_watchdog_timer(m_rst_state); // force timer update during reset
+
+	m_rst_handler(m_rst_state);
+
+	if (!m_rst_state)
+		set_wdo(0);
+
+	LOGMASKED(LOG_WATCHDOG, "wdo %s rst %s\n", !m_wdo_state ? "asserted" : "cleared", !m_rst_state ? "asserted" : "cleared");
+}
+
+void bq4847_device::update_int()
+{
+	// TODO: check what happens if reg_interrupts is changed after the flag is set.
+	int int_state = !(m_register[reg_interrupts] & m_userbuffer[reg_flags] & (FLAG_AF | FLAG_PF | FLAG_PWRF));
+	if (m_int_state != int_state)
+	{
+		m_int_state = int_state;
+		m_int_handler(m_int_state);
+	}
+}
+
+// device_t
 
 void bq4847_device::device_start()
 {
-	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_clock_cb), this));
+	m_update_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::update_callback), this));
+	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::periodic_callback), this));
+	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::watchdog_callback), this));
 
-	// Periodic timer
-	m_periodic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_periodic_cb), this));
+	m_int_handler.resolve_safe();
+	m_wdo_handler.resolve_safe();
+	m_rst_handler.resolve_safe();
 
-	// Watchdog timer
-	m_watchdog_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(bq4847_device::rtc_watchdog_cb), this));
+	m_wdo_handler(m_wdo_state);
+	m_int_handler(m_int_state);
+	m_rst_handler(m_rst_state);
 
-	// Interrupt line
-	m_interrupt_cb.resolve_safe();
-
-	// Watchdog output
-	m_wdout_cb.resolve_safe();
-
-	// Interrupt enables are cleared on powerup
-	set_register(reg_interrupts, 0xff, false);
-
-	// State save
-	save_pointer(NAME(m_reg), 16);
-	save_pointer(NAME(m_intreg), 16);
-
-	// Start clock
-	connect_osc(true);
+	save_pointer(NAME(m_userbuffer), 16);
+	save_pointer(NAME(m_register), 16);
+	save_item(NAME(m_wdo_state));
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_rst_state));
+	save_item(NAME(m_wdi_state));
+	save_item(NAME(m_writing));
 }
 
-// ----------------------------------------------------
+void bq4847_device::device_reset()
+{
+	device_clock_changed();
+}
+
+void bq4847_device::device_clock_changed()
+{
+	m_update_timer->adjust(clocks_to_attotime(32768), 0, clocks_to_attotime(32768));
+	set_watchdog_timer();
+	set_periodic_timer();
+}
+
+// device_nvram_interface
 
 void bq4847_device::nvram_default()
 {
-	std::fill_n(m_reg, 16, 0);
+	if (m_region.found())
+	{
+		if (m_region->bytes() != std::size(m_register))
+			fatalerror("%s incorrect region size", tag());
+
+		std::copy_n(m_region->base(), std::size(m_register), m_register);
+	}
+	else
+	{
+		std::fill_n(m_register, std::size(m_register), 0);
+
+		m_register[reg_control] = CONTROL_STOP | CONTROL_24;
+	}
 }
 
-void bq4847_device::nvram_read(emu_file &file)
+void bq4847_device::nvram_read(emu_file& file)
 {
-	file.read(m_reg, 16);
-	transfer_to_access();
-
-	// Clear the saved flags
-	set_register(reg_flags, 0xff, false);
-
-	// Interrupts must be re-enabled on power-up
-	set_register(reg_interrupts, 0xff, false);
+	file.read(m_register, std::size(m_register));
 }
 
-void bq4847_device::nvram_write(emu_file &file)
+void bq4847_device::nvram_write(emu_file& file)
 {
-	transfer_to_access();
-	file.write(m_reg, 16);
+	file.write(m_register, std::size(m_register));
 }

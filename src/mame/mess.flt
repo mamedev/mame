@@ -1217,6 +1217,7 @@ z100.cpp
 z1013.cpp
 z22.cpp
 z29.cpp
+z80clock.cpp
 z80dev.cpp
 z80ne.cpp
 z88.cpp
