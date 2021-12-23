@@ -36554,6 +36554,7 @@ rzindy500                       //
 rztoshden                       //
 
 @source:s11.cpp
+alcat_l7                        //
 gmine_l2                        //
 grand_l3                        //
 grand_l4                        //
@@ -36765,7 +36766,6 @@ pfevr_p3                        //
 scrzy_l1                        //
 
 @source:s9.cpp
-alcat_l7                        //
 comet_l4                        //
 comet_l5                        //
 ratrc_l1                        //
