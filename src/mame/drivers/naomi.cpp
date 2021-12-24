@@ -1,26 +1,23 @@
 // license:LGPL-2.1+
 // copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
-/*
+// thanks-to: CaH4e3, Deunan Knute, Stefanos Kornilios Mitsis Poiiitidis, Guru, Psyman, ZeZu
+/**************************************************************************************************
 
-  Sega Naomi / Naomi 2 / Atomiswave
-  Sega, 1998-2005
+	NAOMI (c) 1998 Sega
+	NAOMI2 (c) 2000 Sega
+	Atomiswave (c) 2003 Sammy
 
-  Driver by Samuele Zannoli, R. Belmont, ElSemi,
-            David Haywood, Angelo Salese and Olivier Galibert
-  Special thanks to CaH4e3, Deunan Knute, drkIIRaziel, Guru, Psyman and ZeZu for the help given.
+Notes:
+	- Several early NAOMI games are running on an earlier revision mainboard (HOTD2 etc.) which
+      appears to have an earlier revision of the graphic chip. Attempting to run these games on
+	  the later board results in graphical glitches and/or other problems.
 
- Notes:
-  Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
-   revision of the graphic chip.  Attempting to run these games on the later board results in graphical glitches and/or
-   other problems.
+    - The later revision games (released after GD-ROM had been discontinued) require the 'h'
+	  revision bios, which checks the SH-4 ID register.
 
-  Naomi 2 is backwards compatible with Naomi 1
+	- List of boot error codes can be seen at https://wiki.arcadeotaku.com/w/Sega_NAOMI_Error_Codes
 
-  The later revision games (released after GD-ROM had been discontinued) require the 'h' revision bios, which checks the SH-4 ID register.
-
-  Error 51 means that you need to change the cabinet to a different player arrangement in main test mode (usually 1p)
-
-Sega Naomi is Dreamcast based Arcade hardware.
+	- NAOMI2 is backwards compatible with regular NAOMI.
 
 QA Notes (Update December 2021):
     - Roadmap: https://github.com/mamedev/mame/projects/2
@@ -1230,7 +1227,7 @@ key matrix is shown in below
 * LST = Last chance, F/F = Flip flop, STR = Start
 
 
----------------------------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------
 
 Guru's Readme
 -------------
@@ -1652,7 +1649,7 @@ Force Five
 Kenju
 Premier Eleven
 
-*/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "includes/naomi.h"

@@ -983,7 +983,9 @@ u16 aica_device::r16(u32 addr)
 			v = m_EFSPAN[addr & 0x7f];
 		}
 		else if (addr < 0x2800)
-			popmessage("AICA read undocumented reg %04x", addr);
+		{
+			//logerror("%s: AICA read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x28be)
 		{
 			UpdateRegR(addr & 0xff);
@@ -1012,7 +1014,9 @@ u16 aica_device::r16(u32 addr)
 		else if (addr < 0x3c00)
 			v= *((u16 *)(m_DSP.MPRO+(addr - 0x3400) / 2));
 		else if (addr < 0x4000)
-			popmessage("AICADSP read undocumented reg %04x",addr);
+		{
+			//logerror("%s: AICADSP read to undocumented reg %04x\n", machine().describe_context(), addr);
+		}
 		else if (addr < 0x4400)
 		{
 			if (addr & 4)
