@@ -509,14 +509,14 @@ The function decodes the ports appropriately */
 void spectrum_state::spectrum_io(address_map &map)
 {
 	map(0x0000, 0xffff).w(m_exp, FUNC(spectrum_expansion_slot_device::iorq_w));
-	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_port_ula_r)).select(0xfffe);
+	map(0x00, 0x00).select(0xfffe).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w));
+	map(0x01, 0x01).select(0xfffe).r(FUNC(spectrum_state::spectrum_port_ula_r));
 }
 
 void spectrum_state::spectrum_clone_io(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
-	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0x00, 0x00).select(0xfffe).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w));
 	map(0x01, 0x01).r(FUNC(spectrum_state::spectrum_clone_port_ula_r)); // .mirror(0xfffe);
 }
 

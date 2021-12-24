@@ -249,10 +249,10 @@ uint8_t spectrum_128_state::spectrum_128_ula_r()
 void spectrum_128_state::spectrum_128_io(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
-	map(0x0000, 0x0000).rw(FUNC(spectrum_128_state::spectrum_port_fe_r), FUNC(spectrum_128_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0x0001, 0x0001).w(FUNC(spectrum_128_state::spectrum_128_port_7ffd_w)).select(0x7ffc);   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
-	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
-	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
+	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(spectrum_128_state::spectrum_port_fe_r), FUNC(spectrum_128_state::spectrum_port_fe_w));
+	map(0x0001, 0x0001).select(0x7ffc).w(FUNC(spectrum_128_state::spectrum_128_port_7ffd_w));   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x0001, 0x0001).r(FUNC(spectrum_128_state::spectrum_128_ula_r)); // .mirror(0xfffe);
 }
 
