@@ -485,7 +485,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case SYS_CONFIG:
-		/* TODO
+		// 0 - 3.5MHz, 1 - 7MHz, 2 - 14MHz, 3 - reserved
 		switch (data & 0x03)
 		{
 		case 2:
@@ -499,7 +499,6 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 			m_maincpu->set_clock(X1 / 4);
 			break;
 		}
-		*/
 		break;
 
 	case FMAPS:

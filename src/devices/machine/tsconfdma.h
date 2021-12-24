@@ -43,7 +43,7 @@ private:
     devcb_read16 m_in_mspi_cb;
     devcb_write16 m_out_cram_cb;
 
-    int m_ready;
+    u8 m_ready;
 
     offs_t m_address_s;
     offs_t m_address_d;
