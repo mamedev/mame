@@ -3,36 +3,35 @@
 // thanks-to: CaH4e3, Deunan Knute, Stefanos Kornilios Mitsis Poiiitidis, Guru, Psyman, ZeZu
 /**************************************************************************************************
 
-	NAOMI (c) 1998 Sega
-	NAOMI2 (c) 2000 Sega
-	Atomiswave (c) 2003 Sammy
+    NAOMI (c) 1998 Sega
+    NAOMI2 (c) 2000 Sega
+    Atomiswave (c) 2003 Sammy
 
 Notes:
-	- Several early NAOMI games are running on an earlier revision mainboard (HOTD2 etc.) which
-      appears to have an earlier revision of the graphic chip. Attempting to run these games on
-	  the later board results in graphical glitches and/or other problems.
-
     - The later revision games (released after GD-ROM had been discontinued) require the 'h'
-	  revision bios, which checks the SH-4 ID register.
+      revision bios, which checks the SH-4 ID register.
 
-	- List of boot error codes can be seen at https://wiki.arcadeotaku.com/w/Sega_NAOMI_Error_Codes
+    - List of boot error codes can be seen at https://wiki.arcadeotaku.com/w/Sega_NAOMI_Error_Codes
 
-	- NAOMI2 is backwards compatible with regular NAOMI.
+    - NAOMI2 is backwards compatible with regular NAOMI.
 
 QA Notes (Update December 2021):
     - Roadmap: https://github.com/mamedev/mame/projects/2
-	- Testing functional notes:	<.md URL here>, legacy TODO below will be removed once ready;
-	- Games that are known to be completed and have no functional bugs in audio/video/input portions
-	  are effectively promoted to (MIG | MIS), as a clear attempt to be proven otherwise given
-	  the non-trivial host PC requirements;
-	- Manufacturers needs to be overhauled, also
-	  cfr. MT#08143 about a necessity to at least log Sega divisions.
+    - Testing functional notes: <.md URL here>, legacy TODO below will be removed once ready;
+    - Games that are known to be completed and have no functional bugs in audio/video/input portions
+      are effectively promoted to (MIG | MIS), as a clear attempt to be proven otherwise given
+      the non-trivial host PC requirements;
+    - Manufacturers needs to be overhauled, also
+      cfr. MT#08143 about a necessity to at least log Sega divisions.
     - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
-	- Some SH to ARM sound streaming doesn't work (used by ADX compression system)
-	  Anything that drops the logo it's bound to eventually crash/hang if using a loop.
-	  Is it a regression even? sfz3ugd and trizeal were logged as "playable" back in 2009 ...
+    - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
+      Anything that drops the logo it's bound to eventually crash/hang if using a loop.
+      Is it a regression even? sfz3ugd and trizeal were logged as "playable" back in 2009 ...
     - marstv: Oddly enough, intro/game select hangs for a long time on line dispatches,
-	          eventually draws a bunch of white overline chars (?)
+              eventually draws a bunch of white overline chars (?)
+    - hotd2: needs its special BIOS to run properly on real HW, it otherwise throws GFX bugs
+             when run on regular BIOSes (TODO: real HW video ref?).
+             Regardless in MAME this seems to have more GFX bugs than totd, why?
 
 TODO (legacy, to be removed):
     - Boots and accepts coin, but won't accept start button
@@ -53,8 +52,8 @@ TODO (legacy, to be removed):
     * Shootout Pool Prize
 
     - other issues:
-    * Death Crimson OX (boots now, but dies in YUV-mode movie; coining up before it appears to 
-	  freeze the game)
+    * Death Crimson OX (boots now, but dies in YUV-mode movie; coining up before it appears to
+      freeze the game)
 
 TODO (game-specific):
     - Airline Pilots (deluxe): returns error 03
@@ -1928,11 +1927,11 @@ inline int atomiswave_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask,
 }
 
 /*
-	0x00600280 r  0000dcba
-	a/b - 1P/2P coin inputs (JAMMA), active low
-	c/d - 3P/4P coin inputs (EX. IO board), active low
+    0x00600280 r  0000dcba
+    a/b - 1P/2P coin inputs (JAMMA), active low
+    c/d - 3P/4P coin inputs (EX. IO board), active low
 
-	(ab == 0) -> BIOS skip RAM test
+    (ab == 0) -> BIOS skip RAM test
 */
 uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 {
@@ -1953,21 +1952,21 @@ uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 }
 
 /*
-	0x00600284 rw ddcc0000
-		cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
-	0 - regular Atomiswave controller
-	1 - DC lightgun
-	2,3 - DC mouse/trackball
+    0x00600284 rw ddcc0000
+        cc/dd - set type of Maple devices at ports 2/3 (EX. IO board)
+    0 - regular Atomiswave controller
+    1 - DC lightgun
+    2,3 - DC mouse/trackball
 
-	0x00600288 rw 0000dcba
-		a - 1P coin counter
-		b - 2P coin counter
-		c - 1P coin lockout
-		d - 2P coin lockout
+    0x00600288 rw 0000dcba
+        a - 1P coin counter
+        b - 2P coin counter
+        c - 1P coin lockout
+        d - 2P coin lockout
 
-	0x0060028C rw POUT CN304 (EX. IO board)
-		counter/lockout for 3P/4P in ggisuka (same bit mapping as above)
-		dolphin known to read it too (verify)
+    0x0060028C rw POUT CN304 (EX. IO board)
+        counter/lockout for 3P/4P in ggisuka (same bit mapping as above)
+        dolphin known to read it too (verify)
 */
 void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
@@ -2102,7 +2101,7 @@ uint64_t atomiswave_xtrmhnt2_state::allnet_hack_r(offs_t offset, uint64_t mem_ma
 	logerror("%s: ALL.net check %x (%x)\n", machine().describe_context(), offset * 8, mem_mask);
 	// "100 NETBD NOT RESPOND" right off the bat
 	if (m_maincpu->pc() == 0xc03cb30 ||
-	    m_maincpu->pc() == 0xc03cb10 ||
+		m_maincpu->pc() == 0xc03cb10 ||
 		m_maincpu->pc() == 0xc03cb2e)
 	{
 		dc_ram[0x357fe/8] |= (uint64_t)0x200 << 48;
@@ -2112,7 +2111,7 @@ uint64_t atomiswave_xtrmhnt2_state::allnet_hack_r(offs_t offset, uint64_t mem_ma
 	}
 	// "ERROR: THIS IS NOT ACCEPTABLE BY MAIN BOARD"
 	if (m_maincpu->pc() == 0xc108240 ||
-	    m_maincpu->pc() == 0xc108210 ||
+		m_maincpu->pc() == 0xc108210 ||
 		m_maincpu->pc() == 0xc10823e)
 		dc_ram[0x9acc8/8] = (dc_ram[0x9acc8/8] & 0xffffffffffff0000U) | (uint64_t)0x0009;
 	return 0;
@@ -2123,7 +2122,7 @@ void atomiswave_xtrmhnt2_state::aw_map(address_map &map)
 	atomiswave_state::aw_map(map);
 	// ALL.net
 	map(0x01000000, 0x0100011f).r(FUNC(atomiswave_xtrmhnt2_state::allnet_hack_r));
-//	map(0x01001800, 0x01001803).lr32(NAME([]() -> u32 { return 0x53504147; }));
+//  map(0x01001800, 0x01001803).lr32(NAME([]() -> u32 { return 0x53504147; }));
 }
 
 void dc_state::dc_audio_map(address_map &map)
