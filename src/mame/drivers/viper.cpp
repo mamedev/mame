@@ -114,8 +114,7 @@
         code1d,b            Can boot but crashes randomly and quickly so it's hard to do anything.
 
         mocapglf            Security code error
-        sscopex             Security code error
-        sogeki              Graphics very heavily glitched. Gun controller is not emulated.
+        sscopex,sogeki      Graphics very heavily glitched. Gun controller is not emulated.
 
         wcombat             Can boot into a test menu by using a combination of dipswitches, but it says "serial check bad". Can't boot normally.
         wcombatu            Bootable when dipsw 4 is set to on. Controls not implemented so it's not possible to pass nickname selection screen. Freezes when test button is pressed.
@@ -2437,6 +2436,15 @@ INPUT_PORTS_START( sogeki )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
 INPUT_PORTS_END
 
+INPUT_PORTS_START( sscopex )
+	PORT_INCLUDE( sogeki )
+
+	PORT_MODIFY("IN3")
+	PORT_DIPNAME( 0x20, 0x20, "Cabinet Type" ) // must stay on Normal for game to boot
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "E-Amusement" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( tsurugi )
 	PORT_INCLUDE( viper )
 
@@ -3042,7 +3050,7 @@ ROM_START(sscopex)
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-		ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(427a65ef) SHA1(745e951715ece9f60898b7ed4809e69558145d2d))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("a13uaa_nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
@@ -3387,7 +3395,7 @@ GAME(2001, p911ed,    p911,      viper,     p911,       viper_state, init_viperc
 GAME(2001, p911ea,    p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD, alt)", MACHINE_NOT_WORKING)
 GAME(2001, p911j,     p911,      viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Keisatsukan Shinjuku 24ji (ver JAE)", MACHINE_NOT_WORKING)
 GAME(2001, p9112,     kviper,    viper,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
-GAME(2001, sscopex,   kviper,    viper,     sogeki,     viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
+GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING)
 GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING)
 GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
