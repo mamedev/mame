@@ -26,7 +26,6 @@ Status:
 ToDo:
 - Mechanical sounds
 - faeton6d,petacon,petacona: 6-digit displays
-- Outputs
 
 *******************************************************************************************************/
 
