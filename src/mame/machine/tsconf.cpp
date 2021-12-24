@@ -10,16 +10,14 @@
 #define NW0_MAP (BIT(m_regs[MEM_CONFIG], 2))
 #define W0_WE (BIT(m_regs[MEM_CONFIG], 1))
 #define ROM128 (BIT(m_regs[MEM_CONFIG], 0))
-#define RRES (BIT(m_regs[V_CONFIG], 6, 2))
 
 #define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
 
-static constexpr rectangle resolution_info[5] = {
+static constexpr rectangle resolution_info[4] = {
 	rectangle(52, 256 + 51, 48, 192 + 47), // 52|256|52 x 48-192-48
 	rectangle(20, 320 + 19, 44, 200 + 43), // 20|320|20 x 44-200-44
 	rectangle(20, 320 + 19, 24, 240 + 23), // 20|320|20 x 24-240-24
-	rectangle(0, 360 - 1, 0, 288 - 1),	   //  0|360|0  x  0-288-0
-	rectangle(0, 640 - 1, 0, 240 - 1)	   // text
+	rectangle(0, 360 - 1, 0, 288 - 1)      //  0|360|0  x  0-288-0
 };
 
 enum v_mode : u8
@@ -40,6 +38,17 @@ static constexpr u8 pwm_to_rgb[32] = {
 static constexpr rgb_t from_pwm(u16 pwm15)
 {
 	return rgb_t(pwm_to_rgb[BIT(pwm15, 10, 5)], pwm_to_rgb[BIT(pwm15, 5, 5)], pwm_to_rgb[BIT(pwm15, 0, 5)]);
+}
+
+rectangle tsconf_state::get_resolution_info()
+{
+	rectangle info = resolution_info[BIT(m_regs[V_CONFIG], 6, 2)];
+	if (VM == VM_TXT)
+	{
+		info.set_origin(0, 0);
+		info.set_width(info.width() << 1);
+	}
+	return info;
 }
 
 void tsconf_state::tsconf_palette(palette_device &palette) const
@@ -84,7 +93,7 @@ void tsconf_state::tsconf_update_video_mode()
 	switch (VM)
 	{
 	case VM_TXT: // Text Mode
-		resolution = resolution_info[4];
+		resolution = get_resolution_info();
 		m_gfxdecode->gfx(1)->set_source(messram + PAGE4K(m_regs[V_PAGE] ^ 0x01));
 		break;
 	case VM_ZX: // Zx
@@ -113,7 +122,7 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 		}
 
 		// Main Graphics
-		rectangle resolution = resolution_info[VM == VM_TXT ? 4 : RRES];
+		rectangle resolution = get_resolution_info();
 		if (!BIT(m_regs[V_CONFIG], 5))
 		{
 			if (VM == VM_ZX)
@@ -166,6 +175,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		else if (!eof)
 		{
 			u8 pal_offset = m_regs[PAL_SEL] << 4;
+			rectangle resolution = get_resolution_info();
 			if (VM == VM_TXT)
 			{
 				u8 *messram = m_ram->pointer();
@@ -173,7 +183,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 				u8 *font_location = messram + PAGE4K(m_regs[V_PAGE] ^ 0x01);
 				u8 *text_location = messram + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
 				u16 *bm = &m_screen_bitmap.pix(y, 0);
-				for (auto x = 0; x < 80; x++)
+				for (auto x = 0; x < resolution.width() / 8; x++)
 				{
 					u8 char_x = *(font_location + (*text_location * 8) + (y % 8));
 					u8 font_color = *(text_location + 128) & 0x0f;
@@ -187,7 +197,6 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 			}
 			else
 			{
-				rectangle resolution = resolution_info[RRES];
 				if (m_screen->vpos() >= resolution.top())
 				{
 					u16 y = m_screen->vpos() - resolution.top();

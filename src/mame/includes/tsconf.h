@@ -124,6 +124,7 @@ private:
 	u16 get_border_color() override;
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tsconf_update_video_mode();
+	rectangle get_resolution_info();
 
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_port_fe_w(offs_t offset, u8 data);
