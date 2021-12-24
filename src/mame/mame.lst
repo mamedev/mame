@@ -43709,6 +43709,9 @@ psr70                           // 1985 PSR-70
 @source:ympsr340.cpp
 psr340                          // 1999 PSR-340
 
+@source:ymrx15.cpp
+rx15                            //
+
 @source:ymsy35.cpp
 sy35                            //
 
