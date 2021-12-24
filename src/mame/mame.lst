@@ -19259,6 +19259,9 @@ wndrplnt                        // (c) 1987 Data East Corporation (Japan)
 @source:kas89.cpp
 kas89                           // 1989, SFC S.R.L.
 
+@source:kawai_acr20.cpp
+acr20                           //
+
 @source:kawai_k1.cpp
 k1                              //
 k1m                             //
