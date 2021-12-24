@@ -1572,7 +1572,6 @@ files {
 	MAME_DIR .. "src/mame/machine/mapledev.h",
 	MAME_DIR .. "src/mame/machine/mie.cpp",
 	MAME_DIR .. "src/mame/machine/mie.h",
-	MAME_DIR .. "src/mame/machine/naomi.cpp",
 	MAME_DIR .. "src/mame/machine/naomibd.cpp",
 	MAME_DIR .. "src/mame/machine/naomibd.h",
 	MAME_DIR .. "src/mame/machine/naomig1.cpp",

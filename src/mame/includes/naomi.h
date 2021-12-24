@@ -1,15 +1,18 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
-/*
 
-naomi.h -> NAOMI includes
+#ifndef MAME_INCLUDES_NAOMI_H
+#define MAME_INCLUDES_NAOMI_H
 
-*/
-#include "machine/eepromser.h"
-#include "machine/intelfsh.h"
+#pragma once
+
+#include "cpu/sh/sh4.h"
+#include "cpu/arm7/arm7core.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/z80/z80.h"
 #include "machine/x76f100.h"
+#include "machine/eepromser.h"
+#include "machine/intelfsh.h"
 #include "machine/maple-dc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/mie.h"
@@ -20,15 +23,13 @@ naomi.h -> NAOMI includes
 #include "machine/naomim4.h"
 #include "machine/awboard.h"
 #include "machine/nvram.h"
-#include "cpu/sh/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/aica.h"
 #include "machine/aicartc.h"
 #include "machine/jvsdev.h"
 #include "machine/jvs13551.h"
 #include "machine/m3comm.h"
 #include "machine/gunsense.h"
 #include "machine/segashiobd.h"
+#include "sound/aica.h"
 #include "dc.h"
 
 enum {
@@ -60,15 +61,11 @@ class naomi_state : public dc_state
 	void naomigd_kb(machine_config &config);
 	void naomim4(machine_config &config);
 
-	void init_naomigd();
-	void init_ggxx();
-	void init_ggxxrl();
-	void init_ggxxsla();
 	void init_naomi();
-	void init_naomigd_mp();
-	void init_sfz3ugd();
-	void init_hotd2();
 	void init_naomi_mp();
+	void init_hotd2();
+	void init_naomigd();
+	void init_naomigd_mp();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(suchie3_mp_r);
@@ -93,14 +90,6 @@ protected:
 
 	uint8_t asciihex_to_dec(uint8_t in);
 	void create_pic_from_retdat();
-
-	uint64_t naomi_biose_idle_skip_r();
-	uint64_t naomi_biosh_idle_skip_r();
-	uint64_t naomigd_ggxxsla_idle_skip_r();
-	uint64_t naomigd_ggxx_idle_skip_r();
-	uint64_t naomigd_ggxxrl_idle_skip_r();
-	uint64_t naomigd_sfz3ugd_idle_skip_r();
-	uint64_t hotd2_idle_skip_r();
 
 	void naomi_map(address_map &map);
 	void naomi_port(address_map &map);
@@ -184,3 +173,5 @@ private:
 
 
 INPUT_PORTS_EXTERN( naomi_debug );
+
+#endif // MAME_INCLUDES_NAOMI_H

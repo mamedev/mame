@@ -1,10 +1,6 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
-/*
 
-    dc.h - Sega Dreamcast includes
-
-*/
 #ifndef MAME_INCLUDES_DC_H
 #define MAME_INCLUDES_DC_H
 

@@ -3518,7 +3518,6 @@ files {
 	MAME_DIR .. "src/mame/video/powervr2.h",
 	MAME_DIR .. "src/mame/machine/gunsense.cpp",
 	MAME_DIR .. "src/mame/machine/gunsense.h",
-	MAME_DIR .. "src/mame/machine/naomi.cpp",
 	MAME_DIR .. "src/mame/machine/naomig1.cpp",
 	MAME_DIR .. "src/mame/machine/naomig1.h",
 	MAME_DIR .. "src/mame/machine/naomibd.cpp",

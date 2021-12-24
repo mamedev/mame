@@ -2645,6 +2645,25 @@ INPUT_PORTS_END
 
 
 /* JVS mahjong panel */
+
+INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
+{
+	m_mp_mux = newval;
+}
+
+CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
+{
+	uint8_t retval = 0;
+
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
+	{
+		if (m_mp_mux & i)
+			retval |= m_mp[port].read_safe(0);
+	}
+	return retval;
+}
+
 static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_mie )
 	PORT_INCLUDE( naomi_debug )
@@ -2703,11 +2722,65 @@ static INPUT_PORTS_START( naomi_mp )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_MAHJONG_D )
 INPUT_PORTS_END
 
+CUSTOM_INPUT_MEMBER(naomi_state::suchie3_mp_r)
+{
+	uint8_t retval = 0;
+
+	int port = 0;
+	for (int i = 0x80; i >= 0x08; i >>= 1, port++)
+	{
+		if (m_mp_mux & i)
+		{
+			// KEY1 and KEY5 are swapped
+			// FIXME: should really be mapped in input struct instead
+			if (port == 0)
+				retval |= m_mp[4].read_safe(0);
+			else if (port == 4)
+				retval |= m_mp[0].read_safe(0);
+			else
+				retval |= m_mp[port].read_safe(0);
+		}
+	}
+	return retval;
+}
+
 static INPUT_PORTS_START( suchie3 )
 	PORT_INCLUDE( naomi_mp )
 	PORT_MODIFY("P1")
 	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(naomi_state, suchie3_mp_r)
 INPUT_PORTS_END
+
+CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
+{
+	// TODO: player 2 input reading
+	uint8_t retval = 0;
+	static const char *const keynames[] =
+	{
+		"P1.ROW0", "P1.ROW1", "P1.ROW2", "P1.ROW3", "P1.ROW4"
+	};
+
+	for(int i=0;i<5;i++)
+	{
+		uint32_t row;
+
+		// read the current row
+		row = ioport(keynames[i])->read();
+
+		// if anything is pressed, convert the 32-bit raw value to keycode
+		if(row != 0)
+		{
+			// base value x20
+			retval = i * 0x20;
+			for(int j=0;j<32;j++)
+			{
+				if(row & 1 << j)
+					return retval + j;
+			}
+		}
+	}
+
+	return retval;
+}
 
 static INPUT_PORTS_START( naomi_kb )
 	PORT_INCLUDE( naomi_mie )
@@ -11783,6 +11856,187 @@ ROM_START( sushibar )
 	ROM_PARAMETER(":rom_board:key", "25") // Julie
 ROM_END
 
+uint8_t naomi_state::asciihex_to_dec(uint8_t in)
+{
+	if (in>=0x30 && in<=0x39)
+	{
+		return in - 0x30;
+	}
+	else
+	if (in>=0x41 && in<=0x46)
+	{
+		return in - 0x37;
+	}
+	/*
+	else
+	if (in>=0x61 && in<=0x66)
+	{
+	    return in - 0x57;
+	}
+	*/
+	else
+	{
+		fatalerror("unexpected value in asciihex_to_dec\n");
+	}
+}
+
+// development helper function
+void naomi_state::create_pic_from_retdat()
+{
+	{
+		memory_region * rgn_hexregion = memregion("pichex");
+		memory_region * rgn_retregion = memregion("picreturn");
+		memory_region * rgn_newregion = memregion("pic");
+		int outcount = 0;
+
+		if (rgn_hexregion && rgn_newregion)
+		{
+			uint8_t* hexregion = rgn_hexregion->base();
+			uint8_t* newregion = rgn_newregion->base();
+
+
+			int hexoffs = 0;
+			int line;
+
+			hexoffs += 0x11; // skip first line  // :020000040000FA
+
+			for (line=0;line<0x200;line++)
+			{
+				int offs2;
+
+				hexoffs+= 0x1; // skip :
+				hexoffs+= 0x8; // skip line #  (:20xxxxxx incrementing in 0x2000)
+
+				for (offs2=0;offs2<0x20;offs2++)
+				{
+					uint8_t ascii1 = hexregion[hexoffs+0];
+					uint8_t ascii2 = hexregion[hexoffs+1];
+					uint8_t dec1 = asciihex_to_dec(ascii1);
+					uint8_t dec2 = asciihex_to_dec(ascii2);
+					uint8_t val = dec1 << 4 | dec2;
+
+					//printf("%02x%02x", ascii1, ascii2);
+
+					printf("%02x", val);
+
+					newregion[outcount] = val;
+
+					hexoffs+=2;
+					outcount++;
+				}
+
+				hexoffs+=0x4; // skip running checksum + newline
+
+				printf("\n");
+			}
+
+			if (rgn_retregion && rgn_newregion)
+			{
+				uint8_t* retregion = rgn_retregion->base();
+				uint8_t* newregion = rgn_newregion->base();
+
+				int i;
+				printf("string 1 (key1)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x780+i*2], retregion[0x31+i]);
+
+					newregion[0x780+i*2] = retregion[0x31+i]; // patch with extracted data
+				}
+
+				printf("string 2 (key2)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7a0+i*2], retregion[0x29+i]);
+
+					newregion[0x7a0+i*2] = retregion[0x29+i]; // patch with extracted data
+				}
+
+				printf("string 3 (filename)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7c0+i*2], retregion[0x21+i]);
+
+					newregion[0x7c0+i*2] = retregion[0x21+i]; // patch with extracted data
+				}
+
+				printf("string 4 (filename?)\n");
+				for (i=0;i<7;i++)
+				{
+					printf("%02x %02x\n", newregion[0x7e0+i*2], retregion[0x19+i]);
+
+					newregion[0x7e0+i*2] = retregion[0x19+i]; // patch with extracted data
+				}
+			}
+
+			if (rgn_newregion)
+			{
+				uint8_t* newregion = rgn_newregion->base();
+
+				FILE *fp;
+				char filename[256];
+				sprintf(filename,"picbin_%s", machine().system().name);
+				fp=fopen(filename, "w+b");
+				if (fp)
+				{
+					fwrite(newregion, outcount, 1, fp);
+					fclose(fp);
+				}
+
+				printf("wrote %04x bytes\n", outcount);
+			}
+
+			// hex dumps end with
+			//:10400000000000000000000000000000000082002E
+			//:00000001FF
+		}
+	}
+}
+
+void naomi_state::set_drc_options()
+{
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, m_rombase);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, dc_ram);
+}
+
+// TODO: intentional repetition, to allow possible future extensions
+void naomi_state::init_naomi()
+{
+	set_drc_options();
+	create_pic_from_retdat();
+}
+
+void naomi2_state::init_naomi2()
+{
+	set_drc_options();
+	create_pic_from_retdat();
+}
+
+void naomi_state::init_naomigd()
+{
+	set_drc_options();
+	create_pic_from_retdat();
+}
+
+// TODO: do we really need these two extra inits to initialize the panel muxer variable?
+void naomi_state::init_naomi_mp()
+{
+	naomi_state::init_naomi();
+	m_mp_mux = 0;
+}
+
+void naomi_state::init_naomigd_mp()
+{
+	naomi_state::init_naomigd();
+	m_mp_mux = 0;
+}
+
+void naomi_state::init_hotd2()
+{
+	set_drc_options();
+}
+
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -12118,7 +12372,7 @@ ROM_END
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Capcom / Banpresto","Mobile Suit Gundam: Federation Vs. Zeon (GDL-0001)", GAME_FLAGS )
-/* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_sfz3ugd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )
+/* 0002  */ GAME( 2001, sfz3ugd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom",       "Street Fighter Zero 3 Upper (Japan) (GDL-0002)", GAME_FLAGS )
 // 0003
 /* 0004  */ GAME( 2001, cvsgd,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK Millennium Fight 2000 Pro (Japan) (GDL-0004)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 /* 0005  */ GAME( 2001, starseek,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "G.Rev",        "Doki Doki Idol Star Seeker (GDL-0005)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
@@ -12128,8 +12382,8 @@ ROM_END
 /* 0008  */ GAME( 2001, cvs2,      naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Capcom / SNK", "Capcom Vs. SNK 2 Mark Of The Millennium 2001 (USA) (GDL-0008)", GAME_FLAGS )
 // 0009  Capcom Vs. SNK 2 (Export)
 /* 0010  */ GAME( 2001, ikaruga,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Treasure",     "Ikaruga (GDL-0010)", GAME_FLAGS )
-/* 0011  */ GAME( 2002, ggxx,      naomigd, naomigd, naomi, naomi_state,  init_ggxx,     ROT0,"Arc System Works","Guilty Gear XX (GDL-0011)", GAME_FLAGS )
-/* 0012  */ GAME( 2002, cleoftp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron / Taito",       "Cleopatra Fortune Plus (GDL-0012)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+/* 0011  */ GAME( 2002, ggxx,      naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX (GDL-0011)", GAME_FLAGS )
+/* 0012  */ GAME( 2002, cleoftp,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron / Taito",       "Cleopatra Fortune Plus (GDL-0012)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 /* 0013  */ GAME( 2002, moeru,     naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Altron",       "Moeru Casinyo (Japan) (GDL-0013)", GAME_FLAGS )
 // 0014  Musapey's Choco Marker (GDL-0014)
 /* 0014A */ GAME( 2002, chocomk,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software", "Musapey's Choco Marker (Rev A) (GDL-0014A)", GAME_FLAGS )
@@ -12137,8 +12391,8 @@ ROM_END
 // 0016  GD SOFT POCHI (Pochinya ?)
 /* 0017  */ GAME( 2002, quizqgd,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Amedio (Taito license)","Quiz Keitai Q mode (GDL-0017)", GAME_FLAGS )
 /* 0018  */ GAME( 2002, azumanga,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "MOSS (Taito license)","Azumanga Daioh Puzzle Bobble (GDL-0018)", GAME_FLAGS )
-/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
-/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_ggxxrl,   ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
+/* 0019  */ GAME( 2003, ggxxrlo,   ggxxrl,  naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan) (GDL-0019)", GAME_FLAGS )
+/* 0019A */ GAME( 2003, ggxxrl,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Arc System Works","Guilty Gear XX #Reload (Japan, Rev A) (GDL-0019A)", GAME_FLAGS )
 /* 0020  */ GAME( 2004, tetkiwam,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Success",      "Tetris Kiwamemichi (Japan) (GDL-0020)", GAME_FLAGS )
 /* 0021  */ GAME( 2003, shikgam2,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Alfa System",  "Shikigami no Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_FLAGS )
 /* 0022  */ GAME( 2003, usagiym,   naomigd, naomigd, naomi_mp,naomi_state,init_naomigd_mp,ROT0,  "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (Japan) (GDL-0022)", MACHINE_IMPERFECT_GRAPHICS |MACHINE_IMPERFECT_SOUND )
@@ -12160,7 +12414,7 @@ ROM_END
 /* 0032  */ GAME( 2005, radirgyo,  radirgy, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Radirgy (Japan) (GDL-0032)", GAME_FLAGS )
 /* 0032A */ GAME( 2005, radirgy,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",    "Radirgy (Japan, Rev A) (GDL-0032A)", GAME_FLAGS )
 // 0033  Guilty Gear XX Slash (GDL-0033)
-/* 0033A */ GAME( 2005, ggxxsla,   naomigd, naomigd, naomi, naomi_state,  init_ggxxsla,  ROT0,"Arc System Works","Guilty Gear XX Slash (Japan, Rev A) (GDL-0033A)", GAME_FLAGS )
+/* 0033A */ GAME( 2005, ggxxsla,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works","Guilty Gear XX Slash (Japan, Rev A) (GDL-0033A)", GAME_FLAGS )
 /* 0034  */ GAME( 2006, kurucham,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Able",         "Kurukuru Chameleon (Japan) (GDL-0034)", GAME_FLAGS )
 /* 0035  */ GAME( 2005, undefeat,  naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "G.Rev",        "Under Defeat (Japan) (GDL-0035)", GAME_FLAGS )
 /* 0036  */ GAME( 2006, trghearto, trgheart,naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Warashi",      "Trigger Heart Exelica (Japan) (GDL-0036)", GAME_FLAGS )
