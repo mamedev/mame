@@ -35,6 +35,7 @@ agat.cpp
 aid80f.cpp
 aim65.cpp
 aim65_40.cpp
+airbase99.cpp
 akaiax80.cpp
 akaivx600.cpp
 alcat7100.cpp
@@ -1217,6 +1218,7 @@ z100.cpp
 z1013.cpp
 z22.cpp
 z29.cpp
+z80clock.cpp
 z80dev.cpp
 z80ne.cpp
 z88.cpp

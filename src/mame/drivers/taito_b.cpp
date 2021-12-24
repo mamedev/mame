@@ -1532,49 +1532,70 @@ static INPUT_PORTS_START( ryujin )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbm )
-	PORT_START("DSWA") //+-ok
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, "Tickets" )					PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Win Bonus Tickets" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x04, IP_ACTIVE_LOW, "SW1:3" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x08, DEF_STR( On ))
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )      	PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB") //+-ok
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Punch Power" )				PORT_DIPLOCATION("SW2:3,4")
+	/* Modifies the power of the player's punch by a set amount. Table is at 0x0A614:
+		DIP 00: 0000 ;+00
+		DIP 01: FFFB ;-05
+		DIP 10: 0005 :+05
+		DIP 11: 000A :+10
+		For example, if the player had an initial power of 200t and Dip Switches 2-3 and 2-4 were both set, the power would be increased to 210t.
+		This bonus (or penalty) is applied before the game floors the punch power at 1t and before it caps the punch power at 300t. So, if in MAME, you hold Pad Photosensors 1 and 2 and then immediately hit Pad Photosensor 3, you'll still get a punch power of 300t even if Dip Switch 2-3 was set and Dip Switch 2-4 wasn't.
+		Just for reference, the initial power of the player's punch is calculated by taking 24000 and dividing it by the timer at 105048 in RAM. This is performed in the subroutine at 0x0A5B0 in the main CPU.
+	*/
+	PORT_DIPSETTING(    0x08, "Lower" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Higher ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Highest ) )
+	PORT_DIPNAME( 0x30, 0x30, "Tickets Payout" )			PORT_DIPLOCATION("SW2:5,6")
+	/* Controls the power divider. The game calculates the base ticket total by taking the total power of the player's three punches and then dividing it by one of four values in the table at 0x7FFC0:
+		DIP 00: 50
+		DIP 01: 40
+		DIP 10: 80
+		DIP 11: 120
+		For example, if the player got a combined total of 640t power and dip switch 2-6 was set but 2-5 was not, they'll have a base of 8 tickets.
+	*/
+	PORT_DIPSETTING(    0x00, "Total Power / 120" )
+	PORT_DIPSETTING(    0x10, "Total Power / 80" )
+	PORT_DIPSETTING(    0x30, "Total Power / 50" )
+	PORT_DIPSETTING(    0x20, "Total Power / 40" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Win Bonus Tickets Payout" )	PORT_DIPLOCATION("SW2:7,8")
+	/* Controls the value of the round completion ticket bonus. Each round has its own ticket table: The first value is for 00, the second is for 01, third for 10, fourth for 11:
+		7FFC8: 0001 0002 0003 0002 #ROUND 1 BONUS TABLE - 01 / 02 / 03 / 02
+		7FFD0: 0002 0004 0004 0004 #ROUND 2 BONUS TABLE - 02 / 04 / 04 / 04
+		7FFD8: 0003 0006 0005 0008 #ROUND 3 BONUS TABLE - 03 / 06 / 05 / 08
+		7FFE0: 0004 0008 0006 0010 #ROUND 4 BONUS TABLE - 04 / 08 / 06 / 16
+		7FFE8: 0005 000A 0007 0020 #ROUND 5 BONUS TABLE - 05 / 10 / 07 / 32
+		For example, if the player beat round 4 and dip switch 2-7 was set but 2-8 was not, they'd have a bonus of 8 tickets.
+	*/
+	PORT_DIPSETTING(    0xc0, "1, 2, 3, 4, 5" )
+	PORT_DIPSETTING(    0x80, "2, 4, 6, 8, 10" )
+	PORT_DIPSETTING(    0x40, "3, 4, 5, 6, 7" )
+	PORT_DIPSETTING(    0x00, "2, 4, 8, 16, 32" )
 
 	PORT_START("JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)//sound select UP
@@ -1613,6 +1634,30 @@ static INPUT_PORTS_START( sbm )
 	    The longer the time - the less power.
 	*/
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Pad Photosensor 4")//PHOTO 4  ??? ACTIVE_LOW  ??? (punching pad photosensor 4)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( sbmj )
+	PORT_INCLUDE(sbm)
+
+	PORT_MODIFY("DSWA")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+
+	PORT_MODIFY("DSWB")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( realpunc )
@@ -3588,6 +3633,6 @@ GAME( 1994, spacedxo, spacedx, spacedxo, spacedxo,  taitob_state, init_taito_b, 
     the enemy.
 */
 GAME( 1990, sbm,      0,       sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (US)",    MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
-GAME( 1990, sbmj,     sbm,     sbm,      sbm,       taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
+GAME( 1990, sbmj,     sbm,     sbm,      sbmj,      taitob_state,   init_taito_b, ROT0, "Taito Corporation",       "Sonic Blast Man (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpunc, 0,       realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (World, v2.12O)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )
 GAME( 1994, realpuncj,realpunc,realpunc, realpunc,  taitob_c_state, init_taito_b, ROT0, "Taito Corporation Japan", "Real Puncher (Japan, v2.12J)",   MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL )

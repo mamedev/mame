@@ -1026,6 +1026,9 @@ aim65                           // Rockwell AIM65
 @source:aim65_40.cpp
 aim65_40                        // Rockwell AIM65/40
 
+@source:airbase99.cpp
+airbase99
+
 @source:airbustr.cpp
 airbustr                        // (c) 1990 Kaneko + Namco
 airbustrb                       // bootleg
@@ -36554,6 +36557,7 @@ rzindy500                       //
 rztoshden                       //
 
 @source:s11.cpp
+alcat_l7                        //
 gmine_l2                        //
 grand_l3                        //
 grand_l4                        //
@@ -36765,7 +36769,6 @@ pfevr_p3                        //
 scrzy_l1                        //
 
 @source:s9.cpp
-alcat_l7                        //
 comet_l4                        //
 comet_l5                        //
 ratrc_l1                        //
@@ -43750,6 +43753,9 @@ z22                             //
 
 @source:z29.cpp
 z29                             //
+
+@source:z80clock.cpp
+z80clock                        // 2020 Tom Storey
 
 @source:z80dev.cpp
 z80dev                          //
