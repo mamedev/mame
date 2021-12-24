@@ -106,21 +106,14 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 		// Border
 		if (m_border_bitmap.valid())
 		{
-			for (auto y = cliprect.top(); y <= cliprect.bottom(); y++)
-			{
-				u16 *border_bm = &m_border_bitmap.pix(y, 0);
-				for (auto x = cliprect.left(); x <= cliprect.right(); x++)
-				{
-					*border_bm++ |= 0xf0;
-				}
-			}
-			if (VM != VM_ZX)
+			if (BIT(m_regs[V_CONFIG], 5) || VM != VM_ZX)
 			{
 				copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
 			}
 		}
 
 		// Main Graphics
+		rectangle resolution = resolution_info[VM == VM_TXT ? 4 : RRES];
 		if (!BIT(m_regs[V_CONFIG], 5))
 		{
 			if (VM == VM_ZX)
@@ -138,25 +131,24 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 			}
 			else
 			{
-				copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, resolution_info[VM == VM_TXT ? 4 : RRES]);
+				copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, resolution);
 			}
 		}
-
 		// Tiles & Sprites
 		// TODO layers
 		if (!BIT(m_regs[V_CONFIG], 4))
 		{
 			if (BIT(m_regs[TS_CONFIG], 5))
 			{
-				m_ts_tilemap[1]->draw(screen, bitmap, cliprect, 0);
+				m_ts_tilemap[1]->draw(screen, bitmap, resolution, 0);
 			}
 			if (BIT(m_regs[TS_CONFIG], 6))
 			{
-				m_ts_tilemap[2]->draw(screen, bitmap, cliprect, 0);
+				m_ts_tilemap[2]->draw(screen, bitmap, resolution, 0);
 			}
 			if (BIT(m_regs[TS_CONFIG], 7))
 			{
-				draw_sprites(screen, bitmap, cliprect);
+				draw_sprites(screen, bitmap, resolution);
 			}
 		}
 	}
@@ -165,67 +157,73 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 
 void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 {
-	u8 pal_offset = m_regs[PAL_SEL] << 4;
-	if (VM == VM_ZX)
+	if (!BIT(m_regs[V_CONFIG], 5))
 	{
-		spectrum_state::spectrum_UpdateScreenBitmap(eof);
-	}
-	else if (VM == VM_TXT)
-	{
-		u8 *messram = m_ram->pointer();
-		u16 y = m_screen->vpos();
-		u8 *font_location = messram + PAGE4K(m_regs[V_PAGE] ^ 0x01);
-		u8 *text_location = messram + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
-		u16 *bm = &m_screen_bitmap.pix(y, 0);
-		for (auto x = 0; x < 80; x++)
+		if (VM == VM_ZX)
 		{
-			u8 char_x = *(font_location + (*text_location * 8) + (y % 8));
-			u8 font_color = *(text_location + 128) & 0x0f;
-			u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
-			for (auto i = 7; i >= 0; i--)
-			{
-				*bm++ = (BIT(char_x, i) ? font_color : bg_color) + pal_offset;
-			}
-			text_location++;
+			spectrum_state::spectrum_UpdateScreenBitmap(eof);
 		}
-	}
-	else
-	{
-		rectangle resolution = resolution_info[RRES];
-		if (resolution.contains(resolution.xcenter(), m_screen->vpos()))
+		else if (!eof)
 		{
-			u16 line_len = VM == VM_16C ? 256 : 512;
-			u16 y = m_screen->vpos() - resolution.top();
-			u32 offset = ((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) * line_len) +
-						 ((((m_regs[G_X_OFFS_H] & 1) << 8 /* .. 16/256 */) + m_regs[G_X_OFFS_L]) >> 1);
-			u8 *video_location = &m_ram->pointer()[PAGE4K(m_regs[V_PAGE]) + offset];
-			u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
-			for (auto x = resolution.left(); x <= resolution.right(); x++)
+			u8 pal_offset = m_regs[PAL_SEL] << 4;
+			if (VM == VM_TXT)
 			{
-				u8 pix = *video_location;
-				if (VM == VM_16C)
+				u8 *messram = m_ram->pointer();
+				u16 y = m_screen->vpos();
+				u8 *font_location = messram + PAGE4K(m_regs[V_PAGE] ^ 0x01);
+				u8 *text_location = messram + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
+				u16 *bm = &m_screen_bitmap.pix(y, 0);
+				for (auto x = 0; x < 80; x++)
 				{
-					*bm++ = (pix >> 4) + pal_offset;
-					*bm++ = (pix & 0x0f) + pal_offset;
-					x++;
+					u8 char_x = *(font_location + (*text_location * 8) + (y % 8));
+					u8 font_color = *(text_location + 128) & 0x0f;
+					u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
+					for (auto i = 7; i >= 0; i--)
+					{
+						*bm++ = (BIT(char_x, i) ? font_color : bg_color) + pal_offset;
+					}
+					text_location++;
 				}
-				else
+			}
+			else
+			{
+				rectangle resolution = resolution_info[RRES];
+				if (m_screen->vpos() >= resolution.top())
 				{
-					*bm++ = pix;
+					u16 y = m_screen->vpos() - resolution.top();
+					u32 offset = ((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) * 512) +
+								 ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
+					if (VM == VM_16C)
+					{
+						// FIXME wouldn't work for odd offsets
+						offset >>= 1;
+					}
+					u8 *video_location = &m_ram->pointer()[PAGE4K(m_regs[V_PAGE]) + offset];
+					u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
+					for (auto x = resolution.left(); x <= resolution.right(); x++)
+					{
+						u8 pix = *video_location;
+						if (VM == VM_16C)
+						{
+							*bm++ = (pix >> 4) + pal_offset;
+							*bm++ = (pix & 0x0f) + pal_offset;
+							x++;
+						}
+						else
+						{
+							*bm++ = pix;
+						}
+						video_location++;
+					}
 				}
-				video_location++;
 			}
 		}
 	}
 }
 
-void tsconf_state::spectrum_UpdateBorderBitmap()
+u16 tsconf_state::get_border_color()
 {
-	rectangle resolution = resolution_info[RRES];
-	if (VM != VM_TXT && resolution.left() > 0 && resolution.top() > 0)
-	{
-		spectrum_state::spectrum_UpdateBorderBitmap();
-	}
+	return m_regs[BORDER];
 }
 
 void tsconf_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -434,7 +432,7 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		break;
 
 	case BORDER:
-		tsconf_port_fe_w(0, (m_port_fe_data & 0xf8) | (data & 0x07));
+		spectrum_UpdateBorderBitmap();
 		break;
 
 	case DMAS_ADDRESS_L:

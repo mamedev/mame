@@ -144,6 +144,26 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
         }
         break;
 
+    case 0b1001: // Blt -> Mem
+        for (u16 block = 0; block <= m_block_num; block++)
+        {
+            auto s_addr = m_address_s;
+            auto d_addr = m_address_d;
+            for (u16 len = 0; len <= m_block_len; len++)
+            {
+                u16 d_val = m_in_mreq_cb(d_addr);
+                if (d_val != 0)
+                {
+                    m_out_mreq_cb(d_addr, m_in_mreq_cb(s_addr));
+                }
+                s_addr += 2;
+                d_addr += 2;
+            }
+            m_address_s = s_align ? (m_address_s + m_align) : s_addr;
+            m_address_d = d_align ? (m_address_d + m_align) : d_addr;
+        }
+        break;
+
     case 0b1100: // RAM -> CRAM
         for (u16 block = 0; block <= m_block_num; block++)
         {
@@ -160,8 +180,8 @@ void tsconfdma_device::start_tx(u8 dev, bool s_align, bool d_align, bool align_o
         }
         break;
 
-    //case 0b1101: // RAM -> SFILE
-    //    break;
+        //case 0b1101: // RAM -> SFILE
+        //    break;
 
     default:
         logerror("'tsdma': TX %02X: %06X (%02X:%04X) -> %06X\n", dev, m_address_s, m_block_len, m_block_num, m_address_d);

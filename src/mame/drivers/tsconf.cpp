@@ -74,8 +74,7 @@
 
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 {
-	u8 *messram = m_ram->pointer();
-	u8 *m_row_location = messram + (m_regs[V_PAGE] << 14) + (tile_index / tilemap.cols() * 256);
+	u8 *m_row_location = &m_ram->pointer()[(m_regs[V_PAGE] << 14) + (tile_index / tilemap.cols() * 256)];
 	u8 col = tile_index % tilemap.cols();
 	u8 symbol = m_row_location[col];
 	tileinfo.set(1, symbol, 0, 0);
@@ -87,8 +86,7 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 	u8 col_offset = (tile_index % tilemap.cols()) << 1;
 	u16 row_offset = (((tile_index / tilemap.cols()) << 1) + Layer) * 64 * 2;
 
-	u8 *messram = m_ram->pointer();
-	u8 *tile_info_addr = messram + (m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset;
+	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset];
 	u8 hi = tile_info_addr[1];
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
