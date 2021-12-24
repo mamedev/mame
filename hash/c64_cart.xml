@@ -3819,8 +3819,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="2764.u1" size="0x2000" crc="538a8ebc" sha1=""/>
-				<rom name="2764.u2" size="0x2000" crc="f46075ae" sha1="" offset="0x2000"/>
+				<rom name="2764.u1" size="0x2000" crc="538a8ebc" sha1="8917f59cea45b3408e0c032ae7edf72266435019"/>
+				<rom name="2764.u2" size="0x2000" crc="f46075ae" sha1="186565c0d5d0877b5c0e91334899f2ceea7ce435" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
