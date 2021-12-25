@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(NES_TURBOFILE, nes_turbofile_device, "nes_turbofile", "ASCII 
 
 INPUT_CHANGED_MEMBER( nes_turbofile_device::lock_changed )
 {
-	m_locked ^= 1;
+	m_locked = newval;
 	popmessage("Turbofile Protect Switch %s\n", m_locked ? "ON" : "OFF");
 }
 
@@ -90,6 +90,16 @@ void nes_turbofile_device::device_start()
 	save_item(NAME(m_bit));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_locked));
+}
+
+
+//-------------------------------------------------
+//  device_reset
+//-------------------------------------------------
+
+void nes_turbofile_device::device_reset()
+{
+	m_locked = m_lock->read();
 }
 
 

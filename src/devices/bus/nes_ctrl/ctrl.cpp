@@ -59,8 +59,8 @@
 #include "partytap.h"
 #include "powerpad.h"
 #include "snesadapter.h"
-#include "turbofile.h"
 #include "suborkey.h"
+#include "turbofile.h"
 #include "zapper.h"
 
 
