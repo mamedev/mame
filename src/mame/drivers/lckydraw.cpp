@@ -19,6 +19,7 @@ Status:
 ToDo:
 - Test button doesn't work
 - DIP labels are incomplete
+- If the match digit matches, you don't get a reward.
 - Schematic doesn't show interconnections between boards, so had to guess a few things. Also
   there's no operations manual, so don't know if there's a special procedure to activate the tests.
 
