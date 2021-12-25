@@ -100,23 +100,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	static constexpr uint32_t RTC_FREQUENCY = 32'768;
-	static constexpr uint8_t RTC_CARRY = 0x80;
-	static constexpr uint8_t RTC_HALT = 0x40;
-	static constexpr uint8_t REG_SECONDS = 0;
-	static constexpr uint8_t REG_MINUTES = 1;
-	static constexpr uint8_t REG_HOURS = 2;
-	static constexpr uint8_t REG_DAYS = 3;
-	static constexpr uint8_t REG_CONTROL = 4;
-
-
-	emu_timer *m_rtc_timer;
-	uint32_t m_rtc_ticks;
+	void update_rtc();
 	uint8_t m_rtc_regs[5];
-	uint8_t m_latched_regs[5];
 	int m_rtc_ready;
-
-	TIMER_CALLBACK_MEMBER(rtc_tick);
 };
 
 // ======================> gb_rom_mbc5_device

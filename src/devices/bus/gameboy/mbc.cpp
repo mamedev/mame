@@ -4,8 +4,8 @@
 
  Game Boy carts with MBC (Memory Bank Controller)
 
-TODO:
-- The MBC3 RTC should count the time that passed since the game was last played.
+
+ TODO: RTC runs too fast while in-game, in MBC-3 games... find the problem!
 
  ***********************************************************************************************************/
 
@@ -189,26 +189,12 @@ void gb_rom_mbc3_device::device_start()
 	shared_start();
 	save_item(NAME(m_rtc_regs));
 	save_item(NAME(m_rtc_ready));
-	save_item(NAME(m_rtc_ticks));
-	save_item(NAME(m_latched_regs));
-
-	m_rtc_ticks = 0;
-	system_time curtime;
-	machine().current_datetime(curtime);
-
-	m_rtc_regs[REG_SECONDS] = curtime.local_time.second;
-	m_rtc_regs[REG_MINUTES] = curtime.local_time.minute;
-	m_rtc_regs[REG_HOURS] = curtime.local_time.hour;
-	m_rtc_regs[REG_DAYS] = curtime.local_time.day & 0xff;
-	m_rtc_regs[REG_CONTROL] = (curtime.local_time.day >> 8) & 0x01;
-
-	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_rom_mbc3_device::rtc_tick),this));
-	m_rtc_timer->adjust(attotime::from_hz(RTC_FREQUENCY), 0, attotime::from_hz(RTC_FREQUENCY));
 }
 
 void gb_rom_mbc3_device::device_reset()
 {
 	shared_reset();
+	memset(m_rtc_regs, 0, sizeof(m_rtc_regs));
 	m_rtc_ready = 0;
 }
 
@@ -482,39 +468,16 @@ void gb_rom_mbc2_device::write_ram(offs_t offset, uint8_t data)
 
 // MBC3
 
-TIMER_CALLBACK_MEMBER(gb_rom_mbc3_device::rtc_tick)
+void gb_rom_mbc3_device::update_rtc()
 {
-	if (BIT(m_rtc_regs[REG_CONTROL], 6)) {
-		return;
-	}
-	m_rtc_ticks++;
-	if (m_rtc_ticks >= RTC_FREQUENCY)
-	{
-		m_rtc_ticks = 0;
-		m_rtc_regs[REG_SECONDS] = (m_rtc_regs[REG_SECONDS] + 1) & 0x3f;
-		if (m_rtc_regs[REG_SECONDS] == 60)
-		{
-			m_rtc_regs[REG_SECONDS] = 0;
-			m_rtc_regs[REG_MINUTES] = (m_rtc_regs[REG_MINUTES] + 1) & 0x3f;
-			if (m_rtc_regs[REG_MINUTES] == 60)
-			{
-				m_rtc_regs[REG_MINUTES] -= 60;
-				m_rtc_regs[REG_HOURS] = (m_rtc_regs[REG_HOURS] + 1) & 0x1f;
-				if (m_rtc_regs[REG_HOURS] == 24)
-				{
-					m_rtc_regs[REG_HOURS] = 0;
-					m_rtc_regs[REG_DAYS]++;
-					if (m_rtc_regs[REG_DAYS] == 0)
-					{
-						m_rtc_regs[REG_CONTROL] = (m_rtc_regs[REG_CONTROL] & 0xfe) | ((m_rtc_regs[REG_CONTROL] + 1) & 0x01);
-						if (!(m_rtc_regs[REG_CONTROL] & 0x01)) {
-							m_rtc_regs[REG_CONTROL] |= RTC_CARRY;
-						}
-					}
-				}
-			}
-		}
-	}
+	system_time curtime;
+	machine().current_datetime(curtime);
+
+	m_rtc_regs[0] = curtime.local_time.second;
+	m_rtc_regs[1] = curtime.local_time.minute;
+	m_rtc_regs[2] = curtime.local_time.hour;
+	m_rtc_regs[3] = curtime.local_time.day & 0xff;
+	m_rtc_regs[4] = (m_rtc_regs[4] & 0xf0) | (curtime.local_time.day >> 8);
 }
 
 uint8_t gb_rom_mbc3_device::read_rom(offs_t offset)
@@ -549,66 +512,42 @@ void gb_rom_mbc3_device::write_bank(offs_t offset, uint8_t data)
 			m_rtc_ready = 0;
 		if (m_rtc_ready == 0 && data == 1)
 		{
-			m_latched_regs[REG_SECONDS] = m_rtc_regs[REG_SECONDS];
-			m_latched_regs[REG_MINUTES] = m_rtc_regs[REG_MINUTES];
-			m_latched_regs[REG_HOURS] = m_rtc_regs[REG_HOURS];
-			m_latched_regs[REG_DAYS] = m_rtc_regs[REG_DAYS];
-			m_latched_regs[REG_CONTROL] = m_rtc_regs[REG_CONTROL];
 			m_rtc_ready = 1;
+			update_rtc();
 		}
 	}
 }
 
 uint8_t gb_rom_mbc3_device::read_ram(offs_t offset)
 {
-	if (m_ram_enable)
+	if (m_ram_bank < 4 && m_ram_enable)
 	{
-		if (m_ram_bank < 4 && !m_ram.empty())
-		{
-			// RAM
+		// RAM
+		if (!m_ram.empty())
 			return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
-		}
-		else if (m_ram_bank >= 0x08 && m_ram_bank <= 0x0c && has_timer)
-		{
-			// RTC registers
-			return m_latched_regs[m_ram_bank - 8];
-		}
+	}
+	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
+	{
+		// RTC registers
+		if (has_timer)
+			return m_rtc_regs[m_ram_bank - 8];
 	}
 	return 0xff;
 }
 
 void gb_rom_mbc3_device::write_ram(offs_t offset, uint8_t data)
 {
-	if (m_ram_enable)
+	if (m_ram_bank < 4 && m_ram_enable)
 	{
-		if (m_ram_bank < 4 && !m_ram.empty())
-		{
-			// RAM
+		// RAM
+		if (!m_ram.empty())
 			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
-		}
-		else if (m_ram_bank >= 0x08 && m_ram_bank <= 0x0c && has_timer)
-		{
-			// RTC registers are writeable too
-			uint8_t reg = m_ram_bank - 8;
-			switch(reg)
-			{
-			case REG_SECONDS:
-			case REG_MINUTES:
-				data &= 0x3f;
-				break;
-			case REG_HOURS:
-				data &= 0x1f;
-				break;
-			case REG_CONTROL:
-				data &= 0xc1;
-				break;
-			}
-			m_rtc_regs[reg] = data;
-			if (reg == REG_SECONDS)
-			{
-				m_rtc_ticks = 0;
-			}
-		}
+	}
+	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc && m_ram_enable)
+	{
+		// RTC registers are writeable too
+		if (has_timer)
+			m_rtc_regs[m_ram_bank - 8] = data;
 	}
 }
 
