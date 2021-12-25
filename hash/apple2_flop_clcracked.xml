@@ -46640,4 +46640,93 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="esinttrv">
+		<description>Earth Science: Interplanetary Travel (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Prentice-Hall</publisher>
+		<info name="release" value="2021-12-20"/>
+		<!--"Earth Science: Interplanetary Travel" is a 1986 educational program developed by Edunetics and distributed by Prentice-Hall. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 1.dsk" size="143360" crc="c35d21b7" sha1="8f753832cd892925538de7c21521ff603a83899c"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 2.dsk" size="143360" crc="4d9a25ae" sha1="db26b7f57db6ac98380bccccb4bda1866c09013c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Side 3"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 3.dsk" size="143360" crc="9b0a10a4" sha1="938464be04fd9691c9c72f8711f35c61161e8881"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Side 4"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earth science- interplanetary travel (4am crack) side 4.dsk" size="143360" crc="9abbfa0b" sha1="1f07718a51f685ac5df3eaa88ce99cdd26e8eae2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ifnewton">
+		<description>Isaac Newton and F.I.G. Newton (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Krell Software</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"Isaac Newton and F.I.G. Newton" is a 1981 educational program developed and distributed by Krell Software. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="isaac newton and f.i.g. newton (4am crack).dsk" size="143360" crc="ace8866e" sha1="c8ddb5c2993392cce73ac18cd6456e64be93aeb1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rtrcallwild">
+		<description>Return to Reading: The Call of the Wild (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Media Basics</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"Return to Reading: The Call of the Wild" is a 1983 educational program developed and distributed by Media Basics. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="return to reading- the call of the wild (4am crack).dsk" size="143360" crc="5044a6b5" sha1="58fda8da6d6e459ba5aba446fe412a498cfe4709"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="germhangman">
+		<description>The German Hangman (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"The German Hangman" (a.k.a. "German Practice") is a 1982 educational program developed and distributed by George Earl. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the german hangman (4am crack).dsk" size="143360" crc="8c448486" sha1="221e6db2deee877d86ea41715b1e42603c9ca8a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="legiona">
+		<description>Legionnaire (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>The Avalon Hill Game Company</publisher>
+		<info name="release" value="2021-12-22"/>
+		<!--"Legionnaire" is a 1982 strategy game developed and distributed by The Avalon Hill Game Company. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="legionnaire (4am crack).dsk" size="143360" crc="c470dca5" sha1="fb0f40ac5397c288317806217715405f2a81257c"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
