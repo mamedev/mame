@@ -109,7 +109,7 @@ void nes_turbofile_device::device_reset()
 
 u8 nes_turbofile_device::read_exp(offs_t offset)
 {
-	return offset ? BIT(m_ram[m_addr], m_bit) << 2 : 0;
+	return (offset == 1) ? BIT(m_ram[m_addr], m_bit) << 2 : 0;
 }
 
 //-------------------------------------------------
