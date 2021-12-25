@@ -87,8 +87,8 @@ public:
 		, m_ay1(*this, "ay1")
 		, m_ay2(*this, "ay2")
 		, m_zsu(*this, "zsu")
-		, m_io_keyboard(*this, "X%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -127,13 +127,13 @@ private:
 	void flashman_io(address_map &map);
 	void sklflite_io(address_map &map);
 
-	u8 m_resetcnt = 0;
-	u8 m_resetcnt_a = 0;
-	u8 m_soundlatch = 0;
-	u8 m_port03_old = 0;
-	u8 m_a_irqset = 0;
-	u16 m_a_irqcnt = 0;
-	u8 m_kbdrow = 0;
+	u8 m_resetcnt = 0U;
+	u8 m_resetcnt_a = 0U;
+	u8 m_soundlatch = 0U;
+	u8 m_port03_old = 0U;
+	u8 m_a_irqset = 0U;
+	u16 m_a_irqcnt = 0U;
+	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
 	bool m_disp_sw = 0;
 	virtual void machine_reset() override;

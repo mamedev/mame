@@ -534,6 +534,7 @@ MACHINES["ER2055"] = true
 MACHINES["EXORTERM"] = true
 MACHINES["F3853"] = true
 MACHINES["F4702"] = true
+MACHINES["GLUKRS"] = true
 MACHINES["GT913"] = true
 MACHINES["HD63450"] = true
 MACHINES["HD64610"] = true
@@ -716,6 +717,7 @@ MACHINES["TMS9901"] = true
 MACHINES["TMS9902"] = true
 MACHINES["TMS9914"] = true
 MACHINES["TPI6525"] = true
+MACHINES["TSCONF_DMA"] = true
 MACHINES["TTL7400"] = true
 MACHINES["TTL7404"] = true
 --MACHINES["TSB12LV01A"] = true
@@ -2817,6 +2819,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "kawai")
 files {
+	MAME_DIR .. "src/mame/drivers/kawai_acr20.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_k1.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_k4.cpp",
 	MAME_DIR .. "src/mame/drivers/kawai_k5.cpp",
@@ -3799,6 +3802,9 @@ files {
 	MAME_DIR .. "src/mame/video/zx8301.h",
 	MAME_DIR .. "src/mame/machine/zx8302.cpp",
 	MAME_DIR .. "src/mame/machine/zx8302.h",
+	MAME_DIR .. "src/mame/drivers/tsconf.cpp",
+	MAME_DIR .. "src/mame/includes/tsconf.h",
+	MAME_DIR .. "src/mame/machine/tsconf.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "siemens")
@@ -4473,6 +4479,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/ympsr40.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr60.cpp",
 	MAME_DIR .. "src/mame/drivers/ympsr340.cpp",
+	MAME_DIR .. "src/mame/drivers/ymrx15.cpp",
 	MAME_DIR .. "src/mame/drivers/ymsy35.cpp",
 	MAME_DIR .. "src/mame/drivers/ymtx81z.cpp",
 	MAME_DIR .. "src/mame/drivers/ymvl70.cpp",
@@ -4508,6 +4515,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/aceex.cpp",
 	MAME_DIR .. "src/mame/drivers/adacp150.cpp",
 	MAME_DIR .. "src/mame/drivers/aid80f.cpp",
+	MAME_DIR .. "src/mame/drivers/airbase99.cpp",
 	MAME_DIR .. "src/mame/drivers/alcat7100.cpp",
 	MAME_DIR .. "src/mame/drivers/alesis_qs.cpp",
 	MAME_DIR .. "src/mame/drivers/alfaskop41xx.cpp",

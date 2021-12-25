@@ -42,7 +42,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_digits(*this, "digit%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -57,7 +57,7 @@ private:
 	void audio_mem_map(address_map &map);
 	void audio_io_map(address_map &map);
 
-	u8 m_sndcmd = 0xff;
+	u8 m_sndcmd = 0xffU;
 	u8 m_io[32]{};
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

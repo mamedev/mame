@@ -2,17 +2,30 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /******************************************************************************************************
 
-  PINBALL
-  Juegos Populares
+PINBALL
+Juegos Populares
 
-  All manuals are in Spanish.
-  Schematic has a number of errors and omissions, so referring to PinMAME.
+All manuals are in Spanish.
+Schematic has a number of errors and omissions, so referring to PinMAME.
+
+Games:
+- Petaco (newer hardware)
+- Faeton
+- Halley Comet
+- Aqualand
+- America 1492
+- Olympus
+- Lortium
+- Pimbal (Pinball 3000)
+- Petaco (older hardware) is in peyper.cpp
+
+Status:
+- petaco2,faeton,halley,halleya,aqualand,america,olympus,lortium,pimbal: Playable
+- Pimbal is multiball, so press XY to end a ball.
 
 ToDo:
 - Mechanical sounds
-- Even though nvram is fitted, all credits and scores are lost at reboot
-- Pimbal: outhole not working
-- Petaco: different hardware - manual is very poor copy
+- faeton6d,petacon,petacona: 6-digit displays
 
 *******************************************************************************************************/
 
@@ -37,13 +50,14 @@ public:
 	jp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_soundcpu(*this, "soundcpu")
-		, m_latch(*this, "latch%u", 0)
-		, m_sw(*this, "SW.%u", 0)
+		, m_audiocpu(*this, "audiocpu")
+		, m_latch(*this, "latch%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_msm(*this, "msm")
 		, m_adpcm_select(*this, "adpcm_select")
 		, m_adpcm_bank(*this, "adpcm_bank")
-		, m_digits(*this, "digit%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void jp(machine_config &config);
@@ -54,39 +68,40 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t porta_r();
-	uint8_t portb_r();
-	void out1_w(offs_t offset, uint8_t data);
-	void out2_w(offs_t offset, uint8_t data);
+	u8 porta_r();
+	u8 portb_r();
+	void out1_w(offs_t offset, u8 data);
+	void out2_w(offs_t offset, u8 data);
 	DECLARE_WRITE_LINE_MEMBER(disp_data_w);
 	DECLARE_WRITE_LINE_MEMBER(disp_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(disp_strobe_w);
 	DECLARE_WRITE_LINE_MEMBER(row_w);
-	void sample_bank_w(uint8_t data);
-	void adpcm_reset_w(uint8_t data);
+	void sample_bank_w(u8 data);
+	void adpcm_reset_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(vck_w);
 	IRQ_CALLBACK_MEMBER(sound_int_cb);
 
-	void jp_map(address_map &map);
-	void jp_sound_map(address_map &map);
+	void main_map(address_map &map);
+	void audio_map(address_map &map);
 
 	void update_display();
 
-	uint32_t m_disp_data;
-	bool m_adpcm_ff;
+	u32 m_disp_data = 0U;
+	bool m_adpcm_ff = 0;
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_soundcpu;
+	optional_device<cpu_device> m_audiocpu;
 	required_device_array<ls259_device, 10> m_latch;
-	required_ioport_array<8> m_sw;
+	required_ioport_array<8> m_io_keyboard;
 	optional_device<msm5205_device> m_msm;
 	optional_device<ls157_device> m_adpcm_select;
 	optional_memory_bank m_adpcm_bank;
 	output_finder<100> m_digits;
+	output_finder<80> m_io_outputs;   // 16 solenoids + 64 lamps
 };
 
 
-void jp_state::jp_map(address_map &map)
+void jp_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).mirror(0x1800).ram().share("nvram"); // ram-"5128" battery backed
@@ -97,7 +112,7 @@ void jp_state::jp_map(address_map &map)
 	map(0xc000, 0xc007).mirror(0x1ff8).w(FUNC(jp_state::out2_w));
 }
 
-void jp_state::jp_sound_map(address_map &map)
+void jp_state::audio_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom(); // includes ADPCM data from 0x0400 to 0x3fff
 	map(0x4000, 0x47ff).ram();
@@ -108,7 +123,7 @@ void jp_state::jp_sound_map(address_map &map)
 }
 
 static INPUT_PORTS_START( jp )
-	PORT_START("SW.0")
+	PORT_START("X0")
 	PORT_DIPNAME( 0x01, 0x01, "SW 1")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
@@ -134,7 +149,7 @@ static INPUT_PORTS_START( jp )
 	PORT_DIPSETTING(    0x80, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 
-	PORT_START("SW.1")
+	PORT_START("X1")
 	PORT_DIPNAME( 0x01, 0x01, "SW 10")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
@@ -160,7 +175,7 @@ static INPUT_PORTS_START( jp )
 	PORT_DIPSETTING(    0x80, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 
-	PORT_START("SW.2")
+	PORT_START("X2")
 	PORT_DIPNAME( 0x01, 0x01, "SW A")
 	PORT_DIPSETTING(    0x01, DEF_STR(Off))
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
@@ -175,67 +190,73 @@ static INPUT_PORTS_START( jp )
 	PORT_DIPSETTING(    0x00, DEF_STR(On))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SW.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_START("X3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP30")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP31")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP32")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP33")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP34")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP35")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP36")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP37")
 
-	PORT_START("SW.4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_START("X4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP40")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP41")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP42")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP43")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP44")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP45")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP46")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP47")
 
-	PORT_START("SW.5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP50")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP51")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP52")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP53")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP54")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP55")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP56")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP57")
 
-	PORT_START("SW.6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
+	PORT_START("X6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_SLASH)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP67")
 
-	PORT_START("SW.7")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_QUOTE)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_EQUALS)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSPACE)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_OPENBRACE)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_CLOSEBRACE)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_COLON)
+	PORT_START("X7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP70")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP71")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP72")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP73")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP74")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP75")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP76")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP77")
 INPUT_PORTS_END
 
-void jp_state::out1_w(offs_t offset, uint8_t data)
+void jp_state::out1_w(offs_t offset, u8 data)
 {
-	for (int i = 0; i < 8; i++)
+	for (u8 i = 0; i < 8; i++)
+	{
 		m_latch[i]->write_bit(offset, BIT(data, i));
+		m_io_outputs[i*8U+offset] = BIT(data, i);
+	}
 }
 
-void jp_state::out2_w(offs_t offset, uint8_t data)
+void jp_state::out2_w(offs_t offset, u8 data)
 {
-	for (int i = 0; i < 2; i++)
+	for (u8 i = 0; i < 2; i++)
+	{
 		m_latch[8 + i]->write_bit(offset, BIT(data, i));
+		m_io_outputs[64U+i*8U+offset] = BIT(data, i);
+	}
 }
 
 WRITE_LINE_MEMBER(jp_state::row_w)
@@ -265,7 +286,7 @@ WRITE_LINE_MEMBER(jp_state::disp_strobe_w)
 
 void jp_state::update_display()
 {
-	uint8_t segment, t = (m_disp_data >> 24) & 15;
+	u8 segment, t = (m_disp_data >> 24) & 15;
 	if (t == 8)
 	{ // ball number
 		segment = m_disp_data >> 6;
@@ -278,7 +299,7 @@ void jp_state::update_display()
 		else
 			segment = 1 << (6-t);
 
-		for (int i = 0; i < 32; i++)
+		for (u8 i = 0; i < 32; i++)
 			if (BIT(m_disp_data, i))
 				m_digits[i] = m_digits[i] & ~segment;
 			else
@@ -286,31 +307,31 @@ void jp_state::update_display()
 	}
 }
 
-uint8_t jp_state::porta_r()
+u8 jp_state::porta_r()
 {
-	uint8_t result = 0xff;
+	u8 result = 0xff;
 	if (m_latch[3]->q1_r() == 0)
-		result &= m_sw[1]->read();
+		result &= m_io_keyboard[1]->read();
 	if (m_latch[4]->q1_r() == 0)
-		result &= m_sw[7]->read();
+		result &= m_io_keyboard[7]->read();
 	if (m_latch[7]->q1_r() == 0)
-		result &= m_sw[2]->read();
+		result &= m_io_keyboard[2]->read();
 	return result;
 }
 
-uint8_t jp_state::portb_r()
+u8 jp_state::portb_r()
 {
-	uint8_t result = 0xff;
+	u8 result = 0xff;
 	if (m_latch[3]->q1_r() == 0)
-		result &= m_sw[0]->read();
+		result &= m_io_keyboard[0]->read();
 	if (m_latch[4]->q1_r() == 0)
-		result &= m_sw[3]->read();
+		result &= m_io_keyboard[3]->read();
 	if (m_latch[5]->q1_r() == 0)
-		result &= m_sw[4]->read();
+		result &= m_io_keyboard[4]->read();
 	if (m_latch[6]->q1_r() == 0)
-		result &= m_sw[5]->read();
+		result &= m_io_keyboard[5]->read();
 	if (m_latch[7]->q1_r() == 0)
-		result &= m_sw[6]->read();
+		result &= m_io_keyboard[6]->read();
 	return result;
 }
 
@@ -319,6 +340,7 @@ void jp_state::machine_start()
 	genpin_class::machine_start();
 
 	m_digits.resolve();
+	m_io_outputs.resolve();
 
 	if (m_adpcm_bank.found())
 		m_adpcm_bank->configure_entries(0, 16, memregion("sound1")->base(), 0x8000);
@@ -333,6 +355,8 @@ void jp_state::machine_start()
 void jp_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 
 	//m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	m_digits[96] = 0x3f;
@@ -346,7 +370,7 @@ void jp_state::jp(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jp_state::jp_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jp_state::main_map);
 	m_maincpu->set_periodic_int(FUNC(jp_state::irq0_line_hold), attotime::from_hz(8_MHz_XTAL / 8192)); // 4020 divider
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -391,12 +415,12 @@ void jp_state::jp(machine_config &config)
 	ay.add_route(ALL_OUTPUTS, "ayvol", 0.9);
 }
 
-void jp_state::sample_bank_w(uint8_t data)
+void jp_state::sample_bank_w(u8 data)
 {
 	m_adpcm_bank->set_entry(data & 15);
 }
 
-void jp_state::adpcm_reset_w(uint8_t data)
+void jp_state::adpcm_reset_w(u8 data)
 {
 	m_msm->reset_w(BIT(data, 0));
 }
@@ -408,22 +432,22 @@ WRITE_LINE_MEMBER(jp_state::vck_w)
 		m_adpcm_ff = !m_adpcm_ff;
 		m_adpcm_select->select_w(m_adpcm_ff);
 		if (m_adpcm_ff)
-			m_soundcpu->set_input_line(0, ASSERT_LINE);
+			m_audiocpu->set_input_line(0, ASSERT_LINE);
 	}
 }
 
 IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 {
-	m_soundcpu->set_input_line(0, CLEAR_LINE);
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
 	return 0xff;
 }
 
 void jp_state::jps(machine_config &config)
 {
 	jp(config);
-	Z80(config, m_soundcpu, 8_MHz_XTAL / 2);
-	m_soundcpu->set_addrmap(AS_PROGRAM, &jp_state::jp_sound_map);
-	m_soundcpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
+	Z80(config, m_audiocpu, 8_MHz_XTAL / 2);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &jp_state::audio_map);
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(jp_state::sound_int_cb));
 
 	LS157(config, m_adpcm_select, 0); // not labeled in manual; might even be a CD4019
 	m_adpcm_select->out_callback().set("msm", FUNC(msm5205_device::data_w));
@@ -434,7 +458,7 @@ void jp_state::jps(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B); // unknown
 	m_msm->add_route(ALL_OUTPUTS, "msmvol", 1.0);
 
-	m_latch[9]->q_out_cb<5>().set_inputline("soundcpu", INPUT_LINE_NMI); // only external input for sound board
+	m_latch[9]->q_out_cb<5>().set_inputline("audiocpu", INPUT_LINE_NMI); // only external input for sound board
 }
 
 /*-------------------------------------------------------------------
@@ -444,7 +468,7 @@ ROM_START(america)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("cpvi1492.dat", 0x0000, 0x2000, CRC(e1d3bd57) SHA1(049c17cd717404e58339100ab8efd4d6bf8ee791))
 
-	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("sbvi1492.dat", 0x0000, 0x4000, CRC(38934e06) SHA1(eef850a5096a7436b728921aed22fe5f3d85b4ee))
 
 	ROM_REGION(0x80000, "sound1", 0)
@@ -464,7 +488,7 @@ ROM_START(aqualand)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("jpaqcpu", 0x0000, 0x2000, CRC(53230fab) SHA1(0b049f3be412be598982537e7fa7abf9b2766a16))
 
-	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("jpaqsds", 0x0000, 0x4000, CRC(ff1e0cd2) SHA1(ef58d2b59929c7250dd30c413a3ba31ebfd7e09d))
 
 	ROM_REGION(0x80000, "sound1", 0)
@@ -504,7 +528,7 @@ ROM_START(halley)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("halley.cpu", 0x0000, 0x2000, CRC(b158a0d7) SHA1(ad071ac3d06a99a8fbd4df461071fe03dc1e1a26))
 
-	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("hc_sh", 0x0000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
 
 	ROM_REGION(0x80000, "sound1", 0)
@@ -530,7 +554,7 @@ ROM_START(halleya)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("hc_pgm", 0x0000, 0x2000, CRC(dc5eaa8f) SHA1(2f3af60ba5439f67e9c69de543167ac31abc09f1))
 
-	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("hc_sh", 0x0000, 0x4000, CRC(8af15ded) SHA1(2abc199b612df6180dc116f56ec0027dacf30e77))
 
 	ROM_REGION(0x80000, "sound1", 0)
@@ -577,7 +601,7 @@ ROM_START(olympus)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("olympus.dat", 0x0000, 0x2000, CRC(08b021e8) SHA1(9662d37ccef94b6e6bc3c8c81dea0c0a34c8052d))
 
-	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("cs.128", 0x0000, 0x4000, CRC(39b9107a) SHA1(8a11fa0c1558d0b1d309446b8a6f97e761b6559d))
 
 	ROM_REGION(0x80000, "sound1", 0)
@@ -588,15 +612,6 @@ ROM_START(olympus)
 	ROM_LOAD("c5.256", 0x20000, 0x8000, CRC(402a3fb2) SHA1(1c078ca519271bf2bcbe0bc10e33078861085fcf))
 	ROM_LOAD("c6.256", 0x28000, 0x8000, CRC(d113add1) SHA1(c0258226994af162ef766d5e8d27f809dac4ef7f))
 	ROM_LOAD("c7.256", 0x30000, 0x8000, CRC(13f5fcad) SHA1(e7a8b76527067f16aa62d0f22eccde5b55eba972))
-ROM_END
-
-/*-------------------------------------------------------------------
-/ Petaco #1101
-/-------------------------------------------------------------------*/
-ROM_START(petaco)
-	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("petaco1.cpu", 0x0000, 0x2000, CRC(f4e09939) SHA1(dcc4220b269d271eb0b6ad0a5d3c1a240587a01b))
-	ROM_LOAD("petaco2.cpu", 0x2000, 0x2000, CRC(d29a59ea) SHA1(bb7891e9597bbf5ae6a3276abf2b1247e082d828))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -619,7 +634,7 @@ ROM_START(petaco2)
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD("petaco2.dat", 0x0000, 0x2000, CRC(9a3d6409) SHA1(bca061e254c3214b940080c92d2cf88904f1b81c))
 
-	ROM_REGION(0x4000, "soundcpu", 0)
+	ROM_REGION(0x4000, "audiocpu", 0)
 	ROM_LOAD("jpsonid0.dat", 0x0000, 0x4000, CRC(1bdbdd60) SHA1(903012e58cdb4041e5546a377f5c9df83dc93737))
 
 	ROM_REGION(0x80000, "sound1", 0)
@@ -634,20 +649,18 @@ ROM_END
 
 } // Anonymous namespace
 
+// 6-digit display - not working
+GAME(1985,  petacon,  0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  petacona, 0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  faeton6d, faeton, jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
 
-// different hardware
-GAME(1984,  petaco,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco",                               MACHINE_IS_SKELETON_MECHANICAL)
-
-// mostly ok
-GAME(1985,  petacon,  0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1985,  petacona, 0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco (new hardware, alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1985,  petaco2,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1985,  faeton,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1985,  faeton6d, faeton, jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (6 digits)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  halley,   0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  halleya,  halley, jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  aqualand, 0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  america,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1986,  olympus,  0,      jps, jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1987,  lortium,  0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(19??,  pimbal,   0,      jp,  jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL)
+// 7-digit display - working
+GAME(1985,  petaco2,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Petaco 2",                             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1985,  faeton,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Faeton (7 digits)",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  halley,   0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  halleya,  halley, jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Halley Comet (alternate version)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  aqualand, 0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Aqualand",                             MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  america,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "America 1492",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1986,  olympus,  0,      jps,    jp, jp_state, empty_init, ROT0, "Juegos Populares", "Olympus (Juegos Populares)",           MACHINE_IS_SKELETON_MECHANICAL )
+GAME(1987,  lortium,  0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Lortium",                              MACHINE_IS_SKELETON_MECHANICAL )
+GAME(19??,  pimbal,   0,      jp,     jp, jp_state, empty_init, ROT0, "Juegos Populares", "Pimbal (Pinball 3000)",                MACHINE_IS_SKELETON_MECHANICAL )

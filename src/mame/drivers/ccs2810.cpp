@@ -131,10 +131,10 @@ protected:
 	void port04_w(u8 data);
 	void port34_w(u8 data);
 
-	bool m_ss;
-	bool m_dden;
-	bool m_dsize;
-	u8 m_ds;
+	bool m_ss = 0;
+	bool m_dden = 0;
+	bool m_dsize = 0;
+	u8 m_ds = 0U;
 	floppy_image_device *m_floppy;
 
 	required_device<z80_device> m_maincpu;
@@ -161,7 +161,7 @@ private:
 	void ccs2810_io(address_map &map);
 	void ccs2810_mem(address_map &map);
 
-	u8 m_power_on_status;
+	u8 m_power_on_status = 0U;
 };
 
 class ccs300_state : public ccs_state

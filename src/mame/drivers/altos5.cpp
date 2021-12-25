@@ -69,10 +69,10 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_port08;
-	uint8_t m_port09;
-	bool m_ipl;
-	offs_t m_curr_bank;
+	uint8_t m_port08 = 0U;
+	uint8_t m_port09 = 0U;
+	bool m_ipl = 0;
+	offs_t m_curr_bank = 0;
 	floppy_image_device *m_floppy;
 	std::unique_ptr<u8[]> m_ram;  // main ram 192k
 	std::unique_ptr<u8[]> m_dummy;  // for wrpt

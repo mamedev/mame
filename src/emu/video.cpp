@@ -1129,7 +1129,7 @@ std::error_condition video_manager::open_next(emu_file &file, const char *extens
 
 	if (pos_time != -1)
 	{
-		char t_str[15];
+		char t_str[16];
 		const std::time_t cur_time = std::time(nullptr);
 		strftime(t_str, sizeof(t_str), "%Y%m%d_%H%M%S", std::localtime(&cur_time));
 		strreplace(snapstr, "%t", t_str);

@@ -29,7 +29,13 @@
 
 #include "emu.h"
 #include "grafex.h"
+
+#include "video/upd7220.h"
+
 #include "screen.h"
+
+
+namespace {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -62,12 +68,6 @@ private:
 
 	rgb_t m_bg, m_fg;
 };
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_GRAFEX, a2bus_grafex_device, "a2grafex", "Grafex-32")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -132,3 +132,12 @@ UPD7220_DISPLAY_PIXELS_MEMBER(a2bus_grafex_device::hgdc_display_pixels )
 		bitmap.pix(y, x + i) = BIT(gfx, i) ? m_fg : m_bg;
 	}
 }
+
+} // anonymous namespace
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_GRAFEX, device_a2bus_card_interface, a2bus_grafex_device, "a2grafex", "Grafex-32")

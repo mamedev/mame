@@ -250,7 +250,7 @@ void igt_gameking_state::igt_gameking_map(address_map &map)
 	map(0x28010030, 0x28010033).r(FUNC(igt_gameking_state::uart_status_r)); // channel D
 	map(0x28010034, 0x28010037).w(FUNC(igt_gameking_state::uart_w));       // channel D
 	map(0x28020000, 0x280205ff).flags(i960_cpu_device::BURST).ram();	   // CMOS?
-																		   //  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
+//  map(0x28020000, 0x2802007f).r(FUNC(igt_gameking_state::igt_gk_28010008_r)).nopw();
 	map(0x28030000, 0x28030003).portr("IN0");
 //  map(0x28040000, 0x2804007f).rw("quart2", FUNC(sc28c94_device::read), FUNC(sc28c94_device::write)).umask32(0x00ff00ff);
 	map(0x2804000a, 0x2804000a).w(FUNC(igt_gameking_state::unk_w));

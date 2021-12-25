@@ -54,8 +54,8 @@ public:
 		, m_hcpu(*this, "hcpu")
 		, m_shared_ram(*this, "sharedram")
 		, m_io_keyboard(*this, "X%d", 0U)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void wico(machine_config &config);
@@ -77,12 +77,12 @@ private:
 	void ccpu_map(address_map &map);
 	void hcpu_map(address_map &map);
 
-	bool m_zcen;
-	bool m_gten;
-	bool m_disp_on;
-	bool m_diag_on;
-	u8 m_firqtimer;
-	u8 m_diag_segments;
+	bool m_zcen = 0;
+	bool m_gten = 0;
+	bool m_disp_on = 0;
+	bool m_diag_on = 0;
+	u8 m_firqtimer = 0U;
+	u8 m_diag_segments = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_ccpu;

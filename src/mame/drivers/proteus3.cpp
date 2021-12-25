@@ -112,11 +112,11 @@ private:
 
 	void mem_map(address_map &map);
 
-	u8 m_video_data;
-	u8 m_flashcnt;
-	u16 m_curs_pos;
-	u8 m_cass_data[4];
-	bool m_cassbit, m_cassold, m_cassinbit;
+	u8 m_video_data = 0U;
+	u8 m_flashcnt = 0U;
+	u16 m_curs_pos = 0U;
+	u8 m_cass_data[4]{};
+	bool m_cassbit = 0, m_cassold = 0, m_cassinbit = 0;
 	std::unique_ptr<u8[]> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_p_chargen;

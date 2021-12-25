@@ -69,8 +69,8 @@ private:
 	void maincpu_io(address_map &map);
 	void maincpu_map(address_map &map);
 	u8 m_segment[5]{};
-	u8 m_game = 0;
-	u8 m_row = 0;
+	u8 m_game = 0U;
+	u8 m_row = 0U;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

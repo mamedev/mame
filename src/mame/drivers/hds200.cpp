@@ -31,14 +31,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "machine/hds200_kbd.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/z80dma.h"
 #include "video/scn2674.h"
-#include "bus/rs232/rs232.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -53,8 +56,8 @@ namespace {
 class hds200_state : public driver_device
 {
 public:
-	hds200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hds200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dma(*this, "dma"),
 		m_screen(*this, "screen"),
@@ -173,10 +176,10 @@ SCN2674_DRAW_CHARACTER_MEMBER( hds200_state::draw_character )
 	// ------1-  unknown
 	// -------0  unknown
 
-	if (ul && (BIT(attrcode, 4)))
+	if (ul && BIT(attrcode, 4))
 		data = 0x1ff;
 
-	if (blink && (BIT(attrcode, 3)))
+	if (blink && BIT(attrcode, 3))
 		data = 0x000;
 
 	// invert

@@ -3902,6 +3902,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SKROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="hsp-46-1 prg" size="131072" crc="9c94a0ec" sha1="f5650471a1b3121e7bab77df2399cce157c1d91c" offset="00000" />
 			</dataarea>
@@ -3976,6 +3977,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-36-0 prg" size="262144" crc="974e8840" sha1="8f228f38437423388a2e0860c05b1798e20cfe95" offset="00000" />
 			</dataarea>
@@ -4000,6 +4002,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SNROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-33-0 prg" size="262144" crc="c2ef3422" sha1="ce103fe6971e2f97b82f13b8011c592039f46265" offset="00000" />
 			</dataarea>
@@ -4024,6 +4027,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SXROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="hsp-bs-1 prg" size="262144" crc="c3de7c69" sha1="e847474c0576d394125245695d7e3a49d66f7956" offset="00000" />
 			</dataarea>
@@ -6000,6 +6004,7 @@ license:CC0
 			<feature name="slot" value="cnrom" />
 			<feature name="pcb" value="HVC-CNROM" />
 			<feature name="mirroring" value="vertical" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="32768">
 				<rom name="hsp-05-0 prg" size="32768" crc="9fa1c11f" sha1="099b3b7e1b3f335abcd29cd3aa013894d745beb2" offset="00000" />
 			</dataarea>
@@ -9559,6 +9564,7 @@ license:CC0
 			<feature name="slot" value="txrom" />
 			<feature name="pcb" value="HVC-TLROM" />
 			<feature name="mmc3_type" value="MMC3A" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="tjc-dn-0 prg" size="131072" crc="728c3d98" sha1="dd6069c0827d60682bc97723750946ce89ab4630" offset="00000" />
 			</dataarea>
@@ -16966,7 +16972,7 @@ license:CC0
 		<publisher>Irem</publisher>
 		<info name="serial" value="IF-12"/>
 		<info name="release" value="19890428"/>
-		<info name="alt_title" value="ホーリーダイヴァー"/>
+		<info name="alt_title" value="ホーリー・ダイヴァー"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="holydivr" />
 			<feature name="pcb" value="IREM-HOLYDIVER" />
@@ -24577,10 +24583,10 @@ license:CC0
 
 	<software name="metroidu" cloneof="metroid">
 		<description>Metroid (USA)</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MT-USA"/>
-		<info name="release" value="198608xx"/>
+		<info name="release" value="198708xx"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SNROM" />
@@ -25708,6 +25714,7 @@ license:CC0
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="HVC-SLROM" />
 			<feature name="mmc1_type" value="MMC1B2" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="sfl-zm-0 prg" size="131072" crc="ea79cc19" sha1="682ce64b60645d5d76bd15deeb254ae8f7537015" offset="00000" />
 			</dataarea>
@@ -45116,6 +45123,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="131072">
 				<rom name="best keiba - derby stallion (japan).prg" size="131072" crc="41482da3" sha1="7545769a31a1623b6947ec412dda569aae9190f2" offset="00000" status="baddump" />
 			</dataarea>
@@ -45139,6 +45147,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="prg" size="262144">
 				<rom name="best play pro yakyuu special (japan).prg" size="262144" crc="b8747abf" sha1="340f507cfc3f3827ee0b7269814e08d634b807f4" offset="00000" status="baddump" />
 			</dataarea>
@@ -46605,6 +46614,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SLROM" />
+			<feature name="peripheral" value="turbofile" />
 			<dataarea name="chr" size="131072">
 				<rom name="famicom shougi - ryuuousen (japan).chr" size="131072" crc="30989ad9" sha1="6d96e346713547af01adea39751327f8b924e41d" offset="00000" status="baddump" />
 			</dataarea>
@@ -47252,6 +47262,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="hokuto no ken (japan) (beta).prg" size="32768" crc="48d83fb0" sha1="43b6e926ddfbdce0468e89e2a0b96c412d9f0d26" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="holydivrce" cloneof="holydivr">
+		<description>Holy Diver Collector's Edition</description>
+		<year>2018</year>
+		<publisher>retro-bit</publisher>
+		<info name="alt_title" value="ホーリー・ダイヴァー"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="smd133" />
+			<feature name="smd133-addr" value="6K" />
+			<dataarea name="prg" size="524288">
+				<rom name="holy diver (2018).prg" size="524288" crc="b14969c8" sha1="500e06626c2c59acd319d2a287daf23916cfa95e" status="baddump" /> <!-- TODO: is there missing undumped, albeit unused, data on the cartridge? -->
+			</dataarea>
+			<!-- 128k VRAM on cartridge -->
+			<dataarea name="vram" size="131072">
 			</dataarea>
 		</part>
 	</software>

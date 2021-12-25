@@ -126,9 +126,9 @@ private:
 	void mem_map(address_map &map);
 
 	virtual void machine_start() override;
-	int m_centronics_busy;
-	int m_centronics_ack;
-	bool m_cass_state;
+	int m_centronics_busy = 0;
+	int m_centronics_ack = 0;
+	bool m_cass_state = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<centronics_device> m_centronics;
 	required_device<cassette_image_device> m_cass;

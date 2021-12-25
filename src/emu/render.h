@@ -586,7 +586,7 @@ private:
 	std::pair<float, float> map_point_internal(s32 target_x, s32 target_y);
 
 	// config callbacks
-	void config_load(util::xml::data_node const &targetnode);
+	void config_load(util::xml::data_node const *targetnode);
 	bool config_save(util::xml::data_node &targetnode);
 
 	// view lookups

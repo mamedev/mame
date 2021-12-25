@@ -35,6 +35,7 @@ agat.cpp
 aid80f.cpp
 aim65.cpp
 aim65_40.cpp
+airbase99.cpp
 akaiax80.cpp
 akaivx600.cpp
 alcat7100.cpp
@@ -502,6 +503,7 @@ jupiter.cpp
 k1003.cpp
 k28.cpp
 k8915.cpp
+kawai_acr20.cpp
 kawai_k1.cpp
 kawai_k4.cpp
 kawai_k5.cpp
@@ -1101,6 +1103,7 @@ ts3000.cpp
 ts802.cpp
 ts803.cpp
 ts816.cpp
+tsconf.cpp
 tsispch.cpp
 tulip1.cpp
 tutor.cpp
@@ -1210,6 +1213,7 @@ ympsr16.cpp
 ympsr40.cpp
 ympsr60.cpp
 ympsr340.cpp
+ymrx15.cpp
 ymsy35.cpp
 ymtx81z.cpp
 ymvl70.cpp

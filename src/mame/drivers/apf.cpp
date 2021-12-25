@@ -117,8 +117,8 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
-		, m_joy(*this, "joy.%u", 0)
-		, m_key(*this, "key.%u", 0)
+		, m_joy(*this, "joy.%u", 0U)
+		, m_key(*this, "key.%u", 0U)
 		, m_p_videoram(*this, "videoram")
 	{ }
 
@@ -144,12 +144,12 @@ private:
 	void apfimag_map(address_map &map);
 	void apfm1000_map(address_map &map);
 
-	uint8_t m_latch;
-	uint8_t m_keyboard_data;
-	uint8_t m_pad_data;
-	uint8_t m_portb;
-	bool m_ca2;
-	bool m_has_cart_ram;
+	uint8_t m_latch = 0U;
+	uint8_t m_keyboard_data = 0U;
+	uint8_t m_pad_data = 0U;
+	uint8_t m_portb = 0U;
+	bool m_ca2 = 0;
+	bool m_has_cart_ram = 0;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<ram_device> m_ram;
 	required_device<mc6847_base_device> m_crtc;
