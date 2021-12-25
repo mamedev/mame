@@ -106,7 +106,7 @@ void nes_mjpanel_device::device_start()
 u8 nes_mjpanel_device::read_exp(offs_t offset)
 {
 	u8 ret = 0;
-	if (offset)    // $4017
+	if (offset == 1)    // $4017
 	{
 		if (m_strobe)
 			set_latch();
