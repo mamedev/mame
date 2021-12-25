@@ -46,7 +46,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_term_data;
+	u8 m_term_data = 0U;
 	void machine_reset() override;
 	void machine_start() override;
 	memory_passthrough_handler *m_rom_shadow_tap;

@@ -663,11 +663,6 @@ void nes_bmc_80013b_device::pcb_reset()
 	update_prg();
 }
 
-void nes_bmc_810544c_device::device_start()
-{
-	common_start();
-}
-
 void nes_bmc_810544c_device::pcb_reset()
 {
 	prg16_89ab(0);
@@ -1628,9 +1623,9 @@ void nes_bmc_80013b_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- BMC-810544-C-A1
+ BMC-810544-C-A1, NTDEC 2746
 
- Games: 200-in-1 Elfland
+ Games: 200-in-1 Elfland, 14 in 1
 
  NES 2.0: mapper 261
 
@@ -1640,20 +1635,15 @@ void nes_bmc_80013b_device::write_h(offs_t offset, u8 data)
 
 void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 {
-	u8 bank = (offset >> 7);
 	LOG_MMC(("bmc_810544c write_h, offset: %04x, data: %02x\n", offset, data));
 
-	if (!BIT(offset, 6))
-	{
-		prg16_89ab((bank << 1) | BIT(offset, 5));
-		prg16_cdef((bank << 1) | BIT(offset, 5));
-	}
-	else
-		prg32(bank);
-
-	set_nt_mirroring(BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	u8 bank = bitswap<4>(offset, 9, 8, 7, 5);
+	u8 mode = BIT(offset, 6);
+	prg16_89ab(bank & ~mode);
+	prg16_cdef(bank | mode);
 
 	chr8(offset & 0x0f, CHRROM);
+	set_nt_mirroring(BIT(offset, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------

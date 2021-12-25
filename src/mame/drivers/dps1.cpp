@@ -61,8 +61,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	bool m_dma_dir;
-	u16 m_dma_adr;
+	bool m_dma_dir = 0;
+	u16 m_dma_adr = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
 	required_shared_ptr<u8> m_ram;

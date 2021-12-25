@@ -46,8 +46,8 @@ public:
 		, m_ic2(*this, "ic2")
 		, m_dac(*this, "dac")
 		, m_io_test(*this, "TEST")
-		, m_io_x(*this, { "X0", "X1", "X2", "X3", "X4", "DSW0", "DSW1", "DSW2" })
-		, m_digits(*this, "digit%u%u", 0U, 0U)
+		, m_io_keyboard(*this, { "X0", "X1", "X2", "X3", "X4", "DSW0", "DSW1", "DSW2" })
+		, m_digits(*this, "digit%d%d", 0U, 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -80,19 +80,19 @@ private:
 
 	bool m_timer_sb = 0;
 	u8 m_timer_s[3]{};
-	u8 m_vol = 0;
-	u8 m_ic2a = 0;
-	u8 m_ic2b = 0;
-	u8 m_ic10a = 0;
-	u8 m_ic10b = 0;
-	u8 m_ic11a = 0;
+	u8 m_vol = 0U;
+	u8 m_ic2a = 0U;
+	u8 m_ic2b = 0U;
+	u8 m_ic10a = 0U;
+	u8 m_ic10b = 0U;
+	u8 m_ic11a = 0U;
 	bool m_ic11_ca2 = 0;
 	bool m_ic11_cb2 = 0;
 	bool m_ic10_cb2 = 0;
 	bool m_ic2_ca2 = 0;
 	bool m_ic2_cb2 = 0;
-	u8 m_counter = 0;
-	u8 m_digit = 0;
+	u8 m_counter = 0U;
+	u8 m_digit = 0U;
 	u8 m_segment[5]{};
 
 	required_region_ptr<u8> m_p_prom;
@@ -103,7 +103,7 @@ private:
 	required_device<pia6821_device> m_ic2;
 	required_device<dac_4bit_r2r_device> m_dac;
 	required_ioport m_io_test;
-	required_ioport_array<8> m_io_x;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<5, 6> m_digits;
 	output_finder<96> m_io_outputs;   // 32 solenoids + 64 lamps
 };
@@ -368,7 +368,7 @@ u8 hankin_state::ic11_b_r()
 	for (unsigned i = 0U; i < 8U; ++i)
 	{
 		if (BIT(m_ic11a, i))
-			data |= m_io_x[i]->read();
+			data |= m_io_keyboard[i]->read();
 	}
 
 	return data;

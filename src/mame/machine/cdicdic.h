@@ -32,7 +32,6 @@ TODO:
 #include "sound/dmadac.h"
 #include "cdrom.h"
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -53,7 +52,6 @@ public:
 
 	// non-static internal members
 	void sample_trigger();
-	void process_delayed_command();
 
 	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -69,51 +67,86 @@ protected:
 	virtual void device_reset() override;
 
 	// internal callbacks
-	TIMER_CALLBACK_MEMBER( periodic_sample_trigger );
-	TIMER_CALLBACK_MEMBER( audio_sample_trigger );
-	TIMER_CALLBACK_MEMBER( initial_sample_trigger );
-	TIMER_CALLBACK_MEMBER( trigger_readback_int );
+	TIMER_CALLBACK_MEMBER(sector_tick);
+	TIMER_CALLBACK_MEMBER(audio_tick);
 
 private:
-	enum
+	enum : uint8_t
 	{
-		CDIC_SECTOR_SYNC        = 0,
-
-		CDIC_SECTOR_HEADER      = 12,
-
-		CDIC_SECTOR_MODE        = 15,
-
-		CDIC_SECTOR_FILE1       = 16,
-		CDIC_SECTOR_CHAN1       = 17,
-		CDIC_SECTOR_SUBMODE1    = 18,
-		CDIC_SECTOR_CODING1     = 19,
-
-		CDIC_SECTOR_FILE2       = 20,
-		CDIC_SECTOR_CHAN2       = 21,
-		CDIC_SECTOR_SUBMODE2    = 22,
-		CDIC_SECTOR_CODING2     = 23,
-
-		CDIC_SECTOR_DATA        = 24,
-
-		CDIC_SECTOR_SIZE        = 2352,
-
-		CDIC_SECTOR_DATASIZE    = 2048,
-		CDIC_SECTOR_AUDIOSIZE   = 2304,
-		CDIC_SECTOR_VIDEOSIZE   = 2324,
-
-		CDIC_SUBMODE_EOF        = 0x80,
-		CDIC_SUBMODE_RT         = 0x40,
-		CDIC_SUBMODE_FORM       = 0x20,
-		CDIC_SUBMODE_TRIG       = 0x10,
-		CDIC_SUBMODE_DATA       = 0x08,
-		CDIC_SUBMODE_AUDIO      = 0x04,
-		CDIC_SUBMODE_VIDEO      = 0x02,
-		CDIC_SUBMODE_EOR        = 0x01
+		DISC_NONE,
+		DISC_MODE1,
+		DISC_MODE2,
+		DISC_CDDA,
+		DISC_TOC
 	};
 
-	int is_valid_sample_buf(uint16_t addr) const;
-	double sample_buf_freq(uint16_t addr) const;
-	int sample_buf_size(uint16_t addr) const;
+	enum
+	{
+		SECTOR_SYNC        = 0,
+
+		SECTOR_HEADER      = 12,
+
+		SECTOR_MODE        = 15,
+
+		SECTOR_FILE1       = 16,
+		SECTOR_CHAN1       = 17,
+		SECTOR_SUBMODE1    = 18,
+		SECTOR_CODING1     = 19,
+
+		SECTOR_FILE2       = 20,
+		SECTOR_CHAN2       = 21,
+		SECTOR_SUBMODE2    = 22,
+		SECTOR_CODING2     = 23,
+
+		SECTOR_DATA        = 24,
+
+		SECTOR_SIZE        = 2352,
+		SECTOR_AUDIO_SIZE  = 2304,
+
+		SECTOR_DATASIZE    = 2048,
+		SECTOR_AUDIOSIZE   = 2304,
+		SECTOR_VIDEOSIZE   = 2324,
+
+		SUBMODE_EOF        = 0x80,
+		SUBMODE_RT         = 0x40,
+		SUBMODE_FORM       = 0x20,
+		SUBMODE_TRIG       = 0x10,
+		SUBMODE_DATA       = 0x08,
+		SUBMODE_AUDIO      = 0x04,
+		SUBMODE_VIDEO      = 0x02,
+		SUBMODE_EOR        = 0x01,
+
+		CODING_BPS_MASK    = 0x30,
+		CODING_4BPS        = 0x00,
+		CODING_8BPS        = 0x10,
+		CODING_16BPS       = 0x20,
+		CODING_BPS_MPEG    = 0x30,
+
+		CODING_RATE_MASK   = 0x0c,
+		CODING_37KHZ       = 0x00,
+		CODING_18KHZ       = 0x04,
+		CODING_RATE_RESV   = 0x08,
+		CODING_44KHZ       = 0x0c,
+
+		CODING_CHAN_MASK   = 0x03,
+		CODING_MONO        = 0x00,
+		CODING_STEREO      = 0x01,
+		CODING_CHAN_RESV   = 0x02,
+		CODING_CHAN_MPEG   = 0x03,
+
+		SUBCODE_Q_CONTROL       = 12,
+		SUBCODE_Q_TRACK         = 13,
+		SUBCODE_Q_INDEX         = 14,
+		SUBCODE_Q_MODE1_MINS    = 15,
+		SUBCODE_Q_MODE1_SECS    = 16,
+		SUBCODE_Q_MODE1_FRAC    = 17,
+		SUBCODE_Q_MODE1_ZERO    = 18,
+		SUBCODE_Q_MODE1_AMINS   = 19,
+		SUBCODE_Q_MODE1_ASECS   = 20,
+		SUBCODE_Q_MODE1_AFRAC   = 21,
+		SUBCODE_Q_CRC0          = 22,
+		SUBCODE_Q_CRC1          = 23
+	};
 
 	devcb_write_line m_intreq_callback;
 
@@ -139,36 +172,53 @@ private:
 	uint16_t m_interrupt_vector;  // CDIC Interrupt Vector Register   (0x303ffc)
 	uint16_t m_data_buffer;       // CDIC Data Buffer Register        (0x303ffe)
 
-	emu_timer *m_interrupt_timer;
 	cdrom_file *m_cd;
 
-	emu_timer *m_audio_sample_timer;
-	emu_timer *m_audio_playback_timer;
-	emu_timer *m_periodic_sample_timer[2];
-	int32_t m_audio_sample_freq;
-	int32_t m_audio_sample_size;
+	emu_timer *m_sector_timer;
+	uint8_t m_disc_command;
+	uint8_t m_disc_mode;
+	uint8_t m_disc_spinup_counter;
+	uint32_t m_curr_lba;
 
+	emu_timer *m_audio_timer;
+	uint8_t m_audio_sector_counter;
+	uint8_t m_audio_format_sectors;
+	bool m_decoding_audio_map;
 	uint16_t m_decode_addr;
-	uint8_t m_decode_delay;
-	attotime m_decode_period;
-	bool m_break_on_achan;
-	bool m_valid_audio_sample;
 
-	int m_xa_last[4];
-	std::unique_ptr<uint16_t[]> m_ram;
+	int16_t m_xa_last[4];
+	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<int16_t[]> m_samples[2];
 
-	static void decode_xa_mono(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
-	static void decode_xa_mono8(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
-	static void decode_xa_stereo(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
-	static void decode_xa_stereo8(int32_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
+	void decode_8bit_xa_unit(int channel, uint8_t param, const uint8_t *data, int16_t *out_buffer);
+	void decode_4bit_xa_unit(int channel, uint8_t param, const uint8_t *data, uint8_t shift, int16_t *out_buffer);
+	void play_raw_group(const uint8_t *data);
+	void play_xa_group(const uint8_t coding, const uint8_t *data);
+	void play_audio_sector(const uint8_t coding, const uint8_t *data);
+	void process_audio_map();
 
-	static const int32_t s_cdic_adpcm_filter_coef[5][2];
+	bool is_mode2_sector_selected(const uint8_t *buffer);
+	bool is_mode2_audio_selected(const uint8_t *buffer);
 
-	uint32_t increment_cdda_frame_bcd(uint32_t bcd);
-	uint32_t increment_cdda_sector_bcd(uint32_t bcd);
-	void decode_audio_sector(const uint8_t *xa, int32_t triggered);
-	void play_audio_sector();
+	void process_disc_sector();
+	void process_sector_data(const uint8_t *buffer, const uint8_t *subcode_buffer);
+	void init_disc_read(uint8_t disc_mode);
+	void cancel_disc_read();
+	void handle_cdic_command();
+
+	void update_interrupt_state();
+
+	uint32_t lba_from_time();
+
+	static uint8_t get_sector_count_for_coding(uint8_t coding);
+	static void decode_xa_mono(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
+	static void decode_xa_mono8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
+	static void decode_xa_stereo(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
+	static void decode_xa_stereo8(int16_t *cdic_xa_last, const uint8_t *xa, int16_t *dp);
+
+	static const int16_t s_xa_filter_coef[4][2];
+	static const int32_t s_samples_per_sector;
+	static const uint16_t s_crc_ccitt_table[256];
 };
 
 // device type definition

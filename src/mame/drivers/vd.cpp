@@ -41,8 +41,8 @@ public:
 	vd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void vd(machine_config &config);
@@ -61,8 +61,8 @@ private:
 	void mem_map(address_map &map);
 
 	bool m_ready = 0;
-	u8 m_t_c = 0;
-	u8 m_game = 0;
+	u8 m_t_c = 0U;
+	u8 m_game = 0U;
 	u8 m_segment[5]{};
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

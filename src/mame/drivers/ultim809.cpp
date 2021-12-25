@@ -59,7 +59,6 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_psg(*this, "psg")
 		, m_uart(*this, "uart")
-		, m_membank(0)
 	{}
 
 	void ultim809(machine_config &config);
@@ -77,7 +76,7 @@ private:
 	required_device<tms9918a_device> m_crtc;
 	required_device<ay8910_device> m_psg;
 	required_device<ns16550_device> m_uart;
-	u8 m_membank;
+	u8 m_membank = 0U;
 };
 
 void ultim809_state::mem_map(address_map &map)

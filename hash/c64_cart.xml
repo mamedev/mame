@@ -1837,7 +1837,7 @@ license:CC0
 	</software>
 
 	<software name="blueprnt">
-		<description>Blue-Print</description>
+		<description>Blueprint</description> <!-- spelt 'Blueprint' on cart and 'Blueprint', 'Blue-Print' and 'Blue - - Print' on various game screens -->
 		<year>1983</year>
 		<publisher>Commodore</publisher>
 		<info name="serial" value="C-64612" />
@@ -1845,7 +1845,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="blue print (1983)(commodore).80" size="0x4000" crc="b929eb5c" sha1="0acd28c13074ab0af4e6437ae4612cecad5c3133"/>
+				<rom name="317022-01.u1" size="0x2000" crc="09d33a92" sha1="b836ee02f19067c7e83be8dc882da92480d031ab"/>
+				<rom name="317023-01.u2" size="0x2000" crc="afbef1dd" sha1="8ca791e866da70983dc521b37b33cba98882da92" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2401,8 +2402,8 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x2000">
-				<rom name="gridrunner (1983)(hesware).80" size="0x2000" crc="12f36a09" sha1="218625325984ebdef88a5b56bc81bcff229d61db"/>
+			<dataarea name="roml" size="0x1000">
+				<rom name="hn462732p.u1" size="0x1000" crc="43b1df18" sha1="7fccb49a2557b50be7244945dd7031e411789089"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2849,14 +2850,14 @@ license:CC0
 	</software>
 
 	<software name="minfats">
-		<description>Minnesota Fat's Pool Challenger</description>
+		<description>Minnesota Fat's Pool Challenger</description> <!-- spelt Minnesota Fats´ Pool Challenger on cart -->
 		<year>1983</year>
 		<publisher>HesWare</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="minnesota fat's pool challenger (1983)(hesware).80" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4"/>
+				<rom name="mfpc.u1" size="0x2000" crc="7f2d8a46" sha1="44f8f8ee6238829bca8ca2d412b3f238159377a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3069,7 +3070,7 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
-				<rom name="omega race (1982)(commodore).80" size="0x2000" crc="b6e99657" sha1="7931433edba8e9ca1ea85b84351cea0760f7aabf"/>
+				<rom name="m5l2764k.u1" size="0x2000" crc="b6e99657" sha1="7931433edba8e9ca1ea85b84351cea0760f7aabf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3096,8 +3097,8 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
-			<dataarea name="roml" size="0x4000">
-				<rom name="paint brush (1983)(hesware).80" size="0x4000" crc="4c880095" sha1="88c0faff4617270d3d6ff0e8084b796abe94f31b"/>
+			<dataarea name="roml" size="0x1000">
+				<rom name="hn462532p.u2" size="0x1000" crc="c26dab1a" sha1="5a06123516e31c6e4ca73e621dff76edffd6285a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3818,7 +3819,8 @@ license:CC0
 			<feature name="exrom" value="0" />
 			<feature name="game" value="0" />
 			<dataarea name="roml" size="0x4000">
-				<rom name="story machine (1983)(spinnaker).80" size="0x4000" crc="1a6a8a2d" sha1="4800a7815d91b1703f647140e8578f8e34d0ca20"/>
+				<rom name="2764.u1" size="0x2000" crc="538a8ebc" sha1="8917f59cea45b3408e0c032ae7edf72266435019"/>
+				<rom name="2764.u2" size="0x2000" crc="f46075ae" sha1="186565c0d5d0877b5c0e91334899f2ceea7ce435" offset="0x2000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5156,8 +5158,8 @@ license:CC0
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
-			<dataarea name="roml" size="0x2000">
-				<rom name="hes mon 64 (1983)(hesware).80" size="0x2000" crc="fdcdc0a4" sha1="1055bd169c0de0b5ff0f351eaad0a0d6a159bd31"/>
+			<dataarea name="roml" size="0x1000">
+				<rom name="hesmon.u1" size="0x1000" crc="cc0f6ab4" sha1="0014a7c9cd2343b98d3e6f2a4cfb07b77ae96ac2"/>
 			</dataarea>
 		</part>
 	</software>

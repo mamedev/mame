@@ -58,7 +58,9 @@
 #include "pachinko.h"
 #include "partytap.h"
 #include "powerpad.h"
+#include "snesadapter.h"
 #include "suborkey.h"
+#include "turbofile.h"
 #include "zapper.h"
 
 
@@ -182,6 +184,7 @@ void nes_control_port1_devices(device_slot_interface &device)
 	device.option_add("zapper", NES_ZAPPER);
 	device.option_add("4score_p1p3", NES_4SCORE_P1P3);
 	device.option_add("miracle_piano", NES_MIRACLE);
+	device.option_add("snes_adapter", NES_SNESADAPTER);
 }
 
 void nes_control_port2_devices(device_slot_interface &device)
@@ -191,6 +194,7 @@ void nes_control_port2_devices(device_slot_interface &device)
 	device.option_add("vaus", NES_ARKPADDLE);
 	device.option_add("powerpad", NES_POWERPAD);
 	device.option_add("4score_p2p4", NES_4SCORE_P2P4);
+	device.option_add("snes_adapter", NES_SNESADAPTER);
 }
 
 void fc_control_port1_devices(device_slot_interface &device)
@@ -218,7 +222,7 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("konamibag", NES_KONAMIBAG);
 	device.option_add("konamihs", NES_KONAMIHS);
 	device.option_add("konami_piano", NES_DOREPIANO);
-	device.option_add("mj_panel", NES_MJPANEL);
+	device.option_add("mahjong", NES_MJPANEL);
 	device.option_add("pachinko", NES_PACHINKO);
 	device.option_add("partytap", NES_PARTYTAP);
 	device.option_add("hori_twin", NES_HORITWIN);
@@ -226,4 +230,5 @@ void fc_expansion_devices(device_slot_interface &device)
 	device.option_add("barcode_battler", NES_BARCODE_BATTLER);
 	device.option_add("subor_keyboard", NES_SUBORKEYBOARD);
 	device.option_add("taptapmat", NES_TAPTAPMAT);
+	device.option_add("turbofile", NES_TURBOFILE);
 }

@@ -58,9 +58,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
-		, m_io_keyboard(*this, "X%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void gts3(machine_config &config);
@@ -77,10 +77,10 @@ private:
 	void mem_map(address_map &map);
 	bool m_dispclk = 0;
 	bool m_lampclk = 0;
-	u8 m_digit = 0;
-	u8 m_row = 0; // for lamps and switches
-	u8 m_segment[4];
-	u8 m_u4b = 0;
+	u8 m_digit = 0U;
+	u8 m_row = 0U; // for lamps and switches
+	u8 m_segment[4]{};
+	u8 m_u4b = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<m65c02_device> m_maincpu;
@@ -115,8 +115,8 @@ static INPUT_PORTS_START( gts3 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_COIN3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Left Advance")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Right Advance")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Left Advance")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Right Advance")
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("INP06")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("INP07")
 
@@ -320,6 +320,9 @@ void gts3_state::machine_start()
 void gts3_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_digit = 0;
 	m_dispclk = 0;
 }

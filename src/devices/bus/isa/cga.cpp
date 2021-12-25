@@ -1368,7 +1368,6 @@ void isa8_wyse700_device::change_resolution(uint8_t mode)
 {
 	int width = 0, height = 0;
 	m_vrambank->set_entry((mode >> 1) & 1);
-	fprintf(stderr, "screen reconfiguration, mode %02x control %02x\n", mode, m_control);
 	if ((m_control & 0xf0) == (mode & 0xf0)) return;
 
 	switch(mode & 0xf0) {

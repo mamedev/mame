@@ -14315,6 +14315,19 @@ clips onto the player's ear.
 		</part>
 	</software>
 
+<!-- Very early prototype without sound -->
+	<software name="xroller">
+		<description>X'treme Roller (prototype)</description>
+		<year>200?</year>
+		<publisher>Microids</publisher>
+		<part name="cart" interface="n64_cart">
+			<feature name="pcb" value="NUS-16F32SB-B" /> <!-- label on cartridge shell -->
+			<dataarea name="rom" size="25165824">
+				<rom name="xtremeroller.bin" size="25165824" crc="9a47af0f" sha1="238efed4c5f4d6c3aba98774299bf7ea2cb0d021" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="yakouch2">
 		<description>Yakouchuu II - Satsujin Kouro (Japan)</description>
 		<year>1999</year>

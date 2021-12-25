@@ -124,11 +124,11 @@ private:
 	optional_device<ram_device> m_videoram;
 	optional_region_ptr<uint8_t> m_p_cas;
 
-	int m_led1_val;
-	int m_led2_val;
-	u8 m_krfd;
-	uint16_t m_dma_adr;
-	int m_r, m_w;
+	int m_led1_val = 0;
+	int m_led2_val = 0;
+	u8 m_krfd = 0U;
+	uint16_t m_dma_adr = 0U;
+	int m_r = 0, m_w = 0;
 };
 
 
@@ -882,6 +882,6 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME                             FLAGS
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, rt1715w, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

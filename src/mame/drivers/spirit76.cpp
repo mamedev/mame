@@ -65,9 +65,9 @@ private:
 	u8 sw_r();
 	void maincpu_map(address_map &map);
 
-	u8 m_t_c = 0;
-	u8 m_strobe = 0;
-	u8 m_segment = 0;
+	u8 m_t_c = 0U;
+	u8 m_strobe = 0U;
+	u8 m_segment = 0U;
 	u8 m_last_solenoid[2]{ };
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

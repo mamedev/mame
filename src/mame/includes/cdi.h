@@ -64,6 +64,9 @@ private:
 	uint16_t dvc_r(offs_t offset, uint16_t mem_mask = ~0);
 	void dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
+	uint16_t bus_error_r(offs_t offset);
+	void bus_error_w(offs_t offset, uint16_t data);
+
 	required_shared_ptr<uint16_t> m_planea;
 	optional_device<cdislave_hle_device> m_slave_hle;
 	optional_device<m68hc05c8_device> m_servo;

@@ -4,7 +4,7 @@
 // SM510 shared opcode handlers
 
 #include "emu.h"
-#include "sm510.h"
+#include "sm510base.h"
 
 
 // internal helpers
@@ -50,7 +50,6 @@ u8 sm510_base_device::bitmask(u16 param)
 	// bitmask from immediate opcode param
 	return 1 << (param & 3);
 }
-
 
 
 // instruction set
@@ -152,7 +151,6 @@ void sm510_base_device::op_tm()
 	u8 idx = m_program->read_byte(m_op & 0x3f);
 	do_branch(idx >> 6 & 3, 4, idx & 0x3f);
 }
-
 
 
 // Data transfer instructions
@@ -438,12 +436,6 @@ void sm510_base_device::op_idiv()
 {
 	// IDIV: reset divider
 	m_div = 0;
-}
-
-void sm510_base_device::op_dr()
-{
-	// DR: reset divider low 8 bits
-	m_div &= 0x7f;
 }
 
 void sm510_base_device::op_dta()

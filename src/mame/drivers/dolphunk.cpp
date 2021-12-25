@@ -119,11 +119,11 @@ private:
 	void mem_map(address_map &map);
 	void machine_start() override;
 
-	u8 m_cass_data;
-	u8 m_last_key;
-	bool m_cassbit;
-	bool m_cassold;
-	bool m_speaker_state;
+	u8 m_cass_data = 0U;
+	u8 m_last_key = 0U;
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
+	bool m_speaker_state = 0;
 	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;

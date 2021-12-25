@@ -154,7 +154,7 @@ private:
 		void clear() { m_list.clear(); }
 
 		// parse a new sequence
-		bool parse(u8 const *data, u32 length, u8 force_channel);
+		bool parse(u8 const *data, u32 length);
 
 		// rewind to the start of time
 		void rewind(attotime const &basetime);
@@ -165,8 +165,8 @@ private:
 	private:
 		// internal helpers
 		midi_event &event_at(u32 tick);
-		u32 parse_track_data(midi_parser &buffer, u32 start_tick, u8 force_channel);
-		void parse_midi_data(midi_parser &buffer, u8 force_channel);
+		u32 parse_track_data(midi_parser &buffer, u32 start_tick);
+		void parse_midi_data(midi_parser &buffer);
 
 		// internal state
 		std::list<midi_event> m_list;

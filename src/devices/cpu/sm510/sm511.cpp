@@ -14,7 +14,7 @@
 */
 
 #include "emu.h"
-#include "sm510.h"
+#include "sm511.h"
 #include "sm510d.h"
 #include "debugger.h"
 
@@ -67,7 +67,6 @@ sm512_device::sm512_device(const machine_config &mconfig, const char *tag, devic
 { }
 
 
-
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -80,7 +79,6 @@ void sm511_device::device_reset()
 	m_clk_div = 4; // 8kHz
 	notify_clock_changed();
 }
-
 
 
 //-------------------------------------------------
@@ -158,21 +156,9 @@ void sm511_device::init_melody()
 }
 
 
-
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-void sm511_device::get_opcode_param()
-{
-	// LBL, PRE, TL, TML and prefix opcodes are 2 bytes
-	if ((m_op >= 0x5f && m_op <= 0x61) || (m_op & 0xf0) == 0x70 || (m_op & 0xfc) == 0x68)
-	{
-		m_icount--;
-		m_param = m_program->read_byte(m_pc);
-		increment_pc();
-	}
-}
 
 void sm511_device::execute_one()
 {
@@ -229,7 +215,7 @@ void sm511_device::execute_one()
 		case 0x62: op_wr(); break;
 		case 0x63: op_ws(); break;
 		case 0x64: op_incb(); break;
-		case 0x65: op_dr(); break;
+		case 0x65: op_idiv(); break;
 		case 0x66: op_rc(); break;
 		case 0x67: op_sc(); break;
 		case 0x6c: op_decb(); break;
@@ -266,4 +252,10 @@ void sm511_device::execute_one()
 
 	// BM high bit is only valid for 1 step
 	m_sbm = (m_op == 0x02);
+}
+
+bool sm511_device::op_argument()
+{
+	// LBL, PRE, TL, TML and prefix opcodes are 2 bytes
+	return (m_op >= 0x5f && m_op <= 0x61) || (m_op & 0xf0) == 0x70 || (m_op & 0xfc) == 0x68;
 }

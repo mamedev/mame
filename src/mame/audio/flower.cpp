@@ -141,6 +141,12 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 
 		for (int i = 0; i < buffer.samples(); i++)
 		{
+			// Volume LUT ROM address bit:
+			// Bit 0-7: Sample ROM data
+			// Bit 8-11: Channel Volume
+			// Bit 12: Sample Position bit 6 (Sample nibble select bit for 4 bit data)
+			// Bit 13: Volume LUT bank select? (4 bit/8 bit data mode or wavetable/PCM?)
+			const u16 volume_index = (((ch_volume | voice.volume_bank) & 0x2f) << 8) | (BIT(voice.position, 6) << 12);
 			if (voice.repeat)
 			{
 				raw_sample = m_sample_rom[((voice.start_address >> 7) & 0x7e00) | ((voice.position >> 7) & 0x1ff)];
@@ -160,9 +166,7 @@ void flower_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 					break;
 				}
 			}
-			ch_volume |= voice.volume_bank;
-
-			*mix++ += m_volume_rom[(ch_volume << 8 | raw_sample) & 0x3fff] - 0x80;
+			*mix++ += m_volume_rom[(volume_index | raw_sample) & 0x3fff] - 0x80;
 			voice.position += ch_frequency;
 		}
 	}

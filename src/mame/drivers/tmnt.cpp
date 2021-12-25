@@ -73,8 +73,9 @@ Updates:
 #include "sound/okim6295.h"
 #include "sound/samples.h"
 #include "sound/ymopm.h"
+
 #include "speaker.h"
-#include "ymfm/src/ymfm.h"
+#include "ymfm/src/ymfm.h" // decode_fp
 
 
 uint16_t tmnt_state::k052109_word_noA12_r(offs_t offset)
@@ -209,7 +210,7 @@ void tmnt_state::tmnt_sres_w(uint8_t data)
 	if (data & 0x04)
 	{
 		if (!m_samples->playing(0))
-			m_samples->start_raw(0, m_sampledata, 0x40000, 20000);
+			m_samples->start_raw(0, m_sampledata, 0x40000, 640000 / 32);
 	}
 	else
 		m_samples->stop(0);
@@ -228,11 +229,13 @@ uint8_t tmnt_state::tmnt_upd_busy_r()
 
 SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
 {
-	int i;
+	// using MAME samples to HLE the title music
+	// to put it briefly, it's like this on the PCB:
+	// 640kHz XTAL -> 74161 and 3 74393 -> ROM address -> ROM output to 2 74166 -> YM3014
 	uint8_t *source = memregion("title")->base();
 
 	// sample data is encoded in Yamaha FP format
-	for (i = 0; i < 0x40000; i++)
+	for (int i = 0; i < 0x40000; i++)
 	{
 		int val = source[2 * i] + source[2 * i + 1] * 256;
 		m_sampledata[i] = ymfm::decode_fp(val >> 3);

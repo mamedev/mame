@@ -11725,6 +11725,13 @@ ROM_START( madshark )
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fq001007.26", 0x000000, 0x100000, CRC(e4b33c13) SHA1(c4f9532de7a09c80f5a74c3a386e99a0f546846f) )
+
+	ROM_REGION( 0xa00, "plds", 0 )
+	ROM_LOAD( "fq-008.u50", 0x000, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-009.u51", 0x200, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-010.u52", 0x400, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-011.u53", 0x600, 0x104, NO_DUMP )
+	ROM_LOAD( "fq-012.u54", 0x800, 0x104, NO_DUMP )
 ROM_END
 
 ROM_START( magspeed )
