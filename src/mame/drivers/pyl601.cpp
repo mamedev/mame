@@ -54,14 +54,14 @@
 class pyl601_state : public driver_device
 {
 public:
-	pyl601_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_speaker(*this, "speaker"),
-		m_fdc(*this, "upd765"),
-		m_floppy(*this, "upd765:%u", 0U),
-		m_ram(*this, RAM_TAG),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+	pyl601_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_speaker(*this, "speaker")
+		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{ }
 
 	void pyl601(machine_config &config);
@@ -95,13 +95,13 @@ private:
 	static void floppy_formats(format_registration &fr);
 	void mem_map(address_map &map);
 
-	uint8_t m_rom_page;
-	uint32_t m_vdisk_addr;
-	uint8_t m_key_code;
-	uint8_t m_keyboard_clk;
-	uint8_t m_video_mode;
-	uint8_t m_tick50_mark;
-	uint8_t m_floppy_ctrl;
+	uint8_t m_rom_page = 0U;
+	uint32_t m_vdisk_addr = 0U;
+	uint8_t m_key_code = 0U;
+	uint8_t m_keyboard_clk = 0U;
+	uint8_t m_video_mode = 0U;
+	uint8_t m_tick50_mark = 0U;
+	uint8_t m_floppy_ctrl = 0U;
 
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;

@@ -55,7 +55,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_p_rom(*this, "rom")
-		, m_uart(*this, "uart%u", 1)
+		, m_uart(*this, "uart%u", 1U)
 	{ }
 
 	void hpz80unk(machine_config &config);
@@ -70,7 +70,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_port02_data;
+	u8 m_port02_data = 0U;
 	void machine_reset() override;
 	void machine_start() override;
 	required_device<cpu_device> m_maincpu;
