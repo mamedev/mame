@@ -1274,7 +1274,7 @@ void render_target::compute_visible_area(s32 target_width, s32 target_height, fl
 						continue;
 
 					// score the result
-					float new_diff = fabs(aspect_ratio * (a / b) - (ab / bb));
+					float new_diff = fabsf(aspect_ratio * (a / b) - (ab / bb));
 
 					if (new_diff <= diff)
 					{
