@@ -42,8 +42,6 @@ TODO:
 #define VERBOSE         (0)
 #include "logmacro.h"
 
-static FILE *raw_out = nullptr;
-
 // device type definition
 DEFINE_DEVICE_TYPE(CDI_CDIC, cdicdic_device, "cdicdic", "CD-i CDIC")
 
@@ -458,24 +456,6 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 	}
 
 	LOGMASKED(LOG_SECTORS, "Coding %02x, %d channels, %d bits, %08x frequency\n", coding, channels, bits, sample_frequency);
-
-	if (coding == 5)
-	{
-		if (raw_out == nullptr)
-		{
-			raw_out = fopen("lemm.raw", "wb");
-		}
-
-		LOGMASKED(LOG_SECTORS, "Sample data:\n");
-		for (uint16_t i = 0; i < SECTOR_SIZE - 24; i += 16)
-		{
-			LOGMASKED(LOG_SECTORS, "%04x: %02x %02x %02x %02x-%02x %02x %02x %02x|%02x %02x %02x %02x-%02x %02x %02x %02x\n", i
-				, data[i + 0x00], data[i + 0x01], data[i + 0x02], data[i + 0x03]
-				, data[i + 0x04], data[i + 0x05], data[i + 0x06], data[i + 0x07]
-				, data[i + 0x08], data[i + 0x09], data[i + 0x0a], data[i + 0x0b]
-				, data[i + 0x0c], data[i + 0x0d], data[i + 0x0e], data[i + 0x0f]);
-		}
-	}
 
 	m_dmadac[0]->set_frequency(sample_frequency);
 	m_dmadac[1]->set_frequency(sample_frequency);
@@ -1131,15 +1111,6 @@ void cdicdic_device::device_resolve_objects()
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-
-void cdicdic_device::device_stop()
-{
-	if (raw_out != nullptr)
-	{
-		fclose(raw_out);
-		raw_out = nullptr;
-	}
-}
 
 void cdicdic_device::device_start()
 {
