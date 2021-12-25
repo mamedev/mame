@@ -24583,10 +24583,10 @@ license:CC0
 
 	<software name="metroidu" cloneof="metroid">
 		<description>Metroid (USA)</description>
-		<year>1986</year>
+		<year>1987</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="NES-MT-USA"/>
-		<info name="release" value="198608xx"/>
+		<info name="release" value="198708xx"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="sxrom" />
 			<feature name="pcb" value="NES-SNROM" />
