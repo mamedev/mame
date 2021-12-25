@@ -378,9 +378,28 @@ MB81G163222-80 - Fujitsu MB81G163222-80 256k x 32-bit x 2 banks Synchronous Grap
       CN2/CN3 - Video output connector to external monitors
       CN4/CN5 - Multi-pin IDC connectors joining to main board CN15/CN16
 
-An additional control PCB is used for Mocap Golf for the golf club sensor. It contains a ROMless MCU, an EPROM and
-some other components. It will be documented at a later date.
 
+I/O Board for Mocap Golf
+----------------------------------
+Board#: OMZ-3DCPU
+The I/O board and hook-up is very similar to the gun board used on
+House Of The Dead 2 (NAOMI).
+The I/O board talks to the main board via a MAX232 TX/RX connection.
+The MCU is a ROM-less NEC D784031GC.
+EPROM is common 27C512 EPROM. End of the ROM shows plain text
+'COPYRIGHT(C) OHMIC 1997-1998'
+The rest of the board just contains lots of opamps, logic, a DC-DC converter,
+resistors/caps/diodes/inductors, LM7805 5V regulator, MAX232, 2MHz XTAL,
+some pots, 2-position dipsw (both on, pulls MCU pins 77 & 78 to ground),
+VCO (2x BA7042), dual frequency synthesizer (BU2630) and a bunch of
+connectors.
+The monitor has a lot of LED sensors around the edge. The sensors
+are the same type used by Sega gun games like Too Spicy, HOTD2 etc.
+The sensors are linked together (like Christmas tree lights) and plug into the
+I/O board. The gun/golf club plugs into the gun connectors.
+There are 2 gun connectors on the board but as far as I know Mocap Golf is
+a single player game, although network/e-Amusement might be possible.
+The golf club acts like a LED gun. PCB power input is 12V.
 */
 
 #include "emu.h"
