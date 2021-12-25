@@ -4881,13 +4881,3 @@ if (MACHINES["BITMAP_PRINTER"]~=null) then
 	}
 end
 
----------------------------------------------------
---
---@src/devices/machine/session_time.h,MACHINES["SESSION_TIME"] = true
----------------------------------------------------
-if (MACHINES["SESSION_TIME"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/session_time.cpp",
-		MAME_DIR .. "src/devices/machine/session_time.h",
-	}
-end
