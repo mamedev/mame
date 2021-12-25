@@ -148,9 +148,9 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_update_border);
 	void applix_palette(palette_device &palette) const;
 
-	u8 m_video_latch;
-	u8 m_pa;
-	u8 m_palette_latch[4];
+	u8 m_video_latch = 0U;
+	u8 m_pa = 0U;
+	u8 m_palette_latch[4]{};
 	required_shared_ptr<u16> m_base;
 
 	void main_mem(address_map &map);
@@ -159,24 +159,24 @@ private:
 	void sub_io(address_map &map);
 	void sub_mem(address_map &map);
 
-	u8 m_pb;
-	u8 m_analog_latch;
-	u8 m_dac_latch;
-	u8 m_port08;
-	u8 m_data_to_fdc;
-	u8 m_data_from_fdc;
-	bool m_data;
-	bool m_data_or_cmd;
-	bool m_buffer_empty;
-	bool m_fdc_cmd;
-	u8 m_clock_count;
-	bool m_cp;
-	u8   m_p1;
-	u8   m_p1_data;
-	u8   m_p2;
-	u8   m_p3;
-	u16  m_last_write_addr;
-	u8 m_cass_data[4];
+	u8 m_pb = 0U;
+	u8 m_analog_latch = 0U;
+	u8 m_dac_latch = 0U;
+	u8 m_port08 = 0U;
+	u8 m_data_to_fdc = 0U;
+	u8 m_data_from_fdc = 0U;
+	bool m_data = 0;
+	bool m_data_or_cmd = 0;
+	bool m_buffer_empty = 0;
+	bool m_fdc_cmd = 0;
+	u8 m_clock_count = 0U;
+	bool m_cp = 0;
+	u8   m_p1 = 0U;
+	u8   m_p1_data = 0U;
+	u8   m_p2 = 0U;
+	u8   m_p3 = 0U;
+	u16  m_last_write_addr = 0U;
+	u8 m_cass_data[4]{};
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<via6522_device> m_via;

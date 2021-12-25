@@ -109,12 +109,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_sys_status;
-	u8 m_kbdrow;
-	bool m_crtc_vs;
-	bool m_crtc_hs;
-	bool m_motor;
-	bool m_centronics_busy;
+	u8 m_sys_status = 0U;
+	u8 m_kbdrow = 0U;
+	bool m_crtc_vs = 0;
+	bool m_crtc_hs = 0;
+	bool m_motor = 0;
+	bool m_centronics_busy = 0;
 	std::unique_ptr<u8[]> m_vram;
 	std::unique_ptr<u8[]> m_hram;
 	std::unique_ptr<u8[]> m_ram;

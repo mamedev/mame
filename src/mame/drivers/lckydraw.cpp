@@ -38,10 +38,10 @@ public:
 	lckydraw_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_io_dips(*this, "DSW%u", 0U)
-		, m_io_switches(*this, "X%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_io_dips(*this, "DSW%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void lckydraw(machine_config &config);
@@ -53,17 +53,17 @@ private:
 	void p2_w(u8);
 	u8 bus_r(offs_t);
 	void bus_w(offs_t,u8);
-	u8 m_bank_sw = 0;
-	u8 m_ram[256];
-	u8 m_p2_out[16];
-	u8 m_segment[3];
-	u8 m_p1 = 0;
-	u8 m_p2 = 0;
+	u8 m_bank_sw = 0U;
+	u8 m_ram[256]{};
+	u8 m_p2_out[16]{};
+	u8 m_segment[3]{};
+	u8 m_p1 = 0U;
+	u8 m_p2 = 0U;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<i8035_device> m_maincpu;
 	required_ioport_array<4> m_io_dips;
-	required_ioport_array<8> m_io_switches;
+	required_ioport_array<8> m_io_keyboard;
 	output_finder<48> m_digits;
 	output_finder<48> m_io_outputs;  // 16 solenoids + 32 lamps
 };
@@ -99,7 +99,7 @@ u8 lckydraw_state::bus_r(offs_t offset)
 				data = 0xff;
 				for (u8 i = 0; i < 4; i++)
 					if (!BIT(m_p1, i))
-						data &= m_io_switches[i]->read();
+						data &= m_io_keyboard[i]->read();
 			}
 			break;
 		case 4:
@@ -385,6 +385,8 @@ void lckydraw_state::machine_start()
 void lckydraw_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
 }
 
 void lckydraw_state::lckydraw(machine_config &config)

@@ -158,14 +158,14 @@ private:
 	bool m_ackv = 0;
 	bool m_flip = 0;
 	bool m_intst = 0;
-	u8 m_data = 0;
-	u8 m_sxx = 0;
-	u8 m_irq_state = 0;
-	u8 m_row = 0;
-	u8 m_sound_data = 0;
-	u8 m_gfx_bank = 0;
-	u8 m_video_data = 0;
-	u8 m_video_status = 0;
+	u8 m_data = 0U;
+	u8 m_sxx = 0U;
+	u8 m_irq_state = 0U;
+	u8 m_row = 0U;
+	u8 m_sound_data = 0U;
+	u8 m_gfx_bank = 0U;
+	u8 m_video_data = 0U;
+	u8 m_video_status = 0U;
 
 	tilemap_t *m_tilemap;
 };

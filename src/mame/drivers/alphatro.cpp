@@ -77,8 +77,6 @@ public:
 		, m_centronics(*this, "centronics")
 		, m_config(*this, "CONFIG")
 		, m_cart(*this, "cartslot")
-		, m_centronics_ack(0)
-		, m_centronics_busy(0)
 	{ }
 
 	void alphatro(machine_config &config);
@@ -119,11 +117,11 @@ private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<u8> m_p_videoram;
-	u8 m_flashcnt;
-	u8 m_cass_data[4];
-	u8 m_port_10, m_port_20, m_port_f0;
-	bool m_cassbit;
-	bool m_cassold, m_fdc_irq;
+	u8 m_flashcnt = 0U;
+	u8 m_cass_data[4]{};
+	u8 m_port_10 = 0U, m_port_20 = 0U, m_port_f0 = 0U;
+	bool m_cassbit = 0;
+	bool m_cassold = 0, m_fdc_irq = 0;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -140,12 +138,12 @@ private:
 	required_ioport m_config;
 	required_device<generic_slot_device> m_cart;
 
-	int m_centronics_ack;
-	int m_centronics_busy;
+	int m_centronics_ack = 0;
+	int m_centronics_busy = 0;
 
 	std::unique_ptr<uint8_t[]> m_bicom_ram;
-	uint16_t m_bicom_addr;
-	uint8_t m_bicom_en;
+	uint16_t m_bicom_addr = 0U;
+	uint8_t m_bicom_en = 0U;
 };
 
 class alphatro_pal_state : public alphatro_state
