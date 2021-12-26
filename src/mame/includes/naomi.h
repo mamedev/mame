@@ -6,9 +6,6 @@
 
 #pragma once
 
-#include "cpu/sh/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "cpu/arm7/arm7.h"
 #include "cpu/z80/z80.h"
 #include "machine/x76f100.h"
 #include "machine/eepromser.h"
