@@ -126,6 +126,8 @@ void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_confi
 }
 
 // Is there an internal ROM that gets mapped out or can this type really execute directly from scrambled SPI?
+// there doesn't appear to be anywhere to map an internal ROM, nor access to it, so I think they just execute
+// from SPI
 
 ROM_START( fixitflx )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -162,7 +164,23 @@ ROM_START( bfmpac )
 	ROM_LOAD16_WORD_SWAP( "mspacman_25q80_c84014.bin", 0x0000, 0x100000, CRC(c0c3f8ce) SHA1(30da9b14f1a2c966167c97da9b8329f2f7f73291) )
 ROM_END
 
+ROM_START( bfdigdug )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "arcadeclassicsdigdug_25q80csig_c84014.bin", 0x0000, 0x100000, CRC(4030bc46) SHA1(8c086c96b9822e95c1862012786d6d6e59e0387e) )
+ROM_END
+
+ROM_START( bfspyhnt )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "arcadeclassicsspyhunter_md25q16csig_c84015.bin", 0x0000, 0x200000, CRC(1f1eaabd) SHA1(1c484e0b0749123cfa1ac6d1959aefa6ed09ab20) )
+
+	// also has a 24C04 (to store high scores?)
+ROM_END
 
 void generalplus_gpspi_direct_game_state::init_fif()
 {
@@ -178,3 +196,5 @@ CONS(2017, fixitflx, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_d
 CONS(2018, wiwcs,    0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Where in the World is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2018, bfpacman, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2017, bfmpac,   0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Ms. Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
