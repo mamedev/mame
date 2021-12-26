@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
+// copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
 
 #ifndef MAME_INCLUDES_NAOMI_H
 #define MAME_INCLUDES_NAOMI_H
@@ -21,7 +21,7 @@
 #include "machine/naomim1.h"
 #include "machine/naomim2.h"
 #include "machine/naomim4.h"
-#include "machine/awboard.h"
+//#include "machine/awboard.h"
 #include "machine/nvram.h"
 #include "machine/aicartc.h"
 #include "machine/jvsdev.h"
@@ -121,53 +121,6 @@ private:
 	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void naomi2_map(address_map &map);
 };
-
-class atomiswave_state : public dc_state
-{
-public:
-	atomiswave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dc_state(mconfig, type, tag)
-		, m_awflash(*this, "awflash")
-		, m_exid(*this, "EXID")
-	   { }
-
-	void aw_base(machine_config &config);
-	void aw1c(machine_config &config);
-	void aw2c(machine_config &config);
-	void aw4c(machine_config &config);
-
-	void init_atomiswave();
-
-protected:
-	virtual void aw_map(address_map &map);
-	void aw_port(address_map &map);
-
-private:
-	required_device<macronix_29l001mc_device> m_awflash;
-	optional_ioport m_exid;
-
-	uint64_t aw_flash_r(offs_t offset);
-	void aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint32_t aw_modem_r(offs_t offset, uint32_t mem_mask = ~0);
-	void aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	uint8_t aw_ctrl_type;
-	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
-};
-
-class atomiswave_xtrmhnt2_state : public atomiswave_state
-{
-public:
-	atomiswave_xtrmhnt2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atomiswave_state(mconfig, type, tag)
-	   { }
-
-protected:
-	virtual void aw_map(address_map &map) override;
-private:
-	uint64_t allnet_hack_r(offs_t offset, uint64_t mem_mask = ~0);
-};
-
 
 INPUT_PORTS_EXTERN( naomi_debug );
 
