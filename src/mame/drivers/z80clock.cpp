@@ -14,6 +14,7 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
@@ -25,9 +26,14 @@ TODO:
 #include "machine/z80daisy.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
+
 #include "softlist.h"
 #include "speaker.h"
+
 #include "z80clock.lh"
+
+
+namespace {
 
 class z80clock_state : public driver_device
 {
@@ -431,5 +437,7 @@ INPUT_PORTS_END
 
 ROM_START( z80clock )
 ROM_END
+
+} // anonymous namespace
 
 COMP(2020, z80clock, 0, 0, z80clock, z80clock, z80clock_state, empty_init, "Tom Storey", "Z80 based, triple time zone clock", MACHINE_SUPPORTS_SAVE)

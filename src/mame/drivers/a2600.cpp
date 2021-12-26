@@ -128,20 +128,14 @@ void a2600_pop_state::memory_map(address_map &map) // 6507 has 13-bit address sp
 }
 
 
-void a2600_pop_state::banked_map(address_map &map)
-{
-	map(0x00000, 0x02ffff).rom().region("maincpu", 0);
-}
-
-
 //  read returns number of empty game rom slots
 uint8_t a2600_pop_state::rom_switch_r(offs_t offset)
 {
-	return 5;	// Max 47 games, 5 empty slots => 42 games
+	return 5;   // Max 47 games, 5 empty slots => 42 games
 }
 
 
-//	Rom switch
+//  Rom switch
 void a2600_pop_state::rom_switch_w(offs_t offset, uint8_t data)
 {
 	m_bank->set_entry(data & 0x7f);

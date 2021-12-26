@@ -345,8 +345,8 @@ void pdp11_state::pdp11(machine_config &config)
 	m_dl11->set_txvec(064);
 	m_dl11->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 // future
-//	m_dl11->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
-//	m_dl11->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "terminal");
 	m_rs232->rxd_handler().set(m_dl11, FUNC(dl11_device::rx_w));

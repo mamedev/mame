@@ -22,70 +22,70 @@ Year   Game                PCB            NOTES
 
 -------------------------------------------------------------
       Note about 57.42 'FRAMERATE_922804' screen refresh
-	  frequency and protection checks.
+      frequency and protection checks.
 
-	  In thoop there's a timing loop at 0x49e-4ac.  It's
+      In thoop there's a timing loop at 0x49e-4ac.  It's
       counting frames between interrupt-triggers.
 
-	  0x49e writes the count to 0xffdb62.
+      0x49e writes the count to 0xffdb62.
 
       While fighting the second-stage boss, when the pink
-	  things fly out,  0x8970 is called.  0x8988 fetches
-	  from 0xffdb62.  If the value is > 0xdd1 (via 0x898a)
-	  or < 0xdb1 (via 0x8992), then 0x89ac sets 0xffdc45
-	  to 5.
+      things fly out,  0x8970 is called.  0x8988 fetches
+      from 0xffdb62.  If the value is > 0xdd1 (via 0x898a)
+      or < 0xdb1 (via 0x8992), then 0x89ac sets 0xffdc45
+      to 5.
 
-	  At 60hz the value returned is 0xd29, which causes
-	  the fail condition to trigger. Values >=57.3 or
-	  <=57.7 give a result within the required range. The
-	  failure is not obvious at this point.
+      At 60hz the value returned is 0xd29, which causes
+      the fail condition to trigger. Values >=57.3 or
+      <=57.7 give a result within the required range. The
+      failure is not obvious at this point.
 
-	  While fighting the third boss, 0xc2e8 is called.
-	  After passing checks to know exactly when to trigger
-	  (specifically, after the boss is defeated and the
-	  power-up animation is finishes), 0xc350 checks if
+      While fighting the third boss, 0xc2e8 is called.
+      After passing checks to know exactly when to trigger
+      (specifically, after the boss is defeated and the
+      power-up animation is finishes), 0xc350 checks if
       0xffdc45 is 5.  If it is, then we reach 0xc368, which
-	  0xc368 sets 0xffe08e to 0x27.  Again the failure is
-	  not obvious at this point.
+      0xc368 sets 0xffe08e to 0x27.  Again the failure is
+      not obvious at this point.
 
-	  0xffe08e is checked during player respawn after
-	  losing a life or continuing at 0x16d00, with an
-	  explicit compare against 0x27, if this condition is
-	  met, then the game will intentionally corrupt memory
-	  and crash.
+      0xffe08e is checked during player respawn after
+      losing a life or continuing at 0x16d00, with an
+      explicit compare against 0x27, if this condition is
+      met, then the game will intentionally corrupt memory
+      and crash.
 
-	  Many of these checks are done with obfuscated code
-	  to hide the target addresses eg.
+      Many of these checks are done with obfuscated code
+      to hide the target addresses eg.
 
-	  writing 0x27 to 0xffe08e
-	  00C35C: lea     $ffc92b.l, A4
-	  00C362: adda.l  #$1763, A4
-	  00C368: move.b  #$27, (A4)
+      writing 0x27 to 0xffe08e
+      00C35C: lea     $ffc92b.l, A4
+      00C362: adda.l  #$1763, A4
+      00C368: move.b  #$27, (A4)
 
-	  This makes it more difficult to find where the checks
-	  are being performed as an additional layer of
-	  security
+      This makes it more difficult to find where the checks
+      are being performed as an additional layer of
+      security
 
-	  Squash has a similar timing loop, but with the
-	  expected values adjusted due to the different 68000
-	  clock on the otherwise identical Squash PCB (10Mhz on
-	  Squash vs. 12Mhz on Thunder Hoop)  In the case of
-	  Squash the most obvious sign of failure is bad
-	  'Insert Coin' sprites at the bottom of the screen
-	  after a continue.
+      Squash has a similar timing loop, but with the
+      expected values adjusted due to the different 68000
+      clock on the otherwise identical Squash PCB (10Mhz on
+      Squash vs. 12Mhz on Thunder Hoop)  In the case of
+      Squash the most obvious sign of failure is bad
+      'Insert Coin' sprites at the bottom of the screen
+      after a continue.
 
-	  A refresh rate of 57.42, while not yet accurately
-	  measured, allows a video of thoop to stay in sync with
-	  MAME over a 10 minute period.
+      A refresh rate of 57.42, while not yet accurately
+      measured, allows a video of thoop to stay in sync with
+      MAME over a 10 minute period.
 
-	  No checks have been observed in Biomechanical Toy,
-	  the Maniac Square prototype, or the Last KM prototype.
+      No checks have been observed in Biomechanical Toy,
+      the Maniac Square prototype, or the Last KM prototype.
 
-	  Big Karnak runs on a different board type and does fail
-	  if the CPU clock is set to 10Mhz rather than 12Mhz, it
-	  also has additional checks which may still fail and
-	  need more extensive research to determine exactly what
-	  is being timed.
+      Big Karnak runs on a different board type and does fail
+      if the CPU clock is set to 10Mhz rather than 12Mhz, it
+      also has additional checks which may still fail and
+      need more extensive research to determine exactly what
+      is being timed.
 
 ***************************************************************************/
 

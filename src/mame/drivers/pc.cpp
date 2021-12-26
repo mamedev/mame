@@ -1746,7 +1746,7 @@ Desktop?
 void pc_state::ec1847(machine_config &config)
 {
 	pccga(config);
-//	subdevice<isa8_slot_device>("isa1")->set_default_option("hercules");
+//  subdevice<isa8_slot_device>("isa1")->set_default_option("hercules");
 }
 
 ROM_START( ec1847 )

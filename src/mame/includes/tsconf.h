@@ -10,13 +10,17 @@
 
 #pragma once
 
+#include "spectrum.h"
+
 #include "machine/beta.h"
+
 #include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/tsconfdma.h"
-#include "spectrum.h"
+
 #include "tilemap.h"
+
 
 class tsconf_state : public spectrum_128_state
 {

@@ -65,8 +65,8 @@ void vme_cp31_card_device::cp31_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x001fffff).ram().share("dram"); // local bus DRAM, 4 MB
-//	map(0x08010000, 0x08011fff).ram();               // unknown -- accessed by cp31dssp
-//	map(0xfca03500, 0xfca0350f).unmaprw();           // ISCSI-1 board on VME bus
+//  map(0x08010000, 0x08011fff).ram();               // unknown -- accessed by cp31dssp
+//  map(0xfca03500, 0xfca0350f).unmaprw();           // ISCSI-1 board on VME bus
 	map(0xff000000, 0xff03ffff).rom().region("user1", 0);
 	map(0xff040000, 0xff07ffff).ram();               // onboard SRAM
 	map(0xff800000, 0xff80001f).rw(m_mpcc, FUNC(mpcc68561_device::read), FUNC(mpcc68561_device::write));
@@ -74,8 +74,8 @@ void vme_cp31_card_device::cp31_mem(address_map &map)
 	map(0xff800800, 0xff80080f).rw(m_bim, FUNC(bim68153_device::read), FUNC(bim68153_device::write)).umask32(0xff00ff00);
 	map(0xff800a00, 0xff800a1f).rw(m_rtc, FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 	map(0xff800c00, 0xff800dff).rw(m_pit1, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
-//	map(0xff800400, 0xff800xxx) // TIC? -- shows up in cp31dssp log
-//	map(0xff800e00, 0xff800xxx) // PIT3?
+//  map(0xff800400, 0xff800xxx) // TIC? -- shows up in cp31dssp log
+//  map(0xff800e00, 0xff800xxx) // PIT3?
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -180,7 +180,7 @@ void vme_cp31_card_device::device_add_mconfig(machine_config &config)
 	m_pit1->pa_in_callback().set_ioport("SA1");
 	m_pit1->pb_out_callback().set(*this, FUNC(vme_cp31_card_device::pit1_pb_w));
 	m_pit1->pc_in_callback().set(*this, FUNC(vme_cp31_card_device::pit1_pc_r));
-//	m_pit1->pc_out_callback().set(*this, FUNC(vme_cp31_card_device::pit1_pc_w));
+//  m_pit1->pc_out_callback().set(*this, FUNC(vme_cp31_card_device::pit1_pc_w));
 	m_pit1->timer_irq_callback().set(m_bim, FUNC(bim68153_device::int2_w));
 	m_pit1->port_irq_callback().set(m_bim, FUNC(bim68153_device::int3_w));
 

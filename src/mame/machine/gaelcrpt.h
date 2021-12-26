@@ -14,7 +14,8 @@ class gaelco_vram_encryption_device :  public device_t
 public:
 	// construction/destruction
 	gaelco_vram_encryption_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	void set_params(uint8_t param1, uint16_t param2) {	m_param1 = param1; m_param2 = param2; }
+
+	void set_params(uint8_t param1, uint16_t param2) { m_param1 = param1; m_param2 = param2; }
 
 	uint16_t gaelco_decrypt(cpu_device &cpu, int offset, int data);
 
