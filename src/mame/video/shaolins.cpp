@@ -147,38 +147,23 @@ void shaolins_state::video_start()
 
 void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// area $3000-1f is written and never read to.
-	// Its values are filled to 0x00 when it's expected to have no sprites (cross hatch, service mode, between level transitions ...)
-	// May be a rudimentary per-sprite disable
-	// TODO: understand actual disabling conditions (either by schematics or by probing the real HW)
-	if (m_spriteram[0] == 0)
-		return;
-
-	for (int offs = m_spriteram.bytes() - 32; offs >= 0x100; offs -= 32 ) /* max 24 sprites */
+	for (int offs = 23 * 2; offs >= 0; offs -= 2) /* max 24 sprites */
 	{
-		if (m_spriteram[offs] && m_spriteram[offs + 6]) /* stop rogue sprites on high score screen */
-		{
-			int code = m_spriteram[offs + 8];
-			int color = (m_spriteram[offs + 9] & 0x0f) | (m_palettebank << 4);
-			int flipx = !(m_spriteram[offs + 9] & 0x40);
-			int flipy = m_spriteram[offs + 9] & 0x80;
-			int sx = 240 - m_spriteram[offs + 6];
-			int sy = 248 - m_spriteram[offs + 4];
+		int code = m_spriteram2[offs + 1];
+		int color = (m_spriteram[offs + 0] & 0x0f) | (m_palettebank << 4);
+		int flipx = !(m_spriteram[offs + 0] & 0x40);
+		int flipy = m_spriteram[offs + 0] & 0x80;
+		int sx = m_spriteram2[offs + 0];
+		int sy = 241 - m_spriteram[offs + 1];
 
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 248 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
+		if (flip_screen())
+			sy--;
 
-			m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
-				code, color,
-				flipx, flipy,
-				sx, sy,
-				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, m_palettebank << 5));
-		}
+		m_gfxdecode->gfx(1)->transmask(bitmap,cliprect,
+			code, color,
+			flipx, flipy,
+			sx, sy,
+			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, m_palettebank << 5));
 	}
 }
 

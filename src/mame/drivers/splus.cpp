@@ -715,8 +715,8 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 ROM_START( spset005 ) /* Set Chip, not sure how it works but archive for future use */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "set005.u52",   0x00000, 0x10000, CRC(43b70e2e) SHA1(30d610c988fc7e7e9fd54ff378c4a1fecfe5fffe) ) /* 09/24/93   @ IGT L93-1769 */
-	ROM_LOAD( "set017.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
-	ROM_LOAD( "set020.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a seperate romdef */
+	ROM_LOAD( "set017.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a separate romdef */
+	ROM_LOAD( "set020.u52",   0x00000, 0x10000, NO_DUMP ) /* When dumped make a separate romdef */
 ROM_END
 
 ROM_START( spset015 ) /* Set Chip, not sure how it works but archive for future use */

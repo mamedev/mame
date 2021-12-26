@@ -94,7 +94,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_portb;
+	u8 m_portb = 0U;
 	memory_passthrough_handler *m_rom_shadow_tap;
 	required_device<i8085a_cpu_device> m_maincpu;
 	required_region_ptr<u8> m_rom;

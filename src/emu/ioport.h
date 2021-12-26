@@ -798,7 +798,7 @@ public:
 	ioport_group group() const noexcept { return m_group; }
 	u8 player() const noexcept { return m_player; }
 	const char *token() const noexcept { return m_token; }
-	const char *name() const noexcept { return m_name; }
+	std::string name() const;
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) noexcept { return m_defseq[seqtype]; }
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_defseq[seqtype]; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept { return m_seq[seqtype]; }
@@ -914,6 +914,7 @@ public:
 	{
 		m_condition = condition;
 		m_tag = tag;
+		m_port = nullptr;
 		m_mask = mask;
 		m_value = value;
 	}
@@ -1036,7 +1037,7 @@ public:
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
 	u8 impulse() const noexcept { return m_impulse; }
-	const char *name() const;
+	std::string name() const;
 	const char *specific_name() const noexcept { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
@@ -1381,7 +1382,7 @@ public:
 	// type helpers
 	const std::vector<input_type_entry> &types() const noexcept { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
-	const char *type_name(ioport_type type, u8 player) const noexcept;
+	std::string type_name(ioport_type type, u8 player) const;
 	ioport_group type_group(ioport_type type, int player) const noexcept;
 	const input_seq &type_seq(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD) const noexcept;
 	void set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq) noexcept;
@@ -1488,6 +1489,7 @@ public:
 	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
 	ioport_configurer& field_set_impulse(u8 impulse) { m_curfield->m_impulse = impulse; return *this; }
 	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
+	[[deprecated("PORT_RESET is deprecated; manage counter state explicitly")]]
 	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
 	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
 	ioport_configurer& field_set_min_max(ioport_value minval, ioport_value maxval) { m_curfield->m_min = minval; m_curfield->m_max = maxval; return *this; }

@@ -67,7 +67,7 @@ ToDo:
   -- You can't add more players;
   -- No switches register, so unable to score;
   -- The score flashes the high score as if the game had ended;
-  -- You can still hit tilt (num9) and X until it really is game over.
+  -- You can still hit tilt (9-key) and X until it really is game over.
   -- If the lucky number matches you'll still get a free credit.
   -- Some games will go straight to test 11, or instant game over.
 

@@ -2303,8 +2303,8 @@ ROM_START( lordofkb )
 	ROM_LOAD16_BYTE( "maincpu.e",   0x40001, 0x10000, CRC(1e1cbdb2) SHA1(5d076233d5ed6fdd9f0ecf64453325c14d33e879) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "soundcpu1",  0x000000, 0x010000, BAD_DUMP CRC(b3e53583) SHA1(d8f01b06d82e04f730138d42c37f2c335db04fa5) ) // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD16_BYTE( "soundcpu0",  0x000001, 0x010000, BAD_DUMP CRC(1d97e578) SHA1(d7b759a8684f703f21b30c6e0ae3962ff90aff60) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD16_BYTE( "soundcpu1",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
+	ROM_LOAD16_BYTE( "soundcpu0",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) // identical to astyanax, but with smaller ROMs
 	ROM_LOAD( "gfxc2.a20",   0x000000, 0x010000, CRC(e8be2851) SHA1(ee73fee09bf589f833d5c7e3ff8fa0f1fd8e5ec5) )
@@ -2315,8 +2315,8 @@ ROM_START( lordofkb )
 	ROM_LOAD( "gfxc6.lower", 0x050000, 0x010000, CRC(3a412a0f) SHA1(36a73a1255e27dcba6bd676bc6575957e37a7a56) )
 	ROM_LOAD( "gfxc6.upper", 0x060000, 0x010000, CRC(92a5171e) SHA1(06a57ba54dd9b4e7ab5754c6912f8b40489559b7) )
 
-	ROM_REGION( 0x80000, "scroll1", 0 ) // probably identical to astyanax, but with smaller ROMs
-	ROM_LOAD( "gfxb6.a14", 0x000000, 0x010000, BAD_DUMP CRC(52d29b73) SHA1(3adfd4e054d8bb72f6d5cef5633a59f40134265f) ) // ROM read empty, but the rest of the GFX ROMs is identical to astyanax so we'll use this handcrafted one for now
+	ROM_REGION( 0x80000, "scroll1", 0 ) // identical to astyanax, but with smaller ROMs
+	ROM_LOAD( "gfxb6.a14", 0x000000, 0x010000, CRC(52d29b73) SHA1(3adfd4e054d8bb72f6d5cef5633a59f40134265f) )
 	ROM_LOAD( "gfxb7.a15", 0x010000, 0x010000, CRC(0b48e8e5) SHA1(371b910e6227f919202b5e25ec9b6ed41a7ca79a) )
 	ROM_LOAD( "gfxb2.bin", 0x020000, 0x010000, CRC(af3aa84d) SHA1(45b4688254ca6958bfe04b264a2ec9da6fd8965f) )
 	ROM_LOAD( "gfxb3.bin", 0x030000, 0x010000, CRC(76dc6632) SHA1(38add1a5ba7c92d09756eb9cc9d823eb0c9ffe3c) )
@@ -2325,9 +2325,9 @@ ROM_START( lordofkb )
 	ROM_LOAD( "gfxb4.bin", 0x060000, 0x010000, CRC(cdf45985) SHA1(1d2611e555164a3dd1b4f4a7f9f788d14b899e30) )
 	ROM_LOAD( "gfxb5.bin", 0x070000, 0x010000, CRC(d609e379) SHA1(b83fc8922967702fbb2b6576b8787913c13a5640) )
 
-	ROM_REGION( 0x20000, "scroll2", 0 ) // probably identical to astyanax, but with smaller ROMs
+	ROM_REGION( 0x20000, "scroll2", 0 ) // second ROM differs from astyanax
 	ROM_LOAD( "lower.18", 0x000000, 0x010000, CRC(1c5df501) SHA1(4eb3f3e31ff91b1734fe1bbdcf43f1798e0c5911) )
-	ROM_LOAD( "upper.18", 0x010000, 0x010000, BAD_DUMP CRC(1babf60c) SHA1(056d81bd2eccb05154305a7dd5398a362c15308a) ) // ROM read empty, but the rest of the GFX ROMs is identical to astyanax so we'll use this handcrafted one for now
+	ROM_LOAD( "upper.18", 0x010000, 0x010000, CRC(c0943ffe) SHA1(a433c85e48963b6c0637f15692c9cb6599d332eb) )
 
 	ROM_REGION( 0x80000, "sprites", 0 ) // identical to astyanax, but with smaller ROMs
 	ROM_LOAD( "gfxa2.bin", 0x000000, 0x010000, CRC(8c82e91f) SHA1(837a9234cef35a6533686f9b94110adebf3f47a2) )
@@ -2349,6 +2349,73 @@ ROM_START( lordofkb )
 
 	ROM_REGION( 0x0200, "proms", 0 )        // Priority PROM, not dumped for this set
 	ROM_LOAD( "rd.bpr",       0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+ROM_END
+
+
+// this is basically the same as the above, but has a small daughter card with the load.dc ROM and an undumped MC68705R3P probably used to decrypt the ROM.
+ROM_START( lordofkbp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "load.d18", 0x00000, 0x10000, CRC(36e4de06) SHA1(69db06bbf0818be7ed37087314773b3463b24ef6) )
+	ROM_LOAD16_BYTE( "load.b18", 0x00001, 0x10000, CRC(c0e1076f) SHA1(e6171194b2e2bcbb62dfe4e6f5e102c52dbe2408) )
+	ROM_LOAD16_BYTE( "load.d17", 0x20000, 0x10000, CRC(b8cd3151) SHA1(1bf1bf42b0e12750ea22e7da4c576cdaf76505f5) )
+	ROM_LOAD16_BYTE( "load.dc",  0x20001, 0x10000, CRC(cbb9728d) SHA1(3585ca615a9db05186410d8ebb50d717e02cba35) )
+	ROM_LOAD16_BYTE( "load.a10", 0x40000, 0x10000, CRC(097b53a6) SHA1(80952b2e685cefa8dd7c31b1ec54c4de924a84eb) )
+	ROM_LOAD16_BYTE( "load.a15", 0x40001, 0x10000, CRC(1e1cbdb2) SHA1(5d076233d5ed6fdd9f0ecf64453325c14d33e879) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "load.h15", 0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
+	ROM_LOAD16_BYTE( "load.i15", 0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
+
+	ROM_REGION( 0x1000, "mcu", 0 ) // MC68705R3P
+	ROM_LOAD( "68705r3p.dc", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x80000, "scroll0", 0 )
+	ROM_LOAD( "load.m17",  0x000000, 0x010000, CRC(e8be2851) SHA1(ee73fee09bf589f833d5c7e3ff8fa0f1fd8e5ec5) )
+	ROM_LOAD( "load.m16",  0x010000, 0x010000, CRC(b7b80980) SHA1(9ed12481ab6aae2a1793d605eb0791a63fdb05bf) )
+	ROM_LOAD( "load.m18",  0x020000, 0x010000, CRC(b3363955) SHA1(c074073e29b44f2a7809a8bea6779b95567c77cf) )
+	ROM_LOAD( "load.m14",  0x030000, 0x010000, CRC(805ac7a9) SHA1(35ba1e22a5ae04cc11a34aaee3c4d5c99b7f1a48) )
+	ROM_LOAD( "load.m13",  0x040000, 0x010000, CRC(4bb43e5e) SHA1(79a036e60282e3cccbb039382ad59ef4e1dbada7) )
+	ROM_LOAD( "load.m11b", 0x050000, 0x010000, CRC(3a412a0f) SHA1(36a73a1255e27dcba6bd676bc6575957e37a7a56) )
+	ROM_LOAD( "load.m11t", 0x060000, 0x010000, CRC(92a5171e) SHA1(06a57ba54dd9b4e7ab5754c6912f8b40489559b7) )
+
+	ROM_REGION( 0x80000, "scroll1", ROMREGION_ERASEFF )
+	ROM_LOAD( "load.b3", 0x000000, 0x010000, CRC(52d29b73) SHA1(3adfd4e054d8bb72f6d5cef5633a59f40134265f) )
+	ROM_LOAD( "load.b2", 0x010000, 0x010000, CRC(0b48e8e5) SHA1(371b910e6227f919202b5e25ec9b6ed41a7ca79a) )
+	ROM_LOAD( "load.a8", 0x020000, 0x010000, CRC(af3aa84d) SHA1(45b4688254ca6958bfe04b264a2ec9da6fd8965f) )
+	ROM_LOAD( "load.a6", 0x030000, 0x010000, CRC(76dc6632) SHA1(38add1a5ba7c92d09756eb9cc9d823eb0c9ffe3c) )
+	ROM_LOAD( "load.d2", 0x040000, 0x010000, CRC(07c27836) SHA1(b4df7919743efa6c1690dd4471de6b77f179cdaa) )
+	ROM_LOAD( "load.d3", 0x050000, 0x010000, CRC(e2c40977) SHA1(914f5f46ce95ad8f4f4d5f3f0a1e3801bf42debc) )
+	ROM_LOAD( "load.a4", 0x060000, 0x010000, CRC(cdf45985) SHA1(1d2611e555164a3dd1b4f4a7f9f788d14b899e30) )
+	// 0x70000 - 0x7ffff empty
+
+	ROM_REGION( 0x20000, "scroll2", 0 )
+	ROM_LOAD( "load.g3b", 0x000000, 0x010000, CRC(1c5df501) SHA1(4eb3f3e31ff91b1734fe1bbdcf43f1798e0c5911) )
+	ROM_LOAD( "load.g3t", 0x010000, 0x010000, CRC(c0943ffe) SHA1(a433c85e48963b6c0637f15692c9cb6599d332eb) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )
+	ROM_LOAD( "load.g2", 0x000000, 0x010000, CRC(8c82e91f) SHA1(837a9234cef35a6533686f9b94110adebf3f47a2) )
+	ROM_LOAD( "load.g1", 0x010000, 0x010000, CRC(82183cb3) SHA1(b8a5a0f7256d54f97e58684a3adbd4667e6f4f53) )
+	ROM_LOAD( "load.h2", 0x020000, 0x010000, CRC(e747928b) SHA1(22a8fb2e5c8fa316961e5aeba587cea127e13407) )
+	ROM_LOAD( "load.h1", 0x030000, 0x010000, CRC(5ea64444) SHA1(60301f3bfb8a8daba55469a99bae8e6f4e51b1cd) )
+	ROM_LOAD( "load.g3", 0x040000, 0x010000, CRC(6b1572b4) SHA1(4e39d68988d55fa559ca8c633ea04db41e9f80d3) )
+	ROM_LOAD( "load.h3", 0x050000, 0x010000, CRC(88b5d7f8) SHA1(477dbb354defa71d1fc54a891559023d5698ce5d) )
+	ROM_LOAD( "load.i2", 0x060000, 0x010000, CRC(210eb169) SHA1(d82d3834c1c69990b3eda3e6c85edbe607af5756) )
+	ROM_LOAD( "load.i1", 0x070000, 0x010000, CRC(f6d91d5b) SHA1(3fce4e641e327b40950d088418b3fbbb35f2cf13) )
+
+	ROM_REGION( 0x40000, "oki1", ROMREGION_ERASEFF ) // read below
+
+	ROM_REGION( 0x40000, "oki2", 0 ) // this bootleg only has an OKI and its ROMs' contents match the one from astyanax's 'oki2' region
+	ROM_LOAD( "load.h17", 0x000000, 0x010000, CRC(6f18a8c9) SHA1(3845e699d2baa17ca8f33cb728cc93aee2e7b487) )
+	ROM_LOAD( "load.i17", 0x010000, 0x010000, CRC(5a5bf82e) SHA1(ac7ee84e1d4d136c9a2cf776f48e537967d6787a) )
+	ROM_LOAD( "load.j17", 0x020000, 0x010000, CRC(7a818ada) SHA1(cf5ad0f996927fa6d86fe18d38a51fdd726d3af7) )
+	ROM_LOAD( "load.k17", 0x020000, 0x010000, CRC(f8f0a2db) SHA1(3776770e9f86d1aa38ffad7f203d4d8ba8005ca6) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        // Priority PROM, not dumped for this set
+	ROM_LOAD( "rd.bpr", 0x0000, 0x0200, BAD_DUMP CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
+
+	ROM_REGION( 0x0400, "plds", 0 ) // both PALs have identical content
+	ROM_LOAD( "pal16l8acn.i7", 0x0000, 0x0104, CRC(4e9118f6) SHA1(f5da2bc1846cecbf9d4e435773f8c27366f05d0c) )
+	ROM_LOAD( "pal16l8acn.j7", 0x0200, 0x0104, CRC(4e9118f6) SHA1(f5da2bc1846cecbf9d4e435773f8c27366f05d0c) )
 ROM_END
 
 
@@ -3296,7 +3363,7 @@ ROM_START( inyourfa )
 	ROM_LOAD( "08.27c1001",  0x020000, 0x020000, CRC(cadd4731) SHA1(1c4e7ea7064b9c6b2dfdf01fd64f37de6d50bdfa) ) // 11xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
-	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(1341ba02) SHA1(edff62979d0376ac01b8da0aca46df087d6e4051) ) // wasn't dumped, this one has been handcrafted
+	ROM_LOAD( "prom.14m",    0x0000,   0x0200, BAD_DUMP CRC(21390e3a) SHA1(e641be8ee6ed2ac62a027bf47ec49acb30d65ced) ) // was missing from PCB, this one has been handcrafted
 ROM_END
 
 /***************************************************************************
@@ -4766,6 +4833,19 @@ void megasys1_state::init_astyanax()
 	save_item(NAME(m_mcu_hs_ram));
 }
 
+void megasys1_state::init_lordofkbp()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x20000; i < 0x40000; i += 2)
+	{
+		if (i & 0x02)
+			rom[i] = 0x51 - rom[i];
+		else
+			rom[i] = 0xc7 - rom[i];
+	}
+}
+
 void megasys1_state::init_avspirit()
 {
 	m_ip_select_values[0] = 0x37;
@@ -5106,7 +5186,8 @@ GAME( 1988, iganinjub,kazan,    system_A_iganinju, kazan,    megasys1_state, emp
 GAME( 1989, astyanax, 0,        system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (EPROM version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, astyanaxa,astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Astyanax (mask ROM version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, lordofk,  astyanax, system_A,          astyanax, megasys1_state, init_astyanax, ROT0,   "Jaleco", "The Lord of King (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, lordofkb, astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // the two audio CPU ROMs are suspect. May be bootleg crappiness, but doubtful
+GAME( 1989, lordofkb, astyanax, system_A,          astyanax, megasys1_state, empty_init,    ROT0,   "bootleg","The Lord of King (bootleg, not protected)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, lordofkbp,astyanax, system_A,          astyanax, megasys1_state, init_lordofkbp,ROT0,   "bootleg","The Lord of King (bootleg, protected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   megasys1_state, init_astyanax, ROT0,   "Jaleco", "Hachoo!", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, jitsupro, 0,        system_A_jitsupro, jitsupro, megasys1_state, init_jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, plusalph, 0,        system_A,          plusalph, megasys1_state, init_astyanax, ROT270, "Jaleco", "Plus Alpha", MACHINE_SUPPORTS_SAVE )

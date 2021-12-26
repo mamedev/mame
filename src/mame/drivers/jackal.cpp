@@ -315,10 +315,6 @@ void jackal_state::machine_start()
 
 void jackal_state::machine_reset()
 {
-	// HACK: running at the nominal clock rate, music stops working
-	// at the beginning of the game. This fixes it.
-	m_slavecpu->set_clock_scale(1.5);
-
 	m_irq_enable = 0;
 }
 

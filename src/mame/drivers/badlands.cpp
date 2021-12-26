@@ -213,10 +213,9 @@ INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
 {
 	// TODO: remove this hack
 	int pedal_state = ioport("PEDALS")->read();
-	int i;
 
 	/* update the pedals once per frame */
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		m_pedal_value[i]--;
 		if (pedal_state & (1 << i))

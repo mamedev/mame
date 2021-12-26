@@ -62,6 +62,7 @@ DEFINE_DEVICE_TYPE(NES_NT639,         nes_nt639_device,         "nes_nt639",    
 DEFINE_DEVICE_TYPE(NES_RESETTXROM,    nes_resettxrom_device,    "nes_resettxrom",    "NES Cart BMC RESET-TXROM PCB")
 DEFINE_DEVICE_TYPE(NES_S24IN1SC03,    nes_s24in1sc03_device,    "nes_s24in1c03",     "NES Cart Super 24 in 1 SC-03 PCB")
 DEFINE_DEVICE_TYPE(NES_TECHLINE9IN1,  nes_tech9in1_device,      "nes_tech9in1",      "NES Cart Techline 9 in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_5IN1,      nes_bmc_5in1_device,      "nes_bmc_5in1",      "NES Cart BMC 5 in 1 1993 Copyright PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_8IN1,      nes_bmc_8in1_device,      "nes_bmc_8in1",      "NES Cart BMC GRM070 8 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_15IN1,     nes_bmc_15in1_device,     "nes_bmc_15in1",     "NES Cart BMC 15 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_SBIG7,     nes_bmc_sbig7_device,     "nes_bmc_sbig7",     "NES Cart BMC Super BIG 7 in 1 PCB")
@@ -96,6 +97,13 @@ INPUT_PORTS_START( sachen_shero )
 	PORT_CONFSETTING(    0x80, u8"\u4f8d\u9b42 (Shìhún)" )    // 侍魂
 INPUT_PORTS_END
 
+INPUT_PORTS_START( bmc_5in1 )
+	PORT_START("JUMPER")
+	PORT_CONFNAME( 0x01, 0x01, "Menu Type" )
+	PORT_CONFSETTING(    0x00, "20 in 1" )
+	PORT_CONFSETTING(    0x01, "5 in 1" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( bmc_f600 )
 	PORT_START("JUMPER")
 	PORT_CONFNAME( 0x80, 0x80, "Menu Type" )
@@ -111,6 +119,11 @@ INPUT_PORTS_END
 ioport_constructor nes_sachen_shero_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( sachen_shero );
+}
+
+ioport_constructor nes_bmc_5in1_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_5in1 );
 }
 
 ioport_constructor nes_bmc_f600_device::device_input_ports() const
@@ -308,6 +321,12 @@ nes_s24in1sc03_device::nes_s24in1sc03_device(const machine_config &mconfig, cons
 
 nes_tech9in1_device::nes_tech9in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_TECHLINE9IN1, tag, owner, clock)
+{
+}
+
+nes_bmc_5in1_device::nes_bmc_5in1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_BMC_5IN1, tag, owner, clock)
+	, m_jumper(*this, "JUMPER")
 {
 }
 
@@ -768,6 +787,13 @@ void nes_tech9in1_device::pcb_reset()
 	mmc3_common_initialize(0x1f, 0xff, 0);
 }
 
+void nes_bmc_5in1_device::pcb_reset()
+{
+	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	mmc3_common_initialize(0x0f, 0x7f, 0);
+	prg32(0);
+}
+
 void nes_bmc_8in1_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
@@ -797,6 +823,7 @@ void nes_bmc_hik8_device::device_start()
 void nes_bmc_hik8_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
+	set_nt_mirroring(PPU_MIRROR_VERT);  // necessary since some boards/games don't reliably set mirroring (Rockman 1 on mc_s13 at least)
 
 	m_count = 0;
 	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
@@ -2553,6 +2580,40 @@ void nes_tech9in1_device::write_l(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ BMC-5IN1
+
+ Unknown Bootleg Multigame Board
+ Games: 5 in 1 1993 Copyright
+
+ NES 2.0: mapper 334
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_5in1_device::read_m(offs_t offset)
+{
+	LOG_MMC(("bmc_5in1 read_m, offset: %04x\n", offset));
+
+	if ((offset & 0x03) == 0x02)
+		return (get_open_bus() & 0xfe) | m_jumper->read();
+	else
+		return get_open_bus();
+}
+
+void nes_bmc_5in1_device::write_m(offs_t offset, u8 data)
+{
+	LOG_MMC(("bmc_5in1 write_m, offset: %04x, data: %02x\n", offset, data));
+
+	if ((m_wram_protect & 0xc0) == 0x80)
+	{
+		if (!(offset & 0x03))
+			prg32((data >> 1) & 0x03);
+	}
+}
+
+/*-------------------------------------------------
+
  BMC-NEWSTAR-GRM070-8IN1
 
  Unknown Bootleg Multigame Board
@@ -3143,8 +3204,8 @@ void nes_bmc_k3033_device::prg_cb(int start, int bank)
 
 void nes_bmc_k3033_device::write_m(offs_t offset, u8 data)
 {
-	LOG_MMC(("bmc_k3033 write_m, offset: %04x, data: %02x\n", offset, data))
-;
+	LOG_MMC(("bmc_k3033 write_m, offset: %04x, data: %02x\n", offset, data));
+
 	if ((m_wram_protect & 0xc0) == 0x80)
 	{
 		m_mmc3_mode = BIT(offset, 5);

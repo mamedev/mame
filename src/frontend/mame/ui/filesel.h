@@ -61,10 +61,11 @@ private:
 
 	struct file_selector_entry
 	{
-		file_selector_entry() { }
+		file_selector_entry() = default;
 		file_selector_entry(file_selector_entry &&) = default;
 		file_selector_entry &operator=(file_selector_entry &&) = default;
-		file_selector_entry_type type;
+
+		file_selector_entry_type type = SELECTOR_ENTRY_TYPE_EMPTY;
 		std::string basename;
 		std::string fullpath;
 	};

@@ -18,7 +18,7 @@ DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "Intel i960KB")
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I960, tag, owner, clock)
 	, m_stalled(false), m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0)
+	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_immediate_irq(0)
 	, m_immediate_vector(0), m_immediate_pri(0), m_icount(0)
 {
 	std::fill(std::begin(m_r), std::end(m_r), 0);
@@ -46,6 +46,15 @@ uint32_t i960_cpu_device::i960_read_dword_unaligned(uint32_t address)
 		return m_program.read_dword(address);
 }
 
+std::pair<uint32_t, uint16_t> i960_cpu_device::i960_read_dword_unaligned_flags(uint32_t address)
+{
+	if (!DWORD_ALIGNED(address)) {
+		auto v = m_program.read_byte_flags(address);
+		return std::pair<uint32_t, uint16_t>(v.first | m_program.read_byte(address+1)<<8 | m_program.read_byte(address+2)<<16 | m_program.read_byte(address+3)<<24, v.second);
+	} else
+		return m_program.read_dword_flags(address);
+}
+
 uint16_t i960_cpu_device::i960_read_word_unaligned(uint32_t address)
 {
 	if (!WORD_ALIGNED(address))
@@ -66,6 +75,22 @@ void i960_cpu_device::i960_write_dword_unaligned(uint32_t address, uint32_t data
 	else
 	{
 		m_program.write_dword(address, data);
+	}
+}
+
+uint16_t i960_cpu_device::i960_write_dword_unaligned_flags(uint32_t address, uint32_t data)
+{
+	if (!DWORD_ALIGNED(address))
+	{
+		uint16_t flags = m_program.write_byte_flags(address, data & 0xff);
+		m_program.write_byte(address+1, (data>>8)&0xff);
+		m_program.write_byte(address+2, (data>>16)&0xff);
+		m_program.write_byte(address+3, (data>>24)&0xff);
+		return flags;
+	}
+	else
+	{
+		return m_program.write_dword_flags(address, data);
 	}
 }
 
@@ -2004,16 +2029,15 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount -= 5;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1e;
-			m_bursting = 1;
 			for(i=0; i<2; i++) {
-				u32 v = i960_read_dword_unaligned(t1);
+				auto pack = i960_read_dword_unaligned_flags(t1);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,2,false);
 					return;
 				}
-				m_r[t2+i] = v;
-				if(m_bursting)
+				m_r[t2+i] = pack.first;
+				if(pack.second & BURST)
 					t1 += 4;
 			}
 			break;
@@ -2024,15 +2048,14 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount -= 3;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1e;
-			m_bursting = 1;
 			for(i=0; i<2; i++) {
-				i960_write_dword_unaligned(t1, m_r[t2+i]);
+				auto flags = i960_write_dword_unaligned_flags(t1, m_r[t2+i]);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,2,true);
 					return;
 				}
-				if(m_bursting)
+				if(flags & BURST)
 					t1 += 4;
 			}
 			break;
@@ -2043,16 +2066,15 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount -= 6;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1c;
-			m_bursting = 1;
 			for(i=0; i<3; i++) {
-				u32 v = i960_read_dword_unaligned(t1);
+				auto pack = i960_read_dword_unaligned_flags(t1);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,3,false);
 					return;
 				}
-				m_r[t2+i] = v;
-				if(m_bursting)
+				m_r[t2+i] = pack.first;
+				if(pack.second & BURST)
 					t1 += 4;
 			}
 			break;
@@ -2063,15 +2085,14 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount -= 4;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1c;
-			m_bursting = 1;
 			for(i=0; i<3; i++) {
-				i960_write_dword_unaligned(t1, m_r[t2+i]);
+				auto flags = i960_write_dword_unaligned_flags(t1, m_r[t2+i]);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,3,true);
 					return;
 				}
-				if(m_bursting)
+				if(flags & BURST)
 					t1 += 4;
 			}
 			break;
@@ -2082,16 +2103,15 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount -= 7;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1c;
-			m_bursting = 1;
 			for(i=0; i<4; i++) {
-				u32 v = i960_read_dword_unaligned(t1);
+				auto pack = i960_read_dword_unaligned_flags(t1);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,4,false);
 					return;
 				}
-				m_r[t2+i] = v;
-				if(m_bursting)
+				m_r[t2+i] = pack.first;
+				if(pack.second & BURST)
 					t1 += 4;
 			}
 			break;
@@ -2102,15 +2122,14 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount -= 5;
 			t1 = get_ea(opcode);
 			t2 = (opcode>>19)&0x1c;
-			m_bursting = 1;
 			for(i=0; i<4; i++) {
-				i960_write_dword_unaligned(t1, m_r[t2+i]);
+				auto flags = i960_write_dword_unaligned_flags(t1, m_r[t2+i]);
 				if(m_stalled)
 				{
 					burst_stall_save(t1,t2,i,4,true);
 					return;
 				}
-				if(m_bursting)
+				if(flags & BURST)
 					t1 += 4;
 			}
 			break;
@@ -2159,8 +2178,6 @@ void i960_cpu_device::execute_run()
 	while(m_icount > 0) {
 		m_PIP = m_IP;
 		debugger_instruction_hook(m_IP);
-
-		m_bursting = 0;
 
 		opcode = m_cache.read_dword(m_IP);
 		m_IP += 4;
@@ -2263,7 +2280,6 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_immediate_irq));
 	save_item(NAME(m_immediate_vector));
 	save_item(NAME(m_immediate_pri));
-	save_item(NAME(m_bursting));
 	save_item(NAME(m_stalled));
 	save_item(NAME(m_stall_state.index));
 	save_item(NAME(m_stall_state.size));
@@ -2347,7 +2363,6 @@ void i960_cpu_device::device_reset()
 	m_PC         = 0x001f2002;
 	m_AC         = 0;
 	m_ICR       = 0xff000000;
-	m_bursting   = 0;
 	m_immediate_irq = 0;
 
 	memset(m_r, 0, sizeof(m_r));

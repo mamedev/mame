@@ -168,21 +168,21 @@ private:
 	output_finder<10> m_digits;
 	output_finder<7> m_leds;
 
-	int m_load_state;
+	int m_load_state = 0;
 
-	int m_digitsel;
-	int m_segment;
+	int m_digitsel = 0;
+	int m_segment = 0;
 	emu_timer *m_displayena_timer;
-	uint8_t m_segment_state[10];
-	uint8_t m_old_segment_state[10];
-	uint8_t m_LED_state;
+	uint8_t m_segment_state[10]{};
+	uint8_t m_old_segment_state[10]{};
+	uint8_t m_LED_state = 0U;
 	emu_timer *m_joy1x_timer;
 	emu_timer *m_joy1y_timer;
 	emu_timer *m_joy2x_timer;
 	emu_timer *m_joy2y_timer;
 	device_image_interface *m_rs232_fp;
 	//uint8_t m_rs232_rts;
-	uint8_t m_bogus_read_save;
+	uint8_t m_bogus_read_save = 0U;
 };
 
 

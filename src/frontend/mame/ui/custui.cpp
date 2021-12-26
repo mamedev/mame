@@ -83,10 +83,10 @@ menu_custom_ui::menu_custom_ui(mame_ui_manager &mui, render_container &container
 }
 
 //-------------------------------------------------
-//  dtor
+//  menu dismissed
 //-------------------------------------------------
 
-menu_custom_ui::~menu_custom_ui()
+void menu_custom_ui::menu_dismissed()
 {
 	ui().options().set_value(OPTION_HIDE_PANELS, ui_globals::panels_status, OPTION_PRIORITY_CMDLINE);
 
@@ -375,10 +375,10 @@ void menu_font_ui::list()
 }
 
 //-------------------------------------------------
-//  dtor
+//  menu dismissed
 //-------------------------------------------------
 
-menu_font_ui::~menu_font_ui()
+void menu_font_ui::menu_dismissed()
 {
 	if (m_changed)
 	{
@@ -580,10 +580,10 @@ menu_colors_ui::menu_colors_ui(mame_ui_manager &mui, render_container &container
 }
 
 //-------------------------------------------------
-//  dtor
+//  menu dismissed
 //-------------------------------------------------
 
-menu_colors_ui::~menu_colors_ui()
+void menu_colors_ui::menu_dismissed()
 {
 	std::string dec_color;
 	for (int index = 1; index < MUI_RESTORE; index++)
@@ -607,7 +607,7 @@ void menu_colors_ui::handle(event const *ev)
 	{
 		if ((uintptr_t)ev->itemref != MUI_RESTORE)
 		{
-			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)ev->itemref].color, selected_item().text());
+			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)ev->itemref].color, std::string(selected_item().text()));
 		}
 		else
 		{
@@ -803,23 +803,15 @@ void menu_colors_ui::restore_colors()
 //  ctor
 //-------------------------------------------------
 
-menu_rgb_ui::menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *_color, std::string _title)
-	: menu(mui, container),
-		m_color(_color),
-		m_search(),
-		m_key_active(false),
-		m_lock_ref(0),
-		m_title(_title)
+menu_rgb_ui::menu_rgb_ui(mame_ui_manager &mui, render_container &container, rgb_t *color, std::string &&title)
+	: menu(mui, container)
+	, m_color(color)
+	, m_search()
+	, m_key_active(false)
+	, m_lock_ref(0)
+	, m_title(std::move(title))
 {
 	set_process_flags(PROCESS_LR_REPEAT);
-}
-
-//-------------------------------------------------
-//  dtor
-//-------------------------------------------------
-
-menu_rgb_ui::~menu_rgb_ui()
-{
 }
 
 //-------------------------------------------------
@@ -1108,14 +1100,6 @@ std::pair<const char *, const char *> const menu_palette_sel::s_palette[] = {
 
 menu_palette_sel::menu_palette_sel(mame_ui_manager &mui, render_container &container, rgb_t &_color)
 	: menu(mui, container), m_original(_color)
-{
-}
-
-//-------------------------------------------------
-//  dtor
-//-------------------------------------------------
-
-menu_palette_sel::~menu_palette_sel()
 {
 }
 

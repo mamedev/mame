@@ -1881,7 +1881,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 
 	<software name="dahnak" cloneof="dahna">
 		<description>Dahna (Kor)</description>
-		<year>199?</year>
+		<year>1992</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="GM 8031 JT"/>
 		<part name="cart" interface="megadriv_cart">
@@ -11282,7 +11282,7 @@ but dumps still have to be confirmed.
 
 	<software name="barver">
 		<description>Barver Battle Saga - Tai Kong Zhan Shi - Mo Fa Zhan Shi (Chi)</description>
-		<year>199?</year>
+		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="太空戰士 魔法戰士"/>
 		<part name="cart" interface="megadriv_cart">
@@ -11835,7 +11835,7 @@ but dumps still have to be confirmed.
 
 	<software name="btomato">
 		<description>Bill's Tomato Game (Prototype)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -16164,7 +16164,7 @@ but dumps still have to be confirmed.
 
 	<software name="funcar">
 		<description>Fun Car Rally (USA, Prototype)</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -16259,7 +16259,7 @@ but dumps still have to be confirmed.
 
 	<software name="gamenko">
 		<description>Game no Kandume Otokuyou (Jpn)</description>
-		<year>199?</year>
+		<year>1995</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3145728">
@@ -17570,7 +17570,7 @@ but dumps still have to be confirmed.
 	<!-- // BAD DUMP -->
 	<software name="jimpower">
 		<description>Jim Power - The Arcade Game (USA, Prototype)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Loriciel</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -19114,7 +19114,7 @@ but dumps still have to be confirmed.
 
 	<software name="megabm8">
 		<description>Mega Bomberman - 8 Player Demo</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -22584,7 +22584,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="pokemon2">
 		<description>Pocket Monsters 2</description>
-		<year>199?</year>
+		<year>2001</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_lion3"/>
@@ -23396,7 +23396,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="resq">
 		<description>Resq (Euro, Prototype)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -25226,7 +25226,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="scrack">
 		<description>Sonic Crackers (Jpn, Prototype)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
@@ -26445,7 +26445,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="sf2pir" cloneof="sf2">
 		<description>Street Fighter II' Turbo (Pirate)</description>
-		<year>1993?</year>
+		<year>1994</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
@@ -27511,7 +27511,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	<!-- // BAD DUMP -->
 	<software name="tecmocup">
 		<description>Tecmo Cup (Jpn, Prototype?)</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -28485,7 +28485,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="tunshi">
 		<description>Tun Shi Tian Di III (Chi, Simple Chinese)</description>
-		<year>199?</year>
+		<year>1997</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="吞食天地III"/>
 		<part name="cart" interface="megadriv_cart">
@@ -30986,7 +30986,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="xiaomo">
 		<description>Xiao Monv - Magic Girl (Tw)</description>
-		<year>199?</year>
+		<year>1993</year>
 		<publisher>Gamtec</publisher>
 		<info name="alt_title" value="小魔女"/>
 		<part name="cart" interface="megadriv_cart">
@@ -31343,7 +31343,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="meganser">
 		<description>Mega Anser (Jpn)</description>
-		<year>199?</year>
+		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="G-4502"/>
 		<part name="cart" interface="megadriv_cart">
@@ -31366,7 +31366,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="segachnl">
 		<description>Sega Channel (Scientific Atlanta) (USA)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Scientific Atlanta</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
@@ -31377,7 +31377,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="segachnla" cloneof="segachnl" supported="no">
 		<description>Sega Channel (General Instrument) (USA)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Scientific Atlanta</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -31388,7 +31388,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="segachd">
 		<description>Sega Channel Demo (USA)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Scientific Atlanta</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -31399,7 +31399,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="segachnj" supported="no">
 		<description>Sega Channel (Jpn, v2.11)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -31410,7 +31410,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="segachnjo" cloneof="segachnj" supported="no">
 		<description>Sega Channel (Jpn, v2.11 older)</description>
-		<year>199?</year>
+		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="524288">
@@ -31450,7 +31450,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="bugslife">
 		<description>A Bug's Life</description>
-		<year>199?</year>
+		<year>2000</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_bugs"/>
@@ -31600,7 +31600,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="lionkin2">
 		<description>Shi Zi Wang II - Lion King II</description>
-		<year>199?</year>
+		<year>1996</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_lion2"/>
@@ -31699,7 +31699,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="squirrel">
 		<description>Squirrel King (Chi)</description>
-		<year>199?</year>
+		<year>1995</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_squir"/>
@@ -31737,7 +31737,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="suprbubl">
 		<description>Super Bubble Bobble MD (Chi)</description>
-		<year>199?</year>
+		<year>1995</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sbubl"/>
@@ -31788,7 +31788,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="smario2">
 		<description>Super Mario 2 1998</description>
-		<year>199?</year>
+		<year>1998</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_smb2"/>
@@ -32421,7 +32421,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 
 	<software name="domino">
 		<description>Domino (Rus)</description>
-		<year>199?</year>
+		<year>2000</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="Домино"/>
 		<part name="cart" interface="megadriv_cart">

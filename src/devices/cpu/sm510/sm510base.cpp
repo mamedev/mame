@@ -13,16 +13,10 @@
   Default external frequency of these is 32.768kHz, forwarding a clockrate in the
   MAME machine config is optional. Newer revisions can have an internal oscillator.
 
-  TODO:
-  - source organiziation between files is a mess
-  - wake up after CEND doesn't work right
-
-  for more, see the *core.cpp file notes
-
 */
 
 #include "emu.h"
-#include "sm510.h"
+#include "sm510base.h"
 #include "debugger.h"
 
 
@@ -38,6 +32,8 @@ enum
 
 void sm510_base_device::device_start()
 {
+	assert(SM510_INPUT_LINE_K1 == 0);
+
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 	m_prgmask = (1 << m_prgwidth) - 1;
@@ -52,7 +48,7 @@ void sm510_base_device::device_start()
 	m_write_segs.resolve_safe();
 
 	// init/zerofill
-	memset(m_stack, 0, sizeof(m_stack));
+	std::fill_n(m_stack, std::size(m_stack), 0);
 	m_pc = 0;
 	m_prev_pc = 0;
 	m_op = 0;
@@ -70,7 +66,9 @@ void sm510_base_device::device_start()
 	m_r_out = 0;
 	m_div = 0;
 	m_1s = false;
-	m_k_active = false;
+	m_1s_rise = false;
+	m_k_rise = false;
+	std::fill_n(m_k_input, std::size(m_k_input), 0);
 	m_l = 0;
 	m_x = 0;
 	m_y = 0;
@@ -103,7 +101,9 @@ void sm510_base_device::device_start()
 	save_item(NAME(m_r_out));
 	save_item(NAME(m_div));
 	save_item(NAME(m_1s));
-	save_item(NAME(m_k_active));
+	save_item(NAME(m_1s_rise));
+	save_item(NAME(m_k_rise));
+	save_item(NAME(m_k_input));
 	save_item(NAME(m_l));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
@@ -138,6 +138,13 @@ void sm510_base_device::device_start()
 	init_melody();
 }
 
+device_memory_interface::space_config_vector sm510_base_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 
 //-------------------------------------------------
@@ -165,7 +172,6 @@ void sm510_base_device::device_reset()
 }
 
 
-
 //-------------------------------------------------
 //  lcd driver
 //-------------------------------------------------
@@ -181,14 +187,6 @@ inline u16 sm510_base_device::get_lcd_row(int column, u8* ram)
 		rowdata |= (ram[i] >> column & 1) << i;
 
 	return rowdata;
-}
-
-device_memory_interface::space_config_vector sm510_base_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
 }
 
 void sm510_base_device::lcd_update()
@@ -222,36 +220,9 @@ void sm510_base_device::init_lcd_driver()
 }
 
 
-
 //-------------------------------------------------
-//  interrupt/divider
+//  divider
 //-------------------------------------------------
-
-bool sm510_base_device::wake_me_up()
-{
-	// in halt mode, wake up after 1S signal or K input
-	if (m_k_active || m_1s)
-	{
-		// note: official doc warns that Bl/Bm and the stack are undefined
-		// after waking up, but we leave it unchanged
-		m_halt = false;
-		wakeup_vector();
-
-		standard_irq_callback(0);
-		return true;
-	}
-	else
-		return false;
-}
-
-void sm510_base_device::execute_set_input(int line, int state)
-{
-	if (line != SM510_INPUT_LINE_K)
-		return;
-
-	// set K input lines active state
-	m_k_active = (state != 0);
-}
 
 TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
@@ -259,7 +230,10 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 
 	// 1S signal on overflow(falling edge of F1)
 	if (m_div == 0)
+	{
+		m_1s_rise = !m_1s;
 		m_1s = true;
+	}
 
 	clock_melody();
 }
@@ -270,6 +244,33 @@ void sm510_base_device::init_divider()
 	m_div_timer->adjust(attotime::from_ticks(1, unscaled_clock()), 0, attotime::from_ticks(1, unscaled_clock()));
 }
 
+
+//-------------------------------------------------
+//  interrupt
+//-------------------------------------------------
+
+void sm510_base_device::execute_set_input(int line, int state)
+{
+	if (!valid_wakeup_line(line))
+		return;
+
+	// rising edge of any K input
+	if (state && !m_k_input[line])
+		m_k_rise = true;
+
+	m_k_input[line] = state;
+}
+
+void sm510_base_device::do_interrupt()
+{
+	// note: official doc warns that Bl/Bm and the stack are undefined
+	// after waking up, but we leave it unchanged
+	m_icount--;
+	m_halt = false;
+	wakeup_vector();
+
+	standard_irq_callback(0);
+}
 
 
 //-------------------------------------------------
@@ -286,16 +287,28 @@ void sm510_base_device::increment_pc()
 
 void sm510_base_device::execute_run()
 {
+	bool _1s_prev = m_1s_rise;
+
 	while (m_icount > 0)
 	{
-		m_icount--;
+		// in halt mode, wake up after 1S signal or K input
+		bool wakeup = m_k_rise || m_1s_rise;
+		m_k_rise = false;
+		m_1s_rise = false;
 
-		if (m_halt && !wake_me_up())
+		if (m_halt)
 		{
-			// got nothing to do
-			m_icount = 0;
-			return;
+			if (!wakeup)
+			{
+				// got nothing to do
+				m_icount = 0;
+				return;
+			}
+			else
+				do_interrupt();
 		}
+
+		m_icount--;
 
 		// remember previous state
 		m_prev_op = m_op;
@@ -306,7 +319,14 @@ void sm510_base_device::execute_run()
 			debugger_instruction_hook(m_pc);
 		m_op = m_program->read_byte(m_pc);
 		increment_pc();
-		get_opcode_param();
+
+		// 2-byte opcodes
+		if (op_argument())
+		{
+			m_icount--;
+			m_param = m_program->read_byte(m_pc);
+			increment_pc();
+		}
 
 		// handle opcode if it's not skipped
 		if (m_skip)
@@ -316,5 +336,10 @@ void sm510_base_device::execute_run()
 		}
 		else
 			execute_one();
+
+		// if CEND triggered at the same time as 1S signal, make sure it still wakes up
+		if (m_halt)
+			m_1s_rise = _1s_prev;
+		_1s_prev = false;
 	}
 }

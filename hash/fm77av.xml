@@ -8,7 +8,7 @@ Titles, serial #s, publishers and release dates taken from:
 
 
     Some FM-7 and FM-77AV applications can span multiple disk images, and will often be found as one file
-    comprised of multiple images concatenated together.  MESS does not support this, so with those images you'll
+    comprised of multiple images concatenated together.  MAME does not support this, so with those images you'll
     need to split the images into separate files.  This software list assumes that there is only one image per file.
 -->
 

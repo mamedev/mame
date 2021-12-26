@@ -83,6 +83,9 @@ private:
 
 	// Determine the state of the READY line
 	void operate_ready_line();
+
+	// Send the EOP signal to the controller
+	void signal_scsi_eop(int state);
 };
 
 class whtscsi_pld_device : public device_t

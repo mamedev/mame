@@ -91,8 +91,8 @@ protected:
 	void pb_w(u8 data);
 	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	void cpu09_mem(address_map &map);
-	u8 m_pa;
-	bool m_cassold;
+	u8 m_pa = 0U;
+	bool m_cassold = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia0;

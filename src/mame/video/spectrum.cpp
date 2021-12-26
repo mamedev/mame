@@ -266,6 +266,10 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 	}
 }
 
+u16 spectrum_state::get_border_color() {
+	return m_port_fe_data & 0x07;
+}
+
 /* The code below is just a per-pixel 'partial update' for the border */
 
 void spectrum_state::spectrum_UpdateBorderBitmap()
@@ -278,7 +282,7 @@ void spectrum_state::spectrum_UpdateBorderBitmap()
 
 	if (m_border_bitmap.valid())
 	{
-		uint16_t border = m_port_fe_data & 0x07;
+		uint16_t border = get_border_color();
 
 		//printf("update border from %d,%d to %d,%d\n", m_previous_border_x, m_previous_border_y, x, y);
 

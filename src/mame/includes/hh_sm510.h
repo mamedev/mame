@@ -9,8 +9,16 @@
 #ifndef MAME_INCLUDES_HH_SM510_H
 #define MAME_INCLUDES_HH_SM510_H
 
+#pragma once
+
 #include "cpu/sm510/sm510.h"
+#include "cpu/sm510/sm511.h"
+#include "cpu/sm510/sm5a.h"
 #include "sound/spkrdev.h"
+
+
+#define PORT_CHANGED_CB(x) \
+	PORT_CHANGED_MEMBER(DEVICE_SELF, hh_sm510_state, x, 0)
 
 
 class hh_sm510_state : public driver_device

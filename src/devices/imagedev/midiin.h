@@ -46,6 +46,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -61,6 +62,7 @@ private:
 	void xmit_char(uint8_t data);
 
 	std::unique_ptr<osd_midi_device> m_midi;
+	required_ioport m_config;
 	emu_timer *m_timer;
 	devcb_write_line        m_input_cb;
 	uint8_t m_xmitring[XMIT_RING_SIZE];

@@ -117,15 +117,15 @@ private:
 
 	required_device<ieee488_device>     m_ieee;
 
-	uint8_t m_intmask;
-	uint8_t m_tx_rx_rdy;
-	uint8_t m_irq;
+	uint8_t m_intmask = 0U;
+	uint8_t m_tx_rx_rdy = 0U;
+	uint8_t m_irq = 0U;
 
-	bool    m_printer_prowriter;
-	int     m_printer_fault;
-	int     m_printer_select;
+	bool    m_printer_prowriter = 0;
+	int     m_printer_fault = 0;
+	int     m_printer_select = 0;
 
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 };
 
 #endif // MAME_INCLUDES_ZORBA_H

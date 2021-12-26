@@ -69,7 +69,7 @@ copyright-holders:Robbbert
 		<element name="digit15" ref="digit">
 			<bounds left="54" top="345" right="88" bottom="384" />
 		</element>
-		<element name="digit8" ref="digit">
+		<element name="digit6" ref="digit">
 			<bounds left="186" top="345" right="220" bottom="384" />
 		</element>
 		<element name="digit7" ref="digit">

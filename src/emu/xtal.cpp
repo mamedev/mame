@@ -80,10 +80,12 @@ const double XTAL::known_xtals[] = {
 	  2'000'000, /* 2_MHz_XTAL             - */
 	  2'012'160, /* 2.01216_MHz_XTAL       Cidelsa Draco sound board */
 	  2'097'152, /* 2.097152_MHz_XTAL      Icatel 1995 - Brazilian public payphone */
+	  2'250'000, /* 2.25_MHz_XTAL          Resonator - YM2154 on Yamaha PSR-60 & PSR-70 */
 	  2'376'000, /* 2.376_MHz_XTAL         CIT-101 keyboard */
 	  2'457'600, /* 2.4576_MHz_XTAL        Atari ST MFP */
 	  2'500'000, /* 2.5_MHz_XTAL           Janken Man units */
 	  2'600'000, /* 2.6_MHz_XTAL           Sharp PC-1500 */
+	  2'700'000, /* 2.7_MHz_XTAL           Resonator - YM2154 on Yamaha RX15 */
 	  2'950'000, /* 2.95_MHz_XTAL          Playmatic MPU-C, MPU-III & Sound-3 */
 	  3'000'000, /* 3_MHz_XTAL             Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	  3'072'000, /* 3.072_MHz_XTAL         INS 8520 input clock rate */
@@ -327,6 +329,7 @@ const double XTAL::known_xtals[] = {
 	 22'464'000, /* 22.464_MHz_XTAL        CIT-101 132-column display clock */
 	 22'579'000, /* 22.579_MHz_XTAL        Sega System H1 SCSP clock */
 	 22'656'000, /* 22.656_MHz_XTAL        Super Pinball Action (~1440x NTSC line rate) */
+	 22'680'000, /* 22.680_MHz_XTAL        HDS200 80-columns display clock */
 	 22'896'000, /* 22.896_MHz_XTAL        DEC VT220 132-column display clock */
 	 23'200'000, /* 23.2_MHz_XTAL          Roland JV-80 & JV-880 PCM clock */
 	 23'814'000, /* 23.814_MHz_XTAL        TeleVideo TVI-912, 920 & 950 */
@@ -402,6 +405,7 @@ const double XTAL::known_xtals[] = {
 	 34'000'000, /* 34_MHz_XTAL            Gaelco PCBs */
 	 34'291'712, /* 34.291712_MHz_XTAL     Fairlight CMI master card */
 	 34'846'000, /* 34.846_MHz_XTAL        Visual 550 */
+	 35'640'000, /* 35.640_MHz_XTAL        HDS200 132-column display clock */
 	 35'834'400, /* 35.8344_MHz_XTAL       Tab Products E-22 132-column display clock */
 	 35'840'000, /* 35.84_MHz_XTAL         Akai MPC 60 voice PCB */
 	 35'904'000, /* 35.904_MHz_XTAL        Used on HP98543 graphics board */

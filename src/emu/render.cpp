@@ -1338,10 +1338,6 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 
 render_primitive_list &render_target::get_primitives()
 {
-	// remember the base values if this is the first frame
-	if (!m_base_view)
-		m_base_view = &current_view();
-
 	// switch to the next primitive list
 	render_primitive_list &list = m_primlist[m_listindex];
 	m_listindex = (m_listindex + 1) % std::size(m_primlist);
@@ -2613,10 +2609,18 @@ int render_target::view_index(layout_view &targetview) const
 //  config_load - process config information
 //-------------------------------------------------
 
-void render_target::config_load(util::xml::data_node const &targetnode)
+void render_target::config_load(util::xml::data_node const *targetnode)
 {
+	// remember the view selected via command line and INI options
+	if (!m_base_view)
+		m_base_view = &current_view();
+
+	// bail if no configuration
+	if (!targetnode)
+		return;
+
 	// find the view
-	const char *viewname = targetnode.get_attribute_string("view", nullptr);
+	const char *viewname = targetnode->get_attribute_string("view", nullptr);
 	if (viewname != nullptr)
 		for (int viewnum = 0; viewnum < 1000; viewnum++)
 		{
@@ -2631,12 +2635,12 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 	// modify the artwork config
-	int const zoom = targetnode.get_attribute_int("zoom", -1);
+	int const zoom = targetnode->get_attribute_int("zoom", -1);
 	if (zoom == 0 || zoom == 1)
 		set_zoom_to_screen(zoom);
 
 	// apply orientation
-	int rotate = targetnode.get_attribute_int("rotate", -1);
+	int rotate = targetnode->get_attribute_int("rotate", -1);
 	if (rotate != -1)
 	{
 		if (rotate == 90)
@@ -2660,7 +2664,7 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 	}
 
 	// apply per-view settings
-	for (util::xml::data_node const *viewnode = targetnode.get_child("view"); viewnode; viewnode = viewnode->get_next_sibling("view"))
+	for (util::xml::data_node const *viewnode = targetnode->get_child("view"); viewnode; viewnode = viewnode->get_next_sibling("view"))
 	{
 		char const *const viewname = viewnode->get_attribute_string("name", nullptr);
 		if (!viewname)
@@ -3297,8 +3301,20 @@ void render_manager::resolve_tags()
 void render_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
 	// we only care about system-specific configuration with matching nodes
-	if ((cfg_type != config_type::SYSTEM) || !parentnode)
+	if (cfg_type == config_type::DEFAULT)
+	{
+		// let the targets stabilise themselves
+		for (render_target &target : m_targetlist)
+		{
+			if (!target.hidden())
+				target.config_load(nullptr);
+		}
 		return;
+	}
+	else if ((cfg_type != config_type::SYSTEM) || !parentnode)
+	{
+		return;
+	}
 
 	// check the UI target
 	util::xml::data_node const *const uinode = parentnode->get_child("interface");
@@ -3314,7 +3330,7 @@ void render_manager::config_load(config_type cfg_type, config_level cfg_level, u
 	{
 		render_target *const target = target_by_index(targetnode->get_attribute_int("index", -1));
 		if (target && !target->hidden())
-			target->config_load(*targetnode);
+			target->config_load(targetnode);
 	}
 
 	// iterate over screen nodes

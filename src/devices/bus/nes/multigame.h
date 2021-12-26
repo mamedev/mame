@@ -299,10 +299,6 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
 };
 
 
@@ -542,6 +538,31 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+};
+
+
+// ======================> nes_bmc_tf2740_device
+
+class nes_bmc_tf2740_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_tf2740_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+private:
+	void update_chr();
+	u8 m_reg[3];
+	u8 m_jumper;
 };
 
 
@@ -1232,6 +1253,7 @@ DECLARE_DEVICE_TYPE(NES_BMC_K1029,      nes_bmc_k1029_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3036,      nes_bmc_k3036_device)
 DECLARE_DEVICE_TYPE(NES_BMC_K3046,      nes_bmc_k3046_device)
 DECLARE_DEVICE_TYPE(NES_BMC_SA005A,     nes_bmc_sa005a_device)
+DECLARE_DEVICE_TYPE(NES_BMC_TF2740,     nes_bmc_tf2740_device)
 DECLARE_DEVICE_TYPE(NES_BMC_TJ03,       nes_bmc_tj03_device)
 DECLARE_DEVICE_TYPE(NES_BMC_WS,         nes_bmc_ws_device)
 DECLARE_DEVICE_TYPE(NES_BMC_11160,      nes_bmc_11160_device)

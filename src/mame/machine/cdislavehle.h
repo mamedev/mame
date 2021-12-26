@@ -55,6 +55,9 @@ protected:
 	TIMER_CALLBACK_MEMBER( trigger_readback_int );
 
 private:
+	void prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd);
+	void set_mouse_position();
+
 	devcb_write_line m_int_callback;
 
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
@@ -63,12 +66,8 @@ private:
 	required_ioport m_mousey;
 	required_ioport m_mousebtn;
 
-	// internal state
-	class channel_state
+	struct channel_state
 	{
-	public:
-		channel_state() { }
-
 		uint8_t m_out_buf[4];
 		uint8_t m_out_index;
 		uint8_t m_out_count;
@@ -88,18 +87,11 @@ private:
 
 	uint8_t m_lcd_state[16];
 
-	uint16_t m_real_mouse_x;
-	uint16_t m_real_mouse_y;
+	uint16_t m_input_mouse_x;
+	uint16_t m_input_mouse_y;
 
-	uint16_t m_fake_mouse_x;
-	uint16_t m_fake_mouse_y;
-
-	// static internal members
-
-	// non-static internal members
-	void prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd);
-	void perform_mouse_update();
-	void set_mouse_position();
+	int16_t m_device_mouse_x;
+	int16_t m_device_mouse_y;
 };
 
 

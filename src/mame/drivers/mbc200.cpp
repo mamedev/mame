@@ -103,8 +103,8 @@ private:
 	void sub_mem(address_map &map);
 	void sub_io(address_map &map);
 
-	u8 m_comm_latch;
-	u8 m_term_data;
+	u8 m_comm_latch = 0U;
+	u8 m_term_data = 0U;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8255_device> m_ppi_m;
 	required_shared_ptr<u8> m_vram;

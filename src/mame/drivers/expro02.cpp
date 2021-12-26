@@ -222,6 +222,8 @@ BTANB:
 #include "speaker.h"
 
 
+namespace {
+
 class expro02_state : public driver_device
 {
 public:
@@ -240,6 +242,7 @@ public:
 	{ }
 
 	void supmodel(machine_config &config);
+	void supmodl2(machine_config &config);
 	void zipzap(machine_config &config);
 	void fantasia(machine_config &config);
 	void fantsia2(machine_config &config);
@@ -250,6 +253,9 @@ public:
 	void expro02(machine_config &config);
 
 	void init_expro02();
+
+protected:
+	virtual void machine_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -273,7 +279,6 @@ private:
 
 	void oki_bankswitch_w(u8 data);
 
-	virtual void machine_start() override;
 	void expro02_palette(palette_device &palette) const;
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -294,6 +299,7 @@ private:
 	void oki_map(address_map &map);
 	void smissw_map(address_map &map);
 	void supmodel_map(address_map &map);
+	void supmodl2_map(address_map &map);
 	void zipzap_map(address_map &map);
 };
 
@@ -778,6 +784,13 @@ void expro02_state::fantsia2_map(address_map &map)
 	map(0xf80000, 0xf8ffff).ram();
 }
 
+void expro02_state::supmodl2_map(address_map &map)
+{
+	fantsia2_map(map);
+	map(0x800006, 0x800007).r(FUNC(expro02_state::comad_timer_r));
+	map(0x80000a, 0x80000b).r(FUNC(expro02_state::comad_timer_r));
+}
+
 
 
 
@@ -1002,6 +1015,13 @@ void expro02_state::fantsia2(machine_config &config)
 	comad_noview2(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::fantsia2_map);
+}
+
+void expro02_state::supmodl2(machine_config &config)
+{
+	fantsia2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &expro02_state::supmodl2_map);
 }
 
 void expro02_state::galhustl(machine_config &config)
@@ -1472,7 +1492,7 @@ ROM_START( fantasian ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 940803 MADE IN
 	ROM_LOAD( "music2_2.uc6", 0x80000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
 ROM_END
 
-ROM_START( newfant )
+ROM_START( newfant ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 940630 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "prog2.12", 0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
 	ROM_LOAD16_BYTE( "prog1.07", 0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
@@ -1494,7 +1514,7 @@ ROM_START( newfant )
 	ROM_LOAD( "musc2.02", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
-ROM_START( newfanta ) // Comad 940630 PCB
+ROM_START( newfanta ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 940630 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "12.ue17",  0x000000, 0x80000, CRC(de43a457) SHA1(91db13f63b46146131c58e775119ea3b073ca409) )
 	ROM_LOAD16_BYTE( "7.ud17",   0x000001, 0x80000, CRC(370b45be) SHA1(775873df9d3af803dbd1a392a45cad5f37b1b1c7) )
@@ -1516,7 +1536,7 @@ ROM_START( newfanta ) // Comad 940630 PCB
 	ROM_LOAD( "2.uc6", 0x80000, 0x80000, CRC(b9646a8c) SHA1(e9432261ac86e4251a2c97301c6d014c05110a9c) )
 ROM_END
 
-ROM_START( missw96 )
+ROM_START( missw96 ) // found on PCBs silkscreened COMAD INDUSTRY CO.,LTD 951005 MADE IN KOREA  or  COMAD INDUSTRY CO.,LTD 951127 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "mw96_10.bin", 0x000000, 0x80000, CRC(b1309bb1) SHA1(3cc7a903cb007d8fc0f836a33780c1c9231d1629) )
 	ROM_LOAD16_BYTE( "mw96_06.bin", 0x000001, 0x80000, CRC(a5892bb3) SHA1(99130eb0af307fe66c9668414475e003f9c7d969) )
@@ -1536,7 +1556,7 @@ ROM_START( missw96 )
 	ROM_LOAD( "mw96_02.bin", 0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
-ROM_START( missw96a )
+ROM_START( missw96a ) // found on PCBs silkscreened COMAD INDUSTRY CO.,LTD 951005 MADE IN KOREA  or  COMAD INDUSTRY CO.,LTD 951127 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "mw96n2_10.prog2", 0x000000, 0x80000, CRC(563ce811) SHA1(4013b303dc7fdfcd2b5b91f12a950eb71b27714a) )
 	ROM_LOAD16_BYTE( "mw96n2_6.prog1",  0x000001, 0x80000, CRC(98e91a3b) SHA1(a135458e0373b528498408ac3288a01a666f3522) )
@@ -1556,7 +1576,7 @@ ROM_START( missw96a )
 	ROM_LOAD( "mw96_02.bin", 0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
-ROM_START( missw96b )
+ROM_START( missw96b ) // found on PCBs silkscreened COMAD INDUSTRY CO.,LTD 951005 MADE IN KOREA  or  COMAD INDUSTRY CO.,LTD 951127 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "mw96n3_10.prog2", 0x000000, 0x80000, CRC(67bde86b) SHA1(7457a4c130a9ab1c75645e2a662a87af3fee8bba) )
 	ROM_LOAD16_BYTE( "mw96n3_6.prog1",  0x000001, 0x80000, CRC(de99cc48) SHA1(ffa2597083c412fb943724048d8d5cc7bd9be11c) )
@@ -1576,7 +1596,7 @@ ROM_START( missw96b )
 	ROM_LOAD( "mw96_02.bin", 0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
-ROM_START( missw96c )
+ROM_START( missw96c ) // found on PCBs silkscreened COMAD INDUSTRY CO.,LTD 951005 MADE IN KOREA  or  COMAD INDUSTRY CO.,LTD 951127 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "10_prog2.ue17", 0x000000, 0x80000, CRC(36a7beb6) SHA1(11f6aef506a4e357442207fef760401757deaaeb) )
 	ROM_LOAD16_BYTE( "6_prog1.ud17",  0x000001, 0x80000, CRC(e70b562f) SHA1(4affd40ab7f962824d1c7be22ea6819cf06d6347) )
@@ -1617,7 +1637,7 @@ ROM_START( missmw96 )
 	ROM_LOAD( "mw96_02.bin", 0x80000, 0x80000, CRC(60fa0c00) SHA1(391aa31e61663cc083a8a2320ba48a9859f3fd4e) )
 ROM_END
 
-ROM_START( smissw )
+ROM_START( smissw ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 951127 MADE IN KOREA
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "10_prog2.ue17", 0x000000, 0x80000, CRC(e99e520f) SHA1(edd06a3b0f8d30a4020e6ea452abb0afd79d426a) )
 	ROM_LOAD16_BYTE( "6_prog1.ud17",  0x000001, 0x80000, CRC(22831657) SHA1(eeabcdef543048ccceabc4c3b4b288aec959a14f) )
@@ -1638,7 +1658,7 @@ ROM_START( smissw )
 ROM_END
 
 
-ROM_START( fantsia2 )
+ROM_START( fantsia2 ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 961210 MADE IN KOREA   (PCB has an additional OSC marked 18MHz, currently unpopulated)
 	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_BYTE( "prog2.g17", 0x000000, 0x80000, CRC(57c59972) SHA1(4b1da928b537cf340a67026d07bc3dfc078b0d0f) )
 	ROM_LOAD16_BYTE( "prog1.f17", 0x000001, 0x80000, CRC(bf2d9a26) SHA1(92f0c1bd32f1e5e0ede3ba847242a212dfae4986) )
@@ -1706,6 +1726,29 @@ ROM_START( fantsia2n )
 	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
 	ROM_LOAD( "music2.1b", 0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
 	ROM_LOAD( "music1.1a", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+ROM_END
+
+ROM_START( supmodl2 ) // PCB silkscreened COMAD INDUSTRY CO.,LTD 961210 MADE IN KOREA   (PCB has an additional OSC marked 18MHz, currently unpopulated)
+	ROM_REGION( 0x500000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "12_prog2.ue17",   0x000000, 0x80000, CRC(9107f65d) SHA1(c66c1cfeae2afc5a1bf0d6385291592c0f9b1578) )
+	ROM_LOAD16_BYTE( "7_prog1.ud17",    0x000001, 0x80000, CRC(0d9253a7) SHA1(2c7e84bfbf648c22acf76dbfcbb9e2416225abc9) )
+	ROM_LOAD16_BYTE( "11_i-scr2.ue16b", 0x100000, 0x80000, CRC(b836c1f3) SHA1(56c611313336dbb0ebcdba42ba73c5738ca7c8d7) )
+	ROM_LOAD16_BYTE( "6_i-scr1.ue16a",  0x100001, 0x80000, CRC(d56cac96) SHA1(31fe266ba6abbd51ed7ff6089ebc86e528ac249a) )
+	ROM_LOAD16_BYTE( "10_i-scr4.ue15b", 0x200000, 0x80000, CRC(aa85a247) SHA1(6508c0f8b1bc397599ecb0ae5c9a9ebcc532bdd8) )
+	ROM_LOAD16_BYTE( "5_i-scr3.ue15a",  0x200001, 0x80000, CRC(3e9bd17a) SHA1(cbbd90120fe9504eac05bb6c8f38d16b44d8b475) )
+	ROM_LOAD16_BYTE( "9_i-scr6.ue14b",  0x300000, 0x80000, CRC(d21355dc) SHA1(f449f6b2c815453545a798e6d7081327b8c1677c) )
+	ROM_LOAD16_BYTE( "4_i-scr5.ue14a",  0x300001, 0x80000, CRC(d1c9155c) SHA1(9d50e0875feab77a91cc1d8fe575ad6361bfada2) )
+	ROM_LOAD16_BYTE( "8_i-scr8.ue20b",  0x400000, 0x80000, CRC(7ffe761e) SHA1(63d0b6e3e34a465e038f8f96ae5f3f1e3666aaaa) )
+	ROM_LOAD16_BYTE( "3_i-scr7.ue20a",  0x400001, 0x80000, CRC(d2bb19ef) SHA1(b8dee4c64915ae9d7e3a79a0d32f692f5e2a0d06) )
+
+	ROM_REGION( 0x100000, "kan_spr", 0 ) // sprites
+	ROM_LOAD( "13_obj1.u5", 0x00000, 0x80000, CRC(52e6872a) SHA1(7e5274b9a415ee0e536cd3b87f73d3eae9644669) )
+	ROM_LOAD( "14_obj2.u4", 0x80000, 0x80000, CRC(ea6e3861) SHA1(463b40f5441231a0451571a0b8afe1ed0fd4b164) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // OKIM6295 samples
+	// 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs
+	ROM_LOAD( "1_music1.ub6", 0x00000, 0x80000, CRC(23cc4f9c) SHA1(06b5342c25de966ce590917c571e5b19af1fef7d) )
+	ROM_LOAD( "2_music2.uc6", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
 ROM_START( wownfant)
@@ -1918,6 +1961,9 @@ void expro02_state::init_expro02()
 	}
 }
 
+} // Anonymous namespace
+
+
 /*************************************
  *
  *  Game driver(s)
@@ -1956,6 +2002,8 @@ GAME( 1996, smissw,    0,        smissw,   missw96,   expro02_state, empty_init,
 GAME( 1997, fantsia2,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Explicit)",      MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
 GAME( 1997, fantsia2a, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
 GAME( 1998, fantsia2n, fantsia2, fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Fantasia II (1998)",          MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+
+GAME( 1997, supmodl2,  0,        supmodl2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "Super Model II",              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 GAME( 2002, wownfant,  0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
 GAME( 2002, missw02,   0,        fantsia2, missw96,   expro02_state, empty_init,   ROT0,  "Daigom",                   "Miss World 2002",  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level

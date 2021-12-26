@@ -163,7 +163,6 @@ OSC3: 48.384MHz
 #include "emu.h"
 #include "includes/namcofl.h"
 
-#include "cpu/i960/i960.h"
 #include "sound/c352.h"
 #include "machine/nvram.h"
 #include "speaker.h"
@@ -194,14 +193,9 @@ void namcofl_state::sysreg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
 	{
-		if (data == 0)  // RAM at 00000000, ROM at 10000000
-		{
-			set_bank(1);
-		}
-		else        // ROM at 00000000, RAM at 10000000
-		{
-			set_bank(0);
-		}
+		// 0: RAM at 00000000, ROM at 10000000
+		// 1: ROM at 00000000, RAM at 10000000
+		m_mainbank.select(data & 1);
 	}
 }
 
@@ -219,29 +213,27 @@ void namcofl_state::c116_w(offs_t offset, uint8_t data)
 
 void namcofl_state::namcofl_mem(address_map &map)
 {
-	map(0x00000000, 0x000fffff).m(m_mainbank[0], FUNC(address_map_bank_device::amap32));
-	map(0x10000000, 0x100fffff).m(m_mainbank[1], FUNC(address_map_bank_device::amap32));
-	map(0x20000000, 0x201fffff).rom().region("data", 0);
-	map(0x30000000, 0x30001fff).ram().share("nvram"); /* nvram */
-	map(0x30100000, 0x30100003).w(FUNC(namcofl_state::spritebank_w));
-	map(0x30284000, 0x3028bfff).ram().share("shareram");
-	map(0x30300000, 0x30303fff).ram(); /* COMRAM */
-	map(0x30380000, 0x303800ff).r(FUNC(namcofl_state::network_r)).umask32(0x00ff00ff); /* network registers */
-	map(0x30400000, 0x30407fff).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::c116_w));
-	map(0x30800000, 0x3080ffff).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
-	map(0x30a00000, 0x30a0003f).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
-	map(0x30c00000, 0x30c1ffff).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
-	map(0x30d00000, 0x30d0001f).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
-	map(0x30e00000, 0x30e1ffff).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
-	map(0x30f00000, 0x30f0000f).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
-	map(0x40000000, 0x4000005f).rw(FUNC(namcofl_state::sysreg_r), FUNC(namcofl_state::sysreg_w));
-	map(0xfffffffc, 0xffffffff).r(FUNC(namcofl_state::unk1_r));
-}
+	map(0x00000000, 0x1fffffff).view(m_mainbank);
+	m_mainbank[0](0x00000000, 0x000fffff).flags(i960_cpu_device::BURST).ram().share("workram");
+	m_mainbank[0](0x10000000, 0x100fffff).flags(i960_cpu_device::BURST).rom().region("maincpu", 0);
+	m_mainbank[1](0x00000000, 0x000fffff).flags(i960_cpu_device::BURST).rom().region("maincpu", 0);
+	m_mainbank[1](0x10000000, 0x100fffff).flags(i960_cpu_device::BURST).ram().share("workram");
 
-void namcofl_state::namcofl_bank_mem(address_map &map)
-{
-	map(0x000000, 0x0fffff).rom().region("maincpu", 0);
-	map(0x100000, 0x1fffff).ram().share("workram");
+	map(0x20000000, 0x201fffff).flags(i960_cpu_device::BURST).rom().region("data", 0);
+	map(0x30000000, 0x30001fff).flags(i960_cpu_device::BURST).ram().share("nvram"); /* nvram */
+	map(0x30100000, 0x30100003).flags(i960_cpu_device::BURST).w(FUNC(namcofl_state::spritebank_w));
+	map(0x30284000, 0x3028bfff).flags(i960_cpu_device::BURST).ram().share("shareram");
+	map(0x30300000, 0x30303fff).flags(i960_cpu_device::BURST).ram(); /* COMRAM */
+	map(0x30380000, 0x303800ff).flags(i960_cpu_device::BURST).r(FUNC(namcofl_state::network_r)).umask32(0x00ff00ff); /* network registers */
+	map(0x30400000, 0x30407fff).flags(i960_cpu_device::BURST).r(m_c116, FUNC(namco_c116_device::read)).w(FUNC(namcofl_state::c116_w));
+	map(0x30800000, 0x3080ffff).flags(i960_cpu_device::BURST).rw(m_c123tmap, FUNC(namco_c123tmap_device::videoram16_r), FUNC(namco_c123tmap_device::videoram16_w));
+	map(0x30a00000, 0x30a0003f).flags(i960_cpu_device::BURST).rw(m_c123tmap, FUNC(namco_c123tmap_device::control16_r), FUNC(namco_c123tmap_device::control16_w));
+	map(0x30c00000, 0x30c1ffff).flags(i960_cpu_device::BURST).rw(m_c169roz, FUNC(namco_c169roz_device::videoram_r), FUNC(namco_c169roz_device::videoram_w));
+	map(0x30d00000, 0x30d0001f).flags(i960_cpu_device::BURST).rw(m_c169roz, FUNC(namco_c169roz_device::control_r), FUNC(namco_c169roz_device::control_w));
+	map(0x30e00000, 0x30e1ffff).flags(i960_cpu_device::BURST).rw(m_c355spr, FUNC(namco_c355spr_device::spriteram_r), FUNC(namco_c355spr_device::spriteram_w)).share("objram");
+	map(0x30f00000, 0x30f0000f).flags(i960_cpu_device::BURST).ram(); /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
+	map(0x40000000, 0x4000005f).flags(i960_cpu_device::BURST).rw(FUNC(namcofl_state::sysreg_r), FUNC(namcofl_state::sysreg_w));
+	map(0xfffffffc, 0xffffffff).flags(i960_cpu_device::BURST).r(FUNC(namcofl_state::unk1_r));
 }
 
 
@@ -504,6 +496,8 @@ void namcofl_state::machine_start()
 	m_raster_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::raster_interrupt_callback),this));
 	m_network_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 	m_vblank_interrupt_timer =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
+
+	m_mainbank.select(1);
 }
 
 
@@ -513,8 +507,7 @@ void namcofl_state::machine_reset()
 	m_vblank_interrupt_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().max_y + 1));
 
 	std::fill_n(&m_workram[0], m_workram.bytes() / 4, 0);
-
-	set_bank(0);
+	m_mainbank.select(1);
 }
 
 
@@ -522,13 +515,6 @@ void namcofl_state::namcofl(machine_config &config)
 {
 	I960(config, m_maincpu, 80_MHz_XTAL/4); // i80960KA-20 == 20 MHz part
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcofl_state::namcofl_mem);
-
-	for (int bank = 0; bank < 2; bank++)
-	{
-		ADDRESS_MAP_BANK(config, m_mainbank[bank]);
-		m_mainbank[bank]->set_map(&namcofl_state::namcofl_bank_mem);
-		m_mainbank[bank]->set_options(ENDIANNESS_LITTLE, 32, 21, 0x100000);
-	}
 
 	NAMCO_C75(config, m_mcu, 48.384_MHz_XTAL/3);
 	m_mcu->set_addrmap(AS_PROGRAM, &namcofl_state::namcoc75_am);

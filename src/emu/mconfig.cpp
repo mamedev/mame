@@ -257,24 +257,23 @@ std::pair<const char *, device_t *> machine_config::resolve_owner(const char *ta
 	device_t *owner(m_current_device);
 
 	// if the device path is absolute, start from the root
-	if (tag[0] == ':')
-	{
-		tag++;
-		owner = m_root_device.get();
-	}
+	if (!*tag || (':' == *tag) || ('^' == *tag))
+		throw emu_fatalerror("Attempting to add device with tag containing parent references '%s'\n", orig_tag);
 
 	// go down the path until we're done with it
-	while (strchr(tag, ':'))
+	char const *next;
+	while ((next = strchr(tag, ':')) != nullptr)
 	{
-		const char *next = strchr(tag, ':');
 		assert(next != tag);
 		std::string_view part(tag, next - tag);
 		owner = owner->subdevices().find(part);
 		if (!owner)
-			throw emu_fatalerror("Could not find %s when looking up path for device %s\n", part, orig_tag);
-		tag = next+1;
+			throw emu_fatalerror("Could not find '%s' when looking up path for device '%s'\n", part, orig_tag);
+		tag = next + 1;
+		if ('^' == *tag)
+			throw emu_fatalerror("Attempting to add device with tag containing parent references '%s'\n", orig_tag);
 	}
-	assert(tag[0] != '\0');
+	assert(*tag != '\0');
 
 	return std::make_pair(tag, owner);
 }
@@ -296,7 +295,7 @@ std::tuple<const char *, device_t *, device_t *> machine_config::prepare_replace
 	if (old_device)
 		remove_references(*old_device);
 	else
-		osd_printf_warning("Warning: attempting to replace non-existent device '%s'\n", tag);
+		throw emu_fatalerror("Attempting to replace non-existent device '%s'\n", tag);
 
 	return std::make_tuple(owner.first, owner.second, old_device);
 }

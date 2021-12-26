@@ -84,17 +84,17 @@ private:
 	required_ioport m_io_row2;
 	required_ioport m_io_joy;
 
-	uint8_t m_column;
+	uint8_t m_column = 0U;
 
 	// graphics signals
-	uint8_t m_ag;
-	uint8_t m_gm2;
-	uint8_t m_gm1;
-	uint8_t m_gm0;
-	uint8_t m_as;
-	uint8_t m_css;
-	uint8_t m_intext;
-	uint8_t m_inv;
+	uint8_t m_ag = 0U;
+	uint8_t m_gm2 = 0U;
+	uint8_t m_gm1 = 0U;
+	uint8_t m_gm0 = 0U;
+	uint8_t m_as = 0U;
+	uint8_t m_css = 0U;
+	uint8_t m_intext = 0U;
+	uint8_t m_inv = 0U;
 };
 
 

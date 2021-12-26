@@ -3,7 +3,6 @@
 
 // Creation of unformatted floppy images
 
-#include "emu.h"
 #include "fs_unformatted.h"
 
 const fs_unformatted FS_UNFORMATTED;
@@ -20,6 +19,8 @@ const char *fs_unformatted::description() const
 
 void fs_unformatted::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
+	using u32 = std::uint32_t;
+
 	bool all = form_factor == floppy_image::FF_UNKNOWN;
 	u32 best_8 =
 		form_factor == floppy_image::FF_8 ?
@@ -83,7 +84,7 @@ void fs_unformatted::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, co
 		fe.add_raw("u3ssdd", FSI_35_SSDD, "Unformatted 3\" single-sided double-density");
 }
 
-void fs_unformatted::format(u32 key, floppy_image *image)
+void fs_unformatted::format(uint32_t key, floppy_image *image)
 {
 	switch(key) {
 	case FSI_8_DSDD: image->set_form_variant(floppy_image::FF_8, floppy_image::DSDD); break;

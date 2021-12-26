@@ -46,12 +46,12 @@ public:
 		, m_riot1(*this, "riot1")
 		, m_riot2(*this, "riot2")
 		, m_riot3(*this, "riot3")
-		, m_io_dips(*this, "DSW%u", 0U)
-		, m_io_keyboard(*this, "X%u", 0U)
+		, m_io_dips(*this, "DSW%d", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_r0_sound(*this, "r0sound")
 		, m_r1_sound(*this, "r1sound")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void gts80b_s2(machine_config &config);
@@ -73,14 +73,14 @@ private:
 	void port3b_w(u8 data);
 	void gts80b_map(address_map &map);
 
-	u8 m_segment = 0;
-	u8 m_lamprow = 0;
-	u8 m_swrow = 0;
-	u8 m_soundex = 0;
-	u8 m_sol_state[9][2];
-	u8 m_dispcmd;
-	bool m_in_cmd_mode[2];
-	u8 m_digit[2];
+	u8 m_segment = 0U;
+	u8 m_lamprow = 0U;
+	u8 m_swrow = 0U;
+	u8 m_soundex = 0U;
+	u8 m_sol_state[9][2]{};
+	u8 m_dispcmd = 0U;
+	bool m_in_cmd_mode[2]{};
+	u8 m_digit[2]{};
 	bool m_slam_low = false;
 
 	virtual void machine_reset() override;
@@ -517,6 +517,9 @@ void gts80b_state::machine_start()
 void gts80b_state::machine_reset()
 {
 	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_lamprow = 0;
 	m_swrow = 0;
 	m_segment = 0;

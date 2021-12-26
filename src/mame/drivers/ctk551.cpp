@@ -53,6 +53,7 @@
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 namespace {
 
@@ -63,7 +64,9 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "lcdc")
+		, m_outputs(*this, "%02x.%d.%d", 0U, 0U, 0U)
 		, m_led_touch(*this, "led_touch")
+		, m_led_power(*this, "led_power")
 	{
 	}
 
@@ -83,21 +86,21 @@ private:
 
 	virtual void driver_start() override;
 
-	HD44780_PIXEL_UPDATE(lcd_update);
-	void palette_init(palette_device &palette);
-
 	required_device<gt913_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 
+	output_finder<64, 8, 5> m_outputs;
 	output_finder<> m_led_touch;
+	output_finder<> m_led_power;
 
 	ioport_value m_switch;
+
+	DECLARE_WRITE_LINE_MEMBER(render_w);
 };
 
 
 INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 {
-	logerror("switch_w: %x\n", param);
 	if (!oldval && newval)
 	{
 		if (m_switch == 0x1 && param != m_switch)
@@ -112,20 +115,28 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 WRITE_LINE_MEMBER(ctk551_state::apo_w)
 {
 	logerror("apo_w: %x\n", state);
-	/* TODO: when 1, this should turn off the LCD, speakers, etc.
+	/* auto power off - disable the LCD
 	the CPU will go to sleep until the power switch triggers a NMI */
+	if (state)
+		m_lcdc->reset();
+	m_led_power = !state;
 }
 
-HD44780_PIXEL_UPDATE(ctk551_state::lcd_update)
-{
-	if (x < 6 && y < 8 && line < 2 && pos < 8)
-		bitmap.pix(line * 8 + y, pos * 6 + x) = state;
-}
 
-void ctk551_state::palette_init(palette_device &palette)
+WRITE_LINE_MEMBER(ctk551_state::render_w)
 {
-	palette.set_pen_color(0, rgb_t(255, 255, 255));
-	palette.set_pen_color(1, rgb_t(0, 0, 0));
+	if(!state)
+		return;
+
+	const u8 *render = m_lcdc->render();
+	for(int x=0; x != 64; x++) {
+		for(int y=0; y != 8; y++) {
+			u8 v = *render++;
+			for(int z=0; z != 5; z++)
+				m_outputs[x][y][z] = (v >> z) & 1;
+		}
+		render += 8;
+	}
 }
 
 void ctk551_state::ctk551_io_map(address_map &map)
@@ -140,6 +151,8 @@ void ctk551_state::ctk551_io_map(address_map &map)
 void ctk551_state::driver_start()
 {
 	m_led_touch.resolve();
+	m_led_power.resolve();
+	m_outputs.resolve();
 
 	m_switch = 0x2;
 
@@ -149,8 +162,11 @@ void ctk551_state::driver_start()
 void ctk551_state::ctk551(machine_config &config)
 {
 	// CPU
-	GT913(config, m_maincpu, 30'000'000);
+	// 30MHz oscillator, divided down internally (otherwise the test mode's OK/NG sounds play at double speed)
+	GT913(config, m_maincpu, 30'000'000 / 2);
 	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
+	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(0, "lspeaker", 1.0);
+	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(1, "rspeaker", 1.0);
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));
@@ -164,19 +180,15 @@ void ctk551_state::ctk551(machine_config &config)
 	// LCD
 	HD44780(config, m_lcdc, 0);
 	m_lcdc->set_lcd_size(2, 8);
-	m_lcdc->set_pixel_update_cb(FUNC(ctk551_state::lcd_update));
 
-	// screen (for testing only)
-	// TODO: the actual LCD with custom segments
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
-	screen.set_size(6 * 8, 8 * 2);
+	screen.set_size(1000, 737);
 	screen.set_visarea_full();
-	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(ctk551_state::render_w));
 
-	PALETTE(config, "palette", FUNC(ctk551_state::palette_init), 2);
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
 }
 
 INPUT_PORTS_START(ctk551)
@@ -351,9 +363,13 @@ INPUT_PORTS_END
 ROM_START(ctk551)
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD16_WORD_SWAP("ctk551.lsi2", 0x000000, 0x100000, CRC(66fc34cd) SHA1(47e9559edc106132f8a83462ed17a6c5c3872157))
+
+	ROM_REGION(285279, "screen", 0)
+	ROM_LOAD("ctk551lcd.svg", 0, 285279, CRC(1bb5da03) SHA1(a0cf22c6577c4ff0119ee7bb4ba8b487e23872d4))
+
 ROM_END
 
 } // anonymous namespace
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME     FLAGS
-SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+SYST( 1999, ctk551,  0,      0,      ctk551,  ctk551, ctk551_state, empty_init, "Casio", "CTK-551",   MACHINE_SUPPORTS_SAVE )

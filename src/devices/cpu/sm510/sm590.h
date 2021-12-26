@@ -9,12 +9,13 @@
 #ifndef MAME_CPU_SM510_SM590_H
 #define MAME_CPU_SM510_SM590_H
 
-#include "sm510.h"
+#include "sm510base.h"
 
 
 // I/O ports setup
 
-// ..
+// It does not have K pins, but can wake up after halt on R2.2
+#define SM590_INPUT_LINE_R22 SM510_INPUT_LINE_K3
 
 
 // pinout reference
@@ -89,7 +90,6 @@ R3.3/CL2 =>  |_|6         15|_|  <> R1.3
      GND --  |_|10        11|_|  <> R1.0
                |____________|
 
-
 */
 
 class sm590_device : public sm510_base_device
@@ -105,17 +105,17 @@ protected:
 
 	virtual void device_reset() override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-	virtual bool wake_me_up() override;
 	virtual void init_divider() override { }
 	virtual void init_lcd_driver() override { }
 	virtual void init_melody() override { }
 	virtual void increment_pc() override;
 	virtual void execute_one() override;
-	virtual void get_opcode_param() override;
+	virtual bool op_argument() override;
 	virtual void do_branch(u8 pu, u8 pm, u8 pl) override;
 
 	virtual void reset_vector() override { do_branch(0, 0, 0); }
 	virtual void wakeup_vector() override { do_branch(0, 1, 0); }
+	virtual bool valid_wakeup_line(int line) const override { return (line == SM590_INPUT_LINE_R22); }
 
 	// opcode handlers
 	// 00-3f

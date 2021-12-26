@@ -78,6 +78,8 @@ public:
 	void K053990_martchmp_word_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void fantjour_dma_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void type3_bank_w(offs_t offset, uint8_t data);
+	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_tilebank_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_t1_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void konamigx_t4_psacmap_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -166,6 +168,7 @@ public:
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
 	int K055555GX_decode_vmixcolor(int layer, int *color);
+	[[maybe_unused]] int K055555GX_decode_osmixcolor(int layer, int *color);
 
 	void init_posthack();
 	void konamigx_6bpp(machine_config &config);
