@@ -32,23 +32,18 @@
 #include "sound/aica.h"
 #include "dc.h"
 
-enum {
-	JVSBD_DEFAULT = 0,
-	JVSBD_ADSTICK,
-	JVSBD_LIGHTGUN,
-	JVSBD_MAHJONG,
-	JVSBD_KEYBOARD
-};
 
 class naomi_state : public dc_state
 {
-	public:
-		naomi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dc_state(mconfig, type, tag),
-		m_eeprom(*this, "main_eeprom"),
-		m_rombase(*this, "maincpu"),
-		m_mp(*this, "KEY%u", 1U)
-		{ }
+public:
+	naomi_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dc_state(mconfig, type, tag)
+		, m_eeprom(*this, "main_eeprom")
+		, m_rombase(*this, "maincpu")
+		, m_mp(*this, "KEY%u", 1U)
+		, m_p1_kb(*this, "P1.ROW%u", 0U)
+		, m_p2_kb(*this, "P2.ROW%u", 0U)
+	{ }
 
 	void naomi_base(machine_config &config);
 	void naomim2(machine_config &config);
@@ -69,7 +64,7 @@ class naomi_state : public dc_state
 
 	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(suchie3_mp_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
+	template <int P> DECLARE_CUSTOM_INPUT_MEMBER(naomi_kb_r);
 	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
 
 	uint64_t naomi2_biose_idle_skip_r();
@@ -78,6 +73,8 @@ protected:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_region_ptr<uint64_t> m_rombase;
 	optional_ioport_array<5> m_mp;
+	optional_ioport_array<5> m_p1_kb;
+	optional_ioport_array<5> m_p2_kb;
 
 	DECLARE_MACHINE_RESET(naomi);
 	DECLARE_WRITE_LINE_MEMBER(external_reset);
