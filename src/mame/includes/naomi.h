@@ -12,7 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/x76f100.h"
 #include "machine/eepromser.h"
-#include "machine/intelfsh.h"
+//#include "machine/intelfsh.h"
 #include "machine/maple-dc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/mie.h"
@@ -21,7 +21,6 @@
 #include "machine/naomim1.h"
 #include "machine/naomim2.h"
 #include "machine/naomim4.h"
-//#include "machine/awboard.h"
 #include "machine/nvram.h"
 #include "machine/aicartc.h"
 #include "machine/jvsdev.h"
@@ -121,7 +120,5 @@ private:
 	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void naomi2_map(address_map &map);
 };
-
-INPUT_PORTS_EXTERN( naomi_debug );
 
 #endif // MAME_INCLUDES_NAOMI_H

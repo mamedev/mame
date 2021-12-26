@@ -1464,16 +1464,6 @@ void dc_state::aica_map(address_map &map)
 * Input ports
 */
 
-INPUT_PORTS_START( naomi_debug )
-	PORT_START("MAMEDEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
-	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( naomi_mie )
 	PORT_START("MIE.3")
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", eeprom_serial_93cxx_device, di_write)
@@ -1502,7 +1492,6 @@ INPUT_PORTS_END
 /* 2 players with 1 joystick and 6 buttons each */
 static INPUT_PORTS_START( naomi )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1585,7 +1574,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotd2 )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1622,7 +1610,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crzytaxi )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1652,7 +1639,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dybbnao )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1697,7 +1683,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( zombrvn )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1736,7 +1721,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jambo )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1766,7 +1750,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( 18wheelr )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1801,7 +1784,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( alpilota )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1840,7 +1822,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sstrkfgt )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1877,7 +1858,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( crackndj )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1897,7 +1877,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( monkeyba )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1921,7 +1900,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( shaktamb )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("TILT")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
@@ -1987,7 +1965,6 @@ CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
 
 static INPUT_PORTS_START( naomi_mp )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("OUTPUT")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_CHANGED_MEMBER(DEVICE_SELF, naomi_state,naomi_mp_w, 0)
@@ -2100,7 +2077,6 @@ template <int P> CUSTOM_INPUT_MEMBER(naomi_state::naomi_kb_r)
 
 static INPUT_PORTS_START( naomi_kb )
 	PORT_INCLUDE( naomi_mie )
-	PORT_INCLUDE( naomi_debug )
 
 	PORT_START("P1.M")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LCONTROL) PORT_NAME("P1 Left Control") PORT_PLAYER(1)

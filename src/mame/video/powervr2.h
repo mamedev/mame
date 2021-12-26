@@ -344,6 +344,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	devcb_write8 irq_cb;

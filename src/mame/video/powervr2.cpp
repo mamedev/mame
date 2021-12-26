@@ -3924,6 +3924,8 @@ TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 	irq_cb(DMA_PVR_IRQ);
 }
 
+/* used so far by usagiym and sprtjam */
+// TODO: very inaccurate
 void powervr2_device::pvr_dma_execute(address_space &space)
 {
 	dc_state *state = machine().driver_data<dc_state>();
@@ -3932,29 +3934,28 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	src = m_pvr_dma.sys_addr;
 	size = 0;
 
-	/* used so far by usagui and sprtjam*/
-	printf("PVR-DMA start\n");
-	printf("%08x %08x %08x\n",m_pvr_dma.pvr_addr,m_pvr_dma.sys_addr,m_pvr_dma.size);
-	printf("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
+	logerror("PVR-DMA start\n");
+	logerror("%08x %08x %08x\n",m_pvr_dma.pvr_addr, m_pvr_dma.sys_addr, m_pvr_dma.size);
+	logerror("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
 
 	/* Throw illegal address set */
-	#if 0
+#if 0
 	if((m_pvr_dma.sys_addr & 0x1c000000) != 0x0c000000)
 	{
-		/* TODO: timing */
+		// TODO: timing
 		irq_cb(ERR_PVRIF_ILL_ADDR_IRQ);
 		m_pvr_dma.start = sb_pdst = 0;
 		printf("Illegal PVR DMA set\n");
 		return;
 	}
-	#endif
+#endif
 
 	/* 0 rounding size = 16 Mbytes */
 	if(m_pvr_dma.size == 0) { m_pvr_dma.size = 0x100000; }
 
 	if(m_pvr_dma.dir == 0)
 	{
-		for(;size<m_pvr_dma.size;size+=4)
+		for(;size < m_pvr_dma.size; size+=4)
 		{
 			space.write_dword(dst,space.read_dword(src));
 			src+=4;
@@ -3963,23 +3964,42 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	}
 	else
 	{
-		for(;size<m_pvr_dma.size;size+=4)
+		for(;size < m_pvr_dma.size; size+=4)
 		{
 			space.write_dword(src,space.read_dword(dst));
 			src+=4;
 			dst+=4;
 		}
 	}
+
 	/* Note: do not update the params, since this DMA type doesn't support it. */
-	/* TODO: timing of this */
-	machine().scheduler().timer_set(state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4), timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this));
+	// TODO: accurate timing
+	machine().scheduler().timer_set(
+		state->m_maincpu->cycles_to_attotime(m_pvr_dma.size/4),
+		timer_expired_delegate(FUNC(powervr2_device::pvr_dma_irq), this)
+	);
+}
+
+INPUT_PORTS_START( powervr2 )
+	PORT_START("PVR_DEBUG")
+	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_CONFNAME( 0x02, 0x00, "Disable Render Calls" )
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+ioport_constructor powervr2_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( powervr2 );
 }
 
 powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, POWERVR2, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		irq_cb(*this),
-		m_mamedebug(*this, ":MAMEDEBUG")
+	: device_t(mconfig, POWERVR2, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, irq_cb(*this)
+	, m_mamedebug(*this, "PVR_DEBUG")
 {
 }
 

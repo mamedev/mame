@@ -723,8 +723,6 @@ static INPUT_PORTS_START( aw2c )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
 // ggisuka
@@ -815,8 +813,6 @@ static INPUT_PORTS_START( aw1w )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_INCLUDE( naomi_debug )
 INPUT_PORTS_END
 
 void atomiswave_state::aw_base(machine_config &config)

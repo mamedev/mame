@@ -10,6 +10,8 @@
 #include "cpu/arm7/arm7core.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/awboard.h"
+#include "machine/intelfsh.h"
+#include "machine/dc-ctrl.h"
 #include "machine/nvram.h"
 #include "machine/aicartc.h"
 #include "machine/m3comm.h"
@@ -17,7 +19,7 @@
 #include "machine/segashiobd.h"
 #include "sound/aica.h"
 #include "dc.h"
-#include "naomi.h"
+//#include "naomi.h"
 
 class atomiswave_state : public dc_state
 {

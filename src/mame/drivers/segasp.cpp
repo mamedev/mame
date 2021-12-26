@@ -254,8 +254,6 @@ void segasp_state::onchip_port(address_map &map)
 
 
 INPUT_PORTS_START( segasp )
-	PORT_INCLUDE( naomi_debug )
-
 	PORT_START("CFG")
 	PORT_DIPNAME( 0x01, 0x01, "ROM Board type" )
 	PORT_DIPSETTING(    0x00, "other" )
