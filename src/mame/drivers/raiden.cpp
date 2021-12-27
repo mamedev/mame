@@ -12,14 +12,19 @@
 
     To access test mode, reset with both start buttons held.
 
-    The country byte is stored at 0xffffd in the main cpu region,
+    The country/game mode byte is stored at 0xffffd in the main cpu region,
     (that's 0x1fffe in program rom 4).
 
-        0x80  = World/Japan version? (Seibu Kaihatsu) (distributed by Tecmo?)
-        0x81  = USA version (Fabtek license)
-        0x82  = Taiwan version (Liang HWA Electronics license)
-        0x83  = Hong Kong version (Wah Yan Electronics license)
-        0x84  = Korean version (IBL Corporation license)
+    High nibble: Player respawn behavior when single playing
+	    0x0*  = If single playing, Restart at checkpoint when every miss
+	    0x8*  = Respawn instantly when every miss
+
+    Low nibble: country/region code
+        0x*0  = World/Japan version? (Seibu Kaihatsu) (distributed by Tecmo?)
+        0x*1  = USA version (Fabtek license)
+        0x*2  = Taiwan version (Liang HWA Electronics license)
+        0x*3  = Hong Kong version (Wah Yan Electronics license)
+        0x*4  = Korean version (IBL Corporation license)
 
         There are also strings for Spanish, Greece, Mexico, Middle &
         South America though it's not clear if they are used.
