@@ -116,6 +116,7 @@ public:
 
 	void im01(machine_config &config);
 	void im01t(machine_config &config);
+	void im05(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -128,18 +129,19 @@ protected:
 
 	void im01_map(address_map &map);
 	void im01t_map(address_map &map);
+	void im05_map(address_map &map);
 
 	u8 irq_callback(offs_t offset);
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// I/O handlers
-	void update_display();
-	virtual u8 get_segs(u8 data) { return bitswap<8>(data,0,1,2,3,4,5,6,7); }
 	u16 mux_r(offs_t offset, u16 mem_mask);
 	void mux_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 digit_r(offs_t offset, u16 mem_mask);
 	void digit_w(offs_t offset, u16 data, u16 mem_mask);
+	void digita_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 input_r(offs_t offset, u16 mem_mask);
+	u16 inputa_r(offs_t offset, u16 mem_mask);
 	void error_w(offs_t offset, u16 data, u16 mem_mask);
 
 	u16 m_inp_mux = 0;
@@ -152,24 +154,6 @@ void im01_state::machine_start()
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_digit_data));
 }
-
-// ИМ-05
-
-class im05_state : public im01_state
-{
-public:
-	im05_state(const machine_config &mconfig, device_type type, const char *tag) :
-		im01_state(mconfig, type, tag)
-	{ }
-
-	void im05(machine_config &config);
-
-private:
-	void im05_map(address_map &map);
-
-	// digit segments are in a different order
-	virtual u8 get_segs(u8 data) override { return bitswap<8>(data,0,1,6,4,2,3,5,7); }
-};
 
 
 
@@ -199,10 +183,7 @@ INTERRUPT_GEN_MEMBER(im01_state::interrupt)
     I/O
 ******************************************************************************/
 
-void im01_state::update_display()
-{
-	m_display->matrix(m_inp_mux, get_segs(m_digit_data));
-}
+// ИМ-01 / shared
 
 u16 im01_state::mux_r(offs_t offset, u16 mem_mask)
 {
@@ -213,7 +194,7 @@ void im01_state::mux_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// d0-d5: input mux, digit select
 	COMBINE_DATA(&m_inp_mux);
-	update_display();
+	m_display->write_my(m_inp_mux);
 
 	// d7: speaker out
 	m_dac->write(BIT(m_inp_mux, 7));
@@ -228,7 +209,7 @@ void im01_state::digit_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// d1-d7: digit segment data
 	COMBINE_DATA(&m_digit_data);
-	update_display();
+	m_display->write_mx(bitswap<8>(m_digit_data,0,1,2,3,4,5,6,7));
 }
 
 u16 im01_state::input_r(offs_t offset, u16 mem_mask)
@@ -247,6 +228,23 @@ void im01_state::error_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// unmapped port, it expects a bus error
 	m_maincpu->pulse_input_line(t11_device::BUS_ERROR, attotime::zero);
+}
+
+
+// ИМ-05 specific
+
+void im01_state::digita_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	// digit segment data is in a different order
+	digit_w(offset, data, mem_mask);
+	m_display->write_mx(bitswap<8>(m_digit_data,0,1,6,4,2,3,5,7));
+}
+
+u16 im01_state::inputa_r(offs_t offset, u16 mem_mask)
+{
+	// inputs are reversed
+	u16 data = input_r(offset, mem_mask);
+	return (data & 0xf0ff) | (bitswap<4>(data,8,9,10,11) << 8);
 }
 
 
@@ -271,10 +269,12 @@ void im01_state::im01t_map(address_map &map)
 	map(0x0800, 0x0fff).ram();
 }
 
-void im05_state::im05_map(address_map &map)
+void im01_state::im05_map(address_map &map)
 {
 	im01t_map(map);
 	map(0x6000, 0x7fff).rom();
+	map(0xe03c, 0xe03d).mirror(0x1800).w(FUNC(im01_state::digita_w));
+	map(0xe03e, 0xe03f).mirror(0x1800).r(FUNC(im01_state::inputa_r));
 }
 
 
@@ -322,41 +322,26 @@ static INPUT_PORTS_START( im01 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( im05 )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A) PORT_NAME("A 1 / Pawn")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B) PORT_NAME("B 2 / Knight")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C) PORT_NAME("C 3 / Bishop")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D) PORT_NAME("D 4 / Rook")
+	PORT_INCLUDE( im01 )
 
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"Р (Promotion)")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("? (Verify Position)")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME(u8"ПХ (Hint)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Forward")
+	PORT_MODIFY("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Y) PORT_NAME("Forward")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME(u8"ПХ (Hint)")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_O) PORT_NAME(u8"Р (Promotion)")
 
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME(u8"CТА (Enter)")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME(u8"CИ (Clear Entry)")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Confirm")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("Take Back")
+	PORT_MODIFY("IN.2")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Confirm")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME(u8"CТА (Enter Move)")
 
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E) PORT_NAME("E 5 / Queen")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F) PORT_NAME("F 6 / King")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G) PORT_NAME("G 7")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H) PORT_NAME("H 8")
+	PORT_MODIFY("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"Реж (Mode)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White / 9")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME(u8"N (Show Moves)")
 
-	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME(u8"N (Show Moves)")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_Z) PORT_NAME("White / 9")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME(u8"И (Show Analyzed Move)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME(u8"Реж (Mode)")
-
-	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("Set Level")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_X) PORT_NAME("Black / 0")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Cancel)")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset)")
+	PORT_MODIFY("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME(u8"НП (Reset)")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME(u8"СД (Cancel)")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_X) PORT_NAME("Black / 0")
 INPUT_PORTS_END
 
 
@@ -392,13 +377,13 @@ void im01_state::im01t(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::im01t_map);
 }
 
-void im05_state::im05(machine_config &config)
+void im01_state::im05(machine_config &config)
 {
 	im01(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &im05_state::im05_map);
-	m_maincpu->set_periodic_int(FUNC(im05_state::interrupt), attotime::from_hz(512)); // approximation
+	m_maincpu->set_addrmap(AS_PROGRAM, &im01_state::im05_map);
+	m_maincpu->set_periodic_int(FUNC(im01_state::interrupt), attotime::from_hz(512)); // approximation
 
 	// video hardware
 	config.set_default_layout(layout_im05);
@@ -441,4 +426,4 @@ ROM_END
 CONS( 1986, im01,  0,      0, im01,    im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1991, im01t, im01,   0, im01t,   im01,  im01_state, empty_init, "Svetlana", "Elektronika IM-01T", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1993, im05,  0,      0, im05,    im05,  im05_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1993, im05,  0,      0, im05,    im05,  im01_state, empty_init, "Svetlana", "Elektronika IM-05", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
