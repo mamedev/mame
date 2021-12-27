@@ -48,7 +48,7 @@ void generalplus_gpspi_direct_game_state::machine_reset()
 	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
-static INPUT_PORTS_START( gcm394 )
+static INPUT_PORTS_START( bfmpac )
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x0001, 0x0000, "0" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -91,6 +91,14 @@ static INPUT_PORTS_START( gcm394 )
 	PORT_START("IN0")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bfspyhnt )
+	PORT_INCLUDE( bfmpac )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+INPUT_PORTS_END
+
+
 uint16_t generalplus_gpspi_direct_game_state::cs0_r(offs_t offset)
 {
 	// TODO: is cs_space even used by this type?
@@ -115,6 +123,7 @@ void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_confi
 	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspi_direct_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//m_screen->set_refresh_hz(20); // 20hz update gives more correct speed (and working inputs) in fixitflx and bfdigdug, but speed should probably be limited in some other way
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320*2, 262*2);
 	m_screen->set_visarea(0, (320*2)-1, 0, (240*2)-1);
@@ -192,9 +201,9 @@ void generalplus_gpspi_direct_game_state::init_fif()
 	}
 }
 
-CONS(2017, fixitflx, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Fix It Felix Jr. (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, wiwcs,    0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Where in the World is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, bfpacman, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2017, bfmpac,   0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Ms. Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, gcm394, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2017, fixitflx, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Fix It Felix Jr. (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2018, wiwcs,    0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Where in the World is Carmen Sandiego? (handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2018, bfpacman, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2017, bfmpac,   0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Ms. Pac-Man (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
