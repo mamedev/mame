@@ -5,7 +5,9 @@
  Game Boy carts with MBC (Memory Bank Controller)
 
 TODO:
-- The MBC3 RTC should count the time that passed since the game was last played.
+- The MBC3 RTC is not really a true RTC. The chip is used to track passed time even
+  when the console is off, not to keep track of the time of day. Keeping track of
+  passed time when the emulation was not running is currently not supported.
 
  ***********************************************************************************************************/
 
@@ -193,14 +195,12 @@ void gb_rom_mbc3_device::device_start()
 	save_item(NAME(m_latched_regs));
 
 	m_rtc_ticks = 0;
-	system_time curtime;
-	machine().current_datetime(curtime);
 
-	m_rtc_regs[REG_SECONDS] = curtime.local_time.second;
-	m_rtc_regs[REG_MINUTES] = curtime.local_time.minute;
-	m_rtc_regs[REG_HOURS] = curtime.local_time.hour;
-	m_rtc_regs[REG_DAYS] = curtime.local_time.day & 0xff;
-	m_rtc_regs[REG_CONTROL] = (curtime.local_time.day >> 8) & 0x01;
+	m_rtc_regs[REG_SECONDS] = 0;
+	m_rtc_regs[REG_MINUTES] = 0;
+	m_rtc_regs[REG_HOURS] = 0;
+	m_rtc_regs[REG_DAYS] = 0;
+	m_rtc_regs[REG_CONTROL] = 0;
 
 	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_rom_mbc3_device::rtc_tick),this));
 	m_rtc_timer->adjust(attotime::from_hz(RTC_FREQUENCY), 0, attotime::from_hz(RTC_FREQUENCY));
