@@ -3873,7 +3873,8 @@ uint32_t powervr2_device::elan_regs_r(offs_t offset)
 {
 	switch(offset)
 	{
-		case 0x00/4: // ID chip (TODO: BIOS crashes / gives a black screen with this as per now!)
+		case 0x00/4: // ID chip 
+			// TODO: BIOS crashes / gives a black screen with this as per now
 			return 0xe1ad0000;
 		case 0x04/4: // REVISION
 			return 0x12; //or 0x01?
@@ -3893,7 +3894,7 @@ uint32_t powervr2_device::elan_regs_r(offs_t offset)
 		case 0x78/4: // IRQ MASK
 			return 0;
 		default:
-			logerror("%s %08x\n", machine().describe_context(),offset*4);
+			logerror("%s: ELAN read %08x\n", machine().describe_context(),offset*4);
 			break;
 	}
 
@@ -3905,7 +3906,7 @@ void powervr2_device::elan_regs_w(offs_t offset, uint32_t data)
 	switch(offset)
 	{
 		default:
-			logerror("%s %08x %08x W\n", machine().describe_context(),offset*4,data);
+			logerror("%s: ELAN write %08x %08x W\n", machine().describe_context(),offset*4,data);
 			break;
 	}
 }
