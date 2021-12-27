@@ -16,8 +16,8 @@
     (that's 0x1fffe in program rom 4).
 
     High nibble: Player respawn behavior when single playing
-	    0x0*  = If single playing, Restart at checkpoint when every miss
-	    0x8*  = Respawn instantly when every miss
+        0x0*  = If single playing, Restart at checkpoint when every miss
+        0x8*  = Respawn instantly when every miss
 
     Low nibble: country/region code
         0x*0  = World/Japan version? (Seibu Kaihatsu) (distributed by Tecmo?)
