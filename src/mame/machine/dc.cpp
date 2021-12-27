@@ -1,5 +1,5 @@
 // license:LGPL-2.1+
-// copyright-holders:Angelo Salese, Olivier Galibert, David Haywood, Samuele Zannoli, R. Belmont, ElSemi
+// copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
 /*
 
     dc.c - Sega Dreamcast hardware
@@ -7,7 +7,7 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
+//#include "debugger.h"
 #include "includes/dc.h"
 #include "cpu/sh/sh4.h"
 #include "cpu/arm7/arm7core.h"

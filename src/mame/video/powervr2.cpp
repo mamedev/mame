@@ -2,6 +2,15 @@
 // copyright-holders:Olivier Galibert
 /*
   Dreamcast video emulation
+
+  TODO:
+  - Needs break-down into sub-devices, as a generic rule of thumb
+    TA is Holly/CLX implementation specific while CORE is ISP/TSP only.
+    This will be particularly useful for PVR PMX implmentations
+    (atvtrack.cpp and aristmk6.cpp);
+  - Remove dc_state readbacks from here;
+  - Better abstraction of timers;
+
 */
 
 #include "emu.h"
@@ -11,6 +20,25 @@
 #include "cpu/sh/sh4.h"
 #include "video/rgbutil.h"
 #include "rendutil.h"
+
+#define LOG_WARN        (1U << 1) // Show warnings
+#define LOG_TA_CMD      (1U << 2) // Show TA CORE commands
+#define LOG_TA_FIFO     (1U << 3) // Show TA FIFO polygon entries
+#define LOG_TA_TILE     (1U << 4) // Show TA tile entries
+#define LOG_PVR_DMA     (1U << 5) // Show PVR-DMA access
+#define LOG_YUV_FIFO    (1U << 6) // Show YUV register access
+
+#define VERBOSE (LOG_WARN | LOG_PVR_DMA)
+
+#include "logmacro.h"
+
+#define LOGWARN(...)       LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGTACMD(...)      LOGMASKED(LOG_TA_CMD, __VA_ARGS__)
+#define LOGTAFIFO(...)     LOGMASKED(LOG_TA_FIFO, __VA_ARGS__)
+#define LOGTATILE(...)     LOGMASKED(LOG_TA_TILE, __VA_ARGS__)
+#define LOGPVRDMA(...)     LOGMASKED(LOG_PVR_DMA, __VA_ARGS__)
+
+#define LIVE_YUV_VIEW 0
 
 
 DEFINE_DEVICE_TYPE(POWERVR2, powervr2_device, "powervr2", "PowerVR 2")
@@ -105,12 +133,6 @@ void powervr2_device::pd_dma_map(address_map &map)
 const int powervr2_device::pvr_parconfseq[] = {1,2,3,2,3,4,5,6,5,6,7,8,9,10,11,12,13,14,13,14,15,16,17,16,17,0,0,0,0,0,18,19,20,19,20,21,22,23,22,23};
 const int powervr2_device::pvr_wordsvertex[24]  = {8,8,8,8,8,16,16,8,8,8, 8, 8,8,8,8,8,16,16, 8,16,16,8,16,16};
 const int powervr2_device::pvr_wordspolygon[24] = {8,8,8,8,8, 8, 8,8,8,8,16,16,8,8,8,8, 8, 8,16,16,16,8, 8, 8};
-
-#define DEBUG_FIFO_POLY (0)
-#define DEBUG_PVRTA 0
-#define DEBUG_PVRDLIST  (0)
-#define DEBUG_PALRAM (0)
-#define DEBUG_PVRCTRL   (0)
 
 inline int32_t powervr2_device::clamp(int32_t in, int32_t min, int32_t max)
 {
@@ -959,15 +981,12 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 {
 	COMBINE_DATA(&softreset);
 	if (softreset & 1) {
-#if DEBUG_PVRTA
-		logerror("%s: TA soft reset\n", tag());
-#endif
+		LOGTACMD("%s: TA soft reset\n", tag());
 		listtype_used=0;
 	}
 	if (softreset & 2) {
-#if DEBUG_PVRTA
-		logerror("%s: Core Pipeline soft reset\n", tag());
-#endif
+		LOGTACMD("%s: Core Pipeline soft reset\n", tag());
+
 		if (start_render_received == 1) {
 			for (int a=0;a < NUM_BUFFERS;a++)
 				if (grab[a].busy == 1)
@@ -977,9 +996,7 @@ void powervr2_device::softreset_w(offs_t offset, uint32_t data, uint32_t mem_mas
 		}
 	}
 	if (softreset & 4) {
-#if DEBUG_PVRTA
-		logerror("%s: sdram I/F soft reset\n", tag());
-#endif
+		LOGTACMD("%s: sdram I/F soft reset\n", tag());
 	}
 }
 
@@ -987,9 +1004,8 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 {
 	dc_state *state = machine().driver_data<dc_state>();
 	g_profiler.start(PROFILER_USER1);
-#if DEBUG_PVRTA
-	logerror("%s: Start render, region=%08x, params=%08x\n", tag(), region_base, param_base);
-#endif
+
+	LOGTACMD("%s: Start render, region=%08x, params=%08x\n", tag(), region_base, param_base);
 
 	// select buffer to draw using param_base
 	for (int a=0;a < NUM_BUFFERS;a++) {
@@ -1055,7 +1071,8 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 				//  break;
 			}
 //          printf("ISP START %d %d\n",sanitycount,screen().vpos());
-			/* Fire ISP irq after a set amount of time TODO: timing of this */
+			/* Fire ISP irq after a set amount of time */
+			// TODO: timing of this
 			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 500000));   // hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
 			break;
 		}
@@ -1221,7 +1238,7 @@ uint32_t powervr2_device::spg_hblank_int_r()
 void powervr2_device::spg_hblank_int_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&spg_hblank_int);
-	/* TODO: timer adjust */
+	// TODO: timer adjust
 }
 
 uint32_t powervr2_device::spg_vblank_int_r()
@@ -1364,7 +1381,7 @@ uint32_t powervr2_device::spg_status_r()
 
 	uint32_t vsync = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend)) ? 0 : 1;
 	uint32_t hsync = ((screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
-	/* FIXME: following is just a wild guess */
+	// FIXME: following is just a wild guess
 	uint32_t blank = ((screen().vpos() >= spg_vbstart) || (screen().vpos() < spg_vbend) |
 					(screen().hpos() >= spg_hbstart) || (screen().hpos() < spg_hbend)) ? 0 : 1;
 	if(vo_control & 4) { blank^=1; }
@@ -1447,10 +1464,15 @@ void powervr2_device::ta_list_init_w(uint32_t data)
 		tafifo_mask=7;
 		tafifo_vertexwords=8;
 		tafifo_listtype= DISPLAY_LIST_NONE;
-#if DEBUG_PVRTA
-		logerror("%s: list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
-					tag(), ta_ol_base, ta_ol_limit, ta_isp_base, ta_isp_limit, ta_alloc_ctrl, ta_next_opb_init);
-#endif
+
+		LOGTACMD("%s: list init ol=(%08x, %08x) isp=(%08x, %08x), alloc=%08x obp=%08x\n",
+			tag(),
+			ta_ol_base, ta_ol_limit,
+			ta_isp_base, ta_isp_limit,
+			ta_alloc_ctrl,
+			ta_next_opb_init
+		);
+
 		ta_next_opb = ta_next_opb_init;
 		ta_itp_current = ta_isp_base;
 		alloc_ctrl_OPB_Mode = ta_alloc_ctrl & 0x100000; // 0 up 1 down
@@ -1509,12 +1531,11 @@ uint32_t powervr2_device::ta_yuv_tex_base_r()
 void powervr2_device::ta_yuv_tex_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&ta_yuv_tex_base);
-	logerror("%s: ta_yuv_tex_base = %08x\n", tag(), ta_yuv_tex_base);
 
+	// Writes causes a reset in YUV FIFO pipeline
 	ta_yuv_index = 0;
 	ta_yuv_x = 0;
 	ta_yuv_y = 0;
-
 }
 
 uint32_t powervr2_device::ta_yuv_tex_ctrl_r()
@@ -1525,24 +1546,21 @@ uint32_t powervr2_device::ta_yuv_tex_ctrl_r()
 void powervr2_device::ta_yuv_tex_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&ta_yuv_tex_ctrl);
-	ta_yuv_x_size = ((ta_yuv_tex_ctrl & 0x3f)+1)*16;
-	ta_yuv_y_size = (((ta_yuv_tex_ctrl>>8) & 0x3f)+1)*16;
-	logerror("%s: ta_yuv_tex_ctrl = %08x\n", tag(), ta_yuv_tex_ctrl);
-	if(ta_yuv_tex_ctrl & 0x01010000)
-		fatalerror("YUV with setting %08x",ta_yuv_tex_ctrl);
+	ta_yuv_x_size = ((ta_yuv_tex_ctrl & 0x3f) + 1) * 16;
+	ta_yuv_y_size = (((ta_yuv_tex_ctrl >> 8) & 0x3f) + 1) * 16;
+
+	if (ta_yuv_tex_ctrl & 0x01010000)
+		throw emu_fatalerror("YUV422 mode selected %08x", ta_yuv_tex_ctrl);
 }
 
-#include "debugger.h"
-/* TODO */
+// TODO: unemulated YUV live count, nothing seems to use it?
 uint32_t powervr2_device::ta_yuv_tex_cnt_r()
 {
-	machine().debug_break();
 	return ta_yuv_tex_cnt;
 }
 
 void powervr2_device::ta_yuv_tex_cnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	machine().debug_break();
 	COMBINE_DATA(&ta_yuv_tex_cnt);
 }
 
@@ -1870,54 +1888,55 @@ void powervr2_device::process_ta_fifo()
 	// here we should generate the data for the various tiles
 	// for now, just interpret their meaning
 	if (paratype == 0)
-	{ // end of list
-		#if DEBUG_PVRDLIST
-		osd_printf_verbose("Para Type 0 End of List\n");
-		#endif
+	{
+		LOGTATILE("%s: Para Type 0 End of List\n", tag());
+
 		/* Process transfer FIFO done irqs here */
-		/* FIXME: timing of these */
 		//printf("%d %d\n",tafifo_listtype,screen().vpos());
+		// FIXME: timing of these
 		switch (tafifo_listtype)
 		{
-		case DISPLAY_LIST_OPAQUE: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this)); break;
-		case DISPLAY_LIST_OPAQUE_MOD: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this)); break;
-		case DISPLAY_LIST_TRANS: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this)); break;
-		case DISPLAY_LIST_TRANS_MOD: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this)); break;
-		case DISPLAY_LIST_PUNCH_THROUGH: machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this)); break;
+			case DISPLAY_LIST_OPAQUE:
+				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_list_irq), this));
+				break;
+			case DISPLAY_LIST_OPAQUE_MOD:
+				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_opaque_modifier_volume_list_irq), this));
+				break;
+			case DISPLAY_LIST_TRANS:
+				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_list_irq), this));
+				break;
+			case DISPLAY_LIST_TRANS_MOD:
+				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_translucent_modifier_volume_list_irq), this));
+				break;
+			case DISPLAY_LIST_PUNCH_THROUGH:
+				machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(powervr2_device::transfer_punch_through_list_irq), this));
+				break;
 		}
-		tafifo_listtype= DISPLAY_LIST_NONE; // no list being received
+		tafifo_listtype = DISPLAY_LIST_NONE; // no list being received
 		listtype_used |= (2+8);
 	}
 	else if (paratype == 1)
-	{ // user tile clip
-		#if DEBUG_PVRDLIST
-		osd_printf_verbose("Para Type 1 User Tile Clip\n");
-		osd_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
-		#endif
+	{
+		LOGTATILE("%s: Para Type 1 User Tile Clip\n", tag());
+		LOGTATILE(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 	}
 	else if (paratype == 2)
-	{ // object list set
-		#if DEBUG_PVRDLIST
-		osd_printf_verbose("Para Type 2 Object List Set at %08x\n", tafifo_buff[1]);
-		osd_printf_verbose(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
-		#endif
+	{
+		LOGTATILE("%s: Para Type 2 Object List Set at %08x\n", tag(), tafifo_buff[1]);
+		LOGTATILE(" (%d , %d)-(%d , %d)\n", tafifo_buff[4], tafifo_buff[5], tafifo_buff[6], tafifo_buff[7]);
 	}
 	else if (paratype == 3)
 	{
-		#if DEBUG_PVRDLIST
-		osd_printf_verbose("Para Type %x Unknown!\n", tafifo_buff[0]);
-		#endif
+		LOGWARN("%s: Para Type %x Unknown!\n", tag(), tafifo_buff[0]);
 	}
 	else
 	{ // global parameter or vertex parameter
-		#if DEBUG_PVRDLIST
-		osd_printf_verbose("Para Type %d", paratype);
+		LOGTATILE("%s: Para Type %d", tag(), paratype);
 		if (paratype == 7)
-			osd_printf_verbose(" End of Strip %d", endofstrip);
+			LOGTATILE(" End of Strip %d", endofstrip);
 		if (listtype_used & 3)
-			osd_printf_verbose(" List Type %d", listtype);
-		osd_printf_verbose("\n");
-		#endif
+			LOGTATILE(" List Type %d", listtype);
+		LOGTATILE("\n");
 
 		// set type of list currently being received
 		if ((paratype == 4) || (paratype == 5) || (paratype == 6))
@@ -1963,61 +1982,49 @@ void powervr2_device::process_ta_fifo()
 				vqcompressed=(tafifo_buff[3] >> 30) & 1;
 				strideselect=(tafifo_buff[3] >> 25) & 1;
 				paletteselector=(tafifo_buff[3] >> 21) & 0x3F;
-				#if DEBUG_PVRDLIST
-				osd_printf_verbose(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
-				#endif
+
+				LOGTATILE(" Texture at %08x format %d\n", (tafifo_buff[3] & 0x1FFFFF) << 3, pixelformat);
 			}
 			if (paratype == 4)
-			{ // polygon or mv
-				if ((tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
-					(tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
-				{
-				#if DEBUG_PVRDLIST
-					osd_printf_verbose(" Modifier Volume\n");
-				#endif
-				}
-				else
-				{
-				#if DEBUG_PVRDLIST
-					osd_printf_verbose(" Polygon\n");
-				#endif
-				}
+			{
+				LOGTATILE(" %s\n",
+					((tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
+					 (tafifo_listtype == DISPLAY_LIST_TRANS_MOD)) ? "Modifier Volume" : "Polygon"
+				);
 			}
 			if (paratype == 5)
 			{ // quad
-				#if DEBUG_PVRDLIST
-				osd_printf_verbose(" Sprite\n");
-				#endif
+				LOGTATILE(" Sprite\n");
 			}
 		}
 
 		if (paratype == 7)
 		{ // vertex
 			if (tafifo_listtype < 0 || tafifo_listtype >= DISPLAY_LIST_COUNT) {
-				logerror("PowerVR2 unrecognized list type %d\n", tafifo_listtype);
+				LOGWARN("PowerVR2 unrecognized list type %d\n", tafifo_listtype);
 				return;
 			}
 			struct poly_group *grp = rd->groups + tafifo_listtype;
 			if ((tafifo_listtype == DISPLAY_LIST_OPAQUE_MOD) ||
 				(tafifo_listtype == DISPLAY_LIST_TRANS_MOD))
 			{
-				#if DEBUG_PVRDLIST
-				osd_printf_verbose(" Vertex modifier volume");
-				osd_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
-					u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
-					u2f(tafifo_buff[8]), u2f(tafifo_buff[9]));
-				osd_printf_verbose("\n");
-				#endif
+				LOGTATILE(" Vertex modifier volume");
+				LOGTATILE(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f)\n",
+					u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]),
+					u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]),
+					u2f(tafifo_buff[7]), u2f(tafifo_buff[8]), u2f(tafifo_buff[9])
+				);
 			}
 			else if (global_paratype == 5)
 			{
-				#if DEBUG_PVRDLIST
-				osd_printf_verbose(" Vertex sprite");
-				osd_printf_verbose(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]),
-					u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]), u2f(tafifo_buff[7]),
-					u2f(tafifo_buff[8]), u2f(tafifo_buff[9]), u2f(tafifo_buff[10]), u2f(tafifo_buff[11]));
-				osd_printf_verbose("\n");
-				#endif
+				LOGTATILE(" Vertex sprite");
+				LOGTATILE(" A(%f,%f,%f) B(%f,%f,%f) C(%f,%f,%f) D(%f,%f,)\n",
+					u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]),
+					u2f(tafifo_buff[4]), u2f(tafifo_buff[5]), u2f(tafifo_buff[6]),
+					u2f(tafifo_buff[7]), u2f(tafifo_buff[8]), u2f(tafifo_buff[9]),
+					u2f(tafifo_buff[10]), u2f(tafifo_buff[11])
+				);
+
 				if (texture == 1)
 				{
 					if (rd->verts_size <= (MAX_VERTS - 6) && grp->strips_size < MAX_STRIPS)
@@ -2064,11 +2071,12 @@ void powervr2_device::process_ta_fifo()
 			}
 			else if (global_paratype == 4)
 			{
-				#if DEBUG_PVRDLIST
-				osd_printf_verbose(" Vertex polygon");
-				osd_printf_verbose(" V(%f,%f,%f) T(%f,%f)", u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]), u2f(tafifo_buff[4]), u2f(tafifo_buff[5]));
-				osd_printf_verbose("\n");
-				#endif
+				LOGTATILE(" Vertex polygon");
+				LOGTATILE(" V(%f,%f,%f) T(%f,%f)\n",
+					u2f(tafifo_buff[1]), u2f(tafifo_buff[2]), u2f(tafifo_buff[3]),
+					u2f(tafifo_buff[4]), u2f(tafifo_buff[5])
+				);
+
 				if (rd->verts_size <= (MAX_VERTS - 6))
 				{
 					float vert_offset_color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -2158,14 +2166,17 @@ void powervr2_device::ta_fifo_poly_w(offs_t offset, uint64_t data, uint64_t mem_
 	{
 		tafifo_buff[tafifo_pos]=(uint32_t)data;
 		tafifo_buff[tafifo_pos+1]=(uint32_t)(data >> 32);
-		#if DEBUG_FIFO_POLY
-		osd_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %x -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
-		#endif
+		LOGTAFIFO("ta_fifo_poly_w: write64 %08x = %x -> %08x %08x\n",
+			0x10000000 + offset * 8,
+			data,
+			tafifo_buff[tafifo_pos],
+			tafifo_buff[tafifo_pos + 1]
+		);
 		tafifo_pos += 2;
 	}
 	else
 	{
-		osd_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %x mask %x\n", 0x10000000+offset*8, data, mem_mask);
+		LOGWARN("ta_fifo_poly_w:  Unmapped write64 %08x = %x mask %x\n", 0x10000000+offset*8, data, mem_mask);
 	}
 
 	tafifo_pos &= tafifo_mask;
@@ -2186,26 +2197,30 @@ TIMER_CALLBACK_MEMBER(powervr2_device::yuv_convert_end)
 void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 {
 	dc_state *state = machine().driver_data<dc_state>();
-	//printf("%08x %08x\n",ta_yuv_index++,ta_yuv_tex_ctrl);
-
-	//popmessage("YUV fifo write %08x %08x",ta_yuv_index,ta_yuv_tex_ctrl);
 
 	yuv_fifo[ta_yuv_index] = data;
 	ta_yuv_index++;
 
 	if(ta_yuv_index == 0x180)
 	{
+#if LIVE_YUV_VIEW
+	popmessage("YUV fifo write base=%08x ctrl=%08x (%dx%d)",
+		ta_yuv_tex_base, ta_yuv_tex_ctrl,
+		ta_yuv_x_size, ta_yuv_y_size
+	);
+#endif
+
 		ta_yuv_index = 0;
-		for(int y=0;y<16;y++)
+		for(int y = 0; y < 16; y++)
 		{
-			for(int x=0;x<16;x+=2)
+			for(int x = 0; x < 16; x+=2)
 			{
 				int dst_addr;
 				int u,v,y0,y1;
 
 				dst_addr = ta_yuv_tex_base;
-				dst_addr+= (ta_yuv_x+x)*2;
-				dst_addr+= ((ta_yuv_y+y)*320*2);
+				dst_addr+= (ta_yuv_x+x) * 2;
+				dst_addr+= ((ta_yuv_y+y) * 320 * 2);
 
 				u = yuv_fifo[0x00+(x>>1)+((y>>1)*8)];
 				v = yuv_fifo[0x40+(x>>1)+((y>>1)*8)];
@@ -2227,7 +2242,7 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 			if(ta_yuv_y == ta_yuv_y_size)
 			{
 				ta_yuv_y = 0;
-				/* TODO: timing */
+				// TODO: actual timings
 				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime((ta_yuv_x_size/16)*(ta_yuv_y_size/16)*0x180));
 			}
 		}
@@ -3641,59 +3656,6 @@ void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &
 	}
 }
 
-
-#if DEBUG_PALRAM
-void powervr2_device::debug_paletteram()
-{
-	//popmessage("%02x",pal_ram_ctrl);
-
-	for(int i=0;i<0x400;i++)
-	{
-		uint64_t pal = palette[i];
-		switch(pal_ram_ctrl)
-		{
-			case 0: //argb1555 <- guilty gear uses this mode
-			{
-				//a = (pal & 0x8000)>>15;
-				uint32_t r = (pal & 0x7c00)>>10;
-				uint32_t g = (pal & 0x03e0)>>5;
-				uint32_t b = (pal & 0x001f)>>0;
-				//a = a ? 0xff : 0x00;
-				m_palette->set_pen_color(i, pal5bit(r), pal5bit(g), pal5bit(b));
-			}
-			break;
-			case 1: //rgb565
-			{
-				//a = 0xff;
-				uint32_t r = (pal & 0xf800)>>11;
-				uint32_t g = (pal & 0x07e0)>>5;
-				uint32_t b = (pal & 0x001f)>>0;
-				m_palette->set_pen_color(i, pal5bit(r), pal6bit(g), pal5bit(b));
-			}
-			break;
-			case 2: //argb4444
-			{
-				//a = (pal & 0xf000)>>12;
-				uint32_t r = (pal & 0x0f00)>>8;
-				uint32_t g = (pal & 0x00f0)>>4;
-				uint32_t b = (pal & 0x000f)>>0;
-				m_palette->set_pen_color(i, pal4bit(r), pal4bit(g), pal4bit(b));
-			}
-			break;
-			case 3: //argb8888
-			{
-				//a = (pal & 0xff000000)>>20;
-				uint32_t r = (pal & 0x00ff0000)>>16;
-				uint32_t g = (pal & 0x0000ff00)>>8;
-				uint32_t b = (pal & 0x000000ff)>>0;
-				m_palette->set_pen_color(i, r, g, b);
-			}
-			break;
-		}
-	}
-}
-#endif
-
 /* test video end */
 
 void powervr2_device::pvr_build_parameterconfig()
@@ -3815,10 +3777,6 @@ uint32_t powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 //  static int useframebuffer=1;
 //  const rectangle &visarea = screen.visible_area();
 
-#if DEBUG_PALRAM
-	debug_paletteram();
-#endif
-
 	// copy our fake framebuffer bitmap (where things have been rendered) to the screen
 #if 0
 	for (int y = visarea->min_y ; y <= visarea->max_y ; y++)
@@ -3832,10 +3790,10 @@ uint32_t powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	}
 #endif
 
-	bitmap.fill(rgb_t(0xff,
-							(vo_border_col >> 16) & 0xff,
+	//FIXME: additional Chroma bit
+	bitmap.fill(rgb_t(0xff, (vo_border_col >> 16) & 0xff,
 							(vo_border_col >> 8 ) & 0xff,
-							(vo_border_col      ) & 0xff), cliprect); //FIXME: Chroma bit?
+							(vo_border_col      ) & 0xff), cliprect);
 
 	if(!(vo_control & 8))
 		pvr_drawframebuffer(bitmap, cliprect);
@@ -3873,7 +3831,7 @@ uint32_t powervr2_device::elan_regs_r(offs_t offset)
 {
 	switch(offset)
 	{
-		case 0x00/4: // ID chip 
+		case 0x00/4: // ID chip
 			// TODO: BIOS crashes / gives a black screen with this as per now
 			return 0xe1ad0000;
 		case 0x04/4: // REVISION
@@ -3935,15 +3893,15 @@ void powervr2_device::pvr_dma_execute(address_space &space)
 	src = m_pvr_dma.sys_addr;
 	size = 0;
 
-	logerror("PVR-DMA start\n");
-	logerror("%08x %08x %08x\n",m_pvr_dma.pvr_addr, m_pvr_dma.sys_addr, m_pvr_dma.size);
-	logerror("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
+	LOGPVRDMA("PVR-DMA start\n");
+	LOGPVRDMA("%08x %08x %08x\n",m_pvr_dma.pvr_addr, m_pvr_dma.sys_addr, m_pvr_dma.size);
+	LOGPVRDMA("src %s dst %08x\n",m_pvr_dma.dir ? "->" : "<-",m_pvr_dma.sel);
 
 	/* Throw illegal address set */
+	// TODO: unimplemented for now, checkable from DCLP
 #if 0
 	if((m_pvr_dma.sys_addr & 0x1c000000) != 0x0c000000)
 	{
-		// TODO: timing
 		irq_cb(ERR_PVRIF_ILL_ADDR_IRQ);
 		m_pvr_dma.start = sb_pdst = 0;
 		printf("Illegal PVR DMA set\n");

@@ -1665,6 +1665,7 @@ static INPUT_PORTS_START( dybbnao )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+// TODO: optional digital inputs (in service mode)
 static INPUT_PORTS_START( zombrvn )
 	PORT_INCLUDE( naomi_mie )
 
