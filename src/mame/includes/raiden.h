@@ -27,10 +27,10 @@ public:
 		m_palette(*this, "palette"),
 		m_spriteram(*this, "spriteram"),
 		m_shared_ram(*this, "shared_ram"),
-		m_videoram(*this, "videoram"),
+		m_textram(*this, "textram"),
 		m_scroll_ram(*this, "scroll_ram"),
-		m_back_data(*this, "back_data"),
-		m_fore_data(*this, "fore_data")
+		m_bgram(*this, "bgram"),
+		m_fgram(*this, "fgram")
 	{ }
 
 	void raidene(machine_config &config);
@@ -44,17 +44,17 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<seibu_sound_device> m_seibu_sound;
 
-	uint8_t m_bg_layer_enabled;
-	uint8_t m_fg_layer_enabled;
-	uint8_t m_tx_layer_enabled;
-	uint8_t m_sp_layer_enabled;
-	uint8_t m_flipscreen;
+	bool m_bg_layer_enabled;
+	bool m_fg_layer_enabled;
+	bool m_tx_layer_enabled;
+	bool m_sp_layer_enabled;
+	bool m_flipscreen;
 
 	virtual void video_start() override;
 
-	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t *scrollregs);
+	u32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u16 *scrollregs);
 
-	void raiden_text_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void textram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void common_video_start();
 
@@ -63,29 +63,29 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<buffered_spriteram16_device> m_spriteram;
 
-	required_shared_ptr<uint16_t> m_shared_ram;
-	required_shared_ptr<uint16_t> m_videoram;
-	optional_shared_ptr<uint16_t> m_scroll_ram;
-	required_shared_ptr<uint16_t> m_back_data;
-	required_shared_ptr<uint16_t> m_fore_data;
+	required_shared_ptr<u16> m_shared_ram;
+	required_shared_ptr<u16> m_textram;
+	optional_shared_ptr<u16> m_scroll_ram;
+	required_shared_ptr<u16> m_bgram;
+	required_shared_ptr<u16> m_fgram;
 
 	tilemap_t *m_bg_layer;
 	tilemap_t *m_fg_layer;
 	tilemap_t *m_tx_layer;
 
-	void raiden_background_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void raiden_foreground_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void raiden_control_w(uint8_t data);
+	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void raiden_control_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fore_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	uint32_t screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 	void common_decrypt();
 
 	void main_map(address_map &map);
@@ -109,13 +109,13 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint16_t m_raidenb_scroll_ram[6];
+	u16 m_raidenb_scroll_ram[6];
 
-	uint32_t screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void raidenb_control_w(uint8_t data);
-	void raidenb_layer_enable_w(uint16_t data);
-	void raidenb_layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void raidenb_control_w(u8 data);
+	void raidenb_layer_enable_w(u16 data);
+	void raidenb_layer_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void raidenb_main_map(address_map &map);
 };
