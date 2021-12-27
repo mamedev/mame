@@ -26,7 +26,6 @@
 #define LOG_TA_FIFO     (1U << 3) // Show TA FIFO polygon entries
 #define LOG_TA_TILE     (1U << 4) // Show TA tile entries
 #define LOG_PVR_DMA     (1U << 5) // Show PVR-DMA access
-#define LOG_YUV_FIFO    (1U << 6) // Show YUV register access
 
 #define VERBOSE (LOG_WARN | LOG_PVR_DMA)
 
@@ -110,7 +109,7 @@ void powervr2_device::ta_map(address_map &map)
 	map(0x0144, 0x0147).rw(FUNC(powervr2_device::ta_list_init_r), FUNC(powervr2_device::ta_list_init_w));
 	map(0x0148, 0x014b).rw(FUNC(powervr2_device::ta_yuv_tex_base_r), FUNC(powervr2_device::ta_yuv_tex_base_w));
 	map(0x014c, 0x014f).rw(FUNC(powervr2_device::ta_yuv_tex_ctrl_r), FUNC(powervr2_device::ta_yuv_tex_ctrl_w));
-	map(0x0150, 0x0153).rw(FUNC(powervr2_device::ta_yuv_tex_cnt_r), FUNC(powervr2_device::ta_yuv_tex_cnt_w));
+	map(0x0150, 0x0153).r(FUNC(powervr2_device::ta_yuv_tex_cnt_r));
 	map(0x0160, 0x0163).w(FUNC(powervr2_device::ta_list_cont_w));
 	map(0x0164, 0x0167).rw(FUNC(powervr2_device::ta_next_opb_init_r), FUNC(powervr2_device::ta_next_opb_init_w));
 
@@ -1534,8 +1533,8 @@ void powervr2_device::ta_yuv_tex_base_w(offs_t offset, uint32_t data, uint32_t m
 
 	// Writes causes a reset in YUV FIFO pipeline
 	ta_yuv_index = 0;
-	ta_yuv_x = 0;
-	ta_yuv_y = 0;
+	ta_yuv_u_ptr = 0;
+	ta_yuv_v_ptr = 0;
 }
 
 uint32_t powervr2_device::ta_yuv_tex_ctrl_r()
@@ -1546,22 +1545,20 @@ uint32_t powervr2_device::ta_yuv_tex_ctrl_r()
 void powervr2_device::ta_yuv_tex_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&ta_yuv_tex_ctrl);
-	ta_yuv_x_size = ((ta_yuv_tex_ctrl & 0x3f) + 1) * 16;
-	ta_yuv_y_size = (((ta_yuv_tex_ctrl >> 8) & 0x3f) + 1) * 16;
+
+	ta_yuv_v_size = (((ta_yuv_tex_ctrl >> 8) & 0x3f) + 1) * 16;
+	ta_yuv_u_size = ((ta_yuv_tex_ctrl & 0x3f) + 1) * 16;
 
 	if (ta_yuv_tex_ctrl & 0x01010000)
 		throw emu_fatalerror("YUV422 mode selected %08x", ta_yuv_tex_ctrl);
 }
 
-// TODO: unemulated YUV live count, nothing seems to use it?
+// TODO: unemulated YUV macroblock live count, nothing seems to use it?
 uint32_t powervr2_device::ta_yuv_tex_cnt_r()
 {
+	if (!machine().side_effects_disabled())
+		LOGWARN("%s: yuv_tex_cnt read!", tag());
 	return ta_yuv_tex_cnt;
-}
-
-void powervr2_device::ta_yuv_tex_cnt_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&ta_yuv_tex_cnt);
 }
 
 void powervr2_device::ta_list_cont_w(uint32_t data)
@@ -2193,7 +2190,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::yuv_convert_end)
 	yuv_timer_end->adjust(attotime::never);
 }
 
-
+// TODO: this doesn't really work for anything that isn't typical 320x240 scenario (luptype)
 void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 {
 	dc_state *state = machine().driver_data<dc_state>();
@@ -2204,10 +2201,10 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 	if(ta_yuv_index == 0x180)
 	{
 #if LIVE_YUV_VIEW
-	popmessage("YUV fifo write base=%08x ctrl=%08x (%dx%d)",
-		ta_yuv_tex_base, ta_yuv_tex_ctrl,
-		ta_yuv_x_size, ta_yuv_y_size
-	);
+		popmessage("YUV fifo write base=%08x ctrl=%08x (%dx%d)",
+			ta_yuv_tex_base, ta_yuv_tex_ctrl,
+			ta_yuv_u_size, ta_yuv_v_size
+		);
 #endif
 
 		ta_yuv_index = 0;
@@ -2216,11 +2213,11 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 			for(int x = 0; x < 16; x+=2)
 			{
 				int dst_addr;
-				int u,v,y0,y1;
+				int u, v, y0, y1;
 
 				dst_addr = ta_yuv_tex_base;
-				dst_addr+= (ta_yuv_x+x) * 2;
-				dst_addr+= ((ta_yuv_y+y) * 320 * 2);
+				dst_addr+= (ta_yuv_u_ptr + x) * 2;
+				dst_addr+= ((ta_yuv_v_ptr + y) * 320 * 2);
 
 				u = yuv_fifo[0x00+(x>>1)+((y>>1)*8)];
 				v = yuv_fifo[0x40+(x>>1)+((y>>1)*8)];
@@ -2234,16 +2231,16 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 			}
 		}
 
-		ta_yuv_x+=16;
-		if(ta_yuv_x == ta_yuv_x_size)
+		ta_yuv_u_ptr += 16;
+		if(ta_yuv_u_ptr == ta_yuv_u_size)
 		{
-			ta_yuv_x = 0;
-			ta_yuv_y+=16;
-			if(ta_yuv_y == ta_yuv_y_size)
+			ta_yuv_u_ptr = 0;
+			ta_yuv_v_ptr += 16;
+			if(ta_yuv_v_ptr == ta_yuv_v_size)
 			{
-				ta_yuv_y = 0;
+				ta_yuv_v_ptr = 0;
 				// TODO: actual timings
-				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime((ta_yuv_x_size/16)*(ta_yuv_y_size/16)*0x180));
+				yuv_timer_end->adjust(state->m_maincpu->cycles_to_attotime((ta_yuv_u_size/16)*(ta_yuv_v_size/16)*0x180));
 			}
 		}
 	}
@@ -4110,13 +4107,13 @@ void powervr2_device::device_reset()
 	spg_hblank_int =            0x031d0000;
 	spg_vblank_int =            0x01500104;
 
-	tafifo_pos=0;
-	tafifo_mask=7;
-	tafifo_vertexwords=8;
-	tafifo_listtype= DISPLAY_LIST_NONE;
-	start_render_received=0;
-	renderselect= -1;
-	grabsel=0;
+	tafifo_pos = 0;
+	tafifo_mask = 7;
+	tafifo_vertexwords = 8;
+	tafifo_listtype = DISPLAY_LIST_NONE;
+	start_render_received = 0;
+	renderselect = -1;
+	grabsel = 0;
 
 //  vbout_timer->adjust(screen().time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 //  vbin_timer->adjust(screen().time_until_pos(spg_vblank_int & 0x3ff));

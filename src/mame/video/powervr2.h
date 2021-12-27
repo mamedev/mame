@@ -278,7 +278,6 @@ public:
 	uint32_t ta_yuv_tex_ctrl_r();
 	void ta_yuv_tex_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t ta_yuv_tex_cnt_r();
-	void ta_yuv_tex_cnt_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void ta_list_cont_w(uint32_t data);
 	uint32_t ta_next_opb_init_r();
 	void ta_next_opb_init_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -367,8 +366,8 @@ private:
 	uint32_t ta_next_opb, ta_itp_current, ta_alloc_ctrl, ta_next_opb_init;
 	uint32_t ta_yuv_tex_base, ta_yuv_tex_ctrl, ta_yuv_tex_cnt;
 	uint32_t ta_yuv_index;
-	int ta_yuv_x,ta_yuv_y;
-	int ta_yuv_x_size,ta_yuv_y_size;
+	int ta_yuv_u_ptr, ta_yuv_v_ptr;
+	int ta_yuv_u_size, ta_yuv_v_size;
 	uint8_t yuv_fifo[384];
 
 	// Other registers
