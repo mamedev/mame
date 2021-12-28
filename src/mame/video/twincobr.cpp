@@ -89,7 +89,7 @@ void twincobr_state::video_start()
 	m_fgvideoram16 = make_unique_clear<u16[]>(m_fgvideoram_size);
 	m_bgvideoram16 = make_unique_clear<u16[]>(m_bgvideoram_size);
 
-	m_display_on = 0;
+	m_display_on = false;
 
 	save_pointer(NAME(m_txvideoram16), m_txvideoram_size);
 	save_pointer(NAME(m_fgvideoram16), m_fgvideoram_size);

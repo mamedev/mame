@@ -11,6 +11,7 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
+#include "machine/toaplan_gxl.h"
 #include "sound/ymopl.h"
 #include "video/toaplan_scu.h"
 #include "emupal.h"
@@ -56,7 +57,7 @@ protected:
 	optional_ioport m_dswb_io;
 	optional_ioport m_tjump_io;
 
-	u8 m_intenable;
+	u8 m_intenable = 0;
 
 	std::unique_ptr<u16[]> m_tilevram[4];
 	/*
@@ -71,22 +72,22 @@ protected:
 	std::unique_ptr<u16[]> m_spritesizeram;
 	std::unique_ptr<u16[]> m_buffered_spritesizeram;
 
-	s32 m_bcu_flipscreen;     /* Tile   controller flip flag */
-	s32 m_fcu_flipscreen;     /* Sprite controller flip flag */
+	s32  m_bcu_flipscreen = -1;     /* Tile   controller flip flag */
+	bool m_fcu_flipscreen = false;  /* Sprite controller flip flag */
 
-	s32 m_pf_voffs;
-	s32 m_spriteram_offs;
+	s32 m_pf_voffs = 0;
+	s32 m_spriteram_offs = 0;
 
-	s32 m_scrollx[4];
-	s32 m_scrolly[4];
+	s32 m_scrollx[4] = {0};
+	s32 m_scrolly[4] = {0};
 
 #ifdef MAME_DEBUG
 	int m_display_pf[4];
 	int m_displog;
 #endif
 
-	s32 m_tiles_offsetx;
-	s32 m_tiles_offsety;
+	s32 m_tiles_offsetx = 0;
+	s32 m_tiles_offsety = 0;
 
 	tilemap_t *m_tilemap[4];
 
@@ -192,36 +193,20 @@ class toaplan1_demonwld_state : public toaplan1_state
 public:
 	toaplan1_demonwld_state(const machine_config &mconfig, device_type type, const char *tag) :
 		toaplan1_state(mconfig, type, tag),
-		m_dsp(*this, "dsp")
+		m_gxl(*this, "gxl")
 	{
 	}
 
 	void demonwld(machine_config &config);
 
-protected:
-	virtual void device_post_load() override;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 private:
 	/* Demon world */
-	int m_dsp_on;
-	int m_dsp_bio;
-	int m_dsp_execute;
-	u32 m_dsp_addr_w;
-	u32 m_main_ram_seg;
-
-	void dsp_addrsel_w(u16 data);
-	u16 dsp_r();
-	void dsp_w(u16 data);
-	void dsp_bio_w(u16 data);
-	DECLARE_READ_LINE_MEMBER(bio_r);
+	void dsp_addr_cb(u32 &main_ram_seg, u32 &dsp_addr, u16 data);
+	bool dsp_read_cb(u32 main_ram_seg, u32 dsp_addr, u16 &data);
+	bool dsp_write_cb(u32 main_ram_seg, u32 dsp_addr, bool &dsp_execute, u16 data);
 	void dsp_ctrl_w(u8 data);
-	void dsp_int_w(int enable);
 
-	required_device<tms32010_device> m_dsp;
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
+	required_device<toaplan_gxl_device> m_gxl;
 	void main_map(address_map &map);
 	void sound_io_map(address_map &map);
 };
@@ -241,8 +226,8 @@ protected:
 
 private:
 	// Fire Shark sound
-	u8 m_to_mcu;
-	u8 m_cmdavailable;
+	u8 m_to_mcu = 0;
+	bool m_cmdavailable = false;
 
 	void mcu_w(u8 data);
 	u8 soundlatch_r();

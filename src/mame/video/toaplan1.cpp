@@ -247,7 +247,7 @@ void toaplan1_rallybik_state::video_start()
 	m_tilemap[3]->set_scrolldy(-0x111, 0x8);
 
 	m_bcu_flipscreen = -1;
-	m_fcu_flipscreen = 0;
+	m_fcu_flipscreen = false;
 
 	register_common();
 }
@@ -268,7 +268,7 @@ void toaplan1_state::video_start()
 	m_tilemap[3]->set_scrolldy(-0x101, -0xff);
 
 	m_bcu_flipscreen = -1;
-	m_fcu_flipscreen = 0;
+	m_fcu_flipscreen = false;
 
 	register_common();
 }
@@ -686,7 +686,7 @@ void toaplan1_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, c
 {
 	u16 *source = (u16 *)m_buffered_spriteram.get();
 	u16 *size   = (u16 *)m_buffered_spritesizeram.get();
-	int fcu_flipscreen = m_fcu_flipscreen;
+	const bool fcu_flipscreen = m_fcu_flipscreen;
 
 	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{

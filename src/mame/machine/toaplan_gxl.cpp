@@ -1,0 +1,189 @@
+// license:BSD-3-Clause
+// copyright-holders:Darren Olafson, Quench,Stephane Humbert
+/***************************************************************************
+
+    Toaplan GXL-0x family MCU (and compatible clones)
+	Toaplan used this chip at 1987 to 1990 for protection and DSP operations.
+	This chip has embedded TMS320C10 DSP with internal ROM,
+	There's 4 Known revisions:
+
+	    GXL-01 (Hishou Zame)
+	    GXL-02 (Flying Shark, Sky Shark, Wardner, Pyros, Wardner no Mori)
+	    GXL-03 (Kyukyoku Tiger)
+	    GXL-04 (Twin Cobra, Demon's World, Horror Story)
+
+***************************************************************************/
+
+#include "emu.h"
+#include "machine/toaplan_gxl.h"
+
+
+#define LOG_DSP_CALLS      (1U<<1)
+#define LOG_DSP_WARN       (1U<<2)
+
+#define VERBOSE ( LOG_DSP_WARN )
+
+#include "logmacro.h"
+
+
+DEFINE_DEVICE_TYPE(TOAPLAN_GXL, toaplan_gxl_device, "toaplan_gxl", "Toaplan GXL DSP")
+
+
+toaplan_gxl_device::toaplan_gxl_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, TOAPLAN_GXL, tag, owner, clock),
+	m_dsp(*this, "dsp"),
+	m_halt_cb(*this),
+	m_dsp_addr_cb(*this),
+	m_dsp_read_cb(*this),
+	m_dsp_write_cb(*this)
+{
+}
+
+
+void toaplan_gxl_device::dsp_addrsel_w(u16 data)
+{
+	// This sets the main CPU RAM address the DSP should
+	//  read/write, via the DSP IO port 0
+
+	m_dsp_addr_cb(m_main_ram_seg, m_dsp_addr_w, data);
+	LOGMASKED(LOG_DSP_CALLS, "DSP PC:%04x IO write %04x (%08x) at port 0\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
+}
+
+
+u16 toaplan_gxl_device::dsp_r()
+{
+	// DSP can read data from main CPU RAM via DSP IO port 1
+
+	u16 input_data = 0;
+
+	if (m_dsp_read_cb.isnull() || (!m_dsp_read_cb(m_main_ram_seg, m_dsp_addr_w, input_data)))
+		LOGMASKED(LOG_DSP_WARN, "DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
+
+	LOGMASKED(LOG_DSP_CALLS, "DSP PC:%04x IO read %04x at %08x (port 1)\n", m_dsp->pcbase(), input_data, m_main_ram_seg + m_dsp_addr_w);
+	return input_data;
+}
+
+
+void toaplan_gxl_device::dsp_w(u16 data)
+{
+	// Data written to main CPU RAM via DSP IO port 1
+
+	m_dsp_execute = false;
+
+	if (m_dsp_write_cb.isnull() || (!m_dsp_write_cb(m_main_ram_seg, m_dsp_addr_w, m_dsp_execute, data)))
+		LOGMASKED(LOG_DSP_WARN, "DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
+
+	LOGMASKED(LOG_DSP_CALLS, "DSP PC:%04x IO write %04x at %08x (port 1)\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
+}
+
+
+void toaplan_gxl_device::dsp_bio_w(u16 data)
+{
+	// data 0xffff  means inhibit BIO line to DSP and enable
+	//              communication to main processor
+	//              Actually only DSP data bit 15 controls this
+	// data 0x0000  means set DSP BIO line active and disable
+	//              communication to main processor
+
+	LOGMASKED(LOG_DSP_CALLS, "DSP PC:%04x IO write %04x at port 3\n", m_dsp->pcbase(), data);
+	if (data & 0x8000)
+		m_dsp_bio = CLEAR_LINE;
+
+	if (data == 0)
+	{
+		if (m_dsp_execute)
+		{
+			LOGMASKED(LOG_DSP_CALLS, "Turning the main CPU on\n");
+			m_halt_cb(CLEAR_LINE);
+			m_dsp_execute = false;
+		}
+		m_dsp_bio = ASSERT_LINE;
+	}
+}
+
+
+READ_LINE_MEMBER(toaplan_gxl_device::bio_r)
+{
+	return m_dsp_bio;
+}
+
+
+WRITE_LINE_MEMBER(toaplan_gxl_device::dsp_int_w)
+{
+	m_dsp_on = state;
+	if (state)
+	{
+		// assert the INT line to the DSP
+		LOGMASKED(LOG_DSP_CALLS, "Turning DSP on and main CPU off\n");
+		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_dsp->set_input_line(0, ASSERT_LINE); // TMS32010 INT
+		m_halt_cb(ASSERT_LINE);
+	}
+	else
+	{
+		// inhibit the INT line to the DSP
+		LOGMASKED(LOG_DSP_CALLS, "Turning DSP off\n");
+		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
+		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+}
+
+
+void toaplan_gxl_device::dsp_program_map(address_map &map)
+{
+	map(0x000, 0x7ff).rom().region("dsp", 0);
+}
+
+
+// $000 - 08F  TMS32010 Internal Data RAM in Data Address Space
+
+
+void toaplan_gxl_device::dsp_io_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(toaplan_gxl_device::dsp_addrsel_w));
+	map(0x01, 0x01).rw(FUNC(toaplan_gxl_device::dsp_r), FUNC(toaplan_gxl_device::dsp_w));
+	map(0x03, 0x03).w(FUNC(toaplan_gxl_device::dsp_bio_w));
+}
+
+
+void toaplan_gxl_device::device_add_mconfig(machine_config &config)
+{
+	TMS32010(config, m_dsp, DERIVED_CLOCK(1,1));
+	m_dsp->set_addrmap(AS_PROGRAM, &toaplan_gxl_device::dsp_program_map);
+	m_dsp->set_addrmap(AS_IO, &toaplan_gxl_device::dsp_io_map);
+	m_dsp->bio().set(FUNC(toaplan_gxl_device::bio_r));
+}
+
+
+void toaplan_gxl_device::device_resolve_objects()
+{
+	m_halt_cb.resolve_safe();
+	m_dsp_addr_cb.resolve();
+	m_dsp_read_cb.resolve();
+	m_dsp_write_cb.resolve();
+}
+
+
+void toaplan_gxl_device::device_post_load()
+{
+	dsp_int_w(m_dsp_on);
+}
+
+
+void toaplan_gxl_device::device_start()
+{
+	save_item(NAME(m_dsp_on));
+	save_item(NAME(m_dsp_addr_w));
+	save_item(NAME(m_main_ram_seg));
+	save_item(NAME(m_dsp_bio));
+	save_item(NAME(m_dsp_execute));
+}
+
+
+void toaplan_gxl_device::device_reset()
+{
+	m_dsp_addr_w = 0;
+	m_main_ram_seg = 0;
+	m_dsp_execute = false;
+	m_dsp_bio = CLEAR_LINE;
+}

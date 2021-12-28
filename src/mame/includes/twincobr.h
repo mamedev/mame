@@ -11,6 +11,7 @@
 
 #include "cpu/tms32010/tms32010.h"
 #include "machine/74259.h"
+#include "machine/toaplan_gxl.h"
 #include "video/mc6845.h"
 #include "video/bufsprite.h"
 #include "video/toaplan_scu.h"
@@ -27,7 +28,7 @@ public:
 		m_spriteram8(*this, "spriteram8"),
 		m_spriteram16(*this, "spriteram16"),
 		m_maincpu(*this, "maincpu"),
-		m_dsp(*this, "dsp"),
+		m_gxl(*this, "gxl"),
 		m_spritegen(*this, "scu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -42,6 +43,7 @@ public:
 	void fshark(machine_config &config);
 
 	void init_twincobr();
+	void init_fsharkbt();
 
 protected:
 	virtual void machine_reset() override;
@@ -51,46 +53,39 @@ protected:
 	optional_device<buffered_spriteram8_device> m_spriteram8;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
 
-	u32 m_fg_rom_bank;
-	u32 m_bg_ram_bank;
-	int m_intenable;
-	int m_dsp_bio;
-	int m_fsharkbt_8741;
-	int m_dsp_execute;
-	u32 m_dsp_addr_w;
-	u32 m_main_ram_seg;
+	u32 m_fg_rom_bank = 0;
+	u32 m_bg_ram_bank = 0;
+	bool m_intenable = false;
+	s32 m_fsharkbt_8741 = -1;
 	std::unique_ptr<u16[]> m_bgvideoram16;
 	std::unique_ptr<u16[]> m_fgvideoram16;
 	std::unique_ptr<u16[]> m_txvideoram16;
-	size_t m_bgvideoram_size;
-	size_t m_fgvideoram_size;
-	size_t m_txvideoram_size;
-	s32 m_txscrollx;
-	s32 m_txscrolly;
-	s32 m_fgscrollx;
-	s32 m_fgscrolly;
-	s32 m_bgscrollx;
-	s32 m_bgscrolly;
-	s32 m_txoffs;
-	s32 m_fgoffs;
-	s32 m_bgoffs;
-	s32 m_display_on;
+	size_t m_bgvideoram_size = 0x2000;
+	size_t m_fgvideoram_size = 0x1000;
+	size_t m_txvideoram_size = 0x0800;
+	s32 m_txscrollx = 0;
+	s32 m_txscrolly = 0;
+	s32 m_fgscrollx = 0;
+	s32 m_fgscrolly = 0;
+	s32 m_bgscrollx = 0;
+	s32 m_bgscrolly = 0;
+	s32 m_txoffs = 0;
+	s32 m_fgoffs = 0;
+	s32 m_bgoffs = 0;
+	bool m_display_on = false;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
 
-	void twincobr_dsp_addrsel_w(u16 data);
-	u16 twincobr_dsp_r();
-	void twincobr_dsp_w(u16 data);
-	void wardner_dsp_addrsel_w(u16 data);
-	u16 wardner_dsp_r();
-	void wardner_dsp_w(u16 data);
-	void twincobr_dsp_bio_w(u16 data);
+	void twincobr_dsp_addr_cb(u32 &main_ram_seg, u32 &dsp_addr, u16 data);
+	bool twincobr_dsp_read_cb(u32 main_ram_seg, u32 dsp_addr, u16 &data);
+	bool twincobr_dsp_write_cb(u32 main_ram_seg, u32 dsp_addr, bool &dsp_execute, u16 data);
+	void wardner_dsp_addr_cb(u32 &main_ram_seg, u32 &dsp_addr, u16 data);
+	bool wardner_dsp_read_cb(u32 main_ram_seg, u32 dsp_addr, u16 &data);
+	bool wardner_dsp_write_cb(u32 main_ram_seg, u32 dsp_addr, bool &dsp_execute, u16 data);
 	u16 fsharkbt_dsp_r();
 	void fsharkbt_dsp_w(u16 data);
-	DECLARE_READ_LINE_MEMBER(twincobr_bio_r);
 	DECLARE_WRITE_LINE_MEMBER(int_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(dsp_int_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_lockout_1_w);
@@ -136,7 +131,7 @@ protected:
 	void log_vram();
 	void driver_savestate();
 	required_device<cpu_device> m_maincpu;
-	required_device<tms32010_device> m_dsp;
+	required_device<toaplan_gxl_device> m_gxl;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -144,8 +139,6 @@ protected:
 	required_device<ls259_device> m_mainlatch;
 	required_device<ls259_device> m_coinlatch;
 
-	void dsp_io_map(address_map &map);
-	void dsp_program_map(address_map &map);
 	void fsharkbt_i8741_io_map(address_map &map);
 	void main_program_map(address_map &map);
 	void sound_io_map(address_map &map);

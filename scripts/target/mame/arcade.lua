@@ -4438,6 +4438,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/wardner.cpp",
 	MAME_DIR .. "src/mame/video/toaplan_scu.cpp",
 	MAME_DIR .. "src/mame/video/toaplan_scu.h",
+	MAME_DIR .. "src/mame/machine/toaplan_gxl.cpp",
+	MAME_DIR .. "src/mame/machine/toaplan_gxl.h",
 }
 
 createMAMEProjects(_target, _subtarget, "unico")
