@@ -75,6 +75,8 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #include "tilemap.h"
 
 
+namespace {
+
 /*************************************
  *
  *  Constants
@@ -718,10 +720,10 @@ static INPUT_PORTS_START( looping )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_B ) )     PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0e, 0x02, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0e, 0x02, DEF_STR( Coin_A ) )     PORT_DIPLOCATION("DSW:2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
@@ -730,14 +732,14 @@ static INPUT_PORTS_START( looping )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      // Check code at 0x2c00
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW:5")  // Check code at 0x2c00
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "5" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "DSW:7" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )    PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
@@ -747,11 +749,11 @@ static INPUT_PORTS_START( skybump )
 	PORT_INCLUDE(looping)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Lives ) )      PORT_DIPLOCATION("DSW:6,7")
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x60, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-//  PORT_DIPSETTING(    0x20, "Infinite (Cheat)")
+	PORT_DIPSETTING(    0x20, "Infinite (Cheat)") // duplicate
 INPUT_PORTS_END
 
 
@@ -879,6 +881,8 @@ void looping_state::init_looping()
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x7007, read8smo_delegate(*this, FUNC(looping_state::protection_r)));
 }
 
+
+} // Anonymous namespace
 
 
 /*************************************
