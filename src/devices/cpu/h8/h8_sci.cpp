@@ -623,7 +623,6 @@ void h8_sci_device::tx_dropped_edge()
 
 void h8_sci_device::rx_start()
 {
-	ssr |= SSR_TDRE;
 	rx_parity = smr & SMR_OE ? 0 : 1;
 	rsr = 0x00;
 	if(V>=2) logerror("start receive\n");
