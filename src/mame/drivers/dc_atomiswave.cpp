@@ -433,7 +433,7 @@ Premier Eleven
 #include "includes/dc_atomiswave.h"
 
 //#include "machine/gunsense.h"
-#include "emupal.h"
+//#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
