@@ -4,11 +4,6 @@
 
  Game Boy carts with MBC (Memory Bank Controller)
 
-TODO:
-- The MBC3 RTC is not really a true RTC. The chip is used to track passed time even
-  when the console is off, not to keep track of the time of day. Keeping track of
-  passed time when the emulation was not running is currently not supported.
-
  ***********************************************************************************************************/
 
 
@@ -67,6 +62,8 @@ gb_rom_mbc2_device::gb_rom_mbc2_device(const machine_config &mconfig, const char
 
 gb_rom_mbc3_device::gb_rom_mbc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: gb_rom_mbc_device(mconfig, GB_ROM_MBC3, tag, owner, clock)
+	, device_rtc_interface(mconfig, *this)
+	, device_nvram_interface(mconfig, *this)
 	, m_rtc_ready(0)
 {
 }
@@ -189,18 +186,12 @@ void gb_rom_mbc_device::shared_reset()
 void gb_rom_mbc3_device::device_start()
 {
 	shared_start();
-	save_item(NAME(m_rtc_regs));
 	save_item(NAME(m_rtc_ready));
 	save_item(NAME(m_rtc_ticks));
-	save_item(NAME(m_latched_regs));
 
 	m_rtc_ticks = 0;
-
-	m_rtc_regs[REG_SECONDS] = 0;
-	m_rtc_regs[REG_MINUTES] = 0;
-	m_rtc_regs[REG_HOURS] = 0;
-	m_rtc_regs[REG_DAYS] = 0;
-	m_rtc_regs[REG_CONTROL] = 0;
+	m_rtc_control = 0;
+	std::fill(std::begin(m_data), std::end(m_data), 0);
 
 	m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_rom_mbc3_device::rtc_tick),this));
 	m_rtc_timer->adjust(attotime::from_hz(RTC_FREQUENCY), 0, attotime::from_hz(RTC_FREQUENCY));
@@ -210,6 +201,87 @@ void gb_rom_mbc3_device::device_reset()
 {
 	shared_reset();
 	m_rtc_ready = 0;
+
+	// Setup the simple time and day counting RTC and update it with the seconds passed
+	// since the last save. Use simple day counting mode by setting RTC_MONTH to 0;
+	set_clock_register(RTC_SECOND, m_data[REG_SECONDS]);
+	set_clock_register(RTC_MINUTE, m_data[REG_MINUTES]);
+	set_clock_register(RTC_HOUR, m_data[REG_HOURS]);
+	set_clock_register(RTC_DAY, m_data[REG_DAYS] | ((m_data[REG_CONTROL] & 0x01) << 8));
+	set_clock_register(RTC_MONTH, 0);
+	set_clock_register(RTC_YEAR, 0);
+	m_rtc_control = m_data[REG_CONTROL] & 0xc0;
+
+	s64 previous_time = 0;
+	for (int i = 0; i < 8; i++)
+	{
+		previous_time |= (u64(m_data[START_TIMESTAMP + i]) << (i * 8));
+	}
+	system_time systime;
+	machine().base_datetime(systime);
+	s64 seconds_passed = systime.time - previous_time;
+	if (seconds_passed > 0 && !(m_rtc_control & RTC_HALT))
+	{
+		while (seconds_passed > 24 * 60 * 60)
+		{
+			advance_days();
+			seconds_passed -= 24 * 60 * 60;
+		}
+		while (seconds_passed > 60)
+		{
+			advance_minutes();
+			seconds_passed -= 60;
+		}
+		while (seconds_passed > 0)
+		{
+			advance_seconds();
+			seconds_passed--;
+		}
+		apply_rtc_masks();
+		// Check whether the RTC timer overflowed since the last save.
+		if (get_clock_register(RTC_DAY) > 511) {
+			m_rtc_control |= RTC_CARRY;
+		}
+	}
+}
+
+void gb_rom_mbc3_device::apply_rtc_masks()
+{
+	// The chip uses 5 and 6 bit registers for storing the hours, minutes and seconds.
+	// Any invalid values should rollover to 0 and continue counting as normal.
+	set_clock_register(RTC_SECOND, get_clock_register(RTC_SECOND) & MASK_SEC_MIN);
+	set_clock_register(RTC_MINUTE, get_clock_register(RTC_MINUTE) & MASK_SEC_MIN);
+	set_clock_register(RTC_HOUR, get_clock_register(RTC_HOUR) & MASK_HOUR);
+}
+
+void gb_rom_mbc3_device::nvram_default()
+{
+	std::fill(std::begin(m_data), std::end(m_data), 0);
+}
+
+void gb_rom_mbc3_device::nvram_read(emu_file &file)
+{
+	file.read(m_data, std::size(m_data));
+
+}
+
+void gb_rom_mbc3_device::nvram_write(emu_file &file)
+{
+	// prepare data for writing
+	m_data[0] = get_clock_register(RTC_SECOND);
+	m_data[1] = get_clock_register(RTC_MINUTE);
+	m_data[2] = get_clock_register(RTC_HOUR);
+	m_data[3] = get_clock_register(RTC_DAY) & 0xff;
+	m_data[4] = ((get_clock_register(RTC_DAY) >> 8) & 0x01) | (m_rtc_control & 0xc0);
+	// store current timestamp
+	system_time systime;
+	machine().base_datetime(systime);
+	for (int i = 0; i < 8; i++)
+	{
+		m_data[START_TIMESTAMP + i] = (systime.time >> (i * 8)) & 0xff;
+	}
+
+	file.write(m_data, std::size(m_data));
 }
 
 void gb_rom_mbc6_device::device_start()
@@ -484,35 +556,19 @@ void gb_rom_mbc2_device::write_ram(offs_t offset, uint8_t data)
 
 TIMER_CALLBACK_MEMBER(gb_rom_mbc3_device::rtc_tick)
 {
-	if (BIT(m_rtc_regs[REG_CONTROL], 6)) {
+	if (m_rtc_control & RTC_HALT) {
 		return;
 	}
 	m_rtc_ticks++;
 	if (m_rtc_ticks >= RTC_FREQUENCY)
 	{
 		m_rtc_ticks = 0;
-		m_rtc_regs[REG_SECONDS] = (m_rtc_regs[REG_SECONDS] + 1) & 0x3f;
-		if (m_rtc_regs[REG_SECONDS] == 60)
+		advance_seconds();
+		apply_rtc_masks();
+		if (get_clock_register(RTC_DAY) == 512)
 		{
-			m_rtc_regs[REG_SECONDS] = 0;
-			m_rtc_regs[REG_MINUTES] = (m_rtc_regs[REG_MINUTES] + 1) & 0x3f;
-			if (m_rtc_regs[REG_MINUTES] == 60)
-			{
-				m_rtc_regs[REG_MINUTES] -= 60;
-				m_rtc_regs[REG_HOURS] = (m_rtc_regs[REG_HOURS] + 1) & 0x1f;
-				if (m_rtc_regs[REG_HOURS] == 24)
-				{
-					m_rtc_regs[REG_HOURS] = 0;
-					m_rtc_regs[REG_DAYS]++;
-					if (m_rtc_regs[REG_DAYS] == 0)
-					{
-						m_rtc_regs[REG_CONTROL] = (m_rtc_regs[REG_CONTROL] & 0xfe) | ((m_rtc_regs[REG_CONTROL] + 1) & 0x01);
-						if (!(m_rtc_regs[REG_CONTROL] & 0x01)) {
-							m_rtc_regs[REG_CONTROL] |= RTC_CARRY;
-						}
-					}
-				}
-			}
+			set_clock_register(RTC_DAY, 0);
+			m_rtc_control |= RTC_CARRY;
 		}
 	}
 }
@@ -549,11 +605,11 @@ void gb_rom_mbc3_device::write_bank(offs_t offset, uint8_t data)
 			m_rtc_ready = 0;
 		if (m_rtc_ready == 0 && data == 1)
 		{
-			m_latched_regs[REG_SECONDS] = m_rtc_regs[REG_SECONDS];
-			m_latched_regs[REG_MINUTES] = m_rtc_regs[REG_MINUTES];
-			m_latched_regs[REG_HOURS] = m_rtc_regs[REG_HOURS];
-			m_latched_regs[REG_DAYS] = m_rtc_regs[REG_DAYS];
-			m_latched_regs[REG_CONTROL] = m_rtc_regs[REG_CONTROL];
+			m_data[REG_LATCHED + REG_SECONDS] = get_clock_register(RTC_SECOND) & MASK_SEC_MIN;
+			m_data[REG_LATCHED + REG_MINUTES] = get_clock_register(RTC_MINUTE) & MASK_SEC_MIN;
+			m_data[REG_LATCHED + REG_HOURS] = get_clock_register(RTC_HOUR) & MASK_HOUR;
+			m_data[REG_LATCHED + REG_DAYS] = get_clock_register(RTC_DAY) & 0xff;
+			m_data[REG_LATCHED + REG_CONTROL] = (m_rtc_control & 0xfe) | ((get_clock_register(RTC_DAY) >> 8) & 0x01);
 			m_rtc_ready = 1;
 		}
 	}
@@ -570,8 +626,8 @@ uint8_t gb_rom_mbc3_device::read_ram(offs_t offset)
 		}
 		else if (m_ram_bank >= 0x08 && m_ram_bank <= 0x0c && has_timer)
 		{
-			// RTC registers
-			return m_latched_regs[m_ram_bank - 8];
+			// latched RTC registers
+			return m_data[REG_LATCHED + (m_ram_bank - 8)];
 		}
 	}
 	return 0xff;
@@ -589,24 +645,25 @@ void gb_rom_mbc3_device::write_ram(offs_t offset, uint8_t data)
 		else if (m_ram_bank >= 0x08 && m_ram_bank <= 0x0c && has_timer)
 		{
 			// RTC registers are writeable too
-			uint8_t reg = m_ram_bank - 8;
-			switch(reg)
+			switch(m_ram_bank - 8)
 			{
 			case REG_SECONDS:
+				set_clock_register(RTC_SECOND, data & MASK_SEC_MIN);
+				m_rtc_ticks = 0;
+				break;
 			case REG_MINUTES:
-				data &= 0x3f;
+				set_clock_register(RTC_MINUTE, data & MASK_SEC_MIN);
 				break;
 			case REG_HOURS:
-				data &= 0x1f;
+				set_clock_register(RTC_HOUR, data & MASK_HOUR);
+				break;
+			case REG_DAYS:
+				set_clock_register(RTC_DAY, (get_clock_register(RTC_DAY) & 0x100) | data);
 				break;
 			case REG_CONTROL:
-				data &= 0xc1;
+				set_clock_register(RTC_DAY, (get_clock_register(RTC_DAY) & 0xff) | ((data & 0x01) << 8));
+				m_rtc_control = data & 0xc0;
 				break;
-			}
-			m_rtc_regs[reg] = data;
-			if (reg == REG_SECONDS)
-			{
-				m_rtc_ticks = 0;
 			}
 		}
 	}

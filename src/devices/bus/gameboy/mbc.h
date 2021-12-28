@@ -3,6 +3,7 @@
 #ifndef MAME_BUS_GAMEBOY_MBC_H
 #define MAME_BUS_GAMEBOY_MBC_H
 
+#include "dirtc.h"
 #include "gb_slot.h"
 
 
@@ -83,7 +84,10 @@ protected:
 
 // ======================> gb_rom_mbc3_device
 
-class gb_rom_mbc3_device : public gb_rom_mbc_device
+class gb_rom_mbc3_device : public gb_rom_mbc_device,
+	public device_rtc_interface,
+	public device_nvram_interface
+
 {
 public:
 	// construction/destruction
@@ -99,24 +103,40 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_rtc_interface overrides
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override {}
+
+	// device_nvram_interface overrides
+	virtual void nvram_default() override;
+	virtual void nvram_read(emu_file &file) override;
+	virtual void nvram_write(emu_file &file) override;
+
 private:
 	static constexpr uint32_t RTC_FREQUENCY = 32'768;
 	static constexpr uint8_t RTC_CARRY = 0x80;
 	static constexpr uint8_t RTC_HALT = 0x40;
-	static constexpr uint8_t REG_SECONDS = 0;
-	static constexpr uint8_t REG_MINUTES = 1;
-	static constexpr uint8_t REG_HOURS = 2;
-	static constexpr uint8_t REG_DAYS = 3;
-	static constexpr uint8_t REG_CONTROL = 4;
-
+	static constexpr uint8_t MASK_SEC_MIN = 0x3f;
+	static constexpr uint8_t MASK_HOUR = 0x1f;
+	enum {
+		REG_SECONDS = 0,
+		REG_MINUTES,
+		REG_HOURS,
+		REG_DAYS,
+		REG_CONTROL,
+		REG_COUNT
+	};
+	static constexpr int REG_LATCHED = REG_COUNT;
+	static constexpr int START_TIMESTAMP = 2 * REG_COUNT;
 
 	emu_timer *m_rtc_timer;
 	uint32_t m_rtc_ticks;
-	uint8_t m_rtc_regs[5];
-	uint8_t m_latched_regs[5];
+	uint8_t m_rtc_control;
 	int m_rtc_ready;
+	// For storing RTC registers, latched RTC registers and the system timestamp
+	uint8_t m_data[(2 * REG_COUNT) + 8];
 
 	TIMER_CALLBACK_MEMBER(rtc_tick);
+	void apply_rtc_masks();
 };
 
 // ======================> gb_rom_mbc5_device
