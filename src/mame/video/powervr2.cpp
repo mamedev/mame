@@ -6,7 +6,7 @@
   TODO:
   - Needs break-down into sub-devices, as a generic rule of thumb
     TA is Holly/CLX implementation specific while CORE is ISP/TSP only.
-    This will be particularly useful for PVR PMX implmentations
+    This will be particularly useful for PVR PMX implementations
     (atvtrack.cpp and aristmk6.cpp);
   - Remove dc_state readbacks from here;
   - Better abstraction of timers;
@@ -1715,7 +1715,8 @@ void powervr2_device::sb_pdst_w(address_space &space, offs_t offset, uint32_t da
 	uint32_t old = m_pvr_dma.start & 1;
 	m_pvr_dma.start = sb_pdst & 1;
 
-	if(((old & 1) == 0) && m_pvr_dma.flag && m_pvr_dma.start && ((m_pvr_dma.sel & 1) == 0)) // 0 -> 1
+	// 0 -> 1 transition starts the DMA
+	if(((old & 1) == 0) && m_pvr_dma.flag && m_pvr_dma.start && ((m_pvr_dma.sel & 1) == 0))
 		pvr_dma_execute(space);
 }
 
@@ -2190,7 +2191,6 @@ TIMER_CALLBACK_MEMBER(powervr2_device::yuv_convert_end)
 	yuv_timer_end->adjust(attotime::never);
 }
 
-// TODO: this doesn't really work for anything that isn't typical 320x240 scenario (luptype)
 void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 {
 	dc_state *state = machine().driver_data<dc_state>();
@@ -2217,7 +2217,8 @@ void powervr2_device::ta_fifo_yuv_w(uint8_t data)
 
 				dst_addr = ta_yuv_tex_base;
 				dst_addr+= (ta_yuv_u_ptr + x) * 2;
-				dst_addr+= ((ta_yuv_v_ptr + y) * 320 * 2);
+				// pitch is given by U size (320 for luptype, 512 for ss2005/kurucham)
+				dst_addr+= ((ta_yuv_v_ptr + y) * ta_yuv_u_size * 2);
 
 				u = yuv_fifo[0x00+(x>>1)+((y>>1)*8)];
 				v = yuv_fifo[0x40+(x>>1)+((y>>1)*8)];
