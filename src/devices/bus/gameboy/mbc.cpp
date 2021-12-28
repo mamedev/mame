@@ -80,7 +80,11 @@ gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, const char
 }
 
 gb_rom_mbc6_device::gb_rom_mbc6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, GB_ROM_MBC6, tag, owner, clock), m_latch1(0), m_latch2(0), m_bank_4000(0), m_bank_6000(0)
+	: gb_rom_mbc_device(mconfig, GB_ROM_MBC6, tag, owner, clock)
+	, m_latch1(0)
+	, m_latch2(0)
+	, m_bank_4000(0)
+	, m_bank_6000(0)
 {
 }
 
@@ -90,12 +94,22 @@ gb_rom_mbc7_device::gb_rom_mbc7_device(const machine_config &mconfig, const char
 }
 
 gb_rom_m161_device::gb_rom_m161_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, GB_ROM_M161, tag, owner, clock), m_base_bank(0), m_load_disable(0)
+	: gb_rom_mbc_device(mconfig, GB_ROM_M161, tag, owner, clock)
+	, m_base_bank(0)
+	, m_load_disable(0)
 {
 }
 
 gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, tag, owner, clock), m_romb(0), m_romb_nwe(0), m_ramb(0), m_ramb_nwe(0), m_mode(0), m_mode_nwe(0), m_map(0), m_mux(0)
+	: gb_rom_mbc_device(mconfig, GB_ROM_MMM01, tag, owner, clock)
+	, m_romb(0)
+	, m_romb_nwe(0)
+	, m_ramb(0)
+	, m_ramb_nwe(0)
+	, m_mode(0)
+	, m_mode_nwe(0)
+	, m_map(0)
+	, m_mux(0)
 {
 }
 
@@ -105,7 +119,11 @@ gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconf
 }
 
 gb_rom_sachen_mmc1_device::gb_rom_sachen_mmc1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, type, tag, owner, clock), m_base_bank(0), m_mask(0), m_mode(0), m_unlock_cnt(0)
+	: gb_rom_mbc_device(mconfig, type, tag, owner, clock)
+	, m_base_bank(0)
+	, m_mask(0)
+	, m_mode(0)
+	, m_unlock_cnt(0)
 {
 }
 
@@ -115,17 +133,28 @@ gb_rom_sachen_mmc2_device::gb_rom_sachen_mmc2_device(const machine_config &mconf
 }
 
 gb_rom_188in1_device::gb_rom_188in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc1_device(mconfig, GB_ROM_188IN1, tag, owner, clock), m_game_base(0)
+	: gb_rom_mbc1_device(mconfig, GB_ROM_188IN1, tag, owner, clock)
+	, m_game_base(0)
 {
 }
 
 gb_rom_sintax_device::gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, GB_ROM_SINTAX, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0), m_currentxor(0), m_xor2(0), m_xor3(0), m_xor4(0), m_xor5(0), m_sintax_mode(0)
+	: gb_rom_mbc_device(mconfig, GB_ROM_SINTAX, tag, owner, clock)
+	, m_bank_mask(0)
+	, m_bank(0)
+	, m_reg(0)
+	, m_currentxor(0)
+	, m_xor2(0)
+	, m_xor3(0)
+	, m_xor4(0)
+	, m_xor5(0)
+	, m_sintax_mode(0)
 {
 }
 
 gb_rom_chongwu_device::gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc5_device(mconfig, GB_ROM_CHONGWU, tag, owner, clock), m_protection_checked(0)
+	: gb_rom_mbc5_device(mconfig, GB_ROM_CHONGWU, tag, owner, clock)
+	, m_protection_checked(0)
 {
 }
 
@@ -140,12 +169,19 @@ gb_rom_digimon_device::gb_rom_digimon_device(const machine_config &mconfig, cons
 }
 
 gb_rom_rockman8_device::gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, GB_ROM_ROCKMAN8, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0)
+	: gb_rom_mbc_device(mconfig, GB_ROM_ROCKMAN8, tag, owner, clock)
+	, m_bank_mask(0)
+	, m_bank(0)
+	, m_reg(0)
 {
 }
 
 gb_rom_sm3sp_device::gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: gb_rom_mbc_device(mconfig, GB_ROM_SM3SP, tag, owner, clock), m_bank_mask(0), m_bank(0), m_reg(0), m_mode(0)
+	: gb_rom_mbc_device(mconfig, GB_ROM_SM3SP, tag, owner, clock)
+	, m_bank_mask(0)
+	, m_bank(0)
+	, m_reg(0)
+	, m_mode(0)
 {
 }
 
@@ -203,7 +239,7 @@ void gb_rom_mbc3_device::device_reset()
 	m_rtc_ready = 0;
 
 	// Setup the simple time and day counting RTC and update it with the seconds passed
-	// since the last save. Use simple day counting mode by setting RTC_MONTH to 0;
+	// since the last save. Use simple day counting mode by setting RTC_MONTH to 0.
 	set_clock_register(RTC_SECOND, m_data[REG_SECONDS]);
 	set_clock_register(RTC_MINUTE, m_data[REG_MINUTES]);
 	set_clock_register(RTC_HOUR, m_data[REG_HOURS]);
@@ -238,7 +274,7 @@ void gb_rom_mbc3_device::device_reset()
 			seconds_passed--;
 		}
 		apply_rtc_masks();
-		// Check whether the RTC timer overflowed since the last save.
+		// Check for RTC day timer overflow since the last save.
 		if (get_clock_register(RTC_DAY) > 511) {
 			m_rtc_control |= RTC_CARRY;
 		}
@@ -248,7 +284,7 @@ void gb_rom_mbc3_device::device_reset()
 void gb_rom_mbc3_device::apply_rtc_masks()
 {
 	// The chip uses 5 and 6 bit registers for storing the hours, minutes and seconds.
-	// Any invalid values should rollover to 0 and continue counting as normal.
+	// Any invalid values should rollover from all 1s to 0 and continue counting as normal.
 	set_clock_register(RTC_SECOND, get_clock_register(RTC_SECOND) & MASK_SEC_MIN);
 	set_clock_register(RTC_MINUTE, get_clock_register(RTC_MINUTE) & MASK_SEC_MIN);
 	set_clock_register(RTC_HOUR, get_clock_register(RTC_HOUR) & MASK_HOUR);
