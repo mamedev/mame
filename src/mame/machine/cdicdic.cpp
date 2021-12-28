@@ -415,11 +415,11 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 	}
 
 	int channels = 2;
-	offs_t buffer_length = 1;
+	//offs_t buffer_length = 1;
 	if (!(coding & CODING_STEREO))
 	{
 		channels = 1;
-		buffer_length *= 2;
+		//buffer_length *= 2;
 	}
 
 	int bits = 4;
@@ -434,7 +434,7 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		break;
 	default:
 		bits = 4;
-		buffer_length *= 2;
+		//buffer_length *= 2;
 		break;
 	}
 
