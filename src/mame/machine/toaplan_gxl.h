@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Darren Olafson, Quench, Stephane Humbert
+// copyright-holders:Quench
 #ifndef MAME_MACHINE_TOAPLAN_GXL_H
 #define MAME_MACHINE_TOAPLAN_GXL_H
 

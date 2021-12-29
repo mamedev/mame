@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Darren Olafson, Quench, Stephane Humbert
+// copyright-holders:Quench
 /***************************************************************************
 
     Toaplan GXL-0x family MCU (and compatible clones)
