@@ -1376,6 +1376,65 @@ void naomi2_state::both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t 
 	space.write_dword(0x025f8000|offset*4, data, mem_mask);
 }
 
+// 315-6289 "ELAN" T&L chip registers
+// Stands between the two PVRs and mixes their output, applies T&L via commands at 0x09000000.
+// It's also responsible of enable/disable broadcast mode (i.e. writes to both PVRs)
+// and "macro tiler" config (?)
+// TODO: move to specific device once we have enough information about the inner workings
+uint32_t naomi2_state::elan_regs_r(offs_t offset)
+{
+	switch(offset)
+	{
+		case 0x00/4: // ID chip
+			// TODO: BIOS gives a black screen with this as per now
+			// It boots to NAOMI2 logo if this is zeroed, which should be a debug mode.
+			// Is it expecting an irq from the macro tiler enabling?
+			// Also BIOS attempts to write on this reg, why?
+			return 0xe1ad0000;
+
+		case 0x04/4: // REVISION
+			return 0x12; //or 0x01?
+
+		case 0x10/4: // SH4 interface control (???)
+			/* ---- -x-- enable second PVR */
+			/* ---- --x- elan has channel 2 */
+			/* ---- ---x broadcast on cs1 (?) */
+			return 6;
+
+		case 0x14/4: // SDRAM refresh register
+			return 0x2029; //default 0x1429
+
+		case 0x1c/4: // SDRAM CFG
+			return 0xa7320961; //default 0xa7320961
+
+		case 0x30/4: // Macro tiler configuration, bit 0 is enable
+			return 0;
+
+		case 0x74/4: // IRQ STAT
+			return 0;
+
+		case 0x78/4: // IRQ MASK
+			// enables 0x3f on boot
+			return 0;
+
+		default:
+			logerror("%s: ELAN read %08x\n", machine().describe_context(),offset*4);
+			break;
+	}
+
+	return 0;
+}
+
+void naomi2_state::elan_regs_w(offs_t offset, uint32_t data)
+{
+	switch(offset)
+	{
+		default:
+			logerror("%s: ELAN write %08x %08x W\n", machine().describe_context(), offset*4, data);
+			break;
+	}
+}
+
 void naomi2_state::naomi2_map(address_map &map)
 {
 	naomi_map(map);
@@ -1398,7 +1457,7 @@ void naomi2_state::naomi2_map(address_map &map)
 	// TODO: writes to BOTH PVRs
 	map(0x085f6800, 0x085f69ff).w(FUNC(naomi2_state::dc_sysctrl_w)); 
 	map(0x085f8000, 0x085f9fff).w(FUNC(naomi2_state::both_pvr2_ta_w));
-	map(0x08800000, 0x088000ff).rw(m_powervr2, FUNC(powervr2_device::elan_regs_r), FUNC(powervr2_device::elan_regs_w)); // T&L chip registers
+	map(0x08800000, 0x088000ff).rw(FUNC(naomi2_state::elan_regs_r), FUNC(naomi2_state::elan_regs_w)); 
 //  map(0x09000000, 0x09??????) T&L command processing
 	map(0x0a000000, 0x0bffffff).ram().share("elan_ram"); // T&L chip RAM
 

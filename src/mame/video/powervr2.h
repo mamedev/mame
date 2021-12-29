@@ -181,7 +181,6 @@ public:
 
 	uint64_t *pvr2_texture_ram;
 	uint64_t *pvr2_framebuffer_ram;
-	uint64_t *elan_ram;
 
 	uint32_t debug_dip_status;
 	emu_timer *vbout_timer;
@@ -306,10 +305,7 @@ public:
 	void sb_pdapro_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t pvr2_ta_r(offs_t offset);
-	void pvr2_ta_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void pvrs_ta_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t elan_regs_r(offs_t offset);
-	void elan_regs_w(offs_t offset, uint32_t data);
+
 	void ta_fifo_poly_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void ta_fifo_yuv_w(uint8_t data);
 	void ta_texture_directpath0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
