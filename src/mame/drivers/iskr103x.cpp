@@ -16,14 +16,15 @@
 
 
 #include "emu.h"
-#include "machine/genpc.h"
-#include "cpu/i86/i86.h"
-#include "cpu/nec/nec.h"
+
 #include "bus/isa/xsu_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "cpu/i86/i86.h"
+#include "machine/genpc.h"
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
+
 #include "softlist.h"
 
 
@@ -67,7 +68,7 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 	DEVICE_INPUT_DEFAULTS("DSW0", 0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-// XXX
+
 void iskr103x_state::iskr1030m(machine_config &config)
 {
 	/* basic machine hardware */

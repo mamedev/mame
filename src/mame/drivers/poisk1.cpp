@@ -25,6 +25,7 @@
 #include "machine/kb_poisk1.h"
 
 #include "bus/isa/isa.h"
+#include "bus/isa/p1_fdc.h"
 #include "bus/isa/xsu_cards.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/cassette.h"
@@ -35,7 +36,6 @@
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 #include "video/cgapal.h"
-#include "bus/isa/p1_fdc.h"
 
 #include "emupal.h"
 #include "screen.h"

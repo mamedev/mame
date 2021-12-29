@@ -29,6 +29,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
+#include "formats/ms0515_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -42,8 +43,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-
-#include "formats/ms0515_dsk.h"
 
 #include "ms0515.lh"
 
@@ -547,7 +546,7 @@ void ms0515_state::ms0515(machine_config &config)
 
 	/* video hardware -- 50 Hz refresh rate */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw( XTAL(15'000'000), 958,0,640, 313,0,200 );
+	screen.set_raw(XTAL(15'000'000), 958, 0, 640, 313, 0, 200);
 	screen.set_screen_update(FUNC(ms0515_state::screen_update_ms0515));
 	screen.screen_vblank().set(FUNC(ms0515_state::screen_vblank));
 	screen.set_palette("palette");

@@ -24,12 +24,9 @@
 #include "emu.h"
 
 #include "machine/netlist.h"
-
-#include "video/fixfreq.h"
-
-#include "netlist/devices/net_lib.h"
-
 #include "machine/nl_palestra.h"
+#include "netlist/devices/net_lib.h"
+#include "video/fixfreq.h"
 
 #include "screen.h"
 
@@ -47,8 +44,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_video(*this, "fixfreq")
-	{
-	}
+	{ }
 
 	// devices
 	required_device<netlist_mame_device> m_maincpu;
@@ -60,8 +56,6 @@ protected:
 	// driver_device overrides
 	virtual void machine_start() override { };
 	virtual void machine_reset() override { };
-
-	virtual void video_start() override { };
 
 private:
 };
