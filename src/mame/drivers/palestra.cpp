@@ -24,9 +24,12 @@
 #include "emu.h"
 
 #include "machine/netlist.h"
-#include "machine/nl_palestra.h"
-#include "netlist/devices/net_lib.h"
+
 #include "video/fixfreq.h"
+
+#include "netlist/devices/net_lib.h"
+
+#include "machine/nl_palestra.h"
 
 #include "screen.h"
 
