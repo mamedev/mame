@@ -24,22 +24,20 @@ To do:
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/bankdev.h"
 #include "machine/input_merger.h"
-
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/z80sio.h"
-
-#include "bus/rs232/rs232.h"
 #include "machine/isbc_215g.h"
 #include "machine/keyboard.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -475,14 +473,14 @@ static const z80_daisy_config k7070_daisy_chain[] =
  */
 void a7150_state::a7150(machine_config &config)
 {
-	I8086(config, m_maincpu, XTAL(9'832'000)/2);
+	I8086(config, m_maincpu, XTAL(9'832'000) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a7150_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &a7150_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
 	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
 
-	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000)/2));
+	i8087_device &i8087(I8087(config, "i8087", XTAL(9'832'000) / 2));
 	i8087.set_space_86(m_maincpu, AS_PROGRAM);
 	i8087.irq().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	i8087.busy().set_inputline("maincpu", INPUT_LINE_TEST);
@@ -497,10 +495,10 @@ void a7150_state::a7150(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(a7150_state::ppi_c_w));
 
 	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(14.7456_MHz_XTAL/4);
+	m_pit8253->set_clk<0>(14.7456_MHz_XTAL / 4);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir2_w));
-	m_pit8253->set_clk<1>(14.7456_MHz_XTAL/4);
-	m_pit8253->set_clk<2>(14.7456_MHz_XTAL/4);
+	m_pit8253->set_clk<1>(14.7456_MHz_XTAL / 4);
+	m_pit8253->set_clk<2>(14.7456_MHz_XTAL / 4);
 	m_pit8253->out_handler<2>().set(FUNC(a7150_state::a7150_tmr2_w));
 
 	INPUT_MERGER_ANY_HIGH(config, "uart_irq").output_handler().set(m_pic8259, FUNC(pic8259_device::ir4_w));
@@ -522,7 +520,7 @@ void a7150_state::a7150(machine_config &config)
 	ISBC_215G(config, "isbc_215g", 0, 0x4a, m_maincpu).irq_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
 
 	// KGS K7070 graphics terminal controlling ABG K7072 framebuffer
-	Z80(config, m_gfxcpu, XTAL(16'000'000)/4);
+	Z80(config, m_gfxcpu, XTAL(16'000'000) / 4);
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &a7150_state::k7070_cpu_mem);
 	m_gfxcpu->set_addrmap(AS_IO, &a7150_state::k7070_cpu_io);
 	m_gfxcpu->set_daisy_config(k7070_daisy_chain);
@@ -534,7 +532,7 @@ void a7150_state::a7150(machine_config &config)
 	m_video_bankdev->set_data_width(8);
 	m_video_bankdev->set_stride(0x10000);
 
-	Z80CTC(config, m_ctc, 16_MHz_XTAL/3);
+	Z80CTC(config, m_ctc, 16_MHz_XTAL / 3);
 	m_ctc->intr_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
 	m_ctc->set_clk<0>(1230750);
 	m_ctc->set_clk<1>(1230750);
@@ -544,7 +542,7 @@ void a7150_state::a7150(machine_config &config)
 	m_ctc->zc_callback<0>().append(Z80SIO_TAG, FUNC(z80sio_device::txca_w));
 	m_ctc->zc_callback<1>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
-	z80sio_device& sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000)/4));
+	z80sio_device &sio(Z80SIO(config, Z80SIO_TAG, XTAL(16'000'000) / 4));
 	sio.out_int_callback().set_inputline(m_gfxcpu, INPUT_LINE_IRQ0);
 	sio.out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	sio.out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
@@ -565,7 +563,7 @@ void a7150_state::a7150(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_color(rgb_t::green());
-	screen.set_raw(XTAL(16'000'000), 737,0,640, 431,0,400);
+	screen.set_raw(XTAL(16'000'000), 737, 0, 640, 431, 0, 400);
 	screen.set_screen_update(FUNC(a7150_state::screen_update_k7072));
 	screen.set_palette(m_palette);
 
