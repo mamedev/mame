@@ -1,16 +1,16 @@
 // license:BSD-3-Clause
-// copyright-holders:Darren Olafson, Quench,Stephane Humbert
+// copyright-holders:Darren Olafson, Quench, Stephane Humbert
 /***************************************************************************
 
     Toaplan GXL-0x family MCU (and compatible clones)
-	Toaplan used this chip at 1987 to 1990 for protection and DSP operations.
-	This chip has embedded TMS320C10 DSP with internal ROM,
-	There's 4 Known revisions:
+    Toaplan used this chip at 1987 to 1990 for protection and DSP operations.
+    This chip has embedded TMS320C10 DSP with internal ROM,
+    There's 4 Known revisions:
 
-	    GXL-01 (Hishou Zame)
-	    GXL-02 (Flying Shark, Sky Shark, Wardner, Pyros, Wardner no Mori)
-	    GXL-03 (Kyukyoku Tiger)
-	    GXL-04 (Twin Cobra, Demon's World, Horror Story)
+        GXL-01 (Hishou Zame)
+        GXL-02 (Flying Shark, Sky Shark, Wardner, Pyros, Wardner no Mori)
+        GXL-03 (Kyukyoku Tiger)
+        GXL-04 (Twin Cobra, Demon's World, Horror Story)
 
 ***************************************************************************/
 
