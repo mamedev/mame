@@ -881,8 +881,8 @@ void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent,
 	float dgg = extent.param[POLY_G].dpdx;
 	float gb = extent.param[POLY_B].start;
 	float dgb = extent.param[POLY_B].dpdx;
-	float ga = extent.param[POLY_A].start;
-	float dga = extent.param[POLY_A].dpdx;
+	[[maybe_unused]] float ga = extent.param[POLY_A].start;
+	[[maybe_unused]] float dga = extent.param[POLY_A].dpdx;
 
 	uint32_t zmode = extradata.zmode;
 
@@ -967,8 +967,8 @@ void cobra_renderer::render_texture_scan(int32_t scanline, const extent_t &exten
 	float dgg = extent.param[POLY_G].dpdx;
 	float gb = extent.param[POLY_B].start;
 	float dgb = extent.param[POLY_B].dpdx;
-	float ga = extent.param[POLY_A].start;
-	float dga = extent.param[POLY_A].dpdx;
+	[[maybe_unused]] float ga = extent.param[POLY_A].start;
+	[[maybe_unused]] float dga = extent.param[POLY_A].dpdx;
 
 	uint32_t *const fb = &m_backbuffer->pix(scanline);
 	float *const zb = (float*)&m_zbuffer->pix(scanline);

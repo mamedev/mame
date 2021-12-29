@@ -75,9 +75,6 @@ private:
 	int m_adb_keybaddr;
 	int m_adb_keybinitialized, m_adb_currentkeys[2], m_adb_modifiers;
 
-	// PRAM for ADB MCU HLEs (mostly unused now)
-	uint8_t m_adb_pram[256];
-
 	int adb_pollkbd(int update);
 	int adb_pollmouse();
 	void adb_accummouse( uint8_t *MouseX, uint8_t *MouseY );
@@ -85,7 +82,7 @@ private:
 
 	inline void set_adb_line(int linestate) { write_adb_data(linestate); }
 
-	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
+	TIMER_CALLBACK_MEMBER(mac_adb_tick);
 };
 
 // device type definition

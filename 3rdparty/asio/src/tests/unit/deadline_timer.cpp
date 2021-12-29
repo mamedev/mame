@@ -2,7 +2,7 @@
 // deadline_timer.cpp
 // ~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -20,7 +20,7 @@
 
 #if defined(ASIO_HAS_BOOST_DATE_TIME)
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include "archetypes/async_result.hpp"
 #include "asio/executor_work_guard.hpp"
 #include "asio/io_context.hpp"
@@ -250,21 +250,77 @@ struct custom_allocation_timer_handler
   custom_allocation_timer_handler(int* count) : count_(count) {}
   void operator()(const asio::error_code&) {}
   int* count_;
+
+  template <typename T>
+  struct allocator
+  {
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+    typedef T value_type;
+
+    template <typename U>
+    struct rebind
+    {
+      typedef allocator<U> other;
+    };
+
+    explicit allocator(int* count) ASIO_NOEXCEPT
+      : count_(count)
+    {
+    }
+
+    allocator(const allocator& other) ASIO_NOEXCEPT
+      : count_(other.count_)
+    {
+    }
+
+    template <typename U>
+    allocator(const allocator<U>& other) ASIO_NOEXCEPT
+      : count_(other.count_)
+    {
+    }
+
+    pointer allocate(size_type n, const void* = 0)
+    {
+      ++(*count_);
+      return static_cast<T*>(::operator new(sizeof(T) * n));
+    }
+
+    void deallocate(pointer p, size_type)
+    {
+      --(*count_);
+      ::operator delete(p);
+    }
+
+    size_type max_size() const
+    {
+      return ~size_type(0);
+    }
+
+    void construct(pointer p, const T& v)
+    {
+      new (p) T(v);
+    }
+
+    void destroy(pointer p)
+    {
+      p->~T();
+    }
+
+    int* count_;
+  };
+
+  typedef allocator<int> allocator_type;
+
+  allocator_type get_allocator() const ASIO_NOEXCEPT
+  {
+    return allocator_type(count_);
+  }
 };
-
-void* asio_handler_allocate(std::size_t size,
-    custom_allocation_timer_handler* handler)
-{
-  ++(*handler->count_);
-  return ::operator new(size);
-}
-
-void asio_handler_deallocate(void* pointer, std::size_t,
-    custom_allocation_timer_handler* handler)
-{
-  --(*handler->count_);
-  ::operator delete(pointer);
-}
 
 void deadline_timer_custom_allocation_test()
 {

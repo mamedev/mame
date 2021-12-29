@@ -424,6 +424,10 @@ void rmnimbus_state::nimbus_video_io_w(offs_t offset, uint16_t data, uint16_t me
 			change_palette(offset - P_COLOUR03, data);
 			return;
 
+// This register doesn't appear to be documented, but is written regually in setpc ibm mode
+		case 0x18 :
+			break;
+
 		default:
 			logerror("nimbus: unknown video reg write %02x %04x\n", offset, data);
 			return;

@@ -82,6 +82,13 @@ menu_confswitch::~menu_confswitch()
 }
 
 
+void menu_confswitch::menu_activated()
+{
+	// switches can have input assignments, and scripts are a thing
+	reset(reset_options::REMEMBER_REF);
+}
+
+
 void menu_confswitch::populate(float &customtop, float &custombottom)
 {
 	// locate relevant fields if necessary
@@ -95,7 +102,6 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 
 	// loop over input ports and set up the current values
 	device_t *prev_owner(nullptr);
-	bool first_entry(true);
 	for (field_descriptor &desc : m_fields)
 	{
 		ioport_field &field(desc.field);
@@ -107,11 +113,10 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 				if (&field.device() != prev_owner)
 				{
 					prev_owner = &field.device();
-					if (first_entry)
-						first_entry = false;
+					if (prev_owner->owner())
+						item_append(string_format(_("%1$s [root%2$s]"), prev_owner->type().fullname(), prev_owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 					else
-						item_append(menu_item_type::SEPARATOR);
-					item_append(string_format("[root%s]", prev_owner->tag()), 0, nullptr);
+						item_append(string_format(_("[root%1$s]"), prev_owner->tag()), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 				}
 
 				// set the left/right flags appropriately
@@ -162,31 +167,28 @@ void menu_confswitch::populate(float &customtop, float &custombottom)
 	}
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset"), 0, (void *)1);
+	item_append(_("Reset Machine"), 0, (void *)1);
 }
 
 
-void menu_confswitch::handle()
+void menu_confswitch::handle(event const *ev)
 {
-	// process the menu
-	event const *const menu_event(process(0));
-
 	// handle events
-	if (menu_event && menu_event->itemref)
+	if (ev && ev->itemref)
 	{
-		if (uintptr_t(menu_event->itemref) == 1U)
+		if (uintptr_t(ev->itemref) == 1U)
 		{
 			// reset
-			if (menu_event->iptkey == IPT_UI_SELECT)
+			if (ev->iptkey == IPT_UI_SELECT)
 				machine().schedule_hard_reset();
 		}
 		else
 		{
 			// actual settings
-			ioport_field &field(*reinterpret_cast<ioport_field *>(menu_event->itemref));
+			ioport_field &field(*reinterpret_cast<ioport_field *>(ev->itemref));
 			bool changed(false);
 
-			switch (menu_event->iptkey)
+			switch (ev->iptkey)
 			{
 			// if selected, reset to default value
 			case IPT_UI_SELECT:
@@ -209,6 +211,51 @@ void menu_confswitch::handle()
 			case IPT_UI_RIGHT:
 				field.select_next_setting();
 				changed = true;
+				break;
+
+			// trick to get previous group - depend on headings having null reference
+			case IPT_UI_PREV_GROUP:
+				{
+					auto current = selected_index();
+					bool found_break = false;
+					while (0 < current)
+					{
+						if (!found_break)
+						{
+							if (!item(--current).ref())
+								found_break = true;
+						}
+						else if (!item(current - 1).ref())
+						{
+							set_selected_index(current);
+							set_top_line(current - 1);
+							break;
+						}
+						else
+						{
+							--current;
+						}
+					}
+				}
+				break;
+
+			// trick to get next group - depend on special item references
+			case IPT_UI_NEXT_GROUP:
+				{
+					auto current = selected_index();
+					while (item_count() > ++current)
+					{
+						if (!item(current).ref())
+						{
+							if ((item_count() > (current + 1)) && (uintptr_t(item(current + 1).ref()) != 1))
+							{
+								set_selected_index(current + 1);
+								set_top_line(current);
+							}
+							break;
+						}
+					}
+				}
 				break;
 			}
 

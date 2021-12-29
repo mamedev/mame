@@ -43,12 +43,6 @@ extern const char UI_VERSION_TAG[];
 
 namespace ui {
 
-namespace {
-
-constexpr uint32_t FLAGS_UI = ui::menu::FLAG_LEFT_ARROW | ui::menu::FLAG_RIGHT_ARROW;
-
-} // anonymous namespace
-
 bool menu_select_game::s_first_start = true;
 
 
@@ -147,14 +141,11 @@ menu_select_game::~menu_select_game()
 }
 
 //-------------------------------------------------
-//  handle
+//  menu_activated
 //-------------------------------------------------
 
-void menu_select_game::handle()
+void menu_select_game::menu_activated()
 {
-	if (!m_prev_selected)
-		m_prev_selected = item(0).ref;
-
 	// if I have to load datfile, perform a hard reset
 	if (ui_globals::reset)
 	{
@@ -167,10 +158,21 @@ void menu_select_game::handle()
 		stack_reset();
 		return;
 	}
+}
+
+//-------------------------------------------------
+//  handle
+//-------------------------------------------------
+
+void menu_select_game::handle(event const *ev)
+{
+	if (!m_prev_selected)
+		m_prev_selected = item(0).ref();
 
 	// if I have to select software, force software list submenu
 	if (reselect_last::get())
 	{
+		// FIXME: this is never hit, need a better way to return to software selection if necessary
 		const ui_system_info *system;
 		const ui_software_info *software;
 		get_selection(software, system);
@@ -178,18 +180,16 @@ void menu_select_game::handle()
 		return;
 	}
 
-	// ignore pause keys by swallowing them before we process the menu
-	machine().ui_input().pressed(IPT_UI_PAUSE);
+	// FIXME: everything above here used to run before events were processed
 
 	// process the menu
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-	if (menu_event)
+	if (ev)
 	{
 		if (dismiss_error())
 		{
-			// reset the error on any future menu_event
+			// reset the error on any subsequent menu event
 		}
-		else switch (menu_event->iptkey)
+		else switch (ev->iptkey)
 		{
 		case IPT_UI_UP:
 			if ((get_focus() == focused_menu::LEFT) && (machine_filter::FIRST < m_filter_highlight))
@@ -220,17 +220,17 @@ void menu_select_game::handle()
 			break;
 
 		default:
-			if (menu_event->itemref)
+			if (ev->itemref)
 			{
-				switch (menu_event->iptkey)
+				switch (ev->iptkey)
 				{
 				case IPT_UI_SELECT:
 					if (get_focus() == focused_menu::MAIN)
 					{
 						if (m_populated_favorites)
-							inkey_select_favorite(menu_event);
+							inkey_select_favorite(ev);
 						else
-							inkey_select(menu_event);
+							inkey_select(ev);
 					}
 					break;
 
@@ -242,8 +242,7 @@ void menu_select_game::handle()
 								ui(),
 								container(),
 								*reinterpret_cast<ui_system_info const *>(m_prev_selected),
-								nullptr,
-								menu_event->mouse.x0, menu_event->mouse.y0);
+								nullptr);
 					}
 					else
 					{
@@ -257,8 +256,7 @@ void menu_select_game::handle()
 								{
 									if (changed)
 										reset(empty ? reset_options::SELECT_FIRST : reset_options::REMEMBER_REF);
-								},
-								menu_event->mouse.x0, menu_event->mouse.y0);
+								});
 					}
 					break;
 
@@ -289,12 +287,12 @@ void menu_select_game::handle()
 					break;
 
 				case IPT_UI_FAVORITES:
-					if (uintptr_t(menu_event->itemref) > skip_main_items)
+					if (uintptr_t(ev->itemref) > skip_main_items)
 					{
 						favorite_manager &mfav(mame_machine_manager::instance()->favorite());
 						if (!m_populated_favorites)
 						{
-							auto const &info(*reinterpret_cast<ui_system_info const *>(menu_event->itemref));
+							auto const &info(*reinterpret_cast<ui_system_info const *>(ev->itemref));
 							auto const &driver(*info.driver);
 							if (!mfav.is_favorite_system(driver))
 							{
@@ -309,7 +307,7 @@ void menu_select_game::handle()
 						}
 						else
 						{
-							ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(menu_event->itemref));
+							ui_software_info const *const swinfo(reinterpret_cast<ui_software_info const *>(ev->itemref));
 							machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname);
 							mfav.remove_favorite_software(*swinfo);
 							reset(reset_options::SELECT_FIRST);
@@ -339,10 +337,13 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		icon.second.texture.reset();
 
 	set_switch_image();
-	int old_item_selected = -1;
 
+	bool have_prev_selected = false;
+	int old_item_selected = -1;
 	if (!isfavorite())
 	{
+		if (m_populated_favorites)
+			m_prev_selected = nullptr;
 		m_populated_favorites = false;
 		m_displaylist.clear();
 		machine_filter const *const flt(m_persistent_data.filter_data().get_current_filter());
@@ -391,21 +392,25 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 		int curitem = 0;
 		for (ui_system_info const &elem : m_displaylist)
 		{
-			if (old_item_selected == -1 && elem.driver->name == reselect_last::driver())
+			have_prev_selected = have_prev_selected || (&elem == m_prev_selected);
+			if ((old_item_selected == -1) && (elem.driver->name == reselect_last::driver()))
 				old_item_selected = curitem;
 
-			item_append(elem.description, elem.is_clone ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&elem);
+			item_append(elem.description, elem.is_clone ? FLAG_INVERT : 0, (void *)&elem);
 			curitem++;
 		}
 	}
 	else
 	{
 		// populate favorites list
+		if (!m_populated_favorites)
+			m_prev_selected = nullptr;
 		m_populated_favorites = true;
 		m_search.clear();
 		mame_machine_manager::instance()->favorite().apply_sorted(
-				[this, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
+				[this, &have_prev_selected, &old_item_selected, curitem = 0] (ui_software_info const &info) mutable
 				{
+					have_prev_selected = have_prev_selected || (&info == m_prev_selected);
 					if (info.startempty)
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
@@ -414,19 +419,18 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 						bool cloneof = strcmp(info.driver->parent, "0");
 						if (cloneof)
 						{
-							int cx = driver_list::find(info.driver->parent);
-							if (cx != -1 && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
+							int const cx = driver_list::find(info.driver->parent);
+							if ((0 <= cx) && ((driver_list::driver(cx).flags & machine_flags::IS_BIOS_ROOT) != 0))
 								cloneof = false;
 						}
 
-						item_append(info.longname, cloneof ? (FLAGS_UI | FLAG_INVERT) : FLAGS_UI, (void *)&info);
+						item_append(info.longname, cloneof ? FLAG_INVERT : 0, (void *)&info);
 					}
 					else
 					{
 						if (old_item_selected == -1 && info.shortname == reselect_last::driver())
 							old_item_selected = curitem;
-						item_append(info.longname, info.devicetype,
-									info.parentname.empty() ? FLAGS_UI : (FLAG_INVERT | FLAGS_UI), (void *)&info);
+						item_append(info.longname, info.devicetype, info.parentname.empty() ? 0 : FLAG_INVERT, (void *)&info);
 					}
 					curitem++;
 				});
@@ -435,13 +439,18 @@ void menu_select_game::populate(float &customtop, float &custombottom)
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(menu_item_type::SEPARATOR, FLAGS_UI);
-		item_append(_("Configure Options"), FLAGS_UI, (void *)(uintptr_t)CONF_OPTS);
-		item_append(_("Configure Machine"), FLAGS_UI, (void *)(uintptr_t)CONF_MACHINE);
+		item_append(menu_item_type::SEPARATOR, 0);
+		item_append(_("Configure Options"), 0, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), 0, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 3;
+
+		if (m_prev_selected && !have_prev_selected)
+			m_prev_selected = item(0).ref();
 	}
 	else
+	{
 		skip_main_items = 0;
+	}
 
 	// configure the custom rendering
 	customtop = 3.0f * ui().get_line_height() + 5.0f * ui().box_tb_border();
@@ -572,14 +581,9 @@ void menu_select_game::build_available_list()
 
 void menu_select_game::force_game_select(mame_ui_manager &mui, render_container &container)
 {
-	// reset the menu stack
-	menu::stack_reset(mui.machine());
-
-	// add the quit entry followed by the game select entry
-	menu::stack_push_special_main<menu_quit_game>(mui, container);
-	menu::stack_push<menu_select_game>(mui, container, nullptr);
-
-	// force the menus on
+	// drop any existing menus and start the system selection menu
+	menu::stack_reset(mui);
+	menu::stack_push_special_main<menu_select_game>(mui, container, nullptr);
 	mui.show_menu();
 
 	// make sure MAME is paused
@@ -1042,7 +1046,7 @@ void menu_select_game::get_selection(ui_software_info const *&software, ui_syste
 	if (m_populated_favorites)
 	{
 		software = reinterpret_cast<ui_software_info const *>(get_selection_ptr());
-		system = &m_persistent_data.systems()[driver_list::find(software->driver->name)];
+		system = software ? &m_persistent_data.systems()[driver_list::find(software->driver->name)] : nullptr;
 	}
 	else
 	{
@@ -1106,7 +1110,7 @@ void menu_select_game::filter_selected()
 						}
 					}
 					m_persistent_data.filter_data().set_current_filter_type(new_type);
-					reset(reset_options::SELECT_FIRST);
+					reset(reset_options::REMEMBER_REF);
 				});
 	}
 }

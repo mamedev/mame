@@ -41,9 +41,8 @@ void menu_pty_info::populate(float &customtop, float &custombottom)
 	}
 }
 
-void menu_pty_info::handle()
+void menu_pty_info::handle(event const *ev)
 {
-	process(0);
 }
 
 } // namespace ui

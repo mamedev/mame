@@ -2,22 +2,23 @@
 // async_tcp_client.cpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "asio/deadline_timer.hpp"
+#include "asio/buffer.hpp"
 #include "asio/io_context.hpp"
 #include "asio/ip/tcp.hpp"
 #include "asio/read_until.hpp"
-#include "asio/streambuf.hpp"
+#include "asio/steady_timer.hpp"
 #include "asio/write.hpp"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <iostream>
+#include <string>
 
-using asio::deadline_timer;
+using asio::steady_timer;
 using asio::ip::tcp;
 
 //
@@ -78,7 +79,7 @@ using asio::ip::tcp;
 //
 // The heartbeat actor sends a heartbeat (a message that consists of a single
 // newline character) every 10 seconds. In this example, no deadline is applied
-// message sending.
+// to message sending.
 //
 class client
 {
@@ -125,12 +126,12 @@ private:
       std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
 
       // Set a deadline for the connect operation.
-      deadline_.expires_from_now(boost::posix_time::seconds(60));
+      deadline_.expires_after(asio::chrono::seconds(60));
 
       // Start the asynchronous connect operation.
       socket_.async_connect(endpoint_iter->endpoint(),
-          boost::bind(&client::handle_connect,
-            this, _1, endpoint_iter));
+          boost::bind(&client::handle_connect, this,
+            boost::placeholders::_1, endpoint_iter));
     }
     else
     {
@@ -185,14 +186,16 @@ private:
   void start_read()
   {
     // Set a deadline for the read operation.
-    deadline_.expires_from_now(boost::posix_time::seconds(30));
+    deadline_.expires_after(asio::chrono::seconds(30));
 
     // Start an asynchronous operation to read a newline-delimited message.
-    asio::async_read_until(socket_, input_buffer_, '\n',
-        boost::bind(&client::handle_read, this, _1));
+    asio::async_read_until(socket_,
+        asio::dynamic_buffer(input_buffer_), '\n',
+        boost::bind(&client::handle_read, this,
+          boost::placeholders::_1, boost::placeholders::_2));
   }
 
-  void handle_read(const asio::error_code& ec)
+  void handle_read(const asio::error_code& ec, std::size_t n)
   {
     if (stopped_)
       return;
@@ -200,9 +203,8 @@ private:
     if (!ec)
     {
       // Extract the newline-delimited message from the buffer.
-      std::string line;
-      std::istream is(&input_buffer_);
-      std::getline(is, line);
+      std::string line(input_buffer_.substr(0, n - 1));
+      input_buffer_.erase(0, n);
 
       // Empty messages are heartbeats and so ignored.
       if (!line.empty())
@@ -227,7 +229,7 @@ private:
 
     // Start an asynchronous operation to send a heartbeat message.
     asio::async_write(socket_, asio::buffer("\n", 1),
-        boost::bind(&client::handle_write, this, _1));
+        boost::bind(&client::handle_write, this, boost::placeholders::_1));
   }
 
   void handle_write(const asio::error_code& ec)
@@ -238,7 +240,7 @@ private:
     if (!ec)
     {
       // Wait 10 seconds before sending the next heartbeat.
-      heartbeat_timer_.expires_from_now(boost::posix_time::seconds(10));
+      heartbeat_timer_.expires_after(asio::chrono::seconds(10));
       heartbeat_timer_.async_wait(boost::bind(&client::start_write, this));
     }
     else
@@ -257,15 +259,16 @@ private:
     // Check whether the deadline has passed. We compare the deadline against
     // the current time since a new asynchronous operation may have moved the
     // deadline before this actor had a chance to run.
-    if (deadline_.expires_at() <= deadline_timer::traits_type::now())
+    if (deadline_.expiry() <= steady_timer::clock_type::now())
     {
       // The deadline has passed. The socket is closed so that any outstanding
       // asynchronous operations are cancelled.
       socket_.close();
 
-      // There is no longer an active deadline. The expiry is set to positive
-      // infinity so that the actor takes no action until a new deadline is set.
-      deadline_.expires_at(boost::posix_time::pos_infin);
+      // There is no longer an active deadline. The expiry is set to the
+      // maximum time point so that the actor takes no action until a new
+      // deadline is set.
+      deadline_.expires_at(steady_timer::time_point::max());
     }
 
     // Put the actor back to sleep.
@@ -276,9 +279,9 @@ private:
   bool stopped_;
   tcp::resolver::results_type endpoints_;
   tcp::socket socket_;
-  asio::streambuf input_buffer_;
-  deadline_timer deadline_;
-  deadline_timer heartbeat_timer_;
+  std::string input_buffer_;
+  steady_timer deadline_;
+  steady_timer heartbeat_timer_;
 };
 
 int main(int argc, char* argv[])

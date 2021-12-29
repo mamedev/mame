@@ -76,10 +76,14 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	// Create a data format group
 	QActionGroup *dataFormat = new QActionGroup(this);
 	dataFormat->setObjectName("dataformat");
-	QAction *formatActOne  = new QAction("1-byte chunks", this);
-	QAction *formatActTwo  = new QAction("2-byte chunks", this);
-	QAction *formatActFour = new QAction("4-byte chunks", this);
-	QAction *formatActEight = new QAction("8-byte chunks", this);
+	QAction *formatActOne  = new QAction("1-byte hexadecimal", this);
+	QAction *formatActTwo  = new QAction("2-byte hexadecimal", this);
+	QAction *formatActFour = new QAction("4-byte hexadecimal", this);
+	QAction *formatActEight = new QAction("8-byte hexadecimal", this);
+	QAction *formatActOneOctal = new QAction("1-byte octal", this);
+	QAction *formatActTwoOctal = new QAction("2-byte octal", this);
+	QAction *formatActFourOctal = new QAction("4-byte octal", this);
+	QAction *formatActEightOctal = new QAction("8-byte octal", this);
 	QAction *formatAct32bitFloat = new QAction("32 bit floating point", this);
 	QAction *formatAct64bitFloat = new QAction("64 bit floating point", this);
 	QAction *formatAct80bitFloat = new QAction("80 bit floating point", this);
@@ -87,6 +91,10 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setObjectName("formatActTwo");
 	formatActFour->setObjectName("formatActFour");
 	formatActEight->setObjectName("formatActEight");
+	formatActOneOctal->setObjectName("formatActOneOctal");
+	formatActTwoOctal->setObjectName("formatActTwoOctal");
+	formatActFourOctal->setObjectName("formatActFourOctal");
+	formatActEightOctal->setObjectName("formatActEightOctal");
 	formatAct32bitFloat->setObjectName("formatAct32bitFloat");
 	formatAct64bitFloat->setObjectName("formatAct64bitFloat");
 	formatAct80bitFloat->setObjectName("formatAct80bitFloat");
@@ -94,6 +102,10 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setCheckable(true);
 	formatActFour->setCheckable(true);
 	formatActEight->setCheckable(true);
+	formatActOneOctal->setCheckable(true);
+	formatActTwoOctal->setCheckable(true);
+	formatActFourOctal->setCheckable(true);
+	formatActEightOctal->setCheckable(true);
 	formatAct32bitFloat->setCheckable(true);
 	formatAct64bitFloat->setCheckable(true);
 	formatAct80bitFloat->setCheckable(true);
@@ -101,6 +113,10 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setActionGroup(dataFormat);
 	formatActFour->setActionGroup(dataFormat);
 	formatActEight->setActionGroup(dataFormat);
+	formatActOneOctal->setActionGroup(dataFormat);
+	formatActTwoOctal->setActionGroup(dataFormat);
+	formatActFourOctal->setActionGroup(dataFormat);
+	formatActEightOctal->setActionGroup(dataFormat);
 	formatAct32bitFloat->setActionGroup(dataFormat);
 	formatAct64bitFloat->setActionGroup(dataFormat);
 	formatAct80bitFloat->setActionGroup(dataFormat);
@@ -108,10 +124,17 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	formatActTwo->setShortcut(QKeySequence("Ctrl+2"));
 	formatActFour->setShortcut(QKeySequence("Ctrl+4"));
 	formatActEight->setShortcut(QKeySequence("Ctrl+8"));
-	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+9"));
+	formatActOneOctal->setShortcut(QKeySequence("Ctrl+3"));
+	formatActTwoOctal->setShortcut(QKeySequence("Ctrl+5"));
+	formatActFourOctal->setShortcut(QKeySequence("Ctrl+7"));
+	formatActEightOctal->setShortcut(QKeySequence("Ctrl+9"));
+	formatAct32bitFloat->setShortcut(QKeySequence("Ctrl+Shift+F"));
+	formatAct64bitFloat->setShortcut(QKeySequence("Ctrl+Shift+D"));
+	formatAct80bitFloat->setShortcut(QKeySequence("Ctrl+Shift+E"));
 	formatActOne->setChecked(true);
 	connect(dataFormat, &QActionGroup::triggered, this, &MemoryWindow::formatChanged);
-	// Create a address display group
+
+	// Create an address display group
 	QActionGroup *addressGroup = new QActionGroup(this);
 	addressGroup->setObjectName("addressgroup");
 	QAction *addressActLogical = new QAction("Logical Addresses", this);
@@ -124,6 +147,26 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	addressActPhysical->setShortcut(QKeySequence("Ctrl+Y"));
 	addressActLogical->setChecked(true);
 	connect(addressGroup, &QActionGroup::triggered, this, &MemoryWindow::addressChanged);
+
+	// Create an address radix group
+	QActionGroup *radixGroup = new QActionGroup(this);
+	radixGroup->setObjectName("radixgroup");
+	QAction *radixActHexadecimal = new QAction("Hexadecimal Addresses", this);
+	QAction *radixActDecimal = new QAction("Decimal Addresses", this);
+	QAction *radixActOctal = new QAction("Octal Addresses", this);
+	radixActHexadecimal->setObjectName("radixHexadecimal");
+	radixActDecimal->setObjectName("radixDecimal");
+	radixActOctal->setObjectName("radixOctal");
+	radixActHexadecimal->setCheckable(true);
+	radixActDecimal->setCheckable(true);
+	radixActOctal->setCheckable(true);
+	radixActHexadecimal->setActionGroup(radixGroup);
+	radixActDecimal->setActionGroup(radixGroup);
+	radixActOctal->setActionGroup(radixGroup);
+	radixActHexadecimal->setShortcut(QKeySequence("Ctrl+Shift+H"));
+	radixActOctal->setShortcut(QKeySequence("Ctrl+Shift+O"));
+	radixActHexadecimal->setChecked(true);
+	connect(radixGroup, &QActionGroup::triggered, this, &MemoryWindow::radixChanged);
 
 	// Create a reverse view radio
 	QAction *reverseAct = new QAction("Reverse View", this);
@@ -145,6 +188,8 @@ MemoryWindow::MemoryWindow(running_machine &machine, QWidget *parent) :
 	optionsMenu->addActions(dataFormat->actions());
 	optionsMenu->addSeparator();
 	optionsMenu->addActions(addressGroup->actions());
+	optionsMenu->addSeparator();
+	optionsMenu->addActions(radixGroup->actions());
 	optionsMenu->addSeparator();
 	optionsMenu->addAction(reverseAct);
 	optionsMenu->addSeparator();
@@ -182,9 +227,20 @@ void MemoryWindow::memoryRegionChanged(int index)
 		case debug_view_memory::data_format::HEX_16BIT: dataFormatMenuItem("formatActTwo")->setChecked(true); break;
 		case debug_view_memory::data_format::HEX_32BIT: dataFormatMenuItem("formatActFour")->setChecked(true); break;
 		case debug_view_memory::data_format::HEX_64BIT: dataFormatMenuItem("formatActEight")->setChecked(true); break;
+		case debug_view_memory::data_format::OCTAL_8BIT: dataFormatMenuItem("formatActOneOctal")->setChecked(true); break;
+		case debug_view_memory::data_format::OCTAL_16BIT: dataFormatMenuItem("formatActTwoOctal")->setChecked(true); break;
+		case debug_view_memory::data_format::OCTAL_32BIT: dataFormatMenuItem("formatActFourOctal")->setChecked(true); break;
+		case debug_view_memory::data_format::OCTAL_64BIT: dataFormatMenuItem("formatActEightOctal")->setChecked(true); break;
 		case debug_view_memory::data_format::FLOAT_32BIT: dataFormatMenuItem("formatAct32bitFloat")->setChecked(true); break;
 		case debug_view_memory::data_format::FLOAT_64BIT: dataFormatMenuItem("formatAct64bitFloat")->setChecked(true); break;
 		case debug_view_memory::data_format::FLOAT_80BIT: dataFormatMenuItem("formatAct80bitFloat")->setChecked(true); break;
+		default: break;
+		}
+		switch (memView->address_radix())
+		{
+		case 8: dataFormatMenuItem("radixOctal")->setChecked(true); break;
+		case 10: dataFormatMenuItem("radixDecimal")->setChecked(true); break;
+		case 16: dataFormatMenuItem("radixHexadecimal")->setChecked(true); break;
 		default: break;
 		}
 	}
@@ -213,14 +269,22 @@ void MemoryWindow::formatChanged(QAction* changedTo)
 {
 	debug_view_memory *memView = downcast<debug_view_memory*>(m_memTable->view());
 
-	if (changedTo->text() == "1-byte chunks")
+	if (changedTo->text() == "1-byte hexadecimal")
 		memView->set_data_format(debug_view_memory::data_format::HEX_8BIT);
-	else if (changedTo->text() == "2-byte chunks")
+	else if (changedTo->text() == "2-byte hexadecimal")
 		memView->set_data_format(debug_view_memory::data_format::HEX_16BIT);
-	else if (changedTo->text() == "4-byte chunks")
+	else if (changedTo->text() == "4-byte hexadecimal")
 		memView->set_data_format(debug_view_memory::data_format::HEX_32BIT);
-	else if (changedTo->text() == "8-byte chunks")
+	else if (changedTo->text() == "8-byte hexadecimal")
 		memView->set_data_format(debug_view_memory::data_format::HEX_64BIT);
+	else if (changedTo->text() == "1-byte octal")
+		memView->set_data_format(debug_view_memory::data_format::OCTAL_8BIT);
+	else if (changedTo->text() == "2-byte octal")
+		memView->set_data_format(debug_view_memory::data_format::OCTAL_16BIT);
+	else if (changedTo->text() == "4-byte octal")
+		memView->set_data_format(debug_view_memory::data_format::OCTAL_32BIT);
+	else if (changedTo->text() == "8-byte octal")
+		memView->set_data_format(debug_view_memory::data_format::OCTAL_64BIT);
 	else if (changedTo->text() == "32 bit floating point")
 		memView->set_data_format(debug_view_memory::data_format::FLOAT_32BIT);
 	else if (changedTo->text() == "64 bit floating point")
@@ -240,6 +304,21 @@ void MemoryWindow::addressChanged(QAction* changedTo)
 		memView->set_physical(false);
 	else if (changedTo->text() == "Physical Addresses")
 		memView->set_physical(true);
+
+	m_memTable->viewport()->update();
+}
+
+
+void MemoryWindow::radixChanged(QAction* changedTo)
+{
+	debug_view_memory *memView = downcast<debug_view_memory *>(m_memTable->view());
+
+	if (changedTo->text() == "Hexadecimal Addresses")
+		memView->set_address_radix(16);
+	else if (changedTo->text() == "Decimal Addresses")
+		memView->set_address_radix(10);
+	else if (changedTo->text() == "Octal Addresses")
+		memView->set_address_radix(8);
 
 	m_memTable->viewport()->update();
 }
@@ -403,21 +482,37 @@ void MemoryWindowQtConfig::buildFromQWidget(QWidget *widget)
 	else if (addressGroup->checkedAction()->text() == "Physical Addresses")
 		m_addressMode = 1;
 
+	QActionGroup *radixGroup = window->findChild<QActionGroup*>("radixgroup");
+	if (radixGroup->checkedAction()->text() == "Hexadecimal Addresses")
+		m_addressRadix = 0;
+	else if (radixGroup->checkedAction()->text() == "Decimal Addresses")
+		m_addressRadix = 1;
+	else if (radixGroup->checkedAction()->text() == "Octal Addresses")
+		m_addressRadix = 2;
+
 	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
-	if (dataFormat->checkedAction()->text() == "1-byte chunks")
+	if (dataFormat->checkedAction()->text() == "1-byte hexadecimal")
 		m_dataFormat = 0;
-	else if (dataFormat->checkedAction()->text() == "2-byte chunks")
+	else if (dataFormat->checkedAction()->text() == "2-byte hexadecimal")
 		m_dataFormat = 1;
-	else if (dataFormat->checkedAction()->text() == "4-byte chunks")
+	else if (dataFormat->checkedAction()->text() == "4-byte hexadecimal")
 		m_dataFormat = 2;
-	else if (dataFormat->checkedAction()->text() == "8-byte chunks")
+	else if (dataFormat->checkedAction()->text() == "8-byte hexadecimal")
 		m_dataFormat = 3;
-	else if (dataFormat->checkedAction()->text() == "32 bit floating point")
+	else if (dataFormat->checkedAction()->text() == "1-byte octal")
 		m_dataFormat = 4;
-	else if (dataFormat->checkedAction()->text() == "64 bit floating point")
+	else if (dataFormat->checkedAction()->text() == "2-byte octal")
 		m_dataFormat = 5;
-	else if (dataFormat->checkedAction()->text() == "80 bit floating point")
+	else if (dataFormat->checkedAction()->text() == "4-byte octal")
 		m_dataFormat = 6;
+	else if (dataFormat->checkedAction()->text() == "8-byte octal")
+		m_dataFormat = 7;
+	else if (dataFormat->checkedAction()->text() == "32 bit floating point")
+		m_dataFormat = 8;
+	else if (dataFormat->checkedAction()->text() == "64 bit floating point")
+		m_dataFormat = 9;
+	else if (dataFormat->checkedAction()->text() == "80 bit floating point")
+		m_dataFormat = 10;
 }
 
 
@@ -435,6 +530,9 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget *widget)
 	QActionGroup *addressGroup = window->findChild<QActionGroup*>("addressgroup");
 	addressGroup->actions()[m_addressMode]->trigger();
 
+	QActionGroup *radixGroup = window->findChild<QActionGroup*>("radixgroup");
+	radixGroup->actions()[m_addressRadix]->trigger();
+
 	QActionGroup *dataFormat = window->findChild<QActionGroup*>("dataformat");
 	dataFormat->actions()[m_dataFormat]->trigger();
 }
@@ -446,6 +544,7 @@ void MemoryWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 	node.set_attribute_int("memoryregion", m_memoryRegion);
 	node.set_attribute_int("reverse", m_reverse);
 	node.set_attribute_int("addressmode", m_addressMode);
+	node.set_attribute_int("addressradix", m_addressRadix);
 	node.set_attribute_int("dataformat", m_dataFormat);
 }
 
@@ -456,5 +555,6 @@ void MemoryWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
 	m_reverse = node.get_attribute_int("reverse", m_reverse);
 	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
+	m_addressRadix = node.get_attribute_int("addressradix", m_addressRadix);
 	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
 }

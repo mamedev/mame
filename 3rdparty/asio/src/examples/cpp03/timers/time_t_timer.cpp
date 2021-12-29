@@ -2,7 +2,7 @@
 // time_t_timer.cpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2016 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2021 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -12,53 +12,66 @@
 #include <ctime>
 #include <iostream>
 
-struct time_t_traits
+// A custom implementation of the Clock concept from the standard C++ library.
+struct time_t_clock
 {
-  // The time type.
-  typedef std::time_t time_type;
-
   // The duration type.
-  struct duration_type
-  {
-    duration_type() : value(0) {}
-    duration_type(std::time_t v) : value(v) {}
-    std::time_t value;
-  };
+  typedef asio::chrono::steady_clock::duration duration;
+
+  // The duration's underlying arithmetic representation.
+  typedef duration::rep rep;
+
+  // The ratio representing the duration's tick period.
+  typedef duration::period period;
+
+  // An absolute time point represented using the clock.
+  typedef asio::chrono::time_point<time_t_clock> time_point;
+
+  // The clock is not monotonically increasing.
+  static const bool is_steady = false;
 
   // Get the current time.
-  static time_type now()
+  static time_point now()
   {
-    return std::time(0);
-  }
-
-  // Add a duration to a time.
-  static time_type add(const time_type& t, const duration_type& d)
-  {
-    return t + d.value;
-  }
-
-  // Subtract one time from another.
-  static duration_type subtract(const time_type& t1, const time_type& t2)
-  {
-    return duration_type(t1 - t2);
-  }
-
-  // Test whether one time is less than another.
-  static bool less_than(const time_type& t1, const time_type& t2)
-  {
-    return t1 < t2;
-  }
-
-  // Convert to POSIX duration type.
-  static boost::posix_time::time_duration to_posix_duration(
-      const duration_type& d)
-  {
-    return boost::posix_time::seconds(d.value);
+    return time_point() + asio::chrono::seconds(std::time(0));
   }
 };
 
-typedef asio::basic_deadline_timer<
-    std::time_t, time_t_traits> time_t_timer;
+// The asio::basic_waitable_timer template accepts an optional WaitTraits
+// template parameter. The underlying time_t clock has one-second granularity,
+// so these traits may be customised to reduce the latency between the clock
+// ticking over and a wait operation's completion. When the timeout is near
+// (less than one second away) we poll the clock more frequently to detect the
+// time change closer to when it occurs. The user can select the appropriate
+// trade off between accuracy and the increased CPU cost of polling. In extreme
+// cases, a zero duration may be returned to make the timers as accurate as
+// possible, albeit with 100% CPU usage.
+struct time_t_wait_traits
+{
+  // Determine how long until the clock should be next polled to determine
+  // whether the duration has elapsed.
+  static time_t_clock::duration to_wait_duration(
+      const time_t_clock::duration& d)
+  {
+    if (d > asio::chrono::seconds(1))
+      return d - asio::chrono::seconds(1);
+    else if (d > asio::chrono::seconds(0))
+      return asio::chrono::milliseconds(10);
+    else
+      return asio::chrono::seconds(0);
+  }
+
+  // Determine how long until the clock should be next polled to determine
+  // whether the absoluate time has been reached.
+  static time_t_clock::duration to_wait_duration(
+      const time_t_clock::time_point& t)
+  {
+    return to_wait_duration(t - time_t_clock::now());
+  }
+};
+
+typedef asio::basic_waitable_timer<
+  time_t_clock, time_t_wait_traits> time_t_timer;
 
 void handle_timeout(const asio::error_code&)
 {
@@ -73,12 +86,12 @@ int main()
 
     time_t_timer timer(io_context);
 
-    timer.expires_from_now(5);
+    timer.expires_after(asio::chrono::seconds(5));
     std::cout << "Starting synchronous wait\n";
     timer.wait();
     std::cout << "Finished synchronous wait\n";
 
-    timer.expires_from_now(5);
+    timer.expires_after(asio::chrono::seconds(5));
     std::cout << "Starting asynchronous wait\n";
     timer.async_wait(&handle_timeout);
     io_context.run();

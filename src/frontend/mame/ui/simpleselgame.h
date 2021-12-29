@@ -36,15 +36,16 @@ private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 
 	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
+	virtual void handle(event const *ev) override;
 
 	// internal methods
 	void build_driver_list();
-	void inkey_select(const event *menu_event);
+	void inkey_select(const event &menu_event);
 	void inkey_cancel();
-	void inkey_special(const event *menu_event);
+	void inkey_special(const event &menu_event);
 
 	// internal state
+	bool                    m_nomatch;
 	bool                    m_error;
 	bool                    m_rerandomize;
 	std::string             m_search;

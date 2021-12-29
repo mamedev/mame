@@ -16,9 +16,8 @@ Main components
 
 
 TODO:
-- stuck at the play screen with 'attendere' (wait) message;
-- some devices aren't mapped and others may be mapped wrong
-- currently hacked to display something (see ay port A read)
+- stuck at the play screen with 'attendere' (wait) message after coining up;
+- some devices aren't mapped and others may be mapped wrong.
 */
 
 #include "emu.h"
@@ -43,6 +42,8 @@ public:
 		m_vram(*this, "vram"),
 		m_cram(*this, "cram"),
 		m_maincpu(*this, "maincpu"),
+		m_aysnd(*this, "aysnd"),
+		m_upd(*this, "upd"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
@@ -52,14 +53,26 @@ public:
 
 protected:
 	virtual void video_start() override;
+	virtual void machine_reset() override;
 
 private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	required_device<cpu_device> m_maincpu;
+	required_device<ay8910_device> m_aysnd;
+	required_device<upd7759_device> m_upd;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	uint8_t m_hbeat;
+	bool m_aysnd_data_next;
+	bool m_aysnd_toggle_enabled;
+
+	void aysnd_2000_w(uint8_t data);
+	void aysnd_2002_w(uint8_t data);
+	void upd_data_w(uint8_t data);
+	uint8_t upd_ready_r();
+	uint8_t upd_busy_r();
+	uint8_t upd_reset_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map);
@@ -71,6 +84,14 @@ void rgum_state::video_start()
 	m_hbeat = 0;
 
 	save_item(NAME(m_hbeat));
+	save_item(NAME(m_aysnd_data_next));
+	save_item(NAME(m_aysnd_toggle_enabled));
+}
+
+void rgum_state::machine_reset()
+{
+	m_aysnd_data_next = false;
+	m_aysnd_toggle_enabled = false;
 }
 
 uint32_t rgum_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -94,21 +115,67 @@ uint32_t rgum_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10, second 8255, UPD7759
+void rgum_state::aysnd_2000_w(uint8_t data)
+{
+	m_aysnd_toggle_enabled = true;
+}
+
+void rgum_state::aysnd_2002_w(uint8_t data)
+{
+	// AY-3-8910 interface is bizarre. Address is written to $2000 and then $2002 with successive instructions, then data is written to both $2000 and $2002.
+	// Sound data contains many pairs where the address byte is $50. Do these control some other device?
+	m_aysnd->address_data_w(m_aysnd_data_next, data);
+	if (m_aysnd_toggle_enabled)
+	{
+		m_aysnd_data_next = !m_aysnd_data_next;
+		m_aysnd_toggle_enabled = false;
+	}
+}
+
+void rgum_state::upd_data_w(u8 data)
+{
+	m_upd->port_w(data);
+	m_upd->start_w(1);
+}
+
+uint8_t rgum_state::upd_ready_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		m_upd->reset_w(1);
+		m_upd->start_w(0);
+	}
+	return 0;
+}
+
+uint8_t rgum_state::upd_busy_r()
+{
+	return m_upd->busy_r() ? 0x80 : 0;
+}
+
+uint8_t rgum_state::upd_reset_r()
+{
+	if (!machine().side_effects_disabled())
+		m_upd->reset_w(0);
+	return 0;
+}
+
+void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10
 {
 	map(0x0000, 0x07ff).ram(); // not all of it?
 
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 
-	map(0x2000, 0x2000).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x2002, 0x2002).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x2000, 0x2000).w(FUNC(rgum_state::aysnd_2000_w));
+	map(0x2002, 0x2002).r("aysnd", FUNC(ay8910_device::data_r)).w(FUNC(rgum_state::aysnd_2002_w));
 
-	map(0x2801, 0x2801).nopr();  // read but value discarded?
-	map(0x2802, 0x2802).nopr();
-	map(0x2803, 0x2803).nopr();
+	map(0x2800, 0x2800).w(FUNC(rgum_state::upd_data_w));
+	map(0x2801, 0x2801).r(FUNC(rgum_state::upd_ready_r));
+	map(0x2802, 0x2802).r(FUNC(rgum_state::upd_busy_r));
+	map(0x2803, 0x2803).r(FUNC(rgum_state::upd_reset_r));
 
-	// map(0x2c00, 0x2c03).w(); // ?
+	map(0x2c00, 0x2c03).w("ppi8255_1", FUNC(i8255_device::write));
 
 	map(0x3000, 0x3003).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
@@ -121,143 +188,83 @@ void rgum_state::main_map(address_map &map) // TODO: map MK48Z08B-10, second 825
 
 READ_LINE_MEMBER(rgum_state::heartbeat_r)
 {
-	m_hbeat ^= 1;
-
 	return m_hbeat;
 }
 
 
 static INPUT_PORTS_START( rgum )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x01, 0x01, "IN0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "PIN'S SW."
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(rgum_state, heartbeat_r)
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Stop Reel 5") PORT_CODE(KEYCODE_N)
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "IN1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "GUM SW."
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // "PAY LOT"
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
-	PORT_DIPNAME( 0x01, 0x01, "IN2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "COIN SERV"
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 
-
-	// TODO: should be 1 8-dip bank and 1 4-dip bank
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) // changes some words from Italian to French and back
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x00, "Game Level" ) PORT_DIPLOCATION("DSW1:1,2") // 'livello gioco' in test mode
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x02, "60" )
+	PORT_DIPSETTING(    0x03, "80" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("DSW1:3") // seems buggy: Italian works as expected while French just puts some disclaimer strings in place of the winning combinations
+	PORT_DIPSETTING(    0x00, DEF_STR( Italian ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( French ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // SW2 dip 1
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:1") // must stay on at boot or the game will stop with 'switch 2 dip 1 off' message
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -289,6 +296,7 @@ void rgum_state::rgum(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("DSW1");
 	ppi.in_pc_callback().set_ioport("DSW2");
+	ppi.out_pc_callback().set([this](uint8_t data) { m_hbeat = BIT(data, 0); });
 
 	I8255A(config, "ppi8255_1");
 
@@ -313,8 +321,8 @@ void rgum_state::rgum(machine_config &config)
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 24_MHz_XTAL / 16));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50); // guessed to use the same xtal as the crtc
-	aysnd.port_a_read_callback().set([this](){ return machine().rand() & 0x01; }); // TODO: hack! Otherwise it flashes 'RAM ERROR 0', then black screen
-	aysnd.port_b_read_callback().set_constant(0x00); // 'micro palline err.' (microballs err.) if bit 0 is set
+	aysnd.port_a_read_callback().set_ioport("COIN");
+	aysnd.port_b_read_callback().set_ioport("IN1");
 
 	UPD7759(config, "upd").add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -350,4 +358,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 199?, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1993, rgum, 0, rgum, rgum, rgum_state, empty_init, ROT0, "<unknown>", "Royal Gum (Italy)", MACHINE_NOT_WORKING )

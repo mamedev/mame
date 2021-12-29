@@ -84,7 +84,7 @@ template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_NSEC(T &&x) 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
-//***************************************************************************/
+//**************************************************************************
 
 // the attotime structure itself
 class attotime

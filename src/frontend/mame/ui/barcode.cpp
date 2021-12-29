@@ -9,12 +9,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "ui/barcode.h"
+
 #include "ui/ui.h"
 #include "ui/utils.h"
 
+
 namespace ui {
+
 // itemrefs for key menu items
 #define ITEMREF_NEW_BARCODE    ((void *) 0x0001)
 #define ITEMREF_ENTER_BARCODE  ((void *) 0x0002)
@@ -35,6 +37,7 @@ namespace ui {
 menu_barcode_reader::menu_barcode_reader(mame_ui_manager &mui, render_container &container, barcode_reader_device *device)
 	: menu_device_control<barcode_reader_device>(mui, container, device)
 {
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 
@@ -86,29 +89,26 @@ void menu_barcode_reader::populate(float &customtop, float &custombottom)
 //  handle - manages inputs in the barcode input menu
 //-------------------------------------------------
 
-void menu_barcode_reader::handle()
+void menu_barcode_reader::handle(event const *ev)
 {
-	// process the menu
-	const event *event = process(PROCESS_LR_REPEAT);
-
 	// process the event
-	if (event)
+	if (ev)
 	{
 		// handle selections
-		switch (event->iptkey)
+		switch (ev->iptkey)
 		{
 		case IPT_UI_LEFT:
-			if (event->itemref == ITEMREF_SELECT_READER)
+			if (ev->itemref == ITEMREF_SELECT_READER)
 				previous();
 			break;
 
 		case IPT_UI_RIGHT:
-			if (event->itemref == ITEMREF_SELECT_READER)
+			if (ev->itemref == ITEMREF_SELECT_READER)
 				next();
 			break;
 
 		case IPT_UI_SELECT:
-			if (event->itemref == ITEMREF_ENTER_BARCODE)
+			if (ev->itemref == ITEMREF_ENTER_BARCODE)
 			{
 				std::string tmp_file(m_barcode_buffer);
 				//printf("code %s\n", m_barcode_buffer);
@@ -135,7 +135,7 @@ void menu_barcode_reader::handle()
 		case IPT_SPECIAL:
 			if (get_selection_ref() == ITEMREF_NEW_BARCODE)
 			{
-				if (input_character(m_barcode_buffer, event->unichar, uchar_is_digit))
+				if (input_character(m_barcode_buffer, ev->unichar, uchar_is_digit))
 					reset(reset_options::REMEMBER_POSITION);
 			}
 			break;

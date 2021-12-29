@@ -16,7 +16,6 @@
 // standard windows headers
 #include <windows.h>
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 #include <debugger.h>
 
 #include <psapi.h>
@@ -1097,7 +1096,5 @@ diagnostics_module * diagnostics_module::get_instance()
 	static diagnostics_win32 s_instance;
 	return &s_instance;
 }
-
-#endif // WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 #endif

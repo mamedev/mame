@@ -381,12 +381,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl",
 	}
 
-	if _OPTIONS["targetos"]=="windows" then
-		files {
-			MAME_DIR .. "src/osd/windows/main.cpp",
-		}
-	end
-
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
 			MAME_DIR .. "src/osd/modules/debugger/debugosx.mm",

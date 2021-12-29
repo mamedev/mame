@@ -5,10 +5,15 @@
     Sega vector hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SEGAG80V_H
+#define MAME_INCLUDES_SEGAG80V_H
 
+#pragma once
+
+#include "audio/segag80.h"
 #include "audio/segaspeech.h"
 #include "audio/segausb.h"
-#include "audio/segag80.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/segag80.h"
 #include "sound/ay8910.h"
@@ -166,3 +171,5 @@ private:
 	void spacfurybl_speech_prg_map(address_map &map);
 	void spacfurybl_speech_io_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_SEGAG80V_H

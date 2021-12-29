@@ -417,14 +417,10 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 	auto state = std::make_unique<slider_state>(std::move(description), minval, defval, maxval, incval,
 												std::bind(&chain_manager::slider_changed, this, screen_index, _1, _2));
 
-	ui::menu_item item;
-	item.text = state->description;
-	item.subtext = "";
-	item.flags = 0;
-	item.ref = state.get();
-	item.type = ui::menu_item_type::SLIDER;
-	m_selection_sliders.push_back(item);
-	m_core_sliders.push_back(std::move(state));
+	ui::menu_item item(ui::menu_item_type::SLIDER, state.get());
+	item.set_text(state->description);
+	m_selection_sliders.emplace_back(item);
+	m_core_sliders.emplace_back(std::move(state));
 }
 
 uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *starting_prim, osd_window& window)
@@ -685,7 +681,7 @@ std::vector<ui::menu_item> chain_manager::get_slider_list()
 				std::vector<ui::menu_item> input_sliders = input->get_slider_list();
 				for (ui::menu_item slider : input_sliders)
 				{
-					sliders.push_back(slider);
+					sliders.emplace_back(slider);
 				}
 			}
 		}
@@ -695,27 +691,19 @@ std::vector<ui::menu_item> chain_manager::get_slider_list()
 		{
 			slider_state* core_slider = slider->core_slider();
 
-			ui::menu_item item;
-			item.text = core_slider->description;
-			item.subtext = "";
-			item.flags = 0;
-			item.ref = core_slider;
-			item.type = ui::menu_item_type::SLIDER;
-			m_selection_sliders.push_back(item);
+			ui::menu_item item(ui::menu_item_type::SLIDER, core_slider);
+			item.set_text(core_slider->description);
+			m_selection_sliders.emplace_back(item);
 
-			sliders.push_back(item);
+			sliders.emplace_back(std::move(item));
 		}
 
 		if (chain_sliders.size() > 0)
 		{
-			ui::menu_item item;
-			item.text = MENU_SEPARATOR_ITEM;
-			item.subtext = "";
-			item.flags = 0;
-			item.ref = nullptr;
-			item.type = ui::menu_item_type::SEPARATOR;
+			ui::menu_item item(ui::menu_item_type::SEPARATOR);
+			item.set_text(MENU_SEPARATOR_ITEM);
 
-			sliders.push_back(item);
+			sliders.emplace_back(std::move(item));
 		}
 	}
 

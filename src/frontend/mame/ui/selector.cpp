@@ -47,32 +47,30 @@ menu_selector::~menu_selector()
 //  handle
 //-------------------------------------------------
 
-void menu_selector::handle()
+void menu_selector::handle(event const *ev)
 {
 	// process the menu
-	const event *menu_event = process(0);
-
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	if (ev && ev->itemref)
 	{
-		if (menu_event->iptkey == IPT_UI_SELECT)
+		if (ev->iptkey == IPT_UI_SELECT)
 		{
 			int selection(-1);
 			for (size_t idx = 0; (m_str_items.size() > idx) && (0 > selection); ++idx)
-				if ((void*)&m_str_items[idx] == menu_event->itemref)
+				if ((void*)&m_str_items[idx] == ev->itemref)
 					selection = int(unsigned(idx));
 
 			m_handler(selection);
 
 			stack_pop();
 		}
-		else if (menu_event->iptkey == IPT_SPECIAL)
+		else if (ev->iptkey == IPT_SPECIAL)
 		{
-			if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+			if (input_character(m_search, ev->unichar, uchar_is_printable))
 				reset(reset_options::SELECT_FIRST);
 		}
 
 		// escape pressed with non-empty text clears the text
-		else if (menu_event->iptkey == IPT_UI_CANCEL && !m_search.empty())
+		else if (ev->iptkey == IPT_UI_CANCEL && !m_search.empty())
 		{
 			m_search.clear();
 			reset(reset_options::SELECT_FIRST);

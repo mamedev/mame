@@ -195,8 +195,8 @@ static INPUT_PORTS_START( archimedes_keyboard )
 
 	PORT_START("MOUSE.2")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Left")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Center")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Right")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON3) PORT_NAME("Mouse Center")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Right")
 INPUT_PORTS_END
 
 
@@ -278,11 +278,11 @@ void archimedes_keyboard_device::device_reset()
 void archimedes_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	I8051(config, m_mcu, 12_MHz_XTAL);  // Philips 8051AH-2
-	m_mcu->port_in_cb<0>().set([this]() { return m_keyboard[m_mux & 0x0f]->read() & 0xff; });
-	m_mcu->port_in_cb<1>().set([this]() { return (m_keyboard[m_mux & 0x0f]->read() >> 8) & 0xff; });
+	m_mcu->port_in_cb<0>().set([this]() { return m_keyboard[m_mux]->read() & 0xff; });
+	m_mcu->port_in_cb<1>().set([this]() { return (m_keyboard[m_mux]->read() >> 8) & 0xff; });
 	m_mcu->port_in_cb<2>().set(FUNC(archimedes_keyboard_device::mouse_r));
 	m_mcu->port_in_cb<3>().set([this]() { return m_mouse[2]->read() & 0xff; });
-	m_mcu->port_out_cb<2>().set([this](uint8_t data) { m_mux = data; });
+	m_mcu->port_out_cb<2>().set([this](uint8_t data) { m_mux = data & 0x0f; });
 	m_mcu->port_out_cb<3>().set(FUNC(archimedes_keyboard_device::leds_w));
 	m_mcu->serial_rx_cb().set([this]() { return get_received_char(); });
 	m_mcu->serial_tx_cb().set(FUNC(archimedes_keyboard_device::tx_w));

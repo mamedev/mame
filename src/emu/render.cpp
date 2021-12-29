@@ -51,6 +51,7 @@
 #include "ui/uimain.h"
 
 #include "util/ioprocsfilter.h"
+#include "util/language.h"
 #include "util/path.h"
 #include "util/xmlfile.h"
 
@@ -1096,7 +1097,7 @@ unsigned render_target::configured_view(const char *viewname, int targetindex, i
 			screen_device const &screen = screens[index() % screens.size()];
 			for (unsigned i = 0; !view && (m_views.size() > i); ++i)
 			{
-				for (layout_view::item &viewitem : m_views[i].first.items())
+				for (layout_view_item &viewitem : m_views[i].first.items())
 				{
 					screen_device const *const viewscreen(viewitem.screen());
 					if (viewscreen == &screen)
@@ -1285,7 +1286,7 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 		throw emu_fatalerror("Mandatory artwork is missing");
 
 	// scan the current view for all screens
-	for (layout_view::item &curitem : current_view().items())
+	for (layout_view_item &curitem : current_view().items())
 	{
 		screen_device const *const screen = curitem.screen();
 		if (screen)
@@ -1369,7 +1370,7 @@ render_primitive_list &render_target::get_primitives()
 	{
 		// we're running - iterate over items in the view
 		current_view().prepare_items();
-		for (layout_view::item &curitem : current_view().visible_items())
+		for (layout_view_item &curitem : current_view().visible_items())
 		{
 			// first apply orientation to the bounds
 			render_bounds bounds = curitem.bounds();
@@ -1390,7 +1391,7 @@ render_primitive_list &render_target::get_primitives()
 			if (curitem.screen())
 				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
 			else
-				add_element_primitives(list, item_xform, *curitem.element(), curitem.element_state(), curitem.blend_mode());
+				add_element_primitives(list, item_xform, curitem);
 		}
 	}
 	else
@@ -1493,10 +1494,10 @@ bool render_target::map_point_container(s32 target_x, s32 target_y, render_conta
 		auto const found(std::find_if(
 					items.begin(),
 					items.end(),
-					[&container] (layout_view::item &item) { return &item.screen()->container() == &container; }));
+					[&container] (layout_view_item &item) { return &item.screen()->container() == &container; }));
 		if (items.end() != found)
 		{
-			layout_view::item &item(*found);
+			layout_view_item &item(*found);
 			render_bounds const bounds(item.bounds());
 			if (bounds.includes(target_f.first, target_f.second))
 			{
@@ -1554,7 +1555,7 @@ bool render_target::map_point_input(s32 target_x, s32 target_y, ioport_port *&in
 	{
 		if (m_hit_test[i] && m_hit_test[items.size() + i])
 		{
-			layout_view::item &item(items[i]);
+			layout_view_item &item(items[i]);
 			render_bounds const bounds(item.bounds());
 			if (bounds.includes(target_f.first, target_f.second))
 			{
@@ -1693,6 +1694,8 @@ void render_target::load_layout_files(util::xml::data_node const &rootnode, bool
 
 void render_target::load_additional_layout_files(const char *basename, bool have_artwork)
 {
+	using util::lang_translate;
+
 	m_external_artwork = false;
 
 	// if override_artwork defined, load that and skip artwork other than default
@@ -1841,7 +1844,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			viewnode->set_attribute(
 					"name",
 					util::string_format(
-						"Screen %1$u Standard (%2$u:%3$u)",
+						_("view-name", "Screen %1$u Standard (%2$u:%3$u)"),
 						i, screens[i].physical_x(), screens[i].physical_y()).c_str());
 			util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 			if (!screennode)
@@ -1867,7 +1870,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				viewnode->set_attribute(
 						"name",
 						util::string_format(
-							"Screen %1$u Pixel Aspect (%2$u:%3$u)",
+							_("view-name", "Screen %1$u Pixel Aspect (%2$u:%3$u)"),
 							i, screens[i].native_x(), screens[i].native_y()).c_str());
 				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
 				if (!screennode)
@@ -1889,7 +1892,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 			if (!viewnode)
 				throw emu_fatalerror("Couldn't create XML node??");
-			viewnode->set_attribute("name", "Cocktail");
+			viewnode->set_attribute("name", _("view-name", "Cocktail"));
 
 			util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
 			if (!mirrornode)
@@ -2009,10 +2012,10 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 					};
 
 			// generate linear views
-			generate_view("Left-to-Right", screens.size(), false, [] (unsigned x, unsigned y) { return x; });
-			generate_view("Left-to-Right (Gapless)", screens.size(), true, [] (unsigned x, unsigned y) { return x; });
-			generate_view("Top-to-Bottom", 1U, false, [] (unsigned x, unsigned y) { return y; });
-			generate_view("Top-to-Bottom (Gapless)", 1U, true, [] (unsigned x, unsigned y) { return y; });
+			generate_view(_("view-name", "Left-to-Right"), screens.size(), false, [] (unsigned x, unsigned y) { return x; });
+			generate_view(_("view-name", "Left-to-Right (Gapless)"), screens.size(), true, [] (unsigned x, unsigned y) { return x; });
+			generate_view(_("view-name", "Top-to-Bottom"), 1U, false, [] (unsigned x, unsigned y) { return y; });
+			generate_view(_("view-name", "Top-to-Bottom (Gapless)"), 1U, true, [] (unsigned x, unsigned y) { return y; });
 
 			// generate fake cocktail view for systems with two screens
 			if (screens.size() == 2U)
@@ -2024,7 +2027,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
 				if (!viewnode)
 					throw emu_fatalerror("Couldn't create XML node??");
-				viewnode->set_attribute("name", "Cocktail");
+				viewnode->set_attribute("name", _("view-name", "Cocktail"));
 
 				util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
 				if (!mirrornode)
@@ -2063,7 +2066,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 				if (!remainder || (((majdim + 1) / 2) <= remainder))
 				{
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom", majdim, mindim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom"), majdim, mindim).c_str(),
 							majdim,
 							false,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2072,7 +2075,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Left-to-Right, Top-to-Bottom (Gapless)", majdim, mindim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Left-to-Right, Top-to-Bottom (Gapless)"), majdim, mindim).c_str(),
 							majdim,
 							true,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2081,7 +2084,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right", mindim, majdim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right"), mindim, majdim).c_str(),
 							mindim,
 							false,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2090,7 +2093,7 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 								return (screens.size() > i) ? int(i) : -1;
 							});
 					generate_view(
-							util::string_format("%1$u\xC3\x97%2$u Top-to-Bottom, Left-to-Right (Gapless)", mindim, majdim).c_str(),
+							util::string_format(_("view-name", u8"%1$u×%2$u Top-to-Bottom, Left-to-Right (Gapless)"), mindim, majdim).c_str(),
 							mindim,
 							true,
 							[&screens, majdim] (unsigned x, unsigned y)
@@ -2520,11 +2523,13 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 //  for an element in the current state
 //-------------------------------------------------
 
-void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode)
+void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_view_item &item)
 {
+	layout_element &element(*item.element());
+	int const blendmode(item.blend_mode());
+
 	// limit state range to non-negative values
-	if (state < 0)
-		state = 0;
+	int const state((std::max)(item.element_state(), 0));
 
 	// get a pointer to the relevant texture
 	render_texture *texture = element.state_texture(state);
@@ -2534,29 +2539,70 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 
 		// configure the basics
 		prim->color = xform.color;
-		prim->flags = PRIMFLAG_TEXORIENT(xform.orientation) | PRIMFLAG_BLENDMODE(blendmode) | PRIMFLAG_TEXFORMAT(texture->format());
+		prim->flags =
+				PRIMFLAG_TEXORIENT(xform.orientation) |
+				PRIMFLAG_TEXFORMAT(texture->format()) |
+				PRIMFLAG_BLENDMODE(blendmode) |
+				PRIMFLAG_TEXWRAP((item.scroll_wrap_x() || item.scroll_wrap_y()) ? 1 : 0);
 
 		// compute the bounds
-		s32 width = render_round_nearest(xform.xscale);
-		s32 height = render_round_nearest(xform.yscale);
-		prim->bounds.set_wh(render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), float(width), float(height));
+		float const primwidth(render_round_nearest(xform.xscale));
+		float const primheight(render_round_nearest(xform.yscale));
+		prim->bounds.set_wh(render_round_nearest(xform.xoffs), render_round_nearest(xform.yoffs), primwidth, primheight);
 		prim->full_bounds = prim->bounds;
-		if (xform.orientation & ORIENTATION_SWAP_XY)
-			std::swap(width, height);
-		width = (std::min)(width, m_maxtexwidth);
-		height = (std::min)(height, m_maxtexheight);
 
 		// get the scaled texture and append it
-		texture->get_scaled(width, height, prim->texture, list, prim->flags);
+		float const xsize(item.scroll_size_x());
+		float const ysize(item.scroll_size_y());
+		s32 texwidth = render_round_nearest(((xform.orientation & ORIENTATION_SWAP_XY) ? primheight : primwidth) / xsize);
+		s32 texheight = render_round_nearest(((xform.orientation & ORIENTATION_SWAP_XY) ? primwidth : primheight) / ysize);
+		texwidth = (std::min)(texwidth, m_maxtexwidth);
+		texheight = (std::min)(texheight, m_maxtexheight);
+		texture->get_scaled(texwidth, texheight, prim->texture, list, prim->flags);
 
 		// compute the clip rect
 		render_bounds cliprect = prim->bounds & m_bounds;
 
 		// determine UV coordinates and apply clipping
-		prim->texcoords = oriented_texcoords[xform.orientation];
-		bool clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
+		float const xwindow((xform.orientation & ORIENTATION_SWAP_XY) ? primheight : primwidth);
+		float const ywindow((xform.orientation & ORIENTATION_SWAP_XY) ? primwidth : primheight);
+		float const xrange(float(texwidth) - (item.scroll_wrap_x() ? 0.0f : xwindow));
+		float const yrange(float(texheight) - (item.scroll_wrap_y() ? 0.0f : ywindow));
+		float const xoffset(render_round_nearest(item.scroll_pos_x() * xrange) / float(texwidth));
+		float const yoffset(render_round_nearest(item.scroll_pos_y() * yrange) / float(texheight));
+		float const xend(xoffset + (xwindow / float(texwidth)));
+		float const yend(yoffset + (ywindow / float(texheight)));
+		switch (xform.orientation)
+		{
+		default:
+		case 0:
+			prim->texcoords = render_quad_texuv{ { xoffset, yoffset }, { xend, yoffset }, { xoffset, yend }, { xend, yend } };
+			break;
+		case ORIENTATION_FLIP_X:
+			prim->texcoords = render_quad_texuv{ { xend, yoffset }, { xoffset, yoffset }, { xend, yend }, { xoffset, yend } };
+			break;
+		case ORIENTATION_FLIP_Y:
+			prim->texcoords = render_quad_texuv{ { xoffset, yend }, { xend, yend }, { xoffset, yoffset }, { xend, yoffset } };
+			break;
+		case ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+			prim->texcoords = render_quad_texuv{ { xend, yend }, { xoffset, yend }, { xend, yoffset }, { xoffset, yoffset } };
+			break;
+		case ORIENTATION_SWAP_XY:
+			prim->texcoords = render_quad_texuv{ { xoffset, yoffset }, { xoffset, yend }, { xend, yoffset }, { xend, yend } };
+			break;
+		case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X:
+			prim->texcoords = render_quad_texuv{ { xoffset, yend }, { xoffset, yoffset }, { xend, yend }, { xend, yoffset } };
+			break;
+		case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y:
+			prim->texcoords = render_quad_texuv{ { xend, yoffset }, { xend, yend }, { xoffset, yoffset }, { xoffset, yend } };
+			break;
+		case ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y:
+			prim->texcoords = render_quad_texuv{ { xend, yend }, { xend, yoffset }, { xoffset, yend }, { xoffset, yoffset } };
+			break;
+		}
 
 		// add to the list or free if we're clipped out
+		bool const clipped = render_clip_quad(&prim->bounds, &cliprect, &prim->texcoords);
 		list.append_or_return(*prim, clipped);
 	}
 }
