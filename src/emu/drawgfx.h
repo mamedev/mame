@@ -140,7 +140,6 @@ enum
 	GFX_PMASK_8  = 0xff00
 };
 
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -148,6 +147,8 @@ enum
 class gfx_element
 {
 public:
+	typedef u32 (*layout_char_offset_delegate)(u32, u16, u16, u8, u32);
+
 	// construction/destruction
 #ifdef UNUSED_FUNCTION
 	gfx_element();
@@ -182,6 +183,7 @@ public:
 	void set_colorbase(u16 colorbase) { m_color_base = colorbase; }
 	void set_granularity(u16 granularity) { m_color_granularity = granularity; }
 	void set_source_clip(u32 xoffs, u32 width, u32 yoffs, u32 height);
+	void set_layout_char_offset_func(layout_char_offset_delegate func) { m_layout_char_offset = func; };
 
 	// operations
 	void mark_dirty(u32 code) { if (code < elements()) { m_dirty[code] = 1; m_dirtyseq++; } }
@@ -317,6 +319,7 @@ private:
 	std::vector<u32>  m_layout_planeoffset;// plane offsets
 	std::vector<u32>  m_layout_xoffset; // X offsets
 	std::vector<u32>  m_layout_yoffset; // Y offsets
+	layout_char_offset_delegate m_layout_char_offset = nullptr; // char offset not common calculation
 };
 
 
@@ -549,5 +552,7 @@ public:
 protected:
 	virtual void device_start() override {}
 };
+
+#define LAYOUT_CHAR_OFFSET_FUNC(_name) u32 _name(u32 code, u16 width, u16 height, u8 planes, u32 charincrement)
 
 #endif  // MAME_EMU_DRAWGFX_H
