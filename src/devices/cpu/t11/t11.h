@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "machine/z80daisy.h"
+
 
 enum
 {
@@ -19,7 +21,7 @@ enum
 #define T11_IRQ3        3      /* IRQ3 */
 
 
-class t11_device :  public cpu_device
+class t11_device :  public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	// T11 input lines
@@ -58,6 +60,29 @@ protected:
 		T11_EMT         = 030,  // EMT instruction vector
 		T11_TRAP        = 034   // TRAP instruction vector
 	};
+	enum
+	{
+		// DEC command set extensions
+		IS_CIS          = 1 << 0,	// ADDNI, ADDN...
+		IS_CSM          = 1 << 1,	// CSM
+		IS_LEIS         = 1 << 2,	// MARK, RTT, SOB, SXT, XOR
+		IS_EIS          = 1 << 3 | IS_LEIS,	// same plus ASH, ASHC, MUL, DIV
+		IS_FIS          = 1 << 4,	// FADD, FDIV, FMUL, FSUB
+		IS_FP11         = 1 << 5,	// ABSF, ...
+		IS_MFPT         = 1 << 6,	// MFPT
+		IS_MXPS         = 1 << 7,	// MFPS, MTPS
+		IS_SPL          = 1 << 8,	// SPL
+		IS_T11          = 1 << 9,	// LEIS without MARK
+		// K1801 command set extensions
+		IS_VM1          = 1 << 10,	// START, STEP
+		IS_VM1G         = 1 << 11,	// MUL, timer
+		IS_VM2          = 1 << 12 | IS_VM1,	// VM1 plus RSEL, MxUS, RCPx, WCPx
+	};
+	enum
+	{
+		VM1_SEL1		= 0177716,
+		VM1_STACK		= 0177674
+	};
 
 	t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -84,6 +109,7 @@ protected:
 
 	address_space_config m_program_config;
 
+	uint16_t c_insn_set;
 	uint16_t c_initial_mode;
 
 	PAIR                m_ppc;    /* previous program counter */
@@ -113,15 +139,19 @@ protected:
 	inline void WWORD(int addr, int data);
 	inline void PUSH(int val);
 	inline int POP();
-	void t11_check_irqs();
+
+	virtual void t11_check_irqs();
 	void take_interrupt(uint8_t vector);
+	void trap_to(uint16_t vector);
 
 	typedef void ( t11_device::*opcode_func )(uint16_t op);
 	static const opcode_func s_opcode_table[65536 >> 3];
 
 	void op_0000(uint16_t op);
+	void op_0001(uint16_t op);
 	void halt(uint16_t op);
 	void illegal(uint16_t op);
+	void illegal4(uint16_t op);
 	void jmp_rgd(uint16_t op);
 	void jmp_in(uint16_t op);
 	void jmp_ind(uint16_t op);
@@ -1160,6 +1190,23 @@ protected:
 	void sub_ixd_ixd(uint16_t op);
 };
 
+class k1801vm1_device : public t11_device
+{
+public:
+	// construction/destruction
+	k1801vm1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_reset() override;
+
+	// device_state_interface overrides
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	virtual void t11_check_irqs() override;
+};
+
+
 class k1801vm2_device : public t11_device
 {
 public:
@@ -1176,6 +1223,7 @@ protected:
 
 
 DECLARE_DEVICE_TYPE(T11,      t11_device)
+DECLARE_DEVICE_TYPE(K1801VM1, k1801vm1_device)
 DECLARE_DEVICE_TYPE(K1801VM2, k1801vm2_device)
 
 #endif // MAME_CPU_T11_T11_H

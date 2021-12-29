@@ -37,16 +37,25 @@
 
 
 DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
+DEFINE_DEVICE_TYPE(K1801VM1, k1801vm1_device, "k1801vm1", "K1801VM1")
 DEFINE_DEVICE_TYPE(K1801VM2, k1801vm2_device, "k1801vm2", "K1801VM2")
 
+
+k1801vm1_device::k1801vm1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: t11_device(mconfig, K1801VM1, tag, owner, clock)
+{
+	c_insn_set = IS_LEIS | IS_MXPS | IS_VM1;
+}
 
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
 {
+	c_insn_set = IS_EIS | IS_MXPS | IS_VM2;
 }
 
 t11_device::t11_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock)
+	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, 0)
 	, c_initial_mode(0)
 	, m_cp_state(0)
@@ -67,6 +76,7 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 t11_device::t11_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, T11, tag, owner, clock)
 {
+	c_insn_set = IS_LEIS | IS_MFPT | IS_MXPS | IS_T11;
 }
 
 device_memory_interface::space_config_vector t11_device::memory_space_config() const
@@ -150,12 +160,16 @@ int t11_device::POP()
 #define VFLAG 2
 #define ZFLAG 4
 #define NFLAG 8
+#define TFLAG 16
+#define IFLAG 128
 
 /* extracts flags */
 #define GET_C (PSW & CFLAG)
 #define GET_V (PSW & VFLAG)
 #define GET_Z (PSW & ZFLAG)
 #define GET_N (PSW & NFLAG)
+#define GET_T (PSW & TFLAG)
+#define GET_I (PSW & IFLAG)
 
 /* clears flags */
 #define CLR_C (PSW &= ~CFLAG)
@@ -202,6 +216,39 @@ static const struct irq_table_entry irq_table[] =
 	{ 7<<5, 0144 },
 	{ 7<<5, 0140 }
 };
+
+void k1801vm1_device::t11_check_irqs()
+{
+	if (m_bus_error)
+	{
+		m_bus_error = false;
+		take_interrupt(T11_TIMEOUT);
+		return;
+	}
+	else if (GET_T)
+	{
+		take_interrupt(T11_BPT);
+		return;
+	}
+	else if (m_power_fail)
+	{
+		m_power_fail = false;
+		take_interrupt(T11_PWRFAIL);
+		return;
+	}
+
+	if (m_vec_active & !GET_I)
+	{
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		int vec = (intf != nullptr) ? intf->z80daisy_irq_ack() : m_in_iack_func(0);
+		if (vec == -1 || vec == 0)
+		{
+			m_vec_active = 0;
+			return;
+		}
+		take_interrupt(vec);
+	}
+}
 
 void t11_device::t11_check_irqs()
 {
@@ -370,6 +417,25 @@ void t11_device::state_string_export(const device_state_entry &entry, std::strin
 	}
 }
 
+void k1801vm1_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c%c%c%c",
+				m_psw.b.l & 0x80 ? 'I':'.',
+				m_psw.b.l & 0x40 ? '?':'.',
+				m_psw.b.l & 0x20 ? '?':'.',
+				m_psw.b.l & 0x10 ? 'T':'.',
+				m_psw.b.l & 0x08 ? 'N':'.',
+				m_psw.b.l & 0x04 ? 'Z':'.',
+				m_psw.b.l & 0x02 ? 'V':'.',
+				m_psw.b.l & 0x01 ? 'C':'.'
+			);
+			break;
+	}
+}
+
 void k1801vm2_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
@@ -412,6 +478,13 @@ void t11_device::device_reset()
 	m_power_fail = false;
 	m_bus_error = false;
 	m_ext_halt = false;
+}
+
+void k1801vm1_device::device_reset()
+{
+	t11_device::device_reset();
+
+	PC = RWORD(VM1_SEL1) & 0177400;
 }
 
 void k1801vm2_device::device_reset()

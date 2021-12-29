@@ -38,6 +38,8 @@ protected:
 	// construction/destruction
 	device_qbus_card_interface(const machine_config &mconfig, device_t &device);
 
+	virtual void device_reset() { }
+
 	virtual int z80daisy_irq_state() { return 0; }
 	virtual int z80daisy_irq_ack() { return -1; }
 	virtual void z80daisy_irq_reti() { }

@@ -124,6 +124,13 @@ void qbus_device::device_start()
 
 void qbus_device::device_reset()
 {
+        device_qbus_card_interface *entry = m_device_list.first();
+
+        while (entry)
+        {
+                entry->device_reset();
+                entry = entry->next();
+        }
 }
 
 
