@@ -114,8 +114,9 @@ private:
 	required_shared_ptr<uint64_t> m_elan_ram;
 	required_device<powervr2_device> m_powervr2_slave;
 
-	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void naomi2_map(address_map &map);
+
+	void both_pvr2_ta_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	uint32_t elan_regs_r(offs_t offset);
 	void elan_regs_w(offs_t offset, uint32_t data);

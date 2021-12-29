@@ -26,6 +26,7 @@
 #define LOG_TA_FIFO     (1U << 3) // Show TA FIFO polygon entries
 #define LOG_TA_TILE     (1U << 4) // Show TA tile entries
 #define LOG_PVR_DMA     (1U << 5) // Show PVR-DMA access
+#define LOG_IRQ         (1U << 6) // Show irq triggers
 
 #define VERBOSE (LOG_WARN | LOG_PVR_DMA)
 
@@ -36,6 +37,7 @@
 #define LOGTAFIFO(...)     LOGMASKED(LOG_TA_FIFO, __VA_ARGS__)
 #define LOGTATILE(...)     LOGMASKED(LOG_TA_TILE, __VA_ARGS__)
 #define LOGPVRDMA(...)     LOGMASKED(LOG_PVR_DMA, __VA_ARGS__)
+#define LOGIRQ(...)        LOGMASKED(LOG_IRQ, __VA_ARGS__)
 
 #define LIVE_YUV_VIEW 0
 
@@ -1069,10 +1071,19 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 				//if(sanitycount>2000)
 				//  break;
 			}
-//          printf("ISP START %d %d\n",sanitycount,screen().vpos());
+
 			/* Fire ISP irq after a set amount of time */
-			// TODO: timing of this
-			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(sanitycount*25 + 500000));   // hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed
+			// TODO: exact timing of this
+			// hacky end of render delay for Capcom games, otherwise they works at ~1/10 speed.
+			// 500k is definitely too slow for them: it fires the isp/tsp completion at
+			// vbl-in and expect that it completes after some time that vbl-out kicks in,
+			// in order to have enough time to execute logic stuff in the meantime.
+//          const u64 isp_completion = sanitycount * 25 + 500000;
+			const u64 isp_completion = sanitycount * 25 + 2000000;
+			LOGIRQ("%s: [%d] ISP end of render start %d in %d cycles\n",
+				tag(), screen().frame_number(), screen().vpos(), isp_completion
+			);
+			endofrender_timer_isp->adjust(state->m_maincpu->cycles_to_attotime(isp_completion));
 			break;
 		}
 	}
@@ -1733,35 +1744,35 @@ void powervr2_device::sb_pdapro_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
 {
-//  printf("OPLST %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] EOXFER OPLST %d\n", tag(), screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_OPLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
 {
-//  printf("OPMV %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] EOXFER OPMV %d\n", tag(), screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_OPMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
 {
-//  printf("TRLST %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] EOXFER TRLST %d\n", tag(), screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_TRLST_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
 {
-//  printf("TRMV %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] EOXFER TRMV %d\n", tag(), screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_TRMV_IRQ);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
 {
-//  printf("PTLST %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] EOXFER PTLST %d\n", tag(), screen().frame_number(), screen().vpos());
 
 	irq_cb(EOXFER_PTLST_IRQ);
 }
@@ -3398,11 +3409,9 @@ void powervr2_device::pvr_accumulationbuffer_to_framebuffer(address_space &space
 		break;
 
 		case 0x07:
-			printf("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (Reserved! Don't Use!)\n",x,y,packmode);
+			throw emu_fatalerror("pvr_accumulationbuffer_to_framebuffer buffer to tile at %d,%d - unsupported pack mode %02x (Reserved! Don't Use!)\n",x,y,packmode);
 			break;
 	}
-
-
 }
 
 void powervr2_device::pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect)
@@ -3686,16 +3695,24 @@ void powervr2_device::pvr_build_parameterconfig()
 			pvr_parameterconfig[a] = pvr_parameterconfig[a-1];
 }
 
+// TODO: these two are currently unused
 TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 {
+	LOGIRQ("%s: [%d] VBL IN %d\n", tag(), screen().frame_number(), screen().vpos());
+	LOGIRQ("    VII %d VOI %d VI %d VO %d VS %d\n",
+		spg_vblank_int & 0x3ff, (spg_vblank_int >> 16) & 0x3ff,
+		spg_vblank & 0x3ff, (spg_vblank >> 16) & 0x3ff, (spg_load >> 16) & 0x3ff
+	);
+
 	irq_cb(VBL_IN_IRQ);
 
-	//popmessage("VII %d VOI %d VI %d VO %d VS %d",spg_vblank_int & 0x3ff,(spg_vblank_int >> 16) & 0x3ff,spg_vblank & 0x3ff,(spg_vblank >> 16) & 0x3ff,(spg_load >> 16) & 0x3ff);
 //  vbin_timer->adjust(screen().time_until_pos(spg_vblank_int & 0x3ff));
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
 {
+	LOGIRQ("%s: [%d] VBL OUT %d\n", tag(), screen().frame_number(), screen().vpos());
+
 	irq_cb(VBL_OUT_IRQ);
 
 //  vbout_timer->adjust(screen().time_until_pos((spg_vblank_int >> 16) & 0x3ff));
@@ -3707,16 +3724,20 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 	{
 		if(scanline == next_y)
 		{
+			LOGIRQ("%s: [%d] HBL IN %d - (%08x)\n",
+				tag(), screen().frame_number(), screen().vpos(), scanline, spg_hblank_int
+			);
 			irq_cb(HBL_IN_IRQ);
 			next_y += spg_hblank_int & 0x3ff;
 		}
 	}
 	else if((scanline == (spg_hblank_int & 0x3ff)) || (spg_hblank_int & 0x2000))
 	{
+		LOGIRQ("%s: [%d] HBL IN %d - (%08x)\n",
+			tag(), screen().frame_number(), screen().vpos(), scanline, spg_hblank_int
+		);
 		irq_cb(HBL_IN_IRQ);
 	}
-
-//  printf("hbin on scanline %d\n",scanline);
 
 	scanline++;
 
@@ -3729,17 +3750,16 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 	hbin_timer->adjust(screen().time_until_pos(scanline, ((spg_hblank_int >> 16) & 0x3ff)-1));
 }
 
-
-
+// TODO: these two aren't really called atm
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
 {
-	printf("VIDEO END %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] VIDEO END %d\n", tag(), screen().frame_number(), screen().vpos());
 //  endofrender_timer_video->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 {
-	printf("TSP END %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] TSP END %d\n", tag(), screen().frame_number(), screen().vpos());
 
 //  endofrender_timer_tsp->adjust(attotime::never);
 //  endofrender_timer_video->adjust(attotime::from_usec(500) );
@@ -3751,7 +3771,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
 	irq_cb(EOR_TSP_IRQ); // TSP end of render
 	irq_cb(EOR_VIDEO_IRQ); // VIDEO end of render
 
-//  printf("ISP END %d\n",screen().vpos());
+	LOGIRQ("%s: [%d] ISP END %d\n", tag(), screen().frame_number(), screen().vpos());
 
 	endofrender_timer_isp->adjust(attotime::never);
 //  endofrender_timer_tsp->adjust(attotime::from_usec(500) );
@@ -3804,6 +3824,8 @@ uint32_t powervr2_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 
 TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
 {
+	LOGIRQ("%s: [%d] PVR DMA %d\n", tag(), screen().frame_number(), screen().vpos());
+
 	m_pvr_dma.start = sb_pdst = 0;
 	irq_cb(DMA_PVR_IRQ);
 }
@@ -4075,8 +4097,18 @@ void powervr2_device::pvr_scanline_timer(int vpos)
 		state->m_maple->maple_hw_trigger();
 
 	if(vbin_line == vpos)
+	{
+		LOGIRQ("%s: [%d] VBL IN %d\n", tag(), screen().frame_number(), screen().vpos());
+		LOGIRQ("    VII %d VOI %d VI %d VO %d VS %d\n",
+			spg_vblank_int & 0x3ff, (spg_vblank_int >> 16) & 0x3ff,
+			spg_vblank & 0x3ff, (spg_vblank >> 16) & 0x3ff, (spg_load >> 16) & 0x3ff
+		);
 		irq_cb(VBL_IN_IRQ);
+	}
 
 	if(vbout_line == vpos)
+	{
+		LOGIRQ("%s: [%d] VBL OUT %d\n", tag(), screen().frame_number(), screen().vpos());
 		irq_cb(VBL_OUT_IRQ);
+	}
 }
