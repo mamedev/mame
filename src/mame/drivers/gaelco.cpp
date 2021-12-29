@@ -11,10 +11,11 @@ Games supported:
 Year   Game                PCB                       NOTES
 ------------------------------------------------------------------------
 1991   Big Karnak          REF 901112-1              Unprotected
-1992   Squash              REF 922804/2 or 922804/1  Encrypted Video RAM
-1992   Thunder Hoop        REF 922804/1              Encrypted Video RAM
-1995   Biomechanical Toy   REF 922804/2 or 922804/1  Unprotected
 1992   Maniac Square       REF 922804/2              Prototype
+1992   Squash              REF 922804/2 or 922804/1  Encrypted Video RAM
+1992   Thunder Hoop        REF 922804/2 or 922804/1  Encrypted Video RAM
+1995   Biomechanical Toy   REF 922804/2 or 922804/1  Unprotected
+1995   Last Km             REF 922804/2              Prototype
 
       Priorities for all games - the games don't make extensive
       enough use of the priority scheme to properly draw any
@@ -1180,7 +1181,22 @@ ROM_START( squash ) // PCB - REF.922804/1 or REF.922804/2
 	ROM_LOAD ( "squashv1_gal20v8.h11", 0x385, 0x157, CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Unprotected
 ROM_END
 
-
+/*
+There is a Thunder Hoop on a REF.922804/2 PCB, with exactly the same ROM contents,
+but on a different chips layout / capacity:
+   program.d16             th161eb4.020            IDENTICAL
+   program.d18             th18dea1.040            IDENTICAL
+   gfx.j10                 c09          [1/2]      IDENTICAL
+   gfx.j6                  c12          [1/2]      IDENTICAL
+   gfx.j7                  c11          [1/2]      IDENTICAL
+   gfx.j9                  c10          [1/2]      IDENTICAL
+   sound.c1                sound        [1/2]      IDENTICAL
+   gfx.h10                 c09          [2/2]      IDENTICAL
+   gfx.h6                  c12          [2/2]      IDENTICAL
+   gfx.h7                  c11          [2/2]      IDENTICAL
+   gfx.h9                  c10          [2/2]      IDENTICAL
+   sound.c3                sound        [2/2]      IDENTICAL
+*/
 ROM_START( thoop ) // PCB - REF.922804/1
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
