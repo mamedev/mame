@@ -38,6 +38,7 @@
 #include "cheat.h"
 #include "rendfont.h"
 #include "romload.h"
+#include "screen.h"
 #include "uiinput.h"
 
 #include "../osd/modules/lib/osdobj_common.h"
