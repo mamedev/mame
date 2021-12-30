@@ -2,10 +2,10 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        PK-8000
+PK-8000
 
-        18/07/2009 Mostly working driver
-        12/05/2009 Skeleton driver.
+2009-05-12 Skeleton driver.
+2009-07-18 Mostly working driver
 
 ****************************************************************************/
 
@@ -42,7 +42,7 @@ public:
 	void pk8000(machine_config &config);
 
 private:
-	u8 m_keyboard_line;
+	u8 m_keyboard_line = 0U;
 
 	u8 joy_1_r();
 	u8 joy_2_r();
