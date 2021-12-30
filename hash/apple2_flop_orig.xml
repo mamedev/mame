@@ -18500,4 +18500,55 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="mickspca">
+		<description>Mickey's Space Adventure</description>
+		<year>1984</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2021-12-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 64K Apple II+ or later. -->
+		<!--"Mickey's Space Adventure" is a 1984 adventure game developed by Roberta Williams, Peter Oliphant, Robert Eric Heitman, Mark Crowe, Doug MacNeill, Jennifer Nelsen, Terry Pierce, Al Lowe, and Annette Childs, and distributed by Sierra On-Line. It requires a 64K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 1, side a.woz" size="234942" crc="0b4f70db" sha1="9b4f799ad6ab2ffcff9edac36f2c19eddf20b689"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 1, side b.woz" size="234942" crc="4213cb80" sha1="d5e2bd7b3dc7bd9a11b7e22f74da4da5848c4211"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 2, side a.woz" size="234942" crc="c035ffcc" sha1="a46004c7bd16b2a9b012347496efe66f4c56af42"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="234942">
+				<rom name="mickey's space adventure - disk 2, side b.woz" size="234942" crc="5e4cae02" sha1="4624eda8ef93e71ca8237a5cb44cf874f1f7e55e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="envlifed">
+		<description>The Environment Life Dynamic</description>
+		<year>1980</year>
+		<publisher>Avant-Garde Creations</publisher>
+		<info name="release" value="2021-12-29"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"The Environment Life Dynamic" is a 1980 set of action games (Lightning Bug, Moon-Catcher, Jungle Safari, Turn 'Em Loose) developed and distributed by Avant-Garde Creations. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="the environment life dynamic.woz" size="234809" crc="2add673d" sha1="93d69773a0d8e84ff0a1dfe5de5f54e19815e8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
