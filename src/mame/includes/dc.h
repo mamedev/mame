@@ -48,8 +48,8 @@ class dc_state : public driver_device
 		uint32_t root_addr;
 		uint32_t size;
 		uint8_t dir;
-		uint8_t flag;
-		uint8_t indirect;
+		uint8_t enable;
+		uint8_t mode;
 		uint8_t start;
 		uint8_t sel;
 	} m_g2_dma[4];

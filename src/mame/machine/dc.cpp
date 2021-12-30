@@ -96,7 +96,11 @@ void dc_state::generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, ui
 
 TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
 {
+//	machine().scheduler().synchronize();
+
 	m_g2_dma[param].start = g2bus_regs[SB_ADST + (param * 8)] = 0;
+	// TODO: suspend flag
+
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << param;
 	dc_update_interrupt_status();
 }
@@ -197,7 +201,7 @@ TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 
 void dc_state::g2_dma_execute(address_space &space, int channel)
 {
-	uint32_t src,dst,size;
+	uint32_t src, dst, size;
 	dst = m_g2_dma[channel].g2_addr;
 	src = m_g2_dma[channel].root_addr;
 	size = 0;
@@ -205,33 +209,39 @@ void dc_state::g2_dma_execute(address_space &space, int channel)
 	/* 0 rounding size = 32 Mbytes */
 	if (m_g2_dma[channel].size == 0) { m_g2_dma[channel].size = 0x200000; }
 
-	if (m_g2_dma[channel].dir == 0)
+	if (m_g2_dma[channel].dir == 1)
+		std::swap(src, dst);
+
+	// TODO: punt with exception if SB_G2APRO isn't asserted along the way
+	// TODO: raise debug signals if SB_G2DSTO / SB_G2TRTO aren't respected
+	//       (shouldn't matter for AICA RAM?)
+	for (; size < m_g2_dma[channel].size; size += 2)
 	{
-		for (; size<m_g2_dma[channel].size; size += 4)
-		{
-			space.write_dword(dst,space.read_dword(src));
-			src+=4;
-			dst+=4;
-		}
-	}
-	else
-	{
-		for (; size<m_g2_dma[channel].size; size += 4)
-		{
-			space.write_dword(src,space.read_dword(dst));
-			src+=4;
-			dst+=4;
-		}
+		space.write_word(dst,space.read_word(src));
+		src += 2;
+		dst += 2;
 	}
 
-	/* update the params*/
+	// update the params
+	// Note: if you trigger an instant DMA IRQ trigger, sfz3ugd doesn't play any BGM.
+	// G2 bus is 16 bits @ 25 MHz according to Fig. 2-1
+	// TODO: reported limit output for AICA DMA is set at 11.3MB/s while the others at 24.0/26.0
+	// bus contention ftw ...
+	const attotime dma_time = attotime::from_ticks(size / 2, 25000000);
+
 	m_g2_dma[channel].g2_addr = g2bus_regs[SB_ADSTAG + (channel * 8)] = dst;
 	m_g2_dma[channel].root_addr = g2bus_regs[SB_ADSTAR + (channel * 8)] = src;
 	m_g2_dma[channel].size = g2bus_regs[SB_ADLEN + (channel * 8)] = 0;
-	m_g2_dma[channel].flag = (m_g2_dma[channel].indirect & 1) ? 1 : 0;
-	/* Note: if you trigger an instant DMA IRQ trigger, sfz3upper doesn't play any bgm. */
-	/* TODO: timing of this */
-	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_g2_dma[channel].size / 4), timer_expired_delegate(FUNC(dc_state::g2_dma_irq), this), channel);
+	// clear mask flag if the DMA transfer mode is in End mode
+	// (Restart mode leaves this set to true)
+	if (m_g2_dma[channel].mode & 1)
+		m_g2_dma[channel].enable = 0;
+
+	machine().scheduler().timer_set(
+		dma_time,
+		timer_expired_delegate(FUNC(dc_state::g2_dma_irq), this),
+		channel
+	);
 }
 
 // register decode helpers
@@ -342,7 +352,7 @@ void dc_state::dc_update_interrupt_status()
 	/* Wave DMA HW trigger */
 	for (int i = 0; i < 4; i++)
 	{
-		if (m_g2_dma[i].flag && ((m_g2_dma[i].sel & 2) == 2))
+		if (m_g2_dma[i].enable && ((m_g2_dma[i].sel & 2) == 2))
 		{
 			if ((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 			{
@@ -553,12 +563,13 @@ void dc_state::dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, 
 		/*DMA size (in dword units, bit 31 is "set dma initiation enable setting to 0"*/
 		case SB_ADLEN:
 			m_g2_dma[g2chan].size = dat & 0x7fffffff;
-			m_g2_dma[g2chan].indirect = (dat & 0x80000000) >> 31;
+			// Mode (0) Restart (1) End
+			m_g2_dma[g2chan].mode = (dat & 0x80000000) >> 31;
 			break;
 		/*0 = root memory to aica / 1 = aica to root memory*/
 		case SB_ADDIR: m_g2_dma[g2chan].dir = (dat & 1); break;
 		/*dma flag (active HIGH, bug in docs)*/
-		case SB_ADEN: m_g2_dma[g2chan].flag = (dat & 1); break;
+		case SB_ADEN: m_g2_dma[g2chan].enable = (dat & 1); break;
 		/*
 		SB_ADTSEL
 		bit 1: (0) Wave DMA through SB_ADST flag (1) Wave DMA through irq trigger, defined by SB_G2DTNRM / SB_G2DTEXT
@@ -571,12 +582,12 @@ void dc_state::dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, 
 
 			#if DEBUG_AICA_DMA
 			printf("AICA: G2-DMA start \n");
-			printf("DST %08x SRC %08x SIZE %08x IND %02x\n",m_g2_dma[g2chan].g2_addr,m_g2_dma[g2chan].root_addr,m_g2_dma[g2chan].size,m_g2_dma[g2chan].indirect);
-			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_g2_dma[g2chan].sel,m_g2_dma[g2chan].start,m_g2_dma[g2chan].flag,m_g2_dma[g2chan].dir);
+			printf("DST %08x SRC %08x SIZE %08x MODE %02x\n",m_g2_dma[g2chan].g2_addr,m_g2_dma[g2chan].root_addr,m_g2_dma[g2chan].size,m_g2_dma[g2chan].mode);
+			printf("SEL %08x ST  %08x FLAG %08x DIR %02x\n",m_g2_dma[g2chan].sel,m_g2_dma[g2chan].start,m_g2_dma[g2chan].enable,m_g2_dma[g2chan].dir);
 			#endif
 
 			//osd_printf_verbose("SB_ADST data %08x\n",dat);
-			if (((old & 1) == 0) && m_g2_dma[g2chan].flag && m_g2_dma[g2chan].start && ((m_g2_dma[g2chan].sel & 2) == 0)) // 0 -> 1
+			if (((old & 1) == 0) && m_g2_dma[g2chan].enable && m_g2_dma[g2chan].start && ((m_g2_dma[g2chan].sel & 2) == 0)) // 0 -> 1
 				g2_dma_execute(space, g2chan);
 			break;
 
@@ -643,8 +654,8 @@ void dc_state::dc_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	save_item(NAME(m_g2_dma[x].root_addr)); \
 	save_item(NAME(m_g2_dma[x].size)); \
 	save_item(NAME(m_g2_dma[x].dir)); \
-	save_item(NAME(m_g2_dma[x].flag)); \
-	save_item(NAME(m_g2_dma[x].indirect)); \
+	save_item(NAME(m_g2_dma[x].enable)); \
+	save_item(NAME(m_g2_dma[x].mode)); \
 	save_item(NAME(m_g2_dma[x].start)); \
 	save_item(NAME(m_g2_dma[x].sel));
 
