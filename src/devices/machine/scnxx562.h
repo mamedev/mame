@@ -336,7 +336,10 @@ protected:
 	enum
 	{
 		REG_RSR_CHAR_COMPARE        = 0x80,
+		REG_RSR_RTS_NEGATED         = 0x40,
 		REG_RSR_OVERRUN_ERROR       = 0x20,
+		REG_RSR_BRK_END_DETECT      = 0x08,
+		REG_RSR_BRK_START_DETECT    = 0x04,
 		REG_RSR_FRAMING_ERROR       = 0x02,
 		REG_RSR_PARITY_ERROR        = 0x01,
 	};
@@ -344,18 +347,24 @@ protected:
 	enum
 	{
 		REG_GSR_CHAN_A_RXREADY      = 0x01,
-		REG_GSR_CHAN_B_RXREADY      = 0x10,
 		REG_GSR_CHAN_A_TXREADY      = 0x02,
+		REG_GSR_CHAN_A_RXTXSTAT     = 0x04,
+		REG_GSR_CHAN_A_EXTCTSTAT    = 0x08,
+		REG_GSR_CHAN_B_RXREADY      = 0x10,
 		REG_GSR_CHAN_B_TXREADY      = 0x20,
+		REG_GSR_CHAN_B_RXTXSTAT     = 0x40,
+		REG_GSR_CHAN_B_EXTCTSTAT    = 0x80,
 		REG_GSR_XXREADY_MASK        = 0x33
 	};
 
 	enum
 	{
 		REG_ICTSR_ZERO_DET          = 0x40,
+		REG_ICTSR_DELTA_DCD         = 0x20,
 		REG_ICTSR_DELTA_CTS         = 0x10,
 		REG_ICTSR_DCD               = 0x08,
 		REG_ICTSR_CTS               = 0x04,
+		REG_ICTSR_GPIO_MASK         = 0x03
 	};
 
 	enum

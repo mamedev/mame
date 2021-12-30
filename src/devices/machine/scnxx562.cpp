@@ -753,6 +753,7 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
 		if (m_ct-- == 0) // Zero detect
 		{
 			m_ictsr |= REG_ICTSR_ZERO_DET; // set zero detection bit
+			m_uart->m_gsr |= (m_index == duscc_device::CHANNEL_A) ? REG_GSR_CHAN_A_EXTCTSTAT : REG_GSR_CHAN_B_EXTCTSTAT;
 
 			// Generate interrupt?
 			if ( ( (m_ctcr & REG_CTCR_ZERO_DET_INT) == REG_CTCR_ZERO_DET_INT ) &&
@@ -809,8 +810,9 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 		}
 		else
-		{   // clear zero detection bit
+		{
 			m_ictsr &= ~REG_ICTSR_ZERO_DET;
+			m_uart->clear_interrupt(m_index, INT_EXTCTSTAT);
 		}
 		break;
 	case TIMER_ID_RTXC: // Terminate zero detection pulse
@@ -888,6 +890,10 @@ uint8_t duscc_channel::do_dusccreg_ctcr_r()
 void duscc_channel::do_dusccreg_ctcr_w(uint8_t data)
 {
 	LOG("%s(%02x) -  not supported yet\n", FUNCNAME, data);
+	if ((m_ctcr ^ data) == REG_CTCR_ZERO_DET_INT && !(data & REG_CTCR_ZERO_DET_INT))
+	{
+		m_uart->clear_interrupt(m_index, INT_EXTCTSTAT);
+	}
 	m_ctcr = data;
 	return;
 }
@@ -2139,8 +2145,13 @@ void duscc_channel::do_dusccreg_trsr_w(uint8_t data)
 
 void duscc_channel::do_dusccreg_ictsr_w(uint8_t data)
 {
-	LOG("%s: %02x - not supported yet\n", FUNCNAME, data);
-	m_ictsr = data;
+	LOG("%s: %02x(%02x) - not supported yet\n", FUNCNAME, data, m_ictsr);
+	m_ictsr &= ~(data & 0x70);
+	if (!(m_ictsr & 0x70))
+	{
+		m_uart->m_gsr &= ~(m_index == duscc_device::CHANNEL_A ? REG_GSR_CHAN_A_EXTCTSTAT : REG_GSR_CHAN_B_EXTCTSTAT);
+		m_uart->clear_interrupt(m_index, INT_EXTCTSTAT);
+	}
 	return;
 }
 
@@ -2433,14 +2444,16 @@ void duscc_channel::cts_w(int state)
 
 	if (m_cts != state)
 	{
+		m_ictsr |= REG_ICTSR_DELTA_CTS;
+
 		// enable transmitter if in auto enables mode
 		if (!state)
 		{
-			m_ictsr |= REG_ICTSR_DELTA_CTS;
+			m_ictsr &= ~REG_ICTSR_CTS;
 		}
 		else
 		{
-			m_ictsr &= ~REG_ICTSR_DELTA_CTS;
+			m_ictsr |= REG_ICTSR_CTS;
 		}
 
 		if (m_tpr & REG_TPR_CTS && m_tra)
@@ -2461,21 +2474,32 @@ void duscc_channel::cts_w(int state)
 void duscc_channel::dcd_w(int state)
 {
 	LOG("\"%s\" %s: %c : DCD %u - not implemented\n", owner()->tag(), FUNCNAME, 'A' + m_index, state);
-#if 0
 
 	if (m_dcd != state)
 	{
+#if 0
 		// enable receiver if in auto enables mode
 		if (!state)
 			if (reg & REG_AUTO_ENABLES)
 			{
 				reg |= REG_RX_ENABLE;
 			}
+#endif
+
+		m_ictsr |= REG_ICTSR_DELTA_DCD;
+
+		if (!state)
+		{
+			m_ictsr &= ~REG_ICTSR_DCD;
+		}
+		else
+		{
+			m_ictsr |= REG_ICTSR_DCD;
+		}
 
 		// set data carrier detect
 		m_dcd = state;
 	}
-#endif
 }
 
 //-------------------------------------------------
