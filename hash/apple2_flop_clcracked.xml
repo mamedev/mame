@@ -46729,4 +46729,51 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="bridpasb">
+		<description>Bridge Tutor with Precision and Scientific Bidding (cleanly cracked)</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2021-12-27"/>
+		<!--"Bridge Tutor with Precision and Scientific Bidding" is a 1980 educational program developed by Alex Hanuse and distributed by Apple Computer. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bridge tutor with precision and scientific bidding (4am and san inc crack) volume 1.dsk" size="143360" crc="e08ab07d" sha1="b91d055b92c3a6dc6a1e3f14912aba65636a540a"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="bridge tutor with precision and scientific bidding (4am and san inc crack) volume 2.dsk" size="143360" crc="926f46f9" sha1="650ccf62f1aa4b7227d36cdd50fa71bd5c7da165"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frhangmn">
+		<description>The French Hangman (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2021-12-28"/>
+		<!--"The French Hangman" is a 1982 educational program developed and distributed by George Earl. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the french hangman (4am crack).dsk" size="143360" crc="67e321ee" sha1="c0ed5bf1bac516e1c45f7ab9acfa3545ff83d2f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruhangmn">
+		<description>The Russian Hangman (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2021-12-28"/>
+		<!--"The Russian Hangman" (a.k.a. "Russian Practice") is a 1982 educational program developed and distributed by George Earl. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the russian hangman (4am crack).dsk" size="143360" crc="a5e4e256" sha1="bab661ab9695e44bf22441f20597d15324e6febe"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
