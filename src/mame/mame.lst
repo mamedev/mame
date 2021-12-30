@@ -11633,6 +11633,9 @@ tsarevnaa                       //
 akatana                         // (c) 2010 Cave (AMI license) - 2010/ 8/13 MASTER VER.
 ddpdfk                          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
 ddpdfk10                        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
+ddpsdoj                         // (c) 2012 Cave - 2012/04/20
+ddpsdojbl                       // bootleg
+ddpsdojbla                      // bootleg
 deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
 dfkbl                           // (c) 2010 Cave (AMI license) - 2010/1/18 BLACK LABEL
 dsmbl                           // (c) 2008 Cave (AMI license) - 2008/10/06 MEGABLACK LABEL VER
@@ -11658,8 +11661,6 @@ pinkswtsa                       // (c) 2006 Cave (AMI license) - 2006/04/06 MAST
 pinkswtsb                       // (c) 2006 Cave (AMI license) - 2006/04/06 MASTER VER.
 pinkswtsx                       // (c) 2006 Cave (AMI license) - 2006/xx/xx MASTER VER.
 pinkswtssc                      // bootleg
-sdojbl                          // bootleg
-sdojbla                         // bootleg
 
 @source:cvicny.cpp
 cvicny                          //
