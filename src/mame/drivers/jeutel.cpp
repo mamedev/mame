@@ -22,7 +22,6 @@ ToDo:
 - Speech not working because the TMS5110 INT pin is not emulated
 - Le King: Bad sound rom
 - Match doesn't display or work
-- Mechanical sounds
 
 ********************************************************************************/
 
@@ -73,7 +72,7 @@ private:
 	void ppi1b_w(u8 data);
 	void ppi1c_w(u8 data) { m_lamp_data = data; }
 	void ppi2a_w(u8 data);
-	u8 ppi2b_r() { u8 data = 0xff; for (u8 i = 0; i < 4; i++) if (!BIT(m_row, i)) data &= m_io_dips[i]->read(); return data; }
+	u8 ppi2b_r() { u8 data = 0xff; for (u8 i = 0; i < 4; i++) if (!BIT(m_diprow, i)) data &= m_io_dips[i]->read(); return data; }
 	void ppi2c_w(u8 data) { m_sndcmd = data; }
 	void tmaddr_w(u8 data);
 	void tminc_w(u8);
@@ -87,6 +86,7 @@ private:
 	u8 m_sndcmd = 0U;
 	u8 m_digit = 0U;
 	u8 m_row = 0U;
+	u8 m_diprow = 0U;
 	u16 m_tmbyte = 0U;
 	u8 m_tmbit = 0U;
 	u8 m_tmtemp = 0U;
@@ -110,7 +110,7 @@ void jeutel_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom().region("roms", 0);
-	map(0xc000, 0xc3ff).ram().share("shared");
+	map(0xc000, 0xc3ff).ram().share("nvram");
 	map(0xc400, 0xc7ff).ram();
 	map(0xe000, 0xe003).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
@@ -123,7 +123,7 @@ void jeutel_state::cpu2_map(address_map &map)
 	map(0x3000, 0x3003).rw("ppi0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x4000, 0x4000).nopw(); // writes 12 here many times
 	map(0x8000, 0x83ff).ram();
-	map(0xc000, 0xc3ff).ram().share("shared");
+	map(0xc000, 0xc3ff).ram().share("nvram");
 }
 
 void jeutel_state::audio_main_map(address_map &map)
@@ -372,13 +372,22 @@ void jeutel_state::ppi1b_w(u8 data)
 	if (m_digit > 7)
 		m_digit+=2;
 
+	data >>= 4;
 	for (u8 i = 0; i < 8; i++)
-		m_io_outputs[8+(data>>4)*8+i] = BIT(m_lamp_data, i);
+		m_io_outputs[8+data*8+i] = BIT(m_lamp_data, i);
+
+	if (data == 9)
+	{
+		if (BIT(m_lamp_data, 0))
+			m_samples->start(5, 5); // outhole
+		if (BIT(m_lamp_data, 2))
+			m_samples->start(0, 6); // gong
+	}
 }
 
 void jeutel_state::ppi2a_w(u8 data)
 {
-	m_row = data;
+	m_diprow = data;
 	if (!BIT(data, 6))
 		m_audiocpu->reset();
 	if (m_t_c > 0x10)
@@ -393,6 +402,7 @@ void jeutel_state::machine_start()
 
 	save_item(NAME(m_t_c));
 	save_item(NAME(m_row));
+	save_item(NAME(m_diprow));
 	save_item(NAME(m_lamp_data));
 	save_item(NAME(m_sndcmd));
 	save_item(NAME(m_digit));
@@ -436,6 +446,8 @@ void jeutel_state::jeutel(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jeutel_state::audio_main_map);
 	m_audiocpu->set_addrmap(AS_IO, &jeutel_state::audio_io_map);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	/* Video */
 	config.set_default_layout(layout_jeutel);
 
@@ -465,7 +477,7 @@ void jeutel_state::jeutel(machine_config &config)
 	m_ppi[0]->in_pb_callback().set(FUNC(jeutel_state::ppi0b_r));
 	//m_ppi[0]->out_pb_callback().set(FUNC(jeutel_state::ppi0b_w));
 	//m_ppi[0]->in_pc_callback().set(FUNC(jeutel_state::ppi0c_r));
-	//m_ppi[0]->out_pc_callback().set(FUNC(jeutel_state::ppi0c_w));
+	m_ppi[0]->out_pc_callback().set(FUNC(jeutel_state::ppi0c_w));
 
 	I8255A(config, m_ppi[1]);   // IC32
 	//m_ppi[1]->in_pa_callback().set(FUNC(jeutel_state::ppi1a_r));
@@ -473,7 +485,7 @@ void jeutel_state::jeutel(machine_config &config)
 	//m_ppi[1]->in_pb_callback().set(FUNC(jeutel_state::ppi1b_r));
 	m_ppi[1]->out_pb_callback().set(FUNC(jeutel_state::ppi1b_w));
 	//m_ppi[1]->in_pc_callback().set(FUNC(jeutel_state::ppi1c_r));
-	//m_ppi[1]->out_pc_callback().set(FUNC(jeutel_state::ppi1c_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(jeutel_state::ppi1c_w));
 
 	I8255A(config, m_ppi[2]);   // IC33
 	//m_ppi[2]->in_pa_callback().set(FUNC(jeutel_state::ppi2a_r));
