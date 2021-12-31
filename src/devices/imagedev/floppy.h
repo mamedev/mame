@@ -28,14 +28,14 @@ public:
 	format_registration();
 
 	void add(floppy_format_type format);
-	void add(const filesystem_manager_t &fs);
+	void add(const fs::manager_t &fs);
 
 	void add_fm_containers();
 	void add_mfm_containers();
 	void add_pc_formats();
 
 	std::vector<floppy_format_type> m_formats;
-	std::vector<const filesystem_manager_t *> m_fs;
+	std::vector<const fs::manager_t *> m_fs;
 };
 
 class floppy_image_device : public device_t,
@@ -50,14 +50,14 @@ public:
 	typedef delegate<void (floppy_image_device *, int)> led_cb;
 
 	struct fs_info {
-		const filesystem_manager_t *m_manager;
+		const fs::manager_t *m_manager;
 		floppy_format_type m_type;
 		u32 m_image_size;
 		const char *m_name;
 		u32 m_key;
 		const char *m_description;
 
-		fs_info(const filesystem_manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
+		fs_info(const fs::manager_t *manager, floppy_format_type type, u32 image_size, const char *name, const char *description) :
 			m_manager(manager),
 			m_type(type),
 			m_image_size(image_size),
@@ -87,7 +87,7 @@ public:
 	floppy_image_format_t *identify(std::string filename);
 	void set_rpm(float rpm);
 
-	void init_fs(const fs_info *fs, const fs_meta_data &meta);
+	void init_fs(const fs_info *fs, const fs::meta_data &meta);
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -156,11 +156,11 @@ public:
 	void    enable_sound(bool doit) { m_make_sound = doit; }
 
 protected:
-	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
+	struct fs_enum : public fs::manager_t::floppy_enumerator {
 		floppy_image_device *m_fid;
-		const filesystem_manager_t *m_manager;
+		const fs::manager_t *m_manager;
 
-		fs_enum(floppy_image_device *fid) : filesystem_manager_t::floppy_enumerator(), m_fid(fid) {};
+		fs_enum(floppy_image_device *fid) : fs::manager_t::floppy_enumerator(), m_fid(fid) {};
 
 		virtual void add(floppy_format_type type, u32 image_size, const char *name, const char *description) override;
 		virtual void add_raw(const char *name, u32 key, const char *description) override;
@@ -191,7 +191,7 @@ protected:
 	char                  extension_list[256];
 	std::vector<floppy_image_format_t *> fif_list;
 	std::vector<fs_info>  m_create_fs, m_io_fs;
-	std::vector<const filesystem_manager_t *> m_fs_managers;
+	std::vector<const fs::manager_t *> m_fs_managers;
 	emu_timer             *index_timer;
 
 	/* Physical characteristics, filled by setup_characteristics */
