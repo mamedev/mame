@@ -94,6 +94,10 @@
         * NBA Showtime
         * NBA Showtime / NFL Blitz 2000 Gold
         * Cart Fury
+		
+	DCS2 pinball 2000 driver
+		* Revenge from Mars
+		* Star Wars Episode 1
 
 *****************************************************************************
 
@@ -356,6 +360,11 @@ void dcs_audio_device::dcs2_2104_program_map(address_map &map)
 	map(0x0000, 0x01ff).ram().share("dcsint");
 }
 
+void dcs_audio_device::dcs2_2104_pin2k_program_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0000, 0x01ff).ram().share("dcsint");
+}
 
 void dcs_audio_device::dcs2_2115_data_map(address_map &map)
 {
@@ -383,6 +392,20 @@ void dcs_audio_device::dcs2_2104_data_map(address_map &map)
 	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
 }
 
+void dcs_audio_device::dcs2_2104_pin2k_data_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x0400, 0x0400).rw(FUNC(dcs_audio_device::input_latch_r), FUNC(dcs_audio_device::input_latch_ack_w));
+	map(0x0401, 0x0401).rw(FUNC(dcs_audio_device::output_latch_r), FUNC(dcs_audio_device::output_latch_w));
+	map(0x0402, 0x0402).rw(FUNC(dcs_audio_device::output_control_r), FUNC(dcs_audio_device::output_control_w));
+	map(0x0403, 0x0403).r(FUNC(dcs_audio_device::latch_status_r));
+	map(0x0404, 0x0407).r(FUNC(dcs_audio_device::fifo_input_r));
+	map(0x0413, 0x0413).r(FUNC(dcs_audio_device::pin2000_status_r));
+	map(0x0480, 0x0483).rw(FUNC(dcs_audio_device::sdrc_r), FUNC(dcs_audio_device::sdrc_w));
+	map(0x3800, 0x3fff).ram().share("iram");
+	map(0x3fe0, 0x3fff).rw(FUNC(dcs_audio_device::adsp_control_r), FUNC(dcs_audio_device::adsp_control_w));
+	
+}
 
 
 /*************************************
@@ -583,6 +606,10 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
 	/* initialize the comm bits */
 	SET_INPUT_EMPTY();
 	SET_OUTPUT_EMPTY();
+	// for pin2k
+	m_scriptmodeactive = 0;
+	m_pin2k_state = 0;
+	// --
 	if (!m_last_input_empty && !m_input_empty_cb.isnull())
 		m_input_empty_cb(m_last_input_empty = 1);
 	if (m_last_output_full && !m_output_full_cb.isnull())
@@ -1512,7 +1539,11 @@ uint16_t dcs_audio_device::fifo_input_r()
 	else
 		return 0xffff;
 }
-
+// for showing the data to de debugger ;)
+uint16_t dcs_audio_device::output_latch_r()
+{
+	return m_output_data;
+}
 
 
 /***************************************************************************
@@ -1560,6 +1591,32 @@ void dcs_audio_device::data_w(uint16_t data)
 		dcs_delayed_data_w(data);
 }
 
+void dcs_audio_device::data_w_pin2k(uint16_t data)
+{
+	/* preprocess the write */
+	// ADSP2181 variants use IDMA to transfer data
+	
+	if (data == 0xace1)
+	{
+		m_scriptmodeactive = 1;
+		logerror("script mode is now 1\n");
+	}
+	if (data == 0xacef)
+	{
+		m_scriptmodeactive = 0;
+		//logerror("script mode is now 0\n");
+	}
+	
+	if (m_rev <= REV_DCS2 && preprocess_write_pin2k(data))
+		return;
+	
+	 m_pin2k_state = 0; // command has been sent
+	/* if we are DCS1, set a timer to latch the data */
+	if (!m_sport0_timer)
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dcs_audio_device::dcs_delayed_data_w_callback),this), data);
+	else
+		dcs_delayed_data_w(data);
+}
 
 void dcs_audio_device::input_latch_ack_w(uint16_t data)
 {
@@ -1600,7 +1657,19 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
 {
 	if (!m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 1);
-	SET_OUTPUT_FULL();
+	// for pin2k
+	if (m_pre_output_data == 0x0c && m_scriptmodeactive == 1)
+	{
+		m_scriptmodeactive = 2;
+		
+		//logerror("script mode is now 2\n");
+	}
+	if (m_scriptmodeactive == 2)
+		
+		SET_INPUT_FULL();
+	else
+		SET_OUTPUT_FULL();
+	m_pin2k_state = 1;
 	m_output_data = m_pre_output_data;
 }
 
@@ -1661,7 +1730,48 @@ uint16_t dcs_audio_device::data_r()
 	return m_output_data;
 }
 
+uint16_t dcs_audio_device::data_r_pin2k()
+{
+	// If the cpu is reading empty data it is probably polling so eat some cyles
+	if IS_OUTPUT_EMPTY()
+		m_maincpu->eat_cycles(4444);
+	
+	/* data is actually only 8 bit (read from d8-d15, which is d0-d7 from the data access instructions POV) on early dcs, but goes 16 on later (seattle) */
+	if (m_last_output_full && !m_output_full_cb.isnull())
+		m_output_full_cb(m_last_output_full = 0);
+	SET_OUTPUT_EMPTY();
+	m_pin2k_state = 2;
+	if (LOG_DCS_IO)
+		logerror("%s:dcs_data_r(%04X)\n", machine().describe_context(), m_output_data);
+	return m_output_data;
+}
 
+
+uint16_t dcs_audio_device::pin2000_status_r()
+{
+	int result = 0;
+	if (m_scriptmodeactive == 2)
+	{
+		if (IS_INPUT_FULL())
+			result |= 0x80;
+		if (IS_OUTPUT_EMPTY())
+			result |= 0x40;
+	}
+	else
+		switch (m_pin2k_state)
+		{
+			case 1:
+				result = 0x80;
+				break;
+			case 2:
+				result = 0x40;
+				break;
+			default:
+				result = 0;
+				break;
+		}
+	return result;
+}
 
 /***************************************************************************
     OUTPUT CONTROL BITS (has 3 additional lines to the host)
@@ -2047,7 +2157,7 @@ void dcs_audio_device::recompute_sample_rate()
 
 	/* frequency the time per each bit sent */
 	attotime sample_period;
-	if (m_control_regs[S1_CONTROL_REG] & 0x4000) {
+	if (m_control_regs[S1_CONTROL_REG] & 0x4000 && m_dcs_pin2k == 0) { // pin2k needs fix freq of 31250!
 		// Use internal clock for SPORT1 Tx timing
 		sample_period = attotime::from_hz(m_cpu->unscaled_clock()) * (2 * (m_control_regs[S1_SCLKDIV_REG] + 1));
 		/* now put it down to samples, so we know what the channel frequency has to be */
@@ -2350,7 +2460,121 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 	}
 	return 0;
 }
+int dcs_audio_device::preprocess_stage_1_pin2k(uint16_t data)
+{
+	hle_transfer_state &transfer = m_transfer;
 
+	switch (transfer.state)
+	{
+		case 0:
+			
+			if (data == 0x000e) // 77 PM words of loading data
+			{
+				transfer.start_command = data;
+				transfer.start = 0;
+				transfer.stop = ((data + 1) * 8) - 1;
+				if (LOG_DCS_TRANSFERS)
+					logerror("Stop address = %04X\n", transfer.stop);
+				logerror("script mode %02x\n", m_scriptmodeactive);
+				transfer.state++;
+				transfer.writes_left = transfer.stop - transfer.start + 1;
+				if (transfer.hle_enabled)
+					return 1;
+			}
+			
+			else
+			{
+				if (LOG_DCS_TRANSFERS)
+					logerror("Command: %04X\n", data);
+			}
+			break;
+
+		case 1:
+			if ((data & 0xff00) > 0) {
+				dcs_delayed_data_w(transfer.start_command);
+				transfer.state = 0;
+				return 0;
+				
+			}
+			if (m_scriptmodeactive == 2) {
+				m_scriptmodeactive = 0;
+				logerror("stop script mode\n");
+				//dcs_delayed_data_w(0xacef); // stop script mode after reloading data
+				m_cpu->set_input_line(ADSP2105_IRQ2, ASSERT_LINE);
+
+				/* indicate we are no longer empty */
+				if (m_last_input_empty && !m_input_empty_cb.isnull())
+					m_input_empty_cb(m_last_input_empty = 0);
+				SET_INPUT_FULL(); 
+
+				/* set the data */
+				m_input_data = 0xacef;
+				
+			}
+			transfer.sum += data;
+			
+			
+				
+			switch (transfer.word_counter)
+			{
+				case 0:
+					transfer.temp = (data << 16) & 0xff0000;
+					break;
+				case 1:
+					transfer.temp |= data & 0xff;
+					break;
+				case 2:
+					transfer.temp |= (data << 8) & 0xff00;
+					transfer.transfer_data[transfer.writes_left - 1] = transfer.temp;
+					//m_program->write_dword(transfer.stop, transfer.temp);
+					if (LOG_DCS_TRANSFERS)
+						logerror("transfer: %06x\n", transfer.temp);
+					break;
+			}
+			
+			
+			transfer.word_counter++;
+			if (transfer.word_counter > 2)
+			{
+				transfer.word_counter = 0;
+				
+				if (--transfer.writes_left == 0)
+				{
+					
+					if (LOG_DCS_TRANSFERS) logerror("Transfer done, sum = %04X\n", transfer.sum);
+					transfer.state = 2;
+					
+				}
+			}
+			return 1;
+			break;
+
+		case 2:
+			/* wait for command 0xe */
+			if (data == transfer.start_command) {
+				if (LOG_DCS_TRANSFERS) logerror("transfer done, writing data\n"); // trigger irq??
+				for (int32_t i = transfer.stop; i >= 0; i--)
+				{
+					if (LOG_DCS_TRANSFERS) logerror("address: %04x data %06x\n", i, transfer.transfer_data[i]);
+					m_program->write_dword(i, transfer.transfer_data[i]);
+				}
+				if (LOG_DCS_TRANSFERS) logerror("transfer done, writing data finished\n"); // trigger irq??
+				
+				transfer.state = 0;
+				transfer.sum = 0;
+				
+					
+					
+					
+				
+			}
+				return 1; 
+			break;
+
+		
+	}
+	return 0;
+}
 
 TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
 {
@@ -2493,6 +2717,31 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 	return result;
 }
 
+int dcs_audio_device::preprocess_write_pin2k(uint16_t data)
+{
+	hle_transfer_state &transfer = m_transfer;
+	int result;
+
+	/* if we're not DCS2, skip */
+	if (!m_sport0_timer)
+		return 0;
+
+	/* state 0 - initialization phase */
+	if (transfer.dcs_state == 0)
+		result = preprocess_stage_1_pin2k(data);
+	else
+		result = preprocess_stage_2(data);
+
+	/* if we did the write, toggle the full/not full state so interrupts are generated */
+	if (result && !m_input_empty_cb.isnull())
+	{
+		if (m_last_input_empty)
+			m_input_empty_cb(m_last_input_empty = 0);
+		if (!m_last_input_empty)
+			m_input_empty_cb(m_last_input_empty = 1);
+	}
+	return result;
+}
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 
 void dcs_audio_device::add_mconfig_dcs(machine_config &config)
@@ -2649,6 +2898,28 @@ void dcs2_audio_2104_device::device_add_mconfig(machine_config &config)
 	dcs2.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
 	dcs2.set_addrmap(AS_PROGRAM, &dcs2_audio_2104_device::dcs2_2104_program_map);
 	dcs2.set_addrmap(AS_DATA, &dcs2_audio_2104_device::dcs2_2104_data_map);
+}
+
+DEFINE_DEVICE_TYPE(DCS2_AUDIO_2104_PIN2K, dcs2_audio_2104_pin2k_device, "dcs2_audio_2104_pin2k", "DCS2 Audio 2104 Pin2K")
+
+//-------------------------------------------------
+//  dcs2_audio_2104__pin2k_device - constructor
+//-------------------------------------------------
+
+dcs2_audio_2104_pin2k_device::dcs2_audio_2104_pin2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dcs2_audio_device(mconfig, DCS2_AUDIO_2104_PIN2K, tag, owner, clock)
+{
+}
+
+void dcs2_audio_2104_pin2k_device::device_add_mconfig(machine_config &config)
+{
+	dcs2_audio_device::add_mconfig_dcs2(config);
+	m_dcs_pin2k = 1;
+	adsp2104_device &dcs2(ADSP2104(config.replace(), "dcs2", XTAL(16'000'000)));
+	dcs2.sport_tx().set(FUNC(dcs_audio_device::sound_tx_callback)); /* callback for serial transmit */
+	dcs2.timer_fired().set(FUNC(dcs_audio_device::timer_enable_callback)); /* callback for timer fired */
+	dcs2.set_addrmap(AS_PROGRAM, &dcs2_audio_2104_pin2k_device::dcs2_2104_pin2k_program_map);
+	dcs2.set_addrmap(AS_DATA, &dcs2_audio_2104_pin2k_device::dcs2_2104_pin2k_data_map);
 }
 
 DEFINE_DEVICE_TYPE(DCS2_AUDIO_DSIO, dcs2_audio_dsio_device, "dcs2_audio_dsio", "DCS2 Audio DSIO")
