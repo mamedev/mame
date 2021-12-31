@@ -950,6 +950,9 @@ adacp150p                       //
 @source:adam.cpp
 adam                            // Coleco Adam
 
+@source:adds2020.cpp
+adds2020                        //
+
 @source:adm11.cpp
 adm12                           //
 
