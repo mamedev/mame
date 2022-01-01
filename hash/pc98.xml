@@ -69856,10 +69856,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
     <!-- The company Kao used to add a bonus disk in Kao's 10-pack of floppy disks with trial versions of -->
     <!-- the game and graphics collections as an extra. Eventually, they made the full version of the game -->
     <!-- available in the bonus disk. This game was not available for sale in regular computer game stores. -->
-<<<<<<< HEAD
     <!-- The label in the floppy disk indicates the game is for PC-9800 series (PC-9801 V or later) -->
-=======
->>>>>>> 4288fd3985a425e1bd2ffda28fc949aee211d7f4
     <software name="route246" supported="yes">
 		<description>Kao Floppy Gekijou - Route 246 Satsujin Annai</description>
 		<year>1991</year>
@@ -69874,11 +69871,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 
     <!-- There is no sound when run on PC-9821 -->
     <!-- PC-9801 has sound but every now and then the game crashes -->
-<<<<<<< HEAD
     <software name="3takun" supported="no">
-=======
-    <software name="3takun" supported="partial">
->>>>>>> 4288fd3985a425e1bd2ffda28fc949aee211d7f4
 		<description>Santa-kun</description>
 		<year>1991</year>
 		<publisher>アクティブ (Active)</publisher>
