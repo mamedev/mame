@@ -675,6 +675,13 @@ static int hdwrite(int argc, char *argv[])
 	return generic_write(ih, argv[4], argv[5]);
 }
 
+static int version(int argc, char *argv[])
+{
+	extern const char build_version[];
+	fprintf(stdout, "%s\n", build_version);
+	return 0;
+}
+
 int CLIB_DECL main(int argc, char *argv[])
 {
 	formats.init();
@@ -703,6 +710,8 @@ int CLIB_DECL main(int argc, char *argv[])
 			return hdread(argc, argv);
 		else if(!core_stricmp("hdwrite", argv[1]))
 			return hdwrite(argc, argv);
+		else if (!core_stricmp("-version", argv[1]))
+			return version(argc, argv);
 		else {
 			fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
 			display_usage();
