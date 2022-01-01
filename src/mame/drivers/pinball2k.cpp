@@ -266,7 +266,7 @@ private:
 
 	uint32_t m_cx5520_regs[256/4];
 	uint32_t m_prism_regs[256/4];
-	uint32_t m_mediagx_regs[256/4];
+	uint32_t m_mediagx_regs[65];
 	
 	// mediaGX Control registers GX_BASE + 0x8000
 	uint32_t disp_ctrl_r(offs_t offset);
@@ -1187,7 +1187,7 @@ void pinball2k_state::nvram_updates_w(offs_t offset, uint16_t data)
 		
 		return;
 	}
-	else if ((m_1200_mode == 6))
+	else if (m_1200_mode == 6)
 	{
 		if (offset >= 0x3e0000) {
 		
