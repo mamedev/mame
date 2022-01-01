@@ -2100,4 +2100,16 @@ if opt_tool(FORMATS, "FS_ORIC_JASMIN") then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/lib/formats/fs_coco_rsdos.h,FORMATS["FS_COCO_RSDOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_COCO_RSDOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_coco_rsdos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_coco_rsdos.h",
+	}
+end
+
 end
