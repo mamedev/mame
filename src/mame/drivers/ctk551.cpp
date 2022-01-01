@@ -115,11 +115,12 @@ INPUT_CHANGED_MEMBER(ctk551_state::switch_w)
 WRITE_LINE_MEMBER(ctk551_state::apo_w)
 {
 	logerror("apo_w: %x\n", state);
-	/* auto power off - disable the LCD
+	/* auto power off - disable the LCD and speakers
 	the CPU will go to sleep until the power switch triggers a NMI */
-	if (state)
+	if (!state)
 		m_lcdc->reset();
-	m_led_power = !state;
+	m_led_power = state;
+	m_maincpu->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.0);
 }
 
 
@@ -143,7 +144,7 @@ void ctk551_state::ctk551_io_map(address_map &map)
 {
 	map(h8_device::PORT_1, h8_device::PORT_1).portr("P1_R").portw("P1_W").umask16(0x00ff);
 	map(h8_device::PORT_2, h8_device::PORT_2).portrw("P2").umask16(0x00ff);
-	map(h8_device::PORT_3, h8_device::PORT_3).portrw("P3").umask16(0x00ff);
+	map(h8_device::PORT_3, h8_device::PORT_3).noprw(); // port 3 pins are shared w/ key matrix
 	map(h8_device::ADC_0,  h8_device::ADC_0).portr("AN0");
 	map(h8_device::ADC_1,  h8_device::ADC_1).portr("AN1");
 }
@@ -165,8 +166,8 @@ void ctk551_state::ctk551(machine_config &config)
 	// 30MHz oscillator, divided down internally (otherwise the test mode's OK/NG sounds play at double speed)
 	GT913(config, m_maincpu, 30'000'000 / 2);
 	m_maincpu->set_addrmap(AS_IO, &ctk551_state::ctk551_io_map);
-	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(0, "lspeaker", 1.0);
-	m_maincpu->subdevice<gt913_sound_device>("gt_sound")->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "lspeaker", 1.0);
+	m_maincpu->add_route(1, "rspeaker", 1.0);
 
 	// MIDI
 	auto &mdin(MIDI_PORT(config, "mdin"));
@@ -335,7 +336,7 @@ INPUT_PORTS_START(ctk551)
 	PORT_START("P1_W")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk551_state, led_touch_w)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )  // unknown
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk551_state, apo_w)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, e_w)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk551_state, lcd_w)
 
@@ -344,11 +345,6 @@ INPUT_PORTS_START(ctk551)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rs_w)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("lcdc", hd44780_device, rw_w)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("P3")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(ctk551_state, apo_w)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("AN0")
 	PORT_CONFNAME( 0xff, 0x00, "Power Source" )
