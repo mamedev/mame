@@ -8,7 +8,9 @@
 
 #include <stdexcept>
 
-const fs_oric_jasmin FS_ORIC_JASMIN;
+namespace fs {
+
+const oric_jasmin_image ORIC_JASMIN;
 
 // Floppy only, format is 41 tracks, 1/2 heads, 17 sectors.
 // Filesystem has no subdirectories.
@@ -42,17 +44,17 @@ const fs_oric_jasmin FS_ORIC_JASMIN;
 //     offset 04-05: length of the file in bytes on the first sector, ffff otherwise
 //     offset 06+  : reference to data sectors, (ff, ff) when done
 
-const char *fs_oric_jasmin::name() const
+const char *oric_jasmin_image::name() const
 {
 	return "oric_jasmin";
 }
 
-const char *fs_oric_jasmin::description() const
+const char *oric_jasmin_image::description() const
 {
 	return "Oric Jasmin";
 }
 
-void fs_oric_jasmin::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, const std::vector<uint32_t> &variants) const
+void oric_jasmin_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const std::vector<u32> &variants) const
 {
 	if(has(form_factor, variants, floppy_image::FF_3, floppy_image::DSDD))
 		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 356864, "oric_jasmin_ds", "Oric Jasmin dual-sided");
@@ -60,52 +62,52 @@ void fs_oric_jasmin::enumerate_f(floppy_enumerator &fe, uint32_t form_factor, co
 		fe.add(FLOPPY_ORIC_JASMIN_FORMAT, 178432, "oric_jasmin_ss", "Oric Jasmin single-sided");
 }
 
-std::unique_ptr<filesystem_t> fs_oric_jasmin::mount(fsblk_t &blockdev) const
+std::unique_ptr<filesystem_t> oric_jasmin_image::mount(fsblk_t &blockdev) const
 {
 	return std::make_unique<impl>(blockdev);
 }
 
-bool fs_oric_jasmin::can_format() const
+bool oric_jasmin_image::can_format() const
 {
 	return true;
 }
 
-bool fs_oric_jasmin::can_read() const
+bool oric_jasmin_image::can_read() const
 {
 	return true;
 }
 
-bool fs_oric_jasmin::can_write() const
+bool oric_jasmin_image::can_write() const
 {
 	return true;
 }
 
-bool fs_oric_jasmin::has_rsrc() const
+bool oric_jasmin_image::has_rsrc() const
 {
 	return false;
 }
 
-std::vector<fs_meta_description> fs_oric_jasmin::volume_meta_description() const
+std::vector<meta_description> oric_jasmin_image::volume_meta_description() const
 {
-	std::vector<fs_meta_description> res;
-	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "UNTITLED", false, [](const fs_meta &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
+	std::vector<meta_description> res;
+	res.emplace_back(meta_description(meta_name::name, meta_type::string, "UNTITLED", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "Volume name, up to 8 characters"));
 
 	return res;
 }
 
-fs_meta_data fs_oric_jasmin::impl::metadata()
+meta_data oric_jasmin_image::impl::metadata()
 {
-	fs_meta_data res;
+	meta_data res;
 	auto bdir = m_blockdev.get(20*17);
 	int len = 8;
 	while(len > 0 && bdir.rodata()[0xf8 + len - 1] == ' ')
 		len--;
 
-	res.set(fs_meta_name::name, bdir.rstr(0xf8, len));
+	res.set(meta_name::name, bdir.rstr(0xf8, len));
 	return res;
 }
 
-bool fs_oric_jasmin::validate_filename(std::string name)
+bool oric_jasmin_image::validate_filename(std::string name)
 {
 	auto pos = name.find('.');
 	if(pos != std::string::npos)
@@ -114,30 +116,30 @@ bool fs_oric_jasmin::validate_filename(std::string name)
 		return name.size() > 0 && name.size() <= 8;
 }
 
-std::vector<fs_meta_description> fs_oric_jasmin::file_meta_description() const
+std::vector<meta_description> oric_jasmin_image::file_meta_description() const
 {
-	std::vector<fs_meta_description> res;
-	res.emplace_back(fs_meta_description(fs_meta_name::name, fs_meta_type::string, "", false, [](const fs_meta &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
-	res.emplace_back(fs_meta_description(fs_meta_name::loading_address, fs_meta_type::number, 0x501, false, [](const fs_meta &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
-	res.emplace_back(fs_meta_description(fs_meta_name::length, fs_meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
-	res.emplace_back(fs_meta_description(fs_meta_name::size_in_blocks, fs_meta_type::number, 0, true, nullptr, "Number of blocks used by the file"));
-	res.emplace_back(fs_meta_description(fs_meta_name::locked, fs_meta_type::flag, false, false, nullptr, "File locked"));
-	res.emplace_back(fs_meta_description(fs_meta_name::sequential, fs_meta_type::flag, true, false, nullptr, "File sequential"));
+	std::vector<meta_description> res;
+	res.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
+	res.emplace_back(meta_description(meta_name::loading_address, meta_type::number, 0x501, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
+	res.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
+	res.emplace_back(meta_description(meta_name::size_in_blocks, meta_type::number, 0, true, nullptr, "Number of blocks used by the file"));
+	res.emplace_back(meta_description(meta_name::locked, meta_type::flag, false, false, nullptr, "File locked"));
+	res.emplace_back(meta_description(meta_name::sequential, meta_type::flag, true, false, nullptr, "File sequential"));
 	return res;
 }
 
 
-void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
+void oric_jasmin_image::impl::format(const meta_data &meta)
 {
-	std::string volume_name = meta.get_string(fs_meta_name::name, "UNTITLED");
-	uint32_t blocks = m_blockdev.block_count();
+	std::string volume_name = meta.get_string(meta_name::name, "UNTITLED");
+	u32 blocks = m_blockdev.block_count();
 
 	m_blockdev.fill(0x6c);
 
-	uint32_t bblk = 20*17;
+	u32 bblk = 20*17;
 	auto fmap = m_blockdev.get(bblk);
-	uint32_t off = 0;
-	for(uint32_t blk = 0; blk != blocks; blk += 17) {
+	u32 off = 0;
+	for(u32 blk = 0; blk != blocks; blk += 17) {
 		if(blk == bblk)
 			fmap.w24l(off, 0x07fff);
 		else
@@ -145,7 +147,7 @@ void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
 		off += 3;
 	}
 
-	for(uint32_t blk = blocks; blk != 17*42*2; blk += 17) {
+	for(u32 blk = blocks; blk != 17*42*2; blk += 17) {
 		fmap.w24l(off, 0x800000);
 		off += 3;
 	}
@@ -161,14 +163,14 @@ void fs_oric_jasmin::impl::format(const fs_meta_data &meta)
 	bdir.w16l(2, 0x0000);
 }
 
-fs_oric_jasmin::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 256), m_root(true)
+oric_jasmin_image::impl::impl(fsblk_t &blockdev) : filesystem_t(blockdev, 256), m_root(true)
 {
 }
 
-bool fs_oric_jasmin::impl::ref_valid(uint16_t ref)
+bool oric_jasmin_image::impl::ref_valid(u16 ref)
 {
-	uint8_t track = ref >> 8;
-	uint8_t sector = ref & 0xff;
+	u8 track = ref >> 8;
+	u8 sector = ref & 0xff;
 	if(sector < 1 || sector > 17)
 		return false;
 	if(track >= m_blockdev.block_count()/17)
@@ -176,21 +178,21 @@ bool fs_oric_jasmin::impl::ref_valid(uint16_t ref)
 	return true;
 }
 
-uint32_t fs_oric_jasmin::impl::cs_to_block(uint16_t ref)
+u32 oric_jasmin_image::impl::cs_to_block(u16 ref)
 {
-	uint8_t track = ref >> 8;
-	uint8_t sector = ref & 0xff;
+	u8 track = ref >> 8;
+	u8 sector = ref & 0xff;
 	return track * 17 + sector - 1;
 }
 
-uint16_t fs_oric_jasmin::impl::block_to_cs(uint32_t block)
+u16 oric_jasmin_image::impl::block_to_cs(u32 block)
 {
-	uint8_t track = block / 17;
-	uint8_t sector = (block % 17) + 1;
+	u8 track = block / 17;
+	u8 sector = (block % 17) + 1;
 	return (track << 8) | sector;
 }
 
-std::string fs_oric_jasmin::impl::read_file_name(const uint8_t *p)
+std::string oric_jasmin_image::impl::read_file_name(const u8 *p)
 {
 	int main_len;
 	for(main_len = 8; main_len > 0; main_len--)
@@ -209,49 +211,49 @@ std::string fs_oric_jasmin::impl::read_file_name(const uint8_t *p)
 }
 
 
-filesystem_t::dir_t fs_oric_jasmin::impl::root()
+filesystem_t::dir_t oric_jasmin_image::impl::root()
 {
 	if(!m_root)
 		m_root = new root_dir(*this);
 	return m_root.strong();
 }
 
-void fs_oric_jasmin::impl::drop_root_ref()
+void oric_jasmin_image::impl::drop_root_ref()
 {
 	m_root = nullptr;
 }
 
-void fs_oric_jasmin::impl::root_dir::drop_weak_references()
+void oric_jasmin_image::impl::root_dir::drop_weak_references()
 {
 	m_fs.drop_root_ref();
 }
 
-fs_meta_data fs_oric_jasmin::impl::root_dir::metadata()
+meta_data oric_jasmin_image::impl::root_dir::metadata()
 {
-	return fs_meta_data();
+	return meta_data();
 }
 
-std::vector<fs_dir_entry> fs_oric_jasmin::impl::root_dir::contents()
+std::vector<dir_entry> oric_jasmin_image::impl::root_dir::contents()
 {
-	std::vector<fs_dir_entry> res;
+	std::vector<dir_entry> res;
 
 	auto bdir = m_fs.m_blockdev.get(20*17+1);
-	uint64_t id = 0;
+	u64 id = 0;
 	for(;;) {
-		for(uint32_t i = 0; i != 14; i ++) {
-			uint32_t off = 4 + i*18;
-			uint16_t ref = bdir.r16b(off);
+		for(u32 i = 0; i != 14; i ++) {
+			u32 off = 4 + i*18;
+			u16 ref = bdir.r16b(off);
 			std::string fname = read_file_name(bdir.rodata()+off+3);
 			bool system = ref == 0 && id == 0 && bdir.r32b(off+0xb) == 0x2e535953;
 			if(system)
-				res.emplace_back(fs_dir_entry(fname, fs_dir_entry_type::system_file, 0));
+				res.emplace_back(dir_entry(fname, dir_entry_type::system_file, 0));
 
 			else if(m_fs.ref_valid(ref))
-				res.emplace_back(fs_dir_entry(fname, fs_dir_entry_type::file, id));
+				res.emplace_back(dir_entry(fname, dir_entry_type::file, id));
 
 			id++;
 		}
-		uint16_t ref = bdir.r16b(2);
+		u16 ref = bdir.r16b(2);
 		if(!ref || !m_fs.ref_valid(ref))
 			break;
 		bdir = m_fs.m_blockdev.get(cs_to_block(ref));
@@ -259,24 +261,24 @@ std::vector<fs_dir_entry> fs_oric_jasmin::impl::root_dir::contents()
 	return res;
 }
 
-std::pair<fsblk_t::block_t, uint32_t> fs_oric_jasmin::impl::root_dir::get_dir_block(uint64_t key)
+std::pair<fsblk_t::block_t, u32> oric_jasmin_image::impl::root_dir::get_dir_block(u64 key)
 {
 	auto bdir = m_fs.m_blockdev.get(20*17+1);
 	while(key >= 14) {
-		uint16_t ref = bdir.r16b(2);
+		u16 ref = bdir.r16b(2);
 		if(!ref || !m_fs.ref_valid(ref))
 			throw std::invalid_argument("Incorrect file key");
 		bdir = m_fs.m_blockdev.get(cs_to_block(ref));
 		key -= 14;
 	}
-	return std::pair<fsblk_t::block_t, uint32_t>(bdir, 4 + key * 18);
+	return std::pair<fsblk_t::block_t, u32>(bdir, 4 + key * 18);
 }
 
-filesystem_t::file_t fs_oric_jasmin::impl::root_dir::file_get(uint64_t key)
+filesystem_t::file_t oric_jasmin_image::impl::root_dir::file_get(u64 key)
 {
-	uint64_t rkey = key;
+	u64 rkey = key;
 	auto [bdir, off] = get_dir_block(rkey);
-	uint16_t ref = bdir.r16b(off);
+	u16 ref = bdir.r16b(off);
 	bool system = ref == 0 && key == 0 && bdir.r32b(off+0xb) == 0x2e535953;
 	if(system)
 		return file_t(new system_file(m_fs, this, bdir.rodata() + off, key));
@@ -286,19 +288,19 @@ filesystem_t::file_t fs_oric_jasmin::impl::root_dir::file_get(uint64_t key)
 	return file_t(new file(m_fs, this, bdir.rodata() + off, key));
 }
 
-void fs_oric_jasmin::impl::root_dir::update_file(uint16_t key, const uint8_t *entry)
+void oric_jasmin_image::impl::root_dir::update_file(u16 key, const u8 *entry)
 {
-	uint64_t rkey = key;
+	u64 rkey = key;
 	auto [bdir, off] = get_dir_block(rkey);
 	bdir.copy(off, entry, 18);
 }
 
-filesystem_t::dir_t fs_oric_jasmin::impl::root_dir::dir_get(uint64_t key)
+filesystem_t::dir_t oric_jasmin_image::impl::root_dir::dir_get(u64 key)
 {
 	throw std::logic_error("Directories not supported");
 }
 
-std::string fs_oric_jasmin::impl::file_name_prepare(std::string fname)
+std::string oric_jasmin_image::impl::file_name_prepare(std::string fname)
 {
 	std::string nname;
 	size_t i;
@@ -318,45 +320,45 @@ std::string fs_oric_jasmin::impl::file_name_prepare(std::string fname)
 	return nname;
 }
 
-fs_oric_jasmin::impl::file::file(impl &fs, root_dir *dir, const uint8_t *entry, uint16_t key) : m_fs(fs), m_dir(dir), m_key(key)
+oric_jasmin_image::impl::file::file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 18);
 }
 
-void fs_oric_jasmin::impl::file::drop_weak_references()
+void oric_jasmin_image::impl::file::drop_weak_references()
 {
 }
 
-fs_meta_data fs_oric_jasmin::impl::file::metadata()
+meta_data oric_jasmin_image::impl::file::metadata()
 {
-	fs_meta_data res;
+	meta_data res;
 
-	res.set(fs_meta_name::name, read_file_name(m_entry + 3));
-	res.set(fs_meta_name::locked, m_entry[2] == 'L');
-	res.set(fs_meta_name::sequential, m_entry[0xf] == 'S');
-	res.set(fs_meta_name::size_in_blocks, r16l(m_entry + 0x10));
+	res.set(meta_name::name, read_file_name(m_entry + 3));
+	res.set(meta_name::locked, m_entry[2] == 'L');
+	res.set(meta_name::sequential, m_entry[0xf] == 'S');
+	res.set(meta_name::size_in_blocks, r16l(m_entry + 0x10));
 
-	uint16_t ref = r16b(m_entry);
+	u16 ref = r16b(m_entry);
 	auto dblk = m_fs.m_blockdev.get(cs_to_block(ref));
-	res.set(fs_meta_name::loading_address, dblk.r16l(2));
-	res.set(fs_meta_name::length, dblk.r16l(4));
+	res.set(meta_name::loading_address, dblk.r16l(2));
+	res.set(meta_name::length, dblk.r16l(4));
 
 	return res;
 }
 
-std::vector<uint8_t> fs_oric_jasmin::impl::file::read_all()
+std::vector<u8> oric_jasmin_image::impl::file::read_all()
 {
-	std::vector<uint8_t> data;
-	uint16_t ref = r16b(m_entry);
+	std::vector<u8> data;
+	u16 ref = r16b(m_entry);
 	auto iblk = m_fs.m_blockdev.get(cs_to_block(ref));
-	uint32_t length = iblk.r16l(4);
+	u32 length = iblk.r16l(4);
 	while(m_fs.ref_valid(ref)) {
-		for(uint32_t pos = 6; pos != 256 && data.size() < length; pos += 2) {
-			uint16_t dref = iblk.r16b(pos);
+		for(u32 pos = 6; pos != 256 && data.size() < length; pos += 2) {
+			u16 dref = iblk.r16b(pos);
 			if(!m_fs.ref_valid(dref))
 			   goto done;
 			auto dblk = m_fs.m_blockdev.get(cs_to_block(dref));
-			uint32_t dpos = data.size();
+			u32 dpos = data.size();
 			data.resize(dpos + 256);
 			memcpy(data.data() + dpos, dblk.rodata(), 256);
 			if(data.size() >= length)
@@ -372,55 +374,55 @@ std::vector<uint8_t> fs_oric_jasmin::impl::file::read_all()
 	return data;
 }
 
-fs_oric_jasmin::impl::system_file::system_file(impl &fs, root_dir *dir, const uint8_t *entry, uint16_t key) : m_fs(fs), m_dir(dir), m_key(key)
+oric_jasmin_image::impl::system_file::system_file(impl &fs, root_dir *dir, const u8 *entry, u16 key) : m_fs(fs), m_dir(dir), m_key(key)
 {
 	memcpy(m_entry, entry, 18);
 }
 
-void fs_oric_jasmin::impl::system_file::drop_weak_references()
+void oric_jasmin_image::impl::system_file::drop_weak_references()
 {
 }
 
-fs_meta_data fs_oric_jasmin::impl::system_file::metadata()
+meta_data oric_jasmin_image::impl::system_file::metadata()
 {
-	fs_meta_data res;
+	meta_data res;
 
-	res.set(fs_meta_name::name, read_file_name(m_entry + 3));
-	res.set(fs_meta_name::locked, m_entry[2] == 'L');
-	res.set(fs_meta_name::sequential, m_entry[0xf] == 'S');
-	res.set(fs_meta_name::size_in_blocks, r16l(m_entry + 0x10));
-	res.set(fs_meta_name::length, 0x3e00);
+	res.set(meta_name::name, read_file_name(m_entry + 3));
+	res.set(meta_name::locked, m_entry[2] == 'L');
+	res.set(meta_name::sequential, m_entry[0xf] == 'S');
+	res.set(meta_name::size_in_blocks, r16l(m_entry + 0x10));
+	res.set(meta_name::length, 0x3e00);
 
 	return res;
 }
 
-std::vector<uint8_t> fs_oric_jasmin::impl::system_file::read_all()
+std::vector<u8> oric_jasmin_image::impl::system_file::read_all()
 {
-	std::vector<uint8_t> data(0x3e00);
-	for(uint32_t i = 0; i != 62; i++) {
+	std::vector<u8> data(0x3e00);
+	for(u32 i = 0; i != 62; i++) {
 		auto dblk = m_fs.m_blockdev.get(i);
 		memcpy(data.data() + 256 * i, dblk.rodata(), 256);
 	}
 	return data;
 }
 
-fs_oric_jasmin::impl::file_t fs_oric_jasmin::impl::root_dir::file_create(const fs_meta_data &info)
+oric_jasmin_image::impl::file_t oric_jasmin_image::impl::root_dir::file_create(const meta_data &info)
 {
 	// One block of sector list, one block of data
-	uint32_t nb = 2;
+	u32 nb = 2;
 
 	// Find the key for the next entry, increase nb if needed
 	auto bdir = m_fs.m_blockdev.get(20*17+1);
-	uint64_t id = 0;
+	u64 id = 0;
 	for(;;) {
-		for(uint32_t i = 0; i != 14; i ++) {
-			uint32_t off = 4 + i*18;
-			uint16_t ref = bdir.r16b(off);
+		for(u32 i = 0; i != 14; i ++) {
+			u32 off = 4 + i*18;
+			u16 ref = bdir.r16b(off);
 			if(!m_fs.ref_valid(ref))
 				goto found;
 			id++;
 		}
-		uint16_t ref = bdir.r16b(2);
+		u16 ref = bdir.r16b(2);
 		if(!ref || !m_fs.ref_valid(ref)) {
 			nb ++;
 			break;
@@ -434,7 +436,7 @@ fs_oric_jasmin::impl::file_t fs_oric_jasmin::impl::root_dir::file_create(const f
 
 	auto sblk = m_fs.m_blockdev.get(cs_to_block(block[0]));
 	sblk.w16b(0, 0xff00);   // Next sector
-	sblk.w16l(2, info.get_number(fs_meta_name::loading_address, 0x500));
+	sblk.w16l(2, info.get_number(meta_name::loading_address, 0x500));
 	sblk.w16l(4, 0);        // Length
 	sblk.w16b(6, block[1]); // Data block
 
@@ -446,11 +448,11 @@ fs_oric_jasmin::impl::file_t fs_oric_jasmin::impl::root_dir::file_create(const f
 		bdir.w16l(2, 0xff00);   // No next directory sector
 	}
 
-	uint32_t off = 4 + (id % 14) * 18;
+	u32 off = 4 + (id % 14) * 18;
 	bdir.w16b(off+0x00, block[0]); // First (and only) sector in the sector list
-	bdir.w8  (off+0x02, info.get_flag(fs_meta_name::locked, false) ? 'L' : 'U');
-	bdir.wstr(off+0x03, file_name_prepare(info.get_string(fs_meta_name::name, "")));
-	bdir.w8  (off+0x0f, info.get_flag(fs_meta_name::sequential, true) ? 'S' : 'D');
+	bdir.w8  (off+0x02, info.get_flag(meta_name::locked, false) ? 'L' : 'U');
+	bdir.wstr(off+0x03, file_name_prepare(info.get_string(meta_name::name, "")));
+	bdir.w8  (off+0x0f, info.get_flag(meta_name::sequential, true) ? 'S' : 'D');
 	bdir.w16l(off+0x10, 2); // 2 sectors for an empty file
 
 	return file_t(new file(m_fs, this, bdir.rodata() + off, id));
@@ -458,15 +460,15 @@ fs_oric_jasmin::impl::file_t fs_oric_jasmin::impl::root_dir::file_create(const f
 
 
 
-void fs_oric_jasmin::impl::root_dir::file_delete(uint64_t key)
+void oric_jasmin_image::impl::root_dir::file_delete(u64 key)
 {
 }
 
-void fs_oric_jasmin::impl::file::replace(const std::vector<uint8_t> &data)
+void oric_jasmin_image::impl::file::replace(const std::vector<u8> &data)
 {
-	uint32_t cur_ns = r16l(m_entry + 0x10);
+	u32 cur_ns = r16l(m_entry + 0x10);
 	// Data sectors first
-	uint32_t need_ns = (data.size() + 255) / 256;
+	u32 need_ns = (data.size() + 255) / 256;
 	if(need_ns == 0)
 		need_ns = 1;
 	// Add the sector list sectors, 125 entries/sector
@@ -476,22 +478,22 @@ void fs_oric_jasmin::impl::file::replace(const std::vector<uint8_t> &data)
 	if(cur_ns < need_ns && m_fs.free_block_count() < need_ns - cur_ns)
 		return;
 
-	uint16_t load_address = 0;
-	std::vector<uint16_t> tofree;
-	uint16_t iref = r16b(m_entry);
-	for(uint32_t i=0; i < cur_ns; i += 125+1) {
+	u16 load_address = 0;
+	std::vector<u16> tofree;
+	u16 iref = r16b(m_entry);
+	for(u32 i=0; i < cur_ns; i += 125+1) {
 		auto iblk = m_fs.m_blockdev.get(cs_to_block(iref));
 		if(!i)
 			load_address = iblk.r16l(2);
 		tofree.push_back(iref);
-		for(uint32_t j=0; j != 125 && i+j+1 != cur_ns; j++)
+		for(u32 j=0; j != 125 && i+j+1 != cur_ns; j++)
 			tofree.push_back(iblk.r16b(6+2*j));
 		iref = iblk.r16b(2);
 	}
 	m_fs.free_blocks(tofree);
 
-	std::vector<uint16_t> blocks = m_fs.allocate_blocks(need_ns);
-	for(uint32_t i=0; i < need_ns; i += 125+1) {
+	std::vector<u16> blocks = m_fs.allocate_blocks(need_ns);
+	for(u32 i=0; i < need_ns; i += 125+1) {
 		auto iblk = m_fs.m_blockdev.get(cs_to_block(blocks[i]));
 		iblk.fill(0xff);
 		if(!i) {
@@ -503,9 +505,9 @@ void fs_oric_jasmin::impl::file::replace(const std::vector<uint8_t> &data)
 		else
 			iblk.w16b(0, 0xff00);
 
-		for(uint32_t j=0; j != 125 && i+j+1 != need_ns; j++) {
-			uint32_t dpos = 256 * (j + i/126*125);
-			uint32_t size = data.size() - dpos;
+		for(u32 j=0; j != 125 && i+j+1 != need_ns; j++) {
+			u32 dpos = 256 * (j + i/126*125);
+			u32 size = data.size() - dpos;
 			iblk.w16b(6+j*2, blocks[i+j+1]);
 			auto dblk = m_fs.m_blockdev.get(cs_to_block(blocks[i+j+1]));
 			if(size >= 256)
@@ -521,66 +523,66 @@ void fs_oric_jasmin::impl::file::replace(const std::vector<uint8_t> &data)
 	m_dir->update_file(m_key, m_entry);
 }
 
-void fs_oric_jasmin::impl::root_dir::metadata_change(const fs_meta_data &info)
+void oric_jasmin_image::impl::root_dir::metadata_change(const meta_data &info)
 {
 }
 
-void fs_oric_jasmin::impl::metadata_change(const fs_meta_data &info)
+void oric_jasmin_image::impl::metadata_change(const meta_data &info)
 {
-	if(info.has(fs_meta_name::name)) {
-		std::string volume_name = info.get_string(fs_meta_name::name);
+	if(info.has(meta_name::name)) {
+		std::string volume_name = info.get_string(meta_name::name);
 		volume_name.resize(8, ' ');
 		m_blockdev.get(20*17).wstr(0xf8, volume_name);
 	}
 }
 
-void fs_oric_jasmin::impl::file::metadata_change(const fs_meta_data &info)
+void oric_jasmin_image::impl::file::metadata_change(const meta_data &info)
 {
-	if(info.has(fs_meta_name::locked))
-		w8  (m_entry+0x02, info.get_flag(fs_meta_name::locked) ? 'L' : 'U');
-	if(info.has(fs_meta_name::name))
-		wstr(m_entry+0x03, file_name_prepare(info.get_string(fs_meta_name::name)));
-	if(info.has(fs_meta_name::sequential))
-		w8  (m_entry+0x0f, info.get_flag(fs_meta_name::sequential) ? 'D' : 'S');
-	if(info.has(fs_meta_name::loading_address))
-		m_fs.m_blockdev.get(cs_to_block(r16b(m_entry))).w16l(2, info.get_number(fs_meta_name::loading_address));
+	if(info.has(meta_name::locked))
+		w8  (m_entry+0x02, info.get_flag(meta_name::locked) ? 'L' : 'U');
+	if(info.has(meta_name::name))
+		wstr(m_entry+0x03, file_name_prepare(info.get_string(meta_name::name)));
+	if(info.has(meta_name::sequential))
+		w8  (m_entry+0x0f, info.get_flag(meta_name::sequential) ? 'D' : 'S');
+	if(info.has(meta_name::loading_address))
+		m_fs.m_blockdev.get(cs_to_block(r16b(m_entry))).w16l(2, info.get_number(meta_name::loading_address));
 	m_dir->update_file(m_key, m_entry);
 }
 
-void fs_oric_jasmin::impl::system_file::replace(const std::vector<uint8_t> &data)
+void oric_jasmin_image::impl::system_file::replace(const std::vector<u8> &data)
 {
 	if(data.size() != 0x3e00)
 		return;
 
-	for(uint32_t i=0; i != 0x3e; i++)
+	for(u32 i=0; i != 0x3e; i++)
 		m_fs.m_blockdev.get(i).copy(0, data.data() + i * 256, 256);
 }
 
-void fs_oric_jasmin::impl::system_file::metadata_change(const fs_meta_data &info)
+void oric_jasmin_image::impl::system_file::metadata_change(const meta_data &info)
 {
-	if(info.has(fs_meta_name::locked))
-		w8  (m_entry+0x02, info.get_flag(fs_meta_name::locked) ? 'L' : 'U');
-	if(info.has(fs_meta_name::name))
-		wstr(m_entry+0x03, file_name_prepare(info.get_string(fs_meta_name::name)));
-	if(info.has(fs_meta_name::sequential))
-		w8  (m_entry+0x0f, info.get_flag(fs_meta_name::sequential) ? 'S' : 'D');
-	if(info.has(fs_meta_name::loading_address))
-		m_fs.m_blockdev.get(cs_to_block(r16b(m_entry))).w16l(2, info.get_number(fs_meta_name::loading_address));
+	if(info.has(meta_name::locked))
+		w8  (m_entry+0x02, info.get_flag(meta_name::locked) ? 'L' : 'U');
+	if(info.has(meta_name::name))
+		wstr(m_entry+0x03, file_name_prepare(info.get_string(meta_name::name)));
+	if(info.has(meta_name::sequential))
+		w8  (m_entry+0x0f, info.get_flag(meta_name::sequential) ? 'S' : 'D');
+	if(info.has(meta_name::loading_address))
+		m_fs.m_blockdev.get(cs_to_block(r16b(m_entry))).w16l(2, info.get_number(meta_name::loading_address));
 	m_dir->update_file(m_key, m_entry);
 }
 
-std::vector<uint16_t> fs_oric_jasmin::impl::allocate_blocks(uint32_t count)
+std::vector<u16> oric_jasmin_image::impl::allocate_blocks(u32 count)
 {
-	std::vector<uint16_t> blocks;
+	std::vector<u16> blocks;
 	if(free_block_count() < count)
 		return blocks;
 
 	auto fmap = m_blockdev.get(20*17);
-	uint32_t nf = 0;
-	for(uint32_t track = 0; track != 2*41 && nf != count; track++) {
-		uint32_t map = fmap.r24l(track*3);
+	u32 nf = 0;
+	for(u32 track = 0; track != 2*41 && nf != count; track++) {
+		u32 map = fmap.r24l(track*3);
 		if(map != 0x800000) {
-			for(uint32_t sect = 1; sect <= 17 && nf != count; sect++)
+			for(u32 sect = 1; sect <= 17 && nf != count; sect++)
 				if(map & (0x20000 >> sect)) {
 					blocks.push_back((track << 8) | sect);
 					map &= ~(0x20000 >> sect);
@@ -594,13 +596,13 @@ std::vector<uint16_t> fs_oric_jasmin::impl::allocate_blocks(uint32_t count)
 	return blocks;
 }
 
-void fs_oric_jasmin::impl::free_blocks(const std::vector<uint16_t> &blocks)
+void oric_jasmin_image::impl::free_blocks(const std::vector<u16> &blocks)
 {
 	auto fmap = m_blockdev.get(20*17);
-	for(uint16_t ref : blocks) {
-		uint32_t track = ref >> 8;
-		uint32_t sect = ref & 0xff;
-		uint32_t map = fmap.r24l(track*3);
+	for(u16 ref : blocks) {
+		u32 track = ref >> 8;
+		u32 sect = ref & 0xff;
+		u32 map = fmap.r24l(track*3);
 		if(map == 0x800000)
 			map = 0;
 		map |= 0x20000 >> sect;
@@ -608,17 +610,19 @@ void fs_oric_jasmin::impl::free_blocks(const std::vector<uint16_t> &blocks)
 	}
 }
 
-uint32_t fs_oric_jasmin::impl::free_block_count()
+u32 oric_jasmin_image::impl::free_block_count()
 {
 	auto fmap = m_blockdev.get(20*17);
-	uint32_t nf = 0;
-	for(uint32_t track = 0; track != 2*41; track++) {
-		uint32_t map = fmap.r24l(track*3);
+	u32 nf = 0;
+	for(u32 track = 0; track != 2*41; track++) {
+		u32 map = fmap.r24l(track*3);
 		if(map != 0x800000) {
-			for(uint32_t sect = 1; sect <= 17; sect++)
+			for(u32 sect = 1; sect <= 17; sect++)
 				if(map & (0x20000 >> sect))
 					nf++;
 		}
 	}
 	return nf;
 }
+
+} // namespace fs

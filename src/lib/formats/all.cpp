@@ -687,7 +687,7 @@
 void mame_formats_full_list(mame_formats_enumerator &en)
 {
 	en.category("Generic");
-	en.add(FS_UNFORMATTED);
+	en.add(fs::UNFORMATTED);
 	en.add(cassette_default_formats);
 #ifdef HAS_FORMATS_UEF_CAS
 	en.add(uef_cassette_formats); // uef_cas.h
@@ -711,7 +711,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 
 	en.category("Apple");
 #ifdef HAS_FORMATS_FS_PRODOS
-	en.add(FS_PRODOS);
+	en.add(fs::PRODOS);
 #endif
 #ifdef HAS_FORMATS_AP2_DSK
 	en.add(FLOPPY_A216S_FORMAT); // ap2_dsk.h
@@ -1144,7 +1144,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_ORIC_JASMIN_FORMAT); // oric_dsk.h
 #endif
 #ifdef HAS_FORMATS_FS_ORIC_JASMIN
-	en.add(FS_ORIC_JASMIN); // fs_oric_jasmin.h
+	en.add(fs::ORIC_JASMIN); // fs_oric_jasmin.h
 #endif
 
 	en.category("Atari");
@@ -1391,7 +1391,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.add(FLOPPY_VTECH_DSK_FORMAT); // vt_dsk.h
 #endif
 #ifdef HAS_FORMATS_FS_VTECH
-	en.add(FS_VTECH); // fs_vtech.h
+	en.add(fs::VTECH); // fs_vtech.h
 #endif
 
 	en.category("Canon");

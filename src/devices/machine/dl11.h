@@ -2,7 +2,7 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DEC DL11-type SLU (serial line unit)
+    DEC DL11-type SLU (serial line unit)
 
 ***************************************************************************/
 
@@ -82,8 +82,8 @@ private:
 	devcb_write_line   m_write_rxrdy;
 	devcb_write_line   m_write_txrdy;
 
-	line_state	m_rxrdy;
-	line_state	m_txrdy;
+	line_state  m_rxrdy;
+	line_state  m_txrdy;
 
 	int m_rxc;
 	int m_txc;

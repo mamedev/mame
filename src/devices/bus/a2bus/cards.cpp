@@ -9,6 +9,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "bus/a2bus/cards.h"
 
 #include "bus/a2bus/4play.h"

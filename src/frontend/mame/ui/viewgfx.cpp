@@ -16,6 +16,7 @@
 #include "render.h"
 #include "rendfont.h"
 #include "rendutil.h"
+#include "screen.h"
 #include "tilemap.h"
 #include "uiinput.h"
 

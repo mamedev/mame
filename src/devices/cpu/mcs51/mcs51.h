@@ -158,7 +158,7 @@ protected:
 	/* Serial Port TX/RX Callbacks */
 	devcb_write8 m_serial_tx_cb;    //Call back function when sending data out of serial port
 	devcb_read8 m_serial_rx_cb;    //Call back function to retrieve data when receiving serial port data
-	
+
 	/* DS5002FP */
 	struct {
 		uint8_t   previous_ta;        /* Previous Timed Access value */
@@ -168,7 +168,7 @@ protected:
 		uint8_t   mcon;                   /* bootstrap loader MCON register */
 		uint8_t   rpctl;                  /* bootstrap loader RPCTL register */
 		uint8_t   crc;                    /* bootstrap loader CRC register */
-		int32_t   rnr_delay;			  /* delay before new random number available */
+		int32_t   rnr_delay;              /* delay before new random number available */
 	} m_ds5002fp;
 
 	// for the debugger

@@ -128,7 +128,6 @@ protected:
 
 private:
 	void memory_map(address_map &map);
-	void banked_map(address_map &map);
 
 	uint8_t rom_switch_r(offs_t offset);
 	void rom_switch_w(offs_t offset, uint8_t data);

@@ -14,9 +14,9 @@
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
 
     TODO:
-	- Convert I/O registers to space addresses;
+    - Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
-	- Derive from SCSP device;
+    - Derive from SCSP device;
 */
 
 #include "emu.h"

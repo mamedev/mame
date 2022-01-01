@@ -415,11 +415,11 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 	}
 
 	int channels = 2;
-	offs_t buffer_length = 1;
+	//offs_t buffer_length = 1;
 	if (!(coding & CODING_STEREO))
 	{
 		channels = 1;
-		buffer_length *= 2;
+		//buffer_length *= 2;
 	}
 
 	int bits = 4;
@@ -434,7 +434,7 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		break;
 	default:
 		bits = 4;
-		buffer_length *= 2;
+		//buffer_length *= 2;
 		break;
 	}
 
@@ -461,8 +461,6 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 	m_dmadac[1]->set_frequency(sample_frequency);
 	m_dmadac[0]->set_volume(0x100);
 	m_dmadac[1]->set_volume(0x100);
-
-	std::fill_n(&m_xa_last[0], 4, 0);
 
 	if (bits == 16 && channels == 2)
 	{
@@ -547,6 +545,8 @@ void cdicdic_device::process_audio_map()
 void cdicdic_device::update_interrupt_state()
 {
 	const bool interrupt_active = (bool)BIT(m_x_buffer | m_audio_buffer, 15);
+	if (!interrupt_active)
+		LOGMASKED(LOG_SECTORS, "%s: Clearing CDIC interrupt line\n", machine().describe_context());
 	m_intreq_callback(interrupt_active ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -718,9 +718,6 @@ void cdicdic_device::process_disc_sector()
 		if (is_mode2_audio_selected(buffer))
 		{
 			LOGMASKED(LOG_SECTORS, "Audio is selected\n");
-			if (m_audio_sector_counter == 0)
-				std::fill_n(&m_xa_last[0], 4, 0);
-
 			m_audio_sector_counter = get_sector_count_for_coding(buffer[SECTOR_CODING2]);
 			m_decoding_audio_map = false;
 
@@ -804,7 +801,7 @@ void cdicdic_device::process_sector_data(const uint8_t *buffer, const uint8_t *s
 	m_data_buffer |= 0x4000;
 	update_interrupt_state();
 
-	if (m_command == 0x23) // Reset Mode 1? If so, stop.
+	if (m_command == 0x23 || m_command == 0x24) // Reset? If so, stop.
 		cancel_disc_read();
 }
 
@@ -1021,13 +1018,21 @@ void cdicdic_device::handle_cdic_command()
 	switch (m_command)
 	{
 		case 0x23: // Reset Mode 1
+			LOGMASKED(LOG_WRITES, "%s: cdic_w: Reset Mode 1 command\n", machine().describe_context());
 			if (m_disc_command == 0)
 				init_disc_read(DISC_MODE1);
 			break;
 		case 0x24: // Reset Mode 2
+			LOGMASKED(LOG_WRITES, "%s: cdic_w: Reset Mode 2 command\n", machine().describe_context());
+			if (m_disc_command == 0)
+				init_disc_read(DISC_MODE1);
+			break;
 		case 0x2b: // Stop CDDA
-		case 0x2e: // Abort
+			LOGMASKED(LOG_WRITES, "%s: cdic_w: Stop CDDA command\n", machine().describe_context());
 			cancel_disc_read();
+			break;
+		case 0x2e: // Update
+			LOGMASKED(LOG_WRITES, "%s: cdic_w: Update command\n", machine().describe_context());
 			break;
 		case 0x27: // Fetch TOC
 			init_disc_read(DISC_TOC);

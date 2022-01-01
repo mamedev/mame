@@ -400,10 +400,10 @@ license:CC0
 	</software>
 
 	<software name="alienodu" cloneof="alienody" supported="no">
-        <!--
-            L384 9614 05921024 B51103-30 M1S4
-            IFPI6100
-        -->
+		<!--
+		    L384 9614 05921024 B51103-30 M1S4
+		    IFPI6100
+		-->
 		<description>Alien Odyssey (US)</description>
 		<year>1995</year>
 		<publisher>Philips / Argonaut Software LTD</publisher>
@@ -2155,11 +2155,11 @@ license:CC0
 	</software>
 
 	<software name="ignition" supported="no">
-        <!--
-            FUTURE MEDIA / CA
-            FM 16942 (CD-C95-1063-0/IN0002)
-            IFPI 3V17
-        -->
+		<!--
+		    FUTURE MEDIA / CA
+		    FM 16942 (CD-C95-1063-0/IN0002)
+		    IFPI 3V17
+		-->
 		<description>Ignition (US)</description>
 		<year>1997</year>
 		<publisher>Interplay</publisher>

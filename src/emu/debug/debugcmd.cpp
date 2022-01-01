@@ -23,6 +23,7 @@
 #include "emuopts.h"
 #include "natkeyboard.h"
 #include "render.h"
+#include "screen.h"
 #include "softlist.h"
 
 #include "corestr.h"
@@ -3395,7 +3396,7 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 				data_size[data_count++] |= 0x10;
 
 			// otherwise, validate as a number
-			else if (!validate_number_parameter(params[i], data_to_find[data_count++]))
+			else if (!validate_number_parameter(pdata, data_to_find[data_count++]))
 				return;
 		}
 	}

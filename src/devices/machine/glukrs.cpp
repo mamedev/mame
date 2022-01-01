@@ -13,9 +13,9 @@
 #include "glukrs.h"
 
 glukrs_device::glukrs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : device_t(mconfig, GLUKRS, tag, owner, clock),
-      device_rtc_interface(mconfig, *this),
-      m_nvram(*this, "nvram") {}
+	: device_t(mconfig, GLUKRS, tag, owner, clock),
+	  device_rtc_interface(mconfig, *this),
+	  m_nvram(*this, "nvram") {}
 
 void glukrs_device::device_add_mconfig(machine_config &config)
 {

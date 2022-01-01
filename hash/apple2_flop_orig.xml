@@ -16940,7 +16940,7 @@ license:CC0
 		Apple SuperDrive (G7287), will not work due to
 		incompatibilities created by the copy protection. -->
 		<!--"Troll Sports Math" is a 1991 educational program developed by Millicent Sabater, Gregory Truex, Thomas Whiting, and Toby Shack, and distributed by Troll Associates. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or Apple ][+ with an Apple UniDisk 3.5-inch drive (A2M2053) and a Liron or other compatible drive controller card. Other 3.5-inch drives, such as the AppleDisk 3.5 (A2M0106) or Apple SuperDrive (G7287), will not work due to incompatibilities created by the copy protection.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296307">
@@ -16957,7 +16957,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
 		<!--"Where in Europe is Carmen Sandiego?" is a 1988 educational game developed by Ken Bull, Gene Portwood, Lauren Elliott, Leila Bronstein, Don Albrecht, Katherine Bird, Susan Meyers, and Louis Ewens, and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296763">
@@ -16974,7 +16974,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
 		<!--"The Playroom" is a 1989 educational game developed by Leslie Grimm, Dennis Caswell, Lynn Kirkpatrick, D. Buttlaire, and D. Albrecht, and distributed by Broderbund Software. This is version 1.0. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296725">
@@ -16991,7 +16991,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
 		<!--"SuperPrint!" is a 1987 graphics program developed by Joel Fried, Susan Swanson, Ken Grey, Lester Humphreys, Kim Looney, and David Shearer, and distributed by Pelican Software. This is version 1.4. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296709">
@@ -17008,7 +17008,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
 		<!--"Rampage" is a 1988 action game ported to the Apple II by Ken Hurley, J. David Koch, Kelly Flock, Steve Imes, and Alex Edelstein, and distributed by Activision. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1312568">
@@ -17201,7 +17201,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
 		<!--"Bank Street Writer Plus" is a 1989 productivity program developed by Gordon Riggs and distributed by Broderbund Software. This version is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296168">
@@ -17234,7 +17234,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card. -->
 		<!--"Grammar Gremlins" is a 1987 educational program developed by Santa Barbara Softworks and distributed by Davidson and Associates. This version is dated 05.01.87. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296190">
@@ -17251,7 +17251,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card. -->
 		<!--"Beagle Write" is a 1989 productivity program developed by Kevin Harvey, Alex Perelberg, and Mark Munz, and distributed by Beagle Bros. This is version 3.2. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or a 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296189">
@@ -17268,7 +17268,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card. -->
 		<!--"Design Your Own Home: Interior Design" is a 1986 productivity program developed by Don Fudge and distributed by Abracadata. This is version 2. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or an Apple //e or 64K Apple ][+ and a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1328956">
@@ -17308,7 +17308,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card. -->
 		<!--"Arithmetic Critters" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345310">
@@ -17325,7 +17325,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card. -->
 		<!--"Clock Works" is a 1986 educational program developed and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, Apple //e or 64K Apple ][+ with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345302">
@@ -17342,7 +17342,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card. -->
 		<!--"Backyard Birds" is a 1989 educational program developed by Hassan Kaganda, John Persoon, Larry Phenow, Diane Portner, and James L. Thompson, and distributed by MECC. This is version 1.0. It is distributed on a single 3.5-inch (800K) disk. It requires an Apple IIgs, Apple //c+, or 128K Apple //e with a compatible drive controller card.-->
-        <!-- Image updated December 14th, 2021 to fix incorrect header information -->
+		<!-- Image updated December 14th, 2021 to fix incorrect header information -->
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1345386">
@@ -18389,7 +18389,7 @@ license:CC0
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS"/>
 		<!-- It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card. -->
 		<!--"Spell It Plus!" is a 1989 educational program developed by Faye Schwartz, Cathy Johnson, Kevin Burley, and Carol Carpenter, and distributed by Davidson and Associates. It requires a Apple IIgs, //c+, 128K //e, or 128K enhanced Apple //e with a compatible drive controller card.-->
- 
+
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296218">
 				<rom name="spell it plus 800k.woz" size="1296218" crc="12943fe4" sha1="fc672aaaaacb195229719107eaaaf36b6feb127d" />

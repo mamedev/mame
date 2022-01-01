@@ -91,17 +91,17 @@ private:
 
 	void mc6845_screen_configure();
 
-	u8 m_mc6845_reg[32];
-	u8 m_mc6845_ind;
-	u8 m_framecnt;
+	u8 m_mc6845_reg[32]{};
+	u8 m_mc6845_ind = 0U;
+	u8 m_framecnt = 0U;
 	std::unique_ptr<u8[]> m_ram;
 	std::unique_ptr<u8[]> m_vram; // video ram
 	std::unique_ptr<u8[]> m_dummy;  // black hole for write to rom
 	int m_centronics_busy;
-	bool m_is_motor_off;
-	u8 m_fdc_rq;
-	u8 m_system_port;
-	uint16_t m_mc6845_video_address;
+	bool m_is_motor_off = 0;
+	u8 m_fdc_rq = 0U;
+	u8 m_system_port = 0U;
+	u16 m_mc6845_video_address = 0U;
 	floppy_image_device *m_floppy;
 
 	required_device<palette_device> m_palette;

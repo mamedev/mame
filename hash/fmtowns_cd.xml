@@ -57,7 +57,6 @@ CD-ROM-ban Katei Igaku Daizenka                               Houken            
 CDWord                                                        Sanshusha                         1989/3     SET(CD+FD)
 Chiisana Ensouka                                              Fujitsu Social Science Laboratory 1993/9     CD
 Chikyuu no Himitsu (Kankyou Kyouiku Kyouzai)                  Fujitsu                           1994/7     CD
-Chinsei                                                       Toshiba EMI                       1989/11    CD
 Chiri Jigsaw World 2                                          Fujitsu Ooita Software Laboratory 1994/12    SET(CD+FD)
 Chotto Shita Ohanashi                                         Fujitsu                           1995/11    CD
 Chuugokugo de Ajiwau: Kanshi no Sekai                         CSK Research Institute (CRI)      1991/4     CD
@@ -346,8 +345,8 @@ Powers of Ten                                                 Datt Japan        
 Present                                                       Orange House                      1991/6     ?
 Primary Health Care System                                    Raison                            1990/9     CD
 Psychic Detective Series Vol. 2: Memories (Remake)            Data West                         1994/4     SET(CD+FD)
-Psychic Detective Series Vol. 3: Aya (Remake)                 Data West                         1994/7     SET(CD+FD)
-Psychic Detective Series Vol. 5: Nightmare (Remake)           Data West                         1995/4     SET(CD+FD)
+* Psychic Detective Series Vol. 3: Aya (Remake)               Data West                         1994/7     SET(CD+FD)
+* Psychic Detective Series Vol. 5: Nightmare (Remake)         Data West                         1995/4     SET(CD+FD)
 Pyoko-tan no Niji no Shima: Nanairo no Ninjin wo Sagase       Nanken Koubou                     1994/3     CD
 Queen of Duellist Gaiden + Gaiden Alpha Light                 Agumix                            1994/4     CD
 Quiz de Let's Go!                                             Great                             1993/3     ?
@@ -401,7 +400,6 @@ Stingo Monogatari ST-2: Stingo no Atarashii Otomodachi        Technos Yashima   
 Stingo Monogatari ST-3: Stingo Umi ni Iku                     Technos Yashima                   1995/1     CD
 Stingo Monogatari ST-4: Stingo Yuuenchi ni Iku                Technos Yashima                   1995/1     CD
 Stingo Monogatari ST-5: Stingo no Christmas                   Technos Yashima                   1995/1     CD
-Stress                                                        Toshiba EMI                       1989/11    CD
 Suisai Graphic Art Software                                   NTT Data Tsuushin                 1993/8     CD
 Sunshine 1-nen                                                Uchida Youkou                     1993/7     CD
 Sunshine 2-nen                                                Uchida Youkou                     1993/7     CD
@@ -713,6 +711,39 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="towns system software v1.1l10 (japan)" sha1="98807c8ff948ed200cbd3199a32ae1edfdfae542" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tss1110b">
+		<!--
+		Origin: redump.org
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 01).bin" size="67549440" crc="770d781e" sha1="f849957d457966a89776080ce47ea0f6541f77cd"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 02).bin" size="2845920" crc="c3a8a67e" sha1="b819792025af57961983c9e3980cb199d8c603ad"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 03).bin" size="8469552" crc="bf055392" sha1="6dfedea95b2c9787ce0853880f1ab9491494173c"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 04).bin" size="4243008" crc="80379ff5" sha1="adf45689e2bb58b03d972cc49f3cdc230df90ee6"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 05).bin" size="2509584" crc="5f95c7b8" sha1="458254012df042a871dc3214c3d0fc4631720f22"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 06).bin" size="2702448" crc="26cfae15" sha1="fdc05da986f4e68d7cfbb079c63d13cb3090c34b"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 07).bin" size="3057600" crc="ebdc6d6e" sha1="8a33441f5e72ed7edf855b8d913495861b810060"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 08).bin" size="2829456" crc="edcf6157" sha1="a01726f6a97c415f54bd930e18a47c37f08a9921"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 09).bin" size="3375120" crc="721cb5fe" sha1="cd0730663bb5583db4d2750f68edc5ab9e0fff71"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 10).bin" size="3560928" crc="e1e342ed" sha1="aa19656f8d537d676dbc3fceb8d7456238541064"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 11).bin" size="2312016" crc="b1255f83" sha1="43b257ffe84309d046e5cceb1f5d73f6c8af415d"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 12).bin" size="127370208" crc="12846823" sha1="175521e0ae772be710855f780eb472f916997678"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 13).bin" size="47644464" crc="816fc82a" sha1="b1311940c386d10a25c70edc3119c3237bfbdd77"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 14).bin" size="31789632" crc="2a353dfd" sha1="7bf3d2369b3c7f1db4779430a678361a819eb6f6"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 15).bin" size="28781424" crc="0a891438" sha1="7841d3ecc289ce2f8a1428b8cc6acbde05776346"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 16).bin" size="33875856" crc="9ccc4919" sha1="06d05217fdec562b18c2072f9d094e72768e4cce"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A) (Track 17).bin" size="44798544" crc="bca237f7" sha1="72b89d03040e1b809f3c91e4819399e37987a7c1"/>
+		<rom name="Towns System Software V1.1 L10 (Japan) (Rev A).cue" size="2402" crc="88d81b11" sha1="370d789829a2bb690ea9ff0dbfaaafb2b51116af"/>
+		 -->
+		<description>Towns System Software V1.1 L10B</description>
+		<year>1989</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276A010"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns system software v1.1 l10 (japan) (rev a)" sha1="9fa8e5611885f38d124dc4e6b6f4a7aa1e444252" />
 			</diskarea>
 		</part>
 	</software>
@@ -4467,6 +4498,33 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<software name="chinsei">
+		<!--
+		Origin: redump.org
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 1).bin" size="9878400" crc="9f6885a0" sha1="24b66de8afa960d17eb546ec69164b91933c216f"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 2).bin" size="2646000" crc="0eb977bd" sha1="b835dea412ecded90aec58f303ae7c0e824498ae"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 3).bin" size="31446240" crc="56e7325c" sha1="fc6c697d26bd49783fa7ddd374afdfe6fe3fc666"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 4).bin" size="31575600" crc="d03816b0" sha1="c6a87f67b026bd96721b5cf3a68b32043e7f0677"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 5).bin" size="31328640" crc="403f462c" sha1="e3399618fab034d7cbd296cbe8b7c9b7a86a6a16"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 6).bin" size="29117760" crc="9c61675e" sha1="f7c7e5951f60892f8407bf6e22629ef5c31b5555"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 7).bin" size="38243520" crc="7f7905ad" sha1="61c635a19d7b0e0734fdf99d49f2aee8fb6e0162"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan) (Track 8).bin" size="3116400" crc="6c747ec7" sha1="97822afb6192240756bcc38d06a1101492817101"/>
+		<rom name="Technostress Yobou-hou Series - Chinsei (Japan).cue" size="1110" crc="bfe5b14c" sha1="fc1c6781d15c36527152681ec91d29ba66cc45a0"/>
+		-->
+		<description>Technostress Yobouhou Series - Chinsei</description>
+		<year>1989</year>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
+		<info name="serial" value="HMA-256"/>
+		<info name="alt_title" value="【テクノストレス予防法シリーズ】　鎮静" />
+		<info name="release" value="198911xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="technostress yobou-hou series - chinsei (japan)" sha1="4a56ee0db62782316a0c074ece19c03caab05bb2" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="chuumon">
 		<!--
 		Origin: P2P
@@ -6898,7 +6956,6 @@ User/save disks that can be created from the game itself are not included.
 	<software name="emit1">
 		<!--
 		Origin: redump.org
-		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 1).bin" size="20281296" crc="4b15bc51" sha1="02433dd33ba55bf686349d1332a5d72914f418c2"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 2).bin" size="42766416" crc="cddb61dc" sha1="f40ae55a596258434672d7975388b2bdbfc08125"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 3).bin" size="151908624" crc="0480ad92" sha1="e62722a8e8c0e54b11a8a293950a55410d1e7086"/>
@@ -6907,8 +6964,9 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 6).bin" size="114714096" crc="3422fc41" sha1="57197a1ccb5c7d2a02a84ee6929fcd2d958e7eb7"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 7).bin" size="6837264" crc="a8bb630c" sha1="34c54fa85a566a00e3c9ba4572a347a15d718170"/>
 		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
 		-->
-		<description>Emit Vol. 1 - Toki no Maigo</description>
+		<description>Emit Vol. 1 - Toki no Maigo (Version 1.30 Release 2.00)</description>
 		<year>1994</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="HMF-115 / KN10601010"/>
@@ -6917,7 +6975,39 @@ User/save disks that can be created from the game itself are not included.
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="emit1.hdm" size="1261568" crc="660198bd" sha1="f84e0ede2de479d61de72c59e64a5c6829ae9cb7" offset="000000" />
+				<rom name="emit1_v1.30_r2.00.hdm" size="1261568" crc="eca37c28" sha1="58d7f1add8ad84ce7200b0661f380608d8d0639a" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="emit vol. 1 - toki no maigo (japan) (en,ja)" sha1="038ddc530689da76a82b225a8deefd713b0b059e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="emit1o" cloneof="emit1">
+		<!--
+		Origin: redump.org
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 1).bin" size="20281296" crc="4b15bc51" sha1="02433dd33ba55bf686349d1332a5d72914f418c2"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 2).bin" size="42766416" crc="cddb61dc" sha1="f40ae55a596258434672d7975388b2bdbfc08125"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 3).bin" size="151908624" crc="0480ad92" sha1="e62722a8e8c0e54b11a8a293950a55410d1e7086"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 4).bin" size="159395040" crc="3e561925" sha1="c0f4058a6678439d128648e8d48e8344e828bca8"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 5).bin" size="72077040" crc="0c366937" sha1="77f71ca8d795a8c2e6ed0e286750fea7becc1abb"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 6).bin" size="114714096" crc="3422fc41" sha1="57197a1ccb5c7d2a02a84ee6929fcd2d958e7eb7"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 7).bin" size="6837264" crc="a8bb630c" sha1="34c54fa85a566a00e3c9ba4572a347a15d718170"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja) (Track 8).bin" size="70376544" crc="a9597842" sha1="07b706406105d4f4d99038aad84a2c9408692ee6"/>
+		<rom name="Emit Vol. 1 - Toki no Maigo (Japan) (En,Ja).cue" size="1078" crc="4ed341d2" sha1="7d5c07157bd438cab5d0d84dd1024b369cfd9db6"/>
+		-->
+		<description>Emit Vol. 1 - Toki no Maigo (Version 1.20 Release 1.00)</description>
+		<year>1994</year>
+		<publisher>光栄 (Koei)</publisher>
+		<info name="serial" value="HMF-115 / KN10601010"/>
+		<info name="release" value="199403xx" />
+		<info name="alt_title" value="エミット Vol. 1 時の迷子" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1261568">
+				<rom name="emit1_v1.20_r1.00.hdm" size="1261568" crc="49b1a035" sha1="1b0f1886a587e6b9e4bacdfd90145837a3eb6cc0" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">
@@ -6955,7 +7045,6 @@ User/save disks that can be created from the game itself are not included.
 	<software name="emit2">
 		<!--
 		Origin: redump.org
-		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja).cue" size="1260" crc="92e3280f" sha1="f86c316920455ad3be2769edee7a33cdc890fb65"/>
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 1).bin" size="20815200" crc="0ae40089" sha1="6b7c70f4c14602f9866e2c125491d39ae80dfdfe"/>
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 2).bin" size="69595680" crc="346a3abd" sha1="ee7325fea4ecd2bb5a63356f511566284669efd0"/>
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 3).bin" size="147070560" crc="67ca5cca" sha1="74ffd1b5a5401f03aa388a50259e748f3fdd8241"/>
@@ -6965,6 +7054,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 7).bin" size="6738480" crc="1f2dbaa5" sha1="2e1b29fb2597477ac45e471c14865f13614263c4"/>
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 8).bin" size="43175664" crc="3134c4b6" sha1="39899d98d01020a589e67674300a7fbae74b2f5d"/>
 		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja) (Track 9).bin" size="2598960" crc="c08c050d" sha1="5464a05ade770fe4fbc211b1789b8d13d1444301"/>
+		<rom name="Emit Vol. 2 - Inochigake no Tabi (Japan) (En,Ja).cue" size="1260" crc="92e3280f" sha1="f86c316920455ad3be2769edee7a33cdc890fb65"/>
 		-->
 		<description>Emit Vol. 2 - Inochigake no Tabi</description>
 		<year>1994</year>
@@ -8019,6 +8109,40 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="f-basic 386 v1.1l20 (japan)" sha1="2c18dc8b8193ed5c5b41a6caba8103ea41da0bcc" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fbas1110" cloneof="fbas1121">
+		<!--
+		 Origin: redump.org
+		<rom name="F-BASIC386 V1.1 L10 (Japan).bin" size="32986800" crc="5b21aeaa" sha1="bea5d1db75c2dcac5ea80241b8fda5bd9b0f5cd2"/>
+		<rom name="F-BASIC386 V1.1 L10 (Japan).cue" size="116" crc="d8072cee" sha1="2368f56ef3730d006da47500daa0b561092c6d05"/>
+		 -->
+		<description>F-BASIC386 v1.1 L10</description>
+		<year>1989</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276C010"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="f-basic386 v1.1 l10 (japan)" sha1="55d0c4fa89e9407a2d8a6a068ccbd6e459dc7b4a" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fbas1110b" cloneof="fbas1121">
+		<!--
+		 Origin: redump.org
+		<rom name="F-BASIC386 V1.1 L10 (Japan) (Rev B).bin" size="32986800" crc="6d274411" sha1="4dbd78b0c12b9694e6bd251e0f09a53c6db4cc1f"/>
+		<rom name="F-BASIC386 V1.1 L10 (Japan) (Rev B).cue" size="124" crc="f03655f3" sha1="5a0a623196920a006132a96e39c4b37d84cd0c35"/>
+		 -->
+		<description>F-BASIC386 v1.1 L10B</description>
+		<year>1989</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276C010"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="f-basic386 v1.1 l10 (japan) (rev b)" sha1="4d0623451f45655131b88b02905cb7be0baa021e" />
 			</diskarea>
 		</part>
 	</software>
@@ -10799,26 +10923,26 @@ User/save disks that can be created from the game itself are not included.
 	<software name="hirou">
 		<!--
 		Origin: redump.org
-		<rom name="Hirou (Japan) (Track 1).bin" size="9878400" crc="aee5df2f" sha1="ab1a1658db36504c6b4696db0ee1e43be883752e"/>
-		<rom name="Hirou (Japan) (Track 2).bin" size="2610720" crc="8d869c4e" sha1="2ced7cb5f32ff1db70850ada465580091f0e53f0"/>
-		<rom name="Hirou (Japan) (Track 3).bin" size="37584960" crc="4b50fbfa" sha1="7f5768b5f796284b5068a37d3876ca5a1778f6dc"/>
-		<rom name="Hirou (Japan) (Track 4).bin" size="40724880" crc="6663b655" sha1="9f2fa126113de1be9a2a437fe227fe6d05c2a760"/>
-		<rom name="Hirou (Japan) (Track 5).bin" size="18474960" crc="88fc2909" sha1="233998f97ab7627090b449617a22b6632cd8433c"/>
-		<rom name="Hirou (Japan) (Track 6).bin" size="31022880" crc="afd7c7c1" sha1="bb1e568064d54c748096efee1d13e7a7fb9da080"/>
-		<rom name="Hirou (Japan) (Track 7).bin" size="40313280" crc="8989c45a" sha1="5985def21e970ca3cd01fdce6bfef0cf0d4c7b11"/>
-		<rom name="Hirou (Japan) (Track 8).bin" size="3034080" crc="38340369" sha1="23de0e8041fb1e31b8ed56d99d3975588cd1e260"/>
-		<rom name="Hirou (Japan).cue" size="838" crc="4ab6e35b" sha1="05bbdf62eef650ed28b56b82e05c40105d7c3025"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 1).bin" size="9878400" crc="aee5df2f" sha1="ab1a1658db36504c6b4696db0ee1e43be883752e"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 2).bin" size="2610720" crc="8d869c4e" sha1="2ced7cb5f32ff1db70850ada465580091f0e53f0"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 3).bin" size="37584960" crc="4b50fbfa" sha1="7f5768b5f796284b5068a37d3876ca5a1778f6dc"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 4).bin" size="40724880" crc="6663b655" sha1="9f2fa126113de1be9a2a437fe227fe6d05c2a760"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 5).bin" size="18474960" crc="88fc2909" sha1="233998f97ab7627090b449617a22b6632cd8433c"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 6).bin" size="31022880" crc="afd7c7c1" sha1="bb1e568064d54c748096efee1d13e7a7fb9da080"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 7).bin" size="40313280" crc="8989c45a" sha1="5985def21e970ca3cd01fdce6bfef0cf0d4c7b11"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan) (Track 8).bin" size="3034080" crc="38340369" sha1="23de0e8041fb1e31b8ed56d99d3975588cd1e260"/>
+		<rom name="Technostress Yobou-hou Series - Hirou (Japan).cue" size="1094" crc="49e23359" sha1="413d226dc9b8712fd0078a38eaf34096d35526a5"/>
 		-->
-		<description>Hirou</description>
+		<description>Technostress Yobouhou Series - Hirou</description>
 		<year>1989</year>
 		<publisher>東芝EMI (Toshiba EMI)</publisher>
 		<info name="serial" value="HMA-254"/>
-		<info name="alt_title" value="疲労" />
+		<info name="alt_title" value="【テクノストレス予防法シリーズ】　疲労" />
 		<info name="release" value="198911xx" />
 		<info name="usage" value="Requires 2 MB RAM"/>
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hirou (japan)" sha1="22be39e55d6c3ed0c7a836be7bb151425c2e8954" />
+				<disk name="technostress yobou-hou series - hirou (japan)" sha1="22be39e55d6c3ed0c7a836be7bb151425c2e8954" />
 			</diskarea>
 		</part>
 	</software>
@@ -21197,6 +21321,32 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
+	<!-- Missing a floppy disk -->
+	<software name="psydet3r" supported="no">
+		<!--
+		Origin: redump.org
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 1).bin" size="89359536" crc="6915161f" sha1="aa06da54feeb4f0fd8e249cf53c4d4d2539cdd61"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 2).bin" size="5743584" crc="f06ba894" sha1="5a243e2c9c64689aed3e850025c329dd32175670"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 3).bin" size="17136672" crc="c2b7d833" sha1="3b947afe9fc19d6b974d3a7ab8217f9723168ddb"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 4).bin" size="36587712" crc="229dcb89" sha1="9b9aca9bf4b43f7676b8e0af913781106f050502"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 5).bin" size="51033696" crc="61955ee5" sha1="8576b18bdff63860d0fcbdb6aa7c05276589e64c"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 6).bin" size="34459152" crc="394dfd5d" sha1="89aeb23a109c243f3b0f363af0a528eb5533d4fa"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake) (Track 7).bin" size="57922704" crc="129e590d" sha1="26b1f9ae5402ac906bef84d40b2b62009a1947a2"/>
+		<rom name="Psychic Detective Series Vol. 3 - Aya (Japan) (Remake).cue" size="1041" crc="25834b3e" sha1="cd2a4c08e3fb792650a63c1f1b17774d78e0cf97"/>
+		-->
+		<description>Psychic Detective Series Vol. 3 - Aya (DCCS remake)</description>
+		<year>1994</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="serial" value="DWDC4022"/>
+		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.3　アヤ" />
+		<info name="release" value="199407xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 3 - aya (japan) (remake)" sha1="1c887f76a96952b058d74335ce73eb6b06c803f7" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="psydet4">
 		<!--
 		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
@@ -21291,6 +21441,34 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="psychic detective series vol. 5 - nightmare (japan)" sha1="4883b57a9ab704c99bed18f46791b3fed4a23631" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Missing a floppy disk -->
+	<software name="psydet5r" supported="no">
+		<!--
+		Origin: redump.org
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 1).bin" size="116983776" crc="a36646c6" sha1="d5aef069a6a6a5d18442ccba065026be66e8fb7e"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 2).bin" size="48079584" crc="00f56a5d" sha1="6bf54e0f1076e73a5efca7716dfb4e0dc63e2704"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 3).bin" size="6606768" crc="e14b585d" sha1="9d83445ee246af371ea4191eb49f3d9ce335563f"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 4).bin" size="21490224" crc="9c7c56a6" sha1="765a31464665fe54236e98b0674f3e21bf07a19c"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 5).bin" size="5604816" crc="1e4d521f" sha1="bac94d53ce83e9feeb3bd7528e96556f58e2a6ef"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 6).bin" size="34510896" crc="1a01543f" sha1="f2fd99f5b0a62dc20bfb8ccac5735bdd0d901fc2"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 7).bin" size="26928048" crc="0364eaa6" sha1="f2123d332f75cf5f2dbabd7dde3cd8f13f45c4f9"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 8).bin" size="29766912" crc="bb26f92b" sha1="79ab44f8e18e7d29bd69b0e1ca139700f3a58c31"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake) (Track 9).bin" size="12540864" crc="99416f24" sha1="e42f29b4509c798a85a8743c7664981b19f80d82"/>
+		<rom name="Psychic Detective Series Vol. 5 - Nightmare (Japan) (Remake).cue" size="1391" crc="169f7225" sha1="182cd14fbe9791efcdf054ea95073cdcbefed3dc"/>
+		-->
+		<description>Psychic Detective Series Vol. 5 - Nightmare (DCCS remake)</description>
+		<year>1995</year>
+		<publisher>データウエスト (Data West)</publisher>
+		<info name="serial" value="DWDC4024"/>
+		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.5　ナイトメア" />
+		<info name="release" value="199504xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="psychic detective series vol. 5 - nightmare (japan) (remake)" sha1="b0a088b71f05c1afa037e3dddff116fa95aee503" />
 			</diskarea>
 		</part>
 	</software>
@@ -24269,6 +24447,33 @@ User/save disks that can be created from the game itself are not included.
 	<software name="beast">
 		<!--
 		Origin: redump.org
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 1).bin" size="31399200" crc="c77a6a6b" sha1="b3c29e201f8797c454c595f5c042897a9a8bfe88"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 2).bin" size="55756512" crc="c3b2d79a" sha1="c0b3a7636fba2a4234d0c39cc8319a9ba0b2d5d7"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 3).bin" size="44918496" crc="b97227c1" sha1="48fe87a8cfa6848272ed4941f16ba8add64b6eea"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 4).bin" size="72493344" crc="35ba67c8" sha1="3ad4f5d34a275ecbaeaaf8439e6e282402a6983b"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 5).bin" size="73492944" crc="190880bf" sha1="e674ce061e87c6513385cd88a79cd6fada92b0b9"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 6).bin" size="72926112" crc="9da4f8c2" sha1="959530845fdc6ff7e594fea2891515bf2a8bbe10"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 7).bin" size="74469024" crc="0132e0a2" sha1="7399ccca6ec38402795e840cd7f1928732468085"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1) (Track 8).bin" size="67215456" crc="7c400bc6" sha1="24e26e175da1b6a684c7524dafa9e855f6eb6b88"/>
+		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Rev 1).cue" size="1181" crc="0abb72b3" sha1="b5a0cfb7b128c6a918f5ef135738b94d9b331317"/>
+		-->
+		<description>Shadow of the Beast - Mashou no Okite (1991-10-11)</description>
+		<year>1991</year>
+		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
+		<info name="serial" value="HMC-157 / F-5503"/>
+		<info name="alt_title" value="シャドー・オブ・ザ・ビースト 魔性の掟" />
+		<info name="release" value="199110xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="shadow of the beast - mashou no okite (japan) (rev 1)" sha1="89a710a473fb364b97ab9cf3768fef2be59518d6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="beasto" cloneof="beast">
+		<!--
+		Origin: redump.org
 		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Track 1).bin" size="41454000" crc="f72daa92" sha1="8dfce09b1420ad8e17da50bcee49b9a5aa555699"/>
 		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Track 2).bin" size="56139888" crc="d56e1693" sha1="d572bc7712daf7e7ab9e4bbe97ec31e23032c453"/>
 		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Track 3).bin" size="44782080" crc="c37c1348" sha1="06e30d4766281163647ab801e85d06b829db77e6"/>
@@ -24279,7 +24484,7 @@ User/save disks that can be created from the game itself are not included.
 		<rom name="Shadow of the Beast - Mashou no Okite (Japan) (Track 8).bin" size="67549440" crc="2db914a1" sha1="145324b2616e2cfeac43bd85be6ec1784bfa615d"/>
 		<rom name="Shadow of the Beast - Mashou no Okite (Japan).cue" size="1117" crc="8aa202bc" sha1="8368414b441674a49243e478991083030713dfe6"/>
 		-->
-		<description>Shadow of the Beast - Mashou no Okite</description>
+		<description>Shadow of the Beast - Mashou no Okite (1991-08-29)</description>
 		<year>1991</year>
 		<publisher>ビクター音楽産業 (Victor Musical Industries)</publisher>
 		<info name="serial" value="HMC-157 / F-5503"/>
@@ -24880,6 +25085,33 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="steepia lite (japan)" sha1="9622e76e629eeef2676ef2e3b489b7b4610d120f" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="stress">
+		<!--
+		Origin: redump.org
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 1).bin" size="9878400" crc="7b5dada4" sha1="3c82250db70352efc0b600f0032afffedd7c5c23"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 2).bin" size="2869440" crc="8f767cd6" sha1="4d359841307217b7e4dca517e370dcdbd159c2c2"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 3).bin" size="46181520" crc="dabf4d7b" sha1="c7b7ccb1ee183328a69e7facb200745cec4f4169"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 4).bin" size="30376080" crc="067b2efb" sha1="58a890b2f686ff89c9e61694f390829dacb166f4"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 5).bin" size="24119760" crc="97290dfe" sha1="6bae291ae6b467c94367f3c3707d4b2323bc59d9"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 6).bin" size="38149440" crc="6cce58ef" sha1="a43b659ab01e3f4c4ed3cbe38a421bb10bfd2056"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 7).bin" size="36891120" crc="28ec4ba3" sha1="89b357e6c1559cd07242fbcfb646d4f0d001e9b9"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan) (Track 8).bin" size="3116400" crc="c12f3c2b" sha1="090f2a701b8ec699eee18369f49e60366941e957"/>
+		<rom name="Technostress Yobou-hou Series - Stress (Japan).cue" size="1102" crc="4da73561" sha1="67bee12041d5c62284b75a8c25e83616bd5a8638"/>
+		-->
+		<description>Technostress Yobouhou Series - Stress</description>
+		<year>1989</year>
+		<publisher>東芝EMI (Toshiba EMI)</publisher>
+		<info name="serial" value="HMA-255"/>
+		<info name="alt_title" value="【テクノストレス予防法シリーズ】　ストレス" />
+		<info name="release" value="198911xx" />
+		<info name="usage" value="Requires 2 MB RAM"/>
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="technostress yobou-hou series - stress (japan)" sha1="0117809c22c87992438dc16632039f597eb6cf68" />
 			</diskarea>
 		</part>
 	</software>
@@ -26833,6 +27065,24 @@ User/save disks that can be created from the game itself are not included.
 		<part name="cdrom" interface="fmt_cdrom">
 			<diskarea name="cdrom">
 				<disk name="towns sound v1.1l20 (japan)" sha1="50364d094494c80250fa8d1a064479af8dc3d655" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="tsound1110" cloneof="tsound1120">
+		<!--
+		Origin: redump.org
+		<rom name="Towns Sound V1.1 L10 (Japan).bin" size="11113200" crc="d317fac4" sha1="df49cb4ae0ef41d701de28e4ea3430ae7f62e8eb"/>
+		<rom name="Towns Sound V1.1 L10 (Japan).cue" size="117" crc="139680fa" sha1="5f8b43fef7811e90ac55e4f0ea2116aa79d9eb88"/>
+		-->
+		<description>TownsSOUND V1.1 L10</description>
+		<year>1989</year>
+		<publisher>富士通 (Fujitsu)</publisher>
+		<info name="serial" value="B276D020"/>
+		<info name="release" value="198903xx" />
+		<part name="cdrom" interface="fmt_cdrom">
+			<diskarea name="cdrom">
+				<disk name="towns sound v1.1 l10 (japan)" sha1="a9ec91a5fb0b6d5aecdf087ab2d97216e2160b73" />
 			</diskarea>
 		</part>
 	</software>

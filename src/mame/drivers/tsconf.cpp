@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
 /***************************************************************************
-  
+
   TS-Configuration (ZX Evolution) machine driver.
   Implementation: Revision C / 5-bit VDAC
 
@@ -17,7 +17,7 @@
   - Floppy (WDC1793) Beta-disk compatible interface, IDE (one channel, up to 2 devices on master/slave mode), SD(HC) card, RS232;
   - Sound: AY, Beeper, Covox (PWM);
   - Real-time clock.
-  
+
   Features (TS-Configuration):
   - Resolutions: 360x288, 320x240, 320x200, 256x192
   - Hardware scrolled graphic planes
@@ -25,16 +25,16 @@
   - Programmable color RAM with RGB555 color space and 256 cells
   - Text mode with loadable font and hardware vertical scroll
   - Up to 256 graphic screens
-  
+
   - Up to 85 sprites per line
   - Sprites sized from 8x8 to 64x64 pixels
   - Up to 3 sprite planes
   - Up to 2 tile planes with 8x8 pixels tiles
   - Up to 16 palettes for sprites per line
   - Up to 4 palettes for tiles per line for each tile plane
-  
+
   - DRAM-to-Device, Device-to-DRAM and DRAM-to-DRAM DMA Controller
-  
+
   Refs:
     ZxEvo: http://nedopc.com/zxevo/zxevo_eng.php
            Principal scheme (rev. C) :: http://nedopc.com/zxevo/zxevo_sch_revc.pdf
@@ -43,7 +43,7 @@
            https://github.com/tslabs/zx-evo/raw/master/pentevo/docs/TSconf/TSconf.xls
   FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
       ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
-  
+
   HowTo:
   # Use ts-bios.rom above. You also need tr-dos roms which simpliest(?) to get from pentagon.
   # Create SD image "wc.img"
@@ -55,7 +55,7 @@
   # Change "Reset To: BD boot.$c"
   # Reset (F3)
   # Enable keyboard: MAME Setup (Tab) > Keyboard Mode > AT Keyboard: Enabled
-  
+
   TODO:
   - Interrupts
   - Sprites
@@ -66,7 +66,7 @@
   - Ram cache
   - VDos
   - Many more...
-  
+
  ****************************************************************************/
 
 #include "emu.h"
@@ -145,8 +145,8 @@ void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 static const gfx_layout spectrum_charlayout =
 {
 	8, 8, /* 8 x 8 characters */
-	96,	  /* 96 characters */
-	1,	  /* 1 bits per pixel */
+	96,   /* 96 characters */
+	1,    /* 1 bits per pixel */
 	{0},  /* no bitplanes */
 	/* x offsets */
 	{STEP8(0, 1)},
@@ -231,12 +231,12 @@ void tsconf_state::machine_reset()
 	m_regs[FMAPS] &= 0xef; // xxx0xxxx
 	m_regs[SYS_CONFIG] = 0x00;
 	m_regs[MEM_CONFIG] = 0x04;
-	m_regs[HS_INT] = 0x01;	 // 00000001
+	m_regs[HS_INT] = 0x01;   // 00000001
 	m_regs[VS_INT_L] = 0x00; // 00000001
 	m_regs[VS_INT_H] = 0x00; // 0000xxx0
-	// FDDVirt		= 0x00; // 0000xxx0
+	// FDDVirt      = 0x00; // 0000xxx0
 	m_regs[INT_MASK] = 0x01; // xxxxx001
-	// CacheConfig	= 0x01; // xxxxx001
+	// CacheConfig  = 0x01; // xxxxx001
 
 	if (m_beta->started())
 		m_beta->enable();
@@ -292,5 +292,5 @@ ROM_START(tsconf)
 	ROM_LOAD("ts-bios.rom", 0x010000, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
 ROM_END
 
-//    YEAR	NAME	PARENT		COMPAT	MACHINE		INPUT		CLASS			INIT		COMPANY				FULLNAME							FLAGS
-COMP( 2011,	tsconf,	spec128,	0,		tsconf,		spec_plus,	tsconf_state,	empty_init,	"NedoPC, TS-Labs",	"ZX Evolution TS-Configuration",	MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_TIMING )
+//    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
+COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_TIMING )
