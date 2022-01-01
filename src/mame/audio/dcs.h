@@ -76,6 +76,7 @@ public:
 	uint32_t input_latch32_r();
 	TIMER_CALLBACK_MEMBER( latch_delayed_w );
 	void output_latch_w(uint16_t data);
+	uint16_t output_latch_r();
 	void output_latch32_w(uint32_t data);
 	void delayed_ack_w();
 	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
@@ -106,6 +107,8 @@ public:
 
 	void dcs2_2104_data_map(address_map &map);
 	void dcs2_2104_program_map(address_map &map);
+	void dcs2_2104_pin2k_data_map(address_map &map);
+	void dcs2_2104_pin2k_program_map(address_map &map);
 	void dcs2_2115_data_map(address_map &map);
 	void dcs2_2115_program_map(address_map &map);
 	void dcs_2k_data_map(address_map &map);
@@ -127,6 +130,16 @@ public:
 	cpu_device *get_cpu() { return m_cpu; } // TODO(RH): Same.
 
 	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
+	// for pin2k
+	uint16_t pin2000_status_r();
+	uint16_t data_r_pin2k();
+	void data_w_pin2k(uint16_t data);
+	int m_pin2k_state;
+	int m_scriptmodeactive;
+	int m_dcs_pin2k;
+	int preprocess_write_pin2k(uint16_t data);
+	int preprocess_stage_1_pin2k(uint16_t data);
+	
 
 protected:
 	// construction/destruction
@@ -167,6 +180,10 @@ protected:
 		int32_t       writes_left;
 		uint16_t      sum;
 		int32_t       fifo_entries;
+		// added for pin2k
+		uint8_t		  word_counter;
+		uint8_t		  start_command;
+		uint32_t	  transfer_data[200];
 		timer_device *watchdog;
 	};
 
@@ -361,6 +378,22 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(DCS2_AUDIO_2104, dcs2_audio_2104_device)
+
+// pin 2k 2104 device
+class dcs2_audio_2104_pin2k_device : public dcs2_audio_device
+{
+public:
+	// construction/destruction
+	dcs2_audio_2104_pin2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	
+};
+
+// device type definition
+DECLARE_DEVICE_TYPE(DCS2_AUDIO_2104_PIN2K, dcs2_audio_2104_pin2k_device)
 
 // dcs2_audio_dsio_device
 
