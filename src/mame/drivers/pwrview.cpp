@@ -76,10 +76,8 @@ private:
 	std::vector<u16> m_vram;
 	u8 m_leds[2];
 	u8 m_switch, m_c001, m_c009, m_c280, m_c080, m_errcode, m_vramwin[2];
-	emu_timer *m_dmahack;
 	emu_timer *m_tmr0ext;
 	enum {
-		DMA_TIMER,
 		TMR0_TIMER
 	};
 };
@@ -87,7 +85,6 @@ private:
 void pwrview_state::device_start()
 {
 	save_item(NAME(m_vram));
-	m_dmahack = timer_alloc(DMA_TIMER);
 	m_tmr0ext = timer_alloc(TMR0_TIMER);
 	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
@@ -97,7 +94,7 @@ void pwrview_state::device_reset()
 {
 	m_leds[0] = m_leds[1] = 0;
 	m_switch = 0xe0;
-	m_c001 = m_c009 = m_c080 = 0;
+	m_c001 = m_c009 = m_c080 = m_c280 = 0;
 	m_errcode = 0x31;
 	membank("vram1")->set_entry(0);
 	membank("vram2")->set_entry(0);
@@ -109,10 +106,6 @@ void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param
 {
 	switch(id)
 	{
-		case DMA_TIMER:
-			m_maincpu->drq0_w(1);
-			m_maincpu->drq1_w(1); // TODO: this is unfortunate
-			break;
 		case TMR0_TIMER:
 			m_maincpu->tmrin0_w(ASSERT_LINE);
 			m_maincpu->tmrin0_w(CLEAR_LINE);
@@ -246,22 +239,42 @@ u8 pwrview_state::unk2_r()
 
 void pwrview_state::unk2_w(u8 data)
 {
-	if(data & 0x40)
-		m_dmahack->adjust(attotime::zero, 0, attotime::from_nsec(50));
+	if(BIT(data, 6))
+	{
+		m_maincpu->drq0_w(1);
+		m_maincpu->drq1_w(1);
+	}
 	else
-		m_dmahack->adjust(attotime::never);
+	{
+		m_maincpu->drq0_w(0);
+		m_maincpu->drq1_w(0);
+	}
+	if(!BIT(m_c080, 7))
+	{
+		if(BIT(data, 4))
+			m_tmr0ext->adjust(attotime::from_hz(33500), 0, attotime::from_hz(33500)); //refresh?
+		else
+			m_tmr0ext->adjust(attotime::never);
+	}
+
 	m_biosbank->set_bank((data >> 2) & 3);
 	m_c009 = data;
 }
 
 u8 pwrview_state::unk3_r(offs_t offset)
 {
+	u8 ret = 0;
 	switch(offset)
 	{
 		case 0:
-			return m_c280;
+			ret = m_c280;
+			if(BIT(m_c280, 4))
+				m_c280 &= ~0x10;
+			break;
+		case 2:
+			ret = 0x40; // 8251 RTS?
 	}
-	return 0;
+	return ret;
 }
 
 void pwrview_state::unk3_w(offs_t offset, u8 data)
@@ -287,19 +300,28 @@ void pwrview_state::unk4_w(u8 data)
 	m_c080 = data;
 	if(!BIT(data, 7))
 	{
-		m_tmr0ext->adjust(attotime::never);
+		if(BIT(m_c009, 4))
+			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+		else
+			m_tmr0ext->adjust(attotime::never);
 		return;
 	}
 	switch(data & 7) // this is all hand tuned to match the expected ratio with the pit clock
 	{
 		case 2:
-			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500)); // hfreq?
 			break;
 		case 3:
-			m_tmr0ext->adjust(attotime::from_hz(90), 0, attotime::from_hz(90));
+			m_tmr0ext->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // vfreq?
 			break;
 		case 4:
-			m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000));
+			m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000)); // pixelclock?
+			break;
+		case 0:
+			if(m_maincpu->space(AS_PROGRAM).read_byte(0xfbe00) == 0xff) // HACK: this appears to be the vram bank, are the outputed pixels clocking the timer?
+				m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+			else
+				m_tmr0ext->adjust(attotime::never);
 			break;
 	}
 }
@@ -330,6 +352,7 @@ void pwrview_state::led_w(offs_t offset, u8 data)
 		logerror("%c%c%c%c\n", m_leds[1] & 0x80 ? ' ' : '.', xlate(m_leds[1]), m_leds[0] & 0x80 ? ' ' : '.', xlate(m_leds[0]));
 		m_c009 &= ~2;
 		m_c009 |= (data & 0x80) ? 0 : 2; // TODO: what this means
+		m_c009 &= (data & 0x80) ? ~0x10 : ~0; // TODO: what this means
 	}
 }
 
