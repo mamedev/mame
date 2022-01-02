@@ -120,8 +120,7 @@ public:
 		m_blitter(*this, "blitter"),
 		m_oki(*this, "oki"),
 		m_microtouch(*this,"microtouch"),
-		m_duart(*this, "duart68681"),
-		m_mainram(*this, "mainram")
+		m_duart(*this, "duart68681")
 	{ }
 
 	void tm(machine_config &config);
@@ -143,9 +142,6 @@ private:
 	uint16_t rtc_r(offs_t offset);
 	void rtc_w(offs_t offset, uint16_t data);
 
-	uint16_t oob_r(offs_t offset);
-	void oob_w(offs_t offset, uint16_t data);
-
 	void tmaster_map(address_map &map);
 	void cpu_space_map(address_map &map);
 
@@ -156,8 +152,6 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<microtouch_device> m_microtouch;
 	required_device<mc68681_device> m_duart;
-
-	required_shared_ptr<uint16_t> m_mainram;
 
 	int m_okibank;
 
@@ -261,21 +255,6 @@ void tmaster_state::rtc_w(offs_t offset, uint16_t data)
 	}
 }
 
-uint16_t tmaster_state::oob_r(offs_t offset)
-{
-	if (m_maincpu->pc() > 0x500)
-	{
-		return 0;
-	}
-
-	return m_mainram.target()[offset];
-}
-
-void tmaster_state::oob_w(offs_t offset, uint16_t data)
-{
-	m_mainram.target()[offset] = data;
-}
-
 /***************************************************************************
 
                                 Memory Maps
@@ -290,11 +269,7 @@ READ_LINE_MEMBER(tmaster_state::read_rand)
 void tmaster_state::tmaster_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x27ffff).ram().share("mainram");
-	// special case memory should RAZ after memtest completes, otherwise Solitaire games break
-	// looks like a game bug that is somehow handled by the hardware
-	map(0x212000, 0x212fff).rw(FUNC(tmaster_state::oob_r), FUNC(tmaster_state::oob_w));
-
+	map(0x200000, 0x20ffff).mirror(0x70000).ram();
 	map(0x280000, 0x28ffef).ram().share("nvram");
 	map(0x28fff0, 0x28ffff).rw(FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 
