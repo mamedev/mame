@@ -565,6 +565,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/coco_rawdsk.h,FORMATS["COCO_RAWDSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COCO_RAWDSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/coco_rawdsk.cpp",
+		MAME_DIR.. "src/lib/formats/coco_rawdsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/comx35_dsk.h,FORMATS["COMX35_DSK"] = true
 --------------------------------------------------
 

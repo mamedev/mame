@@ -9,9 +9,7 @@
 ***************************************************************************/
 
 #include "fs_coco_rsdos.h"
-#include "jvc_dsk.h"
-#include "vdk_dsk.h"
-#include "dmk_dsk.h"
+#include "coco_rawdsk.h"
 #include "util/corestr.h"
 #include "util/strformat.h"
 
@@ -36,9 +34,8 @@ void coco_rsdos_image::enumerate_f(floppy_enumerator &fe, u32 form_factor, const
 {
 	if (has(form_factor, variants, floppy_image::FF_525, floppy_image::SSDD))
 	{
-		fe.add(FLOPPY_JVC_FORMAT, 161280, "coco_jvc_rsdos_ss", "CoCo JVC RS-DOS single-sided");
-		fe.add(FLOPPY_VDK_FORMAT, 161280, "coco_vdk_rsdos_ss", "CoCo VDK RS-DOS single-sided");
-		fe.add(FLOPPY_DMK_FORMAT, 161280, "coco_dmk_rsdos_ss", "CoCo DMK RS-DOS single-sided");
+		fe.add(FLOPPY_COCO_RAWDSK_FORMAT, 161280, "coco_rawdsk_rsdos_35", "CoCo Raw Disk RS-DOS single-sided 35 tracks");
+		fe.add(FLOPPY_COCO_RAWDSK_FORMAT, 184320, "coco_rawdsk_rsdos_40", "CoCo Raw Disk RS-DOS single-sided 40 tracks");
 	}
 }
 
