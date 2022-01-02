@@ -25,6 +25,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_pit(*this, "pit"),
+		m_uart(*this, "uart"),
 		m_bios(*this, "bios"),
 		m_ram(*this, "ram"),
 		m_biosbank(*this, "bios_bank"),
@@ -42,8 +43,8 @@ private:
 	void unk2_w(u8 data);
 	u8 unk3_r(offs_t offset);
 	void unk3_w(offs_t offset, u8 data);
-	u8 unk4_r();
-	void unk4_w(u8 data);
+	u8 unk4_r(offs_t offset);
+	void unk4_w(offs_t offset, u8 data);
 	u8 led_r(offs_t offset);
 	void led_w(offs_t offset, u8 data);
 	u8 pitclock_r();
@@ -70,15 +71,19 @@ private:
 
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
+	required_device<i8251_device> m_uart;
 	required_memory_region m_bios;
 	required_shared_ptr<u16> m_ram;
 	required_device<address_map_bank_device> m_biosbank;
 	std::vector<u16> m_vram;
 	u8 m_leds[2];
 	u8 m_switch, m_c001, m_c009, m_c280, m_c080, m_errcode, m_vramwin[2];
+	bool m_dtr;
 	emu_timer *m_tmr0ext;
+	emu_timer *m_tmrkbd;
 	enum {
-		TMR0_TIMER
+		TMR0_TIMER,
+		KBD_TIMER
 	};
 };
 
@@ -86,6 +91,7 @@ void pwrview_state::device_start()
 {
 	save_item(NAME(m_vram));
 	m_tmr0ext = timer_alloc(TMR0_TIMER);
+	m_tmrkbd = timer_alloc(KBD_TIMER);
 	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 }
@@ -100,6 +106,8 @@ void pwrview_state::device_reset()
 	membank("vram2")->set_entry(0);
 	m_vramwin[0] = m_vramwin[1] = 0;
 	m_biosbank->set_bank(0);
+	m_uart->write_cts(0);
+	m_tmrkbd->adjust(attotime::from_hz(9600*16), 0, attotime::from_hz(9600*16)); // kbd baud is guess
 }
 
 void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -109,6 +117,12 @@ void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		case TMR0_TIMER:
 			m_maincpu->tmrin0_w(ASSERT_LINE);
 			m_maincpu->tmrin0_w(CLEAR_LINE);
+			break;
+		case KBD_TIMER:
+			m_uart->write_rxc(ASSERT_LINE);
+			m_uart->write_txc(ASSERT_LINE);
+			m_uart->write_rxc(CLEAR_LINE);
+			m_uart->write_txc(CLEAR_LINE);
 			break;
 	}
 }
@@ -273,6 +287,7 @@ u8 pwrview_state::unk3_r(offs_t offset)
 			break;
 		case 2:
 			ret = 0x40; // 8251 RTS?
+			break;
 	}
 	return ret;
 }
@@ -283,46 +298,57 @@ void pwrview_state::unk3_w(offs_t offset, u8 data)
 	{
 		case 0:
 			m_c280 = data;
-			m_pit->set_clockin(0, data & 0x20 ? 1000000 : 0);
-			m_pit->set_clockin(1, data & 0x40 ? 1000000 : 0);
-			m_pit->set_clockin(2, data & 0x80 ? 1000000 : 0);
+			m_pit->set_clockin(0, BIT(data, 5) ? 1000000 : 0);
+			m_pit->set_clockin(1, BIT(data, 6) ? 1000000 : 0);
+			m_pit->set_clockin(2, BIT(data, 7) ? 1000000 : 0);
 			break;
 	}
 }
 
-u8 pwrview_state::unk4_r()
+u8 pwrview_state::unk4_r(offs_t offset)
 {
-	return m_c080;
-}
-
-void pwrview_state::unk4_w(u8 data)
-{
-	m_c080 = data;
-	if(!BIT(data, 7))
+	switch(offset)
 	{
-		if(BIT(m_c009, 4))
-			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
-		else
-			m_tmr0ext->adjust(attotime::never);
-		return;
-	}
-	switch(data & 7) // this is all hand tuned to match the expected ratio with the pit clock
-	{
-		case 2:
-			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500)); // hfreq?
-			break;
-		case 3:
-			m_tmr0ext->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // vfreq?
-			break;
-		case 4:
-			m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000)); // pixelclock?
-			break;
 		case 0:
-			if(m_maincpu->space(AS_PROGRAM).read_byte(0xfbe00) == 0xff) // HACK: this appears to be the vram bank, are the outputed pixels clocking the timer?
-				m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
-			else
-				m_tmr0ext->adjust(attotime::never);
-			break;
+			return m_c080;
+		case 2:
+			return m_dtr ? 0 : 0x80;
+	}
+	return 0;
+}
+
+void pwrview_state::unk4_w(offs_t offset, u8 data)
+{
+	switch(offset)
+	{
+		case 0:
+			m_c080 = data;
+			if(!BIT(data, 7))
+			{
+				if(BIT(m_c009, 4))
+					m_tmr0ext->adjust(attotime::from_hz(33500), 0, attotime::from_hz(33500));
+				else
+					m_tmr0ext->adjust(attotime::never);
+				return;
+			}
+			switch(data & 7) // this is all hand tuned to match the expected ratio with the pit clock
+			{
+				case 2:
+					m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500)); // hfreq?
+					break;
+				case 3:
+					m_tmr0ext->adjust(attotime::from_hz(60), 0, attotime::from_hz(60)); // vfreq?
+					break;
+				case 4:
+					m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000)); // pixelclock?
+					break;
+				case 0:
+					if(m_maincpu->space(AS_PROGRAM).read_byte(0xfbe00) == 0xff) // HACK: this appears to be the vram bank, are the outputed pixels clocking the timer?
+						m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+					else
+						m_tmr0ext->adjust(attotime::never);
+					break;
+			}
 	}
 }
 
@@ -410,7 +436,7 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc009, 0xc009).rw(FUNC(pwrview_state::unk2_r), FUNC(pwrview_state::unk2_w));
 	map(0xc00b, 0xc00b).r(FUNC(pwrview_state::err_r));
 	map(0xc00c, 0xc00d).ram();
-	map(0xc080, 0xc080).rw(FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
+	map(0xc080, 0xc087).rw(FUNC(pwrview_state::unk4_r), FUNC(pwrview_state::unk4_w));
 	map(0xc088, 0xc088).w("crtc", FUNC(hd6845s_device::address_w));
 	map(0xc08a, 0xc08a).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
@@ -450,7 +476,9 @@ void pwrview_state::pwrview(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:0", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
-	I8251(config, "uart", 0);
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set([this](bool state){ if(BIT(m_c280, 4)) m_uart->write_rxd(state); });
+	m_uart->dtr_handler().set([this](bool state){ m_dtr = state; });
 
 	Z80SIO(config, "sio", 4000000); // Z8442BPS (SIO/2)
 
