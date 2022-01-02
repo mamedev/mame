@@ -38,6 +38,7 @@ TODO:
 
 #define MCD212_ICM_CS               0x400000    // CLUT select
 #define MCD212_ICM_NR               0x080000    // Number of region flags
+#define MCD212_ICM_NR_BIT           19
 #define MCD212_ICM_EV               0x040000    // External video
 #define MCD212_ICM_MODE2            0x000f00    // Plane 2
 #define MCD212_ICM_MODE2_SHIFT      8
@@ -70,11 +71,11 @@ TODO:
 
 #define MCD212_RC_X                 0x0003ff    // X position
 #define MCD212_RC_WF                0x00fc00    // Weight position
-#define MCD212_RC_WF_SHIFT          10
+#define MCD212_RC_WF_BIT            10
 #define MCD212_RC_RF                0x010000    // Region flag
-#define MCD212_RC_RF_SHIFT          16
+#define MCD212_RC_RF_BIT            16
 #define MCD212_RC_OP                0xf00000    // Operation
-#define MCD212_RC_OP_SHIFT          20
+#define MCD212_RC_OP_BIT            20
 
 #define MCD212_CSR1W_ST             0x0002  // Standard
 #define MCD212_CSR1W_BE             0x0001  // Bus Error
@@ -103,12 +104,6 @@ TODO:
 #define MCD212_DDR_MT_16            0x0c00  // 16x1
 #define MCD212_DDR_MT_SHIFT         10
 
-typedef uint8_t BYTE68K;
-typedef uint16_t WORD68K;
-typedef int16_t SWORD68K;
-
-#define BYTE68K_MAX 255
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -126,15 +121,11 @@ public:
 
 	auto int_callback() { return m_int_callback.bind(); }
 
-	template <typename... T> void set_scanline_callback(T &&... args) { m_scanline_callback.set(std::forward<T>(args)...); }
-
 	// device members
 	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TIMER_CALLBACK_MEMBER( perform_scan );
 
-	bitmap_rgb32& get_bitmap() { return m_bitmap; }
-
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct channel_t
@@ -176,28 +167,28 @@ public:
 	struct ab_t
 	{
 		//* Color limit array.
-		BYTE68K limit[3 * BYTE68K_MAX];
+		uint8_t limit[3 * 0xff];
 
 		//* Color clamp array.
-		BYTE68K clamp[3 * BYTE68K_MAX];
+		uint8_t clamp[3 * 0xff];
 
 		//* U-to-B matrix array.
-		SWORD68K matrixUB[BYTE68K_MAX + 1];
+		int16_t matrixUB[0x100];
 
 		//* U-to-G matrix array.
-		SWORD68K matrixUG[BYTE68K_MAX + 1];
+		int16_t matrixUG[0x100];
 
 		//* V-to-G matrix array.
-		SWORD68K matrixVG[BYTE68K_MAX + 1];
+		int16_t matrixVG[0x100];
 
 		//* V-to-R matrix array.
-		SWORD68K matrixVR[BYTE68K_MAX + 1];
+		int16_t matrixVR[0x100];
 
 		//* Delta-Y decoding array.
-		BYTE68K deltaY[BYTE68K_MAX + 1];
+		uint8_t deltaY[0x100];
 
 		//* Delta-U/V decoding array.
-		BYTE68K deltaUV[BYTE68K_MAX + 1];
+		uint8_t deltaUV[0x100];
 	};
 
 protected:
@@ -210,18 +201,15 @@ private:
 	// interrupt callbacks
 	devcb_write_line m_int_callback;
 
-	scanline_callback_delegate m_scanline_callback;
-
 	required_shared_ptr<uint16_t> m_planea;
 	required_shared_ptr<uint16_t> m_planeb;
 
 	// internal state
 	channel_t m_channel[2];
-	emu_timer *m_scan_timer;
 	uint8_t m_region_flag_0[768];
 	uint8_t m_region_flag_1[768];
-
-	bitmap_rgb32 m_bitmap;
+	int m_ica_height;
+	int m_total_height;
 
 	static const uint32_t s_4bpp_color[16];
 
@@ -247,8 +235,8 @@ private:
 
 	void mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *plane_a_b, uint8_t *plane_b_r, uint8_t *plane_b_g, uint8_t *plane_b_b, uint32_t *out);
 
-	void draw_cursor(uint32_t *scanline, int y);
-	void draw_scanline(int y);
+	void draw_cursor(uint32_t *scanline);
+	void draw_scanline(bitmap_rgb32 &bitmap);
 
 	void ab_init();
 };
