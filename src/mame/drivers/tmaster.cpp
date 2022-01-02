@@ -17,7 +17,6 @@ To Do:
  - Coin optics
  - Correct sound banking
  - Proper protection emulation in tm4k and later games
- - Find cause and fix hang in Solitaire Erotic (all Touchmaster version hang in this game)
 
 To be dumped and added:
 
@@ -122,7 +121,7 @@ public:
 		m_oki(*this, "oki"),
 		m_microtouch(*this,"microtouch"),
 		m_duart(*this, "duart68681"),
-		m_oob_ram(*this, "oob_ram")
+		m_mainram(*this, "mainram")
 	{ }
 
 	void tm(machine_config &config);
@@ -158,7 +157,7 @@ private:
 	required_device<microtouch_device> m_microtouch;
 	required_device<mc68681_device> m_duart;
 
-	required_shared_ptr<uint16_t> m_oob_ram;
+	required_shared_ptr<uint16_t> m_mainram;
 
 	int m_okibank;
 
@@ -269,12 +268,12 @@ uint16_t tmaster_state::oob_r(offs_t offset)
 		return 0;
 	}
 
-	return m_oob_ram.target()[offset];
+	return m_mainram.target()[offset];
 }
 
 void tmaster_state::oob_w(offs_t offset, uint16_t data)
 {
-	m_oob_ram.target()[offset] = data;
+	m_mainram.target()[offset] = data;
 }
 
 /***************************************************************************
@@ -291,13 +290,11 @@ READ_LINE_MEMBER(tmaster_state::read_rand)
 void tmaster_state::tmaster_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom();
-	map(0x200000, 0x211fff).ram();
-
+	map(0x200000, 0x27ffff).ram().share("mainram");
 	// special case memory should RAZ after memtest completes, otherwise Solitaire games break
 	// looks like a game bug that is somehow handled by the hardware
-	map(0x212000, 0x212fff).ram().share("oob_ram").rw(FUNC(tmaster_state::oob_r), FUNC(tmaster_state::oob_w));
+	map(0x212000, 0x212fff).rw(FUNC(tmaster_state::oob_r), FUNC(tmaster_state::oob_w));
 
-	map(0x213000, 0x27ffff).ram();
 	map(0x280000, 0x28ffef).ram().share("nvram");
 	map(0x28fff0, 0x28ffff).rw(FUNC(tmaster_state::rtc_r), FUNC(tmaster_state::rtc_w));
 
