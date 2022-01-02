@@ -32,7 +32,9 @@ enum class meta_name {
 	sequential,
 	size_in_blocks,
 	file_type,
-	ascii_flag
+	ascii_flag,
+	owner_id,
+	attributes
 };
 
 enum class meta_type {

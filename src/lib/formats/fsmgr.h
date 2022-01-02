@@ -158,7 +158,9 @@ public:
 		block_t strong() { return block_t(m_object, false); }
 		block_t weak() { return block_t(m_object, true); }
 
-		const u8 *rodata() { return m_object->rodata(); }
+		u32 size() const { return m_object->size(); }
+
+		const u8 *rodata() const { return m_object->rodata(); }
 		u8 *data() { return m_object->data(); }
 
 		void copy(u32 offset, const u8 *src, u32 size);

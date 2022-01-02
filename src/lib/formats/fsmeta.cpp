@@ -26,6 +26,8 @@ const char *meta_data::entry_name(meta_name name)
 	case meta_name::size_in_blocks: return "size_in_blocks";
 	case meta_name::file_type: return "file_type";
 	case meta_name::ascii_flag: return "ascii_flag";
+	case meta_name::owner_id: return "owner_id";
+	case meta_name::attributes: return "attributes";
 	}
 	return "";
 }

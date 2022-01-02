@@ -2124,4 +2124,16 @@ if opt_tool(FORMATS, "FS_COCO_RSDOS") then
 	}
 end
 
+--------------------------------------------------
+--
+--@src/lib/formats/fs_coco_os9.h,FORMATS["FS_COCO_OS9"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_COCO_OS9") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_coco_os9.cpp",
+		MAME_DIR.. "src/lib/formats/fs_coco_os9.h",
+	}
+end
+
 end

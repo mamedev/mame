@@ -364,6 +364,10 @@
 #include "fs_coco_rsdos.h"
 #endif
 
+#ifdef HAS_FORMATS_FS_COCO_OS9
+#include "fs_coco_os9.h"
+#endif
+
 #ifdef HAS_FORMATS_JFD_DSK
 #include "jfd_dsk.h"
 #endif
@@ -1084,6 +1088,9 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #endif
 #ifdef HAS_FORMATS_FS_COCO_RSDOS
 	en.add(fs::COCO_RSDOS); // fs_coco_rsdos.h
+#endif
+#ifdef HAS_FORMATS_FS_COCO_OS9
+	en.add(fs::COCO_OS9); // fs_coco_os9.h
 #endif
 
 	en.category("Kaypro");

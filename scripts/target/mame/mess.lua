@@ -1185,6 +1185,7 @@ FORMATS["ZX81_P"] = true
 FORMATS["FS_PRODOS"] = true
 FORMATS["FS_ORIC_JASMIN"] = true
 FORMATS["FS_COCO_RSDOS"] = true
+FORMATS["FS_COCO_OS9"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
