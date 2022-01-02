@@ -32,7 +32,11 @@ const coco_rawdsk_format::format coco_rawdsk_format::formats[] =
 {
 	{
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
-		2000, 18, 35, 1, 256, {}, -1, { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18 }, 32, 22, 24
+		2000, 18, 35, 1, 256, {}, -1, { 1,12,5,16,9,2,13,6,17,10,3,14,7,18,11,4,15,8 }, 32, 22, 24
+	},
+	{
+		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
+		2000, 18, 40, 1, 256, {}, -1, { 1,12,5,16,9,2,13,6,17,10,3,14,7,18,11,4,15,8 }, 32, 22, 24
 	},
 	{}
 };
