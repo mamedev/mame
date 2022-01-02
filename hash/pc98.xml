@@ -69771,7 +69771,8 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		</part>
 	</software>
     
-    <software name="kuronoda" supported="yes">
+    <!-- The game works fine on 9801 but hangs on 9821 -->
+    <software name="kuronoda" supported="no">
 		<description>Kuro no Danshou - The Literary Fragment</description>
 		<year>1995</year>
 		<publisher>アボガドパワーズ (Abogado Powers)</publisher>
@@ -69796,13 +69797,13 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 				<rom name="Kuro no Danshou - The Literary Fragment (Disk B).hdm" size="1261568" crc="74441140" sha1="de8732198cea1ee5e79a47b0a45f128e9328b09b" offset="0" />
 			</dataarea>
 		</part>
-    		<part name="flop5" interface="floppy_5_25">
+    		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="Kuro no Danshou - The Literary Fragment (Disk C).hdm" size="1261568" crc="a9808040" sha1="e2bdf9990a95229d75f717b8f91cd9549b928771" offset="0" />
 			</dataarea>
 		</part>
-    		<part name="flop3" interface="floppy_5_25">
+    		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Disk D"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="Kuro no Danshou - The Literary Fragment (Disk D).hdm" size="1261568" crc="a0509730" sha1="4e8fe2c10de9896f538d2a918238fa91f43ac2e3" offset="0" />
