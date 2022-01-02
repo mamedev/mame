@@ -64,13 +64,12 @@ bool coco_rsdos_image::has_rsrc() const
 
 std::vector<meta_description> coco_rsdos_image::file_meta_description() const
 {
-	// CoCo RS-DOS has two other types of metadata:
-	// - File Type (0=BASIC, 1=data, 2=binary, 3=assembler)
-	// - ASCII Flag (0x00=binary, 0xFF=ASCII)
 	std::vector<meta_description> results;
 	results.emplace_back(meta_description(meta_name::name, meta_type::string, "", false, [](const meta_value &m) { return validate_filename(m.as_string()); }, "File name, 8.3"));
-	results.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
+	results.emplace_back(meta_description(meta_name::file_type, meta_type::number, 0, true, nullptr, "Type of the file"));
+	results.emplace_back(meta_description(meta_name::ascii_flag, meta_type::string, 0, true, nullptr, "Ascii or binary flag"));
 	results.emplace_back(meta_description(meta_name::size_in_blocks, meta_type::number, 0, true, nullptr, "Number of granules used by the file"));
+	results.emplace_back(meta_description(meta_name::length, meta_type::number, 0, true, nullptr, "Size of the file in bytes"));
 	return results;
 }
 
@@ -205,12 +204,13 @@ bool coco_rsdos_image::impl::granule_iterator::next(u8 &granule, u16 &byte_count
 			byte_count = 9 * 256;
 			m_current_granule = granule_map_data[*m_current_granule];
 		}
-		else if (granule_map_data[*m_current_granule] >= 0xC1 && granule_map_data[*m_current_granule] <= 0xC9)
+		else if (granule_map_data[*m_current_granule] >= 0xC0 && granule_map_data[*m_current_granule] <= 0xC9)
 		{
 			// this is the last granule in the file
 			success = true;
 			granule = *m_current_granule;
-			byte_count = (granule_map_data[*m_current_granule] - 0xC1) * 256 + m_last_sector_bytes;
+			u16 sector_count = std::max(granule_map_data[*m_current_granule], (u8)0xC1) - 0xC1;
+			byte_count = sector_count * 256 + m_last_sector_bytes;
 			m_current_granule = std::nullopt;
 		}
 		else
@@ -246,11 +246,17 @@ meta_data coco_rsdos_image::impl::file::metadata()
 		granule_count++;
 		file_size += byte_count;
 	}
-	
+
+	// turn the ASCII flag to a single character (this reflects what the user sees when doing a directory listing on a real CoCo)
+	char file_type_char = 'B' + m_dirent.m_asciiflag;
+
+	// build the metadata and return it
 	meta_data result;
-	result.set(meta_name::name, get_filename_from_dirent(m_dirent));
-	result.set(meta_name::size_in_blocks, granule_count);
-	result.set(meta_name::length, file_size);
+	result.set(meta_name::name,				get_filename_from_dirent(m_dirent));
+	result.set(meta_name::file_type,		m_dirent.m_filetype);
+	result.set(meta_name::ascii_flag,		std::string(1, file_type_char));
+	result.set(meta_name::size_in_blocks,	granule_count);
+	result.set(meta_name::length,			file_size);
 	return result;
 }
 

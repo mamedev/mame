@@ -24,6 +24,8 @@ const char *meta_data::entry_name(meta_name name)
 	case meta_name::rsrc_length: return "rsrc_length";
 	case meta_name::sequential: return "sequential";
 	case meta_name::size_in_blocks: return "size_in_blocks";
+	case meta_name::file_type: return "file_type";
+	case meta_name::ascii_flag: return "ascii_flag";
 	}
 	return "";
 }
