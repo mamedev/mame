@@ -122,8 +122,7 @@ public:
 	auto int_callback() { return m_int_callback.bind(); }
 
 	// device members
-	uint16_t regs_r(offs_t offset, uint16_t mem_mask = ~0);
-	void regs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void map(address_map &map);
 
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -197,7 +196,28 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
+	uint8_t csr1_r();
+	void csr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dcr1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vsr1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vsr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ddr1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ddr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dca1_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dca1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint8_t csr2_r();
+	void csr2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dcr2_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t vsr2_r(offs_t offset, uint16_t mem_mask = ~0);
+	void vsr2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t ddr2_r(offs_t offset, uint16_t mem_mask = ~0);
+	void ddr2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dca2_r(offs_t offset, uint16_t mem_mask = ~0);
+	void dca2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
 	// interrupt callbacks
 	devcb_write_line m_int_callback;
 
