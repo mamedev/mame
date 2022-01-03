@@ -271,7 +271,7 @@ u16 alpha68k_N_state::kyros_alpha_trigger_r(offs_t offset)
 		}
 		else
 		{
-			if (m_microcontroller_id == 0x00ff)     /* Super Stingry */
+			if (m_microcontroller_id == 0x00ff || m_game_id == ALPHA68K_JONGBOU)     /* Super Stingry */
 			{
 				if (m_trigstate >= 12 || m_game_id == ALPHA68K_JONGBOU) /* arbitrary value ! */
 				{
@@ -518,7 +518,7 @@ static const gfx_layout jongbou_layout1 =
 	8,8,    /* 8*8 chars */
 	1024,
 	3,      /* 3 bits per pixel */
-	{ 4, 0+0x20000*8, 4+0x20000*8 },
+	{ 4+0x00000*8, 0+0x8000*8, 4+0x8000*8 },
 	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
 	{ STEP8(0,8) },
 	16*8    /* every char takes 16 consecutive bytes */
@@ -529,40 +529,7 @@ static const gfx_layout jongbou_layout2 =
 	8,8,    /* 8*8 chars */
 	1024,
 	3,      /* 3 bits per pixel */
-	{ 0, 0+0x28000*8, 4+0x28000*8 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ STEP8(0,8) },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout jongbou_layout3 =
-{
-	8,8,    /* 8*8 chars */
-	1024,
-	3,      /* 3 bits per pixel */
-	{ 4+0x8000*8, 0+0x10000*8, 4+0x10000*8 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ STEP8(0,8) },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout jongbou_layout4 =
-{
-	8,8,    /* 8*8 chars */
-	1024,
-	3,      /* 3 bits per pixel */
-	{ 0x8000*8, 0x18000*8, 4+0x18000*8 },
-	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
-	{ STEP8(0,8) },
-	16*8    /* every char takes 16 consecutive bytes */
-};
-
-static const gfx_layout jongbou_layout5 =
-{
-	8,8,    /* 8*8 chars */
-	1024,
-	3,      /* 3 bits per pixel */
-	{ 4+0x4000*8, 0+0x24000*8, 4+0x24000*8 },
+	{ 0+0x00000*8, 0+0x10000*8, 4+0x10000*8 },
 	{ 8*8+3, 8*8+2, 8*8+1, 8*8+0, 3, 2, 1, 0 },
 	{ STEP8(0,8) },
 	16*8    /* every char takes 16 consecutive bytes */
@@ -587,11 +554,14 @@ static GFXDECODE_START( gfx_kyros )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_jongbou )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout3,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout4,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, jongbou_layout5,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x18000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x18000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x04000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x04000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x1c000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0x1c000, jongbou_layout2,  0, 32 )
 GFXDECODE_END
 
 /*
@@ -999,9 +969,10 @@ ROM_START( jongbou )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
-	ROM_LOAD( "p6.l15", 0x00000, 0x10000, CRC(1facee65) SHA1(6c98338c616e53106960063d0d31483131b492b0) )
-	ROM_LOAD( "p5.k15", 0x10000, 0x10000, CRC(db0ad6bb) SHA1(c2ce0e78a4be9314f4f14ea87f521a79bab3697c) )
-	ROM_LOAD( "p4.j15", 0x20000, 0x10000, CRC(56842cfa) SHA1(141ed992332540487cec951eab61c18be994b618) )
+	ROM_LOAD( "p6.l15", 0x00000, 0x08000, CRC(1facee65) SHA1(6c98338c616e53106960063d0d31483131b492b0) )
+	ROM_CONTINUE(0x18000,0x8000)
+	ROM_LOAD( "p5.k15", 0x20000, 0x10000, CRC(db0ad6bb) SHA1(c2ce0e78a4be9314f4f14ea87f521a79bab3697c) )
+	ROM_LOAD( "p4.j15", 0x08000, 0x10000, CRC(56842cfa) SHA1(141ed992332540487cec951eab61c18be994b618) )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "r.k2",  0x0000, 0x0100, CRC(0563235a) SHA1(c337a9a15c1a27012a963fc4e1345605aaa1401f) )
@@ -1015,6 +986,38 @@ ROM_START( jongbou )
 	ROM_REGION( 0x2000, "color_proms", 0 )
 	ROM_LOAD( "p3.i15", 0x0000, 0x2000, CRC(8c09cd2a) SHA1(317764e0f5af29e78fd764bdf28579bf6be5630f) )
 ROM_END
+
+ROM_START( jongbou2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "j.b1_ver.2.13a.27c512", 0x00000, 0x10000, CRC(22e18446) SHA1(e6f6f06a99c66dcf8b3e05b85c35597a26b57aa2) )
+	ROM_LOAD16_BYTE( "j.b2_ver.2.16a.27c512", 0x00001, 0x10000, CRC(c30d0030) SHA1(56d3aacf7f53970c21abd6ac5592a5b29ac946c8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "j.b7.1i.27256", 0x00000, 0x8000, CRC(88d74794) SHA1(98dbbb4d88c1e96a0e251e39ef43b02bd68e0bba) )
+
+	ROM_REGION( 0x10000, "mcu", 0 )
+	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "j.b6.16l.27c512",  0x00000, 0x08000, CRC(71c53f95) SHA1(0e12d03f2bbcff14816f739026e40939c9f68bab) )
+	ROM_CONTINUE(0x18000,0x8000)
+	ROM_LOAD( "j.b5.16k.27c512",  0x20000, 0x10000, CRC(d68b6412) SHA1(6734f5eb31fbf7b5b3edf1d8c4369cc74aea74ab) )
+	ROM_LOAD( "j.b24.16j.27c512", 0x08000, 0x10000, CRC(7dad0bda) SHA1(bea00314036a43806c07c39a0d3f7020990ded09) )
+
+	ROM_REGION( 0x300, "proms", 0 )
+	ROM_LOAD( "2.l2.82s129a",  0x0000, 0x0100, CRC(aa5c9b97) SHA1(2758d393aa210fab0af9f5fd817edbd5c71a88f2) )
+	ROM_LOAD( "1.l1.82s129a",  0x0100, 0x0100, CRC(15e45cf2) SHA1(f0712b43e8423f811a1691b1f51683a7af58f868) )
+	ROM_LOAD( "3.l3.82s129a",  0x0200, 0x0100, CRC(90de80ca) SHA1(d58c5fed42ac71b84bb51e6acfe1d65158532387) )
+
+	ROM_REGION( 0x200, "clut_proms", 0 )
+	ROM_LOAD( "4.l9.82s129a",  0x0100, 0x0100, CRC(a2c6204a) SHA1(3bb342eced4abc0d7404b00343b3770dd7a0003e) )
+	ROM_LOAD( "5.l10.82s129a", 0x0000, 0x0100, CRC(f7cdebee) SHA1(20cb28e2fb9507ef1aaa9c05f22ca589756eb49d) )
+
+	ROM_REGION( 0x2000, "color_proms", 0 )
+	ROM_LOAD( "j.b3.16i.2764", 0x00000, 0x2000, CRC(d13a1c02) SHA1(7ad4b96f5ce05e0ca5b55c486b3870d756e6bded) )
+ROM_END
+
+
 
 void sstingray_state::init_sstingry()
 {
@@ -1045,9 +1048,18 @@ void jongbou_state::init_jongbou()
 	m_game_id = ALPHA68K_JONGBOU;
 }
 
+void jongbou_state::init_jongbou2()
+{
+	init_jongbou();
+	m_microcontroller_id = 0x0012;
+}
+
+
 GAME( 1986, sstingry,  0,        sstingry,       sstingry,  sstingray_state, init_sstingry,  ROT90, "Alpha Denshi Co.",                                  "Super Stingray (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_TIMING )
 
 GAME( 1987, kyros,     0,        kyros,          kyros,     kyros_state, init_kyros,     ROT90, "Alpha Denshi Co. (World Games Inc. license)",       "Kyros", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, kyrosj,    kyros,    kyros,          kyros,     kyros_state, init_kyros,     ROT90, "Alpha Denshi Co.",                                  "Kyros no Yakata (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, jongbou,   0,        jongbou,        jongbou,   jongbou_state,    init_jongbou,   ROT90, "SNK",                                               "Mahjong Block Jongbou (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1987, jongbou2,  0,        jongbou,        jongbou,   jongbou_state,    init_jongbou2,  ROT90, "SNK",                                               "Mahjong Block Jongbou 2 (Japan)", MACHINE_SUPPORTS_SAVE )
