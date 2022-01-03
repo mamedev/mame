@@ -35,6 +35,7 @@ static void display_usage()
 	fprintf(stderr, "       floptool.exe flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n");
 	fprintf(stderr, "       floptool.exe flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n");
 	fprintf(stderr, "       floptool.exe flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n");
+	fprintf(stderr, "       floptool.exe version                                                                -- Display the current version of floptool\n");
 }
 
 static void display_formats()
