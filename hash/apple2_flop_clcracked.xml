@@ -46776,4 +46776,117 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="kenus112">
+		<description>Ken Uston's Professional Blackjack (Version 1.12) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>Intelligent Statements</publisher>
+		<info name="release" value="2021-12-31"/>
+		<!--"Ken Uston's Professional Blackjack" is a 1983 card game developed and distributed by Intelligent Statements. This is version 1.12. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="ken uston's professional blackjack v1.12 (4am crack).dsk" size="143360" crc="027933c6" sha1="a73a1648879a3e0223c67b7b71670b92ffd9926c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinolnch">
+		<description>Dinosaur's Lunch (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Dinosaur's Lunch" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="dinosaur's lunch (4am crack).dsk" size="143360" crc="87f9d6c6" sha1="426ef821a5448d9ce8955195cf7c46efaa5736af"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="racekeys">
+		<description>Race Car Keys (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Race Car Keys" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="race car keys (4am crack).dsk" size="143360" crc="ae68c7c6" sha1="69dca0d7e57edb59fadde9c6da482d045558c19f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhbchord">
+		<description>Functional Harmony: Basic Chords (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Functional Harmony: Basic Chords" is a 1987 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- basic chords (4am crack).dsk" size="143360" crc="3cf27e56" sha1="c74402014e1fb0d372e925df22eeb0c4f151b21e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhdia7th">
+		<description>Functional Harmony: Diatonic Seventh Chords (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Functional Harmony: Diatonic Seventh Chords" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- diatonic seventh chords (4am crack).dsk" size="143360" crc="d9e14b76" sha1="70cdb71b772f0124901a1efec89663b6ac54277c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fhboachr">
+		<description>Functional Harmony: Borrowed and Altered Chords (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Electronic Courseware Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Functional Harmony: Borrowed and Altered Chords" is a 1988 educational program developed by Vincent Oddo and distributed by Electronic Courseware Systems. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="functional harmony- borrowed and altered chords (4am crack).dsk" size="143360" crc="cd53e752" sha1="1bc8a7db008717854b9c1b2493939e533f63e03f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brsltrsnd">
+		<description>Building Reading Skills: The Letter-Sound Farm (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Borg-Warner Educational Systems</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"Building Reading Skills: The Letter-Sound Farm" is a 1984 educational program developed and distributed by Borg-Warner Educational Systems. It requires a Ufonic Voice System peripheral card. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="building reading skills- the letter-sound farm (4am crack).dsk" size="143360" crc="e856ffbe" sha1="4ad13935ebc7d9ba2c62c041a459f2620dc34b40"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="followme">
+		<description>Follow Me (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Electronic Courseware Systems</publisher>
+        <info name="usage" value="Requires MIDI keyboard" />
+		<info name="release" value="2022-01-03"/>
+		<!--"Follow Me" is a 1989 educational program developed by Brenna Bailey and distributed by Electronic Courseware Systems. It requires a MIDI keyboard. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="follow me (4am crack).dsk" size="143360" crc="2f7d52d5" sha1="174d8d956bf71a1820ad8fed563245354e48b507"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

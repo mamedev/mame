@@ -18551,4 +18551,20 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="stelpowr">
+		<description>Stellar Power</description>
+		<year>1984</year>
+		<publisher>STI Software</publisher>
+		<info name="release" value="2022-01-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS"/>
+		<!-- It requires a 48K Apple II+ or later. -->
+		<!--"Stellar Power" is a 1984 strategy game developed by David Strimple and distributed by STI Software. It requires a 48K Apple ][+ or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234829">
+				<rom name="stellar power.woz" size="234829" crc="230af062" sha1="b3bb6cedfcd1063ee7b04d537b33d97723323012"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
