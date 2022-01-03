@@ -1275,6 +1275,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"exorterm",
 		"fairch",
 		"fairlight",
+		"falco",
 		"fidelity",
 		"force",
 		"francedr",
@@ -2464,6 +2465,13 @@ files {
 	MAME_DIR .. "src/mame/machine/cmi_ankbd.h",
 	MAME_DIR .. "src/mame/machine/cmi_mkbd.cpp",
 	MAME_DIR .. "src/mame/machine/cmi_mkbd.h",
+}
+
+createMESSProjects(_target, _subtarget, "falco")
+files {
+	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
+	MAME_DIR .. "src/mame/drivers/falcots.cpp",
+	MAME_DIR .. "src/mame/drivers/falcots28.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")
@@ -4605,8 +4613,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/facit4440.cpp",
-	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
-	MAME_DIR .. "src/mame/drivers/falcots.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",

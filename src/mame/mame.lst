@@ -13750,6 +13750,9 @@ falco5220s                      // 1989
 ts1                             // 1980
 ts2624                          // 1982
 
+@source:falcots28.cpp
+ts28                            // 1983
+
 @source:falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
 
