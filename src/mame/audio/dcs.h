@@ -130,16 +130,13 @@ public:
 	cpu_device *get_cpu() { return m_cpu; } // TODO(RH): Same.
 
 	enum { REV_DCS1, REV_DCS1P5, REV_DCS2, REV_DSIO, REV_DENV };
+
 	// for pin2k
 	uint16_t pin2000_status_r();
 	uint16_t data_r_pin2k();
 	void data_w_pin2k(uint16_t data);
-	int m_pin2k_state;
-	int m_scriptmodeactive;
-	int m_dcs_pin2k;
 	int preprocess_write_pin2k(uint16_t data);
 	int preprocess_stage_1_pin2k(uint16_t data);
-	
 
 protected:
 	// construction/destruction
@@ -180,10 +177,11 @@ protected:
 		int32_t       writes_left;
 		uint16_t      sum;
 		int32_t       fifo_entries;
-		// added for pin2k
-		uint8_t		  word_counter;
-		uint8_t		  start_command;
-		uint32_t	  transfer_data[200];
+		// pin2k
+		uint8_t       word_counter;
+		uint8_t       start_command;
+		uint32_t      transfer_data[200];
+
 		timer_device *watchdog;
 	};
 
@@ -261,6 +259,11 @@ protected:
 	hle_transfer_state m_transfer;
 
 	int m_dram_in_mb;
+
+	// pin2k
+	int m_pin2k_state;
+	int m_scriptmodeactive;
+	int m_dcs_pin2k;
 
 	optional_shared_ptr<uint16_t> m_iram;
 	optional_device<device_execute_interface> m_maincpu;
@@ -385,11 +388,10 @@ class dcs2_audio_2104_pin2k_device : public dcs2_audio_device
 public:
 	// construction/destruction
 	dcs2_audio_2104_pin2k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-	
 };
 
 // device type definition
