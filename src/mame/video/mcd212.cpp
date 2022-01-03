@@ -43,17 +43,25 @@ TODO:
 // device type definition
 DEFINE_DEVICE_TYPE(MCD212, mcd212_device, "mcd212", "MCD212 VDSC")
 
+inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_weight_factor(const uint32_t region_idx)
+{
+	return (m_channel[0].region_control[region_idx] & RC_WF) >> RC_WF_SHIFT;
+}
+
+inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_region_op(const uint32_t region_idx)
+{
+	return (m_channel[0].region_control[region_idx] & RC_OP) >> RC_OP_SHIFT;
+}
+
 void mcd212_device::update_region_arrays()
 {
 	int latched_rf[2] { 0, 0 };
 	uint8_t latched_wfa = m_channel[0].weight_factor_a[0];
 	uint8_t latched_wfb = m_channel[1].weight_factor_b[0];
 
-	if (BIT(m_channel[0].image_coding_method, MCD212_ICM_NR_BIT))
+	if (BIT(m_channel[0].image_coding_method, ICM_NR_BIT))
 	{
-		const uint32_t op_region0 = (m_channel[0].region_control[0] & MCD212_RC_OP) >> MCD212_RC_OP_BIT;
-		const uint32_t op_region4 = (m_channel[0].region_control[4] & MCD212_RC_OP) >> MCD212_RC_OP_BIT;
-		if (op_region0 == 0 && op_region4 == 0)
+		if (get_region_op(0) == 0 && get_region_op(4) == 0)
 		{
 			std::fill_n(m_channel[0].weight_factor_a, std::size(m_channel[0].weight_factor_a), latched_wfa);
 			std::fill_n(m_channel[1].weight_factor_b, std::size(m_channel[1].weight_factor_b), latched_wfb);
@@ -70,12 +78,12 @@ void mcd212_device::update_region_arrays()
 				{
 					const int region_idx = (flag << 2) + region;
 					const uint32_t region_ctrl = m_channel[0].region_control[region_idx];
-					const uint32_t region_op = (m_channel[0].region_control[region_idx] & MCD212_RC_OP) >> MCD212_RC_OP_BIT;
+					const uint32_t region_op = get_region_op(region_idx);
 					if (region_op == 0)
 					{
 						break;
 					}
-					if (x == (region_ctrl & MCD212_RC_X))
+					if (x == (region_ctrl & RC_X))
 					{
 						switch (region_op)
 						{
@@ -86,12 +94,12 @@ void mcd212_device::update_region_arrays()
 							case 3: // Not used
 								break;
 							case 4: // Change weight of plane A
-								latched_wfa = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+								latched_wfa = get_weight_factor(region_idx);
 								break;
 							case 5: // Not used
 								break;
 							case 6: // Change weight of plane B
-								latched_wfb = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+								latched_wfb = get_weight_factor(region_idx);
 								break;
 							case 7: // Not used
 								break;
@@ -105,19 +113,19 @@ void mcd212_device::update_region_arrays()
 							case 11:    // Not used
 								break;
 							case 12: // Reset region flag and change weight of plane A
-								latched_wfa = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+								latched_wfa = get_weight_factor(region_idx);
 								latched_rf[flag] = 0;
 								break;
 							case 13: // Set region flag and change weight of plane A
-								latched_wfa = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+								latched_wfa = get_weight_factor(region_idx);
 								latched_rf[flag] = 1;
 								break;
 							case 14: // Reset region flag and change weight of plane B
-								latched_wfb = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+								latched_wfb = get_weight_factor(region_idx);
 								latched_rf[flag] = 0;
 								break;
 							case 15: // Set region flag and change weight of plane B
-								latched_wfb = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+								latched_wfb = get_weight_factor(region_idx);
 								latched_rf[flag] = 1;
 								break;
 						}
@@ -137,9 +145,9 @@ void mcd212_device::update_region_arrays()
 		{
 			if (region_idx < 8)
 			{
-				int flag = BIT(m_channel[0].region_control[region_idx], MCD212_RC_RF_BIT);
+				const int flag = BIT(m_channel[0].region_control[region_idx], RC_RF_BIT);
 				const uint32_t region_ctrl = m_channel[0].region_control[region_idx];
-				const uint32_t region_op = (m_channel[0].region_control[region_idx] & MCD212_RC_OP) >> MCD212_RC_OP_BIT;
+				const uint32_t region_op = get_region_op(region_idx);
 				if (region_op == 0)
 				{
 					std::fill_n(m_channel[0].weight_factor_a + x, std::size(m_channel[0].weight_factor_a) - x, latched_wfa);
@@ -148,7 +156,7 @@ void mcd212_device::update_region_arrays()
 					std::fill_n(m_region_flag_1 + x, std::size(m_region_flag_1) - x, 0);
 					return;
 				}
-				if (x == (region_ctrl & MCD212_RC_X))
+				if (x == (region_ctrl & RC_X))
 				{
 					switch (region_op)
 					{
@@ -159,12 +167,12 @@ void mcd212_device::update_region_arrays()
 						case 3: // Not used
 							break;
 						case 4: // Change weight of plane A
-							latched_wfa = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+							latched_wfa = get_weight_factor(region_idx);
 							break;
 						case 5: // Not used
 							break;
 						case 6: // Change weight of plane B
-							latched_wfb = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+							latched_wfb = get_weight_factor(region_idx);
 							break;
 						case 7: // Not used
 							break;
@@ -178,19 +186,19 @@ void mcd212_device::update_region_arrays()
 						case 11:    // Not used
 							break;
 						case 12: // Reset region flag and change weight of plane A
-							latched_wfa = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+							latched_wfa = get_weight_factor(region_idx);
 							latched_rf[flag] = 0;
 							break;
 						case 13: // Set region flag and change weight of plane A
-							latched_wfa = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+							latched_wfa = get_weight_factor(region_idx);
 							latched_rf[flag] = 1;
 							break;
 						case 14: // Reset region flag and change weight of plane B
-							latched_wfb = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+							latched_wfb = get_weight_factor(region_idx);
 							latched_rf[flag] = 0;
 							break;
 						case 15: // Set region flag and change weight of plane B
-							latched_wfb = (region_ctrl & MCD212_RC_WF) >> MCD212_RC_WF_BIT;
+							latched_wfb = get_weight_factor(region_idx);
 							latched_rf[flag] = 1;
 							break;
 					}
@@ -399,13 +407,13 @@ void mcd212_device::update_visible_area()
 	rectangle visarea;
 	attoseconds_t period = screen().frame_period().attoseconds();
 
-	const bool st_set = (m_channel[0].csrw & MCD212_CSR1W_ST) != 0;
-	const bool fd_set = (m_channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) != 0;
+	const bool st_set = (m_channel[0].csrw & CSR1W_ST) != 0;
+	const bool fd_set = (m_channel[0].dcr & (DCR_CF | DCR_FD)) != 0;
 	int total_width = 384;
 	if (fd_set && st_set)
 		total_width = 360;
 
-	const bool pal = !(m_channel[0].dcr & MCD212_DCR_FD);
+	const bool pal = !(m_channel[0].dcr & DCR_FD);
 	const int total_height = (pal ? 312 : 262);
 
 	int visible_height = 240;
@@ -425,7 +433,7 @@ void mcd212_device::update_visible_area()
 
 uint32_t mcd212_device::get_screen_width()
 {
-	if ((m_channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (m_channel[0].csrw & MCD212_CSR1W_ST))
+	if ((m_channel[0].dcr & (DCR_CF | DCR_FD)) && (m_channel[0].csrw & CSR1W_ST))
 	{
 		return 720;
 	}
@@ -477,7 +485,7 @@ void mcd212_device::process_ica(int channel)
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: INTERRUPT\n", (addr - 2) * 2 + channel * 0x200000, cmd, channel );
 				m_channel[1].csrr |= 1 << (2 - channel);
-				if (m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
+				if (m_channel[1].csrr & (CSR2R_IT1 | CSR2R_IT2))
 					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
@@ -545,7 +553,7 @@ void mcd212_device::process_dca(int channel)
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: INTERRUPT\n", (addr - 2) * 2 + channel * 0x200000, cmd, channel );
 				m_channel[1].csrr |= 1 << (2 - channel);
-				if (m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
+				if (m_channel[1].csrr & (CSR2R_IT1 | CSR2R_IT2))
 					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
@@ -569,19 +577,6 @@ void mcd212_device::process_dca(int channel)
 		}
 	}
 	m_channel[channel].dca = addr * 2;
-}
-
-static inline uint8_t MCD212_LIM(int32_t in)
-{
-	if (in < 0)
-	{
-		return 0;
-	}
-	else if (in > 255)
-	{
-		return 255;
-	}
-	return (uint8_t)in;
 }
 
 static inline uint8_t BYTE_TO_CLUT(int channel, int icm, uint8_t byte)
@@ -620,20 +615,35 @@ static inline uint8_t BYTE_TO_CLUT(int channel, int icm, uint8_t byte)
 	return 0;
 }
 
+inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_icm(const int channel)
+{
+	const uint32_t mask = channel ? ICM_MODE2 : ICM_MODE1;
+	const uint32_t shift = channel ? ICM_MODE2_SHIFT : ICM_MODE1_SHIFT;
+	return (m_channel[0].image_coding_method & mask) >> shift;
+}
+
+inline ATTR_FORCE_INLINE bool mcd212_device::get_mosaic_enable(const int channel)
+{
+	return (m_channel[channel].ddr & DDR_FT) == DDR_FT_MOSAIC;
+}
+
+inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_mosaic_factor(const int channel)
+{
+	return 1 << (((m_channel[channel].ddr & DDR_MT) >> DDR_MT_SHIFT) + 1);
+}
+
 void mcd212_device::process_vsr(int channel, uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *pixels_b)
 {
 	uint8_t *data = reinterpret_cast<uint8_t *>(channel ? m_planeb.target() : m_planea.target());
 	uint32_t vsr = get_vsr(channel);
 	uint8_t done = 0;
 	uint32_t x = 0;
-	uint32_t icm_mask = channel ? MCD212_ICM_MODE2 : MCD212_ICM_MODE1;
-	uint32_t icm_shift = channel ? MCD212_ICM_MODE2_SHIFT : MCD212_ICM_MODE1_SHIFT;
-	uint8_t icm = (m_channel[0].image_coding_method & icm_mask) >> icm_shift;
+	uint8_t icm = get_icm(channel);
 	uint8_t *clut_r = m_channel[0].clut_r;
 	uint8_t *clut_g = m_channel[0].clut_g;
 	uint8_t *clut_b = m_channel[0].clut_b;
-	uint8_t mosaic_enable = ((m_channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
-	uint8_t mosaic_factor = 1 << (((m_channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
+	uint8_t mosaic_enable = get_mosaic_enable(channel);
+	uint8_t mosaic_factor = get_mosaic_factor(channel);
 	int mosaic_index = 0;
 	uint32_t width = get_screen_width();
 
@@ -652,24 +662,24 @@ void mcd212_device::process_vsr(int channel, uint8_t *pixels_r, uint8_t *pixels_
 		uint8_t byte = data[(vsr & 0x0007ffff) ^ 1];
 		LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: VSR[%05x] = %02x\n", screen().vpos(), channel, (vsr & 0x0007ffff), byte);
 		vsr++;
-		switch (m_channel[channel].ddr & MCD212_DDR_FT)
+		switch (m_channel[channel].ddr & DDR_FT)
 		{
-			case MCD212_DDR_FT_BMP:
-			case MCD212_DDR_FT_BMP2:
-			case MCD212_DDR_FT_MOSAIC:
-				if ((m_channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_BMP)
+			case DDR_FT_BMP:
+			case DDR_FT_BMP2:
+			case DDR_FT_MOSAIC:
+				if ((m_channel[channel].ddr & DDR_FT) == DDR_FT_BMP)
 				{
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: BMP\n", screen().vpos(), channel);
 				}
-				else if ((m_channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_BMP2)
+				else if ((m_channel[channel].ddr & DDR_FT) == DDR_FT_BMP2)
 				{
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: BMP2\n", screen().vpos(), channel);
 				}
-				else if ((m_channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC)
+				else if ((m_channel[channel].ddr & DDR_FT) == DDR_FT_MOSAIC)
 				{
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: MOSAIC\n", screen().vpos(), channel);
 				}
-				if (m_channel[channel].dcr & MCD212_DCR_CM)
+				if (m_channel[channel].dcr & DCR_CM)
 				{
 					// 4-bit Bitmap
 					LOGMASKED(LOG_UNKNOWNS, "%s", "Unsupported display mode: 4-bit Bitmap\n" );
@@ -851,9 +861,9 @@ void mcd212_device::process_vsr(int channel, uint8_t *pixels_r, uint8_t *pixels_
 				}
 				done = 1;
 				break;
-			case MCD212_DDR_FT_RLE:
+			case DDR_FT_RLE:
 				LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: RLE\n", screen().vpos(), channel);
-				if (m_channel[channel].dcr & MCD212_DCR_CM)
+				if (m_channel[channel].dcr & DCR_CM)
 				{
 					LOGMASKED(LOG_UNKNOWNS, "%s", "Unsupported display mode: 4-bit RLE\n" );
 					done = 1;
@@ -955,11 +965,11 @@ void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *p
 	for (int x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
-		if (!(m_channel[0].transparency_control & MCD212_TCR_DISABLE_MX))
+		if (!(m_channel[0].transparency_control & TCR_DISABLE_MX))
 		{
-			uint8_t abr = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_r[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((int32_t)plane_b_r[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			uint8_t abg = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_g[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((int32_t)plane_b_g[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			uint8_t abb = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_b[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((int32_t)plane_b_b[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			uint8_t abr = std::clamp(((std::clamp((int32_t)plane_a_r[x] - 16, 0, 255) * m_channel[0].weight_factor_a[x]) >> 6) + ((std::clamp((int32_t)plane_b_r[x] - 16, 0, 255) * m_channel[1].weight_factor_b[x]) >> 6) + 16, 0, 255);
+			uint8_t abg = std::clamp(((std::clamp((int32_t)plane_a_g[x] - 16, 0, 255) * m_channel[0].weight_factor_a[x]) >> 6) + ((std::clamp((int32_t)plane_b_g[x] - 16, 0, 255) * m_channel[1].weight_factor_b[x]) >> 6) + 16, 0, 255);
+			uint8_t abb = std::clamp(((std::clamp((int32_t)plane_a_b[x] - 16, 0, 255) * m_channel[0].weight_factor_a[x]) >> 6) + ((std::clamp((int32_t)plane_b_b[x] - 16, 0, 255) * m_channel[1].weight_factor_b[x]) >> 6) + 16, 0, 255);
 			out[x] = (abr << 16) | (abg << 8) | abb;
 		}
 		else
@@ -1058,15 +1068,15 @@ void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *p
 					plane_enable_b = 1;
 					break;
 			}
-			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_r_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_g_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_b_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_b_r_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_b_r_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			plane_b_g_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_b_g_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			plane_b_b_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_b_b_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_a_r_cur = std::clamp(((std::clamp((int32_t)plane_a_r_cur - 16, 0, 255) * m_channel[0].weight_factor_a[x]) >> 6) + 16, 0, 255);
+			plane_a_g_cur = std::clamp(((std::clamp((int32_t)plane_a_g_cur - 16, 0, 255) * m_channel[0].weight_factor_a[x]) >> 6) + 16, 0, 255);
+			plane_a_b_cur = std::clamp(((std::clamp((int32_t)plane_a_b_cur - 16, 0, 255) * m_channel[0].weight_factor_a[x]) >> 6) + 16, 0, 255);
+			plane_b_r_cur = std::clamp(((std::clamp((int32_t)plane_b_r_cur - 16, 0, 255) * m_channel[1].weight_factor_b[x]) >> 6) + 16, 0, 255);
+			plane_b_g_cur = std::clamp(((std::clamp((int32_t)plane_b_g_cur - 16, 0, 255) * m_channel[1].weight_factor_b[x]) >> 6) + 16, 0, 255);
+			plane_b_b_cur = std::clamp(((std::clamp((int32_t)plane_b_b_cur - 16, 0, 255) * m_channel[1].weight_factor_b[x]) >> 6) + 16, 0, 255);
 			switch (m_channel[0].plane_order)
 			{
-				case MCD212_POR_AB:
+				case POR_AB:
 					if (plane_enable_a)
 					{
 						out[x] = (plane_a_r_cur << 16) | (plane_a_g_cur << 8) | plane_a_b_cur;
@@ -1076,7 +1086,7 @@ void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *p
 						out[x] = (plane_b_r_cur << 16) | (plane_b_g_cur << 8) | plane_b_b_cur;
 					}
 					break;
-				case MCD212_POR_BA:
+				case POR_BA:
 					if (plane_enable_b)
 					{
 						out[x] = (plane_b_r_cur << 16) | (plane_b_g_cur << 8) | plane_b_b_cur;
@@ -1093,16 +1103,16 @@ void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *p
 
 void mcd212_device::draw_cursor(uint32_t *scanline)
 {
-	if (m_channel[0].cursor_control & MCD212_CURCNT_EN)
+	if (m_channel[0].cursor_control & CURCNT_EN)
 	{
 		uint16_t y = (uint16_t)screen().vpos();
 		const uint16_t cursor_x =  m_channel[0].cursor_position        & 0x3ff;
 		const uint16_t cursor_y = ((m_channel[0].cursor_position >> 12) & 0x3ff) + m_ica_height;
 		if (y >= cursor_y && y < (cursor_y + 16))
 		{
-			uint32_t color = s_4bpp_color[m_channel[0].cursor_control & MCD212_CURCNT_COLOR];
+			uint32_t color = s_4bpp_color[m_channel[0].cursor_control & CURCNT_COLOR];
 			y -= cursor_y;
-			if (m_channel[0].cursor_control & MCD212_CURCNT_CUW)
+			if (m_channel[0].cursor_control & CURCNT_CUW)
 			{
 				for (int x = cursor_x; x < cursor_x + 64 && x < 768; x++)
 				{
@@ -1239,8 +1249,8 @@ uint8_t mcd212_device::csr2_r()
 	const uint8_t data = m_channel[1].csrr;
 	LOGMASKED(LOG_STATUS, "%s: Status Register 2: %02x\n", machine().describe_context(), data);
 
-	m_channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
-	if (data & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
+	m_channel[1].csrr &= ~(CSR2R_IT1 | CSR2R_IT2);
+	if (data & (CSR2R_IT1 | CSR2R_IT2))
 		m_int_callback(CLEAR_LINE);
 
 	return data;
@@ -1308,7 +1318,7 @@ WRITE_LINE_MEMBER(mcd212_device::screen_vblank)
 		m_channel[0].csrr &= 0x7f;
 		for (int index = 0; index < 2; index++)
 		{
-			if (m_channel[index].dcr & MCD212_DCR_ICA)
+			if (m_channel[index].dcr & DCR_ICA)
 			{
 				process_ica(index);
 			}
@@ -1328,7 +1338,7 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		for (int index = 0; index < 2; index++)
 		{
 			//m_channel[index].
-			if (m_channel[index].dcr & MCD212_DCR_DCA)
+			if (m_channel[index].dcr & DCR_DCA)
 			{
 				if (scanline == m_ica_height)
 				{
