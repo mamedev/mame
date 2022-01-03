@@ -286,7 +286,7 @@ u8 pwrview_state::unk3_r(offs_t offset)
 				m_c280 &= ~0x10;
 			break;
 		case 2:
-			ret = (m_rts ? 0 : 0x40) | (m_dtr ? 0 : 0x80);
+			ret = (m_rts ? 0 : 0x40) | (m_dtr ? 0 : 0x80) | 0x20;
 			break;
 	}
 	return ret;
@@ -298,9 +298,23 @@ void pwrview_state::unk3_w(offs_t offset, u8 data)
 	{
 		case 0:
 			m_c280 = data;
-			m_pit->set_clockin(0, BIT(data, 5) ? 1000000 : 0);
+			m_pit->set_clockin(0, BIT(data, 7) ? 1000000 : 0);
 			m_pit->set_clockin(1, BIT(data, 6) ? 1000000 : 0);
-			m_pit->set_clockin(2, BIT(data, 7) ? 1000000 : 0);
+			m_pit->set_clockin(2, BIT(data, 5) ? 1000000 : 0);
+			if(BIT(data, 2))
+			{
+				if(!BIT(data, 6))
+					m_pit->set_clockin(1, 2000000);
+				if(!BIT(data, 7))
+					m_pit->set_clockin(2, 2000000);
+			}
+			else
+			{
+				if(!BIT(data, 6))
+					m_pit->set_clockin(1, 0);
+				if(!BIT(data, 7))
+					m_pit->set_clockin(2, 0);
+			}
 			break;
 	}
 }
