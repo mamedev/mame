@@ -31,6 +31,8 @@ enum class meta_name {
 	rsrc_length,
 	sequential,
 	size_in_blocks,
+	file_type,
+	ascii_flag
 };
 
 enum class meta_type {

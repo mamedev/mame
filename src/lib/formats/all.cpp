@@ -356,6 +356,14 @@
 #include "os9_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_COCO_RAWDSK
+#include "coco_rawdsk.h"
+#endif
+
+#ifdef HAS_FORMATS_FS_COCO_RSDOS
+#include "fs_coco_rsdos.h"
+#endif
+
 #ifdef HAS_FORMATS_JFD_DSK
 #include "jfd_dsk.h"
 #endif
@@ -1070,6 +1078,12 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 #ifdef HAS_FORMATS_TRS80_DSK
 	en.add(FLOPPY_JV1_FORMAT); // trs80_dsk.h
 	en.add(FLOPPY_JV3_FORMAT); // trs80_dsk.h
+#endif
+#ifdef HAS_FORMATS_COCO_RAWDSK
+	en.add(FLOPPY_COCO_RAWDSK_FORMAT); // coco_rawdsk.h
+#endif
+#ifdef HAS_FORMATS_FS_COCO_RSDOS
+	en.add(fs::COCO_RSDOS); // fs_coco_rsdos.h
 #endif
 
 	en.category("Kaypro");
