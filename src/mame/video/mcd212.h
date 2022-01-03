@@ -31,87 +31,18 @@ TODO:
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mcd212_device
-
 class mcd212_device : public device_t,
-						public device_video_interface
+					  public device_video_interface
 {
 public:
-	typedef device_delegate<void (int)> scanline_callback_delegate;
-
-	// construction/destruction
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
 
-	// device members
-	void map(address_map &map);
-
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	struct channel_t
-	{
-		uint8_t csrr;
-		uint16_t csrw;
-		uint16_t dcr;
-		uint16_t vsr;
-		uint16_t ddr;
-		uint16_t dcp;
-		uint32_t dca;
-		uint8_t clut_r[256];
-		uint8_t clut_g[256];
-		uint8_t clut_b[256];
-		uint32_t image_coding_method;
-		uint32_t transparency_control;
-		uint32_t plane_order;
-		uint32_t clut_bank;
-		uint32_t transparent_color_a;
-		uint32_t reserved0;
-		uint32_t transparent_color_b;
-		uint32_t mask_color_a;
-		uint32_t reserved1;
-		uint32_t mask_color_b;
-		uint32_t dyuv_abs_start_a;
-		uint32_t dyuv_abs_start_b;
-		uint32_t reserved2;
-		uint32_t cursor_position;
-		uint32_t cursor_control;
-		uint32_t cursor_pattern[16];
-		uint32_t region_control[8];
-		uint32_t backdrop_color;
-		uint32_t mosaic_hold_a;
-		uint32_t mosaic_hold_b;
-		uint8_t weight_factor_a[768];
-		uint8_t weight_factor_b[768];
-	};
-
-	struct ab_t
-	{
-		//* Color limit array.
-		uint8_t limit[3 * 0xff];
-
-		//* Color clamp array.
-		uint8_t clamp[3 * 0xff];
-
-		//* U-to-B matrix array.
-		int16_t matrixUB[0x100];
-
-		//* U-to-G matrix array.
-		int16_t matrixUG[0x100];
-
-		//* V-to-G matrix array.
-		int16_t matrixVG[0x100];
-
-		//* V-to-R matrix array.
-		int16_t matrixVR[0x100];
-
-		//* Delta-Y decoding array.
-		uint8_t deltaY[0x100];
-
-		//* Delta-U/V decoding array.
-		uint8_t deltaUV[0x100];
-	};
+	void map(address_map &map);
 
 protected:
 	// device-level overrides
@@ -140,6 +71,61 @@ protected:
 	void ddr2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t dca2_r(offs_t offset, uint16_t mem_mask = ~0);
 	void dca2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	struct channel_t
+	{
+		uint8_t csrr;
+		uint16_t csrw;
+		uint16_t dcr;
+		uint16_t vsr;
+		uint16_t ddr;
+		uint16_t dcp;
+		uint32_t dca;
+		uint8_t clut_r[256];
+		uint8_t clut_g[256];
+		uint8_t clut_b[256];
+		uint32_t image_coding_method;
+		uint32_t transparency_control;
+		uint32_t plane_order;
+		uint32_t clut_bank;
+		uint32_t transparent_color;
+		uint32_t mask_color;
+		uint32_t dyuv_abs_start;
+		uint32_t cursor_position;
+		uint32_t cursor_control;
+		uint32_t cursor_pattern[16];
+		uint32_t region_control[8];
+		uint32_t backdrop_color;
+		uint32_t mosaic_hold;
+		uint8_t weight_factor[768];
+	};
+
+	struct ab_t
+	{
+		//* Color limit array.
+		uint8_t limit[3 * 0xff];
+
+		//* Color clamp array.
+		uint8_t clamp[3 * 0xff];
+
+		//* U-to-B matrix array.
+		int16_t matrixUB[0x100];
+
+		//* U-to-G matrix array.
+		int16_t matrixUG[0x100];
+
+		//* V-to-G matrix array.
+		int16_t matrixVG[0x100];
+
+		//* V-to-R matrix array.
+		int16_t matrixVR[0x100];
+
+		//* Delta-Y decoding array.
+		uint8_t deltaY[0x100];
+
+		//* Delta-U/V decoding array.
+		uint8_t deltaUV[0x100];
+	};
 
 	enum : uint32_t
 	{
@@ -241,25 +227,26 @@ protected:
 	uint8_t get_region_op(const uint32_t region_idx);
 	void update_region_arrays();
 
-	void set_vsr(int channel, uint32_t value);
-	uint32_t get_vsr(int channel);
-
-	void set_dcp(int channel, uint32_t value);
-	uint32_t get_dcp(int channel);
-
-	void set_display_parameters(int channel, uint8_t value);
 	void update_visible_area();
 	uint32_t get_screen_width();
 
-	void process_ica(int channel);
-	void process_dca(int channel);
+	template <int Channel> void set_vsr(uint32_t value);
+	template <int Channel> uint32_t get_vsr();
 
-	uint8_t get_icm(const int channel);
-	bool get_mosaic_enable(const int channel);
-	uint8_t get_mosaic_factor(const int channel);
-	void process_vsr(int channel, uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *pixels_b);
+	template <int Channel> void set_dcp(uint32_t value);
+	template <int Channel> uint32_t get_dcp();
 
-	void set_register(int channel, uint8_t reg, uint32_t value);
+	template <int Channel> void set_display_parameters(uint8_t value);
+
+	template <int Channel> void process_ica();
+	template <int Channel> void process_dca();
+
+	template <int Channel> uint8_t get_icm();
+	template <int Channel> bool get_mosaic_enable();
+	template <int Channel> uint8_t get_mosaic_factor();
+	template <int Channel> void process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *pixels_b);
+
+	template <int Channel> void set_register(uint8_t reg, uint32_t value);
 
 	void mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *plane_a_b, uint8_t *plane_b_r, uint8_t *plane_b_g, uint8_t *plane_b_b, uint32_t *out);
 
