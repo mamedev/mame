@@ -78,7 +78,7 @@ private:
 	std::vector<u16> m_vram;
 	u8 m_leds[2];
 	u8 m_switch, m_c001, m_c009, m_c280, m_c080, m_errcode, m_vramwin[2];
-	bool m_dtr;
+	bool m_dtr, m_rts;
 	emu_timer *m_tmr0ext;
 	emu_timer *m_tmrkbd;
 	enum {
@@ -286,7 +286,7 @@ u8 pwrview_state::unk3_r(offs_t offset)
 				m_c280 &= ~0x10;
 			break;
 		case 2:
-			ret = 0x40; // 8251 RTS?
+			ret = (m_rts ? 0 : 0x40) | (m_dtr ? 0 : 0x80);
 			break;
 	}
 	return ret;
@@ -311,8 +311,6 @@ u8 pwrview_state::unk4_r(offs_t offset)
 	{
 		case 0:
 			return m_c080;
-		case 2:
-			return m_dtr ? 0 : 0x80;
 	}
 	return 0;
 }
@@ -442,7 +440,7 @@ void pwrview_state::pwrview_io(address_map &map)
 	map(0xc280, 0xc287).rw(FUNC(pwrview_state::unk3_r), FUNC(pwrview_state::unk3_w)).umask16(0x00ff);
 	map(0xc288, 0xc28f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0xc2a0, 0xc2a7).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)).umask16(0x00ff);
-	map(0xc2c0, 0xc2c3).rw("uart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
+	map(0xc2c0, 0xc2c3).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xc2e0, 0xc2e3).m("fdc", FUNC(upd765a_device::map)).umask16(0x00ff);
 	map(0xc2e4, 0xc2e5).ram();
 	map(0xc2e6, 0xc2e6).r(FUNC(pwrview_state::pitclock_r));
@@ -477,8 +475,10 @@ void pwrview_state::pwrview(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", pwrview_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats);
 
 	I8251(config, m_uart, 0);
-	m_uart->txd_handler().set([this](bool state){ if(BIT(m_c280, 4)) m_uart->write_rxd(state); });
+	m_uart->rxrdy_handler().set(m_maincpu, FUNC(i80186_cpu_device::int3_w));
+	m_uart->txd_handler().set([this](bool state){ if(BIT(m_c280, 4) && m_dtr) m_uart->write_rxd(state); }); // m_dtr here appears unlikely but the post seems to expect it
 	m_uart->dtr_handler().set([this](bool state){ m_dtr = state; });
+	m_uart->rts_handler().set([this](bool state){ m_rts = state; });
 
 	Z80SIO(config, "sio", 4000000); // Z8442BPS (SIO/2)
 
