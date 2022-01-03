@@ -710,7 +710,7 @@ int CLIB_DECL main(int argc, char *argv[])
 			return hdread(argc, argv);
 		else if(!core_stricmp("hdwrite", argv[1]))
 			return hdwrite(argc, argv);
-		else if (!core_stricmp("-version", argv[1]))
+		else if (!core_stricmp("version", argv[1]))
 			return version(argc, argv);
 		else {
 			fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
