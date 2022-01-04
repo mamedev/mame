@@ -38,9 +38,9 @@ static void display_usage(const char *first_argument)
 	fprintf(stderr, "       %s flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n", exe_name.c_str());
 	fprintf(stderr, "       %s flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hddir filesystem <image>                                               -- List the contents of a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hdread filesystem <image> <path> <outputfile>                          -- Extract a file from a floppy image\n", exe_name.c_str());
-	fprintf(stderr, "       %s hdwrite filesystem <image> <inputfile> <path>                          -- Write a file into a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hddir filesystem <image>                                               -- List the contents of a hard disk image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hdread filesystem <image> <path> <outputfile>                          -- Extract a file from a hard disk image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hdwrite filesystem <image> <inputfile> <path>                          -- Write a file into a hard disk image\n", exe_name.c_str());
 	fprintf(stderr, "       %s version                                                                -- Display the current version of floptool\n", exe_name.c_str());
 }
 
