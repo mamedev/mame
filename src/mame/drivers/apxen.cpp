@@ -49,6 +49,7 @@
 #include "formats/apridisk.h"
 #include "bus/apricot/keyboard/keyboard.h"
 #include "bus/apricot/video/video.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

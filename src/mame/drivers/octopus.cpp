@@ -133,7 +133,7 @@ It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both
 #include "bus/centronics/printer.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

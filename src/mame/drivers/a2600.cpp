@@ -91,7 +91,7 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

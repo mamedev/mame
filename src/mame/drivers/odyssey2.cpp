@@ -121,7 +121,7 @@ Plenty games have minor bugs not worth mentioning here.
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

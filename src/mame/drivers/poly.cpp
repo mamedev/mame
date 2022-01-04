@@ -33,7 +33,7 @@
 #include "emu.h"
 #include "includes/poly.h"
 #include "formats/flex_dsk.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 void poly_state::poly_bank(address_map &map)

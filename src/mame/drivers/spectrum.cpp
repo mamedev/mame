@@ -282,7 +282,7 @@ SamRam
 #include "machine/spec_snqk.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/tzx_cas.h"

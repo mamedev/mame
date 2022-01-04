@@ -61,6 +61,7 @@ To load and play a game:
 #include "cpu/pdp1/pdp1.h"
 #include "video/crt.h"
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 /*

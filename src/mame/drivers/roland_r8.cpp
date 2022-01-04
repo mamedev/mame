@@ -79,6 +79,7 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 #include "sound/rolandpcm.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // PCM card address line scrambling

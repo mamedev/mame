@@ -41,7 +41,7 @@ Cassette (nascom2):
 #include "bus/nasbus/nasbus.h"
 
 #include "emupal.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 

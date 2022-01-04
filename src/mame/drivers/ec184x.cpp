@@ -17,7 +17,7 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i86/i86.h"
 #include "machine/ram.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 //#define LOG_GENERAL (1U <<  0) //defined in logmacro.h already

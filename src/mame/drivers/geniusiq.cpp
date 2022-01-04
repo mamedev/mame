@@ -160,7 +160,7 @@ PCB - German Version:
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define KEYBOARD_QUEUE_SIZE     0x80
 

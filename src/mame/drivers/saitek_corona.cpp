@@ -20,7 +20,7 @@ different compared to Stratos/Turbo King.
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

@@ -240,6 +240,7 @@
 #include "emu.h"
 #include "includes/pc8801.h"
 
+#include "softlist_dev.h"
 
 
 #define IRQ_DEBUG       (0)

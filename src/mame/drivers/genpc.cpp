@@ -14,7 +14,7 @@
 #include "cpu/i86/i86.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 class genpc_state : public driver_device
 {

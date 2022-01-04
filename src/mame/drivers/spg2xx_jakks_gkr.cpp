@@ -7,6 +7,7 @@
 #include "includes/spg2xx.h"
 
 #include "bus/jakks_gamekey/slot.h"
+#include "softlist_dev.h"
 
 
 class jakks_gkr_state : public spg2xx_game_state

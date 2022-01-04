@@ -26,7 +26,7 @@
 
 #include "machine/input_merger.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void apple3_state::apple3_map(address_map &map)

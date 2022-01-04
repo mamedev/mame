@@ -121,7 +121,7 @@ anything in hardware. No cartridge has been found which uses them.
 
 #include "emu.h"
 #include "includes/arcadia.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 void arcadia_state::arcadia_mem(address_map &map)

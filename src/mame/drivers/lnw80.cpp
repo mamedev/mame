@@ -78,6 +78,7 @@ To Do / Status:
 #include "includes/trs80.h"
 #include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
+#include "softlist_dev.h"
 
 namespace {
 

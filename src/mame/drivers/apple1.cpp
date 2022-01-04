@@ -82,7 +82,7 @@
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define A1_CPU_TAG  "maincpu"
 #define A1_PIA_TAG  "pia6821"

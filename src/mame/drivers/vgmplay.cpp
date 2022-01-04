@@ -49,6 +49,7 @@
 
 #include "vgmplay.lh"
 #include "debugger.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include <zlib.h>
