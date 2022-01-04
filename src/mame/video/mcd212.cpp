@@ -45,28 +45,29 @@ DEFINE_DEVICE_TYPE(MCD212, mcd212_device, "mcd212", "MCD212 VDSC")
 
 inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_weight_factor(const uint32_t region_idx)
 {
-	return (m_channel[0].region_control[region_idx] & RC_WF) >> RC_WF_SHIFT;
+	uint8_t data = (uint8_t)((m_region_control[region_idx] & RC_WF) >> RC_WF_SHIFT);
+	return (data << 2) | (data >> 4);
 }
 
 inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_region_op(const uint32_t region_idx)
 {
-	return (m_channel[0].region_control[region_idx] & RC_OP) >> RC_OP_SHIFT;
+	return (m_region_control[region_idx] & RC_OP) >> RC_OP_SHIFT;
 }
 
 void mcd212_device::update_region_arrays()
 {
-	int latched_rf[2] { 0, 0 };
-	uint8_t latched_wfa = m_channel[0].weight_factor[0];
-	uint8_t latched_wfb = m_channel[1].weight_factor[0];
+	bool latched_rf[2] { false, false };
+	uint8_t latched_wfa = m_weight_factor[0][0];
+	uint8_t latched_wfb = m_weight_factor[1][0];
 
-	if (BIT(m_channel[0].image_coding_method, ICM_NR_BIT))
+	if (BIT(m_image_coding_method, ICM_NR_BIT))
 	{
 		if (get_region_op(0) == 0 && get_region_op(4) == 0)
 		{
-			std::fill_n(m_channel[0].weight_factor, std::size(m_channel[0].weight_factor), latched_wfa);
-			std::fill_n(m_channel[1].weight_factor, std::size(m_channel[1].weight_factor), latched_wfb);
-			std::fill_n(m_region_flag_0, std::size(m_region_flag_0), 0);
-			std::fill_n(m_region_flag_1, std::size(m_region_flag_1), 0);
+			std::fill_n(m_weight_factor[0], std::size(m_weight_factor[0]), latched_wfa);
+			std::fill_n(m_weight_factor[1], std::size(m_weight_factor[1]), latched_wfb);
+			std::fill_n(m_region_flag[0], std::size(m_region_flag[0]), false);
+			std::fill_n(m_region_flag[1], std::size(m_region_flag[1]), false);
 			return;
 		}
 
@@ -77,7 +78,7 @@ void mcd212_device::update_region_arrays()
 				for (int region = 0; region < 4; region++)
 				{
 					const int region_idx = (flag << 2) + region;
-					const uint32_t region_ctrl = m_channel[0].region_control[region_idx];
+					const uint32_t region_ctrl = m_region_control[region_idx];
 					const uint32_t region_op = get_region_op(region_idx);
 					if (region_op == 0)
 					{
@@ -132,10 +133,10 @@ void mcd212_device::update_region_arrays()
 					}
 				}
 			}
-			m_channel[0].weight_factor[x] = latched_wfa;
-			m_channel[1].weight_factor[x] = latched_wfb;
-			m_region_flag_0[x] = latched_rf[0];
-			m_region_flag_1[x] = latched_rf[1];
+			m_weight_factor[0][x] = latched_wfa;
+			m_weight_factor[1][x] = latched_wfb;
+			m_region_flag[0][x] = latched_rf[0];
+			m_region_flag[1][x] = latched_rf[1];
 		}
 	}
 	else
@@ -145,15 +146,15 @@ void mcd212_device::update_region_arrays()
 		{
 			if (region_idx < 8)
 			{
-				const int flag = BIT(m_channel[0].region_control[region_idx], RC_RF_BIT);
-				const uint32_t region_ctrl = m_channel[0].region_control[region_idx];
+				const int flag = BIT(m_region_control[region_idx], RC_RF_BIT);
+				const uint32_t region_ctrl = m_region_control[region_idx];
 				const uint32_t region_op = get_region_op(region_idx);
 				if (region_op == 0)
 				{
-					std::fill_n(m_channel[0].weight_factor + x, std::size(m_channel[0].weight_factor) - x, latched_wfa);
-					std::fill_n(m_channel[1].weight_factor + x, std::size(m_channel[1].weight_factor) - x, latched_wfb);
-					std::fill_n(m_region_flag_0 + x, std::size(m_region_flag_0) - x, 0);
-					std::fill_n(m_region_flag_1 + x, std::size(m_region_flag_1) - x, 0);
+					std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
+					std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
+					std::fill_n(m_region_flag[0] + x, std::size(m_region_flag[0]) - x, false);
+					std::fill_n(m_region_flag[1] + x, std::size(m_region_flag[1]) - x, false);
 					return;
 				}
 				if (x == (region_ctrl & RC_X))
@@ -205,10 +206,10 @@ void mcd212_device::update_region_arrays()
 					region_idx++;
 				}
 			}
-			m_channel[0].weight_factor[x] = latched_wfa;
-			m_channel[1].weight_factor[x] = latched_wfb;
-			m_region_flag_0[x] = latched_rf[0];
-			m_region_flag_1[x] = latched_rf[1];
+			m_weight_factor[0][x] = latched_wfa;
+			m_weight_factor[1][x] = latched_wfb;
+			m_region_flag[0][x] = latched_rf[0];
+			m_region_flag[1][x] = latched_rf[1];
 		}
 	}
 }
@@ -226,97 +227,97 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 		case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
-			LOGMASKED(LOG_CLUT, "%s: Channel %d: CLUT[%d] = %08x\n", machine().describe_context(), Channel, m_channel[Channel].clut_bank * 0x40 + (reg - 0x80), value );
-			m_channel[0].clut_r[m_channel[Channel].clut_bank * 0x40 + (reg - 0x80)] = (uint8_t)(value >> 16) & 0xfc;
-			m_channel[0].clut_g[m_channel[Channel].clut_bank * 0x40 + (reg - 0x80)] = (uint8_t)(value >>  8) & 0xfc;
-			m_channel[0].clut_b[m_channel[Channel].clut_bank * 0x40 + (reg - 0x80)] = (uint8_t)(value >>  0) & 0xfc;
-			break;
+		{
+			const uint8_t clut_index = m_clut_bank[Channel] * 0x40 + (reg - 0x80);
+			LOGMASKED(LOG_CLUT, "%s: Channel %d: CLUT[%d] = %08x\n", machine().describe_context(), Channel, clut_index, value);
+			set_pen_color(clut_index, 0xff000000 | (value & 0x00ffffff));
+		}	break;
 		case 0xc0: // Image Coding Method
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Channel 0: Image Coding Method = %08x\n", machine().describe_context(), value );
-				m_channel[0].image_coding_method = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Channel 0: Image Coding Method = %08x\n", machine().describe_context(), value);
+				m_image_coding_method = value;
 			}
 			break;
 		case 0xc1: // Transparency Control
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Transparency Control = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].transparency_control = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Transparency Control = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_transparency_control = value;
 			}
 			break;
 		case 0xc2: // Plane Order
 			if (Channel == 0)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Plane Order = %08x\n", machine().describe_context(), screen().vpos(), value & 7);
-				m_channel[0].plane_order = value & 0x00000007;
+				m_plane_order = value & 0x00000007;
 			}
 			break;
 		case 0xc3: // CLUT Bank Register
 			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel %d: CLUT Bank Register = %08x\n", machine().describe_context(), screen().vpos(), Channel, value & 3);
-			m_channel[Channel].clut_bank = Channel ? (2 | (value & 0x00000001)) : (value & 0x00000003);
+			m_clut_bank[Channel] = Channel ? (2 | (value & 0x00000001)) : (value & 0x00000003);
 			break;
 		case 0xc4: // Transparent Color A
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Transparent Color A = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].transparent_color = value & 0xfcfcfc;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Transparent Color A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_transparent_color[0] = 0xff000000 | (value & 0x00ffffff);
 			}
 			break;
 		case 0xc6: // Transparent Color B
 			if (Channel == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Transparent Color B = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[1].transparent_color = value & 0xfcfcfc;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Transparent Color B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_transparent_color[1] = 0xff000000 | (value & 0x00ffffff);
 			}
 			break;
 		case 0xc7: // Mask Color A
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Mask Color A = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].mask_color = value & 0xfcfcfc;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Mask Color A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_mask_color[0] = 0xff000000 | (value & 0x00ffffff);
 			}
 			break;
 		case 0xc9: // Mask Color B
 			if (Channel == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Mask Color B = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[1].mask_color = value & 0xfcfcfc;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Mask Color B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_mask_color[1] = 0xff000000 | (value & 0x00ffffff);
 			}
 			break;
 		case 0xca: // Delta YUV Absolute Start Value A
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Delta YUV Absolute Start Value A = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].dyuv_abs_start = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Delta YUV Absolute Start Value A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_dyuv_abs_start[0] = value;
 			}
 			break;
 		case 0xcb: // Delta YUV Absolute Start Value B
 			if (Channel == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Delta YUV Absolute Start Value B = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[1].dyuv_abs_start = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Delta YUV Absolute Start Value B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_dyuv_abs_start[1] = value;
 			}
 			break;
 		case 0xcd: // Cursor Position
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Cursor Position = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].cursor_position = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Cursor Position = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_cursor_position = value;
 			}
 			break;
 		case 0xce: // Cursor Control
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Cursor Control = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].cursor_control = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Cursor Control = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_cursor_control = value;
 			}
 			break;
 		case 0xcf: // Cursor Pattern
 			if (Channel == 0)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Cursor Pattern[%d] = %04x\n", machine().describe_context(), screen().vpos(), (value >> 16) & 0x000f, value & 0x0000ffff);
-				m_channel[0].cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
+				m_cursor_pattern[(value >> 16) & 0x000f] = value & 0x0000ffff;
 			}
 			break;
 		case 0xd0: // Region Control 0-7
@@ -327,44 +328,46 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 		case 0xd5:
 		case 0xd6:
 		case 0xd7:
-			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel %d: Region Control %d = %08x\n", machine().describe_context(), screen().vpos(), Channel, reg & 7, value );
-			m_channel[0].region_control[reg & 7] = value;
+			LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel %d: Region Control %d = %08x\n", machine().describe_context(), screen().vpos(), Channel, reg & 7, value);
+			m_region_control[reg & 7] = value;
 			update_region_arrays();
 			break;
 		case 0xd8: // Backdrop Color
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Backdrop Color = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].backdrop_color = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Backdrop Color = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_backdrop_color = value;
 			}
 			break;
 		case 0xd9: // Mosaic Pixel Hold Factor A
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Mosaic Pixel Hold Factor A = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[0].mosaic_hold = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Mosaic Pixel Hold Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_mosaic_hold[0] = value;
 			}
 			break;
 		case 0xda: // Mosaic Pixel Hold Factor B
 			if (Channel == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Mosaic Pixel Hold Factor B = %08x\n", machine().describe_context(), screen().vpos(), value );
-				m_channel[1].mosaic_hold = value;
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Mosaic Pixel Hold Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_mosaic_hold[1] = value;
 			}
 			break;
 		case 0xdb: // Weight Factor A
 			if (Channel == 0)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Weight Factor A = %08x\n", machine().describe_context(), screen().vpos(), value );
-				memset(m_channel[0].weight_factor, value & 0x000000ff, 768);
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Weight Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_weight_factor[0][0] = (uint8_t)(value << 2);
+				m_weight_factor[0][0] |= m_weight_factor[0][0] >> 6;
 				update_region_arrays();
 			}
 			break;
 		case 0xdc: // Weight Factor B
 			if (Channel == 1)
 			{
-				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Weight Factor B = %08x\n", machine().describe_context(), screen().vpos(), value );
-				memset(m_channel[1].weight_factor, value & 0x000000ff, 768);
+				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Weight Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
+				m_weight_factor[1][0] = (uint8_t)(value << 2);
+				m_weight_factor[1][0] |= m_weight_factor[1][0] >> 6;
 				update_region_arrays();
 			}
 			break;
@@ -374,38 +377,38 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 template <int Channel>
 inline ATTR_FORCE_INLINE uint32_t mcd212_device::get_vsr()
 {
-	return ((m_channel[Channel].dcr & 0x3f) << 16) | m_channel[Channel].vsr;
+	return ((m_dcr[Channel] & 0x3f) << 16) | m_vsr[Channel];
 }
 
 template <int Channel>
 inline ATTR_FORCE_INLINE void mcd212_device::set_vsr(uint32_t value)
 {
-	m_channel[Channel].vsr = value & 0x0000ffff;
-	m_channel[Channel].dcr &= 0xffc0;
-	m_channel[Channel].dcr |= (value >> 16) & 0x003f;
+	m_vsr[Channel] = value & 0x0000ffff;
+	m_dcr[Channel] &= 0xffc0;
+	m_dcr[Channel] |= (value >> 16) & 0x003f;
 }
 
 template <int Channel>
 inline ATTR_FORCE_INLINE void mcd212_device::set_dcp(uint32_t value)
 {
-	m_channel[Channel].dcp = value & 0x0000ffff;
-	m_channel[Channel].ddr &= 0xffc0;
-	m_channel[Channel].ddr |= (value >> 16) & 0x003f;
+	m_dcp[Channel] = value & 0x0000ffff;
+	m_ddr[Channel] &= 0xffc0;
+	m_ddr[Channel] |= (value >> 16) & 0x003f;
 }
 
 template <int Channel>
 inline ATTR_FORCE_INLINE uint32_t mcd212_device::get_dcp()
 {
-	return ((m_channel[Channel].ddr & 0x3f) << 16) | m_channel[Channel].dcp;
+	return ((m_ddr[Channel] & 0x3f) << 16) | m_dcp[Channel];
 }
 
 template <int Channel>
 inline ATTR_FORCE_INLINE void mcd212_device::set_display_parameters(uint8_t value)
 {
-	m_channel[Channel].ddr &= 0xf0ff;
-	m_channel[Channel].ddr |= (value & 0x0f) << 8;
-	m_channel[Channel].dcr &= 0xf7ff;
-	m_channel[Channel].dcr |= (value & 0x10) << 7;
+	m_ddr[Channel] &= 0xf0ff;
+	m_ddr[Channel] |= (value & 0x0f) << 8;
+	m_dcr[Channel] &= 0xf7ff;
+	m_dcr[Channel] |= (value & 0x10) << 7;
 }
 
 void mcd212_device::update_visible_area()
@@ -413,13 +416,13 @@ void mcd212_device::update_visible_area()
 	rectangle visarea;
 	attoseconds_t period = screen().frame_period().attoseconds();
 
-	const bool st_set = (m_channel[0].csrw & CSR1W_ST) != 0;
-	const bool fd_set = (m_channel[0].dcr & (DCR_CF | DCR_FD)) != 0;
+	const bool st_set = (m_csrw[0] & CSR1W_ST) != 0;
+	const bool fd_set = (m_dcr[0] & (DCR_CF | DCR_FD)) != 0;
 	int total_width = 384;
 	if (fd_set && st_set)
 		total_width = 360;
 
-	const bool pal = !(m_channel[0].dcr & DCR_FD);
+	const bool pal = !(m_dcr[0] & DCR_FD);
 	const int total_height = (pal ? 312 : 262);
 
 	int visible_height = 240;
@@ -439,7 +442,7 @@ void mcd212_device::update_visible_area()
 
 uint32_t mcd212_device::get_screen_width()
 {
-	if ((m_channel[0].dcr & (DCR_CF | DCR_FD)) && (m_channel[0].csrw & CSR1W_ST))
+	if ((m_dcr[0] & (DCR_CF | DCR_FD)) && (m_csrw[0] & CSR1W_ST))
 	{
 		return 720;
 	}
@@ -491,8 +494,8 @@ void mcd212_device::process_ica()
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: INTERRUPT\n", (addr - 2) * 2 + Channel * 0x200000, cmd, Channel );
-				m_channel[1].csrr |= 1 << (2 - Channel);
-				if (m_channel[1].csrr & (CSR2R_IT1 | CSR2R_IT2))
+				m_csrr[1] |= 1 << (2 - Channel);
+				if (m_csrr[1] & (CSR2R_IT1 | CSR2R_IT2))
 					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
@@ -512,11 +515,11 @@ void mcd212_device::process_dca()
 {
 	if (screen().vpos() == m_ica_height)
 	{
-		m_channel[Channel].dca = get_dcp<Channel>();
+		m_dca[Channel] = get_dcp<Channel>();
 	}
 
 	uint16_t *dca = Channel ? m_planeb.target() : m_planea.target();
-	uint32_t addr = (m_channel[Channel].dca & 0x0007ffff) / 2;
+	uint32_t addr = (m_dca[Channel] & 0x0007ffff) / 2;
 	uint32_t cmd = 0;
 	uint32_t count = 0;
 	uint32_t max = 64;
@@ -565,8 +568,8 @@ void mcd212_device::process_dca()
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
 			case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 				LOGMASKED(LOG_DCA, "%08x: %08x: DCA %d: INTERRUPT\n", (addr - 2) * 2 + Channel * 0x200000, cmd, Channel );
-				m_channel[1].csrr |= 1 << (2 - Channel);
-				if (m_channel[1].csrr & (CSR2R_IT1 | CSR2R_IT2))
+				m_csrr[1] |= 1 << (2 - Channel);
+				if (m_csrr[1] & (CSR2R_IT1 | CSR2R_IT2))
 					m_int_callback(ASSERT_LINE);
 				break;
 			case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f: // RELOAD DISPLAY PARAMETERS
@@ -589,17 +592,18 @@ void mcd212_device::process_dca()
 			addr += (max - count) >> 1;
 		}
 	}
-	m_channel[Channel].dca = addr * 2;
+	m_dca[Channel] = addr * 2;
 }
 
-static inline uint8_t BYTE_TO_CLUT(int channel, int icm, uint8_t byte)
+template <int Channel>
+static inline uint8_t BYTE_TO_CLUT(int icm, uint8_t byte)
 {
 	switch (icm)
 	{
 		case 1:
 			return byte;
 		case 3:
-			if (channel)
+			if (Channel == 1)
 			{
 				return 0x80 + (byte & 0x7f);
 			}
@@ -608,13 +612,13 @@ static inline uint8_t BYTE_TO_CLUT(int channel, int icm, uint8_t byte)
 				return byte & 0x7f;
 			}
 		case 4:
-			if (!channel)
+			if (Channel == 0)
 			{
 				return byte & 0x7f;
 			}
 			break;
 		case 11:
-			if (channel)
+			if (Channel == 1)
 			{
 				return 0x80 + (byte & 0x0f);
 			}
@@ -633,32 +637,29 @@ inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_icm()
 {
 	const uint32_t mask = Channel ? ICM_MODE2 : ICM_MODE1;
 	const uint32_t shift = Channel ? ICM_MODE2_SHIFT : ICM_MODE1_SHIFT;
-	return (m_channel[0].image_coding_method & mask) >> shift;
+	return (m_image_coding_method & mask) >> shift;
 }
 
 template <int Channel>
 inline ATTR_FORCE_INLINE bool mcd212_device::get_mosaic_enable()
 {
-	return (m_channel[Channel].ddr & DDR_FT) == DDR_FT_MOSAIC;
+	return (m_ddr[Channel] & DDR_FT) == DDR_FT_MOSAIC;
 }
 
 template <int Channel>
 inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_mosaic_factor()
 {
-	return 1 << (((m_channel[Channel].ddr & DDR_MT) >> DDR_MT_SHIFT) + 1);
+	return 1 << (((m_ddr[Channel] & DDR_MT) >> DDR_MT_SHIFT) + 1);
 }
 
 template <int Channel>
-void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *pixels_b)
+void mcd212_device::process_vsr(rgb_t *pixels)
 {
 	uint8_t *data = reinterpret_cast<uint8_t *>(Channel ? m_planeb.target() : m_planea.target());
 	uint32_t vsr = get_vsr<Channel>();
 	uint8_t done = 0;
 	uint32_t x = 0;
 	uint8_t icm = get_icm<Channel>();
-	uint8_t *clut_r = m_channel[0].clut_r;
-	uint8_t *clut_g = m_channel[0].clut_g;
-	uint8_t *clut_b = m_channel[0].clut_b;
 	uint8_t mosaic_enable = get_mosaic_enable<Channel>();
 	uint8_t mosaic_factor = get_mosaic_factor<Channel>();
 	int mosaic_index = 0;
@@ -666,37 +667,37 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 
 	if (!icm || !vsr)
 	{
-		memset(pixels_r, 0x10, width);
-		memset(pixels_g, 0x10, width);
-		memset(pixels_b, 0x10, width);
+		std::fill_n(pixels, width, 0xff101010);
 		return;
 	}
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Channel %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Channel, icm, vsr);
+
+	uint32_t dyuv_abs_start = m_dyuv_abs_start[Channel];
 
 	while(!done)
 	{
 		uint8_t byte = data[(vsr & 0x0007ffff) ^ 1];
 		LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: VSR[%05x] = %02x\n", screen().vpos(), Channel, (vsr & 0x0007ffff), byte);
 		vsr++;
-		switch (m_channel[Channel].ddr & DDR_FT)
+		switch (m_ddr[Channel] & DDR_FT)
 		{
 			case DDR_FT_BMP:
 			case DDR_FT_BMP2:
 			case DDR_FT_MOSAIC:
-				if ((m_channel[Channel].ddr & DDR_FT) == DDR_FT_BMP)
+				if ((m_ddr[Channel] & DDR_FT) == DDR_FT_BMP)
 				{
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: BMP\n", screen().vpos(), Channel);
 				}
-				else if ((m_channel[Channel].ddr & DDR_FT) == DDR_FT_BMP2)
+				else if ((m_ddr[Channel] & DDR_FT) == DDR_FT_BMP2)
 				{
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: BMP2\n", screen().vpos(), Channel);
 				}
-				else if ((m_channel[Channel].ddr & DDR_FT) == DDR_FT_MOSAIC)
+				else if ((m_ddr[Channel] & DDR_FT) == DDR_FT_MOSAIC)
 				{
 					LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: MOSAIC\n", screen().vpos(), Channel);
 				}
-				if (m_channel[Channel].dcr & DCR_CM)
+				if (m_dcr[Channel] & DCR_CM)
 				{
 					// 4-bit Bitmap
 					LOGMASKED(LOG_UNKNOWNS, "%s", "Unsupported display mode: 4-bit Bitmap\n" );
@@ -707,9 +708,9 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 					if (icm == 5)
 					{
 						LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: DYUV\n", screen().vpos(), Channel);
-						uint8_t bY = (m_channel[Channel].dyuv_abs_start >> 16) & 0x000000ff;
-						uint8_t bU = (m_channel[Channel].dyuv_abs_start >>  8) & 0x000000ff;
-						uint8_t bV = (m_channel[Channel].dyuv_abs_start >>  0) & 0x000000ff;
+						uint8_t bY = (dyuv_abs_start >> 16) & 0x000000ff;
+						uint8_t bU = (dyuv_abs_start >>  8) & 0x000000ff;
+						uint8_t bV = (dyuv_abs_start >>  0) & 0x000000ff;
 						for (; x < width; x += 2)
 						{
 							uint8_t b0 = byte;
@@ -733,20 +734,15 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 
 							pbLimit = m_ab.limit + bY + 0xff;
 
-							pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[m_ab.matrixVR[bV]];
-							pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[m_ab.matrixUG[bU] + m_ab.matrixVG[bV]];
-							pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[m_ab.matrixUB[bU]];
+							rgb_t entry = rgb_t(0xff, pbLimit[m_ab.matrixVR[bV]], pbLimit[m_ab.matrixUG[bU] + m_ab.matrixVG[bV]], pbLimit[m_ab.matrixUB[bU]]);
+							pixels[x] = pixels[x + 1] = entry;
 
 							if (mosaic_enable)
 							{
 								for (mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
 								{
-									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
-									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
-									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
-									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
-									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
-									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+									pixels[x + 0 + mosaic_index*2] = pixels[x];
+									pixels[x + 1 + mosaic_index*2] = pixels[x + 1];
 								}
 								x += mosaic_factor * 2;
 							}
@@ -761,20 +757,15 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 
 							pbLimit = m_ab.limit + bY + 0xff;
 
-							pixels_r[x + 0] = pixels_r[x + 1] = pbLimit[m_ab.matrixVR[bV]];
-							pixels_g[x + 0] = pixels_g[x + 1] = pbLimit[m_ab.matrixUG[bU] + m_ab.matrixVG[bV]];
-							pixels_b[x + 0] = pixels_b[x + 1] = pbLimit[m_ab.matrixUB[bU]];
+							entry = rgb_t(0xff, pbLimit[m_ab.matrixVR[bV]], pbLimit[m_ab.matrixUG[bU] + m_ab.matrixVG[bV]], pbLimit[m_ab.matrixUB[bU]]);
+							pixels[x] = pixels[x + 1] = entry;
 
 							if (mosaic_enable)
 							{
 								for (mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
 								{
-									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
-									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
-									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
-									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
-									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
-									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+									pixels[x + 0 + mosaic_index*2] = pixels[x];
+									pixels[x + 1 + mosaic_index*2] = pixels[x + 1];
 								}
 								x += (mosaic_factor * 2) - 2;
 							}
@@ -789,23 +780,13 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 					{
 						for (; x < width; x += 2)
 						{
-							uint8_t clut_entry = BYTE_TO_CLUT(Channel, icm, byte);
-							pixels_r[x + 0] = clut_r[clut_entry];
-							pixels_g[x + 0] = clut_g[clut_entry];
-							pixels_b[x + 0] = clut_b[clut_entry];
-							pixels_r[x + 1] = clut_r[clut_entry];
-							pixels_g[x + 1] = clut_g[clut_entry];
-							pixels_b[x + 1] = clut_b[clut_entry];
+							pixels[x] = pixels[x + 1] = pen_color(BYTE_TO_CLUT<Channel>(icm, byte));
 							if (mosaic_enable)
 							{
 								for (mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
 								{
-									pixels_r[x + 0 + mosaic_index*2] = pixels_r[x + 0];
-									pixels_g[x + 0 + mosaic_index*2] = pixels_g[x + 0];
-									pixels_b[x + 0 + mosaic_index*2] = pixels_b[x + 0];
-									pixels_r[x + 1 + mosaic_index*2] = pixels_r[x + 1];
-									pixels_g[x + 1 + mosaic_index*2] = pixels_g[x + 1];
-									pixels_b[x + 1 + mosaic_index*2] = pixels_b[x + 1];
+									pixels[x + 0 + mosaic_index*2] = pixels[x];
+									pixels[x + 1 + mosaic_index*2] = pixels[x + 1];
 								}
 								x += (mosaic_factor * 2) - 2;
 							}
@@ -818,32 +799,24 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 					{
 						for (; x < width; x += 2)
 						{
-							uint8_t even_entry = BYTE_TO_CLUT(Channel, icm, byte >> 4);
-							uint8_t odd_entry = BYTE_TO_CLUT(Channel, icm, byte);
+							rgb_t even_entry = pen_color(BYTE_TO_CLUT<Channel>(icm, byte >> 4));
+							rgb_t odd_entry = pen_color(BYTE_TO_CLUT<Channel>(icm, byte));
 							if (mosaic_enable)
 							{
 								for (mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
 								{
-									pixels_r[x + mosaic_index] = clut_r[even_entry];
-									pixels_g[x + mosaic_index] = clut_g[even_entry];
-									pixels_b[x + mosaic_index] = clut_b[even_entry];
+									pixels[x + mosaic_index] = even_entry;
 								}
 								for (mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
 								{
-									pixels_r[x + mosaic_factor + mosaic_index] = clut_r[odd_entry];
-									pixels_g[x + mosaic_factor + mosaic_index] = clut_g[odd_entry];
-									pixels_b[x + mosaic_factor + mosaic_index] = clut_b[odd_entry];
+									pixels[x + mosaic_factor + mosaic_index] = odd_entry;
 								}
 								x += (mosaic_factor * 2) - 2;
 							}
 							else
 							{
-								pixels_r[x + 0] = clut_r[even_entry];
-								pixels_g[x + 0] = clut_g[even_entry];
-								pixels_b[x + 0] = clut_b[even_entry];
-								pixels_r[x + 1] = clut_r[odd_entry];
-								pixels_g[x + 1] = clut_g[odd_entry];
-								pixels_b[x + 1] = clut_b[odd_entry];
+								pixels[x + 0] = even_entry;
+								pixels[x + 1] = odd_entry;
 							}
 							byte = data[(vsr & 0x0007ffff) ^ 1];
 							vsr++;
@@ -852,19 +825,14 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 					}
 					else
 					{
-						for (; x < width; x++)
-						{
-							pixels_r[x] = 0x10;
-							pixels_g[x] = 0x10;
-							pixels_b[x] = 0x10;
-						}
+						std::fill_n(pixels + x, width - x, 0xff101010);
 					}
 				}
 				done = 1;
 				break;
 			case DDR_FT_RLE:
 				LOGMASKED(LOG_VSR, "Scanline %d: Chan %d: RLE\n", screen().vpos(), Channel);
-				if (m_channel[Channel].dcr & DCR_CM)
+				if (m_dcr[Channel] & DCR_CM)
 				{
 					LOGMASKED(LOG_UNKNOWNS, "%s", "Unsupported display mode: 4-bit RLE\n" );
 					done = 1;
@@ -876,55 +844,33 @@ void mcd212_device::process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *p
 						// Run length
 						uint8_t length = data[((vsr++) & 0x0007ffff) ^ 1];
 						LOGMASKED(LOG_VSR, "Byte %02x w/ run length %02x at %d\n", byte, length, x);
+						rgb_t clut_entry = pen_color(BYTE_TO_CLUT<Channel>(icm, byte & 0x7f));
 						if (!length)
 						{
-							uint8_t clut_entry = BYTE_TO_CLUT(Channel, icm, byte & 0x7f);
-							uint8_t r = clut_r[clut_entry];
-							uint8_t g = clut_g[clut_entry];
-							uint8_t b = clut_b[clut_entry];
 							// Go to the end of the line
-							for (; x < width; x++)
-							{
-								pixels_r[x] = r;
-								pixels_g[x] = g;
-								pixels_b[x] = b;
-							}
+							std::fill_n(pixels + x, width - x, clut_entry);
 							done = 1;
 							set_vsr<Channel>(vsr);
 						}
 						else
 						{
-							int end = x + (length * 2);
-							uint8_t clut_entry = BYTE_TO_CLUT(Channel, icm, byte & 0x7f);
-							uint8_t r = clut_r[clut_entry];
-							uint8_t g = clut_g[clut_entry];
-							uint8_t b = clut_b[clut_entry];
-							for (; x < end && x < width; x++)
-							{
-								pixels_r[x] = r;
-								pixels_g[x] = g;
-								pixels_b[x] = b;
-							}
+							int end = std::min(width, x + (length * 2));
+							std::fill_n(pixels + x, end - x, clut_entry);
 							if (x >= width)
 							{
 								done = 1;
 								set_vsr<Channel>(vsr);
 							}
+							x = end;
 						}
 					}
 					else
 					{
 						LOGMASKED(LOG_VSR, "Byte %02x, single at %d\n", byte, x);
 						// Single pixel
-						uint8_t clut_entry = BYTE_TO_CLUT(Channel, icm, byte);
-						pixels_r[x] = clut_r[clut_entry];
-						pixels_g[x] = clut_g[clut_entry];
-						pixels_b[x] = clut_b[clut_entry];
-						x++;
-						pixels_r[x] = clut_r[clut_entry];
-						pixels_g[x] = clut_g[clut_entry];
-						pixels_b[x] = clut_b[clut_entry];
-						x++;
+						rgb_t clut_entry = pen_color(BYTE_TO_CLUT<Channel>(icm, byte));
+						pixels[x++] = clut_entry;
+						pixels[x++] = clut_entry;
 						if (x >= width)
 						{
 							done = 1;
@@ -943,159 +889,138 @@ const uint32_t mcd212_device::s_4bpp_color[16] =
 	0x00101010, 0x001010e6, 0x0010e610, 0x0010e6e6, 0x00e61010, 0x00e610e6, 0x00e6e610, 0x00e6e6e6
 };
 
-void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *plane_a_b, uint8_t *plane_b_r, uint8_t *plane_b_g, uint8_t *plane_b_b, uint32_t *out)
+void mcd212_device::mix_lines(rgb_t *plane_a, rgb_t *plane_b, uint32_t *out)
 {
-	const uint32_t backdrop = s_4bpp_color[m_channel[0].backdrop_color];
-	const uint8_t transparency_mode_a = (m_channel[0].transparency_control >> 0) & 0x0f;
-	const uint8_t transparency_mode_b = (m_channel[0].transparency_control >> 8) & 0x0f;
-	const uint8_t transparent_color_a_r = (uint8_t)(m_channel[0].transparent_color >> 16);
-	const uint8_t transparent_color_a_g = (uint8_t)(m_channel[0].transparent_color >>  8);
-	const uint8_t transparent_color_a_b = (uint8_t)(m_channel[0].transparent_color >>  0);
-	const uint8_t transparent_color_b_r = (uint8_t)(m_channel[1].transparent_color >> 16);
-	const uint8_t transparent_color_b_g = (uint8_t)(m_channel[1].transparent_color >>  8);
-	const uint8_t transparent_color_b_b = (uint8_t)(m_channel[1].transparent_color >>  0);
-	const uint8_t image_coding_method_a = m_channel[0].image_coding_method & 0x0000000f;
-	const uint8_t image_coding_method_b = (m_channel[0].image_coding_method >> 8) & 0x0000000f;
+	const uint32_t backdrop = s_4bpp_color[m_backdrop_color];
+	const uint8_t transparency_mode_a = (m_transparency_control >> 0) & 0x0f;
+	const uint8_t transparency_mode_b = (m_transparency_control >> 8) & 0x0f;
+	const uint32_t transparent_color_a = m_transparent_color[0];
+	const uint32_t transparent_color_b = m_transparent_color[1];
+	const uint8_t image_coding_method_a = m_image_coding_method & 0x0000000f;
+	const uint8_t image_coding_method_b = (m_image_coding_method >> 8) & 0x0000000f;
 	const bool dyuv_enable_a = (image_coding_method_a == 5);
 	const bool dyuv_enable_b = (image_coding_method_b == 5);
-	const uint8_t mosaic_enable_a = (m_channel[0].mosaic_hold & 0x800000) >> 23;
-	const uint8_t mosaic_enable_b = (m_channel[1].mosaic_hold & 0x800000) >> 23;
-	const uint8_t mosaic_count_a = (m_channel[0].mosaic_hold & 0x0000ff) << 1;
-	const uint8_t mosaic_count_b = (m_channel[1].mosaic_hold & 0x0000ff) << 1;
+	const uint8_t mosaic_enable_a = (m_mosaic_hold[0] & 0x800000) >> 23;
+	const uint8_t mosaic_enable_b = (m_mosaic_hold[1] & 0x800000) >> 23;
+	const uint8_t mosaic_count_a = (m_mosaic_hold[0] & 0x0000ff) << 1;
+	const uint8_t mosaic_count_b = (m_mosaic_hold[1] & 0x0000ff) << 1;
+
+	const rgb_t cutoff = rgb_t(0x00101010);
 
 	for (int x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
-		if (!(m_channel[0].transparency_control & TCR_DISABLE_MX))
+		if (!(m_transparency_control & TCR_DISABLE_MX))
 		{
-			uint8_t abr = std::clamp(((std::clamp((int32_t)plane_a_r[x] - 16, 0, 255) * m_channel[0].weight_factor[x]) >> 6) + ((std::clamp((int32_t)plane_b_r[x] - 16, 0, 255) * m_channel[1].weight_factor[x]) >> 6) + 16, 0, 255);
-			uint8_t abg = std::clamp(((std::clamp((int32_t)plane_a_g[x] - 16, 0, 255) * m_channel[0].weight_factor[x]) >> 6) + ((std::clamp((int32_t)plane_b_g[x] - 16, 0, 255) * m_channel[1].weight_factor[x]) >> 6) + 16, 0, 255);
-			uint8_t abb = std::clamp(((std::clamp((int32_t)plane_a_b[x] - 16, 0, 255) * m_channel[0].weight_factor[x]) >> 6) + ((std::clamp((int32_t)plane_b_b[x] - 16, 0, 255) * m_channel[1].weight_factor[x]) >> 6) + 16, 0, 255);
-			out[x] = (abr << 16) | (abg << 8) | abb;
+			out[x] = ((plane_a[x] - cutoff).scale8(m_weight_factor[0][x]) + (plane_b[x] - cutoff).scale8(m_weight_factor[1][x])) + cutoff;
 		}
 		else
 		{
-			uint8_t plane_enable_a = 0;
-			uint8_t plane_enable_b = 0;
-			uint8_t plane_a_r_cur = mosaic_enable_a ? plane_a_r[x - (x % mosaic_count_a)] : plane_a_r[x];
-			uint8_t plane_a_g_cur = mosaic_enable_a ? plane_a_g[x - (x % mosaic_count_a)] : plane_a_g[x];
-			uint8_t plane_a_b_cur = mosaic_enable_a ? plane_a_b[x - (x % mosaic_count_a)] : plane_a_b[x];
-			uint8_t plane_b_r_cur = mosaic_enable_b ? plane_b_r[x - (x % mosaic_count_b)] : plane_b_r[x];
-			uint8_t plane_b_g_cur = mosaic_enable_b ? plane_b_g[x - (x % mosaic_count_b)] : plane_b_g[x];
-			uint8_t plane_b_b_cur = mosaic_enable_b ? plane_b_b[x - (x % mosaic_count_b)] : plane_b_b[x];
+			bool plane_enable_a = false;
+			bool plane_enable_b = false;
+			uint32_t plane_a_cur = mosaic_enable_a ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
+			uint32_t plane_b_cur = mosaic_enable_b ? plane_b[x - (x % mosaic_count_b)] : plane_b[x];
 			switch (transparency_mode_a)
 			{
 				case 0:
-					plane_enable_a = 0;
+					plane_enable_a = false;
 					break;
 				case 1:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b);
+					plane_enable_a = plane_a_cur != transparent_color_a;
 					break;
 				case 3:
-					plane_enable_a = !m_region_flag_0[x];
+					plane_enable_a = !m_region_flag[0][x];
 					break;
 				case 4:
-					plane_enable_a = !m_region_flag_1[x];
+					plane_enable_a = !m_region_flag[1][x];
 					break;
 				case 5:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) && (dyuv_enable_a || m_region_flag_0[x] == 0);
+					plane_enable_a = plane_a_cur != transparent_color_a && (dyuv_enable_a || !m_region_flag[0][x]);
 					break;
 				case 6:
-					plane_enable_a = (plane_a_r_cur != transparent_color_a_r || plane_a_g_cur != transparent_color_a_g || plane_a_b_cur != transparent_color_a_b) && (dyuv_enable_a || m_region_flag_1[x] == 0);
+					plane_enable_a = plane_a_cur != transparent_color_a && (dyuv_enable_a || !m_region_flag[1][x]);
 					break;
 				case 8:
-					plane_enable_a = 1;
+					plane_enable_a = true;
 					break;
 				case 9:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b);
+					plane_enable_a = plane_a_cur == transparent_color_a;
 					break;
 				case 11:
-					plane_enable_a = m_region_flag_0[x];
+					plane_enable_a = m_region_flag[0][x];
 					break;
 				case 12:
-					plane_enable_a = m_region_flag_1[x];
+					plane_enable_a = m_region_flag[1][x];
 					break;
 				case 13:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || m_region_flag_0[x] == 1;
+					plane_enable_a = plane_a_cur == transparent_color_a || dyuv_enable_a || m_region_flag[0][x];
 					break;
 				case 14:
-					plane_enable_a = (plane_a_r_cur == transparent_color_a_r && plane_a_g_cur == transparent_color_a_g && plane_a_b_cur == transparent_color_a_b) || dyuv_enable_a || m_region_flag_1[x] == 1;
+					plane_enable_a = plane_a_cur == transparent_color_a || dyuv_enable_a || m_region_flag[1][x];
 					break;
 				default:
 					LOGMASKED(LOG_UNKNOWNS, "Unhandled transparency mode for plane A: %d\n", transparency_mode_a);
-					plane_enable_a = 1;
+					plane_enable_a = true;
 					break;
 			}
 			switch (transparency_mode_b)
 			{
 				case 0:
-					plane_enable_b = 0;
+					plane_enable_b = false;
 					break;
 				case 1:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b);
+					plane_enable_b = plane_b_cur != transparent_color_b;
 					break;
 				case 3:
-					plane_enable_b = !m_region_flag_0[x];
+					plane_enable_b = !m_region_flag[0][x];
 					break;
 				case 4:
-					plane_enable_b = !m_region_flag_1[x];
+					plane_enable_b = !m_region_flag[1][x];
 					break;
 				case 5:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) && (dyuv_enable_b || m_region_flag_0[x] == 0);
+					plane_enable_b = plane_b_cur != transparent_color_b && (dyuv_enable_b || !m_region_flag[0][x]);
 					break;
 				case 6:
-					plane_enable_b = (plane_b_r_cur != transparent_color_b_r || plane_b_g_cur != transparent_color_b_g || plane_b_b_cur != transparent_color_b_b) && (dyuv_enable_b || m_region_flag_1[x] == 0);
+					plane_enable_b = plane_b_cur != transparent_color_b && (dyuv_enable_b || !m_region_flag[1][x]);
 					break;
 				case 8:
-					plane_enable_b = 1;
+					plane_enable_b = true;
 					break;
 				case 9:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b);
+					plane_enable_b = plane_b_cur == transparent_color_b;
 					break;
 				case 11:
-					plane_enable_b = m_region_flag_0[x];
+					plane_enable_b = m_region_flag[0][x];
 					break;
 				case 12:
-					plane_enable_b = m_region_flag_1[x];
+					plane_enable_b = m_region_flag[1][x];
 					break;
 				case 13:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || m_region_flag_0[x] == 1;
+					plane_enable_b = plane_b_cur == transparent_color_b || dyuv_enable_b || m_region_flag[0][x];
 					break;
 				case 14:
-					plane_enable_b = (plane_b_r_cur == transparent_color_b_r && plane_b_g_cur == transparent_color_b_g && plane_b_b_cur == transparent_color_b_b) || dyuv_enable_b || m_region_flag_1[x] == 1;
+					plane_enable_b = plane_b_cur == transparent_color_b || dyuv_enable_b || m_region_flag[1][x];
 					break;
 				default:
 					LOGMASKED(LOG_UNKNOWNS, "Unhandled transparency mode for plane B: %d\n", transparency_mode_b);
 					plane_enable_b = 1;
 					break;
 			}
-			plane_a_r_cur = std::clamp(((std::clamp((int32_t)plane_a_r_cur - 16, 0, 255) * m_channel[0].weight_factor[x]) >> 6) + 16, 0, 255);
-			plane_a_g_cur = std::clamp(((std::clamp((int32_t)plane_a_g_cur - 16, 0, 255) * m_channel[0].weight_factor[x]) >> 6) + 16, 0, 255);
-			plane_a_b_cur = std::clamp(((std::clamp((int32_t)plane_a_b_cur - 16, 0, 255) * m_channel[0].weight_factor[x]) >> 6) + 16, 0, 255);
-			plane_b_r_cur = std::clamp(((std::clamp((int32_t)plane_b_r_cur - 16, 0, 255) * m_channel[1].weight_factor[x]) >> 6) + 16, 0, 255);
-			plane_b_g_cur = std::clamp(((std::clamp((int32_t)plane_b_g_cur - 16, 0, 255) * m_channel[1].weight_factor[x]) >> 6) + 16, 0, 255);
-			plane_b_b_cur = std::clamp(((std::clamp((int32_t)plane_b_b_cur - 16, 0, 255) * m_channel[1].weight_factor[x]) >> 6) + 16, 0, 255);
-			switch (m_channel[0].plane_order)
+			plane_a_cur = (rgb_t(plane_a_cur) - cutoff).scale8(m_weight_factor[0][x]) + cutoff;
+			plane_b_cur = (rgb_t(plane_b_cur) - cutoff).scale8(m_weight_factor[1][x]) + cutoff;
+			switch (m_plane_order)
 			{
 				case POR_AB:
 					if (plane_enable_a)
-					{
-						out[x] = (plane_a_r_cur << 16) | (plane_a_g_cur << 8) | plane_a_b_cur;
-					}
+						out[x] = plane_a_cur;
 					else if (plane_enable_b)
-					{
-						out[x] = (plane_b_r_cur << 16) | (plane_b_g_cur << 8) | plane_b_b_cur;
-					}
+						out[x] = plane_b_cur;
 					break;
 				case POR_BA:
 					if (plane_enable_b)
-					{
-						out[x] = (plane_b_r_cur << 16) | (plane_b_g_cur << 8) | plane_b_b_cur;
-					}
+						out[x] = plane_b_cur;
 					else if (plane_enable_a)
-					{
-						out[x] = (plane_a_r_cur << 16) | (plane_a_g_cur << 8) | plane_a_b_cur;
-					}
+						out[x] = plane_a_cur;
 					break;
 			}
 		}
@@ -1104,20 +1029,20 @@ void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *p
 
 void mcd212_device::draw_cursor(uint32_t *scanline)
 {
-	if (m_channel[0].cursor_control & CURCNT_EN)
+	if (m_cursor_control & CURCNT_EN)
 	{
 		uint16_t y = (uint16_t)screen().vpos();
-		const uint16_t cursor_x =  m_channel[0].cursor_position        & 0x3ff;
-		const uint16_t cursor_y = ((m_channel[0].cursor_position >> 12) & 0x3ff) + m_ica_height;
+		const uint16_t cursor_x =  m_cursor_position & 0x3ff;
+		const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
 		if (y >= cursor_y && y < (cursor_y + 16))
 		{
-			uint32_t color = s_4bpp_color[m_channel[0].cursor_control & CURCNT_COLOR];
+			uint32_t color = s_4bpp_color[m_cursor_control & CURCNT_COLOR];
 			y -= cursor_y;
-			if (m_channel[0].cursor_control & CURCNT_CUW)
+			if (m_cursor_control & CURCNT_CUW)
 			{
 				for (int x = cursor_x; x < cursor_x + 64 && x < 768; x++)
 				{
-					if (m_channel[0].cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 2))))
+					if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 2))))
 					{
 						scanline[(x++)/2] = color;
 						scanline[(x++)/2] = color;
@@ -1130,7 +1055,7 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 			{
 				for (int x = cursor_x; x < cursor_x + 32 && x < 768; x++)
 				{
-					if (m_channel[0].cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 1))))
+					if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 1))))
 					{
 						scanline[(x++)/2] = color;
 						scanline[x/2] = color;
@@ -1143,14 +1068,14 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 
 void mcd212_device::draw_scanline(bitmap_rgb32 &bitmap)
 {
-	uint8_t plane_a_r[768], plane_a_g[768], plane_a_b[768];
-	uint8_t plane_b_r[768], plane_b_g[768], plane_b_b[768];
+	rgb_t plane_a[768];
+	rgb_t plane_b[768];
 	uint32_t out[768];
 
-	process_vsr<0>(plane_a_r, plane_a_g, plane_a_b);
-	process_vsr<1>(plane_b_r, plane_b_g, plane_b_b);
+	process_vsr<0>(plane_a);
+	process_vsr<1>(plane_b);
 
-	mix_lines(plane_a_r, plane_a_g, plane_a_b, plane_b_r, plane_b_g, plane_b_b, out);
+	mix_lines(plane_a, plane_b, out);
 
 	uint32_t *const scanline = &bitmap.pix(screen().vpos());
 	for (int x = 0; x < 384; x++)
@@ -1180,77 +1105,77 @@ void mcd212_device::map(address_map &map)
 
 uint8_t mcd212_device::csr1_r()
 {
-	LOGMASKED(LOG_STATUS, "%s: Control/Status Register 1 Read: %02x\n", machine().describe_context(), m_channel[0].csrr);
-	return m_channel[0].csrr;
+	LOGMASKED(LOG_STATUS, "%s: Control/Status Register 1 Read: %02x\n", machine().describe_context(), m_csrr[0]);
+	return m_csrr[0];
 }
 
 void mcd212_device::csr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Control/Status Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[0].csrw);
+	COMBINE_DATA(&m_csrw[0]);
 	update_visible_area();
 }
 
 uint16_t mcd212_device::dcr1_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: Display Command Register 1 Read: %04x & %08x\n", machine().describe_context(), m_channel[0].dcr, mem_mask);
-	return m_channel[0].dcr;
+	LOGMASKED(LOG_STATUS, "%s: Display Command Register 1 Read: %04x & %08x\n", machine().describe_context(), m_dcr[0], mem_mask);
+	return m_dcr[0];
 }
 
 void mcd212_device::dcr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Display Command Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[0].dcr);
+	COMBINE_DATA(&m_dcr[0]);
 	update_visible_area();
 }
 
 uint16_t mcd212_device::vsr1_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: Video Start Register 1 Read: %04x & %08x\n", machine().describe_context(), m_channel[0].vsr, mem_mask);
-	return m_channel[0].vsr;
+	LOGMASKED(LOG_STATUS, "%s: Video Start Register 1 Read: %04x & %08x\n", machine().describe_context(), m_vsr[0], mem_mask);
+	return m_vsr[0];
 }
 
 void mcd212_device::vsr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Video Start Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[0].vsr);
+	COMBINE_DATA(&m_vsr[0]);
 }
 
 uint16_t mcd212_device::ddr1_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: Display Decoder Register 1 Read: %04x & %08x\n", machine().describe_context(), m_channel[0].ddr, mem_mask);
-	return m_channel[0].ddr;
+	LOGMASKED(LOG_STATUS, "%s: Display Decoder Register 1 Read: %04x & %08x\n", machine().describe_context(), m_ddr[0], mem_mask);
+	return m_ddr[0];
 }
 
 void mcd212_device::ddr1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Display Decoder Register 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[0].ddr);
+	COMBINE_DATA(&m_ddr[0]);
 }
 
 uint16_t mcd212_device::dca1_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: DCA Pointer 1 Read: %04x & %08x\n", machine().describe_context(), m_channel[0].dca, mem_mask);
-	return m_channel[0].dca;
+	LOGMASKED(LOG_STATUS, "%s: DCA Pointer 1 Read: %04x & %08x\n", machine().describe_context(), m_dca[0], mem_mask);
+	return m_dca[0];
 }
 
 void mcd212_device::dca1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: DCA Pointer 1 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[0].dca);
+	COMBINE_DATA(&m_dca[0]);
 }
 
 uint8_t mcd212_device::csr2_r()
 {
 	if (machine().side_effects_disabled())
 	{
-		return m_channel[1].csrr;
+		return m_csrr[1];
 	}
 
-	const uint8_t data = m_channel[1].csrr;
+	const uint8_t data = m_csrr[1];
 	LOGMASKED(LOG_STATUS, "%s: Status Register 2: %02x\n", machine().describe_context(), data);
 
-	m_channel[1].csrr &= ~(CSR2R_IT1 | CSR2R_IT2);
+	m_csrr[1] &= ~(CSR2R_IT1 | CSR2R_IT2);
 	if (data & (CSR2R_IT1 | CSR2R_IT2))
 		m_int_callback(CLEAR_LINE);
 
@@ -1260,55 +1185,55 @@ uint8_t mcd212_device::csr2_r()
 void mcd212_device::csr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Control/Status Register 2 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[1].csrw);
+	COMBINE_DATA(&m_csrw[1]);
 }
 
 uint16_t mcd212_device::dcr2_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: Display Command Register 2 Read: %04x & %08x\n", machine().describe_context(), m_channel[1].dcr, mem_mask);
-	return m_channel[1].dcr;
+	LOGMASKED(LOG_STATUS, "%s: Display Command Register 2 Read: %04x & %08x\n", machine().describe_context(), m_dcr[1], mem_mask);
+	return m_dcr[1];
 }
 
 void mcd212_device::dcr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Display Command Register 2 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[1].dcr);
+	COMBINE_DATA(&m_dcr[1]);
 }
 
 uint16_t mcd212_device::vsr2_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: Video Start Register 2 Read: %04x & %08x\n", machine().describe_context(), m_channel[1].vsr, mem_mask);
-	return m_channel[1].vsr;
+	LOGMASKED(LOG_STATUS, "%s: Video Start Register 2 Read: %04x & %08x\n", machine().describe_context(), m_vsr[1], mem_mask);
+	return m_vsr[1];
 }
 
 void mcd212_device::vsr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Video Start Register 2 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[1].vsr);
+	COMBINE_DATA(&m_vsr[1]);
 }
 
 uint16_t mcd212_device::ddr2_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: Display Decoder Register 2 Read: %04x & %08x\n", machine().describe_context(), m_channel[1].ddr, mem_mask);
-	return m_channel[1].ddr;
+	LOGMASKED(LOG_STATUS, "%s: Display Decoder Register 2 Read: %04x & %08x\n", machine().describe_context(), m_ddr[1], mem_mask);
+	return m_ddr[1];
 }
 
 void mcd212_device::ddr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: Display Decoder Register 2 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[1].ddr);
+	COMBINE_DATA(&m_ddr[1]);
 }
 
 uint16_t mcd212_device::dca2_r(offs_t offset, uint16_t mem_mask)
 {
-	LOGMASKED(LOG_STATUS, "%s: DCA Pointer 2 Read: %04x & %08x\n", machine().describe_context(), m_channel[1].dca, mem_mask);
-	return m_channel[1].dca;
+	LOGMASKED(LOG_STATUS, "%s: DCA Pointer 2 Read: %04x & %08x\n", machine().describe_context(), m_dca[1], mem_mask);
+	return m_dca[1];
 }
 
 void mcd212_device::dca2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGMASKED(LOG_STATUS, "%s: DCA Pointer 2 Write: %04x & %08x\n", machine().describe_context(), data, mem_mask);
-	COMBINE_DATA(&m_channel[1].dca);
+	COMBINE_DATA(&m_dca[1]);
 }
 
 WRITE_LINE_MEMBER(mcd212_device::screen_vblank)
@@ -1316,10 +1241,10 @@ WRITE_LINE_MEMBER(mcd212_device::screen_vblank)
 	if (state)
 	{
 		// Process ICA
-		m_channel[0].csrr &= 0x7f;
-		if (m_channel[0].dcr & DCR_ICA)
+		m_csrr[0] &= 0x7f;
+		if (m_dcr[0] & DCR_ICA)
 			process_ica<0>();
-		if (m_channel[1].dcr & DCR_ICA)
+		if (m_dcr[1] & DCR_ICA)
 			process_ica<1>();
 	}
 }
@@ -1330,12 +1255,12 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if (scanline >= m_ica_height)
 	{
-		m_channel[0].csrr |= 0x80;
+		m_csrr[0] |= 0x80;
 
 		// Process DCA
-		if (m_channel[0].dcr & DCR_DCA)
+		if (m_dcr[0] & DCR_DCA)
 			process_dca<0>();
-		if (m_channel[1].dcr & DCR_DCA)
+		if (m_dcr[1] & DCR_DCA)
 			process_dca<1>();
 
 		// Process VSR
@@ -1344,7 +1269,7 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	if (scanline == (m_total_height - 1))
 	{
-		m_channel[0].csrr ^= 0x20;
+		m_csrr[0] ^= 0x20;
 	}
 
 	return 0;
@@ -1352,35 +1277,30 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void mcd212_device::device_reset()
 {
-	for (auto & elem : m_channel)
-	{
-		elem.csrr = 0;
-		elem.csrw = 0;
-		elem.dcr = 0;
-		elem.vsr = 0;
-		elem.ddr = 0;
-		elem.dcp = 0;
-		elem.dca = 0;
-		memset(elem.clut_r, 0, 256);
-		memset(elem.clut_g, 0, 256);
-		memset(elem.clut_b, 0, 256);
-		elem.image_coding_method = 0;
-		elem.transparency_control = 0;
-		elem.plane_order = 0;
-		elem.clut_bank = 0;
-		elem.transparent_color = 0;
-		elem.mask_color = 0;
-		elem.dyuv_abs_start = 0;
-		elem.cursor_position = 0;
-		elem.cursor_control = 0;
-		memset((uint8_t*)&elem.cursor_pattern, 0, 16 * sizeof(uint32_t));
-		memset((uint8_t*)&elem.region_control, 0, 8 * sizeof(uint32_t));
-		elem.backdrop_color = 0;
-		elem.mosaic_hold = 0;
-		memset(elem.weight_factor, 0, 768);
-	}
-	memset(m_region_flag_0, 0, 768);
-	memset(m_region_flag_1, 0, 768);
+	std::fill_n(m_csrr, 2, 0);
+	std::fill_n(m_csrw, 2, 0);
+	std::fill_n(m_dcr, 2, 0);
+	std::fill_n(m_vsr, 2, 0);
+	std::fill_n(m_ddr, 2, 0);
+	std::fill_n(m_dcp, 2, 0);
+	std::fill_n(m_dca, 2, 0);
+	m_image_coding_method = 0;
+	m_transparency_control = 0;
+	m_plane_order = 0;
+	std::fill_n(m_clut_bank, 2, 0);
+	std::fill_n(m_transparent_color, 2, 0);
+	std::fill_n(m_mask_color, 2, 0);
+	std::fill_n(m_dyuv_abs_start, 2, 0);
+	m_cursor_position = 0;
+	m_cursor_control = 0;
+	std::fill_n(m_cursor_pattern, std::size(m_cursor_pattern), 0);
+	std::fill_n(m_region_control, 8, 0);
+	m_backdrop_color = 0;
+	std::fill_n(m_mosaic_hold, 2, 0);
+	std::fill_n(m_weight_factor[0], std::size(m_weight_factor[0]), 0);
+	std::fill_n(m_weight_factor[1], std::size(m_weight_factor[1]), 0);
+	std::fill_n(m_region_flag[0], std::size(m_region_flag[0]), false);
+	std::fill_n(m_region_flag[1], std::size(m_region_flag[1]), false);
 	m_ica_height = 32;
 	m_total_height = 312;
 
@@ -1394,6 +1314,7 @@ void mcd212_device::device_reset()
 mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MCD212, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, device_palette_interface(mconfig, *this)
 	, m_int_callback(*this)
 	, m_planea(*this, "planea")
 	, m_planeb(*this, "planeb")
@@ -1419,58 +1340,32 @@ void mcd212_device::device_start()
 {
 	ab_init();
 
-	save_item(NAME(m_region_flag_0));
-	save_item(NAME(m_region_flag_1));
+	save_item(NAME(m_region_flag[0]));
+	save_item(NAME(m_region_flag[1]));
 	save_item(NAME(m_ica_height));
 	save_item(NAME(m_total_height));
-	save_item(NAME(m_channel[0].csrr));
-	save_item(NAME(m_channel[0].csrw));
-	save_item(NAME(m_channel[0].dcr));
-	save_item(NAME(m_channel[0].vsr));
-	save_item(NAME(m_channel[0].ddr));
-	save_item(NAME(m_channel[0].dcp));
-	save_item(NAME(m_channel[0].dca));
-	save_item(NAME(m_channel[0].clut_r));
-	save_item(NAME(m_channel[0].clut_g));
-	save_item(NAME(m_channel[0].clut_b));
-	save_item(NAME(m_channel[0].image_coding_method));
-	save_item(NAME(m_channel[0].transparency_control));
-	save_item(NAME(m_channel[0].plane_order));
-	save_item(NAME(m_channel[0].clut_bank));
-	save_item(NAME(m_channel[0].transparent_color));
-	save_item(NAME(m_channel[0].mask_color));
-	save_item(NAME(m_channel[0].dyuv_abs_start));
-	save_item(NAME(m_channel[0].cursor_position));
-	save_item(NAME(m_channel[0].cursor_control));
-	save_item(NAME(m_channel[0].cursor_pattern));
-	save_item(NAME(m_channel[0].region_control));
-	save_item(NAME(m_channel[0].backdrop_color));
-	save_item(NAME(m_channel[0].mosaic_hold));
-	save_item(NAME(m_channel[0].weight_factor));
-	save_item(NAME(m_channel[1].csrr));
-	save_item(NAME(m_channel[1].csrw));
-	save_item(NAME(m_channel[1].dcr));
-	save_item(NAME(m_channel[1].vsr));
-	save_item(NAME(m_channel[1].ddr));
-	save_item(NAME(m_channel[1].dcp));
-	save_item(NAME(m_channel[1].dca));
-	save_item(NAME(m_channel[1].clut_r));
-	save_item(NAME(m_channel[1].clut_g));
-	save_item(NAME(m_channel[1].clut_b));
-	save_item(NAME(m_channel[1].image_coding_method));
-	save_item(NAME(m_channel[1].transparency_control));
-	save_item(NAME(m_channel[1].plane_order));
-	save_item(NAME(m_channel[1].clut_bank));
-	save_item(NAME(m_channel[1].transparent_color));
-	save_item(NAME(m_channel[1].mask_color));
-	save_item(NAME(m_channel[1].dyuv_abs_start));
-	save_item(NAME(m_channel[1].cursor_position));
-	save_item(NAME(m_channel[1].cursor_control));
-	save_item(NAME(m_channel[1].cursor_pattern));
-	save_item(NAME(m_channel[1].region_control));
-	save_item(NAME(m_channel[1].backdrop_color));
-	save_item(NAME(m_channel[1].mosaic_hold));
-	save_item(NAME(m_channel[1].weight_factor));
+	save_item(NAME(m_csrr));
+	save_item(NAME(m_csrw));
+	save_item(NAME(m_dcr));
+	save_item(NAME(m_vsr));
+	save_item(NAME(m_ddr));
+	save_item(NAME(m_dcp));
+	save_item(NAME(m_dca));
+	save_item(NAME(m_image_coding_method));
+	save_item(NAME(m_transparency_control));
+	save_item(NAME(m_plane_order));
+	save_item(NAME(m_clut_bank));
+	save_item(NAME(m_transparent_color));
+	save_item(NAME(m_mask_color));
+	save_item(NAME(m_dyuv_abs_start));
+	save_item(NAME(m_cursor_position));
+	save_item(NAME(m_cursor_control));
+	save_item(NAME(m_cursor_pattern));
+	save_item(NAME(m_region_control));
+	save_item(NAME(m_backdrop_color));
+	save_item(NAME(m_mosaic_hold));
+	save_item(NAME(m_weight_factor[0]));
+	save_item(NAME(m_weight_factor[1]));
 }
 
 void mcd212_device::ab_init()

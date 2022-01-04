@@ -32,7 +32,8 @@ TODO:
 //**************************************************************************
 
 class mcd212_device : public device_t,
-					  public device_video_interface
+					  public device_video_interface,
+					  public device_palette_interface
 {
 public:
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -49,6 +50,9 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_palette_interface overrides
+	virtual uint32_t palette_entries() const override { return 0x100; }
 
 	uint8_t csr1_r();
 	void csr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -72,33 +76,27 @@ protected:
 	uint16_t dca2_r(offs_t offset, uint16_t mem_mask = ~0);
 	void dca2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	struct channel_t
-	{
-		uint8_t csrr;
-		uint16_t csrw;
-		uint16_t dcr;
-		uint16_t vsr;
-		uint16_t ddr;
-		uint16_t dcp;
-		uint32_t dca;
-		uint8_t clut_r[256];
-		uint8_t clut_g[256];
-		uint8_t clut_b[256];
-		uint32_t image_coding_method;
-		uint32_t transparency_control;
-		uint32_t plane_order;
-		uint32_t clut_bank;
-		uint32_t transparent_color;
-		uint32_t mask_color;
-		uint32_t dyuv_abs_start;
-		uint32_t cursor_position;
-		uint32_t cursor_control;
-		uint32_t cursor_pattern[16];
-		uint32_t region_control[8];
-		uint32_t backdrop_color;
-		uint32_t mosaic_hold;
-		uint8_t weight_factor[768];
-	};
+	uint8_t m_csrr[2];
+	uint16_t m_csrw[2];
+	uint16_t m_dcr[2];
+	uint16_t m_vsr[2];
+	uint16_t m_ddr[2];
+	uint16_t m_dcp[2];
+	uint32_t m_dca[2];
+	uint32_t m_image_coding_method;
+	uint32_t m_transparency_control;
+	uint32_t m_plane_order;
+	uint32_t m_clut_bank[2];
+	uint32_t m_transparent_color[2];
+	uint32_t m_mask_color[2];
+	uint32_t m_dyuv_abs_start[2];
+	uint32_t m_cursor_position;
+	uint32_t m_cursor_control;
+	uint32_t m_cursor_pattern[16];
+	uint32_t m_region_control[8];
+	uint32_t m_backdrop_color;
+	uint32_t m_mosaic_hold[2];
+	uint8_t m_weight_factor[2][768];
 
 	struct ab_t
 	{
@@ -213,9 +211,7 @@ protected:
 	required_shared_ptr<uint16_t> m_planeb;
 
 	// internal state
-	channel_t m_channel[2];
-	uint8_t m_region_flag_0[768];
-	uint8_t m_region_flag_1[768];
+	bool m_region_flag[2][768];
 	int m_ica_height;
 	int m_total_height;
 
@@ -244,11 +240,11 @@ protected:
 	template <int Channel> uint8_t get_icm();
 	template <int Channel> bool get_mosaic_enable();
 	template <int Channel> uint8_t get_mosaic_factor();
-	template <int Channel> void process_vsr(uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *pixels_b);
+	template <int Channel> void process_vsr(rgb_t *pixels);
 
 	template <int Channel> void set_register(uint8_t reg, uint32_t value);
 
-	void mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *plane_a_b, uint8_t *plane_b_r, uint8_t *plane_b_g, uint8_t *plane_b_b, uint32_t *out);
+	void mix_lines(rgb_t *plane_a, rgb_t *plane_b, uint32_t *out);
 
 	void draw_cursor(uint32_t *scanline);
 	void draw_scanline(bitmap_rgb32 &bitmap);
