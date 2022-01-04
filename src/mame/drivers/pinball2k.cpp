@@ -101,6 +101,10 @@ public:
 		m_kbdc(*this, "kbdc"),
 		dcs(*this, "dcs"),
 		m_pit(*this, "pit8253"),
+		m_prismdata1(*this, "prismdata1"),
+		m_prismdata2(*this, "prismdata2"),
+		m_prismdata3(*this, "prismdata3"),
+		m_prismdata4(*this, "prismdata4"),
 		m_irq_callback(*this) { }
 
 	void mediagx(machine_config &config);
@@ -153,6 +157,10 @@ private:
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<dcs2_audio_2104_pin2k_device> dcs;
 	required_device<pit8253_device> m_pit;
+	required_region_ptr<u32> m_prismdata1;
+	required_region_ptr<u32> m_prismdata2;
+	required_region_ptr<u32> m_prismdata3;
+	required_region_ptr<u32> m_prismdata4;
 	uint8_t m_pal[768];
 
 	std::unique_ptr<uint8_t[]> m_nvram_updates;
@@ -203,7 +211,6 @@ private:
 		IOASIC_INTSTAT,     /* e: interrupt status */
 		IOASIC_INTCTL       /* f: interrupt control */
 	};
-	//DECLARE_WRITE_LINE_MEMBER(timer1_changed);
 
 	uint8_t m_pdb[10];
 	int m_pdbcounter;
@@ -244,14 +251,6 @@ private:
 	uint8_t m_superio_reg_sel;
 	uint8_t m_superio_regs[256];
 
-	//uint8_t m_controls_data;
-	//uint8_t m_parallel_pointer;
-	//uint8_t m_parallel_latched;
-	//uint32_t m_parport;
-	//int m_control_num;
-	//int m_control_num2;
-	//int m_control_read;
-
 	uint32_t m_cx5520_regs[256/4];
 	uint32_t m_prism_regs[256/4];
 	uint32_t m_mediagx_regs[65];
@@ -273,8 +272,6 @@ private:
 
 	uint8_t io22_r(offs_t offset);
 	void io22_w(offs_t offset, uint8_t data);
-	[[maybe_unused]]uint8_t io23_r(offs_t offset);
-	[[maybe_unused]]void io23_w(offs_t offset, uint8_t data);
 	uint8_t io61_r(offs_t offset);
 	void io61_w(offs_t offset, uint8_t data);
 	uint32_t port400_r();
@@ -487,10 +484,9 @@ INPUT_CHANGED_MEMBER(pinball2k_state::kb_irq)
 				m_pic1->ir1_w(0);
 			break;
 		case 0x0: // coindoor
-			//if (newval == 1) m_cabinetswitch |= 1UL << 1;
-			//if (newval == 0) m_cabinetswitch &= ~(1 << 1);
 			if (newval == 1) {
-				if ((m_cabinetswitch >> 1 & 1) == 1)
+				//if ((m_cabinetswitch >> 1 & 1) == 1)
+				if (BIT(m_cabinetswitch, 1) ==1 )
 					m_cabinetswitch &= ~(1 << 1);
 				else
 					m_cabinetswitch |= 1UL << 1;
@@ -650,8 +646,7 @@ static const rgb_t cga_palette[16] =
 
 void pinball2k_state::video_start()
 {
-	int i;
-	for (i=0; i < 16; i++)
+	for (int i=0; i < 16; i++)
 	{
 		m_palette->set_pen_color(i, cga_palette[i]);
 	}
@@ -684,23 +679,16 @@ void pinball2k_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int scanline)
 {
-	int width, height;
 	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) << 1;
-	constexpr int _rgb_scale_5[32] =
-	{
-		0, 8, 16, 24, 32, 41, 49, 57,
-		65, 74, 82, 90, 98, 106, 115, 123,
-		131, 139, 148, 156, 164, 172, 180, 189,
-		197, 205, 213, 222, 230, 238, 246, 255
-	};
-	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	
+	int width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
 	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	int height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
 	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
@@ -754,6 +742,13 @@ void pinball2k_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cl
 		// RGB 5-5-5 mode
 		else
 		{
+			constexpr int _rgb_scale_5[32] =
+			{
+				0, 8, 16, 24, 32, 41, 49, 57,
+				65, 74, 82, 90, 98, 106, 115, 123,
+				131, 139, 148, 156, 164, 172, 180, 189,
+				197, 205, 213, 222, 230, 238, 246, 255
+			};
 			// pinball 2000 uses 5-5-5 mode
 			uint32_t *const p = &bitmap.pix(scanline);
 			uint16_t const *si = &framebuf[scanline * line_delta];
@@ -1007,7 +1002,7 @@ void pinball2k_state::expansion_w(offs_t offset, uint32_t data, uint32_t mem_mas
 
 uint32_t pinball2k_state::expansion_r(offs_t offset)
 {
-	return ((uint32_t *)memregion("prismdata1")->base())[offset];
+	return m_prismdata1[offset];
 }
 
 uint32_t pinball2k_state::prism_1000_r(offs_t offset, uint32_t mem_mask)
@@ -1031,14 +1026,10 @@ uint32_t pinball2k_state::prism_1000_r(offs_t offset, uint32_t mem_mask)
 			m_prism_eprom_counter--;
 			// start with offset + 1 then offset, shift
 			uint16_t val;
-			//val = memregion("eeprom_data")->base()[m_prism_eprom_offset + 1] << 8;
 			if (m_prism_eprom_wordtoggle == 0) 
 				val = ((m_eeprom[m_prism_eprom_offset] & 0xffff0000) >> 16);
 			else
 				val = m_eeprom[m_prism_eprom_offset] & 0xffff;
-
-			//val |= memregion("eeprom_data")->base()[m_prism_eprom_offset];
-			//val |= eeprom[m_prism_eprom_offset];
 
 			uint8_t bit = (val >> m_prism_eprom_counter) & 0x1;
 			t = (t & (~(1 << 27))) | (bit << 27);
@@ -1054,7 +1045,6 @@ uint32_t pinball2k_state::prism_1000_r(offs_t offset, uint32_t mem_mask)
 	if (offset == 0x13)
 	{
 		return m_eeprom_regs[offset] | 0x4;
-		//return eeprom[offset];
 	}
 	else
 		return m_eeprom_regs[offset];
@@ -1067,7 +1057,9 @@ void pinball2k_state::prism_1000_w(offs_t offset, uint32_t data, uint32_t mem_ma
 		if (((data >> 24 ) & 0x2) == 0x2) // bit 25 = 1 need clock
 		{
 			if (m_prism_clock_enabled == 0)
-				{m_prism_eprom_offset = -1;}
+				{
+					m_prism_eprom_offset = -1;
+				}
 			m_prism_clock_enabled = 1;
 			// bit 24 is clock
 			m_prism_eprom_clk = ((data >> 24) & 0x1);
@@ -1098,7 +1090,6 @@ void pinball2k_state::nvram_updates_w(offs_t offset, uint16_t data)
 				// 60h + 01h = set block lock-bit
 				// 60h + d0h = clear block lock-bit
 				// 60h + f1h = set master lock bit
-	//logerror("%s: mode = %02x\n", machine().describe_context(), m_1200_mode);
 
 	if ((data  == 0x0098) && (offset >= 0) && (offset <= 0x7fffff) && !(m_1200_mode == 6))
 		m_1200_mode = 1; // read query
@@ -1142,8 +1133,6 @@ void pinball2k_state::nvram_updates_w(offs_t offset, uint16_t data)
 
 uint8_t pinball2k_state::nvram_updates_r(offs_t offset)
 {
-	//return m_nvram_updates[offset];
-
 	if (m_1200_mode == 0) {
 		return m_nvram_updates[offset];
 	}
@@ -1237,30 +1226,30 @@ uint32_t pinball2k_state::prism_1400_r(offs_t offset)
 	switch(m_prismbank)
 	{
 		case 0:
-			return ((uint32_t *)memregion("prismdata1")->base())[offset];
+			return m_prismdata1[offset];
 		case 1:
-			return ((uint32_t *)memregion("prismdata2")->base())[offset];
+			return m_prismdata2[offset];
 		case 2:
-			return ((uint32_t *)memregion("prismdata3")->base())[offset];
+			return m_prismdata3[offset];
 		case 3:
-			return ((uint32_t *)memregion("prismdata4")->base())[offset];
+			return m_prismdata4[offset];
 	}
 	return 0;
 }
 
 uint32_t pinball2k_state::prism_1500_r(offs_t offset)
 {
-	return ((uint32_t *)memregion("prismdata2")->base())[offset];
+	return m_prismdata2[offset];
 }
 
 uint32_t pinball2k_state::prism_1600_r(offs_t offset)
 {
-	return ((uint32_t *)memregion("prismdata3")->base())[offset];
+	return m_prismdata3[offset];
 }
 
 uint32_t pinball2k_state::prism_1700_r(offs_t offset)
 {
-	return ((uint32_t *)memregion("prismdata4")->base())[offset];
+	return m_prismdata4[offset];
 }
 
 void pinball2k_state::prism_1400_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -1291,11 +1280,7 @@ uint8_t pinball2k_state::io22_r(offs_t offset)
 {
 	uint8_t r = 0;
 
-	// 0x22, 0x23, Cyrix configuration registers
-	if (offset == 0x00)
-	{
-	}
-	else if (offset == 0x01)
+	if (offset == 0x01)
 	{
 		r = m_mediagx_config_regs[m_mediagx_config_reg_sel];
 	}
@@ -1308,24 +1293,6 @@ void pinball2k_state::io22_w(offs_t offset, uint8_t data)
 	if (offset == 0x00)
 	{
 		m_mediagx_config_reg_sel = data;
-	}
-	else if (offset == 0x01)
-	{
-		m_mediagx_config_regs[m_mediagx_config_reg_sel] = data;
-	}
-}
-
-uint8_t pinball2k_state::io23_r(offs_t offset)
-{
-	// 0x22, 0x23, Cyrix configuration registers
-	return m_mediagx_config_regs[m_mediagx_config_reg_sel];
-}
-
-void pinball2k_state::io23_w(offs_t offset, uint8_t data)
-{
-	// 0x22, 0x23, Cyrix configuration registers
-	if (offset == 0x00)
-	{
 	}
 	else if (offset == 0x01)
 	{
@@ -1346,10 +1313,7 @@ uint8_t pinball2k_state::port2e_r(offs_t offset)
 {
 	uint8_t r = 0;
 
-	if (offset == 0x00)
-	{
-	}
-	else if (offset == 0x01)
+	if (offset == 0x01)
 	{
 		r = m_superio_regs[m_superio_reg_sel];
 	}
@@ -1871,7 +1835,6 @@ void pinball2k_state::mediagx_map(address_map &map)
 
 void pinball2k_state::mediagx_io(address_map &map)
 {
-	// all in pcat32_io_common
 	map(0x0000, 0x001f).rw(m_dma8237_1, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw(m_pic1, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x0043).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
@@ -1885,7 +1848,6 @@ void pinball2k_state::mediagx_io(address_map &map)
 
 	// mediaGX port
 	map(0x0022, 0x0023).rw(FUNC(pinball2k_state::io22_r), FUNC(pinball2k_state::io22_w));
-	//map(0x0023, 0x0023).rw(FUNC(pinball2k_state::io23_r), FUNC(pinball2k_state::io23_w));
 
 	map(0x0161, 0x0161).rw(FUNC(pinball2k_state::io61_r), FUNC(pinball2k_state::io61_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
@@ -2107,7 +2069,6 @@ void pinball2k_state::init_pinball2k()
 
 void pinball2k_state::init_swe1pb()
 {
-	#define bootnormal 1
 	init_mediagx();
 }
 
