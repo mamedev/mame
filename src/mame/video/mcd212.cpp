@@ -45,8 +45,7 @@ DEFINE_DEVICE_TYPE(MCD212, mcd212_device, "mcd212", "MCD212 VDSC")
 
 inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_weight_factor(const uint32_t region_idx)
 {
-	uint8_t data = (uint8_t)((m_region_control[region_idx] & RC_WF) >> RC_WF_SHIFT);
-	return (data << 2) | (data >> 4);
+	return (uint8_t)((m_region_control[region_idx] & RC_WF) >> RC_WF_SHIFT);
 }
 
 inline ATTR_FORCE_INLINE uint8_t mcd212_device::get_region_op(const uint32_t region_idx)
@@ -230,7 +229,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 		{
 			const uint8_t clut_index = m_clut_bank[Channel] * 0x40 + (reg - 0x80);
 			LOGMASKED(LOG_CLUT, "%s: Channel %d: CLUT[%d] = %08x\n", machine().describe_context(), Channel, clut_index, value);
-			m_clut[clut_index] = value & 0x00ffffff;
+			m_clut[clut_index] = value & 0x00fcfcfc;
 		}	break;
 		case 0xc0: // Image Coding Method
 			if (Channel == 0)
@@ -261,28 +260,28 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			if (Channel == 0)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Transparent Color A = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_transparent_color[0] = value & 0x00ffffff;
+				m_transparent_color[0] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xc6: // Transparent Color B
 			if (Channel == 1)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Transparent Color B = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_transparent_color[1] = value & 0x00ffffff;
+				m_transparent_color[1] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xc7: // Mask Color A
 			if (Channel == 0)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Mask Color A = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_mask_color[0] = value & 0x00ffffff;
+				m_mask_color[0] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xc9: // Mask Color B
 			if (Channel == 1)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Mask Color B = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_mask_color[1] = value & 0x00ffffff;
+				m_mask_color[1] = value & 0x00fcfcfc;
 			}
 			break;
 		case 0xca: // Delta YUV Absolute Start Value A
@@ -357,8 +356,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			if (Channel == 0)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 0: Weight Factor A = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_weight_factor[0][0] = (uint8_t)(value << 2);
-				m_weight_factor[0][0] |= m_weight_factor[0][0] >> 6;
+				m_weight_factor[0][0] = (uint8_t)value;
 				update_region_arrays();
 			}
 			break;
@@ -366,8 +364,7 @@ void mcd212_device::set_register(uint8_t reg, uint32_t value)
 			if (Channel == 1)
 			{
 				LOGMASKED(LOG_REGISTERS, "%s: Scanline %d, Channel 1: Weight Factor B = %08x\n", machine().describe_context(), screen().vpos(), value);
-				m_weight_factor[1][0] = (uint8_t)(value << 2);
-				m_weight_factor[1][0] |= m_weight_factor[1][0] >> 6;
+				m_weight_factor[1][0] = (uint8_t)value;
 				update_region_arrays();
 			}
 			break;
@@ -964,12 +961,12 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 			const int32_t plane_b_g = (int32_t)(uint8_t)(plane_b_cur >> 8);
 			const int32_t plane_a_b = (int32_t)(uint8_t)plane_a_cur;
 			const int32_t plane_b_b = (int32_t)(uint8_t)plane_b_cur;
-			const int32_t weighted_a_r = (plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 8) : 0;
-			const int32_t weighted_a_g = (plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 8) : 0;
-			const int32_t weighted_a_b = (plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 8) : 0;
-			const int32_t weighted_b_r = ((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 8) : 0) + weighted_a_r;
-			const int32_t weighted_b_g = ((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 8) : 0) + weighted_a_g;
-			const int32_t weighted_b_b = ((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 8) : 0) + weighted_a_b;
+			const int32_t weighted_a_r = (plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 6) : 0;
+			const int32_t weighted_a_g = (plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 6) : 0;
+			const int32_t weighted_a_b = (plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 6) : 0;
+			const int32_t weighted_b_r = ((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 6) : 0) + weighted_a_r;
+			const int32_t weighted_b_g = ((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 6) : 0) + weighted_a_g;
+			const int32_t weighted_b_b = ((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 6) : 0) + weighted_a_b;
 			const uint8_t out_r = (weighted_b_r > 255) ? 255 : (uint8_t)weighted_b_r;
 			const uint8_t out_g = (weighted_b_g > 255) ? 255 : (uint8_t)weighted_b_g;
 			const uint8_t out_b = (weighted_b_b > 255) ? 255 : (uint8_t)weighted_b_b;
@@ -989,9 +986,9 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 					const int32_t plane_a_r = (int32_t)(uint8_t)(plane_a_cur >> 16);
 					const int32_t plane_a_g = (int32_t)(uint8_t)(plane_a_cur >> 8);
 					const int32_t plane_a_b = (int32_t)(uint8_t)plane_a_cur;
-					const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 8) : 0) + 16, 0, 255);
+					const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
 					out[x] = (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
 				}
 				else if (!(*transparent_b))
@@ -1001,9 +998,9 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 					const int32_t plane_b_r = (int32_t)(uint8_t)(plane_b_cur >> 16);
 					const int32_t plane_b_g = (int32_t)(uint8_t)(plane_b_cur >> 8);
 					const int32_t plane_b_b = (int32_t)(uint8_t)plane_b_cur;
-					const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 8) : 0) + 16, 0, 255);
+					const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
 					out[x] = (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
 				}
 				else
@@ -1020,9 +1017,9 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 					const int32_t plane_b_r = (int32_t)(uint8_t)(plane_b_cur >> 16);
 					const int32_t plane_b_g = (int32_t)(uint8_t)(plane_b_cur >> 8);
 					const int32_t plane_b_b = (int32_t)(uint8_t)plane_b_cur;
-					const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 8) : 0) + 16, 0, 255);
+					const uint8_t weighted_b_r = std::clamp(((plane_b_r > 16) ? (((plane_b_r - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_b_g = std::clamp(((plane_b_g > 16) ? (((plane_b_g - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_b_b = std::clamp(((plane_b_b > 16) ? (((plane_b_b - 16) * weight_b_cur) >> 6) : 0) + 16, 0, 255);
 					out[x] = (weighted_b_r << 16) | (weighted_b_g << 8) | weighted_b_b;
 				}
 				else if (!(*transparent_a))
@@ -1032,9 +1029,9 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 					const int32_t plane_a_r = (int32_t)(uint8_t)(plane_a_cur >> 16);
 					const int32_t plane_a_g = (int32_t)(uint8_t)(plane_a_cur >> 8);
 					const int32_t plane_a_b = (int32_t)(uint8_t)plane_a_cur;
-					const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 8) : 0) + 16, 0, 255);
-					const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 8) : 0) + 16, 0, 255);
+					const uint8_t weighted_a_r = std::clamp(((plane_a_r > 16) ? (((plane_a_r - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_a_g = std::clamp(((plane_a_g > 16) ? (((plane_a_g - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
+					const uint8_t weighted_a_b = std::clamp(((plane_a_b > 16) ? (((plane_a_b - 16) * weight_a_cur) >> 6) : 0) + 16, 0, 255);
 					out[x] = (weighted_a_r << 16) | (weighted_a_g << 8) | weighted_a_b;
 				}
 				else
