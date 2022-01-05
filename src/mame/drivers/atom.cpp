@@ -120,6 +120,7 @@ Hardware:   PPIA 8255
 #include "machine/clock.h"
 #include "formats/imageutl.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /***************************************************************************

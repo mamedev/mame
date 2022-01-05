@@ -555,7 +555,7 @@
 
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "irrmaze.lh"

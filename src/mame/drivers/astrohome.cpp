@@ -20,7 +20,7 @@
 #include "bus/astrocde/ctrl.h"
 #include "bus/astrocde/accessory.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

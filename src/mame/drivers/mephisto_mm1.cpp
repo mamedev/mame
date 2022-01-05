@@ -47,7 +47,7 @@ TODO:
 #include "sound/dac.h"
 #include "video/mmdisplay1.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

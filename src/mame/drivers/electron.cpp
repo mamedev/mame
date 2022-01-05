@@ -87,7 +87,7 @@ Other internal boards to emulate:
 #include "formats/csw_cas.h"
 #include "sound/beep.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

@@ -426,6 +426,12 @@ void cosmicg_state::init_cosmicg()
 
 		rom[offs] = normal;
 	}
+
+	/* Patch to avoid crash - Seems like duff romcheck routine */
+	/* I would expect it to be bitrot, but have two romsets    */
+	/* from different sources with the same problem!           */
+	rom[0x1e9e] = 0x04;
+	rom[0x1e9f] = 0xc0;
 }
 
 

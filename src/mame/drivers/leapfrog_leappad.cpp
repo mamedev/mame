@@ -76,7 +76,7 @@
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class leapfrog_leappad_state : public driver_device

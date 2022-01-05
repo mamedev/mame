@@ -53,7 +53,7 @@
 #include "machine/com8116.h"
 #include "machine/z80sio.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

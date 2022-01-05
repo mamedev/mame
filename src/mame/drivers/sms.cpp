@@ -246,7 +246,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #include "includes/sms.h"
 
 #include "cpu/z80/z80.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "sms1.lh"

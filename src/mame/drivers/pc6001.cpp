@@ -143,6 +143,8 @@ irq vector 0x26:                                                                
 #include "emu.h"
 #include "includes/pc6001.h"
 
+#include "softlist_dev.h"
+
 #define LOG_IRQ    (1U << 1)
 
 //#define VERBOSE (LOG_IRQ)

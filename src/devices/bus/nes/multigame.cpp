@@ -54,6 +54,7 @@ DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_85043
 DEFINE_DEVICE_TYPE(NES_BMC_970630C,    nes_bmc_970630c_device,    "nes_bmc_970630c",    "NES Cart BMC 970630C PCB")
 DEFINE_DEVICE_TYPE(NES_NTD03,          nes_ntd03_device,          "nes_ntd03",          "NES Cart NTD-03 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_CTC09,      nes_bmc_ctc09_device,      "nes_bmc_ctc09",      "NES Cart BMC CTC-09 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_FAM250,     nes_bmc_fam250_device,     "nes_bmc_fam250",     "NES Cart BMC FAM250 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKA,        nes_bmc_gka_device,        "nes_bmc_gka",        "NES Cart BMC GK-A PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKB,        nes_bmc_gkb_device,        "nes_bmc_gkb",        "NES Cart BMC GK-B PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GKCXIN1,    nes_bmc_gkcxin1_device,    "nes_bmc_gkcxin1",    "NES Cart BMC GKCXIN1 PCB")
@@ -460,8 +461,18 @@ nes_bmc_60311c_device::nes_bmc_60311c_device(const machine_config &mconfig, cons
 {
 }
 
+nes_bmc_k1029_device::nes_bmc_k1029_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: nes_vram_protect_device(mconfig, type, tag, owner, clock)
+{
+}
+
 nes_bmc_k1029_device::nes_bmc_k1029_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_vram_protect_device(mconfig, NES_BMC_K1029, tag, owner, clock)
+	: nes_bmc_k1029_device(mconfig, NES_BMC_K1029, tag, owner, clock)
+{
+}
+
+nes_bmc_fam250_device::nes_bmc_fam250_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_bmc_k1029_device(mconfig, NES_BMC_FAM250, tag, owner, clock), m_latch(0), m_reg(0)
 {
 }
 
@@ -1138,6 +1149,21 @@ void nes_bmc_60311c_device::pcb_reset()
 
 	m_reg[0] = m_reg[1] = m_reg[2] = 0;
 	update_banks();
+}
+
+void nes_bmc_fam250_device::device_start()
+{
+	nes_bmc_k1029_device::device_start();
+	save_item(NAME(m_latch));
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_fam250_device::pcb_reset()
+{
+	nes_bmc_k1029_device::pcb_reset();
+
+	m_latch = 0;
+	m_reg = 0;
 }
 
 void nes_n625092_device::device_start()
@@ -2380,7 +2406,7 @@ u8 nes_bmc_ball11_device::read_m(offs_t offset)
 	LOG_MMC(("bmc_ball11 read_m, offset: %04x, data: %02x\n", offset));
 
 	u8 bank = m_reg[1] << 2 | (m_reg[0] ? 0x23 : 0x2f);
-	return m_prg[bank * 0x2000 + offset];
+	return m_prg[(bank * 0x2000 + offset) & (m_prg_size - 1)];
 }
 
 void nes_bmc_ball11_device::update_prg()
@@ -3200,6 +3226,52 @@ void nes_bmc_60311c_device::write_h(offs_t offset, u8 data)
 	LOG_MMC(("bmc_60311c write_h, offset: %04x, data: %02x\n", offset, data));
 	m_reg[2] = data & 0x07;
 	update_banks();
+}
+
+/*-------------------------------------------------
+
+ BMC-FAM250
+
+ Games: 250 in 1
+
+ This board is very close to the K-1029 board of the
+ famous Contra 100 and 168 multicarts. It sports an
+ extra mode to support a Bubble Bobble FDS bootleg.
+
+ NES 2.0: mapper 354
+
+ In MAME: Supported.
+
+ TODO: Circus Charlie's mirroring is incorrectly set
+ to horizontal. Is this a BTANB?
+
+ -------------------------------------------------*/
+
+u8 nes_bmc_fam250_device::read_m(offs_t offset)
+{
+// LOG_MMC(("fam250 read_m, offset: %04x\n", offset));
+
+	if (m_latch == 5)    // only the Bubble Bobble FDS bootleg uses this
+		return m_prg[(((m_reg & 0x1f) << 1 | BIT(m_reg, 7)) * 0x2000 + offset) & (m_prg_size - 1)];
+	else
+		return get_open_bus();
+}
+
+void nes_bmc_fam250_device::write_h(offs_t offset, u8 data)
+{
+	LOG_MMC(("fam250 write_h, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset >= 0x7000)
+	{
+		nes_bmc_k1029_device::write_h(offset, data);
+
+		m_latch = offset & 0x07;
+		m_reg = data;
+		if (m_latch == 5)
+			prg32((m_reg & 0x18) >> 1 | 0x03);
+
+		m_vram_protect = BIT(offset, 3);
+	}
 }
 
 /*-------------------------------------------------

@@ -16,7 +16,7 @@
 #include "includes/nes.h"
 
 #include "cpu/m6502/n2a03.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

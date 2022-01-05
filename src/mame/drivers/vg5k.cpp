@@ -58,7 +58,7 @@
 #include "video/ef9345.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/vg5k_cas.h"

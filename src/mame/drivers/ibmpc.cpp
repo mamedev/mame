@@ -261,7 +261,7 @@ XT U44 IBM.bin: IBM 5160 PC/XT Bank-selection decoding ROM (256x4 bit). Not mapp
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "machine/genpc.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 class ibmpc_state : public driver_device
 {

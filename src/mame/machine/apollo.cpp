@@ -35,7 +35,7 @@
 #include "bus/isa/sc499.h"
 #include "bus/isa/3c505.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #define APOLLO_IRQ_VECTOR 0xa0
 #define APOLLO_IRQ_PTM 0

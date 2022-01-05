@@ -12,6 +12,7 @@
 
 #include "emuopts.h"
 #include "romload.h"
+#include "softlist.h"
 
 #include <cstring>
 

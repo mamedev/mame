@@ -73,7 +73,7 @@ uninteresting to emulate as separate drivers.
 #include "sound/s14001a.h"
 #include "video/pwm.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 // internal artwork

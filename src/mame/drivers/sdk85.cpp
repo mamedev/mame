@@ -50,7 +50,7 @@ Press 0 to restart.
 #include "machine/i8155.h"
 #include "machine/i8355.h"
 #include "machine/i8279.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "sdk85.lh"
 
 

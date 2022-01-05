@@ -40,6 +40,7 @@ Todo:
 #include "sound/spkrdev.h"
 #include "video/mc6847.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/imageutl.h"

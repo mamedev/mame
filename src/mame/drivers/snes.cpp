@@ -35,7 +35,7 @@
 #include "bus/snes/snes_carts.h"
 #include "bus/snes_ctrl/ctrl.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

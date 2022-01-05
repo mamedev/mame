@@ -35,12 +35,12 @@ namespace {
 			m_table->floppy_format_infos.emplace_back(std::make_unique<floppy_format_info>(format(), m_category));
 		}
 
-		virtual void add(const filesystem_manager_t &fs) {
+		virtual void add(const fs::manager_t &fs) {
 			m_table->filesystem_formats.emplace_back(std::make_unique<filesystem_format>(&fs, m_category));
 		}
 	};
 
-	struct fs_enum : public filesystem_manager_t::floppy_enumerator {
+	struct fs_enum : public fs::manager_t::floppy_enumerator {
 		filesystem_format *m_format;
 
 		fs_enum(filesystem_format *format) : m_format(format) {}
@@ -162,6 +162,7 @@ std::vector<u8> image_handler::fload_rsrc(std::string path)
 	auto filedata = fload(path);
 	const u8 *head = filedata.data();
 
+	using fs::filesystem_t;
 	if(filesystem_t::r32b(head+0x00) == 0x00051607 &&
 	   filesystem_t::r32b(head+0x04) == 0x00020000) {
 		u16 nent = filesystem_t::r16b(head+0x18);
@@ -198,6 +199,7 @@ void image_handler::fsave_rsrc(std::string path, const std::vector<u8> &data)
 {
 	u8 head[0x2a];
 
+	using fs::filesystem_t;
 	filesystem_t::w32b(head+0x00, 0x00051607);  // Magic
 	filesystem_t::w32b(head+0x04, 0x00020000);  // Version
 	filesystem_t::fill(head+0x08, 0, 16);       // Filler
@@ -281,12 +283,12 @@ bool image_handler::floppy_save(const floppy_format_info *format)
 	return !format->m_format->save(*io, variants, &m_floppy_image);
 }
 
-void image_handler::floppy_create(const floppy_create_info *format, fs_meta_data meta)
+void image_handler::floppy_create(const floppy_create_info *format, fs::meta_data meta)
 {
 	if(format->m_type) {
 		std::vector<uint32_t> variants;
 		std::vector<u8> img(format->m_image_size);
-		fsblk_vec_t blockdev(img);
+		fs::fsblk_vec_t blockdev(img);
 		auto fs = format->m_manager->mount(blockdev);
 		fs->format(meta);
 
@@ -295,7 +297,7 @@ void image_handler::floppy_create(const floppy_create_info *format, fs_meta_data
 		source_format->load(*io, floppy_image::FF_UNKNOWN, variants, &m_floppy_image);
 		delete source_format;
 	} else {
-		fs_unformatted::format(format->m_key, &m_floppy_image);
+		fs::unformatted_image::format(format->m_key, &m_floppy_image);
 	}
 }
 
@@ -321,7 +323,7 @@ bool image_handler::floppy_mount_fs(const filesystem_format *format)
 	return true;
 
  success:
-	m_fsblk.reset(new fsblk_vec_t(m_sector_image));
+	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
 	m_fsm = format->m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
 	return false;
@@ -332,7 +334,7 @@ bool image_handler::hd_mount_fs(const filesystem_format *format)
 	// Should use the chd mechanisms, one thing at a time...
 
 	m_sector_image = fload(m_on_disk_path);
-	m_fsblk.reset(new fsblk_vec_t(m_sector_image));
+	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
 	m_fsm = format->m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
 	return false;

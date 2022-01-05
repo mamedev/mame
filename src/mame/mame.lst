@@ -950,6 +950,9 @@ adacp150p                       //
 @source:adam.cpp
 adam                            // Coleco Adam
 
+@source:adds2020.cpp
+adds2020                        //
+
 @source:adm11.cpp
 adm12                           //
 
@@ -1190,6 +1193,7 @@ tnextspcj                       // A8003 'NS' (c) 1989 - Japan
 
 @source:alpha68k_n.cpp
 jongbou                         // (c) 1987 SNK
+jongbou2                        // (c) 1987 SNK
 kyros                           // (c) 1987 World Games
 kyrosj                          // (c) 1986 Alpha Denshi Co.
 sstingry                        // (c) 1986 Alpha Denshi Co.
@@ -11630,7 +11634,6 @@ tsarevna                        //
 tsarevnaa                       //
 
 @source:cv1k.cpp
-akatana                         // (c) 2010 Cave (AMI license) - 2010/ 8/13 MASTER VER.
 ddpdfk                          // (c) 2008 Cave (AMI license) - 2008/06/23  MASTER VER 1.5
 ddpdfk10                        // (c) 2008 Cave (AMI license) - 2008/05/16  MASTER VER
 deathsml                        // (c) 2007 Cave (AMI license) - 2007/10/09 MASTER VER
@@ -13748,6 +13751,9 @@ falco5220s                      // 1989
 ts1                             // 1980
 ts2624                          // 1982
 
+@source:falcots28.cpp
+ts28                            // 1983
+
 @source:falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
 
@@ -14168,6 +14174,9 @@ fs3216                          //
 
 @source:ft68m.cpp
 ft68m                           //
+
+@source:funeball.cpp
+funeball                        // (c) 1997 Fun Industries Inc.
 
 @source:fungames.cpp
 biplane                         // (c) 1975 Fun Games
@@ -15180,8 +15189,10 @@ rp200
 
 @source:generalplus_gpl_unknown.cpp
 mapacman
-taspinv
 parcade
+tagalaga
+taspinv
+taturtf
 
 @source:generalplus_gpl162xx_lcdtype.cpp
 pcp8718
@@ -15239,9 +15250,13 @@ wrlshunt                        // Wireless: Hunting Video Game System
 bkrankp
 
 @source:generalplus_gpl16250_spi_direct.cpp
+fixitflx
+bfdigdug
+bfgalaga
 bfmpac
 bfpacman
-fixitflx
+bfspyhnt
+bftetris
 wiwcs
 
 @source:generalplus_gpl32612.cpp
@@ -34162,7 +34177,10 @@ peip0118                        // (c) 1987 IGT - International Game Technology
 peip0120                        // (c) 1987 IGT - International Game Technology
 peivc006                        // (c) 1987 IGT - International Game Technology
 peke0004                        // (c) 1994 IGT - International Game Technology
+peke0004a                       // (c) 1994 IGT - International Game Technology
+peke0004b                       // (c) 1994 IGT - International Game Technology
 peke0017                        // (c) 1994 IGT - International Game Technology
+peke0017a                       // (c) 1994 IGT - International Game Technology
 peke1001                        // (c) 1994 IGT - International Game Technology
 peke1006                        // (c) 1994 IGT - International Game Technology
 peke1012                        // (c) 1994 IGT - International Game Technology
@@ -34194,6 +34212,7 @@ pepk0756                        // (c) 1987 IGT - International Game Technology
 pepk0756a                       // (c) 1987 IGT - International Game Technology
 pepk0756b                       // (c) 1987 IGT - International Game Technology
 pepk0756c                       // (c) 1987 IGT - International Game Technology
+pepk0756d                       // (c) 1987 IGT - International Game Technology
 pepk0757                        // (c) 1987 IGT - International Game Technology
 pepk0758                        // (c) 1987 IGT - International Game Technology
 pepk0769                        // (c) 1987 IGT - International Game Technology
@@ -34250,6 +34269,7 @@ pepp0045d                       // (c) 1987 IGT - International Game Technology
 pepp0046                        // (c) 1987 IGT - International Game Technology
 pepp0046a                       // (c) 1987 IGT - International Game Technology
 pepp0046b                       // (c) 1987 IGT - International Game Technology
+pepp0046c                       // (c) 1987 IGT - International Game Technology
 pepp0048                        // (c) 1987 IGT - International Game Technology
 pepp0048a                       // (c) 1987 IGT - International Game Technology
 pepp0048b                       // (c) 1987 IGT - International Game Technology
@@ -34279,6 +34299,7 @@ pepp0060c                       // (c) 1987 IGT - International Game Technology
 pepp0063                        // (c) 1987 IGT - International Game Technology
 pepp0064                        // (c) 1987 IGT - International Game Technology
 pepp0065                        // (c) 1987 IGT - International Game Technology
+pepp0078                        // (c) 1987 IGT - International Game Technology
 pepp0083                        // (c) 1987 IGT - International Game Technology
 pepp0085                        // (c) 1987 IGT - International Game Technology
 pepp0089                        // (c) 1987 IGT - International Game Technology
@@ -34415,6 +34436,7 @@ pepp0515c                       // (c) 1987 IGT - International Game Technology
 pepp0516                        // (c) 1987 IGT - International Game Technology
 pepp0516a                       // (c) 1987 IGT - International Game Technology
 pepp0516b                       // (c) 1987 IGT - International Game Technology
+pepp0516c                       // (c) 1987 IGT - International Game Technology
 pepp0526                        // (c) 1987 IGT - International Game Technology
 pepp0531                        // (c) 1987 IGT - International Game Technology
 pepp0536                        // (c) 1987 IGT - International Game Technology
@@ -34704,9 +34726,9 @@ pexm009p                        // (c) 1997 IGT - International Game Technology
 pexm013p                        // (c) 1997 IGT - International Game Technology
 pexmp011                        // (c) 1997 IGT - International Game Technology
 pexmp013                        // (c) 1997 IGT - International Game Technology
+pexmp014                        // (c) 1997 IGT - International Game Technology
 pexmp017                        // (c) 1997 IGT - International Game Technology
 pexmp017a                       // (c) 1997 IGT - International Game Technology
-pexmp017b                       // (c) 1997 IGT - International Game Technology
 pexmp022                        // (c) 1997 IGT - International Game Technology
 pexmp026                        // (c) 1997 IGT - International Game Technology
 pexmp030                        // (c) 1997 IGT - International Game Technology
@@ -40220,6 +40242,7 @@ tagteam                         // TA-0007 (c) 1983 + Data East license
 sformula                        // [1989] V-System Co. (Japan)
 sformulaa                       // [1989] V-System Co. (Japan)
 tail2nos                        // [1989] V-System Co.
+tail2nosa                       // [1989] V-System Co.
 
 @source:taito.cpp
 cavnegro                        //
@@ -43913,7 +43936,8 @@ zephyr                          //
 
 @source:zn.cpp
 1on1gov                         // 1 on 1 Government (JAPAN)
-aerofgts                        // Aero Fighters Special (TAIWAN)
+aerofgts                        // Aero Fighters Special (USA)
+aerofgtst                       // Aero Fighters Special (TAIWAN)
 bam2                            // Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)
 beastrzr                        // Beastorizer (USA, Sep 22 1997)
 beastrzra                       // Beastorizer (USA, Jun 21 1997)

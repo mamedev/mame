@@ -172,6 +172,7 @@
 #include "formats/camplynx_dsk.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

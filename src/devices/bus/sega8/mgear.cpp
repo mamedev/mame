@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "mgear.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 //-------------------------------------------------
 //  constructors

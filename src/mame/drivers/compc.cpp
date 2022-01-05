@@ -35,6 +35,7 @@ Options: 8087 FPU
 #include "machine/genpc.h"
 #include "machine/nvram.h"
 #include "machine/pckeybrd.h"
+#include "softlist_dev.h"
 
 
 class compc_state : public driver_device

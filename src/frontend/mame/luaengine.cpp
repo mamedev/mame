@@ -23,6 +23,7 @@
 #include "emuopts.h"
 #include "inputdev.h"
 #include "natkeyboard.h"
+#include "screen.h"
 #include "softlist.h"
 #include "uiinput.h"
 

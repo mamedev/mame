@@ -191,7 +191,7 @@ PCB - LEAPSTER-TV:
 #include "bus/generic/carts.h"
 #include "cpu/arcompact/arcompact.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class leapster_state : public driver_device

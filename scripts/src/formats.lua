@@ -565,6 +565,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/coco_rawdsk.h,FORMATS["COCO_RAWDSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COCO_RAWDSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/coco_rawdsk.cpp",
+		MAME_DIR.. "src/lib/formats/coco_rawdsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/comx35_dsk.h,FORMATS["COMX35_DSK"] = true
 --------------------------------------------------
 
@@ -2097,6 +2109,18 @@ if opt_tool(FORMATS, "FS_ORIC_JASMIN") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.cpp",
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_coco_rsdos.h,FORMATS["FS_COCO_RSDOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_COCO_RSDOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_coco_rsdos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_coco_rsdos.h",
 	}
 end
 

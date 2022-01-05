@@ -37,7 +37,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "cpu/m6502/r65c02.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 DEFINE_DEVICE_TYPE(OSA_MAESTRO, saitekosa_maestro_device, "osa_maestro", "Maestro B-D")
