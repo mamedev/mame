@@ -732,20 +732,20 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 						for (; x < width; x += 2)
 						{
 							const uint8_t byte1 = data[(vsr++ & 0x0007ffff) ^ 1];
-							const uint8_t u1 = u + m_ab.deltaUV[byte];
-							const uint8_t y0 = y + m_ab.deltaY[byte];
+							const uint8_t u1 = u + m_delta_uv_lut[byte];
+							const uint8_t y0 = y + m_delta_y_lut[byte];
 
-							const uint8_t v1 = v + m_ab.deltaUV[byte1];
-							const uint8_t y1 = y0 + m_ab.deltaY[byte1];
+							const uint8_t v1 = v + m_delta_uv_lut[byte1];
+							const uint8_t y1 = y0 + m_delta_y_lut[byte1];
 
 							const uint8_t u0 = (u + u1) >> 1;
 							const uint8_t v0 = (v + v1) >> 1;
 
-							uint32_t *limit_r = m_ab.limit_r + y0 + 0xff;
-							uint32_t *limit_g = m_ab.limit_g + y0 + 0xff;
-							uint32_t *limit_b = m_ab.limit_b + y0 + 0xff;
+							uint32_t *limit_r = m_dyuv_limit_r_lut + y0 + 0xff;
+							uint32_t *limit_g = m_dyuv_limit_g_lut + y0 + 0xff;
+							uint32_t *limit_b = m_dyuv_limit_b_lut + y0 + 0xff;
 
-							uint32_t entry = limit_r[m_ab.matrixVR[v0]] | limit_g[m_ab.matrixUG[u0] + m_ab.matrixVG[v0]] | limit_b[m_ab.matrixUB[u0]];
+							uint32_t entry = limit_r[m_dyuv_v_to_r[v0]] | limit_g[m_dyuv_u_to_g[u0] + m_dyuv_v_to_g[v0]] | limit_b[m_dyuv_u_to_b[u0]];
 							pixels[x] = pixels[x + 1] = entry;
 							transparent[x] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
 							transparent[x + 1] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
@@ -766,11 +766,11 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 								x += 2;
 							}
 
-							limit_r = m_ab.limit_r + y1 + 0xff;
-							limit_g = m_ab.limit_g + y1 + 0xff;
-							limit_b = m_ab.limit_b + y1 + 0xff;
+							limit_r = m_dyuv_limit_r_lut + y1 + 0xff;
+							limit_g = m_dyuv_limit_g_lut + y1 + 0xff;
+							limit_b = m_dyuv_limit_b_lut + y1 + 0xff;
 
-							entry = limit_r[m_ab.matrixVR[v1]] | limit_g[m_ab.matrixUG[u1] + m_ab.matrixVG[v1]] | limit_b[m_ab.matrixUB[u1]];
+							entry = limit_r[m_dyuv_v_to_r[v1]] | limit_g[m_dyuv_u_to_g[u1] + m_dyuv_v_to_g[v1]] | limit_b[m_dyuv_u_to_b[u1]];
 							pixels[x] = pixels[x + 1] = entry;
 							transparent[x] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
 							transparent[x + 1] = (transp_always || (use_region_flag && region_flags[x])) != invert_transp_condition;
@@ -1388,7 +1388,29 @@ void mcd212_device::device_resolve_objects()
 
 void mcd212_device::device_start()
 {
-	ab_init();
+	static const uint8_t s_dyuv_deltas[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
+
+	for (uint16_t d = 0; d < 0x100; d++)
+	{
+		m_delta_y_lut[d] = s_dyuv_deltas[d & 15];
+		m_delta_uv_lut[d] = s_dyuv_deltas[d >> 4];
+	}
+
+	for (uint16_t w = 0; w < 3 * 0xff; w++)
+	{
+		const uint8_t limit = (w < 0xff + 16) ?  0 : w <= 16 + 2 * 0xff ? w - 0x10f : 0xff;
+		m_dyuv_limit_r_lut[w] = limit << 16;
+		m_dyuv_limit_g_lut[w] = limit << 8;
+		m_dyuv_limit_b_lut[w] = limit;
+	}
+
+	for (int16_t sw = 0; sw < 0x100; sw++)
+	{
+		m_dyuv_u_to_b[sw] = (444 * (sw - 128)) / 256;
+		m_dyuv_u_to_g[sw] = - (86 * (sw - 128)) / 256;
+		m_dyuv_v_to_g[sw] = - (179 * (sw - 128)) / 256;
+		m_dyuv_v_to_r[sw] = (351 * (sw - 128)) / 256;
+	}
 
 	save_item(NAME(m_region_flag[0]));
 	save_item(NAME(m_region_flag[1]));
@@ -1417,39 +1439,4 @@ void mcd212_device::device_start()
 	save_item(NAME(m_mosaic_hold));
 	save_item(NAME(m_weight_factor[0]));
 	save_item(NAME(m_weight_factor[1]));
-}
-
-void mcd212_device::ab_init()
-{
-	// Delta decoding array.
-	static const uint8_t abDelta[16] = { 0, 1, 4, 9, 16, 27, 44, 79, 128, 177, 212, 229, 240, 247, 252, 255 };
-
-	// Initialize delta decoding arrays for each unsigned byte value b.
-	for (uint16_t d = 0; d < 0x100; d++)
-	{
-		m_ab.deltaY[d] = abDelta[d & 15];
-	}
-
-	// Initialize delta decoding arrays for each unsigned byte value b.
-	for (uint16_t d = 0; d < 0x100; d++)
-	{
-		m_ab.deltaUV[d] = abDelta[d >> 4];
-	}
-
-	// Initialize color limit and clamp arrays.
-	for (uint16_t w = 0; w < 3 * 0xff; w++)
-	{
-		const uint8_t limit = (w < 0xff + 16) ?  0 : w <= 16 + 2 * 0xff ? w - 0x10f : 0xff;
-		m_ab.limit_r[w] = limit << 16;
-		m_ab.limit_g[w] = limit << 8;
-		m_ab.limit_b[w] = limit;
-	}
-
-	for (int16_t sw = 0; sw < 0x100; sw++)
-	{
-		m_ab.matrixUB[sw] = (444 * (sw - 128)) / 256;
-		m_ab.matrixUG[sw] = - (86 * (sw - 128)) / 256;
-		m_ab.matrixVG[sw] = - (179 * (sw - 128)) / 256;
-		m_ab.matrixVR[sw] = (351 * (sw - 128)) / 256;
-	}
 }

@@ -72,55 +72,6 @@ protected:
 	uint16_t dca2_r(offs_t offset, uint16_t mem_mask = ~0);
 	void dca2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	uint8_t m_csrr[2];
-	uint16_t m_csrw[2];
-	uint16_t m_dcr[2];
-	uint16_t m_vsr[2];
-	uint16_t m_ddr[2];
-	uint16_t m_dcp[2];
-	uint32_t m_dca[2];
-	uint32_t m_clut[256];
-	uint32_t m_image_coding_method;
-	uint32_t m_transparency_control;
-	uint32_t m_plane_order;
-	uint32_t m_clut_bank[2];
-	uint32_t m_transparent_color[2];
-	uint32_t m_mask_color[2];
-	uint32_t m_dyuv_abs_start[2];
-	uint32_t m_cursor_position;
-	uint32_t m_cursor_control;
-	uint32_t m_cursor_pattern[16];
-	uint32_t m_region_control[8];
-	uint32_t m_backdrop_color;
-	uint32_t m_mosaic_hold[2];
-	uint8_t m_weight_factor[2][768];
-
-	struct ab_t
-	{
-		//* Color limit arrays.
-		uint32_t limit_r[3 * 0xff];
-		uint32_t limit_g[3 * 0xff];
-		uint32_t limit_b[3 * 0xff];
-
-		//* U-to-B matrix array.
-		int16_t matrixUB[0x100];
-
-		//* U-to-G matrix array.
-		int16_t matrixUG[0x100];
-
-		//* V-to-G matrix array.
-		int16_t matrixVG[0x100];
-
-		//* V-to-R matrix array.
-		int16_t matrixVR[0x100];
-
-		//* Delta-Y decoding array.
-		uint8_t deltaY[0x100];
-
-		//* Delta-U/V decoding array.
-		uint8_t deltaUV[0x100];
-	};
-
 	enum : uint32_t
 	{
 		CURCNT_COLOR         = 0x00000f,    // Cursor color
@@ -200,6 +151,52 @@ protected:
 		DDR_MT_SHIFT         = 10
 	};
 
+	uint8_t m_csrr[2];
+	uint16_t m_csrw[2];
+	uint16_t m_dcr[2];
+	uint16_t m_vsr[2];
+	uint16_t m_ddr[2];
+	uint16_t m_dcp[2];
+	uint32_t m_dca[2];
+	uint32_t m_clut[256];
+	uint32_t m_image_coding_method;
+	uint32_t m_transparency_control;
+	uint32_t m_plane_order;
+	uint32_t m_clut_bank[2];
+	uint32_t m_transparent_color[2];
+	uint32_t m_mask_color[2];
+	uint32_t m_dyuv_abs_start[2];
+	uint32_t m_cursor_position;
+	uint32_t m_cursor_control;
+	uint32_t m_cursor_pattern[16];
+	uint32_t m_region_control[8];
+	uint32_t m_backdrop_color;
+	uint32_t m_mosaic_hold[2];
+	uint8_t m_weight_factor[2][768];
+
+	// DYUV color limit arrays.
+	uint32_t m_dyuv_limit_r_lut[3 * 0xff];
+	uint32_t m_dyuv_limit_g_lut[3 * 0xff];
+	uint32_t m_dyuv_limit_b_lut[3 * 0xff];
+
+	// DYUV delta-Y decoding array
+	uint8_t m_delta_y_lut[0x100];
+
+	// DYUV delta-UV decoding array
+	uint8_t m_delta_uv_lut[0x100];
+
+	// DYUV U-to-B decoding array
+	int16_t m_dyuv_u_to_b[0x100];
+
+	// U-to-G decoding array
+	int16_t m_dyuv_u_to_g[0x100];
+
+	// V-to-G decoding array
+	int16_t m_dyuv_v_to_g[0x100];
+
+	// V-to-R decoding array
+	int16_t m_dyuv_v_to_r[0x100];
+
 	// interrupt callbacks
 	devcb_write_line m_int_callback;
 
@@ -212,8 +209,6 @@ protected:
 	int m_total_height;
 
 	static const uint32_t s_4bpp_color[16];
-
-	ab_t m_ab;
 
 	uint8_t get_weight_factor(const uint32_t region_idx);
 	uint8_t get_region_op(const uint32_t region_idx);
@@ -245,8 +240,6 @@ protected:
 
 	void draw_cursor(uint32_t *scanline);
 	void draw_scanline(bitmap_rgb32 &bitmap);
-
-	void ab_init();
 };
 
 // device type definition
