@@ -32,8 +32,7 @@ TODO:
 //**************************************************************************
 
 class mcd212_device : public device_t,
-					  public device_video_interface,
-					  public device_palette_interface
+					  public device_video_interface
 {
 public:
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -50,9 +49,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device_palette_interface overrides
-	virtual uint32_t palette_entries() const override { return 0x100; }
 
 	uint8_t csr1_r();
 	void csr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -83,6 +79,7 @@ protected:
 	uint16_t m_ddr[2];
 	uint16_t m_dcp[2];
 	uint32_t m_dca[2];
+	uint32_t m_clut[256];
 	uint32_t m_image_coding_method;
 	uint32_t m_transparency_control;
 	uint32_t m_plane_order;
@@ -100,11 +97,10 @@ protected:
 
 	struct ab_t
 	{
-		//* Color limit array.
-		uint8_t limit[3 * 0xff];
-
-		//* Color clamp array.
-		uint8_t clamp[3 * 0xff];
+		//* Color limit arrays.
+		uint32_t limit_r[3 * 0xff];
+		uint32_t limit_g[3 * 0xff];
+		uint32_t limit_b[3 * 0xff];
 
 		//* U-to-B matrix array.
 		int16_t matrixUB[0x100];
@@ -237,14 +233,15 @@ protected:
 	template <int Channel> void process_ica();
 	template <int Channel> void process_dca();
 
+	template <int Channel> uint8_t get_transparency_control();
 	template <int Channel> uint8_t get_icm();
 	template <int Channel> bool get_mosaic_enable();
 	template <int Channel> uint8_t get_mosaic_factor();
-	template <int Channel> void process_vsr(rgb_t *pixels);
+	template <int Channel> void process_vsr(uint32_t *pixels, bool *transparent);
 
 	template <int Channel> void set_register(uint8_t reg, uint32_t value);
 
-	void mix_lines(rgb_t *plane_a, rgb_t *plane_b, uint32_t *out);
+	template <bool MosaicA, bool MosaicB, bool OrderAB> void mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out);
 
 	void draw_cursor(uint32_t *scanline);
 	void draw_scanline(bitmap_rgb32 &bitmap);
