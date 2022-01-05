@@ -26,12 +26,7 @@ public:
 	required_device<fujitsu_29lv002tc_device> m_dcflash;
 
 	void init_dc();
-	void init_dcus();
-	void init_dcjp();
 	void init_tream();
-
-	uint64_t dcus_idle_skip_r();
-	uint64_t dcjp_idle_skip_r();
 
 	uint64_t dc_pdtra_r();
 	void dc_pdtra_w(uint64_t data);

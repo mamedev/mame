@@ -278,44 +278,12 @@
 
 #define CPU_CLOCK (200000000)
 
-uint64_t dc_cons_state::dcus_idle_skip_r()
-{
-	//if (m_maincpu->pc()==0xc0ba52a)
-	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(m_maincpu);
-
-	return dc_ram[0x2303b0/8];
-}
-
-uint64_t dc_cons_state::dcjp_idle_skip_r()
-{
-	//if (m_maincpu->pc()==0xc0bac62)
-	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(m_maincpu);
-
-	return dc_ram[0x2302f8/8];
-}
-
 void dc_cons_state::init_dc()
 {
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x001fffff, true, memregion("maincpu")->base());
 	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0cffffff, false, dc_ram);
 	dreamcast_atapi_init();
-}
-
-void dc_cons_state::init_dcus()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64smo_delegate(*this, FUNC(dc_cons_state::dcus_idle_skip_r)));
-
-	init_dc();
-}
-
-void dc_cons_state::init_dcjp()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64smo_delegate(*this, FUNC(dc_cons_state::dcjp_idle_skip_r)));
-
-	init_dc();
 }
 
 void dc_cons_state::init_tream()
@@ -327,7 +295,7 @@ void dc_cons_state::init_tream()
 	rom[0x523] |= 0x40;
 	rom[0x531] |= 0x40;
 
-	init_dcus();
+	init_dc();
 }
 
 uint64_t dc_cons_state::dc_pdtra_r()
@@ -834,9 +802,9 @@ ROM_START( dcdev )
 ROM_END
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS          INIT       COMPANY FULLNAME */
-CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dcjp, "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dcus, "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
 
@@ -900,4 +868,4 @@ ROM_START( dcfish )
 ROM_END
 
 /*    YEAR  NAME     PARENT  MACHINE  INPUT  CLASS          INIT       ROT   COMPANY FULLNAME */
-GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dcjp, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
+GAME( 2000, dcfish,  0,      dc_fish, dcfish,dc_cons_state, init_dc, ROT0, "Sega", "Fish Life Amazon Playful Edition (Japan)", MACHINE_NOT_WORKING )
