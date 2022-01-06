@@ -843,14 +843,13 @@ void aica_device::UpdateRegR(int reg)
 
 				if (PCMS(slot) == 0)    // 16-bit samples
 				{
-					CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;
+					//CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;
+					CA = (slot->cur_addr >> (SHIFT + 1));
 				}
 				else    // 8-bit PCM and 4-bit ADPCM
 				{
 					CA = (slot->cur_addr >> SHIFT);
 				}
-
-				//printf("%08x %08x\n",CA,slot->cur_addr & ~1);
 
 				m_udata.data[0x14 / 2] = CA;
 			}
