@@ -179,7 +179,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 					{
 						u16 y = m_screen->vpos() - resolution.top();
 						u16 x_src = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
-						u32 offset = ((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L] & 0x1ff) * 512) + x_src;
+						u32 offset = (((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) & 0x1ff) * 512) + x_src;
 						if (VM == VM_16C)
 						{
 							// FIXME wouldn't work for odd offsets
