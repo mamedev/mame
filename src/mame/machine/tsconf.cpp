@@ -17,7 +17,7 @@ static constexpr rectangle resolution_info[4] = {
 	rectangle(52, 256 + 51, 48, 192 + 47), // 52|256|52 x 48-192-48
 	rectangle(20, 320 + 19, 44, 200 + 43), // 20|320|20 x 44-200-44
 	rectangle(20, 320 + 19, 24, 240 + 23), // 20|320|20 x 24-240-24
-	rectangle(0, 360 - 1, 0, 288 - 1)      //  0|360|0  x  0-288-0
+	rectangle(0, 360 - 1, 0, 288 - 1)	   //  0|360|0  x  0-288-0
 };
 
 enum v_mode : u8
@@ -242,12 +242,12 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 			if (BIT(m_regs[TS_CONFIG], 5))
 			{
 				m_ts_tilemap[TM_TILES0]->draw(*m_screen, m_screen_bitmap, resolution,
-				BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
+											  BIT(m_regs[TS_CONFIG], 2) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 1);
 			}
 			if (BIT(m_regs[TS_CONFIG], 6))
 			{
 				m_ts_tilemap[TM_TILES1]->draw(*m_screen, m_screen_bitmap, resolution,
-				BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
+											  BIT(m_regs[TS_CONFIG], 3) ? TILEMAP_DRAW_ALL_CATEGORIES : TILEMAP_DRAW_CATEGORY(1), 2);
 			}
 			if (BIT(m_regs[TS_CONFIG], 7))
 			{
@@ -283,20 +283,24 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 		y |= BIT(*sinfo, 0) << 8;
 		y += resolution.top() - (y > resolution.height() ? 512 : 0);
 		u8 height8 = BIT(*sinfo, 1, 3);
-		bool act = BIT(*sinfo, 5);
 		bool leap = BIT(*sinfo, 6);
-		bool flipy = BIT(*sinfo++, 7);
-		s16 x = *sinfo++;
-		x |= BIT(*sinfo, 0) << 8;
-		x += resolution.left() - (x > resolution.width() ? 512 : 0);
-		u8 width8 = BIT(*sinfo, 1, 3);
-		bool flipx = BIT(*sinfo++, 7);
-		u16 code = *sinfo++;
-		code |= BIT(*sinfo, 0, 4) << 8;
-		u8 pal = BIT(*sinfo++, 4, 4);
-
-		if (act && layer < 3)
+		if (!BIT(*sinfo, 5))
 		{
+			// sprite disabled -> skip decoding
+			sinfo += 5;
+		}
+		else
+		{
+			bool flipy = BIT(*sinfo++, 7);
+			s16 x = *sinfo++;
+			x |= BIT(*sinfo, 0) << 8;
+			x += resolution.left() - (x > resolution.width() ? 512 : 0);
+			u8 width8 = BIT(*sinfo, 1, 3);
+			bool flipx = BIT(*sinfo++, 7);
+			u16 code = *sinfo++;
+			code |= BIT(*sinfo, 0, 4) << 8;
+			u8 pal = BIT(*sinfo++, 4, 4);
+
 			for (auto iy = 0; iy <= height8; iy++)
 			{
 				auto code_x = code + (flipx ? width8 : 0);
