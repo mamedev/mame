@@ -229,11 +229,23 @@ u32 coco_os9_image::pick_integer_be(const fsblk_t::block_t &block, int offset, i
 
 bool coco_os9_image::validate_filename(std::string_view name)
 {
-	return name.size() > 0
-		&& name.size() <= 28
-		&& name != "."
-		&& name != ".."
-		&& std::find_if(name.begin(), name.end(), [](const char ch) { return (ch & 0x80) != 0; }) != name.end();
+	return !is_ignored_filename(name)
+		&& name.size() <= 29
+		&& std::find_if(name.begin(), name.end(), [](const char ch) { return ch == '\0' || ch == '/' || ch >= 0x80; }) == name.end();
+}
+
+
+//-------------------------------------------------
+//	is_ignored_filename - should this file name be
+//	ignored if it is in the file system?
+//-------------------------------------------------
+
+bool coco_os9_image::is_ignored_filename(std::string_view name)
+{
+	return name.empty()
+		|| name[0] == '\0'
+		|| name == "."
+		|| name == "..";
 }
 
 
@@ -498,9 +510,9 @@ std::vector<dir_entry> coco_os9_image::impl::directory::contents()
 	for (int i = 0; i < directory_count; i++)
 	{
 		// determine the filename
-		std::string_view raw_filename((const char *) &directory_data[i * 32], 28);
+		std::string_view raw_filename((const char *) &directory_data[i * 32], 29);
 		std::string filename = pick_os9_string(raw_filename);
-		if (filename == "." || filename == "..")
+		if (is_ignored_filename(filename))
 			continue;
 
 		// determine the entry type

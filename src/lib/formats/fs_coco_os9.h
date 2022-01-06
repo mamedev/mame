@@ -153,6 +153,7 @@ private:
 	static u32 pick_integer_be(const u8 *data, int length);
 	static u32 pick_integer_be(const fsblk_t::block_t &block, int offset, int length);
 	static bool validate_filename(std::string_view name);
+	static bool is_ignored_filename(std::string_view name);
 };
 
 extern const coco_os9_image COCO_OS9;
