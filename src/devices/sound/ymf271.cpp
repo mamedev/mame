@@ -1375,6 +1375,8 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 				break;
 
 			case 0x11:
+				// Timer A is 10 bit, splitted high 8 bit and low 2 bit like other Yamaha FM chips
+				// unlike Yamaha's documentation; it says 0x11 writes timer A upper 2 bits.
 				m_timerA = (m_timerA & 0x3fc) | (data & 0x03); // Low 2 bit of Timer A period
 				break;
 
