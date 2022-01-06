@@ -280,19 +280,19 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 	for (u8 i = 0; i < 85 && layer < 3; i++)
 	{
 		s16 y = *sinfo++;
-		y |= (BIT(*sinfo, 0) << 8);
+		y |= BIT(*sinfo, 0) << 8;
 		y += resolution.top() - (y > resolution.height() ? 512 : 0);
 		u8 height8 = BIT(*sinfo, 1, 3);
 		bool act = BIT(*sinfo, 5);
 		bool leap = BIT(*sinfo, 6);
 		bool flipy = BIT(*sinfo++, 7);
 		s16 x = *sinfo++;
-		x |= (BIT(*sinfo, 0) << 8);
+		x |= BIT(*sinfo, 0) << 8;
 		x += resolution.left() - (x > resolution.width() ? 512 : 0);
 		u8 width8 = BIT(*sinfo, 1, 3);
 		bool flipx = BIT(*sinfo++, 7);
 		u16 code = *sinfo++;
-		code |= BIT(*sinfo, 0, 4);
+		code |= BIT(*sinfo, 0, 4) << 8;
 		u8 pal = BIT(*sinfo++, 4, 4);
 
 		if (act && layer < 3)
