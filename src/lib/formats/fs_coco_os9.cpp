@@ -214,16 +214,6 @@ u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
 
 
 //-------------------------------------------------
-//	pick_integer_be
-//-------------------------------------------------
-
-u32 coco_os9_image::pick_integer_be(const fsblk_t::block_t &block, int offset, int length)
-{
-	return pick_integer_be(block.rodata() + offset, length);
-}
-
-
-//-------------------------------------------------
 //	validate_filename
 //-------------------------------------------------
 
@@ -288,9 +278,9 @@ util::arbitrary_datetime coco_os9_image::file_header::creation_date() const
 {
 	util::arbitrary_datetime dt;
 	memset(&dt, 0, sizeof(dt));
-	dt.year			= pick_integer_be(m_block, 13, 1) + 1900;
-	dt.month		= pick_integer_be(m_block, 14, 1);
-	dt.day_of_month	= pick_integer_be(m_block, 15, 1);
+	dt.year			= 1900 + m_block.r8(13);
+	dt.month		= m_block.r8(14);
+	dt.day_of_month	= m_block.r8(15);
 	return dt;
 }
 
@@ -337,8 +327,8 @@ int coco_os9_image::file_header::get_sector_map_entry_count() const
 
 void coco_os9_image::file_header::get_sector_map_entry(int entry_number, u32 &start_lsn, u16 &count) const
 {
-	start_lsn = pick_integer_be(m_block, 16 + (entry_number * 5) + 0, 3);
-	count = pick_integer_be(m_block, 16 + (entry_number * 5) + 3, 2);
+	start_lsn	= m_block.r24b(16 + (entry_number * 5) + 0);
+	count		= m_block.r16b(16 + (entry_number * 5) + 3);
 }
 
 
@@ -416,7 +406,7 @@ std::vector<u8> coco_os9_image::impl::read_file_data(const file_header &header) 
 		for (u32 lsn = start_lsn; lsn < start_lsn + count; lsn++)
 		{
 			auto block = m_blockdev.get(lsn);
-			size_t block_size = std::min(std::min(m_volume_header.sector_size(), block.size()), header.file_size() - (u32)data.size());
+			size_t block_size = std::min(std::min((u32)m_volume_header.sector_size(), block.size()), header.file_size() - (u32)data.size());
 			for (auto i = 0; i < block_size; i++)
 				data.push_back(block.rodata()[i]);
 		}

@@ -28,18 +28,18 @@ public:
 	public:
 		volume_header(fsblk_t::block_t &&block);
 
-		u32 total_sectors() const			{ return pick_integer_be(m_block, 0, 3); }
-		u32 track_size_in_sectors() const	{ return pick_integer_be(m_block, 3, 1); }
-		u32 allocation_bitmap_bytes() const { return pick_integer_be(m_block, 4, 2); }
-		u32 cluster_size() const			{ return pick_integer_be(m_block, 6, 2); }
-		u32 root_dir_lsn() const			{ return pick_integer_be(m_block, 8, 3); }
-		u32 owner_id() const				{ return pick_integer_be(m_block, 11, 2); }
-		u32 disk_id() const					{ return pick_integer_be(m_block, 14, 2); }
-		u32 format_flags() const			{ return pick_integer_be(m_block, 16, 1); }
-		u32 sectors_per_track() const		{ return pick_integer_be(m_block, 17, 2); }
-		u32 bootstrap_lsn() const			{ return pick_integer_be(m_block, 21, 3); }
-		u32 bootstrap_size() const			{ return pick_integer_be(m_block, 24, 2); }
-		u32 sector_size() const				{ u32 result = pick_integer_be(m_block, 104, 2); return result != 0 ? result : 256; }
+		u32 total_sectors() const			{ return m_block.r24b(0); }
+		u8  track_size_in_sectors() const	{ return m_block.r8(3); }
+		u16 allocation_bitmap_bytes() const { return m_block.r16b(4); }
+		u16 cluster_size() const			{ return m_block.r16b(6); }
+		u32 root_dir_lsn() const			{ return m_block.r24b(8); }
+		u16 owner_id() const				{ return m_block.r16b(11); }
+		u16 disk_id() const					{ return m_block.r16b(14); }
+		u8  format_flags() const			{ return m_block.r8(16); }
+		u16 sectors_per_track() const		{ return m_block.r16b(17); }
+		u32 bootstrap_lsn() const			{ return m_block.r24b(21); }
+		u16 bootstrap_size() const			{ return m_block.r16b(24); }
+		u16 sector_size() const				{ u16 result = m_block.r16b(104); return result != 0 ? result : 256; }
 		u8 sides() const					{ return (format_flags() & 0x01) ? 2 : 1; }
 		bool double_density() const			{ return (format_flags() & 0x02) != 0; }
 		bool double_track() const			{ return (format_flags() & 0x04) != 0; }
@@ -57,13 +57,11 @@ public:
 	public:
 		file_header(fsblk_t::block_t &&block);
 
-		u32 attributes() const			{ return pick_integer_be(m_block, 0, 1); }
-		u32 owner_id() const			{ return pick_integer_be(m_block, 1, 2); }
-		u32 link_count() const			{ return pick_integer_be(m_block, 8, 1); }
-		u32 file_size() const			{ return pick_integer_be(m_block, 9, 4); }
+		u8  attributes() const			{ return m_block.r8(0); }
+		u16 owner_id() const			{ return m_block.r16b(1); }
+		u8  link_count() const			{ return m_block.r8(8); }
+		u32 file_size() const			{ return m_block.r32b(9); }
 		util::arbitrary_datetime creation_date() const;
-		u32 creation_month() const		{ return pick_integer_be(m_block, 14, 1); }
-		u32 creation_day() const		{ return pick_integer_be(m_block, 15, 1); }
 		bool is_directory() const		{ return (attributes() & 0x80) != 0; }
 		bool is_non_sharable() const	{ return (attributes() & 0x40) != 0; }
 		bool is_public_execute() const	{ return (attributes() & 0x20) != 0; }
@@ -151,7 +149,6 @@ private:
 
 	static std::string pick_os9_string(std::string_view raw_string);
 	static u32 pick_integer_be(const u8 *data, int length);
-	static u32 pick_integer_be(const fsblk_t::block_t &block, int offset, int length);
 	static bool validate_filename(std::string_view name);
 	static bool is_ignored_filename(std::string_view name);
 };
