@@ -14,9 +14,10 @@
     - Some minor other tweeks (no EGHOLD, slighly more capable DSP)
 
     TODO:
-	- Convert I/O registers to space addresses;
+    - Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
-	- Derive from SCSP device;
+    - Derive from SCSP device;
+    - Sound clips a bit too much (cfr. deathcox, bdrdown). dB scale tables?
 */
 
 #include "emu.h"
@@ -839,18 +840,10 @@ void aica_device::UpdateRegR(int reg)
 				//m_stream->update();
 				int slotnum = MSLC();
 				AICA_SLOT *slot = m_Slots + slotnum;
-				u32 CA;
-
-				if (PCMS(slot) == 0)    // 16-bit samples
-				{
-					//CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;
-					CA = (slot->cur_addr >> (SHIFT + 1));
-				}
-				else    // 8-bit PCM and 4-bit ADPCM
-				{
-					CA = (slot->cur_addr >> SHIFT);
-				}
-
+				// NB: despite previous implementation this does not depend on PCMS setting.
+				// Was "CA = (slot->cur_addr >> (SHIFT - 1)) & ~1;" on 16-bit path,
+				// causing repeated samples/hangs in several ADX driven entries.
+				u32 CA = (slot->cur_addr >> SHIFT);
 				m_udata.data[0x14 / 2] = CA;
 			}
 			break;
@@ -1201,9 +1194,6 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 			}
 			break;
 		case 1: //normal loop
-			// TODO: loop mechanism causes hangs in Border Down/Metal Slug 6/Karous etc.
-			// - For mslug6 culprit RAM address is 0x13880 ARM side (a flag that should be zeroed somehow)
-			// - The lpend mechanism more or less works if the ARM CPU is downclocked at about 10%.
 			if (*addr[addr_select] >= chanlea)
 			{
 				slot->lpend = 1;
