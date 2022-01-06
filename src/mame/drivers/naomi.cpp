@@ -17,15 +17,13 @@ Notes:
 QA Notes (Update December 2021):
     - Roadmap: https://github.com/mamedev/mame/projects/2
     - Testing functional notes: <.md URL here>, legacy TODO below will be removed once ready;
-    - Games that are known to be completed and have no functional bugs in audio/video/input portions
-      are effectively promoted to (MIG | MIS), as a clear attempt to be proven otherwise given
-      the non-trivial host PC requirements;
+    - Games that are known to be completed and have no functional bugs in audio/video/input
+	  portions are effectively promoted to (MIG | MIS), as a clear attempt to be proven otherwise
+	  given the non-trivial host PC requirements;
     - Manufacturers needs to be overhauled, also
-      cfr. MT#08143 about a necessity to at least log Sega divisions.
+      cfr. MT#08143 about a necessity to at least log Sega divisions somehow.
     - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
-    - Some SH to ARM sound streaming doesn't work (used by ADX compression system)
-      Anything that drops the logo it's bound to eventually crash/hang if using a loop.
-      Is it a regression even? sfz3ugd and trizeal were logged as "playable" back in 2009 ...
+	- deathcox: default lightgun input is very offset (enter into service mode to recalibrate)
     - marstv: Oddly enough, intro/game select hangs for a long time on line dispatches,
               eventually draws a bunch of white overline chars (?)
 
@@ -46,10 +44,6 @@ TODO (legacy, to be removed):
     * Shootout Pool
     * Shootout Pool Medal
     * Shootout Pool Prize
-
-    - other issues:
-    * Death Crimson OX (boots now, but dies in YUV-mode movie; coining up before it appears to
-      freeze the game)
 
 TODO (game-specific):
     - Airline Pilots (deluxe): returns error 03
@@ -10644,13 +10638,13 @@ void naomi_state::init_hotd2()
 #define GAME_FLAGS (MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NOT_WORKING)
 
 /* Main board and game specific BIOS */
-/* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "Naomi Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi The House of the Dead 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi Ferrari F355 Challenge (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi Ferrari F355 Challenge (twin/deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi Airline Pilots (deluxe) Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "Naomi 2 Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
-/* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "Naomi GD-ROM Bios", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi */ GAME( 1998, naomi,    0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "NAOMI BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1998, hod2bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI The House of the Dead 2 BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355dlx,  0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Ferrari F355 Challenge (deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, f355bios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Ferrari F355 Challenge (twin/deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* game  */ GAME( 1999, airlbios, 0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI Airline Pilots (deluxe) BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* Naomi2*/ GAME( 2001, naomi2,   0, naomi, naomi, naomi_state,   empty_init, ROT0, "Sega", "NAOMI 2 BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
+/* GDROM */ GAME( 2001, naomigd,  0, naomi, naomi, naomi_state,   init_naomi, ROT0, "Sega", "NAOMI GD-ROM BIOS", GAME_FLAGS|MACHINE_IS_BIOS_ROOT )
 
 /* 834-xxxxx (Sega Naomi cart with game specific BIOS sets) */
 /* 13636-01 */ GAME( 1998, hotd2,    hod2bios, naomim2_gun, hotd2, naomi_state, init_hotd2, ROT0, "Sega", "The House of the Dead 2 (USA)", GAME_FLAGS ) /* specific BIOS "hod2bios" needed */
@@ -10702,7 +10696,7 @@ void naomi_state::init_hotd2()
 /* 0027    */ GAME( 2000, smarinef,  naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Sega Marine Fishing", GAME_FLAGS )
 /* 0028    */ GAME( 2000, vonot,     naomi,    naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_FLAGS )
 // 0029 Derby Owners Club 2000
-/* 0030    */ GAME( 2000, qmegamis,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Quiz Ah Megamisama", GAME_FLAGS )
+/* 0030    */ GAME( 2000, qmegamis,  naomi,    naomim1, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Quiz Ah Megamisama (Japan)", GAME_FLAGS )
 /* 0034    */ GAME( 2000, shorsepb,  shorsep,  naomim2, naomi,   naomi_state, init_naomi,   ROT0, "Sega", "Star Horse Progress (backup data)", GAME_FLAGS )
 /* 0035    */ GAME( 2000, sstrkfgt,  naomi,    naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A)", GAME_FLAGS )
 /* 0035    */ GAME( 2000, sstrkfgta, sstrkfgt, naomim2, sstrkfgt,naomi_state, init_naomi,   ROT0, "Sega", "Sega Strike Fighter (Rev A, no training mode)", GAME_FLAGS )
@@ -10832,9 +10826,9 @@ void naomi_state::init_hotd2()
 /* 0013 */       GAME( 2000, ggx,       naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Arc System Works","Guilty Gear X", GAME_FLAGS )
 /* 0014 */       GAME( 2000, gwing2,    naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Takumi / Capcom", "Giga Wing 2", GAME_FLAGS )
 /* 0015 */       GAME( 2000, pjustic,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Capcom",          "Project Justice / Moero! Justice Gakuen (Rev A)", GAME_FLAGS )
-/* 0016 */       GAME( 2000, deathcoxo, deathcox, naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan)", GAME_FLAGS )
-/* 0016 */       GAME( 2000, deathcoxj, deathcox, naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan, Rev A)", GAME_FLAGS )
-/* 0016 */       GAME( 2000, deathcox,  naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (USA)", GAME_FLAGS ) // possible location test or limited release
+/* 0016 */       GAME( 2000, deathcoxo, deathcox, naomim2, hotd2,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan)", GAME_FLAGS )
+/* 0016 */       GAME( 2000, deathcoxj, deathcox, naomim2, hotd2,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (Japan, Rev A)", GAME_FLAGS )
+/* 0016 */       GAME( 2000, deathcox,  naomi,    naomim2, hotd2,   naomi_state, init_naomi,  ROT0,  "Ecole Software",  "Death Crimson OX (USA)", GAME_FLAGS ) // possible location test or limited release
 /* 0017 */       GAME( 2001, gundmct,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Banpresto / Capcom","Mobile Suit Gundam: Federation Vs. Zeon", GAME_FLAGS )
 /* 0020 */       GAME( 2001, zerogu2,   naomi,    naomim2, naomi,   naomi_state, init_naomi,  ROT0,  "Psikyo",          "Zero Gunner 2", GAME_FLAGS )
 /* 0057 */       GAME( 2007, sl2007,    naomi,    naomim4, naomi,   naomi_state, init_naomi,  ROT270,"Triangle Service","Shooting Love 2007 (Japan)", GAME_FLAGS )
