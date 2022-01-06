@@ -145,7 +145,6 @@ protected:
 	int m_LastFrameStartTime;
 	int m_CyclesPerLine;
 
-	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);

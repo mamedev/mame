@@ -319,7 +319,7 @@ private:
 	std::vector<u32>  m_layout_planeoffset;// plane offsets
 	std::vector<u32>  m_layout_xoffset; // X offsets
 	std::vector<u32>  m_layout_yoffset; // Y offsets
-	layout_char_offset_delegate m_layout_char_offset = nullptr; // char offset not common calculation
+	layout_char_offset_delegate m_layout_char_offset = nullptr; // custom char offset calculation
 };
 
 

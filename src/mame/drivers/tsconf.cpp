@@ -58,8 +58,6 @@
 
   TODO:
   - Interrupts
-  - Sprites
-  - Sound
   - ZX-Mode locks
   - CPU frequency
   - Timings
@@ -71,44 +69,38 @@
 
 #include "emu.h"
 #include "includes/tsconf.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
 
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_txt)
 {
 	u8 *m_row_location = &m_ram->pointer()[(m_regs[V_PAGE] << 14) + (tile_index / tilemap.cols() * 256)];
 	u8 col = tile_index % tilemap.cols();
 	u8 symbol = m_row_location[col];
-	tileinfo.set(1, symbol, 0, 0);
+	tileinfo.set(TM_TS_CHAR, symbol, 0, 0);
 }
 
 template <u8 Layer>
 TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 {
-	u8 col_offset = (tile_index % tilemap.cols()) << 1;
-	u16 row_offset = (((tile_index / tilemap.cols()) << 1) + Layer) * 64 * 2;
+	u8 col_offset = (tile_index % tilemap.cols() + Layer * 64) << 1;
+	u16 row_offset = (tile_index / tilemap.cols() * 64 * 2) << 1;
 
 	u8 *tile_info_addr = &m_ram->pointer()[(m_regs[T_MAP_PAGE] << 14) + row_offset + col_offset];
 	u8 hi = tile_info_addr[1];
 
 	u16 tile = ((u16(hi) & 0x0f) << 8) | tile_info_addr[0];
 	u8 pal = (BIT(m_regs[PAL_SEL], 4 + Layer * 2, 2) << 2) | BIT(hi, 4, 2);
-	if (BIT(hi, 6, 2))
-	{
-		logerror("FIXME - FLIP Case\n");
-	}
-	tileinfo.set(2 + Layer, tile, pal, 0);
-}
-
-TILE_GET_INFO_MEMBER(tsconf_state::get_sprite_info_16c)
-{
-	tileinfo.set(4, tile_index, 0, 0);
+	tileinfo.set(TM_TILES0 + Layer, tile, pal, TILE_FLIPYX(BIT(hi, 6, 2)));
+	tileinfo.category = tile == 0 ? 2 : 1;
 }
 
 void tsconf_state::tsconf_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr("bank1").w(FUNC(tsconf_state::tsconf_bank_w<0>));
-	map(0x4000, 0x7fff).bankr("bank2").w(FUNC(tsconf_state::tsconf_bank_w<1>));
-	map(0x8000, 0xbfff).bankr("bank3").w(FUNC(tsconf_state::tsconf_bank_w<2>));
-	map(0xc000, 0xffff).bankr("bank4").w(FUNC(tsconf_state::tsconf_bank_w<3>));
+	map(0x0000, 0x3fff).bankr(m_banks[0]).w(FUNC(tsconf_state::tsconf_bank_w<0>));
+	map(0x4000, 0x7fff).bankr(m_banks[1]).w(FUNC(tsconf_state::tsconf_bank_w<1>));
+	map(0x8000, 0xbfff).bankr(m_banks[2]).w(FUNC(tsconf_state::tsconf_bank_w<2>));
+	map(0xc000, 0xffff).bankr(m_banks[3]).w(FUNC(tsconf_state::tsconf_bank_w<3>));
 }
 
 void tsconf_state::tsconf_io(address_map &map)
@@ -126,6 +118,8 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
 	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 }
 
 void tsconf_state::tsconf_switch(address_map &map)
@@ -156,8 +150,7 @@ static const gfx_layout spectrum_charlayout =
 
 static const gfx_layout tsconf_charlayout =
 {
-	8,
-	8,
+	8, 8,
 	256,
 	1,
 	{0},
@@ -176,50 +169,54 @@ static const gfx_layout tsconf_tile_16cpp_layout =
 	{STEP8(0, 256 * 8)}
 };
 
-static LAYOUT_CHAR_OFFSET_FUNC(layout_tile_offset) {
+static LAYOUT_CHAR_OFFSET_FUNC(layout_tile_offset)
+{
 	u32 col = code % 64;
 	u32 row = code / 64;
 	return (width * planes) * (row * height * 8 * 8 + col);
 }
 
 static GFXDECODE_START(gfx_tsconf)
-	GFXDECODE_ENTRY("maincpu", 0x1fd00, spectrum_charlayout, 0xf7, 1)
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)       // TXT
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 255) // T0 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 255) // T1 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 255) // Sprites 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)         // TM_TS_CHAR : TXT
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES0  : T0 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES1  : T1 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_SPRITES : Sprites 16cpp
+	GFXDECODE_ENTRY("maincpu", 0x1fd00, spectrum_charlayout, 0xf7, 1) // TM_ZX_CHAR
 GFXDECODE_END
 
 void tsconf_state::video_start()
 {
 	spectrum_128_state::video_start();
 
-	m_ts_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_ts_tilemap[TM_TS_CHAR] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_txt)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
-	m_gfxdecode->gfx(2)->set_layout_char_offset_func(layout_tile_offset);
-	m_ts_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_ts_tilemap[1]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_TILES0)->set_layout_char_offset_func(layout_tile_offset);
+	m_gfxdecode->gfx(TM_TILES0)->set_source(m_ram->pointer());
+	m_ts_tilemap[TM_TILES0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_ts_tilemap[TM_TILES0]->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(3)->set_layout_char_offset_func(layout_tile_offset);
-	m_ts_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_ts_tilemap[2]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_TILES1)->set_layout_char_offset_func(layout_tile_offset);
+	m_gfxdecode->gfx(TM_TILES1)->set_source(m_ram->pointer());
+	m_ts_tilemap[TM_TILES1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_tile_info_16c<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_ts_tilemap[TM_TILES1]->set_transparent_pen(0);
 
-	m_ts_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tsconf_state::get_sprite_info_16c)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_ts_tilemap[3]->set_transparent_pen(0);
+	m_gfxdecode->gfx(TM_SPRITES)->set_layout_char_offset_func(layout_tile_offset);
+	m_gfxdecode->gfx(TM_SPRITES)->set_source(m_ram->pointer());
 }
 
 void tsconf_state::machine_start()
 {
+	m_banks[1]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
+	m_banks[2]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
+	m_banks[3]->configure_entries(0, 256, m_ram->pointer(), 0x4000);
+
 	save_item(NAME(m_regs));
 	// TODO save'm'all!
 }
 
 void tsconf_state::machine_reset()
 {
-	u8 *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
-
-	m_ram_0000 = nullptr;
 
 	m_port_f7_ext = DISABLED;
 
@@ -229,7 +226,7 @@ void tsconf_state::machine_reset()
 	m_regs[G_X_OFFS_H] &= 0xfe; // xxxxxxx0
 	m_regs[G_Y_OFFS_L] = 0x00;
 	m_regs[G_Y_OFFS_H] &= 0xfe; // xxxxxxx0
-	m_regs[TS_CONFIG] &= 0x03; // 000000xx
+	m_regs[TS_CONFIG] &= 0x03;  // 000000xx
 	m_regs[PAL_SEL] = 0x0f;
 	m_regs[PAGE0] = 0x00;
 	m_regs[PAGE1] = 0x05;
@@ -248,14 +245,13 @@ void tsconf_state::machine_reset()
 	if (m_beta->started())
 		m_beta->enable();
 
-	memset(messram, 0, 4096 * 1024);
-
 	m_port_7ffd_data = 0;
 
 	m_zctl_cs = 1;
 	m_zctl_di = 0xff;
 
-	tsconf_update_bank1();
+	tsconf_update_bank0();
+	tsconf_update_video_mode();
 
 	m_keyboard->write(0xff);
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
@@ -281,23 +277,34 @@ void tsconf_state::tsconf(machine_config &config)
 	m_dma->out_mreq_callback().set(FUNC(tsconf_state::ram_write16));
 	m_dma->in_spireq_callback().set(FUNC(tsconf_state::spi_read16));
 	m_dma->out_cram_callback().set(FUNC(tsconf_state::cram_write16));
+	m_dma->out_sfile_callback().set(FUNC(tsconf_state::sfile_write16));
 
 	BETA_DISK(config, m_beta, 0);
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
+	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "rspeaker").front_right();
+
+	AY8912(config.replace(), "ay8912", XTAL(14'000'000) / 8)
+		.add_route(0, "lspeaker", 0.50)
+		.add_route(1, "lspeaker", 0.25)
+		.add_route(1, "rspeaker", 0.25)
+		.add_route(2, "rspeaker", 0.50);
+
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
 	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 448, 0, 360, 320, 0, 288);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
+	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6
 
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 }
 
 ROM_START(tsconf)
-	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF) // 16KB ROM
+	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF) // ROM: 32 * 16KB
 	ROM_LOAD("ts-bios.rom", 0x010000, 0x10000, CRC(b060b0d9) SHA1(820d3539de115141daff220a3cb733fc880d1bab))
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
-COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_TIMING )
+COMP( 2011, tsconf, spec128,    0,      tsconf,     spec_plus,  tsconf_state,   empty_init, "NedoPC, TS-Labs",  "ZX Evolution TS-Configuration",    MACHINE_IMPERFECT_TIMING )

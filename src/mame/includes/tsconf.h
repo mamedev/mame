@@ -10,25 +10,20 @@
 
 #pragma once
 
-#include "spectrum.h"
-
 #include "machine/beta.h"
-
 #include "machine/glukrs.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/tsconfdma.h"
-
+#include "spectrum.h"
 #include "tilemap.h"
-
 
 class tsconf_state : public spectrum_128_state
 {
 public:
 	tsconf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_128_state(mconfig, type, tag),
-		  m_p_rom(*this, "maincpu"),
-		  m_bank1(*this, "bank1"), m_bank2(*this, "bank2"), m_bank3(*this, "bank3"), m_bank4(*this, "bank4"),
+		  m_banks(*this, "bank%u", 0U),
 		  m_keyboard(*this, "pc_keyboard"),
 		  m_beta(*this, BETA_DISK_TAG),
 		  m_dma(*this, "dma"),
@@ -36,7 +31,8 @@ public:
 		  m_glukrs(*this, "glukrs"),
 		  m_palette(*this, "palette"),
 		  m_gfxdecode(*this, "gfxdecode"),
-		  m_cram(*this, "cram")
+		  m_cram(*this, "cram"),
+		  m_sfile(*this, "sfile")
 	{
 	}
 
@@ -46,6 +42,7 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum gluk_ext : u8
@@ -58,6 +55,14 @@ private:
 		SPIFL = 0x10,
 
 		DISABLED = 0xff
+	};
+
+	enum tilemaps : u8 {
+		TM_TS_CHAR = 0x00,
+		TM_TILES0,
+		TM_TILES1,
+		TM_SPRITES,
+		TM_ZX_CHAR,
 	};
 
 	enum tsconf_regs : u8
@@ -119,14 +124,13 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
 	TILE_GET_INFO_MEMBER(get_tile_info_16c);
-	TILE_GET_INFO_MEMBER(get_sprite_info_16c);
 
 	// Changing this consider to revert 'virtual' in spectrum.h
 	u32 screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	void spectrum_UpdateScreenBitmap(bool eof = false) override;
 	void tsconf_palette(palette_device &palette) const;
 	u16 get_border_color() override;
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(const rectangle &cliprect);
 	void tsconf_update_video_mode();
 	rectangle get_resolution_info();
 
@@ -142,7 +146,7 @@ private:
 	u8 tsconf_port_f7_r(offs_t offset);
 	void tsconf_port_f7_w(offs_t offset, u8 data);
 
-	void tsconf_update_bank1();
+	void tsconf_update_bank0();
 	u8 beta_neutral_r(offs_t offset);
 	u8 beta_enable_r(offs_t offset);
 	u8 beta_disable_r(offs_t offset);
@@ -157,6 +161,7 @@ private:
 	void ram_page_write(u8 page, offs_t offset, u8 data);
 	void cram_write(u16 offset, u8 data);
 	void cram_write16(offs_t offset, u16 data);
+	void sfile_write16(offs_t offset, u16 data);
 	void ram_write16(offs_t offset, u16 data);
 	u16 ram_read16(offs_t offset);
 	u16 spi_read16();
@@ -164,11 +169,7 @@ private:
 	u8 m_regs[0x100];
 
 	address_space *m_program;
-	required_region_ptr<u8> m_p_rom;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
-	required_memory_bank m_bank3;
-	required_memory_bank m_bank4;
+	required_memory_bank_array<4> m_banks;
 
 	required_device<at_keyboard_device> m_keyboard;
 
@@ -182,10 +183,13 @@ private:
 	gluk_ext m_port_f7_ext;
 	u8 m_port_f7_gluk_reg;
 
-	optional_device<device_palette_interface> m_palette;
+	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
-	tilemap_t *m_ts_tilemap[4];
+	tilemap_t *m_ts_tilemap[3];
 	required_device<ram_device> m_cram;
+	required_device<ram_device> m_sfile;
+	u16 m_previous_tsu_y;
+
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

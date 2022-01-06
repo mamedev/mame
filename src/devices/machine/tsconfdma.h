@@ -20,6 +20,7 @@ public:
 	auto out_mreq_callback() { return m_out_mreq_cb.bind(); }
 	auto in_spireq_callback() { return m_in_mspi_cb.bind(); }
 	auto out_cram_callback() { return m_out_cram_cb.bind(); }
+	auto out_sfile_callback() { return m_out_sfile_cb.bind(); }
 
 	int is_ready();
 
@@ -42,6 +43,7 @@ private:
 	devcb_write16 m_out_mreq_cb;
 	devcb_read16 m_in_mspi_cb;
 	devcb_write16 m_out_cram_cb;
+	devcb_write16 m_out_sfile_cb;
 
 	u8 m_ready;
 
