@@ -10,6 +10,7 @@
 #include "cpu/arm7/arm7core.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/naomig1.h"
+#include "machine/dc_g2if.h"
 #include "machine/maple-dc.h"
 #include "machine/timer.h"
 #include "sound/aica.h"
@@ -17,19 +18,21 @@
 
 class dc_state : public driver_device
 {
-	public:
-		dc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		dc_framebuffer_ram(*this, "frameram"),
-		dc_texture_ram(*this, "dc_texture_ram"),
-		dc_sound_ram(*this, "dc_sound_ram"),
-		dc_ram(*this, "dc_ram"),
-		m_maincpu(*this, "maincpu"),
-		m_soundcpu(*this, "soundcpu"),
-		m_powervr2(*this, "powervr2"),
-		m_maple(*this, "maple_dc"),
-		m_naomig1(*this, "rom_board"),
-		m_aica(*this, "aica") { }
+public:
+	dc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, dc_framebuffer_ram(*this, "frameram")
+		, dc_texture_ram(*this, "dc_texture_ram")
+		, dc_sound_ram(*this, "dc_sound_ram")
+		, dc_ram(*this, "dc_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
+		, m_powervr2(*this, "powervr2")
+		, m_maple(*this, "maple_dc")
+		, m_naomig1(*this, "rom_board")
+		, m_g2if(*this, "sb_g2if")
+		, m_aica(*this, "aica")
+	{ }
 
 	required_shared_ptr<uint64_t> dc_framebuffer_ram; // '32-bit access area'
 	required_shared_ptr<uint64_t> dc_texture_ram; // '64-bit access area'
@@ -56,7 +59,7 @@ class dc_state : public driver_device
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(g2_dma_irq);
+	void g2_dma_end_w(offs_t channel, u8 state);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	uint32_t dc_aica_reg_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dc_aica_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -91,6 +94,7 @@ class dc_state : public driver_device
 	required_device<powervr2_device> m_powervr2;
 	required_device<maple_dc_device> m_maple;
 	optional_device<naomi_g1_device> m_naomig1;
+	required_device<dc_g2if_device> m_g2if;
 	required_device<aica_device> m_aica;
 
 	void generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram);
@@ -100,6 +104,9 @@ class dc_state : public driver_device
 	void naomi_aw_base(machine_config &config);
 	void aica_map(address_map &map);
 	void dc_audio_map(address_map &map);
+
+protected:
+	void system_bus_config(machine_config &config, cpu_device *dev);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

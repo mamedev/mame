@@ -94,14 +94,9 @@ void dc_state::generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, ui
 	m_maincpu->sh4_dma_ddt(&ddt);
 }
 
-TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
+void dc_state::g2_dma_end_w(offs_t channel, u8 state)
 {
-//	machine().scheduler().synchronize();
-
-	m_g2_dma[param].start = g2bus_regs[SB_ADST + (param * 8)] = 0;
-	// TODO: suspend flag
-
-	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << param;
+	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << channel;
 	dc_update_interrupt_status();
 }
 
@@ -193,8 +188,8 @@ void dc_state::maple_irq(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
 {
-	dc_sysctrl_regs[SB_C2DLEN]=0;
-	dc_sysctrl_regs[SB_C2DST]=0;
+	dc_sysctrl_regs[SB_C2DLEN] = 0;
+	dc_sysctrl_regs[SB_C2DST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_CH2;
 	dc_update_interrupt_status();
 }
@@ -227,7 +222,7 @@ void dc_state::g2_dma_execute(address_space &space, int channel)
 	// G2 bus is 16 bits @ 25 MHz according to Fig. 2-1
 	// TODO: reported limit output for AICA DMA is set at 11.3MB/s while the others at 24.0/26.0
 	// bus contention ftw ...
-	const attotime dma_time = attotime::from_ticks(size / 2, 25000000);
+	//const attotime dma_time = attotime::from_ticks(size / 2, 25000000);
 
 	m_g2_dma[channel].g2_addr = g2bus_regs[SB_ADSTAG + (channel * 8)] = dst;
 	m_g2_dma[channel].root_addr = g2bus_regs[SB_ADSTAR + (channel * 8)] = src;
@@ -237,11 +232,13 @@ void dc_state::g2_dma_execute(address_space &space, int channel)
 	if (m_g2_dma[channel].mode & 1)
 		m_g2_dma[channel].enable = 0;
 
+#if 0
 	machine().scheduler().timer_set(
 		dma_time,
 		timer_expired_delegate(FUNC(dc_state::g2_dma_irq), this),
 		channel
 	);
+#endif
 }
 
 // register decode helpers
@@ -778,4 +775,11 @@ MACHINE_RESET_MEMBER(dc_state,dc_console)
 TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 {
 	m_powervr2->pvr_scanline_timer(param);
+}
+
+void dc_state::system_bus_config(machine_config &config, cpu_device *dev)
+{
+	DC_G2IF(config, m_g2if, XTAL(25'000'000));
+	m_g2if->set_host_space("maincpu", AS_PROGRAM);
+	m_g2if->int_cb().set(FUNC(dc_state::g2_dma_end_w));
 }
