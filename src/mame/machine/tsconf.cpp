@@ -59,8 +59,6 @@ void tsconf_state::tsconf_palette(palette_device &palette) const
 
 void tsconf_state::tsconf_update_bank0()
 {
-
-	//W0_WE
 	if (NW0_MAP)
 	{
 		m_ROMSelection = m_regs[PAGE0];
@@ -145,22 +143,21 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		{
 			spectrum_state::spectrum_UpdateScreenBitmap(eof);
 		}
-		else if (!eof)
+		else if (m_previous_screen_y != m_screen->vpos())
 		{
-			if (m_previous_screen_y != m_screen->vpos())
-			{
-				//TODO consider perfom update not based on current line but from previous saved.
-				m_previous_screen_y = m_screen->vpos();
+			//TODO consider perfom update not based on current line but from previous saved.
+			m_previous_screen_y = m_screen->vpos();
 
+			rectangle resolution = get_resolution_info();
+			s16 y = m_screen->vpos() - resolution.top();
+			if (y >= 0)
+			{
 				u8 pal_offset = m_regs[PAL_SEL] << 4;
-				rectangle resolution = get_resolution_info();
+				u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
 				if (VM == VM_TXT)
 				{
-					u8 *messram = m_ram->pointer();
-					u16 y = m_screen->vpos();
-					u8 *font_location = messram + PAGE4K(m_regs[V_PAGE] ^ 0x01);
-					u8 *text_location = messram + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
-					u16 *bm = &m_screen_bitmap.pix(y, 0);
+					u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
+					u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
 					for (auto x = 0; x < resolution.width() / 8; x++)
 					{
 						u8 char_x = *(font_location + (*text_location * 8) + (y % 8));
@@ -175,36 +172,34 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 				}
 				else
 				{
-					if (m_screen->vpos() >= resolution.top())
+					u16 x_offset = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
+					u16 y_offset = (((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L] + y) & 0x1ff;
+					u8 *video_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + ((y_offset * 512 + x_offset) >> (2 - VM));
+					if (VM == VM_16C)
 					{
-						u16 y = m_screen->vpos() - resolution.top();
-						u16 x_src = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
-						u32 offset = (((y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) & 0x1ff) * 512) + x_src;
-						if (VM == VM_16C)
+						if (x_offset & 1)
 						{
-							// FIXME wouldn't work for odd offsets
-							offset >>= 1;
+							*bm++ = (*video_location++ & 0x0f) + pal_offset;
+							x_offset++;
 						}
-						u8 *video_location = &m_ram->pointer()[PAGE4K(m_regs[V_PAGE]) + offset];
-						u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
-						for (auto x = x_src; x <= x_src + resolution.width(); x++)
+						for (auto x = 0; x < resolution.width(); x++)
 						{
-							if (x == 512)
-							{
-								video_location -= 256 * VM;
-							}
-							u8 pix = *video_location;
-							if (VM == VM_16C)
-							{
-								*bm++ = (pix >> 4) + pal_offset;
-								*bm++ = (pix & 0x0f) + pal_offset;
-								x++;
-							}
-							else
-							{
-								*bm++ = pix;
-							}
-							video_location++;
+							if (x_offset == 512)
+								video_location -= 256;
+							u8 pix = *video_location++;
+							*bm++ = (pix >> 4) + pal_offset;
+							*bm++ = (pix & 0x0f) + pal_offset;
+							x_offset += 2;
+						}
+					}
+					else // VM_256C
+					{
+						for (auto x = 0; x < resolution.width(); x++)
+						{
+							if (x_offset == 512)
+								video_location -= 512;
+							*bm++ = *video_location++;
+							x_offset++;
 						}
 					}
 				}
