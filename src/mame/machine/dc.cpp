@@ -2,7 +2,9 @@
 // copyright-holders: Samuele Zannoli, R. Belmont, ElSemi, David Haywood, Angelo Salese, Olivier Galibert, MetalliC
 /*
 
-    dc.c - Sega Dreamcast hardware
+    dc.cpp - Sega Dreamcast hardware
+
+    Misc interfacing to common DC buses over the various clients.
 
 */
 

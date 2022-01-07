@@ -6,6 +6,12 @@
 
     DC home console hardware overrides (GD-ROM drive etc)
 
+    TODO:
+    - Convert to actual G1 I/F;
+    - gdrom_alt_status is identical to normal status except that "but it does not clear DMA status information when it is accessed";
+    - Verify unimplemented behaviours via tests;
+
+    Old notes, consultation only:
     c230048 - 5 is written, want 6
     c0d9d9e - where bad happens, from routine @ c0da260
 
@@ -13,20 +19,18 @@
 
     cfffee0 - stack location when bad happens
 
-    TODO:
-    - gdrom_alt_status is identical to normal status except that "but it does not clear DMA status information when it is accessed"
-
 */
 
 #include "emu.h"
 #include "cdrom.h"
-#include "debugger.h"
+//#include "debugger.h"
 #include "includes/dc.h"
 #include "cpu/sh/sh4.h"
 #include "sound/aica.h"
 #include "includes/dccons.h"
 
-#define ATAPI_CYCLES_PER_SECTOR (5000)  // TBD for Dreamcast
+// TODO: fine grain this value
+#define ATAPI_CYCLES_PER_SECTOR (5000)
 
 WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
 {
@@ -119,8 +123,9 @@ uint32_t dc_cons_state::dc_mess_g1_ctrl_r(offs_t offset)
 	switch(offset)
 	{
 		case SB_GDSTARD:
-			printf("G1CTRL: GDSTARD %08x\n", atapi_xferbase); // Hello Kitty reads here
-			machine().debug_break();
+			// TODO: one of the Hello Kitty (identify which) reads there
+			logerror("G1CTRL: GDSTARD %08x\n", atapi_xferbase);
+			//machine().debug_break();
 			return atapi_xferbase;
 		case SB_GDST:
 			break;
@@ -135,8 +140,8 @@ uint32_t dc_cons_state::dc_mess_g1_ctrl_r(offs_t offset)
 								// 0 - check in progress, BIOS data summed, G1 ATA area blocked (read FFFFFFFFh)
 			return 3;
 		default:
-			printf("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
-			machine().debug_break();
+			logerror("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
+			//machine().debug_break();
 			break;
 	}
 	return g1bus_regs[offset];
