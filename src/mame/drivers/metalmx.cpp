@@ -690,9 +690,21 @@ void metalmx_state::metalmx(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_565);
 
+	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
+	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
+	SPEAKER(config, "flspeaker").front_left();
+	SPEAKER(config, "frspeaker").front_right();
+	SPEAKER(config, "rlspeaker").headrest_left();
+	SPEAKER(config, "rrspeaker").headrest_right();
+	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->set_speedup(0); // TODO: speedup address
 	m_cage->irq_handler().set(FUNC(metalmx_state::cage_irq_callback));
+	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
+	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
+	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
+	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
 }
 
 

@@ -39,6 +39,7 @@ public:
 	{ }
 
 	void atarigt(machine_config &config);
+	void atarigt_stereo(machine_config &config);
 	void tmek(machine_config &config);
 	void primrage20(machine_config &config);
 	void primrage(machine_config &config);
