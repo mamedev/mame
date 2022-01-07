@@ -92,7 +92,7 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x318000, 0x31ffff).noprw();
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x400000, 0x47ffff).rom().region("maincpu", 0);
-	map(0x4fffe0, 0x4fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
+	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 	map(0x500000, 0x57ffff).ram();
 	map(0xd00000, 0xdfffff).ram(); // DVC RAM block 1
 	map(0xe00000, 0xe7ffff).rw(FUNC(cdi_state::dvc_r), FUNC(cdi_state::dvc_w));
@@ -106,13 +106,9 @@ void cdi_state::cdimono2_mem(address_map &map)
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-	//map(0x300000, 0x303bff).rw("cdic", FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
-	//map(0x303c00, 0x303fff).rw("cdic", FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
-	//map(0x310000, 0x317fff).rw("slave", FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
-	//map(0x318000, 0x31ffff).noprw();
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x400000, 0x47ffff).rom().region("maincpu", 0);
-	map(0x4fffe0, 0x4fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
+	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 }
 
 void cdi_state::cdi910_mem(address_map &map)
@@ -124,15 +120,9 @@ void cdi_state::cdi910_mem(address_map &map)
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
-//  map(0x300000, 0x303bff).rw("cdic", FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
-//  map(0x303c00, 0x303fff).rw("cdic", FUNC(cdicdic_device::regs_r), FUNC(cdicdic_device::regs_w));
-//  map(0x310000, 0x317fff).rw("slave_hle", FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
-//  map(0x318000, 0x31ffff).noprw();
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x4fffe0, 0x4fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-//  map(0x500000, 0x57ffff).ram();
+	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 	map(0x500000, 0xffffff).noprw();
-//  map(0xe00000, 0xefffff).ram(); // DVC
 }
 
 
@@ -141,69 +131,12 @@ void cdi_state::cdi910_mem(address_map &map)
 *************************/
 
 static INPUT_PORTS_START( cdi )
-	PORT_START("DEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Plane B Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Force Backdrop Color")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
-	PORT_CONFNAME( 0xf0, 0x00, "Backdrop Color")
-	PORT_CONFSETTING(    0x00, "Black" )
-	PORT_CONFSETTING(    0x10, "Half-Bright Blue" )
-	PORT_CONFSETTING(    0x20, "Half-Bright Green" )
-	PORT_CONFSETTING(    0x30, "Half-Bright Cyan" )
-	PORT_CONFSETTING(    0x40, "Half-Bright Red" )
-	PORT_CONFSETTING(    0x50, "Half-Bright Magenta" )
-	PORT_CONFSETTING(    0x60, "Half-Bright Yellow" )
-	PORT_CONFSETTING(    0x70, "Half-Bright White" )
-	PORT_CONFSETTING(    0x80, "Black (Alternate)" )
-	PORT_CONFSETTING(    0x90, "Blue" )
-	PORT_CONFSETTING(    0xa0, "Green" )
-	PORT_CONFSETTING(    0xb0, "Cyan" )
-	PORT_CONFSETTING(    0xc0, "Red" )
-	PORT_CONFSETTING(    0xd0, "Magenta" )
-	PORT_CONFSETTING(    0xe0, "Yellow" )
-	PORT_CONFSETTING(    0xf0, "White" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cdimono2 )
-	PORT_START("DEBUG")
-	PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Plane B Disable")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Force Backdrop Color")
-	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
-	PORT_CONFNAME( 0xf0, 0x00, "Backdrop Color")
-	PORT_CONFSETTING(    0x00, "Black" )
-	PORT_CONFSETTING(    0x10, "Half-Bright Blue" )
-	PORT_CONFSETTING(    0x20, "Half-Bright Green" )
-	PORT_CONFSETTING(    0x30, "Half-Bright Cyan" )
-	PORT_CONFSETTING(    0x40, "Half-Bright Red" )
-	PORT_CONFSETTING(    0x50, "Half-Bright Magenta" )
-	PORT_CONFSETTING(    0x60, "Half-Bright Yellow" )
-	PORT_CONFSETTING(    0x70, "Half-Bright White" )
-	PORT_CONFSETTING(    0x80, "Black (Alternate)" )
-	PORT_CONFSETTING(    0x90, "Blue" )
-	PORT_CONFSETTING(    0xa0, "Green" )
-	PORT_CONFSETTING(    0xb0, "Cyan" )
-	PORT_CONFSETTING(    0xc0, "Red" )
-	PORT_CONFSETTING(    0xd0, "Magenta" )
-	PORT_CONFSETTING(    0xe0, "Yellow" )
-	PORT_CONFSETTING(    0xf0, "White" )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( quizard )
-	PORT_INCLUDE( cdi )
-
 	PORT_START("P0")
 	PORT_DIPNAME( 0x07, 0x05, "Settings" )
 	PORT_DIPSETTING(    0x00, "1 Coin, 0 Bonus Limit, 0 Bonus Number" )
@@ -419,40 +352,33 @@ static const uint16_t cdi220_lcd_char[20*22] =
 	0x1000, 0x1000, 0x1000, 0x1000, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0800, 0x0400, 0x0400, 0x0400, 0x0400
 };
 
-void cdi_state::draw_lcd(int y)
+uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (y >= 22 || !m_slave_hle.found())
-		return;
+	if (!m_slave_hle.found())
+		return 0;
 
-	uint32_t *scanline = &m_lcdbitmap.pix(y);
-
-	for (int lcd = 0; lcd < 8; lcd++)
+	for (int y = 0; y < 22; y++)
 	{
-		uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
-						m_slave_hle->get_lcd_state()[lcd*2 + 1];
-		for (int x = 0; x < 20; x++)
+		uint32_t *scanline = &bitmap.pix(y);
+
+		for (int lcd = 0; lcd < 8; lcd++)
 		{
-			if (data & cdi220_lcd_char[y*20 + x])
+			uint16_t data = (m_slave_hle->get_lcd_state()[lcd*2] << 8) |
+							m_slave_hle->get_lcd_state()[lcd*2 + 1];
+			for (int x = 0; x < 20; x++)
 			{
-				scanline[(7 - lcd)*24 + x] = rgb_t::white();
-			}
-			else
-			{
-				scanline[(7 - lcd)*24 + x] = rgb_t::black();
+				if (data & cdi220_lcd_char[y*20 + x])
+				{
+					scanline[(7 - lcd)*24 + x] = rgb_t::white();
+				}
+				else
+				{
+					scanline[(7 - lcd)*24 + x] = rgb_t::black();
+				}
 			}
 		}
 	}
-}
 
-void cdi_state::video_start()
-{
-	if (m_lcd)
-		m_lcd->register_screen_bitmap(m_lcdbitmap);
-}
-
-uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	copybitmap(bitmap, m_lcdbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
@@ -470,14 +396,15 @@ void cdi_state::cdimono1_base(machine_config &config)
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_size(384, 312);
+	screen.set_visarea(0, 384-1, 0, 312-1); // TODO: dynamic resolution
+	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
+	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::screen_vblank));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(50);
@@ -509,10 +436,6 @@ void cdi_state::cdimono1_base(machine_config &config)
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
 	MK48T08(config, "mk48t08");
 }
 
@@ -525,14 +448,15 @@ void cdi_state::cdimono2(machine_config &config)
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(384, 302);
-	screen.set_visarea(0, 384-1, 22, 302-1); // TODO: dynamic resolution
-	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_size(384, 312);
+	screen.set_visarea(0, 384-1, 0, 312-1); // TODO: dynamic resolution
+	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
+	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::screen_vblank));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -560,10 +484,6 @@ void cdi_state::cdimono2(machine_config &config)
 
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MK48T08(config, "mk48t08");
 }
@@ -576,14 +496,15 @@ void cdi_state::cdi910(machine_config &config)
 	MCD212(config, m_mcd212, CLOCK_A);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
-	m_mcd212->set_scanline_callback(FUNC(cdi_state::draw_lcd));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_size(384, 312);
 	screen.set_visarea(0, 384-1, 32, 312-1); // TODO: dynamic resolution
-	screen.set_screen_update("mcd212", FUNC(mcd212_device::screen_update));
+	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
+	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::screen_vblank));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -611,10 +532,6 @@ void cdi_state::cdi910(machine_config &config)
 
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MK48T08(config, "mk48t08");
 }
