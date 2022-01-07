@@ -23435,7 +23435,7 @@ Fails at MMU checks 2-3-4, tries everything back again, stalls on MMU Check_1 ba
 
 	<software name="loopchk" supported="no">
 		<!-- build number: "V0.800" -->
-		<description>Loop Checker v1.00 (World) </description>
+		<description>Loop Checker v1.00 (World)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
@@ -23447,11 +23447,7 @@ cfr. https://github.com/mamedev/mame/issues/9106 for more info.
 		<info name="serial" value="SDPS-1"/>
 		<info name="release" value="19991109"/>
 		<!-- TODO: understand what the various button combinations actually does -->
-		<info name="usage" value=<![CDATA[
-Select tests with A button in port A, selected to be run tests will have a dot at string tail.
-Once done, in main menu press B to select number of times said tests needs to be run cyclically.
-Press B to undo, A to move on. Select "Con't" or "Halt" mode with A.
-]]>/>
+		<info name="usage" value="1. Select tests with A button in port A, selected to be run tests will have a dot at string tail; 2. Once done, in main menu press B to select number of times said tests needs to be run cyclically; 3. Press B to undo, A to move on. Select Con't or Halt mode with A; 4. Selected tests will (hopefully) run;"/>
 		<part interface="cdrom" name="cdrom">
 			<diskarea name="cdrom">
 				<disk name="loop checker Ver 1.00 (world)" sha1="cd63dc2bdad2c6ce20af052871bcc77276808910"/>
