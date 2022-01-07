@@ -993,7 +993,21 @@ void cdicdic_device::process_disc_sector()
 		m_audio_sector_counter = 2;
 		m_decoding_audio_map = false;
 
-		play_cdda_sector(buffer);
+		// Byteswap if not already detected as byteswapped
+		if (!m_cd_byteswap)
+		{
+			uint8_t swapped_buffer[2560];
+			for (uint16_t i = 0; i < 2560; i += 2)
+			{
+				swapped_buffer[i + 1] = buffer[i + 0];
+				swapped_buffer[i + 0] = buffer[i + 1];
+			}
+			play_cdda_sector(swapped_buffer);
+		}
+		else
+		{
+			play_cdda_sector(buffer);
+		}
 
 		if (frac != 0)
 		{
