@@ -34,7 +34,8 @@ enum class meta_name {
 	file_type,
 	ascii_flag,
 	owner_id,
-	attributes
+	attributes,
+	oem_name
 };
 
 enum class meta_type {
