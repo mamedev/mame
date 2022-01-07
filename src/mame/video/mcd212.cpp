@@ -152,8 +152,8 @@ void mcd212_device::update_region_arrays()
 				{
 					std::fill_n(m_weight_factor[0] + x, std::size(m_weight_factor[0]) - x, latched_wfa);
 					std::fill_n(m_weight_factor[1] + x, std::size(m_weight_factor[1]) - x, latched_wfb);
-					std::fill_n(m_region_flag[0] + x, std::size(m_region_flag[0]) - x, false);
-					std::fill_n(m_region_flag[1] + x, std::size(m_region_flag[1]) - x, false);
+					std::fill_n(m_region_flag[0] + x, std::size(m_region_flag[0]) - x, latched_rf[0]);
+					std::fill_n(m_region_flag[1] + x, std::size(m_region_flag[1]) - x, latched_rf[1]);
 					return;
 				}
 				if (x == (region_ctrl & RC_X))
