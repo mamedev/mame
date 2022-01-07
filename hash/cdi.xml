@@ -10690,12 +10690,34 @@ license:CC0
 	</software>
 
 	<software name="aliengat">
-		<description>Alien Gate [CDi Ready]</description>
-		<year>????</year>
+		<description>Alien Gate (Euro)</description>
+		<year>1992</year>
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="alien gate (cdi-ready)" sha1="8ad4d0c5b875a04a7db3abbe236ba18eb2696a96"/>
+				<disk name="alien gate (euro)" sha1="8ad4d0c5b875a04a7db3abbe236ba18eb2696a96"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aliengatu">
+		<description>Alien Gate (US)</description>
+		<year>1992</year>
+		<publisher>The Vision Factory</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien gate (us)(cdi-ready)" sha1="16009503b1fadb28b9fff293a7099b7cab062325"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aliengatu1">
+		<description>Alien Gate (US, set 1)</description>
+		<year>1992</year>
+		<publisher>The Vision Factory</publisher>
+		<part name="cdrom" interface="cdi_cdrom">
+			<diskarea name="cdrom">
+				<disk name="alien gate (us, set 1)(cdi-ready)" sha1="823a5b692a87b51a7c2f35ac0d63865494e253f7"/>
 			</diskarea>
 		</part>
 	</software>
@@ -10962,7 +10984,7 @@ license:CC0
 		</part>
 	</software>
 
-	<software name="luckluke">
+	<software name="luckluke" supported="no">
 		<description>Lucky Luke: The Video Game [CDi Ready]</description>
 		<year>1996</year>
 		<publisher>Philips Media GmbH</publisher>
