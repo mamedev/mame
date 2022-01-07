@@ -277,6 +277,8 @@
 #include "softlist.h"
 
 #define CPU_CLOCK (200000000)
+// cfr. sh4.cpp m_mmuhack
+#define DC_MMU_HACK_MODE (1)
 
 void dc_cons_state::init_dc()
 {
@@ -319,10 +321,12 @@ uint64_t dc_cons_state::dc_pdtra_r()
 		}
 	}
 
-	/*
-	cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
-	Note: several games doesn't like VGA setting (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta), default to composite.
-	*/
+
+	// cable setting, (0) VGA, (2) TV RGB (3) TV VBS/Y + S/C.
+	// Note: several games doesn't like VGA setting,
+	// default to composite for max possible compatibility
+	// (i.e. Idol Janshi wo Tsukucchaou, Airforce Delta)
+	// TODO: identify via script
 	out |= ioport("SCREEN_TYPE")->read() << 8;
 
 	return out;
@@ -595,6 +599,7 @@ void dc_cons_state::dc_base(machine_config &config)
 	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dc_cons_state::dc_map);
 	m_maincpu->set_addrmap(AS_IO, &dc_cons_state::dc_port);
+	m_maincpu->set_mmu_hacktype(DC_MMU_HACK_MODE);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 

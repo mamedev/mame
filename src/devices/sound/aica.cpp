@@ -17,7 +17,7 @@
     - Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
     - Derive from SCSP device;
-    - Sound clips a bit too much (cfr. deathcox, bdrdown). dB scale tables?
+    - Sound clips a bit too much (cfr. deathcox, bdrdown, samba title screen). dB scale tables?
 */
 
 #include "emu.h"
