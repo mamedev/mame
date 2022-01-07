@@ -223,7 +223,7 @@ RCA Studio II Factory Test Cart: http://videogamekraken.com/rca-studio-ii-protot
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
 				<rom name="bingo.u1" size="0x200" crc="48a7fb02" sha1="8e86d01f10d4a9c21ea50949c6c959c4f082d934"/>
-				<rom name="bingo.u2" size="0x200" crc="b2aa75578" sha1="5c3eb80066420002bc3dcc7ca4ab6efad7ed4ae5" offset="0x200" />
+				<rom name="bingo.u2" size="0x200" crc="b2aa7578" sha1="5c3eb80066420002bc3dcc7ca4ab6efad7ed4ae5" offset="0x200" />
 			</dataarea>
 		</part>
 	</software>
