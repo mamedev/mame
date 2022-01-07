@@ -10700,7 +10700,7 @@ license:CC0
 		<publisher>The Vision Factory</publisher>
 		<part name="cdrom" interface="cdi_cdrom">
 			<diskarea name="cdrom">
-				<disk name="the apprentice (cdi-ready)" sha1="7e1f612f1c36dabdc304abf2d17200b5faa4e180" status="baddump"/>
+				<disk name="the apprentice (cdi-ready)" sha1="3a66337c20b9157e64228847ee3d153f80c25e4e"/>
 			</diskarea>
 		</part>
 	</software>

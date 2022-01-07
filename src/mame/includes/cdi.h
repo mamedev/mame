@@ -21,7 +21,6 @@ public:
 	cdi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_cdda(*this, "cdda")
 		, m_lcd(*this, "lcd")
 		, m_planea(*this, "mcd212:planea")
 		, m_slave_hle(*this, "slave_hle")
@@ -43,7 +42,6 @@ protected:
 	void cdimono1_mem(address_map &map);
 
 	required_device<scc68070_device> m_maincpu;
-	required_device<cdda_device> m_cdda;
 	optional_device<screen_device> m_lcd;
 
 private:

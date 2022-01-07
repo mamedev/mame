@@ -436,10 +436,6 @@ void cdi_state::cdimono1_base(machine_config &config)
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
 	MK48T08(config, "mk48t08");
 }
 
@@ -489,10 +485,6 @@ void cdi_state::cdimono2(machine_config &config)
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
 	MK48T08(config, "mk48t08");
 }
 
@@ -540,10 +532,6 @@ void cdi_state::cdi910(machine_config &config)
 
 	DMADAC(config, m_dmadac[1]);
 	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-
-	CDDA(config, m_cdda);
-	m_cdda->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_cdda->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	MK48T08(config, "mk48t08");
 }
