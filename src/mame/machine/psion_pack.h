@@ -9,7 +9,7 @@
 #ifndef MAME_MACHINE_PSION_PACK_H
 #define MAME_MACHINE_PSION_PACK_H
 
-#include "softlist_dev.h"
+#include "imagedev/memcard.h"
 
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 // ======================> datapack_device
 
 class datapack_device : public device_t,
-						public device_image_interface
+						public device_memcard_image_interface
 {
 public:
 	// construction/destruction
@@ -31,14 +31,11 @@ public:
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *create_args) override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override { return "psion_pack"; }
 	virtual const char *file_extensions() const noexcept override { return "opk"; }
+	virtual const char *image_type_name() const noexcept override { return "datapack"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "dpak"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
@@ -56,7 +53,7 @@ protected:
 	virtual void device_config_complete() override;
 
 	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const override;
 
 private:
 	// internal device state

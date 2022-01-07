@@ -1269,6 +1269,7 @@ void vboy_state::vboy(machine_config &config)
 
 	/* cartridge */
 	VBOY_CART_SLOT(config, m_cart, vboy_carts, nullptr);
+	m_cart->set_must_be_loaded(true);
 	m_cart->intcro().set_inputline(m_maincpu, 2);
 	m_cart->set_exp(m_maincpu, AS_PROGRAM, 0x0400'0000);
 	m_cart->set_chip(m_maincpu, AS_PROGRAM, 0x0600'0000);

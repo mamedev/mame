@@ -24,7 +24,7 @@
 #include "formats/fs_unformatted.h"
 #include "formats/fsblk_vec.h"
 
-#include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/imageutl.h"
@@ -426,6 +426,11 @@ void floppy_image_device::device_config_complete()
 
 	setup_characteristics();
 	register_formats();
+}
+
+const software_list_loader &floppy_image_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }
 
 

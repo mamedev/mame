@@ -23,6 +23,8 @@
 #include "emu.h"
 #include "psion_pack.h"
 
+#include "softlist_dev.h"
+
 #include "opresolv.h"
 
 // Datapack control lines
@@ -64,7 +66,7 @@ DEFINE_DEVICE_TYPE(PSION_DATAPACK, datapack_device, "datapack", "Psion Datapack"
 
 datapack_device::datapack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PSION_DATAPACK, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_memcard_image_interface(mconfig, *this)
 {
 }
 
@@ -97,6 +99,16 @@ void datapack_device::device_start()
 void datapack_device::device_config_complete()
 {
 	add_format("opk", "Psion Datapack image", "opk", datapack_option_spec);
+}
+
+
+//-------------------------------------------------
+//  get_software_list_loader -
+//-------------------------------------------------
+
+const software_list_loader &datapack_device::get_software_list_loader() const
+{
+	return image_software_list_loader::instance();
 }
 
 

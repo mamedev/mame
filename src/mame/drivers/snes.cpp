@@ -1371,6 +1371,7 @@ void snes_console_state::snes(machine_config &config)
 	m_s_dsp->add_route(1, "rspeaker", 1.00);
 
 	SNS_CART_SLOT(config, m_cartslot, MCLK_NTSC, snes_cart, nullptr);
+	m_cartslot->set_must_be_loaded(true);
 	m_cartslot->irq_callback().set(m_scpu_irq, FUNC(input_merger_device::in_w<1>)); // FIXME: conflict with video interrupt, it should be ORed
 	m_cartslot->open_bus_callback().set(FUNC(snes_console_state::snes_open_bus_r));
 	m_cartslot->set_scanlines(SNES_VTOTAL_NTSC);
