@@ -271,6 +271,8 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 		case fs::dir_entry_type::dir: {
 			auto subdir = dir.dir_get(c.m_key);
 			auto meta = subdir.metadata();
+			if (!meta.has(fs::meta_name::name))
+				meta.set(fs::meta_name::name, c.m_name);
 			for(const auto &m : dmetad) {
 				if(!meta.has(m.m_name))
 					continue;
@@ -287,6 +289,8 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 		case fs::dir_entry_type::system_file: {
 			auto file = dir.file_get(c.m_key);
 			auto meta = file.metadata();
+			if (!meta.has(fs::meta_name::name))
+				meta.set(fs::meta_name::name, c.m_name);
 			for(const auto &m : fmetad) {
 				if(!meta.has(m.m_name))
 					continue;
