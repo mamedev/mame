@@ -89,6 +89,8 @@ void k573dio_device::amap(address_map &map)
 	map(0x0a, 0x0b).r(FUNC(k573dio_device::a0a_r));
 	map(0x10, 0x11).w(FUNC(k573dio_device::a10_w));
 	map(0x80, 0x81).r(FUNC(k573dio_device::a80_r));
+	map(0x90, 0x91).w(FUNC(k573dio_device::network_id_w));
+	//map(0x92, 0x93).w(FUNC(k573dio_device::network_unk_w));
 	map(0xa0, 0xa1).w(FUNC(k573dio_device::mpeg_start_adr_high_w));
 	map(0xa2, 0xa3).w(FUNC(k573dio_device::mpeg_start_adr_low_w));
 	map(0xa4, 0xa5).w(FUNC(k573dio_device::mpeg_end_adr_high_w));
@@ -102,6 +104,10 @@ void k573dio_device::amap(address_map &map)
 	map(0xb4, 0xb5).rw(FUNC(k573dio_device::ram_r), FUNC(k573dio_device::ram_w));
 	map(0xb6, 0xb7).w(FUNC(k573dio_device::ram_read_adr_high_w));
 	map(0xb8, 0xb9).w(FUNC(k573dio_device::ram_read_adr_low_w));
+	map(0xc0, 0xc1).rw(FUNC(k573dio_device::network_r), FUNC(k573dio_device::network_w));
+	map(0xc2, 0xc3).r(FUNC(k573dio_device::network_output_buf_size_r));
+	map(0xc4, 0xc5).r(FUNC(k573dio_device::network_input_buf_size_r));
+	//map(0xc8, 0xc9).w(FUNC(k573dio_device::network_unk2_w));
 	map(0xca, 0xcb).r(FUNC(k573dio_device::mp3_counter_high_r));
 	map(0xcc, 0xcd).rw(FUNC(k573dio_device::mp3_counter_low_r), FUNC(k573dio_device::mp3_counter_low_w));
 	map(0xce, 0xcf).r(FUNC(k573dio_device::mp3_counter_diff_r));
@@ -138,6 +144,7 @@ void k573dio_device::device_start()
 	save_item(NAME(output_data));
 	save_item(NAME(is_ddrsbm_fpga));
 	save_item(NAME(crypto_key1));
+	save_item(NAME(network_id));
 
 	k573fpga->set_ddrsbm_fpga(is_ddrsbm_fpga);
 }
@@ -147,6 +154,7 @@ void k573dio_device::device_reset()
 	ram_adr = 0;
 	ram_read_adr = 0;
 	crypto_key1 = 0;
+	network_id = 0;
 
 	std::fill(std::begin(output_data), std::end(output_data), 0);
 }
@@ -208,12 +216,6 @@ uint16_t k573dio_device::a0a_r()
 void k573dio_device::a10_w(uint16_t data)
 {
 	LOGUNKNOWNREG("%s: a10_w: %04x (%s)\n", tag(), data, machine().describe_context());
-}
-
-uint16_t k573dio_device::ac4_r()
-{
-	LOGUNKNOWNREG("%s: ac4_r (%s)\n", tag(), machine().describe_context());
-	return 0;
 }
 
 uint16_t k573dio_device::a80_r()
@@ -434,4 +436,33 @@ void k573dio_device::output(int offset, uint16_t data)
 			output_cb(4*offset + i, newbit, 0xff);
 	}
 	output_data[offset] = data;
+}
+
+uint16_t k573dio_device::network_r()
+{
+	// Return a byte from the input buffer
+	return 0;
+}
+
+void k573dio_device::network_w(uint16_t data)
+{
+	// Write a byte to the output buffer
+}
+
+uint16_t k573dio_device::network_output_buf_size_r()
+{
+	// Number of bytes in the output buffer waiting to be sent
+	return 0;
+}
+
+uint16_t k573dio_device::network_input_buf_size_r()
+{
+	// Number of bytes in the input buffer waiting to be read
+	return 0;
+}
+
+void k573dio_device::network_id_w(uint16_t data)
+{
+	// The network ID configured in the operator menu
+	network_id = data;
 }

@@ -25,7 +25,6 @@ public:
 	uint16_t a0a_r();
 	void a10_w(uint16_t data);
 	uint16_t a80_r();
-	uint16_t ac4_r();
 
 	void mpeg_start_adr_high_w(uint16_t data);
 	void mpeg_start_adr_low_w(uint16_t data);
@@ -61,6 +60,11 @@ public:
 	void output_4_w(uint16_t data);
 	void output_2_w(uint16_t data);
 	void output_5_w(uint16_t data);
+	uint16_t network_r();
+	void network_w(uint16_t data);
+	uint16_t network_output_buf_size_r();
+	uint16_t network_input_buf_size_r();
+	void network_id_w(uint16_t data);
 
 protected:
 	virtual void device_start() override;
@@ -82,6 +86,8 @@ private:
 
 	bool is_ddrsbm_fpga;
 	u16 crypto_key1;
+
+	uint16_t network_id;
 };
 
 DECLARE_DEVICE_TYPE(KONAMI_573_DIGITAL_IO_BOARD, k573dio_device)
