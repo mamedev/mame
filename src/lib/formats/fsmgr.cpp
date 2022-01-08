@@ -216,49 +216,49 @@ void fsblk_t::block_t::w32l(u32 offset, u32 data)
 	blk[3] = data >> 24;
 }
 
-std::string fsblk_t::block_t::rstr(u32 offset, u32 size)
+std::string fsblk_t::block_t::rstr(u32 offset, u32 size) const
 {
 	const u8 *d = m_object->rooffset("rstr", offset, size);
 	return std::string(d, d + size);
 }
 
-u8 fsblk_t::block_t::r8(u32 offset)
+u8 fsblk_t::block_t::r8(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r8", offset, 1);
 	return blk[0];
 }
 
-u16 fsblk_t::block_t::r16b(u32 offset)
+u16 fsblk_t::block_t::r16b(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r16b", offset, 2);
 	return (blk[0] << 8) | blk[1];
 }
 
-u32 fsblk_t::block_t::r24b(u32 offset)
+u32 fsblk_t::block_t::r24b(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r24b", offset, 3);
 	return (blk[0] << 16) | (blk[1] << 8) | blk[2];
 }
 
-u32 fsblk_t::block_t::r32b(u32 offset)
+u32 fsblk_t::block_t::r32b(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r32b", offset, 4);
 	return (blk[0] << 24) | (blk[1] << 16) | (blk[2] << 8) | blk[3];
 }
 
-u16 fsblk_t::block_t::r16l(u32 offset)
+u16 fsblk_t::block_t::r16l(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r16l", offset, 2);
 	return blk[0] | (blk[1] << 8);
 }
 
-u32 fsblk_t::block_t::r24l(u32 offset)
+u32 fsblk_t::block_t::r24l(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r24l", offset, 3);
 	return blk[0] | (blk[1] << 8) | (blk[2] << 16);
 }
 
-u32 fsblk_t::block_t::r32l(u32 offset)
+u32 fsblk_t::block_t::r32l(u32 offset) const
 {
 	const u8 *blk = m_object->offset("r32l", offset, 4);
 	return blk[0] | (blk[1] << 8) | (blk[2] << 16) | (blk[3] << 24);
