@@ -1377,7 +1377,7 @@ ROM_END
 
 **********************************************************/
 
-ROM_START( crzmon ) // 030217
+ROM_START( czmon ) // 030217
 	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
 	ROM_LOAD( "cm_m_030217.rom", 0x00000, 0x40000, CRC(199ebd48) SHA1(75787f32aa4c8e8ff7bc11c57a37ad5a65f71c52) )
 
@@ -3561,7 +3561,7 @@ GAME( 2002, mfish_13,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 
 GAME( 2002, windjamr,    0,        igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Windjammer (021216)", MACHINE_SUPPORTS_SAVE ) /* World */
 
-GAME( 2003, crzmon,      czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030217 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
+GAME( 2003, czmon,       czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030217 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, czmon_2,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030225 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, czmon_3,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030227 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
 GAME( 2003, czmon_4,     czmon_13, igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,      ROT0, "Igrosoft", "Crazy Monkey (030404 World)",         MACHINE_SUPPORTS_SAVE ) /* World */
