@@ -269,7 +269,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
 	[[deprecated("IRQs should be cleared explicitly")]] void hold_irq_line();
 	void reset_cpu();
-	[[deprecated("devices should stop poking into memory spaces where they don't belong")]] void poke(offs_t offset, uint8_t data);
 
 	// internal state
 	uint8_t *m_prg;

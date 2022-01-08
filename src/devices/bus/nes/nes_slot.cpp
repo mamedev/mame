@@ -574,12 +574,6 @@ void device_nes_cart_interface::reset_cpu()
 	m_maincpu->set_pc(0xfffc);
 }
 
-void device_nes_cart_interface::poke(offs_t offset, uint8_t data)
-{
-	// even worse hack
-	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
-}
-
 //-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
