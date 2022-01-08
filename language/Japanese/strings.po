@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2022-01-07 20:59+0900\n"
+"PO-Revision-Date: 2022-01-08 23:44+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: MAME Language Team\n"
 "Language: ja\n"
@@ -2541,11 +2541,11 @@ msgstr "新規バーコード:"
 
 #: src/frontend/mame/ui/barcode.cpp:80
 msgid "Enter Code"
-msgstr "コードを入れる"
+msgstr "コードを入力"
 
 #: src/frontend/mame/ui/barcode.cpp:116
 msgid "Barcode length invalid!"
-msgstr "バーコードの長さが合いません!"
+msgstr "バーコードの長さが無効です！"
 
 #: src/frontend/mame/ui/mainmenu.cpp:121
 msgid "Input (general)"
@@ -5064,7 +5064,7 @@ msgstr "FPSを表示"
 #: src/emu/inpttype.ipp:822
 msgctxt "input-name"
 msgid "Save Snapshot"
-msgstr "スクリーショットを保存"
+msgstr "スクリーンショットを保存"
 
 #: src/emu/inpttype.ipp:823
 msgctxt "input-name"
@@ -5250,7 +5250,7 @@ msgstr "フルスクリーンの切り替え"
 #: src/osd/modules/input/input_windows.cpp:117
 msgctxt "input-name"
 msgid "Take Rendered Snapshot"
-msgstr "スクリーンショットを撮る"
+msgstr "スクリーンショットを保存"
 
 #: src/osd/modules/input/input_windows.cpp:128
 #: src/osd/modules/input/input_sdlcommon.cpp:223
