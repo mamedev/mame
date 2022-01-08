@@ -91,10 +91,10 @@ void k573dio_device::amap(address_map &map)
 	map(0x80, 0x81).r(FUNC(k573dio_device::a80_r));
 	map(0x90, 0x91).w(FUNC(k573dio_device::network_id_w));
 	//map(0x92, 0x93).w(FUNC(k573dio_device::network_unk_w));
-	map(0xa0, 0xa1).w(FUNC(k573dio_device::mpeg_start_adr_high_w));
-	map(0xa2, 0xa3).w(FUNC(k573dio_device::mpeg_start_adr_low_w));
-	map(0xa4, 0xa5).w(FUNC(k573dio_device::mpeg_end_adr_high_w));
-	map(0xa6, 0xa7).w(FUNC(k573dio_device::mpeg_end_adr_low_w));
+	map(0xa0, 0xa1).rw(FUNC(k573dio_device::mpeg_start_adr_high_r), FUNC(k573dio_device::mpeg_start_adr_high_w));
+	map(0xa2, 0xa3).rw(FUNC(k573dio_device::mpeg_start_adr_low_r), FUNC(k573dio_device::mpeg_start_adr_low_w));
+	map(0xa4, 0xa5).rw(FUNC(k573dio_device::mpeg_end_adr_high_r), FUNC(k573dio_device::mpeg_end_adr_high_w));
+	map(0xa6, 0xa7).rw(FUNC(k573dio_device::mpeg_end_adr_low_r), FUNC(k573dio_device::mpeg_end_adr_low_w));
 	map(0xa8, 0xa9).rw(FUNC(k573dio_device::mpeg_key_1_r), FUNC(k573dio_device::mpeg_key_1_w));
 	map(0xaa, 0xab).r(FUNC(k573dio_device::mpeg_ctrl_r));
 	map(0xac, 0xad).rw(FUNC(k573dio_device::mas_i2c_r), FUNC(k573dio_device::mas_i2c_w));
@@ -224,10 +224,20 @@ uint16_t k573dio_device::a80_r()
 	return 0x1234;
 }
 
+uint16_t k573dio_device::mpeg_start_adr_high_r()
+{
+	return k573fpga->get_mp3_start_addr() >> 16;
+}
+
 void k573dio_device::mpeg_start_adr_high_w(uint16_t data)
 {
 	LOGMP3("FPGA MPEG start address high %04x\n", data);
 	k573fpga->set_mp3_start_addr((k573fpga->get_mp3_start_addr() & 0x0000ffff) | (data << 16)); // high
+}
+
+uint16_t k573dio_device::mpeg_start_adr_low_r()
+{
+	return k573fpga->get_mp3_start_addr() & 0xffff;
 }
 
 void k573dio_device::mpeg_start_adr_low_w(uint16_t data)
@@ -239,10 +249,20 @@ void k573dio_device::mpeg_start_adr_low_w(uint16_t data)
 		k573fpga->set_crypto_key3(0);
 }
 
+uint16_t k573dio_device::mpeg_end_adr_high_r()
+{
+	return k573fpga->get_mp3_end_addr() >> 16;
+}
+
 void k573dio_device::mpeg_end_adr_high_w(uint16_t data)
 {
 	LOGMP3("FPGA MPEG end address high %04x\n", data);
 	k573fpga->set_mp3_end_addr((k573fpga->get_mp3_end_addr() & 0x0000ffff) | (data << 16)); // high
+}
+
+uint16_t k573dio_device::mpeg_end_adr_low_r()
+{
+	return k573fpga->get_mp3_end_addr() & 0xffff;
 }
 
 void k573dio_device::mpeg_end_adr_low_w(uint16_t data)
