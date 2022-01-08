@@ -46889,4 +46889,53 @@ license:CC0
 		</part>
 	</software>
 
+	<software name="germhangmanr2">
+		<description>The German Hangman (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"The German Hangman" (a.k.a. "German Practice") is a 1982 educational program developed and distributed by George Earl. This undated revision contains spelling corrections. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the german hangman rev. 2 (4am crack).dsk" size="143360" crc="27b0db8b" sha1="ddcdd35c993dcb96bf0bb87fb7fdabe7251a2cfe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruhangmnr2">
+		<description>The Russian Hangman (Revision 2) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"The Russian Hangman" (a.k.a. "Russian Practice") is a 1982 educational program developed and distributed by George Earl. This undated revision fixes several spelling errors. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the russian hangman rev. 2 (4am crack).dsk" size="143360" crc="6d0a737a" sha1="4da3bdcc9b34c4363b3774d2baf5f1315adc68df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spnhangr2">
+		<description>The Spanish Hangman (Revision 2) (cleanly cracked)</description>
+		<year>1983</year>
+		<publisher>George Earl</publisher>
+		<info name="release" value="2022-01-03"/>
+		<!--"The Spanish Hangman" is a 1983 educational program developed and distributed by George Earl. This undated revision fixes several spelling errors. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spanish hangman rev. 2 (4am crack) side a.dsk" size="143360" crc="c2ffb4aa" sha1="0e2f433415d48c628c448d5e0653132f25664dd3"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the spanish hangman rev. 2 (4am crack) side b.dsk" size="143360" crc="9356d978" sha1="5a078e8488eb531f37698d9b336bfc666a524ce5"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
