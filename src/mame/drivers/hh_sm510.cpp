@@ -1583,8 +1583,8 @@ ROM_START( nupogodi )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "im-02.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
 
-	ROM_REGION( 156488, "screen", 0)
-	ROM_LOAD( "nupogodi.svg", 0, 156488, CRC(8ae6ec5d) SHA1(28cb05967837e52fc40f088361456e1dcd4ec09f) )
+	ROM_REGION( 154233, "screen", 0)
+	ROM_LOAD( "nupogodi.svg", 0, 154233, CRC(bf4b1838) SHA1(f01eecb8b60adb2623588dc05b1be7ab6ac33791) )
 ROM_END
 
 ROM_START( ehockey )
