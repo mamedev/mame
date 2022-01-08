@@ -313,7 +313,7 @@ private:
 
 	void twinkle_io_w(offs_t offset, uint8_t data);
 	uint8_t twinkle_io_r(offs_t offset);
-	void twinkle_output_w(offs_t offset, uint16_t data);
+	void twinkle_videomixer_w(offs_t offset, uint16_t data);
 	void led_w(uint16_t data);
 	void key_led_w(uint16_t data);
 	void serial_w(uint16_t data);
@@ -691,21 +691,71 @@ uint8_t twinkle_state::twinkle_io_r(offs_t offset)
 	return data;
 }
 
-void twinkle_state::twinkle_output_w(offs_t offset, uint16_t data)
+void twinkle_state::twinkle_videomixer_w(offs_t offset, uint16_t data)
 {
+	// Bt812 NTSC/PAL to RGB/YCrCb Decoder chip
 	switch( offset )
 	{
 	case 0x00:
-		/* offset */
+		/*
+			Address Register offset
+			0x00 Command Register 0, Input Select Register
+			0x01 Reserved
+			0x02 Command Register 2, Status Register
+			0x03 Command Register 3, Output Format Register
+			0x04 Command Register 4, Operation Mode Select Register
+			0x05 Command Register 5, Input Format Register
+			0x06 Command Register 6, Clock Definition Register
+			0x07 Command Register 7, Video Timing Definition Register
+			0x08 Brightness Adjust Register (range: -64 to +63)
+			0x09 Contrast Adjust Register (range: 0 to 198.44%)
+			0x0a Saturation Adjust Register (range: 0 to 198.44%)
+			0x0b Hue Adjust Register (range: -45 to +44.3)
+			0x0c HCLOCK Low Register
+			0x0d HCLOCK High Register
+			0x0e HDELAY Low Register
+			0x0f HDELAY High Register
+			0x10 ACTIVE_PIXELS Low Register
+			0x11 ACTIVE_PIXELS High Register
+			0x12 VDELAY Low Register
+			0x13 VDELAY High Register
+			0x14 ACTIVE_LINES Low Register
+			0x15 ACTIVE_LINES High Register
+			0x16 P (subcarrier freq) Register 0
+			0x17 P (subcarrier freq) Register 1
+			0x18 P (subcarrier freq) Register 2
+			0x19 AGC Delay Register
+			0x1a Burst Delay Register
+			0x1b Sample Rate Conversion Low Register
+			0x1c Sample Rate Conversion High Register
+			0x1d Command Register 1D, Video Timing Polarity Register
+			0x1e-0xfe Reserved
+			0xff Software Reset
+		*/
 		break;
 	case 0x04:
-		/* data */
+		/*
+			Register data
+			Uses offset given in the address register offset command.
+
+			Game initialized values:
+			HCLOCK 853
+			HDELAY 126
+			ACTIVE_PIXELS 706
+			VDELAY 22
+			ACTIVE_LINES 16
+		*/
 		break;
 	case 0x08:
-		// overlay enable?
+		// Status bits?
+		// Seen values:
+		// 0x01 - ?
+		// 0x02 - Perform overlay mixing
+		// 0x08 - ?
 		break;
 	case 0x10:
 		{
+			// Always writes 0x214 and 0x128 here?
 			int clock = (data >> 0) & 1;
 			int _do = (data >> 1) & 1;
 			int cs = (data >> 2) & 1;
@@ -738,13 +788,13 @@ void twinkle_state::twinkle_output_w(offs_t offset, uint16_t data)
 		}
 		break;
 	case 0x18:
-		/* ?? */
+		// Always 0x69?
 		break;
 	case 0x30:
-		/* ?? */
+		// Always 0x10?
 		break;
 	case 0x48:
-		/* ?? */
+		// 0x20 - Powered on?
 		break;
 	}
 }
@@ -835,7 +885,7 @@ void twinkle_state::main_map(address_map &map)
 	map(0x1f280000, 0x1f280003).portr("INSEC");
 	map(0x1f290000, 0x1f29007f).rw("rtc", FUNC(rtc65271_device::rtc_r), FUNC(rtc65271_device::rtc_w)).umask32(0x00ff00ff);
 	map(0x1f2a0000, 0x1f2a007f).rw("rtc", FUNC(rtc65271_device::xram_r), FUNC(rtc65271_device::xram_w)).umask32(0x00ff00ff);
-	map(0x1f2b0000, 0x1f2b00ff).w(FUNC(twinkle_state::twinkle_output_w));
+	map(0x1f2b0000, 0x1f2b00ff).w(FUNC(twinkle_state::twinkle_videomixer_w));
 }
 
 /* SPU board */
@@ -1094,6 +1144,7 @@ void twinkle_state::twinkle(machine_config &config)
 
 	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
+	// TODO: The DVD player is connected to the PSX SIO1 for all versions before beatmania IIDX 2nd style
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", 0));
 	rs232.option_add("xvd701", JVC_XVD701);
 //  rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
