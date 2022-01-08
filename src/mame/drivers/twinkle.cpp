@@ -305,8 +305,11 @@ public:
 	}
 
 	void twinklex(machine_config &config);
+	void twinklex2(machine_config &config);
 	void twinklei(machine_config &config);
 	void twinkle(machine_config &config);
+	void twinkle_dvd_type1(machine_config &config);
+	void twinkle_dvd_type2(machine_config &config);
 
 private:
 	virtual void machine_start() override;
@@ -1144,22 +1147,6 @@ void twinkle_state::twinkle(machine_config &config)
 
 	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
-	// TODO: The DVD player is connected to the PSX SIO1 for all versions before beatmania IIDX 2nd style
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", 0));
-	rs232.option_add("xvd701", JVC_XVD701);
-//  rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
-	rs232.set_default_option("xvd701");
-	rs232.rxd_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::rx_w));
-	rs232.dcd_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::dcd_w));
-	rs232.dsr_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::dsr_w));
-	rs232.ri_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::ri_w));
-	rs232.cts_handler().set("fdc37c665gt:uart2", FUNC(ins8250_uart_device::cts_w));
-
-	ns16550_device &uart(*subdevice<ns16550_device>("fdc37c665gt:uart2"));
-	uart.out_tx_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	uart.out_dtr_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
-	uart.out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
-
 	/* video hardware */
 	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x200000, subdevice<psxcpu_device>("maincpu")).set_screen("screen");
 
@@ -1181,15 +1168,82 @@ void twinkle_state::twinkle(machine_config &config)
 	rf5c400.add_route(1, "speakerright", 1.0);
 }
 
+void twinkle_state::twinkle_dvd_type1(machine_config &config)
+{
+	// All versions before beatmania IIDX 2nd style
+	//   - maincpu:sio1 (PSX SIO1) is used for the DVD player
+	//   - fdc37c665gt:uart2 is used for network/session play
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232.option_add("xvd701", JVC_XVD701);
+	rs232.set_default_option("xvd701");
+
+	// TODO: CTS isn't implemented in SIO but it's required to fix the DVD player error for very early IIDX games
+	auto sio1 = subdevice<psxsio1_device>("maincpu:sio1");
+	rs232.rxd_handler().set(*sio1, FUNC(psxsio1_device::write_rxd));
+	rs232.dsr_handler().set(*sio1, FUNC(psxsio1_device::write_dsr));
+	//rs232.cts_handler().set(*sio1, FUNC(psxsio1_device::write_cts));
+	sio1->txd_handler().set(rs232, FUNC(rs232_port_device::write_txd));
+	sio1->dtr_handler().set(rs232, FUNC(rs232_port_device::write_dtr));
+	sio1->rts_handler().set(rs232, FUNC(rs232_port_device::write_rts));
+
+	ns16550_device &uart(*subdevice<ns16550_device>("fdc37c665gt:uart2"));
+	rs232_port_device &rs232_network(RS232_PORT(config, "rs232_network", default_rs232_devices, nullptr));
+	uart.out_tx_callback().set(rs232_network, FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set(rs232_network, FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set(rs232_network, FUNC(rs232_port_device::write_rts));
+	rs232_network.rxd_handler().set(uart, FUNC(ns16550_device::rx_w));
+	rs232_network.dcd_handler().set(uart, FUNC(ns16550_device::dcd_w));
+	rs232_network.dsr_handler().set(uart, FUNC(ns16550_device::dsr_w));
+	rs232_network.ri_handler().set(uart, FUNC(ns16550_device::ri_w));
+	rs232_network.cts_handler().set(uart, FUNC(ns16550_device::cts_w));
+}
+
+void twinkle_state::twinkle_dvd_type2(machine_config &config)
+{
+	// All versions starting from beatmania IIDX 2nd style
+	//   - fdc37c665gt:uart2 is used for the DVD player
+	//   - maincpu:sio1 (PSX SIO1) is used for network/session play
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232.option_add("xvd701", JVC_XVD701);
+	// rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
+	rs232.set_default_option("xvd701");
+
+	auto sio1 = subdevice<psxsio1_device>("maincpu:sio1");
+	rs232_port_device &rs232_network(RS232_PORT(config, "rs232_network", default_rs232_devices, nullptr));
+	sio1->txd_handler().set(rs232_network, FUNC(rs232_port_device::write_txd));
+	sio1->dtr_handler().set(rs232_network, FUNC(rs232_port_device::write_dtr));
+	rs232_network.rxd_handler().set(*sio1, FUNC(psxsio1_device::write_rxd));
+	rs232_network.dsr_handler().set(*sio1, FUNC(psxsio1_device::write_dsr));
+
+	ns16550_device &uart(*subdevice<ns16550_device>("fdc37c665gt:uart2"));
+	uart.out_tx_callback().set(rs232, FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set(rs232, FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set(rs232, FUNC(rs232_port_device::write_rts));
+	rs232.rxd_handler().set(uart, FUNC(ns16550_device::rx_w));
+	rs232.dcd_handler().set(uart, FUNC(ns16550_device::dcd_w));
+	rs232.dsr_handler().set(uart, FUNC(ns16550_device::dsr_w));
+	rs232.ri_handler().set(uart, FUNC(ns16550_device::ri_w));
+	rs232.cts_handler().set(uart, FUNC(ns16550_device::cts_w));
+}
+
 void twinkle_state::twinklex(machine_config &config)
 {
 	twinkle(config);
+	twinkle_dvd_type1(config);
+	X76F041(config, "security");
+}
+
+void twinkle_state::twinklex2(machine_config &config)
+{
+	twinkle(config);
+	twinkle_dvd_type2(config);
 	X76F041(config, "security");
 }
 
 void twinkle_state::twinklei(machine_config &config)
 {
 	twinkle(config);
+	twinkle_dvd_type2(config);
 	I2C_M24C02(config, "security", 0); // M24C02-W
 }
 
@@ -1583,7 +1637,7 @@ GAMEL( 1999, bmiidxc,  gq863,   twinklex, twinklex, twinkle_state, empty_init, R
 GAMEL( 1999, bmiidxca, bmiidxc, twinklex, twinklex, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX with DDR 2nd Club Version (896 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING, layout_bmiidx )
 GAMEL( 1999, bmiidxs,  gq863,   twinklex, twinklex, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX Substream (983 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
 GAMEL( 1999, bmiidxsa, bmiidxs, twinklex, twinklex, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX Substream (983-AA JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
-GAMEL( 1999, bmiidxc2, gq863,   twinklex, twinklex, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
+GAMEL( 1999, bmiidxc2, gq863,   twinklex2,twinklex, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX Substream with DDR 2nd Club Version 2 (984 A01 BM)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
 GAMEL( 1999, bmiidx2,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 2nd style (GC985 JAA)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
 GAMEL( 2000, bmiidx3,  gq863,   twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAC)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
 GAMEL( 2000, bmiidx3b, bmiidx3, twinklei, twinklei, twinkle_state, empty_init, ROT0, "Konami", "beatmania IIDX 3rd style (GC992 JAB)", MACHINE_IMPERFECT_SOUND, layout_bmiidx )
