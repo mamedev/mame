@@ -49,7 +49,7 @@
   | AK4309B   CN18         29.450MHz  MAS3507D    |
   |                                               |
   |                           CN3                 |
-  | HYC24855  RCA-L/R                             |
+  | HYC2485S  RCA-1/2                             |
   |-----------------------------------------------|
 
   Notes:
@@ -73,8 +73,8 @@
   CN18        - 6 pin connector
   MAS3507D    - IM MAS3507D D8 9173 51 HM U 072953.000 ES  MPEG 1/2 Layer 2/3 Audio Decoder
   CN3         - Connector joining this PCB to the MAIN PCB
-  HYC24855    - ?
-  RCA-L/R     - RCA connectors for left/right audio output
+  HYC2485S    - RS485 transceiver
+  RCA-1/2     - RCA connectors for network communication
 
 */
 
@@ -89,7 +89,6 @@ void k573dio_device::amap(address_map &map)
 	map(0x0a, 0x0b).r(FUNC(k573dio_device::a0a_r));
 	map(0x10, 0x11).w(FUNC(k573dio_device::a10_w));
 	map(0x80, 0x81).r(FUNC(k573dio_device::a80_r));
-	map(0xc4, 0xc5).r(FUNC(k573dio_device::ac4_r));
 	map(0xa0, 0xa1).w(FUNC(k573dio_device::mpeg_start_adr_high_w));
 	map(0xa2, 0xa3).w(FUNC(k573dio_device::mpeg_start_adr_low_w));
 	map(0xa4, 0xa5).w(FUNC(k573dio_device::mpeg_end_adr_high_w));
