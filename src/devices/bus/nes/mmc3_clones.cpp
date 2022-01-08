@@ -242,8 +242,8 @@ nes_kof97_device::nes_kof97_device(const machine_config &mconfig, const char *ta
 {
 }
 
-nes_kof96_device::nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_txrom_device(mconfig, NES_KOF96, tag, owner, clock)
+nes_kof96_device::nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_txrom_device(mconfig, NES_KOF96, tag, owner, clock), m_mmc3_mode(true)
 {
 }
 
@@ -547,7 +547,6 @@ void nes_kasing_device::device_start()
 void nes_kasing_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-
 	m_mmc3_mode = true;
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
@@ -601,13 +600,13 @@ void nes_6035052_device::pcb_reset()
 void nes_kof96_device::device_start()
 {
 	mmc3_start();
-	save_item(NAME(m_reg));
+	save_item(NAME(m_mmc3_mode));
 }
 
 void nes_kof96_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	memset(m_reg, 0, sizeof(m_reg));
+	m_mmc3_mode = true;
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
@@ -1861,127 +1860,57 @@ void nes_kof97_device::write_h(offs_t offset, uint8_t data)
 
  Bootleg Board for KOF96
 
- Games: The King of Fighters 96, Sonic 3D Blast 6, Street
- Fighter Zero 2
+ Games: The King of Fighters 96, Street Fighter Zero 2
 
  MMC3 clone
 
  iNES: mapper 187
 
- In MESS: Preliminary Support.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
 void nes_kof96_device::prg_cb(int start, int bank)
 {
-	if (!(m_reg[0] & 0x80))
-		prg8_x(start, bank);
+	if (m_mmc3_mode)
+		nes_txrom_device::prg_cb(start, bank);
 }
 
 void nes_kof96_device::chr_cb(int start, int bank, int source)
 {
-	uint8_t chr_page = (m_latch & 0x80) >> 5;
-
-	if ((start & 0x04) == chr_page)
-		bank |= 0x100;
-
+	bank |= (m_latch << 1) & (start << 6) & 0x100;
 	chr1_x(start, bank, source);
 }
 
-void nes_kof96_device::write_l(offs_t offset, uint8_t data)
+void nes_kof96_device::write_l(offs_t offset, u8 data)
 {
-	uint8_t new_bank;
 	LOG_MMC(("kof96 write_l, offset: %04x, data: %02x\n", offset, data));
+
 	offset += 0x100;
-
-	if (offset == 0x1000)
+	if ((offset & 0x5001) == 0x1000)
 	{
-		m_reg[0] = data;
-
-		if (m_reg[0] & 0x80)
-		{
-			new_bank = (m_reg[0] & 0x1f);
-
-			if (m_reg[0] & 0x20)
-				prg32(new_bank >> 2);
-			else
-			{
-				prg16_89ab(new_bank);
-				prg16_cdef(new_bank);
-			}
-		}
-		else
+		m_mmc3_mode = !BIT(data, 7);
+		if (m_mmc3_mode)
 			set_prg(m_prg_base, m_prg_mask);
-	}
-
-	if (offset >= 0x1000)
-	{
-		switch (data & 0x03)
+		else
 		{
-			case 0x00:
-			case 0x01:
-				m_reg[1] = 0x83;
-				break;
-			case 0x02:
-				m_reg[1] = 0x42;
-				break;
-			case 0x03:
-				m_reg[1] = 0x00;
-				break;
+			u8 bank = (data >> 1) & 0x0f;
+			u8 mode = BIT(data, 5);
+			prg16_89ab(bank & ~mode);
+			prg16_cdef(bank | mode);
 		}
-
-	}
-
-	if (!m_reg[3] && offset > 0x1000)
-	{
-		m_reg[3] = 1;
-		poke(0x4017, 0x40); // FIXME
 	}
 }
 
-uint8_t nes_kof96_device::read_l(offs_t offset)
+u8 nes_kof96_device::read_l(offs_t offset)
 {
 	LOG_MMC(("kof96 read_l, offset: %04x\n", offset));
-	offset += 0x100;
 
-	if (!(offset < 0x1000))
-		return m_reg[1];
+	offset += 0x100;
+	if (offset >= 0x1000)
+		return 0x80;  // unknown protection read, kof96 expects that MSB is set
 	else
 		return 0;
-}
-
-void nes_kof96_device::write_h(offs_t offset, uint8_t data)
-{
-	LOG_MMC(("kof96 write_h, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset & 0x6003)
-	{
-		case 0x0000:
-			m_reg[2] = 1;
-			txrom_write(0x0000, data);
-			break;
-
-		case 0x0001:
-			if (m_reg[2])
-				txrom_write(0x0001, data);
-			break;
-
-		case 0x0002:
-			break;
-
-		case 0x0003:
-			m_reg[2] = 0;
-
-			if (data == 0x28)
-				prg8_cd(0x17);
-			else if (data == 0x2a)
-				prg8_ab(0x0f);
-			break;
-
-		default:
-			txrom_write(offset, data);
-			break;
-	}
 }
 
 /*-------------------------------------------------
