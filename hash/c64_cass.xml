@@ -9603,7 +9603,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	</software>
 
 	<software name="mwalk">
-		<description>Michael Jackson's Moonwalker</description>
+		<description>Michael Jackson: Moonwalker</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 
@@ -9615,7 +9615,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 	</software>
 
 	<software name="mwalka" cloneof="mwalk">
-		<description>Michael Jackson's Moonwalker (alt)</description>
+		<description>Michael Jackson: Moonwalker (alt)</description>
 		<year>1989</year>
 		<publisher>U.S. Gold</publisher>
 
