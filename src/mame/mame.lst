@@ -24052,7 +24052,8 @@ mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
 mps1230                         // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
 
 @source:mpu12wbk.cpp
-fruitstb                        //
+fruitstb                        // 199? Webak
+fruitstba                       // 1997 Webak
 
 @source:mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
