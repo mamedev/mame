@@ -78,8 +78,7 @@ constexpr double MOTION_MARGIN = 1e-5;  // Margin to ensure motion events have p
 constexpr hti_format_t::tape_pos_t TAPE_INIT_POS = 80 * hti_format_t::ONE_INCH_POS; // Initial tape position: 80" from beginning (just past the punched part)
 
 hp_dc100_tape_device::hp_dc100_tape_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig , HP_DC100_TAPE , tag , owner , clock)
-	, device_image_interface(mconfig , *this)
+	: microtape_image_device(mconfig , HP_DC100_TAPE , tag , owner , clock)
 	, m_cart_out_handler(*this)
 	, m_hole_handler(*this)
 	, m_tacho_tick_handler(*this)

@@ -2587,6 +2587,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/nippelclock.h",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/pc_xporter.h",
+		MAME_DIR .. "src/devices/bus/a2bus/prodosromdrive.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/prodosromdrive.h",
 		MAME_DIR .. "src/devices/bus/a2bus/q68.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/q68.h",
 		MAME_DIR .. "src/devices/bus/a2bus/ramcard128k.cpp",
@@ -4020,6 +4022,8 @@ if (BUSES["QBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/dsd4432.h",
+		MAME_DIR .. "src/devices/bus/qbus/dvk_kgd.cpp",
+		MAME_DIR .. "src/devices/bus/qbus/dvk_kgd.h",
 		MAME_DIR .. "src/devices/bus/qbus/pc11.cpp",
 		MAME_DIR .. "src/devices/bus/qbus/pc11.h",
 		MAME_DIR .. "src/devices/bus/qbus/qbus.cpp",

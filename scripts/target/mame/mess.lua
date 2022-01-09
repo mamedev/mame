@@ -829,6 +829,7 @@ MACHINES["BL_HANDHELDS_MENUCONTROL"] = true
 MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
 MACHINES["NS32082"] = true
+MACHINES["BITMAP_PRINTER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1184,6 +1185,8 @@ FORMATS["XDF_DSK"] = true
 FORMATS["ZX81_P"] = true
 FORMATS["FS_PRODOS"] = true
 FORMATS["FS_ORIC_JASMIN"] = true
+FORMATS["FS_COCO_RSDOS"] = true
+FORMATS["FS_COCO_OS9"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that
@@ -1274,6 +1277,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"exorterm",
 		"fairch",
 		"fairlight",
+		"falco",
 		"fidelity",
 		"force",
 		"francedr",
@@ -2463,6 +2467,13 @@ files {
 	MAME_DIR .. "src/mame/machine/cmi_ankbd.h",
 	MAME_DIR .. "src/mame/machine/cmi_mkbd.cpp",
 	MAME_DIR .. "src/mame/machine/cmi_mkbd.h",
+}
+
+createMESSProjects(_target, _subtarget, "falco")
+files {
+	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
+	MAME_DIR .. "src/mame/drivers/falcots.cpp",
+	MAME_DIR .. "src/mame/drivers/falcots28.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "fidelity")
@@ -4604,8 +4615,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/facit4440.cpp",
-	MAME_DIR .. "src/mame/drivers/falco5220.cpp",
-	MAME_DIR .. "src/mame/drivers/falcots.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucs15.cpp",
 	MAME_DIR .. "src/mame/drivers/fanucspmg.cpp",
 	MAME_DIR .. "src/mame/drivers/fc100.cpp",

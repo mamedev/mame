@@ -8,6 +8,7 @@
 
 #include "image_handler.h"
 
+#include "corefile.h"
 #include "corestr.h"
 #include "ioprocs.h"
 #include "strformat.h"
@@ -26,15 +27,21 @@
 
 static formats_table formats;
 
-static void display_usage()
+static void display_usage(const char *first_argument)
 {
+	std::string exe_name(core_filename_extract_base(first_argument));
+
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "       floptool.exe identify <inputfile> [<inputfile> ...]                                 -- Identify an image format\n");
-	fprintf(stderr, "       floptool.exe flopconvert [input_format|auto] output_format <inputfile> <outputfile> -- Convert a floppy image\n");
-	fprintf(stderr, "       floptool.exe flopcreate output_format filesystem <outputfile>                       -- Create a preformatted floppy image\n");
-	fprintf(stderr, "       floptool.exe flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n");
-	fprintf(stderr, "       floptool.exe flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n");
-	fprintf(stderr, "       floptool.exe flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n");
+	fprintf(stderr, "       %s identify <inputfile> [<inputfile> ...]                                 -- Identify an image format\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopconvert [input_format|auto] output_format <inputfile> <outputfile> -- Convert a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopcreate output_format filesystem <outputfile>                       -- Create a preformatted floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopdir input_format filesystem <image>                                -- List the contents of a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopread input_format filesystem <image> <path> <outputfile>           -- Extract a file from a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s flopwrite input_format filesystem <image> <inputfile> <path>           -- Write a file into a floppy image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hddir filesystem <image>                                               -- List the contents of a hard disk image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hdread filesystem <image> <path> <outputfile>                          -- Extract a file from a hard disk image\n", exe_name.c_str());
+	fprintf(stderr, "       %s hdwrite filesystem <image> <inputfile> <path>                          -- Write a file into a hard disk image\n", exe_name.c_str());
+	fprintf(stderr, "       %s version                                                                -- Display the current version of floptool\n", exe_name.c_str());
 }
 
 static void display_formats()
@@ -91,14 +98,13 @@ static void display_formats()
 		}
 }
 
-static void display_full_usage()
+static void display_full_usage(char *argv[])
 {
 	/* Usage */
 	fprintf(stderr, "floptool - Generic floppy image manipulation tool for use with MAME\n\n");
-	display_usage();
+	display_usage(argv[0]);
 	fprintf(stderr, "\n");
 	display_formats();
-
 }
 
 static int identify(int argc, char *argv[])
@@ -107,7 +113,7 @@ static int identify(int argc, char *argv[])
 
 	if(argc<3) {
 		fprintf(stderr, "Missing name of file to identify.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -179,7 +185,7 @@ static int flopconvert(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -219,7 +225,7 @@ static int flopcreate(int argc, char *argv[])
 {
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -265,6 +271,8 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 		case fs::dir_entry_type::dir: {
 			auto subdir = dir.dir_get(c.m_key);
 			auto meta = subdir.metadata();
+			if (!meta.has(fs::meta_name::name))
+				meta.set(fs::meta_name::name, c.m_name);
 			for(const auto &m : dmetad) {
 				if(!meta.has(m.m_name))
 					continue;
@@ -281,6 +289,8 @@ static void dir_scan(u32 depth, fs::filesystem_t::dir_t dir, std::vector<std::ve
 		case fs::dir_entry_type::system_file: {
 			auto file = dir.file_get(c.m_key);
 			auto meta = file.metadata();
+			if (!meta.has(fs::meta_name::name))
+				meta.set(fs::meta_name::name, c.m_name);
 			for(const auto &m : fmetad) {
 				if(!meta.has(m.m_name))
 					continue;
@@ -356,7 +366,7 @@ static int flopdir(int argc, char *argv[])
 {
 	if(argc!=5) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -395,7 +405,7 @@ static int hddir(int argc, char *argv[])
 {
 	if(argc!=4) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -480,7 +490,7 @@ static int flopread(int argc, char *argv[])
 {
 	if(argc!=7) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -519,7 +529,7 @@ static int hdread(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -601,7 +611,7 @@ static int flopwrite(int argc, char *argv[])
 {
 	if(argc!=7) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -648,7 +658,7 @@ static int hdwrite(int argc, char *argv[])
 {
 	if(argc!=6) {
 		fprintf(stderr, "Incorrect number of arguments.\n\n");
-		display_usage();
+		display_usage(argv[0]);
 		return 1;
 	}
 
@@ -675,12 +685,19 @@ static int hdwrite(int argc, char *argv[])
 	return generic_write(ih, argv[4], argv[5]);
 }
 
+static int version(int argc, char *argv[])
+{
+	extern const char build_version[];
+	fprintf(stdout, "%s\n", build_version);
+	return 0;
+}
+
 int CLIB_DECL main(int argc, char *argv[])
 {
 	formats.init();
 
 	if(argc == 1) {
-		display_full_usage();
+		display_full_usage(argv);
 		return 0;
 	}
 
@@ -703,9 +720,11 @@ int CLIB_DECL main(int argc, char *argv[])
 			return hdread(argc, argv);
 		else if(!core_stricmp("hdwrite", argv[1]))
 			return hdwrite(argc, argv);
+		else if (!core_stricmp("version", argv[1]))
+			return version(argc, argv);
 		else {
 			fprintf(stderr, "Unknown command '%s'\n\n", argv[1]);
-			display_usage();
+			display_usage(argv[0]);
 			return 1;
 		}
 	} catch(const std::exception &err) {

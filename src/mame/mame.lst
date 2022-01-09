@@ -1193,6 +1193,7 @@ tnextspcj                       // A8003 'NS' (c) 1989 - Japan
 
 @source:alpha68k_n.cpp
 jongbou                         // (c) 1987 SNK
+jongbou2                        // (c) 1987 SNK
 kyros                           // (c) 1987 World Games
 kyrosj                          // (c) 1986 Alpha Denshi Co.
 sstingry                        // (c) 1986 Alpha Denshi Co.
@@ -13750,6 +13751,9 @@ falco5220s                      // 1989
 ts1                             // 1980
 ts2624                          // 1982
 
+@source:falcots28.cpp
+ts28                            // 1983
+
 @source:falgas_m89.cpp
 cbully                          // (c) 1991 Falgas
 
@@ -14170,6 +14174,9 @@ fs3216                          //
 
 @source:ft68m.cpp
 ft68m                           //
+
+@source:funeball.cpp
+funeball                        // (c) 1997 Fun Industries Inc.
 
 @source:fungames.cpp
 biplane                         // (c) 1975 Fun Games
@@ -16513,6 +16520,7 @@ rkosmosa                        // Elektronika
 taddams                         // Tiger
 taltbeast                       // Tiger
 tapollo13                       // Tiger
+taynyoke                        // Elektronika
 tbatfor                         // Tiger
 tbatman                         // Tiger
 tbatmana                        // Tiger
@@ -31165,49 +31173,64 @@ crzmon2                         // (c) 2010
 crzmon2_2                       // (c) 2010
 crzmon2_3                       // (c) 2010
 crzmon2_4                       // (c) 2010
-czmon_13                        // (c) 2003
-czmon_15                        // (c) 2003
-czmon_16                        // (c) 2003
+czmon                           // (c) 2003
+czmon_2                         // (c) 2003
+czmon_3                         // (c) 2003
+czmon_4                         // (c) 2003
 czmon_5                         // (c) 2003
+czmon_6                         // (c) 2003
 czmon_7                         // (c) 2003
 czmon_8                         // (c) 2003
 czmon_9                         // (c) 2003
-fcockt_10                       // (c) 2003
-fcockt_11                       // (c) 2003
-fcockt_12                       // (c) 2003
-fcockt_14                       // (c) 2003
+czmon_12                        // (c) 2003
+czmon_13                        // (c) 2003
+czmon_15                        // (c) 2003
+czmon_16                        // (c) 2003
+fcockt                          // (c) 2003
+fcockt_2                        // (c) 2003
 fcockt_3                        // (c) 2003
+fcockt_4                        // (c) 2003
 fcockt_5                        // (c) 2003
 fcockt_6                        // (c) 2003
 fcockt_7                        // (c) 2003
 fcockt_8                        // (c) 2003
 fcockt_9                        // (c) 2003
+fcockt_10                       // (c) 2003
+fcockt_11                       // (c) 2003
+fcockt_12                       // (c) 2003
+fcockt_14                       // (c) 2003
 fcockt2                         // (c) 2008
+fcockt2_2                       // (c) 2008
 fcockt2_3                       // (c) 2008
 fcockt2_4                       // (c) 2008
 fcockt2_5                       // (c) 2008
 fcockt2_6                       // (c) 2008
 fcockt2_7                       // (c) 2008
+garage                          // (c) 2004
+garage_2                        // (c) 2004
+garage_3                        // (c) 2004
 garage_4                        // (c) 2004
 garage_5                        // (c) 2004
 garage_6                        // (c) 2004
 garage_7                        // (c) 2004
 garage_9                        // (c) 2004
 gnome                           // (c) 2007
-gnome_10                        // (c) 2007
-gnome_11                        // (c) 2007
-gnome_12                        // (c) 2007
 gnome_2                         // (c) 2007
 gnome_3                         // (c) 2007
 gnome_4                         // (c) 2007
 gnome_5                         // (c) 2007
 gnome_7                         // (c) 2007
+gnome_8                         // (c) 2007
 gnome_9                         // (c) 2007
+gnome_10                        // (c) 2007
+gnome_11                        // (c) 2007
+gnome_12                        // (c) 2007
 goldfish                        // (c) 2002 - Prototype of Multifish
 island                          // (c) 2005
 island_2                        // (c) 2005
 island_3                        // (c) 2005
 island2                         // (c) 2006
+island2_2                       // (c) 2006
 island2_3                       // (c) 2006
 island2_4                       // (c) 2006
 island2_5                       // (c) 2006
@@ -31219,20 +31242,30 @@ keks_4                          // (c) 2006
 keks_5                          // (c) 2006
 keks_6                          // (c) 2006
 keks_7                          // (c) 2006
-lhaunt_10                       // (c) 2003
-lhaunt_11                       // (c) 2003
+lhaunt                          // (c) 2003
 lhaunt_2                        // (c) 2003
+lhaunt_3                        // (c) 2003
 lhaunt_4                        // (c) 2003
 lhaunt_5                        // (c) 2003
 lhaunt_6                        // (c) 2003
 lhaunt_7                        // (c) 2003
 lhaunt_8                        // (c) 2003
+lhaunt_10                       // (c) 2003
+lhaunt_11                       // (c) 2003
+mfish                           // (c) 2002
+mfish_2                         // (c) 2002
+mfish_3                         // (c) 2002
+mfish_4                         // (c) 2002
+mfish_5                         // (c) 2002
+mfish_6                         // (c) 2002
+mfish_7                         // (c) 2002
+mfish_8                         // (c) 2002
+mfish_9                         // (c) 2002
+mfish_10                        // (c) 2002
 mfish_11                        // (c) 2002
 mfish_12                        // (c) 2002
 mfish_13                        // (c) 2002
-mfish_3                         // (c) 2002
-mfish_6                         // (c) 2002
-mfish_8                         // (c) 2002
+pirate                          // (c) 2005
 pirate_2                        // (c) 2005
 pirate_3                        // (c) 2005
 pirate_4                        // (c) 2005
@@ -31242,6 +31275,7 @@ pirate2_2                       // (c) 2006
 pirate2_3                       // (c) 2006
 pirate2_4                       // (c) 2006
 rclimb                          // (c) 2004
+rclimb_2                        // (c) 2004
 rclimb_3                        // (c) 2004
 rclimb_4                        // (c) 2004
 rclimb_5                        // (c) 2004
@@ -31249,9 +31283,11 @@ rclimb_7                        // (c) 2004
 resdnt                          // (c) 2004
 resdnt_2                        // (c) 2004
 resdnt_3                        // (c) 2004
+resdnt_5                        // (c) 2004
 resdnt_6                        // (c) 2004
 resdnt_8                        // (c) 2004
 resdnt_9                        // (c) 2004
+rollfr                          // (c) 2003
 rollfr_2                        // (c) 2003
 rollfr_3                        // (c) 2003
 rollfr_4                        // (c) 2003
@@ -40235,6 +40271,7 @@ tagteam                         // TA-0007 (c) 1983 + Data East license
 sformula                        // [1989] V-System Co. (Japan)
 sformulaa                       // [1989] V-System Co. (Japan)
 tail2nos                        // [1989] V-System Co.
+tail2nosa                       // [1989] V-System Co.
 
 @source:taito.cpp
 cavnegro                        //
@@ -43928,7 +43965,8 @@ zephyr                          //
 
 @source:zn.cpp
 1on1gov                         // 1 on 1 Government (JAPAN)
-aerofgts                        // Aero Fighters Special (TAIWAN)
+aerofgts                        // Aero Fighters Special (USA)
+aerofgtst                       // Aero Fighters Special (TAIWAN)
 bam2                            // Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00)
 beastrzr                        // Beastorizer (USA, Sep 22 1997)
 beastrzra                       // Beastorizer (USA, Jun 21 1997)

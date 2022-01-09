@@ -23,7 +23,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 namespace {

@@ -22,7 +22,7 @@
 #include "bus/generic/slot.h"
 #include "bus/svi3x8/expander/expander.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/svi_cas.h"

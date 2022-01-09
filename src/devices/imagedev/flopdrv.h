@@ -8,7 +8,6 @@
 #pragma once
 
 #include "formats/flopimg_legacy.h"
-#include "softlist_dev.h"
 
 #define FLOPPY_TYPE_REGULAR 0
 #define FLOPPY_TYPE_APPLE   1
@@ -107,15 +106,14 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override;
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *image_interface() const noexcept override;
 	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
+	virtual const char *image_type_name() const noexcept override { return "floppydisk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
 	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide(); }
 
 	floppy_image_legacy *flopimg_get_image();
@@ -172,7 +170,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const override;
 
 	/* callbacks */
 	devcb_write_line m_out_idx_func;

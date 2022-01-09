@@ -35,7 +35,7 @@
 #include "machine/pit8253.h"
 #include "machine/i8257.h"
 #include "sound/spkrdev.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"

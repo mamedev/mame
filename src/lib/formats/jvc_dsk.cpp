@@ -8,7 +8,7 @@
 
     Used by Jeff Vavasour's CoCo Emulators
 
-     Documentation taken from Tim Linder's web site:
+     Documentation taken from Tim Lindner's web site:
          http://tlindner.macmess.org/?page_id=86
 
      A. Header length

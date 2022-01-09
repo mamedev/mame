@@ -30,7 +30,7 @@
 #include "bus/rs232/rs232.h"
 #include "sound/dac.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /*

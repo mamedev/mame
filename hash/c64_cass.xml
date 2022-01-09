@@ -7057,7 +7057,7 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
-	<software name="hobbita" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
+	<software name="hobbita" cloneof="hobbit" supported="no"> <!-- game loads fully with a light blue screen but doesn't run -->
 		<description>The Hobbit (alt)</description>
 		<year>1985</year>
 		<publisher>Melbourne House</publisher>
@@ -9305,6 +9305,42 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="magmarble">
+		<description>Magic Marbles</description>
+		<year>1986</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="418289">
+				<rom name="Magic_Marbles.tap" size="418289" crc="2ed93d5d" sha1="26b33ea6b4c0e46dff759d1eb20a0bf4583a4d19"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magdizzy">
+		<description>Magicland Dizzy</description>
+		<year>1990</year>
+		<publisher>Codemasters</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="731907">
+				<rom name="Magicland_Dizzy.tap" size="731907" crc="f6419be2" sha1="93a59dccb781b1a3e784f993bed7d03c017af2d5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magnetro">
+		<description>Magnetron</description>
+		<year>1988</year>
+		<publisher>Firebird</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="374894">
+				<rom name="Magnetron.tap" size="374894" crc="c3b7040d" sha1="c4abeec419b1615d84d9d95e9f83feb2b1b2a444"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="majik">
 		<description>Majik</description>
 		<year>1988</year>
@@ -9337,6 +9373,58 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="383066">
 				<rom name="Manic_Miner_(MAD).tap" size="383066" crc="9c652294" sha1="a8d2428249335da51fa910d58f85ccc5d71f6ef8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marble">
+		<description>Marble Madness</description>
+		<year>1986</year>
+		<publisher>Ariolasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Main"/>
+			<dataarea name="cass" size="434338">
+				<rom name="Marble_Madness_Side_1_-_Main.tap" size="434338" crc="a4a479f9" sha1="ca740ed5b5294b90fd6743dddbffa4679d6bf6fc"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Level Data"/>
+			<dataarea name="cass" size="2235896">
+				<rom name="Marble_Madness_Side_2_-_Level_data.tap" size="2235896" crc="76d29d9a" sha1="7a911342162b806362cc3de0feeadc9f793b1c4f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario"> <!-- cass1 image does not run correctly (screen is filled with garbled graphics) -->
+		<description>Mario Bros</description>
+		<year>1987</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="cass1 image does not run correctly (screen is filled with garbled graphics) so use cass2 image instead"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="710739">
+				<rom name="Mario_Bros.tap" size="710739" crc="0eec9e90" sha1="95dac1f1782a8656d900ca54e4bc0615d5c126b5"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="710731">
+				<rom name="Mario_Bros_a1.tap" size="710731" crc="5d98b91b" sha1="aad3b9bbe5871eda6c0880175ffa25c864da1039"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mask2">
+		<description>MASK II</description>
+		<year>1987</year>
+		<publisher>Gremlin Graphics</publisher>
+		<info name="alt_title" value="MASK Two Two"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="961877">
+				<rom name="MASK_Two.tap" size="961877" crc="4677bc12" sha1="b2bb11ba10b06f5a59f3620ca910e26cde1e09d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9378,9 +9466,66 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Match Point (set 2)</description>
 		<year>1986</year>
 		<publisher>The Hit Squad</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="412484">
 				<rom name="Match Point.tap" size="412484" crc="4fb72ed9" sha1="7bcc2d1c6dc9818b24236e1e8ef094e98111d623"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathstut">
+		<description>Maths Tutor</description>
+		<year>1983</year>
+		<publisher>Channel 8 Software</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="758388">
+				<rom name="Maths_Tutor.tap" size="758388" crc="6e23f4a6" sha1="a15a61476eadb47576bd7d58137299a554c31c2b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix</description>
+		<year>1983</year>
+		<publisher>Llamasoft</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="845548">
+				<rom name="Matrix.tap" size="845548" crc="5dec5527" sha1="003fb7fd2bc40e14209fa5acf8df37c219d395b6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaapoc">
+		<description>Mega-Apocalypse</description>
+		<year>1987</year>
+		<publisher>Martech</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="635233">
+				<rom name="Mega-Apocalypse.tap" size="635233" crc="323973ae" sha1="f0f70e124d1b7904ef720204befb7988e8c3d62f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megaplay">
+		<description>Megaplay Volume 1</description>
+		<year>1988</year>
+		<publisher>Mastertronic</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<feature name="part_id" value="Side 1: Agent X II / Pipeline II / Rapid Fire"/>
+			<dataarea name="cass" size="2115745">
+				<rom name="Megaplay_Volume_1_Side_1.tap" size="2115745" crc="81497a0c" sha1="05857a1c29f2655c057e0589fd7752e806a68172"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<feature name="part_id" value="Side 2: Cage Match / Destructo / Street Beat"/>
+			<dataarea name="cass" size="2104831">
+				<rom name="Megaplay_Volume_1_Side_2.tap" size="2104831" crc="d3df8255" sha1="2f1b15cc5babbe3333e62bfa7e5096feda9a170d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9389,9 +9534,22 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<description>Mermaid Madness</description>
 		<year>1986</year>
 		<publisher>Firebird Silver</publisher>
+
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="430865">
 				<rom name="mermaid madness.tap" size="430865" crc="c9984f7d" sha1="ddcf116b3b5ce2e174110f93008b36861c48786f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="metrobli">
+		<description>Metro Blitz</description>
+		<year>1983</year>
+		<publisher>Personal Software Services</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="1421030">
+				<rom name="Metro_Blitz.tap" size="1421030" crc="e5d18f23" sha1="001a6eed8ae6bbd756065d2dfb6d5227ee43d9fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9408,6 +9566,18 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		</part>
 	</software>
 
+	<software name="metroxg" cloneof="metrox">
+		<description>Metro Cross (U.S. Gold)</description>
+		<year>1987</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="462110">
+				<rom name="Metro_Cross.tap" size="462110" crc="6eea2b12" sha1="b343b0b05673e786263f490b5cbe62adb696bcb2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="miamichs">
 		<description>Miami Chase</description>
 		<year>1991</year>
@@ -9416,6 +9586,54 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="730166">
 				<rom name="Miami_Chase.tap" size="730166" crc="a7cb5895" sha1="cfab648ecb84b12e6af2074d6e62c71fd3931cf8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="miamivic">
+		<description>Miami Vice</description>
+		<year>1986</year>
+		<publisher>Ocean</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="667803">
+				<rom name="Miami_Vice.tap" size="667803" crc="77071e84" sha1="af3a1de2e1fad0b1aa8139b3d44418fbd5b91a83"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwalk">
+		<description>Michael Jackson: Moonwalker</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2419326">
+				<rom name="Michael_Jackson_Moonwalker.tap" size="2419326" crc="cf1c98c6" sha1="0cb9c87066dce2c22ae5f09cdcf44466e42be46c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mwalka" cloneof="mwalk">
+		<description>Michael Jackson: Moonwalker (alt)</description>
+		<year>1989</year>
+		<publisher>U.S. Gold</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="2419326">
+				<rom name="Michael_Jackson_Moonwalker.tap" size="2419326" crc="2267b8ba" sha1="d7504dba5ba4ab856766285102880d8aa9b97e0e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickeymo">
+		<description>Mickey Mouse: The Computer Game</description>
+		<year>1988</year>
+		<publisher>Gremlin Graphics</publisher>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="667278">
+				<rom name="Mickey_Mouse.tap" size="667278" crc="df59dcc0" sha1="d2e24ea24094f1499094cad5ddb16a6a9bc583a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9466,6 +9684,25 @@ Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="27938166">
 				<rom name="midway campaign (1980)(avalon hill).wav" size="27938166" crc="612a1ea2" sha1="8f373fe651218f5ce101ad0037e3139f02f4488b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="migalley">
+		<description>Mig Alley Ace</description>
+		<year>1985</year>
+		<publisher>U.S. Gold</publisher>
+		<info name="usage" value="Ensure c1541 Slot Device is removed prior to loading"/>
+
+		<part name="cass1" interface="cbm_cass">
+			<dataarea name="cass" size="606227">
+				<rom name="Mig_Alley_Ace.tap" size="606227" crc="6d3fd6af" sha1="151a6d42cbb9d6e8bc61f1a8f237d1a1b3c28fbf"/>
+			</dataarea>
+		</part>
+
+		<part name="cass2" interface="cbm_cass">
+			<dataarea name="cass" size="606639">
+				<rom name="Mig_Alley_Ace_a1.tap" size="606639" crc="680c136f" sha1="76420f66e56f4a5d97d45d0ff1743634a29c13dd"/>
 			</dataarea>
 		</part>
 	</software>

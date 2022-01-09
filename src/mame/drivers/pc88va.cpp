@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "includes/pc88va.h"
 
+#include "softlist_dev.h"
+
 
 // TODO: verify clocks
 #define MASTER_CLOCK    XTAL(8'000'000) // may be XTAL(31'948'800) / 4? (based on PC-8801 and PC-9801)

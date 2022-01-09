@@ -33,7 +33,7 @@
 #include "cpu/m6809/hd6309.h"
 #include "imagedev/cassette.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/coco_cas.h"

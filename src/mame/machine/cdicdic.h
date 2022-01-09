@@ -86,6 +86,9 @@ private:
 
 		SECTOR_HEADER      = 12,
 
+		SECTOR_MINUTES     = 12,
+		SECTOR_SECONDS     = 13,
+		SECTOR_FRACS       = 14,
 		SECTOR_MODE        = 15,
 
 		SECTOR_FILE1       = 16,
@@ -153,7 +156,6 @@ private:
 	required_address_space m_memory_space;
 	required_device_array<dmadac_sound_device, 2> m_dmadac;
 	required_device<scc68070_device> m_scc;
-	required_device<cdda_device> m_cdda;
 	optional_device<cdrom_image_device> m_cdrom_dev;
 
 	uint32_t m_clock2;
@@ -173,6 +175,7 @@ private:
 	uint16_t m_data_buffer;       // CDIC Data Buffer Register        (0x303ffe)
 
 	cdrom_file *m_cd;
+	bool m_cd_byteswap;
 
 	emu_timer *m_sector_timer;
 	uint8_t m_disc_command;
@@ -195,8 +198,11 @@ private:
 	void play_raw_group(const uint8_t *data);
 	void play_xa_group(const uint8_t coding, const uint8_t *data);
 	void play_audio_sector(const uint8_t coding, const uint8_t *data);
+	void play_cdda_sector(const uint8_t *data);
 	void process_audio_map();
 
+	void descramble_sector(uint8_t *buffer);
+	bool is_valid_sector(const uint8_t *buffer);
 	bool is_mode2_sector_selected(const uint8_t *buffer);
 	bool is_mode2_audio_selected(const uint8_t *buffer);
 
@@ -219,6 +225,7 @@ private:
 	static const int16_t s_xa_filter_coef[4][2];
 	static const int32_t s_samples_per_sector;
 	static const uint16_t s_crc_ccitt_table[256];
+	static const uint8_t s_sector_scramble[2448];
 };
 
 // device type definition

@@ -38,6 +38,6 @@ void default_scsi_devices(device_slot_interface &device)
 
 void mac_scsi_devices(device_slot_interface &device)
 {
-	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("cdrom", NSCSI_CDROM_APPLE);
+	default_scsi_devices(device);
+	device.option_replace("cdrom", NSCSI_CDROM_APPLE);
 }

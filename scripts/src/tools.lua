@@ -612,6 +612,7 @@ files {
 	MAME_DIR .. "src/tools/image_handler.cpp",
 	MAME_DIR .. "src/tools/image_handler.h",
 	MAME_DIR .. "src/tools/floptool.cpp",
+	GEN_DIR .. "version.cpp",
 }
 
 configuration { "mingw*" or "vs*" }

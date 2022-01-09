@@ -21,7 +21,7 @@
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class leapfrog_leapster_explorer_state : public driver_device

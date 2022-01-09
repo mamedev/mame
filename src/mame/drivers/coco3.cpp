@@ -17,7 +17,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "formats/coco_cas.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 

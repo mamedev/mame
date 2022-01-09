@@ -196,7 +196,7 @@ TODO:
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 

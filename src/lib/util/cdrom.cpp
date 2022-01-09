@@ -970,6 +970,11 @@ static void cdrom_get_info_from_type_string(const char *typestring, uint32_t *tr
 		*trktype = CD_TRACK_MODE2_RAW;
 		*datasize = 2352;
 	}
+	else if (!strcmp(typestring, "CDI/2352"))
+	{
+		*trktype = CD_TRACK_MODE2_RAW;
+		*datasize = 2352;
+	}
 	else if (!strcmp(typestring, "AUDIO"))
 	{
 		*trktype = CD_TRACK_AUDIO;

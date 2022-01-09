@@ -278,7 +278,7 @@ space. This mapper uses 32KB sized banks.
 #include "bus/gameboy/rom.h"
 #include "bus/gameboy/mbc.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

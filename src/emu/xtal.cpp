@@ -263,6 +263,7 @@ const double XTAL::known_xtals[] = {
 	 16'364'000, /* 16.364_MHz_XTAL        Corvus Concept */
 	 16'384'000, /* 16.384_MHz_XTAL        - */
 	 16'400'000, /* 16.4_MHz_XTAL          MS 6102 */
+	 16'537'000, /* 16.537_MHz_XTAL        Falco terminals 80-column clock */
 	 16'572'000, /* 16.572_MHz_XTAL        Micro-Term ACT-5A */
 	 16'588'800, /* 16.5888_MHz_XTAL       SM 7238 */
 	 16'666'600, /* 16.6666_MHz_XTAL       Firebeat GCU */

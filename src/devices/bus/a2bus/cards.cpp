@@ -47,6 +47,7 @@
 #include "bus/a2bus/grappler.h"
 #include "bus/a2bus/laser128.h"
 #include "bus/a2bus/mouse.h"
+#include "bus/a2bus/prodosromdrive.h"
 #include "bus/a2bus/ramcard128k.h"
 #include "bus/a2bus/ramcard16k.h"
 #include "bus/a2bus/ssbapple.h"
@@ -215,6 +216,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("q68plus", A2BUS_Q68PLUS);               // Stellation Q68 Plus 68000 card
 	device.option_add("a2sd", A2BUS_A2SD);                     // Florian Reitz AppleIISD
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
+	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);	   // ProDOS ROM Drive
 }
 
 void apple2gs_cards(device_slot_interface &device)
@@ -285,6 +287,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("q68", A2BUS_Q68);                       // Stellation Q68 68000 card
 	device.option_add("q68plus", A2BUS_Q68PLUS);               // Stellation Q68 Plus 68000 card
 	device.option_add("grafex", A2BUS_GRAFEX);                 // Grafex card (uPD7220 graphics)
+	device.option_add("pdromdrive", A2BUS_PRODOSROMDRIVE);	   // ProDOS ROM Drive
 }
 
 void apple3_cards(device_slot_interface &device)

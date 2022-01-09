@@ -18,7 +18,7 @@
 #include "includes/kc.h"
 
 #include "machine/input_merger.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "screen.h"
 #include "speaker.h"
 

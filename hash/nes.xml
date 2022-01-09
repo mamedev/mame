@@ -77460,7 +77460,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="kof96" supported="no">
+	<software name="kof96">
 		<description>The King of Fighters 96 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

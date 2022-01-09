@@ -37,6 +37,8 @@ files {
 files {
 	MAME_DIR .. "src/devices/imagedev/bitbngr.cpp",
 	MAME_DIR .. "src/devices/imagedev/bitbngr.h",
+	MAME_DIR .. "src/devices/imagedev/cartrom.cpp",
+	MAME_DIR .. "src/devices/imagedev/cartrom.h",
 	MAME_DIR .. "src/devices/imagedev/cassette.cpp",
 	MAME_DIR .. "src/devices/imagedev/cassette.h",
 	MAME_DIR .. "src/devices/imagedev/chd_cd.cpp",
@@ -49,6 +51,10 @@ files {
 	MAME_DIR .. "src/devices/imagedev/floppy.h",
 	MAME_DIR .. "src/devices/imagedev/harddriv.cpp",
 	MAME_DIR .. "src/devices/imagedev/harddriv.h",
+	MAME_DIR .. "src/devices/imagedev/magtape.cpp",
+	MAME_DIR .. "src/devices/imagedev/magtape.h",
+	MAME_DIR .. "src/devices/imagedev/memcard.cpp",
+	MAME_DIR .. "src/devices/imagedev/memcard.h",
 	MAME_DIR .. "src/devices/imagedev/mfmhd.cpp",
 	MAME_DIR .. "src/devices/imagedev/mfmhd.h",
 	MAME_DIR .. "src/devices/imagedev/microdrv.cpp",
@@ -57,6 +63,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/midiin.h",
 	MAME_DIR .. "src/devices/imagedev/midiout.cpp",
 	MAME_DIR .. "src/devices/imagedev/midiout.h",
+	MAME_DIR .. "src/devices/imagedev/papertape.cpp",
+	MAME_DIR .. "src/devices/imagedev/papertape.h",
 	MAME_DIR .. "src/devices/imagedev/picture.cpp",
 	MAME_DIR .. "src/devices/imagedev/picture.h",
 	MAME_DIR .. "src/devices/imagedev/printer.cpp",
@@ -4901,5 +4909,16 @@ if (MACHINES["GLUKRS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/glukrs.cpp",
 		MAME_DIR .. "src/devices/machine/glukrs.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/bitmap_printer.h,MACHINES["BITMAP_PRINTER"] = true
+---------------------------------------------------
+if (MACHINES["BITMAP_PRINTER"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/bitmap_printer.cpp",
+		MAME_DIR .. "src/devices/machine/bitmap_printer.h",
 	}
 end

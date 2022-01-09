@@ -91,7 +91,7 @@ E1 Prog ROM 42 DEMON/DIAMOND (CX2615)
 
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -592,7 +592,7 @@ static void a2600_cart(device_slot_interface &device)
 
 void a2600_state::a2600_cartslot(machine_config &config)
 {
-	VCS_CART_SLOT(config, "cartslot", a2600_cart, nullptr);
+	VCS_CART_SLOT(config, "cartslot", a2600_cart, nullptr).set_must_be_loaded(true);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("a2600");
