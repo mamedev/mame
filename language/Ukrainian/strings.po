@@ -222,12 +222,12 @@ msgstr "Зміщення прицілу Y %1$1.3f"
 
 #: src/frontend/mame/ui/ui.cpp:2110
 msgid "**Error saving ui.ini**"
-msgstr "Помилка збереження ui.ini."
+msgstr "**Помилка збереження ui.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2169
 #, c-format
 msgid "**Error saving %s.ini**"
-msgstr "Помилка збереження %s.ini."
+msgstr "**Помилка збереження %s.ini**"
 
 #: src/frontend/mame/ui/ui.cpp:2173 src/frontend/mame/ui/miscmenu.cpp:748
 msgid ""
@@ -236,7 +236,7 @@ msgid ""
 "\n"
 msgstr ""
 "\n"
-"Конфігурацію збережено.\n"
+"    Конфігурацію збережено.    \n"
 "\n"
 
 #: src/frontend/mame/ui/selsoft.cpp:484 src/frontend/mame/ui/selgame.cpp:300
@@ -260,7 +260,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Start empty]"
-msgstr "(Розпочати порожнім)"
+msgstr "[Розпочати порожнім]"
 
 #: src/frontend/mame/ui/selsoft.cpp:522
 msgid "[Use file manager]"
@@ -326,15 +326,15 @@ msgstr "Налаштувати каталоги"
 #: src/frontend/mame/ui/filesel.cpp:260 src/frontend/mame/ui/swlist.cpp:89
 #: src/frontend/mame/ui/slotopt.cpp:220
 msgid "[empty slot]"
-msgstr "(порожній слот)"
+msgstr "[порожній слот]"
 
 #: src/frontend/mame/ui/filesel.cpp:264
 msgid "[create]"
-msgstr "(створити)"
+msgstr "[створити]"
 
 #: src/frontend/mame/ui/filesel.cpp:268 src/frontend/mame/ui/swlist.cpp:100
 msgid "[software list]"
-msgstr "(перелік програм)"
+msgstr "[перелік програм]"
 
 #: src/frontend/mame/ui/filesel.cpp:324
 #, c-format
@@ -1050,11 +1050,11 @@ msgstr "Часткова підтримка"
 
 #: src/frontend/mame/ui/info.cpp:677
 msgid "[empty]"
-msgstr "(порожньо)"
+msgstr "[порожньо]"
 
 #: src/frontend/mame/ui/swlist.cpp:94
 msgid "[file manager]"
-msgstr "(менеджер файлів)"
+msgstr "[менеджер файлів]"
 
 #: src/frontend/mame/ui/swlist.cpp:227
 msgid "Switch Item Ordering"
@@ -1070,7 +1070,7 @@ msgstr "Перемкнений порядок: записи впорядкова
 
 #: src/frontend/mame/ui/swlist.cpp:396
 msgid "[compatible lists]"
-msgstr "(сумісні переліки)"
+msgstr "[сумісні переліки]"
 
 #: src/frontend/mame/ui/filecreate.cpp:78
 msgid "File Already Exists - Override?"
@@ -1450,11 +1450,11 @@ msgstr "Вибери категорію:"
 
 #: src/frontend/mame/ui/utils.cpp:1033
 msgid "[no category INI files]"
-msgstr "(INI без категорій)"
+msgstr "[INI без категорій]"
 
 #: src/frontend/mame/ui/utils.cpp:1041
 msgid "[no groups in INI file]"
-msgstr "(INI без груп)"
+msgstr "[INI без груп]"
 
 #: src/frontend/mame/ui/utils.cpp:1075
 msgid "No category INI files found"
@@ -1629,11 +1629,11 @@ msgstr "Псевдотермінали"
 
 #: src/frontend/mame/ui/info_pty.cpp:39
 msgid "[failed]"
-msgstr "(не виконано)"
+msgstr "[не виконано]"
 
 #: src/frontend/mame/ui/state.cpp:217
 msgid "[no saved states found]"
-msgstr "(не знайдено збережених станів)"
+msgstr "[не знайдено збережених станів]"
 
 #: src/frontend/mame/ui/state.cpp:222 plugins/cheatfind/init.lua:492
 msgid "Cancel"
@@ -1679,7 +1679,7 @@ msgstr "Натисни кнопку клавіатури / джойстика ч
 #: src/frontend/mame/ui/slotopt.cpp:192
 #, c-format
 msgid "%s [internal]"
-msgstr "%s (внутрішній)"
+msgstr "%s [внутрішній]"
 
 #: src/frontend/mame/ui/inputmap.cpp:38
 msgid "User Interface"
@@ -2251,7 +2251,7 @@ msgstr "Зміна UI-налаштувань"
 
 #: src/frontend/mame/ui/custui.cpp:246 src/frontend/mame/ui/custui.cpp:290
 msgid "[built-in]"
-msgstr "(вбудовано)"
+msgstr "[вбудовано]"
 
 #: src/frontend/mame/ui/custui.cpp:374
 msgid "default"
@@ -3026,11 +3026,11 @@ msgstr "Магнітний барабан\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3006
 msgid "(EP)ROM\tUnimplemented\n"
-msgstr "EPROM\tНе реалізовано\n"
+msgstr "(EP)ROM\tНе реалізовано\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3008
 msgid "(EP)ROM\tImperfect\n"
-msgstr "EPROM\tНедосконало\n"
+msgstr "(EP)ROM\tНедосконало\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:3011
 msgid "Communications\tUnimplemented\n"
@@ -3316,7 +3316,7 @@ msgstr "* Слот-опції:\n"
 
 #: src/frontend/mame/ui/devopt.cpp:344
 msgid "[None]\n"
-msgstr "(Не вказано)\n"
+msgstr "[Не вказано]\n"
 
 #: src/emu/render.cpp:1796
 #, c-format
@@ -5621,18 +5621,18 @@ msgstr "Натисни %s для видалення."
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "%s [%g Hz]"
-msgstr "%s (%g Гц)"
+msgstr "%s [%g Гц]"
 
 #: plugins/autofire/autofire_menu.lua:95
 #, lua-format
 msgctxt "plugin-autofire"
 msgid "n/a [%g Hz]"
-msgstr "Не доступно (%g Гц)"
+msgstr "Не доступно [%g Гц]"
 
 #: plugins/autofire/autofire_menu.lua:103
 msgctxt "plugin-autofire"
 msgid "[no autofire buttons]"
-msgstr "(відсутні турбокнопки)"
+msgstr "[відсутні турбокнопки]"
 
 #: plugins/autofire/autofire_menu.lua:109 plugins/autofire/autofire_menu.lua:263
 msgctxt "plugin-autofire"
@@ -5647,7 +5647,7 @@ msgstr "Не доступно"
 #: plugins/autofire/autofire_menu.lua:152 plugins/autofire/autofire_menu.lua:154
 msgctxt "plugin-autofire"
 msgid "[not set]"
-msgstr "(не встановлено)"
+msgstr "[не встановлено]"
 
 #: plugins/autofire/autofire_menu.lua:155
 msgctxt "plugin-autofire"
@@ -5744,7 +5744,7 @@ msgstr "TIMECODE: Тривалість додатку %d %s."
 #, lua-format
 msgctxt "plugin-timecode"
 msgid " %s%s%02d:%02d [paused] "
-msgstr " %s%s%02d:%02d (призупинено) "
+msgstr " %s%s%02d:%02d [призупинено] "
 
 #: plugins/timecode/init.lua:207
 #, lua-format
@@ -5813,7 +5813,7 @@ msgstr "Ім'я"
 #: plugins/inputmacro/inputmacro_menu.lua:400
 msgctxt "plugin-inputmacro"
 msgid "[not set]"
-msgstr "(не встановлено)"
+msgstr "[не встановлено]"
 
 #: plugins/inputmacro/inputmacro_menu.lua:359
 msgctxt "plugin-inputmacro"
