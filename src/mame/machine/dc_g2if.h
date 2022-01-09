@@ -25,6 +25,8 @@ public:
 
 	void amap(address_map &map);
 
+	void hw_irq_trigger_hs(u32 normal_ist, u32 ext_ist);
+
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;
@@ -47,7 +49,8 @@ private:
 		bool enable;
 		bool in_progress;
 		bool start;
-		uint8_t sel;
+		u8 tsel;
+		bool hw_trigger;
 		emu_timer *end_timer;
 	} m_dma[4];
 
@@ -62,7 +65,10 @@ private:
 
 	template <u8 ch> u32 dir_r();
 	template <u8 ch> void dir_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	
+
+	template <u8 ch> u32 tsel_r();
+	template <u8 ch> void tsel_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
 	template <u8 ch> u32 en_r();
 	template <u8 ch> void en_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	
@@ -72,7 +78,7 @@ private:
 	template <u8 ch> u32 susp_r();
 	template <u8 ch> void susp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	
-	void dma_execute(u8 channel);	
+	void dma_execute(u8 channel);
 };
 
 

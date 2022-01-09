@@ -51,6 +51,8 @@ public:
 	void dc_map(address_map &map);
 	void dc_port(address_map &map);
 private:
+	uint32_t g1bus_regs[0x100/4]; // DC-only
+
 	uint64_t PDTRA, PCTRA;
 	emu_timer *atapi_timer;
 	int atapi_xferlen, atapi_xferbase, atapi_xfercomplete;

@@ -17,7 +17,10 @@
     - Convert I/O registers to space addresses;
     - Timebases are based on 44100KHz case?
     - Derive from SCSP device;
-    - Sound clips a bit too much (cfr. deathcox, bdrdown, samba title screen). dB scale tables?
+    - Sound clips a bit too much (cfr. deathcox, bdrdown, samba title screen, cfield).
+	  According to skmp note: "The [ADX] sound decompression code on the sh4 uses FTRC
+	  (float -> int) to convert the samples. Make sure you saturate the value when converting" -> Verify this statement.
+
 */
 
 #include "emu.h"

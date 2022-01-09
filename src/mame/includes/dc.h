@@ -42,20 +42,7 @@ public:
 
 	/* machine related */
 	uint32_t dc_sysctrl_regs[0x200/4];
-	uint32_t g1bus_regs[0x100/4]; // DC-only
-	uint32_t g2bus_regs[0x100/4];
 	uint8_t m_armrst;
-
-	struct {
-		uint32_t g2_addr;
-		uint32_t root_addr;
-		uint32_t size;
-		uint8_t dir;
-		uint8_t enable;
-		uint8_t mode;
-		uint8_t start;
-		uint8_t sel;
-	} m_g2_dma[4];
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -65,7 +52,6 @@ public:
 	void dc_aica_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t dc_arm_aica_r(offs_t offset);
 	void dc_arm_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void g2_dma_execute(address_space &space, int channel);
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	inline int decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 	int dc_compute_interrupt_level();
@@ -75,8 +61,6 @@ public:
 	void dc_sysctrl_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t dc_gdrom_r(offs_t offset, uint64_t mem_mask = ~0);
 	void dc_gdrom_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t dc_g2_ctrl_r(offs_t offset, uint64_t mem_mask = ~0);
-	void dc_g2_ctrl_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint64_t dc_modem_r(offs_t offset, uint64_t mem_mask = ~0);
 	void dc_modem_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	void g1_irq(uint8_t data);
