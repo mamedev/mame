@@ -66236,7 +66236,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="crayon2" cloneof="biomirac">
-		<description>Crayon Shin-Chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
+		<description>Crayon Shin-chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
 		<year>1995</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66253,10 +66253,11 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="crayonc">
-		<description>La Bi Xiao Xin - Crayon Shin-Chan (Chi)</description>
+	<software name="crayonc" supported="partial">
+		<description>Làbǐ Xiǎo Xīn - Crayon Shin-chan (China)</description>
 		<year>1995</year>
 		<publisher>Future Media</publisher>
+		<info name="alt_title" value="蠟筆小新"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="futuremedia" />
 			<feature name="pcb" value="FUTUREMEDIA" />
@@ -67368,9 +67369,10 @@ All musics were removed in this game.
 	</software>
 
 	<software name="sanguo4" supported="partial">
-		<description>San Guo Zhi 4 - Chi Bi Feng Yun (Chi)</description>
+		<description>Sānguózhì 4 - Chìbì Fēngyún (China)</description>
 		<year>1995</year>
 		<publisher>Future Media</publisher>
+		<info name="alt_title" value="三國誌IV: 赤璧風雲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="futuremedia" />
 			<feature name="pcb" value="FUTUREMEDIA" />
