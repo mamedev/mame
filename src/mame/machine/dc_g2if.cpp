@@ -9,6 +9,19 @@
 #include "emu.h"
 #include "dc_g2if.h"
 
+#define LOG_WARN    (1U << 0)
+#define LOG_DMA     (1U << 1) // log DMA starts with CPU triggers (.tsel bit 1 == 0)
+#define LOG_HWTRIG  (1U << 2) // log DMA starts with HW triggers (.tsel bit 1 == 1)
+#define LOG_DMAEND  (1U << 3) // log DMA ends (mostly useful to checkout if device doesn't eat a timer)
+
+#define VERBOSE (LOG_WARN | LOG_DMA | LOG_HWTRIG | LOG_DMAEND)
+//#define LOG_OUTPUT_STREAM std::cout
+#include "logmacro.h"
+
+#define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGDMA(...)       LOGMASKED(LOG_DMA, __VA_ARGS__)
+#define LOGHWTRIG(...)    LOGMASKED(LOG_HWTRIG, __VA_ARGS__)
+#define LOGDMAEND(...)    LOGMASKED(LOG_DMAEND, __VA_ARGS__)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -94,7 +107,7 @@ void dc_g2if_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	u8 channel = param;
 	m_dma[channel].in_progress = false;
 	m_dma[channel].start = false;
-	//printf("%02x\n", channel);
+	LOGDMAEND("%s: DMA%d end event\n", tag(), channel);
 	m_int_w(channel, 1);
 }
 
@@ -162,7 +175,9 @@ template <u8 ch> u32 dc_g2if_device::len_r()
 template <u8 ch> void dc_g2if_device::len_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_dma[ch].len);
-	// TODO: throw log warning if reserved bits 30-25 and 4-0 are set
+	// log an attempt if any of the reserved bits 30-25 and 4-0 are set
+	if (m_dma[ch].len & 0x7fe0001f)
+		LOGWARN("%s: DMA%d LEN setup %08x (mask=%08x)!\n", machine().describe_context(), data, mem_mask);
 //  m_dma[ch].size = m_dma[ch].len & 0x7fffffff;
 	m_dma[ch].size = m_dma[ch].len & 0x001fffe0;
 	m_dma[ch].mode = bool(BIT(m_dma[ch].len, 31));
@@ -246,14 +261,21 @@ template <u8 ch> void dc_g2if_device::st_w(offs_t offset, u32 data, u32 mem_mask
 	{
 		if (m_dma[ch].start == true)
 		{
-			// TODO: log warning for an in-flight attempt
+			LOGWARN("%s: DMA%d attempt to start an in-flight", machine().describe_context());
 			return;
 		}
 
 		m_dma[ch].start = bool(BIT(data, 0));
 
 		if (m_dma[ch].enable && m_dma[ch].start && m_dma[ch].hw_trigger == false)
+		{
+			LOGDMA("%s: DMA%d root=%08x g2=%08x dir=G2%sroot\n    size=%08x (len=%08x) mode=DMA %s\n",
+				machine().describe_context(), ch,
+				m_dma[ch].root_addr, m_dma[ch].g2_addr, m_dma[ch].dir ? "->" : "<-",
+				m_dma[ch].size, m_dma[ch].len, m_dma[ch].mode ? "end" : "restart"
+			);
 			dma_execute(ch);
+		}
 	}
 }
 
@@ -288,6 +310,11 @@ void dc_g2if_device::dma_execute(u8 channel)
 
 	//printf("%08x %08x %08x\n", src, dst, transfer_size);
 
+	// notify that a DMA is in progress
+	// ofc this should rather transfer one word at a time,
+	// we currently don't do that for performance reasons ...
+	m_dma[channel].in_progress = true;
+
 	// TODO: punt with exception if SB_G2APRO isn't asserted along the way
 	// TODO: raise debug signals if SB_G2DSTO / SB_G2TRTO aren't respected
 	//       (shouldn't matter for AICA RAM?)
@@ -314,8 +341,6 @@ void dc_g2if_device::dma_execute(u8 channel)
 	if (m_dma[channel].mode == true)
 		m_dma[channel].enable = 0;
 
-	m_dma[channel].in_progress = true;
-
 	m_dma[channel].end_timer->adjust(dma_time, channel);
 }
 
@@ -337,8 +362,8 @@ void dc_g2if_device::hw_irq_trigger_hs(u32 normal_ist, u32 ext_ist)
 	{
 		if (m_dma[ch].hw_trigger & m_dma[ch].enable)
 		{
-			logerror("G2 I/F HW trigger channel %d (ISTNRM=%08x ISTEXT=%08x)\n", ch, normal_ist, ext_ist);
-			m_g2if->dma_execute(ch);
+			LOGHWTRIG("%s: G2 I/F HW trigger channel %d (ISTNRM=%08x ISTEXT=%08x)\n", tag(), ch, normal_ist, ext_ist);
+			dma_execute(ch);
 		}
 	}
 }

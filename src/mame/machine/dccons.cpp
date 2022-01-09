@@ -85,7 +85,7 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 	m_ata->write_dmack(0);
 
-	g1bus_regs[SB_GDST]=0;
+	g1bus_regs[SB_GDST] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 	dc_update_interrupt_status();
 }
