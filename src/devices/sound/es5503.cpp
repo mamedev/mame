@@ -430,7 +430,7 @@ void es5503_device::write(offs_t offset, u8 data)
 			case 0xe1:  // oscillator enable
 				// The number here is the number of oscillators to enable -1 times 2.  You can never
 				// have zero oscilllators enabled.  So a value of 62 enables all 32 oscillators.
-				oscsenabled = ((data>>1) & 0x3f) + 1;
+				oscsenabled = ((data>>1) & 0x1f) + 1;
 				notify_clock_changed();
 				break;
 
