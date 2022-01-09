@@ -539,10 +539,13 @@ void atomiswave_state::aw_map(address_map &map)
 	map(0x00800000, 0x00ffffff).rw(FUNC(atomiswave_state::soundram_r), FUNC(atomiswave_state::soundram_w));           // sound RAM (8 MB)
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
-	map(0x04000000, 0x047fffff).ram().mirror(0x00800000).share("dc_texture_ram");      // texture memory 64 bit access
-	map(0x05000000, 0x057fffff).ram().mirror(0x00800000).share("frameram"); // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	// texture memory 64 bit access
+	map(0x04000000, 0x047fffff).mirror(0x02800000).ram().share("dc_texture_ram");
+	// apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	map(0x05000000, 0x057fffff).mirror(0x02800000).ram().share("frameram");
+	//  0x067xxxxx written by maxspeed title screen animation
 
-	/* Area 2*/
+	/* Area 2 */
 	map(0x08000000, 0x0bffffff).noprw(); // 'Unassigned'
 
 	/* Area 3 */
