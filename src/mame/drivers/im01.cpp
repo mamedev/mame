@@ -31,7 +31,7 @@ Hardware notes:
 
 ИМ-01:
 - К1801ВМ1 CPU (PDP-11 derived) @ ~4.61MHz (9216 кгц XTAL)
-- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1) (4KB RAM for ИМ-01Т)
+- 16KB ROM (2*К1809РЕ1), 2KB RAM(К1809РУ1)
 - K1809BB1 (I/O, counter)
 - 4-digit VFD 7seg panel(cyan, green window overlay), beeper
 
