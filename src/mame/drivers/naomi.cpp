@@ -1848,6 +1848,12 @@ static INPUT_PORTS_START( alpilota )
 	// Below the Control Wheel stands the Rudder Pedal: volume setting suggests having a neutral position
 	// and most likely controllable by both feet on real cab.
 	// TODO: volume min/max default settings in service mode are quite diverging, needs user setup for now
+	// 0x41-0x78-0xaf for control wheel aileron
+	// 0x26-0x84-0xe1 for control wheel elevator
+	// 0x36-0x80-0xce for rudder pedal
+	// 0x31-0xca for thrust lever L
+	// 0x2b-0xbe for thrust level R
+	// (are those even valid?)
 	PORT_START("A0")
 	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Control Wheel (Elevator)")
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -1861,22 +1867,19 @@ static INPUT_PORTS_START( alpilota )
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A4")
-	PORT_BIT( 0xff00, 0x8000, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever L")
+	PORT_BIT( 0xff00, 0x8000, IPT_POSITIONAL_V ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_NAME("Thrust Lever L") PORT_POSITIONS(256)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("A5")
-	PORT_BIT( 0xff00, 0x8000, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever R")
+	PORT_BIT( 0xff00, 0x8000, IPT_POSITIONAL_V ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_CENTERDELTA(0) PORT_NAME("Thrust Lever R") PORT_POSITIONS(256)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sstrkfgt )
-	PORT_INCLUDE( naomi_mie )
+	// minor modifications, definitely derived I/O design
+	PORT_INCLUDE( alpilota )
 
-	PORT_START("TILT")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("P1")
+	PORT_MODIFY("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Gun Trigger")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Missile Button")
@@ -1884,24 +1887,22 @@ static INPUT_PORTS_START( sstrkfgt )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("View Change")
 	PORT_BIT( 0x7c3f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("P2")
+	// TODO: again expects different min/maxes as default
+	// 0x40-0x80-0xc0 for control wheel
+	// 0x50-0x80-0xb0 for rudder pedal
+	// 0x40-0x90-0xd0 for thrust lever
+	// Tested lever with a PORT_MINMAX of 0x4000, 0xd000: it can cause a COM. ERROR too ...
+	// Regardless this has a neutral compared to alpilot correlated thrusts,
+	// and tutorial shows it as a regular 2-way ad stick that autocenters.
+	PORT_START("A2")
+	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x0000, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(20) PORT_NAME("Thrust Lever")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("A4")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("A0")
-	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Elevator Wheel")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("A1")
-	PORT_BIT( 0xff00, 0x8000, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_NAME("Aileron Wheel") PORT_PLAYER(2)
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("A2")
-	PORT_BIT( 0xff00, 0x8000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xff00) PORT_SENSITIVITY(25) PORT_KEYDELTA(200) PORT_NAME("Thrust Lever")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("A3")
-	PORT_BIT( 0xff00, 0x0000, IPT_PEDAL ) PORT_MINMAX(0x00,0xff00) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Rudder Pedal")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_MODIFY("A5")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
