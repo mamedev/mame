@@ -3923,9 +3923,9 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY                         PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY                        PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )                                          PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
-	PORT_DIPNAME( 0x20, 0x00, "Ghost Muncher - Cabinet" )  PORT_DIPLOCATION("EDGE:1")     PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )         // Edge connector pin 14 solder-side
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_CONFNAME( 0x20, 0x00, "Ghost Muncher - Cabinet" )                                PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )      // Edge connector pin 14 solder-side
+	PORT_CONFSETTING(    0x20, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY                         PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY                           PORT_CONDITION("GAMESEL",0x01,NOTEQUALS,0x01)
 
@@ -3961,9 +3961,9 @@ static INPUT_PORTS_START( gmgalax )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY                    PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY                   PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )                                    PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
-	PORT_DIPNAME( 0x20, 0x00, "Galaxian - Cabinet" )    PORT_DIPLOCATION("EDGE:1")   PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )      // Edge connector pin 14 solder-side
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
+	PORT_CONFNAME( 0x20, 0x00, "Galaxian - Cabinet" )                                PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )      // Edge connector pin 14 solder-side
+	PORT_CONFSETTING(    0x20, DEF_STR( Cocktail ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )                                             PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE1 )                                   PORT_CONDITION("GAMESEL",0x01,EQUALS,0x01)
 
