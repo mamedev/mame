@@ -199,12 +199,12 @@ void n64_texture_pipe_t::cycle_nearest(color_t* TEX, color_t* prev, int32_t SSS,
 
 	t0.sign_extend(0x00000100, 0xffffff00);
 
-	rgbaint_t k1r(m_rdp->get_k1());
-	k1r.mul_imm(t0.get_r32());
+	rgbaint_t k13r(m_rdp->get_k13());
+	k13r.mul_imm(t0.get_r32());
 
-	TEX->set(m_rdp->get_k023());
+	TEX->set(m_rdp->get_k02());
 	TEX->mul_imm(t0.get_g32());
-	TEX->add(k1r);
+	TEX->add(k13r);
 	TEX->add_imm(0x80);
 	TEX->shr_imm(8);
 	TEX->add_imm(t0.get_b32());
@@ -249,12 +249,12 @@ void n64_texture_pipe_t::cycle_linear(color_t* TEX, color_t* prev, int32_t SSS, 
 
 	t0.sign_extend(0x00000100, 0xffffff00);
 
-	rgbaint_t k1r(m_rdp->get_k1());
-	k1r.mul_imm(t0.get_r32());
+	rgbaint_t k13r(m_rdp->get_k13());
+	k13r.mul_imm(t0.get_r32());
 
-	TEX->set(m_rdp->get_k023());
+	TEX->set(m_rdp->get_k02());
 	TEX->mul_imm(t0.get_g32());
-	TEX->add(k1r);
+	TEX->add(k13r);
 	TEX->add_imm(0x80);
 	TEX->shr_imm(8);
 	TEX->add_imm(t0.get_b32());
@@ -738,12 +738,13 @@ void n64_texture_pipe_t::fetch_yuv(rgbaint_t& out, int32_t s, int32_t t, int32_t
 {
 	const uint16_t *tc = ((uint16_t*)userdata->m_tmem);
 
-	const int32_t taddr = (((tbase << 3) + s) ^ sTexAddrSwap8[t & 1]) & 0x7ff;
+	const int32_t taddr = (tbase << 3) + s;
+	const int32_t taddrhi = (taddr ^ sTexAddrSwap8[t & 1]) & 0x7ff;
 	const int32_t taddrlow = ((taddr >> 1) ^ sTexAddrSwap16[t & 1]) & 0x3ff;
 
 	const uint16_t c = tc[taddrlow];
 
-	int32_t y = userdata->m_tmem[taddr | 0x800];
+	int32_t y = userdata->m_tmem[taddrhi | 0x800];
 	int32_t u = c >> 8;
 	int32_t v = c & 0xff;
 
@@ -751,7 +752,7 @@ void n64_texture_pipe_t::fetch_yuv(rgbaint_t& out, int32_t s, int32_t t, int32_t
 	u |= ((u & 0x80) << 1);
 	v |= ((v & 0x80) << 1);
 
-	out.set(y & 0xff, y & 0xff, u & 0xff, v & 0xff);
+	out.set(y, u, v, y);
 }
 
 void n64_texture_pipe_t::fetch_ci4_tlut0(rgbaint_t& out, int32_t s, int32_t t, int32_t tbase, int32_t tpal, rdp_span_aux* userdata)
