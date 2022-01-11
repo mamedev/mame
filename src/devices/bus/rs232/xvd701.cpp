@@ -157,189 +157,159 @@ void jvc_xvd701_device::rcv_complete()
 		m_command[1] == 0xff &&
 		m_command[10] == sum(m_command, sizeof(m_command) - 1))
 	{
-		if (m_command[3] == 0x0c)
+		if (m_command[3] == 0x0c && m_command[4] == 0x43 && m_command[5] == 0x6d)
 		{
-			// Media packets
+			// FF FF 21 0C 43 6D 00 00 00 00 25 PAUSE
+			LOGCMD("xvd701: Playback PAUSE\n");
+			m_playback_status = STATUS_PAUSE;
+			create_packet(STATUS_OK, NO_RESPONSE);
+		}
+		else if (m_command[3] == 0x0c && m_command[4] == 0x43 && m_command[5] == 0x75)
+		{
+			// FF FF 21 0C 43 75 00 00 00 00 1D PLAY
+			LOGCMD("xvd701: Playback PLAY\n");
 
-			// TODO: 0x41 Drive commands
-
-			// 0x43 Playback commands
-			if (m_command[4] == 0x43 && m_command[5] == 0x6d)
+			auto status = STATUS_OK;
+			if (m_playback_status == STATUS_STOP)
 			{
-				// FF FF 21 0C 43 6D 00 00 00 00 25 PAUSE
-				LOGCMD("xvd701: Playback PAUSE\n");
-				m_playback_status = STATUS_PAUSE;
+				// Force video to load again if the video was stopped then started again
+				if (!seek_chapter(m_chapter))
+					status = STATUS_ERROR;
+			}
+
+			if (status == STATUS_OK)
+				m_playback_status = STATUS_PLAYING;
+
+			create_packet(status, NO_RESPONSE);
+		}
+		else if (m_command[3] == 0x0c && m_command[4] == 0x44 && m_command[5] == 0x60)
+		{
+			// FF FF 21 0C 44 60 00 00 00 00 31 STOP
+			LOGCMD("xvd701: Playback STOP\n");
+
+			m_playback_status = STATUS_STOP;
+			create_packet(STATUS_OK, NO_RESPONSE);
+		}
+		else if (m_command[3] == 0x0c && m_command[4] == 0x50 && m_command[5] == 0x20)
+		{
+			// FF FF 21 0C 50 20 00 00 00 00 63 SEEK TO SPECIFIC CHAPTER
+			auto chapter = ((m_command[6] % 10) * 100) + ((m_command[7] % 10) * 10) + (m_command[8] % 10);
+
+			if (m_media_type == JVC_MEDIA_VCD)
+			{
+				// VCD can only go to 99, so it sticks the data in the first two spots
+				chapter /= 10;
+			}
+
+			auto status = seek_chapter(chapter);
+			LOGCMD("xvd701: Seek chapter %d -> %d\n", chapter, status);
+			create_packet(status ? STATUS_OK : STATUS_ERROR, NO_RESPONSE);
+		}
+		else if (m_command[3] == 0x0c && m_command[4] == 0x50 && m_command[5] == 0x61)
+		{
+			// FF FF 21 0C 50 61 00 00 00 00 24 PREV (SEEK TO PREVIOUS CHAPTER)
+			auto chapter = m_chapter - 1;
+			if (m_playback_status != STATUS_PLAYING && chapter == 0)
+				chapter = 1;
+
+			auto status = seek_chapter(chapter);
+			LOGCMD("xvd701: Seek prev -> %d\n", status);
+			create_packet(status ? STATUS_OK : STATUS_ERROR, NO_RESPONSE);
+		}
+		else if (m_command[3] == 0x0c && m_command[4] == 0x50 && m_command[5] == 0x73)
+		{
+			// FF FF 21 0C 50 73 00 00 00 00 12 FF (SEEK TO NEXT CHAPTER)
+			auto status = seek_chapter(m_chapter + 1);
+			LOGCMD("xvd701: Seek FF -> %d\n", status);
+			create_packet(status ? STATUS_OK : STATUS_ERROR, NO_RESPONSE);
+		}
+
+		else if (m_command[3] == 0x3e && m_command[4] == 0x40 && m_command[5] == 0x60)
+		{
+			// FF FF 21 3E 40 60 00 00 00 00 03 DEVICE OFF
+			LOGCMD("xvd701: Device OFF\n");
+
+			auto status = m_is_powered ? STATUS_OK : STATUS_ERROR;
+			if (m_is_powered)
+				m_is_powered = false;
+
+			create_packet(status, NO_RESPONSE);
+
+		}
+		else if (m_command[3] == 0x3e && m_command[4] == 0x40 && m_command[5] == 0x70)
+		{
+			// FF FF 21 3E 40 70 00 00 00 00 73 DEVICE ON
+			LOGCMD("xvd701: Device ON\n");
+
+			auto status = !m_is_powered ? STATUS_OK : STATUS_ERROR;
+			if (!m_is_powered)
+				m_is_powered = true;
+
+			create_packet(status, NO_RESPONSE);
+		}
+		else if (m_command[3] == 0x3e && m_command[4] == 0x4e && m_command[5] == 0x20)
+		{
+			LOGCMD("xvd701: Device power status request\n");
+			const unsigned char response[6] = { m_is_powered, 0x20, 0, 0, 0, 0 };
+			create_packet(STATUS_OK, response);
+		}
+		else if (m_command[3] == 0x7c && m_command[4] == 0x41)
+		{
+			auto new_id = m_command[5];
+			LOGCMD("xvd701: Change JLIP ID to %02x\n", new_id);
+
+			if (new_id > 0 && new_id < 64)
+			{
+				m_jlip_id = new_id;
 				create_packet(STATUS_OK, NO_RESPONSE);
 			}
-			else if (m_command[4] == 0x43 && m_command[5] == 0x75)
+			else
 			{
-				// FF FF 21 0C 43 75 00 00 00 00 1D PLAY
-				LOGCMD("xvd701: Playback PLAY\n");
-
-				auto status = STATUS_OK;
-				if (m_playback_status == STATUS_STOP)
-				{
-					// Force video to load again if the video was stopped then started again
-					if (!seek_chapter(m_chapter))
-						status = STATUS_ERROR;
-				}
-
-				if (status == STATUS_OK)
-					m_playback_status = STATUS_PLAYING;
-
-				create_packet(status, NO_RESPONSE);
-			}
-
-			// 0x44 Stop commands
-			else if (m_command[4] == 0x44 && m_command[5] == 0x60)
-			{
-				// FF FF 21 0C 44 60 00 00 00 00 31 STOP
-				LOGCMD("xvd701: Playback STOP\n");
-
-				m_playback_status = STATUS_STOP;
-				create_packet(STATUS_OK, NO_RESPONSE);
-			}
-
-			// TODO: 0x4c Disk parameter commands
-
-			// TODO: 0x4e Disk status commands
-
-			// 0x50 Seek commands
-			else if (m_command[4] == 0x50 && m_command[5] == 0x20)
-			{
-				// FF FF 21 0C 50 20 00 00 00 00 63 SEEK TO SPECIFIC CHAPTER
-				auto chapter = ((m_command[6] % 10) * 100) + ((m_command[7] % 10) * 10) + (m_command[8] % 10);
-
-				if (m_media_type == JVC_MEDIA_VCD)
-				{
-					// VCD can only go to 99, so it sticks the data in the first two spots
-					chapter /= 10;
-				}
-
-				auto status = seek_chapter(chapter);
-				LOGCMD("xvd701: Seek chapter %d -> %d\n", chapter, status);
-				create_packet(status ? STATUS_OK : STATUS_ERROR, NO_RESPONSE);
-			}
-			else if (m_command[4] == 0x50 && m_command[5] == 0x61)
-			{
-				// FF FF 21 0C 50 61 00 00 00 00 24 PREV (SEEK TO PREVIOUS CHAPTER)
-				auto chapter = m_chapter - 1;
-				if (m_playback_status != STATUS_PLAYING && chapter == 0)
-					chapter = 1;
-
-				auto status = seek_chapter(chapter);
-				LOGCMD("xvd701: Seek prev -> %d\n", status);
-				create_packet(status ? STATUS_OK : STATUS_ERROR, NO_RESPONSE);
-			}
-			else if (m_command[4] == 0x50 && m_command[5] == 0x73)
-			{
-				// FF FF 21 0C 50 73 00 00 00 00 12 FF (SEEK TO NEXT CHAPTER)
-				auto status = seek_chapter(m_chapter + 1);
-				LOGCMD("xvd701: Seek FF -> %d\n", status);
-				create_packet(status ? STATUS_OK : STATUS_ERROR, NO_RESPONSE);
+				create_packet(STATUS_ERROR, NO_RESPONSE);
 			}
 		}
-		else if (m_command[3] == 0x3e)
+		else if (m_command[3] == 0x7c && m_command[4] == 0x45 && m_command[5] == 0x00)
 		{
-			// 0x40 Power commands
-			if (m_command[4] == 0x40 && m_command[5] == 0x60)
-			{
-				// FF FF 21 3E 40 60 00 00 00 00 03 DEVICE OFF
-				LOGCMD("xvd701: Device OFF\n");
+			LOGCMD("xvd701: Machine code request\n");
 
-				auto status = m_is_powered ? STATUS_OK : STATUS_ERROR;
-				if (m_is_powered)
-					m_is_powered = false;
-
-				create_packet(status, NO_RESPONSE);
-
-			}
-			else if (m_command[4] == 0x40 && m_command[5] == 0x70)
-			{
-				// FF FF 21 3E 40 70 00 00 00 00 73 DEVICE ON
-				LOGCMD("xvd701: Device ON\n");
-
-				auto status = !m_is_powered ? STATUS_OK : STATUS_ERROR;
-				if (!m_is_powered)
-					m_is_powered = true;
-
-				create_packet(status, NO_RESPONSE);
-			}
-			// TODO: 0x4e Power status commands
-			else if (m_command[4] == 0x4e && m_command[5] == 0x20)
-			{
-				LOGCMD("xvd701: Device power status request\n");
-				const unsigned char response[6] = { m_is_powered, 0x20, 0, 0, 0, 0 };
-				create_packet(STATUS_OK, response);
-			}
+			const unsigned char response[6] = { 0x00, 0x01, 0x03, 0x00, 0x03, 0x01 };
+			create_packet(STATUS_OK, response);
 		}
-		else if (m_command[3] == 0x7c)
+		else if (m_command[3] == 0x7c && m_command[4] == 0x48 && m_command[5] == 0x20)
 		{
-			if (m_command[4] == 0x41)
-			{
-				// 0x41 Change JLIP ID request
-				auto new_id = m_command[5];
-				LOGCMD("xvd701: Change JLIP ID to %02x\n", new_id);
+			LOGCMD("xvd701: Baud rate request\n");
 
-				if (new_id > 0 && new_id < 64)
-				{
-					m_jlip_id = new_id;
-					create_packet(STATUS_OK, NO_RESPONSE);
-				}
-				else
-				{
-					create_packet(STATUS_ERROR, NO_RESPONSE);
-				}
-			}
-			else if (m_command[4] == 0x45 && m_command[5] == 0x00)
-			{
-				// 0x45 0x00 Machine code request
-				LOGCMD("xvd701: Machine code request\n");
+			// Hardcoded to 9600 baud
+			const unsigned char response[6] = { 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 };
+			create_packet(STATUS_OK, response);
+		}
+		else if (m_command[3] == 0x7c && m_command[4] == 0x49 && m_command[5] == 0x00)
+		{
+			LOGCMD("xvd701: Device code request\n");
 
-				const unsigned char response[6] = { 0x00, 0x01, 0x03, 0x00, 0x03, 0x01 };
-				create_packet(STATUS_OK, response);
-			}
-			else if (m_command[4] == 0x48 && m_command[5] == 0x20)
-			{
-				// 0x48 0x20 Baud rate request
-				LOGCMD("xvd701: Baud rate request\n");
+			const unsigned char response[6] = { 0x03, 0x0C, 0x7F, 0x7F, 0x7F, 0x7F };
+			create_packet(STATUS_OK, response);
+		}
+		else if (m_command[3] == 0x7c && m_command[4] == 0x4c && m_command[5] == 0x00)
+		{
+			LOGCMD("xvd701: Device name first half request\n");
 
-				// Hardcoded to 9600 baud
-				const unsigned char response[6] = { 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 };
-				create_packet(STATUS_OK, response);
-			}
-			else if (m_command[4] == 0x49 && m_command[5] == 0x00)
-			{
-				// 0x49 0x00 Device code request
-				LOGCMD("xvd701: Device code request\n");
+			const unsigned char response[6] = { 'D', 'V', 'D', ' ', 'P', 'L' };
+			create_packet(STATUS_OK, response);
+		}
+		else if (m_command[3] == 0x7c && m_command[4] == 0x4d && m_command[5] == 0x00)
+		{
+			LOGCMD("xvd701: Device name last half request\n");
 
-				const unsigned char response[6] = { 0x03, 0x0C, 0x7F, 0x7F, 0x7F, 0x7F };
-				create_packet(STATUS_OK, response);
-			}
-			else if (m_command[4] == 0x4c && m_command[5] == 0x00)
-			{
-				// 0x4c 0x00 Device name first half request
-				LOGCMD("xvd701: Device name first half request\n");
+			const unsigned char response[6] = { 'A', 'Y', 'E', 'R', 0x7F, 0x7F };
+			create_packet(STATUS_OK, response);
+		}
+		else if (m_command[3] == 0x7c && m_command[4] == 0x4e && m_command[5] == 0x20)
+		{
+			LOGCMD("xvd701: NOP request\n");
 
-				const unsigned char response[6] = { 'D', 'V', 'D', ' ', 'P', 'L' };
-				create_packet(STATUS_OK, response);
-			}
-			else if (m_command[4] == 0x4d && m_command[5] == 0x00)
-			{
-				// 0x4d 0x00 Device name last half request
-				LOGCMD("xvd701: Device name last half request\n");
-
-				const unsigned char response[6] = { 'A', 'Y', 'E', 'R', 0x7F, 0x7F };
-				create_packet(STATUS_OK, response);
-			}
-			else if (m_command[4] == 0x4e && m_command[5] == 0x20)
-			{
-				// 0x4e 0x00 NOP request?
-				LOGCMD("xvd701: NOP request\n");
-
-				const unsigned char response[6] = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00 };
-				create_packet(STATUS_OK, response);
-			}
+			const unsigned char response[6] = { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00 };
+			create_packet(STATUS_OK, response);
 		}
 	}
 }
