@@ -1430,6 +1430,7 @@ ROM_END
   ИМ-10  Хоккей              Hockey (Khokkey)     Ice Hockey          Export version manufactured by PO Proton
   ИМ-13  Разведчики космоса  Razvedchiki kosmosa  Explorers of Space  Modified ROM (see note above)
   ИМ-16  Охота               Okhota               Fowling             -
+  ИМ-19  Биатлон             Biathlon (Biatlon)   -                   -
   ИМ-22  Весёлые футболисты  Vesyolye futbolisty  Monkey Goalkeeper   -
   ИМ-32  Кот-рыболов         Kot-rybolov          -                   -
   ИМ-33  Квака-задавака      Kvaka-zadavaka       Frogling            -
@@ -1453,6 +1454,7 @@ public:
 	void ehockey(machine_config &config);
 	void rkosmosa(machine_config &config);
 	void okhota(machine_config &config);
+	void biathlon(machine_config &config);
 	void vfutbol(machine_config &config);
 	void krybolov(machine_config &config);
 	void kvakazad(machine_config &config);
@@ -1524,6 +1526,11 @@ void gnw_mmouse_state::rkosmosa(machine_config &config)
 void gnw_mmouse_state::okhota(machine_config &config)
 {
 	kb1013vk12_common(config, 1632, 1080); // R mask option ?
+}
+
+void gnw_mmouse_state::biathlon(machine_config &config)
+{
+	kb1013vk12_common(config, 1633, 1080); // R mask option ?
 }
 
 void gnw_mmouse_state::vfutbol(machine_config &config)
@@ -1609,6 +1616,14 @@ ROM_START( okhota )
 
 	ROM_REGION( 117838, "screen", 0)
 	ROM_LOAD( "okhota.svg", 0, 117838, CRC(7de707c6) SHA1(c876ea16bd8af033086e2e20860d2e1d09296d59) )
+ROM_END
+
+ROM_START( biathlon )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-19.bin", 0x0000, 0x0740, CRC(cb820c32) SHA1(7e94fc255f32db725d5aa9e196088e490c1a1443) )
+
+	ROM_REGION( 116377, "screen", 0)
+	ROM_LOAD( "biathlon.svg", 0, 116377, CRC(fadf729e) SHA1(671f9496e2bfe7b4800ee7bad039485e19958428) )
 ROM_END
 
 ROM_START( vfutbol )
@@ -9775,6 +9790,7 @@ CONS( 1984, nupogodi,     gnw_mmouse,  0, nupogodi,     gnw_mmouse,   gnw_mmouse
 CONS( 1988, ehockey,      gnw_mmouse,  0, ehockey,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, rkosmosa,     gnw_mmouse,  0, rkosmosa,     rkosmosa,     gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, okhota,       gnw_mmouse,  0, okhota,       gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1989, biathlon,     gnw_mmouse,  0, biathlon,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Biathlon", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, vfutbol,      gnw_mmouse,  0, vfutbol,      gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Vesyolye futbolisty", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, krybolov,     gnw_mmouse,  0, krybolov,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kot-rybolov (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1989, kvakazad,     gnw_mmouse,  0, kvakazad,     gnw_mmouse,   gnw_mmouse_state,   empty_init, "bootleg (Elektronika)", "Kvaka-zadavaka", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
