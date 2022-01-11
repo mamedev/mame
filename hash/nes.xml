@@ -27196,6 +27196,7 @@ license:CC0
 		<description>Nintendo World Championships 1990 (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
+		<info name="usage" value="To play, press start on controller 2."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nes_event" />
 			<feature name="pcb" value="NES-EVENT" />
