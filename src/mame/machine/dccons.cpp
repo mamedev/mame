@@ -32,6 +32,16 @@
 // TODO: fine grain this value
 #define ATAPI_CYCLES_PER_SECTOR (5000)
 
+#define LOG_WARN    (1U << 0)
+#define LOG_XFER    (1U << 1) // log ATAPI transfers
+
+#define VERBOSE (LOG_WARN)
+//#define LOG_OUTPUT_STREAM std::cout
+#include "logmacro.h"
+
+#define LOGWARN(...)      LOGMASKED(LOG_WARN, __VA_ARGS__)
+#define LOGXFER(...)      LOGMASKED(LOG_XFER, __VA_ARGS__)
+
 WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
 {
 	if (state)
@@ -48,18 +58,18 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 	atapi_timer->adjust(attotime::never);
 
-	printf("atapi_xfer_end atapi_xferlen = %d\n", atapi_xferlen );
-
-	//osd_printf_debug("ATAPI: xfer_end.  xferlen = %d\n", atapi_xferlen);
+	LOGXFER("atapi_xfer_end atapi_xferlen = %d\n", atapi_xferlen );
 
 	m_ata->write_dmack(1);
 	atapi_xfercomplete = 0;
+
+	// TODO: dispatch transfers one step at a time instead of the full block
 	while (atapi_xferlen > 0 )
 	{
 		struct sh4_ddt_dma ddtdata;
 
 		// get a sector from the SCSI device
-		for (int i = 0; i < 2048/2; i++)
+		for (int i = 0; i < 2048 / 2; i++)
 		{
 			int d = m_ata->read_dma();
 			sector_buffer[ i*2 ] = d & 0xff;
@@ -71,13 +81,16 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 		// perform the DMA
 		ddtdata.destination = atapi_xferbase;   // destination address
-		ddtdata.length = 2048/4;
+		ddtdata.length = 2048 / 4;
 		ddtdata.size = 4;
 		ddtdata.buffer = sector_buffer;
-		ddtdata.direction=1;    // 0 source to buffer, 1 buffer to destination
-		ddtdata.channel= 0;
-		ddtdata.mode= -1;       // copy from/to buffer
-		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
+		ddtdata.direction = 1;    // 0 source to buffer, 1 buffer to destination
+		ddtdata.channel = 0;
+		ddtdata.mode = -1;       // copy from/to buffer
+		LOGXFER("G1 I/F ATAPI: DMA one sector to %x, %x remaining\n",
+			machine().describe_context(),
+			atapi_xferbase, atapi_xferlen
+		);
 		m_maincpu->sh4_dma_ddt(&ddtdata);
 
 		atapi_xferbase += 2048;
@@ -92,7 +105,9 @@ TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
 
 void dc_cons_state::dreamcast_atapi_init()
 {
-	atapi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dc_cons_state::atapi_xfer_end),this));
+	atapi_timer = machine().scheduler().timer_alloc(
+		timer_expired_delegate(FUNC(dc_cons_state::atapi_xfer_end), this)
+	);
 	atapi_timer->adjust(attotime::never);
 	save_item(NAME(atapi_xferlen));
 	save_item(NAME(atapi_xferbase));
@@ -140,7 +155,7 @@ uint32_t dc_cons_state::dc_mess_g1_ctrl_r(offs_t offset)
 								// 0 - check in progress, BIOS data summed, G1 ATA area blocked (read FFFFFFFFh)
 			return 3;
 		default:
-			logerror("G1CTRL:  Unmapped read %08x\n", 0x5f7400+offset*4);
+			LOGWARN("G1CTRL:  Unmapped read %08x\n", 0x5f7400 + offset * 4);
 			//machine().debug_break();
 			break;
 	}
@@ -153,27 +168,29 @@ void dc_cons_state::dc_mess_g1_ctrl_w(offs_t offset, uint32_t data, uint32_t mem
 //  osd_printf_verbose("G1CTRL: [%08x=%x] write %x to %x, mask %x\n", 0x5f7400+reg*4, dat, data, offset, mem_mask);
 	switch (offset)
 	{
-	case SB_GDST:
-		if (data & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
-		{
-			if (g1bus_regs[SB_GDDIR] == 0)
+		case SB_GDST:
+			if (data & 1 && g1bus_regs[SB_GDEN] == 1) // 0 -> 1
 			{
-				printf("G1CTRL: unsupported transfer\n");
-				return;
+				if (g1bus_regs[SB_GDDIR] == 0)
+				{
+					// TODO: write to GD-ROM, shouldn't happen unless "special" condition occurs
+					// (implies a debug/development device?)
+					LOGWARN("%s: G1 I/F illegal direction transfer\n", machine().describe_context());
+					return;
+				}
+
+				atapi_xferbase = g1bus_regs[SB_GDSTAR];
+				//atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
+				/* 12x * 75 Hz = 0,00(1) secs per sector */
+				/* TODO: make DMA to be single step */
+				atapi_timer->adjust(attotime::from_usec(1111*atapi_xferlen/2048));
+//              atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
 			}
+			break;
 
-			atapi_xferbase = g1bus_regs[SB_GDSTAR];
-			//atapi_timer->adjust(m_maincpu->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))));
-			/* 12x * 75 Hz = 0,00(1) secs per sector */
-			/* TODO: make DMA to be single step */
-			atapi_timer->adjust(attotime::from_usec(1111*atapi_xferlen/2048));
-//          atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
-		}
-		break;
-
-	case SB_GDLEN:
-		atapi_xferlen = data;
-		break;
+		case SB_GDLEN:
+			atapi_xferlen = data;
+			break;
 
 /*
     The following register is involved in BIOS checksum protection system.
@@ -200,12 +217,12 @@ void dc_cons_state::dc_mess_g1_ctrl_w(offs_t offset, uint32_t data, uint32_t mem
 
     all described above works the same way in all HOLLY/CLX2-based systems - Dreamcast, Naomi 1/2, Atomiswave, SystemSP
 */
-	case SB_SECUR_EADR:
-		if (data==0 || data==0x001fffff || data==0x42fe)
-		{
-//          atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
-			printf("Unlocking GD-ROM! %x\n", data);
-		}
-		break;
+		case SB_SECUR_EADR:
+			if (data==0 || data==0x001fffff || data==0x42fe)
+			{
+	//          atapi_regs[ATAPI_REG_SAMTAG] = GDROM_PAUSE_STATE | 0x80;
+				logerror("%s: Unlocking GD-ROM %x\n", machine().describe_context(), data);
+			}
+			break;
 	}
 }

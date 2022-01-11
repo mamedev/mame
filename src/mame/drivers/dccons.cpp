@@ -180,8 +180,8 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
 
 	map(0xa0000000, 0xa01fffff).rom().region("maincpu", 0);
-	
-	map(0xf4000000, 0xf4003fff).nopw(); // SH-4 operand cache address array
+
+	map(0xf4000000, 0xf4003fff).noprw(); // SH-4 operand cache address array
 }
 
 void dc_cons_state::dc_port(address_map &map)
