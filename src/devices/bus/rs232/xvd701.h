@@ -6,19 +6,6 @@
 #include "rs232.h"
 #include "diserial.h"
 
-enum jvc_xvd701_media_type : uint32_t
-{
-	JVC_MEDIA_VCD = 0,
-	JVC_MEDIA_DVD = 1,
-};
-
-enum jvc_xvd701_playback_status : uint32_t
-{
-	STATUS_STOP = 0,
-	STATUS_PLAYING = 1,
-	STATUS_PAUSE = 2,
-};
-
 class jvc_xvd701_device : public device_t,
 		public device_serial_interface,
 		public device_rs232_port_interface
@@ -40,6 +27,19 @@ protected:
 
 private:
 	static constexpr int TIMER_RESPONSE = 1;
+
+	enum jvc_xvd701_media_type : uint32_t
+	{
+		JVC_MEDIA_VCD = 0,
+		JVC_MEDIA_DVD = 1,
+	};
+
+	enum jvc_xvd701_playback_status : uint32_t
+	{
+		STATUS_STOP = 0,
+		STATUS_PLAYING = 1,
+		STATUS_PAUSE = 2,
+	};
 
 	void send_response();
 	unsigned char sum(unsigned char *buffer, int length);
