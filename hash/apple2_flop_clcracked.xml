@@ -46737,11 +46737,13 @@ license:CC0
 		<!--"Bridge Tutor with Precision and Scientific Bidding" is a 1980 educational program developed by Alex Hanuse and distributed by Apple Computer. It is preserved here for the first time.-->
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Volume 1 Disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="bridge tutor with precision and scientific bidding (4am and san inc crack) volume 1.dsk" size="143360" crc="e08ab07d" sha1="b91d055b92c3a6dc6a1e3f14912aba65636a540a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Volume 2 Disk"/>
 			<dataarea name="flop" size="143360">
 				<rom name="bridge tutor with precision and scientific bidding (4am and san inc crack) volume 2.dsk" size="143360" crc="926f46f9" sha1="650ccf62f1aa4b7227d36cdd50fa71bd5c7da165"/>
 			</dataarea>
@@ -46934,6 +46936,108 @@ license:CC0
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="143360">
 				<rom name="the spanish hangman rev. 2 (4am crack) side b.dsk" size="143360" crc="9356d978" sha1="5a078e8488eb531f37698d9b336bfc666a524ce5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expllibl">
+		<description>Exploring Library Land (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-09"/>
+		<!--"Exploring Library Land" is a 1986 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="exploring library land (4am crack).dsk" size="143360" crc="fc31fd2f" sha1="82da6dc63a73333c2bacc0a801d4e589c57bd150"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="libthunt">
+		<description>Library Treasure Hunt (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-09"/>
+		<!--"Library Treasure Hunt" is a 1986 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="library treasure hunt (4am crack).dsk" size="143360" crc="db217b7f" sha1="d162824a2b6586334b0cfa0464d527727840968e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expusa">
+		<description>Expedition U.S.A.! (cleanly cracked)</description>
+		<year>1989</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-09"/>
+		<!--"Expedition U.S.A.!" is a 1989 educational program developed and distributed by Society for Visual Education. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) boot.dsk" size="143360" crc="9c9a159a" sha1="b142154a1a29e3545b089a19fef0923ac44a59e4"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 1a.dsk" size="143360" crc="eb056baf" sha1="64061545cf10638e6c466679471554551f9581cd"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 1 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 1b.dsk" size="143360" crc="5061245e" sha1="01341f959e453b4abddaf065d3fab96e26452819"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2 Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 2a.dsk" size="143360" crc="f94bb7ba" sha1="ebe6b62e46d9b10c1cd64e9cfbc5df20c3ac6051"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk 2 Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="expedition usa (4am crack) data disk 2b.dsk" size="143360" crc="167c615f" sha1="06892f7a397011bfd6acf851aa06f282f00f4552"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="codecyph">
+		<description>Codes and Cyphers (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2022-01-10"/>
+		<!--"Codes and Cyphers" is a 1985 educational program developed by Richard Hefter, Susan Dubicki, and David Cunningham, and distributed by Optimum Resource. It is preserved here for the first time.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="codes and cyphers (4am and san inc crack).dsk" size="143360" crc="ae8cf9e1" sha1="67ef4606dd8c0b1ec5db07119057c6884144739e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beglibrs">
+		<description>Ripley's Believe It Or Not: Beginning Library Research Skills (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Society for Visual Education</publisher>
+		<info name="release" value="2022-01-11"/>
+		<!--"Ripley's Believe It Or Not: Beginning Library Research Skills" is a 1984 educational program developed and distribute by Society for Visual Education. It is preserved here for the first time.&lt;div&gt;&lt;br /&gt;&lt;/div&gt;&lt;div&gt;Enter TEACHER (password TEACHER) for the administration menu.&lt;/div&gt;-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ripley's beginning library research skills (4am crack) side a.dsk" size="143360" crc="6dbfbf09" sha1="b89426448321dcdf2d50bb8b6687b8cf9d771846"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="ripley's beginning library research skills (4am crack) side b.dsk" size="143360" crc="ece690ff" sha1="7eae9eed3ed1bfa0ed1037a9f995aefaeeebc0dc"/>
 			</dataarea>
 		</part>
 	</software>
