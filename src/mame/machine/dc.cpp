@@ -102,6 +102,18 @@ void dc_state::g2_dma_end_w(offs_t channel, u8 state)
 	dc_update_interrupt_status();
 }
 
+void dc_state::g2_dma_error_ia_w(offs_t channel, u8 state)
+{
+	dc_sysctrl_regs[SB_ISTERR] |= 0x8000 << channel;
+	dc_update_interrupt_status();
+}
+
+void dc_state::g2_dma_error_ov_w(offs_t channel, u8 state)
+{
+	dc_sysctrl_regs[SB_ISTERR] |= 0x80000 << channel;
+	dc_update_interrupt_status();
+}
+
 void dc_state::g1_irq(uint8_t data)
 {
 	switch(data) {
@@ -646,4 +658,6 @@ void dc_state::system_bus_config(machine_config &config, cpu_device *dev)
 	DC_G2IF(config, m_g2if, XTAL(25'000'000));
 	m_g2if->set_host_space("maincpu", AS_PROGRAM);
 	m_g2if->int_cb().set(FUNC(dc_state::g2_dma_end_w));
+	m_g2if->error_ia_cb().set(FUNC(dc_state::g2_dma_error_ia_w));
+	m_g2if->error_ov_cb().set(FUNC(dc_state::g2_dma_error_ov_w));
 }

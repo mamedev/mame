@@ -4,6 +4,15 @@
 
     Sega Dreamcast G2 System Bus I/F
 
+    TODO:
+    - Single-step instead of transfering in one go;
+    - Abort DMA if suspend mode is triggered;
+    - Time Out mechanism thru DS# & TR# signals;
+    - External pin enable in trigger select;
+    - Create a pure abstract interface shared with PVR-DMA I/F
+	  (one channel, different max size, simpler tsel, no suspend,
+	   different security code & area protection);
+
 **************************************************************************************************/
 
 #include "emu.h"
@@ -12,9 +21,10 @@
 #define LOG_WARN    (1U << 0)
 #define LOG_DMA     (1U << 1) // log DMA starts with CPU triggers (.tsel bit 1 == 0)
 #define LOG_HWTRIG  (1U << 2) // log DMA starts with HW triggers (.tsel bit 1 == 1)
-#define LOG_DMAEND  (1U << 3) // log DMA ends (mostly useful to checkout if device doesn't eat a timer)
+#define LOG_DMAEND  (1U << 3) // log DMA event ends
+#define LOG_ILLEGAL (1U << 4) // log illegal/malformed addresses
 
-#define VERBOSE (LOG_WARN | LOG_DMA | LOG_HWTRIG | LOG_DMAEND)
+#define VERBOSE (LOG_WARN | LOG_DMA | LOG_HWTRIG | LOG_DMAEND | LOG_ILLEGAL)
 //#define LOG_OUTPUT_STREAM std::cout
 #include "logmacro.h"
 
@@ -22,6 +32,7 @@
 #define LOGDMA(...)       LOGMASKED(LOG_DMA, __VA_ARGS__)
 #define LOGHWTRIG(...)    LOGMASKED(LOG_HWTRIG, __VA_ARGS__)
 #define LOGDMAEND(...)    LOGMASKED(LOG_DMAEND, __VA_ARGS__)
+#define LOGILLEGAL(...)   LOGMASKED(LOG_ILLEGAL, __VA_ARGS__)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -46,19 +57,9 @@ dc_g2if_device::dc_g2if_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, DC_G2IF, tag, owner, clock)
 	, m_host_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_int_w(*this)
+	, m_error_ia_w(*this)
+	, m_error_ov_w(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_add_mconfig - device-specific machine
-//  configuration addiitons
-//-------------------------------------------------
-
-
-void dc_g2if_device::device_add_mconfig(machine_config &config)
-{
-	//DEVICE(config, ...);
 }
 
 
@@ -75,6 +76,22 @@ void dc_g2if_device::device_start()
 	}
 
 	m_int_w.resolve();
+	m_error_ia_w.resolve();
+	m_error_ov_w.resolve();
+
+	save_item(STRUCT_MEMBER(m_dma, g2_addr));
+	save_item(STRUCT_MEMBER(m_dma, root_addr));
+	save_item(STRUCT_MEMBER(m_dma, len));
+	save_item(STRUCT_MEMBER(m_dma, size));
+	save_item(STRUCT_MEMBER(m_dma, mode));
+	save_item(STRUCT_MEMBER(m_dma, dir));
+	save_item(STRUCT_MEMBER(m_dma, enable));
+	save_item(STRUCT_MEMBER(m_dma, in_progress));
+	save_item(STRUCT_MEMBER(m_dma, start));
+	save_item(STRUCT_MEMBER(m_dma, tsel));
+	save_item(STRUCT_MEMBER(m_dma, hw_trigger));
+	save_item(NAME(m_g2apro.top_addr));
+	save_item(NAME(m_g2apro.bottom_addr));
 }
 
 
@@ -104,11 +121,16 @@ void dc_g2if_device::device_reset()
 
 void dc_g2if_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	u8 channel = param;
+	u8 channel = (u8)id;
+	bool dma_result = (bool)(param == 1);
 	m_dma[channel].in_progress = false;
 	m_dma[channel].start = false;
-	LOGDMAEND("%s: DMA%d end event\n", tag(), channel);
-	m_int_w(channel, 1);
+	LOGDMAEND("%s: DMA%d %s\n", tag(), id, dma_result ? "normal end" : "overflow error");
+
+	if (dma_result)
+		m_int_w(channel, 1);
+	else
+		m_error_ov_w(channel, 1);
 }
 
 
@@ -116,23 +138,49 @@ void dc_g2if_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
+template <u8 ch> void dc_g2if_device::channel_map(address_map &map)
+{
+	map(0x00, 0x03).rw(FUNC(dc_g2if_device::stag_r<ch>), FUNC(dc_g2if_device::stag_w<ch>));
+	map(0x04, 0x07).rw(FUNC(dc_g2if_device::star_r<ch>), FUNC(dc_g2if_device::star_w<ch>));
+	map(0x08, 0x0b).rw(FUNC(dc_g2if_device::len_r<ch>), FUNC(dc_g2if_device::len_w<ch>));
+	map(0x0c, 0x0f).rw(FUNC(dc_g2if_device::dir_r<ch>), FUNC(dc_g2if_device::dir_w<ch>));
+	map(0x10, 0x13).rw(FUNC(dc_g2if_device::tsel_r<ch>), FUNC(dc_g2if_device::tsel_w<ch>));
+	map(0x14, 0x17).rw(FUNC(dc_g2if_device::en_r<ch>), FUNC(dc_g2if_device::en_w<ch>));
+	map(0x18, 0x1b).rw(FUNC(dc_g2if_device::st_r<ch>), FUNC(dc_g2if_device::st_w<ch>));
+	map(0x1c, 0x1f).rw(FUNC(dc_g2if_device::susp_r<ch>), FUNC(dc_g2if_device::susp_w<ch>));
+}
+
+// Instantiate channel maps
+template void dc_g2if_device::channel_map<0>(address_map &map);
+template void dc_g2if_device::channel_map<1>(address_map &map);
+template void dc_g2if_device::channel_map<2>(address_map &map);
+template void dc_g2if_device::channel_map<3>(address_map &map);
+
 void dc_g2if_device::amap(address_map &map)
 {
+	// 0x5f7800-ff
 	// SB_AD*
-	map(0x00, 0x03).rw(FUNC(dc_g2if_device::stag_r<0>), FUNC(dc_g2if_device::stag_w<0>));
-	map(0x04, 0x07).rw(FUNC(dc_g2if_device::star_r<0>), FUNC(dc_g2if_device::star_w<0>));
-	map(0x08, 0x0b).rw(FUNC(dc_g2if_device::len_r<0>), FUNC(dc_g2if_device::len_w<0>));
-	map(0x0c, 0x0f).rw(FUNC(dc_g2if_device::dir_r<0>), FUNC(dc_g2if_device::dir_w<0>));
-	map(0x10, 0x13).rw(FUNC(dc_g2if_device::tsel_r<0>), FUNC(dc_g2if_device::tsel_w<0>));
-	map(0x14, 0x17).rw(FUNC(dc_g2if_device::en_r<0>), FUNC(dc_g2if_device::en_w<0>));
-	map(0x18, 0x1b).rw(FUNC(dc_g2if_device::st_r<0>), FUNC(dc_g2if_device::st_w<0>));
-	map(0x1c, 0x1f).rw(FUNC(dc_g2if_device::susp_r<0>), FUNC(dc_g2if_device::susp_w<0>));
-
+	map(0x00, 0x1f).m(FUNC(dc_g2if_device::channel_map<0>));
 	// SB_E1*
-
+	map(0x20, 0x3f).m(FUNC(dc_g2if_device::channel_map<1>));
 	// SB_E2*
-
+	map(0x40, 0x5f).m(FUNC(dc_g2if_device::channel_map<2>));
 	// SB_DD*
+	map(0x60, 0x7f).m(FUNC(dc_g2if_device::channel_map<3>));
+
+	map(0x80, 0x83).r(FUNC(dc_g2if_device::g2id_r));
+
+//  map(0x90, 0x93).rw SB_G2DSTO #DS timeout
+//  map(0x94, 0x97).rw SB_G2TRTO #TR timeout
+//  map(0x98, 0x9b).rw SB_G2MDMTO modem wait timeout
+//  map(0x9c, 0x9f).rw SB_G2MDMW modem wait time
+
+	map(0xbc, 0xbf).w(FUNC(dc_g2if_device::g2apro_w));
+
+//  map(0xc0, 0xcb).r SB_AD*D live register reads (STAG, STAR, LEN)
+//  map(0xd0, 0xdb).r SB_E1*D live register reads
+//  map(0xe0, 0xeb).r SB_E2*D live register reads
+//  map(0xf0, 0xfb).r SB_DD*D live register reads
 }
 
 template <u8 ch> u32 dc_g2if_device::stag_r()
@@ -145,6 +193,12 @@ template <u8 ch> u32 dc_g2if_device::stag_r()
 template <u8 ch> void dc_g2if_device::stag_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_dma[ch].g2_addr);
+
+	if (!g2_address_check(m_dma[ch].g2_addr))
+	{
+		LOGILLEGAL("%s: G2 illegal Address trap %08x (%08x)\n", machine().describe_context(), data, mem_mask);
+		m_error_ia_w(ch, 1);
+	}
 }
 
 template <u8 ch> u32 dc_g2if_device::star_r()
@@ -157,6 +211,12 @@ template <u8 ch> u32 dc_g2if_device::star_r()
 template <u8 ch> void dc_g2if_device::star_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_dma[ch].root_addr);
+
+	if (!root_address_check(m_dma[ch].root_addr))
+	{
+		LOGILLEGAL("%s: root illegal Address trap %08x (%08x)\n", machine().describe_context(), data, mem_mask);
+		m_error_ia_w(ch, 1);
+	}
 }
 
 template <u8 ch> u32 dc_g2if_device::len_r()
@@ -240,7 +300,7 @@ template <u8 ch> void dc_g2if_device::en_w(offs_t offset, u32 data, u32 mem_mask
 	if (ACCESSING_BITS_0_7)
 	{
 		m_dma[ch].enable = bool(BIT(data, 0));
-		// TODO: suppress an in-progress DMA if this is disabled
+		// TODO: suppresses an in-progress DMA if this is disabled
 	}
 }
 
@@ -261,7 +321,7 @@ template <u8 ch> void dc_g2if_device::st_w(offs_t offset, u32 data, u32 mem_mask
 	{
 		if (m_dma[ch].start == true)
 		{
-			LOGWARN("%s: DMA%d attempt to start an in-flight", machine().describe_context());
+			LOGWARN("%s: DMA%d attempt to start an in-flight\n", machine().describe_context());
 			return;
 		}
 
@@ -269,9 +329,10 @@ template <u8 ch> void dc_g2if_device::st_w(offs_t offset, u32 data, u32 mem_mask
 
 		if (m_dma[ch].enable && m_dma[ch].start && m_dma[ch].hw_trigger == false)
 		{
-			LOGDMA("%s: DMA%d root=%08x g2=%08x dir=G2%sroot\n    size=%08x (len=%08x) mode=DMA %s\n",
+			LOGDMA("%s: DMA%d root=%08x g2=%08x dir=G2%sroot (%d)\n    size=%08x (len=%08x) mode=DMA %s\n",
 				machine().describe_context(), ch,
 				m_dma[ch].root_addr, m_dma[ch].g2_addr, m_dma[ch].dir ? "->" : "<-",
+				m_dma[ch].dir,
 				m_dma[ch].size, m_dma[ch].len, m_dma[ch].mode ? "end" : "restart"
 			);
 			dma_execute(ch);
@@ -279,6 +340,9 @@ template <u8 ch> void dc_g2if_device::st_w(offs_t offset, u32 data, u32 mem_mask
 	}
 }
 
+// --x- ---- (r/o) DMA request input state (from external bus?)
+// ---x ---- (r/o) DMA suspend/stop status (active low)
+// ---- ---x (w) DMA suspend request
 template <u8 ch> u32 dc_g2if_device::susp_r()
 {
 	return (m_dma[ch].in_progress == false) << 4;
@@ -288,9 +352,87 @@ template <u8 ch> void dc_g2if_device::susp_w(offs_t offset, u32 data, u32 mem_ma
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// TODO: log a suspend request (bit 0 off)
-		// ...
+		// TODO: unemulated suspend mode
+		if (data & 1)
+		{
+			LOGWARN("%s: DMA%d suspend write %08x %08x\n", machine().describe_context(), data, mem_mask);
+			// ...
+		}
 	}
+}
+
+//**************************************************************************
+//  Misc. registers
+//**************************************************************************
+
+// SB_G2ID
+// 0001 ---- Holly v1.0
+// ---- 0011 G2 version
+u32 dc_g2if_device::g2id_r()
+{
+	LOGWARN("%s: read ID\n", machine().describe_context());
+	return 0x12;
+}
+
+// SB_G2APRO
+// xxxx xxxx xxxx xxxx ---- ---- ---- ---- Unlock register (must be == 0x4659)
+// ---- ---- ---- ---- -xxx xxxx ---- ---- Top range (start address)
+// ---- ---- ---- ---- ---- ---- -xxx xxxx Bottom range (end address)
+// all channels follows this ruleset
+void dc_g2if_device::g2apro_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (mem_mask != 0xffffffff)
+	{
+		LOGWARN("%s: g2apro_w attempt to write %08x with a non-dword (mem_mask=%08x)\n", machine().describe_context(), data, mem_mask);
+		return;
+	}
+	const u16 security_code = data >> 16;
+
+	if (security_code != 0x4659)
+	{
+		LOGWARN("%s: g2apro_w attempt to write %08x without satisfying security code condition\n", machine().describe_context(), data);
+		return;
+	}
+
+	const u16 top_range = (data & 0x7f00) >> 8;
+	const u16 bottom_range = (data & 0x7f);
+
+	m_g2apro.top_addr = (top_range << 20) | 0x08000000;
+	m_g2apro.bottom_addr = (bottom_range << 20) | 0x080fffff;
+
+	LOGILLEGAL("%s: g2apro_w set top=%08x bottom=%08x (%08x)\n",
+		machine().describe_context(),
+		m_g2apro.top_addr, m_g2apro.bottom_addr, data
+	);
+}
+
+//**************************************************************************
+//  DMA implementation
+//**************************************************************************
+
+inline bool dc_g2if_device::root_address_check(u32 offset)
+{
+	const u8 area = (offset >> 26) & 7;
+	// root iA is generated by accessing outside System RAM or texture/framebuffer RAM
+	return area == 1 || area == 3;
+}
+
+inline bool dc_g2if_device::g2_address_check(u32 offset)
+{
+	const u8 area = (offset >> 26) & 7;
+	// g2 iA is generated by accessing outside:
+	// - area == 0 for AD/E1/E2 buses
+	// - area == 5 for DD
+	return area == 0 || area == 5;
+}
+
+inline bool dc_g2if_device::root_overflow_check(u32 offset, u8 channel)
+{
+	bool result = offset >= m_g2apro.top_addr && offset <= m_g2apro.bottom_addr;
+	if (result == false)
+		LOGILLEGAL("%s: DMA%d overflow abort root=%08x\n", tag(), channel, offset);
+
+	return result;
 }
 
 void dc_g2if_device::dma_execute(u8 channel)
@@ -298,6 +440,21 @@ void dc_g2if_device::dma_execute(u8 channel)
 	u32 src, dst, index, transfer_size;
 	dst = m_dma[channel].g2_addr;
 	src = m_dma[channel].root_addr;
+
+	// Punt if attempts to go beyond the allocated buses
+	// TODO: should require two extra cycles for fetching addresses first
+	if (!root_address_check(src) || !g2_address_check(dst))
+	{
+		LOGILLEGAL("%s: DMA%d illegal address attempt root=%08x g2=%08x\n",
+			machine().describe_context(),
+			channel, src, dst
+		);
+		m_dma[channel].in_progress = false;
+		m_dma[channel].start = false;
+		m_dma[channel].enable = false;
+		m_error_ia_w(channel, 1);
+		return;
+	}
 
 	index = 0;
 
@@ -308,18 +465,25 @@ void dc_g2if_device::dma_execute(u8 channel)
 	if (m_dma[channel].dir == 1)
 		std::swap(src, dst);
 
-	//printf("%08x %08x %08x\n", src, dst, transfer_size);
-
 	// notify that a DMA is in progress
 	// ofc this should rather transfer one word at a time,
 	// we currently don't do that for performance reasons ...
 	m_dma[channel].in_progress = true;
 
-	// TODO: punt with exception if SB_G2APRO isn't asserted along the way
-	// TODO: raise debug signals if SB_G2DSTO / SB_G2TRTO aren't respected
-	//       (shouldn't matter for AICA RAM?)
+	bool dma_result = true;
+
 	for (; index < transfer_size; index += 2)
 	{
+		// assert that root address is inside the g2apro range
+		if (!root_overflow_check(m_dma[channel].dir ? dst : src, channel))
+		{
+			dma_result = false;
+			break;
+		}
+		// TODO: raise debug signals if SB_G2DSTO / SB_G2TRTO aren't respected
+		// Shouldn't matter for AICA RAM,
+		// it does in loopchk g2 test 0304 when it tries to write to
+		// expansion bus (where nothing lies on stock DC)
 		m_host_space->write_word(dst, m_host_space->read_word(src));
 		src += 2;
 		dst += 2;
@@ -339,9 +503,9 @@ void dc_g2if_device::dma_execute(u8 channel)
 	// clear mask flag if the DMA transfer mode is in End mode
 	// (Restart mode leaves this set to true)
 	if (m_dma[channel].mode == true)
-		m_dma[channel].enable = 0;
+		m_dma[channel].enable = false;
 
-	m_dma[channel].end_timer->adjust(dma_time, channel);
+	m_dma[channel].end_timer->adjust(dma_time, dma_result);
 }
 
 /*

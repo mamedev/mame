@@ -47,6 +47,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void g2_dma_end_w(offs_t channel, u8 state);
+	void g2_dma_error_ia_w(offs_t channel, u8 state);
+	void g2_dma_error_ov_w(offs_t channel, u8 state);
 	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
 	uint32_t dc_aica_reg_r(offs_t offset, uint32_t mem_mask = ~0);
 	void dc_aica_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

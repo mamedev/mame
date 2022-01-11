@@ -149,10 +149,10 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x00600000, 0x006007ff).rw(FUNC(dc_cons_state::dc_modem_r), FUNC(dc_cons_state::dc_modem_w));
 	map(0x00700000, 0x00707fff).rw(FUNC(dc_cons_state::dc_aica_reg_r), FUNC(dc_cons_state::dc_aica_reg_w));
 	map(0x00710000, 0x0071000f).mirror(0x02000000).rw("aicartc", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask64(0x0000ffff0000ffff);
-	map(0x00800000, 0x009fffff).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
+	map(0x00800000, 0x009fffff).mirror(0x02000000).rw(FUNC(dc_cons_state::soundram_r), FUNC(dc_cons_state::soundram_w));
 //  map(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  map(0x02700000, 0x02707fff) AICA reg mirror
-//  map(0x02800000, 0x02ffffff) AICA wave mem mirror
+//  map(0x02800000, 0x02ffffff) AICA wave mem mirror (loopchk g2 bus DMA test)
 
 //  map(0x03000000, 0x03ffffff) G2 Ext Device #2
 
@@ -180,6 +180,8 @@ void dc_cons_state::dc_map(address_map &map)
 	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
 
 	map(0xa0000000, 0xa01fffff).rom().region("maincpu", 0);
+	
+	map(0xf4000000, 0xf4003fff).nopw(); // SH-4 operand cache address array
 }
 
 void dc_cons_state::dc_port(address_map &map)
