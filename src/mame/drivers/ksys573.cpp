@@ -356,6 +356,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 #include "machine/linflash.h"
 #include "machine/k573cass.h"
 #include "machine/k573dio.h"
+#include "machine/k573mcal.h"
 #include "machine/k573mcr.h"
 #include "machine/k573msu.h"
 #include "machine/k573npu.h"
@@ -2430,6 +2431,10 @@ void ksys573_state::konami573(machine_config &config)
 	adc.set_input_callback(FUNC(ksys573_state::analogue_inputs_callback));
 
 	SYS573_JVS_HOST(config, m_sys573_jvs_host, 0);
+
+	// Uncomment for generating new security cartridges
+	// Warning: Does not play well with memory card reader (JVS chaining issue?)
+	//KONAMI_573_MASTER_CALENDAR(config, "k573mcal", 0, m_sys573_jvs_host);
 }
 
 // Variants with additional digital sound board
