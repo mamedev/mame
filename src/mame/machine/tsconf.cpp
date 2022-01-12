@@ -83,7 +83,6 @@ void tsconf_state::tsconf_update_bank1()
 		rom0 = &m_p_rom[0x10000 + PAGE4K(m_ROMSelection & 0x1f)];
 		m_bank1->set_base(rom0);
 	}
-	m_ram_0000 = W0_WE ? rom0 : nullptr;
 }
 
 void tsconf_state::tsconf_update_video_mode()

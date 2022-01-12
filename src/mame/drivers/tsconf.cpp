@@ -212,8 +212,6 @@ void tsconf_state::machine_reset()
 	u8 *messram = m_ram->pointer();
 	m_program = &m_maincpu->space(AS_PROGRAM);
 
-	m_ram_0000 = nullptr;
-
 	m_port_f7_ext = DISABLED;
 
 	m_regs[V_CONFIG] = 0x00;
