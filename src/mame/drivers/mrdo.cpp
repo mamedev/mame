@@ -38,19 +38,6 @@ constexpr XTAL VIDEO_CLOCK = 19.6_MHz_XTAL;
 
 } // anonymous namespace
 
-
-
-/* PAL16R6CN used for protection. The game doesn't clear the screen
-   if a read from this address doesn't return the value it expects. */
-uint8_t mrdo_state::mrdo_SECRE_r()
-{
-	uint8_t *RAM = memregion("maincpu")->base();
-
-	return RAM[m_maincpu->state_int(Z80_HL)];
-}
-
-
-
 void mrdo_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
