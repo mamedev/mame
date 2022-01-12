@@ -84,8 +84,6 @@ private:
  *************************************/
 
 /* Spectrum screen size in pixels */
-#define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
-                                   line. Some of these may be vertical retrace. */
 #define SPEC_TOP_BORDER    48   /* Number of border lines before actual screen */
 #define SPEC_DISPLAY_YSIZE 192  /* Vertical screen resolution */
 #define SPEC_BOTTOM_BORDER 56   /* Number of border lines at bottom of screen */
@@ -95,12 +93,6 @@ private:
 #define SPEC_DISPLAY_XSIZE 256  /* Horizontal screen resolution */
 #define SPEC_RIGHT_BORDER  48   /* Number of right hand border pixels */
 #define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
-
-#define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
-#define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
-#define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
 static constexpr rgb_t spectrum_palette[16] = {
 	rgb_t(0x00, 0x00, 0x00),

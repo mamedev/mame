@@ -24,14 +24,11 @@
 /* Spectrum crystals */
 
 #define X1 XTAL(14'000'000)       // Main clock (48k Spectrum)
-#define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
 
 #define X2 XTAL(4'433'619) // PAL color subcarrier
 
 /* Spectrum screen size in pixels */
-#define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
-                                   line. Some of these may be vertical retrace. */
 #define SPEC_TOP_BORDER    48   /* Number of border lines before actual screen */
 #define SPEC_DISPLAY_YSIZE 192  /* Vertical screen resolution */
 #define SPEC_BOTTOM_BORDER 56   /* Number of border lines at bottom of screen */
@@ -39,27 +36,8 @@
 
 #define SPEC_LEFT_BORDER   48   /* Number of left hand border pixels */
 #define SPEC_DISPLAY_XSIZE 256  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER  48   /* Number of right hand border pixels */
-#define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
 
-#define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
-#define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
-#define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
-
-struct EVENT_LIST_ITEM
-{
-	/* driver defined ID for this write */
-	int Event_ID;
-	/* driver defined data for this write */
-	int Event_Data;
-	/* time at which this write occurred */
-	int Event_Time;
-};
-
-
-
 
 class spectrum_state : public driver_device
 {
@@ -138,15 +116,8 @@ protected:
 	// Stormlord) and makes Firefly playable.
 	emu_timer *m_scanline_timer;
 
-	EVENT_LIST_ITEM *m_pCurrentItem;
-	int m_NumEvents;
-	int m_TotalEvents;
-	char *m_pEventListBuffer;
-	int m_LastFrameStartTime;
 	int m_CyclesPerLine;
 
-	uint8_t *m_ram_0000;
-	uint8_t m_ram_disabled_by_beta;
 	uint8_t pre_opcode_fetch_r(offs_t offset);
 	void spectrum_rom_w(offs_t offset, uint8_t data);
 	uint8_t spectrum_rom_r(offs_t offset);
