@@ -6,7 +6,7 @@
 
     Three variations of this terminal were introduced in 1986. Falco 5220
     primarily emulates the DEC VT220; Falco 542 primarily emulates the LSI
-    ADM 42; and Falco 5550 primarily emulates the Wyse WY-50.
+    ADM 42; and Falco 5500 primarily emulates the Wyse WY-50.
 
     All three of these terminals have the same video characteristics, with
     9x12 characters rendered in a 10x16 cell, displayed in up to 2 screen

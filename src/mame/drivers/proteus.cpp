@@ -55,7 +55,7 @@
 #include "bus/centronics/ctronics.h"
 #include "formats/flex_dsk.h"
 #include "formats/poly_dsk.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 
 class proteus_state : public driver_device

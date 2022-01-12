@@ -67,7 +67,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_term_data;
+	u8 m_term_data = 0U;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device_array<z80sio_device, 2> m_sio;

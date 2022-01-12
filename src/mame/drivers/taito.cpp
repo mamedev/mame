@@ -66,7 +66,7 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_audiocpu(*this, "audiocpu")
 		, m_pia(*this, "pia")
-		, m_digits(*this, "digit%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -79,7 +79,7 @@ protected:
 	void audio_map(address_map &map);
 	void audio_map2(address_map &map);
 	u8 pia_pb_r();
-	u8 m_sndcmd = 0x3e;
+	u8 m_sndcmd = 0x3eU;
 	required_device<m6802_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia;
 	output_finder<32> m_digits;
@@ -114,7 +114,7 @@ private:
 	void shock_audio_map(address_map &map);
 	void main_map(address_map &map);
 
-	u8 m_votrax_cmd = 0;
+	u8 m_votrax_cmd = 0U;
 	u8 m_io[32]{};
 	required_device<i8080_cpu_device> m_maincpu;
 	optional_device<votrax_sc01_device> m_votrax;
@@ -143,8 +143,8 @@ private:
 	void z80_lamp_w(u8);
 	void z80_sol_w(u8);
 	u8 z80_key_r();
-	u8 m_row = 0;
-	u8 m_t_c = 0;
+	u8 m_row = 0U;
+	u8 m_t_c = 0U;
 	required_device<z80_device> m_z80cpu;
 	required_ioport_array<8> m_io_keyboard;
 };

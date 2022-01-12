@@ -31,7 +31,7 @@ Driver file for IBM PC, IBM PC XT, and related machines.
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 /******************************************************* Generic PC with CGA ***/
 
@@ -1746,7 +1746,7 @@ Desktop?
 void pc_state::ec1847(machine_config &config)
 {
 	pccga(config);
-//	subdevice<isa8_slot_device>("isa1")->set_default_option("hercules");
+//  subdevice<isa8_slot_device>("isa1")->set_default_option("hercules");
 }
 
 ROM_START( ec1847 )

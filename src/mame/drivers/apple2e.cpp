@@ -152,7 +152,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "bus/rs232/rs232.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/ap2_dsk.h"

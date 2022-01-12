@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "includes/svision.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "svision.lh"

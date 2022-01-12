@@ -16,7 +16,7 @@ Status:
 - freefall, viperp, ironmaid, orbitor1: multiball, scores stay blank, no inputs
 - cue uses first player display for all players, one at a time (this is by design)
 - flight2k, gamatron: take a while to finish booting
-- st_game: no inputs, seems to be nonfunctional. Might be for different hardware.
+- st_sam: This is a test unit. Internal tests are working.
 - gamatron is actually a Bally conversion - it won't physically fit into a Stern machine.
 - drgnfist, cue, nineball, lightnin, spltsecp, catacomb, lazrlord: need a new layout to
   handle different credit/ball display (shows 17 at boot).
@@ -26,6 +26,7 @@ ToDo:
 - Sound - All machines have a B605/C605 sound card containing a 6840 and many other chips
 - Sound - Games 126,128-151,165 have a A720 voice synthesizer with a 'CRC' CPU and many other chips
 - Dips, Inputs, Solenoids vary per game
+- st_sam: hook up the sam4 roms
 
 *********************************************************************************************/
 
@@ -67,8 +68,8 @@ public:
 		, m_io_x2(*this, "X2")
 		, m_io_x3(*this, "X3")
 		, m_io_x4(*this, "X4")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void st_mp201(machine_config &config);
@@ -101,19 +102,19 @@ private:
 
 	void mem_map(address_map &map);
 
-	u8 m_u10a = 0;
-	u8 m_u10b = 0;
-	u8 m_u11a = 0;
-	u8 m_u11b = 0;
+	u8 m_u10a = 0U;
+	u8 m_u10b = 0U;
+	u8 m_u11a = 0U;
+	u8 m_u11b = 0U;
 	bool m_u10_ca2 = 0;
 	bool m_u10_cb2 = 0;
 	bool m_u11_cb2 = 0;
 	bool m_7d = 0; // 7-digit display yes/no
-	u8 m_stored_lamp = 0xff;
-	u8 m_digit = 0;
-	u8 m_counter = 0;
+	u8 m_stored_lamp = 0xffU;
+	u8 m_digit = 0U;
+	u8 m_counter = 0U;
 	u8 m_segment[5]{};
-	u8 m_last_solenoid = 31;
+	u8 m_last_solenoid = 31U;
 	required_device<m6800_cpu_device> m_maincpu;
 	optional_device<s14001a_device> m_s14001a;
 	optional_region_ptr<u8> m_speech;
@@ -538,7 +539,6 @@ u8 st_mp200_state::speech_r(offs_t offset)
 void st_mp200_state::machine_start()
 {
 	genpin_class::machine_start();
-
 	m_digits.resolve();
 	m_io_outputs.resolve();
 
@@ -560,6 +560,7 @@ void st_mp200_state::machine_start()
 void st_mp200_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	m_u10a = 0;
 	m_u10b = 0;
 	m_u10_cb2 = 0;
@@ -1063,13 +1064,21 @@ ROM_START(gamatron)
 	ROM_CONTINUE( 0x5800, 0x0800)
 ROM_END
 
-/*----------------------------------
-/ Unknown game and manufacturer
-/---------------------------------*/
-ROM_START(st_game)
+/*----------------------------------------
+/ Stern SAM III/IV test unit
+/  Ver. III roms working - see the manual
+/  Ver. IV roms not yet hooked up
+/----------------------------------------*/
+ROM_START(st_sam)
 	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(b9ac5204) SHA1(1ac4e336eb62c091e61e9b6b21a858e70ac9ab38))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(e16fbde1) SHA1(f7fe2f2ef9251792af1227f82dcc95239dd8baa1))
+	ROM_LOAD( "sam_iii_rev5.u2", 0x5000, 0x0800, CRC(b9ac5204) SHA1(1ac4e336eb62c091e61e9b6b21a858e70ac9ab38))
+	ROM_LOAD( "sam_iii_rev5.u6", 0x5800, 0x0800, CRC(e16fbde1) SHA1(f7fe2f2ef9251792af1227f82dcc95239dd8baa1))
+
+	ROM_REGION(0x1000, "sam4", ROMREGION_ERASEFF) // not hooked up, order not worked out yet
+	ROM_LOAD( "sam_iv_r_c5.u1", 0x0000, 0x0400, CRC(5fc44fc9) SHA1(aef3b9dbb0ba1c110b20b8e577168f4c67b6c99d) )
+	ROM_LOAD( "sam_iv_r_c5.u3", 0x0400, 0x0400, CRC(121a4db0) SHA1(a6a94fb4e17ca1ebcd009b96de6a3c253c7fb510) )
+	ROM_LOAD( "sam_iv_r_c5.u5", 0x0800, 0x0400, CRC(361af770) SHA1(1d9698bf261e4f34c7304569c3b5c6d31edaa16a) )
+	ROM_LOAD( "sam_iv_r_c5.u7", 0x0c00, 0x0400, CRC(8766c667) SHA1(d6e6d1927016487f1429d084ec6b1abf54c004c5) )
 ROM_END
 
 } // Anonymous namespace
@@ -1105,4 +1114,4 @@ GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_m
 
 // other manufacturer
 GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown MP-200 pinball game", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III/IV test unit",        MACHINE_IS_SKELETON_MECHANICAL)

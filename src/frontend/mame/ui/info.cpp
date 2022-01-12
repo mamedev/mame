@@ -15,9 +15,10 @@
 #include "ui/ui.h"
 
 #include "drivenum.h"
-#include "romload.h"
-#include "softlist.h"
 #include "emuopts.h"
+#include "romload.h"
+#include "screen.h"
+#include "softlist.h"
 
 #include <set>
 #include <sstream>
@@ -234,8 +235,8 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	// suppress "requires external artwork" warning when external artwork was loaded
 	if (config.root_device().has_running_machine())
 	{
-		for (render_target *target = config.root_device().machine().render().first_target(); target != nullptr; target = target->next())
-			if (!target->hidden() && target->external_artwork())
+		for (render_target const &target : config.root_device().machine().render().targets())
+			if (!target.hidden() && target.external_artwork())
 			{
 				m_flags &= ~::machine_flags::REQUIRES_ARTWORK;
 				break;

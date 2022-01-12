@@ -14,6 +14,7 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
@@ -25,9 +26,14 @@ TODO:
 #include "machine/z80daisy.h"
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
-#include "softlist.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
+
 #include "z80clock.lh"
+
+
+namespace {
 
 class z80clock_state : public driver_device
 {
@@ -87,7 +93,6 @@ public:
 		m_ctc->zc_callback<0>().set(FUNC(z80clock_state::ctc_sound<0>));
 		m_ctc->zc_callback<1>().set(FUNC(z80clock_state::ctc_sound<1>));
 		m_ctc->zc_callback<2>().set(FUNC(z80clock_state::ctc_sound<2>));
-		m_ctc->zc_callback<3>().set(FUNC(z80clock_state::ctc_sound<3>));
 
 		BQ4845(config, m_rtc, 32.768_kHz_XTAL);
 		m_rtc->int_handler().set(m_ctc, FUNC(z80ctc_device::trg3));
@@ -364,9 +369,6 @@ INPUT_PORTS_START(z80clock)
 	PORT_CONFNAME(0x4, 0x04, "JP5 5-6 Sound CTC CH2")
 	PORT_CONFSETTING(0x04, DEF_STR(Off))
 	PORT_CONFSETTING(0x00, DEF_STR(On))
-	PORT_CONFNAME(0x8, 0x08, "JP5 7-8 Sound CTC CH3")
-	PORT_CONFSETTING(0x08, DEF_STR(Off))
-	PORT_CONFSETTING(0x00, DEF_STR(On))
 
 	PORT_START("JP6")
 	PORT_CONFNAME(0x1, 0x00, "JP6 1-2 Sound CTC flip flop")
@@ -431,5 +433,7 @@ INPUT_PORTS_END
 
 ROM_START( z80clock )
 ROM_END
+
+} // anonymous namespace
 
 COMP(2020, z80clock, 0, 0, z80clock, z80clock, z80clock_state, empty_init, "Tom Storey", "Z80 based, triple time zone clock", MACHINE_SUPPORTS_SAVE)

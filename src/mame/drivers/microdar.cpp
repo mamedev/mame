@@ -261,7 +261,7 @@ ROM_END
 
 /* Info about "Far West":
  The sound contains shooting samples and a small sample of the Rawhide main theme.
- Background layout (four shooting targets as food cans with led circles), see https://youtu.be/YVxThMwhvKQ 
+ Background layout (four shooting targets as food cans with led circles), see https://youtu.be/YVxThMwhvKQ
 
                             o o o o
                     o o o o         o o o o          <- 16 LEDs

@@ -140,10 +140,8 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_p_nvram(*this, "nvram")
-		, m_bank_mask(0)
 		, m_parity_poison(false)
 		, m_display_enable(false)
-		, m_framecnt(0)
 		, m_nvram_protect(false)
 		, m_alarm_enable(false)
 		, m_alarm_toggle(false)
@@ -210,24 +208,24 @@ private:
 	required_shared_ptr<u8> m_p_nvram;
 	std::unique_ptr<u8 []>  m_p_parity;
 
-	u16 m_disp_mask;
-	u16 m_bank_mask;
-	bool m_parity_poison;
-	bool m_display_enable;
-	u8  m_framecnt;
-	bool m_nvram_protect;
+	u16 m_disp_mask = 0U;
+	u16 m_bank_mask = 0U;
+	bool m_parity_poison = 0;
+	bool m_display_enable = 0;
+	u8 m_framecnt = 0U;
+	bool m_nvram_protect = 0;
 
-	bool m_alarm_enable;
-	bool m_alarm_toggle;
+	bool m_alarm_enable = 0;
+	bool m_alarm_toggle = 0;
 
-	bool m_loopback_control;
-	bool m_comm_rxd;
-	bool m_sio_txda;
-	bool m_aux_rxd;
-	bool m_sio_txdb;
-	bool m_sio_rtsb;
-	bool m_aux_dsr;
-	bool m_sio_wrdyb;
+	bool m_loopback_control = 0;
+	bool m_comm_rxd = 0;
+	bool m_sio_txda = 0;
+	bool m_aux_rxd = 0;
+	bool m_sio_txdb = 0;
+	bool m_sio_rtsb = 0;
+	bool m_aux_dsr = 0;
+	bool m_sio_wrdyb = 0;
 };
 
 

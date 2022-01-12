@@ -75,7 +75,7 @@ u8 nes_partytap_device::read_exp(offs_t offset)
 	{
 		if (m_strobe)
 			m_latch = m_inputs->read();
-		ret |= m_latch & 0x1c;
+		ret = m_latch & 0x1c;
 		m_latch >>= 3;
 		m_latch |= 0xa0; // after first two reads, 0x14 will be returned
 	}

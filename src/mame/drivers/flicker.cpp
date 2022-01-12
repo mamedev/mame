@@ -45,6 +45,7 @@ The programming seems to be incomplete with some bugs and omissions.
 
 #include "flicker.lh"
 
+namespace {
 
 class flicker_state : public genpin_class
 {
@@ -429,6 +430,8 @@ ROM_START(flicker)
 	ROM_REGION(0x0400, "maincpu", 0)
 	ROM_LOAD("flicker.rom", 0x0000, 0x0400, CRC(c692e586) SHA1(5cabb28a074d18b589b5b8f700c57e1610071c68))
 ROM_END
+
+} // Anonymous namespace
 
 //    YEAR   GAME      PARENT  MACHINE   INPUT    CLASS           INIT        ORIENTATION  COMPANY                            DESCRIPTION            FLAGS
 GAME( 1974,  flicker,  0,      flicker,  flicker, flicker_state,  empty_init, ROT0,        "Dave Nutting Associates / Bally", "Flicker (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

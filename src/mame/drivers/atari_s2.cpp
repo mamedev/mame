@@ -43,7 +43,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
 		, m_dac1(*this, "dac1")
-		, m_digits(*this, "digit%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -70,10 +70,10 @@ private:
 
 	bool m_timer_sb = 0;
 	u8 m_timer_s[5]{};
-	u8 m_sound0 = 0;
-	u8 m_sound1 = 0;
-	u8 m_vol = 0;
-	u8 m_t_c = 0;
+	u8 m_sound0 = 0U;
+	u8 m_sound1 = 0U;
+	u8 m_vol = 0U;
+	u8 m_t_c = 0U;
 	u8 m_segment[7]{};
 	required_region_ptr<u8> m_p_prom;
 	required_device<cpu_device> m_maincpu;

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "softlist_dev.h"
+#include "imagedev/cartrom.h"
 
 
 /***************************************************************************
@@ -100,8 +100,8 @@ enum
 	BMC_60311C, BMC_80013B, BMC_810544C, BMC_830425C,
 	BMC_830506C, BMC_830928C, BMC_850437C, BMC_970630C,
 	BMC_N32_4IN1, BMC_NC20MB, BMC_NT639, BMC_NTD_03, BMC_SRPG_5IN1,
-	BMC_EL860947C, BMC_EL861121C, BMC_FK23C, BMC_FK23CA, BMC_JY012005,
-	BMC_JY820845C, BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
+	BMC_EL860947C, BMC_EL861121C, BMC_FAM250, BMC_FK23C, BMC_FK23CA,
+	BMC_JY012005, BMC_JY820845C, BMC_PJOY84, BMC_TH22913, BMC_11160, BMC_G146,
 	BMC_2751, BMC_8157, BMC_00202650,
 	BMC_411120C, BMC_810305C, BMC_820720C, BMC_830118C,
 	BMC_830832C, BMC_YY841101C, BMC_YY841155C,
@@ -269,7 +269,6 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER(set_irq_line);
 	[[deprecated("IRQs should be cleared explicitly")]] void hold_irq_line();
 	void reset_cpu();
-	[[deprecated("devices should stop poking into memory spaces where they don't belong")]] void poke(offs_t offset, uint8_t data);
 
 	// internal state
 	uint8_t *m_prg;
@@ -383,7 +382,7 @@ public:
 // ======================> nes_cart_slot_device
 
 class nes_cart_slot_device : public device_t,
-								public device_image_interface,
+								public device_cartrom_image_interface,
 								public device_single_card_slot_interface<device_nes_cart_interface>
 {
 public:
@@ -404,11 +403,6 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "nes_cart"; }
 	virtual const char *file_extensions() const noexcept override { return "nes,unf,unif"; }
@@ -440,19 +434,13 @@ public:
 
 	int get_crc_hack() { return m_crc_hack; }
 
-	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
-
 //private:
 	device_nes_cart_interface*      m_cart;
 	int m_pcb_id;
-	bool                            m_must_be_loaded;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-
-	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	const char * get_default_card_ines(get_default_card_software_hook &hook, const uint8_t *ROM, uint32_t len) const;
 	static const char * get_default_card_unif(const uint8_t *ROM, uint32_t len);

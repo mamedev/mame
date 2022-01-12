@@ -410,6 +410,7 @@ MACHINES["ALPHA_8921"] = true
 --MACHINES["AM2901B"] = true
 MACHINES["ARM_IOMD"] = true
 MACHINES["AUTOCONFIG"] = true
+MACHINES["BITMAP_PRINTER"] = true
 MACHINES["BUSMOUSE"] = true
 MACHINES["CR511B"] = true
 MACHINES["DMAC"] = true
@@ -4922,6 +4923,7 @@ files {
 	MAME_DIR .. "src/mame/includes/freekick.h",
 	MAME_DIR .. "src/mame/video/freekick.cpp",
 	MAME_DIR .. "src/mame/drivers/freeway.cpp",
+	MAME_DIR .. "src/mame/drivers/funeball.cpp",
 	MAME_DIR .. "src/mame/drivers/fungames.cpp",
 	MAME_DIR .. "src/mame/drivers/funkball.cpp",
 	MAME_DIR .. "src/mame/drivers/gambl186.cpp",

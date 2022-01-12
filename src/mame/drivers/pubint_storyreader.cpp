@@ -72,7 +72,7 @@
 #include "bus/generic/carts.h"
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class pi_storyreader_state : public driver_device

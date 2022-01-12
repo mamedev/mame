@@ -184,7 +184,7 @@ void nes_sxrom_device::set_chr(int chr_base, int chr_mask)
 		chr8((chr_base | (m_reg[1] & chr_mask)) >> 1, m_chr_source);
 }
 
-// this allows for easier implementation of the NES-EVENT board used for Nintento World Championships
+// this allows for easier implementation of MMC1 subclasses
 void nes_sxrom_device::update_regs(int reg)
 {
 	switch (reg)

@@ -178,6 +178,10 @@ Blitter Timing
  - Correct slowdown emulation and flags (depends on blit mode, and speed of RAM) - could do with the recompiler or alt idle skips on the busy flag wait loops
  - End of Blit IRQ? (one game has a valid irq routine that looks like it was used for profiling, but nothing depends on it)
 
+31/12/2021:
+  Akai Katana and Dodonpachi Saidaioujou removed at the request of the
+  current rightholder, exA-Arcadia (legal@exa.ac).
+
 */
 
 #include "emu.h"
@@ -894,17 +898,32 @@ ROM_START( dfkbl )
 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(31f9eb0a) SHA1(322158779e969bb321241065dd49c1167b91ff6c) )
 ROM_END
 
-ROM_START( akatana )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(613fd380) SHA1(6e28480eef3b483d00b42d811a9d2c7fa1097924) ) // (2010/ 8/13 MASTER VER.)
+// ROM_START( akatana )
+// 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+// 	ROM_LOAD16_WORD_SWAP( "u4", 0x000000, 0x400000, CRC(613fd380) SHA1(6e28480eef3b483d00b42d811a9d2c7fa1097924) ) // (2010/ 8/13 MASTER VER.)
 
-	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
-	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(89a2e1a5) SHA1(e6f4ec974406283665697fdd52bd606d0337dd11) )
+// 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+// 	ROM_LOAD( "u2", 0x000000, 0x8400000, CRC(89a2e1a5) SHA1(e6f4ec974406283665697fdd52bd606d0337dd11) )
 
-	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(34a67e24) SHA1(78a7e82123b86311f1116a80c39f147b8b695549) )
-	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(10760fed) SHA1(b70f4506c00f3901ff38f5efd4b897af1afc7a0c) )
-ROM_END
+// 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+// 	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x400000, CRC(34a67e24) SHA1(78a7e82123b86311f1116a80c39f147b8b695549) )
+// 	ROM_LOAD16_WORD_SWAP( "u24", 0x400000, 0x400000, CRC(10760fed) SHA1(b70f4506c00f3901ff38f5efd4b897af1afc7a0c) )
+// ROM_END
+
+// ROM_START( ddpsdoj )
+// 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+// 	ROM_LOAD16_WORD_SWAP("u4", 0x000000, 0x400000, CRC(e2a4411c) SHA1(f8b2b6326dd8eeae99b8b1ab2bd5a3f0b9c7f027) )
+// 	ROM_IGNORE( 0x000100 ) // Flash extra bytes
+
+// 	ROM_REGION( 0x8400000, "game", ROMREGION_ERASEFF)
+// 	ROM_LOAD("u2", 0x000000, 0x8400000, CRC(668e4cd6) SHA1(da0b10865df3a3e46cf8a109ca88a551faba4483) )
+
+// 	ROM_REGION( 0x800000, "ymz770", ROMREGION_ERASEFF)
+// 	ROM_LOAD16_WORD_SWAP("u23", 0x000000, 0x400000, CRC(ac94801c) SHA1(cbcc6d5d89860bc961967e1d3b7c329adaf200c5) )
+// 	ROM_IGNORE( 0x000100 ) // Flash extra bytes
+// 	ROM_LOAD16_WORD_SWAP("u24", 0x400000, 0x400000, CRC(f593045b) SHA1(91b92870d0dd2a7817cb0059cc750e2393686f4c) )
+// 	ROM_IGNORE( 0x000100 ) // Flash extra bytes
+// ROM_END
 
 uint64_t cv1k_state::speedup_r()
 {
@@ -1027,7 +1046,10 @@ GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT27
 GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",     MACHINE_IMPERFECT_TIMING )
 
 // CA021  Akai Katana
-GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
+//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
+
+// CA??? DoDonPachi SaiDaiOuJou
+//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
 GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)", "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",           MACHINE_NOT_WORKING )

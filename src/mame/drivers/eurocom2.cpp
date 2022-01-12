@@ -41,6 +41,7 @@
 #include "machine/wd_fdc.h"
 
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "screen.h"
 
 

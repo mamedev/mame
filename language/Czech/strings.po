@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-12-09 04:44+1100\n"
-"PO-Revision-Date: 2016-04-01 16:38+0200\n"
-"Last-Translator: Karel Brejcha <pankabre@gmail.com>\n"
+"PO-Revision-Date: 2021-12-20 22:08+0100\n"
+"Last-Translator: Milan Galcik <milan.galcik@gmail.com>\n"
 "Language-Team: MAME Language Team\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -389,11 +389,11 @@ msgstr "Zobrazit ukazatel myši"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Confirm quit from emulation"
-msgstr ""
+msgstr "Potvrdit ukončení emulace zařízení"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Skip system information screen"
-msgstr ""
+msgstr "Přeskočit úvodní informační obrazovku o systému"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Force 4:3 aspect for snapshot display"
@@ -409,7 +409,7 @@ msgstr "Přeskočit menu s výběrem BIOSu"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Skip software part selection menu"
-msgstr ""
+msgstr "Přeskočit menu s výběrem součásti softvéru"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Info auto audit"
@@ -561,7 +561,7 @@ msgstr "Uživatelské rozhraní nad emulovanou klávesnicí"
 
 #: src/frontend/mame/ui/submenu.cpp:91
 msgid "Off-screen reload"
-msgstr "Konvertovat tlačítko 2 světelné pistole na offscreen reload"
+msgstr "Konvertovat tlačítko 2 světelné pistole na off-screen reload"
 
 #: src/frontend/mame/ui/submenu.cpp:92
 msgid "Joystick deadzone"
@@ -577,7 +577,7 @@ msgstr "Přirozená klávesnice"
 
 #: src/frontend/mame/ui/submenu.cpp:95
 msgid "Allow contradictory joystick inputs"
-msgstr "Souběžná aktivace protichodných vstupů joysticku"
+msgstr "Povolit protichůdné vstupy joysticku"
 
 #: src/frontend/mame/ui/submenu.cpp:96
 msgid "Coin impulse"
@@ -1557,7 +1557,7 @@ msgstr "Viditelné opoždění"
 #: src/frontend/mame/ui/miscmenu.cpp:629
 #, c-format
 msgid "%s.xml saved in UI settings folder."
-msgstr ""
+msgstr "Soubor %s.xml byl uložen do složky nastavení uživ. rozhraní."
 
 #: src/frontend/mame/ui/miscmenu.cpp:655
 msgid "Name:             Description:\n"
@@ -1566,7 +1566,7 @@ msgstr "SOUBOR:            NÁZEV ZAŘÍZENÍ:\n"
 #: src/frontend/mame/ui/miscmenu.cpp:666
 #, c-format
 msgid "%s.txt saved in UI settings folder."
-msgstr ""
+msgstr "Soubor %s.txt byl uložen do složky nastavení uživ. rozhraní."
 
 #: src/frontend/mame/ui/miscmenu.cpp:683
 msgid "Export list in XML format (like -listxml)"
@@ -2148,7 +2148,7 @@ msgstr "Zvětšení = %1$d"
 
 #: src/frontend/mame/ui/viewgfx.cpp:1262
 msgid "Expand to fit"
-msgstr ""
+msgstr "Zvětšit na maximum, pokuď to jde"
 
 #: src/frontend/mame/ui/selgame.cpp:444
 msgid "Configure Machine"
@@ -2638,7 +2638,7 @@ msgstr "Zobrazení externího DAT"
 #: src/frontend/mame/ui/mainmenu.cpp:200
 #, c-format
 msgid "About %1$s"
-msgstr "O %1s"
+msgstr "O %1$s"
 
 #: src/frontend/mame/ui/mainmenu.cpp:212
 msgid "Select New Machine"
@@ -2769,7 +2769,7 @@ msgstr "Softvér je klonem %1$s"
 
 #: src/frontend/mame/ui/selmenu.cpp:683
 msgid "Software is parent"
-msgstr ""
+msgstr "Softvér je parentem"
 
 #: src/frontend/mame/ui/selmenu.cpp:688
 msgid "Supported: No"
@@ -2785,7 +2785,7 @@ msgstr "Podporovaný: Ano"
 
 #: src/frontend/mame/ui/selmenu.cpp:714
 msgid "Driver is parent"
-msgstr ""
+msgstr "Ovladač je parentem"
 
 #: src/frontend/mame/ui/selmenu.cpp:716 src/frontend/mame/ui/selmenu.cpp:718
 #, c-format
@@ -2853,7 +2853,7 @@ msgstr "Pokračujte stisknutím libovolné klávesy."
 
 #: src/frontend/mame/ui/selmenu.cpp:2744
 msgid "General Info"
-msgstr ""
+msgstr "Obecné informace"
 
 #: src/frontend/mame/ui/selmenu.cpp:2896
 #, c-format
@@ -2877,7 +2877,7 @@ msgstr "Ovladač je klonem\t%1$s\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2910
 msgid "Driver is Parent\t\n"
-msgstr ""
+msgstr "Ovladač je parentem\t\n"
 
 #: src/frontend/mame/ui/selmenu.cpp:2914
 msgid "Analog Controls\tYes\n"

@@ -119,14 +119,14 @@ private:
 	void lapbylap_audio_map(address_map &map);
 
 	bool m_pc0 = 0;
-	u8 m_game = 0;
-	u8 m_portc = 0;
-	u8 m_row = 0;
+	u8 m_game = 0U;
+	u8 m_portc = 0U;
+	u8 m_row = 0U;
 	u8 m_segment[8]{};
-	u8 m_sndcmd = 0;
-	u8 m_sndbank = 0;
-	u32 m_sound_addr = 0;
-	u32 m_audio_size = 0;
+	u8 m_sndcmd = 0U;
+	u8 m_sndbank = 0U;
+	u32 m_sound_addr = 0U;
+	u32 m_audio_size = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;

@@ -903,7 +903,7 @@ ROM_START( cheesech )
 	ROM_LOAD( "u151", 0x00000, 0x80000, CRC(65d5ebdb) SHA1(0d905b9a60b86e51de3bdcf6eeb059fe29606431) )
 ROM_END
 
-/* There is known to exist an Ultimate Tennis with ROMs labeled  A&M001C1293 13B and A&M001C1293 12B, it not known if they are the same data as below */
+/* There is known to exist an Ultimate Tennis with ROMs labeled A&M001C1293 13B, A&M001C1293 12B, and A&M001C1293 14A and are confirmed to be same data as below */
 ROM_START( ultennis )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
 	ROM_LOAD16_BYTE( "a+m001b1093_13b_u102.u102", 0x00000, 0x40000, CRC(ec31385e) SHA1(244e78619c549712d5541fb252656afeba639bb7) ) /* labeled  A&M001B1093  13B  U102 */

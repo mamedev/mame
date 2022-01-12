@@ -244,7 +244,7 @@ void spi_sdcard_device::do_command()
 			}
 			break;
 
-		case 8:					  // CMD8 - SEND_IF_COND (SD v2 only)
+		case 8:                   // CMD8 - SEND_IF_COND (SD v2 only)
 			m_data[0] = 0x01;
 			m_data[1] = 0;
 			m_data[2] = 0;
@@ -253,7 +253,7 @@ void spi_sdcard_device::do_command()
 			send_data(5, SD_STATE_IDLE);
 			break;
 
-		case 10:			  // CMD10 - SEND_CID
+		case 10:              // CMD10 - SEND_CID
 			m_data[0] = 0x01; // initial R1 response
 			m_data[1] = 0x00; // throwaway byte before data transfer
 			m_data[2] = 0xfe; // data token

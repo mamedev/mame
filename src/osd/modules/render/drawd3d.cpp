@@ -8,10 +8,11 @@
 
 // MAME headers
 #include "emu.h"
-#include "render.h"
-
-#include "rendutil.h"
 #include "emuopts.h"
+#include "render.h"
+#include "rendutil.h"
+#include "screen.h"
+
 #include "aviio.h"
 
 // MAMEOS headers

@@ -33,8 +33,6 @@ class sb2m600_state : public driver_device
 public:
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cassbit(0)
-		, m_cassold(0)
 		, m_maincpu(*this, M6502_TAG)
 		, m_acia(*this, "acia")
 		, m_cass(*this, "cassette")
@@ -69,9 +67,9 @@ protected:
 	void osi630_video(machine_config &config);
 	void osi600_mem(address_map &map);
 
-	uint8_t m_cass_data[4];
-	bool m_cassbit;
-	bool m_cassold;
+	uint8_t m_cass_data[4]{};
+	bool m_cassbit = 0;
+	bool m_cassold = 0;
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 	required_device<cassette_image_device> m_cass;
@@ -85,14 +83,14 @@ protected:
 	required_ioport m_io_reset;
 
 	/* floppy state */
-	int m_fdc_index;
+	int m_fdc_index = 0;
 
 	/* keyboard state */
-	uint8_t m_keylatch;
+	uint8_t m_keylatch = 0U;
 
 	/* video state */
-	int m_32;
-	int m_coloren;
+	int m_32 = 0;
+	int m_coloren = 0;
 };
 
 class c1p_state : public sb2m600_state

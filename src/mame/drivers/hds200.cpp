@@ -31,14 +31,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "machine/hds200_kbd.h"
+
+#include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/z80dma.h"
 #include "video/scn2674.h"
-#include "bus/rs232/rs232.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -53,8 +56,8 @@ namespace {
 class hds200_state : public driver_device
 {
 public:
-	hds200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	hds200_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_dma(*this, "dma"),
 		m_screen(*this, "screen"),
@@ -115,6 +118,7 @@ void hds200_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("maincpu", 0);
 	map(0x4000, 0x5fff).bankr(m_rombank);
+//	map(0x6000, 0x6001) // unknown device here
 	map(0x6800, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x77ff).ram().share("vram");
 	map(0x8000, 0xbfff).ram();
@@ -138,7 +142,6 @@ void hds200_state::io_map(address_map &map)
 uint8_t hds200_state::attr_r(offs_t offset)
 {
 	offs_t addr = ((offset << 1) + 0) & 0x7ff;
-	//logerror("attr_r %04x -> %04x = %02x\n", offset, addr, m_vram[addr]);
 	return m_vram[addr];
 }
 
@@ -149,8 +152,20 @@ void hds200_state::attrram_map(address_map &map)
 
 uint8_t hds200_state::char_r(offs_t offset)
 {
-	offs_t addr = ((offset << 1) + 1) & 0x7ff;
-	//logerror("char_r %04x -> %04x = %02x\n", offset, addr, m_vram[addr]);
+	offs_t addr = 0;
+	
+	// there should be a better way
+	if (((offset << 1) & 0x7000) == 0x7000)
+	{
+		// start address for row table
+		addr = (offset << 1) & 0x7ff;
+	}
+	else
+	{
+		// char data
+		addr = ((offset << 1) + 1) & 0x7ff;
+	}
+
 	return m_vram[addr];
 }
 
@@ -173,10 +188,10 @@ SCN2674_DRAW_CHARACTER_MEMBER( hds200_state::draw_character )
 	// ------1-  unknown
 	// -------0  unknown
 
-	if (ul && (BIT(attrcode, 4)))
+	if (ul && BIT(attrcode, 4))
 		data = 0x1ff;
 
-	if (blink && (BIT(attrcode, 3)))
+	if (blink && BIT(attrcode, 3))
 		data = 0x000;
 
 	// invert
@@ -186,12 +201,12 @@ SCN2674_DRAW_CHARACTER_MEMBER( hds200_state::draw_character )
 	if (cursor)
 		data = ~data;
 
-	if (m_reverse_video)
-		data = ~data;
-
 	// foreground/background colors
-	rgb_t fg = pen[1];
+	rgb_t fg = BIT(attrcode, 6) ? pen[2] : pen[1];
 	rgb_t bg = pen[0];
+
+	if (m_reverse_video)
+		std::swap(fg, bg);
 
 	// draw 9 pixels of the character
 	for (int i = 0; i < 9; i++)
@@ -306,7 +321,7 @@ void hds200_state::hds200(machine_config &config)
 	m_screen->set_raw(22.680_MHz_XTAL, 1008, 0, 720, 375, 0, 350); // 80-column mode
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));
 
-	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	GFXDECODE(config, "gfxdecode", m_palette, chars);
 

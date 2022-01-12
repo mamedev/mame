@@ -78,6 +78,7 @@ To Do / Status:
 #include "includes/trs80.h"
 #include "machine/input_merger.h"
 #include "formats/td0_dsk.h"
+#include "softlist_dev.h"
 
 namespace {
 
@@ -106,7 +107,7 @@ private:
 	void lnw80_io(address_map &map);
 	void lnw80_mem(address_map &map);
 
-	u8 m_lnw_mode = 0;
+	u8 m_lnw_mode = 0U;
 	required_shared_ptr<u8> m_p_gfxram;
 	memory_view m_lnw_bank;
 };

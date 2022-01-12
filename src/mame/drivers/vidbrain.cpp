@@ -54,7 +54,7 @@ Using the system:
 #include "includes/vidbrain.h"
 
 #include "machine/rescap.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "vidbrain.lh"

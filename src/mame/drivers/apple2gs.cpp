@@ -56,7 +56,7 @@
 #define LOG_ADB (0)             // log ADB activity in the old-style HLE simulation of the microcontroller and GLU
 
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "cpu/g65816/g65816.h"
@@ -4809,7 +4809,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[2]);
 	applefdintf_device::add_35(config, m_floppy[3]);
 
-    SOFTWARE_LIST(config, "flop_gs_clean").set_original("apple2gs_flop_clcracked"); // GS-specific cleanly cracked disks
+	SOFTWARE_LIST(config, "flop_gs_clean").set_original("apple2gs_flop_clcracked"); // GS-specific cleanly cracked disks
 	SOFTWARE_LIST(config, "flop_gs_orig").set_compatible("apple2gs_flop_orig"); // Original disks for GS
 	SOFTWARE_LIST(config, "flop_gs_misc").set_compatible("apple2gs_flop_misc"); // Legacy software list pre-June 2021 and defaced cracks
 	SOFTWARE_LIST(config, "flop_a2_clean").set_compatible("apple2_flop_clcracked"); // Apple II series cleanly cracked

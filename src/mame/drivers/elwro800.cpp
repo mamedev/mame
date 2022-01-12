@@ -31,6 +31,7 @@
 #include "machine/bankdev.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

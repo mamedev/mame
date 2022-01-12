@@ -1,22 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:Michael Zapf
 /*
-	Texas Instruments/Benchmarq BQ4847 Real-time clock
+    Texas Instruments/Benchmarq BQ4847 Real-time clock
 
-	Although featuring a similar interface, this chip is sufficiently
-	different from the BQ4842/BQ4852 that a separate implementation
-	makes sense.
+    Although featuring a similar interface, this chip is sufficiently
+    different from the BQ4842/BQ4852 that a separate implementation
+    makes sense.
 
-	This chip is functionally equivalent to the BQ4845; it does not support
-	a backup battery. Most datasheets about the BQ4847 are incomplete and
-	refer to the BQ4845.
+    This chip is functionally equivalent to the BQ4845; it does not support
+    a backup battery. Most datasheets about the BQ4847 are incomplete and
+    refer to the BQ4845.
 
-	Supports 24h/12h and Daylight saving
-	Supports leap years
+    Supports 24h/12h and Daylight saving
+    Supports leap years
 
-	No internal memory, only clock registers
+    No internal memory, only clock registers
 
-	Michael Zapf, April 2020
+    Michael Zapf, April 2020
 */
 #include "emu.h"
 #include "bq4847.h"
@@ -153,11 +153,11 @@ bool bq4847_device::increment_bcd(uint8_t& bcdnumber, uint8_t limit, uint8_t min
 }
 
 /*
-	Update cycle, called every second
-	The BQ RTCs use BCD representation
+    Update cycle, called every second
+    The BQ RTCs use BCD representation
 
-	TODO: We may not be able to use the parent class advance methods, since we
-	have to work with BCD (even with invalid values). Check this.
+    TODO: We may not be able to use the parent class advance methods, since we
+    have to work with BCD (even with invalid values). Check this.
 */
 TIMER_CALLBACK_MEMBER(bq4847_device::update_callback)
 {

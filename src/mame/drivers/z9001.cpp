@@ -55,7 +55,6 @@ class z9001_state : public driver_device
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_framecnt(0)
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
 		, m_ram(*this, "mainram")
@@ -79,8 +78,8 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	uint8_t m_framecnt;
-	bool m_cassbit;
+	uint8_t m_framecnt = 0U;
+	bool m_cassbit = 0;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	memory_passthrough_handler *m_rom_shadow_tap;

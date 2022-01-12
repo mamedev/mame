@@ -406,7 +406,7 @@ void md_cons_slot_state::ms_megadriv(machine_config &config)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -416,7 +416,7 @@ void md_cons_slot_state::ms_megadpal(machine_config &config)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -426,7 +426,7 @@ void md_cons_slot_state::ms_megadriv2(machine_config &config)
 
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
-	MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+	MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 
@@ -443,7 +443,7 @@ void md_cons_state::dcat16_megadriv(machine_config &config)
 	subdevice<screen_device>("megadriv")->screen_vblank().set(FUNC(md_cons_state::screen_vblank_console));
 
 //  has SD card slot instead?
-//  MD_CART_SLOT(config, m_cart, md_cart, nullptr);
+//  MD_CART_SLOT(config, m_cart, md_cart, nullptr).set_must_be_loaded(true);
 //  SOFTWARE_LIST(config, "cart_list").set_original("megadriv");
 }
 

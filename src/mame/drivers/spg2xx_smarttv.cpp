@@ -11,6 +11,7 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "softlist_dev.h"
 
 
 class smarttv_state : public spg2xx_game_state

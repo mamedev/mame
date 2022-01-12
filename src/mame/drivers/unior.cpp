@@ -64,7 +64,7 @@ public:
 		, m_cass(*this, "cassette")
 		, m_palette(*this, "palette")
 		, m_p_chargen(*this, "chargen")
-		, m_io_keyboard(*this, "X%d", 0)
+		, m_io_keyboard(*this, "X%d", 0U)
 	{ }
 
 	void unior(machine_config &config);
@@ -89,10 +89,10 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_4c;
-	u8 m_4e;
-	bool m_txe, m_txd, m_rts, m_casspol;
-	u8 m_cass_data[4];
+	u8 m_4c = 0U;
+	u8 m_4e = 0U;
+	bool m_txe = 0, m_txd = 0, m_rts = 0, m_casspol = 0;
+	u8 m_cass_data[4]{};
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	std::unique_ptr<u8[]> m_vram;

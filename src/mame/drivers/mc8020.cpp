@@ -30,7 +30,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
-		, m_keyboard(*this, "X%u", 0)
+		, m_keyboard(*this, "X%u", 0U)
 	{ }
 
 	void mc8020(machine_config &config);
@@ -44,7 +44,7 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_row;
+	u8 m_row = 0U;
 	virtual void machine_start() override;
 	required_shared_ptr<u8> m_p_videoram;
 	required_device<z80_device> m_maincpu;

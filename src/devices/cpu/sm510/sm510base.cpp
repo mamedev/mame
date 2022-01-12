@@ -287,7 +287,7 @@ void sm510_base_device::increment_pc()
 
 void sm510_base_device::execute_run()
 {
-	bool _1s_prev = m_1s_rise;
+	bool prev_1s = m_1s_rise;
 
 	while (m_icount > 0)
 	{
@@ -339,7 +339,7 @@ void sm510_base_device::execute_run()
 
 		// if CEND triggered at the same time as 1S signal, make sure it still wakes up
 		if (m_halt)
-			m_1s_rise = _1s_prev;
-		_1s_prev = false;
+			m_1s_rise = prev_1s;
+		prev_1s = false;
 	}
 }
