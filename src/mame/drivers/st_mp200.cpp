@@ -16,7 +16,7 @@ Status:
 - freefall, viperp, ironmaid, orbitor1: multiball, scores stay blank, no inputs
 - cue uses first player display for all players, one at a time (this is by design)
 - flight2k, gamatron: take a while to finish booting
-- st_game: no inputs, seems to be nonfunctional. Might be for different hardware.
+- st_sam: This is a test unit. Internal tests are working.
 - gamatron is actually a Bally conversion - it won't physically fit into a Stern machine.
 - drgnfist, cue, nineball, lightnin, spltsecp, catacomb, lazrlord: need a new layout to
   handle different credit/ball display (shows 17 at boot).
@@ -26,6 +26,7 @@ ToDo:
 - Sound - All machines have a B605/C605 sound card containing a 6840 and many other chips
 - Sound - Games 126,128-151,165 have a A720 voice synthesizer with a 'CRC' CPU and many other chips
 - Dips, Inputs, Solenoids vary per game
+- st_sam: hook up the sam4 roms
 
 *********************************************************************************************/
 
@@ -1063,13 +1064,21 @@ ROM_START(gamatron)
 	ROM_CONTINUE( 0x5800, 0x0800)
 ROM_END
 
-/*----------------------------------
-/ Unknown game and manufacturer
-/---------------------------------*/
-ROM_START(st_game)
+/*----------------------------------------
+/ Stern SAM III/IV test unit
+/  Ver. III roms working - see the manual
+/  Ver. IV roms not yet hooked up
+/----------------------------------------*/
+ROM_START(st_sam)
 	ROM_REGION(0x6000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD( "cpu_u2.716", 0x5000, 0x0800, CRC(b9ac5204) SHA1(1ac4e336eb62c091e61e9b6b21a858e70ac9ab38))
-	ROM_LOAD( "cpu_u6.716", 0x5800, 0x0800, CRC(e16fbde1) SHA1(f7fe2f2ef9251792af1227f82dcc95239dd8baa1))
+	ROM_LOAD( "sam_iii_rev5.u2", 0x5000, 0x0800, CRC(b9ac5204) SHA1(1ac4e336eb62c091e61e9b6b21a858e70ac9ab38))
+	ROM_LOAD( "sam_iii_rev5.u6", 0x5800, 0x0800, CRC(e16fbde1) SHA1(f7fe2f2ef9251792af1227f82dcc95239dd8baa1))
+
+	ROM_REGION(0x1000, "sam4", ROMREGION_ERASEFF) // not hooked up, order not worked out yet
+	ROM_LOAD( "sam_iv_r_c5.u1", 0x0000, 0x0400, CRC(5fc44fc9) SHA1(aef3b9dbb0ba1c110b20b8e577168f4c67b6c99d) )
+	ROM_LOAD( "sam_iv_r_c5.u3", 0x0400, 0x0400, CRC(121a4db0) SHA1(a6a94fb4e17ca1ebcd009b96de6a3c253c7fb510) )
+	ROM_LOAD( "sam_iv_r_c5.u5", 0x0800, 0x0400, CRC(361af770) SHA1(1d9698bf261e4f34c7304569c3b5c6d31edaa16a) )
+	ROM_LOAD( "sam_iv_r_c5.u7", 0x0c00, 0x0400, CRC(8766c667) SHA1(d6e6d1927016487f1429d084ec6b1abf54c004c5) )
 ROM_END
 
 } // Anonymous namespace
@@ -1105,4 +1114,4 @@ GAME(1984,  lazrlord,   0,          st_mp200,   mp200, st_mp200_state, init_st_m
 
 // other manufacturer
 GAME(1985,  gamatron,   flight2k,   st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Pinstar",   "Gamatron",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  st_game,    0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "<unknown>", "unknown MP-200 pinball game", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  st_sam,     0,          st_mp200,   mp200, st_mp200_state, init_st_mp200, ROT0, "Stern",     "SAM III/IV test unit",        MACHINE_IS_SKELETON_MECHANICAL)
