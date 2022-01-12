@@ -158,7 +158,9 @@ public:
 		block_t strong() { return block_t(m_object, false); }
 		block_t weak() { return block_t(m_object, true); }
 
-		const u8 *rodata() { return m_object->rodata(); }
+		u32 size() const { return m_object->size(); }
+
+		const u8 *rodata() const { return m_object->rodata(); }
 		u8 *data() { return m_object->data(); }
 
 		void copy(u32 offset, const u8 *src, u32 size);
@@ -173,14 +175,14 @@ public:
 		void w24l(u32 offset, u32 data);
 		void w32l(u32 offset, u32 data);
 
-		std::string rstr(u32 offset, u32 size);
-		u8  r8(  u32 offset);
-		u16 r16b(u32 offset);
-		u32 r24b(u32 offset);
-		u32 r32b(u32 offset);
-		u16 r16l(u32 offset);
-		u32 r24l(u32 offset);
-		u32 r32l(u32 offset);
+		std::string rstr(u32 offset, u32 size) const;
+		u8  r8(  u32 offset) const;
+		u16 r16b(u32 offset) const;
+		u32 r24b(u32 offset) const;
+		u32 r32b(u32 offset) const;
+		u16 r16l(u32 offset) const;
+		u32 r24l(u32 offset) const;
+		u32 r32l(u32 offset) const;
 	};
 
 	fsblk_t() : m_block_size(0) {}

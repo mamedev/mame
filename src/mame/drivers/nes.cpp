@@ -80,7 +80,7 @@ void nes_state::nes(machine_config &config)
 	m_ctrl1->set_screen_tag(m_screen);
 	m_ctrl2->set_screen_tag(m_screen);
 
-	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr);
+	NES_CART_SLOT(config, m_cartslot, NTSC_APU_CLOCK, nes_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("nes");
 	SOFTWARE_LIST(config, "ade_list").set_original("nes_ade");         // Camerica/Codemasters Aladdin Deck Enhancer mini-carts
 	SOFTWARE_LIST(config, "ntb_list").set_original("nes_ntbrom");      // Sunsoft Nantettate! Baseball mini-carts

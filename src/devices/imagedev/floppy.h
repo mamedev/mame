@@ -14,7 +14,6 @@
 #include "formats/flopimg.h"
 #include "formats/fsmgr.h"
 #include "sound/samples.h"
-#include "softlist_dev.h"
 #include "screen.h"
 
 class floppy_sound_device;
@@ -94,14 +93,14 @@ public:
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual const char *image_interface() const noexcept override = 0;
-	virtual iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
 
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return extension_list; }
+	virtual const char *image_type_name() const noexcept override { return "floppydisk"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "flop"; }
 	void setup_write(floppy_image_format_t *output_format);
 
 	void setup_load_cb(load_cb cb);
@@ -176,7 +175,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_image_interface implementation
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
+	virtual const software_list_loader &get_software_list_loader() const override;
 
 	virtual void track_changed();
 	virtual void setup_characteristics() = 0;

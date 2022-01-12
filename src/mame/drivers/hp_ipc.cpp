@@ -370,6 +370,7 @@ Software to look for
 #include "machine/tms9914.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/cop452.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 #include "sound/dac.h"
 #include "machine/input_merger.h"

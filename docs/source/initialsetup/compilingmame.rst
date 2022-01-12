@@ -115,6 +115,11 @@ with MSYS2 and the **pacman** package manager.
   ``mingw-w64-i686-python-sphinx``, ``mingw-w64-i686-python-sphinx_rtd_theme``
   and ``mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter`` a 32-bit MinGW
   environment).
+* To build the PDF documentation, you’ll additionally need
+  ``mingw-w64-x86_64-texlive-latex-extra`` and
+  ``mingw-w64-x86_64-texlive-fonts-recommended`` (or
+  ``mingw-w64-i686-texlive-latex-extra`` and
+  ``mingw-w64-i686-texlive-fonts-recommended`` for a 32-but MinGW environment).
 * To generate API documentation from source, you’ll need ``doxygen``.
 * If you plan to rebuild bgfx shaders and you want to rebuild the GLSL parser,
   you’ll need ``bison``.
@@ -405,8 +410,12 @@ can install these packages with
 
     pacman -S mingw-w64-x86_64-librsvg mingw-w64-x86_64-python-sphinx mingw-w64-x86_64-python-sphinxcontrib-svg2pdfconverter
 
-Note that no LaTeX packages currently exist for MSYS2 so you will not be able to
-generate a PDF file without using external tools.
+If you intend to make a PDF via LaTeX, you’ll need to install a LaTeX
+distribution such as TeX Live:
+
+.. code-block:: bash
+
+    pacman -S mingw-w64-x86_64-texlive-fonts-recommended mingw-w64-x86_64-texlive-latex-extra
 
 .. _compiling-docs-debian:
 

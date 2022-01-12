@@ -415,6 +415,12 @@ void cosmicg_state::init_cosmicg()
 	/* Program ROMs have data pins connected different from normal */
 	offs_t len = memregion("program")->bytes();
 	u8 *rom = memregion("program")->base();
+
+	/* convert dummy instruction to meaningful one */
+
+	rom[0x1e9b] ^= 0x20;
+	rom[0x1e9f] ^= 0x20;
+
 	for (offs_t offs = 0; offs < len; offs++)
 	{
 		u8 scrambled = rom[offs];
@@ -426,12 +432,6 @@ void cosmicg_state::init_cosmicg()
 
 		rom[offs] = normal;
 	}
-
-	/* Patch to avoid crash - Seems like duff romcheck routine */
-	/* I would expect it to be bitrot, but have two romsets    */
-	/* from different sources with the same problem!           */
-	rom[0x1e9e] = 0x04;
-	rom[0x1e9f] = 0xc0;
 }
 
 

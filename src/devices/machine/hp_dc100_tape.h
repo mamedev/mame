@@ -13,10 +13,11 @@
 
 #pragma once
 
+#include "imagedev/magtape.h"
+
 #include "formats/hti_tape.h"
 
-class hp_dc100_tape_device : public device_t,
-							 public device_image_interface
+class hp_dc100_tape_device : public microtape_image_device
 {
 public:
 	// Construction
@@ -27,12 +28,6 @@ public:
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 	virtual std::string call_display() override;
-	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
-	virtual bool is_readable() const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override;
 
 	// **** Units ****

@@ -39,6 +39,16 @@ static char const *const hd_option_spec =
 DEFINE_DEVICE_TYPE(HARDDISK, harddisk_image_device, "harddisk_image", "Harddisk")
 
 //-------------------------------------------------
+//  harddisk_image_base_device - constructor
+//-------------------------------------------------
+
+harddisk_image_base_device::harddisk_image_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+		device_image_interface(mconfig, *this)
+{
+}
+
+//-------------------------------------------------
 //  harddisk_image_device - constructor
 //-------------------------------------------------
 
@@ -50,9 +60,9 @@ harddisk_image_device::harddisk_image_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 //  harddisk_image_device - constructor for subclasses
 //-------------------------------------------------
+
 harddisk_image_device::harddisk_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_image_interface(mconfig, *this),
+	: harddisk_image_base_device(mconfig, type, tag, owner, clock),
 		m_chd(nullptr),
 		m_hard_disk_handle(nullptr),
 		m_device_image_load(*this),

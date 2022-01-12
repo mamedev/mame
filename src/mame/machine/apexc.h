@@ -12,6 +12,8 @@
 #define MAME_MACHINE_APEXC
 
 #pragma once
+
+#include "imagedev/papertape.h"
 #include "softlist_dev.h"
 
 
@@ -33,14 +35,13 @@ public:
 	apexc_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_CYLINDER; }
-
 	virtual bool is_readable()  const noexcept override { return true; }
 	virtual bool is_writeable() const noexcept override { return true; }
 	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *file_extensions() const noexcept override { return "apc"; }
+	virtual const char *image_type_name() const noexcept override { return "cylinder"; }
+	virtual const char *image_brief_type_name() const noexcept override { return "cyln"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -98,20 +99,13 @@ private:
     11111                   Letters
 */
 
-class apexc_tape_puncher_image_device : public device_t, public device_image_interface
+class apexc_tape_puncher_image_device : public paper_tape_punch_device
 {
 public:
 	// construction/destruction
 	apexc_tape_puncher_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return false; }
-	virtual bool is_writeable() const noexcept override { return true; }
-	virtual bool is_creatable() const noexcept override { return true; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	void write(uint8_t data);
@@ -120,7 +114,7 @@ private:
 	virtual void device_start() override { }
 };
 
-class apexc_tape_reader_image_device :  public device_t, public device_image_interface
+class apexc_tape_reader_image_device : public paper_tape_reader_device
 {
 public:
 	// construction/destruction
@@ -132,13 +126,6 @@ public:
 	apexc_tape_reader_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const noexcept override { return IO_PUNCHTAPE; }
-
-	virtual bool is_readable()  const noexcept override { return true; }
-	virtual bool is_writeable() const noexcept override { return false; }
-	virtual bool is_creatable() const noexcept override { return false; }
-	virtual bool must_be_loaded() const noexcept override { return false; }
-	virtual bool is_reset_on_load() const noexcept override { return false; }
 	virtual const char *file_extensions() const noexcept override { return "tap"; }
 
 	uint8_t read();

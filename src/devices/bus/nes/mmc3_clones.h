@@ -251,12 +251,11 @@ class nes_kay_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;
-	virtual void prg_cb(int start, int bank) override;
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
 	virtual void pcb_reset() override;
@@ -265,10 +264,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	virtual void set_prg(int prg_base, int prg_mask) override;
+
 private:
-	void update_regs();
-	uint8_t m_reg[8];
-	uint8_t m_low_reg;
+	u8 m_reg[5];
+	u8 m_low_reg;
 };
 
 
@@ -356,11 +356,10 @@ class nes_kof96_device : public nes_txrom_device
 {
 public:
 	// construction/destruction
-	nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nes_kof96_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	virtual uint8_t read_l(offs_t offset) override;
-	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_h(offs_t offset, uint8_t data) override;   // offset does not really count for this mapper
+	virtual u8 read_l(offs_t offset) override;
+	virtual void write_l(offs_t offset, u8 data) override;
 	virtual void prg_cb(int start, int bank) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
@@ -371,7 +370,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	uint8_t m_reg[4];
+	bool m_mmc3_mode;
 };
 
 

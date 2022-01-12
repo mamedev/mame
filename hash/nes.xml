@@ -27196,6 +27196,7 @@ license:CC0
 		<description>Nintendo World Championships 1990 (USA)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
+		<info name="usage" value="To play, press start on controller 2."/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="nes_event" />
 			<feature name="pcb" value="NES-EVENT" />
@@ -65359,9 +65360,6 @@ We don't include these hacks because they were not burned into real carts nor so
 			<dataarea name="prg" size="262144">
 				<rom name="super lion king 2, the (unl).prg" size="262144" crc="39d36377" sha1="edbc091d7e954793ce466d4f2122e07771f0d1a0" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
-			</dataarea>
 		</part>
 	</software>
 
@@ -66236,7 +66234,7 @@ from the NEStopia source, hence they would require confirmation. -->
 	</software>
 
 	<software name="crayon2" cloneof="biomirac">
-		<description>Crayon Shin-Chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
+		<description>Crayon Shin-chan (Asia, Bio Miracle Bokutte Upa pirate, ripped from multicart?)</description>
 		<year>1995</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66253,10 +66251,11 @@ from the NEStopia source, hence they would require confirmation. -->
 		</part>
 	</software>
 
-	<software name="crayonc">
-		<description>La Bi Xiao Xin - Crayon Shin-Chan (Chi)</description>
+	<software name="crayonc" supported="partial">
+		<description>Làbǐ Xiǎo Xīn - Crayon Shin-chan (China)</description>
 		<year>1995</year>
 		<publisher>Future Media</publisher>
+		<info name="alt_title" value="蠟筆小新"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="futuremedia" />
 			<feature name="pcb" value="FUTUREMEDIA" />
@@ -67368,9 +67367,10 @@ All musics were removed in this game.
 	</software>
 
 	<software name="sanguo4" supported="partial">
-		<description>San Guo Zhi 4 - Chi Bi Feng Yun (Chi)</description>
+		<description>Sānguózhì 4 - Chìbì Fēngyún (China)</description>
 		<year>1995</year>
 		<publisher>Future Media</publisher>
+		<info name="alt_title" value="三國誌IV: 赤璧風雲"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="futuremedia" />
 			<feature name="pcb" value="FUTUREMEDIA" />
@@ -77460,7 +77460,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="kof96" supported="no">
+	<software name="kof96">
 		<description>The King of Fighters 96 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -77800,7 +77800,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk6">
+	<software name="mk6" supported="partial">
 		<description>Mortal Kombat 6 (Asia)</description>
 		<year>1997</year>
 		<publisher>N.T</publisher>
@@ -77812,9 +77812,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="mortal kombat 6 (unl).prg" size="131072" crc="e99f996d" sha1="f14c9d79f4b33f833a6a8256455cb060e2a73ed2" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78366,9 +78363,6 @@ be better to redump them properly. -->
 			<dataarea name="prg" size="131072">
 				<rom name="super real bout 97 (unl).prg" size="131072" crc="7977530c" sha1="6b23129444a5a6d1a7c8f4a7bbdf319337124376" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="8192">
-			</dataarea>
 		</part>
 	</software>
 
@@ -78630,7 +78624,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk3">
+	<software name="umk3" supported="partial">
 		<description>Ultimate Mortal Kombat 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -78642,9 +78636,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="ultimate mortal kombat 3 (unl).prg" size="131072" crc="8e7f85bd" sha1="69c45c46cb5a0faca02ebb76c808ad8cdbd2b5f7" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -78825,9 +78816,6 @@ be better to redump them properly. -->
 			</dataarea>
 			<dataarea name="prg" size="131072">
 				<rom name="yuu yuu hakusho 97 v (unl).prg" size="131072" crc="5191fb3e" sha1="7aa09e3ac055b8b9436a29d2495720b2e6ce915b" offset="00000" status="baddump" />
-			</dataarea>
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -84171,7 +84159,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_s3a" supported="no">
+	<software name="mc_s3a">
 		<description>Super 3 in 1 (NT-934)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>

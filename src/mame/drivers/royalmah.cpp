@@ -318,6 +318,7 @@ private:
 	void rkjanoh2_iomap(address_map &map);
 	void royalmah_iomap(address_map &map);
 	void royalmah_map(address_map &map);
+	void royalmah_banked_map(address_map &map);
 	void seljan_iomap(address_map &map);
 	void seljan_map(address_map &map);
 	void suzume_iomap(address_map &map);
@@ -691,8 +692,14 @@ void royalmah_state::royalmah_map(address_map &map)
 {
 	map(0x0000, 0x6fff).rom().nopw();
 	map(0x7000, 0x7fff).ram().share("nvram");
-	map(0x8000, 0xffff).bankr(m_mainbank);    // banked ROMs not present in royalmah
 	map(0x8000, 0xffff).writeonly().share(m_videoram);
+}
+
+void royalmah_state::royalmah_banked_map(address_map &map)
+{
+	royalmah_map(map);
+
+	map(0x8000, 0xffff).bankr(m_mainbank);
 }
 
 void royalmah_state::mjapinky_map(address_map &map)
@@ -3746,6 +3753,7 @@ void royalmah_state::dondenmj(machine_config &config)
 {
 	royalmah(config);
 	m_maincpu->set_clock(8000000 / 2);   // 4 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::royalmah_banked_map);
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::dondenmj_iomap);
 }
 
@@ -3761,6 +3769,7 @@ void royalmah_state::makaijan(machine_config &config)
 {
 	royalmah(config);
 	m_maincpu->set_clock(8000000 / 2);   // 4 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::royalmah_banked_map);
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::makaijan_iomap);
 }
 
@@ -3768,6 +3777,7 @@ void royalmah_state::daisyari(machine_config &config)
 {
 	royalmah(config);
 	m_maincpu->set_clock(8000000 / 2);   // 4 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::royalmah_banked_map);
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::daisyari_iomap);
 }
 
@@ -3775,6 +3785,7 @@ void royalmah_state::mjclub(machine_config &config)
 {
 	royalmah(config);
 	m_maincpu->set_clock(8000000 / 2);   // 4 MHz ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &royalmah_state::royalmah_banked_map);
 	m_maincpu->set_addrmap(AS_IO, &royalmah_state::mjclub_iomap);
 }
 

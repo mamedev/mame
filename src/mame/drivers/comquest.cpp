@@ -67,7 +67,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 
-	[[maybe_unused]] uint8_t m_data[128][8];
+	//uint8_t m_data[128][8];
 
 	[[maybe_unused]] uint8_t comquest_read(offs_t offset);
 	[[maybe_unused]] void comquest_write(offs_t offset, uint8_t data);

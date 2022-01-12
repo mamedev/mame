@@ -490,7 +490,7 @@ void arcadia_state::arcadia(machine_config &config)
 	ARCADIA_SOUND(config, m_custom).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cartridge */
-	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr);
+	EA2001_CART_SLOT(config, "cartslot", arcadia_cart, nullptr).set_must_be_loaded(true);
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("arcadia");

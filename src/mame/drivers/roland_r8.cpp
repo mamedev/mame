@@ -74,13 +74,20 @@ R8 mkII doesn't seem to store the tone list in the program ROM.
 */
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/upd78k/upd78k2.h"
 #include "machine/nvram.h"
 #include "sound/rolandpcm.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include <array>
+
+
+namespace {
 
 // PCM card address line scrambling
 #define UNSCRAMBLE_ADDR_EXT(_offset) \
@@ -179,7 +186,7 @@ private:
 };
 
 
-image_init_result roland_r8_base_state::pcmrom_load(generic_slot_device* pcmcard, int card_id, device_image_interface &image)
+image_init_result roland_r8_base_state::pcmrom_load(generic_slot_device *pcmcard, int card_id, device_image_interface &image)
 {
 	uint32_t size = pcmcard->common_get_size("rom");
 	if (size > PCMCARD_SIZE)
@@ -201,8 +208,8 @@ image_init_result roland_r8_base_state::pcmrom_load(generic_slot_device* pcmcard
 	}
 
 	offs_t pcm_addr = PCMCARD_OFFSETS[card_id];
-	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
-	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	u8 *src = static_cast<u8 *>(memregion("pcmorg")->base());
+	u8 *dst = static_cast<u8 *>(memregion("pcm")->base());
 	memcpy(&src[pcm_addr], base, PCMCARD_SIZE);
 	// descramble PCM card ROM
 	descramble_rom_external(&dst[pcm_addr], &src[pcm_addr]);
@@ -213,11 +220,11 @@ image_init_result roland_r8_base_state::pcmrom_load(generic_slot_device* pcmcard
 
 void roland_r8_base_state::pcmrom_unload(int card_id)
 {
-	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
-	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	u8 *src = static_cast<u8 *>(memregion("pcmorg")->base());
+	u8 *dst = static_cast<u8 *>(memregion("pcm")->base());
 	offs_t pcm_addr = PCMCARD_OFFSETS[card_id];
-	memset(&src[pcm_addr], 0xFF, PCMCARD_SIZE);
-	memset(&dst[pcm_addr], 0xFF, PCMCARD_SIZE);
+	memset(&src[pcm_addr], 0xff, PCMCARD_SIZE);
+	memset(&dst[pcm_addr], 0xff, PCMCARD_SIZE);
 	//pcmard_loaded[card_id] = false;
 }
 
@@ -319,8 +326,8 @@ void roland_r8mk2_state::r8mk2(machine_config &config)
 
 void roland_r8_base_state::init_r8()
 {
-	u8* src = static_cast<u8*>(memregion("pcmorg")->base());
-	u8* dst = static_cast<u8*>(memregion("pcm")->base());
+	u8 *src = static_cast<u8*>(memregion("pcmorg")->base());
+	u8 *dst = static_cast<u8*>(memregion("pcm")->base());
 
 	for (offs_t addr = 0; addr < memregion("pcmorg")->bytes(); addr += 0x100000)
 	{
@@ -374,6 +381,8 @@ ROM_START(r8mk2)
 	ROM_LOAD("r15209442-upd27c8001eacz-027.ic82", 0x200000, 0x080000, NO_DUMP)
 	ROM_REGION(0x400000, "pcm", ROMREGION_ERASE00) // ROMs after descrambling
 ROM_END
+
+} // anonymous namespace
 
 
 SYST(1989, r8,    0,  0, r8,    r8, roland_r8_state, init_r8, "Roland", "R-8 Human Rhythm Composer (v2.02)", MACHINE_IS_SKELETON)

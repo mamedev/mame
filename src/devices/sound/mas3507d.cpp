@@ -1,8 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-//
-// MAS 3507D MPEG audio decoder
-//
+/*
+    Micronas MAS 3507D MPEG audio decoder
+
+    Datasheet: https://www.mas-player.de/mp3/download/mas3507d.pdf
+
+    TODO:
+    - Datasheet says it has DSP and internal program ROM,
+    but these are not dumped and hooked up
+    - Support Broadcast mode, MPEG Layer 2
+*/
 
 #include "emu.h"
 #include "mas3507d.h"
@@ -37,7 +44,7 @@ ALLOW_SAVE_TYPE(mas3507d_device::i2c_subdest_t)
 ALLOW_SAVE_TYPE(mas3507d_device::i2c_command_t)
 
 // device type definition
-DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "MAS 3507D MPEG decoder")
+DEFINE_DEVICE_TYPE(MAS3507D, mas3507d_device, "mas3507d", "Micronas MAS 3507D MPEG decoder")
 
 mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MAS3507D, tag, owner, clock)
@@ -51,7 +58,7 @@ mas3507d_device::mas3507d_device(const machine_config &mconfig, const char *tag,
 
 void mas3507d_device::device_start()
 {
-	current_rate = 44100;
+	current_rate = 44100; // TODO: related to clock/divider
 	stream = stream_alloc(0, 2, current_rate);
 	cb_sample.resolve();
 

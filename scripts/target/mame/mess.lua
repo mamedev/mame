@@ -829,6 +829,7 @@ MACHINES["BL_HANDHELDS_MENUCONTROL"] = true
 MACHINES["NS32081"] = true
 MACHINES["NS32202"] = true
 MACHINES["NS32082"] = true
+MACHINES["BITMAP_PRINTER"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -1185,6 +1186,7 @@ FORMATS["ZX81_P"] = true
 FORMATS["FS_PRODOS"] = true
 FORMATS["FS_ORIC_JASMIN"] = true
 FORMATS["FS_COCO_RSDOS"] = true
+FORMATS["FS_COCO_OS9"] = true
 
 --------------------------------------------------
 -- this is the list of driver libraries that

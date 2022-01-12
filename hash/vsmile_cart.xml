@@ -166,7 +166,7 @@ Regular game cartridges
 |   XX   | 80-092062-123(NL) | Winnie de Poeh - De wonderwereld van Poeh (rev. 123, labeled as "My Friends Tigger and Pooh", 52-092062(NL) on back label)
 |        | 80-092063(UK)     | Winnie The Pooh: The Honey Hunt                                                                |
 |   XX   | 80-092064(GE)     | Pooh - Die Honigjagd                                                                           |
-|        | 80-092064(GE)     | Pooh - Die Honigjagd (alt, no# on label)                                                       |
+|   XX   | 80-092064(GE)     | Winnie Puuh - Winnie Puuh auf der Honigjagd                                                    |
 |        | 80-092064(GE)     | My Friends Tigger and Pooh - Die Honigjagd                                                     |
 |   XX   | 80-092064-104(GE) | My Friends Tigger and Pooh - Die Honigjagd (rev. 104)                                          |
 |   XX   | 80-092065(FR)     | Winnie l'Ourson - La Chasse au miel de Winnie                                                  |
@@ -365,6 +365,7 @@ Regular game cartridges
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen                                             |
 |   XX   | 80-092344(GE)     | Thomas and Seine Freunde - Freunde Halten Zusammen (alt)                                       |
 |   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen (rev. 104)                                  |
+|   XX   | 80-092344-104(GE) | Thomas and Seine Freunde - Freunde Halten Zusammen (rev. 104, alt)                             |
 |   XX   | 80-092345(FR)     | Thomas et ses Amis - Les locomotives s'entraident                                              |
 |        | 80-092347(SP)     | Thomas and Friends - Juego de Aprendizaje                                                      |
 |        |          (DK)     | Thomas and Friends - Togene arbejder sammen                                                    |
@@ -4275,6 +4276,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 		</part>
 	</software>
 
+	<software name="thomasger104a" cloneof="thomas">
+		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany, rev. 104, alt)</description>
+		<year>2007</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092344-104(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092344-104 - Thomas and seine Freunde - Freunde halten zusammen (GER).bin" size="8388608" crc="11a81943" sha1="54c6afbea80c157858c12c6e813a8f88b82f2a92" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thomasge" cloneof="thomas">
 		<description>Thomas &amp; seine Freunde - Freunde Halten Zusammen (Germany)</description>
 		<year>2005</year>
@@ -4670,6 +4686,21 @@ V.Smile Smartbook Smartidges (need a Smartbook touch tablet connected to a regul
 			<feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
 			<dataarea name="rom" size="8388608">
 				<rom name="92064.u1" size="8388608" crc="38a17e7e" sha1="434849ba8867d0bfb16b0fb5abfec86286390c07" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohgea" cloneof="pooh">
+		<description>Disney's Winnie Puuh - Winnie Puuh auf der Honigjagd (Germany, alt title)</description>
+		<year>2004?</year>
+		<publisher>VTech</publisher>
+		<info name="serial" value="80-092064(GE)" />
+		<part name="cart" interface="vsmile_cart">
+			<feature name="slot" value="vsmile_rom" />
+			<feature name="cart_type" value="lilac" />
+			<feature name="u1" value="" />
+			<dataarea name="rom" size="8388608">
+				<rom name="092064 - Winnie the Pooh - Die Honigjagd (GER).bin" size="8388608" crc="2decf812" sha1="9d9116c6b77775c3263f0b8bdfab35e1fea2fc55" />
 			</dataarea>
 		</part>
 	</software>

@@ -778,7 +778,7 @@ void odyssey2_state::odyssey2(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	/* cartridge */
-	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
+	O2_CART_SLOT(config, m_cart, o2_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("O2");
 }
 
@@ -851,7 +851,7 @@ void vpp_state::g7400(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	/* cartridge */
-	O2_CART_SLOT(config, m_cart, o2_cart, nullptr);
+	O2_CART_SLOT(config, m_cart, o2_cart, nullptr).set_must_be_loaded(true);
 	SOFTWARE_LIST(config, "cart_list").set_original("videopac").set_filter("VPP");
 }
 

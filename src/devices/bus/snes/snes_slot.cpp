@@ -221,7 +221,7 @@ offs_t device_sns_cart_interface::address_r()
 //-------------------------------------------------
 base_sns_cart_slot_device::base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
 	m_addon(ADDON_NONE),
 	m_type(SNES_MODE20),
