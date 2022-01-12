@@ -185,13 +185,11 @@ void mrdo_state::mrdo_bgvideoram_w(offs_t offset, uint8_t data)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-uint8_t pal_u001;
-
 /* PAL16R6CN used for protection. The game doesn't clear the screen
    if a read from this address doesn't return the value it expects. */
 uint8_t mrdo_state::mrdo_SECRE_r()
 {
-    return pal_u001;
+    return m_pal_u001;
 }
 
 void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
@@ -224,7 +222,7 @@ void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
     uint8_t r18 = (1^( t3 | t4 )) << 6 ;
     uint8_t r19 = 0;
     
-    pal_u001 = r19 | r18 | r17 | r16 | r15 | r14 | r13 | r12  ;
+    m_pal_u001 = r19 | r18 | r17 | r16 | r15 | r14 | r13 | r12  ;
 }
 
 /*
