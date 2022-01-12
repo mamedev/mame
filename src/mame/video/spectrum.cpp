@@ -137,52 +137,6 @@ uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_in
 	if (m_screen_bitmap.valid())
 		copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, rect);
 
-#if 0
-	// note, don't update borders in here, this can time travel w/regards to other timers and may end up giving you
-	// screen positions earlier than the last write handler gave you
-
-	/* for now do a full-refresh */
-	int x, y, b, scrx, scry;
-	unsigned short ink, pap;
-	unsigned char *attr, *scr;
-	//  int full_refresh = 1;
-
-	scr=m_screen_location;
-
-	for (y=0; y<192; y++)
-	{
-		scrx=SPEC_LEFT_BORDER;
-		scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-		attr=m_screen_location + ((scry>>3)*32) + 0x1800;
-
-		for (x=0;x<32;x++)
-		{
-			/* Get ink and paper colour with bright */
-			if (m_flash_invert && (*attr & 0x80))
-			{
-				ink=((*attr)>>3) & 0x0f;
-				pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-			}
-			else
-			{
-				ink=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
-				pap=((*attr)>>3) & 0x0f;
-			}
-
-			for (b=0x80;b!=0;b>>=1)
-			{
-				if (*scr&b)
-					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,ink);
-				else
-					spectrum_plot_pixel(bitmap,scrx++,SPEC_TOP_BORDER+scry,pap);
-			}
-
-			scr++;
-			attr++;
-		}
-	}
-#endif
-
 	return 0;
 }
 
