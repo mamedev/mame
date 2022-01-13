@@ -969,7 +969,6 @@ public:
 	{ }
 
 	void gnw_helmet(machine_config &config);
-	void gnw_helmeto(machine_config &config);
 };
 
 // config
@@ -1003,11 +1002,6 @@ static INPUT_PORTS_START( gnw_helmet )
 INPUT_PORTS_END
 
 void gnw_helmet_state::gnw_helmet(machine_config &config)
-{
-	sm5a_common(config, 1657, 1080); // R mask option confirmed
-}
-
-void gnw_helmet_state::gnw_helmeto(machine_config &config)
 {
 	sm5a_common(config, 1657, 1080); // R mask option confirmed
 }
@@ -9731,7 +9725,7 @@ CONS( 1980, gnw_fires,    0,           0, gnw_fires,    gnw_fires,    gnw_fires_
 CONS( 1980, gnw_judge,    0,           0, gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_manholeg, 0,           0, gnw_manholeg, gnw_manholeg, gnw_manholeg_state, empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_helmet,   0,           0, gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (CN-17 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-CONS( 1981, gnw_helmeto,  gnw_helmet,  0, gnw_helmeto,  gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (CN-07 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_helmeto,  gnw_helmet,  0, gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (CN-07 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_lion,     0,           0, gnw_lion,     gnw_lion,     gnw_lion_state,     empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Wide Screen
