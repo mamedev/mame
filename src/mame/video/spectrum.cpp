@@ -66,16 +66,6 @@ void spectrum_128_state::video_start()
 	m_scanline_timer->adjust(m_maincpu->cycles_to_attotime(m_CyclesPerLine));
 }
 
-
-/* return the color to be used inverting FLASHing colors if necessary */
-inline unsigned char spectrum_state::get_display_color (unsigned char color, int invert)
-{
-	if (invert && (color & 0x80))
-		return (color & 0xc0) + ((color & 0x38) >> 3) + ((color & 0x07) << 3);
-	else
-		return color;
-}
-
 /* Code to change the FLASH status every 25 frames. Note this must be
    independent of frame skip etc. */
 WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
@@ -120,11 +110,6 @@ WRITE_LINE_MEMBER(spectrum_state::screen_vblank_spectrum)
   and take 228 T-states per scanline.
 
 ***************************************************************************/
-
-inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
-{
-	bitmap.pix(y, x) = (uint16_t)color;
-}
 
 uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
