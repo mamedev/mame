@@ -2450,7 +2450,7 @@ void dc_state::naomi_aw_base(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(dc_state::dc_scanline), "screen", 0, 1);
 
-	system_bus_config(config, m_maincpu);
+	system_bus_config(config, "maincpu");
 
 	ARM7(config, m_soundcpu, ((XTAL(33'868'800)*2)/3)/8);   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	m_soundcpu->set_addrmap(AS_PROGRAM, &dc_state::dc_audio_map);

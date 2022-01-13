@@ -653,10 +653,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
 	m_powervr2->pvr_scanline_timer(param);
 }
 
-void dc_state::system_bus_config(machine_config &config, cpu_device *dev)
+void dc_state::system_bus_config(machine_config &config, const char *cpu_tag)
 {
 	DC_G2IF(config, m_g2if, XTAL(25'000'000));
-	m_g2if->set_host_space("maincpu", AS_PROGRAM);
+	m_g2if->set_host_space(cpu_tag, AS_PROGRAM);
 	m_g2if->int_cb().set(FUNC(dc_state::g2_dma_end_w));
 	m_g2if->error_ia_cb().set(FUNC(dc_state::g2_dma_error_ia_w));
 	m_g2if->error_ov_cb().set(FUNC(dc_state::g2_dma_error_ov_w));

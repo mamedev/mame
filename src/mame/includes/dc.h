@@ -92,7 +92,7 @@ public:
 	void dc_audio_map(address_map &map);
 
 protected:
-	void system_bus_config(machine_config &config, cpu_device *dev);
+	void system_bus_config(machine_config &config, const char *cpu_tag);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/
