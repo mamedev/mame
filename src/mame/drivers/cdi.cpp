@@ -3,8 +3,8 @@
 /******************************************************************************
 
 
-    Philips CD-I-based games
-    ------------------------
+    Philips CD-i consoles and games
+    -------------------------------
 
     Preliminary MAME driver by Ryan Holtz
     Help provided by CD-i Fan
@@ -30,14 +30,18 @@ STATUS:
   * Philips IMS66490, "CDIC" ADPCM decoder
   * PC85010 DSP
 
-  Quizard:
-- Quizard 3 and 4 fail when going in-game, presumably due to CD-i emulation
-  faults.
-
 TODO:
 
+- Screen clocks are a hack right now; they should be exactly CLOCK_A/2. However, the
+  MCD-212 documentation states in both tables and timing diagrams that vertical retrace
+  has an additional half-line even in non-interlaced mode, which cannot be represented
+  in the current screen-timing framework. The input clock has been adjusted downward
+  to factor out this half-line, resulting in the expected 50Hz exactly in PAL mode.
+
 - Proper abstraction of the 68070's internal devices (UART, DMA, Timers, etc.)
+
 - Mono-I: Full emulation of the CDIC, as well as the SERVO and SLAVE MCUs
+
 - Mono-II: SERVO and SLAVE I/O device hookup
 - Mono-II: DSP56k hookup
 
@@ -81,8 +85,8 @@ TODO:
 void cdi_state::cdimono1_mem(address_map &map)
 {
 	map(0x000000, 0xffffff).rw(FUNC(cdi_state::bus_error_r), FUNC(cdi_state::bus_error_w));
-	map(0x000000, 0x07ffff).ram().share("mcd212:planea");
-	map(0x200000, 0x27ffff).ram().share("mcd212:planeb");
+	map(0x000000, 0x07ffff).rw(FUNC(cdi_state::plane_r<0>), FUNC(cdi_state::plane_w<0>)).share("plane0");
+	map(0x200000, 0x27ffff).rw(FUNC(cdi_state::plane_r<1>), FUNC(cdi_state::plane_w<1>)).share("plane1");
 	map(0x300000, 0x303bff).rw(m_cdic, FUNC(cdicdic_device::ram_r), FUNC(cdicdic_device::ram_w));
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
@@ -91,7 +95,7 @@ void cdi_state::cdimono1_mem(address_map &map)
 	map(0x310000, 0x317fff).rw(m_slave_hle, FUNC(cdislave_hle_device::slave_r), FUNC(cdislave_hle_device::slave_w));
 	map(0x318000, 0x31ffff).noprw();
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x400000, 0x47ffff).rom().region("maincpu", 0);
+	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 	map(0x500000, 0x57ffff).ram();
 	map(0xd00000, 0xdfffff).ram(); // DVC RAM block 1
@@ -101,22 +105,21 @@ void cdi_state::cdimono1_mem(address_map &map)
 
 void cdi_state::cdimono2_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("mcd212:planea");
-	map(0x200000, 0x27ffff).ram().share("mcd212:planeb");
+	map(0x000000, 0x07ffff).ram().share("plane0");
+	map(0x200000, 0x27ffff).ram().share("plane1");
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
 	map(0x320000, 0x323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
-	map(0x400000, 0x47ffff).rom().region("maincpu", 0);
+	map(0x400000, 0x47ffff).r(FUNC(cdi_state::main_rom_r));
 	map(0x4fffe0, 0x4fffff).m(m_mcd212, FUNC(mcd212_device::map));
 }
 
 void cdi_state::cdi910_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram().share("mcd212:planea");
+	map(0x000000, 0x07ffff).ram().share("plane0");
 	map(0x180000, 0x1fffff).rom().region("maincpu", 0); // boot vectors point here
-
-	map(0x200000, 0x27ffff).ram().share("mcd212:planeb");
+	map(0x200000, 0x27ffff).ram().share("plane1");
 #if ENABLE_UART_PRINTING
 	map(0x301400, 0x301403).r(m_maincpu, FUNC(scc68070_device::uart_loopback_enable));
 #endif
@@ -174,8 +177,8 @@ INPUT_PORTS_END
 
 void cdi_state::machine_reset()
 {
-	uint16_t *src   = (uint16_t*)memregion("maincpu")->base();
-	uint16_t *dst   = m_planea;
+	uint16_t *src = &m_main_rom[0];
+	uint16_t *dst = &m_plane_ram[0][0];
 	memcpy(dst, src, 0x8);
 }
 
@@ -191,6 +194,31 @@ void quizard_state::machine_reset()
 
 	m_mcu_rx_from_cpu = 0x00;
 	m_mcu_initial_byte = true;
+}
+
+
+/***************************
+*  Wait-State Handling     *
+***************************/
+
+template<int Channel>
+uint16_t cdi_state::plane_r(offs_t offset, uint16_t mem_mask)
+{
+	m_maincpu->eat_cycles(m_mcd212->ram_dtack_cycle_count<Channel>());
+	return m_plane_ram[Channel][offset];
+}
+
+template<int Channel>
+void cdi_state::plane_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_maincpu->eat_cycles(m_mcd212->ram_dtack_cycle_count<Channel>());
+	COMBINE_DATA(&m_plane_ram[Channel][offset]);
+}
+
+uint16_t cdi_state::main_rom_r(offs_t offset)
+{
+	m_maincpu->eat_cycles(m_mcd212->rom_dtack_cycle_count());
+	return m_main_rom[offset];
 }
 
 
@@ -393,18 +421,14 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono1_mem);
 	m_maincpu->iack4_callback().set(m_cdic, FUNC(cdicdic_device::intack_r));
 
-	MCD212(config, m_mcd212, CLOCK_A);
+	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_size(384, 312);
-	screen.set_visarea(0, 384-1, 0, 312-1); // TODO: dynamic resolution
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
-	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::screen_vblank));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(50);
@@ -445,18 +469,14 @@ void cdi_state::cdimono2(machine_config &config)
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdimono2_mem);
 
-	MCD212(config, m_mcd212, CLOCK_A);
+	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_size(384, 312);
-	screen.set_visarea(0, 384-1, 0, 312-1); // TODO: dynamic resolution
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
-	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::screen_vblank));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
@@ -493,18 +513,14 @@ void cdi_state::cdi910(machine_config &config)
 	SCC68070(config, m_maincpu, CLOCK_A);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cdi_state::cdi910_mem);
 
-	MCD212(config, m_mcd212, CLOCK_A);
+	MCD212(config, m_mcd212, CLOCK_A, m_plane_ram[0], m_plane_ram[1]);
 	m_mcd212->set_screen("screen");
 	m_mcd212->int_callback().set(m_maincpu, FUNC(scc68070_device::int1_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_raw(14976000, 960, 0, 768, 312, 32, 312);
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	screen.set_size(384, 312);
-	screen.set_visarea(0, 384-1, 32, 312-1); // TODO: dynamic resolution
 	screen.set_screen_update(m_mcd212, FUNC(mcd212_device::screen_update));
-	screen.screen_vblank().set(m_mcd212, FUNC(mcd212_device::screen_vblank));
 
 	SCREEN(config, m_lcd, SCREEN_TYPE_RASTER);
 	m_lcd->set_refresh_hz(60);
