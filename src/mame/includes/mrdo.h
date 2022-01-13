@@ -33,6 +33,9 @@ public:
 protected:
 	virtual void video_start() override;
 
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	// memory pointers
 	required_shared_ptr<uint8_t> m_bgvideoram;

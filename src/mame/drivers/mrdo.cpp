@@ -186,6 +186,17 @@ void mrdo_state::mrdo(machine_config &config)
 	SN76489(config, "sn2", MAIN_CLOCK/2).add_route(ALL_OUTPUTS, "mono", 0.50); // Verified
 }
 
+void mrdo_state::machine_start()
+{
+	save_item(NAME(m_pal_u001));
+}
+
+void mrdo_state::machine_reset()
+{
+    // initial outputs are high on power-up
+    m_pal_u001 = 0xff;
+}
+
 void mrdo_state::mrlo(machine_config &config)
 {
 	mrdo(config);
