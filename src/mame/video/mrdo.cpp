@@ -198,14 +198,14 @@ void mrdo_state::mrdo_fgvideoram_w(offs_t offset, uint8_t data)
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
     
     // protection.  each write latches a new value on IC u001 (PAL16R6)
-    uint8_t i9 = data & 0x01;
-    uint8_t i8 = (data >> 1 ) & 0x01;
-//    uint8_t i7 = (data >> 2 ) & 0x01; pin 7 not used in equations
-    uint8_t i6 = (data >> 3 ) & 0x01;
-    uint8_t i5 = (data >> 4 ) & 0x01;
-    uint8_t i4 = (data >> 5 ) & 0x01;
-    uint8_t i3 = (data >> 6 ) & 0x01;
-    uint8_t i2 = (data >> 7 ) & 0x01;
+    uint8_t i9 = BIT(data,0);
+    uint8_t i8 = BIT(data,1);
+//    uint8_t i7 = BIT(data,2); pin 7 not used in equations
+    uint8_t i6 = BIT(data,3);
+    uint8_t i5 = BIT(data,4);
+    uint8_t i4 = BIT(data,5);
+    uint8_t i3 = BIT(data,6);
+    uint8_t i2 = BIT(data,7);
     
     // equations extracted from dump using jedutil
     uint8_t t1 =    i2  & (1^i3) &    i4  & (1^i5) & (1^i6) & (1^i8) &    i9;
