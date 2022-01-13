@@ -39,8 +39,8 @@
 
 #define SPEC_LEFT_BORDER   48   /* Number of left hand border pixels */
 #define SPEC_DISPLAY_XSIZE 256  /* Horizontal screen resolution */
-//#define SPEC_RIGHT_BORDER  48   /* Number of right hand border pixels */
-//#define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
+#define SPEC_RIGHT_BORDER  48   /* Number of right hand border pixels */
+#define SPEC_SCREEN_WIDTH (SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE + SPEC_RIGHT_BORDER)
 
 //#define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
 //#define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
