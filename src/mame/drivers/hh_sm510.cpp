@@ -23,7 +23,6 @@ TODO:
 - confirm gnw_smb rom (assumed to be the same as gnw_smbn)
 - dump/add purple version of gnw_judge, different MCU label?
 - dump/add 2nd version of gnw_mariocmt, different MCU label?
-- dump/add CN-07 version of gnw_helmet
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
@@ -970,6 +969,7 @@ public:
 	{ }
 
 	void gnw_helmet(machine_config &config);
+	void gnw_helmeto(machine_config &config);
 };
 
 // config
@@ -1007,11 +1007,24 @@ void gnw_helmet_state::gnw_helmet(machine_config &config)
 	sm5a_common(config, 1657, 1080); // R mask option confirmed
 }
 
+void gnw_helmet_state::gnw_helmeto(machine_config &config)
+{
+	sm5a_common(config, 1657, 1080); // R mask option confirmed
+}
+
 // roms
 
 ROM_START( gnw_helmet )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "cn-17", 0x0000, 0x0740, CRC(6d251e2e) SHA1(c61f591514de36fb2270038a6505945564c9f90e) )
+
+	ROM_REGION( 109404, "screen", 0)
+	ROM_LOAD( "gnw_helmet.svg", 0, 109404, CRC(0dce1694) SHA1(412e69054b95f17fe08545f3c303c11abbe26304) )
+ROM_END
+
+ROM_START( gnw_helmeto )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "cn-07", 0x0000, 0x0740, CRC(30c8bc90) SHA1(f5ac0fe7a09ee1ad6f6e4bd096b4be20f65d73db) )
 
 	ROM_REGION( 109404, "screen", 0)
 	ROM_LOAD( "gnw_helmet.svg", 0, 109404, CRC(0dce1694) SHA1(412e69054b95f17fe08545f3c303c11abbe26304) )
@@ -9718,6 +9731,7 @@ CONS( 1980, gnw_fires,    0,           0, gnw_fires,    gnw_fires,    gnw_fires_
 CONS( 1980, gnw_judge,    0,           0, gnw_judge,    gnw_judge,    gnw_judge_state,    empty_init, "Nintendo", "Game & Watch: Judge (green version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, gnw_manholeg, 0,           0, gnw_manholeg, gnw_manholeg, gnw_manholeg_state, empty_init, "Nintendo", "Game & Watch: Manhole (Gold)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_helmet,   0,           0, gnw_helmet,   gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (CN-17 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, gnw_helmeto,  gnw_helmet,  0, gnw_helmeto,  gnw_helmet,   gnw_helmet_state,   empty_init, "Nintendo", "Game & Watch: Helmet (CN-07 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1981, gnw_lion,     0,           0, gnw_lion,     gnw_lion,     gnw_lion_state,     empty_init, "Nintendo", "Game & Watch: Lion", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nintendo G&W: Wide Screen
