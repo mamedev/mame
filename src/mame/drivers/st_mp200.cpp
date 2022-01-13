@@ -8,14 +8,10 @@ Stern MP-200 MPU
 
 
 Status:
+- All games are playable, but see the key code list below.
 - All games have missing or wrong sound
-- meteorp, meteorpi, galaxypi, ali, biggame, cheetah, quicksil, seawitch, stargzr, dragfist,
-  cue: Playable
-- cheetahb: units digit in scores flickers. Playable.
-- lightning, nineball, spltsecp, catacomp, lazrlord, flight2k, gamatron: multiball, unplayable
-- freefall, viperp, ironmaid, orbitor1: multiball, scores stay blank, no inputs
 - cue uses first player display for all players, one at a time (this is by design)
-- flight2k, gamatron: take a while to finish booting
+- flight2k, gamatron: take a while to finish booting if balls are missing
 - st_sam: This is a test unit. Internal tests are working.
 - gamatron is actually a Bally conversion - it won't physically fit into a Stern machine.
 - drgnfist, cue, nineball, lightnin, spltsecp, catacomb, lazrlord: need a new layout to
@@ -28,6 +24,23 @@ SAM IV tester
 - Unknown what the PIAs connect to
 - 5x 6-digit displays
 - The LED flashes a few times followed by nothing
+
+Here are the key codes to enable play:
+
+Game              NUM  Start game                End ball
+-----------------------------------------------------------------------------------------------
+Nine Ball         125  X'; hit 1                 X';
+Lightning         126  X./ hit 1                 X./
+Flight 2000       128  X./ hit 1                 X./
+Freefall          134  X./ hit 1                 X./
+Split Second      144  X./ hit 1                 X./
+Catacomb          147  1                         unknown
+Viper             148  X./ hit 1                 X./
+Iron Maiden       151  X./ hit 1                 X./
+Orbitor 1         165  X. hit 1                  X. (last ball is difficult to end)
+Lazer Lord        ---  1                         unknown
+Gamatron          ---  X./ hit 1                 X./
+Others            ---  1                         X
 
 ToDo:
 - Sound - All machines have a B605/C605 sound card containing a 6840 and many other chips
