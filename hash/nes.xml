@@ -56630,8 +56630,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanguo2" cloneof="sango2ht" supported="partial">
-		<description>San Guo Zhi II - Zhong Wen (Chi, Hacked)</description>
+<!-- This should be unimplemented mapper 558. nes20db also flags it as a bad dump (with graffiti?). Good dump available? -->
+	<software name="sanguo2" cloneof="sango2ht" supported="no">
+		<description>Sānguózhì II - Zhōngwén (China, hacked)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1084"/>
