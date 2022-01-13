@@ -288,6 +288,18 @@ The monitor will expect you to load a program from cassette.
 		</part>
 	</software>
 
+	<software name="zerosen" supported="no"><!-- exception after plane takes off -->
+		<description>Zerosen</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="84.ic2.bin" size="0x2000" crc="a569048f" sha1="7d9a37b7347dddca7e16b14689d0bbbc9079afbd" offset="0x4000" />
+				<rom name="85.ic1.bin" size="0x2000" crc="acfcf43f" sha1="c7da59a6222f8664a7ef423af3b7d658627fda39" offset="0x6000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aerial">
 		<description>Aerial</description>
 		<year>2021</year>
