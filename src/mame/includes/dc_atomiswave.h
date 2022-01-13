@@ -24,7 +24,8 @@ public:
 	atomiswave_state(const machine_config &mconfig, device_type type, const char *tag)
 		: dc_state(mconfig, type, tag)
 		, m_awflash(*this, "awflash")
-		, m_exid(*this, "EXID")
+		, m_exid_in(*this, "EXID_IN")
+		, m_exid_out(*this, "EXID_OUT")
 	   { }
 
 	void aw_base(machine_config &config);
@@ -40,14 +41,14 @@ protected:
 
 private:
 	required_device<macronix_29l001mc_device> m_awflash;
-	optional_ioport m_exid;
+	optional_ioport m_exid_in;
+	optional_ioport m_exid_out;
 
 	uint64_t aw_flash_r(offs_t offset);
 	void aw_flash_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint32_t aw_modem_r(offs_t offset, uint32_t mem_mask = ~0);
 	void aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	uint8_t aw_ctrl_type;
 //	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 };
 

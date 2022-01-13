@@ -12,6 +12,8 @@
     - Create a pure abstract interface shared with PVR-DMA I/F
 	  (one channel, different max size, simpler tsel, no suspend,
 	   different security code & area protection);
+	- DMA starts should send DDT requests and being notified back to use this i/f implementation
+	  anyway. Exact purpose is unknown, maybe it's for granting use of the bus?
 
 **************************************************************************************************/
 
@@ -355,7 +357,10 @@ template <u8 ch> void dc_g2if_device::susp_w(offs_t offset, u32 data, u32 mem_ma
 		// TODO: unemulated suspend mode
 		if (data & 1)
 		{
-			LOGWARN("%s: DMA%d suspend write %08x %08x\n", machine().describe_context(), data, mem_mask);
+			LOGWARN("%s: DMA%d suspend write %08x %08x\n",
+				machine().describe_context(),
+				ch, data, mem_mask
+			);
 			// ...
 		}
 	}

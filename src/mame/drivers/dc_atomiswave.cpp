@@ -480,7 +480,7 @@ uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 			// TODO: blokpong purges the expected ID of 0x20 even if a mouse device is connected.
 			// Is it expecting to be p2 instead?
 			//return aw_ctrl_type;
-			return m_exid.read_safe(0xf0);
+			return m_exid_in.read_safe(0xf0);
 	}
 
 	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+offset*4);
@@ -509,9 +509,14 @@ void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 	switch(offset)
 	{
 		case 0x284/4:
-			// TODO: what exactly this set up on an I/O IDentifier, pin direction?
-			// written by xtrmhnt2
-			aw_ctrl_type = data & 0xf0;
+			// EX ID output
+			// - initialized with 0xf0 only by:
+			//   waidrive, sprtshot, samsptk, rangrmsn, claychal, basschal, anmlbskt
+			// - 0xf0 plus double sequence of 0x10->0x50->0x40->0x00 by:
+			//   xtrmhnt2, xtrmhunt
+			if (m_exid_out)
+				m_exid_out->write(data & 0xf0);
+
 			logerror("%s: write to ctrl port %02x %08x\n", machine().describe_context(), data, mem_mask);
 			break;
 	}
@@ -736,7 +741,7 @@ static INPUT_PORTS_START( aw4c )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
 
-	PORT_START("EXID")
+	PORT_START("EXID_IN")
 	// return 0x0x for p3/p4 connectors to work properly
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -896,8 +901,6 @@ void atomiswave_state::init_atomiswave()
 
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & 0xffffffffffffU) | (uint64_t)0x0009<<48;
-
-	aw_ctrl_type = 0;
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0000ffff, true, ROM);
 }
