@@ -138,8 +138,8 @@ void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
 static const gfx_layout spectrum_charlayout =
 {
 	8, 8, /* 8 x 8 characters */
-	96,   /* 96 characters */
-	1,    /* 1 bits per pixel */
+	96,	  /* 96 characters */
+	1,	  /* 1 bits per pixel */
 	{0},  /* no bitplanes */
 	/* x offsets */
 	{STEP8(0, 1)},
@@ -177,10 +177,10 @@ static LAYOUT_CHAR_OFFSET_FUNC(layout_tile_offset)
 }
 
 static GFXDECODE_START(gfx_tsconf)
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)         // TM_TS_CHAR : TXT
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES0  : T0 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_TILES1  : T1 16cpp
-	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)    // TM_SPRITES : Sprites 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_charlayout, 0xf7, 1)		  // TM_TS_CHAR : TXT
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)	  // TM_TILES0  : T0 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)	  // TM_TILES1  : T1 16cpp
+	GFXDECODE_ENTRY("maincpu", 0, tsconf_tile_16cpp_layout, 0, 16)	  // TM_SPRITES : Sprites 16cpp
 	GFXDECODE_ENTRY("maincpu", 0x1fd00, spectrum_charlayout, 0xf7, 1) // TM_ZX_CHAR
 GFXDECODE_END
 
@@ -226,7 +226,7 @@ void tsconf_state::machine_reset()
 	m_regs[G_X_OFFS_H] &= 0xfe; // xxxxxxx0
 	m_regs[G_Y_OFFS_L] = 0x00;
 	m_regs[G_Y_OFFS_H] &= 0xfe; // xxxxxxx0
-	m_regs[TS_CONFIG] &= 0x03;  // 000000xx
+	m_regs[TS_CONFIG] &= 0x03;	// 000000xx
 	m_regs[PAL_SEL] = 0x0f;
 	m_regs[PAGE0] = 0x00;
 	m_regs[PAGE1] = 0x05;
@@ -235,7 +235,7 @@ void tsconf_state::machine_reset()
 	m_regs[FMAPS] &= 0xef; // xxx0xxxx
 	m_regs[SYS_CONFIG] = 0x00;
 	m_regs[MEM_CONFIG] = 0x04;
-	m_regs[HS_INT] = 0x01;   // 00000001
+	m_regs[HS_INT] = 0x01;	 // 00000001
 	m_regs[VS_INT_L] = 0x00; // 00000001
 	m_regs[VS_INT_H] = 0x00; // 0000xxx0
 	// FDDVirt      = 0x00; // 0000xxx0
@@ -268,6 +268,9 @@ void tsconf_state::tsconf(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &tsconf_state::tsconf_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &tsconf_state::tsconf_switch);
 
+	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
+	m_maincpu->set_periodic_int(FUNC(tsconf_state::tsconf_line_interrupt), m_maincpu->clocks_to_attotime(224)); // 448 screen clocks
+
 	m_ram->set_default_size("4096K");
 
 	GLUKRS(config, m_glukrs);
@@ -293,7 +296,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(2, "rspeaker", 0.50);
 
 	PALETTE(config, "palette", FUNC(tsconf_state::tsconf_palette), 256);
-	m_screen->set_raw(X1_128_SINCLAIR / 2.5, 448, 0, 360, 320, 0, 288);
+	m_screen->set_raw(X1 / 4, 448 / 2, TSCONF_SCREEN_HBLANK / 2, 448 / 2, 320, TSCONF_SCREEN_VBLANK, 320);
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_tsconf);
 	RAM(config, m_cram).set_default_size("512").set_default_value(0);
 	RAM(config, m_sfile).set_default_size("512").set_default_value(0); // 85*6

@@ -18,6 +18,9 @@
 #include "spectrum.h"
 #include "tilemap.h"
 
+#define TSCONF_SCREEN_HBLANK 88
+#define TSCONF_SCREEN_VBLANK 32
+
 class tsconf_state : public spectrum_128_state
 {
 public:
@@ -42,7 +45,6 @@ protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	enum gluk_ext : u8
@@ -57,7 +59,8 @@ private:
 		DISABLED = 0xff
 	};
 
-	enum tilemaps : u8 {
+	enum tilemaps : u8
+	{
 		TM_TS_CHAR = 0x00,
 		TM_TILES0,
 		TM_TILES1,
@@ -120,6 +123,9 @@ private:
 		T1_Y_OFFSER_H = 0x47
 	};
 
+	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
+	INTERRUPT_GEN_MEMBER(tsconf_line_interrupt);
+
 	DECLARE_VIDEO_START(tsconf);
 	TILE_GET_INFO_MEMBER(get_tile_info_txt);
 	template <u8 Layer>
@@ -132,7 +138,7 @@ private:
 	u16 get_border_color() override;
 	void draw_sprites(const rectangle &cliprect);
 	void tsconf_update_video_mode();
-	rectangle get_resolution_info();
+	rectangle get_screen_area();
 
 	void tsconf_port_7ffd_w(u8 data);
 	void tsconf_port_fe_w(offs_t offset, u8 data);
@@ -188,8 +194,7 @@ private:
 	tilemap_t *m_ts_tilemap[3];
 	required_device<ram_device> m_cram;
 	required_device<ram_device> m_sfile;
-	u16 m_previous_tsu_y;
-
+	u16 m_previous_tsu_vpos;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

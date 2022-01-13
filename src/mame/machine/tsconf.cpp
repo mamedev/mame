@@ -13,7 +13,7 @@
 
 #define VM static_cast<v_mode>(BIT(m_regs[V_CONFIG], 0, 2))
 
-static constexpr rectangle resolution_info[4] = {
+static constexpr rectangle screen_area[4] = {
 	rectangle(52, 256 + 51, 48, 192 + 47), // 52|256|52 x 48-192-48
 	rectangle(20, 320 + 19, 44, 200 + 43), // 20|320|20 x 44-200-44
 	rectangle(20, 320 + 19, 24, 240 + 23), // 20|320|20 x 24-240-24
@@ -40,9 +40,9 @@ static constexpr rgb_t from_pwm(u16 pwm15)
 	return rgb_t(pwm_to_rgb[BIT(pwm15, 10, 5)], pwm_to_rgb[BIT(pwm15, 5, 5)], pwm_to_rgb[BIT(pwm15, 0, 5)]);
 }
 
-rectangle tsconf_state::get_resolution_info()
+rectangle tsconf_state::get_screen_area()
 {
-	rectangle info = resolution_info[BIT(m_regs[V_CONFIG], 6, 2)];
+	rectangle info = screen_area[BIT(m_regs[V_CONFIG], 6, 2)];
 	if (VM == VM_TXT)
 	{
 		info.set_origin(0, 0);
@@ -84,12 +84,12 @@ void tsconf_state::tsconf_update_bank0()
 
 void tsconf_state::tsconf_update_video_mode()
 {
-	rectangle resolution = resolution_info[3];
+	rectangle visarea = screen_area[3];
 	u8 *messram = m_ram->pointer();
 	switch (VM)
 	{
 	case VM_TXT: // Text Mode
-		resolution = get_resolution_info();
+		visarea = get_screen_area();
 		m_gfxdecode->gfx(TM_TS_CHAR)->set_source(messram + PAGE4K(m_regs[V_PAGE] ^ 0x01));
 		m_ts_tilemap[TM_TS_CHAR]->mark_all_dirty();
 		break;
@@ -102,7 +102,8 @@ void tsconf_state::tsconf_update_video_mode()
 		break;
 	}
 
-	m_screen->configure(resolution.width(), resolution.height(), resolution, HZ_TO_ATTOSECONDS(50));
+	visarea.set_origin(TSCONF_SCREEN_HBLANK / 2, TSCONF_SCREEN_VBLANK);
+	m_screen->configure(visarea.max_x + 1, visarea.max_y + 1, visarea, HZ_TO_ATTOSECONDS(50));
 }
 
 uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -127,9 +128,9 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 		{
 			if (m_border_bitmap.valid())
 			{
-				copyscrollbitmap(bitmap, m_border_bitmap, 0, nullptr, 0, nullptr, cliprect);
+				copybitmap(bitmap, m_border_bitmap, 0, 0, TSCONF_SCREEN_HBLANK / 2, TSCONF_SCREEN_VBLANK, cliprect);
 			}
-			copyscrollbitmap(bitmap, m_screen_bitmap, 0, nullptr, 0, nullptr, get_resolution_info());
+			copybitmap_trans(bitmap, m_screen_bitmap, 0, 0, TSCONF_SCREEN_HBLANK / 2, TSCONF_SCREEN_VBLANK, cliprect, 0);
 		}
 	}
 	return 0;
@@ -137,6 +138,7 @@ uint32_t tsconf_state::screen_update_spectrum(screen_device &screen, bitmap_ind1
 
 void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 {
+	rectangle resolution = get_screen_area();
 	if (!BIT(m_regs[V_CONFIG], 5))
 	{
 		if (VM == VM_ZX)
@@ -145,19 +147,20 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 		}
 		else if (m_previous_screen_y != m_screen->vpos())
 		{
+			s16 y = m_screen->vpos() - resolution.top() - TSCONF_SCREEN_VBLANK;
 			//TODO consider perfom update not based on current line but from previous saved.
 			m_previous_screen_y = m_screen->vpos();
-
-			rectangle resolution = get_resolution_info();
-			s16 y = m_screen->vpos() - resolution.top();
-			if (y >= 0)
+			if (y >= 0 && y < resolution.height())
 			{
+				//assert(!m_screen->vblank());
 				u8 pal_offset = m_regs[PAL_SEL] << 4;
-				u16 *bm = &m_screen_bitmap.pix(m_screen->vpos(), resolution.left());
+				u16 *bm = &m_screen_bitmap.pix(y + resolution.top(), resolution.left());
 				if (VM == VM_TXT)
 				{
+					// TODO u16 x_offset = ((m_regs[G_X_OFFS_H] & 1) << 8) + m_regs[G_X_OFFS_L];
+					y = (y + ((m_regs[G_Y_OFFS_H] & 1) << 8) + m_regs[G_Y_OFFS_L]) % resolution.right();
 					u8 *font_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE] ^ 0x01);
-					u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256); // OFFSETs
+					u8 *text_location = m_ram->pointer() + PAGE4K(m_regs[V_PAGE]) + (y / 8 * 256);
 					for (auto x = 0; x < resolution.width() / 8; x++)
 					{
 						u8 char_x = *(font_location + (*text_location * 8) + (y % 8));
@@ -182,7 +185,7 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 							*bm++ = (*video_location++ & 0x0f) + pal_offset;
 							x_offset++;
 						}
-						for (auto x = 0; x < resolution.width(); x++)
+						for (auto x = 0; x < resolution.width() - 1; x += 2)
 						{
 							if (x_offset == 512)
 								video_location -= 256;
@@ -208,31 +211,38 @@ void tsconf_state::spectrum_UpdateScreenBitmap(bool eof)
 	}
 	else
 	{
-		rectangle resolution = get_resolution_info();
-		memcpy(&m_screen_bitmap.pix(m_screen->vpos(), resolution.left()),
-			   &m_border_bitmap.pix(m_screen->vpos(), resolution.left()),
+		s16 y = m_screen->vpos() - resolution.top() - TSCONF_SCREEN_VBLANK;
+		memcpy(&m_screen_bitmap.pix(y + resolution.top(), resolution.left()),
+			   &m_border_bitmap.pix(y + resolution.top(), resolution.left()),
 			   resolution.width() * 2);
 	}
 
 	if (!BIT(m_regs[V_CONFIG], 4))
 	{
-		rectangle resolution = get_resolution_info();
+		if (m_screen->vpos() == m_previous_tsu_vpos)
+			return;
+
+		rectangle resolution = get_screen_area();
 		bool draw = false;
-		if (m_screen->vpos() == resolution.max_y)
+		if (m_screen->vpos() == 0)
 		{
-			resolution.min_y = m_previous_tsu_y;
-			m_previous_tsu_y = 0;
+			resolution.min_y = m_previous_tsu_vpos - TSCONF_SCREEN_VBLANK;
 			draw = true;
 		}
-		else
+		else if (m_screen->vpos() <= resolution.bottom() + TSCONF_SCREEN_VBLANK)
 		{
-			resolution.sety(m_previous_tsu_y, m_screen->vpos() - 1);
-			m_previous_tsu_y = m_screen->vpos();
+			resolution.sety(m_previous_tsu_vpos - TSCONF_SCREEN_VBLANK, m_screen->vpos() - TSCONF_SCREEN_VBLANK - 1);
 			draw = resolution.height() > 7;
+			if (!draw && (resolution.bottom() + 1) == get_screen_area().bottom())
+			{
+				resolution.max_y++;
+				draw = true;
+			}
 		}
 
 		if (draw)
 		{
+			m_previous_tsu_vpos = std::max(m_screen->vpos(), get_screen_area().top() + TSCONF_SCREEN_VBLANK);
 			m_screen->priority().fill(0, resolution);
 			if (BIT(m_regs[TS_CONFIG], 5))
 			{
@@ -268,37 +278,50 @@ SFILE	Reg.16	7		6		5		4		3		2		1		0
 */
 void tsconf_state::draw_sprites(const rectangle &cliprect)
 {
+	rectangle resolution = get_screen_area();
+
 	u8 layer = 0;
-	u8 *sinfo = m_sfile->pointer();
-	rectangle resolution = get_resolution_info();
-	u32 pmask = GFX_PMASK_1 | GFX_PMASK_2;
-	for (u8 i = 0; i < 85 && layer < 3; i++)
+	u8 *sinfo = m_sfile->pointer() + 1;
+	u8 sid = 1;
+	for (; sid < 85 && layer < 3; sid++)
+	{
+		if (BIT(*sinfo, 6))
+			layer++;
+		sinfo += 6;
+	}
+	sinfo -= 1;
+
+	for (; sid; sid--)
 	{
 		s16 y = *sinfo++;
 		y |= BIT(*sinfo, 0) << 8;
-		y += resolution.top() - (y > resolution.height() ? 512 : 0);
+		y += resolution.top() - (y >= resolution.height() ? 512 : 0);
 		u8 height8 = BIT(*sinfo, 1, 3);
-		bool leap = BIT(*sinfo, 6);
+		layer -= BIT(*sinfo, 6);
 		if (!BIT(*sinfo, 5))
 		{
-			// sprite disabled -> skip decoding
-			sinfo += 5;
+			// sprite disabled -> move to previous
+			sinfo -= 7;
 		}
 		else
 		{
 			bool flipy = BIT(*sinfo++, 7);
 			s16 x = *sinfo++;
 			x |= BIT(*sinfo, 0) << 8;
-			x += resolution.left() - (x > resolution.width() ? 512 : 0);
+			x += resolution.left() - (x >= resolution.width() ? 512 : 0);
 			u8 width8 = BIT(*sinfo, 1, 3);
 			bool flipx = BIT(*sinfo++, 7);
 			u16 code = *sinfo++;
 			code |= BIT(*sinfo, 0, 4) << 8;
-			u8 pal = BIT(*sinfo++, 4, 4);
+			u8 pal = BIT(*sinfo, 4, 4);
+			sinfo -= 11;
 
+			u32 pmask = layer ? (layer == 1 ? GFX_PMASK_2 : 0) : (GFX_PMASK_1 | GFX_PMASK_2);
+
+			code += flipy * height8 * 64;
 			for (auto iy = 0; iy <= height8; iy++)
 			{
-				auto code_x = code + (flipx ? width8 : 0);
+				auto code_x = code + flipx * width8;
 				auto x0 = x;
 				for (auto ix = 0; ix <= width8; ix++)
 				{
@@ -306,14 +329,9 @@ void tsconf_state::draw_sprites(const rectangle &cliprect)
 					code_x += flipx ? -1 : 1;
 					x0 += 8;
 				}
-				code += 64;
+				code += flipy ? -64 : 64;
 				y += 8;
 			}
-		}
-		if (leap)
-		{
-			layer++;
-			pmask = layer == 1 ? GFX_PMASK_2 : 0;
 		}
 	}
 }
@@ -709,24 +727,18 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 	m_zctl_di |= data;
 }
 
-void tsconf_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 {
-	/* TODO
-	if (id == TIMER_SCANLINE)
+	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xff);
+	m_irq_off_timer->adjust(m_maincpu->clocks_to_attotime(32));
+}
+
+INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_line_interrupt)
+{
+	if (BIT(m_regs[INT_MASK], 1) && !m_maincpu->input_state(0))
 	{
-		if (BIT(m_regs[INT_MASK], 1) && m_screen->vpos() == ((BIT(m_regs[VS_INT_H], 0) << 8) | m_regs[VS_INT_L]))
-		{
-			m_maincpu->set_input_line_vector(INPUT_LINE_IRQ2, 0xfd);
-			m_maincpu->signal_interrupt_trigger();
-		}
-		if (BIT(m_regs[INT_MASK], 0) && m_screen->vpos() == 0)
-		{
-			m_maincpu->set_input_line_vector(INPUT_LINE_IRQ2, 0xff);
-			m_maincpu->signal_interrupt_trigger();
-		}
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 0xfd);
 	}
-	*/
-	spectrum_state::device_timer(timer, id, param, ptr);
 }
 
 u8 tsconf_state::beta_neutral_r(offs_t offset)
