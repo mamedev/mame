@@ -21,8 +21,9 @@ public:
 	cdi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_main_rom(*this, "maincpu")
 		, m_lcd(*this, "lcd")
-		, m_planea(*this, "mcd212:planea")
+		, m_plane_ram(*this, "plane%u", 0U)
 		, m_slave_hle(*this, "slave_hle")
 		, m_servo(*this, "servo")
 		, m_slave(*this, "slave")
@@ -42,6 +43,7 @@ protected:
 	void cdimono1_mem(address_map &map);
 
 	required_device<scc68070_device> m_maincpu;
+	required_region_ptr<uint16_t> m_main_rom;
 	optional_device<screen_device> m_lcd;
 
 private:
@@ -58,13 +60,18 @@ private:
 	void cdimono2_mem(address_map &map);
 	void cdi070_cpuspace(address_map &map);
 
+	template<int Channel> uint16_t plane_r(offs_t offset, uint16_t mem_mask = ~0);
+	template<int Channel> void plane_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t main_rom_r(offs_t offset);
+
 	uint16_t dvc_r(offs_t offset, uint16_t mem_mask = ~0);
 	void dvc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint16_t bus_error_r(offs_t offset);
 	void bus_error_w(offs_t offset, uint16_t data);
 
-	required_shared_ptr<uint16_t> m_planea;
+	required_shared_ptr_array<uint16_t, 2> m_plane_ram;
 	optional_device<cdislave_hle_device> m_slave_hle;
 	optional_device<m68hc05c8_device> m_servo;
 	optional_device<m68hc05c8_device> m_slave;
