@@ -287,8 +287,6 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
 
-	m_ram->set_default_size("128K");
-
 	//m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 0, 352,  320, 0, 287);
 
