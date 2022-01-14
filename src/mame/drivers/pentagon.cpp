@@ -275,7 +275,7 @@ static const gfx_layout spectrum_charlayout =
 };
 
 static GFXDECODE_START( gfx_pentagon )
-	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0x17d00, spectrum_charlayout, 7, 8 )
 GFXDECODE_END
 
 void pentagon_state::pentagon(machine_config &config)
