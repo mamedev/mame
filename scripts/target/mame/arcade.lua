@@ -4114,8 +4114,6 @@ files {
 	MAME_DIR .. "src/mame/includes/rbisland.h",
 	MAME_DIR .. "src/mame/video/rbisland.cpp",
 	MAME_DIR .. "src/mame/drivers/rastan.cpp",
-	MAME_DIR .. "src/mame/includes/rastan.h",
-	MAME_DIR .. "src/mame/video/rastan.cpp",
 	MAME_DIR .. "src/mame/drivers/retofinv.cpp",
 	MAME_DIR .. "src/mame/includes/retofinv.h",
 	MAME_DIR .. "src/mame/video/retofinv.cpp",
