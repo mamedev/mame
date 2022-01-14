@@ -50,10 +50,10 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	int       m_flipscreen;
-    uint8_t   m_pal_u001;
-    
-    uint8_t mrdo_SECRE_r();
-    
+	uint8_t   m_pal_u001;
+
+	uint8_t mrdo_secre_r();
+
 	void mrdo_bgvideoram_w(offs_t offset, uint8_t data);
 	void mrdo_fgvideoram_w(offs_t offset, uint8_t data);
 	void mrdo_scrollx_w(uint8_t data);

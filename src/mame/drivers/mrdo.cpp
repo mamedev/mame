@@ -47,7 +47,7 @@ void mrdo_state::main_map(address_map &map)
 	map(0x9800, 0x9800).w(FUNC(mrdo_state::mrdo_flipscreen_w)); // screen flip + playfield priority
 	map(0x9801, 0x9801).w("sn1", FUNC(sn76489_device::write));
 	map(0x9802, 0x9802).w("sn2", FUNC(sn76489_device::write));
-	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_SECRE_r));
+	map(0x9803, 0x9803).r(FUNC(mrdo_state::mrdo_secre_r));
 	map(0xa000, 0xa000).portr("P1");
 	map(0xa001, 0xa001).portr("P2");
 	map(0xa002, 0xa002).portr("DSW1");
