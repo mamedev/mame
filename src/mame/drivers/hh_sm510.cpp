@@ -952,7 +952,7 @@ ROM_END
 
   Nintendo Game & Watch: Helmet (model CN-07)
   * PCB label CN-07
-  * Sharp SM5A label CN-17 21ZA (no decap)
+  * Sharp SM5A label CN-07 5102, or CN-17 21ZA (no decap)
   * lcd screen with custom segments, 1-bit sound
 
   In the UK, it was distributed as Headache by CGL.
