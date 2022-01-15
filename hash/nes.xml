@@ -63515,7 +63515,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="Dragon Ball Party?"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="1048576">
 				<rom name="dragon ball party [p1].chr" size="1048576" crc="1f817045" sha1="5a66a033046ceec9f98a3b6fef5f108e840e6fc8" offset="00000" status="baddump" />
@@ -63523,9 +63523,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="1048576">
 				<rom name="dragon ball party [p1].prg" size="1048576" crc="5721089a" sha1="af8df8dd9449d512c34deddee2a758ca46677bd5" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			<!-- 32k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -77409,12 +77409,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="garou2" cloneof="fatfury2" supported="partial">
+	<software name="garou2" cloneof="fatfury2">
 		<description>Garou Densetsu 2 (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="fatal fury 2 (unl) [a1].chr" size="262144" crc="4d37e840" sha1="692e8929ef7bc6356b518f4150f3453c2bfe5223" offset="00000" status="baddump" />
@@ -77425,12 +77425,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="fatfury2" supported="partial">
+	<software name="fatfury2">
 		<description>Fatal Fury 2 (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="fatal fury 2 (unl).chr" size="262144" crc="d0aa6ce8" sha1="d78b8f163a452bae5e2e9fdcc513a80a4b6b3e71" offset="00000" status="baddump" />
@@ -77445,12 +77445,12 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="fatfury2a" cloneof="fatfury2" supported="partial">
+	<software name="fatfury2a" cloneof="fatfury2">
 		<description>Fatal Fury 2' (Asia)</description>
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="fatal fury 2' (unl).chr" size="262144" crc="58acf414" sha1="d5a2eb44b0f50554cd5daa39a82eaaf95f3ae53d" offset="00000" status="baddump" />
@@ -77655,7 +77655,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mstrfgt6" supported="partial">
+	<software name="mstrfgt6">
 		<description>Master Fighter VI' (Asia)</description>
 		<year>1993</year>
 		<publisher>Yoko</publisher>
@@ -78050,7 +78050,7 @@ be better to redump them properly. -->
 		<year>1993</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="street blaster ii pro (unl).chr" size="262144" crc="0f4ec1ae" sha1="f500133af4ae4988a5f2b2859f46afca97df43ea" offset="00000" status="baddump" />
@@ -78061,12 +78061,29 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="strblst4">
+		<description>Street Blaster IV Pro 10 (Asia)</description>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="cony1k" />
+			<feature name="pcb" value="UNL-CONY" />
+			<dataarea name="prg" size="131072">
+				<rom name="street blaster iv pro 10 (ymh-sn2) (unl).prg" size="131072" crc="0af8c9fd" sha1="184af79064c078101de8c09b3d76d0babf182818" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="262144">
+				<rom name="street blaster iv pro 10 (ymh-sn2) (unl).chr" size="262144" crc="73c30ae1" sha1="da0c88cf43da96812949820ee3e7315ab5aa4b1e" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- FIXME: Title screen gfx corruption is due to unimplemented jumper setting -->
 	<software name="strblst5" supported="partial">
 		<description>Street Blaster V Turbo 20 (Asia, 20 characters)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="street blaster v turbo 20 (unl).chr" size="262144" crc="27a81888" sha1="5cdb53c0f88032895157a61b53fa7a658062207f" offset="00000" status="baddump" />
@@ -78257,9 +78274,9 @@ be better to redump them properly. -->
 	<software name="sfxt">
 		<description>Street Fighter X Turbo 40 (Asia)</description>
 		<year>1993</year>
-		<publisher>Cony</publisher>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="cony" />
+			<feature name="slot" value="cony1k" />
 			<feature name="pcb" value="UNL-CONY" />
 			<dataarea name="chr" size="262144">
 				<rom name="street fighter x turbo 40 (unl).chr" size="262144" crc="8b7a77fc" sha1="bbe096be5e65fb16252c2e16973fbe1d4e3c6e48" offset="00000" status="baddump" />
@@ -78305,8 +78322,8 @@ be better to redump them properly. -->
 
 	<software name="supblst7">
 		<description>Super Blaster VII Turbo 28 (Asia)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1993</year>
+		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cony" />
 			<feature name="pcb" value="UNL-CONY" />
@@ -78717,7 +78734,7 @@ be better to redump them properly. -->
 
 	<software name="wh2">
 		<description>World Heroes 2 (Asia)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cony" />
@@ -78735,9 +78752,9 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="wh2pro">
+	<software name="wh2pro" cloneof="wh2">
 		<description>World Heroes 2 Pro (Asia)</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>Cony Soft</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="cony" />
