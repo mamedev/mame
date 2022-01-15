@@ -10,7 +10,8 @@
     its own Intel 87C51 processor and is an intelligent device.
 	
 	The Kaycomp Kay Pro V / Non-Linear Systems Kaypro 5: https://retrocmp.de/kaypro/kay-p1_vers.htm#kay-5, a version of the Kaypro II, 
-	but with a 5MB harddisk instead of one of the floppy drives, was announced in December 1982, but so far only a photo can be found.
+	but with a 5MB harddisk instead of one of the floppy drives, was announced in December 1982, but apart from the relevant articles of the time,
+	only one photo can be found.
 	
     Kaypro 10 notes:
     - This machine comes with a 10MB hard drive, split into 2 5MB partitions. It also
