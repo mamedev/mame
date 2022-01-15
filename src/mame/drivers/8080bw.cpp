@@ -136,7 +136,7 @@
         + Figure out the difference between the Taito and Midway discrete
           boards and emulate them both properly.
         + Figure out what the current discrete setup is trying to emulate.
-      * Remove Space Invaders 'invaders' set from mw8080bw.c, it does not belong
+      * Remove Space Invaders 'invaders' set from mw8080bw.cpp, it does not belong
         there at all
 
     - Space Chaser (schaser)
@@ -723,11 +723,18 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sinvzen )
 	PORT_INCLUDE( sicv )
 
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Difficulty ) )   /* [code: 0x18ca-d1] */
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
+
+
 
 /*******************************************************/
 /*                                                     */
@@ -738,6 +745,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( spaceat2 )
 	PORT_INCLUDE( sicv )
 
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Difficulty ) )   /* [code: 0x18ca-d1] */
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+
 	PORT_MODIFY("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1:6" )
@@ -745,10 +757,6 @@ static INPUT_PORTS_START( spaceat2 )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-
-	/* Dummy port for cocktail mode (not used) */
-	PORT_MODIFY(INVADERS_CAB_TYPE_PORT_TAG)
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -2304,9 +2312,11 @@ static INPUT_PORTS_START( yosakdon )
 
 	/* Dummy controls port, P1 */
 	INVADERS_CONTROL_PORT_P1
+
+	/* Dummy controls port, P2 */
 	INVADERS_CONTROL_PORT_P2
 
-	/* Dummy port for cocktail mode (not used) */
+	/* Dummy port for cocktail mode */
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
@@ -3533,12 +3543,8 @@ static INPUT_PORTS_START( invmulti )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_in2_control_r)
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW:1" )
 
-	/* fake port for cabinet type */
-	PORT_START(INVADERS_CAB_TYPE_PORT_TAG)
-	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	/* Dummy port for cocktail mode */
+	INVADERS_CAB_TYPE_PORT
 
 	/* fake ports for handling the various input ports based on cabinet type */
 	PORT_START(INVADERS_SW6_SW7_PORT_TAG)
@@ -3550,17 +3556,12 @@ static INPUT_PORTS_START( invmulti )
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:5" )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START(INVADERS_P1_CONTROL_PORT_TAG)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+	/* Dummy controls port, P1 */
+	INVADERS_CONTROL_PORT_P1
 
-	PORT_START(INVADERS_P2_CONTROL_PORT_TAG)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+	/* Dummy controls port, P2 */
+	INVADERS_CONTROL_PORT_P2
+
 INPUT_PORTS_END
 
 void _8080bw_state::invmulti_map(address_map &map)
@@ -5749,18 +5750,19 @@ GAMEL(1978, spceking,    invaders, invaders,  sicv,      mw8080bw_state, empty_i
 GAMEL(1979, cosmicmo,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters (version II)",                                    MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // Taito sued, and as settlement they were allowed to sell Universal's Galaxy Wars
 GAMEL(1979, cosmicm2,    invaders, cosmicmo,  cosmicmo,  _8080bw_state,  empty_init,    ROT270, "bootleg (Universal)",                "Cosmic Monsters 2",                                               MACHINE_SUPPORTS_SAVE, layout_cosmicm ) // "
 GAMEL(1980?,sinvzen,     invaders, invaders,  sinvzen,   mw8080bw_state, empty_init,    ROT270, "Taito / Zenitone-Microsec Ltd.",     "Super Invaders (Zenitone-Microsec)",                              MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
+GAMEL(1980, spaceat2,    invaders, invaders,  spaceat2,  mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games UK)",           "Space Attack II (bootleg of Super Invaders)",                     MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Zenitone-Microsec Super Invaders
+GAMEL(1980, invader4,    invaders, invaders,  spaceat2,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "Space Invaders Part Four (bootleg of Space Attack II)",           MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Space Attack II
 GAMEL(1980, ultrainv,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "Taito / Konami",                     "Ultra Invaders",                                                  MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unclassified, licensed or bootleg?
 GAMEL(1978, spaceatt,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)",         "Space Attack (bootleg of Space Invaders)",                        MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, spaceattbp,  invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)",         "Space Attack (bproms)(bootleg of Space Invaders)",                MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, spaceatt2k,  invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)",         "Space Attack (2k roms)(bootleg of Space Invaders)",               MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spaceattbp,  invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)",         "Space Attack (bootleg of Space Invaders, bproms)",                MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spaceatt2k,  invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games GmbH)",         "Space Attack (bootleg of Space Invaders, 2k roms)",               MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, cosmicin,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg",                            "Cosmic Invaders (bootleg of Space Invaders)",                     MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, galmonst,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg (Laguna S.A.)",              "Galaxy Monsters (Laguna S.A. Spanish bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1980, spaceat2,    invaders, invaders,  spaceat2,  mw8080bw_state, empty_init,    ROT270, "bootleg (Video Games UK)",           "Space Attack II (bootleg of Super Invaders)",                     MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1979, spacecom,    invaders, spacecom,  spacecom,  _8080bw_state,  init_spacecom, ROT270, "bootleg",                            "Space Combat (bootleg of Space Invaders)",                        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacecom )
 GAME( 1978, spacerng,    invaders, spacerng,  sitv,      _8080bw_state,  empty_init,    ROT90,  "bootleg (Leisure Time Electronics)", "Space Ranger",                                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Many modifications
 GAMEL(19??, invasion,    invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (Sidam)",                    "Invasion (Sidam)",                                                MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, invasiona,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, newer set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'Ufo Monster Attack' and standard GFX
-GAMEL(1979, invasiona2,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, older set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'Ufo Monster Attack' and standard GFX
+GAMEL(1979, invasiona,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, newer set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
+GAMEL(1979, invasiona2,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "UFO Robot Attack (bootleg of Invasion, older set)",               MACHINE_SUPPORTS_SAVE, layout_invaders ) // Has Sidam replaced with 'UFO Monster Attack' and standard GFX
 GAMEL(1979, invasionb,   invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "Invasion (Italian bootleg)",                                      MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, invasionrz,  invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 1, R Z SRL Bologna)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
 GAMEL(1979, invasionrza, invaders, invaders,  invasion,  mw8080bw_state, empty_init,    ROT270, "bootleg (R Z SRL Bologna)",          "Invasion (bootleg set 2, R Z SRL Bologna)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING, layout_invaders )
@@ -5775,9 +5777,8 @@ GAMEL(19??, alieninv,    invaders, invaders,  alieninv,  mw8080bw_state, empty_i
 GAMEL(19??, alieninvp2,  invaders, invaders,  searthin,  mw8080bw_state, empty_init,    ROT270, "bootleg",                            "Alien Invasion Part II",                                          MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, jspecter,    invaders, invaders,  jspecter,  mw8080bw_state, empty_init,    ROT270, "bootleg (Jatre)",                    "Jatre Specter (set 1)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, jspecter2,   invaders, invaders,  jspecter,  mw8080bw_state, empty_init,    ROT270, "bootleg (Jatre)",                    "Jatre Specter (set 2)",                                           MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, spacewr3,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Space War Part 3",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Unrelated to Sanritsu's version?
-GAMEL(1978, swipeout,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg (Beyer and Brown)",          "Space Wipeout",                                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, invader4,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT270, "bootleg",                            "Space Invaders Part Four",                                        MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spacewr3,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Space War Part 3",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Sanritsu's Space War
+GAMEL(1978, swipeout,    invaders, spcewars,  sicv,      _8080bw_state,  empty_init,    ROT270, "bootleg (Beyer and Brown)",          "Space Wipeout",                                                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // Bootleg of Sanritsu's Space War
 GAME( 1978, darthvdr,    invaders, darthvdr,  darthvdr,  _8080bw_state,  empty_init,    ROT270, "bootleg",                            "Darth Vader (bootleg of Space Invaders)",                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAMEL(19??, tst_invd,    invaders, invaders,  sicv,      mw8080bw_state, empty_init,    ROT0,   "<unknown>",                          "Space Invaders Test ROM",                                         MACHINE_SUPPORTS_SAVE, layout_invaders )
 
