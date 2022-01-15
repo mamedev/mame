@@ -1616,6 +1616,8 @@ static INPUT_PORTS_START( hotd2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
+	// TODO: reloads should trigger when shoot outside of the screen
+	// (in our case, on border area)
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Trigger") PORT_PLAYER(1)
@@ -2426,6 +2428,7 @@ WRITE_LINE_MEMBER(naomi_state::external_reset)
 	// it will probably need to be adjusted
 	m_aica->reset();
 	m_soundcpu->reset();
+	m_g2if->reset();
 }
 
 /*
@@ -2460,7 +2463,7 @@ void dc_state::naomi_aw_base(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	// TODO: find exact pclk source
+	// TODO: hook up PVR SPG pclk source
 	screen.set_raw(13458568*2, 820, 0, 640, 532, 0, 480);
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
@@ -11007,7 +11010,7 @@ void naomi_state::init_hotd2()
 /* 0039A */ GAME( 2006, meltyb,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0, "Ecole Software",   "Melty Blood Act Cadenza Version B2 (Japan) (GDL-0039A)", GAME_FLAGS )
 /* 0040  */ GAME( 2006, karous,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT270, "Milestone",      "Karous (Japan) (GDL-0040)", GAME_FLAGS )
 /* 0041  */ GAME( 2006, ggxxac,    naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,"Arc System Works",  "Guilty Gear XX Accent Core (Japan) (GDL-0041)", GAME_FLAGS )
-/* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", GAME_FLAGS )
+/* 0042  */ GAME( 2006, takoron,   naomigd, naomigd, naomi, naomi_state,  init_naomigd,  ROT0,   "Compile Heart",  "Noukone Puzzle Takoron (Japan) (GDL-0042)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* CDP-xxxxx and CDV-xxxxx (CD-ROM and DVD-ROM for Naomi 2 Satellite Terminal) */
 // CDP-10001?- World Club Champion Football Serie A 2001-2002 (Sega, 2002)

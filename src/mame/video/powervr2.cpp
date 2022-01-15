@@ -1874,7 +1874,7 @@ void powervr2_device::process_ta_fifo()
 				memcpy(poly_base_color, tafifo_buff + 4, 4 * sizeof(float));
 				memset(poly_offs_color, 0, sizeof(poly_offs_color));
 			}
-						memcpy(poly_last_mode_2_base_color, poly_base_color, sizeof(poly_last_mode_2_base_color));
+			memcpy(poly_last_mode_2_base_color, poly_base_color, sizeof(poly_last_mode_2_base_color));
 			break;
 		case 3:
 			memcpy(poly_base_color, poly_last_mode_2_base_color, sizeof(poly_base_color));
@@ -2010,7 +2010,7 @@ void powervr2_device::process_ta_fifo()
 		if (paratype == 7)
 		{ // vertex
 			if (tafifo_listtype < 0 || tafifo_listtype >= DISPLAY_LIST_COUNT) {
-				LOGWARN("PowerVR2 unrecognized list type %d\n", tafifo_listtype);
+				LOGWARN("%s: unrecognized list type %d\n", tag(), tafifo_listtype);
 				return;
 			}
 			struct poly_group *grp = rd->groups + tafifo_listtype;
