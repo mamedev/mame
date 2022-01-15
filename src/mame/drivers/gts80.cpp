@@ -11,6 +11,25 @@ still there. Like most pinball machines, the leaky battery could destroy everyth
 stuck-on solenoid. If the machine was left on was a while, it could lock up, so a reset board (watchdog) was
 added.
 
+Here are the key codes to enable play:
+
+Game                     NUM  Start game                            End ball
+--------------------------------------------------------------------------------------------------
+Panthera                 652  1                                     X
+Le Grand 8               ---  1                                     X
+The Amazing Spider-man   653  1                                     X
+Circus                   654  1                                     X
+Counterforce             656  1                                     X
+Star Race                657  1                                     X
+James Bond               658  1                                     X
+Timeline                 659  1                                     X
+Force II                 661  unknown                               unknown (PGDN and Down, but not working)
+Pink Panther             664  unknown                               unknown (PGDN and Down, but not working)
+Mars God of War          666  1 them Home and \                     Home then \ (wait for flash or match)
+Volcano                  667  1 then M=                             M then = (wait for flash or match)
+Black Hole               668  1 then R (wait for score to flash)    L then R (wait for flash or match)
+Haunted House            669  1                                     X
+Eclipse                  671  1 then RW                             X
 
 Status:
 - Machines boot up, coins can be inserted, and a game begun.
@@ -19,8 +38,6 @@ Status:
 
 Notes:
 - Jamesb is a timed game and appears to be never-ending.
-- Black Hole: Start game, Hold R until digits flash, then works. After the last ball, hit R to finish the game.
-- Multiball machines: Black Hole, Eclipse, Force II, Mars, Pink Panther, Volcano.
 - Haunted House uses the R1 sound card which doesn't have anything for save-states. If the game has save-state
   support, it will fatal-error at start.
 
@@ -29,6 +46,7 @@ ToDO:
 - Sounds are not correct. The games only seem to use 2 or 3 sounds each.
 - The Sound & Speech board has extra control lines (Sound16 and Sound32). Sound16 comes from a lamp output,
   while Sound32 hasn't been tracked down yet.
+- Mars: Sound board crashes at first sound request
 - None of the "talking" machines talk.
 
 
@@ -365,7 +383,7 @@ void gts80_state::port3a_w(u8 data)
 	data ^= 0x1f;   // Z27 inverter
 	// Sound
 	u8 sndcmd = data & 15;
-	if (BIT(data, 4))  // Z31
+	if (!BIT(data, 4))  // Z31
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board

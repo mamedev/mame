@@ -22,6 +22,37 @@ PinMAME used for the display character generator.
 
 When asked to enter your initials, use the Advance buttons to select a letter, and the Start button to enter it.
 
+Here are the key codes to enable play:
+
+Game                 NUM  Start game                                       End ball
+--------------------------------------------------------------------------------------------------
+Amazon Hunt II       684C 1                                                X
+Amazon Hunt III      684D 1                                                X
+Bounty Hunter        694  1                                                X
+Chicago Cubs         696  1                                                X
+Rock                 697  1                                                X
+Tag Team Wrestling   698  unknown                                          unknown
+Raven                702  1                                                X
+Hollywood Heat       703  unknown                                          unknown (should be Del F4, but not working)
+Rock Encore          704  1                                                X
+Genesis              705  unknown                                          unknown
+Spring Break         706  unknown                                          unknown
+Gold Wings           707  1 then ' del pad+                                del quote pad+
+Monte Carlo          708  unknown                                          unknown
+Arena                709  unknown                                          unknown
+Victory              710  1 then del (wait for sound) then pad+            del (wait for sound) then pad+
+Diamond Lady         711  unknown                                          unknown
+TX-Sector            712  1 then del and pad+                              del and pad+
+Big House            713  unknown                                          unknown
+Robo-War             714  unknown                                          unknown
+Excalibur            715  unknown                                          unknown
+Bad Girls            717  unknown                                          unknown (should be End F2, but not working)
+Hot Shots            718  unknown                                          unknown
+Bone Busters Inc     719  unknown                                          unknown
+Night Moves         C103  unknown                                          unknown
+Master               ---  mnw
+Top Sound            ---  no inputs
+
 *****************************************************************************************************************/
 
 #include "emu.h"
@@ -401,7 +432,7 @@ void gts80b_state::port3a_w(u8 data)
 	data ^= 0x1f;   // Z27 inverter
 	// Sound
 	u8 sndcmd = data & 15;
-	if (BIT(data, 4))  // Z31
+	if (!BIT(data, 4))  // Z31
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board

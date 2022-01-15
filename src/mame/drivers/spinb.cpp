@@ -20,13 +20,18 @@ There are mistakes in the sound board schematic: IC14 pin12 goes to IC5 pin13 on
 Also, very unobvious is the fact that PIA ports A and B are swapped around compared to the Inder
  soundcard.
 
+Game             Start machine    Start game       End ball
+--------------------------------------------------------------------------------------------------
+Metalman                          1                X
+Bushido          unknown          unknown          unknown
+Mach 2           ASX              1                unknown
+Jolly Park       ASDX             1                unknown
+Verne's World    ASDX             1                unknown
+
 Status:
 - Metal Man is the only playable machine.
-- The other machines firstly need balls in the machine to get attract mode. After the ball begins,
-   then the playfield needs enabling. Each of these situations requires a key combination.
-- mach2/a can start by pressing ASX together.
-- vrnwrld can start by pressing ASDX together.
-- jolypark can start by pressing ASDX together.
+- The other machines firstly need balls in the machine to get attract mode. See above table. After
+   the ball begins, then the playfield needs enabling. These codes are unknown.
 
 ToDo:
 - Multiball games - find out the key combinations

@@ -21,12 +21,24 @@ Setting up for surfnsaf,opthund,tt_game,ccruise:
 - Use A and B to cycle up and down (instead of num-1/num-2)
 - After that, still cannot insert a coin.
 
-Known outhole per game:
-- lca,lca2: V
-- vegas: A
-- deadweap: I (but can't score)
-- cactjack allows you to score, but outhole unknown
-- other games won't score.
+Game                 NUM  Start game                                       End ball
+--------------------------------------------------------------------------------------------------
+Lights Camera Action 720  1 then W                                         V
+Silver Slugger       722  unknown                                          unknown
+Vegas                723  1 then B                                         A
+Deadly Weapon        724  1 then Q                                         I then Q
+Car Hop              725  1 then P and ]                                   P then ]
+Title Fight          726  unknown                                          unknown
+Hoops                727  1 then Q and Z                                   unknown
+Cactus Jack          729  unknown                                          unknown
+Class of 1812        730  1 then ; and '                                   up
+Surf'n Safari        731  unknown                                          unknown
+Operation: Thunder   732  unknown                                          unknown
+tt_game              ---  unknown                                          unknown
+Caribbean Cruise    C102  unknown                                          unknown
+Nudge-it            N102  1 then B and M                                   unknown
+Bell Ringer         N103  1 then A                                         unknown
+
 
 Status:
 - Display works
@@ -603,7 +615,7 @@ ROM_END
 
 
 /************************************/
-/* NOT OFFICIALLY LISTED             */
+/* NOT OFFICIALLY LISTED            */
 /************************************/
 
 /*-------------------------------------------------------------------
