@@ -26,7 +26,9 @@ public:
 		, m_awflash(*this, "awflash")
 		, m_exid_in(*this, "EXID_IN")
 		, m_exid_out(*this, "EXID_OUT")
-	   { }
+	{
+		m_aw_ctrl_type = 0xf0;
+	}
 
 	void aw_base(machine_config &config);
 	void aw1c(machine_config &config);
@@ -49,6 +51,7 @@ private:
 	uint32_t aw_modem_r(offs_t offset, uint32_t mem_mask = ~0);
 	void aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	u8 m_aw_ctrl_type;
 //	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 };
 

@@ -477,10 +477,7 @@ uint32_t atomiswave_state::aw_modem_r(offs_t offset, uint32_t mem_mask)
 			return (ioport("COINS")->read() & 0x0f);
 		case 0x284/4:
 			// CHECKME: any game that uses non-canonical input method should be checked from here
-			// TODO: blokpong purges the expected ID of 0x20 even if a mouse device is connected.
-			// Is it expecting to be p2 instead?
-			//return aw_ctrl_type;
-			return m_exid_in.read_safe(0xf0);
+			return m_exid_in.read_safe(m_aw_ctrl_type);
 	}
 
 	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+offset*4);
@@ -514,8 +511,11 @@ void atomiswave_state::aw_modem_w(offs_t offset, uint32_t data, uint32_t mem_mas
 			//   waidrive, sprtshot, samsptk, rangrmsn, claychal, basschal, anmlbskt
 			// - 0xf0 plus double sequence of 0x10->0x50->0x40->0x00 by:
 			//   xtrmhnt2, xtrmhunt
+			// Real HW tests shows that writing to this will ping the value back to reads
+			// (open bus/drain?)
+			m_aw_ctrl_type = data & 0xf0;
 			if (m_exid_out)
-				m_exid_out->write(data & 0xf0);
+				m_exid_out->write(m_aw_ctrl_type);
 
 			logerror("%s: write to ctrl port %02x %08x\n", machine().describe_context(), data, mem_mask);
 			break;
