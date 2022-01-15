@@ -79174,6 +79174,78 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="batlkid">
+		<description>Battle Kid - Fortress of Peril (v1.100)</description>
+		<year>2010</year>
+		<publisher>Sivak Games / RetroZone</publisher>
+		<info name="serial" value="SIV-BK-GBL"/>
+		<info name="release" value="20100702"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="262144">
+				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="aef464ce" sha1="1f5832a163313f930893151a30efb1ebb853b0db" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkida" cloneof="batlkid">
+		<description>Battle Kid - Fortress of Peril (v1.000)</description>
+		<year>2010</year>
+		<publisher>Sivak Games / RetroZone</publisher>
+		<info name="serial" value="SIV-BK-GBL"/>
+		<info name="release" value="20100222"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="262144">
+				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkidj" cloneof="batlkid">
+		<description>Battle Kid - Kiken no Wana (Japan, v2.000)</description>
+		<year>2018</year>
+		<publisher>Columbus Circle</publisher>
+		<info name="release" value="20181018"/>
+		<info name="alt_title" value="バトルキッド 危険の罠"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="524288">
+				<rom name="battle kid - fortress of peril (japan) (v2.000).prg" size="524288" crc="fa5d5a4d" sha1="7f142f448bee7972b5cf4feeb427a7f19d78f2e3" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlkid2">
+		<description>Battle Kid 2 - Mountain of Torment (v1.000)</description>
+		<year>2012</year>
+		<publisher>Sivak Games / RetroZone</publisher>
+		<info name="serial" value="SIV-B2-GBL"/>
+		<info name="release" value="20121215"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="unrom512" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="524288">
+				<rom name="battle kid 2 - mountain of torment (v1.000).prg" size="524288" crc="74b823a1" sha1="dcd6870e0d5a79899dce11b975c8a16652fc7143" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Author self-published through mail order, carts made by RetroZone -->
 	<software name="et">
 		<description>E.T.</description>
