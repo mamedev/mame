@@ -7,7 +7,7 @@
 #include "bus/midi/midi.h"
 #include "video/atarist.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /*

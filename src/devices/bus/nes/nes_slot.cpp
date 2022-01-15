@@ -574,12 +574,6 @@ void device_nes_cart_interface::reset_cpu()
 	m_maincpu->set_pc(0xfffc);
 }
 
-void device_nes_cart_interface::poke(offs_t offset, uint8_t data)
-{
-	// even worse hack
-	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
-}
-
 //-------------------------------------------------
 //  Other helpers
 //-------------------------------------------------
@@ -760,12 +754,11 @@ void device_nes_cart_interface::nes_banks_restore()
 //-------------------------------------------------
 nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_CART_SLOT, tag, owner, clock)
-	, device_image_interface(mconfig, *this)
+	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_nes_cart_interface>(mconfig, *this)
 	, m_crc_hack(0)
 	, m_cart(nullptr)
 	, m_pcb_id(NO_BOARD)
-	, m_must_be_loaded(1)
 {
 }
 

@@ -101,7 +101,7 @@ public:
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_cass(*this, "cassette")
-		, m_io_keyboard(*this, "KEY.%u", 0)
+		, m_io_keyboard(*this, "KEY.%u", 0U)
 	{ }
 
 	void bcs3(machine_config &config);
@@ -125,11 +125,11 @@ private:
 	void bcs3_mem(address_map &map);
 	void bcs3a_mem(address_map &map);
 	void machine_start() override;
-	bool m_cassbit;
-	u8 s_curs;
-	u8 s_init;
-	u8 s_rows;
-	u8 s_cols;
+	bool m_cassbit = 0;
+	u8 s_curs = 0U;
+	u8 s_init = 0U;
+	u8 s_rows = 0U;
+	u8 s_cols = 0U;
 
 	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;

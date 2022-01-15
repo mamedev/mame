@@ -69,9 +69,9 @@ private:
 	void sport2k_map(address_map &map);
 	void sport2k_8051_io(address_map &map);
 
-	u8 m_ay8910_data;
-	bool m_ay8910_bdir;
-	bool m_ay8910_bc1;
+	u8 m_ay8910_data = 0U;
+	bool m_ay8910_bdir = 0;
+	bool m_ay8910_bc1 = 0;
 	void ay8910_update();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

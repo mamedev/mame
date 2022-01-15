@@ -10,7 +10,7 @@
 */
 
 #include "emu.h"
-#include "sm500.h"
+#include "sm5a.h"
 #include "sm510d.h"
 #include "debugger.h"
 

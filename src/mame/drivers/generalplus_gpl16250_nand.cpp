@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "includes/generalplus_gpl16250.h"
 #include "includes/generalplus_gpl16250_nand.h"
+#include "softlist_dev.h"
 
 uint16_t generalplus_gpac800_game_state::cs0_r(offs_t offset)
 {

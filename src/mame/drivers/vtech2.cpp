@@ -77,6 +77,7 @@
 #include "cpu/z80/z80.h"
 #include "formats/vt_cas.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 

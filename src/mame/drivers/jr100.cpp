@@ -80,7 +80,7 @@ public:
 		, m_cassette(*this, "cassette")
 		, m_speaker(*this, "speaker")
 		, m_region_maincpu(*this, "maincpu")
-		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_io_keyboard(*this, "LINE%u", 0U)
 		, m_maincpu(*this, "maincpu")
 		, m_sound_timer(nullptr)
 	{ }
@@ -92,9 +92,9 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_keyboard_line;
-	bool m_use_pcg;
-	bool m_pb7;
+	uint8_t m_keyboard_line = 0U;
+	bool m_use_pcg = 0;
+	bool m_pb7 = 0;
 	uint32_t screen_update_jr100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_tick);
 	uint8_t pb_r();

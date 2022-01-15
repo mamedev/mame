@@ -193,16 +193,16 @@ void scorpion_state::scorpion_mem(address_map &map)
 void scorpion_state::scorpion_io(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x001f, 0x001f).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w)).mirror(0xff00);
-	map(0x003f, 0x003f).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w)).mirror(0xff00);
-	map(0x005f, 0x005f).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w)).mirror(0xff00);
-	map(0x007f, 0x007f).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w)).mirror(0xff00);
-	map(0x00fe, 0x00fe).rw(FUNC(scorpion_state::spectrum_port_fe_r), FUNC(scorpion_state::spectrum_port_fe_w)).select(0xff00);
-	map(0x00ff, 0x00ff).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w)).mirror(0xff00);
-	map(0x4021, 0x4021).w(FUNC(scorpion_state::scorpion_port_7ffd_w)).mirror(0x3fdc);
-	map(0x8021, 0x8021).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3fdc);
-	map(0xc021, 0xc021).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3fdc);
-	map(0x0021, 0x0021).w(FUNC(scorpion_state::scorpion_port_1ffd_w)).mirror(0x3fdc);
+	map(0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
+	map(0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
+	map(0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
+	map(0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
+	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(scorpion_state::spectrum_port_fe_r), FUNC(scorpion_state::spectrum_port_fe_w));
+	map(0x00ff, 0x00ff).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::state_r), FUNC(beta_disk_device::param_w));
+	map(0x4021, 0x4021).mirror(0x3fdc).w(FUNC(scorpion_state::scorpion_port_7ffd_w));
+	map(0x8021, 0x8021).mirror(0x3fdc).w("ay8912", FUNC(ay8910_device::data_w));
+	map(0xc021, 0xc021).mirror(0x3fdc).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x0021, 0x0021).mirror(0x3fdc).w(FUNC(scorpion_state::scorpion_port_1ffd_w));
 }
 
 void scorpion_state::scorpion_switch(address_map &map)

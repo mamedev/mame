@@ -2,8 +2,8 @@
 // copyright-holders:Robbbert
 /*****************************************************************************************
 
-    PINBALL
-    Game Plan MPU-2
+PINBALL
+Game Plan MPU-2
 
 When first turned on, you need to press num-0 to enter the setup program, then keep
 pressing num-0 until 06 shows in the credits display. Press the credit button to set
@@ -68,8 +68,8 @@ public:
 		, m_io_x9(*this, "X9")
 		, m_io_xa(*this, "XA")
 		, m_io_xb(*this, "XB")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	void gp_2(machine_config &config);
@@ -80,10 +80,10 @@ private:
 	u8 portb_r();
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
-	u8 m_u14 = 0;
-	u8 m_digit = 0;
+	u8 m_u14 = 0U;
+	u8 m_digit = 0U;
 	u8 m_segment[16]{};
-	u8 m_last_solenoid = 15;
+	u8 m_last_solenoid = 15U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<z80_device> m_maincpu;

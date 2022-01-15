@@ -602,5 +602,5 @@ ROM_END
 static INPUT_PORTS_START(pcipc)
 INPUT_PORTS_END
 
-COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440HX)", MACHINE_NO_SOUND)
-COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (440TX)", MACHINE_NO_SOUND)
+COMP(1998, pcipc,   0, 0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND)
+COMP(1998, pcipctx, 0, 0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND)

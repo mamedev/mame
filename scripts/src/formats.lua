@@ -21,7 +21,6 @@ project "formats"
 
 	includedirs {
 		MAME_DIR .. "src/osd",
-		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "3rdparty",
@@ -80,6 +79,8 @@ project "formats"
 		MAME_DIR .. "src/lib/formats/fsblk_vec.cpp",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.h",
 		MAME_DIR .. "src/lib/formats/fs_unformatted.cpp",
+		MAME_DIR .. "src/lib/formats/fsmeta.h",
+		MAME_DIR .. "src/lib/formats/fsmeta.cpp",
 	}
 
 --------------------------------------------------
@@ -559,6 +560,18 @@ if opt_tool(FORMATS, "COCO_CAS") then
 	files {
 		MAME_DIR.. "src/lib/formats/coco_cas.cpp",
 		MAME_DIR.. "src/lib/formats/coco_cas.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/coco_rawdsk.h,FORMATS["COCO_RAWDSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "COCO_RAWDSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/coco_rawdsk.cpp",
+		MAME_DIR.. "src/lib/formats/coco_rawdsk.h",
 	}
 end
 
@@ -2096,6 +2109,30 @@ if opt_tool(FORMATS, "FS_ORIC_JASMIN") then
 	files {
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.cpp",
 		MAME_DIR.. "src/lib/formats/fs_oric_jasmin.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_coco_rsdos.h,FORMATS["FS_COCO_RSDOS"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_COCO_RSDOS") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_coco_rsdos.cpp",
+		MAME_DIR.. "src/lib/formats/fs_coco_rsdos.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/lib/formats/fs_coco_os9.h,FORMATS["FS_COCO_OS9"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "FS_COCO_OS9") then
+	files {
+		MAME_DIR.. "src/lib/formats/fs_coco_os9.cpp",
+		MAME_DIR.. "src/lib/formats/fs_coco_os9.h",
 	}
 end
 

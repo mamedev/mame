@@ -97,7 +97,13 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/z80scc.h"
+#include "screen.h"
 
+#define LOG_GENERAL (1U << 0)
+#define LOG_VIDEO   (1U << 1)
+
+//#define VERBOSE (LOG_COMMAND)
+#include "logmacro.h"
 
 namespace {
 
@@ -114,6 +120,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_scc(*this, "scc")
 		, m_via(*this, "via")
+		, m_screen(*this, "screen")
+		, m_vram_offset(0)
 		, m_dsw1(*this, "DSW1")
 		, m_dram_ptr(*this, "dram")
 		, m_sram_ptr(*this, "sram")
@@ -127,6 +135,9 @@ public:
 		, m_print_result(0)
 		, m_sbsy(0)
 		, m_cbsy(0)
+		, m_vsync(0)
+		, m_fifo_count(0)
+		, m_pb6_tick_count(0)
 	{ }
 
 	void lwriter(machine_config &config);
@@ -155,12 +166,18 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(via_cb1_w);
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(via_int_w);
+	emu_timer *m_pb6_timer;
+	TIMER_CALLBACK_MEMBER(pb6_tick);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	//DECLARE_WRITE_LINE_MEMBER(scc_int);
 	void maincpu_map(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<scc8530_device> m_scc;
 	required_device<via6522_device> m_via;
+	optional_device<screen_device> m_screen;
+	std::unique_ptr<u8[]> m_vram;
+	size_t m_vram_offset;
 	required_ioport m_dsw1;
 
 	required_shared_ptr<uint16_t> m_dram_ptr;
@@ -174,6 +191,11 @@ private:
 	int m_print_result;
 	bool m_sbsy;
 	bool m_cbsy;
+	bool m_vsync;;
+	int m_fifo_count;
+	int m_pb6_tick_count;
+	int m_vbl_count;
+	int m_reset_count;
 };
 
 /*
@@ -277,11 +299,15 @@ static INPUT_PORTS_START( lwriter )
 	PORT_DIPSETTING(  0x60, "AppleTalk")
 INPUT_PORTS_END
 
+// 300 dots/inch: 1,863,813 Hz (from the CX manual) / (8 bits per byte) / (48 bytes written per interrupt / 24 ticks per interrupt) = ~116488.3
+#define PB6_CLK 116488
+
 /* Start it up */
 void lwriter_state::machine_start()
 {
 	// do stuff here later on like setting up printer mechanisms HLE timers etc
-
+	m_pb6_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(lwriter_state::pb6_tick),this));
+	m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
 	// Initialize ca1 to 1 so that we don't miss the first interrupt/transition to 0
 	m_via->write_ca1(1);
 }
@@ -358,20 +384,54 @@ void lwriter_state::eeprom_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	logerror("eeprom_w! %x %x %x\n", offset, data, mem_mask);
 }
 
+TIMER_CALLBACK_MEMBER(lwriter_state::pb6_tick)
+{
+    m_pb6_tick_count += 1;
+    m_via->write_pb6(0);
+    m_via->write_pb6(1);
+    m_pb6_timer->adjust(attotime::from_hz(PB6_CLK));
+}
+
 /* 4 diagnostic LEDs, plus 4 i/o lines for the printer */
+/* 0 - print cbsy
+ * 1 - print prnt
+ * 2 - print vsync
+ * 3 - print cprdy
+ * 4 - led 1
+ * 5 - led 2
+ * 6 - led 3
+ * 7 - led 4
+ */
 void lwriter_state::led_out_w(uint8_t data)
 {
 	//popmessage("LED status: %02X\n", data&0xFF);
 	logerror("LED status: %02X\n", data&0xFF);
 	m_cbsy = data & 1;
+	if (!m_vsync && (data & 4)) { // vsync
+		LOGMASKED(LOG_VIDEO, "vsync\n");
+		m_vbl_count = 0;
+	}
+	m_vsync = (data & 4);
 	popmessage("LED status: %x %x %x %x %x %x %x %x\n", data&0x80, data&0x40, data&0x20, data&0x10, data&0x8, data&0x4, data&0x2, data&0x1);
 }
 
+// A guess based on not very much
+#define FB_HEIGHT 3434
+#define FB_WIDTH 2520
 /* FIFO to printer, 64 bytes long */
 void lwriter_state::fifo_out_w(uint8_t data)
 {
-	/** TODO: actually emulate this */
-	logerror("FIFO written with: %02X\n", data&0xFF);
+	m_fifo_count += 8;
+	if (m_vbl_count >= FB_HEIGHT) {
+		m_vbl_count = 0;
+	}
+
+	m_vram[m_vbl_count * FB_WIDTH/8 + m_vram_offset] = data;
+	m_vram_offset++;
+	if (m_vram_offset > (FB_WIDTH*FB_HEIGHT/8)) {
+		LOGMASKED(LOG_VIDEO, "vram reset\n");
+		m_vram_offset = 0;
+	}
 }
 /* via port a bits */
 /* 0 - ?
@@ -416,10 +476,10 @@ WRITE_LINE_MEMBER(lwriter_state::via_ca2_w)
  * 1 - print rdy
  * 2 - print pprdy
  * 3 - overlay
- * 4 -
- * 5 -
- * 6 - timer 2 clk
- * 7 - print related timing thing
+ * 4 - scc w/req
+ * 5 - resetfifo
+ * 6 - timer 2 clk (mroclk)
+ * 7 - vbl
  */
 uint8_t lwriter_state::via_pb_r()
 {
@@ -436,6 +496,16 @@ uint8_t lwriter_state::via_pb_lw2nt_r()
 
 void lwriter_state::via_pb_w(uint8_t data)
 {
+	if ((data & 0x20) && ((m_via_pb & 0x20) == 0)) {
+		m_reset_count++;
+		LOGMASKED(LOG_VIDEO, "reset fifo %d pb6 %d\n", m_fifo_count, m_pb6_tick_count);
+	}
+	if ((data & 0x80) && ((m_via_pb & 0x80) == 0)) {
+		m_vbl_count++;
+		LOGMASKED(LOG_VIDEO, "vbl fifo:%d vbl:%d vram_off: %ld\n", m_fifo_count, m_vbl_count, m_vram_offset);
+		m_vram_offset = 0;
+	}
+
 	logerror(" VIA: Port B written with data of 0x%02x!\n", data);
 	/* Like early Mac models which had VIA A4 control overlaying, the
 	 * LaserWriter II NT overlay is controlled by VIA B3 */
@@ -471,7 +541,6 @@ WRITE_LINE_MEMBER(lwriter_state::scc_int)
 
 #define CPU_CLK (22.321_MHz_XTAL / 2) // Based on pictures form here: http://picclick.co.uk/Apple-Postscript-LaserWriter-IINT-Printer-640-4105-M6009-Mainboard-282160713108.html#&gid=1&pid=7
 #define RXC_CLK ((CPU_CLK.value() - (87 * 16 * 70)) / 3) // Tuned to get 9600 baud according to manual, needs rework based on real hardware
-
 /* These are from LBP-CX Series Video Interface Manual:
  * http://beefchicken.com/retro/laserwriter/LBP-CX%20Series%20Video%20Interface%20Service%20Manual.pdf
  */
@@ -548,6 +617,27 @@ void lwriter_state::write_dtr(int state)
 	}
 }
 
+uint32_t lwriter_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	for (int y = 0; y < FB_HEIGHT; y++) {
+		for (int x = 0; x < FB_WIDTH; x += 8) {
+			uint32_t *scanline = &bitmap.pix(y, x);
+			uint8_t pixels = m_vram[y * FB_WIDTH/8 + x/8];
+#define f(x) ((x) ? (0) : (0xffffffff))
+			*scanline++ = f(pixels&0x80);
+			*scanline++ = f((pixels<<1)&0x80);
+			*scanline++ = f((pixels<<2)&0x80);
+			*scanline++ = f((pixels<<3)&0x80);
+			*scanline++ = f((pixels<<4)&0x80);
+			*scanline++ = f((pixels<<5)&0x80);
+			*scanline++ = f((pixels<<6)&0x80);
+			*scanline++ = f((pixels<<7)&0x80);
+		}
+	}
+
+	return 0;
+}
+
 void lwriter_state::lwriter2nt(machine_config &config)
 {
 	lwriter(config);
@@ -559,6 +649,13 @@ void lwriter_state::lwriter(machine_config &config)
 {
 	M68000(config, m_maincpu, CPU_CLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwriter_state::maincpu_map);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(30);
+	m_screen->set_size(FB_WIDTH, FB_HEIGHT);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(lwriter_state::screen_update));
+	m_vram = make_unique_clear<uint8_t[]>(FB_WIDTH*FB_HEIGHT/8);
 
 	SCC8530N(config, m_scc, CPU_CLK);
 	m_scc->configure_channels(RXC_CLK, 0, RXC_CLK, 0);

@@ -106,7 +106,7 @@
 #include "machine/ram.h"
 #include "machine/rescap.h"
 #include "render.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "pcw.lh"

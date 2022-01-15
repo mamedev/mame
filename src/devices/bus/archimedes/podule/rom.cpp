@@ -14,6 +14,7 @@
 #include "bus/generic/carts.h"
 #include "bus/generic/ram.h"
 #include "bus/generic/rom.h"
+#include "softlist_dev.h"
 
 
 namespace {

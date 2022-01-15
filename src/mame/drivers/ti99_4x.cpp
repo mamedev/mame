@@ -52,7 +52,7 @@
 #include "bus/ti99/internal/ioport.h"
 #include "machine/ram.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #define TI99_CONSOLEGROM     "cons_grom"

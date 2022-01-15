@@ -171,7 +171,7 @@ void kcgd_state::kcgd_mem(address_map &map)
 // future
 static const z80_daisy_config daisy_chain[] =
 {
-//	{ "pic" },
+//  { "pic" },
 	{ "dl11kbd" },
 	{ "dl11host" },
 	{ nullptr }
@@ -215,8 +215,8 @@ void kcgd_state::machine_start()
 	m_tmpclip = rectangle(0, KCGD_DISP_HORZ - 1, 0, KCGD_DISP_VERT - 1);
 	m_tmpbmp.allocate(KCGD_DISP_HORZ, KCGD_DISP_VERT);
 // future
-//	m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC);
-//	m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
+//  m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC);
+//  m_vsync_on_timer->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->frame_period());
 	m_500hz_timer = timer_alloc(TIMER_ID_500HZ);
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 }
@@ -393,7 +393,7 @@ void kcgd_state::kcgd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &kcgd_state::kcgd_mem);
 	m_maincpu->set_initial_mode(0100000);
 // future
-//	m_maincpu->set_daisy_config(daisy_chain);
+//  m_maincpu->set_daisy_config(daisy_chain);
 
 	timer_device &scantimer(TIMER(config, "scantimer"));
 	scantimer.configure_periodic(FUNC(kcgd_state::scanline_callback), attotime::from_hz(50 * 28 * 11));
@@ -417,9 +417,9 @@ void kcgd_state::kcgd(machine_config &config)
 	m_dl11host->set_txvec(0364);
 	m_dl11host->txd_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 // future
-//	m_dl11host->rts_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
-//	m_dl11host->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
-//	m_dl11host->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11host->rts_wr_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
+//  m_dl11host->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11host->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
 
 	RS232_PORT(config, m_rs232, default_rs232_devices, "null_modem");
 	m_rs232->rxd_handler().set(m_dl11host, FUNC(dl11_device::rx_w));
@@ -432,8 +432,8 @@ void kcgd_state::kcgd(machine_config &config)
 	m_dl11kbd->set_txvec(064);
 	m_dl11kbd->txd_wr_callback().set(m_ms7004, FUNC(ms7004_device::write_rxd));
 // future
-//	m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
-//	m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11kbd->txrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
+//  m_dl11kbd->rxrdy_wr_callback().set_inputline(m_maincpu, T11_IRQ0);
 
 	MS7004(config, m_ms7004, 0);
 	m_ms7004->tx_handler().set(m_dl11kbd, FUNC(dl11_device::rx_w));

@@ -987,9 +987,9 @@ void debug_imgui::create_image()
 {
 	image_init_result res;
 
-	if(m_dialog_image->image_type() == IO_FLOPPY)
+	auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
+	if(fd != nullptr)
 	{
-		auto *fd = static_cast<floppy_image_device *>(m_dialog_image);
 		res = fd->create(m_path,nullptr,nullptr);
 		if(res == image_init_result::PASS)
 			fd->setup_write(m_typelist.at(m_format_sel).format);
@@ -1199,7 +1199,8 @@ void debug_imgui::draw_create_dialog(const char* label)
 		}
 
 		// format combo box for floppy devices
-		if(m_dialog_image->image_type() == IO_FLOPPY)
+		auto *fd = dynamic_cast<floppy_image_device *>(m_dialog_image);
+		if(fd != nullptr)
 		{
 			std::string combo_str;
 			combo_str.clear();

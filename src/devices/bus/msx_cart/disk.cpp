@@ -103,7 +103,7 @@
 #include "emu.h"
 #include "disk.h"
 #include "formats/msx_dsk.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 DEFINE_DEVICE_TYPE(MSX_CART_VY0010,  msx_cart_vy0010_device,  "msx_cart_vy0010",  "MSX Cartridge - VY0010")
 DEFINE_DEVICE_TYPE(MSX_CART_FSFD1,   msx_cart_fsfd1_device,   "msx_cart_fsfd1",   "MSX Cartridge - FS-FD1")

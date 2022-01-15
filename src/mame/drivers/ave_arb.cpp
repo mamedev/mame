@@ -50,7 +50,7 @@ TODO:
 #include "sound/dac.h"
 
 #include "speaker.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 // internal artwork
 #include "ave_arb.lh" // clickable

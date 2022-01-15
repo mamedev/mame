@@ -80,8 +80,8 @@ public:
 		, m_dac(*this, "dac")
 		, m_soundlatch(*this, "soundlatch")
 		, m_sn(*this, "sn")
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 		{ }
 
 	void locomotp(machine_config &config);
@@ -112,13 +112,13 @@ private:
 	void audio_data(address_map &map);
 	void audio_io(address_map &map);
 
-	uint8_t m_t_c = 0;
-	uint8_t m_out_offs = 0;
-	uint8_t m_input_line = 0;
-	u8 m_sn_store = 0xff;
+	uint8_t m_t_c = 0U;
+	uint8_t m_out_offs = 0U;
+	uint8_t m_input_line = 0U;
+	u8 m_sn_store = 0xffU;
 	bool m_clock_state = 0;
 	bool m_noise_state = 0;
-	u8 m_40193 = 0;
+	u8 m_40193 = 0U;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void audio_command_w(uint8_t data);
@@ -453,6 +453,10 @@ WRITE_LINE_MEMBER( zac_1_state::serial_w )
 
 void zac_1_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_t_c = 0;
 	m_out_offs = 0;
 	m_input_line = 0;
@@ -476,6 +480,7 @@ void zac_1_state::machine_reset()
 
 void zac_1_state::machine_start()
 {
+	genpin_class::machine_start();
 	m_digits.resolve();
 	m_io_outputs.resolve();
 

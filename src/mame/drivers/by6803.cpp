@@ -2,20 +2,25 @@
 // copyright-holders:Robbbert
 /********************************************************************************************
 
-    PINBALL
-    Bally MPU A084-91786-AH06 (6803)
+PINBALL
+Bally MPU A084-91786-AH06 (6803)
 
-There are no dipswitches; everything is done with a numeric keypad located just inside the
-door. The system responds with messages on the display.
+The characteristic 6803 pinball has 4x 7-digit displays lined up along the bottom of the
+ backbox. They show scores, moving messages, and anything else that's needed.
+
+Schematic has a number of mistakes.
+
+Status:
+- 2nd gen games boot up and display, some can coin up, but cannot start due to balls missing
 
 ToDo:
-- Everything
-- Fails PIA test
-- Artwork
+- Outputs
+- 1st gen display
+- Commas are missing from the display.
+- Code has provision for a round LED, to be added to layout.
 - Operator keypad
 - Various sound boards
 - Inputs, Solenoids vary per game
-- Mechanical
 
 *********************************************************************************************/
 
@@ -29,7 +34,7 @@ ToDo:
 #include "machine/6821pia.h"
 #include "machine/timer.h"
 
-//#include "by6803.lh"
+#include "by6803.lh"
 
 
 namespace {
@@ -43,12 +48,12 @@ public:
 		, m_pia0(*this, "pia0")
 		, m_pia1(*this, "pia1")
 		, m_io_test(*this, "TEST")
-		, m_io_x(*this, "X%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_leds(*this, "led%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void init_by6803();
 	void by6803(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
@@ -59,17 +64,17 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t port1_r();
-	void port1_w(uint8_t data);
-	uint8_t port2_r();
-	void port2_w(uint8_t data);
-	uint8_t pia0_a_r();
-	void pia0_a_w(uint8_t data);
-	uint8_t pia0_b_r();
-	void pia0_b_w(uint8_t data);
-	uint8_t pia1_a_r();
-	void pia1_a_w(uint8_t data);
-	void pia1_b_w(uint8_t data);
+	u8 port1_r();
+	void port1_w(u8 data);
+	u8 port2_r();
+	void port2_w(u8 data);
+	u8 pia0_a_r();
+	void pia0_a_w(u8 data);
+	u8 pia0_b_r();
+	void pia0_b_w(u8 data);
+	u8 pia1_a_r();
+	void pia1_a_w(u8 data);
+	void pia1_b_w(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
@@ -77,22 +82,23 @@ private:
 
 	void by6803_map(address_map &map);
 
-	uint8_t m_pia0_a;
-	uint8_t m_pia0_b;
-	uint8_t m_pia1_a;
-	uint8_t m_pia1_b;
-	bool m_pia0_cb2;
-	bool m_pia0_timer;
-	uint8_t m_port1, m_port2;
-	//uint8_t m_digit;
-	uint8_t m_segment;
+	u8 m_pia0_a = 0;
+	u8 m_pia0_b = 0;
+	u8 m_pia1_a = 0;
+	u8 m_pia1_b = 0;
+	bool m_pia0_cb2 = 0;
+	bool m_pia0_timer = 0;
+	u8 m_port1, m_port2 = 0;
+	u8 m_digit = 0;
+	u8 m_segment[2]{};
 	required_device<m6803_cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia0;
 	required_device<pia6821_device> m_pia1;
 	required_ioport m_io_test;
-	required_ioport_array<5> m_io_x;
+	required_ioport_array<6> m_io_keyboard;
 	output_finder<40> m_digits;
 	output_finder<1> m_leds;
+	output_finder<112> m_io_outputs; // 16 solenoids + 96 lamps
 };
 
 
@@ -106,56 +112,69 @@ void by6803_state::by6803_map(address_map &map)
 
 static INPUT_PORTS_START( by6803 )
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, self_test, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, activity_test, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Self Test") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, self_test, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Activity") PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, by6803_state, activity_test, 0)
 
 	PORT_START("X0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )
-	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_NAME("INP01")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("INP02")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("INP03")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("INP04")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("INP05")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Outhole") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("INP07")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("Outhole")
 
 	PORT_START("X1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x38, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT1 ) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_G) PORT_NAME("INP12")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_H) PORT_NAME("INP13")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_NAME("Tilt")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_NAME("Slam Tilt")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_I) PORT_NAME("INP16")
 
 	// from here, vary per game
 	PORT_START("X2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_J) PORT_NAME("INP17")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_K) PORT_NAME("INP18")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_NAME("INP19")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_NAME("INP20")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("INP21")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_O) PORT_NAME("INP22")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_P) PORT_NAME("INP23")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("INP24")
 
 	PORT_START("X3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_I)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("INP25")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_NAME("INP26")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("INP27")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_U) PORT_NAME("INP28")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("INP29")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("INP30")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("INP31")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("INP32")
 
 	PORT_START("X4")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_COMMA)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COMMA) PORT_NAME("INP33")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_NAME("INP34")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("INP35")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_COLON) PORT_NAME("INP36")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_QUOTE) PORT_NAME("INP37")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("INP38")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_NAME("INP39")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_NAME("INP40")
+
+	PORT_START("X5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_NAME("INP41")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("INP42")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("INP43")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("INP44")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("INP45")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("INP46")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("INP47")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("INP48")
 INPUT_PORTS_END
 
 INPUT_CHANGED_MEMBER( by6803_state::activity_test )
@@ -169,18 +188,18 @@ INPUT_CHANGED_MEMBER( by6803_state::self_test )
 	m_pia0->ca1_w(newval);
 }
 
-uint8_t by6803_state::port1_r()
+u8 by6803_state::port1_r()
 {
 	return m_port1;
 }
 
 // P10-17 - goes to peripheral bus
-void by6803_state::port1_w(uint8_t data)
+void by6803_state::port1_w(u8 data)
 {
 	m_port1 = data; // sound data = P10,11,12,13,24; P14-17 unknown
 }
 
-uint8_t by6803_state::port2_r()
+u8 by6803_state::port2_r()
 {
 	return m_port2;
 }
@@ -190,7 +209,7 @@ uint8_t by6803_state::port2_r()
 // P22 - LED, connects to reset circuit, could be a watchdog
 // P23 - high
 // P24 - sound strobe
-void by6803_state::port2_w(uint8_t data)
+void by6803_state::port2_w(u8 data)
 {
 	m_port2 = data;
 	m_leds[0] = BIT(data, 2); // P22 drives LED
@@ -199,19 +218,29 @@ void by6803_state::port2_w(uint8_t data)
 // display latch strobes; display blanking
 WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
 {
+	//printf("CA02=%X ",state);
+
+	if (state)
+	{
+		// comma info is available in m_pia1_a at this time.
+		m_digits[m_digit] = m_segment[0];
+		m_digits[m_digit+16] = m_segment[1];
+	}
 }
 
 // lamp strobe 1 when high
 WRITE_LINE_MEMBER( by6803_state::pia0_cb2_w )
 {
+	//printf("CB02=%X ",state);
 }
 
 // sol bank select (0 to enable sol selection)
 WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
 {
+	//printf("CB12=%X ",state);
 }
 
-uint8_t by6803_state::pia0_a_r()
+u8 by6803_state::pia0_a_r()
 {
 	return m_pia0_a;
 }
@@ -221,65 +250,51 @@ uint8_t by6803_state::pia0_a_r()
 // d0-3 lamp rows & d5=0 & pia0:cb2=1 (1st lamp bank)
 // d0-3 lamp rows & d6=0 & pia0:cb2=1 (2nd lamp bank)
 // d0-3 lamp rows & d7=0 & pia0:cb2=1 (3rd lamp bank)
-void by6803_state::pia0_a_w(uint8_t data)
+void by6803_state::pia0_a_w(u8 data)
 {
 	m_pia0_a = data;
-#if 0
-// This is all wrong
-	switch (m_pia0_a)
+	if ((data & 15)==14)
 	{
-		case 0x10: // wrong
-			m_digits[m_digit] = m_segment;
-			break;
-		case 0x1d:
-			m_digits[8+m_digit] = m_segment;
-			break;
-		case 0x1b:
-			m_digits[16+m_digit] = m_segment;
-			break;
-		case 0x07:
-			m_digits[24+m_digit] = m_segment;
-			break;
-		case 0x0f:
-			m_digits[32+m_digit] m_segment;
-			break;
-		default:
-			break;
+		m_digit = data >> 4;
+		m_segment[0] = bitswap<8>(m_pia1_a, 0, 7, 6, 5, 4, 3, 2, 1) ^ 0x80;
 	}
-#endif
+	else
+	if ((data & 15)==13)
+	{
+		m_segment[1] = bitswap<8>(m_pia1_a, 0, 7, 6, 5, 4, 3, 2, 1) ^ 0x80;
+	}
 }
 
 // switch returns
-uint8_t by6803_state::pia0_b_r()
+u8 by6803_state::pia0_b_r()
 {
-	uint8_t data = 0;
+	u8 data = 0;
 
-	for (unsigned i = 0; m_io_x.size() > i; ++i)
+	for (u8 i = 0; i < 6; i++)
 		if (BIT(m_pia0_a, i))
-			data |= m_io_x[i]->read();
+			data |= m_io_keyboard[i]->read();
 
 	return data;
 }
 
-void by6803_state::pia0_b_w(uint8_t data)
+void by6803_state::pia0_b_w(u8 data)
 {
 	m_pia0_b = data;
 }
 
-uint8_t by6803_state::pia1_a_r()
+u8 by6803_state::pia1_a_r()
 {
 	return m_pia1_a;
 }
 
 // segment data; d0 & pia0:ca2 = comma; passed to digits when PA0? is high (assume they mean pia0:pa0)
-void by6803_state::pia1_a_w(uint8_t data)
+void by6803_state::pia1_a_w(u8 data)
 {
 	m_pia1_a = data;
-	m_segment = data >> 1;
 }
 
 // solenoids, activated when pia1:cb2 is low
-void by6803_state::pia1_b_w(uint8_t data)
+void by6803_state::pia1_b_w(u8 data)
 {
 	m_pia1_b = data;
 	switch (data & 15)
@@ -333,22 +348,35 @@ void by6803_state::pia1_b_w(uint8_t data)
 
 void by6803_state::machine_start()
 {
+	genpin_class::machine_start();
+	m_io_outputs.resolve();
 	m_digits.resolve();
 	m_leds.resolve();
+
+	save_item(NAME(m_pia0_a));
+	save_item(NAME(m_pia0_b));
+	save_item(NAME(m_pia1_a));
+	save_item(NAME(m_pia1_b));
+	save_item(NAME(m_pia0_cb2));
+	save_item(NAME(m_pia0_timer));
+	save_item(NAME(m_port1));
+	save_item(NAME(m_port2));
+	save_item(NAME(m_digit));
+	save_item(NAME(m_segment));
 }
 
 void by6803_state::machine_reset()
 {
+	genpin_class::machine_reset();
+	for (u8 i = 0; i < m_io_outputs.size(); i++)
+		m_io_outputs[i] = 0;
+
 	m_pia0_a = 0;
 	m_pia0_b = 0;
 	m_pia0_cb2 = 0;
 	m_pia1_a = 0;
 	m_pia1_b = 0;
 	m_port2 = 2+8;
-}
-
-void by6803_state::init_by6803()
-{
 }
 
 // zero-cross detection
@@ -383,7 +411,7 @@ void by6803_state::by6803(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
-	//config.set_default_layout(layout_by6803);
+	config.set_default_layout(layout_by6803);
 
 	/* Sound */
 	genpin_audio(config);
@@ -429,7 +457,7 @@ ROM_START(atlantip)
 ROM_END
 
 /*------------------------------------
-/ Beat the Clock #OC70
+/ Beat the Clock #0C70
 /------------------------------------*/
 ROM_START(beatclck)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -456,7 +484,7 @@ ROM_END
 /------------------------------------*/
 
 /*------------------------------------
-/ Black Belt #OE52
+/ Black Belt #0E52
 /------------------------------------*/
 ROM_START(blackblt)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -478,7 +506,7 @@ ROM_START(blackblt2)
 ROM_END
 
 /*------------------------------------
-/ Blackwater 100 #OH07
+/ Blackwater 100 #0H07
 /------------------------------------*/
 ROM_START(black100)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -503,7 +531,7 @@ ROM_START(black100s)
 ROM_END
 
 /*------------------------------------
-/ City Slicker #OE79
+/ City Slicker #0E79
 /------------------------------------*/
 ROM_START(cityslck)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -514,7 +542,7 @@ ROM_START(cityslck)
 ROM_END
 
 /*------------------------------------
-/ Dungeons & Dragons #OH06
+/ Dungeons & Dragons #0H06
 /------------------------------------*/
 ROM_START(dungdrag)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -528,7 +556,7 @@ ROM_START(dungdrag)
 ROM_END
 
 /*------------------------------------
-/ Eight Ball Champ #OB38
+/ Eight Ball Champ #0B38
 /------------------------------------*/
 ROM_START(eballchp)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -539,20 +567,8 @@ ROM_START(eballchp)
 	ROM_LOAD("u5_snd.532", 0xf000, 0x1000, CRC(655441df) SHA1(9da5578856ded3dcdafed67679eb4c4134dc9f81))
 ROM_END
 
-#ifdef MISSING_GAME // same as above but with CPU2 roms as NO_DUMP
-ROM_START(eballch2)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD( "u3_cpu.128", 0xc000, 0x4000, CRC(025f3008) SHA1(25d310f169b92ce6b348330816ddc3b5710e57da))
-	ROM_REGION(0x10000, "cpu2", 0)
-	ROM_LOAD("ebcu4.snd", 0x8000, 0x2000, NO_DUMP)
-	ROM_RELOAD(0xa000, 0x2000)
-	ROM_LOAD("ebcu3.snd", 0xc000, 0x2000, NO_DUMP)
-	ROM_RELOAD(0xe000, 0x2000)
-ROM_END
-#endif
-
 /*------------------------------------------------
-/ Escape from the Lost World #OH05
+/ Escape from the Lost World #0H05
 /-----------------------------------------------*/
 ROM_START(esclwrld)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -576,7 +592,7 @@ ROM_START(esclwrldg)
 	ROM_LOAD16_BYTE("u13.512", 0x20000, 0x10000, CRC(b056842e) SHA1(7c67e5d69235a784b9c38cb31302d206278a3814))
 ROM_END
 /*------------------------------------
-/ Hardbody #OE94
+/ Hardbody #0E94
 /------------------------------------*/
 ROM_START(hardbody)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -603,7 +619,7 @@ ROM_START(hardbodyg)
 ROM_END
 
 /*-----------------------------------------
-/ Heavy Metal Meltdown #OH03
+/ Heavy Metal Meltdown #0H03
 /-----------------------------------------*/
 ROM_START(hvymetap)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -624,7 +640,7 @@ ROM_START(hvymetapg)
 ROM_END
 
 /*------------------------------------
-/ Lady Luck #OE34
+/ Lady Luck #0E34
 /------------------------------------*/
 ROM_START(ladyluck)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -637,7 +653,7 @@ ROM_START(ladyluck)
 ROM_END
 
 /*--------------------------------
-/ MotorDome #OE14
+/ MotorDome #0E14
 /-------------------------------*/
 ROM_START(motrdome)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -664,7 +680,7 @@ ROM_START(motrdomeg) // German version claims to be game #E69
 ROM_END
 
 /*--------------------------------
-/ Party Animal #OH01
+/ Party Animal #0H01
 /-------------------------------*/
 ROM_START(prtyanim)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -689,7 +705,7 @@ ROM_START(prtyanimg)
 ROM_END
 
 /*------------------------------------
-/ Special Force #OE47 - 1st Game to use Sounds Deluxe Sound Hardware
+/ Special Force #0E47 - 1st Game to use Sounds Deluxe Sound Hardware
 /------------------------------------*/
 ROM_START(specforc)
 	ROM_REGION(0x10000, "maincpu", 0)
@@ -703,7 +719,7 @@ ROM_START(specforc)
 ROM_END
 
 /*------------------------------------
-/ Strange Science #OE35
+/ Strange Science #0E35
 /------------------------------------*/
 
 ROM_START(strngsci)
@@ -764,32 +780,35 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (rev. D)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdomeb, motrdome, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (rev. B)",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "MotorDome (German rev. B)",             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, strngscig, strngsci, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Strange Science (German, Rev A)",       MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (rev. D)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbodyc, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (rev. C)",                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Hardbody (German rev. B)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, hvymetapg, hvymetap, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Heavy Metal Meltdown (German)",         MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, black100s, black100, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL)
-GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, init_by6803, ROT0, "Bally", "Atlantis",                              MACHINE_IS_SKELETON_MECHANICAL)
+// 1st gen
+GAME( 1985, eballchp,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Eight Ball Champ",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, beatclck,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1985, beatclck2, beatclck, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Beat the Clock (with flasher support)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, ladyluck,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Lady Luck",                             MACHINE_IS_SKELETON_MECHANICAL )
+
+// 2nd gen
+GAME( 1986, motrdome,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. D)",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, motrdomeb, motrdome, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (rev. B)",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, motrdomeg, motrdome, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "MotorDome (German rev. B)",             MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, strngsci,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (Rev C)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, strngscia, strngsci, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (Rev A)",               MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, strngscig, strngsci, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Strange Science (German, Rev A)",       MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, specforc,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Special Force",                         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, blackblt,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Black Belt",                            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1986, blackblt2, blackblt, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Black Belt (Squawk and Talk)",          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, cityslck,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "City Slicker",                          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, hardbody,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (rev. D)",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, hardbodyc, hardbody, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (rev. C)",                     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, hardbodyg, hardbody, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Hardbody (German rev. B)",              MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, prtyanim,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Party Animal",                          MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, prtyanimg, prtyanim, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Party Animal (German)",                 MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, hvymetap,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Heavy Metal Meltdown",                  MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, hvymetapg, hvymetap, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Heavy Metal Meltdown (German)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, esclwrld,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Escape from the Lost World",            MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, esclwrldg, esclwrld, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Escape from the Lost World (German)",   MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1987, dungdrag,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Dungeons & Dragons",                    MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, black100,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Blackwater 100",                        MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, black100s, black100, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Blackwater 100 (Single Ball Play)",     MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, trucksp3,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Truck Stop (P-3)",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1988, trucksp2,  trucksp3, by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Truck Stop (P-2)",                      MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 1989, atlantip,  0,        by6803, by6803, by6803_state, empty_init, ROT0, "Bally", "Atlantis",                              MACHINE_IS_SKELETON_MECHANICAL )

@@ -78,7 +78,7 @@ void device_ws_cart_interface::nvram_alloc(u32 size)
 //-------------------------------------------------
 ws_cart_slot_device::ws_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, WS_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_ws_cart_interface>(mconfig, *this),
 	m_type(WS_STD),
 	m_cart(nullptr)

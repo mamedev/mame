@@ -19,7 +19,7 @@
 #include "video/ef9345.h"
 #include "video/mc6847.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/coco_cas.h"

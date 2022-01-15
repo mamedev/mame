@@ -154,7 +154,7 @@ PCB 'Z545-1 A240570-1'
 #include "bus/generic/carts.h"
 #include "emupal.h"
 #include "screen.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 class casloopy_state : public driver_device

@@ -2,11 +2,11 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	DEC DL11-type SLU (serial line unit).
+    DEC DL11-type SLU (serial line unit).
 
-	Frame format is not software-configurable; hardcoded to 8N1 for now.
+    Frame format is not software-configurable; hardcoded to 8N1 for now.
 
-	http://www.ibiblio.org/pub/academic/computer-science/history/pdp-11/hardware/micronotes/numerical/micronote33.txt
+    http://www.ibiblio.org/pub/academic/computer-science/history/pdp-11/hardware/micronotes/numerical/micronote33.txt
 
 ***************************************************************************/
 

@@ -75,6 +75,7 @@ trs80m4p:  Floppy not working, so machine is useless.
 #include "includes/trs80m3.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "formats/imd_dsk.h"

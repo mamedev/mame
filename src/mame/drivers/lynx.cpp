@@ -20,7 +20,7 @@
 #include "includes/lynx.h"
 
 #include "cpu/m6502/m65sc02.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "lynx.lh"

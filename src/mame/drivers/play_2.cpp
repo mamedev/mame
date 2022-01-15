@@ -59,8 +59,8 @@ public:
 		, m_4020(*this, "4020")
 		, m_1863(*this, "1863")
 		, m_snd_off(*this, "snd_off")
-		, m_io_keyboard(*this, "X%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -83,13 +83,13 @@ protected:
 	void play_2_io(address_map &map);
 	void play_2_map(address_map &map);
 
-	u8 m_resetcnt = 0;
-	u8 m_kbdrow = 0;
+	u8 m_resetcnt = 0U;
+	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
 	bool m_disp_sw = 0;
-	u8 m_port06 = 0;
+	u8 m_port06 = 0U;
 	u8 m_old_solenoids[8]{};
-	u8 m_soundlatch = 0;
+	u8 m_soundlatch = 0U;
 	bool m_snd_on = false;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;

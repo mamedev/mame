@@ -92,12 +92,8 @@ class okean240_state : public driver_device
 public:
 	okean240_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_term_data(0)
-		, m_j(0)
-		, m_scroll(0)
-		, m_tog(0)
 		, m_p_videoram(*this, "videoram")
-		, m_io_keyboard(*this, "X%d", 0)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_io_modifiers(*this, "MODIFIERS")
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
@@ -127,12 +123,12 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	u8 m_term_data;
-	u8 m_j;
-	u8 m_scroll;
-	u8 m_tog;
-	bool m_key_pressed;
-	u8 m_kbd_row;
+	u8 m_term_data = 0U;
+	u8 m_j = 0U;
+	u8 m_scroll = 0U;
+	u8 m_tog = 0U;
+	bool m_key_pressed = 0;
+	u8 m_kbd_row = 0U;
 	required_shared_ptr<u8> m_p_videoram;
 	optional_ioport_array<11> m_io_keyboard;
 	optional_ioport m_io_modifiers;

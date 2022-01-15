@@ -40,11 +40,11 @@ public:
 	play_1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_io_keyboard(*this, "X%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
 		, m_monotone(*this, "monotone")
-		, m_digits(*this, "digit%u", 0U)
-		, m_leds(*this, "led%u", 1U)
-		, m_player_lamps(*this, "text%u", 1U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_leds(*this, "led%d", 1U)
+		, m_player_lamps(*this, "text%d", 1U)
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
@@ -74,12 +74,12 @@ private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	u8 m_resetcnt = 0;
-	u16 m_clockcnt = 0;
-	u16 m_waitcnt = 0;
-	u8 m_segment = 0;
-	u8 m_match = 0;
-	u8 m_ball = 0;
+	u8 m_resetcnt = 0U;
+	u16 m_clockcnt = 0U;
+	u16 m_waitcnt = 0U;
+	u8 m_segment = 0U;
+	u8 m_match = 0U;
+	u8 m_ball = 0U;
 	required_device<cosmac_device> m_maincpu;
 	required_ioport_array<10> m_io_keyboard;
 	required_device<clock_device> m_monotone;

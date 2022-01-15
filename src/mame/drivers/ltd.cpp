@@ -67,16 +67,16 @@ public:
 	ltd_state(const machine_config &mconfig, device_type type, const char *tag)
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_io_keyboard(*this, "X%u", 0U)
-		, m_digits(*this, "digit%u", 0U)
-		, m_io_outputs(*this, "out%u", 0U)
+		, m_io_keyboard(*this, "X%d", 0U)
+		, m_digits(*this, "digit%d", 0U)
+		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
 
 protected:
 
-	u8 m_digit = 0;
+	u8 m_digit = 0U;
 	void mr_common();
 	void ms_common();
 	required_device<cpu_device> m_maincpu;

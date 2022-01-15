@@ -3190,10 +3190,10 @@
 		<element name="lamp15" ref="colour_button_149" state="0" inputtag="COINS" inputmask="0x01">
 			<bounds x="615" y="519" width="38" height="23"/>
 		</element>
-		<element name="lamp180" ref="colour_button_150_border" state="0" inputtag="J9_2" inputmask="0x02">
+		<element name="lamp180" ref="colour_button_150_border" state="0" inputtag="J10_2" inputmask="0x02">
 			<bounds x="161" y="307" width="78" height="38"/>
 		</element>
-		<element name="lamp180" ref="colour_button_150" state="0" inputtag="J9_2" inputmask="0x02">
+		<element name="lamp180" ref="colour_button_150" state="0" inputtag="J10_2" inputmask="0x02">
 			<bounds x="163" y="309" width="74" height="34"/>
 		</element>
 		<element ref="led_digit_rect_black">

@@ -2223,20 +2223,23 @@ end
 if CPUS["SM510"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/sm510/sm510base.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510base.h",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm510.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm510op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm510core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm511core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530.h",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm530core.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm511.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm511.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm500.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm500op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm500core.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm5acore.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5a.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm5a.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530.cpp",
+		MAME_DIR .. "src/devices/cpu/sm510/sm530op.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590.h",
+		MAME_DIR .. "src/devices/cpu/sm510/sm590.cpp",
 		MAME_DIR .. "src/devices/cpu/sm510/sm590op.cpp",
-		MAME_DIR .. "src/devices/cpu/sm510/sm590core.cpp",
 	}
 end
 

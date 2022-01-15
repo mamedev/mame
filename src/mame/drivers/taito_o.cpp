@@ -31,13 +31,90 @@ TODO:
 *****************************************************************/
 
 #include "emu.h"
-#include "includes/taito_o.h"
+
+#include "video/tc0080vco.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/ymopn.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+
+namespace {
+
+class taitoo_state : public driver_device
+{
+public:
+	taitoo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
+		m_tc0080vco(*this, "tc0080vco"),
+		m_palette(*this, "palette"),
+		m_io_in(*this, "IN%u", 0U)
+	{ }
+
+	void parentj(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	// devices
+	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<tc0080vco_device> m_tc0080vco;
+	required_device<palette_device> m_palette;
+
+	required_ioport_array<2> m_io_in;
+
+	void io_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 io_r(offs_t offset, u16 mem_mask = ~0);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void prg_map(address_map &map);
+};
+
+
+void taitoo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+{
+	for (int offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
+	{
+		if (offs <  0x01b0 && priority == 0)    continue;
+		if (offs >= 0x01b0 && priority == 1)    continue;
+
+		m_tc0080vco->get_sprite_params(offs, true);
+
+		if (m_tc0080vco->get_sprite_tile_offs())
+		{
+			m_tc0080vco->draw_single_sprite(bitmap, cliprect);
+		}
+	}
+}
+
+
+u32 taitoo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_tc0080vco->tilemap_update();
+
+	bitmap.fill(0, cliprect);
+
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
+
+	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 1);
+
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
+	m_tc0080vco->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
+
+	return 0;
+}
 
 
 static const int clear_hack = 1;
@@ -65,11 +142,11 @@ u16 taitoo_state::io_r(offs_t offset, u16 mem_mask)
 	return retval;
 }
 
-void taitoo_state::parentj_map(address_map &map)
+void taitoo_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x100000, 0x10ffff).mirror(0x010000).ram();
-	map(0x200000, 0x20000f).rw(FUNC(taitoo_state::io_r), FUNC(taitoo_state::io_w)); /* TC0220IOC ? */
+	map(0x200000, 0x20000f).rw(FUNC(taitoo_state::io_r), FUNC(taitoo_state::io_w)); // TC0220IOC ?
 	map(0x300000, 0x300003).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write)).umask16(0x00ff);
 	map(0x400000, 0x420fff).rw(m_tc0080vco, FUNC(tc0080vco_device::word_r), FUNC(tc0080vco_device::word_w));
 	map(0x500800, 0x500fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -193,8 +270,8 @@ static INPUT_PORTS_START( parentj )
 
 INPUT_PORTS_END
 
-/* unknown sources ... */
-TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_interrupt)
+// unknown sources ...
+TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::interrupt)
 {
 	int scanline = param;
 
@@ -211,9 +288,9 @@ void taitoo_state::machine_start()
 
 void taitoo_state::parentj(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000);       /*?? MHz */
-	m_maincpu->set_addrmap(AS_PROGRAM, &taitoo_state::parentj_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::parentj_interrupt), "screen", 0, 1);
+	M68000(config, m_maincpu, 12000000);       //?? MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &taitoo_state::prg_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(taitoo_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -234,14 +311,14 @@ void taitoo_state::parentj(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); /* ?? MHz */
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 2000000)); // ?? MHz
 	ymsnd.port_a_read_callback().set_ioport("DSWA");
 	ymsnd.port_b_read_callback().set_ioport("DSWB");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 ROM_START( parentj )
-	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "c42-13.21", 0x00000, 0x10000, CRC(823623eb) SHA1(7302cc0ac532f6190ae35218ea05bf8cf11fd687) )
 	ROM_LOAD16_BYTE( "c42-12.20", 0x00001, 0x10000, CRC(8654b0ab) SHA1(edd23a731c1c60cab353e51ef5e66d33bc3fde61) )
 
@@ -258,5 +335,8 @@ ROM_START( parentj )
 	ROM_REGION( 0x2dd, "misc", 0 )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
+
+} // Anonymous namespace
+
 
 GAME( 1989, parentj, 0, parentj,  parentj, taitoo_state, driver_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

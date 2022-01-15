@@ -57,7 +57,7 @@ private:
 	uint8_t port_b_r();
 	uint32_t screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mem_map(address_map &map);
-	uint8_t m_term_data;
+	uint8_t m_term_data = 0U;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;

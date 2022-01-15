@@ -30,7 +30,6 @@ public:
 	auto kout() { return m_kout.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(kin_w) { rx_w(state); }
-	DECLARE_INPUT_CHANGED_MEMBER(update_mouse_input);
 
 protected:
 	// device-level overrides
@@ -60,15 +59,16 @@ private:
 	required_ioport_array<3> m_mouse;
 	output_finder<3> m_leds;
 
-	emu_timer * m_mouse_timer;
-	uint8_t     m_mouse_phase;
-	uint8_t     m_mouse_xdir;
-	uint8_t     m_mouse_xref;
-	uint8_t     m_mouse_ydir;
-	uint8_t     m_mouse_yref;
-	int16_t     m_mouse_x;
-	int16_t     m_mouse_y;
-	uint8_t     m_mux;
+	emu_timer *m_mouse_timer;
+	uint8_t    m_mouse_xphase;
+	uint8_t    m_mouse_xdir;
+	uint8_t    m_mouse_xref;
+	uint8_t    m_mouse_yphase;
+	uint8_t    m_mouse_ydir;
+	uint8_t    m_mouse_yref;
+	int16_t    m_mouse_x;
+	int16_t    m_mouse_y;
+	uint8_t    m_mux;
 };
 
 

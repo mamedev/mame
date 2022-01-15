@@ -136,7 +136,7 @@ void device_pce_cart_interface::rom_map_setup(uint32_t size)
 //-------------------------------------------------
 pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCE_CART_SLOT, tag, owner, clock),
-	device_image_interface(mconfig, *this),
+	device_cartrom_image_interface(mconfig, *this),
 	device_single_card_slot_interface<device_pce_cart_interface>(mconfig, *this),
 	m_interface("pce_cart"),
 	m_type(PCE_STD), m_cart(nullptr)

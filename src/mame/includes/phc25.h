@@ -51,8 +51,8 @@ private:
 	void machine_start() override;
 	void machine_reset() override;
 	uint8_t *m_char_rom;
-	uint8_t m_port40;
-	int m_centronics_busy;
+	uint8_t m_port40 = 0U;
+	int m_centronics_busy = 0;
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
