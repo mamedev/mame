@@ -736,8 +736,9 @@ license:CC0
 		</part>
 	</software>
 
+<!-- TODO: This is alleged to be a 3-byte hack of the actual dump to make it run. Original proto doesn't work on hardware? Investigate... -->
 	<software name="drfrankn">
-		<description>The Adventures of Dr. Franken (USA, Prototype)</description>
+		<description>The Adventures of Dr. Franken (USA, prototype)</description>
 		<year>19??</year>
 		<publisher>Elite</publisher>
 		<part name="cart" interface="nes_cart">
@@ -30008,7 +30009,7 @@ license:CC0
 	</software>
 
 	<software name="qbscramb">
-		<description>Quarter Back Scramble (Jpn)</description>
+		<description>QuarterBack Scramble (Japan)</description>
 		<year>1989</year>
 		<publisher>Pony Canyon</publisher>
 		<info name="serial" value="PNF-QS (R59V5925)"/>
@@ -45180,7 +45181,23 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 	</software>
 
 	<software name="bioforce">
-		<description>Bio Force Ape (Jpn, Prototype)</description>
+		<description>Bio Force Ape (USA, prototype)</description>
+		<year>1992</year>
+		<publisher>Seta</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="txrom" />
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="bio force ape (us prototype).prg" size="131072" crc="46ba306d" sha1="196ce06860227b16767d88b7f7c3a22d3cd6978d" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="bio force ape (us prototype).chr" size="131072" crc="bab49652" sha1="9b81991c0c16e6b122f55c9da0b9a1b090ba6afa" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bioforcej" cloneof="bioforce">
+		<description>Bio Force Ape (Japan, prototype)</description>
 		<year>1991</year>
 		<publisher>Seta</publisher>
 		<part name="cart" interface="nes_cart">
@@ -49520,6 +49537,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<dataarea name="prg" size="32768">
 				<rom name="puzznic (japan).prg" size="32768" crc="4468ca43" sha1="4e9c5d3864474b4c47a9fa319444eaa19071076a" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qbscrambp" cloneof="qbscramb">
+		<description>QuarterBack Scramble (USA, prototype)</description>
+		<year>19??</year>
+		<publisher>Pony Canyon</publisher>
+		<info name="alt_title" value="Mike Ditka's Big Play Football"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="sxrom" />
+			<feature name="pcb" value="NES-SLROM" />
+			<dataarea name="prg" size="131072">
+				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="db541a91" sha1="8301b7933ab15eaa8b99054dc6ad2020eb5b84d4" status="baddump" />
+			</dataarea>
+			<dataarea name="chr" size="131072">
+				<rom name="mike ditka's big play football (prototype).prg" size="131072" crc="46ff87d1" sha1="70eb35e70af98ad550ef4f56cbced27890ea4fc9" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -79219,7 +79253,7 @@ be better to redump them properly. -->
 			<feature name="slot" value="uxrom" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="262144">
-				<rom name="battle kid - fortress of peril (v1.100).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
+				<rom name="battle kid - fortress of peril (v1.000).prg" size="262144" crc="48bb5a71" sha1="ed2d9137711c022613e4d9d9e4855c31652d7b8c" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
