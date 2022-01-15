@@ -14,52 +14,15 @@ Notes:
 
     - NAOMI2 is backwards compatible with regular NAOMI.
 
-QA Notes (Update December 2021):
+QA Notes (Update January 2022):
     - Roadmap: https://github.com/mamedev/mame/projects/2
-    - Testing functional notes: <.md URL here>, legacy TODO below will be removed once ready;
+    - Testing functional notes: https://github.com/angelosa/mame_qa/blob/main/mame_qa/naomi.md
     - Games that are known to be completed and have no functional bugs in audio/video/input
 	  portions are effectively promoted to (MIG | MIS), as a clear attempt to be proven otherwise
 	  given the non-trivial host PC requirements;
     - Manufacturers needs to be overhauled, also
       cfr. MT#08143 about a necessity to at least log Sega divisions somehow.
     - usability defaults, i.e. 31kHz dip switch and non-canonical service mode settings in NVRAM.
-	- deathcox: default lightgun input is very offset (enter into service mode to recalibrate)
-    - marstv: Oddly enough, intro/game select hangs for a long time on line dispatches,
-              eventually draws a bunch of white overline chars (?)
-
-TODO (legacy, to be removed):
-    - Boots and accepts coin, but won't accept start button
-    * Usagi Yamashiro Hen
-
-    - missing inputs (needs rotary channels):
-    * Crakin' DJ
-    * Dynamic Golf
-    * Inu no Osampo
-
-    - wrong JVS I/O specs, doesn't boot because of it:
-    * Derby Owners Club II
-    * Kick '4' Cash (hopper)
-    * Sega Marine Fishing
-    * Wave Runner GP
-    * Shootout Pool
-    * Shootout Pool Medal
-    * Shootout Pool Prize
-
-TODO (game-specific):
-    - Airline Pilots (deluxe): returns error 03
-    - Capcom vs. SNK Pro: doesn't accept start input (REGRESSION)
-    - Ferrari 355 Challenge: dies at the network check;
-    - Giant Gram 2: no VMU emulation;
-    - Gun Survivor 2: crashes during game loading;
-    - Lupin the Shooting: "com. error between Naomi BD and i/o BD" after some secs. of gameplay;
-    - monkeyba: CPU jumps to la la land when attempts to load a stage (bp c09e950, uses FPU opcodes for calculating the return address?);
-    - Oinori-Daimyoujin Matsuri: reports "B. RAM error" in test mode, inputs doesn't seem to work after that point;
-    - OutTrigger: crashes on naomibd_r();
-    - puyofev: hangs after pressing start (bp 0C03F490, similar if not same snippet as Tetris 4d on DC).
-    - Ringout 4x4: needs cabinet set to 4p, moans about not having two jamma i/o boards;
-    - Super Major League '99: attract mode/gameplay bogusly have stop-motions from time to time;
-    - sfz3ugd: currently dies at disclaimer screen (regression);
-    - shangril: swapped mahjong inputs (M -> N, C -> B etc.);
 
 ===================================================================================================
 
