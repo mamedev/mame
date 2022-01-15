@@ -549,6 +549,19 @@ Known undumped prototypes:
 		</part>
 	</software>
 
+	<software name="klaxp" cloneof="klax">
+		<description>Klax (prototype)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<feature name="rotation" value="RIGHT" />
+			<feature name="granularity" value="1024"/>
+			<dataarea name="rom" size="262144">
+				<rom name="klax pre-release" size="262144" crc="4d5d94f4" sha1="b6cb710964a5fdd0a236bf38069be40aa4037b6b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="krazyace">
 		<description>Krazy Ace - Miniature Golf (Euro, USA)</description>
 		<year>1993</year>
@@ -767,6 +780,18 @@ Known undumped prototypes:
 			<feature name="granularity" value="2048"/>
 			<dataarea name="rom" size="524288">
 				<rom name="pit fighter - the ultimate competition (euro, usa).bin" size="524288" crc="2393135f" sha1="30f8c7acf41a988578768b251e88b636462752cb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfightp" cloneof="pitfight">
+		<description>Pit-Fighter - The Ultimate Competition (prototype 19921013)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<feature name="granularity" value="2048"/>
+			<dataarea name="rom" size="524288">
+				<rom name="pit fighter (oct 13, 1992 prototype).bin" size="524288" crc="e7a5a4d0" sha1="457a97a914ad90f11b6fcbe6eda11d29d9d4e016" />
 			</dataarea>
 		</part>
 	</software>

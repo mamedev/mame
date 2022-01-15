@@ -35,20 +35,33 @@ class mcd212_device : public device_t,
 					  public device_video_interface
 {
 public:
+	template <typename T, typename U>
+	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&plane_a_tag, U &&plane_b_tag)
+		: mcd212_device(mconfig, tag, owner, clock)
+	{
+		m_planea.set_tag(std::forward<T>(plane_a_tag));
+		m_planeb.set_tag(std::forward<U>(plane_b_tag));
+	}
+
 	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto int_callback() { return m_int_callback.bind(); }
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void map(address_map &map);
+
+	template <int Channel> int ram_dtack_cycle_count();
+	int rom_dtack_cycle_count();
 
 protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	TIMER_CALLBACK_MEMBER(ica_tick);
+	TIMER_CALLBACK_MEMBER(dca_tick);
 
 	uint8_t csr1_r();
 	void csr1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -83,19 +96,18 @@ protected:
 		CURCNT_BLKC          = 0x400000,    // Blink type
 		CURCNT_EN            = 0x800000,    // Cursor enable
 
-		ICM_CS               = 0x400000,    // CLUT select
-		ICM_NR               = 0x080000,    // Number of region flags
-		ICM_NR_BIT           = 19,
-		ICM_EV               = 0x040000,    // External video
-		ICM_MODE2            = 0x000f00,    // Plane 2
-		ICM_MODE2_SHIFT      = 8,
 		ICM_MODE1            = 0x00000f,    // Plane 1
 		ICM_MODE1_SHIFT      = 0,
+		ICM_MODE2            = 0x000f00,    // Plane 2
+		ICM_MODE2_SHIFT      = 8,
+		ICM_EV               = 0x040000,    // External video
+		ICM_NR               = 0x080000,    // Number of region flags
+		ICM_NR_BIT           = 19,
+		ICM_CS               = 0x400000,    // CLUT select
 
-		TCR_DISABLE_MX       = 0x800000,    // Mix disable
+		TCR_TA               = 0x00000f,    // Plane A
 		TCR_TB               = 0x000f00,    // Plane B
 		TCR_TB_SHIFT         = 8,
-		TCR_TA               = 0x00000f,    // Plane A
 		TCR_COND_1           = 0x0,         // Transparent if: Always (Plane Disabled)
 		TCR_COND_KEY_1       = 0x1,         // Transparent if: Color Key = True
 		TCR_COND_XLU_1       = 0x2,         // Transparent if: Transparency Bit = 1
@@ -112,6 +124,7 @@ protected:
 		TCR_COND_RF0KEY_0    = 0xd,         // Transparent if: Region Flag 0 = False && Color Key = False
 		TCR_COND_RF1KEY_0    = 0xe,         // Transparent if: Region Flag 1 = False && Color Key = False
 		TCR_COND_UNUSED1     = 0xf,         // Unused
+		TCR_DISABLE_MX       = 0x800000,    // Mix disable
 
 		POR_AB               = 0,           // Plane A in front of Plane B
 		POR_BA               = 1,           // Plane B in front of Plane A
@@ -123,32 +136,47 @@ protected:
 		RC_OP                = 0xf00000,    // Operation
 		RC_OP_SHIFT          = 20,
 
-		CSR1W_ST             = 0x0002,  // Standard
-		CSR1W_BE             = 0x0001,  // Bus Error
+		CSR1R_PA             = 0x20,        // Parity
+		CSR1R_DA             = 0x80,        // Display Active
 
-		CSR2R_IT1            = 0x0004,  // Interrupt 1
-		CSR2R_IT2            = 0x0002,  // Interrupt 2
-		CSR2R_BE             = 0x0001,  // Bus Error
+		CSR1W_BE             = 0x0001,      // Bus Error
+		CSR1W_ST_BIT         = 1,           // Standard
+		CSR1W_DD_BIT         = 3,
+		CSR1W_DD2            = 0x0300,      // /DTACK Delay
+		CSR1W_DD2_SHIFT      = 8,
+		CSR1W_DI1_BIT        = 15,
 
-		DCR_DE               = 0x8000,  // Display Enable
-		DCR_CF               = 0x4000,  // Crystal Frequency
-		DCR_FD               = 0x2000,  // Frame Duration
-		DCR_SM               = 0x1000,  // Scan Mode
-		DCR_CM               = 0x0800,  // Color Mode Ch.1/2
-		DCR_ICA              = 0x0200,  // ICA Enable Ch.1/2
-		DCR_DCA              = 0x0100,  // DCA Enable Ch.1/2
+		CSR2R_BE             = 0x0001,      // Bus Error
+		CSR2R_IT2            = 0x0002,      // Interrupt 2
+		CSR2R_IT1            = 0x0004,      // Interrupt 1
 
-		DDR_FT               = 0x0300,  // Display File Type
-		DDR_FT_BMP           = 0x0000,  // Bitmap
-		DDR_FT_BMP2          = 0x0100,  // Bitmap (alt.)
-		DDR_FT_RLE           = 0x0200,  // Run-Length Encoded
-		DDR_FT_MOSAIC        = 0x0300,  // Mosaic
-		DDR_MT               = 0x0c00,  // Mosaic File Type
-		DDR_MT_2             = 0x0000,  // 2x1
-		DDR_MT_4             = 0x0400,  // 4x1
-		DDR_MT_8             = 0x0800,  // 8x1
-		DDR_MT_16            = 0x0c00,  // 16x1
-		DDR_MT_SHIFT         = 10
+		DCR_DCA_BIT          = 8,           // DCA Enable Ch.1/2
+		DCR_ICA_BIT          = 9,           // ICA Enable Ch.1/2
+		DCR_CM_BIT           = 11,          // Color Mode Ch.1/2
+		DCR_SM_BIT           = 12,          // Scan Mode
+		DCR_FD_BIT           = 13,          // Frame Duration
+		DCR_CF_BIT           = 14,          // Crystal Frequency
+		DCR_DE_BIT           = 15,          // Display Enable
+
+		DDR_MT               = 0x0c00,      // Mosaic File Type
+		DDR_MT_2             = 0x0000,      // 2x1
+		DDR_MT_4             = 0x0400,      // 4x1
+		DDR_MT_8             = 0x0800,      // 8x1
+		DDR_MT_16            = 0x0c00,      // 16x1
+		DDR_MT_SHIFT         = 10,
+		DDR_FT               = 0x0300,      // Display File Type
+		DDR_FT_BMP           = 0x0000,      // Bitmap
+		DDR_FT_BMP2          = 0x0100,      // Bitmap (alt.)
+		DDR_FT_RLE           = 0x0200,      // Run-Length Encoded
+		DDR_FT_MOSAIC        = 0x0300,      // Mosaic
+
+		ICM_OFF              = 0x0,
+		ICM_CLUT8            = 0x1,
+		ICM_RGB555           = 0x2,
+		ICM_CLUT7            = 0x3,
+		ICM_CLUT77           = 0x4,
+		ICM_DYUV             = 0x5,
+		ICM_CLUT4            = 0xb
 	};
 
 	uint8_t m_csrr[2];
@@ -207,6 +235,8 @@ protected:
 	bool m_region_flag[2][768];
 	int m_ica_height;
 	int m_total_height;
+	emu_timer *m_ica_timer;
+	emu_timer *m_dca_timer;
 
 	static const uint32_t s_4bpp_color[16];
 
@@ -214,8 +244,9 @@ protected:
 	uint8_t get_region_op(const uint32_t region_idx);
 	void update_region_arrays();
 
-	void update_visible_area();
-	uint32_t get_screen_width();
+	int get_screen_width();
+	int get_border_width();
+	template <int Channel> int get_plane_width();
 
 	template <int Channel> void set_vsr(uint32_t value);
 	template <int Channel> uint32_t get_vsr();
@@ -239,7 +270,6 @@ protected:
 	template <bool MosaicA, bool MosaicB, bool OrderAB> void mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *plane_b, bool *transparent_b, uint32_t *out);
 
 	void draw_cursor(uint32_t *scanline);
-	void draw_scanline(bitmap_rgb32 &bitmap);
 };
 
 // device type definition

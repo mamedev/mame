@@ -12381,6 +12381,7 @@ modulab                         //
 @source:dietgo.cpp
 dietgo                          // MAY (c) 1993
 dietgoe                         // MAY (c) 1993
+dietgoea                        // MAY (c) 1993
 dietgoj                         // MAY (c) 1993
 dietgou                         // MAY (c) 1993
 
@@ -16157,6 +16158,9 @@ mspuzzlea                       // (c) 1994 Min Corp.
 mspuzzleb                       // (c) 1994 Min Corp.
 mspuzzleg                       // (c) 1994 Min Corp.
 
+@source:gumrally.cpp
+gumrally                        // Atari Games
+
 @source:gunbustr.cpp
 gunbustr                        // D27 (c) 1992 Taito Corporation Japan (World)
 gunbustrj                       // D27 (c) 1992 Taito Corporation (Japan)
@@ -16354,6 +16358,7 @@ lightfgt                        // Milton Bradley
 mdallas                         // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
+solution                        // SCAT
 unkeinv                         // Gordon Barlow Design
 vidchal                         // Select Merchandise
 
@@ -16439,6 +16444,7 @@ smastmind                       // Invicta
 atakaast                        // Elektronika
 auslalom                        // Elektronika
 bassmate                        // Telko
+biathlon                        // Elektronika
 ehockey                         // Elektronika
 gnw_ball                        // Nintendo
 gnw_bfight                      // Nintendo
@@ -16465,7 +16471,9 @@ gnw_flagman                     // Nintendo
 gnw_gcliff                      // Nintendo
 gnw_ghouse                      // Nintendo
 gnw_helmet                      // Nintendo
+gnw_helmeto                     // Nintendo
 gnw_judge                       // Nintendo
+gnw_judgeo                      // Nintendo
 gnw_lboat                       // Nintendo
 gnw_lion                        // Nintendo
 gnw_manhole                     // Nintendo
@@ -24052,7 +24060,8 @@ mps1000                         // 1986 Commodore MPS-1000 (dot matrix printer)
 mps1230                         // 1988 Commodore MPS-1230 near-letter-quality dot matrix printer
 
 @source:mpu12wbk.cpp
-fruitstb                        //
+fruitstb                        // 199? Webak
+fruitstba                       // 1997 Webak
 
 @source:mpu2.cpp
 m2hilite                        // Hi-Lights (Barcrest) (MPU2)
@@ -31186,6 +31195,15 @@ czmon_12                        // (c) 2003
 czmon_13                        // (c) 2003
 czmon_15                        // (c) 2003
 czmon_16                        // (c) 2003
+czmon_17                        // (c) 2003
+czmon_18                        // (c) 2003
+czmon_19                        // (c) 2003
+czmon_20                        // (c) 2003
+czmon_21                        // (c) 2003
+czmon_22                        // (c) 2003
+czmon_23                        // (c) 2003
+czmon_24                        // (c) 2003
+czmon_25                        // (c) 2003
 fcockt                          // (c) 2003
 fcockt_2                        // (c) 2003
 fcockt_3                        // (c) 2003
@@ -36185,6 +36203,7 @@ rastanua                        // B04 (c) 1987 Taito America Corporation (US)
 rastanub                        // B04 (c) 1987 Taito America Corporation (US)
 rastsaga                        // B04 (c) 1987 Taito Corporation (Japan)
 rastsagaa                       // B04 (c) 1987 Taito Corporation (Japan)
+rastsagaabl                     // bootleg
 rastsagab                       // B04 (c) 1987 Taito Corporation (Japan)
 
 @source:rastersp.cpp
@@ -39586,7 +39605,8 @@ orbitor1                        //
 quicksil                        //
 seawitch                        //
 spltsecp                        //
-st_game                         //
+st_sam                          //
+st_sam4                         //
 stargzr                         //
 viperp                          //
 

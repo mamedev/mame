@@ -324,7 +324,7 @@ void ibmpc_state::ibm5150(machine_config &config)
 	kbd.out_data_cb().set("mb", FUNC(ibm5150_mb_device::keyboard_data_w));
 
 	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("64K, 128K, 256K, 512K");
+	RAM(config, RAM_TAG).set_default_size("640K").set_extra_options("16K, 32K, 48K, 64K, 96K, 128K, 196K, 256K, 384K, 512K");
 
 	/* software lists */
 	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");

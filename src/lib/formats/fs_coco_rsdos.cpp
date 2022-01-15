@@ -116,7 +116,7 @@ u8 coco_rsdos_image::impl::maximum_granules() const
 {
 	u32 sector_count = m_blockdev.block_count();
 	u32 granule_count = (sector_count / 9) - 2;
-	return granule_count <= 0xFF ? (u8)granule_count : 0xFF;
+	return granule_count <= 0xFF ? u8(granule_count) : 0xFF;
 }
 
 std::string coco_rsdos_image::impl::get_filename_from_dirent(const rsdos_dirent &dirent)
@@ -180,7 +180,7 @@ coco_rsdos_image::impl::granule_iterator::granule_iterator(impl &fs, const rsdos
 	: m_granule_map(fs.read_sector(17, 2))
 	, m_current_granule(dirent.m_first_granule)
 	, m_maximum_granules(fs.maximum_granules())
-	, m_last_sector_bytes(((u16) dirent.m_last_sector_bytes_msb << 8) | dirent.m_last_sector_bytes_lsb)
+	, m_last_sector_bytes((u16(dirent.m_last_sector_bytes_msb) << 8) | dirent.m_last_sector_bytes_lsb)
 {
 }
 
@@ -206,7 +206,7 @@ bool coco_rsdos_image::impl::granule_iterator::next(u8 &granule, u16 &byte_count
 			// this is the last granule in the file
 			success = true;
 			granule = *m_current_granule;
-			u16 sector_count = std::max(granule_map_data[*m_current_granule], (u8)0xC1) - 0xC1;
+			u16 sector_count = std::max(granule_map_data[*m_current_granule], u8(0xC1)) - 0xC1;
 			byte_count = sector_count * 256 + m_last_sector_bytes;
 			m_current_granule = std::nullopt;
 		}
@@ -280,7 +280,7 @@ std::vector<u8> coco_rsdos_image::impl::file::read_all()
 			// read this sector
 			auto block = m_fs.read_sector(track, sector);
 			const u8 *data = block.rodata();
-			u16 data_length = std::min(byte_count, (u16)256);
+			u16 data_length = std::min(byte_count, u16(256));
 
 			// and append it to the results
 			memcpy(result.data() + current_size, data, data_length);

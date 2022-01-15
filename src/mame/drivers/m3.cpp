@@ -126,7 +126,7 @@ private:
 	void fdc_drq_w(int state);
 	uint8_t fdc_data_r(offs_t offset);
 	void fdc_data_w(offs_t offset, uint8_t data);
-	bool m_nmi_taken;
+	bool m_nmi_taken = 0;
 };
 
 

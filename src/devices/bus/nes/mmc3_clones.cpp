@@ -217,7 +217,7 @@ nes_sgboog_device::nes_sgboog_device(const machine_config &mconfig, const char *
 {
 }
 
-nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_kay_device::nes_kay_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_txrom_device(mconfig, NES_KAY, tag, owner, clock), m_low_reg(0)
 {
 }
@@ -562,9 +562,9 @@ void nes_kay_device::pcb_reset()
 {
 	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 
-	memset(m_reg, 0, sizeof(m_reg));
+	std::fill(std::begin(m_reg), std::end(m_reg), 0x00);
 	m_low_reg = 0;
-	mmc3_common_initialize(0xff, 0xff, 0);
+	mmc3_common_initialize(0x1f, 0xff, 0);
 }
 
 
@@ -1561,7 +1561,7 @@ void nes_sglionk_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
- Bootleg Board by Kay (for Panda Prince)
+ A9711/A9713 Bootleg Boards by Kay (for Panda Prince)
 
  Games: The Panda Prince, Sonic 3d Blast 6, SFZ2 '97, YuYu '97
  (and its title hack MK6), UMK3, Super Lion King 2
@@ -1570,136 +1570,88 @@ void nes_sglionk_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 121
 
- In MESS: Most game works, with some graphical issues.
+ In MAME: Supported.
+
+ TODO: Most of the fighting games have graphical issues
+ with backgrounds on some stages. Due to common timing
+ issue with PPU/MMC3? Super Lion King 2's title screen
+ is also inexplicably broken.
 
  -------------------------------------------------*/
 
-void nes_kay_device::write_l(offs_t offset, uint8_t data)
+void nes_kay_device::write_l(offs_t offset, u8 data)
 {
 	LOG_MMC(("kay write_l, offset: %04x, data: %02x\n", offset, data));
-	offset += 0x100;
 
+	offset += 0x100;
 	if (offset >= 0x1000)
+		m_low_reg = data & 0x03;
+
+	if ((offset & 0x1180) == 0x1180)  // only written by Super 3-in-1
 	{
-		switch (data & 0x03)
-		{
-			case 0x00:
-			case 0x01:
-				m_low_reg = 0x83;
-				break;
-			case 0x02:
-				m_low_reg = 0x42;
-				break;
-			case 0x03:
-				m_low_reg = 0x00;
-				break;
-		}
+		m_prg_base = (data & 0x80) >> 2;
+		set_prg(m_prg_base, m_prg_mask);
+		m_chr_base = m_prg_base << 3;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
 	}
 }
 
-uint8_t nes_kay_device::read_l(offs_t offset)
+u8 nes_kay_device::read_l(offs_t offset)
 {
 	LOG_MMC(("kay read_l, offset: %04x\n", offset));
+
+	static constexpr u8 prot_table[4] = {0x83, 0x83, 0x42, 0x00};
+
 	offset += 0x100;
-
 	if (offset >= 0x1000)
-		return m_low_reg;
+		return prot_table[m_low_reg];
 	else
-		return 0xff;
-}
-
-void nes_kay_device::update_regs()
-{
-	switch (m_reg[5] & 0x3f)
-	{
-		case 0x20:
-		case 0x29:
-		case 0x2b:
-		case 0x3f:
-			m_reg[7] = 1;
-			m_reg[1] = m_reg[6];
-			break;
-		case 0x26:
-			m_reg[7] = 0;
-			m_reg[1] = m_reg[6];
-			break;
-		case 0x2c:
-			m_reg[7] = 1;
-			if (m_reg[6])
-				m_reg[1] = m_reg[6];
-			break;
-
-		case 0x28:
-			m_reg[7] = 0;
-			m_reg[2] = m_reg[6];
-			break;
-
-		case 0x2a:
-			m_reg[7] = 0;
-			m_reg[3] = m_reg[6];
-			break;
-
-		case 0x2f:
-			break;
-
-		default:
-			m_reg[5] = 0;
-			break;
-	}
-}
-
-void nes_kay_device::prg_cb(int start, int bank)
-{
-	if (m_reg[5] & 0x3f)
-	{
-		prg8_x(start, bank & 0x3f);
-		prg8_ef(m_reg[1]);
-		prg8_cd(m_reg[2]);
-		prg8_ab(m_reg[3]);
-	}
-	else
-		prg8_x(start, bank & 0x3f);
+		return get_open_bus();
 }
 
 void nes_kay_device::chr_cb(int start, int bank, int source)
 {
-	uint8_t chr_page = (m_latch & 0x80) >> 5;
-
-	if ((start & 0x04) == chr_page)
-		bank |= 0x100;
-
+	bank |= (m_latch << 1) & (start << 6) & 0x100;
 	chr1_x(start, bank, source);
 }
 
-void nes_kay_device::write_h(offs_t offset, uint8_t data)
+void nes_kay_device::set_prg(int prg_base, int prg_mask)
+{
+	nes_txrom_device::set_prg(prg_base, prg_mask);
+
+	if (BIT(m_reg[4], 5))
+	{
+		prg8_ab(prg_base | m_reg[0]);
+		prg8_cd(prg_base | m_reg[1]);
+		prg8_ef(prg_base | m_reg[2]);
+	}
+}
+
+void nes_kay_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("kay write_h, offset: %04x, data: %02x\n", offset, data));
 
+	txrom_write(offset, data);
+
 	switch (offset & 0x6003)
 	{
-		case 0x0000:
-			txrom_write(offset, data);
-			set_prg(m_prg_base, m_prg_mask);
-			break;
-
 		case 0x0001:
-			m_reg[6] = (BIT(data, 0) << 5) | (BIT(data, 1) << 4) | (BIT(data, 2) << 3)
-			| (BIT(data, 3) << 2) | (BIT(data, 4) << 1) | BIT(data, 5);
-			if (!m_reg[7])
-				update_regs();
-			txrom_write(offset, data);
-			set_prg(m_prg_base, m_prg_mask);
+			m_reg[3] = bitswap<6>(data, 0, 1, 2, 3, 4, 5);
+			switch (m_reg[4])
+			{
+				case 0x26:
+				case 0x28:
+				case 0x2a:
+					m_reg[(0x2a - m_reg[4]) / 2] = m_reg[3];
+					set_prg(m_prg_base, m_prg_mask);
+					break;
+			}
 			break;
-
 		case 0x0003:
-			m_reg[5] = data;
-			update_regs();
-			txrom_write(0x0000, data);
+			m_reg[4] = data & 0x3f;
+			if (BIT(m_reg[4], 5) && m_reg[3])
+				m_reg[2] = m_reg[3];
 			set_prg(m_prg_base, m_prg_mask);
-			break;
-
-		default:
-			txrom_write(offset, data);
 			break;
 	}
 }

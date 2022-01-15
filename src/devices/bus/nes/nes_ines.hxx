@@ -961,6 +961,11 @@ void nes_cart_slot_device::call_load_ines()
 				m_cart->set_pcb_ctrl_mirror(true);
 			break;
 
+		case CONY_BOARD:
+			if (submapper == 0 || submapper == 2)
+				pcb_id = CONY1K_BOARD;
+			break;
+
 		case UNL_LH28_LH54:
 			if (vrom_size)
 				m_pcb_id = (vrom_size == 0x4000) ? UNL_LE05 : UNL_LH31;
@@ -1307,6 +1312,11 @@ const char * nes_cart_slot_device::get_default_card_ines(get_default_card_softwa
 		case BTL_MARIOBABY:
 			if (crc_hack)
 				pcb_id = BTL_AISENSHINICOL;    // Mapper 42 is used for 2 diff boards
+			break;
+
+		case CONY_BOARD:
+			if (submapper == 0 || submapper == 2)
+				pcb_id = CONY1K_BOARD;         // Mapper 83 is used for 3 diff boards
 			break;
 
 		case UNL_LH28_LH54:                            // Mapper 108 is used for 4 diff boards

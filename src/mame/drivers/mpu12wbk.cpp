@@ -729,8 +729,7 @@ ROM_START( fruitstba )
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "fruit1.ic37",  0x00000, 0x10000, CRC(c1834a6d) SHA1(ece1e47641087be342d3c5c092d8a7233ae871f3) )
 	ROM_LOAD( "fruit2.ic38",  0x10000, 0x10000, CRC(32d282a8) SHA1(792174d75dc7ec5f1e6f145539a5ec8e3953e1dd) )
-//  ROM_LOAD( "fruit3.ic39",  0x20000, 0x10000, CRC(311a6d4e) SHA1(62cf670b605906f7f4225905118524ee30d0e85b) )           // missing... two extra bitplanes.
-	ROM_LOAD( "fruit3.ic39",  0x20000, 0x10000, BAD_DUMP CRC(81ad7752) SHA1(b5be715c9c1e0c20f63bfb2f9dcbadafe758a098) )  // borrowed from parent.
+	ROM_LOAD( "fruit3.ic39",  0x20000, 0x10000, CRC(311a6d4e) SHA1(62cf670b605906f7f4225905118524ee30d0e85b) )           // two extra bitplanes.
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )

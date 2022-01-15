@@ -208,7 +208,7 @@ u32 coco_os9_image::pick_integer_be(const u8 *data, int length)
 {
 	u32 result = 0;
 	for (int i = 0; i < length; i++)
-		result |= ((u32)data[length - i - 1]) << i * 8;
+		result |= u32(data[length - i - 1]) << i * 8;
 	return result;
 }
 
@@ -406,7 +406,7 @@ std::vector<u8> coco_os9_image::impl::read_file_data(const file_header &header) 
 		for (u32 lsn = start_lsn; lsn < start_lsn + count; lsn++)
 		{
 			auto block = m_blockdev.get(lsn);
-			size_t block_size = std::min(std::min((u32)m_volume_header.sector_size(), block.size()), header.file_size() - (u32)data.size());
+			size_t block_size = std::min(std::min(u32(m_volume_header.sector_size()), block.size()), header.file_size() - u32(data.size()));
 			for (auto i = 0; i < block_size; i++)
 				data.push_back(block.rodata()[i]);
 		}
@@ -525,7 +525,7 @@ std::vector<dir_entry> coco_os9_image::impl::directory::contents()
 
 filesystem_t::file_t coco_os9_image::impl::directory::file_get(u64 key)
 {
-	file_header header(m_fs.m_blockdev.get((u32) key));
+	file_header header(m_fs.m_blockdev.get(u32(key)));
 	return file_t(new file(m_fs, std::move(header)));
 }
 
@@ -536,7 +536,7 @@ filesystem_t::file_t coco_os9_image::impl::directory::file_get(u64 key)
 
 filesystem_t::dir_t coco_os9_image::impl::directory::dir_get(u64 key)
 {
-	return dir_t(m_fs.open_directory((u32) key));
+	return dir_t(m_fs.open_directory(u32(key)));
 }
 
-}
+} // namespace fs

@@ -7,9 +7,7 @@ Gottlieb System 80A
 
 Same as system 80, except that the displays have 7 digits.
 
-Most games start up and will accept credits, and the test mode works.
-
-Many games are multiball, and therefore may not respond further to inputs.
+Most games start up and will accept credits, and the test mode works. See key codes below.
 
 Caveman is missing its joystick. Need the manual. The video-pinball interface has not been written.
  If you turn on DIPS6,7,8, you can enter test mode, insert coins and start a game.
@@ -20,6 +18,31 @@ Rocky has a habit of locking up. Have to reboot the machine with F3.
 Sound is wrong in all games.
 
 Note: If DIP28 is set to Novelty, then Match doesn't work.
+
+Here are the key codes to enable play:
+
+Game                 NUM  Start game                                       End ball
+--------------------------------------------------------------------------------------------------
+Devil's Dare         670  1, then hold .enter hit pad-                     .enter hit pad-
+Rocky                672  1                                                X
+Spirit               673  unknown                                          unknown
+Punk!                674  unknown                                          unknown
+Striker              675  unknown                                          unknown
+Krull                676  1, then jiggle X and Y until you hear a sound    X
+Qbert's Quest        677  1                                                X
+Super Orbit          680  1                                                X
+Royal Flush Deluxe   681  1                                                X
+Going Nuts           682  unknown                                          unknown
+Amazon Hunt          684  1                                                X
+Rack 'Em Up          685  unknown                                          unknown (should be like Rocky, but doesn't work)
+Ready Aim Fire       686  1                                                X
+Jacks to Open        687  1                                                X
+Touchdown            688  1                                                X
+Alien Star           689  unknown                                          unknown
+The Games            691  1                                                X
+El Dorado            692  1                                                X
+Ice Fever            695  unknown                                          unknown
+Caveman              810  unknown                                          unknown
 
 *****************************************************************************************************************/
 
@@ -356,7 +379,7 @@ void gts80a_state::port3a_w(u8 data)
 	data ^= 0x1f;   // Z27 inverter
 	// Sound
 	u8 sndcmd = data & 15;
-	if (BIT(data, 4))  // Z31
+	if (!BIT(data, 4))  // Z31
 		sndcmd = 0;
 
 	sndcmd ^= 15;  // inverted again by Z13 on the A3 board

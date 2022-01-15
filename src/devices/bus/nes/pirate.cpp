@@ -63,12 +63,12 @@ nes_fukutake_device::nes_fukutake_device(const machine_config &mconfig, const ch
 {
 }
 
-nes_futuremedia_device::nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_FUTUREMEDIA, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+nes_futuremedia_device::nes_futuremedia_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_FUTUREMEDIA, tag, owner, clock), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }
 
-nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+nes_magseries_device::nes_magseries_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_MAGSERIES, tag, owner, clock)
 {
 }
@@ -158,7 +158,6 @@ void nes_fukutake_device::pcb_reset()
 void nes_futuremedia_device::device_start()
 {
 	common_start();
-	save_item(NAME(m_irq_clear));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
@@ -166,26 +165,12 @@ void nes_futuremedia_device::device_start()
 
 void nes_futuremedia_device::pcb_reset()
 {
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
 	prg16_89ab(0);
 	prg16_cdef(m_prg_chunks - 1);
-	chr8(0, m_chr_source);
+	chr8(0, CHRROM);
 
-	m_irq_clear = 0;
 	m_irq_enable = 0;
 	m_irq_count = m_irq_count_latch = 0;
-}
-
-void nes_magseries_device::device_start()
-{
-	common_start();
-}
-
-void nes_magseries_device::pcb_reset()
-{
-	m_chr_source = m_vrom_chunks ? CHRROM : CHRRAM;
-	prg32(0);
-	chr8(0, m_chr_source);
 }
 
 void nes_daou306_device::device_start()
@@ -406,7 +391,7 @@ uint8_t nes_fukutake_device::read_m(offs_t offset)
 
  iNES: mapper 117
 
- In MESS: Unsupported.
+ In MAME: Partially supported.
 
  -------------------------------------------------*/
 
@@ -418,28 +403,22 @@ void nes_futuremedia_device::hblank_irq(int scanline, int vblank, int blanked)
 		{
 			m_irq_count--;
 			if (!m_irq_count)
-				hold_irq_line();
+				set_irq_line(ASSERT_LINE);
 		}
 	}
 }
 
-void nes_futuremedia_device::write_h(offs_t offset, uint8_t data)
+void nes_futuremedia_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("futuremedia write_h, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 		case 0x0000:
-			prg8_89(data);
-			break;
 		case 0x0001:
-			prg8_ab(data);
-			break;
 		case 0x0002:
-			prg8_cd(data);
-			break;
 		case 0x0003:
-			prg8_ef(data);
+			prg8_x(offset & 0x03, data);
 			break;
 		case 0x2000:
 		case 0x2001:
@@ -451,22 +430,21 @@ void nes_futuremedia_device::write_h(offs_t offset, uint8_t data)
 		case 0x2007:
 			chr1_x(offset & 0x07, data, CHRROM);
 			break;
-
-		case 0x5000:
-			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			break;
-
 		case 0x4001:
 			m_irq_count_latch = data;
 			break;
 		case 0x4002:
-			// IRQ cleared
+			set_irq_line(CLEAR_LINE);
 			break;
 		case 0x4003:
 			m_irq_count = m_irq_count_latch;
 			break;
+		case 0x5000:
+			set_nt_mirroring(BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			break;
 		case 0x6000:
 			m_irq_enable = data & 0x01;
+			set_irq_line(CLEAR_LINE);
 			break;
 	}
 }
@@ -482,11 +460,11 @@ void nes_futuremedia_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 107
 
- In MESS: Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
 
-void nes_magseries_device::write_h(offs_t offset, uint8_t data)
+void nes_magseries_device::write_h(offs_t offset, u8 data)
 {
 	LOG_MMC(("magseries write_h, offset: %04x, data: %02x\n", offset, data));
 

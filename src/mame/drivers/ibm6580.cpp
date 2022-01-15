@@ -165,17 +165,20 @@ private:
 	void p40_w(offs_t offset, uint8_t data);
 	uint8_t p40_r(offs_t offset);
 
+	void gate_open_w(offs_t offset, uint8_t data);
+	void gate_close_w(offs_t offset, uint8_t data);
+
 	void video_w(offs_t offset, uint8_t data);
 	uint8_t video_r(offs_t offset);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
-	uint8_t ppi_a_r();
+	uint8_t kb_data_r();
 	void led_w(uint8_t data);
 	void ppi_c_w(uint8_t data);
-	uint8_t ppi_c_r();
 
 	DECLARE_WRITE_LINE_MEMBER(kb_data_w);
 	DECLARE_WRITE_LINE_MEMBER(kb_clock_w);
+	DECLARE_WRITE_LINE_MEMBER(kb_clock_w_internal);
 	DECLARE_WRITE_LINE_MEMBER(kb_strobe_w);
 
 	void floppy_w(offs_t offset, uint8_t data);
@@ -192,9 +195,10 @@ private:
 	void ibm6580_io(address_map &map);
 	void ibm6580_mem(address_map &map);
 
-	uint8_t m_p40, m_p50, m_e000, m_kb_data, m_ppi_c;
-	bool m_kb_data_bit, m_kb_strobe;
-	util::fifo<uint8_t, 4> m_kb_fifo;
+	uint16_t m_gate;
+	uint8_t m_p40, m_p4a, m_p50, m_e000;
+	uint8_t m_kb_data, m_ppi_c;
+	bool m_kb_data_bit, m_kb_strobe, m_kb_clock;
 
 	util::fifo<uint8_t, 4> m_floppy_mcu_sr, m_floppy_mcu_cr;
 	int m_floppy_mcu_cr_fifo;
@@ -225,7 +229,7 @@ private:
 
 void ibm6580_state::p40_w(offs_t offset, uint8_t data)
 {
-	LOG("___ %02x <- %02x\n", 0x40 + (offset << 1), data);
+	LOG("___ %02x(%d) <- %02x\n", 0x40 + (offset << 1), offset, data);
 
 	switch (offset)
 	{
@@ -238,6 +242,16 @@ void ibm6580_state::p40_w(offs_t offset, uint8_t data)
 			m_p40 |= 4;
 		break;
 
+	case 3:
+		m_dma8257->dreq0_w(BIT(data, 0));
+		m_dma8257->dreq1_w(BIT(data, 1));
+		m_dma8257->dreq2_w(BIT(data, 2));
+		break;
+
+	case 4:
+		m_dma8257->dreq3_w(BIT(data, 0));
+		break;
+
 	case 5:
 		// write_gate0 doesn't work -- counter is read back as 0
 		if (BIT(data, 2))
@@ -245,8 +259,8 @@ void ibm6580_state::p40_w(offs_t offset, uint8_t data)
 			m_pit8253->set_clockin(0, (double)26880000);
 		else
 			m_pit8253->set_clockin(0, 0.0);
+		m_p4a = data;
 		m_p50 = 0;
-		m_ppi_c = data;
 		break;
 
 	case 6:
@@ -284,6 +298,34 @@ uint8_t ibm6580_state::p40_r(offs_t offset)
 	LOGDBG("___ %02x == %02x\n", 0x40 + (offset << 1), data);
 
 	return data;
+}
+
+void ibm6580_state::gate_open_w(offs_t offset, uint8_t data)
+{
+	LOG("___ %02x(%d) <- %02x\n", 0x60 + (offset << 1), offset, data);
+
+	m_gate |= (1 << offset);
+
+	switch (offset)
+	{
+	case 10:
+		m_kbd->reset_w(1);
+		break;
+	}
+}
+
+void ibm6580_state::gate_close_w(offs_t offset, uint8_t data)
+{
+	LOG("___ %04x(%d) <- %02x\n", 0x8060 + (offset << 1), offset, data);
+
+	m_gate &= ~(1 << offset);
+
+	switch (offset)
+	{
+	case 10:
+		m_kbd->reset_w(0);
+		break;
+	}
 }
 
 void ibm6580_state::video_w(offs_t offset, uint8_t data)
@@ -363,6 +405,11 @@ void ibm6580_state::led_w(uint8_t data)
 	for (int i = 0; i < 4; i++)
 		m_leds[i] = BIT(data, 7 - i);
 
+	if (!BIT(m_p4a, 0))
+	{
+		kb_clock_w_internal(BIT(data, 1));
+	}
+
 	if (data & 0xf)
 		return;
 
@@ -420,58 +467,82 @@ void ibm6580_state::led_w(uint8_t data)
 
 void ibm6580_state::ppi_c_w(uint8_t data)
 {
-	LOG("PPI Port C <- %02x\n", data);
+	uint8_t diff = m_ppi_c ^ data;
 
-	// bit 5 -- acknowledge
-	// bit 6 -- reset
-	// bit 7 -- ?? gate
+	LOGKBD("PPI Port C %02x <- %02x\n", m_ppi_c, data);
 
-	if (!BIT(data, 6)) {
-		m_kb_fifo.clear();
+	m_ppi_c = data;
+
+	// bit 3 -- mode 1 INTR.A out
+	// bit 4 -- mode 1 INTE
+	// bit 5 -- mode 1 IBF.A out
+	// bit 6 -- I/O out = reset || to data input of keyboard shift register
+	// bit 7 -- I/O out = invert bit 6
+
+	// normal operation
+	if (BIT(m_p4a, 0))
+	{
+		// Port A IBF bit
+		m_kbd->ack_w(BIT(data, 5));
+
+		// 0 = reset
+		m_kbd->reset_w(BIT(data, 6));
+
+		return;
 	}
 
-	m_kbd->reset_w(!BIT(data, 6));
-	m_kbd->ack_w(BIT(data, 5));
+	// self-tests
+	m_kb_data_bit = BIT(data, 6) ^ !BIT(m_ppi_c, 7);
+	if (BIT(diff, 6)) m_ppi8255->pc4_w(!m_kb_data_bit);
 }
 
-uint8_t ibm6580_state::ppi_c_r()
+uint8_t ibm6580_state::kb_data_r()
 {
-	uint8_t data = 0;
+	uint8_t data = m_kb_data;
 
-	data |= (m_kb_strobe << 3);
-
-	LOGDBG("PPI Port C == %02x\n", data);
-
-	return data;
-}
-
-uint8_t ibm6580_state::ppi_a_r()
-{
-	uint8_t data = m_kb_fifo.dequeue();
-
-	LOG("PPI Port A == %02x (fifo full: %d)\n", data, m_kb_fifo.full());
+	LOGKBD("PPI Port A == %02x\n", data);
 
 	return data;
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::kb_data_w)
 {
+	if (!BIT(m_p4a, 0)) return;
+
 	m_kb_data_bit = !state;
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w)
 {
+	if (!BIT(m_p4a, 0)) return;
+
+	kb_clock_w_internal(state);
+}
+
+WRITE_LINE_MEMBER(ibm6580_state::kb_clock_w_internal)
+{
+	if (m_kb_clock == state) return;
+	m_kb_clock = state;
+
 	if (!state)
+	{
 		m_kb_data = (m_kb_data >> 1) | (m_kb_data_bit << 7);
+		LOGKBD("Kbd clock %d data %d -> %02x\n", state, m_kb_data_bit, m_kb_data);
+	}
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::kb_strobe_w)
 {
-	m_kb_strobe = !state;
-	if (!state && BIT(m_ppi_c, 0)) {
-		m_kb_fifo.enqueue(m_kb_data);
-		LOGKBD("Kbd enqueue %02x (fifo full: %d, m_ppi_c %02x)\n", m_kb_data, m_kb_fifo.full(), m_ppi_c);
+	if (!BIT(m_p4a, 0)) return;
+
+	if (m_kb_strobe != state)
+	LOGKBD("Kbd strobe %d data %02x\n", state, m_kb_data);
+	m_kb_strobe = state;
+	if (!state)
+	{
+		LOGKBD("Kbd enqueue %02x (m_ppi_c %02x)\n", m_kb_data, m_ppi_c);
 	}
+	m_ppi8255->pc4_w(m_kb_strobe);
 }
 
 WRITE_LINE_MEMBER(ibm6580_state::floppy_intrq)
@@ -695,14 +766,14 @@ void ibm6580_state::ibm6580_io(address_map &map)
 	map(0x0010, 0x0017).rw(m_ppi8255, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0020, 0x003f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
 	map(0x0040, 0x005f).rw(FUNC(ibm6580_state::p40_r), FUNC(ibm6580_state::p40_w)).umask16(0x00ff);
-	map(0x0070, 0x007f).unmaprw();
+	map(0x0060, 0x007f).w(FUNC(ibm6580_state::gate_open_w)).umask16(0xff);
 	map(0x0120, 0x0127).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	map(0x0140, 0x0143).rw("upd8251a", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x0160, 0x0163).rw("upd8251b", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0x4000, 0x400f).unmaprw();
 	map(0x5000, 0x500f).unmaprw();
 	map(0x6000, 0x601f).unmaprw();
-	map(0x8060, 0x807f).unmaprw();
+	map(0x8060, 0x807f).w(FUNC(ibm6580_state::gate_close_w)).umask16(0xff);
 	map(0x8150, 0x815f).rw(FUNC(ibm6580_state::floppy_r), FUNC(ibm6580_state::floppy_w)).umask16(0x00ff);  // HLE of floppy board
 	map(0x81a0, 0x81af).unmaprw();
 	map(0xc000, 0xc00f).unmaprw();
@@ -837,10 +908,12 @@ void ibm6580_state::machine_start()
 
 void ibm6580_state::machine_reset()
 {
-	m_p40 = m_p50 = m_e000 = m_ppi_c = m_floppy_sr = 0;
+	m_p40 = m_p4a = m_p50 = m_gate = m_e000 = m_ppi_c = m_floppy_sr = 0;
 	m_kb_data_bit = false;
+	m_kb_clock = false;
+	m_kb_strobe = true;
+	m_kb_data = 0;
 	m_floppy_idle = true;
-	m_kb_fifo.clear();
 
 	m_pit8253->set_clockin(0, 0.0);
 
@@ -867,10 +940,13 @@ static void dw_floppies(device_slot_interface &device)
 
 void ibm6580_state::ibm6580(machine_config &config)
 {
-	I8086(config, m_maincpu, 14.7456_MHz_XTAL / 3);
+	I8086(config, m_maincpu, 14.7456_MHz_XTAL / 3); // XTAL is confirmed, divisor is not
 	m_maincpu->set_addrmap(AS_PROGRAM, &ibm6580_state::ibm6580_mem);
 	m_maincpu->set_addrmap(AS_IO, &ibm6580_state::ibm6580_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+
+	// DMA tests need this
+	config.set_perfect_quantum(m_maincpu);
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("160K,192K,224K,256K,320K,384K");
 
@@ -887,11 +963,12 @@ void ibm6580_state::ibm6580(machine_config &config)
 	PIC8259(config, m_pic8259, 0);
 	m_pic8259->out_int_callback().set_inputline(m_maincpu, 0);
 
-	i8255_device &ppi(I8255(config, "ppi8255"));
-	ppi.in_pa_callback().set(FUNC(ibm6580_state::ppi_a_r));
-	ppi.out_pb_callback().set(FUNC(ibm6580_state::led_w));
-	ppi.out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
-	ppi.in_pc_callback().set(FUNC(ibm6580_state::ppi_c_r));
+	I8255(config, m_ppi8255);
+	m_ppi8255->in_pa_callback().set(FUNC(ibm6580_state::kb_data_r));
+	m_ppi8255->out_pb_callback().set(FUNC(ibm6580_state::led_w));
+	m_ppi8255->out_pc_callback().set(FUNC(ibm6580_state::ppi_c_w));
+	m_ppi8255->tri_pa_callback().set_constant(0);
+	m_ppi8255->tri_pc_callback().set_constant(0);
 
 	PIT8253(config, m_pit8253, 0);
 
@@ -899,7 +976,6 @@ void ibm6580_state::ibm6580(machine_config &config)
 	m_kbd->out_data_handler().set(FUNC(ibm6580_state::kb_data_w));
 	m_kbd->out_clock_handler().set(FUNC(ibm6580_state::kb_clock_w));
 	m_kbd->out_strobe_handler().set(FUNC(ibm6580_state::kb_strobe_w));
-	m_kbd->out_strobe_handler().append(m_ppi8255, FUNC(i8255_device::pc4_w));
 
 	I8257(config, m_dma8257, 14.7456_MHz_XTAL / 3);
 	m_dma8257->out_hrq_cb().set(FUNC(ibm6580_state::hrq_w));

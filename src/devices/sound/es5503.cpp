@@ -326,7 +326,7 @@ u8 es5503_device::read(offs_t offset)
 				m_irq_func(0);
 
 				// scan all oscillators
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -342,7 +342,7 @@ u8 es5503_device::read(offs_t offset)
 				}
 
 				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < oscsenabled+1; i++)
+				for (i = 0; i < oscsenabled; i++)
 				{
 					if (oscillators[i].irqpend)
 					{
@@ -354,7 +354,7 @@ u8 es5503_device::read(offs_t offset)
 				return retval | 0x41;
 
 			case 0xe1:  // oscillator enable
-				return oscsenabled<<1;
+				return (oscsenabled - 1) << 1;
 
 			case 0xe2:  // A/D converter
 				return m_adc_func();

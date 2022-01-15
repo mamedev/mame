@@ -159,6 +159,7 @@ static const nes_pcb pcb_list[] =
 	{ "waixing_sh2",      WAIXING_SH2 },
 	{ "fs304",            WAIXING_FS304 },   // used in Zelda 3 by Waixing
 	{ "cony",             CONY_BOARD },
+	{ "cony1k",           CONY1K_BOARD },
 	{ "yoko",             YOKO_BOARD },
 	{ "hengg_srich",      HENGG_SRICH },
 	{ "hengg_xhzs",       HENGG_XHZS },
