@@ -9158,20 +9158,20 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size = "368640">
 			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "368640">
 				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 2 of 4] [Data Disk].img" size="368640" crc="003b1314" sha1="3f4342e4a82f12f05922dddc0470a151bf03c7c0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Introduction Disk" />
 			<dataarea name="flop" size = "368640">
-				<feature name="part_id" value="Introduction Disk" />
 				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 3 of 4] [Introduction Disk].img" size="368640" crc="7c0a61e5" sha1="92c6ed6aeca6f1b1146c8e709e424bef6cd02848"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Messenger Disk" />
 			<dataarea name="flop" size = "368640">
-				<feature name="part_id" value="Messenger Disk" />
 				<rom name="Castles [Interplay] [1991] [5.25DD] [Disk 4 of 4] [Messenger Disk].img" size="368640" crc="be818299" sha1="12798c9a25d3c296f663c6972d48536fa41e3fbf"/>
 			</dataarea>
 		</part>
@@ -9190,8 +9190,8 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<dataarea name="flop" size = "737280">
 			<feature name="part_id" value="Data Disk" />
+			<dataarea name="flop" size = "737280">
 				<rom name="Castles [Interplay] [1991] [3.5DD] [Disk 2 of 2] [Data Disk].img" size="737280" crc="a539c801" sha1="263dd2213e7d7e19aca72c5dd33e2e4a5492b98c"/>
 			</dataarea>
 		</part>
